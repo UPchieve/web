@@ -1,6 +1,6 @@
-> BelieveAchieve web client
+# BelieveAchieve web client
 
-Online tutoring platform built with Vue.js and Webpack
+> Online tutoring platform built with Vue.js and Webpack
 
 ## Build Setup
 
