@@ -11,6 +11,10 @@
 import 'bootstrap/dist/css/bootstrap.css'
 import Navbar from './components/Navbar'
 
+import AuthService from './services/AuthService';
+
+AuthService.checkAuth();
+
 export default {
   name: 'app',
   components: {

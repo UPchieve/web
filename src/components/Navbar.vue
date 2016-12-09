@@ -15,6 +15,7 @@
 
           <router-link to="/about" tag="li"><a>About</a></router-link>
           <router-link to="/login" tag="li"><a>Login</a></router-link>
+          <router-link to="/signup" tag="li"><a>Signup</a></router-link>
         </ul>
       </div>
     </div>
