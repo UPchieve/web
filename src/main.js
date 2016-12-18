@@ -10,14 +10,16 @@ Vue.use(VueRouter)
 import About from './components/About'
 import LoginForm from './components/LoginForm'
 import SignupForm from './components/SignupForm'
+import Onboarding from './components/Onboarding'
 
 import AuthService from './services/AuthService'
 
 const routes = [
   { path: '/', redirect: '/about' },
-  { path: '/about', component: About, meta: { protected: true } },
+  { path: '/about', component: About },
   { path: '/login', component: LoginForm },
-  { path: '/signup', component: SignupForm }
+  { path: '/signup', component: SignupForm },
+  { path: '/onboarding', component: Onboarding, meta: { protected: true } }
 ]
 
 const router = new VueRouter({

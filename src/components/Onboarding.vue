@@ -4,7 +4,7 @@
 
 <script>
 
-import SendVerification from 'Onboarding/SendVerification';
+import SendVerification from './Onboarding/SendVerification';
 
 // TODO: UserService to choose starting onboarding step based on user state
 

@@ -10,9 +10,6 @@ import AuthService from '../services/AuthService';
 import EmailVerification from 'Onboarding/EmailVerification';
 
 export default {
-  components: {
-    OnboardingStep()
-  }
 }
 </script>
 

@@ -6,12 +6,7 @@
 
 <script>
 
-// TODO: VerificationService to send email
-
 export default {
-  components: {
-    OnboardingStep()
-  }
 }
 </script>
 
