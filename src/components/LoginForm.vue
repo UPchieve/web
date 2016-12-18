@@ -1,17 +1,18 @@
 <template>
   <form class="form-signin">
-        <h2 class="form-signin-heading">Please sign in</h2>
-        <label for="inputEmail" class="sr-only">Email address</label>
-        <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus v-model="credentials.email">
-        <label for="inputPassword" class="sr-only">Password</label>
-        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required v-model="credentials.password">
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" value="remember-me"> Remember me
-          </label>
-        </div>
-        <button class="btn btn-lg btn-primary btn-block" type="submit" @click="submit()">Sign in</button>
-      </form>
+    <h2 class="form-signin-heading">Please sign in</h2>
+    <label for="inputEmail" class="sr-only">Email address</label>
+    <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus v-model="credentials.email">
+    <label for="inputPassword" class="sr-only">Password</label>
+    <input type="password" id="inputPassword" class="form-control" placeholder="Password" required v-model="credentials.password">
+    <!-- <div class="checkbox">
+      <label>
+        <input type="checkbox" value="remember-me"> Remember me
+      </label>
+    </div> -->
+    <button class="btn btn-lg btn-primary btn-block" type="submit" @click="submit">Sign in</button>
+    <p class="error" v-if="error">{{error}}</p>
+  </form>
 </template>
 
 <script>
@@ -23,7 +24,8 @@ export default {
       credentials: {
         email: '',
         password: ''
-      }
+      },
+      error: ''
     }
   },
   methods: {
@@ -31,7 +33,16 @@ export default {
       AuthService.login(this, {
         email: this.credentials.email,
         password: this.credentials.password
-      })
+      }, 'about')
+    }
+  },
+  beforeRouteEnter(to, from, next) {
+    if (AuthService.isAuthenticated){
+      next({
+        path: '/'
+      });
+    } else {
+      next();
     }
   }
 }

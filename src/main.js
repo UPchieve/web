@@ -11,16 +11,39 @@ import About from './components/About'
 import LoginForm from './components/LoginForm'
 import SignupForm from './components/SignupForm'
 
+import AuthService from './services/AuthService'
+
 const routes = [
   { path: '/', redirect: '/about' },
-  { path: '/about', component: About },
+  { path: '/about', component: About, meta: { protected: true } },
   { path: '/login', component: LoginForm },
   { path: '/signup', component: SignupForm }
 ]
 
-export const router = new VueRouter({
+const router = new VueRouter({
   routes,
   linkActiveClass: 'active'
+});
+
+export {router}; // Expose router to app controllers
+
+// Router middleware to check authentication for protect routes
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(route => route.meta.protected)){
+    if (!AuthService.isAuthenticated){
+      console.log('Protected route requires login');
+      next({
+        path: '/login',
+        query: {
+          redirect: to.fullPath
+        }
+      });
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
 });
 
 import App from './App'

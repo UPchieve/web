@@ -14,8 +14,9 @@
         <ul class="nav navbar-nav">
 
           <router-link to="/about" tag="li"><a>About</a></router-link>
-          <router-link to="/login" tag="li"><a>Login</a></router-link>
-          <router-link to="/signup" tag="li"><a>Signup</a></router-link>
+          <router-link to="/login" tag="li" v-if="!authenticated"><a>Login</a></router-link>
+          <router-link to="/signup" tag="li" v-if="!authenticated"><a>Signup</a></router-link>
+          <li v-if="authenticated"><a v-on:click="logout" class="logout">Logout</a></li>
         </ul>
       </div>
     </div>
@@ -23,7 +24,21 @@
 </template>
 
 <script>
+
+import AuthService from '../services/AuthService';
+
 export default {
+  data() {
+    console.log(AuthService.isAuthenticated);
+    return {
+      authenticated: AuthService.isAuthenticated
+    }
+  },
+  methods: {
+    logout(){
+      AuthService.logout();
+    }
+  }
 }
 </script>
 
@@ -45,5 +60,9 @@ li {
 
 a {
   color: #42b983;
+}
+
+a.logout {
+  cursor: pointer;
 }
 </style>
