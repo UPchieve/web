@@ -33,7 +33,7 @@ export default {
       AuthService.login(this, {
         email: this.credentials.email,
         password: this.credentials.password
-      }, 'about')
+      }, this.$route.query.redirect)
     }
   },
   beforeRouteEnter(to, from, next) {
