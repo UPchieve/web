@@ -19,6 +19,7 @@ const routes = [
   { path: '/about', component: About },
   { path: '/login', component: LoginForm },
   { path: '/signup', component: SignupForm },
+  { path: '/whiteboard', component: Whiteboard},
   { path: '/onboarding', component: Onboarding, meta: { protected: true } }
 ]
 
