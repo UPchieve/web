@@ -11,6 +11,7 @@ import About from './components/About'
 import LoginForm from './components/LoginForm'
 import SignupForm from './components/SignupForm'
 import Onboarding from './components/Onboarding'
+import Whiteboard from './components/Whiteboard'
 
 import AuthService from './services/AuthService'
 
