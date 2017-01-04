@@ -98,19 +98,53 @@ export default {
       App.canvas.height=400;
       App.ctx = App.canvas.getContext('2d');
       App.ctx.font = 'bold 16px Arial';
-      if (imageList.length>0) {
+
+      /*if (imageList.length>0) {
         imageData = imageList.pop();
         App.ctx.putImageData(imageData, 0, 0);
       }
+      
       TEXT_POSITION_X = event.layerX-10;
       TEXT_POSITION_Y = event.layerY+34;
       App.ctx.fillText('|', TEXT_POSITION_X, TEXT_POSITION_Y);
-      this.$el.querySelector('#textInputBox').value='';
+      this.$el.querySelector('#textInputBox').value=''; */
+
+
+      if (!CURSOR_VISIBLE && INSERTING_TEXT) {
+        TEXT_POSITION_X = event.layerX-10;
+        TEXT_POSITION_Y = event.layerY+34;
+        CURSOR_VISIBLE = true;
+        //App.socket.emit('saveImage');
+        if (imageList.length>0) {
+          console.log('PUTTING NEW IMAGE ON SCREEN');
+          imageData = imageList[imageList.length-1];
+          App.ctx.putImageData(imageData, 0, 0);
+        } else {
+          imageData = App.ctx.getImageData(0,0,App.canvas.width,App.canvas.height);
+        }
+        
+        imageList.push(imageData);
+        App.ctx.fillText('|', TEXT_POSITION_X, TEXT_POSITION_Y);
+        /*App.socket.emit('insertText', {
+          text: '|',
+          x: TEXT_POSITION_X,
+          y: TEXT_POSITION_Y
+        });*/
+        CURSOR_REMOVED = false;
+      }
 
     }, 
 
     text: function() {
+      var App = {};
+      App.canvas = this.$el.querySelector('#whiteboard');
+      App.ctx = App.canvas.getContext('2d');
+      saveImage(App.canvas, App.ctx);
+      INSERTING_TEXT = true;
+      CURSOR_VISIBLE = false;
+      App.canvas.style.cursor = TEXT_ICON;
       this.$el.querySelector('#textInputBox').style.visibility='visible';
+      this.$el.querySelector('#textInputBox').value='';
 
     },
 
@@ -128,9 +162,15 @@ function insertText(canvas, input) {
   App.ctx = App.canvas.getContext('2d');
   App.ctx.font = 'bold 16px Arial';
   App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
+  
+  if (imageList.length>0) {
+      
+      imageData = imageList.pop();
+      App.ctx.putImageData(imageData, 0, 0);
+      imageList.push(imageData);
+      
+  } 
   App.ctx.fillText(input, TEXT_POSITION_X, TEXT_POSITION_Y);
-  saveImage(App.canvas, App.ctx);
-
 }
 
 function saveImage(canvas, ctx) {
