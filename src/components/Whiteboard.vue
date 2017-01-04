@@ -1,10 +1,10 @@
 <template>
 	<body>
-		<canvas id='whiteboard' v-on:click="cursor"></canvas>
+		<canvas id='whiteboard' v-on:mousedown="drawStart" v-on:mouseup="drawEnd" v-on:mousemove="draw"></canvas>
 		<button id='clearButton' v-on:click="clear" ></button>
-		<button id='drawButton'></button>
-		<button id='undoButton'></button>
-		<button id='eraseButton'></button>
+		<button id='drawButton' v-on:click="drawSetup"></button>
+		<button id='undoButton' v-on:click="undo"></button>
+		<button id='eraseButton' v-on:click="erase"></button>
 		<button id='textButton' v-on:click="text"></button>
 		<button id='blueButton' class='colorButton' v-on:click="color" style='padding:0px;margin:0px;width:28px;height:28px;background-color:blue;'></button>
 		<button id='redButton' class='colorButton' v-on:click="color" style='padding:0px;margin:0px;width:28px;height:28px;background-color:red;'></button>
@@ -55,8 +55,10 @@ var ERASING = false;
 var ERASING_LINE_COLOR = 'white';
 var ERASING_LINE_WIDTH = 20;
 
+var DRAWING = false;
+
 var ERASER_ICON = 'url(\'Eraser-icon.png\'), auto';
-var PEN_ICON = 'url(\'Pen-icon.png\'), auto';
+var PEN_ICON = 'url(\"Pen-icon.png\"), auto';
 var TEXT_ICON = 'text';
 
 var TEXT_POSITION_X = 10;
@@ -66,6 +68,7 @@ var CURSOR_VISIBLE = false;
 var CURSOR_REMOVED = false;
 var imageList = [];
 var imageData;
+var App = {};
 
 
 //alert($('#canvas').css('background-color'));
@@ -75,7 +78,6 @@ export default {
   
   methods: {
     color: function(event){
-      var App = {};
       App.canvas = this.$el.querySelector('#whiteboard');
       App.canvas.width=800;
       App.canvas.height=400;
@@ -84,30 +86,19 @@ export default {
     },
 
     clear: function() {
-      var App = {};
       App.canvas = this.$el.querySelector('#whiteboard');
       App.ctx = App.canvas.getContext('2d');
       App.ctx.font = 'bold 16px Arial';
-      App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height); 
+      App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
+      imageList = []; 
     },
 
-    cursor: function(event) {
-      var App = {};
+    drawStart: function(event) {
       App.canvas = this.$el.querySelector('#whiteboard');
       App.canvas.width=800;
       App.canvas.height=400;
       App.ctx = App.canvas.getContext('2d');
       App.ctx.font = 'bold 16px Arial';
-
-      /*if (imageList.length>0) {
-        imageData = imageList.pop();
-        App.ctx.putImageData(imageData, 0, 0);
-      }
-      
-      TEXT_POSITION_X = event.layerX-10;
-      TEXT_POSITION_Y = event.layerY+34;
-      App.ctx.fillText('|', TEXT_POSITION_X, TEXT_POSITION_Y);
-      this.$el.querySelector('#textInputBox').value=''; */
 
 
       if (!CURSOR_VISIBLE && INSERTING_TEXT) {
@@ -116,7 +107,6 @@ export default {
         CURSOR_VISIBLE = true;
         //App.socket.emit('saveImage');
         if (imageList.length>0) {
-          console.log('PUTTING NEW IMAGE ON SCREEN');
           imageData = imageList[imageList.length-1];
           App.ctx.putImageData(imageData, 0, 0);
         } else {
@@ -131,18 +121,54 @@ export default {
           y: TEXT_POSITION_Y
         });*/
         CURSOR_REMOVED = false;
+      } else {
+        App.canvas.isDrawing = true;
+        var x = event.pageX;
+        var y = event.pageY;
+        var fillColor = 'red';
+        fillCircle(App.canvas, App.ctx, 'dragstart', x, y, fillColor);
       }
+
+
 
     }, 
 
+    drawEnd: function(event) {
+      App.canvas.isDrawing = false;
+      var x = event.pageX;
+      var y = event.pageY;
+      var fillColor = 'red';
+      fillCircle(App.canvas, App.ctx, 'dragend', x, y, fillColor);
+    },
+
+    draw: function(e) {
+
+      if (DRAWING) {
+        if (!App.canvas.isDrawing) {
+           return;
+        }
+        var x = e.pageX;
+        var y = e.pageY;
+        var fillColor = '#ff0000';
+        fillCircle(App.canvas, App.ctx, 'drag', x, y, fillColor);
+
+      }
+    },
+
+    keydown: function() {
+      if (this.$el.querySelector('#textInputBox').value==='') {
+        imageData = App.ctx.getImageData(0,0,App.canvas.width,App.canvas.height);
+        imageList.push(imageData);
+      }
+    },
+
     text: function() {
-      var App = {};
       App.canvas = this.$el.querySelector('#whiteboard');
       App.ctx = App.canvas.getContext('2d');
       saveImage(App.canvas, App.ctx);
       INSERTING_TEXT = true;
       CURSOR_VISIBLE = false;
-      App.canvas.style.cursor = TEXT_ICON;
+      //App.canvas.style.cursor = TEXT_ICON;
       this.$el.querySelector('#textInputBox').style.visibility='visible';
       this.$el.querySelector('#textInputBox').value='';
 
@@ -150,14 +176,65 @@ export default {
 
     textBox: function() {
       insertText(this.$el.querySelector('#whiteboard'), this.$el.querySelector('#textInputBox').value);
+    }, 
+
+    undo: function() {
+      this.$el.querySelector('#textInputBox').value='';
+      App.canvas = this.$el.querySelector('#whiteboard');
+      App.ctx = App.canvas.getContext('2d');
+      if (imageList.length>0) {
+        imageData = imageList.pop();
+        App.ctx.putImageData(imageData, 0, 0);
+      } 
+
+
+    },
+
+
+    drawSetup: function() {
+      DRAWING = true;
+      ERASING = false;
+      INSERTING_TEXT = false;
+
+      App.canvas = this.$el.querySelector('#whiteboard');
+      App.ctx = App.canvas.getContext('2d');
+    },
+
+    erase: function() {
+      ERASING = true;
     }
-
-
   }
 }
 
+
+function fillCircle(canvas, context, type, x, y, fillColor) {
+  if (!ERASING) {
+    context.strokeStyle = fillColor;
+  } else {
+    context.strokeStyle = ERASING_LINE_COLOR;
+    context.lineWidth = ERASING_LINE_WIDTH;
+  }
+  
+  if (type === 'dragstart') {
+    if (imageList.length>0) {
+        imageData = imageList[imageList.length-1];
+        context.putImageData(imageData, 0, 0);
+    }
+    saveImage(canvas, context);
+    context.beginPath();
+    context.moveTo(x-320, y-95);
+  } else if (type === 'drag') {
+    context.lineTo(x-320, y-95);
+    context.stroke();
+  } else {
+    context.closePath();
+    saveImage(canvas, context);
+    
+  }
+}
+
+
 function insertText(canvas, input) {
-  var App = {};
   App.canvas = canvas;
   App.ctx = App.canvas.getContext('2d');
   App.ctx.font = 'bold 16px Arial';
@@ -192,7 +269,8 @@ function saveImage(canvas, ctx) {
 
 
 body {
-	background: #392C44;
+  padding:50px;
+	background: #f2f2f2;
 }
 	
 	
