@@ -5,7 +5,7 @@
 		<button id='drawButton'></button>
 		<button id='undoButton'></button>
 		<button id='eraseButton'></button>
-		<button id='textButton'></button>
+		<button id='textButton' v-on:click="text"></button>
 		<button id='blueButton' class='colorButton' v-on:click="color" style='padding:0px;margin:0px;width:28px;height:28px;background-color:blue;'></button>
 		<button id='redButton' class='colorButton' v-on:click="color" style='padding:0px;margin:0px;width:28px;height:28px;background-color:red;'></button>
 		<button id='greenButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:green;'></button>
@@ -14,7 +14,7 @@
 		<button id='yellowButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:yellow;'></button>
 		<button id='purpleButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:purple;'></button>
 		<button id='brownButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:brown;'></button>
-		<textarea id='textInputBox' rows='4' cols='50' style='visibility:hidden' placeholder='Type Here'></textarea>
+		<textarea id='textInputBox' v-on:input="textBox" rows='4' cols='50' style='visibility:hidden' placeholder='Type Here'></textarea>
 	</body>
 
 </template>
@@ -64,12 +64,15 @@ var TEXT_POSITION_Y = 10;
 var INSERTING_TEXT = false;
 var CURSOR_VISIBLE = false;
 var CURSOR_REMOVED = false;
+var imageList = [];
+var imageData;
 
 
 //alert($('#canvas').css('background-color'));
 
 
 export default {
+  
   methods: {
     color: function(event){
       var App = {};
@@ -95,14 +98,44 @@ export default {
       App.canvas.height=400;
       App.ctx = App.canvas.getContext('2d');
       App.ctx.font = 'bold 16px Arial';
-      //alert(event.layerX);
-      App.ctx.fillText('|', event.layerX-10, event.layerY+34);
+      if (imageList.length>0) {
+        imageData = imageList.pop();
+        App.ctx.putImageData(imageData, 0, 0);
+      }
+      TEXT_POSITION_X = event.layerX-10;
+      TEXT_POSITION_Y = event.layerY+34;
+      App.ctx.fillText('|', TEXT_POSITION_X, TEXT_POSITION_Y);
+      this.$el.querySelector('#textInputBox').value='';
 
+    }, 
 
+    text: function() {
+      this.$el.querySelector('#textInputBox').style.visibility='visible';
+
+    },
+
+    textBox: function() {
+      insertText(this.$el.querySelector('#whiteboard'), this.$el.querySelector('#textInputBox').value);
     }
 
 
   }
+}
+
+function insertText(canvas, input) {
+  var App = {};
+  App.canvas = canvas;
+  App.ctx = App.canvas.getContext('2d');
+  App.ctx.font = 'bold 16px Arial';
+  App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
+  App.ctx.fillText(input, TEXT_POSITION_X, TEXT_POSITION_Y);
+  saveImage(App.canvas, App.ctx);
+
+}
+
+function saveImage(canvas, ctx) {
+  imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
+  imageList.push(imageData);
 }
 
 
