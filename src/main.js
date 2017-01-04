@@ -3,6 +3,7 @@
 import Vue from 'vue'
 import VueResource from 'vue-resource'
 import VueRouter from 'vue-router'
+import $ from 'jquery'
 
 Vue.use(VueResource)
 Vue.use(VueRouter)
