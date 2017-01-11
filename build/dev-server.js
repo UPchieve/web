@@ -5,6 +5,51 @@ var path = require('path')
 var express = require('express')
 var webpack = require('webpack')
 var opn = require('opn')
+
+
+var io = require('socket.io').listen(4000);
+io.sockets.on('connection', function(socket) {
+    socket.on('drawClick', function(data) {
+      socket.broadcast.emit('draw', {
+        x: data.x,
+        y: data.y,
+        type: data.type
+      });
+    });
+
+    socket.on('saveImage', function() {
+      socket.broadcast.emit('save');
+    });
+
+    socket.on('undoClick', function() {
+      socket.broadcast.emit('undo');
+    });
+
+    socket.on('clearClick', function() {
+      socket.broadcast.emit('clear');
+    });
+
+    socket.on('changeColor', function(data) {
+      socket.broadcast.emit('color', data);
+    });
+
+    socket.on('changeWidth', function(data) {
+      socket.broadcast.emit('width', data);
+    });
+
+    socket.on('insertText', function(data) {
+      socket.broadcast.emit('text', {
+        text: data.text,
+        x: data.x,
+        y: data.y
+      });
+    });
+
+    socket.on('resetScreen', function() {
+      socket.broadcast.emit('reset');
+    });
+
+  });
 var proxyMiddleware = require('http-proxy-middleware')
 var webpackConfig = process.env.NODE_ENV === 'testing'
   ? require('./webpack.prod.conf')
