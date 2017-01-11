@@ -3,7 +3,7 @@
 		<canvas id='whiteboard' v-on:mousedown="drawStart" v-on:mouseup="drawEnd" v-on:mousemove="draw"></canvas>
 		<button id='clearButton' v-on:click="clear" ></button>
 		<button id='drawButton' v-on:click="drawSetup"></button>
-		<!--<button id='undoButton' v-on:click="undo"></button>!-->
+		<button id='undoButton' v-on:click="undo"></button>
 		<button id='eraseButton' v-on:click="erase"></button>
 		<button id='textButton' v-on:click="text"></button>
 		<button id='blueButton' class='colorButton' v-on:click="color" style='padding:0px;margin:0px;width:28px;height:28px;background-color:blue;'></button>
@@ -96,12 +96,12 @@ export default {
     clear: function() {
       App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
       imageList = []; 
+      saveImage(App.canvas, App.ctx);
     },
 
     drawStart: function(event) {
 
       if (!CURSOR_VISIBLE && INSERTING_TEXT) {
-        
         
         TEXT_POSITION_X = event.layerX -10;
         TEXT_POSITION_Y = event.layerY +34;
@@ -167,6 +167,9 @@ export default {
     },
 
     text: function() {
+      if (imageList.length === 0) {
+        saveImage(App.canvas, App.ctx);
+      }
       saveImage(App.canvas, App.ctx);
 
       INSERTING_TEXT = true;
@@ -181,17 +184,18 @@ export default {
       insertText(this.$el.querySelector('#whiteboard'), this.$el.querySelector('#textInputBox').value);
     }, 
 
-    /*undo: function() {
+    undo: function() {
+      var currentImage = App.ctx.getImageData(0,0,App.canvas.width,App.canvas.height);
+      console.log(imageList.length);
       this.$el.querySelector('#textInputBox').value='';
-      //App.canvas = this.$el.querySelector('#whiteboard');
-      //App.ctx = App.canvas.getContext('2d');
       if (imageList.length>0) {
         imageData = imageList.pop();
+        while (compareImages(currentImage, imageData)) {
+          imageData = imageList.pop();
+        }
         App.ctx.putImageData(imageData, 0, 0);
       } 
-
-
-    },*/
+    },
 
 
     drawSetup: function() {
@@ -204,6 +208,11 @@ export default {
       if (INSERTING_TEXT) {
         saveImage(App.canvas, App.ctx);
       }
+
+      if (imageList.length === 0) {
+        saveImage(App.canvas, App.ctx);
+      }
+
       DRAWING = true;
       ERASING = false;
       INSERTING_TEXT = false;
@@ -211,6 +220,9 @@ export default {
     },
 
     erase: function() {
+      if (imageList.length === 0) {
+        saveImage(App.canvas, App.ctx);
+      }
       if (INSERTING_TEXT) {
         saveImage(App.canvas, App.ctx);
       }
@@ -232,25 +244,22 @@ export default {
       App.ctx.strokeStyle = LOCAL_LINE_COLOR;
       App.ctx.lineWidth = LINE_WIDTH;
       App.ctx.font = 'bold 16px Arial';
+      saveImage(App.canvas, App.ctx);
   } 
 }
 
 
 function fillCircle(canvas, context, type, x, y, fillColor) {
   var rect = App.canvas.getBoundingClientRect();
-  if (DRAWING || ERASING) {
-    
+  if (DRAWING || ERASING) {   
     if (type === 'dragstart') {
       if (imageList.length>0) {
           imageData = imageList[imageList.length-1];
           context.putImageData(imageData, 0, 0);
       }
-      //saveImage(canvas, context);
       context.beginPath();
-      //context.moveTo(x-320, y-95);
       context.moveTo(x-rect.left, y-rect.top+40);
     } else if (type === 'drag') {
-      //context.lineTo(x-320, y-95);
       context.lineTo(x-rect.left, y-rect.top+40);
       context.stroke();
     } else {
@@ -259,15 +268,10 @@ function fillCircle(canvas, context, type, x, y, fillColor) {
       
     }
   }
-
-  
 }
 
 
 function insertText(canvas, input) {
-  //App.canvas = canvas;
-  //App.ctx = App.canvas.getContext('2d');
-  //App.ctx.font = 'bold 16px Arial';
   App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
   
   if (imageList.length>0) {
@@ -282,20 +286,10 @@ function insertText(canvas, input) {
 
 function saveImage(canvas, ctx) {
   imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
-  imageList.push(imageData);
-  /*if (imageList.length>0) {
-    if (compareImages(imageData,imageList[imageList.length-1])) {
-      imageList.push(imageData);
-    } else {
-      console.log('DUP');
-    }
-  } else {
-    imageList.push(imageData);
-  }*/
-  
+  imageList.push(imageData);  
 }
 
-/*function compareImages(img1,img2){
+function compareImages(img1,img2){
    if(img1.data.length != img2.data.length)
        return false;
    for(var i = 0; i < img1.data.length; ++i){
@@ -303,7 +297,7 @@ function saveImage(canvas, ctx) {
            return false;
    }
    return true;   
-}*/
+}
 
 
 
