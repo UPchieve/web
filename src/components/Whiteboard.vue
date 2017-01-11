@@ -57,9 +57,12 @@ var ERASING_LINE_WIDTH = 20;
 
 var DRAWING = false;
 
-var ERASER_ICON = 'url(\'Eraser-icon.png\'), auto';
-var PEN_ICON = 'url(\"Pen-icon.png\"), auto';
-var TEXT_ICON = 'text';
+
+
+/*var ERASER_ICON = 'url(\'Eraser-icon.png\')';
+var PEN_ICON = 'url(\"Pen-icon.png\")';
+var PEN_ICON = 'url(\'../assets/Pen-icon.png\'), auto';
+var TEXT_ICON = 'text';*/
 
 var TEXT_POSITION_X = 10;
 var TEXT_POSITION_Y = 10;
@@ -107,9 +110,10 @@ export default {
       //App.canvas.height=400;
       App.ctx = App.canvas.getContext('2d');
       App.ctx.font = 'bold 16px Arial';
-
+      
 
       if (!CURSOR_VISIBLE && INSERTING_TEXT) {
+        
         TEXT_POSITION_X = event.layerX-10;
         TEXT_POSITION_Y = event.layerY+34;
         CURSOR_VISIBLE = true;
@@ -117,6 +121,7 @@ export default {
         if (imageList.length>0) {
           imageData = imageList[imageList.length-1];
           App.ctx.putImageData(imageData, 0, 0);
+          
         } else {
           imageData = App.ctx.getImageData(0,0,App.canvas.width,App.canvas.height);
         }
@@ -175,6 +180,13 @@ export default {
       App.canvas = this.$el.querySelector('#whiteboard');
       App.ctx = App.canvas.getContext('2d');
       saveImage(App.canvas, App.ctx);
+      if (!INITIALIZED) {
+        App.canvas.width=800;
+        App.canvas.height=400;
+        App.ctx.strokeStyle = LOCAL_LINE_COLOR;
+        App.ctx.lineWidth = LINE_WIDTH;
+        INITIALIZED = true;
+      }
       INSERTING_TEXT = true;
       CURSOR_VISIBLE = false;
       //App.canvas.style.cursor = TEXT_ICON;
@@ -215,13 +227,13 @@ export default {
       
       this.$el.querySelector('#textInputBox').value=''
       this.$el.querySelector('#textInputBox').style.visibility='hidden';
+      //App.canvas.style.cursor = PEN_ICON;
       if (INSERTING_TEXT) {
         saveImage(App.canvas, App.ctx);
       }
       DRAWING = true;
       ERASING = false;
       INSERTING_TEXT = false;
-
       
     },
 
@@ -233,6 +245,7 @@ export default {
       INSERTING_TEXT = false;
       App.ctx.strokeStyle = ERASING_LINE_COLOR;
       App.ctx.lineWidth = ERASING_LINE_WIDTH;
+      //App.canvas.style.cursor = ERASER_ICON;
       this.$el.querySelector('#textInputBox').value=''
       this.$el.querySelector('#textInputBox').style.visibility='hidden';
 
