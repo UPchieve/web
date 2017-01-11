@@ -59,10 +59,11 @@ var DRAWING = false;
 
 
 
-/*var ERASER_ICON = 'url(\'Eraser-icon.png\')';
-var PEN_ICON = 'url(\"Pen-icon.png\")';
-var PEN_ICON = 'url(\'../assets/Pen-icon.png\'), auto';
-var TEXT_ICON = 'text';*/
+var ERASER_ICON = 'url(\'/static/Eraser-icon.png\'), auto';
+var PEN_ICON = 'url(\"/static/Pen-icon.png\"), auto';
+var TEXT_ICON = 'text';
+
+
 
 var TEXT_POSITION_X = 10;
 var TEXT_POSITION_Y = 10;
@@ -189,7 +190,7 @@ export default {
       }
       INSERTING_TEXT = true;
       CURSOR_VISIBLE = false;
-      //App.canvas.style.cursor = TEXT_ICON;
+      App.canvas.style.cursor = TEXT_ICON;
       this.$el.querySelector('#textInputBox').style.visibility='visible';
       this.$el.querySelector('#textInputBox').value='';
 
@@ -227,7 +228,7 @@ export default {
       
       this.$el.querySelector('#textInputBox').value=''
       this.$el.querySelector('#textInputBox').style.visibility='hidden';
-      //App.canvas.style.cursor = PEN_ICON;
+      App.canvas.style.cursor = PEN_ICON;
       if (INSERTING_TEXT) {
         saveImage(App.canvas, App.ctx);
       }
@@ -245,7 +246,7 @@ export default {
       INSERTING_TEXT = false;
       App.ctx.strokeStyle = ERASING_LINE_COLOR;
       App.ctx.lineWidth = ERASING_LINE_WIDTH;
-      //App.canvas.style.cursor = ERASER_ICON;
+      App.canvas.style.cursor = ERASER_ICON;
       this.$el.querySelector('#textInputBox').value=''
       this.$el.querySelector('#textInputBox').style.visibility='hidden';
 
@@ -345,7 +346,7 @@ canvas {
 	margin: 20px auto;
 	border: 5px solid #E8E8E8;
 	display: block;
- 	cursor:url('../assets/Pen-icon.png'), auto;
+ 	cursor: not-allowed;
 }
 
 #eraseButton {
