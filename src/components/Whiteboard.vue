@@ -102,8 +102,9 @@ export default {
 
       if (!CURSOR_VISIBLE && INSERTING_TEXT) {
         
-        TEXT_POSITION_X = event.layerX-10;
-        TEXT_POSITION_Y = event.layerY+34;
+        
+        TEXT_POSITION_X = event.layerX -10;
+        TEXT_POSITION_Y = event.layerY +34;
         CURSOR_VISIBLE = true;
         //App.socket.emit('saveImage');
         if (imageList.length>0) {
@@ -123,6 +124,7 @@ export default {
         });*/
         CURSOR_REMOVED = false;
       } else if (!INSERTING_TEXT) {
+        
         DRAWING = true;
         App.canvas.isDrawing = true;
         var x = event.pageX;
@@ -235,7 +237,7 @@ export default {
 
 
 function fillCircle(canvas, context, type, x, y, fillColor) {
-  
+  var rect = App.canvas.getBoundingClientRect();
   if (DRAWING || ERASING) {
     
     if (type === 'dragstart') {
@@ -245,9 +247,11 @@ function fillCircle(canvas, context, type, x, y, fillColor) {
       }
       //saveImage(canvas, context);
       context.beginPath();
-      context.moveTo(x-320, y-95);
+      //context.moveTo(x-320, y-95);
+      context.moveTo(x-rect.left, y-rect.top+40);
     } else if (type === 'drag') {
-      context.lineTo(x-320, y-95);
+      //context.lineTo(x-320, y-95);
+      context.lineTo(x-rect.left, y-rect.top+40);
       context.stroke();
     } else {
       context.closePath();
