@@ -75,8 +75,9 @@ var imageData;
 var App = {};
 var INITIALIZED = false;
 
+//var io = require('socket.io').listen(4000);
+//App.socket = io.connect(SOCKET_ADDRESS);
 
-//alert($('#canvas').css('background-color'));
 
 
 export default {
@@ -85,10 +86,6 @@ export default {
     color: function(event){
 
       if (DRAWING && !ERASING) {
-        App.canvas = this.$el.querySelector('#whiteboard');
-        //App.canvas.width=800;
-        //App.canvas.height=400;
-        App.ctx = App.canvas.getContext('2d');
         LOCAL_LINE_COLOR = event.target.style.backgroundColor;
         App.ctx.strokeStyle = LOCAL_LINE_COLOR;
         App.ctx.lineWidth = LINE_WIDTH;
@@ -97,21 +94,11 @@ export default {
     },
 
     clear: function() {
-      App.canvas = this.$el.querySelector('#whiteboard');
-      App.ctx = App.canvas.getContext('2d');
-      App.ctx.font = 'bold 16px Arial';
       App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
       imageList = []; 
     },
 
     drawStart: function(event) {
-
-      App.canvas = this.$el.querySelector('#whiteboard');
-      //App.canvas.width=800;
-      //App.canvas.height=400;
-      App.ctx = App.canvas.getContext('2d');
-      App.ctx.font = 'bold 16px Arial';
-      
 
       if (!CURSOR_VISIBLE && INSERTING_TEXT) {
         
@@ -178,16 +165,8 @@ export default {
     },
 
     text: function() {
-      App.canvas = this.$el.querySelector('#whiteboard');
-      App.ctx = App.canvas.getContext('2d');
       saveImage(App.canvas, App.ctx);
-      if (!INITIALIZED) {
-        App.canvas.width=800;
-        App.canvas.height=400;
-        App.ctx.strokeStyle = LOCAL_LINE_COLOR;
-        App.ctx.lineWidth = LINE_WIDTH;
-        INITIALIZED = true;
-      }
+
       INSERTING_TEXT = true;
       CURSOR_VISIBLE = false;
       App.canvas.style.cursor = TEXT_ICON;
@@ -202,8 +181,8 @@ export default {
 
     /*undo: function() {
       this.$el.querySelector('#textInputBox').value='';
-      App.canvas = this.$el.querySelector('#whiteboard');
-      App.ctx = App.canvas.getContext('2d');
+      //App.canvas = this.$el.querySelector('#whiteboard');
+      //App.ctx = App.canvas.getContext('2d');
       if (imageList.length>0) {
         imageData = imageList.pop();
         App.ctx.putImageData(imageData, 0, 0);
@@ -214,17 +193,8 @@ export default {
 
 
     drawSetup: function() {
-      App.canvas = this.$el.querySelector('#whiteboard');
-      App.ctx = App.canvas.getContext('2d');
       App.ctx.strokeStyle = LOCAL_LINE_COLOR;
       App.ctx.lineWidth = LINE_WIDTH;
-      if (!INITIALIZED) {
-        App.canvas.width=800;
-        App.canvas.height=400;
-        App.ctx.strokeStyle = LOCAL_LINE_COLOR;
-        App.ctx.lineWidth = LINE_WIDTH;
-        INITIALIZED = true;
-      }
       
       this.$el.querySelector('#textInputBox').value=''
       this.$el.querySelector('#textInputBox').style.visibility='hidden';
@@ -251,7 +221,16 @@ export default {
       this.$el.querySelector('#textInputBox').style.visibility='hidden';
 
     }
-  }
+  } ,
+  mounted() {
+      App.canvas = this.$el.querySelector('#whiteboard');
+      App.ctx = App.canvas.getContext('2d');
+      App.canvas.width=800;
+      App.canvas.height=400;
+      App.ctx.strokeStyle = LOCAL_LINE_COLOR;
+      App.ctx.lineWidth = LINE_WIDTH;
+      App.ctx.font = 'bold 16px Arial';
+  } 
 }
 
 
@@ -276,14 +255,15 @@ function fillCircle(canvas, context, type, x, y, fillColor) {
       
     }
   }
+
   
 }
 
 
 function insertText(canvas, input) {
-  App.canvas = canvas;
-  App.ctx = App.canvas.getContext('2d');
-  App.ctx.font = 'bold 16px Arial';
+  //App.canvas = canvas;
+  //App.ctx = App.canvas.getContext('2d');
+  //App.ctx.font = 'bold 16px Arial';
   App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
   
   if (imageList.length>0) {
