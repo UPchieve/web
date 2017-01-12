@@ -75,8 +75,8 @@ var imageData;
 var App = {};
 var INITIALIZED = false;
 
-//var io = require('socket.io').listen(4000);
-//App.socket = io.connect(SOCKET_ADDRESS);
+var io = require('socket.io').listen(4000);
+App.socket = io.connect(SOCKET_ADDRESS);
 
 
 
