@@ -75,9 +75,9 @@ var imageData;
 var App = {};
 var INITIALIZED = false;
 
-var io = require('socket.io').listen(4000);
-App.socket = io.connect(SOCKET_ADDRESS);
 
+App.socket = require('socket.io-client')('http://localhost/4000');
+App.socket.on('save', function() {console.log('HI')});
 
 
 export default {
@@ -106,7 +106,7 @@ export default {
         TEXT_POSITION_X = event.layerX -10;
         TEXT_POSITION_Y = event.layerY +34;
         CURSOR_VISIBLE = true;
-        //App.socket.emit('saveImage');
+        App.socket.emit('saveImage');
         if (imageList.length>0) {
           imageData = imageList[imageList.length-1];
           App.ctx.putImageData(imageData, 0, 0);
@@ -157,8 +157,9 @@ export default {
       }
     },
 
-    keydown: function() {
-      if (this.$el.querySelector('#textInputBox').value==='') {
+    keydown: function(e) {
+      if (this.$el.querySelector('#textInputBox').value==='' && e.keyCode!=8 && e.keyCode!=46) {
+        
         if (imageList.length>0) {
           imageData = imageList.pop();
           App.ctx.putImageData(imageData, 0, 0);
