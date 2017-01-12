@@ -29,6 +29,7 @@ import AuthService from '../services/AuthService';
 
 export default {
   data() {
+    console.log(AuthService.isAuthenticated);
     return {
       authenticated: AuthService.isAuthenticated
     }

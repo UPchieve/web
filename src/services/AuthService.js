@@ -2,9 +2,11 @@ import Validator from 'validator';
 
 import {router} from '../main'
 
+import NetworkService from './NetworkService'
 
-const API_ROOT = 'http://localhost:3000',
-      AUTH_ROOT = `${API_ROOT}/auth`
+
+const SERVER_ROOT = 'http://localhost:3000',
+      AUTH_ROOT = `${SERVER_ROOT}/auth`
 
 export default {
   currentUser: null,
@@ -16,6 +18,7 @@ export default {
       return;
     }
 
+    // NetworkService.login(context, creds).then((res) => {
     context.$http.post(`${AUTH_ROOT}/login`, creds).then((res) => {
       let data = res.data;
       if (!data){

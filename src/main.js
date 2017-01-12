@@ -13,10 +13,11 @@ import SignupForm from './components/SignupForm'
 import Onboarding from './components/Onboarding'
 
 import AuthService from './services/AuthService'
+import OnboardingService from './services/OnboardingService'
 
 const routes = [
   { path: '/', redirect: '/about' },
-  { path: '/about', component: About },
+  { path: '/about', component: About, meta: { protected: true } },
   { path: '/login', component: LoginForm },
   { path: '/signup', component: SignupForm },
   { path: '/onboarding', component: Onboarding, meta: { protected: true } }
@@ -40,6 +41,18 @@ router.beforeEach((to, from, next) => {
           redirect: to.fullPath
         }
       });
+    } else if (!OnboardingService.isOnboarded){
+      console.log('User requires onboarding');
+      if (to.path === '/onboarding'){
+        next();
+      } else {
+        next({
+          path: '/onboarding',
+          query: {
+            redirect: to.fullPath
+          }
+        });
+      }
     } else {
       next();
     }
