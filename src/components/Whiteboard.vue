@@ -76,8 +76,8 @@ var App = {};
 var INITIALIZED = false;
 
 
-App.socket = require('socket.io-client')('http://localhost/4000');
-App.socket.on('save', function() {console.log('HI')});
+//App.socket = require('socket.io-client')('http://localhost:8080');
+//App.socket.on('save', function() {console.log('HI')});
 
 
 export default {
@@ -159,7 +159,6 @@ export default {
 
     keydown: function(e) {
       if (this.$el.querySelector('#textInputBox').value==='' && e.keyCode!=8 && e.keyCode!=46) {
-        
         if (imageList.length>0) {
           imageData = imageList.pop();
           App.ctx.putImageData(imageData, 0, 0);
