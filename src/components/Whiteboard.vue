@@ -23,7 +23,7 @@
 
 
 
-var SOCKET_ADDRESS = 'http://localhost:4000';
+var SOCKET_ADDRESS = 'http://localhost:3001';
 
 var CLEAR_BUTTON_ID = 'clearButton';
 var UNDO_BUTTON_ID = 'undoButton';
@@ -76,12 +76,12 @@ var App = {};
 var INITIALIZED = false;
 
 
-//App.socket = require('socket.io-client')('http://localhost:8080');
-//App.socket.on('save', function() {console.log('HI')});
+App.socket = require('socket.io-client')(SOCKET_ADDRESS);
+App.socket.on('connect', function() {console.log('HI')});
 
 
 export default {
-  
+
   methods: {
     color: function(event){
 
@@ -90,19 +90,19 @@ export default {
         App.ctx.strokeStyle = LOCAL_LINE_COLOR;
         App.ctx.lineWidth = LINE_WIDTH;
       }
-      
+
     },
 
     clear: function() {
       App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
-      imageList = []; 
+      imageList = [];
       saveImage(App.canvas, App.ctx);
     },
 
     drawStart: function(event) {
 
       if (!CURSOR_VISIBLE && INSERTING_TEXT) {
-        
+
         TEXT_POSITION_X = event.layerX -10;
         TEXT_POSITION_Y = event.layerY +34;
         CURSOR_VISIBLE = true;
@@ -110,11 +110,11 @@ export default {
         if (imageList.length>0) {
           imageData = imageList[imageList.length-1];
           App.ctx.putImageData(imageData, 0, 0);
-          
+
         } else {
           imageData = App.ctx.getImageData(0,0,App.canvas.width,App.canvas.height);
         }
-        
+
         imageList.push(imageData);
         App.ctx.fillText('|', TEXT_POSITION_X, TEXT_POSITION_Y);
         /*App.socket.emit('insertText', {
@@ -124,18 +124,18 @@ export default {
         });*/
         CURSOR_REMOVED = false;
       } else if (!INSERTING_TEXT) {
-        
+
         DRAWING = true;
         App.canvas.isDrawing = true;
         var x = event.pageX;
         var y = event.pageY;
         fillCircle(App.canvas, App.ctx, 'dragstart', x, y, LOCAL_LINE_COLOR);
-      } 
-      
+      }
 
 
 
-    }, 
+
+    },
 
     drawEnd: function(event) {
       App.canvas.isDrawing = false;
@@ -182,7 +182,7 @@ export default {
 
     textBox: function() {
       insertText(this.$el.querySelector('#whiteboard'), this.$el.querySelector('#textInputBox').value);
-    }, 
+    },
 
     undo: function() {
       var currentImage = App.ctx.getImageData(0,0,App.canvas.width,App.canvas.height);
@@ -194,14 +194,14 @@ export default {
           imageData = imageList.pop();
         }
         App.ctx.putImageData(imageData, 0, 0);
-      } 
+      }
     },
 
 
     drawSetup: function() {
       App.ctx.strokeStyle = LOCAL_LINE_COLOR;
       App.ctx.lineWidth = LINE_WIDTH;
-      
+
       this.$el.querySelector('#textInputBox').value=''
       this.$el.querySelector('#textInputBox').style.visibility='hidden';
       App.canvas.style.cursor = PEN_ICON;
@@ -216,7 +216,7 @@ export default {
       DRAWING = true;
       ERASING = false;
       INSERTING_TEXT = false;
-      
+
     },
 
     erase: function() {
@@ -245,13 +245,13 @@ export default {
       App.ctx.lineWidth = LINE_WIDTH;
       App.ctx.font = 'bold 16px Arial';
       saveImage(App.canvas, App.ctx);
-  } 
+  }
 }
 
 
 function fillCircle(canvas, context, type, x, y, fillColor) {
   var rect = App.canvas.getBoundingClientRect();
-  if (DRAWING || ERASING) {   
+  if (DRAWING || ERASING) {
     if (type === 'dragstart') {
       if (imageList.length>0) {
           imageData = imageList[imageList.length-1];
@@ -265,7 +265,7 @@ function fillCircle(canvas, context, type, x, y, fillColor) {
     } else {
       context.closePath();
       saveImage(canvas, context);
-      
+
     }
   }
 }
@@ -273,20 +273,20 @@ function fillCircle(canvas, context, type, x, y, fillColor) {
 
 function insertText(canvas, input) {
   App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
-  
+
   if (imageList.length>0) {
-      
+
       imageData = imageList.pop();
       App.ctx.putImageData(imageData, 0, 0);
       imageList.push(imageData);
-      
-  } 
+
+  }
   App.ctx.fillText(input, TEXT_POSITION_X, TEXT_POSITION_Y);
 }
 
 function saveImage(canvas, ctx) {
   imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
-  imageList.push(imageData);  
+  imageList.push(imageData);
 }
 
 function compareImages(img1,img2){
@@ -296,7 +296,7 @@ function compareImages(img1,img2){
        if(img1.data[i] != img2.data[i])
            return false;
    }
-   return true;   
+   return true;
 }
 
 
@@ -315,8 +315,8 @@ body {
   padding:50px;
 	background: #f2f2f2;
 }
-	
-	
+
+
 canvas {
 	background: #fff;
   width:800px;
