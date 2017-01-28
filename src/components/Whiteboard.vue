@@ -33,6 +33,9 @@ var TEXT_BUTTON_ID = 'textButton';
 var TEXT_AREA_ID = 'textInputBox'
 
 var DRAW_EVENT = 'draw';
+var DRAW_START_EVENT = 'dstart';
+var DRAW_END_EVENT = 'dend';
+var DRAW_ACTION_EVENT = 'drag';
 var SAVE_EVENT = 'save';
 var UNDO_EVENT = 'undo';
 var CLEAR_EVENT = 'clear';
@@ -77,7 +80,17 @@ var INITIALIZED = false;
 
 
 App.socket = require('socket.io-client')(SOCKET_ADDRESS);
-App.socket.on('connect', function() {console.log('HI')});
+App.socket.on(DRAW_START_EVENT, handleDrawStartOperation);
+App.socket.on(DRAW_ACTION_EVENT, handleDrawActionOperation);
+App.socket.on(DRAW_END_EVENT, handleDrawEndOperation);
+/*App.socket.on(DRAW_EVENT, handleDrawOperation);*/
+App.socket.on(SAVE_EVENT, handleSaveOperation);
+App.socket.on(UNDO_EVENT, handleUndoOperation);
+App.socket.on(CLEAR_EVENT, handleClearOperation);
+App.socket.on(COLOR_CHANGE_EVENT, handleColorChangeOperation);
+App.socket.on(WIDTH_CHANGE_EVENT, handleWidthChangeOperation);
+App.socket.on(INSERT_TEXT_EVENT, handleInsertTextOperation);
+/*App.socket.on(RESET_SCREEN_EVENT, handleResetScreenOperation);*/
 
 
 export default {
@@ -88,7 +101,10 @@ export default {
       if (DRAWING && !ERASING) {
         LOCAL_LINE_COLOR = event.target.style.backgroundColor;
         App.ctx.strokeStyle = LOCAL_LINE_COLOR;
+        App.socket.emit('changeColor', LOCAL_LINE_COLOR);
         App.ctx.lineWidth = LINE_WIDTH;
+        App.socket.emit('changeWidth', LINE_WIDTH);
+
       }
 
     },
@@ -97,6 +113,8 @@ export default {
       App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
       imageList = [];
       saveImage(App.canvas, App.ctx);
+      App.socket.emit('saveImage');
+      App.socket.emit('clearClick');
     },
 
     drawStart: function(event) {
@@ -117,11 +135,11 @@ export default {
 
         imageList.push(imageData);
         App.ctx.fillText('|', TEXT_POSITION_X, TEXT_POSITION_Y);
-        /*App.socket.emit('insertText', {
+        App.socket.emit('insertText', {
           text: '|',
           x: TEXT_POSITION_X,
           y: TEXT_POSITION_Y
-        });*/
+        });
         CURSOR_REMOVED = false;
       } else if (!INSERTING_TEXT) {
 
@@ -129,7 +147,12 @@ export default {
         App.canvas.isDrawing = true;
         var x = event.pageX;
         var y = event.pageY;
-        fillCircle(App.canvas, App.ctx, 'dragstart', x, y, LOCAL_LINE_COLOR);
+        fillCircle(App.canvas, App.ctx, 'dragstart', false, x, y, LOCAL_LINE_COLOR);
+        App.socket.emit('dragStart', {
+          x:x,
+          y:y,
+          color:LOCAL_LINE_COLOR
+        });
       }
 
 
@@ -141,7 +164,12 @@ export default {
       App.canvas.isDrawing = false;
       var x = event.pageX;
       var y = event.pageY;
-      fillCircle(App.canvas, App.ctx, 'dragend', x, y, LOCAL_LINE_COLOR);
+      fillCircle(App.canvas, App.ctx, 'dragend', false, x, y, LOCAL_LINE_COLOR);
+      App.socket.emit('dragEnd', {
+          x:x,
+          y:y,
+          color:LOCAL_LINE_COLOR
+        });
     },
 
     draw: function(e) {
@@ -152,7 +180,12 @@ export default {
         }
         var x = e.pageX;
         var y = e.pageY;
-        fillCircle(App.canvas, App.ctx, 'drag', x, y, LOCAL_LINE_COLOR);
+        fillCircle(App.canvas, App.ctx, 'drag', false, x, y, LOCAL_LINE_COLOR);
+        App.socket.emit('dragAction', {
+          x:x,
+          y:y,
+          color:LOCAL_LINE_COLOR
+        });
 
       }
     },
@@ -169,8 +202,10 @@ export default {
     text: function() {
       if (imageList.length === 0) {
         saveImage(App.canvas, App.ctx);
+        App.socket.emit('saveImage');
       }
       saveImage(App.canvas, App.ctx);
+      App.socket.emit('saveImage');
 
       INSERTING_TEXT = true;
       CURSOR_VISIBLE = false;
@@ -182,35 +217,48 @@ export default {
 
     textBox: function() {
       insertText(this.$el.querySelector('#whiteboard'), this.$el.querySelector('#textInputBox').value);
+      App.socket.emit('insertText', {
+        text: this.$el.querySelector('#textInputBox').value,
+        x: TEXT_POSITION_X,
+        y: TEXT_POSITION_Y
+      });
     },
 
     undo: function() {
       var currentImage = App.ctx.getImageData(0,0,App.canvas.width,App.canvas.height);
-      console.log(imageList.length);
       this.$el.querySelector('#textInputBox').value='';
       if (imageList.length>0) {
         imageData = imageList.pop();
         while (compareImages(currentImage, imageData)) {
           imageData = imageList.pop();
         }
-        App.ctx.putImageData(imageData, 0, 0);
+        if (imageData!= null) {
+          App.ctx.putImageData(imageData, 0, 0);
+        }
+        
+        App.socket.emit('undoClick');
       }
     },
 
 
     drawSetup: function() {
+      //App.socket.emit('drawClick');
       App.ctx.strokeStyle = LOCAL_LINE_COLOR;
+      App.socket.emit('changeColor', LOCAL_LINE_COLOR);
       App.ctx.lineWidth = LINE_WIDTH;
+      App.socket.emit('changeWidth', LINE_WIDTH);
 
       this.$el.querySelector('#textInputBox').value=''
       this.$el.querySelector('#textInputBox').style.visibility='hidden';
       App.canvas.style.cursor = PEN_ICON;
       if (INSERTING_TEXT) {
         saveImage(App.canvas, App.ctx);
+        App.socket.emit('saveImage');
       }
 
       if (imageList.length === 0) {
         saveImage(App.canvas, App.ctx);
+        App.socket.emit('saveImage');
       }
 
       DRAWING = true;
@@ -222,9 +270,11 @@ export default {
     erase: function() {
       if (imageList.length === 0) {
         saveImage(App.canvas, App.ctx);
+        App.socket.emit('saveImage');
       }
       if (INSERTING_TEXT) {
         saveImage(App.canvas, App.ctx);
+        App.socket.emit('saveImage');
       }
       ERASING = true;
       INSERTING_TEXT = false;
@@ -233,8 +283,11 @@ export default {
       App.canvas.style.cursor = ERASER_ICON;
       this.$el.querySelector('#textInputBox').value=''
       this.$el.querySelector('#textInputBox').style.visibility='hidden';
+      App.socket.emit('changeColor', ERASING_LINE_COLOR);
+      App.socket.emit('changeWidth', ERASING_LINE_WIDTH);
 
     }
+
   } ,
   mounted() {
       App.canvas = this.$el.querySelector('#whiteboard');
@@ -242,16 +295,18 @@ export default {
       App.canvas.width=800;
       App.canvas.height=400;
       App.ctx.strokeStyle = LOCAL_LINE_COLOR;
+      App.socket.emit('changeColor', LOCAL_LINE_COLOR);
       App.ctx.lineWidth = LINE_WIDTH;
       App.ctx.font = 'bold 16px Arial';
       saveImage(App.canvas, App.ctx);
+
   }
 }
 
 
-function fillCircle(canvas, context, type, x, y, fillColor) {
+function fillCircle(canvas, context, type, server, x, y, fillColor) {
   var rect = App.canvas.getBoundingClientRect();
-  if (DRAWING || ERASING) {
+  if (DRAWING || ERASING || server) {
     if (type === 'dragstart') {
       if (imageList.length>0) {
           imageData = imageList[imageList.length-1];
@@ -265,11 +320,23 @@ function fillCircle(canvas, context, type, x, y, fillColor) {
     } else {
       context.closePath();
       saveImage(canvas, context);
+      App.socket.emit('saveImage');
 
     }
   }
 }
 
+function handleDrawStartOperation(data) {
+  fillCircle(App.canvas, App.ctx, 'dragstart', true,  data.x, data.y, data.color);
+}
+
+function handleDrawActionOperation(data) {
+  fillCircle(App.canvas, App.ctx, 'drag', true, data.x, data.y, data.color);
+}
+
+function handleDrawEndOperation(data) {
+  fillCircle(App.canvas, App.ctx, 'dragend', true,  data.x, data.y, data.color);
+}
 
 function insertText(canvas, input) {
   App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
@@ -289,19 +356,65 @@ function saveImage(canvas, ctx) {
   imageList.push(imageData);
 }
 
-function compareImages(img1,img2){
-   if(img1.data.length != img2.data.length)
-       return false;
-   for(var i = 0; i < img1.data.length; ++i){
-       if(img1.data[i] != img2.data[i])
-           return false;
-   }
-   return true;
+function handleSaveOperation() {
+  var imageData = App.ctx.getImageData(0,0,App.canvas.width, App.canvas.height);
+  imageList.push(imageData);
 }
 
+function handleUndoOperation() {
+  var currentImage = App.ctx.getImageData(0,0,App.canvas.width,App.canvas.height);
+  if (imageList.length>0) {
+    imageData = imageList.pop();
+    while (compareImages(currentImage, imageData)) {
+      imageData = imageList.pop();
+    }
+    if (imageData!=null) {
+      App.ctx.putImageData(imageData, 0, 0);
+    }
+    
+}
+}
 
+function compareImages(img1,img2){
+  if (img1!=null && img2!=null) {
+    if(img1.data.length != img2.data.length)
+       return false;
+     for(var i = 0; i < img1.data.length; ++i){
+         if(img1.data[i] != img2.data[i])
+             return false;
+     }
+     return true;
+  } 
+  return false;
+   
+}
 
+function handleInsertTextOperation(data) {
+    
+    App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
 
+    if (imageList.length>0) {
+
+        imageData = imageList.pop();
+        App.ctx.putImageData(imageData, 0, 0);
+        imageList.push(imageData);
+
+    }
+    App.ctx.fillText(data.text, data.x, data.y);
+  
+}
+
+function handleClearOperation() {
+    App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height); 
+}
+
+function handleColorChangeOperation(color) {
+    SERVER_LINE_COLOR = color;
+}
+
+function handleWidthChangeOperation(width) {
+    SERVER_LINE_WIDTH = width;
+  }
 
 
 </script>
