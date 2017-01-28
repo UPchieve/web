@@ -113,7 +113,6 @@ export default {
       App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
       imageList = [];
       saveImage(App.canvas, App.ctx);
-      App.socket.emit('saveImage');
       App.socket.emit('clearClick');
     },
 
@@ -216,6 +215,12 @@ export default {
     },
 
     textBox: function() {
+
+      if (CURSOR_VISIBLE) {
+        handleUndoOperation();
+        App.socket.emit('undoClick');
+        CURSOR_VISIBLE = false;
+      }
       insertText(this.$el.querySelector('#whiteboard'), this.$el.querySelector('#textInputBox').value);
       App.socket.emit('insertText', {
         text: this.$el.querySelector('#textInputBox').value,
@@ -306,6 +311,10 @@ export default {
 
 function fillCircle(canvas, context, type, server, x, y, fillColor) {
   var rect = App.canvas.getBoundingClientRect();
+  if (server) {
+    App.ctx.strokeStyle = SERVER_LINE_COLOR;
+    App.ctx.lineWidth = SERVER_LINE_WIDTH;
+  }
   if (DRAWING || ERASING || server) {
     if (type === 'dragstart') {
       if (imageList.length>0) {
@@ -322,6 +331,11 @@ function fillCircle(canvas, context, type, server, x, y, fillColor) {
       saveImage(canvas, context);
       App.socket.emit('saveImage');
 
+    }
+
+    if (server) {
+      App.ctx.strokeStyle = LOCAL_LINE_COLOR;
+      App.ctx.lineWidth = LOCAL_LINE_WIDTH;
     }
   }
 }
@@ -406,6 +420,8 @@ function handleInsertTextOperation(data) {
 
 function handleClearOperation() {
     App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height); 
+    imageList = [];
+    saveImage(App.canvas, App.ctx);
 }
 
 function handleColorChangeOperation(color) {
