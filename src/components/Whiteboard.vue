@@ -1,5 +1,5 @@
 <template>
-	<body>
+	<div>
 		<canvas id='whiteboard' v-on:mousedown="drawStart" v-on:mouseup="drawEnd" v-on:mousemove="draw"></canvas>
 		<button id='clearButton' v-on:click="clear" ></button>
 		<button id='drawButton' v-on:click="drawSetup"></button>
@@ -15,8 +15,7 @@
 		<button id='purpleButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:purple;'></button>
 		<button id='brownButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:brown;'></button>
 		<textarea id='textInputBox' v-on:input="textBox" v-on:keydown="keydown" rows='4' cols='50' style='visibility:hidden' placeholder='Type Here'></textarea>
-	</body>
-
+	</div>
 </template>
 
 <script>
@@ -79,22 +78,7 @@ var App = {};
 var INITIALIZED = false;
 
 
-App.socket = require('socket.io-client')(SOCKET_ADDRESS);
-App.socket.on(DRAW_START_EVENT, handleDrawStartOperation);
-App.socket.on(DRAW_ACTION_EVENT, handleDrawActionOperation);
-App.socket.on(DRAW_END_EVENT, handleDrawEndOperation);
-/*App.socket.on(DRAW_EVENT, handleDrawOperation);*/
-App.socket.on(SAVE_EVENT, handleSaveOperation);
-App.socket.on(UNDO_EVENT, handleUndoOperation);
-App.socket.on(CLEAR_EVENT, handleClearOperation);
-App.socket.on(COLOR_CHANGE_EVENT, handleColorChangeOperation);
-App.socket.on(WIDTH_CHANGE_EVENT, handleWidthChangeOperation);
-App.socket.on(INSERT_TEXT_EVENT, handleInsertTextOperation);
-/*App.socket.on(RESET_SCREEN_EVENT, handleResetScreenOperation);*/
-
-
 export default {
-
   methods: {
     color: function(event){
 
@@ -240,7 +224,7 @@ export default {
         if (imageData!= null) {
           App.ctx.putImageData(imageData, 0, 0);
         }
-        
+
         App.socket.emit('undoClick');
       }
     },
@@ -295,6 +279,24 @@ export default {
 
   } ,
   mounted() {
+			var room = this.$route.params.id;
+
+			App.socket = require('socket.io-client')(SOCKET_ADDRESS);
+			App.socket.on(DRAW_START_EVENT, handleDrawStartOperation);
+			App.socket.on(DRAW_ACTION_EVENT, handleDrawActionOperation);
+			App.socket.on(DRAW_END_EVENT, handleDrawEndOperation);
+			App.socket.on(SAVE_EVENT, handleSaveOperation);
+			App.socket.on(UNDO_EVENT, handleUndoOperation);
+			App.socket.on(CLEAR_EVENT, handleClearOperation);
+			App.socket.on(COLOR_CHANGE_EVENT, handleColorChangeOperation);
+			App.socket.on(WIDTH_CHANGE_EVENT, handleWidthChangeOperation);
+			App.socket.on(INSERT_TEXT_EVENT, handleInsertTextOperation);
+
+			App.socket.on('connect', function(){
+				App.socket.emit('init', room);
+			});
+
+
       App.canvas = this.$el.querySelector('#whiteboard');
       App.ctx = App.canvas.getContext('2d');
       App.canvas.width=800;
@@ -335,7 +337,7 @@ function fillCircle(canvas, context, type, server, x, y, fillColor) {
 
     if (server) {
       App.ctx.strokeStyle = LOCAL_LINE_COLOR;
-      App.ctx.lineWidth = LOCAL_LINE_WIDTH;
+      App.ctx.lineWidth = LINE_WIDTH;
     }
   }
 }
@@ -385,7 +387,7 @@ function handleUndoOperation() {
     if (imageData!=null) {
       App.ctx.putImageData(imageData, 0, 0);
     }
-    
+
 }
 }
 
@@ -398,13 +400,13 @@ function compareImages(img1,img2){
              return false;
      }
      return true;
-  } 
+  }
   return false;
-   
+
 }
 
 function handleInsertTextOperation(data) {
-    
+
     App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
 
     if (imageList.length>0) {
@@ -415,11 +417,11 @@ function handleInsertTextOperation(data) {
 
     }
     App.ctx.fillText(data.text, data.x, data.y);
-  
+
 }
 
 function handleClearOperation() {
-    App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height); 
+    App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
     imageList = [];
     saveImage(App.canvas, App.ctx);
 }
