@@ -11,6 +11,7 @@ import About from './components/About'
 import LoginForm from './components/LoginForm'
 import SignupForm from './components/SignupForm'
 import Onboarding from './components/Onboarding'
+import Whiteboard from './components/Whiteboard'
 
 import AuthService from './services/AuthService'
 import OnboardingService from './services/OnboardingService'
@@ -20,6 +21,7 @@ const routes = [
   { path: '/about', component: About, meta: { protected: true } },
   { path: '/login', component: LoginForm },
   { path: '/signup', component: SignupForm },
+  { path: '/whiteboard/:id', component: Whiteboard, meta: { protected: true }},
   { path: '/onboarding', component: Onboarding, meta: { protected: true } }
 ]
 
