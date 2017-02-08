@@ -14,10 +14,10 @@
         <ul class="nav navbar-nav">
 
           <router-link to="/about" tag="li"><a>About</a></router-link>
-          <router-link to="/login" tag="li" v-if="!authenticated"><a>Login</a></router-link>
-          <router-link to="/signup" tag="li" v-if="!authenticated"><a>Signup</a></router-link>
-          <li v-if="authenticated"><a v-on:click="logout" class="logout">Logout</a></li>
-          <router-link to="/whiteboard" tag="li" v-if="authenticated"><a>Whiteboard</a></router-link>
+          <router-link to="/login" tag="li" v-if="!user.authenticated"><a>Login</a></router-link>
+          <router-link to="/signup" tag="li" v-if="!user.authenticated"><a>Signup</a></router-link>
+          <li v-if="user.authenticated"><a v-on:click="logout" class="logout">Logout</a></li>
+          <router-link to="/whiteboard" tag="li" v-if="user.authenticated"><a>Whiteboard</a></router-link>
         </ul>
       </div>
     </div>
@@ -30,14 +30,13 @@ import AuthService from '../services/AuthService';
 
 export default {
   data() {
-    console.log(AuthService.isAuthenticated);
     return {
-      authenticated: AuthService.isAuthenticated
+      user: AuthService.user
     }
   },
   methods: {
     logout(){
-      AuthService.logout();
+      AuthService.logout(this);
     }
   }
 }

@@ -4,13 +4,17 @@ import {router} from '../main'
 
 import NetworkService from './NetworkService'
 
+import jQuery from 'jquery';
+
 
 const SERVER_ROOT = 'http://localhost:3000',
       AUTH_ROOT = `${SERVER_ROOT}/auth`
 
 export default {
-  currentUser: null,
-  isAuthenticated: false, // Expose single property for watching
+  user: {
+    authenticated: false,
+    data: null,
+  },
 
   login(context, creds, redirect){
     let {email, password} = creds;
@@ -18,19 +22,18 @@ export default {
       return;
     }
 
-    // NetworkService.login(context, creds).then((res) => {
-    context.$http.post(`${AUTH_ROOT}/login`, creds).then((res) => {
+    NetworkService.login(context, creds).then((res) => {
       let data = res.data;
       if (!data){
         throw new Error('No user returned from auth service');
       }
 
-      this.currentUser = data.user;
-      this.isAuthenticated = true;
+      this.user.authenticated = true;
+      this.user.data = data.user;
       localStorage.setItem('user', JSON.stringify(data.user));
 
       if(redirect) {
-        router.go(redirect)
+        router.push(redirect)
       }
     }, (res) => {
       context.error = 'Error occurred';
@@ -39,45 +42,43 @@ export default {
   },
 
   register(context, creds, redirect){
-    context.$http.post(`${AUTH_ROOT}/register`, creds).then((res) => {
+    NetworkService.register(context, creds).then((res) => {
       let data = res.data;
       if (!data){
         throw new Error('No user returned from auth service');
       }
 
-      this.currentUser = data.user;
-      this.isAuthenticated = true;
+      this.user.authenticated = true;
+      this.user.data = data.user;
       localStorage.setItem('user', JSON.stringify(data.user));
 
       if(redirect) {
-        router.go(redirect)
+        router.push(redirect)
       }
     })
   },
 
-  logout(){
-    localStorage.removeItem('user');
-    this.currentUser = null;
-    this.isAuthenticated = false;
-    router.go('/')
+  logout(context){
+    NetworkService.logout(context).then((res) => {
+      localStorage.removeItem('user');
+      this.user.authenticated = false;
+      this.user.data = null;
+      router.push('/login');
+    });
   },
 
   checkAuth(){
     let user = localStorage.getItem('user');
     if (user){
       try {
-        this.currentUser = JSON.parse(user);
-        this.isAuthenticated = true;
+        this.user.data = JSON.parse(user);
+        this.user.authenticated = true;
       } catch (e) {
         this.logout(); // Error in LocalStorage, so logout
       }
     } else {
-      this.currentUser = null;
-      this.isAuthenticated = false;
+      this.user.authenticated = false;
+      this.user.data = null;
     }
-  },
-
-  getUser(){
-    return this.currentUser;
   }
 };

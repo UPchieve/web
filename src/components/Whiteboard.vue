@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<p>Room: <input v-model="room"> <button v-on:click="changeRoom">Change</button></p>
 		<canvas id='whiteboard' v-on:mousedown="drawStart" v-on:mouseup="drawEnd" v-on:mousemove="draw"></canvas>
 		<button id='clearButton' v-on:click="clear" ></button>
 		<button id='drawButton' v-on:click="drawSetup"></button>
@@ -20,7 +21,7 @@
 
 <script>
 
-
+import AuthService from '../services/AuthService'
 
 var SOCKET_ADDRESS = 'http://localhost:3001';
 
@@ -77,9 +78,30 @@ var imageData;
 var App = {};
 var INITIALIZED = false;
 
+App.socket = require('socket.io-client')(SOCKET_ADDRESS);
+App.socket.on(DRAW_START_EVENT, handleDrawStartOperation);
+App.socket.on(DRAW_ACTION_EVENT, handleDrawActionOperation);
+App.socket.on(DRAW_END_EVENT, handleDrawEndOperation);
+App.socket.on(SAVE_EVENT, handleSaveOperation);
+App.socket.on(UNDO_EVENT, handleUndoOperation);
+App.socket.on(CLEAR_EVENT, handleClearOperation);
+App.socket.on(COLOR_CHANGE_EVENT, handleColorChangeOperation);
+App.socket.on(WIDTH_CHANGE_EVENT, handleWidthChangeOperation);
+App.socket.on(INSERT_TEXT_EVENT, handleInsertTextOperation);
+
 
 export default {
+	data(){
+		return {
+			room: 'test'
+		}
+	},
   methods: {
+		changeRoom(){
+			console.log('Room changed to', this.room)
+			App.socket.emit('room', this.room);
+		},
+
     color: function(event){
 
       if (DRAWING && !ERASING) {
@@ -277,23 +299,13 @@ export default {
 
     }
 
-  } ,
+  },
   mounted() {
-			var room = this.$route.params.id;
-
-			App.socket = require('socket.io-client')(SOCKET_ADDRESS);
-			App.socket.on(DRAW_START_EVENT, handleDrawStartOperation);
-			App.socket.on(DRAW_ACTION_EVENT, handleDrawActionOperation);
-			App.socket.on(DRAW_END_EVENT, handleDrawEndOperation);
-			App.socket.on(SAVE_EVENT, handleSaveOperation);
-			App.socket.on(UNDO_EVENT, handleUndoOperation);
-			App.socket.on(CLEAR_EVENT, handleClearOperation);
-			App.socket.on(COLOR_CHANGE_EVENT, handleColorChangeOperation);
-			App.socket.on(WIDTH_CHANGE_EVENT, handleWidthChangeOperation);
-			App.socket.on(INSERT_TEXT_EVENT, handleInsertTextOperation);
+			var initRoom = this.room;
 
 			App.socket.on('connect', function(){
-				App.socket.emit('init', room);
+				console.log(initRoom);
+				App.socket.emit('room', initRoom);
 			});
 
 

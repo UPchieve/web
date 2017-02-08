@@ -15,8 +15,8 @@ export default {
   login(context, data){
     return context.$http.post(`${AUTH_ROOT}/login`, data).then(this._successHandler, this._errorHandler)
   },
-  logout(context, data){
-    return context.$http.post(`${AUTH_ROOT}/logout`, data).then(this._successHandler, this._errorHandler)
+  logout(context){
+    return context.$http.get(`${AUTH_ROOT}/logout`).then(this._successHandler, this._errorHandler)
   },
   register(context, data){
     return context.$http.post(`${AUTH_ROOT}/register`, data).then(this._successHandler, this._errorHandler)
