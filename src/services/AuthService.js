@@ -8,12 +8,14 @@ import jQuery from 'jquery';
 
 
 const SERVER_ROOT = 'http://localhost:3000',
-      AUTH_ROOT = `${SERVER_ROOT}/auth`
+      AUTH_ROOT = `${SERVER_ROOT}/auth`,
+      USER_FETCH_LIMIT_SECONDS = 5
 
 export default {
   user: {
     authenticated: false,
     data: null,
+    lastFetch: 0
   },
 
   login(context, creds, redirect){
@@ -67,7 +69,7 @@ export default {
     });
   },
 
-  checkAuth(){
+  checkAuth(context){
     let user = localStorage.getItem('user');
     if (user){
       try {
@@ -80,5 +82,35 @@ export default {
       this.user.authenticated = false;
       this.user.data = null;
     }
+
+    if (context && this.shouldFetch()){
+      this.fetchUser(context);
+    }
+  },
+
+  shouldFetch(){
+    return (Date.now() - this.user.lastFetch) > USER_FETCH_LIMIT_SECONDS * 1000
+  },
+
+  fetchUser(context){
+    this.user.lastFetch = Date.now();
+
+    NetworkService.user(context).then((res) => {
+      let data = res.data;
+      if (!data){
+        throw new Error('No user returned from auth service');
+      }
+
+      if (data.user){
+        this.user.authenticated = true;
+        this.user.data = data.user;
+        localStorage.setItem('user', JSON.stringify(data.user));
+      } else {
+        this.user.authenticated = false;
+        this.user.data = null;
+      }
+    }).catch((err) => {
+      console.log(err);
+    })
   }
 };

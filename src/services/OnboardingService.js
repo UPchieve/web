@@ -10,10 +10,6 @@ const SERVER_ROOT = 'http://localhost:3000',
 
 export default {
 
-  sendVerification(){
-
-  },
-
   sendVerification(context, redirect){
     NetworkService.sendVerification(context).then((res) => {
       console.log(res.data);
@@ -25,14 +21,17 @@ export default {
   },
 
   hasVerifiedEmail(){
+    var user = AuthService.user.data;
+    // return user && user.verified;
     return true;
   },
 
   hasProfile(){
-    return true;
+    return false;
   },
 
   getOnboardingRoute(){
+    // Map each route to function that will show route if false
     let map = {
       '/onboarding/verify': this.hasVerifiedEmail,
       '/onboarding/profile': this.hasProfile

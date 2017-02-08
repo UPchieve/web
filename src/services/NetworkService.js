@@ -4,11 +4,10 @@ const SERVER_ROOT = 'http://localhost:3000',
 
 export default {
   _successHandler(res){
-    console.log(res);
     return Promise.resolve(res)
   },
   _errorHandler(res){
-    return Promise.resolve(res)
+    return Promise.reject(res)
   },
 
   // Server route defintions
@@ -20,6 +19,9 @@ export default {
   },
   register(context, data){
     return context.$http.post(`${AUTH_ROOT}/register`, data).then(this._successHandler, this._errorHandler)
+  },
+  user(context){
+    return context.$http.get(`${API_ROOT}/user`).then(this._successHandler, this._errorHandler)
   },
 
   sendVerification(context){

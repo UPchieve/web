@@ -19,6 +19,9 @@ export default {
   name: 'app',
   components: {
     Navbar
+  },
+  created(){
+    AuthService.checkAuth(this);
   }
 }
 </script>
