@@ -8,7 +8,7 @@
 <script>
 
 import SendVerification from './Onboarding/SendVerification';
-import CompleteProfile from './Onboarding/CompleteProfile';
+import CompleteProfile from './Profile';
 
 import OnboardingService from '../services/OnboardingService';
 

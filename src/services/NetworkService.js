@@ -20,12 +20,19 @@ export default {
   register(context, data){
     return context.$http.post(`${AUTH_ROOT}/register`, data).then(this._successHandler, this._errorHandler)
   },
+
+
   user(context){
     return context.$http.get(`${API_ROOT}/user`).then(this._successHandler, this._errorHandler)
   },
-
   sendVerification(context){
     return context.$http.post(`${API_ROOT}/verify/send`).then(this._successHandler, this._errorHandler)
+  },
+  confirmVerification(context, data){
+    return context.$http.post(`${API_ROOT}/verify/confirm`, data).then(this._successHandler, this._errorHandler)
+  },
+  setProfile(context, data){
+    return context.$http.put(`${API_ROOT}/user`, data).then(this._successHandler, this._errorHandler)
   }
 
 }

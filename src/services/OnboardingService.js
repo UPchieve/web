@@ -10,24 +10,38 @@ const SERVER_ROOT = 'http://localhost:3000',
 
 export default {
 
-  sendVerification(context, redirect){
-    NetworkService.sendVerification(context).then((res) => {
-      console.log(res.data);
-      // router.go(redirect || '/')
-    }, (res) => {
-      context.error = 'Error occurred';
-      console.log(res);
+  sendVerification(context){
+    return NetworkService.sendVerification(context)
+      .then(() => {
+        context.msg = 'Email sent!';
+      })
+      .catch(() => {
+        context.msg = 'Error occurred';
+      })
+  },
+  confirmVerification(context, token){
+    return NetworkService.confirmVerification(context, {
+      token: token
+    }).then(() => {
+      router.replace('/');
+    })
+    .catch(() => {
+      context.msg = 'Error occurred';
     })
   },
 
   hasVerifiedEmail(){
-    var user = AuthService.user.data;
-    // return user && user.verified;
-    return true;
+    var user = AuthService.user.data || {};
+    return user.verified;
   },
 
   hasProfile(){
-    return false;
+    var user = AuthService.user.data || {};
+    return user.name && user.picture;
+  },
+
+  isOnboarded(){
+    return this.hasVerifiedEmail() && this.hasProfile();
   },
 
   getOnboardingRoute(){

@@ -14,6 +14,8 @@ import LoginForm from './components/LoginForm'
 import SignupForm from './components/SignupForm'
 import Onboarding from './components/Onboarding'
 import Whiteboard from './components/Whiteboard'
+import Action from './components/Action'
+import Profile from './components/Profile'
 
 import AuthService from './services/AuthService'
 import OnboardingService from './services/OnboardingService'
@@ -24,7 +26,9 @@ const routes = [
   { path: '/login', component: LoginForm },
   { path: '/signup', component: SignupForm },
   { path: '/whiteboard', component: Whiteboard, meta: { protected: true } },
-  { path: '/onboarding/:step', component: Onboarding, meta: { protected: true } }
+  { path: '/action/:action/:data?', component: Action, meta: { bypassOnboarding: true } },
+  { path: '/onboarding/:step?', component: Onboarding, meta: { protected: true } },
+  { path: '/profile', component: Profile, meta: { protected: true } }
 ]
 
 const router = new VueRouter({
@@ -37,7 +41,6 @@ export {router}; // Expose router to app controllers
 // Router middleware to check authentication for protect routes
 router.beforeEach((to, from, next) => {
   if (to.matched.some(route => route.meta.protected)){
-    console.log(AuthService.user);
     if (!AuthService.user.authenticated){
       console.log('Protected route requires login');
       next({
@@ -46,10 +49,10 @@ router.beforeEach((to, from, next) => {
           redirect: to.fullPath
         }
       });
-    } else if (!OnboardingService.isOnboarded){
+    } else if (!OnboardingService.isOnboarded()){
       console.log('User requires onboarding');
       var route = OnboardingService.getOnboardingRoute();
-      if (to.path.indexOf(route) !== -1){
+      if (to.path.indexOf(route) !== -1 || to.matched.some(route => route.meta.bypassOnboarding)){
         next();
       } else {
         next({

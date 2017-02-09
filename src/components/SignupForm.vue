@@ -1,12 +1,13 @@
 <template>
   <form class="form-signin">
-        <h2 class="form-signin-heading">Register</h2>
-        <label for="inputEmail" class="sr-only">Email address</label>
-        <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus v-model="credentials.email">
-        <label for="inputPassword" class="sr-only">Password</label>
-        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required v-model="credentials.password">
-        <button class="btn btn-lg btn-primary btn-block" type="submit" @click="submit()">Sign up</button>
-      </form>
+    <h2 class="form-signin-heading">Register</h2>
+    <label for="inputEmail" class="sr-only">Email address</label>
+    <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus v-model="credentials.email">
+    <label for="inputPassword" class="sr-only">Password</label>
+    <input type="password" id="inputPassword" class="form-control" placeholder="Password" required v-model="credentials.password">
+    <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">Sign up</button>
+    {{msg}}
+  </form>
 </template>
 
 <script>
@@ -15,6 +16,7 @@ import AuthService from 'src/services/AuthService'
 export default {
   data() {
     return {
+      msg: '',
       credentials: {
         email: '',
         password: ''
@@ -26,7 +28,7 @@ export default {
       AuthService.register(this, {
         email: this.credentials.email,
         password: this.credentials.password
-      })
+      }, '/');
     }
   }
 }

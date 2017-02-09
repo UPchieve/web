@@ -54,14 +54,23 @@ export default {
       this.user.data = data.user;
       localStorage.setItem('user', JSON.stringify(data.user));
 
+      context.msg = 'You have been signed up!';
+
       if(redirect) {
-        router.push(redirect)
+        setTimeout(() => {
+          router.push(redirect)
+        }, 2000);
       }
     })
   },
 
   logout(context){
     NetworkService.logout(context).then((res) => {
+      localStorage.removeItem('user');
+      this.user.authenticated = false;
+      this.user.data = null;
+      router.push('/login');
+    }).catch(() => {
       localStorage.removeItem('user');
       this.user.authenticated = false;
       this.user.data = null;
