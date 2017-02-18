@@ -120,6 +120,7 @@ export default {
       imageList = [];
       saveImage(App.canvas, App.ctx);
       App.socket.emit('clearClick');
+      console.log(this.room);
     },
 
     drawStart: function(event) {
