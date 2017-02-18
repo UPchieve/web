@@ -8,7 +8,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <router-link to="/about" class="navbar-brand">BelieveAchieve</router-link>
+        <router-link to="/about" class="navbar-brand">UPchieve</router-link>
       </div>
       <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
@@ -19,6 +19,7 @@
           <li v-if="user.authenticated"><a v-on:click="logout" class="logout">Logout</a></li>
           <router-link to="/whiteboard" tag="li" v-if="user.authenticated"><a>Whiteboard</a></router-link>
           <router-link to="/profile" tag="li" v-if="user.authenticated"><a>Profile</a></router-link>
+          <router-link to="/profile" tag="li" v-if="!user.authenticated"><a>Protected</a></router-link>
         </ul>
       </div>
     </div>

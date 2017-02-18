@@ -23,6 +23,10 @@ export default {
     return NetworkService.confirmVerification(context, {
       token: token
     }).then(() => {
+      let user = AuthService.user.data;
+      if (user){
+        user.verified = true;
+      }
       router.replace('/');
     })
     .catch(() => {

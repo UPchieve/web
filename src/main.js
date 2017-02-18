@@ -22,10 +22,10 @@ import OnboardingService from './services/OnboardingService'
 
 const routes = [
   { path: '/', redirect: '/about' },
-  { path: '/about', component: About, meta: { protected: true } },
+  { path: '/about', component: About },
   { path: '/login', component: LoginForm },
   { path: '/signup', component: SignupForm },
-  { path: '/whiteboard', component: Whiteboard, meta: { protected: true } },
+  { path: '/whiteboard', component: Whiteboard, meta: { protected: false } },
   { path: '/action/:action/:data?', component: Action, meta: { bypassOnboarding: true } },
   { path: '/onboarding/:step?', component: Onboarding, meta: { protected: true } },
   { path: '/profile', component: Profile, meta: { protected: true } }

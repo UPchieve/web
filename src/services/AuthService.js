@@ -65,17 +65,23 @@ export default {
   },
 
   logout(context){
-    NetworkService.logout(context).then((res) => {
+    if (context){
+      NetworkService.logout(context).then((res) => {
+        localStorage.removeItem('user');
+        this.user.authenticated = false;
+        this.user.data = null;
+        router.push('/login');
+      }).catch(() => {
+        localStorage.removeItem('user');
+        this.user.authenticated = false;
+        this.user.data = null;
+        router.push('/login');
+      });
+    } else {
       localStorage.removeItem('user');
       this.user.authenticated = false;
       this.user.data = null;
-      router.push('/login');
-    }).catch(() => {
-      localStorage.removeItem('user');
-      this.user.authenticated = false;
-      this.user.data = null;
-      router.push('/login');
-    });
+    }
   },
 
   checkAuth(context){
