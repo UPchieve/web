@@ -16,12 +16,23 @@
 		<button id='purpleButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:purple;'></button>
 		<button id='brownButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:brown;'></button>
 		<textarea id='textInputBox' v-on:input="textBox" v-on:keydown="keydown" rows='4' cols='50' style='visibility:hidden' placeholder='Type Here'></textarea>
+
+    <div id='messages' style="height:200px;width:400px;border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;overflow:scroll;">
+        <ul>
+          <template v-for="message in messages">
+            <li>{{message}}</li>
+          </template>
+        </ul>
+    </div>
+    
+    <textarea id='messageSendBox' v-on:keyup.enter="sendMessage" rows='4' cols='50'></textarea>
 	</div>
 </template>
 
 <script>
 
 import AuthService from '../services/AuthService'
+import Whiteboard from './Whiteboard.vue'
 
 var SOCKET_ADDRESS = 'http://localhost:3001';
 
@@ -43,6 +54,7 @@ var COLOR_CHANGE_EVENT = 'color';
 var WIDTH_CHANGE_EVENT = 'width';
 var INSERT_TEXT_EVENT = 'text';
 var RESET_SCREEN_EVENT = 'reset';
+var SEND_MESSAGE_EVENT = 'messageSend';
 
 var CANVAS_WIDTH = 800;
 var CANVAS_HEIGHT = 400;
@@ -88,11 +100,15 @@ App.socket.on(CLEAR_EVENT, handleClearOperation);
 App.socket.on(COLOR_CHANGE_EVENT, handleColorChangeOperation);
 App.socket.on(WIDTH_CHANGE_EVENT, handleWidthChangeOperation);
 App.socket.on(INSERT_TEXT_EVENT, handleInsertTextOperation);
+App.socket.on(SEND_MESSAGE_EVENT, receiveMessage);
 
+var messages = [];
+var bottom = 0;
 
 export default {
 	data(){
 		return {
+      messages: messages,
 			room: 'test'
 		}
 	},
@@ -114,6 +130,32 @@ export default {
       }
 
     },
+
+
+    sendMessage: function() {
+       var message = this.$el.querySelector('#messageSendBox').value;
+       
+      App.socket.emit('message', {
+     
+        message: message
+      });
+      this.$el.querySelector('#messageSendBox').value='';
+      var dt = new Date();
+      var hours = dt.getHours();
+      var minutes = dt.getMinutes();
+      var msg = this.$el.querySelector('#messages');
+
+      if (hours>12) {
+         messages.push((hours-12)+':'+dt.getMinutes()+' PM Me: ' + message);
+      } else { 
+         messages.push(dt.getHours()+':'+dt.getMinutes()+ ' AM Me: '+message);
+      }
+
+      msg.scrollTop = msg.scrollHeight;
+      
+      
+    },
+
 
     clear: function() {
       App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
@@ -298,6 +340,10 @@ export default {
       App.socket.emit('changeColor', ERASING_LINE_COLOR);
       App.socket.emit('changeWidth', ERASING_LINE_WIDTH);
 
+    },
+
+    handleMessageSendOperation(message) {
+      this.messages.push(message);
     }
 
   },
@@ -321,6 +367,20 @@ export default {
       saveImage(App.canvas, App.ctx);
 
   }
+}
+
+
+function receiveMessage(message) {
+  var dt = new Date();
+  var hours = dt.getHours();
+  var minutes = dt.getMinutes();
+
+  if (hours>12) {
+     messages.push((hours-12)+':'+dt.getMinutes()+' PM Them: ' + message.message);
+  } else { 
+     messages.push(dt.getHours()+':'+dt.getMinutes()+ ' AM Them: '+message.message);
+  }
+ 
 }
 
 
