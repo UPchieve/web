@@ -1,32 +1,57 @@
 <template>
-	<div>
+	<div class="container">
 		<p>Room: <input v-model="room"> <button v-on:click="changeRoom">Change</button></p>
-		<canvas id='whiteboard' v-on:mousedown="drawStart" v-on:mouseup="drawEnd" v-on:mousemove="draw"></canvas>
-		<button id='clearButton' v-on:click="clear" ></button>
-		<button id='drawButton' v-on:click="drawSetup"></button>
-		<button id='undoButton' v-on:click="undo"></button>
-		<button id='eraseButton' v-on:click="erase"></button>
-		<button id='textButton' v-on:click="text"></button>
-		<button id='blueButton' class='colorButton' v-on:click="color" style='padding:0px;margin:0px;width:28px;height:28px;background-color:blue;'></button>
-		<button id='redButton' class='colorButton' v-on:click="color" style='padding:0px;margin:0px;width:28px;height:28px;background-color:red;'></button>
-		<button id='greenButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:green;'></button>
-		<button id='blackButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:black;'></button>
-		<button id='orangeButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:orange;'></button>
-		<button id='yellowButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:yellow;'></button>
-		<button id='purpleButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:purple;'></button>
-		<button id='brownButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:brown;'></button>
-		<textarea id='textInputBox' v-on:input="textBox" v-on:keydown="keydown" v-on:keyup.enter="hideBox" rows='4' cols='50' style='visibility:hidden' placeholder='Type Here'></textarea>
 
-    <div id='messages' style="height:200px;width:400px;border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;overflow:scroll;">
-        <ul>
-          <template v-for="message in messages">
-            <li>{{message}}</li>
-          </template>
-        </ul>
-    </div>
+    <div class="row">
+      <div class = "col-sm-8">
+          <canvas id='whiteboard' v-on:mousedown="drawStart" v-on:mouseup="drawEnd" v-on:mousemove="draw"></canvas>
+          <div class="row">
+            <div class="col-sm-6">
+
+              <button id='clearButton' v-on:click="clear" ></button>
+              <button id='drawButton' v-on:click="drawSetup"></button>
+              <button id='undoButton' v-on:click="undo"></button>
+              <button id='eraseButton' v-on:click="erase"></button>
+              <button id='textButton' v-on:click="text"></button>
+
+            </div>
+
+
+
+          <div class="col-sm-6">
+                <button id='blueButton' class='colorButton' v-on:click="color" style='padding:0px;margin:0px;width:28px;height:28px;background-color:blue;'></button>
+                <button id='redButton' class='colorButton' v-on:click="color" style='padding:0px;margin:0px;width:28px;height:28px;background-color:red;'></button>
+                <button id='greenButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:green;'></button>
+                <button id='blackButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:black;'></button>
+                <button id='orangeButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:orange;'></button>
+                <button id='yellowButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:yellow;'></button>
+                <button id='purpleButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:purple;'></button>
+                <button id='brownButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:brown;'></button>
+                <textarea id='textInputBox' v-on:input="textBox" v-on:keydown="keydown" v-on:keyup.enter="hideBox" rows='4' cols='50' style='visibility:hidden' placeholder='Type Here'></textarea>
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class = "col-sm-4">
+            <div id='messages' style="border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;overflow:scroll;">
+                <ul>
+                  <template v-for="message in messages">
+                    <li>{{message}}</li>
+                  </template>
+                </ul>
+            </div>
+              <textarea id='messageSendBox' v-on:keyup.enter="sendMessage"></textarea>
+      </div>
+  </div>
+
+  
+
+</div>
+		
+
     
-    <textarea id='messageSendBox' v-on:keyup.enter="sendMessage" rows='4' cols='50'></textarea>
-	</div>
 </template>
 
 <script>
@@ -164,9 +189,18 @@ export default {
       var msg = this.$el.querySelector('#messages');
 
       if (hours>12) {
-         messages.push((hours-12)+':'+dt.getMinutes()+' PM Me: ' + message);
+         if (dt.getMinutes()<10) {
+            messages.push((hours-12)+':0'+dt.getMinutes()+' PM Me: ' + message);
+         } else {
+            messages.push((hours-12)+':'+dt.getMinutes()+' PM Me: ' + message);
+         }
+         
       } else { 
-         messages.push(dt.getHours()+':'+dt.getMinutes()+ ' AM Me: '+message);
+         if (dt.getMinutes()<10) {
+            messages.push((hours)+':0'+dt.getMinutes()+' PM Me: ' + message);
+         } else {
+            messages.push((hours)+':'+dt.getMinutes()+' PM Me: ' + message);
+         }
       }
 
       msg.scrollTop = msg.scrollHeight;
@@ -186,7 +220,6 @@ export default {
     drawStart: function(event) {
 
       if (!CURSOR_VISIBLE && current_state===('INSERTING_TEXT')) {
-        console.log('STARTING DRAWING, INSERTING TEXT');
         TEXT_POSITION_X = event.layerX -10;
         TEXT_POSITION_Y = event.layerY +34;
         CURSOR_VISIBLE = true;
@@ -212,7 +245,6 @@ export default {
 
         saveImage(App.canvas, App.ctx);
         App.socket.emit('saveImage');
-        console.log('STARTING DRAWING, NOT INSERTING TEXT');
         App.canvas.isDrawing = true;
 
          var scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
@@ -363,7 +395,6 @@ export default {
         App.socket.emit('saveImage');
       }
       current_state = 'ERASING';
-      console.log('CURRENT STATE: '+current_state);
       App.ctx.strokeStyle = ERASING_LINE_COLOR;
       App.ctx.lineWidth = ERASING_LINE_WIDTH;
       App.canvas.style.cursor = ERASER_ICON;
@@ -395,8 +426,33 @@ export default {
       App.ctx.strokeStyle = LOCAL_LINE_COLOR;
       App.socket.emit('changeColor', LOCAL_LINE_COLOR);
       App.ctx.lineWidth = LINE_WIDTH;
-      App.ctx.font = 'bold 16px Arial';
+      App.ctx.font = 'bold 64px Arial';
       saveImage(App.canvas, App.ctx);
+
+      var canvas = this.$el.querySelector('#whiteboard');
+      fitToContainer(canvas);
+      var messages = this.$el.querySelector('#messages');
+      
+      var messagebox = this.$el.querySelector('#messageSendBox');
+      fitMessages(messagebox);
+
+      messages.style.width = this.$el.querySelector('#messageSendBox').offsetWidth+'px';
+      messages.style.height =this.$el.querySelector('#whiteboard').offsetHeight+'px';
+      
+
+      function fitToContainer(canvas){
+        canvas.style.width ='100%';   
+        canvas.style.height='100%';
+        canvas.width  = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+      }
+
+      function fitMessages(messagebox){
+        messagebox.style.width ='100%';   
+        messagebox.style.height='100%';
+      }
+
+      
 
   }
 }
@@ -558,11 +614,7 @@ body {
 
 canvas {
 	background: #fff;
-  width:800px;
-  height:400px;
-	margin: 20px auto;
 	border: 5px solid #E8E8E8;
-  position: relative;
 	display: block;
  	cursor: not-allowed;
 }
