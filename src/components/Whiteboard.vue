@@ -1,9 +1,9 @@
 <template>
-	<div class="container">
-		<p>Room: <input v-model="room"> <button v-on:click="changeRoom">Change</button></p>
+  <div class="container">
+    <p>Room: <input v-model="room"> <button v-on:click="changeRoom">Change</button></p>
 
     <div class="row">
-      <div class = "col-sm-8">
+      <div class = "col-sm-12">
           <canvas id='whiteboard' v-on:mousedown="drawStart" v-on:mouseup="drawEnd" v-on:mousemove="draw"></canvas>
           <div class="row">
             <div class="col-sm-6">
@@ -15,9 +15,6 @@
               <button id='textButton' v-on:click="text"></button>
 
             </div>
-
-
-
           <div class="col-sm-6">
                 <button id='blueButton' class='colorButton' v-on:click="color" style='padding:0px;margin:0px;width:28px;height:28px;background-color:blue;'></button>
                 <button id='redButton' class='colorButton' v-on:click="color" style='padding:0px;margin:0px;width:28px;height:28px;background-color:red;'></button>
@@ -32,24 +29,12 @@
           </div>
         </div>
       </div>
-
-
-      <div class = "col-sm-4">
-            <div id='messages' style="border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;overflow:scroll;">
-                <ul>
-                  <template v-for="message in messages">
-                    <li>{{message}}</li>
-                  </template>
-                </ul>
-            </div>
-              <textarea id='messageSendBox' v-on:keyup.enter="sendMessage"></textarea>
-      </div>
   </div>
 
   
 
 </div>
-		
+    
 
     
 </template>
@@ -78,7 +63,7 @@ var COLOR_CHANGE_EVENT = 'color';
 var WIDTH_CHANGE_EVENT = 'width';
 var INSERT_TEXT_EVENT = 'text';
 var RESET_SCREEN_EVENT = 'reset';
-var SEND_MESSAGE_EVENT = 'messageSend';
+
 
 var CANVAS_WIDTH = 800;
 var CANVAS_HEIGHT = 400;
@@ -132,25 +117,22 @@ App.socket.on(CLEAR_EVENT, handleClearOperation);
 App.socket.on(COLOR_CHANGE_EVENT, handleColorChangeOperation);
 App.socket.on(WIDTH_CHANGE_EVENT, handleWidthChangeOperation);
 App.socket.on(INSERT_TEXT_EVENT, handleInsertTextOperation);
-App.socket.on(SEND_MESSAGE_EVENT, receiveMessage);
 
 var messages = [];
 var bottom = 0;
 
 export default {
-	data(){
-		return {
-      messages: messages,
-			room: 'test'
-		}
-	},
+  data(){
+    return {
+      room: 'test'
+    }
+  },
   methods: {
 
-
-		changeRoom(){
-			console.log('Room changed to', this.room)
-			App.socket.emit('room', this.room);
-		},
+    changeRoom(){
+      console.log('Room changed to', this.room)
+      App.socket.emit('room', this.room);
+    },
 
     hideBox: function() {
         this.$el.querySelector('#textInputBox').style.visibility='hidden';
@@ -173,41 +155,6 @@ export default {
       }
 
     },
-
-
-    sendMessage: function() {
-       var message = this.$el.querySelector('#messageSendBox').value;
-       
-      App.socket.emit('message', {
-     
-        message: message
-      });
-      this.$el.querySelector('#messageSendBox').value='';
-      var dt = new Date();
-      var hours = dt.getHours();
-      var minutes = dt.getMinutes();
-      var msg = this.$el.querySelector('#messages');
-
-      if (hours>12) {
-         if (dt.getMinutes()<10) {
-            messages.push((hours-12)+':0'+dt.getMinutes()+' PM Me: ' + message);
-         } else {
-            messages.push((hours-12)+':'+dt.getMinutes()+' PM Me: ' + message);
-         }
-         
-      } else { 
-         if (dt.getMinutes()<10) {
-            messages.push((hours)+':0'+dt.getMinutes()+' PM Me: ' + message);
-         } else {
-            messages.push((hours)+':'+dt.getMinutes()+' PM Me: ' + message);
-         }
-      }
-
-      msg.scrollTop = msg.scrollHeight;
-      
-      
-    },
-
 
     clear: function() {
       App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
@@ -411,12 +358,12 @@ export default {
 
   },
   mounted() {
-			var initRoom = this.room;
+      var initRoom = this.room;
 
-			App.socket.on('connect', function(){
-				console.log(initRoom);
-				App.socket.emit('room', initRoom);
-			});
+      App.socket.on('connect', function(){
+        console.log(initRoom);
+        App.socket.emit('room', initRoom);
+      });
 
 
       App.canvas = this.$el.querySelector('#whiteboard');
@@ -431,14 +378,6 @@ export default {
 
       var canvas = this.$el.querySelector('#whiteboard');
       fitToContainer(canvas);
-      var messages = this.$el.querySelector('#messages');
-      
-      var messagebox = this.$el.querySelector('#messageSendBox');
-      fitMessages(messagebox);
-
-      messages.style.width = this.$el.querySelector('#messageSendBox').offsetWidth+'px';
-      messages.style.height =this.$el.querySelector('#whiteboard').offsetHeight+'px';
-      
 
       function fitToContainer(canvas){
         canvas.style.width ='100%';   
@@ -446,31 +385,8 @@ export default {
         canvas.width  = canvas.offsetWidth;
         canvas.height = canvas.offsetHeight;
       }
-
-      function fitMessages(messagebox){
-        messagebox.style.width ='100%';   
-        messagebox.style.height='100%';
-      }
-
-      
-
   }
 }
-
-
-function receiveMessage(message) {
-  var dt = new Date();
-  var hours = dt.getHours();
-  var minutes = dt.getMinutes();
-
-  if (hours>12) {
-     messages.push((hours-12)+':'+dt.getMinutes()+' PM Them: ' + message.message);
-  } else { 
-     messages.push(dt.getHours()+':'+dt.getMinutes()+ ' AM Them: '+message.message);
-  }
- 
-}
-
 
 function fillCircle(canvas, context, type, server, x, y, fillColor) {
   var scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
@@ -602,61 +518,61 @@ function handleWidthChangeOperation(width) {
 </script>
 
 <style scoped>
-	html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{border:0;font-size:100%;font:inherit;vertical-align:baseline;margin:0;padding:0;}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block;}body{line-height:1;}ol,ul{list-style:none;}blockquote,q{quotes:none;}blockquote:before,blockquote:after,q:before,q:after{content:none;}table{border-collapse:collapse;border-spacing:0;}.clearfix:after{content:'.';display:block;clear:both;visibility:hidden;line-height:0;height:0;}.clearfix{display:inline-block;}html[xmlns] .clearfix{display:block;}* html .clearfix{height:1%;}
+  html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{border:0;font-size:100%;font:inherit;vertical-align:baseline;margin:0;padding:0;}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block;}body{line-height:1;}ol,ul{list-style:none;}blockquote,q{quotes:none;}blockquote:before,blockquote:after,q:before,q:after{content:none;}table{border-collapse:collapse;border-spacing:0;}.clearfix:after{content:'.';display:block;clear:both;visibility:hidden;line-height:0;height:0;}.clearfix{display:inline-block;}html[xmlns] .clearfix{display:block;}* html .clearfix{height:1%;}
 
 
 
 body {
   padding:50px;
-	background: #f2f2f2;
+  background: #f2f2f2;
 }
 
 
 canvas {
-	background: #fff;
-	border: 5px solid #E8E8E8;
-	display: block;
- 	cursor: not-allowed;
+  background: #fff;
+  border: 5px solid #E8E8E8;
+  display: block;
+  cursor: not-allowed;
 }
 
 #eraseButton {
-	height:28px;
-	width:28px;
-	background-image: url('../assets/Eraser-icon-24.png');
-	padding:0px;
-	margin:0px;
+  height:28px;
+  width:28px;
+  background-image: url('../assets/Eraser-icon-24.png');
+  padding:0px;
+  margin:0px;
 }
 
 #drawButton {
-	height:28px;
-	width:28px;
-	background-image: url('../assets/Pen-icon-24.png');
-	padding:0px;
-	margin:0px;
+  height:28px;
+  width:28px;
+  background-image: url('../assets/Pen-icon-24.png');
+  padding:0px;
+  margin:0px;
 }
 
 #undoButton {
-	height:28px;
-	width:28px;
-	background-image: url('../assets/Arrows-Undo-icon.png');
-	padding:0px;
-	margin:0px;
+  height:28px;
+  width:28px;
+  background-image: url('../assets/Arrows-Undo-icon.png');
+  padding:0px;
+  margin:0px;
 }
 
 #textButton {
-	height:28px;
-	width:28px;
-	background-image: url('../assets/Text-Effect-icon.png');
-	padding:0px;
-	margin:0px;
+  height:28px;
+  width:28px;
+  background-image: url('../assets/Text-Effect-icon.png');
+  padding:0px;
+  margin:0px;
 }
 
 #clearButton {
-	height:28px;
-	width:28px;
-	background-image: url('../assets/Paper-icon.png');
-	padding:0px;
-	margin:0px;
+  height:28px;
+  width:28px;
+  background-image: url('../assets/Paper-icon.png');
+  padding:0px;
+  margin:0px;
 }
 
 </style>
