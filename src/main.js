@@ -10,8 +10,10 @@ Vue.use(VueRouter)
 Vue.http.options.credentials = true;
 
 import About from './components/About'
+import Contact from './components/Contact'
+import Privacy from './components/Privacy'
 import LoginForm from './components/LoginForm'
-import SignupForm from './components/SignupForm'
+import Registration from './components/Registration'
 import Onboarding from './components/Onboarding'
 import Whiteboard from './components/Whiteboard'
 import Action from './components/Action'
@@ -23,8 +25,10 @@ import OnboardingService from './services/OnboardingService'
 const routes = [
   { path: '/', redirect: '/about' },
   { path: '/about', component: About },
+  { path: '/contact', component: Contact },
+  { path: '/privacy', component: Privacy },
   { path: '/login', component: LoginForm },
-  { path: '/signup', component: SignupForm },
+  { path: '/signup', component: Registration },
   { path: '/whiteboard', component: Whiteboard, meta: { protected: false } },
   { path: '/action/:action/:data?', component: Action, meta: { bypassOnboarding: true } },
   { path: '/onboarding/:step?', component: Onboarding, meta: { protected: true } },

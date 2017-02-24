@@ -10,10 +10,6 @@
 import SendVerification from './Onboarding/SendVerification';
 import CompleteProfile from './Profile';
 
-import OnboardingService from '../services/OnboardingService';
-
-// TODO: UserService to choose starting onboarding step based on user state
-
 export default {
   components: {
     SendVerification,

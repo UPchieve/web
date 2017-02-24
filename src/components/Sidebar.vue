@@ -1,0 +1,65 @@
+<template>
+  <nav class="navbar">
+    <router-link to="/about" tag="h1" class="header-link">UPchieve</router-link>
+    <div v-if="auth.authenticated">
+      <profile-info v-if="auth.authenticated"></profile-info>
+      <div id="navbar">
+        <user-nav></user-nav>
+      </div>
+    </div>
+    <div class="navbar-footer">
+      <sidebar-footer></sidebar-footer>
+    </div>
+  </nav>
+</template>
+
+<script>
+
+import UserService from '../services/UserService';
+
+import UserNav from './Sidebar/UserNav';
+import ProfileInfo from './Sidebar/ProfileInfo';
+import Footer from './Sidebar/Footer';
+
+export default {
+  components: {
+    UserNav,
+    ProfileInfo,
+    SidebarFooter: Footer // footer is reserved component name
+  },
+  data() {
+    return {
+      auth: UserService.getAuth()
+    }
+  }
+}
+</script>
+
+<style scoped>
+nav {
+  height: 100%;
+  border-radius: 0;
+  border: none;
+  padding-top: 30px;
+
+  background-color: #263368;
+  color: white;
+}
+
+h1, h2 {
+  font-weight: normal;
+}
+
+h1.header-link {
+  margin-top: 29px;
+  margin-bottom: 50px;
+}
+
+.navbar-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+</style>

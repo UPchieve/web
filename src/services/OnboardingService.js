@@ -9,6 +9,9 @@ const SERVER_ROOT = 'http://localhost:3000',
       API_ROOT = `${SERVER_ROOT}/api`
 
 export default {
+  status: {
+    isOnboarded: false
+  },
 
   sendVerification(context){
     return NetworkService.sendVerification(context)

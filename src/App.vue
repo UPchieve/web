@@ -1,15 +1,20 @@
 <template>
   <div id="app">
-    <navbar></navbar>
-    <div class="container">
-       <router-view></router-view>
+    <div class="row">
+      <div class="nav-container">
+        <sidebar></sidebar>
+      </div>
+      <div class="col-xs-12 view-container">
+        <router-view></router-view>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import 'bootstrap/dist/css/bootstrap.css'
-import Navbar from './components/Navbar'
+
+import Sidebar from './components/Sidebar'
 
 import AuthService from './services/AuthService';
 
@@ -18,7 +23,7 @@ AuthService.checkAuth();
 export default {
   name: 'app',
   components: {
-    Navbar
+    Sidebar
   },
   created(){
     AuthService.checkAuth(this);
@@ -28,11 +33,30 @@ export default {
 
 <style>
 
+html, body, #app {
+  height: 100%;
+}
+
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: 'Work Sans', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+}
+
+#app > .row, .nav-container, .view-container {
+  height: 100%;
+}
+
+.nav-container {
+  width: 300px;
+  position: fixed;
+  z-index: 1;
+}
+
+.col-xs-12.view-container {
+  padding-left: 300px;
+  z-index: 0;
 }
 </style>

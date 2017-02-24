@@ -4,8 +4,6 @@ import {router} from '../main'
 
 import NetworkService from './NetworkService'
 
-import jQuery from 'jquery';
-
 
 const SERVER_ROOT = 'http://localhost:3000',
       AUTH_ROOT = `${SERVER_ROOT}/auth`,
@@ -24,7 +22,7 @@ export default {
       return;
     }
 
-    NetworkService.login(context, creds).then((res) => {
+    return NetworkService.login(context, creds).then((res) => {
       let data = res.data;
       if (!data){
         throw new Error('No user returned from auth service');
@@ -38,13 +36,13 @@ export default {
         router.push(redirect)
       }
     }, (res) => {
-      context.error = 'Error occurred';
+      context.error = 'Could not login';
       console.log(res);
     })
   },
 
   register(context, creds, redirect){
-    NetworkService.register(context, creds).then((res) => {
+    return NetworkService.register(context, creds).then((res) => {
       let data = res.data;
       if (!data){
         throw new Error('No user returned from auth service');
@@ -70,12 +68,12 @@ export default {
         localStorage.removeItem('user');
         this.user.authenticated = false;
         this.user.data = null;
-        router.push('/login');
+        router.push('/');
       }).catch(() => {
         localStorage.removeItem('user');
         this.user.authenticated = false;
         this.user.data = null;
-        router.push('/login');
+        router.push('/');
       });
     } else {
       localStorage.removeItem('user');
