@@ -1,22 +1,42 @@
 <template>
-	<div>
-		<p>Room: <input v-model="room"> <button v-on:click="changeRoom">Change</button></p>
-		<canvas id='whiteboard' v-on:mousedown="drawStart" v-on:mouseup="drawEnd" v-on:mousemove="draw"></canvas>
-		<button id='clearButton' v-on:click="clear" ></button>
-		<button id='drawButton' v-on:click="drawSetup"></button>
-		<button id='undoButton' v-on:click="undo"></button>
-		<button id='eraseButton' v-on:click="erase"></button>
-		<button id='textButton' v-on:click="text"></button>
-		<button id='blueButton' class='colorButton' v-on:click="color" style='padding:0px;margin:0px;width:28px;height:28px;background-color:blue;'></button>
-		<button id='redButton' class='colorButton' v-on:click="color" style='padding:0px;margin:0px;width:28px;height:28px;background-color:red;'></button>
-		<button id='greenButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:green;'></button>
-		<button id='blackButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:black;'></button>
-		<button id='orangeButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:orange;'></button>
-		<button id='yellowButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:yellow;'></button>
-		<button id='purpleButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:purple;'></button>
-		<button id='brownButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:brown;'></button>
-		<textarea id='textInputBox' v-on:input="textBox" v-on:keydown="keydown" rows='4' cols='50' style='visibility:hidden' placeholder='Type Here'></textarea>
-	</div>
+  <div class="container">
+    <p>Room: <input v-model="room"> <button v-on:click="changeRoom">Change</button></p>
+
+    <div class="row">
+      <div class = "col-sm-12">
+          <canvas id='whiteboard' v-on:mousedown="drawStart" v-on:mouseup="drawEnd" v-on:mousemove="draw"></canvas>
+          <div class="row">
+            <div class="col-sm-6">
+
+              <button id='clearButton' v-on:click="clear" ></button>
+              <button id='drawButton' v-on:click="drawSetup"></button>
+              <button id='undoButton' v-on:click="undo"></button>
+              <button id='eraseButton' v-on:click="erase"></button>
+              <button id='textButton' v-on:click="text"></button>
+
+            </div>
+          <div class="col-sm-6">
+                <button id='blueButton' class='colorButton' v-on:click="color" style='padding:0px;margin:0px;width:28px;height:28px;background-color:blue;'></button>
+                <button id='redButton' class='colorButton' v-on:click="color" style='padding:0px;margin:0px;width:28px;height:28px;background-color:red;'></button>
+                <button id='greenButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:green;'></button>
+                <button id='blackButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:black;'></button>
+                <button id='orangeButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:orange;'></button>
+                <button id='yellowButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:yellow;'></button>
+                <button id='purpleButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:purple;'></button>
+                <button id='brownButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:brown;'></button>
+                <textarea id='textInputBox' v-on:input="textBox" v-on:keydown="keydown" v-on:keyup.enter="hideBox" rows='4' cols='50' style='visibility:hidden' placeholder='Type Here'></textarea>
+
+          </div>
+        </div>
+      </div>
+  </div>
+
+  
+
+</div>
+    
+
+    
 </template>
 
 <script>
@@ -44,6 +64,7 @@ var WIDTH_CHANGE_EVENT = 'width';
 var INSERT_TEXT_EVENT = 'text';
 var RESET_SCREEN_EVENT = 'reset';
 
+
 var CANVAS_WIDTH = 800;
 var CANVAS_HEIGHT = 400;
 
@@ -54,7 +75,7 @@ var SERVER_LINE_WIDTH = 5;
 var LINE_WIDTH = 5;
 var LINE_CAP = 'round';
 
-var ERASING = false;
+
 var ERASING_LINE_COLOR = 'white';
 var ERASING_LINE_WIDTH = 20;
 
@@ -70,9 +91,17 @@ var TEXT_ICON = 'text';
 
 var TEXT_POSITION_X = 10;
 var TEXT_POSITION_Y = 10;
+
+var ERASING = false;
 var INSERTING_TEXT = false;
 var CURSOR_VISIBLE = false;
 var CURSOR_REMOVED = false;
+
+
+var current_state ='';
+
+
+
 var imageList = [];
 var imageData;
 var App = {};
@@ -89,28 +118,40 @@ App.socket.on(COLOR_CHANGE_EVENT, handleColorChangeOperation);
 App.socket.on(WIDTH_CHANGE_EVENT, handleWidthChangeOperation);
 App.socket.on(INSERT_TEXT_EVENT, handleInsertTextOperation);
 
+var messages = [];
+var bottom = 0;
 
 export default {
-	data(){
-		return {
-			room: 'test'
-		}
-	},
+  data(){
+    return {
+      room: 'test'
+    }
+  },
   methods: {
-		changeRoom(){
-			console.log('Room changed to', this.room)
-			App.socket.emit('room', this.room);
-		},
+
+    changeRoom(){
+      console.log('Room changed to', this.room)
+      App.socket.emit('room', this.room);
+    },
+
+    hideBox: function() {
+        this.$el.querySelector('#textInputBox').style.visibility='hidden';
+        this.$el.querySelector('#textInputBox').value='';
+        current_state = '';
+    },
 
     color: function(event){
 
-      if (DRAWING && !ERASING) {
+      if (current_state===('DRAWING')) {
         LOCAL_LINE_COLOR = event.target.style.backgroundColor;
         App.ctx.strokeStyle = LOCAL_LINE_COLOR;
         App.socket.emit('changeColor', LOCAL_LINE_COLOR);
         App.ctx.lineWidth = LINE_WIDTH;
         App.socket.emit('changeWidth', LINE_WIDTH);
 
+      } else if (current_state===('ERASING')) {
+        App.ctx.strokeStyle = ERASING_LINE_COLOR;
+        App.ctx.lineWidth = ERASING_LINE_WIDTH;
       }
 
     },
@@ -125,11 +166,11 @@ export default {
 
     drawStart: function(event) {
 
-      if (!CURSOR_VISIBLE && INSERTING_TEXT) {
-
+      if (!CURSOR_VISIBLE && current_state===('INSERTING_TEXT')) {
         TEXT_POSITION_X = event.layerX -10;
         TEXT_POSITION_Y = event.layerY +34;
         CURSOR_VISIBLE = true;
+        saveImage(App.canvas, App.ctx);
         App.socket.emit('saveImage');
         if (imageList.length>0) {
           imageData = imageList[imageList.length-1];
@@ -147,12 +188,18 @@ export default {
           y: TEXT_POSITION_Y
         });
         CURSOR_REMOVED = false;
-      } else if (!INSERTING_TEXT) {
+      } else if (current_state===('DRAWING')|| current_state==='ERASING') {
 
-        DRAWING = true;
+        saveImage(App.canvas, App.ctx);
+        App.socket.emit('saveImage');
         App.canvas.isDrawing = true;
-        var x = event.pageX;
+
+         var scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
+        var scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+
+         var x = event.pageX;
         var y = event.pageY;
+
         fillCircle(App.canvas, App.ctx, 'dragstart', false, x, y, LOCAL_LINE_COLOR);
         App.socket.emit('dragStart', {
           x:x,
@@ -161,31 +208,39 @@ export default {
         });
       }
 
-
-
-
     },
 
     drawEnd: function(event) {
       App.canvas.isDrawing = false;
-      var x = event.pageX;
-      var y = event.pageY;
+
+        var scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
+        var scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+
+         var x = event.pageX ;
+        var y = event.pageY ;
+
       fillCircle(App.canvas, App.ctx, 'dragend', false, x, y, LOCAL_LINE_COLOR);
       App.socket.emit('dragEnd', {
           x:x,
           y:y,
           color:LOCAL_LINE_COLOR
-        });
+      });
+      saveImage(App.canvas, App.ctx);
+      App.socket.emit('saveImage');
     },
 
     draw: function(e) {
-
-      if (DRAWING) {
+      if (current_state===('DRAWING') || current_state==='ERASING') {
         if (!App.canvas.isDrawing) {
            return;
         }
-        var x = e.pageX;
-        var y = e.pageY;
+
+         var scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
+        var scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+
+        var x = event.pageX;
+        var y = event.pageY;
+
         fillCircle(App.canvas, App.ctx, 'drag', false, x, y, LOCAL_LINE_COLOR);
         App.socket.emit('dragAction', {
           x:x,
@@ -194,6 +249,30 @@ export default {
         });
 
       }
+    },
+
+    drawSetup: function() {
+      App.ctx.strokeStyle = LOCAL_LINE_COLOR;
+      App.socket.emit('changeColor', LOCAL_LINE_COLOR);
+      App.ctx.lineWidth = LINE_WIDTH;
+      App.socket.emit('changeWidth', LINE_WIDTH);
+
+      this.$el.querySelector('#textInputBox').value=''
+      this.$el.querySelector('#textInputBox').style.visibility='hidden';
+      App.canvas.style.cursor = PEN_ICON;
+
+      if (current_state===('INSERTING_TEXT')) {
+        saveImage(App.canvas, App.ctx);
+        App.socket.emit('saveImage');
+      }
+
+      if (imageList.length === 0) {
+        saveImage(App.canvas, App.ctx);
+        App.socket.emit('saveImage');
+      }
+
+      current_state= 'DRAWING';
+
     },
 
     keydown: function(e) {
@@ -213,6 +292,7 @@ export default {
       saveImage(App.canvas, App.ctx);
       App.socket.emit('saveImage');
 
+      current_state = 'INSERTING_TEXT';
       INSERTING_TEXT = true;
       CURSOR_VISIBLE = false;
       App.canvas.style.cursor = TEXT_ICON;
@@ -252,44 +332,16 @@ export default {
       }
     },
 
-
-    drawSetup: function() {
-      //App.socket.emit('drawClick');
-      App.ctx.strokeStyle = LOCAL_LINE_COLOR;
-      App.socket.emit('changeColor', LOCAL_LINE_COLOR);
-      App.ctx.lineWidth = LINE_WIDTH;
-      App.socket.emit('changeWidth', LINE_WIDTH);
-
-      this.$el.querySelector('#textInputBox').value=''
-      this.$el.querySelector('#textInputBox').style.visibility='hidden';
-      App.canvas.style.cursor = PEN_ICON;
-      if (INSERTING_TEXT) {
-        saveImage(App.canvas, App.ctx);
-        App.socket.emit('saveImage');
-      }
-
-      if (imageList.length === 0) {
-        saveImage(App.canvas, App.ctx);
-        App.socket.emit('saveImage');
-      }
-
-      DRAWING = true;
-      ERASING = false;
-      INSERTING_TEXT = false;
-
-    },
-
     erase: function() {
       if (imageList.length === 0) {
         saveImage(App.canvas, App.ctx);
         App.socket.emit('saveImage');
       }
-      if (INSERTING_TEXT) {
+      if (current_state===('INSERTING_TEXT')) {
         saveImage(App.canvas, App.ctx);
         App.socket.emit('saveImage');
       }
-      ERASING = true;
-      INSERTING_TEXT = false;
+      current_state = 'ERASING';
       App.ctx.strokeStyle = ERASING_LINE_COLOR;
       App.ctx.lineWidth = ERASING_LINE_WIDTH;
       App.canvas.style.cursor = ERASER_ICON;
@@ -298,16 +350,20 @@ export default {
       App.socket.emit('changeColor', ERASING_LINE_COLOR);
       App.socket.emit('changeWidth', ERASING_LINE_WIDTH);
 
-    }
+    },
+
+    handleMessageSendOperation(message) {
+      this.messages.push(message);
+    },
 
   },
   mounted() {
-			var initRoom = this.room;
+      var initRoom = this.room;
 
-			App.socket.on('connect', function(){
-				console.log(initRoom);
-				App.socket.emit('room', initRoom);
-			});
+      App.socket.on('connect', function(){
+        console.log(initRoom);
+        App.socket.emit('room', initRoom);
+      });
 
 
       App.canvas = this.$el.querySelector('#whiteboard');
@@ -317,29 +373,43 @@ export default {
       App.ctx.strokeStyle = LOCAL_LINE_COLOR;
       App.socket.emit('changeColor', LOCAL_LINE_COLOR);
       App.ctx.lineWidth = LINE_WIDTH;
-      App.ctx.font = 'bold 16px Arial';
+      App.ctx.font = 'bold 64px Arial';
       saveImage(App.canvas, App.ctx);
 
+      var canvas = this.$el.querySelector('#whiteboard');
+      fitToContainer(canvas);
+
+      function fitToContainer(canvas){
+        canvas.style.width ='100%';   
+        canvas.style.height='100%';
+        canvas.width  = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+      }
   }
 }
 
-
 function fillCircle(canvas, context, type, server, x, y, fillColor) {
+  var scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
+  var scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+
   var rect = App.canvas.getBoundingClientRect();
   if (server) {
     App.ctx.strokeStyle = SERVER_LINE_COLOR;
     App.ctx.lineWidth = SERVER_LINE_WIDTH;
+  } else if (current_state==='ERASING') {
+    App.ctx.strokeStyle = ERASING_LINE_COLOR;
+    App.ctx.lineWidth = ERASING_LINE_WIDTH;
   }
-  if (DRAWING || ERASING || server) {
+  if (current_state===('DRAWING') || current_state===('ERASING') || server) {
     if (type === 'dragstart') {
       if (imageList.length>0) {
           imageData = imageList[imageList.length-1];
           context.putImageData(imageData, 0, 0);
       }
       context.beginPath();
-      context.moveTo(x-rect.left, y-rect.top+40);
+      context.moveTo(x-scrollLeft-rect.left, y-scrollTop-rect.top+40);
     } else if (type === 'drag') {
-      context.lineTo(x-rect.left, y-rect.top+40);
+      context.lineTo(x-scrollLeft-rect.left, y-scrollTop-rect.top+40);
       context.stroke();
     } else {
       context.closePath();
@@ -347,7 +417,6 @@ function fillCircle(canvas, context, type, server, x, y, fillColor) {
       App.socket.emit('saveImage');
 
     }
-
     if (server) {
       App.ctx.strokeStyle = LOCAL_LINE_COLOR;
       App.ctx.lineWidth = LINE_WIDTH;
@@ -393,15 +462,15 @@ function handleSaveOperation() {
 function handleUndoOperation() {
   var currentImage = App.ctx.getImageData(0,0,App.canvas.width,App.canvas.height);
   if (imageList.length>0) {
-    imageData = imageList.pop();
-    while (compareImages(currentImage, imageData)) {
-      imageData = imageList.pop();
-    }
-    if (imageData!=null) {
-      App.ctx.putImageData(imageData, 0, 0);
-    }
+        imageData = imageList.pop();
+        while (compareImages(currentImage, imageData)) {
+          imageData = imageList.pop();
+        }
+        if (imageData!= null) {
+          App.ctx.putImageData(imageData, 0, 0);
+        }
 
-}
+      }
 }
 
 function compareImages(img1,img2){
@@ -423,11 +492,9 @@ function handleInsertTextOperation(data) {
     App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
 
     if (imageList.length>0) {
-
         imageData = imageList.pop();
         App.ctx.putImageData(imageData, 0, 0);
         imageList.push(imageData);
-
     }
     App.ctx.fillText(data.text, data.x, data.y);
 
@@ -451,64 +518,61 @@ function handleWidthChangeOperation(width) {
 </script>
 
 <style scoped>
-	html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{border:0;font-size:100%;font:inherit;vertical-align:baseline;margin:0;padding:0;}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block;}body{line-height:1;}ol,ul{list-style:none;}blockquote,q{quotes:none;}blockquote:before,blockquote:after,q:before,q:after{content:none;}table{border-collapse:collapse;border-spacing:0;}.clearfix:after{content:'.';display:block;clear:both;visibility:hidden;line-height:0;height:0;}.clearfix{display:inline-block;}html[xmlns] .clearfix{display:block;}* html .clearfix{height:1%;}
+  html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{border:0;font-size:100%;font:inherit;vertical-align:baseline;margin:0;padding:0;}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block;}body{line-height:1;}ol,ul{list-style:none;}blockquote,q{quotes:none;}blockquote:before,blockquote:after,q:before,q:after{content:none;}table{border-collapse:collapse;border-spacing:0;}.clearfix:after{content:'.';display:block;clear:both;visibility:hidden;line-height:0;height:0;}.clearfix{display:inline-block;}html[xmlns] .clearfix{display:block;}* html .clearfix{height:1%;}
 
 
 
 body {
   padding:50px;
-	background: #f2f2f2;
+  background: #f2f2f2;
 }
 
 
 canvas {
-	background: #fff;
-  width:800px;
-  height:400px;
-	margin: 20px auto;
-	border: 5px solid #E8E8E8;
-	display: block;
- 	cursor: not-allowed;
+  background: #fff;
+  border: 5px solid #E8E8E8;
+  display: block;
+  cursor: not-allowed;
 }
 
 #eraseButton {
-	height:28px;
-	width:28px;
-	background-image: url('../assets/Eraser-icon-24.png');
-	padding:0px;
-	margin:0px;
+  height:28px;
+  width:28px;
+  background-image: url('../assets/Eraser-icon-24.png');
+  padding:0px;
+  margin:0px;
 }
 
 #drawButton {
-	height:28px;
-	width:28px;
-	background-image: url('../assets/Pen-icon-24.png');
-	padding:0px;
-	margin:0px;
+  height:28px;
+  width:28px;
+  background-image: url('../assets/Pen-icon-24.png');
+  padding:0px;
+  margin:0px;
 }
 
 #undoButton {
-	height:28px;
-	width:28px;
-	background-image: url('../assets/Arrows-Undo-icon.png');
-	padding:0px;
-	margin:0px;
+  height:28px;
+  width:28px;
+  background-image: url('../assets/Arrows-Undo-icon.png');
+  padding:0px;
+  margin:0px;
 }
 
 #textButton {
-	height:28px;
-	width:28px;
-	background-image: url('../assets/Text-Effect-icon.png');
-	padding:0px;
-	margin:0px;
+  height:28px;
+  width:28px;
+  background-image: url('../assets/Text-Effect-icon.png');
+  padding:0px;
+  margin:0px;
 }
 
 #clearButton {
-	height:28px;
-	width:28px;
-	background-image: url('../assets/Paper-icon.png');
-	padding:0px;
-	margin:0px;
+  height:28px;
+  width:28px;
+  background-image: url('../assets/Paper-icon.png');
+  padding:0px;
+  margin:0px;
 }
 
 </style>
