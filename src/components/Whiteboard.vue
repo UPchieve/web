@@ -5,25 +5,25 @@
     <div class="row">
       <div class = "col-sm-12">
           <canvas id='whiteboard' v-on:mousedown="drawStart" v-on:mouseup="drawEnd" v-on:mousemove="draw"></canvas>
-          <div class="row">
-            <div class="col-sm-6">
+          <div class="row" style="background-color:rgba(238,238,238,1)">
+            <div class="col-sm-6 col-centered" style="margin-top:20px">
 
-              <button id='clearButton' v-on:click="clear" ></button>
               <button id='drawButton' v-on:click="drawSetup"></button>
-              <button id='undoButton' v-on:click="undo"></button>
               <button id='eraseButton' v-on:click="erase"></button>
+              <button id='undoButton' v-on:click="undo"></button>
               <button id='textButton' v-on:click="text"></button>
+              <button id='clearButton' v-on:click="clear" ></button>
 
             </div>
-          <div class="col-sm-6">
-                <button id='blueButton' class='colorButton' v-on:click="color" style='padding:0px;margin:0px;width:28px;height:28px;background-color:blue;'></button>
-                <button id='redButton' class='colorButton' v-on:click="color" style='padding:0px;margin:0px;width:28px;height:28px;background-color:red;'></button>
-                <button id='greenButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:green;'></button>
-                <button id='blackButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:black;'></button>
-                <button id='orangeButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:orange;'></button>
-                <button id='yellowButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:yellow;'></button>
-                <button id='purpleButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:purple;'></button>
-                <button id='brownButton' class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;width:28px;height:28px;background-color:brown;'></button>
+          <div class="col-sm-6 col-centered" style="margin-top:20px">
+                <button class='colorButton' v-on:click="color" style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(244,71,71,1);'></button>
+                <button class='colorButton' v-on:click="color" style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(255,208,115,.6);'></button>
+                <button class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(22,210,170,.6);'></button>
+                <button class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(24,85,209,.6);'></button>
+                <button class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(52,52,64,.6);'></button>
+                <button class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(38,51,104,1);'></button>
+                
+                
                 <textarea id='textInputBox' v-on:input="textBox" v-on:keydown="keydown" v-on:keyup.enter="hideBox" rows='4' cols='50' style='visibility:hidden' placeholder='Type Here'></textarea>
 
           </div>
@@ -69,8 +69,8 @@ var CANVAS_WIDTH = 800;
 var CANVAS_HEIGHT = 400;
 
 var LINE_FILL_STYLE = 'solid';
-var LOCAL_LINE_COLOR = 'black';
-var SERVER_LINE_COLOR = 'black';
+var LOCAL_LINE_COLOR = 'rgba(244,71,71,1)';
+var SERVER_LINE_COLOR = 'rgba(244,71,71,1)';
 var SERVER_LINE_WIDTH = 5;
 var LINE_WIDTH = 5;
 var LINE_CAP = 'round';
@@ -536,43 +536,63 @@ canvas {
 }
 
 #eraseButton {
-  height:28px;
-  width:28px;
-  background-image: url('../assets/Eraser-icon-24.png');
+  height:36px;
+  width:36px;
+  background-color: rgba(52,52,64,.6);
+  background-image: url('../assets/eraser_icon.png');
   padding:0px;
+  border:none;
   margin:0px;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 #drawButton {
-  height:28px;
-  width:28px;
-  background-image: url('../assets/Pen-icon-24.png');
+  height:36px;
+  width:36px;
+  background-color: rgba(52,52,64,.6);
+  background-image: url('../assets/pen_icon.png');
   padding:0px;
   margin:0px;
+  border:none;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 #undoButton {
-  height:28px;
-  width:28px;
-  background-image: url('../assets/Arrows-Undo-icon.png');
+  height:36px;
+  width:36px;
+  border:none;
+  background-color: rgba(52,52,64,.6);
+  background-image: url('../assets/undo.png');
   padding:0px;
   margin:0px;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 #textButton {
-  height:28px;
-  width:28px;
-  background-image: url('../assets/Text-Effect-icon.png');
+  height:36px;
+  width:36px;
+  border:none;
+  background-color: rgba(52,52,64,.6);
+  background-image: url('../assets/Aa.png');
   padding:0px;
   margin:0px;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 #clearButton {
-  height:28px;
-  width:28px;
-  background-image: url('../assets/Paper-icon.png');
+  height:36px;
+  width:36px;
+  border:none;
+  background-color: rgba(52,52,64,.6);
+  background-image: url('../assets/new_page.png');
   padding:0px;
   margin:0px;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 </style>
