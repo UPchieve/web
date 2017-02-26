@@ -1,6 +1,5 @@
 <template>
-	<div class="container">
-		<p>Room: <input v-model="room"> <button v-on:click="changeRoom">Change</button></p>
+	<div class="container" style="margin-top:20px;">
 
     <div class="row">
       <div class = "col-sm-12">
@@ -52,7 +51,16 @@ export default {
 			room: 'test'
 		}
 	},
+
+  ready: function() {
+      window.addEventListener('beforeunload', this.leaving);
+  },
+
   methods: {
+
+    leaving: function() {
+
+    },
 		changeRoom(){
 			console.log('Room changed to', this.room)
 			App.socket.emit('room', this.room);
@@ -89,20 +97,22 @@ export default {
       }
        
       App.socket.emit('message', {
+        senderName: 'username',
+        room: 'test',
         timeStamp: timeStamp,
         message: message
       });
 
       this.$el.querySelector('#messageSendBox').value='';
       
-      var msgBox = this.$el.querySelector('#messages');
+      /*var msgBox = this.$el.querySelector('#messages');
       var msg = this.$el.querySelector('#messages').lastChild;
       messages.push({
               timeStamp: timeStamp + ' Me:',
               message: message
             });
 
-      msgBox.scrollTop = msgBox.scrollHeight-msgBox.clientHeight;
+      msgBox.scrollTop = msgBox.scrollHeight-msgBox.clientHeight;*/
       //console.log(msgBox.scrollHeight);
       //console.log(msgBox.scrollTop);
       //this.$el.querySelector('#messageList').lastChild.scrollIntoView(false)
@@ -148,7 +158,7 @@ export default {
 function receiveMessage(message) {      
 
       messages.push({
-              timeStamp: message.timeStamp+' Them:',
+              timeStamp: message.timeStamp+' '+ message.senderName,
               message: message.message
             });
 
