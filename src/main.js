@@ -12,6 +12,7 @@ Vue.http.options.credentials = true;
 import About from './components/About'
 import Contact from './components/Contact'
 import Privacy from './components/Privacy'
+import Logout from './components/Logout'
 import LoginForm from './components/LoginForm'
 import Registration from './components/Registration'
 import Onboarding from './components/Onboarding'
@@ -29,12 +30,13 @@ const routes = [
   { path: '/contact', component: Contact },
   { path: '/privacy', component: Privacy },
   { path: '/login', component: LoginForm },
+  { path: '/logout', component: Logout },
   { path: '/signup', component: Registration },
   { path: '/whiteboard', component: Whiteboard, meta: { protected: false } },
   { path: '/messager', component: Messager, meta: {protected: false}},
   { path: '/action/:action/:data?', component: Action, meta: { bypassOnboarding: true } },
   { path: '/onboarding/:step?', component: Onboarding, meta: { protected: true } },
-  { path: '/profile', component: Profile, meta: { protected: true } }
+  { path: '/profile', component: Profile, meta: { protected: true, bypassOnboarding: true } }
 ]
 
 const router = new VueRouter({

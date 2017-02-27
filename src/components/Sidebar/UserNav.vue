@@ -2,6 +2,7 @@
   <ul class="nav navbar-nav">
     <router-link to="/signup" tag="li" v-if="!user.authenticated"><a>Signup</a></router-link>
     <router-link to="/whiteboard" tag="li" v-if="user.authenticated"><a>Whiteboard</a></router-link>
+    <router-link to="/messager" tag="li" v-if="user.authenticated"><a>Chat</a></router-link>
   </ul>
 </template>
 

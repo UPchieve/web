@@ -21,7 +21,12 @@ export default {
   },
   setProfile(context, data, redirect){
     NetworkService.setProfile(context, data).then((res) => {
-      context.msg = 'Set!'
+      if (res.data){
+        AuthService.storeUser(res.data.user)
+        context.msg = 'Set!'
+      } else {
+        throw new Error();
+      }
       if (redirect){
         router.push(redirect)
       }

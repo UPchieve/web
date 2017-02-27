@@ -1,22 +1,25 @@
 <template>
   <div class="profile-info">
     <div class="avatar"></div>
-    <p class="greeting">Hello, student!</p>
-    <a class="edit-profile">Edit profile</a>
+    <p class="greeting">Hello, {{name}}!</p>
+    <router-link to="/profile" class="edit-profile">Edit profile</router-link>
   </div>
 </template>
 
 <script>
 
-import AuthService from '../../services/AuthService';
+import UserService from '../../services/UserService';
 
 export default {
   components: {
 
   },
   data() {
+    let user = UserService.getUser() || {};
+    console.log(user);
     return {
-      user: AuthService.user
+      user: user,
+      name: user.name || 'student'
     }
   },
   methods: {

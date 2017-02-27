@@ -1,5 +1,6 @@
 <template>
   <div class="registration-container">
+    <sig
     <code-form v-if="!validRegistrationCode"></code-form>
     <signup-form v-else></signup-form>
   </div>

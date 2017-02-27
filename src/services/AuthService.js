@@ -28,9 +28,7 @@ export default {
         throw new Error('No user returned from auth service');
       }
 
-      this.user.authenticated = true;
-      this.user.data = data.user;
-      localStorage.setItem('user', JSON.stringify(data.user));
+      this.storeUser(data.user);
 
       if(redirect) {
         router.push(redirect)
@@ -48,9 +46,7 @@ export default {
         throw new Error('No user returned from auth service');
       }
 
-      this.user.authenticated = true;
-      this.user.data = data.user;
-      localStorage.setItem('user', JSON.stringify(data.user));
+      this.storeUser(data.user)
 
       context.msg = 'You have been signed up!';
 
@@ -65,20 +61,14 @@ export default {
   logout(context){
     if (context){
       NetworkService.logout(context).then((res) => {
-        localStorage.removeItem('user');
-        this.user.authenticated = false;
-        this.user.data = null;
-        router.push('/');
+        this.removeUser();
+        router.push('/logout');
       }).catch(() => {
-        localStorage.removeItem('user');
-        this.user.authenticated = false;
-        this.user.data = null;
-        router.push('/');
+        this.removeUser();
+        router.push('/logout');
       });
     } else {
-      localStorage.removeItem('user');
-      this.user.authenticated = false;
-      this.user.data = null;
+      this.removeUser();
     }
   },
 
@@ -103,6 +93,18 @@ export default {
 
   shouldFetch(){
     return (Date.now() - this.user.lastFetch) > USER_FETCH_LIMIT_SECONDS * 1000
+  },
+
+  storeUser(userObj){
+    this.user.authenticated = true;
+    this.user.data = userObj;
+    localStorage.setItem('user', JSON.stringify(userObj));
+  },
+
+  removeUser(){
+    localStorage.removeItem('user');
+    this.user.authenticated = false;
+    this.user.data = null;
   },
 
   fetchUser(context){

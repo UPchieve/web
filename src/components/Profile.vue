@@ -18,7 +18,7 @@ import OnboardingService from '../services/OnboardingService'
 export default {
   data() {
     return {
-      isOnboarding: !OnboardingService.isOnboarded(),
+      isOnboarding: this.$route.path.indexOf('/onboarding') === 0,
       user: AuthService.user,
       msg: ''
     }

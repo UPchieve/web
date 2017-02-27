@@ -1,6 +1,6 @@
 <template>
   <nav class="navbar">
-    <router-link to="/about" tag="h1" class="header-link">UPchieve</router-link>
+    <h1>UPchieve</h1>
     <div v-if="auth.authenticated">
       <profile-info v-if="auth.authenticated"></profile-info>
       <div id="navbar">
@@ -50,7 +50,7 @@ h1, h2 {
   font-weight: normal;
 }
 
-h1.header-link {
+h1 {
   margin-top: 29px;
   margin-bottom: 50px;
 }
