@@ -16,6 +16,8 @@ import Logout from './components/Logout'
 import LoginForm from './components/LoginForm'
 import Registration from './components/Registration'
 import Onboarding from './components/Onboarding'
+import Dashboard from './components/Dashboard'
+import Session from './components/Session'
 import Whiteboard from './components/Whiteboard'
 import Messager from './components/Messager'
 import Action from './components/Action'
@@ -32,6 +34,8 @@ const routes = [
   { path: '/login', component: LoginForm },
   { path: '/logout', component: Logout },
   { path: '/signup', component: Registration },
+  { path: '/dashboard', component: Dashboard },
+  { path: '/session', component: Session },
   { path: '/whiteboard', component: Whiteboard, meta: { protected: false } },
   { path: '/messager', component: Messager, meta: {protected: false}},
   { path: '/action/:action/:data?', component: Action, meta: { bypassOnboarding: true } },

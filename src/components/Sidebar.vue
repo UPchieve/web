@@ -7,6 +7,9 @@
         <user-nav></user-nav>
       </div>
     </div>
+    <div v-else>
+      <p class="aboutText">UPchieve is a volunteer-run ed-tech initiative with the goal of providing free, online, and on-demand educational and guidance services to disadvantaged students.</p>
+    </div>
     <div class="navbar-footer">
       <sidebar-footer></sidebar-footer>
     </div>
@@ -53,6 +56,18 @@ h1, h2 {
 h1 {
   margin-top: 29px;
   margin-bottom: 50px;
+  font-size: 24px;
+
+}
+
+h1::before {
+  content: "";
+  display: inline-block;;
+  width: 48px;
+  height: 32px;
+  background-image: url('../assets/logo.png');
+  top: 0;
+  left: 0;
 }
 
 .navbar-footer {
@@ -60,6 +75,12 @@ h1 {
   bottom: 0;
   left: 0;
   right: 0;
+}
+
+p.aboutText {
+  width: 250px;
+  margin: auto;
+  text-align: left;
 }
 
 </style>

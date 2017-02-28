@@ -1,5 +1,5 @@
 <template>
-  <div class="form-signin">
+  <form class="form-signin">
     <div class="alert alert-danger" role="alert" v-if="error">{{error}}</div>
     <h2 class="form-signin-heading">Log in</h2>
     <label for="inputEmail">Email</label>
@@ -10,7 +10,7 @@
     <div class="help-text">
       <p>Don't have an account? <router-link to="signup">Register for one!</router-link></p>
     </div>
-  </div>
+  </form>
 </template>
 
 <script>

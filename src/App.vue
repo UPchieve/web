@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <div class="row">
       <div class="nav-container">
         <sidebar></sidebar>
       </div>
@@ -8,7 +7,6 @@
         <router-view></router-view>
       </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -57,6 +55,7 @@ html, body, #app {
 
 .col-xs-12.view-container {
   padding-left: 300px;
+  padding-right: 0;
   z-index: 0;
 }
 </style>

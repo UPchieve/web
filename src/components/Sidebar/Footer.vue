@@ -42,12 +42,14 @@ ul {
 
 li {
   width: 100%;
-  margin-bottom: 16px;
+  height: 50px;
 }
 
 li > a {
   color: white;
   padding: 2px 0;
+  height: 50px;
+  line-height: 50px;
 }
 
 li > a:hover {
@@ -60,8 +62,14 @@ li > a:focus {
   background: none;
 }
 
+li.active {
+  background-color: #16D2AA;
+}
+
 li.active > a {
   font-weight: bold;
+  background-color: #263368;
+  margin: auto 10px;
 }
 
 
