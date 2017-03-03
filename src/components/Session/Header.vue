@@ -14,7 +14,7 @@
       </template>
     </div>
     <div class="end-session">
-      <button class="btn btn-lg btn-primary btn-block" @click.prevent="end">End session</button>
+      <button class="btn btn-lg btn-block" @click.prevent="end">End session</button>
     </div>
   </div>
 </template>
@@ -49,6 +49,7 @@ export default {
     end(){
       var result = window.confirm('Do you really want to end the session?')
       if (result){
+        this.$socket.disconnect();
         SessionService.endSession();
       }
     }
@@ -93,7 +94,7 @@ h1 {
   font-weight: 700;
 }
 
-button {
+.btn {
   position: absolute;
   top: 30px;
   right: 30px;
@@ -103,7 +104,11 @@ button {
   color: #64E1C6;
   border: none;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
+}
+
+.btn:hover {
+  background-color: inherit;
 }
 
 .session-header.inactive {

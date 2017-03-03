@@ -3,6 +3,7 @@
     <router-link to="/contact" tag="li"><a>Contact Us</a></router-link>
     <router-link to="/privacy" tag="li"><a>Privacy Policy</a></router-link>
     <li v-if="userauth.authenticated"><a v-on:click="logout" class="logout">Logout</a></li>
+    <li v-if="!userauth.authenticated"><a v-bind:href="mainWebsiteUrl">Back to Website</a></li>
   </ul>
 </template>
 
@@ -17,7 +18,8 @@ export default {
   },
   data() {
     return {
-      userauth: UserService.getAuth()
+      userauth: UserService.getAuth(),
+      mainWebsiteUrl: process.env.MAIN_WEBSITE_URL
     }
   },
   methods: {

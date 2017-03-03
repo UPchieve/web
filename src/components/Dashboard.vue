@@ -6,17 +6,17 @@
       </div>
     </div>
     <div class="dashboard-body row">
-      <div class="col-md-6">
+      <div class="col-lg-6">
         <h2>New to UPchieve?</h2>
         <p>Watch the video to learn how to use our services.</p>
         <div class="video">
 
         </div>
       </div>
-      <div class="col-md-6">
+      <div class="col-lg-6">
         <h2>Get started!</h2>
         <p>Our volunteers are here to help you.</p>
-        <a href="#">Start a new session</a>
+        <router-link to="/session" class="btn btn-lg btn-primary btn-block">Start a new session</router-link>
       </div>
     </div>
   </div>
@@ -73,14 +73,13 @@ h1 {
 }
 
 .dashboard-body {
-  padding: 40px 30px;
+  padding: 20px 30px;
 }
 
 .dashboard-body h2 {
   font-size: 24px;
   font-weight: 600;
   text-align: left;
-  margin-top: 0;
 }
 
 .dashboard-body p {
@@ -94,5 +93,18 @@ h1 {
   width: 450px;
   height: 264px;
   background-color: #EEEEEE;
+}
+
+.btn {
+  width: 250px;
+  background-color: #16D2AA;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.btn:hover {
+  background-color: #16D2AA;
 }
 </style>

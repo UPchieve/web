@@ -1,9 +1,11 @@
 import Vue from 'vue'
 import VueResource from 'vue-resource'
 import VueRouter from 'vue-router'
+import VueSocketio from 'vue-socket.io';
 
 Vue.use(VueResource)
 Vue.use(VueRouter)
+Vue.use(VueSocketio, process.env.SOCKET_ADDRESS);
 
 Vue.http.options.credentials = true;
 

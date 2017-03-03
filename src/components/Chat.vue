@@ -29,12 +29,10 @@ import SessionService from '../services/SessionService'
 
 const DEFAULT_AVATAR_URL = 'static/defaultAvatar@2x.png';
 
-var messages = [];
-
 export default {
 	data(){
 		return {
-      messages: messages,
+      messages: [],
 			currentSession: SessionService.currentSession,
 			newMessage: ''
 		}
@@ -43,7 +41,7 @@ export default {
     sendMessage: function() {
       var message = this.newMessage;
 
-      SessionService.socket.emit('message', {
+      this.$socket.emit('message', {
 				sessionId: this.currentSession.sessionId,
         user: UserService.getUser(),
         message: message
@@ -52,10 +50,33 @@ export default {
       this.newMessage = '';
     },
   },
+  sockets: {
+    'session-change'(data){
+      console.log('session-change', data);
+      SessionService.currentSession.sessionId = data._id;
+      SessionService.currentSession.data = data;
+    },
+    messageSend(data){
+    	console.log(data);
+    	var picture = data.picture;
+    	if (!picture || picture === ''){
+    		picture = DEFAULT_AVATAR_URL
+    	}
+      this.messages.push({
+    		contents: data.contents,
+    		name: data.name,
+    		avatarStyle: {
+    			backgroundImage: `url(${picture})`
+    		},
+    		time: moment(data.time).format('h:mm:ss a')
+      });
+    }
+  },
   mounted() {
-		let socket = SessionService.startChatSocket();
-
-		socket.on('messageSend', receiveMessage);
+		this.$socket.emit('join', {
+			sessionId: SessionService.currentSession.sessionId,
+			user: UserService.getUser()
+		});
   },
 
 	updated(){
@@ -63,23 +84,6 @@ export default {
 		var scrollTop = el[0].scrollHeight - el[0].clientHeight;
 		el.scrollTop(scrollTop)
 	}
-}
-
-
-function receiveMessage(data) {
-	console.log(data);
-	var picture = data.picture;
-	if (!picture || picture === ''){
-		picture = DEFAULT_AVATAR_URL
-	}
-  messages.push({
-		contents: data.contents,
-		name: data.name,
-		avatarStyle: {
-			backgroundImage: `url(${picture})`
-		},
-		time: moment(data.time).format('h:mm:ss a')
-  });
 }
 
 

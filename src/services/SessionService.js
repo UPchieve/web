@@ -1,5 +1,4 @@
 import Validator from 'validator';
-import Socket from 'socket.io-client';
 
 import {router} from '../router'
 
@@ -8,7 +7,6 @@ import UserService from './UserService'
 
 
 export default {
-  socket: null,
   loading: false,
   currentSession: {
     sessionId: null,
@@ -26,32 +24,8 @@ export default {
     }
   },
 
-  startChatSocket(){
-    this.socket = Socket(process.env.SOCKET_ADDRESS);
-
-    this.socket.on('connect', () => {
-			this.socket.emit('join', {
-				sessionId: this.currentSession.sessionId,
-				user: UserService.getUser()
-			});
-		});
-
-    this.socket.on('session-change', (data) => {
-      console.log('session-change', data);
-      this.currentSession.sessionId = data._id;
-      this.currentSession.data = data;
-
-    })
-    return this.socket;
-  },
-
-  startWhiteboard(){
-
-  },
-
   endSession(){
     router.replace('/');
-    this.socket.disconnect();
   },
 
 

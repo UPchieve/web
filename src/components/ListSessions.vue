@@ -24,8 +24,7 @@ import UserService from '../services/UserService'
 
 import {router} from '../router'
 
-let App = {},
-    openSessions = [];
+let openSessions = [];
 
 export default {
   data(){
@@ -39,17 +38,15 @@ export default {
       router.push(`/session/${session._id}`);
     }
   },
-  mounted(){
-    App.socket = require('socket.io-client')(process.env.SOCKET_ADDRESS);
-    App.socket.on('connect', function(){
-      App.socket.emit('list', {
-        user: UserService.getUser()
-      });
-    });
-    App.socket.on('sessions', (sessions) => {
+  sockets: {
+    sessions(sessions){
       this.openSessions = sessions;
-      console.log(sessions);
-    })
+    }
+  },
+  mounted(){
+    this.$socket.emit('list', {
+      user: UserService.getUser()
+    });
   }
 }
 </script>
