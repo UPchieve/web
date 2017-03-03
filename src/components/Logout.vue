@@ -26,7 +26,7 @@ export default {
 h1 {
   color: #16D2AA;
   font-size: 24px;
-  font-weight: 700;
+  font-weight: 600;
   margin-bottom: 100px;
   text-align: left;
 }
@@ -36,7 +36,7 @@ h1 {
   background-color: #16D2AA;
   border: none;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
   margin-bottom: 20px;
 }
 

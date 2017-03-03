@@ -44,6 +44,8 @@ export default {
   }
 
   li > a {
+    font-size: 16px;
+    font-weight: 400;
     color: white;
     padding: 2px 0;
     height: 50px;
@@ -65,7 +67,6 @@ export default {
   }
 
   li.active > a {
-    font-weight: bold;
     background-color: #263368;
     margin: auto 10px;
   }

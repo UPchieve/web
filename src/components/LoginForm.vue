@@ -50,7 +50,7 @@ export default {
   h2 {
     font-size: 24px;
     text-align: left;
-    font-weight: 700;
+    font-weight: 600;
     margin-bottom: 50px;
   }
 
@@ -95,15 +95,17 @@ export default {
     width: 190px;
     background-color: #16D2AA;
     border: none;
-    font-weight: 700;
+    font-weight: 600;
   }
 
   .help-text {
     margin-top: 58px;
+    font-weight: 300;
+    text-align: left;
   }
 
   .help-text a {
     color: #16D2AA;
-    font-weight: 900;
+    font-weight: 700;
   }
 </style>

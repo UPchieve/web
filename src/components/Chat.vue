@@ -116,7 +116,7 @@ function receiveMessage(data) {
 
 .time {
 	font-size: 12px;
-	font-weight: 200;
+	font-weight: 300;
 	color: #73737A;
 }
 
