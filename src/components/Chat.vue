@@ -22,23 +22,14 @@
 <script>
 
 import $ from 'jquery'
+import moment from 'moment'
 
 import UserService from '../services/UserService'
 import SessionService from '../services/SessionService'
 
 var INITIALIZED = false;
 
-var messages = [
-	{name: 'Test', contents: 'This is a test message to style with', time: '5 minutes ago'},
-	{name: 'Corey', contents: 'Ok let\'s test this out!', time: '6 minutes ago'},
-	{name: 'Corey', contents: 'Ok let\'s test this out!', time: '6 minutes ago'},
-	{name: 'Corey', contents: 'Ok let\'s test this out!', time: '6 minutes ago'},
-	{name: 'Corey', contents: 'Ok let\'s test this out!', time: '6 minutes ago'},
-	{name: 'Corey', contents: 'Ok let\'s test this out!', time: '6 minutes ago'},
-	{name: 'Corey', contents: 'Ok let\'s test this out!', time: '6 minutes ago'},
-	{name: 'Corey', contents: 'Ok let\'s test this out!', time: '6 minutes ago'}
-];
-var bottom = 0;
+var messages = [];
 
 export default {
 	data(){
@@ -48,46 +39,9 @@ export default {
 			newMessage: ''
 		}
 	},
-
-  ready: function() {
-      window.addEventListener('beforeunload', this.leaving);
-  },
-
   methods: {
-
-    leaving: function() {
-
-    },
-
     sendMessage: function() {
       var message = this.newMessage;
-      var timeStamp;
-
-      var dt = new Date();
-      var hours = dt.getHours();
-      var minutes = dt.getMinutes();
-
-      if (hours>12) {
-         if (dt.getMinutes()<10) {
-            timeStamp = (hours-12)+':0'+dt.getMinutes()+' PM';
-         } else {
-            timeStamp = (hours-12)+':'+dt.getMinutes()+' PM';
-         }
-
-      } else if (hours==12){
-        if (dt.getMinutes()<10) {
-            timeStamp = (hours)+':0'+dt.getMinutes()+' PM';
-         } else {
-            timeStamp = (hours)+':'+dt.getMinutes()+' PM';
-         }
-      } else
-      {
-         if (dt.getMinutes()<10) {
-            timeStamp = (hours)+':0'+dt.getMinutes()+' AM';
-         } else {
-            timeStamp = (hours)+':'+dt.getMinutes()+' AM';
-         }
-      }
 
       SessionService.socket.emit('message', {
 				sessionId: this.currentSession.sessionId,
@@ -96,26 +50,7 @@ export default {
       });
 
       this.newMessage = '';
-
-      /*var msgBox = this.$el.querySelector('#messages');
-      var msg = this.$el.querySelector('#messages').lastChild;
-      messages.push({
-              timeStamp: timeStamp + ' Me:',
-              message: message
-            });
-
-      msgBox.scrollTop = msgBox.scrollHeight-msgBox.clientHeight;*/
-      //console.log(msgBox.scrollHeight);
-      //console.log(msgBox.scrollTop);
-      //this.$el.querySelector('#messageList').lastChild.scrollIntoView(false)
-
     },
-
-    handleMessageSendOperation(message) {
-			console.log(message);
-      this.messages.push(message);
-    },
-
   },
   mounted() {
 		let socket = SessionService.startChatSocket();
@@ -136,7 +71,7 @@ function receiveMessage(data) {
   messages.push({
 		contents: data.contents,
 		name: data.name,
-		time: data.time
+		time: moment(data.time).format('h:mm:ss a')
   });
 }
 
@@ -146,9 +81,6 @@ function receiveMessage(data) {
 <style scoped>
 .chat {
 	height: 100%;
-	/*display: flex;
-	flex-direction: column;
-	justify-content: center;*/
 }
 
 .messages-container {

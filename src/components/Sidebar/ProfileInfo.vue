@@ -1,6 +1,6 @@
 <template>
   <div class="profile-info">
-    <div class="avatar"></div>
+    <div class="avatar" v-bind:style="avatarStyle"></div>
     <p class="greeting">Hello, {{name}}!</p>
     <router-link to="/profile" class="edit-profile">Edit profile</router-link>
   </div>
@@ -16,9 +16,14 @@ export default {
   },
   data() {
     let user = UserService.getUser() || {};
+
+    var avatarUrl = user.picture || 'static/defaultavatar.png';
     return {
       user: user,
-      name: user.name || 'student'
+      name: user.name || 'student',
+      avatarStyle: {
+        backgroundImage: `url(${avatarUrl})`
+      }
     }
   },
   methods: {
@@ -35,7 +40,7 @@ export default {
     width: 60px;
     height: 60px;
     margin: 0 auto;
-    background-image: url('../../assets/defaultavatar.png')
+    background-size: cover;
   }
 
   .greeting {

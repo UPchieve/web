@@ -26,6 +26,9 @@ export default {
 			});
 		});
     return this.socket;
+  },
+
+  startWhiteboard(){
 
   },
 

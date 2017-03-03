@@ -30,8 +30,7 @@
 <script>
 
 import AuthService from '../services/AuthService'
-
-var SOCKET_ADDRESS = 'http://localhost:3001';
+import SessionService from '../services/SessionService'
 
 var CLEAR_BUTTON_ID = 'clearButton';
 var UNDO_BUTTON_ID = 'undoButton';
@@ -94,17 +93,6 @@ var imageList = [];
 var imageData;
 var App = {};
 var INITIALIZED = false;
-
-App.socket = require('socket.io-client')(SOCKET_ADDRESS);
-App.socket.on(DRAW_START_EVENT, handleDrawStartOperation);
-App.socket.on(DRAW_ACTION_EVENT, handleDrawActionOperation);
-App.socket.on(DRAW_END_EVENT, handleDrawEndOperation);
-App.socket.on(SAVE_EVENT, handleSaveOperation);
-App.socket.on(UNDO_EVENT, handleUndoOperation);
-App.socket.on(CLEAR_EVENT, handleClearOperation);
-App.socket.on(COLOR_CHANGE_EVENT, handleColorChangeOperation);
-App.socket.on(WIDTH_CHANGE_EVENT, handleWidthChangeOperation);
-App.socket.on(INSERT_TEXT_EVENT, handleInsertTextOperation);
 
 var messages = [];
 var bottom = 0;
@@ -342,6 +330,16 @@ export default {
   },
   mounted() {
       var initRoom = this.room;
+
+      App.socket.on(DRAW_START_EVENT, handleDrawStartOperation);
+      App.socket.on(DRAW_ACTION_EVENT, handleDrawActionOperation);
+      App.socket.on(DRAW_END_EVENT, handleDrawEndOperation);
+      App.socket.on(SAVE_EVENT, handleSaveOperation);
+      App.socket.on(UNDO_EVENT, handleUndoOperation);
+      App.socket.on(CLEAR_EVENT, handleClearOperation);
+      App.socket.on(COLOR_CHANGE_EVENT, handleColorChangeOperation);
+      App.socket.on(WIDTH_CHANGE_EVENT, handleWidthChangeOperation);
+      App.socket.on(INSERT_TEXT_EVENT, handleInsertTextOperation);
 
       App.socket.on('connect', function(){
         App.socket.emit('join', initRoom);
