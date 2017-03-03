@@ -1,8 +1,8 @@
 <template>
   <div class="logout">
     <h1>You're logged out!</h1>
-    <router-link to="/" tag="button" class="btn btn-lg btn-primary btn-block" active-class="">Go to Main Website</router-link>
-    <router-link to="/feedbac," tag="button" class="btn btn-lg btn-primary btn-block" active-class="">Give Feedback</router-link>
+    <a class="btn btn-lg btn-primary btn-block" href="http://www.upchieve.org">Go to Main Website</a>
+    <router-link to="/feedback" class="btn btn-lg btn-primary btn-block">Give Feedback</router-link>
   </div>
 </template>
 
@@ -31,12 +31,16 @@ h1 {
   text-align: left;
 }
 
-button {
+.btn {
   width: 250px;
   background-color: #16D2AA;
   border: none;
   font-size: 16px;
   font-weight: 700;
   margin-bottom: 20px;
+}
+
+.btn:hover {
+  background-color: #16D2AA;
 }
 </style>

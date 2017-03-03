@@ -7,7 +7,6 @@ Vue.use(VueRouter)
 
 Vue.http.options.credentials = true;
 
-import About from './components/About'
 import Contact from './components/Contact'
 import Privacy from './components/Privacy'
 import Logout from './components/Logout'
@@ -24,8 +23,13 @@ import AuthService from './services/AuthService'
 import OnboardingService from './services/OnboardingService'
 
 const routes = [
-  { path: '/', redirect: '/about' },
-  { path: '/about', component: About },
+  { path: '/', redirect: () => {
+    if (AuthService.user.authenticated){
+      return '/dashboard';
+    } else {
+      return '/login';
+    }
+  }},
   { path: '/contact', component: Contact },
   { path: '/privacy', component: Privacy },
   { path: '/login', component: LoginForm },
