@@ -30,10 +30,10 @@ export default {
         this.msg = 'Please provide a first and last name';
         return;
       }
-      if (!this.user.picture || this.user.picture === ''){
-        this.msg = 'Please provide a picture';
-        return;
-      }
+      // if (!this.user.picture || this.user.picture === ''){
+      //   this.msg = 'Please provide a picture';
+      //   return;
+      // }
 
       this.msg = 'Sending...';
       UserService.setProfile(this, this.user, OnboardingService.isOnboarded() ? null : '/');

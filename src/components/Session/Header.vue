@@ -1,10 +1,10 @@
 <template>
-  <div class="session-header" v-bind:class="{inactive: !currentSession.active}">
-    <div class="avatar"></div>
+  <div class="session-header" v-bind:class="{inactive: !partnerName}">
+    <div class="avatar" v-bind:style="partnerAvatar"></div>
     <div class="info">
-      <template v-if="currentSession.sessionPartner">
+      <template v-if="partnerName">
         In a session with: <br />
-        <span class="volunteer-name">Volunteer Username</span>
+        <span class="volunteer-name">{{partnerName}}</span>
       </template>
       <template v-else-if="currentSession.sessionId">
         Waiting for a volunteer...
@@ -23,11 +23,26 @@
 
 import SessionService from 'src/services/SessionService';
 
+const DEFAULT_AVATAR_URL = 'static/defaultAvatar@2x.png';
 
 export default {
   data(){
     return {
       currentSession: SessionService.currentSession
+    }
+  },
+  computed: {
+    partnerName(){
+      var partner = SessionService.getPartner();
+      return partner && partner.name;
+    },
+    partnerAvatar(){
+      var partner = SessionService.getPartner();
+
+      var partnerAvatar = partner && partner.picture || DEFAULT_AVATAR_URL;
+      return {
+        backgroundImage: `url(${partnerAvatar})`
+      }
     }
   },
   methods: {
@@ -66,7 +81,7 @@ h1 {
   width: 60px;
   height: 60px;
   background-image: url('../../assets/defaultAvatar@2x.png');
-  background-size: 60px 60px;
+  background-size: cover;
 }
 
 .info {

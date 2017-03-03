@@ -13,7 +13,19 @@ export default {
   socket: null,
   loading: false,
   currentSession: {
-    sessionId: null
+    sessionId: null,
+    data: {}
+  },
+
+  getPartner(){
+    var user = UserService.getUser(),
+        session = this.currentSession.data;
+
+    if (user.isVolunteer){
+      return session.student;
+    } else {
+      return session.volunteer;
+    }
   },
 
   startChatSocket(){
@@ -27,6 +39,7 @@ export default {
 		});
 
     this.socket.on('session-change', (data) => {
+      console.log('session-change', data);
       this.currentSession.sessionId = data._id;
       this.currentSession.data = data;
 
