@@ -1,42 +1,30 @@
 <template>
-  <div class="container">
-    <p>Room: <input v-model="room"> <button v-on:click="changeRoom">Change</button></p>
+  <div class="whiteboard">
+      <canvas id='whiteboard' v-on:mousedown="drawStart" v-on:mouseup="drawEnd" v-on:mousemove="draw"></canvas>
+      <div class="row" style="background-color:rgba(238,238,238,1)">
+        <div class="col-sm-6 col-centered" style="margin-top:20px">
 
-    <div class="row">
-      <div class = "col-sm-12">
-          <canvas id='whiteboard' v-on:mousedown="drawStart" v-on:mouseup="drawEnd" v-on:mousemove="draw"></canvas>
-          <div class="row" style="background-color:rgba(238,238,238,1)">
-            <div class="col-sm-6 col-centered" style="margin-top:20px">
+          <button id='drawButton' v-on:click="drawSetup"></button>
+          <button id='eraseButton' v-on:click="erase"></button>
+          <button id='undoButton' v-on:click="undo"></button>
+          <button id='textButton' v-on:click="text"></button>
+          <button id='clearButton' v-on:click="clear" ></button>
 
-              <button id='drawButton' v-on:click="drawSetup"></button>
-              <button id='eraseButton' v-on:click="erase"></button>
-              <button id='undoButton' v-on:click="undo"></button>
-              <button id='textButton' v-on:click="text"></button>
-              <button id='clearButton' v-on:click="clear" ></button>
-
-            </div>
-          <div class="col-sm-6 col-centered" style="margin-top:20px">
-                <button class='colorButton' v-on:click="color" style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(244,71,71,1);'></button>
-                <button class='colorButton' v-on:click="color" style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(255,208,115,.6);'></button>
-                <button class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(22,210,170,.6);'></button>
-                <button class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(24,85,209,.6);'></button>
-                <button class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(52,52,64,.6);'></button>
-                <button class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(38,51,104,1);'></button>
-                
-                
-                <textarea id='textInputBox' v-on:input="textBox" v-on:keydown="keydown" v-on:keyup.enter="hideBox" rows='4' cols='50' style='visibility:hidden' placeholder='Type Here'></textarea>
-
-          </div>
         </div>
+      <div class="col-sm-6 col-centered" style="margin-top:20px">
+            <button class='colorButton' v-on:click="color" style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(244,71,71,1);'></button>
+            <button class='colorButton' v-on:click="color" style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(255,208,115,.6);'></button>
+            <button class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(22,210,170,.6);'></button>
+            <button class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(24,85,209,.6);'></button>
+            <button class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(52,52,64,.6);'></button>
+            <button class='colorButton' v-on:click="color"  style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(38,51,104,1);'></button>
+
+
+            <textarea id='textInputBox' v-on:input="textBox" v-on:keydown="keydown" v-on:keyup.enter="hideBox" rows='4' cols='50' style='visibility:hidden' placeholder='Type Here'></textarea>
+
       </div>
+    </div>
   </div>
-
-
-
-</div>
-
-
-
 </template>
 
 <script>
@@ -128,11 +116,6 @@ export default {
     }
   },
   methods: {
-
-    changeRoom(){
-      console.log('Room changed to', this.room)
-      App.socket.emit('room', this.room);
-    },
 
     hideBox: function() {
         this.$el.querySelector('#textInputBox').style.visibility='hidden';
@@ -361,8 +344,7 @@ export default {
       var initRoom = this.room;
 
       App.socket.on('connect', function(){
-        console.log(initRoom);
-        App.socket.emit('room', initRoom);
+        App.socket.emit('join', initRoom);
       });
 
 

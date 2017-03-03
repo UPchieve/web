@@ -43,7 +43,6 @@ nav {
   height: 100%;
   border-radius: 0;
   border: none;
-  padding-top: 30px;
 
   background-color: #263368;
   color: white;

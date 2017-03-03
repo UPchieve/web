@@ -4,10 +4,6 @@ import {router} from '../main'
 
 import NetworkService from './NetworkService'
 
-
-const SERVER_ROOT = 'http://localhost:3000',
-      AUTH_ROOT = `${SERVER_ROOT}/auth`;
-
 export default {
   data: {
     registrationCode: null,

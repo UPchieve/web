@@ -13,7 +13,7 @@ export default {
     if (auth.authenticated){
       return auth.data;
     } else {
-      return false;
+      return {};
     }
   },
   getOnboarding(){

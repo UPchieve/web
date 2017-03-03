@@ -1,78 +1,74 @@
 <template>
   <div class="session">
-    <div class="session-header">
-      <div class="avatar"></div>
-      <div class="info">
-        In a session with: <br />
-        <span class="volunteer-name">Volunteer Username</span>
+    <div class="session-header-container">
+      <session-header></session-header>
+    </div>
+    <div v-if="currentSession.sessionId" class="session-contents-container">
+      <div class="col-sm-8 whiteboard-container">
+        <!-- <whiteboard></whiteboard> -->
       </div>
-      <div class="end-session">
-        <button class="btn btn-lg btn-primary btn-block" @click.prevent="submit">End session</button>
+      <div class="col-sm-4 chat-container">
+        <chat></chat>
       </div>
     </div>
-    <whiteboard></whiteboard>
   </div>
 </template>
 
 <script>
 
-import Whiteboard from './Whiteboard';
+import SessionService from 'src/services/SessionService';
+
+import SessionHeader from './Session/Header';
+// import Whiteboard from './Whiteboard';
+import Chat from './Chat';
 
 export default {
   components: {
-    Whiteboard
+    SessionHeader,
+    // Whiteboard,
+    Chat
+  },
+  data(){
+    return {
+      currentSession: SessionService.currentSession
+    }
+  },
+  mounted(){
+    var id = this.$route.params.sessionId;
+    if (!id){
+      SessionService.newSession(this, 'Math')
+    } else {
+      SessionService.useExistingSession(this, id);
+    }
   }
 }
 </script>
 
 <style scoped>
 
-
-.session-header {
-  position: relative;
-  height: 100px;
-  background-color: #64E1C6;
-  padding: 20px;
-  text-align: left;
-  display: flex;
-  flex-direction: row;
-  justify-content: left;
-  align-items: center;
+.session {
+  height: 100%;
 }
 
-h1 {
-  margin: 0;
-  text-align: left;
-  font-size: 36px;
-  line-height: 42px;
-}
-
-.avatar {
-  width: 60px;
-  height: 60px;
-  background-image: url('../assets/defaultAvatar@2x.png');
-  background-size: 60px 60px;
-}
-
-.info {
-  padding-left: 15px;
-  color: white;
-}
-
-.volunteer-name {
-  font-weight: 700;
-}
-
-button {
+.session-header-container {
   position: absolute;
-  top: 30px;
-  right: 30px;
-  width: 190px;
-  height: 40px;
-  background-color: white;
-  color: #64E1C6;
-  border: none;
-  font-size: 16px;
-  font-weight: 700;
+  left: 300px;
+  right: 0;
+  z-index: 1;
+}
+
+.session-contents-container {
+  height: 100%;
+  padding-top: 100px;
+}
+
+.whiteboard-container {
+  padding: 0;
+}
+
+.chat-container {
+  height: 100%;
+  padding: 0;
+  border-left: 1px solid #979797;
 }
 </style>
