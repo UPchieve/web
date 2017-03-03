@@ -4,7 +4,7 @@
 			<div class="messages">
 				<template v-for="message in messages">
 					<div class="message">
-						<div class="avatar"></div>
+						<div class="avatar" v-bind:style="message.avatarStyle"></div>
 						<div class="contents">
 							<div class="time">
 								{{message.time}}
@@ -27,7 +27,7 @@ import moment from 'moment'
 import UserService from '../services/UserService'
 import SessionService from '../services/SessionService'
 
-var INITIALIZED = false;
+const DEFAULT_AVATAR_URL = 'static/defaultAvatar@2x.png';
 
 var messages = [];
 
@@ -68,9 +68,16 @@ export default {
 
 function receiveMessage(data) {
 	console.log(data);
+	var picture = data.picture;
+	if (!picture || picture === ''){
+		picture = DEFAULT_AVATAR_URL
+	}
   messages.push({
 		contents: data.contents,
 		name: data.name,
+		avatarStyle: {
+			backgroundImage: `url(${picture})`
+		},
 		time: moment(data.time).format('h:mm:ss a')
   });
 }
@@ -103,8 +110,8 @@ function receiveMessage(data) {
 	position: absolute;
   width: 40px;
   height: 40px;
-  background-image: url('../assets/defaultAvatar@2x.png');
-  background-size: 40px 40px;
+  /*background-image: url('../assets/defaultAvatar@2x.png');*/
+  background-size: cover;
 }
 
 .time {

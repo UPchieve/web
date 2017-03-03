@@ -25,11 +25,22 @@ export default {
 				user: UserService.getUser()
 			});
 		});
+
+    this.socket.on('session-change', (data) => {
+      this.currentSession.sessionId = data._id;
+      this.currentSession.data = data;
+
+    })
     return this.socket;
   },
 
   startWhiteboard(){
 
+  },
+
+  endSession(){
+    router.replace('/');
+    this.socket.disconnect();
   },
 
 

@@ -14,7 +14,7 @@
       </template>
     </div>
     <div class="end-session">
-      <button class="btn btn-lg btn-primary btn-block" @click.prevent="submit">End session</button>
+      <button class="btn btn-lg btn-primary btn-block" @click.prevent="end">End session</button>
     </div>
   </div>
 </template>
@@ -28,6 +28,14 @@ export default {
   data(){
     return {
       currentSession: SessionService.currentSession
+    }
+  },
+  methods: {
+    end(){
+      var result = window.confirm('Do you really want to end the session?')
+      if (result){
+        SessionService.endSession();
+      }
     }
   }
 }
