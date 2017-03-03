@@ -1,6 +1,6 @@
 import Validator from 'validator';
 
-import {router} from '../main'
+import {router} from '../router'
 
 import NetworkService from './NetworkService'
 

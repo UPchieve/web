@@ -1,6 +1,5 @@
-const SERVER_ROOT = 'http://localhost:3000',
-      AUTH_ROOT = `${SERVER_ROOT}/auth`,
-      API_ROOT = `${SERVER_ROOT}/api`
+const AUTH_ROOT = `${process.env.SERVER_ROOT}/auth`,
+    API_ROOT = `${process.env.SERVER_ROOT}/api`
 
 export default {
   _successHandler(res){

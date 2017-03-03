@@ -19,12 +19,10 @@
 
 <script>
 
-const SOCKET_ADDRESS = 'http://localhost:3001';
-
 import moment from 'moment'
 import UserService from '../services/UserService'
 
-import {router} from '../main'
+import {router} from '../router'
 
 let App = {},
     openSessions = [];
@@ -42,7 +40,7 @@ export default {
     }
   },
   mounted(){
-    App.socket = require('socket.io-client')(SOCKET_ADDRESS);
+    App.socket = require('socket.io-client')(process.env.SOCKET_ADDRESS);
     App.socket.on('connect', function(){
       App.socket.emit('list', {
         user: UserService.getUser()

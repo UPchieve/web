@@ -1,13 +1,11 @@
 import Validator from 'validator';
 
-import {router} from '../main'
+import {router} from '../router'
 
 import NetworkService from './NetworkService'
 
 
-const SERVER_ROOT = 'http://localhost:3000',
-      AUTH_ROOT = `${SERVER_ROOT}/auth`,
-      USER_FETCH_LIMIT_SECONDS = 5
+const USER_FETCH_LIMIT_SECONDS = 5
 
 export default {
   user: {

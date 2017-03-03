@@ -4,7 +4,7 @@
 
 import OnboardingService from '../services/OnboardingService';
 
-import {router} from '../main'
+import {router} from '../router'
 
 // TODO: UserService to choose starting onboarding step based on user state
 

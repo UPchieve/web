@@ -1,12 +1,10 @@
 import Validator from 'validator';
 import Socket from 'socket.io-client';
 
-import {router} from '../main'
+import {router} from '../router'
 
 import NetworkService from './NetworkService'
 import UserService from './UserService'
-
-const SOCKET_ADDRESS = 'http://localhost:3001';
 
 
 export default {
@@ -29,7 +27,7 @@ export default {
   },
 
   startChatSocket(){
-    this.socket = Socket(SOCKET_ADDRESS);
+    this.socket = Socket(process.env.SOCKET_ADDRESS);
 
     this.socket.on('connect', () => {
 			this.socket.emit('join', {

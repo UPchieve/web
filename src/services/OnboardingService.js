@@ -1,12 +1,9 @@
 import AuthService from './AuthService'
 import NetworkService from './NetworkService'
 
-import {router} from '../main'
+import {router} from '../router'
 
 let REQUIRED_PROFILE_FIELDS = [ 'name' ]
-
-const SERVER_ROOT = 'http://localhost:3000',
-      API_ROOT = `${SERVER_ROOT}/api`
 
 export default {
   status: {
