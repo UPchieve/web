@@ -1,13 +1,12 @@
 <template>
   <ul class="nav navbar-nav" v-if="auth.authenticated">
     <router-link to="/dashboard" tag="li"><a>Home</a></router-link>
-    <template v-if="user.isVolunteer">
-      <router-link to="/open-sessions" tag="li"><a>Open Sessions</a></router-link>
-    </template>
-    <template v-else>
+    <template v-if="!user.isVolunteer">
       <router-link to="/session/math" tag="li"><a>Get Math Tutoring</a></router-link>
       <router-link to="/session/college" tag="li"><a>Get College Advice</a></router-link>
+      <router-link to="/schedule" tag="li"><a>Schedule a Session</a></router-link>
     </template>
+    <router-link to="/resources" tag="li"><a>Resources</a></router-link>
 
   </ul>
 </template>

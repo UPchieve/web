@@ -20,6 +20,8 @@ import Session from './components/Session'
 import ListSessions from './components/ListSessions'
 import Action from './components/Action'
 import Profile from './components/Profile'
+import Schedule from './components/Schedule'
+import Resources from './components/Resources'
 
 import AuthService from './services/AuthService'
 import OnboardingService from './services/OnboardingService'
@@ -41,6 +43,8 @@ const routes = [
   { path: '/session/math/:sessionId?', component: Session },
   { path: '/session/college/:sessionId?', component: Session },
   { path: '/open-sessions', component: ListSessions },
+  { path: '/schedule', component: Schedule },
+  { path: '/resources', component: Resources },
   { path: '/action/:action/:data?', component: Action, meta: { bypassOnboarding: true } },
   { path: '/onboarding/:step?', component: Onboarding, meta: { protected: true } },
   { path: '/profile', component: Profile, meta: { protected: true, bypassOnboarding: true } }

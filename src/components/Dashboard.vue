@@ -13,10 +13,15 @@
 
         </div>
       </div>
-      <div class="col-lg-6">
+      <div class="col-lg-6" v-if="!user.isVolunteer">
         <h2>Get started!</h2>
         <p>Our volunteers are here to help you.</p>
-        <router-link to="/session" class="btn btn-lg btn-primary btn-block">Start a new session</router-link>
+        <router-link to="/session/math" class="btn btn-lg btn-block">Get Math Tutoring</router-link>
+        <router-link to="/session/college" class="btn btn-lg btn-block">Get College Admissions Advice</router-link>
+        <router-link to="/schedule" class="btn btn-lg btn-block">Schedule an Admissions Consulting Session</router-link>
+      </div>
+      <div class="col-lg-6" v-else>
+        <list-sessions></list-sessions>
       </div>
     </div>
   </div>
@@ -26,7 +31,12 @@
 
 import UserService from 'src/services/UserService';
 
+import ListSessions from 'src/components/ListSessions';
+
 export default {
+  components: {
+    ListSessions
+  },
   data() {
     let user = UserService.getUser() || {};
     return {
@@ -96,12 +106,14 @@ h1 {
 }
 
 .btn {
-  width: 250px;
+  height: 60px;
   background-color: #16D2AA;
   border: none;
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 20px;
+  color: white;
+  line-height: 40px;
 }
 
 .btn:hover {
