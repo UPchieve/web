@@ -6,7 +6,7 @@
           <button id='drawButton' v-on:click="drawSetup"></button>
           <button id='eraseButton' v-on:click="erase"></button>
           <button id='undoButton' v-on:click="undo"></button>
-          <button id='textButton' v-on:click="text"></button>
+          <!-- <button id='textButton' v-on:click="text"></button> -->
           <button id='clearButton' v-on:click="clear" ></button>
         </div>
         <div class="toolset col-md-6">

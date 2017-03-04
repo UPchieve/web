@@ -7,7 +7,7 @@
         <span class="volunteer-name">{{partnerName}}</span>
       </template>
       <template v-else-if="currentSession.sessionId">
-        Waiting for a volunteer...
+        {{waitingText}}
       </template>
       <template v-else>
         Loading
@@ -21,6 +21,7 @@
 
 <script>
 
+import UserService from 'src/services/UserService'
 import SessionService from 'src/services/SessionService';
 
 const DEFAULT_AVATAR_URL = 'static/defaultAvatar@2x.png';
@@ -32,6 +33,14 @@ export default {
     }
   },
   computed: {
+    waitingText(){
+      var user = UserService.getUser()
+      if (user.isVolunteer){
+        return 'No student is in this session';
+      } else {
+          return 'Waiting for a volunteer...';
+      }
+    },
     partnerName(){
       var partner = SessionService.getPartner();
       return partner && partner.name;
