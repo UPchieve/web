@@ -20,6 +20,9 @@
         <router-link to="/session/college" class="btn btn-lg btn-block">Get College Admissions Advice</router-link>
         <router-link to="/schedule" class="btn btn-lg btn-block">Schedule an Admissions Consulting Session</router-link>
       </div>
+      <div class="col-lg-6" v-else>
+        <list-sessions></list-sessions>
+      </div>
     </div>
   </div>
 </template>
@@ -28,7 +31,12 @@
 
 import UserService from 'src/services/UserService';
 
+import ListSessions from 'src/components/ListSessions';
+
 export default {
+  components: {
+    ListSessions
+  },
   data() {
     let user = UserService.getUser() || {};
     return {

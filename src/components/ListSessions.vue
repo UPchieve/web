@@ -1,16 +1,14 @@
 <template>
-  <table class="table table-striped">
+  <table class="table table-striped table-hover">
     <thead>
       <tr>
-        <th>Id</th>
         <th>Student</th>
         <th>Session type</th>
         <th>Created</th>
       </tr>
     </thead>
     <tbody>
-      <tr v-for="session in openSessions" v-on:click="gotoSession(session)">
-        <td>{{session._id}}</td>
+      <tr v-for="session in openSessions" v-on:click="gotoSession(session)" class="session-row">
         <td>{{session.student.name}}</td>
         <td>{{session.type}}</td>
         <td>{{session.createdAt}}</td>
@@ -54,4 +52,7 @@ export default {
 </script>
 
 <style scoped>
+.session-row {
+  cursor: pointer;
+}
 </style>
