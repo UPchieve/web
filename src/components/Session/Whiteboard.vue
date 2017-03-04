@@ -154,7 +154,7 @@ export default {
     emitChangeColor(color){
       this.$socket.emit('changeColor', {
         sessionId: this.currentSession.sessionId,
-        color
+        color:color
       });
     },
     emitChangeWidth(width){
@@ -264,8 +264,8 @@ export default {
 
         this.fillCircle(App.canvas, App.ctx, 'dragstart', false, x, y, LOCAL_LINE_COLOR);
         this.emitDragStart({
-          x,
-          y,
+          x:x,
+          y:y,
           color:LOCAL_LINE_COLOR
         });
       }
@@ -281,8 +281,8 @@ export default {
 
       this.fillCircle(App.canvas, App.ctx, 'dragend', false, x, y, LOCAL_LINE_COLOR);
       this.emitDragEnd({
-        x,
-        y,
+        x:x,
+        y:y,
         color: LOCAL_LINE_COLOR
       });
       saveImage(App.canvas, App.ctx);
@@ -301,9 +301,11 @@ export default {
         var y = event.pageY;
 
         this.fillCircle(App.canvas, App.ctx, 'drag', false, x, y, LOCAL_LINE_COLOR);
+        console.log('LOCAL: ' + LOCAL_LINE_COLOR);
+        console.log('SERVER: '+ SERVER_LINE_COLOR);
         this.emitDragAction({
-          x,
-          y,
+          x:x,
+          y:y,
           color: LOCAL_LINE_COLOR
         });
 
