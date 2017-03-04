@@ -21,6 +21,8 @@
         <router-link to="/schedule" class="btn btn-lg btn-block">Schedule an Admissions Consulting Session</router-link>
       </div>
       <div class="col-lg-6" v-else>
+        <h2>Select a student to help</h2>
+        <p> Only students who are waiting for a volunteer will show up below.</p>
         <list-sessions></list-sessions>
       </div>
     </div>
