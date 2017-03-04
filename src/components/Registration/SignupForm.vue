@@ -12,7 +12,7 @@
     </div>
     <div class="successMessage" v-else>
       <h2>Your account has been created!</h2>
-      <p>Please check your email to verify your account and sign in for the first time.</p>
+      <p>A verification email has been sent to confirm your account. Follow the link to get started! (Check your spam folder if you do not see the email)</p>
     </div>
   </form>
 </template>

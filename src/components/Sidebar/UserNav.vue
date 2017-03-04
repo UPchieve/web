@@ -7,6 +7,7 @@
     <template v-else>
       <router-link to="/session/math" tag="li"><a>Get Math Tutoring</a></router-link>
       <router-link to="/session/college" tag="li"><a>Get College Advice</a></router-link>
+      <router-link to="/schedule" tag="li"><a>Schedule a Session</a></router-link>
     </template>
 
   </ul>
