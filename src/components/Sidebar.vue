@@ -1,6 +1,6 @@
 <template>
   <nav class="navbar">
-    <h1>UPchieve</h1>
+    <router-link tag="h1" to="/">UPchieve</router-link>
     <div v-if="auth.authenticated">
       <profile-info v-if="auth.authenticated"></profile-info>
       <div id="navbar">
@@ -56,7 +56,7 @@ h1 {
   margin-top: 29px;
   margin-bottom: 50px;
   font-size: 24px;
-
+  cursor: pointer;
 }
 
 h1::before {

@@ -5,7 +5,8 @@
       <router-link to="/open-sessions" tag="li"><a>Open Sessions</a></router-link>
     </template>
     <template v-else>
-      <router-link to="/session" tag="li"><a>Start Session</a></router-link>
+      <router-link to="/session/math" tag="li"><a>Get Math Tutoring</a></router-link>
+      <router-link to="/session/college" tag="li"><a>Get College Advice</a></router-link>
     </template>
 
   </ul>
@@ -44,6 +45,8 @@ export default {
   }
 
   li > a {
+    font-size: 16px;
+    font-weight: 400;
     color: white;
     padding: 2px 0;
     height: 50px;
@@ -65,7 +68,6 @@ export default {
   }
 
   li.active > a {
-    font-weight: bold;
     background-color: #263368;
     margin: auto 10px;
   }

@@ -50,7 +50,7 @@ export default {
 h2 {
   font-size: 24px;
   text-align: left;
-  font-weight: 700;
+  font-weight: 600;
   margin-bottom: 50px;
 }
 
@@ -91,7 +91,7 @@ label {
 
 .password-guidelines {
   font-size: 12px;
-  font-weight: 200;
+  font-weight: 300;
   text-align: left;
   color: #73737A;
   margin: 10px auto 50px;

@@ -6,6 +6,9 @@
 					<div class="message">
 						<div class="avatar" v-bind:style="message.avatarStyle"></div>
 						<div class="contents">
+              <div class="name">
+								{{message.name}}
+							</div>
 							<div class="time">
 								{{message.time}}
 							</div>
@@ -24,17 +27,15 @@
 import $ from 'jquery'
 import moment from 'moment'
 
-import UserService from '../services/UserService'
-import SessionService from '../services/SessionService'
+import UserService from 'src/services/UserService'
+import SessionService from 'src/services/SessionService'
 
 const DEFAULT_AVATAR_URL = 'static/defaultAvatar@2x.png';
-
-var messages = [];
 
 export default {
 	data(){
 		return {
-      messages: messages,
+      messages: [],
 			currentSession: SessionService.currentSession,
 			newMessage: ''
 		}
@@ -43,7 +44,7 @@ export default {
     sendMessage: function() {
       var message = this.newMessage;
 
-      SessionService.socket.emit('message', {
+      this.$socket.emit('message', {
 				sessionId: this.currentSession.sessionId,
         user: UserService.getUser(),
         message: message
@@ -52,10 +53,27 @@ export default {
       this.newMessage = '';
     },
   },
-  mounted() {
-		let socket = SessionService.startChatSocket();
-
-		socket.on('messageSend', receiveMessage);
+  sockets: {
+    'session-change'(data){
+      console.log('session-change', data);
+      SessionService.currentSession.sessionId = data._id;
+      SessionService.currentSession.data = data;
+    },
+    messageSend(data){
+    	console.log(data);
+    	var picture = data.picture;
+    	if (!picture || picture === ''){
+    		picture = DEFAULT_AVATAR_URL
+    	}
+      this.messages.push({
+    		contents: data.contents,
+    		name: data.name,
+    		avatarStyle: {
+    			backgroundImage: `url(${picture})`
+    		},
+    		time: moment(data.time).format('h:mm:ss a')
+      });
+    }
   },
 
 	updated(){
@@ -63,23 +81,6 @@ export default {
 		var scrollTop = el[0].scrollHeight - el[0].clientHeight;
 		el.scrollTop(scrollTop)
 	}
-}
-
-
-function receiveMessage(data) {
-	console.log(data);
-	var picture = data.picture;
-	if (!picture || picture === ''){
-		picture = DEFAULT_AVATAR_URL
-	}
-  messages.push({
-		contents: data.contents,
-		name: data.name,
-		avatarStyle: {
-			backgroundImage: `url(${picture})`
-		},
-		time: moment(data.time).format('h:mm:ss a')
-  });
 }
 
 
@@ -114,9 +115,9 @@ function receiveMessage(data) {
   background-size: cover;
 }
 
-.time {
+.name, .time {
 	font-size: 12px;
-	font-weight: 200;
+	font-weight: 300;
 	color: #73737A;
 }
 

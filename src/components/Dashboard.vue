@@ -5,7 +5,20 @@
         <h1>Welcome,<br />{{name}}.</h1>
       </div>
     </div>
+    <div class="dashboard-body row">
+      <div class="col-lg-6">
+        <h2>New to UPchieve?</h2>
+        <p>Watch the video to learn how to use our services.</p>
+        <div class="video">
 
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <h2>Get started!</h2>
+        <p>Our volunteers are here to help you.</p>
+        <router-link to="/session" class="btn btn-lg btn-primary btn-block">Start a new session</router-link>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -56,5 +69,42 @@ h1 {
   text-align: left;
   font-size: 36px;
   line-height: 42px;
+  font-weight: 400;
+}
+
+.dashboard-body {
+  padding: 20px 30px;
+}
+
+.dashboard-body h2 {
+  font-size: 24px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.dashboard-body p {
+  font-size: 16px;
+  font-weight: 300;
+  color: #333333;
+  text-align: left;
+}
+
+.video {
+  width: 450px;
+  height: 264px;
+  background-color: #EEEEEE;
+}
+
+.btn {
+  width: 250px;
+  background-color: #16D2AA;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.btn:hover {
+  background-color: #16D2AA;
 }
 </style>

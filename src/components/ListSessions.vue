@@ -4,6 +4,7 @@
       <tr>
         <th>Id</th>
         <th>Student</th>
+        <th>Session type</th>
         <th>Created</th>
       </tr>
     </thead>
@@ -11,6 +12,7 @@
       <tr v-for="session in openSessions" v-on:click="gotoSession(session)">
         <td>{{session._id}}</td>
         <td>{{session.student.name}}</td>
+        <td>{{session.type}}</td>
         <td>{{session.createdAt}}</td>
       </tr>
     </tbody>
@@ -24,8 +26,7 @@ import UserService from '../services/UserService'
 
 import {router} from '../router'
 
-let App = {},
-    openSessions = [];
+let openSessions = [];
 
 export default {
   data(){
@@ -39,17 +40,15 @@ export default {
       router.push(`/session/${session._id}`);
     }
   },
-  mounted(){
-    App.socket = require('socket.io-client')(process.env.SOCKET_ADDRESS);
-    App.socket.on('connect', function(){
-      App.socket.emit('list', {
-        user: UserService.getUser()
-      });
-    });
-    App.socket.on('sessions', (sessions) => {
+  sockets: {
+    sessions(sessions){
       this.openSessions = sessions;
-      console.log(sessions);
-    })
+    }
+  },
+  mounted(){
+    this.$socket.emit('list', {
+      user: UserService.getUser()
+    });
   }
 }
 </script>

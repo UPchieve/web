@@ -5,7 +5,7 @@
     </div>
     <div v-if="currentSession.sessionId" class="session-contents-container">
       <div class="col-sm-8 whiteboard-container">
-        <!-- <whiteboard></whiteboard> -->
+        <whiteboard></whiteboard>
       </div>
       <div class="col-sm-4 chat-container">
         <chat></chat>
@@ -17,15 +17,16 @@
 <script>
 
 import SessionService from 'src/services/SessionService';
+import UserService from 'src/services/UserService';
 
 import SessionHeader from './Session/Header';
-// import Whiteboard from './Whiteboard';
-import Chat from './Chat';
+import Whiteboard from './Session/Whiteboard';
+import Chat from './Session/Chat';
 
 export default {
   components: {
     SessionHeader,
-    // Whiteboard,
+    Whiteboard,
     Chat
   },
   data(){
@@ -34,12 +35,31 @@ export default {
     }
   },
   mounted(){
-    var id = this.$route.params.sessionId;
+    var id = this.$route.params.sessionId,
+        promise;
+
     if (!id){
-      SessionService.newSession(this, 'Math')
+      var type;
+      if (this.$route.path.indexOf('session/college') !== -1){
+        type = 'college'
+      } else {
+        type = 'math'
+      }
+      promise = SessionService.newSession(this, type)
     } else {
-      SessionService.useExistingSession(this, id);
+      promise = SessionService.useExistingSession(this, id);
     }
+
+    promise.then( (sessionId) => {
+      this.$socket.emit('join', {
+  			sessionId: sessionId,
+  			user: UserService.getUser()
+  		});
+    });
+  },
+  beforeRouteLeave(to, from, next){
+    this.$socket.disconnect();
+    next();
   }
 }
 </script>
@@ -63,6 +83,7 @@ export default {
 }
 
 .whiteboard-container {
+  height: 100%;
   padding: 0;
 }
 

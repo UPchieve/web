@@ -1,13 +1,14 @@
 import Vue from 'vue'
 import VueResource from 'vue-resource'
 import VueRouter from 'vue-router'
+import VueSocketio from 'vue-socket.io';
 
 Vue.use(VueResource)
 Vue.use(VueRouter)
+Vue.use(VueSocketio, process.env.SOCKET_ADDRESS);
 
 Vue.http.options.credentials = true;
 
-import About from './components/About'
 import Contact from './components/Contact'
 import Privacy from './components/Privacy'
 import Logout from './components/Logout'
@@ -24,15 +25,21 @@ import AuthService from './services/AuthService'
 import OnboardingService from './services/OnboardingService'
 
 const routes = [
-  { path: '/', redirect: '/about' },
-  { path: '/about', component: About },
+  { path: '/', redirect: () => {
+    if (AuthService.user.authenticated){
+      return '/dashboard';
+    } else {
+      return '/login';
+    }
+  }},
   { path: '/contact', component: Contact },
   { path: '/privacy', component: Privacy },
   { path: '/login', component: LoginForm },
   { path: '/logout', component: Logout },
   { path: '/signup', component: Registration },
   { path: '/dashboard', component: Dashboard },
-  { path: '/session/:sessionId?', component: Session },
+  { path: '/session/math/:sessionId?', component: Session },
+  { path: '/session/college/:sessionId?', component: Session },
   { path: '/open-sessions', component: ListSessions },
   { path: '/action/:action/:data?', component: Action, meta: { bypassOnboarding: true } },
   { path: '/onboarding/:step?', component: Onboarding, meta: { protected: true } },
