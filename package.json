@@ -1,7 +1,7 @@
 {
   "name": "web",
   "version": "1.0.0",
-  "description": "BelieveAchieve web client",
+  "description": "UPchieve web client",
   "author": "Corey <corey.johns@believeachieve.com>",
   "private": true,
   "scripts": {
