@@ -1,6 +1,5 @@
 <template>
   <div class="session-list">
-    <h2>Open sessions</h2>
     <table class="table table-striped table-hover">
       <thead>
         <tr>
@@ -56,11 +55,6 @@ export default {
 </script>
 
 <style scoped>
-h2 {
-  font-size: 24px;
-  font-weight: 600;
-  text-align: left;
-}
 
 .session-row {
   cursor: pointer;
