@@ -38,8 +38,11 @@ export default {
       this.currentSession.sessionId = sessionId;
 
       console.log(sessionId);
-
-      router.replace(`/session/${sessionId}`);
+      if (sessionId){
+        router.replace(`/session/${sessionId}`);
+      } else {
+        router.replace('/');
+      }
 
       return sessionId;
     })

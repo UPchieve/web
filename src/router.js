@@ -38,6 +38,8 @@ const routes = [
   { path: '/logout', component: Logout },
   { path: '/signup', component: Registration },
   { path: '/dashboard', component: Dashboard },
+  { path: '/new-session/math', component: Session },
+  { path: '/new-session/college', component: Session },
   { path: '/session/:sessionId?', component: Session },
   { path: '/open-sessions', component: ListSessions },
   { path: '/action/:action/:data?', component: Action, meta: { bypassOnboarding: true } },

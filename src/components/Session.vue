@@ -37,8 +37,15 @@ export default {
   mounted(){
     var id = this.$route.params.sessionId,
         promise;
+
     if (!id){
-      promise = SessionService.newSession(this, 'Math')
+      var type;
+      if (this.$route.path === '/new-session/college'){
+        type = 'College'
+      } else {
+        type = 'Math'
+      }
+      promise = SessionService.newSession(this, type)
     } else {
       promise = SessionService.useExistingSession(this, id);
     }

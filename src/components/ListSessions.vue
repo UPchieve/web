@@ -4,6 +4,7 @@
       <tr>
         <th>Id</th>
         <th>Student</th>
+        <th>Session type</th>
         <th>Created</th>
       </tr>
     </thead>
@@ -11,6 +12,7 @@
       <tr v-for="session in openSessions" v-on:click="gotoSession(session)">
         <td>{{session._id}}</td>
         <td>{{session.student.name}}</td>
+        <td>{{session.type}}</td>
         <td>{{session.createdAt}}</td>
       </tr>
     </tbody>
