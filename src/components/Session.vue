@@ -40,10 +40,10 @@ export default {
 
     if (!id){
       var type;
-      if (this.$route.path === '/new-session/college'){
-        type = 'College'
+      if (this.$route.path.indexOf('session/college') !== -1){
+        type = 'college'
       } else {
-        type = 'Math'
+        type = 'math'
       }
       promise = SessionService.newSession(this, type)
     } else {
@@ -56,6 +56,10 @@ export default {
   			user: UserService.getUser()
   		});
     });
+  },
+  beforeRouteLeave(to, from, next){
+    this.$socket.disconnect();
+    next();
   }
 }
 </script>

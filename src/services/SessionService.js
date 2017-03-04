@@ -31,7 +31,7 @@ export default {
 
 
   newSession(context, sessionType){
-    return NetworkService.newSession(context, { sessionType }).then((res) => {
+    return NetworkService.newSession(context, {sessionType}).then((res) => {
       let data = res.data || {},
           sessionId = data.sessionId;
 
@@ -39,7 +39,7 @@ export default {
 
       console.log(sessionId);
       if (sessionId){
-        router.replace(`/session/${sessionId}`);
+        router.replace(`/session/${sessionType}/${sessionId}`);
       } else {
         router.replace('/');
       }
@@ -51,14 +51,13 @@ export default {
   useExistingSession(context, sessionId){
     return NetworkService.checkSession(context, { sessionId }).then((res) => {
       let data = res.data || {},
-          sessionId = data.sessionId;
+          sessionId = data.sessionId,
+          sessionType = data.type;
 
       this.currentSession.sessionId = sessionId;
 
       console.log(sessionId);
-      if (sessionId){
-        router.replace(`/session/${sessionId}`);
-      } else {
+      if (!sessionId){
         router.replace('/');
       }
 

@@ -5,8 +5,8 @@
       <router-link to="/open-sessions" tag="li"><a>Open Sessions</a></router-link>
     </template>
     <template v-else>
-      <router-link to="/new-session/math" tag="li"><a>Get Math Tutoring</a></router-link>
-      <router-link to="/new-session/college" tag="li"><a>Get College Advice</a></router-link>
+      <router-link to="/session/math" tag="li"><a>Get Math Tutoring</a></router-link>
+      <router-link to="/session/college" tag="li"><a>Get College Advice</a></router-link>
     </template>
 
   </ul>
