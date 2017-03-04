@@ -61,6 +61,5 @@ export default {
 
       return sessionId;
     })
-    this.currentSession.sessionId = sessionId;
   }
 };

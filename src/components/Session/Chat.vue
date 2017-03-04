@@ -6,6 +6,9 @@
 					<div class="message">
 						<div class="avatar" v-bind:style="message.avatarStyle"></div>
 						<div class="contents">
+              <div class="name">
+								{{message.name}}
+							</div>
 							<div class="time">
 								{{message.time}}
 							</div>
@@ -24,8 +27,8 @@
 import $ from 'jquery'
 import moment from 'moment'
 
-import UserService from '../services/UserService'
-import SessionService from '../services/SessionService'
+import UserService from 'src/services/UserService'
+import SessionService from 'src/services/SessionService'
 
 const DEFAULT_AVATAR_URL = 'static/defaultAvatar@2x.png';
 
@@ -72,12 +75,6 @@ export default {
       });
     }
   },
-  mounted() {
-		this.$socket.emit('join', {
-			sessionId: SessionService.currentSession.sessionId,
-			user: UserService.getUser()
-		});
-  },
 
 	updated(){
 		var el = $('.messages');
@@ -118,7 +115,7 @@ export default {
   background-size: cover;
 }
 
-.time {
+.name, .time {
 	font-size: 12px;
 	font-weight: 300;
 	color: #73737A;
