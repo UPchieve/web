@@ -2,7 +2,7 @@
   <div class="row">
 
   	<div class="col-sm-12" style="background-color:rgba(255,208,115,.6); text-align:left; padding-left:50px;">
-  		<h3 style="color:white"><strong>Privacy Policy</strong><h2>
+  		<h3 style="color:white"><strong>Privacy Policy</strong></h3>
   	</div>
   	<div class="row">
       	<div class = "col-sm-6" style="text-align:left;padding-left:70px;padding-top:40px;">
@@ -13,7 +13,7 @@
     <div class="col-sm-6">
        <div class="row">
       	<div class = "col-sm-12" style="text-align:left;padding-left:50px;padding-bottom:40px">
-        	
+
         	<h2 style="font-weight:bold">Why We Need Your Personal Information</h2>
         	<br>
         	<p>UPchieve strives to connect students with volunteers who can help you succeed in your classes and in the college application process. However, in order to ensure that you receive personalized help from volunteers, improve the services we offer you, and obtain funding to continue providing these services to you, we have to collect personal information about you. Here are some examples of what we use your personal information to do:</p>
@@ -72,7 +72,7 @@
     <div class="col-sm-5" style="">
     	<div class="row">
       	<div class = "col-sm-12" style="text-align:left;padding-left:50px;padding-bottom:40px">
-        	
+
         	<h2 style="font-weight:bold">We May Share Your Personal Information For Safety or Legal Reasons</h2>
         	<br>
         	<p>If we have reason to believe that disclosing your personal information is required by law, is reasonable to protect someone from possible injury, or is required as part of an internal or external legal investigation, we may do so.</p>
