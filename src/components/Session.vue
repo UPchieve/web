@@ -51,6 +51,7 @@ export default {
     }
 
     promise.then( (sessionId) => {
+      this.$socket.connect();
       this.$socket.emit('join', {
   			sessionId: sessionId,
   			user: UserService.getUser()
@@ -59,6 +60,7 @@ export default {
   },
   beforeRouteLeave(to, from, next){
     this.$socket.disconnect();
+    SessionService.endSession({ skipRoute: true });
     next();
   }
 }

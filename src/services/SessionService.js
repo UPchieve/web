@@ -24,8 +24,12 @@ export default {
     }
   },
 
-  endSession(){
-    router.replace('/feedback');
+  endSession(options = {}){
+    this.currentSession.sessionId = null;
+    this.currentSession.data = {};
+    if (!options.skipRoute){
+      router.replace('/feedback');
+    }
   },
 
 
