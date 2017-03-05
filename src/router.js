@@ -45,7 +45,7 @@ const routes = [
   { path: '/session/college/:sessionId?', component: Session, meta: { protected: true } },
   { path: '/schedule', component: Schedule, meta: { protected: true } },
   { path: '/resources', component: Resources, meta: { protected: true } },
-  { path: '/resources', component: Feedback, meta: { protected: true } },
+  { path: '/feedback', component: Feedback, meta: { protected: true } },
   { path: '/action/:action/:data?', component: Action, meta: { bypassOnboarding: true } },
   { path: '/onboarding/:step?', component: Onboarding, meta: { protected: true } },
   { path: '/profile', component: Profile, meta: { protected: true, bypassOnboarding: true } }
