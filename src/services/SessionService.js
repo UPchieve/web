@@ -25,7 +25,7 @@ export default {
   },
 
   endSession(){
-    router.replace('/');
+    router.replace('/feedback');
   },
 
 
