@@ -89,6 +89,16 @@ router.beforeEach((to, from, next) => {
   }
 });
 
+// If endpoint returns 401, redirect to login (except for requests to get user's session)
+Vue.http.interceptors.push(function(request, next) {
+  next(function(response){
+    if (response.status === 401 && request.url.indexOf('/api/user') === -1){
+      AuthService.removeUser();
+      router.push('/login?401=true');
+    }
+  });
+});
+
 import App from './App'
 
 /* eslint-disable no-new */
