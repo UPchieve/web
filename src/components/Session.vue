@@ -38,6 +38,8 @@ export default {
     var id = this.$route.params.sessionId,
         promise;
 
+    console.log(id);
+
     if (!id){
       var type;
       if (this.$route.path.indexOf('session/college') !== -1){
@@ -51,6 +53,7 @@ export default {
     }
 
     promise.then( (sessionId) => {
+      this.$socket.connect();
       this.$socket.emit('join', {
   			sessionId: sessionId,
   			user: UserService.getUser()
@@ -58,8 +61,16 @@ export default {
     });
   },
   beforeRouteLeave(to, from, next){
-    this.$socket.disconnect();
-    next();
+    if (to.path.indexOf('/feedback') !== -1){
+      next();
+      return;
+    }
+    var result = window.confirm('Do you really want to end the session?')
+    if (result){
+      this.$socket.disconnect();
+      SessionService.endSession({ skipRoute: true });
+      next('/feedback');
+    }
   }
 }
 </script>

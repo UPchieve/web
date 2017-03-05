@@ -13,6 +13,9 @@
         Loading
       </template>
     </div>
+    <div class="upload-file" v-if="partnerName">
+      <a class="btn btn-lg btn-block" target="_blank" href="http://google.com">Upload file</a>
+    </div>
     <div class="end-session">
       <button class="btn btn-lg btn-block" @click.prevent="end">End session</button>
     </div>
@@ -126,5 +129,9 @@ h1 {
 
 .session-header.inactive button {
   color: #73737A;
+}
+
+.upload-file .btn {
+  right: 230px;
 }
 </style>

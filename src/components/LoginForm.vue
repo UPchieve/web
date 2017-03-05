@@ -1,6 +1,6 @@
 <template>
   <form class="form-signin">
-    <div class="alert alert-danger" role="alert" v-if="error">{{error}}</div>
+    <div class="alert alert-danger" role="alert" v-if="error || $route.query['401'] === 'true'">{{error}}</div>
     <h2 class="form-signin-heading">Log in</h2>
     <label for="inputEmail">Email</label>
     <input type="email" id="inputEmail" class="form-control" required autofocus v-model="credentials.email">
@@ -18,12 +18,16 @@ import AuthService from 'src/services/AuthService'
 
 export default {
   data() {
+    let error;
+    if (this.$route.query['401'] === 'true'){
+      error = 'Your session has expired. Please login again'
+    }
     return {
       credentials: {
         email: '',
         password: ''
       },
-      error: ''
+      error: error
     }
   },
   methods: {
