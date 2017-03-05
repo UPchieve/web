@@ -1,20 +1,20 @@
 <template>
-  <table class="table table-striped table-hover">
-    <thead>
-      <tr>
-        <th>Student</th>
-        <th>Session type</th>
-        <th>Created</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="session in openSessions" v-on:click="gotoSession(session)" class="session-row">
-        <td>{{session.student.name}}</td>
-        <td>{{session.type}}</td>
-        <td>{{session.createdAt}}</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="session-list">
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Session type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="session in openSessions" v-on:click="gotoSession(session)" class="session-row">
+          <td>{{session.student.name}}</td>
+          <td>{{session.type}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <script>
@@ -40,7 +40,10 @@ export default {
   },
   sockets: {
     sessions(sessions){
-      this.openSessions = sessions;
+      this.openSessions = sessions.filter(function(session){
+        console.log(session);
+        return !session.volunteer;
+      });
     }
   },
   mounted(){
@@ -52,7 +55,12 @@ export default {
 </script>
 
 <style scoped>
+
 .session-row {
   cursor: pointer;
+}
+
+.session-row td {
+  text-align: left;
 }
 </style>
