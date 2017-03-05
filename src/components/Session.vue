@@ -38,6 +38,8 @@ export default {
     var id = this.$route.params.sessionId,
         promise;
 
+    console.log(id);
+
     if (!id){
       var type;
       if (this.$route.path.indexOf('session/college') !== -1){
@@ -59,9 +61,16 @@ export default {
     });
   },
   beforeRouteLeave(to, from, next){
-    this.$socket.disconnect();
-    SessionService.endSession({ skipRoute: true });
-    next();
+    if (to.path.indexOf('/feedback') !== -1){
+      next();
+      return;
+    }
+    var result = window.confirm('Do you really want to end the session?')
+    if (result){
+      this.$socket.disconnect();
+      SessionService.endSession({ skipRoute: true });
+      next('/feedback');
+    }
   }
 }
 </script>
