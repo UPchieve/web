@@ -47,6 +47,8 @@ a:hover {
         	</ul>
        </div>
     </div>
+    <br>
+    <p>Have ideas for additional resources to add to this page? Email <a>info@upchieve.org!</a></p>
   </div>
 </template>
 
@@ -70,8 +72,11 @@ a:hover {
         		<li><a href="https://eliademy.com/app/a/courses/01af786cd6 " target="_blank">Admissions Consultant course on Eliademy</a></li>
         		<li><a href="https://goo.gl/XfdE3X" target="_blank">Google Drive Folder for Admissions Consultants</a></li>
         	</ul>
+
         </div>
     </div>
+    <br>
+    <p>Have ideas for additional resources to add to this page? Email <a>info@upchieve.org!</a></p>
   </div>
 </template>
 
