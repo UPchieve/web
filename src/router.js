@@ -23,6 +23,7 @@ import Profile from './components/Profile'
 import Schedule from './components/Schedule'
 import Resources from './components/Resources'
 import Feedback from './components/Feedback'
+import Upload from './components/Upload'
 
 import AuthService from './services/AuthService'
 import OnboardingService from './services/OnboardingService'
@@ -40,6 +41,7 @@ const routes = [
   { path: '/login', component: LoginForm },
   { path: '/logout', component: Logout },
   { path: '/signup', component: Registration },
+  { path: '/upload', component: Upload, meta: {protected: true} },
   { path: '/dashboard', component: Dashboard, meta: { protected: true } },
   { path: '/session/math/:sessionId?', component: Session, meta: { protected: true } },
   { path: '/session/college/:sessionId?', component: Session, meta: { protected: true } },
