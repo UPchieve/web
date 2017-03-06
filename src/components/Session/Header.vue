@@ -14,7 +14,7 @@
       </template>
     </div>
     <div class="upload-file" v-if="partnerName">
-      <a class="btn btn-lg btn-block" target="_blank" href="http://app.upchieve.org/upload">Upload file</a>
+      <a class="btn btn-lg btn-block" target="_blank" href="http://localhost:8080/#/upload">Upload file</a>
     </div>
     <div class="end-session">
       <button class="btn btn-lg btn-block" @click.prevent="end">End session</button>
