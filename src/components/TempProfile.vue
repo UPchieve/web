@@ -364,6 +364,7 @@
         <div class="col-sm-6"> 
           <input type="text" id="inputPicture" style="width:600px; height:100px;border:1px solid black" required autofocus>
         </div>
+      </div>
 
 
 
