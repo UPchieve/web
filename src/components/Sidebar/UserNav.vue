@@ -6,7 +6,7 @@
       <router-link to="/session/college" tag="li"><a>Get College Advice</a></router-link>
       <router-link to="/schedule" tag="li"><a>Schedule a Session</a></router-link>
     </template>
-    <router-link to="/resources" tag="li"><a>Useful Resources</a></router-link>
+    <router-link to="/resources" tag="li"><a>Resources</a></router-link>
 
   </ul>
 </template>
