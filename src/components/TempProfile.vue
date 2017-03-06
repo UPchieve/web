@@ -21,10 +21,10 @@
       </div>
       <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:0px">
         <div class="col-sm-4" style="padding-top:0px"> 
-          <p style="color:gray">First</p>
+          <p style="color:gray">First name</p>
         </div>
         <div class="col-sm-4" style="text-align:left; padding-left:35px;">
-          <p style="color:gray">Last</p>
+          <p style="color:gray">Last name</p>
         </div>
       </div>
       <div class="col-sm-12" style="text-align:left; padding-left:50px;">
@@ -88,9 +88,9 @@
               Dropdown button
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <a class="dropdown-item" href="#">Action</a>
-              <a class="dropdown-item" href="#">Another action</a>
-              <a class="dropdown-item" href="#">Something else here</a>
+              <a class="dropdown-item" href="#">Male</a>
+              <a class="dropdown-item" href="#">Female</a>
+              <a class="dropdown-item" href="#">Transgender</a>
             </div>
           </div>
         </div>
@@ -102,12 +102,13 @@
 
       <div class="col-sm-4" style="text-align:left; padding-left:30px;padding-top:0px">
         <ul class="checkbox-grid">
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Hispanic or Latino</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>White</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Black/African American</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>American Indian</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Alaskan Native</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Asian</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Native Hawaiian/Other Pacific Islander</p></li>
         </ul>
       </div>
 
@@ -117,18 +118,51 @@
 
       <div class="col-sm-4" style="text-align:left; padding-left:30px;padding-top:0px">
         <ul class="checkbox-grid">
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>LGBTQ</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Learning disabilities</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Other disabilities</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Immigrant</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Homeless</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Free or reduced price lunch</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Low-income</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Single parent household</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>NYCHA (public housing) resident</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>None of the above</p></li>
+        </ul>
+      </div>
+
+      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
+        <p>Do you have access to a computer or phone with internet access?</p>
+      </div>
+
+      <div class="col-sm-4" style="text-align:left; padding-left:30px;padding-top:0px">
+        <ul class="checkbox-grid">
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>My home has a computer with internet access</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>I have my own smartphone with internet access</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Someone who lives with me has a smartphone with internet access</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>None of the above</p></li>
+        </ul>
+      </div>
+
+      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
+        <p>What time(s) do you prefer to use our services?</p>
+      </div>
+
+      <div class="col-sm-4" style="text-align:left; padding-left:30px;padding-top:0px">
+        <ul class="checkbox-grid">
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>3-4pm</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>4-5pm</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>5-6pm</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>6-7pm</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>7-8pm</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>8-9pm</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>9-10pm</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>10-11pm</p></li>
         </ul>
       </div>
 
       <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-bottom:0px">
         <div class="col-sm-6"> 
-          
         </div>
         <div class="col-sm-4" style="text-align:left;">
          <button class="btn btn-lg btn-primary btn-block" type="submit">Next</button>
@@ -165,9 +199,10 @@
               Dropdown button
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <a class="dropdown-item" href="#">Action</a>
-              <a class="dropdown-item" href="#">Another action</a>
-              <a class="dropdown-item" href="#">Something else here</a>
+              <a class="dropdown-item" href="#">Freshman</a>
+              <a class="dropdown-item" href="#">Sophomore</a>
+              <a class="dropdown-item" href="#">Junior</a>
+              <a class="dropdown-item" href="#">Senior</a>
             </div>
           </div>
         </div>
@@ -184,9 +219,12 @@
               Dropdown button
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <a class="dropdown-item" href="#">Action</a>
-              <a class="dropdown-item" href="#">Another action</a>
-              <a class="dropdown-item" href="#">Something else here</a>
+              <a class="dropdown-item" href="#">2017</a>
+              <a class="dropdown-item" href="#">2018</a>
+              <a class="dropdown-item" href="#">2019</a>
+              <a class="dropdown-item" href="#">2020</a>
+              <a class="dropdown-item" href="#">2021</a>
+              <a class="dropdown-item" href="#">2022</a>
             </div>
           </div>
         </div>
@@ -207,55 +245,15 @@
         <p>What part of the college application process do you find most difficult?</p>
       </div>
 
-      <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:0px">
-        <div class="col-sm-4" style="padding-top:0px"> 
-          <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Dropdown button
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <a class="dropdown-item" href="#">Action</a>
-              <a class="dropdown-item" href="#">Another action</a>
-              <a class="dropdown-item" href="#">Something else here</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
-        <p>What time are you most likely to use our online, on-demand services?</p>
-      </div>
-
       <div class="col-sm-4" style="text-align:left; padding-left:30px;padding-top:0px">
         <ul class="checkbox-grid">
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Personal Statement/Essays</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Resume</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>SAT/ACT Exams</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Choosing which schools to apply to</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Other</p></li>
         </ul>
       </div>
-
-
-
-
-
-
-
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
-        <p>Do you have internet access at home?</p>
-      </div>
-      <div class="col-sm-4" style="text-align:left; padding-left:30px;padding-top:0px">
-        <ul class="checkbox-grid-singlecol">
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-
-        </ul>
-      </div>
-    </div>
-
 
     <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:40px">
         <div class="col-sm-6"> 
@@ -277,18 +275,39 @@
         </div>
       </div>
 
+      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
+        <p>What is the highest level of education completed by one of your parents?</p>
+      </div>
 
+      <div class="col-sm-4" style="text-align:left; padding-left:30px;padding-top:0px">
+        <ul class="checkbox-grid">
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Some high school</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>High school/GED degree</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Some college</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Associate's degree</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Bachelor's degree</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Master’s degree or higher</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Not sure</p></li>
+        </ul>
+      </div>
 
       <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
         <p>Does your high school have a college guidance counselor?</p>
       </div>
-      <div class="col-sm-4" style="text-align:left; padding-left:30px;padding-top:0px">
-        <ul class="checkbox-grid-singlecol">
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
 
-        </ul>
+      <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:0px">
+        <div class="col-sm-4" style="padding-top:0px"> 
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Dropdown button
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="#">Yes</a>
+              <a class="dropdown-item" href="#">No</a>
+              <a class="dropdown-item" href="#">I don't know</a>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
@@ -321,12 +340,14 @@
       </div>
     <div class="col-sm-4" style="text-align:left; padding-left:30px;padding-top:0px">
         <ul class="checkbox-grid">
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Text 2</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>High School Transcript</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Common Application</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Personal Statement</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Resume</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>SAT/ACT Scores</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Letters of Recommendation</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>FAFSA</p></li>
+            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>CSS/Financial Aid Profile</p></li>
         </ul>
       </div>
 
@@ -337,13 +358,11 @@
 
           <h6 style="color:gray">Please tell us about your interests! For example, your favorite class, a new topic you want to study, a cause you are passionate about, a professional hobby, an intended major/minor, etc.</h6>
         </div>
-
-        
       </div>
 
       <div class="col-sm-12" style="text-align:left; padding-bottom:40px;padding-left:25px">
         <div class="col-sm-6"> 
-          <input type="text" id="inputPicture" style="width:600px; height:100px;border:1px solid black" required autofocus >
+          <input type="text" id="inputPicture" style="width:600px; height:100px;border:1px solid black" required autofocus>
         </div>
 
 
@@ -397,7 +416,8 @@
          <button class="btn btn-lg btn-primary btn-block" type="submit">Done</button>
         </div>
       </div>
-
+</div>
+</div>
 
 
 </template>
