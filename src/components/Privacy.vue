@@ -1,4 +1,4 @@
-
+<template>
   <div class="row">
 
   	<div class="col-sm-12" style="background-color:rgba(255,208,115,.6); text-align:left; padding-left:50px;">
@@ -50,7 +50,7 @@
         	<br>
         	<p>If you are under age 13, a law called the Children's Online Privacy Protection Act (COPPA) says that we must have a parent's permission before we may collect and use your Personal Information. We will need this permission before we are able to create an account for you or provide you with any tutoring.</p>
         	<br>
-        	<p>Note to parents of children under the age of 13: You are welcome to email us at <span><a href="mailto:info@upchieve.org" style="none; font-weight:bold">info@upchieve.org</span> to review any identifiable information we have collected about your child. If you desire, you may request that we delete this information and/or specify that we collect no more of your child's information. Please note that we will need to verify the identity of anyone requesting information about a child to ensure that the person is in fact the child's parent or legal guardian, and that a request for us to delete all personal information about a child also requires us to cancel the child's account.</p>
+        	<p>Note to parents of children under the age of 13: You are welcome to email us at <span><a href="mailto:info@upchieve.org" style="none; font-weight:bold">info@upchieve.org</a></span> to review any identifiable information we have collected about your child. If you desire, you may request that we delete this information and/or specify that we collect no more of your child's information. Please note that we will need to verify the identity of anyone requesting information about a child to ensure that the person is in fact the child's parent or legal guardian, and that a request for us to delete all personal information about a child also requires us to cancel the child's account.</p>
         	<br><br>
         	<h2 style="font-weight:bold">Who Has Access to Your Personal Information</h2>
         	<br>
@@ -61,9 +61,9 @@
         		<li><span style="font-weight:bold">Volunteers:</span> Volunteers may view the "College Counseling Information" section of your profile only while they are in a college counseling session with you. After ending the session, volunteers will not be able to view this information or contact you.</li>
 
         	</ul>
-        	<p><span style="font-weight:bold">A word of caution: </span>We encourage students to practice internet safety and use caution even when interacting with UPchieve volunteers. Although we do our best to vet all volunteers, we cannot guarantee their intentions or capabilities and therefore strongly encourage you not to share personal or identifying information with volunteers. For more information on best internet safety practices specifically for teens, check out <a href="/" style="none;font-weight:bold">WebMD's article.</p>
+        	<p><span style="font-weight:bold">A word of caution: </span>We encourage students to practice internet safety and use caution even when interacting with UPchieve volunteers. Although we do our best to vet all volunteers, we cannot guarantee their intentions or capabilities and therefore strongly encourage you not to share personal or identifying information with volunteers. For more information on best internet safety practices specifically for teens, check out <a href="/" style="none;font-weight:bold">WebMD's article.</a></p>
         	<br>
-        	<p><span style="font-weight:bold">Completely anonymized and consolidated information </span>will be shared in our annual reports (which will be available on our website to all visitors) and in our applications for funding. Anonymized and consolidated information means that the information will not pertain to any one individual and it will not be possible to identify any individuals that may or may not be included. For example, we may share statistics such as X percent of students who used our services were the first in their family to attend college or Y percent of students said they thought our services were helpful. If you would like to be excluded from these statistics, please email <span><a href="mailto:info@upchieve.org" style="none; font-weight:bold">info@upchieve.org</span></p>
+        	<p><span style="font-weight:bold">Completely anonymized and consolidated information </span>will be shared in our annual reports (which will be available on our website to all visitors) and in our applications for funding. Anonymized and consolidated information means that the information will not pertain to any one individual and it will not be possible to identify any individuals that may or may not be included. For example, we may share statistics such as X percent of students who used our services were the first in their family to attend college or Y percent of students said they thought our services were helpful. If you would like to be excluded from these statistics, please email <span><a href="mailto:info@upchieve.org" style="none; font-weight:bold">info@upchieve.org</a></span></p>
         	<br>
         	On occassion, we may also ask for your permission to quote feedback from one of your submitted feedback forms. However, we will never share anything from your feedback forms without your prior permission.
         </div>
@@ -87,13 +87,13 @@
         	<p>We will occassionally update this Privacy Policy. When we post changes to this Privacy Policy, we will revise the "effective" date at the top of this Privacy Policy and send you an email to let you know. We recommend that you check our website from time to time to inform yourself of any changes to this policy</p>
         	<br><br>
         	<h2 style="font-weight:bold">Contacting the Website</h2>
-        	<p>If you have any questions, comments or concerns about UPchieve's privacy policy, you can contact us at <span><a href="mailto:info@upchieve.org" style="none; font-weight:bold">info@upchieve.org</span></p>
+        	<p>If you have any questions, comments or concerns about UPchieve's privacy policy, you can contact us at <span><a href="mailto:info@upchieve.org" style="none; font-weight:bold">info@upchieve.org</a></span></p>
         </div>
       </div>
 
     </div>
   </div>
-
+</template>
 
 <script>
 export default {
