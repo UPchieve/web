@@ -24,6 +24,7 @@ import Schedule from './components/Schedule'
 import Resources from './components/Resources'
 import Feedback from './components/Feedback'
 import Upload from './components/Upload'
+import TempProfile from './components/TempProfile'
 
 import AuthService from './services/AuthService'
 import OnboardingService from './services/OnboardingService'
@@ -37,6 +38,7 @@ const routes = [
     }
   }},
   { path: '/contact', component: Contact },
+  { path: '/completeprof', component: TempProfile},
   { path: '/privacy', component: Privacy },
   { path: '/login', component: LoginForm },
   { path: '/logout', component: Logout },
