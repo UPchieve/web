@@ -59,7 +59,7 @@
     </div>
 
     <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
-      <p>Link to a profile picture</p>
+      <p>Link to a profile picture (Optional) </p>
     </div>
 
     <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-bottom:0px">
