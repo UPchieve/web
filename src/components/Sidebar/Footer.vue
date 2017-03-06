@@ -1,6 +1,6 @@
 <template>
   <ul class="nav navbar-nav">
-    <router-link to="/login" tag="li"><a v-if="!userauth.authenticated">Log In</a></router-link>
+    <router-link to="/login" tag="li" v-if="!userauth.authenticated"><a>Log In</a></router-link>
     <router-link to="/contact" tag="li"><a>Contact Us</a></router-link>
     <router-link to="/privacy" tag="li"><a>Privacy Policy</a></router-link>
     <li v-if="userauth.authenticated"><a v-on:click="logout" class="logout">Logout</a></li>
