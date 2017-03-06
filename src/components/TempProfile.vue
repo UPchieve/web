@@ -12,7 +12,7 @@
         <p>Your full name</p>
       </div>
       <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-bottom:0px">
-        <div class="col-sm-4"> 
+        <div class="col-sm-4">
           <input type="text" id="inputName" class="form-control" required autofocus>
         </div>
         <div class="col-sm-4" style="text-align:left; padding-left:35px;">
@@ -20,7 +20,7 @@
         </div>
       </div>
       <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:0px">
-        <div class="col-sm-4" style="padding-top:0px"> 
+        <div class="col-sm-4" style="padding-top:0px">
           <p style="color:gray">First name</p>
         </div>
         <div class="col-sm-4" style="text-align:left; padding-left:35px;">
@@ -30,7 +30,7 @@
       <div class="col-sm-12" style="text-align:left; padding-left:50px;">
         <br>
         <p>Your nickname (that volunteers will see)</p>
-        <div class="col-sm-8" style="padding-top:0px; padding-left:0px"> 
+        <div class="col-sm-8" style="padding-top:0px; padding-left:0px">
           <input type="text" id="inputNickname" class="form-control" required autofocus>
         </div>
         <br><br>
@@ -43,8 +43,8 @@
         <ul class="checkbox-grid-singlecol">
             <li><input type="checkbox" class="checkbox-round" name="mathtutoring" value="mathtutoring" /><p>Math Tutoring</p></li>
             <li><input type="checkbox" class="checkbox-round" name="collegecounseling" value="collegecounseling" /><p>College Counseling</p></li>
-            
-            
+
+
         </ul>
       </div>
 
@@ -53,7 +53,7 @@
       </div>
 
       <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-bottom:0px">
-        <div class="col-sm-6"> 
+        <div class="col-sm-6">
           <input type="text" id="inputPicture" style="width:400px; height:40px" required autofocus placeholder="No file selected">
         </div>
         <div class="col-sm-4" style="text-align:left;">
@@ -66,13 +66,13 @@
         <p>Your birthday</p>
       </div>
       <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-bottom:0px">
-        <div class="col-sm-4"> 
+        <div class="col-sm-4">
           <input type="text" id="inputDOB" class="form-control" required autofocus>
         </div>
       </div>
 
       <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:0px">
-        <div class="col-sm-4" style="padding-top:0px"> 
+        <div class="col-sm-4" style="padding-top:0px">
           <p style="color:gray">MM/DD/YYYY</p>
         </div>
       </div>
@@ -82,7 +82,7 @@
       </div>
 
       <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:0px">
-        <div class="col-sm-4" style="padding-top:0px"> 
+        <div class="col-sm-4" style="padding-top:0px">
           <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               Dropdown button
@@ -162,7 +162,7 @@
       </div>
 
       <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-bottom:0px">
-        <div class="col-sm-6"> 
+        <div class="col-sm-6">
         </div>
         <div class="col-sm-4" style="text-align:left;">
          <button class="btn btn-lg btn-primary btn-block" type="submit">Next</button>
@@ -182,7 +182,7 @@
       <div class="col-sm-12" style="text-align:left; padding-left:50px;">
         <br>
         <p>Current high school</p>
-        <div class="col-sm-8" style="padding-top:0px; padding-left:0px"> 
+        <div class="col-sm-8" style="padding-top:0px; padding-left:0px">
           <input type="text" id="inputNickname" class="form-control" required autofocus>
         </div>
         <br><br>
@@ -193,7 +193,7 @@
       </div>
 
       <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:0px">
-        <div class="col-sm-4" style="padding-top:0px"> 
+        <div class="col-sm-4" style="padding-top:0px">
           <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               Dropdown button
@@ -213,7 +213,7 @@
       </div>
 
       <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:0px">
-        <div class="col-sm-4" style="padding-top:0px"> 
+        <div class="col-sm-4" style="padding-top:0px">
           <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               Dropdown button
@@ -234,7 +234,7 @@
       <div class="col-sm-12" style="text-align:left; padding-left:50px;">
         <br>
         <p>Which academic subject do you find most difficult?</p>
-        <div class="col-sm-8" style="padding-top:0px; padding-left:0px"> 
+        <div class="col-sm-8" style="padding-top:0px; padding-left:0px">
           <input type="text" id="inputNickname" class="form-control" required autofocus>
         </div>
         <br><br>
@@ -256,7 +256,7 @@
       </div>
 
     <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:40px">
-        <div class="col-sm-6"> 
+        <div class="col-sm-6">
           <button class="btn btn-lg btn-primary btn-block" type="submit">Back</button>
         </div>
         <div class="col-sm-4" style="text-align:left;">
@@ -296,7 +296,7 @@
       </div>
 
       <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:0px">
-        <div class="col-sm-4" style="padding-top:0px"> 
+        <div class="col-sm-4" style="padding-top:0px">
           <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               Dropdown button
@@ -315,10 +315,10 @@
       </div>
 
       <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-bottom:0px">
-        <div class="col-sm-4"> 
+        <div class="col-sm-4">
           <input type="text" id="inputName" class="form-control" required autofocus>
         </div>
-      <div class="col-sm-12" style="text-align:left; padding-left:15px;padding-top:0px"> 
+      <div class="col-sm-12" style="text-align:left; padding-left:15px;padding-top:0px">
           <p style="color:gray">Please fill out on a 4.0 scale if possible</p>
       </div>
 
@@ -328,10 +328,10 @@
       </div>
 
       <div class="col-sm-12" style="text-align:left; padding-bottom:40px;padding-left:0px">
-        <div class="col-sm-6"> 
+        <div class="col-sm-6">
           <input type="text" id="inputPicture" style="width:600px; height:100px;border:1px solid black" required autofocus >
         </div>
-        
+
       </div>
     </div>
       <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:20px">
@@ -361,7 +361,7 @@
       </div>
 
       <div class="col-sm-12" style="text-align:left; padding-bottom:40px;padding-left:25px">
-        <div class="col-sm-6"> 
+        <div class="col-sm-6">
           <input type="text" id="inputPicture" style="width:600px; height:100px;border:1px solid black" required autofocus>
         </div>
       </div>
@@ -373,7 +373,7 @@
       </div>
 
       <div class="col-sm-12" style="text-align:left; padding-bottom:40px;padding-left:0px">
-        <div class="col-sm-6"> 
+        <div class="col-sm-6">
           <input type="text" id="inputPicture" style="width:600px; height:100px;border:1px solid black" required autofocus >
         </div>
       </div>
@@ -383,7 +383,7 @@
       </div>
 
       <div class="col-sm-12" style="text-align:left; padding-bottom:40px;padding-left:0px">
-        <div class="col-sm-6"> 
+        <div class="col-sm-6">
           <input type="text" id="inputPicture" style="width:600px; height:100px;border:1px solid black" required autofocus >
         </div>
       </div>
@@ -393,7 +393,7 @@
       </div>
 
       <div class="col-sm-12" style="text-align:left; padding-bottom:40px;padding-left:0px">
-        <div class="col-sm-6"> 
+        <div class="col-sm-6">
           <input type="text" id="inputPicture" style="width:600px; height:100px;border:1px solid black" required autofocus >
         </div>
       </div>
@@ -403,14 +403,14 @@
       </div>
 
       <div class="col-sm-12" style="text-align:left; padding-bottom:40px;padding-left:0px">
-        <div class="col-sm-6"> 
+        <div class="col-sm-6">
           <input type="text" id="inputPicture" style="width:600px; height:100px;border:1px solid black" required autofocus >
         </div>
       </div>
 
 
       <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:40px">
-        <div class="col-sm-6"> 
+        <div class="col-sm-6">
           <button class="btn btn-lg btn-primary btn-block" type="submit">Back</button>
         </div>
         <div class="col-sm-4" style="text-align:left;">
@@ -531,7 +531,7 @@ h2 {
         outline: none;
         cursor: pointer;
     }
-    
+
     .checkbox-round:checked {
         background-color: black;
     }

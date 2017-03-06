@@ -40,8 +40,13 @@ export default {
   register(context, creds, redirect){
     return NetworkService.register(context, creds).then((res) => {
       let data = res.data;
+      console.log(data);
       if (!data){
         throw new Error('No user returned from auth service');
+        return;
+      } else if (data.err){
+        throw new Error(data.err);
+        return;
       }
 
       this.storeUser(data.user)

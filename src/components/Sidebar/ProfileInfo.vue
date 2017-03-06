@@ -20,7 +20,7 @@ export default {
     var avatarUrl = user.picture || 'static/defaultavatar.png';
     return {
       user: user,
-      name: user.name || 'student',
+      name: user.firstname || 'student',
       avatarStyle: {
         backgroundImage: `url(${avatarUrl})`
       }

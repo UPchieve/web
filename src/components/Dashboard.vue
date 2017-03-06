@@ -61,7 +61,7 @@ export default {
     let user = UserService.getUser() || {};
     return {
       user: user,
-      name: user.name || 'student'
+      name: user.firstname || 'student'
     }
   },
 }

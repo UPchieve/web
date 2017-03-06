@@ -1,9 +1,78 @@
 <template>
   <div>
-    <p v-if="isOnboarding">Please complete your profile</p>
-    Name: <input v-model="user.name" placeholder="Your name">
-    Picture URL: <input v-model="user.picture" placeholder="URL">
-    <a class="btn btn-default" href="#" role="button" @click.prevent="submitProfile">Finish</a>
+    <div class="row">
+      <div class="col-sm-12" style="background-color:rgba(24,85,209,.6); text-align:left; padding-left:50px;padding-bottom:20px">
+        <h3 style="color:white"><strong>Student Profile</strong></h3>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
+        <p>Your full name</p>
+      </div>
+      <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-bottom:0px">
+        <div class="col-sm-4">
+          <input type="text" v-model="user.firstname" class="form-control" required autofocus>
+        </div>
+        <div class="col-sm-4" style="text-align:left; padding-left:35px;">
+          <input type="text" v-model="user.lastname" class="form-control">
+        </div>
+      </div>
+      <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:0px">
+        <div class="col-sm-4" style="padding-top:0px">
+          <p style="color:gray">First name</p>
+        </div>
+        <div class="col-sm-4" style="text-align:left; padding-left:35px;">
+          <p style="color:gray">Last name</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
+        <p>Your birthday</p>
+      </div>
+      <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-bottom:0px">
+        <div class="col-sm-4">
+          <input type="text" v-model="birthdate" class="form-control" required autofocus>
+        </div>
+      </div>
+
+      <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:0px">
+        <div class="col-sm-4" style="padding-top:0px">
+          <p style="color:gray">MM/DD/YYYY</p>
+        </div>
+      </div> -->
+
+      <!-- <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
+        <p>Your gender</p>
+      </div>
+      <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:0px">
+        <div class="col-sm-4" style="padding-top:0px">
+          <select class="form-control" v-model="user">
+            <option v-bind:value="{gender: male}">Male</option>
+            <option v-bind:value="{gender: female}">Female</option>
+            <option v-bind:value="{gender: other}">Other</option>
+          </select>
+        </div>
+      </div> -->
+    </div>
+
+    <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
+      <p>Link to a profile picture</p>
+    </div>
+
+    <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-bottom:0px">
+      <div class="col-sm-6">
+        <input type="text" v-model="user.picture" placeholder="URL" style="width:400px; height:40px" required autofocus>
+      </div>
+    </div>
+
+    <div class="col-sm-12" style="padding-left:35px;padding-top:40px">
+         <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submitProfile">Finish</button>
+
+      </div>
+
     <br />
     {{msg}}
   </div>
@@ -12,28 +81,23 @@
 <script>
 
 import UserService from '../services/UserService'
-import AuthService from '../services/AuthService'
 import OnboardingService from '../services/OnboardingService'
 
 export default {
   data() {
     return {
       isOnboarding: this.$route.path.indexOf('/onboarding') === 0,
-      user: AuthService.user,
+      user: UserService.getUser(),
+      birthdate: UserService.getBirthDate(),
       msg: ''
     }
   },
   methods: {
     submitProfile(e){
       this.msg = ''
-      if (!this.user.name || this.user.name === ''){
-        this.msg = 'Please provide a first and last name';
-        return;
-      }
-      // if (!this.user.picture || this.user.picture === ''){
-      //   this.msg = 'Please provide a picture';
-      //   return;
-      // }
+
+      console.log(this.user);
+
 
       this.msg = 'Sending...';
       UserService.setProfile(this, this.user, OnboardingService.isOnboarded() ? null : '/');

@@ -40,7 +40,10 @@ export default {
         password: this.credentials.password
       }).then(() => {
         this.showingSuccess = true;
-      });
+      }).catch((err) => {
+        console.log(err);
+        this.msg = err.message;
+      })
     }
   }
 }

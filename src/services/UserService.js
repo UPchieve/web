@@ -16,11 +16,23 @@ export default {
       return {};
     }
   },
+  getBirthDate(){
+    var user = this.getUser(),
+        month = user.month,
+        day = user.day,
+        year = user.year;
+    if (month && day && year){
+      return `${month}/${day}/${year}`;
+    } else {
+      return '';
+    }
+  },
   getOnboarding(){
     return OnboardingService.status;
   },
   setProfile(context, data, redirect){
     NetworkService.setProfile(context, data).then((res) => {
+      console.log(res.data);
       if (res.data){
         AuthService.storeUser(res.data.user)
         context.msg = 'Set!'

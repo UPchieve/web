@@ -46,7 +46,7 @@ export default {
     },
     partnerName(){
       var partner = SessionService.getPartner();
-      return partner && partner.name;
+      return partner && partner.firstname;
     },
     partnerAvatar(){
       var partner = SessionService.getPartner();

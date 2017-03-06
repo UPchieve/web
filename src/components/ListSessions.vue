@@ -9,7 +9,7 @@
       </thead>
       <tbody>
         <tr v-for="session in openSessions" v-on:click="gotoSession(session)" class="session-row">
-          <td>{{session.student.name}}</td>
+          <td>{{session.student.firstname}}</td>
           <td>{{session.type}}</td>
         </tr>
       </tbody>

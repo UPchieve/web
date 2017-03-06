@@ -41,7 +41,7 @@ export default {
 
   hasProfile(){
     var user = AuthService.user.data || {};
-    return user.name && user.picture;
+    return user.firstname && user.lastname;
   },
 
   isOnboarded(){
