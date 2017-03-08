@@ -27,90 +27,91 @@
           <p style="color:gray">Last name</p>
         </div>
       </div>
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;">
-        <br>
-        <p>Your nickname (that volunteers will see)</p>
-        <div class="col-sm-8" style="padding-top:0px; padding-left:0px">
+    </div>
+
+    <div class = "row">
+      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
+        <p>Your nickname (Volunteers will see this!)</p>
+        <div class="col-sm-4" style="padding-top:0px; padding-left:0px">
           <input type="text" id="inputNickname" class="form-control" required autofocus>
         </div>
         <br><br>
       </div>
+    </div>
+
+    <div class="row">
       <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
-        <p>Which services are you interested in?</p>
-      </div>
-
-      <div class="col-sm-4" style="text-align:left; padding-left:30px;padding-top:0px">
+        <p>Which services are you interested in? (Select all that apply)</p>
         <ul class="checkbox-grid-singlecol">
-            <li><input type="checkbox" class="checkbox-round" name="mathtutoring" value="mathtutoring" /><p>Math Tutoring</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="collegecounseling" value="collegecounseling" /><p>College Counseling</p></li>
-
-
+            <li><input type="checkbox" name="mathtutoring" value="mathtutoring" > Math Tutoring</li>
+            <li><input type="checkbox" name="collegecounseling" value="collegecounseling"> College Counseling</li>
         </ul>
       </div>
+    </div>
 
+
+    <div class="row">
       <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
         <p>(Optional) Upload a profile picture</p>
       </div>
-
-      <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-bottom:0px">
-        <div class="col-sm-6">
-          <input type="text" id="inputPicture" style="width:400px; height:40px" required autofocus placeholder="No file selected">
-        </div>
-        <div class="col-sm-4" style="text-align:left;">
-         <button class="btn btn-lg btn-primary btn-block" type="submit">Upload a file</button>
-        </div>
+      <div class="col-sm-4" style="text-align:left; padding-left:50px;padding-bottom:0px">
+        <input type="text" id="inputPicture" style="width:400px; height:32px" required autofocus placeholder="No file selected">
       </div>
+      <div class="col-sm-4 col-sm-offset-2" style="text-align:left; padding-left:50px;padding-bottom:0px">
+        <button class="btn btn-md btn-primary btn-block" type="submit">Upload a file</button>
+      </div>
+    </div>
 
-
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
+    <div class="row">
+      <div class="col-sm-6" style="text-align:left; padding-left:50px;padding-top:40px">
         <p>Your birthday</p>
       </div>
-      <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-bottom:0px">
-        <div class="col-sm-4">
+      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:0px">
+        <div class="col-sm-4" style="text-align:left; padding-left:0px;padding-bottom:0px">
           <input type="text" id="inputDOB" class="form-control" required autofocus>
-        </div>
-      </div>
-
-      <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:0px">
-        <div class="col-sm-4" style="padding-top:0px">
-          <p style="color:gray">MM/DD/YYYY</p>
-        </div>
-      </div>
-
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
-        <p>Your gender</p>
-      </div>
-
-      <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:0px">
-        <div class="col-sm-4" style="padding-top:0px">
-          <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Dropdown button
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <a class="dropdown-item" href="#">Male</a>
-              <a class="dropdown-item" href="#">Female</a>
-              <a class="dropdown-item" href="#">Transgender</a>
-            </div>
+          <div class="col-sm-4" style="padding-left:0px">
+            <p style="color:gray">MM/DD/YYYY</p>
           </div>
         </div>
       </div>
+    </div>
 
+    <div class="row">
       <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
-        <p>Your ethnicity</p>
+        <p>Your gender</p>
       </div>
+      <div class="col-sm-4" style="text-align:left; padding-left:35px;padding-top:0px">
+        <div class="col-sm-4" style="padding-top:0px">
+          <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Select a response <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a href="#">Male</a></li>
+              <li><a> href="#">Female</a></li>
+              <li><a> href="#">Transgender</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
 
-      <div class="col-sm-4" style="text-align:left; padding-left:30px;padding-top:0px">
-        <ul class="checkbox-grid">
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Hispanic or Latino</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>White</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Black/African American</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>American Indian</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Alaskan Native</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Asian</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Native Hawaiian/Other Pacific Islander</p></li>
+    <div class="row">
+      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
+        <p>Your race/ethnicity (Select all that apply)</p>
+      </div>
+      <div class="col-sm-12" style="text-align:left; padding-left:30px;padding-top:0px">
+        <ul class="checkbox-grid-singlecol">
+            <li><input type="checkbox" name="text2" value="value2" >Hispanic or Latino</li>
+            <li><input type="checkbox" name="text2" value="value2" >White</li>
+            <li><input type="checkbox" name="text2" value="value2" >Black/African American</li>
+            <li><input type="checkbox" name="text2" value="value2" >American Indian</li>
+            <li><input type="checkbox" name="text2" value="value2" >Alaskan Native</li>
+            <li><input type="checkbox" name="text2" value="value2" >Asian</li>
+            <li><input type="checkbox" name="text2" value="value2" >Native Hawaiian/Other Pacific Islander</li>
         </ul>
       </div>
+    </div>
 
       <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
         <p>Do you identify with any of the following minority groups?</p>
