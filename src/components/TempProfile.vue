@@ -397,12 +397,46 @@
          <button class="btn btn-lg btn-primary btn-block" type="submit">Done</button>
         </div>
       </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="cloudwok-embed" data-wokid="d2RX" data-hide-upload-success-msg="y">
+            <form class="cloudwok-upload">
+              <input type="file" />
+            </form>
+            <div class="cloudwok-upload-files"> </div>
+            <div class="cloudwok-upload-message"></div>
+            
+          </div>
+        </div>
+      </div>
+    
+
+
+
+
+
+          
 
 
 
 </template>
 
 <script>
+
+(function(window, document) {
+        var loader = function() {
+          var script = document.createElement('script'),
+          tag = document.getElementsByTagName('script')[0];
+          script.src = 'https://www.cloudwok.com/cdn-vassets/javascripts/cw.js';
+          tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener('load', loader, false) :
+        window.attachEvent('onload', loader);
+      })(window, document);
+
+
 
 import UserService from '../services/UserService'
 import AuthService from '../services/AuthService'
