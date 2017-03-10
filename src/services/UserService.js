@@ -1,3 +1,5 @@
+import moment from 'moment'
+
 import NetworkService from './NetworkService'
 import AuthService from './AuthService'
 import OnboardingService from './OnboardingService'
@@ -26,6 +28,27 @@ export default {
     } else {
       return '';
     }
+  },
+  setBirthDate(date, format = 'MM/DD/YYYY'){
+    var m = moment(date, format),
+        user = this.getUser();
+
+    var day = m.date();
+    var month = m.month();
+    var year = m.year();
+
+    if (day && month && year){
+      user.day = day;
+      user.month = month;
+      user.year = year;
+      return true;
+    } else {
+      return false;
+    }
+  },
+  getOnboardingServiceInterest(){
+    var user = this.getUser();
+    return (user && user.onboardingServiceInterest) || [];
   },
   getOnboarding(){
     return OnboardingService.status;

@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <div class = "row">
+    <!-- <div class = "row">
       <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
         <p>Your nickname (Volunteers will see this!)</p>
         <div class="col-sm-4" style="padding-top:0px; padding-left:0px">
@@ -37,7 +37,7 @@
         </div>
         <br><br>
       </div>
-    </div>
+    </div> -->
 
     <div class="row">
       <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">

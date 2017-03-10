@@ -1,4 +1,4 @@
-import AuthService from './AuthService'
+import UserService from './UserService'
 import NetworkService from './NetworkService'
 
 import {router} from '../router'
@@ -23,10 +23,8 @@ export default {
     return NetworkService.confirmVerification(context, {
       token: token
     }).then(() => {
-      let user = AuthService.user.data;
-      if (user){
-        user.verified = true;
-      }
+      let user = UserService.getUser();
+      user.verified = true;
       router.replace('/');
     })
     .catch(() => {
@@ -35,14 +33,15 @@ export default {
   },
 
   hasVerifiedEmail(){
-    var user = AuthService.user.data || {};
+    var user = UserService.getUser();
     return user.verified;
   },
 
   hasProfile(){
-    var user = AuthService.user.data || {};
-    return user.firstname && user.lastname;
+    var user = UserService.getUser();
+    return user.firstname && user.lastname && user.day && user.month && user.year;
   },
+
 
   isOnboarded(){
     return this.hasVerifiedEmail() && this.hasProfile();
@@ -51,7 +50,7 @@ export default {
   getOnboardingRoute(){
     // Map each route to function that will show route if false
     let map = {
-      '/onboarding/verify': this.hasVerifiedEmail,
+      '/verify': this.hasVerifiedEmail,
       '/onboarding/profile': this.hasProfile
     }
 

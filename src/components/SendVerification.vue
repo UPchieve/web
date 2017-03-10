@@ -9,7 +9,7 @@
 
 <script>
 
-import OnboardingService from '../../services/OnboardingService';
+import OnboardingService from 'src/services/OnboardingService';
 
 export default {
   data(){
