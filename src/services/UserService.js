@@ -18,33 +18,17 @@ export default {
       return {};
     }
   },
-  getBirthDate(){
+  validateBirthdate(){
     var user = this.getUser(),
-        month = user.month,
-        day = user.day,
-        year = user.year;
-    if (month && day && year){
-      return `${month}/${day}/${year}`;
-    } else {
-      return '';
-    }
-  },
-  setBirthDate(date, format = 'MM/DD/YYYY'){
-    var m = moment(date, format),
-        user = this.getUser();
+        birthdate = user.birthdate;
 
-    var day = m.date();
-    var month = m.month();
-    var year = m.year();
+    var m = moment(birthdate, 'MM/DD/YYYY');
 
-    if (day && month && year){
-      user.day = day;
-      user.month = month;
-      user.year = year;
-      return true;
-    } else {
-      return false;
+    if (!m.isValid()){
+      return 'Birthdate is invalid'
     }
+
+    return true; // No validation errors
   },
   getOnboardingServiceInterest(){
     var user = this.getUser();

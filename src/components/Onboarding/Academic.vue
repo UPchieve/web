@@ -18,8 +18,148 @@
       </div>
     </div>
 
+    <div class="row form-group">
+      <p>Current grade</p>
+      <div class="row">
+        <div class="col-sm-6">
+          <select class="form-control" v-model="user.currentGrade">
+            <option></option>
+            <option>Freshman</option>
+            <option>Sophomore</option>
+            <option>Junior</option>
+            <option>Senior</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="row form-group">
+      <p>Expected high school graduation</p>
+      <div class="row">
+        <div class="col-sm-6">
+          <select class="form-control" v-model="user.expectedGraduation">
+            <option></option>
+            <option>2017</option>
+            <option>2018</option>
+            <option>2019</option>
+            <option>2020</option>
+            <option>2021</option>
+            <option>2022</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="row form-group">
+      <p>Which academic subject do you find most difficult?</p>
+
+      <div class="row">
+        <div class="col-sm-12">
+          <input type="text" v-model="user.difficultAcademicSubject" class="form-control">
+        </div>
+      </div>
+    </div>
+
+    <div class="row form-group">
+      <p>Which part of the college application process do you find most difficult?</p>
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="PersonalStatement" v-model="user.difficultCollegeProcess">
+              Personal Statement / Essay
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="Resume" v-model="user.difficultCollegeProcess">
+              Resume
+            </label>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="Exams" v-model="user.difficultCollegeProcess">
+              SAT / ACT Exams
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="ChoosingSchools" v-model="user.difficultCollegeProcess">
+              Choosing which schools to apply to
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row form-group">
+      <p>What is the highest level of education completed by one of your parents?</p>
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="SomeHighSchool" v-model="user.highestLevelEducation">
+              Some high school
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="HighSchoolGED" v-model="user.highestLevelEducation">
+              High school/GED degree
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="SomeCollege" v-model="user.highestLevelEducation">
+              Some college
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="AssociatesDegree" v-model="user.highestLevelEducation">
+              Associate's degree
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="BachelorsDegree" v-model="user.highestLevelEducation">
+              Bachelor's degree
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="MastersDegreeHigher" v-model="user.highestLevelEducation">
+              Master’s degree or higher
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="NotSure" v-model="user.highestLevelEducation">
+              Not sure
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row form-group">
+      <p>Does your high school have a college guidance counselor?</p>
+      <div class="row">
+        <div class="col-sm-6">
+          <select class="form-control" v-model="user.hasGuidanceCounselor">
+            <option></option>
+            <option>Yes</option>
+            <option>No</option>
+            <option>I don't know</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
     <button class="btn btn-lg btn-primary btn-block back" @click.prevent="back">Back</button>
-    <button class="btn btn-lg btn-primary btn-block next" type="submit" @click.prevent="submit">{{buttonMsg}}</button>
+    <button class="btn btn-lg btn-primary btn-block next" type="submit" @click.prevent="submitProfile">{{buttonMsg}}</button>
   </div>
 </template>
 
@@ -30,8 +170,9 @@ import OnboardingService from 'src/services/OnboardingService'
 
 export default {
   data() {
+    var user = UserService.getUser();
     return {
-      user: UserService.getUser(),
+      user: user,
       buttonMsg: 'Next',
       error: ''
     }
@@ -44,17 +185,9 @@ export default {
       this.$router.push('/onboarding/profile');
     },
     submitProfile(e){
-      this.error = ''
-
-      if (!UserService.setBirthDate(this.birthdate)){
-        this.error = 'Could not set birhtday';
-        return;
-      }
-
-      this.user.onboardingServiceInterest = this.checkedServices;
-
       this.buttonMsg = 'Updating...';
-      UserService.setProfile(this, this.user, OnboardingService.isOnboarded() ? null : '/')
+      console.log(this.user);
+      UserService.setProfile(this, this.user, '/onboarding/college');
     }
   }
 }
@@ -112,11 +245,6 @@ p {
   color: #73737A;
 }
 
-
-.form-signin .form-control:focus {
-  z-index: 2;
-}
-
 label {
   display: block;
   text-align: left;
@@ -137,6 +265,11 @@ label {
 
 .checkbox label {
   font-size: 16px;
+}
+
+select.form-control, select.form-control:focus {
+  border-bottom: 0;
+  border: 1px solid #979797;
 }
 
 .btn {

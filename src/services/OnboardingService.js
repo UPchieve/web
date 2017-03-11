@@ -39,7 +39,27 @@ export default {
 
   hasProfile(){
     var user = UserService.getUser();
-    return user.firstname && user.lastname && user.day && user.month && user.year;
+
+    var requiredFields = [
+      'firstname', 'lastname', 'birthdate', 'serviceInterests', 'gender', 'race',
+      'groupIdentification', 'computerAccess', 'preferredTimes'
+    ];
+
+    // Test if each required field is present, return true when field fails to terminate iteration
+    var hasInvalidField = requiredFields.some((fieldName) => {
+      var field = user[fieldName];
+      if (field === null){
+        return true; // Field must be non-null
+      } else if (Array.isArray(field) && field.length === 0){
+        return true; // If field is an array, it must be populated
+      } else if (typeof field === 'string' && field === ''){
+        return true; // If field is a string, it must be non-empty
+      } else {
+        return false;
+      }
+    })
+
+    return !hasInvalidField;
   },
 
 

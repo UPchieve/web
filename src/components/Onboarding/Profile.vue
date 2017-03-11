@@ -50,7 +50,7 @@
       <p>Your birthday</p>
       <div class="row">
         <div class="col-sm-6">
-          <input type="text" v-model="birthdate" class="form-control" id="birthdayInput">
+          <input type="text" v-model="user.birthdate" class="form-control" id="birthdayInput">
           <label for="birthdayInput">MM/DD/YYYY</label>
         </div>
       </div>
@@ -283,6 +283,7 @@
 <script>
 
 import $ from 'jquery'
+import validator from 'validator'
 
 import UserService from 'src/services/UserService'
 import OnboardingService from 'src/services/OnboardingService'
@@ -295,25 +296,33 @@ export default {
     user.groupIdentification = user.groupIdentification || [];
     user.computerAccess = user.computerAccess || [];
     user.preferredTimes = user.preferredTimes || [];
+    user.birthdate = user.birthdate || '';
     return {
       user: user,
-      birthdate: UserService.getBirthDate(),
       buttonMsg: 'Next',
       error: ''
     }
   },
   methods: {
     submitProfile(e){
-      console.log(this.user);
-      // return;
-      // this.$router.push('/onboarding/academic');
-      // return;
       this.error = ''
 
-      if (!UserService.setBirthDate(this.birthdate)){
-        this.error = 'Could not set birhtday';
+      var birthdateValidation = UserService.validateBirthdate();
+
+      if (!this.user.firstname || this.user.firstname === ''){
+        this.error = 'Please provide your full name';
+      } else if (!this.user.lastname || this.user.lastname === '') {
+        this.error = 'Please provide your full name';
       } else if (!this.user.serviceInterests.length){
         this.error = 'Please indicate a service you are interested in';
+      } else if (this.user.picture && !validator.isURL(this.user.picture)){
+        this.error = 'Profile picture URL is invalid';
+      } else if (!this.user.birthdate || this.user.birthdate === ''){
+        this.error = 'Please provide your birthday'
+      } else if (birthdateValidation !== true){
+        this.error = birthdateValidation;
+      } else if (!this.user.gender || this.user.gender === ''){
+        this.error = 'Please select a gender';
       } else if (!this.user.race.length){
         this.error = 'Please select a race';
       } else if (!this.user.preferredTimes.length){
@@ -321,7 +330,7 @@ export default {
       }
 
       if (this.error !== ''){
-        document.body.scrollTop = document.documentElement.scrollTop = 0;
+        $('body').animate({scrollTop: 0})
         return;
       }
 
@@ -335,7 +344,7 @@ export default {
       }
 
       this.buttonMsg = 'Updating...';
-      UserService.setProfile(this, this.user, '/')
+      UserService.setProfile(this, this.user, '/onboarding/academic')
     }
   }
 }
@@ -391,11 +400,6 @@ p {
 
 .form-control.url-box::placeholder {
   color: #73737A;
-}
-
-
-.form-signin .form-control:focus {
-  z-index: 2;
 }
 
 label {
