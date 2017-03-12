@@ -1,9 +1,12 @@
 <template>
   <div>
-    <ul class="nav navbar-nav" v-if="$route.path.indexOf('/onboarding') !== -1">
+    <ul class="nav navbar-nav" v-if="$route.path.indexOf('/onboarding') !== -1 && !user.isVolunteer">
       <li v-bind:class="onboardingProfileClass"><a>Profile Information</a></li>
       <li v-bind:class="onboardingAcademicClass"><a>Academic Information</a></li>
       <li v-bind:class="onboardingCollegeClass"><a>College Counseling Information</a></li>
+    </ul>
+    <ul class="nav navbar-nav" v-else-if="$route.path.indexOf('/onboarding') !== -1">
+      <li v-bind:class="onboardingProfileClass"><a>Profile Information</a></li>
     </ul>
     <ul class="nav navbar-nav" v-else-if="auth.authenticated">
       <router-link to="/dashboard" tag="li"><a>Home</a></router-link>
@@ -43,7 +46,7 @@ export default {
     },
     onboardingCollegeClass() {
       return {
-        disabled: this.$route.path.indexOf('/onboarding/profile') !== -1 || this.$route.path.indexOf('/onboarding/academic') !== -1  
+        disabled: this.$route.path.indexOf('/onboarding/profile') !== -1 || this.$route.path.indexOf('/onboarding/academic') !== -1
       }
     }
   }
