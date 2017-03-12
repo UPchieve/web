@@ -57,8 +57,8 @@ var DRAWING = false;
 
 
 
-var ERASER_ICON = 'url(\'/static/Eraser-icon.png\'), auto';
-var PEN_ICON = 'url(\"/static/Pen-icon.png\"), auto';
+var ERASER_ICON = 'url(\'/static/eraser_icon_01_dark.png\') 0 50, auto';
+var PEN_ICON = 'url(\"/static/pen_icon_01_dark.png\") 0 50, auto';
 var TEXT_ICON = 'text';
 
 
@@ -301,8 +301,6 @@ export default {
         var y = event.pageY;
 
         this.fillCircle(App.canvas, App.ctx, 'drag', false, x, y, LOCAL_LINE_COLOR);
-        console.log('LOCAL: ' + LOCAL_LINE_COLOR);
-        console.log('SERVER: '+ SERVER_LINE_COLOR);
         this.emitDragAction({
           x:x,
           y:y,
@@ -431,9 +429,9 @@ export default {
               context.putImageData(imageData, 0, 0);
           }
           context.beginPath();
-          context.moveTo(x-scrollLeft-rect.left, y-scrollTop-rect.top+40);
+          context.moveTo(x-scrollLeft-rect.left, y-scrollTop-rect.top+5);
         } else if (type === 'drag') {
-          context.lineTo(x-scrollLeft-rect.left, y-scrollTop-rect.top+40);
+          context.lineTo(x-scrollLeft-rect.left, y-scrollTop-rect.top+5);
           context.stroke();
         } else {
           context.closePath();

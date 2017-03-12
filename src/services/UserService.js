@@ -1,3 +1,5 @@
+import moment from 'moment'
+
 import NetworkService from './NetworkService'
 import AuthService from './AuthService'
 import OnboardingService from './OnboardingService'
@@ -16,11 +18,28 @@ export default {
       return {};
     }
   },
+  validateBirthdate(){
+    var user = this.getUser(),
+        birthdate = user.birthdate;
+
+    var m = moment(birthdate, 'MM/DD/YYYY');
+
+    if (!m.isValid()){
+      return 'Birthdate is invalid'
+    }
+
+    return true; // No validation errors
+  },
+  getOnboardingServiceInterest(){
+    var user = this.getUser();
+    return (user && user.onboardingServiceInterest) || [];
+  },
   getOnboarding(){
     return OnboardingService.status;
   },
   setProfile(context, data, redirect){
     NetworkService.setProfile(context, data).then((res) => {
+      console.log(res.data);
       if (res.data){
         AuthService.storeUser(res.data.user)
         context.msg = 'Set!'
