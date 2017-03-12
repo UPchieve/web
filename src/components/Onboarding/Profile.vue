@@ -21,21 +21,21 @@
       </div>
     </div>
 
-    <div class="row form-group">
-      <p>Which services are you interested in? (Select all that apply)</p>
-      <div class="checkbox">
-        <label>
-          <input type="checkbox" value="Math" v-model="user.serviceInterests">
-          Math Tutoring
-        </label>
-      </div>
-      <div class="checkbox">
-        <label>
-          <input type="checkbox" value="College" v-model="user.serviceInterests">
-          College Counseling
-        </label>
-      </div>
-    </div>
+    <ul class="row form-group" v-if="!user.isVolunteer">
+        <p>Which services are you interested in? (Select all that apply)</p>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="Math" v-model="user.serviceInterests">
+            Math Tutoring
+          </label>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="College" v-model="user.serviceInterests">
+            College Counseling
+          </label>
+        </div>
+    </ul>
 
     <div class="row form-group">
       <p>(Optional) Link to a profile picture</p>
@@ -46,7 +46,7 @@
       </div>
     </div>
 
-    <div class="row form-group">
+    <ul class="row form-group" v-if="!user.isVolunteer">
       <p>Your birthday</p>
       <div class="row">
         <div class="col-sm-6">
@@ -54,9 +54,9 @@
           <label for="birthdayInput">MM/DD/YYYY</label>
         </div>
       </div>
-    </div>
+    </ul>
 
-    <div class="row form-group">
+    <ul class="row form-group" v-if="!user.isVolunteer">
       <p>Your gender</p>
       <div class="row">
         <div class="col-sm-6">
@@ -68,9 +68,9 @@
           </select>
         </div>
       </div>
-    </div>
+    </ul>
 
-    <div class="row form-group">
+    <ul class="row form-group" v-if="!user.isVolunteer">
       <p>Your race/ethnicity</p>
       <div class="row">
         <div class="col-sm-6">
@@ -114,9 +114,9 @@
           </div>
         </div>
       </div>
-    </div>
+    </ul>
 
-    <div class="row form-group">
+    <ul class="row form-group" v-if="!user.isVolunteer">
       <p>Do you identify with any of the following groups?</p>
       <div class="row">
         <div class="col-sm-6">
@@ -184,9 +184,9 @@
           </div>
         </div>
       </div>
-    </div>
+    </ul>
 
-    <div class="row form-group">
+    <ul class="row form-group" v-if="!user.isVolunteer">
       <p>Do you have access to a computer or phone with internet access?</p>
       <div class="row">
         <div class="col-sm-12">
@@ -216,9 +216,9 @@
           </div>
         </div>
       </div>
-    </div>
+    </ul>
 
-    <div class="row form-group">
+    <ul class="row form-group" v-if="!user.isVolunteer">
       <p>What time(s) do you prefer to use our services?</p>
       <div class="row">
         <div class="col-sm-6">
@@ -274,7 +274,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </ul>
 
     <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submitProfile">{{buttonMsg}}</button>
   </div>
@@ -297,9 +297,14 @@ export default {
     user.computerAccess = user.computerAccess || [];
     user.preferredTimes = user.preferredTimes || [];
     user.birthdate = user.birthdate || '';
+    if (!user.isVolunteer) {
+      var button = 'Next';
+    } else {
+      var button = 'Submit';
+    }
     return {
       user: user,
-      buttonMsg: 'Next',
+      buttonMsg: button,
       error: ''
     }
   },
@@ -307,26 +312,39 @@ export default {
     submitProfile(e){
       this.error = ''
 
+      var user = UserService.getUser()
       var birthdateValidation = UserService.validateBirthdate();
 
-      if (!this.user.firstname || this.user.firstname === ''){
-        this.error = 'Please provide your full name';
-      } else if (!this.user.lastname || this.user.lastname === '') {
-        this.error = 'Please provide your full name';
-      } else if (!this.user.serviceInterests.length){
-        this.error = 'Please indicate a service you are interested in';
-      } else if (this.user.picture && !validator.isURL(this.user.picture)){
-        this.error = 'Profile picture URL is invalid';
-      } else if (!this.user.birthdate || this.user.birthdate === ''){
-        this.error = 'Please provide your birthday'
-      } else if (birthdateValidation !== true){
-        this.error = birthdateValidation;
-      } else if (!this.user.gender || this.user.gender === ''){
-        this.error = 'Please select a gender';
-      } else if (!this.user.race.length){
-        this.error = 'Please select a race';
-      } else if (!this.user.preferredTimes.length){
-        this.error = 'Please selected a preferred time';
+      if (!user.isVolunteer) {
+        if (!this.user.firstname || this.user.firstname === ''){
+          this.error = 'Please provide your full name';
+        } else if (!this.user.lastname || this.user.lastname === '') {
+          this.error = 'Please provide your full name';
+        } else if (!this.user.serviceInterests.length){
+          this.error = 'Please indicate a service you are interested in';
+        } else if (this.user.picture && !validator.isURL(this.user.picture)){
+          this.error = 'Profile picture URL is invalid';
+        } else if (!this.user.birthdate || this.user.birthdate === ''){
+          this.error = 'Please provide your birthday'
+        } else if (birthdateValidation !== true){
+          this.error = birthdateValidation;
+        } else if (!this.user.gender || this.user.gender === ''){
+          this.error = 'Please select a gender';
+        } else if (!this.user.race.length){
+          this.error = 'Please select a race';
+        } else if (!this.user.preferredTimes.length){
+          this.error = 'Please selected a preferred time';
+        } else if (!this.user.groupIdentification.length){
+          this.error = 'If you don\'t identify with any of the groups, please select "None of the Above"' ;
+        } else if (!this.user.computerAccess.length){
+          this.error = 'If you don\'t have access to a computer or phone with internet access, please select "None"' ;
+        }
+      } else {
+        if (!this.user.firstname || this.user.firstname === ''){
+          this.error = 'Please provide your full name';
+        } else if (!this.user.lastname || this.user.lastname === '') {
+          this.error = 'Please provide your full name';
+        }
       }
 
       if (this.error !== ''){
@@ -334,20 +352,17 @@ export default {
         return;
       }
 
-      // Select none option if certain questions unanswered
-      if (!this.user.groupIdentification.length){
-        this.user.groupIdentification = ['None'];
-      }
-
-      if (!this.user.computerAccess.length){
-        this.user.computerAccess = ['None'];
-      }
-
       this.buttonMsg = 'Updating...';
-      UserService.setProfile(this, this.user, '/onboarding/academic')
+      if (!user.isVolunteer) {
+        UserService.setProfile(this, this.user, '/onboarding/academic')
+      }
+      else {
+        UserService.setProfile(this, this.user, '/dashboard')
+      }
     }
   }
 }
+
 </script>
 
 <style scoped>

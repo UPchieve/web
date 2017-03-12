@@ -27,7 +27,7 @@
 	        	<br>
 	        	<h2 style="font-weight:bold">Math Resources</h2>
 	        	<br>
-	        	<ul>
+	        	<ul class=bigFont>
 	        	    <li><a href="https://www.khanacademy.org/math/" target="_blank">Khan Academy (math tutorial videos and practice questions)</a></li>
 	        	    <li><a href="https://www.wolframalpha.com/" target="_blank">Online Calculator (can graph and solve equations)</a></li>
 	        	    <li><a href="http://math.stackexchange.com/questions/tagged/calculus " target="_blank">Calculus Forum</a></li>
