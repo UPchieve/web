@@ -38,12 +38,17 @@ export default {
   },
 
   hasProfile(){
-    var user = UserService.getUser();
+    var user = UserService.getUser(),
+        requiredFields;
 
-    var requiredFields = [
-      'firstname', 'lastname', 'birthdate', 'serviceInterests', 'gender', 'race',
-      'groupIdentification', 'computerAccess', 'preferredTimes'
-    ];
+    if (user.isVolunteer){
+      requiredFields = ['firstname', 'lastname'];
+    } else {
+      requiredFields = [
+        'firstname', 'lastname', 'birthdate', 'serviceInterests', 'gender', 'race',
+        'groupIdentification', 'computerAccess', 'preferredTimes'
+      ];
+    }
 
     // Test if each required field is present, return true when field fails to terminate iteration
     var hasInvalidField = requiredFields.some((fieldName) => {
