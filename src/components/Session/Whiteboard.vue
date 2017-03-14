@@ -55,6 +55,8 @@ var ERASING_LINE_WIDTH = 20;
 
 var DRAWING = false;
 
+var SERVER_DRAWING = false;
+
 
 
 var ERASER_ICON = 'url(\'/static/eraser_icon_01_dark.png\') 0 50, auto';
@@ -163,6 +165,16 @@ export default {
         width
       });
     },
+    emitDrawing() {
+      this.$socket.emit('drawing', {
+        sessionId: this.currentSession.sessionId
+      });
+    },
+    emitEnd() {
+      this.$socket.emit('end', {
+        sessionId: this.currentSession.sessionId
+      });
+    },
     emitDragStart(data){
       this.$socket.emit('dragStart', {
         sessionId: this.currentSession.sessionId,
@@ -228,86 +240,100 @@ export default {
       this.emitClearClick();;
     },
     drawStart: function(event) {
-      if (!CURSOR_VISIBLE && current_state===('INSERTING_TEXT')) {
-        TEXT_POSITION_X = event.layerX -10;
-        TEXT_POSITION_Y = event.layerY +34;
-        CURSOR_VISIBLE = true;
-        saveImage(App.canvas, App.ctx);
-        this.emitSaveImage();
-        if (imageList.length>0) {
-          imageData = imageList[imageList.length-1];
-          App.ctx.putImageData(imageData, 0, 0);
 
-        } else {
-          imageData = App.ctx.getImageData(0,0,App.canvas.width,App.canvas.height);
+      if (!SERVER_DRAWING) {
+          this.emitDrawing();
+          if (!CURSOR_VISIBLE && current_state===('INSERTING_TEXT')) {
+          TEXT_POSITION_X = event.layerX -10;
+          TEXT_POSITION_Y = event.layerY +34;
+          CURSOR_VISIBLE = true;
+          saveImage(App.canvas, App.ctx);
+          this.emitSaveImage();
+          if (imageList.length>0) {
+            imageData = imageList[imageList.length-1];
+            App.ctx.putImageData(imageData, 0, 0);
+
+          } else {
+            imageData = App.ctx.getImageData(0,0,App.canvas.width,App.canvas.height);
+          }
+
+          imageList.push(imageData);
+          App.ctx.fillText('|', TEXT_POSITION_X, TEXT_POSITION_Y);
+          this.emitInsertText({
+            text: '|',
+            x: TEXT_POSITION_X,
+            y: TEXT_POSITION_Y
+          });
+          CURSOR_REMOVED = false;
+        } else if (current_state===('DRAWING')|| current_state==='ERASING') {
+
+          saveImage(App.canvas, App.ctx);
+          this.emitSaveImage();
+          App.canvas.isDrawing = true;
+
+           var scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
+          var scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+
+          var x = event.pageX;
+          var y = event.pageY;
+
+
+          this.fillCircle(App.canvas, App.ctx, 'dragstart', false, x, y, LOCAL_LINE_COLOR);
+          this.emitDragStart({
+            x:x,
+            y:y,
+            color:LOCAL_LINE_COLOR
+          });
         }
-
-        imageList.push(imageData);
-        App.ctx.fillText('|', TEXT_POSITION_X, TEXT_POSITION_Y);
-        this.emitInsertText({
-          text: '|',
-          x: TEXT_POSITION_X,
-          y: TEXT_POSITION_Y
-        });
-        CURSOR_REMOVED = false;
-      } else if (current_state===('DRAWING')|| current_state==='ERASING') {
-
-        saveImage(App.canvas, App.ctx);
-        this.emitSaveImage();
-        App.canvas.isDrawing = true;
-
-         var scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
-        var scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
-
-         var x = event.pageX;
-        var y = event.pageY;
-
-        this.fillCircle(App.canvas, App.ctx, 'dragstart', false, x, y, LOCAL_LINE_COLOR);
-        this.emitDragStart({
-          x:x,
-          y:y,
-          color:LOCAL_LINE_COLOR
-        });
       }
+      
     },
     drawEnd: function(event) {
-      App.canvas.isDrawing = false;
+      if (!SERVER_DRAWING){
 
-        var scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
-        var scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+          App.canvas.isDrawing = false;
 
-         var x = event.pageX ;
-        var y = event.pageY ;
+          var scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
+          var scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
 
-      this.fillCircle(App.canvas, App.ctx, 'dragend', false, x, y, LOCAL_LINE_COLOR);
-      this.emitDragEnd({
-        x:x,
-        y:y,
-        color: LOCAL_LINE_COLOR
-      });
-      saveImage(App.canvas, App.ctx);
-      this.emitSaveImage();
-    },
-    draw: function(e) {
-      if (current_state===('DRAWING') || current_state==='ERASING') {
-        if (!App.canvas.isDrawing) {
-           return;
-        }
+           var x = event.pageX ;
+          var y = event.pageY ;
 
-         var scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
-        var scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
-
-        var x = event.pageX;
-        var y = event.pageY;
-
-        this.fillCircle(App.canvas, App.ctx, 'drag', false, x, y, LOCAL_LINE_COLOR);
-        this.emitDragAction({
+        this.fillCircle(App.canvas, App.ctx, 'dragend', false, x, y, LOCAL_LINE_COLOR);
+        this.emitDragEnd({
           x:x,
           y:y,
           color: LOCAL_LINE_COLOR
         });
-
+        saveImage(App.canvas, App.ctx);
+        this.emitSaveImage();
+        this.emitEnd();
       }
+        
+    },
+    draw: function(e) {
+      if (!SERVER_DRAWING){
+          if (current_state===('DRAWING') || current_state==='ERASING') {
+            if (!App.canvas.isDrawing) {
+               return;
+            }
+
+             var scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
+            var scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+
+            var x = event.pageX;
+            var y = event.pageY;
+
+            this.fillCircle(App.canvas, App.ctx, 'drag', false, x, y, LOCAL_LINE_COLOR);
+            this.emitDragAction({
+              x:x,
+              y:y,
+              color: LOCAL_LINE_COLOR
+            });
+
+          }
+      }
+      
     },
     drawSetup: function() {
       App.ctx.strokeStyle = LOCAL_LINE_COLOR;
@@ -467,6 +493,14 @@ export default {
     },
     dend (data){
       this.fillCircle(App.canvas, App.ctx, 'dragend', true,  data.x, data.y, data.color);
+    },
+    draw() {
+      console.log('SERVER DRAWING');
+      SERVER_DRAWING = true;
+    },
+    end() {
+      console.log('SERVER DONE DRAWING');
+      SERVER_DRAWING = false;
     },
     save (){
       var imageData = App.ctx.getImageData(0,0,App.canvas.width, App.canvas.height);
