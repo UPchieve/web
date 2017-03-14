@@ -34,6 +34,7 @@
           <h2>New to UPchieve?</h2>
           <p>Watch the video to learn how to use our services.</p>
           <div class="video">
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/TfjsjukrnB8" frameborder="0" allowfullscreen></iframe>
           </div>
         </div>
         <div class="col-lg-6">

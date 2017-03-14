@@ -76,6 +76,12 @@
               Resume
             </label>
           </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="Application" v-model="user.difficultCollegeProcess">
+              Filling out application
+            </label>
+          </div>
         </div>
         <div class="col-sm-6">
           <div class="checkbox">

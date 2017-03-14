@@ -6,7 +6,7 @@
   	</div>
   	<div class="row">
       	<div class = "col-sm-6" style="text-align:left;padding-left:70px;padding-top:40px;">
-        	<p style="font-weight:bold">UPchieve takes your privacy seriously. We know you trust us to help with your homework and college applications, and we want you to know that you can trust to keep your personal information safe.</p>
+        	<p style="font-weight:bold">UPchieve takes your privacy seriously. We know you trust us to help with your homework and college applications, and we want you to know that you can trust us to keep your personal information safe.</p>
         	<p style="font-weight:bold">Effective Date: March 6, 2017</p>
        </div>
     </div>
