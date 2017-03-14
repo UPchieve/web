@@ -19,11 +19,10 @@ import Dashboard from './components/Dashboard'
 import Session from './components/Session'
 import ListSessions from './components/ListSessions'
 import Action from './components/Action'
-import Profile from './components/Profile'
 import Schedule from './components/Schedule'
 import Resources from './components/Resources'
 import Feedback from './components/Feedback'
-import TempProfile from './components/TempProfile'
+import Upload from './components/Upload'
 
 import AuthService from './services/AuthService'
 import OnboardingService from './services/OnboardingService'
@@ -37,20 +36,20 @@ const routes = [
     }
   }},
   { path: '/contact', component: Contact },
-  {path: '/completeprof', component: TempProfile},
   { path: '/privacy', component: Privacy },
   { path: '/login', component: LoginForm },
   { path: '/logout', component: Logout },
   { path: '/signup', component: Registration },
+  { path: '/upload', component: Upload, meta: {protected: true} },
   { path: '/dashboard', component: Dashboard, meta: { protected: true } },
   { path: '/session/math/:sessionId?', component: Session, meta: { protected: true } },
   { path: '/session/college/:sessionId?', component: Session, meta: { protected: true } },
   { path: '/schedule', component: Schedule, meta: { protected: true } },
-  { path: '/resources', component: Resources, meta: { protected: true } },
-  { path: '/resources', component: Feedback, meta: { protected: true } },
+  { path: '/resources', component: Resources, meta: { protected: true, bypassOnboarding: true } },
+  { path: '/feedback', component: Feedback, meta: { protected: true } },
   { path: '/action/:action/:data?', component: Action, meta: { bypassOnboarding: true } },
   { path: '/onboarding/:step?', component: Onboarding, meta: { protected: true } },
-  { path: '/profile', component: Profile, meta: { protected: true, bypassOnboarding: true } }
+  { path: '/profile', redirect: '/onboarding/profile' }
 ]
 
 const router = new VueRouter({
@@ -95,7 +94,7 @@ router.beforeEach((to, from, next) => {
 // If endpoint returns 401, redirect to login (except for requests to get user's session)
 Vue.http.interceptors.push(function(request, next) {
   next(function(response){
-    if (response.status === 401 && request.url.indexOf('/api/user') === -1){
+    if (response.status === 401 && !(request.url.indexOf('/api/user') !== -1 && request.method === 'GET')){
       AuthService.removeUser();
       router.push('/login?401=true');
     }

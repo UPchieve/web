@@ -5,26 +5,44 @@
         <h1>Welcome,<br />{{name}}.</h1>
       </div>
     </div>
-    <div class="dashboard-body row">
-      <div class="col-lg-6">
-        <h2>New to UPchieve?</h2>
-        <p>Watch the video to learn how to use our services.</p>
-        <div class="video">
 
+    <template v-if="!user.isVolunteer">
+      <div class="dashboard-body row">
+        <div class="col-lg-6">
+          <h2>New to UPchieve?</h2>
+          <p>Watch the video to learn how to use our services.</p>
+          <div class="video">
+
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <h2>Get started!</h2>
+          <p>Our volunteers are here to help you.</p>
+          <router-link to="/session/math" class="btn btn-lg btn-block">Get Math Tutoring</router-link>
+          <router-link to="/session/college" class="btn btn-lg btn-block">Get College Admissions Advice</router-link>
+          <router-link to="/schedule" class="btn btn-lg btn-block">Schedule an Admissions Consulting Session</router-link>
         </div>
       </div>
-      <div class="col-lg-6" v-if="!user.isVolunteer">
-        <h2>Get started!</h2>
-        <p>Our volunteers are here to help you.</p>
-        <router-link to="/session/math" class="btn btn-lg btn-block">Get Math Tutoring</router-link>
-        <router-link to="/session/college" class="btn btn-lg btn-block">Get College Admissions Advice</router-link>
-        <router-link to="/schedule" class="btn btn-lg btn-block">Schedule an Admissions Consulting Session</router-link>
+      <div class="disclaimer row">
+        <p><h3> Disclaimer:</h3> The UPchieve team will do its best to screen and train all volunteers prior to allowing them to work with students. (To learn more about how we screen and train volunteers please visit the <a href="http://www.upchieve.org/faq" target="_blank" > “FAQ” </a> section of our website). However, we lack the necessary resources to adequately vet all volunteers and make no representations regarding the intentions or capabilities of any such volunteers. Consequently, UPchieve assumes no responsibility for the actions of volunteers. The UPchieve team strongly encourages students to follow Internet safety practices at all times. In particular, students should not share personal or identifying information with volunteers. (For more information on recommended  Internet safety practices for teens, please refer to <a href="http://teens.webmd.com/features/teen-internet-safety-tips" target="_blank" > this WebMD article. </a></p>
       </div>
-      <div class="col-lg-6" v-else>
-        <h2>Select a student to help</h2>
-        <p> Only students who are waiting for a volunteer will show up below.</p>
-        <list-sessions></list-sessions>
+    </template>
+    <template v-else>
+      <div class="dashboard-body row">
+        <div class="col-lg-6">
+          <h2>New to UPchieve?</h2>
+          <p>Watch the video to learn how to use our services.</p>
+          <div class="video">
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <h2>Select a student to help</h2>
+          <p> Only students who are waiting for a volunteer will show up below.</p>
+          <list-sessions></list-sessions>
+        </div>
       </div>
+    </template>
     </div>
   </div>
 </template>
@@ -43,7 +61,7 @@ export default {
     let user = UserService.getUser() || {};
     return {
       user: user,
-      name: user.name || 'student'
+      name: user.firstname || 'student'
     }
   },
 }
@@ -84,8 +102,16 @@ h1 {
   font-weight: 400;
 }
 
+h3 {
+  text-weight: bold;
+}
+
 .dashboard-body {
   padding: 20px 30px;
+}
+
+.disclaimer {
+  padding: 25px 100px;
 }
 
 .dashboard-body h2 {

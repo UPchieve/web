@@ -1,27 +1,53 @@
 <template>
-  <ul class="nav navbar-nav" v-if="auth.authenticated">
-    <router-link to="/dashboard" tag="li"><a>Home</a></router-link>
-    <template v-if="!user.isVolunteer">
-      <router-link to="/session/math" tag="li"><a>Get Math Tutoring</a></router-link>
-      <router-link to="/session/college" tag="li"><a>Get College Advice</a></router-link>
-      <router-link to="/schedule" tag="li"><a>Schedule a Session</a></router-link>
-    </template>
-    <router-link to="/resources" tag="li"><a>Resources</a></router-link>
-
-  </ul>
+  <div>
+    <ul class="nav navbar-nav" v-if="$route.path.indexOf('/onboarding') !== -1 && !user.isVolunteer">
+      <li v-bind:class="onboardingProfileClass"><a>Profile Information</a></li>
+      <li v-bind:class="onboardingAcademicClass"><a>Academic Information</a></li>
+      <li v-bind:class="onboardingCollegeClass"><a>College Counseling Information</a></li>
+    </ul>
+    <ul class="nav navbar-nav" v-else-if="$route.path.indexOf('/onboarding') !== -1">
+      <li v-bind:class="onboardingProfileClass"><a>Profile Information</a></li>
+    </ul>
+    <ul class="nav navbar-nav" v-else-if="auth.authenticated">
+      <router-link to="/dashboard" tag="li"><a>Home</a></router-link>
+      <template v-if="!user.isVolunteer">
+        <router-link to="/session/math" tag="li"><a>Get Math Tutoring</a></router-link>
+        <router-link to="/session/college" tag="li"><a>Get College Advice</a></router-link>
+        <router-link to="/schedule" tag="li"><a>Schedule a Session</a></router-link>
+      </template>
+      <router-link to="/resources" tag="li"><a>Resources</a></router-link>
+    </ul>
+  </div>
 </template>
 
 <script>
 
-import UserService from '../../services/UserService';
+import UserService from 'src/services/UserService'
+import OnboardingService from 'src/services/OnboardingService'
 
 export default {
   data() {
     let auth = UserService.getAuth(),
-        user = UserService.getUser();
+        user = UserService.getUser(),
+        onboarding = UserService.getOnboarding();
     return {
-      auth: auth,
-      user: user
+      auth, user, onboarding,
+
+      onboardingProfileClass: {
+        disabled: false
+      }
+    }
+  },
+  computed: {
+    onboardingAcademicClass() {
+      return {
+        disabled: this.$route.path.indexOf('/onboarding/profile') !== -1
+      }
+    },
+    onboardingCollegeClass() {
+      return {
+        disabled: this.$route.path.indexOf('/onboarding/profile') !== -1 || this.$route.path.indexOf('/onboarding/academic') !== -1
+      }
     }
   }
 }
