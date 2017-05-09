@@ -6,7 +6,7 @@
     <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">Next</button>
     {{msg}}
     <div class="help-text">
-      <p><router-link to="apply">Don't have a code?</router-link></p>
+      <p><a href="https://upchieve.org/students">Don't have a code?</a></p>
       <p>Have an account? <router-link to="login">Sign in!</router-link></p>
     </div>
   </form>
