@@ -1,6 +1,6 @@
 <template>
   <nav class="navbar">
-    <router-link tag="h1" to="/">UPchieve</router-link>
+    <router-link tag="h1" to="/"></router-link>
     <div v-if="auth.authenticated">
       <profile-info v-if="auth.authenticated"></profile-info>
       <div id="navbar">
@@ -62,9 +62,10 @@ h1 {
 h1::before {
   content: "";
   display: inline-block;;
-  width: 48px;
-  height: 32px;
+  width: 50px;
+  height: 50px;
   background-image: url('../assets/logo.png');
+  background-size: 50px 50px;
   top: 0;
   left: 0;
 }
