@@ -75,7 +75,7 @@ export default {
   getOnboardingRoute(){
     // Map each route to function that will show route if false
     let map = {
-      '/verify': this.hasVerifiedEmail,
+      '/onboarding/verify': this.hasVerifiedEmail,
       '/onboarding/profile': this.hasProfile
     }
 
