@@ -10,15 +10,22 @@
     </ul>
     <ul class="nav navbar-nav" v-else-if="auth.authenticated">
       <router-link to="/dashboard" tag="li">
-        <div class="home-icon icon"></div>
-        <a>Home</a></router-link>
+        <a><div class="home-icon icon"></div><span>Home</span></a>
       </router-link>
       <template v-if="!user.isVolunteer">
-        <router-link to="/session/math" tag="li"><a>Get Math Tutoring</a></router-link>
-        <router-link to="/session/college" tag="li"><a>Get College Advice</a></router-link>
-        <router-link to="/schedule" tag="li"><a>Schedule a Session</a></router-link>
+        <router-link to="/session/math" tag="li">
+          <a><div class="math-icon icon"></div><span>Get Math Tutoring</span></a>
+        </router-link>
+        <router-link to="/session/college" tag="li">
+          <a><div class="college-icon icon"></div><span>Get College Advice</span></a>
+        </router-link>
+        <router-link to="/schedule" tag="li">
+          <a><div class="schedule-icon icon"></div><span>Schedule a Session</span></a>
+        </router-link>
       </template>
-      <router-link to="/resources" tag="li"><a>Resources</a></router-link>
+      <router-link to="/resources" tag="li">
+        <a><div class="resources-icon icon"></div><span>Resources</span></a>
+      </router-link>
     </ul>
   </div>
 </template>
@@ -79,6 +86,11 @@ export default {
     padding: 2px 0;
     height: 50px;
     line-height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #263368;
+    margin: auto 10px;
   }
 
   li > a:hover {
@@ -93,19 +105,37 @@ export default {
 
   li.active {
     background-color: #16D2AA;
-    display: flex;
-    justify-content: center;
   }
 
   li.active > a {
-    background-color: #263368;
-    margin: auto 10px;
+      background-color: #263368;
+      margin: auto 10px;
+  }
+
+  .icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
   }
 
   .home-icon {
     background-image: url('../../assets/home_icon-01.svg');
-    width: 30px;
-    height: 30px;
-    align-self: center;
   }
+
+  .math-icon {
+    background-image: url('../../assets/math_icon-01.svg');
+  }
+
+  .college-icon {
+    background-image: url('../../assets/college_icon-01.svg');
+  }
+
+  .schedule-icon {
+    background-image: url('../../assets/calendar_icon-01.svg');
+  }
+
+  .resources-icon {
+    background-image: url('../../assets/resources_icon-01.svg');
+  }
+
 </style>

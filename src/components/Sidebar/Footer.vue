@@ -1,10 +1,18 @@
 <template>
   <ul class="nav navbar-nav">
     <router-link to="/login" tag="li" v-if="!userauth.authenticated"><a>Log In</a></router-link>
-    <router-link to="/contact" tag="li"><a>Contact Us</a></router-link>
-    <router-link to="/privacy" tag="li"><a>Privacy Policy</a></router-link>
-    <li v-if="userauth.authenticated"><a v-on:click="logout" class="logout">Logout</a></li>
-    <li v-if="!userauth.authenticated"><a v-bind:href="mainWebsiteUrl">Back to Website</a></li>
+    <router-link to="/contact" tag="li">
+      <a><div class="contact-icon icon"></div><span>Contact Us</span></a>
+    </router-link>
+    <router-link to="/privacy" tag="li">
+      <a><div class="privacy-icon icon"></div><span>Privacy Policy</span></a>
+    </router-link>
+    <li v-if="userauth.authenticated">
+      <a v-on:click="logout" class="logout"><div class="logout-icon icon"></div><span>Logout</span></a>
+    </li>
+    <li v-if="!userauth.authenticated">
+      <a v-bind:href="mainWebsiteUrl"><div class="icon"></div><span>Back to Website</span></a>
+    </li>
   </ul>
 </template>
 
@@ -52,6 +60,11 @@ li > a {
   padding: 2px 0;
   height: 50px;
   line-height: 50px;
+  display: flex;
+  justify-content: center;
+  margin: auto 10px;
+  align-items: center;
+  background-color: #263368;
 }
 
 li > a:hover {
@@ -74,8 +87,26 @@ li.active > a {
   margin: auto 10px;
 }
 
-
 a.logout {
   cursor: pointer;
 }
+
+.icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.contact-icon {
+  background-image: url('../../assets/contact_us_icon-01.svg');
+}
+
+.privacy-icon {
+  background-image: url('../../assets/privacy_policy_icon-01.svg');
+}
+
+.logout-icon {
+  background-image: url('../../assets/log_out_icon-01.svg');
+}
+
 </style>
