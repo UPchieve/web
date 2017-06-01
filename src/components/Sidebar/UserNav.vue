@@ -9,7 +9,10 @@
       <li v-bind:class="onboardingProfileClass"><a>Profile Information</a></li>
     </ul>
     <ul class="nav navbar-nav" v-else-if="auth.authenticated">
-      <router-link to="/dashboard" tag="li"><a>Home</a></router-link>
+      <router-link to="/dashboard" tag="li">
+        <div class="home-icon icon"></div>
+        <a>Home</a></router-link>
+      </router-link>
       <template v-if="!user.isVolunteer">
         <router-link to="/session/math" tag="li"><a>Get Math Tutoring</a></router-link>
         <router-link to="/session/college" tag="li"><a>Get College Advice</a></router-link>
@@ -90,10 +93,19 @@ export default {
 
   li.active {
     background-color: #16D2AA;
+    display: flex;
+    justify-content: center;
   }
 
   li.active > a {
     background-color: #263368;
     margin: auto 10px;
+  }
+
+  .home-icon {
+    background-image: url('../../assets/home_icon-01.svg');
+    width: 30px;
+    height: 30px;
+    align-self: center;
   }
 </style>
