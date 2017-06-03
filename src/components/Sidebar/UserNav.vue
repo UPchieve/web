@@ -9,23 +9,13 @@
       <li v-bind:class="onboardingProfileClass"><a>Profile Information</a></li>
     </ul>
     <ul class="nav navbar-nav" v-else-if="auth.authenticated">
-      <router-link to="/dashboard" tag="li">
-        <a><div class="home-icon icon"></div><span>Home</span></a>
-      </router-link>
+      <router-link to="/dashboard" tag="li"><a class="home -icon">Home</a></router-link>
       <template v-if="!user.isVolunteer">
-        <router-link to="/session/math" tag="li">
-          <a><div class="math-icon icon"></div><span>Get Math Tutoring</span></a>
-        </router-link>
-        <router-link to="/session/college" tag="li">
-          <a><div class="college-icon icon"></div><span>Get College Advice</span></a>
-        </router-link>
-        <router-link to="/schedule" tag="li">
-          <a><div class="schedule-icon icon"></div><span>Schedule a Session</span></a>
-        </router-link>
+        <router-link to="/session/math" tag="li"><a class="math -icon">Get Math Tutoring</a></router-link>
+        <router-link to="/session/college" tag="li"><a class="college -icon">Get College Advice</a></router-link>
+        <router-link to="/schedule" tag="li"><a class="schedule -icon">Schedule a Session</a></router-link>
       </template>
-      <router-link to="/resources" tag="li">
-        <a><div class="resources-icon icon"></div><span>Resources</span></a>
-      </router-link>
+      <router-link to="/resources" tag="li"><a class="resources -icon">Resources</a></router-link>
     </ul>
   </div>
 </template>
@@ -88,7 +78,6 @@ export default {
     line-height: 50px;
     display: flex;
     align-items: center;
-    background-color: #263368;
     margin: auto 10px;
   }
 
@@ -111,30 +100,31 @@ export default {
       margin: auto 10px;
   }
 
-  .icon {
+  .-icon::before {
+    content: "";
     width: 20px;
     height: 20px;
     margin-right: 10px;
     margin-left: 20px;
   }
 
-  .home-icon {
+  .home.-icon::before {
     background-image: url('../../assets/home_icon-01.svg');
   }
 
-  .math-icon {
+  .math.-icon::before {
     background-image: url('../../assets/math_icon-01.svg');
   }
 
-  .college-icon {
+  .college.-icon::before {
     background-image: url('../../assets/college_icon-01.svg');
   }
 
-  .schedule-icon {
+  .schedule.-icon::before {
     background-image: url('../../assets/calendar_icon-01.svg');
   }
 
-  .resources-icon {
+  .resources.-icon::before {
     background-image: url('../../assets/resources_icon-01.svg');
   }
 
