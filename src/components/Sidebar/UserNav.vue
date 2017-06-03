@@ -87,7 +87,6 @@ export default {
     height: 50px;
     line-height: 50px;
     display: flex;
-    justify-content: center;
     align-items: center;
     background-color: #263368;
     margin: auto 10px;
@@ -116,6 +115,7 @@ export default {
     width: 20px;
     height: 20px;
     margin-right: 10px;
+    margin-left: 20px;
   }
 
   .home-icon {

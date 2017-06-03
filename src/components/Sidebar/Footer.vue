@@ -61,7 +61,6 @@ li > a {
   height: 50px;
   line-height: 50px;
   display: flex;
-  justify-content: center;
   margin: auto 10px;
   align-items: center;
   background-color: #263368;
@@ -95,6 +94,7 @@ a.logout {
   width: 20px;
   height: 20px;
   margin-right: 10px;
+  margin-left: 20px;
 }
 
 .contact-icon {
