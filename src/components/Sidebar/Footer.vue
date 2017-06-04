@@ -1,9 +1,9 @@
 <template>
   <ul class="nav navbar-nav">
     <router-link to="/login" tag="li" v-if="!userauth.authenticated"><a>Log In</a></router-link>
-    <router-link to="/contact" tag="li"><a class="contact -icon">Contact Us</a></router-link>
-    <router-link to="/privacy" tag="li"><a class="privacy -icon">Privacy Policy</a></router-link>
-    <li v-if="userauth.authenticated"><a v-on:click="logout" class="logout -icon">Logout</a></li>
+    <router-link to="/contact" tag="li"><a class="contact icon">Contact Us</a></router-link>
+    <router-link to="/privacy" tag="li"><a class="privacy icon">Privacy Policy</a></router-link>
+    <li v-if="userauth.authenticated"><a v-on:click="logout" class="logout icon">Logout</a></li>
     <li v-if="!userauth.authenticated"><a v-bind:href="mainWebsiteUrl">Back to Website</a></li>
   </ul>
 </template>
@@ -81,7 +81,7 @@ a.logout {
   cursor: pointer;
 }
 
-.-icon::before {
+.icon::before {
   content: "";
   width: 20px;
   height: 20px;
@@ -89,15 +89,15 @@ a.logout {
   margin-left: 20px;
 }
 
-.contact.-icon::before {
+.contact.icon::before {
   background-image: url('../../assets/contact_us_icon-01.svg');
 }
 
-.privacy.-icon::before {
+.privacy.icon::before {
   background-image: url('../../assets/privacy_policy_icon-01.svg');
 }
 
-.logout.-icon::before {
+.logout.icon::before {
   background-image: url('../../assets/log_out_icon-01.svg');
 }
 
