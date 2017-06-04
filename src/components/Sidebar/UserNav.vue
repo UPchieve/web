@@ -9,13 +9,13 @@
       <li v-bind:class="onboardingProfileClass"><a>Profile Information</a></li>
     </ul>
     <ul class="nav navbar-nav" v-else-if="auth.authenticated">
-      <router-link to="/dashboard" tag="li"><a>Home</a></router-link>
+      <router-link to="/dashboard" tag="li"><a class="home icon">Home</a></router-link>
       <template v-if="!user.isVolunteer">
-        <router-link to="/session/math" tag="li"><a>Get Math Tutoring</a></router-link>
-        <router-link to="/session/college" tag="li"><a>Get College Advice</a></router-link>
-        <router-link to="/schedule" tag="li"><a>Schedule a Session</a></router-link>
+        <router-link to="/session/math" tag="li"><a class="math icon">Get Math Tutoring</a></router-link>
+        <router-link to="/session/college" tag="li"><a class="college icon">Get College Advice</a></router-link>
+        <router-link to="/schedule" tag="li"><a class="schedule icon">Schedule a Session</a></router-link>
       </template>
-      <router-link to="/resources" tag="li"><a>Resources</a></router-link>
+      <router-link to="/resources" tag="li"><a class="resources icon">Resources</a></router-link>
     </ul>
   </div>
 </template>
@@ -76,6 +76,9 @@ export default {
     padding: 2px 0;
     height: 50px;
     line-height: 50px;
+    display: flex;
+    align-items: center;
+    margin: auto 10px;
   }
 
   li > a:hover {
@@ -93,7 +96,36 @@ export default {
   }
 
   li.active > a {
-    background-color: #263368;
-    margin: auto 10px;
+      background-color: #263368;
+      margin: auto 10px;
   }
+
+  .icon::before {
+    content: "";
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    margin-left: 20px;
+  }
+
+  .home.icon::before {
+    background-image: url('../../assets/home_icon-01.svg');
+  }
+
+  .math.icon::before {
+    background-image: url('../../assets/math_icon-01.svg');
+  }
+
+  .college.icon::before {
+    background-image: url('../../assets/college_icon-01.svg');
+  }
+
+  .schedule.icon::before {
+    background-image: url('../../assets/calendar_icon-01.svg');
+  }
+
+  .resources.icon::before {
+    background-image: url('../../assets/resources_icon-01.svg');
+  }
+
 </style>
