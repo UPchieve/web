@@ -1,6 +1,6 @@
 <template>
   <ul class="nav navbar-nav">
-    <router-link to="/login" tag="li" v-if="!userauth.authenticated"><a>Log In</a></router-link>
+    <router-link to="/login" tag="li" v-if="!userauth.authenticated"><a class="login">Log In</a></router-link>
     <router-link to="/contact" tag="li"><a class="contact icon">Contact Us</a></router-link>
     <router-link to="/privacy" tag="li"><a class="privacy icon">Privacy Policy</a></router-link>
     <li v-if="userauth.authenticated"><a v-on:click="logout" class="logout icon">Logout</a></li>
@@ -77,6 +77,10 @@ li.active > a {
   margin: auto 10px;
 }
 
+li.active > a.login {
+  padding-left: 20px;
+}
+
 a.logout {
   cursor: pointer;
 }
@@ -99,6 +103,10 @@ a.logout {
 
 .logout.icon::before {
   background-image: url('../../assets/log_out_icon-01.svg');
+}
+
+.login {
+  margin-left: 30px;
 }
 
 </style>
