@@ -14,6 +14,7 @@ import Privacy from './components/Privacy'
 import Logout from './components/Logout'
 import LoginForm from './components/LoginForm'
 import Registration from './components/Registration'
+import ResetPasswordForm from './components/ResetPasswordForm'
 import Onboarding from './components/Onboarding'
 import Dashboard from './components/Dashboard'
 import Session from './components/Session'
@@ -40,6 +41,7 @@ const routes = [
   { path: '/login', component: LoginForm },
   { path: '/logout', component: Logout },
   { path: '/signup', component: Registration },
+  { path: '/resetpassword', component: ResetPasswordForm },
   { path: '/upload', component: Upload, meta: {protected: true} },
   { path: '/dashboard', component: Dashboard, meta: { protected: true } },
   { path: '/session/math/:sessionId?', component: Session, meta: { protected: true } },
