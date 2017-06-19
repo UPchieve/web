@@ -6,11 +6,21 @@ import NetworkService from './NetworkService'
 
 export default {
   data: {
-    emailAddress: null,
-    validEmailAddress: false
+    email: null,
+    validEmail: false
   },
 
-  checkEmailAddress(context, email){
-      return this.data.validEmailAddress;
+  checkEmail(context, email) {
+    return NetworkService.checkEmail(context, { email }).then((res) => {
+      let data = res.data || {};
+
+      this.data.validEmail = data.valid === true;
+
+      if (data.valid){
+        this.data.email = email;
+      }
+
+      return this.data.validEmail;
+    });
   }
 };

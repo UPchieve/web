@@ -1,8 +1,8 @@
 <template>
   <form class="form-resetpassword">
     <h2 class="form-resetpassword-heading">Reset Your Password</h2>
-    <label for="inputEmailAddress">Please enter your email address</label>
-    <input type="text" id="inputEmailAddress" class="form-control" required autofocus v-model="emailAddress">
+    <label for="inputEmail">Please enter your email address</label>
+    <input type="text" id="inputEmail" class="form-control" required autofocus v-model="email">
     <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">Next</button>
     {{msg}}
     <div class="help-text">
@@ -13,23 +13,18 @@
 
 <script>
 
-import ResetPasswordService from '../services/ResetPasswordService';
+import NetworkService from '../services/NetworkService';
 
 export default {
   data() {
     return {
-      emailAddress: '',
+      email: '',
       msg: ''
     }
   },
   methods: {
     submit() {
-      ResetPasswordService.checkEmailAddress(this, this.emailAddress)
-        .then((isValid) => {
-          if (!isValid){
-            this.msg = 'Sorry, we do not recognize that email address';
-          }
-        })
+      NetworkService.sendReset(this, this.email);
     }
   }
 }
