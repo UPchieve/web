@@ -25,6 +25,7 @@ export default {
   methods: {
     submit() {
       NetworkService.sendReset(this, this.email);
+      NetworkService.confirmReset(this, this.email);
     }
   }
 }
