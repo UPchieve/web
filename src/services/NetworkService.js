@@ -23,7 +23,7 @@ export default {
     return context.$http.post(`${AUTH_ROOT}/register`, data).then(this._successHandler, this._errorHandler)
   },
   sendReset(context, data){
-    return context.$http.post(`${AUTH_ROOT}/reset/send`).then(this._successHandler, this._errorHandler)
+    return context.$http.post(`${AUTH_ROOT}/reset/send`, data).then(this._successHandler, this._errorHandler)
   },
   confirmReset(context, data){
     return context.$http.post(`${AUTH_ROOT}/reset/confirm`, data).then(this._successHandler, this._errorHandler)
