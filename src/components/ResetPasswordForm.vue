@@ -4,6 +4,7 @@
     <label for="inputEmail">Please enter your email address</label>
     <input type="text" id="inputEmail" class="form-control" required autofocus v-model="email">
     <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">Next</button>
+    {{msg}}
     <div class="help-text">
       <p>Don't have an account? <router-link to="signup">Register for one!</router-link></p>
     </div>
@@ -12,17 +13,23 @@
 
 <script>
 
-import NetworkService from '../services/NetworkService';
+import AuthService from '../services/AuthService';
 
 export default {
   data() {
     return {
       email: '',
+      msg: ''
     }
   },
   methods: {
     submit() {
-      NetworkService.sendReset(this, this.email);
+      AuthService.sendReset(this, this.email)
+        .then((isValid) => {
+          if (!isValid){
+            this.msg = 'Sorry, we do not recognize that email address';
+          }
+        });
     }
   }
 }

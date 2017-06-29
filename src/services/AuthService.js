@@ -61,6 +61,28 @@ export default {
     })
   },
 
+  sendReset(context, email, redirect){
+    return NetworkService.sendReset(context, {email}).then((res) => {
+      let data = res.data;
+      console.log(data);
+      if (!data){
+        throw new Error('No user returned from auth service');
+        return;
+      } else if (data.err){
+        throw new Error(data.err);
+        return;
+      }
+
+      context.msg = 'Password reset email has been sent!';
+
+      if(redirect) {
+        setTimeout(() => {
+          router.push(redirect)
+        }, 2000);
+      }
+    })
+  },
+
   logout(context){
     if (context){
       NetworkService.logout(context).then((res) => {
