@@ -2,11 +2,16 @@
   <form class="form-resetpassword">
     <h2 class="form-resetpassword-heading">Reset Your Password</h2>
     <label for="inputEmail">Please enter your email address</label>
-    <input type="text" id="inputEmail" class="form-control" required autofocus v-model="email">
-    <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">Send Reset Email</button>
+    <input type="text" id="inputEmail" class="form-control" required autofocus v-model="credentials.email">
+    <label for="inputPassword">Create a new password</label>
+    <input type="password" id="inputPassword" class="form-control" required v-model="credentials.password">
+    <label for="inputPassword">Reenter your new password</label>
+    <input type="password" id="inputPassword" class="form-control" required v-model="credentials.newpassword">
+    <p class="password-guidelines">It must contain lowercase and uppercase letters, numbers, and at least 8 characters.</p>
+    <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">Reset Password</button>
     {{msg}}
     <div class="help-text">
-      <p>Don't have an account? <router-link to="signup">Register for one!</router-link></p>
+      <p>Remember your password? <router-link to="login">Sign in!</router-link></p>
     </div>
   </form>
 </template>
@@ -18,13 +23,28 @@ import AuthService from '../services/AuthService';
 export default {
   data() {
     return {
-      email: '',
-      msg: ''
+      msg: '',
+      credentials: {
+        token: '',
+        email: '',
+        password: '',
+        newpassword: ''
+      }
     }
   },
   methods: {
     submit() {
-      AuthService.sendReset(this, this.email);
+      AuthService.confirmReset(this, {
+        token: this.$route.params.token,
+        email: this.credentials.email,
+        password: this.credentials.password,
+        newpassword: this.credentials.newpassword
+      }).then(() => {
+        this.showingSuccess = true;
+      }).catch((err) => {
+        console.log(err);
+        this.msg = err.message;
+      })
     }
   }
 }

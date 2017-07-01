@@ -83,6 +83,28 @@ export default {
     })
   },
 
+  confirmReset(context, credentials, redirect){
+    return NetworkService.confirmReset(context, credentials).then((res) => {
+      let data = res.data;
+      console.log(data);
+      if (!data){
+        throw new Error('No user returned from auth service');
+        return;
+      } else if (data.err){
+        throw new Error(data.err);
+        return;
+      }
+
+      context.msg = 'Password has been reset!';
+
+      if(redirect) {
+        setTimeout(() => {
+          router.push(redirect)
+        }, 2000);
+      }
+    })
+  },
+
   logout(context){
     if (context){
       NetworkService.logout(context).then((res) => {
