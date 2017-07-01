@@ -91,6 +91,7 @@ export default {
         throw new Error('No user returned from auth service');
         return;
       } else if (data.err){
+        console.log(data.err.message);
         throw new Error(data.err);
         return;
       }

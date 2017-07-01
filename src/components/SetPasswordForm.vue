@@ -10,9 +10,6 @@
     <p class="password-guidelines">It must contain lowercase and uppercase letters, numbers, and at least 8 characters.</p>
     <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">Reset Password</button>
     {{msg}}
-    <div class="help-text">
-      <p>Remember your password? <router-link to="login">Sign in!</router-link></p>
-    </div>
   </form>
 </template>
 
