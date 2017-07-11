@@ -48,4 +48,7 @@ export default {
   checkSession(context, data){
     return context.$http.post(`${API_ROOT}/session/check`, data).then(this._successHandler, this._errorHandler)
   },
+  getQuestion(context, data){
+    return context.$http.post(`${API_ROOT}/quiz/getquestion`, data).then(this._successHandler, this._errorHandler)
+  }
 }
