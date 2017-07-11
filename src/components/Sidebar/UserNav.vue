@@ -15,6 +15,10 @@
         <router-link to="/session/college" tag="li"><a class="college icon">Get College Advice</a></router-link>
         <router-link to="/schedule" tag="li"><a class="schedule icon">Schedule a Session</a></router-link>
       </template>
+      <template v-if="user.isVolunteer">
+        <router-link to="/training" tag="li"><a class="training icon">Training</a></router-link>
+        <router-link to="/stats" tag="li"><a class="stats icon">Personal Stats</a></router-link>
+      </template>
       <router-link to="/resources" tag="li"><a class="resources icon">Resources</a></router-link>
     </ul>
   </div>
