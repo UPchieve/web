@@ -15,7 +15,7 @@
 <script>
 
 import UserService from 'src/services/UserService';
-import QuizService from 'src/services/QuizService';
+import NetworkService from 'src/services/NetworkService';
 
 export default {
   data() {
@@ -26,10 +26,9 @@ export default {
   },
   methods: {
     start(){
-      QuizService.startQuiz(this);
+      NetworkService.getQuestion(this);
     },
     next(){
-
     }
   }
 }
