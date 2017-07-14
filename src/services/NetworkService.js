@@ -48,13 +48,8 @@ export default {
   checkSession(context, data){
     return context.$http.post(`${API_ROOT}/session/check`, data).then(this._successHandler, this._errorHandler)
   },
-  getQuestion(context, data){
-    return context.$http.post(`${API_ROOT}/quiz/getquestion`, data).then(this._successHandler, this._errorHandler)
-  },
-  createQuiz(context){
-    return context.$http.post(`${API_ROOT}/quiz/create`).then(this._successHandler, this._errorHandler)
-  },
-  nextQuestion(context, data){
-    return context.$http.post(`${API_ROOT}/quiz/nextquestion`, data).then(this._successHandler, this._errorHandler)
+
+  getQuestion(context){
+    return context.$http.post(`${API_ROOT}/training/question`).then(this._successHandler, this._errorHandler)
   }
 }
