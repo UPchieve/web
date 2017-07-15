@@ -45,8 +45,6 @@ const routes = [
   { path: '/login', component: LoginForm },
   { path: '/logout', component: Logout },
   { path: '/signup', component: Registration },
-  { path: '/resetpassword', component: ResetPasswordForm },
-  { path: '/setpassword/:token', component: SetPasswordForm },
   { path: '/upload', component: Upload, meta: {protected: true} },
   { path: '/dashboard', component: Dashboard, meta: { protected: true } },
   { path: '/session/math/:sessionId?', component: Session, meta: { protected: true } },
