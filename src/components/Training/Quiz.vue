@@ -15,7 +15,7 @@
 <script>
 
 import UserService from 'src/services/UserService';
-import NetworkService from 'src/services/NetworkService';
+import TrainingService from 'src/services/TrainingService';
 
 export default {
   data() {
@@ -26,7 +26,8 @@ export default {
   },
   methods: {
     start(){
-      NetworkService.getQuestion(this);
+      var question = TrainingService.displayQuestion(this);
+      
     },
     next(){
     }
