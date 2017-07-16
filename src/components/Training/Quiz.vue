@@ -11,7 +11,7 @@
     <button id="start-question-button" type="start" @click.prevent="start()">Start Quiz</button>
     <button id="prev-question-button">Previous</button>
     <button id="next-question-button" type="next" @click.prevent="next()">Next Question</button>
-    <button id="submit-button">Submit Answers</button>
+    <button id="submit-button" type="submit" @click.prevent="submit()">Submit Answers</button>
   </div>
 </template>
 
@@ -35,19 +35,23 @@ export default {
   },
   methods: {
     start(){
-      TrainingService.displayQuestions(this);
+      var question = TrainingService.startQuiz(this);
+      this.questionText = question.questionText;
+      this.option0 = question.possibleAnswers[0];
+      this.option1 = question.possibleAnswers[1];
+      this.option2 = question.possibleAnswers[2];
+      this.option3 = question.possibleAnswers[3];
     },
     next(){
-      TrainingService.displayQuestions(this).then((question) => {
-        this.questionText = question.questionText;
-        this.option0 = question.possibleAnswers[0];
-        this.option1 = question.possibleAnswers[1];
-        this.option2 = question.possibleAnswers[2];
-        this.option3 = question.possibleAnswers[3];
-      });
+      var question = TrainingService.getNextQuestion(this);
+      this.questionText = question.questionText;
+      this.option0 = question.possibleAnswers[0];
+      this.option1 = question.possibleAnswers[1];
+      this.option2 = question.possibleAnswers[2];
+      this.option3 = question.possibleAnswers[3];
     },
     submit(){
-
+      
     }
   }
 }
