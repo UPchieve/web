@@ -35,7 +35,10 @@ export default {
   },
   methods: {
     start(){
-      TrainingService.displayQuestion(this).then((question) => {
+      TrainingService.displayQuestions(this);
+    },
+    next(){
+      TrainingService.displayQuestions(this).then((question) => {
         this.questionText = question.questionText;
         this.option0 = question.possibleAnswers[0];
         this.option1 = question.possibleAnswers[1];
@@ -43,11 +46,8 @@ export default {
         this.option3 = question.possibleAnswers[3];
       });
     },
-    next(){
-
-    },
     submit(){
-    
+
     }
   }
 }
