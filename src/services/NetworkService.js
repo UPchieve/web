@@ -43,7 +43,7 @@ export default {
     return context.$http.post(`${API_ROOT}/session/check`, data).then(this._successHandler, this._errorHandler)
   },
 
-  getQuestion(context){
+  getQuestions(context){
     return context.$http.post(`${API_ROOT}/training/question`).then(this._successHandler, this._errorHandler)
   }
 }
