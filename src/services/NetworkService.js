@@ -44,6 +44,6 @@ export default {
   },
 
   getQuestions(context){
-    return context.$http.post(`${API_ROOT}/training/question`).then(this._successHandler, this._errorHandler)
+    return context.$http.post(`${API_ROOT}/training/questions`).then(this._successHandler, this._errorHandler)
   }
 }
