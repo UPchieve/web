@@ -28,11 +28,19 @@ import TrainingService from 'src/services/TrainingService';
 export default {
   data() {
     let user = UserService.getUser();
+<<<<<<< HEAD
     let category = this.$route.params.category;
     let quizName = category.charAt(0).toUpperCase() + category.slice(1);
     return {
       user: user,
       category: category,
+=======
+    let quizType = this.$route.params.quizType;
+    let quizName = quizType.charAt(0).toUpperCase() + quizType.slice(1);
+    return {
+      user: user,
+      quizType: quizType,
+>>>>>>> button functionality
       questionText: '',
       quizName: quizName,
       a: '',
@@ -76,6 +84,7 @@ export default {
         this.disablePrev = true;
       }
       this.disableNext = false;
+      this.picked = question.picked;
     },
     next(){
       TrainingService.saveAnswer(this, this.picked);
@@ -92,6 +101,7 @@ export default {
         this.disableNext = true;
       }
       this.disablePrev = false;
+      this.picked = question.picked;
     },
     submit(){
       TrainingService.saveAnswer(this, this.picked);
