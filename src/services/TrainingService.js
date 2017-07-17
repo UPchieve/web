@@ -3,9 +3,9 @@ import NetworkService from './NetworkService'
 export default {
   questions: [],
   index: 0,
-  startQuiz(context){
+  startQuiz(context, quizType){
     this.index = 0;
-    return NetworkService.getQuestions(context).then((res) => {
+    return NetworkService.getQuestions(context, { quizType: quizType }).then((res) => {
       this.questions = res.data.questions;
       var question = this.questions[this.index];
       console.log(this.questions);
