@@ -28,8 +28,10 @@ import TrainingService from 'src/services/TrainingService';
 export default {
   data() {
     let user = UserService.getUser();
+    let quizType = this.$route.params.quizType;
     return {
       user: user,
+      quizType: quizType,
       questionText: 'Click the Start button to begin the quiz!',
       quizName: 'Quiz',
       a: '',
@@ -46,7 +48,7 @@ export default {
   },
   methods: {
     start(){
-      TrainingService.startQuiz(this).then((question) => {
+      TrainingService.startQuiz(this, this.quizType).then((question) => {
         this.questionText = question.questionText;
         this.a = question.possibleAnswers[0];
         this.b = question.possibleAnswers[1];
