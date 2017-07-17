@@ -19,7 +19,7 @@ export default {
   hasPrevious(context){
     return ((this.index) > 0);
   },
-  getNextQuestion(context){
+  getNextQuestion(context, picked){
     if (this.index < this.questions.length) {
       this.index = this.index + 1;
       var question = this.questions[this.index];
