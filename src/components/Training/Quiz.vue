@@ -1,8 +1,8 @@
 <template>
   <div v-if="user.isVolunteer" class="training-quiz">
-    <h1 class="header" id="quiz-name">{{ quizName }}</h1>
-    <div class="questionText">{{ questionText }}</div>
-    <form class="possibleAnswers"">
+    <h1 class="header" id="quiz-name">{{ quizName }} Quiz</h1>
+    <div class="questionText" v-if="showQuestion">{{ questionText }}</div>
+    <form class="possibleAnswers" v-if="showQuestion">
       <input type="radio" id="a" value="a" v-model="picked">
       <label for="a">{{ a }}</label>
       <input type="radio" id="b" value="b" v-model="picked">
@@ -12,10 +12,10 @@
       <input type="radio" id="d" value="d" v-model="picked">
       <label for="d">{{ d }}</label>
     </form>
-    <button id="start-question-button" type="start" @click.prevent="start()" v-bind:disabled="disableStart">Start Quiz</button>
-    <button id="prev-question-button" type="previous" @click.prevent="previous()" v-bind:disabled="disablePrev">Previous</button>
-    <button id="next-question-button" type="next" @click.prevent="next()" v-bind:disabled="disableNext">Next Question</button>
-    <button id="submit-button" type="submit" @click.prevent="submit()" v-bind:disabled="disableSubmit">Submit Answers</button>
+    <button id="start-question-button" type="start" @click.prevent="start()" v-if="showStart">Take Quiz</button>
+    <button id="prev-question-button" type="previous" @click.prevent="previous()" v-bind:disabled="disablePrev" v-if="showQuestion">Previous</button>
+    <button id="next-question-button" type="next" @click.prevent="next()" v-bind:disabled="disableNext" v-if="showQuestion">Next Question</button>
+    <button id="submit-button" type="submit" @click.prevent="submit()" v-if="showQuestion">Submit Answers</button>
     <div class="score">{{ scoreMsg }}</div>
   </div>
 </template>
@@ -29,21 +29,22 @@ export default {
   data() {
     let user = UserService.getUser();
     let quizType = this.$route.params.quizType;
+    let quizName = quizType.charAt(0).toUpperCase() + quizType.slice(1);
     return {
       user: user,
       quizType: quizType,
-      questionText: 'Click the Start button to begin the quiz!',
-      quizName: 'Quiz',
+      questionText: '',
+      quizName: quizName,
       a: '',
       b: '',
       c: '',
       d: '',
       picked: '',
       scoreMsg: '',
-      disableStart: false,
+      showStart: true,
       disablePrev: true,
-      disableNext: true,
-      disableSubmit: true
+      disableNext: false,
+      showQuestion: false
     }
   },
   methods: {
@@ -55,9 +56,8 @@ export default {
         this.c = question.possibleAnswers[2];
         this.d = question.possibleAnswers[3];
       });
-      this.disableStart = true;
-      this.disableSubmit = false;
-      this.disableNext = false;
+      this.showStart = false;
+      this.showQuestion = true;
       this.scoreMsg = '';
     },
     previous(){
@@ -72,6 +72,7 @@ export default {
         this.disablePrev = true;
       }
       this.disableNext = false;
+      this.picked = question.picked;
     },
     next(){
       TrainingService.saveAnswer(this, this.picked);
@@ -85,16 +86,26 @@ export default {
         this.disableNext = true;
       }
       this.disablePrev = false;
+      this.picked = question.picked;
     },
     submit(){
+      TrainingService.saveAnswer(this, this.picked);
       var correctAnswers = TrainingService.submitQuiz(this);
       this.scoreMsg = 'You got ' + correctAnswers + ' answers correct!';
-      this.disableSubmit = true;
-      this.disableStart = false;
+      this.a = '';
+      this.b = '';
+      this.c = '';
+      this.d = '';
+      this.picked = '';
+      this.showStart = true;
       this.disablePrev = true;
-      this.disableNext = true;
+      this.disableNext = false;
+      this.showQuestion = false;
     }
   }
 }
 
 </script>
+
+<style scoped>
+</style>
