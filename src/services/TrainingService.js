@@ -48,8 +48,11 @@ export default {
     this.idAnswerMap[question._id] = picked;
     return;
   },
-  submitQuiz(context){
-    return NetworkService.getQuizScore(context, { idAnswerMap: this.idAnswerMap }).then((res) => {
+  submitQuiz(context, userid){
+    return NetworkService.getQuizScore(context,
+      { userid: userid,
+        idAnswerMap: this.idAnswerMap
+      }).then((res) => {
       return res.data.score;
     });
   }
