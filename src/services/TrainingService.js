@@ -1,33 +1,33 @@
 import NetworkService from './NetworkService'
 
 export default {
+  idAnswerMap: new Object(),
   questions: [],
   index: 0,
   startQuiz(context, quizType){
     this.index = 0;
+    this.idAnswerMap = new Object();
     return NetworkService.getQuestions(context, { quizType: quizType }).then((res) => {
       this.questions = res.data.questions;
       var question = this.questions[this.index];
-      console.log(this.questions);
-      console.log('first question: ', question);
-      console.log(this.questions);
       return question;
     });
   },
   hasNext(context){
-    console.log('has next');
     return ((this.index + 1) < this.questions.length);
   },
   hasPrevious(context){
-    console.log('has previous');
     return ((this.index) > 0);
   },
-  getNextQuestion(context, picked){
+  getNextQuestion(context){
     if (this.index < this.questions.length) {
       this.index = this.index + 1;
       var question = this.questions[this.index];
-      console.log(question);
-      return question;
+      var picked = this.idAnswerMap[question._id];
+      return {
+        question : question,
+        picked : picked
+      };
     }
     return null;
   },
@@ -35,23 +35,22 @@ export default {
     if (this.index > 0) {
       this.index = this.index - 1;
       var question = this.questions[this.index];
-      console.log(question);
-      return question;
+      var picked = this.idAnswerMap[question._id];
+      return {
+        question : question,
+        picked : picked
+      };
     }
     return null;
   },
   saveAnswer(context, picked){
     var question = this.questions[this.index];
-    question.picked = picked;
+    this.idAnswerMap[question._id] = picked;
     return;
   },
   submitQuiz(context){
-    var correctAnswers = 0;
-    this.questions.forEach(function(item, index){
-      if (item.picked == item.correctAnswer) {
-        correctAnswers = correctAnswers + 1;
-      }
+    return NetworkService.getQuizScore(context, { idAnswerMap: this.idAnswerMap }).then((res) => {
+      return res.data.score;
     });
-    return correctAnswers;
   }
 }
