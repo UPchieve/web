@@ -45,5 +45,8 @@ export default {
 
   getQuestions(context, data){
     return context.$http.post(`${API_ROOT}/training/questions`, data).then(this._successHandler, this._errorHandler)
+  },
+  getQuizScore(context, data){
+    return context.$http.post(`${API_ROOT}/training/score`, data).then(this._successHandler, this._errorHandler)
   }
 }

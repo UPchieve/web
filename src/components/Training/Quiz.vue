@@ -59,10 +59,14 @@ export default {
       this.showStart = false;
       this.showQuestion = true;
       this.scoreMsg = '';
+      this.picked = '';
     },
     previous(){
       TrainingService.saveAnswer(this, this.picked);
-      var question = TrainingService.getPreviousQuestion(this);
+      this.picked = '';
+      var data = TrainingService.getPreviousQuestion(this);
+      var question = data.question;
+      this.picked = data.picked;
       this.questionText = question.questionText;
       this.a = question.possibleAnswers[0];
       this.b = question.possibleAnswers[1];
@@ -72,11 +76,13 @@ export default {
         this.disablePrev = true;
       }
       this.disableNext = false;
-      this.picked = question.picked;
     },
     next(){
       TrainingService.saveAnswer(this, this.picked);
-      var question = TrainingService.getNextQuestion(this);
+      this.picked = '';
+      var data = TrainingService.getNextQuestion(this);
+      var question = data.question;
+      this.picked = data.picked;
       this.questionText = question.questionText;
       this.a = question.possibleAnswers[0];
       this.b = question.possibleAnswers[1];
@@ -86,12 +92,12 @@ export default {
         this.disableNext = true;
       }
       this.disablePrev = false;
-      this.picked = question.picked;
     },
     submit(){
       TrainingService.saveAnswer(this, this.picked);
-      var correctAnswers = TrainingService.submitQuiz(this);
-      this.scoreMsg = 'You got ' + correctAnswers + ' answers correct!';
+      TrainingService.submitQuiz(this).then((score) => {
+        this.scoreMsg = 'Your score is ' + score + '.';
+      });
       this.a = '';
       this.b = '';
       this.c = '';
