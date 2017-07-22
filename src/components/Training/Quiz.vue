@@ -95,7 +95,7 @@ export default {
     },
     submit(){
       TrainingService.saveAnswer(this, this.picked);
-      TrainingService.submitQuiz(this).then((score) => {
+      TrainingService.submitQuiz(this, this.user._id).then((score) => {
         this.scoreMsg = 'Your score is ' + score + '.';
       });
       this.a = '';
