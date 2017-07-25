@@ -4,10 +4,10 @@ export default {
   idAnswerMap: new Object(),
   questions: [],
   index: 0,
-  startQuiz(context, quizType){
+  startQuiz(context, category){
     this.index = 0;
     this.idAnswerMap = new Object();
-    return NetworkService.getQuestions(context, { quizType: quizType }).then((res) => {
+    return NetworkService.getQuestions(context, { category: category }).then((res) => {
       this.questions = res.data.questions;
       var question = this.questions[this.index];
       return question;
