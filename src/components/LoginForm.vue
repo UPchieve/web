@@ -9,6 +9,7 @@
     <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit">Log in</button>
     <div class="help-text">
       <p>Don't have an account? <router-link to="signup">Register for one!</router-link></p>
+      <p>Forget your password? <router-link to="resetpassword">Reset it!</router-link></p>
     </div>
   </form>
 </template>
