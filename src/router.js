@@ -58,7 +58,7 @@ const routes = [
   { path: '/training', component: Training, meta: { protected: true } },
   { path: '/training/math', component: Math, meta: { protected: true } },
   { path: '/training/college', component: CollegeCounseling, meta: { protected: true } },
-  { path: '/training/:quizType/quiz', component: Quiz, meta: { protected: true } },
+  { path: '/training/:category/quiz', component: Quiz, meta: { protected: true } },
   { path: '/stats', component: Stats, meta: { protected: true } }
 ]
 
