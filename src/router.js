@@ -14,8 +14,6 @@ import Privacy from './components/Privacy'
 import Logout from './components/Logout'
 import LoginForm from './components/LoginForm'
 import Registration from './components/Registration'
-import ResetPasswordForm from './components/ResetPasswordForm'
-import SetPasswordForm from './components/SetPasswordForm'
 import Onboarding from './components/Onboarding'
 import Dashboard from './components/Dashboard'
 import Session from './components/Session'
@@ -25,6 +23,11 @@ import Schedule from './components/Schedule'
 import Resources from './components/Resources'
 import Feedback from './components/Feedback'
 import Upload from './components/Upload'
+import Training from './components/Training'
+import CollegeCounseling from './components/Training/CollegeCounseling'
+import Math from './components/Training/Math'
+import Quiz from './components/Training/Quiz'
+import Stats from './components/Stats'
 
 import AuthService from './services/AuthService'
 import OnboardingService from './services/OnboardingService'
@@ -42,8 +45,6 @@ const routes = [
   { path: '/login', component: LoginForm },
   { path: '/logout', component: Logout },
   { path: '/signup', component: Registration },
-  { path: '/resetpassword', component: ResetPasswordForm },
-  { path: '/setpassword/:token', component: SetPasswordForm },
   { path: '/upload', component: Upload, meta: {protected: true} },
   { path: '/dashboard', component: Dashboard, meta: { protected: true } },
   { path: '/session/math/:sessionId?', component: Session, meta: { protected: true } },
@@ -53,7 +54,12 @@ const routes = [
   { path: '/feedback', component: Feedback, meta: { protected: true } },
   { path: '/action/:action/:data?', component: Action, meta: { bypassOnboarding: true } },
   { path: '/onboarding/:step?', component: Onboarding, meta: { protected: true } },
-  { path: '/profile', redirect: '/onboarding/profile' }
+  { path: '/profile', redirect: '/onboarding/profile' },
+  { path: '/training', component: Training, meta: { protected: true } },
+  { path: '/training/math', component: Math, meta: { protected: true } },
+  { path: '/training/college', component: CollegeCounseling, meta: { protected: true } },
+  { path: '/training/:category/quiz', component: Quiz, meta: { protected: true } },
+  { path: '/stats', component: Stats, meta: { protected: true } }
 ]
 
 const router = new VueRouter({
