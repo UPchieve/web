@@ -1,7 +1,7 @@
 <template>
   <div v-if="user.isVolunteer" class="training-quiz">
     <h1 class="header" id="quiz-name">{{ quizName }} Quiz</h1>
-    <div class="questionText" v-if="showQuestion" v-bind:style="{backgroundImage: 'url('+questionImage+')'}">{{ questionText }}</div>
+    <div class="questionText" v-if="showQuestion" v-bind:style="{backgroundImage: `url(${questionImage})`}">{{ questionText }}</div>
     <form class="possibleAnswers" v-if="showQuestion">
       <input type="radio" id="a" value="a" v-model="picked">
       <label for="a">{{ a }}</label>
@@ -51,7 +51,7 @@ export default {
       TrainingService.startQuiz(this, this.category).then((question) => {
         this.questionText = question.questionText;
         if (question.image) {
-          this.questionImage = '../../assets/' + question.image;
+          this.questionImage = '../../../static/' + question.image;
         }
         else {
           this.questionImage = '';
@@ -74,7 +74,7 @@ export default {
       this.picked = data.picked;
       this.questionText = question.questionText;
       if (question.image) {
-        this.questionImage = '../../assets/' + question.image;
+        this.questionImage = '../../../static/' + question.image;
       }
       else {
         this.questionImage = '';
@@ -97,7 +97,7 @@ export default {
       this.picked = data.picked;
       this.questionText = question.questionText;
       if (question.image) {
-        this.questionImage = '../../assets/' + question.image;
+        this.questionImage = '../../../static/' + question.image;
       }
       else {
         this.questionImage = '';
