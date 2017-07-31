@@ -1,7 +1,8 @@
 <template>
   <div v-if="user.isVolunteer" class="training-quiz">
     <h1 class="header" id="quiz-name">{{ quizName }} Quiz</h1>
-    <div class="questionText" v-if="showQuestion" v-bind:style="{backgroundImage: `url(${questionImage})`}">{{ questionText }}</div>
+    <div class="questionText" v-if="showQuestion">{{ questionText }}</div>
+    <div class="questionImage" v-bind:style="imageStyle"></div>
     <form class="possibleAnswers" v-if="showQuestion">
       <input type="radio" id="a" value="a" v-model="picked">
       <label for="a">{{ a }}</label>
@@ -43,7 +44,7 @@ export default {
       disablePrev: true,
       disableNext: false,
       showQuestion: false,
-      questionImage: ''
+      imageStyle: { }
     }
   },
   methods: {
@@ -51,11 +52,15 @@ export default {
       TrainingService.startQuiz(this, this.category).then((question) => {
         this.questionText = question.questionText;
         if (question.image) {
-          this.questionImage = '../../../static/' + question.image;
+          var questionImage = '../../../static/question_images/' + question.image;
+          this.imageStyle = {
+            backgroundImage: `url(${questionImage})`,
+            width: '500px',
+            height: '500px',
+            display: 'inline-block'
+          }
         }
-        else {
-          this.questionImage = '';
-        }
+        else { this.imageStyle = { } }
         this.a = question.possibleAnswers[0];
         this.b = question.possibleAnswers[1];
         this.c = question.possibleAnswers[2];
@@ -74,11 +79,15 @@ export default {
       this.picked = data.picked;
       this.questionText = question.questionText;
       if (question.image) {
-        this.questionImage = '../../../static/' + question.image;
+        var questionImage = '../../../static/question_images/' + question.image;
+        this.imageStyle = {
+          backgroundImage: `url(${questionImage})`,
+          width: '500px',
+          height: '500px',
+          display: 'inline-block'
+        }
       }
-      else {
-        this.questionImage = '';
-      }
+      else { this.imageStyle = { } }
       this.a = question.possibleAnswers[0];
       this.b = question.possibleAnswers[1];
       this.c = question.possibleAnswers[2];
@@ -97,11 +106,15 @@ export default {
       this.picked = data.picked;
       this.questionText = question.questionText;
       if (question.image) {
-        this.questionImage = '../../../static/' + question.image;
+        var questionImage = '../../../static/question_images/' + question.image;
+        this.imageStyle = {
+          backgroundImage: `url(${questionImage})`,
+          width: '500px',
+          height: '500px',
+          display: 'inline-block'
+        }
       }
-      else {
-        this.questionImage = '';
-      }
+      else { this.imageStyle = { } }
       this.a = question.possibleAnswers[0];
       this.b = question.possibleAnswers[1];
       this.c = question.possibleAnswers[2];
@@ -126,6 +139,7 @@ export default {
       this.disablePrev = true;
       this.disableNext = false;
       this.showQuestion = false;
+      this.imageStyle = { };
     }
   }
 }
