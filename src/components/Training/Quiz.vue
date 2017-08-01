@@ -4,14 +4,10 @@
     <div class="questionText" v-if="showQuestion">{{ questionText }}</div>
     <div class="questionImage" v-bind:style="imageStyle"></div>
     <form class="possibleAnswers" v-if="showQuestion">
-      <input type="radio" id="a" value="a" v-model="picked">
-      <label for="a">{{ a }}</label>
-      <input type="radio" id="b" value="b" v-model="picked">
-      <label for="b">{{ b }}</label>
-      <input type="radio" id="c" value="c" v-model="picked">
-      <label for="c">{{ c }}</label>
-      <input type="radio" id="d" value="d" v-model="picked">
-      <label for="d">{{ d }}</label>
+      <div  v-for="item in items">
+        <input type="radio" :value="item.val" v-model="picked">
+        <label :for="item.val">{{ item.txt }}</label>
+      </div>
     </form>
     <button id="start-question-button" type="start" @click.prevent="start()" v-if="showStart">Take Quiz</button>
     <button id="prev-question-button" type="previous" @click.prevent="previous()" v-bind:disabled="disablePrev" v-if="showQuestion">Previous</button>
@@ -34,10 +30,7 @@ export default {
       category: category,
       questionText: '',
       quizName: quizName,
-      a: '',
-      b: '',
-      c: '',
-      d: '',
+      items: [],
       picked: '',
       scoreMsg: '',
       showStart: true,
@@ -55,16 +48,14 @@ export default {
           var questionImage = '../../../static/question_images/' + question.image;
           this.imageStyle = {
             backgroundImage: `url(${questionImage})`,
-            width: '500px',
-            height: '500px',
-            display: 'inline-block'
+            width: '100px',
+            height: '100px',
+            display: 'inline-block',
+            backgroundRepeat: 'no-repeat'
           }
         }
         else { this.imageStyle = { } }
-        this.a = question.possibleAnswers[0];
-        this.b = question.possibleAnswers[1];
-        this.c = question.possibleAnswers[2];
-        this.d = question.possibleAnswers[3];
+        this.items = question.possibleAnswers;
       });
       this.showStart = false;
       this.showQuestion = true;
@@ -82,16 +73,14 @@ export default {
         var questionImage = '../../../static/question_images/' + question.image;
         this.imageStyle = {
           backgroundImage: `url(${questionImage})`,
-          width: '500px',
-          height: '500px',
-          display: 'inline-block'
+          width: '100px',
+          height: '100px',
+          display: 'inline-block',
+          backgroundRepeat: 'no-repeat'
         }
       }
       else { this.imageStyle = { } }
-      this.a = question.possibleAnswers[0];
-      this.b = question.possibleAnswers[1];
-      this.c = question.possibleAnswers[2];
-      this.d = question.possibleAnswers[3];
+      this.items = question.possibleAnswers;
       if (!TrainingService.hasPrevious(this)) {
         this.disablePrev = true;
       }
@@ -109,16 +98,14 @@ export default {
         var questionImage = '../../../static/question_images/' + question.image;
         this.imageStyle = {
           backgroundImage: `url(${questionImage})`,
-          width: '500px',
-          height: '500px',
-          display: 'inline-block'
+          width: '100px',
+          height: '100px',
+          display: 'inline-block',
+          backgroundRepeat: 'no-repeat'
         }
       }
       else { this.imageStyle = { } }
-      this.a = question.possibleAnswers[0];
-      this.b = question.possibleAnswers[1];
-      this.c = question.possibleAnswers[2];
-      this.d = question.possibleAnswers[3];
+      this.items = question.possibleAnswers;
       if (!TrainingService.hasNext(this)) {
         this.disableNext = true;
       }
@@ -130,10 +117,7 @@ export default {
       TrainingService.submitQuiz(this, this.user._id).then((score) => {
         this.scoreMsg = 'Your score is ' + score + '.';
       });
-      this.a = '';
-      this.b = '';
-      this.c = '';
-      this.d = '';
+      this.items = [];
       this.picked = '';
       this.showStart = true;
       this.disablePrev = true;

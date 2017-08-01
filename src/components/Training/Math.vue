@@ -1,7 +1,7 @@
 <template>
   <div v-if="user.isVolunteer" class="math-training">
     <div class="header">Math Training</div>
-    <router-link to="/training/math/quiz" tag="li">Certification Quiz</router-link>
+    <router-link to="/training/algebra/quiz" tag="li">Certification Quiz</router-link>
   </div>
 </template>
 
