@@ -1,5 +1,8 @@
 <template>
 <div>
+  <div class="profile-header">
+      <h2>{{user.isVolunteer ? 'Volunteer' : 'Student' }} Profile</h2>
+  </div>
   <div class="name">
     <div id="firstname">
       <span>First name:</span>
@@ -24,7 +27,7 @@
 
   <div><router-link to="resetpassword">Reset password</router-link></div>
 
-  <div v-if="!user.isVolunteer">
+  <div v-if="user.isVolunteer">
     <div id="highschool">
       <span>High school:</span>
       <span v-show="'highschool' != activeEdit">{{ user.highschool }}</span>
@@ -121,6 +124,14 @@
       <input type="text" v-model="user.gpa" v-show="'gpa' == activeEdit">
       <button @click="editField('gpa')" v-show="'gpa' != activeEdit">Edit</button>
       <button @click="doneEdit('gpa')" v-show="'gpa' == activeEdit">Done Editing</button>
+    </div>
+
+    <div class="collegeApplicationsText">
+      <span>List all colleges and universities you are considering apply to:</span>
+      <span v-show="'collegeApplicationsText' != activeEdit">{{ user.collegeApplicationsText }}</span>
+      <input type="text" v-model="user.collegeApplicationsText" v-show="'collegeApplicationsText' == activeEdit">
+      <button @click="editField('collegeApplicationsText')" v-show="'collegeApplicationsText' != activeEdit">Edit</button>
+      <button @click="doneEdit('collegeApplicationsText')" v-show="'collegeApplicationsText' == activeEdit">Done Editing</button>
     </div>
   </div>
 
