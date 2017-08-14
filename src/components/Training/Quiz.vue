@@ -1,19 +1,23 @@
 <template>
   <div v-if="user.isVolunteer" class="training-quiz">
-    <h1 class="header" id="quiz-name">{{ quizName }} Quiz</h1>
-    <div class="questionText" v-if="showQuestion">{{ questionText }}</div>
-    <div class="questionImage" v-bind:style="imageStyle"></div>
-    <form class="possibleAnswers" v-if="showQuestion">
-      <div  v-for="item in items">
-        <input type="radio" :value="item.val" v-model="picked">
-        <label :for="item.val">{{ item.txt }}</label>
-      </div>
-    </form>
-    <button id="start-question-button" type="start" @click.prevent="start()" v-if="showStart">Take Quiz</button>
-    <button id="prev-question-button" type="previous" @click.prevent="previous()" v-bind:disabled="disablePrev" v-if="showQuestion">Previous</button>
-    <button id="next-question-button" type="next" @click.prevent="next()" v-bind:disabled="disableNext" v-if="showQuestion">Next Question</button>
-    <button id="submit-button" type="submit" @click.prevent="submit()" v-if="showQuestion">Submit Answers</button>
-    <div class="score">{{ scoreMsg }}</div>
+    <h1 class="header" id="quiz-name">{{ quizName }} Certification Quiz</h1>
+    <div class="quizBody">
+      <div v-if="showStartMsg">This test is untimed. You have 3 tries left to pass
+      this test. Once you feel ready, click on start!</div>
+      <div class="questionText">{{ questionText }}</div>
+      <div class="questionImage" v-bind:style="imageStyle"></div>
+      <form class="possibleAnswers">
+        <div v-for="item in items">
+          <input type="radio" :value="item.val" v-model="picked">
+          <label :for="item.val">{{ item.txt }}</label>
+        </div>
+      </form>
+      <button class="start-question btn" type="start" @click.prevent="start()" v-if="showStart">Start</button>
+      <button class="prev-question btn" type="previous" @click.prevent="previous()" v-if="showPrevious">Previous</button>
+      <button class="next-question btn" type="next" @click.prevent="next()" v-if="showNext">Next</button>
+      <button class="submit btn" type="submit" @click.prevent="submit()" v-if="showSubmit">Submit Test</button>
+      <div class="score">{{ scoreMsg }}</div>
+    </div>
   </div>
 </template>
 
@@ -33,10 +37,11 @@ export default {
       items: [],
       picked: '',
       scoreMsg: '',
+      showStartMsg: true,
       showStart: true,
-      disablePrev: true,
-      disableNext: false,
-      showQuestion: false,
+      showPrevious: false,
+      showNext: false,
+      showSubmit: false,
       imageStyle: { }
     }
   },
@@ -57,8 +62,11 @@ export default {
         else { this.imageStyle = { } }
         this.items = question.possibleAnswers;
       });
+      this.showStartMsg = false;
       this.showStart = false;
-      this.showQuestion = true;
+      this.showPrevious = false;
+      this.showNext = true;
+      this.showSubmit = false;
       this.scoreMsg = '';
       this.picked = '';
     },
@@ -82,9 +90,9 @@ export default {
       else { this.imageStyle = { } }
       this.items = question.possibleAnswers;
       if (!TrainingService.hasPrevious(this)) {
-        this.disablePrev = true;
+        this.showPrevious = false;
       }
-      this.disableNext = false;
+      this.showNext = true;
       this.picked = question.picked;
     },
     next(){
@@ -107,9 +115,10 @@ export default {
       else { this.imageStyle = { } }
       this.items = question.possibleAnswers;
       if (!TrainingService.hasNext(this)) {
-        this.disableNext = true;
+        this.showNext = false;
+        this.showSubmit = true;
       }
-      this.disablePrev = false;
+      this.showPrevious = true;
       this.picked = question.picked;
     },
     submit(){
@@ -118,11 +127,12 @@ export default {
         this.scoreMsg = 'Your score is ' + score + '.';
       });
       this.items = [];
+      this.questionText = '';
       this.picked = '';
       this.showStart = true;
-      this.disablePrev = true;
-      this.disableNext = false;
-      this.showQuestion = false;
+      this.showPrevious = false;
+      this.showNext = false;
+      this.showSubmit = false;
       this.imageStyle = { };
     }
   }
@@ -130,5 +140,31 @@ export default {
 </script>
 
 <style scoped>
+
+.training-quiz {
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  text-align: start;
+  margin-left: 20px;
+  font-size: 24px;
+  margin-bottom: 50px;
+}
+
+.questionImage {
+  background-position: center;
+}
+
+.quizBody {
+  width: 300px;
+  align-self: center;
+  margin-top: 20px;
+}
+
+.btn {
+  margin-top: 20px;
+}
 
 </style>

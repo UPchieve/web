@@ -26,10 +26,7 @@ import Resources from './components/Resources'
 import Feedback from './components/Feedback'
 import Upload from './components/Upload'
 import Training from './components/Training'
-import CollegeCounseling from './components/Training/CollegeCounseling'
-import Math from './components/Training/Math'
 import Quiz from './components/Training/Quiz'
-import Stats from './components/Stats'
 
 import AuthService from './services/AuthService'
 import OnboardingService from './services/OnboardingService'
@@ -60,10 +57,7 @@ const routes = [
   { path: '/onboarding/:step?', component: Onboarding, meta: { protected: true } },
   { path: '/profile', redirect: '/onboarding/profile' },
   { path: '/training', component: Training, meta: { protected: true } },
-  { path: '/training/math', component: Math, meta: { protected: true } },
-  { path: '/training/college', component: CollegeCounseling, meta: { protected: true } },
-  { path: '/training/:category/quiz', component: Quiz, meta: { protected: true } },
-  { path: '/stats', component: Stats, meta: { protected: true } }
+  { path: '/training/:category/quiz', component: Quiz, meta: { protected: true } }
 ]
 
 const router = new VueRouter({
