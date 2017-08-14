@@ -8,15 +8,13 @@
       <span>First name:</span>
       <span v-show="'firstname' != activeEdit">{{ user.firstname }}</span>
       <input type="text" v-model="user.firstname" v-show="'firstname' == activeEdit">
-      <button @click="editField('firstname')" v-show="'firstname' != activeEdit">Edit</button>
-      <button @click="doneEdit('firstname')" v-show="'firstname' == activeEdit">Done Editing</button>
+      <button @click="editField('firstname')">{{ fields['firstname'] }}</button>
     </div>
     <div id="lastname">
       <span>Last name:</span>
       <span v-show="'lastname' != activeEdit">{{ user.lastname }}</span>
       <input type="text" v-model="user.lastname" v-show="'lastname' == activeEdit">
-      <button @click="editField('lastname')" v-show="'lastname' != activeEdit">Edit</button>
-      <button @click="doneEdit('lastname')" v-show="'lastname' == activeEdit">Done Editing</button>
+      <button @click="editField('lastname')">{{ fields['lastname'] }}</button>
     </div>
   </div>
 
@@ -32,8 +30,7 @@
       <span>High school:</span>
       <span v-show="'highschool' != activeEdit">{{ user.highschool }}</span>
       <input type="text" v-model="user.highschool" v-show="'highschool' == activeEdit">
-      <button @click="editField('highschool')" v-show="'highschool' != activeEdit">Edit</button>
-      <button @click="doneEdit('highschool')" v-show="'highschool' == activeEdit">Done Editing</button>
+      <button @click="editField('highschool')">{{ fields['highschool'] }}</button>
     </div>
 
     <div class="currentGrade">
@@ -46,8 +43,7 @@
         <option>Junior</option>
         <option>Senior</option>
       </select>
-      <button @click="editField('currentGrade')" v-show="'currentGrade' != activeEdit">Edit</button>
-      <button @click="doneEdit('currentGrade')" v-show="'currentGrade' == activeEdit">Done Editing</button>
+      <button @click="editField('currentGrade')">{{ fields['currentGrade'] }}</button>
     </div>
 
     <div class="expectedGraduation">
@@ -62,16 +58,14 @@
         <option>2021</option>
         <option>2022</option>
       </select>
-      <button @click="editField('expectedGraduation')" v-show="'expectedGraduation' != activeEdit">Edit</button>
-      <button @click="doneEdit('expectedGraduation')" v-show="'expectedGraduation' == activeEdit">Done Editing</button>
+      <button @click="editField('expectedGraduation')">{{ fields['expectedGraduation'] }}</button>
     </div>
 
     <div class="difficultAcademicSubject">
       <span>Most difficult academic subject:</span>
       <input type="text" v-model="user.difficultAcademicSubject" v-show="'difficultAcademicSubject' == activeEdit">
       <span v-show="'difficultAcademicSubject' != activeEdit">{{ user.difficultAcademicSubject }}</span>
-      <button @click="editField('difficultAcademicSubject')" v-show="'difficultAcademicSubject' != activeEdit">Edit</button>
-      <button @click="doneEdit('difficultAcademicSubject')" v-show="'difficultAcademicSubject' == activeEdit">Done Editing</button>
+      <button @click="editField('difficultAcademicSubject')">{{ fields['difficultAcademicSubject'] }}</button>
     </div>
 
     <div class="difficultCollegeProcess">
@@ -101,8 +95,7 @@
       <ul v-show="'difficultCollegeProcess' != activeEdit" v-for="item in user.difficultCollegeProcess">
         <li>{{ item }}</li>
       </ul>
-      <button @click="editField('difficultCollegeProcess')" v-show="'difficultCollegeProcess' != activeEdit">Edit</button>
-      <button @click="doneEdit('difficultCollegeProcess')" v-show="'difficultCollegeProcess' == activeEdit">Done Editing</button>
+      <button @click="editField('difficultCollegeProcess')">{{ fields['difficultCollegeProcess'] }}</button>
     </div>
 
     <div class="hasGuidanceCounselor">
@@ -114,28 +107,25 @@
         <option>I don't know</option>
       </select>
       <span v-show="'hasGuidanceCounselor' != activeEdit">{{ user.hasGuidanceCounselor }}</span>
-      <button @click="editField('hasGuidanceCounselor')" v-show="'hasGuidanceCounselor' != activeEdit">Edit</button>
-      <button @click="doneEdit('hasGuidanceCounselor')" v-show="'hasGuidanceCounselor' == activeEdit">Done Editing</button>
+      <button @click="editField('hasGuidanceCounselor')">{{ fields['hasGuidanceCounselor'] }}</button>
     </div>
 
     <div class="gpa">
       <span>GPA:</span>
       <span v-show="'gpa' != activeEdit">{{ user.gpa }}</span>
       <input type="text" v-model="user.gpa" v-show="'gpa' == activeEdit">
-      <button @click="editField('gpa')" v-show="'gpa' != activeEdit">Edit</button>
-      <button @click="doneEdit('gpa')" v-show="'gpa' == activeEdit">Done Editing</button>
+      <button @click="editField('gpa')">{{ fields['gpa'] }}</button>
     </div>
 
     <div class="collegeApplicationsText">
       <span>List all colleges and universities you are considering apply to:</span>
       <span v-show="'collegeApplicationsText' != activeEdit">{{ user.collegeApplicationsText }}</span>
       <input type="text" v-model="user.collegeApplicationsText" v-show="'collegeApplicationsText' == activeEdit">
-      <button @click="editField('collegeApplicationsText')" v-show="'collegeApplicationsText' != activeEdit">Edit</button>
-      <button @click="doneEdit('collegeApplicationsText')" v-show="'collegeApplicationsText' == activeEdit">Done Editing</button>
+      <button @click="editField('collegeApplicationsText')">{{ fields['collegeApplicationsText'] }}</button>
     </div>
   </div>
 
-  <button @click="saveProfile()">{{ btnMsg }}</button>
+  <button @click="saveProfile()">{{ saveBtnMsg }}</button>
 </div>
 
 </template>
@@ -146,26 +136,34 @@ import UserService from 'src/services/UserService'
 export default {
   data() {
     var user = UserService.getUser();
+    var fieldnames = ['firstname', 'lastname', 'highschool', 'currentGrade',
+    'expectedGraduation', 'difficultAcademicSubject', 'difficultCollegeProcess',
+    'hasGuidanceCounselor', 'gpa', 'collegeApplicationsText'];
+    var fields = [];
+    fieldnames.map(function(field) {
+      fields[field] = 'Edit';
+    });
     return {
       user: user,
       activeEdit: null,
-      btnMsg: 'Save Changes'
+      fields: fields,
+      saveBtnMsg: 'Save Changes'
     }
   },
   methods: {
     editField: function(field) {
-      this.activeEdit = field;
-      this.btnMsg = 'Save Changes';
-    },
-    doneEdit(field) {
-      if (!this.activeEdit) {
-        return;
+      if (field != this.activeEdit) {
+        this.activeEdit = field;
+        this.fields[field] = 'Done';
+        this.savBtnMsg = 'Save Changes';
+      } else {
+        this.activeEdit = null;
+        this.fields[field] = 'Edit';
       }
-      this.activeEdit = null;
     },
     saveProfile() {
       UserService.setProfile(this, this.user);
-      this.btnMsg = 'Changes saved!';
+      this.saveBtnMsg = 'Changes saved!';
     }
   }
 }
