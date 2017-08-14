@@ -25,7 +25,7 @@
 
   <div><router-link to="resetpassword">Reset password</router-link></div>
 
-  <div v-if="user.isVolunteer">
+  <div v-if="!user.isVolunteer">
     <div id="highschool">
       <span>High school:</span>
       <span v-show="'highschool' != activeEdit">{{ user.highschool }}</span>
