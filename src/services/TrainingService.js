@@ -13,6 +13,13 @@ export default {
       return question;
     });
   },
+  getQuizLength(context) {
+    console.log(this.questions.length);
+    return this.questions.length;
+  },
+  getIndex(context) {
+    return this.index;
+  },
   hasNext(context){
     return ((this.index + 1) < this.questions.length);
   },

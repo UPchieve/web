@@ -1,6 +1,13 @@
 <template>
   <div v-if="user.isVolunteer" class="training-quiz">
     <h1 class="header" id="quiz-name">{{ quizName }} Certification Quiz</h1>
+    <div class="progressBar">
+      <div class="circles">
+        <div v-for="n in quizLength" class="circle" v-bind:id="'circle-' + n">{{ n }}</div>
+      </div>
+      <div class="rect" v-if="quizLength > 0"></div>
+      <div class="rect cover" v-bind:style="{ width: barWidth + '%' }" v-if="quizLength > 0"></div>
+    </div>
     <div class="quizBody">
       <div v-if="showStartMsg">This test is untimed. You have 3 tries left to pass
       this test. Once you feel ready, click on start!</div>
@@ -42,25 +49,47 @@ export default {
       showPrevious: false,
       showNext: false,
       showSubmit: false,
-      imageStyle: { }
+      imageStyle: { },
+      quizLength: 0,
+      barWidth: 0
     }
   },
   methods: {
+    updateProgressBar(){
+      var index = TrainingService.getIndex(this);
+      console.log(index);
+      console.log('length' + this.quizLength);
+      this.barWidth = 100/(this.quizLength - 1) * index;
+      for (var i = 1; i < this.quizLength + 1; i++) {
+        var element = document.getElementById('circle-' + i);
+        if (i < (index + 2)) {
+          element.style.background = '#000000';
+          console.log('true');
+        }
+        else {
+          element.style.background = '#EEEEEE';
+        }
+      }
+    },
+    styleImage(image){
+      if (image) {
+        var questionImage = '../../../static/question_images/' + image;
+        this.imageStyle = {
+          backgroundImage: `url(${questionImage})`,
+          width: '100px',
+          height: '100px',
+          display: 'inline-block',
+          backgroundRepeat: 'no-repeat'
+        }
+      }
+      else { this.imageStyle = { } }
+    },
     start(){
       TrainingService.startQuiz(this, this.category).then((question) => {
         this.questionText = question.questionText;
-        if (question.image) {
-          var questionImage = '../../../static/question_images/' + question.image;
-          this.imageStyle = {
-            backgroundImage: `url(${questionImage})`,
-            width: '100px',
-            height: '100px',
-            display: 'inline-block',
-            backgroundRepeat: 'no-repeat'
-          }
-        }
-        else { this.imageStyle = { } }
+        this.styleImage(question.image);
         this.items = question.possibleAnswers;
+        this.quizLength = TrainingService.getQuizLength(this);
       });
       this.showStartMsg = false;
       this.showStart = false;
@@ -69,6 +98,7 @@ export default {
       this.showSubmit = false;
       this.scoreMsg = '';
       this.picked = '';
+      this.updateProgressBar();
     },
     previous(){
       TrainingService.saveAnswer(this, this.picked);
@@ -77,23 +107,15 @@ export default {
       var question = data.question;
       this.picked = data.picked;
       this.questionText = question.questionText;
-      if (question.image) {
-        var questionImage = '../../../static/question_images/' + question.image;
-        this.imageStyle = {
-          backgroundImage: `url(${questionImage})`,
-          width: '100px',
-          height: '100px',
-          display: 'inline-block',
-          backgroundRepeat: 'no-repeat'
-        }
-      }
-      else { this.imageStyle = { } }
+      this.updateProgressBar();
+      this.styleImage(question.image);
       this.items = question.possibleAnswers;
       if (!TrainingService.hasPrevious(this)) {
         this.showPrevious = false;
       }
       this.showNext = true;
       this.picked = question.picked;
+      this.showSubmit = false;
     },
     next(){
       TrainingService.saveAnswer(this, this.picked);
@@ -102,17 +124,8 @@ export default {
       var question = data.question;
       this.picked = data.picked;
       this.questionText = question.questionText;
-      if (question.image) {
-        var questionImage = '../../../static/question_images/' + question.image;
-        this.imageStyle = {
-          backgroundImage: `url(${questionImage})`,
-          width: '100px',
-          height: '100px',
-          display: 'inline-block',
-          backgroundRepeat: 'no-repeat'
-        }
-      }
-      else { this.imageStyle = { } }
+      this.updateProgressBar();
+      this.styleImage(question.image);
       this.items = question.possibleAnswers;
       if (!TrainingService.hasNext(this)) {
         this.showNext = false;
@@ -165,6 +178,43 @@ export default {
 
 .btn {
   margin-top: 20px;
+}
+
+.progressBar {
+  margin: 0px 50px;
+}
+
+.circles {
+  display: flex;
+  justify-content: space-between;
+}
+
+.circle {
+  display: flex;
+  justify-content: center;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  background: #EEEEEE;
+  z-index: 1;
+  color: #FFFFFF;
+}
+
+#circle-1 {
+  background: #000000;
+}
+
+.rect {
+  height: 7px;
+  background: #EEEEEE;
+  position: relative;
+  top:-13px;
+  z-index: -1;
+}
+
+.rect.cover {
+  background: #000000;
+  top: -20px;
 }
 
 </style>
