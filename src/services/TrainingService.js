@@ -4,18 +4,17 @@ export default {
   idAnswerMap: new Object(),
   questions: [],
   index: 0,
-  startQuiz(context, category){
+  loadQuiz(context, category){
     this.index = 0;
     this.idAnswerMap = new Object();
     return NetworkService.getQuestions(context, { category: category }).then((res) => {
       this.questions = res.data.questions;
-      var question = this.questions[this.index];
-      return question;
+      return this.questions.length;
     });
   },
-  getQuizLength(context) {
-    console.log(this.questions.length);
-    return this.questions.length;
+  getFirstQuestion(context){
+    var question = this.questions[this.index];
+    return question;
   },
   getIndex(context) {
     return this.index;
