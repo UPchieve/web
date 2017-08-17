@@ -17,11 +17,23 @@
       <form class="possibleAnswers">
         <div v-for="item in items">
           <input type="radio" :value="item.val" v-model="picked">
-          <label :for="item.val">{{ item.txt }}</label>
+          <label :for="item.val" v-bind:id="'answer-' + item.val">{{ item.val }}. {{ item.txt }}</label>
         </div>
       </form>
       <div class="score">{{ scoreMsg }}</div>
-      <button class="start btn" type="start" @click.prevent="getFirst()" v-if="showStart">Start</button>
+      <div class="review" v-if="showQuizReview">
+        <div class="question" v-for="question in questionsReview">
+          <div class="questionText">{{ question.questionText }}</div>
+          <div class="questionImage" v-bind:style="question.imageStyle"></div>
+          <div class="possibleAnswers">
+            <div v-for="answer in question.possibleAnswers" v-bind:id="'answer-' + answer.val">{{ answer.val }}. {{ answer.txt }}</div>
+          </div>
+          <div class="userAnswer">Your answer: {{ question.userAnswer }}</div>
+          <div class="correctAnswer">Correct answer: {{ question.correctAnswer }}</div>
+        </div>
+      </div>
+      <button class="review btn" type="review" @click.prevent="review()" v-if="showReview">Review Materials</button>
+      <button class="start btn" type="start" @click.prevent="getFirst()" v-if="showStart">{{ startQuizMsg }}</button>
       <button class="prev btn" type="previous" @click.prevent="previous()" v-if="showPrevious">Previous</button>
       <button class="next btn" type="next" @click.prevent="next()" v-if="showNext">Next</button>
       <button class="submit btn" type="submit" @click.prevent="submit()" v-if="showSubmit">Submit Test</button>
@@ -47,13 +59,17 @@ export default {
       scoreMsg: '',
       showStartMsg: true,
       showStart: true,
+      startQuizMsg: 'Start',
       showPrevious: false,
       showNext: false,
       showSubmit: false,
+      showReview: false,
       imageStyle: { },
       quizLength: 0,
       barWidth: 0,
-      showProgressBar: false
+      showProgressBar: false,
+      questionsReview: [],
+      showQuizReview: false
     }
   },
   beforeMount(){
@@ -90,8 +106,11 @@ export default {
     },
     getFirst(){
       if (TrainingService.getIndex(this) != 0) {
-        TrainingService.loadQuiz(this, this.category);
-        this.updateProgressBar();
+        TrainingService.loadQuiz(this, this.category).then((quizLength) => {
+          this.quizLength = quizLength;
+          this.showProgressBar = true;
+          this.updateProgressBar();
+        });
       }
       var question = TrainingService.getFirstQuestion(this);
       this.questionText = question.questionText;
@@ -101,8 +120,11 @@ export default {
       this.showStart = false;
       this.showPrevious = false;
       this.showSubmit = false;
+      this.showReview = false;
+      this.showQuizReview = false;
+      if (!this.showProgressBar) { this.showProgressBar = true; }
       this.showNext = true;
-      this.showProgressBar = true;
+      this.barWidth = 0;
       this.scoreMsg = '';
       this.picked = '';
     },
@@ -118,6 +140,9 @@ export default {
       this.items = question.possibleAnswers;
       if (!TrainingService.hasPrevious(this)) {
         this.showPrevious = false;
+      }
+      if (this.scoreMsg) {
+        this.scoreMsg = '';
       }
       this.showSubmit = false;
       this.showNext = true;
@@ -140,17 +165,43 @@ export default {
     },
     submit(){
       TrainingService.saveAnswer(this, this.picked);
-      TrainingService.submitQuiz(this, this.user._id).then((score) => {
-        this.scoreMsg = 'Score: ' + score + ' out of ' + this.quizLength + ' correct.';
+      if (TrainingService.hasCompleted(this)) {
+        TrainingService.submitQuiz(this, this.user._id).then((data) => {
+          this.scoreMsg = 'Score: ' + data.score + ' out of ' + this.quizLength + ' correct';
+        });
+        this.items = [];
+        this.questionText = '';
+        this.picked = '';
+        this.showPrevious = false;
+        this.showNext = false;
+        this.showSubmit = false;
+        this.startQuizMsg = 'Retake Quiz';
+        this.showReview = true;
+        this.showStart = true;
+        this.imageStyle = { };
+      }
+      else {
+        this.scoreMsg = 'You must answer all questions before submitting the quiz!';
+      }
+    },
+    review(){
+      this.questionsReview = TrainingService.reviewQuiz(this);
+      this.questionsReview.forEach(function(question) {
+        if (question.image) {
+          var questionImage = '../../../static/question_images/' + question.image;
+          question['imageStyle'] = {
+            backgroundImage: `url(${questionImage})`,
+            width: '100px',
+            height: '100px',
+            display: 'inline-block',
+            backgroundRepeat: 'no-repeat'
+          }
+        }
+        else { question['imageStyle'] = { } }
       });
-      this.items = [];
-      this.questionText = '';
-      this.picked = '';
-      this.showPrevious = false;
-      this.showNext = false;
-      this.showSubmit = false;
-      this.showStart = true;
-      this.imageStyle = { };
+      this.showReview = false;
+      this.showQuizReview = true;
+      this.showProgressBar = false;
     }
   }
 }
@@ -219,6 +270,10 @@ export default {
 .rect.cover {
   background: #000000;
   top: -20px;
+}
+
+.question {
+  margin: 50px 0px;
 }
 
 </style>

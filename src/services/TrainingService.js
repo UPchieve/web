@@ -4,9 +4,13 @@ export default {
   idAnswerMap: new Object(),
   questions: [],
   index: 0,
+  numAnswers: 0,
+  idCorrectAnswerMap: new Object(),
   loadQuiz(context, category){
     this.index = 0;
+    this.numAnswers = 0;
     this.idAnswerMap = new Object();
+    this.idCorrectAnswerMap = new Object();
     return NetworkService.getQuestions(context, { category: category }).then((res) => {
       this.questions = res.data.questions;
       return this.questions.length;
@@ -18,6 +22,10 @@ export default {
   },
   getIndex(context) {
     return this.index;
+  },
+  hasCompleted(context) {
+    console.log(this.numAnswers);
+    return (this.numAnswers == this.questions.length);
   },
   hasNext(context){
     return ((this.index + 1) < this.questions.length);
@@ -51,6 +59,9 @@ export default {
   },
   saveAnswer(context, picked){
     var question = this.questions[this.index];
+    if (picked != '' && picked != null && (this.idAnswerMap[question._id] == null || this.idAnswerMap[question._id] == '')) {
+      this.numAnswers++;
+    }
     this.idAnswerMap[question._id] = picked;
     return;
   },
@@ -59,7 +70,21 @@ export default {
       { userid: userid,
         idAnswerMap: this.idAnswerMap
       }).then((res) => {
-      return res.data.score;
+      this.idCorrectAnswerMap = res.data.idCorrectAnswerMap;
+      return {
+        score: res.data.score,
+        idUserAnswerMap: this.idAnswerMap
+      };
     });
+  },
+  reviewQuiz(context){
+    var questionsReview = this.questions.slice(0);
+    var idCorrectAnswerMap = this.idCorrectAnswerMap;
+    var idAnswerMap = this.idAnswerMap;
+    questionsReview.forEach(function(question) {
+      question['userAnswer'] = idAnswerMap[question._id];
+      question['correctAnswer'] = idCorrectAnswerMap[question._id];
+    });
+    return questionsReview;
   }
 }
