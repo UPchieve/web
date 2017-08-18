@@ -1,5 +1,5 @@
 <template>
-  <div v-if="user.isVolunteer" class="training-quiz">
+  <div v-if="user.isVolunteer" class="training-quiz" v-bind:style="coverStyle">
     <h1 class="header" id="quiz-name">{{ quizName }} Certification Quiz</h1>
     <div class="progressBar" v-if="showProgressBar">
       <div class="circles">
@@ -20,8 +20,6 @@
           <label :for="item.val" v-bind:id="'answer-' + item.val">{{ item.val }}. {{ item.txt }}</label>
         </div>
       </form>
-      <div class="passed">{{ passedMsg }}</div>
-      <div class="score">{{ scoreMsg }}</div>
       <div class="review" v-if="showQuizReview">
         <div class="question" v-for="question in questionsReview">
           <div class="questionText">{{ question.questionText }}</div>
@@ -33,11 +31,17 @@
           <div class="correctAnswer">Correct answer: {{ question.correctAnswer }}</div>
         </div>
       </div>
-      <button class="review btn" type="review" @click.prevent="review()" v-if="showReview">Review Materials</button>
-      <button class="start btn" type="start" @click.prevent="getFirst()" v-if="showStart">{{ startQuizMsg }}</button>
-      <button class="prev btn" type="previous" @click.prevent="previous()" v-if="showPrevious">Previous</button>
-      <button class="next btn" type="next" @click.prevent="next()" v-if="showNext">Next</button>
-      <button class="submit btn" type="submit" @click.prevent="submit()" v-if="showSubmit">Submit Test</button>
+      <div class="passScoreContainer" v-bind:style="popUpStyle">
+        <div class="passed">{{ passedMsg }}</div>
+        <div class="score">{{ scoreMsg }}</div>
+        <div class="btnContainer">
+          <button class="review btn" type="review" @click.prevent="review()" v-if="showReview">Review Materials</button>
+          <button class="start btn" type="start" @click.prevent="getFirst()" v-if="showStart">{{ startQuizMsg }}</button>
+          <button class="prev btn" type="previous" @click.prevent="previous()" v-if="showPrevious">Previous</button>
+          <button class="next btn" type="next" @click.prevent="next()" v-if="showNext">Next</button>
+          <button class="submit btn" type="submit" @click.prevent="submit()" v-if="showSubmit">Submit Test</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -66,12 +70,14 @@ export default {
       showSubmit: false,
       showReview: false,
       imageStyle: { },
+      popUpStyle: { },
       quizLength: 0,
       barWidth: 0,
       showProgressBar: false,
       questionsReview: [],
       showQuizReview: false,
-      passedMsg: ''
+      passedMsg: '',
+      coverStyle: { }
     }
   },
   beforeMount(){
@@ -130,6 +136,8 @@ export default {
       this.scoreMsg = '';
       this.passedMsg = '';
       this.picked = '';
+      this.popUpStyle = { };
+      this.coverStyle = { };
     },
     previous(){
       TrainingService.saveAnswer(this, this.picked);
@@ -175,10 +183,26 @@ export default {
           } else {
             this.passedMsg = 'You failed.';
           }
-          this.scoreMsg = 'Score: ' + data.score + ' out of ' + this.quizLength + ' correct';
+          this.scoreMsg = 'Score: ' + data.score + ' out of ' + this.quizLength + ' correct.';
         });
-        this.items = [];
-        this.questionText = '';
+        this.popUpStyle = {
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          width: '500px',
+          height: '300px',
+          background: '#FFFFFF',
+          zIndex: '5',
+          position: 'absolute',
+          top: '0',
+          bottom: '0',
+          left: '0',
+          right: '0',
+          margin: 'auto'
+        };
+        this.coverStyle = {
+          background: 'rgba(0,0,0,0.10)'
+        };
         this.picked = '';
         this.showPrevious = false;
         this.showNext = false;
@@ -186,7 +210,6 @@ export default {
         this.startQuizMsg = 'Retake Quiz';
         this.showReview = true;
         this.showStart = true;
-        this.imageStyle = { };
       }
       else {
         this.scoreMsg = 'You must answer all questions before submitting the quiz!';
@@ -207,6 +230,10 @@ export default {
         }
         else { question['imageStyle'] = { } }
       });
+      this.items = [];
+      this.questionText = '';
+      this.popUpStyle = { };
+      this.coverStyle = { };
       this.showReview = false;
       this.showQuizReview = true;
       this.showProgressBar = false;
@@ -220,6 +247,7 @@ export default {
 .training-quiz {
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .header {
@@ -234,7 +262,6 @@ export default {
 }
 
 .quizBody {
-  width: 300px;
   align-self: center;
   margin-top: 20px;
 }
