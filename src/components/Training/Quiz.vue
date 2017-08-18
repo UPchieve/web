@@ -20,6 +20,7 @@
           <label :for="item.val" v-bind:id="'answer-' + item.val">{{ item.val }}. {{ item.txt }}</label>
         </div>
       </form>
+      <div class="passed">{{ passedMsg }}</div>
       <div class="score">{{ scoreMsg }}</div>
       <div class="review" v-if="showQuizReview">
         <div class="question" v-for="question in questionsReview">
@@ -69,7 +70,8 @@ export default {
       barWidth: 0,
       showProgressBar: false,
       questionsReview: [],
-      showQuizReview: false
+      showQuizReview: false,
+      passedMsg: ''
     }
   },
   beforeMount(){
@@ -126,6 +128,7 @@ export default {
       this.showNext = true;
       this.barWidth = 0;
       this.scoreMsg = '';
+      this.passedMsg = '';
       this.picked = '';
     },
     previous(){
@@ -167,6 +170,11 @@ export default {
       TrainingService.saveAnswer(this, this.picked);
       if (TrainingService.hasCompleted(this)) {
         TrainingService.submitQuiz(this, this.user._id).then((data) => {
+          if (data.passed) {
+            this.passedMsg = 'You passed!';
+          } else {
+            this.passedMsg = 'You failed.';
+          }
           this.scoreMsg = 'Score: ' + data.score + ' out of ' + this.quizLength + ' correct';
         });
         this.items = [];

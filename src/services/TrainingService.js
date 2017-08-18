@@ -6,11 +6,13 @@ export default {
   index: 0,
   numAnswers: 0,
   idCorrectAnswerMap: new Object(),
+  category: null,
   loadQuiz(context, category){
     this.index = 0;
     this.numAnswers = 0;
     this.idAnswerMap = new Object();
     this.idCorrectAnswerMap = new Object();
+    this.category = category;
     return NetworkService.getQuestions(context, { category: category }).then((res) => {
       this.questions = res.data.questions;
       return this.questions.length;
@@ -68,10 +70,12 @@ export default {
   submitQuiz(context, userid){
     return NetworkService.getQuizScore(context,
       { userid: userid,
-        idAnswerMap: this.idAnswerMap
+        idAnswerMap: this.idAnswerMap,
+        category: this.category
       }).then((res) => {
       this.idCorrectAnswerMap = res.data.idCorrectAnswerMap;
       return {
+        passed: res.data.hasPassed,
         score: res.data.score,
         idUserAnswerMap: this.idAnswerMap
       };
