@@ -232,6 +232,7 @@ export default {
       });
       this.items = [];
       this.questionText = '';
+      this.imageStyle = { };
       this.popUpStyle = { };
       this.coverStyle = { };
       this.showReview = false;
