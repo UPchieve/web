@@ -3,8 +3,8 @@
 <form class="days">
   <div v-for="(dayValue, day) in availability">
     {{ day }}
-    <div class="times">
-      <div v-for="(timeValue, time) in dayValue">
+    <div class="times" v-bind:style="orderTimes">
+      <div v-for="(timeValue, time, index) in dayValue" class="time" v-bind:id="time + '-' + index + '-' + day">
         <input type="checkbox" id=time v-model=availability[day][time]>
         <label for=time>{{ time }}: {{ timeValue }}</label>
       </div>
@@ -23,14 +23,32 @@ import UserService from 'src/services/UserService';
 export default {
   data(){
     let user = UserService.getUser();
-    let availability = {};
     return {
       user: user,
-      availability: availability
+      availability: {},
+      orderTimes: {}
     }
   },
   beforeMount() {
     this.initialize();
+  },
+  mounted: function(){
+    var id = '12a-0-Sunday';
+    var element = document.getElementById(id);
+    console.log(element);
+    if (!element) {
+      console.log('orderTimes is column reverse');
+      this.orderTimes = {
+        display: 'flex',
+        flexDirection: 'column-reverse'
+      };
+    } else {
+      console.log('orderTimes is column');
+      this.orderTimes = {
+        display: 'flex',
+        flexDirection: 'column'
+      };
+    }
   },
   methods: {
     initialize(){
@@ -67,11 +85,6 @@ export default {
 
 .days {
   display: flex;
-}
-
-.times {
-  display: flex;
-  flex-direction: column-reverse;
 }
 
 </style>
