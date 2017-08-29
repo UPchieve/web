@@ -1,24 +1,25 @@
 <template>
 <div class="calendar">
-<div class="dayTime">
-  <div class="timeLabel">
-    <div v-for="time in timeRange">
+<h1 class="header">Schedule</h1>
+<div class="dayTimeContainer">
+  <div class="timeLabelContainer">
+    <div v-for="time in timeRange" class="timeLabel">
       {{ time }}
     </div>
   </div>
-  <form class="days">
+  <form class="dayTime">
     <div v-for="(dayValue, day) in availability">
-      {{ day }}
+      <div class="dayLabel">{{ day }}</div>
       <div class="times">
         <div v-for="sortedTime in sortedTimes[day]" class="timeOfDay">
           <input type="checkbox" id=time v-model=availability[day][sortedTime]>
-          <label for=sortedTime>{{ sortedTime }}: {{ availability[day][sortedTime] }}</label>
+          <label for=sortedTime></label>
         </div>
       </div>
     </div>
   </form>
 </div>
-<button @click="save()">Save</button>
+<button @click="save()" class="btn">Save</button>
 </div>
 </template>
 
@@ -83,8 +84,53 @@ export default {
 
 <style scoped>
 
+.calendar {
+  font-size: 16px;
+}
+
+.header {
+  display: flex;
+  padding: 30px 0 30px 50px;
+  margin: 0px;
+  font-size: 24px;
+  border-bottom: 1px solid #000;
+}
+
+.timeLabelContainer {
+  padding-top: 50px;
+}
+
+.timeLabel {
+  display: flex;
+  justify-content: center;
+  padding: 15px;
+  height: 52px;
+}
+
+.dayLabel {
+  padding: 15px 0;
+}
+
+.dayTimeContainer {
+  display: flex;
+}
+
+.dayTime {
+  display: flex;
+}
+
+.times {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.timeOfDay {
+  border: 1px solid #000;
+  height: 52px;
+}
+
 input[type='checkbox'] {
-  position: fixed;
+  position: absolute;
   display: block;
   opacity: 0;
   width: 100px;
@@ -98,24 +144,12 @@ label {
 }
 
 input[type='checkbox']:checked + label {
-  background-color: #EEEEEE;
+  background-color: #16D2AA;
 }
 
-.dayTime {
-  display: flex;
-}
-
-.days {
-  display: flex;
-}
-
-.times {
-  display: flex;
-  flex-direction: column-reverse;
-}
-
-.timeOfDay {
-  border: 1px solid #000;
+.btn {
+  margin: 50px 0px;
+  font-size: 16px;
 }
 
 </style>
