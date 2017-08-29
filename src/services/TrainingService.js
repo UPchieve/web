@@ -26,7 +26,6 @@ export default {
     return this.index;
   },
   hasCompleted(context) {
-    console.log(this.numAnswers);
     return (this.numAnswers == this.questions.length);
   },
   hasNext(context){
@@ -75,7 +74,8 @@ export default {
       }).then((res) => {
       this.idCorrectAnswerMap = res.data.idCorrectAnswerMap;
       return {
-        passed: res.data.hasPassed,
+        tries: res.data.tries,
+        passed: res.data.passed,
         score: res.data.score,
         idUserAnswerMap: this.idAnswerMap
       };

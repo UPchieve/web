@@ -26,7 +26,7 @@ import Resources from './components/Resources'
 import Feedback from './components/Feedback'
 import Upload from './components/Upload'
 import Training from './components/Training'
-import Quiz from './components/Training/Quiz'
+import Quiz from './components/Quiz'
 
 import AuthService from './services/AuthService'
 import OnboardingService from './services/OnboardingService'
