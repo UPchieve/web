@@ -31,9 +31,9 @@ import UserService from 'src/services/UserService';
 export default {
   data(){
     let user = UserService.getUser();
-    let timeRange = ['12a', '1a', '2a', '3a', '4a', '5a', '6a', '7a', '8a', '9a',
-      '10a', '11a', '12p', '1p', '2p', '3p', '4p', '5p', '6p', '7p', '8p', '9p',
-      '10p', '11p'];
+    let timeRange = ['12 am', '1 am', '2 am', '3 am', '4 am', '5 am', '6 am', '7 am', '8 am', '9 am',
+      '10 am', '11 am', '12 pm', '1 pm', '2 pm', '3 pm', '4 pm', '5 pm', '6 pm', '7 pm', '8 pm', '9 pm',
+      '10 pm', '11 pm'];
     return {
       user: user,
       availability: {},
