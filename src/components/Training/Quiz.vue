@@ -104,8 +104,8 @@ export default {
         var questionImage = '../../../static/question_images/' + image;
         this.imageStyle = {
           backgroundImage: `url(${questionImage})`,
-          width: '100px',
-          height: '100px',
+          width: '300px',
+          height: '300px',
           display: 'inline-block',
           backgroundRepeat: 'no-repeat'
         }
@@ -222,8 +222,8 @@ export default {
           var questionImage = '../../../static/question_images/' + question.image;
           question['imageStyle'] = {
             backgroundImage: `url(${questionImage})`,
-            width: '100px',
-            height: '100px',
+            width: '300px',
+            height: '300px',
             display: 'inline-block',
             backgroundRepeat: 'no-repeat'
           }
