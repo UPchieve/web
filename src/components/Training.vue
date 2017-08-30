@@ -3,39 +3,28 @@
     <h1 class="header">Volunteer Training</h1>
 
     <div class="collegeAdmissions">
-      <div class="category">College Admissions</div>
+      <div class="supercategory">College Admissions</div>
     </div>
 
     <div class="ESL">
-      <div class="category">ESL</div>
+      <div class="supercategory">ESL</div>
     </div>
 
     <div class="math">
-      <div class="category" v-on:click="mathExpand = !mathExpand">Math</div>
-      <div class="algebra subcategory" v-show="mathExpand">
-        <div>
-          <span>Algebra</span>
-          <div class="review">
-            <router-link to="/training/algebra/review" tag="div">Review</router-link>
+      <div class="supercategory" v-on:click="mathExpand = !mathExpand">Math</div>
+      <div v-for="category in quizzes['math']">
+        <div class="category" v-show="mathExpand">
+          <div>
+            <span>{{ category | capitalize }}</span>
+            <div class="review">
+              <router-link :to="'/training/' + category + '/review'" tag="div">Review</router-link>
+            </div>
           </div>
-        </div>
-        <div class="test">
-          <router-link to="/training/algebra/quiz" tag="div" v-if="!hasPassed('algebra') && hasTries('algebra')">Take test</router-link>
-          <div v-if="hasPassed('algebra')">Passed!</div>
-          <div class="numTries">You have used {{ getTries('algebra') }}/3 tries.</div>
-        </div>
-      </div>
-      <div class="geometry subcategory" v-show="mathExpand">
-        <div>
-          <span>Geometry</span>
-          <div class="review">
-            <router-link to="/training/geometry/review" tag="div">Review</router-link>
+          <div class="test">
+            <router-link :to="'/training/' + category + '/quiz'" tag="div" v-if="!hasPassed(category) && hasTries(category)">Take test</router-link>
+            <div v-if="hasPassed(category)">Passed!</div>
+            <div class="numTries">You have used {{ getTries(category) }}/3 tries.</div>
           </div>
-        </div>
-        <div class="test">
-          <router-link to="/training/geometry/quiz" tag="div" v-if="!hasPassed('geometry') && hasTries('geometry')">Take test</router-link>
-          <div v-if="hasPassed('geometry')">Passed!</div>
-          <div class="numTries">You have used {{ getTries('geometry') }}/3 tries.</div>
         </div>
       </div>
     </div>
@@ -48,9 +37,19 @@ import UserService from 'src/services/UserService';
 export default {
   data() {
     var user = UserService.getUser();
+    var quizzes = new Object();
+    quizzes['math'] = ['algebra', 'geometry', 'trigonometry'];
     return {
       user: user,
-      mathExpand: false
+      mathExpand: false,
+      quizzes: quizzes
+    }
+  },
+  filters: {
+    capitalize: function (value) {
+      if (!value) return ''
+      value = value.toString()
+      return value.charAt(0).toUpperCase() + value.slice(1)
     }
   },
   methods: {
@@ -88,7 +87,7 @@ export default {
   margin-left: 20px;
 }
 
-.category, .subcategory {
+.supercategory, .category {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -97,17 +96,17 @@ export default {
   padding: 0px 20px;
 }
 
-.category, .header {
+.supercategory, .header {
   text-align: start;
   font-size: 24px;
 }
 
-.category {
+.supercategory {
   background: #EEEEEE;
   margin-top: 20px;
 }
 
-.subcategory {
+.category {
   font-size: 16px;
   border: 1px solid #EEEEEE;
 }
