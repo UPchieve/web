@@ -55,7 +55,13 @@ export default {
   data() {
     let user = UserService.getUser();
     let category = this.$route.params.category;
-    let quizName = category.charAt(0).toUpperCase() + category.slice(1);
+    var quizName;
+    if (category == 'esl') {
+      quizName = category.toUpperCase();
+    }
+    else {
+      quizName = category.charAt(0).toUpperCase() + category.slice(1);
+    }
     var tries = 0;
     if (user[category]) {
       tries = user[category].tries;

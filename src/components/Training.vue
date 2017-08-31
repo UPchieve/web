@@ -1,21 +1,14 @@
 <template>
   <div v-if="user.isVolunteer" class="training">
     <h1 class="header">Volunteer Training</h1>
-
-    <div class="collegeAdmissions">
-      <div class="supercategory">College Admissions</div>
-    </div>
-
-    <div class="ESL">
-      <div class="supercategory">ESL</div>
-    </div>
-
-    <div class="math">
-      <div class="supercategory" v-on:click="mathExpand = !mathExpand">Math</div>
-      <div v-for="category in quizzes['math']">
-        <div class="category" v-show="mathExpand">
+    <div v-for="supercategory in supercategories">
+      <div class="supercategory" v-on:click="flipBool(supercategory)" v-if="supercategory != 'esl'">{{ supercategory | capitalize }}</div>
+      <div class="supercategory" v-on:click="flipBool(supercategory)" v-if="supercategory == 'esl'">{{ supercategory | uppercase }}</div>
+      <div v-for="category in quizzes[supercategory]">
+        <div class="category" v-show="bools[supercategory]">
           <div>
-            <span>{{ category | capitalize }}</span>
+            <span v-if="category != 'esl'">{{ category | capitalize }}</span>
+            <span v-if="category == 'esl'">{{ category | uppercase }}</span>
             <div class="review">
               <router-link :to="'/training/' + category + '/review'" tag="div">Review</router-link>
             </div>
@@ -28,7 +21,6 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -39,10 +31,16 @@ export default {
     var user = UserService.getUser();
     var quizzes = new Object();
     quizzes['math'] = ['algebra', 'geometry', 'trigonometry'];
+    quizzes['esl'] = ['esl'];
+    var bools = new Object();
+    bools['math'] = false;
+    bools['esl'] = false;
+    var supercategories = ['esl', 'math'];
     return {
       user: user,
-      mathExpand: false,
-      quizzes: quizzes
+      quizzes: quizzes,
+      bools: bools,
+      supercategories: supercategories
     }
   },
   filters: {
@@ -50,9 +48,18 @@ export default {
       if (!value) return ''
       value = value.toString()
       return value.charAt(0).toUpperCase() + value.slice(1)
+    },
+    uppercase: function (value) {
+      if (!value) return ''
+      value = value.toString()
+      return value.toUpperCase()
     }
   },
   methods: {
+    flipBool(supercategory) {
+      var bool = this.bools[supercategory];
+      this.bools[supercategory] = !bool;
+    },
     hasPassed(category) {
       if (this.user[category]) {
         return this.user[category]['passed'];
