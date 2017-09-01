@@ -30,7 +30,7 @@ export default {
   data() {
     var user = UserService.getUser();
     var quizzes = new Object();
-    quizzes['math'] = ['algebra', 'geometry', 'trigonometry', 'precalculus'];
+    quizzes['math'] = ['algebra', 'geometry', 'trigonometry', 'precalculus', 'calculus'];
     quizzes['esl'] = ['esl'];
     var bools = new Object();
     bools['math'] = false;
