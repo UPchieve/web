@@ -19,9 +19,21 @@
         <div class="col-lg-6">
           <h2>Get started!</h2>
           <p>Our volunteers are here to help you.</p>
-          <router-link to="/session/math" class="btn btn-lg btn-block">Get Math Tutoring</router-link>
-          <router-link to="/session/college" class="btn btn-lg btn-block">Get College Admissions Advice</router-link>
-          <router-link to="/schedule" class="btn btn-lg btn-block">Schedule an Admissions Consulting Session</router-link>
+          <button class="btn getHelp" @click.prevent="getHelp()">Get help from a tutor!</button>
+          <div class="getHelpPopUp" v-bind:style="popUpStyle" v-if="showHelpPopUp">
+            <span>Select a help topic.</span>
+            <select class="form-control topic" v-model="pickedTopic">
+              <option value="math">Math</option>
+              <option value="college">College Counseling</option>
+            </select>
+            <select class="form-control subtopic" v-model="pickedSubtopic">
+              <option v-for="subtopic in subtopics[pickedTopic]">{{ subtopic }}</option>
+            </select>
+            <div class="helpBtns">
+              <button class="btn helpCancel" type="cancel" @click.prevent="getHelpCancel()" v-if="showHelpPopUp">Cancel</button>
+              <button class="btn helpNext" type="next" @click.prevent="getHelpNext()" v-if="showHelpPopUp">Get help</button>
+            </div>
+          </div>
         </div>
       </div>
       <div class="disclaimer row">
@@ -60,11 +72,54 @@ export default {
   },
   data() {
     let user = UserService.getUser() || {};
+    var subtopics = new Object();
+    subtopics['math'] = ['Algebra', 'Geometry', 'Trigonometry', 'Precalculus', 'Calculus'];
+    subtopics['esl'] = ['ESL'];
+    subtopics['college'] = ['General help'];
     return {
       user: user,
-      name: user.firstname || 'student'
+      name: user.firstname || 'student',
+      popUpStyle: { },
+      showHelpPopUp: false,
+      pickedTopic: '',
+      pickedSubtopic: '',
+      subtopics: subtopics
     }
   },
+  methods: {
+    getHelp() {
+      this.popUpStyle = {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '500px',
+        height: '300px',
+        background: '#FFFFFF',
+        zIndex: '5',
+        position: 'fixed',
+        top: '0',
+        bottom: '0',
+        left: '0',
+        right: '0',
+        margin: 'auto'
+      };
+      this.showHelpPopUp = true;
+    },
+    capitalize(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    },
+    getHelpCancel() {
+      this.popUpStyle = { };
+      this.showHelpPopUp = false;
+    },
+    getHelpNext() {
+      var topic = this.pickedTopic;
+      topic = topic.toLowerCase();
+      var linkName = '/session/' + topic;
+      this.$router.push(linkName);
+    }
+  }
 }
 </script>
 
@@ -148,4 +203,22 @@ h3 {
 .btn:hover {
   background-color: #16D2AA;
 }
+
+.form-control {
+  width: 300px;
+  margin-bottom: 20px;
+}
+
+.getHelpPopUp span {
+  margin-bottom: 20px;
+}
+
+.helpBtns {
+  display: flex;
+}
+
+.helpCancel, .helpNext {
+  margin: 0 20px;
+}
+
 </style>
