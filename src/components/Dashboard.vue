@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard">
+  <div class="dashboard" v-bind:style="coverStyle">
     <div class="header-container">
       <div class="header">
         <h1>Welcome,<br />{{name}}.</h1>
@@ -34,10 +34,10 @@
               <button class="btn helpNext" type="next" @click.prevent="getHelpNext()" v-if="showHelpPopUp">Get help</button>
             </div>
           </div>
+          <div class="disclaimer row">
+            <p><h3> Disclaimer:</h3> The UPchieve team will do its best to screen and train all volunteers prior to allowing them to work with students. (To learn more about how we screen and train volunteers please visit the <a href="http://www.upchieve.org/faq" target="_blank" > “FAQ” </a> section of our website). However, we lack the necessary resources to adequately vet all volunteers and make no representations regarding the intentions or capabilities of any such volunteers. Consequently, UPchieve assumes no responsibility for the actions of volunteers. The UPchieve team strongly encourages students to follow Internet safety practices at all times. In particular, students should not share personal or identifying information with volunteers. (For more information on recommended  Internet safety practices for teens, please refer to <a href="http://teens.webmd.com/features/teen-internet-safety-tips" target="_blank" > this WebMD article. </a></p>
+          </div>
         </div>
-      </div>
-      <div class="disclaimer row">
-        <p><h3> Disclaimer:</h3> The UPchieve team will do its best to screen and train all volunteers prior to allowing them to work with students. (To learn more about how we screen and train volunteers please visit the <a href="http://www.upchieve.org/faq" target="_blank" > “FAQ” </a> section of our website). However, we lack the necessary resources to adequately vet all volunteers and make no representations regarding the intentions or capabilities of any such volunteers. Consequently, UPchieve assumes no responsibility for the actions of volunteers. The UPchieve team strongly encourages students to follow Internet safety practices at all times. In particular, students should not share personal or identifying information with volunteers. (For more information on recommended  Internet safety practices for teens, please refer to <a href="http://teens.webmd.com/features/teen-internet-safety-tips" target="_blank" > this WebMD article. </a></p>
       </div>
     </template>
     <template v-else>
@@ -83,7 +83,8 @@ export default {
       showHelpPopUp: false,
       pickedTopic: '',
       pickedSubtopic: '',
-      subtopics: subtopics
+      subtopics: subtopics,
+      coverStyle: { }
     }
   },
   methods: {
@@ -104,6 +105,9 @@ export default {
         right: '0',
         margin: 'auto'
       };
+      this.coverStyle = {
+        background: 'rgba(0,0,0,0.10)'
+      };
       this.showHelpPopUp = true;
     },
     capitalize(string) {
@@ -111,6 +115,7 @@ export default {
     },
     getHelpCancel() {
       this.popUpStyle = { };
+      this.coverStyle = { };
       this.showHelpPopUp = false;
     },
     getHelpNext() {
@@ -162,12 +167,18 @@ h3 {
   text-weight: bold;
 }
 
+.col-lg-6 {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
 .dashboard-body {
   padding: 20px 30px;
 }
 
 .disclaimer {
-  padding: 25px 100px;
+  padding: 0 20px;
 }
 
 .dashboard-body h2 {
@@ -184,8 +195,6 @@ h3 {
 }
 
 .video {
-  width: 450px;
-  height: 264px;
   background-color: #EEEEEE;
 }
 
