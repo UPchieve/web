@@ -16,6 +16,7 @@
         <router-link to="/schedule" tag="li"><a class="schedule icon">Schedule a Session</a></router-link>
       </template>
       <router-link to="/resources" tag="li"><a class="resources icon">Resources</a></router-link>
+      <router-link to="/calendar" tag="li"><a class="calendar icon">Calendar</a></router-link>
     </ul>
   </div>
 </template>
