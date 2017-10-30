@@ -34,7 +34,6 @@ export default {
 <style scoped>
 .navbar-nav {
   width: 100%;
-  margin-top: 38px;
 }
 
 ul {

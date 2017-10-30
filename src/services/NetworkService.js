@@ -48,4 +48,14 @@ export default {
   checkSession(context, data){
     return context.$http.post(`${API_ROOT}/session/check`, data).then(this._successHandler, this._errorHandler)
   },
+
+  initAvailability(context, data){
+    return context.$http.post(`${API_ROOT}/calendar/init`, data).then(this._successHandler, this._errorHandler)
+  },
+  getAvailability(context, data){
+    return context.$http.post(`${API_ROOT}/calendar/get`, data).then(this._successHandler, this._errorHandler)
+  },
+  updateAvailability(context, data){
+    return context.$http.post(`${API_ROOT}/calendar/save`, data).then(this._successHandler, this._errorHandler)
+  }
 }
