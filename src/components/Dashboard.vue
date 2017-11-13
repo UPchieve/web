@@ -72,10 +72,11 @@ export default {
   },
   data() {
     let user = UserService.getUser() || {};
-    var subtopics = new Object();
-    subtopics['math'] = ['Algebra', 'Geometry', 'Trigonometry', 'Precalculus', 'Calculus'];
-    subtopics['esl'] = ['ESL'];
-    subtopics['college'] = ['General help'];
+    var subtopics = {
+      'math': ['Algebra', 'Geometry', 'Trigonometry', 'Precalculus', 'Calculus'],
+      'esl': ['ESL'],
+      'college': ['General help']
+    };
     return {
       user: user,
       name: user.firstname || 'student',
@@ -90,20 +91,7 @@ export default {
   methods: {
     getHelp() {
       this.popUpStyle = {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '500px',
-        height: '300px',
-        background: '#FFFFFF',
-        zIndex: '5',
-        position: 'fixed',
-        top: '0',
-        bottom: '0',
-        left: '0',
-        right: '0',
-        margin: 'auto'
+        display: 'flex'
       };
       this.coverStyle = {
         background: 'rgba(0,0,0,0.10)'
@@ -216,6 +204,23 @@ h3 {
 .form-control {
   width: 300px;
   margin-bottom: 20px;
+}
+
+.getHelpPopUp {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 500px;
+  height: 300px;
+  background: #FFFFFF;
+  z-index: 5;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
 }
 
 .getHelpPopUp span {
