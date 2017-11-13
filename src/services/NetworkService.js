@@ -49,6 +49,12 @@ export default {
     return context.$http.post(`${API_ROOT}/session/check`, data).then(this._successHandler, this._errorHandler)
   },
 
+  getQuestions(context, data){
+    return context.$http.post(`${API_ROOT}/training/questions`, data).then(this._successHandler, this._errorHandler)
+  },
+  getQuizScore(context, data){
+    return context.$http.post(`${API_ROOT}/training/score`, data).then(this._successHandler, this._errorHandler)
+  },
   initAvailability(context, data){
     return context.$http.post(`${API_ROOT}/calendar/init`, data).then(this._successHandler, this._errorHandler)
   },
