@@ -28,6 +28,8 @@ import Upload from './components/Upload'
 import Training from './components/Training'
 import Quiz from './components/Quiz'
 import Review from './components/Review'
+import Profile from './components/Profile'
+import Calendar from './components/Calendar'
 
 import AuthService from './services/AuthService'
 import OnboardingService from './services/OnboardingService'
@@ -56,10 +58,11 @@ const routes = [
   { path: '/feedback', component: Feedback, meta: { protected: true } },
   { path: '/action/:action/:data?', component: Action, meta: { bypassOnboarding: true } },
   { path: '/onboarding/:step?', component: Onboarding, meta: { protected: true } },
-  { path: '/profile', redirect: '/onboarding/profile' },
   { path: '/training', component: Training, meta: { protected: true } },
   { path: '/training/:category/quiz', component: Quiz, meta: { protected: true } },
   { path: '/training/:category/review', component: Review, meta: { protected: true } }
+  { path: '/profile', component: Profile, meta: { protected: true } }
+  { path: '/calendar', component: Calendar }
 ]
 
 const router = new VueRouter({
