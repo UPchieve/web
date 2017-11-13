@@ -60,8 +60,8 @@ const routes = [
   { path: '/onboarding/:step?', component: Onboarding, meta: { protected: true } },
   { path: '/training', component: Training, meta: { protected: true } },
   { path: '/training/:category/quiz', component: Quiz, meta: { protected: true } },
-  { path: '/training/:category/review', component: Review, meta: { protected: true } }
-  { path: '/profile', component: Profile, meta: { protected: true } }
+  { path: '/training/:category/review', component: Review, meta: { protected: true } },
+  { path: '/profile', component: Profile, meta: { protected: true } },
   { path: '/calendar', component: Calendar }
 ]
 
