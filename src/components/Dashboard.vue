@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard">
+  <div class="dashboard" v-bind:style="coverStyle">
     <div class="header-container">
       <div class="header">
         <h1>Welcome,<br />{{name}}.</h1>
@@ -19,13 +19,25 @@
         <div class="col-lg-6">
           <h2>Get started!</h2>
           <p>Our volunteers are here to help you.</p>
-          <router-link to="/session/math" class="btn btn-lg btn-block">Get Math Tutoring</router-link>
-          <router-link to="/session/college" class="btn btn-lg btn-block">Get College Admissions Advice</router-link>
-          <router-link to="/schedule" class="btn btn-lg btn-block">Schedule an Admissions Consulting Session</router-link>
+          <button class="btn getHelp" @click.prevent="getHelp()">Get help from a tutor!</button>
+          <div class="getHelpPopUp" v-bind:style="popUpStyle" v-if="showHelpPopUp">
+            <span>Select a help topic.</span>
+            <select class="form-control topic" v-model="pickedTopic">
+              <option value="math">Math</option>
+              <option value="college">College Counseling</option>
+            </select>
+            <select class="form-control subtopic" v-model="pickedSubtopic">
+              <option v-for="subtopic in subtopics[pickedTopic]">{{ subtopic }}</option>
+            </select>
+            <div class="helpBtns">
+              <button class="btn helpCancel" type="cancel" @click.prevent="getHelpCancel()" v-if="showHelpPopUp">Cancel</button>
+              <button class="btn helpNext" type="next" @click.prevent="getHelpNext()" v-if="showHelpPopUp">Get help</button>
+            </div>
+          </div>
+          <div class="disclaimer row">
+            <p><h3> Disclaimer:</h3> The UPchieve team will do its best to screen and train all volunteers prior to allowing them to work with students. (To learn more about how we screen and train volunteers please visit the <a href="http://www.upchieve.org/faq" target="_blank" > “FAQ” </a> section of our website). However, we lack the necessary resources to adequately vet all volunteers and make no representations regarding the intentions or capabilities of any such volunteers. Consequently, UPchieve assumes no responsibility for the actions of volunteers. The UPchieve team strongly encourages students to follow Internet safety practices at all times. In particular, students should not share personal or identifying information with volunteers. (For more information on recommended  Internet safety practices for teens, please refer to <a href="http://teens.webmd.com/features/teen-internet-safety-tips" target="_blank" > this WebMD article. </a></p>
+          </div>
         </div>
-      </div>
-      <div class="disclaimer row">
-        <p><h3> Disclaimer:</h3> The UPchieve team will do its best to screen and train all volunteers prior to allowing them to work with students. (To learn more about how we screen and train volunteers please visit the <a href="http://www.upchieve.org/faq" target="_blank" > “FAQ” </a> section of our website). However, we lack the necessary resources to adequately vet all volunteers and make no representations regarding the intentions or capabilities of any such volunteers. Consequently, UPchieve assumes no responsibility for the actions of volunteers. The UPchieve team strongly encourages students to follow Internet safety practices at all times. In particular, students should not share personal or identifying information with volunteers. (For more information on recommended  Internet safety practices for teens, please refer to <a href="http://teens.webmd.com/features/teen-internet-safety-tips" target="_blank" > this WebMD article. </a></p>
       </div>
     </template>
     <template v-else>
@@ -60,11 +72,47 @@ export default {
   },
   data() {
     let user = UserService.getUser() || {};
+    var subtopics = {
+      'math': ['Algebra', 'Geometry', 'Trigonometry', 'Precalculus', 'Calculus'],
+      'esl': ['ESL'],
+      'college': ['General help']
+    };
     return {
       user: user,
-      name: user.firstname || 'student'
+      name: user.firstname || 'student',
+      popUpStyle: { },
+      showHelpPopUp: false,
+      pickedTopic: '',
+      pickedSubtopic: '',
+      subtopics: subtopics,
+      coverStyle: { }
     }
   },
+  methods: {
+    getHelp() {
+      this.popUpStyle = {
+        display: 'flex'
+      };
+      this.coverStyle = {
+        background: 'rgba(0,0,0,0.10)'
+      };
+      this.showHelpPopUp = true;
+    },
+    capitalize(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    },
+    getHelpCancel() {
+      this.popUpStyle = { };
+      this.coverStyle = { };
+      this.showHelpPopUp = false;
+    },
+    getHelpNext() {
+      var topic = this.pickedTopic;
+      topic = topic.toLowerCase();
+      var linkName = '/session/' + topic;
+      this.$router.push(linkName);
+    }
+  }
 }
 </script>
 
@@ -107,12 +155,18 @@ h3 {
   text-weight: bold;
 }
 
+.col-lg-6 {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
 .dashboard-body {
   padding: 20px 30px;
 }
 
 .disclaimer {
-  padding: 25px 100px;
+  padding: 0 20px;
 }
 
 .dashboard-body h2 {
@@ -129,8 +183,6 @@ h3 {
 }
 
 .video {
-  width: 450px;
-  height: 264px;
   background-color: #EEEEEE;
 }
 
@@ -148,4 +200,39 @@ h3 {
 .btn:hover {
   background-color: #16D2AA;
 }
+
+.form-control {
+  width: 300px;
+  margin-bottom: 20px;
+}
+
+.getHelpPopUp {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 500px;
+  height: 300px;
+  background: #FFFFFF;
+  z-index: 5;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+
+.getHelpPopUp span {
+  margin-bottom: 20px;
+}
+
+.helpBtns {
+  display: flex;
+}
+
+.helpCancel, .helpNext {
+  margin: 0 20px;
+}
+
 </style>
