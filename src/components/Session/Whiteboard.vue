@@ -6,11 +6,11 @@
           <button class='whiteboardBtn' id='drawButton' v-on:click="drawSetup"></button>
           <button class='whiteboardBtn' id='eraseButton' v-on:click="erase"></button>
           <button class='whiteboardBtn' id='undoButton' v-on:click="undo"></button>
-          <!-- <button id='textButton' v-on:click="text"></button> -->
+          <!-- <button class='whiteboardBtn' id='textButton' v-on:click="text"></button> -->
           <button class='whiteboardBtn' id='clearButton' v-on:click="clear" ></button>
           <div>
             <button class='whiteboardBtn' id='openColorsButton' v-on:click="openColors" ></button>
-            <div class="toolset col-md-6 colorContainer" v-if="showColors">
+            <div class="toolset col-md-6 colorContainer" v-bind:style="{ visibility: showColors }">
               <button class='colorButton whiteboardBtn' v-on:click="changeColor" style='background-color:rgba(244,71,71,1);'></button>
               <button class='colorButton whiteboardBtn' v-on:click="changeColor" style='background-color:rgba(255,208,115,.6);'></button>
               <button class='colorButton whiteboardBtn' v-on:click="changeColor"  style='background-color:rgba(22,210,170,.6);'></button>
@@ -23,6 +23,7 @@
             </div>
           </div>
         </div>
+
     </div>
   </div>
 </template>
@@ -85,6 +86,8 @@ var imageList = [];
 var imageData;
 var App = {};
 
+
+
 var RESET_SCREEN_EVENT = 'reset';
 
 function compareImages(img1,img2){
@@ -111,7 +114,7 @@ export default {
   data(){
     return {
       currentSession: SessionService.currentSession,
-      showColors: false
+      showColors: 'hidden'
     }
   },
   directives: {
@@ -486,7 +489,11 @@ export default {
       App.ctx.fillText(input, TEXT_POSITION_X, TEXT_POSITION_Y);
     },
     openColors() {
-      this.showColors = !this.showColors;
+      if (this.showColors == 'hidden') {
+        this.showColors = 'visible';
+      } else {
+        this.showColors = 'hidden';
+      }
     }
   },
   sockets: {
@@ -619,9 +626,6 @@ canvas {
 
 #clearButton {
   background-image: url('../../assets/new_page.png');
-}
-
-#openColorsButton {
 }
 
 </style>
