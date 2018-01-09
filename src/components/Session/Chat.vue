@@ -9,10 +9,10 @@
               <div class="name">
 								{{message.name}}
 							</div>
-							<div class="time">
+							{{message.contents}}
+              <div class="time">
 								{{message.time}}
 							</div>
-							{{message.contents}}
 						</div>
 					</div>
 				</template>

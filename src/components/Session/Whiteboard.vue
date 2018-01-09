@@ -8,7 +8,7 @@
           <button class='whiteboardBtn' id='undoButton' v-on:click="undo"></button>
           <!-- <button class='whiteboardBtn' id='textButton' v-on:click="text"></button> -->
           <button class='whiteboardBtn' id='clearButton' v-on:click="clear" ></button>
-          <div>
+          <div class="colorWrapper">
             <button class='whiteboardBtn' id='openColorsButton' v-on:click="openColors" ></button>
             <div class="toolset col-md-6 colorContainer" v-bind:style="{ visibility: showColors }">
               <button class='colorButton whiteboardBtn' v-on:click="changeColor" style='background-color:rgba(244,71,71,1);'></button>
@@ -592,9 +592,12 @@ canvas {
 .colorContainer {
   position: absolute;
   bottom: 125%;
-  height: 100%;
-  width: 100%;
-  padding: 0px;
+  height: 60px;
+  width: 285px;
+  padding: 0px 10px;
+  background-color: rgb(238, 238, 238);
+  border-radius: 5px;
+  z-index: 1;
 }
 
 .whiteboardBtn {
@@ -606,6 +609,10 @@ canvas {
   background-repeat: no-repeat;
   background-position: center;
   background-color: rgba(52,52,64,.6);
+}
+
+.colorButton {
+  margin:10px 2px;
 }
 
 #eraseButton {
