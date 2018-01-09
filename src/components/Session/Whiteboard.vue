@@ -3,22 +3,25 @@
       <canvas id='whiteboardCanvas' v-canvas v-on:mousedown="drawStart" v-on:mouseup="drawEnd" v-on:mousemove="draw"></canvas>
       <div class="whiteboardTools row" style="background-color:rgba(238,238,238,1)">
         <div class="toolset col-md-6">
-          <button id='drawButton' v-on:click="drawSetup"></button>
-          <button id='eraseButton' v-on:click="erase"></button>
-          <button id='undoButton' v-on:click="undo"></button>
+          <button class='whiteboardBtn' id='drawButton' v-on:click="drawSetup"></button>
+          <button class='whiteboardBtn' id='eraseButton' v-on:click="erase"></button>
+          <button class='whiteboardBtn' id='undoButton' v-on:click="undo"></button>
           <!-- <button id='textButton' v-on:click="text"></button> -->
-          <button id='clearButton' v-on:click="clear" ></button>
-        </div>
-        <div class="toolset col-md-6">
-          <button class='colorButton' v-on:click="changeColor" style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(244,71,71,1);'></button>
-          <button class='colorButton' v-on:click="changeColor" style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(255,208,115,.6);'></button>
-          <button class='colorButton' v-on:click="changeColor"  style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(22,210,170,.6);'></button>
-          <button class='colorButton' v-on:click="changeColor"  style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(24,85,209,.6);'></button>
-          <button class='colorButton' v-on:click="changeColor"  style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(52,52,64,.6);'></button>
-          <button class='colorButton' v-on:click="changeColor"  style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(38,51,104,1);'></button>
+          <button class='whiteboardBtn' id='clearButton' v-on:click="clear" ></button>
+          <div>
+            <button class='whiteboardBtn' id='openColorsButton' v-on:click="openColors" ></button>
+            <div class="toolset col-md-6 colorContainer" v-if="showColors">
+              <button class='colorButton whiteboardBtn' v-on:click="changeColor" style='background-color:rgba(244,71,71,1);'></button>
+              <button class='colorButton whiteboardBtn' v-on:click="changeColor" style='background-color:rgba(255,208,115,.6);'></button>
+              <button class='colorButton whiteboardBtn' v-on:click="changeColor"  style='background-color:rgba(22,210,170,.6);'></button>
+              <button class='colorButton whiteboardBtn' v-on:click="changeColor"  style='background-color:rgba(24,85,209,.6);'></button>
+              <button class='colorButton whiteboardBtn' v-on:click="changeColor"  style='background-color:rgba(52,52,64,.6);'></button>
+              <button class='colorButton whiteboardBtn' v-on:click="changeColor"  style='background-color:rgba(38,51,104,1);'></button>
 
 
-          <textarea id='textInputBox' v-on:input="textBox" v-on:keydown="keydown" v-on:keyup.enter="hideBox" rows='4' cols='50' style='visibility:hidden' placeholder='Type Here'></textarea>
+              <textarea id='textInputBox' v-on:input="textBox" v-on:keydown="keydown" v-on:keyup.enter="hideBox" rows='4' cols='50' style='visibility:hidden' placeholder='Type Here'></textarea>
+            </div>
+          </div>
         </div>
     </div>
   </div>
@@ -82,8 +85,6 @@ var imageList = [];
 var imageData;
 var App = {};
 
-
-
 var RESET_SCREEN_EVENT = 'reset';
 
 function compareImages(img1,img2){
@@ -109,7 +110,8 @@ function saveImage(canvas, ctx) {
 export default {
   data(){
     return {
-      currentSession: SessionService.currentSession
+      currentSession: SessionService.currentSession,
+      showColors: false
     }
   },
   directives: {
@@ -286,7 +288,7 @@ export default {
           });
         }
       }
-      
+
     },
     drawEnd: function(event) {
       if (!SERVER_DRAWING){
@@ -309,7 +311,7 @@ export default {
         this.emitSaveImage();
         this.emitEnd();
       }
-        
+
     },
     draw: function(e) {
       if (!SERVER_DRAWING){
@@ -333,7 +335,7 @@ export default {
 
           }
       }
-      
+
     },
     drawSetup: function() {
       App.ctx.strokeStyle = LOCAL_LINE_COLOR;
@@ -482,6 +484,9 @@ export default {
 
       }
       App.ctx.fillText(input, TEXT_POSITION_X, TEXT_POSITION_Y);
+    },
+    openColors() {
+      this.showColors = !this.showColors;
     }
   },
   sockets: {
@@ -574,67 +579,49 @@ canvas {
 }
 
 .whiteboardTools .toolset {
+  display: flex;
+}
 
+.colorContainer {
+  position: absolute;
+  bottom: 125%;
+  height: 100%;
+  width: 100%;
+  padding: 0px;
+}
+
+.whiteboardBtn {
+  height:36px;
+  width:36px;
+  padding:20px;
+  border:none;
+  margin:2px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: rgba(52,52,64,.6);
 }
 
 #eraseButton {
-  height:36px;
-  width:36px;
-  background-color: rgba(52,52,64,.6);
   background-image: url('../../assets/eraser_icon.png');
-  padding:0px;
-  border:none;
-  margin:0px;
-  background-repeat: no-repeat;
-  background-position: center;
 }
 
 #drawButton {
-  height:36px;
-  width:36px;
-  background-color: rgba(52,52,64,.6);
   background-image: url('../../assets/pen_icon.png');
-  padding:0px;
-  margin:0px;
-  border:none;
-  background-repeat: no-repeat;
-  background-position: center;
 }
 
 #undoButton {
-  height:36px;
-  width:36px;
-  border:none;
-  background-color: rgba(52,52,64,.6);
   background-image: url('../../assets/undo.png');
-  padding:0px;
-  margin:0px;
-  background-repeat: no-repeat;
-  background-position: center;
 }
 
 #textButton {
-  height:36px;
-  width:36px;
-  border:none;
-  background-color: rgba(52,52,64,.6);
   background-image: url('../../assets/Aa.png');
-  padding:0px;
-  margin:0px;
-  background-repeat: no-repeat;
-  background-position: center;
 }
 
 #clearButton {
-  height:36px;
-  width:36px;
-  border:none;
-  background-color: rgba(52,52,64,.6);
   background-image: url('../../assets/new_page.png');
-  padding:0px;
-  margin:0px;
-  background-position: center;
-  background-repeat: no-repeat;
+}
+
+#openColorsButton {
 }
 
 </style>
