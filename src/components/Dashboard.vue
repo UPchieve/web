@@ -1,25 +1,21 @@
 <template>
   <div class="dashboard" v-bind:style="coverStyle">
     <div class="header-container">
-      <div class="header">
-        <h1>Welcome,<br />{{name}}.</h1>
-      </div>
+      <h1>Welcome,<br />{{name}}.</h1>
     </div>
 
     <template v-if="!user.isVolunteer">
       <div class="dashboard-body row">
-        <div class="col-lg-6">
-          <h2>New to UPchieve?</h2>
-          <p>Watch the video to learn how to use our services.</p>
+        <div class="col-lg-6 video">
+          <p><span class="intro_bold">New to UPchieve?</span>Watch the video to learn how to use our services.</p>
           <div class="video">
           <iframe width="500" height="300" src="https://www.youtube.com/embed/UOFFF5hOwdM" frameborder="0" allowfullscreen></iframe>
           </div>
         </div>
 
-        <div class="col-lg-6">
-          <h2>Get started!</h2>
-          <p>Our volunteers are here to help you.</p>
-          <button class="btn getHelp" @click.prevent="getHelp()">Get help from a tutor!</button>
+        <div class="col-lg-6 help">
+          <h2>You can get help from an Academic Coach.</h2>
+          <button class="btn getHelp" @click.prevent="getHelp()">Get help now</button>
           <div class="getHelpPopUp" v-bind:style="popUpStyle" v-if="showHelpPopUp">
             <span>Select a help topic.</span>
             <select class="form-control topic" v-model="pickedTopic">
@@ -34,17 +30,18 @@
               <button class="btn helpNext" type="next" @click.prevent="getHelpNext()" v-if="showHelpPopUp">Get help</button>
             </div>
           </div>
-          <div class="disclaimer row">
-            <p><h3> Disclaimer:</h3> The UPchieve team will do its best to screen and train all volunteers prior to allowing them to work with students. (To learn more about how we screen and train volunteers please visit the <a href="http://www.upchieve.org/faq" target="_blank" > “FAQ” </a> section of our website). However, we lack the necessary resources to adequately vet all volunteers and make no representations regarding the intentions or capabilities of any such volunteers. Consequently, UPchieve assumes no responsibility for the actions of volunteers. The UPchieve team strongly encourages students to follow Internet safety practices at all times. In particular, students should not share personal or identifying information with volunteers. (For more information on recommended  Internet safety practices for teens, please refer to <a href="http://teens.webmd.com/features/teen-internet-safety-tips" target="_blank" > this WebMD article. </a></p>
-          </div>
+            <div class="disclaimer row">Disclaimer: UPchieve assumes no
+            responsibility for the actions of its volunteers and strongly
+            encourages students to follow internet safety practices at all times.
+            In particular, please do not share personal or identifying information
+            with volunteers.</div>
         </div>
       </div>
     </template>
     <template v-else>
       <div class="dashboard-body row">
-        <div class="col-lg-6">
-          <h2>New to UPchieve?</h2>
-          <p>Watch the video to learn how to use our services.</p>
+        <div class="col-lg-6 video">
+          <p><strong>New to UPchieve? </strong>Watch the video to learn how to use our services.</p>
           <div class="video">
           <iframe width="500" height="300" src="https://www.youtube.com/embed/TfjsjukrnB8" frameborder="0" allowfullscreen></iframe>
           </div>
@@ -123,32 +120,38 @@ export default {
   position: relative;
 }
 
+.col-xs-12 {
+  width: inherit;
+}
+
 .header-container::after {
   content: "";
-  z-index: 2;
   display: inline-block;;
-  width: 451px;
-  height: 232px;
+  width: 100%;
+  height: 100%;
   background-image: url('../assets/dashboardHeader@2x.png');
-  background-size: 451px 232px;
   position: absolute;
   bottom: 0px;
   right: 0;
 }
 
-.header {
-  height: 210px;
-  background-color: #64E1C6;
-  padding-top: 83px;
-  padding-left: 45px;
+.header-container {
+  height: 50%;
 }
 
 h1 {
   margin: 0;
-  text-align: left;
+  text-align: center;
   font-size: 36px;
   line-height: 42px;
   font-weight: 400;
+  z-index: 10;
+  color: white;
+}
+
+h2 {
+  text-align: center;
+  margin: 20px;
 }
 
 h3 {
@@ -157,22 +160,45 @@ h3 {
 
 .col-lg-6 {
   display: flex;
-  align-items: center;
   flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 0;
+}
+
+.col-lg-6.help {
+  background-color: #E3F2FD;
+}
+
+.col-lg-6 p {
+  padding: 40px 0 0 20px;
+
+}
+
+.video {
+  margin: 0 5px;
+}
+
+.dashboard {
+  height: inherit;
 }
 
 .dashboard-body {
-  padding: 20px 30px;
+  display: flex;
+  width: 100%;
+  height: 50%;
+  margin: 0;
 }
 
 .disclaimer {
   padding: 0 20px;
+  font-size: 12px;
+  margin: 20px;
 }
 
 .dashboard-body h2 {
   font-size: 24px;
   font-weight: 600;
-  text-align: left;
 }
 
 .dashboard-body p {
@@ -182,8 +208,9 @@ h3 {
   text-align: left;
 }
 
-.video {
-  background-color: #EEEEEE;
+.col-lg-6.video {
+  background-color: white;
+  margin: 0 20px;
 }
 
 .btn {
@@ -233,6 +260,11 @@ h3 {
 
 .helpCancel, .helpNext {
   margin: 0 20px;
+}
+
+.intro_bold {
+  font-weight: 600;
+  margin-right: 4px;
 }
 
 </style>
