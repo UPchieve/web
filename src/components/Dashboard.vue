@@ -14,27 +14,29 @@
         </div>
 
         <div class="col-lg-6 help">
-          <h2>You can get help from an Academic Coach.</h2>
-          <button class="btn getHelp" @click.prevent="getHelp()">Get help now</button>
-          <div class="getHelpPopUp" v-bind:style="popUpStyle" v-if="showHelpPopUp">
-            <span>Select a help topic.</span>
-            <select class="form-control topic" v-model="pickedTopic">
-              <option value="math">Math</option>
-              <option value="college">College Counseling</option>
-            </select>
-            <select class="form-control subtopic" v-model="pickedSubtopic">
-              <option v-for="subtopic in subtopics[pickedTopic]">{{ subtopic }}</option>
-            </select>
-            <div class="helpBtns">
-              <button class="btn helpCancel" type="cancel" @click.prevent="getHelpCancel()" v-if="showHelpPopUp">Cancel</button>
-              <button class="btn helpNext" type="next" @click.prevent="getHelpNext()" v-if="showHelpPopUp">Get help</button>
+          <div class = "help-container">
+            <h2>You can get help from an Academic Coach.</h2>
+            <button class="btn getHelp" @click.prevent="getHelp()">Get help now</button>
+            <div class="getHelpPopUp" v-bind:style="popUpStyle" v-if="showHelpPopUp">
+              <span>Select a help topic.</span>
+              <select class="form-control topic" v-model="pickedTopic">
+                <option value="math">Math</option>
+                <option value="college">College Counseling</option>
+              </select>
+              <select class="form-control subtopic" v-model="pickedSubtopic">
+                <option v-for="subtopic in subtopics[pickedTopic]">{{ subtopic }}</option>
+              </select>
+              <div class="helpBtns">
+                <button class="btn helpCancel" type="cancel" @click.prevent="getHelpCancel()" v-if="showHelpPopUp">Cancel</button>
+                <button class="btn helpNext" type="next" @click.prevent="getHelpNext()" v-if="showHelpPopUp">Get help</button>
+              </div>
             </div>
+              <div class="disclaimer row">Disclaimer: UPchieve assumes no
+              responsibility for the actions of its volunteers and strongly
+              encourages students to follow internet safety practices at all times.
+              In particular, please do not share personal or identifying information
+              with volunteers.</div>
           </div>
-            <div class="disclaimer row">Disclaimer: UPchieve assumes no
-            responsibility for the actions of its volunteers and strongly
-            encourages students to follow internet safety practices at all times.
-            In particular, please do not share personal or identifying information
-            with volunteers.</div>
         </div>
       </div>
     </template>
@@ -260,6 +262,10 @@ h3 {
 
 .helpCancel, .helpNext {
   margin: 0 20px;
+}
+
+.help-container {
+  width: 400px;
 }
 
 .intro_bold {
