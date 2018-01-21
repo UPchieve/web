@@ -1,15 +1,14 @@
 <template>
   <div class="dashboard" v-bind:style="coverStyle">
-    <div class="header-container">
-      <h1>Welcome,<br />{{name}}.</h1>
-    </div>
+    <div class="header-container"></div>
+    <h1>Welcome, {{name}}.</h1>
 
     <template v-if="!user.isVolunteer">
       <div class="dashboard-body row">
         <div class="col-lg-6 video">
           <p><span class="intro_bold">New to UPchieve?</span>Watch the video to learn how to use our services.</p>
           <div class="video">
-          <iframe width="500" height="300" src="https://www.youtube.com/embed/UOFFF5hOwdM" frameborder="0" allowfullscreen></iframe>
+          <iframe width="480" height="280" src="https://www.youtube.com/embed/UOFFF5hOwdM" frameborder="0" allowfullscreen></iframe>
           </div>
         </div>
 
@@ -142,6 +141,9 @@ export default {
 }
 
 h1 {
+  position: absolute;
+  top: 20%;
+  left: 55%;
   margin: 0;
   text-align: center;
   font-size: 36px;
@@ -170,11 +172,17 @@ h3 {
 
 .col-lg-6.help {
   background-color: #E3F2FD;
+  padding: 50px 0;
+}
+
+.col-lg-6.video {
+  background-color: white;
+  margin: 0;
 }
 
 .col-lg-6 p {
-  padding: 40px 0 0 20px;
-
+  padding: 20px 0 0 20px;
+  text-align: center;
 }
 
 .video {
@@ -186,7 +194,7 @@ h3 {
 }
 
 .dashboard-body {
-  display: flex;
+  display: table;
   width: 100%;
   height: 50%;
   margin: 0;
@@ -208,11 +216,6 @@ h3 {
   font-weight: 300;
   color: #333333;
   text-align: left;
-}
-
-.col-lg-6.video {
-  background-color: white;
-  margin: 0 20px;
 }
 
 .btn {
@@ -265,7 +268,7 @@ h3 {
 }
 
 .help-container {
-  width: 400px;
+  width: 500px;
 }
 
 .intro_bold {
