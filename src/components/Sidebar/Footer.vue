@@ -47,7 +47,7 @@ li {
 }
 
 li > a {
-  color: white;
+  color: #73737A;
   padding: 2px 0;
   height: 50px;
   line-height: 50px;
@@ -72,7 +72,7 @@ li.active {
 
 li.active > a {
   font-weight: bold;
-  background-color: #263368;
+  background-color: #F6F6F6;
   margin: auto 10px;
 }
 

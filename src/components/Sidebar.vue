@@ -44,8 +44,9 @@ nav {
   border-radius: 0;
   border: none;
 
-  background-color: #263368;
-  color: white;
+  background-color: #F6F6F6;
+  color: #73737A;
+  font-weight: 600;
 }
 
 h1, h2 {

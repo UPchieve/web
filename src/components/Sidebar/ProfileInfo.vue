@@ -51,7 +51,7 @@ export default {
 
   .edit-profile {
     font-size: 12px;
-    color: white;
+    color: #73737A;
   }
 
 

@@ -75,8 +75,8 @@ export default {
 
   li > a {
     font-size: 16px;
-    font-weight: 400;
-    color: white;
+    font-weight: 600;
+    color: #73737A;
     padding: 2px 0;
     height: 50px;
     line-height: 50px;
@@ -100,7 +100,7 @@ export default {
   }
 
   li.active > a {
-      background-color: #263368;
+      background-color: #F6F6F6;
       margin: auto 10px;
   }
 
