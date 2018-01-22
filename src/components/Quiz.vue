@@ -304,8 +304,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   font-weight: 600;
-  color: #FFF;
-  background-color: #9575CD;
+  color: #343440;
 }
 
 .questionImage {
