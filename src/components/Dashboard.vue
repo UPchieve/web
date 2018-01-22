@@ -47,10 +47,12 @@
           <iframe width="500" height="300" src="https://www.youtube.com/embed/TfjsjukrnB8" frameborder="0" allowfullscreen></iframe>
           </div>
         </div>
-        <div class="col-lg-6">
-          <h2>Select a student to help</h2>
-          <p> Only students who are waiting for a volunteer will show up below.</p>
-          <list-sessions></list-sessions>
+        <div class="col-lg-6 help">
+          <div class = "help-container">
+            <h2>You are ready to help!</h2>
+            <p> Only students who are waiting for a volunteer will show up below.</p>
+            <list-sessions></list-sessions>
+          </div>
         </div>
       </div>
     </template>
@@ -269,11 +271,17 @@ h3 {
 
 .help-container {
   width: 500px;
+  height: 300px;
 }
 
 .intro_bold {
   font-weight: 600;
   margin-right: 4px;
+}
+
+.btn.getHelp {
+  border-radius: 30px;
+  width: 300px;
 }
 
 </style>
