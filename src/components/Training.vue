@@ -203,6 +203,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   font-weight: 600;
+  color: #343440;
 }
 
 .body-container {
