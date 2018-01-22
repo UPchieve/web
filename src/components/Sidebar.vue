@@ -63,10 +63,10 @@ h1 {
 h1::before {
   content: "";
   display: inline-block;;
-  width: 50px;
+  width: 100px;
   height: 50px;
-  background-image: url('../assets/logo.png');
-  background-size: 50px 50px;
+  background-image: url('../assets/logo-01.svg');
+  background-size: 100px 50px;
   top: 0;
   left: 0;
 }

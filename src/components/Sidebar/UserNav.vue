@@ -18,8 +18,9 @@
         <template v-if="user.isVolunteer">
           <router-link to="/training" tag="li"><a class="training icon">Training</a></router-link>
         </template>
+      <router-link to="/profile" tag="li"><a class="profile icon">Profile</a></router-link>
       <router-link to="/resources" tag="li"><a class="resources icon">Resources</a></router-link>
-      <router-link to="/calendar" tag="li"><a class="calendar icon">Calendar</a></router-link>
+      <router-link to="/calendar" tag="li"><a class="schedule icon">Schedule</a></router-link>
     </ul>
   </div>
 </template>
@@ -110,6 +111,8 @@ export default {
     height: 20px;
     margin-right: 10px;
     margin-left: 20px;
+    background-repeat: no-repeat;
+    color: #73737A;
   }
 
   .home.icon::before {
@@ -130,6 +133,14 @@ export default {
 
   .resources.icon::before {
     background-image: url('../../assets/resources_icon-01.svg');
+  }
+
+  .training.icon::before {
+    background-image: url('../../assets/training_icon-01.svg');
+  }
+
+  .profile.icon::before {
+    background-image: url('../../assets/profile_icon-01.svg');
   }
 
   .profile-info {

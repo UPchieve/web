@@ -90,6 +90,7 @@ a.logout {
   height: 20px;
   margin-right: 10px;
   margin-left: 20px;
+  background-repeat: no-repeat;
 }
 
 .contact.icon::before {
