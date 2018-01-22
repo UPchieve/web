@@ -1,6 +1,10 @@
 <template>
   <div v-if="user.isVolunteer && (tries < 3)" class="training-quiz" v-bind:style="coverStyle">
-    <h1 class="header" id="quiz-name">{{ quizName }} Certification Quiz</h1>
+    <div class="popUpCover" v-if="popUpBool" v-bind:style="popUpCoverStyle"></div>
+    <h1 class="header" id="quiz-name">
+      {{ quizName }} Certification Quiz
+      <router-link to="/dashboard" tag="div" class="done btn" v-if="showQuizReview">DONE</router-link>
+    </h1>
     <div class="progressBar" v-if="showProgressBar">
       <div class="circles">
         <div v-for="n in quizLength" class="circle" v-bind:id="'circle-' + n">{{ n }}</div>
@@ -29,7 +33,8 @@
         </form>
       </div>
       <div class="review" v-if="showQuizReview">
-        <div class="question" v-for="question in questionsReview">
+        <div class="question" v-for="(question, index) in questionsReview">
+          <div class="questionNumber">Question {{ index + 1 }}</div><br/>
           <div class="questionText">{{ question.questionText }}</div>
           <div class="questionImage" v-bind:style="question.imageStyle"></div>
           <div class="possibleAnswers">
@@ -40,15 +45,14 @@
         </div>
       </div>
     </div>
-    <div class="passScoreContainer" v-bind:style="popUpStyle">
+    <div class="passScoreContainer" v-bind:style="[ popUpStyle, popUpBorderStyle ]" v-if="!showQuizReview">
       <div class="passed">{{ passedMsg }}</div>
       <div class="score">{{ scoreMsg }}</div>
       <div class="btnContainer">
-        <button class="review btn" type="review" @click.prevent="review()" v-if="showReview">REVIEW MATERIALS</button>
+        <button class="reviewBtn btn" type="review" @click.prevent="review()" v-if="showReview">REVIEW TEST</button>
         <button class="prev btn" type="previous" @click.prevent="previous()" v-if="showPrevious">PREVIOUS</button>
         <button class="next btn" type="next" @click.prevent="next()" v-if="showNext">NEXT</button>
         <button class="submit btn" type="submit" @click.prevent="submit()" v-if="showSubmit">SUBMIT TEST</button>
-        <router-link to="/dashboard" tag="div" class="done btn" v-if="showDone">DONE</router-link>
         <button class="btn" @click.prevent="reload()" v-if="showRestart">RETAKE TEST</button>
       </div>
     </div>
@@ -91,6 +95,9 @@ export default {
       showRestart: false,
       imageStyle: { },
       popUpStyle: { },
+      popUpBool: false,
+      popUpCoverStyle:{ },
+      popUpBorderStyle: { },
       quizLength: 0,
       barWidth: 0,
       showProgressBar: false,
@@ -192,8 +199,22 @@ export default {
           if (data.passed) {
             this.passedMsg = 'You passed!';
             this.showDone = true;
+            this.popUpCoverStyle = {
+              backgroundColor: '#E3F2FD'
+            }
+            this.popUpBorderStyle = {
+              borderBottom: '5px solid #1855D1',
+              borderLeft: '5px solid #1855D1'
+            }
           } else {
             this.passedMsg = 'You failed.';
+            this.popUpCoverStyle = {
+              backgroundColor: '#FEEAB2'
+            }
+            this.popUpBorderStyle = {
+              borderBottom: '5px solid #F44747',
+              borderLeft: '5px solid #F44747'
+            }
             if (data.tries < 3) {
               this.showRestart = true;
             }
@@ -214,10 +235,11 @@ export default {
           position: 'absolute',
           top: '0',
           bottom: '0',
-          left: '0',
+          left: '300px',
           right: '0',
           margin: 'auto'
         };
+        this.popUpBool = true;
         this.coverStyle = {
           background: 'rgba(0,0,0,0.10)'
         };
@@ -251,7 +273,10 @@ export default {
       this.questionText = '';
       this.imageStyle = { };
       this.popUpStyle = { };
+      this.popUpBorderStyle = { };
+      this.popUpBool = false;
       this.coverStyle = { };
+      this.qNumber = '';
       this.showReview = false;
       this.showQuizReview = true;
       this.showProgressBar = false;
@@ -347,6 +372,7 @@ export default {
 
 .question {
   margin: 50px 0px;
+  text-align: left;
 }
 
 .btn.next, .btn.submit {
@@ -392,6 +418,10 @@ input[type=radio]:checked {
   margin: 50px 75px;
 }
 
+.possibleAnswers {
+  margin: 20px 50px;
+}
+
 label {
   font-weight: 400;
   display: inline;
@@ -403,6 +433,29 @@ label {
 
 .score {
   margin-top: 20px;
+}
+
+.popUpCover {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 2;
+}
+
+.passed {
+  font-weight: 600;
+  margin-top: 75px;
+}
+
+.review {
+  width: 600px;
+  align-self: center;
+}
+
+.review .question {
+  border-bottom: 0.5px solid #CCCCCF;
+  padding: 20px;
+  margin: 0px;
 }
 
 </style>

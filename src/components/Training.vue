@@ -30,7 +30,7 @@
                   <div class="test-label">Take test</div>
                   <div class="arrow right"></div>
                 </router-link>
-              <div v-if="hasPassed(category)">Passed!</div>
+              <div class="test-container certified" v-if="hasPassed(category)">Certified!</div>
               <div class="numTries">You have used {{ getTries(category) }}/3 tries.</div>
             </div>
           </div>
@@ -208,6 +208,11 @@ export default {
 
 .body-container {
   margin-left: 30px;
+}
+
+.certified {
+  color: #16D2AA;
+  font-weight: 600;
 }
 
 </style>
