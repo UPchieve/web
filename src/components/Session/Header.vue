@@ -41,7 +41,7 @@ export default {
       if (user.isVolunteer){
         return 'No student is in this session';
       } else {
-          return 'Waiting for a volunteer...';
+          return 'We are contacting our Academic Coaches for you right now - please hang tight while we try to connect you! This process can take 5-10 minutes.';
       }
     },
     partnerName(){
@@ -99,7 +99,9 @@ h1 {
 
 .info {
   padding-left: 15px;
-  color: white;
+  color: black;
+  width: 500px;
+  font-weight: 600;
 }
 
 .volunteer-name {
@@ -110,26 +112,24 @@ h1 {
   position: absolute;
   top: 30px;
   right: 30px;
-  width: 190px;
+  width: auto;
   height: 40px;
-  background-color: white;
-  color: #64E1C6;
+  color: #FFF;
   border: none;
   font-size: 16px;
   font-weight: 600;
-}
-
-.btn:hover {
   background-color: inherit;
 }
 
-.session-header.inactive {
-  background-color: #73737A;
+.btn:hover {
+  color: inherit;
 }
 
-.session-header.inactive button {
-  color: #73737A;
+.end-session .btn:hover {
+  color: #F6F6F6;
 }
+
+
 
 .upload-file .btn {
   right: 230px;

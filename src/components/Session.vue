@@ -96,11 +96,13 @@ export default {
 .whiteboard-container {
   height: 100%;
   padding: 0;
+  border-top: 25px solid #EAEAEB;
+  border-left: 25px solid #EAEAEB;
+  border-right: 25px solid #EAEAEB;
 }
 
 .chat-container {
   height: 100%;
   padding: 0;
-  border-left: 1px solid #979797;
 }
 </style>

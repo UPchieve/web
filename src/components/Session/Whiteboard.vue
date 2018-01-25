@@ -2,26 +2,28 @@
   <div class="whiteboard">
       <canvas id='whiteboardCanvas' v-canvas v-on:mousedown="drawStart" v-on:mouseup="drawEnd" v-on:mousemove="draw"></canvas>
       <div class="whiteboardTools row" style="background-color:rgba(238,238,238,1)">
+        <div class="header">Whiteboard Tools</div>
         <div class="toolset col-md-6">
-          <button class='whiteboardBtn' id='drawButton' v-on:click="drawSetup"></button>
-          <button class='whiteboardBtn' id='eraseButton' v-on:click="erase"></button>
-          <button class='whiteboardBtn' id='undoButton' v-on:click="undo"></button>
-          <!-- <button class='whiteboardBtn' id='textButton' v-on:click="text"></button> -->
           <button class='whiteboardBtn' id='clearButton' v-on:click="clear" ></button>
           <div class="colorWrapper">
             <button class='whiteboardBtn' id='openColorsButton' v-on:click="openColors" ></button>
             <div class="toolset col-md-6 colorContainer" v-bind:style="{ visibility: showColors }">
-              <button class='colorButton whiteboardBtn' v-on:click="changeColor" style='background-color:rgba(244,71,71,1);'></button>
-              <button class='colorButton whiteboardBtn' v-on:click="changeColor" style='background-color:rgba(255,208,115,.6);'></button>
-              <button class='colorButton whiteboardBtn' v-on:click="changeColor"  style='background-color:rgba(22,210,170,.6);'></button>
-              <button class='colorButton whiteboardBtn' v-on:click="changeColor"  style='background-color:rgba(24,85,209,.6);'></button>
-              <button class='colorButton whiteboardBtn' v-on:click="changeColor"  style='background-color:rgba(52,52,64,.6);'></button>
-              <button class='colorButton whiteboardBtn' v-on:click="changeColor"  style='background-color:rgba(38,51,104,1);'></button>
+              <button class='colorButton redBtn' v-on:click="changeColor"></button>
+              <button class='colorButton yellowBtn' v-on:click="changeColor"></button>
+              <button class='colorButton greenBtn' v-on:click="changeColor"></button>
+              <button class='colorButton blueBtn' v-on:click="changeColor"></button>
+              <button class='colorButton greyBtn' v-on:click="changeColor"></button>
+              <button class='colorButton navyBtn' v-on:click="changeColor"></button>
 
 
               <textarea id='textInputBox' v-on:input="textBox" v-on:keydown="keydown" v-on:keyup.enter="hideBox" rows='4' cols='50' style='visibility:hidden' placeholder='Type Here'></textarea>
             </div>
           </div>
+          <button class='whiteboardBtn' id='drawButton' v-on:click="drawSetup"></button>
+          <button class='whiteboardBtn' id='eraseButton' v-on:click="erase"></button>
+          <button class='whiteboardBtn' id='undoButton' v-on:click="undo"></button>
+          <!-- <button class='whiteboardBtn' id='textButton' v-on:click="text"></button> -->
+
         </div>
 
     </div>
@@ -581,50 +583,89 @@ canvas {
 }
 
 .whiteboardTools {
-  height: 100px;
   padding: 10px 30px;
+  width: 300px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  align-self: center;
+  flex-direction: column;
+  position: absolute;
+  bottom: 0;
 }
 
-.whiteboardTools .toolset {
+.header {
+  font-size: 12px;
+}
+
+.toolset {
   display: flex;
+  justify-content: center;
+  padding-top: 5px;
 }
 
 .colorContainer {
   position: absolute;
-  bottom: 125%;
-  height: 60px;
-  width: 285px;
-  padding: 0px 10px;
-  background-color: rgb(238, 238, 238);
+  bottom: 85%;
+  height: 30px;
+  width: 130px;
+  padding: 0px 10px 0px 15px;
+  border: 1px solid #979797;
+  background-color: #FFF;
   border-radius: 5px;
   z-index: 1;
+  align-items: center;
 }
 
 .whiteboardBtn {
-  height:36px;
-  width:36px;
-  padding:20px;
+  padding:20px 20px 20px 10px;
   border:none;
   margin:2px;
   background-repeat: no-repeat;
   background-position: center;
-  background-color: rgba(52,52,64,.6);
+  background-color: rgb(238, 238, 238);
 }
 
 .colorButton {
   margin:10px 2px;
+  height: 17px;
+  border-radius: 10px;
+}
+
+.redBtn {
+  background-color:rgba(244,71,71,1);
+}
+
+.yellowBtn {
+  background-color:rgba(255,208,115,.6);
+}
+
+.greenBtn {
+  background-color:rgba(22,210,170,.6);
+}
+
+.blueBtn {
+  background-color:rgba(24,85,209,.6);
+}
+
+.greyBtn {
+  background-color:rgba(52,52,64,.6);
+}
+
+.navyBtn {
+  background-color:rgba(38,51,104,1);
 }
 
 #eraseButton {
-  background-image: url('../../assets/eraser_icon.png');
+  background-image: url('../../assets/eraser_icon.svg');
 }
 
 #drawButton {
-  background-image: url('../../assets/pen_icon.png');
+  background-image: url('../../assets/pen_icon.svg');
 }
 
 #undoButton {
-  background-image: url('../../assets/undo.png');
+  background-image: url('../../assets/undo_icon.svg');
 }
 
 #textButton {
@@ -632,7 +673,11 @@ canvas {
 }
 
 #clearButton {
-  background-image: url('../../assets/new_page.png');
+  background-image: url('../../assets/new_page.svg');
+}
+
+#openColorsButton {
+  background-image: url('../../assets/color_icon.svg');
 }
 
 </style>

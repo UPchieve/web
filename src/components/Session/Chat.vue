@@ -1,5 +1,6 @@
 <template>
   <div class="chat">
+    <div class="header">Chat</div>
     <div class="messages-container">
 			<div class="messages">
 				<template v-for="message in messages">
@@ -91,10 +92,24 @@ export default {
 	height: 100%;
 }
 
+.header {
+  height: 40px;
+  background-color: #1855D1;
+  color: #FFF;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  padding: 13px;
+  position: absolute;
+  width: 100%;
+}
+
 .messages-container {
-	height: 100%;
+	height: calc(100% - 40px);
 	padding-bottom: 100px;
 	overflow: hidden;
+  top: 40px;
+  position: relative;
 }
 
 .messages {
