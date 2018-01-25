@@ -33,12 +33,12 @@
     <div class="section"><router-link to="resetpassword" class="prompt">Reset password</router-link></div>
   </div>
 
-  <div v-if="user.isVolunteer">
+  <div v-if="!user.isVolunteer">
     <div class="section" id="highschool">
       <div class="prompt">Your high school</div>
       <div class="answer" v-show="'highschool' !== activeEdit">{{ user.highschool }}</div>
       <input type="text" v-model="user.highschool" v-show="'highschool' === activeEdit">
-      <button @click="editField('highschool')">{{ fieldButtons.highschool }}</button>
+      <button @click="editField('highschool')" class="sectionBtn">{{ fieldButtons.highschool }}</button>
     </div>
 
     <div class="section" id="currentGrade">
@@ -51,7 +51,7 @@
         <option>Junior</option>
         <option>Senior</option>
       </select>
-      <button @click="editField('currentGrade')">{{ fieldButtons.currentGrade }}</button>
+      <button @click="editField('currentGrade')" class="sectionBtn">{{ fieldButtons.currentGrade }}</button>
     </div>
 
     <div class="section" id="expectedGraduation">
@@ -66,14 +66,14 @@
         <option>2021</option>
         <option>2022</option>
       </select>
-      <button @click="editField('expectedGraduation')">{{ fieldButtons.expectedGraduation }}</button>
+      <button @click="editField('expectedGraduation')" class="sectionBtn">{{ fieldButtons.expectedGraduation }}</button>
     </div>
 
     <div class="section" id="difficultAcademicSubject">
       <div class="prompt">Your most difficult academic subject</div>
       <input type="text" v-model="user.difficultAcademicSubject" v-show="'difficultAcademicSubject' === activeEdit">
       <div class="answer" v-show="'difficultAcademicSubject' !== activeEdit">{{ user.difficultAcademicSubject }}</div>
-      <button @click="editField('difficultAcademicSubject')">{{ fieldButtons.difficultAcademicSubject }}</button>
+      <button @click="editField('difficultAcademicSubject')" class="sectionBtn">{{ fieldButtons.difficultAcademicSubject }}</button>
     </div>
 
     <div class="section" id="difficultCollegeProcess">
@@ -105,7 +105,7 @@
           <li>{{ item }}</li>
         </ul>
       </div>
-      <div class="answer"><button @click="editField('difficultCollegeProcess')">{{ fieldButtons.difficultCollegeProcess }}</button></div>
+      <div class="answer"><button @click="editField('difficultCollegeProcess')" class="sectionBtn">{{ fieldButtons.difficultCollegeProcess }}</button></div>
     </div>
 
     <div class="section" id="hasGuidanceCounselor">
@@ -117,21 +117,21 @@
         <option>I don't know</option>
       </select>
       <div class="answer" v-show="'hasGuidanceCounselor' !== activeEdit">{{ user.hasGuidanceCounselor }}</div>
-      <button @click="editField('hasGuidanceCounselor')">{{ fieldButtons.hasGuidanceCounselor }}</button>
+      <button @click="editField('hasGuidanceCounselor')" class="sectionBtn">{{ fieldButtons.hasGuidanceCounselor }}</button>
     </div>
 
     <div class="section" id="gpa">
       <div class="prompt">Your GPA</div>
       <div class="answer" v-show="'gpa' !== activeEdit">{{ user.gpa }}</div>
       <input type="text" v-model="user.gpa" v-show="'gpa' === activeEdit">
-      <button @click="editField('gpa')">{{ fieldButtons.gpa }}</button>
+      <button @click="editField('gpa')" class="sectionBtn">{{ fieldButtons.gpa }}</button>
     </div>
 
     <div class="section" id="collegeApplicationsText">
       <div class="prompt">The colleges and universities you are considering apply to</div>
       <div class="answer" v-show="'collegeApplicationsText' !== activeEdit">{{ user.collegeApplicationsText }}</div>
       <input type="text" v-model="user.collegeApplicationsText" v-show="'collegeApplicationsText' === activeEdit">
-      <button @click="editField('collegeApplicationsText')">{{ fieldButtons.collegeApplicationsText }}</button>
+      <button @click="editField('collegeApplicationsText')" class="sectionBtn">{{ fieldButtons.collegeApplicationsText }}</button>
     </div>
   </div>
 
@@ -196,11 +196,34 @@ button {
   height: 30px;
   border-radius: 20px;
   padding: 0px 10px;
+  color: #16D2AA;
+  background-color: #F6F6F6;
+}
+
+button:active, button:hover {
+  background-color: #16D2AA;
+  color: #FFF;
+}
+
+.saveBtn {
+  font-size: 16px;
+  font-weight: 600;
+  color: #343440;
+  background-color: #FFF;
+}
+
+.saveBtn:active, .saveBtn:hover {
+  background-color: #FFF;
+  color: #16D2AA;
+  box-shadow: none;
+  margin: 0px;
 }
 
 select, input[type=text] {
   width: 200px;
   margin-right: 10px;
+  border-color: #16D2AA;
+  border-style: solid;
 }
 
 .profile {
@@ -241,11 +264,6 @@ select, input[type=text] {
 .answer {
   margin-right: 10px;
   text-align: left
-}
-
-.saveBtn {
-  font-size: 16px;
-  font-weight: 600;
 }
 
 .difficultCollegeProcessAnswer {
