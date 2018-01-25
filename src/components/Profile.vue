@@ -5,7 +5,7 @@
     <button @click="saveProfile()" class="saveBtn btn">{{ saveBtnMsg }}</button>
   </div>
   <div class="basic-info">
-    <div class="basic-info-header">Personal Information</div>
+    <div class="info-header basic">Personal Information</div>
     <div class="section" id="profilePic">
       <div class="prompt">Your profile picture</div>
       <div class="answer avatar" v-bind:style="avatarStyle">
@@ -135,6 +135,12 @@
       <button @click="editField('collegeApplicationsText')" class="sectionBtn">{{ fieldButtons.collegeApplicationsText }}</button>
     </div>
   </div>
+  <div v-if="user.isVolunteer">
+    <div class="info-header cert">Certifications</div>
+    <div class="certifications" v-for="(value, key) in certifications">
+      <div v-if="value">{{ key }}</div>
+    </div>
+  </div>
 
 </div>
 
@@ -154,6 +160,26 @@ export default {
     fieldnames.map(function(field) {
       fieldButtons[field] = 'Edit';
     });
+    var certifications = new Object();
+    if (user.algebra.passed) {
+      certifications['Math: Algebra'] = true;
+    }
+    if (user.geometry.passed) {
+      certifications['Math: Geometry'] = true;
+    }
+    if (user.trigonometry.passed) {
+      certifications['Math: Trigonometry'] = true;
+    }
+    if (user.precalculus.passed) {
+      certifications['Math: Precalculus'] = true;
+    }
+    if (user.calculus.passed) {
+      certifications['Math: Calculus'] = true;
+    }
+    if (user.esl.passed) {
+      certifications['ESL'] = true;
+    }
+
     return {
       user: user,
       activeEdit: null,
@@ -162,7 +188,8 @@ export default {
       name: user.firstname || (user.isVolunteer ? 'volunteer' : 'student'),
       avatarStyle: {
         backgroundImage: `url(${avatarUrl})`
-      }
+      },
+      certifications: certifications
     }
   },
   methods: {
@@ -281,13 +308,30 @@ select, input[type=text] {
   align-items: left;
 }
 
-.basic-info-header {
+.info-header {
   display: flex;
   align-items: center;
-  height: 60px;
+
   margin-left: 30px;
   font-size: 20px;
   font-weight: 600;
+}
+
+.info-header.basic {
+  height: 60px;
+}
+
+.info-header.cert {
+  margin-bottom: 15px;
+}
+
+.certifications {
+  display: flex;
+  align-items: center;
+  height: 60px;
+  width: 300px;
+  text-align: left;
+  margin-left: 30px;
 }
 
 </style>
