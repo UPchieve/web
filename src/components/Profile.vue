@@ -5,6 +5,7 @@
     <button @click="saveProfile()" class="saveBtn btn">{{ saveBtnMsg }}</button>
   </div>
   <div class="basic-info">
+    <div class="basic-info-header">Personal Information</div>
     <div class="section" id="profilePic">
       <div class="prompt">Your profile picture</div>
       <div class="answer avatar" v-bind:style="avatarStyle">
@@ -234,7 +235,7 @@ select, input[type=text] {
 .header {
   display: flex;
   padding: 30px;
-  margin: 0px 0px 20px 0px;
+  margin: 0;
   font-size: 24px;
   border-bottom: 0.5px solid #CCCCCF;
   align-items: center;
@@ -272,6 +273,21 @@ select, input[type=text] {
   align-items: left;
   margin-left: 150px;
   flex-direction: column;
+}
+
+.basic-info {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+}
+
+.basic-info-header {
+  display: flex;
+  align-items: center;
+  height: 60px;
+  margin-left: 30px;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 </style>
