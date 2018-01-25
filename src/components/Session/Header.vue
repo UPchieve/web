@@ -129,7 +129,20 @@ h1 {
   color: #F6F6F6;
 }
 
+.session-header.inactive {
+  background-color: #73737A;
+}
 
+.session-header.inactive button {
+  color: #000;
+  background-color: #73737A;
+  width: auto;
+  height: auto;
+}
+
+.session-header.inactive button:hover {
+  color: #16D2AA;
+}
 
 .upload-file .btn {
   right: 230px;
