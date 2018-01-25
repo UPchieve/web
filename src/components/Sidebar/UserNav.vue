@@ -13,14 +13,13 @@
       <template v-if="!user.isVolunteer">
         <router-link to="/session/math" tag="li"><a class="math icon">Get Math Tutoring</a></router-link>
         <router-link to="/session/college" tag="li"><a class="college icon">Get College Advice</a></router-link>
-        <router-link to="/schedule" tag="li"><a class="schedule icon">Schedule a Session</a></router-link>
       </template>
-        <template v-if="user.isVolunteer">
-          <router-link to="/training" tag="li"><a class="training icon">Training</a></router-link>
-        </template>
+      <template v-if="user.isVolunteer">
+        <router-link to="/training" tag="li"><a class="training icon">Training</a></router-link>
+        <router-link to="/calendar" tag="li"><a class="schedule icon">Schedule</a></router-link>
+      </template>
       <router-link to="/profile" tag="li"><a class="profile icon">Profile</a></router-link>
       <router-link to="/resources" tag="li"><a class="resources icon">Resources</a></router-link>
-      <router-link to="/calendar" tag="li"><a class="schedule icon">Schedule</a></router-link>
     </ul>
   </div>
 </template>
@@ -96,13 +95,12 @@ export default {
     background: none;
   }
 
-  li.active {
-    background-color: #16D2AA;
+  li.active > a {
+    color: #16D2AA;
   }
 
-  li.active > a {
-      background-color: #F6F6F6;
-      margin: auto 10px;
+  li.active > a::before {
+    fill: #16D2AA;
   }
 
   .icon::before {
@@ -112,7 +110,7 @@ export default {
     margin-right: 10px;
     margin-left: 20px;
     background-repeat: no-repeat;
-    color: #73737A;
+    fill: #73737A;
   }
 
   .home.icon::before {

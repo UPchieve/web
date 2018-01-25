@@ -66,18 +66,9 @@ li > a:focus {
   background: none;
 }
 
-li.active {
-  background-color: #16D2AA;
-}
-
 li.active > a {
   font-weight: bold;
-  background-color: #F6F6F6;
-  margin: auto 10px;
-}
-
-li.active > a.login {
-  padding-left: 20px;
+  color: #16D2AA;
 }
 
 a.logout {
