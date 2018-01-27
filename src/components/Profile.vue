@@ -161,23 +161,35 @@ export default {
       fieldButtons[field] = 'Edit';
     });
     var certifications = new Object();
-    if (user.algebra.passed) {
-      certifications['Math: Algebra'] = true;
+    if (user.algebra) {
+      if (user.algebra.passed) {
+        certifications['Math: Algebra'] = true;
+      }
     }
-    if (user.geometry.passed) {
-      certifications['Math: Geometry'] = true;
+    if (user.geometry) {
+      if (user.geometry.passed) {
+        certifications['Math: Geometry'] = true;
+      }
     }
-    if (user.trigonometry.passed) {
-      certifications['Math: Trigonometry'] = true;
+    if (user.trigonometry) {
+      if (user.trigonometry.passed) {
+        certifications['Math: Trigonometry'] = true;
+      }
     }
-    if (user.precalculus.passed) {
-      certifications['Math: Precalculus'] = true;
+    if (user.precalculus) {
+      if (user.precalculus.passed) {
+        certifications['Math: Precalculus'] = true;
+      }
     }
-    if (user.calculus.passed) {
-      certifications['Math: Calculus'] = true;
+    if (user.calculus) {
+      if (user.calculus.passed) {
+        certifications['Math: Calculus'] = true;
+      }
     }
-    if (user.esl.passed) {
-      certifications['ESL'] = true;
+    if (user.esl) {
+      if (user.esl.passed) {
+        certifications['ESL'] = true;
+      }
     }
 
     return {
