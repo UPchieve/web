@@ -8,13 +8,12 @@
           <div class="colorWrapper">
             <button class='whiteboardBtn' id='openColorsButton' v-on:click="openColors" ></button>
             <div class="toolset col-md-6 colorContainer" v-bind:style="{ visibility: showColors }">
-              <button class='colorButton redBtn' v-on:click="changeColor"></button>
-              <button class='colorButton yellowBtn' v-on:click="changeColor"></button>
-              <button class='colorButton greenBtn' v-on:click="changeColor"></button>
-              <button class='colorButton blueBtn' v-on:click="changeColor"></button>
-              <button class='colorButton greyBtn' v-on:click="changeColor"></button>
-              <button class='colorButton navyBtn' v-on:click="changeColor"></button>
-
+              <button class='colorButton redBtn' v-on:click="changeColor" style='background-color: rgba(244,71,71,1)'></button>
+              <button class='colorButton yellowBtn' v-on:click="changeColor" style='background-color: rgba(255,208,115,.6)'></button>
+              <button class='colorButton greenBtn' v-on:click="changeColor" style='background-color: rgba(22,210,170,.6)'></button>
+              <button class='colorButton blueBtn' v-on:click="changeColor" style='background-color: rgba(24,85,209,.6)'></button>
+              <button class='colorButton greyBtn' v-on:click="changeColor" style='background-color: rgba(52,52,64,.6)'></button>
+              <button class='colorButton navyBtn' v-on:click="changeColor" style='background-color: rgba(38,51,104,1)'></button>
 
               <textarea id='textInputBox' v-on:input="textBox" v-on:keydown="keydown" v-on:keyup.enter="hideBox" rows='4' cols='50' style='visibility:hidden' placeholder='Type Here'></textarea>
             </div>
@@ -630,30 +629,6 @@ canvas {
   margin:10px 2px;
   height: 17px;
   border-radius: 10px;
-}
-
-.redBtn {
-  background-color:rgba(244,71,71,1);
-}
-
-.yellowBtn {
-  background-color:rgba(255,208,115,.6);
-}
-
-.greenBtn {
-  background-color:rgba(22,210,170,.6);
-}
-
-.blueBtn {
-  background-color:rgba(24,85,209,.6);
-}
-
-.greyBtn {
-  background-color:rgba(52,52,64,.6);
-}
-
-.navyBtn {
-  background-color:rgba(38,51,104,1);
 }
 
 #eraseButton {
