@@ -617,9 +617,9 @@ canvas {
 }
 
 .whiteboardBtn {
-  padding:20px 20px 20px 10px;
-  border:none;
-  margin:2px;
+  padding: 13px;
+  border: none;
+  margin: 4px;
   background-repeat: no-repeat;
   background-position: center;
   background-color: rgb(238, 238, 238);

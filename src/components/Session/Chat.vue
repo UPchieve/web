@@ -19,7 +19,7 @@
 				</template>
 			</div>
     </div>
-    <textarea v-on:keyup.enter="sendMessage" v-model="newMessage" placeholder="Type here, press enter to send"></textarea>
+    <textarea v-on:keyup.enter="sendMessage" v-model="newMessage" placeholder="Type here."></textarea>
   </div>
 </template>
 
@@ -143,7 +143,11 @@ export default {
   align-self: center;
 }
 
-.name, .time {
+.name {
+  font-weight: 600;
+}
+
+.time {
 	font-size: 12px;
 	font-weight: 300;
 	color: #73737A;
@@ -153,6 +157,7 @@ export default {
 	text-align: left;
   width: 200px;
   overflow-wrap: break-word;
+  font-size: 16px;
 }
 
 textarea {
