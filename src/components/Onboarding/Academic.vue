@@ -1,168 +1,115 @@
 <template>
   <div class="profile-editor">
     <div class="profile-header">
-        <h2>{{user.isVolunteer ? 'Volunteer' : 'Student' }} Profile</h2>
+        <h2>Registration: First Time Use Survey</h2>
     </div>
-
-    <button class="btn btn-lg btn-primary btn-block skip" @click.prevent="skipOnboarding">Skip this step for now</button>
+    <div class="description">Before you can request a tutor, we request that you
+     fill out this short survey so that we can continue to improve our services.
+     You will not be asked to take this again.</div>
 
     <div class="alert alert-danger" role="alert" v-if="error">{{error}}</div>
 
-    <div class="row form-group">
-      <p>Current high school</p>
-
-      <div class="row">
-        <div class="col-sm-12">
-          <input type="text" v-model="user.highschool" class="form-control" required autofocus>
-        </div>
-      </div>
-    </div>
-
-    <div class="row form-group">
-      <p>Current grade</p>
-      <div class="row">
-        <div class="col-sm-6">
-          <select class="form-control" v-model="user.currentGrade">
-            <option></option>
-            <option>Freshman</option>
-            <option>Sophomore</option>
-            <option>Junior</option>
-            <option>Senior</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div class="row form-group">
-      <p>Expected high school graduation</p>
-      <div class="row">
-        <div class="col-sm-6">
-          <select class="form-control" v-model="user.expectedGraduation">
-            <option></option>
-            <option>2017</option>
-            <option>2018</option>
-            <option>2019</option>
-            <option>2020</option>
-            <option>2021</option>
-            <option>2022</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div class="row form-group">
-      <p>Which academic subject do you find most difficult?</p>
-
-      <div class="row">
-        <div class="col-sm-12">
-          <input type="text" v-model="user.difficultAcademicSubject" class="form-control">
-        </div>
-      </div>
-    </div>
-
-    <div class="row form-group">
-      <p>Which part of the college application process do you find most difficult?</p>
+    <ul class="row form-group" v-if="!user.isVolunteer">
+      <p>Do you identify with any of the following groups?</p>
       <div class="row">
         <div class="col-sm-6">
           <div class="checkbox">
             <label>
-              <input type="checkbox" value="PersonalStatement" v-model="user.difficultCollegeProcess">
-              Personal Statement / Essay
+              <input type="checkbox" value="LGBTQ" v-model="user.groupIdentification">
+              LGBTQ
             </label>
           </div>
           <div class="checkbox">
             <label>
-              <input type="checkbox" value="Resume" v-model="user.difficultCollegeProcess">
-              Resume
+              <input type="checkbox" value="LearningDisability" v-model="user.groupIdentification">
+              Learning disabilities
             </label>
           </div>
           <div class="checkbox">
             <label>
-              <input type="checkbox" value="Application" v-model="user.difficultCollegeProcess">
-              Filling out application
+              <input type="checkbox" value="OtherDisability" v-model="user.groupIdentification">
+              Other disabilities
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="Immigrant" v-model="user.groupIdentification">
+              Immigrant
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="Homeless" v-model="user.groupIdentification">
+              Homeless
             </label>
           </div>
         </div>
         <div class="col-sm-6">
           <div class="checkbox">
             <label>
-              <input type="checkbox" value="Exams" v-model="user.difficultCollegeProcess">
-              SAT / ACT Exams
+              <input type="checkbox" value="FreeLunch" v-model="user.groupIdentification">
+              Free or reduced price lunch
             </label>
           </div>
           <div class="checkbox">
             <label>
-              <input type="checkbox" value="ChoosingSchools" v-model="user.difficultCollegeProcess">
-              Choosing which schools to apply to
+              <input type="checkbox" value="LowIncome" v-model="user.groupIdentification">
+              Low-income
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="SingleParent" v-model="user.groupIdentification">
+              Single-parent household
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="PublicHousing" v-model="user.groupIdentification">
+              NYCHA (public housing) resident
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="None" v-model="user.groupIdentification">
+              None of the above
             </label>
           </div>
         </div>
       </div>
-    </div>
+    </ul>
 
-    <div class="row form-group">
-      <p>What is the highest level of education completed by one of your parents?</p>
+    <ul class="row form-group" v-if="!user.isVolunteer">
+      <p>Do you have access to a computer or phone with internet access?</p>
       <div class="row">
         <div class="col-sm-12">
           <div class="checkbox">
             <label>
-              <input type="checkbox" value="SomeHighSchool" v-model="user.highestLevelEducation">
-              Some high school
+              <input type="checkbox" value="HomeInternet" v-model="user.computerAccess">
+              My home has a computer with internet access
             </label>
           </div>
           <div class="checkbox">
             <label>
-              <input type="checkbox" value="HighSchoolGED" v-model="user.highestLevelEducation">
-              High school/GED degree
+              <input type="checkbox" value="PhoneInternet" v-model="user.computerAccess">
+              I have my own smartphone with internet access
             </label>
           </div>
           <div class="checkbox">
             <label>
-              <input type="checkbox" value="SomeCollege" v-model="user.highestLevelEducation">
-              Some college
+              <input type="checkbox" value="FamilyPhone" v-model="user.computerAccess">
+              Someone who lives with me has a smartphone with internet access
             </label>
           </div>
           <div class="checkbox">
             <label>
-              <input type="checkbox" value="AssociatesDegree" v-model="user.highestLevelEducation">
-              Associate's degree
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="BachelorsDegree" v-model="user.highestLevelEducation">
-              Bachelor's degree
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="MastersDegreeHigher" v-model="user.highestLevelEducation">
-              Master’s degree or higher
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="NotSure" v-model="user.highestLevelEducation">
-              Not sure
+              <input type="checkbox" value="None" v-model="user.computerAccess">
+              None
             </label>
           </div>
         </div>
       </div>
-    </div>
-
-    <div class="row form-group">
-      <p>Does your high school have a college guidance counselor?</p>
-      <div class="row">
-        <div class="col-sm-6">
-          <select class="form-control" v-model="user.hasGuidanceCounselor">
-            <option></option>
-            <option>Yes</option>
-            <option>No</option>
-            <option>I don't know</option>
-          </select>
-        </div>
-      </div>
-    </div>
+    </ul>
 
     <button class="btn btn-lg btn-primary btn-block back" @click.prevent="back">Back</button>
     <button class="btn btn-lg btn-primary btn-block next" type="submit" @click.prevent="submitProfile">{{buttonMsg}}</button>
@@ -173,13 +120,14 @@
 
 import UserService from 'src/services/UserService'
 import OnboardingService from 'src/services/OnboardingService'
+import $ from 'jquery'
 
 export default {
   data() {
     var user = UserService.getUser();
     return {
       user: user,
-      buttonMsg: 'Next',
+      buttonMsg: 'Done',
       error: ''
     }
   },
@@ -191,9 +139,24 @@ export default {
       this.$router.push('/onboarding/profile');
     },
     submitProfile(e){
+      this.error = '';
+
+      if (!this.user.isVolunteer) {
+        if (!this.user.groupIdentification.length){
+          this.error = 'If you don\'t identify with any of the groups, please select "None of the Above"' ;
+        } else if (!this.user.computerAccess.length){
+          this.error = 'If you don\'t have access to a computer or phone with internet access, please select "None"' ;
+        }
+      }
+
+      if (this.error !== ''){
+        $('body').animate({scrollTop: 0})
+        return;
+      }
+
       this.buttonMsg = 'Updating...';
       console.log(this.user);
-      UserService.setProfile(this, this.user, '/onboarding/college');
+      UserService.setProfile(this, this.user, '/');
     }
   }
 }

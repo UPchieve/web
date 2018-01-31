@@ -1,7 +1,7 @@
 <template>
   <div class="profile-editor">
-    <div class="profile-header">
-        <h2>{{user.isVolunteer ? 'Volunteer' : 'Student' }} Profile</h2>
+    <div class="header">
+        <h2>Registration: Basic Profile</h2>
     </div>
 
     <div class="alert alert-danger" role="alert" v-if="error">{{error}}</div>
@@ -12,30 +12,14 @@
       <div class="row">
         <div class="col-sm-6">
           <input type="text" v-model="user.firstname" class="form-control" id="firstNameInput" required autofocus>
-          <label for="firstNameInput">First name</label>
+          <label for="firstNameInput">First</label>
         </div>
         <div class="col-sm-6">
           <input type="text" v-model="user.lastname" class="form-control" id="lastNameInput">
-          <label for="lastNameInput">Last name</label>
+          <label for="lastNameInput">Last</label>
         </div>
       </div>
     </div>
-
-    <ul class="row form-group" v-if="!user.isVolunteer">
-        <p>Which services are you interested in? (Select all that apply)</p>
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" value="Math" v-model="user.serviceInterests">
-            Math Tutoring
-          </label>
-        </div>
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" value="College" v-model="user.serviceInterests">
-            College Counseling
-          </label>
-        </div>
-    </ul>
 
     <div class="row form-group">
       <p>(Optional) Link to a profile picture</p>
@@ -116,166 +100,6 @@
       </div>
     </ul>
 
-    <ul class="row form-group" v-if="!user.isVolunteer">
-      <p>Do you identify with any of the following groups?</p>
-      <div class="row">
-        <div class="col-sm-6">
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="LGBTQ" v-model="user.groupIdentification">
-              LGBTQ
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="LearningDisability" v-model="user.groupIdentification">
-              Learning disabilities
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="OtherDisability" v-model="user.groupIdentification">
-              Other disabilities
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="Immigrant" v-model="user.groupIdentification">
-              Immigrant
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="Homeless" v-model="user.groupIdentification">
-              Homeless
-            </label>
-          </div>
-        </div>
-        <div class="col-sm-6">
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="FreeLunch" v-model="user.groupIdentification">
-              Free or reduced price lunch
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="LowIncome" v-model="user.groupIdentification">
-              Low-income
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="SingleParent" v-model="user.groupIdentification">
-              Single-parent household
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="PublicHousing" v-model="user.groupIdentification">
-              NYCHA (public housing) resident
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="None" v-model="user.groupIdentification">
-              None of the above
-            </label>
-          </div>
-        </div>
-      </div>
-    </ul>
-
-    <ul class="row form-group" v-if="!user.isVolunteer">
-      <p>Do you have access to a computer or phone with internet access?</p>
-      <div class="row">
-        <div class="col-sm-12">
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="HomeInternet" v-model="user.computerAccess">
-              My home has a computer with internet access
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="PhoneInternet" v-model="user.computerAccess">
-              I have my own smartphone with internet access
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="FamilyPhone" v-model="user.computerAccess">
-              Someone who lives with me has a smartphone with internet access
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="None" v-model="user.computerAccess">
-              None
-            </label>
-          </div>
-        </div>
-      </div>
-    </ul>
-
-    <ul class="row form-group" v-if="!user.isVolunteer">
-      <p>What time(s) do you prefer to use our services?</p>
-      <div class="row">
-        <div class="col-sm-6">
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="3-4" v-model="user.preferredTimes">
-              3-4
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="4-5" v-model="user.preferredTimes">
-              4-5
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="5-6" v-model="user.preferredTimes">
-              5-6
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="6-7" v-model="user.preferredTimes">
-              6-7
-            </label>
-          </div>
-        </div>
-        <div class="col-sm-6">
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="7-8" v-model="user.preferredTimes">
-              7-8
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="8-9" v-model="user.preferredTimes">
-              8-9
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="9-10" v-model="user.preferredTimes">
-              9-10
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="10-11" v-model="user.preferredTimes">
-              10-11
-            </label>
-          </div>
-        </div>
-      </div>
-    </ul>
-
     <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submitProfile">{{buttonMsg}}</button>
   </div>
 </template>
@@ -291,11 +115,7 @@ import OnboardingService from 'src/services/OnboardingService'
 export default {
   data() {
     var user = UserService.getUser();
-    user.serviceInterests = user.serviceInterests || [];
     user.race = user.race || [];
-    user.groupIdentification = user.groupIdentification || [];
-    user.computerAccess = user.computerAccess || [];
-    user.preferredTimes = user.preferredTimes || [];
     user.birthdate = user.birthdate || '';
     if (!user.isVolunteer) {
       var button = 'Next';
@@ -320,8 +140,6 @@ export default {
           this.error = 'Please provide your full name';
         } else if (!this.user.lastname || this.user.lastname === '') {
           this.error = 'Please provide your full name';
-        } else if (!this.user.serviceInterests.length){
-          this.error = 'Please indicate a service you are interested in';
         } else if (this.user.picture && !validator.isURL(this.user.picture)){
           this.error = 'Profile picture URL is invalid';
         } else if (!this.user.birthdate || this.user.birthdate === ''){
@@ -332,12 +150,6 @@ export default {
           this.error = 'Please select a gender';
         } else if (!this.user.race.length){
           this.error = 'Please select a race';
-        } else if (!this.user.preferredTimes.length){
-          this.error = 'Please selected a preferred time';
-        } else if (!this.user.groupIdentification.length){
-          this.error = 'If you don\'t identify with any of the groups, please select "None of the Above"' ;
-        } else if (!this.user.computerAccess.length){
-          this.error = 'If you don\'t have access to a computer or phone with internet access, please select "None"' ;
         }
       } else {
         if (!this.user.firstname || this.user.firstname === ''){
@@ -366,16 +178,22 @@ export default {
 </script>
 
 <style scoped>
-.profile-header {
+.header {
   height: 100px;
   margin: 0;
-  background-color: #1855D1;
   padding-left: 30px;
   margin-bottom: 50px;
+  display: flex;
+  padding: 30px 0 30px 50px;
+  font-size: 24px;
+  border-bottom: 0.5px solid #CCCCCF;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
 }
 
 h2 {
-  color: white;
+  color: #343440;
   font-size: 24px;
   text-align: left;
   font-weight: 600;
@@ -405,12 +223,12 @@ p {
 
 .form-control.url-box {
   height: 40px;
-  border: 1px solid #979797;
+  border: 1px solid #16D2AA;
   font-weight: 300;
 }
 
 .form-control.url-box:focus {
-  border: 1px solid #979797;
+  border: 1px solid #16D2AA;
 }
 
 .form-control.url-box::placeholder {
@@ -426,7 +244,7 @@ label {
 }
 
 .form-control {
-  border-bottom: 3px solid black;
+  border-bottom: 3px solid #16D2AA;
   margin-bottom: 10px;
 }
 
@@ -441,7 +259,7 @@ label {
 
 select.form-control, select.form-control:focus {
   border-bottom: 0;
-  border: 1px solid #979797;
+  border: 1px solid #16D2AA;
 }
 
 button[type="submit"] {
