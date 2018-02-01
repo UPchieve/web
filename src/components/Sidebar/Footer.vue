@@ -58,7 +58,8 @@ li > a {
 
 li > a:hover {
   background: none;
-  text-decoration: underline;
+  text-decoration: none;
+  color: #16D2AA;
 }
 
 li > a:focus {

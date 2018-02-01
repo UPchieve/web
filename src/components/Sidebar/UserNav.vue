@@ -1,25 +1,20 @@
 <template>
   <div>
     <ul class="nav navbar-nav" v-if="$route.path.indexOf('/onboarding') !== -1 && !user.isVolunteer">
-      <li v-bind:class="onboardingProfileClass"><a class="profile-info">Profile Information</a></li>
-      <li v-bind:class="onboardingAcademicClass"><a>Academic Information</a></li>
-      <li v-bind:class="onboardingCollegeClass"><a>College Counseling Information</a></li>
+      <li v-bind:class="onboardingProfileClass"><a class="profile-info">Basic Profile</a></li>
+      <li v-bind:class="onboardingAcademicClass"><a class="profile-info">First Time Use Survey</a></li>
     </ul>
     <ul class="nav navbar-nav" v-else-if="$route.path.indexOf('/onboarding') !== -1">
       <li v-bind:class="onboardingProfileClass"><a class="profile-info">Profile Information</a></li>
     </ul>
     <ul class="nav navbar-nav" v-else-if="auth.authenticated">
       <router-link to="/dashboard" tag="li"><a class="home icon">Home</a></router-link>
-      <template v-if="!user.isVolunteer">
-        <router-link to="/session/math" tag="li"><a class="math icon">Get Math Tutoring</a></router-link>
-        <router-link to="/session/college" tag="li"><a class="college icon">Get College Advice</a></router-link>
-      </template>
       <template v-if="user.isVolunteer">
         <router-link to="/training" tag="li"><a class="training icon">Training</a></router-link>
         <router-link to="/calendar" tag="li"><a class="schedule icon">Schedule</a></router-link>
       </template>
       <router-link to="/profile" tag="li"><a class="profile icon">Profile</a></router-link>
-      <router-link to="/resources" tag="li"><a class="resources icon">Resources</a></router-link>
+      <router-link to="/resources" tag="li"><a class="resources icon">Useful Information</a></router-link>
     </ul>
   </div>
 </template>
@@ -87,7 +82,8 @@ export default {
 
   li > a:hover {
     background: none;
-    text-decoration: underline;
+    text-decoration: none;
+    color: #16D2AA;
   }
 
   li > a:focus {
