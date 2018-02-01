@@ -1,6 +1,9 @@
 <template>
 <div class="calendar">
-<h1 class="header">Schedule</h1>
+<h1 class="header">
+  <div class="header-title">Schedule</div>
+  <button @click="save()" class="btn">Update Schedule</button>
+</h1>
 <div class="dayTimeContainer">
   <div class="timeLabelContainer">
     <div v-for="time in timeRange" class="timeLabel">
@@ -19,7 +22,6 @@
     </div>
   </form>
 </div>
-<button @click="save()" class="btn">Save</button>
 </div>
 </template>
 
@@ -85,7 +87,8 @@ export default {
 <style scoped>
 
 .calendar {
-  font-size: 16px;
+  font-size: 12px;
+  color: ##343440;
 }
 
 .header {
@@ -93,18 +96,27 @@ export default {
   padding: 30px 0 30px 50px;
   margin: 0px;
   font-size: 24px;
-  border-bottom: 1px solid #000;
+  border-bottom: 0.5px solid #CCCCCF;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+}
+
+.header-title {
+  font-weight: 600;
 }
 
 .timeLabelContainer {
-  padding-top: 50px;
+  padding-top: 47px;
 }
 
 .timeLabel {
   display: flex;
   justify-content: center;
   padding: 15px;
-  height: 52px;
+  height: 40px;
+  width: 100px;
+  border: 0.5px solid #CCCCCF;
 }
 
 .dayLabel {
@@ -113,6 +125,8 @@ export default {
 
 .dayTimeContainer {
   display: flex;
+  padding: 20px 0 40px 0;
+  justify-content: center;
 }
 
 .dayTime {
@@ -125,8 +139,8 @@ export default {
 }
 
 .timeOfDay {
-  border: 1px solid #000;
-  height: 52px;
+  border: 0.5px solid #CCCCCF;
+  height: 40px;
 }
 
 input[type='checkbox'] {
@@ -134,22 +148,24 @@ input[type='checkbox'] {
   display: block;
   opacity: 0;
   width: 100px;
-  height: 50px;
+  height: 40px;
 }
 
 label {
   width: 100px;
-  height: 50px;
+  height: 40px;
   margin: 0;
 }
 
 input[type='checkbox']:checked + label {
-  background-color: #16D2AA;
+  background-color: rgba(22, 210, 170, 0.5);
 }
 
 .btn {
-  margin: 50px 0px;
-  font-size: 16px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #16D2AA;
+  padding-right: 40px;
 }
 
 </style>
