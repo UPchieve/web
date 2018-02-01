@@ -5,58 +5,28 @@
     <button @click="saveProfile()" class="saveBtn btn">{{ saveBtnMsg }}</button>
   </div>
   <div class="basic-info">
-    <div class="info-header basic">Personal Information</div>
     <div class="section" id="profilePic">
       <div class="prompt">Your profile picture</div>
       <div class="answer avatar" v-bind:style="avatarStyle">
       </div>
     </div>
-    <div class="name">
-      <div class="section" id="firstname">
-        <div class="prompt">Your first name</div>
-        <div v-show="'firstname' !== activeEdit" class="answer">{{ user.firstname }}</div>
-        <input type="text" v-model="user.firstname" v-show="'firstname' === activeEdit">
-        <button @click="editField('firstname')">{{ fieldButtons.firstname }}</button>
-      </div>
-      <div class="section" id="lastname">
-        <div class="prompt">Your last name</div>
-        <div v-show="'lastname' !== activeEdit" class="answer">{{ user.lastname }}</div>
-        <input type="text" v-model="user.lastname" v-show="'lastname' === activeEdit">
-        <button @click="editField('lastname')">{{ fieldButtons.lastname }}</button>
-      </div>
-    </div>
 
     <div class="section" id="email">
-      <div class="prompt">Your email</div>
+      <div class="prompt">Your Email</div>
       <div class="answer">{{ user.email }}</div>
     </div>
-
-    <div class="section"><router-link to="resetpassword" class="prompt">Reset password</router-link></div>
   </div>
 
   <div v-if="!user.isVolunteer">
     <div class="section" id="highschool">
-      <div class="prompt">Your high school</div>
+      <div class="prompt">Your High School's Name</div>
       <div class="answer" v-show="'highschool' !== activeEdit">{{ user.highschool }}</div>
       <input type="text" v-model="user.highschool" v-show="'highschool' === activeEdit">
       <button @click="editField('highschool')" class="sectionBtn">{{ fieldButtons.highschool }}</button>
     </div>
 
-    <div class="section" id="currentGrade">
-      <div class="prompt">Your current grade</div>
-      <div class="answer" v-show="'currentGrade' !== activeEdit">{{ user.currentGrade }}</div>
-      <select class="form-control" v-model="user.currentGrade" v-show="'currentGrade' === activeEdit">
-        <option></option>
-        <option>Freshman</option>
-        <option>Sophomore</option>
-        <option>Junior</option>
-        <option>Senior</option>
-      </select>
-      <button @click="editField('currentGrade')" class="sectionBtn">{{ fieldButtons.currentGrade }}</button>
-    </div>
-
     <div class="section" id="expectedGraduation">
-      <div class="prompt">Your expected graduation year</div>
+      <div class="prompt">Expected High School Graduation</div>
       <div class="answer" v-show="'expectedGraduation' !== activeEdit">{{ user.expectedGraduation }}</div>
       <select class="form-control" v-model="user.expectedGraduation" v-show="'expectedGraduation' === activeEdit">
         <option></option>
@@ -70,77 +40,15 @@
       <button @click="editField('expectedGraduation')" class="sectionBtn">{{ fieldButtons.expectedGraduation }}</button>
     </div>
 
-    <div class="section" id="difficultAcademicSubject">
-      <div class="prompt">Your most difficult academic subject</div>
-      <input type="text" v-model="user.difficultAcademicSubject" v-show="'difficultAcademicSubject' === activeEdit">
-      <div class="answer" v-show="'difficultAcademicSubject' !== activeEdit">{{ user.difficultAcademicSubject }}</div>
-      <button @click="editField('difficultAcademicSubject')" class="sectionBtn">{{ fieldButtons.difficultAcademicSubject }}</button>
-    </div>
-
-    <div class="section" id="difficultCollegeProcess">
-      <div class="prompt">Aspects of the college process you have found difficult</div>
-      <div class="difficultCollegeProcessAnswer" v-show="'difficultCollegeProcess' === activeEdit">
-        <label>
-          <input type="checkbox" value="PersonalStatement" v-model="user.difficultCollegeProcess">
-          Personal Statement / Essay
-        </label>
-        <label>
-          <input type="checkbox" value="Resume" v-model="user.difficultCollegeProcess">
-          Resume
-        </label>
-        <label>
-          <input type="checkbox" value="Application" v-model="user.difficultCollegeProcess">
-          Filling out application
-        </label>
-        <label>
-          <input type="checkbox" value="Exams" v-model="user.difficultCollegeProcess">
-          SAT / ACT Exams
-        </label>
-        <label>
-          <input type="checkbox" value="ChoosingSchools" v-model="user.difficultCollegeProcess">
-          Choosing which schools to apply to
-        </label>
-      </div>
-      <div class="answer">
-        <ul v-show="'difficultCollegeProcess' !== activeEdit" v-for="item in user.difficultCollegeProcess">
-          <li>{{ item }}</li>
-        </ul>
-      </div>
-      <div class="answer"><button @click="editField('difficultCollegeProcess')" class="sectionBtn">{{ fieldButtons.difficultCollegeProcess }}</button></div>
-    </div>
-
-    <div class="section" id="hasGuidanceCounselor">
-      <div class="prompt">Do you have a guidance counselor</div>
-      <select class="form-control" v-model="user.hasGuidanceCounselor" v-show="'hasGuidanceCounselor' === activeEdit">
-        <option></option>
-        <option>Yes</option>
-        <option>No</option>
-        <option>I don't know</option>
-      </select>
-      <div class="answer" v-show="'hasGuidanceCounselor' !== activeEdit">{{ user.hasGuidanceCounselor }}</div>
-      <button @click="editField('hasGuidanceCounselor')" class="sectionBtn">{{ fieldButtons.hasGuidanceCounselor }}</button>
-    </div>
-
-    <div class="section" id="gpa">
-      <div class="prompt">Your GPA</div>
-      <div class="answer" v-show="'gpa' !== activeEdit">{{ user.gpa }}</div>
-      <input type="text" v-model="user.gpa" v-show="'gpa' === activeEdit">
-      <button @click="editField('gpa')" class="sectionBtn">{{ fieldButtons.gpa }}</button>
-    </div>
-
-    <div class="section" id="collegeApplicationsText">
-      <div class="prompt">The colleges and universities you are considering apply to</div>
-      <div class="answer" v-show="'collegeApplicationsText' !== activeEdit">{{ user.collegeApplicationsText }}</div>
-      <input type="text" v-model="user.collegeApplicationsText" v-show="'collegeApplicationsText' === activeEdit">
-      <button @click="editField('collegeApplicationsText')" class="sectionBtn">{{ fieldButtons.collegeApplicationsText }}</button>
-    </div>
   </div>
-  <div v-if="user.isVolunteer">
+  <div v-if="user.isVolunteer" class="cert-info">
     <div class="info-header cert">Certifications</div>
     <div class="certifications" v-for="(value, key) in certifications">
       <div v-if="value">{{ key }}</div>
     </div>
   </div>
+
+  <div class="section"><router-link to="resetpassword" class="prompt">Reset password</router-link></div>
 
 </div>
 
@@ -283,12 +191,6 @@ select, input[type=text] {
   color: #343440;
 }
 
-.basic-info {
-  border-bottom: 0.5px solid #CCCCCF;
-  padding-bottom: 20px;
-  margin-bottom: 20px;
-}
-
 .section {
   display: flex;
   align-items: center;
@@ -318,6 +220,7 @@ select, input[type=text] {
   display: flex;
   flex-direction: column;
   align-items: left;
+  margin-top: 30px;
 }
 
 .info-header {
@@ -344,6 +247,11 @@ select, input[type=text] {
   width: 300px;
   text-align: left;
   margin-left: 30px;
+}
+
+.cert-info {
+  border-top: 0.5px solid #CCCCCF;
+  padding-top: 30px;
 }
 
 </style>
