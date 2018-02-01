@@ -1,6 +1,6 @@
 <template>
   <div class="profile-editor">
-    <div class="profile-header">
+    <div class="header">
         <h2>Registration: First Time Use Survey</h2>
     </div>
     <div class="description">Before you can request a tutor, we request that you
@@ -10,9 +10,8 @@
     <div class="alert alert-danger" role="alert" v-if="error">{{error}}</div>
 
     <ul class="row form-group" v-if="!user.isVolunteer">
-      <p>Do you identify with any of the following groups?</p>
-      <div class="row">
-        <div class="col-sm-6">
+      <p>Do you identify with any of the following minority groups? (Please select all that apply.)</p>
+      <div class=option-container>
           <div class="checkbox">
             <label>
               <input type="checkbox" value="LGBTQ" v-model="user.groupIdentification">
@@ -43,8 +42,6 @@
               Homeless
             </label>
           </div>
-        </div>
-        <div class="col-sm-6">
           <div class="checkbox">
             <label>
               <input type="checkbox" value="FreeLunch" v-model="user.groupIdentification">
@@ -75,12 +72,11 @@
               None of the above
             </label>
           </div>
-        </div>
       </div>
     </ul>
 
     <ul class="row form-group" v-if="!user.isVolunteer">
-      <p>Do you have access to a computer or phone with internet access?</p>
+      <p>Do you have access to a computer or phone with internet access? (Please select all that apply.)</p>
       <div class="row">
         <div class="col-sm-12">
           <div class="checkbox">
@@ -111,7 +107,7 @@
       </div>
     </ul>
 
-    <button class="btn btn-lg btn-primary btn-block back" @click.prevent="back">Back</button>
+    <button class="btn btn-lg btn-primary btn-block back" type="back" @click.prevent="back">BACK</button>
     <button class="btn btn-lg btn-primary btn-block next" type="submit" @click.prevent="submitProfile">{{buttonMsg}}</button>
   </div>
 </template>
@@ -127,7 +123,7 @@ export default {
     var user = UserService.getUser();
     return {
       user: user,
-      buttonMsg: 'Done',
+      buttonMsg: 'DONE',
       error: ''
     }
   },
@@ -163,21 +159,35 @@ export default {
 </script>
 
 <style scoped>
-.profile-header {
+.header {
   height: 100px;
   margin: 0;
-  background-color: #1855D1;
   padding-left: 30px;
-  margin-bottom: 50px;
+  margin-bottom: 40px;
+  display: flex;
+  padding: 30px 0 30px 50px;
+  font-size: 24px;
+  border-bottom: 0.5px solid #CCCCCF;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
 }
 
 h2 {
-  color: white;
+  color: #343440;
   font-size: 24px;
   text-align: left;
   font-weight: 600;
   line-height: 100px;
   margin: 0;
+  min-width: 500px;
+}
+
+.description {
+  font-size: 16px;
+  max-width: 650px;
+  text-align: left;
+  padding: 0px 50px 30px;
 }
 
 p {
@@ -191,7 +201,7 @@ p {
   margin: 0;
   padding-left: 50px;
   max-width: 650px;
-  margin-bottom: 50px;
+  margin-bottom: 30px;
 }
 
 .form-control {
@@ -241,17 +251,23 @@ select.form-control, select.form-control:focus {
   border: 1px solid #979797;
 }
 
-.btn {
-  width: 190px;
-  background-color: #16D2AA;
+button[type="submit"], button[type="back"] {
+  width: 140px;
+  height: 40px;
+  background-color: #F6F6F6;
+  color: #16D2AA;
   border: none;
   font-weight: 600;
-  margin-left: 50px;
+  margin: 0 50px 50px 50px;
+  border-radius: 20px;
+  font-size: 12px;
+  float: right;
 }
 
-.btn.skip {
-  width: 250px;
-  margin: 0 auto;
+button[type="submit"]:hover, button[type="submit"]:active,
+button[type="back"]:hover, button[type="back"]:active {
+  background-color: #16D2AA;
+  color: #FFF;
 }
 
 .btn.back {
@@ -260,6 +276,5 @@ select.form-control, select.form-control:focus {
 
 .btn.next {
   float: right;
-  margin-right: 50px;
 }
 </style>

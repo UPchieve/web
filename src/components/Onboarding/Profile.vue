@@ -7,7 +7,7 @@
     <div class="alert alert-danger" role="alert" v-if="error">{{error}}</div>
 
     <div class="row form-group">
-      <p>Your full name</p>
+      <p>Your Name</p>
 
       <div class="row">
         <div class="col-sm-6">
@@ -31,7 +31,7 @@
     </div>
 
     <ul class="row form-group" v-if="!user.isVolunteer">
-      <p>Your birthday</p>
+      <p>Your Birthday</p>
       <div class="row">
         <div class="col-sm-6">
           <input type="text" v-model="user.birthdate" class="form-control" id="birthdayInput">
@@ -41,7 +41,7 @@
     </ul>
 
     <ul class="row form-group" v-if="!user.isVolunteer">
-      <p>Your gender</p>
+      <p>Your Gender</p>
       <div class="row">
         <div class="col-sm-6">
           <select class="form-control" v-model="user.gender">
@@ -55,50 +55,69 @@
     </ul>
 
     <ul class="row form-group" v-if="!user.isVolunteer">
-      <p>Your race/ethnicity</p>
-      <div class="row">
-        <div class="col-sm-6">
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="HispanicOrLatino" v-model="user.race">
-              Hispanic or Latino
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="White" v-model="user.race">
-              White
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="Black" v-model="user.race">
-              Black / African American
-            </label>
-          </div>
+      <p>Your Race/Ethnicity (Please select all that apply.)</p>
+      <div class="race-container">
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="HispanicOrLatino" v-model="user.race">
+            Hispanic or Latino
+          </label>
         </div>
-        <div class="col-sm-6">
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="AmericanIndian" v-model="user.race">
-              American Indian / Alaskan Native
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="Asian" v-model="user.race">
-              Asian
-            </label>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" value="PacificIslander" v-model="user.race">
-              Native Hawaiian / Other Pacific Islander
-            </label>
-          </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="White" v-model="user.race">
+            White
+          </label>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="Black" v-model="user.race">
+            Black / African American
+          </label>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="AmericanIndian" v-model="user.race">
+            American Indian / Alaskan Native
+          </label>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="Asian" v-model="user.race">
+            Asian
+          </label>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="PacificIslander" v-model="user.race">
+            Native Hawaiian / Other Pacific Islander
+          </label>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="Other" v-model="user.race">
+            Other
+          </label>
         </div>
       </div>
     </ul>
+
+    <div class="row form-group">
+      <p>Expected High School Graduation</p>
+      <div class="row">
+        <div class="col-sm-6">
+          <select class="form-control" v-model="user.expectedGraduation">
+            <option></option>
+            <option>2017</option>
+            <option>2018</option>
+            <option>2019</option>
+            <option>2020</option>
+            <option>2021</option>
+            <option>2022</option>
+          </select>
+        </div>
+      </div>
+    </div>
 
     <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submitProfile">{{buttonMsg}}</button>
   </div>
@@ -118,9 +137,9 @@ export default {
     user.race = user.race || [];
     user.birthdate = user.birthdate || '';
     if (!user.isVolunteer) {
-      var button = 'Next';
+      var button = 'NEXT';
     } else {
-      var button = 'Submit';
+      var button = 'DONE';
     }
     return {
       user: user,
@@ -150,6 +169,8 @@ export default {
           this.error = 'Please select a gender';
         } else if (!this.user.race.length){
           this.error = 'Please select a race';
+        } else if (!this.user.expectedGraduation || this.user.expectedGraduation === ''){
+          this.error = 'Please provide your expected graduation year';
         }
       } else {
         if (!this.user.firstname || this.user.firstname === ''){
@@ -164,7 +185,7 @@ export default {
         return;
       }
 
-      this.buttonMsg = 'Updating...';
+      this.buttonMsg = 'UPDATING...';
       if (!user.isVolunteer) {
         UserService.setProfile(this, this.user, '/onboarding/academic')
       }
@@ -182,7 +203,7 @@ export default {
   height: 100px;
   margin: 0;
   padding-left: 30px;
-  margin-bottom: 50px;
+  margin-bottom: 40px;
   display: flex;
   padding: 30px 0 30px 50px;
   font-size: 24px;
@@ -199,6 +220,7 @@ h2 {
   font-weight: 600;
   line-height: 100px;
   margin: 0;
+  min-width: 500px;
 }
 
 p {
@@ -212,7 +234,7 @@ p {
   margin: 0;
   padding-left: 50px;
   max-width: 650px;
-  margin-bottom: 50px;
+  margin-bottom: 30px;
 }
 
 .form-control {
@@ -263,10 +285,20 @@ select.form-control, select.form-control:focus {
 }
 
 button[type="submit"] {
-  width: 190px;
-  background-color: #16D2AA;
+  width: 140px;
+  height: 40px;
+  background-color: #F6F6F6;
+  color: #16D2AA;
   border: none;
   font-weight: 600;
-  margin-left: 50px;
+  margin: 0 50px 50px 50px;
+  border-radius: 20px;
+  font-size: 12px;
+  float: right;
+}
+
+button[type="submit"]:hover, button[type="submit"]:active {
+  background-color: #16D2AA;
+  color: #FFF;
 }
 </style>
