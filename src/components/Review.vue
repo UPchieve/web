@@ -39,10 +39,15 @@ export default {
 <style scoped>
 
 .header {
-  text-align: start;
-  margin-left: 20px;
+  display: flex;
+  padding: 30px;
+  margin: 0px;
   font-size: 24px;
-  margin-bottom: 50px;
+  border-bottom: 0.5px solid #CCCCCF;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  color: #343440;
 }
 
 </style>

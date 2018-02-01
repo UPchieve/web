@@ -1,6 +1,10 @@
 <template>
   <div v-if="user.isVolunteer && (tries < 3)" class="training-quiz" v-bind:style="coverStyle">
-    <h1 class="header" id="quiz-name">{{ quizName }} Certification Quiz</h1>
+    <div class="popUpCover" v-if="popUpBool" v-bind:style="popUpCoverStyle"></div>
+    <h1 class="header" id="quiz-name">
+      {{ quizName }} Certification Quiz
+      <router-link to="/dashboard" tag="div" class="done btn" v-if="showQuizReview">DONE</router-link>
+    </h1>
     <div class="progressBar" v-if="showProgressBar">
       <div class="circles">
         <div v-for="n in quizLength" class="circle" v-bind:id="'circle-' + n">{{ n }}</div>
@@ -8,20 +12,29 @@
       <div class="rect"></div>
       <div class="rect cover" v-bind:style="{ width: barWidth + '%' }" v-if="quizLength > 0"></div>
     </div>
-    <div class="quizBody">
-      <div v-if="showStartMsg">This test will have {{ quizLength }} questions, and it is untimed.<br/>
-      You have {{ 3 - tries }}/3 tries left to pass this test.<br/>
-      Once you feel ready, click on start!</div>
-      <div class="questionText">{{ questionText }}</div>
-      <div class="questionImage" v-bind:style="imageStyle"></div>
-      <form class="possibleAnswers">
-        <div v-for="item in items">
-          <input type="radio" :value="item.val" v-model="picked">
-          <label :for="item.val" v-bind:id="'answer-' + item.val">{{ item.val }}. {{ item.txt }}</label>
-        </div>
-      </form>
+    <div class="questionNumber" v-if="qNumber">Question {{qNumber}}</div><br/>
+    <div class="body">
+      <div class="startBody">
+        <div class="instructions" v-if="showStartMsg">This test will have {{ quizLength }} questions, and it is untimed.<br/>
+        You have {{ 3 - tries }}/3 tries left to pass this test.<br/><br/>
+        Once you feel ready, click on start!</div>
+        <button class="start btn" type="start" @click.prevent="getFirst()" v-if="showStart">START TEST</button>
+      </div>
+      <div class="quizBody">
+        <div class="questionText">{{ questionText }}</div><br/>
+        <div class="questionImage" v-bind:style="imageStyle"></div>
+        <form class="possibleAnswers">
+          <div v-for="item in items">
+            <div class="options">
+              <input type="radio" :value="item.val" v-model="picked">
+              <label :for="item.val" v-bind:id="'answer-' + item.val">{{ item.val }}. {{ item.txt }}</label>
+            </div>
+          </div>
+        </form>
+      </div>
       <div class="review" v-if="showQuizReview">
-        <div class="question" v-for="question in questionsReview">
+        <div class="question" v-for="(question, index) in questionsReview">
+          <div class="questionNumber">Question {{ index + 1 }}</div><br/>
           <div class="questionText">{{ question.questionText }}</div>
           <div class="questionImage" v-bind:style="question.imageStyle"></div>
           <div class="possibleAnswers">
@@ -31,18 +44,16 @@
           <div class="correctAnswer">Correct answer: {{ question.correctAnswer }}</div>
         </div>
       </div>
-      <div class="passScoreContainer" v-bind:style="popUpStyle">
-        <div class="passed">{{ passedMsg }}</div>
-        <div class="score">{{ scoreMsg }}</div>
-        <div class="btnContainer">
-          <button class="review btn" type="review" @click.prevent="review()" v-if="showReview">Review Materials</button>
-          <button class="start btn" type="start" @click.prevent="getFirst()" v-if="showStart">Start Quiz</button>
-          <button class="prev btn" type="previous" @click.prevent="previous()" v-if="showPrevious">Previous</button>
-          <button class="next btn" type="next" @click.prevent="next()" v-if="showNext">Next</button>
-          <button class="submit btn" type="submit" @click.prevent="submit()" v-if="showSubmit">Submit Test</button>
-          <router-link to="/dashboard" tag="div" class="done btn" v-if="showDone">Done</router-link>
-          <button class="btn" @click.prevent="reload()" v-if="showRestart">Retake Quiz</button>
-        </div>
+    </div>
+    <div class="passScoreContainer" v-bind:style="[ popUpStyle, popUpBorderStyle ]" v-if="!showQuizReview">
+      <div class="passed">{{ passedMsg }}</div>
+      <div class="score">{{ scoreMsg }}</div>
+      <div class="btnContainer">
+        <button class="reviewBtn btn" type="review" @click.prevent="review()" v-if="showReview">REVIEW TEST</button>
+        <button class="prev btn" type="previous" @click.prevent="previous()" v-if="showPrevious">PREVIOUS</button>
+        <button class="next btn" type="next" @click.prevent="next()" v-if="showNext">NEXT</button>
+        <button class="submit btn" type="submit" @click.prevent="submit()" v-if="showSubmit">SUBMIT TEST</button>
+        <button class="btn" @click.prevent="reload()" v-if="showRestart">RETAKE TEST</button>
       </div>
     </div>
   </div>
@@ -84,6 +95,9 @@ export default {
       showRestart: false,
       imageStyle: { },
       popUpStyle: { },
+      popUpBool: false,
+      popUpCoverStyle:{ },
+      popUpBorderStyle: { },
       quizLength: 0,
       barWidth: 0,
       showProgressBar: false,
@@ -91,7 +105,8 @@ export default {
       showQuizReview: false,
       passedMsg: '',
       coverStyle: { },
-      tries: tries
+      tries: tries,
+      qNumber: ''
     }
   },
   beforeMount(){
@@ -105,11 +120,12 @@ export default {
     },
     updateProgressBar(){
       var index = TrainingService.getIndex(this);
+      this.qNumber = TrainingService.getIndex(this) + 1;
       this.barWidth = 100/(this.quizLength - 1) * index;
       for (var i = 1; i < this.quizLength + 1; i++) {
         var element = document.getElementById('circle-' + i);
         if (i < (index + 2)) {
-          element.style.background = '#000000';
+          element.style.background = '#16D2AA';
         }
         else {
           element.style.background = '#EEEEEE';
@@ -123,7 +139,8 @@ export default {
           backgroundImage: `url(${questionImage})`,
           width: '300px',
           height: '300px',
-          display: 'inline-block',
+          display: 'flex',
+          backgroundSize: '100%',
           backgroundRepeat: 'no-repeat'
         }
       }
@@ -138,6 +155,7 @@ export default {
       this.showStart = false;
       this.showProgressBar = true;
       this.showNext = true;
+      this.qNumber = TrainingService.getIndex(this) + 1;
     },
     previous(){
       TrainingService.saveAnswer(this, this.picked);
@@ -181,8 +199,22 @@ export default {
           if (data.passed) {
             this.passedMsg = 'You passed!';
             this.showDone = true;
+            this.popUpCoverStyle = {
+              backgroundColor: '#E3F2FD'
+            }
+            this.popUpBorderStyle = {
+              borderBottom: '5px solid #1855D1',
+              borderLeft: '5px solid #1855D1'
+            }
           } else {
             this.passedMsg = 'You failed.';
+            this.popUpCoverStyle = {
+              backgroundColor: '#FEEAB2'
+            }
+            this.popUpBorderStyle = {
+              borderBottom: '5px solid #F44747',
+              borderLeft: '5px solid #F44747'
+            }
             if (data.tries < 3) {
               this.showRestart = true;
             }
@@ -203,10 +235,11 @@ export default {
           position: 'absolute',
           top: '0',
           bottom: '0',
-          left: '0',
+          left: '300px',
           right: '0',
           margin: 'auto'
         };
+        this.popUpBool = true;
         this.coverStyle = {
           background: 'rgba(0,0,0,0.10)'
         };
@@ -229,7 +262,8 @@ export default {
             backgroundImage: `url(${questionImage})`,
             width: '300px',
             height: '300px',
-            display: 'inline-block',
+            display: 'flex',
+            backgroundSize: '100%',
             backgroundRepeat: 'no-repeat'
           }
         }
@@ -239,7 +273,10 @@ export default {
       this.questionText = '';
       this.imageStyle = { };
       this.popUpStyle = { };
+      this.popUpBorderStyle = { };
+      this.popUpBool = false;
       this.coverStyle = { };
+      this.qNumber = '';
       this.showReview = false;
       this.showQuizReview = true;
       this.showProgressBar = false;
@@ -254,30 +291,49 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100%;
+  color: #73737A;
+  font-size: 16px;
 }
 
 .header {
-  text-align: start;
-  margin-left: 20px;
+  display: flex;
+  padding: 30px;
+  margin: 0px;
   font-size: 24px;
-  margin-bottom: 50px;
+  border-bottom: 0.5px solid #CCCCCF;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  color: #343440;
 }
 
 .questionImage {
   background-position: center;
 }
 
-.quizBody {
-  align-self: center;
-  margin-top: 20px;
+.body {
+  display: flex;
+  flex-direction: column;
 }
 
-.btn {
-  margin-top: 20px;
+.startBody {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: inherit;
+}
+
+.quizBody {
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+  text-align: left;
+  align-self: center;
 }
 
 .progressBar {
-  margin: 0px 50px;
+  margin: 50px;
 }
 
 .circles {
@@ -297,7 +353,7 @@ export default {
 }
 
 #circle-1 {
-  background: #000000;
+  background: #16D2AA;
 }
 
 .rect {
@@ -309,16 +365,96 @@ export default {
 }
 
 .rect.cover {
-  background: #000000;
+  background: #16D2AA;
   top: -20px;
 }
 
 .question {
   margin: 50px 0px;
+  text-align: left;
+}
+
+.btn.next, .btn.submit {
+  float: right;
+}
+
+.btn.previous {
+  float: left;
 }
 
 .btn {
-  background: #EEEEEE;
+  background: #F6F6F6;
+  border-radius: 20px;
+  width: 140px;
+  height: 40px;
+  color: #16D2AA;
+  font-weight: 600;
+}
+
+.btn:hover {
+  background-color: #16D2AA;
+  color: #FFF;
+}
+
+.instructions {
+  margin: 50px 0;
+}
+
+.questionNumber {
+  font-weight: 600;
+  width: 400px;
+  align-self: center;
+  text-align: left;
+}
+
+input[type=radio]:checked {
+  background-color: #16D2AA;
+}
+
+.btnContainer {
+  display: flex;
+  justify-content: space-between;
+  margin: 50px 75px;
+}
+
+.possibleAnswers {
+  margin: 20px 50px;
+}
+
+label {
+  font-weight: 400;
+  display: inline;
+}
+
+.options {
+  margin-bottom: 10px;
+}
+
+.score {
+  margin-top: 20px;
+}
+
+.popUpCover {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 2;
+}
+
+.passed {
+  font-weight: 600;
+  margin-top: 75px;
+}
+
+.review {
+  width: 600px;
+  align-self: center;
+}
+
+.review .question {
+  border-bottom: 0.5px solid #CCCCCF;
+  padding: 20px;
+  margin: 0px;
 }
 
 </style>
