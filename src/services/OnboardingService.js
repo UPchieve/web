@@ -45,8 +45,7 @@ export default {
       requiredFields = ['firstname', 'lastname'];
     } else {
       requiredFields = [
-        'firstname', 'lastname', 'birthdate', 'serviceInterests', 'gender', 'race',
-        'groupIdentification', 'computerAccess', 'preferredTimes'
+        'firstname', 'lastname', 'birthdate', 'gender', 'race', 'expectedGraduation'
       ];
     }
 
