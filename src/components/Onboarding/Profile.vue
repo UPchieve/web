@@ -21,15 +21,6 @@
       </div>
     </div>
 
-    <div class="row form-group">
-      <p>(Optional) Link to a profile picture</p>
-      <div class="row">
-        <div class="col-sm-6">
-          <input type="url" v-model="user.picture" class="form-control url-box" id="profilePictureInput" placeholder="http://example.com/picture.jpg">
-        </div>
-      </div>
-    </div>
-
     <ul class="row form-group" v-if="!user.isVolunteer">
       <p>Your Birthday</p>
       <div class="row">
