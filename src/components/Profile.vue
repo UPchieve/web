@@ -1,54 +1,33 @@
 <template>
-<div>
-  <div class="profile-header">
-      <h2>{{user.isVolunteer ? 'Volunteer' : 'Student' }} Profile</h2>
+<div class="profile">
+  <div class="header">
+    Profile
+    <button @click="saveProfile()" class="saveBtn btn">{{ saveBtnMsg }}</button>
   </div>
-  <div class="name">
-    <div id="firstname">
-      <span>First name:</span>
-      <span v-show="'firstname' !== activeEdit">{{ user.firstname }}</span>
-      <input type="text" v-model="user.firstname" v-show="'firstname' === activeEdit">
-      <button @click="editField('firstname')">{{ fieldButtons.firstname }}</button>
+  <div class="basic-info">
+    <div class="section" id="profilePic">
+      <div class="prompt">Your profile picture</div>
+      <div class="answer avatar" v-bind:style="avatarStyle">
+      </div>
     </div>
-    <div id="lastname">
-      <span>Last name:</span>
-      <span v-show="'lastname' !== activeEdit">{{ user.lastname }}</span>
-      <input type="text" v-model="user.lastname" v-show="'lastname' === activeEdit">
-      <button @click="editField('lastname')">{{ fieldButtons.lastname }}</button>
+
+    <div class="section" id="email">
+      <div class="prompt">Your Email</div>
+      <div class="answer">{{ user.email }}</div>
     </div>
   </div>
-
-  <div class="email">
-    <span>Email address:</span>
-    {{ user.email }}
-  </div>
-
-  <div><router-link to="resetpassword">Reset password</router-link></div>
 
   <div v-if="!user.isVolunteer">
-    <div id="highschool">
-      <span>High school:</span>
-      <span v-show="'highschool' !== activeEdit">{{ user.highschool }}</span>
+    <div class="section" id="highschool">
+      <div class="prompt">Your High School's Name</div>
+      <div class="answer" v-show="'highschool' !== activeEdit">{{ user.highschool }}</div>
       <input type="text" v-model="user.highschool" v-show="'highschool' === activeEdit">
-      <button @click="editField('highschool')">{{ fieldButtons.highschool }}</button>
+      <button @click="editField('highschool')" class="sectionBtn">{{ fieldButtons.highschool }}</button>
     </div>
 
-    <div class="currentGrade">
-      <span>Current grade:</span>
-      <span v-show="'currentGrade' !== activeEdit">{{ user.currentGrade }}</span>
-      <select class="form-control" v-model="user.currentGrade" v-show="'currentGrade' === activeEdit">
-        <option></option>
-        <option>Freshman</option>
-        <option>Sophomore</option>
-        <option>Junior</option>
-        <option>Senior</option>
-      </select>
-      <button @click="editField('currentGrade')">{{ fieldButtons.currentGrade }}</button>
-    </div>
-
-    <div class="expectedGraduation">
-      <span>Expected graduation:</span>
-      <span v-show="'expectedGraduation' !== activeEdit">{{ user.expectedGraduation }}</span>
+    <div class="section" id="expectedGraduation">
+      <div class="prompt">Expected High School Graduation</div>
+      <div class="answer" v-show="'expectedGraduation' !== activeEdit">{{ user.expectedGraduation }}</div>
       <select class="form-control" v-model="user.expectedGraduation" v-show="'expectedGraduation' === activeEdit">
         <option></option>
         <option>2017</option>
@@ -58,74 +37,19 @@
         <option>2021</option>
         <option>2022</option>
       </select>
-      <button @click="editField('expectedGraduation')">{{ fieldButtons.expectedGraduation }}</button>
+      <button @click="editField('expectedGraduation')" class="sectionBtn">{{ fieldButtons.expectedGraduation }}</button>
     </div>
 
-    <div class="difficultAcademicSubject">
-      <span>Most difficult academic subject:</span>
-      <input type="text" v-model="user.difficultAcademicSubject" v-show="'difficultAcademicSubject' === activeEdit">
-      <span v-show="'difficultAcademicSubject' !== activeEdit">{{ user.difficultAcademicSubject }}</span>
-      <button @click="editField('difficultAcademicSubject')">{{ fieldButtons.difficultAcademicSubject }}</button>
-    </div>
-
-    <div class="difficultCollegeProcess">
-      <span>Difficult aspects of the college process:</span>
-      <div v-show="'difficultCollegeProcess' === activeEdit">
-        <label>
-          <input type="checkbox" value="PersonalStatement" v-model="user.difficultCollegeProcess">
-          Personal Statement / Essay
-        </label>
-        <label>
-          <input type="checkbox" value="Resume" v-model="user.difficultCollegeProcess">
-          Resume
-        </label>
-        <label>
-          <input type="checkbox" value="Application" v-model="user.difficultCollegeProcess">
-          Filling out application
-        </label>
-        <label>
-          <input type="checkbox" value="Exams" v-model="user.difficultCollegeProcess">
-          SAT / ACT Exams
-        </label>
-        <label>
-          <input type="checkbox" value="ChoosingSchools" v-model="user.difficultCollegeProcess">
-          Choosing which schools to apply to
-        </label>
-      </div>
-      <ul v-show="'difficultCollegeProcess' !== activeEdit" v-for="item in user.difficultCollegeProcess">
-        <li>{{ item }}</li>
-      </ul>
-      <button @click="editField('difficultCollegeProcess')">{{ fieldButtons.difficultCollegeProcess }}</button>
-    </div>
-
-    <div class="hasGuidanceCounselor">
-      <span>Have a guidance counselor:</span>
-      <select class="form-control" v-model="user.hasGuidanceCounselor" v-show="'hasGuidanceCounselor' === activeEdit">
-        <option></option>
-        <option>Yes</option>
-        <option>No</option>
-        <option>I don't know</option>
-      </select>
-      <span v-show="'hasGuidanceCounselor' !== activeEdit">{{ user.hasGuidanceCounselor }}</span>
-      <button @click="editField('hasGuidanceCounselor')">{{ fieldButtons.hasGuidanceCounselor }}</button>
-    </div>
-
-    <div class="gpa">
-      <span>GPA:</span>
-      <span v-show="'gpa' !== activeEdit">{{ user.gpa }}</span>
-      <input type="text" v-model="user.gpa" v-show="'gpa' === activeEdit">
-      <button @click="editField('gpa')">{{ fieldButtons.gpa }}</button>
-    </div>
-
-    <div class="collegeApplicationsText">
-      <span>List all colleges and universities you are considering apply to:</span>
-      <span v-show="'collegeApplicationsText' !== activeEdit">{{ user.collegeApplicationsText }}</span>
-      <input type="text" v-model="user.collegeApplicationsText" v-show="'collegeApplicationsText' === activeEdit">
-      <button @click="editField('collegeApplicationsText')">{{ fieldButtons.collegeApplicationsText }}</button>
+  </div>
+  <div v-if="user.isVolunteer" class="cert-info">
+    <div class="info-header cert">Certifications</div>
+    <div class="certifications" v-for="(value, key) in certifications">
+      <div v-if="value">{{ key }}</div>
     </div>
   </div>
 
-  <button @click="saveProfile()">{{ saveBtnMsg }}</button>
+  <div class="section"><router-link to="resetpassword" class="prompt">Reset password</router-link></div>
+
 </div>
 
 </template>
@@ -136,6 +60,7 @@ import UserService from 'src/services/UserService'
 export default {
   data() {
     var user = UserService.getUser();
+    var avatarUrl = user.picture || 'static/defaultavatar.png';
     var fieldnames = ['firstname', 'lastname', 'highschool', 'currentGrade',
     'expectedGraduation', 'difficultAcademicSubject', 'difficultCollegeProcess',
     'hasGuidanceCounselor', 'gpa', 'collegeApplicationsText'];
@@ -143,11 +68,48 @@ export default {
     fieldnames.map(function(field) {
       fieldButtons[field] = 'Edit';
     });
+    var certifications = new Object();
+    if (user.algebra) {
+      if (user.algebra.passed) {
+        certifications['Math: Algebra'] = true;
+      }
+    }
+    if (user.geometry) {
+      if (user.geometry.passed) {
+        certifications['Math: Geometry'] = true;
+      }
+    }
+    if (user.trigonometry) {
+      if (user.trigonometry.passed) {
+        certifications['Math: Trigonometry'] = true;
+      }
+    }
+    if (user.precalculus) {
+      if (user.precalculus.passed) {
+        certifications['Math: Precalculus'] = true;
+      }
+    }
+    if (user.calculus) {
+      if (user.calculus.passed) {
+        certifications['Math: Calculus'] = true;
+      }
+    }
+    if (user.esl) {
+      if (user.esl.passed) {
+        certifications['ESL'] = true;
+      }
+    }
+
     return {
       user: user,
       activeEdit: null,
       fieldButtons: fieldButtons,
-      saveBtnMsg: 'Save Changes'
+      saveBtnMsg: 'Save Profile',
+      name: user.firstname || (user.isVolunteer ? 'volunteer' : 'student'),
+      avatarStyle: {
+        backgroundImage: `url(${avatarUrl})`
+      },
+      certifications: certifications
     }
   },
   methods: {
@@ -155,7 +117,7 @@ export default {
       if (field !== this.activeEdit) {
         this.activeEdit = field;
         this.fieldButtons[field] = 'Done';
-        this.savBtnMsg = 'Save Changes';
+        this.savBtnMsg = 'Save Profile';
       } else {
         this.activeEdit = null;
         this.fieldButtons[field] = 'Edit';
@@ -163,11 +125,133 @@ export default {
     },
     saveProfile() {
       UserService.setProfile(this, this.user);
-      this.saveBtnMsg = 'Changes saved!';
+      this.saveBtnMsg = 'Profile is saved!';
     }
   }
 }
 </script>
 
 <style scoped>
+
+.avatar {
+  display: block;
+  width: 50px;
+  height: 50px;
+  background-size: cover;
+}
+
+button {
+  height: 30px;
+  border-radius: 20px;
+  padding: 0px 10px;
+  color: #16D2AA;
+  background-color: #F6F6F6;
+}
+
+button:active, button:hover {
+  background-color: #16D2AA;
+  color: #FFF;
+}
+
+.saveBtn {
+  font-size: 16px;
+  font-weight: 600;
+  color: #343440;
+  background-color: #FFF;
+}
+
+.saveBtn:active, .saveBtn:hover {
+  background-color: #FFF;
+  color: #16D2AA;
+  box-shadow: none;
+  margin: 0px;
+}
+
+select, input[type=text] {
+  width: 200px;
+  margin-right: 10px;
+  border-color: #16D2AA;
+  border-style: solid;
+}
+
+.profile {
+  font-size: 16px;
+  font-family: Work Sans;
+}
+
+.header {
+  display: flex;
+  padding: 30px;
+  margin: 0;
+  font-size: 24px;
+  border-bottom: 0.5px solid #CCCCCF;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  color: #343440;
+}
+
+.section {
+  display: flex;
+  align-items: center;
+  height: 60px;
+}
+
+.prompt {
+  width: 300px;
+  text-align: left;
+  margin-left: 30px;
+}
+
+.answer {
+  margin-right: 10px;
+  text-align: left
+}
+
+.difficultCollegeProcessAnswer {
+  width: 400px;
+  display: flex;
+  align-items: left;
+  margin-left: 150px;
+  flex-direction: column;
+}
+
+.basic-info {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  margin-top: 30px;
+}
+
+.info-header {
+  display: flex;
+  align-items: center;
+
+  margin-left: 30px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.info-header.basic {
+  height: 60px;
+}
+
+.info-header.cert {
+  margin-bottom: 15px;
+}
+
+.certifications {
+  display: flex;
+  align-items: center;
+  height: 60px;
+  width: 300px;
+  text-align: left;
+  margin-left: 30px;
+}
+
+.cert-info {
+  border-top: 0.5px solid #CCCCCF;
+  padding-top: 30px;
+}
+
 </style>
