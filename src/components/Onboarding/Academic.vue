@@ -107,8 +107,10 @@
       </div>
     </ul>
 
-    <button class="btn btn-lg btn-primary btn-block back" type="back" @click.prevent="back">BACK</button>
-    <button class="btn btn-lg btn-primary btn-block next" type="submit" @click.prevent="submitProfile">{{buttonMsg}}</button>
+    <div class="btn-container">
+      <button class="btn btn-lg btn-primary btn-block back" type="back" @click.prevent="back">BACK</button>
+      <button class="btn btn-lg btn-primary btn-block next" type="submit" @click.prevent="submitProfile">{{buttonMsg}}</button>
+    </div>
   </div>
 </template>
 
@@ -270,11 +272,10 @@ button[type="back"]:hover, button[type="back"]:active {
   color: #FFF;
 }
 
-.btn.back {
-  float: left;
+.btn-container {
+  max-width: 650px;
+  display: flex;
+  justify-content: space-between;
 }
 
-.btn.next {
-  float: right;
-}
 </style>

@@ -93,7 +93,7 @@
       </div>
     </ul>
 
-    <div class="row form-group">
+    <div class="row form-group" v-if="!user.isVolunteer">
       <p>Expected High School Graduation</p>
       <div class="row">
         <div class="col-sm-6">
@@ -110,7 +110,21 @@
       </div>
     </div>
 
-    <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submitProfile">{{buttonMsg}}</button>
+    <div class="row form-group">
+      <p>Were you referred by one of our partner organizations?</p>
+      <div class="row">
+        <div class="col-sm-6">
+          <select class="form-control" v-model="user.referred">
+            <option></option>
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="btn-container">
+      <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submitProfile">{{buttonMsg}}</button>
+    </div>
   </div>
 </template>
 
@@ -282,7 +296,7 @@ button[type="submit"] {
   color: #16D2AA;
   border: none;
   font-weight: 600;
-  margin: 0 50px 50px 50px;
+  margin: 0px 0px 50px;
   border-radius: 20px;
   font-size: 12px;
   float: right;
@@ -291,5 +305,9 @@ button[type="submit"] {
 button[type="submit"]:hover, button[type="submit"]:active {
   background-color: #16D2AA;
   color: #FFF;
+}
+
+.btn-container {
+  max-width: 600px;
 }
 </style>
