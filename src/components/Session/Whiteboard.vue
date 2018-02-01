@@ -2,24 +2,29 @@
   <div class="whiteboard">
       <canvas id='whiteboardCanvas' v-canvas v-on:mousedown="drawStart" v-on:mouseup="drawEnd" v-on:mousemove="draw"></canvas>
       <div class="whiteboardTools row" style="background-color:rgba(238,238,238,1)">
+        <div class="header">Whiteboard Tools</div>
         <div class="toolset col-md-6">
-          <button id='drawButton' v-on:click="drawSetup"></button>
-          <button id='eraseButton' v-on:click="erase"></button>
-          <button id='undoButton' v-on:click="undo"></button>
-          <!-- <button id='textButton' v-on:click="text"></button> -->
-          <button id='clearButton' v-on:click="clear" ></button>
-        </div>
-        <div class="toolset col-md-6">
-          <button class='colorButton' v-on:click="changeColor" style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(244,71,71,1);'></button>
-          <button class='colorButton' v-on:click="changeColor" style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(255,208,115,.6);'></button>
-          <button class='colorButton' v-on:click="changeColor"  style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(22,210,170,.6);'></button>
-          <button class='colorButton' v-on:click="changeColor"  style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(24,85,209,.6);'></button>
-          <button class='colorButton' v-on:click="changeColor"  style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(52,52,64,.6);'></button>
-          <button class='colorButton' v-on:click="changeColor"  style='padding:0px;margin:0px;border:none;width:36px;height:36px;background-color:rgba(38,51,104,1);'></button>
+          <button class='whiteboardBtn' id='clearButton' v-on:click="clear" ></button>
+          <div class="colorWrapper">
+            <button class='whiteboardBtn' id='openColorsButton' v-on:click="openColors" ></button>
+            <div class="toolset col-md-6 colorContainer" v-bind:style="{ visibility: showColors }">
+              <button class='colorButton redBtn' v-on:click="changeColor" style='background-color: rgba(244,71,71,1)'></button>
+              <button class='colorButton yellowBtn' v-on:click="changeColor" style='background-color: rgba(255,208,115,.6)'></button>
+              <button class='colorButton greenBtn' v-on:click="changeColor" style='background-color: rgba(22,210,170,.6)'></button>
+              <button class='colorButton blueBtn' v-on:click="changeColor" style='background-color: rgba(24,85,209,.6)'></button>
+              <button class='colorButton greyBtn' v-on:click="changeColor" style='background-color: rgba(52,52,64,.6)'></button>
+              <button class='colorButton navyBtn' v-on:click="changeColor" style='background-color: rgba(38,51,104,1)'></button>
 
+              <textarea id='textInputBox' v-on:input="textBox" v-on:keydown="keydown" v-on:keyup.enter="hideBox" rows='4' cols='50' style='visibility:hidden' placeholder='Type Here'></textarea>
+            </div>
+          </div>
+          <button class='whiteboardBtn' id='drawButton' v-on:click="drawSetup"></button>
+          <button class='whiteboardBtn' id='eraseButton' v-on:click="erase"></button>
+          <button class='whiteboardBtn' id='undoButton' v-on:click="undo"></button>
+          <!-- <button class='whiteboardBtn' id='textButton' v-on:click="text"></button> -->
 
-          <textarea id='textInputBox' v-on:input="textBox" v-on:keydown="keydown" v-on:keyup.enter="hideBox" rows='4' cols='50' style='visibility:hidden' placeholder='Type Here'></textarea>
         </div>
+
     </div>
   </div>
 </template>
@@ -109,7 +114,8 @@ function saveImage(canvas, ctx) {
 export default {
   data(){
     return {
-      currentSession: SessionService.currentSession
+      currentSession: SessionService.currentSession,
+      showColors: 'hidden'
     }
   },
   directives: {
@@ -286,7 +292,7 @@ export default {
           });
         }
       }
-      
+
     },
     drawEnd: function(event) {
       if (!SERVER_DRAWING){
@@ -309,7 +315,7 @@ export default {
         this.emitSaveImage();
         this.emitEnd();
       }
-        
+
     },
     draw: function(e) {
       if (!SERVER_DRAWING){
@@ -333,7 +339,7 @@ export default {
 
           }
       }
-      
+
     },
     drawSetup: function() {
       App.ctx.strokeStyle = LOCAL_LINE_COLOR;
@@ -482,6 +488,13 @@ export default {
 
       }
       App.ctx.fillText(input, TEXT_POSITION_X, TEXT_POSITION_Y);
+    },
+    openColors() {
+      if (this.showColors == 'hidden') {
+        this.showColors = 'visible';
+      } else {
+        this.showColors = 'hidden';
+      }
     }
   },
   sockets: {
@@ -569,72 +582,77 @@ canvas {
 }
 
 .whiteboardTools {
-  height: 100px;
   padding: 10px 30px;
+  width: 300px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  align-self: center;
+  flex-direction: column;
+  position: absolute;
+  bottom: 0;
 }
 
-.whiteboardTools .toolset {
+.header {
+  font-size: 12px;
+}
 
+.toolset {
+  display: flex;
+  justify-content: center;
+  padding-top: 5px;
+}
+
+.colorContainer {
+  position: absolute;
+  bottom: 85%;
+  height: 30px;
+  width: 130px;
+  padding: 0px 10px 0px 15px;
+  border: 1px solid #979797;
+  background-color: #FFF;
+  border-radius: 5px;
+  z-index: 1;
+  align-items: center;
+}
+
+.whiteboardBtn {
+  padding: 13px;
+  border: none;
+  margin: 4px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: rgb(238, 238, 238);
+}
+
+.colorButton {
+  margin:10px 2px;
+  height: 17px;
+  border-radius: 10px;
 }
 
 #eraseButton {
-  height:36px;
-  width:36px;
-  background-color: rgba(52,52,64,.6);
-  background-image: url('../../assets/eraser_icon.png');
-  padding:0px;
-  border:none;
-  margin:0px;
-  background-repeat: no-repeat;
-  background-position: center;
+  background-image: url('../../assets/eraser_icon.svg');
 }
 
 #drawButton {
-  height:36px;
-  width:36px;
-  background-color: rgba(52,52,64,.6);
-  background-image: url('../../assets/pen_icon.png');
-  padding:0px;
-  margin:0px;
-  border:none;
-  background-repeat: no-repeat;
-  background-position: center;
+  background-image: url('../../assets/pen_icon.svg');
 }
 
 #undoButton {
-  height:36px;
-  width:36px;
-  border:none;
-  background-color: rgba(52,52,64,.6);
-  background-image: url('../../assets/undo.png');
-  padding:0px;
-  margin:0px;
-  background-repeat: no-repeat;
-  background-position: center;
+  background-image: url('../../assets/undo_icon.svg');
 }
 
 #textButton {
-  height:36px;
-  width:36px;
-  border:none;
-  background-color: rgba(52,52,64,.6);
   background-image: url('../../assets/Aa.png');
-  padding:0px;
-  margin:0px;
-  background-repeat: no-repeat;
-  background-position: center;
 }
 
 #clearButton {
-  height:36px;
-  width:36px;
-  border:none;
-  background-color: rgba(52,52,64,.6);
-  background-image: url('../../assets/new_page.png');
-  padding:0px;
-  margin:0px;
-  background-position: center;
-  background-repeat: no-repeat;
+  background-image: url('../../assets/new_page.svg');
+}
+
+#openColorsButton {
+  background-image: url('../../assets/color_icon.svg');
 }
 
 </style>
