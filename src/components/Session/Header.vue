@@ -123,7 +123,7 @@ h1 {
 }
 
 .btn:hover {
-  color: #16D2AA;
+  color: #000000;
 }
 
 .button-container {
