@@ -44,8 +44,9 @@ nav {
   border-radius: 0;
   border: none;
 
-  background-color: #263368;
-  color: white;
+  background-color: #F6F6F6;
+  color: #73737A;
+  font-weight: 600;
 }
 
 h1, h2 {
@@ -62,10 +63,10 @@ h1 {
 h1::before {
   content: "";
   display: inline-block;;
-  width: 50px;
+  width: 100px;
   height: 50px;
-  background-image: url('../assets/logo.png');
-  background-size: 50px 50px;
+  background-image: url('../assets/logo-01.svg');
+  background-size: 100px 50px;
   top: 0;
   left: 0;
 }

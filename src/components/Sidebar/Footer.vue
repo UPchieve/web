@@ -47,7 +47,7 @@ li {
 }
 
 li > a {
-  color: white;
+  color: #73737A;
   padding: 2px 0;
   height: 50px;
   line-height: 50px;
@@ -58,7 +58,8 @@ li > a {
 
 li > a:hover {
   background: none;
-  text-decoration: underline;
+  text-decoration: none;
+  color: #16D2AA;
 }
 
 li > a:focus {
@@ -66,18 +67,9 @@ li > a:focus {
   background: none;
 }
 
-li.active {
-  background-color: #16D2AA;
-}
-
 li.active > a {
   font-weight: bold;
-  background-color: #263368;
-  margin: auto 10px;
-}
-
-li.active > a.login {
-  padding-left: 20px;
+  color: #16D2AA;
 }
 
 a.logout {
@@ -90,6 +82,7 @@ a.logout {
   height: 20px;
   margin-right: 10px;
   margin-left: 20px;
+  background-repeat: no-repeat;
 }
 
 .contact.icon::before {

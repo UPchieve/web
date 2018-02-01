@@ -2,7 +2,6 @@
   <div class="profile-info">
     <div class="avatar" v-bind:style="avatarStyle"></div>
     <p class="greeting">Hello, {{name}}!</p>
-    <router-link to="/profile" class="edit-profile">Edit profile</router-link>
   </div>
 </template>
 
@@ -51,7 +50,7 @@ export default {
 
   .edit-profile {
     font-size: 12px;
-    color: white;
+    color: #73737A;
   }
 
 
