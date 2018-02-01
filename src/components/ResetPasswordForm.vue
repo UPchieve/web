@@ -1,14 +1,17 @@
 <template>
-  <form class="form-resetpassword">
-    <h2 class="form-resetpassword-heading">Reset Your Password</h2>
-    <label for="inputEmail">Please enter your email address</label>
-    <input type="text" id="inputEmail" class="form-control" required autofocus v-model="email">
-    <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">Send Reset Email</button>
-    {{msg}}
-    <div class="help-text">
-      <p>Don't have an account? <router-link to="signup">Register for one!</router-link></p>
-    </div>
-  </form>
+  <div class="background">
+    <form class="form-resetpassword">
+      <div class="header">
+        <div class="reset-header">Reset Your Password</div>
+        <p><router-link to="signup" class="register-link">Register</router-link> /
+        <router-link to="login" class="login-link">Log In</router-link></p>
+      </div>
+      <label for="inputEmail">Please enter your email address</label>
+      <input type="text" id="inputEmail" class="form-control" required autofocus v-model="email">
+      <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">ENTER</button>
+      {{msg}}
+    </form>
+  </div>
 </template>
 
 <script>
@@ -31,22 +34,41 @@ export default {
 </script>
 
 <style scoped>
-h2 {
-  font-size: 24px;
-  text-align: left;
-  font-weight: 600;
-  margin-bottom: 50px;
+
+.background {
+  display: flex;
+  background-image: url('../assets/onboarding_background.png');
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
 }
 
 .form-resetpassword {
-  height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  max-width: 400px;
-  padding: 15px;
+  width: 500px;
+  height: 500px;
   margin: auto;
+  background-color: white;
+  padding: 0px 75px;
 }
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 50px;
+  margin-top: 75px;
+}
+.register-link, .login-link {
+  color: #73737A;
+  font-weight: 600;
+}
+.reset-header {
+  color: #16D2AA;
+  font-weight: 600;
+}
+
 .form-control {
   border: none;
   box-shadow: none;
@@ -66,7 +88,7 @@ label {
   color: #343440;
 }
 .form-control {
-  border-bottom: 3px solid black;
+  border-bottom: 3px solid #16D2AA;
   margin-bottom: 50px;
 }
 
@@ -76,10 +98,19 @@ label {
 }
 
 button[type="submit"] {
-  width: 190px;
-  background-color: #16D2AA;
+  background-color: #F6F6F6;
   border: none;
   font-weight: 600;
+  color: #16D2AA;
+  height: 40px;
+  border-radius: 20px;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+button[type="submit"]:hover, button[type="submit"]:active {
+  color: white;
+  background-color: #16D2AA;
 }
 
 .help-text {
