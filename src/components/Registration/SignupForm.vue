@@ -1,18 +1,21 @@
 <template>
   <form class="form-signup">
+    <div class="header">
+      <router-link to="login" class="login-link">Log In</router-link>
+      <div class="registration-header">Registration</div>
+    </div>
     <div v-if="!showingSuccess">
-      <h2 class="form-signup-heading">Registration</h2>
-      <label for="inputEmail">Your email</label>
+      <label for="inputEmail">Please enter your email</label>
       <input type="email" id="inputEmail" class="form-control" required autofocus v-model="credentials.email">
+      <div class="description">You will be sent a verification email</div>
       <label for="inputPassword">Create a password</label>
       <input type="password" id="inputPassword" class="form-control" required v-model="credentials.password">
       <p class="password-guidelines">It must contain lowercase and uppercase letters, numbers, and at least 8 characters.</p>
-      <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">Next</button>
+      <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">SIGN UP</button>
       {{msg}}
     </div>
     <div class="successMessage" v-else>
-      <h2>Your account has been created!</h2>
-      <p>A verification email has been sent to confirm your account. Follow the link to get started! (Check your spam folder if you do not see the email)</p>
+      <p>You’ve been sent a verification email! Use the link in the email to get started.</p>
     </div>
   </form>
 </template>
@@ -50,18 +53,36 @@ export default {
 </script>
 
 <style scoped>
-h2 {
-  font-size: 24px;
-  text-align: left;
-  font-weight: 600;
+
+.header {
+  display: flex;
+  justify-content: space-between;
   margin-bottom: 50px;
+  margin-top: 65px;
+}
+.login-link {
+  color: #73737A;
+  font-weight: 600;
+}
+.registration-header {
+  color: #16D2AA;
+  font-weight: 600;
+}
+.description {
+  font-size: 12px;
+  text-align: left;
+  margin-bottom: 50px;
+  color: #73737A;
+}
+
+#inputEmail {
+  margin-bottom: 6px;
 }
 
 .form-signup {
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   max-width: 500px;
   padding: 15px;
   margin: auto;
@@ -85,7 +106,7 @@ label {
   color: #343440;
 }
 .form-control {
-  border-bottom: 3px solid black;
+  border-bottom: 3px solid #16D2AA;
   margin-bottom: 50px;
 }
 .form-control:last-of-type {
@@ -106,20 +127,26 @@ label {
 }
 
 button[type="submit"] {
-  width: 190px;
-  background-color: #16D2AA;
+  background-color: #F6F6F6;
   border: none;
-  font-weight: 700;
+  font-weight: 600;
+  color: #16D2AA;
+  height: 40px;
+  border-radius: 20px;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+button[type="submit"]:hover, button[type="submit"]:active {
+  color: white;
+  background-color: #16D2AA;
 }
 
 .successMessage {
   text-align: left;
+  margin-top: 50px;
+  padding-bottom: 20px;
+  border-bottom: 3px solid black;
 }
 
-.successMessage h2 {
-  color: #16D2AA;
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 20px;
-}
 </style>

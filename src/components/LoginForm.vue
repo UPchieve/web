@@ -1,17 +1,19 @@
 <template>
-  <form class="form-signin">
-    <div class="alert alert-danger" role="alert" v-if="error || $route.query['401'] === 'true'">{{error}}</div>
-    <h2 class="form-signin-heading">Log in</h2>
-    <label for="inputEmail">Email</label>
-    <input type="email" id="inputEmail" class="form-control" required autofocus v-model="credentials.email">
-    <label for="inputPassword">Password</label>
-    <input type="password" id="inputPassword" class="form-control" required v-model="credentials.password">
-    <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit">Log in</button>
-    <div class="help-text">
-      <p>Don't have an account? <router-link to="signup">Register for one!</router-link></p>
-      <p>Forget your password? <router-link to="resetpassword">Reset it!</router-link></p>
-    </div>
-  </form>
+  <div class="background">
+    <form class="form-signin">
+      <div class="alert alert-danger" role="alert" v-if="error || $route.query['401'] === 'true'">{{error}}</div>
+      <div class="header">
+        <div class="login-header">Log In</div>
+        <router-link to="signup" class="register-link">Register an Account</router-link></p>
+      </div>
+      <label for="inputEmail">Email</label>
+      <input type="email" id="inputEmail" class="form-control" required autofocus v-model="credentials.email">
+      <label for="inputPassword">Password</label>
+      <input type="password" id="inputPassword" class="form-control password" required v-model="credentials.password">
+      <router-link to="resetpassword" class="password-reset-link">Forgot password?</router-link>
+      <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit">LOGIN</button>
+    </form>
+  </div>
 </template>
 
 <script>
@@ -52,21 +54,35 @@ export default {
 </script>
 
 <style scoped>
-  h2 {
-    font-size: 24px;
-    text-align: left;
-    font-weight: 600;
+  .header {
+    display: flex;
+    justify-content: space-between;
     margin-bottom: 50px;
+    margin-top: 75px;
   }
-
+  .register-link {
+    padding-left: 140px;
+    color: #73737A;
+    font-weight: 600;
+  }
+  .login-header {
+    color: #16D2AA;
+    font-weight: 600;
+  }
+  .password-reset-link {
+    font-size: 12px;
+    text-align: left;
+    margin-bottom: 50px;
+    color: #73737A;
+  }
   .form-signin {
-    height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    max-width: 400px;
-    padding: 15px;
+    width: 500px;
+    height: 500px;
     margin: auto;
+    background-color: white;
+    padding: 0px 75px;
   }
   .form-control {
     border: none;
@@ -85,10 +101,14 @@ export default {
     font-size: 16px;
     font-weight: 400;
     color: #343440;
+    margin: 0px;
   }
   .form-control {
     border-bottom: 3px solid black;
     margin-bottom: 50px;
+  }
+  .form-control.password {
+    margin-bottom: 6px;
   }
 
   .form-control:focus {
@@ -97,10 +117,18 @@ export default {
   }
 
   button[type="submit"] {
-    width: 190px;
-    background-color: #16D2AA;
+    background-color: #F6F6F6;
     border: none;
     font-weight: 600;
+    color: #16D2AA;
+    height: 40px;
+    border-radius: 20px;
+    font-size: 12px;
+  }
+
+  button[type="submit"]:hover, button[type="submit"]:active {
+    color: white;
+    background-color: #16D2AA;
   }
 
   .help-text {
@@ -113,4 +141,14 @@ export default {
     color: #16D2AA;
     font-weight: 700;
   }
+
+  .background {
+    display: flex;
+    background-image: url('../assets/onboarding_background.png');
+    background-size: cover;
+    width: calc(100%);
+    height: 100%;
+    font-size: 16px;
+  }
+
 </style>

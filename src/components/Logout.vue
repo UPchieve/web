@@ -1,9 +1,12 @@
 <template>
-  <div class="logout">
-    <h1>You're logged out!</h1>
-    <a class="btn btn-lg btn-primary btn-block" v-bind:href="mainWebsiteUrl">Go to Main Website</a>
-    <router-link to="/feedback" class="btn btn-lg btn-primary btn-block">Give Feedback</router-link>
-    <router-link to="/login" class="login">Log back in</router-link>
+  <div class="logout background">
+    <div class="form-signout">
+      <h1>You're logged out!</h1>
+      <div class="button-container">
+        <router-link to="/login" class="btn login">LOGIN</router-link>
+        <router-link to="/feedback" class="btn btn-lg btn-primary btn-block feedback">GIVE FEEDBACK</router-link>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -23,35 +26,52 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  max-width: 500px;
-  padding: 15px;
-  margin: auto;
-  padding-left: 100px;
 }
 
 h1 {
-  color: #16D2AA;
+  color: #000;
   font-size: 24px;
   font-weight: 600;
-  margin-bottom: 100px;
+  margin: 100px 0px;
+}
+
+.background {
+  display: flex;
+  background-image: url('../assets/onboarding_background.png');
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
+}
+
+.form-signout {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 500px;
+  height: 500px;
+  margin: auto;
+  background-color: white;
+  padding: 0px 75px;
 }
 
 .btn {
-  width: 250px;
-  background-color: #16D2AA;
+  background-color: #F6F6F6;
   border: none;
-  font-size: 16px;
   font-weight: 600;
-  margin-bottom: 20px;
-  margin-left: auto;
-  margin-right: auto;
+  color: #16D2AA;
+  height: 40px;
+  border-radius: 20px;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 30px;
 }
 
-.btn:hover {
+.btn:hover, .btn:active, .btn.feedback:active {
+  color: white;
   background-color: #16D2AA;
 }
 
-a.login {
-  margin-top: 200px;
-}
 </style>

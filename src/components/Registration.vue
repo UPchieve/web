@@ -1,8 +1,10 @@
 <template>
-  <div class="registration-container">
-    <sig
-    <code-form v-if="!validRegistrationCode"></code-form>
-    <signup-form v-else></signup-form>
+  <div class="registration-container background">
+    <div class="form-register">
+      <sig
+      <code-form v-if="!validRegistrationCode"></code-form>
+      <signup-form v-else></signup-form>
+    </div>
   </div>
 </template>
 
@@ -28,4 +30,25 @@ export default {
 .registration-container {
   height: 100%;
 }
+
+.background {
+  display: flex;
+  background-image: url('../assets/onboarding_background.png');
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
+}
+
+.form-register {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 500px;
+  height: 500px;
+  margin: auto;
+  background-color: white;
+  padding: 0px 75px;
+}
+
 </style>
