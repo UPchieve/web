@@ -60,7 +60,7 @@ import UserService from 'src/services/UserService'
 export default {
   data() {
     var user = UserService.getUser();
-    var avatarUrl = user.picture || 'static/defaultavatar.png';
+    var avatarUrl = user.picture || 'static/defaultavatar4.png';
     var fieldnames = ['firstname', 'lastname', 'highschool', 'currentGrade',
     'expectedGraduation', 'difficultAcademicSubject', 'difficultCollegeProcess',
     'hasGuidanceCounselor', 'gpa', 'collegeApplicationsText'];
