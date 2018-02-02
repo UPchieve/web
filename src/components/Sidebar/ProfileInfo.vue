@@ -6,7 +6,7 @@
     </p>
     <p class="greeting" v-else-if="$route.path.indexOf('/onboarding') !== -1">
       Welcome, Volunteer!
-    <p>
+    </p>
     <p class="greeting" v-else-if="auth.authenticated">
       {{name}}
     </p>
