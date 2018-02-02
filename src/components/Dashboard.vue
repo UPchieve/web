@@ -113,6 +113,8 @@ export default {
     },
     getHelpNext() {
       var topic = this.pickedTopic;
+      //Temp change all to math
+      topic = 'math';
       topic = topic.toLowerCase();
       var linkName = '/session/' + topic;
       this.$router.push(linkName);
