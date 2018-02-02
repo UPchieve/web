@@ -13,6 +13,7 @@
       </p>
     </template>
   </div>
+
 </template>
 
 <script>
@@ -20,7 +21,8 @@
 import UserService from '../../services/UserService';
 
 export default {
-  components: {
+ components: {
+
 
   },
   data() {
