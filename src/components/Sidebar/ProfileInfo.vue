@@ -1,15 +1,17 @@
 <template>
   <div class="profile-info">
     <div class="avatar" v-bind:style="avatarStyle"></div>
-    <p class="greeting" v-if="$route.path.indexOf('/onboarding') !== -1 && !user.isVolunteer">
-      Welcome, Student!
-    </p>
-    <p class="greeting" v-else-if="$route.path.indexOf('/onboarding') !== -1">
-      Welcome, Volunteer!
-    </p>
-    <p class="greeting" v-else-if="auth.authenticated">
-      {{name}}
-    </p>
+    <template>
+      <p class="greeting" v-if="($route.path.indexOf('/onboarding') !== -1 || $route.path.indexOf('/signup') !== -1) && !user.isVolunteer">
+        Welcome, Student!
+      </p>
+      <p class="greeting" v-else-if="$route.path.indexOf('/onboarding') !== -1 || $route.path.indexOf('/signup') !== -1">
+        Welcome, Volunteer!
+      </p>
+      <p class="greeting" v-else>
+        {{name}}
+      </p>
+    </template>
   </div>
 </template>
 
@@ -23,11 +25,9 @@ export default {
   },
   data() {
     let user = UserService.getUser() || {};
-        auth = UserService.getAuth() || {};
 
     var avatarUrl = user.picture || 'static/defaultavatar3.png';
     return {
-      auth: auth,
       user: user,
       name: user.firstname + ' ' + user.lastname || (user.isVolunteer ? 'volunteer' : 'student'),
       avatarStyle: {
