@@ -23,9 +23,11 @@ export default {
   },
   data() {
     let user = UserService.getUser() || {};
+        auth = UserService.getAuth() || {};
 
     var avatarUrl = user.picture || 'static/defaultavatar3.png';
     return {
+      auth: auth,
       user: user,
       name: user.firstname + ' ' + user.lastname || (user.isVolunteer ? 'volunteer' : 'student'),
       avatarStyle: {
