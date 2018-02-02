@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard" v-bind:style="coverStyle">
     <div class="header-container"></div>
-    <h1>Welcome, {{name}}.</h1>
+    <h1>Hello, {{name}}!</h1>
 
     <template v-if="!user.isVolunteer">
       <div class="dashboard-body row">
@@ -19,8 +19,11 @@
             <div class="getHelpPopUp" v-bind:style="popUpStyle" v-if="showHelpPopUp">
               <span>Select a help topic.</span>
               <select class="form-control topic" v-model="pickedTopic">
-                <option value="math">Math</option>
+                <option value="esl">ESL</option>
                 <option value="college">College Counseling</option>
+                <option value="math">Math</option>
+                <option value="science">Science</option>
+                <option value="standardTest">Standardized Tests</option>
               </select>
               <select class="form-control subtopic" v-model="pickedSubtopic">
                 <option v-for="subtopic in subtopics[pickedTopic]">{{ subtopic }}</option>
@@ -74,8 +77,10 @@ export default {
     let user = UserService.getUser() || {};
     var subtopics = {
       'math': ['Algebra', 'Geometry', 'Trigonometry', 'Precalculus', 'Calculus'],
-      'esl': ['ESL'],
-      'college': ['General help']
+      'esl': ['General Help'],
+      'college': ['College Counseling', 'College Planning','Essay Editting'],
+      'science': ['Biology','Chemistry'],
+      'standardTest': ['SAT']
     };
     return {
       user: user,
@@ -133,6 +138,8 @@ export default {
   width: 100%;
   height: 100%;
   background-image: url('../assets/dashboardHeader@2x.png');
+  background-repeat: no-repeat;
+  background-size: cover;
   position: absolute;
   bottom: 0px;
   right: 0;
