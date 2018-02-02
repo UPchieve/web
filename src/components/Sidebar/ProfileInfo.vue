@@ -1,13 +1,7 @@
 <template>
   <div class="profile-info">
     <div class="avatar" v-bind:style="avatarStyle"></div>
-    <p class="greeting" v-if="$route.path.indexOf('/onboarding') !== -1 && !user.isVolunteer">
-      Welcome, Student!
-    </p>
-    <p class="greeting" v-else-if="$route.path.indexOf('/onboarding') !== -1">
-      Welcome, Volunteer!
-    </p>
-    <p class="greeting" v-else-if="auth.authenticated">
+    <p class="greeting">
       {{name}}
     </p>
   </div>
