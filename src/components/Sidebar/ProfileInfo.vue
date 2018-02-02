@@ -1,10 +1,18 @@
 <template>
-  <div class="profile-info">
-    <div class="avatar" v-bind:style="avatarStyle"></div>
-    <p class="greeting">
-      {{name}}
-    </p>
-  </div>
+ <div class="profile-info">
+   <div class="avatar" v-bind:style="avatarStyle"></div>
+   <template>
+     <p class="greeting" v-if="$route.path.indexOf('/onboarding') !== -1 && !user.isVolunteer">
+       Welcome, Student!
+     </p>
+     <p class="greeting" v-else-if="$route.path.indexOf('/onboarding') !== -1">
+       Welcome, Volunteer!
+     </p>
+     <p class="greeting" v-else>
+       {{name}}
+     </p>
+   </template>
+ </div>
 </template>
 
 <script>
@@ -12,23 +20,21 @@
 import UserService from '../../services/UserService';
 
 export default {
-  components: {
+ components: {
 
-  },
-  data() {
-    let user = UserService.getUser() || {};
-        auth = UserService.getAuth() || {};
+ },
+ data() {
+   let user = UserService.getUser() || {};
 
-    var avatarUrl = user.picture || 'static/defaultavatar3.png';
-    return {
-      auth: auth,
-      user: user,
-      name: user.firstname + ' ' + user.lastname || (user.isVolunteer ? 'volunteer' : 'student'),
-      avatarStyle: {
-        backgroundImage: `url(${avatarUrl})`
-      }
-    }
-  },
+   var avatarUrl = user.picture || 'static/defaultavatar3.png';
+   return {
+     user: user,
+     name: user.firstname + ' ' + user.lastname || (user.isVolunteer ? 'volunteer' : 'student'),
+     avatarStyle: {
+       backgroundImage: `url(${avatarUrl})`
+     }
+   }
+ },
   methods: {
     logout(){
       AuthService.logout(this);
