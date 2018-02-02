@@ -1,7 +1,7 @@
 <template>
   <div class="profile-info">
     <div class="avatar" v-bind:style="avatarStyle"></div>
-    <p class="greeting" v-else-if="auth.authenticated">
+    <p class="greeting">
       {{name}}
     </p>
   </div>
