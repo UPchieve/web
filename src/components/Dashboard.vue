@@ -23,7 +23,7 @@
                 <option value="college">College Counseling</option>
                 <option value="math">Math</option>
                 <option value="science">Science</option>
-                <option value="standardTest">Standardized Tests</option>
+                <option value="standardizedtest">Standardized Tests</option>
               </select>
               <select class="form-control subtopic" v-model="pickedSubtopic">
                 <option v-for="subtopic in subtopics[pickedTopic]">{{ subtopic }}</option>
@@ -80,7 +80,7 @@ export default {
       'esl': ['General Help'],
       'college': ['College Counseling', 'College Planning','Essay Editting'],
       'science': ['Biology','Chemistry'],
-      'standardTest': ['SAT']
+      'standardizedtest': ['SAT']
     };
     return {
       user: user,
