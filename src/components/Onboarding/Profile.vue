@@ -116,7 +116,8 @@
         <div class="col-sm-6">
           <select class="form-control" v-model="user.referred">
             <option></option>
-            <option>Yes</option>
+            <option>Yes - Oasis</option>
+            <option>Yes - Big Brothers Big Sisters</option>
             <option>No</option>
           </select>
         </div>
