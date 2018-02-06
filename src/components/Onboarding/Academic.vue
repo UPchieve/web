@@ -107,6 +107,180 @@
       </div>
     </ul>
 
+    <div class="row form-group">
+     <p>Where/How are you currently accessing the internet?</p>
+       <div class="row">
+          <div class="col-sm-6">
+           <select class="form-control" v-model="user.computerAccessLocation">
+             <option></option>
+             <option>School’s computer lab/library</option>
+             <option>Public library</option>
+             <option>Community center</option>
+             <option>Shelter</option>
+             <option>Using a friend’s computer or smartphone</option>
+             <option>Other</option>
+            </select>
+          </div>
+        </div>
+    </div>
+
+    <div class="row form-group">
+     <p>At what time do you usually do your homework?</p>
+       <div class="row">
+          <div class="col-sm-6">
+           <select class="form-control" v-model="user.homeworkTime">
+             <option></option>
+             <option>In the morning before school</option>
+             <option>During school</option>
+             <option>After school (2-5pm)</option>
+             <option>Early evening (5-9pm)</option>
+             <option>Late evening (after 9pm)</option>
+            </select>
+          </div>
+        </div>
+    </div>
+
+    <div class="row form-group">
+      <p>Which academic subject do you find most difficult?</p>
+     <div class="row">
+       <div class="col-sm-12">
+         <input type="text" v-model="user.difficultAcademicSubject" class="form-control">
+       </div>
+     </div>
+  </div>
+
+  <div class="row form-group">
+    <p>What is your current GPA? Please fill out on a 4.0 scale if possible.</p>
+   <div class="row">
+     <div class="col-sm-12">
+       <input type="text" v-model="user.gpa" class="form-control">
+     </div>
+   </div>
+</div>
+
+  <div class="row form-group">
+     <p>Which part of the college application process do you find most difficult?</p>
+      <div class="row">
+       <div class="col-sm-6">
+       <div class="checkbox">
+              <label>
+              <input type="checkbox" value="PersonalStatement" v-model="user.difficultCollegeProcess">
+             Personal Statement / Essay
+             </label>
+            </div>
+            <div class="checkbox">
+            <label>
+            <input type="checkbox" value="Resume" v-model="user.difficultCollegeProcess">
+                         Resume
+                         </label>
+                           </div>
+       </div>
+
+       <div class="col-sm-6">
+       <div class="checkbox">
+              <label>
+               <input type="checkbox" value="Exams" v-model="user.difficultCollegeProcess">
+             SAT / ACT Exams
+             </label>
+                        </div>
+                        <div class="checkbox">
+                          <label>
+                          <input type="checkbox" value="ChoosingSchools" v-model="user.difficultCollegeProcess">
+             Choosing which schools to apply to
+             </label>
+             </div>
+            <div class="checkbox">
+               <label>
+               <input type="checkbox" value="Other" v-model="user.difficultCollegeProcess">
+                Other
+                </label>
+            </div>
+        </div>
+      </div>
+    </div>
+
+   <div class="row form-group">
+     <p>What is the highest level of education completed by one of your parents?</p>
+     <div class="row">
+        <div class="col-sm-12">
+             <div class="checkbox">
+               <label>
+             <input type="checkbox" value="SomeHighSchool" v-model="user.highestLevelEducation">
+             Some high school
+             </label>
+            </div>
+            <div class="checkbox">
+              <label>
+              <input type="checkbox" value="HighSchoolGED" v-model="user.highestLevelEducation">
+              High school/GED degree
+              </label>
+                   </div>
+                   <div class="checkbox">
+                     <label>
+               <input type="checkbox" value="SomeCollege" v-model="user.highestLevelEducation">
+                  Some college
+                  </label>
+                   </div>
+                   <div class="checkbox">
+                     <label>
+                   <input type="checkbox" value="AssociatesDegree" v-model="user.highestLevelEducation">
+             Associate's degree
+             </label>
+                     </div>
+                     <div class="checkbox">
+                       <label>
+                   <input type="checkbox" value="BachelorsDegree" v-model="user.highestLevelEducation">
+                    Bachelor's degree
+                    </label>
+                   </div>
+                   <div class="checkbox">
+                        <label>
+                   <input type="checkbox" value="MastersDegreeHigher" v-model="user.highestLevelEducation">
+                   Master’s degree or higher
+                   </label>
+                     </div>
+                     <div class="checkbox">
+                       <label>
+                    <input type="checkbox" value="NotSure" v-model="user.highestLevelEducation">
+                 Not sure
+                 </label>
+                             </div>
+                           </div>
+                         </div>
+                   </div>
+
+              <div class="row form-group">
+               <p>Does your high school have a college guidance counselor?</p>
+                 <div class="row">
+                    <div class="col-sm-6">
+                   <select class="form-control" v-model="user.hasGuidanceCounselor">
+                     <option></option>
+                       <option>Yes</option>
+                     <option>No</option>
+                     <option>I don't know</option>
+                    </select>
+                 </div>
+                </div>
+              </div>
+
+              <div class="row form-group">
+               <p>How did you hear about UPchieve?</p>
+                 <div class="row">
+                    <div class="col-sm-6">
+                   <select class="form-control" v-model="user.heardFrom">
+                     <option></option>
+                     <option>Flyer</option>
+                     <option>Email</option>
+                     <option>Friend</option>
+                     <option>Family</option>
+                     <option>Teacher</option>
+                     <option>Mentor</option>
+                     <option>Other</option>
+                    </select>
+                 </div>
+                </div>
+              </div>
+
     <div class="btn-container">
       <button class="btn btn-lg btn-primary btn-block back" type="back" @click.prevent="back">BACK</button>
       <button class="btn btn-lg btn-primary btn-block next" type="submit" @click.prevent="submitProfile">{{buttonMsg}}</button>
@@ -144,7 +318,24 @@ export default {
           this.error = 'If you don\'t identify with any of the groups, please select "None of the Above"' ;
         } else if (!this.user.computerAccess.length){
           this.error = 'If you don\'t have access to a computer or phone with internet access, please select "None"' ;
+        } else if (!this.user.computerAccessLocation || this.user.computerAccessLocation === ''){
+          this.error = 'Please provide where you are accessing this site from' ;
+        } else if (!this.user.homeworkTime || this.user.homeworkTime === ''){
+          this.error = 'Please provide the times times you generally do your homework' ;
+        } else if (!this.user.difficultAcademicSubject || this.user.difficultAcademicSubject === ''){
+          this.error = 'Please provide the academic subjects you find most difficult' ;
+        } else if (!this.user.gpa || this.user.gpa === ''){
+          this.error = 'Please provide your GPA' ;
+        } else if (!this.user.difficultCollegeProcess.length){
+          this.error = 'Please provide the aspects of the college process that are most difficult' ;
+        } else if (!this.user.highestLevelEducation.length){
+          this.error = 'Please provide your parent\'s highest level of education' ;
+        } else if (!this.user.hasGuidanceCounselor || this.user.hasGuidanceCounselor === ''){
+          this.error = 'Please provide whether or not you have a guidance counselor' ;
+        } else if (!this.user.heardFrom || this.user.heardFrom === ''){
+          this.error = 'Please provide where you heard about UPchieve' ;
         }
+
       }
 
       if (this.error !== ''){

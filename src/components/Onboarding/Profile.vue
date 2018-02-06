@@ -21,7 +21,7 @@
       </div>
     </div>
 
-    <ul class="row form-group" v-if="!user.isVolunteer">
+    <ul class="row form-group">
       <p>Your Birthday</p>
       <div class="row">
         <div class="col-sm-6">
@@ -31,7 +31,7 @@
       </div>
     </ul>
 
-    <ul class="row form-group" v-if="!user.isVolunteer">
+    <ul class="row form-group">
       <p>Your Gender</p>
       <div class="row">
         <div class="col-sm-6">
@@ -45,7 +45,7 @@
       </div>
     </ul>
 
-    <ul class="row form-group" v-if="!user.isVolunteer">
+    <ul class="row form-group">
       <p>Your Race/Ethnicity (Please select all that apply.)</p>
       <div class="race-container">
         <div class="checkbox">
@@ -94,6 +94,15 @@
     </ul>
 
     <div class="row form-group" v-if="!user.isVolunteer">
+      <p>Current high school</p>
+      <div class="row">
+          <div class="col-sm-12">
+           <input type="text" v-model="user.highschool" class="form-control" required autofocus>
+        </div>
+      </div>
+    </div>
+
+    <div class="row form-group" v-if="!user.isVolunteer">
       <p>Expected High School Graduation</p>
       <div class="row">
         <div class="col-sm-6">
@@ -110,7 +119,7 @@
       </div>
     </div>
 
-    <div class="row form-group">
+    <div class="row form-group" v-if="!user.isVolunteer">
       <p>Were you referred by one of our partner organizations?</p>
       <div class="row">
         <div class="col-sm-6">
@@ -123,6 +132,7 @@
         </div>
       </div>
     </div>
+
     <div class="btn-container">
       <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submitProfile">{{buttonMsg}}</button>
     </div>
@@ -165,8 +175,6 @@ export default {
           this.error = 'Please provide your full name';
         } else if (!this.user.lastname || this.user.lastname === '') {
           this.error = 'Please provide your full name';
-        } else if (this.user.picture && !validator.isURL(this.user.picture)){
-          this.error = 'Profile picture URL is invalid';
         } else if (!this.user.birthdate || this.user.birthdate === ''){
           this.error = 'Please provide your birthday'
         } else if (birthdateValidation !== true){
@@ -175,14 +183,26 @@ export default {
           this.error = 'Please select a gender';
         } else if (!this.user.race.length){
           this.error = 'Please select a race';
+        } else if (!this.user.highschool || this.user.highschool === ''){
+          this.error = 'Please provide the name of your high school';
         } else if (!this.user.expectedGraduation || this.user.expectedGraduation === ''){
           this.error = 'Please provide your expected graduation year';
+        } else if (!this.user.referred || this.user.referred === ''){
+          this.error = 'Please provide your referral information';
         }
       } else {
         if (!this.user.firstname || this.user.firstname === ''){
           this.error = 'Please provide your full name';
         } else if (!this.user.lastname || this.user.lastname === '') {
           this.error = 'Please provide your full name';
+        } else if (!this.user.birthdate || this.user.birthdate === ''){
+          this.error = 'Please provide your birthday'
+        } else if (birthdateValidation !== true){
+          this.error = birthdateValidation;
+        } else if (!this.user.gender || this.user.gender === ''){
+          this.error = 'Please select a gender';
+        } else if (!this.user.race.length){
+          this.error = 'Please select a race';
         }
       }
 
