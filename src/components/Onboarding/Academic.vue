@@ -426,12 +426,12 @@ label {
 }
 
 .form-control {
-  border-bottom: 3px solid black;
+  border-bottom: 3px solid #16D2AA;
   margin-bottom: 10px;
 }
 
 .form-control:focus {
-  border-bottom: 3px solid black;
+  border-bottom: 3px solid #16D2AA;
   box-shadow: none;
 }
 
@@ -441,7 +441,7 @@ label {
 
 select.form-control, select.form-control:focus {
   border-bottom: 0;
-  border: 1px solid #979797;
+  border: 1px solid #16D2AA;
 }
 
 button[type="submit"], button[type="back"] {

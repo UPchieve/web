@@ -11,10 +11,37 @@
       </div>
     </div>
 
+    <div class="section" id="nickname">
+      <div class="prompt">Your Nickname</div>
+      <div class="answer" v-show="'nickname' !== activeEdit">{{ user.nickname }}</div>
+      <input type="text" v-model="user.nickname" v-show="'nickname' === activeEdit">
+      <button @click="editField('nickname')" class="sectionBtn">{{ fieldButtons.nickname || 'Edit' }}</button>
+    </div>
+
     <div class="section" id="email">
       <div class="prompt">Your Email</div>
       <div class="answer">{{ user.email }}</div>
     </div>
+
+    <div class="section" id="birthdate">
+      <div class="prompt">Your Birthday</div>
+      <div class="answer">{{ user.birthdate }}</div>
+    </div>
+
+    <div class="section" id="gender">
+      <div class="prompt">Your Gender</div>
+      <div class="answer">{{ user.gender }}</div>
+    </div>
+
+    <div class="section" id="race">
+      <div class="prompt">Your Race</div>
+      <div class="answer">
+        <ul v-show="'race' !== activeEdit" v-for="item in user.race">
+          <li>{{ item }}</li>
+        </ul>
+      </div>
+    </div>
+
   </div>
 
   <div v-if="!user.isVolunteer">
@@ -252,6 +279,10 @@ select, input[type=text] {
 .cert-info {
   border-top: 0.5px solid #CCCCCF;
   padding-top: 30px;
+}
+
+ul {
+  padding: 15px;
 }
 
 </style>

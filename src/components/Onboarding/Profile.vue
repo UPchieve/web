@@ -18,6 +18,12 @@
           <input type="text" v-model="user.lastname" class="form-control" id="lastNameInput">
           <label for="lastNameInput">Last</label>
         </div>
+
+        <div class="col-sm-6">
+          <input type="text" v-model="user.nickname" class="form-control" id="nicknameInput" required autofocus>
+          <label for="nicknameInput">Nickname</label>
+        </div>
+
       </div>
     </div>
 
@@ -297,7 +303,7 @@ label {
 }
 
 .form-control:focus {
-  border-bottom: 3px solid black;
+  border-bottom: 3px solid #16D2AA;
   box-shadow: none;
 }
 
@@ -331,4 +337,5 @@ button[type="submit"]:hover, button[type="submit"]:active {
 .btn-container {
   max-width: 600px;
 }
+
 </style>
