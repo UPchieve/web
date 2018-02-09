@@ -42,7 +42,8 @@ export default {
         requiredFields;
 
     if (user.isVolunteer){
-      requiredFields = ['firstname', 'lastname', 'birthdate', 'gender', 'race'];
+      requiredFields = ['firstname', 'lastname', 'birthdate', 'gender', 'race',
+      'phone', 'referred', 'favoriteAcademicSubject', 'college'];
     } else {
       requiredFields = [
         'firstname', 'lastname', 'birthdate', 'gender', 'race', 'expectedGraduation'

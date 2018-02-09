@@ -139,6 +139,50 @@
       </div>
     </div>
 
+    <div class="row form-group" v-if="user.isVolunteer">
+      <p>Your Phone Number</p>
+      <div class="row">
+          <div class="col-sm-12">
+           <input type="text" v-model="user.phone" class="form-control" required autofocus>
+        </div>
+      </div>
+      <label>We will use this number to send
+      you notifications when a student needs help. You will only receive
+      notifications during the periods that you select in your schedule.</label>
+    </div>
+
+    <div class="row form-group" v-if="user.isVolunteer">
+      <p>Your College</p>
+      <div class="row">
+          <div class="col-sm-12">
+           <input type="text" v-model="user.college" class="form-control" required autofocus>
+        </div>
+      </div>
+    </div>
+
+    <div class="row form-group" v-if="user.isVolunteer">
+      <p>Your Favorite Academic Subject</p>
+      <div class="row">
+          <div class="col-sm-12">
+           <input type="text" v-model="user.favoriteAcademicSubject" class="form-control" required autofocus>
+        </div>
+      </div>
+    </div>
+
+    <div class="row form-group" v-if="user.isVolunteer">
+      <p>Were you referred by one of our partner organizations?</p>
+      <div class="row">
+        <div class="col-sm-6">
+          <select class="form-control" v-model="user.referred">
+            <option></option>
+            <option>Yes - APO Xi Alpha</option>
+            <option>Yes - Alpha Gamma Iota</option>
+            <option>No</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
     <div class="btn-container">
       <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submitProfile">{{buttonMsg}}</button>
     </div>
@@ -209,6 +253,14 @@ export default {
           this.error = 'Please select a gender';
         } else if (!this.user.race.length){
           this.error = 'Please select a race';
+        } else if (!this.user.phone || this.user.phone === ''){
+          this.error = 'Please provide your phone number';
+        } else if (!this.user.college || this.user.college === ''){
+          this.error = 'Please provide your college';
+        } else if (!this.user.favoriteAcademicSubject || this.user.favoriteAcademicSubject === ''){
+          this.error = 'Please provide your favorite academic subject';
+        } else if (!this.user.referred.length){
+          this.error = 'Please provide your referral information';
         }
       }
 
@@ -222,7 +274,7 @@ export default {
         UserService.setProfile(this, this.user, '/onboarding/academic')
       }
       else {
-        UserService.setProfile(this, this.user, '/dashboard')
+        UserService.setProfile(this, this.user, '/')
       }
     }
   }
