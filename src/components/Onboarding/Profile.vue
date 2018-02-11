@@ -21,7 +21,7 @@
       </div>
     </div>
 
-    <ul class="row form-group" v-if="!user.isVolunteer">
+    <ul class="row form-group" v-if="user.isVolunteer">
       <p>Your Birthday</p>
       <div class="row">
         <div class="col-sm-6">
