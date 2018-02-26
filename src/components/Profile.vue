@@ -11,10 +11,37 @@
       </div>
     </div>
 
+    <div class="section" id="nickname">
+      <div class="prompt">Your Nickname</div>
+      <div class="answer" v-show="'nickname' !== activeEdit">{{ user.nickname }}</div>
+      <input type="text" v-model="user.nickname" v-show="'nickname' === activeEdit">
+      <button @click="editField('nickname')" class="sectionBtn">{{ fieldButtons.nickname }}</button>
+    </div>
+
     <div class="section" id="email">
       <div class="prompt">Your Email</div>
       <div class="answer">{{ user.email }}</div>
     </div>
+
+    <div class="section" id="birthdate">
+      <div class="prompt">Your Birthday</div>
+      <div class="answer">{{ user.birthdate }}</div>
+    </div>
+
+    <div class="section" id="gender">
+      <div class="prompt">Your Gender</div>
+      <div class="answer">{{ user.gender }}</div>
+    </div>
+
+    <div class="section" id="race">
+      <div class="prompt">Your Race</div>
+      <div class="answer">
+        <ul v-show="'race' !== activeEdit" v-for="item in user.race">
+          <li>{{ item }}</li>
+        </ul>
+      </div>
+    </div>
+
   </div>
 
   <div v-if="!user.isVolunteer">
@@ -41,6 +68,43 @@
     </div>
 
   </div>
+  <div v-if="user.isVolunteer">
+    <div class="section" id="phone">
+      <div class="prompt">Your Phone Number
+      </div>
+      <div class="answer" v-show="'phone' !== activeEdit">{{ user.phone }}</div>
+      <input type="text" v-model="user.phone" v-show="'phone' === activeEdit">
+      <button @click="editField('phone')" class="sectionBtn">{{ fieldButtons.phone }}</button>
+    </div>
+    <div class="description">We will use this number to send
+    you notifications when a student needs help. You will only receive
+    notifications during the periods that you select in your schedule.</div>
+
+    <div class="section" id="college">
+      <div class="prompt">Your College</div>
+      <div class="answer" v-show="'college' !== activeEdit">{{ user.college }}</div>
+    </div>
+
+    <div class="section" id="favoriteAcademicSubject">
+      <div class="prompt">Your Favorite Academic Subject</div>
+      <div class="answer" v-show="'favoriteAcademicSubject' !== activeEdit">{{ user.favoriteAcademicSubject }}</div>
+      <input type="text" v-model="user.favoriteAcademicSubject" v-show="'favoriteAcademicSubject' === activeEdit">
+      <button @click="editField('favoriteAcademicSubject')" class="sectionBtn">{{ fieldButtons.favoriteAcademicSubject }}</button>
+    </div>
+
+    <div class="section" id="referred">
+      <div class="prompt">Were you referred by one of our partner organizations?</div>
+      <div class="answer" v-show="'referred' !== activeEdit">{{ user.referred }}</div>
+      <select class="form-control" v-model="user.referred" v-show="'referred' === activeEdit">
+        <option></option>
+        <option>Yes - APO Xi Alpha</option>
+        <option>Yes - Alpha Gamma Iota</option>
+        <option>No</option>
+      </select>
+      <button @click="editField('referred')" class="sectionBtn">{{ fieldButtons.referred }}</button>
+    </div>
+  </div>
+
   <div v-if="user.isVolunteer" class="cert-info">
     <div class="info-header cert">Certifications</div>
     <div class="certifications" v-for="(value, key) in certifications">
@@ -61,9 +125,10 @@ export default {
   data() {
     var user = UserService.getUser();
     var avatarUrl = user.picture || 'static/defaultavatar4.png';
-    var fieldnames = ['firstname', 'lastname', 'highschool', 'currentGrade',
+    var fieldnames = ['firstname', 'lastname', 'nickname', 'highschool', 'currentGrade',
     'expectedGraduation', 'difficultAcademicSubject', 'difficultCollegeProcess',
-    'hasGuidanceCounselor', 'gpa', 'collegeApplicationsText'];
+    'hasGuidanceCounselor', 'gpa', 'collegeApplicationsText', 'phone', 'favoriteAcademicSubject', 'college',
+    'referred'];
     var fieldButtons = [];
     fieldnames.map(function(field) {
       fieldButtons[field] = 'Edit';
@@ -201,6 +266,7 @@ select, input[type=text] {
   width: 300px;
   text-align: left;
   margin-left: 30px;
+  padding-bottom: 20px;
 }
 
 .answer {
@@ -252,6 +318,18 @@ select, input[type=text] {
 .cert-info {
   border-top: 0.5px solid #CCCCCF;
   padding-top: 30px;
+}
+
+ul {
+  padding: 15px;
+}
+
+.description {
+  font-size: 12px;
+  max-width: 500px;
+  margin-left: 30px;
+  margin-bottom: 20px;
+  text-align: left;
 }
 
 </style>
