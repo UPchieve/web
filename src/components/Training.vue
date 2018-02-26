@@ -48,13 +48,19 @@ export default {
     var quizzes = new Object();
     quizzes['math'] = ['algebra', 'geometry', 'trigonometry', 'precalculus', 'calculus'];
     quizzes['esl'] = ['esl'];
+    quizzes['college Counseling'] = ['planning', 'essay', 'application'];
+    quizzes['science'] = ['biology', 'chemistry'];
     var bools = new Object();
     bools['math'] = false;
     bools['esl'] = false;
-    var supercategories = ['esl', 'math'];
+    bools['college Counseling'] = false;
+    bools['science'] = false;
+    var supercategories = ['esl', 'math', 'college Counseling', 'science'];
     var colors = new Object();
     colors['esl'] = '#1855D1';
     colors['math'] = '#F7AEF8';
+    colors['college Counseling'] = '#FED766';
+    colors['science'] = '#9575CD';
     return {
       user: user,
       quizzes: quizzes,
