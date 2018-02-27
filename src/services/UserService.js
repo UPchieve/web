@@ -34,6 +34,7 @@ export default {
     return OnboardingService.status;
   },
   setProfile(context, data, redirect){
+    console.log(data.phone)
     NetworkService.setProfile(context, data).then((res) => {
       console.log(res.data);
       if (res.data){
