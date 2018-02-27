@@ -18,12 +18,8 @@ export default {
       return {};
     }
   },
-  validateBirthdate(){
-    var user = this.getUser(),
-        birthdate = user.birthdate;
-
+  validateBirthdate(birthdate){
     var m = moment(birthdate, 'MM/DD/YYYY');
-
     if (!m.isValid()){
       return 'Birthdate is invalid'
     }
