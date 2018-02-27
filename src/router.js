@@ -73,6 +73,7 @@ const router = new VueRouter({
 export {router}; // Expose router to app controllers
 
 // Router middleware to check authentication for protect routes
+
 router.beforeEach((to, from, next) => {
   if (to.matched.some(route => route.meta.protected)){
     if (!AuthService.user.authenticated){
