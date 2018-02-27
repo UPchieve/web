@@ -218,7 +218,7 @@ export default {
       this.error = ''
 
       var user = UserService.getUser()
-      var birthdateValidation = UserService.validateBirthdate();
+      var birthdateValidation = UserService.validateBirthdate(this.user.birthdate);
 
       if (!user.isVolunteer) {
         if (!this.user.firstname || this.user.firstname === ''){
