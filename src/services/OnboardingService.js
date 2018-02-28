@@ -40,13 +40,13 @@ export default {
   hasProfile(){
     var user = UserService.getUser(),
         requiredFields;
-    console.log(user.firstname);
-    console.log(user.lastname);
-    console.log(user.birthdate);
-    console.log(user.gender);
-    console.log(user.race);
-    console.log(user.phone);
-    console.log(user.referred);
+    // console.log(user.firstname);
+    // console.log(user.lastname);
+    // console.log(user.birthdate);
+    // console.log(user.gender);
+    // console.log(user.race);
+    // console.log(user.phone);
+    // console.log(user.referred);
     if (user.isVolunteer){
       requiredFields = ['firstname', 'lastname', 'birthdate', 'gender', 'race',
       'phone', 'referred', 'favoriteAcademicSubject', 'college'];

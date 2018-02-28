@@ -34,9 +34,10 @@ export default {
     return OnboardingService.status;
   },
   setProfile(context, data, redirect){
-    console.log(data.phone)
+    
     NetworkService.setProfile(context, data).then((res) => {
-      console.log(res.data);
+     console.log(res.bodyText);
+      //console.log(res.data.user);
       if (res.data){
         AuthService.storeUser(res.data.user)
         context.msg = 'Set!'
