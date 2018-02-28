@@ -127,8 +127,7 @@ export default {
     var avatarUrl = user.picture || 'static/defaultavatar4.png';
     var fieldnames = ['firstname', 'lastname', 'nickname', 'highschool', 'currentGrade',
     'expectedGraduation', 'difficultAcademicSubject', 'difficultCollegeProcess',
-    'hasGuidanceCounselor', 'gpa', 'collegeApplicationsText', 'phone', 'favoriteAcademicSubject', 'college',
-    'referred'];
+    'hasGuidanceCounselor', 'gpa', 'collegeApplicationsText', 'phone', 'favoriteAcademicSubject', 'college','referred'];
     var fieldButtons = [];
     fieldnames.map(function(field) {
       fieldButtons[field] = 'Edit';
