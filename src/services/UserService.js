@@ -34,10 +34,7 @@ export default {
     return OnboardingService.status;
   },
   setProfile(context, data, redirect){
-    
     NetworkService.setProfile(context, data).then((res) => {
-     console.log(res.bodyText);
-      //console.log(res.data.user);
       if (res.data){
         AuthService.storeUser(res.data.user)
         context.msg = 'Set!'
