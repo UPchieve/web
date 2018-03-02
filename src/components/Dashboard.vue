@@ -22,9 +22,6 @@
                 <option value="math">Math</option>
                 <option value="college">College Counseling</option>
                 <option value="esl">ESL</option>
-                // Temporarily removing science and Standardized Testing since quizzes are not set up
-                // <option value="science">Science</option>
-                // <option value="standardizedtest">Standardized Tests</option>
               </select>
               <select class="form-control subtopic" v-model="pickedSubtopic">
                 <option v-for="subtopic in subtopics[pickedTopic]">{{ subtopic }}</option>
