@@ -31,9 +31,16 @@ export default {
     var avatarUrl = user.picture || 'static/defaultavatar3.png';
     return {
       user: user,
-      name: user.firstname + ' ' + user.lastname,
       avatarStyle: {
         backgroundImage: `url(${avatarUrl})`
+      }
+    }
+  },
+  computed: {
+    name: {
+      cache: false,
+      get: function() {
+        return this.user.firstname + ' ' + this.user.lastname
       }
     }
   },
