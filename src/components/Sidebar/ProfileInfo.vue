@@ -28,7 +28,7 @@ export default {
   data() {
     let user = UserService.getUser() || {};
 
-    var avatarUrl = user.picture || 'static/defaultavatar3.png';
+    var avatarUrl = user.picture || (user.isVolunteer ? 'static/defaultavatar4.png' : 'static/defaultavatar3.png');
     return {
       user: user,
       name: user.firstname + ' ' + user.lastname,
