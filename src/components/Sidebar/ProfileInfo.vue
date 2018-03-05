@@ -8,8 +8,14 @@
       <p class="greeting" v-else-if="$route.path.indexOf('/onboarding') !== -1 || $route.path.indexOf('/signup') !== -1">
         Welcome, Volunteer!
       </p>
+      <p class="greeting" v-else-if='!user.isVolunteer && user.firstname === undefined'>
+        Welcome, Student!
+      </p>
+      <p class="greeting" v-else-if='user.isVolunteer &&  user.firstname === undefined'>
+        Welcome Volunteer!
+      </p>
       <p class="greeting" v-else>
-        {{name}}
+        {{ name }}
       </p>
     </template>
   </div>
