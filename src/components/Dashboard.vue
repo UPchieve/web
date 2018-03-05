@@ -76,7 +76,11 @@ export default {
     var subtopics = {
       'math': ['Algebra', 'Geometry', 'Trigonometry', 'Precalculus', 'Calculus'],
       'esl': ['General Help'],
-      'college': ['College Planning', 'Application Help','Essay Editing']
+      'college': ['Planning', 'Applications','Essays']
+
+      // Temporarily changing to single word labels
+      // 'college': ['College Planning', 'Application Help','Essay Editing']
+
       // Temporarily removing science and standardized testing
       // 'science': ['Biology','Chemistry'],
       // 'standardizedtest': ['SAT']
