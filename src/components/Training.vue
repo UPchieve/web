@@ -48,7 +48,7 @@ export default {
     var quizzes = new Object();
     quizzes['math'] = ['algebra', 'geometry', 'trigonometry', 'precalculus', 'calculus'];
     quizzes['esl'] = ['esl'];
-    quizzes['college Counseling'] = ['planning', 'essay', 'application'];
+    quizzes['college Counseling'] = ['planning', 'essays', 'applications'];
     quizzes['science'] = ['biology', 'chemistry'];
     var bools = new Object();
     bools['math'] = false;

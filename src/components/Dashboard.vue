@@ -78,7 +78,7 @@ export default {
     var subtopics = {
       'math': ['Algebra', 'Geometry', 'Trigonometry', 'Precalculus', 'Calculus'],
       'esl': ['General Help'],
-      'college': ['College Counseling', 'College Planning','Essay Editting'],
+      'college': ['College Counseling', 'College Planning','Essay Editing'],
       'science': ['Biology','Chemistry'],
       'standardizedtest': ['SAT']
     };
