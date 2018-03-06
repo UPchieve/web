@@ -1,4 +1,6 @@
 <template>
+	<div class="row">
+		<div class="col-sm-12">
 		<template v-if="!user.isVolunteer">
 			
     <div class="container">
