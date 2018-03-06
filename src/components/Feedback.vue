@@ -31,7 +31,7 @@
   </label>
 </div>
 <br>
-   <div class="form-group">
+   <div class="form-group col-xs-4">
     <label for="exampleInputEmail1">What Day did you log on for help? <b class="text-danger">*
     </b> </label>
   
@@ -53,7 +53,7 @@
     <label for="exampleTable">What topics did volunteer help you with today? <b class="text-danger">*
     </b> </label>
   
-      <div class="form-control date">
+      <div class="form-group date">
       <input type="text" class="form-control" id="" placeholder="Your Answer">
   </div>
 </div>
@@ -341,7 +341,7 @@
     <label for="exampleInputEmail1"><h4>What Day did you log on for help? <b class="text-danger">*
     </b></h4> </label>
   
-      <div class="input-group date">
+      <div class="form-group date">
       <input type="text" class="form-control" id="datepicker" placeholder="MM/DD/YYYY">
   </div>
 </div>
@@ -350,7 +350,7 @@
     <label for="exampleInputEmail1"><h4>What's todays date? <b class="text-danger">*
     </b></h4> </label>
   
-      <div class="input-group date">
+      <div class="form-group date">
       <input type="text" class="form-control" id="bfh-timepicker" placeholder="mm/dd/yyyy">
   </div>
 </div>
@@ -359,7 +359,7 @@
     <label for="exampleTable"><h4>What topics did you help the student with? <b class="text-danger">*
     </b></h4> </label>
   
-      <div class="input-group date">
+      <div class="form-group date">
       <input type="text" class="form-control" id="" placeholder="Your Answer">
   </div>
 </div>
@@ -367,7 +367,7 @@
 <div class="form-group">
     <label for="exampleTable"><h4>Were there any features that you needed or would have been helpful during this session that the web app didnt have?</h4> </label>
   
-      <div class="input-group date">
+      <div class="form-group date">
       <input type="text" class="form-control" id="" placeholder="Your Answer">
   </div>
 </div>
