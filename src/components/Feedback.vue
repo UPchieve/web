@@ -13,6 +13,7 @@
   </div>
 </div>
 <!--feedback Form Below-->
+<div class="container">
 <form >
    <div class="form-group">
     <label for="validationCustom01">What service did you Recieve? <b class="text-danger">*
@@ -289,6 +290,7 @@
 
   <button type="submit" class="btn btn-primary">Submit</button>
   </form>
+</div>
 
 </div>
 </for>
@@ -304,6 +306,7 @@
   </div>
 </div>
 <!--feedback Form Below-->
+<div class="container">
 <form >
    <div class="form-group">
     <label for="validationCustom01"><h4>What is your name? <b class="text-danger">*
@@ -389,7 +392,7 @@
 
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
-
+</div>
 </div>
 		</template>
 		</div>
