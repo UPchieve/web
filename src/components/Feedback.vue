@@ -31,7 +31,7 @@
   </label>
 </div>
 <br>
-   <div class="form-group col-xs-4">
+   <div class="form-group ">
     <label for="exampleInputEmail1">What Day did you log on for help? <b class="text-danger">*
     </b> </label>
   
