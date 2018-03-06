@@ -53,7 +53,7 @@
     <label for="exampleTable">What topics did volunteer help you with today? <b class="text-danger">*
     </b> </label>
   
-      <div class="input-group date">
+      <div class="form-control date">
       <input type="text" class="form-control" id="" placeholder="Your Answer">
   </div>
 </div>
