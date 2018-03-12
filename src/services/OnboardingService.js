@@ -40,9 +40,9 @@ export default {
   hasProfile(){
     var user = UserService.getUser(),
         requiredFields;
-
     if (user.isVolunteer){
-      requiredFields = ['firstname', 'lastname'];
+      requiredFields = ['firstname', 'lastname', 'birthdate', 'gender', 'race',
+      'phone', 'referred', 'favoriteAcademicSubject', 'college'];
     } else {
       requiredFields = [
         'firstname', 'lastname', 'birthdate', 'gender', 'race', 'expectedGraduation'
@@ -52,7 +52,7 @@ export default {
     // Test if each required field is present, return true when field fails to terminate iteration
     var hasInvalidField = requiredFields.some((fieldName) => {
       var field = user[fieldName];
-      if (field === null){
+      if (field === null || field === undefined){
         return true; // Field must be non-null
       } else if (Array.isArray(field) && field.length === 0){
         return true; // If field is an array, it must be populated

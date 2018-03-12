@@ -28,7 +28,6 @@ export default {
   confirmReset(context, data){
     return context.$http.post(`${AUTH_ROOT}/reset/confirm`, data).then(this._successHandler, this._errorHandler)
   },
-
   user(context){
     return context.$http.get(`${API_ROOT}/user`).then(this._successHandler, this._errorHandler)
   },
@@ -41,14 +40,12 @@ export default {
   setProfile(context, data){
     return context.$http.put(`${API_ROOT}/user`, data).then(this._successHandler, this._errorHandler)
   },
-
   newSession(context, data){
     return context.$http.post(`${API_ROOT}/session/new`, data).then(this._successHandler, this._errorHandler)
   },
   checkSession(context, data){
     return context.$http.post(`${API_ROOT}/session/check`, data).then(this._successHandler, this._errorHandler)
   },
-
   getQuestions(context, data){
     return context.$http.post(`${API_ROOT}/training/questions`, data).then(this._successHandler, this._errorHandler)
   },

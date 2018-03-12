@@ -19,11 +19,9 @@
             <div class="getHelpPopUp" v-bind:style="popUpStyle" v-if="showHelpPopUp">
               <span>Select a help topic.</span>
               <select class="form-control topic" v-model="pickedTopic">
-                <option value="esl">ESL</option>
-                <option value="college">College Counseling</option>
                 <option value="math">Math</option>
-                <option value="science">Science</option>
-                <option value="standardizedtest">Standardized Tests</option>
+                <option value="college">College Counseling</option>
+                <option value="esl">ESL</option>
               </select>
               <select class="form-control subtopic" v-model="pickedSubtopic">
                 <option v-for="subtopic in subtopics[pickedTopic]">{{ subtopic }}</option>
@@ -78,9 +76,14 @@ export default {
     var subtopics = {
       'math': ['Algebra', 'Geometry', 'Trigonometry', 'Precalculus', 'Calculus'],
       'esl': ['General Help'],
-      'college': ['College Counseling', 'College Planning','Essay Editing'],
-      'science': ['Biology','Chemistry'],
-      'standardizedtest': ['SAT']
+      'college': ['Planning', 'Applications','Essays']
+
+      // Temporarily changing to single word labels
+      // 'college': ['College Planning', 'Application Help','Essay Editing']
+
+      // Temporarily removing science and standardized testing
+      // 'science': ['Biology','Chemistry'],
+      // 'standardizedtest': ['SAT']
     };
     return {
       user: user,

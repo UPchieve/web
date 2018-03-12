@@ -18,10 +18,16 @@
           <input type="text" v-model="user.lastname" class="form-control" id="lastNameInput">
           <label for="lastNameInput">Last</label>
         </div>
+
+        <div class="col-sm-6">
+          <input type="text" v-model="user.nickname" class="form-control" id="nicknameInput" required autofocus>
+          <label for="nicknameInput">Nickname</label>
+        </div>
+
       </div>
     </div>
 
-    <ul class="row form-group" v-if="!user.isVolunteer">
+    <ul class="row form-group">
       <p>Your Birthday</p>
       <div class="row">
         <div class="col-sm-6">
@@ -31,7 +37,7 @@
       </div>
     </ul>
 
-    <ul class="row form-group" v-if="!user.isVolunteer">
+    <ul class="row form-group">
       <p>Your Gender</p>
       <div class="row">
         <div class="col-sm-6">
@@ -45,7 +51,7 @@
       </div>
     </ul>
 
-    <ul class="row form-group" v-if="!user.isVolunteer">
+    <ul class="row form-group">
       <p>Your Race/Ethnicity (Please select all that apply.)</p>
       <div class="race-container">
         <div class="checkbox">
@@ -94,6 +100,15 @@
     </ul>
 
     <div class="row form-group" v-if="!user.isVolunteer">
+      <p>Current high school</p>
+      <div class="row">
+          <div class="col-sm-12">
+           <input type="text" v-model="user.highschool" class="form-control" required autofocus>
+        </div>
+      </div>
+    </div>
+
+    <div class="row form-group" v-if="!user.isVolunteer">
       <p>Expected High School Graduation</p>
       <div class="row">
         <div class="col-sm-6">
@@ -110,7 +125,7 @@
       </div>
     </div>
 
-    <div class="row form-group">
+    <div class="row form-group" v-if="!user.isVolunteer">
       <p>Were you referred by one of our partner organizations?</p>
       <div class="row">
         <div class="col-sm-6">
@@ -123,6 +138,51 @@
         </div>
       </div>
     </div>
+
+    <div class="row form-group" v-if="user.isVolunteer">
+      <p>Your Phone Number</p>
+      <div class="row">
+          <div class="col-sm-12">
+           <input type="text" v-model="user.phone" class="form-control" required autofocus>
+        </div>
+      </div>
+      <label>We will use this number to send
+      you notifications when a student needs help. You will only receive
+      notifications during the periods that you select in your schedule.</label>
+    </div>
+
+    <div class="row form-group" v-if="user.isVolunteer">
+      <p>Your College</p>
+      <div class="row">
+          <div class="col-sm-12">
+           <input type="text" v-model="user.college" class="form-control" required autofocus>
+        </div>
+      </div>
+    </div>
+
+    <div class="row form-group" v-if="user.isVolunteer">
+      <p>Your Favorite Academic Subject</p>
+      <div class="row">
+          <div class="col-sm-12">
+           <input type="text" v-model="user.favoriteAcademicSubject" class="form-control" required autofocus>
+        </div>
+      </div>
+    </div>
+
+    <div class="row form-group" v-if="user.isVolunteer">
+      <p>Were you referred by one of our partner organizations?</p>
+      <div class="row">
+        <div class="col-sm-6">
+          <select class="form-control" v-model="user.referred">
+            <option></option>
+            <option>Yes - APO Xi Alpha</option>
+            <option>Yes - Alpha Gamma Iota</option>
+            <option>No</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
     <div class="btn-container">
       <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submitProfile">{{buttonMsg}}</button>
     </div>
@@ -158,15 +218,13 @@ export default {
       this.error = ''
 
       var user = UserService.getUser()
-      var birthdateValidation = UserService.validateBirthdate();
+      var birthdateValidation = UserService.validateBirthdate(this.user.birthdate);
 
       if (!user.isVolunteer) {
         if (!this.user.firstname || this.user.firstname === ''){
           this.error = 'Please provide your full name';
         } else if (!this.user.lastname || this.user.lastname === '') {
           this.error = 'Please provide your full name';
-        } else if (this.user.picture && !validator.isURL(this.user.picture)){
-          this.error = 'Profile picture URL is invalid';
         } else if (!this.user.birthdate || this.user.birthdate === ''){
           this.error = 'Please provide your birthday'
         } else if (birthdateValidation !== true){
@@ -175,14 +233,34 @@ export default {
           this.error = 'Please select a gender';
         } else if (!this.user.race.length){
           this.error = 'Please select a race';
+        } else if (!this.user.highschool || this.user.highschool === ''){
+          this.error = 'Please provide the name of your high school';
         } else if (!this.user.expectedGraduation || this.user.expectedGraduation === ''){
           this.error = 'Please provide your expected graduation year';
+        } else if (!this.user.referred || this.user.referred === ''){
+          this.error = 'Please provide your referral information';
         }
       } else {
         if (!this.user.firstname || this.user.firstname === ''){
           this.error = 'Please provide your full name';
         } else if (!this.user.lastname || this.user.lastname === '') {
           this.error = 'Please provide your full name';
+        } else if (!this.user.birthdate || this.user.birthdate === ''){
+          this.error = 'Please provide your birthday'
+        } else if (birthdateValidation !== true){
+          this.error = birthdateValidation;
+        } else if (!this.user.gender || this.user.gender === ''){
+          this.error = 'Please select a gender';
+        } else if (!this.user.race.length){
+          this.error = 'Please select a race';
+        } else if (!this.user.phone || this.user.phone === ''){
+          this.error = 'Please provide your phone number';
+        } else if (!this.user.college || this.user.college === ''){
+          this.error = 'Please provide your college';
+        } else if (!this.user.favoriteAcademicSubject || this.user.favoriteAcademicSubject === ''){
+          this.error = 'Please provide your favorite academic subject';
+        } else if (!this.user.referred.length){
+          this.error = 'Please provide your referral information';
         }
       }
 
@@ -196,7 +274,7 @@ export default {
         UserService.setProfile(this, this.user, '/onboarding/academic')
       }
       else {
-        UserService.setProfile(this, this.user, '/dashboard')
+        UserService.setProfile(this, this.user, '/')
       }
     }
   }
@@ -277,7 +355,7 @@ label {
 }
 
 .form-control:focus {
-  border-bottom: 3px solid black;
+  border-bottom: 3px solid #16D2AA;
   box-shadow: none;
 }
 
@@ -311,4 +389,5 @@ button[type="submit"]:hover, button[type="submit"]:active {
 .btn-container {
   max-width: 600px;
 }
+
 </style>
