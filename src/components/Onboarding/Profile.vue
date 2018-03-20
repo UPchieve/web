@@ -20,8 +20,17 @@
         </div>
       </div>
     </div>
+      <div class="">
+        <label for="inputEmail">Update Email</label>
+      <input type="email" id="inputEmail" class="form-control" required autofocus v-model="credentials.email">
+      </div>
+      <div v-if="user.isVolunteer" class="">
+      <label for="inputPhone">Please enter your phone number</label>
+      <input type="text" id="inputPhone" class="form-control" required autofocus v-model="credentials.phone">
+  </div>
 
-    <ul class="row form-group" v-if="user.isVolunteer">
+
+    <ul class="row form-group" v-if="!user.isVolunteer">
       <p>Your Birthday</p>
       <div class="row">
         <div class="col-sm-6">
