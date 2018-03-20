@@ -19,10 +19,6 @@
 
   <div v-if="!user.isVolunteer">
     <div class="section" id="highschool">
-      <label for="inputEmail">Update Email</label>
-      <input type="email" id="inputEmail" class="form-control" required autofocus v-model="credentials.email">
-      <label for="inputPhone">Please enter your phone number</label>
-      <input type="number" id="inputPhone" class="form-control" required autofocus v-model="credentials.phone">
       <div class="prompt">Your High School's Name</div>
       <div class="answer" v-show="'highschool' !== activeEdit">{{ user.highschool }}</div>
       <input type="text" v-model="user.highschool" v-show="'highschool' === activeEdit">
@@ -45,16 +41,21 @@
     </div>
 
   </div>
+    <div class="cert-info">
+        <label for="inputEmail">Update Email</label>
+      <input type="email" id="inputEmail" class="form-control" required autofocus v-model="credentials.email">
+      </div>
+      <div v-if="user.isVolunteer" class="cert-info">
+      <label for="inputPhone">Please enter your phone number</label>
+      <input type="text" id="inputPhone" class="form-control" required autofocus v-model="credentials.phone">
+  </div>
   <div v-if="user.isVolunteer" class="cert-info">
     <div class="info-header cert">Certifications</div>
     <div class="certifications" v-for="(value, key) in certifications">
       <div v-if="value">{{ key }}</div>
     </div>
 
-    <label for="inputEmail">Update Email</label>
-      <input type="email" id="inputEmail" class="form-control" required autofocus v-model="credentials.email">
-      <label for="inputPhone">Please enter your phone number</label>
-      <input type="number" id="inputPhone" class="form-control" required autofocus v-model="credentials.phone">
+    
   </div>
 
   <div class="section"><router-link to="resetpassword" class="prompt">Reset password</router-link></div>
