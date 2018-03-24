@@ -41,6 +41,7 @@ export default {
     return context.$http.put(`${API_ROOT}/user`, data).then(this._successHandler, this._errorHandler)
   },
   newSession(context, data){
+    console.log(data)
     return context.$http.post(`${API_ROOT}/session/new`, data).then(this._successHandler, this._errorHandler)
   },
   checkSession(context, data){

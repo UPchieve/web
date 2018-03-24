@@ -116,10 +116,15 @@ export default {
     },
     getHelpNext() {
       var topic = this.pickedTopic;
+      var subTopic = this.pickedSubtopic;
       //Temp change all to math
       topic = 'math';
       topic = topic.toLowerCase();
-      var linkName = '/session/' + topic;
+      subTopic = subTopic.toLowerCase();
+      if (subTopic == 'general help') {
+        subTopic = topic;
+      }
+      var linkName = '/session/' + topic + '/' + subTopic;
       this.$router.push(linkName);
     }
   }
