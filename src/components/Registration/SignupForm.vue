@@ -11,13 +11,18 @@
       <label for="inputPassword">Create a password</label>
       <input type="password" id="inputPassword" class="form-control" required v-model="credentials.password">
       <p class="password-guidelines">It must contain lowercase and uppercase letters, numbers, and at least 8 characters.</p>
+      <div class="agreement-box">
+        <input type="checkbox" id="userAgreement" required>
+        <label id='agreement' for="userAgreement"></label>
+        <div class="agreement-label">I have read and accept the <a href="#">user agreement</a>.</div>
+      </div>
       <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">SIGN UP</button>
       {{msg}}
-    </div>
+    </div> 
     <div class="successMessage" v-else>
       <p>You’ve been sent a verification email! Use the link in the email to get started.</p>
     </div>
-  </form>
+  </form> 
 </template>
 
 <script>
@@ -118,12 +123,75 @@ label {
   font-weight: 300;
   text-align: left;
   color: #73737A;
-  margin: 10px auto 50px;
+  margin: 10px auto;
 }
 
 .form-control:focus {
   border-bottom: 3px solid black;
   box-shadow: none;
+}
+
+#userAgreement {
+  margin-right: 12px;
+  border: 3px solid #000; 
+  display: inline-block;
+}
+
+#agreement {
+  display: inline-block;
+  margin-bottom: 0;
+}
+
+input[type="checkbox"] {
+   visibility: hidden;
+   position: absolute;
+   top: -9999px;
+}
+
+.agreement-box {
+  margin: 25px 0 50px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.agreement-box label {
+  cursor: pointer;
+  margin-right: 12px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border:2px solid #343440;
+  border-radius: 2px;
+}
+
+.agreement-box label:after {
+  opacity: 0;
+  content: '';
+  position: absolute;
+  margin: 4px 0 0 3px;
+  width: 8px;
+  height: 5px;
+  background: transparent;
+  border: 3px solid #343440;
+  border-top: none;
+  border-right: none;
+  transform: rotate(-45deg);
+}
+
+.agreement-box input[type="checkbox"]:checked + label:after {
+  opacity: 1;
+}
+
+.agreement-label {
+  font-size: 12px;
+  color: #343440;
+  position: absolute;
+  margin-left: 35px;
+}
+
+.agreement-label a {
+  color: #16D2AA;
 }
 
 button[type="submit"] {
