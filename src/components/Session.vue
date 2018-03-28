@@ -59,17 +59,32 @@ export default {
   			user: UserService.getUser()
   		});
     });
+
+    // -------------------------------------------------------------new code
+    const timer = setTimeout(() => {
+      this.$router.push('/submit-question');
+    }, 2000);
+    // -------------------------------------------------------------end new code
   },
   beforeRouteLeave(to, from, next){
     if (to.path.indexOf('/feedback') !== -1){
       next();
       return;
     }
+    // -------------------------------------------------------------new code
+    if (to.path.indexOf('/submit-question') !== -1){
+      next();
+      return;
+    }
+    // -------------------------------------------------------------end new code
     var result = window.confirm('Do you really want to end the session?')
     if (result){
       this.$socket.disconnect();
       SessionService.endSession({ skipRoute: true });
-      next('/feedback');
+      //next('/feedback');
+    // -------------------------------------------------------------new code
+      next('/submit-question');
+    // -------------------------------------------------------------end new code
     }
   }
 }

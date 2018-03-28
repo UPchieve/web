@@ -30,6 +30,7 @@ import Quiz from './components/Quiz'
 import Review from './components/Review'
 import Profile from './components/Profile'
 import Calendar from './components/Calendar'
+import SubmitQuestion from './components/views/SubmitQuestion'
 
 import AuthService from './services/AuthService'
 import OnboardingService from './services/OnboardingService'
@@ -62,7 +63,8 @@ const routes = [
   { path: '/training/:category/quiz', component: Quiz, meta: { protected: true } },
   { path: '/training/:category/review', component: Review, meta: { protected: true } },
   { path: '/profile', component: Profile, meta: { protected: true } },
-  { path: '/calendar', component: Calendar }
+  { path: '/calendar', component: Calendar },
+  { path: '/submit-question', component: SubmitQuestion, meta: { protected: true } }
 ]
 
 const router = new VueRouter({
