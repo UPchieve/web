@@ -1,17 +1,26 @@
 <template>
 <div class="SubmitQuestion">
-  Hola!
-  
-  If there are no volunteers available - students are somehow notified that no volunteers are available and encouraged to submit a written question instead
-  Volunteers can see a list of submitted questions and answer ones which they have certifications for. - this option is especially highlighted if no students are waiting for live help
-
-  Web_Student.pdf wireframe Page 21-23 
+  <modal :message="message"></modal>  
 </div>
 </template>
 
 
 <script>
-    
+  import Modal from '../molecules/Modal';
+  
+  export default {
+    components: {
+      Modal
+    },
+    data() {
+      return {
+        message: `
+          We don't have any Academic Coaches right now, but you can submit a 
+          question. Would you like to submit a question?
+        `
+      }
+    }
+  }
 </script>
 
 
