@@ -1,6 +1,8 @@
 <template>
 <div class="SubmitQuestion">
-  <modal :message="message"></modal>  
+  <div class="backdrop">
+    <modal :message="message"></modal>  
+  </div>
 </div>
 </template>
 
@@ -25,5 +27,7 @@
 
 
 <style>
-    
+  .backdrop {
+    background: var(--c-backdrop-warn);
+  }
 </style>

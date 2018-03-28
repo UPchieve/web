@@ -24,11 +24,6 @@ export default {
 
 
 <style>
-  :root {
-    --c-accent: #16d2aa;
-    --c-bg: #f6f6f6;
-  }
-
   .bttn {
     background: var(--c-bg);
     color: var(--c-accent);
@@ -48,6 +43,6 @@ export default {
     outline: 0;
   }
   .bttn--big {
-    // for the future :)
+    /* for the bright future :)*/
   }
 </style>

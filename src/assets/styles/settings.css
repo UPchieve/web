@@ -1,0 +1,20 @@
+:root {
+  /*
+   * Main 
+  */
+  --c-accent: #16d2aa;
+  --c-bg: #f6f6f6;
+  /*
+   * Modals 
+  */
+  --c-shadow: #1855d1;
+  --c-backdrop: #e3f2fd;
+  --c-shadow-warn: #f44747;
+  --c-backdrop-warn: #feeab2;
+  /*
+   * Labels 
+  */
+  --c-math: #f7aef8;
+  --c-college: #fed766;
+  --c-sat: #54defd;
+};
