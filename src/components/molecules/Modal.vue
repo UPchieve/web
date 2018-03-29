@@ -54,6 +54,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1000;
   }
   .v-modal--warn {
     background: var(--c-backdrop-warn);

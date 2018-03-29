@@ -11,6 +11,12 @@
         <chat></chat>
       </div>
     </div>
+
+    <modal warn v-if="showModal"
+      :labels="btnLabels"
+      :message="message"
+      :clickHandlers="clickHandlers"
+    ></modal>
   </div>
 </template>
 
@@ -22,16 +28,38 @@ import UserService from 'src/services/UserService';
 import SessionHeader from './Session/Header';
 import Whiteboard from './Session/Whiteboard';
 import Chat from './Session/Chat';
+import Modal from './molecules/Modal';
 
 export default {
   components: {
     SessionHeader,
     Whiteboard,
-    Chat
+    Chat,
+    Modal
   },
   data(){
     return {
-      currentSession: SessionService.currentSession
+      currentSession: SessionService.currentSession,
+      showModal: false,
+      btnLabels: [
+        'Exit session',
+        'Submit question'
+      ],
+      message: `
+        We don’t have any Academic Coaches
+        available right now, but you can submit a
+        written question, and we will try to get
+        back to you within 24 hours! Would you
+        like to submit a question now?
+      `,
+      clickHandlers: {
+        main() {
+          this.$router.push('/');
+        },
+        second() {
+          this.$router.push('/');
+        }
+      }
     }
   },
   mounted(){
@@ -60,11 +88,15 @@ export default {
   		});
     });
 
-    // -------------------------------------------------------------new code
-    //const timer = setTimeout(() => {
-    //  this.$router.push('/submit-question');
-    //}, 2000);
-    // -------------------------------------------------------------end new code
+    // Offer the option to ask a question
+    setTimeout(() => {
+      if (
+        !UserService.getUser().isVolunteer && 
+        SessionService.getPartner() === undefined
+      ) {
+        this.showModal = true;
+      }
+    }, 5000);
   },
   beforeRouteLeave(to, from, next){
     if (to.path.indexOf('/feedback') !== -1){
@@ -92,15 +124,20 @@ export default {
 
 
 <style scoped>
+  /*
+  * @notes
+  * [1] Refactoring candidate: these styles should be placed in the container
+  *     (we need to rethink the containing model in order to do so)
+  */
   .session {
-    height: 100%;
+    position: relative; /*[1]*/
+    height: 100%; /*[1]*/
   }
 
   .session-header-container {
     position: absolute;
-    left: 300px;
-    right: 0;
-    z-index: 1;
+    left: 0;
+    width: 100%;
   }
 
   .session-contents-container {

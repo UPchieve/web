@@ -67,17 +67,7 @@ export default {
         this.$socket.disconnect();
         SessionService.endSession();
       }
-    },
-    showModal() {
-      console.log('modal shown');
     }
-  },
-  mounted() {
-    setTimeout(() => {
-      if (!UserService.getUser().isVolunteer && this.partnerName === undefined) {
-        this.showModal();
-      }
-    }, 1000);
   }
 }
 </script>
