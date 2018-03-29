@@ -25,8 +25,8 @@
   </div>
 </template>
 
-<script>
 
+<script>
 import UserService from 'src/services/UserService'
 import SessionService from 'src/services/SessionService';
 

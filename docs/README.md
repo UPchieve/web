@@ -25,3 +25,26 @@
 | ![color](https://imgur.com/RClSp1z.png) | --c-math    | #f7aef8  |
 | ![color](https://imgur.com/ScoPTpW.png) | --c-college | #fed766  |
 | ![color](https://imgur.com/Mj7jeip.png) | --c-sat     | #54defd  |
+
+
+## Style Guide
+
+- [Vue's official guide](https://vuejs.org/v2/style-guide/)
+- Use ES6+ syntax
+- Two lines of space between `<template>`, `<script>`, and  `<style>`
+- No indentation for the first level inside `<template>` / `<script>` /  `<style>`:
+```vue
+  // Bad
+  <template>
+    <div class="my-component">
+      <div></div>
+    </div>
+  </template>
+
+  // Good
+  <template>
+  <div class="my-component">
+    <div></div>
+  </div>
+  </template>
+```

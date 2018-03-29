@@ -53,10 +53,10 @@ export default {
         like to submit a question now?
       `,
       clickHandlers: {
-        main() {
-          this.$router.push('/');
+        main: () => {
+          this.$router.push('/submit-question');
         },
-        second() {
+        second: () => {
           this.$router.push('/');
         }
       }
@@ -64,9 +64,7 @@ export default {
   },
   mounted(){
     var id = this.$route.params.sessionId,
-        promise;
-
-    console.log(id);
+            promise;
 
     if (!id){
       var type;
@@ -98,25 +96,21 @@ export default {
       }
     }, 5000);
   },
-  beforeRouteLeave(to, from, next){
-    if (to.path.indexOf('/feedback') !== -1){
+  beforeRouteLeave(to, from, next) {
+    if (
+      to.path.indexOf('/feedback') !== -1 ||
+      to.path.indexOf('/submit-question') !== -1
+    ) {
       next();
       return;
     }
-    // -------------------------------------------------------------new code
-    //if (to.path.indexOf('/submit-question') !== -1){
-    //  next();
-    //  return;
-    //}
-    // -------------------------------------------------------------end new code
-    var result = window.confirm('Do you really want to end the session?')
-    if (result){
-      this.$socket.disconnect();
-      SessionService.endSession({ skipRoute: true });
-      //next('/feedback');
-    // -------------------------------------------------------------new code
-      next('/submit-question');
-    // -------------------------------------------------------------end new code
+    else {
+      let result = window.confirm('Do you really want to end the session?');
+      if (result) {
+        this.$socket.disconnect();
+        SessionService.endSession({ skipRoute: true });
+        next('/feedback');
+      }
     }
   }
 }
