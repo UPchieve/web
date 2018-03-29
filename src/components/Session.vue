@@ -14,8 +14,8 @@
   </div>
 </template>
 
-<script>
 
+<script>
 import SessionService from 'src/services/SessionService';
 import UserService from 'src/services/UserService';
 
@@ -61,9 +61,9 @@ export default {
     });
 
     // -------------------------------------------------------------new code
-    const timer = setTimeout(() => {
-      this.$router.push('/submit-question');
-    }, 2000);
+    //const timer = setTimeout(() => {
+    //  this.$router.push('/submit-question');
+    //}, 2000);
     // -------------------------------------------------------------end new code
   },
   beforeRouteLeave(to, from, next){
@@ -72,10 +72,10 @@ export default {
       return;
     }
     // -------------------------------------------------------------new code
-    if (to.path.indexOf('/submit-question') !== -1){
-      next();
-      return;
-    }
+    //if (to.path.indexOf('/submit-question') !== -1){
+    //  next();
+    //  return;
+    //}
     // -------------------------------------------------------------end new code
     var result = window.confirm('Do you really want to end the session?')
     if (result){
@@ -90,34 +90,34 @@ export default {
 }
 </script>
 
+
 <style scoped>
+  .session {
+    height: 100%;
+  }
 
-.session {
-  height: 100%;
-}
+  .session-header-container {
+    position: absolute;
+    left: 300px;
+    right: 0;
+    z-index: 1;
+  }
 
-.session-header-container {
-  position: absolute;
-  left: 300px;
-  right: 0;
-  z-index: 1;
-}
+  .session-contents-container {
+    height: 100%;
+    padding-top: 100px;
+  }
 
-.session-contents-container {
-  height: 100%;
-  padding-top: 100px;
-}
+  .whiteboard-container {
+    height: 100%;
+    padding: 0;
+    border-top: 25px solid #EAEAEB;
+    border-left: 25px solid #EAEAEB;
+    border-right: 25px solid #EAEAEB;
+  }
 
-.whiteboard-container {
-  height: 100%;
-  padding: 0;
-  border-top: 25px solid #EAEAEB;
-  border-left: 25px solid #EAEAEB;
-  border-right: 25px solid #EAEAEB;
-}
-
-.chat-container {
-  height: 100%;
-  padding: 0;
-}
+  .chat-container {
+    height: 100%;
+    padding: 0;
+  }
 </style>
