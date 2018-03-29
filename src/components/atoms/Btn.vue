@@ -1,5 +1,5 @@
 <template>
-  <button :class="classes">
+  <button :class="classes" @click="clickHandler">
     {{ label }}
   </button>    
 </template>
@@ -9,13 +9,14 @@
 export default {
   props: {
     label: String,
-    big: Boolean
+    rowMember: Boolean,
+    clickHandler: Function
   },
   data() {
     return {
       classes: {
-        'bttn': true,
-        'bttn--big': this.big
+        'v-btn': true,
+        'v-btn--row-member': this.rowMember
       }
     } 
   }
@@ -24,7 +25,7 @@ export default {
 
 
 <style>
-  .bttn {
+  .v-btn {
     background: var(--c-bg);
     color: var(--c-accent);
     text-align: center;
@@ -35,14 +36,14 @@ export default {
     border-radius: 20px;
     padding: 0 20px;
   }
-  .bttn:hover {
+  .v-btn:hover {
     color: #fff;
     background: var(--c-accent);
   }
-  .bttn:focus {
+  .v-btn:focus {
     outline: 0;
   }
-  .bttn--big {
-    /* for the bright future :)*/
+  .v-btn--row-member {
+    margin-right: 20px; 
   }
 </style>
