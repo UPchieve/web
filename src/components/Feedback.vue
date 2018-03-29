@@ -19,13 +19,13 @@
     <label for="validationCustom01">What service did you Recieve? <b class="text-danger">*
     </b> </label>
   <div class="form-check">
-     <input class="form-check-input" type="radio" name="Radios" id="exampleRadios2" value="option2">
+     <input class="form-check-input" type="radio" name="Radios" id="Tutoring" value="Tutoring" v-model="servicePicked">
   <label class="form-check-label" for="exampleRadios2">
     Tutoring 
   </label>
     </div>
 <div class="form-check">
-  <input class="form-check-input" type="radio" name="Radios" id="exampleRadios2" value="option2">
+  <input class="form-check-input" type="radio" name="Radios" id="College Counseling" value="College Counseling" v-model="servicePicked">
   <label class="form-check-label" for="exampleRadios2">
     College Counseling
   </label>
@@ -36,7 +36,7 @@
     </b> </label>
   
       <div class="form-group date">
-      <input type="text" class="form-control" id="datepicker" placeholder="MM/DD/YYYY">
+      <input type="text" class="form-control" id="datepicker" placeholder="MM/DD/YYYY" v-model="serviceDate">
   </div>
 </div>
 <br>
@@ -45,7 +45,7 @@
     </b> </label>
   
       <div class="form-group date">
-      <input type="text" class="form-control" id="bfh-timepicker" placeholder="12:00">
+      <input type="text" class="form-control" id="bfh-timepicker" placeholder="12:00 " v-model="serviceTime">
   </div>
 </div>
 <br>
@@ -54,7 +54,7 @@
     </b> </label>
   
       <div class="form-group date">
-      <input type="text" class="form-control" id="" placeholder="Your Answer">
+      <input type="text" class="form-control" id="" placeholder="Your Answer" v-model="serviceTopic">
   </div>
 </div>
 <br>
@@ -77,92 +77,92 @@
     <tr>
       <th scope="row">My volunteer was helpful</th>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio" id="Strongly Disagree" value="Strongly Disagree" aria-label="..."  v-model="serviceHelpful">
 </div></td>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio" id="Somewhat disagree" value="Somewhat disagree" aria-label="..." v-model="serviceHelpful">
 </div></td>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio" id="Neither agree nor disagree" value="Neither agree nor disagree" aria-label="..." v-model="serviceHelpful">
 </div></td>
   <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio" id="Somewhat agree" value="Somewhat agree" aria-label="..." v-model="serviceHelpful">
 </div></td>
   <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio" id="Strongly agree" value="Strongly agree" aria-label="..." v-model="serviceHelpful">
 </div></td>
     </tr>
     <tr>
       <th scope="row">My volunteer was friendly and/or nice</th>
 
         <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio1" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio1" id="Strongly Disagree" value="Strongly Disagree" aria-label="..." v-model="serviceFriendly">
 </div></td>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio1" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio1" id="Somewhat disagree" value="Somewhat disagree" aria-label="..." v-model="serviceFriendly">
 </div></td>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio1" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio1" id="Neither agree nor disagree" value="Neither agree nor disagree" aria-label="..." v-model="serviceFriendly">
 </div></td>
   <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio1" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio1" id="Somewhat agree" value="Somewhat agree" aria-label="..." v-model="serviceFriendly">
 </div></td>
   <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio1" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio1" id="Strongly agree" value="Strongly agree" aria-label="..." v-model="serviceFriendly">
 </div></td>
     </tr>
     <tr>
       <th scope="row">My volunteer seemed knowledgable about the topic they were helping me with.</th>
        <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio2" id="blankRadio1" value="option2" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio2" id="Strongly Disagree" value="Strongly Disagree" aria-label="..." v-model="serviceKnowledgeable">
 </div></td>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio2" id="blankRadio1" value="option2" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio2" id="Somewhat disagree" value="Somewhat disagree" aria-label="..." v-model="serviceKnowledgeable">
 </div></td>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio2" id="blankRadio1" value="option2" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio2" id="Neither agree nor disagree" value="Neither agree nor disagree" aria-label="..." v-model="serviceKnowledgeable">
 </div></td>
   <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio2" id="blankRadio1" value="option2" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio2" id="Somewhat agree" value="Somewhat agree" aria-label="..." v-model="serviceKnowledgeable">
 </div></td>
   <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio2" id="blankRadio1" value="option2" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio2" id="Strongly agree" value="Strongly agree" aria-label="..." v-model="serviceKnowledgeable">
 </div></td>
     </tr>
      <tr>
       <th scope="row">I would like to recieve help from this tutor again.</th>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio3" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio3" id="Strongly Disagree" value="Strongly Disagree" aria-label="..." v-model="serviceRepeat">
 </div></td>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio3" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio3" id="Somewhat disagree" value="Somewhat disagree" aria-label="..." v-model="serviceRepeat">
 </div></td>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio3" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio3" id="Neither agree nor disagree" value="Neither agree nor disagree" aria-label="..." v-model="serviceRepeat">
 </div></td>
   <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio3" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio3" id="Somewhat agree" value="Somewhat agree" aria-label="..." v-model="serviceRepeat">
 </div></td>
   <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio3" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio3" id="Strongly agree" value="Strongly agree" aria-label="..." v-model="serviceRepeat">
 </div></td>
     </tr>
       <tr>
       <th scope="row">As a result of this  session, I feel more prepared to succeed in my high school classes or college application process.</th>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio4" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio4" id="Strongly Disagree" value="Strongly Disagree" aria-label="..." v-model="serviceRepeat">
 </div></td>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio4" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio4" id="Somewhat disagree" value="Somewhat disagree" aria-label="..." v-model="serviceRepeat">
 </div></td>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio4" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio4" id="Neither agree nor disagree" value="Neither agree nor disagree" aria-label="..." v-model="serviceRepeat">
 </div></td>
   <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio4" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio4" id="Somewhat agree" value="Somewhat agree" aria-label="..." v-model="serviceRepeat">
 </div></td>
   <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio4" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="blankRadio4" id="Strongly agree" value="Strongly agree" aria-label="..." v-model="serviceRepeat">
 </div></td>
     </tr>
   </tbody>
@@ -188,92 +188,92 @@
     <tr>
       <th scope="row">UPchieve helps me succeed in my high school classes and/or the college application process</th>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio" id="blankRadio1" value="option1" aria-label="...">
+<input class="form-check-input position-static" type="radio" name="serviceRadio" id="Strongly Disagree" value="Strongly Disagree" aria-label="..." v-model="serviceSuccess">
 </div></td>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio" id="Somewhat disagree" value="Somewhat disagree" aria-label="..." v-model="serviceSuccess">
 </div></td>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio" id="Neither agree nor disagree" value="Neither agree nor disagree" aria-label="..." v-model="serviceSuccess">
 </div></td>
   <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio" id="Somewhat agree" value="Somewhat agree" aria-label="..." v-model="serviceSuccess">
 </div></td>
   <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio" id="Strongly agree" value="Strongly agree" aria-label="..." v-model="serviceSuccess">
 </div></td>
     </tr>
     <tr>
       <th scope="row">I am likely to use UPchieve's services the next time I need help.</th>
 
         <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio1" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio1" id="Strongly Disagree" value="Strongly Disagree" aria-label="..." v-model="serviceReuse">
 </div></td>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio1" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio1" id="Somewhat disagree" value="Somewhat disagree" aria-label="..." v-model="serviceReuse">
 </div></td>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio1" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio1" id="Neither agree nor disagree" value="Neither agree nor disagree" aria-label="..." v-model="serviceReuse">
 </div></td>
   <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio1" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio1" id="Somewhat agree" value="Somewhat agree" aria-label="..." v-model="serviceReuse">
 </div></td>
   <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio1" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio1" id="Strongly agree" value="Strongly agree" aria-label="..." v-model="serviceReuse">
 </div></td>
     </tr>
     <tr>
       <th scope="row">I would recommend UPcheive's services to a friend.</th>
        <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio2" id="blankRadio1" value="option2" aria-label="...">
+<input class="form-check-input position-static" type="radio" name="serviceRadio2" id="Strongly Disagree" value="Strongly Disagree" aria-label="..." v-model="serviceRecommend">
 </div></td>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio2" id="blankRadio1" value="option2" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio2" id="Somewhat disagree" value="Somewhat disagree" aria-label="..." v-model="serviceRecommend">
 </div></td>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio2" id="blankRadio1" value="option2" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio2" id="Neither agree nor disagree" value="Neither agree nor disagree" aria-label="..." v-model="serviceRecommend">
 </div></td>
   <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio2" id="blankRadio1" value="option2" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio2" id="Somewhat agree" value="Somewhat agree" aria-label="..." v-model="serviceRecommend">
 </div></td>
   <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio2" id="blankRadio1" value="option2" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio2" id="Strongly agree" value="Strongly agree" aria-label="..." v-model="serviceRecommend">
 </div></td>
     </tr>
      <tr>
       <th scope="row">The days and times that UPchieve offers helps are enough.</th>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio3" id="blankRadio1" value="option1" aria-label="...">
+ <input class="form-check-input position-static" type="radio" name="serviceRadio3" id="Strongly Disagree" value="Strongly Disagree" aria-label="..." v-model="serviceDayandTime">
 </div></td>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio3" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio3" id="Somewhat disagree" value="Somewhat disagree" aria-label="..." v-model="serviceDayandTime">
 </div></td>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio3" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio3" id="Neither agree nor disagree" value="Neither agree nor disagree" aria-label="..." v-model="serviceDayandTime">
 </div></td>
   <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio3" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio3" id="Somewhat agree" value="Somewhat agree" aria-label="..." v-model="serviceDayandTime">
 </div></td>
   <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio3" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio3" id="Strongly agree" value="Strongly agree" aria-label="..." v-model="serviceDayandTime">
 </div></td>
     </tr>
       <tr>
       <th scope="row">UPchieve's web app is easy to use.</th>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio4" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio4" id="Strongly Disagree" value="Strongly Disagree" aria-label="..." v-model="serviceEasyToUse">
 </div></td>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="blankRadio4" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio4" id="Somewhat disagree" value="Somewhat disagree" aria-label="..." v-model="serviceEasyToUse">
 </div></td>
       <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio4" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio4" id="Neither agree nor disagree" value="Neither agree nor disagree" aria-label="..." v-model="serviceEasyToUse">
 </div></td>
   <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio4" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio4" id="Somewhat agree" value="Somewhat agree" aria-label="..." v-model="serviceEasyToUse">
 </div></td>
   <td><div class="form-check">
-  <input class="form-check-input position-static" type="radio" name="serviceRadio4" id="blankRadio1" value="option1" aria-label="...">
+  <input class="form-check-input position-static" type="radio" name="serviceRadio4" id="Strongly agree" value="Strongly agree" aria-label="..." v-model="serviceEasyToUse">
 </div></td>
     </tr>
   </tbody>
@@ -283,17 +283,17 @@
 <br>
  <div class="form-group">
     <label for="exampleFormControlTextarea1"><h4>Do you have any other feedback you would like to share?</h4><h6>This can be about the web app, the volunteer(s) who helped you, the services UPchieve offers, etc.</h6></label>
-    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" v-model="serviceAdditionalFeedback"></textarea>
   </div>
 
 
 
-  <button type="submit" class="btn btn-primary">Submit</button>
+  <button type="submit" class="btn btn-primary" @click.prevent="submitFeedback">Submit</button>
   </form>
 </div>
 
 </div>
-</for>
+<!--Volunteer feedback Form Below-->
 		</template>
 		<template v-else>
 			<div class="container">
@@ -312,26 +312,26 @@
     <label for="validationCustom01"><h4>What is your name? <b class="text-danger">*
     </b></h4> </label>
   <div class="input-group date">
-      <input type="text" class="form-control" id="name" placeholder="Your Answer">
+      <input type="text" class="form-control" id="name" placeholder="Your Answer" v-model="volunteerName">
   </div>
   <br>
     <h4>What services did you provide for the students?<b class="text-danger">*
     </b></h4>
   
 <div class="form-check">
-  <input class="form-check-input" type="radio" name="Radios" id="exampleRadios2"  value="option2">
+  <input class="form-check-input" type="radio" name="Radios" id="Tutoring"  value="Tutoring" v-model="volunteerServiceProvided">
   <label class="form-check-label" for="exampleRadios2">
     Tutoring
   </label>
 </div>
 <div class="form-check">
-  <input class="form-check-input" type="radio" name="Radios" id="exampleRadios2" value="option2">
+  <input class="form-check-input" type="radio" name="Radios" id="College Counseling" value="College Counseling" v-model="volunteerServiceProvided">
   <label class="form-check-label" for="exampleRadios2">
     College Counseling
   </label>
 </div>
 <div class="form-check">
-  <input class="form-check-input" type="radio" name="Radios" id="exampleRadios2" value="option2">
+  <input class="form-check-input" type="radio" name="Radios" id="Some of both" value="Some of both" v-model="volunteerServiceProvided">
   <label class="form-check-label" for="exampleRadios2">
     Some of both
   </label>
@@ -342,16 +342,16 @@
     </b></h4> </label>
   
       <div class="form-group date">
-      <input type="text" class="form-control" id="datepicker" placeholder="MM/DD/YYYY">
+      <input type="text" class="form-control" id="datepicker" placeholder="MM/DD/YYYY" v-model="volunteerTime">
   </div>
 </div>
 <br>
    <div class="form-group">
-    <label for="exampleInputEmail1"><h4>What's todays date? <b class="text-danger">*
+    <label for="exampleInputEmail1"><h4>What's todays date? <b class="text-danger" >*
     </b></h4> </label>
   
       <div class="form-group date">
-      <input type="text" class="form-control" id="bfh-timepicker" placeholder="mm/dd/yyyy">
+      <input type="text" class="form-control" id="bfh-timepicker" placeholder="mm/dd/yyyy"  v-model="volunteerDate">
   </div>
 </div>
 <br>
@@ -360,7 +360,7 @@
     </b></h4> </label>
   
       <div class="form-group date">
-      <input type="text" class="form-control" id="" placeholder="Your Answer">
+      <input type="text" class="form-control" id="" placeholder="Your Answer" v-model="volunteerTopic">
   </div>
 </div>
 <br>
@@ -368,7 +368,7 @@
     <label for="exampleTable"><h4>Were there any features that you needed or would have been helpful during this session that the web app didnt have?</h4> </label>
   
       <div class="form-group date">
-      <input type="text" class="form-control" id="" placeholder="Your Answer">
+      <input type="text" class="form-control" id="" placeholder="Your Answer" v-model="volunteerNewFeatures">
   </div>
 </div>
 <br>
@@ -376,21 +376,21 @@
     <label for="exampleTable"><h4>Did you encounter any technical difficulties/bugs during your shift? </h4><h6>if yes, please describe in as much detail as possible about the course of events that led to the bug ocurring so that our tech team can replicate and fix it.</h6> </label>
   
       <div class="input-group date">
-      <input type="text" class="form-control" id="" placeholder="Your Answer">
+      <input type="text" class="form-control" id="" placeholder="Your Answer" v-model="volunteerDifficulties">
   </div>
 </div>
 <br>
 <div class="form-group">
     <label for="exampleTable"><h4>Do you have any other feedback you'd like to sjare with  us?</h4></label>
   <div class="input-group date">
-      <input type="text" class="form-control" id="" placeholder="Your Answer">
+      <input type="text" class="form-control" id="" placeholder="Your Answer" v-model="volunteerAdditionalFeedback">
   </div>
 </div>
 <br>
 
 
 
-  <button type="submit" class="btn btn-primary">Submit</button>
+  <button type="submit" class="btn btn-primary"  @click.prevent="submitFeedback">Submit</button>
 </form>
 </div>
 </div>
@@ -405,7 +405,34 @@ import UserService from 'src/services/UserService';
 export default {
 	data(){
     return {
-      user: UserService.getUser()
+    
+      user: UserService.getUser(),
+      servicePicked: servicePicked,
+      serviceDate: serviceDate,
+      serviceTime: serviceTime,
+      serviceTopic: serviceTopic,
+      serviceHelpful: serviceHelpful,
+      serviceKnowledgeable: serviceKnowledgeable,
+      serviceSuccess: serviceSuccess,
+      serviceReuse: serviceReuse,
+      serviceRecommend: serviceRecommend,
+      serviceDayandTime: serviceDayandTime,
+      serviceEasyToUse: serviceEasyToUse,
+      serviceAdditionalFeedback: serviceAdditionalFeedback,
+      volunteerName: volunteerName,
+      volunteerServiceProvided: volunteerServiceProvided,
+      volunteerDate: volunteerDate,
+      volunteerTopic: volunteerTopic,
+      volunteerNewFeatures: volunteerNewFeatures,
+      volunteerDifficulties: volunteerDifficulties,
+      volunteerAdditionalFeedback: volunteerAdditionalFeedback
+
+      
+     }
+  },
+  methods: {
+    submitFeedback(e){
+
     }
   }
 }
