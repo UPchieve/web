@@ -12,7 +12,7 @@
       <input type="password" id="inputPassword" class="form-control" required v-model="credentials.password">
       <p class="password-guidelines">It must contain lowercase and uppercase letters, numbers, and at least 8 characters.</p>
       <div class="agreement-box">
-        <input type="checkbox" id="userAgreement" required>
+        <input type="checkbox" id="userAgreement" v-model="credentials.terms" required>
         <label id='agreement' for="userAgreement"></label>
         <div class="agreement-label">I have read and accept the <a href="#">user agreement</a>.</div>
       </div>
@@ -35,7 +35,8 @@ export default {
       msg: '',
       credentials: {
         email: '',
-        password: ''
+        password: '',
+        terms: false
       },
       showingSuccess: false
     }
@@ -45,7 +46,8 @@ export default {
       AuthService.register(this, {
         code: RegistrationService.data.registrationCode,
         email: this.credentials.email,
-        password: this.credentials.password
+        password: this.credentials.password,
+        terms: this.credentials.terms
       }).then(() => {
         this.showingSuccess = true;
       }).catch((err) => {
