@@ -4,23 +4,30 @@
     <div class="v-modal-dialog__content">
       {{ message }}
     </div>
+    <!---
     <div class="v-modal-dialog__options">
       <btn rowMember :label="secondBtnLabel" :clickHandler="clickHandlers.second"></btn>
       <btn :label="mainBtnLabel" :clickHandler="clickHandlers.main"></btn>
     </div>
+  -->
+  <btn-options 
+    :mainBtnLabel="mainBtnLabel"
+    :secondBtnLabel="secondBtnLabel"
+    :clickHandlers="clickHandlers"
+  ></btn-options>
   </div> 
 </div> 
 </template>
 
 
 <script>
-import Btn from '../atoms/Btn';
+import BtnOptions from './BtnOptions';
 
 export default {
   components: {
-    Btn
+    BtnOptions
   },
-  props: {
+  props: { 
     message: String,
     warn: Boolean,
     labels: Array[String],

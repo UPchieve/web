@@ -1,39 +1,49 @@
 <template>
 <div class="submit-question">
-  <div class="basic-template">
-    <div class="basic-template__header">
-      <h1>{{ title }}</h1>
-    </div>
-    <div class="basic-template__content">
-      <div class="content-card">
-        <div class="content-card__card">
-          This is the content
-          Lorem ipsum dolor 
-          lipsum150
-        </div>
+  <basic-template headerTitle="Submit a question">
+    <form class="question-form">
+      <div class="form-body">
+        <label for="">What is your question?</label>      
+        <textarea name="" id="" cols="30" rows="10"></textarea>
+        <label for="">(Optional) Attach a file</label>
+        <btn big label="Upload a file" :clickHandler="attachFile"></btn>
       </div>
-    </div>
-  </div>
+      <div class="form-options">
+        <btn rowMember label="Cancel" :clickHandler="cancel"></btn>
+        <btn label="Submit" :clickHandler="submitQuestion"></btn>
+      </div>
+    </form>
+  </basic-template>
 </div>
 </template>
 
 
 <script>
-import Modal from '../molecules/Modal';
+import BasicTemplate from '../organisms/BasicTemplate';
+import Btn from '../atoms/Btn';
 
 export default {
   components: {
-    Modal
+    BasicTemplate,
+    Btn
   },
   data() {
     return {
-      title: 'Submit a question' 
     }
   },
   methods: {
-    goHome() {
+    attachFile() {
+
+    },
+    submitQuestion() {
+
+    },
+    cancel() {
       this.$router.push('/');
     }
+  },
+  mounted() {
+
   }
 }
 </script>
@@ -44,51 +54,23 @@ export default {
   height: 100vh;
 }
 
-/*
-* @notes
-* [1] This shoudln't be done, but I had to do it since Bootstap interferes with
-*     this :/
-*/
-.basic-template {
-  min-height: 100vh;
-  background: var(--c-backdrop);
+.form-body {
+  margin-bottom: 80px;
+  text-align: left;
 }
-.basic-template__header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-  padding: 20px;
-}
-.basic-template__header h1 { /* [1] */
-  font-size: 20px;
-  margin: 0;
-  font-weight: bold;
-}
-.basic-template__content {
-
-}
-
-.content-card {
-  padding: 80px 40px;
+.form-body label {
   width: 100%;
+  font-weight: 500;
 }
-.content-card__card {
-  background: #fff;
-  width: 80%;
-  max-width: 700px;
-  padding: 40px;
-  box-shadow: -4px 4px var(--c-shadow);
-  margin: auto;
+.form-body textarea {
+  width: 100%;
+  height: 200px;
+  resize: none;
+  border: 2px solid var(--c-accent);
+  margin-bottom: 20px;
+  padding: 4px 8px;
 }
-
-
-@media screen and (min-width: 700px) {
-  .basic-template__header {
-    justify-content: flex-start;
-  }
-  .basic-template__header h1 {
-    font-size: 28px;
-  }
+.form-body textarea:focus {
+  outline: 0;
 }
 </style>
