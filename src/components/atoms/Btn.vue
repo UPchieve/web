@@ -27,7 +27,12 @@ export default {
 
 
 <style>
-.v-btn {
+/*
+* @notes
+* [1] Refactoring candidate: the v- prefix was added to avoid colliding with
+*     Bootstrap
+*/
+.v-btn { /*[1]*/
   background: var(--c-bg);
   color: var(--c-accent);
   text-align: center;
@@ -40,18 +45,18 @@ export default {
   line-height: 1;
   min-width: 128px;
 }
-.v-btn:hover {
+.v-btn:hover { /*[1]*/
   color: #fff;
   background: var(--c-accent);
 }
-.v-btn:focus {
+.v-btn:focus { /*[1]*/
   outline: 0;
 }
-.v-btn--big {
+.v-btn--big { /*[1]*/
   width: 100%;
   max-width: 512px;
 }
-.v-btn--btn-options-second {
+.v-btn--btn-options-second { /*[1]*/
   margin-top: 16px; 
 }
 

@@ -1,5 +1,7 @@
 <template>
-<div class="submit-question">
+<div class="send-answer">
+  Le answer
+  <!--
   <basic-template headerTitle="Submit a question">
     <form class="question-form">
       <div class="form-body">
@@ -21,6 +23,7 @@
       :message="message"
       :clickHandlers="clickHandlersModal"
   ></modal>
+-->
 </div>
 </template>
 
