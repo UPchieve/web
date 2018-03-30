@@ -38,6 +38,7 @@ export default {
   border-radius: 20px;
   padding: 0 20px;
   line-height: 1;
+  min-width: 128px;
 }
 .v-btn:hover {
   color: #fff;

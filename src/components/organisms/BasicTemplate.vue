@@ -44,8 +44,8 @@ export default {
 
 /*
 * @notes
-* [1] This shoudln't be done, but I had to do it since Bootstap interferes with
-*     this :/
+* [1] Refactoring candidate: this shoudln't be done, but I had to do it since 
+*     Bootstap interferes with this :/
 */
 .basic-template {
   min-height: 100vh;
@@ -57,6 +57,7 @@ export default {
   justify-content: center;
   background: #fff;
   padding: 20px;
+  box-shadow: 0 4px var(--c-shadow-header);
 }
 .basic-template__header h1 { /* [1] */
   font-size: 20px;
@@ -68,7 +69,7 @@ export default {
 }
 
 .content-card {
-  padding: 80px 40px;
+  padding: 80px 0;
   width: 100%;
 }
 .content-card__card {

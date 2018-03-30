@@ -4,10 +4,11 @@
 
 ### Main
 
-| Color                                   | Variable   | Hex code |
-|-----------------------------------------|------------|----------|
-| ![color](https://imgur.com/fAQkTOE.png) | --c-accent | #16d2aa  |
-| ![color](https://imgur.com/Nlhzx6E.png) | --c-bg     | #f6f6f6  |
+| Color                                   | Variable          | Hex code |
+|-----------------------------------------|-------------------|----------|
+| ![color](https://imgur.com/fAQkTOE.png) | --c-accent        | #16d2aa  |
+| ![color](https://imgur.com/Nlhzx6E.png) | --c-bg            | #f6f6f6  |
+| ![color](https://imgur.com/jD9OTjB.png) | --c-shadow-header | #e1e1e1  |
 
 ### Modals
 

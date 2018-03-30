@@ -94,7 +94,7 @@ export default {
       ) {
         this.showModal = true;
       }
-    }, 0);//600000);
+    }, 600000);
   },
   beforeRouteLeave(to, from, next) {
     if (

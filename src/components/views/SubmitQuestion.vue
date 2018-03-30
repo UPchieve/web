@@ -8,10 +8,11 @@
         <label for="">(Optional) Attach a file</label>
         <btn big label="Upload a file" :clickHandler="attachFile"></btn>
       </div>
-      <div class="form-options">
-        <btn rowMember label="Cancel" :clickHandler="cancel"></btn>
-        <btn label="Submit" :clickHandler="submitQuestion"></btn>
-      </div>
+      <btn-options 
+        mainBtnLabel="Submit" 
+        secondBtnLabel="Cancel" 
+        :clickHandlers="clickHandlers"
+      ></btn-options>
     </form>
   </basic-template>
 </div>
@@ -20,15 +21,21 @@
 
 <script>
 import BasicTemplate from '../organisms/BasicTemplate';
+import BtnOptions from '../molecules/BtnOptions';
 import Btn from '../atoms/Btn';
 
 export default {
   components: {
     BasicTemplate,
+    BtnOptions,
     Btn
   },
   data() {
     return {
+      clickHandlers: {
+        main: this.submitQuestion,
+        second: this.cancel
+      }
     }
   },
   methods: {
