@@ -4,17 +4,13 @@
     <div class="v-modal-dialog__content">
       {{ message }}
     </div>
-    <!---
-    <div class="v-modal-dialog__options">
-      <btn rowMember :label="secondBtnLabel" :clickHandler="clickHandlers.second"></btn>
-      <btn :label="mainBtnLabel" :clickHandler="clickHandlers.main"></btn>
-    </div>
-  -->
-  <btn-options 
-    :mainBtnLabel="mainBtnLabel"
-    :secondBtnLabel="secondBtnLabel"
-    :clickHandlers="clickHandlers"
-  ></btn-options>
+    <btn v-if="singleBtn" :label="mainBtnLabel" :clickHandler="clickHandlers.main">
+    </btn>
+    <btn-options v-else
+      :mainBtnLabel="mainBtnLabel"
+      :secondBtnLabel="secondBtnLabel"
+      :clickHandlers="clickHandlers"
+    ></btn-options>
   </div> 
 </div> 
 </template>
@@ -22,12 +18,15 @@
 
 <script>
 import BtnOptions from './BtnOptions';
+import Btn from '../atoms/Btn';
 
 export default {
   components: {
-    BtnOptions
+    BtnOptions,
+    Btn
   },
   props: { 
+    singleBtn: Boolean,
     message: String,
     warn: Boolean,
     labels: Array[String],
@@ -35,8 +34,8 @@ export default {
   },
   data() {
     return {
-      mainBtnLabel: this.labels[1],
-      secondBtnLabel: this.labels[0],
+      mainBtnLabel: this.labels[0],
+      secondBtnLabel: this.labels[1] ? this.labels[1] : null,
       classes: {
         'v-modal': true,
         'v-modal--warn': this.warn
@@ -62,6 +61,7 @@ export default {
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  background: var(--c-backdrop);
 }
 .v-modal--warn {
   background: var(--c-backdrop-warn);
@@ -72,6 +72,7 @@ export default {
   width: 80%;
   max-width: 480px;
   padding: 40px;
+  box-shadow: -4px 4px var(--c-shadow);
 }
 .v-modal-dialog__content {
   margin-bottom: 40px;

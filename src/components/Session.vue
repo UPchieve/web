@@ -42,8 +42,8 @@ export default {
       currentSession: SessionService.currentSession,
       showModal: false,
       btnLabels: [
-        'Exit session',
-        'Submit question'
+        'Submit question',
+        'Exit session'
       ],
       message: `
         We don’t have any Academic Coaches

@@ -4,17 +4,23 @@
     <form class="question-form">
       <div class="form-body">
         <label for="">What is your question?</label>      
-        <textarea name="" id="" cols="30" rows="10"></textarea>
+        <textarea name="" id=""></textarea>
         <label for="">(Optional) Attach a file</label>
+        <input type="file">
         <btn big label="Upload a file" :clickHandler="attachFile"></btn>
       </div>
       <btn-options 
         mainBtnLabel="Submit" 
         secondBtnLabel="Cancel" 
-        :clickHandlers="clickHandlers"
+        :clickHandlers="clickHandlersBtnOptions"
       ></btn-options>
     </form>
   </basic-template>
+  <modal v-if="showModal" singleBtn
+      :labels="btnLabels"
+      :message="message"
+      :clickHandlers="clickHandlersModal"
+  ></modal>
 </div>
 </template>
 
@@ -22,28 +28,45 @@
 <script>
 import BasicTemplate from '../organisms/BasicTemplate';
 import BtnOptions from '../molecules/BtnOptions';
+import Modal from '../molecules/Modal';
 import Btn from '../atoms/Btn';
 
 export default {
   components: {
     BasicTemplate,
     BtnOptions,
+    Modal,
     Btn
   },
   data() {
     return {
-      clickHandlers: {
+      showModal: false,
+      clickHandlersBtnOptions: {
         main: this.submitQuestion,
         second: this.cancel
+      },
+      message: `
+        Thanks for submitting your question! You 
+        will receive a response to your email 
+        address as soon as possible.
+      `,
+      btnLabels: ['Go to home page'],
+      clickHandlersModal: {
+        main: () => {
+          this.$router.push('/');
+        }
       }
     }
   },
   methods: {
     attachFile() {
-
+      const click = new MouseEvent('click');
+      this.$el.querySelector('input[type="file"]').dispatchEvent(click);
     },
     submitQuestion() {
-
+      // this will be the success callback
+      this.showModal = true;
+      this.$el.style.overflow = 'hidden';
     },
     cancel() {
       this.$router.push('/');
@@ -59,6 +82,7 @@ export default {
 <style>
 .submit-question {
   height: 100vh;
+  position: relative;
 }
 
 .form-body {
@@ -79,5 +103,8 @@ export default {
 }
 .form-body textarea:focus {
   outline: 0;
+}
+.form-body input[type="file"] {
+  display: none;
 }
 </style>
