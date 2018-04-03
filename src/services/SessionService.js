@@ -34,8 +34,8 @@ export default {
 
 
 
-  newSession(context, sessionType){
-    return NetworkService.newSession(context, {sessionType}).then((res) => {
+  newSession(context, sessionType, sessionSubTopic){
+    return NetworkService.newSession(context, {sessionType, sessionSubTopic} ).then((res) => {
       let data = res.data || {},
           sessionId = data.sessionId;
 
@@ -43,7 +43,7 @@ export default {
 
       console.log(sessionId);
       if (sessionId){
-        router.replace(`/session/${sessionType}/${sessionId}`);
+        router.replace(`/session/${sessionType}/${sessionSubTopic}/${sessionId}`);
       } else {
         router.replace('/');
       }
