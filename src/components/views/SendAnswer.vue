@@ -1,57 +1,55 @@
 <template>
 <div class="send-answer">
-  Le answer
-  <!--
-  <basic-template headerTitle="Submit a question">
-    <form class="question-form">
-      <div class="form-body">
-        <label for="">What is your question?</label>      
-        <textarea name="" id=""></textarea>
-        <label for="">(Optional) Attach a file</label>
-        <input type="file">
-        <btn big label="Upload a file" :clickHandler="attachFile"></btn>
+  <basic-template headerTitle="Answer question">
+    <div class="question">
+      <div class="question__content">
+        {{ question.content }}
       </div>
-      <btn-options 
-        mainBtnLabel="Submit" 
-        secondBtnLabel="Cancel" 
-        :clickHandlers="clickHandlersBtnOptions"
-      ></btn-options>
-    </form>
+      <div class="question__author">
+        {{ question.author }}
+      </div>
+      <div class="attachment-list">
+        <!-- TODO -->
+      </div>
+    </div>
+    <message-form 
+      textareaLabel="Write your answer below"
+      :clickHandlersBtnOptions="clickHandlersBtnOptions"
+    ></message-form>
   </basic-template>
   <modal v-if="showModal" singleBtn
       :labels="btnLabels"
       :message="message"
       :clickHandlers="clickHandlersModal"
   ></modal>
--->
 </div>
 </template>
 
 
 <script>
 import BasicTemplate from '../organisms/BasicTemplate';
-import BtnOptions from '../molecules/BtnOptions';
+import MessageForm from '../organisms/MessageForm';
 import Modal from '../molecules/Modal';
-import Btn from '../atoms/Btn';
 
 export default {
   components: {
     BasicTemplate,
-    BtnOptions,
-    Modal,
-    Btn
+    MessageForm,
+    Modal
   },
   data() {
     return {
+      question: {
+        content: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa a repellendus, illo nesciunt, sint suscipit veniam provident ad hic. Maxime sapiente esse similique, laudantium voluptas sequi! Nihil, molestiae, accusantium. Optio? ',
+        author: 'Some Student'
+      },
       showModal: false,
       clickHandlersBtnOptions: {
-        main: this.submitQuestion,
+        main: this.sendAnswer,
         second: this.cancel
       },
       message: `
-        Thanks for submitting your question! You 
-        will receive a response to your email 
-        address as soon as possible.
+        The answer was sent.
       `,
       btnLabels: ['Go to home page'],
       clickHandlersModal: {
@@ -66,7 +64,7 @@ export default {
       const click = new MouseEvent('click');
       this.$el.querySelector('input[type="file"]').dispatchEvent(click);
     },
-    submitQuestion() {
+    sendAnswer() {
       // this will be the success callback
       this.showModal = true;
       this.$el.style.overflow = 'hidden';
@@ -87,31 +85,24 @@ export default {
 * @notes
 * [1] Refactoring candidate: this should be in the global container
 */
-.submit-question { /*[1]*/
+.send-answer { /*[1]*/
   height: 100vh;
   position: relative;
 }
 
-.form-body {
-  margin-bottom: 80px;
-  text-align: left;
+.question {
+  margin-bottom: 40px;
+  border-bottom: 1px solid var(--c-shadow-header);
+  text-align: center;
 }
-.form-body label {
-  width: 100%;
-  font-weight: 500;
+.question__content {
+  font-weight: 600;
 }
-.form-body textarea {
-  width: 100%;
-  height: 200px;
-  resize: none;
-  border: 2px solid var(--c-accent);
-  margin-bottom: 20px;
-  padding: 4px 8px;
+.question__author {
+  margin: 20px 0;
+  font-style: italic;
 }
-.form-body textarea:focus {
-  outline: 0;
-}
-.form-body input[type="file"] {
-  display: none;
+.question__author::before {
+  content: 'by'
 }
 </style>

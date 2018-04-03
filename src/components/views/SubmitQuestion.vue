@@ -2,6 +2,7 @@
 <div class="submit-question">
   <basic-template headerTitle="Submit a question">
     <message-form 
+      textareaLabel="What is your question?"
       :clickHandlersBtnOptions="clickHandlersBtnOptions"
     ></message-form>
   </basic-template>

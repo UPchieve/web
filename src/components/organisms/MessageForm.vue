@@ -2,7 +2,7 @@
 <div class="message-form">
   <form class="question-form">
     <div class="form-body">
-      <label for="">What is your question?</label>      
+      <label for="">{{ textareaLabel }}</label>      
       <textarea name="" id=""></textarea>
       <label for="">(Optional) Attach a file</label>
       <input type="file">
@@ -28,7 +28,8 @@ export default {
     Btn
   },
   props: {
-    clickHandlersBtnOptions: Object
+    clickHandlersBtnOptions: Object,
+    textareaLabel: String
   },
   data() {
     return {
