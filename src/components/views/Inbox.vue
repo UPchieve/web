@@ -1,6 +1,18 @@
 <template>
 <div class="inbox">
   Le inbox
+  <div class="tabular-template">
+    <div class="tabular-template__header">
+      <h1>{{ headerTitle }}</h1>
+    </div>
+    <div class="tabular-template__content">
+      <div class="content-card">
+        <div class="content-card__card">
+          <slot></slot>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 </template>
 

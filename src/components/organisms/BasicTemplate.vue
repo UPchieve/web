@@ -1,9 +1,7 @@
 <template>
 <div class="submit-question">
   <div class="basic-template">
-    <div class="basic-template__header">
-      <h1>{{ headerTitle }}</h1>
-    </div>
+    <content-header :headerTitle="headerTitle"></content-header>  
     <div class="basic-template__content">
       <div class="content-card">
         <div class="content-card__card">
@@ -17,9 +15,11 @@
 
 
 <script>
+import ContentHeader from '../atoms/ContentHeader';
+
 export default {
   components: {
-    
+    ContentHeader
   },
   props: {
     headerTitle: String
@@ -42,27 +42,9 @@ export default {
   height: 100vh;
 }
 
-/*
-* @notes
-* [1] Refactoring candidate: this shoudln't be done, but I had to do it since 
-*     Bootstap interferes with this :/
-*/
 .basic-template {
   min-height: 100vh;
   background: var(--c-backdrop);
-}
-.basic-template__header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-  padding: 20px;
-  box-shadow: 0 4px var(--c-shadow-header);
-}
-.basic-template__header h1 { /* [1] */
-  font-size: 20px;
-  margin: 0;
-  font-weight: bold;
 }
 .basic-template__content {
 
