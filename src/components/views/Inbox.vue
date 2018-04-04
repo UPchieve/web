@@ -26,16 +26,16 @@ export default {
         requests: [
           {
             student: {
-              name: 'Student 1',
-              avatar: 'url'
+              name: 'John Doe',
+              avatar: 'static/defaultavatar4.png'
             },
             helpTopic: 'Math',
             helpSubtopic: 'Algebra'
           },
           {
             student: {
-              name: 'Student 2',
-              avatar: 'url'
+              name: 'Sally Smith',
+              avatar: 'static/defaultavatar4.png'
             },
             helpTopic: 'College',
             helpSubtopic: 'Personal Statement'

@@ -62,14 +62,4 @@ export default {
   box-shadow: -4px 4px var(--c-shadow);
   margin: auto;
 }
-
-
-@media screen and (min-width: 700px) {
-  .basic-template__header {
-    justify-content: flex-start;
-  }
-  .basic-template__header h1 {
-    font-size: 28px;
-  }
-}
 </style>
