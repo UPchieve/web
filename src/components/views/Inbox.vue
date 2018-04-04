@@ -1,16 +1,9 @@
 <template>
 <div class="inbox">
-  Le inbox
   <div class="tabular-template">
-    <div class="tabular-template__header">
-      <h1>{{ headerTitle }}</h1>
-    </div>
+    <content-header headerTitle="Answer Questions"></content-header>
     <div class="tabular-template__content">
-      <div class="content-card">
-        <div class="content-card__card">
-          <slot></slot>
-        </div>
-      </div>
+      <help-requests :helpRequests="helpRequests"></help-requests>
     </div>
   </div>
 </div>
@@ -18,43 +11,38 @@
 
 
 <script>
-import BasicTemplate from '../organisms/BasicTemplate';
-import BtnOptions from '../molecules/BtnOptions';
-import Modal from '../molecules/Modal';
-import Btn from '../atoms/Btn';
+import ContentHeader from '../atoms/ContentHeader';
+import HelpRequests from '../organisms/HelpRequests';
 
 export default {
   components: {
-    BasicTemplate,
-    BtnOptions,
-    Modal,
-    Btn
+    ContentHeader,
+    HelpRequests
   },
   data() {
     return {
-      showModal: false,
-      clickHandlersBtnOptions: {
-        main: this.submitQuestion,
-        second: this.cancel
-      },
-      message: `
-        Thanks for submitting your question! You 
-        will receive a response to your email 
-        address as soon as possible.
-      `,
-      btnLabels: ['Go to home page'],
-      clickHandlersModal: {
-        main: () => {
-          this.$router.push('/');
-        }
+      helpRequests: {
+        type: 'question',
+        requests: [
+          {
+            student: {
+              name: 'Student 1',
+              avatar: 'url'
+            },
+            helpTopic: 'Math',
+            helpSubtopic: 'Algebra'
+          },
+          {
+            student: {
+              name: 'Student 2',
+              avatar: 'url'
+            },
+            helpTopic: 'College',
+            helpSubtopic: 'Personal Statement'
+          },
+        ]
       }
     }
-  },
-  methods: {
-
-  },
-  mounted() {
-
   }
 }
 </script>

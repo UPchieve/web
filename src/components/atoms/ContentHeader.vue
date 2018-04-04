@@ -33,4 +33,13 @@ export default {
   margin: 0;
   font-weight: bold;
 }
+
+@media screen and (min-width: 700px) {
+  .content-header {
+    justify-content: flex-start;
+  }
+  .content-header h1 { /* [1] */
+    font-size: 28px;
+  }
+}
 </style>
