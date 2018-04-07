@@ -64,7 +64,9 @@ export default {
   },
   mounted(){
     var id = this.$route.params.sessionId,
+
             promise;
+
 
     if (!id){
       var type;
@@ -73,7 +75,7 @@ export default {
       } else {
         type = 'math'
       }
-      promise = SessionService.newSession(this, type)
+      promise = SessionService.newSession(this, type, subTopic)
     } else {
       promise = SessionService.useExistingSession(this, id);
     }

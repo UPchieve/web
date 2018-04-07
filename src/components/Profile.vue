@@ -103,6 +103,18 @@
       </select>
       <button @click="editField('referred')" class="sectionBtn">{{ fieldButtons.referred }}</button>
     </div>
+    
+    <div class="section" id="preferredContactMethod">
+      <div class="prompt">What is your preferred method of contact?</div>
+      <div class="answer" v-show="'preferredContactMethod' !== activeEdit">{{ user.preferredContactMethod }}</div>
+      <select class="form-control" v-model="user.preferredContactMethod" v-show="'preferredContactMethod' === activeEdit">
+        <option></option>
+        <option>Email</option>
+        <option>Text message</option>
+        <option>None</option>
+      </select>
+      <button @click="editField('preferredContactMethod')" class="sectionBtn">{{ fieldButtons.preferredContactMethod }}</button>
+    </div>
   </div>
 
   <div v-if="user.isVolunteer" class="cert-info">
@@ -127,7 +139,7 @@ export default {
     var avatarUrl = user.picture || (user.isVolunteer ? 'static/defaultavatar4.png' : 'static/defaultavatar3.png');
     var fieldnames = ['firstname', 'lastname', 'nickname', 'highschool', 'currentGrade',
     'expectedGraduation', 'difficultAcademicSubject', 'difficultCollegeProcess',
-    'hasGuidanceCounselor', 'gpa', 'collegeApplicationsText', 'phone', 'favoriteAcademicSubject', 'college','referred'];
+    'hasGuidanceCounselor', 'gpa', 'collegeApplicationsText', 'phone', 'favoriteAcademicSubject', 'college', 'referred', 'preferredContactMethod'];
     var fieldButtons = [];
     fieldnames.map(function(field) {
       fieldButtons[field] = 'Edit';
