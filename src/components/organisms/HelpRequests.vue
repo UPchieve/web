@@ -22,8 +22,8 @@
           {{ req.helpSubtopic }}
         </td>
         <td>
-          <router-link tag="a" to="/" v-if="type === 'question'">Answer question ›</router-link>
-          <router-link tag="a" to="/" v-if="type === 'session'">Help student ›</router-link>
+          <router-link tag="a" to="/send-answer" v-if="type === 'question'">Answer question ›</router-link>
+          <router-link tag="a" to="/send-answer" v-if="type === 'session'">Help student ›</router-link>
         </td>
       </tr>
     </tbody>
