@@ -20,7 +20,9 @@
 
     <div class="section" id="email">
       <div class="prompt">Your Email</div>
-      <div class="answer">{{ user.email }}</div>
+      <div class="answer" v-show="'email' !== activeEdit">{{ user.email }}</div>
+      <input type="text" v-model="user.email" v-show="'email' === activeEdit">
+      <button @click="editField('email')" class="sectionBtn">{{ fieldButtons.email }}</button>
     </div>
 
     <div class="section" id="birthdate">
@@ -125,7 +127,7 @@ export default {
   data() {
     var user = UserService.getUser();
     var avatarUrl = user.picture || (user.isVolunteer ? 'static/defaultavatar4.png' : 'static/defaultavatar3.png');
-    var fieldnames = ['firstname', 'lastname', 'nickname', 'highschool', 'currentGrade',
+    var fieldnames = ['firstname', 'lastname', 'nickname', 'email', 'highschool', 'currentGrade',
     'expectedGraduation', 'difficultAcademicSubject', 'difficultCollegeProcess',
     'hasGuidanceCounselor', 'gpa', 'collegeApplicationsText', 'phone', 'favoriteAcademicSubject', 'college','referred'];
     var fieldButtons = [];
