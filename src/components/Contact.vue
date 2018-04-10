@@ -19,11 +19,12 @@
                         
                         <div class="col-sm-5 margin-fix">
                             <select class="form-control" name="topic" required>
-                                <option>Select an option</option>
-                                <option>Technical issues while using the web app</option>
-                                <option>Math question</option>
-                                <option>College application question</option>
-                                <option>Feedback</option>
+                                <option value="none">Select an option</option>
+                                <option value="technical-issues">Technical issues while using the web app</option>
+                                <option value="math-question">Math question</option>
+                                <option value="college-application-question">College application question</option>
+                                <option value="feedback">Feedback</option>
+                                <option value="other">Other</option>
                             </select><br /><br />
                         </div>
                     </div>
