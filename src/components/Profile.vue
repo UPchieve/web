@@ -87,7 +87,7 @@
     notifications during the periods that you select in your schedule.</div>
 
     <div class="section" id="college">
-      <div class="prompt" v-show="'favoriteAcademicSubject' !== activeEdit">Your College</div>
+      <div class="prompt">Your College</div>
       <div class="answer" v-show="'college' !== activeEdit">{{ user.college }}</div>
       <input type="text" v-model="user.college" v-show="'college' === activeEdit">
       <button @click="editField('college')" class="sectionBtn">{{ fieldButtons.college }}</button>
