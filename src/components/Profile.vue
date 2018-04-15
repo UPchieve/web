@@ -4,115 +4,130 @@
     Profile
     <button @click="saveProfile()" class="saveBtn btn">{{ saveBtnMsg }}</button>
   </div>
-  <div class="basic-info">
-    <div class="section" id="profilePic">
-      <div class="prompt">Your profile picture</div>
-      <div class="answer avatar" v-bind:style="avatarStyle">
-      </div>
-    </div>
+  <div class="wrapper row">
+    <div class="pad-right col-xs-8">
+        <div class="personal-information">
+          <div class="pi-heading">
+            Personal Information
+          </div>
+          <div class="basic-info">
+            <div class="section" id="nickname">
+              <div class="prompt">Your Nickname</div>
+              <div class="answer" v-show="'nickname' !== activeEdit">{{ user.nickname }}</div>
+              <input type="text" v-model="user.nickname" v-show="'nickname' === activeEdit">
+              <button @click="editField('nickname')" class="sectionBtn">{{ fieldButtons.nickname }}</button>
+            </div>
 
-    <div class="section" id="nickname">
-      <div class="prompt">Your Nickname</div>
-      <div class="answer" v-show="'nickname' !== activeEdit">{{ user.nickname }}</div>
-      <input type="text" v-model="user.nickname" v-show="'nickname' === activeEdit">
-      <button @click="editField('nickname')" class="sectionBtn">{{ fieldButtons.nickname }}</button>
-    </div>
+            <div class="section" id="email">
+              <div class="prompt">Your Email</div>
+              <div class="answer">{{ user.email }}</div>
+            </div>
 
-    <div class="section" id="email">
-      <div class="prompt">Your Email</div>
-      <div class="answer">{{ user.email }}</div>
-    </div>
+            <div class="section" id="birthdate">
+              <div class="prompt">Your Birthday</div>
+              <div class="answer">{{ user.birthdate }}</div>
+            </div>
 
-    <div class="section" id="birthdate">
-      <div class="prompt">Your Birthday</div>
-      <div class="answer">{{ user.birthdate }}</div>
-    </div>
+            <div class="section" id="gender">
+              <div class="prompt">Your Gender</div>
+              <div class="answer">{{ user.gender }}</div>
+            </div>
 
-    <div class="section" id="gender">
-      <div class="prompt">Your Gender</div>
-      <div class="answer">{{ user.gender }}</div>
-    </div>
+            <div class="section" id="race">
+              <div class="prompt">Your Race</div>
+              <div class="answer">
+                <ul v-show="'race' !== activeEdit" v-for="item in user.race">
+                  <li>{{ item }}</li>
+                </ul>
+              </div>
+            </div>
 
-    <div class="section" id="race">
-      <div class="prompt">Your Race</div>
-      <div class="answer">
-        <ul v-show="'race' !== activeEdit" v-for="item in user.race">
-          <li>{{ item }}</li>
-        </ul>
-      </div>
-    </div>
+          </div>
 
+          <div v-if="!user.isVolunteer">
+            <div class="section" id="highschool">
+              <div class="prompt">Your High School's Name</div>
+              <div class="answer" v-show="'highschool' !== activeEdit">{{ user.highschool }}</div>
+              <input type="text" v-model="user.highschool" v-show="'highschool' === activeEdit">
+              <button @click="editField('highschool')" class="sectionBtn">{{ fieldButtons.highschool }}</button>
+            </div>
+
+            <div class="section" id="expectedGraduation">
+              <div class="prompt">Expected High School Graduation</div>
+              <div class="answer" v-show="'expectedGraduation' !== activeEdit">{{ user.expectedGraduation }}</div>
+              <select class="form-control" v-model="user.expectedGraduation" v-show="'expectedGraduation' === activeEdit">
+                <option></option>
+                <option>2017</option>
+                <option>2018</option>
+                <option>2019</option>
+                <option>2020</option>
+                <option>2021</option>
+                <option>2022</option>
+              </select>
+              <button @click="editField('expectedGraduation')" class="sectionBtn">{{ fieldButtons.expectedGraduation }}</button>
+            </div>
+
+          </div>
+          <div v-if="user.isVolunteer">
+            <div class="section" id="phone">
+              <div class="prompt">Your Phone Number
+              </div>
+              <div class="answer" v-show="'phone' !== activeEdit">{{ user.phone }}</div>
+              <input type="text" v-model="user.phone" v-show="'phone' === activeEdit">
+              <button @click="editField('phone')" class="sectionBtn">{{ fieldButtons.phone }}</button>
+            </div>
+            <div class="description">We will use this number to send
+            you notifications when a student needs help. You will only receive
+            notifications during the periods that you select in your schedule.</div>
+
+            <div class="section" id="college">
+              <div class="prompt">Your College</div>
+              <div class="answer" v-show="'college' !== activeEdit">{{ user.college }}</div>
+            </div>
+
+            <div class="section" id="favoriteAcademicSubject">
+              <div class="prompt">Your Favorite Academic Subject</div>
+              <div class="answer" v-show="'favoriteAcademicSubject' !== activeEdit">{{ user.favoriteAcademicSubject }}</div>
+              <input type="text" v-model="user.favoriteAcademicSubject" v-show="'favoriteAcademicSubject' === activeEdit">
+              <button @click="editField('favoriteAcademicSubject')" class="sectionBtn">{{ fieldButtons.favoriteAcademicSubject }}</button>
+            </div>
+
+            <div class="section" id="referred">
+              <div class="prompt">Were you referred by one of our partner organizations?</div>
+              <div class="answer" v-show="'referred' !== activeEdit">{{ user.referred }}</div>
+              <select class="form-control" v-model="user.referred" v-show="'referred' === activeEdit">
+                <option></option>
+                <option>Yes - APO Xi Alpha</option>
+                <option>Yes - Alpha Gamma Iota</option>
+                <option>No</option>
+              </select>
+              <button @click="editField('referred')" class="sectionBtn">{{ fieldButtons.referred }}</button>
+            </div>
+          </div>
+
+          <div v-if="user.isVolunteer" class="cert-info">
+            <div class="info-header cert">Certifications</div>
+            <div class="certifications" v-for="(value, key) in certifications">
+              <div v-if="value">{{ key }}</div>
+            </div>
+          </div>
+
+          <div class="section"><router-link to="resetpassword" class="prompt">Reset password</router-link></div>
+        </div>
+    </div>
+    <div class="pad-left col-xs-4">
+        <div class="profile-picture">
+          <div class="pp-heading">
+            Profile Picture
+          </div>
+
+            <div class="section" id="profilePic">
+              <div class="answer avatar" v-bind:style="avatarStyle">
+              </div>
+            </div>
+        </div>
+    </div>
   </div>
-
-  <div v-if="!user.isVolunteer">
-    <div class="section" id="highschool">
-      <div class="prompt">Your High School's Name</div>
-      <div class="answer" v-show="'highschool' !== activeEdit">{{ user.highschool }}</div>
-      <input type="text" v-model="user.highschool" v-show="'highschool' === activeEdit">
-      <button @click="editField('highschool')" class="sectionBtn">{{ fieldButtons.highschool }}</button>
-    </div>
-
-    <div class="section" id="expectedGraduation">
-      <div class="prompt">Expected High School Graduation</div>
-      <div class="answer" v-show="'expectedGraduation' !== activeEdit">{{ user.expectedGraduation }}</div>
-      <select class="form-control" v-model="user.expectedGraduation" v-show="'expectedGraduation' === activeEdit">
-        <option></option>
-        <option>2017</option>
-        <option>2018</option>
-        <option>2019</option>
-        <option>2020</option>
-        <option>2021</option>
-        <option>2022</option>
-      </select>
-      <button @click="editField('expectedGraduation')" class="sectionBtn">{{ fieldButtons.expectedGraduation }}</button>
-    </div>
-
-  </div>
-  <div v-if="user.isVolunteer">
-    <div class="section" id="phone">
-      <div class="prompt">Your Phone Number
-      </div>
-      <div class="answer" v-show="'phone' !== activeEdit">{{ user.phone }}</div>
-      <input type="text" v-model="user.phone" v-show="'phone' === activeEdit">
-      <button @click="editField('phone')" class="sectionBtn">{{ fieldButtons.phone }}</button>
-    </div>
-    <div class="description">We will use this number to send
-    you notifications when a student needs help. You will only receive
-    notifications during the periods that you select in your schedule.</div>
-
-    <div class="section" id="college">
-      <div class="prompt">Your College</div>
-      <div class="answer" v-show="'college' !== activeEdit">{{ user.college }}</div>
-    </div>
-
-    <div class="section" id="favoriteAcademicSubject">
-      <div class="prompt">Your Favorite Academic Subject</div>
-      <div class="answer" v-show="'favoriteAcademicSubject' !== activeEdit">{{ user.favoriteAcademicSubject }}</div>
-      <input type="text" v-model="user.favoriteAcademicSubject" v-show="'favoriteAcademicSubject' === activeEdit">
-      <button @click="editField('favoriteAcademicSubject')" class="sectionBtn">{{ fieldButtons.favoriteAcademicSubject }}</button>
-    </div>
-
-    <div class="section" id="referred">
-      <div class="prompt">Were you referred by one of our partner organizations?</div>
-      <div class="answer" v-show="'referred' !== activeEdit">{{ user.referred }}</div>
-      <select class="form-control" v-model="user.referred" v-show="'referred' === activeEdit">
-        <option></option>
-        <option>Yes - APO Xi Alpha</option>
-        <option>Yes - Alpha Gamma Iota</option>
-        <option>No</option>
-      </select>
-      <button @click="editField('referred')" class="sectionBtn">{{ fieldButtons.referred }}</button>
-    </div>
-  </div>
-
-  <div v-if="user.isVolunteer" class="cert-info">
-    <div class="info-header cert">Certifications</div>
-    <div class="certifications" v-for="(value, key) in certifications">
-      <div v-if="value">{{ key }}</div>
-    </div>
-  </div>
-
-  <div class="section"><router-link to="resetpassword" class="prompt">Reset password</router-link></div>
 
 </div>
 
@@ -197,10 +212,44 @@ export default {
 
 <style scoped>
 
+.wrapper {
+  margin: 30px 15px;
+}
+
+.personal-information {
+  background-color: #f0f7fd;
+}
+
+.profile-picture {
+  background-color: #a9edfd;
+}
+
+.profile-picture .section {
+  height: auto;
+}
+
+.profile-picture .answer {
+  margin: 30px auto;
+}
+
+.pi-heading {
+  background-color: #e2f1fc;
+}
+
+.pi-heading, .pp-heading {
+    font-weight: 600;
+    text-align: left;
+    padding: 30px;
+    font-size: 18px;
+}
+
 .avatar {
   display: block;
-  width: 50px;
-  height: 50px;
+  width: 140px;
+  height: 140px;
+  border-radius: 70px;
+  //width: 50px;
+  //height: 50px;
   background-size: cover;
 }
 
@@ -262,14 +311,16 @@ select, input[type=text] {
 }
 
 .prompt {
-  width: 300px;
+  font-weight: 600;
+  width: 240px;
+  //width: 300px;
   text-align: left;
   margin-left: 30px;
-  padding-bottom: 20px;
+  //padding-bottom: 20px;
 }
 
 .answer {
-  margin-right: 10px;
+  margin-right: 30px;
   text-align: left
 }
 
@@ -328,6 +379,7 @@ ul {
   max-width: 500px;
   margin-left: 30px;
   margin-bottom: 20px;
+  margin-right: 30px;
   text-align: left;
 }
 
