@@ -63,19 +63,17 @@ export default {
     }
   },
   mounted(){
-    var id = this.$route.params.sessionId,
-
-            promise;
-
+    let id = this.$route.params.sessionId;
+    let promise;
 
     if (!id){
-      var type;
+      let type;
       if (this.$route.path.indexOf('session/college') !== -1){
         type = 'college'
       } else {
         type = 'math'
       }
-      promise = SessionService.newSession(this, type, subTopic)
+      promise = SessionService.newSession(this, type, this.$route.params.subTopic);
     } else {
       promise = SessionService.useExistingSession(this, id);
     }
