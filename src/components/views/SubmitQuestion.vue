@@ -55,6 +55,9 @@ export default {
     cancel() {
       this.$router.push('/');
     }
+  },
+  mounted() {
+    
   }
 }
 </script>

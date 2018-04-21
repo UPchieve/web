@@ -37,6 +37,11 @@ export default {
     Chat,
     Modal
   },
+  /* 
+  * @notes
+  * [1] Refactoring candidate: it'd be awesome if Dashboard could pass 
+  *     the topic directly
+  */
   data(){
     return {
       currentSession: SessionService.currentSession,
@@ -54,7 +59,13 @@ export default {
       `,
       clickHandlers: {
         main: () => {
-          this.$router.push('/submit-question');
+          this.$router.push({
+            path: '/submit-question',
+            query: {
+              topic: this.$route.path.split('/')[2], // [1]
+              subTopic: this.$route.params.subTopic
+            }
+          });
         },
         second: () => {
           this.$router.push('/');
