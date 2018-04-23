@@ -20,17 +20,23 @@
 
     <div class="section" id="email">
       <div class="prompt">Your Email</div>
-      <div class="answer">{{ user.email }}</div>
+      <div class="answer" v-show="'email' !== activeEdit">{{ user.email }}</div>
+      <input type="text" v-model="user.email" v-show="'email' === activeEdit">
+      <button @click="editField('email')" class="sectionBtn">{{ fieldButtons.email }}</button>
     </div>
 
     <div class="section" id="birthdate">
       <div class="prompt">Your Birthday</div>
-      <div class="answer">{{ user.birthdate }}</div>
+      <div class="answer" v-show="'birthdate' !== activeEdit">{{ user.birthdate }}</div>
+      <input type="date" v-model="user.birthdate" v-show="'birthdate' === activeEdit">
+      <button @click="editField('birthdate')" class="sectionBtn">{{ fieldButtons.birthdate }}</button>
     </div>
 
     <div class="section" id="gender">
       <div class="prompt">Your Gender</div>
-      <div class="answer">{{ user.gender }}</div>
+      <div class="answer" v-show="'gender' !== activeEdit">{{ user.gender }}</div>
+      <input type="text" v-model="user.gender" v-show="'gender' === activeEdit">
+      <button @click="editField('gender')" class="sectionBtn">{{ fieldButtons.gender }}</button>
     </div>
 
     <div class="section" id="race">
@@ -83,6 +89,8 @@
     <div class="section" id="college">
       <div class="prompt">Your College</div>
       <div class="answer" v-show="'college' !== activeEdit">{{ user.college }}</div>
+      <input type="text" v-model="user.college" v-show="'college' === activeEdit">
+      <button @click="editField('college')" class="sectionBtn">{{ fieldButtons.college }}</button>
     </div>
 
     <div class="section" id="favoriteAcademicSubject">
@@ -137,7 +145,7 @@ export default {
   data() {
     var user = UserService.getUser();
     var avatarUrl = user.picture || (user.isVolunteer ? 'static/defaultavatar4.png' : 'static/defaultavatar3.png');
-    var fieldnames = ['firstname', 'lastname', 'nickname', 'highschool', 'currentGrade',
+    var fieldnames = ['firstname', 'lastname', 'nickname', 'email', 'birthdate', 'gender', 'highschool', 'currentGrade',
     'expectedGraduation', 'difficultAcademicSubject', 'difficultCollegeProcess',
     'hasGuidanceCounselor', 'gpa', 'collegeApplicationsText', 'phone', 'favoriteAcademicSubject', 'college', 'referred', 'preferredContactMethod'];
     var fieldButtons = [];
