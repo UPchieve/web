@@ -11,34 +11,62 @@
         <chat></chat>
       </div>
     </div>
+
+    <modal warn v-if="showModal"
+      :labels="btnLabels"
+      :message="message"
+      :clickHandlers="clickHandlers"
+    ></modal>
   </div>
 </template>
 
-<script>
 
+<script>
 import SessionService from 'src/services/SessionService';
 import UserService from 'src/services/UserService';
 
 import SessionHeader from './Session/Header';
 import Whiteboard from './Session/Whiteboard';
 import Chat from './Session/Chat';
+import Modal from './molecules/Modal';
 
 export default {
   components: {
     SessionHeader,
     Whiteboard,
-    Chat
+    Chat,
+    Modal
   },
   data(){
     return {
-      currentSession: SessionService.currentSession
+      currentSession: SessionService.currentSession,
+      showModal: false,
+      btnLabels: [
+        'Submit question',
+        'Exit session'
+      ],
+      message: `
+        We don’t have any Academic Coaches
+        available right now, but you can submit a
+        written question, and we will try to get
+        back to you within 24 hours! Would you
+        like to submit a question now?
+      `,
+      clickHandlers: {
+        main: () => {
+          this.$router.push('/submit-question');
+        },
+        second: () => {
+          this.$router.push('/');
+        }
+      }
     }
   },
   mounted(){
     var id = this.$route.params.sessionId,
-        promise;
 
-    console.log(id);
+            promise;
+
 
     if (!id){
       var type;
@@ -47,7 +75,7 @@ export default {
       } else {
         type = 'math'
       }
-      promise = SessionService.newSession(this, type)
+      promise = SessionService.newSession(this, type, subTopic)
     } else {
       promise = SessionService.useExistingSession(this, id);
     }
@@ -59,50 +87,70 @@ export default {
   			user: UserService.getUser()
   		});
     });
+
+    // Offer the option to ask a question
+    setTimeout(() => {
+      if (
+        !UserService.getUser().isVolunteer && 
+        SessionService.getPartner() === undefined
+      ) {
+        this.showModal = true;
+      }
+    }, 600000);
   },
-  beforeRouteLeave(to, from, next){
-    if (to.path.indexOf('/feedback') !== -1){
+  beforeRouteLeave(to, from, next) {
+    if (
+      to.path.indexOf('/feedback') !== -1 ||
+      to.path.indexOf('/submit-question') !== -1
+    ) {
       next();
       return;
     }
-    var result = window.confirm('Do you really want to end the session?')
-    if (result){
-      this.$socket.disconnect();
-      SessionService.endSession({ skipRoute: true });
-      next('/feedback');
+    else {
+      let result = window.confirm('Do you really want to end the session?');
+      if (result) {
+        this.$socket.disconnect();
+        SessionService.endSession({ skipRoute: true });
+        next('/feedback');
+      }
     }
   }
 }
 </script>
 
+
 <style scoped>
+  /*
+  * @notes
+  * [1] Refactoring candidate: these styles should be placed in the container
+  *     (we need to rethink the containing model in order to do so)
+  */
+  .session {
+    position: relative; /*[1]*/
+    height: 100%; /*[1]*/
+  }
 
-.session {
-  height: 100%;
-}
+  .session-header-container {
+    position: absolute;
+    left: 0;
+    width: 100%;
+  }
 
-.session-header-container {
-  position: absolute;
-  left: 300px;
-  right: 0;
-  z-index: 1;
-}
+  .session-contents-container {
+    height: 100%;
+    padding-top: 100px;
+  }
 
-.session-contents-container {
-  height: 100%;
-  padding-top: 100px;
-}
+  .whiteboard-container {
+    height: 100%;
+    padding: 0;
+    border-top: 25px solid #EAEAEB;
+    border-left: 25px solid #EAEAEB;
+    border-right: 25px solid #EAEAEB;
+  }
 
-.whiteboard-container {
-  height: 100%;
-  padding: 0;
-  border-top: 25px solid #EAEAEB;
-  border-left: 25px solid #EAEAEB;
-  border-right: 25px solid #EAEAEB;
-}
-
-.chat-container {
-  height: 100%;
-  padding: 0;
-}
+  .chat-container {
+    height: 100%;
+    padding: 0;
+  }
 </style>

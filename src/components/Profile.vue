@@ -115,6 +115,7 @@
           <div class="section"><router-link to="resetpassword" class="prompt">Reset password</router-link></div>
         </div>
     </div>
+
     <div class="pad-left col-xs-4">
         <div class="profile-picture">
           <div class="pp-heading">
@@ -126,9 +127,129 @@
               </div>
             </div>
         </div>
+
+    <div class="section" id="nickname">
+      <div class="prompt">Your Nickname</div>
+      <div class="answer" v-show="'nickname' !== activeEdit">{{ user.nickname }}</div>
+      <input type="text" v-model="user.nickname" v-show="'nickname' === activeEdit">
+      <button @click="editField('nickname')" class="sectionBtn">{{ fieldButtons.nickname }}</button>
+    </div>
+
+    <div class="section" id="email">
+      <div class="prompt">Your Email</div>
+      <div class="answer" v-show="'email' !== activeEdit">{{ user.email }}</div>
+      <input type="text" v-model="user.email" v-show="'email' === activeEdit">
+      <button @click="editField('email')" class="sectionBtn">{{ fieldButtons.email }}</button>
+    </div>
+
+    <div class="section" id="birthdate">
+      <div class="prompt">Your Birthday</div>
+      <div class="answer" v-show="'birthdate' !== activeEdit">{{ user.birthdate }}</div>
+      <input type="date" v-model="user.birthdate" v-show="'birthdate' === activeEdit">
+      <button @click="editField('birthdate')" class="sectionBtn">{{ fieldButtons.birthdate }}</button>
+    </div>
+
+    <div class="section" id="gender">
+      <div class="prompt">Your Gender</div>
+      <div class="answer" v-show="'gender' !== activeEdit">{{ user.gender }}</div>
+      <input type="text" v-model="user.gender" v-show="'gender' === activeEdit">
+      <button @click="editField('gender')" class="sectionBtn">{{ fieldButtons.gender }}</button>
+    </div>
+
+    <div class="section" id="race">
+      <div class="prompt">Your Race</div>
+      <div class="answer">
+        <ul v-show="'race' !== activeEdit" v-for="item in user.race">
+          <li>{{ item }}</li>
+        </ul>
+      </div>
     </div>
   </div>
 
+
+  <div v-if="!user.isVolunteer">
+    <div class="section" id="highschool">
+      <div class="prompt">Your High School's Name</div>
+      <div class="answer" v-show="'highschool' !== activeEdit">{{ user.highschool }}</div>
+      <input type="text" v-model="user.highschool" v-show="'highschool' === activeEdit">
+      <button @click="editField('highschool')" class="sectionBtn">{{ fieldButtons.highschool }}</button>
+    </div>
+
+    <div class="section" id="expectedGraduation">
+      <div class="prompt">Expected High School Graduation</div>
+      <div class="answer" v-show="'expectedGraduation' !== activeEdit">{{ user.expectedGraduation }}</div>
+      <select class="form-control" v-model="user.expectedGraduation" v-show="'expectedGraduation' === activeEdit">
+        <option></option>
+        <option>2017</option>
+        <option>2018</option>
+        <option>2019</option>
+        <option>2020</option>
+        <option>2021</option>
+        <option>2022</option>
+      </select>
+      <button @click="editField('expectedGraduation')" class="sectionBtn">{{ fieldButtons.expectedGraduation }}</button>
+    </div>
+
+  </div>
+  <div v-if="user.isVolunteer">
+    <div class="section" id="phone">
+      <div class="prompt">Your Phone Number
+      </div>
+      <div class="answer" v-show="'phone' !== activeEdit">{{ user.phone }}</div>
+      <input type="text" v-model="user.phone" v-show="'phone' === activeEdit">
+      <button @click="editField('phone')" class="sectionBtn">{{ fieldButtons.phone }}</button>
+    </div>
+    <div class="description">We will use this number to send
+    you notifications when a student needs help. You will only receive
+    notifications during the periods that you select in your schedule.</div>
+
+    <div class="section" id="college">
+      <div class="prompt">Your College</div>
+      <div class="answer" v-show="'college' !== activeEdit">{{ user.college }}</div>
+      <input type="text" v-model="user.college" v-show="'college' === activeEdit">
+      <button @click="editField('college')" class="sectionBtn">{{ fieldButtons.college }}</button>
+    </div>
+
+    <div class="section" id="favoriteAcademicSubject">
+      <div class="prompt">Your Favorite Academic Subject</div>
+      <div class="answer" v-show="'favoriteAcademicSubject' !== activeEdit">{{ user.favoriteAcademicSubject }}</div>
+      <input type="text" v-model="user.favoriteAcademicSubject" v-show="'favoriteAcademicSubject' === activeEdit">
+      <button @click="editField('favoriteAcademicSubject')" class="sectionBtn">{{ fieldButtons.favoriteAcademicSubject }}</button>
+    </div>
+
+    <div class="section" id="referred">
+      <div class="prompt">Were you referred by one of our partner organizations?</div>
+      <div class="answer" v-show="'referred' !== activeEdit">{{ user.referred }}</div>
+      <select class="form-control" v-model="user.referred" v-show="'referred' === activeEdit">
+        <option></option>
+        <option>Yes - APO Xi Alpha</option>
+        <option>Yes - Alpha Gamma Iota</option>
+        <option>No</option>
+      </select>
+      <button @click="editField('referred')" class="sectionBtn">{{ fieldButtons.referred }}</button>
+    </div>
+    
+    <div class="section" id="preferredContactMethod">
+      <div class="prompt">What is your preferred method of contact?</div>
+      <div class="answer" v-show="'preferredContactMethod' !== activeEdit">{{ user.preferredContactMethod }}</div>
+      <select class="form-control" v-model="user.preferredContactMethod" v-show="'preferredContactMethod' === activeEdit">
+        <option></option>
+        <option>Email</option>
+        <option>Text message</option>
+        <option>None</option>
+      </select>
+      <button @click="editField('preferredContactMethod')" class="sectionBtn">{{ fieldButtons.preferredContactMethod }}</button>
+    </div>
+  </div>
+
+  <div v-if="user.isVolunteer" class="cert-info">
+    <div class="info-header cert">Certifications</div>
+    <div class="certifications" v-for="(value, key) in certifications">
+      <div v-if="value">{{ key }}</div>
+    </div>
+  </div>
+
+  <div class="section"><router-link to="resetpassword" class="prompt">Reset password</router-link></div>
 </div>
 
 </template>
@@ -140,9 +261,9 @@ export default {
   data() {
     var user = UserService.getUser();
     var avatarUrl = user.picture || (user.isVolunteer ? 'static/defaultavatar4.png' : 'static/defaultavatar3.png');
-    var fieldnames = ['firstname', 'lastname', 'nickname', 'highschool', 'currentGrade',
+    var fieldnames = ['firstname', 'lastname', 'nickname', 'email', 'birthdate', 'gender', 'highschool', 'currentGrade',
     'expectedGraduation', 'difficultAcademicSubject', 'difficultCollegeProcess',
-    'hasGuidanceCounselor', 'gpa', 'collegeApplicationsText', 'phone', 'favoriteAcademicSubject', 'college','referred'];
+    'hasGuidanceCounselor', 'gpa', 'collegeApplicationsText', 'phone', 'favoriteAcademicSubject', 'college', 'referred', 'preferredContactMethod'];
     var fieldButtons = [];
     fieldnames.map(function(field) {
       fieldButtons[field] = 'Edit';

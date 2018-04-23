@@ -58,4 +58,18 @@ html, body, #app {
   padding-right: 0;
   z-index: 0;
 }
+
+@media screen and (max-width: 700px) {
+  /*------------------------------------------------------------------quickfix*/
+  .nav-container {
+    background: #000;
+    width: 40px; 
+    overflow: hidden;
+  }
+  .col-xs-12.view-container {
+    padding-left: 40px;
+  }
+  /*------------------------------------------------------------------quickfix*/
+}
+
 </style>
