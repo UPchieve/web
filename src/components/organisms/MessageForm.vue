@@ -2,10 +2,10 @@
 <div class="message-form">
   <form class="question-form">
     <div class="form-body">
-      <label for="">{{ textareaLabel }}</label>      
-      <textarea name="" id=""></textarea>
-      <label for="">(Optional) Attach a file</label>
-      <input type="file">
+      <label for="message">{{ textareaLabel }}</label>      
+      <textarea name="message" id="message"></textarea>
+      <label for="">Attach a file (Optional - 7MB Max)</label>
+      <input type="file" id="file" name="file" v-on:change="changeHandler">
       <btn big label="Upload a file" :clickHandler="attachFile"></btn>
     </div>
     <btn-options 
@@ -13,6 +13,13 @@
       secondBtnLabel="Cancel" 
       :clickHandlers="clickHandlersBtnOptions"
     ></btn-options>
+    <div class="form-loader">
+      <div class="form-loader__dot"></div>
+      <div class="form-loader__dot"></div>
+      <div class="form-loader__msg">
+        Sending...
+      </div>
+    </div>
   </form>
 </div>
 </template>
@@ -33,13 +40,17 @@ export default {
   },
   data() {
     return {
-
+      
     }
   },
   methods: {
     attachFile() {
       const click = new MouseEvent('click');
       this.$el.querySelector('input[type="file"]').dispatchEvent(click);
+    },
+    changeHandler() {
+      let files = [];
+      console.log(document.getElementById('file').files);
     }
   }
 }
@@ -47,6 +58,11 @@ export default {
 
 
 <style>
+.message-form {
+  position: relative;
+  overflow: hidden;
+}
+
 .form-body {
   margin-bottom: 80px;
   text-align: left;
@@ -68,5 +84,48 @@ export default {
 }
 .form-body input[type="file"] {
   display: none;
+}
+
+.form-loader {
+  transition: all .25s ease-out;
+  background: #fff;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.form-loader__dot {
+  width: 0;
+  height: 0;
+  background: var(--c-accent);
+  border-radius: 100%;
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  transform: translate(-50%,-50%);
+}
+.form-loader__msg {
+  width: 100%;
+  color: var(--c-accent);
+  font-weight: bold;
+  position: absolute;
+  left: 12px;
+  top: 52%;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+}
+
+@keyframes a-loader-1 {
+  0% {
+    opacity: 1;
+    width: 4px;
+    height: 4px;
+  }
+  100% {
+    opacity: 0;
+    width: 64px;
+    height: 64px;
+  }
 }
 </style>

@@ -61,5 +61,8 @@ export default {
   },
   updateAvailability(context, data){
     return context.$http.post(`${API_ROOT}/calendar/save`, data).then(this._successHandler, this._errorHandler)
+  },
+  createUserQuestion(context, data) {
+    return context.$http.post(`${API_ROOT}/user-questions`, data).then(this._successHandler, this._errorHandler);
   }
 }

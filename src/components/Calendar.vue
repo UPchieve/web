@@ -15,7 +15,7 @@
       <div class="dayLabel">{{ day }}</div>
       <div class="times">
         <div v-for="sortedTime in sortedTimes[day]" class="timeOfDay">
-          <input type="checkbox" id=time v-model=availability[day][sortedTime]>
+          <input type="checkbox" id="time" v-model="availability[day][sortedTime]">
           <label for=sortedTime></label>
         </div>
       </div>

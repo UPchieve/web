@@ -70,6 +70,11 @@ export default {
         second: () => {
           this.$router.push('/');
         }
+      },
+      formLoaderOptions: {
+        formLoaderTop: '0',
+        formLoaderDot1: 'a-loader-1 2s ease-out infinite',
+        formLoaderDot2: 'a-loader-1 1s 2s ease-out infinite'
       }
     }
   },

@@ -43,6 +43,19 @@ export default {
         ]
       }
     }
+  },
+  mounted() {
+    this.$http.post('http://localhost:3000/api/student-questions', {})
+      .then(
+        (questions) => {
+          console.log('retrieved success');
+          console.log(questions);
+        }, 
+        (err) => {
+          console.log('retrieved error');
+          console.log(err);
+        }
+      );
   }
 }
 </script>
