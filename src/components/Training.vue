@@ -48,14 +48,16 @@ export default {
     var quizzes = new Object();
     quizzes['math'] = ['algebra', 'geometry', 'trigonometry', 'precalculus', 'calculus'];
     quizzes['esl'] = ['esl'];
-    quizzes['college Counseling'] = ['planning', 'essays', 'applications'];
-    quizzes['science'] = ['biology', 'chemistry'];
+    quizzes['college Counseling'] = ['planning', 'essay', 'application'];
+    //quizzes['science'] = ['biology', 'chemistry'];
     var bools = new Object();
     bools['math'] = false;
     bools['esl'] = false;
     bools['college Counseling'] = false;
     bools['science'] = false;
-    var supercategories = ['esl', 'math', 'college Counseling', 'science'];
+    //Science Currently Removed due to quiz issues -Will
+   //var supercategories = ['esl', 'math', 'college Counseling', 'science'];
+    var supercategories = ['esl', 'math', 'college Counseling'];
     var colors = new Object();
     colors['esl'] = '#1855D1';
     colors['math'] = '#F7AEF8';
