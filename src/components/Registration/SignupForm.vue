@@ -14,7 +14,7 @@
       <div class="agreement-box">
         <input type="checkbox" id="userAgreement" v-model="credentials.terms" required>
         <label id='agreement' for="userAgreement"></label>
-        <div class="agreement-label">I have read and accept the <a href="#">user agreement</a>.</div>
+        <div class="agreement-label">I have read and accept the <a href="#/legal" target="_blank">user agreement</a>.</div>
       </div>
       <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">SIGN UP</button>
       {{msg}}
@@ -151,7 +151,7 @@ input[type="checkbox"] {
 }
 
 .agreement-box {
-  margin: 25px 0 50px 0;
+  margin: 25px 0 10px 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
