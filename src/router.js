@@ -10,7 +10,7 @@ Vue.use(VueSocketio, process.env.SOCKET_ADDRESS);
 Vue.http.options.credentials = true;
 
 import Contact from './components/Contact'
-import Privacy from './components/Privacy'
+import Legal from './components/Legal'
 import Logout from './components/Logout'
 import LoginForm from './components/LoginForm'
 import Registration from './components/Registration'
@@ -43,7 +43,7 @@ const routes = [
     }
   }},
   { path: '/contact', component: Contact },
-  { path: '/privacy', component: Privacy },
+  { path: '/legal', component: Legal },
   { path: '/login', component: LoginForm },
   { path: '/logout', component: Logout },
   { path: '/signup', component: Registration },
