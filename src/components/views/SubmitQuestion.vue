@@ -6,9 +6,9 @@
       :clickHandlersBtnOptions="clickHandlersBtnOptions"
     ></message-form>
   </basic-template>
-  <modal v-if="showModal" singleBtn
+  <modal v-if="showModal" :singleBtn="modalOptions.singleBtn" :warn="modalOptions.warn"
     :labels="btnLabels"
-    :message="message"
+    :message="modalOptions.message"
     :clickHandlers="clickHandlersModal"
   ></modal>
 </div>
@@ -36,17 +36,9 @@ export default {
         main: this.submitQuestion,
         second: this.cancel
       },
-      message: `
-        Thanks for submitting your question! You 
-        will receive a response to your email 
-        address as soon as possible.
-      `,
-      btnLabels: ['Go to home page'],
-      clickHandlersModal: {
-        main: () => {
-          this.$router.push('/');
-        }
-      }
+      btnLabels: [],
+      modalOptions: {},
+      clickHandlersModal: {}
     }
   },
   methods: {
@@ -55,33 +47,88 @@ export default {
       document.querySelector('.form-loader__dot:nth-child(1)').style = 'animation: a-loader-1 2s ease-out infinite';
       document.querySelector('.form-loader__dot:nth-child(2)').style = 'animation: a-loader-1 1s 2s ease-out infinite';
     },
+    hideLoader() {
+      document.querySelector('.form-loader').style = '';
+      document.querySelector('.form-loader__dot:nth-child(1)').style = '';
+      document.querySelector('.form-loader__dot:nth-child(2)').style = '';
+    },
+    askForAMessage() {
+      this.btnLabels = ['Write message'];
+      this.modalOptions = {
+        singleBtn: true,
+        warn: true,
+        message: `
+          Message is empty!
+        `
+      };
+      this.clickHandlersModal = {
+        main: () => {
+          this.showModal = false;
+        }
+      };
+      this.showModal = true;
+    },
+    showResponseState(res) {
+      if (res === 'notSent') {
+        this.btnLabels = ['Retry'];
+        this.modalOptions = {
+          singleBtn: true,
+          warn: true,
+          message: `
+            There was a problem sending the message
+          `
+        };
+        this.clickHandlersModal = {
+          main: () => {
+            this.hideLoader();
+            this.showModal = false;
+          }
+        };
+      }
+      else {
+        this.btnLabels = ['Go to home page'];
+        this.modalOptions = {
+          singleBtn: true,
+          warn: false,
+          message: `
+            Thanks for submitting your question! You 
+            will receive a response to your email 
+            address as soon as possible.
+          `
+        };
+        this.clickHandlersModal = {
+          main: () => {
+            this.$router.push('/');
+          }
+        }
+      }
+      this.showModal = true;
+    },
     submitQuestion(e) {
 
       e.preventDefault();
 
-      this.showLoader();
+      if (document.getElementById('message').value !== '') {
 
-      let questionObj = {};
-          questionObj.topic = this.$route.query.topic;
-          questionObj.subTopic = this.$route.query.subTopic;
-          questionObj.studentName = UserService.getUser().name;
-          questionObj.studentEmail = UserService.getUser().email;
-          questionObj.content = document.getElementById('message').value;
-          questionObj.attachment = document.getElementById('file').files;
+        this.showLoader();
 
-      
-      UserQuestionService.createUserQuestion(this, questionObj)
-        .then(
-          (res) => { console.log('component'); console.log(res) },
-          (err) => {
-            console.log('err');
+        let questionObj = {};
+            questionObj.topic = this.$route.query.topic;
+            questionObj.subTopic = this.$route.query.subTopic;
+            questionObj.studentName = UserService.getUser().name;
+            questionObj.studentEmail = UserService.getUser().email;
+            questionObj.content = document.getElementById('message').value;
+            questionObj.attachment = document.getElementById('file').files;
+        
+        UserQuestionService.createUserQuestion(this, questionObj).then(
+          (res) => { 
+            this.showResponseState(res)
           }
         );
-
-
-      // this will be the success callback
-      //this.showModal = true;
-      //this.$el.style.overflow = 'hidden';
+      }
+      else {
+        this.askForAMessage();
+      }
     },
     cancel() {
       this.$router.push('/');

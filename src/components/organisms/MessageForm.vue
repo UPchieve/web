@@ -1,12 +1,15 @@
 <template>
 <div class="message-form">
-  <form class="question-form">
+  <form class="question-form" onsubmit="return false;">
     <div class="form-body">
       <label for="message">{{ textareaLabel }}</label>      
       <textarea name="message" id="message"></textarea>
       <label for="">Attach a file (Optional - 7MB Max)</label>
       <input type="file" id="file" name="file" v-on:change="changeHandler">
       <btn big label="Upload a file" :clickHandler="attachFile"></btn>
+      <ul class="file-list">
+        <li v-for="file in fileList">{{ file }}</li>
+      </ul>
     </div>
     <btn-options 
       mainBtnLabel="Submit" 
@@ -26,13 +29,17 @@
 
 
 <script>
+import Vue from 'vue';
+
 import BtnOptions from '../molecules/BtnOptions';
 import Btn from '../atoms/Btn';
+import Attachment from '../atoms/Attachment';
 
 export default {
   components: {
     BtnOptions,
-    Btn
+    Btn,
+    Attachment
   },
   props: {
     clickHandlersBtnOptions: Object,
@@ -40,7 +47,7 @@ export default {
   },
   data() {
     return {
-      
+      fileList: []
     }
   },
   methods: {
@@ -48,9 +55,9 @@ export default {
       const click = new MouseEvent('click');
       this.$el.querySelector('input[type="file"]').dispatchEvent(click);
     },
-    changeHandler() {
-      let files = [];
-      console.log(document.getElementById('file').files);
+    changeHandler(e) {
+      e.preventDefault();
+      Vue.set(this.fileList, 0, document.getElementById('file').files[0].name);
     }
   }
 }
@@ -84,6 +91,12 @@ export default {
 }
 .form-body input[type="file"] {
   display: none;
+}
+
+.file-list {
+  list-style: none;
+  margin-top: 8px;
+  padding: 0;
 }
 
 .form-loader {
