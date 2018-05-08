@@ -12,5 +12,17 @@ export default {
         return 'notSent';
       }
     );
+  },
+
+  getStudentQuestions(context, data) {
+    return NetworkService.getStudentQuestions(context, data).then(
+      (res) => {
+        return res.body;
+      },
+      (err) => {
+        console.error(new Error('Unable to retrieve StudentQuestions'));
+        console.log(err);
+      }
+    );
   }
 }

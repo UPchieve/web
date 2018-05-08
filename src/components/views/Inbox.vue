@@ -11,6 +11,11 @@
 
 
 <script>
+import Vue from 'vue';
+
+import StudentQuestionService from '../../services/StudentQuestionService';
+import UserService from '../../services/UserService';
+
 import ContentHeader from '../atoms/ContentHeader';
 import HelpRequests from '../organisms/HelpRequests';
 
@@ -25,35 +30,39 @@ export default {
         type: 'question',
         requests: [
           {
-            student: {
-              name: 'John Doe',
-              avatar: 'static/defaultavatar4.png'
-            },
-            helpTopic: 'Math',
-            helpSubtopic: 'Algebra'
+            topic: 'Maths',
+            subTopic: 'Algebra',
+            studentName: 'Mark',
+            studentAvatar: '',
+            _id: 'dfahkdjsfhkjdashfjkhsd',
           },
           {
-            student: {
-              name: 'Sally Smith',
-              avatar: 'static/defaultavatar4.png'
-            },
-            helpTopic: 'College',
-            helpSubtopic: 'Personal Statement'
+            topic: 'Maths',
+            subTopic: 'Algebra',
+            studentName: 'Mary Ann',
+            studentAvatar: '',
+            _id: 'dfahkdjsfhkjdashfjkhsd',
           },
         ]
       }
     }
   },
   mounted() {
-    this.$http.get('http://localhost:3000/api/student-questions', {})
-      .then(
+    StudentQuestionService.getStudentQuestions(this, {}).then(
         (questions) => {
-          console.log('retrieved success');
-          console.log(questions);
-        }, 
-        (err) => {
-          console.log('retrieved error');
-          console.log(err);
+          console.log(questions, 'ja');
+          //Vue.set()
+
+          /*
+          CHALLENGE:
+          HOW TO GET THE AVATAR
+
+          OPTION 1: add studentId to the StudentQuestion schema and then retrieve avatar when I load the thing
+
+          OPTION 2: add studentAvatar to the StudentQuestion schema and then just use the avatar
+
+          ALSO CAPITALIZE topic and subTopic
+          */
         }
       );
   }

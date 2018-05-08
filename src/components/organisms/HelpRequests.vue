@@ -14,12 +14,12 @@
         class="help-request"
       >
         <td>
-          <span class="row-avatar"><img :src="req.student.avatar" alt="Avatar"></span>
-          {{ req.student.name }}
+          <span class="row-avatar"><img :src="req.studentAvatar" alt="Avatar"></span>
+          {{ req.studentName }}
         </td>
         <td>
-          <topic-label :label="req.helpTopic"></topic-label>
-          {{ req.helpSubtopic }}
+          <topic-label :label="req.topic"></topic-label>
+          {{ req.subTopic }}
         </td>
         <td>
           <router-link tag="a" to="/send-answer" v-if="type === 'question'">Answer question ›</router-link>

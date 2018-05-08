@@ -17,7 +17,7 @@
 
 <script>
 import UserService from '../../services/UserService';
-import UserQuestionService from '../../services/StudentQuestionService';
+import StudentQuestionService from '../../services/StudentQuestionService';
 
 import BasicTemplate from '../organisms/BasicTemplate';
 import MessageForm from '../organisms/MessageForm';
@@ -112,15 +112,22 @@ export default {
 
         this.showLoader();
 
+        let user = UserService.getUser();
         let questionObj = {};
-            questionObj.topic = this.$route.query.topic;
-            questionObj.subTopic = this.$route.query.subTopic;
-            questionObj.studentName = UserService.getUser().name;
-            questionObj.studentEmail = UserService.getUser().email;
+            questionObj.topic = 
+              this.$route.query.topic.charAt(0).toUpperCase() + 
+              this.$route.query.topic.slice(1);
+            questionObj.subTopic = 
+              this.$route.query.subTopic.charAt(0).toUpperCase() + 
+              this.$route.query.subTopic.slice(1);
+            questionObj.student = {};
+            questionObj.student.name = user.name;
+            questionObj.student.email = user.email;
+            questionObj.student.picture = user.picture;
             questionObj.content = document.getElementById('message').value;
             questionObj.attachments = document.getElementById('file').files;
         
-        UserQuestionService.createStudentQuestion(this, questionObj).then(
+        StudentQuestionService.createStudentQuestion(this, questionObj).then(
           (res) => { 
             this.showResponseState(res)
           }
