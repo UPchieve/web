@@ -45,7 +45,7 @@ export default {
     }
   },
   mounted() {
-    this.$http.post('http://localhost:3000/api/student-questions', {})
+    this.$http.get('http://localhost:3000/api/student-questions', {})
       .then(
         (questions) => {
           console.log('retrieved success');

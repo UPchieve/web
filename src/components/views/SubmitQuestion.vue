@@ -17,7 +17,7 @@
 
 <script>
 import UserService from '../../services/UserService';
-import UserQuestionService from '../../services/UserQuestionService';
+import UserQuestionService from '../../services/StudentQuestionService';
 
 import BasicTemplate from '../organisms/BasicTemplate';
 import MessageForm from '../organisms/MessageForm';
@@ -120,7 +120,7 @@ export default {
             questionObj.content = document.getElementById('message').value;
             questionObj.attachments = document.getElementById('file').files;
         
-        UserQuestionService.createUserQuestion(this, questionObj).then(
+        UserQuestionService.createStudentQuestion(this, questionObj).then(
           (res) => { 
             this.showResponseState(res)
           }
