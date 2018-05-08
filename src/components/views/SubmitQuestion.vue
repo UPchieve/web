@@ -118,7 +118,7 @@ export default {
             questionObj.studentName = UserService.getUser().name;
             questionObj.studentEmail = UserService.getUser().email;
             questionObj.content = document.getElementById('message').value;
-            questionObj.attachment = document.getElementById('file').files;
+            questionObj.attachments = document.getElementById('file').files;
         
         UserQuestionService.createUserQuestion(this, questionObj).then(
           (res) => { 
