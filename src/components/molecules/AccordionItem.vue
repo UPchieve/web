@@ -29,7 +29,6 @@ export default {
   },
   methods: {
     slideToggle() {
-      console.log('slideToggle');
       this.accordionItemBulletClasses['accordion-item__bullet--active'] = 
         !this.accordionItemBulletClasses['accordion-item__bullet--active'];
       this.accordionItemContentClasses['accordion-item__content--active'] = 
@@ -58,14 +57,14 @@ export default {
   margin-right: 8px;
   position: relative;
   display: inline-block;
-  transition: .2s ease-in-out;
+  transition: all .2s ease-in-out;
 }
 .accordion-item__bullet--active {
   transform: rotate(90deg);
 }
 .accordion-item__content {
   background: var(--c-backdrop-clear);
-  transition: .2s ease-in-out;
+  transition: all .2s ease-in-out;
   padding: 0 20px;
   height: 0;
 }
