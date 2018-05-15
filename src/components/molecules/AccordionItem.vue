@@ -1,9 +1,9 @@
 <template>
 <div class="accordion-item">
-  <div class="accordion-item__title">
-      <span class="accordion-item__bullet">▸</span>{{ label }}
+  <div class="accordion-item__title" v-on:click="slideToggle">
+      <span :class="accordionItemBulletClasses">▸</span>{{ label }}
   </div>
-  <div class="accordion-item__content">
+  <div :class="accordionItemContentClasses">
     <slot></slot>
   </div>
 </div>
@@ -14,6 +14,27 @@
 export default {
   props: {
     label: String
+  },
+  data() {
+    return {
+      accordionItemBulletClasses: {
+        'accordion-item__bullet': true,
+        'accordion-item__bullet--active': false
+      },
+      accordionItemContentClasses: {
+        'accordion-item__content': true,
+        'accordion-item__content--active': false
+      }
+    }
+  },
+  methods: {
+    slideToggle() {
+      console.log('slideToggle');
+      this.accordionItemBulletClasses['accordion-item__bullet--active'] = 
+        !this.accordionItemBulletClasses['accordion-item__bullet--active'];
+      this.accordionItemContentClasses['accordion-item__content--active'] = 
+        !this.accordionItemContentClasses['accordion-item__content--active'];
+    }
   }
 }
 </script>
@@ -21,7 +42,7 @@ export default {
 
 <style>
 .accordion-item {
-
+  overflow: hidden;
 }
 .accordion-item__title {
   background: var(--c-backdrop);
@@ -29,18 +50,30 @@ export default {
   font-weight: bold;
   border-bottom: 2px solid var(--c-shadow-header);
 }
+.accordion-item__title:hover {
+  cursor: pointer;
+  background: var(--c-backdrop-clear);
+}
 .accordion-item__bullet {
   margin-right: 8px;
+  position: relative;
+  display: inline-block;
+  transition: .2s ease-in-out;
+}
+.accordion-item__bullet--active {
+  transform: rotate(90deg);
 }
 .accordion-item__content {
   background: var(--c-backdrop-clear);
-  padding: 20px;
-  border-bottom: 2px solid var(--c-shadow-header);  
+  transition: .2s ease-in-out;
+  padding: 0 20px;
+  height: 0;
+}
+.accordion-item__content--active {
+  padding: 20px 20px;
+  height: auto;
 }
 .accordion-item__content p:last-child {
   margin-bottom: 0;
-}
-.accordion-item:last-child {
-  margin-bottom: 20px;
 }
 </style>
