@@ -54,7 +54,7 @@ section {
   margin-top: 0;
 }
 
-.full-text-template__content p {
+.full-text-template__content p { /* [1] */
   margin-bottom: 20px;
 }
 
@@ -63,6 +63,4 @@ section {
   padding: 20px;
   margin-bottom: 20px;
 }
-
-
 </style>
