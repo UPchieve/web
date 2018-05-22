@@ -6,7 +6,7 @@
         {{ question.content }}
       </div>
       <div class="question__author">
-        {{ question.author }}
+        {{ question.student.name }}
       </div>
       <div class="attachment-list">
         <!-- TODO -->
@@ -27,6 +27,8 @@
 
 
 <script>
+import StudentQuestionService from '../../services/StudentQuestionService';
+
 import BasicTemplate from '../organisms/BasicTemplate';
 import MessageForm from '../organisms/MessageForm';
 import Modal from '../molecules/Modal';
@@ -40,8 +42,10 @@ export default {
   data() {
     return {
       question: {
-        content: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa a repellendus, illo nesciunt, sint suscipit veniam provident ad hic. Maxime sapiente esse similique, laudantium voluptas sequi! Nihil, molestiae, accusantium. Optio? ',
-        author: 'Some Student'
+        content: null,
+        student: {
+          name: null
+        }
       },
       showModal: false,
       clickHandlersBtnOptions: {
@@ -73,8 +77,13 @@ export default {
       this.$router.push('/');
     }
   },
-  mounted() {
-    console.log(this.$route.query);
+  beforeCreate() {
+    StudentQuestionService.getStudentQuestions(this, { _id: this.$route.query.q })
+      .then(
+        (questions) => {
+          this.question = questions[0];
+        }
+      );
   }
 }
 </script>
