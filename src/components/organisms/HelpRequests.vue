@@ -14,16 +14,16 @@
         class="help-request"
       >
         <td>
-          <span class="row-avatar"><img :src="req.studentAvatar" alt="Avatar"></span>
-          {{ req.studentName }}
+          <span class="row-avatar"><img :src="req.student.picture" alt="Avatar"></span>
+          {{ req.student.name }}
         </td>
         <td>
           <topic-label :label="req.topic"></topic-label>
           {{ req.subTopic }}
         </td>
         <td>
-          <router-link tag="a" to="/send-answer" v-if="type === 'question'">Answer question ›</router-link>
-          <router-link tag="a" to="/send-answer" v-if="type === 'session'">Help student ›</router-link>
+          <router-link tag="a" :to="`/send-answer?q=${req._id}`" v-if="type === 'question'">Answer question ›</router-link>
+          <router-link tag="a" :to="`/send-answer?q=${req._id}`" v-if="type === 'session'">Help student ›</router-link>
         </td>
       </tr>
     </tbody>

@@ -11,8 +11,6 @@
 
 
 <script>
-import Vue from 'vue';
-
 import StudentQuestionService from '../../services/StudentQuestionService';
 import UserService from '../../services/UserService';
 
@@ -28,41 +26,26 @@ export default {
     return {
       helpRequests: {
         type: 'question',
-        requests: [
-          {
-            topic: 'Maths',
-            subTopic: 'Algebra',
-            studentName: 'Mark',
-            studentAvatar: '',
-            _id: 'dfahkdjsfhkjdashfjkhsd',
-          },
-          {
-            topic: 'Maths',
-            subTopic: 'Algebra',
-            studentName: 'Mary Ann',
-            studentAvatar: '',
-            _id: 'dfahkdjsfhkjdashfjkhsd',
-          },
-        ]
+        requests: []
       }
     }
   },
   mounted() {
-    StudentQuestionService.getStudentQuestions(this, {}).then(
+    StudentQuestionService.getStudentQuestions(this, {})
+      .then(
         (questions) => {
-          console.log(questions, 'ja');
-          //Vue.set()
+          for (let i=0; i<questions.length; i++) {
 
-          /*
-          CHALLENGE:
-          HOW TO GET THE AVATAR
+            let o = {};
+              o.topic = questions[i].topic;
+              o.subTopic = questions[i].subTopic;
+              o.student = {};
+              o.student.name = questions[i].student.name;
+              o.student.picture = questions[i].student.picture;
+              o._id = questions[i]._id;
 
-          OPTION 1: add studentId to the StudentQuestion schema and then retrieve avatar when I load the thing
-
-          OPTION 2: add studentAvatar to the StudentQuestion schema and then just use the avatar
-
-          ALSO CAPITALIZE topic and subTopic
-          */
+            this.helpRequests.requests.push(o);
+          }
         }
       );
   }
