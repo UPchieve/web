@@ -19,10 +19,10 @@
               <span v-if="category != 'esl'">{{ category | capitalize }}</span>
               <span v-if="category == 'esl'">{{ category | uppercase }}</span>
               <div class="review">
-                <router-link :to="'/training/' + category + '/review'" tag="div" class="review-container">
-                  <div class="review-label">Review</div>
+                <div class="review-container">
+                  <div class="review-label"><a v-bind:href="reviewMaterials[category]" target="_blank">Review</a></div>
                   <div class="arrow right"></div>
-                </router-link>
+                </div>
               </div>
             </div>
             <div class="test">
@@ -63,12 +63,23 @@ export default {
     colors['math'] = '#F7AEF8';
     colors['college Counseling'] = '#FED766';
     colors['science'] = '#9575CD';
+    var reviewMaterials = new Object();
+    reviewMaterials['algebra'] = 'https://drive.google.com/open?id=1UQCaewADDlYXT7vv4-GUuTg7rjLnIdeufGwLgezBo4Y';
+    reviewMaterials['geometry'] = 'https://docs.google.com/document/d/128AHz0DakobmILSTrbiQVix3677FhCNcazduc3896Lk/edit?usp=sharing';
+    reviewMaterials['trigonometry'] = 'https://drive.google.com/open?id=0B8mTVZa3-VGQUkxhd0R0Wmg1azZ5Z1pWUE8xa2g0MGZYemZF';
+    reviewMaterials['precalculus'] = 'https://drive.google.com/open?id=1_T6wdW1_aDvT5kkK2DslUTBllRdOAc_JJ4oxHzzoB6U';
+    reviewMaterials['calculus'] = 'https://drive.google.com/open?id=1dxBoVIZsmw4tuUkmDF2y1rmuS0tvxw_d';
+    reviewMaterials['esl'] = 'https://drive.google.com/open?id=1P99PIY89X6VdvCGMMzjNOS55Nvljkc8Lv6FxmjJzo8Y';
+    reviewMaterials['planning'] = 'https://drive.google.com/file/d/1MXl7g4E4hdt05Pt8jl9gQvr1kfv-cKBU/view?usp=sharing';
+    reviewMaterials['essay'] = 'https://drive.google.com/file/d/19IyuDkShzdaRvN0fAZqvYkpoMJPR-XfG/view?usp=sharing';
+    reviewMaterials['application'] = 'https://drive.google.com/file/d/18J5ca1LSNgh_9MQqct02Myr5UMFp1VOu/view?usp=sharing';
     return {
       user: user,
       quizzes: quizzes,
       bools: bools,
       supercategories: supercategories,
-      colors: colors
+      colors: colors,
+      reviewMaterials: reviewMaterials
     }
   },
   filters: {
