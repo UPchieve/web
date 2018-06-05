@@ -113,19 +113,25 @@ export default {
         this.showLoader();
 
         let user = UserService.getUser();
-        let questionObj = {};
-            questionObj.topic = 
+
+        let questionObj = new FormData();
+            questionObj.append(
+              'topic', 
               this.$route.query.topic.charAt(0).toUpperCase() + 
-              this.$route.query.topic.slice(1);
-            questionObj.subTopic = 
+              this.$route.query.topic.slice(1)
+            );
+            questionObj.append(
+              'subTopic', 
               this.$route.query.subTopic.charAt(0).toUpperCase() + 
-              this.$route.query.subTopic.slice(1);
-            questionObj.student = {};
-            questionObj.student.name = user.name;
-            questionObj.student.email = user.email;
-            questionObj.student.picture = user.picture;
-            questionObj.content = document.getElementById('message').value;
-            questionObj.attachments = document.getElementById('file').files;
+              this.$route.query.subTopic.slice(1)
+            );
+            questionObj.append(
+              'student',
+              `{ name: ${user.name}, email: ${user.email}, picture: ${user.picture} }`
+            );
+            questionObj.append('content', document.getElementById('message').value);
+            questionObj.append('attachments', document.getElementById('file').files[0]);
+
         
         StudentQuestionService.createStudentQuestion(this, questionObj).then(
           (res) => { 
