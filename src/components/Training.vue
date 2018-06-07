@@ -129,6 +129,11 @@ export default {
 
 <style scoped>
 
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
 .training {
   color: #73737A;
 }
@@ -157,6 +162,7 @@ export default {
 .category {
   font-size: 16px;
   border: 1px solid #EEEEEE;
+  text-align: left;
 }
 
 .category span {
