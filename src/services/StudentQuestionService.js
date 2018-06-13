@@ -24,5 +24,17 @@ export default {
         console.log(err);
       }
     );
+  },
+
+  getAttachment(context, data) {
+    return NetworkService.getAttachment(context, data).then(
+      (res) => {
+        return res;
+      },
+      (err) => {
+        console.error(new Error('Unable to retrieve attachment'));
+        console.log(err);
+      }
+    );
   }
 }

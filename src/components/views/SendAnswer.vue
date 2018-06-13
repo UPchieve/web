@@ -8,8 +8,11 @@
       <div class="question__author">
         {{ question.student.name }}
       </div>
-      <div class="attachment-list">
-        <!-- TODO -->
+      <div v-if="hasAttachments" class="attachment-list">
+        <div class="attachment-list__icon"></div>
+        <div class="attachment-list__content" v-on:click="downloadFile()">
+          {{ question.attachments[0] }}
+        </div>
       </div>
     </div>
     <message-form 
@@ -27,6 +30,7 @@
 
 
 <script>
+import DownloadService from '../../services/DownloadService';
 import StudentQuestionService from '../../services/StudentQuestionService';
 
 import BasicTemplate from '../organisms/BasicTemplate';
@@ -41,12 +45,8 @@ export default {
   },
   data() {
     return {
-      question: {
-        content: null,
-        student: {
-          name: null
-        }
-      },
+      hasAttachments: false,
+      question: {},
       showModal: false,
       clickHandlersBtnOptions: {
         main: this.sendAnswer,
@@ -64,6 +64,18 @@ export default {
     }
   },
   methods: {
+    downloadFile() {
+      StudentQuestionService.getAttachment(this, this.question.attachments[0])
+        .then(
+          (res) => {
+            DownloadService.openDownloadDialog(
+              res.body, 
+              this.question.attachments[0], 
+              res.headers.map['content-type']
+            );
+          }
+        );
+    },
     attachFile() {
       const click = new MouseEvent('click');
       this.$el.querySelector('input[type="file"]').dispatchEvent(click);
@@ -82,6 +94,7 @@ export default {
       .then(
         (questions) => {
           this.question = questions[0];
+          this.hasAttachments = this.question.attachments.length > 0 ? true : false;
         }
       );
   }
@@ -106,6 +119,8 @@ export default {
 }
 .question__content {
   font-weight: 600;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 .question__author {
   margin: 20px 0;
@@ -113,5 +128,37 @@ export default {
 }
 .question__author::before {
   content: 'by'
+}
+
+/*
+* @notes
+* [1] Refactoring candidate: this should be in a separate component
+*/
+.attachment-list { /*[1]*/
+  background: var(--c-bg);
+  display: flex;
+}
+.attachment-list__icon {
+  position: relative;
+  min-width: 64px;
+  background: var(--c-shadow-header);
+}
+.attachment-list__icon::before {
+  content: ' ';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  width: 24px;
+  height: 24px;
+  background-image: url('../../assets/attachment_icon.svg');
+}
+.attachment-list__content {
+  padding: 20px;
+  text-decoration: underline;
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 </style>
