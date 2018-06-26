@@ -42,15 +42,20 @@ export default {
     Attachment
   },
   props: {
-    clickHandlersBtnOptions: Object,
-    textareaLabel: String
+    textareaLabel: String,
+    modalContainer: Object
   },
   data() {
     return {
-      fileList: []
+      fileList: [],
+      clickHandlersBtnOptions: {
+        main: this.submitQuestion,
+        second: this.cancel
+      }
     }
   },
   methods: {
+    // File attachment
     attachFile() {
       const click = new MouseEvent('click');
       this.$el.querySelector('input[type="file"]').dispatchEvent(click);
@@ -58,7 +63,112 @@ export default {
     changeHandler(e) {
       e.preventDefault();
       Vue.set(this.fileList, 0, document.getElementById('file').files[0].name);
-    }
+    },
+    // Form feedback
+    askForAMessage() {
+      this.modalContainer.modalBtnLabels = ['Write message'];
+      this.modalContainer.modalOptions = {
+        singleBtn: true,
+        warn: true,
+        message: `
+          Message is empty!
+        `
+      };
+      this.modalContainer.modalClickHandlers = {
+        main: () => {
+          this.modalContainer.showModal = false;
+        }
+      };
+      this.modalContainer.showModal = true;
+    },
+    showLoader() {
+      document.querySelector('.form-loader').style = 'top: 0';
+      document.querySelector('.form-loader__dot:nth-child(1)').style = 'animation: a-loader-1 2s ease-out infinite';
+      document.querySelector('.form-loader__dot:nth-child(2)').style = 'animation: a-loader-1 1s 2s ease-out infinite';
+    },
+    hideLoader() {
+      document.querySelector('.form-loader').style = '';
+      document.querySelector('.form-loader__dot:nth-child(1)').style = '';
+      document.querySelector('.form-loader__dot:nth-child(2)').style = '';
+    },    
+    showResponseState(res) {
+      if (res === 'notSent') {
+        this.modalContainer.modalBtnLabels = ['Retry'];
+        this.modalContainer.modalOptions = {
+          singleBtn: true,
+          warn: true,
+          message: `
+            There was a problem sending the message
+          `
+        };
+        this.modalContainer.modalClickHandlers = {
+          main: () => {
+            this.hideLoader();
+            this.showModal = false;
+          }
+        };
+      }
+      else {
+        this.modalContainer.modalBtnLabels = ['Go to home page'];
+        this.modalContainer.modalOptions = {
+          singleBtn: true,
+          warn: false,
+          message: `
+            Thanks for submitting your question! You 
+            will receive a response to your email 
+            address as soon as possible.
+          `
+        };
+        this.modalContainer.modalClickHandlers = {
+          main: () => {
+            this.$router.push('/');
+          }
+        }
+      }
+      this.modalContainer.showModal = true;
+    },
+    // Form options (buttons)
+    cancel() {
+      this.$router.push('/');
+    },
+    submitQuestion(e) {
+
+      e.preventDefault();
+
+      if (document.getElementById('message').value !== '') {
+
+        this.showLoader();
+
+        let user = UserService.getUser();
+
+        let questionObj = new FormData();
+            questionObj.append(
+              'topic', 
+              this.$route.query.topic.charAt(0).toUpperCase() + 
+              this.$route.query.topic.slice(1)
+            );
+            questionObj.append(
+              'subTopic', 
+              this.$route.query.subTopic.charAt(0).toUpperCase() + 
+              this.$route.query.subTopic.slice(1)
+            );
+            questionObj.append(
+              'student',
+              `{ name: ${user.name}, email: ${user.email}, picture: ${user.picture} }`
+            );
+            questionObj.append('content', document.getElementById('message').value);
+            questionObj.append('attachments', document.getElementById('file').files[0]);
+        
+        StudentQuestionService.createStudentQuestion(this, questionObj).then(
+          (res) => { 
+            this.showResponseState(res)
+          }
+        );
+      }
+      else {
+        this.modalContainer.askForAMessage();
+      }
+    },
   }
 }
 </script>

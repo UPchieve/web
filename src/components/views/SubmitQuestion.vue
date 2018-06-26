@@ -3,13 +3,13 @@
   <basic-template headerTitle="Submit a question">
     <message-form 
       textareaLabel="What is your question?"
-      :clickHandlersBtnOptions="clickHandlersBtnOptions"
+      :modalContainer="this"
     ></message-form>
   </basic-template>
   <modal v-if="showModal" :singleBtn="modalOptions.singleBtn" :warn="modalOptions.warn"
-    :labels="btnLabels"
+    :labels="modalBtnLabels"
     :message="modalOptions.message"
-    :clickHandlers="clickHandlersModal"
+    :clickHandlers="modalClickHandlers"
   ></modal>
 </div>
 </template>
@@ -32,121 +32,11 @@ export default {
   data() {
     return {
       showModal: false,
-      clickHandlersBtnOptions: {
-        main: this.submitQuestion,
-        second: this.cancel
-      },
-      btnLabels: [],
+      modalBtnLabels: [],
       modalOptions: {},
-      clickHandlersModal: {}
+      modalClickHandlers: {}
     }
   },
-  methods: {
-    showLoader() {
-      document.querySelector('.form-loader').style = 'top: 0';
-      document.querySelector('.form-loader__dot:nth-child(1)').style = 'animation: a-loader-1 2s ease-out infinite';
-      document.querySelector('.form-loader__dot:nth-child(2)').style = 'animation: a-loader-1 1s 2s ease-out infinite';
-    },
-    hideLoader() {
-      document.querySelector('.form-loader').style = '';
-      document.querySelector('.form-loader__dot:nth-child(1)').style = '';
-      document.querySelector('.form-loader__dot:nth-child(2)').style = '';
-    },
-    askForAMessage() {
-      this.btnLabels = ['Write message'];
-      this.modalOptions = {
-        singleBtn: true,
-        warn: true,
-        message: `
-          Message is empty!
-        `
-      };
-      this.clickHandlersModal = {
-        main: () => {
-          this.showModal = false;
-        }
-      };
-      this.showModal = true;
-    },
-    showResponseState(res) {
-      if (res === 'notSent') {
-        this.btnLabels = ['Retry'];
-        this.modalOptions = {
-          singleBtn: true,
-          warn: true,
-          message: `
-            There was a problem sending the message
-          `
-        };
-        this.clickHandlersModal = {
-          main: () => {
-            this.hideLoader();
-            this.showModal = false;
-          }
-        };
-      }
-      else {
-        this.btnLabels = ['Go to home page'];
-        this.modalOptions = {
-          singleBtn: true,
-          warn: false,
-          message: `
-            Thanks for submitting your question! You 
-            will receive a response to your email 
-            address as soon as possible.
-          `
-        };
-        this.clickHandlersModal = {
-          main: () => {
-            this.$router.push('/');
-          }
-        }
-      }
-      this.showModal = true;
-    },
-    submitQuestion(e) {
-
-      e.preventDefault();
-
-      if (document.getElementById('message').value !== '') {
-
-        this.showLoader();
-
-        let user = UserService.getUser();
-
-        let questionObj = new FormData();
-            questionObj.append(
-              'topic', 
-              this.$route.query.topic.charAt(0).toUpperCase() + 
-              this.$route.query.topic.slice(1)
-            );
-            questionObj.append(
-              'subTopic', 
-              this.$route.query.subTopic.charAt(0).toUpperCase() + 
-              this.$route.query.subTopic.slice(1)
-            );
-            questionObj.append(
-              'student',
-              `{ name: ${user.name}, email: ${user.email}, picture: ${user.picture} }`
-            );
-            questionObj.append('content', document.getElementById('message').value);
-            questionObj.append('attachments', document.getElementById('file').files[0]);
-
-        
-        StudentQuestionService.createStudentQuestion(this, questionObj).then(
-          (res) => { 
-            this.showResponseState(res)
-          }
-        );
-      }
-      else {
-        this.askForAMessage();
-      }
-    },
-    cancel() {
-      this.$router.push('/');
-    }
-  }
 }
 </script>
 
