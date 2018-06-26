@@ -16,9 +16,6 @@
 
 
 <script>
-import UserService from '../../services/UserService';
-import StudentQuestionService from '../../services/StudentQuestionService';
-
 import BasicTemplate from '../organisms/BasicTemplate';
 import MessageForm from '../organisms/MessageForm';
 import Modal from '../molecules/Modal';

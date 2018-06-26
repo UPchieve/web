@@ -31,6 +31,9 @@
 <script>
 import Vue from 'vue';
 
+import UserService from '../../services/UserService';
+import StudentQuestionService from '../../services/StudentQuestionService';
+
 import BtnOptions from '../molecules/BtnOptions';
 import Btn from '../atoms/Btn';
 import Attachment from '../atoms/Attachment';
