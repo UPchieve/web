@@ -43,7 +43,7 @@ function isValid() {
   return valid;
 }
 
-function buildFormDataObj(routeQuery, typeOfForm) {
+function buildFormDataObj(context, typeOfForm) {
 
   if (typeOfForm === 'submit-question') {
 
@@ -52,13 +52,13 @@ function buildFormDataObj(routeQuery, typeOfForm) {
     let questionObj = new FormData();
         questionObj.append(
           'topic', 
-          routeQuery.topic.charAt(0).toUpperCase() + 
-          routeQuery.topic.slice(1)
+          context.$route.query.topic.charAt(0).toUpperCase() + 
+          context.$route.query.topic.slice(1)
         );
         questionObj.append(
           'subTopic', 
-          routeQuery.subTopic.charAt(0).toUpperCase() + 
-          routeQuery.subTopic.slice(1)
+          context.$route.query.subTopic.charAt(0).toUpperCase() + 
+          context.$route.query.subTopic.slice(1)
         );
         questionObj.append(
           'student',
@@ -88,7 +88,6 @@ export default {
     textareaLabel: String,
     modalContainer: Object,
     typeOfForm: String,
-    routeQuery: Object
   },
   data() {
     return {
@@ -184,10 +183,7 @@ export default {
 
         this.showLoader();
 
-        let formDataObj = buildFormDataObj(
-          this.routeQuery, 
-          this.typeOfForm
-        );        
+        let formDataObj = buildFormDataObj(this, this.typeOfForm);        
         
         StudentQuestionService.createStudentQuestion(this, formDataObj).then(
           (res) => { 

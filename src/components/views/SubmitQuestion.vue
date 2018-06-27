@@ -5,7 +5,6 @@
       textareaLabel="What is your question?"
       :modalContainer="this"
       typeOfForm="submit-question"
-      :routeQuery="this.$route.query"
     ></message-form>
   </basic-template>
   <modal v-if="showModal" :singleBtn="modalOptions.singleBtn" :warn="modalOptions.warn"
