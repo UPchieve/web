@@ -38,6 +38,46 @@ import BtnOptions from '../molecules/BtnOptions';
 import Btn from '../atoms/Btn';
 import Attachment from '../atoms/Attachment';
 
+function isValid() {
+  let valid = document.getElementById('message').value !== '' ? true : false;
+  return valid;
+}
+
+function buildFormDataObj(routeQuery, typeOfForm) {
+
+  if (typeOfForm === 'submit-question') {
+
+    let user = UserService.getUser();
+
+    let questionObj = new FormData();
+        questionObj.append(
+          'topic', 
+          routeQuery.topic.charAt(0).toUpperCase() + 
+          routeQuery.topic.slice(1)
+        );
+        questionObj.append(
+          'subTopic', 
+          routeQuery.subTopic.charAt(0).toUpperCase() + 
+          routeQuery.subTopic.slice(1)
+        );
+        questionObj.append(
+          'student',
+          `{ name: ${user.name}, email: ${user.email}, picture: ${user.picture} }`
+        );
+        questionObj.append('content', document.getElementById('message').value);
+        questionObj.append('attachments', document.getElementById('file').files[0]);
+
+    return questionObj;
+  }
+  
+  if (typeOfForm === 'send-answer') {
+
+    let answerObj = new FormData();
+
+    return answerObj;
+  }
+}
+
 export default {
   components: {
     BtnOptions,
@@ -46,13 +86,15 @@ export default {
   },
   props: {
     textareaLabel: String,
-    modalContainer: Object
+    modalContainer: Object,
+    typeOfForm: String,
+    routeQuery: Object
   },
   data() {
     return {
       fileList: [],
       clickHandlersBtnOptions: {
-        main: this.submitQuestion,
+        main: this.submitForm,
         second: this.cancel
       }
     }
@@ -134,42 +176,27 @@ export default {
     cancel() {
       this.$router.push('/');
     },
-    submitQuestion(e) {
+    submitForm(e) {
 
       e.preventDefault();
 
-      if (document.getElementById('message').value !== '') {
+      if (isValid()) {
 
         this.showLoader();
 
-        let user = UserService.getUser();
-
-        let questionObj = new FormData();
-            questionObj.append(
-              'topic', 
-              this.$route.query.topic.charAt(0).toUpperCase() + 
-              this.$route.query.topic.slice(1)
-            );
-            questionObj.append(
-              'subTopic', 
-              this.$route.query.subTopic.charAt(0).toUpperCase() + 
-              this.$route.query.subTopic.slice(1)
-            );
-            questionObj.append(
-              'student',
-              `{ name: ${user.name}, email: ${user.email}, picture: ${user.picture} }`
-            );
-            questionObj.append('content', document.getElementById('message').value);
-            questionObj.append('attachments', document.getElementById('file').files[0]);
+        let formDataObj = buildFormDataObj(
+          this.routeQuery, 
+          this.typeOfForm
+        );        
         
-        StudentQuestionService.createStudentQuestion(this, questionObj).then(
+        StudentQuestionService.createStudentQuestion(this, formDataObj).then(
           (res) => { 
-            this.showResponseState(res)
+            this.showResponseState(res);
           }
         );
       }
       else {
-        this.modalContainer.askForAMessage();
+        this.askForAMessage();
       }
     },
   }
