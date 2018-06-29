@@ -3,16 +3,28 @@
     <h1 class="header">Volunteer Training</h1>
     <div class="body-container">
       <div v-for="supercategory in supercategories">
-        <div class="supercategory" v-bind:style="{ backgroundColor: colors[supercategory]}" v-on:click="flipBool(supercategory)" v-if="supercategory != 'esl'">
+
+        <div 
+          class="supercategory" 
+          :style="{ backgroundColor: colors[supercategory]}" 
+          v-on:click="flipBool(supercategory)" 
+          v-if="supercategory != 'esl'"
+         >
           {{ supercategory | capitalize }}
           <div class="arrow up" v-if="bools[supercategory]"></div>
           <div class="arrow down" v-if="!bools[supercategory]"></div>
         </div>
-        <div class="supercategory" v-bind:style="{ backgroundColor: colors[supercategory]}" v-on:click="flipBool(supercategory)" v-if="supercategory == 'esl'">
+        <div 
+          class="supercategory" 
+          :style="{ backgroundColor: colors[supercategory]}" 
+          v-on:click="flipBool(supercategory)" 
+          v-if="supercategory == 'esl'"
+        >
           {{ supercategory | uppercase }}
           <div class="arrow up" v-if="bools[supercategory]"></div>
           <div class="arrow down" v-if="!bools[supercategory]"></div>
         </div>
+
         <div v-for="category in quizzes[supercategory]">
           <div class="category" v-show="bools[supercategory]">
             <div>
@@ -20,68 +32,79 @@
               <span v-if="category == 'esl'">{{ category | uppercase }}</span>
               <div class="review">
                 <div class="review-container">
-                  <div class="review-label"><a v-bind:href="reviewMaterials[category]" target="_blank">Review</a></div>
+                  <div class="review-label">
+                    <a :href="reviewMaterials[category]" target="_blank">Review</a>
+                  </div>
                   <div class="arrow right"></div>
                 </div>
               </div>
             </div>
             <div class="test">
-                <router-link :to="'/training/' + category + '/quiz'" tag="div" v-if="!hasPassed(category) && hasTries(category)" class="test-container">
+                <router-link 
+                  :to="'/training/' + category + '/quiz'" tag="div" 
+                  v-if="!user[category]['passed'] && (user[category]['tries'] < 3)" 
+                  class="test-container"
+                >
                   <div class="test-label">Take test</div>
                   <div class="arrow right"></div>
                 </router-link>
-              <div class="test-container certified" v-if="hasPassed(category)">Certified!</div>
-              <div class="numTries">You have used {{ getTries(category) }}/3 tries.</div>
+              <div class="test-container certified" v-if="user[category]['passed']">Certified!</div>
+              <div class="numTries" v-if="!user[category]['passed']">
+                You have used {{ user[category].tries }}/3 tries.
+              </div>
             </div>
           </div>
         </div>
+
       </div>
     </div>
   </div>
 </template>
 
+
 <script>
 import UserService from 'src/services/UserService';
 export default {
+
+  // @notes
+  // [1] Science Currently Removed due to quiz issues -Will
+  //     var supercategories = ['esl', 'math', 'college Counseling', 'science'];
+  //     quizzes['science'] = ['biology', 'chemistry'];
   data() {
-    var user = UserService.getUser();
-    var quizzes = new Object();
-    quizzes['math'] = ['algebra', 'geometry', 'trigonometry', 'precalculus', 'calculus'];
-    quizzes['esl'] = ['esl'];
-    quizzes['college Counseling'] = ['planning', 'essay', 'application'];
-    //quizzes['science'] = ['biology', 'chemistry'];
-    var bools = new Object();
-    bools['math'] = false;
-    bools['esl'] = false;
-    bools['college Counseling'] = false;
-    bools['science'] = false;
-    //Science Currently Removed due to quiz issues -Will
-   //var supercategories = ['esl', 'math', 'college Counseling', 'science'];
-    var supercategories = ['esl', 'math', 'college Counseling'];
-    var colors = new Object();
-    colors['esl'] = '#1855D1';
-    colors['math'] = '#F7AEF8';
-    colors['college Counseling'] = '#FED766';
-    colors['science'] = '#9575CD';
-    var reviewMaterials = new Object();
-    reviewMaterials['algebra'] = 'https://drive.google.com/open?id=1UQCaewADDlYXT7vv4-GUuTg7rjLnIdeufGwLgezBo4Y';
-    reviewMaterials['geometry'] = 'https://docs.google.com/document/d/128AHz0DakobmILSTrbiQVix3677FhCNcazduc3896Lk/edit?usp=sharing';
-    reviewMaterials['trigonometry'] = 'https://drive.google.com/open?id=0B8mTVZa3-VGQUkxhd0R0Wmg1azZ5Z1pWUE8xa2g0MGZYemZF';
-    reviewMaterials['precalculus'] = 'https://drive.google.com/open?id=1_T6wdW1_aDvT5kkK2DslUTBllRdOAc_JJ4oxHzzoB6U';
-    reviewMaterials['calculus'] = 'https://drive.google.com/open?id=1dxBoVIZsmw4tuUkmDF2y1rmuS0tvxw_d';
-    reviewMaterials['esl'] = 'https://drive.google.com/open?id=1P99PIY89X6VdvCGMMzjNOS55Nvljkc8Lv6FxmjJzo8Y';
-    reviewMaterials['planning'] = 'https://drive.google.com/file/d/1MXl7g4E4hdt05Pt8jl9gQvr1kfv-cKBU/view?usp=sharing';
-    reviewMaterials['essay'] = 'https://drive.google.com/file/d/19IyuDkShzdaRvN0fAZqvYkpoMJPR-XfG/view?usp=sharing';
-    reviewMaterials['application'] = 'https://drive.google.com/file/d/18J5ca1LSNgh_9MQqct02Myr5UMFp1VOu/view?usp=sharing';
     return {
-      user: user,
-      quizzes: quizzes,
-      bools: bools,
-      supercategories: supercategories,
-      colors: colors,
-      reviewMaterials: reviewMaterials
+      user: {},
+      quizzes: {
+        'math': ['algebra', 'geometry', 'trigonometry', 'precalculus', 'calculus'],
+        'esl': ['esl'],
+        'college Counseling': ['planning', 'essay', 'application']
+      },
+      bools: {
+        'math': false,
+        'esl': false,
+        'college Counseling': false,
+        'science': false
+      },
+      supercategories: ['esl', 'math', 'college Counseling'], /* [1] */
+      colors: {
+        'esl': '#1855D1',
+        'math': '#F7AEF8',
+        'college Counseling': '#FED766',
+        'science': '#9575CD'
+      },
+      reviewMaterials: {
+        'algebra': 'https://drive.google.com/open?id=1UQCaewADDlYXT7vv4-GUuTg7rjLnIdeufGwLgezBo4Y',
+        'geometry': 'https://docs.google.com/document/d/128AHz0DakobmILSTrbiQVix3677FhCNcazduc3896Lk/edit?usp=sharing',
+        'trigonometry': 'https://drive.google.com/open?id=0B8mTVZa3-VGQUkxhd0R0Wmg1azZ5Z1pWUE8xa2g0MGZYemZF',
+        'precalculus': 'https://drive.google.com/open?id=1_T6wdW1_aDvT5kkK2DslUTBllRdOAc_JJ4oxHzzoB6U',
+        'calculus': 'https://drive.google.com/open?id=1dxBoVIZsmw4tuUkmDF2y1rmuS0tvxw_d',
+        'esl': 'https://drive.google.com/open?id=1P99PIY89X6VdvCGMMzjNOS55Nvljkc8Lv6FxmjJzo8Y',
+        'planning': 'https://drive.google.com/file/d/1MXl7g4E4hdt05Pt8jl9gQvr1kfv-cKBU/view?usp=sharing',
+        'essay': 'https://drive.google.com/file/d/19IyuDkShzdaRvN0fAZqvYkpoMJPR-XfG/view?usp=sharing',
+        'application': 'https://drive.google.com/file/d/18J5ca1LSNgh_9MQqct02Myr5UMFp1VOu/view?usp=sharing',
+      }
     }
   },
+
   filters: {
     capitalize: function (value) {
       if (!value) return ''
@@ -94,38 +117,27 @@ export default {
       return value.toUpperCase()
     }
   },
+
   methods: {
     flipBool(supercategory) {
       var bool = this.bools[supercategory];
       this.bools[supercategory] = !bool;
-    },
-    hasPassed(category) {
-      if (this.user[category]) {
-        return this.user[category]['passed'];
-      }
-      else {
-        return false;
-      }
-    },
-    hasTries(category) {
-      if (this.user[category]) {
-        return (this.user[category]['tries'] < 3);
-      }
-      else {
-        return true;
-      }
-    },
-    getTries(category) {
-      if (this.user[category]) {
-        return this.user[category].tries;
-      }
-      else {
-        return 0;
-      }
     }
+  },
+
+  mounted() {
+    UserService.fetchUser(this)
+      .then((user) => {
+        this.user = user;
+      })
+      .catch((err) => {
+        console.warn('Current user data wasn\'t fetched, showing cached data');
+        this.user = UserService.getUser();
+      });
   }
 }
 </script>
+
 
 <style scoped>
 
