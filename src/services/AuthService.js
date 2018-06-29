@@ -62,26 +62,25 @@ export default {
   },
 
   sendReset(context, email, redirect){
-    return NetworkService.sendReset(context, {email})
-      .then((res) => {
-        let data = res.data;
-        console.log(data);
-        if (!data){
-          throw new Error('No user returned from auth service');
-          return;
-        } else if (data.err){
-          throw new Error(data.err);
-          return;
-        }
+    return NetworkService.sendReset(context, {email}).then((res) => {
+      let data = res.data;
+      console.log(data);
+      if (!data){
+        throw new Error('No user returned from auth service');
+        return;
+      } else if (data.err){
+        throw new Error(data.err);
+        return;
+      }
 
-        context.msg = 'Password reset email has been sent!';
+      context.msg = 'Password reset email has been sent!';
 
-        if(redirect) {
-          setTimeout(() => {
-            router.push(redirect)
-          }, 2000);
-        }
-      });
+      if(redirect) {
+        setTimeout(() => {
+          router.push(redirect)
+        }, 2000);
+      }
+    })
   },
 
   confirmReset(context, credentials, redirect){
@@ -108,16 +107,14 @@ export default {
   },
 
   logout(context){
-    if (context) {
-      NetworkService.logout(context)
-        .then((res) => {
-          this.removeUser();
-          router.push('/logout');
-        })
-        .catch(() => {
-          this.removeUser();
-          router.push('/logout');
-        });
+    if (context){
+      NetworkService.logout(context).then((res) => {
+        this.removeUser();
+        router.push('/logout');
+      }).catch(() => {
+        this.removeUser();
+        router.push('/logout');
+      });
     } else {
       this.removeUser();
     }
@@ -125,7 +122,7 @@ export default {
 
   checkAuth(context){
     let user = localStorage.getItem('user');
-    if (user) {
+    if (user){
       try {
         this.user.data = JSON.parse(user);
         this.user.authenticated = true;
@@ -161,24 +158,22 @@ export default {
   fetchUser(context){
     this.user.lastFetch = Date.now();
 
-    return NetworkService.user(context)
-      .then((res) => {
-        let data = res.data;
-        if (!data){
-          throw new Error('No user returned from auth service');
-        }
-        if (data.user) {
-          this.user.authenticated = true;
-          this.user.data = data.user;
-          localStorage.setItem('user', JSON.stringify(data.user));
-        } else {
-          this.user.authenticated = false;
-          this.user.data = null;
-        }
-        return this.user;
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    NetworkService.user(context).then((res) => {
+      let data = res.data;
+      if (!data){
+        throw new Error('No user returned from auth service');
+      }
+
+      if (data.user){
+        this.user.authenticated = true;
+        this.user.data = data.user;
+        localStorage.setItem('user', JSON.stringify(data.user));
+      } else {
+        this.user.authenticated = false;
+        this.user.data = null;
+      }
+    }).catch((err) => {
+      console.log(err);
+    })
   }
 };

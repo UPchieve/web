@@ -18,16 +18,6 @@ export default {
       return {};
     }
   },
-  fetchUser(context) {
-    return AuthService.fetchUser(context)
-      .then((user) => {
-        return user.data;
-      })
-      .catch((err) => {
-        console.error('Error: couldn\'t fetch user');
-        throw err;
-      });
-  },
   validateBirthdate(birthdate){
     var m = moment(birthdate, 'MM/DD/YYYY');
     if (!m.isValid()){
