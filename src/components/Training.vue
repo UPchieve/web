@@ -50,7 +50,7 @@
                 </router-link>
               <div class="test-container certified" v-if="user[category]['passed']">Certified!</div>
               <div class="numTries" v-if="!user[category]['passed']">
-                You have used {{ user[category].tries }}/3 tries.
+                You have used {{ user[category]['tries'] }}/3 tries.
               </div>
             </div>
           </div>
@@ -67,16 +67,19 @@ import UserService from 'src/services/UserService';
 export default {
 
   // @notes
-  // [1] Science Currently Removed due to quiz issues -Will
-  //     var supercategories = ['esl', 'math', 'college Counseling', 'science'];
-  //     quizzes['science'] = ['biology', 'chemistry'];
+  // [1] The full array included 'essay' and 'application', but adding them will
+  //     caused an error since it seems that these subtopics haven't been added
+  //     to te schema
+  // [2] Science Currently Removed due to quiz issues -Will
+  //     supercategories = ['esl', 'math', 'college Counseling', 'science']
+  //     quizzes['science'] = ['biology', 'chemistry']
   data() {
     return {
-      user: {},
+      user: UserService.getUser(),
       quizzes: {
         'math': ['algebra', 'geometry', 'trigonometry', 'precalculus', 'calculus'],
         'esl': ['esl'],
-        'college Counseling': ['planning', 'essay', 'application']
+        'college Counseling': ['planning'] /* [1] */
       },
       bools: {
         'math': false,
@@ -84,7 +87,7 @@ export default {
         'college Counseling': false,
         'science': false
       },
-      supercategories: ['esl', 'math', 'college Counseling'], /* [1] */
+      supercategories: ['esl', 'math', 'college Counseling'], /* [2] */
       colors: {
         'esl': '#1855D1',
         'math': '#F7AEF8',
@@ -107,22 +110,22 @@ export default {
 
   filters: {
     capitalize: function (value) {
-      if (!value) return ''
-      value = value.toString()
-      return value.charAt(0).toUpperCase() + value.slice(1)
+      if (!value) return '';
+      value = value.toString();
+      return value.charAt(0).toUpperCase() + value.slice(1);
     },
     uppercase: function (value) {
-      if (!value) return ''
-      value = value.toString()
-      return value.toUpperCase()
+      if (!value) return '';
+      value = value.toString();
+      return value.toUpperCase();
     }
   },
 
   methods: {
     flipBool(supercategory) {
-      var bool = this.bools[supercategory];
+      let bool = this.bools[supercategory];
       this.bools[supercategory] = !bool;
-    }
+    },
   },
 
   mounted() {
