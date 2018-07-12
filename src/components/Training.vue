@@ -75,7 +75,7 @@ export default {
   //     quizzes['science'] = ['biology', 'chemistry']
   data() {
     return {
-      user: UserService.getUser(),
+      user: {},
       quizzes: {
         'math': ['algebra', 'geometry', 'trigonometry', 'precalculus', 'calculus'],
         'esl': ['esl'],
