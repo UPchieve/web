@@ -30,12 +30,8 @@
                   <div class="test-label">Take test</div>
                   <div class="arrow right"></div>
                 </router-link>
-
-              <div class="test-container certified" v-if="user[category]['passed']">Certified!</div>
-              <div class="numTries" v-if="!user[category]['passed']">
-                You have used {{ user[category]['tries'] }}/3 tries.
-              </div>
-
+              <div class="test-container certified" v-if="hasPassed(category)">Certified!</div>
+              <div class="numTries">You have used {{ getTries(category) }}/3 tries.</div>
             </div>
           </div>
         </div>
@@ -47,16 +43,6 @@
 <script>
 import UserService from 'src/services/UserService';
 export default {
-
-
-  // @notes
-  // [1] The full array included 'essay' and 'application', but adding them will
-  //     caused an error since it seems that these subtopics haven't been added
-  //     to te schema
-  // [2] Science Currently Removed due to quiz issues -Will
-  //     supercategories = ['esl', 'math', 'college Counseling', 'science']
-  //     quizzes['science'] = ['biology', 'chemistry']
-
   data() {
     var user = UserService.getUser();
     var quizzes = new Object();
@@ -88,68 +74,55 @@ export default {
     reviewMaterials['essay'] = 'https://drive.google.com/file/d/19IyuDkShzdaRvN0fAZqvYkpoMJPR-XfG/view?usp=sharing';
     reviewMaterials['application'] = 'https://drive.google.com/file/d/18J5ca1LSNgh_9MQqct02Myr5UMFp1VOu/view?usp=sharing';
     return {
-      user: {},
-      quizzes: {
-        'math': ['algebra', 'geometry', 'trigonometry', 'precalculus', 'calculus'],
-        'esl': ['esl'],
-        'college Counseling': ['planning'] /* [1] */
-      },
-      bools: {
-        'math': false,
-        'esl': false,
-        'college Counseling': false,
-        'science': false
-      },
-      supercategories: ['esl', 'math', 'college Counseling'], /* [2] */
-      colors: {
-        'esl': '#1855D1',
-        'math': '#F7AEF8',
-        'college Counseling': '#FED766',
-        'science': '#9575CD'
-      },
-      reviewMaterials: {
-        'algebra': 'https://drive.google.com/open?id=1UQCaewADDlYXT7vv4-GUuTg7rjLnIdeufGwLgezBo4Y',
-        'geometry': 'https://docs.google.com/document/d/128AHz0DakobmILSTrbiQVix3677FhCNcazduc3896Lk/edit?usp=sharing',
-        'trigonometry': 'https://drive.google.com/open?id=0B8mTVZa3-VGQUkxhd0R0Wmg1azZ5Z1pWUE8xa2g0MGZYemZF',
-        'precalculus': 'https://drive.google.com/open?id=1_T6wdW1_aDvT5kkK2DslUTBllRdOAc_JJ4oxHzzoB6U',
-        'calculus': 'https://drive.google.com/open?id=1dxBoVIZsmw4tuUkmDF2y1rmuS0tvxw_d',
-        'esl': 'https://drive.google.com/open?id=1P99PIY89X6VdvCGMMzjNOS55Nvljkc8Lv6FxmjJzo8Y',
-        'planning': 'https://drive.google.com/file/d/1MXl7g4E4hdt05Pt8jl9gQvr1kfv-cKBU/view?usp=sharing',
-        'essay': 'https://drive.google.com/file/d/19IyuDkShzdaRvN0fAZqvYkpoMJPR-XfG/view?usp=sharing',
-        'application': 'https://drive.google.com/file/d/18J5ca1LSNgh_9MQqct02Myr5UMFp1VOu/view?usp=sharing',
-      }
-
+      user: user,
+      quizzes: quizzes,
+      bools: bools,
+      supercategories: supercategories,
+      colors: colors,
+      reviewMaterials: reviewMaterials
     }
   },
   filters: {
     capitalize: function (value) {
-      if (!value) return '';
-      value = value.toString();
-      return value.charAt(0).toUpperCase() + value.slice(1);
+      if (!value) return ''
+      value = value.toString()
+      return value.charAt(0).toUpperCase() + value.slice(1)
     },
     uppercase: function (value) {
-      if (!value) return '';
-      value = value.toString();
-      return value.toUpperCase();
+      if (!value) return ''
+      value = value.toString()
+      return value.toUpperCase()
     }
   },
   methods: {
     flipBool(supercategory) {
-      let bool = this.bools[supercategory];
+      var bool = this.bools[supercategory];
       this.bools[supercategory] = !bool;
     },
-  },
-
-  mounted() {
-    UserService.fetchUser(this)
-      .then((user) => {
-        this.user = user;
-      })
-      .catch((err) => {
-        console.warn('Current user data wasn\'t fetched, showing cached data');
-        this.user = UserService.getUser();
-      });
-
+    hasPassed(category) {
+      if (this.user[category]) {
+        return this.user[category]['passed'];
+      }
+      else {
+        return false;
+      }
+    },
+    hasTries(category) {
+      if (this.user[category]) {
+        return (this.user[category]['tries'] < 3);
+      }
+      else {
+        return true;
+      }
+    },
+    getTries(category) {
+      if (this.user[category]) {
+        return this.user[category].tries;
+      }
+      else {
+        return 0;
+      }
+    }
   }
 }
 </script>
