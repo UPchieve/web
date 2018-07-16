@@ -1,12 +1,10 @@
 <template>
   <div v-if="user.isVolunteer && (tries < 3)" class="training-quiz" v-bind:style="coverStyle">
     <div class="popUpCover" v-if="popUpBool" v-bind:style="popUpCoverStyle"></div>
-
     <h1 class="header" id="quiz-name">
       {{ quizName }} Certification Quiz
       <router-link to="/dashboard" tag="div" class="done btn" v-if="showQuizReview">DONE</router-link>
     </h1>
-
     <div class="progressBar" v-if="showProgressBar">
       <div class="circles">
         <div v-for="n in quizLength" class="circle" v-bind:id="'circle-' + n">{{ n }}</div>
@@ -15,7 +13,6 @@
       <div class="rect cover" v-bind:style="{ width: barWidth + '%' }" v-if="quizLength > 0"></div>
     </div>
     <div class="questionNumber" v-if="qNumber">Question {{qNumber}}</div><br/>
-
     <div class="body">
       <div class="startBody">
         <div class="instructions" v-if="showStartMsg">This test will have {{ quizLength }} questions, and it is untimed.<br/>
@@ -48,7 +45,6 @@
         </div>
       </div>
     </div>
-
     <div class="passScoreContainer" v-bind:style="[ popUpStyle, popUpBorderStyle ]" v-if="!showQuizReview">
       <div class="passed">{{ passedMsg }}</div>
       <div class="score">{{ scoreMsg }}</div>
@@ -63,19 +59,24 @@
   </div>
 </template>
 
-
 <script>
 import UserService from 'src/services/UserService';
 import TrainingService from 'src/services/TrainingService';
-
 export default {
   data() {
     let user = UserService.getUser();
     let category = this.$route.params.category;
-    let quizName = category == 'els' ? 
-      category.toUpperCase() : 
-      category.charAt(0).toUpperCase() + category.slice(1);
-
+    var quizName;
+    if (category == 'esl') {
+      quizName = category.toUpperCase();
+    }
+    else {
+      quizName = category.charAt(0).toUpperCase() + category.slice(1);
+    }
+    var tries = 0;
+    if (user[category]) {
+      tries = user[category].tries;
+    }
     return {
       user: user,
       category: category,
@@ -92,49 +93,37 @@ export default {
       showReview: false,
       showDone: false,
       showRestart: false,
-      imageStyle: {},
-      popUpStyle: {},
+      imageStyle: { },
+      popUpStyle: { },
       popUpBool: false,
-      popUpCoverStyle:{},
-      popUpBorderStyle: {},
+      popUpCoverStyle:{ },
+      popUpBorderStyle: { },
       quizLength: 0,
       barWidth: 0,
       showProgressBar: false,
       questionsReview: [],
       showQuizReview: false,
       passedMsg: '',
-      coverStyle: {},
-      tries: user[category] ? user[category].tries : 0,
+      coverStyle: { },
+      tries: tries,
       qNumber: ''
     }
   },
-
   beforeMount(){
-
     TrainingService.loadQuiz(this, this.category).then((quizLength) => {
       this.quizLength = quizLength;
     });
-
-    UserService.fetchUser(this)
-      .then((user) => {
-        this.user = user;
-        this.tries = this.user[this.category].tries;
-      })
-      .catch((err) => {
-        console.warn('Current user data wasn\'t fetched, showing cached data');
-      });
   },
-
   methods: {
     reload() {
-       this.$router.go(this.$router.currentRoute);
+       this.$router.go(this.$router.currentRoute)
     },
     updateProgressBar(){
-      let index = TrainingService.getIndex(this);
+      var index = TrainingService.getIndex(this);
       this.qNumber = TrainingService.getIndex(this) + 1;
       this.barWidth = 100/(this.quizLength - 1) * index;
-      for (let i = 1; i < this.quizLength + 1; i++) {
-        let element = document.getElementById('circle-' + i);
+      for (var i = 1; i < this.quizLength + 1; i++) {
+        var element = document.getElementById('circle-' + i);
         if (i < (index + 2)) {
           element.style.background = '#16D2AA';
         }
@@ -145,7 +134,7 @@ export default {
     },
     styleImage(image){
       if (image) {
-        let questionImage = '../../../static/question_images/' + image;
+        var questionImage = '../../../static/question_images/' + image;
         this.imageStyle = {
           backgroundImage: `url(${questionImage})`,
           width: '300px',
@@ -155,12 +144,10 @@ export default {
           backgroundRepeat: 'no-repeat'
         }
       }
-      else { 
-        this.imageStyle = {};
-      }
+      else { this.imageStyle = { } }
     },
     getFirst(){
-      let question = TrainingService.getFirstQuestion(this);
+      var question = TrainingService.getFirstQuestion(this);
       this.questionText = question.questionText;
       this.styleImage(question.image);
       this.items = question.possibleAnswers;
@@ -173,8 +160,8 @@ export default {
     previous(){
       TrainingService.saveAnswer(this, this.picked);
       this.picked = '';
-      let data = TrainingService.getPreviousQuestion(this);
-      let question = data.question;
+      var data = TrainingService.getPreviousQuestion(this);
+      var question = data.question;
       this.picked = data.picked;
       this.questionText = question.questionText;
       this.updateProgressBar();
@@ -192,8 +179,8 @@ export default {
     next(){
       TrainingService.saveAnswer(this, this.picked);
       this.picked = '';
-      let data = TrainingService.getNextQuestion(this);
-      let question = data.question;
+      var data = TrainingService.getNextQuestion(this);
+      var question = data.question;
       this.picked = data.picked;
       this.questionText = question.questionText;
       this.updateProgressBar();
@@ -270,7 +257,7 @@ export default {
       this.questionsReview = TrainingService.reviewQuiz(this);
       this.questionsReview.forEach(function(question) {
         if (question.image) {
-          let questionImage = '../../../static/question_images/' + question.image;
+          var questionImage = '../../../static/question_images/' + question.image;
           question['imageStyle'] = {
             backgroundImage: `url(${questionImage})`,
             width: '300px',
@@ -280,17 +267,15 @@ export default {
             backgroundRepeat: 'no-repeat'
           }
         }
-        else { 
-          question['imageStyle'] = {};
-        }
+        else { question['imageStyle'] = { } }
       });
       this.items = [];
       this.questionText = '';
-      this.imageStyle = {};
-      this.popUpStyle = {};
-      this.popUpBorderStyle = {};
+      this.imageStyle = { };
+      this.popUpStyle = { };
+      this.popUpBorderStyle = { };
       this.popUpBool = false;
-      this.coverStyle = {};
+      this.coverStyle = { };
       this.qNumber = '';
       this.showReview = false;
       this.showQuizReview = true;
@@ -299,7 +284,6 @@ export default {
   }
 }
 </script>
-
 
 <style scoped>
 
