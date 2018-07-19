@@ -10,20 +10,21 @@
       </div>
       <div v-if="hasAttachments" class="attachment-list">
         <div class="attachment-list__icon"></div>
-        <div class="attachment-list__content" v-on:click="downloadFile()">
+        <div class="attachment-list__content" @click="downloadFile()">
           {{ question.attachments[0] }}
         </div>
       </div>
     </div>
     <message-form 
       textareaLabel="Write your answer below"
-      :clickHandlersBtnOptions="clickHandlersBtnOptions"
+      :modalContainer="this"
+      typeOfForm="send-answer"
     ></message-form>
   </basic-template>
   <modal v-if="showModal" singleBtn
-      :labels="btnLabels"
-      :message="message"
-      :clickHandlers="clickHandlersModal"
+    :labels="modalBtnLabels"
+    :message="modalMessage"
+    :clickHandlers="modalClickHandlers"
   ></modal>
 </div>
 </template>
@@ -45,25 +46,18 @@ export default {
   },
   data() {
     return {
+      // This component
       hasAttachments: false,
       question: {},
+      // Modal
       showModal: false,
-      clickHandlersBtnOptions: {
-        main: this.sendAnswer,
-        second: this.cancel
-      },
-      message: `
-        The answer was sent.
-      `,
-      btnLabels: ['Go to home page'],
-      clickHandlersModal: {
-        main: () => {
-          this.$router.push('/');
-        }
-      }
+      modalBtnLabels: [],
+      modalOptions: {},
+      modalClickHandlers: {}
     }
   },
   methods: {
+    // This component
     downloadFile() {
       StudentQuestionService.getAttachment(this, this.question.attachments[0])
         .then(
@@ -76,18 +70,6 @@ export default {
           }
         );
     },
-    attachFile() {
-      const click = new MouseEvent('click');
-      this.$el.querySelector('input[type="file"]').dispatchEvent(click);
-    },
-    sendAnswer() {
-      // this will be the success callback
-      this.showModal = true;
-      this.$el.style.overflow = 'hidden';
-    },
-    cancel() {
-      this.$router.push('/');
-    }
   },
   beforeCreate() {
     StudentQuestionService.getStudentQuestions(this, { _id: this.$route.query.q })

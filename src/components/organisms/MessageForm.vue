@@ -14,7 +14,7 @@
     <btn-options 
       mainBtnLabel="Submit" 
       secondBtnLabel="Cancel" 
-      :clickHandlers="clickHandlersBtnOptions"
+      :clickHandlers="btnOptionsClickHandlers"
     ></btn-options>
     <div class="form-loader">
       <div class="form-loader__dot"></div>
@@ -92,13 +92,14 @@ export default {
   data() {
     return {
       fileList: [],
-      clickHandlersBtnOptions: {
+      btnOptionsClickHandlers: {
         main: this.submitForm,
         second: this.cancel
       }
     }
   },
   methods: {
+
     // File attachment
     attachFile() {
       const click = new MouseEvent('click');
@@ -108,6 +109,7 @@ export default {
       e.preventDefault();
       Vue.set(this.fileList, 0, document.getElementById('file').files[0].name);
     },
+
     // Form feedback
     askForAMessage() {
       this.modalContainer.modalBtnLabels = ['Write message'];
@@ -134,8 +136,8 @@ export default {
       document.querySelector('.form-loader').style = '';
       document.querySelector('.form-loader__dot:nth-child(1)').style = '';
       document.querySelector('.form-loader__dot:nth-child(2)').style = '';
-    },    
-    showResponseState(res) {
+    },
+    showResponseStateSubmitQuestion(res) {
       if (res === 'notSent') {
         this.modalContainer.modalBtnLabels = ['Retry'];
         this.modalContainer.modalOptions = {
@@ -171,26 +173,46 @@ export default {
       }
       this.modalContainer.showModal = true;
     },
+    showResponseStateSendAnswer(res) {
+
+    },
+    showResponseState(res) {
+      if (this.typeOfForm === 'submit-question') {
+        this.showResponseStateSubmitQuestion(res);
+      }
+      else if (this.typeOfForm === 'send-answer') {
+        this.showResponseStateSendAnswer(res);
+      }
+    },
+
     // Form options (buttons)
     cancel() {
       this.$router.push('/');
     },
-    submitForm(e) {
+    submitFormSubmitQuestion(formDataObj) {
+      StudentQuestionService.createStudentQuestion(this, formDataObj).then(
+        (res) => { 
+          this.showResponseState(res);
+        }
+      );
+    },
+    submitFormSendAnswer(formDataObj) {
 
+    },
+    submitForm(e) {
       e.preventDefault();
 
       if (isValid()) {
-
         this.showLoader();
-
-        let formDataObj = buildFormDataObj(this, this.typeOfForm);        
         
-        StudentQuestionService.createStudentQuestion(this, formDataObj).then(
-          (res) => { 
-            this.showResponseState(res);
-          }
-        );
-      }
+        if (this.typeOfForm === 'submit-question') {
+          console.log('ehe')
+          this.submitFormSubmitQuestion(buildFormDataObj(this, this.typeOfForm));
+        }
+        else if (this.typeOfForm === 'send-answer') {
+          this.submitFormSendAnswer(buildFormDataObj(this, this.typeOfForm));
+        }
+      }      
       else {
         this.askForAMessage();
       }
