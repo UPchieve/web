@@ -206,7 +206,6 @@ export default {
         this.showLoader();
         
         if (this.typeOfForm === 'submit-question') {
-          console.log('ehe')
           this.submitFormSubmitQuestion(buildFormDataObj(this, this.typeOfForm));
         }
         else if (this.typeOfForm === 'send-answer') {

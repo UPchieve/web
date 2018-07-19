@@ -23,7 +23,7 @@
   </basic-template>
   <modal v-if="showModal" singleBtn
     :labels="modalBtnLabels"
-    :message="modalMessage"
+    :message="modalOptions.message"
     :clickHandlers="modalClickHandlers"
   ></modal>
 </div>
