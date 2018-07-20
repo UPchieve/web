@@ -43,38 +43,41 @@ function isValid() {
   return valid;
 }
 
+function buildFormDataObjSubmitQuestion(context) {
+  let user = UserService.getUser();
+
+  let questionObj = new FormData();
+      questionObj.append(
+        'topic', 
+        context.$route.query.topic.charAt(0).toUpperCase() + 
+        context.$route.query.topic.slice(1)
+      );
+      questionObj.append(
+        'subTopic', 
+        context.$route.query.subTopic.charAt(0).toUpperCase() + 
+        context.$route.query.subTopic.slice(1)
+      );
+      questionObj.append(
+        'student',
+        `{ name: ${user.name}, email: ${user.email}, picture: ${user.picture} }`
+      );
+      questionObj.append('content', document.getElementById('message').value);
+      questionObj.append('attachments', document.getElementById('file').files[0]);
+
+  return questionObj;
+}
+
+function buildFormDataObjSendAnswer(context) {
+  let answerObj = new FormData();
+  return answerObj;
+}
+
 function buildFormDataObj(context, typeOfForm) {
-
   if (typeOfForm === 'submit-question') {
-
-    let user = UserService.getUser();
-
-    let questionObj = new FormData();
-        questionObj.append(
-          'topic', 
-          context.$route.query.topic.charAt(0).toUpperCase() + 
-          context.$route.query.topic.slice(1)
-        );
-        questionObj.append(
-          'subTopic', 
-          context.$route.query.subTopic.charAt(0).toUpperCase() + 
-          context.$route.query.subTopic.slice(1)
-        );
-        questionObj.append(
-          'student',
-          `{ name: ${user.name}, email: ${user.email}, picture: ${user.picture} }`
-        );
-        questionObj.append('content', document.getElementById('message').value);
-        questionObj.append('attachments', document.getElementById('file').files[0]);
-
-    return questionObj;
+    return buildFormDataObjSubmitQuestion(context);
   }
-  
-  if (typeOfForm === 'send-answer') {
-
-    let answerObj = new FormData();
-
-    return answerObj;
+  else if (typeOfForm === 'send-answer') {
+    return buildFormDataObjSubmitQuestion(context);;
   }
 }
 
@@ -112,13 +115,13 @@ export default {
 
     // Form feedback
     askForAMessage() {
-      this.modalContainer.modalBtnLabels = ['Write message'];
       this.modalContainer.modalOptions = {
         warn: true,
         message: `
           Message is empty!
         `
       };
+      this.modalContainer.modalBtnLabels = ['Write message'];
       this.modalContainer.modalClickHandlers = {
         main: () => {
           this.modalContainer.showModal = false;
@@ -175,14 +178,6 @@ export default {
     showResponseStateSendAnswer(res) {
 
     },
-    showResponseState(res) {
-      if (this.typeOfForm === 'submit-question') {
-        this.showResponseStateSubmitQuestion(res);
-      }
-      else if (this.typeOfForm === 'send-answer') {
-        this.showResponseStateSendAnswer(res);
-      }
-    },
 
     // Form options (buttons)
     cancel() {
@@ -191,7 +186,7 @@ export default {
     submitFormSubmitQuestion(formDataObj) {
       StudentQuestionService.createStudentQuestion(this, formDataObj).then(
         (res) => { 
-          this.showResponseState(res);
+          this.showResponseStateSubmitQuestion(res);
         }
       );
     },
