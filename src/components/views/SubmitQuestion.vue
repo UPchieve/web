@@ -20,6 +20,7 @@
 
 <script>
 import UserService from '../../services/UserService';
+
 import BasicTemplate from '../organisms/BasicTemplate';
 import MessageForm from '../organisms/MessageForm';
 import Modal from '../molecules/Modal';

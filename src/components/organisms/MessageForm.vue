@@ -69,6 +69,10 @@ function buildFormDataObjSubmitQuestion(context) {
 
 function buildFormDataObjSendAnswer(context) {
   let answerObj = new FormData();
+      answerObj.append('userId', context.user._id);
+      answerObj.append('questionId', context.$route.query.q);
+      answerObj.append('answerContent', document.getElementById('message').value);
+      answerObj.append('attachments', document.getElementById('file').files[0]);
   return answerObj;
 }
 
@@ -77,7 +81,7 @@ function buildFormDataObj(context, typeOfForm) {
     return buildFormDataObjSubmitQuestion(context);
   }
   else if (typeOfForm === 'send-answer') {
-    return buildFormDataObjSubmitQuestion(context);;
+    return buildFormDataObjSendAnswer(context);
   }
 }
 
@@ -191,7 +195,13 @@ export default {
       );
     },
     submitFormSendAnswer(formDataObj) {
+      let entries = formDataObj.entries()
 
+      console.log(entries.length, entries);
+
+      for (let entry of entries) {
+        console.log(entry[0], entry[1]);
+      }
     },
     submitForm(e) {
       e.preventDefault();
@@ -203,7 +213,7 @@ export default {
           this.submitFormSubmitQuestion(buildFormDataObj(this, this.typeOfForm));
         }
         else if (this.typeOfForm === 'send-answer') {
-          this.submitFormSendAnswer(buildFormDataObj(this, this.typeOfForm));
+          this.submitFormSendAnswer(buildFormDataObj(this.modalContainer, this.typeOfForm));
         }
       }      
       else {

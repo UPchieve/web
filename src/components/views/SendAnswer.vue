@@ -61,7 +61,6 @@ export default {
     }
   },
   methods: {
-    // This component
     downloadFile() {
       StudentQuestionService.getAttachment(this, this.question.attachments[0])
         .then(
