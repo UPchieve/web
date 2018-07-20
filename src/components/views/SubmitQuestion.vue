@@ -7,9 +7,11 @@
       typeOfForm="submit-question"
     ></message-form>
   </basic-template>
-  <modal v-if="showModal" :singleBtn="modalOptions.singleBtn" :warn="modalOptions.warn"
-    :labels="modalBtnLabels"
+  <modal v-if="showModal" 
+    singleBtn
+    :warn="modalOptions.warn"
     :message="modalOptions.message"
+    :labels="modalBtnLabels"
     :clickHandlers="modalClickHandlers"
   ></modal>
 </div>
@@ -29,6 +31,7 @@ export default {
   },
   data() {
     return {
+      // Modal
       showModal: false,
       modalBtnLabels: [],
       modalOptions: {},

@@ -114,7 +114,6 @@ export default {
     askForAMessage() {
       this.modalContainer.modalBtnLabels = ['Write message'];
       this.modalContainer.modalOptions = {
-        singleBtn: true,
         warn: true,
         message: `
           Message is empty!

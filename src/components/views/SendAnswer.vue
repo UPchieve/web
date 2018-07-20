@@ -21,9 +21,11 @@
       typeOfForm="send-answer"
     ></message-form>
   </basic-template>
-  <modal v-if="showModal" singleBtn
-    :labels="modalBtnLabels"
+  <modal v-if="showModal" 
+    singleBtn 
+    :warn="modalOptions.warn"
     :message="modalOptions.message"
+    :labels="modalBtnLabels"
     :clickHandlers="modalClickHandlers"
   ></modal>
 </div>
