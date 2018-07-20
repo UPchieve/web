@@ -52,9 +52,9 @@ export default {
 
 <style>
 .v-modal {
-  position: absolute;
+  position: fixed;
   top: 0;
-  left: 0;
+  left: 300px;
   right: 0;
   bottom: 0;
   display: flex;
