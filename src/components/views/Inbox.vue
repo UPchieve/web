@@ -1,5 +1,5 @@
 <template>
-<div class="inbox">
+<div v-if="user.isVolunteer" class="inbox">
   <div class="tabular-template">
     <content-header headerTitle="Answer Questions"></content-header>
     <div class="tabular-template__content">
@@ -24,6 +24,7 @@ export default {
   },
   data() {
     return {
+      user: UserService.getUser(),
       helpRequests: {
         type: 'question',
         requests: []

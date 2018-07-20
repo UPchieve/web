@@ -1,5 +1,5 @@
 <template>
-<div class="send-answer">
+<div v-if="user.isVolunteer" class="send-answer">
   <basic-template headerTitle="Answer question">
     <div class="question">
       <div class="question__content">
@@ -33,6 +33,7 @@
 
 
 <script>
+import UserService from '../../services/UserService';
 import DownloadService from '../../services/DownloadService';
 import StudentQuestionService from '../../services/StudentQuestionService';
 
@@ -49,6 +50,7 @@ export default {
   data() {
     return {
       // This component
+      user: UserService.getUser(),
       hasAttachments: false,
       question: {},
       // Modal
