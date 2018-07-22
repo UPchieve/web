@@ -85,6 +85,37 @@ function buildFormDataObj(context, typeOfForm) {
   }
 }
 
+function showModalRetry(context) {
+  context.modalContainer.modalBtnLabels = ['Retry'];
+  context.modalContainer.modalOptions = {
+    singleBtn: true,
+    warn: true,
+    message: `
+      There was a problem sending the message
+    `
+  };
+  context.modalContainer.modalClickHandlers = {
+    main: () => {
+      context.hideLoader();
+      context.showModal = false;
+    }
+  };
+}
+
+function showModalSuccess(context, message) {
+  context.modalContainer.modalBtnLabels = ['Go to home page'];
+  context.modalContainer.modalOptions = {
+    singleBtn: true,
+    warn: false,
+    message: message
+  };
+  context.modalContainer.modalClickHandlers = {
+    main: () => {
+      context.$router.push('/');
+    }
+  }
+}
+
 export default {
   components: {
     BtnOptions,
@@ -145,20 +176,21 @@ export default {
     },
     showResponseStateSubmitQuestion(res) {
       if (res === 'notSent') {
-        this.modalContainer.modalBtnLabels = ['Retry'];
-        this.modalContainer.modalOptions = {
-          singleBtn: true,
-          warn: true,
-          message: `
-            There was a problem sending the message
-          `
-        };
-        this.modalContainer.modalClickHandlers = {
-          main: () => {
-            this.hideLoader();
-            this.showModal = false;
-          }
-        };
+        showModalRetry(this);
+      }
+      else {
+        let message = `
+          Thanks for submitting your question! You 
+          will receive a response to your email 
+          address as soon as possible.
+        `
+        showModalSuccess(this, message);
+      }
+      this.modalContainer.showModal = true;
+    },
+    showResponseStateSendAnswer(res) {
+      if (res === 'notSent') {
+        showModalRetry(this);
       }
       else {
         this.modalContainer.modalBtnLabels = ['Go to home page'];
