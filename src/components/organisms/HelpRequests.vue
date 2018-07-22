@@ -72,6 +72,7 @@ export default {
 <style>
 .help-requests-t {
   width: 100%;
+  margin-bottom: 64px;
 }
 .help-requests-t__header {
   height: 48px;
