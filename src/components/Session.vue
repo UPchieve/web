@@ -110,7 +110,7 @@ export default {
       ) {
         this.showModal = true;
       }
-    }, 600000);
+    }, 86400000);
   },
   beforeRouteLeave(to, from, next) {
     if (
