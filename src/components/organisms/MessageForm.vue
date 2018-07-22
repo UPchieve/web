@@ -76,23 +76,12 @@ function buildFormDataObjSendAnswer(context) {
   return answerObj;
 }
 
-function buildFormDataObj(context, typeOfForm) {
-  if (typeOfForm === 'submit-question') {
-    return buildFormDataObjSubmitQuestion(context);
-  }
-  else if (typeOfForm === 'send-answer') {
-    return buildFormDataObjSendAnswer(context);
-  }
-}
-
 function showModalRetry(context) {
   context.modalContainer.modalBtnLabels = ['Retry'];
   context.modalContainer.modalOptions = {
     singleBtn: true,
     warn: true,
-    message: `
-      There was a problem sending the message
-    `
+    message: 'There was a problem sending the message'
   };
   context.modalContainer.modalClickHandlers = {
     main: () => {
@@ -223,10 +212,10 @@ export default {
         this.showLoader();
         
         if (this.typeOfForm === 'submit-question') {
-          this.submitFormSubmitQuestion(buildFormDataObj(this, this.typeOfForm));
+          this.submitFormSubmitQuestion(buildFormDataObjSubmitQuestion(this));
         }
         else if (this.typeOfForm === 'send-answer') {
-          this.submitFormSendAnswer(buildFormDataObj(this.modalContainer, this.typeOfForm));
+          this.submitFormSendAnswer(buildFormDataObjSendAnswer(this.modalContainer));
         }
       }      
       else {
