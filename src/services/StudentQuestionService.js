@@ -26,6 +26,19 @@ export default {
     );
   },
 
+  answerStudentQuestion(context, data) {
+    return NetworkService.answerStudentQuestion(context, data).then(
+      (res) => {
+        return 'sentOK';
+      },
+      (err) => {
+        console.error(new Error('Unable to send answer'));
+        console.log(err);
+        return 'notSent';
+      }
+    );
+  },
+
   getAttachment(context, data) {
     return NetworkService.getAttachment(context, data).then(
       (res) => {
