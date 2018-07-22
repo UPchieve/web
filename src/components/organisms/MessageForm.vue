@@ -97,7 +97,7 @@ function showModalRetry(context) {
   context.modalContainer.modalClickHandlers = {
     main: () => {
       context.hideLoader();
-      context.showModal = false;
+      context.modalContainer.showModal = false;
     }
   };
 }
