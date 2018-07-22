@@ -69,7 +69,7 @@ function buildFormDataObjSubmitQuestion(context) {
 
 function buildFormDataObjSendAnswer(context) {
   let answerObj = new FormData();
-      answerObj.append('userId', context.user._id);
+      answerObj.append('userEmail', context.user.email);
       answerObj.append('questionId', context.$route.query.q);
       answerObj.append('answerContent', document.getElementById('message').value);
       answerObj.append('attachments', document.getElementById('file').files[0]);
