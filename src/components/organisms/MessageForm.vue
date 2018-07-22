@@ -180,10 +180,9 @@ export default {
       }
       else {
         let message = `
-          Thanks for submitting your question! You 
-          will receive a response to your email 
-          address as soon as possible.
-        `
+          Thanks for submitting your question! You will receive a response to 
+          your email address as soon as possible.
+        `;
         showModalSuccess(this, message);
       }
       this.modalContainer.showModal = true;
@@ -193,26 +192,10 @@ export default {
         showModalRetry(this);
       }
       else {
-        this.modalContainer.modalBtnLabels = ['Go to home page'];
-        this.modalContainer.modalOptions = {
-          singleBtn: true,
-          warn: false,
-          message: `
-            Thanks for submitting your question! You 
-            will receive a response to your email 
-            address as soon as possible.
-          `
-        };
-        this.modalContainer.modalClickHandlers = {
-          main: () => {
-            this.$router.push('/');
-          }
-        }
+        let message = 'Your answer has been sent!';
+        showModalSuccess(this, message);
       }
       this.modalContainer.showModal = true;
-    },
-    showResponseStateSendAnswer(res) {
-
     },
 
     // Form options (buttons)
@@ -227,13 +210,11 @@ export default {
       );
     },
     submitFormSendAnswer(formDataObj) {
-      let entries = formDataObj.entries()
-
-      console.log(entries.length, entries);
-
-      for (let entry of entries) {
-        console.log(entry[0], entry[1]);
-      }
+      StudentQuestionService.answerStudentQuestion(this, formDataObj).then(
+        (res) => { 
+          this.showResponseStateSendAnswer(res);
+        }
+      );
     },
     submitForm(e) {
       e.preventDefault();
