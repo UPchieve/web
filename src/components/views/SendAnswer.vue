@@ -52,7 +52,7 @@ export default {
       // This component
       user: UserService.getUser(),
       hasAttachments: false,
-      question: {},
+      question: { student: { name: '' } },
       // Modal
       showModal: false,
       modalBtnLabels: [],
