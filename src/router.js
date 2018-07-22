@@ -21,7 +21,7 @@ import Dashboard from './components/Dashboard';
 import Session from './components/Session';
 import ListSessions from './components/ListSessions';
 import Action from './components/Action';
-import Schedule from './components/Schedule'
+import Schedule from './components/Schedule';
 import Resources from './components/Resources';
 import Feedback from './components/Feedback';
 import Upload from './components/Upload';
@@ -46,7 +46,7 @@ const routes = [
     }
   }},
   { path: '/contact', component: Contact },
-  { path: '/privacy', component: Privacy },
+  { path: '/legal', component: Legal },
   { path: '/login', component: LoginForm },
   { path: '/logout', component: Logout },
   { path: '/signup', component: Registration },
