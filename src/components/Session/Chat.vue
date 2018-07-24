@@ -7,7 +7,7 @@
 			<div class="messages">
 				<template v-for="message in messages">
 
-					<div class="message" :class="leftRightMessage(message)">
+					<div class="message" :class="message.name === user.firstname ? 'left' : 'right'">
 						<div class="avatar" :style="message.avatarStyle"></div>
 						<div class="contents">
               <div class="name">
@@ -29,8 +29,8 @@
   </div>
 </template>
 
-<script>
 
+<script>
 import $ from 'jquery'
 import moment from 'moment'
 
@@ -40,18 +40,18 @@ import SessionService from 'src/services/SessionService'
 const DEFAULT_AVATAR_URL = 'static/defaultAvatar@2x.png';
 
 export default {
-	data(){
-    var user = UserService.getUser();
+	data() {
 		return {
-      user: user,
+      user: UserService.getUser(),
       messages: [],
 			currentSession: SessionService.currentSession,
 			newMessage: ''
 		}
 	},
+
   methods: {
-    sendMessage: function() {
-      var message = this.newMessage;
+    sendMessage() {
+      let message = this.newMessage;
 
       this.$socket.emit('message', {
 				sessionId: this.currentSession.sessionId,
@@ -60,26 +60,20 @@ export default {
       });
 
       this.newMessage = '';
-    },
-    leftRightMessage: function(message) {
-      if (message.name == this.user.firstname) {
-        return 'left';
-      } else {
-        return 'right';
-      }
     }
   },
+
   sockets: {
-    'session-change'(data){
+    'session-change'(data) {
       console.log('session-change', data);
       SessionService.currentSession.sessionId = data._id;
       SessionService.currentSession.data = data;
     },
-    messageSend(data){
+    messageSend(data) {
     	console.log(data);
-    	var picture = data.picture;
+    	let picture = data.picture;
     	if (!picture || picture === ''){
-    		picture = DEFAULT_AVATAR_URL
+    		picture = DEFAULT_AVATAR_URL;
     	}
       this.messages.push({
     		contents: data.contents,
@@ -92,15 +86,14 @@ export default {
     }
   },
 
-	updated(){
-		var el = $('.messages');
-		var scrollTop = el[0].scrollHeight - el[0].clientHeight;
-		el.scrollTop(scrollTop)
+	updated() {
+		let el = $('.messages');
+		let scrollTop = el[0].scrollHeight - el[0].clientHeight;
+		el.scrollTop(scrollTop);
 	}
 }
-
-
 </script>
+
 
 <style scoped>
 .chat {
