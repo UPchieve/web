@@ -1,11 +1,14 @@
 <template>
   <div class="chat">
+    
     <div class="header">Chat</div>
+
     <div class="messages-container">
 			<div class="messages">
 				<template v-for="message in messages">
-					<div class="message" v-bind:class="leftRightMessage(message)">
-						<div class="avatar" v-bind:style="message.avatarStyle"></div>
+
+					<div class="message" :class="leftRightMessage(message)">
+						<div class="avatar" :style="message.avatarStyle"></div>
 						<div class="contents">
               <div class="name">
 								{{message.name}}
@@ -16,10 +19,13 @@
 							</div>
 						</div>
 					</div>
+
 				</template>
 			</div>
     </div>
-    <textarea v-on:keyup.enter="sendMessage" v-model="newMessage" placeholder="Type here."></textarea>
+
+    <textarea @keyup.enter="sendMessage" v-model="newMessage" placeholder="Type here..."></textarea>
+
   </div>
 </template>
 
