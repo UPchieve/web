@@ -31,7 +31,6 @@
 
 
 <script>
-import $ from 'jquery'
 import moment from 'moment'
 
 import UserService from 'src/services/UserService'
@@ -87,9 +86,8 @@ export default {
   },
 
 	updated() {
-		let el = $('.messages');
-		let scrollTop = el[0].scrollHeight - el[0].clientHeight;
-		el.scrollTop(scrollTop);
+		let msgBox = document.querySelector('.messages');
+		msgBox.scrollTop = msgBox.scrollHeight;
 	}
 }
 </script>
