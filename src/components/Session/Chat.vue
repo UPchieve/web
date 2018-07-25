@@ -54,9 +54,9 @@ export default {
 
     },
     sendMessage() {
-      let message = this.newMessage;
+      let message = this.newMessage.slice(0,-1);
 
-      if (message != '\n') {
+      if (message != '') {
 
         ModerationService.checkIfMessageIsClean(this, message).then((isClean) => {
           if (isClean) {
