@@ -61,5 +61,8 @@ export default {
   },
   updateAvailability(context, data){
     return context.$http.post(`${API_ROOT}/calendar/save`, data).then(this._successHandler, this._errorHandler)
+  },
+  checkIfMessageIsClean(context, data) {
+    return context.$http.post(`${API_ROOT}/moderate/message`, data).then(this._successHandler, this._errorHandler);
   }
 }
