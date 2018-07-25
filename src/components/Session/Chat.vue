@@ -35,6 +35,7 @@ import moment from 'moment'
 
 import UserService from 'src/services/UserService'
 import SessionService from 'src/services/SessionService'
+import ModerationService from 'src/services/ModerationService'
 
 const DEFAULT_AVATAR_URL = 'static/defaultAvatar@2x.png';
 
@@ -49,14 +50,29 @@ export default {
 	},
 
   methods: {
+    showModerationWarning() {
+
+    },
+    isClean(message) {
+      return ModerationService.checkIfMessageIsClean(this, message);
+    },
     sendMessage() {
       let message = this.newMessage;
 
-      this.$socket.emit('message', {
-				sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
-        message: message
-      });
+      if (message != '\n') {
+
+        if (this.isClean(message)) {
+          this.$socket.emit('message', {
+            sessionId: this.currentSession.sessionId,
+            user: UserService.getUser(),
+            message: message
+          });
+        }
+
+        else {
+          this.showModerationWarning();
+        } 
+      }
 
       this.newMessage = '';
     }
@@ -71,7 +87,7 @@ export default {
     messageSend(data) {
     	console.log(data);
     	let picture = data.picture;
-    	if (!picture || picture === ''){
+    	if (!picture || picture === '') {
     		picture = DEFAULT_AVATAR_URL;
     	}
       this.messages.push({
@@ -129,6 +145,8 @@ export default {
 	position: relative;
 	padding: 10px;
   display: flex;
+  min-height: 61px;
+  margin-bottom: 12px;
   justify-content: flex-start;
 }
 
