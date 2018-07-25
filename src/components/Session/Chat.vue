@@ -53,25 +53,23 @@ export default {
     showModerationWarning() {
 
     },
-    isClean(message) {
-      return ModerationService.checkIfMessageIsClean(this, message);
-    },
     sendMessage() {
       let message = this.newMessage;
 
       if (message != '\n') {
 
-        if (this.isClean(message)) {
-          this.$socket.emit('message', {
-            sessionId: this.currentSession.sessionId,
-            user: UserService.getUser(),
-            message: message
-          });
-        }
-
-        else {
-          this.showModerationWarning();
-        } 
+        ModerationService.checkIfMessageIsClean(this, message).then((isClean) => {
+          if (isClean) {
+            this.$socket.emit('message', {
+              sessionId: this.currentSession.sessionId,
+              user: UserService.getUser(),
+              message: message
+            });
+          }
+          else {
+            this.showModerationWarning();
+          } 
+        });        
       }
 
       this.newMessage = '';
