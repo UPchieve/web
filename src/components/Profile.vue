@@ -8,83 +8,10 @@
     <div class="personal-info contain">
       <div class="subheader">Personal Information</div>
       <div class="container-content">
-        <div class="container-section" id="nickname">
-          <div class="prompt">Your Nickname</div>
-          <div class="answer" v-show="!activeEdit">{{ user.nickname }}</div>
-          <input type="text" v-model="user.nickname" v-show="activeEdit" class="form-control">
-        </div>
 
         <div class="container-section" id="email">
           <div class="prompt">Your Email</div>
           <div class="answer">{{ user.email }}</div>
-        </div>
-
-        <div class="container-section" id="birthdate">
-          <div class="prompt">Your Birthday</div>
-          <div class="answer" v-show="!activeEdit">{{ user.birthdate }}</div>
-          <input type="text" v-model="user.birthdate" v-show="activeEdit" class="form-control">
-        </div>
-
-        <div class="container-section" id="gender">
-          <div class="prompt">Your Gender</div>
-          <div class="answer" v-show="!activeEdit">{{ user.gender }}</div>
-          <input type="text" v-model="user.gender" v-show="activeEdit" class="form-control">
-        </div>
-
-        <div class="container-section" id="race">
-          <div class="prompt">Your Race</div>
-          <div class="answer">
-            <ul v-show="!activeEdit" v-for="item in user.race">
-              <li>{{ item }}</li>
-            </ul>
-          </div>
-          <ul class="row form-control" v-model="user.race" v-show="activeEdit">
-            <p>Please select all that apply.</p>
-            <div class="race-container">
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox" value="HispanicOrLatino" v-model="user.race">
-                  Hispanic or Latino
-                </label>
-              </div>
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox" value="White" v-model="user.race">
-                  White
-                </label>
-              </div>
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox" value="Black" v-model="user.race">
-                  Black / African American
-                </label>
-              </div>
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox" value="AmericanIndian" v-model="user.race">
-                  American Indian / Alaskan Native
-                </label>
-              </div>
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox" value="Asian" v-model="user.race">
-                  Asian
-                </label>
-              </div>
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox" value="PacificIslander" v-model="user.race">
-                  Native Hawaiian / Other Pacific Islander
-                </label>
-              </div>
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox" value="Other" v-model="user.race">
-                  Other
-                </label>
-              </div>
-            </div>
-          </ul>
         </div>
 
         <div v-if="!user.isVolunteer">
@@ -120,6 +47,38 @@
             notifications during the periods that you select in your schedule.</div>
           </div>
 
+          <div class="container-section" id="preferredContactMethod">
+            <div class="prompt">What is your preferred method of contact?</div>
+            <div class="answer">
+              <ul v-show="!activeEdit" v-for="item in user.preferredContactMethod">
+                <li>{{ item }}</li>
+              </ul>
+            </div>
+            <ul class="row form-control" v-model="user.preferredContactMethod" v-show="activeEdit">
+              <p>Please select all that apply.</p>
+              <div>
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox" value="Email" v-model="user.preferredContactMethod">
+                    Email
+                  </label>
+                </div>
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox" value="Text message" v-model="user.preferredContactMethod">
+                    Text message
+                  </label>
+                </div>
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox" value="None" v-model="user.preferredContactMethod">
+                    None
+                  </label>
+                </div>
+              </div>
+            </ul>
+          </div>
+
           <div class="container-section" id="college">
             <div class="prompt">Your College</div>
             <div class="answer" v-show="!activeEdit">{{ user.college }}</div>
@@ -132,30 +91,9 @@
             <input type="text" v-model="user.favoriteAcademicSubject" v-show="activeEdit" class="form-control">
           </div>
 
-          <div class="container-section" id="referred">
-            <div class="prompt">Were you referred by one of our partner organizations?</div>
-            <div class="answer" v-show="!activeEdit">{{ user.referred }}</div>
-            <select class="form-control" v-model="user.referred" v-show="activeEdit">
-              <option></option>
-              <option>Yes - APO Xi Alpha</option>
-              <option>Yes - Alpha Gamma Iota</option>
-              <option>No</option>
-            </select>
-          </div>
-
-          <div class="container-section" id="preferredContactMethod">
-            <div class="prompt">What is your preferred method of contact?</div>
-            <div class="answer" v-show="!activeEdit">{{ user.preferredContactMethod }}</div>
-            <select class="form-control" v-model="user.preferredContactMethod" v-show="activeEdit">
-              <option></option>
-              <option>Email</option>
-              <option>Text message</option>
-              <option>None</option>
-            </select>
-          </div>
         </div>
 
-        <div class="container-section"><router-link to="resetpassword" class="prompt">Reset password</router-link></div>
+        <div class="container-section resetBtn btn"><router-link to="resetpassword" class="prompt">Reset password</router-link></div>
       </div>
 
     </div>
@@ -169,7 +107,7 @@
       </div>
     </div>
 
-    <div class="profile-pic contain">
+    <div class="profile-pic contain" v-if="false">
       <div class="subheader">Profile Picture</div>
       <div class="container-content">
         <div class="container-section" id="profilePic">
@@ -425,8 +363,28 @@ ul {
   font-size: 16px;
 }
 
-.profile-pic {
+.cert-info {
   margin-bottom: 30px;
+}
+
+.resetBtn {
+  background-color: #16D2AA;
+  border-radius: 30px;
+  width: 200px;
+  align-items: center;
+  height: 50px;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.resetBtn a {
+  color: #2C3E50;
+}
+
+.resetBtn a:hover {
+  color: white;
+  text-decoration: none;
 }
 
 </style>
