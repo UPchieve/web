@@ -173,7 +173,6 @@
       <div class="subheader">Profile Picture</div>
       <div class="container-content">
         <div class="container-section" id="profilePic">
-          <div class="prompt">Your profile picture</div>
           <div class="answer avatar" v-bind:style="avatarStyle">
           </div>
         </div>
@@ -350,6 +349,8 @@ button:active, button:hover {
 
 ul {
   padding: 15px;
+  height: 100%;
+  margin: auto;
 }
 
 .wrap-container {
@@ -394,6 +395,10 @@ ul {
   font-weight: 600;
 }
 
+.answer ul {
+  margin-left: 20px;
+}
+
 .description {
   margin-top: 15px;
   font-size: 12px;
@@ -418,6 +423,10 @@ ul {
 
 .checkbox label {
   font-size: 16px;
+}
+
+.profile-pic {
+  margin-bottom: 30px;
 }
 
 </style>
