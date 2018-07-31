@@ -1,15 +1,25 @@
 import NetworkService from './NetworkService';
 
+function _errHandler(err) {
+  console.error(new Error('Unable to check if message is clean'));
+  console.log(err);
+  return null;
+}
+
 export default {
+
   checkIfMessageIsClean(context, data) {
-    return NetworkService.checkIfMessageIsClean(context, { msg: data }).then(
+    return NetworkService.checkIfMessageIsClean(context, { content: data }).then(
       (res) => {
-        return res.body.isClean;
+        if ('err' in res.body) {
+          return _errHandler(res.body);
+        }
+        else {
+          return res.body.isClean;
+        }
       },
       (err) => {
-        console.error(new Error('Unable to check if message is clean'));
-        console.log(err);
-        return false;
+        return _errHandler(err);
       }
     );
   }

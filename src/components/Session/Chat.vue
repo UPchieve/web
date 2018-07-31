@@ -51,28 +51,39 @@ export default {
 
   methods: {
     showModerationWarning() {
-
+      console.log('showing moderation warning')
     },
+
+    showNewMessage(message) {
+      this.$socket.emit('message', {
+        sessionId: this.currentSession.sessionId,
+        user: UserService.getUser(),
+        message: message
+      });
+      this.newMessage = '';
+    },
+
     sendMessage() {
       let message = this.newMessage.slice(0,-1);
 
       if (message != '') {
 
         ModerationService.checkIfMessageIsClean(this, message).then((isClean) => {
-          if (isClean) {
-            this.$socket.emit('message', {
-              sessionId: this.currentSession.sessionId,
-              user: UserService.getUser(),
-              message: message
-            });
-          }
-          else {
-            this.showModerationWarning();
-          } 
-        });        
-      }
+          
+          if (isClean != null) {
 
-      this.newMessage = '';
+            if (isClean) {
+              this.showNewMessage(message);
+            } 
+            else {
+              this.showModerationWarning();
+            }
+          }          
+          else {
+            this.showNewMessage(message);
+          }
+        });  
+      }
     }
   },
 
