@@ -164,6 +164,7 @@ export default {
   top: -64px;
   padding: 12px 52px 12px 12px;
   transition: all .15s ease-in;
+  z-index: 1;
 }
 .chat-warning__close {
   font-size: 2rem;
