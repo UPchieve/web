@@ -1,41 +1,47 @@
 <template>
-  <div class="chat">
-    
-    <div class="header">Chat</div>
+<div class="chat">
+  
+  <div class="header">Chat</div>
 
-    <div class="messages-container">
-			<div class="messages">
-				<template v-for="message in messages">
+  <div class="message-box">
 
-					<div class="message" :class="message.name === user.firstname ? 'left' : 'right'">
-						<div class="avatar" :style="message.avatarStyle"></div>
-						<div class="contents">
-              <div class="name">
-								{{message.name}}
-							</div>
-							{{message.contents}}
-              <div class="time">
-								{{message.time}}
-							</div>
-						</div>
-					</div>
-
-				</template>
-			</div>
+    <div class="chat-warning">
+      Messages cannot contain personal information
+      <span class="chat-warning__close" @click="hideModerationWarning">×</span>
     </div>
 
-    <textarea @keyup.enter="sendMessage" v-model="newMessage" placeholder="Type here..."></textarea>
+		<div class="messages">
+			<template v-for="message in messages">
 
+				<div class="message" :class="message.name === user.firstname ? 'left' : 'right'">
+					<div class="avatar" :style="message.avatarStyle"></div>
+					<div class="contents">
+            <div class="name">
+							{{message.name}}
+						</div>
+						{{message.contents}}
+            <div class="time">
+							{{message.time}}
+						</div>
+					</div>
+				</div>
+
+			</template>
+		</div>
   </div>
+
+  <textarea @keyup.enter="sendMessage" v-model="newMessage" placeholder="Type here..."></textarea>
+
+</div>
 </template>
 
 
 <script>
-import moment from 'moment'
+import moment from 'moment';
 
-import UserService from 'src/services/UserService'
-import SessionService from 'src/services/SessionService'
-import ModerationService from 'src/services/ModerationService'
+import UserService from 'src/services/UserService';
+import SessionService from 'src/services/SessionService';
+import ModerationService from 'src/services/ModerationService';
 
 const DEFAULT_AVATAR_URL = 'static/defaultAvatar@2x.png';
 
@@ -51,7 +57,10 @@ export default {
 
   methods: {
     showModerationWarning() {
-      console.log('showing moderation warning')
+      document.querySelector('.chat-warning').style.top = 0;
+    },
+    hideModerationWarning() {
+      document.querySelector('.chat-warning').style.top = '';
     },
 
     showNewMessage(message) {
@@ -69,7 +78,7 @@ export default {
       if (message != '') {
 
         ModerationService.checkIfMessageIsClean(this, message).then((isClean) => {
-          
+
           if (isClean != null) {
 
             if (isClean) {
@@ -121,6 +130,7 @@ export default {
 <style scoped>
 .chat {
 	height: 100%;
+  position: relative;
 }
 
 .header {
@@ -135,7 +145,7 @@ export default {
   width: 100%;
 }
 
-.messages-container {
+.message-box {
 	height: calc(100% - 40px);
 	padding-bottom: 100px;
 	overflow: hidden;
@@ -143,9 +153,33 @@ export default {
   position: relative;
 }
 
+.chat-warning {
+  width: 100%;
+  background: #ff0000;
+  color: #fff;
+  font-weight: bold;
+  min-height: 40px;
+  position: absolute;
+  left: 0;
+  top: -64px;
+  padding: 12px 52px 12px 12px;
+  transition: all .15s ease-in;
+}
+.chat-warning__close {
+  font-size: 2rem;
+  width: 40px;
+  padding: 12px;
+  cursor: pointer;
+  display: block;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 .messages {
 	height: 100%;
-	overflow: scroll;
+	overflow: auto;
   display: flex;
   flex-direction: column;
 }

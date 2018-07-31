@@ -1,7 +1,7 @@
 <template>
-  <div class="content-header">
-    <h1>{{ headerTitle }}</h1>
-  </div>
+<div class="content-header">
+  <h1>{{ headerTitle }}</h1>
+</div>
 </template>
 
 
