@@ -10,7 +10,7 @@ Vue.use(VueSocketio, process.env.SOCKET_ADDRESS);
 Vue.http.options.credentials = true;
 
 import Contact from './components/Contact';
-import Privacy from './components/Privacy';
+import Legal from './components/Legal';
 import Logout from './components/Logout';
 import LoginForm from './components/LoginForm';
 import Registration from './components/Registration';
