@@ -35,18 +35,17 @@ export default {
     StudentQuestionService.getStudentQuestions(this, {})
       .then(
         (questions) => {
-          for (let i=0; i<questions.length; i++) {
-
+          questions.map((q) => {
             let o = {};
-              o.topic = questions[i].topic;
-              o.subTopic = questions[i].subTopic;
+              o.topic = q.topic;
+              o.subTopic = q.subTopic;
               o.student = {};
-              o.student.name = questions[i].student.name;
-              o.student.picture = questions[i].student.picture;
-              o._id = questions[i]._id;
+              o.student.name = q.student.name;
+              o.student.picture = q.student.picture;
+              o._id = q._id;
 
             this.helpRequests.requests.push(o);
-          }
+          });
         }
       );
   }
