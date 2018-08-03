@@ -32,22 +32,11 @@ export default {
     }
   },
   mounted() {
-    StudentQuestionService.getStudentQuestions(this, {})
-      .then(
-        (questions) => {
-          questions.map((q) => {
-            let o = {};
-              o.topic = q.topic;
-              o.subTopic = q.subTopic;
-              o.student = {};
-              o.student.name = q.student.name;
-              o.student.picture = q.student.picture;
-              o._id = q._id;
-
-            this.helpRequests.requests.push(o);
-          });
-        }
-      );
+    StudentQuestionService.getStudentQuestions(this, {}).then((questions) => {
+      questions.map((question) => {
+        this.helpRequests.requests.push(question);
+      });
+    });
   }
 }
 </script>
