@@ -10,24 +10,24 @@
       <span class="chat-warning__close" @click="hideModerationWarning">×</span>
     </div>
 
-		<div class="messages">
-			<template v-for="message in messages">
+    <div class="messages">
+      <template v-for="message in messages">
 
-				<div class="message" :class="message.name === user.firstname ? 'left' : 'right'">
-					<div class="avatar" :style="message.avatarStyle"></div>
-					<div class="contents">
+        <div class="message" :class="message.name === user.firstname ? 'left' : 'right'">
+          <div class="avatar" :style="message.avatarStyle"></div>
+          <div class="contents">
             <div class="name">
-							{{message.name}}
-						</div>
-						{{message.contents}}
+              {{message.name}}
+            </div>
+            {{message.contents}}
             <div class="time">
-							{{message.time}}
-						</div>
-					</div>
-				</div>
+              {{message.time}}
+            </div>
+          </div>
+        </div>
 
-			</template>
-		</div>
+      </template>
+    </div>
   </div>
 
   <textarea @keyup.enter="sendMessage" v-model="newMessage" placeholder="Type here..."></textarea>
@@ -46,14 +46,14 @@ import ModerationService from 'src/services/ModerationService';
 const DEFAULT_AVATAR_URL = 'static/defaultAvatar@2x.png';
 
 export default {
-	data() {
-		return {
+  data() {
+    return {
       user: UserService.getUser(),
       messages: [],
-			currentSession: SessionService.currentSession,
-			newMessage: ''
-		}
-	},
+      currentSession: SessionService.currentSession,
+      newMessage: ''
+    }
+  },
 
   methods: {
     showModerationWarning() {
@@ -103,33 +103,33 @@ export default {
       SessionService.currentSession.data = data;
     },
     messageSend(data) {
-    	console.log(data);
-    	let picture = data.picture;
-    	if (!picture || picture === '') {
-    		picture = DEFAULT_AVATAR_URL;
-    	}
+      console.log(data);
+      let picture = data.picture;
+      if (!picture || picture === '') {
+        picture = DEFAULT_AVATAR_URL;
+      }
       this.messages.push({
-    		contents: data.contents,
-    		name: data.name,
-    		avatarStyle: {
-    			backgroundImage: `url(${picture})`
-    		},
-    		time: moment(data.time).format('h:mm:ss a')
+        contents: data.contents,
+        name: data.name,
+        avatarStyle: {
+          backgroundImage: `url(${picture})`
+        },
+        time: moment(data.time).format('h:mm:ss a')
       });
     }
   },
 
-	updated() {
-		let msgBox = document.querySelector('.messages');
-		msgBox.scrollTop = msgBox.scrollHeight;
-	}
+  updated() {
+    let msgBox = document.querySelector('.messages');
+    msgBox.scrollTop = msgBox.scrollHeight;
+  }
 }
 </script>
 
 
 <style scoped>
 .chat {
-	height: 100%;
+  height: 100%;
   position: relative;
 }
 
@@ -146,9 +146,9 @@ export default {
 }
 
 .message-box {
-	height: calc(100% - 40px);
-	padding-bottom: 100px;
-	overflow: hidden;
+  height: calc(100% - 40px);
+  padding-bottom: 100px;
+  overflow: hidden;
   top: 40px;
   position: relative;
 }
@@ -179,15 +179,15 @@ export default {
 }
 
 .messages {
-	height: 100%;
-	overflow: auto;
+  height: 100%;
+  overflow: auto;
   display: flex;
   flex-direction: column;
 }
 
 .message {
-	position: relative;
-	padding: 10px;
+  position: relative;
+  padding: 10px;
   display: flex;
   min-height: 61px;
   margin-bottom: 12px;
@@ -207,27 +207,27 @@ export default {
 }
 
 .time {
-	font-size: 12px;
-	font-weight: 300;
-	color: #73737A;
+  font-size: 12px;
+  font-weight: 300;
+  color: #73737A;
 }
 
 .contents {
-	text-align: left;
+  text-align: left;
   width: 200px;
   overflow-wrap: break-word;
   font-size: 16px;
 }
 
 textarea {
-	width: 100%;
-	height: 100px;
-	border: none;
-	position: absolute;
-	left: 0;
-	bottom: 0;
-	border-top: 1px solid #979797;
-	padding: 10px 12px;
+  width: 100%;
+  height: 100px;
+  border: none;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  border-top: 1px solid #979797;
+  padding: 10px 12px;
 }
 
 .left {
