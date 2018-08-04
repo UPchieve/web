@@ -5,14 +5,15 @@
 
   <div class="message-box">
 
-    <div class="chat-warning">
-      Messages cannot contain personal information
-      <span class="chat-warning__close" @click="hideModerationWarning">×</span>
-    </div>
+    <transition name="chat-warning--slide">
+      <div class="chat-warning" v-show="chatWarningIsShown">
+        Messages cannot contain personal information
+        <span class="chat-warning__close" @click="hideModerationWarning">×</span>
+      </div>
+    </transition>
 
     <div class="messages">
       <template v-for="message in messages">
-
         <div class="message" :class="message.name === user.firstname ? 'left' : 'right'">
           <div class="avatar" :style="message.avatarStyle"></div>
           <div class="contents">
@@ -25,7 +26,6 @@
             </div>
           </div>
         </div>
-
       </template>
     </div>
   </div>
@@ -51,16 +51,17 @@ export default {
       user: UserService.getUser(),
       messages: [],
       currentSession: SessionService.currentSession,
-      newMessage: ''
+      newMessage: '',
+      chatWarningIsShown: false
     }
   },
 
   methods: {
     showModerationWarning() {
-      document.querySelector('.chat-warning').style.top = 0;
+      this.chatWarningIsShown = true;
     },
     hideModerationWarning() {
-      document.querySelector('.chat-warning').style.top = '';
+      this.chatWarningIsShown = false;
     },
 
     showNewMessage(message) {
@@ -155,13 +156,13 @@ export default {
 
 .chat-warning {
   width: 100%;
-  background: #ff0000;
+  background: var(--c-shadow-warn);
   color: #fff;
   font-weight: bold;
   min-height: 40px;
   position: absolute;
   left: 0;
-  top: -64px;
+  top: 0;
   padding: 12px 52px 12px 12px;
   transition: all .15s ease-in;
   z-index: 1;
@@ -176,6 +177,10 @@ export default {
   right: 0;
   top: 50%;
   transform: translateY(-50%);
+}
+.chat-warning--slide-enter, 
+.chat-warning--slide-leave-to {
+  top: -64px;
 }
 
 .messages {
