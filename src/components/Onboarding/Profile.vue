@@ -102,8 +102,9 @@
     <div class="row form-group" v-if="!user.isVolunteer">
       <p>Current high school</p>
       <div class="row">
-          <div class="col-sm-12">
-           <input type="text" v-model="user.highschool" class="form-control" required autofocus>
+        <div class="col-sm-12">
+          <input type="text" v-model="user.highschool" class="form-control" required autofocus>
+          <div class="stufff">kdafhkjasdh</div>
         </div>
       </div>
     </div>
@@ -189,13 +190,13 @@
   </div>
 </template>
 
+
 <script>
+import $ from 'jquery';
+import validator from 'validator';
 
-import $ from 'jquery'
-import validator from 'validator'
-
-import UserService from 'src/services/UserService'
-import OnboardingService from 'src/services/OnboardingService'
+import UserService from 'src/services/UserService';
+import OnboardingService from 'src/services/OnboardingService';
 
 export default {
   data() {
@@ -279,8 +280,8 @@ export default {
     }
   }
 }
-
 </script>
+
 
 <style scoped>
 .header {
