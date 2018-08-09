@@ -103,8 +103,7 @@
       <p>Current high school</p>
       <div class="row">
         <div class="col-sm-12">
-          <input type="text" v-model="user.highschool" class="form-control" required autofocus>
-          <div class="stufff">kdafhkjasdh</div>
+          <autocomplete-input :parentModel="user.highschool"></autocomplete-input>          
         </div>
       </div>
     </div>
@@ -198,7 +197,12 @@ import validator from 'validator';
 import UserService from 'src/services/UserService';
 import OnboardingService from 'src/services/OnboardingService';
 
+import AutocompleteInput from '../molecules/AutocompleteInput';
+
 export default {
+  components: {
+    AutocompleteInput
+  },
   data() {
     var user = UserService.getUser();
     user.race = user.race || [];
@@ -283,7 +287,7 @@ export default {
 </script>
 
 
-<style scoped>
+<style>
 .header {
   height: 100px;
   margin: 0;
