@@ -20,20 +20,6 @@
             <div class="answer" v-show="!activeEdit">{{ user.highschool }}</div>
             <input type="text" v-model="user.highschool" v-show="activeEdit" class="form-control">
           </div>
-
-          <div class="container-section" id="expectedGraduation">
-            <div class="prompt">Expected High School Graduation</div>
-            <div class="answer" v-show="!activeEdit">{{ user.expectedGraduation }}</div>
-            <select class="form-control" v-model="user.expectedGraduation" v-show="activeEdit">
-              <option></option>
-              <option>2017</option>
-              <option>2018</option>
-              <option>2019</option>
-              <option>2020</option>
-              <option>2021</option>
-              <option>2022</option>
-            </select>
-          </div>
         </div>
         <div v-if="user.isVolunteer">
           <div class="container-section" id="phone">
