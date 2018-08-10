@@ -99,10 +99,13 @@
     </div>
 
     <div v-if="user.isVolunteer" class="cert-info contain">
-      <div class="subheader">Certifications</div>
-      <div class="container-content">
-        <div class="certifications" v-for="(value, key) in certifications">
-          <div v-if="value">{{ key }}</div>
+      <div class="subheader">Certifications and Tutoring Topics</div>
+      <div class="container-content cert">
+        <div v-for="(value, key) in certifications">
+          <div class="certBox" v-if="value">
+            <div class="certKey" v-bind:class="certKey[key]">{{ certKey[key] }}</div>
+            <div class="certValue">{{ key }}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -136,27 +139,27 @@ export default {
     var certifications = new Object();
     if (user.algebra) {
       if (user.algebra.passed) {
-        certifications['Math: Algebra'] = true;
+        certifications['Algebra'] = true;
       }
     }
     if (user.geometry) {
       if (user.geometry.passed) {
-        certifications['Math: Geometry'] = true;
+        certifications['Geometry'] = true;
       }
     }
     if (user.trigonometry) {
       if (user.trigonometry.passed) {
-        certifications['Math: Trigonometry'] = true;
+        certifications['Trigonometry'] = true;
       }
     }
     if (user.precalculus) {
       if (user.precalculus.passed) {
-        certifications['Math: Precalculus'] = true;
+        certifications['Precalculus'] = true;
       }
     }
     if (user.calculus) {
       if (user.calculus.passed) {
-        certifications['Math: Calculus'] = true;
+        certifications['Calculus'] = true;
       }
     }
     if (user.esl) {
@@ -164,6 +167,32 @@ export default {
         certifications['ESL'] = true;
       }
     }
+    if (user.planning) {
+      if (user.planning.passed) {
+        certifications['Planning'] = true;
+      }
+    }
+    if (user.essay) {
+      if (user.essay.passed) {
+        certifications['Essay'] = true;
+      }
+    }
+    if (user.application) {
+      if (user.application.passed) {
+        certifications['Application'] = true;
+      }
+    }
+
+    var certKey = new Object();
+    certKey['Algebra'] = 'MATH';
+    certKey['Geometry'] = 'MATH';
+    certKey['Trigonometry'] = 'MATH';
+    certKey['Precalculus'] = 'MATH';
+    certKey['Calculus'] = 'MATH';
+    certKey['ESL'] = 'ESL'
+    certKey['Planning'] = 'COLLEGE';
+    certKey['Essay'] = 'COLLEGE';
+    certKey['Application'] = 'COLLEGE';
 
     return {
       user: user,
@@ -173,7 +202,8 @@ export default {
       avatarStyle: {
         backgroundImage: `url(${avatarUrl})`
       },
-      certifications: certifications
+      certifications: certifications,
+      certKey: certKey
     }
   },
   methods: {
@@ -276,15 +306,6 @@ button:active, button:hover {
   margin-bottom: 15px;
 }
 
-.certifications {
-  display: flex;
-  align-items: center;
-  height: 60px;
-  width: 300px;
-  text-align: left;
-  margin-left: 30px;
-}
-
 ul {
   padding: 15px;
   height: 100%;
@@ -385,6 +406,39 @@ ul {
 .resetBtn a:hover {
   color: white;
   text-decoration: none;
+}
+
+.container-content.cert {
+  padding: 0px
+}
+
+.certBox {
+  display: flex;
+  height: 60px;
+  align-items: center;
+  padding-left: 20px;
+  border-bottom: 1px solid #CCCCCF;
+  font-weight: 600;
+}
+
+.certKey {
+  border-radius: 12px;
+  padding: 0 10px;
+  margin: 0 10px 0 0;
+  color: #FFFFFF;
+  font-size: 12px;
+}
+
+.ESL {
+  background-color: #1855D1;
+}
+
+.COLLEGE {
+  background-color: #FED766;
+}
+
+.MATH {
+  background-color: #F7AEF8;
 }
 
 </style>
