@@ -2,12 +2,14 @@
 <div class="autocomplete-input">
   <input required autofocus
     type="text"
+    placeholder="Search your school" 
     class="v-form-control" 
     :value="parentModel" 
     @keyup="keyupHandler"
     @focusout="focusoutHandler"
-    @focusin="showSuggestions = suggestions.length > 0 ? true : false"
+    @focusin="focusinHandler"
   >
+  <span class="v-form-control__icon">▾</span>
   <ul class="suggestions" v-show="showSuggestions" @click="useSuggestion">
     <li 
       class="suggestions__item" 
@@ -22,6 +24,8 @@
 
 <script>
 import NetworkService from '../../services/NetworkService';
+
+const SCHOOL_NOT_FOUND_MSG = 'I coudn\'t find my school';
 
 export default {
   props: {
@@ -48,9 +52,17 @@ export default {
         });
     },
     keyupHandler(e) {
-      this.updateParentModel(this.$parent, 'highschool', e.target.value);
-      this.getSuggestions(e.target.value).then((suggestions) => {
-        this.suggestions = suggestions;
+      let query = e.target.value;
+
+      this.updateParentModel(this.$parent, 'highschool', query);
+
+      this.getSuggestions(query).then((suggestions) => {
+        if (suggestions.length > 0) {
+          this.suggestions = suggestions;
+        }
+        else {
+          this.suggestions = query !== '' ? [SCHOOL_NOT_FOUND_MSG] : [];
+        }
         this.showSuggestions = this.suggestions.length > 0 ? true : false;
       }); 
     },
@@ -62,6 +74,17 @@ export default {
       setTimeout(() => {
         this.showSuggestions = false;
       }, 100);
+    },
+    focusinHandler() {
+      if (
+        this.suggestions.length > 0 && 
+        this.suggestions[0] !== SCHOOL_NOT_FOUND_MSG
+      ) {
+        this.showSuggestions = true;
+      }
+      else {
+        this.showSuggestions = false;
+      }
     }
   }
 }
@@ -77,14 +100,20 @@ export default {
 
 .v-form-control {
   height: 34px;
-  border: 0;
   display: block;
   width: 100%;
-  border-bottom: 3px solid #12d2aa;
+  border: 1px solid var(--c-accent);
+  padding: 6px 12px;
   margin-bottom: 10px;
 }
 .v-form-control:focus {
   outline: none;
+}
+.v-form-control__icon {
+  position: absolute;
+  font-size: 12px;
+  right: 6px;
+  top: 8px;
 }
 
 .suggestions {
@@ -94,7 +123,7 @@ export default {
   width: 100%;
   background: #fff;
   padding: 0;
-  box-shadow: 0 2px 8px 2px rgba(0,0,0,.3);
+  box-shadow: 0 4px 6px 2px rgba(0,0,0,.3);
   z-index: 1;
 }
 .suggestions__item {
