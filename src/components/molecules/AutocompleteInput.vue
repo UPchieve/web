@@ -1,12 +1,14 @@
 <template>
 <div class="autocomplete-input">
   <input required autofocus
-    type="text" 
-    @keyup="keyupHandler" 
+    type="text"
     class="v-form-control" 
     :value="parentModel" 
+    @keyup="keyupHandler"
+    @focusout="focusoutHandler"
+    @focusin="showSuggestions = suggestions.length > 0 ? true : false"
   >
-  <ul class="suggestions" v-show="showSuggestions">
+  <ul class="suggestions" v-show="showSuggestions" @click="useSuggestion">
     <li 
       class="suggestions__item" 
       v-for="suggestion in suggestions"
@@ -51,6 +53,15 @@ export default {
         this.suggestions = suggestions;
         this.showSuggestions = this.suggestions.length > 0 ? true : false;
       }); 
+    },
+    useSuggestion(e) {
+      this.updateParentModel(this.$parent, 'highschool', e.target.innerText);
+      this.showSuggestions = false;
+    },
+    focusoutHandler(e) {
+      setTimeout(() => {
+        this.showSuggestions = false;
+      }, 100);
     }
   }
 }
