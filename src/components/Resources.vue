@@ -1,7 +1,7 @@
 <template>
 	<div class="resources-page">
 		<div v-if="!user.isVolunteer">
-			<div class="header">
+			<div class="res-header">
 				Resources for Students
 			</div>
 			<div class="body">
@@ -72,7 +72,7 @@ export default {
 
 <style>
 
-.header {
+.res-header {
   display: flex;
   padding: 30px;
   margin: 0;
