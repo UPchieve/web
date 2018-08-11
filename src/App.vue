@@ -56,5 +56,6 @@ html, body, #app {
 .col-xs-12.view-container {
   padding-left: 300px;
   padding-right: 0;
+  z-index: 0;
 }
 </style>
