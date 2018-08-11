@@ -28,6 +28,12 @@ export default {
   justify-content: center;
 }
 
+.col-xs-12.view-container {
+  padding-left: 0;
+  padding-right: 0;
+  z-index: 1;
+}
+
 h1 {
   color: #000;
   font-size: 24px;
@@ -39,9 +45,11 @@ h1 {
   display: flex;
   background-image: url('../assets/onboarding_background.png');
   background-size: cover;
-  width: 100%;
   height: 100%;
   font-size: 16px;
+  margin-left: -300px;
+  position: relative;
+  z-index: 2;
 }
 
 .form-signout {

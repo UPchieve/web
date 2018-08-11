@@ -18,11 +18,11 @@
       </div>
       <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">SIGN UP</button>
       {{msg}}
-    </div> 
+    </div>
     <div class="successMessage" v-else>
       <p>You’ve been sent a verification email! Use the link in the email to get started.</p>
     </div>
-  </form> 
+  </form>
 </template>
 
 <script>
@@ -135,7 +135,7 @@ label {
 
 #userAgreement {
   margin-right: 12px;
-  border: 3px solid #000; 
+  border: 3px solid #000;
   display: inline-block;
 }
 
