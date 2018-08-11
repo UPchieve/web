@@ -12,7 +12,7 @@
         Welcome, Student!
       </p>
       <p class="greeting" v-else-if='user.isVolunteer &&  user.firstname === undefined'>
-        Welcome, Volunteer!
+        Welcome Volunteer!
       </p>
       <p class="greeting" v-else>
         {{ name }}
