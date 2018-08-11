@@ -117,7 +117,7 @@ export default {
       var topic = this.pickedTopic;
       var subTopic = this.pickedSubtopic;
       //Temp change all to math
-      topic = 'math';
+      //topic = 'math';
       topic = topic.toLowerCase();
       subTopic = subTopic.toLowerCase();
       if (subTopic == 'general help') {
