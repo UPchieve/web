@@ -37,7 +37,7 @@ export default {
   methods: {
     gotoSession(session){
       console.log(session._id);
-      router.push(`/session/${session.type}/{$session.subTopic }/${session._id}`);
+      router.push(`/session/${session.type}/${session.subTopic}/${session._id}`);
     }
   },
   sockets: {

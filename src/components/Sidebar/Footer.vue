@@ -8,7 +8,6 @@
   </ul>
 </template>
 
-
 <script>
 
 import UserService from '../../services/UserService';

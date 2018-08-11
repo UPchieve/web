@@ -30,7 +30,23 @@ export default {
         user = UserService.getUser(),
         onboarding = UserService.getOnboarding();
     return {
-      auth, user, onboarding
+      auth, user, onboarding,
+
+      onboardingProfileClass: {
+        disabled: false
+      }
+    }
+  },
+  computed: {
+    onboardingAcademicClass() {
+      return {
+        disabled: this.$route.path.indexOf('/onboarding/profile') !== -1
+      }
+    },
+    onboardingCollegeClass() {
+      return {
+        disabled: this.$route.path.indexOf('/onboarding/profile') !== -1 || this.$route.path.indexOf('/onboarding/academic') !== -1
+      }
     }
   }
 }
