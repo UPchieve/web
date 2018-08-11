@@ -4,187 +4,199 @@
         <h2>Registration: Basic Profile</h2>
     </div>
 
-    <div class="alert alert-danger" role="alert" v-if="error">{{error}}</div>
+    <div class="registration-body">
 
-    <div class="row form-group">
-      <p>Your Name</p>
+      <div class="alert alert-danger" role="alert" v-if="error">{{error}}</div>
 
-      <div class="row">
-        <div class="col-sm-6">
-          <input type="text" v-model="user.firstname" class="form-control" id="firstNameInput" required autofocus>
-          <label for="firstNameInput">First</label>
-        </div>
-        <div class="col-sm-6">
-          <input type="text" v-model="user.lastname" class="form-control" id="lastNameInput">
-          <label for="lastNameInput">Last</label>
-        </div>
+      <div class="row form-group">
+        <p>Your Name</p>
 
-        <div class="col-sm-6">
-          <input type="text" v-model="user.nickname" class="form-control" id="nicknameInput" required autofocus>
-          <label for="nicknameInput">Nickname</label>
-        </div>
+        <div class="row">
+          <div class="col-sm-6">
+            <input type="text" v-model="user.firstname" class="form-control" id="firstNameInput" required autofocus>
+            <label for="firstNameInput">First</label>
+          </div>
+          <div class="col-sm-6">
+            <input type="text" v-model="user.lastname" class="form-control" id="lastNameInput">
+            <label for="lastNameInput">Last</label>
+          </div>
 
-      </div>
-    </div>
+          <div class="col-sm-6">
+            <input type="text" v-model="user.nickname" class="form-control" id="nicknameInput" required autofocus>
+            <label for="nicknameInput">Nickname</label>
+          </div>
 
-    <ul class="row form-group">
-      <p>Your Birthday</p>
-      <div class="row">
-        <div class="col-sm-6">
-          <input type="text" v-model="user.birthdate" class="form-control" id="birthdayInput">
-          <label for="birthdayInput">MM/DD/YYYY</label>
         </div>
       </div>
-    </ul>
 
-    <ul class="row form-group">
-      <p>Your Gender</p>
-      <div class="row">
-        <div class="col-sm-6">
-          <select class="form-control" v-model="user.gender">
-            <option></option>
-            <option>Male</option>
-            <option>Female</option>
-            <option>Other</option>
-          </select>
+      <ul class="row form-group">
+        <p>Your Birthday</p>
+        <div class="row">
+          <div class="col-sm-6">
+            <input type="text" v-model="user.birthdate" class="form-control" id="birthdayInput">
+            <label for="birthdayInput">MM/DD/YYYY</label>
+          </div>
+        </div>
+      </ul>
+
+      <ul class="row form-group">
+        <p>Your Gender</p>
+        <div class="row">
+          <div class="col-sm-6">
+            <select class="form-control" v-model="user.gender">
+              <option></option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+      </ul>
+
+      <ul class="row form-group">
+        <p>Your Race/Ethnicity (Please select all that apply.)</p>
+        <div class="race-container">
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="HispanicOrLatino" v-model="user.race">
+              Hispanic or Latino
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="White" v-model="user.race">
+              White
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="Black" v-model="user.race">
+              Black / African American
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="AmericanIndian" v-model="user.race">
+              American Indian / Alaskan Native
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="Asian" v-model="user.race">
+              Asian
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="PacificIslander" v-model="user.race">
+              Native Hawaiian / Other Pacific Islander
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="Other" v-model="user.race">
+              Other
+            </label>
+          </div>
+        </div>
+      </ul>
+
+      <div class="row form-group" v-if="!user.isVolunteer">
+        <p>Current high school</p>
+        <div class="row">
+            <div class="col-sm-12">
+             <input type="text" v-model="user.highschool" class="form-control" required autofocus>
+          </div>
         </div>
       </div>
-    </ul>
 
-    <ul class="row form-group">
-      <p>Your Race/Ethnicity (Please select all that apply.)</p>
-      <div class="race-container">
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" value="HispanicOrLatino" v-model="user.race">
-            Hispanic or Latino
-          </label>
-        </div>
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" value="White" v-model="user.race">
-            White
-          </label>
-        </div>
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" value="Black" v-model="user.race">
-            Black / African American
-          </label>
-        </div>
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" value="AmericanIndian" v-model="user.race">
-            American Indian / Alaskan Native
-          </label>
-        </div>
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" value="Asian" v-model="user.race">
-            Asian
-          </label>
-        </div>
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" value="PacificIslander" v-model="user.race">
-            Native Hawaiian / Other Pacific Islander
-          </label>
-        </div>
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" value="Other" v-model="user.race">
-            Other
-          </label>
-        </div>
-      </div>
-    </ul>
 
     <div class="row form-group" v-if="!user.isVolunteer">
       <p>Current high school</p>
       <div class="row">
         <div class="col-sm-12">
-          <autocomplete-input :parentModel="user.highschool"></autocomplete-input>          
+          <autocomplete-input :parentModel="user.highschool"></autocomplete-input>
         </div>
       </div>
     </div>
 
-    <div class="row form-group" v-if="!user.isVolunteer">
-      <p>Expected High School Graduation</p>
-      <div class="row">
-        <div class="col-sm-6">
-          <select class="form-control" v-model="user.expectedGraduation">
-            <option></option>
-            <option>2017</option>
-            <option>2018</option>
-            <option>2019</option>
-            <option>2020</option>
-            <option>2021</option>
-            <option>2022</option>
-          </select>
+      <div class="row form-group" v-if="!user.isVolunteer">
+        <p>Expected High School Graduation</p>
+        <div class="row">
+          <div class="col-sm-6">
+            <select class="form-control" v-model="user.expectedGraduation">
+              <option></option>
+              <option>2017</option>
+              <option>2018</option>
+              <option>2019</option>
+              <option>2020</option>
+              <option>2021</option>
+              <option>2022</option>
+            </select>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="row form-group" v-if="!user.isVolunteer">
-      <p>Were you referred by one of our partner organizations?</p>
-      <div class="row">
-        <div class="col-sm-6">
-          <select class="form-control" v-model="user.referred">
-            <option></option>
-            <option>Yes - Oasis</option>
-            <option>Yes - Big Brothers Big Sisters</option>
-            <option>No</option>
-          </select>
+      <div class="row form-group" v-if="!user.isVolunteer">
+        <p>Were you referred by one of our partner organizations?</p>
+        <div class="row">
+          <div class="col-sm-6">
+            <select class="form-control" v-model="user.referred">
+              <option></option>
+              <option>Yes - Oasis</option>
+              <option>Yes - Big Brothers Big Sisters</option>
+              <option>No</option>
+            </select>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="row form-group" v-if="user.isVolunteer">
-      <p>Your Phone Number</p>
-      <div class="row">
-          <div class="col-sm-12">
-           <input type="text" v-model="user.phone" class="form-control" required autofocus>
+      <div class="row form-group" v-if="user.isVolunteer">
+        <p>Your Phone Number</p>
+        <div class="row">
+            <div class="col-sm-12">
+             <input type="text" v-model="user.phone" class="form-control" required autofocus>
+          </div>
+        </div>
+        <label>We will use this number to send
+        you notifications when a student needs help. You will only receive
+        notifications during the periods that you select in your schedule.</label>
+      </div>
+
+      <div class="row form-group" v-if="user.isVolunteer">
+        <p>Your College</p>
+        <div class="row">
+            <div class="col-sm-12">
+             <input type="text" v-model="user.college" class="form-control" required autofocus>
+          </div>
         </div>
       </div>
-      <label>We will use this number to send
-      you notifications when a student needs help. You will only receive
-      notifications during the periods that you select in your schedule.</label>
-    </div>
 
-    <div class="row form-group" v-if="user.isVolunteer">
-      <p>Your College</p>
-      <div class="row">
-          <div class="col-sm-12">
-           <input type="text" v-model="user.college" class="form-control" required autofocus>
+      <div class="row form-group" v-if="user.isVolunteer">
+        <p>Your Favorite Academic Subject</p>
+        <div class="row">
+            <div class="col-sm-12">
+             <input type="text" v-model="user.favoriteAcademicSubject" class="form-control" required autofocus>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="row form-group" v-if="user.isVolunteer">
-      <p>Your Favorite Academic Subject</p>
-      <div class="row">
-          <div class="col-sm-12">
-           <input type="text" v-model="user.favoriteAcademicSubject" class="form-control" required autofocus>
+      <div class="row form-group" v-if="user.isVolunteer">
+        <p>Were you referred by one of our partner organizations?</p>
+        <div class="row">
+          <div class="col-sm-6">
+            <select class="form-control" v-model="user.referred">
+              <option></option>
+              <option>Yes - APO Xi Alpha</option>
+              <option>Yes - Alpha Gamma Iota</option>
+              <option>No</option>
+            </select>
+          </div>
         </div>
       </div>
-    </div>
-
-    <div class="row form-group" v-if="user.isVolunteer">
-      <p>Were you referred by one of our partner organizations?</p>
-      <div class="row">
-        <div class="col-sm-6">
-          <select class="form-control" v-model="user.referred">
-            <option></option>
-            <option>Yes - APO Xi Alpha</option>
-            <option>Yes - Alpha Gamma Iota</option>
-            <option>No</option>
-          </select>
-        </div>
+      <div class="btn-container">
+        <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submitProfile">{{buttonMsg}}</button>
       </div>
-    </div>
-
-    <div class="btn-container">
-      <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submitProfile">{{buttonMsg}}</button>
     </div>
   </div>
 </template>
@@ -300,6 +312,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   font-weight: 600;
+  background-color: #FFFFFF;
 }
 
 h2 {
@@ -321,7 +334,7 @@ p {
 
 .form-group {
   margin: 0;
-  padding-left: 50px;
+  padding: 0 50px;
   max-width: 650px;
   margin-bottom: 30px;
 }
@@ -393,6 +406,20 @@ button[type="submit"]:hover, button[type="submit"]:active {
 
 .btn-container {
   max-width: 600px;
+}
+
+.profile-editor {
+  display: flex;
+  flex-direction: column;
+  background-color: #E3F2FD;
+}
+
+.registration-body {
+  padding-top: 50px;
+  width: 620px;
+  align-self: center;
+  background-color: #FFFFFF;
+  border-left: 5px solid #1855D1;
 }
 
 </style>

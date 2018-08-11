@@ -39,9 +39,11 @@ export default {
   display: flex;
   background-image: url('../assets/onboarding_background.png');
   background-size: cover;
-  width: 100%;
   height: 100%;
   font-size: 16px;
+  margin-left: -300px;
+  position: relative;
+  z-index: 2;
 }
 
 .form-resetpassword {
