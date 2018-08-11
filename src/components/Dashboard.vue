@@ -21,7 +21,6 @@
               <select class="form-control topic" v-model="pickedTopic">
                 <option value="math">Math</option>
                 <option value="college">College Counseling</option>
-                <option value="esl">ESL</option>
               </select>
               <select class="form-control subtopic" v-model="pickedSubtopic">
                 <option v-for="subtopic in subtopics[pickedTopic]">{{ subtopic }}</option>
