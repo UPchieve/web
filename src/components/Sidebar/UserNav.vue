@@ -1,10 +1,10 @@
 <template>
   <div>
-    <ul class="nav navbar-nav" v-if="($route.path.indexOf('/onboarding') !== -1 || onboarding) && !user.isVolunteer">
+    <ul class="nav navbar-nav" v-if="($route.path.indexOf('/onboarding') !== -1) && !user.isVolunteer">
       <router-link to="/onboarding/profile" tag="li"><a class="profile-info">Basic Profile</a></router-link>
       <router-link to="/onboarding/academic" tag="li"><a class="profile-info">First Time Use Survey</a></router-link>
     </ul>
-    <ul class="nav navbar-nav" v-else-if="$route.path.indexOf('/onboarding') !== -1 || onboarding">
+    <ul class="nav navbar-nav" v-else-if="$route.path.indexOf('/onboarding') !== -1">
       <router-link to="/onboarding/profile" tag="li"><a class="profile-info">Basic Profile</a></router-link>
     </ul>
     <ul class="nav navbar-nav" v-else-if="auth.authenticated">
