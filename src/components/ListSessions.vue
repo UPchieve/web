@@ -10,7 +10,7 @@
       <tbody>
         <tr v-for="session in openSessions" v-on:click="gotoSession(session)" class="session-row">
           <td>{{session.student.firstname}}</td>
-          <td>{{session.type}}</td>
+          <td>{{session.subTopic.charAt(0).toUpperCase() + session.subTopic.substr(1)}}</td>
         </tr>
       </tbody>
     </table>
