@@ -36,23 +36,23 @@ export default {
   },
   methods: {
     gotoSession(session){
+      alert(JSON.stringify(this.user[session.subTopic].passed));
       console.log(session._id);
-      router.push(`/session/${session.type}/${session.subTopic}/${session._id}`);
+      //router.push(`/session/${session.type}/${session.subTopic}/${session._id}`);
     }
   },
   sockets: {
     sessions(sessions){
       let results = [];
       let socketSessions = sessions.filter(function(session){
-        console.log(session);
+        //alert(JSON.stringify(session));
         return !session.volunteer;
       });
 
       for (var i=0; i<socketSessions.length; i++) {
         let currentSession = socketSessions[i];
         if (socketSessions[i].type == 'college') {
-          result.push(currentSession);
-          continue;
+          results.push(currentSession);
         }
 
         let subTopic = currentSession.subTopic;
