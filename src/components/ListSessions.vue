@@ -4,7 +4,7 @@
       <thead>
         <tr>
           <th>Student</th>
-          <th>Session type</th>
+          <th>Help Topic</th>
         </tr>
       </thead>
       <tbody>
@@ -36,16 +36,15 @@ export default {
   },
   methods: {
     gotoSession(session){
-      alert(JSON.stringify(this.user[session.subTopic].passed));
       console.log(session._id);
-      //router.push(`/session/${session.type}/${session.subTopic}/${session._id}`);
+      router.push(`/session/${session.type}/${session.subTopic}/${session._id}`);
     }
   },
   sockets: {
     sessions(sessions){
       let results = [];
       let socketSessions = sessions.filter(function(session){
-        //alert(JSON.stringify(session));
+        console.log(session);
         return !session.volunteer;
       });
 
@@ -53,6 +52,7 @@ export default {
         let currentSession = socketSessions[i];
         if (socketSessions[i].type == 'college') {
           results.push(currentSession);
+          continue;
         }
 
         let subTopic = currentSession.subTopic;
