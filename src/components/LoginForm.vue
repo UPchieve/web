@@ -14,6 +14,11 @@
         <router-link to="resetpassword" class="password-reset-link">Forgot password?</router-link>
         <button class="btn btn-lg btn-primary btn-block login-btn" type="submit" @click.prevent="submit">LOGIN</button>
       </div>
+      <div class="footer">
+        <router-link to="/contact" tag="div"><a class="contact icon" target="_blank">CONTACT US</a></router-link>
+        <router-link to="/legal" tag="div"><a class="privacy icon" target="_blank">LEGAL POLICY</a></router-link>
+        <div><a href="https://upchieve.org/" target="_blank">OUR WEBSITE</a></div>
+      </div>
     </form>
   </div>
 </template>
@@ -154,6 +159,24 @@ export default {
     margin-left: -300px;
     position: relative;
     z-index: 2;
+  }
+
+  .footer {
+    display: flex;
+    font-weight: 600;
+    font-size: 12px;
+    justify-content: space-around;
+    width: 500px;
+    height: 40px;
+    align-items: center;
+    align-self: center;
+    padding: 0 50px;
+    background-color: #F6F6F6;
+    border-top: 0.5px solid #CCCCCF;
+  }
+
+  .footer a {
+    color: #73737A;
   }
 
 </style>
