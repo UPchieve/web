@@ -18,6 +18,7 @@
           <div class="container-section" id="highschool">
             <div class="prompt">Your High School's Name</div>
             <div class="answer" v-show="!activeEdit">{{ user.highschool }}</div>
+            <div class="answer" v-show="!user.highschool && !activeEdit">(None given)</div>
             <input type="text" v-model="user.highschool" v-show="activeEdit" class="form-control">
           </div>
         </div>
@@ -26,6 +27,7 @@
             <div class="prompt">Your Phone Number
             </div>
             <div class="answer" v-show="!activeEdit">{{ user.phone }}</div>
+            <div class="answer" v-show="!user.phone && !activeEdit">(None given)</div>
             <input type="text" v-model="user.phone" v-show="activeEdit" class="form-control" >
 
             <div class="description">We will use this number to send
@@ -40,6 +42,7 @@
                 <li>{{ item }}</li>
               </ul>
             </div>
+            <div class="answer" v-show="!user.preferredContactMethod[0] && !activeEdit">(None given)</div>
             <ul class="row form-control" v-model="user.preferredContactMethod" v-show="activeEdit">
               <p>Please select all that apply.</p>
               <div>
@@ -68,12 +71,14 @@
           <div class="container-section" id="college">
             <div class="prompt">Your College</div>
             <div class="answer" v-show="!activeEdit">{{ user.college }}</div>
+            <div class="answer" v-show="!user.college && !activeEdit">(None given)</div>
             <input type="text" v-model="user.college" v-show="activeEdit" class="form-control">
           </div>
 
           <div class="container-section" id="favoriteAcademicSubject">
             <div class="prompt">Your Favorite Academic Subject</div>
             <div class="answer" v-show="!activeEdit">{{ user.favoriteAcademicSubject }}</div>
+            <div class="answer" v-show="!user.favoriteAcademicSubject && !activeEdit">(None given)</div>
             <input type="text" v-model="user.favoriteAcademicSubject" v-show="activeEdit" class="form-control">
           </div>
 
