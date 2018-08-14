@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard" v-bind:style="coverStyle">
     <div class="header-container"></div>
-    <h1>Hello, {{name}}!</h1>
+    <h1>Hello1, {{name}}!</h1>
 
     <template v-if="!user.isVolunteer">
       <div class="dashboard-body row">
