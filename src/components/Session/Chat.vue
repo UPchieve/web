@@ -79,18 +79,11 @@ export default {
       if (message != '') {
 
         ModerationService.checkIfMessageIsClean(this, message).then((isClean) => {
-
-          if (isClean != null) {
-
-            if (isClean) {
-              this.showNewMessage(message);
-            } 
-            else {
-              this.showModerationWarning();
-            }
-          }          
-          else {
+          if (isClean) {
             this.showNewMessage(message);
+          } 
+          else {
+            this.showModerationWarning();
           }
         });  
       }

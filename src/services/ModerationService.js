@@ -3,7 +3,7 @@ import NetworkService from './NetworkService';
 function _errHandler(err) {
   console.error(new Error('Unable to check if message is clean'));
   console.log(err);
-  return null;
+  return true;
 }
 
 export default {
