@@ -37,8 +37,8 @@ export default {
     })
   },
 
-  register(context, creds, redirect){
-    return NetworkService.register(context, creds).then((res) => {
+  registerStudent(context, creds, profile, redirect){
+    return NetworkService.registerStudent(context, {...creds, ...profile}).then((res) => {
       let data = res.data;
       console.log(data);
       if (!data){

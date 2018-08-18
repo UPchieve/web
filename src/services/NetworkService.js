@@ -19,8 +19,8 @@ export default {
   checkCode(context, data){
     return context.$http.post(`${AUTH_ROOT}/register/check`, data).then(this._successHandler, this._errorHandler)
   },
-  register(context, data){
-    return context.$http.post(`${AUTH_ROOT}/register`, data).then(this._successHandler, this._errorHandler)
+  registerStudent(context, data){
+    return context.$http.post(`${AUTH_ROOT}/register/student/create`, data).then(this._successHandler, this._errorHandler)
   },
   sendReset(context, data){
     return context.$http.post(`${AUTH_ROOT}/reset/send`, data).then(this._successHandler, this._errorHandler)
