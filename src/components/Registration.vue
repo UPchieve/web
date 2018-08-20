@@ -4,7 +4,7 @@
       <div v-if="this.userSelection === 'none'">
         <div class="header">
           <router-link to="login" class="login-link">Log In</router-link>
-          <div class="registration-header">Registration</div>
+          <div class="registration-header">Register an Account</div>
         </div>
         <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="selectStudent()">STUDENT</button>
         <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="selectVolunteer()">VOLUNTEER</button>

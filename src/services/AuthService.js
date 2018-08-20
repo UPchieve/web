@@ -37,8 +37,8 @@ export default {
     })
   },
 
-  registerStudent(context, creds, profile, redirect){
-    return NetworkService.registerStudent(context, {...creds, ...profile}).then((res) => {
+  register(context, creds, profile, redirect){
+    return NetworkService.register(context, {...creds, ...profile}).then((res) => {
       let data = res.data;
       console.log(data);
       if (!data){
@@ -57,6 +57,15 @@ export default {
         setTimeout(() => {
           router.push(redirect)
         }, 2000);
+      }
+    })
+  },
+
+  checkRegister(context, creds) {
+    return NetworkService.checkRegister(context, creds).then((res) => {
+      if (res.data.err) {
+        throw new Error(res.data.err);
+        return;
       }
     })
   },

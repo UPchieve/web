@@ -1,19 +1,19 @@
 <template>
   <code-form v-if="!validRegistrationCode"></code-form>
-  <signup-form v-else></signup-form>
+  <volunteer-signup-form v-else></volunteer-signup-form>
 </template>
 
 <script>
 
 import CodeForm from './CodeForm';
-import SignupForm from './SignupForm';
+import VolunteerSignupForm from './VolunteerSignupForm';
 
 import RegistrationService from '../../services/RegistrationService';
 
 export default {
   components: {
     CodeForm,
-    SignupForm
+    VolunteerSignupForm
   },
   data(){
     return RegistrationService.data;

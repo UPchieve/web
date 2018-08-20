@@ -4,7 +4,7 @@
       <router-link to="login" class="login-link">Log In</router-link>
       <div class="registration-header">Register an Account</div>
     </div>
-    <div>
+    <div v-if="!showingSuccess">
       <div v-if="step==1">
         <div class="step-1-text" colspan="2"><b>Step 1 of 2: Choose your log-in details </b></div>
         <label for="inputEmail">What's your email?</label>
@@ -33,27 +33,16 @@
             <td class="table-entry"><div class="description">Last Name</div></td>
           </tr>
           <tr class="question-row">
-            <td class="table-entry" colspan="2">What high school did you go to?</td>
+            <td class="table-entry" colspan="2">What college did you go to?</td>
           </tr>
           <tr>
-            <td colspan="2"><input class="form-control" required autofocus v-model="profile.highSchool"></td>
+            <td colspan="2"><input class="form-control" required autofocus v-model="profile.college"></td>
           </tr>
           <tr class="question-row">
-            <td class="table-entry" colspan="2">How did you hear about us?</td>
+            <td class="table-entry" colspan="2">What’s your favorite academic subject?</td>
           </tr>
           <tr>
-            <td colspan="2">
-              <select class="form-control topic" v-model="profile.heardFrom">
-                <option value="Flyer">Flyer</option>
-                <option value="Email">Email</option>
-                <option value="Internet search">Internet search</option>
-                <option value="Friend">Friend</option>
-                <option value="Family member">Family member</option>
-                <option value="Teacher">Teacher</option>
-                <option value="School">School</option>
-                <option value="Other">Other</option>
-              </select>
-            </td>
+            <td colspan="2"><input class="form-control" required autofocus v-model="profile.favoriteAcademicSubject"></td>
           </tr>
           <tr>
             <div class="agreement-box">
@@ -66,11 +55,15 @@
         <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">SIGN UP</button>
       </div>
     </div>
+    <div class="successMessage" v-else>
+      <p>You’ve been sent a verification email! Use the link in the email to get started.</p>
+    </div>
   </form>
 </template>
 
 <script>
   import AuthService from 'src/services/AuthService'
+  import RegistrationService from 'src/services/RegistrationService'
   import UserService from "../../services/UserService";
 
   export default {
@@ -85,10 +78,11 @@
         profile: {
           firstName: '',
           lastName: '',
-          highSchool: '',
-          heardFrom: ''
+          college: '',
+          favoriteAcademicSubject: ''
         },
-        step: 1
+        step: 1,
+        showingSuccess: false
       }
     },
     methods: {
@@ -104,7 +98,7 @@
       },
       submit() {
         AuthService.register(this, {
-          code: undefined,
+          code: RegistrationService.data.registrationCode,
           email: this.credentials.email,
           password: this.credentials.password,
           terms: this.credentials.terms
@@ -112,9 +106,10 @@
           let user = UserService.getUser();
           user.firstname = this.profile.firstName;
           user.lastname = this.profile.lastName;
-          user.highschool = this.profile.highSchool;
-          user.heardFrom = this.profile.heardFrom;
-          UserService.setProfile(this, user, '/');
+          user.college = this.profile.college;
+          user.favoriteAcademicSubject = this.profile.favoriteAcademicSubject;
+          UserService.setProfile(this, user);
+          this.showingSuccess = true;
         }).catch((err) => {
           console.log(err);
           this.msg = err.message;
