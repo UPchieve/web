@@ -23,7 +23,7 @@ export default {
     return context.$http.post(`${AUTH_ROOT}/register/checkcred`, data).then(this._successHandler, this._errorHandler)
   },
   register(context, data){
-    return context.$http.post(`${AUTH_ROOT}/register/create`, data).then(this._successHandler, this._errorHandler)
+    return context.$http.post(`${AUTH_ROOT}/register`, data).then(this._successHandler, this._errorHandler)
   },
   sendReset(context, data){
     return context.$http.post(`${AUTH_ROOT}/reset/send`, data).then(this._successHandler, this._errorHandler)

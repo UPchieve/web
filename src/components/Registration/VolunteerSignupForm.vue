@@ -5,7 +5,7 @@
       <div class="registration-header">Register an Account</div>
     </div>
     <div v-if="!showingSuccess">
-      <div v-if="step==1">
+      <div v-if="step=='step-1'">
         <div class="step-1-text" colspan="2"><b>Step 1 of 2: Choose your log-in details </b></div>
         <label for="inputEmail">What's your email?</label>
         <input type="email" id="inputEmail" class="form-control" required autofocus v-model="credentials.email">
@@ -16,7 +16,7 @@
         <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="nextPage()">CONTINUE</button>
         {{msg}}
       </div>
-      <div v-else>
+      <div v-else-if="step=='step-2'">
         <table class="step-2-table">
           <tr>
             <td class="table-entry" colspan="2"><b>Step 2 of 2: Tell us about yourself! </b></td>
@@ -54,6 +54,7 @@
         </table>
         <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">SIGN UP</button>
       </div>
+      <div v-else>Unexpected Error</div>
     </div>
     <div class="successMessage" v-else>
       <p>You’ve been sent a verification email! Use the link in the email to get started.</p>
@@ -81,7 +82,7 @@
           college: '',
           favoriteAcademicSubject: ''
         },
-        step: 1,
+        step: 'step-1',
         showingSuccess: false
       }
     },
@@ -91,7 +92,7 @@
           email: this.credentials.email,
           password: this.credentials.password
         }).then(() => {
-          this.step = 2;
+          this.step = 'step-2';
         }).catch((err) => {
           this.msg = err.message;
         })

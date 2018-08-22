@@ -1,7 +1,9 @@
 <template>
   <div class="registration-container background">
     <div class="form-register">
-      <div v-if="this.userSelection === 'none'">
+      <volunteer-form v-if="this.userSelection === 'volunteer'"></volunteer-form>
+      <student-form v-else-if="this.userSelection === 'student'"></student-form>
+      <div v-else>
         <div class="header">
           <router-link to="login" class="login-link">Log In</router-link>
           <div class="registration-header">Register an Account</div>
@@ -9,8 +11,6 @@
         <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="selectStudent()">STUDENT</button>
         <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="selectVolunteer()">VOLUNTEER</button>
       </div>
-      <volunteer-form v-else-if="this.userSelection === 'volunteer'"></volunteer-form>
-      <student-form v-else></student-form>
     </div>
   </div>
 </template>
@@ -27,7 +27,7 @@ export default {
   },
   data(){
     return {
-      userSelection: 'none'
+      userSelection: null
     };
   },
   methods: {
