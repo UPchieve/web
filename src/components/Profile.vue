@@ -2,130 +2,116 @@
 <div class="profile">
   <div class="header">
     Profile
-    <button @click="saveProfile()" class="saveBtn btn">{{ saveBtnMsg }}</button>
+    <button @click="editProfile()" class="editBtn btn">{{ editBtnMsg }}</button>
   </div>
-  <div class="basic-info">
-    <div class="section" id="profilePic">
-      <div class="prompt">Your profile picture</div>
-      <div class="answer avatar" v-bind:style="avatarStyle">
+  <div class="wrap-container">
+    <div class="personal-info contain">
+      <div class="subheader">Personal Information</div>
+      <div class="container-content">
+
+        <div class="container-section" id="email">
+          <div class="prompt">Your Email</div>
+          <div class="answer">{{ user.email }}</div>
+        </div>
+
+        <div v-if="!user.isVolunteer">
+          <div class="container-section" id="highschool">
+            <div class="prompt">Your High School's Name</div>
+            <div class="answer" v-show="!activeEdit">{{ user.highschool }}</div>
+            <div class="answer" v-show="!user.highschool && !activeEdit">(None given)</div>
+            <input type="text" v-model="user.highschool" v-show="activeEdit" class="form-control">
+          </div>
+        </div>
+        <div v-if="user.isVolunteer">
+          <div class="container-section" id="phone">
+            <div class="prompt">Your Phone Number
+            </div>
+            <div class="answer" v-show="!activeEdit">{{ user.phone }}</div>
+            <div class="answer" v-show="!user.phone && !activeEdit">(None given)</div>
+            <input type="text" v-model="user.phone" v-show="activeEdit" class="form-control" >
+
+            <div class="description">We will use this number to send
+            you notifications when a student needs help. You will only receive
+            notifications during the periods that you select in your schedule.</div>
+          </div>
+
+          <div class="container-section" id="preferredContactMethod">
+            <div class="prompt">What is your preferred method of contact?</div>
+            <div class="answer">
+              <ul v-show="!activeEdit" v-for="item in user.preferredContactMethod">
+                <li>{{ item }}</li>
+              </ul>
+            </div>
+            <div class="answer" v-show="!user.preferredContactMethod[0] && !activeEdit">(None given)</div>
+            <ul class="row form-control" v-model="user.preferredContactMethod" v-show="activeEdit">
+              <p>Please select all that apply.</p>
+              <div>
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox" value="Email" v-model="user.preferredContactMethod">
+                    Email
+                  </label>
+                </div>
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox" value="Text message" v-model="user.preferredContactMethod">
+                    Text message
+                  </label>
+                </div>
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox" value="None" v-model="user.preferredContactMethod">
+                    None
+                  </label>
+                </div>
+              </div>
+            </ul>
+          </div>
+
+          <div class="container-section" id="college">
+            <div class="prompt">Your College</div>
+            <div class="answer" v-show="!activeEdit">{{ user.college }}</div>
+            <div class="answer" v-show="!user.college && !activeEdit">(None given)</div>
+            <input type="text" v-model="user.college" v-show="activeEdit" class="form-control">
+          </div>
+
+          <div class="container-section" id="favoriteAcademicSubject">
+            <div class="prompt">Your Favorite Academic Subject</div>
+            <div class="answer" v-show="!activeEdit">{{ user.favoriteAcademicSubject }}</div>
+            <div class="answer" v-show="!user.favoriteAcademicSubject && !activeEdit">(None given)</div>
+            <input type="text" v-model="user.favoriteAcademicSubject" v-show="activeEdit" class="form-control">
+          </div>
+
+        </div>
+
+        <div class="container-section resetBtn btn"><router-link to="resetpassword" class="prompt">Reset password</router-link></div>
+      </div>
+
+    </div>
+
+    <div v-if="user.isVolunteer" class="cert-info contain">
+      <div class="subheader">Certifications and Tutoring Topics</div>
+      <div class="container-content cert">
+        <div v-for="(value, key) in certifications">
+          <div class="certBox" v-if="value">
+            <div class="certKey" v-bind:class="certKey[key]">{{ certKey[key] }}</div>
+            <div class="certValue">{{ key }}</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="section" id="nickname">
-      <div class="prompt">Your Nickname</div>
-      <div class="answer" v-show="'nickname' !== activeEdit">{{ user.nickname }}</div>
-      <input type="text" v-model="user.nickname" v-show="'nickname' === activeEdit">
-      <button @click="editField('nickname')" class="sectionBtn">{{ fieldButtons.nickname }}</button>
-    </div>
-
-    <div class="section" id="email">
-      <div class="prompt">Your Email</div>
-      <div class="answer">{{ user.email }}</div>
-    </div>
-
-    <div class="section" id="birthdate">
-      <div class="prompt">Your Birthday</div>
-      <div class="answer">{{ user.birthdate }}</div>
-    </div>
-
-    <div class="section" id="gender">
-      <div class="prompt">Your Gender</div>
-      <div class="answer">{{ user.gender }}</div>
-    </div>
-
-    <div class="section" id="race">
-      <div class="prompt">Your Race</div>
-      <div class="answer">
-        <ul v-show="'race' !== activeEdit" v-for="item in user.race">
-          <li>{{ item }}</li>
-        </ul>
+    <div class="profile-pic contain" v-if="false">
+      <div class="subheader">Profile Picture</div>
+      <div class="container-content">
+        <div class="container-section" id="profilePic">
+          <div class="answer avatar" v-bind:style="avatarStyle">
+          </div>
+        </div>
       </div>
     </div>
 
   </div>
-
-  <div v-if="!user.isVolunteer">
-    <div class="section" id="highschool">
-      <div class="prompt">Your High School's Name</div>
-      <div class="answer" v-show="'highschool' !== activeEdit">{{ user.highschool }}</div>
-      <input type="text" v-model="user.highschool" v-show="'highschool' === activeEdit">
-      <button @click="editField('highschool')" class="sectionBtn">{{ fieldButtons.highschool }}</button>
-    </div>
-
-    <div class="section" id="expectedGraduation">
-      <div class="prompt">Expected High School Graduation</div>
-      <div class="answer" v-show="'expectedGraduation' !== activeEdit">{{ user.expectedGraduation }}</div>
-      <select class="form-control" v-model="user.expectedGraduation" v-show="'expectedGraduation' === activeEdit">
-        <option></option>
-        <option>2017</option>
-        <option>2018</option>
-        <option>2019</option>
-        <option>2020</option>
-        <option>2021</option>
-        <option>2022</option>
-      </select>
-      <button @click="editField('expectedGraduation')" class="sectionBtn">{{ fieldButtons.expectedGraduation }}</button>
-    </div>
-
-  </div>
-  <div v-if="user.isVolunteer">
-    <div class="section" id="phone">
-      <div class="prompt">Your Phone Number
-      </div>
-      <div class="answer" v-show="'phone' !== activeEdit">{{ user.phone }}</div>
-      <input type="text" v-model="user.phone" v-show="'phone' === activeEdit">
-      <button @click="editField('phone')" class="sectionBtn">{{ fieldButtons.phone }}</button>
-    </div>
-    <div class="description">We will use this number to send
-    you notifications when a student needs help. You will only receive
-    notifications during the periods that you select in your schedule.</div>
-
-    <div class="section" id="college">
-      <div class="prompt">Your College</div>
-      <div class="answer" v-show="'college' !== activeEdit">{{ user.college }}</div>
-    </div>
-
-    <div class="section" id="favoriteAcademicSubject">
-      <div class="prompt">Your Favorite Academic Subject</div>
-      <div class="answer" v-show="'favoriteAcademicSubject' !== activeEdit">{{ user.favoriteAcademicSubject }}</div>
-      <input type="text" v-model="user.favoriteAcademicSubject" v-show="'favoriteAcademicSubject' === activeEdit">
-      <button @click="editField('favoriteAcademicSubject')" class="sectionBtn">{{ fieldButtons.favoriteAcademicSubject }}</button>
-    </div>
-
-    <div class="section" id="referred">
-      <div class="prompt">Were you referred by one of our partner organizations?</div>
-      <div class="answer" v-show="'referred' !== activeEdit">{{ user.referred }}</div>
-      <select class="form-control" v-model="user.referred" v-show="'referred' === activeEdit">
-        <option></option>
-        <option>Yes - APO Xi Alpha</option>
-        <option>Yes - Alpha Gamma Iota</option>
-        <option>No</option>
-      </select>
-      <button @click="editField('referred')" class="sectionBtn">{{ fieldButtons.referred }}</button>
-    </div>
-    
-    <div class="section" id="preferredContactMethod">
-      <div class="prompt">What is your preferred method of contact?</div>
-      <div class="answer" v-show="'preferredContactMethod' !== activeEdit">{{ user.preferredContactMethod }}</div>
-      <select class="form-control" v-model="user.preferredContactMethod" v-show="'preferredContactMethod' === activeEdit">
-        <option></option>
-        <option>Email</option>
-        <option>Text message</option>
-        <option>None</option>
-      </select>
-      <button @click="editField('preferredContactMethod')" class="sectionBtn">{{ fieldButtons.preferredContactMethod }}</button>
-    </div>
-  </div>
-
-  <div v-if="user.isVolunteer" class="cert-info">
-    <div class="info-header cert">Certifications</div>
-    <div class="certifications" v-for="(value, key) in certifications">
-      <div v-if="value">{{ key }}</div>
-    </div>
-  </div>
-
-  <div class="section"><router-link to="resetpassword" class="prompt">Reset password</router-link></div>
-
 </div>
 
 </template>
@@ -140,34 +126,31 @@ export default {
     var fieldnames = ['firstname', 'lastname', 'nickname', 'highschool', 'currentGrade',
     'expectedGraduation', 'difficultAcademicSubject', 'difficultCollegeProcess',
     'hasGuidanceCounselor', 'gpa', 'collegeApplicationsText', 'phone', 'favoriteAcademicSubject', 'college', 'referred', 'preferredContactMethod'];
-    var fieldButtons = [];
-    fieldnames.map(function(field) {
-      fieldButtons[field] = 'Edit';
-    });
+
     var certifications = new Object();
     if (user.algebra) {
       if (user.algebra.passed) {
-        certifications['Math: Algebra'] = true;
+        certifications['Algebra'] = true;
       }
     }
     if (user.geometry) {
       if (user.geometry.passed) {
-        certifications['Math: Geometry'] = true;
+        certifications['Geometry'] = true;
       }
     }
     if (user.trigonometry) {
       if (user.trigonometry.passed) {
-        certifications['Math: Trigonometry'] = true;
+        certifications['Trigonometry'] = true;
       }
     }
     if (user.precalculus) {
       if (user.precalculus.passed) {
-        certifications['Math: Precalculus'] = true;
+        certifications['Precalculus'] = true;
       }
     }
     if (user.calculus) {
       if (user.calculus.passed) {
-        certifications['Math: Calculus'] = true;
+        certifications['Calculus'] = true;
       }
     }
     if (user.esl) {
@@ -175,33 +158,55 @@ export default {
         certifications['ESL'] = true;
       }
     }
+    if (user.planning) {
+      if (user.planning.passed) {
+        certifications['Planning'] = true;
+      }
+    }
+    if (user.essay) {
+      if (user.essay.passed) {
+        certifications['Essay'] = true;
+      }
+    }
+    if (user.application) {
+      if (user.application.passed) {
+        certifications['Application'] = true;
+      }
+    }
+
+    var certKey = new Object();
+    certKey['Algebra'] = 'MATH';
+    certKey['Geometry'] = 'MATH';
+    certKey['Trigonometry'] = 'MATH';
+    certKey['Precalculus'] = 'MATH';
+    certKey['Calculus'] = 'MATH';
+    certKey['ESL'] = 'ESL'
+    certKey['Planning'] = 'COLLEGE';
+    certKey['Essay'] = 'COLLEGE';
+    certKey['Application'] = 'COLLEGE';
 
     return {
       user: user,
-      activeEdit: null,
-      fieldButtons: fieldButtons,
-      saveBtnMsg: 'Save Profile',
+      activeEdit: false,
+      editBtnMsg: 'Edit Profile',
       name: user.firstname || (user.isVolunteer ? 'volunteer' : 'student'),
       avatarStyle: {
         backgroundImage: `url(${avatarUrl})`
       },
-      certifications: certifications
+      certifications: certifications,
+      certKey: certKey
     }
   },
   methods: {
-    editField: function(field) {
-      if (field !== this.activeEdit) {
-        this.activeEdit = field;
-        this.fieldButtons[field] = 'Done';
-        this.savBtnMsg = 'Save Profile';
+    editProfile() {
+      if (this.activeEdit) {
+        UserService.setProfile(this, this.user);
+        this.editBtnMsg = 'Edit Profile';
+        this.activeEdit = false;
       } else {
-        this.activeEdit = null;
-        this.fieldButtons[field] = 'Edit';
+        this.editBtnMsg = 'Save Profile';
+        this.activeEdit = true;
       }
-    },
-    saveProfile() {
-      UserService.setProfile(this, this.user);
-      this.saveBtnMsg = 'Profile is saved!';
     }
   }
 }
@@ -229,25 +234,18 @@ button:active, button:hover {
   color: #FFF;
 }
 
-.saveBtn {
-  font-size: 16px;
+.editBtn {
+  font-size: 20px;
   font-weight: 600;
   color: #343440;
   background-color: #FFF;
 }
 
-.saveBtn:active, .saveBtn:hover {
+.editBtn:active, .editBtn:hover {
   background-color: #FFF;
   color: #16D2AA;
   box-shadow: none;
   margin: 0px;
-}
-
-select, input[type=text] {
-  width: 200px;
-  margin-right: 10px;
-  border-color: #16D2AA;
-  border-style: solid;
 }
 
 .profile {
@@ -265,24 +263,6 @@ select, input[type=text] {
   justify-content: space-between;
   font-weight: 600;
   color: #343440;
-}
-
-.section {
-  display: flex;
-  align-items: center;
-  height: 60px;
-}
-
-.prompt {
-  width: 300px;
-  text-align: left;
-  margin-left: 30px;
-  padding-bottom: 20px;
-}
-
-.answer {
-  margin-right: 10px;
-  text-align: left
 }
 
 .difficultCollegeProcessAnswer {
@@ -317,30 +297,139 @@ select, input[type=text] {
   margin-bottom: 15px;
 }
 
-.certifications {
-  display: flex;
-  align-items: center;
-  height: 60px;
-  width: 300px;
-  text-align: left;
-  margin-left: 30px;
+ul {
+  padding: 15px;
+  height: 100%;
+  margin: auto;
 }
 
-.cert-info {
-  border-top: 0.5px solid #CCCCCF;
-  padding-top: 30px;
+.wrap-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.contain {
+  margin: 30px 0 0 30px;
+  width: 475px;
+}
+
+.container-content {
+  background-color: #F0F8FD;
+  padding: 30px;
+  text-align: left;
+}
+
+.subheader {
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80px;
+  background-color: #E3F2FD;
+  font-size: 20px;
+
+}
+
+.container-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 20px;
 }
 
 ul {
-  padding: 15px;
+  padding: 0px;
+}
+
+.answer {
+  font-weight: 600;
+}
+
+.answer ul {
+  margin-left: 20px;
 }
 
 .description {
+  margin-top: 15px;
   font-size: 12px;
-  max-width: 500px;
-  margin-left: 30px;
-  margin-bottom: 20px;
-  text-align: left;
+}
+
+.form-control {
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  background-color: #F0F8FD;
+}
+
+.form-control {
+  border-bottom: 3px solid #16D2AA;
+  margin-bottom: 10px;
+}
+
+.form-control:focus {
+  border-bottom: 3px solid #16D2AA;
+  box-shadow: none;
+}
+
+.checkbox label {
+  font-size: 16px;
+}
+
+.cert-info {
+  margin-bottom: 30px;
+}
+
+.resetBtn {
+  background-color: #16D2AA;
+  border-radius: 30px;
+  width: 200px;
+  align-items: center;
+  height: 50px;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.resetBtn a {
+  color: #2C3E50;
+}
+
+.resetBtn a:hover {
+  color: white;
+  text-decoration: none;
+}
+
+.container-content.cert {
+  padding: 0px
+}
+
+.certBox {
+  display: flex;
+  height: 60px;
+  align-items: center;
+  padding-left: 20px;
+  border-bottom: 1px solid #CCCCCF;
+  font-weight: 600;
+}
+
+.certKey {
+  border-radius: 12px;
+  padding: 0 10px;
+  margin: 0 10px 0 0;
+  color: #FFFFFF;
+  font-size: 12px;
+}
+
+.ESL {
+  background-color: #1855D1;
+}
+
+.COLLEGE {
+  background-color: #FED766;
+}
+
+.MATH {
+  background-color: #F7AEF8;
 }
 
 </style>

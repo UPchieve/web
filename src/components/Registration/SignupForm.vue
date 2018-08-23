@@ -18,11 +18,11 @@
       </div>
       <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">SIGN UP</button>
       {{msg}}
-    </div> 
+    </div>
     <div class="successMessage" v-else>
       <p>You’ve been sent a verification email! Use the link in the email to get started.</p>
     </div>
-  </form> 
+  </form>
 </template>
 
 <script>
@@ -65,7 +65,7 @@ export default {
   display: flex;
   justify-content: space-between;
   margin-bottom: 50px;
-  margin-top: 65px;
+  margin-top: 50px;
 }
 .login-link {
   color: #73737A;
@@ -74,11 +74,12 @@ export default {
 .registration-header {
   color: #16D2AA;
   font-weight: 600;
+  padding-left: 140px;
 }
 .description {
   font-size: 12px;
   text-align: left;
-  margin-bottom: 50px;
+  margin-bottom: 10px;
   color: #73737A;
 }
 
@@ -91,8 +92,6 @@ export default {
   display: flex;
   flex-direction: column;
   max-width: 500px;
-  padding: 15px;
-  margin: auto;
 }
 .form-control {
   border: none;
@@ -135,7 +134,7 @@ label {
 
 #userAgreement {
   margin-right: 12px;
-  border: 3px solid #000; 
+  border: 3px solid #000;
   display: inline-block;
 }
 

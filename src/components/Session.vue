@@ -11,48 +11,87 @@
         <chat></chat>
       </div>
     </div>
+
+    <modal warn v-if="showModal"
+      :labels="btnLabels"
+      :message="message"
+      :clickHandlers="clickHandlers"
+    ></modal>
   </div>
 </template>
 
-<script>
 
+<script>
 import SessionService from 'src/services/SessionService';
 import UserService from 'src/services/UserService';
 
 import SessionHeader from './Session/Header';
 import Whiteboard from './Session/Whiteboard';
 import Chat from './Session/Chat';
+import Modal from './molecules/Modal';
 
 export default {
   components: {
     SessionHeader,
     Whiteboard,
-    Chat
+    Chat,
+    Modal
   },
+  /* 
+  * @notes
+  * [1] Refactoring candidate: it'd be awesome if Dashboard could pass 
+  *     the topic directly
+  */
   data(){
     return {
-      sessionId: '',
-      currentSession: SessionService.currentSession
+      currentSession: SessionService.currentSession,
+      showModal: false,
+      btnLabels: [
+        'Submit question',
+        'Exit session'
+      ],
+      message: `
+        We don’t have any Academic Coaches
+        available right now, but you can submit a
+        written question, and we will try to get
+        back to you within 24 hours! Would you
+        like to submit a question now?
+      `,
+      clickHandlers: {
+        main: () => {
+          this.$router.push({
+            path: '/submit-question',
+            query: {
+              topic: this.$route.path.split('/')[2], // [1]
+              subTopic: this.$route.params.subTopic
+            }
+          });
+        },
+        second: () => {
+          this.$router.push('/');
+        }
+      },
+      formLoaderOptions: {
+        formLoaderTop: '0',
+        formLoaderDot1: 'a-loader-1 2s ease-out infinite',
+        formLoaderDot2: 'a-loader-1 1s 2s ease-out infinite'
+      }
     }
   },
   mounted(){
-    var id = this.$route.params.sessionId,
-        promise;
-    var subTopic = this.$route.params.subTopic;
-
-    console.log(id);
-    console.log(subTopic);
+    let id = this.$route.params.sessionId;
+    let promise;
 
     this.sessionId = id;
 
     if (!id){
-      var type;
+      let type;
       if (this.$route.path.indexOf('session/college') !== -1){
         type = 'college'
       } else {
         type = 'math'
       }
-      promise = SessionService.newSession(this, type, subTopic)
+      promise = SessionService.newSession(this, type, this.$route.params.subTopic);
     } else {
       promise = SessionService.useExistingSession(this, id);
     }
@@ -65,6 +104,17 @@ export default {
   			user: UserService.getUser()
   		});
     });
+
+    // Offer the option to ask a question
+    const MODAL_TIMEOUT_MS = 24 * 60 * 60 * 1000;
+    setTimeout(() => {
+      if (
+        !UserService.getUser().isVolunteer && 
+        SessionService.getPartner() === undefined
+      ) {
+        this.showModal = true;
+      }
+    }, MODAL_TIMEOUT_MS);
   },
   beforeRouteLeave(to, from, next){
     let url = '/feedback/' + this.sessionId + '/' + (UserService.getUser().isVolunteer ? 'volunteer' : 'student');
@@ -83,34 +133,39 @@ export default {
 }
 </script>
 
+
 <style scoped>
+  /*
+  * @notes
+  * [1] Refactoring candidate: these styles should be placed in the container
+  *     (we need to rethink the containing model in order to do so)
+  */
+  .session {
+    position: relative; /*[1]*/
+    height: 100%; /*[1]*/
+  }
 
-.session {
-  height: 100%;
-}
+  .session-header-container {
+    position: absolute;
+    left: 0;
+    width: 100%;
+  }
 
-.session-header-container {
-  position: absolute;
-  left: 300px;
-  right: 0;
-  z-index: 1;
-}
+  .session-contents-container {
+    height: 100%;
+    padding-top: 100px;
+  }
 
-.session-contents-container {
-  height: 100%;
-  padding-top: 100px;
-}
+  .whiteboard-container {
+    height: 100%;
+    padding: 0;
+    border-top: 25px solid #EAEAEB;
+    border-left: 25px solid #EAEAEB;
+    border-right: 25px solid #EAEAEB;
+  }
 
-.whiteboard-container {
-  height: 100%;
-  padding: 0;
-  border-top: 25px solid #EAEAEB;
-  border-left: 25px solid #EAEAEB;
-  border-right: 25px solid #EAEAEB;
-}
-
-.chat-container {
-  height: 100%;
-  padding: 0;
-}
+  .chat-container {
+    height: 100%;
+    padding: 0;
+  }
 </style>
