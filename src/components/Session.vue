@@ -31,6 +31,7 @@ export default {
   },
   data(){
     return {
+      sessionId: '',
       currentSession: SessionService.currentSession
     }
   },
@@ -41,6 +42,8 @@ export default {
 
     console.log(id);
     console.log(subTopic);
+
+    this.sessionId = id;
 
     if (!id){
       var type;
@@ -55,6 +58,7 @@ export default {
     }
 
     promise.then( (sessionId) => {
+      this.sessionId = this.currentSession.sessionId;
       this.$socket.connect();
       this.$socket.emit('join', {
   			sessionId: sessionId,
@@ -63,15 +67,17 @@ export default {
     });
   },
   beforeRouteLeave(to, from, next){
-    if (to.path.indexOf('/feedback') !== -1){
+    let url = '/feedback/' + this.sessionId + '/' + (UserService.getUser().isVolunteer ? 'volunteer' : 'student');
+    if (to.path.indexOf(url) !== -1){
       next();
       return;
     }
-    var result = window.confirm('Do you really want to end the session?')
+    var result = window.confirm('Do you really want to end the session?');
     if (result){
       this.$socket.disconnect();
       SessionService.endSession({ skipRoute: true });
-      next('/feedback');
+      let url = '/feedback/' + this.sessionId + '/' + (UserService.getUser().isVolunteer ? 'volunteer' : 'student');
+      next(url);
     }
   }
 }
