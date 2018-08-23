@@ -32,6 +32,12 @@ import UserService from 'src/services/UserService'
 import SessionService from 'src/services/SessionService'
 
 const DEFAULT_AVATAR_URL = 'static/defaultAvatar@2x.png';
+//student
+//http://localhost:8080/static/defaultavatar3.png
+const STUDENT_AVATAR_URL = 'static/defaultavatar3.png';
+//volunteer
+const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png';
+
 
 export default {
 	data(){
@@ -72,8 +78,17 @@ export default {
     messageSend(data){
     	console.log(data);
     	var picture = data.picture;
-    	if (!picture || picture === ''){
-    		picture = DEFAULT_AVATAR_URL
+      if (!picture || picture === ''){
+        if(data.isVolunteer === true){
+
+            picture = VOLUNTEER_AVATAR_URL;
+      
+        }else{
+
+            picture = STUDENT_AVATAR_URL;
+
+        }
+        //picture = DEFAULT_AVATAR_URL
     	}
       this.messages.push({
     		contents: data.contents,
