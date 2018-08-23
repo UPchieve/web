@@ -72,7 +72,7 @@
 
 <script>
   import AuthService from 'src/services/AuthService'
-  import UserService from "../../services/UserService";
+  import UserService from '../../services/UserService';
 
   export default {
     data() {

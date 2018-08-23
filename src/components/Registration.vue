@@ -87,7 +87,6 @@ export default {
   padding: 0px 75px;
 }
 
-<<<<<<< HEAD
 .footer {
   display: flex;
   font-weight: 600;
@@ -102,9 +101,6 @@ export default {
   border-top: 0.5px solid #CCCCCF;
 }
 
-.footer a {
-  color: #73737A;
-=======
 button[type="submit"] {
   background-color: #F6F6F6;
   border: none;
@@ -119,7 +115,6 @@ button[type="submit"] {
 button[type="submit"]:hover, button[type="submit"]:active {
   color: white;
   background-color: #16D2AA;
->>>>>>> new-register
 }
 
 </style>
