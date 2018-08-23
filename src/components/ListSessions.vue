@@ -4,13 +4,13 @@
       <thead>
         <tr>
           <th>Student</th>
-          <th>Help Topic</th>
+          <th>Session type</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="session in openSessions" v-on:click="gotoSession(session)" class="session-row">
           <td>{{session.student.firstname}}</td>
-          <td>{{session.subTopic.charAt(0).toUpperCase() + session.subTopic.substr(1)}}</td>
+          <td>{{session.type}}</td>
         </tr>
       </tbody>
     </table>
@@ -51,7 +51,7 @@ export default {
       for (var i=0; i<socketSessions.length; i++) {
         let currentSession = socketSessions[i];
         if (socketSessions[i].type == 'college') {
-          results.push(currentSession);
+          result.push(currentSession);
           continue;
         }
 

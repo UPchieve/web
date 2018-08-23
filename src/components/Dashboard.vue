@@ -21,6 +21,7 @@
               <select class="form-control topic" v-model="pickedTopic">
                 <option value="math">Math</option>
                 <option value="college">College Counseling</option>
+                <option value="esl">ESL</option>
               </select>
               <select class="form-control subtopic" v-model="pickedSubtopic">
                 <option v-for="subtopic in subtopics[pickedTopic]">{{ subtopic }}</option>
@@ -117,7 +118,7 @@ export default {
       var topic = this.pickedTopic;
       var subTopic = this.pickedSubtopic;
       //Temp change all to math
-      //topic = 'math';
+      topic = 'math';
       topic = topic.toLowerCase();
       subTopic = subTopic.toLowerCase();
       if (subTopic == 'general help') {
