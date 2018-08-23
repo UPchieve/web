@@ -82,6 +82,8 @@ export default {
     let id = this.$route.params.sessionId;
     let promise;
 
+    this.sessionId = id;
+
     if (!id){
       let type;
       if (this.$route.path.indexOf('session/college') !== -1){
@@ -95,6 +97,7 @@ export default {
     }
 
     promise.then( (sessionId) => {
+      this.sessionId = this.currentSession.sessionId;
       this.$socket.connect();
       this.$socket.emit('join', {
   			sessionId: sessionId,
@@ -113,21 +116,18 @@ export default {
       }
     }, MODAL_TIMEOUT_MS);
   },
-  beforeRouteLeave(to, from, next) {
-    if (
-      to.path.indexOf('/feedback') !== -1 ||
-      to.path.indexOf('/submit-question') !== -1
-    ) {
+  beforeRouteLeave(to, from, next){
+    let url = '/feedback/' + this.sessionId + '/' + (UserService.getUser().isVolunteer ? 'volunteer' : 'student');
+    if (to.path.indexOf(url) !== -1){
       next();
       return;
     }
-    else {
-      let result = window.confirm('Do you really want to end the session?');
-      if (result) {
-        this.$socket.disconnect();
-        SessionService.endSession({ skipRoute: true });
-        next('/feedback');
-      }
+    var result = window.confirm('Do you really want to end the session?');
+    if (result){
+      this.$socket.disconnect();
+      SessionService.endSession({ skipRoute: true });
+      let url = '/feedback/' + this.sessionId + '/' + (UserService.getUser().isVolunteer ? 'volunteer' : 'student');
+      next(url);
     }
   }
 }

@@ -62,7 +62,10 @@ export default {
     return context.$http.post(`${API_ROOT}/calendar/get`, data).then(this._successHandler, this._errorHandler);
   },
   updateAvailability(context, data){
-    return context.$http.post(`${API_ROOT}/calendar/save`, data).then(this._successHandler, this._errorHandler);
+    return context.$http.post(`${API_ROOT}/calendar/save`, data).then(this._successHandler, this._errorHandler)
+  },
+  feedback(context, data) {
+    return context.$http.post(`${API_ROOT}/feedback`, data).then(this._successHandler, this._errorHandler)
   },
   createStudentQuestion(context, data) {
     return context.$http.post(`${API_ROOT}/student-questions/create`, data).then(this._successHandler, this._errorHandler);

@@ -4,7 +4,7 @@
       <thead>
         <tr>
           <th>Student</th>
-          <th>Session type</th>
+          <th>Help Topic</th>
         </tr>
       </thead>
       <tbody>
@@ -51,7 +51,7 @@ export default {
       for (var i=0; i<socketSessions.length; i++) {
         let currentSession = socketSessions[i];
         if (socketSessions[i].type == 'college') {
-          result.push(currentSession);
+          results.push(currentSession);
           continue;
         }
 
