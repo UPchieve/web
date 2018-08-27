@@ -15,7 +15,7 @@
 
 1. Create a new branch following the [name convention](#name-convention).
 2. Work on your branch until the task is done.
-3. Make sure that your code works and that it complies with [the standards](CODING_STANDARDS.md).
+3. Make sure that your code works and that it complies with [the standards](coding-standards.md).
 4. Update the documentation if needed.
 5. Submit a PR to be [merged **to the `dev` branch**](https://stackoverflow.com/a/38985999), making sure to comply with the [PR convention](#pr-convention).
 6. Make changes to the PR if requested by the reviewer(s).
@@ -51,7 +51,7 @@
 
 ## PR Convention
 
-- **Keep your PRs clean**, only submit them after making sure that you're complying with our [coding standards](CODING_STANDARDS.md) (run the linter).
+- **Keep your PRs clean**, only submit them after making sure that you're complying with our [coding standards](coding-standards.md) (run the linter).
 - **Don't mix** fix PRs with feature PRs.
 - **Always assign a reviewer**. If you're unsure about whom to ask, then just assign the review to the Director of Technology.
 - **Always explain the edits** you're submitting.
