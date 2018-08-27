@@ -53,7 +53,7 @@
 
 - **Keep your PRs clean**, only submit them after making sure that you're complying with our [coding standards](CODING_STANDARDS.md) (run the linter).
 - **Don't mix** fix PRs with feature PRs.
-- **Always assign a reviewer**. If you're not sure about who to ask, then just assign the review to the Director of Technology.
+- **Always assign a reviewer**. If you're unsure about whom to ask, then just assign the review to the Director of Technology.
 - **Always explain the edits** you're submitting.
 
 **[⬆ back to top](#contents)**
