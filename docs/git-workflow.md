@@ -5,8 +5,8 @@
 ## Contents
 
 1. [Overview](#overview)
-1. [Naming Convention](#naming-Convention)
-1. [PR Convention](#pr-Convention)
+1. [Naming Convention](#naming-convention)
+1. [PR Convention](#pr-convention)
 1. [FAQs](#faqs)
 
 
