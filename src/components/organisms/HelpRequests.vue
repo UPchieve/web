@@ -1,34 +1,42 @@
 <template>
-<div class="help-requests">
-  <table class="help-requests-t">
-    <thead>
-      <tr class="help-requests-t__header">
-        <th>Student</th>
-        <th>Help topic</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody class="help-requests-t__content">
-      <tr 
-        v-for="(req, index) in requests"
-        class="help-request"
-      >
-        <td>
-          <span class="row-avatar"><img :src="req.student.picture" alt="Avatar"></span>
-          {{ req.student.name }}
-        </td>
-        <td>
-          <topic-label :label="req.topic"></topic-label>
-          {{ req.subTopic }}
-        </td>
-        <td>
-          <router-link tag="a" :to="`/send-answer?q=${req._id}`" v-if="type === 'question'">Answer question ›</router-link>
-          <router-link tag="a" :to="`/send-answer?q=${req._id}`" v-if="type === 'session'">Help student ›</router-link>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+  <div class="help-requests">
+    <table class="help-requests-t">
+      <thead>
+        <tr class="help-requests-t__header">
+          <th>Student</th>
+          <th>Help topic</th>
+          <th/>
+        </tr>
+      </thead>
+      <tbody class="help-requests-t__content">
+        <tr
+          v-for="(req, index) in requests"
+          class="help-request"
+        >
+          <td>
+            <span class="row-avatar"><img
+              :src="req.student.picture"
+              alt="Avatar"></span>
+            {{ req.student.name }}
+          </td>
+          <td>
+            <topic-label :label="req.topic"/>
+            {{ req.subTopic }}
+          </td>
+          <td>
+            <router-link
+              v-if="type === 'question'"
+              :to="`/send-answer?q=${req._id}`"
+              tag="a">Answer question ›</router-link>
+            <router-link
+              v-if="type === 'session'"
+              :to="`/send-answer?q=${req._id}`"
+              tag="a">Help student ›</router-link>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 
@@ -46,7 +54,7 @@ import TopicLabel from '../atoms/TopicLabel';
 *             avatar: String
 *           },
 *           helpTopic: < math | college >,
-*           helpSubtopic: 
+*           helpSubtopic:
 *             < Algebra | Geometry | Trigonometry | Precalculus | Calculus >
 *             < Planning | Essays | Applications >
 *         }
@@ -54,18 +62,18 @@ import TopicLabel from '../atoms/TopicLabel';
 */
 export default {
   components: {
-    TopicLabel
+    TopicLabel,
   },
   props: {
-    helpRequests: Object // [1]
+    helpRequests: Object, // [1]
   },
   data() {
     return {
       type: this.helpRequests.type,
-      requests: this.helpRequests.requests 
-    }
-  }
-}
+      requests: this.helpRequests.requests,
+    };
+  },
+};
 </script>
 
 

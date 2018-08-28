@@ -3,12 +3,6 @@ import VueResource from 'vue-resource';
 import VueRouter from 'vue-router';
 import VueSocketio from 'vue-socket.io';
 
-Vue.use(VueResource)
-Vue.use(VueRouter)
-Vue.use(VueSocketio, process.env.SOCKET_ADDRESS);
-
-Vue.http.options.credentials = true;
-
 import Contact from './components/Contact';
 import Legal from './components/Legal';
 import Logout from './components/Logout';
@@ -37,14 +31,24 @@ import SendAnswer from './components/views/SendAnswer';
 import AuthService from './services/AuthService';
 import OnboardingService from './services/OnboardingService';
 
+import App from './App';
+
+Vue.use(VueResource);
+Vue.use(VueRouter);
+Vue.use(VueSocketio, process.env.SOCKET_ADDRESS);
+
+Vue.http.options.credentials = true;
+
 const routes = [
-  { path: '/', redirect: () => {
-    if (AuthService.user.authenticated){
-      return '/dashboard';
-    } else {
+  {
+    path: '/',
+    redirect: () => {
+      if (AuthService.user.authenticated) {
+        return '/dashboard';
+      }
       return '/login';
-    }
-  }},
+    },
+  },
   { path: '/contact', component: Contact },
   { path: '/legal', component: Legal },
   { path: '/login', component: LoginForm },
@@ -52,7 +56,7 @@ const routes = [
   { path: '/signup', component: Registration },
   { path: '/resetpassword', component: ResetPasswordForm },
   { path: '/setpassword/:token', component: SetPasswordForm },
-  { path: '/upload', component: Upload, meta: {protected: true} },
+  { path: '/upload', component: Upload, meta: { protected: true } },
   { path: '/dashboard', component: Dashboard, meta: { protected: true } },
   { path: '/session/math/:subTopic/:sessionId?', component: Session, meta: { protected: true } },
   { path: '/session/college/:subTopic/:sessionId?', component: Session, meta: { protected: true } },
@@ -68,39 +72,39 @@ const routes = [
   { path: '/calendar', component: Calendar },
   { path: '/submit-question', component: SubmitQuestion, meta: { protected: true } },
   { path: '/inbox', component: Inbox, meta: { protected: true } },
-  { path: '/send-answer', component: SendAnswer, meta: { protected: true } }
+  { path: '/send-answer', component: SendAnswer, meta: { protected: true } },
 ];
 
 const router = new VueRouter({
   routes,
-  linkActiveClass: 'active'
+  linkActiveClass: 'active',
 });
 
-export {router}; // Expose router to app controllers
+export { router }; // Expose router to app controllers
 
 // Router middleware to check authentication for protect routes
 
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(route => route.meta.protected)){
-    if (!AuthService.user.authenticated){
+  if (to.matched.some(route => route.meta.protected)) {
+    if (!AuthService.user.authenticated) {
       console.log('Protected route requires login');
       next({
         path: '/login',
         query: {
-          redirect: to.fullPath
-        }
+          redirect: to.fullPath,
+        },
       });
-    } else if (!OnboardingService.isOnboarded()){
+    } else if (!OnboardingService.isOnboarded()) {
       console.log('User requires onboarding');
-      var route = OnboardingService.getOnboardingRoute();
-      if (to.path.indexOf(route) !== -1 || to.matched.some(route => route.meta.bypassOnboarding)){
+      const route = OnboardingService.getOnboardingRoute();
+      if (to.path.indexOf(route) !== -1 || to.matched.some(route => route.meta.bypassOnboarding)) {
         next();
       } else {
         next({
           path: route,
           query: {
-            redirect: to.fullPath
-          }
+            redirect: to.fullPath,
+          },
         });
       }
     } else {
@@ -112,21 +116,19 @@ router.beforeEach((to, from, next) => {
 });
 
 // If endpoint returns 401, redirect to login (except for requests to get user's session)
-Vue.http.interceptors.push(function(request, next) {
-  next(function(response){
-    if (response.status === 401 && !(request.url.indexOf('/api/user') !== -1 && request.method === 'GET')){
+Vue.http.interceptors.push((request, next) => {
+  next((response) => {
+    if (response.status === 401 && !(request.url.indexOf('/api/user') !== -1 && request.method === 'GET')) {
       AuthService.removeUser();
       router.push('/login?401=true');
     }
   });
 });
 
-import App from './App'
-
 /* eslint-disable no-new */
 new Vue({
   router,
   el: '#app',
+  components: { App },
   template: '<App/>',
-  components: { App }
-})
+});

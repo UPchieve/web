@@ -1,30 +1,41 @@
 <template>
-<div class="message-form">
-  <form class="question-form" onsubmit="return false;">
-    <div class="form-body">
-      <label for="message">{{ textareaLabel }}</label>      
-      <textarea name="message" id="message"></textarea>
-      <label for="">Attach a file (Optional - 7MB Max)</label>
-      <input type="file" id="file" name="file" v-on:change="changeHandler">
-      <btn big label="Upload a file" :clickHandler="attachFile"></btn>
-      <ul class="file-list">
-        <li v-for="file in fileList">{{ file }}</li>
-      </ul>
-    </div>
-    <btn-options 
-      mainBtnLabel="Submit" 
-      secondBtnLabel="Cancel" 
-      :clickHandlers="btnOptionsClickHandlers"
-    ></btn-options>
-    <div class="form-loader">
-      <div class="form-loader__dot"></div>
-      <div class="form-loader__dot"></div>
-      <div class="form-loader__msg">
-        Sending...
+  <div class="message-form">
+    <form
+      class="question-form"
+      onsubmit="return false;">
+      <div class="form-body">
+        <label for="message">{{ textareaLabel }}</label>
+        <textarea
+          id="message"
+          name="message"/>
+        <label for="">Attach a file (Optional - 7MB Max)</label>
+        <input
+          id="file"
+          type="file"
+          name="file"
+          @change="changeHandler">
+        <btn
+          :click-handler="attachFile"
+          big
+          label="Upload a file"/>
+        <ul class="file-list">
+          <li v-for="file in fileList">{{ file }}</li>
+        </ul>
       </div>
-    </div>
-  </form>
-</div>
+      <btn-options
+        :click-handlers="btnOptionsClickHandlers"
+        main-btn-label="Submit"
+        second-btn-label="Cancel"
+      />
+      <div class="form-loader">
+        <div class="form-loader__dot"/>
+        <div class="form-loader__dot"/>
+        <div class="form-loader__msg">
+          Sending...
+        </div>
+      </div>
+    </form>
+  </div>
 </template>
 
 
@@ -39,40 +50,40 @@ import Btn from '../atoms/Btn';
 import Attachment from '../atoms/Attachment';
 
 function isValid() {
-  let valid = document.getElementById('message').value !== '' ? true : false;
+  const valid = document.getElementById('message').value !== '';
   return valid;
 }
 
 function buildFormDataObjSubmitQuestion(context) {
-  let user = UserService.getUser();
+  const user = UserService.getUser();
 
-  let questionObj = new FormData();
-      questionObj.append(
-        'topic', 
-        context.$route.query.topic.charAt(0).toUpperCase() + 
-        context.$route.query.topic.slice(1)
-      );
-      questionObj.append(
-        'subTopic', 
-        context.$route.query.subTopic.charAt(0).toUpperCase() + 
-        context.$route.query.subTopic.slice(1)
-      );
-      questionObj.append(
-        'student',
-        `{ name: ${user.name}, email: ${user.email}, picture: ${user.picture} }`
-      );
-      questionObj.append('content', document.getElementById('message').value);
-      questionObj.append('attachments', document.getElementById('file').files[0]);
+  const questionObj = new FormData();
+  questionObj.append(
+    'topic',
+    context.$route.query.topic.charAt(0).toUpperCase()
+        + context.$route.query.topic.slice(1),
+  );
+  questionObj.append(
+    'subTopic',
+    context.$route.query.subTopic.charAt(0).toUpperCase()
+        + context.$route.query.subTopic.slice(1),
+  );
+  questionObj.append(
+    'student',
+    `{ name: ${user.name}, email: ${user.email}, picture: ${user.picture} }`,
+  );
+  questionObj.append('content', document.getElementById('message').value);
+  questionObj.append('attachments', document.getElementById('file').files[0]);
 
   return questionObj;
 }
 
 function buildFormDataObjSendAnswer(context) {
-  let answerObj = new FormData();
-      answerObj.append('userEmail', context.user.email);
-      answerObj.append('questionId', context.$route.query.q);
-      answerObj.append('answerContent', document.getElementById('message').value);
-      answerObj.append('attachments', document.getElementById('file').files[0]);
+  const answerObj = new FormData();
+  answerObj.append('userEmail', context.user.email);
+  answerObj.append('questionId', context.$route.query.q);
+  answerObj.append('answerContent', document.getElementById('message').value);
+  answerObj.append('attachments', document.getElementById('file').files[0]);
   return answerObj;
 }
 
@@ -81,13 +92,13 @@ function showModalRetry(context) {
   context.modalContainer.modalOptions = {
     singleBtn: true,
     warn: true,
-    message: 'There was a problem sending the message'
+    message: 'There was a problem sending the message',
   };
   context.modalContainer.modalClickHandlers = {
     main: () => {
       context.hideLoader();
       context.modalContainer.showModal = false;
-    }
+    },
   };
 }
 
@@ -96,20 +107,20 @@ function showModalSuccess(context, message) {
   context.modalContainer.modalOptions = {
     singleBtn: true,
     warn: false,
-    message: message
+    message,
   };
   context.modalContainer.modalClickHandlers = {
     main: () => {
       context.$router.push('/');
-    }
-  }
+    },
+  };
 }
 
 export default {
   components: {
     BtnOptions,
     Btn,
-    Attachment
+    Attachment,
   },
   props: {
     textareaLabel: String,
@@ -121,9 +132,9 @@ export default {
       fileList: [],
       btnOptionsClickHandlers: {
         main: this.submitForm,
-        second: this.cancel
-      }
-    }
+        second: this.cancel,
+      },
+    };
   },
   methods: {
 
@@ -143,13 +154,13 @@ export default {
         warn: true,
         message: `
           Message is empty!
-        `
+        `,
       };
       this.modalContainer.modalBtnLabels = ['Write message'];
       this.modalContainer.modalClickHandlers = {
         main: () => {
           this.modalContainer.showModal = false;
-        }
+        },
       };
       this.modalContainer.showModal = true;
     },
@@ -166,9 +177,8 @@ export default {
     showResponseStateSubmitQuestion(res) {
       if (res === 'notSent') {
         showModalRetry(this);
-      }
-      else {
-        let message = `
+      } else {
+        const message = `
           Thanks for submitting your question! You will receive a response to 
           your email address as soon as possible.
         `;
@@ -179,9 +189,8 @@ export default {
     showResponseStateSendAnswer(res) {
       if (res === 'notSent') {
         showModalRetry(this);
-      }
-      else {
-        let message = 'Your answer has been sent!';
+      } else {
+        const message = 'Your answer has been sent!';
         showModalSuccess(this, message);
       }
       this.modalContainer.showModal = true;
@@ -193,16 +202,16 @@ export default {
     },
     submitFormSubmitQuestion(formDataObj) {
       StudentQuestionService.createStudentQuestion(this, formDataObj).then(
-        (res) => { 
+        (res) => {
           this.showResponseStateSubmitQuestion(res);
-        }
+        },
       );
     },
     submitFormSendAnswer(formDataObj) {
       StudentQuestionService.answerStudentQuestion(this, formDataObj).then(
-        (res) => { 
+        (res) => {
           this.showResponseStateSendAnswer(res);
-        }
+        },
       );
     },
     submitForm(e) {
@@ -210,20 +219,18 @@ export default {
 
       if (isValid()) {
         this.showLoader();
-        
+
         if (this.typeOfForm === 'submit-question') {
           this.submitFormSubmitQuestion(buildFormDataObjSubmitQuestion(this));
-        }
-        else if (this.typeOfForm === 'send-answer') {
+        } else if (this.typeOfForm === 'send-answer') {
           this.submitFormSendAnswer(buildFormDataObjSendAnswer(this.modalContainer));
         }
-      }      
-      else {
+      } else {
         this.askForAMessage();
       }
     },
-  }
-}
+  },
+};
 </script>
 
 

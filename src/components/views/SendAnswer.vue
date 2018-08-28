@@ -1,34 +1,41 @@
 <template>
-<div v-if="user.isVolunteer" class="send-answer">
-  <basic-template headerTitle="Answer question">
-    <div class="question">
-      <div class="question__content">
-        {{ question.content }}
-      </div>
-      <div class="question__author">
-        {{ question.student.name }}
-      </div>
-      <div v-if="hasAttachments" class="attachment-list">
-        <div class="attachment-list__icon"></div>
-        <div class="attachment-list__content" @click="downloadFile()">
-          {{ question.attachments[0] }}
+  <div
+    v-if="user.isVolunteer"
+    class="send-answer">
+    <basic-template header-title="Answer question">
+      <div class="question">
+        <div class="question__content">
+          {{ question.content }}
+        </div>
+        <div class="question__author">
+          {{ question.student.name }}
+        </div>
+        <div
+          v-if="hasAttachments"
+          class="attachment-list">
+          <div class="attachment-list__icon"/>
+          <div
+            class="attachment-list__content"
+            @click="downloadFile()">
+            {{ question.attachments[0] }}
+          </div>
         </div>
       </div>
-    </div>
-    <message-form 
-      textareaLabel="Write your answer below"
-      :modalContainer="this"
-      typeOfForm="send-answer"
-    ></message-form>
-  </basic-template>
-  <modal v-if="showModal" 
-    singleBtn 
-    :warn="modalOptions.warn"
-    :message="modalOptions.message"
-    :labels="modalBtnLabels"
-    :clickHandlers="modalClickHandlers"
-  ></modal>
-</div>
+      <message-form
+        :modal-container="this"
+        textarea-label="Write your answer below"
+        type-of-form="send-answer"
+      />
+    </basic-template>
+    <modal
+      v-if="showModal"
+      :warn="modalOptions.warn"
+      :message="modalOptions.message"
+      :labels="modalBtnLabels"
+      :click-handlers="modalClickHandlers"
+      single-btn
+    />
+  </div>
 </template>
 
 
@@ -45,7 +52,7 @@ export default {
   components: {
     BasicTemplate,
     MessageForm,
-    Modal
+    Modal,
   },
   data() {
     return {
@@ -57,8 +64,17 @@ export default {
       showModal: false,
       modalBtnLabels: [],
       modalOptions: {},
-      modalClickHandlers: {}
-    }
+      modalClickHandlers: {},
+    };
+  },
+  beforeCreate() {
+    StudentQuestionService.getStudentQuestions(this, { _id: this.$route.query.q })
+      .then(
+        (questions) => {
+          this.question = questions[0];
+          this.hasAttachments = this.question.attachments.length > 0;
+        },
+      );
   },
   methods: {
     downloadFile() {
@@ -66,24 +82,15 @@ export default {
         .then(
           (res) => {
             DownloadService.openDownloadDialog(
-              res.body, 
-              this.question.attachments[0], 
-              res.headers.map['content-type']
+              res.body,
+              this.question.attachments[0],
+              res.headers.map['content-type'],
             );
-          }
+          },
         );
     },
   },
-  beforeCreate() {
-    StudentQuestionService.getStudentQuestions(this, { _id: this.$route.query.q })
-      .then(
-        (questions) => {
-          this.question = questions[0];
-          this.hasAttachments = this.question.attachments.length > 0 ? true : false;
-        }
-      );
-  }
-}
+};
 </script>
 
 

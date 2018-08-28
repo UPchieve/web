@@ -1,6 +1,6 @@
 <template>
-  <div v-bind:class="{ background: !auth.authenticated && !user.verified}">
-    <full-text-template headerTitle="Legal Policy">
+  <div :class="{ background: !auth.authenticated && !user.verified}">
+    <full-text-template header-title="Legal Policy">
       <section>
         <h2>Disclaimer</h2>
 
@@ -292,25 +292,27 @@
 </template>
 
 <script>
+import UserService from 'src/services/UserService';
 import FullTextTemplate from './organisms/FullTextTemplate';
 import Accordion from './organisms/Accordion';
 import AccordionItem from './molecules/AccordionItem';
-import UserService from 'src/services/UserService';
 
 export default {
   components: {
     FullTextTemplate,
     Accordion,
-    AccordionItem
+    AccordionItem,
   },
   data() {
-		let auth = UserService.getAuth(),
-        user = UserService.getUser()
-		return {
-			auth, user
-		}
-	}
-}
+    const auth = UserService.getAuth();
+
+
+    const user = UserService.getUser();
+    return {
+      auth, user,
+    };
+  },
+};
 </script>
 
 <style>

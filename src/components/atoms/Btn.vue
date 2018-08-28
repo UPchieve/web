@@ -1,7 +1,9 @@
 <template>
-<button :class="classes" @click="clickHandler">
-  {{ label }}
-</button>    
+  <button
+    :class="classes"
+    @click="clickHandler">
+    {{ label }}
+  </button>
 </template>
 
 
@@ -11,18 +13,18 @@ export default {
     label: String,
     btnOptionsSecond: Boolean,
     big: Boolean,
-    clickHandler: Function
+    clickHandler: Function,
   },
   data() {
     return {
       classes: {
         'v-btn': true,
         'v-btn--btn-options-second': this.btnOptionsSecond,
-        'v-btn--big': this.big
-      }
-    } 
-  }
-}
+        'v-btn--big': this.big,
+      },
+    };
+  },
+};
 </script>
 
 
@@ -57,12 +59,12 @@ export default {
   max-width: 512px;
 }
 .v-btn--btn-options-second { /*[1]*/
-  margin-top: 16px; 
+  margin-top: 16px;
 }
 
 @media screen and (min-width: 700px) {
   .v-btn--btn-options-second {
-    margin-top: 0; 
+    margin-top: 0;
     margin-right: 20px;
   }
 }

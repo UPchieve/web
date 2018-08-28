@@ -1,8 +1,13 @@
 <template>
-<div class="btn-options">
-  <btn btnOptionsSecond :label="secondBtnLabel" :clickHandler="clickHandlers.second"></btn>
-  <btn :label="mainBtnLabel" :clickHandler="clickHandlers.main"></btn>
-</div>
+  <div class="btn-options">
+    <btn
+      :label="secondBtnLabel"
+      :click-handler="clickHandlers.second"
+      btn-options-second/>
+    <btn
+      :label="mainBtnLabel"
+      :click-handler="clickHandlers.main"/>
+  </div>
 </template>
 
 
@@ -11,14 +16,14 @@ import Btn from '../atoms/Btn';
 
 export default {
   components: {
-    Btn
+    Btn,
   },
   props: {
     mainBtnLabel: String,
     secondBtnLabel: String,
-    clickHandlers: Object
-  }
-}
+    clickHandlers: Object,
+  },
+};
 </script>
 
 

@@ -1,17 +1,19 @@
 <template>
   <nav class="navbar">
-    <router-link tag="h1" to="/"></router-link>
+    <router-link
+      tag="h1"
+      to="/"/>
     <div v-if="auth.authenticated">
-      <profile-info v-if="auth.authenticated"></profile-info>
+      <profile-info v-if="auth.authenticated"/>
       <div id="navbar">
-        <user-nav></user-nav>
+        <user-nav/>
       </div>
     </div>
     <div v-else>
       <p class="aboutText">UPchieve is a volunteer-run ed-tech initiative with the goal of providing free, online, and on-demand educational and guidance services to disadvantaged students.</p>
     </div>
     <div class="navbar-footer">
-      <sidebar-footer></sidebar-footer>
+      <sidebar-footer/>
     </div>
   </nav>
 </template>
@@ -28,14 +30,14 @@ export default {
   components: {
     UserNav,
     ProfileInfo,
-    SidebarFooter: Footer // footer is reserved component name
+    SidebarFooter: Footer, // footer is reserved component name
   },
   data() {
     return {
-      auth: UserService.getAuth()
-    }
-  }
-}
+      auth: UserService.getAuth(),
+    };
+  },
+};
 </script>
 
 <style scoped>

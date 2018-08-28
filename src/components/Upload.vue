@@ -1,48 +1,52 @@
 <template>
-  <div class='cloudwok-embed' data-wokid='XnMj'>
-    <div class='cloudwok-upload-files'></div>
-    <form class='cloudwok-upload'>
-        <div class='cloudwok-dropzone'></div>
+  <div
+    class="cloudwok-embed"
+    data-wokid="XnMj">
+    <div class="cloudwok-upload-files"/>
+    <form class="cloudwok-upload">
+      <div class="cloudwok-dropzone"/>
     </form>
   </div>
 </template>
 
 <script>
-var cloudWokConfig = {
-    'dropzone': {
-        'label': 'DRAG N DROP',
-        'button': 'ADD FILES'
+const cloudWokConfig = {
+  dropzone: {
+    label: 'DRAG N DROP',
+    button: 'ADD FILES',
+  },
+  success: {
+    message: {
+      title: 'File successfully uploaded!',
+      subtitle: '',
+      text: 'Your volunteer can find the file now. Let them know it has been successfully uploaded.',
+      button: 'OK',
+      noButtonOwnCW: true,
+      dontpopup: false,
+      dontslideup: true,
+      dontfadeout: true,
     },
-    'success': {
-        'message': {
-            'title': 'File successfully uploaded!',
-            'subtitle': '',
-            'text': 'Your volunteer can find the file now. Let them know it has been successfully uploaded.',
-            'button': 'OK',
-            'noButtonOwnCW': true,
-            'dontpopup': false,
-            'dontslideup': true,
-            'dontfadeout': true
-        },
-        'redirect': ''
-    }
+    redirect: '',
+  },
 };
 
 export default {
-  mounted(){
+  mounted() {
     document.querySelector('.cloudwok-embed').setAttribute('data-config', JSON.stringify(cloudWokConfig));
-    (function(window, document) {
-      var loader = function() {
-        var script = document.createElement('script'),
-        tag = document.getElementsByTagName('script')[0];
+    (function (window, document) {
+      const loader = function () {
+        const script = document.createElement('script');
+
+
+        const tag = document.getElementsByTagName('script')[0];
         script.src = 'https://www.cloudwok.com/cdn-vassets/javascripts/cw.js';
         tag.parentNode.insertBefore(script, tag);
-        };
-      window.addEventListener ? window.addEventListener('load', loader, false) :
-      window.attachEvent('onload', loader);
-    })(window, document);
-  }
-}
+      };
+      window.addEventListener ? window.addEventListener('load', loader, false)
+        : window.attachEvent('onload', loader);
+    }(window, document));
+  },
+};
 </script>
 
 <style scoped>

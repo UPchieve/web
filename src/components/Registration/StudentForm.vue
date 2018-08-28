@@ -1,49 +1,89 @@
 <template>
   <form class="form-signup">
     <div class="header">
-      <router-link to="login" class="login-link">Log In</router-link>
+      <router-link
+        to="login"
+        class="login-link">Log In</router-link>
       <div class="registration-header">Register an Account</div>
     </div>
     <div>
       <div v-if="step==='step-1'">
-        <div class="step-1-text" colspan="2"><b>Step 1 of 2: Choose your log-in details </b></div>
+        <div
+          class="step-1-text"
+          colspan="2"><b>Step 1 of 2: Choose your log-in details </b></div>
         <label for="inputEmail">What's your email?</label>
-        <input type="email" id="inputEmail" class="form-control" required autofocus v-model="credentials.email">
+        <input
+          id="inputEmail"
+          v-model="credentials.email"
+          type="email"
+          class="form-control"
+          required
+          autofocus>
         <div class="description">We will only use your email to contact you about your account. See our Privacy Policy for more info.</div>
         <label for="inputPassword">Create a password.</label>
-        <input type="password" id="inputPassword" class="form-control" required v-model="credentials.password">
+        <input
+          id="inputPassword"
+          v-model="credentials.password"
+          type="password"
+          class="form-control"
+          required>
         <p class="password-guidelines">Keep your account safe by choosing a password with one number, one uppercase letter, and one lowercase letter.</p>
-        <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="nextPage()">CONTINUE</button>
-        {{msg}}
+        <button
+          class="btn btn-lg btn-primary btn-block"
+          type="submit"
+          @click.prevent="nextPage()">CONTINUE</button>
+        {{ msg }}
       </div>
       <div v-else-if="step==='step-2'">
         <table class="step-2-table">
           <tr>
-            <td class="table-entry" colspan="2"><b>Step 2 of 2: Tell us about yourself! </b></td>
+            <td
+              class="table-entry"
+              colspan="2"><b>Step 2 of 2: Tell us about yourself! </b></td>
           </tr>
           <tr class="question-row">
-            <td class="table-entry" colspan="2">What's your name?</td>
+            <td
+              class="table-entry"
+              colspan="2">What's your name?</td>
           </tr>
           <tr>
-            <td style="padding-right: 15px;"><input class="form-control" required autofocus v-model="profile.firstName"></td>
-            <td style="padding-left: 15px;"><input class="form-control" required autofocus v-model="profile.lastName"></td>
+            <td style="padding-right: 15px;"><input
+              v-model="profile.firstName"
+              class="form-control"
+              required
+              autofocus></td>
+            <td style="padding-left: 15px;"><input
+              v-model="profile.lastName"
+              class="form-control"
+              required
+              autofocus></td>
           </tr>
           <tr>
             <td class="table-entry"><div class="description">First Name</div></td>
             <td class="table-entry"><div class="description">Last Name</div></td>
           </tr>
           <tr class="question-row">
-            <td class="table-entry" colspan="2">What high school did you go to?</td>
+            <td
+              class="table-entry"
+              colspan="2">What high school did you go to?</td>
           </tr>
           <tr>
-            <td colspan="2"><input class="form-control" required autofocus v-model="profile.highSchool"></td>
+            <td colspan="2"><input
+              v-model="profile.highSchool"
+              class="form-control"
+              required
+              autofocus></td>
           </tr>
           <tr class="question-row">
-            <td class="table-entry" colspan="2">How did you hear about us?</td>
+            <td
+              class="table-entry"
+              colspan="2">How did you hear about us?</td>
           </tr>
           <tr>
             <td colspan="2">
-              <select class="form-control topic" v-model="profile.heardFrom">
+              <select
+                v-model="profile.heardFrom"
+                class="form-control topic">
                 <option value="Flyer">Flyer</option>
                 <option value="Email">Email</option>
                 <option value="Internet search">Internet search</option>
@@ -57,13 +97,24 @@
           </tr>
           <tr>
             <div class="agreement-box">
-              <input type="checkbox" id="userAgreement" v-model="credentials.terms" required>
-              <label id='agreement' for="userAgreement"></label>
-              <div class="agreement-label">I have read and accept the <a href="#/legal" target="_blank">user agreement</a>.</div>
+              <input
+                id="userAgreement"
+                v-model="credentials.terms"
+                type="checkbox"
+                required>
+              <label
+                id="agreement"
+                for="userAgreement"/>
+              <div class="agreement-label">I have read and accept the <a
+                href="#/legal"
+                target="_blank">user agreement</a>.</div>
             </div>
           </tr>
         </table>
-        <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">SIGN UP</button>
+        <button
+          class="btn btn-lg btn-primary btn-block"
+          type="submit"
+          @click.prevent="submit()">SIGN UP</button>
       </div>
       <div v-else>Unexpected Error</div>
     </div>
@@ -71,58 +122,58 @@
 </template>
 
 <script>
-  import AuthService from 'src/services/AuthService'
-  import UserService from '../../services/UserService';
+import AuthService from 'src/services/AuthService';
+import UserService from '../../services/UserService';
 
-  export default {
-    data() {
-      return {
-        msg: '',
-        credentials: {
-          email: '',
-          password: '',
-          terms: false
-        },
-        profile: {
-          firstName: '',
-          lastName: '',
-          highSchool: '',
-          heardFrom: ''
-        },
-        step: 'step-1'
-      }
-    },
-    methods: {
-      nextPage() {
-        AuthService.checkRegister(this, {
-          email: this.credentials.email,
-          password: this.credentials.password
-        }).then(() => {
-          this.step = 'step-2';
-        }).catch((err) => {
-          this.msg = err.message;
-        })
+export default {
+  data() {
+    return {
+      msg: '',
+      credentials: {
+        email: '',
+        password: '',
+        terms: false,
       },
-      submit() {
-        AuthService.register(this, {
-          code: undefined,
-          email: this.credentials.email,
-          password: this.credentials.password,
-          terms: this.credentials.terms
-        }).then(() => {
-          let user = UserService.getUser();
-          user.firstname = this.profile.firstName;
-          user.lastname = this.profile.lastName;
-          user.highschool = this.profile.highSchool;
-          user.heardFrom = this.profile.heardFrom;
-          UserService.setProfile(this, user, '/');
-        }).catch((err) => {
-          console.log(err);
-          this.msg = err.message;
-        })
-      }
-    }
-  }
+      profile: {
+        firstName: '',
+        lastName: '',
+        highSchool: '',
+        heardFrom: '',
+      },
+      step: 'step-1',
+    };
+  },
+  methods: {
+    nextPage() {
+      AuthService.checkRegister(this, {
+        email: this.credentials.email,
+        password: this.credentials.password,
+      }).then(() => {
+        this.step = 'step-2';
+      }).catch((err) => {
+        this.msg = err.message;
+      });
+    },
+    submit() {
+      AuthService.register(this, {
+        code: undefined,
+        email: this.credentials.email,
+        password: this.credentials.password,
+        terms: this.credentials.terms,
+      }).then(() => {
+        const user = UserService.getUser();
+        user.firstname = this.profile.firstName;
+        user.lastname = this.profile.lastName;
+        user.highschool = this.profile.highSchool;
+        user.heardFrom = this.profile.heardFrom;
+        UserService.setProfile(this, user, '/');
+      }).catch((err) => {
+        console.log(err);
+        this.msg = err.message;
+      });
+    },
+  },
+};
 </script>
 
 <style scoped>

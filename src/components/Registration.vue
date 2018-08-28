@@ -2,15 +2,23 @@
   <div class="registration-container background">
     <div class="form-register">
 
-      <volunteer-form v-if="this.userSelection === 'volunteer'"></volunteer-form>
-      <student-form v-else-if="this.userSelection === 'student'"></student-form>
+      <volunteer-form v-if="this.userSelection === 'volunteer'"/>
+      <student-form v-else-if="this.userSelection === 'student'"/>
       <div v-else>
         <div class="header">
-          <router-link to="login" class="login-link">Log In</router-link>
+          <router-link
+            to="login"
+            class="login-link">Log In</router-link>
           <div class="registration-header">Register an Account</div>
         </div>
-        <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="selectStudent()">STUDENT</button>
-        <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="selectVolunteer()">VOLUNTEER</button>
+        <button
+          class="btn btn-lg btn-primary btn-block"
+          type="submit"
+          @click.prevent="selectStudent()">STUDENT</button>
+        <button
+          class="btn btn-lg btn-primary btn-block"
+          type="submit"
+          @click.prevent="selectVolunteer()">VOLUNTEER</button>
       </div>
     </div>
   </div>
@@ -24,11 +32,11 @@ import VolunteerForm from './Registration/VolunteerForm';
 export default {
   components: {
     StudentForm,
-    VolunteerForm
+    VolunteerForm,
   },
-  data(){
+  data() {
     return {
-      userSelection: null
+      userSelection: null,
     };
   },
   methods: {
@@ -37,9 +45,9 @@ export default {
     },
     selectStudent() {
       this.userSelection = 'student';
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>

@@ -1,31 +1,32 @@
 <template>
-<div class="full-text-template">
-  <content-header :headerTitle="headerTitle"></content-header>  
-  <div class="full-text-template__content">
-    <div class="full-text-template__wrap">
-      <slot></slot>
+  <div class="full-text-template">
+    <content-header :header-title="headerTitle"/>
+    <div class="full-text-template__content">
+      <div class="full-text-template__wrap">
+        <slot/>
+      </div>
     </div>
   </div>
-</div>
 </template>
 
 
 <script>
 import ContentHeader from '../atoms/ContentHeader';
+
 export default {
   components: {
-    ContentHeader
+    ContentHeader,
   },
   props: {
-    headerTitle: String
+    headerTitle: String,
   },
   data() {
     return {
-    }
+    };
   },
   methods: {
-  }
-}
+  },
+};
 </script>
 
 
@@ -45,7 +46,7 @@ section {
 
 /*
 * @notes
-* [1] Refactoring candidate: this shoudln't be done, but I had to do it since 
+* [1] Refactoring candidate: this shoudln't be done, but I had to do it since
 *     Bootstap interferes with this :/
 */
 .full-text-template__content h2 { /* [1] */

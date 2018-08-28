@@ -1,12 +1,14 @@
 <template>
-<div v-if="user.isVolunteer" class="inbox">
-  <div class="tabular-template">
-    <content-header headerTitle="Answer Questions"></content-header>
-    <div class="tabular-template__content">
-      <help-requests :helpRequests="helpRequests"></help-requests>
+  <div
+    v-if="user.isVolunteer"
+    class="inbox">
+    <div class="tabular-template">
+      <content-header header-title="Answer Questions"/>
+      <div class="tabular-template__content">
+        <help-requests :help-requests="helpRequests"/>
+      </div>
     </div>
   </div>
-</div>
 </template>
 
 
@@ -20,16 +22,16 @@ import HelpRequests from '../organisms/HelpRequests';
 export default {
   components: {
     ContentHeader,
-    HelpRequests
+    HelpRequests,
   },
   data() {
     return {
       user: UserService.getUser(),
       helpRequests: {
         type: 'question',
-        requests: []
-      }
-    }
+        requests: [],
+      },
+    };
   },
   mounted() {
     StudentQuestionService.getStudentQuestions(this, {}).then((questions) => {
@@ -37,8 +39,8 @@ export default {
         this.helpRequests.requests.push(question);
       });
     });
-  }
-}
+  },
+};
 </script>
 
 

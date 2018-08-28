@@ -8,16 +8,16 @@
 <script>
 export default {
   props: {
-    headerTitle: String
-  }
-}
+    headerTitle: String,
+  },
+};
 </script>
 
 
 <style>
 /*
 * @notes
-* [1] Refactoring candidate: this shoudln't be done, but I had to do it since 
+* [1] Refactoring candidate: this shoudln't be done, but I had to do it since
 *     Bootstap interferes with this :/
 */
 .content-header {

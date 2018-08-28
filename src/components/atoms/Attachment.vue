@@ -1,14 +1,14 @@
 <template>
-<li class="attachment"><span class="attachment__icon logout">I</span> {{ filename }}</li>
+  <li class="attachment"><span class="attachment__icon logout">I</span> {{ filename }}</li>
 </template>
 
 
 <script>
 export default {
   props: {
-    filename: String
-  }
-}
+    filename: String,
+  },
+};
 </script>
 
 

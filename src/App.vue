@@ -1,32 +1,32 @@
 <template>
   <div id="app">
-      <div class="nav-container">
-        <sidebar></sidebar>
-      </div>
-      <div class="col-xs-12 view-container">
-        <router-view></router-view>
-      </div>
+    <div class="nav-container">
+      <sidebar/>
     </div>
+    <div class="col-xs-12 view-container">
+      <router-view/>
+    </div>
+  </div>
 </template>
 
 <script>
-import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap/dist/css/bootstrap.css';
 
-import Sidebar from './components/Sidebar'
+import Sidebar from './components/Sidebar';
 
 import AuthService from './services/AuthService';
 
 AuthService.checkAuth();
 
 export default {
-  name: 'app',
+  name: 'App',
   components: {
-    Sidebar
+    Sidebar,
   },
-  created(){
+  created() {
     AuthService.checkAuth(this);
-  }
-}
+  },
+};
 </script>
 
 <style>
@@ -62,7 +62,7 @@ html, body, #app {
   /*------------------------------------------------------------------quickfix*/
   .nav-container {
     background: #000;
-    width: 40px; 
+    width: 40px;
     overflow: hidden;
   }
   .col-xs-12.view-container {

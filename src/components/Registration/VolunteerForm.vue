@@ -1,6 +1,6 @@
 <template>
-  <code-form v-if="!validRegistrationCode"></code-form>
-  <volunteer-signup-form v-else></volunteer-signup-form>
+  <code-form v-if="!validRegistrationCode"/>
+  <volunteer-signup-form v-else/>
 </template>
 
 <script>
@@ -13,12 +13,12 @@ import RegistrationService from '../../services/RegistrationService';
 export default {
   components: {
     CodeForm,
-    VolunteerSignupForm
+    VolunteerSignupForm,
   },
-  data(){
+  data() {
     return RegistrationService.data;
-  }
-}
+  },
+};
 </script>
 
 <style scoped>

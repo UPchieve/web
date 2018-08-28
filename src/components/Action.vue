@@ -1,25 +1,27 @@
-<template></template>
+<template/>
 
 <script>
 
 import OnboardingService from '../services/OnboardingService';
 
-import {router} from '../router'
+import { router } from '../router';
 
 // TODO: UserService to choose starting onboarding step based on user state
 
 export default {
-  mounted(){
-    let action = this.$route.params.action,
-        data = this.$route.params.data;
+  mounted() {
+    const action = this.$route.params.action;
 
-    if (action === 'verify'){
+
+    const data = this.$route.params.data;
+
+    if (action === 'verify') {
       OnboardingService.confirmVerification(this, data);
     } else {
       router.replace('/onboarding/profile');
     }
-  }
-}
+  },
+};
 </script>
 
 <style scoped>

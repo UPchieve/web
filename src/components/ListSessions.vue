@@ -8,9 +8,12 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="session in openSessions" v-on:click="gotoSession(session)" class="session-row">
-          <td>{{session.student.firstname}}</td>
-          <td>{{session.subTopic.charAt(0).toUpperCase() + session.subTopic.substr(1)}}</td>
+        <tr
+          v-for="session in openSessions"
+          class="session-row"
+          @click="gotoSession(session)">
+          <td>{{ session.student.firstname }}</td>
+          <td>{{ session.subTopic.charAt(0).toUpperCase() + session.subTopic.substr(1) }}</td>
         </tr>
       </tbody>
     </table>
@@ -19,43 +22,48 @@
 
 <script>
 
-import moment from 'moment'
-import UserService from '../services/UserService'
+import moment from 'moment';
+import UserService from '../services/UserService';
 
-import {router} from '../router'
+import { router } from '../router';
 
-let openSessions = [];
+const openSessions = [];
 
 export default {
-  data(){
-    let user = UserService.getUser();
+  data() {
+    const user = UserService.getUser();
     return {
-      user: user,
-      openSessions: openSessions
-    }
+      user,
+      openSessions,
+    };
+  },
+  mounted() {
+    this.$socket.emit('list', {
+      user: UserService.getUser(),
+    });
   },
   methods: {
-    gotoSession(session){
+    gotoSession(session) {
       console.log(session._id);
       router.push(`/session/${session.type}/${session.subTopic}/${session._id}`);
-    }
+    },
   },
   sockets: {
-    sessions(sessions){
-      let results = [];
-      let socketSessions = sessions.filter(function(session){
+    sessions(sessions) {
+      const results = [];
+      const socketSessions = sessions.filter((session) => {
         console.log(session);
         return !session.volunteer;
       });
 
-      for (var i=0; i<socketSessions.length; i++) {
-        let currentSession = socketSessions[i];
+      for (let i = 0; i < socketSessions.length; i++) {
+        const currentSession = socketSessions[i];
         if (socketSessions[i].type == 'college') {
           results.push(currentSession);
           continue;
         }
 
-        let subTopic = currentSession.subTopic;
+        const subTopic = currentSession.subTopic;
 
         if (subTopic == 'algebra') {
           if (this.user.algebra.passed) {
@@ -92,18 +100,12 @@ export default {
             results.push(currentSession);
           }
         }
-
       }
 
       this.openSessions = results;
-    }
+    },
   },
-  mounted(){
-    this.$socket.emit('list', {
-      user: UserService.getUser()
-    });
-  }
-}
+};
 </script>
 
 <style scoped>

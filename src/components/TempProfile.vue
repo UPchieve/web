@@ -1,29 +1,51 @@
 <template>
   <div>
     <div class="row">
-      <div class="col-sm-12" style="background-color:rgba(24,85,209,.6); text-align:left; padding-left:50px;padding-bottom:20px">
+      <div
+        class="col-sm-12"
+        style="background-color:rgba(24,85,209,.6); text-align:left; padding-left:50px;padding-bottom:20px">
         <h3 style="color:white"><strong>Student Profile</strong></h3>
       </div>
     </div>
 
 
     <div class="row">
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
+      <div
+        class="col-sm-12"
+        style="text-align:left; padding-left:50px;padding-top:40px">
         <p>Your full name</p>
       </div>
-      <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-bottom:0px">
+      <div
+        class="col-sm-12"
+        style="text-align:left; padding-left:35px;padding-bottom:0px">
         <div class="col-sm-4">
-          <input type="text" id="inputName" class="form-control" required autofocus>
+          <input
+            id="inputName"
+            type="text"
+            class="form-control"
+            required
+            autofocus>
         </div>
-        <div class="col-sm-4" style="text-align:left; padding-left:35px;">
-          <input type="text" id="inputLast" class="form-control">
+        <div
+          class="col-sm-4"
+          style="text-align:left; padding-left:35px;">
+          <input
+            id="inputLast"
+            type="text"
+            class="form-control">
         </div>
       </div>
-      <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:0px">
-        <div class="col-sm-4" style="padding-top:0px">
+      <div
+        class="col-sm-12"
+        style="text-align:left; padding-left:35px;padding-top:0px">
+        <div
+          class="col-sm-4"
+          style="padding-top:0px">
           <p style="color:gray">First name</p>
         </div>
-        <div class="col-sm-4" style="text-align:left; padding-left:35px;">
+        <div
+          class="col-sm-4"
+          style="text-align:left; padding-left:35px;">
           <p style="color:gray">Last name</p>
         </div>
       </div>
@@ -40,36 +62,71 @@
     </div> -->
 
     <div class="row">
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
+      <div
+        class="col-sm-12"
+        style="text-align:left; padding-left:50px;padding-top:40px">
         <p>Which services are you interested in? (Select all that apply)</p>
         <ul class="checkbox-grid-singlecol">
-            <li><input type="checkbox" name="mathtutoring" value="mathtutoring" > Math Tutoring</li>
-            <li><input type="checkbox" name="collegecounseling" value="collegecounseling"> College Counseling</li>
+          <li><input
+            type="checkbox"
+            name="mathtutoring"
+            value="mathtutoring" > Math Tutoring</li>
+          <li><input
+            type="checkbox"
+            name="collegecounseling"
+            value="collegecounseling"> College Counseling</li>
         </ul>
       </div>
     </div>
 
 
     <div class="row">
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
+      <div
+        class="col-sm-12"
+        style="text-align:left; padding-left:50px;padding-top:40px">
         <p>(Optional) Upload a profile picture</p>
       </div>
-      <div class="col-sm-4" style="text-align:left; padding-left:50px;padding-bottom:0px">
-        <input type="text" id="inputPicture" style="width:400px; height:32px" required autofocus placeholder="No file selected">
+      <div
+        class="col-sm-4"
+        style="text-align:left; padding-left:50px;padding-bottom:0px">
+        <input
+          id="inputPicture"
+          type="text"
+          style="width:400px; height:32px"
+          required
+          autofocus
+          placeholder="No file selected">
       </div>
-      <div class="col-sm-4 col-sm-offset-2" style="text-align:left; padding-left:50px;padding-bottom:0px">
-        <button class="btn btn-md btn-primary btn-block" type="submit">Upload a file</button>
+      <div
+        class="col-sm-4 col-sm-offset-2"
+        style="text-align:left; padding-left:50px;padding-bottom:0px">
+        <button
+          class="btn btn-md btn-primary btn-block"
+          type="submit">Upload a file</button>
       </div>
     </div>
 
     <div class="row">
-      <div class="col-sm-6" style="text-align:left; padding-left:50px;padding-top:40px">
+      <div
+        class="col-sm-6"
+        style="text-align:left; padding-left:50px;padding-top:40px">
         <p>Your birthday</p>
       </div>
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:0px">
-        <div class="col-sm-4" style="text-align:left; padding-left:0px;padding-bottom:0px">
-          <input type="text" id="inputDOB" class="form-control" required autofocus>
-          <div class="col-sm-4" style="padding-left:0px">
+      <div
+        class="col-sm-12"
+        style="text-align:left; padding-left:50px;padding-top:0px">
+        <div
+          class="col-sm-4"
+          style="text-align:left; padding-left:0px;padding-bottom:0px">
+          <input
+            id="inputDOB"
+            type="text"
+            class="form-control"
+            required
+            autofocus>
+          <div
+            class="col-sm-4"
+            style="padding-left:0px">
             <p style="color:gray">MM/DD/YYYY</p>
           </div>
         </div>
@@ -77,14 +134,25 @@
     </div>
 
     <div class="row">
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
+      <div
+        class="col-sm-12"
+        style="text-align:left; padding-left:50px;padding-top:40px">
         <p>Your gender</p>
       </div>
-      <div class="col-sm-4" style="text-align:left; padding-left:35px;padding-top:0px">
-        <div class="col-sm-4" style="padding-top:0px">
+      <div
+        class="col-sm-4"
+        style="text-align:left; padding-left:35px;padding-top:0px">
+        <div
+          class="col-sm-4"
+          style="padding-top:0px">
           <div class="btn-group">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Select a response <span class="caret"></span>
+            <button
+              type="button"
+              class="btn btn-default dropdown-toggle"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false">
+              Select a response <span class="caret"/>
             </button>
             <ul class="dropdown-menu">
               <li><a href="#">Male</a></li>
@@ -97,389 +165,795 @@
     </div>
 
     <div class="row">
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
+      <div
+        class="col-sm-12"
+        style="text-align:left; padding-left:50px;padding-top:40px">
         <p>Your race/ethnicity (Select all that apply)</p>
       </div>
-      <div class="col-sm-12" style="text-align:left; padding-left:30px;padding-top:0px">
+      <div
+        class="col-sm-12"
+        style="text-align:left; padding-left:30px;padding-top:0px">
         <ul class="checkbox-grid-singlecol">
-            <li><input type="checkbox" name="text2" value="value2" >Hispanic or Latino</li>
-            <li><input type="checkbox" name="text2" value="value2" >White</li>
-            <li><input type="checkbox" name="text2" value="value2" >Black/African American</li>
-            <li><input type="checkbox" name="text2" value="value2" >American Indian</li>
-            <li><input type="checkbox" name="text2" value="value2" >Alaskan Native</li>
-            <li><input type="checkbox" name="text2" value="value2" >Asian</li>
-            <li><input type="checkbox" name="text2" value="value2" >Native Hawaiian/Other Pacific Islander</li>
+          <li><input
+            type="checkbox"
+            name="text2"
+            value="value2" >Hispanic or Latino</li>
+          <li><input
+            type="checkbox"
+            name="text2"
+            value="value2" >White</li>
+          <li><input
+            type="checkbox"
+            name="text2"
+            value="value2" >Black/African American</li>
+          <li><input
+            type="checkbox"
+            name="text2"
+            value="value2" >American Indian</li>
+          <li><input
+            type="checkbox"
+            name="text2"
+            value="value2" >Alaskan Native</li>
+          <li><input
+            type="checkbox"
+            name="text2"
+            value="value2" >Asian</li>
+          <li><input
+            type="checkbox"
+            name="text2"
+            value="value2" >Native Hawaiian/Other Pacific Islander</li>
         </ul>
       </div>
     </div>
 
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
-        <p>Do you identify with any of the following minority groups?</p>
-      </div>
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:50px;padding-top:40px">
+      <p>Do you identify with any of the following minority groups?</p>
+    </div>
 
-      <div class="col-sm-4" style="text-align:left; padding-left:30px;padding-top:0px">
-        <ul class="checkbox-grid">
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>LGBTQ</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Learning disabilities</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Other disabilities</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Immigrant</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Homeless</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Free or reduced price lunch</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Low-income</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Single parent household</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>NYCHA (public housing) resident</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>None of the above</p></li>
-        </ul>
-      </div>
+    <div
+      class="col-sm-4"
+      style="text-align:left; padding-left:30px;padding-top:0px">
+      <ul class="checkbox-grid">
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>LGBTQ</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Learning disabilities</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Other disabilities</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Immigrant</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Homeless</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Free or reduced price lunch</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Low-income</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Single parent household</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>NYCHA (public housing) resident</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>None of the above</p></li>
+      </ul>
+    </div>
 
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
-        <p>Do you have access to a computer or phone with internet access?</p>
-      </div>
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:50px;padding-top:40px">
+      <p>Do you have access to a computer or phone with internet access?</p>
+    </div>
 
-      <div class="col-sm-4" style="text-align:left; padding-left:30px;padding-top:0px">
-        <ul class="checkbox-grid">
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>My home has a computer with internet access</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>I have my own smartphone with internet access</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Someone who lives with me has a smartphone with internet access</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>None of the above</p></li>
-        </ul>
-      </div>
+    <div
+      class="col-sm-4"
+      style="text-align:left; padding-left:30px;padding-top:0px">
+      <ul class="checkbox-grid">
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>My home has a computer with internet access</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>I have my own smartphone with internet access</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Someone who lives with me has a smartphone with internet access</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>None of the above</p></li>
+      </ul>
+    </div>
 
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
-        <p>What time(s) do you prefer to use our services?</p>
-      </div>
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:50px;padding-top:40px">
+      <p>What time(s) do you prefer to use our services?</p>
+    </div>
 
-      <div class="col-sm-4" style="text-align:left; padding-left:30px;padding-top:0px">
-        <ul class="checkbox-grid">
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>3-4pm</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>4-5pm</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>5-6pm</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>6-7pm</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>7-8pm</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>8-9pm</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>9-10pm</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>10-11pm</p></li>
-        </ul>
-      </div>
+    <div
+      class="col-sm-4"
+      style="text-align:left; padding-left:30px;padding-top:0px">
+      <ul class="checkbox-grid">
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>3-4pm</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>4-5pm</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>5-6pm</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>6-7pm</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>7-8pm</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>8-9pm</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>9-10pm</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>10-11pm</p></li>
+      </ul>
+    </div>
 
-      <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-bottom:0px">
-        <div class="col-sm-6">
-        </div>
-        <div class="col-sm-4" style="text-align:left;">
-         <button class="btn btn-lg btn-primary btn-block" type="submit">Next</button>
-        </div>
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:35px;padding-bottom:0px">
+      <div class="col-sm-6"/>
+      <div
+        class="col-sm-4"
+        style="text-align:left;">
+        <button
+          class="btn btn-lg btn-primary btn-block"
+          type="submit">Next</button>
       </div>
+    </div>
 
-      <div class="col-sm-9" style="text-align:center; padding-left:35px;padding-top:40px">
-        <div class="col-sm-3" style="text-align:center; padding-left:35px;padding-bottom:0px">
-        </div>
-        <div class="col-sm-3" style="text-align:center; padding-left:35px;padding-bottom:0px">
-          <button class="btn btn-lg btn-primary btn-block" type="submit" style="width:auto">Skip this step for now</button>
-        </div>
-        <div class="col-sm-3" style="text-align:center; padding-left:35px;padding-bottom:0px">
-        </div>
+    <div
+      class="col-sm-9"
+      style="text-align:center; padding-left:35px;padding-top:40px">
+      <div
+        class="col-sm-3"
+        style="text-align:center; padding-left:35px;padding-bottom:0px"/>
+      <div
+        class="col-sm-3"
+        style="text-align:center; padding-left:35px;padding-bottom:0px">
+        <button
+          class="btn btn-lg btn-primary btn-block"
+          type="submit"
+          style="width:auto">Skip this step for now</button>
       </div>
+      <div
+        class="col-sm-3"
+        style="text-align:center; padding-left:35px;padding-bottom:0px"/>
+    </div>
 
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;">
-        <br>
-        <p>Current high school</p>
-        <div class="col-sm-8" style="padding-top:0px; padding-left:0px">
-          <input type="text" id="inputNickname" class="form-control" required autofocus>
-        </div>
-        <br><br>
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:50px;">
+      <br>
+      <p>Current high school</p>
+      <div
+        class="col-sm-8"
+        style="padding-top:0px; padding-left:0px">
+        <input
+          id="inputNickname"
+          type="text"
+          class="form-control"
+          required
+          autofocus>
       </div>
+      <br><br>
+    </div>
 
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
-        <p>Current grade</p>
-      </div>
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:50px;padding-top:40px">
+      <p>Current grade</p>
+    </div>
 
-      <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:0px">
-        <div class="col-sm-4" style="padding-top:0px">
-          <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Dropdown button
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <a class="dropdown-item" href="#">Freshman</a>
-              <a class="dropdown-item" href="#">Sophomore</a>
-              <a class="dropdown-item" href="#">Junior</a>
-              <a class="dropdown-item" href="#">Senior</a>
-            </div>
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:35px;padding-top:0px">
+      <div
+        class="col-sm-4"
+        style="padding-top:0px">
+        <div class="dropdown">
+          <button
+            id="dropdownMenuButton"
+            class="btn btn-secondary dropdown-toggle"
+            type="button"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false">
+            Dropdown button
+          </button>
+          <div
+            class="dropdown-menu"
+            aria-labelledby="dropdownMenuButton">
+            <a
+              class="dropdown-item"
+              href="#">Freshman</a>
+            <a
+              class="dropdown-item"
+              href="#">Sophomore</a>
+            <a
+              class="dropdown-item"
+              href="#">Junior</a>
+            <a
+              class="dropdown-item"
+              href="#">Senior</a>
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
-        <p>Expected high school graduation</p>
-      </div>
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:50px;padding-top:40px">
+      <p>Expected high school graduation</p>
+    </div>
 
-      <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:0px">
-        <div class="col-sm-4" style="padding-top:0px">
-          <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Dropdown button
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <a class="dropdown-item" href="#">2017</a>
-              <a class="dropdown-item" href="#">2018</a>
-              <a class="dropdown-item" href="#">2019</a>
-              <a class="dropdown-item" href="#">2020</a>
-              <a class="dropdown-item" href="#">2021</a>
-              <a class="dropdown-item" href="#">2022</a>
-            </div>
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:35px;padding-top:0px">
+      <div
+        class="col-sm-4"
+        style="padding-top:0px">
+        <div class="dropdown">
+          <button
+            id="dropdownMenuButton"
+            class="btn btn-secondary dropdown-toggle"
+            type="button"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false">
+            Dropdown button
+          </button>
+          <div
+            class="dropdown-menu"
+            aria-labelledby="dropdownMenuButton">
+            <a
+              class="dropdown-item"
+              href="#">2017</a>
+            <a
+              class="dropdown-item"
+              href="#">2018</a>
+            <a
+              class="dropdown-item"
+              href="#">2019</a>
+            <a
+              class="dropdown-item"
+              href="#">2020</a>
+            <a
+              class="dropdown-item"
+              href="#">2021</a>
+            <a
+              class="dropdown-item"
+              href="#">2022</a>
           </div>
         </div>
       </div>
+    </div>
 
 
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;">
-        <br>
-        <p>Which academic subject do you find most difficult?</p>
-        <div class="col-sm-8" style="padding-top:0px; padding-left:0px">
-          <input type="text" id="inputNickname" class="form-control" required autofocus>
-        </div>
-        <br><br>
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:50px;">
+      <br>
+      <p>Which academic subject do you find most difficult?</p>
+      <div
+        class="col-sm-8"
+        style="padding-top:0px; padding-left:0px">
+        <input
+          id="inputNickname"
+          type="text"
+          class="form-control"
+          required
+          autofocus>
       </div>
+      <br><br>
+    </div>
 
 
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
-        <p>What part of the college application process do you find most difficult?</p>
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:50px;padding-top:40px">
+      <p>What part of the college application process do you find most difficult?</p>
+    </div>
+
+    <div
+      class="col-sm-4"
+      style="text-align:left; padding-left:30px;padding-top:0px">
+      <ul class="checkbox-grid">
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Personal Statement/Essays</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Resume</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>SAT/ACT Exams</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Choosing which schools to apply to</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Other</p></li>
+      </ul>
+    </div>
+
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:35px;padding-top:40px">
+      <div class="col-sm-6">
+        <button
+          class="btn btn-lg btn-primary btn-block"
+          type="submit">Back</button>
       </div>
-
-      <div class="col-sm-4" style="text-align:left; padding-left:30px;padding-top:0px">
-        <ul class="checkbox-grid">
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Personal Statement/Essays</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Resume</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>SAT/ACT Exams</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Choosing which schools to apply to</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Other</p></li>
-        </ul>
+      <div
+        class="col-sm-4"
+        style="text-align:left;">
+        <button
+          class="btn btn-lg btn-primary btn-block"
+          type="submit">Next</button>
       </div>
+    </div>
+    <br >
 
-    <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:40px">
-        <div class="col-sm-6">
-          <button class="btn btn-lg btn-primary btn-block" type="submit">Back</button>
-        </div>
-        <div class="col-sm-4" style="text-align:left;">
-         <button class="btn btn-lg btn-primary btn-block" type="submit">Next</button>
-        </div>
+    <div
+      class="col-sm-9"
+      style="text-align:center; padding-left:35px;padding-top:40px">
+      <div
+        class="col-sm-3"
+        style="text-align:center; padding-left:35px;padding-bottom:0px"/>
+      <div
+        class="col-sm-3"
+        style="text-align:center; padding-left:35px;padding-bottom:0px">
+        <button
+          class="btn btn-lg btn-primary btn-block"
+          type="submit"
+          style="width:auto">Skip this step for now</button>
       </div>
-    <br />
+      <div
+        class="col-sm-3"
+        style="text-align:center; padding-left:35px;padding-bottom:0px"/>
+    </div>
 
-    <div class="col-sm-9" style="text-align:center; padding-left:35px;padding-top:40px">
-        <div class="col-sm-3" style="text-align:center; padding-left:35px;padding-bottom:0px">
-        </div>
-        <div class="col-sm-3" style="text-align:center; padding-left:35px;padding-bottom:0px">
-          <button class="btn btn-lg btn-primary btn-block" type="submit" style="width:auto">Skip this step for now</button>
-        </div>
-        <div class="col-sm-3" style="text-align:center; padding-left:35px;padding-bottom:0px">
-        </div>
-      </div>
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:50px;padding-top:40px">
+      <p>What is the highest level of education completed by one of your parents?</p>
+    </div>
 
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
-        <p>What is the highest level of education completed by one of your parents?</p>
-      </div>
+    <div
+      class="col-sm-4"
+      style="text-align:left; padding-left:30px;padding-top:0px">
+      <ul class="checkbox-grid">
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Some high school</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>High school/GED degree</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Some college</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Associate's degree</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Bachelor's degree</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Master’s degree or higher</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Not sure</p></li>
+      </ul>
+    </div>
 
-      <div class="col-sm-4" style="text-align:left; padding-left:30px;padding-top:0px">
-        <ul class="checkbox-grid">
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Some high school</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>High school/GED degree</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Some college</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Associate's degree</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Bachelor's degree</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Master’s degree or higher</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Not sure</p></li>
-        </ul>
-      </div>
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:50px;padding-top:40px">
+      <p>Does your high school have a college guidance counselor?</p>
+    </div>
 
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
-        <p>Does your high school have a college guidance counselor?</p>
-      </div>
-
-      <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:0px">
-        <div class="col-sm-4" style="padding-top:0px">
-          <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Dropdown button
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <a class="dropdown-item" href="#">Yes</a>
-              <a class="dropdown-item" href="#">No</a>
-              <a class="dropdown-item" href="#">I don't know</a>
-            </div>
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:35px;padding-top:0px">
+      <div
+        class="col-sm-4"
+        style="padding-top:0px">
+        <div class="dropdown">
+          <button
+            id="dropdownMenuButton"
+            class="btn btn-secondary dropdown-toggle"
+            type="button"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false">
+            Dropdown button
+          </button>
+          <div
+            class="dropdown-menu"
+            aria-labelledby="dropdownMenuButton">
+            <a
+              class="dropdown-item"
+              href="#">Yes</a>
+            <a
+              class="dropdown-item"
+              href="#">No</a>
+            <a
+              class="dropdown-item"
+              href="#">I don't know</a>
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:40px">
-        <p>Your GPA</p>
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:50px;padding-top:40px">
+      <p>Your GPA</p>
+    </div>
+
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:35px;padding-bottom:0px">
+      <div class="col-sm-4">
+        <input
+          id="inputName"
+          type="text"
+          class="form-control"
+          required
+          autofocus>
+      </div>
+      <div
+        class="col-sm-12"
+        style="text-align:left; padding-left:15px;padding-top:0px">
+        <p style="color:gray">Please fill out on a 4.0 scale if possible</p>
       </div>
 
-      <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-bottom:0px">
-        <div class="col-sm-4">
-          <input type="text" id="inputName" class="form-control" required autofocus>
-        </div>
-      <div class="col-sm-12" style="text-align:left; padding-left:15px;padding-top:0px">
-          <p style="color:gray">Please fill out on a 4.0 scale if possible</p>
-      </div>
 
-
-      <div class="col-sm-12" style="text-align:left; padding-left:15px;padding-top:40px">
+      <div
+        class="col-sm-12"
+        style="text-align:left; padding-left:15px;padding-top:40px">
         <p>Please list all colleges and universities you are considering applying to.</p>
       </div>
 
-      <div class="col-sm-12" style="text-align:left; padding-bottom:40px;padding-left:0px">
+      <div
+        class="col-sm-12"
+        style="text-align:left; padding-bottom:40px;padding-left:0px">
         <div class="col-sm-6">
-          <input type="text" id="inputPicture" style="width:600px; height:100px;border:1px solid black" required autofocus >
+          <input
+            id="inputPicture"
+            type="text"
+            style="width:600px; height:100px;border:1px solid black"
+            required
+            autofocus >
         </div>
 
       </div>
     </div>
-      <div class="col-sm-12" style="text-align:left; padding-left:50px;padding-top:20px">
-        <p>Common College Documents Checklist</p>
-        <h6 style="color:gray">Please check all that you currently have completed or obtained</h6>
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:50px;padding-top:20px">
+      <p>Common College Documents Checklist</p>
+      <h6 style="color:gray">Please check all that you currently have completed or obtained</h6>
+    </div>
+    <div
+      class="col-sm-4"
+      style="text-align:left; padding-left:30px;padding-top:0px">
+      <ul class="checkbox-grid">
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>High School Transcript</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Common Application</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Personal Statement</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Resume</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>SAT/ACT Scores</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>Letters of Recommendation</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>FAFSA</p></li>
+        <li><input
+          type="checkbox"
+          class="checkbox-round"
+          name="text2"
+          value="value2" ><p>CSS/Financial Aid Profile</p></li>
+      </ul>
+    </div>
+
+
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:40px;padding-top:40px">
+      <div
+        class="col-sm-6"
+        style="text-align:left; padding-left:0px;padding-top:40px">
+        <p>Academic Interests</p>
+
+        <h6 style="color:gray">Please tell us about your interests! For example, your favorite class, a new topic you want to study, a cause you are passionate about, a professional hobby, an intended major/minor, etc.</h6>
       </div>
-    <div class="col-sm-4" style="text-align:left; padding-left:30px;padding-top:0px">
-        <ul class="checkbox-grid">
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>High School Transcript</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Common Application</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Personal Statement</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Resume</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>SAT/ACT Scores</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>Letters of Recommendation</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>FAFSA</p></li>
-            <li><input type="checkbox" class="checkbox-round" name="text2" value="value2" /><p>CSS/Financial Aid Profile</p></li>
-        </ul>
+    </div>
+
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-bottom:40px;padding-left:25px">
+      <div class="col-sm-6">
+        <input
+          id="inputPicture"
+          type="text"
+          style="width:600px; height:100px;border:1px solid black"
+          required
+          autofocus>
       </div>
+    </div>
 
 
-      <div class="col-sm-12" style="text-align:left; padding-left:40px;padding-top:40px">
-        <div class="col-sm-6" style="text-align:left; padding-left:0px;padding-top:40px">
-          <p>Academic Interests</p>
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:15px;padding-top:40px">
+      <p>Please list all your SAT and/or ACT Scores & when they were taken.</p>
+    </div>
 
-          <h6 style="color:gray">Please tell us about your interests! For example, your favorite class, a new topic you want to study, a cause you are passionate about, a professional hobby, an intended major/minor, etc.</h6>
-        </div>
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-bottom:40px;padding-left:0px">
+      <div class="col-sm-6">
+        <input
+          id="inputPicture"
+          type="text"
+          style="width:600px; height:100px;border:1px solid black"
+          required
+          autofocus >
       </div>
+    </div>
 
-      <div class="col-sm-12" style="text-align:left; padding-bottom:40px;padding-left:25px">
-        <div class="col-sm-6">
-          <input type="text" id="inputPicture" style="width:600px; height:100px;border:1px solid black" required autofocus>
-        </div>
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:15px;padding-top:40px">
+      <p>Have you taken any advanced (honors, AP, IB, college-level) courses? If so, please list them and your AP exam scores if applicable.</p>
+    </div>
+
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-bottom:40px;padding-left:0px">
+      <div class="col-sm-6">
+        <input
+          id="inputPicture"
+          type="text"
+          style="width:600px; height:100px;border:1px solid black"
+          required
+          autofocus >
       </div>
+    </div>
 
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:15px;padding-top:40px">
+      <p>What extracurricular activities are you involved with in high school?</p>
+    </div>
 
-
-      <div class="col-sm-12" style="text-align:left; padding-left:15px;padding-top:40px">
-        <p>Please list all your SAT and/or ACT Scores & when they were taken.</p>
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-bottom:40px;padding-left:0px">
+      <div class="col-sm-6">
+        <input
+          id="inputPicture"
+          type="text"
+          style="width:600px; height:100px;border:1px solid black"
+          required
+          autofocus >
       </div>
+    </div>
 
-      <div class="col-sm-12" style="text-align:left; padding-bottom:40px;padding-left:0px">
-        <div class="col-sm-6">
-          <input type="text" id="inputPicture" style="width:600px; height:100px;border:1px solid black" required autofocus >
-        </div>
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:15px;padding-top:40px">
+      <p>Is there anything else you want your admissions consultant to know?</p>
+    </div>
+
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-bottom:40px;padding-left:0px">
+      <div class="col-sm-6">
+        <input
+          id="inputPicture"
+          type="text"
+          style="width:600px; height:100px;border:1px solid black"
+          required
+          autofocus >
       </div>
+    </div>
 
-      <div class="col-sm-12" style="text-align:left; padding-left:15px;padding-top:40px">
-        <p>Have you taken any advanced (honors, AP, IB, college-level) courses? If so, please list them and your AP exam scores if applicable.</p>
+
+    <div
+      class="col-sm-12"
+      style="text-align:left; padding-left:35px;padding-top:40px">
+      <div class="col-sm-6">
+        <button
+          class="btn btn-lg btn-primary btn-block"
+          type="submit">Back</button>
       </div>
-
-      <div class="col-sm-12" style="text-align:left; padding-bottom:40px;padding-left:0px">
-        <div class="col-sm-6">
-          <input type="text" id="inputPicture" style="width:600px; height:100px;border:1px solid black" required autofocus >
-        </div>
+      <div
+        class="col-sm-4"
+        style="text-align:left;">
+        <button
+          class="btn btn-lg btn-primary btn-block"
+          type="submit">Done</button>
       </div>
+    </div>
+    <<<<<<< HEAD
+  </div>
 
-      <div class="col-sm-12" style="text-align:left; padding-left:15px;padding-top:40px">
-        <p>What extracurricular activities are you involved with in high school?</p>
+  <div class="row">
+    <div class="col-sm-12">
+      <div
+        class="cloudwok-embed"
+        data-wokid="d2RX"
+        data-hide-upload-success-msg="y">
+        <form class="cloudwok-upload">
+          <input type="file" >
+        </form>
+        <div class="cloudwok-upload-files"/>
+        <div class="cloudwok-upload-message"/>
+
       </div>
-
-      <div class="col-sm-12" style="text-align:left; padding-bottom:40px;padding-left:0px">
-        <div class="col-sm-6">
-          <input type="text" id="inputPicture" style="width:600px; height:100px;border:1px solid black" required autofocus >
-        </div>
-      </div>
-
-      <div class="col-sm-12" style="text-align:left; padding-left:15px;padding-top:40px">
-        <p>Is there anything else you want your admissions consultant to know?</p>
-      </div>
-
-      <div class="col-sm-12" style="text-align:left; padding-bottom:40px;padding-left:0px">
-        <div class="col-sm-6">
-          <input type="text" id="inputPicture" style="width:600px; height:100px;border:1px solid black" required autofocus >
-        </div>
-      </div>
+    </div>
+  </div>
 
 
-      <div class="col-sm-12" style="text-align:left; padding-left:35px;padding-top:40px">
-        <div class="col-sm-6">
-          <button class="btn btn-lg btn-primary btn-block" type="submit">Back</button>
-        </div>
-        <div class="col-sm-4" style="text-align:left;">
-         <button class="btn btn-lg btn-primary btn-block" type="submit">Done</button>
-        </div>
-      </div>
-<<<<<<< HEAD
-      </div>
-
-      <div class="row">
-        <div class="col-sm-12">
-          <div class="cloudwok-embed" data-wokid="d2RX" data-hide-upload-success-msg="y">
-            <form class="cloudwok-upload">
-              <input type="file" />
-            </form>
-            <div class="cloudwok-upload-files"> </div>
-            <div class="cloudwok-upload-message"></div>
-            
-          </div>
-        </div>
-      </div>
-    
-
-
-
-
-
-          
-
-=======
+  =======
 </div>
 </div>
->>>>>>> 64ee9fe6e5deca3fa3017a951fb58c9b2ec486de
+  >>>>>>> 64ee9fe6e5deca3fa3017a951fb58c9b2ec486de
 
 
 </template>
 
 <script>
 
-(function(window, document) {
-        var loader = function() {
-          var script = document.createElement('script'),
-          tag = document.getElementsByTagName('script')[0];
-          script.src = 'https://www.cloudwok.com/cdn-vassets/javascripts/cw.js';
-          tag.parentNode.insertBefore(script, tag);
-        };
-        window.addEventListener ? window.addEventListener('load', loader, false) :
-        window.attachEvent('onload', loader);
-      })(window, document);
+import UserService from '../services/UserService';
+import AuthService from '../services/AuthService';
+import OnboardingService from '../services/OnboardingService';
 
 
+(function (window, document) {
+  const loader = function () {
+    const script = document.createElement('script');
 
-import UserService from '../services/UserService'
-import AuthService from '../services/AuthService'
-import OnboardingService from '../services/OnboardingService'
+
+    const tag = document.getElementsByTagName('script')[0];
+    script.src = 'https://www.cloudwok.com/cdn-vassets/javascripts/cw.js';
+    tag.parentNode.insertBefore(script, tag);
+  };
+  window.addEventListener ? window.addEventListener('load', loader, false)
+    : window.attachEvent('onload', loader);
+}(window, document));
 
 export default {
   data() {
     return {
       isOnboarding: this.$route.path.indexOf('/onboarding') === 0,
       user: AuthService.user,
-      msg: ''
-    }
+      msg: '',
+    };
   },
   methods: {
-    submitProfile(e){
-      this.msg = ''
-      if (!this.user.name || this.user.name === ''){
+    submitProfile(e) {
+      this.msg = '';
+      if (!this.user.name || this.user.name === '') {
         this.msg = 'Please provide a first and last name';
         return;
       }
@@ -490,9 +964,9 @@ export default {
 
       this.msg = 'Sending...';
       UserService.setProfile(this, this.user, OnboardingService.isOnboarded() ? null : '/');
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>

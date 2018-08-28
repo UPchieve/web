@@ -1,8 +1,8 @@
 <template>
   <div>
-    <send-verification v-if="$route.params.step === 'verify'"></send-verification>
-    <complete-profile v-else-if="$route.params.step === 'profile'"></complete-profile>
-    <academic-survey v-else-if="$route.params.step === 'academic'"></academic-survey>
+    <send-verification v-if="$route.params.step === 'verify'"/>
+    <complete-profile v-else-if="$route.params.step === 'profile'"/>
+    <academic-survey v-else-if="$route.params.step === 'academic'"/>
   </div>
 </template>
 
@@ -16,9 +16,9 @@ export default {
   components: {
     SendVerification,
     CompleteProfile,
-    AcademicSurvey
-  }
-}
+    AcademicSurvey,
+  },
+};
 </script>
 
 <style scoped>

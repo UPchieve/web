@@ -1,59 +1,124 @@
 <template>
-  <div v-if="user.isVolunteer && (tries < 3)" class="training-quiz" v-bind:style="coverStyle">
-    <div class="popUpCover" v-if="popUpBool" v-bind:style="popUpCoverStyle"></div>
-    <h1 class="header" id="quiz-name">
+  <div
+    v-if="user.isVolunteer && (tries < 3)"
+    :style="coverStyle"
+    class="training-quiz">
+    <div
+      v-if="popUpBool"
+      :style="popUpCoverStyle"
+      class="popUpCover"/>
+    <h1
+      id="quiz-name"
+      class="header">
       {{ quizName }} Certification Quiz
-      <router-link to="/dashboard" tag="div" class="done btn" v-if="showQuizReview">DONE</router-link>
+      <router-link
+        v-if="showQuizReview"
+        to="/dashboard"
+        tag="div"
+        class="done btn">DONE</router-link>
     </h1>
-    <div class="progressBar" v-if="showProgressBar">
+    <div
+      v-if="showProgressBar"
+      class="progressBar">
       <div class="circles">
-        <div v-for="n in quizLength" class="circle" v-bind:id="'circle-' + n">{{ n }}</div>
+        <div
+          v-for="n in quizLength"
+          :id="'circle-' + n"
+          class="circle">{{ n }}</div>
       </div>
-      <div class="rect"></div>
-      <div class="rect cover" v-bind:style="{ width: barWidth + '%' }" v-if="quizLength > 0"></div>
+      <div class="rect"/>
+      <div
+        v-if="quizLength > 0"
+        :style="{ width: barWidth + '%' }"
+        class="rect cover"/>
     </div>
-    <div class="questionNumber" v-if="qNumber">Question {{qNumber}}</div><br/>
+    <div
+      v-if="qNumber"
+      class="questionNumber">Question {{ qNumber }}</div><br>
     <div class="body">
       <div class="startBody">
-        <div class="instructions" v-if="showStartMsg">This test will have {{ quizLength }} questions, and it is untimed.<br/>
-        You have {{ 3 - tries }}/3 tries left to pass this test.<br/><br/>
-        Once you feel ready, click on start!</div>
-        <button class="start btn" type="start" @click.prevent="getFirst()" v-if="showStart">START TEST</button>
+        <div
+          v-if="showStartMsg"
+          class="instructions">This test will have {{ quizLength }} questions, and it is untimed.<br>
+          You have {{ 3 - tries }}/3 tries left to pass this test.<br><br>
+          Once you feel ready, click on start!</div>
+        <button
+          v-if="showStart"
+          class="start btn"
+          type="start"
+          @click.prevent="getFirst()">START TEST</button>
       </div>
       <div class="quizBody">
-        <div class="questionText">{{ questionText }}</div><br/>
-        <div class="questionImage" v-bind:style="imageStyle"></div>
+        <div class="questionText">{{ questionText }}</div><br>
+        <div
+          :style="imageStyle"
+          class="questionImage"/>
         <form class="possibleAnswers">
           <div v-for="item in items">
             <div class="options">
-              <input type="radio" :value="item.val" v-model="picked">
-              <label :for="item.val" v-bind:id="'answer-' + item.val">{{ item.val }}. {{ item.txt }}</label>
+              <input
+                :value="item.val"
+                v-model="picked"
+                type="radio">
+              <label
+                :for="item.val"
+                :id="'answer-' + item.val">{{ item.val }}. {{ item.txt }}</label>
             </div>
           </div>
         </form>
       </div>
-      <div class="review" v-if="showQuizReview">
-        <div class="question" v-for="(question, index) in questionsReview">
-          <div class="questionNumber">Question {{ index + 1 }}</div><br/>
+      <div
+        v-if="showQuizReview"
+        class="review">
+        <div
+          v-for="(question, index) in questionsReview"
+          class="question">
+          <div class="questionNumber">Question {{ index + 1 }}</div><br>
           <div class="questionText">{{ question.questionText }}</div>
-          <div class="questionImage" v-bind:style="question.imageStyle"></div>
+          <div
+            :style="question.imageStyle"
+            class="questionImage"/>
           <div class="possibleAnswers">
-            <div v-for="answer in question.possibleAnswers" v-bind:id="'answer-' + answer.val">{{ answer.val }}. {{ answer.txt }}</div>
+            <div
+              v-for="answer in question.possibleAnswers"
+              :id="'answer-' + answer.val">{{ answer.val }}. {{ answer.txt }}</div>
           </div>
           <div class="userAnswer">Your answer: {{ question.userAnswer }}</div>
           <div class="correctAnswer">Correct answer: {{ question.correctAnswer }}</div>
         </div>
       </div>
     </div>
-    <div class="passScoreContainer" v-bind:style="[ popUpStyle, popUpBorderStyle ]" v-if="!showQuizReview">
+    <div
+      v-if="!showQuizReview"
+      :style="[ popUpStyle, popUpBorderStyle ]"
+      class="passScoreContainer">
       <div class="passed">{{ passedMsg }}</div>
       <div class="score">{{ scoreMsg }}</div>
       <div class="btnContainer">
-        <button class="reviewBtn btn" type="review" @click.prevent="review()" v-if="showReview">REVIEW TEST</button>
-        <button class="prev btn" type="previous" @click.prevent="previous()" v-if="showPrevious">PREVIOUS</button>
-        <button class="next btn" type="next" @click.prevent="next()" v-if="showNext">NEXT</button>
-        <button class="submit btn" type="submit" @click.prevent="submit()" v-if="showSubmit">SUBMIT TEST</button>
-        <button class="btn" @click.prevent="reload()" v-if="showRestart">RETAKE TEST</button>
+        <button
+          v-if="showReview"
+          class="reviewBtn btn"
+          type="review"
+          @click.prevent="review()">REVIEW TEST</button>
+        <button
+          v-if="showPrevious"
+          class="prev btn"
+          type="previous"
+          @click.prevent="previous()">PREVIOUS</button>
+        <button
+          v-if="showNext"
+          class="next btn"
+          type="next"
+          @click.prevent="next()">NEXT</button>
+        <button
+          v-if="showSubmit"
+          class="submit btn"
+          type="submit"
+          @click.prevent="submit()">SUBMIT TEST</button>
+        <button
+          v-if="showRestart"
+          class="btn"
+          @click.prevent="reload()">RETAKE TEST</button>
       </div>
     </div>
   </div>
@@ -62,26 +127,26 @@
 <script>
 import UserService from 'src/services/UserService';
 import TrainingService from 'src/services/TrainingService';
+
 export default {
   data() {
-    let user = UserService.getUser();
-    let category = this.$route.params.category;
-    var quizName;
+    const user = UserService.getUser();
+    const category = this.$route.params.category;
+    let quizName;
     if (category == 'esl') {
       quizName = category.toUpperCase();
-    }
-    else {
+    } else {
       quizName = category.charAt(0).toUpperCase() + category.slice(1);
     }
-    var tries = 0;
+    let tries = 0;
     if (user[category]) {
       tries = user[category].tries;
     }
     return {
-      user: user,
-      category: category,
+      user,
+      category,
       questionText: '',
-      quizName: quizName,
+      quizName,
       items: [],
       picked: '',
       scoreMsg: '',
@@ -96,7 +161,7 @@ export default {
       imageStyle: { },
       popUpStyle: { },
       popUpBool: false,
-      popUpCoverStyle:{ },
+      popUpCoverStyle: { },
       popUpBorderStyle: { },
       quizLength: 0,
       barWidth: 0,
@@ -105,49 +170,47 @@ export default {
       showQuizReview: false,
       passedMsg: '',
       coverStyle: { },
-      tries: tries,
-      qNumber: ''
-    }
+      tries,
+      qNumber: '',
+    };
   },
-  beforeMount(){
+  beforeMount() {
     TrainingService.loadQuiz(this, this.category).then((quizLength) => {
       this.quizLength = quizLength;
     });
   },
   methods: {
     reload() {
-       this.$router.go(this.$router.currentRoute)
+      this.$router.go(this.$router.currentRoute);
     },
-    updateProgressBar(){
-      var index = TrainingService.getIndex(this);
+    updateProgressBar() {
+      const index = TrainingService.getIndex(this);
       this.qNumber = TrainingService.getIndex(this) + 1;
-      this.barWidth = 100/(this.quizLength - 1) * index;
-      for (var i = 1; i < this.quizLength + 1; i++) {
-        var element = document.getElementById('circle-' + i);
+      this.barWidth = 100 / (this.quizLength - 1) * index;
+      for (let i = 1; i < this.quizLength + 1; i++) {
+        const element = document.getElementById(`circle-${i}`);
         if (i < (index + 2)) {
           element.style.background = '#16D2AA';
-        }
-        else {
+        } else {
           element.style.background = '#EEEEEE';
         }
       }
     },
-    styleImage(image){
+    styleImage(image) {
       if (image) {
-        var questionImage = '../../../static/question_images/' + image;
+        const questionImage = `../../../static/question_images/${image}`;
         this.imageStyle = {
           backgroundImage: `url(${questionImage})`,
           width: '300px',
           height: '300px',
           display: 'flex',
           backgroundSize: '100%',
-          backgroundRepeat: 'no-repeat'
-        }
-      }
-      else { this.imageStyle = { } }
+          backgroundRepeat: 'no-repeat',
+        };
+      } else { this.imageStyle = { }; }
     },
-    getFirst(){
-      var question = TrainingService.getFirstQuestion(this);
+    getFirst() {
+      const question = TrainingService.getFirstQuestion(this);
       this.questionText = question.questionText;
       this.styleImage(question.image);
       this.items = question.possibleAnswers;
@@ -157,11 +220,11 @@ export default {
       this.showNext = true;
       this.qNumber = TrainingService.getIndex(this) + 1;
     },
-    previous(){
+    previous() {
       TrainingService.saveAnswer(this, this.picked);
       this.picked = '';
-      var data = TrainingService.getPreviousQuestion(this);
-      var question = data.question;
+      const data = TrainingService.getPreviousQuestion(this);
+      const question = data.question;
       this.picked = data.picked;
       this.questionText = question.questionText;
       this.updateProgressBar();
@@ -176,11 +239,11 @@ export default {
       this.showSubmit = false;
       this.showNext = true;
     },
-    next(){
+    next() {
       TrainingService.saveAnswer(this, this.picked);
       this.picked = '';
-      var data = TrainingService.getNextQuestion(this);
-      var question = data.question;
+      const data = TrainingService.getNextQuestion(this);
+      const question = data.question;
       this.picked = data.picked;
       this.questionText = question.questionText;
       this.updateProgressBar();
@@ -192,7 +255,7 @@ export default {
       }
       this.showPrevious = true;
     },
-    submit(){
+    submit() {
       TrainingService.saveAnswer(this, this.picked);
       if (TrainingService.hasCompleted(this)) {
         TrainingService.submitQuiz(this, this.user._id).then((data) => {
@@ -200,29 +263,28 @@ export default {
             this.passedMsg = 'You passed!';
             this.showDone = true;
             this.popUpCoverStyle = {
-              backgroundColor: '#E3F2FD'
-            }
+              backgroundColor: '#E3F2FD',
+            };
             this.popUpBorderStyle = {
               borderBottom: '5px solid #1855D1',
-              borderLeft: '5px solid #1855D1'
-            }
+              borderLeft: '5px solid #1855D1',
+            };
           } else {
             this.passedMsg = 'You failed.';
             this.popUpCoverStyle = {
-              backgroundColor: '#FEEAB2'
-            }
+              backgroundColor: '#FEEAB2',
+            };
             this.popUpBorderStyle = {
               borderBottom: '5px solid #F44747',
-              borderLeft: '5px solid #F44747'
-            }
+              borderLeft: '5px solid #F44747',
+            };
             if (data.tries < 3) {
               this.showRestart = true;
-            }
-            else {
+            } else {
               this.showDone = true;
             }
           }
-          this.scoreMsg = 'Score: ' + data.score + ' out of ' + this.quizLength + ' correct.';
+          this.scoreMsg = `Score: ${data.score} out of ${this.quizLength} correct.`;
         });
         this.popUpStyle = {
           display: 'flex',
@@ -237,37 +299,35 @@ export default {
           bottom: '0',
           left: '300px',
           right: '0',
-          margin: 'auto'
+          margin: 'auto',
         };
         this.popUpBool = true;
         this.coverStyle = {
-          background: 'rgba(0,0,0,0.10)'
+          background: 'rgba(0,0,0,0.10)',
         };
         this.picked = '';
         this.showPrevious = false;
         this.showNext = false;
         this.showSubmit = false;
         this.showReview = true;
-      }
-      else {
+      } else {
         this.scoreMsg = 'You must answer all questions before submitting the quiz!';
       }
     },
-    review(){
+    review() {
       this.questionsReview = TrainingService.reviewQuiz(this);
-      this.questionsReview.forEach(function(question) {
+      this.questionsReview.forEach((question) => {
         if (question.image) {
-          var questionImage = '../../../static/question_images/' + question.image;
-          question['imageStyle'] = {
+          const questionImage = `../../../static/question_images/${question.image}`;
+          question.imageStyle = {
             backgroundImage: `url(${questionImage})`,
             width: '300px',
             height: '300px',
             display: 'flex',
             backgroundSize: '100%',
-            backgroundRepeat: 'no-repeat'
-          }
-        }
-        else { question['imageStyle'] = { } }
+            backgroundRepeat: 'no-repeat',
+          };
+        } else { question.imageStyle = { }; }
       });
       this.items = [];
       this.questionText = '';
@@ -280,9 +340,9 @@ export default {
       this.showReview = false;
       this.showQuizReview = true;
       this.showProgressBar = false;
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>

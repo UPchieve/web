@@ -1,22 +1,26 @@
 <template>
   <div class="session">
     <div class="session-header-container">
-      <session-header></session-header>
+      <session-header/>
     </div>
-    <div v-if="currentSession.sessionId" class="session-contents-container">
+    <div
+      v-if="currentSession.sessionId"
+      class="session-contents-container">
       <div class="col-sm-8 whiteboard-container">
-        <whiteboard></whiteboard>
+        <whiteboard/>
       </div>
       <div class="col-sm-4 chat-container">
-        <chat></chat>
+        <chat/>
       </div>
     </div>
 
-    <modal warn v-if="showModal"
+    <modal
+      v-if="showModal"
       :labels="btnLabels"
       :message="message"
-      :clickHandlers="clickHandlers"
-    ></modal>
+      :click-handlers="clickHandlers"
+      warn
+    />
   </div>
 </template>
 
@@ -35,20 +39,20 @@ export default {
     SessionHeader,
     Whiteboard,
     Chat,
-    Modal
+    Modal,
   },
-  /* 
+  /*
   * @notes
-  * [1] Refactoring candidate: it'd be awesome if Dashboard could pass 
+  * [1] Refactoring candidate: it'd be awesome if Dashboard could pass
   *     the topic directly
   */
-  data(){
+  data() {
     return {
       currentSession: SessionService.currentSession,
       showModal: false,
       btnLabels: [
         'Submit question',
-        'Exit session'
+        'Exit session',
       ],
       message: `
         We don’t have any Academic Coaches
@@ -63,45 +67,45 @@ export default {
             path: '/submit-question',
             query: {
               topic: this.$route.path.split('/')[2], // [1]
-              subTopic: this.$route.params.subTopic
-            }
+              subTopic: this.$route.params.subTopic,
+            },
           });
         },
         second: () => {
           this.$router.push('/');
-        }
+        },
       },
       formLoaderOptions: {
         formLoaderTop: '0',
         formLoaderDot1: 'a-loader-1 2s ease-out infinite',
-        formLoaderDot2: 'a-loader-1 1s 2s ease-out infinite'
-      }
-    }
+        formLoaderDot2: 'a-loader-1 1s 2s ease-out infinite',
+      },
+    };
   },
-  mounted(){
-    let id = this.$route.params.sessionId;
+  mounted() {
+    const id = this.$route.params.sessionId;
     let promise;
 
     this.sessionId = id;
 
-    if (!id){
+    if (!id) {
       let type;
-      if (this.$route.path.indexOf('session/college') !== -1){
-        type = 'college'
+      if (this.$route.path.indexOf('session/college') !== -1) {
+        type = 'college';
       } else {
-        type = 'math'
+        type = 'math';
       }
       promise = SessionService.newSession(this, type, this.$route.params.subTopic);
     } else {
       promise = SessionService.useExistingSession(this, id);
     }
 
-    promise.then( (sessionId) => {
+    promise.then((sessionId) => {
       this.sessionId = this.currentSession.sessionId;
       this.$socket.connect();
       this.$socket.emit('join', {
-  			sessionId: sessionId,
-  			user: UserService.getUser()
+  			sessionId,
+  			user: UserService.getUser(),
   		});
     });
 
@@ -109,28 +113,28 @@ export default {
     const MODAL_TIMEOUT_MS = 24 * 60 * 60 * 1000;
     setTimeout(() => {
       if (
-        !UserService.getUser().isVolunteer && 
-        SessionService.getPartner() === undefined
+        !UserService.getUser().isVolunteer
+        && SessionService.getPartner() === undefined
       ) {
         this.showModal = true;
       }
     }, MODAL_TIMEOUT_MS);
   },
-  beforeRouteLeave(to, from, next){
-    let url = '/feedback/' + this.sessionId + '/' + (UserService.getUser().isVolunteer ? 'volunteer' : 'student');
-    if (to.path.indexOf(url) !== -1){
+  beforeRouteLeave(to, from, next) {
+    const url = `/feedback/${this.sessionId}/${UserService.getUser().isVolunteer ? 'volunteer' : 'student'}`;
+    if (to.path.indexOf(url) !== -1) {
       next();
       return;
     }
-    var result = window.confirm('Do you really want to end the session?');
-    if (result){
+    const result = window.confirm('Do you really want to end the session?');
+    if (result) {
       this.$socket.disconnect();
       SessionService.endSession({ skipRoute: true });
-      let url = '/feedback/' + this.sessionId + '/' + (UserService.getUser().isVolunteer ? 'volunteer' : 'student');
+      const url = `/feedback/${this.sessionId}/${UserService.getUser().isVolunteer ? 'volunteer' : 'student'}`;
       next(url);
     }
-  }
-}
+  },
+};
 </script>
 
 

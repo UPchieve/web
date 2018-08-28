@@ -13,17 +13,17 @@ export default {
   login(context, data) {
     return context.$http.post(`${AUTH_ROOT}/login`, data).then(this._successHandler, this._errorHandler);
   },
-  logout(context){
+  logout(context) {
     return context.$http.get(`${AUTH_ROOT}/logout`).then(this._successHandler, this._errorHandler);
   },
   checkCode(context, data) {
     return context.$http.post(`${AUTH_ROOT}/register/check`, data).then(this._successHandler, this._errorHandler);
   },
   checkRegister(context, data) {
-    return context.$http.post(`${AUTH_ROOT}/register/checkcred`, data).then(this._successHandler, this._errorHandler)
+    return context.$http.post(`${AUTH_ROOT}/register/checkcred`, data).then(this._successHandler, this._errorHandler);
   },
-  register(context, data){
-    return context.$http.post(`${AUTH_ROOT}/register`, data).then(this._successHandler, this._errorHandler)
+  register(context, data) {
+    return context.$http.post(`${AUTH_ROOT}/register`, data).then(this._successHandler, this._errorHandler);
   },
   sendReset(context, data) {
     return context.$http.post(`${AUTH_ROOT}/reset/send`, data).then(this._successHandler, this._errorHandler);
@@ -37,7 +37,7 @@ export default {
   sendVerification(context) {
     return context.$http.post(`${API_ROOT}/verify/send`).then(this._successHandler, this._errorHandler);
   },
-  confirmVerification(context, data){
+  confirmVerification(context, data) {
     return context.$http.post(`${API_ROOT}/verify/confirm`, data).then(this._successHandler, this._errorHandler);
   },
   setProfile(context, data) {
@@ -61,11 +61,11 @@ export default {
   getAvailability(context, data) {
     return context.$http.post(`${API_ROOT}/calendar/get`, data).then(this._successHandler, this._errorHandler);
   },
-  updateAvailability(context, data){
-    return context.$http.post(`${API_ROOT}/calendar/save`, data).then(this._successHandler, this._errorHandler)
+  updateAvailability(context, data) {
+    return context.$http.post(`${API_ROOT}/calendar/save`, data).then(this._successHandler, this._errorHandler);
   },
   feedback(context, data) {
-    return context.$http.post(`${API_ROOT}/feedback`, data).then(this._successHandler, this._errorHandler)
+    return context.$http.post(`${API_ROOT}/feedback`, data).then(this._successHandler, this._errorHandler);
   },
   createStudentQuestion(context, data) {
     return context.$http.post(`${API_ROOT}/student-questions/create`, data).then(this._successHandler, this._errorHandler);
@@ -78,5 +78,5 @@ export default {
   },
   getAttachment(context, data) {
     return context.$http.get(`${API_ROOT}/download/${data}`).then(this._successHandler, this._errorHandler);
-  }
-}
+  },
+};

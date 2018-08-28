@@ -1,20 +1,32 @@
 <template>
   <div class="profile-info">
-    <div class="avatar" v-bind:style="avatarStyle"></div>
+    <div
+      :style="avatarStyle"
+      class="avatar"/>
     <template>
-      <p class="greeting" v-if="($route.path.indexOf('/onboarding') !== -1 || $route.path.indexOf('/signup') !== -1) && !user.isVolunteer">
+      <p
+        v-if="($route.path.indexOf('/onboarding') !== -1 || $route.path.indexOf('/signup') !== -1) && !user.isVolunteer"
+        class="greeting">
         Welcome, Student!
       </p>
-      <p class="greeting" v-else-if="$route.path.indexOf('/onboarding') !== -1 || $route.path.indexOf('/signup') !== -1">
+      <p
+        v-else-if="$route.path.indexOf('/onboarding') !== -1 || $route.path.indexOf('/signup') !== -1"
+        class="greeting">
         Welcome, Volunteer!
       </p>
-      <p class="greeting" v-else-if='!user.isVolunteer && user.firstname === undefined'>
+      <p
+        v-else-if="!user.isVolunteer && user.firstname === undefined"
+        class="greeting">
         Welcome, Student!
       </p>
-      <p class="greeting" v-else-if='user.isVolunteer &&  user.firstname === undefined'>
+      <p
+        v-else-if="user.isVolunteer && user.firstname === undefined"
+        class="greeting">
         Welcome, Volunteer!
       </p>
-      <p class="greeting" v-else>
+      <p
+        v-else
+        class="greeting">
         {{ name }}
       </p>
     </template>
@@ -27,35 +39,35 @@
 import UserService from '../../services/UserService';
 
 export default {
- components: {
+  components: {
 
 
   },
   data() {
-    let user = UserService.getUser() || {};
+    const user = UserService.getUser() || {};
 
-    var avatarUrl = user.picture || (user.isVolunteer ? 'static/defaultavatar4.png' : 'static/defaultavatar3.png');
+    const avatarUrl = user.picture || (user.isVolunteer ? 'static/defaultavatar4.png' : 'static/defaultavatar3.png');
     return {
-      user: user,
+      user,
       avatarStyle: {
-        backgroundImage: `url(${avatarUrl})`
-      }
-    }
+        backgroundImage: `url(${avatarUrl})`,
+      },
+    };
   },
   computed: {
     name: {
       cache: false,
-      get: function() {
-        return this.user.firstname + ' ' + this.user.lastname
-      }
-    }
+      get() {
+        return `${this.user.firstname} ${this.user.lastname}`;
+      },
+    },
   },
   methods: {
-    logout(){
+    logout() {
       AuthService.logout(this);
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>

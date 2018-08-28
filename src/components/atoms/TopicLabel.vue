@@ -1,25 +1,25 @@
 <template>
-<div :class="classes">
-  {{ label }}
-</div>
+  <div :class="classes">
+    {{ label }}
+  </div>
 </template>
 
 
 <script>
 export default {
   props: {
-    label: String
+    label: String,
   },
   data() {
     return {
       classes: {
         'topic-label': true,
-        'topic-label--math': this.label.toLowerCase() === 'math' ? true : false,
-        'topic-label--college': this.label.toLowerCase() === 'college' ? true : false
-      }
-    }
-  }
-}
+        'topic-label--math': this.label.toLowerCase() === 'math',
+        'topic-label--college': this.label.toLowerCase() === 'college',
+      },
+    };
+  },
+};
 </script>
 
 
