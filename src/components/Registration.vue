@@ -1,18 +1,21 @@
 <template>
   <div class="registration-container background">
     <div class="form-register">
-
-      <volunteer-form v-if="this.userSelection === 'volunteer'"></volunteer-form>
-      <student-form v-else-if="this.userSelection === 'student'"></student-form>
-      <div v-else>
-        <div class="header">
-          <router-link to="login" class="login-link">Log In</router-link>
-          <div class="registration-header">Register an Account</div>
+      <div class="header">
+        <router-link to="login" class="login-link">Log In</router-link>
+        <div class="registration-header">Register an Account</div>
+      </div>
+      <div class="body">
+        <volunteer-form v-if="this.userSelection === 'volunteer'"></volunteer-form>
+        <student-form v-else-if="this.userSelection === 'student'"></student-form>
+        <div v-else>
+          Are you a student or a volunteer?
+          <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="selectStudent()">STUDENT</button>
+          <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="selectVolunteer()">VOLUNTEER</button>
         </div>
-        <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="selectStudent()">STUDENT</button>
-        <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="selectVolunteer()">VOLUNTEER</button>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -51,8 +54,8 @@ export default {
 .header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 50px;
-  margin-top: 65px;
+  margin-bottom: 80px;
+  margin-top: 50px;
 }
 
 .login-link {
@@ -79,7 +82,6 @@ export default {
 .form-register {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   width: 500px;
   height: 500px;
   margin: auto;
@@ -99,6 +101,11 @@ export default {
   padding: 0 50px;
   background-color: #F6F6F6;
   border-top: 0.5px solid #CCCCCF;
+  margin-top: 130px
+}
+
+.footer a {
+  color: #73737A;
 }
 
 button[type="submit"] {
@@ -109,7 +116,7 @@ button[type="submit"] {
   height: 40px;
   border-radius: 20px;
   font-size: 12px;
-  margin-bottom: 10px;
+  margin-top: 50px;
 }
 
 button[type="submit"]:hover, button[type="submit"]:active {
