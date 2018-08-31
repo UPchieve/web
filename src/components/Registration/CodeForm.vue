@@ -2,7 +2,7 @@
   <form class="form-signup">
     <div class="header">
       <router-link to="login" class="login-link">Log In</router-link>
-      <div class="registration-header">Registration</div>
+      <div class="registration-header">Register an Account</div>
     </div>
     <label for="inputRegistrationCode">Please enter your registration code</label>
     <input type="text" id="inputRegistrationCode" class="form-control" required autofocus v-model="registrationCode">
@@ -41,7 +41,7 @@ export default {
   display: flex;
   justify-content: space-between;
   margin-bottom: 50px;
-  margin-top: 65px;
+  margin-top: 50px;
 }
 .login-link {
   color: #73737A;
@@ -50,7 +50,9 @@ export default {
 .registration-header {
   color: #16D2AA;
   font-weight: 600;
+  padding-left: 140px;
 }
+
 .no-code-link {
   font-size: 12px;
   text-align: left;
@@ -66,8 +68,6 @@ export default {
   display: flex;
   flex-direction: column;
   max-width: 400px;
-  padding: 15px;
-  margin: auto;
 }
 .form-control {
   border: none;

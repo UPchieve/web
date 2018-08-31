@@ -40,7 +40,6 @@ export default {
   hasProfile(){
     var user = UserService.getUser(),
         requiredFields;
-
     if (user.isVolunteer){
       requiredFields = ['firstname', 'lastname', 'birthdate', 'gender', 'race',
       'phone', 'referred', 'favoriteAcademicSubject', 'college'];
@@ -75,8 +74,7 @@ export default {
   getOnboardingRoute(){
     // Map each route to function that will show route if false
     let map = {
-      '/onboarding/verify': this.hasVerifiedEmail,
-      '/onboarding/profile': this.hasProfile
+      '/onboarding/verify': this.hasVerifiedEmail
     }
 
     let matched;

@@ -35,7 +35,6 @@ export default {
   },
   setProfile(context, data, redirect){
     NetworkService.setProfile(context, data).then((res) => {
-      console.log(res.data);
       if (res.data){
         AuthService.storeUser(res.data.user)
         context.msg = 'Set!'

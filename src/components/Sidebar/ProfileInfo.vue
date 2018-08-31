@@ -8,8 +8,14 @@
       <p class="greeting" v-else-if="$route.path.indexOf('/onboarding') !== -1 || $route.path.indexOf('/signup') !== -1">
         Welcome, Volunteer!
       </p>
+      <p class="greeting" v-else-if='!user.isVolunteer && user.firstname === undefined'>
+        Welcome, Student!
+      </p>
+      <p class="greeting" v-else-if='user.isVolunteer &&  user.firstname === undefined'>
+        Welcome, Volunteer!
+      </p>
       <p class="greeting" v-else>
-        {{name}}
+        {{ name }}
       </p>
     </template>
   </div>
@@ -28,12 +34,19 @@ export default {
   data() {
     let user = UserService.getUser() || {};
 
-    var avatarUrl = user.picture || 'static/defaultavatar3.png';
+    var avatarUrl = user.picture || (user.isVolunteer ? 'static/defaultavatar4.png' : 'static/defaultavatar3.png');
     return {
       user: user,
-      name: user.firstname + ' ' + user.lastname,
       avatarStyle: {
         backgroundImage: `url(${avatarUrl})`
+      }
+    }
+  },
+  computed: {
+    name: {
+      cache: false,
+      get: function() {
+        return this.user.firstname + ' ' + this.user.lastname
       }
     }
   },

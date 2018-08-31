@@ -2,11 +2,12 @@
   <ul class="nav navbar-nav">
     <router-link to="/login" tag="li" v-if="!userauth.authenticated"><a class="login">Log In</a></router-link>
     <router-link to="/contact" tag="li"><a class="contact icon">Contact Us</a></router-link>
-    <router-link to="/privacy" tag="li"><a class="privacy icon">Privacy Policy</a></router-link>
+    <router-link to="/legal" tag="li"><a class="privacy icon">Legal Policy</a></router-link>
     <li v-if="userauth.authenticated"><a v-on:click="logout" class="logout icon">Logout</a></li>
     <li v-if="!userauth.authenticated"><a v-bind:href="mainWebsiteUrl">Back to Website</a></li>
   </ul>
 </template>
+
 
 <script>
 

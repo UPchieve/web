@@ -1,11 +1,11 @@
 <template>
   <div>
-    <ul class="nav navbar-nav" v-if="$route.path.indexOf('/onboarding') !== -1 && !user.isVolunteer">
-      <li v-bind:class="onboardingProfileClass"><a class="profile-info">Basic Profile</a></li>
-      <li v-bind:class="onboardingAcademicClass"><a class="profile-info">First Time Use Survey</a></li>
+    <ul class="nav navbar-nav" v-if="($route.path.indexOf('/onboarding') !== -1) && !user.isVolunteer">
+      <router-link to="/onboarding/profile" tag="li"><a class="profile-info">Basic Profile</a></router-link>
+      <router-link to="/onboarding/academic" tag="li"><a class="profile-info">First Time Use Survey</a></router-link>
     </ul>
     <ul class="nav navbar-nav" v-else-if="$route.path.indexOf('/onboarding') !== -1">
-      <li v-bind:class="onboardingProfileClass"><a class="profile-info">Profile Information</a></li>
+      <router-link to="/onboarding/profile" tag="li"><a class="profile-info">Basic Profile</a></router-link>
     </ul>
     <ul class="nav navbar-nav" v-else-if="auth.authenticated">
       <router-link to="/dashboard" tag="li"><a class="home icon">Home</a></router-link>
@@ -30,23 +30,7 @@ export default {
         user = UserService.getUser(),
         onboarding = UserService.getOnboarding();
     return {
-      auth, user, onboarding,
-
-      onboardingProfileClass: {
-        disabled: false
-      }
-    }
-  },
-  computed: {
-    onboardingAcademicClass() {
-      return {
-        disabled: this.$route.path.indexOf('/onboarding/profile') !== -1
-      }
-    },
-    onboardingCollegeClass() {
-      return {
-        disabled: this.$route.path.indexOf('/onboarding/profile') !== -1 || this.$route.path.indexOf('/onboarding/academic') !== -1
-      }
+      auth, user, onboarding
     }
   }
 }
