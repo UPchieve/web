@@ -1,9 +1,5 @@
 <template>
   <form class="form-signup">
-    <div class="header">
-      <router-link to="login" class="login-link">Log In</router-link>
-      <div class="registration-header">Register an Account</div>
-    </div>
     <label for="inputRegistrationCode">Please enter your registration code</label>
     <input type="text" id="inputRegistrationCode" class="form-control" required autofocus v-model="registrationCode">
     <p class="no-code-link"><a href="https://upchieve.org/students">Don't have a code?</a></p>

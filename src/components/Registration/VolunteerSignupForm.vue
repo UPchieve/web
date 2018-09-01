@@ -1,9 +1,5 @@
 <template>
   <form class="form-signup">
-    <div class="header">
-      <router-link to="login" class="login-link">Log In</router-link>
-      <div class="registration-header">Register an Account</div>
-    </div>
     <div v-if="!showingSuccess">
       <div v-if="step=='step-1'">
         <div class="step-1-text" colspan="2"><b>Step 1 of 2: Choose your log-in details </b></div>
@@ -55,9 +51,6 @@
         <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">SIGN UP</button>
       </div>
       <div v-else>Unexpected Error</div>
-    </div>
-    <div class="successMessage" v-else>
-      <p>You’ve been sent a verification email! Use the link in the email to get started.</p>
     </div>
   </form>
 </template>
@@ -156,9 +149,10 @@
     display: flex;
     flex-direction: column;
     max-width: 500px;
-    padding: 15px;
+    padding: 0px;
     margin: auto;
   }
+
   .form-control {
     border: none;
     box-shadow: none;
@@ -262,7 +256,7 @@
   }
 
   button[type="submit"] {
-    margin-top: 20px;
+    margin-top: 10px;
     background-color: #F6F6F6;
     border: none;
     font-weight: 600;
@@ -278,12 +272,6 @@
     background-color: #16D2AA;
   }
 
-  .successMessage {
-    text-align: left;
-    margin-top: 50px;
-    padding-bottom: 20px;
-    border-bottom: 3px solid black;
-  }
 
   .step-2-table {
     width: 100%;

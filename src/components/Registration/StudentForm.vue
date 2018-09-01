@@ -1,9 +1,5 @@
 <template>
   <form class="form-signup">
-    <div class="header">
-      <router-link to="login" class="login-link">Log In</router-link>
-      <div class="registration-header">Register an Account</div>
-    </div>
     <div>
       <div v-if="step==='step-1'">
         <div class="step-1-text" colspan="2"><b>Step 1 of 2: Choose your log-in details </b></div>
@@ -161,7 +157,7 @@
     display: flex;
     flex-direction: column;
     max-width: 500px;
-    padding: 15px;
+
     margin: auto;
   }
   .form-control {

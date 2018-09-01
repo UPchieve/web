@@ -3,7 +3,7 @@
     <form class="form-signin">
       <div class="header">
         <div class="login-header">Log In</div>
-        <router-link to="signup" class="register-link">Register an Account</router-link></p>
+        <router-link to="signup" class="register-link">Sign Up</router-link></p>
       </div>
       <div class="body">
         <div class="alert alert-danger" role="alert" v-if="error || $route.query['401'] === 'true'">{{error}}</div>
@@ -65,10 +65,10 @@ export default {
     display: flex;
     justify-content: space-between;
     margin-bottom: 20px;
-    margin-top: 50px;
+    margin-top: 25px;
   }
   .register-link {
-    padding-left: 140px;
+    padding-left: 290px;
     color: #73737A;
     font-weight: 600;
   }
@@ -89,7 +89,7 @@ export default {
     height: 500px;
     margin: auto;
     background-color: white;
-    padding: 0px 75px;
+    padding: 0px 50px;
   }
   .form-control {
     border: none;
@@ -111,7 +111,7 @@ export default {
     margin: 0px;
   }
   .form-control {
-    border-bottom: 3px solid black;
+    border-bottom: 3px solid #16D2AA;
     margin-bottom: 50px;
   }
   .form-control.password {
@@ -119,7 +119,7 @@ export default {
   }
 
   .form-control:focus {
-    border-bottom: 3px solid black;
+    border-bottom: 3px solid #16D2AA;
     box-shadow: none;
   }
 
@@ -170,7 +170,7 @@ export default {
     height: 40px;
     align-items: center;
     align-self: center;
-    padding: 0 50px;
+    padding: 25px 50px;
     background-color: #F6F6F6;
     border-top: 0.5px solid #CCCCCF;
   }
