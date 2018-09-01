@@ -3,13 +3,21 @@
     <div class="form-register">
       <div class="header">
         <router-link to="login" class="login-link">Log In</router-link>
+<<<<<<< HEAD
         <div class="registration-header">Sign Up</div>
+=======
+        <div class="registration-header">Register an Account</div>
+>>>>>>> origin/master
       </div>
       <div class="body">
         <volunteer-form v-if="this.userSelection === 'volunteer'"></volunteer-form>
         <student-form v-else-if="this.userSelection === 'student'"></student-form>
         <div v-else>
+<<<<<<< HEAD
           <b>Are you a student or a volunteer?</b>
+=======
+          Are you a student or a volunteer?
+>>>>>>> origin/master
           <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="selectStudent()">STUDENT</button>
           <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="selectVolunteer()">VOLUNTEER</button>
         </div>
@@ -54,12 +62,17 @@ export default {
 .header {
   display: flex;
   justify-content: space-between;
+<<<<<<< HEAD
   margin-bottom: 0px;
   margin-top: 25px;
 }
 
 .body {
   margin: auto;
+=======
+  margin-bottom: 80px;
+  margin-top: 50px;
+>>>>>>> origin/master
 }
 
 .login-link {
