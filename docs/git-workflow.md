@@ -13,15 +13,15 @@
 
 ## Overview
 
-1. Create a new branch following the [name convention](#name-convention).
+1. Create a new branch following the [name convention](#naming-convention).
 2. Work on your branch until the task is done.
 3. Make sure that your code works and that it complies with [the standards](coding-standards/README.md).
 4. Update the documentation if needed.
 5. Submit a PR to be [merged **to the `dev` branch**](https://stackoverflow.com/a/38985999), making sure to comply with the [PR convention](#pr-convention).
 6. Make changes to the PR if requested by the reviewer(s).
-7. Once the PR is approved, it gets merged to `dev`, which is the branch deployed on our test server.
+7. Once the PR is approved, it gets merged to `dev` (which is the branch deployed on our test server).
 8. If we find an error on the test server, a new *issue* with the label *bug* is created and assigned to you (and then we go through steps 1-7 with the fix).
-9. If the new edits deploy smoothly on the test server, then they get merged to `master`, which is the branch of the live server. FIN :raised_hands:
+9. If the new edits deploy smoothly on the test server, a senior developer will create a new PR from `dev` to merge to `master` (which is the branch deployed on our live server). This PR will follow a special [naming convention](#naming-convention), and its only purpose is to track our deployments to the live server. FIN :raised_hands:
 
 **[⬆ back to top](#contents)**
 
@@ -44,6 +44,7 @@
   ```
 - Branches for edits to the documentation that are not linked to a particular bug or feature don't require a prefix.
 - Special branches like `master` and `dev` don't require prefixes either.
+- Title all `dev` to `master` PRs using the format `PR#<number-of-the-dev-to-master-PR> FROM: Merge pull request #<number-of-the-<feat|fix>-to-dev-PR> from UPchieve/<<feat|fix>/brach>` and use the title for the message of the merge commit. Notice that everything after the semicolon is just the default message that GitHub suggested when merging the original feature or fix branch to `dev`, so you only need to copy-paste it from the commit history :wink:.
 
 **[⬆ back to top](#contents)**
 
@@ -55,6 +56,7 @@
 - **Don't mix** fix PRs with feature PRs.
 - **Always assign a reviewer**. If you're unsure about whom to ask, then just assign the review to the Director of Technology.
 - **Always explain the edits** you're submitting.
+- **Follow the [naming convention](#naming-convention)** for `dev` to `master` PRs.
 
 **[⬆ back to top](#contents)**
 
