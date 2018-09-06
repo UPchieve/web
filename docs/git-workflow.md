@@ -19,7 +19,14 @@
 4. Update the documentation if needed.
 5. Submit a PR to be [merged **to the `dev` branch**](https://stackoverflow.com/a/38985999), making sure to comply with the [PR convention](#pr-convention).
 6. Make changes to the PR if requested by the reviewer(s).
-7. Once the PR is approved, it gets merged to `dev` (which is the branch deployed on our test server).
+7. Once the PR is approved, it gets merged to `dev` (which is the branch deployed on our test server). Make sure to remove both the local and the remote branch after it has been merged:
+  ```
+  # Delete local branch
+  git branch -d <<fix|feat>/branch>
+
+  # Delete remote branch (equivalent to using GitHub's button: https://bit.ly/2PJkz1V)
+  git push origin --delete <<fix|feat>/branch>
+  ```
 8. If we find an error on the test server, a new *issue* with the label *bug* is created and assigned to you (and then we go through steps 1-7 with the fix).
 9. If the new edits deploy smoothly on the test server, a senior developer will create a new PR from `dev` to merge to `master` (which is the branch deployed on our live server). This PR will follow a special [naming convention](#naming-convention), and its only purpose is to track our deployments to the live server. FIN :raised_hands:
 
@@ -64,7 +71,7 @@
 
 ## FAQs
 
-- **Should we delete or keep old branches?**: we're keeping them for now.
+- **Should we delete or keep old branches?**: we delete every secondary branch after the changes it contains have been merged to `dev` or have been rejected. However, we still keep a lot of legacy secondary branches that will be deleted after the transition to best practices has been completed (hopefully before fall 2018 :muscle:).
 - **Can I use emojis in my commits?**: yes, as long as you don't overdo it.
 
 **[⬆ back to top](#contents)**
