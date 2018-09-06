@@ -13,7 +13,7 @@
 
 ## Overview
 
-1. Create a new branch following the [name convention](#naming-convention).
+1. Create a new branch from `master` following the [name convention](#naming-convention).
 2. Work on your branch until the task is done.
 3. Make sure that your code works and that it complies with [the standards](coding-standards/README.md).
 4. Update the documentation if needed.
@@ -27,7 +27,7 @@
   # Delete remote branch (equivalent to using GitHub's button: https://bit.ly/2PJkz1V)
   git push origin --delete <<fix|feat>/branch>
   ```
-8. If we find an error on the test server, a new *issue* with the label *bug* is created and assigned to you (and then we go through steps 1-7 with the fix).
+8. If we find an error on the test server, a new *issue* with the label *bug* is created and assigned to you (and then we go through steps 1-7 with the fix, but branching from `dev`).
 9. If the new edits deploy smoothly on the test server, a senior developer will create a new PR from `dev` to merge to `master` (which is the branch deployed on our live server). This PR will follow a special [naming convention](#naming-convention), and its only purpose is to track our deployments to the live server. FIN :raised_hands:
 
 **[⬆ back to top](#contents)**
