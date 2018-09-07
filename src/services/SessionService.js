@@ -1,5 +1,3 @@
-import Validator from 'validator';
-
 import { router } from '../router';
 
 import NetworkService from './NetworkService';
@@ -15,8 +13,6 @@ export default {
 
   getPartner() {
     const user = UserService.getUser();
-
-
     const session = this.currentSession.data;
 
     if (user.isVolunteer) {
@@ -33,13 +29,10 @@ export default {
     }
   },
 
-
   newSession(context, sessionType, sessionSubTopic) {
     return NetworkService.newSession(context, { sessionType, sessionSubTopic }).then((res) => {
       const data = res.data || {};
-
-
-      const sessionId = data.sessionId;
+      const sessionId = { ...data.sessionId };
 
       this.currentSession.sessionId = sessionId;
 
@@ -57,12 +50,7 @@ export default {
   useExistingSession(context, sessionId) {
     return NetworkService.checkSession(context, { sessionId }).then((res) => {
       const data = res.data || {};
-
-
-      const sessionId = data.sessionId;
-
-
-      const sessionType = data.type;
+      const sessionId = { ...data.sessionId };
 
       this.currentSession.sessionId = sessionId;
 
