@@ -19,7 +19,9 @@
           big
           label="Upload a file"/>
         <ul class="file-list">
-          <li v-for="file in fileList">{{ file }}</li>
+          <li
+            v-for="file in fileList"
+            :key="file">{{ file }}</li>
         </ul>
       </div>
       <btn-options
@@ -45,9 +47,9 @@ import Vue from 'vue';
 import UserService from '../../services/UserService';
 import StudentQuestionService from '../../services/StudentQuestionService';
 
-import BtnOptions from '../molecules/BtnOptions';
-import Btn from '../atoms/Btn';
-import Attachment from '../atoms/Attachment';
+import BtnOptions from '../molecules/BtnOptions.vue';
+import Btn from '../atoms/Btn.vue';
+import Attachment from '../atoms/Attachment.vue';
 
 function isValid() {
   const valid = document.getElementById('message').value !== '';
@@ -123,9 +125,18 @@ export default {
     Attachment,
   },
   props: {
-    textareaLabel: String,
-    modalContainer: Object,
-    typeOfForm: String,
+    textareaLabel: {
+      type: String,
+      required: true,
+    },
+    modalContainer: {
+      type: Object,
+      required: true,
+    },
+    typeOfForm: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
