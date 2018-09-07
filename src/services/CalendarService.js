@@ -7,7 +7,7 @@ export default {
   },
   getAvailability(context, userid) {
     return NetworkService.getAvailability(context, { userid }).then((res) => {
-      const availability = res.data.availability;
+      const availability = { ...res.data.availability };
       return availability;
     });
   },
