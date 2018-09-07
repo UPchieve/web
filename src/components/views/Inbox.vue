@@ -16,8 +16,8 @@
 import StudentQuestionService from '../../services/StudentQuestionService';
 import UserService from '../../services/UserService';
 
-import ContentHeader from '../atoms/ContentHeader';
-import HelpRequests from '../organisms/HelpRequests';
+import ContentHeader from '../atoms/ContentHeader.vue';
+import HelpRequests from '../organisms/HelpRequests.vue';
 
 export default {
   components: {
@@ -35,7 +35,7 @@ export default {
   },
   mounted() {
     StudentQuestionService.getStudentQuestions(this, {}).then((questions) => {
-      questions.map((question) => {
+      questions.forEach((question) => {
         this.helpRequests.requests.push(question);
       });
     });
