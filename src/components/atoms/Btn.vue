@@ -10,10 +10,22 @@
 <script>
 export default {
   props: {
-    label: String,
-    btnOptionsSecond: Boolean,
-    big: Boolean,
-    clickHandler: Function,
+    label: {
+      type: String,
+      default: '',
+    },
+    btnOptionsSecond: {
+      type: Boolean,
+      default: false,
+    },
+    big: {
+      type: Boolean,
+      default: false,
+    },
+    clickHandler: {
+      type: Function,
+      required: true,
+    },
   },
   data() {
     return {
@@ -29,12 +41,11 @@ export default {
 
 
 <style>
-/*
-* @notes
-* [1] Refactoring candidate: the v- prefix was added to avoid colliding with
-*     Bootstrap
-*/
-.v-btn { /*[1]*/
+/**
+ * @todo {1} Refactoring candidate: the v- prefix was added to avoid colliding
+ *           with Bootstrap
+ */
+.v-btn { /*{1}*/
   background: var(--c-bg);
   color: var(--c-accent);
   text-align: center;
@@ -47,18 +58,18 @@ export default {
   line-height: 1;
   min-width: 128px;
 }
-.v-btn:hover { /*[1]*/
+.v-btn:hover { /*{1}*/
   color: #fff;
   background: var(--c-accent);
 }
-.v-btn:focus { /*[1]*/
+.v-btn:focus { /*{1}*/
   outline: 0;
 }
-.v-btn--big { /*[1]*/
+.v-btn--big { /*{1}*/
   width: 100%;
   max-width: 512px;
 }
-.v-btn--btn-options-second { /*[1]*/
+.v-btn--btn-options-second { /*{1}*/
   margin-top: 16px;
 }
 
