@@ -12,16 +12,25 @@
 
 
 <script>
-import Btn from '../atoms/Btn';
+import Btn from '../atoms/Btn.vue';
 
 export default {
   components: {
     Btn,
   },
   props: {
-    mainBtnLabel: String,
-    secondBtnLabel: String,
-    clickHandlers: Object,
+    mainBtnLabel: {
+      type: String,
+      default: '',
+    },
+    secondBtnLabel: {
+      type: String,
+      default: '',
+    },
+    clickHandlers: {
+      type: Object,
+      required: true,
+    },
   },
 };
 </script>
