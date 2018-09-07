@@ -7,7 +7,8 @@
       <btn
         v-if="singleBtn"
         :label="mainBtnLabel"
-        :click-handler="clickHandlers.main"/>
+        :click-handler="clickHandlers.main"
+      />
       <btn-options
         v-else
         :main-btn-label="mainBtnLabel"
@@ -20,8 +21,8 @@
 
 
 <script>
-import BtnOptions from './BtnOptions';
-import Btn from '../atoms/Btn';
+import BtnOptions from './BtnOptions.vue';
+import Btn from '../atoms/Btn.vue';
 
 export default {
   components: {
@@ -29,11 +30,26 @@ export default {
     Btn,
   },
   props: {
-    singleBtn: Boolean,
-    message: String,
-    warn: Boolean,
-    labels: Array[String],
-    clickHandlers: Object,
+    singleBtn: {
+      type: Boolean,
+      default: false,
+    },
+    message: {
+      type: String,
+      default: '',
+    },
+    warn: {
+      type: Boolean,
+      default: false,
+    },
+    labels: {
+      type: Array[String],
+      default: [''],
+    },
+    clickHandlers: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
