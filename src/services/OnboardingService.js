@@ -3,8 +3,6 @@ import NetworkService from './NetworkService';
 
 import { router } from '../router';
 
-const REQUIRED_PROFILE_FIELDS = ['name'];
-
 export default {
   status: {
     isOnboarded: false,
