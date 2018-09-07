@@ -17,11 +17,11 @@ export default {
   login(context, creds, redirect) {
     const { email, password } = creds;
     if (!email || !password || !Validator.isEmail(email) || password.length < 1) {
-      return;
+      return undefined;
     }
 
     return NetworkService.login(context, creds).then((res) => {
-      const data = res.data;
+      const data = { ...res.data };
       if (!data) {
         throw new Error('No user returned from auth service');
       }
@@ -39,7 +39,7 @@ export default {
 
   register(context, creds, profile, redirect) {
     return NetworkService.register(context, { ...creds, ...profile }).then((res) => {
-      const data = res.data;
+      const data = { ...res.data };
       console.log(data);
       if (!data) {
         throw new Error('No user returned from auth service');
@@ -69,7 +69,7 @@ export default {
 
   sendReset(context, email, redirect) {
     return NetworkService.sendReset(context, { email }).then((res) => {
-      const data = res.data;
+      const data = { ...res.data };
       console.log(data);
       if (!data) {
         throw new Error('No user returned from auth service');
@@ -89,7 +89,7 @@ export default {
 
   confirmReset(context, credentials, redirect) {
     return NetworkService.confirmReset(context, credentials).then((res) => {
-      const data = res.data;
+      const data = { ...res.data };
       console.log(data);
       if (!data) {
         throw new Error('No user returned from auth service');
@@ -110,7 +110,7 @@ export default {
 
   logout(context) {
     if (context) {
-      NetworkService.logout(context).then((res) => {
+      NetworkService.logout(context).then(() => {
         this.removeUser();
         router.push('/logout');
       }).catch(() => {
@@ -161,7 +161,7 @@ export default {
     this.user.lastFetch = Date.now();
 
     NetworkService.user(context).then((res) => {
-      const data = res.data;
+      const data = { ...res.data };
       if (!data) {
         throw new Error('No user returned from auth service');
       }
