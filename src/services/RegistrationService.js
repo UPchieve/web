@@ -1,7 +1,3 @@
-import Validator from 'validator';
-
-import { router } from '../router';
-
 import NetworkService from './NetworkService';
 
 export default {
