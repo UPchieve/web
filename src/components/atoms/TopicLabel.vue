@@ -8,7 +8,10 @@
 <script>
 export default {
   props: {
-    label: String,
+    label: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
