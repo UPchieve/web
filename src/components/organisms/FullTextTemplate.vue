@@ -11,14 +11,17 @@
 
 
 <script>
-import ContentHeader from '../atoms/ContentHeader';
+import ContentHeader from '../atoms/ContentHeader.vue';
 
 export default {
   components: {
     ContentHeader,
   },
   props: {
-    headerTitle: String,
+    headerTitle: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
