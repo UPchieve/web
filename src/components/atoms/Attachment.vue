@@ -6,7 +6,10 @@
 <script>
 export default {
   props: {
-    filename: String,
+    filename: {
+      type: String,
+      default: '',
+    },
   },
 };
 </script>
