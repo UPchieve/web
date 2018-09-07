@@ -1,17 +1,17 @@
 import NetworkService from './NetworkService';
 
 export default {
-  idAnswerMap: new Object(),
+  idAnswerMap: {},
   questions: [],
   index: 0,
   numAnswers: 0,
-  idCorrectAnswerMap: new Object(),
+  idCorrectAnswerMap: {},
   category: null,
   loadQuiz(context, category) {
     this.index = 0;
     this.numAnswers = 0;
-    this.idAnswerMap = new Object();
-    this.idCorrectAnswerMap = new Object();
+    this.idAnswerMap = {};
+    this.idCorrectAnswerMap = {};
     this.category = category;
     return NetworkService.getQuestions(context, { category }).then((res) => {
       this.questions = res.data.questions;
@@ -26,7 +26,7 @@ export default {
     return this.index;
   },
   hasCompleted(context) {
-    return (this.numAnswers == this.questions.length);
+    return (this.numAnswers === this.questions.length);
   },
   hasNext(context) {
     return ((this.index + 1) < this.questions.length);
@@ -38,7 +38,7 @@ export default {
     if (this.index < this.questions.length) {
       this.index = this.index + 1;
       const question = this.questions[this.index];
-      var picked = this.idAnswerMap[question._id];
+      let picked = this.idAnswerMap[question._id];
       return {
         question,
         picked,
@@ -60,8 +60,8 @@ export default {
   },
   saveAnswer(context, picked) {
     const question = this.questions[this.index];
-    if (picked != '' && picked != null && (this.idAnswerMap[question._id] == null || this.idAnswerMap[question._id] == '')) {
-      this.numAnswers++;
+    if (picked !== '' && picked !== null && (this.idAnswerMap[question._id] === null || this.idAnswerMap[question._id] === '')) {
+      this.numAnswers += 1;
     }
     this.idAnswerMap[question._id] = picked;
   },
@@ -83,8 +83,8 @@ export default {
   },
   reviewQuiz(context) {
     const questionsReview = this.questions.slice(0);
-    const idCorrectAnswerMap = this.idCorrectAnswerMap;
-    const idAnswerMap = this.idAnswerMap;
+    const idCorrectAnswerMap = { ...this.idCorrectAnswerMap };
+    const idAnswerMap = { ...this.idAnswerMap };
     questionsReview.forEach((question) => {
       question.userAnswer = idAnswerMap[question._id];
       question.correctAnswer = idCorrectAnswerMap[question._id];
