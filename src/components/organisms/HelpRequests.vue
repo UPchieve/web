@@ -10,7 +10,8 @@
       </thead>
       <tbody class="help-requests-t__content">
         <tr
-          v-for="(req, index) in requests"
+          v-for="(request, index) in requests"
+          :key="`request-${index}`"
           class="help-request"
         >
           <td>
@@ -41,31 +42,34 @@
 
 
 <script>
-import TopicLabel from '../atoms/TopicLabel';
+import TopicLabel from '../atoms/TopicLabel.vue';
 
 /*
-* @notes
-* [1] Full documentation of this "type": {
-*       type: < 'question' | 'session' >
-*       requests: Array[Request]
-*         Request: {
-*           student: {
-*             name: String,
-*             avatar: String
-*           },
-*           helpTopic: < math | college >,
-*           helpSubtopic:
-*             < Algebra | Geometry | Trigonometry | Precalculus | Calculus >
-*             < Planning | Essays | Applications >
-*         }
-*     }
-*/
+ * @note {1} Full documentation of involved "types":
+ *            HelpRequestsObject: {
+ *              type: < 'question' | 'session' >
+ *              requests: Array[Request]
+ *            }
+ *            Request: {
+ *              student: {
+ *                name: String,
+ *                avatar: String
+ *              },
+ *              helpTopic: < math | college >,
+ *              helpSubtopic:
+ *                < Algebra | Geometry | Trigonometry | Precalculus | Calculus >
+ *                < Planning | Essays | Applications >
+ *            }
+ */
 export default {
   components: {
     TopicLabel,
   },
   props: {
-    helpRequests: Object, // [1]
+    helpRequests: {
+      type: Object, // {1}
+      required: true,
+    },
   },
   data() {
     return {
