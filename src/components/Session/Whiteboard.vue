@@ -80,53 +80,54 @@
 </template>
 
 <script>
-import $ from 'jquery';
+/**
+ * @todo {0} This component needs a lot of refactoring
+ * @todo {1} Solve this bug ('handleUndoOperation' is not defined)
+ */
 
-import AuthService from 'src/services/AuthService';
 import SessionService from 'src/services/SessionService';
 
-const CLEAR_BUTTON_ID = 'clearButton';
-const UNDO_BUTTON_ID = 'undoButton';
-const ERASE_BUTTON_ID = 'eraseButton';
-const DRAW_BUTTON_ID = 'drawButton';
-const TEXT_BUTTON_ID = 'textButton';
-const TEXT_AREA_ID = 'textInputBox';
+// const CLEAR_BUTTON_ID = 'clearButton';
+// const UNDO_BUTTON_ID = 'undoButton';
+// const ERASE_BUTTON_ID = 'eraseButton';
+// const DRAW_BUTTON_ID = 'drawButton';
+// const TEXT_BUTTON_ID = 'textButton';
+// const TEXT_AREA_ID = 'textInputBox';
 
+// const CANVAS_WIDTH = 800;
+// const CANVAS_HEIGHT = 400;
 
-const CANVAS_WIDTH = 800;
-const CANVAS_HEIGHT = 400;
-
-const LINE_FILL_STYLE = 'solid';
+// const LINE_FILL_STYLE = 'solid';
 let LOCAL_LINE_COLOR = 'rgba(244,71,71,1)';
 let SERVER_LINE_COLOR = 'rgba(244,71,71,1)';
 let SERVER_LINE_WIDTH = 5;
 const LINE_WIDTH = 5;
-const LINE_CAP = 'round';
+// const LINE_CAP = 'round';
 
 
 const ERASING_LINE_COLOR = 'white';
 const ERASING_LINE_WIDTH = 20;
 
-const DRAWING = false;
+// const DRAWING = false;
 
 let SERVER_DRAWING = false;
 
 
-const ERASER_ICON = 'url(\'/static/eraser_icon_01_dark.png\') 0 50, auto';
-const PEN_ICON = 'url(\"/static/pen_icon_01_dark.png\") 0 50, auto';
+const ERASER_ICON = 'url("/static/eraser_icon_01_dark.png") 0 50, auto';
+const PEN_ICON = 'url("/static/pen_icon_01_dark.png") 0 50, auto';
 const TEXT_ICON = 'text';
 
 
 let TEXT_POSITION_X = 10;
 let TEXT_POSITION_Y = 10;
 
-const ERASING = false;
+// const ERASING = false;
 let INSERTING_TEXT = false;
 let CURSOR_VISIBLE = false;
 let CURSOR_REMOVED = false;
 
 
-let current_state = '';
+let currentState = '';
 
 
 let imageList = [];
@@ -134,15 +135,15 @@ let imageData;
 const App = {};
 
 
-const RESET_SCREEN_EVENT = 'reset';
+// const RESET_SCREEN_EVENT = 'reset';
 
 function compareImages(img1, img2) {
-  if (img1 != null && img2 != null) {
-    if (img1.data.length != img2.data.length) {
+  if (img1 !== null && img2 !== null) {
+    if (img1.data.length !== img2.data.length) {
       return false;
     }
     for (let i = 0; i < img1.data.length; ++i) {
-      if (img1.data[i] != img2.data[i]) {
+      if (img1.data[i] !== img2.data[i]) {
         return false;
       }
     }
@@ -275,17 +276,17 @@ export default {
     hideBox() {
       this.$el.querySelector('#textInputBox').style.visibility = 'hidden';
       this.$el.querySelector('#textInputBox').value = '';
-      current_state = '';
+      currentState = '';
     },
     changeColor(event) {
-      if (current_state === ('DRAWING')) {
+      if (currentState === ('DRAWING')) {
         LOCAL_LINE_COLOR = event.target.style.backgroundColor;
         App.ctx.strokeStyle = LOCAL_LINE_COLOR;
         this.emitChangeColor(LOCAL_LINE_COLOR);
         App.ctx.lineWidth = LINE_WIDTH;
         this.emitChangeWidth(LINE_WIDTH);
       }
-      else if (current_state === ('ERASING')) {
+      else if (currentState === ('ERASING')) {
         App.ctx.strokeStyle = ERASING_LINE_COLOR;
         App.ctx.lineWidth = ERASING_LINE_WIDTH;
       }
@@ -299,7 +300,7 @@ export default {
     drawStart(event) {
       if (!SERVER_DRAWING) {
         this.emitDrawing();
-        if (!CURSOR_VISIBLE && current_state === ('INSERTING_TEXT')) {
+        if (!CURSOR_VISIBLE && currentState === ('INSERTING_TEXT')) {
           TEXT_POSITION_X = event.layerX - 10;
           TEXT_POSITION_Y = event.layerY + 34;
           CURSOR_VISIBLE = true;
@@ -322,13 +323,13 @@ export default {
           });
           CURSOR_REMOVED = false;
         }
-        else if (current_state === ('DRAWING') || current_state === 'ERASING') {
+        else if (currentState === ('DRAWING') || currentState === 'ERASING') {
           saveImage(App.canvas, App.ctx);
           this.emitSaveImage();
           App.canvas.isDrawing = true;
 
-          const scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
-          const scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+          // const scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
+          // const scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
 
           const x = event.pageX;
           const y = event.pageY;
@@ -347,8 +348,8 @@ export default {
       if (!SERVER_DRAWING) {
         App.canvas.isDrawing = false;
 
-        const scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
-        const scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+        // const scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
+        // const scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
 
         const x = event.pageX;
         const y = event.pageY;
@@ -364,15 +365,15 @@ export default {
         this.emitEnd();
       }
     },
-    draw(e) {
+    draw() {
       if (!SERVER_DRAWING) {
-        if (current_state === ('DRAWING') || current_state === 'ERASING') {
+        if (currentState === ('DRAWING') || currentState === 'ERASING') {
           if (!App.canvas.isDrawing) {
             return;
           }
 
-          const scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
-          const scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+          // const scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
+          // const scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
 
           const x = event.pageX;
           const y = event.pageY;
@@ -396,7 +397,7 @@ export default {
       this.$el.querySelector('#textInputBox').style.visibility = 'hidden';
       App.canvas.style.cursor = PEN_ICON;
 
-      if (current_state === ('INSERTING_TEXT')) {
+      if (currentState === ('INSERTING_TEXT')) {
         saveImage(App.canvas, App.ctx);
         this.emitSaveImage();
       }
@@ -406,11 +407,15 @@ export default {
         this.emitSaveImage();
       }
 
-      current_state = 'DRAWING';
+      currentState = 'DRAWING';
     },
 
     keydown(e) {
-      if (this.$el.querySelector('#textInputBox').value === '' && e.keyCode != 8 && e.keyCode != 46) {
+      if (
+        this.$el.querySelector('#textInputBox').value === '' &&
+        e.keyCode !== 8 &&
+        e.keyCode !== 46
+      ) {
         if (imageList.length > 0) {
           imageData = imageList.pop();
           App.ctx.putImageData(imageData, 0, 0);
@@ -426,7 +431,7 @@ export default {
       saveImage(App.canvas, App.ctx);
       this.emitSaveImage();
 
-      current_state = 'INSERTING_TEXT';
+      currentState = 'INSERTING_TEXT';
       INSERTING_TEXT = true;
       CURSOR_VISIBLE = false;
       App.canvas.style.cursor = TEXT_ICON;
@@ -436,11 +441,14 @@ export default {
 
     textBox() {
       if (CURSOR_VISIBLE) {
-        handleUndoOperation();
+        handleUndoOperation(); // {1}
         this.emitUndoClick();
         CURSOR_VISIBLE = false;
       }
-      this.insertText(this.$el.querySelector('#whiteboardCanvas'), this.$el.querySelector('#textInputBox').value);
+      this.insertText(
+        this.$el.querySelector('#whiteboardCanvas'),
+        this.$el.querySelector('#textInputBox').value,
+      );
       this.emitInsertText({
         text: this.$el.querySelector('#textInputBox').value,
         x: TEXT_POSITION_X,
@@ -449,14 +457,15 @@ export default {
     },
 
     undo() {
-      const currentImage = App.ctx.getImageData(0, 0, App.canvas.width, App.canvas.height);
+      const currentImage
+        = App.ctx.getImageData(0, 0, App.canvas.width, App.canvas.height);
       this.$el.querySelector('#textInputBox').value = '';
       if (imageList.length > 0) {
         imageData = imageList.pop();
         while (compareImages(currentImage, imageData)) {
           imageData = imageList.pop();
         }
-        if (imageData != null) {
+        if (imageData !== null) {
           App.ctx.putImageData(imageData, 0, 0);
         }
 
@@ -469,11 +478,11 @@ export default {
         saveImage(App.canvas, App.ctx);
         this.emitSaveImage();
       }
-      if (current_state === ('INSERTING_TEXT')) {
+      if (currentState === ('INSERTING_TEXT')) {
         saveImage(App.canvas, App.ctx);
         this.emitSaveImage();
       }
-      current_state = 'ERASING';
+      currentState = 'ERASING';
       App.ctx.strokeStyle = ERASING_LINE_COLOR;
       App.ctx.lineWidth = ERASING_LINE_WIDTH;
       App.canvas.style.cursor = ERASER_ICON;
@@ -485,19 +494,34 @@ export default {
 
     // Canvas manipulations
     fillCircle(canvas, context, type, server, x, y, fillColor) {
-      const scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
-      const scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+      const scrollLeft
+        = (window.pageXOffset !== undefined) ?
+          window.pageXOffset :
+          (
+            document.documentElement ||
+          document.body.parentNode ||
+          document.body
+          ).scrollLeft;
+
+      const scrollTop
+        = (window.pageYOffset !== undefined) ?
+          window.pageYOffset :
+          (
+            document.documentElement ||
+          document.body.parentNode ||
+          document.body
+          ).scrollTop;
 
       const rect = App.canvas.getBoundingClientRect();
       if (server) {
         App.ctx.strokeStyle = SERVER_LINE_COLOR;
         App.ctx.lineWidth = SERVER_LINE_WIDTH;
       }
-      else if (current_state === 'ERASING') {
+      else if (currentState === 'ERASING') {
         App.ctx.strokeStyle = ERASING_LINE_COLOR;
         App.ctx.lineWidth = ERASING_LINE_WIDTH;
       }
-      if (current_state === ('DRAWING') || current_state === ('ERASING') || server) {
+      if (currentState === ('DRAWING') || currentState === ('ERASING') || server) {
         if (type === 'dragstart') {
           if (imageList.length > 0) {
             imageData = imageList[imageList.length - 1];
@@ -532,7 +556,7 @@ export default {
       App.ctx.fillText(input, TEXT_POSITION_X, TEXT_POSITION_Y);
     },
     openColors() {
-      if (this.showColors == 'hidden') {
+      if (this.showColors === 'hidden') {
         this.showColors = 'visible';
       }
       else {
@@ -559,17 +583,19 @@ export default {
       SERVER_DRAWING = false;
     },
     save() {
-      const imageData = App.ctx.getImageData(0, 0, App.canvas.width, App.canvas.height);
+      const imageData
+        = App.ctx.getImageData(0, 0, App.canvas.width, App.canvas.height);
       imageList.push(imageData);
     },
     undo() {
-      const currentImage = App.ctx.getImageData(0, 0, App.canvas.width, App.canvas.height);
+      const currentImage
+        = App.ctx.getImageData(0, 0, App.canvas.width, App.canvas.height);
       if (imageList.length > 0) {
         imageData = imageList.pop();
         while (compareImages(currentImage, imageData)) {
           imageData = imageList.pop();
         }
-        if (imageData != null) {
+        if (imageData !== null) {
           App.ctx.putImageData(imageData, 0, 0);
         }
       }
