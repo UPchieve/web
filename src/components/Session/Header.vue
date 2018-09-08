@@ -43,6 +43,9 @@ import SessionService from 'src/services/SessionService';
 
 const DEFAULT_AVATAR_URL = 'static/defaultAvatar@2x.png';
 
+/**
+ * @todo {1} Refactoring candidate: use a modal instead.
+ */
 export default {
   data() {
     return {
@@ -63,8 +66,7 @@ export default {
     },
     partnerAvatar() {
       const partner = SessionService.getPartner();
-
-      const partnerAvatar = partner && partner.picture || DEFAULT_AVATAR_URL;
+      const partnerAvatar = (partner && partner.picture) || DEFAULT_AVATAR_URL;
       return {
         backgroundImage: `url(${partnerAvatar})`,
       };
@@ -72,7 +74,7 @@ export default {
   },
   methods: {
     end() {
-      const result = window.confirm('Do you really want to end the session?');
+      const result = window.confirm('Do you really want to end the session?'); // {1}
       if (result) {
         this.$socket.disconnect();
         SessionService.endSession();
