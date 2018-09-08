@@ -66,7 +66,7 @@ export default {
   },
   methods: {
     sortTimes() {
-      const keysMap = new Object();
+      const keysMap = {};
       for (const day in this.availability) {
         if (this.availability.hasOwnProperty(day)) {
           const times = this.availability[day];

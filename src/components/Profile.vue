@@ -202,7 +202,7 @@ export default {
       'expectedGraduation', 'difficultAcademicSubject', 'difficultCollegeProcess',
       'hasGuidanceCounselor', 'gpa', 'collegeApplicationsText', 'phone', 'favoriteAcademicSubject', 'college', 'referred', 'preferredContactMethod'];
 
-    const certifications = new Object();
+    const certifications = {};
     if (user.algebra) {
       if (user.algebra.passed) {
         certifications.Algebra = true;
@@ -249,7 +249,7 @@ export default {
       }
     }
 
-    const certKey = new Object();
+    const certKey = {};
     certKey.Algebra = 'MATH';
     certKey.Geometry = 'MATH';
     certKey.Trigonometry = 'MATH';

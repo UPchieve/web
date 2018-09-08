@@ -86,12 +86,12 @@ export default {
   },
   data() {
     const user = UserService.getUser();
-    const quizzes = new Object();
+    const quizzes = {};
     quizzes.math = ['algebra', 'geometry', 'trigonometry', 'precalculus', 'calculus'];
     quizzes.esl = ['esl'];
     quizzes['college Counseling'] = ['planning', 'essay', 'application'];
     // quizzes['science'] = ['biology', 'chemistry'];
-    const bools = new Object();
+    const bools = {};
     bools.math = false;
     bools.esl = false;
     bools['college Counseling'] = false;
@@ -99,12 +99,12 @@ export default {
     // Science Currently Removed due to quiz issues -Will
     // var supercategories = ['esl', 'math', 'college Counseling', 'science'];
     const supercategories = ['esl', 'math', 'college Counseling'];
-    const colors = new Object();
+    const colors = {};
     colors.esl = '#1855D1';
     colors.math = '#F7AEF8';
     colors['college Counseling'] = '#FED766';
     colors.science = '#9575CD';
-    const reviewMaterials = new Object();
+    const reviewMaterials = {};
     reviewMaterials.algebra = 'https://drive.google.com/open?id=1UQCaewADDlYXT7vv4-GUuTg7rjLnIdeufGwLgezBo4Y';
     reviewMaterials.geometry = 'https://docs.google.com/document/d/128AHz0DakobmILSTrbiQVix3677FhCNcazduc3896Lk/edit?usp=sharing';
     reviewMaterials.trigonometry = 'https://drive.google.com/open?id=0B8mTVZa3-VGQUkxhd0R0Wmg1azZ5Z1pWUE8xa2g0MGZYemZF';
