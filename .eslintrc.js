@@ -52,5 +52,6 @@ module.exports = {
       }
     ],
     "brace-style": ["error", "stroustrup"], // {5}
+    "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
   }
 }
