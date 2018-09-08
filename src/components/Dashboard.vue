@@ -149,7 +149,7 @@ export default {
       // topic = 'math';
       topic = topic.toLowerCase();
       subTopic = subTopic.toLowerCase();
-      if (subTopic == 'general help') {
+      if (subTopic === 'general help') {
         subTopic = topic;
       }
       const linkName = `/session/${topic}/${subTopic}`;

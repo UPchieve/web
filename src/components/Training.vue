@@ -6,7 +6,7 @@
     <div class="body-container">
       <div v-for="supercategory in supercategories">
         <div
-          v-if="supercategory != 'esl'"
+          v-if="supercategory !== 'esl'"
           :style="{ backgroundColor: colors[supercategory]}"
           class="supercategory"
           @click="flipBool(supercategory)">
@@ -19,7 +19,7 @@
             class="arrow down"/>
         </div>
         <div
-          v-if="supercategory == 'esl'"
+          v-if="supercategory === 'esl'"
           :style="{ backgroundColor: colors[supercategory]}"
           class="supercategory"
           @click="flipBool(supercategory)">
@@ -36,8 +36,8 @@
             v-show="bools[supercategory]"
             class="category">
             <div>
-              <span v-if="category != 'esl'">{{ category | capitalize }}</span>
-              <span v-if="category == 'esl'">{{ category | uppercase }}</span>
+              <span v-if="category !== 'esl'">{{ category | capitalize }}</span>
+              <span v-if="category === 'esl'">{{ category | uppercase }}</span>
               <div class="review">
                 <div class="review-container">
                   <div class="review-label"><a

@@ -128,12 +128,15 @@
 import UserService from 'src/services/UserService';
 import TrainingService from 'src/services/TrainingService';
 
+/**
+ * @note {1} Why the extra parens: https://stackoverflow.com/a/27386370
+ */
 export default {
   data() {
     const user = UserService.getUser();
-    const category = this.$route.params.category;
+    const { category } = this.$route.params;
     let quizName;
-    if (category == 'esl') {
+    if (category === 'esl') {
       quizName = category.toUpperCase();
     }
     else {
@@ -141,7 +144,7 @@ export default {
     }
     let tries = 0;
     if (user[category]) {
-      tries = user[category].tries;
+      ({ tries } = user[category]); // {1}
     }
     return {
       user,
@@ -229,7 +232,7 @@ export default {
       TrainingService.saveAnswer(this, this.picked);
       this.picked = '';
       const data = TrainingService.getPreviousQuestion(this);
-      const question = data.question;
+      const { question } = data;
       this.picked = data.picked;
       this.questionText = question.questionText;
       this.updateProgressBar();
@@ -248,7 +251,7 @@ export default {
       TrainingService.saveAnswer(this, this.picked);
       this.picked = '';
       const data = TrainingService.getNextQuestion(this);
-      const question = data.question;
+      const { question } = data;
       this.picked = data.picked;
       this.questionText = question.questionText;
       this.updateProgressBar();

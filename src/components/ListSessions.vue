@@ -58,44 +58,44 @@ export default {
 
       for (let i = 0; i < socketSessions.length; i++) {
         const currentSession = socketSessions[i];
-        if (socketSessions[i].type == 'college') {
+        if (socketSessions[i].type === 'college') {
           results.push(currentSession);
           continue;
         }
 
-        const subTopic = currentSession.subTopic;
+        const { subTopic } = currentSession;
 
-        if (subTopic == 'algebra') {
+        if (subTopic === 'algebra') {
           if (this.user.algebra.passed) {
             results.push(currentSession);
           }
         }
 
-        if (subTopic == 'geometry') {
+        if (subTopic === 'geometry') {
           if (this.user.geometry.passed) {
             results.push(currentSession);
           }
         }
 
-        if (subTopic == 'trigonometry') {
+        if (subTopic === 'trigonometry') {
           if (this.user.trigonometry.passed) {
             results.push(currentSession);
           }
         }
 
-        if (subTopic == 'esl') {
+        if (subTopic === 'esl') {
           if (this.user.esl.passed) {
             results.push(currentSession);
           }
         }
 
-        if (subTopic == 'precalculus') {
+        if (subTopic === 'precalculus') {
           if (this.user.precalculus.passed) {
             results.push(currentSession);
           }
         }
 
-        if (subTopic == 'calculus') {
+        if (subTopic === 'calculus') {
           if (this.user.calculus.passed) {
             results.push(currentSession);
           }

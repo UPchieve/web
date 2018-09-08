@@ -3,10 +3,10 @@
     v-if="user.isVolunteer"
     class="review">
     <h1
-      v-if="category != 'esl'"
+      v-if="category !== 'esl'"
       class="header">{{ category | capitalize }} Review</h1>
     <h1
-      v-if="category == 'esl'"
+      v-if="category === 'esl'"
       class="header">{{ category | uppercase }} Review</h1>
   </div>
 </template>
@@ -29,7 +29,7 @@ export default {
   },
   data() {
     const user = UserService.getUser();
-    const category = this.$route.params.category;
+    const { category } = this.$route.params;
     return {
       user,
       category,

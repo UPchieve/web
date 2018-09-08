@@ -10,10 +10,8 @@ import { router } from '../router';
 
 export default {
   mounted() {
-    const action = this.$route.params.action;
-
-
-    const data = this.$route.params.data;
+    const { action } = this.$route.params;
+    const { data } = this.$route.params;
 
     if (action === 'verify') {
       OnboardingService.confirmVerification(this, data);

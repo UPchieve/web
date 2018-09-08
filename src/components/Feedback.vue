@@ -50,7 +50,7 @@
           </div>
           <div v-else-if="question.qtype === 'text'">
             <div
-              v-if="question.secondary_title.length != 0"
+              v-if="question.secondary_title.length !== 0"
               class="question-secondary-title">
               {{ question.secondary_title }}
             </div>
@@ -162,7 +162,7 @@ export default {
   beforeMount() {
     const _self = this;
     this.sessionId = this.$route.params.sessionId;
-    const userType = this.$route.params.userType;
+    const { userType } = this.$route.params;
     if (userType === 'student') {
       this.questions = this.student_questions;
     }
@@ -170,7 +170,7 @@ export default {
       this.questions = this.volunteer_questions;
     }
     this.questions.map((question, key) => {
-      if (question.qtype == 'multiple-radio') _self.userResponse[question.qid] = {};
+      if (question.qtype === 'multiple-radio') _self.userResponse[question.qid] = {};
     });
   },
   methods: {

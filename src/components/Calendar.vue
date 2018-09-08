@@ -76,7 +76,7 @@ export default {
               keys.push(time);
             }
           }
-          if (keys[0] != '12a') {
+          if (keys[0] !== '12a') {
             keys.reverse();
           }
           keysMap[day] = keys;
