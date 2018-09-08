@@ -37,7 +37,7 @@ module.exports = {
     "max-len": [ 
       "error", 
       {
-        "ignorePattern": "((<.*>)(\n?\s*)(.*)(\n?\s*)<\/.*>)|(\ \ \ \ return\ context\..*http.*;)", // {3}
+        "ignorePattern": "((<.*>)*(\n?\s*)(.*)(\n?\s*)<\/.*>)|(\ \ \ \ return\ context\..*http.*;)", // {3}
         "code": 85 // {4}    
       } 
     ],
