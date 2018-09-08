@@ -121,41 +121,41 @@ export default {
 }
 
 .body {
-	display: flex;
-	flex-direction: column;
-	align-items: start;
-	font-size: 16px;
-	padding: 30px 30px 20px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  font-size: 16px;
+  padding: 30px 30px 20px 30px;
 }
 
 .description {
-	padding-bottom: 20px;
-	font-size: 20px;
+  padding-bottom: 20px;
+  font-size: 20px;
 }
 
 .category {
-	padding-bottom: 10px;
+  padding-bottom: 10px;
 }
 
 .cat-header {
-	text-align: left;
-	font-size: 20px;
-	font-weight: 600;
-	padding-bottom: 10px;
+  text-align: left;
+  font-size: 20px;
+  font-weight: 600;
+  padding-bottom: 10px;
 }
 
 ul {
-	text-align: left;
+  text-align: left;
 }
 
 li {
-	padding-bottom: 10px;
+  padding-bottom: 10px;
 }
 
 .end-msg {
-	font-size: 16px;
-	padding: 0 30px 50px;
-	text-align: left;
+  font-size: 16px;
+  padding: 0 30px 50px;
+  text-align: left;
 }
 
 </style>

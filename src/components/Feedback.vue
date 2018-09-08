@@ -122,14 +122,14 @@ export default {
         },
       ],
       volunteer_questions: [
-		  {
+      {
           qid: '1',
           qtype: 'text',
           title: 'Did the student ask you any questions that you weren’t prepared to answer?',
           secondary_title: 'Don’t worry! We use this to improve our training and certification materials and won’t hold it against you.',
           table_title: [],
           options: [],
-		  },
+      },
         {
           qid: '2',
           qtype: 'text',
@@ -165,10 +165,10 @@ export default {
     const userType = this.$route.params.userType;
     if (userType === 'student') {
       this.questions = this.student_questions;
-	  }
+    }
     else {
       this.questions = this.volunteer_questions;
-	  }
+    }
     this.questions.map((question, key) => {
       if (question.qtype == 'multiple-radio') _self.userResponse[question.qid] = {};
     });
@@ -188,167 +188,167 @@ export default {
 <style scoped>
 
 .header {
-	height: 100px;
-	margin: 0;
-	padding-left: 30px;
-	margin-bottom: 40px;
-	display: flex;
-	padding: 30px 0 30px 50px;
-	font-size: 24px;
-	border-bottom: 0.5px solid #CCCCCF;
-	align-items: center;
-	justify-content: space-between;
-	font-weight: 600;
-	background-color: white;
+  height: 100px;
+  margin: 0;
+  padding-left: 30px;
+  margin-bottom: 40px;
+  display: flex;
+  padding: 30px 0 30px 50px;
+  font-size: 24px;
+  border-bottom: 0.5px solid #CCCCCF;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  background-color: white;
 }
 
 .feedback-form {
-	background-color: #e5f2fc;
-	min-height: 100%;
-	width: 100%;
-	position: relative;
-	vertical-align: middle;
-	text-align: center;
+  background-color: #e5f2fc;
+  min-height: 100%;
+  width: 100%;
+  position: relative;
+  vertical-align: middle;
+  text-align: center;
 }
 
 .questions-table {
-	width: 75%;
-	max-width: 750px;
-	margin: auto;
-	background-color: white;
-	vertical-align: middle;
-	display: table;
-	border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-	box-shadow: -9px 9px #2757ca;
+  width: 75%;
+  max-width: 750px;
+  margin: auto;
+  background-color: white;
+  vertical-align: middle;
+  display: table;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  box-shadow: -9px 9px #2757ca;
 }
 
 .title-row {
-	display: table-row;
+  display: table-row;
 }
 
 .title-cell {
-	display: table-cell;
-	height: 150px;
-	vertical-align: middle;
-	font-size: 19px;
-	text-align: left;
-	padding-left: 60px;
-	padding-right: 60px;
+  display: table-cell;
+  height: 150px;
+  vertical-align: middle;
+  font-size: 19px;
+  text-align: left;
+  padding-left: 60px;
+  padding-right: 60px;
 }
 
 .question-row {
-	display: table-row;
+  display: table-row;
 }
 
 .question-cell {
-	display: table-cell;
-	vertical-align: middle;
-	font-size: 19px;
-	text-align: left;
-	padding-left: 60px;
-	padding-right: 60px;
-	padding-bottom: 40px;
+  display: table-cell;
+  vertical-align: middle;
+  font-size: 19px;
+  text-align: left;
+  padding-left: 60px;
+  padding-right: 60px;
+  padding-bottom: 40px;
 }
 
 .question-title {
-	padding-bottom: 10px;
+  padding-bottom: 10px;
 }
 
 .question-secondary-title {
-	font-size: 15px;
-	padding-bottom: 10px;
+  font-size: 15px;
+  padding-bottom: 10px;
 }
 
 .radio-question-table {
-	font-size: 15px;
+  font-size: 15px;
 }
 
 .radio-question-table tr:nth-child(even) {
-	background: #f1f8fc;
+  background: #f1f8fc;
 }
 
 .radio-question-table tr:nth-child(odd) {
-	background: #e5f2fc;
+  background: #e5f2fc;
 }
 
 .radio-question-table tr:nth-child(1) {
-	background: white;
+  background: white;
 }
 
 
 .radio-question-row {
-	display: table-row;
+  display: table-row;
 }
 
 .radio-question-cell {
-	display: table-cell;
-	vertical-align: middle;
-	width: 175px;
-	padding-left: 15px;
-	padding-top: 20px;
-	padding-bottom: 25px;
+  display: table-cell;
+  vertical-align: middle;
+  width: 175px;
+  padding-left: 15px;
+  padding-top: 20px;
+  padding-bottom: 25px;
 }
 
 .radio-question-selection-title {
-	display: table-cell;
-	padding-left: 2px;
-	padding-right: 2px;
-	text-align: center;
-	vertical-align: middle;
-	padding-top: 8px;
-	padding-bottom: 15px;
+  display: table-cell;
+  padding-left: 2px;
+  padding-right: 2px;
+  text-align: center;
+  vertical-align: middle;
+  padding-top: 8px;
+  padding-bottom: 15px;
 }
 
 .radio-question-selection-cell {
-	display: table-cell;
-	padding-left: 2px;
-	padding-right: 2px;
-	text-align: center;
-	vertical-align: middle;
+  display: table-cell;
+  padding-left: 2px;
+  padding-right: 2px;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .text-question-textarea {
-	width: 100%;
-	resize: none;
-	font-size: 15px;
-	height: 80px;
-	border-width: 3px;
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
-	border-radius: 3px;
-	border-color: #16D2AA;
+  width: 100%;
+  resize: none;
+  font-size: 15px;
+  height: 80px;
+  border-width: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  border-color: #16D2AA;
 }
 
 .submit-button-row {
-	display: table-row;
+  display: table-row;
 }
 
 .submit-button-cell {
-	display: table-cell;
-	text-align: right;
-	padding-right: 60px;
-	padding-bottom: 80px;
+  display: table-cell;
+  text-align: right;
+  padding-right: 60px;
+  padding-bottom: 80px;
 }
 
 .submit-button {
-	width: 180px;
-	height: 50px;
-	background-color: #F6F6F6;
-	color: #16D2AA;
-	border: none;
-	font-weight: 600;
-	border-radius: 50px;
-	-webkit-border-radius: 50px;
-	-moz-border-radius: 50px;
-	font-size: 15px;
-	float: right;
+  width: 180px;
+  height: 50px;
+  background-color: #F6F6F6;
+  color: #16D2AA;
+  border: none;
+  font-weight: 600;
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  font-size: 15px;
+  float: right;
 }
 
 .submit-button:hover, .submit-button:active {
-	background-color: #16D2AA;
-	color: #FFF;
+  background-color: #16D2AA;
+  color: #FFF;
 }
 
 </style>

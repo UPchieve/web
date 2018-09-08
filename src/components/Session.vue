@@ -106,9 +106,9 @@ export default {
       this.sessionId = this.currentSession.sessionId;
       this.$socket.connect();
       this.$socket.emit('join', {
-  			sessionId,
-  			user: UserService.getUser(),
-  		});
+        sessionId,
+        user: UserService.getUser(),
+      });
     });
 
     // Offer the option to ask a question

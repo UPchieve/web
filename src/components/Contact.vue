@@ -36,9 +36,9 @@ export default {
 <style scoped>
 
 .background {
-	margin-left: -350px;
-	position: relative;
-	z-index: 2;
+  margin-left: -350px;
+  position: relative;
+  z-index: 2;
 }
 
 </style>

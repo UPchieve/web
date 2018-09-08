@@ -318,9 +318,9 @@ export default {
 <style>
 
 .background {
-	margin-left: -320px;
-	position: relative;
-	z-index: 2;
+  margin-left: -320px;
+  position: relative;
+  z-index: 2;
   padding-left: 30px;
   background-color: white;
 }
