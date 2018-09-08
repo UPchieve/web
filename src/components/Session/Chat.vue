@@ -38,7 +38,6 @@ import moment from 'moment';
 import UserService from 'src/services/UserService';
 import SessionService from 'src/services/SessionService';
 
-const DEFAULT_AVATAR_URL = 'static/defaultAvatar@2x.png';
 // student
 // http://localhost:8080/static/defaultavatar3.png
 const STUDENT_AVATAR_URL = 'static/defaultavatar3.png';
@@ -75,7 +74,7 @@ export default {
       this.newMessage = '';
     },
     leftRightMessage(message) {
-      if (message.name == this.user.firstname) {
+      if (message.name === this.user.firstname) {
         return 'left';
       }
       return 'right';
@@ -88,8 +87,8 @@ export default {
       SessionService.currentSession.data = data;
     },
     messageSend(data) {
-    	console.log(data);
-    	let picture = data.picture;
+      console.log(data);
+      let { picture } = data;
       if (!picture || picture === '') {
         if (data.isVolunteer === true) {
           picture = VOLUNTEER_AVATAR_URL;
@@ -97,15 +96,14 @@ export default {
         else {
           picture = STUDENT_AVATAR_URL;
         }
-        // picture = DEFAULT_AVATAR_URL
-    	}
+      }
       this.messages.push({
-    		contents: data.contents,
-    		name: data.name,
-    		avatarStyle: {
-    			backgroundImage: `url(${picture})`,
-    		},
-    		time: moment(data.time).format('h:mm:ss a'),
+        contents: data.contents,
+        name: data.name,
+        avatarStyle: {
+          backgroundImage: `url(${picture})`,
+        },
+        time: moment(data.time).format('h:mm:ss a'),
       });
     },
   },
@@ -116,7 +114,7 @@ export default {
 
 <style scoped>
 .chat {
-	height: 100%;
+  height: 100%;
 }
 
 .header {
@@ -132,23 +130,23 @@ export default {
 }
 
 .messages-container {
-	height: calc(100% - 40px);
-	padding-bottom: 100px;
-	overflow: hidden;
+  height: calc(100% - 40px);
+  padding-bottom: 100px;
+  overflow: hidden;
   top: 40px;
   position: relative;
 }
 
 .messages {
-	height: 100%;
-	overflow: scroll;
+  height: 100%;
+  overflow: scroll;
   display: flex;
   flex-direction: column;
 }
 
 .message {
-	position: relative;
-	padding: 10px;
+  position: relative;
+  padding: 10px;
   display: flex;
   justify-content: flex-start;
 }
@@ -166,27 +164,27 @@ export default {
 }
 
 .time {
-	font-size: 12px;
-	font-weight: 300;
-	color: #73737A;
+  font-size: 12px;
+  font-weight: 300;
+  color: #73737A;
 }
 
 .contents {
-	text-align: left;
+  text-align: left;
   width: 200px;
   overflow-wrap: break-word;
   font-size: 16px;
 }
 
 textarea {
-	width: 100%;
-	height: 100px;
-	border: none;
-	position: absolute;
-	left: 0;
-	bottom: 0;
-	border-top: 1px solid #979797;
-	padding: 10px 12px;
+  width: 100%;
+  height: 100px;
+  border: none;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  border-top: 1px solid #979797;
+  padding: 10px 12px;
 }
 
 .left {
