@@ -43,7 +43,8 @@ export default {
       console.log(data);
       if (!data) {
         throw new Error('No user returned from auth service');
-      } else if (data.err) {
+      }
+      else if (data.err) {
         throw new Error(data.err);
       }
 
@@ -93,7 +94,8 @@ export default {
       console.log(data);
       if (!data) {
         throw new Error('No user returned from auth service');
-      } else if (data.err) {
+      }
+      else if (data.err) {
         console.log(data.err.message);
         throw new Error(data.err);
       }
@@ -117,7 +119,8 @@ export default {
         this.removeUser();
         router.push('/logout');
       });
-    } else {
+    }
+    else {
       this.removeUser();
     }
   },
@@ -128,10 +131,12 @@ export default {
       try {
         this.user.data = JSON.parse(user);
         this.user.authenticated = true;
-      } catch (e) {
+      }
+      catch (e) {
         this.logout(); // Error in LocalStorage, so logout
       }
-    } else {
+    }
+    else {
       this.user.authenticated = false;
       this.user.data = null;
     }
@@ -170,7 +175,8 @@ export default {
         this.user.authenticated = true;
         this.user.data = data.user;
         localStorage.setItem('user', JSON.stringify(data.user));
-      } else {
+      }
+      else {
         this.user.authenticated = false;
         this.user.data = null;
       }

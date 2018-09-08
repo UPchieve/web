@@ -190,7 +190,8 @@ export default {
     showResponseStateSubmitQuestion(res) {
       if (res === 'notSent') {
         showModalRetry(this);
-      } else {
+      }
+      else {
         const message = `
           Thanks for submitting your question! You will receive a response to 
           your email address as soon as possible.
@@ -202,7 +203,8 @@ export default {
     showResponseStateSendAnswer(res) {
       if (res === 'notSent') {
         showModalRetry(this);
-      } else {
+      }
+      else {
         const message = 'Your answer has been sent!';
         showModalSuccess(this, message);
       }
@@ -235,10 +237,12 @@ export default {
 
         if (this.typeOfForm === 'submit-question') {
           this.submitFormSubmitQuestion(buildFormDataObjSubmitQuestion(this));
-        } else if (this.typeOfForm === 'send-answer') {
+        }
+        else if (this.typeOfForm === 'send-answer') {
           this.submitFormSendAnswer(buildFormDataObjSendAnswer(this.modalContainer));
         }
-      } else {
+      }
+      else {
         this.askForAMessage();
       }
     },

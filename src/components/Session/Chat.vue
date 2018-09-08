@@ -93,7 +93,8 @@ export default {
       if (!picture || picture === '') {
         if (data.isVolunteer === true) {
           picture = VOLUNTEER_AVATAR_URL;
-        } else {
+        }
+        else {
           picture = STUDENT_AVATAR_URL;
         }
         // picture = DEFAULT_AVATAR_URL

@@ -397,7 +397,6 @@
 <script>
 
 import UserService from 'src/services/UserService';
-import OnboardingService from 'src/services/OnboardingService';
 import $ from 'jquery';
 
 export default {
@@ -416,29 +415,38 @@ export default {
     back() {
       this.$router.push('/onboarding/profile');
     },
-    submitProfile(e) {
+    submitProfile() {
       this.error = '';
 
       if (!this.user.isVolunteer) {
         if (!this.user.groupIdentification.length) {
           this.error = 'If you don\'t identify with any of the groups, please select "None of the Above"';
-        } else if (!this.user.computerAccess.length) {
+        }
+        else if (!this.user.computerAccess.length) {
           this.error = 'If you don\'t have access to a computer or phone with internet access, please select "None"';
-        } else if (!this.user.computerAccessLocation || this.user.computerAccessLocation === '') {
+        }
+        else if (!this.user.computerAccessLocation || this.user.computerAccessLocation === '') {
           this.error = 'Please provide where you are accessing this site from';
-        } else if (!this.user.homeworkTime || this.user.homeworkTime === '') {
+        }
+        else if (!this.user.homeworkTime || this.user.homeworkTime === '') {
           this.error = 'Please provide the times times you generally do your homework';
-        } else if (!this.user.difficultAcademicSubject || this.user.difficultAcademicSubject === '') {
+        }
+        else if (!this.user.difficultAcademicSubject || this.user.difficultAcademicSubject === '') {
           this.error = 'Please provide the academic subjects you find most difficult';
-        } else if (!this.user.gpa || this.user.gpa === '') {
+        }
+        else if (!this.user.gpa || this.user.gpa === '') {
           this.error = 'Please provide your GPA';
-        } else if (!this.user.difficultCollegeProcess.length) {
+        }
+        else if (!this.user.difficultCollegeProcess.length) {
           this.error = 'Please provide the aspects of the college process that are most difficult';
-        } else if (!this.user.highestLevelEducation.length) {
+        }
+        else if (!this.user.highestLevelEducation.length) {
           this.error = 'Please provide your parent\'s highest level of education';
-        } else if (!this.user.hasGuidanceCounselor || this.user.hasGuidanceCounselor === '') {
+        }
+        else if (!this.user.hasGuidanceCounselor || this.user.hasGuidanceCounselor === '') {
           this.error = 'Please provide whether or not you have a guidance counselor';
-        } else if (!this.user.heardFrom || this.user.heardFrom === '') {
+        }
+        else if (!this.user.heardFrom || this.user.heardFrom === '') {
           this.error = 'Please provide where you heard about UPchieve';
         }
       }

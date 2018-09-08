@@ -13,6 +13,8 @@
  *           a few characters beyond the 80th column AND if breaking the 
  *           expression into several lines is undesirable because it would make
  *           it look funny.
+ * @note {5} Stroustrup was chosen because it keeps related logical statements
+ *           perfectly aligned.
  */
 module.exports = {
   "root": true,
@@ -48,5 +50,6 @@ module.exports = {
         "overrides": { "=": "before" } 
       }
     ],
+    "brace-style": ["error", "stroustrup"], // {5}
   }
 }

@@ -37,7 +37,8 @@ export default {
       if (res.data) {
         AuthService.storeUser(res.data.user);
         context.msg = 'Set!';
-      } else {
+      }
+      else {
         throw new Error();
       }
       if (redirect) {

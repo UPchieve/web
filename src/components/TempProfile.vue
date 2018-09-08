@@ -938,8 +938,8 @@ import OnboardingService from '../services/OnboardingService';
     script.src = 'https://www.cloudwok.com/cdn-vassets/javascripts/cw.js';
     tag.parentNode.insertBefore(script, tag);
   };
-  window.addEventListener ? window.addEventListener('load', loader, false)
-    : window.attachEvent('onload', loader);
+  window.addEventListener ? window.addEventListener('load', loader, false) :
+    window.attachEvent('onload', loader);
 }(window, document));
 
 export default {

@@ -94,12 +94,14 @@ router.beforeEach((to, from, next) => {
           redirect: to.fullPath,
         },
       });
-    } else if (!OnboardingService.isOnboarded()) {
+    }
+    else if (!OnboardingService.isOnboarded()) {
       console.log('User requires onboarding');
       const route = OnboardingService.getOnboardingRoute();
       if (to.path.indexOf(route) !== -1 || to.matched.some(route => route.meta.bypassOnboarding)) {
         next();
-      } else {
+      }
+      else {
         next({
           path: route,
           query: {
@@ -107,10 +109,12 @@ router.beforeEach((to, from, next) => {
           },
         });
       }
-    } else {
+    }
+    else {
       next();
     }
-  } else {
+  }
+  else {
     next();
   }
 });

@@ -295,7 +295,8 @@ export default {
     user.birthdate = user.birthdate || '';
     if (!user.isVolunteer) {
       var button = 'NEXT';
-    } else {
+    }
+    else {
       var button = 'DONE';
     }
     return {
@@ -314,42 +315,60 @@ export default {
       if (!user.isVolunteer) {
         if (!this.user.firstname || this.user.firstname === '') {
           this.error = 'Please provide your full name';
-        } else if (!this.user.lastname || this.user.lastname === '') {
+        }
+        else if (!this.user.lastname || this.user.lastname === '') {
           this.error = 'Please provide your full name';
-        } else if (!this.user.birthdate || this.user.birthdate === '') {
+        }
+        else if (!this.user.birthdate || this.user.birthdate === '') {
           this.error = 'Please provide your birthday';
-        } else if (birthdateValidation !== true) {
+        }
+        else if (birthdateValidation !== true) {
           this.error = birthdateValidation;
-        } else if (!this.user.gender || this.user.gender === '') {
+        }
+        else if (!this.user.gender || this.user.gender === '') {
           this.error = 'Please select a gender';
-        } else if (!this.user.race.length) {
+        }
+        else if (!this.user.race.length) {
           this.error = 'Please select a race';
-        } else if (!this.user.highschool || this.user.highschool === '') {
+        }
+        else if (!this.user.highschool || this.user.highschool === '') {
           this.error = 'Please provide the name of your high school';
-        } else if (!this.user.expectedGraduation || this.user.expectedGraduation === '') {
+        }
+        else if (!this.user.expectedGraduation || this.user.expectedGraduation === '') {
           this.error = 'Please provide your expected graduation year';
-        } else if (!this.user.referred || this.user.referred === '') {
+        }
+        else if (!this.user.referred || this.user.referred === '') {
           this.error = 'Please provide your referral information';
         }
-      } else if (!this.user.firstname || this.user.firstname === '') {
+      }
+      else if (!this.user.firstname || this.user.firstname === '') {
         this.error = 'Please provide your full name';
-      } else if (!this.user.lastname || this.user.lastname === '') {
+      }
+      else if (!this.user.lastname || this.user.lastname === '') {
         this.error = 'Please provide your full name';
-      } else if (!this.user.birthdate || this.user.birthdate === '') {
+      }
+      else if (!this.user.birthdate || this.user.birthdate === '') {
         this.error = 'Please provide your birthday';
-      } else if (birthdateValidation !== true) {
+      }
+      else if (birthdateValidation !== true) {
         this.error = birthdateValidation;
-      } else if (!this.user.gender || this.user.gender === '') {
+      }
+      else if (!this.user.gender || this.user.gender === '') {
         this.error = 'Please select a gender';
-      } else if (!this.user.race.length) {
+      }
+      else if (!this.user.race.length) {
         this.error = 'Please select a race';
-      } else if (!this.user.phone || this.user.phone === '') {
+      }
+      else if (!this.user.phone || this.user.phone === '') {
         this.error = 'Please provide your phone number';
-      } else if (!this.user.college || this.user.college === '') {
+      }
+      else if (!this.user.college || this.user.college === '') {
         this.error = 'Please provide your college';
-      } else if (!this.user.favoriteAcademicSubject || this.user.favoriteAcademicSubject === '') {
+      }
+      else if (!this.user.favoriteAcademicSubject || this.user.favoriteAcademicSubject === '') {
         this.error = 'Please provide your favorite academic subject';
-      } else if (!this.user.referred.length) {
+      }
+      else if (!this.user.referred.length) {
         this.error = 'Please provide your referral information';
       }
 
@@ -361,7 +380,8 @@ export default {
       this.buttonMsg = 'UPDATING...';
       if (!user.isVolunteer) {
         UserService.setProfile(this, this.user, '/onboarding/academic');
-      } else {
+      }
+      else {
         UserService.setProfile(this, this.user, '/');
       }
     },

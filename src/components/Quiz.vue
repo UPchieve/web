@@ -135,7 +135,8 @@ export default {
     let quizName;
     if (category == 'esl') {
       quizName = category.toUpperCase();
-    } else {
+    }
+    else {
       quizName = category.charAt(0).toUpperCase() + category.slice(1);
     }
     let tries = 0;
@@ -191,7 +192,8 @@ export default {
         const element = document.getElementById(`circle-${i}`);
         if (i < (index + 2)) {
           element.style.background = '#16D2AA';
-        } else {
+        }
+        else {
           element.style.background = '#EEEEEE';
         }
       }
@@ -207,7 +209,10 @@ export default {
           backgroundSize: '100%',
           backgroundRepeat: 'no-repeat',
         };
-      } else { this.imageStyle = { }; }
+      }
+      else {
+        this.imageStyle = { };
+      }
     },
     getFirst() {
       const question = TrainingService.getFirstQuestion(this);
@@ -269,7 +274,8 @@ export default {
               borderBottom: '5px solid #1855D1',
               borderLeft: '5px solid #1855D1',
             };
-          } else {
+          }
+          else {
             this.passedMsg = 'You failed.';
             this.popUpCoverStyle = {
               backgroundColor: '#FEEAB2',
@@ -280,7 +286,8 @@ export default {
             };
             if (data.tries < 3) {
               this.showRestart = true;
-            } else {
+            }
+            else {
               this.showDone = true;
             }
           }
@@ -310,7 +317,8 @@ export default {
         this.showNext = false;
         this.showSubmit = false;
         this.showReview = true;
-      } else {
+      }
+      else {
         this.scoreMsg = 'You must answer all questions before submitting the quiz!';
       }
     },
@@ -327,7 +335,10 @@ export default {
             backgroundSize: '100%',
             backgroundRepeat: 'no-repeat',
           };
-        } else { question.imageStyle = { }; }
+        }
+        else {
+          question.imageStyle = { };
+        }
       });
       this.items = [];
       this.questionText = '';

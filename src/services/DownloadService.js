@@ -6,7 +6,8 @@ export default {
     const blob = new Blob([data], { type: mime || 'application/octet-stream' });
     if (typeof window.navigator.msSaveBlob !== 'undefined') {
       window.navigator.msSaveBlob(blob, filename);
-    } else {
+    }
+    else {
       const blobURL = window.URL.createObjectURL(blob);
       const tempLink = document.createElement('a');
       tempLink.style.display = 'none';

@@ -45,7 +45,8 @@ export default {
         'firstname', 'lastname', 'birthdate', 'gender', 'race',
         'phone', 'referred', 'favoriteAcademicSubject', 'college',
       ];
-    } else {
+    }
+    else {
       requiredFields = [
         'firstname', 'lastname', 'birthdate', 'gender', 'race', 'expectedGraduation',
       ];

@@ -84,7 +84,8 @@ export default {
       next({
         path: '/',
       });
-    } else {
+    }
+    else {
       next();
     }
   },

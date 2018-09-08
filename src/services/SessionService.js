@@ -40,7 +40,8 @@ export default {
         console.log(sessionId);
         if (sessionId) {
           router.replace(`/session/${sessionType}/${sessionSubTopic}/${sessionId}`);
-        } else {
+        }
+        else {
           router.replace('/');
         }
 

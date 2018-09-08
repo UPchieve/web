@@ -165,7 +165,8 @@ export default {
     const userType = this.$route.params.userType;
     if (userType === 'student') {
       this.questions = this.student_questions;
-	  } else {
+	  }
+    else {
       this.questions = this.volunteer_questions;
 	  }
     this.questions.map((question, key) => {

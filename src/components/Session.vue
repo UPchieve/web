@@ -92,11 +92,13 @@ export default {
       let type;
       if (this.$route.path.indexOf('session/college') !== -1) {
         type = 'college';
-      } else {
+      }
+      else {
         type = 'math';
       }
       promise = SessionService.newSession(this, type, this.$route.params.subTopic);
-    } else {
+    }
+    else {
       promise = SessionService.useExistingSession(this, id);
     }
 
@@ -113,8 +115,8 @@ export default {
     const MODAL_TIMEOUT_MS = 24 * 60 * 60 * 1000;
     setTimeout(() => {
       if (
-        !UserService.getUser().isVolunteer
-        && SessionService.getPartner() === undefined
+        !UserService.getUser().isVolunteer &&
+        SessionService.getPartner() === undefined
       ) {
         this.showModal = true;
       }

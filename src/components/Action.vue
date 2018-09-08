@@ -17,7 +17,8 @@ export default {
 
     if (action === 'verify') {
       OnboardingService.confirmVerification(this, data);
-    } else {
+    }
+    else {
       router.replace('/onboarding/profile');
     }
   },

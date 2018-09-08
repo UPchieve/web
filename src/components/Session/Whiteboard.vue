@@ -284,7 +284,8 @@ export default {
         this.emitChangeColor(LOCAL_LINE_COLOR);
         App.ctx.lineWidth = LINE_WIDTH;
         this.emitChangeWidth(LINE_WIDTH);
-      } else if (current_state === ('ERASING')) {
+      }
+      else if (current_state === ('ERASING')) {
         App.ctx.strokeStyle = ERASING_LINE_COLOR;
         App.ctx.lineWidth = ERASING_LINE_WIDTH;
       }
@@ -307,7 +308,8 @@ export default {
           if (imageList.length > 0) {
             imageData = imageList[imageList.length - 1];
             App.ctx.putImageData(imageData, 0, 0);
-          } else {
+          }
+          else {
             imageData = App.ctx.getImageData(0, 0, App.canvas.width, App.canvas.height);
           }
 
@@ -319,7 +321,8 @@ export default {
             y: TEXT_POSITION_Y,
           });
           CURSOR_REMOVED = false;
-        } else if (current_state === ('DRAWING') || current_state === 'ERASING') {
+        }
+        else if (current_state === ('DRAWING') || current_state === 'ERASING') {
           saveImage(App.canvas, App.ctx);
           this.emitSaveImage();
           App.canvas.isDrawing = true;
@@ -489,7 +492,8 @@ export default {
       if (server) {
         App.ctx.strokeStyle = SERVER_LINE_COLOR;
         App.ctx.lineWidth = SERVER_LINE_WIDTH;
-      } else if (current_state === 'ERASING') {
+      }
+      else if (current_state === 'ERASING') {
         App.ctx.strokeStyle = ERASING_LINE_COLOR;
         App.ctx.lineWidth = ERASING_LINE_WIDTH;
       }
@@ -501,10 +505,12 @@ export default {
           }
           context.beginPath();
           context.moveTo(x - scrollLeft - rect.left, y - scrollTop - rect.top + 5);
-        } else if (type === 'drag') {
+        }
+        else if (type === 'drag') {
           context.lineTo(x - scrollLeft - rect.left, y - scrollTop - rect.top + 5);
           context.stroke();
-        } else {
+        }
+        else {
           context.closePath();
           saveImage(canvas, context);
           this.emitSaveImage();
@@ -528,7 +534,8 @@ export default {
     openColors() {
       if (this.showColors == 'hidden') {
         this.showColors = 'visible';
-      } else {
+      }
+      else {
         this.showColors = 'hidden';
       }
     },

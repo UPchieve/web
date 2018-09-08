@@ -278,7 +278,8 @@ export default {
         UserService.setProfile(this, this.user);
         this.editBtnMsg = 'Edit Profile';
         this.activeEdit = false;
-      } else {
+      }
+      else {
         this.editBtnMsg = 'Save Profile';
         this.activeEdit = true;
       }
