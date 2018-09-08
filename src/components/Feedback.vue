@@ -122,14 +122,14 @@ export default {
         },
       ],
       volunteer_questions: [
-      {
+        {
           qid: '1',
           qtype: 'text',
           title: 'Did the student ask you any questions that you weren’t prepared to answer?',
           secondary_title: 'Don’t worry! We use this to improve our training and certification materials and won’t hold it against you.',
           table_title: [],
           options: [],
-      },
+        },
         {
           qid: '2',
           qtype: 'text',
