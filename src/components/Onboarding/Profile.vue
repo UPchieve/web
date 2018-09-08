@@ -281,9 +281,7 @@
 </template>
 
 <script>
-
 import $ from 'jquery';
-import validator from 'validator';
 
 import UserService from 'src/services/UserService';
 import OnboardingService from 'src/services/OnboardingService';
@@ -291,13 +289,14 @@ import OnboardingService from 'src/services/OnboardingService';
 export default {
   data() {
     const user = UserService.getUser();
+    let button;
     user.race = user.race || [];
     user.birthdate = user.birthdate || '';
     if (!user.isVolunteer) {
-      var button = 'NEXT';
+      button = 'NEXT';
     }
     else {
-      var button = 'DONE';
+      button = 'DONE';
     }
     return {
       user,
@@ -306,7 +305,7 @@ export default {
     };
   },
   methods: {
-    submitProfile(e) {
+    submitProfile() {
       this.error = '';
 
       const user = UserService.getUser();

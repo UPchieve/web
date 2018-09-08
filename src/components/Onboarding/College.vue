@@ -173,9 +173,7 @@
 </template>
 
 <script>
-
 import UserService from 'src/services/UserService';
-import OnboardingService from 'src/services/OnboardingService';
 
 export default {
   data() {
@@ -192,7 +190,7 @@ export default {
     back() {
       this.$router.push('/onboarding/academic');
     },
-    submitProfile(e) {
+    submitProfile() {
       this.buttonMsg = 'Updating...';
       UserService.setProfile(this, this.user, '/');
     },
