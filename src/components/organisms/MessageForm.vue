@@ -62,13 +62,13 @@ function buildFormDataObjSubmitQuestion(context) {
   const questionObj = new FormData();
   questionObj.append(
     'topic',
-    context.$route.query.topic.charAt(0).toUpperCase()
-        + context.$route.query.topic.slice(1),
+    context.$route.query.topic.charAt(0).toUpperCase() +
+        context.$route.query.topic.slice(1),
   );
   questionObj.append(
     'subTopic',
-    context.$route.query.subTopic.charAt(0).toUpperCase()
-        + context.$route.query.subTopic.slice(1),
+    context.$route.query.subTopic.charAt(0).toUpperCase() +
+        context.$route.query.subTopic.slice(1),
   );
   questionObj.append(
     'student',
@@ -177,8 +177,10 @@ export default {
     },
     showLoader() {
       document.querySelector('.form-loader').style = 'top: 0';
-      document.querySelector('.form-loader__dot:nth-child(1)').style = 'animation: a-loader-1 2s ease-out infinite';
-      document.querySelector('.form-loader__dot:nth-child(2)').style = 'animation: a-loader-1 1s 2s ease-out infinite';
+      document.querySelector('.form-loader__dot:nth-child(1)').style
+        = 'animation: a-loader-1 2s ease-out infinite';
+      document.querySelector('.form-loader__dot:nth-child(2)').style
+        = 'animation: a-loader-1 1s 2s ease-out infinite';
     },
     hideLoader() {
       document.querySelector('.form-loader').style = '';

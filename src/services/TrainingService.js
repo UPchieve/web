@@ -38,7 +38,7 @@ export default {
     if (this.index < this.questions.length) {
       this.index = this.index + 1;
       const question = this.questions[this.index];
-      let picked = this.idAnswerMap[question._id];
+      const picked = this.idAnswerMap[question._id];
       return {
         question,
         picked,
@@ -60,7 +60,14 @@ export default {
   },
   saveAnswer(context, picked) {
     const question = this.questions[this.index];
-    if (picked !== '' && picked !== null && (this.idAnswerMap[question._id] === null || this.idAnswerMap[question._id] === '')) {
+    if (
+      picked !== '' &&
+      picked !== null &&
+      (
+        this.idAnswerMap[question._id] === null ||
+        this.idAnswerMap[question._id] === ''
+      )
+    ) {
       this.numAnswers += 1;
     }
     this.idAnswerMap[question._id] = picked;

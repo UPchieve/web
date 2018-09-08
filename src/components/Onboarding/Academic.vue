@@ -4,9 +4,8 @@
       <h2>Registration: First Time Use Survey</h2>
     </div>
     <div class="registration-body">
-      <div class="description">Before you can request a tutor, we request that you
-      fill out this short survey so that we can continue to improve our services.
-      You will not be asked to take this again.</div>
+      <div class="description">
+        Before you can request a tutor, we request that you fill out this short survey so that we can continue to improve our services. You will not be asked to take this again.</div>
 
       <div
         v-if="error"

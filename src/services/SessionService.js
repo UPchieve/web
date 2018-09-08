@@ -30,21 +30,22 @@ export default {
   },
 
   newSession(context, sessionType, sessionSubTopic) {
-    return NetworkService.newSession(context, { sessionType, sessionSubTopic }).then((res) => {
-      const data = res.data || {};
-      const sessionId = { ...data.sessionId };
+    return NetworkService.newSession(context, { sessionType, sessionSubTopic })
+      .then((res) => {
+        const data = res.data || {};
+        const sessionId = { ...data.sessionId };
 
-      this.currentSession.sessionId = sessionId;
+        this.currentSession.sessionId = sessionId;
 
-      console.log(sessionId);
-      if (sessionId) {
-        router.replace(`/session/${sessionType}/${sessionSubTopic}/${sessionId}`);
-      } else {
-        router.replace('/');
-      }
+        console.log(sessionId);
+        if (sessionId) {
+          router.replace(`/session/${sessionType}/${sessionSubTopic}/${sessionId}`);
+        } else {
+          router.replace('/');
+        }
 
-      return sessionId;
-    });
+        return sessionId;
+      });
   },
 
   useExistingSession(context, sessionId) {

@@ -41,15 +41,18 @@ export default {
 
     let requiredFields;
     if (user.isVolunteer) {
-      requiredFields = ['firstname', 'lastname', 'birthdate', 'gender', 'race',
-        'phone', 'referred', 'favoriteAcademicSubject', 'college'];
+      requiredFields = [
+        'firstname', 'lastname', 'birthdate', 'gender', 'race',
+        'phone', 'referred', 'favoriteAcademicSubject', 'college',
+      ];
     } else {
       requiredFields = [
         'firstname', 'lastname', 'birthdate', 'gender', 'race', 'expectedGraduation',
       ];
     }
 
-    // Test if each required field is present, return true when field fails to terminate iteration
+    // Test if each required field is present, return true when field fails to
+    // terminate iteration
     const hasInvalidField = requiredFields.some((fieldName) => {
       const field = user[fieldName];
       if (field === null || field === undefined) {

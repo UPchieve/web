@@ -34,8 +34,10 @@ export default {
   },
   methods: {
     slideToggle() {
-      this.accordionItemBulletClasses['accordion-item__bullet--active'] = !this.accordionItemBulletClasses['accordion-item__bullet--active'];
-      this.accordionItemContentClasses['accordion-item__content--active'] = !this.accordionItemContentClasses['accordion-item__content--active'];
+      this.accordionItemBulletClasses['accordion-item__bullet--active']
+        = !this.accordionItemBulletClasses['accordion-item__bullet--active'];
+      this.accordionItemContentClasses['accordion-item__content--active']
+        = !this.accordionItemContentClasses['accordion-item__content--active'];
     },
   },
 };
