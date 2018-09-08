@@ -40,7 +40,8 @@ module.exports = {
       "error", 
       {
         "ignorePattern": "((<.*>)*(\n?\s*)(.*)(\n?\s*)<\/.*>)|(\ \ \ \ return\ context\..*http.*;)", // {3}
-        "code": 85 // {4}    
+        "code": 85, // {4}    
+        "ignoreStrings": true,
       } 
     ],
     "operator-linebreak": [
