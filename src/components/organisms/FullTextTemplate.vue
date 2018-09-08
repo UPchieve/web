@@ -11,7 +11,7 @@
 
 
 <script>
-import ContentHeader from '../atoms/ContentHeader.vue';
+import ContentHeader from '../atoms/ContentHeader';
 
 export default {
   components: {

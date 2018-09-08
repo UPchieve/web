@@ -16,8 +16,8 @@
 import StudentQuestionService from '../../services/StudentQuestionService';
 import UserService from '../../services/UserService';
 
-import ContentHeader from '../atoms/ContentHeader.vue';
-import HelpRequests from '../organisms/HelpRequests.vue';
+import ContentHeader from '../atoms/ContentHeader';
+import HelpRequests from '../organisms/HelpRequests';
 
 export default {
   components: {

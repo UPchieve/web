@@ -21,8 +21,8 @@
 
 
 <script>
-import BtnOptions from './BtnOptions.vue';
-import Btn from '../atoms/Btn.vue';
+import BtnOptions from './BtnOptions';
+import Btn from '../atoms/Btn';
 
 export default {
   components: {

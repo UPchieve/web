@@ -15,6 +15,8 @@
  *           it look funny.
  * @note {5} Stroustrup was chosen because it keeps related logical statements
  *           perfectly aligned.
+ * @note {6} These settings are used by the plug-ins eslint-plugin-import and
+ *           eslint-import-resolver-webpack. 
  */
 module.exports = {
   "root": true,
@@ -53,5 +55,12 @@ module.exports = {
     ],
     "brace-style": ["error", "stroustrup"], // {5}
     "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
-  }
+  },
+  "settings": { // {6}
+    "import/resolver": {
+      "webpack": {
+        "config": "./build/webpack.dev.conf.js"
+      }
+    }
+  },
 }

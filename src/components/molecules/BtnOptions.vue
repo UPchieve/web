@@ -12,7 +12,7 @@
 
 
 <script>
-import Btn from '../atoms/Btn.vue';
+import Btn from '../atoms/Btn';
 
 export default {
   components: {

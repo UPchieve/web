@@ -42,7 +42,7 @@
 
 
 <script>
-import TopicLabel from '../atoms/TopicLabel.vue';
+import TopicLabel from '../atoms/TopicLabel';
 
 /*
  * @note {1} Full documentation of involved "types":

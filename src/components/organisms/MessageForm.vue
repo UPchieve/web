@@ -47,9 +47,9 @@ import Vue from 'vue';
 import UserService from '../../services/UserService';
 import StudentQuestionService from '../../services/StudentQuestionService';
 
-import BtnOptions from '../molecules/BtnOptions.vue';
-import Btn from '../atoms/Btn.vue';
-import Attachment from '../atoms/Attachment.vue';
+import BtnOptions from '../molecules/BtnOptions';
+import Btn from '../atoms/Btn';
+import Attachment from '../atoms/Attachment';
 
 function isValid() {
   const valid = document.getElementById('message').value !== '';
