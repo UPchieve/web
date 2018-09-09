@@ -18,7 +18,6 @@ import Action from './components/Action';
 import Schedule from './components/Schedule';
 import Resources from './components/Resources';
 import Feedback from './components/Feedback';
-import Upload from './components/Upload';
 import Training from './components/Training';
 import Quiz from './components/Quiz';
 import Review from './components/Review';
@@ -56,7 +55,6 @@ const routes = [
   { path: '/signup', component: Registration },
   { path: '/resetpassword', component: ResetPasswordForm },
   { path: '/setpassword/:token', component: SetPasswordForm },
-  { path: '/upload', component: Upload, meta: { protected: true } },
   { path: '/dashboard', component: Dashboard, meta: { protected: true } },
   { path: '/session/math/:subTopic/:sessionId?', component: Session, meta: { protected: true } },
   { path: '/session/college/:subTopic/:sessionId?', component: Session, meta: { protected: true } },
