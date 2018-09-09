@@ -41,19 +41,14 @@
   </div>
 </template>
 
-<script>
 
+<script>
 import UserService from 'src/services/UserService';
-import OnboardingService from 'src/services/OnboardingService';
 
 export default {
   data() {
     const auth = UserService.getAuth();
-
-
     const user = UserService.getUser();
-
-
     const onboarding = UserService.getOnboarding();
     return {
       auth, user, onboarding,
@@ -62,93 +57,93 @@ export default {
 };
 </script>
 
+
 <style scoped>
-  .navbar-nav {
-    width: 100%;
-    margin-top: 38px;
-  }
+.navbar-nav {
+  width: 100%;
+  margin-top: 38px;
+}
 
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
+ul {
+  list-style-type: none;
+  padding: 0;
+}
 
-  li {
-    width: 100%;
-    height: 50px;
-  }
+li {
+  width: 100%;
+  height: 50px;
+}
 
-  li > a {
-    font-size: 16px;
-    font-weight: 600;
-    color: #73737A;
-    padding: 2px 0;
-    height: 50px;
-    line-height: 50px;
-    display: flex;
-    align-items: center;
-    margin: auto 10px;
-  }
+li > a {
+  font-size: 16px;
+  font-weight: 600;
+  color: #73737A;
+  padding: 2px 0;
+  height: 50px;
+  line-height: 50px;
+  display: flex;
+  align-items: center;
+  margin: auto 10px;
+}
 
-  li > a:hover {
-    background: none;
-    text-decoration: none;
-    color: #16D2AA;
-  }
+li > a:hover {
+  background: none;
+  text-decoration: none;
+  color: #16D2AA;
+}
 
-  li > a:focus {
-    text-decoration: none;
-    background: none;
-  }
+li > a:focus {
+  text-decoration: none;
+  background: none;
+}
 
-  li.active > a {
-    color: #16D2AA;
-  }
+li.active > a {
+  color: #16D2AA;
+}
 
-  li.active > a::before {
-    fill: #16D2AA;
-  }
+li.active > a::before {
+  fill: #16D2AA;
+}
 
-  .icon::before {
-    content: "";
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
-    margin-left: 20px;
-    background-repeat: no-repeat;
-    fill: #73737A;
-  }
+.icon::before {
+  content: "";
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  margin-left: 20px;
+  background-repeat: no-repeat;
+  fill: #73737A;
+}
 
-  .home.icon::before {
-    background-image: url('../../assets/home_icon-01.svg');
-  }
+.home.icon::before {
+  background-image: url('../../assets/home_icon-01.svg');
+}
 
-  .math.icon::before {
-    background-image: url('../../assets/math_icon-01.svg');
-  }
+.math.icon::before {
+  background-image: url('../../assets/math_icon-01.svg');
+}
 
-  .college.icon::before {
-    background-image: url('../../assets/college_icon-01.svg');
-  }
+.college.icon::before {
+  background-image: url('../../assets/college_icon-01.svg');
+}
 
-  .schedule.icon::before {
-    background-image: url('../../assets/calendar_icon-01.svg');
-  }
+.schedule.icon::before {
+  background-image: url('../../assets/calendar_icon-01.svg');
+}
 
-  .resources.icon::before {
-    background-image: url('../../assets/resources_icon-01.svg');
-  }
+.resources.icon::before {
+  background-image: url('../../assets/resources_icon-01.svg');
+}
 
-  .training.icon::before {
-    background-image: url('../../assets/training_icon-01.svg');
-  }
+.training.icon::before {
+  background-image: url('../../assets/training_icon-01.svg');
+}
 
-  .profile.icon::before {
-    background-image: url('../../assets/profile_icon-01.svg');
-  }
+.profile.icon::before {
+  background-image: url('../../assets/profile_icon-01.svg');
+}
 
-  .profile-info {
-    padding-left: 20px;
-  }
-
+.profile-info {
+  padding-left: 20px;
+}
 </style>
