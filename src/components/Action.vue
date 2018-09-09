@@ -1,4 +1,6 @@
-<template/>
+<template>
+  <div class="action"/>
+</template>
 
 <script>
 
@@ -6,8 +8,9 @@ import OnboardingService from '../services/OnboardingService';
 
 import { router } from '../router';
 
-// TODO: UserService to choose starting onboarding step based on user state
-
+/**
+ * @todo UserService to choose starting onboarding step based on user state
+ */
 export default {
   mounted() {
     const { action } = this.$route.params;
