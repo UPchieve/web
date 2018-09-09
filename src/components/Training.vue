@@ -75,17 +75,19 @@
 <script>
 import UserService from 'src/services/UserService';
 
+/**
+ * @todo {1} Refactor into global filters (https://vuejs.org/v2/guide/filters.html)
+ */
 export default {
-  filters: {
+  filters: { // {1}
     capitalize(value) {
       if (!value) return '';
-      value = value.toString();
-      return value.charAt(0).toUpperCase() + value.slice(1);
+      const valueStr = value.toString();
+      return valueStr.charAt(0).toUpperCase() + valueStr.slice(1);
     },
     uppercase(value) {
       if (!value) return '';
-      value = value.toString();
-      return value.toUpperCase();
+      return value.toString().toUpperCase();
     },
   },
   data() {

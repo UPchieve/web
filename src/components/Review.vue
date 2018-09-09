@@ -14,8 +14,11 @@
 <script>
 import UserService from 'src/services/UserService';
 
+/**
+ * @todo {1} Refactor into global filters (https://vuejs.org/v2/guide/filters.html)
+ */
 export default {
-  filters: {
+  filters: { // {1}
     capitalize(value) {
       if (!value) return '';
       const valueStr = value.toString();
