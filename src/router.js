@@ -98,7 +98,10 @@ router.beforeEach((to, from, next) => {
     else if (!OnboardingService.isOnboarded()) {
       console.log('User requires onboarding');
       const route = OnboardingService.getOnboardingRoute();
-      if (to.path.indexOf(route) !== -1 || to.matched.some(route => route.meta.bypassOnboarding)) {
+      if (
+        to.path.indexOf(route) !== -1 ||
+        to.matched.some(route => route.meta.bypassOnboarding)
+      ) {
         next();
       }
       else {
@@ -119,7 +122,8 @@ router.beforeEach((to, from, next) => {
   }
 });
 
-// If endpoint returns 401, redirect to login (except for requests to get user's session)
+// If endpoint returns 401, redirect to login (except for requests to get user's
+// session)
 Vue.http.interceptors.push((request, next) => {
   next((response) => {
     if (response.status === 401 && !(request.url.indexOf('/api/user') !== -1 && request.method === 'GET')) {

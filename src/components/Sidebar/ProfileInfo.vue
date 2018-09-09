@@ -5,12 +5,18 @@
       class="avatar"/>
     <template>
       <p
-        v-if="($route.path.indexOf('/onboarding') !== -1 || $route.path.indexOf('/signup') !== -1) && !user.isVolunteer"
+        v-if="(
+          ($route.path.indexOf('/onboarding') !== -1 ||
+          $route.path.indexOf('/signup') !== -1) && !user.isVolunteer
+        )"
         class="greeting">
         Welcome, Student!
       </p>
       <p
-        v-else-if="$route.path.indexOf('/onboarding') !== -1 || $route.path.indexOf('/signup') !== -1"
+        v-else-if="(
+          $route.path.indexOf('/onboarding') !== -1 ||
+          $route.path.indexOf('/signup') !== -1
+        )"
         class="greeting">
         Welcome, Volunteer!
       </p>
