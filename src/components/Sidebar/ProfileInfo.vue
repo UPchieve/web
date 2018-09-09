@@ -40,19 +40,21 @@
 
 </template>
 
+
 <script>
-
 import UserService from '../../services/UserService';
+import AuthService from '../../services/AuthService';
 
+/**
+ * @todo {1} Refactor this, apply naming convention to files and improve the
+ *           the style of the block.
+ */
 export default {
-  components: {
-
-
-  },
   data() {
     const user = UserService.getUser() || {};
-
-    const avatarUrl = user.picture || (user.isVolunteer ? 'static/defaultavatar4.png' : 'static/defaultavatar3.png');
+    const avatarUrl // {1}
+      = user.picture ||
+       (user.isVolunteer ? 'static/defaultavatar4.png' : 'static/defaultavatar3.png');
     return {
       user,
       avatarStyle: {
