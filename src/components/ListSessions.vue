@@ -22,8 +22,6 @@
 </template>
 
 <script>
-
-import moment from 'moment';
 import UserService from '../services/UserService';
 
 import { router } from '../router';
@@ -61,44 +59,44 @@ export default {
         const currentSession = socketSessions[i];
         if (socketSessions[i].type === 'college') {
           results.push(currentSession);
-          continue;
         }
+        else {
+          const { subTopic } = currentSession;
 
-        const { subTopic } = currentSession;
-
-        if (subTopic === 'algebra') {
-          if (this.user.algebra.passed) {
-            results.push(currentSession);
+          if (subTopic === 'algebra') {
+            if (this.user.algebra.passed) {
+              results.push(currentSession);
+            }
           }
-        }
 
-        if (subTopic === 'geometry') {
-          if (this.user.geometry.passed) {
-            results.push(currentSession);
+          if (subTopic === 'geometry') {
+            if (this.user.geometry.passed) {
+              results.push(currentSession);
+            }
           }
-        }
 
-        if (subTopic === 'trigonometry') {
-          if (this.user.trigonometry.passed) {
-            results.push(currentSession);
+          if (subTopic === 'trigonometry') {
+            if (this.user.trigonometry.passed) {
+              results.push(currentSession);
+            }
           }
-        }
 
-        if (subTopic === 'esl') {
-          if (this.user.esl.passed) {
-            results.push(currentSession);
+          if (subTopic === 'esl') {
+            if (this.user.esl.passed) {
+              results.push(currentSession);
+            }
           }
-        }
 
-        if (subTopic === 'precalculus') {
-          if (this.user.precalculus.passed) {
-            results.push(currentSession);
+          if (subTopic === 'precalculus') {
+            if (this.user.precalculus.passed) {
+              results.push(currentSession);
+            }
           }
-        }
 
-        if (subTopic === 'calculus') {
-          if (this.user.calculus.passed) {
-            results.push(currentSession);
+          if (subTopic === 'calculus') {
+            if (this.user.calculus.passed) {
+              results.push(currentSession);
+            }
           }
         }
       }
