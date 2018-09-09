@@ -76,7 +76,6 @@
                 class="answer">(None given)</div>
               <ul
                 v-show="activeEdit"
-                v-model="user.preferredContactMethod"
                 class="row form-control">
                 <p>Please select all that apply.</p>
                 <div>
@@ -191,8 +190,8 @@
 
     </div>
   </div>
-
 </template>
+
 
 <script>
 import UserService from 'src/services/UserService';
@@ -201,9 +200,6 @@ export default {
   data() {
     const user = UserService.getUser();
     const avatarUrl = user.picture || (user.isVolunteer ? 'static/defaultavatar4.png' : 'static/defaultavatar3.png');
-    const fieldnames = ['firstname', 'lastname', 'nickname', 'highschool', 'currentGrade',
-      'expectedGraduation', 'difficultAcademicSubject', 'difficultCollegeProcess',
-      'hasGuidanceCounselor', 'gpa', 'collegeApplicationsText', 'phone', 'favoriteAcademicSubject', 'college', 'referred', 'preferredContactMethod'];
 
     const certifications = {};
     if (user.algebra) {
