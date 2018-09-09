@@ -39,7 +39,9 @@
               <select
                 v-model="pickedSubtopic"
                 class="form-control subtopic">
-                <option v-for="subtopic in subtopics[pickedTopic]">{{ subtopic }}</option>
+                <option
+                  v-for="(subtopic, index) in subtopics[pickedTopic]"
+                  :key="`subtopic-${index}`">{{ subtopic }}</option>
               </select>
               <div class="helpBtns">
                 <button

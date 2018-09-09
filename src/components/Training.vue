@@ -4,7 +4,9 @@
     class="training">
     <h1 class="header">Volunteer Training</h1>
     <div class="body-container">
-      <div v-for="supercategory in supercategories">
+      <div
+        v-for="supercategory in supercategories"
+        :key="supercategory">
         <div
           v-if="supercategory !== 'esl'"
           :style="{ backgroundColor: colors[supercategory]}"
@@ -31,7 +33,9 @@
             v-if="!bools[supercategory]"
             class="arrow down"/>
         </div>
-        <div v-for="category in quizzes[supercategory]">
+        <div
+          v-for="category in quizzes[supercategory]"
+          :key="category">
           <div
             v-show="bools[supercategory]"
             class="category">

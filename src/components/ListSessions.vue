@@ -9,7 +9,8 @@
       </thead>
       <tbody>
         <tr
-          v-for="session in openSessions"
+          v-for="(session, index) in openSessions"
+          :key="`session-${index}`"
           class="session-row"
           @click="gotoSession(session)">
           <td>{{ session.student.firstname }}</td>

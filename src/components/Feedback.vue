@@ -20,6 +20,7 @@
       </tr>
       <tr
         v-for="(question, index) in questions"
+        :key="`question-${index}`"
         class="question-row">
         <td class="question-cell">
           <div class="question-title">{{ question.title }}</div>
@@ -29,10 +30,12 @@
                 <td/>
                 <td
                   v-for="(label, index) in question.table_title"
+                  :key="`label-${index}`"
                   class="radio-question-selection-title">{{ label }}</td>
               </tr>
               <tr
                 v-for="(subquestion, subquestion_index) in question.options"
+                :key="`subquestion-${subquestion_index}`"
                 class="radio-question-row">
                 <td class="radio-question-cell"> {{ subquestion }}</td>
                 <td

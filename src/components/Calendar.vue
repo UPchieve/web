@@ -10,16 +10,20 @@
       <div class="timeLabelContainer">
         <div
           v-for="time in timeRange"
+          :key="time"
           class="timeLabel">
           {{ time }}
         </div>
       </div>
       <form class="dayTime">
-        <div v-for="(dayValue, day) in availability">
+        <div
+          v-for="(dayValue, day) in availability"
+          :key="`day-${day}`">
           <div class="dayLabel">{{ day }}</div>
           <div class="times">
             <div
               v-for="sortedTime in sortedTimes[day]"
+              :key="sortedTime"
               class="timeOfDay">
               <input
                 id="time"

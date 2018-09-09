@@ -23,6 +23,7 @@
       <div class="circles">
         <div
           v-for="n in quizLength"
+          :key="`circle-${n}`"
           :id="'circle-' + n"
           class="circle">{{ n }}</div>
       </div>
@@ -54,7 +55,9 @@
           :style="imageStyle"
           class="questionImage"/>
         <form class="possibleAnswers">
-          <div v-for="item in items">
+          <div
+            v-for="(item, index) in items"
+            :key="`item-${index}`">
             <div class="options">
               <input
                 :value="item.val"
@@ -72,6 +75,7 @@
         class="review">
         <div
           v-for="(question, index) in questionsReview"
+          :key="`question-${index}`"
           class="question">
           <div class="questionNumber">Question {{ index + 1 }}</div><br>
           <div class="questionText">{{ question.questionText }}</div>
@@ -80,7 +84,8 @@
             class="questionImage"/>
           <div class="possibleAnswers">
             <div
-              v-for="answer in question.possibleAnswers"
+              v-for="(answer, index) in question.possibleAnswers"
+              :key="`answer-${index}`"
               :id="'answer-' + answer.val">{{ answer.val }}. {{ answer.txt }}</div>
           </div>
           <div class="userAnswer">Your answer: {{ question.userAnswer }}</div>

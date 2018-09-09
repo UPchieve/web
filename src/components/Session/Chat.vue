@@ -3,8 +3,9 @@
     <div class="header">Chat</div>
     <div class="messages-container">
       <div class="messages">
-        <template v-for="message in messages">
+        <template v-for="(message, index) in messages">
           <div
+            :key="`message-${index}`"
             :class="leftRightMessage(message)"
             class="message">
             <div

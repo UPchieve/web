@@ -65,8 +65,9 @@
               <div class="prompt">What is your preferred method of contact?</div>
               <div class="answer">
                 <ul
-                  v-for="item in user.preferredContactMethod"
-                  v-show="!activeEdit">
+                  v-for="(item, index) in user.preferredContactMethod"
+                  v-show="!activeEdit"
+                  :key="`item-${index}`">
                   <li>{{ item }}</li>
                 </ul>
               </div>
@@ -158,7 +159,9 @@
         class="cert-info contain">
         <div class="subheader">Certifications and Tutoring Topics</div>
         <div class="container-content cert">
-          <div v-for="(value, key) in certifications">
+          <div
+            v-for="(value, key) in certifications"
+            :key="`certification-${key}-${value}`">
             <div
               v-if="value"
               class="certBox">
