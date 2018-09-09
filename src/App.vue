@@ -11,6 +11,7 @@
 
 <script>
 import 'bootstrap/dist/css/bootstrap.css';
+import './assets/styles/settings.css';
 
 import Sidebar from './components/Sidebar';
 
