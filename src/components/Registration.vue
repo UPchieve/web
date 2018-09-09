@@ -2,8 +2,8 @@
   <div class="registration-container background">
     <div class="form-register">
 
-      <volunteer-form v-if="this.userSelection === 'volunteer'"/>
-      <student-form v-else-if="this.userSelection === 'student'"/>
+      <volunteer-form v-if="userSelection === 'volunteer'"/>
+      <student-form v-else-if="userSelection === 'student'"/>
       <div v-else>
         <div class="header">
           <router-link
