@@ -6,13 +6,12 @@
  * @note {2} Ignore the single line methods in NetworkService. This regex could
  *           theoretically be more concise, but for some reason ESLint refused
  *           to recognize some quantifiers and literals here.
- * @note {3} Ignore opening HTML tags that only contain a single attribute with
- *           a long value.
+ * @note {3} HTML attributes with long values.
  */
 const listOfPatterns = [
   '((<.*>)*(\n?\s*)(.*)(\n?\s*)<\/.*>)',  // {1}
-  '(\ \ \ \ return\ context\..*http.*;)', // {2} 
-  '(<[a-z]*-?\ ?.*>)',                    // {3}
+  '(\ \ \ \ return\ context\..*http.*;)', // {2}
+  '([a-z]*(-*[a-z])*=".*")',              // {3}
 ];
 const theOnePatternToRuleThemAll = listOfPatterns.join('|');
 
@@ -57,6 +56,7 @@ module.exports = {
         "ignorePattern": theOnePatternToRuleThemAll, // {3}
         "code": 85, // {4}    
         "ignoreStrings": true,
+        "ignoreUrls": true,
       } 
     ],
     "operator-linebreak": [
