@@ -29,7 +29,7 @@
               <tr class="radio-question-row">
                 <td/>
                 <td
-                  v-for="(label, index) in question.table_title"
+                  v-for="(label, index) in question.tableTitle"
                   :key="`label-${index}`"
                   class="radio-question-selection-title">{{ label }}</td>
               </tr>
@@ -39,7 +39,7 @@
                 class="radio-question-row">
                 <td class="radio-question-cell"> {{ subquestion }}</td>
                 <td
-                  v-for="index in question.table_title.length"
+                  v-for="index in question.tableTitle.length"
                   :key="index"
                   class="radio-question-selection-cell">
                   <input
@@ -53,9 +53,9 @@
           </div>
           <div v-else-if="question.qtype === 'text'">
             <div
-              v-if="question.secondary_title.length !== 0"
+              v-if="question.secondaryTitle.length !== 0"
               class="question-secondary-title">
-              {{ question.secondary_title }}
+              {{ question.secondaryTitle }}
             </div>
             <textarea
               v-model="userResponse[question.qid]"
@@ -87,13 +87,13 @@ export default {
       user: UserService.getUser(),
       sessionId: '',
       userType: '',
-      student_questions: [
+      studentQuestions: [
         {
           qid: '1',
           qtype: 'multiple-radio',
           title: 'Please give feedback on the Academic Coach who helped you.',
-          secondary_title: '',
-          table_title: ['Strongly Disagree', 'Somewhat Agree', 'Neither', 'Somewhat Agree', 'Strongly Agree'],
+          secondaryTitle: '',
+          tableTitle: ['Strongly Disagree', 'Somewhat Agree', 'Neither', 'Somewhat Agree', 'Strongly Agree'],
           options: [
             'I was able to find the help/information I needed from my Academic Coach.',
             'My Academic Coach was friendly and/or nice.',
@@ -106,8 +106,8 @@ export default {
           qid: '2',
           qtype: 'multiple-radio',
           title: 'Please give feedback on UPchieve’s services',
-          secondary_title: '',
-          table_title: ['Strongly Disagree', 'Somewhat Agree', 'Neither', 'Somewhat Agree', 'Strongly Agree'],
+          secondaryTitle: '',
+          tableTitle: ['Strongly Disagree', 'Somewhat Agree', 'Neither', 'Somewhat Agree', 'Strongly Agree'],
           options: [
             'UPchieve helps me succeed and achieve my academic goals.',
             'I am likely to use UPchieve the next time I need help.',
@@ -119,42 +119,42 @@ export default {
           qid: '3',
           qtype: 'text',
           title: '(Optional) Do you have any other feedback you would like to share?',
-          secondary_title: 'This can be about the web app, the Academic Coach who helped you, the services UPchieve offers, etc.',
-          table_title: [],
+          secondaryTitle: 'This can be about the web app, the Academic Coach who helped you, the services UPchieve offers, etc.',
+          tableTitle: [],
           options: [],
         },
       ],
-      volunteer_questions: [
+      volunteerQuestions: [
         {
           qid: '1',
           qtype: 'text',
           title: 'Did the student ask you any questions that you weren’t prepared to answer?',
-          secondary_title: 'Don’t worry! We use this to improve our training and certification materials and won’t hold it against you.',
-          table_title: [],
+          secondaryTitle: 'Don’t worry! We use this to improve our training and certification materials and won’t hold it against you.',
+          tableTitle: [],
           options: [],
         },
         {
           qid: '2',
           qtype: 'text',
           title: 'Were there any app features that you needed or that would have been helpful during this session?',
-          secondary_title: '',
-          table_title: [],
+          secondaryTitle: '',
+          tableTitle: [],
           options: [],
         },
         {
           qid: '3',
           qtype: 'text',
           title: 'Did you encounter any technical difficulties/bugs while using the app?',
-          secondary_title: 'If yes, please describe the issue in as much detail as possible so that our tech team can replicate and fix it.',
-          table_title: [],
+          secondaryTitle: 'If yes, please describe the issue in as much detail as possible so that our tech team can replicate and fix it.',
+          tableTitle: [],
           options: [],
         },
         {
           qid: '4',
           qtype: 'text',
           title: '(Optional) Do you have any other feedback you’d like to share with us?',
-          secondary_title: '',
-          table_title: [],
+          secondaryTitle: '',
+          tableTitle: [],
           options: [],
         },
       ],
@@ -167,12 +167,12 @@ export default {
     this.sessionId = this.$route.params.sessionId;
     const { userType } = this.$route.params;
     if (userType === 'student') {
-      this.questions = this.student_questions;
+      this.questions = this.studentQuestions;
     }
     else {
-      this.questions = this.volunteer_questions;
+      this.questions = this.volunteerQuestions;
     }
-    this.questions.map((question, key) => {
+    this.questions.forEach((question) => {
       if (question.qtype === 'multiple-radio') _self.userResponse[question.qid] = {};
     });
   },
