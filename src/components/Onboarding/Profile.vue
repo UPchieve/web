@@ -284,7 +284,6 @@
 import $ from 'jquery';
 
 import UserService from 'src/services/UserService';
-import OnboardingService from 'src/services/OnboardingService';
 
 export default {
   data() {
