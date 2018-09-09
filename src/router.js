@@ -13,7 +13,6 @@ import SetPasswordForm from './components/SetPasswordForm';
 import Onboarding from './components/Onboarding';
 import Dashboard from './components/Dashboard';
 import Session from './components/Session';
-import ListSessions from './components/ListSessions';
 import Action from './components/Action';
 import Schedule from './components/Schedule';
 import Resources from './components/Resources';
@@ -78,10 +77,9 @@ const router = new VueRouter({
   linkActiveClass: 'active',
 });
 
-export { router }; // Expose router to app controllers
+export default { router }; // Expose router to app controllers
 
 // Router middleware to check authentication for protect routes
-
 router.beforeEach((to, from, next) => {
   if (to.matched.some(route => route.meta.protected)) {
     if (!AuthService.user.authenticated) {
@@ -124,7 +122,10 @@ router.beforeEach((to, from, next) => {
 // session)
 Vue.http.interceptors.push((request, next) => {
   next((response) => {
-    if (response.status === 401 && !(request.url.indexOf('/api/user') !== -1 && request.method === 'GET')) {
+    if (
+      response.status === 401 &&
+      !(request.url.indexOf('/api/user') !== -1 && request.method === 'GET')
+    ) {
       AuthService.removeUser();
       router.push('/login?401=true');
     }
