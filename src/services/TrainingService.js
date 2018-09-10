@@ -19,23 +19,23 @@ export default {
       return this.questions.length;
     });
   },
-  getFirstQuestion(context) {
+  getFirstQuestion() {
     const question = this.questions[this.index];
     return question;
   },
-  getIndex(context) {
+  getIndex() {
     return this.index;
   },
-  hasCompleted(context) {
+  hasCompleted() {
     return (this.numAnswers === this.questions.length);
   },
-  hasNext(context) {
+  hasNext() {
     return ((this.index + 1) < this.questions.length);
   },
-  hasPrevious(context) {
+  hasPrevious() {
     return ((this.index) > 0);
   },
-  getNextQuestion(context, picked) {
+  getNextQuestion() {
     if (this.index < this.questions.length) {
       this.index = this.index + 1;
       const question = this.questions[this.index];
@@ -47,7 +47,7 @@ export default {
     }
     return null;
   },
-  getPreviousQuestion(context) {
+  getPreviousQuestion() {
     if (this.index > 0) {
       this.index = this.index - 1;
       const question = this.questions[this.index];
@@ -92,7 +92,7 @@ export default {
         };
       });
   },
-  reviewQuiz(context) {
+  reviewQuiz() {
     const questionsReview = this.questions.slice(0);
     const idCorrectAnswerMap = { ...this.idCorrectAnswerMap };
     const idAnswerMap = { ...this.idAnswerMap };
