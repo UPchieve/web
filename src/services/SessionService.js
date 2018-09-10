@@ -33,7 +33,7 @@ export default {
     return NetworkService.newSession(context, { sessionType, sessionSubTopic })
       .then((res) => {
         const data = res.data || {};
-        const sessionId = { ...data.sessionId };
+        const { sessionId } = data;
 
         this.currentSession.sessionId = sessionId;
 
@@ -52,7 +52,7 @@ export default {
   useExistingSession(context, sessionId) {
     return NetworkService.checkSession(context, { sessionId }).then((res) => {
       const data = res.data || {};
-      const sessionId = { ...data.sessionId };
+      const { sessionId } = data;
 
       this.currentSession.sessionId = sessionId;
 
