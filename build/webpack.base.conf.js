@@ -32,7 +32,7 @@ module.exports = {
   resolveLoader: {
     fallback: [path.join(__dirname, '../node_modules')]
   },
-  module: {
+  module: {/*
     preLoaders: [
       {
         test: /\.vue$/,
@@ -46,7 +46,7 @@ module.exports = {
         include: projectRoot,
         exclude: /node_modules/
       }
-    ],
+    ],*/
     loaders: [
       {
         test: /\.vue$/,
