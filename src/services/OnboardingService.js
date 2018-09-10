@@ -18,13 +18,12 @@ export default {
       });
   },
   confirmVerification(context, token) {
-    return NetworkService.confirmVerification(context, {
-      token,
-    }).then(() => {
-      const user = UserService.getUser();
-      user.verified = true;
-      router.replace('/');
-    })
+    return NetworkService.confirmVerification(context, { token })
+      .then(() => {
+        const user = UserService.getUser();
+        user.verified = true;
+        router.replace('/');
+      })
       .catch(() => {
         context.msg = 'Error occurred';
       });
@@ -37,7 +36,6 @@ export default {
 
   hasProfile() {
     const user = UserService.getUser();
-
 
     let requiredFields;
     if (user.isVolunteer) {
@@ -58,9 +56,11 @@ export default {
       const field = user[fieldName];
       if (field === null || field === undefined) {
         return true; // Field must be non-null
-      } if (Array.isArray(field) && field.length === 0) {
+      }
+      if (Array.isArray(field) && field.length === 0) {
         return true; // If field is an array, it must be populated
-      } if (typeof field === 'string' && field === '') {
+      }
+      if (typeof field === 'string' && field === '') {
         return true; // If field is a string, it must be non-empty
       }
       return false;
@@ -75,21 +75,20 @@ export default {
   },
 
   getOnboardingRoute() {
-    // Map each route to function that will show route if false
-    const map = {
+    const mapOfRoutesToTheirValidator = {
       '/onboarding/verify': this.hasVerifiedEmail,
     };
 
-    let matched;
+    let incompleteStepRoute;
 
-    Object.keys(map).some((r) => {
-      if (!map[r]()) {
-        // If step has not been completed, set route and exit
-        matched = r;
+    Object.keys(mapOfRoutesToTheirValidator).some((route) => {
+      if (!mapOfRoutesToTheirValidator[route]()) {
+        incompleteStepRoute = route;
         return true;
       }
+      return false;
     });
-    return matched;
-  },
 
+    return incompleteStepRoute;
+  },
 };
