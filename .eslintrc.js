@@ -25,9 +25,11 @@ const theOnePatternToRuleThemAll = listOfPatterns.join('|');
  *           a few characters beyond the 80th column AND if breaking the 
  *           expression into several lines is undesirable because it would make
  *           it look funny.
- * @note {5} Stroustrup was chosen because it keeps related logical statements
+ * @note {5} It makes it easier to tell a variable reassigment from other types 
+ *           of expressions since the "=" sign will be spotted right away.
+ * @note {6} Stroustrup was chosen because it keeps related logical statements
  *           perfectly aligned.
- * @note {6} These settings are used by the plug-ins eslint-plugin-import and
+ * @note {7} These settings are used by the plug-ins eslint-plugin-import and
  *           eslint-import-resolver-webpack. 
  */
 module.exports = {
@@ -63,13 +65,13 @@ module.exports = {
       "error",
       "after", 
       {
-        "overrides": { "=": "before" } 
+        "overrides": { "=": "before" } // {5}
       }
     ],
-    "brace-style": ["error", "stroustrup"], // {5}
+    "brace-style": ["error", "stroustrup"], // {6}
     "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
   },
-  "settings": { // {6}
+  "settings": { // {7}
     "import/resolver": {
       "webpack": {
         "config": "./build/webpack.dev.conf.js"
