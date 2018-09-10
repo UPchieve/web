@@ -1,4 +1,4 @@
-import { router } from '../router';
+import router from '../router';
 
 import NetworkService from './NetworkService';
 import UserService from './UserService';

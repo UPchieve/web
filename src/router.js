@@ -29,8 +29,6 @@ import SendAnswer from './components/views/SendAnswer';
 import AuthService from './services/AuthService';
 import OnboardingService from './services/OnboardingService';
 
-import App from './App';
-
 Vue.use(VueResource);
 Vue.use(VueRouter);
 Vue.use(VueSocketio, process.env.SOCKET_ADDRESS);
@@ -72,12 +70,15 @@ const routes = [
   { path: '/send-answer', component: SendAnswer, meta: { protected: true } },
 ];
 
+/**
+ * @todo Consider refactoring this file
+ */
 const router = new VueRouter({
   routes,
   linkActiveClass: 'active',
 });
 
-export default { router }; // Expose router to app controllers
+export default router;
 
 // Router middleware to check authentication for protect routes
 router.beforeEach((to, from, next) => {
@@ -130,12 +131,4 @@ Vue.http.interceptors.push((request, next) => {
       router.push('/login?401=true');
     }
   });
-});
-
-/* eslint-disable no-new */
-new Vue({
-  router,
-  el: '#app',
-  components: { App },
-  template: '<App/>',
 });

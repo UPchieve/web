@@ -7,6 +7,7 @@ export default {
   numAnswers: 0,
   idCorrectAnswerMap: {},
   category: null,
+
   loadQuiz(context, category) {
     this.index = 0;
     this.numAnswers = 0;
@@ -73,20 +74,23 @@ export default {
     this.idAnswerMap[question._id] = picked;
   },
   submitQuiz(context, userid) {
-    return NetworkService.getQuizScore(context,
+    return NetworkService.getQuizScore(
+      context,
       {
         userid,
         idAnswerMap: this.idAnswerMap,
         category: this.category,
-      }).then((res) => {
-      this.idCorrectAnswerMap = res.data.idCorrectAnswerMap;
-      return {
-        tries: res.data.tries,
-        passed: res.data.passed,
-        score: res.data.score,
-        idUserAnswerMap: this.idAnswerMap,
-      };
-    });
+      },
+    )
+      .then((res) => {
+        this.idCorrectAnswerMap = res.data.idCorrectAnswerMap;
+        return {
+          tries: res.data.tries,
+          passed: res.data.passed,
+          score: res.data.score,
+          idUserAnswerMap: this.idAnswerMap,
+        };
+      });
   },
   reviewQuiz(context) {
     const questionsReview = this.questions.slice(0);

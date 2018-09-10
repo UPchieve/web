@@ -24,7 +24,7 @@
 <script>
 import UserService from '../services/UserService';
 
-import { router } from '../router';
+import router from '../router';
 
 const openSessions = [];
 
