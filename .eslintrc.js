@@ -17,7 +17,7 @@ const theOnePatternToRuleThemAll = listOfPatterns.join('|');
 
 /**
  * @note {0} Why this config: https://bit.ly/2oiXnf7.
- * @note {1} To allow debugger during development.
+ * @note {1} To allow debugger statement during development.
  * @note {2} To allow modifying properties of components passed as arguments.
  * @note {3} Specific patterns are documented above. 
  * @note {4} The actual max length is 80 columns. The extra padding is meant to
