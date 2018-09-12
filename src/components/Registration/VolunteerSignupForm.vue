@@ -1,57 +1,64 @@
 <template>
   <form class="form-signup">
-    <div v-if="!showingSuccess">
-      <div v-if="step=='step-1'">
-        <div class="step-1-text" colspan="2"><b>Step 1 of 2: Choose your log-in details </b></div>
-        <label for="inputEmail">What's your email?</label>
-        <input type="email" id="inputEmail" class="form-control" required autofocus v-model="credentials.email">
-        <div class="description">We will only use your email to contact you about your account. See our Privacy Policy for more info.</div>
-        <label for="inputPassword">Create a password.</label>
-        <input type="password" id="inputPassword" class="form-control" required v-model="credentials.password">
-        <p class="password-guidelines">Keep your account safe by choosing a password with one number, one uppercase letter, and one lowercase letter.</p>
-        <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="nextPage()">CONTINUE</button>
-        {{msg}}
-      </div>
-      <div v-else-if="step=='step-2'">
-        <table class="step-2-table">
-          <tr>
-            <td class="table-entry" colspan="2"><b>Step 2 of 2: Tell us about yourself! </b></td>
-          </tr>
-          <tr class="question-row">
-            <td class="table-entry" colspan="2">What's your name?</td>
-          </tr>
-          <tr>
-            <td style="padding-right: 15px;"><input class="form-control" required autofocus v-model="profile.firstName"></td>
-            <td style="padding-left: 15px;"><input class="form-control" required autofocus v-model="profile.lastName"></td>
-          </tr>
-          <tr>
-            <td class="table-entry"><div class="description">First Name</div></td>
-            <td class="table-entry"><div class="description">Last Name</div></td>
-          </tr>
-          <tr class="question-row">
-            <td class="table-entry" colspan="2">What college did you go to?</td>
-          </tr>
-          <tr>
-            <td colspan="2"><input class="form-control" required autofocus v-model="profile.college"></td>
-          </tr>
-          <tr class="question-row">
-            <td class="table-entry" colspan="2">What’s your favorite academic subject?</td>
-          </tr>
-          <tr>
-            <td colspan="2"><input class="form-control" required autofocus v-model="profile.favoriteAcademicSubject"></td>
-          </tr>
-          <tr>
-            <div class="agreement-box">
-              <input type="checkbox" id="userAgreement" v-model="credentials.terms" required>
-              <label id='agreement' for="userAgreement"></label>
-              <div class="agreement-label">I have read and accept the <a href="#/legal" target="_blank">user agreement</a>.</div>
-            </div>
-          </tr>
-        </table>
-        <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">SIGN UP</button>
-      </div>
-      <div v-else>Unexpected Error</div>
+    <div v-if="step=='step-1'">
+      <div class="step-1-text" colspan="2"><b>Step 1 of 2: Choose your log-in details </b></div>
+      <label for="inputEmail">What's your email?</label>
+      <input type="email" id="inputEmail" class="form-control" required autofocus v-model="credentials.email">
+      <div class="description">We will only use your email to contact you about your account. See our Privacy Policy for more info.</div>
+      <label for="inputPassword">Create a password.</label>
+      <input type="password" id="inputPassword" class="form-control" required v-model="credentials.password">
+      <p class="password-guidelines">Keep your account safe by choosing a password with one number, one uppercase letter, and one lowercase letter.</p>
+      <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="nextPage()">CONTINUE</button>
+      {{msg}}
     </div>
+    <div v-else-if="step=='step-2'">
+      <table class="step-2-table">
+        <tr>
+          <td class="table-entry" colspan="2"><b>Step 2 of 2: Tell us about yourself! </b></td>
+        </tr>
+        <tr class="question-row">
+          <td class="table-entry" colspan="2">What's your name?</td>
+        </tr>
+        <tr>
+          <td style="padding-right: 15px;"><input class="form-control" required autofocus v-model="profile.firstName"></td>
+          <td style="padding-left: 15px;"><input class="form-control" required autofocus v-model="profile.lastName"></td>
+        </tr>
+        <tr>
+          <td class="table-entry"><div class="description" style="padding-bottom: 0px;">First Name</div></td>
+          <td class="table-entry"><div class="description" style="padding-bottom: 0px;">Last Name</div></td>
+        </tr>
+        <tr class="question-row">
+          <td class="table-entry" colspan="2">What college do you go to?</td>
+        </tr>
+        <tr>
+          <td colspan="2"><input class="form-control" required autofocus v-model="profile.college"></td>
+        </tr>
+        <tr class="question-row">
+          <td class="table-entry" colspan="2">What's your phone number'?</td>
+        </tr>
+        <tr>
+          <td colspan="2"><input class="form-control" required autofocus v-model="profile.phone"></td>
+        </tr>
+        <tr class="question-row">
+          <td class="table-entry" colspan="2">What’s your favorite academic subject?</td>
+        </tr>
+        <tr>
+          <td colspan="2"><input class="form-control" required autofocus v-model="profile.favoriteAcademicSubject"></td>
+        </tr>
+        <tr>
+          <div class="agreement-box">
+            <input type="checkbox" id="userAgreement" v-model="credentials.terms" required>
+            <label id='agreement' for="userAgreement"></label>
+            <div class="agreement-label">I have read and accept the <a href="#/legal" target="_blank">user agreement</a>.</div>
+          </div>
+        </tr>
+      </table>
+      <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">SIGN UP</button>
+    </div>
+    <div v-else-if="step=='success-message'">
+      <div class="step-1-text" colspan="2">You've been sent a verification email! Check your email for a link to confirm your account. </div>
+    </div>
+    <div v-else>Unexpected Error</div>
   </form>
 </template>
 
@@ -73,10 +80,10 @@
           firstName: '',
           lastName: '',
           college: '',
+          phone: '',
           favoriteAcademicSubject: ''
         },
-        step: 'step-1',
-        showingSuccess: false
+        step: 'step-1'
       }
     },
     methods: {
@@ -101,9 +108,10 @@
           user.firstname = this.profile.firstName;
           user.lastname = this.profile.lastName;
           user.college = this.profile.college;
+          user.phone = this.profile.phone;
           user.favoriteAcademicSubject = this.profile.favoriteAcademicSubject;
           UserService.setProfile(this, user);
-          this.showingSuccess = true;
+          this.step = 'success-message';
         }).catch((err) => {
           console.log(err);
           this.msg = err.message;
@@ -119,7 +127,7 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: 25px;
-    margin-top: 25px;
+    margin-top: 15px;
   }
 
   .step-1-text {
@@ -282,7 +290,7 @@
   }
 
   .question-row {
-    height: 45px;
+    height: 30px;
     vertical-align: bottom;
   }
 

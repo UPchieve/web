@@ -25,11 +25,11 @@
             <td style="padding-left: 15px;"><input class="form-control" required autofocus v-model="profile.lastName"></td>
           </tr>
           <tr>
-            <td class="table-entry"><div class="description">First Name</div></td>
-            <td class="table-entry"><div class="description">Last Name</div></td>
+            <td class="table-entry"><div class="description" style="padding-bottom: 0px;">First Name</div></td>
+            <td class="table-entry"><div class="description" style="padding-bottom: 0px;">Last Name</div></td>
           </tr>
           <tr class="question-row">
-            <td class="table-entry" colspan="2">What high school did you go to?</td>
+            <td class="table-entry" colspan="2">What high school do you go to?</td>
           </tr>
           <tr>
             <td colspan="2"><input class="form-control" required autofocus v-model="profile.highSchool"></td>
@@ -48,6 +48,21 @@
                 <option value="Teacher">Teacher</option>
                 <option value="School">School</option>
                 <option value="Other">Other</option>
+              </select>
+            </td>
+          </tr>
+          <tr class="question-row">
+            <td class="table-entry" style="height: 50px;" colspan="2">Do you get help from any of these organizations?</td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <select class="form-control topic" v-model="profile.referred">
+                <option value="Big Brothers Big Sisters of NYC">Big Brothers Big Sisters of NYC</option>
+                <option value="Breakthrough New York">Breakthrough New York</option>
+                <option value="East Harlem Tutorial Program">East Harlem Tutorial Program</option>
+                <option value="First Graduate">First Graduate</option>
+                <option value="Oasis - A Heaven for Women and Children">Oasis - A Heaven for Women and Children</option>
+                <option value="None of the above">None of the above</option>
               </select>
             </td>
           </tr>
@@ -83,7 +98,8 @@
           firstName: '',
           lastName: '',
           highSchool: '',
-          heardFrom: ''
+          heardFrom: '',
+          referred: ''
         },
         step: 'step-1'
       }
@@ -111,6 +127,7 @@
           user.lastname = this.profile.lastName;
           user.highschool = this.profile.highSchool;
           user.heardFrom = this.profile.heardFrom;
+          user.referred = this.profile.referred;
           UserService.setProfile(this, user, '/');
         }).catch((err) => {
           console.log(err);
@@ -217,7 +234,7 @@
   }
 
   .agreement-box {
-    margin: 25px 0 10px 0;
+    margin: 15px 0 10px 0;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -263,7 +280,7 @@
   }
 
   button[type="submit"] {
-    margin-top: 20px;
+    margin-top: 5px;
     background-color: #F6F6F6;
     border: none;
     font-weight: 600;
@@ -295,7 +312,7 @@
   }
 
   .question-row {
-    height: 45px;
+    height: 28px;
     vertical-align: bottom;
   }
 
