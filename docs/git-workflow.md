@@ -15,7 +15,7 @@
 
 1. Create a new branch from `master` following the [name convention](#naming-convention).
 2. Work on your branch until the task is done.
-3. Make sure that your code works and that it complies with [the standards](coding-standards/README.md).
+3. Make sure that your code works (run the test suite) and that it complies with [the standards](coding-standards/README.md) ([run the linter](coding-standards/README.md#javascript)).
 4. Update the documentation if needed.
 5. Submit a PR to be [merged **to the `dev` branch**](https://stackoverflow.com/a/38985999), making sure to comply with the [PR convention](#pr-convention).
 6. Make changes to the PR if requested by the reviewer(s).
