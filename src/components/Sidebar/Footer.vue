@@ -1,12 +1,22 @@
 <template>
   <ul class="nav navbar-nav">
-    <router-link to="/login" tag="li" v-if="!userauth.authenticated"><a class="login">Log In</a></router-link>
-    <router-link to="/contact" tag="li"><a class="contact icon">Contact Us</a></router-link>
-    <router-link to="/legal" tag="li"><a class="privacy icon">Legal Policy</a></router-link>
-    <li v-if="userauth.authenticated"><a v-on:click="logout" class="logout icon">Logout</a></li>
-    <li v-if="!userauth.authenticated"><a v-bind:href="mainWebsiteUrl">Back to Website</a></li>
+    <router-link
+      v-if="!userauth.authenticated"
+      to="/login"
+      tag="li"><a class="login">Log In</a></router-link>
+    <router-link
+      to="/contact"
+      tag="li"><a class="contact icon">Contact Us</a></router-link>
+    <router-link
+      to="/legal"
+      tag="li"><a class="privacy icon">Legal Policy</a></router-link>
+    <li v-if="userauth.authenticated"><a
+      class="logout icon"
+      @click="logout">Logout</a></li>
+    <li v-if="!userauth.authenticated"><a :href="mainWebsiteUrl">Back to Website</a></li>
   </ul>
 </template>
+
 
 <script>
 
@@ -20,15 +30,15 @@ export default {
   data() {
     return {
       userauth: UserService.getAuth(),
-      mainWebsiteUrl: process.env.MAIN_WEBSITE_URL
-    }
+      mainWebsiteUrl: process.env.MAIN_WEBSITE_URL,
+    };
   },
   methods: {
-    logout(){
+    logout() {
       AuthService.logout(this);
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>

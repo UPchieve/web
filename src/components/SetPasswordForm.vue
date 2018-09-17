@@ -2,14 +2,33 @@
   <form class="form-resetpassword">
     <h2 class="form-resetpassword-heading">Reset Your Password</h2>
     <label for="inputEmail">Please enter your email address</label>
-    <input type="text" id="inputEmail" class="form-control" required autofocus v-model="credentials.email">
+    <input
+      id="inputEmail"
+      v-model="credentials.email"
+      type="text"
+      class="form-control"
+      required
+      autofocus>
     <label for="inputPassword">Create a new password</label>
-    <input type="password" id="inputPassword" class="form-control" required v-model="credentials.password">
+    <input
+      id="inputPassword"
+      v-model="credentials.password"
+      type="password"
+      class="form-control"
+      required>
     <label for="inputPassword">Reenter your new password</label>
-    <input type="password" id="inputPassword" class="form-control" required v-model="credentials.newpassword">
+    <input
+      id="inputPassword"
+      v-model="credentials.newpassword"
+      type="password"
+      class="form-control"
+      required>
     <p class="password-guidelines">It must contain lowercase and uppercase letters, numbers, and at least 8 characters.</p>
-    <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">Reset Password</button>
-    {{msg}}
+    <button
+      class="btn btn-lg btn-primary btn-block"
+      type="submit"
+      @click.prevent="submit()">Reset Password</button>
+    {{ msg }}
   </form>
 </template>
 
@@ -25,9 +44,9 @@ export default {
         token: '',
         email: '',
         password: '',
-        newpassword: ''
-      }
-    }
+        newpassword: '',
+      },
+    };
   },
   methods: {
     submit() {
@@ -35,16 +54,16 @@ export default {
         token: this.$route.params.token,
         email: this.credentials.email,
         password: this.credentials.password,
-        newpassword: this.credentials.newpassword
+        newpassword: this.credentials.newpassword,
       }).then(() => {
         this.showingSuccess = true;
       }).catch((err) => {
         console.log(err);
         this.msg = err.message;
-      })
-    }
-  }
-}
+      });
+    },
+  },
+};
 </script>
 
 <style scoped>

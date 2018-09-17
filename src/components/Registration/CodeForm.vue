@@ -1,38 +1,49 @@
 <template>
   <form class="form-signup">
     <div class="header">
-      <router-link to="login" class="login-link">Log In</router-link>
-      <div class="registration-header">Registration</div>
+      <router-link
+        to="login"
+        class="login-link">Log In</router-link>
+      <div class="registration-header">Register an Account</div>
     </div>
     <label for="inputRegistrationCode">Please enter your registration code</label>
-    <input type="text" id="inputRegistrationCode" class="form-control" required autofocus v-model="registrationCode">
+    <input
+      id="inputRegistrationCode"
+      v-model="registrationCode"
+      type="text"
+      class="form-control"
+      required
+      autofocus>
     <p class="no-code-link"><a href="https://upchieve.org/students">Don't have a code?</a></p>
-    <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">ENTER</button>
-    {{msg}}
+    <button
+      class="btn btn-lg btn-primary btn-block"
+      type="submit"
+      @click.prevent="submit()">ENTER</button>
+    {{ msg }}
   </form>
 </template>
 
 <script>
-import RegistrationService from 'src/services/RegistrationService'
+import RegistrationService from 'src/services/RegistrationService';
 
 export default {
   data() {
     return {
       registrationCode: '',
-      msg: ''
-    }
+      msg: '',
+    };
   },
   methods: {
     submit() {
       RegistrationService.checkCode(this, this.registrationCode)
         .then((isValid) => {
-          if (!isValid){
+          if (!isValid) {
             this.msg = 'Sorry, that code is invalid';
           }
-        })
-    }
-  }
-}
+        });
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -41,7 +52,7 @@ export default {
   display: flex;
   justify-content: space-between;
   margin-bottom: 50px;
-  margin-top: 65px;
+  margin-top: 50px;
 }
 .login-link {
   color: #73737A;
@@ -50,7 +61,9 @@ export default {
 .registration-header {
   color: #16D2AA;
   font-weight: 600;
+  padding-left: 140px;
 }
+
 .no-code-link {
   font-size: 12px;
   text-align: left;
@@ -66,8 +79,6 @@ export default {
   display: flex;
   flex-direction: column;
   max-width: 400px;
-  padding: 15px;
-  margin: auto;
 }
 .form-control {
   border: none;

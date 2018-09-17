@@ -1,71 +1,67 @@
-import Validator from 'validator';
+import router from '../router';
 
-import {router} from '../router'
-
-import NetworkService from './NetworkService'
-import UserService from './UserService'
+import NetworkService from './NetworkService';
+import UserService from './UserService';
 
 
 export default {
   loading: false,
   currentSession: {
     sessionId: null,
-    data: {}
+    data: {},
   },
 
-  getPartner(){
-    var user = UserService.getUser(),
-        session = this.currentSession.data;
+  getPartner() {
+    const user = UserService.getUser();
+    const session = this.currentSession.data;
 
-    if (user.isVolunteer){
+    if (user.isVolunteer) {
       return session.student;
-    } else {
-      return session.volunteer;
     }
+    return session.volunteer;
   },
 
-  endSession(options = {}){
+  endSession(options = {}) {
     this.currentSession.sessionId = null;
     this.currentSession.data = {};
-    if (!options.skipRoute){
+    if (!options.skipRoute) {
       router.replace('/feedback');
     }
   },
 
+  newSession(context, sessionType, sessionSubTopic) {
+    return NetworkService.newSession(context, { sessionType, sessionSubTopic })
+      .then((res) => {
+        const data = res.data || {};
+        const { sessionId } = data;
 
+        this.currentSession.sessionId = sessionId;
 
-  newSession(context, sessionType, sessionSubTopic){
-    return NetworkService.newSession(context, {sessionType, sessionSubTopic} ).then((res) => {
-      let data = res.data || {},
-          sessionId = data.sessionId;
+        console.log(sessionId);
+        if (sessionId) {
+          router.replace(`/session/${sessionType}/${sessionSubTopic}/${sessionId}`);
+        }
+        else {
+          router.replace('/');
+        }
 
-      this.currentSession.sessionId = sessionId;
-
-      console.log(sessionId);
-      if (sessionId){
-        router.replace(`/session/${sessionType}/${sessionSubTopic}/${sessionId}`);
-      } else {
-        router.replace('/');
-      }
-
-      return sessionId;
-    })
+        return sessionId;
+      });
   },
 
-  useExistingSession(context, sessionId){
+  useExistingSession(context, sessionId) {
     return NetworkService.checkSession(context, { sessionId }).then((res) => {
-      let data = res.data || {},
-          sessionId = data.sessionId,
-          sessionType = data.type;
+      const data = res.data || {};
+      const { sessionId } = data;
 
       this.currentSession.sessionId = sessionId;
 
       console.log(sessionId);
-      if (!sessionId){
+      if (!sessionId) {
         router.replace('/');
       }
 
       return sessionId;
-    })
-  }
+    });
+  },
 };

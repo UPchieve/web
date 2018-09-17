@@ -1,36 +1,44 @@
 <template>
   <div id="app">
-      <div class="nav-container">
-        <sidebar></sidebar>
-      </div>
-      <div class="col-xs-12 view-container">
-        <router-view></router-view>
-      </div>
+    <div class="nav-container">
+      <sidebar/>
     </div>
+    <div class="col-xs-12 view-container">
+      <router-view/>
+    </div>
+  </div>
 </template>
 
-<script>
-import 'bootstrap/dist/css/bootstrap.css'
 
-import Sidebar from './components/Sidebar'
+<script>
+import 'bootstrap/dist/css/bootstrap.css';
+import './assets/styles/settings.css';
+
+import Sidebar from './components/Sidebar';
 
 import AuthService from './services/AuthService';
 
-AuthService.checkAuth();
+/**
+ * @todo Examine this, huge code smell, refactoring might be needed
+ */
+AuthService.checkAuth(); // {1}
 
 export default {
-  name: 'app',
+  name: 'App',
   components: {
-    Sidebar
+    Sidebar,
   },
-  created(){
-    AuthService.checkAuth(this);
-  }
-}
+  created() {
+    AuthService.checkAuth(this); // {1}
+  },
+};
 </script>
 
-<style>
 
+<style>
+/*
+ * @todo {1} Make this truly responsive
+ */
 html, body, #app {
   height: 100%;
 }
@@ -56,6 +64,19 @@ html, body, #app {
 .col-xs-12.view-container {
   padding-left: 300px;
   padding-right: 0;
-  z-index: 0;
 }
+
+@media screen and (max-width: 700px) { /* {1} */
+  /*------------------------------------------------------------------quickfix*/
+  .nav-container {
+    background: #000;
+    width: 40px;
+    overflow: hidden;
+  }
+  .col-xs-12.view-container {
+    padding-left: 40px;
+  }
+  /*------------------------------------------------------------------quickfix*/
+}
+
 </style>
