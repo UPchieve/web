@@ -5,7 +5,7 @@
         <div class="login-header">Log In</div>
         <router-link
           to="signup"
-          class="register-link">Register an Account</router-link>
+          class="register-link">Sign Up</router-link>
       </div>
       <div class="body">
         <div
