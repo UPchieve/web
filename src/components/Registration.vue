@@ -27,11 +27,11 @@ import VolunteerForm from './Registration/VolunteerForm';
 export default {
   components: {
     StudentForm,
-    VolunteerForm
+    VolunteerForm,
   },
-  data(){
+  data() {
     return {
-      userSelection: null
+      userSelection: null,
     };
   },
   methods: {
@@ -40,9 +40,9 @@ export default {
     },
     selectStudent() {
       this.userSelection = 'student';
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>

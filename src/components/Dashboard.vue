@@ -1,40 +1,66 @@
 <template>
-  <div class="dashboard" v-bind:style="coverStyle">
-    <div class="header-container"></div>
-    <h1>Hello, {{name}}!</h1>
+  <div
+    :style="coverStyle"
+    class="dashboard">
+    <div class="header-container"/>
+    <h1>Hello, {{ name }}!</h1>
 
     <template v-if="!user.isVolunteer">
       <div class="dashboard-body row">
         <div class="col-lg-6 video">
           <p><span class="intro_bold">New to UPchieve?</span>Watch the video to learn how to use our services.</p>
           <div class="video">
-          <iframe width="480" height="280" src="https://www.youtube.com/embed/UOFFF5hOwdM" frameborder="0" allowfullscreen></iframe>
+            <iframe
+              width="480"
+              height="280"
+              src="https://www.youtube.com/embed/UOFFF5hOwdM"
+              frameborder="0"
+              allowfullscreen/>
           </div>
         </div>
 
         <div class="col-lg-6 help">
           <div class = "help-container">
             <h2>You can get help from an Academic Coach.</h2>
-            <button class="btn getHelp" @click.prevent="getHelp()">Get help now</button>
-            <div class="getHelpPopUp" v-bind:style="popUpStyle" v-if="showHelpPopUp">
+            <button
+              class="btn getHelp"
+              @click.prevent="getHelp()">Get help now</button>
+            <div
+              v-if="showHelpPopUp"
+              :style="popUpStyle"
+              class="getHelpPopUp">
               <span>Select a help topic.</span>
-              <select class="form-control topic" v-model="pickedTopic">
+              <select
+                v-model="pickedTopic"
+                class="form-control topic">
                 <option value="math">Math</option>
                 <option value="college">College Counseling</option>
               </select>
-              <select class="form-control subtopic" v-model="pickedSubtopic">
-                <option v-for="subtopic in subtopics[pickedTopic]">{{ subtopic }}</option>
+              <select
+                v-model="pickedSubtopic"
+                class="form-control subtopic">
+                <option
+                  v-for="(subtopic, index) in subtopics[pickedTopic]"
+                  :key="`subtopic-${index}`">{{ subtopic }}</option>
               </select>
               <div class="helpBtns">
-                <button class="btn helpCancel" type="cancel" @click.prevent="getHelpCancel()" v-if="showHelpPopUp">Cancel</button>
-                <button class="btn helpNext" type="next" @click.prevent="getHelpNext()" v-if="showHelpPopUp">Get help</button>
+                <button
+                  v-if="showHelpPopUp"
+                  class="btn helpCancel"
+                  type="cancel"
+                  @click.prevent="getHelpCancel()">Cancel</button>
+                <button
+                  v-if="showHelpPopUp"
+                  class="btn helpNext"
+                  type="next"
+                  @click.prevent="getHelpNext()">Get help</button>
               </div>
             </div>
-              <div class="disclaimer row">Disclaimer: UPchieve assumes no
-              responsibility for the actions of its volunteers and strongly
-              encourages students to follow internet safety practices at all times.
-              In particular, please do not share personal or identifying information
-              with volunteers.</div>
+            <div class="disclaimer row">Disclaimer: UPchieve assumes no
+            responsibility for the actions of its volunteers and strongly
+            encourages students to follow internet safety practices at all times.
+            In particular, please do not share personal or identifying information
+            with volunteers.</div>
           </div>
         </div>
       </div>
@@ -44,19 +70,23 @@
         <div class="col-lg-6 video">
           <p><strong>New to UPchieve? </strong>Watch the video to learn how to use our services.</p>
           <div class="video">
-          <iframe width="500" height="300" src="https://www.youtube.com/embed/TfjsjukrnB8" frameborder="0" allowfullscreen></iframe>
+            <iframe
+              width="500"
+              height="300"
+              src="https://www.youtube.com/embed/TfjsjukrnB8"
+              frameborder="0"
+              allowfullscreen/>
           </div>
         </div>
         <div class="col-lg-6 help">
           <div class = "help-container">
             <h2>You are ready to help!</h2>
             <p> Only students who are waiting for a volunteer will show up below.</p>
-            <list-sessions></list-sessions>
+            <list-sessions/>
           </div>
         </div>
       </div>
     </template>
-    </div>
   </div>
 </template>
 
@@ -68,14 +98,14 @@ import ListSessions from 'src/components/ListSessions';
 
 export default {
   components: {
-    ListSessions
+    ListSessions,
   },
   data() {
-    let user = UserService.getUser() || {};
-    var subtopics = {
-      'math': ['Algebra', 'Geometry', 'Trigonometry', 'Precalculus', 'Calculus'],
-      'esl': ['General Help'],
-      'college': ['Planning', 'Applications','Essays']
+    const user = UserService.getUser() || {};
+    const subtopics = {
+      math: ['Algebra', 'Geometry', 'Trigonometry', 'Precalculus', 'Calculus'],
+      esl: ['General Help'],
+      college: ['Planning', 'Applications', 'Essays'],
 
       // Temporarily changing to single word labels
       // 'college': ['College Planning', 'Application Help','Essay Editing']
@@ -85,23 +115,23 @@ export default {
       // 'standardizedtest': ['SAT']
     };
     return {
-      user: user,
+      user,
       name: user.firstname || 'student',
       popUpStyle: { },
       showHelpPopUp: false,
       pickedTopic: '',
       pickedSubtopic: '',
-      subtopics: subtopics,
-      coverStyle: { }
-    }
+      subtopics,
+      coverStyle: { },
+    };
   },
   methods: {
     getHelp() {
       this.popUpStyle = {
-        display: 'flex'
+        display: 'flex',
       };
       this.coverStyle = {
-        background: 'rgba(0,0,0,0.10)'
+        background: 'rgba(0,0,0,0.10)',
       };
       this.showHelpPopUp = true;
     },
@@ -114,20 +144,20 @@ export default {
       this.showHelpPopUp = false;
     },
     getHelpNext() {
-      var topic = this.pickedTopic;
-      var subTopic = this.pickedSubtopic;
-      //Temp change all to math
-      //topic = 'math';
+      let topic = this.pickedTopic;
+      let subTopic = this.pickedSubtopic;
+      // Temp change all to math
+      // topic = 'math';
       topic = topic.toLowerCase();
       subTopic = subTopic.toLowerCase();
-      if (subTopic == 'general help') {
+      if (subTopic === 'general help') {
         subTopic = topic;
       }
-      var linkName = '/session/' + topic + '/' + subTopic;
+      const linkName = `/session/${topic}/${subTopic}`;
       this.$router.push(linkName);
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>

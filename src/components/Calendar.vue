@@ -1,51 +1,64 @@
 <template>
-<div class="calendar">
-<h1 class="header">
-  <div class="header-title">Schedule</div>
-  <button @click="save()" class="btn">Update Schedule</button>
-</h1>
-<div class="dayTimeContainer">
-  <div class="timeLabelContainer">
-    <div v-for="time in timeRange" class="timeLabel">
-      {{ time }}
-    </div>
-  </div>
-  <form class="dayTime">
-    <div v-for="(dayValue, day) in availability">
-      <div class="dayLabel">{{ day }}</div>
-      <div class="times">
-        <div v-for="sortedTime in sortedTimes[day]" class="timeOfDay">
-          <input type="checkbox" id="time" v-model="availability[day][sortedTime]">
-          <label for=sortedTime></label>
+  <div class="calendar">
+    <h1 class="header">
+      <div class="header-title">Schedule</div>
+      <button
+        class="btn"
+        @click="save()">Update Schedule</button>
+    </h1>
+    <div class="dayTimeContainer">
+      <div class="timeLabelContainer">
+        <div
+          v-for="time in timeRange"
+          :key="time"
+          class="timeLabel">
+          {{ time }}
         </div>
       </div>
+      <form class="dayTime">
+        <div
+          v-for="(dayValue, day) in availability"
+          :key="`day-${day}`">
+          <div class="dayLabel">{{ day }}</div>
+          <div class="times">
+            <div
+              v-for="sortedTime in sortedTimes[day]"
+              :key="sortedTime"
+              class="timeOfDay">
+              <input
+                id="time"
+                v-model="availability[day][sortedTime]"
+                type="checkbox">
+              <label for="sortedTime"/>
+            </div>
+          </div>
+        </div>
+      </form>
     </div>
-  </form>
-</div>
-</div>
+  </div>
 </template>
 
 <script>
 
-import CalendarService from '../services/CalendarService';
 import UserService from 'src/services/UserService';
+import CalendarService from '../services/CalendarService';
 
 export default {
-  data(){
-    let user = UserService.getUser();
-    let timeRange = ['12 am', '1 am', '2 am', '3 am', '4 am', '5 am', '6 am', '7 am', '8 am', '9 am',
+  data() {
+    const user = UserService.getUser();
+    const timeRange = ['12 am', '1 am', '2 am', '3 am', '4 am', '5 am', '6 am', '7 am', '8 am', '9 am',
       '10 am', '11 am', '12 pm', '1 pm', '2 pm', '3 pm', '4 pm', '5 pm', '6 pm', '7 pm', '8 pm', '9 pm',
       '10 pm', '11 pm'];
     return {
-      user: user,
+      user,
       availability: {},
-      timeRange: timeRange
-    }
+      timeRange,
+    };
   },
   computed: {
-    sortedTimes: function () {
+    sortedTimes() {
       return this.sortTimes();
-    }
+    },
   },
   beforeMount() {
     if (!this.user.hasSchedule) {
@@ -56,18 +69,18 @@ export default {
     });
   },
   methods: {
-    sortTimes(){
-      var keysMap = new Object();
-      for (var day in this.availability) {
+    sortTimes() {
+      const keysMap = {};
+      for (const day in this.availability) {
         if (this.availability.hasOwnProperty(day)) {
-          var times = this.availability[day];
-          var keys = [];
-          for (var time in times) {
+          const times = this.availability[day];
+          const keys = [];
+          for (const time in times) {
             if (times.hasOwnProperty(time)) {
               keys.push(time);
             }
           }
-          if (keys[0] != '12a') {
+          if (keys[0] !== '12a') {
             keys.reverse();
           }
           keysMap[day] = keys;
@@ -75,12 +88,12 @@ export default {
       }
       return keysMap;
     },
-    save(){
+    save() {
       console.log(this.availability);
       CalendarService.updateAvailability(this, this.user._id, this.availability);
-    }
-  }
-}
+    },
+  },
+};
 
 </script>
 

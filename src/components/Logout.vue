@@ -3,8 +3,12 @@
     <div class="form-signout">
       <h1>You're logged out!</h1>
       <div class="button-container">
-        <router-link to="/login" class="btn login">LOGIN</router-link>
-        <router-link to="/feedback" class="btn btn-lg btn-primary btn-block feedback">GIVE FEEDBACK</router-link>
+        <router-link
+          to="/login"
+          class="btn login">LOGIN</router-link>
+        <router-link
+          to="/feedback"
+          class="btn btn-lg btn-primary btn-block feedback">GIVE FEEDBACK</router-link>
       </div>
     </div>
   </div>
@@ -12,12 +16,12 @@
 
 <script>
 export default {
-  data(){
+  data() {
     return {
-      mainWebsiteUrl: process.env.MAIN_WEBSITE_URL
-    }
-  }
-}
+      mainWebsiteUrl: process.env.MAIN_WEBSITE_URL,
+    };
+  },
+};
 </script>
 
 <style scoped>

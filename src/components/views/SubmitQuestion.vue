@@ -1,20 +1,23 @@
 <template>
-<div v-if="!user.isVolunteer" class="submit-question">
-  <basic-template headerTitle="Submit a question">
-    <message-form 
-      textareaLabel="What is your question?"
-      :modalContainer="this"
-      typeOfForm="submit-question"
-    ></message-form>
-  </basic-template>
-  <modal v-if="showModal" 
-    singleBtn
-    :warn="modalOptions.warn"
-    :message="modalOptions.message"
-    :labels="modalBtnLabels"
-    :clickHandlers="modalClickHandlers"
-  ></modal>
-</div>
+  <div
+    v-if="!user.isVolunteer"
+    class="submit-question">
+    <basic-template header-title="Submit a question">
+      <message-form
+        :modal-container="this"
+        textarea-label="What is your question?"
+        type-of-form="submit-question"
+      />
+    </basic-template>
+    <modal
+      v-if="showModal"
+      :warn="modalOptions.warn"
+      :message="modalOptions.message"
+      :labels="modalBtnLabels"
+      :click-handlers="modalClickHandlers"
+      single-btn
+    />
+  </div>
 </template>
 
 
@@ -29,7 +32,7 @@ export default {
   components: {
     BasicTemplate,
     MessageForm,
-    Modal
+    Modal,
   },
   data() {
     return {
@@ -39,10 +42,10 @@ export default {
       showModal: false,
       modalBtnLabels: [],
       modalOptions: {},
-      modalClickHandlers: {}
-    }
+      modalClickHandlers: {},
+    };
   },
-}
+};
 </script>
 
 

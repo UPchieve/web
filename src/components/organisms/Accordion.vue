@@ -1,13 +1,13 @@
 <template>
-<div class="accordion">
-  <slot></slot>
-</div>
+  <div class="accordion">
+    <slot/>
+  </div>
 </template>
 
 
 <script>
 export default {
-}
+};
 </script>
 
 

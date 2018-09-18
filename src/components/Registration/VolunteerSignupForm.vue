@@ -63,11 +63,11 @@
 </template>
 
 <script>
-  import AuthService from 'src/services/AuthService'
-  import RegistrationService from 'src/services/RegistrationService'
-  import UserService from '../../services/UserService';
+import AuthService from 'src/services/AuthService';
+import RegistrationService from 'src/services/RegistrationService';
+import UserService from '../../services/UserService';
 
-  export default {
+export default {
     data() {
       return {
         msg: '',

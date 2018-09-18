@@ -1,201 +1,275 @@
 <template>
-<div class="profile">
-  <div class="header">
-    Profile
-    <button @click="editProfile()" class="editBtn btn">{{ editBtnMsg }}</button>
-  </div>
-  <div class="wrap-container">
-    <div class="personal-info contain">
-      <div class="subheader">Personal Information</div>
-      <div class="container-content">
+  <div class="profile">
+    <div class="header">
+      Profile
+      <button
+        class="editBtn btn"
+        @click="editProfile()">{{ editBtnMsg }}</button>
+    </div>
+    <div class="wrap-container">
+      <div class="personal-info contain">
+        <div class="subheader">Personal Information</div>
+        <div class="container-content">
 
-        <div class="container-section" id="email">
-          <div class="prompt">Your Email</div>
-          <div class="answer">{{ user.email }}</div>
-        </div>
-
-        <div v-if="!user.isVolunteer">
-          <div class="container-section" id="highschool">
-            <div class="prompt">Your High School's Name</div>
-            <div class="answer" v-show="!activeEdit">{{ user.highschool }}</div>
-            <div class="answer" v-show="!user.highschool && !activeEdit">(None given)</div>
-            <input type="text" v-model="user.highschool" v-show="activeEdit" class="form-control">
+          <div
+            id="email"
+            class="container-section">
+            <div class="prompt">Your Email</div>
+            <div class="answer">{{ user.email }}</div>
           </div>
-        </div>
-        <div v-if="user.isVolunteer">
-          <div class="container-section" id="phone">
-            <div class="prompt">Your Phone Number
+
+          <div v-if="!user.isVolunteer">
+            <div
+              id="highschool"
+              class="container-section">
+              <div class="prompt">Your High School's Name</div>
+              <div
+                v-show="!activeEdit"
+                class="answer">{{ user.highschool }}</div>
+              <div
+                v-show="!user.highschool && !activeEdit"
+                class="answer">(None given)</div>
+              <input
+                v-show="activeEdit"
+                v-model="user.highschool"
+                type="text"
+                class="form-control">
             </div>
-            <div class="answer" v-show="!activeEdit">{{ user.phone }}</div>
-            <div class="answer" v-show="!user.phone && !activeEdit">(None given)</div>
-            <input type="text" v-model="user.phone" v-show="activeEdit" class="form-control" >
-
-            <div class="description">We will use this number to send
-            you notifications when a student needs help. You will only receive
-            notifications during the periods that you select in your schedule.</div>
           </div>
+          <div v-if="user.isVolunteer">
+            <div
+              id="phone"
+              class="container-section">
+              <div class="prompt">Your Phone Number
+              </div>
+              <div
+                v-show="!activeEdit"
+                class="answer">{{ user.phone }}</div>
+              <div
+                v-show="!user.phone && !activeEdit"
+                class="answer">(None given)</div>
+              <input
+                v-show="activeEdit"
+                v-model="user.phone"
+                type="text"
+                class="form-control" >
 
-          <div class="container-section" id="preferredContactMethod">
-            <div class="prompt">What is your preferred method of contact?</div>
-            <div class="answer">
-              <ul v-show="!activeEdit" v-for="item in user.preferredContactMethod">
-                <li>{{ item }}</li>
+              <div class="description">We will use this number to send
+              you notifications when a student needs help. You will only receive
+              notifications during the periods that you select in your schedule.</div>
+            </div>
+
+            <div
+              id="preferredContactMethod"
+              class="container-section">
+              <div class="prompt">What is your preferred method of contact?</div>
+              <div class="answer">
+                <ul
+                  v-for="(item, index) in user.preferredContactMethod"
+                  v-show="!activeEdit"
+                  :key="`item-${index}`">
+                  <li>{{ item }}</li>
+                </ul>
+              </div>
+              <div
+                v-show="!user.preferredContactMethod[0] && !activeEdit"
+                class="answer">(None given)</div>
+              <ul
+                v-show="activeEdit"
+                class="row form-control">
+                <p>Please select all that apply.</p>
+                <div>
+                  <div class="checkbox">
+                    <label>
+                      <input
+                        v-model="user.preferredContactMethod"
+                        type="checkbox"
+                        value="Email">
+                      Email
+                    </label>
+                  </div>
+                  <div class="checkbox">
+                    <label>
+                      <input
+                        v-model="user.preferredContactMethod"
+                        type="checkbox"
+                        value="Text message">
+                      Text message
+                    </label>
+                  </div>
+                  <div class="checkbox">
+                    <label>
+                      <input
+                        v-model="user.preferredContactMethod"
+                        type="checkbox"
+                        value="None">
+                      None
+                    </label>
+                  </div>
+                </div>
               </ul>
             </div>
-            <div class="answer" v-show="!user.preferredContactMethod[0] && !activeEdit">(None given)</div>
-            <ul class="row form-control" v-model="user.preferredContactMethod" v-show="activeEdit">
-              <p>Please select all that apply.</p>
-              <div>
-                <div class="checkbox">
-                  <label>
-                    <input type="checkbox" value="Email" v-model="user.preferredContactMethod">
-                    Email
-                  </label>
-                </div>
-                <div class="checkbox">
-                  <label>
-                    <input type="checkbox" value="Text message" v-model="user.preferredContactMethod">
-                    Text message
-                  </label>
-                </div>
-                <div class="checkbox">
-                  <label>
-                    <input type="checkbox" value="None" v-model="user.preferredContactMethod">
-                    None
-                  </label>
-                </div>
-              </div>
-            </ul>
+
+            <div
+              id="college"
+              class="container-section">
+              <div class="prompt">Your College</div>
+              <div
+                v-show="!activeEdit"
+                class="answer">{{ user.college }}</div>
+              <div
+                v-show="!user.college && !activeEdit"
+                class="answer">(None given)</div>
+              <input
+                v-show="activeEdit"
+                v-model="user.college"
+                type="text"
+                class="form-control">
+            </div>
+
+            <div
+              id="favoriteAcademicSubject"
+              class="container-section">
+              <div class="prompt">Your Favorite Academic Subject</div>
+              <div
+                v-show="!activeEdit"
+                class="answer">{{ user.favoriteAcademicSubject }}</div>
+              <div
+                v-show="!user.favoriteAcademicSubject && !activeEdit"
+                class="answer">(None given)</div>
+              <input
+                v-show="activeEdit"
+                v-model="user.favoriteAcademicSubject"
+                type="text"
+                class="form-control">
+            </div>
+
           </div>
 
-          <div class="container-section" id="college">
-            <div class="prompt">Your College</div>
-            <div class="answer" v-show="!activeEdit">{{ user.college }}</div>
-            <div class="answer" v-show="!user.college && !activeEdit">(None given)</div>
-            <input type="text" v-model="user.college" v-show="activeEdit" class="form-control">
-          </div>
-
-          <div class="container-section" id="favoriteAcademicSubject">
-            <div class="prompt">Your Favorite Academic Subject</div>
-            <div class="answer" v-show="!activeEdit">{{ user.favoriteAcademicSubject }}</div>
-            <div class="answer" v-show="!user.favoriteAcademicSubject && !activeEdit">(None given)</div>
-            <input type="text" v-model="user.favoriteAcademicSubject" v-show="activeEdit" class="form-control">
-          </div>
-
+          <div class="container-section resetBtn btn"><router-link
+            to="resetpassword"
+            class="prompt">Reset password</router-link></div>
         </div>
 
-        <div class="container-section resetBtn btn"><router-link to="resetpassword" class="prompt">Reset password</router-link></div>
       </div>
 
-    </div>
-
-    <div v-if="user.isVolunteer" class="cert-info contain">
-      <div class="subheader">Certifications and Tutoring Topics</div>
-      <div class="container-content cert">
-        <div v-for="(value, key) in certifications">
-          <div class="certBox" v-if="value">
-            <div class="certKey" v-bind:class="certKey[key]">{{ certKey[key] }}</div>
-            <div class="certValue">{{ key }}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="profile-pic contain" v-if="false">
-      <div class="subheader">Profile Picture</div>
-      <div class="container-content">
-        <div class="container-section" id="profilePic">
-          <div class="answer avatar" v-bind:style="avatarStyle">
+      <div
+        v-if="user.isVolunteer"
+        class="cert-info contain">
+        <div class="subheader">Certifications and Tutoring Topics</div>
+        <div class="container-content cert">
+          <div
+            v-for="(value, key) in certifications"
+            :key="`certification-${key}-${value}`">
+            <div
+              v-if="value"
+              class="certBox">
+              <div
+                :class="certKey[key]"
+                class="certKey">{{ certKey[key] }}</div>
+              <div class="certValue">{{ key }}</div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
+      <div
+        v-if="false"
+        class="profile-pic contain">
+        <div class="subheader">Profile Picture</div>
+        <div class="container-content">
+          <div
+            id="profilePic"
+            class="container-section">
+            <div
+              :style="avatarStyle"
+              class="answer avatar"/>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
-</div>
-
 </template>
 
+
 <script>
-import UserService from 'src/services/UserService'
+import UserService from 'src/services/UserService';
 
 export default {
   data() {
-    var user = UserService.getUser();
-    var avatarUrl = user.picture || (user.isVolunteer ? 'static/defaultavatar4.png' : 'static/defaultavatar3.png');
-    var fieldnames = ['firstname', 'lastname', 'nickname', 'highschool', 'currentGrade',
-    'expectedGraduation', 'difficultAcademicSubject', 'difficultCollegeProcess',
-    'hasGuidanceCounselor', 'gpa', 'collegeApplicationsText', 'phone', 'favoriteAcademicSubject', 'college', 'referred', 'preferredContactMethod'];
+    const user = UserService.getUser();
+    const avatarUrl = user.picture || (user.isVolunteer ? 'static/defaultavatar4.png' : 'static/defaultavatar3.png');
 
-    var certifications = new Object();
+    const certifications = {};
     if (user.algebra) {
       if (user.algebra.passed) {
-        certifications['Algebra'] = true;
+        certifications.Algebra = true;
       }
     }
     if (user.geometry) {
       if (user.geometry.passed) {
-        certifications['Geometry'] = true;
+        certifications.Geometry = true;
       }
     }
     if (user.trigonometry) {
       if (user.trigonometry.passed) {
-        certifications['Trigonometry'] = true;
+        certifications.Trigonometry = true;
       }
     }
     if (user.precalculus) {
       if (user.precalculus.passed) {
-        certifications['Precalculus'] = true;
+        certifications.Precalculus = true;
       }
     }
     if (user.calculus) {
       if (user.calculus.passed) {
-        certifications['Calculus'] = true;
+        certifications.Calculus = true;
       }
     }
     if (user.esl) {
       if (user.esl.passed) {
-        certifications['ESL'] = true;
+        certifications.ESL = true;
       }
     }
     if (user.planning) {
       if (user.planning.passed) {
-        certifications['Planning'] = true;
+        certifications.Planning = true;
       }
     }
     if (user.essay) {
       if (user.essay.passed) {
-        certifications['Essay'] = true;
+        certifications.Essay = true;
       }
     }
     if (user.application) {
       if (user.application.passed) {
-        certifications['Application'] = true;
+        certifications.Application = true;
       }
     }
 
-    var certKey = new Object();
-    certKey['Algebra'] = 'MATH';
-    certKey['Geometry'] = 'MATH';
-    certKey['Trigonometry'] = 'MATH';
-    certKey['Precalculus'] = 'MATH';
-    certKey['Calculus'] = 'MATH';
-    certKey['ESL'] = 'ESL'
-    certKey['Planning'] = 'COLLEGE';
-    certKey['Essay'] = 'COLLEGE';
-    certKey['Application'] = 'COLLEGE';
+    const certKey = {};
+    certKey.Algebra = 'MATH';
+    certKey.Geometry = 'MATH';
+    certKey.Trigonometry = 'MATH';
+    certKey.Precalculus = 'MATH';
+    certKey.Calculus = 'MATH';
+    certKey.ESL = 'ESL';
+    certKey.Planning = 'COLLEGE';
+    certKey.Essay = 'COLLEGE';
+    certKey.Application = 'COLLEGE';
 
     return {
-      user: user,
+      user,
       activeEdit: false,
       editBtnMsg: 'Edit Profile',
       name: user.firstname || (user.isVolunteer ? 'volunteer' : 'student'),
       avatarStyle: {
-        backgroundImage: `url(${avatarUrl})`
+        backgroundImage: `url(${avatarUrl})`,
       },
-      certifications: certifications,
-      certKey: certKey
-    }
+      certifications,
+      certKey,
+    };
   },
   methods: {
     editProfile() {
@@ -203,13 +277,14 @@ export default {
         UserService.setProfile(this, this.user);
         this.editBtnMsg = 'Edit Profile';
         this.activeEdit = false;
-      } else {
+      }
+      else {
         this.editBtnMsg = 'Save Profile';
         this.activeEdit = true;
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>

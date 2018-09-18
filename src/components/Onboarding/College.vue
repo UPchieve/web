@@ -1,16 +1,24 @@
 <template>
   <div class="profile-editor">
     <div class="profile-header">
-        <h2>{{user.isVolunteer ? 'Volunteer' : 'Student' }} Profile</h2>
+      <h2>{{ user.isVolunteer ? 'Volunteer' : 'Student' }} Profile</h2>
     </div>
 
-    <div class="alert alert-danger" role="alert" v-if="error">{{error}}</div>
+    <div
+      v-if="error"
+      class="alert alert-danger"
+      role="alert">{{ error }}</div>
 
     <div class="row form-group">
       <p>GPA</p>
       <div class="row">
         <div class="col-sm-12">
-          <input type="text" v-model="user.gpa" class="form-control" required autofocus>
+          <input
+            v-model="user.gpa"
+            type="text"
+            class="form-control"
+            required
+            autofocus>
         </div>
       </div>
     </div>
@@ -19,7 +27,9 @@
       <p>Please list all colleges and universities you are considering apply to.</p>
       <div class="row">
         <div class="col-sm-12">
-          <textarea class="form-control" v-model="user.collegeApplicationsText"></textarea>
+          <textarea
+            v-model="user.collegeApplicationsText"
+            class="form-control"/>
         </div>
       </div>
     </div>
@@ -31,25 +41,37 @@
         <div class="col-sm-6">
           <div class="checkbox">
             <label>
-              <input type="checkbox" value="highschoolTranscript" v-model="user.commonCollegeDocs">
+              <input
+                v-model="user.commonCollegeDocs"
+                type="checkbox"
+                value="highschoolTranscript">
               High School Transcript
             </label>
           </div>
           <div class="checkbox">
             <label>
-              <input type="checkbox" value="commonApplication" v-model="user.commonCollegeDocs">
+              <input
+                v-model="user.commonCollegeDocs"
+                type="checkbox"
+                value="commonApplication">
               Common Application
             </label>
           </div>
           <div class="checkbox">
             <label>
-              <input type="checkbox" value="personalStatement" v-model="user.commonCollegeDocs">
+              <input
+                v-model="user.commonCollegeDocs"
+                type="checkbox"
+                value="personalStatement">
               Personal Statement
             </label>
           </div>
           <div class="checkbox">
             <label>
-              <input type="checkbox" value="resume" v-model="user.commonCollegeDocs">
+              <input
+                v-model="user.commonCollegeDocs"
+                type="checkbox"
+                value="resume">
               Resume
             </label>
           </div>
@@ -57,25 +79,37 @@
         <div class="col-sm-6">
           <div class="checkbox">
             <label>
-              <input type="checkbox" value="testScores" v-model="user.commonCollegeDocs">
+              <input
+                v-model="user.commonCollegeDocs"
+                type="checkbox"
+                value="testScores">
               SAT / ACT Scores
             </label>
           </div>
           <div class="checkbox">
             <label>
-              <input type="checkbox" value="lettersRecommendation" v-model="user.commonCollegeDocs">
+              <input
+                v-model="user.commonCollegeDocs"
+                type="checkbox"
+                value="lettersRecommendation">
               Letters of Recommendation
             </label>
           </div>
           <div class="checkbox">
             <label>
-              <input type="checkbox" value="fafsa" v-model="user.commonCollegeDocs">
+              <input
+                v-model="user.commonCollegeDocs"
+                type="checkbox"
+                value="fafsa">
               FAFSA
             </label>
           </div>
           <div class="checkbox">
             <label>
-              <input type="checkbox" value="finAidProfile" v-model="user.commonCollegeDocs">
+              <input
+                v-model="user.commonCollegeDocs"
+                type="checkbox"
+                value="finAidProfile">
               CSS / Financial Aid Profile
             </label>
           </div>
@@ -88,7 +122,9 @@
       <p class="sub">Please tell us about your interests! For example, your favorite class, a new topic you want to study, a cause you are passionate about, a professional hobby, an intended major/minor, etc.</p>
       <div class="row">
         <div class="col-sm-12">
-          <textarea class="form-control" v-model="user.academicInterestsText"></textarea>
+          <textarea
+            v-model="user.academicInterestsText"
+            class="form-control"/>
         </div>
       </div>
     </div>
@@ -97,7 +133,9 @@
       <p>Please list all your SAT and/or ACT Scores &amp; when they were taken</p>
       <div class="row">
         <div class="col-sm-12">
-          <textarea class="form-control" v-model="user.testScoresText"></textarea>
+          <textarea
+            v-model="user.testScoresText"
+            class="form-control"/>
         </div>
       </div>
     </div>
@@ -106,7 +144,9 @@
       <p>Have you taken any advanced (honors, AP, IB, college-level) courses? If so, please list them and your AP exam scores if applicable</p>
       <div class="row">
         <div class="col-sm-12">
-          <textarea class="form-control" v-model="user.advancedCoursesText"></textarea>
+          <textarea
+            v-model="user.advancedCoursesText"
+            class="form-control"/>
         </div>
       </div>
     </div>
@@ -115,42 +155,47 @@
       <p>What extracurricular activities are you involved in at high school?</p>
       <div class="row">
         <div class="col-sm-12">
-          <textarea class="form-control" v-model="user.extracurricularActivitesText"></textarea>
+          <textarea
+            v-model="user.extracurricularActivitesText"
+            class="form-control"/>
         </div>
       </div>
     </div>
 
-    <button class="btn btn-lg btn-primary btn-block back" @click.prevent="back">Back</button>
-    <button class="btn btn-lg btn-primary btn-block next" type="submit" @click.prevent="submitProfile">{{buttonMsg}}</button>
+    <button
+      class="btn btn-lg btn-primary btn-block back"
+      @click.prevent="back">Back</button>
+    <button
+      class="btn btn-lg btn-primary btn-block next"
+      type="submit"
+      @click.prevent="submitProfile">{{ buttonMsg }}</button>
   </div>
 </template>
 
 <script>
-
-import UserService from 'src/services/UserService'
-import OnboardingService from 'src/services/OnboardingService'
+import UserService from 'src/services/UserService';
 
 export default {
   data() {
     return {
       user: UserService.getUser(),
       buttonMsg: 'Next',
-      error: ''
-    }
+      error: '',
+    };
   },
   methods: {
-    skipOnboarding(){
+    skipOnboarding() {
       this.$router.push('/');
     },
-    back(){
+    back() {
       this.$router.push('/onboarding/academic');
     },
-    submitProfile(e){
+    submitProfile() {
       this.buttonMsg = 'Updating...';
       UserService.setProfile(this, this.user, '/');
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>
