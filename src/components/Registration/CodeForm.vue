@@ -1,11 +1,5 @@
 <template>
   <form class="form-signup">
-    <div class="header">
-      <router-link
-        to="login"
-        class="login-link">Log In</router-link>
-      <div class="registration-header">Register an Account</div>
-    </div>
     <label for="inputRegistrationCode">Please enter your registration code</label>
     <input
       id="inputRegistrationCode"

@@ -1,11 +1,5 @@
 <template>
   <form class="form-signup">
-    <div class="header">
-      <router-link
-        to="login"
-        class="login-link">Log In</router-link>
-      <div class="registration-header">Register an Account</div>
-    </div>
     <div>
       <div v-if="step==='step-1'">
         <div
@@ -59,8 +53,8 @@
               autofocus></td>
           </tr>
           <tr>
-            <td class="table-entry"><div class="description">First Name</div></td>
-            <td class="table-entry"><div class="description">Last Name</div></td>
+            <td class="table-entry"><div class="description" style="padding-bottom: 0px;">First Name</div></td>
+            <td class="table-entry"><div class="description" style="padding-bottom: 0px;">Last Name</div></td>
           </tr>
           <tr class="question-row">
             <td
@@ -95,6 +89,21 @@
               </select>
             </td>
           </tr>
+          <tr class="question-row">
+            <td class="table-entry" style="height: 50px;" colspan="2">Do you get help from any of these organizations?</td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <select class="form-control topic" v-model="profile.referred">
+                <option value="Big Brothers Big Sisters of NYC">Big Brothers Big Sisters of NYC</option>
+                <option value="Breakthrough New York">Breakthrough New York</option>
+                <option value="East Harlem Tutorial Program">East Harlem Tutorial Program</option>
+                <option value="First Graduate">First Graduate</option>
+                <option value="Oasis - A Heaven for Women and Children">Oasis - A Heaven for Women and Children</option>
+                <option value="None of the above">None of the above</option>
+              </select>
+            </td>
+          </tr>
           <tr>
             <div class="agreement-box">
               <input
@@ -126,54 +135,56 @@ import AuthService from 'src/services/AuthService';
 import UserService from '../../services/UserService';
 
 export default {
-  data() {
-    return {
-      msg: '',
-      credentials: {
-        email: '',
-        password: '',
-        terms: false,
-      },
-      profile: {
-        firstName: '',
-        lastName: '',
-        highSchool: '',
-        heardFrom: '',
-      },
-      step: 'step-1',
-    };
-  },
-  methods: {
-    nextPage() {
-      AuthService.checkRegister(this, {
-        email: this.credentials.email,
-        password: this.credentials.password,
-      }).then(() => {
-        this.step = 'step-2';
-      }).catch((err) => {
-        this.msg = err.message;
-      });
+    data() {
+      return {
+        msg: '',
+        credentials: {
+          email: '',
+          password: '',
+          terms: false
+        },
+        profile: {
+          firstName: '',
+          lastName: '',
+          highSchool: '',
+          heardFrom: '',
+          referred: ''
+        },
+        step: 'step-1'
+      }
     },
-    submit() {
-      AuthService.register(this, {
-        code: undefined,
-        email: this.credentials.email,
-        password: this.credentials.password,
-        terms: this.credentials.terms,
-      }).then(() => {
-        const user = UserService.getUser();
-        user.firstname = this.profile.firstName;
-        user.lastname = this.profile.lastName;
-        user.highschool = this.profile.highSchool;
-        user.heardFrom = this.profile.heardFrom;
-        UserService.setProfile(this, user, '/');
-      }).catch((err) => {
-        console.log(err);
-        this.msg = err.message;
-      });
-    },
-  },
-};
+    methods: {
+      nextPage() {
+        AuthService.checkRegister(this, {
+          email: this.credentials.email,
+          password: this.credentials.password
+        }).then(() => {
+          this.step = 'step-2';
+        }).catch((err) => {
+          this.msg = err.message;
+        })
+      },
+      submit() {
+        AuthService.register(this, {
+          code: undefined,
+          email: this.credentials.email,
+          password: this.credentials.password,
+          terms: this.credentials.terms
+        }).then(() => {
+          let user = UserService.getUser();
+          user.firstname = this.profile.firstName;
+          user.lastname = this.profile.lastName;
+          user.highschool = this.profile.highSchool;
+          user.heardFrom = this.profile.heardFrom;
+          user.referred = this.profile.referred;
+          UserService.setProfile(this, user, '/');
+        }).catch((err) => {
+          console.log(err);
+          this.msg = err.message;
+        })
+      }
+    }
+  }
 </script>
 
 <style scoped>
@@ -212,7 +223,7 @@ export default {
     display: flex;
     flex-direction: column;
     max-width: 500px;
-    padding: 15px;
+
     margin: auto;
   }
   .form-control {
@@ -272,7 +283,7 @@ export default {
   }
 
   .agreement-box {
-    margin: 25px 0 10px 0;
+    margin: 15px 0 10px 0;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -318,7 +329,7 @@ export default {
   }
 
   button[type="submit"] {
-    margin-top: 20px;
+    margin-top: 5px;
     background-color: #F6F6F6;
     border: none;
     font-weight: 600;
@@ -350,7 +361,7 @@ export default {
   }
 
   .question-row {
-    height: 45px;
+    height: 28px;
     vertical-align: bottom;
   }
 
