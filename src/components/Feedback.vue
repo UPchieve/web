@@ -53,7 +53,7 @@
 
 <script>
   import UserService from 'src/services/UserService';
-  import NetworkService from "../services/NetworkService";
+  import NetworkService from '../services/NetworkService';
 
   export default {
     data (){
