@@ -117,7 +117,15 @@ export default {
     }, MODAL_TIMEOUT_MS);
   },
   beforeRouteLeave(to, from, next){
-    let url = '/feedback/' + this.sessionId + '/' + (UserService.getUser().isVolunteer ? 'volunteer' : 'student');
+    let studentId = '';
+    let volunteerId = '';
+    if (SessionService.currentSession && SessionService.currentSession.student) {
+      studentId = SessionService.currentSession.student.id;
+    }
+    if (SessionService.currentSession && SessionService.currentSession.volunteer) {
+      volunteerId = SessionService.currentSession.volunteer.id;
+    }
+    let url = '/feedback/' + this.sessionId + '/' + (UserService.getUser().isVolunteer ? 'volunteer' : 'student') + '/' + studentId + '/' + volunteerId;
     if (to.path.indexOf(url) !== -1){
       next();
       return;
@@ -126,7 +134,7 @@ export default {
     if (result){
       this.$socket.disconnect();
       SessionService.endSession({ skipRoute: true });
-      let url = '/feedback/' + this.sessionId + '/' + (UserService.getUser().isVolunteer ? 'volunteer' : 'student');
+      let url = '/feedback/' + this.sessionId + '/' + (UserService.getUser().isVolunteer ? 'volunteer' : 'student') + '/' + studentId + '/' + volunteerId;
       next(url);
     }
   }

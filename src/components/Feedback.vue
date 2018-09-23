@@ -26,7 +26,7 @@
 							<tr class="radio-question-row" v-for="(subquestion, subquestion_index) in question.options">
 								<td class="radio-question-cell"> {{ subquestion }}</td>
 								<td class="radio-question-selection-cell" v-for="index in question.table_title.length" :key="index">
-									<input v-model="userResponse[question.qid][subquestion_index.toString()]" type="radio" :name="question.qid + '_' + subquestion_index.toString()" :value="index" />
+									<input v-model="userResponse[question.alias][question.options_alias[subquestion_index]]" type="radio" :name="question.qid + '_' + subquestion_index.toString()" :value="index" />
 								</td>
 							</tr>
 						</table>
@@ -35,7 +35,7 @@
 						<div class="question-secondary-title" v-if="question.secondary_title.length != 0">
 							{{ question.secondary_title }}
 						</div>
-						<textarea class="text-question-textarea" v-model="userResponse[question.qid]" />
+						<textarea class="text-question-textarea" v-model="userResponse[question.alias]" />
 					</div>
 					<div v-else>
 						something else
@@ -59,12 +59,15 @@
     data (){
       return {
         user: UserService.getUser(),
-		sessionId: '',
-        userType: '',
+	    	sessionId: '',
+			userType: '',
+			studentId: '',
+			volunteerId: '',
         student_questions: [
           {
             qid: '1',
-            qtype: 'multiple-radio',
+			qtype: 'multiple-radio',
+			alias: 'rate-coach',
             title: 'Please give feedback on the Academic Coach who helped you.',
             secondary_title: '',
             table_title: ['Strongly Disagree', 'Somewhat Agree', 'Neither', 'Somewhat Agree', 'Strongly Agree'],
@@ -74,11 +77,19 @@
               'I would like to receive help from this Academic Coach again.',
               'My Academic Coach was knowledgeable about the help topic.',
               'As a result of this session, I feel more prepared to succeed and achieve my academic goals.'
-            ]
+			],
+			options_alias: [
+              'find-help',
+              'nice',
+              'want-him/her-again',
+              'knowledgeable',
+              'achieve-goal'
+			],
           },
           {
             qid: '2',
-            qtype: 'multiple-radio',
+			qtype: 'multiple-radio',
+			alias: 'rate-upchieve',
             title: 'Please give feedback on UPchieve’s services',
             secondary_title: '',
             table_title: ['Strongly Disagree', 'Somewhat Agree', 'Neither', 'Somewhat Agree', 'Strongly Agree'],
@@ -87,11 +98,18 @@
               'I am likely to use UPchieve the next time I need help.',
               'UPchieve’s app is easy to use.',
               'UPchieve enables me to get help faster than before.',
-            ]
+			],
+			options_alias: [
+			  'achieve-goal',
+              'use-next-time',
+              'easy-to-use',
+              'get-help-faster',
+			],
           },
           {
             qid: '3',
-            qtype: 'text',
+			qtype: 'text',
+			alias: 'other-feedback',
             title: '(Optional) Do you have any other feedback you would like to share?',
             secondary_title: 'This can be about the web app, the Academic Coach who helped you, the services UPchieve offers, etc.',
             table_title: [],
@@ -101,7 +119,8 @@
 		volunteer_questions: [
 		  {
             qid: '1',
-            qtype: 'text',
+			qtype: 'text',
+			alias: 'asked-unprepared-questions',
             title: 'Did the student ask you any questions that you weren’t prepared to answer?',
             secondary_title: 'Don’t worry! We use this to improve our training and certification materials and won’t hold it against you.',
             table_title: [],
@@ -109,7 +128,8 @@
 		  },
           {
             qid: '2',
-            qtype: 'text',
+			qtype: 'text',
+			alias: 'app-features-needed',
             title: 'Were there any app features that you needed or that would have been helpful during this session?',
             secondary_title: '',
             table_title: [],
@@ -117,7 +137,8 @@
           },
           {
             qid: '3',
-            qtype: 'text',
+			qtype: 'text',
+			alias: 'technical-difficulties',
             title: 'Did you encounter any technical difficulties/bugs while using the app?',
             secondary_title: 'If yes, please describe the issue in as much detail as possible so that our tech team can replicate and fix it.',
             table_title: [],
@@ -125,7 +146,8 @@
           },
           {
             qid: '4',
-            qtype: 'text',
+			qtype: 'text',
+			alias: 'other-feedback',
             title: '(Optional) Do you have any other feedback you’d like to share with us?',
             secondary_title: '',
             table_title: [],
@@ -137,29 +159,37 @@
       }
     },
 	beforeMount() {
-      var _self = this;
-      this.sessionId = this.$route.params.sessionId;
-      let userType = this.$route.params.userType;
-      if (userType === 'student') {
-        this.questions = this.student_questions;
+		var _self = this;
+		this.sessionId = this.$route.params.sessionId;
+		this.userType = this.$route.params.userType;
+		this.studentId = this.$route.params.studentId;
+		this.volunteerId = this.$route.params.volunteerId;
+		console.log('student ' + this.studentId);
+		console.log('volunteer ' + this.volunteerId);
+		if (this.userType === 'student') {
+			this.questions = this.student_questions;
 	  } else {
         this.questions = this.volunteer_questions;
 	  }
-      this.questions.map(function(question, key) {
-        if (question.qtype == 'multiple-radio')
-          _self.userResponse[question.qid] = {};
-      });
+		this.questions.map(function(question, key) {
+			if (question.qtype == 'multiple-radio')
+				_self.userResponse[question.alias] = {};
+		});
 	},
-    methods: {
-      submitFeedback() {
-        NetworkService.feedback(this, {
-          sessionId: this.sessionId,
-          responseData: this.userResponse
-        });
-        this.$router.push('/');
-      }
-    }
-  }
+	methods: {
+		submitFeedback() {
+			console.log(this.userResponse);
+			NetworkService.feedback(this, {
+				sessionId: this.sessionId,
+				responseData: this.userResponse,
+				userType: this.userType,
+				studentId: this.studentId,
+				volunteerId: this.volunteerId
+			});
+			this.$router.push('/');
+		}
+	}
+}
 </script>
 
 <style scoped>
