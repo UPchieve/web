@@ -2,118 +2,120 @@
   <div class="chat">
     <div class="header">Chat</div>
     <div class="messages-container">
-			<div class="messages">
-				<template v-for="message in messages">
-					<div class="message" v-bind:class="leftRightMessage(message)">
-						<div class="avatar" v-bind:style="message.avatarStyle"></div>
-						<div class="contents">
+      <div class="messages">
+        <template v-for="(message, index) in messages">
+          <div
+            :key="`message-${index}`"
+            :class="leftRightMessage(message)"
+            class="message">
+            <div
+              :style="message.avatarStyle"
+              class="avatar"/>
+            <div class="contents">
               <div class="name">
-								{{message.name}}
-							</div>
-							{{message.contents}}
+                {{ message.name }}
+              </div>
+              {{ message.contents }}
               <div class="time">
-								{{message.time}}
-							</div>
-						</div>
-					</div>
-				</template>
-			</div>
+                {{ message.time }}
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
     </div>
-    <textarea v-on:keyup.enter="sendMessage" v-model="newMessage" placeholder="Type here."></textarea>
+    <textarea
+      v-model="newMessage"
+      placeholder="Type here."
+      @keyup.enter="sendMessage"/>
   </div>
 </template>
 
 <script>
 
-import $ from 'jquery'
-import moment from 'moment'
+import $ from 'jquery';
+import moment from 'moment';
 
-import UserService from 'src/services/UserService'
-import SessionService from 'src/services/SessionService'
+import UserService from 'src/services/UserService';
+import SessionService from 'src/services/SessionService';
 
-const DEFAULT_AVATAR_URL = 'static/defaultAvatar@2x.png';
-//student
-//http://localhost:8080/static/defaultavatar3.png
+// student
+// http://localhost:8080/static/defaultavatar3.png
 const STUDENT_AVATAR_URL = 'static/defaultavatar3.png';
-//volunteer
+// volunteer
 const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png';
 
 
 export default {
-	data(){
-    var user = UserService.getUser();
-		return {
-      user: user,
+  data() {
+    const user = UserService.getUser();
+    return {
+      user,
       messages: [],
-			currentSession: SessionService.currentSession,
-			newMessage: ''
-		}
-	},
+      currentSession: SessionService.currentSession,
+      newMessage: '',
+    };
+  },
+
+  updated() {
+    const el = $('.messages');
+    const scrollTop = el[0].scrollHeight - el[0].clientHeight;
+    el.scrollTop(scrollTop);
+  },
   methods: {
-    sendMessage: function() {
-      var message = this.newMessage;
+    sendMessage() {
+      const message = this.newMessage;
 
       this.$socket.emit('message', {
-				sessionId: this.currentSession.sessionId,
+        sessionId: this.currentSession.sessionId,
         user: UserService.getUser(),
-        message: message
+        message,
       });
 
       this.newMessage = '';
     },
-    leftRightMessage: function(message) {
-      if (message.name == this.user.firstname) {
+    leftRightMessage(message) {
+      if (message.name === this.user.firstname) {
         return 'left';
-      } else {
-        return 'right';
       }
-    }
+      return 'right';
+    },
   },
   sockets: {
-    'session-change'(data){
+    'session-change': function (data) {
       console.log('session-change', data);
       SessionService.currentSession.sessionId = data._id;
       SessionService.currentSession.data = data;
     },
-    messageSend(data){
-    	console.log(data);
-    	var picture = data.picture;
-      if (!picture || picture === ''){
-        if(data.isVolunteer === true){
-
-            picture = VOLUNTEER_AVATAR_URL;
-      
-        }else{
-
-            picture = STUDENT_AVATAR_URL;
-
+    messageSend(data) {
+      console.log(data);
+      let { picture } = data;
+      if (!picture || picture === '') {
+        if (data.isVolunteer === true) {
+          picture = VOLUNTEER_AVATAR_URL;
         }
-        //picture = DEFAULT_AVATAR_URL
-    	}
+        else {
+          picture = STUDENT_AVATAR_URL;
+        }
+      }
       this.messages.push({
-    		contents: data.contents,
-    		name: data.name,
-    		avatarStyle: {
-    			backgroundImage: `url(${picture})`
-    		},
-    		time: moment(data.time).format('h:mm:ss a')
+        contents: data.contents,
+        name: data.name,
+        avatarStyle: {
+          backgroundImage: `url(${picture})`,
+        },
+        time: moment(data.time).format('h:mm:ss a'),
       });
-    }
+    },
   },
-
-	updated(){
-		var el = $('.messages');
-		var scrollTop = el[0].scrollHeight - el[0].clientHeight;
-		el.scrollTop(scrollTop)
-	}
-}
+};
 
 
 </script>
 
 <style scoped>
 .chat {
-	height: 100%;
+  height: 100%;
 }
 
 .header {
@@ -129,23 +131,23 @@ export default {
 }
 
 .messages-container {
-	height: calc(100% - 40px);
-	padding-bottom: 100px;
-	overflow: hidden;
+  height: calc(100% - 40px);
+  padding-bottom: 100px;
+  overflow: hidden;
   top: 40px;
   position: relative;
 }
 
 .messages {
-	height: 100%;
-	overflow: scroll;
+  height: 100%;
+  overflow: scroll;
   display: flex;
   flex-direction: column;
 }
 
 .message {
-	position: relative;
-	padding: 10px;
+  position: relative;
+  padding: 10px;
   display: flex;
   justify-content: flex-start;
 }
@@ -163,27 +165,27 @@ export default {
 }
 
 .time {
-	font-size: 12px;
-	font-weight: 300;
-	color: #73737A;
+  font-size: 12px;
+  font-weight: 300;
+  color: #73737A;
 }
 
 .contents {
-	text-align: left;
+  text-align: left;
   width: 200px;
   overflow-wrap: break-word;
   font-size: 16px;
 }
 
 textarea {
-	width: 100%;
-	height: 100px;
-	border: none;
-	position: absolute;
-	left: 0;
-	bottom: 0;
-	border-top: 1px solid #979797;
-	padding: 10px 12px;
+  width: 100%;
+  height: 100px;
+  border: none;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  border-top: 1px solid #979797;
+  padding: 10px 12px;
 }
 
 .left {

@@ -3,61 +3,93 @@
     <form class="form-signin">
       <div class="header">
         <div class="login-header">Log In</div>
-        <router-link to="signup" class="register-link">Register an Account</router-link></p>
+        <router-link
+          to="signup"
+          class="register-link">Sign Up</router-link>
       </div>
       <div class="body">
-        <div class="alert alert-danger" role="alert" v-if="error || $route.query['401'] === 'true'">{{error}}</div>
+        <div
+          v-if="error || $route.query['401'] === 'true'"
+          class="alert alert-danger"
+          role="alert">{{ error }}</div>
         <label for="inputEmail">Email</label>
-        <input type="email" id="inputEmail" class="form-control" required autofocus v-model="credentials.email">
+        <input
+          id="inputEmail"
+          v-model="credentials.email"
+          type="email"
+          class="form-control"
+          required
+          autofocus>
         <label for="inputPassword">Password</label>
-        <input type="password" id="inputPassword" class="form-control password" required v-model="credentials.password">
-        <router-link to="resetpassword" class="password-reset-link">Forgot password?</router-link>
-        <button class="btn btn-lg btn-primary btn-block login-btn" type="submit" @click.prevent="submit">LOGIN</button>
+        <input
+          id="inputPassword"
+          v-model="credentials.password"
+          type="password"
+          class="form-control password"
+          required>
+        <router-link
+          to="resetpassword"
+          class="password-reset-link">Forgot password?</router-link>
+        <button
+          class="btn btn-lg btn-primary btn-block login-btn"
+          type="submit"
+          @click.prevent="submit">LOGIN</button>
       </div>
       <div class="footer">
-        <router-link to="/contact" tag="div"><a class="contact icon" target="_blank">CONTACT US</a></router-link>
-        <router-link to="/legal" tag="div"><a class="privacy icon" target="_blank">LEGAL POLICY</a></router-link>
-        <div><a href="https://upchieve.org/" target="_blank">OUR WEBSITE</a></div>
+        <router-link
+          to="/contact"
+          tag="div"><a
+            class="contact icon"
+            target="_blank">CONTACT US</a></router-link>
+        <router-link
+          to="/legal"
+          tag="div"><a
+            class="privacy icon"
+            target="_blank">LEGAL POLICY</a></router-link>
+        <div><a
+          href="https://upchieve.org/"
+          target="_blank">OUR WEBSITE</a></div>
       </div>
     </form>
   </div>
 </template>
 
 <script>
-import AuthService from 'src/services/AuthService'
+import AuthService from 'src/services/AuthService';
 
 export default {
   data() {
     let error;
-    if (this.$route.query['401'] === 'true'){
-      error = 'Your session has expired. Please login again'
+    if (this.$route.query['401'] === 'true') {
+      error = 'Your session has expired. Please login again';
     }
     return {
       credentials: {
         email: '',
-        password: ''
+        password: '',
       },
-      error: error
-    }
+      error,
+    };
   },
   methods: {
     submit() {
       AuthService.login(this, {
         email: this.credentials.email,
-        password: this.credentials.password
-      }, this.$route.query.redirect || '/')
-    }
+        password: this.credentials.password,
+      }, this.$route.query.redirect || '/');
+    },
   },
   beforeRouteEnter(to, from, next) {
-    if (AuthService.user.authenticated){
+    if (AuthService.user.authenticated) {
       next({
-        path: '/'
+        path: '/',
       });
-    } else {
+    }
+    else {
       next();
     }
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
@@ -65,10 +97,10 @@ export default {
     display: flex;
     justify-content: space-between;
     margin-bottom: 20px;
-    margin-top: 50px;
+    margin-top: 25px;
   }
   .register-link {
-    padding-left: 140px;
+    padding-left: 290px;
     color: #73737A;
     font-weight: 600;
   }
@@ -89,7 +121,7 @@ export default {
     height: 500px;
     margin: auto;
     background-color: white;
-    padding: 0px 75px;
+    padding: 0px 50px;
   }
   .form-control {
     border: none;
@@ -111,7 +143,7 @@ export default {
     margin: 0px;
   }
   .form-control {
-    border-bottom: 3px solid black;
+    border-bottom: 3px solid #16D2AA;
     margin-bottom: 50px;
   }
   .form-control.password {
@@ -119,7 +151,7 @@ export default {
   }
 
   .form-control:focus {
-    border-bottom: 3px solid black;
+    border-bottom: 3px solid #16D2AA;
     box-shadow: none;
   }
 
@@ -170,7 +202,7 @@ export default {
     height: 40px;
     align-items: center;
     align-self: center;
-    padding: 0 50px;
+    padding: 25px 50px;
     background-color: #F6F6F6;
     border-top: 0.5px solid #CCCCCF;
   }

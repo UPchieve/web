@@ -1,17 +1,17 @@
-import NetworkService from './NetworkService'
+import NetworkService from './NetworkService';
 
 export default {
 
-  initAvailability(context, userid){
-    return NetworkService.initAvailability(context, { userid: userid });
+  initAvailability(context, userid) {
+    return NetworkService.initAvailability(context, { userid });
   },
-  getAvailability(context, userid){
-    return NetworkService.getAvailability(context, { userid: userid }).then((res) => {
-      var availability = res.data.availability;
+  getAvailability(context, userid) {
+    return NetworkService.getAvailability(context, { userid }).then((res) => {
+      const availability = { ...res.data.availability };
       return availability;
     });
   },
-  updateAvailability(context, userid, availability){
-    return NetworkService.updateAvailability(context, { userid: userid, availability: availability });
-  }
+  updateAvailability(context, userid, availability) {
+    return NetworkService.updateAvailability(context, { userid, availability });
+  },
 };

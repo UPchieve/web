@@ -3,13 +3,26 @@
     <form class="form-resetpassword">
       <div class="header">
         <div class="reset-header">Reset Your Password</div>
-        <p><router-link to="signup" class="register-link">Register</router-link> /
-        <router-link to="login" class="login-link">Log In</router-link></p>
+        <p><router-link
+          to="signup"
+          class="register-link">Register</router-link> /
+          <router-link
+            to="login"
+            class="login-link">Log In</router-link></p>
       </div>
       <label for="inputEmail">Please enter your email address</label>
-      <input type="text" id="inputEmail" class="form-control" required autofocus v-model="email">
-      <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">ENTER</button>
-      {{msg}}
+      <input
+        id="inputEmail"
+        v-model="email"
+        type="text"
+        class="form-control"
+        required
+        autofocus>
+      <button
+        class="btn btn-lg btn-primary btn-block"
+        type="submit"
+        @click.prevent="submit()">ENTER</button>
+      {{ msg }}
     </form>
   </div>
 </template>
@@ -22,15 +35,15 @@ export default {
   data() {
     return {
       email: '',
-      msg: ''
-    }
+      msg: '',
+    };
   },
   methods: {
     submit() {
       AuthService.sendReset(this, this.email);
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>

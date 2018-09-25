@@ -1,38 +1,51 @@
 <template>
-<button :class="classes" @click="clickHandler">
-  {{ label }}
-</button>    
+  <button
+    :class="classes"
+    @click="clickHandler">
+    {{ label }}
+  </button>
 </template>
 
 
 <script>
 export default {
   props: {
-    label: String,
-    btnOptionsSecond: Boolean,
-    big: Boolean,
-    clickHandler: Function
+    label: {
+      type: String,
+      default: '',
+    },
+    btnOptionsSecond: {
+      type: Boolean,
+      default: false,
+    },
+    big: {
+      type: Boolean,
+      default: false,
+    },
+    clickHandler: {
+      type: Function,
+      required: true,
+    },
   },
   data() {
     return {
       classes: {
         'v-btn': true,
         'v-btn--btn-options-second': this.btnOptionsSecond,
-        'v-btn--big': this.big
-      }
-    } 
-  }
-}
+        'v-btn--big': this.big,
+      },
+    };
+  },
+};
 </script>
 
 
 <style>
-/*
-* @notes
-* [1] Refactoring candidate: the v- prefix was added to avoid colliding with
-*     Bootstrap
-*/
-.v-btn { /*[1]*/
+/**
+ * @todo {1} Refactoring candidate: the v- prefix was added to avoid colliding
+ *           with Bootstrap
+ */
+.v-btn { /*{1}*/
   background: var(--c-bg);
   color: var(--c-accent);
   text-align: center;
@@ -45,24 +58,24 @@ export default {
   line-height: 1;
   min-width: 128px;
 }
-.v-btn:hover { /*[1]*/
+.v-btn:hover { /*{1}*/
   color: #fff;
   background: var(--c-accent);
 }
-.v-btn:focus { /*[1]*/
+.v-btn:focus { /*{1}*/
   outline: 0;
 }
-.v-btn--big { /*[1]*/
+.v-btn--big { /*{1}*/
   width: 100%;
   max-width: 512px;
 }
-.v-btn--btn-options-second { /*[1]*/
-  margin-top: 16px; 
+.v-btn--btn-options-second { /*{1}*/
+  margin-top: 16px;
 }
 
 @media screen and (min-width: 700px) {
   .v-btn--btn-options-second {
-    margin-top: 0; 
+    margin-top: 0;
     margin-right: 20px;
   }
 }

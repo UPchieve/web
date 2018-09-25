@@ -1,16 +1,16 @@
 <template>
-<div class="submit-question">
-  <div class="basic-template">
-    <content-header :headerTitle="headerTitle"></content-header>  
-    <div class="basic-template__content">
-      <div class="content-card">
-        <div class="content-card__card">
-          <slot></slot>
+  <div class="submit-question">
+    <div class="basic-template">
+      <content-header :header-title="headerTitle"/>
+      <div class="basic-template__content">
+        <div class="content-card">
+          <div class="content-card__card">
+            <slot/>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 </template>
 
 
@@ -19,21 +19,24 @@ import ContentHeader from '../atoms/ContentHeader';
 
 export default {
   components: {
-    ContentHeader
+    ContentHeader,
   },
   props: {
-    headerTitle: String
+    headerTitle: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
-    }
+    };
   },
   methods: {
     goHome() {
       this.$router.push('/');
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 

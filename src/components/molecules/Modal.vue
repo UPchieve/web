@@ -1,18 +1,22 @@
 <template>
-<div :class="classes">
-  <div :class="dialogClasses">
-    <div class="v-modal-dialog__content">
-      {{ message }}
+  <div :class="classes">
+    <div :class="dialogClasses">
+      <div class="v-modal-dialog__content">
+        {{ message }}
+      </div>
+      <btn
+        v-if="singleBtn"
+        :label="mainBtnLabel"
+        :click-handler="clickHandlers.main"
+      />
+      <btn-options
+        v-else
+        :main-btn-label="mainBtnLabel"
+        :second-btn-label="secondBtnLabel"
+        :click-handlers="clickHandlers"
+      />
     </div>
-    <btn v-if="singleBtn" :label="mainBtnLabel" :clickHandler="clickHandlers.main">
-    </btn>
-    <btn-options v-else
-      :mainBtnLabel="mainBtnLabel"
-      :secondBtnLabel="secondBtnLabel"
-      :clickHandlers="clickHandlers"
-    ></btn-options>
-  </div> 
-</div> 
+  </div>
 </template>
 
 
@@ -23,14 +27,29 @@ import Btn from '../atoms/Btn';
 export default {
   components: {
     BtnOptions,
-    Btn
+    Btn,
   },
-  props: { 
-    singleBtn: Boolean,
-    message: String,
-    warn: Boolean,
-    labels: Array[String],
-    clickHandlers: Object
+  props: {
+    singleBtn: {
+      type: Boolean,
+      default: false,
+    },
+    message: {
+      type: String,
+      default: '',
+    },
+    warn: {
+      type: Boolean,
+      default: false,
+    },
+    labels: {
+      type: Array[String],
+      default: [''],
+    },
+    clickHandlers: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -38,15 +57,15 @@ export default {
       secondBtnLabel: this.labels[1] ? this.labels[1] : null,
       classes: {
         'v-modal': true,
-        'v-modal--warn': this.warn
+        'v-modal--warn': this.warn,
       },
       dialogClasses: {
         'v-modal-dialog': true,
-        'v-modal-dialog--warn': this.warn
-      }
-    }
-  }
-}
+        'v-modal-dialog--warn': this.warn,
+      },
+    };
+  },
+};
 </script>
 
 
