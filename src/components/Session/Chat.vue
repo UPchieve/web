@@ -136,9 +136,7 @@ export default {
 
 .messages {
   height: 100%;
-  overflow: scroll;
-  display: flex;
-  flex-direction: column;
+  overflow-y: scroll;
 }
 
 .message {
@@ -146,6 +144,8 @@ export default {
   padding: 10px;
   display: flex;
   justify-content: flex-start;
+  background: #fff;
+  width: 100%;
 }
 
 .avatar {
