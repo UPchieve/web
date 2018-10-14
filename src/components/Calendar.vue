@@ -148,7 +148,7 @@ export default {
 
 .times {
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
 }
 
 .timeOfDay {
