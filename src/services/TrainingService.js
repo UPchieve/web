@@ -64,9 +64,11 @@ export default {
     if (
       picked !== '' &&
       picked !== null &&
+      picked !== undefined &&
       (
         this.idAnswerMap[question._id] === null ||
-        this.idAnswerMap[question._id] === ''
+        this.idAnswerMap[question._id] === '' ||
+        picked !== undefined
       )
     ) {
       this.numAnswers += 1;
