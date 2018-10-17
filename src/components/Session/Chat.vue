@@ -71,7 +71,7 @@ export default {
       this.newMessage = '';
     },
     leftRightMessage(message) {
-      if (message.name === this.user.firstname) {
+      if (message.email === this.user.email) {
         return 'left';
       }
       return 'right';
@@ -97,10 +97,12 @@ export default {
       this.messages.push({
         contents: data.contents,
         name: data.name,
+        email: data.email,
+        isVolunteer: data.isVolunteer,
         avatarStyle: {
           backgroundImage: `url(${picture})`,
         },
-        time: moment(data.time).format('h:mm:ss a'),
+        time: moment(data.time).format('h:mm a'),
       });
     },
   },
@@ -152,7 +154,7 @@ export default {
   width: 30px;
   height: 30px;
   background-size: cover;
-  align-self: center;
+  margin-top: 5px;
 }
 
 .name {
