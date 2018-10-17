@@ -19,14 +19,6 @@
       </div>
     </div>
     <div class="button-container">
-      <div
-        v-if="partnerName"
-        class="upload-file">
-        <a
-          class="btn btn-lg btn-block"
-          target="_blank"
-          href="#/upload">Upload file</a>
-      </div>
       <div class="end-session">
         <button
           class="btn btn-lg btn-block"
@@ -41,7 +33,8 @@
 import UserService from 'src/services/UserService';
 import SessionService from 'src/services/SessionService';
 
-const DEFAULT_AVATAR_URL = 'static/defaultAvatar@2x.png';
+const STUDENT_AVATAR_URL = 'static/defaultavatar3.png';
+const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png';
 
 /**
  * @todo {1} Refactoring candidate: use a modal instead.
@@ -65,10 +58,16 @@ export default {
       return partner && partner.firstname;
     },
     partnerAvatar() {
-      const partner = SessionService.getPartner();
-      const partnerAvatar = (partner && partner.picture) || DEFAULT_AVATAR_URL;
+      const user = UserService.getUser();
+      let picture = ''
+      if (user.isVolunteer === false) {
+        picture = VOLUNTEER_AVATAR_URL;
+      }
+      else {
+        picture = STUDENT_AVATAR_URL;
+      }
       return {
-        backgroundImage: `url(${partnerAvatar})`,
+        backgroundImage: `url(${picture})`,
       };
     },
   },
