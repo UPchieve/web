@@ -237,14 +237,14 @@ export default {
         certifications.Planning = true;
       }
     }
-    if (user.essay) {
-      if (user.essay.passed) {
-        certifications.Essay = true;
+    if (user.essays) {
+      if (user.essays.passed) {
+        certifications.Essays = true;
       }
     }
-    if (user.application) {
-      if (user.application.passed) {
-        certifications.Application = true;
+    if (user.applications) {
+      if (user.applications.passed) {
+        certifications.Applications = true;
       }
     }
 
@@ -256,8 +256,8 @@ export default {
     certKey.Calculus = 'MATH';
     certKey.ESL = 'ESL';
     certKey.Planning = 'COLLEGE';
-    certKey.Essay = 'COLLEGE';
-    certKey.Application = 'COLLEGE';
+    certKey.Essays = 'COLLEGE';
+    certKey.Applications = 'COLLEGE';
 
     return {
       user,
