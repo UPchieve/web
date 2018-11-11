@@ -24,6 +24,14 @@
             :style="{ visibility: showColors }"
             class="toolset col-md-6 colorContainer">
             <button
+              class="colorButton greyBtn"
+              style="background-color: rgba(52,52,64,.6)"
+              @click="changeColor"/>
+            <button
+              class="colorButton navyBtn"
+              style="background-color: rgba(38,51,104,1)"
+              @click="changeColor"/>
+            <button
               class="colorButton redBtn"
               style="background-color: rgba(244,71,71,1)"
               @click="changeColor"/>
@@ -38,14 +46,6 @@
             <button
               class="colorButton blueBtn"
               style="background-color: rgba(24,85,209,.6)"
-              @click="changeColor"/>
-            <button
-              class="colorButton greyBtn"
-              style="background-color: rgba(52,52,64,.6)"
-              @click="changeColor"/>
-            <button
-              class="colorButton navyBtn"
-              style="background-color: rgba(38,51,104,1)"
               @click="changeColor"/>
 
             <textarea
@@ -98,8 +98,8 @@ import SessionService from 'src/services/SessionService';
 // const CANVAS_HEIGHT = 400;
 
 // const LINE_FILL_STYLE = 'solid';
-let LOCAL_LINE_COLOR = 'rgba(244,71,71,1)';
-let SERVER_LINE_COLOR = 'rgba(244,71,71,1)';
+let LOCAL_LINE_COLOR = 'rgba(52,52,64,.6)';
+let SERVER_LINE_COLOR = 'rgba(52,52,64,.6)';
 let SERVER_LINE_WIDTH = 5;
 const LINE_WIDTH = 5;
 // const LINE_CAP = 'round';

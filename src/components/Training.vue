@@ -95,7 +95,7 @@ export default {
     const quizzes = {};
     quizzes.math = ['algebra', 'geometry', 'trigonometry', 'precalculus', 'calculus'];
     quizzes.esl = ['esl'];
-    quizzes['college Counseling'] = ['planning', 'essay', 'application'];
+    quizzes['college Counseling'] = ['planning', 'essays', 'applications'];
     // quizzes['science'] = ['biology', 'chemistry'];
     const bools = {};
     bools.math = false;

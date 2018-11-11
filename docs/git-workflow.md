@@ -51,7 +51,7 @@
   ```
 - Branches for edits to the documentation that are not linked to a particular bug or feature don't require a prefix.
 - Special branches like `master` and `dev` don't require prefixes either.
-- Title all `dev` to `master` PRs using the format `PR#<number-of-the-dev-to-master-PR> FROM: Merge pull request #<number-of-the-<feat|fix>-to-dev-PR> from UPchieve/<<feat|fix>/brach>` and use the title for the message of the merge commit. Notice that everything after the semicolon is just the default message that GitHub suggested when merging the original feature or fix branch to `dev`, so you only need to copy-paste it from the commit history :wink:.
+- Title all `dev` to `master` PRs using the format `[TESTED] <commit message that was used to merge from the secondary branch to dev>`.
 
 **[⬆ back to top](#contents)**
 
@@ -64,6 +64,7 @@
 - **Always assign a reviewer**. If you're unsure about whom to ask, then just assign the review to the Director of Technology.
 - **Always explain the edits** you're submitting.
 - **Follow the [naming convention](#naming-convention)** for `dev` to `master` PRs.
+- (If applicable) Reference the issues that your PR solves using `#<number-of-issue>` (GitHub will add a link to it).
 
 **[⬆ back to top](#contents)**
 
