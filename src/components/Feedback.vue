@@ -164,6 +164,8 @@ export default {
 		this.userType = this.$route.params.userType;
 		this.studentId = this.$route.params.studentId;
 		this.volunteerId = this.$route.params.volunteerId;
+		console.log('student ' + this.studentId);
+		console.log('volunteer ' + this.volunteerId);
 		if (this.userType === 'student') {
 			this.questions = this.student_questions;
 	  } else {
