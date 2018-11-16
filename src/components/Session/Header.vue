@@ -33,6 +33,9 @@
 import UserService from 'src/services/UserService';
 import SessionService from 'src/services/SessionService';
 
+import router from '../../router';
+
+const DEFAULT_AVATAR_URL = 'static/defaultAvatar@2x.png';
 const STUDENT_AVATAR_URL = 'static/defaultavatar3.png';
 const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png';
 
@@ -73,10 +76,25 @@ export default {
   },
   methods: {
     end() {
-      const result = window.confirm('Do you really want to end the session?'); // {1}
+      let studentId = '';
+      let volunteerId = null;
+      let sessionId = SessionService.currentSession.sessionId;
+      if (SessionService.currentSession && SessionService.currentSession.data.student) {
+        studentId = SessionService.currentSession.data.student._id;
+      }
+      if (SessionService.currentSession && SessionService.currentSession.data.volunteer) {
+        volunteerId = SessionService.currentSession.data.volunteer._id;
+      }
+      const result = window.confirm('Do you really want to end the session?');
       if (result) {
-        this.$socket.disconnect();
-        SessionService.endSession();
+        if (volunteerId) {
+          this.$socket.disconnect();
+          SessionService.endSession({ skipRoute: true });
+          const url = '/feedback/' + sessionId + '/' + (UserService.getUser().isVolunteer ? 'volunteer' : 'student') + '/' + studentId + '/' + volunteerId;
+          router.replace(url);
+        } else {
+          router.replace('/');
+        }
       }
     },
   },

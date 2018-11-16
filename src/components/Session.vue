@@ -121,29 +121,7 @@ export default {
         this.showModal = true;
       }
     }, MODAL_TIMEOUT_MS);
-  },
-  beforeRouteLeave(to, from, next){
-    let studentId = '';
-    let volunteerId = '';
-    if (SessionService.currentSession && SessionService.currentSession.student) {
-      studentId = SessionService.currentSession.student.id;
-    }
-    if (SessionService.currentSession && SessionService.currentSession.volunteer) {
-      volunteerId = SessionService.currentSession.volunteer.id;
-    }
-    let url = '/feedback/' + this.sessionId + '/' + (UserService.getUser().isVolunteer ? 'volunteer' : 'student') + '/' + studentId + '/' + volunteerId;
-    if (to.path.indexOf(url) !== -1){
-      next();
-      return;
-    }
-    const result = window.confirm('Do you really want to end the session?');
-    if (result) {
-      this.$socket.disconnect();
-      SessionService.endSession({ skipRoute: true });
-      const url = '/feedback/' + this.sessionId + '/' + (UserService.getUser().isVolunteer ? 'volunteer' : 'student') + '/' + studentId + '/' + volunteerId;
-      next(url);
-    }
-  },
+  }
 };
 </script>
 
