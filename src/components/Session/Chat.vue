@@ -31,6 +31,7 @@
   </div>
 </template>
 
+
 <script>
 import $ from 'jquery';
 import moment from 'moment';
@@ -41,7 +42,11 @@ import SessionService from 'src/services/SessionService';
 const STUDENT_AVATAR_URL = 'static/defaultavatar3.png';
 const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png';
 
-
+/**
+ * @todo {1} Use more descriptive names that comply with the coding standards.
+ *           Keep in mind that it also requires a small backend update in
+ *           router/sockets.js
+ */
 export default {
   data() {
     const user = UserService.getUser();
@@ -71,6 +76,8 @@ export default {
       this.newMessage = '';
     },
     leftRightMessage(message) {
+      console.log('message: ', message);
+      console.log(this.user.email)
       if (message.email === this.user.email) {
         return 'left';
       }
@@ -78,13 +85,11 @@ export default {
     },
   },
   sockets: {
-    'session-change': function (data) {
-      console.log('session-change', data);
+    'session-change'(data) { // {1}
       SessionService.currentSession.sessionId = data._id;
       SessionService.currentSession.data = data;
     },
-    messageSend(data) {
-      console.log(data);
+    messageSend(data) { // {1}
       let { picture } = data;
       if (!picture || picture === '') {
         if (data.isVolunteer === true) {
@@ -107,9 +112,8 @@ export default {
     },
   },
 };
-
-
 </script>
+
 
 <style scoped>
 .chat {
