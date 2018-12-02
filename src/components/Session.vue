@@ -26,20 +26,20 @@
 
 
 <script>
-import SessionService from 'src/services/SessionService';
-import UserService from 'src/services/UserService';
+import SessionService from "src/services/SessionService";
+import UserService from "src/services/UserService";
 
-import SessionHeader from './Session/Header';
-import Whiteboard from './Session/Whiteboard';
-import Chat from './Session/Chat';
-import Modal from './molecules/Modal';
+import SessionHeader from "./Session/Header";
+import Whiteboard from "./Session/Whiteboard";
+import Chat from "./Session/Chat";
+import Modal from "./molecules/Modal";
 
 export default {
   components: {
     SessionHeader,
     Whiteboard,
     Chat,
-    Modal,
+    Modal
   },
   /*
   * @notes
@@ -50,10 +50,7 @@ export default {
     return {
       currentSession: SessionService.currentSession,
       showModal: false,
-      btnLabels: [
-        'Submit question',
-        'Exit session',
-      ],
+      btnLabels: ["Submit question", "Exit session"],
       message: `
         We don’t have any Academic Coaches
         available right now, but you can submit a
@@ -64,22 +61,22 @@ export default {
       clickHandlers: {
         main: () => {
           this.$router.push({
-            path: '/submit-question',
+            path: "/submit-question",
             query: {
-              topic: this.$route.path.split('/')[2], // [1]
-              subTopic: this.$route.params.subTopic,
-            },
+              topic: this.$route.path.split("/")[2], // [1]
+              subTopic: this.$route.params.subTopic
+            }
           });
         },
         second: () => {
-          this.$router.push('/');
-        },
+          this.$router.push("/");
+        }
       },
       formLoaderOptions: {
-        formLoaderTop: '0',
-        formLoaderDot1: 'a-loader-1 2s ease-out infinite',
-        formLoaderDot2: 'a-loader-1 1s 2s ease-out infinite',
-      },
+        formLoaderTop: "0",
+        formLoaderDot1: "a-loader-1 2s ease-out infinite",
+        formLoaderDot2: "a-loader-1 1s 2s ease-out infinite"
+      }
     };
   },
   mounted() {
@@ -90,24 +87,26 @@ export default {
 
     if (!id) {
       let type;
-      if (this.$route.path.indexOf('session/college') !== -1) {
-        type = 'college';
+      if (this.$route.path.indexOf("session/college") !== -1) {
+        type = "college";
+      } else {
+        type = "math";
       }
-      else {
-        type = 'math';
-      }
-      promise = SessionService.newSession(this, type, this.$route.params.subTopic);
-    }
-    else {
+      promise = SessionService.newSession(
+        this,
+        type,
+        this.$route.params.subTopic
+      );
+    } else {
       promise = SessionService.useExistingSession(this, id);
     }
 
-    promise.then((sessionId) => {
+    promise.then(sessionId => {
       this.sessionId = this.currentSession.sessionId;
       this.$socket.connect();
-      this.$socket.emit('join', {
+      this.$socket.emit("join", {
         sessionId,
-        user: UserService.getUser(),
+        user: UserService.getUser()
       });
     });
 
@@ -121,57 +120,43 @@ export default {
         this.showModal = true;
       }
     }, MODAL_TIMEOUT_MS);
-  },
-  beforeRouteLeave(to, from, next) {
-    const url = `/feedback/${this.sessionId}/${UserService.getUser().isVolunteer ? 'volunteer' : 'student'}`;
-    if (to.path.indexOf(url) !== -1) {
-      next();
-      return;
-    }
-    const result = window.confirm('Do you really want to end the session?');
-    if (result) {
-      this.$socket.disconnect();
-      SessionService.endSession({ skipRoute: true });
-      const url = `/feedback/${this.sessionId}/${UserService.getUser().isVolunteer ? 'volunteer' : 'student'}`;
-      next(url);
-    }
-  },
+  }
 };
 </script>
 
 
 <style scoped>
-  /*
+/*
   * @notes
   * [1] Refactoring candidate: these styles should be placed in the container
   *     (we need to rethink the containing model in order to do so)
   */
-  .session {
-    position: relative; /*[1]*/
-    height: 100%; /*[1]*/
-  }
+.session {
+  position: relative; /*[1]*/
+  height: 100%; /*[1]*/
+}
 
-  .session-header-container {
-    position: absolute;
-    left: 0;
-    width: 100%;
-  }
+.session-header-container {
+  position: absolute;
+  left: 0;
+  width: 100%;
+}
 
-  .session-contents-container {
-    height: 100%;
-    padding-top: 100px;
-  }
+.session-contents-container {
+  height: 100%;
+  padding-top: 100px;
+}
 
-  .whiteboard-container {
-    height: 100%;
-    padding: 0;
-    border-top: 25px solid #EAEAEB;
-    border-left: 25px solid #EAEAEB;
-    border-right: 25px solid #EAEAEB;
-  }
+.whiteboard-container {
+  height: 100%;
+  padding: 0;
+  border-top: 25px solid #eaeaeb;
+  border-left: 25px solid #eaeaeb;
+  border-right: 25px solid #eaeaeb;
+}
 
-  .chat-container {
-    height: 100%;
-    padding: 0;
-  }
+.chat-container {
+  height: 100%;
+  padding: 0;
+}
 </style>
