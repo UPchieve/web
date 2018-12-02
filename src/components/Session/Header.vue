@@ -30,11 +30,13 @@
 
 
 <script>
-import UserService from 'src/services/UserService';
-import SessionService from 'src/services/SessionService';
+import UserService from "src/services/UserService";
+import SessionService from "src/services/SessionService";
 
-const STUDENT_AVATAR_URL = 'static/defaultavatar3.png';
-const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png';
+import router from "../../router";
+
+const STUDENT_AVATAR_URL = "static/defaultavatar3.png";
+const VOLUNTEER_AVATAR_URL = "static/defaultavatar4.png";
 
 /**
  * @todo {1} Refactoring candidate: use a modal instead.
@@ -42,16 +44,16 @@ const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png';
 export default {
   data() {
     return {
-      currentSession: SessionService.currentSession,
+      currentSession: SessionService.currentSession
     };
   },
   computed: {
     waitingText() {
       const user = UserService.getUser();
       if (user.isVolunteer) {
-        return 'No student is in this session';
+        return "No student is in this session";
       }
-      return 'We are contacting our Academic Coaches for you right now - please hang tight while we try to connect you! This process can take 5-10 minutes.';
+      return "We are contacting our Academic Coaches for you right now - please hang tight while we try to connect you! This process can take 5-10 minutes.";
     },
     partnerName() {
       const partner = SessionService.getPartner();
@@ -59,36 +61,63 @@ export default {
     },
     partnerAvatar() {
       const user = UserService.getUser();
-      let picture = ''
+      let picture = "";
       if (user.isVolunteer === false) {
         picture = VOLUNTEER_AVATAR_URL;
-      }
-      else {
+      } else {
         picture = STUDENT_AVATAR_URL;
       }
       return {
-        backgroundImage: `url(${picture})`,
+        backgroundImage: `url(${picture})`
       };
-    },
+    }
   },
   methods: {
     end() {
-      const result = window.confirm('Do you really want to end the session?'); // {1}
-      if (result) {
-        this.$socket.disconnect();
-        SessionService.endSession();
+      let studentId = "";
+      let volunteerId = null;
+      let sessionId = SessionService.currentSession.sessionId;
+      if (
+        SessionService.currentSession &&
+        SessionService.currentSession.data.student
+      ) {
+        studentId = SessionService.currentSession.data.student._id;
       }
-    },
-  },
+      if (
+        SessionService.currentSession &&
+        SessionService.currentSession.data.volunteer
+      ) {
+        volunteerId = SessionService.currentSession.data.volunteer._id;
+      }
+      const result = window.confirm("Do you really want to end the session?");
+      if (result) {
+        if (volunteerId) {
+          this.$socket.disconnect();
+          SessionService.endSession({ skipRoute: true });
+          const url =
+            "/feedback/" +
+            sessionId +
+            "/" +
+            (UserService.getUser().isVolunteer ? "volunteer" : "student") +
+            "/" +
+            studentId +
+            "/" +
+            volunteerId;
+          router.replace(url);
+        } else {
+          router.replace("/");
+        }
+      }
+    }
+  }
 };
 </script>
 
 <style scoped>
-
 .session-header {
   position: relative;
   height: 100px;
-  background-color: #64E1C6;
+  background-color: #64e1c6;
   padding: 20px;
   text-align: left;
   display: flex;
@@ -107,7 +136,7 @@ h1 {
 .avatar {
   width: 30px;
   height: 30px;
-  background-image: url('../../assets/defaultAvatar@2x.png');
+  background-image: url("../../assets/defaultAvatar@2x.png");
   background-size: cover;
 }
 
@@ -126,7 +155,7 @@ h1 {
 .btn {
   width: auto;
   height: 40px;
-  color: #FFF;
+  color: #fff;
   border: none;
   font-size: 16px;
   font-weight: 600;
@@ -142,12 +171,11 @@ h1 {
 }
 
 .session-header.inactive {
-  background-color: #73737A;
+  background-color: #73737a;
 }
 
 .avatar-info-container {
   display: flex;
   align-items: center;
 }
-
 </style>
