@@ -1,39 +1,48 @@
 <template>
-  <div v-if="user.isVolunteer" class="review">
-    <h1 class="header" v-if="category != 'esl'">{{ category | capitalize }} Review</h1>
-    <h1 class="header" v-if="category == 'esl'">{{ category | uppercase }} Review</h1>
+  <div
+    v-if="user.isVolunteer"
+    class="review">
+    <h1
+      v-if="category !== 'esl'"
+      class="header">{{ category | capitalize }} Review</h1>
+    <h1
+      v-if="category === 'esl'"
+      class="header">{{ category | uppercase }} Review</h1>
   </div>
 </template>
 
 <script>
 import UserService from 'src/services/UserService';
+
+/**
+ * @todo {1} Refactor into global filters (https://vuejs.org/v2/guide/filters.html)
+ */
 export default {
+  filters: { // {1}
+    capitalize(value) {
+      if (!value) return '';
+      const valueStr = value.toString();
+      return valueStr.charAt(0).toUpperCase() + valueStr.slice(1);
+    },
+    uppercase(value) {
+      if (!value) return '';
+      return value.toString().toUpperCase();
+    },
+  },
   data() {
-    let user = UserService.getUser();
-    let category = this.$route.params.category;
+    const user = UserService.getUser();
+    const { category } = this.$route.params;
     return {
-      user: user,
-      category: category
-    }
+      user,
+      category,
+    };
   },
   beforeMount() {
     this.styleImages();
   },
-  filters: {
-    capitalize: function (value) {
-      if (!value) return ''
-      value = value.toString()
-      return value.charAt(0).toUpperCase() + value.slice(1)
-    },
-    uppercase: function (value) {
-      if (!value) return ''
-      value = value.toString()
-      return value.toUpperCase()
-    }
-  },
   methods: {
-  }
-}
+  },
+};
 </script>
 
 <style scoped>

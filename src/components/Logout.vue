@@ -3,8 +3,12 @@
     <div class="form-signout">
       <h1>You're logged out!</h1>
       <div class="button-container">
-        <router-link to="/login" class="btn login">LOGIN</router-link>
-        <router-link to="/feedback" class="btn btn-lg btn-primary btn-block feedback">GIVE FEEDBACK</router-link>
+        <router-link
+          to="/login"
+          class="btn login">LOGIN</router-link>
+        <router-link
+          to="/feedback"
+          class="btn btn-lg btn-primary btn-block feedback">GIVE FEEDBACK</router-link>
       </div>
     </div>
   </div>
@@ -12,12 +16,12 @@
 
 <script>
 export default {
-  data(){
+  data() {
     return {
-      mainWebsiteUrl: process.env.MAIN_WEBSITE_URL
-    }
-  }
-}
+      mainWebsiteUrl: process.env.MAIN_WEBSITE_URL,
+    };
+  },
+};
 </script>
 
 <style scoped>
@@ -26,6 +30,12 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+.col-xs-12.view-container {
+  padding-left: 0;
+  padding-right: 0;
+  z-index: 1;
 }
 
 h1 {
@@ -39,9 +49,11 @@ h1 {
   display: flex;
   background-image: url('../assets/onboarding_background.png');
   background-size: cover;
-  width: 100%;
   height: 100%;
   font-size: 16px;
+  margin-left: -300px;
+  position: relative;
+  z-index: 2;
 }
 
 .form-signout {

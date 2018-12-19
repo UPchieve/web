@@ -1,13 +1,17 @@
 <template>
-  <div class="session-header" v-bind:class="{inactive: !partnerName}">
+  <div
+    :class="{inactive: !partnerName}"
+    class="session-header">
     <div class="avatar-info-container">
-      <div class="avatar" v-bind:style="partnerAvatar"></div>
+      <div
+        :style="partnerAvatar"
+        class="avatar"/>
       <div class="info">
         <template v-if="partnerName">
-          <span class="volunteer-name">{{partnerName}}</span>
+          <span class="volunteer-name">{{ partnerName }}</span>
         </template>
         <template v-else-if="currentSession.sessionId">
-          {{waitingText}}
+          {{ waitingText }}
         </template>
         <template v-else>
           Loading
@@ -15,69 +19,105 @@
       </div>
     </div>
     <div class="button-container">
-      <div class="upload-file" v-if="partnerName">
-        <a class="btn btn-lg btn-block" target="_blank" href="#/upload">Upload file</a>
-      </div>
       <div class="end-session">
-        <button class="btn btn-lg btn-block" @click.prevent="end">End session</button>
+        <button
+          class="btn btn-lg btn-block"
+          @click.prevent="end">End session</button>
       </div>
     </div>
   </div>
 </template>
 
+
 <script>
+import UserService from "src/services/UserService";
+import SessionService from "src/services/SessionService";
 
-import UserService from 'src/services/UserService'
-import SessionService from 'src/services/SessionService';
+import router from "../../router";
 
-const DEFAULT_AVATAR_URL = 'static/defaultAvatar@2x.png';
+const STUDENT_AVATAR_URL = "static/defaultavatar3.png";
+const VOLUNTEER_AVATAR_URL = "static/defaultavatar4.png";
 
+/**
+ * @todo {1} Refactoring candidate: use a modal instead.
+ */
 export default {
-  data(){
+  data() {
     return {
       currentSession: SessionService.currentSession
-    }
+    };
   },
   computed: {
-    waitingText(){
-      var user = UserService.getUser()
-      if (user.isVolunteer){
-        return 'No student is in this session';
-      } else {
-          return 'We are contacting our Academic Coaches for you right now - please hang tight while we try to connect you! This process can take 5-10 minutes.';
+    waitingText() {
+      const user = UserService.getUser();
+      if (user.isVolunteer) {
+        return "No student is in this session";
       }
+      return "We are contacting our Academic Coaches for you right now - please hang tight while we try to connect you! This process can take 5-10 minutes.";
     },
-    partnerName(){
-      var partner = SessionService.getPartner();
+    partnerName() {
+      const partner = SessionService.getPartner();
       return partner && partner.firstname;
     },
-    partnerAvatar(){
-      var partner = SessionService.getPartner();
-
-      var partnerAvatar = partner && partner.picture || DEFAULT_AVATAR_URL;
-      return {
-        backgroundImage: `url(${partnerAvatar})`
+    partnerAvatar() {
+      const user = UserService.getUser();
+      let picture = "";
+      if (user.isVolunteer === false) {
+        picture = VOLUNTEER_AVATAR_URL;
+      } else {
+        picture = STUDENT_AVATAR_URL;
       }
+      return {
+        backgroundImage: `url(${picture})`
+      };
     }
   },
   methods: {
-    end(){
-      var result = window.confirm('Do you really want to end the session?')
-      if (result){
-        this.$socket.disconnect();
-        SessionService.endSession();
+    end() {
+      let studentId = "";
+      let volunteerId = null;
+      let sessionId = SessionService.currentSession.sessionId;
+      if (
+        SessionService.currentSession &&
+        SessionService.currentSession.data.student
+      ) {
+        studentId = SessionService.currentSession.data.student._id;
+      }
+      if (
+        SessionService.currentSession &&
+        SessionService.currentSession.data.volunteer
+      ) {
+        volunteerId = SessionService.currentSession.data.volunteer._id;
+      }
+      const result = window.confirm("Do you really want to end the session?");
+      if (result) {
+        if (volunteerId) {
+          this.$socket.disconnect();
+          SessionService.endSession({ skipRoute: true });
+          const url =
+            "/feedback/" +
+            sessionId +
+            "/" +
+            (UserService.getUser().isVolunteer ? "volunteer" : "student") +
+            "/" +
+            studentId +
+            "/" +
+            volunteerId;
+          router.replace(url);
+        } else {
+          router.replace("/");
+        }
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>
-
 .session-header {
   position: relative;
   height: 100px;
-  background-color: #64E1C6;
+  background-color: #64e1c6;
   padding: 20px;
   text-align: left;
   display: flex;
@@ -96,7 +136,7 @@ h1 {
 .avatar {
   width: 30px;
   height: 30px;
-  background-image: url('../../assets/defaultAvatar@2x.png');
+  background-image: url("../../assets/defaultAvatar@2x.png");
   background-size: cover;
 }
 
@@ -115,7 +155,7 @@ h1 {
 .btn {
   width: auto;
   height: 40px;
-  color: #FFF;
+  color: #fff;
   border: none;
   font-size: 16px;
   font-weight: 600;
@@ -131,12 +171,11 @@ h1 {
 }
 
 .session-header.inactive {
-  background-color: #73737A;
+  background-color: #73737a;
 }
 
 .avatar-info-container {
   display: flex;
   align-items: center;
 }
-
 </style>

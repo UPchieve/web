@@ -1,36 +1,49 @@
 <template>
 <div class="chat">
-  
+
   <div class="header">Chat</div>
 
   <div class="message-box">
 
     <transition name="chat-warning--slide">
-      <div class="chat-warning" v-show="chatWarningIsShown">
+      <div
+        class="chat-warning"
+        v-show="chatWarningIsShown">
         Messages cannot contain personal information
-        <span class="chat-warning__close" @click="hideModerationWarning">×</span>
+        <span
+          class="chat-warning__close"
+          @click="hideModerationWarning">×</span>
       </div>
     </transition>
 
     <div class="messages">
-      <template v-for="message in messages">
-        <div class="message" :class="message.name === user.firstname ? 'left' : 'right'">
-          <div class="avatar" :style="message.avatarStyle"></div>
+      <template v-for="(message, index) in messages">
+        <div
+          :key="`message-${index}`"
+          :class="message.email === user.email ? 'left' : 'right'"
+          class="message">
+          <div
+            class="avatar"
+            :style="message.avatarStyle"/>
           <div class="contents">
             <div class="name">
-              {{message.name}}
+              {{ message.name }}
             </div>
-            {{message.contents}}
+            {{ message.contents }}
             <div class="time">
-              {{message.time}}
+              {{ message.time }}
             </div>
           </div>
         </div>
       </template>
     </div>
+
   </div>
 
-  <textarea @keyup.enter="sendMessage" v-model="newMessage" placeholder="Type here..."></textarea>
+  <textarea
+    @keyup.enter="sendMessage"
+    v-model="newMessage"
+    placeholder="Type here..."/>
 
 </div>
 </template>
@@ -43,8 +56,14 @@ import UserService from 'src/services/UserService';
 import SessionService from 'src/services/SessionService';
 import ModerationService from 'src/services/ModerationService';
 
-const DEFAULT_AVATAR_URL = 'static/defaultAvatar@2x.png';
+const STUDENT_AVATAR_URL = 'static/defaultavatar3.png';
+const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png';
 
+/**
+ * @todo {1} Use more descriptive names that comply with the coding standards.
+ *           Keep in mind that it also requires a small backend update in
+ *           router/sockets.js
+ */
 export default {
   data() {
     return {
@@ -63,18 +82,16 @@ export default {
     hideModerationWarning() {
       this.chatWarningIsShown = false;
     },
-
     showNewMessage(message) {
       this.$socket.emit('message', {
         sessionId: this.currentSession.sessionId,
         user: UserService.getUser(),
-        message: message
+        message,
       });
       this.newMessage = '';
     },
-
     sendMessage() {
-      let message = this.newMessage.slice(0,-1);
+      const message = this.newMessage.slice(0,-1);
 
       if (message != '') {
 
@@ -85,32 +102,37 @@ export default {
           else {
             this.showModerationWarning();
           }
-        });  
+        });
       }
-    }
+    },    
   },
 
   sockets: {
-    'session-change'(data) {
-      console.log('session-change', data);
+    'session-change'(data) { // {1}
       SessionService.currentSession.sessionId = data._id;
       SessionService.currentSession.data = data;
     },
-    messageSend(data) {
-      console.log(data);
-      let picture = data.picture;
+    messageSend(data) { // {1}
+      let { picture } = data;
       if (!picture || picture === '') {
-        picture = DEFAULT_AVATAR_URL;
+        if (data.isVolunteer === true) {
+          picture = VOLUNTEER_AVATAR_URL;
+        }
+        else {
+          picture = STUDENT_AVATAR_URL;
+        }
       }
       this.messages.push({
         contents: data.contents,
         name: data.name,
+        email: data.email,
+        isVolunteer: data.isVolunteer,
         avatarStyle: {
-          backgroundImage: `url(${picture})`
+          backgroundImage: `url(${picture})`,
         },
-        time: moment(data.time).format('h:mm:ss a')
+        time: moment(data.time).format('h:mm a'),
       });
-    }
+    },
   },
 
   updated() {
@@ -118,6 +140,7 @@ export default {
     msgBox.scrollTop = msgBox.scrollHeight;
   }
 }
+
 </script>
 
 
@@ -190,14 +213,15 @@ export default {
   min-height: 61px;
   margin-bottom: 12px;
   justify-content: flex-start;
+  background: #fff;
+  width: 100%;
 }
 
 .avatar {
   width: 30px;
   height: 30px;
-  /*background-image: url('../assets/defaultAvatar@2x.png');*/
   background-size: cover;
-  align-self: center;
+  margin-top: 5px;
 }
 
 .name {

@@ -1,41 +1,46 @@
 <template>
-<div class="accordion-item">
-  <div class="accordion-item__title" v-on:click="slideToggle">
+  <div class="accordion-item">
+    <div
+      class="accordion-item__title"
+      @click="slideToggle">
       <span :class="accordionItemBulletClasses">▸</span>{{ label }}
+    </div>
+    <div :class="accordionItemContentClasses">
+      <slot/>
+    </div>
   </div>
-  <div :class="accordionItemContentClasses">
-    <slot></slot>
-  </div>
-</div>
 </template>
 
 
 <script>
 export default {
   props: {
-    label: String
+    label: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
       accordionItemBulletClasses: {
         'accordion-item__bullet': true,
-        'accordion-item__bullet--active': false
+        'accordion-item__bullet--active': false,
       },
       accordionItemContentClasses: {
         'accordion-item__content': true,
-        'accordion-item__content--active': false
-      }
-    }
+        'accordion-item__content--active': false,
+      },
+    };
   },
   methods: {
     slideToggle() {
-      this.accordionItemBulletClasses['accordion-item__bullet--active'] = 
-        !this.accordionItemBulletClasses['accordion-item__bullet--active'];
-      this.accordionItemContentClasses['accordion-item__content--active'] = 
-        !this.accordionItemContentClasses['accordion-item__content--active'];
-    }
-  }
-}
+      this.accordionItemBulletClasses['accordion-item__bullet--active']
+        = !this.accordionItemBulletClasses['accordion-item__bullet--active'];
+      this.accordionItemContentClasses['accordion-item__content--active']
+        = !this.accordionItemContentClasses['accordion-item__content--active'];
+    },
+  },
+};
 </script>
 
 

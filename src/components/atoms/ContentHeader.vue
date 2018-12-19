@@ -8,18 +8,20 @@
 <script>
 export default {
   props: {
-    headerTitle: String
-  }
-}
+    headerTitle: {
+      type: String,
+      default: '',
+    },
+  },
+};
 </script>
 
 
 <style>
-/*
-* @notes
-* [1] Refactoring candidate: this shoudln't be done, but I had to do it since 
-*     Bootstap interferes with this :/
-*/
+/**
+ * @todo {1} Refactoring candidate: this shoudln't be done, but I had to do it
+ *           since Bootstap interferes with this :/
+ */
 .content-header {
   display: flex;
   align-items: center;
@@ -28,16 +30,17 @@ export default {
   padding: 20px;
   box-shadow: 0 4px var(--c-shadow-header);
 }
-.content-header h1 { /* [1] */
+.content-header h1 { /*{1}*/
   font-size: 20px;
   margin: 0;
   font-weight: bold;
 }
+
 @media screen and (min-width: 700px) {
   .content-header {
     justify-content: flex-start;
   }
-  .content-header h1 { /* [1] */
+  .content-header h1 { /*{1}*/
     font-size: 28px;
   }
 }
