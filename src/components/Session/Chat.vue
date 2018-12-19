@@ -1,43 +1,60 @@
 <template>
-  <div class="chat">
-    <div class="header">Chat</div>
-    <div class="messages-container">
-      <div class="messages">
-        <template v-for="(message, index) in messages">
+<div class="chat">
+
+  <div class="header">Chat</div>
+
+  <div class="message-box">
+
+    <transition name="chat-warning--slide">
+      <div
+        class="chat-warning"
+        v-show="chatWarningIsShown">
+        Messages cannot contain personal information
+        <span
+          class="chat-warning__close"
+          @click="hideModerationWarning">×</span>
+      </div>
+    </transition>
+
+    <div class="messages">
+      <template v-for="(message, index) in messages">
+        <div
+          :key="`message-${index}`"
+          :class="message.email === user.email ? 'left' : 'right'"
+          class="message">
           <div
-            :key="`message-${index}`"
-            :class="leftRightMessage(message)"
-            class="message">
-            <div
-              :style="message.avatarStyle"
-              class="avatar"/>
-            <div class="contents">
-              <div class="name">
-                {{ message.name }}
-              </div>
-              {{ message.contents }}
-              <div class="time">
-                {{ message.time }}
-              </div>
+            class="avatar"
+            :style="message.avatarStyle"/>
+          <div class="contents">
+            <div class="name">
+              {{ message.name }}
+            </div>
+            {{ message.contents }}
+            <div class="time">
+              {{ message.time }}
             </div>
           </div>
-        </template>
-      </div>
+        </div>
+      </template>
     </div>
-    <textarea
-      v-model="newMessage"
-      placeholder="Type here."
-      @keyup.enter="sendMessage"/>
+
   </div>
+
+  <textarea
+    @keyup.enter="sendMessage"
+    v-model="newMessage"
+    placeholder="Type here..."/>
+
+</div>
 </template>
 
 
 <script>
-import $ from 'jquery';
 import moment from 'moment';
 
 import UserService from 'src/services/UserService';
 import SessionService from 'src/services/SessionService';
+import ModerationService from 'src/services/ModerationService';
 
 const STUDENT_AVATAR_URL = 'static/defaultavatar3.png';
 const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png';
@@ -49,41 +66,47 @@ const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png';
  */
 export default {
   data() {
-    const user = UserService.getUser();
     return {
-      user,
+      user: UserService.getUser(),
       messages: [],
       currentSession: SessionService.currentSession,
       newMessage: '',
-    };
+      chatWarningIsShown: false
+    }
   },
 
-  updated() {
-    const el = $('.messages');
-    const scrollTop = el[0].scrollHeight - el[0].clientHeight;
-    el.scrollTop(scrollTop);
-  },
   methods: {
-    sendMessage() {
-      const message = this.newMessage;
-
+    showModerationWarning() {
+      this.chatWarningIsShown = true;
+    },
+    hideModerationWarning() {
+      this.chatWarningIsShown = false;
+    },
+    showNewMessage(message) {
       this.$socket.emit('message', {
         sessionId: this.currentSession.sessionId,
         user: UserService.getUser(),
         message,
       });
-
       this.newMessage = '';
     },
-    leftRightMessage(message) {
-      console.log('message: ', message);
-      console.log(this.user.email)
-      if (message.email === this.user.email) {
-        return 'left';
+    sendMessage() {
+      const message = this.newMessage.slice(0,-1);
+
+      if (message != '') {
+
+        ModerationService.checkIfMessageIsClean(this, message).then((isClean) => {
+          if (isClean) {
+            this.showNewMessage(message);
+          } 
+          else {
+            this.showModerationWarning();
+          }
+        });
       }
-      return 'right';
-    },
+    },    
   },
+
   sockets: {
     'session-change'(data) { // {1}
       SessionService.currentSession.sessionId = data._id;
@@ -111,13 +134,20 @@ export default {
       });
     },
   },
-};
+
+  updated() {
+    let msgBox = document.querySelector('.messages');
+    msgBox.scrollTop = msgBox.scrollHeight;
+  }
+}
+
 </script>
 
 
 <style scoped>
 .chat {
   height: 100%;
+  position: relative;
 }
 
 .header {
@@ -132,7 +162,7 @@ export default {
   width: 100%;
 }
 
-.messages-container {
+.message-box {
   height: calc(100% - 40px);
   padding-bottom: 100px;
   overflow: hidden;
@@ -140,15 +170,48 @@ export default {
   position: relative;
 }
 
+.chat-warning {
+  width: 100%;
+  background: var(--c-shadow-warn);
+  color: #fff;
+  font-weight: bold;
+  min-height: 40px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 12px 52px 12px 12px;
+  transition: all .15s ease-in;
+  z-index: 1;
+}
+.chat-warning__close {
+  font-size: 2rem;
+  width: 40px;
+  padding: 12px;
+  cursor: pointer;
+  display: block;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.chat-warning--slide-enter, 
+.chat-warning--slide-leave-to {
+  top: -64px;
+}
+
 .messages {
   height: 100%;
-  overflow-y: scroll;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .message {
   position: relative;
   padding: 10px;
   display: flex;
+  min-height: 61px;
+  margin-bottom: 12px;
   justify-content: flex-start;
   background: #fff;
   width: 100%;
