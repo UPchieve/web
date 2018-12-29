@@ -8,20 +8,24 @@ export default {
   loading: false,
   currentSession: {
     sessionId: null,
-    data: {},
+    data: {
+      volunteerJoinTime: null,
+      sessionEndTime: null,
+    },
   },
 
   getPartner() {
     const user = UserService.getUser();
     const session = this.currentSession.data;
-
     if (user.isVolunteer) {
+      this.currentSession.data.volunteerJoinTime = new Date();
       return session.student;
     }
     return session.volunteer;
   },
 
   endSession(options = {}) {
+    this.session.sessionEndTime = new Date();
     this.currentSession.sessionId = null;
     this.currentSession.data = {};
     if (!options.skipRoute) {
@@ -37,7 +41,7 @@ export default {
 
         this.currentSession.sessionId = sessionId;
 
-        console.log(sessionId);
+        console.log('here', sessionId);
         if (sessionId) {
           router.replace(`/session/${sessionType}/${sessionSubTopic}/${sessionId}`);
         }
