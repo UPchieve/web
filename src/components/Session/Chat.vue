@@ -1,104 +1,153 @@
 <template>
-  <div class="chat">
-    <div class="header">Chat</div>
-    <div class="messages-container">
-			<div class="messages">
-				<template v-for="message in messages">
-					<div class="message" v-bind:class="leftRightMessage(message)">
-						<div class="avatar" v-bind:style="message.avatarStyle"></div>
-						<div class="contents">
-              <div class="name">
-								{{message.name}}
-							</div>
-							{{message.contents}}
-              <div class="time">
-								{{message.time}}
-							</div>
-						</div>
-					</div>
-				</template>
-			</div>
+<div class="chat">
+
+  <div class="header">Chat</div>
+
+  <div class="message-box">
+
+    <transition name="chat-warning--slide">
+      <div
+        class="chat-warning"
+        v-show="chatWarningIsShown">
+        Messages cannot contain personal information
+        <span
+          class="chat-warning__close"
+          @click="hideModerationWarning">×</span>
+      </div>
+    </transition>
+
+    <div class="messages">
+      <template v-for="(message, index) in messages">
+        <div
+          :key="`message-${index}`"
+          :class="message.email === user.email ? 'left' : 'right'"
+          class="message">
+          <div
+            class="avatar"
+            :style="message.avatarStyle"/>
+          <div class="contents">
+            <div class="name">
+              {{ message.name }}
+            </div>
+            {{ message.contents }}
+            <div class="time">
+              {{ message.time }}
+            </div>
+          </div>
+        </div>
+      </template>
     </div>
-    <textarea v-on:keyup.enter="sendMessage" v-model="newMessage" placeholder="Type here."></textarea>
+
   </div>
+
+  <textarea
+    @keyup.enter="sendMessage"
+    v-model="newMessage"
+    placeholder="Type here..."/>
+
+</div>
 </template>
 
+
 <script>
+import moment from 'moment';
 
-import $ from 'jquery'
-import moment from 'moment'
+import UserService from 'src/services/UserService';
+import SessionService from 'src/services/SessionService';
+import ModerationService from 'src/services/ModerationService';
 
-import UserService from 'src/services/UserService'
-import SessionService from 'src/services/SessionService'
+const STUDENT_AVATAR_URL = 'static/defaultavatar3.png';
+const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png';
 
-const DEFAULT_AVATAR_URL = 'static/defaultAvatar@2x.png';
-
+/**
+ * @todo {1} Use more descriptive names that comply with the coding standards.
+ *           Keep in mind that it also requires a small backend update in
+ *           router/sockets.js
+ */
 export default {
-	data(){
-    var user = UserService.getUser();
-		return {
-      user: user,
+  data() {
+    return {
+      user: UserService.getUser(),
       messages: [],
-			currentSession: SessionService.currentSession,
-			newMessage: ''
-		}
-	},
-  methods: {
-    sendMessage: function() {
-      var message = this.newMessage;
-
-      this.$socket.emit('message', {
-				sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
-        message: message
-      });
-
-      this.newMessage = '';
-    },
-    leftRightMessage: function(message) {
-      if (message.name == this.user.firstname) {
-        return 'left';
-      } else {
-        return 'right';
-      }
+      currentSession: SessionService.currentSession,
+      newMessage: '',
+      chatWarningIsShown: false
     }
   },
+
+  methods: {
+    showModerationWarning() {
+      this.chatWarningIsShown = true;
+    },
+    hideModerationWarning() {
+      this.chatWarningIsShown = false;
+    },
+    showNewMessage(message) {
+      this.$socket.emit('message', {
+        sessionId: this.currentSession.sessionId,
+        user: UserService.getUser(),
+        message,
+      });
+      this.newMessage = '';
+    },
+    sendMessage() {
+      const message = this.newMessage.slice(0,-1);
+
+      if (message != '') {
+
+        ModerationService.checkIfMessageIsClean(this, message).then((isClean) => {
+          if (isClean) {
+            this.showNewMessage(message);
+          } 
+          else {
+            this.showModerationWarning();
+          }
+        });
+      }
+    },    
+  },
+
   sockets: {
-    'session-change'(data){
-      console.log('session-change', data);
+    'session-change'(data) { // {1}
       SessionService.currentSession.sessionId = data._id;
       SessionService.currentSession.data = data;
     },
-    messageSend(data){
-    	console.log(data);
-    	var picture = data.picture;
-    	if (!picture || picture === ''){
-    		picture = DEFAULT_AVATAR_URL
-    	}
+    messageSend(data) { // {1}
+      let { picture } = data;
+      if (!picture || picture === '') {
+        if (data.isVolunteer === true) {
+          picture = VOLUNTEER_AVATAR_URL;
+        }
+        else {
+          picture = STUDENT_AVATAR_URL;
+        }
+      }
       this.messages.push({
-    		contents: data.contents,
-    		name: data.name,
-    		avatarStyle: {
-    			backgroundImage: `url(${picture})`
-    		},
-    		time: moment(data.time).format('h:mm:ss a')
+        contents: data.contents,
+        name: data.name,
+        email: data.email,
+        isVolunteer: data.isVolunteer,
+        avatarStyle: {
+          backgroundImage: `url(${picture})`,
+        },
+        time: moment(data.time).format('h:mm a'),
       });
-    }
+    },
   },
 
-	updated(){
-		var el = $('.messages');
-		var scrollTop = el[0].scrollHeight - el[0].clientHeight;
-		el.scrollTop(scrollTop)
-	}
+  updated() {
+    let msgBox = document.querySelector('.messages');
+    msgBox.scrollTop = msgBox.scrollHeight;
+  }
 }
-
 
 </script>
 
+
 <style scoped>
 .chat {
-	height: 100%;
+  height: 100%;
+  position: relative;
 }
 
 .header {
@@ -113,34 +162,66 @@ export default {
   width: 100%;
 }
 
-.messages-container {
-	height: calc(100% - 40px);
-	padding-bottom: 100px;
-	overflow: hidden;
+.message-box {
+  height: calc(100% - 40px);
+  padding-bottom: 100px;
+  overflow: hidden;
   top: 40px;
   position: relative;
 }
 
+.chat-warning {
+  width: 100%;
+  background: var(--c-shadow-warn);
+  color: #fff;
+  font-weight: bold;
+  min-height: 40px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 12px 52px 12px 12px;
+  transition: all .15s ease-in;
+  z-index: 1;
+}
+.chat-warning__close {
+  font-size: 2rem;
+  width: 40px;
+  padding: 12px;
+  cursor: pointer;
+  display: block;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.chat-warning--slide-enter, 
+.chat-warning--slide-leave-to {
+  top: -64px;
+}
+
 .messages {
-	height: 100%;
-	overflow: scroll;
+  height: 100%;
+  overflow: auto;
   display: flex;
   flex-direction: column;
 }
 
 .message {
-	position: relative;
-	padding: 10px;
+  position: relative;
+  padding: 10px;
   display: flex;
+  min-height: 61px;
+  margin-bottom: 12px;
   justify-content: flex-start;
+  background: #fff;
+  width: 100%;
 }
 
 .avatar {
   width: 30px;
   height: 30px;
-  /*background-image: url('../assets/defaultAvatar@2x.png');*/
   background-size: cover;
-  align-self: center;
+  margin-top: 5px;
 }
 
 .name {
@@ -148,27 +229,27 @@ export default {
 }
 
 .time {
-	font-size: 12px;
-	font-weight: 300;
-	color: #73737A;
+  font-size: 12px;
+  font-weight: 300;
+  color: #73737A;
 }
 
 .contents {
-	text-align: left;
+  text-align: left;
   width: 200px;
   overflow-wrap: break-word;
   font-size: 16px;
 }
 
 textarea {
-	width: 100%;
-	height: 100px;
-	border: none;
-	position: absolute;
-	left: 0;
-	bottom: 0;
-	border-top: 1px solid #979797;
-	padding: 10px 12px;
+  width: 100%;
+  height: 100px;
+  border: none;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  border-top: 1px solid #979797;
+  padding: 10px 12px;
 }
 
 .left {

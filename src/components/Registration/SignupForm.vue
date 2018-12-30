@@ -1,33 +1,59 @@
 <template>
   <form class="form-signup">
     <div class="header">
-      <router-link to="login" class="login-link">Log In</router-link>
+      <router-link
+        to="login"
+        class="login-link">Log In</router-link>
       <div class="registration-header">Registration</div>
     </div>
     <div v-if="!showingSuccess">
       <label for="inputEmail">Please enter your email</label>
-      <input type="email" id="inputEmail" class="form-control" required autofocus v-model="credentials.email">
+      <input
+        id="inputEmail"
+        v-model="credentials.email"
+        type="email"
+        class="form-control"
+        required
+        autofocus>
       <div class="description">You will be sent a verification email</div>
       <label for="inputPassword">Create a password</label>
-      <input type="password" id="inputPassword" class="form-control" required v-model="credentials.password">
+      <input
+        id="inputPassword"
+        v-model="credentials.password"
+        type="password"
+        class="form-control"
+        required>
       <p class="password-guidelines">It must contain lowercase and uppercase letters, numbers, and at least 8 characters.</p>
       <div class="agreement-box">
-        <input type="checkbox" id="userAgreement" v-model="credentials.terms" required>
-        <label id='agreement' for="userAgreement"></label>
-        <div class="agreement-label">I have read and accept the <a href="#/legal" target="_blank">user agreement</a>.</div>
+        <input
+          id="userAgreement"
+          v-model="credentials.terms"
+          type="checkbox"
+          required>
+        <label
+          id="agreement"
+          for="userAgreement"/>
+        <div class="agreement-label">I have read and accept the <a
+          href="#/legal"
+          target="_blank">user agreement</a>.</div>
       </div>
-      <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="submit()">SIGN UP</button>
-      {{msg}}
+      <button
+        class="btn btn-lg btn-primary btn-block"
+        type="submit"
+        @click.prevent="submit()">SIGN UP</button>
+      {{ msg }}
     </div>
-    <div class="successMessage" v-else>
+    <div
+      v-else
+      class="successMessage">
       <p>You’ve been sent a verification email! Use the link in the email to get started.</p>
     </div>
   </form>
 </template>
 
 <script>
-import AuthService from 'src/services/AuthService'
-import RegistrationService from 'src/services/RegistrationService'
+import AuthService from 'src/services/AuthService';
+import RegistrationService from 'src/services/RegistrationService';
 
 export default {
   data() {
@@ -36,10 +62,10 @@ export default {
       credentials: {
         email: '',
         password: '',
-        terms: false
+        terms: false,
       },
-      showingSuccess: false
-    }
+      showingSuccess: false,
+    };
   },
   methods: {
     submit() {
@@ -47,16 +73,16 @@ export default {
         code: RegistrationService.data.registrationCode,
         email: this.credentials.email,
         password: this.credentials.password,
-        terms: this.credentials.terms
+        terms: this.credentials.terms,
       }).then(() => {
         this.showingSuccess = true;
       }).catch((err) => {
         console.log(err);
         this.msg = err.message;
-      })
-    }
-  }
-}
+      });
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -65,7 +91,7 @@ export default {
   display: flex;
   justify-content: space-between;
   margin-bottom: 50px;
-  margin-top: 65px;
+  margin-top: 50px;
 }
 .login-link {
   color: #73737A;
@@ -74,11 +100,12 @@ export default {
 .registration-header {
   color: #16D2AA;
   font-weight: 600;
+  padding-left: 140px;
 }
 .description {
   font-size: 12px;
   text-align: left;
-  margin-bottom: 50px;
+  margin-bottom: 10px;
   color: #73737A;
 }
 
@@ -91,8 +118,6 @@ export default {
   display: flex;
   flex-direction: column;
   max-width: 500px;
-  padding: 15px;
-  margin: auto;
 }
 .form-control {
   border: none;

@@ -1,36 +1,68 @@
 <template>
-  <div v-if="user.isVolunteer" class="training">
+  <div
+    v-if="user.isVolunteer"
+    class="training">
     <h1 class="header">Volunteer Training</h1>
     <div class="body-container">
-      <div v-for="supercategory in supercategories">
-        <div class="supercategory" v-bind:style="{ backgroundColor: colors[supercategory]}" v-on:click="flipBool(supercategory)" v-if="supercategory != 'esl'">
+      <div
+        v-for="supercategory in supercategories"
+        :key="supercategory">
+        <div
+          v-if="supercategory !== 'esl'"
+          :style="{ backgroundColor: colors[supercategory]}"
+          class="supercategory"
+          @click="flipBool(supercategory)">
           {{ supercategory | capitalize }}
-          <div class="arrow up" v-if="bools[supercategory]"></div>
-          <div class="arrow down" v-if="!bools[supercategory]"></div>
+          <div
+            v-if="bools[supercategory]"
+            class="arrow up"/>
+          <div
+            v-if="!bools[supercategory]"
+            class="arrow down"/>
         </div>
-        <div class="supercategory" v-bind:style="{ backgroundColor: colors[supercategory]}" v-on:click="flipBool(supercategory)" v-if="supercategory == 'esl'">
+        <div
+          v-if="supercategory === 'esl'"
+          :style="{ backgroundColor: colors[supercategory]}"
+          class="supercategory"
+          @click="flipBool(supercategory)">
           {{ supercategory | uppercase }}
-          <div class="arrow up" v-if="bools[supercategory]"></div>
-          <div class="arrow down" v-if="!bools[supercategory]"></div>
+          <div
+            v-if="bools[supercategory]"
+            class="arrow up"/>
+          <div
+            v-if="!bools[supercategory]"
+            class="arrow down"/>
         </div>
-        <div v-for="category in quizzes[supercategory]">
-          <div class="category" v-show="bools[supercategory]">
+        <div
+          v-for="category in quizzes[supercategory]"
+          :key="category">
+          <div
+            v-show="bools[supercategory]"
+            class="category">
             <div>
-              <span v-if="category != 'esl'">{{ category | capitalize }}</span>
-              <span v-if="category == 'esl'">{{ category | uppercase }}</span>
+              <span v-if="category !== 'esl'">{{ category | capitalize }}</span>
+              <span v-if="category === 'esl'">{{ category | uppercase }}</span>
               <div class="review">
                 <div class="review-container">
-                  <div class="review-label"><a v-bind:href="reviewMaterials[category]" target="_blank">Review</a></div>
-                  <div class="arrow right"></div>
+                  <div class="review-label"><a
+                    :href="reviewMaterials[category]"
+                    target="_blank">Review</a></div>
+                  <div class="arrow right"/>
                 </div>
               </div>
             </div>
             <div class="test">
-                <router-link :to="'/training/' + category + '/quiz'" tag="div" v-if="!hasPassed(category) && hasTries(category)" class="test-container">
-                  <div class="test-label">Take test</div>
-                  <div class="arrow right"></div>
-                </router-link>
-              <div class="test-container certified" v-if="hasPassed(category)">Certified!</div>
+              <router-link
+                v-if="!hasPassed(category) && hasTries(category)"
+                :to="'/training/' + category + '/quiz'"
+                tag="div"
+                class="test-container">
+                <div class="test-label">Take test</div>
+                <div class="arrow right"/>
+              </router-link>
+              <div
+                v-if="hasPassed(category)"
+                class="test-container certified">Certified!</div>
               <div class="numTries">You have used {{ getTries(category) }}/3 tries.</div>
             </div>
           </div>
@@ -42,89 +74,89 @@
 
 <script>
 import UserService from 'src/services/UserService';
+
+/**
+ * @todo {1} Refactor into global filters (https://vuejs.org/v2/guide/filters.html)
+ */
 export default {
-  data() {
-    var user = UserService.getUser();
-    var quizzes = new Object();
-    quizzes['math'] = ['algebra', 'geometry', 'trigonometry', 'precalculus', 'calculus'];
-    quizzes['esl'] = ['esl'];
-    quizzes['college Counseling'] = ['planning', 'essay', 'application'];
-    //quizzes['science'] = ['biology', 'chemistry'];
-    var bools = new Object();
-    bools['math'] = false;
-    bools['esl'] = false;
-    bools['college Counseling'] = false;
-    bools['science'] = false;
-    //Science Currently Removed due to quiz issues -Will
-   //var supercategories = ['esl', 'math', 'college Counseling', 'science'];
-    var supercategories = ['esl', 'math', 'college Counseling'];
-    var colors = new Object();
-    colors['esl'] = '#1855D1';
-    colors['math'] = '#F7AEF8';
-    colors['college Counseling'] = '#FED766';
-    colors['science'] = '#9575CD';
-    var reviewMaterials = new Object();
-    reviewMaterials['algebra'] = 'https://drive.google.com/open?id=1UQCaewADDlYXT7vv4-GUuTg7rjLnIdeufGwLgezBo4Y';
-    reviewMaterials['geometry'] = 'https://docs.google.com/document/d/128AHz0DakobmILSTrbiQVix3677FhCNcazduc3896Lk/edit?usp=sharing';
-    reviewMaterials['trigonometry'] = 'https://drive.google.com/open?id=0B8mTVZa3-VGQUkxhd0R0Wmg1azZ5Z1pWUE8xa2g0MGZYemZF';
-    reviewMaterials['precalculus'] = 'https://drive.google.com/open?id=1_T6wdW1_aDvT5kkK2DslUTBllRdOAc_JJ4oxHzzoB6U';
-    reviewMaterials['calculus'] = 'https://drive.google.com/open?id=1dxBoVIZsmw4tuUkmDF2y1rmuS0tvxw_d';
-    reviewMaterials['esl'] = 'https://drive.google.com/open?id=1P99PIY89X6VdvCGMMzjNOS55Nvljkc8Lv6FxmjJzo8Y';
-    reviewMaterials['planning'] = 'https://drive.google.com/file/d/1MXl7g4E4hdt05Pt8jl9gQvr1kfv-cKBU/view?usp=sharing';
-    reviewMaterials['essay'] = 'https://drive.google.com/file/d/19IyuDkShzdaRvN0fAZqvYkpoMJPR-XfG/view?usp=sharing';
-    reviewMaterials['application'] = 'https://drive.google.com/file/d/18J5ca1LSNgh_9MQqct02Myr5UMFp1VOu/view?usp=sharing';
-    return {
-      user: user,
-      quizzes: quizzes,
-      bools: bools,
-      supercategories: supercategories,
-      colors: colors,
-      reviewMaterials: reviewMaterials
-    }
-  },
-  filters: {
-    capitalize: function (value) {
-      if (!value) return ''
-      value = value.toString()
-      return value.charAt(0).toUpperCase() + value.slice(1)
+  filters: { // {1}
+    capitalize(value) {
+      if (!value) return '';
+      const valueStr = value.toString();
+      return valueStr.charAt(0).toUpperCase() + valueStr.slice(1);
     },
-    uppercase: function (value) {
-      if (!value) return ''
-      value = value.toString()
-      return value.toUpperCase()
-    }
+    uppercase(value) {
+      if (!value) return '';
+      return value.toString().toUpperCase();
+    },
+  },
+  data() {
+    const user = UserService.getUser();
+    const quizzes = {};
+    quizzes.math = ['algebra', 'geometry', 'trigonometry', 'precalculus', 'calculus'];
+    quizzes.esl = ['esl'];
+    quizzes['college Counseling'] = ['planning', 'essays', 'applications'];
+    // quizzes['science'] = ['biology', 'chemistry'];
+    const bools = {};
+    bools.math = false;
+    bools.esl = false;
+    bools['college Counseling'] = false;
+    bools.science = false;
+    // Science Currently Removed due to quiz issues -Will
+    // var supercategories = ['esl', 'math', 'college Counseling', 'science'];
+    const supercategories = ['esl', 'math', 'college Counseling'];
+    const colors = {};
+    colors.esl = '#1855D1';
+    colors.math = '#F7AEF8';
+    colors['college Counseling'] = '#FED766';
+    colors.science = '#9575CD';
+    const reviewMaterials = {};
+    reviewMaterials.algebra = 'https://drive.google.com/open?id=1UQCaewADDlYXT7vv4-GUuTg7rjLnIdeufGwLgezBo4Y';
+    reviewMaterials.geometry = 'https://docs.google.com/document/d/128AHz0DakobmILSTrbiQVix3677FhCNcazduc3896Lk/edit?usp=sharing';
+    reviewMaterials.trigonometry = 'https://drive.google.com/open?id=0B8mTVZa3-VGQUkxhd0R0Wmg1azZ5Z1pWUE8xa2g0MGZYemZF';
+    reviewMaterials.precalculus = 'https://drive.google.com/open?id=1_T6wdW1_aDvT5kkK2DslUTBllRdOAc_JJ4oxHzzoB6U';
+    reviewMaterials.calculus = 'https://drive.google.com/open?id=1dxBoVIZsmw4tuUkmDF2y1rmuS0tvxw_d';
+    reviewMaterials.esl = 'https://drive.google.com/open?id=1P99PIY89X6VdvCGMMzjNOS55Nvljkc8Lv6FxmjJzo8Y';
+    reviewMaterials.planning = 'https://drive.google.com/file/d/1MXl7g4E4hdt05Pt8jl9gQvr1kfv-cKBU/view?usp=sharing';
+    reviewMaterials.essay = 'https://drive.google.com/file/d/19IyuDkShzdaRvN0fAZqvYkpoMJPR-XfG/view?usp=sharing';
+    reviewMaterials.application = 'https://drive.google.com/file/d/18J5ca1LSNgh_9MQqct02Myr5UMFp1VOu/view?usp=sharing';
+    return {
+      user,
+      quizzes,
+      bools,
+      supercategories,
+      colors,
+      reviewMaterials,
+    };
   },
   methods: {
     flipBool(supercategory) {
-      var bool = this.bools[supercategory];
+      const bool = this.bools[supercategory];
       this.bools[supercategory] = !bool;
     },
     hasPassed(category) {
       if (this.user[category]) {
-        return this.user[category]['passed'];
+        return this.user[category].passed;
       }
-      else {
-        return false;
-      }
+
+      return false;
     },
     hasTries(category) {
       if (this.user[category]) {
-        return (this.user[category]['tries'] < 3);
+        return (this.user[category].tries < 3);
       }
-      else {
-        return true;
-      }
+
+      return true;
     },
     getTries(category) {
       if (this.user[category]) {
         return this.user[category].tries;
       }
-      else {
-        return 0;
-      }
-    }
-  }
-}
+
+      return 0;
+    },
+  },
+};
 </script>
 
 <style scoped>

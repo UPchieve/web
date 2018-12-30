@@ -1,94 +1,107 @@
-import NetworkService from './NetworkService'
+import NetworkService from './NetworkService';
 
 export default {
-  idAnswerMap: new Object(),
+  idAnswerMap: {},
   questions: [],
   index: 0,
   numAnswers: 0,
-  idCorrectAnswerMap: new Object(),
+  idCorrectAnswerMap: {},
   category: null,
-  loadQuiz(context, category){
+
+  loadQuiz(context, category) {
     this.index = 0;
     this.numAnswers = 0;
-    this.idAnswerMap = new Object();
-    this.idCorrectAnswerMap = new Object();
+    this.idAnswerMap = {};
+    this.idCorrectAnswerMap = {};
     this.category = category;
-    return NetworkService.getQuestions(context, { category: category }).then((res) => {
+    return NetworkService.getQuestions(context, { category }).then((res) => {
       this.questions = res.data.questions;
       return this.questions.length;
     });
   },
-  getFirstQuestion(context){
-    var question = this.questions[this.index];
+  getFirstQuestion() {
+    const question = this.questions[this.index];
     return question;
   },
-  getIndex(context) {
+  getIndex() {
     return this.index;
   },
-  hasCompleted(context) {
-    return (this.numAnswers == this.questions.length);
+  hasCompleted() {
+    return (this.numAnswers === this.questions.length);
   },
-  hasNext(context){
+  hasNext() {
     return ((this.index + 1) < this.questions.length);
   },
-  hasPrevious(context){
+  hasPrevious() {
     return ((this.index) > 0);
   },
-  getNextQuestion(context, picked){
+  getNextQuestion() {
     if (this.index < this.questions.length) {
       this.index = this.index + 1;
-      var question = this.questions[this.index];
-      var picked = this.idAnswerMap[question._id];
+      const question = this.questions[this.index];
+      const picked = this.idAnswerMap[question._id];
       return {
-        question : question,
-        picked : picked
+        question,
+        picked,
       };
     }
     return null;
   },
-  getPreviousQuestion(context){
+  getPreviousQuestion() {
     if (this.index > 0) {
       this.index = this.index - 1;
-      var question = this.questions[this.index];
-      var picked = this.idAnswerMap[question._id];
+      const question = this.questions[this.index];
+      const picked = this.idAnswerMap[question._id];
       return {
-        question : question,
-        picked : picked
+        question,
+        picked,
       };
     }
     return null;
   },
-  saveAnswer(context, picked){
-    var question = this.questions[this.index];
-    if (picked != '' && picked != null && (this.idAnswerMap[question._id] == null || this.idAnswerMap[question._id] == '')) {
-      this.numAnswers++;
+  saveAnswer(context, picked) {
+    const question = this.questions[this.index];
+    if (
+      picked !== '' &&
+      picked !== null &&
+      picked !== undefined &&
+      (
+        this.idAnswerMap[question._id] === null ||
+        this.idAnswerMap[question._id] === '' ||
+        picked !== undefined
+      )
+    ) {
+      this.numAnswers += 1;
     }
     this.idAnswerMap[question._id] = picked;
-    return;
   },
-  submitQuiz(context, userid){
-    return NetworkService.getQuizScore(context,
-      { userid: userid,
+  submitQuiz(context, userid) {
+    return NetworkService.getQuizScore(
+      context,
+      {
+        userid,
         idAnswerMap: this.idAnswerMap,
-        category: this.category
-      }).then((res) => {
-      this.idCorrectAnswerMap = res.data.idCorrectAnswerMap;
-      return {
-        tries: res.data.tries,
-        passed: res.data.passed,
-        score: res.data.score,
-        idUserAnswerMap: this.idAnswerMap
-      };
-    });
+        category: this.category,
+      },
+    )
+      .then((res) => {
+        this.idCorrectAnswerMap = res.data.idCorrectAnswerMap;
+        return {
+          tries: res.data.tries,
+          passed: res.data.passed,
+          score: res.data.score,
+          idUserAnswerMap: this.idAnswerMap,
+        };
+      });
   },
-  reviewQuiz(context){
-    var questionsReview = this.questions.slice(0);
-    var idCorrectAnswerMap = this.idCorrectAnswerMap;
-    var idAnswerMap = this.idAnswerMap;
-    questionsReview.forEach(function(question) {
-      question['userAnswer'] = idAnswerMap[question._id];
-      question['correctAnswer'] = idCorrectAnswerMap[question._id];
+  reviewQuiz() {
+    const questionsReview = this.questions.slice(0);
+    const idCorrectAnswerMap = { ...this.idCorrectAnswerMap };
+    const idAnswerMap = { ...this.idAnswerMap };
+    questionsReview.forEach((question) => {
+      question.userAnswer = idAnswerMap[question._id];
+      question.correctAnswer = idCorrectAnswerMap[question._id];
     });
     return questionsReview;
-  }
-}
+  },
+};

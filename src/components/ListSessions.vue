@@ -4,13 +4,17 @@
       <thead>
         <tr>
           <th>Student</th>
-          <th>Session type</th>
+          <th>Help Topic</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="session in openSessions" v-on:click="gotoSession(session)" class="session-row">
-          <td>{{session.student.firstname}}</td>
-          <td>{{session.type}}</td>
+        <tr
+          v-for="(session, index) in openSessions"
+          :key="`session-${index}`"
+          class="session-row"
+          @click="gotoSession(session)">
+          <td>{{ session.student.firstname }}</td>
+          <td>{{ session.subTopic.charAt(0).toUpperCase() + session.subTopic.substr(1) }}</td>
         </tr>
       </tbody>
     </table>
@@ -18,92 +22,89 @@
 </template>
 
 <script>
+import UserService from '../services/UserService';
 
-import moment from 'moment'
-import UserService from '../services/UserService'
+import router from '../router';
 
-import {router} from '../router'
-
-let openSessions = [];
+const openSessions = [];
 
 export default {
-  data(){
-    let user = UserService.getUser();
+  data() {
+    const user = UserService.getUser();
     return {
-      user: user,
-      openSessions: openSessions
-    }
+      user,
+      openSessions,
+    };
+  },
+  mounted() {
+    this.$socket.emit('list', {
+      user: UserService.getUser(),
+    });
   },
   methods: {
-    gotoSession(session){
+    gotoSession(session) {
       console.log(session._id);
       router.push(`/session/${session.type}/${session.subTopic}/${session._id}`);
-    }
+    },
   },
   sockets: {
-    sessions(sessions){
-      let results = [];
-      let socketSessions = sessions.filter(function(session){
+    sessions(sessions) {
+      const results = [];
+      const socketSessions = sessions.filter((session) => {
         console.log(session);
         return !session.volunteer;
       });
 
-      for (var i=0; i<socketSessions.length; i++) {
-        let currentSession = socketSessions[i];
-        if (socketSessions[i].type == 'college') {
-          result.push(currentSession);
-          continue;
+      for (let i = 0; i < socketSessions.length; i++) {
+        const currentSession = socketSessions[i];
+        if (socketSessions[i].type === 'college') {
+          results.push(currentSession);
         }
+        else {
+          const { subTopic } = currentSession;
 
-        let subTopic = currentSession.subTopic;
+          if (subTopic === 'algebra') {
+            if (this.user.algebra.passed) {
+              results.push(currentSession);
+            }
+          }
 
-        if (subTopic == 'algebra') {
-          if (this.user.algebra.passed) {
-            results.push(currentSession);
+          if (subTopic === 'geometry') {
+            if (this.user.geometry.passed) {
+              results.push(currentSession);
+            }
+          }
+
+          if (subTopic === 'trigonometry') {
+            if (this.user.trigonometry.passed) {
+              results.push(currentSession);
+            }
+          }
+
+          if (subTopic === 'esl') {
+            if (this.user.esl.passed) {
+              results.push(currentSession);
+            }
+          }
+
+          if (subTopic === 'precalculus') {
+            if (this.user.precalculus.passed) {
+              results.push(currentSession);
+            }
+          }
+
+          if (subTopic === 'calculus') {
+            if (this.user.calculus.passed) {
+              results.push(currentSession);
+            }
           }
         }
-
-        if (subTopic == 'geometry') {
-          if (this.user.geometry.passed) {
-            results.push(currentSession);
-          }
-        }
-
-        if (subTopic == 'trigonometry') {
-          if (this.user.trigonometry.passed) {
-            results.push(currentSession);
-          }
-        }
-
-        if (subTopic == 'esl') {
-          if (this.user.esl.passed) {
-            results.push(currentSession);
-          }
-        }
-
-        if (subTopic == 'precalculus') {
-          if (this.user.precalculus.passed) {
-            results.push(currentSession);
-          }
-        }
-
-        if (subTopic == 'calculus') {
-          if (this.user.calculus.passed) {
-            results.push(currentSession);
-          }
-        }
-
       }
 
       this.openSessions = results;
-    }
+    },
   },
-  mounted(){
-    this.$socket.emit('list', {
-      user: UserService.getUser()
-    });
-  }
-}
+};
 </script>
 
 <style scoped>
