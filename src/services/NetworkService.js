@@ -58,6 +58,9 @@ export default {
   initAvailability(context, data) {
     return context.$http.post(`${API_ROOT}/calendar/init`, data).then(this._successHandler, this._errorHandler);
   },
+  checkIfMessageIsClean(context, data) {
+    return context.$http.post(`${API_ROOT}/moderate/message`, data).then(this._successHandler, this._errorHandler);
+  }
   getAvailability(context, data) {
     return context.$http.post(`${API_ROOT}/calendar/get`, data).then(this._successHandler, this._errorHandler);
   },
