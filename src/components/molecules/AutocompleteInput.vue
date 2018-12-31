@@ -5,7 +5,7 @@
     placeholder="Search your school" 
     class="v-form-control" 
     :value="parentModel" 
-    @keyup="keyupHandler"
+    @keyup="debouncedKeyupHandler"
     @focusout="focusoutHandler"
     @focusin="focusinHandler"
   >
@@ -23,6 +23,7 @@
 
 
 <script>
+import _ from 'lodash';
 import NetworkService from '../../services/NetworkService';
 
 const SCHOOL_NOT_FOUND_MSG = 'I coudn\'t find my school';
@@ -51,8 +52,11 @@ export default {
           return Promise.resolve([]);
         });
     },
+    debouncedKeyupHandler(e) {
+      _.debounce(this.keyupHandler, 400).call(this, e);
+    },
     keyupHandler(e) {
-      let query = e.target.value;
+      const query = e.target.value;
 
       this.updateParentModel(this.$parent, 'highschool', query);
 
