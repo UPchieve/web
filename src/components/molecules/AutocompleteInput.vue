@@ -74,8 +74,14 @@ export default {
       this.updateParentModel(this.$parent, 'highschool', e.target.innerText);
       this.showSuggestions = false;
     },
+    /**
+     * @note {1} This timeout is needed because when the user selects a school,
+     *           both useSuggestion() and focusoutHandler() get called, and in
+     *           that case, I need this.showSuggestions to be updated a little
+     *           later to be able to use e.target.innerText inside useSuggestion()
+     */
     focusoutHandler(e) {
-      setTimeout(() => {
+      setTimeout(() => { // {1}
         this.showSuggestions = false;
       }, 100);
     },
