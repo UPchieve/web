@@ -48,15 +48,18 @@ export default {
 
 <style scoped>
 
+/**
+ * @todo {1} Consider refactoring (https://github.com/UPchieve/web/pull/84#discussion_r216185371)
+ */
 .background {
   display: flex;
   background-image: url('../assets/onboarding_background.png');
   background-size: cover;
   height: 100%;
   font-size: 16px;
-  margin-left: -300px;
+  margin-left: -300px; /* {1} */
   position: relative;
-  z-index: 2;
+  z-index: 2; /* {1} */
 }
 
 .form-resetpassword {
