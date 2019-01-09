@@ -163,6 +163,15 @@
         </div>
       </div>
 
+    <div class="row form-group" v-if="!user.isVolunteer">
+      <p>Current high school</p>
+      <div class="row">
+        <div class="col-sm-12">
+          <autocomplete-input :parentModel="user.highschool"></autocomplete-input>
+        </div>
+      </div>
+    </div>
+
       <div
         v-if="!user.isVolunteer"
         class="row form-group">
@@ -280,12 +289,22 @@
   </div>
 </template>
 
+
 <script>
 import $ from 'jquery';
 
+import validator from 'validator';
+
 import UserService from 'src/services/UserService';
+import OnboardingService from 'src/services/OnboardingService';
+
+import AutocompleteInput from '../molecules/AutocompleteInput';
+
 
 export default {
+  components: {
+    AutocompleteInput
+  },
   data() {
     const user = UserService.getUser();
     let button;
@@ -385,8 +404,8 @@ export default {
     },
   },
 };
-
 </script>
+
 
 <style scoped>
 .header {
