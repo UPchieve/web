@@ -43,6 +43,9 @@
           class="instructions">This test will have {{ quizLength }} questions, and it is untimed.<br>
           You have {{ 3 - tries }}/3 tries left to pass this test.<br><br>
           Once you feel ready, click on start!</div>
+                            <div
+          :style="imageStyle"
+          class="questionImage"/><br>
         <button
           v-if="showStart"
           class="start btn"
