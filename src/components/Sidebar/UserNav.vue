@@ -143,7 +143,4 @@ li.active > a::before {
   background-image: url('../../assets/profile_icon-01.svg');
 }
 
-.profile-info {
-  padding-left: 20px;
-}
 </style>

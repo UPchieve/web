@@ -17,6 +17,7 @@
         tag="div"
         class="done btn">DONE</router-link>
     </h1>
+        <div class="body">
     <div
       v-if="showProgressBar"
       class="progressBar">
@@ -33,19 +34,16 @@
         :style="{ width: barWidth + '%' }"
         class="rect cover"/>
     </div>
-    <div
+
+          <div
       v-if="qNumber"
       class="questionNumber">Question {{ qNumber }}</div><br>
-    <div class="body">
       <div class="startBody">
         <div
           v-if="showStartMsg"
           class="instructions">This test will have {{ quizLength }} questions, and it is untimed.<br>
           You have {{ 3 - tries }}/3 tries left to pass this test.<br><br>
           Once you feel ready, click on start!</div>
-                            <div
-          :style="imageStyle"
-          class="questionImage"/><br>
         <button
           v-if="showStart"
           class="start btn"
@@ -215,10 +213,12 @@ export default {
         this.imageStyle = {
           backgroundImage: `url(${questionImage})`,
           width: '300px',
-          height: '300px',
+          height: '150px',
           display: 'flex',
           backgroundSize: '100%',
           backgroundRepeat: 'no-repeat',
+          margin: 'auto',
+          padding: '5px',
         };
       }
       else {
@@ -394,7 +394,7 @@ export default {
 }
 
 .body {
-  display: flex;
+  display: block;
   flex-direction: column;
 }
 
@@ -409,9 +409,10 @@ export default {
 .quizBody {
   display: flex;
   flex-direction: column;
-  width: 400px;
+  width: 100%;
   text-align: left;
   align-self: center;
+  margin: 0;
 }
 
 .progressBar {
@@ -471,6 +472,10 @@ export default {
   height: 40px;
   color: #16D2AA;
   font-weight: 600;
+}
+
+.btn:focus{
+  outline: 0;
 }
 
 .btn:hover {
@@ -537,6 +542,10 @@ label {
   border-bottom: 0.5px solid #CCCCCF;
   padding: 20px;
   margin: 0px;
+}
+
+.passScoreContainer {
+  display: block;
 }
 
 </style>

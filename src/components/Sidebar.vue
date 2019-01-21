@@ -5,7 +5,7 @@
       to="/"/>
     <div v-if="auth.authenticated">
       <profile-info v-if="auth.authenticated"/>
-      <div id="navbar">
+      <div id="nav">
         <user-nav/>
       </div>
     </div>
@@ -45,10 +45,12 @@ nav {
   height: 100%;
   border-radius: 0;
   border: none;
+  position: relative;
 
   background-color: #F6F6F6;
   color: #73737A;
   font-weight: 600;
+  overflow: scroll;
 }
 
 h1, h2 {
@@ -74,7 +76,7 @@ h1::before {
 }
 
 .navbar-footer {
-  position: absolute;
+  position: relative;
   bottom: 0;
   left: 0;
   right: 0;

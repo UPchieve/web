@@ -170,6 +170,11 @@ a {
   color: #73737A;
 }
 
+.test-container:hover{
+  color: blue;
+  cursor: pointer;
+}
+
 .supercategory, .category {
   display: flex;
   justify-content: space-between;
@@ -189,6 +194,12 @@ a {
   margin-top: 20px;
   font-size: 20px;
   font-weight: 600;
+}
+
+.supercategory:hover {
+  color: black;
+  border: 2px solid black;
+  cursor: pointer;
 }
 
 .category {
