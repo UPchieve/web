@@ -1,16 +1,16 @@
 <template>
   <nav class="navbar">
-    <router-link
-      tag="h1"
-      to="/"/>
+    <router-link tag="h1" to="/"/>
     <div v-if="auth.authenticated">
       <profile-info v-if="auth.authenticated"/>
-      <div id="navbar">
+      <div id="nav">
         <user-nav/>
       </div>
     </div>
     <div v-else>
-      <p class="aboutText">UPchieve is a volunteer-run ed-tech initiative with the goal of providing free, online, and on-demand educational and guidance services to disadvantaged students.</p>
+      <p
+        class="aboutText"
+      >UPchieve is a volunteer-run ed-tech initiative with the goal of providing free, online, and on-demand educational and guidance services to disadvantaged students.</p>
     </div>
     <div class="navbar-footer">
       <sidebar-footer/>
@@ -19,24 +19,23 @@
 </template>
 
 <script>
+import UserService from "../services/UserService";
 
-import UserService from '../services/UserService';
-
-import UserNav from './Sidebar/UserNav';
-import ProfileInfo from './Sidebar/ProfileInfo';
-import Footer from './Sidebar/Footer';
+import UserNav from "./Sidebar/UserNav";
+import ProfileInfo from "./Sidebar/ProfileInfo";
+import Footer from "./Sidebar/Footer";
 
 export default {
   components: {
     UserNav,
     ProfileInfo,
-    SidebarFooter: Footer, // footer is reserved component name
+    SidebarFooter: Footer // footer is reserved component name
   },
   data() {
     return {
-      auth: UserService.getAuth(),
+      auth: UserService.getAuth()
     };
-  },
+  }
 };
 </script>
 
@@ -45,13 +44,16 @@ nav {
   height: 100%;
   border-radius: 0;
   border: none;
+  position: relative;
 
-  background-color: #F6F6F6;
-  color: #73737A;
+  background-color: #f6f6f6;
+  color: #73737a;
   font-weight: 600;
+  overflow-y: auto;
 }
 
-h1, h2 {
+h1,
+h2 {
   font-weight: normal;
 }
 
@@ -64,17 +66,17 @@ h1 {
 
 h1::before {
   content: "";
-  display: inline-block;;
+  display: inline-block;
   width: 100px;
   height: 50px;
-  background-image: url('../assets/logo-01.svg');
+  background-image: url("../assets/logo-01.svg");
   background-size: 100px 50px;
   top: 0;
   left: 0;
 }
 
 .navbar-footer {
-  position: absolute;
+  position: relative;
   bottom: 0;
   left: 0;
   right: 0;
@@ -85,5 +87,4 @@ p.aboutText {
   margin: auto;
   text-align: left;
 }
-
 </style>

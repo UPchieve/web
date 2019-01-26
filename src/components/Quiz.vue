@@ -17,6 +17,7 @@
         tag="div"
         class="done btn">DONE</router-link>
     </h1>
+        <div class="body">
     <div
       v-if="showProgressBar"
       class="progressBar">
@@ -33,10 +34,10 @@
         :style="{ width: barWidth + '%' }"
         class="rect cover"/>
     </div>
-    <div
+
+          <div
       v-if="qNumber"
       class="questionNumber">Question {{ qNumber }}</div><br>
-    <div class="body">
       <div class="startBody">
         <div
           v-if="showStartMsg"
@@ -212,10 +213,12 @@ export default {
         this.imageStyle = {
           backgroundImage: `url(${questionImage})`,
           width: '300px',
-          height: '300px',
+          height: '150px',
           display: 'flex',
           backgroundSize: '100%',
           backgroundRepeat: 'no-repeat',
+          margin: 'auto',
+          padding: '5px',
         };
       }
       else {
@@ -391,8 +394,9 @@ export default {
 }
 
 .body {
-  display: flex;
+  display: block;
   flex-direction: column;
+  margin-left: 20px;
 }
 
 .startBody {
@@ -406,13 +410,14 @@ export default {
 .quizBody {
   display: flex;
   flex-direction: column;
-  width: 400px;
+  width: 100%;
   text-align: left;
   align-self: center;
+  margin: 0;
 }
 
 .progressBar {
-  margin: 50px;
+  margin: 20px 0px 50px 0px;
 }
 
 .circles {
@@ -470,6 +475,10 @@ export default {
   font-weight: 600;
 }
 
+.btn:focus{
+  outline: 0;
+}
+
 .btn:hover {
   background-color: #16D2AA;
   color: #FFF;
@@ -492,8 +501,8 @@ input[type=radio]:checked {
 
 .btnContainer {
   display: flex;
-  justify-content: space-between;
-  margin: 50px 75px;
+  justify-content: flex-end;
+  margin: -70px 75px 50px 75px;
 }
 
 .possibleAnswers {
@@ -534,6 +543,10 @@ label {
   border-bottom: 0.5px solid #CCCCCF;
   padding: 20px;
   margin: 0px;
+}
+
+.passScoreContainer {
+  display: block;
 }
 
 </style>
