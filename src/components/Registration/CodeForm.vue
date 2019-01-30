@@ -8,7 +8,7 @@
       class="form-control"
       required
       autofocus>
-    <p class="no-code-link"><a href="https://upchieve.org/students">Don't have a code?</a></p>
+    <p class="no-code-link"><a href="https://upchieve.org/volunteer/">Don't have a code?</a></p>
     <button
       class="btn btn-lg btn-primary btn-block"
       type="submit"
