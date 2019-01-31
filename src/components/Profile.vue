@@ -58,56 +58,6 @@
               you notifications when a student needs help. You will only receive
               notifications during the periods that you select in your schedule.</div>
             </div>
-
-            <div
-              id="preferredContactMethod"
-              class="container-section">
-              <div class="prompt">What is your preferred method of contact?</div>
-              <div class="answer">
-                <ul
-                  v-for="(item, index) in user.preferredContactMethod"
-                  v-show="!activeEdit"
-                  :key="`item-${index}`">
-                  <li>{{ item }}</li>
-                </ul>
-              </div>
-              <div
-                v-show="!user.preferredContactMethod[0] && !activeEdit"
-                class="answer">(None given)</div>
-              <ul
-                v-show="activeEdit"
-                class="row form-control">
-                <p>Please select all that apply.</p>
-                <div>
-                  <div class="checkbox">
-                    <label>
-                      <input
-                        v-model="user.preferredContactMethod"
-                        type="checkbox"
-                        value="Email">
-                      Email
-                    </label>
-                  </div>
-                  <div class="checkbox">
-                    <label>
-                      <input
-                        v-model="user.preferredContactMethod"
-                        type="checkbox"
-                        value="Text message">
-                      Text message
-                    </label>
-                  </div>
-                  <div class="checkbox">
-                    <label>
-                      <input
-                        v-model="user.preferredContactMethod"
-                        type="checkbox"
-                        value="None">
-                      None
-                    </label>
-                  </div>
-                </div>
-              </ul>
             </div>
 
             <div
