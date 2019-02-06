@@ -34,7 +34,7 @@
           <td colspan="2"><input class="form-control" required autofocus v-model="profile.college"></td>
         </tr>
         <tr class="question-row">
-          <td class="table-entry" colspan="2">What's your phone number'?</td>
+          <td class="table-entry" colspan="2">What's your phone number?</td>
         </tr>
         <tr>
           <td colspan="2"><input class="form-control" required autofocus v-model="profile.phone"></td>
