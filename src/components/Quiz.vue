@@ -397,6 +397,7 @@ export default {
   display: block;
   flex-direction: column;
   margin-left: 20px;
+  overflow-y: auto;
 }
 
 .startBody {
