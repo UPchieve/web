@@ -270,12 +270,11 @@ export default {
         this.showSubmit = true;
       }
       this.showPrevious = true;
-      console.log('next', TrainingService)
     },
     submit() {
       TrainingService.saveAnswer(this, this.picked);
       // if (TrainingService.hasCompleted(this)) {
-      if (TrainingService.numAnswers === TrainingService.index) {
+      if (TrainingService.numAnswers === TrainingService.index || TrainingService.numAnswers > TrainingService.index) {
         TrainingService.submitQuiz(this, this.user._id).then((data) => {
           if (data.passed) {
             this.passedMsg = 'You passed!';
@@ -334,7 +333,6 @@ export default {
         this.showReview = true;
       }
       else {
-        console.log('submit, not all answered', TrainingService)
         this.scoreMsg = 'You must answer all questions before submitting the quiz!';
       }
     },
