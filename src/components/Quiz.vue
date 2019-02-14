@@ -17,7 +17,6 @@
         tag="div"
         class="done btn">DONE</router-link>
     </h1>
-        <div class="body">
     <div
       v-if="showProgressBar"
       class="progressBar">
@@ -34,10 +33,10 @@
         :style="{ width: barWidth + '%' }"
         class="rect cover"/>
     </div>
-
-          <div
+    <div
       v-if="qNumber"
       class="questionNumber">Question {{ qNumber }}</div><br>
+    <div class="body">
       <div class="startBody">
         <div
           v-if="showStartMsg"
@@ -213,12 +212,10 @@ export default {
         this.imageStyle = {
           backgroundImage: `url(${questionImage})`,
           width: '300px',
-          height: '150px',
+          height: '300px',
           display: 'flex',
           backgroundSize: '100%',
           backgroundRepeat: 'no-repeat',
-          margin: 'auto',
-          padding: '5px',
         };
       }
       else {
@@ -273,7 +270,6 @@ export default {
     },
     submit() {
       TrainingService.saveAnswer(this, this.picked);
-      // if (TrainingService.hasCompleted(this)) {
       if (TrainingService.numAnswers === TrainingService.index || TrainingService.numAnswers > TrainingService.index) {
         TrainingService.submitQuiz(this, this.user._id).then((data) => {
           if (data.passed) {
@@ -297,11 +293,9 @@ export default {
               borderLeft: '5px solid #F44747',
             };
             if (data.tries < 3) {
-
               this.showRestart = true;
             }
             else {
-
               this.showDone = true;
             }
           }
@@ -397,9 +391,8 @@ export default {
 }
 
 .body {
-  display: block;
+  display: flex;
   flex-direction: column;
-  margin-left: 20px;
 }
 
 .startBody {
@@ -413,14 +406,13 @@ export default {
 .quizBody {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: 400px;
   text-align: left;
   align-self: center;
-  margin: 0;
 }
 
 .progressBar {
-  margin: 20px 0px 50px 0px;
+  margin: 50px;
 }
 
 .circles {
@@ -478,10 +470,6 @@ export default {
   font-weight: 600;
 }
 
-.btn:focus{
-  outline: 0;
-}
-
 .btn:hover {
   background-color: #16D2AA;
   color: #FFF;
@@ -504,8 +492,8 @@ input[type=radio]:checked {
 
 .btnContainer {
   display: flex;
-  justify-content: flex-end;
-  margin: -70px 75px 50px 75px;
+  justify-content: space-between;
+  margin: 50px 75px;
 }
 
 .possibleAnswers {
@@ -546,10 +534,6 @@ label {
   border-bottom: 0.5px solid #CCCCCF;
   padding: 20px;
   margin: 0px;
-}
-
-.passScoreContainer {
-  display: block;
 }
 
 </style>
