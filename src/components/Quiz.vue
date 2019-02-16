@@ -17,7 +17,6 @@
         tag="div"
         class="done btn">DONE</router-link>
     </h1>
-        <div class="body">
     <div
       v-if="showProgressBar"
       class="progressBar">
@@ -34,10 +33,10 @@
         :style="{ width: barWidth + '%' }"
         class="rect cover"/>
     </div>
-
-          <div
+    <div
       v-if="qNumber"
       class="questionNumber">Question {{ qNumber }}</div><br>
+    <div class="body">
       <div class="startBody">
         <div
           v-if="showStartMsg"
@@ -98,7 +97,7 @@
       v-if="!showQuizReview"
       :style="[ popUpStyle, popUpBorderStyle ]"
       class="passScoreContainer">
-      <div class="passed">{{ passedMsg }}</div>
+      <div class="passed passed-msg">{{ passedMsg }}</div>
       <div class="score">{{ scoreMsg }}</div>
       <div class="btnContainer">
         <button
@@ -418,7 +417,7 @@ export default {
 }
 
 .progressBar {
-  margin: 20px 0px 50px 0px;
+  margin: 20px 45px 50px 45px;
 }
 
 .circles {
@@ -459,12 +458,14 @@ export default {
   text-align: left;
 }
 
-.btn.next, .btn.submit {
-  float: right;
+.passScoreContainer {
+  display: block;
 }
 
-.btn.previous {
-  float: left;
+.btnContainer {
+  margin: -70px 30px 50px 30px;
+  display: flex;
+  justify-content: space-evenly;
 }
 
 .btn {
@@ -493,17 +494,11 @@ export default {
   font-weight: 600;
   width: 400px;
   align-self: center;
-  text-align: left;
+  text-align: center;
 }
 
 input[type=radio]:checked {
   background-color: #16D2AA;
-}
-
-.btnContainer {
-  display: flex;
-  justify-content: flex-end;
-  margin: -70px 75px 50px 75px;
 }
 
 .possibleAnswers {
@@ -535,6 +530,10 @@ label {
   margin-top: 75px;
 }
 
+.passed-msg {
+  margin-bottom: 35px;
+}
+
 .review {
   width: 600px;
   align-self: center;
@@ -544,10 +543,6 @@ label {
   border-bottom: 0.5px solid #CCCCCF;
   padding: 20px;
   margin: 0px;
-}
-
-.passScoreContainer {
-  display: block;
 }
 
 </style>
