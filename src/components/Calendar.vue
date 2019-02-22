@@ -71,11 +71,12 @@ export default {
     },
   },
   beforeMount() {
+    var originalAvailability = {};
     if (!this.user.hasSchedule) {
       CalendarService.initAvailability(this, this.user._id);
     }
     CalendarService.getAvailability(this, this.user._id).then((availability) => {
-      this.availability = availability;
+      originalAvailability = availability;
     });
     var userTimezone = '';
     CalendarService.getTimezone(this, this.user._id).then((tz) => {
@@ -88,7 +89,7 @@ export default {
       var estNow = moment.tz('America/New_York').hour();
       var userNow = moment.tz(this.selectedTz).hour();
       var offset =  userNow - estNow;
-      this.availability = this.convertAvailability(offset);
+      this.availability = this.convertAvailability(originalAvailability, offset);
     });
   },
   methods: {
@@ -145,7 +146,7 @@ export default {
       }
       return hour + 'a';
     },
-    convertAvailability(offset) {
+    convertAvailability(availability, offset) {
       const succWeekday = {
         'Sunday': 'Monday',
         'Monday': 'Tuesday',
@@ -165,17 +166,17 @@ export default {
         'Saturday': 'Friday'
       }
       var convertedAvailability = {};
-      for (const day in this.availability) {
-        const times = this.availability[day];
+      for (const day in availability) {
+        const times = availability[day];
         convertedAvailability[day] = {};
         for (const time in times) {
           convertedAvailability[day][time] = false;
         }
       }
-      for (const day in this.availability) {
-        const times = this.availability[day];
+      for (const day in availability) {
+        const times = availability[day];
         for (const time in times) {
-          if (this.availability[day][time] == true) {
+          if (availability[day][time] == true) {
             let newDay = day;
             let numericHour = this.convertAMPMtoTwentyFourHrs(time);
             let newHour = numericHour + offset;
@@ -197,7 +198,7 @@ export default {
       var userNow = moment.tz(this.selectedTz).hour();
       var offset = estNow - userNow;
       CalendarService.updateTimezone(this, this.user._id, this.selectedTz);
-      CalendarService.updateAvailability(this, this.user._id, this.convertAvailability(offset));
+      CalendarService.updateAvailability(this, this.user._id, this.convertAvailability(this.availability, offset));
     },
   },
 };
