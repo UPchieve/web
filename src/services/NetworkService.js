@@ -73,6 +73,12 @@ export default {
   updateAvailability(context, data) {
     return context.$http.post(`${API_ROOT}/calendar/save`, data).then(this._successHandler, this._errorHandler);
   },
+  getTimezone(context, data) {
+    return context.$http.post(`${API_ROOT}/calendar/tz/get`, data).then(this._successHandler, this._errorHandler);
+  },
+  updateTimezone(context, data) {
+    return context.$http.post(`${API_ROOT}/calendar/tz/save`, data).then(this._successHandler, this._errorHandler);
+  },
   feedback(context, data) {
     return context.$http.post(`${API_ROOT}/feedback`, data).then(this._successHandler, this._errorHandler);
   },
