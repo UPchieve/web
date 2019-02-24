@@ -37,7 +37,7 @@ export default {
 
         this.currentSession.sessionId = sessionId;
 
-        console.log(sessionId);
+        console.log(`newSession: ${sessionId}`);
         if (sessionId) {
           router.replace(`/session/${sessionType}/${sessionSubTopic}/${sessionId}`);
         }
@@ -56,7 +56,7 @@ export default {
 
       this.currentSession.sessionId = sessionId;
 
-      console.log(sessionId);
+      console.log(`useExistingSession: ${sessionId}`);
       if (!sessionId) {
         router.replace('/');
       }

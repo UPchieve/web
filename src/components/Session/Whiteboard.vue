@@ -132,7 +132,7 @@ let currentState = '';
 
 let imageList = [];
 let imageData;
-const App = {};
+window.App = {};
 
 
 // const RESET_SCREEN_EVENT = 'reset';
@@ -230,6 +230,7 @@ export default {
     emitEnd() {
       this.$socket.emit('end', {
         sessionId: this.currentSession.sessionId,
+        whiteboardUrl: App.canvas.toDataURL(),
       });
     },
     emitDragStart(data) {

@@ -116,6 +116,11 @@ export default {
       participants[data.student._id] = data.student;
       participants[data.volunteer._id] = data.volunteer;
 
+      // re-render whiteboard canvas
+      console.log('loading saved canvas');
+      let img = new Image();
+      img.src = data.whiteboardUrl;
+      img.onload = () => window.App.ctx.drawImage(img, 0, 0);
 
       let messages = data.messages.map(message => {
         let { picture } = message;
