@@ -365,7 +365,7 @@ export default {
         this.emitEnd();
       }
     },
-    draw() {
+    draw(event) {
       if (!SERVER_DRAWING) {
         if (currentState === ('DRAWING') || currentState === 'ERASING') {
           if (!App.canvas.isDrawing) {
