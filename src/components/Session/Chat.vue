@@ -111,7 +111,35 @@ export default {
     'session-change'(data) { // {1}
       SessionService.currentSession.sessionId = data._id;
       SessionService.currentSession.data = data;
+
+      let participants = {};
+      participants[data.student._id] = data.student;
+      participants[data.volunteer._id] = data.volunteer;
+
+
+      let messages = data.messages.map(message => {
+        let { picture } = message;
+        message.user = participants[message.user]
+
+        if (!picture || picture === '') {
+          picture = (message.isVolunteer) ? VOLUNTEER_AVATAR_URL : STUDENT_AVATAR_URL
+        }
+
+        return {
+          contents: message.contents,
+          name: message.user.firstname,
+          email: message.user.email,
+          isVolunteer: message.user.isVolunteer,
+          avatarStyle: {
+            backgroundImage: `url(${picture})`,
+          },
+          time: moment(message.time).format('h:mm a'),
+        }
+      });
+
+      this.messages = messages;
     },
+
     messageSend(data) { // {1}
       let { picture } = data;
       if (!picture || picture === '') {
