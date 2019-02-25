@@ -112,34 +112,37 @@ export default {
       SessionService.currentSession.sessionId = data._id;
       SessionService.currentSession.data = data;
 
-      let participants = {};
-      participants[data.student._id] = data.student;
-      participants[data.volunteer._id] = data.volunteer;
-
-      // re-render whiteboard canvas
-      console.log('loading saved canvas');
-      let img = new Image();
+      // re-render the session's persisted whiteboard canvas
+      const img = new Image();
       img.src = data.whiteboardUrl;
       img.onload = () => window.App.ctx.drawImage(img, 0, 0);
 
-      let messages = data.messages.map(message => {
+      // index session's participants by user id
+      const participants = {};
+      participants[data.student._id] = data.student;
+      participants[data.volunteer._id] = data.volunteer;
+
+      // re-load the session's persisted messages
+      const messages = data.messages.map(message => {
         let { picture } = message;
-        message.user = participants[message.user]
+        const user = participants[message.user];
 
         if (!picture || picture === '') {
-          picture = (message.isVolunteer) ? VOLUNTEER_AVATAR_URL : STUDENT_AVATAR_URL
+          picture = (user.isVolunteer)
+                  ? VOLUNTEER_AVATAR_URL
+                  : STUDENT_AVATAR_URL;
         }
 
         return {
           contents: message.contents,
-          name: message.user.firstname,
-          email: message.user.email,
-          isVolunteer: message.user.isVolunteer,
+          name: user.firstname,
+          email: user.email,
+          isVolunteer: user.isVolunteer,
           avatarStyle: {
             backgroundImage: `url(${picture})`,
           },
           time: moment(message.time).format('h:mm a'),
-        }
+        };
       });
 
       this.messages = messages;
