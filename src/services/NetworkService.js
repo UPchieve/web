@@ -46,6 +46,9 @@ export default {
   newSession(context, data) {
     return context.$http.post(`${API_ROOT}/session/new`, data).then(this._successHandler, this._errorHandler);
   },
+  endSession(context, data) {
+    return context.$http.post(`${API_ROOT}/session/end`, data).then(this._successHandler, this._errorHandler);
+  },
   checkSession(context, data) {
     return context.$http.post(`${API_ROOT}/session/check`, data).then(this._successHandler, this._errorHandler);
   },

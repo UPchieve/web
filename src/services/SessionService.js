@@ -21,12 +21,21 @@ export default {
     return session.volunteer;
   },
 
-  endSession(options = {}) {
-    this.currentSession.sessionId = null;
-    this.currentSession.data = {};
-    if (!options.skipRoute) {
-      router.replace('/feedback');
-    }
+  endSession(context, sessionId, options = {}) {
+    return NetworkService
+      .endSession(context, { sessionId })
+      .then(res => {
+        const data = res.data || {};
+        const { sessionId } = data;
+
+        console.log(`ended session: ${sessionId}`);
+        this.currentSession.sessionId = null;
+        this.currentSession.data = {};
+
+        if (!options.skipRoute) {
+          router.replace('/feedback');
+        }
+      })
   },
 
   newSession(context, sessionType, sessionSubTopic) {
