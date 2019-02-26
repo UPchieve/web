@@ -13,7 +13,7 @@ export default {
 
   getPartner() {
     const user = UserService.getUser();
-    const session = this.currentSession.data;
+    const session = this.currentSession.data || {};
 
     if (user.isVolunteer) {
       return session.student;
@@ -31,6 +31,7 @@ export default {
         console.log(`ended session: ${sessionId}`);
         this.currentSession.sessionId = null;
         this.currentSession.data = {};
+        localStorage.removeItem('currentSessionPath');
 
         if (!options.skipRoute) {
           router.replace('/feedback');
@@ -46,11 +47,11 @@ export default {
 
         this.currentSession.sessionId = sessionId;
 
-        console.log(sessionId);
         if (sessionId) {
-          router.replace(`/session/${sessionType}/${sessionSubTopic}/${sessionId}`);
-        }
-        else {
+          const path = `/session/${sessionType}/${sessionSubTopic}/${sessionId}`;
+          localStorage.setItem('currentSessionPath', path);
+          router.replace(path);
+        } else {
           router.replace('/');
         }
 
@@ -73,4 +74,23 @@ export default {
       return sessionId;
     });
   },
+
+  getCurrentSession(context, user) {
+    return NetworkService
+      .currentSession(context, { userId: user._id })
+      .then(resp => {
+        const { sessionId, data } = resp.data || {};
+        const { type, subTopic } = data
+
+        this.currentSession.sessionId = sessionId
+        this.currentSession.data = data
+
+        if (type && subTopic && sessionId) {
+          const path = `/session/${type}/${subTopic}/${sessionId}`
+          localStorage.setItem('currentSessionPath', path);
+        } else {
+          localStorage.removeItem('currentSessionPath');
+	}
+      });
+  }
 };

@@ -22,9 +22,12 @@
         <div class="col-lg-6 help">
           <div class = "help-container">
             <h2>You can get help from an Academic Coach.</h2>
-            <button
-              class="btn getHelp"
-              @click.prevent="getHelp()">Get help now</button>
+	    <button v-if="!hasActiveSession()" class="btn getHelp" @click.prevent="getHelp()">
+	      Get help now
+	    </button>
+	    <button v-if="hasActiveSession()" class="btn getHelp" @click.prevent="rejoinHelpSession()">
+	      Rejoin your coaching session
+	    </button>
             <div
               v-if="showHelpPopUp"
               :style="popUpStyle"
@@ -93,6 +96,7 @@
 <script>
 
 import UserService from 'src/services/UserService';
+import SessionService from 'src/services/SessionService';
 
 import ListSessions from 'src/components/ListSessions';
 
@@ -102,6 +106,8 @@ export default {
   },
   data() {
     const user = UserService.getUser() || {};
+    SessionService.getCurrentSession(this, user);
+
     const subtopics = {
       math: ['Algebra', 'Geometry', 'Trigonometry', 'Precalculus', 'Calculus'],
       esl: ['General Help'],
@@ -126,6 +132,14 @@ export default {
     };
   },
   methods: {
+    hasActiveSession() {
+      return localStorage.getItem('currentSessionPath');
+    },
+    rejoinHelpSession() {
+      const sessionPath = localStorage.getItem('currentSessionPath');
+      window.location.hash = `#${sessionPath}`;
+      window.location.reload(true);
+    },
     getHelp() {
       this.popUpStyle = {
         display: 'flex',

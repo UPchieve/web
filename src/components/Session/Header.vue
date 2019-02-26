@@ -89,11 +89,12 @@ export default {
       ) {
         volunteerId = SessionService.currentSession.data.volunteer._id;
       }
+
       const result = window.confirm("Do you really want to end the session?");
       if (result) {
         if (volunteerId) {
           this.$socket.disconnect();
-          SessionService.endSession({ skipRoute: true });
+	  SessionService.endSession(this, sessionId, { skipRoute: true });
           const url =
             "/feedback/" +
             sessionId +
@@ -105,6 +106,7 @@ export default {
             volunteerId;
           router.replace(url);
         } else {
+	  SessionService.endSession(this, sessionId, { skipRoute: true });
           router.replace("/");
         }
       }
