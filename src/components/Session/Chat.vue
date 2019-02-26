@@ -118,9 +118,12 @@ export default {
       img.onload = () => window.App.ctx.drawImage(img, 0, 0);
 
       // index session's participants by user id
+      const studentId = (data.student || {})._id;
+      const volunteerId = (data.volunteer || {})._id;
+
       const participants = {};
-      participants[data.student._id] = data.student;
-      participants[data.volunteer._id] = data.volunteer;
+      participants[studentId] = data.student;
+      participants[volunteerId] = data.volunteer;
 
       // re-load the session's persisted messages
       const messages = data.messages.map(message => {
