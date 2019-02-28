@@ -82,10 +82,17 @@
           </div>
         </div>
         <div class="col-lg-6 help">
-          <div class = "help-container">
+          <div class="help-container">
             <h2>You are ready to help!</h2>
-            <p> Only students who are waiting for a volunteer will show up below.</p>
-            <list-sessions/>
+            <div v-if="hasActiveSession()">
+              <button class="btn getHelp" @click.prevent="rejoinHelpSession()">
+                Rejoin your coaching session
+              </button>
+            </div>
+            <div v-if="!hasActiveSession()">
+              <p> Only students who are waiting for a volunteer will show up below.</p>
+              <list-sessions/>
+            </div>
           </div>
         </div>
       </div>

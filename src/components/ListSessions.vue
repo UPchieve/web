@@ -43,8 +43,11 @@ export default {
   },
   methods: {
     gotoSession(session) {
-      console.log(session._id);
-      router.push(`/session/${session.type}/${session.subTopic}/${session._id}`);
+      const path = `/session/${session.type}/${session.subTopic}/${session._id}`;
+      localStorage.setItem('currentSessionPath', path);
+      console.log(`joining session: ${path}`);
+      window.location.hash = `#${path}`;
+      window.location.reload(true);
     },
   },
   sockets: {
