@@ -143,9 +143,10 @@ export default {
       return localStorage.getItem('currentSessionPath');
     },
     rejoinHelpSession() {
-      const sessionPath = localStorage.getItem('currentSessionPath');
-      window.location.hash = `#${sessionPath}`;
-      window.location.reload(true);
+      const path = localStorage.getItem('currentSessionPath');
+      window.location.hash = `#${path}`;
+      window.location.reload();
+      console.log(`rejoining session: ${path}`);
     },
     getHelp() {
       this.popUpStyle = {

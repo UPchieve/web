@@ -79,20 +79,27 @@ export default {
 
   getCurrentSession(context, user) {
     return NetworkService
-      .currentSession(context, { userId: user._id })
-      .then(resp => {
-        const { sessionId, data } = resp.data || {};
-        const { type, subTopic } = data
+      .currentSession(context, { user_id: user._id, is_volunteer: user.isVolunteer })
+      .then((resp) => {
+        if (resp.data.err) {
+          this.currentSession.sessionId = null;
+          this.currentSession.data = {};
+          console.log('no active session found')
 
-        this.currentSession.sessionId = sessionId
-        this.currentSession.data = data
+          localStorage.removeItem('currentSessionPath');
+          return;
+        }
+
+        const { sessionId, data } = resp.data || {};
+        const { type, subTopic } = data;
 
         if (type && subTopic && sessionId) {
-          const path = `/session/${type}/${subTopic}/${sessionId}`
+          this.currentSession.sessionId = sessionId;
+          this.currentSession.data = data;
+
+          const path = `/session/${type}/${subTopic}/${sessionId}`;
           localStorage.setItem('currentSessionPath', path);
-        } else {
-          localStorage.removeItem('currentSessionPath');
-	}
+        }
       });
   }
 };
