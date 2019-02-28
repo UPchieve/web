@@ -22,12 +22,12 @@
         <div class="col-lg-6 help">
           <div class = "help-container">
             <h2>You can get help from an Academic Coach.</h2>
-	    <button v-if="!hasActiveSession()" class="btn getHelp" @click.prevent="getHelp()">
-	      Get help now
-	    </button>
-	    <button v-if="hasActiveSession()" class="btn getHelp" @click.prevent="rejoinHelpSession()">
-	      Rejoin your coaching session
-	    </button>
+            <button v-if="!hasActiveSession()" class="btn getHelp" @click.prevent="getHelp()">
+              Get help now
+            </button>
+            <button v-if="hasActiveSession()" class="btn getHelp" @click.prevent="rejoinHelpSession()">
+              Rejoin your coaching session
+            </button>
             <div
               v-if="showHelpPopUp"
               :style="popUpStyle"
