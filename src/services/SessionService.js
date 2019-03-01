@@ -22,6 +22,8 @@ export default {
   },
 
   endSession(context, sessionId, options = {}) {
+    localStorage.removeItem('currentSessionPath');
+
     return NetworkService
       .endSession(context, { sessionId })
       .then(res => {
@@ -31,7 +33,6 @@ export default {
         console.log(`ended session: ${sessionId}`);
         this.currentSession.sessionId = null;
         this.currentSession.data = {};
-        localStorage.removeItem('currentSessionPath');
 
         if (!options.skipRoute) {
           router.replace('/feedback');
