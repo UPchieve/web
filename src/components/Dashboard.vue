@@ -144,9 +144,15 @@ export default {
     },
     rejoinHelpSession() {
       const path = localStorage.getItem('currentSessionPath');
-      window.location.hash = `#${path}`;
-      window.location.reload();
-      console.log(`rejoining session: ${path}`);
+      if (path) {
+        window.location.hash = `#${path}`;
+        window.location.reload();
+        console.log(`rejoining session: ${path}`);
+      } else {
+        console.log(`session terminated`);
+        window.location.hash = '';
+        window.location.reload();
+      }
     },
     getHelp() {
       this.popUpStyle = {
