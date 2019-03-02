@@ -22,9 +22,12 @@
         <div class="col-lg-6 help">
           <div class = "help-container">
             <h2>You can get help from an Academic Coach.</h2>
-            <button
-              class="btn getHelp"
-              @click.prevent="getHelp()">Get help now</button>
+            <button v-if="!hasActiveSession()" class="btn getHelp" @click.prevent="getHelp()">
+              Get help now
+            </button>
+            <button v-if="hasActiveSession()" class="btn getHelp" @click.prevent="rejoinHelpSession()">
+              Rejoin your coaching session
+            </button>
             <div
               v-if="showHelpPopUp"
               :style="popUpStyle"
@@ -79,10 +82,17 @@
           </div>
         </div>
         <div class="col-lg-6 help">
-          <div class = "help-container">
+          <div class="help-container">
             <h2>You are ready to help!</h2>
-            <p> Only students who are waiting for a volunteer will show up below.</p>
-            <list-sessions/>
+            <div v-if="hasActiveSession()">
+              <button class="btn getHelp" @click.prevent="rejoinHelpSession()">
+                Rejoin your coaching session
+              </button>
+            </div>
+            <div v-if="!hasActiveSession()">
+              <p> Only students who are waiting for a volunteer will show up below.</p>
+              <list-sessions/>
+            </div>
           </div>
         </div>
       </div>
@@ -93,6 +103,7 @@
 <script>
 
 import UserService from 'src/services/UserService';
+import SessionService from 'src/services/SessionService';
 
 import ListSessions from 'src/components/ListSessions';
 
@@ -102,6 +113,8 @@ export default {
   },
   data() {
     const user = UserService.getUser() || {};
+    SessionService.getCurrentSession(this, user);
+
     const subtopics = {
       math: ['Algebra', 'Geometry', 'Trigonometry', 'Precalculus', 'Calculus'],
       esl: ['General Help'],
@@ -126,6 +139,21 @@ export default {
     };
   },
   methods: {
+    hasActiveSession() {
+      return localStorage.getItem('currentSessionPath');
+    },
+    rejoinHelpSession() {
+      const path = localStorage.getItem('currentSessionPath');
+      if (path) {
+        window.location.hash = `#${path}`;
+        window.location.reload();
+        console.log(`rejoining session: ${path}`);
+      } else {
+        console.log(`session terminated`);
+        window.location.hash = '';
+        window.location.reload();
+      }
+    },
     getHelp() {
       this.popUpStyle = {
         display: 'flex',

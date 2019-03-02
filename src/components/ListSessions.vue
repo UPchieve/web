@@ -43,17 +43,24 @@ export default {
   },
   methods: {
     gotoSession(session) {
-      console.log(session._id);
-      router.push(`/session/${session.type}/${session.subTopic}/${session._id}`);
+      const {type, subTopic, _id} = session;
+
+      if (type && subTopic && _id) {
+        const path = `/session/${type}/${subTopic}/${_id}`;
+        localStorage.setItem('currentSessionPath', path);
+        window.location.hash = `#${path}`;
+        window.location.reload();
+        console.log(`joining session: ${path}`);
+      } else {
+        localStorage.removeItem('currentSessionPath');
+        console.error(`Could not rejoin session`);
+      }
     },
   },
   sockets: {
     sessions(sessions) {
       const results = [];
-      const socketSessions = sessions.filter((session) => {
-        console.log(session);
-        return !session.volunteer;
-      });
+      const socketSessions = sessions.filter(session => !session.volunteer);
 
       for (let i = 0; i < socketSessions.length; i++) {
         const currentSession = socketSessions[i];
