@@ -66,9 +66,9 @@ h1::before {
   content: "";
   display: inline-block;;
   width: 100px;
-  height: 50px;
+  height: 43px;
   background-image: url('../assets/logo-01.svg');
-  background-size: 100px 50px;
+  background-size: 100px 43px;
   top: 0;
   left: 0;
 }
