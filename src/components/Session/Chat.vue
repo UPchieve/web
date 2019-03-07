@@ -98,13 +98,13 @@ export default {
         ModerationService.checkIfMessageIsClean(this, message).then((isClean) => {
           if (isClean) {
             this.showNewMessage(message);
-          } 
+          }
           else {
             this.showModerationWarning();
           }
         });
       }
-    },    
+    },
   },
 
   sockets: {
@@ -128,7 +128,7 @@ export default {
       // re-load the session's persisted messages
       const messages = data.messages.map(message => {
         let { picture } = message;
-        const user = participants[message.user];
+        const user = participants[message.user] || {};
 
         if (!picture || picture === '') {
           picture = (user.isVolunteer)
@@ -233,7 +233,7 @@ export default {
   top: 50%;
   transform: translateY(-50%);
 }
-.chat-warning--slide-enter, 
+.chat-warning--slide-enter,
 .chat-warning--slide-leave-to {
   top: -64px;
 }
