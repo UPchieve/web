@@ -46,7 +46,7 @@ module.exports = {
         include: projectRoot,
         exclude: /node_modules/
       }
-    ],*/
+    ], */
     loaders: [
       {
         test: /\.vue$/,

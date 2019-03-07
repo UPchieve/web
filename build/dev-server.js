@@ -5,7 +5,7 @@ var path = require('path')
 var express = require('express')
 var webpack = require('webpack')
 var opn = require('opn')
-//var io = require('socket.io').listen(8080);
+// var io = require('socket.io').listen(8080);
 
 var proxyMiddleware = require('http-proxy-middleware')
 var webpackConfig = process.env.NODE_ENV === 'testing'
@@ -63,10 +63,8 @@ var staticPath = path.posix.join(config.dev.assetsPublicPath, config.dev.assetsS
 app.use(staticPath, express.static('./static'))
 
 module.exports = app.listen(port, function (err) {
+  /* io.sockets.on('connection', function(socket) {
 
-
-  /*io.sockets.on('connection', function(socket) {
-    
     socket.on('drawClick', function(data) {
       socket.broadcast.emit('draw', {
         x: data.x,
