@@ -1,22 +1,22 @@
-import NetworkService from './NetworkService';
+import NetworkService from './NetworkService'
 
 export default {
   data: {
     registrationCode: null,
-    validRegistrationCode: false,
+    validRegistrationCode: false
   },
 
-  checkCode(context, code) {
+  checkCode (context, code) {
     return NetworkService.checkCode(context, { code }).then((res) => {
-      const data = res.data || {};
+      const data = res.data || {}
 
-      this.data.validRegistrationCode = data.valid === true;
+      this.data.validRegistrationCode = data.valid === true
 
       if (data.valid) {
-        this.data.registrationCode = code;
+        this.data.registrationCode = code
       }
 
-      return this.data.validRegistrationCode;
-    });
-  },
-};
+      return this.data.validRegistrationCode
+    })
+  }
+}
