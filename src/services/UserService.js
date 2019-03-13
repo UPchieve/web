@@ -33,19 +33,22 @@ export default {
     return OnboardingService.status
   },
   setProfile (context, data, redirect) {
-    NetworkService.setProfile(context, data).then((res) => {
-      if (res.data) {
-        AuthService.storeUser(res.data.user)
-        context.msg = 'Set!'
-      } else {
-        throw new Error()
+    NetworkService.setProfile(context, data).then(
+      res => {
+        if (res.data) {
+          AuthService.storeUser(res.data.user)
+          context.msg = 'Set!'
+        } else {
+          throw new Error()
+        }
+        if (redirect) {
+          router.push(redirect)
+        }
+      },
+      res => {
+        context.msg = 'Error occurred'
+        console.log(res)
       }
-      if (redirect) {
-        router.push(redirect)
-      }
-    }, (res) => {
-      context.msg = 'Error occurred'
-      console.log(res)
-    })
+    )
   }
 }

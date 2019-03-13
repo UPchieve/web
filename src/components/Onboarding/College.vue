@@ -4,10 +4,7 @@
       <h2>{{ user.isVolunteer ? 'Volunteer' : 'Student' }} Profile</h2>
     </div>
 
-    <div
-      v-if="error"
-      class="alert alert-danger"
-      role="alert">{{ error }}</div>
+    <div v-if="error" class="alert alert-danger" role="alert">{{ error }}</div>
 
     <div class="row form-group">
       <p>GPA</p>
@@ -18,25 +15,31 @@
             type="text"
             class="form-control"
             required
-            autofocus>
+            autofocus
+          />
         </div>
       </div>
     </div>
 
     <div class="row form-group">
-      <p>Please list all colleges and universities you are considering apply to.</p>
+      <p>
+        Please list all colleges and universities you are considering apply to.
+      </p>
       <div class="row">
         <div class="col-sm-12">
           <textarea
             v-model="user.collegeApplicationsText"
-            class="form-control"/>
+            class="form-control"
+          />
         </div>
       </div>
     </div>
 
     <div class="row form-group">
       <p>Common College Documents Checklist</p>
-      <p class="sub">Please check all that you have currently completed or obtained</p>
+      <p class="sub">
+        Please check all that you have currently completed or obtained
+      </p>
       <div class="row">
         <div class="col-sm-6">
           <div class="checkbox">
@@ -44,7 +47,8 @@
               <input
                 v-model="user.commonCollegeDocs"
                 type="checkbox"
-                value="highschoolTranscript">
+                value="highschoolTranscript"
+              />
               High School Transcript
             </label>
           </div>
@@ -53,7 +57,8 @@
               <input
                 v-model="user.commonCollegeDocs"
                 type="checkbox"
-                value="commonApplication">
+                value="commonApplication"
+              />
               Common Application
             </label>
           </div>
@@ -62,7 +67,8 @@
               <input
                 v-model="user.commonCollegeDocs"
                 type="checkbox"
-                value="personalStatement">
+                value="personalStatement"
+              />
               Personal Statement
             </label>
           </div>
@@ -71,7 +77,8 @@
               <input
                 v-model="user.commonCollegeDocs"
                 type="checkbox"
-                value="resume">
+                value="resume"
+              />
               Resume
             </label>
           </div>
@@ -82,7 +89,8 @@
               <input
                 v-model="user.commonCollegeDocs"
                 type="checkbox"
-                value="testScores">
+                value="testScores"
+              />
               SAT / ACT Scores
             </label>
           </div>
@@ -91,7 +99,8 @@
               <input
                 v-model="user.commonCollegeDocs"
                 type="checkbox"
-                value="lettersRecommendation">
+                value="lettersRecommendation"
+              />
               Letters of Recommendation
             </label>
           </div>
@@ -100,7 +109,8 @@
               <input
                 v-model="user.commonCollegeDocs"
                 type="checkbox"
-                value="fafsa">
+                value="fafsa"
+              />
               FAFSA
             </label>
           </div>
@@ -109,7 +119,8 @@
               <input
                 v-model="user.commonCollegeDocs"
                 type="checkbox"
-                value="finAidProfile">
+                value="finAidProfile"
+              />
               CSS / Financial Aid Profile
             </label>
           </div>
@@ -119,34 +130,37 @@
 
     <div class="row form-group">
       <p>Academic Interests</p>
-      <p class="sub">Please tell us about your interests! For example, your favorite class, a new topic you want to study, a cause you are passionate about, a professional hobby, an intended major/minor, etc.</p>
+      <p class="sub">
+        Please tell us about your interests! For example, your favorite class, a
+        new topic you want to study, a cause you are passionate about, a
+        professional hobby, an intended major/minor, etc.
+      </p>
       <div class="row">
         <div class="col-sm-12">
-          <textarea
-            v-model="user.academicInterestsText"
-            class="form-control"/>
+          <textarea v-model="user.academicInterestsText" class="form-control" />
         </div>
       </div>
     </div>
 
     <div class="row form-group">
-      <p>Please list all your SAT and/or ACT Scores &amp; when they were taken</p>
+      <p>
+        Please list all your SAT and/or ACT Scores &amp; when they were taken
+      </p>
       <div class="row">
         <div class="col-sm-12">
-          <textarea
-            v-model="user.testScoresText"
-            class="form-control"/>
+          <textarea v-model="user.testScoresText" class="form-control" />
         </div>
       </div>
     </div>
 
     <div class="row form-group">
-      <p>Have you taken any advanced (honors, AP, IB, college-level) courses? If so, please list them and your AP exam scores if applicable</p>
+      <p>
+        Have you taken any advanced (honors, AP, IB, college-level) courses? If
+        so, please list them and your AP exam scores if applicable
+      </p>
       <div class="row">
         <div class="col-sm-12">
-          <textarea
-            v-model="user.advancedCoursesText"
-            class="form-control"/>
+          <textarea v-model="user.advancedCoursesText" class="form-control" />
         </div>
       </div>
     </div>
@@ -157,52 +171,56 @@
         <div class="col-sm-12">
           <textarea
             v-model="user.extracurricularActivitesText"
-            class="form-control"/>
+            class="form-control"
+          />
         </div>
       </div>
     </div>
 
-    <button
-      class="btn btn-lg btn-primary btn-block back"
-      @click.prevent="back">Back</button>
+    <button class="btn btn-lg btn-primary btn-block back" @click.prevent="back">
+      Back
+    </button>
     <button
       class="btn btn-lg btn-primary btn-block next"
       type="submit"
-      @click.prevent="submitProfile">{{ buttonMsg }}</button>
+      @click.prevent="submitProfile"
+    >
+      {{ buttonMsg }}
+    </button>
   </div>
 </template>
 
 <script>
-import UserService from 'src/services/UserService';
+import UserService from 'src/services/UserService'
 
 export default {
-  data() {
+  data () {
     return {
       user: UserService.getUser(),
       buttonMsg: 'Next',
-      error: '',
-    };
+      error: ''
+    }
   },
   methods: {
-    skipOnboarding() {
-      this.$router.push('/');
+    skipOnboarding () {
+      this.$router.push('/')
     },
-    back() {
-      this.$router.push('/onboarding/academic');
+    back () {
+      this.$router.push('/onboarding/academic')
     },
-    submitProfile() {
-      this.buttonMsg = 'Updating...';
-      UserService.setProfile(this, this.user, '/');
-    },
-  },
-};
+    submitProfile () {
+      this.buttonMsg = 'Updating...'
+      UserService.setProfile(this, this.user, '/')
+    }
+  }
+}
 </script>
 
 <style scoped>
 .profile-header {
   height: 100px;
   margin: 0;
-  background-color: #1855D1;
+  background-color: #1855d1;
   padding-left: 30px;
   margin-bottom: 50px;
 }
@@ -227,7 +245,7 @@ p {
 p.sub {
   font-size: 12px;
   font-weight: 300;
-  color: #73737A;
+  color: #73737a;
 }
 
 .form-group {
@@ -280,7 +298,7 @@ textarea.form-control:focus {
 
 .btn {
   width: 190px;
-  background-color: #16D2AA;
+  background-color: #16d2aa;
   border: none;
   font-weight: 600;
   margin-left: 50px;

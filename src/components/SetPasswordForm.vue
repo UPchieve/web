@@ -8,62 +8,72 @@
       type="text"
       class="form-control"
       required
-      autofocus>
+      autofocus
+    />
     <label for="inputPassword">Create a new password</label>
     <input
       id="inputPassword"
       v-model="credentials.password"
       type="password"
       class="form-control"
-      required>
+      required
+    />
     <label for="inputPassword">Reenter your new password</label>
     <input
       id="inputPassword"
       v-model="credentials.newpassword"
       type="password"
       class="form-control"
-      required>
-    <p class="password-guidelines">It must contain lowercase and uppercase letters, numbers, and at least 8 characters.</p>
+      required
+    />
+    <p class="password-guidelines">
+      It must contain lowercase and uppercase letters, numbers, and at least 8
+      characters.
+    </p>
     <button
       class="btn btn-lg btn-primary btn-block"
       type="submit"
-      @click.prevent="submit()">Reset Password</button>
+      @click.prevent="submit()"
+    >
+      Reset Password
+    </button>
     {{ msg }}
   </form>
 </template>
 
 <script>
-
-import AuthService from '../services/AuthService';
+import AuthService from '../services/AuthService'
 
 export default {
-  data() {
+  data () {
     return {
       msg: '',
       credentials: {
         token: '',
         email: '',
         password: '',
-        newpassword: '',
-      },
-    };
+        newpassword: ''
+      }
+    }
   },
   methods: {
-    submit() {
+    submit () {
       AuthService.confirmReset(this, {
         token: this.$route.params.token,
         email: this.credentials.email,
         password: this.credentials.password,
-        newpassword: this.credentials.newpassword,
-      }).then(() => {
-        this.showingSuccess = true;
-      }).catch((err) => {
-        console.log(err);
-        this.msg = err.message;
-      });
-    },
-  },
-};
+        newpassword: this.credentials.newpassword
+      })
+        .then(() => {
+          this.showingSuccess = true
+        })
+        .catch(err => {
+          console.log(err)
+          this.msg = err.message
+        })
+    }
+  }
+}
 </script>
 
 <style scoped>
@@ -89,7 +99,6 @@ h2 {
   border-radius: 0;
 }
 
-
 .form-resetpassword .form-control:focus {
   z-index: 2;
 }
@@ -111,9 +120,9 @@ label {
   box-shadow: none;
 }
 
-button[type="submit"] {
+button[type='submit'] {
   width: 190px;
-  background-color: #16D2AA;
+  background-color: #16d2aa;
   border: none;
   font-weight: 600;
 }
@@ -130,7 +139,7 @@ button[type="submit"] {
 }
 
 .help-text a {
-  color: #16D2AA;
+  color: #16d2aa;
   font-weight: 700;
 }
 </style>

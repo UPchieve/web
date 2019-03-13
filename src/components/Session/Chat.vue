@@ -1,63 +1,56 @@
 <template>
-<div class="chat">
+  <div class="chat">
+    <div class="header">Chat</div>
 
-  <div class="header">Chat</div>
+    <div class="message-box">
+      <transition name="chat-warning--slide">
+        <div class="chat-warning" v-show="chatWarningIsShown">
+          Messages cannot contain personal information
+          <span class="chat-warning__close" @click="hideModerationWarning"
+            >×</span
+          >
+        </div>
+      </transition>
 
-  <div class="message-box">
-
-    <transition name="chat-warning--slide">
-      <div
-        class="chat-warning"
-        v-show="chatWarningIsShown">
-        Messages cannot contain personal information
-        <span
-          class="chat-warning__close"
-          @click="hideModerationWarning">×</span>
-      </div>
-    </transition>
-
-    <div class="messages">
-      <template v-for="(message, index) in messages">
-        <div
-          :key="`message-${index}`"
-          :class="message.email === user.email ? 'left' : 'right'"
-          class="message">
+      <div class="messages">
+        <template v-for="(message, index) in messages">
           <div
-            class="avatar"
-            :style="message.avatarStyle"/>
-          <div class="contents">
-            <div class="name">
-              {{ message.name }}
-            </div>
-            {{ message.contents }}
-            <div class="time">
-              {{ message.time }}
+            :key="`message-${index}`"
+            :class="message.email === user.email ? 'left' : 'right'"
+            class="message"
+          >
+            <div class="avatar" :style="message.avatarStyle" />
+            <div class="contents">
+              <div class="name">
+                {{ message.name }}
+              </div>
+              {{ message.contents }}
+              <div class="time">
+                {{ message.time }}
+              </div>
             </div>
           </div>
-        </div>
-      </template>
+        </template>
+      </div>
     </div>
 
+    <textarea
+      @keyup.enter="sendMessage"
+      v-model="newMessage"
+      placeholder="Type here..."
+    />
   </div>
-
-  <textarea
-    @keyup.enter="sendMessage"
-    v-model="newMessage"
-    placeholder="Type here..."/>
-
-</div>
 </template>
 
-
 <script>
-import moment from 'moment';
+import moment from 'moment'
 
-import UserService from 'src/services/UserService';
-import SessionService from 'src/services/SessionService';
-import ModerationService from 'src/services/ModerationService';
+import UserService from 'src/services/UserService'
+import SessionService from 'src/services/SessionService'
+import ModerationService from 'src/services/ModerationService'
 
-const STUDENT_AVATAR_URL = 'static/defaultavatar3.png';
-const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png';
+const STUDENT_AVATAR_URL = 'static/defaultavatar3.png'
+const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png'
 
 /**
  * @todo {1} Use more descriptive names that comply with the coding standards.
@@ -65,7 +58,7 @@ const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png';
  *           router/sockets.js
  */
 export default {
-  data() {
+  data () {
     return {
       user: UserService.getUser(),
       messages: [],
@@ -76,64 +69,61 @@ export default {
   },
 
   methods: {
-    showModerationWarning() {
-      this.chatWarningIsShown = true;
+    showModerationWarning () {
+      this.chatWarningIsShown = true
     },
-    hideModerationWarning() {
-      this.chatWarningIsShown = false;
+    hideModerationWarning () {
+      this.chatWarningIsShown = false
     },
-    showNewMessage(message) {
+    showNewMessage (message) {
       this.$socket.emit('message', {
         sessionId: this.currentSession.sessionId,
         user: UserService.getUser(),
-        message,
-      });
-      this.newMessage = '';
+        message
+      })
+      this.newMessage = ''
     },
-    sendMessage() {
-      const message = this.newMessage.slice(0,-1);
+    sendMessage () {
+      const message = this.newMessage.slice(0, -1)
 
       if (message != '') {
-
-        ModerationService.checkIfMessageIsClean(this, message).then((isClean) => {
+        ModerationService.checkIfMessageIsClean(this, message).then(isClean => {
           if (isClean) {
-            this.showNewMessage(message);
+            this.showNewMessage(message)
+          } else {
+            this.showModerationWarning()
           }
-          else {
-            this.showModerationWarning();
-          }
-        });
+        })
       }
-    },
+    }
   },
 
   sockets: {
-    'session-change'(data) { // {1}
-      SessionService.currentSession.sessionId = data._id;
-      SessionService.currentSession.data = data;
+    'session-change' (data) {
+      // {1}
+      SessionService.currentSession.sessionId = data._id
+      SessionService.currentSession.data = data
 
       // re-render the session's persisted whiteboard canvas
-      const img = new Image();
-      img.src = data.whiteboardUrl;
-      img.onload = () => window.App.ctx.drawImage(img, 0, 0);
+      const img = new Image()
+      img.src = data.whiteboardUrl
+      img.onload = () => window.App.ctx.drawImage(img, 0, 0)
 
       // index session's participants by user id
-      const studentId = (data.student || {})._id;
-      const volunteerId = (data.volunteer || {})._id;
+      const studentId = (data.student || {})._id
+      const volunteerId = (data.volunteer || {})._id
 
-      const participants = {};
-      participants[studentId] = data.student;
-      participants[volunteerId] = data.volunteer;
+      const participants = {}
+      participants[studentId] = data.student
+      participants[volunteerId] = data.volunteer
 
       // re-load the session's persisted messages
       const messages = data.messages.map(message => {
-        let { picture } = message;
-        const user = participants[message.user] || {};
+        let { picture } = message
+        const user = participants[message.user] || {}
 
         if (!picture || picture === '') {
-          picture = (user.isVolunteer)
-                  ? VOLUNTEER_AVATAR_URL
-                  : STUDENT_AVATAR_URL;
+          picture = user.isVolunteer ? VOLUNTEER_AVATAR_URL : STUDENT_AVATAR_URL
         }
 
         return {
@@ -142,23 +132,23 @@ export default {
           email: user.email,
           isVolunteer: user.isVolunteer,
           avatarStyle: {
-            backgroundImage: `url(${picture})`,
+            backgroundImage: `url(${picture})`
           },
-          time: moment(message.time).format('h:mm a'),
-        };
-      });
+          time: moment(message.time).format('h:mm a')
+        }
+      })
 
-      this.messages = messages;
+      this.messages = messages
     },
 
-    messageSend(data) { // {1}
-      let { picture } = data;
+    messageSend (data) {
+      // {1}
+      let { picture } = data
       if (!picture || picture === '') {
         if (data.isVolunteer === true) {
-          picture = VOLUNTEER_AVATAR_URL;
-        }
-        else {
-          picture = STUDENT_AVATAR_URL;
+          picture = VOLUNTEER_AVATAR_URL
+        } else {
+          picture = STUDENT_AVATAR_URL
         }
       }
       this.messages.push({
@@ -167,21 +157,19 @@ export default {
         email: data.email,
         isVolunteer: data.isVolunteer,
         avatarStyle: {
-          backgroundImage: `url(${picture})`,
+          backgroundImage: `url(${picture})`
         },
-        time: moment(data.time).format('h:mm a'),
-      });
-    },
+        time: moment(data.time).format('h:mm a')
+      })
+    }
   },
 
-  updated() {
-    let msgBox = document.querySelector('.messages');
-    msgBox.scrollTop = msgBox.scrollHeight;
+  updated () {
+    let msgBox = document.querySelector('.messages')
+    msgBox.scrollTop = msgBox.scrollHeight
   }
 }
-
 </script>
-
 
 <style scoped>
 .chat {
@@ -191,8 +179,8 @@ export default {
 
 .header {
   height: 40px;
-  background-color: #1855D1;
-  color: #FFF;
+  background-color: #1855d1;
+  color: #fff;
   font-size: 12px;
   font-weight: 600;
   text-align: left;
@@ -219,7 +207,7 @@ export default {
   left: 0;
   top: 0;
   padding: 12px 52px 12px 12px;
-  transition: all .15s ease-in;
+  transition: all 0.15s ease-in;
   z-index: 1;
 }
 .chat-warning__close {
@@ -270,7 +258,7 @@ export default {
 .time {
   font-size: 12px;
   font-weight: 300;
-  color: #73737A;
+  color: #73737a;
 }
 
 .contents {
@@ -314,6 +302,4 @@ textarea {
 .message-content {
   width: 200px;
 }
-
-
 </style>

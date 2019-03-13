@@ -1,7 +1,5 @@
 <template>
-  <div
-    v-if="!user.isVolunteer"
-    class="submit-question">
+  <div v-if="!user.isVolunteer" class="submit-question">
     <basic-template header-title="Submit a question">
       <message-form
         :modal-container="this"
@@ -20,21 +18,20 @@
   </div>
 </template>
 
-
 <script>
-import UserService from '../../services/UserService';
+import UserService from '../../services/UserService'
 
-import BasicTemplate from '../organisms/BasicTemplate';
-import MessageForm from '../organisms/MessageForm';
-import Modal from '../molecules/Modal';
+import BasicTemplate from '../organisms/BasicTemplate'
+import MessageForm from '../organisms/MessageForm'
+import Modal from '../molecules/Modal'
 
 export default {
   components: {
     BasicTemplate,
     MessageForm,
-    Modal,
+    Modal
   },
-  data() {
+  data () {
     return {
       // This component
       user: UserService.getUser(),
@@ -42,19 +39,19 @@ export default {
       showModal: false,
       modalBtnLabels: [],
       modalOptions: {},
-      modalClickHandlers: {},
-    };
-  },
-};
+      modalClickHandlers: {}
+    }
+  }
+}
 </script>
-
 
 <style>
 /*
 * @notes
 * [1] Refactoring candidate: this should be in the global container
 */
-.submit-question { /*[1]*/
+.submit-question {
+  /*[1]*/
   height: 100vh;
   position: relative;
 }

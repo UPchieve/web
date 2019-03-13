@@ -40,18 +40,30 @@ export default {
     let requiredFields
     if (user.isVolunteer) {
       requiredFields = [
-        'firstname', 'lastname', 'birthdate', 'gender', 'race',
-        'phone', 'referred', 'favoriteAcademicSubject', 'college'
+        'firstname',
+        'lastname',
+        'birthdate',
+        'gender',
+        'race',
+        'phone',
+        'referred',
+        'favoriteAcademicSubject',
+        'college'
       ]
     } else {
       requiredFields = [
-        'firstname', 'lastname', 'birthdate', 'gender', 'race', 'expectedGraduation'
+        'firstname',
+        'lastname',
+        'birthdate',
+        'gender',
+        'race',
+        'expectedGraduation'
       ]
     }
 
     // Test if each required field is present, return true when field fails to
     // terminate iteration
-    const hasInvalidField = requiredFields.some((fieldName) => {
+    const hasInvalidField = requiredFields.some(fieldName => {
       const field = user[fieldName]
       if (field === null || field === undefined) {
         return true // Field must be non-null
@@ -79,7 +91,7 @@ export default {
 
     let incompleteStepRoute
 
-    Object.keys(mapOfRoutesToTheirValidator).some((route) => {
+    Object.keys(mapOfRoutesToTheirValidator).some(route => {
       if (!mapOfRoutesToTheirValidator[route]()) {
         incompleteStepRoute = route
         return true

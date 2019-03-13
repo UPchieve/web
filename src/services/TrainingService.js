@@ -14,7 +14,7 @@ export default {
     this.idAnswerMap = {}
     this.idCorrectAnswerMap = {}
     this.category = category
-    return NetworkService.getQuestions(context, { category }).then((res) => {
+    return NetworkService.getQuestions(context, { category }).then(res => {
       this.questions = res.data.questions
       return this.questions.length
     })
@@ -27,13 +27,13 @@ export default {
     return this.index
   },
   hasCompleted () {
-    return (this.numAnswers === this.questions.length)
+    return this.numAnswers === this.questions.length
   },
   hasNext () {
-    return ((this.index + 1) < this.questions.length)
+    return this.index + 1 < this.questions.length
   },
   hasPrevious () {
-    return ((this.index) > 0)
+    return this.index > 0
   },
   getNextQuestion () {
     if (this.index < this.questions.length) {
@@ -65,40 +65,34 @@ export default {
       picked !== '' &&
       picked !== null &&
       picked !== undefined &&
-      (
-        this.idAnswerMap[question._id] === null ||
+      (this.idAnswerMap[question._id] === null ||
         this.idAnswerMap[question._id] === '' ||
-        picked !== undefined
-      )
+        picked !== undefined)
     ) {
       this.numAnswers += 1
     }
     this.idAnswerMap[question._id] = picked
   },
   submitQuiz (context, userid) {
-    return NetworkService.getQuizScore(
-      context,
-      {
-        userid,
-        idAnswerMap: this.idAnswerMap,
-        category: this.category
+    return NetworkService.getQuizScore(context, {
+      userid,
+      idAnswerMap: this.idAnswerMap,
+      category: this.category
+    }).then(res => {
+      this.idCorrectAnswerMap = res.data.idCorrectAnswerMap
+      return {
+        tries: res.data.tries,
+        passed: res.data.passed,
+        score: res.data.score,
+        idUserAnswerMap: this.idAnswerMap
       }
-    )
-      .then((res) => {
-        this.idCorrectAnswerMap = res.data.idCorrectAnswerMap
-        return {
-          tries: res.data.tries,
-          passed: res.data.passed,
-          score: res.data.score,
-          idUserAnswerMap: this.idAnswerMap
-        }
-      })
+    })
   },
   reviewQuiz () {
     const questionsReview = this.questions.slice(0)
     const idCorrectAnswerMap = { ...this.idCorrectAnswerMap }
     const idAnswerMap = { ...this.idAnswerMap }
-    questionsReview.forEach((question) => {
+    questionsReview.forEach(question => {
       question.userAnswer = idAnswerMap[question._id]
       question.correctAnswer = idCorrectAnswerMap[question._id]
     })

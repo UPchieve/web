@@ -1,62 +1,62 @@
 <template>
   <div>
     <ul
-      v-if="($route.path.indexOf('/onboarding') !== -1) && !user.isVolunteer"
-      class="nav navbar-nav">
-      <router-link
-        to="/onboarding/profile"
-        tag="li"><a class="profile-info">Basic Profile</a></router-link>
-      <router-link
-        to="/onboarding/academic"
-        tag="li"><a class="profile-info">First Time Use Survey</a></router-link>
+      v-if="$route.path.indexOf('/onboarding') !== -1 && !user.isVolunteer"
+      class="nav navbar-nav"
+    >
+      <router-link to="/onboarding/profile" tag="li"
+        ><a class="profile-info">Basic Profile</a></router-link
+      >
+      <router-link to="/onboarding/academic" tag="li"
+        ><a class="profile-info">First Time Use Survey</a></router-link
+      >
     </ul>
     <ul
       v-else-if="$route.path.indexOf('/onboarding') !== -1"
-      class="nav navbar-nav">
-      <router-link
-        to="/onboarding/profile"
-        tag="li"><a class="profile-info">Basic Profile</a></router-link>
+      class="nav navbar-nav"
+    >
+      <router-link to="/onboarding/profile" tag="li"
+        ><a class="profile-info">Basic Profile</a></router-link
+      >
     </ul>
-    <ul
-      v-else-if="auth.authenticated"
-      class="nav navbar-nav">
-      <router-link
-        to="/dashboard"
-        tag="li"><a class="home icon">Home</a></router-link>
+    <ul v-else-if="auth.authenticated" class="nav navbar-nav">
+      <router-link to="/dashboard" tag="li"
+        ><a class="home icon">Home</a></router-link
+      >
       <template v-if="user.isVolunteer">
-        <router-link
-          to="/training"
-          tag="li"><a class="training icon">Training</a></router-link>
-        <router-link
-          to="/calendar"
-          tag="li"><a class="schedule icon">Schedule</a></router-link>
+        <router-link to="/training" tag="li"
+          ><a class="training icon">Training</a></router-link
+        >
+        <router-link to="/calendar" tag="li"
+          ><a class="schedule icon">Schedule</a></router-link
+        >
       </template>
-      <router-link
-        to="/profile"
-        tag="li"><a class="profile icon">Profile</a></router-link>
-      <router-link
-        to="/resources"
-        tag="li"><a class="resources icon">Useful Information</a></router-link>
+      <router-link to="/profile" tag="li"
+        ><a class="profile icon">Profile</a></router-link
+      >
+      <router-link to="/resources" tag="li"
+        ><a class="resources icon">Useful Information</a></router-link
+      >
     </ul>
   </div>
 </template>
 
-
 <script>
-import UserService from 'src/services/UserService';
+import UserService from 'src/services/UserService'
 
 export default {
-  data() {
-    const auth = UserService.getAuth();
-    const user = UserService.getUser();
-    const onboarding = UserService.getOnboarding();
+  data () {
+    const auth = UserService.getAuth()
+    const user = UserService.getUser()
+    const onboarding = UserService.getOnboarding()
     return {
-      auth, user, onboarding,
-    };
-  },
-};
+      auth,
+      user,
+      onboarding
+    }
+  }
+}
 </script>
-
 
 <style scoped>
 .navbar-nav {
@@ -77,7 +77,7 @@ li {
 li > a {
   font-size: 16px;
   font-weight: 600;
-  color: #73737A;
+  color: #73737a;
   padding: 2px 0;
   height: 50px;
   line-height: 50px;
@@ -89,7 +89,7 @@ li > a {
 li > a:hover {
   background: none;
   text-decoration: none;
-  color: #16D2AA;
+  color: #16d2aa;
 }
 
 li > a:focus {
@@ -98,21 +98,21 @@ li > a:focus {
 }
 
 li.active > a {
-  color: #16D2AA;
+  color: #16d2aa;
 }
 
 li.active > a::before {
-  fill: #16D2AA;
+  fill: #16d2aa;
 }
 
 .icon::before {
-  content: "";
+  content: '';
   width: 20px;
   height: 20px;
   margin-right: 10px;
   margin-left: 20px;
   background-repeat: no-repeat;
-  fill: #73737A;
+  fill: #73737a;
 }
 
 .home.icon::before {
