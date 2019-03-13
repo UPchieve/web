@@ -10,7 +10,7 @@
     "unit": "karma start test/unit/karma.conf.js --single-run",
     "e2e": "node test/e2e/runner.js",
     "test": "echo hello world",
-    "lint": "eslint --ext .js,.vue src test/unit/specs test/e2e/specs"
+    "format": "prettier-standard {build,config,src,test}/**/*.{js,vue}"
   },
   "dependencies": {
     "bootstrap": "^3.3.7",
