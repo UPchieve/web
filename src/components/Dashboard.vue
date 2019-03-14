@@ -1,69 +1,81 @@
 <template>
-  <div
-    :style="coverStyle"
-    class="dashboard">
-    <div class="header-container"/>
+  <div :style="coverStyle" class="dashboard">
+    <div class="header-container" />
     <h1>Hello, {{ name }}!</h1>
 
     <template v-if="!user.isVolunteer">
       <div class="dashboard-body row">
         <div class="col-lg-6 video">
-          <p><span class="intro_bold">New to UPchieve?</span>Watch the video to learn how to use our services.</p>
+          <p>
+            <span class="intro_bold">New to UPchieve?</span>Watch the video to
+            learn how to use our services.
+          </p>
           <div class="video">
             <iframe
               width="480"
               height="280"
               src="https://www.youtube.com/embed/UOFFF5hOwdM"
               frameborder="0"
-              allowfullscreen/>
+              allowfullscreen
+            />
           </div>
         </div>
 
         <div class="col-lg-6 help">
-          <div class = "help-container">
+          <div class="help-container">
             <h2>You can get help from an Academic Coach.</h2>
-            <button v-if="!hasActiveSession()" class="btn getHelp" @click.prevent="getHelp()">
+            <button
+              v-if="!hasActiveSession()"
+              class="btn getHelp"
+              @click.prevent="getHelp()"
+            >
               Get help now
             </button>
-            <button v-if="hasActiveSession()" class="btn getHelp" @click.prevent="rejoinHelpSession()">
+            <button
+              v-if="hasActiveSession()"
+              class="btn getHelp"
+              @click.prevent="rejoinHelpSession()"
+            >
               Rejoin your coaching session
             </button>
-            <div
-              v-if="showHelpPopUp"
-              :style="popUpStyle"
-              class="getHelpPopUp">
+            <div v-if="showHelpPopUp" :style="popUpStyle" class="getHelpPopUp">
               <span>Select a help topic.</span>
-              <select
-                v-model="pickedTopic"
-                class="form-control topic">
+              <select v-model="pickedTopic" class="form-control topic">
                 <option value="math">Math</option>
                 <option value="college">College Counseling</option>
               </select>
-              <select
-                v-model="pickedSubtopic"
-                class="form-control subtopic">
+              <select v-model="pickedSubtopic" class="form-control subtopic">
                 <option
                   v-for="(subtopic, index) in subtopics[pickedTopic]"
-                  :key="`subtopic-${index}`">{{ subtopic }}</option>
+                  :key="`subtopic-${index}`"
+                  >{{ subtopic }}</option
+                >
               </select>
               <div class="helpBtns">
                 <button
                   v-if="showHelpPopUp"
                   class="btn helpCancel"
                   type="cancel"
-                  @click.prevent="getHelpCancel()">Cancel</button>
+                  @click.prevent="getHelpCancel()"
+                >
+                  Cancel
+                </button>
                 <button
                   v-if="showHelpPopUp"
                   class="btn helpNext"
                   type="next"
-                  @click.prevent="getHelpNext()">Get help</button>
+                  @click.prevent="getHelpNext()"
+                >
+                  Get help
+                </button>
               </div>
             </div>
-            <div class="disclaimer row">Disclaimer: UPchieve assumes no
-            responsibility for the actions of its volunteers and strongly
-            encourages students to follow internet safety practices at all times.
-            In particular, please do not share personal or identifying information
-            with volunteers.</div>
+            <div class="disclaimer row">
+              Disclaimer: UPchieve assumes no responsibility for the actions of
+              its volunteers and strongly encourages students to follow internet
+              safety practices at all times. In particular, please do not share
+              personal or identifying information with volunteers.
+            </div>
           </div>
         </div>
       </div>
@@ -71,14 +83,18 @@
     <template v-else>
       <div class="dashboard-body row">
         <div class="col-lg-6 video">
-          <p><strong>New to UPchieve? </strong>Watch the video to learn how to use our services.</p>
+          <p>
+            <strong>New to UPchieve? </strong>Watch the video to learn how to
+            use our services.
+          </p>
           <div class="video">
             <iframe
               width="500"
               height="300"
               src="https://www.youtube.com/embed/TfjsjukrnB8"
               frameborder="0"
-              allowfullscreen/>
+              allowfullscreen
+            />
           </div>
         </div>
         <div class="col-lg-6 help">
@@ -90,8 +106,11 @@
               </button>
             </div>
             <div v-if="!hasActiveSession()">
-              <p> Only students who are waiting for a volunteer will show up below.</p>
-              <list-sessions/>
+              <p>
+                Only students who are waiting for a volunteer will show up
+                below.
+              </p>
+              <list-sessions />
             </div>
           </div>
         </div>
@@ -101,24 +120,23 @@
 </template>
 
 <script>
+import UserService from 'src/services/UserService'
+import SessionService from 'src/services/SessionService'
 
-import UserService from 'src/services/UserService';
-import SessionService from 'src/services/SessionService';
-
-import ListSessions from 'src/components/ListSessions';
+import ListSessions from 'src/components/ListSessions'
 
 export default {
   components: {
-    ListSessions,
+    ListSessions
   },
-  data() {
-    const user = UserService.getUser() || {};
-    SessionService.getCurrentSession(this, user);
+  data () {
+    const user = UserService.getUser() || {}
+    SessionService.getCurrentSession(this, user)
 
     const subtopics = {
       math: ['Algebra', 'Geometry', 'Trigonometry', 'Precalculus', 'Calculus'],
       esl: ['General Help'],
-      college: ['Planning', 'Applications', 'Essays'],
+      college: ['Planning', 'Applications', 'Essays']
 
       // Temporarily changing to single word labels
       // 'college': ['College Planning', 'Application Help','Essay Editing']
@@ -126,66 +144,66 @@ export default {
       // Temporarily removing science and standardized testing
       // 'science': ['Biology','Chemistry'],
       // 'standardizedtest': ['SAT']
-    };
+    }
     return {
       user,
       name: user.firstname || 'student',
-      popUpStyle: { },
+      popUpStyle: {},
       showHelpPopUp: false,
       pickedTopic: '',
       pickedSubtopic: '',
       subtopics,
-      coverStyle: { },
-    };
+      coverStyle: {}
+    }
   },
   methods: {
-    hasActiveSession() {
-      return localStorage.getItem('currentSessionPath');
+    hasActiveSession () {
+      return localStorage.getItem('currentSessionPath')
     },
-    rejoinHelpSession() {
-      const path = localStorage.getItem('currentSessionPath');
+    rejoinHelpSession () {
+      const path = localStorage.getItem('currentSessionPath')
       if (path) {
-        window.location.hash = `#${path}`;
-        window.location.reload();
-        console.log(`rejoining session: ${path}`);
+        window.location.hash = `#${path}`
+        window.location.reload()
+        console.log(`rejoining session: ${path}`)
       } else {
-        console.log(`session terminated`);
-        window.location.hash = '';
-        window.location.reload();
+        console.log(`session terminated`)
+        window.location.hash = ''
+        window.location.reload()
       }
     },
-    getHelp() {
+    getHelp () {
       this.popUpStyle = {
-        display: 'flex',
-      };
+        display: 'flex'
+      }
       this.coverStyle = {
-        background: 'rgba(0,0,0,0.10)',
-      };
-      this.showHelpPopUp = true;
+        background: 'rgba(0,0,0,0.10)'
+      }
+      this.showHelpPopUp = true
     },
-    capitalize(string) {
-      return string.charAt(0).toUpperCase() + string.slice(1);
+    capitalize (string) {
+      return string.charAt(0).toUpperCase() + string.slice(1)
     },
-    getHelpCancel() {
-      this.popUpStyle = { };
-      this.coverStyle = { };
-      this.showHelpPopUp = false;
+    getHelpCancel () {
+      this.popUpStyle = {}
+      this.coverStyle = {}
+      this.showHelpPopUp = false
     },
-    getHelpNext() {
-      let topic = this.pickedTopic;
-      let subTopic = this.pickedSubtopic;
+    getHelpNext () {
+      let topic = this.pickedTopic
+      let subTopic = this.pickedSubtopic
       // Temp change all to math
       // topic = 'math';
-      topic = topic.toLowerCase();
-      subTopic = subTopic.toLowerCase();
+      topic = topic.toLowerCase()
+      subTopic = subTopic.toLowerCase()
       if (subTopic === 'general help') {
-        subTopic = topic;
+        subTopic = topic
       }
-      const linkName = `/session/${topic}/${subTopic}`;
-      this.$router.push(linkName);
-    },
-  },
-};
+      const linkName = `/session/${topic}/${subTopic}`
+      this.$router.push(linkName)
+    }
+  }
+}
 </script>
 
 <style scoped>
@@ -200,8 +218,8 @@ export default {
 }
 
 .header-container::after {
-  content: "";
-  display: inline-block;;
+  content: '';
+  display: inline-block;
   width: 100%;
   height: 100%;
   background-image: url('../assets/dashboardHeader@2x.png');
@@ -247,7 +265,7 @@ h3 {
 }
 
 .col-lg-6.help {
-  background-color: #E3F2FD;
+  background-color: #e3f2fd;
   padding: 50px 0;
 }
 
@@ -296,7 +314,7 @@ h3 {
 
 .btn {
   height: 60px;
-  background-color: #16D2AA;
+  background-color: #16d2aa;
   border: none;
   font-size: 16px;
   font-weight: 600;
@@ -306,7 +324,7 @@ h3 {
 }
 
 .btn:hover {
-  background-color: #16D2AA;
+  background-color: #16d2aa;
 }
 
 .form-control {
@@ -321,7 +339,7 @@ h3 {
   justify-content: center;
   width: 500px;
   height: 300px;
-  background: #FFFFFF;
+  background: #ffffff;
   z-index: 5;
   position: fixed;
   top: 0;
@@ -339,7 +357,8 @@ h3 {
   display: flex;
 }
 
-.helpCancel, .helpNext {
+.helpCancel,
+.helpNext {
   margin: 0 20px;
 }
 
@@ -357,5 +376,4 @@ h3 {
   border-radius: 30px;
   width: 300px;
 }
-
 </style>

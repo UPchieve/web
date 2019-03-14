@@ -1,44 +1,41 @@
 <template>
   <ul class="nav navbar-nav">
-    <router-link
-      v-if="!userauth.authenticated"
-      to="/login"
-      tag="li"><a class="login">Log In</a></router-link>
-    <router-link
-      to="/contact"
-      tag="li"><a class="contact icon">Contact Us</a></router-link>
-    <router-link
-      to="/legal"
-      tag="li"><a class="privacy icon">Legal Policy</a></router-link>
-    <li v-if="userauth.authenticated"><a
-      class="logout icon"
-      @click="logout">Logout</a></li>
-    <li v-if="!userauth.authenticated"><a :href="mainWebsiteUrl">Back to Website</a></li>
+    <router-link v-if="!userauth.authenticated" to="/login" tag="li"
+      ><a class="login">Log In</a></router-link
+    >
+    <router-link to="/contact" tag="li"
+      ><a class="contact icon">Contact Us</a></router-link
+    >
+    <router-link to="/legal" tag="li"
+      ><a class="privacy icon">Legal Policy</a></router-link
+    >
+    <li v-if="userauth.authenticated">
+      <a class="logout icon" @click="logout">Logout</a>
+    </li>
+    <li v-if="!userauth.authenticated">
+      <a :href="mainWebsiteUrl">Back to Website</a>
+    </li>
   </ul>
 </template>
 
-
 <script>
-
-import UserService from '../../services/UserService';
-import AuthService from '../../services/AuthService';
+import UserService from '../../services/UserService'
+import AuthService from '../../services/AuthService'
 
 export default {
-  components: {
-
-  },
-  data() {
+  components: {},
+  data () {
     return {
       userauth: UserService.getAuth(),
-      mainWebsiteUrl: process.env.MAIN_WEBSITE_URL,
-    };
+      mainWebsiteUrl: process.env.MAIN_WEBSITE_URL
+    }
   },
   methods: {
-    logout() {
-      AuthService.logout(this);
-    },
-  },
-};
+    logout () {
+      AuthService.logout(this)
+    }
+  }
+}
 </script>
 
 <style scoped>
@@ -57,7 +54,7 @@ li {
 }
 
 li > a {
-  color: #73737A;
+  color: #73737a;
   padding: 2px 0;
   height: 50px;
   line-height: 50px;
@@ -69,7 +66,7 @@ li > a {
 li > a:hover {
   background: none;
   text-decoration: none;
-  color: #16D2AA;
+  color: #16d2aa;
 }
 
 li > a:focus {
@@ -79,7 +76,7 @@ li > a:focus {
 
 li.active > a {
   font-weight: bold;
-  color: #16D2AA;
+  color: #16d2aa;
 }
 
 a.logout {
@@ -87,7 +84,7 @@ a.logout {
 }
 
 .icon::before {
-  content: "";
+  content: '';
   width: 20px;
   height: 20px;
   margin-right: 10px;
@@ -110,5 +107,4 @@ a.logout {
 .login {
   margin-left: 30px;
 }
-
 </style>

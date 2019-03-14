@@ -1,28 +1,26 @@
 <template>
-  <code-form v-if="!validRegistrationCode"/>
-  <volunteer-signup-form v-else/>
+  <code-form v-if="!validRegistrationCode" />
+  <volunteer-signup-form v-else />
 </template>
 
 <script>
+import CodeForm from './CodeForm'
+import VolunteerSignupForm from './VolunteerSignupForm'
 
-import CodeForm from './CodeForm';
-import VolunteerSignupForm from './VolunteerSignupForm';
-
-import RegistrationService from '../../services/RegistrationService';
+import RegistrationService from '../../services/RegistrationService'
 
 export default {
   components: {
     CodeForm,
-    VolunteerSignupForm,
+    VolunteerSignupForm
   },
-  data() {
-    return RegistrationService.data;
-  },
-};
+  data () {
+    return RegistrationService.data
+  }
+}
 </script>
 
 <style scoped>
-
 .form-register {
   display: flex;
   flex-direction: column;
@@ -33,5 +31,4 @@ export default {
   background-color: white;
   padding: 0px 75px;
 }
-
 </style>

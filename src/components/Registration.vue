@@ -6,47 +6,60 @@
         <div class="registration-header">Sign Up</div>
       </div>
       <div class="body">
-        <volunteer-form v-if="this.userSelection === 'volunteer'"></volunteer-form>
-        <student-form v-else-if="this.userSelection === 'student'"></student-form>
+        <volunteer-form
+          v-if="this.userSelection === 'volunteer'"
+        ></volunteer-form>
+        <student-form
+          v-else-if="this.userSelection === 'student'"
+        ></student-form>
         <div v-else>
           <b>Are you a student or a volunteer?</b>
-          <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="selectStudent()">STUDENT</button>
-          <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="selectVolunteer()">VOLUNTEER</button>
+          <button
+            class="btn btn-lg btn-primary btn-block"
+            type="submit"
+            @click.prevent="selectStudent()"
+          >
+            STUDENT
+          </button>
+          <button
+            class="btn btn-lg btn-primary btn-block"
+            type="submit"
+            @click.prevent="selectVolunteer()"
+          >
+            VOLUNTEER
+          </button>
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script>
-
-import StudentForm from './Registration/StudentForm';
-import VolunteerForm from './Registration/VolunteerForm';
+import StudentForm from './Registration/StudentForm'
+import VolunteerForm from './Registration/VolunteerForm'
 
 export default {
   components: {
     StudentForm,
-    VolunteerForm,
+    VolunteerForm
   },
-  data() {
+  data () {
     return {
-      userSelection: null,
-    };
+      userSelection: null
+    }
   },
   methods: {
-    selectVolunteer() {
-      this.userSelection = 'volunteer';
+    selectVolunteer () {
+      this.userSelection = 'volunteer'
     },
-    selectStudent() {
-      this.userSelection = 'student';
-    },
-  },
-};
+    selectStudent () {
+      this.userSelection = 'student'
+    }
+  }
+}
 </script>
 
 <style scoped>
-
 .registration-container {
   height: 100%;
 }
@@ -63,12 +76,12 @@ export default {
 }
 
 .login-link {
-  color: #73737A;
+  color: #73737a;
   font-weight: 600;
 }
 
 .registration-header {
-  color: #16D2AA;
+  color: #16d2aa;
   font-weight: 600;
 }
 
@@ -106,29 +119,29 @@ export default {
   align-items: center;
   align-self: center;
   padding: 0 50px;
-  background-color: #F6F6F6;
-  border-top: 0.5px solid #CCCCCF;
-  margin-top: 130px
+  background-color: #f6f6f6;
+  border-top: 0.5px solid #cccccf;
+  margin-top: 130px;
 }
 
 .footer a {
-  color: #73737A;
+  color: #73737a;
 }
 
-button[type="submit"] {
-  background-color: #F6F6F6;
+button[type='submit'] {
+  background-color: #f6f6f6;
   border: none;
   font-weight: 600;
-  color: #16D2AA;
+  color: #16d2aa;
   height: 40px;
   border-radius: 20px;
   font-size: 12px;
   margin-top: 50px;
 }
 
-button[type="submit"]:hover, button[type="submit"]:active {
+button[type='submit']:hover,
+button[type='submit']:active {
   color: white;
-  background-color: #16D2AA;
+  background-color: #16d2aa;
 }
-
 </style>

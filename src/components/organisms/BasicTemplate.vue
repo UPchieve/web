@@ -1,11 +1,11 @@
 <template>
   <div class="submit-question">
     <div class="basic-template">
-      <content-header :header-title="headerTitle"/>
+      <content-header :header-title="headerTitle" />
       <div class="basic-template__content">
         <div class="content-card">
           <div class="content-card__card">
-            <slot/>
+            <slot />
           </div>
         </div>
       </div>
@@ -13,32 +13,29 @@
   </div>
 </template>
 
-
 <script>
-import ContentHeader from '../atoms/ContentHeader';
+import ContentHeader from '../atoms/ContentHeader'
 
 export default {
   components: {
-    ContentHeader,
+    ContentHeader
   },
   props: {
     headerTitle: {
       type: String,
-      default: '',
-    },
+      default: ''
+    }
   },
-  data() {
-    return {
-    };
+  data () {
+    return {}
   },
   methods: {
-    goHome() {
-      this.$router.push('/');
-    },
-  },
-};
+    goHome () {
+      this.$router.push('/')
+    }
+  }
+}
 </script>
-
 
 <style>
 .submit-question {
@@ -50,7 +47,6 @@ export default {
   background: var(--c-backdrop);
 }
 .basic-template__content {
-
 }
 
 .content-card {

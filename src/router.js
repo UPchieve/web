@@ -53,19 +53,55 @@ const routes = [
   { path: '/resetpassword', component: ResetPasswordForm },
   { path: '/setpassword/:token', component: SetPasswordForm },
   { path: '/dashboard', component: Dashboard, meta: { protected: true } },
-  { path: '/session/math/:subTopic/:sessionId?', component: Session, meta: { protected: true } },
-  { path: '/session/college/:subTopic/:sessionId?', component: Session, meta: { protected: true } },
+  {
+    path: '/session/math/:subTopic/:sessionId?',
+    component: Session,
+    meta: { protected: true }
+  },
+  {
+    path: '/session/college/:subTopic/:sessionId?',
+    component: Session,
+    meta: { protected: true }
+  },
   { path: '/schedule', component: Schedule, meta: { protected: true } },
-  { path: '/resources', component: Resources, meta: { protected: true, bypassOnboarding: true } },
-  { path: '/feedback/:sessionId/:userType/:studentId/:volunteerId', component: Feedback, meta: { protected: true } },
-  { path: '/action/:action/:data?', component: Action, meta: { bypassOnboarding: true } },
-  { path: '/onboarding/:step?', component: Onboarding, meta: { protected: true } },
+  {
+    path: '/resources',
+    component: Resources,
+    meta: { protected: true, bypassOnboarding: true }
+  },
+  {
+    path: '/feedback/:sessionId/:userType/:studentId/:volunteerId',
+    component: Feedback,
+    meta: { protected: true }
+  },
+  {
+    path: '/action/:action/:data?',
+    component: Action,
+    meta: { bypassOnboarding: true }
+  },
+  {
+    path: '/onboarding/:step?',
+    component: Onboarding,
+    meta: { protected: true }
+  },
   { path: '/training', component: Training, meta: { protected: true } },
-  { path: '/training/:category/quiz', component: Quiz, meta: { protected: true } },
-  { path: '/training/:category/review', component: Review, meta: { protected: true } },
+  {
+    path: '/training/:category/quiz',
+    component: Quiz,
+    meta: { protected: true }
+  },
+  {
+    path: '/training/:category/review',
+    component: Review,
+    meta: { protected: true }
+  },
   { path: '/profile', component: Profile, meta: { protected: true } },
   { path: '/calendar', component: Calendar },
-  { path: '/submit-question', component: SubmitQuestion, meta: { protected: true } },
+  {
+    path: '/submit-question',
+    component: SubmitQuestion,
+    meta: { protected: true }
+  },
   { path: '/inbox', component: Inbox, meta: { protected: true } },
   { path: '/send-answer', component: SendAnswer, meta: { protected: true } }
 ]
@@ -118,7 +154,7 @@ router.beforeEach((to, from, next) => {
 // If endpoint returns 401, redirect to login (except for requests to get user's
 // session)
 Vue.http.interceptors.push((request, next) => {
-  next((response) => {
+  next(response => {
     if (
       response.status === 401 &&
       !(request.url.indexOf('/api/user') !== -1 && request.method === 'GET')

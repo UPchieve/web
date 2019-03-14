@@ -15,51 +15,61 @@ export default {
 
   login (context, creds, redirect) {
     const { email, password } = creds
-    if (!email || !password || !Validator.isEmail(email) || password.length < 1) {
+    if (
+      !email ||
+      !password ||
+      !Validator.isEmail(email) ||
+      password.length < 1
+    ) {
       return undefined
     }
 
-    return NetworkService.login(context, creds).then((res) => {
-      const data = { ...res.data }
-      if (!data) {
-        throw new Error('No user returned from auth service')
-      }
+    return NetworkService.login(context, creds).then(
+      res => {
+        const data = { ...res.data }
+        if (!data) {
+          throw new Error('No user returned from auth service')
+        }
 
-      this.storeUser(data.user)
+        this.storeUser(data.user)
 
-      if (redirect) {
-        router.push(redirect)
+        if (redirect) {
+          router.push(redirect)
+        }
+      },
+      res => {
+        context.error = 'Could not login'
+        console.log(res)
       }
-    }, (res) => {
-      context.error = 'Could not login'
-      console.log(res)
-    })
+    )
   },
 
   register (context, creds, profile, redirect) {
-    return NetworkService.register(context, { ...creds, ...profile }).then((res) => {
-      const data = { ...res.data }
-      console.log(data)
-      if (!data) {
-        throw new Error('No user returned from auth service')
-      } else if (data.err) {
-        throw new Error(data.err)
+    return NetworkService.register(context, { ...creds, ...profile }).then(
+      res => {
+        const data = { ...res.data }
+        console.log(data)
+        if (!data) {
+          throw new Error('No user returned from auth service')
+        } else if (data.err) {
+          throw new Error(data.err)
+        }
+
+        this.storeUser(data.user)
+
+        context.msg = 'You have been signed up!'
+
+        if (redirect) {
+          setTimeout(() => {
+            router.push(redirect)
+          }, 2000)
+        }
       }
-
-      this.storeUser(data.user)
-
-      context.msg = 'You have been signed up!'
-
-      if (redirect) {
-        setTimeout(() => {
-          router.push(redirect)
-        }, 2000)
-      }
-    })
+    )
   },
 
   checkRegister (context, creds) {
-    return NetworkService.checkRegister(context, creds).then((res) => {
+    return NetworkService.checkRegister(context, creds).then(res => {
       if (res.data.err) {
         throw new Error(res.data.err)
       }
@@ -67,12 +77,13 @@ export default {
   },
 
   sendReset (context, email, redirect) {
-    return NetworkService.sendReset(context, { email }).then((res) => {
+    return NetworkService.sendReset(context, { email }).then(res => {
       const data = { ...res.data }
       console.log(data)
       if (!data) {
         throw new Error('No user returned from auth service')
-      } if (data.err) {
+      }
+      if (data.err) {
         throw new Error(data.err)
       }
 
@@ -87,7 +98,7 @@ export default {
   },
 
   confirmReset (context, credentials, redirect) {
-    return NetworkService.confirmReset(context, credentials).then((res) => {
+    return NetworkService.confirmReset(context, credentials).then(res => {
       const data = { ...res.data }
       console.log(data)
       if (!data) {
@@ -109,13 +120,15 @@ export default {
 
   logout (context) {
     if (context) {
-      NetworkService.logout(context).then(() => {
-        this.removeUser()
-        router.push('/logout')
-      }).catch(() => {
-        this.removeUser()
-        router.push('/logout')
-      })
+      NetworkService.logout(context)
+        .then(() => {
+          this.removeUser()
+          router.push('/logout')
+        })
+        .catch(() => {
+          this.removeUser()
+          router.push('/logout')
+        })
     } else {
       this.removeUser()
     }
@@ -141,7 +154,7 @@ export default {
   },
 
   shouldFetch () {
-    return (Date.now() - this.user.lastFetch) > USER_FETCH_LIMIT_SECONDS * 1000
+    return Date.now() - this.user.lastFetch > USER_FETCH_LIMIT_SECONDS * 1000
   },
 
   storeUser (userObj) {
@@ -159,22 +172,24 @@ export default {
   fetchUser (context) {
     this.user.lastFetch = Date.now()
 
-    NetworkService.user(context).then((res) => {
-      const data = { ...res.data }
-      if (!data) {
-        throw new Error('No user returned from auth service')
-      }
+    NetworkService.user(context)
+      .then(res => {
+        const data = { ...res.data }
+        if (!data) {
+          throw new Error('No user returned from auth service')
+        }
 
-      if (data.user) {
-        this.user.authenticated = true
-        this.user.data = data.user
-        localStorage.setItem('user', JSON.stringify(data.user))
-      } else {
-        this.user.authenticated = false
-        this.user.data = null
-      }
-    }).catch((err) => {
-      console.log(err)
-    })
+        if (data.user) {
+          this.user.authenticated = true
+          this.user.data = data.user
+          localStorage.setItem('user', JSON.stringify(data.user))
+        } else {
+          this.user.authenticated = false
+          this.user.data = null
+        }
+      })
+      .catch(err => {
+        console.log(err)
+      })
   }
 }

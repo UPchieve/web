@@ -1,19 +1,19 @@
 <template>
-  <li class="attachment"><span class="attachment__icon logout">I</span> {{ filename }}</li>
+  <li class="attachment">
+    <span class="attachment__icon logout">I</span> {{ filename }}
+  </li>
 </template>
-
 
 <script>
 export default {
   props: {
     filename: {
       type: String,
-      default: '',
-    },
-  },
-};
+      default: ''
+    }
+  }
+}
 </script>
-
 
 <style>
 .attachment {
