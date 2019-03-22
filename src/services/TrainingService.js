@@ -27,7 +27,7 @@ export default {
     return this.index
   },
   hasCompleted () {
-    return this.numAnswers === this.questions.length
+    return this.numAnswers >= this.questions.length
   },
   hasNext () {
     return this.index + 1 < this.questions.length
