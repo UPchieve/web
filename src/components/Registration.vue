@@ -160,7 +160,8 @@ button[type='submit']:active {
 }
 
 .logo-img {
-  width: 35%;
+  width: 20%;
+  min-width: 250px;
 }
 
 .logo-class {
