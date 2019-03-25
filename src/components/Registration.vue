@@ -10,17 +10,32 @@
           <div class="registration-header">Sign Up</div>
         </div>
         <div class="body">
-          <volunteer-form v-if="this.userSelection === 'volunteer'"></volunteer-form>
-          <student-form v-else-if="this.userSelection === 'student'"></student-form>
+          <volunteer-form
+            v-if="this.userSelection === 'volunteer'"
+          ></volunteer-form>
+          <student-form
+            v-else-if="this.userSelection === 'student'"
+          ></student-form>
           <div v-else>
             <b>Are you a student or a volunteer?</b>
-            <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="selectStudent()">STUDENT</button>
-            <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="selectVolunteer()">VOLUNTEER</button>
+            <button
+              class="btn btn-lg btn-primary btn-block"
+              type="submit"
+              @click.prevent="selectStudent()"
+            >
+              STUDENT
+            </button>
+            <button
+              class="btn btn-lg btn-primary btn-block"
+              type="submit"
+              @click.prevent="selectVolunteer()"
+            >
+              VOLUNTEER
+            </button>
           </div>
         </div>
       </div>
-      <div class="bottom-div">
-      </div>
+      <div class="bottom-div"></div>
     </div>
   </div>
 </template>
@@ -158,5 +173,4 @@ button[type='submit']:active {
 .bottom-div {
   flex: 1;
 }
-
 </style>

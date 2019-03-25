@@ -8,15 +8,16 @@
         <form class="form-signin">
           <div class="header">
             <div class="login-header">Log In</div>
-            <router-link
-              to="signup"
-              class="register-link">Sign Up</router-link>
+            <router-link to="signup" class="register-link">Sign Up</router-link>
           </div>
           <div class="body">
             <div
               v-if="error || $route.query['401'] === 'true'"
               class="alert alert-danger"
-              role="alert">{{ error }}</div>
+              role="alert"
+            >
+              {{ error }}
+            </div>
             <label for="inputEmail">Email</label>
             <input
               id="inputEmail"
@@ -24,41 +25,45 @@
               type="email"
               class="form-control"
               required
-              autofocus>
+              autofocus
+            />
             <label for="inputPassword">Password</label>
             <input
               id="inputPassword"
               v-model="credentials.password"
               type="password"
               class="form-control password"
-              required>
-            <router-link
-              to="resetpassword"
-              class="password-reset-link">Forgot password?</router-link>
+              required
+            />
+            <router-link to="resetpassword" class="password-reset-link"
+              >Forgot password?</router-link
+            >
             <button
               class="btn btn-lg btn-primary btn-block login-btn"
               type="submit"
-              @click.prevent="submit">LOGIN</button>
+              @click.prevent="submit"
+            >
+              LOGIN
+            </button>
           </div>
           <div class="footer">
-            <router-link
-              to="/contact"
-              tag="div"><a
-                class="contact icon"
-                target="_blank">CONTACT US</a></router-link>
-            <router-link
-              to="/legal"
-              tag="div"><a
-                class="privacy icon"
-                target="_blank">LEGAL POLICY</a></router-link>
-            <div><a
-              href="https://upchieve.org/"
-              target="_blank">OUR WEBSITE</a></div>
+            <router-link to="/contact" tag="div"
+              ><a class="contact icon" target="_blank"
+                >CONTACT US</a
+              ></router-link
+            >
+            <router-link to="/legal" tag="div"
+              ><a class="privacy icon" target="_blank"
+                >LEGAL POLICY</a
+              ></router-link
+            >
+            <div>
+              <a href="https://upchieve.org/" target="_blank">OUR WEBSITE</a>
+            </div>
           </div>
         </form>
       </div>
-      <div class="bottom-div">
-      </div>
+      <div class="bottom-div"></div>
     </div>
   </div>
 </template>
@@ -223,27 +228,26 @@ button[type='submit']:active {
   color: #73737a;
 }
 
-  .main-page {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    height: 100%;
-  }
+.main-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height: 100%;
+}
 
-  .logo-img {
-    width: 35%;
-  }
+.logo-img {
+  width: 35%;
+}
 
-  .logo-class {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+.logo-class {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-  .bottom-div {
-    flex: 1;
-  }
-
+.bottom-div {
+  flex: 1;
+}
 </style>
