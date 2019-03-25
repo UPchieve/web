@@ -1,16 +1,18 @@
 <template>
   <nav class="navbar">
-    <router-link tag="h1" to="/"/>
+    <router-link tag="h1" to="/" />
     <div v-if="auth.authenticated">
-      <profile-info v-if="auth.authenticated"/>
+      <profile-info v-if="auth.authenticated" />
       <div id="nav">
-        <user-nav/>
+        <user-nav />
       </div>
     </div>
     <div v-else>
-      <p
-        class="aboutText"
-      >UPchieve is a volunteer-run ed-tech initiative with the goal of providing free, online, and on-demand educational and guidance services to disadvantaged students.</p>
+      <p class="aboutText">
+        UPchieve is a volunteer-run ed-tech initiative with the goal of
+        providing free, online, and on-demand educational and guidance services
+        to disadvantaged students.
+      </p>
     </div>
     <div class="navbar-footer">
       <sidebar-footer />
@@ -19,11 +21,11 @@
 </template>
 
 <script>
-import UserService from "../services/UserService";
+import UserService from '../services/UserService'
 
-import UserNav from "./Sidebar/UserNav";
-import ProfileInfo from "./Sidebar/ProfileInfo";
-import Footer from "./Sidebar/Footer";
+import UserNav from './Sidebar/UserNav'
+import ProfileInfo from './Sidebar/ProfileInfo'
+import Footer from './Sidebar/Footer'
 
 export default {
   components: {
@@ -34,9 +36,9 @@ export default {
   data () {
     return {
       auth: UserService.getAuth()
-    };
+    }
   }
-};
+}
 </script>
 
 <style scoped>
@@ -65,11 +67,11 @@ h1 {
 }
 
 h1::before {
-  content: "";
+  content: '';
   display: inline-block;
   width: 100px;
   height: 50px;
-  background-image: url("../assets/logo-01.svg");
+  background-image: url('../assets/logo-01.svg');
   background-size: 100px 50px;
   top: 0;
   left: 0;

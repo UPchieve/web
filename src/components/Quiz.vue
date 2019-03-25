@@ -94,8 +94,9 @@
     </div>
     <div
       v-if="!showQuizReview"
-      :style="[ popUpStyle, popUpBorderStyle ]"
-      class="passScoreContainer">
+      :style="[popUpStyle, popUpBorderStyle]"
+      class="passScoreContainer"
+    >
       <div class="passed passed-msg">{{ passedMsg }}</div>
       <div class="score">{{ scoreMsg }}</div>
       <div class="btnContainer">
@@ -225,11 +226,10 @@ export default {
           backgroundSize: '100%',
           backgroundRepeat: 'no-repeat',
           margin: 'auto',
-          padding: '5px',
-        };
-      }
-      else {
-        this.imageStyle = { };
+          padding: '5px'
+        }
+      } else {
+        this.imageStyle = {}
       }
     },
     getFirst () {
@@ -485,7 +485,7 @@ export default {
   font-weight: 600;
 }
 
-.btn:focus{
+.btn:focus {
   outline: 0;
 }
 
