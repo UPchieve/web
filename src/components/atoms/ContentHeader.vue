@@ -1,21 +1,19 @@
 <template>
-<div class="content-header">
-  <h1>{{ headerTitle }}</h1>
-</div>
+  <div class="content-header">
+    <h1>{{ headerTitle }}</h1>
+  </div>
 </template>
-
 
 <script>
 export default {
   props: {
     headerTitle: {
       type: String,
-      default: '',
-    },
-  },
-};
+      default: ''
+    }
+  }
+}
 </script>
-
 
 <style>
 /**
@@ -30,7 +28,8 @@ export default {
   padding: 20px;
   box-shadow: 0 4px var(--c-shadow-header);
 }
-.content-header h1 { /*{1}*/
+.content-header h1 {
+  /*{1}*/
   font-size: 20px;
   margin: 0;
   font-weight: bold;
@@ -40,7 +39,8 @@ export default {
   .content-header {
     justify-content: flex-start;
   }
-  .content-header h1 { /*{1}*/
+  .content-header h1 {
+    /*{1}*/
     font-size: 28px;
   }
 }

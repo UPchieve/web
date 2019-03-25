@@ -5,24 +5,28 @@
     </div>
     <div class="registration-body">
       <div class="description">
-        Before you can request a tutor, we request that you fill out this short survey so that we can continue to improve our services. You will not be asked to take this again.</div>
+        Before you can request a tutor, we request that you fill out this short
+        survey so that we can continue to improve our services. You will not be
+        asked to take this again.
+      </div>
 
-      <div
-        v-if="error"
-        class="alert alert-danger"
-        role="alert">{{ error }}</div>
+      <div v-if="error" class="alert alert-danger" role="alert">
+        {{ error }}
+      </div>
 
-      <ul
-        v-if="!user.isVolunteer"
-        class="row form-group">
-        <p>Do you identify with any of the following minority groups? (Please select all that apply.)</p>
+      <ul v-if="!user.isVolunteer" class="row form-group">
+        <p>
+          Do you identify with any of the following minority groups? (Please
+          select all that apply.)
+        </p>
         <div class="option-container">
           <div class="checkbox">
             <label>
               <input
                 v-model="user.groupIdentification"
                 type="checkbox"
-                value="LGBTQ">
+                value="LGBTQ"
+              />
               LGBTQ
             </label>
           </div>
@@ -31,7 +35,8 @@
               <input
                 v-model="user.groupIdentification"
                 type="checkbox"
-                value="LearningDisability">
+                value="LearningDisability"
+              />
               Learning disabilities
             </label>
           </div>
@@ -40,7 +45,8 @@
               <input
                 v-model="user.groupIdentification"
                 type="checkbox"
-                value="OtherDisability">
+                value="OtherDisability"
+              />
               Other disabilities
             </label>
           </div>
@@ -49,7 +55,8 @@
               <input
                 v-model="user.groupIdentification"
                 type="checkbox"
-                value="Immigrant">
+                value="Immigrant"
+              />
               Immigrant
             </label>
           </div>
@@ -58,7 +65,8 @@
               <input
                 v-model="user.groupIdentification"
                 type="checkbox"
-                value="Homeless">
+                value="Homeless"
+              />
               Homeless
             </label>
           </div>
@@ -67,7 +75,8 @@
               <input
                 v-model="user.groupIdentification"
                 type="checkbox"
-                value="FreeLunch">
+                value="FreeLunch"
+              />
               Free or reduced price lunch
             </label>
           </div>
@@ -76,7 +85,8 @@
               <input
                 v-model="user.groupIdentification"
                 type="checkbox"
-                value="LowIncome">
+                value="LowIncome"
+              />
               Low-income
             </label>
           </div>
@@ -85,7 +95,8 @@
               <input
                 v-model="user.groupIdentification"
                 type="checkbox"
-                value="SingleParent">
+                value="SingleParent"
+              />
               Single-parent household
             </label>
           </div>
@@ -94,7 +105,8 @@
               <input
                 v-model="user.groupIdentification"
                 type="checkbox"
-                value="PublicHousing">
+                value="PublicHousing"
+              />
               NYCHA (public housing) resident
             </label>
           </div>
@@ -103,17 +115,19 @@
               <input
                 v-model="user.groupIdentification"
                 type="checkbox"
-                value="None">
+                value="None"
+              />
               None of the above
             </label>
           </div>
         </div>
       </ul>
 
-      <ul
-        v-if="!user.isVolunteer"
-        class="row form-group">
-        <p>Do you have access to a computer or phone with internet access? (Please select all that apply.)</p>
+      <ul v-if="!user.isVolunteer" class="row form-group">
+        <p>
+          Do you have access to a computer or phone with internet access?
+          (Please select all that apply.)
+        </p>
         <div class="row">
           <div class="col-sm-12">
             <div class="checkbox">
@@ -121,7 +135,8 @@
                 <input
                   v-model="user.computerAccess"
                   type="checkbox"
-                  value="HomeInternet">
+                  value="HomeInternet"
+                />
                 My home has a computer with internet access
               </label>
             </div>
@@ -130,7 +145,8 @@
                 <input
                   v-model="user.computerAccess"
                   type="checkbox"
-                  value="PhoneInternet">
+                  value="PhoneInternet"
+                />
                 I have my own smartphone with internet access
               </label>
             </div>
@@ -139,7 +155,8 @@
                 <input
                   v-model="user.computerAccess"
                   type="checkbox"
-                  value="FamilyPhone">
+                  value="FamilyPhone"
+                />
                 Someone who lives with me has a smartphone with internet access
               </label>
             </div>
@@ -148,7 +165,8 @@
                 <input
                   v-model="user.computerAccess"
                   type="checkbox"
-                  value="None">
+                  value="None"
+                />
                 None
               </label>
             </div>
@@ -160,10 +178,8 @@
         <p>Where/How are you currently accessing the internet?</p>
         <div class="row">
           <div class="col-sm-6">
-            <select
-              v-model="user.computerAccessLocation"
-              class="form-control">
-              <option/>
+            <select v-model="user.computerAccessLocation" class="form-control">
+              <option />
               <option>School’s computer lab/library</option>
               <option>Public library</option>
               <option>Community center</option>
@@ -179,10 +195,8 @@
         <p>At what time do you usually do your homework?</p>
         <div class="row">
           <div class="col-sm-6">
-            <select
-              v-model="user.homeworkTime"
-              class="form-control">
-              <option/>
+            <select v-model="user.homeworkTime" class="form-control">
+              <option />
               <option>In the morning before school</option>
               <option>During school</option>
               <option>After school (2-5pm)</option>
@@ -200,25 +214,28 @@
             <input
               v-model="user.difficultAcademicSubject"
               type="text"
-              class="form-control">
+              class="form-control"
+            />
           </div>
         </div>
       </div>
 
       <div class="row form-group">
-        <p>What is your current GPA? Please fill out on a 4.0 scale if possible.</p>
+        <p>
+          What is your current GPA? Please fill out on a 4.0 scale if possible.
+        </p>
         <div class="row">
           <div class="col-sm-12">
-            <input
-              v-model="user.gpa"
-              type="text"
-              class="form-control">
+            <input v-model="user.gpa" type="text" class="form-control" />
           </div>
         </div>
       </div>
 
       <div class="row form-group">
-        <p>Which part of the college application process do you find most difficult?</p>
+        <p>
+          Which part of the college application process do you find most
+          difficult?
+        </p>
         <div class="row">
           <div class="col-sm-6">
             <div class="checkbox">
@@ -226,7 +243,8 @@
                 <input
                   v-model="user.difficultCollegeProcess"
                   type="checkbox"
-                  value="PersonalStatement">
+                  value="PersonalStatement"
+                />
                 Personal Statement / Essay
               </label>
             </div>
@@ -235,7 +253,8 @@
                 <input
                   v-model="user.difficultCollegeProcess"
                   type="checkbox"
-                  value="Resume">
+                  value="Resume"
+                />
                 Resume
               </label>
             </div>
@@ -247,7 +266,8 @@
                 <input
                   v-model="user.difficultCollegeProcess"
                   type="checkbox"
-                  value="Exams">
+                  value="Exams"
+                />
                 SAT / ACT Exams
               </label>
             </div>
@@ -256,7 +276,8 @@
                 <input
                   v-model="user.difficultCollegeProcess"
                   type="checkbox"
-                  value="ChoosingSchools">
+                  value="ChoosingSchools"
+                />
                 Choosing which schools to apply to
               </label>
             </div>
@@ -265,7 +286,8 @@
                 <input
                   v-model="user.difficultCollegeProcess"
                   type="checkbox"
-                  value="Other">
+                  value="Other"
+                />
                 Other
               </label>
             </div>
@@ -274,7 +296,10 @@
       </div>
 
       <div class="row form-group">
-        <p>What is the highest level of education completed by one of your parents?</p>
+        <p>
+          What is the highest level of education completed by one of your
+          parents?
+        </p>
         <div class="row">
           <div class="col-sm-12">
             <div class="checkbox">
@@ -282,7 +307,8 @@
                 <input
                   v-model="user.highestLevelEducation"
                   type="checkbox"
-                  value="SomeHighSchool">
+                  value="SomeHighSchool"
+                />
                 Some high school
               </label>
             </div>
@@ -291,7 +317,8 @@
                 <input
                   v-model="user.highestLevelEducation"
                   type="checkbox"
-                  value="HighSchoolGED">
+                  value="HighSchoolGED"
+                />
                 High school/GED degree
               </label>
             </div>
@@ -300,7 +327,8 @@
                 <input
                   v-model="user.highestLevelEducation"
                   type="checkbox"
-                  value="SomeCollege">
+                  value="SomeCollege"
+                />
                 Some college
               </label>
             </div>
@@ -309,7 +337,8 @@
                 <input
                   v-model="user.highestLevelEducation"
                   type="checkbox"
-                  value="AssociatesDegree">
+                  value="AssociatesDegree"
+                />
                 Associate's degree
               </label>
             </div>
@@ -318,7 +347,8 @@
                 <input
                   v-model="user.highestLevelEducation"
                   type="checkbox"
-                  value="BachelorsDegree">
+                  value="BachelorsDegree"
+                />
                 Bachelor's degree
               </label>
             </div>
@@ -327,7 +357,8 @@
                 <input
                   v-model="user.highestLevelEducation"
                   type="checkbox"
-                  value="MastersDegreeHigher">
+                  value="MastersDegreeHigher"
+                />
                 Master’s degree or higher
               </label>
             </div>
@@ -336,7 +367,8 @@
                 <input
                   v-model="user.highestLevelEducation"
                   type="checkbox"
-                  value="NotSure">
+                  value="NotSure"
+                />
                 Not sure
               </label>
             </div>
@@ -348,10 +380,8 @@
         <p>Does your high school have a college guidance counselor?</p>
         <div class="row">
           <div class="col-sm-6">
-            <select
-              v-model="user.hasGuidanceCounselor"
-              class="form-control">
-              <option/>
+            <select v-model="user.hasGuidanceCounselor" class="form-control">
+              <option />
               <option>Yes</option>
               <option>No</option>
               <option>I don't know</option>
@@ -364,10 +394,8 @@
         <p>How did you hear about UPchieve?</p>
         <div class="row">
           <div class="col-sm-6">
-            <select
-              v-model="user.heardFrom"
-              class="form-control">
-              <option/>
+            <select v-model="user.heardFrom" class="form-control">
+              <option />
               <option>Flyer</option>
               <option>Email</option>
               <option>Friend</option>
@@ -384,84 +412,95 @@
         <button
           class="btn btn-lg btn-primary btn-block back"
           type="back"
-          @click.prevent="back">BACK</button>
+          @click.prevent="back"
+        >
+          BACK
+        </button>
         <button
           class="btn btn-lg btn-primary btn-block next"
           type="submit"
-          @click.prevent="submitProfile">{{ buttonMsg }}</button>
+          @click.prevent="submitProfile"
+        >
+          {{ buttonMsg }}
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-
-import UserService from 'src/services/UserService';
-import $ from 'jquery';
+import UserService from 'src/services/UserService'
+import $ from 'jquery'
 
 export default {
-  data() {
-    const user = UserService.getUser();
+  data () {
+    const user = UserService.getUser()
     return {
       user,
       buttonMsg: 'DONE',
-      error: '',
-    };
+      error: ''
+    }
   },
   methods: {
-    skipOnboarding() {
-      this.$router.push('/');
+    skipOnboarding () {
+      this.$router.push('/')
     },
-    back() {
-      this.$router.push('/onboarding/profile');
+    back () {
+      this.$router.push('/onboarding/profile')
     },
-    submitProfile() {
-      this.error = '';
+    submitProfile () {
+      this.error = ''
 
       if (!this.user.isVolunteer) {
         if (!this.user.groupIdentification.length) {
-          this.error = 'If you don\'t identify with any of the groups, please select "None of the Above"';
-        }
-        else if (!this.user.computerAccess.length) {
-          this.error = 'If you don\'t have access to a computer or phone with internet access, please select "None"';
-        }
-        else if (!this.user.computerAccessLocation || this.user.computerAccessLocation === '') {
-          this.error = 'Please provide where you are accessing this site from';
-        }
-        else if (!this.user.homeworkTime || this.user.homeworkTime === '') {
-          this.error = 'Please provide the times times you generally do your homework';
-        }
-        else if (!this.user.difficultAcademicSubject || this.user.difficultAcademicSubject === '') {
-          this.error = 'Please provide the academic subjects you find most difficult';
-        }
-        else if (!this.user.gpa || this.user.gpa === '') {
-          this.error = 'Please provide your GPA';
-        }
-        else if (!this.user.difficultCollegeProcess.length) {
-          this.error = 'Please provide the aspects of the college process that are most difficult';
-        }
-        else if (!this.user.highestLevelEducation.length) {
-          this.error = 'Please provide your parent\'s highest level of education';
-        }
-        else if (!this.user.hasGuidanceCounselor || this.user.hasGuidanceCounselor === '') {
-          this.error = 'Please provide whether or not you have a guidance counselor';
-        }
-        else if (!this.user.heardFrom || this.user.heardFrom === '') {
-          this.error = 'Please provide where you heard about UPchieve';
+          this.error =
+            'If you don\'t identify with any of the groups, please select "None of the Above"'
+        } else if (!this.user.computerAccess.length) {
+          this.error =
+            'If you don\'t have access to a computer or phone with internet access, please select "None"'
+        } else if (
+          !this.user.computerAccessLocation ||
+          this.user.computerAccessLocation === ''
+        ) {
+          this.error = 'Please provide where you are accessing this site from'
+        } else if (!this.user.homeworkTime || this.user.homeworkTime === '') {
+          this.error =
+            'Please provide the times times you generally do your homework'
+        } else if (
+          !this.user.difficultAcademicSubject ||
+          this.user.difficultAcademicSubject === ''
+        ) {
+          this.error =
+            'Please provide the academic subjects you find most difficult'
+        } else if (!this.user.gpa || this.user.gpa === '') {
+          this.error = 'Please provide your GPA'
+        } else if (!this.user.difficultCollegeProcess.length) {
+          this.error =
+            'Please provide the aspects of the college process that are most difficult'
+        } else if (!this.user.highestLevelEducation.length) {
+          this.error = "Please provide your parent's highest level of education"
+        } else if (
+          !this.user.hasGuidanceCounselor ||
+          this.user.hasGuidanceCounselor === ''
+        ) {
+          this.error =
+            'Please provide whether or not you have a guidance counselor'
+        } else if (!this.user.heardFrom || this.user.heardFrom === '') {
+          this.error = 'Please provide where you heard about UPchieve'
         }
       }
 
       if (this.error !== '') {
-        $('body').animate({ scrollTop: 0 });
-        return;
+        $('body').animate({ scrollTop: 0 })
+        return
       }
 
-      this.buttonMsg = 'Updating...';
-      console.log(this.user);
-      UserService.setProfile(this, this.user, '/');
-    },
-  },
-};
+      this.buttonMsg = 'Updating...'
+      console.log(this.user)
+      UserService.setProfile(this, this.user, '/')
+    }
+  }
+}
 </script>
 
 <style scoped>
@@ -473,11 +512,11 @@ export default {
   display: flex;
   padding: 30px 0 30px 50px;
   font-size: 24px;
-  border-bottom: 0.5px solid #CCCCCF;
+  border-bottom: 0.5px solid #cccccf;
   align-items: center;
   justify-content: space-between;
   font-weight: 600;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
 }
 
 h2 {
@@ -528,7 +567,7 @@ p {
 }
 
 .form-control.url-box::placeholder {
-  color: #73737A;
+  color: #73737a;
 }
 
 label {
@@ -540,12 +579,12 @@ label {
 }
 
 .form-control {
-  border-bottom: 3px solid #16D2AA;
+  border-bottom: 3px solid #16d2aa;
   margin-bottom: 10px;
 }
 
 .form-control:focus {
-  border-bottom: 3px solid #16D2AA;
+  border-bottom: 3px solid #16d2aa;
   box-shadow: none;
 }
 
@@ -553,16 +592,18 @@ label {
   font-size: 16px;
 }
 
-select.form-control, select.form-control:focus {
+select.form-control,
+select.form-control:focus {
   border-bottom: 0;
-  border: 1px solid #16D2AA;
+  border: 1px solid #16d2aa;
 }
 
-button[type="submit"], button[type="back"] {
+button[type='submit'],
+button[type='back'] {
   width: 140px;
   height: 40px;
-  background-color: #F6F6F6;
-  color: #16D2AA;
+  background-color: #f6f6f6;
+  color: #16d2aa;
   border: none;
   font-weight: 600;
   margin: 0 50px 50px 50px;
@@ -571,10 +612,12 @@ button[type="submit"], button[type="back"] {
   float: right;
 }
 
-button[type="submit"]:hover, button[type="submit"]:active,
-button[type="back"]:hover, button[type="back"]:active {
-  background-color: #16D2AA;
-  color: #FFF;
+button[type='submit']:hover,
+button[type='submit']:active,
+button[type='back']:hover,
+button[type='back']:active {
+  background-color: #16d2aa;
+  color: #fff;
 }
 
 .btn-container {
@@ -586,15 +629,14 @@ button[type="back"]:hover, button[type="back"]:active {
 .profile-editor {
   display: flex;
   flex-direction: column;
-  background-color: #E3F2FD;
+  background-color: #e3f2fd;
 }
 
 .registration-body {
   padding-top: 50px;
   width: 620px;
   align-self: center;
-  background-color: #FFFFFF;
-  border-left: 5px solid #1855D1;
+  background-color: #ffffff;
+  border-left: 5px solid #1855d1;
 }
-
 </style>

@@ -13,7 +13,7 @@
       >UPchieve is a volunteer-run ed-tech initiative with the goal of providing free, online, and on-demand educational and guidance services to disadvantaged students.</p>
     </div>
     <div class="navbar-footer">
-      <sidebar-footer/>
+      <sidebar-footer />
     </div>
   </nav>
 </template>
@@ -31,7 +31,7 @@ export default {
     ProfileInfo,
     SidebarFooter: Footer // footer is reserved component name
   },
-  data() {
+  data () {
     return {
       auth: UserService.getAuth()
     };

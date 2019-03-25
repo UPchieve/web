@@ -1,9 +1,7 @@
 <template>
   <form class="form-signup">
     <div class="header">
-      <router-link
-        to="login"
-        class="login-link">Log In</router-link>
+      <router-link to="login" class="login-link">Log In</router-link>
       <div class="registration-header">Registration</div>
     </div>
     <div v-if="!showingSuccess">
@@ -14,7 +12,8 @@
         type="email"
         class="form-control"
         required
-        autofocus>
+        autofocus
+      />
       <div class="description">You will be sent a verification email</div>
       <label for="inputPassword">Create a password</label>
       <input
@@ -22,71 +21,80 @@
         v-model="credentials.password"
         type="password"
         class="form-control"
-        required>
-      <p class="password-guidelines">It must contain lowercase and uppercase letters, numbers, and at least 8 characters.</p>
+        required
+      />
+      <p class="password-guidelines">
+        It must contain lowercase and uppercase letters, numbers, and at least 8
+        characters.
+      </p>
       <div class="agreement-box">
         <input
           id="userAgreement"
           v-model="credentials.terms"
           type="checkbox"
-          required>
-        <label
-          id="agreement"
-          for="userAgreement"/>
-        <div class="agreement-label">I have read and accept the <a
-          href="#/legal"
-          target="_blank">user agreement</a>.</div>
+          required
+        />
+        <label id="agreement" for="userAgreement" />
+        <div class="agreement-label">
+          I have read and accept the
+          <a href="#/legal" target="_blank">user agreement</a>.
+        </div>
       </div>
       <button
         class="btn btn-lg btn-primary btn-block"
         type="submit"
-        @click.prevent="submit()">SIGN UP</button>
+        @click.prevent="submit()"
+      >
+        SIGN UP
+      </button>
       {{ msg }}
     </div>
-    <div
-      v-else
-      class="successMessage">
-      <p>You’ve been sent a verification email! Use the link in the email to get started.</p>
+    <div v-else class="successMessage">
+      <p>
+        You’ve been sent a verification email! Use the link in the email to get
+        started.
+      </p>
     </div>
   </form>
 </template>
 
 <script>
-import AuthService from 'src/services/AuthService';
-import RegistrationService from 'src/services/RegistrationService';
+import AuthService from 'src/services/AuthService'
+import RegistrationService from 'src/services/RegistrationService'
 
 export default {
-  data() {
+  data () {
     return {
       msg: '',
       credentials: {
         email: '',
         password: '',
-        terms: false,
+        terms: false
       },
-      showingSuccess: false,
-    };
+      showingSuccess: false
+    }
   },
   methods: {
-    submit() {
+    submit () {
       AuthService.register(this, {
         code: RegistrationService.data.registrationCode,
         email: this.credentials.email,
         password: this.credentials.password,
-        terms: this.credentials.terms,
-      }).then(() => {
-        this.showingSuccess = true;
-      }).catch((err) => {
-        console.log(err);
-        this.msg = err.message;
-      });
-    },
-  },
-};
+        terms: this.credentials.terms
+      })
+        .then(() => {
+          this.showingSuccess = true
+        })
+        .catch(err => {
+          console.log(err)
+          this.msg = err.message
+        })
+    }
+  }
+}
 </script>
 
 <style scoped>
-
 .header {
   display: flex;
   justify-content: space-between;
@@ -94,11 +102,11 @@ export default {
   margin-top: 50px;
 }
 .login-link {
-  color: #73737A;
+  color: #73737a;
   font-weight: 600;
 }
 .registration-header {
-  color: #16D2AA;
+  color: #16d2aa;
   font-weight: 600;
   padding-left: 140px;
 }
@@ -106,7 +114,7 @@ export default {
   font-size: 12px;
   text-align: left;
   margin-bottom: 10px;
-  color: #73737A;
+  color: #73737a;
 }
 
 #inputEmail {
@@ -125,7 +133,6 @@ export default {
   border-radius: 0;
 }
 
-
 .form-signup .form-control:focus {
   z-index: 2;
 }
@@ -138,7 +145,7 @@ label {
   color: #343440;
 }
 .form-control {
-  border-bottom: 3px solid #16D2AA;
+  border-bottom: 3px solid #16d2aa;
   margin-bottom: 50px;
 }
 .form-control:last-of-type {
@@ -149,7 +156,7 @@ label {
   font-size: 12px;
   font-weight: 300;
   text-align: left;
-  color: #73737A;
+  color: #73737a;
   margin: 10px auto;
 }
 
@@ -169,10 +176,10 @@ label {
   margin-bottom: 0;
 }
 
-input[type="checkbox"] {
-   visibility: hidden;
-   position: absolute;
-   top: -9999px;
+input[type='checkbox'] {
+  visibility: hidden;
+  position: absolute;
+  top: -9999px;
 }
 
 .agreement-box {
@@ -188,7 +195,7 @@ input[type="checkbox"] {
   width: 18px;
   height: 18px;
   background: #fff;
-  border:2px solid #343440;
+  border: 2px solid #343440;
   border-radius: 2px;
 }
 
@@ -206,7 +213,7 @@ input[type="checkbox"] {
   transform: rotate(-45deg);
 }
 
-.agreement-box input[type="checkbox"]:checked + label:after {
+.agreement-box input[type='checkbox']:checked + label:after {
   opacity: 1;
 }
 
@@ -218,23 +225,24 @@ input[type="checkbox"] {
 }
 
 .agreement-label a {
-  color: #16D2AA;
+  color: #16d2aa;
 }
 
-button[type="submit"] {
-  background-color: #F6F6F6;
+button[type='submit'] {
+  background-color: #f6f6f6;
   border: none;
   font-weight: 600;
-  color: #16D2AA;
+  color: #16d2aa;
   height: 40px;
   border-radius: 20px;
   font-size: 12px;
   margin-bottom: 10px;
 }
 
-button[type="submit"]:hover, button[type="submit"]:active {
+button[type='submit']:hover,
+button[type='submit']:active {
   color: white;
-  background-color: #16D2AA;
+  background-color: #16d2aa;
 }
 
 .successMessage {
@@ -243,5 +251,4 @@ button[type="submit"]:hover, button[type="submit"]:active {
   padding-bottom: 20px;
   border-bottom: 3px solid black;
 }
-
 </style>

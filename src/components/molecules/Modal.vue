@@ -19,55 +19,53 @@
   </div>
 </template>
 
-
 <script>
-import BtnOptions from './BtnOptions';
-import Btn from '../atoms/Btn';
+import BtnOptions from './BtnOptions'
+import Btn from '../atoms/Btn'
 
 export default {
   components: {
     BtnOptions,
-    Btn,
+    Btn
   },
   props: {
     singleBtn: {
       type: Boolean,
-      default: false,
+      default: false
     },
     message: {
       type: String,
-      default: '',
+      default: ''
     },
     warn: {
       type: Boolean,
-      default: false,
+      default: false
     },
     labels: {
       type: Array[String],
-      default: [''],
+      default: ['']
     },
     clickHandlers: {
       type: Object,
-      required: true,
-    },
+      required: true
+    }
   },
-  data() {
+  data () {
     return {
       mainBtnLabel: this.labels[0],
       secondBtnLabel: this.labels[1] ? this.labels[1] : null,
       classes: {
         'v-modal': true,
-        'v-modal--warn': this.warn,
+        'v-modal--warn': this.warn
       },
       dialogClasses: {
         'v-modal-dialog': true,
-        'v-modal-dialog--warn': this.warn,
-      },
-    };
-  },
-};
+        'v-modal-dialog--warn': this.warn
+      }
+    }
+  }
+}
 </script>
-
 
 <style>
 .v-modal {
@@ -97,7 +95,6 @@ export default {
   margin-bottom: 40px;
 }
 .v-modal-dialog__options {
-
 }
 .v-modal-dialog--warn {
   box-shadow: -4px 4px var(--c-shadow-warn);

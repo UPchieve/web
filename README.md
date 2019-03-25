@@ -2,6 +2,8 @@
 
 > Online tutoring platform built with Vue.js and Webpack
 
+[![CircleCI](https://circleci.com/gh/UPchieve/web.svg?style=svg)](https://circleci.com/gh/UPchieve/web)
+
 ## Build Setup
 
 1. Install NodeJS either via [binary](https://nodejs.org/en/) or [Homebrew](http://brew.sh) (`brew install node`)
