@@ -1,58 +1,70 @@
 <template>
   <div class="background">
-    <form class="form-signin">
-      <div class="header">
-        <div class="login-header">Log In</div>
-        <router-link to="signup" class="register-link">Sign Up</router-link>
+    <div class="main-page">
+      <div class="logo-class">
+        <img class="logo-img" src="../assets/p_logo_white.png" />
       </div>
-      <div class="body">
-        <div
-          v-if="error || $route.query['401'] === 'true'"
-          class="alert alert-danger"
-          role="alert"
-        >
-          {{ error }}
-        </div>
-        <label for="inputEmail">Email</label>
-        <input
-          id="inputEmail"
-          v-model="credentials.email"
-          type="email"
-          class="form-control"
-          required
-          autofocus
-        />
-        <label for="inputPassword">Password</label>
-        <input
-          id="inputPassword"
-          v-model="credentials.password"
-          type="password"
-          class="form-control password"
-          required
-        />
-        <router-link to="resetpassword" class="password-reset-link"
-          >Forgot password?</router-link
-        >
-        <button
-          class="btn btn-lg btn-primary btn-block login-btn"
-          type="submit"
-          @click.prevent="submit"
-        >
-          LOGIN
-        </button>
+      <div class="form-div">
+        <form class="form-signin">
+          <div class="header">
+            <div class="login-header">Log In</div>
+            <router-link to="signup" class="register-link">Sign Up</router-link>
+          </div>
+          <div class="body">
+            <div
+              v-if="error || $route.query['401'] === 'true'"
+              class="alert alert-danger"
+              role="alert"
+            >
+              {{ error }}
+            </div>
+            <label for="inputEmail">Email</label>
+            <input
+              id="inputEmail"
+              v-model="credentials.email"
+              type="email"
+              class="form-control"
+              required
+              autofocus
+            />
+            <label for="inputPassword">Password</label>
+            <input
+              id="inputPassword"
+              v-model="credentials.password"
+              type="password"
+              class="form-control password"
+              required
+            />
+            <router-link to="resetpassword" class="password-reset-link"
+              >Forgot password?</router-link
+            >
+            <button
+              class="btn btn-lg btn-primary btn-block login-btn"
+              type="submit"
+              @click.prevent="submit"
+            >
+              LOGIN
+            </button>
+          </div>
+          <div class="footer">
+            <router-link to="/contact" tag="div"
+              ><a class="contact icon" target="_blank"
+                >CONTACT US</a
+              ></router-link
+            >
+            <router-link to="/legal" tag="div"
+              ><a class="privacy icon" target="_blank"
+                >LEGAL POLICY</a
+              ></router-link
+            >
+            <div>
+              <a href="https://upchieve.org/" target="_blank">OUR WEBSITE</a>
+            </div>
+          </div>
+        </form>
       </div>
-      <div class="footer">
-        <router-link to="/contact" tag="div"
-          ><a class="contact icon" target="_blank">CONTACT US</a></router-link
-        >
-        <router-link to="/legal" tag="div"
-          ><a class="privacy icon" target="_blank">LEGAL POLICY</a></router-link
-        >
-        <div>
-          <a href="https://upchieve.org/" target="_blank">OUR WEBSITE</a>
-        </div>
-      </div>
-    </form>
+      <div class="bottom-div"></div>
+    </div>
   </div>
 </template>
 
@@ -214,5 +226,29 @@ button[type='submit']:active {
 
 .footer a {
   color: #73737a;
+}
+
+.main-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height: 100%;
+}
+
+.logo-img {
+  width: 20%;
+  min-width: 250px;
+}
+
+.logo-class {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bottom-div {
+  flex: 1;
 }
 </style>

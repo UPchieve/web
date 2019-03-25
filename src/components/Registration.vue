@@ -1,35 +1,41 @@
 <template>
   <div class="registration-container background">
-    <div class="form-register">
-      <div class="header">
-        <router-link to="login" class="login-link">Log In</router-link>
-        <div class="registration-header">Sign Up</div>
+    <div class="main-page">
+      <div class="logo-class">
+        <img class="logo-img" src="../assets/p_logo_white.png" />
       </div>
-      <div class="body">
-        <volunteer-form
-          v-if="this.userSelection === 'volunteer'"
-        ></volunteer-form>
-        <student-form
-          v-else-if="this.userSelection === 'student'"
-        ></student-form>
-        <div v-else>
-          <b>Are you a student or a volunteer?</b>
-          <button
-            class="btn btn-lg btn-primary btn-block"
-            type="submit"
-            @click.prevent="selectStudent()"
-          >
-            STUDENT
-          </button>
-          <button
-            class="btn btn-lg btn-primary btn-block"
-            type="submit"
-            @click.prevent="selectVolunteer()"
-          >
-            VOLUNTEER
-          </button>
+      <div class="form-register">
+        <div class="header">
+          <router-link to="login" class="login-link">Log In</router-link>
+          <div class="registration-header">Sign Up</div>
+        </div>
+        <div class="body">
+          <volunteer-form
+            v-if="this.userSelection === 'volunteer'"
+          ></volunteer-form>
+          <student-form
+            v-else-if="this.userSelection === 'student'"
+          ></student-form>
+          <div v-else>
+            <b>Are you a student or a volunteer?</b>
+            <button
+              class="btn btn-lg btn-primary btn-block"
+              type="submit"
+              @click.prevent="selectStudent()"
+            >
+              STUDENT
+            </button>
+            <button
+              class="btn btn-lg btn-primary btn-block"
+              type="submit"
+              @click.prevent="selectVolunteer()"
+            >
+              VOLUNTEER
+            </button>
+          </div>
         </div>
       </div>
+      <div class="bottom-div"></div>
     </div>
   </div>
 </template>
@@ -143,5 +149,29 @@ button[type='submit']:hover,
 button[type='submit']:active {
   color: white;
   background-color: #16d2aa;
+}
+
+.main-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height: 100%;
+}
+
+.logo-img {
+  width: 20%;
+  min-width: 250px;
+}
+
+.logo-class {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bottom-div {
+  flex: 1;
 }
 </style>
