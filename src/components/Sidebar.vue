@@ -1,10 +1,12 @@
 <template>
-  <nav class="navbar">
-    <router-link tag="h1" to="/" />
-    <div v-if="auth.authenticated">
-      <profile-info v-if="auth.authenticated" />
+  <nav class="navbar">   
+    <div v-on:click="$emit('closeMenu')"> 
+      <router-link tag="h1" to="/" />
+    </div>
+    <div v-if="!auth.authenticated">
+      <profile-info v-if="!auth.authenticated" />
       <div id="navbar">
-        <user-nav />
+        <user-nav v-on:closeMenu="$emit('closeMenu')" />
       </div>
     </div>
     <div v-else>
@@ -15,7 +17,7 @@
       </p>
     </div>
     <div class="navbar-footer">
-      <sidebar-footer />
+      <sidebar-footer v-on:closeMenu="$emit('closeMenu')" />
     </div>
   </nav>
 </template>
@@ -37,7 +39,7 @@ export default {
     return {
       auth: UserService.getAuth()
     }
-  }
+  },
 }
 </script>
 
@@ -86,5 +88,33 @@ p.aboutText {
   width: 250px;
   margin: auto;
   text-align: left;
+}
+
+
+
+@media screen and (max-width: 488px) {
+  .navbar {
+    height: 100vh !important;
+    padding: 1.5em !important;
+  }
+
+  h1 {
+    width: 100px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-top: 0em !important;
+  }
+
+  p.aboutText {
+    width: 100% !important;
+  }
+
+  .navbar-footer {
+    margin: 1em 0em !important;
+  }
+
+  .navbar-nav {
+    margin: 0em !important;
+  }
 }
 </style>

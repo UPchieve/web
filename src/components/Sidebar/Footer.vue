@@ -1,20 +1,34 @@
 <template>
   <ul class="nav navbar-nav">
-    <router-link v-if="!userauth.authenticated" to="/login" tag="li"
-      ><a class="login">Log In</a></router-link
-    >
-    <router-link to="/contact" tag="li"
-      ><a class="contact icon">Contact Us</a></router-link
-    >
-    <router-link to="/legal" tag="li"
-      ><a class="privacy icon">Legal Policy</a></router-link
-    >
-    <li v-if="userauth.authenticated">
-      <a class="logout icon" @click="logout">Logout</a>
-    </li>
-    <li v-if="!userauth.authenticated">
-      <a :href="mainWebsiteUrl">Back to Website</a>
-    </li>
+    <div v-on:click="$emit('closeMenu')">
+      <router-link v-if="!userauth.authenticated" to="/login" tag="li"
+        ><a class="login">Log In</a></router-link
+      >
+    </div>
+
+    <div v-on:click="$emit('closeMenu')">
+      <router-link to="/contact" tag="li"
+        ><a class="contact icon" >Contact Us</a></router-link
+      >
+    </div>
+
+    <div v-on:click="$emit('closeMenu')">
+      <router-link to="/legal" tag="li"
+        ><a class="privacy icon" v-on:click="$emit('closeMenu')">Legal Policy</a></router-link
+      >
+    </div>
+
+    <div v-on:click="$emit('closeMenu')">
+      <li v-if="userauth.authenticated" v-on:click="$emit('closeMenu')">
+        <a class="logout icon" @click="logout">Logout</a>
+      </li>
+    </div>
+
+    <div v-on:click="$emit('closeMenu')">
+      <li v-if="!userauth.authenticated" v-on:click="$emit('closeMenu')">
+        <a :href="mainWebsiteUrl">Back to Website</a>
+      </li>
+    </div>
   </ul>
 </template>
 
