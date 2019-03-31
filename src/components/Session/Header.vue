@@ -175,4 +175,11 @@ h1 {
   display: flex;
   align-items: center;
 }
+
+
+@media screen and (max-width: 488px) {
+  .info {
+    width: auto !important;
+  }
+}
 </style>

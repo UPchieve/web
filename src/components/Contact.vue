@@ -39,4 +39,17 @@ export default {
   position: relative;
   z-index: 2;
 }
+
+
+@media screen and (max-width: 488px) {
+  .background {
+    margin-left: 0em !important;
+    padding-left: 0em !important;
+    padding-top: 0.5em !important;
+  }
+
+  .col-sm-12 {
+    padding: 0em !important;
+  }
+}
 </style>

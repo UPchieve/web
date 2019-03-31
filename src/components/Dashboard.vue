@@ -376,4 +376,28 @@ h3 {
   border-radius: 30px;
   width: 300px;
 }
+
+
+@media screen and (max-width: 488px) {
+  .dashboard-body.row {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .dashboard-body p {
+    padding: 1.2em !important;
+  }
+   
+  iframe {
+    max-width: 100vw !important;
+  }
+
+  .help-container {
+    width: 100% !important;
+  }
+
+  .getHelpPopUp {
+    width: 100% !important;
+  }
+}
 </style>

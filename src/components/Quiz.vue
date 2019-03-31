@@ -543,5 +543,13 @@ label {
   border-bottom: 0.5px solid #cccccf;
   padding: 20px;
   margin: 0px;
+} 
+
+
+
+@media screen and (max-width: 488px) {
+  .header {
+    padding: 1em 1em 1em 3em !important;
+  }
 }
 </style>

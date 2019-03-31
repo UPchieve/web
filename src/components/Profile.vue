@@ -440,4 +440,16 @@ ul {
 .MATH {
   background-color: #f7aef8;
 }
+
+
+
+@media screen and (max-width: 488px) {
+  .header {
+    padding: 1em 20px 1em 3em !important;
+  }
+
+  .contain {
+    margin: 1.5em !important;
+  }
+}
 </style>

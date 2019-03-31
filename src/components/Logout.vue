@@ -87,4 +87,17 @@ h1 {
   color: white;
   background-color: #16d2aa;
 }
+
+
+
+@media screen and (max-width: 488px) {
+  .form-signout {
+    width: 88% !important;
+    height: auto !important;
+  }
+
+  .form-signout h1 {
+    margin: 2.5em 0em !important;
+  }
+}
 </style>

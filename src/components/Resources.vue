@@ -214,4 +214,15 @@ li {
   padding: 0 30px 50px;
   text-align: left;
 }
+
+
+
+@media screen and (max-width: 488px) {
+  .res-header,
+  .header {
+    font-size: 24px;
+    line-height: 1.2 !important;
+    padding: 1em 1em 1em 3em !important;
+  } 
+}
 </style>

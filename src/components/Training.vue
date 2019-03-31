@@ -280,4 +280,20 @@ a {
   color: #16d2aa;
   font-weight: 600;
 }
+
+
+ @media screen and (max-width: 488px) {
+  .header {
+    padding: 1em 1em 1em 3em !important;
+  }
+
+  .body-container {
+    margin: 1.5em !important;
+  }
+
+  .supercategory,
+  .category {
+    width: auto !important;
+  }
+}
 </style>

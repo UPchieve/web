@@ -147,4 +147,21 @@ button[type='submit']:active {
   color: #16d2aa;
   font-weight: 700;
 }
+
+
+@media screen and (max-width: 488px) {
+  .form-resetpassword {
+    width: 88% !important;
+    height: auto !important;
+    padding: 0em 1.5em !important;
+  }
+
+  .header {
+    margin: 1.5em 0em 3em !important;
+  }
+
+  .btn-block {
+    margin-bottom: 4em !important;
+  }
+}
 </style>

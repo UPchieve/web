@@ -31,4 +31,11 @@ export default {
   background-color: white;
   padding: 0px 75px;
 }
+
+
+@media screen and (max-width: 488px) {
+  .form-signup {
+    margin: 0% auto !important;
+  }
+}
 </style>

@@ -251,4 +251,62 @@ button[type='submit']:active {
 .bottom-div {
   flex: 1;
 }
+
+
+
+
+
+
+@media screen and (max-width: 488px) {
+  .background {
+    margin-left: 0em !important;
+    padding-left: 0em !important;
+  }
+
+  .logo-img {
+    width: 40% !important;
+    min-width: 110px !important;
+  }
+
+  .form-div {
+    width: 100vw !important;
+  }
+
+  .form-signin {
+    width: 88% !important;
+    height: 100% !important;
+    padding: 0em 0em !important;
+  }
+
+  .header {
+    margin: 1.5em 1.5em 0.8em !important;
+  }
+
+  .register-link {
+    padding: 0em !important;
+  }
+
+  #inputEmail {
+    margin-bottom: 2em !important;
+  }
+
+  .password-reset-link {
+    margin-bottom: 2em !important;
+  }
+
+  button.login-btn {
+    height: 3.5em !important;
+    margin: 1em 0em !important;
+  }
+
+  .footer {
+    width: 100% !important;
+    padding-left: 0em !important;
+    padding-right: 0em !important;
+    justify-content: space-evenly !important;
+  }
+
+
+
+}
 </style>

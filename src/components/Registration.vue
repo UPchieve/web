@@ -16,7 +16,7 @@
           <student-form
             v-else-if="this.userSelection === 'student'"
           ></student-form>
-          <div v-else>
+          <div class="inner" v-else>
             <b>Are you a student or a volunteer?</b>
             <button
               class="btn btn-lg btn-primary btn-block"
@@ -173,5 +173,46 @@ button[type='submit']:active {
 
 .bottom-div {
   flex: 1;
+}
+
+
+
+
+@media screen and (max-width: 488px) {
+  .background {
+    margin-left: 0em !important;
+    padding-left: 0em !important;
+  }
+
+  .logo-img {
+    width: 40% !important;
+    min-width: 150px !important;
+  }
+
+  .form-register {
+    width: 88% !important;
+    height: auto !important;
+    padding: 0em !important;
+  }
+
+  .header {
+    margin: 1.5em 1.5em 0.8em !important;
+  }
+
+  .body {
+    margin: 2em 2em 3em !important;
+    padding: 0em !important;
+    /* text-align: center !important; */
+  }
+
+  .inner {
+    margin: 0% auto !important;
+  }
+
+  .btn-block {
+    /* font-size: 1em !important; */
+    height: 3.5 !important;
+    margin-top: 3.5em !important;
+  }
 }
 </style>
