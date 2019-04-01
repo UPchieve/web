@@ -59,9 +59,9 @@
           <div v-for="(item, index) in items" :key="`item-${index}`">
             <div class="options">
               <input :value="item.val" v-model="picked" type="radio" />
-              <label :for="item.val" :id="'answer-' + item.val"
-                >{{ item.val }}. {{ item.txt }}</label
-              >
+              <label :for="item.val" :id="'answer-' + item.val">
+                {{ item.val }}. {{ item.txt }}
+              </label>
             </div>
           </div>
         </form>
@@ -198,7 +198,34 @@ export default {
       this.quizLength = quizLength
     })
   },
+  beforeUpdate () {
+    this.clearMathJaxElements()
+  },
+  updated () {
+    this.rerenderMathJaxElements()
+  },
   methods: {
+    clearMathJaxElements () {
+      // Remove any MathJax-rendered elements from the DOM.
+      // Do this before updating to avoid rendering artifacts being left behind
+      const mathJaxElements = document.querySelectorAll('.mjx-chtml')
+      Array.from(mathJaxElements).forEach(node => node.remove())
+    },
+    rerenderMathJaxElements () {
+      // Re-render MathJax in question text and answer choices
+      const quiz = document.querySelector('.quizBody')
+      const questionText = quiz.querySelector('.questionText')
+      const answerChoices = quiz.querySelector('.possibleAnswers')
+
+      if (!questionText || !answerChoices) {
+        return
+      }
+
+      MathJax.Hub.Queue(
+        ['Typeset', MathJax.Hub, questionText],
+        ['Typeset', MathJax.Hub, answerChoices]
+      )
+    },
     reload () {
       this.$router.go(this.$router.currentRoute)
     },
