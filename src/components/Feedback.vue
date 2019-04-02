@@ -29,7 +29,7 @@
           <div v-if="question.qtype === 'multiple-radio'">
             <table class="radio-question-table">
               <tr class="radio-question-row">
-                <td></td>
+                <td class="mobileRemove"></td>
                 <td
                   class="radio-question-selection-title"
                   v-for="(label, index) in question.table_title"
@@ -38,7 +38,7 @@
                 </td>
               </tr>
               <tr
-                class="radio-question-row"
+                class="radio-question-row forMobileView"
                 v-for="(subquestion, subquestion_index) in question.options"
               >
                 <td class="radio-question-cell">{{ subquestion }}</td>
@@ -413,5 +413,47 @@ export default {
 .submit-button:active {
   background-color: #16d2aa;
   color: #fff;
+}
+
+
+
+@media screen and (max-width: 488px) {
+  .mobileRemove {
+    display: none !important;
+  }
+
+  .header {
+    padding: 1em 1em 1em 2em !important;
+  }
+
+  table, thead, tbody, th, tr { 
+		display: block !important; 
+	}
+
+  .title-cell {
+    padding: 1.5em 1em 1em !important;
+  }
+
+  .questions-table {
+    width: 95vw !important;
+  }
+
+  .question-cell {
+    padding: 0em 1em 2em !important;
+  }
+
+  .radio-question-cell {
+    width: 36rem !important;
+    display: table-caption !important;
+    padding: 1.5em !important;
+  }
+
+  .radio-question-selection-cell {
+    padding-bottom: 1em !important;
+  }
+
+  .submit-button-cell {
+    padding-left: 1.2em !important;
+  }
 }
 </style>

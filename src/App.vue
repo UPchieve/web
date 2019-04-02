@@ -1,7 +1,7 @@
 <template>
   <div id="app">
 
-    <div v-if="['LoginForm', 'Logout', 'Registration', 'ResetPasswordForm', 'SetPasswordForm', 'Feedback', 'Session-math', 'Session-college'].indexOf($route.name) > -1">
+    <div v-if="['LoginForm', 'Logout', 'Registration', 'ResetPasswordForm', 'SetPasswordForm', 'Session-math', 'Session-college'].indexOf($route.name) > -1">
     </div>
 
     <div v-else class="toggleMenu forMobileView">

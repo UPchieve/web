@@ -160,12 +160,12 @@ export default {
 @media screen and (max-width: 488px) {
   .whiteboard-container {
     width: 100% !important;
-    height: 60vh !important;
+    height: 55vh !important;
   }
 
   .chat-container {
     width: 100% !important;
-    height: calc(40vh - 100px) !important;
+    height: calc(45vh - 100px) !important;
   }
 }
 </style>
