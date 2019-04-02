@@ -198,9 +198,6 @@ export default {
       this.quizLength = quizLength
     })
   },
-  beforeUpdate () {
-    this.clearMathJaxElements()
-  },
   updated () {
     this.rerenderMathJaxElements()
   },
@@ -241,6 +238,10 @@ export default {
           element.style.background = '#EEEEEE'
         }
       }
+
+      // When switching to a new question, clear any mathjax elements so they
+      // can be re-rendered
+      this.clearMathJaxElements()
     },
     styleImage (image) {
       if (image) {
