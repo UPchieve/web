@@ -210,16 +210,14 @@ export default {
       const mathJaxElements = quizBody.querySelectorAll('[class*=mjx],[class*=MathJax],[id*=MathJax]')
       Array.from(mathJaxElements).forEach(e => e.remove())
 
-      // MathJax slices up the DOM nodes it renders as Math. We need to rejoin
-      // these to avoid rendering artifacts being left behind
+      // MathJax slices up the DOM nodes it renders as math formulas. We need to
+      // rejoin these under the first child's data attribute to avoid artifacts
+      // being left behind
       const questionText = quizBody.querySelector('.questionText')
-      questionText.childNodes[0].data = questionText.innerText
+      questionText.firstChild.data = questionText.innerText
 
-      // Use a while loop because childNodes is a live collection
-      // https://developer.mozilla.org/en-US/docs/Web/API/NodeList#A_sometimes-live_collection
-      while (questionText.childNodes.length > 1) {
-        questionText.removeChild(questionText.childNodes[1])
-      }
+      // Remove all child nodes but the first
+      Array.from(questionText.childNodes).slice(1).forEach(e => e.remove())
     },
 
     rerenderMathJaxElements () {
