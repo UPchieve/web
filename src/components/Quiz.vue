@@ -255,11 +255,10 @@ export default {
         }
       }
     },
-    styleImage (image) {
-      if (image) {
-        const questionImage = `../../../static/question_images/${image}`
+    styleImage (imageSrc) {
+      if (imageSrc) {
         this.imageStyle = {
-          backgroundImage: `url(${questionImage})`,
+          backgroundImage: `url(${imageSrc})`,
           width: '300px',
           height: '300px',
           display: 'flex',
@@ -273,7 +272,7 @@ export default {
     getFirst () {
       const question = TrainingService.getFirstQuestion(this)
       this.questionText = question.questionText
-      this.styleImage(question.image)
+      this.styleImage(question.imageSrc)
       this.items = question.possibleAnswers
       this.showStartMsg = false
       this.showStart = false
@@ -289,7 +288,7 @@ export default {
       this.picked = data.picked
       this.questionText = question.questionText
       this.updateProgressBar()
-      this.styleImage(question.image)
+      this.styleImage(question.imageSrc)
       this.items = question.possibleAnswers
       if (!TrainingService.hasPrevious(this)) {
         this.showPrevious = false
@@ -308,7 +307,7 @@ export default {
       this.picked = data.picked
       this.questionText = question.questionText
       this.updateProgressBar()
-      this.styleImage(question.image)
+      this.styleImage(question.imageSrc)
       this.items = question.possibleAnswers
       if (!TrainingService.hasNext(this)) {
         this.showNext = false
@@ -381,12 +380,9 @@ export default {
     review () {
       this.questionsReview = TrainingService.reviewQuiz(this)
       this.questionsReview.forEach(question => {
-        if (question.image) {
-          const questionImage = `../../../static/question_images/${
-            question.image
-          }`
+        if (question.imageSrc) {
           question.imageStyle = {
-            backgroundImage: `url(${questionImage})`,
+            backgroundImage: `url(${question.imageSrc})`,
             width: '300px',
             height: '300px',
             display: 'flex',
