@@ -4,39 +4,47 @@
       v-if="$route.path.indexOf('/onboarding') !== -1 && !user.isVolunteer"
       class="nav navbar-nav"
     >
-      <router-link to="/onboarding/profile" tag="li"
-        ><a class="profile-info">Basic Profile</a></router-link
-      >
-      <router-link to="/onboarding/academic" tag="li"
-        ><a class="profile-info">First Time Use Survey</a></router-link
-      >
+      <router-link to="/onboarding/profile" tag="li">
+        <a class="profile-info">Basic Profile</a>
+      </router-link>
+      <router-link to="/onboarding/academic" tag="li">
+        <a class="profile-info">First Time Use Survey</a>
+      </router-link>
     </ul>
     <ul
       v-else-if="$route.path.indexOf('/onboarding') !== -1"
       class="nav navbar-nav"
     >
-      <router-link to="/onboarding/profile" tag="li"
-        ><a class="profile-info">Basic Profile</a></router-link
-      >
+      <router-link to="/onboarding/profile" tag="li">
+        <a class="profile-info">Basic Profile</a>
+      </router-link>
     </ul>
     <ul v-else-if="auth.authenticated" class="nav navbar-nav">
-      <router-link to="/dashboard" tag="li"
-        ><a class="home icon">Home</a></router-link
-      >
+      <router-link to="/dashboard" tag="li">
+        <a class="home icon">Home</a>
+      </router-link>
+
       <template v-if="user.isVolunteer">
-        <router-link to="/training" tag="li"
-          ><a class="training icon">Training</a></router-link
-        >
-        <router-link to="/calendar" tag="li"
-          ><a class="schedule icon">Schedule</a></router-link
-        >
+        <router-link to="/training" tag="li">
+          <a class="training icon">Training</a>
+        </router-link>
+        <router-link to="/calendar" tag="li">
+          <a class="schedule icon">Schedule</a>
+        </router-link>
       </template>
-      <router-link to="/profile" tag="li"
-        ><a class="profile icon">Profile</a></router-link
-      >
-      <router-link to="/resources" tag="li"
-        ><a class="resources icon">Useful Information</a></router-link
-      >
+
+      <template v-if="user.isAdmin">
+        <router-link to="/edu" tag="li">
+          <a class="resources icon">EDU Admin</a>
+        </router-link>
+      </template>
+
+      <router-link to="/profile" tag="li">
+        <a class="profile icon">Profile</a>
+      </router-link>
+      <router-link to="/resources" tag="li">
+        <a class="resources icon">Useful Information</a>
+      </router-link>
     </ul>
   </div>
 </template>
