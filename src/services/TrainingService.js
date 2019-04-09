@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import NetworkService from './NetworkService'
 
-
 export default {
   idAnswerMap: {},
   questions: [],
