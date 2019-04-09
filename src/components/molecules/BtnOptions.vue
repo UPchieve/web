@@ -3,38 +3,35 @@
     <btn
       :label="secondBtnLabel"
       :click-handler="clickHandlers.second"
-      btn-options-second/>
-    <btn
-      :label="mainBtnLabel"
-      :click-handler="clickHandlers.main"/>
+      btn-options-second
+    />
+    <btn :label="mainBtnLabel" :click-handler="clickHandlers.main" />
   </div>
 </template>
 
-
 <script>
-import Btn from '../atoms/Btn';
+import Btn from '../atoms/Btn'
 
 export default {
   components: {
-    Btn,
+    Btn
   },
   props: {
     mainBtnLabel: {
       type: String,
-      default: '',
+      default: ''
     },
     secondBtnLabel: {
       type: String,
-      default: '',
+      default: ''
     },
     clickHandlers: {
       type: Object,
-      required: true,
-    },
-  },
-};
+      required: true
+    }
+  }
+}
 </script>
-
 
 <style>
 .btn-options {

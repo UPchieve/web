@@ -1,11 +1,7 @@
 <template>
-  <div
-    :class="{inactive: !partnerName}"
-    class="session-header">
+  <div :class="{ inactive: !partnerName }" class="session-header">
     <div class="avatar-info-container">
-      <div
-        :style="partnerAvatar"
-        class="avatar"/>
+      <div :style="partnerAvatar" class="avatar" />
       <div class="info">
         <template v-if="partnerName">
           <span class="volunteer-name">{{ partnerName }}</span>
@@ -20,97 +16,98 @@
     </div>
     <div class="button-container">
       <div class="end-session">
-        <button
-          class="btn btn-lg btn-block"
-          @click.prevent="end">End session</button>
+        <button class="btn btn-lg btn-block" @click.prevent="end">
+          End session
+        </button>
       </div>
     </div>
   </div>
 </template>
 
-
 <script>
-import UserService from "src/services/UserService";
-import SessionService from "src/services/SessionService";
+import UserService from 'src/services/UserService'
+import SessionService from 'src/services/SessionService'
 
-import router from "../../router";
+import router from '../../router'
 
-const STUDENT_AVATAR_URL = "static/defaultavatar3.png";
-const VOLUNTEER_AVATAR_URL = "static/defaultavatar4.png";
+const STUDENT_AVATAR_URL = 'static/defaultavatar3.png'
+const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png'
 
 /**
  * @todo {1} Refactoring candidate: use a modal instead.
  */
 export default {
-  data() {
+  data () {
     return {
       currentSession: SessionService.currentSession
-    };
+    }
   },
   computed: {
-    waitingText() {
-      const user = UserService.getUser();
+    waitingText () {
+      const user = UserService.getUser()
       if (user.isVolunteer) {
-        return "No student is in this session";
+        return 'No student is in this session'
       }
-      return "We are contacting our Academic Coaches for you right now - please hang tight while we try to connect you! This process can take 5-10 minutes.";
+      return 'We are contacting our Academic Coaches for you right now - please hang tight while we try to connect you! This process can take 5-10 minutes.'
     },
-    partnerName() {
-      const partner = SessionService.getPartner();
-      return partner && partner.firstname;
+    partnerName () {
+      const partner = SessionService.getPartner()
+      return partner && partner.firstname
     },
-    partnerAvatar() {
-      const user = UserService.getUser();
-      let picture = "";
+    partnerAvatar () {
+      const user = UserService.getUser()
+      let picture = ''
       if (user.isVolunteer === false) {
-        picture = VOLUNTEER_AVATAR_URL;
+        picture = VOLUNTEER_AVATAR_URL
       } else {
-        picture = STUDENT_AVATAR_URL;
+        picture = STUDENT_AVATAR_URL
       }
       return {
         backgroundImage: `url(${picture})`
-      };
+      }
     }
   },
   methods: {
-    end() {
-      let studentId = "";
-      let volunteerId = null;
-      let sessionId = SessionService.currentSession.sessionId;
+    end () {
+      let studentId = ''
+      let volunteerId = null
+      let sessionId = SessionService.currentSession.sessionId
       if (
         SessionService.currentSession &&
         SessionService.currentSession.data.student
       ) {
-        studentId = SessionService.currentSession.data.student._id;
+        studentId = SessionService.currentSession.data.student._id
       }
       if (
         SessionService.currentSession &&
         SessionService.currentSession.data.volunteer
       ) {
-        volunteerId = SessionService.currentSession.data.volunteer._id;
+        volunteerId = SessionService.currentSession.data.volunteer._id
       }
-      const result = window.confirm("Do you really want to end the session?");
+
+      const result = window.confirm('Do you really want to end the session?')
       if (result) {
         if (volunteerId) {
-          this.$socket.disconnect();
-          SessionService.endSession({ skipRoute: true });
+          this.$socket.disconnect()
+          SessionService.endSession(this, sessionId, { skipRoute: true })
           const url =
-            "/feedback/" +
+            '/feedback/' +
             sessionId +
-            "/" +
-            (UserService.getUser().isVolunteer ? "volunteer" : "student") +
-            "/" +
+            '/' +
+            (UserService.getUser().isVolunteer ? 'volunteer' : 'student') +
+            '/' +
             studentId +
-            "/" +
-            volunteerId;
-          router.replace(url);
+            '/' +
+            volunteerId
+          router.replace(url)
         } else {
-          router.replace("/");
+          SessionService.endSession(this, sessionId, { skipRoute: true })
+          router.replace('/')
         }
       }
     }
   }
-};
+}
 </script>
 
 <style scoped>
@@ -136,7 +133,7 @@ h1 {
 .avatar {
   width: 30px;
   height: 30px;
-  background-image: url("../../assets/defaultAvatar@2x.png");
+  background-image: url('../../assets/defaultAvatar@2x.png');
   background-size: cover;
 }
 

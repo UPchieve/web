@@ -1,7 +1,5 @@
 <template>
-  <div
-    v-if="user.isVolunteer"
-    class="send-answer">
+  <div v-if="user.isVolunteer" class="send-answer">
     <basic-template header-title="Answer question">
       <div class="question">
         <div class="question__content">
@@ -10,13 +8,9 @@
         <div class="question__author">
           {{ question.student.name }}
         </div>
-        <div
-          v-if="hasAttachments"
-          class="attachment-list">
-          <div class="attachment-list__icon"/>
-          <div
-            class="attachment-list__content"
-            @click="downloadFile()">
+        <div v-if="hasAttachments" class="attachment-list">
+          <div class="attachment-list__icon" />
+          <div class="attachment-list__content" @click="downloadFile()">
             {{ question.attachments[0] }}
           </div>
         </div>
@@ -38,23 +32,22 @@
   </div>
 </template>
 
-
 <script>
-import UserService from '../../services/UserService';
-import DownloadService from '../../services/DownloadService';
-import StudentQuestionService from '../../services/StudentQuestionService';
+import UserService from '../../services/UserService'
+import DownloadService from '../../services/DownloadService'
+import StudentQuestionService from '../../services/StudentQuestionService'
 
-import BasicTemplate from '../organisms/BasicTemplate';
-import MessageForm from '../organisms/MessageForm';
-import Modal from '../molecules/Modal';
+import BasicTemplate from '../organisms/BasicTemplate'
+import MessageForm from '../organisms/MessageForm'
+import Modal from '../molecules/Modal'
 
 export default {
   components: {
     BasicTemplate,
     MessageForm,
-    Modal,
+    Modal
   },
-  data() {
+  data () {
     return {
       // This component
       user: UserService.getUser(),
@@ -64,42 +57,41 @@ export default {
       showModal: false,
       modalBtnLabels: [],
       modalOptions: {},
-      modalClickHandlers: {},
-    };
+      modalClickHandlers: {}
+    }
   },
-  beforeCreate() {
-    StudentQuestionService.getStudentQuestions(this, { _id: this.$route.query.q })
-      .then(
-        (questions) => {
-          [this.question] = questions;
-          this.hasAttachments = this.question.attachments.length > 0;
-        },
-      );
+  beforeCreate () {
+    StudentQuestionService.getStudentQuestions(this, {
+      _id: this.$route.query.q
+    }).then(questions => {
+      ;[this.question] = questions
+      this.hasAttachments = this.question.attachments.length > 0
+    })
   },
   methods: {
-    downloadFile() {
-      StudentQuestionService.getAttachment(this, this.question.attachments[0])
-        .then(
-          (res) => {
-            DownloadService.openDownloadDialog(
-              res.body,
-              this.question.attachments[0],
-              res.headers.map['content-type'],
-            );
-          },
-        );
-    },
-  },
-};
+    downloadFile () {
+      StudentQuestionService.getAttachment(
+        this,
+        this.question.attachments[0]
+      ).then(res => {
+        DownloadService.openDownloadDialog(
+          res.body,
+          this.question.attachments[0],
+          res.headers.map['content-type']
+        )
+      })
+    }
+  }
+}
 </script>
-
 
 <style>
 /*
 * @notes
 * [1] Refactoring candidate: this should be in the global container
 */
-.send-answer { /*[1]*/
+.send-answer {
+  /*[1]*/
   height: 100vh;
   position: relative;
 }
@@ -119,14 +111,15 @@ export default {
   font-style: italic;
 }
 .question__author::before {
-  content: 'by'
+  content: 'by';
 }
 
 /*
 * @notes
 * [1] Refactoring candidate: this should be in a separate component
 */
-.attachment-list { /*[1]*/
+.attachment-list {
+  /*[1]*/
   background: var(--c-bg);
   display: flex;
 }
@@ -140,7 +133,7 @@ export default {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%,-50%);
+  transform: translate(-50%, -50%);
   width: 24px;
   height: 24px;
   background-image: url('../../assets/attachment_icon.svg');

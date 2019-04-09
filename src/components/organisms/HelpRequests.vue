@@ -5,7 +5,7 @@
         <tr class="help-requests-t__header">
           <th>Student</th>
           <th>Help topic</th>
-          <th/>
+          <th />
         </tr>
       </thead>
       <tbody class="help-requests-t__content">
@@ -15,24 +15,29 @@
           class="help-request"
         >
           <td>
-            <span class="row-avatar"><img
-              :src="req.student.picture"
-              alt="Avatar"></span>
+            <span class="row-avatar"
+              ><img :src="req.student.picture" alt="Avatar"
+            /></span>
+
             {{ req.student.name }}
           </td>
           <td>
-            <topic-label :label="req.topic"/>
+            <topic-label :label="req.topic" />
             {{ req.subTopic }}
           </td>
           <td>
             <router-link
               v-if="type === 'question'"
               :to="`/send-answer?q=${req._id}`"
-              tag="a">Answer question ›</router-link>
+              tag="a"
+              >Answer question ›</router-link
+            >
             <router-link
               v-if="type === 'session'"
               :to="`/send-answer?q=${req._id}`"
-              tag="a">Help student ›</router-link>
+              tag="a"
+              >Help student ›</router-link
+            >
           </td>
         </tr>
       </tbody>
@@ -40,9 +45,8 @@
   </div>
 </template>
 
-
 <script>
-import TopicLabel from '../atoms/TopicLabel';
+import TopicLabel from '../atoms/TopicLabel'
 
 /*
  * @note {1} Full documentation of involved "types":
@@ -63,23 +67,22 @@ import TopicLabel from '../atoms/TopicLabel';
  */
 export default {
   components: {
-    TopicLabel,
+    TopicLabel
   },
   props: {
     helpRequests: {
       type: Object, // {1}
-      required: true,
-    },
+      required: true
+    }
   },
-  data() {
+  data () {
     return {
       type: this.helpRequests.type,
-      requests: this.helpRequests.requests,
-    };
-  },
-};
+      requests: this.helpRequests.requests
+    }
+  }
+}
 </script>
-
 
 <style>
 .help-requests-t {

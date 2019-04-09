@@ -1,48 +1,45 @@
 <template>
   <div class="accordion-item">
-    <div
-      class="accordion-item__title"
-      @click="slideToggle">
+    <div class="accordion-item__title" @click="slideToggle">
       <span :class="accordionItemBulletClasses">▸</span>{{ label }}
     </div>
     <div :class="accordionItemContentClasses">
-      <slot/>
+      <slot />
     </div>
   </div>
 </template>
-
 
 <script>
 export default {
   props: {
     label: {
       type: String,
-      default: '',
-    },
+      default: ''
+    }
   },
-  data() {
+  data () {
     return {
       accordionItemBulletClasses: {
         'accordion-item__bullet': true,
-        'accordion-item__bullet--active': false,
+        'accordion-item__bullet--active': false
       },
       accordionItemContentClasses: {
         'accordion-item__content': true,
-        'accordion-item__content--active': false,
-      },
-    };
+        'accordion-item__content--active': false
+      }
+    }
   },
   methods: {
-    slideToggle() {
-      this.accordionItemBulletClasses['accordion-item__bullet--active']
-        = !this.accordionItemBulletClasses['accordion-item__bullet--active'];
-      this.accordionItemContentClasses['accordion-item__content--active']
-        = !this.accordionItemContentClasses['accordion-item__content--active'];
-    },
-  },
-};
+    slideToggle () {
+      this.accordionItemBulletClasses['accordion-item__bullet--active'] = !this
+        .accordionItemBulletClasses['accordion-item__bullet--active']
+      this.accordionItemContentClasses[
+        'accordion-item__content--active'
+      ] = !this.accordionItemContentClasses['accordion-item__content--active']
+    }
+  }
+}
 </script>
-
 
 <style>
 .accordion-item {
@@ -62,14 +59,14 @@ export default {
   margin-right: 8px;
   position: relative;
   display: inline-block;
-  transition: all .2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 .accordion-item__bullet--active {
   transform: rotate(90deg);
 }
 .accordion-item__content {
   background: var(--c-backdrop-clear);
-  transition: all .2s ease-in-out;
+  transition: all 0.2s ease-in-out;
   padding: 0 20px;
   height: 0;
 }

@@ -1,43 +1,44 @@
 <template>
   <nav class="navbar">
-    <router-link
-      tag="h1"
-      to="/"/>
+    <router-link tag="h1" to="/" />
     <div v-if="auth.authenticated">
-      <profile-info v-if="auth.authenticated"/>
+      <profile-info v-if="auth.authenticated" />
       <div id="navbar">
-        <user-nav/>
+        <user-nav />
       </div>
     </div>
     <div v-else>
-      <p class="aboutText">UPchieve is a volunteer-run ed-tech initiative with the goal of providing free, online, and on-demand educational and guidance services to disadvantaged students.</p>
+      <p class="aboutText">
+        UPchieve is a volunteer-run ed-tech initiative with the goal of
+        providing free, online, and on-demand educational and guidance services
+        to disadvantaged students.
+      </p>
     </div>
     <div class="navbar-footer">
-      <sidebar-footer/>
+      <sidebar-footer />
     </div>
   </nav>
 </template>
 
 <script>
+import UserService from '../services/UserService'
 
-import UserService from '../services/UserService';
-
-import UserNav from './Sidebar/UserNav';
-import ProfileInfo from './Sidebar/ProfileInfo';
-import Footer from './Sidebar/Footer';
+import UserNav from './Sidebar/UserNav'
+import ProfileInfo from './Sidebar/ProfileInfo'
+import Footer from './Sidebar/Footer'
 
 export default {
   components: {
     UserNav,
     ProfileInfo,
-    SidebarFooter: Footer, // footer is reserved component name
+    SidebarFooter: Footer // footer is reserved component name
   },
-  data() {
+  data () {
     return {
-      auth: UserService.getAuth(),
-    };
-  },
-};
+      auth: UserService.getAuth()
+    }
+  }
+}
 </script>
 
 <style scoped>
@@ -46,12 +47,13 @@ nav {
   border-radius: 0;
   border: none;
 
-  background-color: #F6F6F6;
-  color: #73737A;
+  background-color: #f6f6f6;
+  color: #73737a;
   font-weight: 600;
 }
 
-h1, h2 {
+h1,
+h2 {
   font-weight: normal;
 }
 
@@ -63,12 +65,12 @@ h1 {
 }
 
 h1::before {
-  content: "";
-  display: inline-block;;
+  content: '';
+  display: inline-block;
   width: 100px;
-  height: 50px;
+  height: 43px;
   background-image: url('../assets/logo-01.svg');
-  background-size: 100px 50px;
+  background-size: 100px 43px;
   top: 0;
   left: 0;
 }
@@ -85,5 +87,4 @@ p.aboutText {
   margin: auto;
   text-align: left;
 }
-
 </style>

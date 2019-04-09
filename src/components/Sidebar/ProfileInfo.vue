@@ -1,102 +1,101 @@
 <template>
   <div class="profile-info">
-    <div
-      :style="avatarStyle"
-      class="avatar"/>
+    <div :style="avatarStyle" class="avatar" />
     <template>
       <p
-        v-if="(
+        v-if="
           ($route.path.indexOf('/onboarding') !== -1 ||
-          $route.path.indexOf('/signup') !== -1) && !user.isVolunteer
-        )"
-        class="greeting">
+            $route.path.indexOf('/signup') !== -1) &&
+            !user.isVolunteer
+        "
+        class="greeting"
+      >
         Welcome, Student!
       </p>
       <p
-        v-else-if="(
+        v-else-if="
           $route.path.indexOf('/onboarding') !== -1 ||
-          $route.path.indexOf('/signup') !== -1
-        )"
-        class="greeting">
+            $route.path.indexOf('/signup') !== -1
+        "
+        class="greeting"
+      >
         Welcome, Volunteer!
       </p>
       <p
         v-else-if="!user.isVolunteer && user.firstname === undefined"
-        class="greeting">
+        class="greeting"
+      >
         Welcome, Student!
       </p>
       <p
         v-else-if="user.isVolunteer && user.firstname === undefined"
-        class="greeting">
+        class="greeting"
+      >
         Welcome, Volunteer!
       </p>
-      <p
-        v-else
-        class="greeting">
+      <p v-else class="greeting">
         {{ name }}
       </p>
     </template>
   </div>
-
 </template>
 
-
 <script>
-import UserService from '../../services/UserService';
-import AuthService from '../../services/AuthService';
+import UserService from '../../services/UserService'
+import AuthService from '../../services/AuthService'
 
 /**
  * @todo {1} Refactor this, apply naming convention to files and improve the
  *           the style of the block.
  */
 export default {
-  data() {
-    const user = UserService.getUser() || {};
-    const avatarUrl // {1}
-      = user.picture ||
-       (user.isVolunteer ? 'static/defaultavatar4.png' : 'static/defaultavatar3.png');
+  data () {
+    const user = UserService.getUser() || {}
+    const avatarUrl = // {1}
+      user.picture ||
+      (user.isVolunteer
+        ? 'static/defaultavatar4.png'
+        : 'static/defaultavatar3.png')
     return {
       user,
       avatarStyle: {
-        backgroundImage: `url(${avatarUrl})`,
-      },
-    };
+        backgroundImage: `url(${avatarUrl})`
+      }
+    }
   },
   computed: {
     name: {
       cache: false,
-      get() {
-        return `${this.user.firstname} ${this.user.lastname}`;
-      },
-    },
+      get () {
+        return `${this.user.firstname} ${this.user.lastname}`
+      }
+    }
   },
   methods: {
-    logout() {
-      AuthService.logout(this);
-    },
-  },
-};
+    logout () {
+      AuthService.logout(this)
+    }
+  }
+}
 </script>
 
 <style scoped>
-  .avatar {
-    display: block;
-    width: 60px;
-    height: 60px;
-    margin: 0 auto;
-    background-size: cover;
-  }
+.avatar {
+  display: block;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto;
+  background-size: cover;
+}
 
-  .greeting {
-    margin-top: 12px;
-    margin-bottom: 0;
-    font-size: 16px;
-  }
+.greeting {
+  margin-top: 12px;
+  margin-bottom: 0;
+  font-size: 16px;
+}
 
-  .edit-profile {
-    font-size: 12px;
-    color: #73737A;
-  }
-
-
+.edit-profile {
+  font-size: 12px;
+  color: #73737a;
+}
 </style>

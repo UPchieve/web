@@ -1,10 +1,5 @@
 export default {
-  sendVerification() {
+  sendVerification () {},
 
-  },
-
-  confirmVerification() {
-
-  },
-
-};
+  confirmVerification () {}
+}

@@ -3,12 +3,10 @@
     <form class="form-resetpassword">
       <div class="header">
         <div class="reset-header">Reset Your Password</div>
-        <p><router-link
-          to="signup"
-          class="register-link">Register</router-link> /
-          <router-link
-            to="login"
-            class="login-link">Log In</router-link></p>
+        <p>
+          <router-link to="signup" class="register-link">Register</router-link>
+          / <router-link to="login" class="login-link">Log In</router-link>
+        </p>
       </div>
       <label for="inputEmail">Please enter your email address</label>
       <input
@@ -17,37 +15,39 @@
         type="text"
         class="form-control"
         required
-        autofocus>
+        autofocus
+      />
       <button
         class="btn btn-lg btn-primary btn-block"
         type="submit"
-        @click.prevent="submit()">ENTER</button>
+        @click.prevent="submit()"
+      >
+        ENTER
+      </button>
       {{ msg }}
     </form>
   </div>
 </template>
 
 <script>
-
-import AuthService from '../services/AuthService';
+import AuthService from '../services/AuthService'
 
 export default {
-  data() {
+  data () {
     return {
       email: '',
-      msg: '',
-    };
+      msg: ''
+    }
   },
   methods: {
-    submit() {
-      AuthService.sendReset(this, this.email);
-    },
-  },
-};
+    submit () {
+      AuthService.sendReset(this, this.email)
+    }
+  }
+}
 </script>
 
 <style scoped>
-
 /**
  * @todo {1} Consider refactoring (https://github.com/UPchieve/web/pull/84#discussion_r216185371)
  */
@@ -78,12 +78,13 @@ export default {
   margin-bottom: 50px;
   margin-top: 75px;
 }
-.register-link, .login-link {
-  color: #73737A;
+.register-link,
+.login-link {
+  color: #73737a;
   font-weight: 600;
 }
 .reset-header {
-  color: #16D2AA;
+  color: #16d2aa;
   font-weight: 600;
 }
 
@@ -92,7 +93,6 @@ export default {
   box-shadow: none;
   border-radius: 0;
 }
-
 
 .form-resetpassword .form-control:focus {
   z-index: 2;
@@ -106,7 +106,7 @@ label {
   color: #343440;
 }
 .form-control {
-  border-bottom: 3px solid #16D2AA;
+  border-bottom: 3px solid #16d2aa;
   margin-bottom: 50px;
 }
 
@@ -115,20 +115,21 @@ label {
   box-shadow: none;
 }
 
-button[type="submit"] {
-  background-color: #F6F6F6;
+button[type='submit'] {
+  background-color: #f6f6f6;
   border: none;
   font-weight: 600;
-  color: #16D2AA;
+  color: #16d2aa;
   height: 40px;
   border-radius: 20px;
   font-size: 12px;
   margin-bottom: 10px;
 }
 
-button[type="submit"]:hover, button[type="submit"]:active {
+button[type='submit']:hover,
+button[type='submit']:active {
   color: white;
-  background-color: #16D2AA;
+  background-color: #16d2aa;
 }
 
 .help-text {
@@ -143,7 +144,7 @@ button[type="submit"]:hover, button[type="submit"]:active {
 }
 
 .help-text a {
-  color: #16D2AA;
+  color: #16d2aa;
   font-weight: 700;
 }
 </style>
