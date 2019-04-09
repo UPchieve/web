@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import NetworkService from './NetworkService';
 
 export default {
@@ -62,14 +63,8 @@ export default {
   saveAnswer(context, picked) {
     const question = this.questions[this.index];
     if (
-      picked !== '' &&
-      picked !== null &&
-      picked !== undefined &&
-      (
-        this.idAnswerMap[question._id] === null ||
-        this.idAnswerMap[question._id] === '' ||
-        picked !== undefined
-      )
+      _.isEmpty(this.idAnswerMap[question._id]) &&
+      !_.isEmpty(picked)
     ) {
       this.numAnswers += 1;
     }
