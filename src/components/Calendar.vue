@@ -101,7 +101,7 @@ export default {
 
 .calendar {
   font-size: 12px;
-  color: ##343440;
+  color: #343440;
 }
 
 .header {
