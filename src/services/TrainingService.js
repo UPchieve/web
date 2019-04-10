@@ -62,10 +62,11 @@ export default {
   },
   saveAnswer (context, picked) {
     const question = this.questions[this.index]
-    if (
-      _.isEmpty(this.idAnswerMap[question._id]) &&
+    const isNewAnswer = (
+      _.isEmpty(this.idAnswerMap[question._id]) &&                  
       !_.isEmpty(picked)
-    ) {
+    )
+    if (isNewAnswer) {
       this.numAnswers += 1
     }
     this.idAnswerMap[question._id] = picked
