@@ -157,7 +157,9 @@ button[type='submit']:active {
   }
 
   .header {
+    font-size: 1em !important;
     margin: 1.5em 0em 3em !important;
+    padding: 0em !important;
   }
 
   .btn-block {

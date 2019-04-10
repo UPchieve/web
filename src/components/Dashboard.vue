@@ -253,7 +253,7 @@ h2 {
 }
 
 h3 {
-  text-weight: bold;
+  font-weight: bold;
 }
 
 .col-lg-6 {
