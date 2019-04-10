@@ -26,14 +26,14 @@
         >
       </div>
     </ul>
-    <ul v-else-if="!auth.authenticated" class="nav navbar-nav">
+    <ul v-else-if="auth.authenticated" class="nav navbar-nav">
       <div v-on:click="$emit('closeMenu')">
         <router-link to="/dashboard" tag="li"
           ><a class="home icon" >Home</a></router-link
         >
       </div>
 
-      <template v-if="!user.isVolunteer">
+      <template v-if="user.isVolunteer">
         <div v-on:click="$emit('closeMenu')">
           <router-link to="/training" tag="li"
             ><a class="training icon" >Training</a></router-link
