@@ -3,8 +3,8 @@
     <div v-on:click="$emit('closeMenu')"> 
       <router-link tag="h1" to="/" />
     </div>
-    <div v-if="!auth.authenticated">
-      <profile-info v-if="!auth.authenticated" />
+    <div v-if="auth.authenticated">
+      <profile-info v-if="auth.authenticated" />
       <div id="navbar">
         <user-nav v-on:closeMenu="$emit('closeMenu')" />
       </div>
