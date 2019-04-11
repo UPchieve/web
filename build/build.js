@@ -14,7 +14,7 @@ console.log(
     "  Opening index.html over file:// won't work.\n"
 )
 
-const spinner = ora('building for production...')
+const spinner = ora(`building for ${config.NODE_ENV}...`)
 spinner.start()
 
 const assetsPath = path.join(
