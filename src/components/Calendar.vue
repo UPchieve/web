@@ -4,39 +4,41 @@
       <div class="header-title">Schedule</div>
       <button class="btn" @click="save()">Update Schedule</button>
     </h1>
-    <div class="tz-selector-container">
-      <span>Time Zone: </span>
-      <select v-model="selectedTz">
-        <option v-for="tz in tzList">
-          {{ tz }}
-        </option>
-      </select>
-    </div>
-    <div class="dayTimeContainer">
-      <div class="timeLabelContainer">
-        <div v-for="time in timeRange" :key="time" class="timeLabel">
-          {{ time }}
-        </div>
+    <div v-if="hasUserSchedule">
+      <div class="tz-selector-container">
+        <span>Time Zone: </span>
+        <select v-model="selectedTz">
+          <option v-for="tz in tzList">
+            {{ tz }}
+          </option>
+        </select>
       </div>
-      <form class="dayTime">
-        <div v-for="(dayValue, day) in availability" :key="`day-${day}`">
-          <div class="dayLabel">{{ day }}</div>
-          <div class="times">
-            <div
-              v-for="sortedTime in sortedTimes[day]"
-              :key="sortedTime"
-              class="timeOfDay"
-            >
-              <input
-                id="time"
-                v-model="availability[day][sortedTime]"
-                type="checkbox"
-              />
-              <label for="sortedTime" />
-            </div>
+      <div class="dayTimeContainer">
+        <div class="timeLabelContainer">
+          <div v-for="time in timeRange" :key="time" class="timeLabel">
+            {{ time }}
           </div>
         </div>
-      </form>
+        <form class="dayTime">
+          <div v-for="(dayValue, day) in availability" :key="`day-${day}`">
+            <div class="dayLabel">{{ day }}</div>
+            <div class="times">
+              <div
+                v-for="sortedTime in sortedTimes[day]"
+                :key="sortedTime"
+                class="timeOfDay"
+              >
+                <input
+                  id="time"
+                  v-model="availability[day][sortedTime]"
+                  type="checkbox"
+                />
+                <label for="sortedTime" />
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </template>
@@ -86,32 +88,26 @@ export default {
   computed: {
     sortedTimes () {
       return this.sortTimes()
+    },
+    hasUserSchedule () {
+      return !_.isEmpty(this.availability)
     }
   },
-  beforeMount () {
-    var originalAvailability = {}
+  async beforeMount () {
     if (!this.user.hasSchedule) {
       CalendarService.initAvailability(this, this.user._id)
     }
-    CalendarService.getAvailability(this, this.user._id).then(availability => {
-      originalAvailability = availability
-    })
-    var userTimezone = ''
-    CalendarService.getTimezone(this, this.user._id).then(tz => {
-      userTimezone = tz
-      if (
-        userTimezone === undefined ||
-        this.userTzInList(userTimezone) == false
-      ) {
-        this.selectedTz = moment.tz.guess()
-      } else {
-        this.selectedTz = userTimezone
-      }
-      var estNow = moment.tz('America/New_York').hour()
-      var userNow = moment.tz(this.selectedTz).hour()
-      var offset = userNow - estNow
-      this.availability = this.convertAvailability(originalAvailability, offset)
-    })
+    var originalAvailability = await CalendarService.getAvailability(this, this.user._id)
+    var userTimezone = await CalendarService.getTimezone(this, this.user._id)
+    if (userTimezone && this.userTzInList(userTimezone)) {
+      this.selectedTz = userTimezone
+    } else {
+      this.selectedTz = moment.tz.guess()
+    }
+    var estNow = moment.tz('America/New_York').hour()
+    var userNow = moment.tz(this.selectedTz).hour()
+    var offset = userNow - estNow
+    this.availability = this.convertAvailability(originalAvailability, offset)
   },
   methods: {
     sortTimes () {
@@ -134,12 +130,7 @@ export default {
       return keysMap
     },
     userTzInList (tz) {
-      for (var i = 0; i < this.tzList.length; i++) {
-        if (this.tzList[i] === tz) {
-          return true
-        }
-      }
-      return false
+      return this.tzList.includes(tz)
     },
     convertAMPMtoTwentyFourHrs (hour) {
       var hr = hour.substring(0, hour.length - 1)
