@@ -94,23 +94,33 @@ export default {
       return !_.isEmpty(this.availability)
     }
   },
-  async beforeMount () {
-    if (!this.user.hasSchedule) {
-      CalendarService.initAvailability(this, this.user._id)
-    }
-    var originalAvailability = await CalendarService.getAvailability(this, this.user._id)
-    var userTimezone = await CalendarService.getTimezone(this, this.user._id)
-    if (userTimezone && this.userTzInList(userTimezone)) {
-      this.selectedTz = userTimezone
-    } else {
-      this.selectedTz = moment.tz.guess()
-    }
-    var estNow = moment.tz('America/New_York').hour()
-    var userNow = moment.tz(this.selectedTz).hour()
-    var offset = userNow - estNow
-    this.availability = this.convertAvailability(originalAvailability, offset)
+  created () {
+    this.fetchData()
   },
   methods: {
+    fetchData () {
+      if (!this.user.hasSchedule) {
+        CalendarService.initAvailability(this, this.user._id)
+      }
+
+      var originalAvailabilityPromise = CalendarService.getAvailability(this, this.user._id)
+      var userTimezonePromise = CalendarService.getTimezone(this, this.user._id)
+
+      Promise
+        .all([originalAvailabilityPromise, userTimezonePromise])
+        .then(([originalAvailability, userTimezone]) => { 
+          if (userTimezone && this.userTzInList(userTimezone)) {
+            this.selectedTz = userTimezone
+          } else {
+            this.selectedTz = moment.tz.guess()
+          }
+          
+          var estNow = moment.tz('America/New_York').hour()
+          var userNow = moment.tz(this.selectedTz).hour()
+          var offset = userNow - estNow
+          this.availability = this.convertAvailability(originalAvailability, offset)
+        })
+    },
     sortTimes () {
       const keysMap = {}
       for (const day in this.availability) {
