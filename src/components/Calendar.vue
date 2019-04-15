@@ -8,7 +8,7 @@
       <div class="tz-selector-container">
         <span>Time Zone: </span>
         <select v-model="selectedTz">
-          <option v-for="tz in tzList">
+          <option v-for="tz in tzList" :key="tz">
             {{ tz }}
           </option>
         </select>
