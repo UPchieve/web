@@ -82,7 +82,7 @@
           </tr>
           <tr class="question-row">
             <td class="table-entry" colspan="2">
-              What high school did you go to?
+              What high school do you go to?
             </td>
           </tr>
           <tr>
