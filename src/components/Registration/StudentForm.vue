@@ -82,7 +82,7 @@
           </tr>
           <tr class="question-row">
             <td class="table-entry" colspan="2">
-              What high school did you go to?
+              What high school do you go to?
             </td>
           </tr>
           <tr>
@@ -108,6 +108,7 @@
                 <option value="Family member">Family member</option>
                 <option value="Teacher">Teacher</option>
                 <option value="School">School</option>
+                <option value="Social media">Social media</option>
                 <option value="Other">Other</option>
               </select>
             </td>
@@ -132,6 +133,9 @@
                 <option value="First Graduate">First Graduate</option>
                 <option value="Oasis - A Heaven for Women and Children"
                   >Oasis - A Heaven for Women and Children</option
+                >
+                <option value="NYC Mission Society"
+                  >NYC Mission Society</option
                 >
                 <option value="None of the above">None of the above</option>
               </select>
