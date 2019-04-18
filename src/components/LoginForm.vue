@@ -280,6 +280,7 @@ button[type='submit']:active {
 
   .header {
     margin: 1.5em 1.5em 0.8em !important;
+    padding: 0em !important;
   }
 
   .register-link {
