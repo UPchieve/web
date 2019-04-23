@@ -1,44 +1,51 @@
 <template>
-  <form class="form-resetpassword">
-    <h2 class="form-resetpassword-heading">Reset Your Password</h2>
-    <label for="inputEmail">Please enter your email address</label>
-    <input
-      id="inputEmail"
-      v-model="credentials.email"
-      type="text"
-      class="form-control"
-      required
-      autofocus
-    />
-    <label for="inputPassword">Create a new password</label>
-    <input
-      id="inputPassword"
-      v-model="credentials.password"
-      type="password"
-      class="form-control"
-      required
-    />
-    <label for="inputPassword">Reenter your new password</label>
-    <input
-      id="inputPassword"
-      v-model="credentials.newpassword"
-      type="password"
-      class="form-control"
-      required
-    />
-    <p class="password-guidelines">
-      It must contain lowercase and uppercase letters, numbers, and at least 8
-      characters.
-    </p>
-    <button
-      class="btn btn-lg btn-primary btn-block"
-      type="submit"
-      @click.prevent="submit()"
-    >
-      Reset Password
-    </button>
-    {{ msg }}
-  </form>
+  <div class="background">
+    <div class="reset-page">
+          <div class="logo-class">
+            <img class="logo-img" src="../assets/p_logo_white.png" />
+          </div>
+      <form class="form-resetpassword">
+        <h2 class="form-resetpassword-heading">Reset Your Password</h2>
+        <label for="inputEmail">Please enter your email address</label>
+        <input
+          id="inputEmail"
+          v-model="credentials.email"
+          type="text"
+          class="form-control"
+          required
+          autofocus
+        />
+        <label for="inputPassword">Create a new password</label>
+        <input
+          id="inputPassword"
+          v-model="credentials.password"
+          type="password"
+          class="form-control"
+          required
+        />
+        <label for="inputPassword">Reenter your new password</label>
+        <input
+          id="inputPassword"
+          v-model="credentials.newpassword"
+          type="password"
+          class="form-control"
+          required
+        />
+        <p class="password-guidelines">
+          It must contain lowercase and uppercase letters, numbers, and at least 8
+          characters.
+        </p>
+        <button
+          class="btn btn-lg btn-primary btn-block"
+          type="submit"
+          @click.prevent="submit()"
+        >
+          Reset Password
+        </button>
+        {{ msg }}
+      </form>
+    </div>
+</div>  
 </template>
 
 <script>
@@ -77,6 +84,18 @@ export default {
 </script>
 
 <style scoped>
+
+.background {
+  display: flex;
+  background-image: url('../assets/onboarding_background.png');
+  background-size: cover;
+  height: 100%;
+  font-size: 16px;
+  margin-left: -300px;
+  position: relative;
+  z-index: 2;
+}
+
 h2 {
   font-size: 24px;
   text-align: left;
@@ -85,14 +104,20 @@ h2 {
 }
 
 .form-resetpassword {
-  height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  max-width: 400px;
-  padding: 15px;
+  width: 500px;
+  height: 540px;
   margin: auto;
+  background-color: white;
+  padding: 0px 75px;
 }
+
+.form-resetpassword-heading {
+  color: #16d2aa;
+  font-weight: 600;
+}
+
 .form-control {
   border: none;
   box-shadow: none;
@@ -111,7 +136,7 @@ label {
   color: #343440;
 }
 .form-control {
-  border-bottom: 3px solid black;
+  border-bottom: 3px solid #16d2aa;
   margin-bottom: 50px;
 }
 
@@ -121,10 +146,20 @@ label {
 }
 
 button[type='submit'] {
-  width: 190px;
-  background-color: #16d2aa;
+  background-color: #f6f6f6;
   border: none;
   font-weight: 600;
+  color: #16d2aa;
+  height: 40px;
+  border-radius: 20px;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+button[type='submit']:hover,
+button[type='submit']:active {
+  color: white;
+  background-color:#16d2aa;
 }
 
 .help-text {
@@ -142,4 +177,29 @@ button[type='submit'] {
   color: #16d2aa;
   font-weight: 700;
 }
+
+.logo-img {
+  width: 20%;
+  min-width: 250px;
+}
+
+.logo-class {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reset-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height: 80%;
+  /* adding margin-left keeps the page centered, has same effect on loginform, 
+  until it is reduced to mobile sizes. Maybe media queries or %s instead
+  of px will solve the issue for mobile responsiveness? */
+  margin-left: 100px; 
+}
+
 </style>

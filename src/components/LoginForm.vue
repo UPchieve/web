@@ -228,12 +228,19 @@ button[type='submit']:active {
   color: #73737a;
 }
 
+@media (min-width: 30em) {
+  .main-page {
+    margin-left: 100px;
+  }
+}
+
 .main-page {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   height: 100%;
+  /*margin-left: 100px; */
 }
 
 .logo-img {
