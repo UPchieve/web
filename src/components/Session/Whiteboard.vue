@@ -766,7 +766,7 @@ canvas {
 }
 
 #clearButton {
-  background-image: url('../../assets/new_page.svg');
+  background-image: url('../../assets/clear_icon.svg');
 }
 
 #openColorsButton {
