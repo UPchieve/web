@@ -188,6 +188,8 @@ button[type='submit']:active {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-top: 40px;
+  padding-bottom: 50px;
 }
 
 .reset-page {
