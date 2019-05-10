@@ -1,13 +1,6 @@
-<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
-    <desc>Created with Sketch.</desc>
-    <defs></defs>
-    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="student-menu" transform="translate(-32.000000, -762.000000)">
-            <g id="log-out" transform="translate(30.000000, 760.000000)">
-                <polygon id="Shape" points="0 0 24 0 24 24 0 24"></polygon>
-                <path d="M12,22 C6.4771525,22 2,17.5228475 2,12 C2,6.4771525 6.4771525,2 12,2 C17.5228475,2 22,6.4771525 22,12 C22,17.5228475 17.5228475,22 12,22 Z M10,16 L10,13 L18,13 L18,11 L10,11 L10,8 L6,12 L10,16 Z" id="Combined-Shape" fill="#73737A"></path>
-            </g>
-        </g>
-    </g>
+<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" fill-rule="evenodd">
+    <path d="M-2-2h24v24H-2z"/>
+    <path d="M10 20C4.477 20 0 15.523 0 10S4.477 0 10 0s10 4.477 10 10-4.477 10-10 10zm-2-6v-3h8V9H8V6l-4 4 4 4z" fill="#73737A"/>
+  </g>
 </svg>
