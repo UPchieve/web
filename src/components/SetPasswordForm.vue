@@ -1,50 +1,47 @@
 <template>
-  <div class="background">
-    <div class="reset-page">
-          <div class="logo-class">
-            <img class="logo-img" src="../assets/p_logo_white.png" />
-          </div>
-      <form class="form-resetpassword">
-        <h2 class="form-resetpassword-heading">Reset Your Password</h2>
-        <label for="inputEmail">Please enter your email address</label>
-        <input
-          id="inputEmail"
-          v-model="credentials.email"
-          type="text"
-          class="form-control"
-          required
-          autofocus
-        />
-        <label for="inputPassword">Create a new password</label>
-        <input
-          id="inputPassword"
-          v-model="credentials.password"
-          type="password"
-          class="form-control"
-          required
-        />
-        <label for="inputPassword">Reenter your new password</label>
-        <input
-          id="inputPassword"
-          v-model="credentials.newpassword"
-          type="password"
-          class="form-control"
-          required
-        />
-        <p class="password-guidelines">
-          It must contain lowercase and uppercase letters, numbers, and at least 8
-          characters.
-        </p>
-        <button
-          class="btn btn-lg btn-primary btn-block"
-          type="submit"
-          @click.prevent="submit()"
-        >
-          Reset Password
-        </button>
-        {{ msg }}
-      </form>
-    </div>
+<div class="background">
+  <div class="reset-page">
+    <form class="form-resetpassword">
+      <h2 class="form-resetpassword-heading">Reset Your Password</h2>
+      <label for="inputEmail">Please enter your email address</label>
+      <input
+        id="inputEmail"
+        v-model="credentials.email"
+        type="text"
+        class="form-control"
+        required
+        autofocus
+      />
+      <label for="inputPassword">Create a new password</label>
+      <input
+        id="inputPassword"
+        v-model="credentials.password"
+        type="password"
+        class="form-control"
+        required
+      />
+      <label for="inputPassword">Re-enter your new password</label>
+      <input
+        id="inputPassword"
+        v-model="credentials.newpassword"
+        type="password"
+        class="form-control"
+        required
+      />
+      <p class="password-guidelines">
+        It must contain lowercase and uppercase letters, numbers, and at least 8
+        characters.
+      </p>
+      <button
+        class="btn btn-lg btn-primary btn-block"
+        type="submit"
+        @click.prevent="submit()"
+      >
+        Reset Password
+      </button>
+      {{ msg }}
+    </form>
+  </div>
 </div>  
 </template>
 
@@ -197,11 +194,7 @@ button[type='submit']:active {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  height: 80%;
-  /* adding margin-left keeps the page centered, has same effect on loginform, 
-  until it is reduced to mobile sizes. Maybe media queries or %s instead
-  of px will solve the issue for mobile responsiveness? */
-  margin-left: 100px; 
+  width: 100%;
 }
 
 </style>
