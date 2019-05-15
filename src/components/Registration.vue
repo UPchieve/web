@@ -157,17 +157,18 @@ button[type='submit']:active {
   justify-content: center;
   flex-direction: column;
   height: 100%;
+  width: 100%;
 }
 
 .logo-img {
-  width: 20%;
-  min-width: 250px;
+  width: 155px;
+  padding-bottom: 25px;
 }
 
 .logo-class {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
 }
 
