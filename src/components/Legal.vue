@@ -651,7 +651,6 @@ export default {
   margin-left: -320px;
   position: relative;
   z-index: 2;
-  padding-left: 30px;
   background-color: white;
 }
 
