@@ -175,20 +175,6 @@ button[type='submit']:active {
   font-weight: 700;
 }
 
-.logo-img {
-  width: 20%;
-  min-width: 250px;
-}
-
-.logo-class {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-top: 40px;
-  padding-bottom: 50px;
-}
-
 .reset-page {
   display: flex;
   align-items: center;

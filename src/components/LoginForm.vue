@@ -228,30 +228,24 @@ button[type='submit']:active {
   color: #73737a;
 }
 
-@media (min-width: 30em) {
-  .main-page {
-    margin-left: 100px;
-  }
-}
-
 .main-page {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   height: 100%;
-  /*margin-left: 100px; */
+  width: 100%;
 }
 
 .logo-img {
-  width: 20%;
-  min-width: 250px;
+  width: 155px;
+  padding-bottom: 25px;
 }
 
 .logo-class {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
 }
 
