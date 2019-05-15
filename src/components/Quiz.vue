@@ -60,9 +60,9 @@
             <div v-for="(item, index) in items" :key="`item-${index}`">
               <div class="options">
                 <input :value="item.val" v-model="picked" type="radio" />
-                <label :for="item.val" :id="'answer-' + item.val"
-                  >{{ item.val }}. {{ item.txt }}</label
-                >
+                <label :for="item.val" :id="'answer-' + item.val">
+                  {{ item.val }}. {{ item.txt }}
+                </label>
               </div>
             </div>
           </form>
@@ -200,11 +200,51 @@ export default {
       this.quizLength = quizLength
     })
   },
+  updated () {
+    this.rerenderMathJaxElements()
+  },
   methods: {
+    clearMathJaxElements () {
+      const quizBody = document.querySelector('.quizBody')
+
+      // Remove any MathJax-rendered elements from the DOM.
+      // Do this before updating to avoid rendering artifacts being left behind
+      const mathJaxElements = quizBody.querySelectorAll('[class*=mjx],[class*=MathJax],[id*=MathJax]')
+      Array.from(mathJaxElements).forEach(e => e.remove())
+
+      // MathJax slices up the DOM nodes it renders as math formulas. We need to
+      // rejoin these under the first child's data attribute to avoid artifacts
+      // being left behind
+      const questionText = quizBody.querySelector('.questionText')
+      questionText.firstChild.data = questionText.innerText
+
+      // Remove all child nodes but the first
+      Array.from(questionText.childNodes).slice(1).forEach(e => e.remove())
+    },
+
+    rerenderMathJaxElements () {
+      // Re-render MathJax in question text and answer choices
+      const quiz = document.querySelector('.quizBody')
+      const questionText = quiz.querySelector('.questionText')
+      const answerChoices = quiz.querySelector('.possibleAnswers')
+
+      if (!questionText || !answerChoices) {
+        return
+      }
+
+      MathJax.Hub.Queue(
+        ['Typeset', MathJax.Hub, questionText],
+        ['Typeset', MathJax.Hub, answerChoices]
+      )
+    },
     reload () {
       this.$router.go(this.$router.currentRoute)
     },
     updateProgressBar () {
+      // When switching to a new question, clear any mathjax elements so they
+      // can be re-rendered
+      this.clearMathJaxElements()
+
       const index = TrainingService.getIndex(this)
       this.qNumber = TrainingService.getIndex(this) + 1
       this.barWidth = (100 / (this.quizLength - 1)) * index
@@ -217,11 +257,10 @@ export default {
         }
       }
     },
-    styleImage (image) {
-      if (image) {
-        const questionImage = `../../../static/question_images/${image}`
+    styleImage (imageSrc) {
+      if (imageSrc) {
         this.imageStyle = {
-          backgroundImage: `url(${questionImage})`,
+          backgroundImage: `url(${imageSrc})`,
           width: '300px',
           height: '300px',
           display: 'flex',
@@ -235,7 +274,7 @@ export default {
     getFirst () {
       const question = TrainingService.getFirstQuestion(this)
       this.questionText = question.questionText
-      this.styleImage(question.image)
+      this.styleImage(question.imageSrc)
       this.items = question.possibleAnswers
       this.showStartMsg = false
       this.showStart = false
@@ -251,7 +290,7 @@ export default {
       this.picked = data.picked
       this.questionText = question.questionText
       this.updateProgressBar()
-      this.styleImage(question.image)
+      this.styleImage(question.imageSrc)
       this.items = question.possibleAnswers
       if (!TrainingService.hasPrevious(this)) {
         this.showPrevious = false
@@ -270,7 +309,7 @@ export default {
       this.picked = data.picked
       this.questionText = question.questionText
       this.updateProgressBar()
-      this.styleImage(question.image)
+      this.styleImage(question.imageSrc)
       this.items = question.possibleAnswers
       if (!TrainingService.hasNext(this)) {
         this.showNext = false
@@ -280,7 +319,7 @@ export default {
     },
     submit () {
       TrainingService.saveAnswer(this, this.picked)
-      if (TrainingService.hasCompleted(this)) {
+      if (TrainingService.hasCompleted()) {
         TrainingService.submitQuiz(this, this.user._id).then(data => {
           if (data.passed) {
             this.passedMsg = 'You passed!'
@@ -343,12 +382,9 @@ export default {
     review () {
       this.questionsReview = TrainingService.reviewQuiz(this)
       this.questionsReview.forEach(question => {
-        if (question.image) {
-          const questionImage = `../../../static/question_images/${
-            question.image
-          }`
+        if (question.imageSrc) {
           question.imageStyle = {
-            backgroundImage: `url(${questionImage})`,
+            backgroundImage: `url(${question.imageSrc})`,
             width: '300px',
             height: '300px',
             display: 'flex',

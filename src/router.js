@@ -73,6 +73,12 @@ const routes = [
     meta: { protected: true, bypassOnboarding: true }
   },
   {
+    path: '/edu',
+    component: () => {
+      window.location.href = '/edu'
+    }
+  },
+  {
     path: '/feedback/:sessionId/:userType/:studentId/:volunteerId',
     name: 'Feedback',
     component: Feedback,

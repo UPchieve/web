@@ -86,14 +86,12 @@ export default {
     sendMessage () {
       const message = this.newMessage.slice(0, -1)
 
-      if (message != '') {
-        ModerationService.checkIfMessageIsClean(this, message).then(isClean => {
-          if (isClean) {
-            this.showNewMessage(message)
-          } else {
-            this.showModerationWarning()
-          }
-        })
+      if (message !== '') {
+        this.showNewMessage(message)
+        // TODO: Disabled until re-implemented
+        // ModerationService
+        //   .checkIfMessageIsClean(this, message)
+        //   .then(isClean => (isClean) ? this.showNewMessage(message) : this.showModerationWarning())
       }
     }
   },
