@@ -1,7 +1,8 @@
 <template>
   <div :style="coverStyle" class="dashboard">
-    <div class="header-container" />
-    <h1>Hello, {{ name }}!</h1>
+    <div class="header-container">
+      <h1>Hello, {{ name }}!</h1>
+    </div>
 
     <template v-if="!user.isVolunteer">
       <div class="dashboard-body row">
@@ -208,9 +209,12 @@ export default {
 
 <style scoped>
 .header-container {
-  height: 250px;
+  height: 50%;
   background-color: #525666;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .col-xs-12 {
@@ -230,16 +234,9 @@ export default {
   right: 0;
 }
 
-.header-container {
-  height: 50%;
-}
-
-h1 {
+.header-container h1 {
   position: absolute;
-  top: 20%;
-  left: 55%;
   margin: 0;
-  text-align: center;
   font-size: 36px;
   line-height: 42px;
   font-weight: 400;

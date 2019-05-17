@@ -95,7 +95,7 @@
       </div>
     </div>
     <div
-      v-if="showQuizReview"
+      v-if="!showQuizReview"
       :style="[popUpStyle, popUpBorderStyle]"
       class="passScoreContainer"
     >
@@ -457,6 +457,11 @@ export default {
   align-self: center;
 }
 
+.quiz-inner {
+  display: flex;
+  flex-direction: column;
+}
+
 .progressBar {
   margin: 50px;
 }
@@ -512,7 +517,9 @@ export default {
   background: #f6f6f6;
   border-radius: 20px;
   width: 140px;
-  height: 40px;
+  box-sizing: content-box;
+  height: 26px;
+  line-height: 26px;
   color: #16d2aa;
   font-weight: 600;
 }
@@ -582,8 +589,6 @@ label {
   padding: 20px;
   margin: 0px;
 } 
-
-
 
 @media screen and (max-width: 488px) {
   .header {

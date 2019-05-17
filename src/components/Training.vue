@@ -197,6 +197,7 @@ a {
   margin-top: 20px;
   font-size: 20px;
   font-weight: 600;
+  cursor: pointer;
 }
 
 .category {
@@ -225,13 +226,38 @@ a {
   align-items: center;
 }
 
+.test-container {
+  cursor: default;
+}
+
+.test-container:not(.certified) {
+  cursor: pointer;
+}
+
+.test-container:not(.certified):hover {
+  color: #5a5a5f;
+}
+
+.test-container .arrow.right {
+  padding-left: 3px;
+  transition: padding-left 0.1s ease-in;
+}
+
+.test-container:hover .arrow.right {
+  padding-left: 6px;
+}
+
+.test-container .arrow.right::after {
+  background-size: 38%;
+}
+
 .numTries {
   font-size: 12px;
 }
 
 .arrow {
   padding-right: 10px;
-  height: 15px;
+  height: 1em;
 }
 
 .arrow::after {
@@ -244,8 +270,12 @@ a {
   background-position: center;
 }
 
+.review-container .arrow.right {
+  height: 1.3em;
+}
+
 .review-container .arrow.right::after {
-  background-size: 30%;
+  background-size: 24%;
 }
 
 .arrow.down::after {
