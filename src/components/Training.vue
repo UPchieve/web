@@ -183,7 +183,6 @@ a {
   align-items: center;
   width: 450px;
   height: 60px;
-  padding: 0px 20px;
 }
 
 .supercategory,
@@ -198,12 +197,15 @@ a {
   font-size: 20px;
   font-weight: 600;
   cursor: pointer;
+  text-shadow: 0px 0px 2px #00000027;
+  padding: 0px 17px 0 20px;
 }
 
 .category {
   font-size: 16px;
   border: 1px solid #eeeeee;
   text-align: left;
+  padding: 0px 20px;
 }
 
 .category span {
@@ -256,15 +258,16 @@ a {
 }
 
 .arrow {
-  padding-right: 10px;
   height: 1em;
+  width: 1em;
+  position: relative;;
 }
 
 .arrow::after {
   content: '';
   z-index: 2;
-  width: 20px;
-  height: 15px;
+  width: 100%;
+  height: 100%;
   position: absolute;
   background-repeat: no-repeat;
   background-position: center;
@@ -272,6 +275,7 @@ a {
 
 .review-container .arrow.right {
   height: 1.3em;
+  width: 1.3em;
 }
 
 .review-container .arrow.right::after {
@@ -303,7 +307,7 @@ a {
 }
 
 .body-container {
-  margin-left: 30px;
+  margin: 0 0 30px 30px;
 }
 
 .certified {

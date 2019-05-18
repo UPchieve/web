@@ -550,6 +550,18 @@ input[type='radio']:checked {
   margin: 50px 75px;
 }
 
+.btnContainer btn {
+  min-width: 100px;
+}
+
+.btnContainer .btn:first-of-type {
+  margin-right: 15px;
+}
+
+.btnContainer .btn:last-of-type {
+  margin-left: 15px;
+}
+
 .possibleAnswers {
   margin: 20px 50px;
 }
@@ -621,7 +633,7 @@ label {
   }
 
   .passScoreContainer {
-    width: 90vw !important;
+    width: 100%;
     left: 0 !important;
   } 
 
