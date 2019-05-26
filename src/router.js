@@ -45,27 +45,30 @@ const routes = [
       return '/login'
     }
   },
-  { path: '/contact', component: Contact },
-  { path: '/legal', component: Legal },
-  { path: '/login', component: LoginForm },
-  { path: '/logout', component: Logout },
-  { path: '/signup', component: Registration },
-  { path: '/resetpassword', component: ResetPasswordForm },
-  { path: '/setpassword/:token', component: SetPasswordForm },
-  { path: '/dashboard', component: Dashboard, meta: { protected: true } },
+  { path: '/contact', name: 'Contact', component: Contact },
+  { path: '/legal', name: 'Legal', component: Legal },
+  { path: '/login', name: 'LoginForm', component: LoginForm },
+  { path: '/logout', name: 'Logout', component: Logout },
+  { path: '/signup', name: 'Registration', component: Registration },
+  { path: '/resetpassword', name: 'ResetPasswordForm', component: ResetPasswordForm },
+  { path: '/setpassword/:token', name: 'SetPasswordForm', component: SetPasswordForm },
+  { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { protected: true } },
   {
     path: '/session/math/:subTopic/:sessionId?',
+    name: 'Session-math',
     component: Session,
     meta: { protected: true }
   },
   {
     path: '/session/college/:subTopic/:sessionId?',
+    name: 'Session-college',
     component: Session,
     meta: { protected: true }
   },
-  { path: '/schedule', component: Schedule, meta: { protected: true } },
+  { path: '/schedule', name: 'Schedule', component: Schedule, meta: { protected: true } },
   {
     path: '/resources',
+    name: 'Resources',
     component: Resources,
     meta: { protected: true, bypassOnboarding: true }
   },
@@ -77,39 +80,45 @@ const routes = [
   },
   {
     path: '/feedback/:sessionId/:userType/:studentId/:volunteerId',
+    name: 'Feedback',
     component: Feedback,
     meta: { protected: true }
   },
   {
     path: '/action/:action/:data?',
+    name: 'Action',
     component: Action,
     meta: { bypassOnboarding: true }
   },
   {
     path: '/onboarding/:step?',
+    name: 'Onboarding',
     component: Onboarding,
     meta: { protected: true }
   },
-  { path: '/training', component: Training, meta: { protected: true } },
+  { path: '/training', name: 'Training', component: Training, meta: { protected: true } },
   {
     path: '/training/:category/quiz',
+    name: 'Quiz',
     component: Quiz,
     meta: { protected: true }
   },
   {
     path: '/training/:category/review',
+    name: 'Review',
     component: Review,
     meta: { protected: true }
   },
-  { path: '/profile', component: Profile, meta: { protected: true } },
-  { path: '/calendar', component: Calendar },
+  { path: '/profile', name: 'Profile', component: Profile, meta: { protected: true } },
+  { path: '/calendar', name: 'Calendar', component: Calendar },
   {
     path: '/submit-question',
+    name: 'SubmitQuestion',
     component: SubmitQuestion,
     meta: { protected: true }
   },
-  { path: '/inbox', component: Inbox, meta: { protected: true } },
-  { path: '/send-answer', component: SendAnswer, meta: { protected: true } }
+  { path: '/inbox', name: 'Inbox', component: Inbox, meta: { protected: true } },
+  { path: '/send-answer', name: 'SendAnswer', component: SendAnswer, meta: { protected: true } }
 ]
 
 /**

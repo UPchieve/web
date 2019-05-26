@@ -497,4 +497,29 @@ button[type='submit']:active {
   background-color: #ffffff;
   border-left: 5px solid #1855d1;
 }
+
+
+
+@media screen and (max-width: 488px) {
+  .header {
+    height: auto !important;
+  }
+
+  h2 {
+    min-width: 1px !important;
+    line-height: 1.2 !important;
+  }
+
+  .registration-body {
+    width: 100% !important;
+  }
+
+  .form-group {
+    padding: 0em 2em !important;
+  }
+
+  .btn-container {
+    padding-right: 2em !important;
+  }
+}
 </style>

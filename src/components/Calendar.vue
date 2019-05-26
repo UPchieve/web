@@ -319,4 +319,13 @@ input[type='checkbox']:checked + label {
 .tz-selector-container {
   padding-top: 30px;
 }
+
+
+
+@media screen and (max-width: 488px) {
+  .btn {
+    padding-top: 0em !important;
+    padding-bottom: 0em !important;
+  }
+}
 </style>

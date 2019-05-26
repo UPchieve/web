@@ -33,61 +33,63 @@
         class="rect cover"
       />
     </div>
-    <div v-if="qNumber" class="questionNumber">Question {{ qNumber }}</div>
-    <br />
-    <div class="body">
-      <div class="startBody">
-        <div v-if="showStartMsg" class="instructions">
-          This test will have {{ quizLength }} questions, and it is untimed.<br />
-          You have {{ 3 - tries }}/3 tries left to pass this test.<br /><br />
-          Once you feel ready, click on start!
+    <div class="quiz-inner">
+      <div v-if="qNumber" class="questionNumber">Question {{ qNumber }}</div>
+      <br />
+      <div class="body">
+        <div class="startBody">
+          <div v-if="showStartMsg" class="instructions">
+            This test will have {{ quizLength }} questions, and it is untimed.<br />
+            You have {{ 3 - tries }}/3 tries left to pass this test.<br /><br />
+            Once you feel ready, click on start!
+          </div>
+          <button
+            v-if="showStart"
+            class="start btn"
+            type="start"
+            @click.prevent="getFirst()"
+          >
+            START TEST
+          </button>
         </div>
-        <button
-          v-if="showStart"
-          class="start btn"
-          type="start"
-          @click.prevent="getFirst()"
-        >
-          START TEST
-        </button>
-      </div>
-      <div class="quizBody">
-        <div class="questionText">{{ questionText }}</div>
-        <br />
-        <div :style="imageStyle" class="questionImage" />
-        <form class="possibleAnswers">
-          <div v-for="(item, index) in items" :key="`item-${index}`">
-            <div class="options">
-              <input :value="item.val" v-model="picked" type="radio" />
-              <label :for="item.val" :id="'answer-' + item.val">
-                {{ item.val }}. {{ item.txt }}
-              </label>
-            </div>
-          </div>
-        </form>
-      </div>
-      <div v-if="showQuizReview" class="review">
-        <div
-          v-for="(question, index) in questionsReview"
-          :key="`question-${index}`"
-          class="question"
-        >
-          <div class="questionNumber">Question {{ index + 1 }}</div>
+        <div class="quizBody">
+          <div class="questionText">{{ questionText }}</div>
           <br />
-          <div class="questionText">{{ question.questionText }}</div>
-          <div :style="question.imageStyle" class="questionImage" />
-          <div class="possibleAnswers">
-            <div
-              v-for="(answer, index) in question.possibleAnswers"
-              :key="`answer-${index}`"
-              :id="'answer-' + answer.val"
-            >
-              {{ answer.val }}. {{ answer.txt }}
+          <div :style="imageStyle" class="questionImage" />
+          <form class="possibleAnswers">
+            <div v-for="(item, index) in items" :key="`item-${index}`">
+              <div class="options">
+                <input :value="item.val" v-model="picked" type="radio" />
+                <label :for="item.val" :id="'answer-' + item.val">
+                  {{ item.val }}. {{ item.txt }}
+                </label>
+              </div>
             </div>
-          </div>
-          <div class="userAnswer">Your answer: {{ question.userAnswer }}</div>
-          <div class="correctAnswer">
-            Correct answer: {{ question.correctAnswer }}
+          </form>
+        </div>
+        <div v-if="showQuizReview" class="review">
+          <div
+            v-for="(question, index) in questionsReview"
+            :key="`question-${index}`"
+            class="question"
+          >
+            <div class="questionNumber">Question {{ index + 1 }}</div>
+            <br />
+            <div class="questionText">{{ question.questionText }}</div>
+            <div :style="question.imageStyle" class="questionImage" />
+            <div class="possibleAnswers">
+              <div
+                v-for="(answer, index) in question.possibleAnswers"
+                :key="`answer-${index}`"
+                :id="'answer-' + answer.val"
+              >
+                {{ answer.val }}. {{ answer.txt }}
+              </div>
+            </div>
+            <div class="userAnswer">Your answer: {{ question.userAnswer }}</div>
+            <div class="correctAnswer">
+              Correct answer: {{ question.correctAnswer }}
+            </div>
           </div>
         </div>
       </div>
@@ -455,6 +457,11 @@ export default {
   align-self: center;
 }
 
+.quiz-inner {
+  display: flex;
+  flex-direction: column;
+}
+
 .progressBar {
   margin: 50px;
 }
@@ -510,7 +517,9 @@ export default {
   background: #f6f6f6;
   border-radius: 20px;
   width: 140px;
-  height: 40px;
+  box-sizing: content-box;
+  height: 26px;
+  line-height: 26px;
   color: #16d2aa;
   font-weight: 600;
 }
@@ -539,6 +548,18 @@ input[type='radio']:checked {
   display: flex;
   justify-content: space-between;
   margin: 50px 75px;
+}
+
+.btnContainer btn {
+  min-width: 100px;
+}
+
+.btnContainer .btn:first-of-type {
+  margin-right: 15px;
+}
+
+.btnContainer .btn:last-of-type {
+  margin-left: 15px;
 }
 
 .possibleAnswers {
@@ -579,5 +600,53 @@ label {
   border-bottom: 0.5px solid #cccccf;
   padding: 20px;
   margin: 0px;
+} 
+
+@media screen and (max-width: 488px) {
+  .header {
+    padding: 1em 1em 1em 3em !important;
+  }
+
+  .col-xs-12.view-container {
+    padding: 0em !important;
+  }
+
+  .progressBar {
+    margin: 2em !important;
+  }
+
+  .quiz-inner {
+    padding: 2em !important;
+  }
+
+  .body {
+    padding: 1em 0em !important;
+  }
+
+  .questionNumber,
+  .quizBody {
+    width: 100% !important;
+  }
+
+  .btnContainer {
+    margin: 2em !important;
+  }
+
+  .passScoreContainer {
+    width: 100%;
+    left: 0 !important;
+  } 
+
+  .reviewBtn {
+    margin: 0% auto !important;
+  }
+
+  .review {
+    width: 100% !important;
+  }
+
+  .done.btn {
+    width: 6em !important;
+  }
 }
 </style>

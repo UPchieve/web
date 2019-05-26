@@ -155,4 +155,17 @@ export default {
   height: 100%;
   padding: 0;
 }
+
+
+@media screen and (max-width: 488px) {
+  .whiteboard-container {
+    width: 100% !important;
+    height: 65vh !important;
+  }
+
+  .chat-container {
+    width: 100% !important;
+    height: 60vh !important;
+  }
+}
 </style>

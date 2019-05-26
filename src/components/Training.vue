@@ -183,7 +183,6 @@ a {
   align-items: center;
   width: 450px;
   height: 60px;
-  padding: 0px 20px;
 }
 
 .supercategory,
@@ -197,12 +196,16 @@ a {
   margin-top: 20px;
   font-size: 20px;
   font-weight: 600;
+  cursor: pointer;
+  text-shadow: 0px 0px 2px #00000027;
+  padding: 0px 17px 0 20px;
 }
 
 .category {
   font-size: 16px;
   border: 1px solid #eeeeee;
   text-align: left;
+  padding: 0px 20px;
 }
 
 .category span {
@@ -225,27 +228,58 @@ a {
   align-items: center;
 }
 
+.test-container {
+  cursor: default;
+}
+
+.test-container:not(.certified) {
+  cursor: pointer;
+}
+
+.test-container:not(.certified):hover {
+  color: #5a5a5f;
+}
+
+.test-container .arrow.right {
+  padding-left: 3px;
+  transition: padding-left 0.1s ease-in;
+}
+
+.test-container:hover .arrow.right {
+  padding-left: 6px;
+}
+
+.test-container .arrow.right::after {
+  background-size: 38%;
+}
+
 .numTries {
   font-size: 12px;
 }
 
 .arrow {
-  padding-right: 10px;
-  height: 15px;
+  height: 1em;
+  width: 1em;
+  position: relative;;
 }
 
 .arrow::after {
   content: '';
   z-index: 2;
-  width: 20px;
-  height: 15px;
+  width: 100%;
+  height: 100%;
   position: absolute;
   background-repeat: no-repeat;
   background-position: center;
 }
 
+.review-container .arrow.right {
+  height: 1.3em;
+  width: 1.3em;
+}
+
 .review-container .arrow.right::after {
-  background-size: 30%;
+  background-size: 24%;
 }
 
 .arrow.down::after {
@@ -273,11 +307,27 @@ a {
 }
 
 .body-container {
-  margin-left: 30px;
+  margin: 0 0 30px 30px;
 }
 
 .certified {
   color: #16d2aa;
   font-weight: 600;
+}
+
+
+ @media screen and (max-width: 488px) {
+  .header {
+    padding: 1em 1em 1em 3em !important;
+  }
+
+  .body-container {
+    margin: 1.5em !important;
+  }
+
+  .supercategory,
+  .category {
+    width: auto !important;
+  }
 }
 </style>

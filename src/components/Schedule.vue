@@ -18,4 +18,14 @@
 export default {}
 </script>
 
-<style scoped></style>
+<style scoped>
+@media screen and (max-width: 488px) {
+  .row {
+    padding-top: 0.5em !important;
+  }
+
+  .col-sm-12 {
+    padding-right: 0em !important;
+  }
+}
+</style>

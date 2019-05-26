@@ -653,4 +653,16 @@ export default {
   z-index: 2;
   background-color: white;
 }
+
+
+@media screen and (max-width: 488px) {
+  .background {
+    margin-left: 0em !important;
+    padding-left: 0em !important;
+  }
+
+  .content-header {
+    padding: 2em !important;
+  }
+}
 </style>

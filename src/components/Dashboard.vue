@@ -1,7 +1,8 @@
 <template>
   <div :style="coverStyle" class="dashboard">
-    <div class="header-container" />
-    <h1>Hello, {{ name }}!</h1>
+    <div class="header-container">
+      <h1>Hello, {{ name }}!</h1>
+    </div>
 
     <template v-if="!user.isVolunteer">
       <div class="dashboard-body row">
@@ -208,9 +209,12 @@ export default {
 
 <style scoped>
 .header-container {
-  height: 250px;
+  height: 50%;
   background-color: #525666;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .col-xs-12 {
@@ -230,16 +234,9 @@ export default {
   right: 0;
 }
 
-.header-container {
-  height: 50%;
-}
-
-h1 {
+.header-container h1 {
   position: absolute;
-  top: 20%;
-  left: 55%;
   margin: 0;
-  text-align: center;
   font-size: 36px;
   line-height: 42px;
   font-weight: 400;
@@ -253,7 +250,7 @@ h2 {
 }
 
 h3 {
-  text-weight: bold;
+  font-weight: bold;
 }
 
 .col-lg-6 {
@@ -375,5 +372,29 @@ h3 {
 .btn.getHelp {
   border-radius: 30px;
   width: 300px;
+}
+
+
+@media screen and (max-width: 488px) {
+  .dashboard-body.row {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .dashboard-body p {
+    padding: 1.2em !important;
+  }
+   
+  iframe {
+    max-width: 100vw !important;
+  }
+
+  .help-container {
+    width: 100% !important;
+  }
+
+  .getHelpPopUp {
+    width: 100% !important;
+  }
 }
 </style>
