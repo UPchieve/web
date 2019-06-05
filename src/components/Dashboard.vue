@@ -42,10 +42,16 @@
             <div v-if="showHelpPopUp" :style="popUpStyle" class="getHelpPopUp">
               <span>Select a help topic.</span>
               <select v-model="pickedTopic" class="form-control topic">
+                <option value="" disabled>Select a topic</option>
                 <option value="math">Math</option>
                 <option value="college">College Counseling</option>
               </select>
-              <select v-model="pickedSubtopic" class="form-control subtopic">
+              <select
+                v-model="pickedSubtopic"
+                class="form-control subtopic"
+                :disabled="pickedTopic === ''"
+              >
+                <option value="" disabled>Select a subtopic</option>
                 <option
                   v-for="(subtopic, index) in subtopics[pickedTopic]"
                   :key="`subtopic-${index}`"
@@ -65,6 +71,7 @@
                   v-if="showHelpPopUp"
                   class="btn helpNext"
                   type="next"
+                  :disabled="pickedSubtopic === ''"
                   @click.prevent="getHelpNext()"
                 >
                   Get help
@@ -155,6 +162,11 @@ export default {
       pickedSubtopic: '',
       subtopics,
       coverStyle: {}
+    }
+  },
+  watch: {
+    pickedTopic: function () {
+      this.pickedSubtopic = ''
     }
   },
   methods: {
@@ -322,6 +334,10 @@ h3 {
 
 .btn:hover {
   background-color: #16d2aa;
+}
+
+.btn:disabled {
+  color: white;
 }
 
 .form-control {
