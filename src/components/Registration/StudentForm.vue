@@ -1,7 +1,13 @@
 <template>
-  <form class="form-signup">
+  <form class="form-signup" @submit.prevent="submit()">
     <div>
       <div v-if="step === 'step-1'">
+        <div v-if="errors.length" class="step-1-errors" colspan="2">
+          <h5>Please correct the following problems:</h5>
+          <ul>
+            <li v-for="error in errors">{{ error }}</li>
+          </ul>
+        </div>
         <div class="step-1-text" colspan="2">
           <b>Step 1 of 2: Choose your log-in details </b>
         </div>
@@ -11,6 +17,7 @@
           v-model="credentials.email"
           type="email"
           class="form-control"
+          v-bind:class="{'form-control-invalid': invalidInputs.indexOf('inputEmail') > -1}"
           required
           autofocus
         />
@@ -24,6 +31,7 @@
           v-model="credentials.password"
           type="password"
           class="form-control"
+          v-bind:class="{'form-control-invalid': invalidInputs.indexOf('inputPassword') > -1}"
           required
         />
         <p class="password-guidelines">
@@ -40,6 +48,12 @@
         {{ msg }}
       </div>
       <div v-else-if="step === 'step-2'">
+        <div v-if="errors.length" class="step-2-errors" colspan="2">
+          <h5>Please correct the following problems:</h5>
+          <ul>
+            <li v-for="error in errors">{{ error }}</li>
+          </ul>
+        </div>
         <table class="step-2-table">
           <tr>
             <td class="table-entry" colspan="2">
@@ -161,7 +175,6 @@
         <button
           class="btn btn-lg btn-primary btn-block"
           type="submit"
-          @click.prevent="submit()"
         >
           SIGN UP
         </button>
@@ -172,6 +185,8 @@
 </template>
 
 <script>
+import validator from 'validator';
+
 import AuthService from 'src/services/AuthService'
 import UserService from '../../services/UserService'
 
@@ -179,6 +194,8 @@ export default {
   data () {
     return {
       msg: '',
+      errors: [],
+      invalidInputs: [],
       credentials: {
         email: '',
         password: '',
@@ -196,6 +213,26 @@ export default {
   },
   methods: {
     nextPage () {
+      // validate input
+      this.errors = []; this.invalidInputs = [];
+      if (!this.credentials.email) {
+        this.errors.push('An email address is required.');
+        this.invalidInputs.push('inputEmail');
+      }
+      else if (!validator.isEmail(this.credentials.email)) {
+        // this is necessary because browsers ignore <input type="email"> until the
+        // user actually tries to submit the form, which does not occur until step 2
+        this.errors.push(this.credentials.email + ' is not a valid email address.');
+        this.invalidInputs.push('inputEmail');
+      }
+      if (!this.credentials.password) {
+        this.errors.push('A password is required.');
+        this.invalidInputs.push('inputPassword');
+      }
+      if (this.errors.length) {
+        return;
+      }
+    
       AuthService.checkRegister(this, {
         email: this.credentials.email,
         password: this.credentials.password
@@ -244,6 +281,11 @@ export default {
   text-align: left;
   padding-bottom: 25px;
 }
+.step-1-errors {
+  text-align: left;
+  font-size: 12px;
+  color: #bf0000;
+}
 .login-link {
   color: #73737a;
   font-weight: 600;
@@ -290,6 +332,9 @@ label {
 .form-control {
   border-bottom: 3px solid #16d2aa;
   margin-bottom: 50px;
+}
+.form-control-invalid {
+  border-bottom: 3px solid #bf0000;
 }
 .form-control:last-of-type {
   margin-bottom: 0;
@@ -396,6 +441,11 @@ button[type='submit']:active {
   border-bottom: 3px solid black;
 }
 
+.step-2-errors {
+  text-align: left;
+  font-size: 12px;
+  color: #bf0000;
+}
 .step-2-table {
   width: 100%;
 }
