@@ -1,5 +1,5 @@
 <template>
-  <form class="form-signup">
+  <form class="form-signup" @submit.prevent="submit()">
     <div v-if="step == 'step-1'">
       <div v-if="errors.length" class="step-1-errors" colspan="2">
         <h5>Please correct the following problems:</h5>
@@ -154,7 +154,6 @@
       <button
         class="btn btn-lg btn-primary btn-block"
         type="submit"
-        @click.prevent="submit()"
       >
         SIGN UP
       </button>
@@ -175,6 +174,26 @@ import validator from 'validator';
 import AuthService from 'src/services/AuthService'
 import RegistrationService from 'src/services/RegistrationService'
 import UserService from '../../services/UserService'
+
+var phoneValidation = function() {
+  return {
+    // see http://regexlib.com/REDetails.aspx?regexp_id=58
+    // modified to ignore trailing/leading whitespace,
+    // and disallow alphanumeric characters
+    re: /^\s*(?<cc>[0-9](?: |-)?)?(?:\(?([0-9]{3})\)?|[0-9]{3})(?: |-)?(?:([0-9]{3})(?: |-)?([0-9]{4}))\s*$/,
+    validatePhoneNumber: function(v) {
+      return this.re.test(v);
+    },
+    // convert phone number into the accepted format ###-###-####
+    convertPhoneNumber: function(v) {
+      var matches = v.match(this.re);
+      if (matches == null || matches.length < 5) {
+        return null;
+      }
+      return matches[2] + '-' + matches[3] + '-' + matches[4];
+    }
+  };
+};
 
 export default {
   data () {
@@ -234,13 +253,16 @@ export default {
     submit () {
       // validate input
       this.errors = []; this.invalidInputs = [];
-      if (!validatePhoneNumber(this.profile.phone)) {
+      if (!phoneValidation().validatePhoneNumber(this.profile.phone)) {
         this.errors.push(this.profile.phone + ' is not a valid U.S. phone number.');
         this.invalidInputs.push('phone');
       }
       if (this.errors.length) {
         return;
       }
+      
+      // convert phone number
+      this.profile.phone = phoneValidation().convertPhoneNumber(this.profile.phone);
     
       AuthService.register(this, {
         code: RegistrationService.data.registrationCode,
@@ -266,11 +288,7 @@ export default {
   }
 }
 
-function validatePhoneNumber(v) {
-  // see http://regexlib.com/REDetails.aspx?regexp_id=58
-  var re = /^([0-9]( |-)?)?(\(?[0-9]{3}\)?|[0-9]{3})( |-)?([0-9]{3}( |-)?[0-9]{4}|[a-zA-Z0-9]{7})$/;
-  return re.test(v);
-}
+
 </script>
 
 <style scoped>
