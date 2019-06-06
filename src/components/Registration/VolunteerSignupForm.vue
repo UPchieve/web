@@ -301,7 +301,7 @@ export default {
 
 .step-1-errors {
   text-align: left;
-  font-size: 12px;
+  font-size: 14px;
   color: #bf0000;
 }
 
@@ -460,7 +460,7 @@ button[type='submit']:active {
 
 .step-2-errors {
   text-align: left;
-  font-size: 12px;
+  font-size: 14px;
   color: #bf0000;
 }
 
