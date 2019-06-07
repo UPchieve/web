@@ -278,13 +278,18 @@ export default {
         code: undefined,
         email: this.credentials.email,
         password: this.credentials.password,
-        terms: this.credentials.terms
+        terms: this.credentials.terms,
+        firstName: this.profile.firstName,
+        lastName: this.profile.lastName,
+        highSchool: this.profile.highSchool
       })
         .then(() => {
           let user = UserService.getUser()
+          /*
           user.firstname = this.profile.firstName
           user.lastname = this.profile.lastName
           user.highschool = this.profile.highSchool
+          */
           user.heardFrom = this.profile.heardFrom
           user.referred = this.profile.referred
           UserService.setProfile(this, user, '/')

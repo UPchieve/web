@@ -301,14 +301,21 @@ export default {
         email: this.credentials.email,
         password: this.credentials.password,
         terms: this.credentials.terms,
+        firstName: this.profile.firstName,
+        lastName: this.profile.lastName,
+        phone: this.profile.phone,
+        college: this.profile.college,
+        favoriteAcademicSubject: this.profile.favoriteAcademicSubject
       })
         .then(() => {
           let user = UserService.getUser()
+          /*
           user.firstname = this.profile.firstName
           user.lastname = this.profile.lastName
           user.college = this.profile.college
           user.phone = this.profile.phone
           user.favoriteAcademicSubject = this.profile.favoriteAcademicSubject
+          */
           UserService.setProfile(this, user)
           this.step = 'success-message'
         })
