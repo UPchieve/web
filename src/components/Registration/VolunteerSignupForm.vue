@@ -154,9 +154,11 @@
       <button
         class="btn btn-lg btn-primary btn-block"
         type="submit"
+        @click="checkTerms()"
       >
         SIGN UP
       </button>
+      {{ msg }}
     </div>
     <div v-else-if="step == 'success-message'">
       <div class="step-1-text" colspan="2">
@@ -250,9 +252,16 @@ export default {
           this.msg = err.message
         })
     },
+    checkTerms () {
+      this.errors = [];
+      if (!this.credentials.terms) {
+        // necessary because the CSS hides the browser's validation message
+        this.errors.push('You must read and accept the user agreement.');
+      }
+    },
     submit () {
-      // validate input
       this.errors = []; this.invalidInputs = [];
+      // validate input
       if (!phoneValidation().validatePhoneNumber(this.profile.phone)) {
         this.errors.push(this.profile.phone + ' is not a valid U.S. phone number.');
         this.invalidInputs.push('phone');

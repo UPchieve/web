@@ -175,9 +175,11 @@
         <button
           class="btn btn-lg btn-primary btn-block"
           type="submit"
+          @click="checkTerms()"
         >
           SIGN UP
         </button>
+        {{ msg }}
       </div>
       <div v-else>Unexpected Error</div>
     </div>
@@ -243,6 +245,13 @@ export default {
         .catch(err => {
           this.msg = err.message
         })
+    },
+    checkTerms () {
+      this.errors = [];
+      if (!this.credentials.terms) {
+        // necessary because the CSS hides the browser's validation message
+        this.errors.push('You must read and accept the user agreement.');
+      }
     },
     submit () {
       AuthService.register(this, {
