@@ -66,6 +66,7 @@
           <td style="padding-right: 15px;">
             <input
               class="form-control"
+              v-bind:class="{'form-control-invalid': invalidInputs.indexOf('firstName') > -1}"
               required
               autofocus
               v-model="profile.firstName"
@@ -74,6 +75,7 @@
           <td style="padding-left: 15px;">
             <input
               class="form-control"
+              v-bind:class="{'form-control-invalid': invalidInputs.indexOf('lastName') > -1}"
               required
               autofocus
               v-model="profile.lastName"
@@ -99,6 +101,7 @@
           <td colspan="2">
             <input
               class="form-control"
+              v-bind:class="{'form-control-invalid': invalidInputs.indexOf('college') > -1}"
               required
               autofocus
               v-model="profile.college"
@@ -128,6 +131,7 @@
           <td colspan="2">
             <input
               class="form-control"
+              v-bind:class="{'form-control-invalid': invalidInputs.indexOf('favoriteAcademicSubject') > -1}"
               required
               autofocus
               v-model="profile.favoriteAcademicSubject"
@@ -154,7 +158,7 @@
       <button
         class="btn btn-lg btn-primary btn-block"
         type="submit"
-        @click="checkTerms()"
+        @click="checkInputs($event)"
       >
         SIGN UP
       </button>
@@ -252,24 +256,43 @@ export default {
           this.msg = err.message
         })
     },
-    checkTerms () {
-      this.errors = [];
-      if (!this.credentials.terms) {
-        // necessary because the CSS hides the browser's validation message
-        this.errors.push('You must read and accept the user agreement.');
-      }
-    },
-    submit () {
+    checkInputs (e) {
       this.errors = []; this.invalidInputs = [];
+
       // validate input
-      if (!phoneValidation().validatePhoneNumber(this.profile.phone)) {
+      if (!this.profile.firstName || !this.profile.lastName) {
+        this.errors.push('You must enter your first and last name.');
+      }
+      if (!this.profile.firstName) {
+        this.invalidInputs.push('firstName');
+      }
+      if (!this.profile.lastName) {
+        this.invalidInputs.push('lastName');
+      }
+      if (!this.profile.phone) {
+        this.errors.push('You must enter a phone number.');
+        this.invalidInputs.push('phone');
+      }
+      else if (!phoneValidation().validatePhoneNumber(this.profile.phone)) {
         this.errors.push(this.profile.phone + ' is not a valid U.S. phone number.');
         this.invalidInputs.push('phone');
       }
-      if (this.errors.length) {
-        return;
+      if (!this.profile.college) {
+        this.errors.push('Please enter the name of the college you go to.');
+        this.invalidInputs.push('college');
       }
-      
+      if (!this.profile.favoriteAcademicSubject) {
+        this.errors.push('Please enter your favorite academic subject.');
+        this.invalidInputs.push('favoriteAcademicSubject');
+      }
+      if (!this.credentials.terms) {
+        this.errors.push('You must read and accept the user agreement.');
+      }
+      if (this.errors.length) {
+        e.preventDefault();
+      }
+    },
+    submit () {
       // convert phone number
       this.profile.phone = phoneValidation().convertPhoneNumber(this.profile.phone);
     

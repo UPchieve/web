@@ -68,6 +68,7 @@
               <input
                 v-model="profile.firstName"
                 class="form-control"
+                v-bind:class="{'form-control-invalid': invalidInputs.indexOf('firstName') > -1}"
                 required
                 autofocus
               />
@@ -77,6 +78,7 @@
               <input
                 v-model="profile.lastName"
                 class="form-control"
+                v-bind:class="{'form-control-invalid': invalidInputs.indexOf('lastName') > -1}"
                 required
                 autofocus
               />
@@ -104,6 +106,7 @@
               <input
                 v-model="profile.highSchool"
                 class="form-control"
+                v-bind:class="{'form-control-invalid': invalidInputs.indexOf('highSchool') > -1}"
                 required
                 autofocus
               />
@@ -175,7 +178,7 @@
         <button
           class="btn btn-lg btn-primary btn-block"
           type="submit"
-          @click="checkTerms()"
+          @click="checkInputs($event)"
         >
           SIGN UP
         </button>
@@ -246,11 +249,28 @@ export default {
           this.msg = err.message
         })
     },
-    checkTerms () {
-      this.errors = [];
+    checkInputs (e) {
+      this.errors = []; this.invalidInputs = [];
+      
+      if (!this.profile.firstName || !this.profile.lastName) {
+        this.errors.push('You must enter your first and last name.');
+      }
+      if (!this.profile.firstName) {
+        this.invalidInputs.push('firstName');
+      }
+      if (!this.profile.lastName) {
+        this.invalidInputs.push('lastName');
+      }
+      if (!this.profile.highSchool) {
+        this.errors.push('Please enter the name of the high school you go to.');
+        this.invalidInputs.push('highSchool');
+      }
       if (!this.credentials.terms) {
         // necessary because the CSS hides the browser's validation message
         this.errors.push('You must read and accept the user agreement.');
+      }
+      if (this.errors.length) {
+        e.preventDefault();
       }
     },
     submit () {
