@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import 'bootstrap/dist/css/bootstrap.css'
 import './assets/styles/settings.css'
 
 import Sidebar from './components/Sidebar'
@@ -76,8 +77,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import './scss/index.scss';
-
 /*
  * @todo {1} Make this truly responsive
  */
