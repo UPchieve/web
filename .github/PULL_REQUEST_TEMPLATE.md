@@ -6,7 +6,9 @@ Related PRs: _Links to related PRs and how they're related (if none, remove this
 
 Description
 -----------
-_High-level summary of the changes, plus any relevant background or context_
+- _High-level summary_
+- _of all the changes,_
+- _plus any relevant background or context._
 
 Developer self-review checklist
 -------------------------------
@@ -17,4 +19,4 @@ Developer self-review checklist
 - [ ] Any appropriate documentation (within the code, README.md, docs, etc) has been updated
 - [ ] There are no new spelling/grammar mistakes in the UI, code, or documentation
 - [ ] Branch has been deployed to staging, and all edge cases have been manually tested
-- [ ] Task and PR have been updated to indicate that this is ready for review
+- [ ] Task and PR have been updated to show that this is ready for review
