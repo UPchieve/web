@@ -2,7 +2,7 @@
   <div class="background">
     <div class="main-page">
       <div class="logo-class">
-        <img class="logo-img" src="../assets/p_logo_white.png" />
+        <img class="logo-img" src="../assets/p_logo_white.png">
       </div>
       <div class="form-div">
         <form class="form-signin">
@@ -15,9 +15,7 @@
               v-if="error || $route.query['401'] === 'true'"
               class="alert alert-danger"
               role="alert"
-            >
-              {{ error }}
-            </div>
+            >{{ error }}</div>
             <label for="inputEmail">Email</label>
             <input
               id="inputEmail"
@@ -26,7 +24,7 @@
               class="form-control"
               required
               autofocus
-            />
+            >
             <label for="inputPassword">Password</label>
             <input
               id="inputPassword"
@@ -34,29 +32,21 @@
               type="password"
               class="form-control password"
               required
-            />
-            <router-link to="resetpassword" class="password-reset-link"
-              >Forgot password?</router-link
             >
+            <router-link to="resetpassword" class="password-reset-link">Forgot password?</router-link>
             <button
               class="btn btn-lg btn-primary btn-block login-btn"
               type="submit"
               @click.prevent="submit"
-            >
-              LOGIN
-            </button>
+            >LOGIN</button>
           </div>
           <div class="footer">
-            <router-link to="/contact" tag="div"
-              ><a class="contact icon" target="_blank"
-                >CONTACT US</a
-              ></router-link
-            >
-            <router-link to="/legal" tag="div"
-              ><a class="privacy icon" target="_blank"
-                >LEGAL POLICY</a
-              ></router-link
-            >
+            <router-link to="/contact" tag="div">
+              <a class="contact icon" target="_blank">CONTACT US</a>
+            </router-link>
+            <router-link to="/legal" tag="div">
+              <a class="privacy icon" target="_blank">LEGAL POLICY</a>
+            </router-link>
             <div>
               <a href="https://upchieve.org/" target="_blank">OUR WEBSITE</a>
             </div>
@@ -69,44 +59,45 @@
 </template>
 
 <script>
-import AuthService from 'src/services/AuthService'
+import AuthService from "src/services/AuthService";
 
 export default {
-  data () {
-    let error
-    if (this.$route.query['401'] === 'true') {
-      error = 'Your session has expired. Please login again'
+  data() {
+    let error;
+    if (this.$route.query["401"] === "true") {
+      error = "Your session has expired. Please login again";
     }
     return {
       credentials: {
-        email: '',
-        password: ''
+        email: "",
+        password: ""
       },
       error
-    }
+    };
   },
   methods: {
-    submit () {
+    submit() {
+      window.analytics.track('tracking: logged In')
       AuthService.login(
         this,
         {
           email: this.credentials.email,
           password: this.credentials.password
         },
-        this.$route.query.redirect || '/'
-      )
+        this.$route.query.redirect || "/"
+      );
     }
   },
-  beforeRouteEnter (to, from, next) {
+  beforeRouteEnter(to, from, next) {
     if (AuthService.user.authenticated) {
       next({
-        path: '/'
-      })
+        path: "/"
+      });
     } else {
-      next()
+      next();
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -171,7 +162,7 @@ label {
   box-shadow: none;
 }
 
-button[type='submit'] {
+button[type="submit"] {
   background-color: #f6f6f6;
   border: none;
   font-weight: 600;
@@ -182,8 +173,8 @@ button[type='submit'] {
   margin: 30px 0;
 }
 
-button[type='submit']:hover,
-button[type='submit']:active {
+button[type="submit"]:hover,
+button[type="submit"]:active {
   color: white;
   background-color: #16d2aa;
 }
@@ -201,7 +192,7 @@ button[type='submit']:active {
 
 .background {
   display: flex;
-  background-image: url('../assets/onboarding_background.png');
+  background-image: url("../assets/onboarding_background.png");
   background-size: cover;
   height: 100%;
   font-size: 16px;
@@ -253,11 +244,6 @@ button[type='submit']:active {
   flex: 1;
 }
 
-
-
-
-
-
 @media screen and (max-width: 488px) {
   .background {
     margin-left: 0em !important;
@@ -307,8 +293,5 @@ button[type='submit']:active {
     padding-right: 0em !important;
     justify-content: space-evenly !important;
   }
-
-
-
 }
 </style>

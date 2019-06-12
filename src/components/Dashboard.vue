@@ -200,6 +200,7 @@ export default {
       if (subTopic === 'general help') {
         subTopic = topic
       }
+      window.analytics.track('tracking: started new session')
       const linkName = `/session/${topic}/${subTopic}`
       this.$router.push(linkName)
     }

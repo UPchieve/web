@@ -77,6 +77,7 @@ export default {
     }
   },
   mounted () {
+    window.analytics.track("tracking: session started")
     const id = this.$route.params.sessionId
     let promise
 
