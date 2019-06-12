@@ -36,7 +36,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 /**
  * @todo {1} Refactoring candidate: the v- prefix was added to avoid colliding
  *           with Bootstrap

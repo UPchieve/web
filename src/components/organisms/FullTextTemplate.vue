@@ -29,7 +29,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .full-text-template__content {
   text-align: left;
 }

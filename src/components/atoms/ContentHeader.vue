@@ -15,7 +15,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 /**
  * @todo {1} Refactoring candidate: this shoudln't be done, but I had to do it
  *           since Bootstap interferes with this :/

@@ -79,7 +79,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .avatar {
   display: block;
   width: 60px;

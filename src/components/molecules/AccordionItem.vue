@@ -41,7 +41,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .accordion-item {
   overflow: hidden;
 }

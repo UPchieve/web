@@ -84,7 +84,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .help-requests-t {
   width: 100%;
   margin-bottom: 64px;

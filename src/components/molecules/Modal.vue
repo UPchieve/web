@@ -67,7 +67,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .v-modal {
   position: fixed;
   top: 0;

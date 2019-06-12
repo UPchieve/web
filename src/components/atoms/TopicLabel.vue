@@ -24,7 +24,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .topic-label {
   color: #fff;
   text-transform: uppercase;

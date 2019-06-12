@@ -169,7 +169,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .chat {
   height: 100%;
   position: relative;

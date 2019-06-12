@@ -233,7 +233,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .message-form {
   position: relative;
   overflow: hidden;

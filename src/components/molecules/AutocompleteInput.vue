@@ -97,7 +97,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .autocomplete-input {
   position: relative;
   display: block;
