@@ -92,7 +92,7 @@ body,
 }
 
 #app {
-  font-family: 'Work Sans', Helvetica, Arial, sans-serif;
+  font-family: $default-font;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;

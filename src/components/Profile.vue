@@ -260,7 +260,7 @@ button:hover {
 
 .profile {
   font-size: 16px;
-  font-family: Work Sans;
+  font-family: $default-font;
 }
 
 .header {
