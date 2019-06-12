@@ -46,14 +46,14 @@ export default {
   overflow: hidden;
 }
 .accordion-item__title {
-  background: var(--c-backdrop);
+  background: $c-backdrop;
   padding: 16px 20px;
   font-weight: bold;
-  border-bottom: 2px solid var(--c-shadow-header);
+  border-bottom: 2px solid $c-shadow-header;
 }
 .accordion-item__title:hover {
   cursor: pointer;
-  background: var(--c-backdrop-clear);
+  background: $c-backdrop-clear;
 }
 .accordion-item__bullet {
   margin-right: 8px;
@@ -65,7 +65,7 @@ export default {
   transform: rotate(90deg);
 }
 .accordion-item__content {
-  background: var(--c-backdrop-clear);
+  background: $c-backdrop-clear;
   transition: all 0.2s ease-in-out;
   padding: 0 20px;
   height: 0;

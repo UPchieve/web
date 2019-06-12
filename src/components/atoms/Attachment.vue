@@ -21,6 +21,6 @@ export default {
   padding: 4px;
 }
 .attachment__icon {
-  color: var(--c-accent);
+  color: $c-accent;
 }
 </style>

@@ -44,7 +44,7 @@ export default {
 
 .basic-template {
   min-height: 100vh;
-  background: var(--c-backdrop);
+  background: $c-backdrop;
 }
 .basic-template__content {
 }
@@ -58,7 +58,7 @@ export default {
   width: 80%;
   max-width: 700px;
   padding: 40px;
-  box-shadow: -4px 4px var(--c-shadow);
+  box-shadow: -4px 4px $c-shadow;
   margin: auto;
 }
 </style>

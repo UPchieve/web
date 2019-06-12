@@ -197,7 +197,7 @@ export default {
 
 .chat-warning {
   width: 100%;
-  background: var(--c-shadow-warn);
+  background: $c-shadow-warn;
   color: #fff;
   font-weight: bold;
   min-height: 40px;

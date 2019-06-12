@@ -251,7 +251,7 @@ export default {
   width: 100%;
   height: 200px;
   resize: none;
-  border: 2px solid var(--c-accent);
+  border: 2px solid $c-accent;
   margin-bottom: 20px;
   padding: 4px 8px;
 }
@@ -280,7 +280,7 @@ export default {
 .form-loader__dot {
   width: 0;
   height: 0;
-  background: var(--c-accent);
+  background: $c-accent;
   border-radius: 100%;
   position: absolute;
   left: 50%;
@@ -289,7 +289,7 @@ export default {
 }
 .form-loader__msg {
   width: 100%;
-  color: var(--c-accent);
+  color: $c-accent;
   font-weight: bold;
   position: absolute;
   left: 12px;

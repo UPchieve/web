@@ -98,7 +98,7 @@ export default {
 
 .question {
   margin-bottom: 40px;
-  border-bottom: 1px solid var(--c-shadow-header);
+  border-bottom: 1px solid $c-shadow-header;
   text-align: center;
 }
 .question__content {
@@ -120,13 +120,13 @@ export default {
 */
 .attachment-list {
   /*[1]*/
-  background: var(--c-bg);
+  background: $c-bg;
   display: flex;
 }
 .attachment-list__icon {
   position: relative;
   min-width: 64px;
-  background: var(--c-shadow-header);
+  background: $c-shadow-header;
 }
 .attachment-list__icon::before {
   content: ' ';

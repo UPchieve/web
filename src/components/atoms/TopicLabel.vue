@@ -36,9 +36,9 @@ export default {
   border-radius: 12px;
 }
 .topic-label--math {
-  background: var(--c-math);
+  background: $c-math;
 }
 .topic-label--college {
-  background: var(--c-college);
+  background: $c-college;
 }
 </style>
