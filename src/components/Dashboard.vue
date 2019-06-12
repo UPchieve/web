@@ -165,6 +165,7 @@ export default {
     }
   },
   watch: {
+    // Watch the help topic for changes, and reset the subtopic when it does.
     pickedTopic: function () {
       this.pickedSubtopic = ''
     }
