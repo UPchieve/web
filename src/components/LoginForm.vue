@@ -60,6 +60,7 @@
 
 <script>
 import AuthService from "src/services/AuthService";
+import UserService from '../services/UserService'
 
 export default {
   data() {
@@ -78,6 +79,10 @@ export default {
   methods: {
     submit() {
       window.analytics.track('tracking: logged In')
+      let user = UserService.getUser()
+      window.analytics.identify(user._id, {
+            user: user
+          }),
       AuthService.login(
         this,
         {

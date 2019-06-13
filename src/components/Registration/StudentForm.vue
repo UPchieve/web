@@ -194,6 +194,7 @@ export default {
       step: 'step-1'
     }
   },
+
   methods: {
     nextPage () {
       AuthService.checkRegister(this, {
@@ -222,6 +223,10 @@ export default {
           user.heardFrom = this.profile.heardFrom
           user.referred = this.profile.referred
           UserService.setProfile(this, user, '/')
+          //tracking data about who is signing up
+          window.analytics.identify(user._id, {
+            user: user
+          })
         })
         .catch(err => {
           console.log(err)
