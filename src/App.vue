@@ -14,14 +14,10 @@
   
       <button v-else  @click="toggleMenu()" class="sidebar-exit" />
     </div>
-    
-      <div v-if="!mobileMode"  class="nav-container">
-        <sidebar v-on:closeMenu="doNothing()" />
-      </div>
 
-      <div v-else class="nav-container forMobileMode" v-bind:class="{active: isActive}">
-        <sidebar v-on:closeMenu="closeMenu()" />
-      </div>
+    <div class="nav-container" v-bind:class="{forMobileMode: mobileMode, active: isActive}">
+      <sidebar v-on:closeMenu="closeMenu()" />
+    </div>
 
     <div class="col-xs-12 view-container">
       <router-view />
@@ -31,10 +27,10 @@
 
 <script>
 import 'bootstrap/dist/css/bootstrap.css'
-
 import Sidebar from './components/Sidebar'
-
 import AuthService from './services/AuthService'
+
+const MOBILE_MODE_WIDTH = 488
 
 /**
  * @todo Examine this, huge code smell, refactoring might be needed
@@ -49,27 +45,25 @@ export default {
   created () {
     AuthService.checkAuth(this) // {1}
 
-    if (window.innerWidth <= 488) {
-      this.mobileMode = true   
-    } else {
-      this.mobileMode = false
-    }
+    // Update mobileMode on window resize
+    window.addEventListener('resize', () => {
+      this.mobileMode = window.innerWidth <= MOBILE_MODE_WIDTH
+    })
   },
   data () {
     return {
-      mobileMode: false,
+      mobileMode: window.innerWidth <= MOBILE_MODE_WIDTH,
       isActive: false
     }
   },
   methods: {
     toggleMenu() {
-        this.isActive = !this.isActive
+      this.isActive = !this.isActive
     },
     closeMenu() {
+      if (this.mobileMode) {
         this.isActive = false
-    },
-    doNothing() {
-      return
+      }
     }
   }
 }
