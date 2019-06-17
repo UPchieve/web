@@ -1,27 +1,30 @@
 <template>
   <div id="app">
+    <div v-if="!$route.meta.hideSidebar" class="sidebar-wrapper">
+      <!-- Sidebar -->
+      <div class="nav-container" v-bind:class="{forMobileMode: mobileMode, active: isActive}">
+        <sidebar v-on:closeMenu="closeMenu()" />
+      </div>
 
-    <div v-if="['LoginForm', 'Logout', 'Registration', 'ResetPasswordForm', 'SetPasswordForm', 'Session-math', 'Session-college'].indexOf($route.name) > -1">
+      <!-- Sidebar button -->
+      <div class="toggleMenu forMobileView">
+        <button
+          v-if="!isActive"
+          @click="toggleMenu()"
+          class="sidebar-hamburger"
+          v-bind:class="{white: $route.name === 'Dashboard'}"
+        />
+
+        <button v-else @click="toggleMenu()" class="sidebar-exit" />
+      </div>
+
+      <!-- Router view -->
+      <div class="col-xs-12 view-container">
+        <router-view />
+      </div>
     </div>
 
-    <div v-else class="toggleMenu forMobileView">
-      <button 
-        v-if="!isActive" 
-        @click="toggleMenu()" 
-        class="sidebar-hamburger" 
-        v-bind:class="{white: ['Dashboard'].indexOf($route.name) > -1}"
-      />
-  
-      <button v-else  @click="toggleMenu()" class="sidebar-exit" />
-    </div>
-
-    <div class="nav-container" v-bind:class="{forMobileMode: mobileMode, active: isActive}">
-      <sidebar v-on:closeMenu="closeMenu()" />
-    </div>
-
-    <div class="col-xs-12 view-container">
-      <router-view />
-    </div>
+    <router-view v-else />
   </div>
 </template>
 
@@ -81,7 +84,11 @@ export default {
 
 html,
 body,
-#app {
+#app,
+#app > .row,
+.nav-container,
+.view-container,
+.sidebar-wrapper {
   height: 100%;
 }
 
@@ -91,12 +98,6 @@ body,
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-}
-
-#app > .row,
-.nav-container,
-.view-container {
-  height: 100%;
 }
 
 .toggleMenu {
