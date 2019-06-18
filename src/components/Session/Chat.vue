@@ -87,7 +87,6 @@ export default {
       const message = this.newMessage.slice(0, -1)
 
       if (message !== '') {
-        this.showNewMessage(message)
         ModerationService
           .checkIfMessageIsClean(this, message)
           .then(isClean => (isClean) ? this.showNewMessage(message) : this.showModerationWarning())
