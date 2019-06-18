@@ -5,7 +5,7 @@
     <div class="message-box">
       <transition name="chat-warning--slide">
         <div class="chat-warning" v-show="chatWarningIsShown">
-          Messages cannot contain personal information
+          Messages cannot contain personal information or profanity
           <span class="chat-warning__close" @click="hideModerationWarning"
             >×</span
           >
@@ -88,10 +88,9 @@ export default {
 
       if (message !== '') {
         this.showNewMessage(message)
-        // TODO: Disabled until re-implemented
-        // ModerationService
-        //   .checkIfMessageIsClean(this, message)
-        //   .then(isClean => (isClean) ? this.showNewMessage(message) : this.showModerationWarning())
+        ModerationService
+          .checkIfMessageIsClean(this, message)
+          .then(isClean => (isClean) ? this.showNewMessage(message) : this.showModerationWarning())
       }
     }
   },
@@ -199,7 +198,7 @@ export default {
   width: 100%;
   background: var(--c-shadow-warn);
   color: #fff;
-  font-weight: bold;
+  font-weight: normal;
   min-height: 40px;
   position: absolute;
   left: 0;
@@ -209,9 +208,10 @@ export default {
   z-index: 1;
 }
 .chat-warning__close {
-  font-size: 2rem;
+  font-size: 3.5rem;
   width: 40px;
-  padding: 12px;
+  padding: 10px;
+  margin-right: 5px;
   cursor: pointer;
   display: block;
   position: absolute;
