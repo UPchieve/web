@@ -81,6 +81,8 @@ export default {
         user: UserService.getUser(),
         message
       })
+    },
+    clearMessageInput () {
       this.newMessage = ''
     },
     sendMessage () {
@@ -89,7 +91,15 @@ export default {
       if (message !== '') {
         ModerationService
           .checkIfMessageIsClean(this, message)
-          .then(isClean => (isClean) ? this.showNewMessage(message) : this.showModerationWarning())
+          .then(isClean => {
+            if (isClean) {
+              this.showNewMessage(message)
+            } else {
+              this.showModerationWarning()
+            }
+
+            this.clearMessageInput()
+          })
       }
     }
   },
