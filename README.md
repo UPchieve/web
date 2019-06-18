@@ -18,9 +18,13 @@ npm -v
 node -v
 ```
 
-If either the following error occurs "'node' is not recognized as an internal or external command, operable program or batch file", or "'npm' is not recognized as an internal or external command, operable program or batch file", add Node and NPM to the PATH and restart the command prompt. 
+> Note: if either of the following errors occur, [add Node and NPM to your $PATH](https://unix.stackexchange.com/questions/26047/how-to-correctly-add-a-path-to-path) and restart the command prompt.
+>
+> - `'node' is not recognized as an internal or external command, operable program or batch file`
+> - `npm' is not recognized as an internal or external command, operable program or batch file`
 
-3. Clone repository using either HTTPS or SSH
+
+3. Clone the repository using HTTPS, SSH, or a git client like [Fork](https://git-fork.com/).
 ``` bash
 # HTTPS
 git clone https://github.com/UPchieve/web.git
@@ -40,7 +44,7 @@ cd web
 npm install
 ```
 
-When inside of the repository folder, the following commands can be run:
+6. NPM commands (available to use in the web repository directory)
 ``` bash
 # serve with hot reload at localhost:8080
 npm run dev
@@ -58,6 +62,10 @@ npm run e2e
 npm test
 ```
 
-6. See [the web server repo](https://github.com/UPchieve/server) for server installation
+7. See [the web server repo](https://github.com/UPchieve/server) for server installation
 
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+More information about our Vue setup:
+- [Vue style guide](https://vuejs.org/v2/style-guide/)
+- [vue-loader](http://vuejs.github.io/vue-loader)
+- [Boilerplate Vue template this project used](http://vuejs-templates.github.io/webpack/)
+
