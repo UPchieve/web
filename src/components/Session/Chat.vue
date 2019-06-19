@@ -35,6 +35,7 @@
     </div>
 
     <textarea
+      @keydown.enter.prevent
       @keyup.enter="sendMessage"
       v-model="newMessage"
       placeholder="Type here..."
@@ -87,7 +88,8 @@ export default {
       this.newMessage = ''
     },
     sendMessage () {
-      const message = this.newMessage.slice(0, -1)
+      const message = this.newMessage.trim()
+      this.clearMessageInput()
       
       // Early exit if message is blank
       if (_.isEmpty(message)) { return }
@@ -103,8 +105,6 @@ export default {
             } else {
               this.showModerationWarning()
             }
-
-            this.clearMessageInput()
           })
     }
   },
