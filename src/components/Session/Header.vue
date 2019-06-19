@@ -228,6 +228,9 @@ h1 {
   border-radius: 10px;
   padding: 5px;
   height: 30px;
+  vertical-align: baseline;
+  padding: 0 3px 0 3px;
+  height: auto;
 }
 
 .btn.btn-bg-dark {
