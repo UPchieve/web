@@ -24,7 +24,7 @@
               <div class="name">
                 {{ message.name }}
               </div>
-              {{ message.contents }}
+              <span>{{ message.contents }}</span>
               <div class="time">
                 {{ message.time }}
               </div>
