@@ -30,6 +30,11 @@
         v-if="connectionMsg || reconnectAttemptMsg"
       >
         {{ connectionMsg }} {{ reconnectAttemptMsg }}
+        <template v-if="reconnectAttemptMsg">
+          <button class="btn btn-in-msg-header btn-bg-dark" @click.prevent="tryReconnect">
+            Try Now
+          </button>
+        </template>
       </div>
     </div>
   </div>
@@ -119,6 +124,15 @@ export default {
           router.replace('/')
         }
       }
+    },
+    tryReconnect() {
+      this.$socket.open()
+      this.reconnectAttemptMsg = 'Waiting for server response.'
+    },
+    connectionSuccess() {
+      this.connectionMsg = 'Connection successful. Please refresh the page, otherwise session messages may not appear.'
+      this.reconnectAttemptMsg = ''
+      this.connectionMsgType = 'success'
     }
   },
   sockets: {
@@ -133,14 +147,17 @@ export default {
       this.connectionMsgType = 'warning'
     },
     reconnect_attempt () {
-      this.reconnectAttemptMsg = 'Trying to reconnect...'
+      this.reconnectAttemptMsg = 'Trying periodically to reconnect.'
+    },
+    connect() {
+      if (this.reconnectAttemptMsg) {
+        this.connectionSuccess()
+      }
     },
     reconnect () {
-      this.connectionMsg = 'Connection successful. Please refresh the page, otherwise session messages may not appear.'
-      this.reconnectAttemptMsg = ''
-      this.connectionMsgType = 'success'
+      this.connectionSuccess()
     }
-    
+
   }
 }
 </script>
@@ -204,6 +221,22 @@ h1 {
 
 .btn:hover {
   color: #000000;
+}
+
+.btn.btn-in-msg-header {
+  font-size: 14px;
+  border-radius: 10px;
+  padding: 5px;
+  height: 30px;
+}
+
+.btn.btn-bg-dark {
+  background-color: #444;
+}
+
+.btn.btn-bg-dark:hover {
+  background-color: #000;
+  color: #fff;
 }
 
 .button-container {
