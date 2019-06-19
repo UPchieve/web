@@ -13,3 +13,14 @@
     @content;
   }
 }
+
+/// Helper to add basic flex styling.
+/// @param {string} $flex-direction [row]
+/// @param {string} $justify-content [initial]
+/// @param {string} $align-items [initial]
+@mixin flex-container($flex-direction: row, $justify-content: initial, $align-items: initial) {
+  display: flex;
+  flex-direction: $flex-direction;
+  justify-content: $justify-content;
+  align-items: $align-items;
+}
