@@ -1,24 +1,35 @@
 <template>
-  <div :class="{ inactive: !partnerName }" class="session-header">
-    <div class="avatar-info-container">
-      <div :style="partnerAvatar" class="avatar" />
-      <div class="info">
-        <template v-if="partnerName">
-          <span class="volunteer-name">{{ partnerName }}</span>
-        </template>
-        <template v-else-if="currentSession.sessionId">
-          {{ waitingText }}
-        </template>
-        <template v-else>
-          Loading
-        </template>
+  <div>
+    <div :class="{ inactive: !partnerName }" class="session-header">
+      <div class="main-session-header">
+        <div class="avatar-info-container">
+          <div :style="partnerAvatar" class="avatar" />
+          <div class="info">
+            <template v-if="partnerName">
+              <span class="volunteer-name">{{ partnerName }}</span>
+            </template>
+            <template v-else-if="currentSession.sessionId">
+              {{ waitingText }}
+            </template>
+            <template v-else>
+              Loading
+            </template>
+          </div>
+        </div>
+        <div class="button-container">
+          <div class="end-session">
+            <button class="btn btn-lg btn-block" @click.prevent="end">
+              End session
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="button-container">
-      <div class="end-session">
-        <button class="btn btn-lg btn-block" @click.prevent="end">
-          End session
-        </button>
+      <div
+        :class="[connectionMsgType]"
+        class="connection-message-header"
+        v-if="connectionMsg || reconnectAttemptMsg"
+      >
+        {{ connectionMsg }} {{ reconnectAttemptMsg }}
       </div>
     </div>
   </div>
@@ -39,7 +50,10 @@ const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png'
 export default {
   data () {
     return {
-      currentSession: SessionService.currentSession
+      currentSession: SessionService.currentSession,
+      connectionMsg: '',
+      connectionMsgType: '',
+      reconnectAttemptMsg: ''
     }
   },
   computed: {
@@ -106,6 +120,27 @@ export default {
         }
       }
     }
+  },
+  sockets: {
+    connect_error (error) {
+      console.log(`connection error: ${error}`)
+      this.connectionMsg = 'The system seems to be having a problem reaching the server.'
+      this.connectionMsgType = 'warning'
+    },
+    connect_timeout () {
+      console.log('connection timeout')
+      this.connectionMsg = 'The system seems to be having a problem reaching the server.'
+      this.connectionMsgType = 'warning'
+    },
+    reconnect_attempt () {
+      this.reconnectAttemptMsg = 'Trying to reconnect...'
+    },
+    reconnect () {
+      this.connectionMsg = 'Connection successful. Please refresh the page, otherwise session messages may not appear.'
+      this.reconnectAttemptMsg = ''
+      this.connectionMsgType = 'success'
+    }
+    
   }
 }
 </script>
@@ -115,8 +150,16 @@ export default {
   position: relative;
   height: 100px;
   background-color: #64e1c6;
-  padding: 20px;
+  padding: 0;
   text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+}
+
+.main-session-header {
+  padding: 20px 20px 0 20px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -169,6 +212,24 @@ h1 {
 
 .session-header.inactive {
   background-color: #73737a;
+}
+
+.connection-message-header {
+  padding: 3px;
+  background-color: #858585;
+  text-color: #fff;
+  text-align: center;
+  font-weight: 600;
+  position: relative;
+  bottom: 0;
+}
+
+.connection-message-header.warning {
+  background-color: #ffde5e;
+}
+
+.connection-message-header.success {
+  background-color: #fff;
 }
 
 .avatar-info-container {
