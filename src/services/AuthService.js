@@ -30,9 +30,11 @@ export default {
         if (!data) {
           throw new Error('No user returned from auth service')
         }
-
         this.storeUser(data.user)
-
+        window.analytics.identify(this.user.data._id, {
+          'is volunteer': this.user.data.isVolunteer ? 'volunteer':'student'
+        })
+        window.analytics.track('logged in',{ })
         if (redirect) {
           router.push(redirect)
         }
@@ -54,9 +56,12 @@ export default {
         } else if (data.err) {
           throw new Error(data.err)
         }
-
+        
         this.storeUser(data.user)
-
+        window.analytics.identify(this.user.data._id, {
+          'is volunteer': this.user.data.isVolunteer ? 'volunteer':'student'
+        })
+        window.analytics.track('signed up',{ })
         context.msg = 'You have been signed up!'
 
         if (redirect) {
@@ -160,6 +165,7 @@ export default {
   storeUser (userObj) {
     this.user.authenticated = true
     this.user.data = userObj
+    console.log(userObj)
     localStorage.setItem('user', JSON.stringify(userObj))
   },
 
@@ -191,5 +197,7 @@ export default {
       .catch(err => {
         console.log(err)
       })
-  }
+  },
+
+  
 }

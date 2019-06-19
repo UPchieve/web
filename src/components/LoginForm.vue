@@ -60,7 +60,7 @@
 
 <script>
 import AuthService from "src/services/AuthService";
-import UserService from '../services/UserService'
+import UserService from "../services/UserService";
 
 export default {
   data() {
@@ -78,11 +78,7 @@ export default {
   },
   methods: {
     submit() {
-      window.analytics.track('tracking: logged In')
-      let user = UserService.getUser()
-      window.analytics.identify(user._id, {
-            user: user
-          }),
+      let user = UserService.getUser();
       AuthService.login(
         this,
         {
@@ -90,7 +86,7 @@ export default {
           password: this.credentials.password
         },
         this.$route.query.redirect || "/"
-      );
+      )     
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -102,6 +98,8 @@ export default {
       next();
     }
   }
+
+  
 };
 </script>
 

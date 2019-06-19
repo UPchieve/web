@@ -7,7 +7,7 @@ export default {
   loading: false,
   currentSession: {
     sessionId: null,
-    data: {}
+    data: {},
   },
 
   getPartner () {
@@ -47,16 +47,21 @@ export default {
 
       this.currentSession.sessionId = sessionId
 
-      console.log(`newSession: ${sessionId}`)
-
+      
       if (sessionId) {
         const path = `/session/${sessionType}/${sessionSubTopic}/${sessionId}`
         localStorage.setItem('currentSessionPath', path)
         router.replace(path)
+        window.analytics.track('Session started', {
+          'Session start': new Date().getTime(),
+          'Session topic': sessionType,
+          'Session subtopic': sessionSubTopic,
+          'Session id': sessionId
+        })
       } else {
         router.replace('/')
       }
-
+      
       return sessionId
     })
   },
@@ -72,7 +77,6 @@ export default {
       if (!sessionId) {
         router.replace('/')
       }
-
       return sessionId
     })
   },
@@ -97,10 +101,12 @@ export default {
       if (type && subTopic && sessionId) {
         this.currentSession.sessionId = sessionId
         this.currentSession.data = data
-
+        
         const path = `/session/${type}/${subTopic}/${sessionId}`
         localStorage.setItem('currentSessionPath', path)
       }
     })
-  }
+  },
+
+
 }

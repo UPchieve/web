@@ -135,8 +135,12 @@ export default router
 router.beforeEach((to, from, next) => {
   /*gets the path routing to, and get the part of the path
   most representative of where it is going*/
-  var pageRoutingTo = to.fullPath.split('/')[1]
-  window.analytics.page(pageRoutingTo)
+  // var pageRoutingTo = to.fullPath.split('/')[1]
+  // window.analytics.page(pageRoutingTo, {
+  //     path: to.fullPath,
+  //     url: to.fullPath
+  // })
+
 
 
   if (to.matched.some(route => route.meta.protected)) {
