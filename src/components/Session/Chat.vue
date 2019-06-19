@@ -44,6 +44,7 @@
 
 <script>
 import moment from 'moment'
+import _ from 'lodash'
 
 import UserService from 'src/services/UserService'
 import SessionService from 'src/services/SessionService'
@@ -87,9 +88,14 @@ export default {
     },
     sendMessage () {
       const message = this.newMessage.slice(0, -1)
+      
+      // Early exit if message is blank
+      if (_.isEmpty(message)) { return }
 
-      if (message !== '') {
-        ModerationService
+      // Reset the chat warning
+      this.hideModerationWarning()
+
+      ModerationService
           .checkIfMessageIsClean(this, message)
           .then(isClean => {
             if (isClean) {
@@ -100,7 +106,6 @@ export default {
 
             this.clearMessageInput()
           })
-      }
     }
   },
 
