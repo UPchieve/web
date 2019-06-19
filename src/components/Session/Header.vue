@@ -217,7 +217,7 @@ h1 {
 .connection-message-header {
   padding: 3px;
   background-color: #858585;
-  text-color: #fff;
+  color: #fff;
   text-align: center;
   font-weight: 600;
   position: relative;
@@ -226,10 +226,12 @@ h1 {
 
 .connection-message-header.warning {
   background-color: #ffde5e;
+  color: #000;
 }
 
 .connection-message-header.success {
   background-color: #fff;
+  color: #000;
 }
 
 .avatar-info-container {
