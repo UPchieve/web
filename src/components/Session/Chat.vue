@@ -5,7 +5,7 @@
     <div class="message-box">
       <transition name="chat-warning--slide">
         <div class="chat-warning" v-show="chatWarningIsShown">
-          Messages cannot contain personal information
+          Messages cannot contain personal information or profanity
           <span class="chat-warning__close" @click="hideModerationWarning"
             >×</span
           >
@@ -24,7 +24,7 @@
               <div class="name">
                 {{ message.name }}
               </div>
-              {{ message.contents }}
+              <span>{{ message.contents }}</span>
               <div class="time">
                 {{ message.time }}
               </div>
@@ -35,6 +35,7 @@
     </div>
 
     <textarea
+      @keydown.enter.prevent
       @keyup.enter="sendMessage"
       v-model="newMessage"
       placeholder="Type here..."
@@ -44,6 +45,7 @@
 
 <script>
 import moment from 'moment'
+import _ from 'lodash'
 
 import UserService from 'src/services/UserService'
 import SessionService from 'src/services/SessionService'
@@ -81,18 +83,29 @@ export default {
         user: UserService.getUser(),
         message
       })
+    },
+    clearMessageInput () {
       this.newMessage = ''
     },
     sendMessage () {
-      const message = this.newMessage.slice(0, -1)
+      const message = this.newMessage.trim()
+      this.clearMessageInput()
+      
+      // Early exit if message is blank
+      if (_.isEmpty(message)) { return }
 
-      if (message !== '') {
-        this.showNewMessage(message)
-        // TODO: Disabled until re-implemented
-        // ModerationService
-        //   .checkIfMessageIsClean(this, message)
-        //   .then(isClean => (isClean) ? this.showNewMessage(message) : this.showModerationWarning())
-      }
+      // Reset the chat warning
+      this.hideModerationWarning()
+
+      ModerationService
+          .checkIfMessageIsClean(this, message)
+          .then(isClean => {
+            if (isClean) {
+              this.showNewMessage(message)
+            } else {
+              this.showModerationWarning()
+            }
+          })
     }
   },
 
@@ -199,7 +212,7 @@ export default {
   width: 100%;
   background: $c-shadow-warn;
   color: #fff;
-  font-weight: bold;
+  font-weight: normal;
   min-height: 40px;
   position: absolute;
   left: 0;
@@ -209,9 +222,10 @@ export default {
   z-index: 1;
 }
 .chat-warning__close {
-  font-size: 2rem;
+  font-size: 3.5rem;
   width: 40px;
-  padding: 12px;
+  padding: 10px;
+  margin-right: 5px;
   cursor: pointer;
   display: block;
   position: absolute;
