@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <div class="feedback-form">
+    <div class="contactus-form">
     <div class="header">
       <h2>Contact Us!</h2>
     </div>
@@ -51,7 +51,7 @@
                   <span class="checkmark"></span>
                 </td>
                 <td class="checkbox-question-cell">{{ subquestion }}
-                <div v-if="subquestion === 'Other'">
+                <div v-if="subquestion === 'Other'" class="other-input">
                     <input
                       v-model="
                         userResponse[question.alias][
@@ -98,7 +98,7 @@
       </tr>
       <tr class="submit-button-row">
         <td class="submit-button-cell">
-          <button class="submit-button" v-on:click="submitFeedback">
+          <button class="submit-button" v-on:click="submitContactUs">
             SUBMIT
           </button>
         </td>
@@ -177,7 +177,7 @@ export default {
     })
   },
   methods: {
-    submitFeedback () {
+    submitContactUs () {
       console.log(this.userResponse)
       if (!this.isValidEmail(this.userResponse['email'])) {
         alert("A valid email required.")
@@ -214,7 +214,7 @@ export default {
   background-color: white;
 }
 
-.feedback-form {
+.contactus-form {
   background-color: #e5f2fc;
   min-height: 100%;
   width: 100%;
@@ -330,13 +330,18 @@ export default {
   width: 100%;
   resize: none;
   font-size: 15px;
-  height: 100%;
+  height: 200px;
   border-width: 3px;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
   border-color: #16d2aa;
 }
+.other-input {
+    display: inline-block;
+    padding-left: 10px;
+}
+
 .text-line {
     background-color: transparent;
     color: #2c3e50;
@@ -349,6 +354,7 @@ export default {
     display: inline-block;
     width: 300px;
 }
+
 .submit-button-row {
   display: table-row;
 }
