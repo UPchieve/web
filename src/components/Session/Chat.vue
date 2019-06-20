@@ -36,7 +36,7 @@
 
     <textarea
       @keydown.enter.prevent
-      @keyup.enter="sendMessage"
+      @keyup="handleMessage"
       v-model="newMessage"
       placeholder="Type here..."
     />
@@ -50,6 +50,7 @@ import _ from 'lodash'
 import UserService from 'src/services/UserService'
 import SessionService from 'src/services/SessionService'
 import ModerationService from 'src/services/ModerationService'
+import { setTimeout } from 'timers';
 
 const STUDENT_AVATAR_URL = 'static/defaultavatar3.png'
 const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png'
@@ -67,7 +68,8 @@ export default {
       currentSession: SessionService.currentSession,
       newMessage: '',
       chatWarningIsShown: false,
-      isTyping: false
+      isTyping: false,
+      typingTimeout: null,
     }
   },
 
@@ -89,28 +91,44 @@ export default {
       this.newMessage = ''
     },
     notTyping() {
+      // Tell the server that the user is no longer typing
       this.isTyping = false
       this.$socket.emit('notTyping')
     },  
-    sendMessage () {
-      const message = this.newMessage.trim()
-      this.clearMessageInput()
+    handleMessage (event) {
+      // If key pressed is Enter, send the message
+      if (event.key == 'Enter') {
+        const message = this.newMessage.trim()
+        this.clearMessageInput()
+        
+        // Early exit if message is blank
+        if (_.isEmpty(message)) { return }
+
+        // Reset the chat warning
+        this.hideModerationWarning()
+
+        ModerationService
+            .checkIfMessageIsClean(this, message)
+            .then(isClean => {
+              if (isClean) {
+                this.showNewMessage(message)
+              } else {
+                this.showModerationWarning()
+              }
+            })
+        return
+      } 
+      // Handle typing 
+      if (this.isTyping == false) {
+        this.isTyping == true
+        this.$socket.emit('typing')
+        // Set a timer for 5s after which user is no longer typing
+        this.typingTimeout = setTimeout(this.notTyping(), 5000)
+      } else {
+        // If user was already typing, reset the timer
+        clearTimeout(this.typingTimeout)
+      }
       
-      // Early exit if message is blank
-      if (_.isEmpty(message)) { return }
-
-      // Reset the chat warning
-      this.hideModerationWarning()
-
-      ModerationService
-          .checkIfMessageIsClean(this, message)
-          .then(isClean => {
-            if (isClean) {
-              this.showNewMessage(message)
-            } else {
-              this.showModerationWarning()
-            }
-          })
     }
   },
 
