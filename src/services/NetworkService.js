@@ -135,6 +135,11 @@ export default {
       .post(`${API_ROOT}/feedback`, data)
       .then(this._successHandler, this._errorHandler)
   },
+  contact (context, data) {
+    return context.$http
+      .post(`${API_ROOT}/contact`, data)
+      .then(this._successHandler, this._errorHandler)
+  },
   createStudentQuestion (context, data) {
     return context.$http
       .post(`${API_ROOT}/student-questions/create`, data)

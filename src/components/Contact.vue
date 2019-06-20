@@ -1,8 +1,5 @@
 <template>
-  <div
-    :class="{ background: !auth.authenticated && !user.verified }"
-    class="row"
-  >
+  <div class="row">
     <div class="feedback-form">
     <div class="header">
       <h2>Contact Us!</h2>
@@ -112,17 +109,11 @@
 </template>
 
 <script>
-import UserService from 'src/services/UserService'
 import NetworkService from '../services/NetworkService'
 
 export default {
   data () {
-    const auth = UserService.getAuth()
-
-    const user = UserService.getUser()
     return {
-      auth,
-      user,
       contactQuestions: [
         {
           qid: '1',
@@ -138,7 +129,7 @@ export default {
         {
           qid: '2',
           qtype: 'multiple-checkbox',
-          alias: 'topic-subject',
+          alias: 'subject',
           title: 'Pick the topic that best matches what you are contacting \
             us about.',
           secondary_title: '',
@@ -193,16 +184,14 @@ export default {
         e.preventDefault();
       }
       else {
-        NetworkService.feedback(this, {
+        NetworkService.contact(this, {
         responseData: this.userResponse,
         })
         this.$router.push('/')
       }
     },
     isValidEmail (address) {
-      var re = new RegExp('/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"] \
-        +)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a \
-        -zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/');
+      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       return re.test(String(address).toLowerCase());
     },
   }
