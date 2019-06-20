@@ -16,7 +16,7 @@
         <template v-for="(message, index) in messages">
           <div
             :key="`message-${index}`"
-            :class="message.email === user.email ? 'left' : 'right'"
+            :class="message.email === user.email ? 'right' : 'left'"
             class="message"
           >
             <div class="avatar" :style="message.avatarStyle" />
@@ -32,6 +32,10 @@
           </div>
         </template>
       </div>
+        <div class="typing-indicator" v-if="typingIndicatorShown">
+          {{this.otherUser}} is typing...
+        </div>
+
     </div>
 
     <textarea
@@ -64,12 +68,14 @@ export default {
   data () {
     return {
       user: UserService.getUser(),
+      otherUser: null,
       messages: [],
       currentSession: SessionService.currentSession,
       newMessage: '',
       chatWarningIsShown: false,
       isTyping: false,
       typingTimeout: null,
+      typingIndicatorShown: false
     }
   },
 
@@ -93,7 +99,9 @@ export default {
     notTyping() {
       // Tell the server that the user is no longer typing
       this.isTyping = false
-      this.$socket.emit('notTyping')
+      this.$socket.emit('notTyping', {
+          sessionId: this.currentSession.sessionId
+      })
     },  
     handleMessage (event) {
       // If key pressed is Enter, send the message
@@ -122,6 +130,7 @@ export default {
       if (this.isTyping == false) {
         this.isTyping == true
         this.$socket.emit('typing', {
+          sessionId: this.currentSession.sessionId,
           user: UserService.getUser()
         })
         // Set a timer for 5s after which user is no longer typing
@@ -176,7 +185,13 @@ export default {
 
       this.messages = messages
     },
-
+    'is-typing' (data) {
+      this.typingIndicatorShown = true
+      this.otherUser = data;
+    },
+    'not-typing' () {
+      this.typingIndicatorShown = false
+    },
     messageSend (data) {
       // {1}
       let { picture } = data
@@ -264,9 +279,11 @@ export default {
 }
 
 .messages {
+  position: relative;
   height: 100%;
   overflow: auto;
   display: flex;
+  padding-bottom: 30px;
   flex-direction: column;
 }
 
@@ -303,6 +320,13 @@ export default {
   width: 200px;
   overflow-wrap: break-word;
   font-size: 16px;
+}
+
+.typing-indicator {
+  position: absolute;
+  bottom: 0;
+  margin-bottom: 100px;
+  padding: 10px;
 }
 
 textarea {
