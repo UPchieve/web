@@ -57,11 +57,10 @@ nav {
 .navbar {
     overflow: scroll;
     scroll-padding-bottom: 100px;
-}
-
-.navbar-user {
-    position: relative;
-    display: block;
+    display: flex;
+    flex-direction: column;;
+    justify-content: space-between;
+    flex-basis: 100%;
 }
 
 h1,
@@ -88,10 +87,7 @@ h1::before {
 }
 
 .navbar-footer {
-  position: relative;
   bottom: 0;
-  left: 0;
-  right: 0;
 }
 
 p.aboutText {
