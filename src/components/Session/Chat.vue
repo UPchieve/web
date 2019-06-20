@@ -121,7 +121,9 @@ export default {
       // Handle typing 
       if (this.isTyping == false) {
         this.isTyping == true
-        this.$socket.emit('typing')
+        this.$socket.emit('typing', {
+          user: UserService.getUser()
+        })
         // Set a timer for 5s after which user is no longer typing
         this.typingTimeout = setTimeout(this.notTyping(), 5000)
       } else {
