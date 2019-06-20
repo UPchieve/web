@@ -66,7 +66,8 @@ export default {
       messages: [],
       currentSession: SessionService.currentSession,
       newMessage: '',
-      chatWarningIsShown: false
+      chatWarningIsShown: false,
+      isTyping: false
     }
   },
 
@@ -87,6 +88,10 @@ export default {
     clearMessageInput () {
       this.newMessage = ''
     },
+    notTyping() {
+      this.isTyping = false
+      this.$socket.emit('notTyping')
+    },  
     sendMessage () {
       const message = this.newMessage.trim()
       this.clearMessageInput()
