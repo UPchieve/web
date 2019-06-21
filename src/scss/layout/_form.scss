@@ -1,0 +1,82 @@
+.Form {
+  @include flex-container(column);
+  $size: 500px;
+
+  background: white;
+  font-size: 16px;
+
+  width: 100%;
+  max-width: $size;
+  min-height: $size;
+}
+
+.Form-header {
+  @include flex-container(row, space-between);
+  padding: 25px;
+  padding-bottom: 0;
+}
+
+.Form-header-link {
+  $className: &;
+
+  color: #73737a;
+  font-weight: 600;
+  
+  &--active {
+    @extend #{$className};
+    color: $c-accent;
+  }
+}
+
+.Form-body {
+  @include flex-container(column);
+  $spacing: 50px;
+
+  margin: auto 0;
+  padding: $spacing;
+
+  // Space apart direct children
+  > * {
+    margin-top: $spacing;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+}
+
+.Form-label {
+  color: #343440;
+  font-weight: 400;
+  text-align: left;
+  margin: 0;
+}
+
+.Form-input {
+  border: none;
+  border-bottom: 3px solid $c-accent;
+  border-radius: 0;
+  box-shadow: none;
+
+  &:focus {
+    border-bottom: 3px solid lighten($c-accent, 10%);
+  }
+}
+
+.Form-button {
+  background: #f6f6f6;
+  border: none;
+  border-radius: 20px;
+  color: $c-accent;
+  
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+
+  min-height: 40px;
+  
+  &:hover, &:active {
+    color: white;
+    background: $c-accent;
+  }
+}
