@@ -129,26 +129,39 @@ export default {
 
         return
       } 
-      // Handle typing 
-      if (this.isTyping == false) {
-        this.isTyping == true
-        this.$socket.emit('typing', {
+
+      // var typingTimeout = null
+      this.$socket.emit('typing', {
           sessionId: this.currentSession.sessionId,
           user: UserService.getUser()
         })
-        // Set a timer for 5s after which user is no longer typing
-        var typingTimeout = setTimeout(() => {
+      clearTimeout(this.typingTimeout)
+      this.typingTimeout = setTimeout(() => {
             this.notTyping()
+            console.log('Timeout expired')
           }, 3000)
 
-      } else {  
-        // If user was already typing, reset the timer
-        window
-        .clearTimeout(typingTimeout)
-        typingTimeout = setTimeout(() => {
-            this.notTyping()
-          }, 3000)
-      }
+
+      // Handle typing 
+      // if (this.isTyping == false) {
+      //   this.isTyping == true
+      //   this.$socket.emit('typing', {
+      //     sessionId: this.currentSession.sessionId,
+      //     user: UserService.getUser()
+      //   })
+      //   Set a timer for 5s after which user is no longer typing
+      //   typingTimeout = setTimeout(() => {
+      //       this.notTyping()
+      //       console.log('Timeout expired')
+      //     }, 3000)
+
+      // } else {  
+      //   If user was already typing, reset the timer
+      //   clearTimeout(typingTimeout)
+      //   typingTimeout = setTimeout(() => {
+      //       this.notTyping()
+      //     }, 3000)
+      // }
       
     }
   },
