@@ -128,6 +128,7 @@ export default {
     tryReconnect() {
       this.$socket.open()
       this.reconnectAttemptMsg = 'Waiting for server response.'
+      this.$emit('try-clicked')
     },
     connectionSuccess() {
       this.connectionMsg = 'Connection successful. Please refresh the page, otherwise session messages may not appear.'
