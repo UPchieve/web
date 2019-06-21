@@ -54,7 +54,7 @@ import _ from 'lodash'
 import UserService from 'src/services/UserService'
 import SessionService from 'src/services/SessionService'
 import ModerationService from 'src/services/ModerationService'
-import { setTimeout } from 'timers';
+import { setTimeout, clearTimeout } from 'timers';
 
 const STUDENT_AVATAR_URL = 'static/defaultavatar3.png'
 const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png'
@@ -102,7 +102,7 @@ export default {
       this.$socket.emit('notTyping', {
           sessionId: this.currentSession.sessionId
       })
-    },  
+    }, 
     handleMessage (event) {
       // If key pressed is Enter, send the message
       if (event.key == 'Enter') {
@@ -124,6 +124,9 @@ export default {
                 this.showModerationWarning()
               }
             })
+
+        this.notTyping()
+
         return
       } 
       // Handle typing 
@@ -134,10 +137,17 @@ export default {
           user: UserService.getUser()
         })
         // Set a timer for 5s after which user is no longer typing
-        this.typingTimeout = setTimeout(this.notTyping(), 5000)
-      } else {
+        var typingTimeout = setTimeout(() => {
+            this.notTyping()
+          }, 3000)
+
+      } else {  
         // If user was already typing, reset the timer
-        clearTimeout(this.typingTimeout)
+        window
+        .clearTimeout(typingTimeout)
+        typingTimeout = setTimeout(() => {
+            this.notTyping()
+          }, 3000)
       }
       
     }
