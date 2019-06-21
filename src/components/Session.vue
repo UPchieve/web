@@ -117,6 +117,11 @@ export default {
         this.showModal = true
       }
     }, MODAL_TIMEOUT_MS)
+  },
+  sockets: {
+    bump: function() {
+      this.$router.push('/')
+    }
   }
 }
 </script>
