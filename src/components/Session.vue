@@ -130,7 +130,7 @@ export default {
           this.joinSession(this.currentSession.sessionId)
         }
         else {
-          this.$router.go()
+          location.reload()
         }
       }
     }
