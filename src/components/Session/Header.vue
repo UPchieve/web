@@ -132,9 +132,9 @@ export default {
       this.$emit('try-clicked')
     },
     connectionSuccess() {
-      this.connectionMsg = 'Connection successful. Please refresh the page, otherwise session messages may not appear.'
+      this.connectionMsg = ''
       this.reconnectAttemptMsg = ''
-      this.connectionMsgType = 'success'
+      this.connectionMsgType = ''
     }
   },
   sockets: {
@@ -152,11 +152,6 @@ export default {
       this.reconnectAttemptMsg = 'Trying periodically to reconnect.'
     },
     connect() {
-      if (this.reconnectAttemptMsg) {
-        this.connectionSuccess()
-      }
-    },
-    reconnect () {
       this.connectionSuccess()
     }
 
