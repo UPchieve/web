@@ -126,6 +126,7 @@ export default {
       }
     },
     tryReconnect() {
+      this.$socket.close()
       this.$socket.open()
       this.reconnectAttemptMsg = 'Waiting for server response.'
       this.$emit('try-clicked')
