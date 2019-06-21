@@ -87,7 +87,7 @@ h1::before {
 }
 
 .navbar-footer {
-  bottom: 0;
+  margin-top: 25px;
 }
 
 p.aboutText {
