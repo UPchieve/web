@@ -29,9 +29,7 @@
 </template>
 
 <script>
-import 'bootstrap/dist/css/bootstrap.css'
-import './scss/main.scss';
-
+import './scss/main.scss'
 import Sidebar from './components/Sidebar'
 import AuthService from './services/AuthService'
 
