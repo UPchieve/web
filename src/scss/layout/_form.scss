@@ -8,6 +8,11 @@
   width: 100%;
   max-width: $size;
   min-height: $size;
+
+  // NOTE: this is to override bootstrap
+  a {
+    color: #73737a;
+  }
 }
 
 .uc-form-header {
