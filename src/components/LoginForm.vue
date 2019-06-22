@@ -1,12 +1,12 @@
 <template>
   <form-page-template>
-    <div class="Form">
-      <div class="Form-header">
-        <div class="Form-header-link--active">Log In</div>
-        <router-link to="signup" class="Form-header-link">Sign Up</router-link>
+    <div class="uc-form">
+      <div class="uc-form-header">
+        <div class="uc-form-header-link--active">Log In</div>
+        <router-link to="signup" class="uc-form-header-link">Sign Up</router-link>
       </div>
 
-      <div class="Form-body">
+      <div class="uc-form-body">
         <div
           v-if="error || $route.query['401'] === 'true'"
           class="alert alert-danger"
@@ -16,33 +16,33 @@
         </div>
 
         <div class="column">
-          <label for="inputEmail" class="Form-label">Email</label>
+          <label for="inputEmail" class="uc-form-label">Email</label>
           <input
             id="inputEmail"
             v-model="credentials.email"
             type="email"
-            class="Form-input"
+            class="uc-form-input"
             required
             autofocus
           />
         </div>
 
         <div class="column">
-          <label for="inputPassword" class="Form-label">Password</label>
+          <label for="inputPassword" class="uc-form-label">Password</label>
           <input
             id="inputPassword"
             v-model="credentials.password"
             type="password"
-            class="Form-input"
+            class="uc-form-input"
             required
           />
-          <router-link to="resetpassword" class="password-reset-link">
+          <router-link to="resetpassword" class="uc-form-input-description">
             Forgot password?
           </router-link>
         </div>
 
         <button
-          class="Form-button"
+          class="uc-form-button"
           type="submit"
           @click.prevent="submit"
         >
@@ -103,20 +103,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '~src/scss/layout/form';
-
 .alert {
   margin-bottom: 0;
 }
 
 .column {
   @include flex-container(column);
-}
-
-.password-reset-link {
-  color: #73737a;
-  font-size: 12px;
-  text-align: left;
-  margin-top: 6px;
 }
 </style>

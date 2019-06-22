@@ -24,3 +24,15 @@
   justify-content: $justify-content;
   align-items: $align-items;
 }
+
+/// Helper to add spacing between direct child elements.
+/// @param {number} $spacing - the amount of spacing
+@mixin child-spacing($spacing) {
+  & > * {
+    margin-top: $spacing;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+}
