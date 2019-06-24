@@ -164,7 +164,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .res-header {
   display: flex;
   padding: 30px;

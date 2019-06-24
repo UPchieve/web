@@ -119,7 +119,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .session-row {
   cursor: pointer;
 }
