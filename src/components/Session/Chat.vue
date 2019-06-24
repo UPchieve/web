@@ -1,8 +1,8 @@
 <template>
   <div class="chat">
-    <!-- <vue-headful
-      :title="title"
-    /> -->
+    <vue-headful
+      :title="typingIndicatorShown ? `${otherUser} is typing...` : 'UPchieve'"
+    />
     <div class="header">Chat</div>
 
     <div class="message-box">
@@ -70,7 +70,6 @@ const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png'
 export default {
   data () {
     return {
-      title: typingIndicatorShown ? `${otherUser} is typing...` : 'UPchieve',
       user: UserService.getUser(),
       otherUser: null,
       messages: [],
@@ -78,7 +77,7 @@ export default {
       newMessage: '',
       chatWarningIsShown: false,
       typingTimeout: null,
-      typingIndicatorShown: false
+      typingIndicatorShown: false,
     }
   },
 
