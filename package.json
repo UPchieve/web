@@ -108,6 +108,14 @@
   "eslintConfig": {
     "extends": [
       "standard"
+    ],
+    "overrides": [
+      {
+        "files": ["*-test.js", "*.spec.js"],
+        "rules": {
+          "no-unused-expressions": "off"
+        }
+      }
     ]
   },
   "standard": {
