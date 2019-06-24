@@ -131,7 +131,7 @@ export default {
         // Disregard typing handler for backspace
       } else if (event.key == 'Backspace') return 
 
-      // Typing handler for when non-Enter keys are pressed
+      // Typing handler for when non-Enter/Backspace keys are pressed
       this.$socket.emit('typing', {
           sessionId: this.currentSession.sessionId,
           user: UserService.getUser()
