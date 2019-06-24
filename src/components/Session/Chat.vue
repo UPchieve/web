@@ -73,7 +73,6 @@ export default {
       currentSession: SessionService.currentSession,
       newMessage: '',
       chatWarningIsShown: false,
-      isTyping: false,
       typingTimeout: null,
       typingIndicatorShown: false
     }
@@ -98,7 +97,6 @@ export default {
     },
     notTyping() {
       // Tell the server that the user is no longer typing
-      this.isTyping = false
       this.$socket.emit('notTyping', {
           sessionId: this.currentSession.sessionId
       })
@@ -110,11 +108,12 @@ export default {
         this.clearMessageInput()
         
         // Early exit if message is blank
-        if (_.isEmpty(message)) { return }
+        if (_.isEmpty(message)) return 
 
         // Reset the chat warning
         this.hideModerationWarning()
 
+        // Check for personal info/profanity in message
         ModerationService
             .checkIfMessageIsClean(this, message)
             .then(isClean => {
@@ -125,44 +124,26 @@ export default {
               }
             })
 
+        // Disregard typing handler for enter
         this.notTyping()
-
         return
-      } 
 
-      // var typingTimeout = null
+        // Disregard typing handler for backspace
+      } else if (event.key == 'Backspace') return 
+
+      // Typing handler for when non-Enter keys are pressed
       this.$socket.emit('typing', {
           sessionId: this.currentSession.sessionId,
           user: UserService.getUser()
         })
+
+      /** Every time a key is pressed, set an inactive timer
+          If another key is pressed within 3 seconds, reset timer**/
       clearTimeout(this.typingTimeout)
       this.typingTimeout = setTimeout(() => {
             this.notTyping()
             console.log('Timeout expired')
-          }, 3000)
-
-
-      // Handle typing 
-      // if (this.isTyping == false) {
-      //   this.isTyping == true
-      //   this.$socket.emit('typing', {
-      //     sessionId: this.currentSession.sessionId,
-      //     user: UserService.getUser()
-      //   })
-      //   Set a timer for 5s after which user is no longer typing
-      //   typingTimeout = setTimeout(() => {
-      //       this.notTyping()
-      //       console.log('Timeout expired')
-      //     }, 3000)
-
-      // } else {  
-      //   If user was already typing, reset the timer
-      //   clearTimeout(typingTimeout)
-      //   typingTimeout = setTimeout(() => {
-      //       this.notTyping()
-      //     }, 3000)
-      // }
-      
+          }, 3000)   
     }
   },
 
