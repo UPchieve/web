@@ -5,7 +5,7 @@
     </div>
     <div v-if="auth.authenticated">
       <profile-info v-if="auth.authenticated" />
-      <div id="navbar">
+      <div id="navbar" class="navbar-user">
         <user-nav v-on:closeMenu="$emit('closeMenu')" />
       </div>
     </div>
@@ -43,7 +43,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 nav {
   height: 100%;
   border-radius: 0;
@@ -52,6 +52,15 @@ nav {
   background-color: #f6f6f6;
   color: #73737a;
   font-weight: 600;
+}
+
+.navbar {
+    overflow: scroll;
+    scroll-padding-bottom: 100px;
+    display: flex;
+    flex-direction: column;;
+    justify-content: space-between;
+    flex-basis: 100%;
 }
 
 h1,
@@ -78,10 +87,7 @@ h1::before {
 }
 
 .navbar-footer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  margin-top: 25px;
 }
 
 p.aboutText {

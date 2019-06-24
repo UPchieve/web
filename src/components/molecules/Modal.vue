@@ -67,7 +67,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .v-modal {
   position: fixed;
   top: 0;
@@ -78,10 +78,10 @@ export default {
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  background: var(--c-backdrop);
+  background: $c-backdrop;
 }
 .v-modal--warn {
-  background: var(--c-backdrop-warn);
+  background: $c-backdrop-warn;
 }
 
 .v-modal-dialog {
@@ -89,7 +89,7 @@ export default {
   width: 80%;
   max-width: 480px;
   padding: 40px;
-  box-shadow: -4px 4px var(--c-shadow);
+  box-shadow: -4px 4px $c-shadow;
 }
 .v-modal-dialog__content {
   margin-bottom: 40px;
@@ -97,6 +97,6 @@ export default {
 .v-modal-dialog__options {
 }
 .v-modal-dialog--warn {
-  box-shadow: -4px 4px var(--c-shadow-warn);
+  box-shadow: -4px 4px $c-shadow-warn;
 }
 </style>

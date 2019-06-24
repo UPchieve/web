@@ -15,12 +15,12 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .attachment {
   display: inline-block;
   padding: 4px;
 }
 .attachment__icon {
-  color: var(--c-accent);
+  color: $c-accent;
 }
 </style>

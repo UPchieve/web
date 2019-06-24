@@ -31,7 +31,6 @@
 
 <script>
 import 'bootstrap/dist/css/bootstrap.css'
-import './assets/styles/settings.css'
 
 import Sidebar from './components/Sidebar'
 
@@ -76,7 +75,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 /*
  * @todo {1} Make this truly responsive
  */
@@ -93,7 +92,7 @@ body,
 }
 
 #app {
-  font-family: 'Work Sans', Helvetica, Arial, sans-serif;
+  font-family: $default-font;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;

@@ -33,7 +33,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .btn-options {
   display: flex;
   flex-direction: column-reverse;
