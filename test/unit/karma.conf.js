@@ -1,5 +1,5 @@
-const webpackConfig = require('../../build/webpack.test.conf');
-process.env.CHROME_BIN = require('puppeteer').executablePath();
+const webpackConfig = require('../../build/webpack.test.conf')
+process.env.CHROME_BIN = require('puppeteer').executablePath()
 
 module.exports = function (config) {
   config.set({
@@ -16,26 +16,26 @@ module.exports = function (config) {
           '--disable-setuid-sandbox',
           '--headless',
           '--disable-gpu',
-          '--remote-debugging-port=9222',
-        ],
-      },
+          '--remote-debugging-port=9222'
+        ]
+      }
     },
     frameworks: ['mocha', 'sinon-chai'],
     reporters: ['spec', 'coverage'],
     files: ['./index.js'],
     preprocessors: {
-      './index.js': ['webpack', 'sourcemap'],
+      './index.js': ['webpack', 'sourcemap']
     },
     webpack: webpackConfig,
     webpackMiddleware: {
-      noInfo: true,
+      noInfo: true
     },
     client: {
-      captureConsole: false,
+      captureConsole: false
     },
     coverageReporter: {
       dir: './coverage',
-      reporters: [{ type: 'lcov', subdir: '.' }, { type: 'text-summary' }],
-    },
-  });
-};
+      reporters: [{ type: 'lcov', subdir: '.' }, { type: 'text-summary' }]
+    }
+  })
+}

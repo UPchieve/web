@@ -111,7 +111,10 @@
     ],
     "overrides": [
       {
-        "files": ["*-test.js", "*.spec.js"],
+        "files": [
+          "*-test.js",
+          "*.spec.js"
+        ],
         "rules": {
           "no-unused-expressions": "off"
         }
