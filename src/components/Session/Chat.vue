@@ -35,9 +35,11 @@
           </div>
         </template>
       </div>
-        <div class="typing-indicator" v-if="typingIndicatorShown">
+      <transition name="fade">
+        <div class="typing-indicator" v-show="typingIndicatorShown">
           {{this.otherUser}} is typing...
         </div>
+      </transition>
 
     </div>
 
@@ -141,12 +143,12 @@ export default {
         })
 
       /** Every time a key is pressed, set an inactive timer
-          If another key is pressed within 3 seconds, reset timer**/
+          If another key is pressed within 2 seconds, reset timer**/
       clearTimeout(this.typingTimeout)
       this.typingTimeout = setTimeout(() => {
             this.notTyping()
             console.log('Timeout expired')
-          }, 3000)   
+          }, 2000)   
     }
   },
 
@@ -290,7 +292,7 @@ export default {
   height: 100%;
   overflow: auto;
   display: flex;
-  padding-bottom: 30px;
+  padding-bottom: 25px;
   flex-direction: column;
 }
 
@@ -298,8 +300,6 @@ export default {
   position: relative;
   padding: 10px;
   display: flex;
-  min-height: 61px;
-  margin-bottom: 12px;
   justify-content: flex-start;
   background: #fff;
   width: 100%;
@@ -324,6 +324,7 @@ export default {
 
 .contents {
   text-align: left;
+  position: relative;
   width: 200px;
   overflow-wrap: break-word;
   font-size: 16px;
@@ -332,9 +333,18 @@ export default {
 .typing-indicator {
   position: absolute;
   bottom: 0;
+  font-size: 13px;
   margin-bottom: 100px;
-  padding: 10px;
+  padding: 8px;
+  font-weight: 300;
+  transition: 0.15s;
 }
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
 
 textarea {
   width: 100%;
