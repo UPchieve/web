@@ -23,7 +23,6 @@ export default {}
 }
 
 .logo {
-  width: 40%;
   max-width: 155px;
   margin-bottom: 20px;
 }
