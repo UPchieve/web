@@ -57,13 +57,13 @@
   &:focus {
     border-bottom: 3px solid lighten($c-accent, 10%);
   }
+}
 
-  &-description {
-    color: #73737a;
-    font-size: 12px;
-    margin-top: 6px;
-    text-align: left;
-  }
+.uc-form-subtext {
+  color: #73737a;
+  font-size: 12px;
+  margin: 6px 0 0 0;
+  text-align: left;
 }
 
 .uc-form-button {
@@ -81,5 +81,54 @@
   &:hover, &:active {
     color: white;
     background: $c-accent;
+  }
+}
+
+/// Helper class for creating a basic form checkbox.
+///
+/// @example
+///   <div class="uc-form-checkbox">
+///     <input id="my-checkbox" type="checkbox" />
+///     <label for="my-checkbox">My Checkbox</label>
+///   </div>
+.uc-form-checkbox {
+  @include flex-container(row, flex-start, center);
+
+  input[type="checkbox"] {
+    @include flex-container(row, center, center);
+    $size: 20px;
+    
+    -webkit-appearance: none;
+    background-color: #f6f6f6;
+    border-radius: 3px;
+    border: 1px solid #99a1a7;
+    box-shadow: none;
+
+    min-width: $size;
+    width: $size;
+    min-height: $size;
+    height: $size;
+
+    margin: 0;
+    
+    &:checked {
+      background-color: white;
+      color: $c-accent;
+      font-size: 14px;
+
+      &:after {
+        content: '✔';
+      }
+    } 
+  }
+
+  label {
+    font-size: 12px;
+    color: #343440;
+    margin: 0 0 0 10px;
+
+    a {
+      color: $c-accent;
+    }
   }
 }

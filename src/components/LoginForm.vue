@@ -15,7 +15,7 @@
           {{ error }}
         </div>
 
-        <div class="column">
+        <div class="uc-column">
           <label for="inputEmail" class="uc-form-label">Email</label>
           <input
             id="inputEmail"
@@ -27,7 +27,7 @@
           />
         </div>
 
-        <div class="column">
+        <div class="uc-column">
           <label for="inputPassword" class="uc-form-label">Password</label>
           <input
             id="inputPassword"
@@ -36,7 +36,7 @@
             class="uc-form-input"
             required
           />
-          <router-link to="resetpassword" class="uc-form-input-description">
+          <router-link to="resetpassword" class="uc-form-subtext">
             Forgot password?
           </router-link>
         </div>
@@ -105,9 +105,5 @@ export default {
 <style lang="scss" scoped>
 .alert {
   margin-bottom: 0;
-}
-
-.column {
-  @include flex-container(column);
 }
 </style>

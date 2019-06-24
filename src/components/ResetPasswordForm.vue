@@ -11,7 +11,7 @@
       </div>
 
       <div class="uc-form-body">
-        <div class="column">
+        <div class="uc-column">
           <label for="inputEmail" class="uc-form-label">Please enter your email address</label>
           <input
             id="inputEmail"
@@ -60,10 +60,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.column {
-  @include flex-container(column);
-}
-
 .link-container {
   @include flex-container(row, space-evenly);
   min-width: 150px;
