@@ -1,6 +1,6 @@
 <template>
   <form-page-template>
-    <div class="uc-form">
+    <form class="uc-form">
       <div class="uc-form-header">
         <router-link to="login" class="uc-form-header-link">Log In</router-link>
         <div class="uc-form-header-link--active">Sign Up</div>
@@ -27,7 +27,7 @@
           Volunteer
         </button>
       </div>
-    </div>
+    </form>
   </form-page-template>
 </template>
 
