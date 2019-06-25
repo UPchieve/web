@@ -98,15 +98,10 @@ export default {
       promise = SessionService.useExistingSession(this, id)
      
         if (UserService.getUser().isVolunteer) {
-          console.log(SessionService.getPartner())
+          //console.log(SessionService.getPartner())
           //console.log(this.currentSession.data.volunteer._id)
           //if (!this.currentSession.data.volunteer._id) {
-          window.analytics.track("volunteer joined", {
-            "Session id": this.sessionId,
-            "Session topic": this.topic,
-            "Session subtopic": this.subTopic,
-            "Volunteer joined": new Date().getTime()/1000
-          });
+          
         //}
       }
     }

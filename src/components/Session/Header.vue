@@ -80,18 +80,10 @@ export default {
       }
 
       const result = window.confirm("Do you really want to end the session?");
-      if (result) {
-        window.analytics.track("Session ended", {
-          'Session topic': SessionService.currentSession.data.type,
-          'Session subtopic': SessionService.currentSession.data.subTopic,
-          'Session id': this.sessionId,
-          'Session ender': UserService.getUser().isVolunteer
-            ? 'volunteer'
-            : 'student',
-          'Volunteer showed?': volunteerId ? true:false,
-          'Session id': sessionId
-        });
+      let volunteerShowed = null
 
+      if (result) {
+        
         if (volunteerId) {
           this.$socket.disconnect();
           SessionService.endSession(this, sessionId, { skipRoute: true });
@@ -110,6 +102,22 @@ export default {
           router.replace("/");
         }
       }
+      if (SessionService.currentSession.data.volunteerJoinedAt) {
+          volunteerShowed = SessionService.currentSession.data.volunteerJoinedAt;
+        }
+        console.log(SessionService.currentSession.data)
+        window.analytics.track("Session ended", {
+          'Session topic': SessionService.currentSession.data.type,
+          'Session subtopic': SessionService.currentSession.data.subTopic,
+          'Session id': this.sessionId,
+          'User': UserService.getUser().isVolunteer
+            ? 'volunteer'
+            : 'student',
+          'Volunteer show time': volunteerShowed,
+          'Volunteer showed?': volunteerShowed ? true: false,
+          'Time ended': new Date(), //might be slightly off from the session's "endedAt"
+          'Session id': sessionId
+        })
     }
   }
 };

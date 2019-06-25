@@ -31,7 +31,30 @@ export default {
           throw new Error('No user returned from auth service')
         }
         this.storeUser(data.user)
+        const listPassed = []
+        for(var property in this.user.data){
+          if(this.user.data[property].hasOwnProperty('passed')){
+            if(this.user.data[property].passed){
+              console.log(property)
+              listPassed.push(property)
+            }
+          }
+        }
+        console.log(listPassed)
+
         window.analytics.identify(this.user.data._id, {
+          'listOfPassed': listPassed,
+          'algebra': this.user.data.algebra.passed,
+          'applications': this.user.data.applications.passed,
+          'biology': this.user.data.biology.passed,
+          'calculus': this.user.data.calculus.passed,
+          'chemistry': this.user.data.chemistry.passed,
+          'esl': this.user.data.esl.passed,
+          'essays': this.user.data.essays.passed,
+          'geometry': this.user.data.geometry.passed,
+          'planning': this.user.data.planning.passed,
+          'precalculus': this.user.data.precalculus.passed,
+          'trigonometry': this.user.data.trigonometry.passed,
           'is volunteer': this.user.data.isVolunteer ? 'volunteer':'student'
         })
         window.analytics.track('logged in',{ })

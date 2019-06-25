@@ -14,7 +14,9 @@
       </tr>
       <tr v-else class="title-row">
         <td class="title-cell">
-          <p style="padding-top: 40px"><b>Congratulations!</b></p>
+          <p style="padding-top: 40px">
+            <b>Congratulations!</b>
+          </p>
           <p style="padding-bottom: 30px">
             You just helped a student get one step closer to achieving their
             academic goals! Thanks so much for your help! Now, to make UPchieve
@@ -33,9 +35,7 @@
                 <td
                   class="radio-question-selection-title"
                   v-for="(label, index) in question.table_title"
-                >
-                  {{ label }}
-                </td>
+                >{{ label }}</td>
               </tr>
               <tr
                 class="radio-question-row forMobileView"
@@ -56,7 +56,7 @@
                     type="radio"
                     :name="question.qid + '_' + subquestion_index.toString()"
                     :value="index"
-                  />
+                  >
                 </td>
               </tr>
             </table>
@@ -65,24 +65,15 @@
             <div
               class="question-secondary-title"
               v-if="question.secondary_title.length != 0"
-            >
-              {{ question.secondary_title }}
-            </div>
-            <textarea
-              class="text-question-textarea"
-              v-model="userResponse[question.alias]"
-            />
+            >{{ question.secondary_title }}</div>
+            <textarea class="text-question-textarea" v-model="userResponse[question.alias]"/>
           </div>
-          <div v-else>
-            something else
-          </div>
+          <div v-else>something else</div>
         </td>
       </tr>
       <tr class="submit-button-row">
         <td class="submit-button-cell">
-          <button class="submit-button" v-on:click="submitFeedback">
-            SUBMIT
-          </button>
+          <button class="submit-button" v-on:click="submitFeedback">SUBMIT</button>
         </td>
       </tr>
     </table>
@@ -90,164 +81,190 @@
 </template>
 
 <script>
-import UserService from 'src/services/UserService'
-import NetworkService from '../services/NetworkService'
+import UserService from "src/services/UserService";
+import NetworkService from "../services/NetworkService";
 
 export default {
-  data () {
+  data() {
     return {
       user: UserService.getUser(),
-      sessionId: '',
-      userType: '',
-      studentId: '',
-      volunteerId: '',
+      sessionId: "",
+      userType: "",
+      studentId: "",
+      volunteerId: "",
       student_questions: [
         {
-          qid: '1',
-          qtype: 'multiple-radio',
-          alias: 'rate-coach',
-          title: 'Please give feedback on the Academic Coach who helped you.',
-          secondary_title: '',
+          qid: "1",
+          qtype: "multiple-radio",
+          alias: "rate-coach",
+          title: "Please give feedback on the Academic Coach who helped you.",
+          secondary_title: "",
           table_title: [
-            'Strongly Disagree',
-            'Somewhat Agree',
-            'Neither',
-            'Somewhat Agree',
-            'Strongly Agree'
+            "Strongly Disagree",
+            "Somewhat Agree",
+            "Neither",
+            "Somewhat Agree",
+            "Strongly Agree"
           ],
           options: [
-            'I was able to find the help/information I needed from my Academic Coach.',
-            'My Academic Coach was friendly and/or nice.',
-            'I would like to receive help from this Academic Coach again.',
-            'My Academic Coach was knowledgeable about the help topic.',
-            'As a result of this session, I feel more prepared to succeed and achieve my academic goals.'
+            "I was able to find the help/information I needed from my Academic Coach.",
+            "My Academic Coach was friendly and/or nice.",
+            "I would like to receive help from this Academic Coach again.",
+            "My Academic Coach was knowledgeable about the help topic.",
+            "As a result of this session, I feel more prepared to succeed and achieve my academic goals."
           ],
           options_alias: [
-            'find-help',
-            'nice',
-            'want-him/her-again',
-            'knowledgeable',
-            'achieve-goal'
+            "find-help",
+            "nice",
+            "want-him/her-again",
+            "knowledgeable",
+            "achieve-goal"
           ]
         },
         {
-          qid: '2',
-          qtype: 'multiple-radio',
-          alias: 'rate-upchieve',
-          title: 'Please give feedback on UPchieve’s services',
-          secondary_title: '',
+          qid: "2",
+          qtype: "multiple-radio",
+          alias: "rate-upchieve",
+          title: "Please give feedback on UPchieve’s services",
+          secondary_title: "",
           table_title: [
-            'Strongly Disagree',
-            'Somewhat Agree',
-            'Neither',
-            'Somewhat Agree',
-            'Strongly Agree'
+            "Strongly Disagree",
+            "Somewhat Agree",
+            "Neither",
+            "Somewhat Agree",
+            "Strongly Agree"
           ],
           options: [
-            'UPchieve helps me succeed and achieve my academic goals.',
-            'I am likely to use UPchieve the next time I need help.',
-            'UPchieve’s app is easy to use.',
-            'UPchieve enables me to get help faster than before.'
+            "UPchieve helps me succeed and achieve my academic goals.",
+            "I am likely to use UPchieve the next time I need help.",
+            "UPchieve’s app is easy to use.",
+            "UPchieve enables me to get help faster than before."
           ],
           options_alias: [
-            'achieve-goal',
-            'use-next-time',
-            'easy-to-use',
-            'get-help-faster'
+            "achieve-goal",
+            "use-next-time",
+            "easy-to-use",
+            "get-help-faster"
           ]
         },
         {
-          qid: '3',
-          qtype: 'text',
-          alias: 'other-feedback',
+          qid: "3",
+          qtype: "text",
+          alias: "other-feedback",
           title:
-            '(Optional) Do you have any other feedback you would like to share?',
+            "(Optional) Do you have any other feedback you would like to share?",
           secondary_title:
-            'This can be about the web app, the Academic Coach who helped you, the services UPchieve offers, etc.',
+            "This can be about the web app, the Academic Coach who helped you, the services UPchieve offers, etc.",
           table_title: [],
           options: []
         }
       ],
       volunteer_questions: [
         {
-          qid: '1',
-          qtype: 'text',
-          alias: 'asked-unprepared-questions',
+          qid: "1",
+          qtype: "text",
+          alias: "asked-unprepared-questions",
           title:
-            'Did the student ask you any questions that you weren’t prepared to answer?',
+            "Did the student ask you any questions that you weren’t prepared to answer?",
           secondary_title:
-            'Don’t worry! We use this to improve our training and certification materials and won’t hold it against you.',
+            "Don’t worry! We use this to improve our training and certification materials and won’t hold it against you.",
           table_title: [],
           options: []
         },
         {
-          qid: '2',
-          qtype: 'text',
-          alias: 'app-features-needed',
+          qid: "2",
+          qtype: "text",
+          alias: "app-features-needed",
           title:
-            'Were there any app features that you needed or that would have been helpful during this session?',
-          secondary_title: '',
+            "Were there any app features that you needed or that would have been helpful during this session?",
+          secondary_title: "",
           table_title: [],
           options: []
         },
         {
-          qid: '3',
-          qtype: 'text',
-          alias: 'technical-difficulties',
+          qid: "3",
+          qtype: "text",
+          alias: "technical-difficulties",
           title:
-            'Did you encounter any technical difficulties/bugs while using the app?',
+            "Did you encounter any technical difficulties/bugs while using the app?",
           secondary_title:
-            'If yes, please describe the issue in as much detail as possible so that our tech team can replicate and fix it.',
+            "If yes, please describe the issue in as much detail as possible so that our tech team can replicate and fix it.",
           table_title: [],
           options: []
         },
         {
-          qid: '4',
-          qtype: 'text',
-          alias: 'other-feedback',
+          qid: "4",
+          qtype: "text",
+          alias: "other-feedback",
           title:
-            '(Optional) Do you have any other feedback you’d like to share with us?',
-          secondary_title: '',
+            "(Optional) Do you have any other feedback you’d like to share with us?",
+          secondary_title: "",
           table_title: [],
           options: []
         }
       ],
       questions: [],
       userResponse: {}
-    }
+    };
   },
-  beforeMount () {
-    var _self = this
-    this.sessionId = this.$route.params.sessionId
-    this.userType = this.$route.params.userType
-    this.studentId = this.$route.params.studentId
-    this.volunteerId = this.$route.params.volunteerId
-    console.log('student ' + this.studentId)
-    console.log('volunteer ' + this.volunteerId)
-    if (this.userType === 'student') {
-      this.questions = this.student_questions
+  beforeMount() {
+    var _self = this;
+    this.sessionId = this.$route.params.sessionId;
+    this.userType = this.$route.params.userType;
+    this.studentId = this.$route.params.studentId;
+    this.volunteerId = this.$route.params.volunteerId;
+    console.log("student " + this.studentId);
+    console.log("volunteer " + this.volunteerId);
+    if (this.userType === "student") {
+      this.questions = this.student_questions;
     } else {
-      this.questions = this.volunteer_questions
+      this.questions = this.volunteer_questions;
     }
-    this.questions.map(function (question, key) {
-      if (question.qtype == 'multiple-radio')
-        _self.userResponse[question.alias] = {}
-    })
+    this.questions.map(function(question, key) {
+      if (question.qtype == "multiple-radio")
+        _self.userResponse[question.alias] = {};
+    });
   },
   methods: {
-    submitFeedback () {
-      console.log(this.userResponse)
+    submitFeedback() {
+      let aggResponses = {};
+      let volunteerScore = 0;
+      for (var response in this.userResponse) {
+        if (typeof this.userResponse[response] == "object") {
+          for (var subresponse in this.userResponse[response]) {
+            aggResponses[subresponse] = this.userResponse[response][
+              subresponse
+            ];
+            if ((this.userType = "student")) {
+              volunteerScore += this.userResponse[response][subresponse];
+            }
+          }
+        } else {
+          aggResponses[response] = this.userResponse[response];
+        }
+      }
+
+      window.analytics.track("Feedback", {
+        sessionId: this.sessionId,
+        userType: this.userType,
+        studentId: this.studentId,
+        volunteerId: this.volunteerId,
+        rating: this.volunteerScore,
+        "assked unprepared questions":
+          aggResponses["asked-unprepared-questions"]
+      });
+
       NetworkService.feedback(this, {
         sessionId: this.sessionId,
         responseData: this.userResponse,
         userType: this.userType,
         studentId: this.studentId,
         volunteerId: this.volunteerId
-      })
-      this.$router.push('/')
+      });
+      this.$router.push("/");
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -415,8 +432,6 @@ export default {
   color: #fff;
 }
 
-
-
 @media screen and (max-width: 488px) {
   .mobileRemove {
     display: none !important;
@@ -426,9 +441,13 @@ export default {
     padding: 1em 1em 1em 2em !important;
   }
 
-  table, thead, tbody, th, tr { 
-		display: block !important; 
-	}
+  table,
+  thead,
+  tbody,
+  th,
+  tr {
+    display: block !important;
+  }
 
   .title-cell {
     padding: 1.5em 1em 1em !important;

@@ -53,7 +53,10 @@ export default {
         localStorage.setItem('currentSessionPath', path)
         router.replace(path)
         window.analytics.track('Session started', {
-          'Session start': new Date().getTime(),
+          'Session started date': new Date(),
+          'User': UserService.getUser().isVolunteer
+            ? 'volunteer'
+            : 'student',
           'Session topic': sessionType,
           'Session subtopic': sessionSubTopic,
           'Session id': sessionId
