@@ -285,7 +285,7 @@ h3 {
 }
 
 .col-lg-6 p {
-  padding: 20px 0 0 20px;
+  padding: 20px;
   text-align: center;
 }
 

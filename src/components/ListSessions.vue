@@ -127,4 +127,8 @@ export default {
 .session-row td {
   text-align: left;
 }
+
+.session-list {
+    padding:20px;
+}
 </style>
