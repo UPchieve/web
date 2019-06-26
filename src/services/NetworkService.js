@@ -60,6 +60,11 @@ export default {
       .post(`${API_ROOT}/verify/confirm`, data)
       .then(this._successHandler, this._errorHandler)
   },
+  sendContact (context, data) {
+    return context.$http
+      .post(`${AUTH_ROOT}/contact/send`, data)
+      .then(this._successHandler, this._errorHandler)
+  },
   setProfile (context, data) {
     return context.$http
       .put(`${API_ROOT}/user`, data)
@@ -133,11 +138,6 @@ export default {
   feedback (context, data) {
     return context.$http
       .post(`${API_ROOT}/feedback`, data)
-      .then(this._successHandler, this._errorHandler)
-  },
-  contact (context, data) {
-    return context.$http
-      .post(`${API_ROOT}/contact`, data)
       .then(this._successHandler, this._errorHandler)
   },
   createStudentQuestion (context, data) {

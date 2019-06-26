@@ -1,13 +1,12 @@
 <template>
-  <div class="row">
-    <div class="contactus-form">
+  <div class="row contactus-form">
     <div class="header">
       <h2>Contact Us!</h2>
     </div>
     <table class="questions-table">
       <tr class="title-row">
         <td class="title-cell">
-          <p style="padding-bottom: 30px">
+          <p>
           Fill out this form, and we will get back to you as soon as possible! 
           We will respond to you via email using the email address you put 
           below.
@@ -105,7 +104,6 @@
       </tr>
     </table>
   </div>
-  </div>
 </template>
 
 <script>
@@ -120,7 +118,7 @@ export default {
           qtype: 'textline',
           alias: 'email',
           title:
-            'Email address \xa0 *',
+            'Email address',
           secondary_title:
             '',
           table_title: [],
@@ -144,11 +142,11 @@ export default {
             'Other'
           ],
           options_alias: [
-            'technical',
-            'math',
-            'college',
-            'feedback',
-            'not-listed'
+            ' Technical Issues',
+            ' Math',
+            ' College',
+            ' Feedback',
+            ' Other'
           ]
         },
         {
@@ -158,8 +156,7 @@ export default {
           title:
             'Tell us more!',
           secondary_title:
-            'If yes, please describe the issue in as much detail as possible \
-              so that our tech team can replicate and fix it.',
+            '',
           table_title: [],
           options: []
         }
@@ -179,16 +176,16 @@ export default {
   methods: {
     submitContactUs () {
       console.log(this.userResponse)
-      if (!this.isValidEmail(this.userResponse['email'])) {
-        alert("A valid email required.")
-        e.preventDefault();
-      }
-      else {
-        NetworkService.contact(this, {
+      // if (!this.isValidEmail(this.userResponse['email'])) {
+      //   alert("A valid email required.")
+      //   e.preventDefault();
+      // }
+      // else {
+        NetworkService.sendContact(this, {
         responseData: this.userResponse,
         })
         this.$router.push('/')
-      }
+      // }
     },
     isValidEmail (address) {
       var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -234,6 +231,7 @@ export default {
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   box-shadow: -9px 9px #2757ca;
+  margin-bottom: 20px;
 }
 
 .title-row {
@@ -248,6 +246,8 @@ export default {
   text-align: left;
   padding-left: 60px;
   padding-right: 60px;
+  padding-bottom: 30px;
+  padding-top: 30px;
 }
 
 .question-row {
@@ -352,7 +352,7 @@ export default {
     border-right: none;
     border-bottom: solid #16d2aa 1px;
     display: inline-block;
-    width: 300px;
+    width: 350px;
 }
 
 .submit-button-row {
