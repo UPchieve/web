@@ -121,7 +121,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 /*
   * @notes
   * [1] Refactoring candidate: these styles should be placed in the container

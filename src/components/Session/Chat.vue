@@ -231,7 +231,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .chat {
   height: 100%;
   position: relative;
@@ -259,7 +259,7 @@ export default {
 
 .chat-warning {
   width: 100%;
-  background: var(--c-shadow-warn);
+  background: $c-shadow-warn;
   color: #fff;
   font-weight: normal;
   min-height: 40px;

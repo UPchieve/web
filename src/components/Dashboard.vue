@@ -220,7 +220,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .header-container {
   height: 50%;
   background-color: #525666;

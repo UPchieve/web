@@ -646,7 +646,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .background {
   margin-left: -320px;
   position: relative;

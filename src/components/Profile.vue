@@ -221,7 +221,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .avatar {
   display: block;
   width: 50px;
@@ -260,7 +260,7 @@ button:hover {
 
 .profile {
   font-size: 16px;
-  font-family: Work Sans;
+  font-family: $default-font;
 }
 
 .header {

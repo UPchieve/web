@@ -233,7 +233,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .calendar {
   font-size: 12px;
   color: #343440;
