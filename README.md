@@ -12,9 +12,9 @@
 2. Run the following command to get the version number of both NPM and Node. Node has to be >= 11.7.0 and NPM has to be >= 6.0.0 for this project.
 ``` bash
 # Get NPM version
-npm -v 
+npm -v
 
-# Get Node version 
+# Get Node version
 node -v
 ```
 
@@ -62,7 +62,14 @@ npm run e2e
 npm test
 ```
 
-7. See [the web server repo](https://github.com/UPchieve/server) for server installation
+7. To track errors on Sentry using your own account, set the `SENTRY_DSN` environment variable in one of the local configuration files `config/prod.local.env.js` or `config/dev.local.env.js`. For example:
+```
+module.exports = {
+  SENTRY_DSN: '"__YOUR_PUBLIC_DSN__"'
+}
+```
+
+8. See [the web server repo](https://github.com/UPchieve/server) for server installation
 
 More information about our Vue setup:
 - [Vue style guide](https://vuejs.org/v2/style-guide/)
