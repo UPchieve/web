@@ -118,7 +118,7 @@ export default {
           qtype: 'textline',
           alias: 'email',
           title:
-            'Email address',
+            'Email address *',
           secondary_title:
             '',
           table_title: [],
@@ -176,16 +176,16 @@ export default {
   methods: {
     submitContactUs () {
       console.log(this.userResponse)
-      // if (!this.isValidEmail(this.userResponse['email'])) {
-      //   alert("A valid email required.")
-      //   e.preventDefault();
-      // }
-      // else {
+      if (!this.isValidEmail(this.userResponse['email'])) {
+        alert("A valid email required.")
+        e.preventDefault();
+      }
+      else {
         NetworkService.sendContact(this, {
         responseData: this.userResponse,
         })
         this.$router.push('/')
-      // }
+      }
     },
     isValidEmail (address) {
       var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;

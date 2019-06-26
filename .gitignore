@@ -6,6 +6,7 @@ test/unit/coverage
 test/e2e/reports
 selenium-debug.log
 *.swp
+sendgrid.env
 
 # Created by https://www.gitignore.io/api/emacs,node,vim,visualstudiocode,sublimetext,vuejs
 # Edit at https://www.gitignore.io/?templates=emacs,node,vim,visualstudiocode,sublimetext,vuejs
