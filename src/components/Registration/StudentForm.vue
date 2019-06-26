@@ -218,6 +218,8 @@ export default {
   },
   methods: {
     nextPage () {
+      // reset error msg from server
+      this.msg = ''
       // validate input
       this.errors = []; this.invalidInputs = [];
       if (!this.credentials.email) {
