@@ -26,6 +26,8 @@ import SubmitQuestion from './components/views/SubmitQuestion'
 import Inbox from './components/views/Inbox'
 import SendAnswer from './components/views/SendAnswer'
 
+import DebugSentry from './components/DebugSentry'
+
 import AuthService from './services/AuthService'
 import OnboardingService from './services/OnboardingService'
 
@@ -120,6 +122,11 @@ const routes = [
   { path: '/inbox', name: 'Inbox', component: Inbox, meta: { protected: true } },
   { path: '/send-answer', name: 'SendAnswer', component: SendAnswer, meta: { protected: true } }
 ]
+
+// debug-sentry route should only work in development mode
+if (process.env.NODE_ENV === 'development') {
+  routes.push({ path: '/debug-sentry', component: DebugSentry })
+}
 
 /**
  * @todo Consider refactoring this file
