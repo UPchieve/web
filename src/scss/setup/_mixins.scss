@@ -26,13 +26,21 @@
 }
 
 /// Helper to add spacing between direct child elements.
+/// @param {string} $side - 'top', 'right', 'bottom', or 'left'
 /// @param {number} $spacing - the amount of spacing
-@mixin child-spacing($spacing) {
+@mixin child-spacing($side, $spacing) {
+  $sides: (top: 0, right: 1, bottom: 2, left: 3);
+
+  @if not map-has-key($map: $sides, $key: $side) {
+    $sides: map-keys($sides);
+    @error "Invalid side: #{$side}. Expected: #{$sides}.";
+  }
+
   & > * {
-    margin-top: $spacing;
+    margin-#{$side}: $spacing;
 
     &:first-child {
-      margin-top: 0;
+      margin-#{$side}: 0;
     }
   }
 }

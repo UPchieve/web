@@ -35,7 +35,7 @@
 
 .uc-form-body {
   @include flex-container(column);
-  @include child-spacing(50px);
+  @include child-spacing(top, 50px);
 
   margin: auto 0;
   padding: 50px;

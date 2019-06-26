@@ -233,7 +233,7 @@ export default {
 
 <style lang="scss" scoped>
 .uc-form-body {
-  @include child-spacing(25px);
+  @include child-spacing(top, 25px);
 }
 
 .step-title {
