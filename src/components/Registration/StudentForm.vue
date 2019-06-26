@@ -45,7 +45,7 @@
         >
           CONTINUE
         </button>
-        {{ msg }}
+        <span>{{ msg }}</span>
       </div>
       <div v-else-if="step === 'step-2'">
         <div v-if="errors.length" class="step-2-errors" colspan="2">
@@ -182,7 +182,7 @@
         >
           SIGN UP
         </button>
-        {{ msg }}
+        <span>{{ msg }}</span>
       </div>
       <div v-else>Unexpected Error</div>
     </div>
@@ -190,7 +190,7 @@
 </template>
 
 <script>
-import validator from 'validator';
+import validator from 'validator'
 
 import AuthService from 'src/services/AuthService'
 import UserService from '../../services/UserService'
@@ -220,26 +220,28 @@ export default {
     nextPage () {
       // reset error msg from server
       this.msg = ''
+
       // validate input
-      this.errors = []; this.invalidInputs = [];
+      this.errors = []
+      this.invalidInputs = []
       if (!this.credentials.email) {
-        this.errors.push('An email address is required.');
-        this.invalidInputs.push('inputEmail');
+        this.errors.push('An email address is required.')
+        this.invalidInputs.push('inputEmail')
       }
       else if (!validator.isEmail(this.credentials.email)) {
         // this is necessary because browsers ignore <input type="email"> until the
         // user actually tries to submit the form, which does not occur until step 2
-        this.errors.push(this.credentials.email + ' is not a valid email address.');
-        this.invalidInputs.push('inputEmail');
+        this.errors.push(this.credentials.email + ' is not a valid email address.')
+        this.invalidInputs.push('inputEmail')
       }
       if (!this.credentials.password) {
-        this.errors.push('A password is required.');
-        this.invalidInputs.push('inputPassword');
+        this.errors.push('A password is required.')
+        this.invalidInputs.push('inputPassword')
       }
       if (this.errors.length) {
-        return;
+        return
       }
-    
+
       AuthService.checkRegister(this, {
         email: this.credentials.email,
         password: this.credentials.password
@@ -252,27 +254,28 @@ export default {
         })
     },
     checkInputs (e) {
-      this.errors = []; this.invalidInputs = [];
+      this.errors = []
+      this.invalidInputs = []
       
       if (!this.profile.firstName || !this.profile.lastName) {
-        this.errors.push('You must enter your first and last name.');
+        this.errors.push('You must enter your first and last name.')
       }
       if (!this.profile.firstName) {
-        this.invalidInputs.push('firstName');
+        this.invalidInputs.push('firstName')
       }
       if (!this.profile.lastName) {
-        this.invalidInputs.push('lastName');
+        this.invalidInputs.push('lastName')
       }
       if (!this.profile.highSchool) {
-        this.errors.push('Please enter the name of the high school you go to.');
-        this.invalidInputs.push('highSchool');
+        this.errors.push('Please enter the name of the high school you go to.')
+        this.invalidInputs.push('highSchool')
       }
       if (!this.credentials.terms) {
         // necessary because the CSS hides the browser's validation message
-        this.errors.push('You must read and accept the user agreement.');
+        this.errors.push('You must read and accept the user agreement.')
       }
       if (this.errors.length) {
-        e.preventDefault();
+        e.preventDefault()
       }
     },
     submit () {
