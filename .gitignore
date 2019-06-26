@@ -211,3 +211,7 @@ docs/_book
 test/
 
 # End of https://www.gitignore.io/api/emacs,node,vim,visualstudiocode,sublimetext,vuejs
+
+### Added by David M. Nisson ###
+config/prod.local.env.js
+config/dev.local.env.js
