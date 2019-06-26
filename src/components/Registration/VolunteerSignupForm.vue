@@ -43,7 +43,7 @@
       Continue
     </button>
 
-    <div>{{ msg }}</div>
+    <div v-if="msg !== ''">{{ msg }}</div>
   </div>
 
   <div v-else-if="step == 'step-2'" class="uc-form-body">

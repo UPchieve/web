@@ -31,7 +31,7 @@
           Enter
         </button>
 
-        <div>{{ msg }}</div>
+        <div v-if="msg !== ''">{{ msg }}</div>
       </div>
     </form>
   </form-page-template>
