@@ -1,11 +1,14 @@
 <template>
   <div class="chat">
+    <vue-headful
+      :title="typingIndicatorShown ? `${otherUser} is typing...` : 'UPchieve'"
+    />
     <div class="header">Chat</div>
 
     <div class="message-box">
       <transition name="chat-warning--slide">
         <div class="chat-warning" v-show="chatWarningIsShown">
-          Messages cannot contain personal information
+          Messages cannot contain personal information or profanity
           <span class="chat-warning__close" @click="hideModerationWarning"
             >×</span
           >
@@ -16,7 +19,7 @@
         <template v-for="(message, index) in messages">
           <div
             :key="`message-${index}`"
-            :class="message.email === user.email ? 'left' : 'right'"
+            :class="message.email === user.email ? 'right' : 'left'"
             class="message"
           >
             <div class="avatar" :style="message.avatarStyle" />
@@ -24,7 +27,7 @@
               <div class="name">
                 {{ message.name }}
               </div>
-              {{ message.contents }}
+              <span>{{ message.contents }}</span>
               <div class="time">
                 {{ message.time }}
               </div>
@@ -32,10 +35,17 @@
           </div>
         </template>
       </div>
+      <transition name="fade">
+        <div class="typing-indicator" v-show="typingIndicatorShown">
+          {{this.otherUser}} is typing...
+        </div>
+      </transition>
+
     </div>
 
     <textarea
-      @keyup.enter="sendMessage"
+      @keydown.enter.prevent
+      @keyup="handleMessage"
       v-model="newMessage"
       placeholder="Type here..."
     />
@@ -44,10 +54,12 @@
 
 <script>
 import moment from 'moment'
+import _ from 'lodash'
 
 import UserService from 'src/services/UserService'
 import SessionService from 'src/services/SessionService'
 import ModerationService from 'src/services/ModerationService'
+import { setTimeout, clearTimeout } from 'timers';
 
 const STUDENT_AVATAR_URL = 'static/defaultavatar3.png'
 const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png'
@@ -61,10 +73,13 @@ export default {
   data () {
     return {
       user: UserService.getUser(),
+      otherUser: null,
       messages: [],
       currentSession: SessionService.currentSession,
       newMessage: '',
-      chatWarningIsShown: false
+      chatWarningIsShown: false,
+      typingTimeout: null,
+      typingIndicatorShown: false,
     }
   },
 
@@ -81,18 +96,59 @@ export default {
         user: UserService.getUser(),
         message
       })
+    },
+    clearMessageInput () {
       this.newMessage = ''
     },
-    sendMessage () {
-      const message = this.newMessage.slice(0, -1)
+    notTyping() {
+      // Tell the server that the user is no longer typing
+      this.$socket.emit('notTyping', {
+          sessionId: this.currentSession.sessionId
+      })
+    }, 
+    handleMessage (event) {
+      // If key pressed is Enter, send the message
+      if (event.key == 'Enter') {
+        const message = this.newMessage.trim()
+        this.clearMessageInput()
+        
+        // Early exit if message is blank
+        if (_.isEmpty(message)) return 
 
-      if (message !== '') {
-        this.showNewMessage(message)
-        // TODO: Disabled until re-implemented
-        // ModerationService
-        //   .checkIfMessageIsClean(this, message)
-        //   .then(isClean => (isClean) ? this.showNewMessage(message) : this.showModerationWarning())
-      }
+        // Reset the chat warning
+        this.hideModerationWarning()
+
+        // Check for personal info/profanity in message
+        ModerationService
+            .checkIfMessageIsClean(this, message)
+            .then(isClean => {
+              if (isClean) {
+                this.showNewMessage(message)
+              } else {
+                this.showModerationWarning()
+              }
+            })
+
+        // Disregard typing handler for enter
+        this.notTyping()
+        return
+
+        // Disregard typing handler for backspace
+      } else if (event.key == 'Backspace') return 
+
+      // Typing handler for when non-Enter/Backspace keys are pressed
+      this.$socket.emit('typing', {
+          sessionId: this.currentSession.sessionId,
+          user: UserService.getUser()
+        })
+
+      /** Every time a key is pressed, set an inactive timer
+          If another key is pressed within 2 seconds, reset timer**/
+      clearTimeout(this.typingTimeout)
+      this.typingTimeout = setTimeout(() => {
+            this.notTyping()
+            console.log('Timeout expired')
+          }, 2000)   
     }
   },
 
@@ -138,7 +194,13 @@ export default {
 
       this.messages = messages
     },
-
+    'is-typing' (data) {
+      this.typingIndicatorShown = true
+      this.otherUser = data;
+    },
+    'not-typing' () {
+      this.typingIndicatorShown = false
+    },
     messageSend (data) {
       // {1}
       let { picture } = data
@@ -169,7 +231,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .chat {
   height: 100%;
   position: relative;
@@ -197,9 +259,9 @@ export default {
 
 .chat-warning {
   width: 100%;
-  background: var(--c-shadow-warn);
+  background: $c-shadow-warn;
   color: #fff;
-  font-weight: bold;
+  font-weight: normal;
   min-height: 40px;
   position: absolute;
   left: 0;
@@ -209,9 +271,10 @@ export default {
   z-index: 1;
 }
 .chat-warning__close {
-  font-size: 2rem;
+  font-size: 3.5rem;
   width: 40px;
-  padding: 12px;
+  padding: 10px;
+  margin-right: 5px;
   cursor: pointer;
   display: block;
   position: absolute;
@@ -225,9 +288,11 @@ export default {
 }
 
 .messages {
+  position: relative;
   height: 100%;
   overflow: auto;
   display: flex;
+  padding-bottom: 25px;
   flex-direction: column;
 }
 
@@ -235,8 +300,6 @@ export default {
   position: relative;
   padding: 10px;
   display: flex;
-  min-height: 61px;
-  margin-bottom: 12px;
   justify-content: flex-start;
   background: #fff;
   width: 100%;
@@ -261,10 +324,27 @@ export default {
 
 .contents {
   text-align: left;
+  position: relative;
   width: 200px;
   overflow-wrap: break-word;
   font-size: 16px;
 }
+
+.typing-indicator {
+  position: absolute;
+  bottom: 0;
+  font-size: 13px;
+  margin-bottom: 100px;
+  padding: 8px;
+  font-weight: 300;
+  transition: 0.15s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
 
 textarea {
   width: 100%;

@@ -47,7 +47,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 /**
  * @todo {1} Consider refactoring (https://github.com/UPchieve/web/pull/84#discussion_r216185371)
  */

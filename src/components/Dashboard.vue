@@ -42,10 +42,16 @@
             <div v-if="showHelpPopUp" :style="popUpStyle" class="getHelpPopUp">
               <span>Select a help topic.</span>
               <select v-model="pickedTopic" class="form-control topic">
+                <option value="" disabled>Select a topic</option>
                 <option value="math">Math</option>
                 <option value="college">College Counseling</option>
               </select>
-              <select v-model="pickedSubtopic" class="form-control subtopic">
+              <select
+                v-model="pickedSubtopic"
+                class="form-control subtopic"
+                :disabled="pickedTopic === ''"
+              >
+                <option value="" disabled>Select a subtopic</option>
                 <option
                   v-for="(subtopic, index) in subtopics[pickedTopic]"
                   :key="`subtopic-${index}`"
@@ -65,6 +71,7 @@
                   v-if="showHelpPopUp"
                   class="btn helpNext"
                   type="next"
+                  :disabled="pickedSubtopic === ''"
                   @click.prevent="getHelpNext()"
                 >
                   Get help
@@ -157,6 +164,12 @@ export default {
       coverStyle: {}
     }
   },
+  watch: {
+    // Watch the help topic for changes, and reset the subtopic when it does.
+    pickedTopic: function () {
+      this.pickedSubtopic = ''
+    }
+  },
   methods: {
     hasActiveSession () {
       return localStorage.getItem('currentSessionPath')
@@ -207,7 +220,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .header-container {
   height: 50%;
   background-color: #525666;
@@ -272,7 +285,7 @@ h3 {
 }
 
 .col-lg-6 p {
-  padding: 20px 0 0 20px;
+  padding: 20px;
   text-align: center;
 }
 
@@ -322,6 +335,10 @@ h3 {
 
 .btn:hover {
   background-color: #16d2aa;
+}
+
+.btn:disabled {
+  color: white;
 }
 
 .form-control {

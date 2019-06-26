@@ -3,6 +3,10 @@
 import Vue from 'vue'
 import router from './router'
 import App from './App'
+import vueHeadful from 'vue-headful'
+
+// Setup vue-headful
+Vue.component('vue-headful', vueHeadful)
 
 /* eslint-disable no-new */
 new Vue({

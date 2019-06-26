@@ -84,14 +84,14 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .help-requests-t {
   width: 100%;
   margin-bottom: 64px;
 }
 .help-requests-t__header {
   height: 48px;
-  border-bottom: 4px solid var(--c-shadow-header);
+  border-bottom: 4px solid $c-shadow-header;
   width: 100%;
   line-height: 1;
 }
@@ -104,7 +104,7 @@ export default {
 
 .help-request {
   height: 48px;
-  border-bottom: 2px solid var(--c-shadow-header);
+  border-bottom: 2px solid $c-shadow-header;
   font-weight: 600;
 }
 .help-request td {

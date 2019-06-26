@@ -20,7 +20,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .form-register {
   display: flex;
   flex-direction: column;

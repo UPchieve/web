@@ -373,7 +373,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .header {
   height: 100px;
   margin: 0;
