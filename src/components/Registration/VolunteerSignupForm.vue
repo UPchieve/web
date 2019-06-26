@@ -1,6 +1,12 @@
 <template>
-  <form class="form-signup">
+  <form class="form-signup" @submit.prevent="submit()">
     <div v-if="step == 'step-1'">
+      <div v-if="errors.length" class="step-1-errors" colspan="2">
+        <h5>Please correct the following problems:</h5>
+        <ul>
+          <li v-for="error in errors">{{ error }}</li>
+        </ul>
+      </div>
       <div class="step-1-text" colspan="2">
         <b>Step 1 of 2: Choose your log-in details </b>
       </div>
@@ -9,6 +15,7 @@
         type="email"
         id="inputEmail"
         class="form-control"
+        v-bind:class="{'form-control-invalid': invalidInputs.indexOf('inputEmail') > -1}"
         required
         autofocus
         v-model="credentials.email"
@@ -22,6 +29,7 @@
         type="password"
         id="inputPassword"
         class="form-control"
+        v-bind:class="{'form-control-invalid': invalidInputs.indexOf('inputPassword') > -1}"
         required
         v-model="credentials.password"
       />
@@ -39,6 +47,12 @@
       {{ msg }}
     </div>
     <div v-else-if="step == 'step-2'">
+      <div v-if="errors.length" class="step-2-errors" colspan="2">
+        <h5>Please correct the following problems:</h5>
+        <ul>
+          <li v-for="error in errors">{{ error }}</li>
+        </ul>
+      </div>
       <table class="step-2-table">
         <tr>
           <td class="table-entry" colspan="2">
@@ -52,6 +66,7 @@
           <td style="padding-right: 15px;">
             <input
               class="form-control"
+              v-bind:class="{'form-control-invalid': invalidInputs.indexOf('firstName') > -1}"
               required
               autofocus
               v-model="profile.firstName"
@@ -60,6 +75,7 @@
           <td style="padding-left: 15px;">
             <input
               class="form-control"
+              v-bind:class="{'form-control-invalid': invalidInputs.indexOf('lastName') > -1}"
               required
               autofocus
               v-model="profile.lastName"
@@ -85,6 +101,7 @@
           <td colspan="2">
             <input
               class="form-control"
+              v-bind:class="{'form-control-invalid': invalidInputs.indexOf('college') > -1}"
               required
               autofocus
               v-model="profile.college"
@@ -98,6 +115,7 @@
           <td colspan="2">
             <input
               class="form-control"
+              v-bind:class="{'form-control-invalid': invalidInputs.indexOf('phone') > -1}"
               required
               autofocus
               v-model="profile.phone"
@@ -113,6 +131,7 @@
           <td colspan="2">
             <input
               class="form-control"
+              v-bind:class="{'form-control-invalid': invalidInputs.indexOf('favoriteAcademicSubject') > -1}"
               required
               autofocus
               v-model="profile.favoriteAcademicSubject"
@@ -139,10 +158,11 @@
       <button
         class="btn btn-lg btn-primary btn-block"
         type="submit"
-        @click.prevent="submit()"
+        @click="checkInputs($event)"
       >
         SIGN UP
       </button>
+      {{ msg }}
     </div>
     <div v-else-if="step == 'success-message'">
       <div class="step-1-text" colspan="2">
@@ -155,14 +175,38 @@
 </template>
 
 <script>
+import validator from 'validator';
+
 import AuthService from 'src/services/AuthService'
 import RegistrationService from 'src/services/RegistrationService'
 import UserService from '../../services/UserService'
+
+var phoneValidation = function() {
+  return {
+    // see http://regexlib.com/REDetails.aspx?regexp_id=58
+    // modified to ignore trailing/leading whitespace,
+    // and disallow alphanumeric characters
+    re: /^\s*(?<cc>[0-9](?: |-)?)?(?:\(?([0-9]{3})\)?|[0-9]{3})(?: |-)?(?:([0-9]{3})(?: |-)?([0-9]{4}))\s*$/,
+    validatePhoneNumber: function(v) {
+      return this.re.test(v);
+    },
+    // convert phone number into the accepted format ###-###-####
+    convertPhoneNumber: function(v) {
+      var matches = v.match(this.re);
+      if (matches == null || matches.length < 5) {
+        return null;
+      }
+      return matches[2] + '-' + matches[3] + '-' + matches[4];
+    }
+  };
+};
 
 export default {
   data () {
     return {
       msg: '',
+      errors: [],
+      invalidInputs: [],
       credentials: {
         email: '',
         password: '',
@@ -180,6 +224,27 @@ export default {
   },
   methods: {
     nextPage () {
+      // validate input
+      this.errors = []; this.invalidInputs = [];
+      if (!this.credentials.email) {
+        this.errors.push('An email address is required.');
+        this.invalidInputs.push('inputEmail');
+      }
+      else if (!validator.isEmail(this.credentials.email)) {
+        // this is necessary because browsers ignore <input type="email"> until the
+        // user actually tries to submit the form, which does not occur until step 2
+        this.errors.push(this.credentials.email + ' is not a valid email address.');
+        this.invalidInputs.push('inputEmail');
+      }
+      if (!this.credentials.password) {
+        this.errors.push('A password is required.');
+        this.invalidInputs.push('inputPassword');
+      }
+      if (this.errors.length) {
+        return;
+      }
+    
+      // check credentials
       AuthService.checkRegister(this, {
         email: this.credentials.email,
         password: this.credentials.password
@@ -191,20 +256,66 @@ export default {
           this.msg = err.message
         })
     },
+    checkInputs (e) {
+      this.errors = []; this.invalidInputs = [];
+
+      // validate input
+      if (!this.profile.firstName || !this.profile.lastName) {
+        this.errors.push('You must enter your first and last name.');
+      }
+      if (!this.profile.firstName) {
+        this.invalidInputs.push('firstName');
+      }
+      if (!this.profile.lastName) {
+        this.invalidInputs.push('lastName');
+      }
+      if (!this.profile.phone) {
+        this.errors.push('You must enter a phone number.');
+        this.invalidInputs.push('phone');
+      }
+      else if (!phoneValidation().validatePhoneNumber(this.profile.phone)) {
+        this.errors.push(this.profile.phone + ' is not a valid U.S. phone number.');
+        this.invalidInputs.push('phone');
+      }
+      if (!this.profile.college) {
+        this.errors.push('Please enter the name of the college you go to.');
+        this.invalidInputs.push('college');
+      }
+      if (!this.profile.favoriteAcademicSubject) {
+        this.errors.push('Please enter your favorite academic subject.');
+        this.invalidInputs.push('favoriteAcademicSubject');
+      }
+      if (!this.credentials.terms) {
+        this.errors.push('You must read and accept the user agreement.');
+      }
+      if (this.errors.length) {
+        e.preventDefault();
+      }
+    },
     submit () {
+      // convert phone number
+      this.profile.phone = phoneValidation().convertPhoneNumber(this.profile.phone);
+    
       AuthService.register(this, {
         code: RegistrationService.data.registrationCode,
         email: this.credentials.email,
         password: this.credentials.password,
-        terms: this.credentials.terms
+        terms: this.credentials.terms,
+        firstName: this.profile.firstName,
+        lastName: this.profile.lastName,
+        phone: this.profile.phone,
+        college: this.profile.college,
+        favoriteAcademicSubject: this.profile.favoriteAcademicSubject
       })
         .then(() => {
           let user = UserService.getUser()
+          /*
           user.firstname = this.profile.firstName
           user.lastname = this.profile.lastName
           user.college = this.profile.college
           user.phone = this.profile.phone
           user.favoriteAcademicSubject = this.profile.favoriteAcademicSubject
+          */
           UserService.setProfile(this, user)
           this.step = 'success-message'
         })
@@ -215,6 +326,8 @@ export default {
     }
   }
 }
+
+
 </script>
 
 <style lang="scss" scoped>
@@ -223,6 +336,12 @@ export default {
   justify-content: space-between;
   margin-bottom: 25px;
   margin-top: 15px;
+}
+
+.step-1-errors {
+  text-align: left;
+  font-size: 14px;
+  color: #bf0000;
 }
 
 .step-1-text {
@@ -276,6 +395,9 @@ label {
 .form-control {
   border-bottom: 3px solid #16d2aa;
   margin-bottom: 50px;
+}
+.form-control-invalid {
+  border-bottom: 3px solid #bf0000;
 }
 .form-control:last-of-type {
   margin-bottom: 0;
@@ -373,6 +495,12 @@ button[type='submit']:hover,
 button[type='submit']:active {
   color: white;
   background-color: #16d2aa;
+}
+
+.step-2-errors {
+  text-align: left;
+  font-size: 14px;
+  color: #bf0000;
 }
 
 .step-2-table {
