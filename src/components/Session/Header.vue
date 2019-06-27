@@ -159,7 +159,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .session-header {
   position: relative;
   height: 100px;
