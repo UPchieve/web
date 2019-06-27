@@ -83,9 +83,9 @@ export default {
     let timeCreatedAt = new Date(currentSession.createdAt)
     if (currentSession.volunteerJoinedAt) {
       volunteerShowed = new Date(currentSession.volunteerJoinedAt)
+      waitTime = ((volunteerShowed - timeCreatedAt)/60000).toFixed(2)
     }
 
-    waitTime = ((volunteerShowed - timeCreatedAt)/60000).toFixed(2)
     sessionLength = ((timeSessionEnded - timeCreatedAt)/60000).toFixed(2)
 
     window.analytics.track('session ended', {
@@ -93,7 +93,7 @@ export default {
       'session length': sessionLength,
       'session topic': currentSession.type,
       'session subtopic': currentSession.subTopic,
-      'session id': headerComponent.sessionId,
+      'session id': currentSession.sessionId,
       'user': UserService.getUser().isVolunteer ? 'volunteer' : 'student',
       'volunteer show time': volunteerShowed,
       'volunteer showed?': volunteerShowed ? true : false,
