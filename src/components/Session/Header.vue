@@ -27,6 +27,7 @@
 <script>
 import UserService from 'src/services/UserService'
 import SessionService from 'src/services/SessionService'
+import AnalyticsService from 'src/services/AnalyticsService'
 
 import router from '../../router'
 
@@ -104,7 +105,11 @@ export default {
           SessionService.endSession(this, sessionId, { skipRoute: true })
           router.replace('/')
         }
+        //analytics: track when a help session has ended
+        AnalyticsService.trackSessionEnded(this, SessionService.currentSession.data)
+
       }
+      
     }
   }
 }

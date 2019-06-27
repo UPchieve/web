@@ -2,6 +2,7 @@ import router from '../router'
 
 import NetworkService from './NetworkService'
 import UserService from './UserService'
+import AnalyticsService from './AnalyticsService'
 
 export default {
   loading: false,
@@ -56,6 +57,8 @@ export default {
       } else {
         router.replace('/')
       }
+      //analytics: track when a session has started
+      AnalyticsService.trackSessionStarted(this.currentSession, sessionType, sessionSubTopic)
 
       return sessionId
     })

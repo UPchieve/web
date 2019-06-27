@@ -48,6 +48,7 @@ import moment from 'moment-timezone'
 import lodash from 'lodash';
 import UserService from 'src/services/UserService'
 import CalendarService from '../services/CalendarService'
+import AnalyticsService from '../services/AnalyticsService'
 
 export default {
   data () {
@@ -228,6 +229,9 @@ export default {
         this.user._id,
         this.convertAvailability(this.availability, offset)
       )
+
+      //analytics: tracking how many hours each volunteer is willing to tutor
+      AnalyticsService.updateIdentify(this.user, this.convertAvailability(this.availability, offset))
     }
   }
 }

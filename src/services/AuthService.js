@@ -3,6 +3,7 @@ import Validator from 'validator'
 import router from '../router'
 
 import NetworkService from './NetworkService'
+import AnalyticsService from './AnalyticsService'
 
 const USER_FETCH_LIMIT_SECONDS = 5
 
@@ -32,6 +33,10 @@ export default {
         }
 
         this.storeUser(data.user)
+
+        //analytics: tracking when a user has logged in
+        AnalyticsService.identify(this.user.data)
+        AnalyticsService.trackNoProperties('logged in')
 
         if (redirect) {
           router.push(redirect)
