@@ -180,6 +180,7 @@ import validator from 'validator';
 import AuthService from 'src/services/AuthService'
 import RegistrationService from 'src/services/RegistrationService'
 import UserService from '../../services/UserService'
+import AnalyticsService from '../../services/AnalyticsService'
 
 var phoneValidation = function() {
   return {
@@ -316,7 +317,13 @@ export default {
           user.phone = this.profile.phone
           user.favoriteAcademicSubject = this.profile.favoriteAcademicSubject
           */
+        
           UserService.setProfile(this, user)
+          
+          //analytics: tracking when a user has signed up
+          AnalyticsService.identify(user)
+          AnalyticsService.trackNoProperties('signed up')
+
           this.step = 'success-message'
         })
         .catch(err => {

@@ -194,6 +194,7 @@ import validator from 'validator'
 
 import AuthService from 'src/services/AuthService'
 import UserService from '../../services/UserService'
+import AnalyticsService from '../../services/AnalyticsService'
 
 export default {
   data () {
@@ -298,6 +299,10 @@ export default {
           user.heardFrom = this.profile.heardFrom
           user.referred = this.profile.referred
           UserService.setProfile(this, user, '/')
+
+          //analytics: tracking when a user has signed up
+          AnalyticsService.identify(user)
+          AnalyticsService.trackNoProperties('signed up')
         })
         .catch(err => {
           console.log(err)
