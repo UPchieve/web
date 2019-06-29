@@ -62,7 +62,6 @@ export default {
         return acc + val
       }, 0)
     }
-
     //sends information
     window.analytics.track('feedback', {
       'session id': feedbackComponent.sessionId,
@@ -79,16 +78,19 @@ export default {
     let volunteerShowed = null
     let waitTime = null
     let sessionLength = null
+    let volunteerSessionLength = null
     let timeSessionEnded = new Date()
     let timeCreatedAt = new Date(currentSession.createdAt)
     if (currentSession.volunteerJoinedAt) {
       volunteerShowed = new Date(currentSession.volunteerJoinedAt)
       waitTime = ((volunteerShowed - timeCreatedAt)/60000).toFixed(2)
+      volunteerSessionLength = ((timeSessionEnded - volunteerShowed)/60000).toFixed(2)
     }
 
     sessionLength = ((timeSessionEnded - timeCreatedAt)/60000).toFixed(2)
 
     window.analytics.track('session ended', {
+      'volunteer session length': volunteerSessionLength,
       'wait time': waitTime,
       'session length': sessionLength,
       'session topic': currentSession.type,
