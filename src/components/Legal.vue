@@ -646,14 +646,13 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .background {
-  margin-left: -320px;
+  margin-left: -300px;
   position: relative;
   z-index: 2;
   background-color: white;
 }
-
 
 @media screen and (max-width: 488px) {
   .background {

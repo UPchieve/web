@@ -177,13 +177,11 @@ export default {
     rejoinHelpSession () {
       const path = localStorage.getItem('currentSessionPath')
       if (path) {
-        window.location.hash = `#${path}`
-        window.location.reload()
+        this.$router.push(path)
         console.log(`rejoining session: ${path}`)
       } else {
         console.log(`session terminated`)
-        window.location.hash = ''
-        window.location.reload()
+        this.$router.push('/')
       }
     },
     getHelp () {
