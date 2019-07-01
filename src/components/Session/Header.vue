@@ -71,6 +71,8 @@ export default {
     end () {
       let studentId = ''
       let volunteerId = null
+      let subTopic = null
+      let topic = null
       let sessionId = SessionService.currentSession.sessionId
       if (
         SessionService.currentSession &&
@@ -84,6 +86,16 @@ export default {
       ) {
         volunteerId = SessionService.currentSession.data.volunteer._id
       }
+      if ( SessionService.currentSession &&
+      SessionService.currentSession.data.type
+      ){
+        topic = SessionService.currentSession.data.type
+      }
+      if ( SessionService.currentSession &&
+      SessionService.currentSession.data.subTopic
+      ){
+        subTopic = SessionService.currentSession.data.subTopic
+      }
 
       const result = window.confirm('Do you really want to end the session?')
       if (result) {
@@ -93,6 +105,10 @@ export default {
           const url =
             '/feedback/' +
             sessionId +
+            '/' +
+            topic +
+            '/' + 
+            subTopic +
             '/' +
             (UserService.getUser().isVolunteer ? 'volunteer' : 'student') +
             '/' +

@@ -79,7 +79,7 @@ const routes = [
     }
   },
   {
-    path: '/feedback/:sessionId/:userType/:studentId/:volunteerId',
+    path: '/feedback/:sessionId/:topic/:subTopic/:userType/:studentId/:volunteerId',
     name: 'Feedback',
     component: Feedback,
     meta: { protected: true }
