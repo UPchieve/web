@@ -69,7 +69,7 @@
 </template>
 
 <script>
-import AuthService from 'src/services/AuthService'
+import AuthService from '../services/AuthService'
 
 export default {
   data () {

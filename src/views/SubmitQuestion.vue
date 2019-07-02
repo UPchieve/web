@@ -19,11 +19,11 @@
 </template>
 
 <script>
-import UserService from '../../services/UserService'
+import UserService from '../services/UserService'
 
-import BasicTemplate from '../organisms/BasicTemplate'
-import MessageForm from '../organisms/MessageForm'
-import Modal from '../molecules/Modal'
+import BasicTemplate from '../components/organisms/BasicTemplate'
+import MessageForm from '../components/organisms/MessageForm'
+import Modal from '../components/molecules/Modal'
 
 export default {
   components: {

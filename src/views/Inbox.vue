@@ -10,11 +10,11 @@
 </template>
 
 <script>
-import StudentQuestionService from '../../services/StudentQuestionService'
-import UserService from '../../services/UserService'
+import StudentQuestionService from '../services/StudentQuestionService'
+import UserService from '../services/UserService'
 
-import ContentHeader from '../atoms/ContentHeader'
-import HelpRequests from '../organisms/HelpRequests'
+import ContentHeader from '../components/atoms/ContentHeader'
+import HelpRequests from '../components/organisms/HelpRequests'
 
 export default {
   components: {

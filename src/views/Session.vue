@@ -23,13 +23,13 @@
 </template>
 
 <script>
-import SessionService from 'src/services/SessionService'
-import UserService from 'src/services/UserService'
+import SessionService from '../services/SessionService'
+import UserService from '../services/UserService'
 
-import SessionHeader from './Session/Header'
-import Whiteboard from './Session/Whiteboard'
-import Chat from './Session/Chat'
-import Modal from './molecules/Modal'
+import SessionHeader from '../components/Session/Header'
+import Whiteboard from '../components/Session/Whiteboard'
+import Chat from '../components/Session/Chat'
+import Modal from '../components/molecules/Modal'
 
 export default {
   components: {

@@ -7,9 +7,9 @@
 </template>
 
 <script>
-import SendVerification from './SendVerification'
-import CompleteProfile from './Onboarding/Profile'
-import AcademicSurvey from './Onboarding/Academic'
+import SendVerification from '../components/SendVerification'
+import CompleteProfile from '../components/Onboarding/Profile'
+import AcademicSurvey from '../components/Onboarding/Academic'
 
 export default {
   components: {

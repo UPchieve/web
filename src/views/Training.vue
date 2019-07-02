@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import UserService from 'src/services/UserService'
+import UserService from '../services/UserService'
 
 /**
  * @todo {1} Refactor into global filters (https://vuejs.org/v2/guide/filters.html)

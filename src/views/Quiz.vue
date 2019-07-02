@@ -143,8 +143,8 @@
 </template>
 
 <script>
-import UserService from 'src/services/UserService'
-import TrainingService from 'src/services/TrainingService'
+import UserService from '../services/UserService'
+import TrainingService from '../services/TrainingService'
 
 /**
  * @note {1} Why the extra parens: https://stackoverflow.com/a/27386370

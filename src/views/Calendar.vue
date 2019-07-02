@@ -45,8 +45,8 @@
 
 <script>
 import moment from 'moment-timezone'
-import lodash from 'lodash';
-import UserService from 'src/services/UserService'
+import lodash from 'lodash'
+import UserService from '../services/UserService'
 import CalendarService from '../services/CalendarService'
 
 export default {

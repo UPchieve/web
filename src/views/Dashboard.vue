@@ -128,10 +128,10 @@
 </template>
 
 <script>
-import UserService from 'src/services/UserService'
-import SessionService from 'src/services/SessionService'
+import UserService from '../services/UserService'
+import SessionService from '../services/SessionService'
 
-import ListSessions from 'src/components/ListSessions'
+import ListSessions from '../components/ListSessions'
 
 export default {
   components: {
