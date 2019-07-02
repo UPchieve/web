@@ -41,8 +41,8 @@
 </template>
 
 <script>
-import StudentForm from '../components/Registration/StudentForm'
-import VolunteerForm from '../components/Registration/VolunteerForm'
+import StudentForm from '../components/Signup/StudentForm'
+import VolunteerForm from '../components/Signup/VolunteerForm'
 
 export default {
   components: {
