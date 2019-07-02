@@ -133,7 +133,8 @@ if (process.env.NODE_ENV === 'development') {
  */
 const router = new VueRouter({
   routes,
-  linkActiveClass: 'active'
+  linkActiveClass: 'active',
+  mode: 'history'
 })
 
 export default router

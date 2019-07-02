@@ -1,7 +1,13 @@
 <template>
-  <form class="form-signup">
+  <form class="form-signup" @submit.prevent="submit()">
     <div>
       <div v-if="step === 'step-1'">
+        <div v-if="errors.length" class="step-1-errors" colspan="2">
+          <h5>Please correct the following problems:</h5>
+          <ul>
+            <li v-for="error in errors">{{ error }}</li>
+          </ul>
+        </div>
         <div class="step-1-text" colspan="2">
           <b>Step 1 of 2: Choose your log-in details </b>
         </div>
@@ -11,6 +17,7 @@
           v-model="credentials.email"
           type="email"
           class="form-control"
+          v-bind:class="{'form-control-invalid': invalidInputs.indexOf('inputEmail') > -1}"
           required
           autofocus
         />
@@ -24,6 +31,7 @@
           v-model="credentials.password"
           type="password"
           class="form-control"
+          v-bind:class="{'form-control-invalid': invalidInputs.indexOf('inputPassword') > -1}"
           required
         />
         <p class="password-guidelines">
@@ -37,9 +45,15 @@
         >
           CONTINUE
         </button>
-        {{ msg }}
+        <span>{{ msg }}</span>
       </div>
       <div v-else-if="step === 'step-2'">
+        <div v-if="errors.length" class="step-2-errors" colspan="2">
+          <h5>Please correct the following problems:</h5>
+          <ul>
+            <li v-for="error in errors">{{ error }}</li>
+          </ul>
+        </div>
         <table class="step-2-table">
           <tr>
             <td class="table-entry" colspan="2">
@@ -54,6 +68,7 @@
               <input
                 v-model="profile.firstName"
                 class="form-control"
+                v-bind:class="{'form-control-invalid': invalidInputs.indexOf('firstName') > -1}"
                 required
                 autofocus
               />
@@ -63,6 +78,7 @@
               <input
                 v-model="profile.lastName"
                 class="form-control"
+                v-bind:class="{'form-control-invalid': invalidInputs.indexOf('lastName') > -1}"
                 required
                 autofocus
               />
@@ -90,6 +106,7 @@
               <input
                 v-model="profile.highSchool"
                 class="form-control"
+                v-bind:class="{'form-control-invalid': invalidInputs.indexOf('highSchool') > -1}"
                 required
                 autofocus
               />
@@ -152,7 +169,7 @@
               <label id="agreement" for="userAgreement" />
               <div class="agreement-label">
                 I have read and accept the
-                <a href="#/legal" target="_blank">user agreement</a>.
+                <a href="/legal" target="_blank">user agreement</a>.
               </div>
             </div>
           </tr>
@@ -161,10 +178,11 @@
         <button
           class="btn btn-lg btn-primary btn-block"
           type="submit"
-          @click.prevent="submit()"
+          @click="checkInputs($event)"
         >
           SIGN UP
         </button>
+        <span>{{ msg }}</span>
       </div>
       <div v-else>Unexpected Error</div>
     </div>
@@ -172,6 +190,8 @@
 </template>
 
 <script>
+import validator from 'validator'
+
 import AuthService from 'src/services/AuthService'
 import UserService from '../../services/UserService'
 
@@ -179,6 +199,8 @@ export default {
   data () {
     return {
       msg: '',
+      errors: [],
+      invalidInputs: [],
       credentials: {
         email: '',
         password: '',
@@ -196,6 +218,30 @@ export default {
   },
   methods: {
     nextPage () {
+      // reset error msg from server
+      this.msg = ''
+
+      // validate input
+      this.errors = []
+      this.invalidInputs = []
+      if (!this.credentials.email) {
+        this.errors.push('An email address is required.')
+        this.invalidInputs.push('inputEmail')
+      }
+      else if (!validator.isEmail(this.credentials.email)) {
+        // this is necessary because browsers ignore <input type="email"> until the
+        // user actually tries to submit the form, which does not occur until step 2
+        this.errors.push(this.credentials.email + ' is not a valid email address.')
+        this.invalidInputs.push('inputEmail')
+      }
+      if (!this.credentials.password) {
+        this.errors.push('A password is required.')
+        this.invalidInputs.push('inputPassword')
+      }
+      if (this.errors.length) {
+        return
+      }
+
       AuthService.checkRegister(this, {
         email: this.credentials.email,
         password: this.credentials.password
@@ -207,18 +253,48 @@ export default {
           this.msg = err.message
         })
     },
+    checkInputs (e) {
+      this.errors = []
+      this.invalidInputs = []
+      
+      if (!this.profile.firstName || !this.profile.lastName) {
+        this.errors.push('You must enter your first and last name.')
+      }
+      if (!this.profile.firstName) {
+        this.invalidInputs.push('firstName')
+      }
+      if (!this.profile.lastName) {
+        this.invalidInputs.push('lastName')
+      }
+      if (!this.profile.highSchool) {
+        this.errors.push('Please enter the name of the high school you go to.')
+        this.invalidInputs.push('highSchool')
+      }
+      if (!this.credentials.terms) {
+        // necessary because the CSS hides the browser's validation message
+        this.errors.push('You must read and accept the user agreement.')
+      }
+      if (this.errors.length) {
+        e.preventDefault()
+      }
+    },
     submit () {
       AuthService.register(this, {
         code: undefined,
         email: this.credentials.email,
         password: this.credentials.password,
-        terms: this.credentials.terms
+        terms: this.credentials.terms,
+        firstName: this.profile.firstName,
+        lastName: this.profile.lastName,
+        highSchool: this.profile.highSchool
       })
         .then(() => {
           let user = UserService.getUser()
+          /*
           user.firstname = this.profile.firstName
           user.lastname = this.profile.lastName
           user.highschool = this.profile.highSchool
+          */
           user.heardFrom = this.profile.heardFrom
           user.referred = this.profile.referred
           UserService.setProfile(this, user, '/')
@@ -243,6 +319,11 @@ export default {
 .step-1-text {
   text-align: left;
   padding-bottom: 25px;
+}
+.step-1-errors {
+  text-align: left;
+  font-size: 14px;
+  color: #bf0000;
 }
 .login-link {
   color: #73737a;
@@ -290,6 +371,9 @@ label {
 .form-control {
   border-bottom: 3px solid #16d2aa;
   margin-bottom: 50px;
+}
+.form-control-invalid {
+  border-bottom: 3px solid #bf0000;
 }
 .form-control:last-of-type {
   margin-bottom: 0;
@@ -396,6 +480,11 @@ button[type='submit']:active {
   border-bottom: 3px solid black;
 }
 
+.step-2-errors {
+  text-align: left;
+  font-size: 14px;
+  color: #bf0000;
+}
 .step-2-table {
   width: 100%;
 }
