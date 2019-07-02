@@ -3,28 +3,28 @@ import VueResource from 'vue-resource'
 import VueRouter from 'vue-router'
 import VueSocketio from 'vue-socket.io'
 
-import Contact from './views/Contact'
-import Legal from './views/Legal'
-import Logout from './views/Logout'
-import LoginForm from './views/LoginForm'
-import Registration from './views/Registration'
-import ResetPasswordForm from './views/ResetPasswordForm'
-import SetPasswordForm from './views/SetPasswordForm'
-import Onboarding from './views/Onboarding'
-import Dashboard from './views/Dashboard'
-import Session from './views/Session'
-import Action from './views/Action'
-import Schedule from './views/Schedule'
-import Resources from './views/Resources'
-import Feedback from './views/Feedback'
-import Training from './views/Training'
-import Quiz from './views/Quiz'
-import Review from './views/Review'
-import Profile from './views/Profile'
-import Calendar from './views/Calendar'
-import SubmitQuestion from './views/SubmitQuestion'
-import Inbox from './views/Inbox'
-import SendAnswer from './views/SendAnswer'
+import ContactView from './views/ContactView'
+import LegalView from './views/LegalView'
+import LogoutView from './views/LogoutView'
+import LoginView from './views/LoginView'
+import SignupView from './views/SignupView'
+import ResetPasswordView from './views/ResetPasswordView'
+import SetPasswordView from './views/SetPasswordView'
+import OnboardingView from './views/OnboardingView'
+import DashboardView from './views/DashboardView'
+import SessionView from './views/SessionView'
+import ActionView from './views/ActionView'
+import ScheduleView from './views/ScheduleView'
+import ResourcesView from './views/ResourcesView'
+import FeedbackView from './views/FeedbackView'
+import TrainingView from './views/TrainingView'
+import QuizView from './views/QuizView'
+import ReviewView from './views/ReviewView'
+import ProfileView from './views/ProfileView'
+import CalendarView from './views/CalendarView'
+import SubmitQuestionView from './views/SubmitQuestionView'
+import InboxView from './views/InboxView'
+import SendAnswerView from './views/SendAnswerView'
 
 import AuthService from './services/AuthService'
 import OnboardingService from './services/OnboardingService'
@@ -45,31 +45,31 @@ const routes = [
       return '/login'
     }
   },
-  { path: '/contact', name: 'Contact', component: Contact },
-  { path: '/legal', name: 'Legal', component: Legal },
-  { path: '/login', name: 'LoginForm', component: LoginForm },
-  { path: '/logout', name: 'Logout', component: Logout },
-  { path: '/signup', name: 'Registration', component: Registration },
-  { path: '/resetpassword', name: 'ResetPasswordForm', component: ResetPasswordForm },
-  { path: '/setpassword/:token', name: 'SetPasswordForm', component: SetPasswordForm },
-  { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { protected: true } },
+  { path: '/contact', name: 'ContactView', component: ContactView },
+  { path: '/legal', name: 'LegalView', component: LegalView },
+  { path: '/login', name: 'LoginView', component: LoginView },
+  { path: '/logout', name: 'LogoutView', component: LogoutView },
+  { path: '/signup', name: 'SignupView', component: SignupView },
+  { path: '/resetpassword', name: 'ResetPasswordView', component: ResetPasswordView },
+  { path: '/setpassword/:token', name: 'SetPasswordView', component: SetPasswordView },
+  { path: '/dashboard', name: 'DashboardView', component: DashboardView, meta: { protected: true } },
   {
     path: '/session/math/:subTopic/:sessionId?',
-    name: 'Session-math',
-    component: Session,
+    name: 'SessionView-math',
+    component: SessionView,
     meta: { protected: true }
   },
   {
     path: '/session/college/:subTopic/:sessionId?',
-    name: 'Session-college',
-    component: Session,
+    name: 'SessionView-college',
+    component: SessionView,
     meta: { protected: true }
   },
-  { path: '/schedule', name: 'Schedule', component: Schedule, meta: { protected: true } },
+  { path: '/schedule', name: 'ScheduleView', component: ScheduleView, meta: { protected: true } },
   {
     path: '/resources',
-    name: 'Resources',
-    component: Resources,
+    name: 'ResourcesView',
+    component: ResourcesView,
     meta: { protected: true, bypassOnboarding: true }
   },
   {
@@ -80,45 +80,45 @@ const routes = [
   },
   {
     path: '/feedback/:sessionId/:userType/:studentId/:volunteerId',
-    name: 'Feedback',
-    component: Feedback,
+    name: 'FeedbackView',
+    component: FeedbackView,
     meta: { protected: true }
   },
   {
     path: '/action/:action/:data?',
-    name: 'Action',
-    component: Action,
+    name: 'ActionView',
+    component: ActionView,
     meta: { bypassOnboarding: true }
   },
   {
     path: '/onboarding/:step?',
-    name: 'Onboarding',
-    component: Onboarding,
+    name: 'OnboardingView',
+    component: OnboardingView,
     meta: { protected: true }
   },
-  { path: '/training', name: 'Training', component: Training, meta: { protected: true } },
+  { path: '/training', name: 'TrainingView', component: TrainingView, meta: { protected: true } },
   {
     path: '/training/:category/quiz',
-    name: 'Quiz',
-    component: Quiz,
+    name: 'QuizView',
+    component: QuizView,
     meta: { protected: true }
   },
   {
     path: '/training/:category/review',
-    name: 'Review',
-    component: Review,
+    name: 'ReviewView',
+    component: ReviewView,
     meta: { protected: true }
   },
-  { path: '/profile', name: 'Profile', component: Profile, meta: { protected: true } },
-  { path: '/calendar', name: 'Calendar', component: Calendar },
+  { path: '/profile', name: 'ProfileView', component: ProfileView, meta: { protected: true } },
+  { path: '/calendar', name: 'CalendarView', component: CalendarView },
   {
     path: '/submit-question',
-    name: 'SubmitQuestion',
-    component: SubmitQuestion,
+    name: 'SubmitQuestionView',
+    component: SubmitQuestionView,
     meta: { protected: true }
   },
-  { path: '/inbox', name: 'Inbox', component: Inbox, meta: { protected: true } },
-  { path: '/send-answer', name: 'SendAnswer', component: SendAnswer, meta: { protected: true } }
+  { path: '/inbox', name: 'InboxView', component: InboxView, meta: { protected: true } },
+  { path: '/send-answer', name: 'SendAnswerView', component: SendAnswerView, meta: { protected: true } }
 ]
 
 /**
