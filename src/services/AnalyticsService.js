@@ -18,7 +18,7 @@ export default {
       }
     }
     window.analytics.identify(userData._id, {
-      referred: userData.referred,
+      'referred': userData.referred ? userData.referred : 'No',
       'listOfPassed': listPassed,
       'is volunteer': userData.isVolunteer ? true : false
     })
