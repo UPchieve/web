@@ -5,16 +5,16 @@
     </div>
 
     <div v-else class="toggleMenu forMobileView">
-      <button 
-        v-if="!isActive" 
-        @click="toggleMenu()" 
-        class="sidebar-hamburger" 
+      <button
+        v-if="!isActive"
+        @click="toggleMenu()"
+        class="sidebar-hamburger"
         v-bind:class="{white: ['Dashboard'].indexOf($route.name) > -1}"
       />
-  
+
       <button v-else  @click="toggleMenu()" class="sidebar-exit" />
     </div>
-    
+
       <div v-if="!mobileMode"  class="nav-container">
         <sidebar v-on:closeMenu="doNothing()" />
       </div>
@@ -50,7 +50,7 @@ export default {
     AuthService.checkAuth(this) // {1}
 
     if (window.innerWidth <= 488) {
-      this.mobileMode = true   
+      this.mobileMode = true
     } else {
       this.mobileMode = false
     }

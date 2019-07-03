@@ -1,3 +1,5 @@
+import sentry from '@sentry/browser'
+
 import router from '../router'
 
 import NetworkService from './NetworkService'
@@ -82,15 +84,6 @@ export default {
       user_id: user._id,
       is_volunteer: user.isVolunteer
     }).then(resp => {
-      if (resp.data.err) {
-        this.currentSession.sessionId = null
-        this.currentSession.data = {}
-        console.log('no active session found')
-
-        localStorage.removeItem('currentSessionPath')
-        return
-      }
-
       const { sessionId, data } = resp.data || {}
       const { type, subTopic } = data
 
@@ -100,6 +93,19 @@ export default {
 
         const path = `/session/${type}/${subTopic}/${sessionId}`
         localStorage.setItem('currentSessionPath', path)
+      }
+    }).catch(err => {
+      if (err.data && err.data.err) {
+        this.currentSession.sessionId = null
+        this.currentSession.data = {}
+        if (err.status === 404) {
+          console.log('no active session found')
+        } else if (err.status !== 0) {
+          sentry.captureException(err.data.err)
+          console.log('database error checking current session')
+        }
+
+        localStorage.removeItem('currentSessionPath')
       }
     })
   }

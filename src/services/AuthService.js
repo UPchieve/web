@@ -4,6 +4,8 @@ import router from '../router'
 
 import NetworkService from './NetworkService'
 
+import sentry from '@sentry/browser'
+
 const USER_FETCH_LIMIT_SECONDS = 5
 
 export default {
@@ -52,7 +54,7 @@ export default {
         if (!data) {
           throw new Error('No user returned from auth service')
         } else if (data.err) {
-          throw new Error(data.err)
+          throw data.err
         }
 
         this.storeUser(data.user)
@@ -65,6 +67,12 @@ export default {
           }, 2000)
         }
       }
+    ).catch(
+      err => {
+        if (err.data) {
+          throw err.data.err
+        }
+      }
     )
   },
 
@@ -72,6 +80,10 @@ export default {
     return NetworkService.checkRegister(context, creds).then(res => {
       if (res.data.err) {
         throw new Error(res.data.err)
+      }
+    }).catch(err => {
+      if (err.data) {
+        throw err.data.err
       }
     })
   },
@@ -94,6 +106,10 @@ export default {
           router.push(redirect)
         }, 2000)
       }
+    }).catch(err => {
+      if (err.data) {
+        throw err.data.err
+      }
     })
   },
 
@@ -114,6 +130,10 @@ export default {
         setTimeout(() => {
           router.push(redirect)
         }, 2000)
+      }
+    }).catch(err => {
+      if (err.data) {
+        throw err.data.err
       }
     })
   },
@@ -141,6 +161,7 @@ export default {
         this.user.data = JSON.parse(user)
         this.user.authenticated = true
       } catch (e) {
+        sentry.captureException(e)
         this.logout() // Error in LocalStorage, so logout
       }
     } else {
@@ -189,7 +210,15 @@ export default {
         }
       })
       .catch(err => {
-        console.log(err)
+        if (err.status === 401) {
+          this.user.authenticated = false
+          this.user.data = null
+        } else {
+          if (err.status && err.status !== 0) {
+            throw err.data.err
+          }
+          console.log(err)
+        }
       })
   }
 }
