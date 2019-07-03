@@ -1,5 +1,8 @@
 <template>
   <div class="chat">
+    <vue-headful
+      :title="typingIndicatorShown ? `${otherUser} is typing...` : 'UPchieve'"
+    />
     <div class="header">Chat</div>
 
     <div class="message-box">
@@ -16,7 +19,7 @@
         <template v-for="(message, index) in messages">
           <div
             :key="`message-${index}`"
-            :class="message.email === user.email ? 'left' : 'right'"
+            :class="message.email === user.email ? 'right' : 'left'"
             class="message"
           >
             <div class="avatar" :style="message.avatarStyle" />
@@ -32,11 +35,17 @@
           </div>
         </template>
       </div>
+      <transition name="fade">
+        <div class="typing-indicator" v-show="typingIndicatorShown">
+          {{this.otherUser}} is typing...
+        </div>
+      </transition>
+
     </div>
 
     <textarea
       @keydown.enter.prevent
-      @keyup.enter="sendMessage"
+      @keyup="handleMessage"
       v-model="newMessage"
       placeholder="Type here..."
     />
@@ -50,6 +59,7 @@ import _ from 'lodash'
 import UserService from 'src/services/UserService'
 import SessionService from 'src/services/SessionService'
 import ModerationService from 'src/services/ModerationService'
+import { setTimeout, clearTimeout } from 'timers';
 
 const STUDENT_AVATAR_URL = 'static/defaultavatar3.png'
 const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png'
@@ -63,10 +73,13 @@ export default {
   data () {
     return {
       user: UserService.getUser(),
+      otherUser: null,
       messages: [],
       currentSession: SessionService.currentSession,
       newMessage: '',
-      chatWarningIsShown: false
+      chatWarningIsShown: false,
+      typingTimeout: null,
+      typingIndicatorShown: false,
     }
   },
 
@@ -87,25 +100,55 @@ export default {
     clearMessageInput () {
       this.newMessage = ''
     },
-    sendMessage () {
-      const message = this.newMessage.trim()
-      this.clearMessageInput()
-      
-      // Early exit if message is blank
-      if (_.isEmpty(message)) { return }
+    notTyping() {
+      // Tell the server that the user is no longer typing
+      this.$socket.emit('notTyping', {
+          sessionId: this.currentSession.sessionId
+      })
+    }, 
+    handleMessage (event) {
+      // If key pressed is Enter, send the message
+      if (event.key == 'Enter') {
+        const message = this.newMessage.trim()
+        this.clearMessageInput()
+        
+        // Early exit if message is blank
+        if (_.isEmpty(message)) return 
 
-      // Reset the chat warning
-      this.hideModerationWarning()
+        // Reset the chat warning
+        this.hideModerationWarning()
 
-      ModerationService
-          .checkIfMessageIsClean(this, message)
-          .then(isClean => {
-            if (isClean) {
-              this.showNewMessage(message)
-            } else {
-              this.showModerationWarning()
-            }
-          })
+        // Check for personal info/profanity in message
+        ModerationService
+            .checkIfMessageIsClean(this, message)
+            .then(isClean => {
+              if (isClean) {
+                this.showNewMessage(message)
+              } else {
+                this.showModerationWarning()
+              }
+            })
+
+        // Disregard typing handler for enter
+        this.notTyping()
+        return
+
+        // Disregard typing handler for backspace
+      } else if (event.key == 'Backspace') return 
+
+      // Typing handler for when non-Enter/Backspace keys are pressed
+      this.$socket.emit('typing', {
+          sessionId: this.currentSession.sessionId,
+          user: UserService.getUser()
+        })
+
+      /** Every time a key is pressed, set an inactive timer
+          If another key is pressed within 2 seconds, reset timer**/
+      clearTimeout(this.typingTimeout)
+      this.typingTimeout = setTimeout(() => {
+            this.notTyping()
+            console.log('Timeout expired')
+          }, 2000)   
     }
   },
 
@@ -151,7 +194,13 @@ export default {
 
       this.messages = messages
     },
-
+    'is-typing' (data) {
+      this.typingIndicatorShown = true
+      this.otherUser = data;
+    },
+    'not-typing' () {
+      this.typingIndicatorShown = false
+    },
     messageSend (data) {
       // {1}
       let { picture } = data
@@ -239,9 +288,11 @@ export default {
 }
 
 .messages {
+  position: relative;
   height: 100%;
   overflow: auto;
   display: flex;
+  padding-bottom: 25px;
   flex-direction: column;
 }
 
@@ -249,8 +300,6 @@ export default {
   position: relative;
   padding: 10px;
   display: flex;
-  min-height: 61px;
-  margin-bottom: 12px;
   justify-content: flex-start;
   background: #fff;
   width: 100%;
@@ -275,10 +324,27 @@ export default {
 
 .contents {
   text-align: left;
+  position: relative;
   width: 200px;
   overflow-wrap: break-word;
   font-size: 16px;
 }
+
+.typing-indicator {
+  position: absolute;
+  bottom: 0;
+  font-size: 13px;
+  margin-bottom: 100px;
+  padding: 8px;
+  font-weight: 300;
+  transition: 0.15s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
 
 textarea {
   width: 100%;

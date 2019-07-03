@@ -109,7 +109,7 @@ export default {
   display: flex;
   flex-direction: column;
   width: 500px;
-  height: 500px;
+  min-height: 500px;
   margin: auto;
   background-color: white;
   padding: 0px 50px;
