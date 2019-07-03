@@ -8,21 +8,26 @@
           / <router-link to="login" class="login-link">Log In</router-link>
         </p>
       </div>
-      <label for="inputEmail">Please enter your email address</label>
-      <input
-        id="inputEmail"
-        v-model="email"
-        type="text"
-        class="form-control"
-        required
-        autofocus
-      />
+      <div v-if="this.firstTime === true">
+        <label for="inputEmail">Please enter your email address</label>
+        <input
+          id="inputEmail"
+          v-model="email"
+          type="text"
+          class="form-control"
+          required
+          autofocus
+        />
+      </div>
+      <div v-else>
+        <p class = "message"> Send password reset email to {{this.email}}?</p>
+      </div>
       <button
         class="btn btn-lg btn-primary btn-block"
         type="submit"
         @click.prevent="submit()"
       >
-        ENTER
+        SEND
       </button>
       {{ msg }}
     </form>
@@ -31,12 +36,24 @@
 
 <script>
 import AuthService from '../services/AuthService'
-
+import UserService from '../services/UserService'
 export default {
   data () {
     return {
+      firstTime: null,
       email: '',
       msg: ''
+    }
+  },
+  mounted () {
+    let auth = UserService.getAuth()
+    if (auth.authenticated) {
+      let user = UserService.getUser()
+      this.email = user.email
+      this.firstTime = false
+    }
+    else{
+      this.firstTime = true
     }
   },
   methods: {
@@ -104,6 +121,10 @@ label {
   font-size: 16px;
   font-weight: 400;
   color: #343440;
+}
+
+.message {
+  margin-bottom: 10px;
 }
 .form-control {
   border-bottom: 3px solid #16d2aa;

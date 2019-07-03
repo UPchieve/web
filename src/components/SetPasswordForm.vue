@@ -3,15 +3,6 @@
   <div class="reset-page">
     <form class="form-resetpassword">
       <h2 class="form-resetpassword-heading">Reset Your Password</h2>
-      <label for="inputEmail">Please enter your email address</label>
-      <input
-        id="inputEmail"
-        v-model="credentials.email"
-        type="text"
-        class="form-control"
-        required
-        autofocus
-      />
       <label for="inputPassword">Create a new password</label>
       <input
         id="inputPassword"
@@ -54,7 +45,6 @@ export default {
       msg: '',
       credentials: {
         token: '',
-        email: '',
         password: '',
         newpassword: ''
       }
@@ -64,7 +54,6 @@ export default {
     submit () {
       AuthService.confirmReset(this, {
         token: this.$route.params.token,
-        email: this.credentials.email,
         password: this.credentials.password,
         newpassword: this.credentials.newpassword
       })
