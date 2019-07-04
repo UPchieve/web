@@ -1,4 +1,4 @@
-import sentry from '@sentry/browser'
+import * as sentry from '@sentry/browser'
 
 import NetworkService from './NetworkService'
 

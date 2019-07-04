@@ -4,7 +4,7 @@ import router from '../router'
 
 import NetworkService from './NetworkService'
 
-import sentry from '@sentry/browser'
+import * as sentry from '@sentry/browser'
 
 const USER_FETCH_LIMIT_SECONDS = 5
 
