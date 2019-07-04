@@ -8,26 +8,36 @@
 import * as sentry from '@sentry/browser'
 
 export default {
+  mounted () {
+    this.$on('async-error', function (err) {
+      this.captureError(err)
+    })
+  },
   data () {
     return {
       error: false,
       eventId: null,
     }
   },
-  errorCaptured (err, vm, info) {
-    var self = this
-    this.error = err
+  methods: {
+    captureError (err) {
+      var self = this
+      this.error = err
 
-    sentry.withScope(function (scope) {
-      scope.addEventProcessor(function (event) {
-        self.eventId = event.event_id
-        sentry.showReportDialog({ eventId: self.eventId })
+      sentry.withScope(function (scope) {
+        scope.addEventProcessor(function (event) {
+          self.eventId = event.event_id
+          console.log(self.eventId)
+          sentry.showReportDialog({ eventId: self.eventId })
 
-        return event
+          return event
+        })
+        sentry.captureException(err)
       })
-      sentry.captureException(err)
-    })
-
+    }
+  },
+  errorCaptured (err, vm, info) {
+    captureError (err)
     return false
   }
 }
