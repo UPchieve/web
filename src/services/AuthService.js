@@ -43,12 +43,8 @@ export default {
         context.error = 'Could not login'
         console.log(res)
 
-        if (res.status !== 401) {
-          if (res.status === 0) {
-            throw new Error('Network error logging in')
-          } else {
-            throw res.data.err
-          }
+        if (res.status !== 401 && res.status !== 0 && res.data) {
+          throw res.data.err
         }
       }
     )
