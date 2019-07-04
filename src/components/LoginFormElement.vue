@@ -77,18 +77,23 @@ export default {
   },
   methods: {
     submit () {
-      AuthService.login(
+      var promise = AuthService.login(
         this,
         {
           email: this.credentials.email,
           password: this.credentials.password
         },
         this.$route.query.redirect || '/'
-      ).catch(err => {
-        // so it will be handled by parent ErrorFeedback component
-        this.$parent.$emit('async-error', err)
-        console.log(err)
-      })
+      )
+      if (promise) {
+        promise.catch(err => {
+          // so it will be handled by parent ErrorFeedback component
+          this.$parent.$emit('async-error', err)
+          console.log(err)
+        })
+      } else {
+        this.error = 'You must enter a username and password'
+      }
     }
   },
   beforeRouteEnter (to, from, next) {
