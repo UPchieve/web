@@ -35,7 +35,6 @@ import StudentQuestionService from '../../services/StudentQuestionService'
 
 import BtnOptions from '../molecules/BtnOptions'
 import Btn from '../atoms/Btn'
-import Attachment from '../atoms/Attachment'
 
 function isValid () {
   const valid = document.getElementById('message').value !== ''
@@ -107,8 +106,7 @@ function showModalSuccess (context, message) {
 export default {
   components: {
     BtnOptions,
-    Btn,
-    Attachment
+    Btn
   },
   props: {
     textareaLabel: {
