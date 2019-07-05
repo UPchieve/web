@@ -8,7 +8,7 @@
         <whiteboard />
       </div>
       <div class="col-sm-4 chat-container">
-        <chat />
+        <session-chat />
       </div>
     </div>
 
@@ -26,16 +26,16 @@
 import SessionService from 'src/services/SessionService'
 import UserService from 'src/services/UserService'
 
-import SessionHeader from 'src/components/Session/Header'
-import Whiteboard from 'src/components/Session/Whiteboard'
-import Chat from 'src/components/Session/Chat'
+import SessionHeader from './SessionHeader'
+import Whiteboard from './Whiteboard'
+import SessionChat from './SessionChat'
 import Modal from 'src/components/ui/Modal'
 
 export default {
   components: {
     SessionHeader,
     Whiteboard,
-    Chat,
+    SessionChat,
     Modal
   },
   /*

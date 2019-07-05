@@ -133,7 +133,7 @@ h1 {
 .avatar {
   width: 30px;
   height: 30px;
-  background-image: url('../../assets/defaultAvatar@2x.png');
+  background-image: url('~src/assets/defaultAvatar@2x.png');
   background-size: cover;
 }
 
