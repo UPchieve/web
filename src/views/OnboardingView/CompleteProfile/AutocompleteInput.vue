@@ -22,7 +22,7 @@
 
 <script>
 import _ from 'lodash'
-import NetworkService from '../../services/NetworkService'
+import NetworkService from 'src/services/NetworkService'
 
 const SCHOOL_NOT_FOUND_MSG = "I coudn't find my school"
 
