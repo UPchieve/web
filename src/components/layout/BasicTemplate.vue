@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import ContentHeader from '../atoms/ContentHeader'
+import ContentHeader from './ContentHeader'
 
 export default {
   components: {
