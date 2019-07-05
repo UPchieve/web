@@ -128,12 +128,13 @@
 </template>
 
 <script>
-import UserService from '../services/UserService'
-import SessionService from '../services/SessionService'
+import UserService from 'src/services/UserService'
+import SessionService from 'src/services/SessionService'
 
-import ListSessions from '../components/ListSessions'
+import ListSessions from './ListSessions'
 
 export default {
+  name: "dashboard-view",
   components: {
     ListSessions
   },
@@ -237,7 +238,7 @@ export default {
   display: inline-block;
   width: 100%;
   height: 100%;
-  background-image: url('../assets/dashboardHeader@2x.png');
+  background-image: url('~src/assets/dashboardHeader@2x.png');
   background-repeat: no-repeat;
   background-size: cover;
   position: absolute;
