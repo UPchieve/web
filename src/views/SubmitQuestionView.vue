@@ -22,7 +22,7 @@
 import UserService from 'src/services/UserService'
 
 import BasicTemplate from 'src/components/layout/BasicTemplate'
-import QuestionAnswerForm from 'src/components/layout/QuestionAnswerForm'
+import QuestionAnswerForm from 'src/components/form/QuestionAnswerForm'
 import Modal from 'src/components/ui/Modal'
 
 export default {

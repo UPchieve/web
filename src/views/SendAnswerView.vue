@@ -38,7 +38,7 @@ import DownloadService from 'src/services/DownloadService'
 import StudentQuestionService from 'src/services/StudentQuestionService'
 
 import BasicTemplate from 'src/components/layout/BasicTemplate'
-import QuestionAnswerForm from 'src/components/layout/QuestionAnswerForm'
+import QuestionAnswerForm from 'src/components/form/QuestionAnswerForm'
 import Modal from 'src/components/ui/Modal'
 
 export default {
