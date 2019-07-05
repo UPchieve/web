@@ -33,8 +33,8 @@
 </template>
 
 <script>
-import UserService from '../../services/UserService'
-import AuthService from '../../services/AuthService'
+import UserService from 'src/services/UserService'
+import AuthService from 'src/services/AuthService'
 
 export default {
   components: {},
@@ -107,15 +107,15 @@ a.logout {
 }
 
 .contact.icon::before {
-  background-image: url('../../assets/contact_us_icon-01.svg');
+  background-image: url('~src/assets/contact_us_icon-01.svg');
 }
 
 .privacy.icon::before {
-  background-image: url('../../assets/privacy_policy_icon-01.svg');
+  background-image: url('~src/assets/privacy_policy_icon-01.svg');
 }
 
 .logout.icon::before {
-  background-image: url('../../assets/log_out_icon-01.svg');
+  background-image: url('~src/assets/log_out_icon-01.svg');
 }
 
 .login {

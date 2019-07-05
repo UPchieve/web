@@ -41,8 +41,8 @@
 </template>
 
 <script>
-import UserService from '../../services/UserService'
-import AuthService from '../../services/AuthService'
+import UserService from 'src/services/UserService'
+import AuthService from 'src/services/AuthService'
 
 /**
  * @todo {1} Refactor this, apply naming convention to files and improve the
