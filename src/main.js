@@ -11,7 +11,15 @@ import vueHeadful from 'vue-headful'
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
   integrations: [new Integrations.Vue({ Vue, attachProps: true })],
-  environment: process.env.NODE_ENV
+  environment: process.env.NODE_ENV,
+  beforeSend (event, hint) {
+    if (event.exception && hint.originalException.sentryEventId) {
+      // event was already reported from server
+      return null
+    }
+
+    return event
+  }
 })
 
 // Setup vue-headful

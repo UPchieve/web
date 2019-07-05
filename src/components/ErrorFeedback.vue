@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="error-boundary-div">
     <slot></slot>
   </div>
 </template>
@@ -26,8 +26,7 @@ export default {
 
       sentry.withScope(function (scope) {
         scope.addEventProcessor(function (event) {
-          self.eventId = event.event_id
-          console.log(self.eventId)
+          self.eventId = err.sentryEventId || event.event_id
           sentry.showReportDialog({ eventId: self.eventId })
 
           return event
@@ -37,8 +36,26 @@ export default {
     }
   },
   errorCaptured (err, vm, info) {
-    captureError (err)
+    this.captureError (err)
     return false
+  },
+  render () {
+    return this.$slots.default[0]
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.error-boundary-div {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+
+  & > * {
+    flex-grow: 1;
+  }
+}
+</style>

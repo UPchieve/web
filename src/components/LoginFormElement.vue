@@ -89,7 +89,6 @@ export default {
         promise.catch(err => {
           // so it will be handled by parent ErrorFeedback component
           this.$parent.$emit('async-error', err)
-          console.log(err)
         })
       } else {
         this.error = 'You must enter a username and password'

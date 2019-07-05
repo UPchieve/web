@@ -5,6 +5,8 @@ import router from '../router'
 import NetworkService from './NetworkService'
 import UserService from './UserService'
 
+import errorFromServer from './error-from-server'
+
 export default {
   loading: false,
   currentSession: {
@@ -61,6 +63,9 @@ export default {
 
       return sessionId
     })
+    .catch(res => {
+      return errorFromServer(res)
+    })
   },
 
   useExistingSession (context, sessionId) {
@@ -76,6 +81,9 @@ export default {
       }
 
       return sessionId
+    })
+    .catch(res => {
+      return errorFromServer(res)
     })
   },
 

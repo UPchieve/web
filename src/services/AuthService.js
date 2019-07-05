@@ -3,6 +3,7 @@ import Validator from 'validator'
 import router from '../router'
 
 import NetworkService from './NetworkService'
+import errorFromServer from './error-from-server'
 
 import * as sentry from '@sentry/browser'
 
@@ -44,7 +45,7 @@ export default {
         console.log(res)
 
         if (res.status !== 401 && res.status !== 0 && res.data) {
-          throw res.data.err
+          throw errorFromServer(res)
         }
       }
     )

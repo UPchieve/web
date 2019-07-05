@@ -1,3 +1,5 @@
+import * as sentry from '@sentry/browser'
+
 const AUTH_ROOT = `${process.env.SERVER_ROOT}/auth`
 const API_ROOT = `${process.env.SERVER_ROOT}/api`
 

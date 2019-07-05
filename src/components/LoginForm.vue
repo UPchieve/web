@@ -6,7 +6,7 @@
       </div>
       <div class="form-div">
         <error-feedback>
-          <login-form-element @async-error="throwInContext($event, err)"/>
+          <login-form-element />
         </error-feedback>
       </div>
       <div class="bottom-div"></div>
