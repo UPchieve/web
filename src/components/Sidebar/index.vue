@@ -23,11 +23,11 @@
 </template>
 
 <script>
-import UserService from '../services/UserService'
+import UserService from 'src/services/UserService'
 
-import UserNav from './Sidebar/UserNav'
-import ProfileInfo from './Sidebar/ProfileInfo'
-import Footer from './Sidebar/Footer'
+import UserNav from './UserNav'
+import ProfileInfo from './ProfileInfo'
+import Footer from './Footer'
 
 export default {
   components: {
@@ -80,7 +80,7 @@ h1::before {
   display: inline-block;
   width: 100px;
   height: 43px;
-  background-image: url('../assets/logo-01.svg');
+  background-image: url('~src/assets/logo-01.svg');
   background-size: 100px 43px;
   top: 0;
   left: 0;
