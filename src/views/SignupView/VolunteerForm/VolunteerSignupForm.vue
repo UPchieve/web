@@ -175,11 +175,11 @@
 </template>
 
 <script>
-import validator from 'validator';
+import validator from 'validator'
 
 import AuthService from 'src/services/AuthService'
 import RegistrationService from 'src/services/RegistrationService'
-import UserService from '../../services/UserService'
+import UserService from 'src/services/UserService'
 
 var phoneValidation = function() {
   return {

@@ -2,7 +2,7 @@
   <div class="registration-container background">
     <div class="main-page">
       <div class="logo-class">
-        <img class="logo-img" src="../assets/p_logo_white.png" />
+        <img class="logo-img" src="~src/assets/p_logo_white.png" />
       </div>
       <div class="form-register">
         <div class="header">
@@ -41,10 +41,11 @@
 </template>
 
 <script>
-import StudentForm from '../components/Signup/StudentForm'
-import VolunteerForm from '../components/Signup/VolunteerForm'
+import StudentForm from './StudentForm'
+import VolunteerForm from './VolunteerForm'
 
 export default {
+  name: "signup-view",
   components: {
     StudentForm,
     VolunteerForm
@@ -96,7 +97,7 @@ export default {
  */
 .background {
   display: flex;
-  background-image: url('../assets/onboarding_background.png');
+  background-image: url('~src/assets/onboarding_background.png');
   background-size: cover;
   height: 100%;
   font-size: 16px;
