@@ -12,6 +12,7 @@ import CompleteProfile from './CompleteProfile'
 import AcademicSurvey from './AcademicSurvey'
 
 export default {
+  name: "onboarding-view",
   components: {
     SendVerification,
     CompleteProfile,
