@@ -623,11 +623,11 @@
 </template>
 
 <script>
-import UserService from '../services/UserService'
+import UserService from 'src/services/UserService'
 
-import FullTextTemplate from '../components/organisms/FullTextTemplate'
-import Accordion from '../components/organisms/Accordion'
-import AccordionItem from '../components/molecules/AccordionItem'
+import FullTextTemplate from 'src/components/layout/FullTextTemplate'
+import Accordion from 'src/components/ui/Accordion'
+import AccordionItem from 'src/components/ui/AccordionItem'
 
 export default {
   components: {

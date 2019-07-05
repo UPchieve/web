@@ -8,7 +8,7 @@
 export default {}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .accordion {
   margin-bottom: 20px;
 }
