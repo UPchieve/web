@@ -32,6 +32,7 @@ import SessionChat from './SessionChat'
 import Modal from 'src/components/ui/Modal'
 
 export default {
+  name: "session-view",
   components: {
     SessionHeader,
     Whiteboard,
