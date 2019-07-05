@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import Btn from '../ui/Btn'
+import Btn from './Btn'
 
 export default {
   components: {
@@ -33,7 +33,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .btn-options {
   display: flex;
   flex-direction: column-reverse;

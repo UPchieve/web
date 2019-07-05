@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import BtnOptions from '../molecules/BtnOptions'
+import BtnOptions from '../ui/BtnOptions'
 import Btn from '../ui/Btn'
 
 export default {

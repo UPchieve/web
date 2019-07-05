@@ -33,7 +33,7 @@ import Vue from 'vue'
 import UserService from '../../services/UserService'
 import StudentQuestionService from '../../services/StudentQuestionService'
 
-import BtnOptions from '../molecules/BtnOptions'
+import BtnOptions from '../ui/BtnOptions'
 import Btn from '../ui/Btn'
 
 function isValid () {
