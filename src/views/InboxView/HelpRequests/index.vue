@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import TopicLabel from '../atoms/TopicLabel'
+import TopicLabel from './TopicLabel'
 
 /*
  * @note {1} Full documentation of involved "types":

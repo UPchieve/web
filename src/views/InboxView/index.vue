@@ -10,13 +10,14 @@
 </template>
 
 <script>
-import StudentQuestionService from '../services/StudentQuestionService'
-import UserService from '../services/UserService'
+import StudentQuestionService from 'src/services/StudentQuestionService'
+import UserService from 'src/services/UserService'
 
-import ContentHeader from '../components/atoms/ContentHeader'
-import HelpRequests from '../components/organisms/HelpRequests'
+import ContentHeader from 'src/components/atoms/ContentHeader'
+import HelpRequests from './HelpRequests'
 
 export default {
+  name: "inbox-view",
   components: {
     ContentHeader,
     HelpRequests
