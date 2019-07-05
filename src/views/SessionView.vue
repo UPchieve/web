@@ -23,13 +23,13 @@
 </template>
 
 <script>
-import SessionService from '../services/SessionService'
-import UserService from '../services/UserService'
+import SessionService from 'src/services/SessionService'
+import UserService from 'src/services/UserService'
 
-import SessionHeader from '../components/Session/Header'
-import Whiteboard from '../components/Session/Whiteboard'
-import Chat from '../components/Session/Chat'
-import Modal from '../components/molecules/Modal'
+import SessionHeader from 'src/components/Session/Header'
+import Whiteboard from 'src/components/Session/Whiteboard'
+import Chat from 'src/components/Session/Chat'
+import Modal from 'src/components/ui/Modal'
 
 export default {
   components: {
@@ -68,11 +68,6 @@ export default {
         second: () => {
           this.$router.push('/')
         }
-      },
-      formLoaderOptions: {
-        formLoaderTop: '0',
-        formLoaderDot1: 'a-loader-1 2s ease-out infinite',
-        formLoaderDot2: 'a-loader-1 1s 2s ease-out infinite'
       }
     }
   },

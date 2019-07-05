@@ -1,6 +1,6 @@
 <template>
-  <div class="message-form">
-    <form class="question-form" onsubmit="return false;">
+  <div class="question-answer-form">
+    <form onsubmit="return false;">
       <div class="form-body">
         <label for="message">{{ textareaLabel }}</label>
         <textarea id="message" name="message" />
@@ -233,8 +233,8 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.message-form {
+<style lang="scss" scoped>
+.question-answer-form {
   position: relative;
   overflow: hidden;
 }

@@ -15,7 +15,7 @@
           </div>
         </div>
       </div>
-      <message-form
+      <question-answer-form
         :modal-container="this"
         textarea-label="Write your answer below"
         type-of-form="send-answer"
@@ -33,18 +33,18 @@
 </template>
 
 <script>
-import UserService from '../services/UserService'
-import DownloadService from '../services/DownloadService'
-import StudentQuestionService from '../services/StudentQuestionService'
+import UserService from 'src/services/UserService'
+import DownloadService from 'src/services/DownloadService'
+import StudentQuestionService from 'src/services/StudentQuestionService'
 
-import BasicTemplate from '../components/organisms/BasicTemplate'
-import MessageForm from '../components/organisms/MessageForm'
-import Modal from '../components/molecules/Modal'
+import BasicTemplate from 'src/components/layout/BasicTemplate'
+import QuestionAnswerForm from 'src/components/layout/QuestionAnswerForm'
+import Modal from 'src/components/ui/Modal'
 
 export default {
   components: {
     BasicTemplate,
-    MessageForm,
+    QuestionAnswerForm,
     Modal
   },
   data () {

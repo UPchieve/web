@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import BtnOptions from './BtnOptions'
+import BtnOptions from '../molecules/BtnOptions'
 import Btn from '../atoms/Btn'
 
 export default {
@@ -67,7 +67,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .v-modal {
   position: fixed;
   top: 0;
@@ -93,8 +93,6 @@ export default {
 }
 .v-modal-dialog__content {
   margin-bottom: 40px;
-}
-.v-modal-dialog__options {
 }
 .v-modal-dialog--warn {
   box-shadow: -4px 4px $c-shadow-warn;

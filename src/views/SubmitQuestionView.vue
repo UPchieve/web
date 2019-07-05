@@ -1,7 +1,7 @@
 <template>
   <div v-if="!user.isVolunteer" class="submit-question">
     <basic-template header-title="Submit a question">
-      <message-form
+      <question-answer-form
         :modal-container="this"
         textarea-label="What is your question?"
         type-of-form="submit-question"
@@ -19,16 +19,16 @@
 </template>
 
 <script>
-import UserService from '../services/UserService'
+import UserService from 'src/services/UserService'
 
-import BasicTemplate from '../components/organisms/BasicTemplate'
-import MessageForm from '../components/organisms/MessageForm'
-import Modal from '../components/molecules/Modal'
+import BasicTemplate from 'src/components/layout/BasicTemplate'
+import QuestionAnswerForm from 'src/components/layout/QuestionAnswerForm'
+import Modal from 'src/components/ui/Modal'
 
 export default {
   components: {
     BasicTemplate,
-    MessageForm,
+    QuestionAnswerForm,
     Modal
   },
   data () {
