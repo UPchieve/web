@@ -34,7 +34,7 @@ import UserService from '../../services/UserService'
 import StudentQuestionService from '../../services/StudentQuestionService'
 
 import BtnOptions from '../molecules/BtnOptions'
-import Btn from '../atoms/Btn'
+import Btn from '../ui/Btn'
 
 function isValid () {
   const valid = document.getElementById('message').value !== ''

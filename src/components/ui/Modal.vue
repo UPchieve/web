@@ -21,7 +21,7 @@
 
 <script>
 import BtnOptions from '../molecules/BtnOptions'
-import Btn from '../atoms/Btn'
+import Btn from '../ui/Btn'
 
 export default {
   components: {
