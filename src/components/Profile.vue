@@ -17,6 +17,12 @@
             <li v-for="error in errors">{{ error }}</li>
           </ul>
         </div>
+        <div
+          v-if="msg && msg !== 'Set!'"
+          class="errors"
+        >
+          <h4 class="errors-heading">{{ msg }}</h4>
+        </div>
         <div class="subheader">Personal Information</div>
         <div class="container-content">
           <div id="email" class="container-section">
@@ -220,7 +226,8 @@ export default {
       certifications,
       certKey,
       errors: [],
-      invalidInputs: []
+      invalidInputs: [],
+      msg: null
     }
   },
   methods: {
@@ -229,6 +236,7 @@ export default {
         // erase previous errors
         this.errors = []
         this.invalidInputs = []
+        this.msg = null
 
         // validate fields
         if (!this.user.isVolunteer && !this.user.highschool) {
@@ -250,10 +258,14 @@ export default {
           }
         }
 
-        if (!this.errors.length) {
+        if (!this.errors.length && !this.msg) {
           UserService.setProfile(this, this.user)
-          this.editBtnMsg = 'Edit Profile'
-          this.activeEdit = false
+          this.$watch('msg', function (newMsg, oldMsg) {
+            if (newMsg === 'Set!') {
+              this.editBtnMsg = 'Edit Profile'
+              this.activeEdit = false
+            }
+          })
         }
       } else {
         this.editBtnMsg = 'Save Profile'
