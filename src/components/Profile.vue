@@ -236,7 +236,6 @@ export default {
         // erase previous errors
         this.errors = []
         this.invalidInputs = []
-        this.msg = null
 
         // validate fields
         if (!this.user.isVolunteer && !this.user.highschool) {
@@ -258,14 +257,18 @@ export default {
           }
         }
 
-        if (!this.errors.length && !this.msg) {
+        if (!this.errors.length) {
+          if (!this.msg) {
+            var unwatch = this.$watch('msg', function (newMsg, oldMsg) {
+              if (newMsg === 'Set!') {
+                this.editBtnMsg = 'Edit Profile'
+                this.activeEdit = false
+                this.msg = null
+                unwatch()
+              }
+            })
+          }
           UserService.setProfile(this, this.user)
-          this.$watch('msg', function (newMsg, oldMsg) {
-            if (newMsg === 'Set!') {
-              this.editBtnMsg = 'Edit Profile'
-              this.activeEdit = false
-            }
-          })
         }
       } else {
         this.editBtnMsg = 'Save Profile'
