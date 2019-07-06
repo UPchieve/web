@@ -8,7 +8,10 @@
     </div>
     <div class="wrap-container">
       <div class="personal-info contain">
-        <div class="errors" v-if="errors.length">
+        <div
+          v-if="errors.length"
+          class="errors"
+        >
           <h4 class="errors-heading">Please correct the following problem<span v-if="errors.length > 1">s</span> before saving:</h4>
           <ul class="errors-list">
             <li v-for="error in errors">{{ error }}</li>
@@ -485,12 +488,18 @@ ul {
   background-color: #f7aef8;
 }
 
+.errors {
+  text-align: left;
+  padding: 30px;
+}
+
 .errors-heading {
-  color: #bf0000
+  color: #bf0000;
 }
 
 .errors-list {
-  color: #bf0000
+  color: #bf0000;
+  margin-left: 40px;
 }
 
 @media screen and (max-width: 488px) {
