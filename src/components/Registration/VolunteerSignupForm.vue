@@ -181,25 +181,7 @@ import AuthService from 'src/services/AuthService'
 import RegistrationService from 'src/services/RegistrationService'
 import UserService from '../../services/UserService'
 
-var phoneValidation = function() {
-  return {
-    // see http://regexlib.com/REDetails.aspx?regexp_id=58
-    // modified to ignore trailing/leading whitespace,
-    // and disallow alphanumeric characters
-    re: /^\s*(?<cc>[0-9](?: |-)?)?(?:\(?([0-9]{3})\)?|[0-9]{3})(?: |-)?(?:([0-9]{3})(?: |-)?([0-9]{4}))\s*$/,
-    validatePhoneNumber: function(v) {
-      return this.re.test(v);
-    },
-    // convert phone number into the accepted format ###-###-####
-    convertPhoneNumber: function(v) {
-      var matches = v.match(this.re);
-      if (matches == null || matches.length < 5) {
-        return null;
-      }
-      return matches[2] + '-' + matches[3] + '-' + matches[4];
-    }
-  };
-};
+import phoneValidation from 'src/phone-validation'
 
 export default {
   data () {
@@ -243,7 +225,7 @@ export default {
       if (this.errors.length) {
         return;
       }
-    
+
       // check credentials
       AuthService.checkRegister(this, {
         email: this.credentials.email,
@@ -273,7 +255,7 @@ export default {
         this.errors.push('You must enter a phone number.');
         this.invalidInputs.push('phone');
       }
-      else if (!phoneValidation().validatePhoneNumber(this.profile.phone)) {
+      else if (!phoneValidation.validatePhoneNumber(this.profile.phone)) {
         this.errors.push(this.profile.phone + ' is not a valid U.S. phone number.');
         this.invalidInputs.push('phone');
       }
@@ -294,8 +276,8 @@ export default {
     },
     submit () {
       // convert phone number
-      this.profile.phone = phoneValidation().convertPhoneNumber(this.profile.phone);
-    
+      this.profile.phone = phoneValidation.convertPhoneNumber(this.profile.phone);
+
       AuthService.register(this, {
         code: RegistrationService.data.registrationCode,
         email: this.credentials.email,

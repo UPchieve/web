@@ -8,6 +8,12 @@
     </div>
     <div class="wrap-container">
       <div class="personal-info contain">
+        <div class="errors" v-if="errors.length">
+          <h4 class="errors-heading">Please correct the following problem<span v-if="errors.length > 1">s</span> before saving:</h4>
+          <ul class="errors-list">
+            <li v-for="error in errors">{{ error }}</li>
+          </ul>
+        </div>
         <div class="subheader">Personal Information</div>
         <div class="container-content">
           <div id="email" class="container-section">
@@ -29,6 +35,7 @@
                 v-model="user.highschool"
                 type="text"
                 class="form-control"
+                :class="{'invalid': invalidInputs.indexOf('highschool') > -1}"
               />
             </div>
           </div>
@@ -44,6 +51,7 @@
                 v-model="user.phone"
                 type="text"
                 class="form-control"
+                :class="{'invalid': invalidInputs.indexOf('phone') > -1}"
               />
 
               <div class="description">
@@ -64,6 +72,7 @@
                 v-model="user.college"
                 type="text"
                 class="form-control"
+                :class="{'invalid': invalidInputs.indexOf('college') > -1}"
               />
             </div>
 
@@ -83,6 +92,7 @@
                 v-model="user.favoriteAcademicSubject"
                 type="text"
                 class="form-control"
+                :class="{'invalid': invalidInputs.indexOf('favoriteAcademicSubject') > -1}"
               />
             </div>
           </div>
@@ -126,6 +136,8 @@
 
 <script>
 import UserService from 'src/services/UserService'
+
+import phoneValidation from 'src/phone-validation'
 
 export default {
   data () {
@@ -203,15 +215,43 @@ export default {
         backgroundImage: `url(${avatarUrl})`
       },
       certifications,
-      certKey
+      certKey,
+      errors: [],
+      invalidInputs: []
     }
   },
   methods: {
     editProfile () {
       if (this.activeEdit) {
-        UserService.setProfile(this, this.user)
-        this.editBtnMsg = 'Edit Profile'
-        this.activeEdit = false
+        // erase previous errors
+        this.errors = []
+        this.invalidInputs = []
+
+        // validate fields
+        if (!this.user.isVolunteer && !this.user.highschool) {
+          this.errors.push('Please tell us what high school you go to.')
+          this.invalidInputs.push('highschool')
+        }
+        if (this.user.isVolunteer) {
+          if (!this.user.phone || !phoneValidation.validatePhoneNumber(this.user.phone)) {
+            this.errors.push('Please enter a valid U. S. phone number.')
+            this.invalidInputs.push('phone')
+          }
+          if (!this.user.college) {
+            this.errors.push('Please tell us what college you go to.')
+            this.invalidInputs.push('college')
+          }
+          if (!this.user.favoriteAcademicSubject) {
+            this.errors.push('Please tell us your favorite academic subject.')
+            this.invalidInputs.push('favoriteAcademicSubject')
+          }
+        }
+
+        if (!this.errors.length) {
+          UserService.setProfile(this, this.user)
+          this.editBtnMsg = 'Edit Profile'
+          this.activeEdit = false
+        }
       } else {
         this.editBtnMsg = 'Save Profile'
         this.activeEdit = true
@@ -373,6 +413,10 @@ ul {
 .form-control {
   border-bottom: 3px solid #16d2aa;
   margin-bottom: 10px;
+
+  &.invalid {
+    border-bottom: 3px solid #bf0000;
+  }
 }
 
 .form-control:focus {
@@ -441,7 +485,13 @@ ul {
   background-color: #f7aef8;
 }
 
+.errors-heading {
+  color: #bf0000
+}
 
+.errors-list {
+  color: #bf0000
+}
 
 @media screen and (max-width: 488px) {
   .header {
