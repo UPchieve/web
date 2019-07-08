@@ -30,11 +30,11 @@
 <script>
 import Vue from 'vue'
 
-import UserService from '../../services/UserService'
-import StudentQuestionService from '../../services/StudentQuestionService'
+import UserService from 'src/services/UserService'
+import StudentQuestionService from 'src/services/StudentQuestionService'
 
-import BtnOptions from '../ui/BtnOptions'
-import Btn from '../ui/Btn'
+import BtnOptions from './BtnOptions'
+import Btn from './Btn'
 
 function isValid () {
   const valid = document.getElementById('message').value !== ''

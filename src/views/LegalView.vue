@@ -625,9 +625,9 @@
 <script>
 import UserService from 'src/services/UserService'
 
-import FullTextTemplate from 'src/components/layout/FullTextTemplate'
-import Accordion from 'src/components/ui/Accordion'
-import AccordionItem from 'src/components/ui/AccordionItem'
+import FullTextTemplate from 'src/components/FullTextTemplate'
+import Accordion from 'src/components/Accordion'
+import AccordionItem from 'src/components/AccordionItem'
 
 export default {
   components: {

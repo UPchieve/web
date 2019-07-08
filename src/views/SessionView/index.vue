@@ -29,7 +29,7 @@ import UserService from 'src/services/UserService'
 import SessionHeader from './SessionHeader'
 import Whiteboard from './Whiteboard'
 import SessionChat from './SessionChat'
-import Modal from 'src/components/ui/Modal'
+import Modal from 'src/components/Modal'
 
 export default {
   name: "session-view",

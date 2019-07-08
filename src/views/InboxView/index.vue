@@ -13,7 +13,7 @@
 import StudentQuestionService from 'src/services/StudentQuestionService'
 import UserService from 'src/services/UserService'
 
-import ContentHeader from 'src/components/layout/ContentHeader'
+import ContentHeader from 'src/components/ContentHeader'
 import HelpRequests from './HelpRequests'
 
 export default {

@@ -21,9 +21,9 @@
 <script>
 import UserService from 'src/services/UserService'
 
-import BasicTemplate from 'src/components/layout/BasicTemplate'
-import QuestionAnswerForm from 'src/components/form/QuestionAnswerForm'
-import Modal from 'src/components/ui/Modal'
+import BasicTemplate from 'src/components/BasicTemplate'
+import QuestionAnswerForm from 'src/components/QuestionAnswerForm'
+import Modal from 'src/components/Modal'
 
 export default {
   components: {
