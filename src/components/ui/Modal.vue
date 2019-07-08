@@ -20,8 +20,8 @@
 </template>
 
 <script>
-import BtnOptions from '../ui/BtnOptions'
-import Btn from '../ui/Btn'
+import BtnOptions from './BtnOptions'
+import Btn from './Btn'
 
 export default {
   components: {
