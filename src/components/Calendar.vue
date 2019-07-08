@@ -230,8 +230,8 @@ export default {
         this.convertAvailability(this.availability, offset)
       )
 
-      //analytics: tracking how many hours each volunteer is willing to tutor
-      AnalyticsService.updateIdentify(this.user, this.convertAvailability(this.availability, offset))
+      //analytics: tracking whether a user has updated their availability
+      AnalyticsService.trackNoProperties('updated availability')
     }
   }
 }

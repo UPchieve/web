@@ -1,13 +1,19 @@
 import UserService from './UserService'
 
 export default {
-  //for tracking only when events happen, not tracking any properties
+  // for tracking only when events happen, not tracking any properties
   trackNoProperties (name) {
     window.analytics.track(name)
   },
 
-  /*identifying a user - should be used when new user is created, 
-  user is logged in, and when user info is updated*/
+  /* identifying a user - treats this event differently than a track event 
+  because it allows the ability to look at user specific data, and 
+  automatically attributes all following events with this user. 
+  It should be called when a new user is created, when a user is logged in, 
+  and if the parameters about the user that we are tracking are updated (we are
+  not currently tracking any user specific info that can be changed, but if
+  we were to track their school, a new identify call would have to be called
+   when profile is updated) */
   identify (userData) {
     const listPassed = []
     for (var property in userData) {
@@ -19,32 +25,18 @@ export default {
     }
     window.analytics.identify(userData._id, {
       'referred': userData.referred ? userData.referred : 'No',
-      'listOfPassed': listPassed,
-      'is volunteer': userData.isVolunteer ? true : false
+      'list of passed': listPassed ? [] : listPassed,
+      'is volunteer': userData.isVolunteer ? 'volunteer' : 'student'
     })
   },
 
-  //updating identifying information for when a schedule is updated
-  updateIdentify (user, availability) {
-    let counter = 0
-    for (const day in availability) {
-      for (const hour in availability[day]) {
-        if (availability[day][hour]) {
-          counter++
-        }
-      }
-    }
-    window.analytics.identify(user._id, {
-      'number hours selected': counter
-    })
-  },
 
-  //tracking the information from the feedback form
+  // tracking the information from the feedback form
   trackFeedback (feedbackComponent) {
     let aggResponses = []
     let volunteerScore = 0
 
-    //creates an array of an agreggate of all responses and subresponses
+    // creates an array of an agreggate of all responses and subresponses
     for (var response in feedbackComponent.userResponse) {
       if (typeof feedbackComponent.userResponse[response] === 'object') {
         for (var subresponse in feedbackComponent.userResponse[response]) {
@@ -56,54 +48,52 @@ export default {
         aggResponses.push(feedbackComponent.userResponse[response])
       }
     }
-    //adds to volunteer score
+    // adds to volunteer score
     if (feedbackComponent.userType === 'student') {
       volunteerScore = aggResponses.reduce(function(acc, val) {
         return acc + val
       }, 0)
     }
-    //sends information
+    // sends information
     window.analytics.track('feedback', {
       'session id': feedbackComponent.sessionId,
       'user': feedbackComponent.userType,
       'student id': feedbackComponent.studentId,
       'volunteer id': feedbackComponent.volunteerId,
       'volunteer score': volunteerScore
-      //can get answers to specific response using aggResponses
+      // can get answers to specific response using aggResponses
     })
   },
 
-  //tracks when a help session has ended
+  // tracks when a help session has ended
   trackSessionEnded (headerComponent, currentSession) {
-    let volunteerShowed = null
+    let volunteerSessionLength  = null
     let waitTime = null
-    let sessionLength = null
-    let volunteerSessionLength = null
-    let timeSessionEnded = new Date()
-    let timeCreatedAt = new Date(currentSession.createdAt)
+    let volunteerShowed = null
+    const timeSessionEnded = new Date()
+    const timeCreatedAt = new Date(currentSession.createdAt)
     if (currentSession.volunteerJoinedAt) {
       volunteerShowed = new Date(currentSession.volunteerJoinedAt)
       waitTime = ((volunteerShowed - timeCreatedAt)/60000).toFixed(2)
       volunteerSessionLength = ((timeSessionEnded - volunteerShowed)/60000).toFixed(2)
     }
-
-    sessionLength = ((timeSessionEnded - timeCreatedAt)/60000).toFixed(2)
-
+    const sessionLength = ((timeSessionEnded - timeCreatedAt)/60000).toFixed(2)
     window.analytics.track('session ended', {
-      'volunteer session length': volunteerSessionLength,
+      'volunteer session length': (UserService.getUser().isVolunteer) ?
+        volunteerSessionLength: null, //if user is volunteer
       'wait time': waitTime,
       'session length': sessionLength,
       'session topic': currentSession.type,
       'session subtopic': currentSession.subTopic,
       'session id': currentSession.sessionId,
-      'user': UserService.getUser().isVolunteer ? 'volunteer' : 'student',
-      'volunteer show time': volunteerShowed,
-      'volunteer showed?': volunteerShowed ? true : false,
-      'time ended': new Date() //might be slightly off from the session's "endedAt"
+      'user': (UserService.getUser().isVolunteer) ? 'volunteer' : 'student',
+      'volunteer show time': volunteerShowed ? volunteerShowed: null,
+      'did volunteer show': volunteerShowed ? true : false,
+      'time ended': new Date() // might be slightly off from the session's "endedAt"
     })
   },
 
-  //tracks when a help session has started
+  // tracks when a help session has started
   trackSessionStarted (currentSession, topic, subTopic){
     window.analytics.track('session started', {
         'session started date': new Date(),
