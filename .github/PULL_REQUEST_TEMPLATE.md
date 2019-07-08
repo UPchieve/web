@@ -18,5 +18,5 @@ Developer self-review checklist
 - [ ] No warnings or errors have been introduced; all known error cases have been handled
 - [ ] Any appropriate documentation (within the code, README.md, docs, etc) has been updated
 - [ ] There are no new spelling/grammar mistakes in the UI, code, or documentation
-- [ ] Branch has been deployed to staging, and all edge cases have been manually tested
+- [ ] Branch has been deployed to staging, and all edge cases have been manually tested on multiple browsers
 - [ ] Task and PR have been updated to show that this is ready for review
