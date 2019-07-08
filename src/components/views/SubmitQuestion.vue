@@ -45,7 +45,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 /*
 * @notes
 * [1] Refactoring candidate: this should be in the global container

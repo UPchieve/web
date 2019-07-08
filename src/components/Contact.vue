@@ -195,7 +195,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .header {
   height: 100px;
   margin: 0;
@@ -338,21 +338,21 @@ export default {
   border-color: #16d2aa;
 }
 .other-input {
-    display: inline-block;
-    padding-left: 10px;
+  display: inline-block;
+  padding-left: 10px;
 }
 
 .text-line {
-    background-color: transparent;
-    color: #2c3e50;
-    outline: none;
-    outline-style: none;
-    border-top: none;
-    border-left: none;
-    border-right: none;
-    border-bottom: solid #16d2aa 1px;
-    display: inline-block;
-    width: 350px;
+  background-color: transparent;
+  color: #2c3e50;
+  outline: none;
+  outline-style: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: solid #16d2aa 1px;
+  display: inline-block;
+  width: 350px;
 }
 
 .submit-button-row {

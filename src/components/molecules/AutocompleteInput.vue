@@ -97,7 +97,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .autocomplete-input {
   position: relative;
   display: block;
@@ -108,7 +108,7 @@ export default {
   height: 34px;
   display: block;
   width: 100%;
-  border: 1px solid var(--c-accent);
+  border: 1px solid $c-accent;
   padding: 6px 12px;
   margin-bottom: 10px;
 }
@@ -143,7 +143,7 @@ export default {
   text-overflow: ellipsis;
 }
 .suggestions__item:hover {
-  background: var(--c-bg);
+  background: $c-bg;
   font-weight: bold;
 }
 </style>

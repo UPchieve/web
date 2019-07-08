@@ -411,7 +411,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .training-quiz {
   display: flex;
   flex-direction: column;

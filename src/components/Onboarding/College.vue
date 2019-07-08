@@ -216,7 +216,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .profile-header {
   height: 100px;
   margin: 0;

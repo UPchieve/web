@@ -29,10 +29,8 @@ export default {
 }
 </script>
 
-<style scoped>
-@media screen and (max-width: 488px) {
-  .verify-inner {
-    padding: 6em 2em 1em !important;
-  }
+<style lang="scss" scoped>
+.verify-inner {
+  padding: 6em 2em 1em;
 }
 </style>

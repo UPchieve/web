@@ -36,15 +36,15 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 /**
  * @todo {1} Refactoring candidate: the v- prefix was added to avoid colliding
  *           with Bootstrap
  */
 .v-btn {
   /*{1}*/
-  background: var(--c-bg);
-  color: var(--c-accent);
+  background: $c-bg;
+  color: $c-accent;
   text-align: center;
   text-transform: uppercase;
   font-weight: 600;
@@ -58,7 +58,7 @@ export default {
 .v-btn:hover {
   /*{1}*/
   color: #fff;
-  background: var(--c-accent);
+  background: $c-accent;
 }
 .v-btn:focus {
   /*{1}*/

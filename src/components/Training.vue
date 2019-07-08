@@ -166,7 +166,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 a {
   color: inherit;
   text-decoration: none;

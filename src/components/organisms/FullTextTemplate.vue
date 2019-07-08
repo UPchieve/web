@@ -29,7 +29,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .full-text-template__content {
   text-align: left;
 }
@@ -61,7 +61,7 @@ section {
 }
 
 .v-panel {
-  background: var(--c-backdrop);
+  background: $c-backdrop;
   padding: 20px;
   margin-bottom: 20px;
 }

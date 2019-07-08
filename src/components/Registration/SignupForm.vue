@@ -37,7 +37,7 @@
         <label id="agreement" for="userAgreement" />
         <div class="agreement-label">
           I have read and accept the
-          <a href="#/legal" target="_blank">user agreement</a>.
+          <a href="/legal" target="_blank">user agreement</a>.
         </div>
       </div>
       <button
@@ -94,7 +94,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .header {
   display: flex;
   justify-content: space-between;

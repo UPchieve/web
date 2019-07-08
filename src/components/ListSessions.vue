@@ -54,8 +54,7 @@ export default {
       if (type && subTopic && _id) {
         const path = `/session/${type}/${subTopic}/${_id}`
         localStorage.setItem('currentSessionPath', path)
-        window.location.hash = `#${path}`
-        window.location.reload()
+        this.$router.push(path)
         console.log(`joining session: ${path}`)
       } else {
         localStorage.removeItem('currentSessionPath')
@@ -119,12 +118,16 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .session-row {
   cursor: pointer;
 }
 
 .session-row td {
   text-align: left;
+}
+
+.session-list {
+    padding:20px;
 }
 </style>

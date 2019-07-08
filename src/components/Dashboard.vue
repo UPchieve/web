@@ -177,13 +177,11 @@ export default {
     rejoinHelpSession () {
       const path = localStorage.getItem('currentSessionPath')
       if (path) {
-        window.location.hash = `#${path}`
-        window.location.reload()
+        this.$router.push(path)
         console.log(`rejoining session: ${path}`)
       } else {
         console.log(`session terminated`)
-        window.location.hash = ''
-        window.location.reload()
+        this.$router.push('/')
       }
     },
     getHelp () {
@@ -220,7 +218,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .header-container {
   height: 50%;
   background-color: #525666;
@@ -285,7 +283,7 @@ h3 {
 }
 
 .col-lg-6 p {
-  padding: 20px 0 0 20px;
+  padding: 20px;
   text-align: center;
 }
 

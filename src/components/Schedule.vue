@@ -18,7 +18,7 @@
 export default {}
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 @media screen and (max-width: 488px) {
   .row {
     padding-top: 0.5em !important;
