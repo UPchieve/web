@@ -4,6 +4,9 @@
       <button class="btn btn-lg btn-primary debug-btn" @click.prevent="debugSentryServer">
         Test Sentry on Server
       </button>
+      <button class="btn btn-lg btn-primary debug-btn" @click.prevent="debugSentryApi">
+        Test Sentry on Server API
+      </button>
       <button class="btn btn-lg btn-primary debug-btn" @click.prevent="debugSentryClient">
         Test Sentry on Client
       </button>
@@ -15,6 +18,9 @@
 </template>
 
 <script>
+import NetworkService from 'src/services/NetworkService'
+import errorFromServer from 'src/services/error-from-server'
+
 export default {
   data () {
     return {
@@ -31,8 +37,26 @@ export default {
         if (response) {
           if (response.status) {
             this.msg = `Server responded with error ${response.status} (${response.statusText})`
+          } else {
+            this.msg = 'Network error'
           }
-          else {
+        } else {
+          this.msg = 'No server response'
+        }
+      })
+    },
+    debugSentryApi () {
+      NetworkService.debugSentryApi(this)
+      .then(response => {
+        this.msg = 'Server API did not throw error'
+      },
+      response => {
+        if (response) {
+          if (response.status) {
+            this.msg = `Server responded with status code ${response.status}, see console for error`
+            console.log(response.data.err)
+            this.$parent.$emit('async-error', errorFromServer(response))
+          } else {
             this.msg = 'Network error'
           }
         } else {

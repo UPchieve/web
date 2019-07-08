@@ -156,5 +156,10 @@ export default {
     return context.$http
       .get(`${API_ROOT}/download/${data}`)
       .then(this._successHandler, this._errorHandler)
+  },
+  debugSentryApi (context) {
+    return context.$http
+      .get(`${API_ROOT}/debug-sentry`)
+      .then(this._successHandler, this._errorHandler)
   }
 }
