@@ -231,49 +231,58 @@ export default {
     }
   },
   methods: {
+    /**
+     * Toggle editing state.
+     * {Case A} if activeEdit === false: enter the editing state by setting activeEdit to true
+     * {Case B} if activeEdit === true: save profile changes & exit the editing state by setting activeEdit to false
+     */
     editProfile () {
-      if (this.activeEdit) {
-        // erase previous errors
-        this.errors = []
-        this.invalidInputs = []
-
-        // validate fields
-        if (!this.user.isVolunteer && !this.user.highschool) {
-          this.errors.push('Please tell us what high school you go to.')
-          this.invalidInputs.push('highschool')
-        }
-        if (this.user.isVolunteer) {
-          if (!this.user.phone || !phoneValidation.validatePhoneNumber(this.user.phone)) {
-            this.errors.push('Please enter a valid U. S. phone number.')
-            this.invalidInputs.push('phone')
-          }
-          if (!this.user.college) {
-            this.errors.push('Please tell us what college you go to.')
-            this.invalidInputs.push('college')
-          }
-          if (!this.user.favoriteAcademicSubject) {
-            this.errors.push('Please tell us your favorite academic subject.')
-            this.invalidInputs.push('favoriteAcademicSubject')
-          }
-        }
-
-        if (!this.errors.length) {
-          if (!this.msg) {
-            var unwatch = this.$watch('msg', function (newMsg, oldMsg) {
-              if (newMsg === 'Set!') {
-                this.editBtnMsg = 'Edit Profile'
-                this.activeEdit = false
-                this.msg = null
-                unwatch()
-              }
-            })
-          }
-          this.user.phone = phoneValidation.convertPhoneNumber(this.user.phone)
-          UserService.setProfile(this, this.user)
-        }
-      } else {
+      // {Case A} Enter the editing state, then early exit
+      if (!this.activeEdit) {
         this.editBtnMsg = 'Save Profile'
         this.activeEdit = true
+        return
+      }
+
+      // {Case B} The remainder of this function saves new changes and exits the editing state
+
+      // Start by erasing previous errors
+      this.errors = []
+      this.invalidInputs = []
+
+      // Validate fields
+      if (!this.user.isVolunteer && !this.user.highschool) {
+        this.errors.push('Please tell us what high school you go to.')
+        this.invalidInputs.push('highschool')
+      }
+      if (this.user.isVolunteer) {
+        if (!this.user.phone || !phoneValidation.validatePhoneNumber(this.user.phone)) {
+          this.errors.push('Please enter a valid U. S. phone number.')
+          this.invalidInputs.push('phone')
+        }
+        if (!this.user.college) {
+          this.errors.push('Please tell us what college you go to.')
+          this.invalidInputs.push('college')
+        }
+        if (!this.user.favoriteAcademicSubject) {
+          this.errors.push('Please tell us your favorite academic subject.')
+          this.invalidInputs.push('favoriteAcademicSubject')
+        }
+      }
+
+      if (!this.errors.length) {
+        if (!this.msg) {
+          var unwatch = this.$watch('msg', function (newMsg, oldMsg) {
+            if (newMsg === 'Set!') {
+              this.editBtnMsg = 'Edit Profile'
+              this.activeEdit = false
+              this.msg = null
+              unwatch()
+            }
+          })
+        }
+        this.user.phone = phoneValidation.convertPhoneNumber(this.user.phone)
+        UserService.setProfile(this, this.user)
       }
     }
   }
