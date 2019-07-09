@@ -51,13 +51,13 @@
           <div v-if="user.isVolunteer">
             <div id="phone" class="container-section">
               <div class="prompt">Your Phone Number</div>
-              <div v-show="!activeEdit" class="answer">{{ user.phone }}</div>
+              <div v-show="!activeEdit" class="answer">{{ user.phonePretty }}</div>
               <div v-show="!user.phone && !activeEdit" class="answer">
                 (None given)
               </div>
               <input
                 v-show="activeEdit"
-                v-model="user.phone"
+                v-model="user.phonePretty"
                 type="text"
                 class="form-control"
                 :class="{'invalid': invalidInputs.indexOf('phone') > -1}"
