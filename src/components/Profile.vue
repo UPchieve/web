@@ -254,7 +254,7 @@ export default {
       if (this.user.isVolunteer) {
 		// volunteers must provide a phone number, so display error message and
 	    // mark field invalid
-        if (!this.user.phone || !phoneValidation.validatePhoneNumber(this.user.phone)) {
+        if (!this.user.phonePretty || !phoneValidation.validatePhoneNumber(this.user.phonePretty)) {
           this.errors.push('Please enter a valid U. S. phone number.')
           this.invalidInputs.push('phone')
 		}
