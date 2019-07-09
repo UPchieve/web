@@ -41,7 +41,7 @@ export default {
 }
 
 
-@media screen and (max-width: 488px) {
+@media screen and (max-width: 700px) {
   .background {
     margin-left: 0em !important;
     padding-left: 0em !important;

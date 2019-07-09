@@ -316,7 +316,7 @@ a {
 }
 
 
- @media screen and (max-width: 488px) {
+ @media screen and (max-width: 700px) {
   .header {
     padding: 1em 1em 1em 3em !important;
   }

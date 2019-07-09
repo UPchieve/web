@@ -1,21 +1,32 @@
 <template>
-  <div class="logout background">
-    <div class="form-signout">
-      <h1>You're logged out!</h1>
-      <div class="button-container">
-        <router-link to="/login" class="btn login">LOGIN</router-link>
-        <router-link
-          to="/feedback"
-          class="btn btn-lg btn-primary btn-block feedback"
-          >GIVE FEEDBACK</router-link
-        >
+  <form-page-template>
+    <div class="uc-form">
+      <div class="uc-form-body">
+        <div class="title">You're logged out!</div>
+
+        <router-link to="/login" class="uc-form-button" tag="button">
+          Login
+        </router-link>
+
+        <router-link to="/feedback" class="uc-form-button" tag="button">
+          Give Feedback
+        </router-link>
       </div>
+
+      <form-footer />
     </div>
-  </div>
+  </form-page-template>
 </template>
 
 <script>
+import FormPageTemplate from 'src/components/FormPageTemplate'
+import FormFooter from 'src/components/FormFooter'
+
 export default {
+  components: {
+    FormPageTemplate,
+    FormFooter
+  },
   data () {
     return {
       mainWebsiteUrl: process.env.MAIN_WEBSITE_URL
@@ -25,79 +36,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.logout {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.col-xs-12.view-container {
-  padding-left: 0;
-  padding-right: 0;
-  z-index: 1;
-}
-
-h1 {
-  color: #000;
+.title {
+  color: black;
   font-size: 24px;
   font-weight: 600;
-  margin: 100px 0px;
-}
-
-.background {
-  display: flex;
-  background-image: url('../assets/onboarding_background.png');
-  background-size: cover;
-  height: 100%;
-  font-size: 16px;
-  margin-left: -300px;
-  position: relative;
-  z-index: 2;
-}
-
-.form-signout {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 500px;
-  height: 500px;
-  margin: auto;
-  background-color: white;
-  padding: 0px 75px;
-}
-
-.btn {
-  background-color: #f6f6f6;
-  border: none;
-  font-weight: 600;
-  color: #16d2aa;
-  height: 40px;
-  border-radius: 20px;
-  font-size: 12px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 30px;
-}
-
-.btn:hover,
-.btn:active,
-.btn.feedback:active {
-  color: white;
-  background-color: #16d2aa;
-}
-
-
-
-@media screen and (max-width: 488px) {
-  .form-signout {
-    width: 88% !important;
-    height: auto !important;
-  }
-
-  .form-signout h1 {
-    margin: 2.5em 0em !important;
-  }
+  margin: 50px 0px;
+  text-align: center;
 }
 </style>
