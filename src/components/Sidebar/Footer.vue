@@ -97,13 +97,23 @@ a.logout {
   cursor: pointer;
 }
 
-.icon::before {
-  content: '';
-  width: 20px;
-  height: 20px;
-  margin-right: 10px;
-  margin-left: 20px;
-  background-repeat: no-repeat;
+.icon {
+  &::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    margin-left: 20px;
+    background-repeat: no-repeat;
+  }
+
+  @media screen and (max-width: 488px) {
+    margin: 0;
+
+    &::before {
+      margin-left: 15px;
+    }
+  }
 }
 
 .contact.icon::before {
