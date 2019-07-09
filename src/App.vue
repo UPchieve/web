@@ -33,7 +33,7 @@ import './scss/main.scss'
 import Sidebar from './components/Sidebar'
 import AuthService from './services/AuthService'
 
-const MOBILE_MODE_WIDTH = 488
+const MOBILE_MODE_WIDTH = 700
 
 /**
  * @todo Examine this, huge code smell, refactoring might be needed
@@ -131,7 +131,7 @@ body,
 
 
 
-@media screen and (max-width: 488px) {
+@media screen and (max-width: 700px) {
   .toggleMenu.forMobileView {
     display: block !important;
     position: absolute !important;

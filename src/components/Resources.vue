@@ -217,7 +217,7 @@ li {
 
 
 
-@media screen and (max-width: 488px) {
+@media screen and (max-width: 700px) {
   .res-header,
   .header {
     font-size: 24px;

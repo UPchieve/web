@@ -107,7 +107,7 @@ a.logout {
     background-repeat: no-repeat;
   }
 
-  @media screen and (max-width: 488px) {
+  @media screen and (max-width: 700px) {
     margin: 0;
 
     &::before {
