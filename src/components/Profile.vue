@@ -249,6 +249,7 @@ export default {
       // Start by erasing previous errors
       this.errors = []
       this.invalidInputs = []
+      this.msg = null
 
       // Validate fields
       if (this.user.isVolunteer) {
@@ -278,21 +279,13 @@ export default {
 
       if (!this.errors.length) {
         // form fields valid, so set profile
-        if (!this.msg) {
-		  // wait for msg to change before coming out of edit mode
-		  // todo refactor UserService.setProfile to return a promise
-		  // rather than catching errors and setting the msg variable
-		  // on the component
-          var unwatch = this.$watch('msg', function (newMsg, oldMsg) {
-            if (newMsg === 'Set!') {
-              this.editBtnMsg = 'Edit Profile'
-              this.activeEdit = false
-              this.msg = null
-              unwatch()
-            }
-          })
-        }
+        // wait for save to succeed before coming out of edit mode
         UserService.setProfile(this, this.user)
+        .then(res => {
+          this.editBtnMsg = 'Edit Profile'
+          this.activeEdit = false
+          this.msg = null
+        })
       }
     }
   }
