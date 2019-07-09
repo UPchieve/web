@@ -267,7 +267,8 @@ export default {
                 unwatch()
               }
             })
-          }
+		  }
+		  this.user.phone = phoneValidation.convertPhoneNumber(this.user.phone)
           UserService.setProfile(this, this.user)
         }
       } else {
