@@ -16,8 +16,10 @@ $default-font: 'Work Sans', Helvetica, Arial, sans-serif;
 
 // Maps
 $breakpoint-map: (
+  'tiny': 414px,
   'small': 576px,
   'medium': 768px,
   'large': 992px,
-  'huge': 1200px
+  'huge': 1200px,
+  'massive': 1800px
 );

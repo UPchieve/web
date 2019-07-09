@@ -98,7 +98,7 @@ p.aboutText {
 
 
 
-@media screen and (max-width: 488px) {
+@media screen and (max-width: 700px) {
   .navbar {
     height: 100vh !important;
     padding: 1.5em !important;

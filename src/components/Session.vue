@@ -157,7 +157,7 @@ export default {
 }
 
 
-@media screen and (max-width: 488px) {
+@media screen and (max-width: 700px) {
   .whiteboard-container {
     width: 100% !important;
     height: 65vh !important;
