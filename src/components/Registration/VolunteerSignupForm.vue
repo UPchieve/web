@@ -181,7 +181,7 @@ import AuthService from 'src/services/AuthService'
 import RegistrationService from 'src/services/RegistrationService'
 import UserService from '../../services/UserService'
 
-import phoneValidation from 'src/phone-validation'
+import phoneValidation from 'src/utils/phone-validation'
 
 export default {
   data () {
