@@ -20,6 +20,14 @@ export default {}
   min-height: 100vh;
 
   padding: 20px;
+
+  // Cancel out the logo's height to maintain vertical centering of the main form.
+  // With short enough viewports, this isn't helpful, so only above 700px.
+  @media screen and (min-height: 700px) {
+    & > *:last-child {
+      margin-bottom: 85px;
+    }
+  }
 }
 
 .logo {

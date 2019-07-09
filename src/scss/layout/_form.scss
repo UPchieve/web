@@ -54,10 +54,14 @@
   border-radius: 0;
   box-shadow: none;
 
+  box-sizing: content-box;
+  padding: 6px 12px;
+
   height: 30px;
 
   &:focus {
-    border-bottom: 3px solid lighten($c-accent, 10%);
+    outline: none;
+    border-bottom: 3px solid darken($c-accent, 15%);
   }
 
   &--invalid {
