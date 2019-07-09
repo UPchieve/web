@@ -54,7 +54,7 @@ export default {
   display: flex;
   justify-content: center;
 
-  & > * {
+  > * {
     flex-grow: 1;
   }
 }
