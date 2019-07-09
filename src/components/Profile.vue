@@ -251,27 +251,38 @@ export default {
       this.invalidInputs = []
 
       // Validate fields
-      if (!this.user.isVolunteer && !this.user.highschool) {
-        this.errors.push('Please tell us what high school you go to.')
-        this.invalidInputs.push('highschool')
-      }
       if (this.user.isVolunteer) {
+		// volunteers must provide a phone number, so display error message and
+	    // mark field invalid
         if (!this.user.phone || !phoneValidation.validatePhoneNumber(this.user.phone)) {
           this.errors.push('Please enter a valid U. S. phone number.')
           this.invalidInputs.push('phone')
-        }
+		}
+		// a college name is required
         if (!this.user.college) {
           this.errors.push('Please tell us what college you go to.')
           this.invalidInputs.push('college')
-        }
+		}
+		// a favorite academic subject is required
         if (!this.user.favoriteAcademicSubject) {
           this.errors.push('Please tell us your favorite academic subject.')
           this.invalidInputs.push('favoriteAcademicSubject')
         }
-      }
+      } else {
+        // students must provide the name of their high school
+        if (!this.user.highschool) {
+          this.errors.push('Please tell us what high school you go to.')
+          this.invalidInputs.push('highschool')
+        }
+	  }
 
       if (!this.errors.length) {
+        // form fields valid, so set profile
         if (!this.msg) {
+		  // wait for msg to change before coming out of edit mode
+		  // todo refactor UserService.setProfile to return a promise
+		  // rather than catching errors and setting the msg variable
+		  // on the component
           var unwatch = this.$watch('msg', function (newMsg, oldMsg) {
             if (newMsg === 'Set!') {
               this.editBtnMsg = 'Edit Profile'
