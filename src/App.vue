@@ -179,13 +179,12 @@ body,
     margin-left: -100% !important;
     width: 80vw !important;
     z-index: 20 !important;
-    transition: all 0.3s linear;
+    transition: margin-left 0.3s linear;
     /* display: none !important; */
   }
 
   .nav-container.forMobileMode.active {
      margin-left: 0% !important;
-     transition: all 0.3s linear;
   }
 
   .col-xs-12.view-container {
