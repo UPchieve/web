@@ -309,8 +309,8 @@ export default {
           UserService.setProfile(this, user)
           
           //analytics: tracking when a user has signed up
-          AnalyticsService.identify(user)
-          AnalyticsService.trackNoProperties('signed up')
+          AnalyticsService.identify(user, user.fakeUser)
+          AnalyticsService.trackNoProperties('signed up', user.fakeUser)
 
           this.step = 'success-message'
         })

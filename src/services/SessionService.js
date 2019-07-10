@@ -30,7 +30,7 @@ export default {
       console.log(`ended session: ${sessionId}`)
 
       //analytics: track when a help session has ended
-      AnalyticsService.trackSessionEnded(this, data)
+      AnalyticsService.trackSessionEnded(this, data, UserService.getUser().fakeUser)
 
       this.currentSession.sessionId = null
       this.currentSession.data = {}
@@ -61,7 +61,7 @@ export default {
         router.replace('/')
       }
       //analytics: track when a session has started
-      AnalyticsService.trackSessionStarted(this.currentSession, sessionType, sessionSubTopic)
+      AnalyticsService.trackSessionStarted(this.currentSession, sessionType, sessionSubTopic, UserService.getUser().fakeUser)
 
       return sessionId
     })
