@@ -25,10 +25,13 @@ export default {
     localStorage.removeItem('currentSessionPath')
 
     return NetworkService.endSession(context, { sessionId }).then(res => {
-      const data = res.data || {}
-      const { sessionId } = data
-
+      const { sessionId, data } = res.data || {}
+      
       console.log(`ended session: ${sessionId}`)
+
+      //analytics: track when a help session has ended
+      AnalyticsService.trackSessionEnded(this, data)
+
       this.currentSession.sessionId = null
       this.currentSession.data = {}
 
@@ -100,7 +103,7 @@ export default {
       if (type && subTopic && sessionId) {
         this.currentSession.sessionId = sessionId
         this.currentSession.data = data
-
+        
         const path = `/session/${type}/${subTopic}/${sessionId}`
         localStorage.setItem('currentSessionPath', path)
       }

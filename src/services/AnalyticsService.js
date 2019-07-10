@@ -25,7 +25,7 @@ export default {
     }
     window.analytics.identify(userData._id, {
       'referred': userData.referred ? userData.referred : 'No',
-      'list of passed': listPassed ? [] : listPassed,
+      'list of passed': listPassed ? listPassed : [],
       'is volunteer': userData.isVolunteer ? 'volunteer' : 'student'
     })
   },
@@ -67,6 +67,7 @@ export default {
 
   // tracks when a help session has ended
   trackSessionEnded (headerComponent, currentSession) {
+    //calculating time-related session info (session length, wait time, etc.) 
     let volunteerSessionLength  = null
     let waitTime = null
     let volunteerShowed = null
@@ -78,9 +79,29 @@ export default {
       volunteerSessionLength = ((timeSessionEnded - volunteerShowed)/60000).toFixed(2)
     }
     const sessionLength = ((timeSessionEnded - timeCreatedAt)/60000).toFixed(2)
+
+    //getting if messages were exchanged
+      let studentMessages = 0
+      let volunteerMessages = 0
+      let successfulSession = false
+      
+      //loops through messages, and counts how many were by student vs. volunteer
+      for(var message in currentSession.messages){
+          if ((currentSession.messages[message]).user === currentSession.student._id) {
+            studentMessages++
+          }
+          else if(currentSession.volunteer && ((currentSession.messages[message]).user === currentSession.volunteer._id)){
+            volunteerMessages++
+          }
+      }
+      //current criteria for a successful session
+      if(studentMessages > 0 && volunteerMessages > 0) {
+          successfulSession = true
+      }
+
     window.analytics.track('session ended', {
-      'volunteer session length': (UserService.getUser().isVolunteer) ?
-        volunteerSessionLength: null, //if user is volunteer
+      //if volunteer joined then report volunteerSessionLength otherwise report null
+      'volunteer session length': volunteerSessionLength ? volunteerSessionLength: null, 
       'wait time': waitTime,
       'session length': sessionLength,
       'session topic': currentSession.type,
@@ -89,7 +110,8 @@ export default {
       'user': (UserService.getUser().isVolunteer) ? 'volunteer' : 'student',
       'volunteer show time': volunteerShowed ? volunteerShowed: null,
       'did volunteer show': volunteerShowed ? true : false,
-      'time ended': new Date() // might be slightly off from the session's "endedAt"
+      'time ended': new Date(), // might be slightly off from the session's "endedAt"
+      'successful session': successfulSession
     })
   },
 
