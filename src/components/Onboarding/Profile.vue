@@ -199,7 +199,7 @@
         <div class="row">
           <div class="col-sm-12">
             <input
-              v-model="user.phone"
+              v-model="user.phonePretty"
               type="text"
               class="form-control"
               required
@@ -344,7 +344,7 @@ export default {
         this.error = 'Please select a gender'
       } else if (!this.user.race.length) {
         this.error = 'Please select a race'
-      } else if (!this.user.phone || this.user.phone === '') {
+      } else if (!this.user.phonePretty || this.user.phonePretty === '') {
         this.error = 'Please provide your phone number'
       } else if (!this.user.college || this.user.college === '') {
         this.error = 'Please provide your college'
@@ -500,7 +500,7 @@ button[type='submit']:active {
 
 
 
-@media screen and (max-width: 488px) {
+@media screen and (max-width: 700px) {
   .header {
     height: auto !important;
   }

@@ -421,7 +421,7 @@ export default {
 
 
 
-@media screen and (max-width: 488px) {
+@media screen and (max-width: 700px) {
   .mobileRemove {
     display: none !important;
   }

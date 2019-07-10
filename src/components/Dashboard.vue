@@ -177,13 +177,11 @@ export default {
     rejoinHelpSession () {
       const path = localStorage.getItem('currentSessionPath')
       if (path) {
-        window.location.hash = `#${path}`
-        window.location.reload()
+        this.$router.push(path)
         console.log(`rejoining session: ${path}`)
       } else {
         console.log(`session terminated`)
-        window.location.hash = ''
-        window.location.reload()
+        this.$router.push('/')
       }
     },
     getHelp () {
@@ -392,7 +390,7 @@ h3 {
 }
 
 
-@media screen and (max-width: 488px) {
+@media screen and (max-width: 700px) {
   .dashboard-body.row {
     display: block !important;
     width: 100% !important;

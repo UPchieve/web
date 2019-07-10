@@ -1,177 +1,165 @@
 <template>
-  <form class="form-signup" @submit.prevent="submit()">
-    <div v-if="step == 'step-1'">
-      <div v-if="errors.length" class="step-1-errors" colspan="2">
-        <h5>Please correct the following problems:</h5>
-        <ul>
-          <li v-for="error in errors">{{ error }}</li>
-        </ul>
-      </div>
-      <div class="step-1-text" colspan="2">
-        <b>Step 1 of 2: Choose your log-in details </b>
-      </div>
-      <label for="inputEmail">What's your email?</label>
+  <form v-if="step == 'step-1'" class="uc-form-body" @submit.prevent="submit()">
+    <div v-if="errors.length" class="step-errors">
+      <h5>Please correct the following problems:</h5>
+      <ul>
+        <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
+      </ul>
+    </div>
+
+    <div class="step-title">Step 1 of 2: Choose your log-in details</div>
+
+    <div class="uc-column">
+      <label for="inputEmail" class="uc-form-label">What's your email?</label>
       <input
-        type="email"
         id="inputEmail"
-        class="form-control"
-        v-bind:class="{'form-control-invalid': invalidInputs.indexOf('inputEmail') > -1}"
+        type="email"
+        class="uc-form-input"
+        v-bind:class="{'uc-form-input--invalid': invalidInputs.indexOf('inputEmail') > -1}"
+        v-model="credentials.email"
         required
         autofocus
-        v-model="credentials.email"
       />
-      <div class="description">
+      <p class="uc-form-subtext">
         We will only use your email to contact you about your account. See our
         Privacy Policy for more info.
-      </div>
-      <label for="inputPassword">Create a password.</label>
+      </p>
+    </div>
+
+    <div class="uc-column">
+      <label for="inputPassword" class="uc-form-label">
+        Create a password.
+      </label>
       <input
-        type="password"
         id="inputPassword"
-        class="form-control"
-        v-bind:class="{'form-control-invalid': invalidInputs.indexOf('inputPassword') > -1}"
-        required
+        type="password"
+        class="uc-form-input"
+        v-bind:class="{'uc-form-input--invalid': invalidInputs.indexOf('inputPassword') > -1}"
         v-model="credentials.password"
+        required
       />
-      <p class="password-guidelines">
+      <p class="uc-form-subtext">
         Keep your account safe by choosing a password with one number, one
         uppercase letter, and one lowercase letter.
       </p>
-      <button
-        class="btn btn-lg btn-primary btn-block"
-        type="submit"
-        @click.prevent="nextPage()"
-      >
-        CONTINUE
-      </button>
-      {{ msg }}
     </div>
-    <div v-else-if="step == 'step-2'">
-      <div v-if="errors.length" class="step-2-errors" colspan="2">
-        <h5>Please correct the following problems:</h5>
-        <ul>
-          <li v-for="error in errors">{{ error }}</li>
-        </ul>
-      </div>
-      <table class="step-2-table">
-        <tr>
-          <td class="table-entry" colspan="2">
-            <b>Step 2 of 2: Tell us about yourself! </b>
-          </td>
-        </tr>
-        <tr class="question-row">
-          <td class="table-entry" colspan="2">What's your name?</td>
-        </tr>
-        <tr>
-          <td style="padding-right: 15px;">
-            <input
-              class="form-control"
-              v-bind:class="{'form-control-invalid': invalidInputs.indexOf('firstName') > -1}"
-              required
-              autofocus
-              v-model="profile.firstName"
-            />
-          </td>
-          <td style="padding-left: 15px;">
-            <input
-              class="form-control"
-              v-bind:class="{'form-control-invalid': invalidInputs.indexOf('lastName') > -1}"
-              required
-              autofocus
-              v-model="profile.lastName"
-            />
-          </td>
-        </tr>
-        <tr>
-          <td class="table-entry">
-            <div class="description" style="padding-bottom: 0px;">
-              First Name
-            </div>
-          </td>
-          <td class="table-entry">
-            <div class="description" style="padding-bottom: 0px;">
-              Last Name
-            </div>
-          </td>
-        </tr>
-        <tr class="question-row">
-          <td class="table-entry" colspan="2">What college do you go to?</td>
-        </tr>
-        <tr>
-          <td colspan="2">
-            <input
-              class="form-control"
-              v-bind:class="{'form-control-invalid': invalidInputs.indexOf('college') > -1}"
-              required
-              autofocus
-              v-model="profile.college"
-            />
-          </td>
-        </tr>
-        <tr class="question-row">
-          <td class="table-entry" colspan="2">What's your phone number?</td>
-        </tr>
-        <tr>
-          <td colspan="2">
-            <input
-              class="form-control"
-              v-bind:class="{'form-control-invalid': invalidInputs.indexOf('phone') > -1}"
-              required
-              autofocus
-              v-model="profile.phone"
-            />
-          </td>
-        </tr>
-        <tr class="question-row">
-          <td class="table-entry" colspan="2">
-            What’s your favorite academic subject?
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">
-            <input
-              class="form-control"
-              v-bind:class="{'form-control-invalid': invalidInputs.indexOf('favoriteAcademicSubject') > -1}"
-              required
-              autofocus
-              v-model="profile.favoriteAcademicSubject"
-            />
-          </td>
-        </tr>
-        <tr>
-          <div class="agreement-box">
-            <input
-              type="checkbox"
-              id="userAgreement"
-              v-model="credentials.terms"
-              required
-            />
-            <label id="agreement" for="userAgreement"></label>
-            <div class="agreement-label">
-              I have read and accept the
-              <a href="#/legal" target="_blank">user agreement</a>.
-            </div>
-          </div>
-        </tr>
-      </table>
 
-      <button
-        class="btn btn-lg btn-primary btn-block"
-        type="submit"
-        @click="checkInputs($event)"
-      >
-        SIGN UP
-      </button>
-      {{ msg }}
-    </div>
-    <div v-else-if="step == 'success-message'">
-      <div class="step-1-text" colspan="2">
-        You've been sent a verification email! Check your email for a link to
-        confirm your account.
-      </div>
-    </div>
-    <div v-else>Unexpected Error</div>
+    <button
+      class="uc-form-button"
+      type="submit"
+      @click.prevent="nextPage()"
+    >
+      Continue
+    </button>
+
+    <div v-if="msg !== ''">{{ msg }}</div>
   </form>
+
+  <form v-else-if="step == 'step-2'" class="uc-form-body" @submit.prevent="submit()">
+    <div v-if="errors.length" class="step-errors">
+      <h5>Please correct the following problems:</h5>
+      <ul>
+        <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
+      </ul>
+    </div>
+
+    <div class="step-title">Step 2 of 2: Tell us about yourself!</div>
+
+    <div class="uc-column">
+      <label for="firstName" class="uc-form-label">First Name</label>
+      <input
+        id="firstName"
+        type="text"
+        class="uc-form-input"
+        v-bind:class="{'uc-form-input--invalid': invalidInputs.indexOf('firstName') > -1}"
+        v-model="profile.firstName"
+        required
+        autofocus
+      />
+    </div>
+
+    <div class="uc-column">
+      <label for="lastName" class="uc-form-label">Last Name</label>
+      <input
+        id="lastName"
+        type="text"
+        class="uc-form-input"
+        v-bind:class="{'uc-form-input--invalid': invalidInputs.indexOf('lastName') > -1}"
+        v-model="profile.lastName"
+        required
+      />
+    </div>
+
+    <div class="uc-column">
+      <label for="phoneNumber" class="uc-form-label">Phone Number</label>
+      <input
+        id="phoneNumber"
+        type="tel"
+        class="uc-form-input"
+        v-bind:class="{'uc-form-input--invalid': invalidInputs.indexOf('phone') > -1}"
+        v-model="profile.phone"
+        required
+      />
+    </div>
+
+    <div class="uc-column">
+      <label for="college" class="uc-form-label">
+        What college do you go to?
+      </label>
+      <input
+        id="college"
+        type="text"
+        class="uc-form-input"
+        v-bind:class="{'uc-form-input--invalid': invalidInputs.indexOf('college') > -1}"
+        v-model="profile.college"
+        required
+      />
+    </div>
+
+    <div class="uc-column">
+      <label for="favoriteAcademicSubject" class="uc-form-label">
+        What’s your favorite academic subject?
+      </label>
+      <input
+        id="favoriteAcademicSubject"
+        type="text"
+        class="uc-form-input"
+        v-bind:class="{'uc-form-input--invalid': invalidInputs.indexOf('favoriteAcademicSubject') > -1}"
+        v-model="profile.favoriteAcademicSubject"
+        required
+      />
+    </div>
+    
+    <div class="uc-form-checkbox">
+      <input
+        id="userAgreement"
+        v-model="credentials.terms"
+        type="checkbox"
+        required
+      />
+      <label for="userAgreement">
+        I have read and accept the
+        <a href="/legal" target="_blank">user agreement</a>.
+      </label>
+    </div>
+
+    <button
+      class="uc-form-button"
+      type="submit"
+      @click="checkInputs($event)"
+    >
+      Sign Up
+    </button>
+
+    <!-- <div v-if="msg !== ''">{{ msg }}</div> -->
+  </form>
+
+  <div v-else-if="step == 'success-message'" class="uc-form-body">
+    You've been sent a verification email! Check your email for a link to
+    confirm your account.
+  </div>
+
+  <div v-else class="uc-form-body">Unexpected Error</div>
 </template>
 
 <script>
@@ -187,7 +175,7 @@ var phoneValidation = function() {
     // see http://regexlib.com/REDetails.aspx?regexp_id=58
     // modified to ignore trailing/leading whitespace,
     // and disallow alphanumeric characters
-    re: /^\s*(?<cc>[0-9](?: |-)?)?(?:\(?([0-9]{3})\)?|[0-9]{3})(?: |-)?(?:([0-9]{3})(?: |-)?([0-9]{4}))\s*$/,
+    re: /^\s*([0-9](?: |-)?)?(?:\(?([0-9]{3})\)?|[0-9]{3})(?: |-)?(?:([0-9]{3})(?: |-)?([0-9]{4}))\s*$/,
     validatePhoneNumber: function(v) {
       return this.re.test(v);
     },
@@ -333,193 +321,21 @@ export default {
     }
   }
 }
-
-
 </script>
 
 <style lang="scss" scoped>
-.header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 25px;
-  margin-top: 15px;
+.uc-form-body {
+  @include child-spacing(top, 25px);
 }
 
-.step-1-errors {
+.step-title {
+  font-weight: bold;
   text-align: left;
+}
+
+.step-errors {
+  color: #BF0000;
   font-size: 14px;
-  color: #bf0000;
-}
-
-.step-1-text {
   text-align: left;
-  padding-bottom: 25px;
-}
-.login-link {
-  color: #73737a;
-  font-weight: 600;
-}
-.registration-header {
-  color: #16d2aa;
-  font-weight: 600;
-}
-.description {
-  font-size: 12px;
-  text-align: left;
-  color: #73737a;
-}
-
-#inputEmail {
-  margin-bottom: 6px;
-}
-
-.form-signup {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  max-width: 500px;
-  padding: 0px;
-  margin: auto;
-}
-
-.form-control {
-  border: none;
-  box-shadow: none;
-  border-radius: 0;
-}
-
-.form-signup .form-control:focus {
-  z-index: 2;
-}
-
-label {
-  display: block;
-  text-align: left;
-  font-size: 16px;
-  font-weight: 400;
-  color: #343440;
-}
-.form-control {
-  border-bottom: 3px solid #16d2aa;
-  margin-bottom: 50px;
-}
-.form-control-invalid {
-  border-bottom: 3px solid #bf0000;
-}
-.form-control:last-of-type {
-  margin-bottom: 0;
-}
-
-.password-guidelines {
-  font-size: 12px;
-  font-weight: 300;
-  text-align: left;
-  color: #73737a;
-  margin: 10px auto;
-}
-
-.form-control:focus {
-  border-bottom: 3px solid black;
-  box-shadow: none;
-}
-
-#userAgreement {
-  margin-right: 12px;
-  border: 3px solid #000;
-  display: inline-block;
-}
-
-#agreement {
-  display: inline-block;
-  margin-bottom: 0;
-}
-
-input[type='checkbox'] {
-  visibility: hidden;
-  position: absolute;
-  top: -9999px;
-}
-
-.agreement-box {
-  margin: 25px 0 10px 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.agreement-box label {
-  cursor: pointer;
-  margin-right: 12px;
-  width: 18px;
-  height: 18px;
-  background: #fff;
-  border: 2px solid #343440;
-  border-radius: 2px;
-}
-
-.agreement-box label:after {
-  opacity: 0;
-  content: '';
-  position: absolute;
-  margin: 4px 0 0 3px;
-  width: 8px;
-  height: 5px;
-  background: transparent;
-  border: 3px solid #343440;
-  border-top: none;
-  border-right: none;
-  transform: rotate(-45deg);
-}
-
-.agreement-box input[type='checkbox']:checked + label:after {
-  opacity: 1;
-}
-
-.agreement-label {
-  font-size: 12px;
-  color: #343440;
-  position: absolute;
-  margin-left: 35px;
-}
-
-.agreement-label a {
-  color: #16d2aa;
-}
-
-button[type='submit'] {
-  margin-top: 10px;
-  background-color: #f6f6f6;
-  border: none;
-  font-weight: 600;
-  color: #16d2aa;
-  height: 40px;
-  border-radius: 20px;
-  font-size: 12px;
-  margin-bottom: 10px;
-}
-
-button[type='submit']:hover,
-button[type='submit']:active {
-  color: white;
-  background-color: #16d2aa;
-}
-
-.step-2-errors {
-  text-align: left;
-  font-size: 14px;
-  color: #bf0000;
-}
-
-.step-2-table {
-  width: 100%;
-}
-
-.table-entry {
-  text-align: left;
-}
-
-.question-row {
-  height: 30px;
-  vertical-align: bottom;
 }
 </style>
