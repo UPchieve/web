@@ -33,13 +33,13 @@
 </template>
 
 <script>
-import UserService from 'src/services/UserService'
-import DownloadService from 'src/services/DownloadService'
-import StudentQuestionService from 'src/services/StudentQuestionService'
+import UserService from '@/services/UserService'
+import DownloadService from '@/services/DownloadService'
+import StudentQuestionService from '@/services/StudentQuestionService'
 
-import BasicTemplate from 'src/components/BasicTemplate'
-import QuestionAnswerForm from 'src/components/QuestionAnswerForm'
-import Modal from 'src/components/Modal'
+import BasicTemplate from '@/components/BasicTemplate'
+import QuestionAnswerForm from '@/components/QuestionAnswerForm'
+import Modal from '@/components/Modal'
 
 export default {
   components: {
@@ -136,7 +136,7 @@ export default {
   transform: translate(-50%, -50%);
   width: 24px;
   height: 24px;
-  background-image: url('../assets/attachment_icon.svg');
+  background-image: url('~@/assets/attachment_icon.svg');
 }
 .attachment-list__content {
   padding: 20px;

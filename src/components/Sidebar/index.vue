@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import UserService from 'src/services/UserService'
+import UserService from '@/services/UserService'
 
 import UserNav from './UserNav'
 import ProfileInfo from './ProfileInfo'
@@ -80,7 +80,7 @@ h1::before {
   display: inline-block;
   width: 100px;
   height: 43px;
-  background-image: url('~src/assets/logo-01.svg');
+  background-image: url('~@/assets/logo-01.svg');
   background-size: 100px 43px;
   top: 0;
   left: 0;

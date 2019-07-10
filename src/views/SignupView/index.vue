@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import FormPageTemplate from 'src/components/FormPageTemplate'
+import FormPageTemplate from '@/components/FormPageTemplate'
 import StudentForm from './StudentForm'
 import VolunteerForm from './VolunteerForm'
 

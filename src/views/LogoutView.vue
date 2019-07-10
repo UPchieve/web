@@ -19,8 +19,8 @@
 </template>
 
 <script>
-import FormPageTemplate from 'src/components/FormPageTemplate'
-import FormFooter from 'src/components/FormFooter'
+import FormPageTemplate from '@/components/FormPageTemplate'
+import FormFooter from '@/components/FormFooter'
 
 export default {
   components: {

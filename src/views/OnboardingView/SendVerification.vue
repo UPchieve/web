@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import OnboardingService from 'src/services/OnboardingService'
+import OnboardingService from '@/services/OnboardingService'
 
 export default {
   data () {

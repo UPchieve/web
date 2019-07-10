@@ -25,10 +25,9 @@
 </template>
 
 <script>
-import UserService from 'src/services/UserService'
-import SessionService from 'src/services/SessionService'
-
-import router from '../../router'
+import UserService from '@/services/UserService'
+import SessionService from '@/services/SessionService'
+import router from '@/router'
 
 const STUDENT_AVATAR_URL = 'static/defaultavatar3.png'
 const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png'
@@ -133,7 +132,7 @@ h1 {
 .avatar {
   width: 30px;
   height: 30px;
-  background-image: url('~src/assets/defaultAvatar@2x.png');
+  background-image: url('~@/assets/defaultAvatar@2x.png');
   background-size: cover;
 }
 

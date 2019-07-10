@@ -56,9 +56,9 @@
 import moment from 'moment'
 import _ from 'lodash'
 
-import UserService from 'src/services/UserService'
-import SessionService from 'src/services/SessionService'
-import ModerationService from 'src/services/ModerationService'
+import UserService from '@/services/UserService'
+import SessionService from '@/services/SessionService'
+import ModerationService from '@/services/ModerationService'
 import { setTimeout, clearTimeout } from 'timers';
 
 const STUDENT_AVATAR_URL = 'static/defaultavatar3.png'

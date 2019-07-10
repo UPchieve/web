@@ -28,9 +28,8 @@
 </template>
 
 <script>
-import UserService from 'src/services/UserService'
-
-import router from 'src/router'
+import UserService from '@/services/UserService'
+import router from '@/router'
 
 const openSessions = []
 

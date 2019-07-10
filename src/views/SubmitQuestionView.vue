@@ -19,11 +19,11 @@
 </template>
 
 <script>
-import UserService from 'src/services/UserService'
+import UserService from '@/services/UserService'
 
-import BasicTemplate from 'src/components/BasicTemplate'
-import QuestionAnswerForm from 'src/components/QuestionAnswerForm'
-import Modal from 'src/components/Modal'
+import BasicTemplate from '@/components/BasicTemplate'
+import QuestionAnswerForm from '@/components/QuestionAnswerForm'
+import Modal from '@/components/Modal'
 
 export default {
   components: {

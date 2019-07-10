@@ -82,7 +82,7 @@
  * @todo {1} Solve this bug ('handleUndoOperation' is not defined)
  */
 
-import SessionService from 'src/services/SessionService'
+import SessionService from '@/services/SessionService'
 
 // const CLEAR_BUTTON_ID = 'clearButton';
 // const UNDO_BUTTON_ID = 'undoButton';
@@ -750,26 +750,26 @@ canvas {
 }
 
 #eraseButton {
-  background-image: url('~src/assets/eraser_icon.svg');
+  background-image: url('~@/assets/eraser_icon.svg');
 }
 
 #drawButton {
-  background-image: url('~src/assets/pen_icon.svg');
+  background-image: url('~@/assets/pen_icon.svg');
 }
 
 #undoButton {
-  background-image: url('~src/assets/undo_icon.svg');
+  background-image: url('~@/assets/undo_icon.svg');
 }
 
 #textButton {
-  background-image: url('~src/assets/Aa.png');
+  background-image: url('~@/assets/Aa.png');
 }
 
 #clearButton {
-  background-image: url('~src/assets/clear_icon.svg');
+  background-image: url('~@/assets/clear_icon.svg');
 }
 
 #openColorsButton {
-  background-image: url('~src/assets/color_icon.svg');
+  background-image: url('~@/assets/color_icon.svg');
 }
 </style>

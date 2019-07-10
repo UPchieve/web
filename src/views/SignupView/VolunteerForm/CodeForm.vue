@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import RegistrationService from 'src/services/RegistrationService'
+import RegistrationService from '@/services/RegistrationService'
 
 export default {
   data () {

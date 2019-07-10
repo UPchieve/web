@@ -166,8 +166,8 @@
 <script>
 import validator from 'validator'
 
-import AuthService from 'src/services/AuthService'
-import UserService from 'src/services/UserService'
+import AuthService from '@/services/AuthService'
+import UserService from '@/services/UserService'
 
 export default {
   data () {

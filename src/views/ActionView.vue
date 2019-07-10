@@ -3,9 +3,8 @@
 </template>
 
 <script>
-import OnboardingService from '../services/OnboardingService'
-
-import router from '../router'
+import OnboardingService from '@/services/OnboardingService'
+import router from '@/router'
 
 /**
  * @todo UserService to choose starting onboarding step based on user state

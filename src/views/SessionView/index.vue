@@ -23,13 +23,13 @@
 </template>
 
 <script>
-import SessionService from 'src/services/SessionService'
-import UserService from 'src/services/UserService'
+import SessionService from '@/services/SessionService'
+import UserService from '@/services/UserService'
 
 import SessionHeader from './SessionHeader'
 import Whiteboard from './Whiteboard'
 import SessionChat from './SessionChat'
-import Modal from 'src/components/Modal'
+import Modal from '@/components/Modal'
 
 export default {
   name: "session-view",

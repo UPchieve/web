@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import UserService from '../services/UserService'
+import UserService from '@/services/UserService'
 
 /**
  * @todo {1} Refactor into global filters (https://vuejs.org/v2/guide/filters.html)
@@ -283,15 +283,15 @@ a {
 }
 
 .arrow.down::after {
-  background-image: url('../assets/down_arrow.png');
+  background-image: url('~@/assets/down_arrow.png');
 }
 
 .arrow.up::after {
-  background-image: url('../assets/up_arrow.png');
+  background-image: url('~@/assets/up_arrow.png');
 }
 
 .arrow.right::after {
-  background-image: url('../assets/right_arrow.png');
+  background-image: url('~@/assets/right_arrow.png');
 }
 
 .header {

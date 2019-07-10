@@ -7,7 +7,7 @@
 import CodeForm from './CodeForm'
 import VolunteerSignupForm from './VolunteerSignupForm'
 
-import RegistrationService from 'src/services/RegistrationService'
+import RegistrationService from '@/services/RegistrationService'
 
 export default {
   components: {

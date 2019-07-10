@@ -275,8 +275,8 @@ import $ from 'jquery'
 
 import validator from 'validator'
 
-import UserService from 'src/services/UserService'
-import OnboardingService from 'src/services/OnboardingService'
+import UserService from '@/services/UserService'
+import OnboardingService from '@/services/OnboardingService'
 
 import AutocompleteInput from './AutocompleteInput'
 

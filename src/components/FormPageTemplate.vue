@@ -1,6 +1,6 @@
 <template>
   <div class="FormPageTemplate">
-    <img class="logo" src="~src/assets/p_logo_white.png" />
+    <img class="logo" src="~@/assets/p_logo_white.png" />
     <slot></slot>
   </div>
 </template>
@@ -13,7 +13,7 @@ export default {}
 .FormPageTemplate {
   @include flex-container(column, center, center);
 
-  background: url('~src/assets/onboarding_background.png') no-repeat center fixed;
+  background: url('~@/assets/onboarding_background.png') no-repeat center fixed;
   background-size: cover;
 
   min-width: 300px;

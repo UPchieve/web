@@ -90,8 +90,8 @@
 </template>
 
 <script>
-import UserService from '../services/UserService'
-import NetworkService from '../services/NetworkService'
+import UserService from '@/services/UserService'
+import NetworkService from '@/services/NetworkService'
 
 export default {
   data () {

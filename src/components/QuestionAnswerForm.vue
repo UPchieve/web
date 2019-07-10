@@ -30,8 +30,8 @@
 <script>
 import Vue from 'vue'
 
-import UserService from 'src/services/UserService'
-import StudentQuestionService from 'src/services/StudentQuestionService'
+import UserService from '@/services/UserService'
+import StudentQuestionService from '@/services/StudentQuestionService'
 
 import BtnOptions from './BtnOptions'
 import Btn from './Btn'

@@ -429,7 +429,7 @@
 </template>
 
 <script>
-import UserService from 'src/services/UserService'
+import UserService from '@/services/UserService'
 import $ from 'jquery'
 
 export default {

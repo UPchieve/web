@@ -56,9 +56,9 @@
 </template>
 
 <script>
-import AuthService from 'src/services/AuthService'
-import FormPageTemplate from 'src/components/FormPageTemplate'
-import FormFooter from 'src/components/FormFooter'
+import AuthService from '@/services/AuthService'
+import FormPageTemplate from '@/components/FormPageTemplate'
+import FormFooter from '@/components/FormFooter'
 
 export default {
   components: {
