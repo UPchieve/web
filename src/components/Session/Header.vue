@@ -105,8 +105,6 @@ export default {
           SessionService.endSession(this, sessionId, { skipRoute: true })
           router.replace('/')
         }
-        //analytics: track when a help session has ended
-        AnalyticsService.trackSessionEnded(this, SessionService.currentSession.data)
 
       }
       
