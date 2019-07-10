@@ -101,7 +101,7 @@ export default {
       if (result) {
         if (volunteerId) {
           this.$socket.disconnect()
-          SessionService.endSession(this, sessionId, { skipRoute: true })
+          SessionService.endSession(this, sessionId)
           const url =
             '/feedback/' +
             sessionId +
@@ -117,7 +117,7 @@ export default {
             volunteerId
           router.replace(url)
         } else {
-          SessionService.endSession(this, sessionId, { skipRoute: true })
+          SessionService.endSession(this, sessionId)
           router.replace('/')
         }
       }
