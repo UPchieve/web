@@ -26,7 +26,8 @@ export default {
     window.analytics.identify(userData._id, {
       'referred': userData.referred ? userData.referred : 'No',
       'list of passed': listPassed ? listPassed : [],
-      'is volunteer': userData.isVolunteer ? 'volunteer' : 'student'
+      'is volunteer': userData.isVolunteer ? 'volunteer' : 'student',
+      'is fake user': userData.fakeUser
     })
   },
 
