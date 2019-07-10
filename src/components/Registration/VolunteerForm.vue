@@ -21,21 +21,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.form-register {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 500px;
-  height: 500px;
-  margin: auto;
-  background-color: white;
-  padding: 0px 75px;
-}
-
-
-@media screen and (max-width: 488px) {
-  .form-signup {
-    margin: 0% auto !important;
-  }
-}
 </style>

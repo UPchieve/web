@@ -322,7 +322,7 @@ input[type='checkbox']:checked + label {
 
 
 
-@media screen and (max-width: 488px) {
+@media screen and (max-width: 700px) {
   .btn {
     padding-top: 0em !important;
     padding-bottom: 0em !important;

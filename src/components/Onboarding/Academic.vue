@@ -642,7 +642,7 @@ button[type='back']:active {
 
 
 
-@media screen and (max-width: 488px) {
+@media screen and (max-width: 700px) {
   .header {
     height: auto !important;
   }
