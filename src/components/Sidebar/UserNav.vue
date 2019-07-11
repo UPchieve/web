@@ -55,6 +55,14 @@
         </div>
       </template>
 
+      <template v-if="user.isAdmin">
+        <div v-on:click="$emit('closeMenu')">
+          <router-link to="/admin" tag="li">
+            <a class="resources icon">Admin</a>
+          </router-link>
+        </div>
+      </template>
+
       <div v-on:click="$emit('closeMenu')">
         <router-link to="/profile" tag="li" v-on:click="$emit('toggleMenu')">
           <a class="profile icon">Profile</a>

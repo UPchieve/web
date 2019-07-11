@@ -25,6 +25,8 @@ import Calendar from './components/Calendar'
 import SubmitQuestion from './components/views/SubmitQuestion'
 import Inbox from './components/views/Inbox'
 import SendAnswer from './components/views/SendAnswer'
+import Navigation from './components/Admin/Navigation'
+import Metrics from './components/Admin/Metrics'
 
 import AuthService from './services/AuthService'
 import OnboardingService from './services/OnboardingService'
@@ -53,6 +55,7 @@ const routes = [
   { path: '/resetpassword', name: 'ResetPasswordForm', component: ResetPasswordForm, meta: { hideSidebar: true } },
   { path: '/setpassword/:token', name: 'SetPasswordForm', component: SetPasswordForm, meta: { hideSidebar: true } },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { protected: true } },
+  { path: '/metrics', name: 'Metrics', component: Metrics, meta: {protected: true, bypassOnboarding : true}},
   {
     path: '/session/math/:subTopic/:sessionId?',
     name: 'Session-math',
@@ -71,6 +74,12 @@ const routes = [
     name: 'Resources',
     component: Resources,
     meta: { protected: true, bypassOnboarding: true }
+  },
+  {
+    path: '/admin',
+    name: 'Navigation',
+    component: Navigation,
+    meta: {protected : true, bypassOnboarding: true}
   },
   {
     path: '/edu',
