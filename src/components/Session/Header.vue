@@ -101,6 +101,7 @@ export default {
             volunteerId
           router.replace(url)
         } else {
+          this.$socket.disconnect()
           SessionService.endSession(this, sessionId, { skipRoute: true })
           router.replace('/')
         }
