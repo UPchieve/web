@@ -21,9 +21,9 @@ export default {
   },
 
   endSession (context, sessionId, options = {}) {
-    localStorage.removeItem('currentSessionPath')
-
     return NetworkService.endSession(context, { sessionId }).then(res => {
+	  localStorage.removeItem('currentSessionPath')
+
       const data = res.data || {}
       const { sessionId } = data
 
