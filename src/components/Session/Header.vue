@@ -107,18 +107,20 @@ export default {
       const result = window.confirm('Do you really want to end the session?')
       if (result) {
         if (volunteerId) {
-          this.$socket.disconnect()
           SessionService.endSession(this, sessionId, { skipRoute: true })
-          const url =
-            '/feedback/' +
-            sessionId +
-            '/' +
-            (UserService.getUser().isVolunteer ? 'volunteer' : 'student') +
-            '/' +
-            studentId +
-            '/' +
-            volunteerId
-          router.replace(url)
+          .then(() => {
+            this.$socket.disconnect()
+            const url =
+              '/feedback/' +
+              sessionId +
+              '/' +
+              (UserService.getUser().isVolunteer ? 'volunteer' : 'student') +
+              '/' +
+              studentId +
+              '/' +
+              volunteerId
+            router.replace(url)
+          })
         } else {
           SessionService.endSession(this, sessionId, { skipRoute: true })
           .then(() => {
