@@ -126,6 +126,8 @@ export default {
       }
     },
     tryReconnect() {
+      // socket must be closed before reopening for automatic reconnections
+      // to resume
       this.$socket.close()
       this.$socket.open()
       this.reconnectAttemptMsg = 'Waiting for server response.'
