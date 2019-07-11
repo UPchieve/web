@@ -54,8 +54,8 @@ export default {
     const avatarUrl = // {1}
       user.picture ||
       (user.isVolunteer
-        ? 'static/defaultavatar4.png'
-        : 'static/defaultavatar3.png')
+        ? '/static/defaultavatar4.png'
+        : '/static/defaultavatar3.png')
     return {
       user,
       avatarStyle: {

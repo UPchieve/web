@@ -133,8 +133,8 @@ export default {
     const avatarUrl =
       user.picture ||
       (user.isVolunteer
-        ? 'static/defaultavatar4.png'
-        : 'static/defaultavatar3.png')
+        ? '/static/defaultavatar4.png'
+        : '/static/defaultavatar3.png')
 
     const certifications = {}
     if (user.algebra) {

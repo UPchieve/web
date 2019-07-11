@@ -61,8 +61,8 @@ import SessionService from '@/services/SessionService'
 import ModerationService from '@/services/ModerationService'
 import { setTimeout, clearTimeout } from 'timers';
 
-const STUDENT_AVATAR_URL = 'static/defaultavatar3.png'
-const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png'
+const STUDENT_AVATAR_URL = '/static/defaultavatar3.png'
+const VOLUNTEER_AVATAR_URL = '/static/defaultavatar4.png'
 
 /**
  * @todo {1} Use more descriptive names that comply with the coding standards.

@@ -29,8 +29,8 @@ import UserService from '@/services/UserService'
 import SessionService from '@/services/SessionService'
 import router from '@/router'
 
-const STUDENT_AVATAR_URL = 'static/defaultavatar3.png'
-const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png'
+const STUDENT_AVATAR_URL = '/static/defaultavatar3.png'
+const VOLUNTEER_AVATAR_URL = '/static/defaultavatar4.png'
 
 /**
  * @todo {1} Refactoring candidate: use a modal instead.
