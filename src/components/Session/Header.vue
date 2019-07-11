@@ -1,24 +1,40 @@
 <template>
-  <div :class="{ inactive: !partnerName }" class="session-header">
-    <div class="avatar-info-container">
-      <div :style="partnerAvatar" class="avatar" />
-      <div class="info">
-        <template v-if="partnerName">
-          <span class="volunteer-name">{{ partnerName }}</span>
-        </template>
-        <template v-else-if="currentSession.sessionId">
-          {{ waitingText }}
-        </template>
-        <template v-else>
-          Loading
-        </template>
+  <div>
+    <div :class="{ inactive: !partnerName }" class="session-header">
+      <div class="main-session-header">
+        <div class="avatar-info-container">
+          <div :style="partnerAvatar" class="avatar" />
+          <div class="info">
+            <template v-if="partnerName">
+              <span class="volunteer-name">{{ partnerName }}</span>
+            </template>
+            <template v-else-if="currentSession.sessionId">
+              {{ waitingText }}
+            </template>
+            <template v-else>
+              Loading
+            </template>
+          </div>
+        </div>
+        <div class="button-container">
+          <div class="end-session">
+            <button class="btn btn-lg btn-block" @click.prevent="end">
+              End session
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="button-container">
-      <div class="end-session">
-        <button class="btn btn-lg btn-block" @click.prevent="end">
-          End session
-        </button>
+      <div
+        :class="[connectionMsgType]"
+        class="connection-message-header"
+        v-if="connectionMsg || reconnectAttemptMsg"
+      >
+        {{ connectionMsg }} {{ reconnectAttemptMsg }}
+        <template v-if="reconnectAttemptMsg">
+          <button class="btn btn-in-msg-header btn-bg-dark" @click.prevent="tryReconnect">
+            Try Now
+          </button>
+        </template>
       </div>
     </div>
   </div>
@@ -39,7 +55,10 @@ const VOLUNTEER_AVATAR_URL = 'static/defaultavatar4.png'
 export default {
   data () {
     return {
-      currentSession: SessionService.currentSession
+      currentSession: SessionService.currentSession,
+      connectionMsg: '',
+      connectionMsgType: '',
+      reconnectAttemptMsg: ''
     }
   },
   computed: {
@@ -108,7 +127,39 @@ export default {
           })
         }
       }
+    },
+    tryReconnect() {
+      // socket must be closed before reopening for automatic reconnections
+      // to resume
+      this.$socket.close()
+      this.$socket.open()
+      this.reconnectAttemptMsg = 'Waiting for server response.'
+      this.$emit('try-clicked')
+    },
+    connectionSuccess() {
+      this.connectionMsg = ''
+      this.reconnectAttemptMsg = ''
+      this.connectionMsgType = ''
     }
+  },
+  sockets: {
+    connect_error (error) {
+      console.log(`connection error: ${error}`)
+      this.connectionMsg = 'The system seems to be having a problem reaching the server.'
+      this.connectionMsgType = 'warning'
+    },
+    connect_timeout () {
+      console.log('connection timeout')
+      this.connectionMsg = 'The system seems to be having a problem reaching the server.'
+      this.connectionMsgType = 'warning'
+    },
+    reconnect_attempt () {
+      this.reconnectAttemptMsg = 'Trying periodically to reconnect.'
+    },
+    connect() {
+      this.connectionSuccess()
+    }
+
   }
 }
 </script>
@@ -118,8 +169,16 @@ export default {
   position: relative;
   height: 100px;
   background-color: #64e1c6;
-  padding: 20px;
+  padding: 0;
   text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+}
+
+.main-session-header {
+  padding: 20px 20px 0 20px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -166,12 +225,51 @@ h1 {
   color: #000000;
 }
 
+.btn.btn-in-msg-header {
+  font-size: 14px;
+  border-radius: 10px;
+  padding: 5px;
+  height: 30px;
+  vertical-align: baseline;
+  padding: 0 3px 0 3px;
+  height: auto;
+}
+
+.btn.btn-bg-dark {
+  background-color: #444;
+}
+
+.btn.btn-bg-dark:hover {
+  background-color: #000;
+  color: #fff;
+}
+
 .button-container {
   display: flex;
 }
 
 .session-header.inactive {
   background-color: #73737a;
+}
+
+.connection-message-header {
+  padding: 3px;
+  background-color: #858585;
+  color: #fff;
+  text-align: center;
+  font-weight: 600;
+  position: relative;
+  bottom: 0;
+}
+
+.connection-message-header.warning {
+  background-color: #ffde5e;
+  color: #000;
+}
+
+.connection-message-header.success {
+  background-color: #fff;
+  color: #000;
 }
 
 .avatar-info-container {
