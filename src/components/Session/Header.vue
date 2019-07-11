@@ -103,7 +103,9 @@ export default {
         } else {
           this.$socket.disconnect()
           SessionService.endSession(this, sessionId, { skipRoute: true })
-          router.replace('/')
+          .then(() => {
+            router.replace('/')
+          })
         }
       }
     }
