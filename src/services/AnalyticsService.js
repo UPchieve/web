@@ -19,8 +19,9 @@ export default {
   identify (userData, fakeUser) {
     if(!fakeUser){
       const listPassed = []
+      console.log(userData)
       for (var property in userData) {
-        if (userData[property].hasOwnProperty('passed')) {
+        if (userData[property] && userData[property].hasOwnProperty('passed')) {
           if (userData[property].passed) {
             listPassed.push(property)
           }
