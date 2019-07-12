@@ -18,10 +18,10 @@
           </ul>
         </div>
         <div
-          v-if="msg && msg !== 'Set!'"
+          v-if="saveFailed"
           class="errors"
         >
-          <h4 class="errors-heading">{{ msg }}</h4>
+          <h4 class="errors-heading">Could not save data</h4>
         </div>
         <div class="subheader">Personal Information</div>
         <div class="container-content">
@@ -227,7 +227,7 @@ export default {
       certKey,
       errors: [],
       invalidInputs: [],
-      msg: null
+      saveFailed: false
     }
   },
   methods: {
@@ -249,7 +249,7 @@ export default {
       // Start by erasing previous errors
       this.errors = []
       this.invalidInputs = []
-      this.msg = null
+      this.saveFailed = false
 
       // Validate fields
       if (this.user.isVolunteer) {
@@ -284,7 +284,10 @@ export default {
         .then(res => {
           this.editBtnMsg = 'Edit Profile'
           this.activeEdit = false
-          this.msg = null
+          this.saveFailed = false
+        },
+        res => {
+          this.saveFailed = true
         })
       }
     }
