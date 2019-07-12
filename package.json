@@ -10,7 +10,8 @@
     "unit": "karma start test/unit/karma.conf.js --single-run",
     "e2e": "node test/e2e/runner.js",
     "test": "echo hello world",
-    "format": "prettier-standard {build,config,src,test}/**/*.{js,vue}"
+    "format": "prettier-standard {build,config,src,test}/**/*.{js,vue}",
+    "clean-slate": "npx rimraf node_modules dist && npm install"
   },
   "dependencies": {
     "bootstrap": "^3.3.7",

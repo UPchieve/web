@@ -41,8 +41,8 @@
 </template>
 
 <script>
-import UserService from '../../services/UserService'
-import AuthService from '../../services/AuthService'
+import UserService from '@/services/UserService'
+import AuthService from '@/services/AuthService'
 
 /**
  * @todo {1} Refactor this, apply naming convention to files and improve the
@@ -54,8 +54,8 @@ export default {
     const avatarUrl = // {1}
       user.picture ||
       (user.isVolunteer
-        ? 'static/defaultavatar4.png'
-        : 'static/defaultavatar3.png')
+        ? '/static/defaultavatar4.png'
+        : '/static/defaultavatar3.png')
     return {
       user,
       avatarStyle: {
