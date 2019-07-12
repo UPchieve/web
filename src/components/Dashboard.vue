@@ -390,7 +390,7 @@ h3 {
 }
 
 
-@media screen and (max-width: 488px) {
+@media screen and (max-width: 700px) {
   .dashboard-body.row {
     display: block !important;
     width: 100% !important;

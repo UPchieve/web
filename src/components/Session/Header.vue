@@ -280,7 +280,7 @@ h1 {
 }
 
 
-@media screen and (max-width: 488px) {
+@media screen and (max-width: 700px) {
   .info {
     width: auto !important;
   }

@@ -35,13 +35,13 @@
           <div v-if="user.isVolunteer">
             <div id="phone" class="container-section">
               <div class="prompt">Your Phone Number</div>
-              <div v-show="!activeEdit" class="answer">{{ user.phone }}</div>
+              <div v-show="!activeEdit" class="answer">{{ user.phonePretty }}</div>
               <div v-show="!user.phone && !activeEdit" class="answer">
                 (None given)
               </div>
               <input
                 v-show="activeEdit"
-                v-model="user.phone"
+                v-model="user.phonePretty"
                 type="text"
                 class="form-control"
               />
@@ -443,7 +443,7 @@ ul {
 
 
 
-@media screen and (max-width: 488px) {
+@media screen and (max-width: 700px) {
   .header {
     padding: 1em 20px 1em 3em !important;
   }
