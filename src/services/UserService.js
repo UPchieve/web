@@ -1,3 +1,4 @@
+/* eslint-disable no-tabs */
 import moment from 'moment'
 
 import NetworkService from './NetworkService'
@@ -33,7 +34,7 @@ export default {
     return OnboardingService.status
   },
   setProfile (context, data, redirect) {
-    NetworkService.setProfile(context, data).then(
+    return NetworkService.setProfile(context, data).then(
       res => {
         if (res.data) {
           AuthService.storeUser(res.data.user)
@@ -44,10 +45,12 @@ export default {
         if (redirect) {
           router.push(redirect)
         }
+        return Promise.resolve(res)
       },
       res => {
         context.msg = 'Error occurred'
         console.log(res)
+        return Promise.reject(res)
       }
     )
   }
