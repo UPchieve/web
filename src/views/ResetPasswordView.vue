@@ -9,7 +9,7 @@
           <router-link to="signup" class="uc-form-header-link">Sign Up</router-link>
         </div>
       </div>
-      <div v-if="this.firstTime === true">
+      <div v-if="this.loggedIn === false">
         <div class="uc-form-body">
           <div class="uc-column">
             <label for="inputEmail" class="uc-form-label">Please enter your email address</label>
@@ -34,7 +34,10 @@
         >
           SEND
         </button>
-        <div v-if="msg !== ''">{{ msg }}</div>
+        
+       <div class = "errors">
+       <div v-if="msg !== ''">{{ msg }}</div>
+       </div>
     </form>
   </form-page-template>
 </template>
@@ -50,7 +53,9 @@ export default {
   },
   data () {
     return {
-      firstTime: null,
+      /* allows differentiation between resetting password
+      when logged in vs. forgetting password before logged in*/
+      loggedIn: null,  
       email: '',
       msg: ''
     }
@@ -60,15 +65,17 @@ export default {
     if (auth.authenticated) {
       let user = UserService.getUser()
       this.email = user.email
-      this.firstTime = false
+      this.loggedIn = true
     }
     else{
-      this.firstTime = true
+      this.loggedIn = false
     }
   },
   methods: {
     submit () {
-      AuthService.sendReset(this, this.email)
+      AuthService.sendReset(this, this.email).catch(err => {
+          this.msg = err.message
+        })
     }
   }
 }
@@ -84,5 +91,11 @@ export default {
   .uc-form-header {
     @include flex-container(column, center, center);
   }
+}
+
+.errors {
+  padding: 20px;
+  font-size: 16px;
+  text-align: center;
 }
 </style>
