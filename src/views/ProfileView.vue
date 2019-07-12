@@ -146,7 +146,7 @@
 <script>
 import UserService from '@/services/UserService'
 
-import phoneValidation from 'src/utils/phone-validation'
+import phoneValidation from '@/utils/phone-validation'
 
 export default {
   data () {
