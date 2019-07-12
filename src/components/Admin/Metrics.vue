@@ -1,4 +1,5 @@
 <template>
+<div> {{users}} </div>
 </template>
 
 <script>
@@ -13,7 +14,7 @@ export default{
     mounted() {
         return NetworkService.getUsers(this).then(res => {
             this.users = res.data
-            console.log(users)
+            console.log(this.users)
             return this.users
         })
     }
