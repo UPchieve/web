@@ -82,8 +82,8 @@
  * @todo {1} Solve this bug ('handleUndoOperation' is not defined)
  */
 
-import SessionService from 'src/services/SessionService'
-import UserService from 'src/services/UserService'
+import SessionService from '@/services/SessionService'
+import UserService from '@/services/UserService'
 
 // const CLEAR_BUTTON_ID = 'clearButton';
 // const UNDO_BUTTON_ID = 'undoButton';
