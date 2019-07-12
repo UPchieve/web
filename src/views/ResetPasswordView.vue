@@ -9,8 +9,8 @@
           <router-link to="signup" class="uc-form-header-link">Sign Up</router-link>
         </div>
       </div>
-      <div v-if="this.loggedIn === false">
-        <div class="uc-form-body">
+      <div class="uc-form-body">
+        <div v-if="this.loggedIn === false">
           <div class="uc-column">
             <label for="inputEmail" class="uc-form-label">Please enter your email address</label>
             <input
@@ -23,20 +23,19 @@
             />
           </div>
         </div>
-        </div>
         <div v-else>
           Send password reset email to {{this.email}}?
         </div>
-        <button
-          class="uc-form-button"
-          type="submit"
-          @click.prevent="submit()"
+      </div>
+      <button
+        class="uc-form-button"
+        type="submit"
+        @click.prevent="submit()"
         >
-          SEND
-        </button>
-        
+        SEND
+      </button>
        <div class = "errors">
-       <div v-if="msg !== ''">{{ msg }}</div>
+        <div v-if="msg !== ''">{{ msg }}</div>
        </div>
     </form>
   </form-page-template>
