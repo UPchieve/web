@@ -82,7 +82,8 @@
  * @todo {1} Solve this bug ('handleUndoOperation' is not defined)
  */
 
-import SessionService from '@/services/SessionService'
+import SessionService from 'src/services/SessionService'
+import UserService from 'src/services/UserService'
 
 // const CLEAR_BUTTON_ID = 'clearButton';
 // const UNDO_BUTTON_ID = 'undoButton';
@@ -187,45 +188,53 @@ export default {
     // Socket emits
     emitDrawClick () {
       this.$socket.emit('drawClick', {
-        sessionId: this.currentSession.sessionId
+        sessionId: this.currentSession.sessionId,
+        user: UserService.getUser()
       })
     },
     emitSaveImage () {
       this.$socket.emit('saveImage', {
-        sessionId: this.currentSession.sessionId
+        sessionId: this.currentSession.sessionId,
+        user: UserService.getUser()
       })
     },
     emitUndoClick () {
       this.$socket.emit('undoClick', {
-        sessionId: this.currentSession.sessionId
+        sessionId: this.currentSession.sessionId,
+        user: UserService.getUser()
       })
     },
     emitClearClick () {
       this.$socket.emit('clearClick', {
-        sessionId: this.currentSession.sessionId
+        sessionId: this.currentSession.sessionId,
+        user: UserService.getUser()
       })
     },
     emitChangeColor (color) {
       this.$socket.emit('changeColor', {
         sessionId: this.currentSession.sessionId,
-        color
+        color,
+        user: UserService.getUser()
       })
     },
     emitChangeWidth (width) {
       this.$socket.emit('changeWidth', {
         sessionId: this.currentSession.sessionId,
-        width
+        width,
+        user: UserService.getUser()
       })
     },
     emitDrawing () {
       this.$socket.emit('drawing', {
-        sessionId: this.currentSession.sessionId
+        sessionId: this.currentSession.sessionId,
+        user: UserService.getUser()
       })
     },
     emitEnd () {
       this.$socket.emit('end', {
         sessionId: this.currentSession.sessionId,
-        whiteboardUrl: App.canvas.toDataURL()
+        whiteboardUrl: App.canvas.toDataURL(),
+        user: UserService.getUser()
       })
     },
     emitDragStart (data) {
@@ -233,7 +242,8 @@ export default {
         sessionId: this.currentSession.sessionId,
         x: data.x,
         y: data.y,
-        color: data.color
+        color: data.color,
+        user: UserService.getUser()
       })
     },
     emitDragAction (data) {
@@ -241,7 +251,8 @@ export default {
         sessionId: this.currentSession.sessionId,
         x: data.x,
         y: data.y,
-        color: data.color
+        color: data.color,
+        user: UserService.getUser()
       })
     },
     emitDragEnd (data) {
@@ -249,7 +260,8 @@ export default {
         sessionId: this.currentSession.sessionId,
         x: data.x,
         y: data.y,
-        color: data.color
+        color: data.color,
+        user: UserService.getUser()
       })
     },
     emitInsertText (data) {
@@ -257,12 +269,14 @@ export default {
         sessionId: this.currentSession.sessionId,
         x: data.x,
         y: data.y,
-        text: data.text
+        text: data.text,
+        user: UserService.getUser()
       })
     },
     emitResetScreen (data) {
       this.$socket.emit('resetScreen', {
-        sessionId: this.currentSession.sessionId
+        sessionId: this.currentSession.sessionId,
+        user: UserService.getUser()
       })
     },
 
