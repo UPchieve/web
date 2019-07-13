@@ -12,7 +12,7 @@
           v-if="!isActive"
           @click="toggleMenu()"
           class="sidebar-hamburger"
-          v-bind:class="{white: $route.name === 'Dashboard'}"
+          v-bind:class="{white: $route.name === 'DashboardView'}"
         />
 
         <button v-else @click="toggleMenu()" class="sidebar-exit" />
