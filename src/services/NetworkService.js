@@ -65,7 +65,7 @@ export default {
       .put(`${API_ROOT}/user`, data)
       .then(this._successHandler, this._errorHandler)
   },
-  getUsers (context) {
+  getAllUserAvailability (context) {
     return context.$http
     .post(`${API_ROOT}/user/all`)
     .then(this._successHandler, this._errorHandler)

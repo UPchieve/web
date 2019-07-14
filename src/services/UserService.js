@@ -33,6 +33,11 @@ export default {
   getOnboarding () {
     return OnboardingService.status
   },
+  getAllUserAvailability (context) {
+      return NetworkService.getAllUserAvailability(context).then(res =>{
+        return res.data.userAvailabilityMap 
+    })
+  },
   setProfile (context, data, redirect) {
     return NetworkService.setProfile(context, data).then(
       res => {
