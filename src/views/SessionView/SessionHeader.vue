@@ -120,14 +120,19 @@ export default {
               volunteerId
             router.replace(url)
           })
+          .catch(this.alertCouldNotEnd)
         } else {
           SessionService.endSession(this, sessionId, { skipRoute: true })
           .then(() => {
             this.$socket.disconnect()
             router.replace('/')
           })
+          .catch(this.alertCouldNotEnd)
         }
       }
+    },
+    alertCouldNotEnd() {
+      window.alert('Could not end session')
     },
     tryReconnect() {
       // socket must be closed before reopening for automatic reconnections
