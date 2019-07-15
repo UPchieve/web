@@ -303,6 +303,9 @@ export default {
   justify-content: flex-start;
   background: #fff;
   width: 100%;
+
+  /* Safari needs this specified to lay out the message divs properly. */
+  flex-shrink: 0;
 }
 
 .avatar {
