@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import UserService from 'src/services/UserService'
+import UserService from '@/services/UserService'
 
 export default {
   data () {
@@ -87,7 +87,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .navbar-nav {
   width: 100%;
   margin-top: 38px;
@@ -145,31 +145,31 @@ li.active > a::before {
 }
 
 .home.icon::before {
-  background-image: url('../../assets/home_icon-01.svg');
+  background-image: url('~@/assets/home_icon-01.svg');
 }
 
 .math.icon::before {
-  background-image: url('../../assets/math_icon-01.svg');
+  background-image: url('~@/assets/math_icon-01.svg');
 }
 
 .college.icon::before {
-  background-image: url('../../assets/college_icon-01.svg');
+  background-image: url('~@/assets/college_icon-01.svg');
 }
 
 .schedule.icon::before {
-  background-image: url('../../assets/calendar_icon-01.svg');
+  background-image: url('~@/assets/calendar_icon-01.svg');
 }
 
 .resources.icon::before {
-  background-image: url('../../assets/resources_icon-01.svg');
+  background-image: url('~@/assets/resources_icon-01.svg');
 }
 
 .training.icon::before {
-  background-image: url('../../assets/training_icon-01.svg');
+  background-image: url('~@/assets/training_icon-01.svg');
 }
 
 .profile.icon::before {
-  background-image: url('../../assets/profile_icon-01.svg');
+  background-image: url('~@/assets/profile_icon-01.svg');
 }
 
 .profile-info {

@@ -1,41 +1,39 @@
 <template>
   <div id="app">
-
-    <div v-if="['LoginForm', 'Logout', 'Registration', 'ResetPasswordForm', 'SetPasswordForm', 'Session-math', 'Session-college'].indexOf($route.name) > -1">
-    </div>
-
-    <div v-else class="toggleMenu forMobileView">
-      <button 
-        v-if="!isActive" 
-        @click="toggleMenu()" 
-        class="sidebar-hamburger" 
-        v-bind:class="{white: ['Dashboard'].indexOf($route.name) > -1}"
-      />
-  
-      <button v-else  @click="toggleMenu()" class="sidebar-exit" />
-    </div>
-    
-      <div v-if="!mobileMode"  class="nav-container">
-        <sidebar v-on:closeMenu="doNothing()" />
-      </div>
-
-      <div v-else class="nav-container forMobileMode" v-bind:class="{active: isActive}">
+    <div v-if="!$route.meta.hideSidebar" class="sidebar-wrapper">
+      <!-- Sidebar -->
+      <div class="nav-container" v-bind:class="{forMobileMode: mobileMode, active: isActive}">
         <sidebar v-on:closeMenu="closeMenu()" />
       </div>
 
-    <div class="col-xs-12 view-container">
-      <router-view />
+      <!-- Sidebar button -->
+      <div class="toggleMenu forMobileView">
+        <button
+          v-if="!isActive"
+          @click="toggleMenu()"
+          class="sidebar-hamburger"
+          v-bind:class="{white: $route.name === 'DashboardView'}"
+        />
+
+        <button v-else @click="toggleMenu()" class="sidebar-exit" />
+      </div>
+
+      <!-- Router view -->
+      <div class="col-xs-12 view-container">
+        <router-view />
+      </div>
     </div>
+
+    <router-view v-else />
   </div>
 </template>
 
 <script>
-import 'bootstrap/dist/css/bootstrap.css'
-import './assets/styles/settings.css'
-
+import './scss/main.scss'
 import Sidebar from './components/Sidebar'
-
 import AuthService from './services/AuthService'
+
+const MOBILE_MODE_WIDTH = 700
 
 /**
  * @todo Examine this, huge code smell, refactoring might be needed
@@ -50,33 +48,31 @@ export default {
   created () {
     AuthService.checkAuth(this) // {1}
 
-    if (window.innerWidth <= 488) {
-      this.mobileMode = true   
-    } else {
-      this.mobileMode = false
-    }
+    // Update mobileMode on window resize
+    window.addEventListener('resize', () => {
+      this.mobileMode = window.innerWidth <= MOBILE_MODE_WIDTH
+    })
   },
   data () {
     return {
-      mobileMode: false,
+      mobileMode: window.innerWidth <= MOBILE_MODE_WIDTH,
       isActive: false
     }
   },
   methods: {
     toggleMenu() {
-        this.isActive = !this.isActive
+      this.isActive = !this.isActive
     },
     closeMenu() {
+      if (this.mobileMode) {
         this.isActive = false
-    },
-    doNothing() {
-      return
+      }
     }
   }
 }
 </script>
 
-<style>
+<style lang="scss">
 /*
  * @todo {1} Make this truly responsive
  */
@@ -88,22 +84,20 @@ export default {
 
 html,
 body,
-#app {
+#app,
+#app > .row,
+.nav-container,
+.view-container,
+.sidebar-wrapper {
   height: 100%;
 }
 
 #app {
-  font-family: 'Work Sans', Helvetica, Arial, sans-serif;
+  font-family: $default-font;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-}
-
-#app > .row,
-.nav-container,
-.view-container {
-  height: 100%;
 }
 
 .toggleMenu {
@@ -137,7 +131,7 @@ body,
 
 
 
-@media screen and (max-width: 488px) {
+@media screen and (max-width: 700px) {
   .toggleMenu.forMobileView {
     display: block !important;
     position: absolute !important;
@@ -185,13 +179,12 @@ body,
     margin-left: -100% !important;
     width: 80vw !important;
     z-index: 20 !important;
-    transition: all 0.3s linear;
+    transition: margin-left 0.3s linear;
     /* display: none !important; */
   }
 
   .nav-container.forMobileMode.active {
      margin-left: 0% !important;
-     transition: all 0.3s linear;
   }
 
   .col-xs-12.view-container {
