@@ -166,7 +166,6 @@
 import validator from 'validator'
 
 import AuthService from '@/services/AuthService'
-import RegistrationService from '@/services/RegistrationService'
 import UserService from '@/services/UserService'
 
 import phoneValidation from '@/utils/phone-validation'
@@ -187,7 +186,8 @@ export default {
         lastName: '',
         college: '',
         phone: '',
-        favoriteAcademicSubject: ''
+        favoriteAcademicSubject: '',
+        userType: 'volunteer'
       },
       step: 'step-1'
     }
@@ -267,7 +267,6 @@ export default {
       this.profile.phone = phoneValidation.convertPhoneNumber(this.profile.phone);
     
       AuthService.register(this, {
-        code: RegistrationService.data.registrationCode,
         email: this.credentials.email,
         password: this.credentials.password,
         terms: this.credentials.terms,
@@ -275,7 +274,8 @@ export default {
         lastName: this.profile.lastName,
         phone: this.profile.phone,
         college: this.profile.college,
-        favoriteAcademicSubject: this.profile.favoriteAcademicSubject
+        favoriteAcademicSubject: this.profile.favoriteAcademicSubject,
+        userType: this.profile.userType
       })
         .then(() => {
           let user = UserService.getUser()

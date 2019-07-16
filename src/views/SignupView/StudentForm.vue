@@ -209,7 +209,8 @@ export default {
         lastName: '',
         highSchool: '',
         heardFrom: '',
-        referred: ''
+        referred: '',
+        userType: 'student'
       },
       step: 'step-1'
     }
@@ -278,13 +279,13 @@ export default {
     },
     submit () {
       AuthService.register(this, {
-        code: undefined,
         email: this.credentials.email,
         password: this.credentials.password,
         terms: this.credentials.terms,
         firstName: this.profile.firstName,
         lastName: this.profile.lastName,
-        highSchool: this.profile.highSchool
+        highSchool: this.profile.highSchool,
+        userType: this.profile.userType
       })
         .then(() => {
           let user = UserService.getUser()

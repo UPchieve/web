@@ -99,7 +99,7 @@ export default {
   },
   methods: {
     fetchData () {
-      if (!this.user.hasSchedule) {
+      if (!this.user.hasAvailability) {
         CalendarService.initAvailability(this, this.user._id)
       }
 
