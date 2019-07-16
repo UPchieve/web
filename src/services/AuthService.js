@@ -1,9 +1,9 @@
 import Validator from 'validator'
 
-import router from '../router'
+import router from '@/router'
 
 import NetworkService from './NetworkService'
-import errorFromServer from './error-from-server'
+import errorFromServer from '@/utils/error-from-server'
 
 import * as sentry from '@sentry/browser'
 

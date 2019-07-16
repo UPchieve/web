@@ -1,11 +1,11 @@
 import * as sentry from '@sentry/browser'
 
-import router from '../router'
+import router from '@/router'
 
 import NetworkService from './NetworkService'
 import UserService from './UserService'
 
-import errorFromServer from './error-from-server'
+import errorFromServer from '@/utils/error-from-server'
 
 export default {
   loading: false,
