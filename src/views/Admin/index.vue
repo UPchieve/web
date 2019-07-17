@@ -33,15 +33,17 @@ export default {}
   justify-content: center;
   font-size: 16px;
   font-weight: 600;
-}
 
-.linkBtn a {
-  color: white;
-}
+  a {
+    color: white;
+    text-decoration: none;
+  }
 
-.linkBtn a:hover {
-  color:#2c3e50;
-  text-decoration: none;
+  &:hover {
+    a {
+      color:#2c3e50;
+    }
+  }
 }
 
 .parent {
