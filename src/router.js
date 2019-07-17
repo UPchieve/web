@@ -55,7 +55,7 @@ const routes = [
   { path: '/resetpassword', name: 'ResetPasswordView', component: ResetPasswordView, meta: { hideSidebar: true } },
   { path: '/setpassword/:token', name: 'SetPasswordView', component: SetPasswordView, meta: { hideSidebar: true } },
   { path: '/dashboard', name: 'DashboardView', component: DashboardView, meta: { protected: true } },
-  { path: '/metrics', name: 'Metrics', component: Metrics, meta: {protected: true, bypassOnboarding : true}},
+  { path: '/metrics', name: 'Metrics', component: Metrics, meta: { protected: true, bypassOnboarding: true } },
 
   {
     path: '/session/math/:subTopic/:sessionId?',
@@ -80,7 +80,7 @@ const routes = [
     path: '/admin',
     name: 'Navigation',
     component: Navigation,
-    meta: {protected : true, bypassOnboarding: true}
+    meta: { protected: true, bypassOnboarding: true }
   },
   {
     path: '/edu',
