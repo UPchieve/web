@@ -3,10 +3,10 @@
     <div class="header">Admin Dashboard</div>
     <div class="parent">
       <div class="container-section linkBtn btn">
-        <router-link to="/volunteerCoverage" class="prompt">Volunteer</router-link>
+        <router-link to="admin/volunteer-coverage" class="prompt">Volunteer Coverage</router-link>
       </div>
       <div class = "container-section linkBtn btn">
-        <router-link to="/edu" class="prompt">Edu Admin</router-link>
+        <router-link to="admin/edu" class="prompt">Edu Admin</router-link>
       </div>
     </div>
   </div>

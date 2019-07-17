@@ -26,6 +26,7 @@ import SubmitQuestionView from './views/SubmitQuestionView'
 import InboxView from './views/InboxView'
 import SendAnswerView from './views/SendAnswerView'
 import AdminView from './views/Admin'
+import VolunteerCoverage from './views/Admin/VolunteerCoverage'
 
 import AuthService from './services/AuthService'
 import OnboardingService from './services/OnboardingService'
@@ -185,6 +186,12 @@ const routes = [
     path: '/admin',
     name: 'Admin',
     component: AdminView,
+    meta: { protected: true }
+  },
+  {
+    path: '/admin/volunteer-coverage',
+    name: 'VolunteerCoverage',
+    component: VolunteerCoverage,
     meta: { protected: true }
   },
   {
