@@ -3,7 +3,7 @@
     <div class="header">Admin Dashboard</div>
     <div class="parent">
       <div class="container-section linkBtn btn">
-        <router-link to="/metrics" class="prompt">Metrics</router-link>
+        <router-link to="/volunteerCoverage" class="prompt">Volunteer</router-link>
       </div>
       <div class = "container-section linkBtn btn">
         <router-link to="/edu" class="prompt">Edu Admin</router-link>
