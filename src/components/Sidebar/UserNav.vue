@@ -47,13 +47,6 @@
         </div>
       </template>
 
-      <template v-if="user.isAdmin">
-        <div v-on:click="$emit('closeMenu')">
-          <router-link to="/edu" tag="li">
-            <a class="resources icon">EDU Admin</a>
-          </router-link>
-        </div>
-      </template>
 
       <template v-if="user.isAdmin">
         <div v-on:click="$emit('closeMenu')">

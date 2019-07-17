@@ -1,8 +1,12 @@
 <template>
-    <div class="center">
+    <div class="parent">
         <div class="container-section linkBtn btn">
             <router-link to="metrics" class="prompt"
             >Metrics</router-link>
+        </div>
+        <div class = "container-section linkBtn btn">
+          <router-link to="/edu" class="prompt"
+            >Edu Admin</router-link>
         </div>
     </div>
 </template>
@@ -17,6 +21,7 @@ export default{
     }
 </script>
 
+
 <style lang="scss" scoped>
 .container-section {
   display: flex;
@@ -26,10 +31,8 @@ export default{
 }
 
 .linkBtn {
-
   background-color: #16d2aa;
   border-radius: 30px;
-  width: 200px;
   align-items: center;
   height: 50px;
   justify-content: center;
@@ -46,9 +49,11 @@ export default{
   text-decoration: none;
 }
 
-.center {
-  margin: 100px;
-  width: 50%;
-  padding: 10px;
+ .parent {
+  padding: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
+
 </style>
