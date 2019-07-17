@@ -9,7 +9,6 @@ import vSelect from 'vue-select'
 
 // Setup vue-headful
 Vue.component('vue-headful', vueHeadful)
-Vue.component('v-select', vSelect)
 
 /* eslint-disable no-new */
 new Vue({
