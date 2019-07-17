@@ -25,8 +25,7 @@ import CalendarView from './views/CalendarView'
 import SubmitQuestionView from './views/SubmitQuestionView'
 import InboxView from './views/InboxView'
 import SendAnswerView from './views/SendAnswerView'
-import Navigation from './views/Admin/Navigation'
-import Metrics from './views/Admin/Metrics'
+import AdminView from './views/Admin'
 
 import AuthService from './services/AuthService'
 import OnboardingService from './services/OnboardingService'
@@ -47,16 +46,52 @@ const routes = [
       return '/login'
     }
   },
-  { path: '/contact', name: 'ContactView', component: ContactView },
-  { path: '/legal', name: 'LegalView', component: LegalView },
-  { path: '/login', name: 'LoginView', component: LoginView, meta: { hideSidebar: true } },
-  { path: '/logout', name: 'LogoutView', component: LogoutView, meta: { hideSidebar: true } },
-  { path: '/signup', name: 'SignupView', component: SignupView, meta: { hideSidebar: true } },
-  { path: '/resetpassword', name: 'ResetPasswordView', component: ResetPasswordView, meta: { hideSidebar: true } },
-  { path: '/setpassword/:token', name: 'SetPasswordView', component: SetPasswordView, meta: { hideSidebar: true } },
-  { path: '/dashboard', name: 'DashboardView', component: DashboardView, meta: { protected: true } },
-  { path: '/metrics', name: 'Metrics', component: Metrics, meta: { protected: true, bypassOnboarding: true } },
-
+  {
+    path: '/contact',
+    name: 'ContactView',
+    component: ContactView
+  },
+  {
+    path: '/legal',
+    name: 'LegalView',
+    component: LegalView
+  },
+  {
+    path: '/login',
+    name: 'LoginView',
+    component: LoginView,
+    meta: { hideSidebar: true }
+  },
+  {
+    path: '/logout',
+    name: 'LogoutView',
+    component: LogoutView,
+    meta: { hideSidebar: true }
+  },
+  {
+    path: '/signup',
+    name: 'SignupView',
+    component: SignupView,
+    meta: { hideSidebar: true }
+  },
+  {
+    path: '/resetpassword',
+    name: 'ResetPasswordView',
+    component: ResetPasswordView,
+    meta: { hideSidebar: true }
+  },
+  {
+    path: '/setpassword/:token',
+    name: 'SetPasswordView',
+    component: SetPasswordView,
+    meta: { hideSidebar: true }
+  },
+  {
+    path: '/dashboard',
+    name: 'DashboardView',
+    component: DashboardView,
+    meta: { protected: true }
+  },
   {
     path: '/session/math/:subTopic/:sessionId?',
     name: 'SessionView-math',
@@ -69,24 +104,17 @@ const routes = [
     component: SessionView,
     meta: { protected: true }
   },
-  { path: '/schedule', name: 'ScheduleView', component: ScheduleView, meta: { protected: true } },
+  {
+    path: '/schedule',
+    name: 'ScheduleView',
+    component: ScheduleView,
+    meta: { protected: true }
+  },
   {
     path: '/resources',
     name: 'ResourcesView',
     component: ResourcesView,
     meta: { protected: true, bypassOnboarding: true }
-  },
-  {
-    path: '/admin',
-    name: 'Navigation',
-    component: Navigation,
-    meta: { protected: true, bypassOnboarding: true }
-  },
-  {
-    path: '/edu',
-    component: () => {
-      window.location.href = '/edu'
-    }
   },
   {
     path: '/feedback/:sessionId/:userType/:studentId/:volunteerId',
@@ -106,7 +134,12 @@ const routes = [
     component: OnboardingView,
     meta: { protected: true }
   },
-  { path: '/training', name: 'TrainingView', component: TrainingView, meta: { protected: true } },
+  {
+    path: '/training',
+    name: 'TrainingView',
+    component: TrainingView,
+    meta: { protected: true }
+  },
   {
     path: '/training/:category/quiz',
     name: 'QuizView',
@@ -119,16 +152,47 @@ const routes = [
     component: ReviewView,
     meta: { protected: true }
   },
-  { path: '/profile', name: 'ProfileView', component: ProfileView, meta: { protected: true } },
-  { path: '/calendar', name: 'CalendarView', component: CalendarView },
+  {
+    path: '/profile',
+    name: 'ProfileView',
+    component: ProfileView,
+    meta: { protected: true }
+  },
+  {
+    path: '/calendar',
+    name: 'CalendarView',
+    component: CalendarView
+  },
   {
     path: '/submit-question',
     name: 'SubmitQuestionView',
     component: SubmitQuestionView,
     meta: { protected: true }
   },
-  { path: '/inbox', name: 'InboxView', component: InboxView, meta: { protected: true } },
-  { path: '/send-answer', name: 'SendAnswerView', component: SendAnswerView, meta: { protected: true } }
+  {
+    path: '/inbox',
+    name: 'InboxView',
+    component: InboxView,
+    meta: { protected: true }
+  },
+  {
+    path: '/send-answer',
+    name: 'SendAnswerView',
+    component: SendAnswerView,
+    meta: { protected: true }
+  },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: AdminView,
+    meta: { protected: true }
+  },
+  {
+    path: '/edu', // TODO: make this be "/admin/edu"
+    component: () => {
+      window.location.href = '/edu'
+    }
+  }
 ]
 
 /**
