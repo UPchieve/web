@@ -1,4 +1,8 @@
 <template>
+<div>
+  <div class="header">
+    Admin Dashboard
+  </div>
     <div class="parent">
         <div class="container-section linkBtn btn">
             <router-link to="metrics" class="prompt"
@@ -9,6 +13,7 @@
             >Edu Admin</router-link>
         </div>
     </div>
+</div>
 </template>
 
 <script>
@@ -41,11 +46,11 @@ export default{
 }
 
 .linkBtn a {
-  color: #2c3e50;
+  color: white;
 }
 
 .linkBtn a:hover {
-  color: white;
+  color: #2c3e50;
   text-decoration: none;
 }
 
@@ -56,4 +61,15 @@ export default{
   justify-content: center;
 }
 
+.header{
+  display: flex;
+  padding: 30px;
+  margin: 0;
+  font-size: 24px;
+  border-bottom: 0.5px solid #cccccf;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  color: #343440;
+}
 </style>
