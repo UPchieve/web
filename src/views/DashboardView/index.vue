@@ -88,7 +88,7 @@
         </div>
       </div>
     </template>
-    <template v-else>
+    <template v-else-if="user.isVolunteer && user.isVolunteerApproved && user.isVolunteerReady">
       <div class="dashboard-body row">
         <div class="col-lg-6 video">
           <p>
@@ -124,6 +124,31 @@
         </div>
       </div>
     </template>
+    <template  v-else-if="user.isVolunteer && (!user.isVolunteerApproved || !user.isVolunteerReady)">
+      <div class="dashboard-body row">
+        <div class="col-lg-6 video">
+          <p>
+            <strong>New to UPchieve? </strong>Watch the video to learn how to
+            use our services.
+          </p>
+          <div class="video">
+            <iframe
+              width="500"
+              height="300"
+              src="https://www.youtube.com/embed/TfjsjukrnB8"
+              frameborder="0"
+              allowfullscreen
+            />
+          </div>
+        </div>
+        <div class="col-lg-6 help">
+          <div class="help-container">
+            <VolunteerOnboardingChecklist />
+
+          </div>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -132,11 +157,13 @@ import UserService from '@/services/UserService'
 import SessionService from '@/services/SessionService'
 
 import ListSessions from './ListSessions'
+import VolunteerOnboardingChecklist from './VolunteerOnboardingChecklist'
 
 export default {
   name: "dashboard-view",
   components: {
-    ListSessions
+    ListSessions,
+    VolunteerOnboardingChecklist
   },
   data () {
     const user = UserService.getUser() || {}
