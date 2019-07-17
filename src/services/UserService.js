@@ -56,14 +56,14 @@ export default {
     )
   },
 
-  getVolunteers(context){
-    return NetworkService.getVolunteers(context).then(res =>{
+  getVolunteers (context) {
+    return NetworkService.getVolunteers(context).then(res => {
       return res.data.volunteers
-  })
+    })
   },
-  getVolunteersAvailability (context, subject) {
-    return NetworkService.getVolunteersAvailability(context, subject).then(res =>{
-      return res.data.userAvailabilityMap 
-  })
-},
+  getVolunteersAvailability (context) {
+    return NetworkService.getVolunteersAvailability(context).then(res => {
+      return res.data.userAvailabilityMap
+    })
+  }
 }

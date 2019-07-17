@@ -45,8 +45,8 @@ export default{
         },
  
     created () {
-        //this.calendarToArray()
-        this.getUsers()
+        this.calendarToArray()
+        //this.getUsers()
     },
 
     methods: {
@@ -64,12 +64,11 @@ export default{
             )
         },
 
-    calendarToArray(subject){
-        console.log(subject)
+    calendarToArray(){
         const calendar = Array(8).fill(0).map(()=>Array(25).fill(0));
-        UserService.getVolunteersAvailability(this, {subject}).then(availability =>{
+        UserService.getVolunteersAvailability(this).then(availability =>{
+            console.log(availability)
             this.volunteers = Object.keys(availability)
-            this.getSubjects()
             for(const user in availability){ //iterating through users
                 for (const day in availability[user]) { //iterating through days
                     this.daysOfWeek = Object.keys(availability[user])
