@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build:staging": "vue-cli-service build --mode=staging",
     "lint": "vue-cli-service lint",
     "e2e": "vue-cli-service test:e2e --mode=development",
     "test": "vue-cli-service test:unit",
