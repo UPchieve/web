@@ -478,11 +478,11 @@ ul {
 }
 
 .resetBtn a {
-  color: #2c3e50;
+  color: white;
 }
 
 .resetBtn a:hover {
-  color: white;
+  color: #2c3e50;
   text-decoration: none;
 }
 

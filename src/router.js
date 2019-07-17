@@ -25,6 +25,8 @@ import CalendarView from './views/CalendarView'
 import SubmitQuestionView from './views/SubmitQuestionView'
 import InboxView from './views/InboxView'
 import SendAnswerView from './views/SendAnswerView'
+import Navigation from './views/Admin/Navigation'
+import Metrics from './views/Admin/Metrics'
 
 import AuthService from './services/AuthService'
 import OnboardingService from './services/OnboardingService'
@@ -53,6 +55,8 @@ const routes = [
   { path: '/resetpassword', name: 'ResetPasswordView', component: ResetPasswordView, meta: { hideSidebar: true } },
   { path: '/setpassword/:token', name: 'SetPasswordView', component: SetPasswordView, meta: { hideSidebar: true } },
   { path: '/dashboard', name: 'DashboardView', component: DashboardView, meta: { protected: true } },
+  { path: '/metrics', name: 'Metrics', component: Metrics, meta: { protected: true, bypassOnboarding: true } },
+
   {
     path: '/session/math/:subTopic/:sessionId?',
     name: 'SessionView-math',
@@ -70,6 +74,12 @@ const routes = [
     path: '/resources',
     name: 'ResourcesView',
     component: ResourcesView,
+    meta: { protected: true, bypassOnboarding: true }
+  },
+  {
+    path: '/admin',
+    name: 'Navigation',
+    component: Navigation,
     meta: { protected: true, bypassOnboarding: true }
   },
   {

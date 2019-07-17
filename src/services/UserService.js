@@ -33,6 +33,7 @@ export default {
   getOnboarding () {
     return OnboardingService.status
   },
+
   setProfile (context, data, redirect) {
     return NetworkService.setProfile(context, data).then(
       res => {
@@ -53,5 +54,16 @@ export default {
         return Promise.reject(res)
       }
     )
+  },
+
+  getVolunteers (context) {
+    return NetworkService.getVolunteers(context).then(res => {
+      return res.data.volunteers
+    })
+  },
+  getVolunteersAvailability (context) {
+    return NetworkService.getVolunteersAvailability(context).then(res => {
+      return res.data.userAvailabilityMap
+    })
   }
 }

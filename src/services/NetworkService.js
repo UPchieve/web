@@ -60,6 +60,16 @@ export default {
       .put(`${API_ROOT}/user`, data)
       .then(this._successHandler, this._errorHandler)
   },
+  getVolunteersAvailability (context) {
+    return context.$http
+      .post(`${API_ROOT}/volunteers/availability`)
+      .then(this._successHandler, this._errorHandler)
+  },
+  getVolunteers (context) {
+    return context.$http
+      .post(`${API_ROOT}/volunteers`)
+      .then(this._successHandler, this._errorHandler)
+  },
   newSession (context, data) {
     return context.$http
       .post(`${API_ROOT}/session/new`, data)
@@ -80,6 +90,7 @@ export default {
       .post(`${API_ROOT}/session/current`, data)
       .then(this._successHandler, this._errorHandler)
   },
+
   getQuestions (context, data) {
     return context.$http
       .post(`${API_ROOT}/training/questions`, data)
