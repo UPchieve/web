@@ -30,10 +30,6 @@ export default {
       console.log(`ended session: ${sessionId}`)
       this.currentSession.sessionId = null
       this.currentSession.data = {}
-
-      if (!options.skipRoute) {
-        router.replace('/feedback')
-      }
     })
   },
 
