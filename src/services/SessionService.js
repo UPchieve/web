@@ -20,7 +20,7 @@ export default {
     return session.volunteer;
   },
 
-  endSession(context, sessionId, options = {}) {
+  endSession(context, sessionId) {
     localStorage.removeItem("currentSessionPath");
 
     return NetworkService.endSession(context, { sessionId }).then(res => {
@@ -30,10 +30,6 @@ export default {
       console.log(`ended session: ${sessionId}`);
       this.currentSession.sessionId = null;
       this.currentSession.data = {};
-
-      if (!options.skipRoute) {
-        router.replace("/feedback");
-      }
     });
   },
 

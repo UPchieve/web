@@ -104,6 +104,8 @@ export default {
     return {
       user: UserService.getUser(),
       sessionId: "",
+      topic: "",
+      subTopic: "",
       userType: "",
       studentId: "",
       volunteerId: "",
@@ -225,9 +227,12 @@ export default {
   beforeMount() {
     var _self = this;
     this.sessionId = this.$route.params.sessionId;
+    this.topic = this.$route.params.topic;
+    this.subTopic = this.$route.params.subTopic;
     this.userType = this.$route.params.userType;
     this.studentId = this.$route.params.studentId;
     this.volunteerId = this.$route.params.volunteerId;
+
     console.log("student " + this.studentId);
     console.log("volunteer " + this.volunteerId);
     if (this.userType === "student") {
@@ -245,6 +250,8 @@ export default {
       console.log(this.userResponse);
       NetworkService.feedback(this, {
         sessionId: this.sessionId,
+        topic: this.topic,
+        subTopic: this.subTopic,
         responseData: this.userResponse,
         userType: this.userType,
         studentId: this.studentId,
