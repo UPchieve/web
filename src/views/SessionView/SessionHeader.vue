@@ -70,13 +70,17 @@ export default {
     end () {
       let studentId = ''
       let volunteerId = null
+      let subTopic = null
+      let topic = null
       let sessionId = SessionService.currentSession.sessionId
+
       if (
         SessionService.currentSession &&
         SessionService.currentSession.data.student
       ) {
         studentId = SessionService.currentSession.data.student._id
       }
+
       if (
         SessionService.currentSession &&
         SessionService.currentSession.data.volunteer
@@ -84,14 +88,33 @@ export default {
         volunteerId = SessionService.currentSession.data.volunteer._id
       }
 
+      if (
+        SessionService.currentSession &&
+        SessionService.currentSession.data.type
+      ) {
+        topic = SessionService.currentSession.data.type
+      }
+
+      if (
+        SessionService.currentSession &&
+        SessionService.currentSession.data.subTopic
+      ) {
+        subTopic = SessionService.currentSession.data.subTopic
+      }
+
       const result = window.confirm('Do you really want to end the session?')
+      
       if (result) {
         if (volunteerId) {
           this.$socket.disconnect()
-          SessionService.endSession(this, sessionId, { skipRoute: true })
+          SessionService.endSession(this, sessionId)
           const url =
             '/feedback/' +
             sessionId +
+            '/' +
+            topic +
+            '/' + 
+            subTopic +
             '/' +
             (UserService.getUser().isVolunteer ? 'volunteer' : 'student') +
             '/' +
@@ -100,7 +123,7 @@ export default {
             volunteerId
           router.replace(url)
         } else {
-          SessionService.endSession(this, sessionId, { skipRoute: true })
+          SessionService.endSession(this, sessionId)
           router.replace('/')
         }
       }
