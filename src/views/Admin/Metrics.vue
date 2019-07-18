@@ -1,6 +1,7 @@
 <template>
 <div>
-<v-select v-model= "selected" :options="certifications" @input ="calendarToArray"></v-select>
+    <div class = "choose"> <v-select v-model= "selected" :options="topics" @input ="calendarToArray"> </v-select> 
+    </div>
 <div class = "calendar">
     <div v-for="(day, index2) in calendar"
        :key = "`${index2}`">
@@ -34,40 +35,31 @@ export default{
     data () {
 
         return {
-            selected : null,
-            certifications: ['algebra', 'precalculus'],
+            topics: ['algebra', 'applications', 'biology', 'calculus', 'chemistry', 'esl', 'essays', 'geometry', 'planning', 'precalculus', 'trigonometry'],
+            selected : 'algebra',
             degs: '50%',
             times: [],
             daysOfWeek: [],
             calendar: [],
             maxVolunteers : 0, //tracks the max volunteers this week
+            minVolunteers : 0
             }
         },
  
     created () {
-        this.calendarToArray()
+       this.calendarToArray(this.selected)
         //this.getUsers()
     },
 
     methods: {
         getGradient(hour){
-            //this.maxVolunteers+1-hour for reversed colors
-            return (hour)*(80/this.maxVolunteers+1)+'%'
-        },
-        getSubjects(){
-            console.log(this.volunteersIterator)
-        },
-        getUsers(){
-            UserService.getVolunteers(this).then(volunteers =>{
-                console.log(volunteers)
-            }
-            )
+            let gradient = ((hour/(this.maxVolunteers - this.minVolunteers)) * (70) + 20) + '%'
+            return gradient
         },
 
-    calendarToArray(){
+    calendarToArray(certifiedSubject){
         const calendar = Array(8).fill(0).map(()=>Array(25).fill(0));
-        UserService.getVolunteersAvailability(this).then(availability =>{
-            console.log(availability)
+        UserService.getVolunteersAvailability(this, certifiedSubject).then(availability =>{
             this.volunteers = Object.keys(availability)
             for(const user in availability){ //iterating through users
                 for (const day in availability[user]) { //iterating through days
@@ -82,6 +74,9 @@ export default{
                                 calendar[dayIndex][timeIndex]++
                                 if(calendar[dayIndex][timeIndex] > this.maxVolunteers){
                                     this.maxVolunteers = calendar[dayIndex][timeIndex]
+                                }
+                                else if(calendar[dayIndex][timeIndex] < this.minVolunteers){
+                                    this.minVolunteers  = calendar[dayIndex][timeIndex]
                                 }
                         }
                     } 
@@ -143,7 +138,11 @@ export default{
 }
 
 .test {
-    background: hsl(120, 30%, var(--degs));
+    background: hsla(120, 30%, 20%, var(--degs));
+}
+
+.choose {
+    text-align: center;
 }
 
 </style>

@@ -80,7 +80,7 @@ const routes = [
     path: '/admin',
     name: 'Navigation',
     component: Navigation,
-    meta: {protected : true, bypassOnboarding: true}
+    meta: { protected: true, bypassOnboarding: true }
   },
   {
     path: '/edu',

@@ -5,7 +5,7 @@
   </div>
     <div class="parent">
         <div class="container-section linkBtn btn">
-            <router-link to="metrics" class="prompt"
+            <router-link to="/metrics" class="prompt"
             >Metrics</router-link>
         </div>
         <div class = "container-section linkBtn btn">
