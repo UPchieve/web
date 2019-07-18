@@ -7,10 +7,6 @@
         <router-link to="/login" class="uc-form-button" tag="button">
           Login
         </router-link>
-
-        <router-link to="/feedback" class="uc-form-button" tag="button">
-          Give Feedback
-        </router-link>
       </div>
 
       <form-footer />

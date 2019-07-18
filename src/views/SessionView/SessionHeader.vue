@@ -113,6 +113,10 @@ export default {
               '/feedback/' +
               sessionId +
               '/' +
+              topic +
+              '/' + 
+              subTopic +
+              '/' +
               (UserService.getUser().isVolunteer ? 'volunteer' : 'student') +
               '/' +
               studentId +

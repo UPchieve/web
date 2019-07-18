@@ -8,6 +8,21 @@
     </div>
     <div class="wrap-container">
       <div class="personal-info contain">
+        <div
+          v-if="errors.length"
+          class="errors"
+        >
+          <h4 class="errors-heading">Please correct the following problem<span v-if="errors.length > 1">s</span> before saving:</h4>
+          <ul class="errors-list">
+            <li v-for="error in errors">{{ error }}</li>
+          </ul>
+        </div>
+        <div
+          v-if="saveFailed"
+          class="errors"
+        >
+          <h4 class="errors-heading">Could not save data</h4>
+        </div>
         <div class="subheader">Personal Information</div>
         <div class="container-content">
           <div id="email" class="container-section">
@@ -29,6 +44,7 @@
                 v-model="user.highschool"
                 type="text"
                 class="form-control"
+                :class="{'invalid': invalidInputs.indexOf('highschool') > -1}"
               />
             </div>
           </div>
@@ -44,6 +60,7 @@
                 v-model="user.phonePretty"
                 type="text"
                 class="form-control"
+                :class="{'invalid': invalidInputs.indexOf('phone') > -1}"
               />
 
               <div class="description">
@@ -64,6 +81,7 @@
                 v-model="user.college"
                 type="text"
                 class="form-control"
+                :class="{'invalid': invalidInputs.indexOf('college') > -1}"
               />
             </div>
 
@@ -83,6 +101,7 @@
                 v-model="user.favoriteAcademicSubject"
                 type="text"
                 class="form-control"
+                :class="{'invalid': invalidInputs.indexOf('favoriteAcademicSubject') > -1}"
               />
             </div>
           </div>
@@ -126,6 +145,8 @@
 
 <script>
 import UserService from '@/services/UserService'
+
+import phoneValidation from '@/utils/phone-validation'
 
 export default {
   data () {
@@ -203,18 +224,71 @@ export default {
         backgroundImage: `url(${avatarUrl})`
       },
       certifications,
-      certKey
+      certKey,
+      errors: [],
+      invalidInputs: [],
+      saveFailed: false
     }
   },
   methods: {
+    /**
+     * Toggle editing state.
+     * {Case A} if activeEdit === false: enter the editing state by setting activeEdit to true
+     * {Case B} if activeEdit === true: save profile changes & exit the editing state by setting activeEdit to false
+     */
     editProfile () {
-      if (this.activeEdit) {
-        UserService.setProfile(this, this.user)
-        this.editBtnMsg = 'Edit Profile'
-        this.activeEdit = false
-      } else {
+      // {Case A} Enter the editing state, then early exit
+      if (!this.activeEdit) {
         this.editBtnMsg = 'Save Profile'
         this.activeEdit = true
+        return
+      }
+
+      // {Case B} The remainder of this function saves new changes and exits the editing state
+
+      // Start by erasing previous errors
+      this.errors = []
+      this.invalidInputs = []
+      this.saveFailed = false
+
+      // Validate fields
+      if (this.user.isVolunteer) {
+		// volunteers must provide a phone number, so display error message and
+	    // mark field invalid
+        if (!this.user.phonePretty || !phoneValidation.validatePhoneNumber(this.user.phonePretty)) {
+          this.errors.push('Please enter a valid U. S. phone number.')
+          this.invalidInputs.push('phone')
+		}
+		// a college name is required
+        if (!this.user.college) {
+          this.errors.push('Please tell us what college you go to.')
+          this.invalidInputs.push('college')
+		}
+		// a favorite academic subject is required
+        if (!this.user.favoriteAcademicSubject) {
+          this.errors.push('Please tell us your favorite academic subject.')
+          this.invalidInputs.push('favoriteAcademicSubject')
+        }
+      } else {
+        // students must provide the name of their high school
+        if (!this.user.highschool) {
+          this.errors.push('Please tell us what high school you go to.')
+          this.invalidInputs.push('highschool')
+        }
+	  }
+
+      if (!this.errors.length) {
+        // form fields valid, so set profile
+        // wait for save to succeed before coming out of edit mode
+        UserService.setProfile(this, this.user)
+        .then(res => {
+          this.editBtnMsg = 'Edit Profile'
+          this.activeEdit = false
+          this.saveFailed = false
+        },
+        res => {
+          this.saveFailed = true
+        })
       }
     }
   }
@@ -373,6 +447,10 @@ ul {
 .form-control {
   border-bottom: 3px solid #16d2aa;
   margin-bottom: 10px;
+
+  &.invalid {
+    border-bottom: 3px solid #bf0000;
+  }
 }
 
 .form-control:focus {
@@ -441,7 +519,19 @@ ul {
   background-color: #f7aef8;
 }
 
+.errors {
+  text-align: left;
+  padding: 30px;
+}
 
+.errors-heading {
+  color: #bf0000;
+}
+
+.errors-list {
+  color: #bf0000;
+  margin-left: 40px;
+}
 
 @media screen and (max-width: 700px) {
   .header {
