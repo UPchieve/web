@@ -1,7 +1,6 @@
 import Vue from "vue";
 import VueResource from "vue-resource";
 import VueRouter from "vue-router";
-import VueSocketio from "vue-socket.io";
 
 import ContactView from "./views/ContactView";
 import LegalView from "./views/LegalView";
@@ -31,7 +30,6 @@ import OnboardingService from "./services/OnboardingService";
 
 Vue.use(VueResource);
 Vue.use(VueRouter);
-Vue.use(VueSocketio, process.env.VUE_APP_SOCKET_ADDRESS);
 
 Vue.http.options.credentials = true;
 

@@ -1,14 +1,20 @@
 import Vue from "vue";
+import VueSocketIO from "vue-socket.io";
+import VueHeadful from "vue-headful";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
-import vueHeadful from "vue-headful";
 
+// Prevent production tip on startup
 Vue.config.productionTip = false;
 
-// Setup vue-headful
-Vue.component("vue-headful", vueHeadful);
+// Use vue-socket.io
+Vue.use(VueSocketIO, process.env.VUE_APP_SOCKET_ADDRESS);
 
+// Set up vue-headful
+Vue.component("vue-headful", VueHeadful);
+
+// Create Vue instance
 new Vue({
   router,
   store,
