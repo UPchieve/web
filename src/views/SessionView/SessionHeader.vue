@@ -73,30 +73,37 @@ export default {
       let subTopic = null
       let topic = null
       let sessionId = SessionService.currentSession.sessionId
+
       if (
         SessionService.currentSession &&
         SessionService.currentSession.data.student
       ) {
         studentId = SessionService.currentSession.data.student._id
       }
+
       if (
         SessionService.currentSession &&
         SessionService.currentSession.data.volunteer
       ) {
         volunteerId = SessionService.currentSession.data.volunteer._id
       }
-      if ( SessionService.currentSession &&
-      SessionService.currentSession.data.type
-      ){
+
+      if (
+        SessionService.currentSession &&
+        SessionService.currentSession.data.type
+      ) {
         topic = SessionService.currentSession.data.type
       }
-      if ( SessionService.currentSession &&
-      SessionService.currentSession.data.subTopic
-      ){
+
+      if (
+        SessionService.currentSession &&
+        SessionService.currentSession.data.subTopic
+      ) {
         subTopic = SessionService.currentSession.data.subTopic
       }
 
       const result = window.confirm('Do you really want to end the session?')
+      
       if (result) {
         if (volunteerId) {
           this.$socket.disconnect()
