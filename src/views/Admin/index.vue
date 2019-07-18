@@ -1,30 +1,19 @@
 <template>
-<div>
-<div class="header">
-  Admin Dashboard 
-  </div>
+  <div class="admin-view">
+    <div class="header">Admin Dashboard</div>
     <div class="parent">
-        <div class="container-section linkBtn btn">
-            <router-link to="metrics" class="prompt"
-            >Metrics</router-link>
-        </div>
-        <div class = "container-section linkBtn btn">
-          <router-link to="/edu" class="prompt"
-            >Edu Admin</router-link>
-        </div>
+      <div class="container-section linkBtn btn">
+        <router-link to="admin/volunteer-coverage" class="prompt">Volunteer Coverage</router-link>
+      </div>
+      <div class = "container-section linkBtn btn">
+        <router-link to="admin/edu" class="prompt">Edu Admin</router-link>
+      </div>
     </div>
-        </div>
-
+  </div>
 </template>
 
 <script>
-export default{
-    data () {
-        return {
-            message: 'UPchieve!'
-        }
-        }
-    }
+export default {}
 </script>
 
 
@@ -44,18 +33,20 @@ export default{
   justify-content: center;
   font-size: 16px;
   font-weight: 600;
+
+  a {
+    color: white;
+    text-decoration: none;
+  }
+
+  &:hover {
+    a {
+      color:#2c3e50;
+    }
+  }
 }
 
-.linkBtn a {
-  color: white;
-}
-
-.linkBtn a:hover {
-  color:#2c3e50;
-  text-decoration: none;
-}
-
- .parent {
+.parent {
   padding: 100px;
   display: flex;
   flex-direction: column;
