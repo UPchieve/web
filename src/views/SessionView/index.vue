@@ -99,6 +99,10 @@ export default {
       this.sessionId = this.currentSession.sessionId
       this.$socket.connect()
       this.joinSession(sessionId)
+	})
+    .catch(() => {
+      window.alert('Could not start new help session')
+      this.$router.replace('/')
     })
 
     // Offer the option to ask a question
