@@ -67,12 +67,12 @@ export default {
   },
   getVolunteersAvailability (context, data) {
     return context.$http
-      .get(`${API_ROOT}/admin/volunteers/availability/${data}`)
+      .get(`${API_ROOT}/volunteers/availability/${data}`)
       .then(this._successHandler, this._errorHandler)
   },
   getVolunteers (context) {
     return context.$http
-      .get(`${API_ROOT}/admin/volunteers`)
+      .get(`${API_ROOT}/volunteers`)
       .then(this._successHandler, this._errorHandler)
   },
   newSession (context, data) {

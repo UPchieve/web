@@ -21,7 +21,9 @@
        </div>
     </div>
     </div>
+    <div v-if="msg !== ''">{{ msg }}</div>
 </div>
+
 
 
         </template>
@@ -35,6 +37,7 @@ export default{
     data () {
 
         return {
+            msg: '',
             topics: ['algebra', 'applications', 'biology', 'calculus', 'chemistry', 'esl', 'essays', 'geometry', 'planning', 'precalculus', 'trigonometry'],
             selected : 'algebra',
             degs: '50%',
@@ -58,7 +61,6 @@ export default{
         },
 
     calendarToArray(certifiedSubject){
-        console.log(certifiedSubject)
         const calendar = Array(8).fill(0).map(()=>Array(25).fill(0));
         UserService.getVolunteersAvailability(this, certifiedSubject).then(availability =>{
             this.volunteers = Object.keys(availability)
@@ -85,6 +87,8 @@ export default{
             }
         calendar[0][0] = '----'
         this.calendar = calendar
+        }).catch(err => {
+          this.msg = err.message
         })
     },
  

@@ -58,12 +58,24 @@ export default {
 
   getVolunteers (context) {
     return NetworkService.getVolunteers(context).then(res => {
-      return res.data.volunteers
+      if (res.data.err) {
+        return res.data.err
+      } else if (res.data.volunteers) {
+        return res.data.volunteers
+      } else {
+        throw new Error()
+      }
     })
   },
   getVolunteersAvailability (context, certifiedSubject) {
     return NetworkService.getVolunteersAvailability(context, certifiedSubject).then(res => {
-      return res.data.userAvailabilityMap
+      if (res.data.err) {
+        return res.data.err
+      } else if (res.data.userAvailabilityMap) {
+        return res.data.userAvailabilityMap
+      } else {
+        throw new Error()
+      }
     })
   }
 }
