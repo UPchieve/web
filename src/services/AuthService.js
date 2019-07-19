@@ -37,9 +37,8 @@ export default {
           router.push(redirect);
         }
       },
-      res => {
+      () => {
         context.error = "Could not login";
-        console.log(res);
       }
     );
   },
@@ -48,7 +47,6 @@ export default {
     return NetworkService.register(context, { ...creds, ...profile }).then(
       res => {
         const data = { ...res.data };
-        console.log(data);
         if (!data) {
           throw new Error("No user returned from auth service");
         } else if (data.err) {
@@ -79,7 +77,6 @@ export default {
   sendReset(context, email, redirect) {
     return NetworkService.sendReset(context, { email }).then(res => {
       const data = { ...res.data };
-      console.log(data);
       if (!data) {
         throw new Error("No user returned from auth service");
       }
@@ -100,11 +97,9 @@ export default {
   confirmReset(context, credentials, redirect) {
     return NetworkService.confirmReset(context, credentials).then(res => {
       const data = { ...res.data };
-      console.log(data);
       if (!data) {
         throw new Error("No user returned from auth service");
       } else if (data.err) {
-        console.log(data.err.message);
         throw new Error(data.err);
       }
 
@@ -188,8 +183,8 @@ export default {
           this.user.data = null;
         }
       })
-      .catch(err => {
-        console.log(err);
+      .catch((/*err*/) => {
+        // console.log(err);
       });
   }
 };

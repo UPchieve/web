@@ -497,7 +497,6 @@ export default {
       }
 
       this.buttonMsg = "Updating...";
-      console.log(this.user);
       UserService.setProfile(this, this.user, "/");
     }
   }

@@ -179,9 +179,7 @@ export default {
       const path = localStorage.getItem("currentSessionPath");
       if (path) {
         this.$router.push(path);
-        console.log(`rejoining session: ${path}`);
       } else {
-        console.log(`session terminated`);
         this.$router.push("/");
       }
     },

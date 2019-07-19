@@ -53,10 +53,8 @@ export default {
         const path = `/session/${type}/${subTopic}/${_id}`;
         localStorage.setItem("currentSessionPath", path);
         this.$router.push(path);
-        console.log(`joining session: ${path}`);
       } else {
         localStorage.removeItem("currentSessionPath");
-        console.error(`Could not rejoin session`);
       }
     }
   },

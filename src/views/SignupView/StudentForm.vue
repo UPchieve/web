@@ -309,7 +309,6 @@ export default {
           UserService.setProfile(this, user, "/");
         })
         .catch(err => {
-          console.log(err);
           this.msg = err.message;
         });
     }

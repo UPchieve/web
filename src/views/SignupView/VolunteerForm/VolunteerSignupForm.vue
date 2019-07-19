@@ -307,7 +307,6 @@ export default {
           this.step = "success-message";
         })
         .catch(err => {
-          console.log(err);
           this.msg = err.message;
         });
     }

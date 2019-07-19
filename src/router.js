@@ -190,7 +190,6 @@ export default router;
 router.beforeEach((to, from, next) => {
   if (to.matched.some(route => route.meta.protected)) {
     if (!AuthService.user.authenticated) {
-      console.log("Protected route requires login");
       next({
         path: "/login",
         query: {
@@ -198,7 +197,6 @@ router.beforeEach((to, from, next) => {
         }
       });
     } else if (!OnboardingService.isOnboarded()) {
-      console.log("User requires onboarding");
       const route = OnboardingService.getOnboardingRoute();
       if (
         to.path.indexOf(route) !== -1 ||

@@ -143,7 +143,6 @@ export default {
       clearTimeout(this.typingTimeout);
       this.typingTimeout = setTimeout(() => {
         this.notTyping();
-        console.log("Timeout expired");
       }, 2000);
     }
   },

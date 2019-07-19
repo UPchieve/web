@@ -233,8 +233,6 @@ export default {
     this.studentId = this.$route.params.studentId;
     this.volunteerId = this.$route.params.volunteerId;
 
-    console.log("student " + this.studentId);
-    console.log("volunteer " + this.volunteerId);
     if (this.userType === "student") {
       this.questions = this.student_questions;
     } else {
@@ -247,7 +245,6 @@ export default {
   },
   methods: {
     submitFeedback() {
-      console.log(this.userResponse);
       NetworkService.feedback(this, {
         sessionId: this.sessionId,
         topic: this.topic,

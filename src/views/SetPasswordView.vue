@@ -88,7 +88,6 @@ export default {
           this.showingSuccess = true;
         })
         .catch(err => {
-          console.log(err);
           this.msg = err.message;
         });
     }

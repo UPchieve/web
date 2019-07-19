@@ -628,11 +628,9 @@ export default {
       );
     },
     draw() {
-      console.log("SERVER DRAWING");
       SERVER_DRAWING = true;
     },
     end() {
-      console.log("SERVER DONE DRAWING");
       SERVER_DRAWING = false;
     },
     save() {

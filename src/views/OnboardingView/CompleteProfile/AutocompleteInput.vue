@@ -49,8 +49,7 @@ export default {
         .then(res => {
           return Promise.resolve(res.body.suggestions);
         })
-        .catch(err => {
-          console.error(err.bodyText);
+        .catch(() => {
           return Promise.resolve([]);
         });
     },

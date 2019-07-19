@@ -49,7 +49,6 @@ export default {
       },
       res => {
         context.msg = "Error occurred";
-        console.log(res);
         return Promise.reject(res);
       }
     );

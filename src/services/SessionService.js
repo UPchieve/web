@@ -23,11 +23,7 @@ export default {
   endSession(context, sessionId) {
     localStorage.removeItem("currentSessionPath");
 
-    return NetworkService.endSession(context, { sessionId }).then(res => {
-      const data = res.data || {};
-      const { sessionId } = data;
-
-      console.log(`ended session: ${sessionId}`);
+    return NetworkService.endSession(context, { sessionId }).then(() => {
       this.currentSession.sessionId = null;
       this.currentSession.data = {};
     });
@@ -42,8 +38,6 @@ export default {
       const { sessionId } = data;
 
       this.currentSession.sessionId = sessionId;
-
-      console.log(`newSession: ${sessionId}`);
 
       if (sessionId) {
         const path = `/session/${sessionType}/${sessionSubTopic}/${sessionId}`;
@@ -64,7 +58,6 @@ export default {
 
       this.currentSession.sessionId = sessionId;
 
-      console.log(`useExistingSession: ${sessionId}`);
       if (!sessionId) {
         router.replace("/");
       }
@@ -81,7 +74,6 @@ export default {
       if (resp.data.err) {
         this.currentSession.sessionId = null;
         this.currentSession.data = {};
-        console.log("no active session found");
 
         localStorage.removeItem("currentSessionPath");
         return;
