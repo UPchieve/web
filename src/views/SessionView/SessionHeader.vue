@@ -121,7 +121,7 @@ export default {
       const result = window.confirm('Do you really want to end the session?')
       if (result) {
         if (volunteerId) {
-          SessionService.endSession(this, sessionId, { skipRoute: true })
+          SessionService.endSession(this, sessionId)
           .then(() => {
             this.$socket.disconnect()
             const url =
@@ -129,7 +129,7 @@ export default {
               sessionId +
               '/' +
               topic +
-              '/' + 
+              '/' +
               subTopic +
               '/' +
               (UserService.getUser().isVolunteer ? 'volunteer' : 'student') +
@@ -141,7 +141,7 @@ export default {
           })
           .catch(this.alertCouldNotEnd)
         } else {
-          SessionService.endSession(this, sessionId, { skipRoute: true })
+          SessionService.endSession(this, sessionId)
           .then(() => {
             this.$socket.disconnect()
             router.replace('/')
