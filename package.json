@@ -5,7 +5,7 @@
   "author": "Corey <corey.johns@believeachieve.com>",
   "private": true,
   "scripts": {
-    "dev": "vue-cli-service serve",
+    "dev": "vue-cli-service serve --open",
     "build": "vue-cli-service build",
     "build:staging": "vue-cli-service build --mode=staging",
     "lint": "vue-cli-service lint",
