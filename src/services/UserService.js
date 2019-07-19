@@ -62,7 +62,7 @@ export default {
     })
   },
   getVolunteersAvailability (context, certifiedSubject) {
-    return NetworkService.getVolunteersAvailability(context, { certifiedSubject }).then(res => {
+    return NetworkService.getVolunteersAvailability(context, certifiedSubject).then(res => {
       return res.data.userAvailabilityMap
     })
   }

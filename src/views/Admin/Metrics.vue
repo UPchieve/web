@@ -1,7 +1,7 @@
 <template>
 <div>
-    <div class = "choose"> <v-select v-model= "selected" :options="topics" @input ="calendarToArray"> </v-select> 
-    </div>
+   <v-select v-model= "selected" :options="topics" @input ="calendarToArray"> </v-select> 
+   
 <div class = "calendar">
     <div v-for="(day, index2) in calendar"
        :key = "`${index2}`">
@@ -58,6 +58,7 @@ export default{
         },
 
     calendarToArray(certifiedSubject){
+        console.log(certifiedSubject)
         const calendar = Array(8).fill(0).map(()=>Array(25).fill(0));
         UserService.getVolunteersAvailability(this, certifiedSubject).then(availability =>{
             this.volunteers = Object.keys(availability)
