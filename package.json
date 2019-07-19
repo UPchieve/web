@@ -45,6 +45,7 @@
     "lint-staged": "^9.2.0",
     "node-sass": "^4.9.0",
     "sass-loader": "^7.1.0",
+    "simple-progress-webpack-plugin": "^1.1.2",
     "style-resources-loader": "^1.2.1",
     "vue-template-compiler": "^2.6.10"
   },
