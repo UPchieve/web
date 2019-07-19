@@ -71,8 +71,8 @@ export default {
     return NetworkService.getVolunteersAvailability(context, certifiedSubject).then(res => {
       if (res.data.err) {
         return res.data.err
-      } else if (res.data.userAvailabilityMap) {
-        return res.data.userAvailabilityMap
+      } else if (res.data.aggAvailabilities) {
+        return res.data.aggAvailabilities
       } else {
         throw new Error()
       }

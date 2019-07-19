@@ -3,15 +3,12 @@
    <v-select v-model= "selected" :options="topics" @input ="calendarToArray"> </v-select> 
    
 <div class = "calendar">
-    <div v-for="(day, index2) in calendar"
+    <div v-for="(day, index2) in availabilityTable"
        :key = "`${index2}`">
         <div v-for="(hour, index3) in day"
             :key = "`${index3}`"> 
                 <div v-if="(index2 = 0)|| (index3 = 0)">
-                    <div class = "header">
-                        console.log({{hour}})
                         {{hour}}
-                        </div>
                 </div>
                 <div v-else>
                     <div class = 'hour' :style = "{'--hour': getGradient(hour)}">
@@ -40,18 +37,14 @@ export default{
             msg: '',
             topics: ['algebra', 'applications', 'biology', 'calculus', 'chemistry', 'esl', 'essays', 'geometry', 'planning', 'precalculus', 'trigonometry'],
             selected : 'algebra',
-            degs: '50%',
-            times: [],
-            daysOfWeek: [],
-            calendar: [],
-            maxVolunteers : 0, //tracks the max volunteers this week
-            minVolunteers : 0
+            maxVolunteers : 0, //stores the max volunteers this week
+            minVolunteers : 0, //stores the min volunteers this week
+            availabilityTable: []
             }
         },
  
     created () {
        this.calendarToArray(this.selected)
-        //this.getUsers()
     },
 
     methods: {
@@ -61,32 +54,13 @@ export default{
         },
 
     calendarToArray(certifiedSubject){
-        const calendar = Array(8).fill(0).map(()=>Array(25).fill(0));
+        this.maxVolunteers = 0
+        this.minVolunteers = 0
         UserService.getVolunteersAvailability(this, certifiedSubject).then(availability =>{
-            this.volunteers = Object.keys(availability)
-            for(const user in availability){ //iterating through users
-                for (const day in availability[user]) { //iterating through days
-                    this.daysOfWeek = Object.keys(availability[user])
-                    this.times = Object.keys(availability[user][day])
-                    for (const time in availability[user][day]) { //iterating through times
-                        let dayIndex = this.daysOfWeek.indexOf(day)+1
-                        let timeIndex = this.convertTimeToIndex(time)+1
-                         calendar[dayIndex][0] = day
-                         calendar[0][timeIndex] = time
-                        if (availability[user][day][time]) {
-                                calendar[dayIndex][timeIndex]++
-                                if(calendar[dayIndex][timeIndex] > this.maxVolunteers){
-                                    this.maxVolunteers = calendar[dayIndex][timeIndex]
-                                }
-                                else if(calendar[dayIndex][timeIndex] < this.minVolunteers){
-                                    this.minVolunteers  = calendar[dayIndex][timeIndex]
-                                }
-                        }
-                    } 
-                }
-            }
-        calendar[0][0] = '----'
-        this.calendar = calendar
+            this.minVolunteers = availability.min
+            this.maxVolunteers = availability.max
+            this.availabilityTable = availability.table
+            return this.availabilityTable
         }).catch(err => {
           this.msg = err.message
         })
