@@ -1,56 +1,56 @@
 /* eslint-disable no-tabs */
-import moment from 'moment'
+import moment from "moment";
 
-import NetworkService from './NetworkService'
-import AuthService from './AuthService'
-import OnboardingService from './OnboardingService'
+import NetworkService from "./NetworkService";
+import AuthService from "./AuthService";
+import OnboardingService from "./OnboardingService";
 
-import router from '@/router'
+import router from "@/router";
 
 export default {
   getAuth() {
-    return AuthService.user
+    return AuthService.user;
   },
   getUser() {
-    const auth = this.getAuth()
+    const auth = this.getAuth();
     if (auth.authenticated) {
-      return auth.data
+      return auth.data;
     }
-    return {}
+    return {};
   },
   validateBirthdate(birthdate) {
-    const m = moment(birthdate, 'MM/DD/YYYY')
+    const m = moment(birthdate, "MM/DD/YYYY");
     if (!m.isValid()) {
-      return 'Birthdate is invalid'
+      return "Birthdate is invalid";
     }
 
-    return true // No validation errors
+    return true; // No validation errors
   },
   getOnboardingServiceInterest() {
-    const user = this.getUser()
-    return (user && user.onboardingServiceInterest) || []
+    const user = this.getUser();
+    return (user && user.onboardingServiceInterest) || [];
   },
   getOnboarding() {
-    return OnboardingService.status
+    return OnboardingService.status;
   },
   setProfile(context, data, redirect) {
     return NetworkService.setProfile(context, data).then(
       res => {
         if (res.data) {
-          AuthService.storeUser(res.data.user)
-          context.msg = 'Set!'
+          AuthService.storeUser(res.data.user);
+          context.msg = "Set!";
         } else {
-          throw new Error()
+          throw new Error();
         }
         if (redirect) {
-          router.push(redirect)
+          router.push(redirect);
         }
-        return Promise.resolve(res)
+        return Promise.resolve(res);
       },
       res => {
-        context.msg = 'Error occurred'
-        return Promise.reject(res)
+        context.msg = "Error occurred";
+        return Promise.reject(res);
       }
-    )
+    );
   }
-}
+};

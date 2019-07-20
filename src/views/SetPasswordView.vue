@@ -58,8 +58,8 @@
 </template>
 
 <script>
-import AuthService from '@/services/AuthService'
-import FormPageTemplate from '@/components/FormPageTemplate'
+import AuthService from "@/services/AuthService";
+import FormPageTemplate from "@/components/FormPageTemplate";
 
 export default {
   components: {
@@ -67,14 +67,14 @@ export default {
   },
   data() {
     return {
-      msg: '',
+      msg: "",
       credentials: {
-        token: '',
-        email: '',
-        password: '',
-        newpassword: ''
+        token: "",
+        email: "",
+        password: "",
+        newpassword: ""
       }
-    }
+    };
   },
   methods: {
     submit() {
@@ -85,14 +85,14 @@ export default {
         newpassword: this.credentials.newpassword
       })
         .then(() => {
-          this.showingSuccess = true
+          this.showingSuccess = true;
         })
         .catch(err => {
-          this.msg = err.message
-        })
+          this.msg = err.message;
+        });
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

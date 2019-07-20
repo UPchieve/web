@@ -28,90 +28,90 @@
 </template>
 
 <script>
-import UserService from '@/services/UserService'
+import UserService from "@/services/UserService";
 
-const openSessions = []
+const openSessions = [];
 
 export default {
   data() {
-    const user = UserService.getUser()
+    const user = UserService.getUser();
     return {
       user,
       openSessions
-    }
+    };
   },
   mounted() {
-    this.$socket.emit('list', {
+    this.$socket.emit("list", {
       user: UserService.getUser()
-    })
+    });
   },
   methods: {
     gotoSession(session) {
-      const { type, subTopic, _id } = session
+      const { type, subTopic, _id } = session;
 
       if (type && subTopic && _id) {
-        const path = `/session/${type}/${subTopic}/${_id}`
-        localStorage.setItem('currentSessionPath', path)
-        this.$router.push(path)
+        const path = `/session/${type}/${subTopic}/${_id}`;
+        localStorage.setItem("currentSessionPath", path);
+        this.$router.push(path);
       } else {
-        localStorage.removeItem('currentSessionPath')
+        localStorage.removeItem("currentSessionPath");
       }
     }
   },
   sockets: {
     sessions(sessions) {
-      const results = []
-      const socketSessions = sessions.filter(session => !session.volunteer)
+      const results = [];
+      const socketSessions = sessions.filter(session => !session.volunteer);
 
       for (let i = 0; i < socketSessions.length; i++) {
-        const currentSession = socketSessions[i]
-        if (socketSessions[i].type === 'college') {
-          results.push(currentSession)
+        const currentSession = socketSessions[i];
+        if (socketSessions[i].type === "college") {
+          results.push(currentSession);
         } else {
-          const { subTopic } = currentSession
+          const { subTopic } = currentSession;
 
-          if (subTopic === 'algebra') {
+          if (subTopic === "algebra") {
             if (this.user.algebra.passed) {
-              results.push(currentSession)
+              results.push(currentSession);
             }
           }
 
-          if (subTopic === 'geometry') {
+          if (subTopic === "geometry") {
             if (this.user.geometry.passed) {
-              results.push(currentSession)
+              results.push(currentSession);
             }
           }
 
-          if (subTopic === 'trigonometry') {
+          if (subTopic === "trigonometry") {
             if (this.user.trigonometry.passed) {
-              results.push(currentSession)
+              results.push(currentSession);
             }
           }
 
-          if (subTopic === 'esl') {
+          if (subTopic === "esl") {
             if (this.user.esl.passed) {
-              results.push(currentSession)
+              results.push(currentSession);
             }
           }
 
-          if (subTopic === 'precalculus') {
+          if (subTopic === "precalculus") {
             if (this.user.precalculus.passed) {
-              results.push(currentSession)
+              results.push(currentSession);
             }
           }
 
-          if (subTopic === 'calculus') {
+          if (subTopic === "calculus") {
             if (this.user.calculus.passed) {
-              results.push(currentSession)
+              results.push(currentSession);
             }
           }
         }
       }
 
-      this.openSessions = results
+      this.openSessions = results;
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

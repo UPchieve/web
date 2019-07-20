@@ -128,24 +128,24 @@
 </template>
 
 <script>
-import UserService from '@/services/UserService'
-import SessionService from '@/services/SessionService'
+import UserService from "@/services/UserService";
+import SessionService from "@/services/SessionService";
 
-import ListSessions from './ListSessions'
+import ListSessions from "./ListSessions";
 
 export default {
-  name: 'dashboard-view',
+  name: "dashboard-view",
   components: {
     ListSessions
   },
   data() {
-    const user = UserService.getUser() || {}
-    SessionService.getCurrentSession(this, user)
+    const user = UserService.getUser() || {};
+    SessionService.getCurrentSession(this, user);
 
     const subtopics = {
-      math: ['Algebra', 'Geometry', 'Trigonometry', 'Precalculus', 'Calculus'],
-      esl: ['General Help'],
-      college: ['Planning', 'Applications', 'Essays']
+      math: ["Algebra", "Geometry", "Trigonometry", "Precalculus", "Calculus"],
+      esl: ["General Help"],
+      college: ["Planning", "Applications", "Essays"]
 
       // Temporarily changing to single word labels
       // 'college': ['College Planning', 'Application Help','Essay Editing']
@@ -153,68 +153,68 @@ export default {
       // Temporarily removing science and standardized testing
       // 'science': ['Biology','Chemistry'],
       // 'standardizedtest': ['SAT']
-    }
+    };
     return {
       user,
-      name: user.firstname || 'student',
+      name: user.firstname || "student",
       popUpStyle: {},
       showHelpPopUp: false,
-      pickedTopic: '',
-      pickedSubtopic: '',
+      pickedTopic: "",
+      pickedSubtopic: "",
       subtopics,
       coverStyle: {}
-    }
+    };
   },
   watch: {
     // Watch the help topic for changes, and reset the subtopic when it does.
     pickedTopic: function() {
-      this.pickedSubtopic = ''
+      this.pickedSubtopic = "";
     }
   },
   methods: {
     hasActiveSession() {
-      return localStorage.getItem('currentSessionPath')
+      return localStorage.getItem("currentSessionPath");
     },
     rejoinHelpSession() {
-      const path = localStorage.getItem('currentSessionPath')
+      const path = localStorage.getItem("currentSessionPath");
       if (path) {
-        this.$router.push(path)
+        this.$router.push(path);
       } else {
-        this.$router.push('/')
+        this.$router.push("/");
       }
     },
     getHelp() {
       this.popUpStyle = {
-        display: 'flex'
-      }
+        display: "flex"
+      };
       this.coverStyle = {
-        background: 'rgba(0,0,0,0.10)'
-      }
-      this.showHelpPopUp = true
+        background: "rgba(0,0,0,0.10)"
+      };
+      this.showHelpPopUp = true;
     },
     capitalize(string) {
-      return string.charAt(0).toUpperCase() + string.slice(1)
+      return string.charAt(0).toUpperCase() + string.slice(1);
     },
     getHelpCancel() {
-      this.popUpStyle = {}
-      this.coverStyle = {}
-      this.showHelpPopUp = false
+      this.popUpStyle = {};
+      this.coverStyle = {};
+      this.showHelpPopUp = false;
     },
     getHelpNext() {
-      let topic = this.pickedTopic
-      let subTopic = this.pickedSubtopic
+      let topic = this.pickedTopic;
+      let subTopic = this.pickedSubtopic;
       // Temp change all to math
       // topic = 'math';
-      topic = topic.toLowerCase()
-      subTopic = subTopic.toLowerCase()
-      if (subTopic === 'general help') {
-        subTopic = topic
+      topic = topic.toLowerCase();
+      subTopic = subTopic.toLowerCase();
+      if (subTopic === "general help") {
+        subTopic = topic;
       }
-      const linkName = `/session/${topic}/${subTopic}`
-      this.$router.push(linkName)
+      const linkName = `/session/${topic}/${subTopic}`;
+      this.$router.push(linkName);
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -232,11 +232,11 @@ export default {
 }
 
 .header-container::after {
-  content: '';
+  content: "";
   display: inline-block;
   width: 100%;
   height: 100%;
-  background-image: url('~@/assets/dashboardHeader@2x.png');
+  background-image: url("~@/assets/dashboardHeader@2x.png");
   background-repeat: no-repeat;
   background-size: cover;
   position: absolute;
