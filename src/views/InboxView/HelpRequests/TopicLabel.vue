@@ -9,19 +9,19 @@ export default {
   props: {
     label: {
       type: String,
-      default: ""
+      default: ''
     }
   },
   data() {
     return {
       classes: {
-        "topic-label": true,
-        "topic-label--math": this.label.toLowerCase() === "math",
-        "topic-label--college": this.label.toLowerCase() === "college"
+        'topic-label': true,
+        'topic-label--math': this.label.toLowerCase() === 'math',
+        'topic-label--college': this.label.toLowerCase() === 'college'
       }
-    };
+    }
   }
-};
+}
 </script>
 
 <style lang="scss">

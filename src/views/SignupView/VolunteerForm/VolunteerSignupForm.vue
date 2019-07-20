@@ -174,57 +174,57 @@
 </template>
 
 <script>
-import validator from "validator";
+import validator from 'validator'
 
-import AuthService from "@/services/AuthService";
-import RegistrationService from "@/services/RegistrationService";
-import UserService from "@/services/UserService";
+import AuthService from '@/services/AuthService'
+import RegistrationService from '@/services/RegistrationService'
+import UserService from '@/services/UserService'
 
-import phoneValidation from "@/utils/phone-validation";
+import phoneValidation from '@/utils/phone-validation'
 
 export default {
   data() {
     return {
-      msg: "",
+      msg: '',
       errors: [],
       invalidInputs: [],
       credentials: {
-        email: "",
-        password: "",
+        email: '',
+        password: '',
         terms: false
       },
       profile: {
-        firstName: "",
-        lastName: "",
-        college: "",
-        phone: "",
-        favoriteAcademicSubject: ""
+        firstName: '',
+        lastName: '',
+        college: '',
+        phone: '',
+        favoriteAcademicSubject: ''
       },
-      step: "step-1"
-    };
+      step: 'step-1'
+    }
   },
   methods: {
     nextPage() {
       // validate input
-      this.errors = [];
-      this.invalidInputs = [];
+      this.errors = []
+      this.invalidInputs = []
       if (!this.credentials.email) {
-        this.errors.push("An email address is required.");
-        this.invalidInputs.push("inputEmail");
+        this.errors.push('An email address is required.')
+        this.invalidInputs.push('inputEmail')
       } else if (!validator.isEmail(this.credentials.email)) {
         // this is necessary because browsers ignore <input type="email"> until the
         // user actually tries to submit the form, which does not occur until step 2
         this.errors.push(
-          this.credentials.email + " is not a valid email address."
-        );
-        this.invalidInputs.push("inputEmail");
+          this.credentials.email + ' is not a valid email address.'
+        )
+        this.invalidInputs.push('inputEmail')
       }
       if (!this.credentials.password) {
-        this.errors.push("A password is required.");
-        this.invalidInputs.push("inputPassword");
+        this.errors.push('A password is required.')
+        this.invalidInputs.push('inputPassword')
       }
       if (this.errors.length) {
-        return;
+        return
       }
 
       // check credentials
@@ -233,55 +233,55 @@ export default {
         password: this.credentials.password
       })
         .then(() => {
-          this.step = "step-2";
+          this.step = 'step-2'
         })
         .catch(err => {
-          this.msg = err.message;
-        });
+          this.msg = err.message
+        })
     },
     checkInputs(e) {
-      this.errors = [];
-      this.invalidInputs = [];
+      this.errors = []
+      this.invalidInputs = []
 
       // validate input
       if (!this.profile.firstName || !this.profile.lastName) {
-        this.errors.push("You must enter your first and last name.");
+        this.errors.push('You must enter your first and last name.')
       }
       if (!this.profile.firstName) {
-        this.invalidInputs.push("firstName");
+        this.invalidInputs.push('firstName')
       }
       if (!this.profile.lastName) {
-        this.invalidInputs.push("lastName");
+        this.invalidInputs.push('lastName')
       }
       if (!this.profile.phone) {
-        this.errors.push("You must enter a phone number.");
-        this.invalidInputs.push("phone");
+        this.errors.push('You must enter a phone number.')
+        this.invalidInputs.push('phone')
       } else if (!phoneValidation.validatePhoneNumber(this.profile.phone)) {
         this.errors.push(
-          this.profile.phone + " is not a valid U.S. phone number."
-        );
-        this.invalidInputs.push("phone");
+          this.profile.phone + ' is not a valid U.S. phone number.'
+        )
+        this.invalidInputs.push('phone')
       }
       if (!this.profile.college) {
-        this.errors.push("Please enter the name of the college you go to.");
-        this.invalidInputs.push("college");
+        this.errors.push('Please enter the name of the college you go to.')
+        this.invalidInputs.push('college')
       }
       if (!this.profile.favoriteAcademicSubject) {
-        this.errors.push("Please enter your favorite academic subject.");
-        this.invalidInputs.push("favoriteAcademicSubject");
+        this.errors.push('Please enter your favorite academic subject.')
+        this.invalidInputs.push('favoriteAcademicSubject')
       }
       if (!this.credentials.terms) {
-        this.errors.push("You must read and accept the user agreement.");
+        this.errors.push('You must read and accept the user agreement.')
       }
       if (this.errors.length) {
-        e.preventDefault();
+        e.preventDefault()
       }
     },
     submit() {
       // convert phone number
       this.profile.phone = phoneValidation.convertPhoneNumber(
         this.profile.phone
-      );
+      )
 
       AuthService.register(this, {
         code: RegistrationService.data.registrationCode,
@@ -295,7 +295,7 @@ export default {
         favoriteAcademicSubject: this.profile.favoriteAcademicSubject
       })
         .then(() => {
-          let user = UserService.getUser();
+          let user = UserService.getUser()
           /*
           user.firstname = this.profile.firstName
           user.lastname = this.profile.lastName
@@ -303,15 +303,15 @@ export default {
           user.phone = this.profile.phone
           user.favoriteAcademicSubject = this.profile.favoriteAcademicSubject
           */
-          UserService.setProfile(this, user);
-          this.step = "success-message";
+          UserService.setProfile(this, user)
+          this.step = 'success-message'
         })
         .catch(err => {
-          this.msg = err.message;
-        });
+          this.msg = err.message
+        })
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

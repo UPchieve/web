@@ -13,20 +13,20 @@
 </template>
 
 <script>
-import OnboardingService from "@/services/OnboardingService";
+import OnboardingService from '@/services/OnboardingService'
 
 export default {
   data() {
     return {
-      msg: ""
-    };
+      msg: ''
+    }
   },
   methods: {
     sendVerification() {
-      OnboardingService.sendVerification(this, "/");
+      OnboardingService.sendVerification(this, '/')
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

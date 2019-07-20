@@ -23,16 +23,16 @@
 </template>
 
 <script>
-import SessionService from "@/services/SessionService";
-import UserService from "@/services/UserService";
+import SessionService from '@/services/SessionService'
+import UserService from '@/services/UserService'
 
-import SessionHeader from "./SessionHeader";
-import Whiteboard from "./Whiteboard";
-import SessionChat from "./SessionChat";
-import Modal from "@/components/Modal";
+import SessionHeader from './SessionHeader'
+import Whiteboard from './Whiteboard'
+import SessionChat from './SessionChat'
+import Modal from '@/components/Modal'
 
 export default {
-  name: "session-view",
+  name: 'session-view',
   components: {
     SessionHeader,
     Whiteboard,
@@ -48,7 +48,7 @@ export default {
     return {
       currentSession: SessionService.currentSession,
       showModal: false,
-      btnLabels: ["Submit question", "Exit session"],
+      btnLabels: ['Submit question', 'Exit session'],
       message: `
         We don’t have any Academic Coaches
         available right now, but you can submit a
@@ -59,62 +59,62 @@ export default {
       clickHandlers: {
         main: () => {
           this.$router.push({
-            path: "/submit-question",
+            path: '/submit-question',
             query: {
-              topic: this.$route.path.split("/")[2], // [1]
+              topic: this.$route.path.split('/')[2], // [1]
               subTopic: this.$route.params.subTopic
             }
-          });
+          })
         },
         second: () => {
-          this.$router.push("/");
+          this.$router.push('/')
         }
       }
-    };
+    }
   },
   mounted() {
-    const id = this.$route.params.sessionId;
-    let promise;
+    const id = this.$route.params.sessionId
+    let promise
 
-    this.sessionId = id;
+    this.sessionId = id
 
     if (!id) {
-      let type;
-      if (this.$route.path.indexOf("session/college") !== -1) {
-        type = "college";
+      let type
+      if (this.$route.path.indexOf('session/college') !== -1) {
+        type = 'college'
       } else {
-        type = "math";
+        type = 'math'
       }
       promise = SessionService.newSession(
         this,
         type,
         this.$route.params.subTopic
-      );
+      )
     } else {
-      promise = SessionService.useExistingSession(this, id);
+      promise = SessionService.useExistingSession(this, id)
     }
 
     promise.then(sessionId => {
-      this.sessionId = this.currentSession.sessionId;
-      this.$socket.connect();
-      this.$socket.emit("join", {
+      this.sessionId = this.currentSession.sessionId
+      this.$socket.connect()
+      this.$socket.emit('join', {
         sessionId,
         user: UserService.getUser()
-      });
-    });
+      })
+    })
 
     // Offer the option to ask a question
-    const MODAL_TIMEOUT_MS = 24 * 60 * 60 * 1000;
+    const MODAL_TIMEOUT_MS = 24 * 60 * 60 * 1000
     setTimeout(() => {
       if (
         !UserService.getUser().isVolunteer &&
         SessionService.getPartner() === undefined
       ) {
-        this.showModal = true;
+        this.showModal = true
       }
-    }, MODAL_TIMEOUT_MS);
+    }, MODAL_TIMEOUT_MS)
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

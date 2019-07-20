@@ -33,13 +33,13 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
-import DownloadService from "@/services/DownloadService";
-import StudentQuestionService from "@/services/StudentQuestionService";
+import UserService from '@/services/UserService'
+import DownloadService from '@/services/DownloadService'
+import StudentQuestionService from '@/services/StudentQuestionService'
 
-import BasicTemplate from "@/components/BasicTemplate";
-import QuestionAnswerForm from "@/components/QuestionAnswerForm";
-import Modal from "@/components/Modal";
+import BasicTemplate from '@/components/BasicTemplate'
+import QuestionAnswerForm from '@/components/QuestionAnswerForm'
+import Modal from '@/components/Modal'
 
 export default {
   components: {
@@ -52,21 +52,21 @@ export default {
       // This component
       user: UserService.getUser(),
       hasAttachments: false,
-      question: { student: { name: "" } },
+      question: { student: { name: '' } },
       // Modal
       showModal: false,
       modalBtnLabels: [],
       modalOptions: {},
       modalClickHandlers: {}
-    };
+    }
   },
   beforeCreate() {
     StudentQuestionService.getStudentQuestions(this, {
       _id: this.$route.query.q
     }).then(questions => {
-      [this.question] = questions;
-      this.hasAttachments = this.question.attachments.length > 0;
-    });
+      ;[this.question] = questions
+      this.hasAttachments = this.question.attachments.length > 0
+    })
   },
   methods: {
     downloadFile() {
@@ -77,12 +77,12 @@ export default {
         DownloadService.openDownloadDialog(
           res.body,
           this.question.attachments[0],
-          res.headers.map["content-type"]
-        );
-      });
+          res.headers.map['content-type']
+        )
+      })
     }
   }
-};
+}
 </script>
 
 <style lang="scss">
@@ -111,7 +111,7 @@ export default {
   font-style: italic;
 }
 .question__author::before {
-  content: "by";
+  content: 'by';
 }
 
 /*
@@ -129,14 +129,14 @@ export default {
   background: $c-shadow-header;
 }
 .attachment-list__icon::before {
-  content: " ";
+  content: ' ';
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 24px;
   height: 24px;
-  background-image: url("~@/assets/attachment_icon.svg");
+  background-image: url('~@/assets/attachment_icon.svg');
 }
 .attachment-list__content {
   padding: 20px;

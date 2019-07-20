@@ -40,8 +40,8 @@
 </template>
 
 <script>
-import AuthService from "@/services/AuthService";
-import FormPageTemplate from "@/components/FormPageTemplate";
+import AuthService from '@/services/AuthService'
+import FormPageTemplate from '@/components/FormPageTemplate'
 
 export default {
   components: {
@@ -49,16 +49,16 @@ export default {
   },
   data() {
     return {
-      email: "",
-      msg: ""
-    };
+      email: '',
+      msg: ''
+    }
   },
   methods: {
     submit() {
-      AuthService.sendReset(this, this.email);
+      AuthService.sendReset(this, this.email)
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
@@ -67,7 +67,7 @@ export default {
   min-width: 150px;
 }
 
-@include breakpoint-below("tiny") {
+@include breakpoint-below('tiny') {
   .uc-form-header {
     @include flex-container(column, center, center);
   }

@@ -44,202 +44,199 @@
 </template>
 
 <script>
-import _ from "lodash";
-import moment from "moment-timezone";
-import UserService from "@/services/UserService";
-import CalendarService from "@/services/CalendarService";
+import _ from 'lodash'
+import moment from 'moment-timezone'
+import UserService from '@/services/UserService'
+import CalendarService from '@/services/CalendarService'
 
 export default {
   data() {
-    const user = UserService.getUser();
+    const user = UserService.getUser()
     const timeRange = [
-      "12 am",
-      "1 am",
-      "2 am",
-      "3 am",
-      "4 am",
-      "5 am",
-      "6 am",
-      "7 am",
-      "8 am",
-      "9 am",
-      "10 am",
-      "11 am",
-      "12 pm",
-      "1 pm",
-      "2 pm",
-      "3 pm",
-      "4 pm",
-      "5 pm",
-      "6 pm",
-      "7 pm",
-      "8 pm",
-      "9 pm",
-      "10 pm",
-      "11 pm"
-    ];
+      '12 am',
+      '1 am',
+      '2 am',
+      '3 am',
+      '4 am',
+      '5 am',
+      '6 am',
+      '7 am',
+      '8 am',
+      '9 am',
+      '10 am',
+      '11 am',
+      '12 pm',
+      '1 pm',
+      '2 pm',
+      '3 pm',
+      '4 pm',
+      '5 pm',
+      '6 pm',
+      '7 pm',
+      '8 pm',
+      '9 pm',
+      '10 pm',
+      '11 pm'
+    ]
     return {
       user,
       availability: {},
       timeRange,
       tzList: moment.tz.names(),
-      selectedTz: ""
-    };
+      selectedTz: ''
+    }
   },
   computed: {
     sortedTimes() {
-      return this.sortTimes();
+      return this.sortTimes()
     },
     hasUserSchedule() {
-      return !_.isEmpty(this.availability);
+      return !_.isEmpty(this.availability)
     }
   },
   created() {
-    this.fetchData();
+    this.fetchData()
   },
   methods: {
     fetchData() {
       if (!this.user.hasSchedule) {
-        CalendarService.initAvailability(this, this.user._id);
+        CalendarService.initAvailability(this, this.user._id)
       }
 
       var originalAvailabilityPromise = CalendarService.getAvailability(
         this,
         this.user._id
-      );
-      var userTimezonePromise = CalendarService.getTimezone(
-        this,
-        this.user._id
-      );
+      )
+      var userTimezonePromise = CalendarService.getTimezone(this, this.user._id)
 
       Promise.all([originalAvailabilityPromise, userTimezonePromise]).then(
         ([originalAvailability, userTimezone]) => {
           if (userTimezone && this.userTzInList(userTimezone)) {
-            this.selectedTz = userTimezone;
+            this.selectedTz = userTimezone
           } else {
-            this.selectedTz = moment.tz.guess();
+            this.selectedTz = moment.tz.guess()
           }
 
-          var estNow = moment.tz("America/New_York").hour();
-          var userNow = moment.tz(this.selectedTz).hour();
-          var offset = userNow - estNow;
+          var estNow = moment.tz('America/New_York').hour()
+          var userNow = moment.tz(this.selectedTz).hour()
+          var offset = userNow - estNow
           this.availability = this.convertAvailability(
             originalAvailability,
             offset
-          );
+          )
         }
-      );
+      )
     },
     sortTimes() {
-      const keysMap = {};
+      const keysMap = {}
       for (const day in this.availability) {
         if (this.availability.hasOwnProperty(day)) {
-          const times = this.availability[day];
-          const keys = [];
+          const times = this.availability[day]
+          const keys = []
           for (const time in times) {
             if (times.hasOwnProperty(time)) {
-              keys.push(time);
+              keys.push(time)
             }
           }
-          if (keys[0] !== "12a") {
-            keys.reverse();
+          if (keys[0] !== '12a') {
+            keys.reverse()
           }
-          keysMap[day] = keys;
+          keysMap[day] = keys
         }
       }
-      return keysMap;
+      return keysMap
     },
     userTzInList(tz) {
-      return this.tzList.includes(tz);
+      return this.tzList.includes(tz)
     },
     convertAMPMtoTwentyFourHrs(hour) {
-      var hr = hour.substring(0, hour.length - 1);
-      var apm = hour.substring(hour.length - 1);
-      if (apm === "a") {
-        if (hr === "12") {
-          return 0;
+      var hr = hour.substring(0, hour.length - 1)
+      var apm = hour.substring(hour.length - 1)
+      if (apm === 'a') {
+        if (hr === '12') {
+          return 0
         }
-        return parseInt(hr);
+        return parseInt(hr)
       }
-      if (hr === "12") {
-        return 12;
+      if (hr === '12') {
+        return 12
       }
-      return parseInt(hr) + 12;
+      return parseInt(hr) + 12
     },
     convertTwentyFourHrsToAMPM(hour) {
       if (hour == 0) {
-        return "12a";
+        return '12a'
       }
       if (hour == 12) {
-        return "12p";
+        return '12p'
       }
       if (hour > 12) {
-        return hour - 12 + "p";
+        return hour - 12 + 'p'
       }
-      return hour + "a";
+      return hour + 'a'
     },
     convertAvailability(availability, offset) {
       const succWeekday = {
-        Sunday: "Monday",
-        Monday: "Tuesday",
-        Tuesday: "Wednesday",
-        Wednesday: "Thursday",
-        Thursday: "Friday",
-        Friday: "Saturday",
-        Saturday: "Sunday"
-      };
+        Sunday: 'Monday',
+        Monday: 'Tuesday',
+        Tuesday: 'Wednesday',
+        Wednesday: 'Thursday',
+        Thursday: 'Friday',
+        Friday: 'Saturday',
+        Saturday: 'Sunday'
+      }
       const predWeekday = {
-        Sunday: "Saturday",
-        Monday: "Sunday",
-        Tuesday: "Monday",
-        Wednesday: "Tuesday",
-        Thursday: "Wednesday",
-        Friday: "Thursday",
-        Saturday: "Friday"
-      };
-      var convertedAvailability = {};
+        Sunday: 'Saturday',
+        Monday: 'Sunday',
+        Tuesday: 'Monday',
+        Wednesday: 'Tuesday',
+        Thursday: 'Wednesday',
+        Friday: 'Thursday',
+        Saturday: 'Friday'
+      }
+      var convertedAvailability = {}
       for (const day in availability) {
-        const times = availability[day];
-        convertedAvailability[day] = {};
+        const times = availability[day]
+        convertedAvailability[day] = {}
         for (const time in times) {
-          convertedAvailability[day][time] = false;
+          convertedAvailability[day][time] = false
         }
       }
       for (const day in availability) {
-        const times = availability[day];
+        const times = availability[day]
         for (const time in times) {
           if (availability[day][time] == true) {
-            let newDay = day;
-            let numericHour = this.convertAMPMtoTwentyFourHrs(time);
-            let newHour = numericHour + offset;
+            let newDay = day
+            let numericHour = this.convertAMPMtoTwentyFourHrs(time)
+            let newHour = numericHour + offset
             if (newHour >= 24) {
-              newHour -= 24;
-              newDay = succWeekday[day];
+              newHour -= 24
+              newDay = succWeekday[day]
             } else if (newHour < 0) {
-              newHour += 24;
-              newDay = predWeekday[day];
+              newHour += 24
+              newDay = predWeekday[day]
             }
             convertedAvailability[newDay][
               this.convertTwentyFourHrsToAMPM(newHour)
-            ] = true;
+            ] = true
           }
         }
       }
-      return convertedAvailability;
+      return convertedAvailability
     },
     save() {
-      var estNow = moment.tz("America/New_York").hour();
-      var userNow = moment.tz(this.selectedTz).hour();
-      var offset = estNow - userNow;
-      CalendarService.updateTimezone(this, this.user._id, this.selectedTz);
+      var estNow = moment.tz('America/New_York').hour()
+      var userNow = moment.tz(this.selectedTz).hour()
+      var offset = estNow - userNow
+      CalendarService.updateTimezone(this, this.user._id, this.selectedTz)
       CalendarService.updateAvailability(
         this,
         this.user._id,
         this.convertAvailability(this.availability, offset)
-      );
+      )
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
@@ -300,7 +297,7 @@ export default {
   height: 40px;
 }
 
-input[type="checkbox"] {
+input[type='checkbox'] {
   position: absolute;
   display: block;
   opacity: 0;
@@ -314,7 +311,7 @@ label {
   margin: 0;
 }
 
-input[type="checkbox"]:checked + label {
+input[type='checkbox']:checked + label {
   background-color: rgba(22, 210, 170, 0.5);
 }
 

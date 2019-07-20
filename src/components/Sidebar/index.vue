@@ -23,11 +23,11 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
+import UserService from '@/services/UserService'
 
-import UserNav from "./UserNav";
-import ProfileInfo from "./ProfileInfo";
-import Footer from "./Footer";
+import UserNav from './UserNav'
+import ProfileInfo from './ProfileInfo'
+import Footer from './Footer'
 
 export default {
   components: {
@@ -38,9 +38,9 @@ export default {
   data() {
     return {
       auth: UserService.getAuth()
-    };
+    }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
@@ -76,11 +76,11 @@ h1 {
 }
 
 h1::before {
-  content: "";
+  content: '';
   display: inline-block;
   width: 100px;
   height: 43px;
-  background-image: url("~@/assets/logo-01.svg");
+  background-image: url('~@/assets/logo-01.svg');
   background-size: 100px 43px;
   top: 0;
   left: 0;

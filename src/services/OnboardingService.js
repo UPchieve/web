@@ -1,7 +1,7 @@
-import UserService from "./UserService";
-import NetworkService from "./NetworkService";
+import UserService from './UserService'
+import NetworkService from './NetworkService'
 
-import router from "@/router";
+import router from '@/router'
 
 export default {
   status: {
@@ -11,94 +11,94 @@ export default {
   sendVerification(context) {
     return NetworkService.sendVerification(context)
       .then(() => {
-        context.msg = "Email sent!";
+        context.msg = 'Email sent!'
       })
       .catch(() => {
-        context.msg = "Error occurred";
-      });
+        context.msg = 'Error occurred'
+      })
   },
   confirmVerification(context, token) {
     return NetworkService.confirmVerification(context, { token })
       .then(() => {
-        const user = UserService.getUser();
-        user.verified = true;
-        router.replace("/");
+        const user = UserService.getUser()
+        user.verified = true
+        router.replace('/')
       })
       .catch(() => {
-        context.msg = "Error occurred";
-      });
+        context.msg = 'Error occurred'
+      })
   },
 
   hasVerifiedEmail() {
-    const user = UserService.getUser();
-    return user.verified;
+    const user = UserService.getUser()
+    return user.verified
   },
 
   hasProfile() {
-    const user = UserService.getUser();
+    const user = UserService.getUser()
 
-    let requiredFields;
+    let requiredFields
     if (user.isVolunteer) {
       requiredFields = [
-        "firstname",
-        "lastname",
-        "birthdate",
-        "gender",
-        "race",
-        "phone",
-        "referred",
-        "favoriteAcademicSubject",
-        "college"
-      ];
+        'firstname',
+        'lastname',
+        'birthdate',
+        'gender',
+        'race',
+        'phone',
+        'referred',
+        'favoriteAcademicSubject',
+        'college'
+      ]
     } else {
       requiredFields = [
-        "firstname",
-        "lastname",
-        "birthdate",
-        "gender",
-        "race",
-        "expectedGraduation"
-      ];
+        'firstname',
+        'lastname',
+        'birthdate',
+        'gender',
+        'race',
+        'expectedGraduation'
+      ]
     }
 
     // Test if each required field is present, return true when field fails to
     // terminate iteration
     const hasInvalidField = requiredFields.some(fieldName => {
-      const field = user[fieldName];
+      const field = user[fieldName]
       if (field === null || field === undefined) {
-        return true; // Field must be non-null
+        return true // Field must be non-null
       }
       if (Array.isArray(field) && field.length === 0) {
-        return true; // If field is an array, it must be populated
+        return true // If field is an array, it must be populated
       }
-      if (typeof field === "string" && field === "") {
-        return true; // If field is a string, it must be non-empty
+      if (typeof field === 'string' && field === '') {
+        return true // If field is a string, it must be non-empty
       }
-      return false;
-    });
+      return false
+    })
 
-    return !hasInvalidField;
+    return !hasInvalidField
   },
 
   isOnboarded() {
-    return this.hasVerifiedEmail() && this.hasProfile();
+    return this.hasVerifiedEmail() && this.hasProfile()
   },
 
   getOnboardingRoute() {
     const mapOfRoutesToTheirValidator = {
-      "/onboarding/verify": this.hasVerifiedEmail
-    };
+      '/onboarding/verify': this.hasVerifiedEmail
+    }
 
-    let incompleteStepRoute;
+    let incompleteStepRoute
 
     Object.keys(mapOfRoutesToTheirValidator).some(route => {
       if (!mapOfRoutesToTheirValidator[route]()) {
-        incompleteStepRoute = route;
-        return true;
+        incompleteStepRoute = route
+        return true
       }
-      return false;
-    });
+      return false
+    })
 
-    return incompleteStepRoute;
+    return incompleteStepRoute
   }
-};
+}

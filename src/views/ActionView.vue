@@ -3,24 +3,24 @@
 </template>
 
 <script>
-import OnboardingService from "@/services/OnboardingService";
-import router from "@/router";
+import OnboardingService from '@/services/OnboardingService'
+import router from '@/router'
 
 /**
  * @todo UserService to choose starting onboarding step based on user state
  */
 export default {
   mounted() {
-    const { action } = this.$route.params;
-    const { data } = this.$route.params;
+    const { action } = this.$route.params
+    const { data } = this.$route.params
 
-    if (action === "verify") {
-      OnboardingService.confirmVerification(this, data);
+    if (action === 'verify') {
+      OnboardingService.confirmVerification(this, data)
     } else {
-      router.replace("/onboarding/profile");
+      router.replace('/onboarding/profile')
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped></style>

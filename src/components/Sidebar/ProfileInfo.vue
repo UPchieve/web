@@ -41,10 +41,10 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
-import AuthService from "@/services/AuthService";
-import StudentAvatarUrl from "@/assets/defaultavatar3.png";
-import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
+import UserService from '@/services/UserService'
+import AuthService from '@/services/AuthService'
+import StudentAvatarUrl from '@/assets/defaultavatar3.png'
+import VolunteerAvatarUrl from '@/assets/defaultavatar4.png'
 
 /**
  * @todo {1} Refactor this, apply naming convention to files and improve the
@@ -52,32 +52,31 @@ import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
  */
 export default {
   data() {
-    const user = UserService.getUser() || {};
+    const user = UserService.getUser() || {}
     const avatarUrl = // {1}
-      user.picture ||
-      (user.isVolunteer ? VolunteerAvatarUrl : StudentAvatarUrl);
+      user.picture || (user.isVolunteer ? VolunteerAvatarUrl : StudentAvatarUrl)
 
     return {
       user,
       avatarStyle: {
         backgroundImage: `url(${avatarUrl})`
       }
-    };
+    }
   },
   computed: {
     name: {
       cache: false,
       get() {
-        return `${this.user.firstname} ${this.user.lastname}`;
+        return `${this.user.firstname} ${this.user.lastname}`
       }
     }
   },
   methods: {
     logout() {
-      AuthService.logout(this);
+      AuthService.logout(this)
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

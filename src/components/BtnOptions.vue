@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import Btn from "./Btn";
+import Btn from './Btn'
 
 export default {
   components: {
@@ -19,18 +19,18 @@ export default {
   props: {
     mainBtnLabel: {
       type: String,
-      default: ""
+      default: ''
     },
     secondBtnLabel: {
       type: String,
-      default: ""
+      default: ''
     },
     clickHandlers: {
       type: Object,
       required: true
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

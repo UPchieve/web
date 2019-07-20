@@ -9,10 +9,10 @@ export default {
   props: {
     headerTitle: {
       type: String,
-      default: ""
+      default: ''
     }
   }
-};
+}
 </script>
 
 <style lang="scss">

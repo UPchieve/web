@@ -1,15 +1,15 @@
-import NetworkService from "./NetworkService";
+import NetworkService from './NetworkService'
 
 export default {
   createStudentQuestion(context, data) {
     return NetworkService.createStudentQuestion(context, data).then(
-      () => "sentOK",
+      () => 'sentOK',
       (/*err*/) => {
         // console.error(new Error("Unable to create a new StudentQuestion"));
         // console.log(err);
-        return "notSent";
+        return 'notSent'
       }
-    );
+    )
   },
 
   getStudentQuestions(context, data) {
@@ -19,18 +19,18 @@ export default {
         // console.error(new Error("Unable to retrieve StudentQuestions"));
         // console.log(err);
       }
-    );
+    )
   },
 
   answerStudentQuestion(context, data) {
     return NetworkService.answerStudentQuestion(context, data).then(
-      () => "sentOK",
+      () => 'sentOK',
       (/*err*/) => {
         // console.error(new Error("Unable to send answer"));
         // console.log(err);
-        return "notSent";
+        return 'notSent'
       }
-    );
+    )
   },
 
   getAttachment(context, data) {
@@ -40,6 +40,6 @@ export default {
         // console.error(new Error("Unable to retrieve attachment"));
         // console.log(err);
       }
-    );
+    )
   }
-};
+}

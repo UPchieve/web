@@ -18,19 +18,19 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
+import UserService from '@/services/UserService'
 
 export default {
   data() {
-    const auth = UserService.getAuth();
+    const auth = UserService.getAuth()
 
-    const user = UserService.getUser();
+    const user = UserService.getUser()
     return {
       auth,
       user
-    };
+    }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

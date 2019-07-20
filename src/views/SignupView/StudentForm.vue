@@ -174,81 +174,81 @@
 </template>
 
 <script>
-import validator from "validator";
+import validator from 'validator'
 
-import AuthService from "@/services/AuthService";
-import UserService from "@/services/UserService";
+import AuthService from '@/services/AuthService'
+import UserService from '@/services/UserService'
 
 export default {
   data() {
     const heardFromOptions = [
-      "Flyer",
-      "Email",
-      "Internet search",
-      "Friend",
-      "Family member",
-      "Teacher",
-      "School",
-      "Social media",
-      "Other"
-    ];
+      'Flyer',
+      'Email',
+      'Internet search',
+      'Friend',
+      'Family member',
+      'Teacher',
+      'School',
+      'Social media',
+      'Other'
+    ]
 
     const referredOptions = [
-      "Big Brothers Big Sisters of NYC",
-      "Breakthrough New York",
-      "East Harlem Tutorial Program",
-      "First Graduate",
-      "Oasis - A Heaven for Women and Children",
-      "NYC Mission Society",
-      "None of the above"
-    ];
+      'Big Brothers Big Sisters of NYC',
+      'Breakthrough New York',
+      'East Harlem Tutorial Program',
+      'First Graduate',
+      'Oasis - A Heaven for Women and Children',
+      'NYC Mission Society',
+      'None of the above'
+    ]
 
     return {
       heardFromOptions,
       referredOptions,
-      msg: "",
+      msg: '',
       errors: [],
       invalidInputs: [],
       credentials: {
-        email: "",
-        password: "",
+        email: '',
+        password: '',
         terms: false
       },
       profile: {
-        firstName: "",
-        lastName: "",
-        highSchool: "",
-        heardFrom: "",
-        referred: ""
+        firstName: '',
+        lastName: '',
+        highSchool: '',
+        heardFrom: '',
+        referred: ''
       },
-      step: "step-1"
-    };
+      step: 'step-1'
+    }
   },
   methods: {
     nextPage() {
       // reset error msg from server
-      this.msg = "";
+      this.msg = ''
 
       // validate input
-      this.errors = [];
-      this.invalidInputs = [];
+      this.errors = []
+      this.invalidInputs = []
       if (!this.credentials.email) {
-        this.errors.push("An email address is required.");
-        this.invalidInputs.push("inputEmail");
+        this.errors.push('An email address is required.')
+        this.invalidInputs.push('inputEmail')
       } else if (!validator.isEmail(this.credentials.email)) {
         // this is necessary because browsers ignore <input type="email"> until the
         // user actually tries to submit the form, which does not occur until step 2
         this.errors.push(
-          this.credentials.email + " is not a valid email address."
-        );
-        this.invalidInputs.push("inputEmail");
+          this.credentials.email + ' is not a valid email address.'
+        )
+        this.invalidInputs.push('inputEmail')
       }
       if (!this.credentials.password) {
-        this.errors.push("A password is required.");
-        this.invalidInputs.push("inputPassword");
+        this.errors.push('A password is required.')
+        this.invalidInputs.push('inputPassword')
       }
       if (this.errors.length) {
-        return;
+        return
       }
 
       AuthService.checkRegister(this, {
@@ -256,35 +256,35 @@ export default {
         password: this.credentials.password
       })
         .then(() => {
-          this.step = "step-2";
+          this.step = 'step-2'
         })
         .catch(err => {
-          this.msg = err.message;
-        });
+          this.msg = err.message
+        })
     },
     checkInputs(e) {
-      this.errors = [];
-      this.invalidInputs = [];
+      this.errors = []
+      this.invalidInputs = []
 
       if (!this.profile.firstName || !this.profile.lastName) {
-        this.errors.push("You must enter your first and last name.");
+        this.errors.push('You must enter your first and last name.')
       }
       if (!this.profile.firstName) {
-        this.invalidInputs.push("firstName");
+        this.invalidInputs.push('firstName')
       }
       if (!this.profile.lastName) {
-        this.invalidInputs.push("lastName");
+        this.invalidInputs.push('lastName')
       }
       if (!this.profile.highSchool) {
-        this.errors.push("Please enter the name of the high school you go to.");
-        this.invalidInputs.push("highSchool");
+        this.errors.push('Please enter the name of the high school you go to.')
+        this.invalidInputs.push('highSchool')
       }
       if (!this.credentials.terms) {
         // necessary because the CSS hides the browser's validation message
-        this.errors.push("You must read and accept the user agreement.");
+        this.errors.push('You must read and accept the user agreement.')
       }
       if (this.errors.length) {
-        e.preventDefault();
+        e.preventDefault()
       }
     },
     submit() {
@@ -298,22 +298,22 @@ export default {
         highSchool: this.profile.highSchool
       })
         .then(() => {
-          let user = UserService.getUser();
+          let user = UserService.getUser()
           /*
           user.firstname = this.profile.firstName
           user.lastname = this.profile.lastName
           user.highschool = this.profile.highSchool
           */
-          user.heardFrom = this.profile.heardFrom;
-          user.referred = this.profile.referred;
-          UserService.setProfile(this, user, "/");
+          user.heardFrom = this.profile.heardFrom
+          user.referred = this.profile.referred
+          UserService.setProfile(this, user, '/')
         })
         .catch(err => {
-          this.msg = err.message;
-        });
+          this.msg = err.message
+        })
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

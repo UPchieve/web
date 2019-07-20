@@ -19,11 +19,11 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
+import UserService from '@/services/UserService'
 
-import BasicTemplate from "@/components/BasicTemplate";
-import QuestionAnswerForm from "@/components/QuestionAnswerForm";
-import Modal from "@/components/Modal";
+import BasicTemplate from '@/components/BasicTemplate'
+import QuestionAnswerForm from '@/components/QuestionAnswerForm'
+import Modal from '@/components/Modal'
 
 export default {
   components: {
@@ -40,9 +40,9 @@ export default {
       modalBtnLabels: [],
       modalOptions: {},
       modalClickHandlers: {}
-    };
+    }
   }
-};
+}
 </script>
 
 <style lang="scss">

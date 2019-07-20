@@ -9,7 +9,7 @@ export default {
   props: {
     label: {
       type: String,
-      default: ""
+      default: ''
     },
     btnOptionsSecond: {
       type: Boolean,
@@ -27,13 +27,13 @@ export default {
   data() {
     return {
       classes: {
-        "v-btn": true,
-        "v-btn--btn-options-second": this.btnOptionsSecond,
-        "v-btn--big": this.big
+        'v-btn': true,
+        'v-btn--btn-options-second': this.btnOptionsSecond,
+        'v-btn--big': this.big
       }
-    };
+    }
   }
-};
+}
 </script>
 
 <style lang="scss">

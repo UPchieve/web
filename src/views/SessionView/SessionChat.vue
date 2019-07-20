@@ -52,15 +52,15 @@
 </template>
 
 <script>
-import { setTimeout, clearTimeout } from "timers";
-import moment from "moment";
-import _ from "lodash";
+import { setTimeout, clearTimeout } from 'timers'
+import moment from 'moment'
+import _ from 'lodash'
 
-import UserService from "@/services/UserService";
-import SessionService from "@/services/SessionService";
-import ModerationService from "@/services/ModerationService";
-import StudentAvatarUrl from "@/assets/defaultavatar3.png";
-import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
+import UserService from '@/services/UserService'
+import SessionService from '@/services/SessionService'
+import ModerationService from '@/services/ModerationService'
+import StudentAvatarUrl from '@/assets/defaultavatar3.png'
+import VolunteerAvatarUrl from '@/assets/defaultavatar4.png'
 
 /**
  * @todo {1} Use more descriptive names that comply with the coding standards.
@@ -74,105 +74,105 @@ export default {
       otherUser: null,
       messages: [],
       currentSession: SessionService.currentSession,
-      newMessage: "",
+      newMessage: '',
       chatWarningIsShown: false,
       typingTimeout: null,
       typingIndicatorShown: false
-    };
+    }
   },
 
   methods: {
     showModerationWarning() {
-      this.chatWarningIsShown = true;
+      this.chatWarningIsShown = true
     },
     hideModerationWarning() {
-      this.chatWarningIsShown = false;
+      this.chatWarningIsShown = false
     },
     showNewMessage(message) {
-      this.$socket.emit("message", {
+      this.$socket.emit('message', {
         sessionId: this.currentSession.sessionId,
         user: UserService.getUser(),
         message
-      });
+      })
     },
     clearMessageInput() {
-      this.newMessage = "";
+      this.newMessage = ''
     },
     notTyping() {
       // Tell the server that the user is no longer typing
-      this.$socket.emit("notTyping", {
+      this.$socket.emit('notTyping', {
         sessionId: this.currentSession.sessionId
-      });
+      })
     },
     handleMessage(event) {
       // If key pressed is Enter, send the message
-      if (event.key == "Enter") {
-        const message = this.newMessage.trim();
-        this.clearMessageInput();
+      if (event.key == 'Enter') {
+        const message = this.newMessage.trim()
+        this.clearMessageInput()
 
         // Early exit if message is blank
-        if (_.isEmpty(message)) return;
+        if (_.isEmpty(message)) return
 
         // Reset the chat warning
-        this.hideModerationWarning();
+        this.hideModerationWarning()
 
         // Check for personal info/profanity in message
         ModerationService.checkIfMessageIsClean(this, message).then(isClean => {
           if (isClean) {
-            this.showNewMessage(message);
+            this.showNewMessage(message)
           } else {
-            this.showModerationWarning();
+            this.showModerationWarning()
           }
-        });
+        })
 
         // Disregard typing handler for enter
-        this.notTyping();
-        return;
+        this.notTyping()
+        return
 
         // Disregard typing handler for backspace
-      } else if (event.key == "Backspace") return;
+      } else if (event.key == 'Backspace') return
 
       // Typing handler for when non-Enter/Backspace keys are pressed
-      this.$socket.emit("typing", {
+      this.$socket.emit('typing', {
         sessionId: this.currentSession.sessionId,
         user: UserService.getUser()
-      });
+      })
 
       /** Every time a key is pressed, set an inactive timer
           If another key is pressed within 2 seconds, reset timer**/
-      clearTimeout(this.typingTimeout);
+      clearTimeout(this.typingTimeout)
       this.typingTimeout = setTimeout(() => {
-        this.notTyping();
-      }, 2000);
+        this.notTyping()
+      }, 2000)
     }
   },
 
   sockets: {
-    "session-change"(data) {
+    'session-change'(data) {
       // {1}
-      SessionService.currentSession.sessionId = data._id;
-      SessionService.currentSession.data = data;
+      SessionService.currentSession.sessionId = data._id
+      SessionService.currentSession.data = data
 
       // re-render the session's persisted whiteboard canvas
-      const img = new Image();
-      img.src = data.whiteboardUrl;
-      img.onload = () => window.App.ctx.drawImage(img, 0, 0);
+      const img = new Image()
+      img.src = data.whiteboardUrl
+      img.onload = () => window.App.ctx.drawImage(img, 0, 0)
 
       // index session's participants by user id
-      const studentId = (data.student || {})._id;
-      const volunteerId = (data.volunteer || {})._id;
+      const studentId = (data.student || {})._id
+      const volunteerId = (data.volunteer || {})._id
 
-      const participants = {};
-      participants[studentId] = data.student;
-      participants[volunteerId] = data.volunteer;
+      const participants = {}
+      participants[studentId] = data.student
+      participants[volunteerId] = data.volunteer
 
       // re-load the session's persisted messages
       const messages = data.messages.map(message => {
-        let { picture } = message;
-        const user = participants[message.user] || {};
+        let { picture } = message
+        const user = participants[message.user] || {}
 
-        if (!picture || picture === "") {
-          picture = user.isVolunteer ? VolunteerAvatarUrl : StudentAvatarUrl;
+        if (!picture || picture === '') {
+          picture = user.isVolunteer ? VolunteerAvatarUrl : StudentAvatarUrl
         }
 
         return {
@@ -183,27 +183,27 @@ export default {
           avatarStyle: {
             backgroundImage: `url(${picture})`
           },
-          time: moment(message.time).format("h:mm a")
-        };
-      });
+          time: moment(message.time).format('h:mm a')
+        }
+      })
 
-      this.messages = messages;
+      this.messages = messages
     },
-    "is-typing"(data) {
-      this.typingIndicatorShown = true;
-      this.otherUser = data;
+    'is-typing'(data) {
+      this.typingIndicatorShown = true
+      this.otherUser = data
     },
-    "not-typing"() {
-      this.typingIndicatorShown = false;
+    'not-typing'() {
+      this.typingIndicatorShown = false
     },
     messageSend(data) {
       // {1}
-      let { picture } = data;
-      if (!picture || picture === "") {
+      let { picture } = data
+      if (!picture || picture === '') {
         if (data.isVolunteer === true) {
-          picture = VolunteerAvatarUrl;
+          picture = VolunteerAvatarUrl
         } else {
-          picture = StudentAvatarUrl;
+          picture = StudentAvatarUrl
         }
       }
       this.messages.push({
@@ -214,16 +214,16 @@ export default {
         avatarStyle: {
           backgroundImage: `url(${picture})`
         },
-        time: moment(data.time).format("h:mm a")
-      });
+        time: moment(data.time).format('h:mm a')
+      })
     }
   },
 
   updated() {
-    let msgBox = document.querySelector(".messages");
-    msgBox.scrollTop = msgBox.scrollHeight;
+    let msgBox = document.querySelector('.messages')
+    msgBox.scrollTop = msgBox.scrollHeight
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

@@ -26,27 +26,27 @@
 </template>
 
 <script>
-import RegistrationService from "@/services/RegistrationService";
+import RegistrationService from '@/services/RegistrationService'
 
 export default {
   data() {
     return {
-      registrationCode: "",
-      msg: ""
-    };
+      registrationCode: '',
+      msg: ''
+    }
   },
   methods: {
     submit() {
       RegistrationService.checkCode(this, this.registrationCode).then(
         isValid => {
           if (!isValid) {
-            this.msg = "Sorry, that code is invalid";
+            this.msg = 'Sorry, that code is invalid'
           }
         }
-      );
+      )
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped></style>
