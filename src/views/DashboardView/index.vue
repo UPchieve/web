@@ -132,6 +132,7 @@ import UserService from '@/services/UserService'
 import SessionService from '@/services/SessionService'
 
 import ListSessions from './ListSessions'
+import router from '../../router'
 
 export default {
   name: "dashboard-view",
@@ -182,9 +183,19 @@ export default {
         console.log(`rejoining session: ${path}`)
       } else {
         console.log(`session terminated`)
-        this.$router.push('/')
+        //this.$router.push('/')
+        const user = UserService.getUser()
+        if (!user.isVolunteer) {
+          const url = '/feedback/null/null/null/student/null/null'
+          router.replace(url)
+        }
+        if (user.isVolunteer) {
+          const url = '/feedback/null/null/null/volunteer/null/null'
+          router.replace(url)
+        }
       }
-    },
+    }
+    ,
     getHelp () {
       this.popUpStyle = {
         display: 'flex'
@@ -400,7 +411,7 @@ h3 {
   .dashboard-body p {
     padding: 1.2em !important;
   }
-   
+
   iframe {
     max-width: 100vw !important;
   }
