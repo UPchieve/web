@@ -29,40 +29,37 @@
 
 <script>
 import UserService from '@/services/UserService'
-import router from '@/router'
 
 const openSessions = []
 
 export default {
-  data () {
+  data() {
     const user = UserService.getUser()
     return {
       user,
       openSessions
     }
   },
-  mounted () {
+  mounted() {
     this.$socket.emit('list', {
       user: UserService.getUser()
     })
   },
   methods: {
-    gotoSession (session) {
+    gotoSession(session) {
       const { type, subTopic, _id } = session
 
       if (type && subTopic && _id) {
         const path = `/session/${type}/${subTopic}/${_id}`
         localStorage.setItem('currentSessionPath', path)
         this.$router.push(path)
-        console.log(`joining session: ${path}`)
       } else {
         localStorage.removeItem('currentSessionPath')
-        console.error(`Could not rejoin session`)
       }
     }
   },
   sockets: {
-    sessions (sessions) {
+    sessions(sessions) {
       const results = []
       const socketSessions = sessions.filter(session => !session.volunteer)
 
@@ -127,6 +124,6 @@ export default {
 }
 
 .session-list {
-    padding:20px;
+  padding: 20px;
 }
 </style>

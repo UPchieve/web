@@ -8,13 +8,15 @@
 
     <div v-on:click="$emit('closeMenu')">
       <router-link to="/contact" tag="li"
-        ><a class="contact icon" >Contact Us</a></router-link
+        ><a class="contact icon">Contact Us</a></router-link
       >
     </div>
 
     <div v-on:click="$emit('closeMenu')">
       <router-link to="/legal" tag="li"
-        ><a class="privacy icon" v-on:click="$emit('closeMenu')">Legal Policy</a></router-link
+        ><a class="privacy icon" v-on:click="$emit('closeMenu')"
+          >Legal Policy</a
+        ></router-link
       >
     </div>
 
@@ -38,14 +40,14 @@ import AuthService from '@/services/AuthService'
 
 export default {
   components: {},
-  data () {
+  data() {
     return {
       userauth: UserService.getAuth(),
-      mainWebsiteUrl: process.env.MAIN_WEBSITE_URL
+      mainWebsiteUrl: process.env.VUE_APP_MAIN_WEBSITE_URL
     }
   },
   methods: {
-    logout () {
+    logout() {
       AuthService.logout(this)
     }
   }

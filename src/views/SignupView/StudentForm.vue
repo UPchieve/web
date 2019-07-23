@@ -1,5 +1,9 @@
 <template>
-  <form v-if="step === 'step-1'" class="uc-form-body" @submit.prevent="submit()">
+  <form
+    v-if="step === 'step-1'"
+    class="uc-form-body"
+    @submit.prevent="submit()"
+  >
     <div v-if="errors.length" class="step-errors">
       <h5>Please correct the following problems:</h5>
       <ul>
@@ -15,7 +19,9 @@
         id="inputEmail"
         type="email"
         class="uc-form-input"
-        v-bind:class="{'uc-form-input--invalid': invalidInputs.indexOf('inputEmail') > -1}"
+        v-bind:class="{
+          'uc-form-input--invalid': invalidInputs.indexOf('inputEmail') > -1
+        }"
         v-model="credentials.email"
         required
         autofocus
@@ -34,7 +40,9 @@
         id="inputPassword"
         type="password"
         class="uc-form-input"
-        v-bind:class="{'uc-form-input--invalid': invalidInputs.indexOf('inputPassword') > -1}"
+        v-bind:class="{
+          'uc-form-input--invalid': invalidInputs.indexOf('inputPassword') > -1
+        }"
         v-model="credentials.password"
         required
       />
@@ -44,18 +52,18 @@
       </p>
     </div>
 
-    <button
-      class="uc-form-button"
-      type="submit"
-      @click.prevent="nextPage()"
-    >
+    <button class="uc-form-button" type="submit" @click.prevent="nextPage()">
       Continue
     </button>
 
     <div v-if="msg !== ''">{{ msg }}</div>
   </form>
 
-  <form v-else-if="step === 'step-2'" class="uc-form-body" @submit.prevent="submit()">
+  <form
+    v-else-if="step === 'step-2'"
+    class="uc-form-body"
+    @submit.prevent="submit()"
+  >
     <div v-if="errors.length" class="step-errors">
       <h5>Please correct the following problems:</h5>
       <ul>
@@ -71,7 +79,9 @@
         id="firstName"
         type="text"
         class="uc-form-input"
-        v-bind:class="{'uc-form-input--invalid': invalidInputs.indexOf('firstName') > -1}"
+        v-bind:class="{
+          'uc-form-input--invalid': invalidInputs.indexOf('firstName') > -1
+        }"
         v-model="profile.firstName"
         required
         autofocus
@@ -84,7 +94,9 @@
         id="lastName"
         type="text"
         class="uc-form-input"
-        v-bind:class="{'uc-form-input--invalid': invalidInputs.indexOf('lastName') > -1}"
+        v-bind:class="{
+          'uc-form-input--invalid': invalidInputs.indexOf('lastName') > -1
+        }"
         v-model="profile.lastName"
         required
       />
@@ -98,7 +110,9 @@
         id="highSchool"
         type="text"
         class="uc-form-input"
-        v-bind:class="{'uc-form-input--invalid': invalidInputs.indexOf('highSchool') > -1}"
+        v-bind:class="{
+          'uc-form-input--invalid': invalidInputs.indexOf('highSchool') > -1
+        }"
         v-model="profile.highSchool"
         required
       />
@@ -149,11 +163,7 @@
       </label>
     </div>
 
-    <button
-      class="uc-form-button"
-      type="submit"
-      @click="checkInputs($event)"
-    >
+    <button class="uc-form-button" type="submit" @click="checkInputs($event)">
       Sign Up
     </button>
 
@@ -170,27 +180,27 @@ import AuthService from '@/services/AuthService'
 import UserService from '@/services/UserService'
 
 export default {
-  data () {
+  data() {
     const heardFromOptions = [
-      "Flyer",
-      "Email",
-      "Internet search",
-      "Friend",
-      "Family member",
-      "Teacher",
-      "School",
-      "Social media",
-      "Other"
+      'Flyer',
+      'Email',
+      'Internet search',
+      'Friend',
+      'Family member',
+      'Teacher',
+      'School',
+      'Social media',
+      'Other'
     ]
 
     const referredOptions = [
-      "Big Brothers Big Sisters of NYC",
-      "Breakthrough New York",
-      "East Harlem Tutorial Program",
-      "First Graduate",
-      "Oasis - A Heaven for Women and Children",
-      "NYC Mission Society",
-      "None of the above"
+      'Big Brothers Big Sisters of NYC',
+      'Breakthrough New York',
+      'East Harlem Tutorial Program',
+      'First Graduate',
+      'Oasis - A Heaven for Women and Children',
+      'NYC Mission Society',
+      'None of the above'
     ]
 
     return {
@@ -215,7 +225,7 @@ export default {
     }
   },
   methods: {
-    nextPage () {
+    nextPage() {
       // reset error msg from server
       this.msg = ''
 
@@ -225,11 +235,12 @@ export default {
       if (!this.credentials.email) {
         this.errors.push('An email address is required.')
         this.invalidInputs.push('inputEmail')
-      }
-      else if (!validator.isEmail(this.credentials.email)) {
+      } else if (!validator.isEmail(this.credentials.email)) {
         // this is necessary because browsers ignore <input type="email"> until the
         // user actually tries to submit the form, which does not occur until step 2
-        this.errors.push(this.credentials.email + ' is not a valid email address.')
+        this.errors.push(
+          this.credentials.email + ' is not a valid email address.'
+        )
         this.invalidInputs.push('inputEmail')
       }
       if (!this.credentials.password) {
@@ -251,10 +262,10 @@ export default {
           this.msg = err.message
         })
     },
-    checkInputs (e) {
+    checkInputs(e) {
       this.errors = []
       this.invalidInputs = []
-      
+
       if (!this.profile.firstName || !this.profile.lastName) {
         this.errors.push('You must enter your first and last name.')
       }
@@ -276,7 +287,7 @@ export default {
         e.preventDefault()
       }
     },
-    submit () {
+    submit() {
       AuthService.register(this, {
         code: undefined,
         email: this.credentials.email,
@@ -298,7 +309,6 @@ export default {
           UserService.setProfile(this, user, '/')
         })
         .catch(err => {
-          console.log(err)
           this.msg = err.message
         })
     }
@@ -317,7 +327,7 @@ export default {
 }
 
 .step-errors {
-  color: #BF0000;
+  color: #bf0000;
   font-size: 14px;
   text-align: left;
 }

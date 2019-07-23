@@ -13,7 +13,7 @@ export default {
     lastFetch: 0
   },
 
-  login (context, creds, redirect) {
+  login(context, creds, redirect) {
     const { email, password } = creds
     if (
       !email ||
@@ -37,18 +37,16 @@ export default {
           router.push(redirect)
         }
       },
-      res => {
+      () => {
         context.error = 'Could not login'
-        console.log(res)
       }
     )
   },
 
-  register (context, creds, profile, redirect) {
+  register(context, creds, profile, redirect) {
     return NetworkService.register(context, { ...creds, ...profile }).then(
       res => {
         const data = { ...res.data }
-        console.log(data)
         if (!data) {
           throw new Error('No user returned from auth service')
         } else if (data.err) {
@@ -68,7 +66,7 @@ export default {
     )
   },
 
-  checkRegister (context, creds) {
+  checkRegister(context, creds) {
     return NetworkService.checkRegister(context, creds).then(res => {
       if (res.data.err) {
         throw new Error(res.data.err)
@@ -76,10 +74,9 @@ export default {
     })
   },
 
-  sendReset (context, email, redirect) {
+  sendReset(context, email, redirect) {
     return NetworkService.sendReset(context, { email }).then(res => {
       const data = { ...res.data }
-      console.log(data)
       if (!data) {
         throw new Error('No user returned from auth service')
       }
@@ -97,14 +94,12 @@ export default {
     })
   },
 
-  confirmReset (context, credentials, redirect) {
+  confirmReset(context, credentials, redirect) {
     return NetworkService.confirmReset(context, credentials).then(res => {
       const data = { ...res.data }
-      console.log(data)
       if (!data) {
         throw new Error('No user returned from auth service')
       } else if (data.err) {
-        console.log(data.err.message)
         throw new Error(data.err)
       }
 
@@ -118,7 +113,7 @@ export default {
     })
   },
 
-  logout (context) {
+  logout(context) {
     if (context) {
       NetworkService.logout(context)
         .then(() => {
@@ -134,7 +129,7 @@ export default {
     }
   },
 
-  checkAuth (context) {
+  checkAuth(context) {
     const user = localStorage.getItem('user')
     if (user) {
       try {
@@ -153,23 +148,23 @@ export default {
     }
   },
 
-  shouldFetch () {
+  shouldFetch() {
     return Date.now() - this.user.lastFetch > USER_FETCH_LIMIT_SECONDS * 1000
   },
 
-  storeUser (userObj) {
+  storeUser(userObj) {
     this.user.authenticated = true
     this.user.data = userObj
     localStorage.setItem('user', JSON.stringify(userObj))
   },
 
-  removeUser () {
+  removeUser() {
     localStorage.removeItem('user')
     this.user.authenticated = false
     this.user.data = null
   },
 
-  fetchUser (context) {
+  fetchUser(context) {
     this.user.lastFetch = Date.now()
 
     NetworkService.user(context)
@@ -188,8 +183,8 @@ export default {
           this.user.data = null
         }
       })
-      .catch(err => {
-        console.log(err)
+      .catch((/*err*/) => {
+        // console.log(err);
       })
   }
 }

@@ -72,17 +72,17 @@ import UserService from '@/services/UserService'
 export default {
   filters: {
     // {1}
-    capitalize (value) {
+    capitalize(value) {
       if (!value) return ''
       const valueStr = value.toString()
       return valueStr.charAt(0).toUpperCase() + valueStr.slice(1)
     },
-    uppercase (value) {
+    uppercase(value) {
       if (!value) return ''
       return value.toString().toUpperCase()
     }
   },
-  data () {
+  data() {
     const user = UserService.getUser()
     const quizzes = {}
     quizzes.math = [
@@ -137,25 +137,25 @@ export default {
     }
   },
   methods: {
-    flipBool (supercategory) {
+    flipBool(supercategory) {
       const bool = this.bools[supercategory]
       this.bools[supercategory] = !bool
     },
-    hasPassed (category) {
+    hasPassed(category) {
       if (this.user[category]) {
         return this.user[category].passed
       }
 
       return false
     },
-    hasTries (category) {
+    hasTries(category) {
       if (this.user[category]) {
         return this.user[category].tries < 3
       }
 
       return true
     },
-    getTries (category) {
+    getTries(category) {
       if (this.user[category]) {
         return this.user[category].tries
       }
@@ -260,7 +260,7 @@ a {
 .arrow {
   height: 1em;
   width: 1em;
-  position: relative;;
+  position: relative;
 }
 
 .arrow::after {
@@ -315,8 +315,7 @@ a {
   font-weight: 600;
 }
 
-
- @media screen and (max-width: 700px) {
+@media screen and (max-width: 700px) {
   .header {
     padding: 1em 1em 1em 3em !important;
   }

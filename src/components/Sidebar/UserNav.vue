@@ -74,7 +74,7 @@
 import UserService from '@/services/UserService'
 
 export default {
-  data () {
+  data() {
     const auth = UserService.getAuth()
     const user = UserService.getUser()
     const onboarding = UserService.getOnboarding()
@@ -83,7 +83,7 @@ export default {
       user,
       onboarding
     }
-  },
+  }
 }
 </script>
 

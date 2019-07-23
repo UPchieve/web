@@ -37,10 +37,9 @@
       </div>
       <transition name="fade">
         <div class="typing-indicator" v-show="typingIndicatorShown">
-          {{this.otherUser}} is typing...
+          {{ this.otherUser }} is typing...
         </div>
       </transition>
-
     </div>
 
     <textarea
@@ -53,16 +52,15 @@
 </template>
 
 <script>
+import { setTimeout, clearTimeout } from 'timers'
 import moment from 'moment'
 import _ from 'lodash'
 
 import UserService from '@/services/UserService'
 import SessionService from '@/services/SessionService'
 import ModerationService from '@/services/ModerationService'
-import { setTimeout, clearTimeout } from 'timers';
-
-const STUDENT_AVATAR_URL = '/static/defaultavatar3.png'
-const VOLUNTEER_AVATAR_URL = '/static/defaultavatar4.png'
+import StudentAvatarUrl from '@/assets/defaultavatar3.png'
+import VolunteerAvatarUrl from '@/assets/defaultavatar4.png'
 
 /**
  * @todo {1} Use more descriptive names that comply with the coding standards.
@@ -70,7 +68,7 @@ const VOLUNTEER_AVATAR_URL = '/static/defaultavatar4.png'
  *           router/sockets.js
  */
 export default {
-  data () {
+  data() {
     return {
       user: UserService.getUser(),
       otherUser: null,
@@ -79,81 +77,78 @@ export default {
       newMessage: '',
       chatWarningIsShown: false,
       typingTimeout: null,
-      typingIndicatorShown: false,
+      typingIndicatorShown: false
     }
   },
 
   methods: {
-    showModerationWarning () {
+    showModerationWarning() {
       this.chatWarningIsShown = true
     },
-    hideModerationWarning () {
+    hideModerationWarning() {
       this.chatWarningIsShown = false
     },
-    showNewMessage (message) {
+    showNewMessage(message) {
       this.$socket.emit('message', {
         sessionId: this.currentSession.sessionId,
         user: UserService.getUser(),
         message
       })
     },
-    clearMessageInput () {
+    clearMessageInput() {
       this.newMessage = ''
     },
     notTyping() {
       // Tell the server that the user is no longer typing
       this.$socket.emit('notTyping', {
-          sessionId: this.currentSession.sessionId
+        sessionId: this.currentSession.sessionId
       })
-    }, 
-    handleMessage (event) {
+    },
+    handleMessage(event) {
       // If key pressed is Enter, send the message
       if (event.key == 'Enter') {
         const message = this.newMessage.trim()
         this.clearMessageInput()
-        
+
         // Early exit if message is blank
-        if (_.isEmpty(message)) return 
+        if (_.isEmpty(message)) return
 
         // Reset the chat warning
         this.hideModerationWarning()
 
         // Check for personal info/profanity in message
-        ModerationService
-            .checkIfMessageIsClean(this, message)
-            .then(isClean => {
-              if (isClean) {
-                this.showNewMessage(message)
-              } else {
-                this.showModerationWarning()
-              }
-            })
+        ModerationService.checkIfMessageIsClean(this, message).then(isClean => {
+          if (isClean) {
+            this.showNewMessage(message)
+          } else {
+            this.showModerationWarning()
+          }
+        })
 
         // Disregard typing handler for enter
         this.notTyping()
         return
 
         // Disregard typing handler for backspace
-      } else if (event.key == 'Backspace') return 
+      } else if (event.key == 'Backspace') return
 
       // Typing handler for when non-Enter/Backspace keys are pressed
       this.$socket.emit('typing', {
-          sessionId: this.currentSession.sessionId,
-          user: UserService.getUser()
-        })
+        sessionId: this.currentSession.sessionId,
+        user: UserService.getUser()
+      })
 
       /** Every time a key is pressed, set an inactive timer
           If another key is pressed within 2 seconds, reset timer**/
       clearTimeout(this.typingTimeout)
       this.typingTimeout = setTimeout(() => {
-            this.notTyping()
-            console.log('Timeout expired')
-          }, 2000)   
+        this.notTyping()
+      }, 2000)
     }
   },
 
   sockets: {
-    'session-change' (data) {
+    'session-change'(data) {
       // {1}
       SessionService.currentSession.sessionId = data._id
       SessionService.currentSession.data = data
@@ -177,7 +172,7 @@ export default {
         const user = participants[message.user] || {}
 
         if (!picture || picture === '') {
-          picture = user.isVolunteer ? VOLUNTEER_AVATAR_URL : STUDENT_AVATAR_URL
+          picture = user.isVolunteer ? VolunteerAvatarUrl : StudentAvatarUrl
         }
 
         return {
@@ -194,21 +189,21 @@ export default {
 
       this.messages = messages
     },
-    'is-typing' (data) {
+    'is-typing'(data) {
       this.typingIndicatorShown = true
-      this.otherUser = data;
+      this.otherUser = data
     },
-    'not-typing' () {
+    'not-typing'() {
       this.typingIndicatorShown = false
     },
-    messageSend (data) {
+    messageSend(data) {
       // {1}
       let { picture } = data
       if (!picture || picture === '') {
         if (data.isVolunteer === true) {
-          picture = VOLUNTEER_AVATAR_URL
+          picture = VolunteerAvatarUrl
         } else {
-          picture = STUDENT_AVATAR_URL
+          picture = StudentAvatarUrl
         }
       }
       this.messages.push({
@@ -224,7 +219,7 @@ export default {
     }
   },
 
-  updated () {
+  updated() {
     let msgBox = document.querySelector('.messages')
     msgBox.scrollTop = msgBox.scrollHeight
   }
@@ -344,7 +339,6 @@ export default {
 .fade-leave-to {
   opacity: 0;
 }
-
 
 textarea {
   width: 100%;

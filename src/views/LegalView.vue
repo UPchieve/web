@@ -635,7 +635,7 @@ export default {
     Accordion,
     AccordionItem
   },
-  data () {
+  data() {
     const auth = UserService.getAuth()
 
     const user = UserService.getUser()

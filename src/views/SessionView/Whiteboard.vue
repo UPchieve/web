@@ -83,6 +83,8 @@
  */
 
 import SessionService from '@/services/SessionService'
+import EraserIconUrl from '@/assets/eraser_icon_01_dark.png'
+import PenIconUrl from '@/assets/pen_icon_01_dark.png'
 
 // const CLEAR_BUTTON_ID = 'clearButton';
 // const UNDO_BUTTON_ID = 'undoButton';
@@ -108,27 +110,28 @@ const ERASING_LINE_WIDTH = 20
 
 let SERVER_DRAWING = false
 
-const ERASER_ICON = 'url("/static/eraser_icon_01_dark.png") 0 50, auto'
-const PEN_ICON = 'url("/static/pen_icon_01_dark.png") 0 50, auto'
+const ERASER_ICON = `url("${EraserIconUrl}") 0 50, auto`
+const PEN_ICON = `url("${PenIconUrl}") 0 50, auto`
 const TEXT_ICON = 'text'
 
 let TEXT_POSITION_X = 10
 let TEXT_POSITION_Y = 10
 
 // const ERASING = false;
-let INSERTING_TEXT = false
+// let INSERTING_TEXT = false;
 let CURSOR_VISIBLE = false
-let CURSOR_REMOVED = false
+// let CURSOR_REMOVED = false;
 
 let currentState = ''
 
 let imageList = []
 let imageData
 window.App = {}
+const App = window.App
 
 // const RESET_SCREEN_EVENT = 'reset';
 
-function compareImages (img1, img2) {
+function compareImages(img1, img2) {
   if (img1 !== null && img2 !== null) {
     if (img1.data.length !== img2.data.length) {
       return false
@@ -143,14 +146,14 @@ function compareImages (img1, img2) {
   return false
 }
 
-function saveImage (canvas, ctx) {
+function saveImage(canvas, ctx) {
   imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
   imageList.push(imageData)
 }
 
 export default {
   directives: {
-    canvas (el) {
+    canvas(el) {
       App.canvas = el
       App.ctx = el.getContext('2d')
       App.ctx.strokeStyle = LOCAL_LINE_COLOR
@@ -160,19 +163,19 @@ export default {
       saveImage(App.canvas, App.ctx)
     }
   },
-  data () {
+  data() {
     return {
       currentSession: SessionService.currentSession,
       showColors: 'hidden'
     }
   },
-  mounted () {
+  mounted() {
     this.resizeCanvas()
     this.drawSetup()
     window.addEventListener('resize', this.resizeCanvas)
   },
   methods: {
-    resizeCanvas () {
+    resizeCanvas() {
       const savedImage = App.ctx.getImageData(
         0,
         0,
@@ -185,50 +188,50 @@ export default {
     },
 
     // Socket emits
-    emitDrawClick () {
+    emitDrawClick() {
       this.$socket.emit('drawClick', {
         sessionId: this.currentSession.sessionId
       })
     },
-    emitSaveImage () {
+    emitSaveImage() {
       this.$socket.emit('saveImage', {
         sessionId: this.currentSession.sessionId
       })
     },
-    emitUndoClick () {
+    emitUndoClick() {
       this.$socket.emit('undoClick', {
         sessionId: this.currentSession.sessionId
       })
     },
-    emitClearClick () {
+    emitClearClick() {
       this.$socket.emit('clearClick', {
         sessionId: this.currentSession.sessionId
       })
     },
-    emitChangeColor (color) {
+    emitChangeColor(color) {
       this.$socket.emit('changeColor', {
         sessionId: this.currentSession.sessionId,
         color
       })
     },
-    emitChangeWidth (width) {
+    emitChangeWidth(width) {
       this.$socket.emit('changeWidth', {
         sessionId: this.currentSession.sessionId,
         width
       })
     },
-    emitDrawing () {
+    emitDrawing() {
       this.$socket.emit('drawing', {
         sessionId: this.currentSession.sessionId
       })
     },
-    emitEnd () {
+    emitEnd() {
       this.$socket.emit('end', {
         sessionId: this.currentSession.sessionId,
         whiteboardUrl: App.canvas.toDataURL()
       })
     },
-    emitDragStart (data) {
+    emitDragStart(data) {
       this.$socket.emit('dragStart', {
         sessionId: this.currentSession.sessionId,
         x: data.x,
@@ -236,7 +239,7 @@ export default {
         color: data.color
       })
     },
-    emitDragAction (data) {
+    emitDragAction(data) {
       this.$socket.emit('dragAction', {
         sessionId: this.currentSession.sessionId,
         x: data.x,
@@ -244,7 +247,7 @@ export default {
         color: data.color
       })
     },
-    emitDragEnd (data) {
+    emitDragEnd(data) {
       this.$socket.emit('dragEnd', {
         sessionId: this.currentSession.sessionId,
         x: data.x,
@@ -252,7 +255,7 @@ export default {
         color: data.color
       })
     },
-    emitInsertText (data) {
+    emitInsertText(data) {
       this.$socket.emit('insertText', {
         sessionId: this.currentSession.sessionId,
         x: data.x,
@@ -260,7 +263,7 @@ export default {
         text: data.text
       })
     },
-    emitResetScreen (data) {
+    emitResetScreen() {
       this.$socket.emit('resetScreen', {
         sessionId: this.currentSession.sessionId
       })
@@ -268,12 +271,12 @@ export default {
 
     // UI events
 
-    hideBox () {
+    hideBox() {
       this.$el.querySelector('#textInputBox').style.visibility = 'hidden'
       this.$el.querySelector('#textInputBox').value = ''
       currentState = ''
     },
-    changeColor (event) {
+    changeColor(event) {
       if (currentState === 'DRAWING') {
         LOCAL_LINE_COLOR = event.target.style.backgroundColor
         App.ctx.strokeStyle = LOCAL_LINE_COLOR
@@ -285,13 +288,13 @@ export default {
         App.ctx.lineWidth = ERASING_LINE_WIDTH
       }
     },
-    clear () {
+    clear() {
       App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height)
       imageList = []
       saveImage(App.canvas, App.ctx)
       this.emitClearClick()
     },
-    drawStart (event) {
+    drawStart(event) {
       if (!SERVER_DRAWING) {
         this.emitDrawing()
         if (!CURSOR_VISIBLE && currentState === 'INSERTING_TEXT') {
@@ -319,7 +322,7 @@ export default {
             x: TEXT_POSITION_X,
             y: TEXT_POSITION_Y
           })
-          CURSOR_REMOVED = false
+          // CURSOR_REMOVED = false;
         } else if (currentState === 'DRAWING' || currentState === 'ERASING') {
           saveImage(App.canvas, App.ctx)
           this.emitSaveImage()
@@ -348,7 +351,7 @@ export default {
         }
       }
     },
-    drawEnd (event) {
+    drawEnd(event) {
       if (!SERVER_DRAWING) {
         App.canvas.isDrawing = false
 
@@ -377,7 +380,7 @@ export default {
         this.emitEnd()
       }
     },
-    draw (event) {
+    draw(event) {
       if (!SERVER_DRAWING) {
         if (currentState === 'DRAWING' || currentState === 'ERASING') {
           if (!App.canvas.isDrawing) {
@@ -407,7 +410,7 @@ export default {
         }
       }
     },
-    drawSetup () {
+    drawSetup() {
       App.ctx.strokeStyle = LOCAL_LINE_COLOR
       this.emitChangeColor(LOCAL_LINE_COLOR)
       App.ctx.lineWidth = LINE_WIDTH
@@ -430,7 +433,7 @@ export default {
       currentState = 'DRAWING'
     },
 
-    keydown (e) {
+    keydown(e) {
       if (
         this.$el.querySelector('#textInputBox').value === '' &&
         e.keyCode !== 8 &&
@@ -443,7 +446,7 @@ export default {
       }
     },
 
-    text () {
+    text() {
       if (imageList.length === 0) {
         saveImage(App.canvas, App.ctx)
         this.emitSaveImage()
@@ -452,16 +455,16 @@ export default {
       this.emitSaveImage()
 
       currentState = 'INSERTING_TEXT'
-      INSERTING_TEXT = true
+      // INSERTING_TEXT = true;
       CURSOR_VISIBLE = false
       App.canvas.style.cursor = TEXT_ICON
       this.$el.querySelector('#textInputBox').style.visibility = 'visible'
       this.$el.querySelector('#textInputBox').value = ''
     },
 
-    textBox () {
+    textBox() {
       if (CURSOR_VISIBLE) {
-        handleUndoOperation() // {1}
+        // handleUndoOperation(); // {1}
         this.emitUndoClick()
         CURSOR_VISIBLE = false
       }
@@ -476,7 +479,7 @@ export default {
       })
     },
 
-    undo () {
+    undo() {
       const currentImage = App.ctx.getImageData(
         0,
         0,
@@ -497,7 +500,7 @@ export default {
       }
     },
 
-    erase () {
+    erase() {
       if (imageList.length === 0) {
         saveImage(App.canvas, App.ctx)
         this.emitSaveImage()
@@ -517,7 +520,7 @@ export default {
     },
 
     // Canvas manipulations
-    fillCircle (canvas, context, type, server, x, y, fillColor) {
+    fillCircle(canvas, context, type, server, x, y) {
       const scrollLeft =
         window.pageXOffset !== undefined
           ? window.pageXOffset
@@ -572,7 +575,7 @@ export default {
         }
       }
     },
-    insertText (canvas, input) {
+    insertText(canvas, input) {
       App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height)
 
       if (imageList.length > 0) {
@@ -582,7 +585,7 @@ export default {
       }
       App.ctx.fillText(input, TEXT_POSITION_X, TEXT_POSITION_Y)
     },
-    openColors () {
+    openColors() {
       if (this.showColors === 'hidden') {
         this.showColors = 'visible'
       } else {
@@ -591,7 +594,7 @@ export default {
     }
   },
   sockets: {
-    dstart (data) {
+    dstart(data) {
       this.fillCircle(
         App.canvas,
         App.ctx,
@@ -602,7 +605,7 @@ export default {
         data.color
       )
     },
-    drag (data) {
+    drag(data) {
       this.fillCircle(
         App.canvas,
         App.ctx,
@@ -613,7 +616,7 @@ export default {
         data.color
       )
     },
-    dend (data) {
+    dend(data) {
       this.fillCircle(
         App.canvas,
         App.ctx,
@@ -624,15 +627,13 @@ export default {
         data.color
       )
     },
-    draw () {
-      console.log('SERVER DRAWING')
+    draw() {
       SERVER_DRAWING = true
     },
-    end () {
-      console.log('SERVER DONE DRAWING')
+    end() {
       SERVER_DRAWING = false
     },
-    save () {
+    save() {
       const imageData = App.ctx.getImageData(
         0,
         0,
@@ -641,7 +642,7 @@ export default {
       )
       imageList.push(imageData)
     },
-    undo () {
+    undo() {
       const currentImage = App.ctx.getImageData(
         0,
         0,
@@ -658,18 +659,18 @@ export default {
         }
       }
     },
-    clear () {
+    clear() {
       App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height)
       imageList = []
       saveImage(App.canvas, App.ctx)
     },
-    color (newColor) {
+    color(newColor) {
       SERVER_LINE_COLOR = newColor
     },
-    width (newWidth) {
+    width(newWidth) {
       SERVER_LINE_WIDTH = newWidth
     },
-    text (data) {
+    text(data) {
       App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height)
 
       if (imageList.length > 0) {

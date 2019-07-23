@@ -2,7 +2,10 @@
   <div id="app">
     <div v-if="!$route.meta.hideSidebar" class="sidebar-wrapper">
       <!-- Sidebar -->
-      <div class="nav-container" v-bind:class="{forMobileMode: mobileMode, active: isActive}">
+      <div
+        class="nav-container"
+        v-bind:class="{ forMobileMode: mobileMode, active: isActive }"
+      >
         <sidebar v-on:closeMenu="closeMenu()" />
       </div>
 
@@ -12,7 +15,7 @@
           v-if="!isActive"
           @click="toggleMenu()"
           class="sidebar-hamburger"
-          v-bind:class="{white: $route.name === 'DashboardView'}"
+          v-bind:class="{ white: $route.name === 'DashboardView' }"
         />
 
         <button v-else @click="toggleMenu()" class="sidebar-exit" />
@@ -45,7 +48,7 @@ export default {
   components: {
     Sidebar
   },
-  created () {
+  created() {
     AuthService.checkAuth(this) // {1}
 
     // Update mobileMode on window resize
@@ -53,7 +56,7 @@ export default {
       this.mobileMode = window.innerWidth <= MOBILE_MODE_WIDTH
     })
   },
-  data () {
+  data() {
     return {
       mobileMode: window.innerWidth <= MOBILE_MODE_WIDTH,
       isActive: false
@@ -76,7 +79,6 @@ export default {
 /*
  * @todo {1} Make this truly responsive
  */
-
 
 .toggleMenu.forMobileView {
   display: none;
@@ -128,8 +130,6 @@ body,
   }
   /*------------------------------------------------------------------quickfix*/
 }
-
-
 
 @media screen and (max-width: 700px) {
   .toggleMenu.forMobileView {
@@ -184,7 +184,7 @@ body,
   }
 
   .nav-container.forMobileMode.active {
-     margin-left: 0% !important;
+    margin-left: 0% !important;
   }
 
   .col-xs-12.view-container {

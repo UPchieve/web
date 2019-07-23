@@ -16,13 +16,13 @@
 import OnboardingService from '@/services/OnboardingService'
 
 export default {
-  data () {
+  data() {
     return {
       msg: ''
     }
   },
   methods: {
-    sendVerification () {
+    sendVerification() {
       OnboardingService.sendVerification(this, '/')
     }
   }

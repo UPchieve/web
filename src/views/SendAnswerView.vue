@@ -47,7 +47,7 @@ export default {
     QuestionAnswerForm,
     Modal
   },
-  data () {
+  data() {
     return {
       // This component
       user: UserService.getUser(),
@@ -60,7 +60,7 @@ export default {
       modalClickHandlers: {}
     }
   },
-  beforeCreate () {
+  beforeCreate() {
     StudentQuestionService.getStudentQuestions(this, {
       _id: this.$route.query.q
     }).then(questions => {
@@ -69,7 +69,7 @@ export default {
     })
   },
   methods: {
-    downloadFile () {
+    downloadFile() {
       StudentQuestionService.getAttachment(
         this,
         this.question.attachments[0]

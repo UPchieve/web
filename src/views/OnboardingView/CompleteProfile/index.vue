@@ -273,18 +273,14 @@
 <script>
 import $ from 'jquery'
 
-import validator from 'validator'
-
 import UserService from '@/services/UserService'
-import OnboardingService from '@/services/OnboardingService'
-
 import AutocompleteInput from './AutocompleteInput'
 
 export default {
   components: {
     AutocompleteInput
   },
-  data () {
+  data() {
     const user = UserService.getUser()
     let button
     user.race = user.race || []
@@ -301,7 +297,7 @@ export default {
     }
   },
   methods: {
-    submitProfile () {
+    submitProfile() {
       this.error = ''
 
       const user = UserService.getUser()
@@ -497,8 +493,6 @@ button[type='submit']:active {
   background-color: #ffffff;
   border-left: 5px solid #1855d1;
 }
-
-
 
 @media screen and (max-width: 700px) {
   .header {

@@ -134,11 +134,11 @@ import SessionService from '@/services/SessionService'
 import ListSessions from './ListSessions'
 
 export default {
-  name: "dashboard-view",
+  name: 'dashboard-view',
   components: {
     ListSessions
   },
-  data () {
+  data() {
     const user = UserService.getUser() || {}
     SessionService.getCurrentSession(this, user)
 
@@ -167,25 +167,23 @@ export default {
   },
   watch: {
     // Watch the help topic for changes, and reset the subtopic when it does.
-    pickedTopic: function () {
+    pickedTopic: function() {
       this.pickedSubtopic = ''
     }
   },
   methods: {
-    hasActiveSession () {
+    hasActiveSession() {
       return localStorage.getItem('currentSessionPath')
     },
-    rejoinHelpSession () {
+    rejoinHelpSession() {
       const path = localStorage.getItem('currentSessionPath')
       if (path) {
         this.$router.push(path)
-        console.log(`rejoining session: ${path}`)
       } else {
-        console.log(`session terminated`)
         this.$router.push('/')
       }
     },
-    getHelp () {
+    getHelp() {
       this.popUpStyle = {
         display: 'flex'
       }
@@ -194,15 +192,15 @@ export default {
       }
       this.showHelpPopUp = true
     },
-    capitalize (string) {
+    capitalize(string) {
       return string.charAt(0).toUpperCase() + string.slice(1)
     },
-    getHelpCancel () {
+    getHelpCancel() {
       this.popUpStyle = {}
       this.coverStyle = {}
       this.showHelpPopUp = false
     },
-    getHelpNext () {
+    getHelpNext() {
       let topic = this.pickedTopic
       let subTopic = this.pickedSubtopic
       // Temp change all to math
@@ -390,7 +388,6 @@ h3 {
   width: 300px;
 }
 
-
 @media screen and (max-width: 700px) {
   .dashboard-body.row {
     display: block !important;
@@ -400,7 +397,7 @@ h3 {
   .dashboard-body p {
     padding: 1.2em !important;
   }
-   
+
   iframe {
     max-width: 100vw !important;
   }

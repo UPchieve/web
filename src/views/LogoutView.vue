@@ -23,9 +23,9 @@ export default {
     FormPageTemplate,
     FormFooter
   },
-  data () {
+  data() {
     return {
-      mainWebsiteUrl: process.env.MAIN_WEBSITE_URL
+      mainWebsiteUrl: process.env.VUE_APP_MAIN_WEBSITE_URL
     }
   }
 }

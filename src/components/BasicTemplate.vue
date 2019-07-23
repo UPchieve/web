@@ -22,11 +22,11 @@ export default {
       default: ''
     }
   },
-  data () {
+  data() {
     return {}
   },
   methods: {
-    goHome () {
+    goHome() {
       this.$router.push('/')
     }
   }

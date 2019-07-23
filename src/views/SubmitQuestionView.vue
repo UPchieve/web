@@ -31,7 +31,7 @@ export default {
     QuestionAnswerForm,
     Modal
   },
-  data () {
+  data() {
     return {
       // This component
       user: UserService.getUser(),

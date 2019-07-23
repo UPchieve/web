@@ -8,7 +8,7 @@ export default {
     isOnboarded: false
   },
 
-  sendVerification (context) {
+  sendVerification(context) {
     return NetworkService.sendVerification(context)
       .then(() => {
         context.msg = 'Email sent!'
@@ -17,7 +17,7 @@ export default {
         context.msg = 'Error occurred'
       })
   },
-  confirmVerification (context, token) {
+  confirmVerification(context, token) {
     return NetworkService.confirmVerification(context, { token })
       .then(() => {
         const user = UserService.getUser()
@@ -29,12 +29,12 @@ export default {
       })
   },
 
-  hasVerifiedEmail () {
+  hasVerifiedEmail() {
     const user = UserService.getUser()
     return user.verified
   },
 
-  hasProfile () {
+  hasProfile() {
     const user = UserService.getUser()
 
     let requiredFields
@@ -80,11 +80,11 @@ export default {
     return !hasInvalidField
   },
 
-  isOnboarded () {
+  isOnboarded() {
     return this.hasVerifiedEmail() && this.hasProfile()
   },
 
-  getOnboardingRoute () {
+  getOnboardingRoute() {
     const mapOfRoutesToTheirValidator = {
       '/onboarding/verify': this.hasVerifiedEmail
     }

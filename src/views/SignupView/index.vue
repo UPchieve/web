@@ -37,27 +37,26 @@ import StudentForm from './StudentForm'
 import VolunteerForm from './VolunteerForm'
 
 export default {
-  name: "signup-view",
+  name: 'signup-view',
   components: {
     FormPageTemplate,
     StudentForm,
     VolunteerForm
   },
-  data () {
+  data() {
     return {
       userSelection: null
     }
   },
   methods: {
-    selectVolunteer () {
+    selectVolunteer() {
       this.userSelection = 'volunteer'
     },
-    selectStudent () {
+    selectStudent() {
       this.userSelection = 'student'
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

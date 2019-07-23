@@ -6,7 +6,7 @@ export default {
     validRegistrationCode: false
   },
 
-  checkCode (context, code) {
+  checkCode(context, code) {
     return NetworkService.checkCode(context, { code }).then(res => {
       const data = res.data || {}
 
