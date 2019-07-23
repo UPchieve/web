@@ -9,7 +9,7 @@
                     volunteers
                 </div> 
                 <div class = "container-content"> 
-                    <div class= "metrics-info" >{{getNumHours(true)}} </div>
+                    <div class= "metrics-info" >{{getNumHours(true)}}hrs </div>
                 </div>
             </div>
 
@@ -18,7 +18,7 @@
                     <input v-model = "greaterThan" placeholder="number" class = "input">
                     volunteers</div> 
                 <div class = "container-content"> 
-                    <div class= "metrics-info" >{{getNumHours(false)}} </div>
+                    <div class= "metrics-info" >{{getNumHours(false)}}hrs </div>
                 </div>
             </div>
 
@@ -99,7 +99,7 @@ export default{
                 return '255, 255, 0'
             }
             else if(this.greaterThan && cell > this.greaterThan){
-                return '0, 255, 0'
+                return '0, 0, 255'
             }
             else{
                 return '255, 0, 0'
