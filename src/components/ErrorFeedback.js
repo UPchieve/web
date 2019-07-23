@@ -1,5 +1,7 @@
 import * as sentry from '@sentry/browser'
 
+import feedbackHandler from '@/utils/error-feedback-handling'
+
 export default {
   mounted () {
     this.$on('async-error', function (err) {
@@ -9,27 +11,17 @@ export default {
   data () {
     return {
       error: null,
-      eventId: null,
+      eventId: null
     }
   },
   methods: {
     captureError (err) {
-      var self = this
       this.error = err
-
-      sentry.withScope(function (scope) {
-        scope.addEventProcessor(function (event) {
-          self.eventId = err.sentryEventId || event.event_id
-          sentry.showReportDialog({ eventId: self.eventId })
-
-          return event
-        })
-        sentry.captureException(err)
-      })
+      feedbackHandler.captureExceptionWithFeedback(this, err)
     }
   },
   errorCaptured (err, vm, info) {
-    this.captureError (err)
+    this.captureError(err)
     return false
   },
   render () {

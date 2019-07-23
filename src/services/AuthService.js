@@ -4,8 +4,7 @@ import router from '@/router'
 
 import NetworkService from './NetworkService'
 import errorFromServer from '@/utils/error-from-server'
-
-import * as sentry from '@sentry/browser'
+import feedbackHandler from '@/utils/error-feedback-handling'
 
 const USER_FETCH_LIMIT_SECONDS = 5
 
@@ -166,8 +165,10 @@ export default {
         this.user.data = JSON.parse(user)
         this.user.authenticated = true
       } catch (e) {
-        sentry.captureException(e)
-        this.logout() // Error in LocalStorage, so logout
+        feedbackHandler.captureExceptionWithFeedback(context, e)
+        // Error in localStorage, so logout, but delay enough not to interfere
+        // with feedback form.
+        window.setTimeout(() => { this.logout() }, 3000)
       }
     } else {
       this.user.authenticated = false
