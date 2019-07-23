@@ -1,10 +1,3 @@
-<template>
-  <div class="error-boundary-div">
-    <slot></slot>
-  </div>
-</template>
-
-<script>
 import * as sentry from '@sentry/browser'
 
 export default {
@@ -15,7 +8,7 @@ export default {
   },
   data () {
     return {
-      error: false,
+      error: null,
       eventId: null,
     }
   },
@@ -40,22 +33,9 @@ export default {
     return false
   },
   render () {
-    return this.$slots.default[0]
+    return this.$scopedSlots.default({
+      error: this.error,
+      eventId: this.eventId
+    })
   }
 }
-</script>
-
-<style lang="scss" scoped>
-.error-boundary-div {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-
-  > * {
-    flex-grow: 1;
-  }
-}
-</style>

@@ -20,7 +20,9 @@
 
       <!-- Router view -->
       <div class="col-xs-12 view-container">
-        <router-view />
+        <error-feedback>
+          <router-view />
+        </error-feedback>
       </div>
     </div>
 
@@ -31,6 +33,7 @@
 <script>
 import './scss/main.scss'
 import Sidebar from './components/Sidebar'
+import ErrorFeedback from './components/ErrorFeedback'
 import AuthService from './services/AuthService'
 
 const MOBILE_MODE_WIDTH = 700
@@ -43,7 +46,8 @@ AuthService.checkAuth() // {1}
 export default {
   name: 'App',
   components: {
-    Sidebar
+    Sidebar,
+    ErrorFeedback
   },
   created () {
     AuthService.checkAuth(this) // {1}

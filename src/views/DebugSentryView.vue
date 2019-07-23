@@ -1,19 +1,21 @@
 <template>
-  <div class="form-div">
-    <form class="form-debug-sentry">
-      <button class="btn btn-lg btn-primary debug-btn" @click.prevent="debugSentryServer">
-        Test Sentry on Server
-      </button>
-      <button class="btn btn-lg btn-primary debug-btn" @click.prevent="debugSentryApi">
-        Test Sentry on Server API
-      </button>
-      <button class="btn btn-lg btn-primary debug-btn" @click.prevent="debugSentryClient">
-        Test Sentry on Client
-      </button>
-      <p class="message">
-        {{ msg }}
-      </p>
-    </form>
+  <div class="main-page">
+    <div class="form-div">
+      <form class="form-debug-sentry">
+        <button class="btn btn-lg btn-primary debug-btn" @click.prevent="debugSentryServer">
+          Test Sentry on Server
+        </button>
+        <button class="btn btn-lg btn-primary debug-btn" @click.prevent="debugSentryApi">
+          Test Sentry on Server API
+        </button>
+        <button class="btn btn-lg btn-primary debug-btn" @click.prevent="debugSentryClient">
+          Test Sentry on Client
+        </button>
+        <p class="message">
+          {{ msg }}
+        </p>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -77,6 +79,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.main-page {
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .form-div {
   display: flex;
   flex-direction: column;

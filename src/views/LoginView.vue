@@ -1,66 +1,71 @@
 <template>
-  <form class="uc-form">
-    <div class="uc-form-header">
-      <div class="uc-form-header-link--active">Log In</div>
-      <router-link to="signup" class="uc-form-header-link">Sign Up</router-link>
-    </div>
-
-    <div class="uc-form-body">
-      <div
-        v-if="error || $route.query['401'] === 'true'"
-        class="alert alert-danger"
-        role="alert"
-      >
-        {{ error }}
+  <form-page-template>
+    <form class="uc-form">
+      <div class="uc-form-header">
+        <div class="uc-form-header-link--active">Log In</div>
+        <router-link to="signup" class="uc-form-header-link">Sign Up</router-link>
       </div>
 
-      <div class="uc-column">
-        <label for="inputEmail" class="uc-form-label">Email</label>
-        <input
-          id="inputEmail"
-          v-model="credentials.email"
-          type="email"
-          class="uc-form-input"
-          required
-          autofocus
-        />
+      <div class="uc-form-body">
+        <div
+          v-if="error || $route.query['401'] === 'true'"
+          class="alert alert-danger"
+          role="alert"
+        >
+          {{ error }}
+        </div>
+
+        <div class="uc-column">
+          <label for="inputEmail" class="uc-form-label">Email</label>
+          <input
+            id="inputEmail"
+            v-model="credentials.email"
+            type="email"
+            class="uc-form-input"
+            required
+            autofocus
+          />
+        </div>
+
+        <div class="uc-column">
+          <label for="inputPassword" class="uc-form-label">Password</label>
+          <input
+            id="inputPassword"
+            v-model="credentials.password"
+            type="password"
+            class="uc-form-input"
+            required
+          />
+          <router-link to="resetpassword" class="uc-form-subtext">
+            Forgot password?
+          </router-link>
+        </div>
+
+        <button
+          class="uc-form-button"
+          type="submit"
+          @click.prevent="submit"
+        >
+          Login
+        </button>
       </div>
 
-      <div class="uc-column">
-        <label for="inputPassword" class="uc-form-label">Password</label>
-        <input
-          id="inputPassword"
-          v-model="credentials.password"
-          type="password"
-          class="uc-form-input"
-          required
-        />
-        <router-link to="resetpassword" class="uc-form-subtext">
-          Forgot password?
-        </router-link>
-      </div>
-
-      <button
-        class="uc-form-button"
-        type="submit"
-        @click.prevent="submit"
-      >
-        Login
-      </button>
-    </div>
-
-    <form-footer />
-  </form>
+      <form-footer />
+    </form>
+  </form-page-template>
 </template>
 
 <script>
+import FormPageTemplate from '@/components/FormPageTemplate'
+
 import AuthService from '@/services/AuthService'
 
 import FormFooter from '@/components/FormFooter'
 
 export default {
   components: {
-    FormFooter
+    FormPageTemplate,
+	  FormFooter
   },
   data () {
     let error
@@ -108,9 +113,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.alert {
+  margin-bottom: 0;
+}
+
 .background {
   display: flex;
-  background-image: url('../../assets/onboarding_background.png');
+  background-image: url('../assets/onboarding_background.png');
   background-size: cover;
   height: 100%;
   font-size: 16px;
