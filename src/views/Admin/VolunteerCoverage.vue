@@ -3,22 +3,27 @@
     <div class="header">Volunteer Coverage </div>
         <div class="wrap-container">
 
-            <div class = "container--metric"> 
-                <div class="subheader--metric"># hours w/ less than 
-                    <input v-model = "lessThan" placeholder="number" class = "input">
+            <div class = "container-metric"> 
+                <div class="subheader-metric"># hours w/ less than 
+                    <form>
+                    <input v-model = "lessThan" placeholder="number" class = "input"
+                    :style = "{'--rgb': lessThanColor}"> </form>
                     volunteers
                 </div> 
                 <div class = "container-content"> 
-                    <div class= "metrics-info" >{{getNumHours(true)}}hrs </div>
+                    <div class= "metrics-info" >{{(100/168*getNumHours(true)).toFixed(2)}}%</div>
+                    {{getNumHours(true)}}hrs 
                 </div>
             </div>
 
-            <div class = "container--metric"> 
-                <div class="subheader--metric"># hours w/ more than
-                    <input v-model = "greaterThan" placeholder="number" class = "input">
+            <div class = "container-metric"> 
+                <div class="subheader-metric"># hours w/ more than
+                    <input v-model = "greaterThan" placeholder="number" class = "input"
+                    :style = "{'--rgb': greaterThanColor}">
                     volunteers</div> 
                 <div class = "container-content"> 
-                    <div class= "metrics-info" >{{getNumHours(false)}}hrs </div>
+                    <div class= "metrics-info" >{{(100/168*getNumHours(false)).toFixed(2)}}% </div>
+                    {{getNumHours(false)}}hrs
                 </div>
             </div>
 
@@ -31,8 +36,8 @@
                     <div class = "grid">
                         <div v-for="(cell, index) in availabilityTable"
                         :key = "`${index}`">
-                            <div v-bind:class = "[{'cell--header': typeof(cell) == 'string',
-                            'cell--data': typeof(cell) != 'string'}]" 
+                            <div v-bind:class = "[{'cell-header': typeof(cell) == 'string',
+                            'cell-data': typeof(cell) != 'string'}]" 
                             :style = " { '--rgb': getColor(cell), '--hour': getGradient(cell)}">
                                 {{cell}}
                             </div>
@@ -52,6 +57,8 @@ import NetworkService from '@/services/NetworkService'
 export default{
     data () {
         return {
+            lessThanColor: '255, 255, 0',
+            greaterThanColor: '0, 255, 0',
             msg: '',
             lessThan : null,
             greaterThan: null,
@@ -96,10 +103,10 @@ export default{
                 return '255, 0, 255'
             }
             else if(this.lessThan && cell < this.lessThan){
-                return '255, 255, 0'
+                return this.lessThanColor
             }
             else if(this.greaterThan && cell > this.greaterThan){
-                return '0, 0, 255'
+                return this.greaterThanColor
             }
             else{
                 return '255, 0, 0'
@@ -136,7 +143,7 @@ export default{
     display: flex;
     flex-direction: column;
     margin: 1vw;
-     &--metric {
+     &-metric {
         @extend .container;
         width: 170px;
     }
@@ -157,22 +164,26 @@ export default{
 
 .cell {
   color: gray;
-    &--header {
+    &-header {
         @extend .cell;
         font: bold;
         overflow: hidden;
     }
-    &--data {
+    &-data {
         @extend .cell;
         background-color: rgba(var(--rgb), (var(--hour)));
     }
 }
 
 .input {
+    background-color: white;
     width: 100px;
     font-size: 15px;
     text-align: center;
+    border-left-width: 10px;
+    border-left-color: rgba(var(--rgb), .5);
 }
+
 
 .subheader {
   font-weight: 600;
@@ -181,7 +192,7 @@ export default{
   background-color: #e3f2fd;
   font-size: 20px;
   padding: 10px;
-    &--metric{
+    &-metric{
       @extend .subheader;
       height: 150px;
   }
