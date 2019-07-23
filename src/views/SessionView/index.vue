@@ -72,6 +72,9 @@ export default {
     }
   },
   mounted () {
+    // pass async-error events from children up to parent
+    this.$on('async-error', (err) => this.$parent.$emit('async-error', err))
+
     const id = this.$route.params.sessionId
     let promise
 

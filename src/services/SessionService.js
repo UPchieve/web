@@ -99,18 +99,21 @@ export default {
         localStorage.setItem('currentSessionPath', path)
       }
     }).catch(err => {
-      if (err.data && err.data.err) {
-        this.currentSession.sessionId = null
-        this.currentSession.data = {}
-        if (err.status === 404) {
-          console.log('no active session found')
-        } else if (err.status !== 0) {
-          sentry.captureException(err.data.err)
-          console.log('database error checking current session')
-        }
-
-        localStorage.removeItem('currentSessionPath')
+      if ((!err.data || !err.data.err) && err.status !== 0) {
+        context.$parent.$emit('async-error', errorFromServer(err))
+        return
       }
+
+      this.currentSession.sessionId = null
+      this.currentSession.data = {}
+      if (err.status === 404) {
+        console.log('no active session found')
+      } else if (err.status !== 0) {
+        context.$parent.$emit('async-error', errorFromServer(err))
+        console.log('database error checking current session')
+      }
+
+      localStorage.removeItem('currentSessionPath')
     })
   }
 }

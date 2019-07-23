@@ -1,14 +1,15 @@
-import * as sentry from '@sentry/browser'
+import errorFromServer from '@/utils/error-from-server'
 
 import NetworkService from './NetworkService'
 
-function _errHandler (err) {
-  if (!err.sentryEventId && err.status !== 401) {
-    sentry.captureException(err.err)
+function _errHandler (context, err) {
+  if ((!err.body || !err.body.sentryEventId) && 
+  err.status !== 0 && err.status !== 401) {
+    context.$parent.$emit('async-error', err.body ? err.body.err : err)
   }
   console.error(new Error('Unable to check if message is clean'))
   console.log(err)
-  return true
+  throw err
 }
 
 export default {
@@ -18,16 +19,13 @@ export default {
     }).then(
       res => {
         if ('err' in res.body) {
-          return _errHandler(res.body)
+          return _errHandler(context, res)
         } else {
           return res.body.isClean
         }
-      },
-      err => {
-        if ('err' in res.body) {
-          return _errHandler(res.body)
-        }
-        return _errHandler(err)
+      })
+      .catch(err => {
+        return _errHandler(context, err)
       }
     )
   }
