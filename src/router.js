@@ -186,13 +186,13 @@ const routes = [
     path: '/admin',
     name: 'Admin',
     component: AdminView,
-    meta: { protected: true }
+    meta: { protected: true, requiresAdmin: true }
   },
   {
     path: '/admin/volunteer-coverage',
     name: 'VolunteerCoverage',
     component: VolunteerCoverage,
-    meta: { protected: true }
+    meta: { protected: true, requiresAdmin: true }
   },
   {
     path: '/edu', // TODO: make this be "/admin/edu"
@@ -242,6 +242,16 @@ router.beforeEach((to, from, next) => {
       }
     } else {
       next()
+    }
+  } if (to.matched.some(route => route.meta.requiresAdmin)) {
+    if (!AuthService.user.data.isAdmin) {
+      console.log('Protected route requires admin access')
+      next({
+        path: '/login',
+        query: {
+          redirect: to.fullPath
+        }
+      })
     }
   } else {
     next()

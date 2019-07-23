@@ -51,7 +51,6 @@ import NetworkService from '@/services/NetworkService'
 
 export default{
     data () {
-
         return {
             msg: '',
             lessThan : null,
@@ -107,21 +106,21 @@ export default{
             }
         },
         getGradient(cell){
-            let gradient = ((cell/(this.maxVolunteers - this.minVolunteers)) * (70) + 20) + '%'
+            let gradient = 100-((cell/(this.maxVolunteers - this.minVolunteers)) * (70) + 20) + '%'
             return gradient
         },
 
-    getAvailability(certifiedSubject){
-        UserService.getVolunteersAvailability(this, certifiedSubject).then(availability =>{
-            this.minVolunteers = availability.min
-            this.maxVolunteers = availability.max
-            this.availabilityTable = availability.table.flat()
-            return this.availabilityTable
-        }).catch(err => {
-          this.msg = err.message
-        })
-        },
-    }
+        getAvailability(certifiedSubject){
+            UserService.getVolunteersAvailability(this, certifiedSubject).then(availability =>{
+                this.minVolunteers = availability.min
+                this.maxVolunteers = availability.max
+                this.availabilityTable = availability.table.flat()
+                return this.availabilityTable
+            }).catch(err => {
+            this.msg = err.message
+            })
+            },
+        }
 }
     
 </script>
