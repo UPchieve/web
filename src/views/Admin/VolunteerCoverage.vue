@@ -109,12 +109,8 @@ export default{
                     if (((typeof(currentValue) === 'number') && currentValue.length != 0) && 
                     ((lessThan && (this.lessThan.length !=0) && currentValue < this.lessThan) || 
                     (!lessThan && (this.greaterThan.length !=0) && currentValue > this.greaterThan))){
-                        console.log('not skipped: ' + currentValue + " : " + typeof(currentValue))
                         totalHours++ 
                     }    
-                    else{
-                        console.log('skipped: ' + currentValue)
-                    }
                 })
             }
             return totalHours
