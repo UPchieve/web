@@ -25,7 +25,6 @@
 </template>
 
 <script>
-import AnalyticsService from '@/services/AnalyticsService'
 import UserService from '@/services/UserService'
 import SessionService from '@/services/SessionService'
 import router from '@/router'
