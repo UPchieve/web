@@ -8,6 +8,10 @@
       <div class = "container-section linkBtn btn">
         <router-link to="admin/edu" class="prompt">Edu Admin</router-link>
       </div>
+      <div class = "container-section linkBtn btn">
+        <router-link to="admin/volunteers" class="prompt"
+          >Volunteers</router-link>
+      </div>
     </div>
   </div>
 </template>

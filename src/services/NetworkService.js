@@ -60,6 +60,11 @@ export default {
       .put(`${API_ROOT}/user`, data)
       .then(this._successHandler, this._errorHandler)
   },
+  editVolunteer (context, data) {
+    return context.$http
+      .post(`${API_ROOT}/volunteers/${data._id}`, data)
+      .then(this._successHandler, this._errorHandler)
+  },
   getVolunteersAvailability (context) {
     return context.$http
       .get(`${API_ROOT}/volunteers/availability`)

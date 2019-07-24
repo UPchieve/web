@@ -27,7 +27,8 @@ import InboxView from './views/InboxView'
 import SendAnswerView from './views/SendAnswerView'
 import AdminView from './views/Admin'
 import VolunteerCoverage from './views/Admin/VolunteerCoverage'
-
+import Volunteers from './views/Admin/Volunteers'
+import VolunteerProfile from './views/Admin/VolunteerProfile'
 import AuthService from './services/AuthService'
 import OnboardingService from './services/OnboardingService'
 
@@ -193,6 +194,17 @@ const routes = [
     name: 'VolunteerCoverage',
     component: VolunteerCoverage,
     meta: { protected: true }
+  },
+  { path: '/admin/volunteers',
+    name: 'Volunteers',
+    component: Volunteers,
+    meta: { protected: true }
+  },
+  { path: '/admin/volunteers/:id',
+    name: 'VolunteerProfile',
+    component: VolunteerProfile,
+    meta: { protected: true },
+    props: true
   },
   {
     path: '/edu', // TODO: make this be "/admin/edu"
