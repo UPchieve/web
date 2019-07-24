@@ -35,8 +35,8 @@ export default {
         this.storeUser(data.user)
 
         //analytics: tracking when a user has logged in
-        AnalyticsService.identify(this.user.data, this.user.data.fakeUser)
-        AnalyticsService.trackNoProperties('logged in', this.user.data.fakeUser)
+        AnalyticsService.identify(this.user.data, this.user.data.isFakeUser)
+        AnalyticsService.trackNoProperties('logged in', this.user.data.isFakeUser)
 
         if (redirect) {
           router.push(redirect)

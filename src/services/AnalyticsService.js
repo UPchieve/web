@@ -2,8 +2,8 @@ import UserService from './UserService'
 
 export default {
   // for tracking only when events happen, not tracking any properties
-  trackNoProperties (name, fakeUser) {
-    if(!fakeUser){
+  trackNoProperties (name, isFakeUser) {
+    if(!isFakeUser){
     window.analytics.track(name)
     }
   },
@@ -16,8 +16,8 @@ export default {
   not currently tracking any user specific info that can be changed, but if
   we were to track their school, a new identify call would have to be called
    when profile is updated) */
-  identify (userData, fakeUser) {
-    if(!fakeUser){
+  identify (userData, isFakeUser) {
+    if(!isFakeUser){
       const listPassed = []
       for (var property in userData) {
         if (userData[property] && userData[property].hasOwnProperty('passed')) {
@@ -37,8 +37,8 @@ export default {
 
 
   // tracking the information from the feedback form
-  trackFeedback (feedbackComponent, fakeUser) {
-    if(!fakeUser){
+  trackFeedback (feedbackComponent, isFakeUser) {
+    if(!isFakeUser){
       let aggResponses = []
       let volunteerScore = 0
 
@@ -73,8 +73,8 @@ export default {
   },
 
   // tracks when a help session has ended
-  trackSessionEnded (headerComponent, currentSession, fakeUser) {
-    if(!fakeUser){
+  trackSessionEnded (headerComponent, currentSession, isFakeUser) {
+    if(!isFakeUser){
       //calculating time-related session info (session length, wait time, etc.) 
       let volunteerSessionLength  = null
       let waitTime = null
@@ -125,8 +125,8 @@ export default {
   },
 
   // tracks when a help session has started
-  trackSessionStarted (currentSession, topic, subTopic, fakeUser){
-    if(!fakeUser){
+  trackSessionStarted (currentSession, topic, subTopic, isFakeUser){
+    if(!isFakeUser){
       window.analytics.track('session started', {
           'session started date': new Date(),
           'user': UserService.getUser().isVolunteer

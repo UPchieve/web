@@ -299,8 +299,8 @@ export default {
           UserService.setProfile(this, user, '/')
 
           //analytics: tracking when a user has signed up
-          AnalyticsService.identify(user, user.fakeUser)
-          AnalyticsService.trackNoProperties('signed up', user.fakeUser)
+          AnalyticsService.identify(user, user.isFakeUser)
+          AnalyticsService.trackNoProperties('signed up', user.isFakeUser)
         })
         .catch(err => {
           console.log(err)
