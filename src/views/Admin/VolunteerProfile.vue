@@ -1,12 +1,14 @@
 <template>
-  <div class="profile">
+  <div v-if="volunteer" class="profile">
     <div class="header">
-      Edit Profile
+      {{volunteer.firstname}}'s Profile
+      <button
+      class="editBtn btn"
+      @click="editApproval(volunteer)">
+      {{ editBtnMsg }}
+      </button>
     </div>
-    <div v-if="loading">
-      Retrieving Volunteer
-    </div>
-    <div v-if="volunteer">
+    <div>
       <table>
         <thead>
           <tr>
@@ -26,15 +28,9 @@
                   v-model="volunteer.isVolunteerApproved"
                   type="text"
                   class="form-control"
-                  v-bind:id="volunteer._id"
-                  @keypress="edited(volunteer._id)"
+                  id="edit"
+                  @keypress="edited()"
                 />
-                 <button
-                  class="editBtn btn"
-                  @click="editApproval(volunteer)">
-                  {{ editBtnMsg }}
-                </button>
-
               </div>
               <div v-else-if="key === 'Approved and Ready'">
                 {{ volunteer.isVolunteerApproved && volunteer.isVolunteerReady }}
@@ -55,12 +51,6 @@ import UserService from '@/services/UserService'
 import axios from 'axios'
 
 export default {
-  // props: {
-  //   volunteer: {
-  //     type: Object
-  //   }
-  // },
-
   data () {
     const volunteerProperties = ['firstname', 'lastname', 'isVolunteerApproved', 'hasAvailability', 'hasCertification', 'isVolunteerReady', 'Approved and Ready']
     return {
@@ -75,17 +65,11 @@ export default {
     }
   },
   
-  async created () {
-    let volunteerData = this.$route.params.volunteer
-    let id = this.$route.params.id
-    if (volunteerData) {
-      this.volunteer = volunteerData
-    } else {
-      this.loading = true
-      let res = await axios.get(`admin/volunteers/${id}`)
-      this.volunteer = res.data
-      this.loading = false
-    }
+  created () {
+    var id = this.$route.params.id
+    UserService.getVolunteer(this, id).then(volunteer =>{
+      this.volunteer = volunteer
+      })
   },
 
   methods: {
@@ -120,8 +104,8 @@ export default {
     
     },
     
-    edited(id) {
-      var x = document.getElementById(id);
+    edited() {
+      var x = document.getElementById("edit");
       x.style.backgroundColor = "yellow";
     },
   }
@@ -198,11 +182,11 @@ button {
 .editBtn {
   background-color: #16d2aa;
   border-radius: 30px;
-  width: 20;
+  width: 70px;
   align-items: center;
-  height: 20px;
+  height: 50px;
   justify-content: center;
-  font-size: 10px;
+  font-size: 16px;
   font-weight: 500;
   color: #2c3e50;
 }

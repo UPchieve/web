@@ -16,30 +16,26 @@
           <tr v-for="volunteer in volunteers" v-bind:key="volunteer._id">
             <td v-for="key in volunteerProperties" v-bind:key="key.index">
               <div v-if="key === '_id'">
-                <!-- <router-link :to="{ path: 'volunteers/' + volunteer._id, query: { volunteer: volunteer } }">{{volunteer._id}} </router-link> -->
-                <router-link :to="{ name: 'VolunteerProfile', params: {volunteer: volunteer, id: volunteer._id}}">{{volunteer._id}} </router-link>
-                  <!-- <VolunteerProfile :volunteer=volunteer>{{ volunteer._id }}</VolunteerProfile> -->
+                <router-link :to="{ name: 'VolunteerProfile', params: {id: volunteer._id}}">{{volunteer._id}} </router-link>
                 </div>
               <div v-if="key === 'isVolunteerApproved'">
                 <div v-show="!activeEdit" class="answer">
                   {{ volunteer.isVolunteerApproved }}
                 </div>
-                <!-- <input
-                  v-show="activeEdit"
-                  v-model="volunteer.isVolunteerApproved"
-                  type="text"
-                  class="form-control"
-                  v-bind:id="volunteer._id"
-                  @keypress="edited(volunteer._id)"
-                />
-                 <button
-                  class="editBtn btn"
-                  @click="editApproval(volunteer)">
-                  {{ editBtnMsg }}
-                </button> -->
               </div>
-              <div v-else-if="key === 'Approved and Ready'">
-                {{ volunteer.isVolunteerApproved && volunteer.isVolunteerReady }}
+              <div v-else-if="key === 'Status'">
+                <div v-if="volunteer.isVolunteerApproved && volunteer.isVolunteerReady">
+                  Approved and Ready!
+                </div>
+                <div v-else-if="volunteer.isVolunteerApproved && !volunteer.isVolunteerReady">
+                  Approved
+                </div>
+                <div v-else-if="!volunteer.isVolunteerApproved && !volunteer.isVolunteerReady">
+                  Hasn't Started
+                </div>
+                <div v-else>
+                  Ready
+                </div>
               </div>
               <div v-else-if="key !== 'isVolunteerApproved' && key !== '_id'">
                 {{ volunteer[key] }}
@@ -62,7 +58,9 @@ export default {
     VolunteerProfile
   },
   data () {
-    var volunteerProperties = ['firstname', 'lastname', '_id', 'isVolunteerApproved', 'hasAvailability', 'hasCertification', 'isVolunteerReady', 'Approved and Ready']
+    var volunteerProperties = ['firstname', 'lastname', '_id', 'Status']
+
+    // var volunteerProperties = ['firstname', 'lastname', '_id', 'isVolunteerApproved', 'hasAvailability', 'hasCertification', 'isVolunteerReady', 'Approved and Ready']
     
     return {
       msg: '',
@@ -81,43 +79,6 @@ export default {
       })
   },
 
-  // methods: {
-  //       /**
-  //    * Toggle editing state.
-  //    * {Case A} if activeEdit === false: enter the editing state by setting activeEdit to true
-  //    * {Case B} if activeEdit === true: save profile changes & exit the editing state by setting activeEdit to false
-  //    */
-  //   editApproval (user) {
-  //     // {Case A} Enter the editing state, then early exit
-  //     if (!this.activeEdit) {
-  //       this.editBtnMsg = 'Save'
-  //       this.activeEdit = true
-  //       return
-  //     }
-  //     // {Case B} The remainder of this function saves new changes and exits the editing state
-
-  //     // Start by erasing previous errors
-  //     this.saveFailed = false
-
-  //     // form fields valid, so set profile
-  //     // wait for save to succeed before coming out of edit mode
-  //     UserService.editVolunteer(this, user)
-  //     .then(res => {
-  //       this.editBtnMsg = 'Edit'
-  //       this.activeEdit = false
-  //       this.saveFailed = false
-  //       return
-  //     }).catch(err => {
-  //       this.msg = err.message
-  //     })
-    
-  //   },
-    
-  //   edited(id) {
-  //     var x = document.getElementById(id);
-  //     x.style.backgroundColor = "yellow";
-  //   },
-  // }
 }
 </script>
 

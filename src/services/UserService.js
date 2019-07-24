@@ -68,6 +68,18 @@ export default {
     })
   },
 
+  getVolunteer (context, data) {
+    return NetworkService.getVolunteer(context, data).then(res => {
+      if (res.data.err) {
+        return res.data.err
+      } else if (res.data.volunteer) {
+        return res.data.volunteer
+      } else {
+        throw new Error()
+      }
+    })
+  },
+
   getVolunteers (context) {
     return NetworkService.getVolunteers(context).then(res => {
       if (res.data.err) {
