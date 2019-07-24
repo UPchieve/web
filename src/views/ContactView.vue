@@ -11,8 +11,9 @@
         frameborder="0"
         marginheight="0"
         marginwidth="0"
-        >Loading...</iframe
       >
+        Loading...
+      </iframe>
     </div>
   </div>
 </template>
