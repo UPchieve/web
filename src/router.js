@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueResource from 'vue-resource'
 import VueRouter from 'vue-router'
-import VueSocketio from 'vue-socket.io'
 
 import ContactView from './views/ContactView'
 import LegalView from './views/LegalView'
@@ -33,7 +32,6 @@ import OnboardingService from './services/OnboardingService'
 
 Vue.use(VueResource)
 Vue.use(VueRouter)
-Vue.use(VueSocketio, process.env.SOCKET_ADDRESS)
 
 Vue.http.options.credentials = true
 
@@ -217,7 +215,6 @@ export default router
 router.beforeEach((to, from, next) => {
   if (to.matched.some(route => route.meta.protected)) {
     if (!AuthService.user.authenticated) {
-      console.log('Protected route requires login')
       next({
         path: '/login',
         query: {
@@ -225,7 +222,6 @@ router.beforeEach((to, from, next) => {
         }
       })
     } else if (!OnboardingService.isOnboarded()) {
-      console.log('User requires onboarding')
       const route = OnboardingService.getOnboardingRoute()
       if (
         to.path.indexOf(route) !== -1 ||

@@ -17,11 +17,7 @@
       </p>
     </div>
 
-    <button
-      class="uc-form-button"
-      type="submit"
-      @click.prevent="submit()"
-    >
+    <button class="uc-form-button" type="submit" @click.prevent="submit()">
       Enter
     </button>
 
@@ -33,14 +29,14 @@
 import RegistrationService from '@/services/RegistrationService'
 
 export default {
-  data () {
+  data() {
     return {
       registrationCode: '',
       msg: ''
     }
   },
   methods: {
-    submit () {
+    submit() {
       RegistrationService.checkCode(this, this.registrationCode).then(
         isValid => {
           if (!isValid) {
@@ -53,5 +49,4 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

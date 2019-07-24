@@ -39,7 +39,8 @@
       <div class="body">
         <div class="startBody">
           <div v-if="showStartMsg" class="instructions">
-            This test will have {{ quizLength }} questions, and it is untimed.<br />
+            This test will have {{ quizLength }} questions, and it is
+            untimed.<br />
             You have {{ 3 - tries }}/3 tries left to pass this test.<br /><br />
             Once you feel ready, click on start!
           </div>
@@ -146,11 +147,13 @@
 import UserService from '@/services/UserService'
 import TrainingService from '@/services/TrainingService'
 
+const MathJax = window.MathJax
+
 /**
  * @note {1} Why the extra parens: https://stackoverflow.com/a/27386370
  */
 export default {
-  data () {
+  data() {
     const user = UserService.getUser()
     const { category } = this.$route.params
     let quizName
@@ -195,21 +198,23 @@ export default {
       qNumber: ''
     }
   },
-  beforeMount () {
+  beforeMount() {
     TrainingService.loadQuiz(this, this.category).then(quizLength => {
       this.quizLength = quizLength
     })
   },
-  updated () {
+  updated() {
     this.rerenderMathJaxElements()
   },
   methods: {
-    clearMathJaxElements () {
+    clearMathJaxElements() {
       const quizBody = document.querySelector('.quizBody')
 
       // Remove any MathJax-rendered elements from the DOM.
       // Do this before updating to avoid rendering artifacts being left behind
-      const mathJaxElements = quizBody.querySelectorAll('[class*=mjx],[class*=MathJax],[id*=MathJax]')
+      const mathJaxElements = quizBody.querySelectorAll(
+        '[class*=mjx],[class*=MathJax],[id*=MathJax]'
+      )
       Array.from(mathJaxElements).forEach(e => e.remove())
 
       // MathJax slices up the DOM nodes it renders as math formulas. We need to
@@ -219,10 +224,12 @@ export default {
       questionText.firstChild.data = questionText.innerText
 
       // Remove all child nodes but the first
-      Array.from(questionText.childNodes).slice(1).forEach(e => e.remove())
+      Array.from(questionText.childNodes)
+        .slice(1)
+        .forEach(e => e.remove())
     },
 
-    rerenderMathJaxElements () {
+    rerenderMathJaxElements() {
       // Re-render MathJax in question text and answer choices
       const quiz = document.querySelector('.quizBody')
       const questionText = quiz.querySelector('.questionText')
@@ -237,10 +244,10 @@ export default {
         ['Typeset', MathJax.Hub, answerChoices]
       )
     },
-    reload () {
+    reload() {
       this.$router.go(this.$router.currentRoute)
     },
-    updateProgressBar () {
+    updateProgressBar() {
       // When switching to a new question, clear any mathjax elements so they
       // can be re-rendered
       this.clearMathJaxElements()
@@ -257,7 +264,7 @@ export default {
         }
       }
     },
-    styleImage (imageSrc) {
+    styleImage(imageSrc) {
       if (imageSrc) {
         this.imageStyle = {
           backgroundImage: `url(${imageSrc})`,
@@ -271,7 +278,7 @@ export default {
         this.imageStyle = {}
       }
     },
-    getFirst () {
+    getFirst() {
       const question = TrainingService.getFirstQuestion(this)
       this.questionText = question.questionText
       this.styleImage(question.imageSrc)
@@ -282,7 +289,7 @@ export default {
       this.showNext = true
       this.qNumber = TrainingService.getIndex(this) + 1
     },
-    previous () {
+    previous() {
       TrainingService.saveAnswer(this, this.picked)
       this.picked = ''
       const data = TrainingService.getPreviousQuestion(this)
@@ -301,7 +308,7 @@ export default {
       this.showSubmit = false
       this.showNext = true
     },
-    next () {
+    next() {
       TrainingService.saveAnswer(this, this.picked)
       this.picked = ''
       const data = TrainingService.getNextQuestion(this)
@@ -317,7 +324,7 @@ export default {
       }
       this.showPrevious = true
     },
-    submit () {
+    submit() {
       TrainingService.saveAnswer(this, this.picked)
       if (TrainingService.hasCompleted()) {
         TrainingService.submitQuiz(this, this.user._id).then(data => {
@@ -379,7 +386,7 @@ export default {
           'You must answer all questions before submitting the quiz!'
       }
     },
-    review () {
+    review() {
       this.questionsReview = TrainingService.reviewQuiz(this)
       this.questionsReview.forEach(question => {
         if (question.imageSrc) {
@@ -600,7 +607,7 @@ label {
   border-bottom: 0.5px solid #cccccf;
   padding: 20px;
   margin: 0px;
-} 
+}
 
 @media screen and (max-width: 700px) {
   .header {
@@ -635,7 +642,7 @@ label {
   .passScoreContainer {
     width: 100%;
     left: 0 !important;
-  } 
+  }
 
   .reviewBtn {
     margin: 0% auto !important;

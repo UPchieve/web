@@ -8,19 +8,18 @@
     </div>
     <div class="wrap-container">
       <div class="personal-info contain">
-        <div
-          v-if="errors.length"
-          class="errors"
-        >
-          <h4 class="errors-heading">Please correct the following problem<span v-if="errors.length > 1">s</span> before saving:</h4>
+        <div v-if="errors.length" class="errors">
+          <h4 class="errors-heading">
+            Please correct the following problem<span v-if="errors.length > 1"
+              >s</span
+            >
+            before saving:
+          </h4>
           <ul class="errors-list">
-            <li v-for="error in errors">{{ error }}</li>
+            <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
           </ul>
         </div>
-        <div
-          v-if="saveFailed"
-          class="errors"
-        >
+        <div v-if="saveFailed" class="errors">
           <h4 class="errors-heading">Could not save data</h4>
         </div>
         <div class="subheader">Personal Information</div>
@@ -44,14 +43,16 @@
                 v-model="user.highschool"
                 type="text"
                 class="form-control"
-                :class="{'invalid': invalidInputs.indexOf('highschool') > -1}"
+                :class="{ invalid: invalidInputs.indexOf('highschool') > -1 }"
               />
             </div>
           </div>
           <div v-if="user.isVolunteer">
             <div id="phone" class="container-section">
               <div class="prompt">Your Phone Number</div>
-              <div v-show="!activeEdit" class="answer">{{ user.phonePretty }}</div>
+              <div v-show="!activeEdit" class="answer">
+                {{ user.phonePretty }}
+              </div>
               <div v-show="!user.phone && !activeEdit" class="answer">
                 (None given)
               </div>
@@ -60,7 +61,7 @@
                 v-model="user.phonePretty"
                 type="text"
                 class="form-control"
-                :class="{'invalid': invalidInputs.indexOf('phone') > -1}"
+                :class="{ invalid: invalidInputs.indexOf('phone') > -1 }"
               />
 
               <div class="description">
@@ -81,7 +82,7 @@
                 v-model="user.college"
                 type="text"
                 class="form-control"
-                :class="{'invalid': invalidInputs.indexOf('college') > -1}"
+                :class="{ invalid: invalidInputs.indexOf('college') > -1 }"
               />
             </div>
 
@@ -101,7 +102,9 @@
                 v-model="user.favoriteAcademicSubject"
                 type="text"
                 class="form-control"
-                :class="{'invalid': invalidInputs.indexOf('favoriteAcademicSubject') > -1}"
+                :class="{
+                  invalid: invalidInputs.indexOf('favoriteAcademicSubject') > -1
+                }"
               />
             </div>
           </div>
@@ -145,17 +148,15 @@
 
 <script>
 import UserService from '@/services/UserService'
-
 import phoneValidation from '@/utils/phone-validation'
+import StudentAvatarUrl from '@/assets/defaultavatar3.png'
+import VolunteerAvatarUrl from '@/assets/defaultavatar4.png'
 
 export default {
-  data () {
+  data() {
     const user = UserService.getUser()
     const avatarUrl =
-      user.picture ||
-      (user.isVolunteer
-        ? '/static/defaultavatar4.png'
-        : '/static/defaultavatar3.png')
+      user.picture || (user.isVolunteer ? VolunteerAvatarUrl : StudentAvatarUrl)
 
     const certifications = {}
     if (user.algebra) {
@@ -236,7 +237,7 @@ export default {
      * {Case A} if activeEdit === false: enter the editing state by setting activeEdit to true
      * {Case B} if activeEdit === true: save profile changes & exit the editing state by setting activeEdit to false
      */
-    editProfile () {
+    editProfile() {
       // {Case A} Enter the editing state, then early exit
       if (!this.activeEdit) {
         this.editBtnMsg = 'Save Profile'
@@ -253,18 +254,21 @@ export default {
 
       // Validate fields
       if (this.user.isVolunteer) {
-		// volunteers must provide a phone number, so display error message and
-	    // mark field invalid
-        if (!this.user.phonePretty || !phoneValidation.validatePhoneNumber(this.user.phonePretty)) {
+        // volunteers must provide a phone number, so display error message and
+        // mark field invalid
+        if (
+          !this.user.phonePretty ||
+          !phoneValidation.validatePhoneNumber(this.user.phonePretty)
+        ) {
           this.errors.push('Please enter a valid U. S. phone number.')
           this.invalidInputs.push('phone')
-		}
-		// a college name is required
+        }
+        // a college name is required
         if (!this.user.college) {
           this.errors.push('Please tell us what college you go to.')
           this.invalidInputs.push('college')
-		}
-		// a favorite academic subject is required
+        }
+        // a favorite academic subject is required
         if (!this.user.favoriteAcademicSubject) {
           this.errors.push('Please tell us your favorite academic subject.')
           this.invalidInputs.push('favoriteAcademicSubject')
@@ -275,20 +279,21 @@ export default {
           this.errors.push('Please tell us what high school you go to.')
           this.invalidInputs.push('highschool')
         }
-	  }
+      }
 
       if (!this.errors.length) {
         // form fields valid, so set profile
         // wait for save to succeed before coming out of edit mode
-        UserService.setProfile(this, this.user)
-        .then(res => {
-          this.editBtnMsg = 'Edit Profile'
-          this.activeEdit = false
-          this.saveFailed = false
-        },
-        res => {
-          this.saveFailed = true
-        })
+        UserService.setProfile(this, this.user).then(
+          () => {
+            this.editBtnMsg = 'Edit Profile'
+            this.activeEdit = false
+            this.saveFailed = false
+          },
+          () => {
+            this.saveFailed = true
+          }
+        )
       }
     }
   }

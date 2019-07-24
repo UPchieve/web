@@ -9,7 +9,7 @@ export default {
   idCorrectAnswerMap: {},
   category: null,
 
-  loadQuiz (context, category) {
+  loadQuiz(context, category) {
     this.index = 0
     this.numAnswers = 0
     this.idAnswerMap = {}
@@ -20,23 +20,23 @@ export default {
       return this.questions.length
     })
   },
-  getFirstQuestion () {
+  getFirstQuestion() {
     const question = this.questions[this.index]
     return question
   },
-  getIndex () {
+  getIndex() {
     return this.index
   },
-  hasCompleted () {
+  hasCompleted() {
     return this.numAnswers === this.questions.length
   },
-  hasNext () {
+  hasNext() {
     return this.index + 1 < this.questions.length
   },
-  hasPrevious () {
+  hasPrevious() {
     return this.index > 0
   },
-  getNextQuestion () {
+  getNextQuestion() {
     if (this.index < this.questions.length) {
       this.index = this.index + 1
       const question = this.questions[this.index]
@@ -48,7 +48,7 @@ export default {
     }
     return null
   },
-  getPreviousQuestion () {
+  getPreviousQuestion() {
     if (this.index > 0) {
       this.index = this.index - 1
       const question = this.questions[this.index]
@@ -60,18 +60,16 @@ export default {
     }
     return null
   },
-  saveAnswer (context, picked) {
+  saveAnswer(context, picked) {
     const question = this.questions[this.index]
-    const isNewAnswer = (
-      _.isEmpty(this.idAnswerMap[question._id]) &&                  
-      !_.isEmpty(picked)
-    )
+    const isNewAnswer =
+      _.isEmpty(this.idAnswerMap[question._id]) && !_.isEmpty(picked)
     if (isNewAnswer) {
       this.numAnswers += 1
     }
     this.idAnswerMap[question._id] = picked
   },
-  submitQuiz (context, userid) {
+  submitQuiz(context, userid) {
     return NetworkService.getQuizScore(context, {
       userid,
       idAnswerMap: this.idAnswerMap,
@@ -86,7 +84,7 @@ export default {
       }
     })
   },
-  reviewQuiz () {
+  reviewQuiz() {
     const questionsReview = this.questions.slice(0)
     const idCorrectAnswerMap = { ...this.idCorrectAnswerMap }
     const idAnswerMap = { ...this.idAnswerMap }

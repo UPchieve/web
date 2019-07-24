@@ -433,7 +433,7 @@ import UserService from '@/services/UserService'
 import $ from 'jquery'
 
 export default {
-  data () {
+  data() {
     const user = UserService.getUser()
     return {
       user,
@@ -442,13 +442,13 @@ export default {
     }
   },
   methods: {
-    skipOnboarding () {
+    skipOnboarding() {
       this.$router.push('/')
     },
-    back () {
+    back() {
       this.$router.push('/onboarding/profile')
     },
-    submitProfile () {
+    submitProfile() {
       this.error = ''
 
       if (!this.user.isVolunteer) {
@@ -496,7 +496,6 @@ export default {
       }
 
       this.buttonMsg = 'Updating...'
-      console.log(this.user)
       UserService.setProfile(this, this.user, '/')
     }
   }
@@ -640,8 +639,6 @@ button[type='back']:active {
   border-left: 5px solid #1855d1;
 }
 
-
-
 @media screen and (max-width: 700px) {
   .header {
     height: auto !important;
@@ -659,6 +656,5 @@ button[type='back']:active {
   .form-group {
     padding: 0em 2em !important;
   }
-
 }
 </style>

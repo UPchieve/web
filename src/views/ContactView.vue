@@ -21,7 +21,7 @@
 import UserService from '@/services/UserService'
 
 export default {
-  data () {
+  data() {
     const auth = UserService.getAuth()
 
     const user = UserService.getUser()
@@ -39,7 +39,6 @@ export default {
   position: relative;
   z-index: 2;
 }
-
 
 @media screen and (max-width: 700px) {
   .background {

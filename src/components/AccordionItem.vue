@@ -17,7 +17,7 @@ export default {
       default: ''
     }
   },
-  data () {
+  data() {
     return {
       accordionItemBulletClasses: {
         'accordion-item__bullet': true,
@@ -30,7 +30,7 @@ export default {
     }
   },
   methods: {
-    slideToggle () {
+    slideToggle() {
       this.accordionItemBulletClasses['accordion-item__bullet--active'] = !this
         .accordionItemBulletClasses['accordion-item__bullet--active']
       this.accordionItemContentClasses[

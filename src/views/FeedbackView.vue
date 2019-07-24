@@ -23,7 +23,11 @@
           </p>
         </td>
       </tr>
-      <tr class="question-row" v-for="(question, index) in questions">
+      <tr
+        class="question-row"
+        v-for="(question, question_index) in questions"
+        v-bind:key="question_index"
+      >
         <td class="question-cell">
           <div class="question-title">{{ question.title }}</div>
           <div v-if="question.qtype === 'multiple-radio'">
@@ -32,7 +36,8 @@
                 <td class="mobileRemove"></td>
                 <td
                   class="radio-question-selection-title"
-                  v-for="(label, index) in question.table_title"
+                  v-for="(label, label_index) in question.table_title"
+                  v-bind:key="label_index"
                 >
                   {{ label }}
                 </td>
@@ -40,12 +45,13 @@
               <tr
                 class="radio-question-row forMobileView"
                 v-for="(subquestion, subquestion_index) in question.options"
+                v-bind:key="subquestion"
               >
                 <td class="radio-question-cell">{{ subquestion }}</td>
                 <td
                   class="radio-question-selection-cell"
                   v-for="index in question.table_title.length"
-                  :key="index"
+                  v-bind:key="index"
                 >
                   <input
                     v-model="
@@ -94,10 +100,12 @@ import UserService from '@/services/UserService'
 import NetworkService from '@/services/NetworkService'
 
 export default {
-  data () {
+  data() {
     return {
       user: UserService.getUser(),
       sessionId: '',
+      topic: '',
+      subTopic: '',
       userType: '',
       studentId: '',
       volunteerId: '',
@@ -216,29 +224,31 @@ export default {
       userResponse: {}
     }
   },
-  beforeMount () {
+  beforeMount() {
     var _self = this
     this.sessionId = this.$route.params.sessionId
+    this.topic = this.$route.params.topic
+    this.subTopic = this.$route.params.subTopic
     this.userType = this.$route.params.userType
     this.studentId = this.$route.params.studentId
     this.volunteerId = this.$route.params.volunteerId
-    console.log('student ' + this.studentId)
-    console.log('volunteer ' + this.volunteerId)
+
     if (this.userType === 'student') {
       this.questions = this.student_questions
     } else {
       this.questions = this.volunteer_questions
     }
-    this.questions.map(function (question, key) {
+    this.questions.map(function(question) {
       if (question.qtype == 'multiple-radio')
         _self.userResponse[question.alias] = {}
     })
   },
   methods: {
-    submitFeedback () {
-      console.log(this.userResponse)
+    submitFeedback() {
       NetworkService.feedback(this, {
         sessionId: this.sessionId,
+        topic: this.topic,
+        subTopic: this.subTopic,
         responseData: this.userResponse,
         userType: this.userType,
         studentId: this.studentId,
@@ -415,8 +425,6 @@ export default {
   color: #fff;
 }
 
-
-
 @media screen and (max-width: 700px) {
   .mobileRemove {
     display: none !important;
@@ -426,9 +434,13 @@ export default {
     padding: 1em 1em 1em 2em !important;
   }
 
-  table, thead, tbody, th, tr { 
-		display: block !important; 
-	}
+  table,
+  thead,
+  tbody,
+  th,
+  tr {
+    display: block !important;
+  }
 
   .title-cell {
     padding: 1.5em 1em 1em !important;

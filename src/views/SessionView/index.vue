@@ -32,7 +32,7 @@ import SessionChat from './SessionChat'
 import Modal from '@/components/Modal'
 
 export default {
-  name: "session-view",
+  name: 'session-view',
   components: {
     SessionHeader,
     Whiteboard,
@@ -44,7 +44,7 @@ export default {
    * [1] Refactoring candidate: it'd be awesome if Dashboard could pass
    *     the topic directly
    */
-  data () {
+  data() {
     return {
       currentSession: SessionService.currentSession,
       showModal: false,
@@ -72,7 +72,7 @@ export default {
       }
     }
   },
-  mounted () {
+  mounted() {
     const id = this.$route.params.sessionId
     let promise
 
@@ -151,7 +151,6 @@ export default {
   height: 100%;
   padding: 0;
 }
-
 
 @media screen and (max-width: 700px) {
   .whiteboard-container {

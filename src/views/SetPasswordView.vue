@@ -47,11 +47,7 @@
           </p>
         </div>
 
-        <button
-          class="uc-form-button"
-          type="submit"
-          @click.prevent="submit()"
-        >
+        <button class="uc-form-button" type="submit" @click.prevent="submit()">
           Reset Password
         </button>
 
@@ -69,7 +65,7 @@ export default {
   components: {
     FormPageTemplate
   },
-  data () {
+  data() {
     return {
       msg: '',
       credentials: {
@@ -81,7 +77,7 @@ export default {
     }
   },
   methods: {
-    submit () {
+    submit() {
       AuthService.confirmReset(this, {
         token: this.$route.params.token,
         email: this.credentials.email,
@@ -92,7 +88,6 @@ export default {
           this.showingSuccess = true
         })
         .catch(err => {
-          console.log(err)
           this.msg = err.message
         })
     }
