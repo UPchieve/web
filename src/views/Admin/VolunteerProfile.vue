@@ -1,5 +1,5 @@
 <template>
-  <div v-if="volunteer" class="profile">
+  <div class="profile">
     <div class="header">
       {{volunteer.firstname}}'s Profile
       <button
@@ -8,15 +8,12 @@
       {{ editBtnMsg }}
       </button>
     </div>
-    <div>
-      <table>
-        <thead>
-          <tr>
-            <th v-for="key in volunteerProperties" v-bind:key="key.index">
-              {{ key }}
-            </th>
-          </tr>
-        </thead>
+    <div class = "wrap-container">
+      <div class="contain">
+      <div class="subheader">Personal Information</div>
+      <div class="container-content">
+      
+      <!-- <table>
         <tbody>
             <td v-for="key in volunteerProperties" v-bind:key="key.index">
               <div v-if="key === 'isVolunteerApproved'">
@@ -40,9 +37,10 @@
               </div>
             </td>
         </tbody>
-      </table>
+      </table> -->
     </div>
-    <!-- <div v-if="msg !== ''">{{ msg }}</div> -->
+      </div>
+  </div>
   </div>
 </template>
 
@@ -180,15 +178,18 @@ button {
 }
 
 .editBtn {
-  background-color: #16d2aa;
-  border-radius: 30px;
-  width: 70px;
-  align-items: center;
-  height: 50px;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: 500;
-  color: #2c3e50;
+  font-size: 20px;
+  font-weight: 600;
+  color: #343440;
+  background-color: #fff;
+}
+
+.editBtn:active,
+.editBtn:hover {
+  background-color: #fff;
+  color: #16d2aa;
+  box-shadow: none;
+  margin: 0px;
 }
 
 .editBtn a {
@@ -199,4 +200,32 @@ button {
   color: #2c3e50;
   text-decoration: none;
 }
+.wrap-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.contain {
+  margin: 30px 0 0 30px;
+  width: 475px;
+}
+
+.container-content {
+  display: flex;
+  background-color: #f0f8fd;
+  padding: 30px;
+  text-align: left;
+}
+
+.subheader {
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80px;
+  background-color: #e3f2fd;
+  font-size: 20px;
+}
+
 </style>
