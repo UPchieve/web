@@ -1,10 +1,7 @@
-/* eslint-disable no-tabs */
 import moment from "moment";
-
 import NetworkService from "./NetworkService";
 import AuthService from "./AuthService";
 import OnboardingService from "./OnboardingService";
-
 import router from "@/router";
 
 export default {
