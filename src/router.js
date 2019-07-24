@@ -241,7 +241,6 @@ router.beforeEach((to, from, next) => {
     }
   } if (to.matched.some(route => route.meta.requiresAdmin)) {
     if (!AuthService.user.data.isAdmin) {
-      console.log('Protected route requires admin access')
       next({
         path: '/login',
         query: {

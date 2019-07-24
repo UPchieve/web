@@ -51,8 +51,6 @@
 
 <script>
 import UserService from '@/services/UserService'
-import NetworkService from '@/services/NetworkService'
-
 
 export default{
     data () {
@@ -88,6 +86,7 @@ export default{
         in the "certifiedSubject". */
         getAvailability (certifiedSubject) {
             UserService.getVolunteersAvailability(this, certifiedSubject).then(availability => {
+               
                 this.minVolunteers = availability.min // minimum # of volunteers available in any hour that week
                 this.maxVolunteers = availability.max // maximum # of volunteers available in any hour that week
                 this.availabilityTable = availability.table.flat()
@@ -146,7 +145,7 @@ export default{
          * 0% or 100% opacity)
          */
         getGradient (cell) {
-            return (100-((cell/(this.maxVolunteers - this.minVolunteers)) * (70) + 20) + '%')
+            return (100-(((cell-this.minVolunteers)/(this.maxVolunteers - this.minVolunteers)) * (70) + 20) + '%')
         },
     }
 }
