@@ -44,14 +44,14 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import moment from 'moment-timezone'
-import lodash from 'lodash'
 import UserService from '@/services/UserService'
 import CalendarService from '@/services/CalendarService'
 import AnalyticsService from '@/services/AnalyticsService'
 
 export default {
-  data () {
+  data() {
     const user = UserService.getUser()
     const timeRange = [
       '12 am',
@@ -88,41 +88,47 @@ export default {
     }
   },
   computed: {
-    sortedTimes () {
+    sortedTimes() {
       return this.sortTimes()
     },
-    hasUserSchedule () {
+    hasUserSchedule() {
       return !_.isEmpty(this.availability)
     }
   },
-  created () {
+  created() {
     this.fetchData()
   },
   methods: {
-    fetchData () {
+    fetchData() {
       if (!this.user.hasSchedule) {
         CalendarService.initAvailability(this, this.user._id)
       }
 
-      var originalAvailabilityPromise = CalendarService.getAvailability(this, this.user._id)
+      var originalAvailabilityPromise = CalendarService.getAvailability(
+        this,
+        this.user._id
+      )
       var userTimezonePromise = CalendarService.getTimezone(this, this.user._id)
 
-      Promise
-        .all([originalAvailabilityPromise, userTimezonePromise])
-        .then(([originalAvailability, userTimezone]) => { 
+      Promise.all([originalAvailabilityPromise, userTimezonePromise]).then(
+        ([originalAvailability, userTimezone]) => {
           if (userTimezone && this.userTzInList(userTimezone)) {
             this.selectedTz = userTimezone
           } else {
             this.selectedTz = moment.tz.guess()
           }
-          
+
           var estNow = moment.tz('America/New_York').hour()
           var userNow = moment.tz(this.selectedTz).hour()
           var offset = userNow - estNow
-          this.availability = this.convertAvailability(originalAvailability, offset)
-        })
+          this.availability = this.convertAvailability(
+            originalAvailability,
+            offset
+          )
+        }
+      )
     },
-    sortTimes () {
+    sortTimes() {
       const keysMap = {}
       for (const day in this.availability) {
         if (this.availability.hasOwnProperty(day)) {
@@ -141,10 +147,10 @@ export default {
       }
       return keysMap
     },
-    userTzInList (tz) {
+    userTzInList(tz) {
       return this.tzList.includes(tz)
     },
-    convertAMPMtoTwentyFourHrs (hour) {
+    convertAMPMtoTwentyFourHrs(hour) {
       var hr = hour.substring(0, hour.length - 1)
       var apm = hour.substring(hour.length - 1)
       if (apm === 'a') {
@@ -158,7 +164,7 @@ export default {
       }
       return parseInt(hr) + 12
     },
-    convertTwentyFourHrsToAMPM (hour) {
+    convertTwentyFourHrsToAMPM(hour) {
       if (hour == 0) {
         return '12a'
       }
@@ -170,7 +176,7 @@ export default {
       }
       return hour + 'a'
     },
-    convertAvailability (availability, offset) {
+    convertAvailability(availability, offset) {
       const succWeekday = {
         Sunday: 'Monday',
         Monday: 'Tuesday',
@@ -219,7 +225,7 @@ export default {
       }
       return convertedAvailability
     },
-    save () {
+    save() {
       var estNow = moment.tz('America/New_York').hour()
       var userNow = moment.tz(this.selectedTz).hour()
       var offset = estNow - userNow
@@ -322,8 +328,6 @@ input[type='checkbox']:checked + label {
 .tz-selector-container {
   padding-top: 30px;
 }
-
-
 
 @media screen and (max-width: 700px) {
   .btn {

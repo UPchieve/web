@@ -1,6 +1,6 @@
 <template>
-  <nav class="navbar">   
-    <div v-on:click="$emit('closeMenu')"> 
+  <nav class="navbar">
+    <div v-on:click="$emit('closeMenu')">
       <router-link tag="h1" to="/" />
     </div>
     <div v-if="auth.authenticated">
@@ -35,11 +35,11 @@ export default {
     ProfileInfo,
     SidebarFooter: Footer // footer is reserved component name
   },
-  data () {
+  data() {
     return {
       auth: UserService.getAuth()
     }
-  },
+  }
 }
 </script>
 
@@ -55,12 +55,12 @@ nav {
 }
 
 .navbar {
-    overflow: scroll;
-    scroll-padding-bottom: 100px;
-    display: flex;
-    flex-direction: column;;
-    justify-content: space-between;
-    flex-basis: 100%;
+  overflow: scroll;
+  scroll-padding-bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-basis: 100%;
 }
 
 h1,
@@ -95,8 +95,6 @@ p.aboutText {
   margin: auto;
   text-align: left;
 }
-
-
 
 @media screen and (max-width: 700px) {
   .navbar {

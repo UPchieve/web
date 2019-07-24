@@ -50,7 +50,7 @@ export default {
       required: true
     }
   },
-  data () {
+  data() {
     return {
       mainBtnLabel: this.labels[0],
       secondBtnLabel: this.labels[1] ? this.labels[1] : null,

@@ -11,7 +11,7 @@ export default {
     data: {}
   },
 
-  getPartner () {
+  getPartner() {
     const user = UserService.getUser()
     const session = this.currentSession.data || {}
 
@@ -21,27 +21,25 @@ export default {
     return session.volunteer
   },
 
-  endSession (context, sessionId, options = {}) {
+  endSession(context, sessionId) {
     localStorage.removeItem('currentSessionPath')
 
     return NetworkService.endSession(context, { sessionId }).then(res => {
-      const { sessionId, data } = res.data || {}
-      
-      console.log(`ended session: ${sessionId}`)
+      const { /* sessionId, */ data } = res.data || {}
 
-      //analytics: track when a help session has ended
-      AnalyticsService.trackSessionEnded(this, data, UserService.getUser().isFakeUser)
+      // analytics: track when a help session has ended
+      AnalyticsService.trackSessionEnded(
+        this,
+        data,
+        UserService.getUser().isFakeUser
+      )
 
       this.currentSession.sessionId = null
       this.currentSession.data = {}
-
-      if (!options.skipRoute) {
-        router.replace('/feedback')
-      }
     })
   },
 
-  newSession (context, sessionType, sessionSubTopic) {
+  newSession(context, sessionType, sessionSubTopic) {
     return NetworkService.newSession(context, {
       sessionType,
       sessionSubTopic
@@ -50,8 +48,6 @@ export default {
       const { sessionId } = data
 
       this.currentSession.sessionId = sessionId
-
-      console.log(`newSession: ${sessionId}`)
 
       if (sessionId) {
         const path = `/session/${sessionType}/${sessionSubTopic}/${sessionId}`
@@ -67,14 +63,13 @@ export default {
     })
   },
 
-  useExistingSession (context, sessionId) {
+  useExistingSession(context, sessionId) {
     return NetworkService.checkSession(context, { sessionId }).then(res => {
       const data = res.data || {}
       const { sessionId } = data
 
       this.currentSession.sessionId = sessionId
 
-      console.log(`useExistingSession: ${sessionId}`)
       if (!sessionId) {
         router.replace('/')
       }
@@ -83,7 +78,7 @@ export default {
     })
   },
 
-  getCurrentSession (context, user) {
+  getCurrentSession(context, user) {
     return NetworkService.currentSession(context, {
       user_id: user._id,
       is_volunteer: user.isVolunteer
@@ -91,7 +86,6 @@ export default {
       if (resp.data.err) {
         this.currentSession.sessionId = null
         this.currentSession.data = {}
-        console.log('no active session found')
 
         localStorage.removeItem('currentSessionPath')
         return

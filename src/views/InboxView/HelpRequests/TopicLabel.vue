@@ -12,7 +12,7 @@ export default {
       default: ''
     }
   },
-  data () {
+  data() {
     return {
       classes: {
         'topic-label': true,

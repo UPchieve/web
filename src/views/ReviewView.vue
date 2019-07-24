@@ -18,17 +18,17 @@ import UserService from '@/services/UserService'
 export default {
   filters: {
     // {1}
-    capitalize (value) {
+    capitalize(value) {
       if (!value) return ''
       const valueStr = value.toString()
       return valueStr.charAt(0).toUpperCase() + valueStr.slice(1)
     },
-    uppercase (value) {
+    uppercase(value) {
       if (!value) return ''
       return value.toString().toUpperCase()
     }
   },
-  data () {
+  data() {
     const user = UserService.getUser()
     const { category } = this.$route.params
     return {
@@ -36,7 +36,7 @@ export default {
       category
     }
   },
-  beforeMount () {
+  beforeMount() {
     this.styleImages()
   },
   methods: {}

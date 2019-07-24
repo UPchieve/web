@@ -1,7 +1,7 @@
 export default {
   // By @kennethjiang et al
   // https://github.com/kennethjiang/js-file-download/blob/master/file-download.js
-  openDownloadDialog (data, filename, mime) {
+  openDownloadDialog(data, filename, mime) {
     const blob = new window.Blob([data], {
       type: mime || 'application/octet-stream'
     })

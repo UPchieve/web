@@ -156,7 +156,7 @@
 import UserService from '@/services/UserService'
 
 export default {
-  data () {
+  data() {
     return {
       user: UserService.getUser()
     }
@@ -180,7 +180,7 @@ export default {
 .body {
   display: flex;
   flex-direction: column;
-  align-items: start;
+  align-items: flex-start;
   font-size: 16px;
   padding: 30px 30px 20px 30px;
 }
@@ -215,14 +215,12 @@ li {
   text-align: left;
 }
 
-
-
 @media screen and (max-width: 700px) {
   .res-header,
   .header {
     font-size: 24px;
     line-height: 1.2 !important;
     padding: 1em 1em 1em 3em !important;
-  } 
+  }
 }
 </style>

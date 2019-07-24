@@ -24,7 +24,7 @@ export default {
       required: true
     }
   },
-  data () {
+  data() {
     return {
       classes: {
         'v-btn': true,

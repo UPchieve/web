@@ -7,10 +7,6 @@
         <router-link to="/login" class="uc-form-button" tag="button">
           Login
         </router-link>
-
-        <router-link to="/feedback" class="uc-form-button" tag="button">
-          Give Feedback
-        </router-link>
       </div>
 
       <form-footer />
@@ -27,9 +23,9 @@ export default {
     FormPageTemplate,
     FormFooter
   },
-  data () {
+  data() {
     return {
-      mainWebsiteUrl: process.env.MAIN_WEBSITE_URL
+      mainWebsiteUrl: process.env.VUE_APP_MAIN_WEBSITE_URL
     }
   }
 }

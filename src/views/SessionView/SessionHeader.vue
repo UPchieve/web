@@ -29,38 +29,37 @@ import AnalyticsService from '@/services/AnalyticsService'
 import UserService from '@/services/UserService'
 import SessionService from '@/services/SessionService'
 import router from '@/router'
-
-const STUDENT_AVATAR_URL = '/static/defaultavatar3.png'
-const VOLUNTEER_AVATAR_URL = '/static/defaultavatar4.png'
+import StudentAvatarUrl from '@/assets/defaultavatar3.png'
+import VolunteerAvatarUrl from '@/assets/defaultavatar4.png'
 
 /**
  * @todo {1} Refactoring candidate: use a modal instead.
  */
 export default {
-  data () {
+  data() {
     return {
       currentSession: SessionService.currentSession
     }
   },
   computed: {
-    waitingText () {
+    waitingText() {
       const user = UserService.getUser()
       if (user.isVolunteer) {
         return 'No student is in this session'
       }
       return 'We are contacting our Academic Coaches for you right now - please hang tight while we try to connect you! This process can take 5-10 minutes.'
     },
-    partnerName () {
+    partnerName() {
       const partner = SessionService.getPartner()
       return partner && partner.firstname
     },
-    partnerAvatar () {
+    partnerAvatar() {
       const user = UserService.getUser()
       let picture = ''
       if (user.isVolunteer === false) {
-        picture = VOLUNTEER_AVATAR_URL
+        picture = VolunteerAvatarUrl
       } else {
-        picture = STUDENT_AVATAR_URL
+        picture = StudentAvatarUrl
       }
       return {
         backgroundImage: `url(${picture})`
@@ -68,16 +67,20 @@ export default {
     }
   },
   methods: {
-    end () {
+    end() {
       let studentId = ''
       let volunteerId = null
+      let subTopic = null
+      let topic = null
       let sessionId = SessionService.currentSession.sessionId
+
       if (
         SessionService.currentSession &&
         SessionService.currentSession.data.student
       ) {
         studentId = SessionService.currentSession.data.student._id
       }
+
       if (
         SessionService.currentSession &&
         SessionService.currentSession.data.volunteer
@@ -85,14 +88,33 @@ export default {
         volunteerId = SessionService.currentSession.data.volunteer._id
       }
 
+      if (
+        SessionService.currentSession &&
+        SessionService.currentSession.data.type
+      ) {
+        topic = SessionService.currentSession.data.type
+      }
+
+      if (
+        SessionService.currentSession &&
+        SessionService.currentSession.data.subTopic
+      ) {
+        subTopic = SessionService.currentSession.data.subTopic
+      }
+
       const result = window.confirm('Do you really want to end the session?')
+
       if (result) {
         if (volunteerId) {
           this.$socket.disconnect()
-          SessionService.endSession(this, sessionId, { skipRoute: true })
+          SessionService.endSession(this, sessionId)
           const url =
             '/feedback/' +
             sessionId +
+            '/' +
+            topic +
+            '/' +
+            subTopic +
             '/' +
             (UserService.getUser().isVolunteer ? 'volunteer' : 'student') +
             '/' +
@@ -101,7 +123,7 @@ export default {
             volunteerId
           router.replace(url)
         } else {
-          SessionService.endSession(this, sessionId, { skipRoute: true })
+          SessionService.endSession(this, sessionId)
           router.replace('/')
         }
 
@@ -177,7 +199,6 @@ h1 {
   display: flex;
   align-items: center;
 }
-
 
 @media screen and (max-width: 700px) {
   .info {

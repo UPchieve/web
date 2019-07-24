@@ -36,12 +36,12 @@ import StudentQuestionService from '@/services/StudentQuestionService'
 import BtnOptions from './BtnOptions'
 import Btn from './Btn'
 
-function isValid () {
+function isValid() {
   const valid = document.getElementById('message').value !== ''
   return valid
 }
 
-function buildFormDataObjSubmitQuestion (context) {
+function buildFormDataObjSubmitQuestion(context) {
   const user = UserService.getUser()
 
   const questionObj = new FormData()
@@ -65,7 +65,7 @@ function buildFormDataObjSubmitQuestion (context) {
   return questionObj
 }
 
-function buildFormDataObjSendAnswer (context) {
+function buildFormDataObjSendAnswer(context) {
   const answerObj = new FormData()
   answerObj.append('userEmail', context.user.email)
   answerObj.append('questionId', context.$route.query.q)
@@ -74,7 +74,7 @@ function buildFormDataObjSendAnswer (context) {
   return answerObj
 }
 
-function showModalRetry (context) {
+function showModalRetry(context) {
   context.modalContainer.modalBtnLabels = ['Retry']
   context.modalContainer.modalOptions = {
     singleBtn: true,
@@ -89,7 +89,7 @@ function showModalRetry (context) {
   }
 }
 
-function showModalSuccess (context, message) {
+function showModalSuccess(context, message) {
   context.modalContainer.modalBtnLabels = ['Go to home page']
   context.modalContainer.modalOptions = {
     singleBtn: true,
@@ -122,7 +122,7 @@ export default {
       required: true
     }
   },
-  data () {
+  data() {
     return {
       fileList: [],
       btnOptionsClickHandlers: {
@@ -133,17 +133,17 @@ export default {
   },
   methods: {
     // File attachment
-    attachFile () {
+    attachFile() {
       const click = new MouseEvent('click')
       this.$el.querySelector('input[type="file"]').dispatchEvent(click)
     },
-    changeHandler (e) {
+    changeHandler(e) {
       e.preventDefault()
       Vue.set(this.fileList, 0, document.getElementById('file').files[0].name)
     },
 
     // Form feedback
-    askForAMessage () {
+    askForAMessage() {
       this.modalContainer.modalOptions = {
         warn: true,
         message: `
@@ -158,19 +158,19 @@ export default {
       }
       this.modalContainer.showModal = true
     },
-    showLoader () {
+    showLoader() {
       document.querySelector('.form-loader').style = 'top: 0'
       document.querySelector('.form-loader__dot:nth-child(1)').style =
         'animation: a-loader-1 2s ease-out infinite'
       document.querySelector('.form-loader__dot:nth-child(2)').style =
         'animation: a-loader-1 1s 2s ease-out infinite'
     },
-    hideLoader () {
+    hideLoader() {
       document.querySelector('.form-loader').style = ''
       document.querySelector('.form-loader__dot:nth-child(1)').style = ''
       document.querySelector('.form-loader__dot:nth-child(2)').style = ''
     },
-    showResponseStateSubmitQuestion (res) {
+    showResponseStateSubmitQuestion(res) {
       if (res === 'notSent') {
         showModalRetry(this)
       } else {
@@ -182,7 +182,7 @@ export default {
       }
       this.modalContainer.showModal = true
     },
-    showResponseStateSendAnswer (res) {
+    showResponseStateSendAnswer(res) {
       if (res === 'notSent') {
         showModalRetry(this)
       } else {
@@ -193,24 +193,24 @@ export default {
     },
 
     // Form options (buttons)
-    cancel () {
+    cancel() {
       this.$router.push('/')
     },
-    submitFormSubmitQuestion (formDataObj) {
+    submitFormSubmitQuestion(formDataObj) {
       StudentQuestionService.createStudentQuestion(this, formDataObj).then(
         res => {
           this.showResponseStateSubmitQuestion(res)
         }
       )
     },
-    submitFormSendAnswer (formDataObj) {
+    submitFormSendAnswer(formDataObj) {
       StudentQuestionService.answerStudentQuestion(this, formDataObj).then(
         res => {
           this.showResponseStateSendAnswer(res)
         }
       )
     },
-    submitForm (e) {
+    submitForm(e) {
       e.preventDefault()
 
       if (isValid()) {

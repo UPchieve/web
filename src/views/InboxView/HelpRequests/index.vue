@@ -75,7 +75,7 @@ export default {
       required: true
     }
   },
-  data () {
+  data() {
     return {
       type: this.helpRequests.type,
       requests: this.helpRequests.requests

@@ -13,7 +13,11 @@
     />
     <span class="v-form-control__icon">▾</span>
     <ul class="suggestions" v-show="showSuggestions" @click="useSuggestion">
-      <li class="suggestions__item" v-for="suggestion in suggestions">
+      <li
+        class="suggestions__item"
+        v-for="suggestion in suggestions"
+        v-bind:key="suggestion"
+      >
         {{ suggestion }}
       </li>
     </ul>
@@ -30,30 +34,29 @@ export default {
   props: {
     parentModel: String
   },
-  data () {
+  data() {
     return {
       showSuggestions: false,
       suggestions: []
     }
   },
   methods: {
-    updateParentModel (parent, key, newValue) {
+    updateParentModel(parent, key, newValue) {
       parent['user'][key] = newValue
     },
-    getSuggestions (query) {
+    getSuggestions(query) {
       return NetworkService.getSuggestions(this, { query })
         .then(res => {
           return Promise.resolve(res.body.suggestions)
         })
-        .catch(err => {
-          console.error(err.bodyText)
+        .catch(() => {
           return Promise.resolve([])
         })
     },
-    debouncedKeyupHandler (e) {
+    debouncedKeyupHandler(e) {
       _.debounce(this.keyupHandler, 400).call(this, e)
     },
-    keyupHandler (e) {
+    keyupHandler(e) {
       const query = e.target.value
 
       this.updateParentModel(this.$parent, 'highschool', query)
@@ -67,7 +70,7 @@ export default {
         this.showSuggestions = this.suggestions.length > 0 ? true : false
       })
     },
-    useSuggestion (e) {
+    useSuggestion(e) {
       this.updateParentModel(this.$parent, 'highschool', e.target.innerText)
       this.showSuggestions = false
     },
@@ -77,13 +80,13 @@ export default {
      *           that case, I need this.showSuggestions to be updated a little
      *           later to be able to use e.target.innerText inside useSuggestion()
      */
-    focusoutHandler (e) {
+    focusoutHandler() {
       setTimeout(() => {
         // {1}
         this.showSuggestions = false
       }, 100)
     },
-    focusinHandler () {
+    focusinHandler() {
       if (
         this.suggestions.length > 0 &&
         this.suggestions[0] !== SCHOOL_NOT_FOUND_MSG

@@ -17,12 +17,12 @@ import ContentHeader from '@/components/ContentHeader'
 import HelpRequests from './HelpRequests'
 
 export default {
-  name: "inbox-view",
+  name: 'inbox-view',
   components: {
     ContentHeader,
     HelpRequests
   },
-  data () {
+  data() {
     return {
       user: UserService.getUser(),
       helpRequests: {
@@ -31,7 +31,7 @@ export default {
       }
     }
   },
-  mounted () {
+  mounted() {
     StudentQuestionService.getStudentQuestions(this, {}).then(questions => {
       questions.forEach(question => {
         this.helpRequests.requests.push(question)

@@ -10,7 +10,7 @@ import router from '@/router'
  * @todo UserService to choose starting onboarding step based on user state
  */
 export default {
-  mounted () {
+  mounted() {
     const { action } = this.$route.params
     const { data } = this.$route.params
 
