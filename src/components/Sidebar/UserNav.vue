@@ -55,7 +55,6 @@
           </router-link>
         </div>
       </template>
-      <template v-else> {{user}} </template>
 
       <div v-on:click="$emit('closeMenu')">
         <router-link to="/profile" tag="li" v-on:click="$emit('toggleMenu')">
