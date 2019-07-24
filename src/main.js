@@ -4,7 +4,6 @@ import VueHeadful from 'vue-headful'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import App from './App'
 import vSelect from 'vue-select'
 import vueHeadful from 'vue-headful'
 
