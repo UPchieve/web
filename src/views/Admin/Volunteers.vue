@@ -3,26 +3,45 @@
     <div class="header">
       Volunteers
     </div>
-    <div>
+    <div class="wrapper">
       <table>
         <thead>
           <tr>
             <th v-for="key in volunteerProperties" v-bind:key="key.index">
-              {{ key }}
+              <div v-if="key === 'firstname' || key === 'lastname' || key === '_id'">
+                <label>Search by</label>
+                <input
+                  type="text"
+                  v-model="appliedFilter[key]"
+                  :placeholder="key"
+                />
+              </div>
+              <div v-else-if="key != 'Status'">
+                <label>{{key}}</label>
+                <select v-model="appliedFilter[key]">
+                  <option></option>
+                  <option>True</option>
+                  <option>False</option>
+                </select>
+              </div>
+              <div v-else>
+                <label>{{key}}</label>
+              </div>
             </th>
+            
           </tr>
         </thead>
         <tbody>
-          <tr v-for="volunteer in volunteers" v-bind:key="volunteer._id">
+          <tr v-for="volunteer in filteredItems" v-bind:key="volunteer._id">
             <td v-for="key in volunteerProperties" v-bind:key="key.index">
               <div v-if="key === '_id'">
-                <router-link :to="{ name: 'VolunteerProfile', params: {id: volunteer._id}}">{{volunteer._id}} </router-link>
+                <router-link
+                  :to="{
+                    name: 'VolunteerProfile',
+                    params: {id: volunteer._id}}">
+                  {{volunteer._id}}
+                </router-link>
                 </div>
-              <div v-if="key === 'isVolunteerApproved'">
-                <div v-show="!activeEdit" class="answer">
-                  {{ volunteer.isVolunteerApproved }}
-                </div>
-              </div>
               <div v-else-if="key === 'Status'">
                 <div v-if="volunteer.isVolunteerApproved && volunteer.isVolunteerReady">
                   Approved and Ready!
@@ -37,7 +56,7 @@
                   Ready
                 </div>
               </div>
-              <div v-else-if="key !== 'isVolunteerApproved' && key !== '_id'">
+              <div v-else>
                 {{ volunteer[key] }}
               </div>
             </td>
@@ -45,7 +64,6 @@
         </tbody>
       </table>
     </div>
-    <div v-if="msg !== ''">{{ msg }}</div>
   </div>
 </template>
 
@@ -58,19 +76,35 @@ export default {
     VolunteerProfile
   },
   data () {
-    var volunteerProperties = ['firstname', 'lastname', '_id', 'Status']
-
-    // var volunteerProperties = ['firstname', 'lastname', '_id', 'isVolunteerApproved', 'hasAvailability', 'hasCertification', 'isVolunteerReady', 'Approved and Ready']
-    
+    var volunteerProperties = ['firstname','lastname', '_id',
+      'isVolunteerApproved', 'isVolunteerReady', 'Status']
     return {
-      msg: '',
-      volunteers: {},
+      search: '',
+      volunteers: [],
       volunteerProperties,
-      activeEdit: false,
-      editBtnMsg: 'Edit',
-      errors: [],
-      saveFailed: false
+      appliedFilter: {},
     }
+  },
+  computed: {
+    filteredItems() {
+      var resultItems = this.volunteers
+      if (this.appliedFilter) {
+        for (const field in this.appliedFilter) {
+          const val = this.appliedFilter[field].toLowerCase()
+          if (val) {
+            resultItems = resultItems.filter(volunteer => {
+              var result = volunteer[field]
+              if (typeof volunteer[field] === 'boolean') {
+                result = volunteer[field].toString()
+              }
+              const filter = result.toLowerCase().includes(val)
+              return filter
+            })
+          }
+        }
+      }
+      return resultItems
+      }
   },
 
   created () {
@@ -78,7 +112,6 @@ export default {
       this.volunteers = volunteers
       })
   },
-
 }
 </script>
 
@@ -97,7 +130,6 @@ table {
 th {
   background-color: #16d2aa;
   color: white;
-  cursor: pointer;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -119,54 +151,36 @@ th, td {
   justify-content: space-between;
   font-weight: 600;
   color: #343440;
-}
-
-.form-control {
-  border: none;
-  box-shadow: none;
-  border-radius: 0;
-  // background-color: #f0f8fd;
-  width: 60px;
-  height: 30px;
-}
-
-.form-control:focus {
-  border-bottom: 3px solid #16d2aa;
-  box-shadow: none;
+  margin-bottom: 30px;
 }
 
 input[type="text"] {
   display: block;
   margin : 0 auto;
   margin-bottom: 5px;
+  color: #73737a;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  background-color: white;
+  width: 100%;
 }
 
-button {
-  height: 30px;
-  border-radius: 20px;
-  padding: 0px 10px;
-  color: #16d2aa;
-  background-color: #f17777;
+input::placeholder {
+  color: lightgrey;
 }
 
-.editBtn {
-  background-color: #16d2aa;
-  border-radius: 30px;
-  width: 20;
-  align-items: center;
-  height: 20px;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: 500;
-  color: #2c3e50;
+select {
+  display: block;
+  margin : 0 auto;
+  margin-bottom: 5px;
+  color: #73737a;
+  background: white;
 }
 
-.editBtn a {
-  color: white;
-}
-
-.editBtn a:hover {
-  color: #2c3e50;
-  text-decoration: none;
+label {
+  display: block;
+  margin : 0 auto;
+  padding: 5px;
 }
 </style>
