@@ -1,23 +1,21 @@
 <template>
   <ul class="nav navbar-nav">
     <div v-on:click="$emit('closeMenu')">
-      <router-link v-if="!userauth.authenticated" to="/login" tag="li"
-        ><a class="login">Log In</a></router-link
-      >
+      <router-link v-if="!userauth.authenticated" to="/login" tag="li">
+        <a class="login">Log In</a>
+      </router-link>
     </div>
 
     <div v-on:click="$emit('closeMenu')">
-      <router-link to="/contact" tag="li"
-        ><a class="contact icon">Contact Us</a></router-link
-      >
+      <router-link to="/contact" tag="li">
+        <a class="contact icon">Contact Us</a>
+      </router-link>
     </div>
 
     <div v-on:click="$emit('closeMenu')">
-      <router-link to="/legal" tag="li"
-        ><a class="privacy icon" v-on:click="$emit('closeMenu')"
-          >Legal Policy</a
-        ></router-link
-      >
+      <router-link to="/legal" tag="li">
+        <a class="privacy icon" v-on:click="$emit('closeMenu')">Legal Policy</a>
+      </router-link>
     </div>
 
     <div v-on:click="$emit('closeMenu')">
@@ -35,8 +33,8 @@
 </template>
 
 <script>
-import UserService from '@/services/UserService'
-import AuthService from '@/services/AuthService'
+import UserService from "@/services/UserService";
+import AuthService from "@/services/AuthService";
 
 export default {
   components: {},
@@ -44,14 +42,14 @@ export default {
     return {
       userauth: UserService.getAuth(),
       mainWebsiteUrl: process.env.VUE_APP_MAIN_WEBSITE_URL
-    }
+    };
   },
   methods: {
     logout() {
-      AuthService.logout(this)
+      AuthService.logout(this);
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -101,7 +99,7 @@ a.logout {
 
 .icon {
   &::before {
-    content: '';
+    content: "";
     width: 20px;
     height: 20px;
     margin-right: 10px;
@@ -119,15 +117,15 @@ a.logout {
 }
 
 .contact.icon::before {
-  background-image: url('~@/assets/contact_us_icon-01.svg');
+  background-image: url("~@/assets/contact_us_icon-01.svg");
 }
 
 .privacy.icon::before {
-  background-image: url('~@/assets/privacy_policy_icon-01.svg');
+  background-image: url("~@/assets/privacy_policy_icon-01.svg");
 }
 
 .logout.icon::before {
-  background-image: url('~@/assets/log_out_icon-01.svg');
+  background-image: url("~@/assets/log_out_icon-01.svg");
 }
 
 .login {

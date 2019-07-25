@@ -54,9 +54,9 @@
 </template>
 
 <script>
-import AuthService from '@/services/AuthService'
-import FormPageTemplate from '@/components/FormPageTemplate'
-import FormFooter from '@/components/FormFooter'
+import AuthService from "@/services/AuthService";
+import FormPageTemplate from "@/components/FormPageTemplate";
+import FormFooter from "@/components/FormFooter";
 
 export default {
   components: {
@@ -64,17 +64,17 @@ export default {
     FormFooter
   },
   data() {
-    let error
-    if (this.$route.query['401'] === 'true') {
-      error = 'Your session has expired. Please login again'
+    let error;
+    if (this.$route.query["401"] === "true") {
+      error = "Your session has expired. Please login again";
     }
     return {
       credentials: {
-        email: '',
-        password: ''
+        email: "",
+        password: ""
       },
       error
-    }
+    };
   },
   methods: {
     submit() {
@@ -84,20 +84,20 @@ export default {
           email: this.credentials.email,
           password: this.credentials.password
         },
-        this.$route.query.redirect || '/'
-      )
+        this.$route.query.redirect || "/"
+      );
     }
   },
   beforeRouteEnter(to, from, next) {
     if (AuthService.user.authenticated) {
       next({
-        path: '/'
-      })
+        path: "/"
+      });
     } else {
-      next()
+      next();
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

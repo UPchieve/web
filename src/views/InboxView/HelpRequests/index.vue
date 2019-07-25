@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import TopicLabel from './TopicLabel'
+import TopicLabel from "./TopicLabel";
 
 /*
  * @note {1} Full documentation of involved "types":
@@ -79,9 +79,9 @@ export default {
     return {
       type: this.helpRequests.type,
       requests: this.helpRequests.requests
-    }
+    };
   }
-}
+};
 </script>
 
 <style lang="scss">
@@ -124,7 +124,7 @@ export default {
 }
 .help-request td:first-child::after,
 .help-request td:last-child::after {
-  content: '';
+  content: "";
   background: #fff;
   height: 2px;
   width: 20px;

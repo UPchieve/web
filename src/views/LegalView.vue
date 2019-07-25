@@ -623,11 +623,11 @@
 </template>
 
 <script>
-import UserService from '@/services/UserService'
+import UserService from "@/services/UserService";
 
-import FullTextTemplate from '@/components/FullTextTemplate'
-import Accordion from '@/components/Accordion'
-import AccordionItem from '@/components/AccordionItem'
+import FullTextTemplate from "@/components/FullTextTemplate";
+import Accordion from "@/components/Accordion";
+import AccordionItem from "@/components/AccordionItem";
 
 export default {
   components: {
@@ -636,15 +636,15 @@ export default {
     AccordionItem
   },
   data() {
-    const auth = UserService.getAuth()
+    const auth = UserService.getAuth();
 
-    const user = UserService.getUser()
+    const user = UserService.getUser();
     return {
       auth,
       user
-    }
+    };
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
