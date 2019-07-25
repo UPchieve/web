@@ -1,5 +1,5 @@
 <template>
-  <div class="profile">
+  <div class="volunteer-profile">
     <div class="header">
       {{volunteer.firstname}}'s Profile
       <button
@@ -10,56 +10,148 @@
     </div>
     <div class = "wrap-container">
       <div class="contain">
-      <div class="subheader">Personal Information</div>
-      <div class="container-content">
-      
-      <!-- <table>
-        <tbody>
-            <td v-for="key in volunteerProperties" v-bind:key="key.index">
-              <div v-if="key === 'isVolunteerApproved'">
-                <div v-show="!activeEdit" class="answer">
-                  {{ volunteer.isVolunteerApproved }}
-                </div>
-                <input
+        <div class="subheader">{{volunteer.firstname}} {{volunteer.nickname ? "\"" + volunteer.nickname + "\"": ''}} {{volunteer.lastname}} </div>
+        <div class="container-content" >
+          <div class="basic-info-container">
+          <div class = "info-subcontainer--basic">
+            <div id="email" class="container-section">
+              <div class="prompt">Email</div>
+              <div v-show="!activeEdit" class="answer">{{volunteer.email}}</div>
+              <div v-show="!volunteer.email && !activeEdit" class="answer">
+                (None given)
+              </div>
+              <input
+                v-show="activeEdit"
+                v-model="volunteer.email"
+                type="text"
+                class="form-control" />
+              </div>
+
+            <div id="phone" class="container-section">
+              <div class="prompt">Phone Number</div>
+              <div v-show="!activeEdit" class="answer">{{ volunteer.phonePretty }}</div>
+              <div v-show="!volunteer.phone && !activeEdit" class="answer">
+                (None given)
+              </div>
+              <input
+                v-show="activeEdit"
+                v-model="volunteer.phonePretty"
+                type="text"
+                class="form-control" />
+                <!-- :class="{'invalid': invalidInputs.indexOf('phone') > -1}" -->
+            </div>
+              
+
+            <div id="college" class="container-section">
+              <div class="prompt">College</div>
+              <div class="answer">{{volunteer.college}}</div>
+            </div>
+
+            <div id="fav-subject" class="container-section">
+              <div class="prompt">Favorite Academic Subject</div>
+              <div class="answer">{{volunteer.favoriteAcademicSubject}}</div>
+            </div>
+            
+            <div id="volunteer-approved" class="container-section">
+              <div class="prompt">Volunteer Approved</div>
+              <div class="answer">{{volunteer.isVolunteerApproved ? 'Yes':'No' }} </div>
+              <input
                   v-show="activeEdit"
                   v-model="volunteer.isVolunteerApproved"
-                  type="text"
+                  type="checkbox"
                   class="form-control"
-                  id="edit"
-                  @keypress="edited()"
                 />
+            </div>
+
+            <div id="volunteer-approved-ready" class="container-section">
+              <div class="prompt">Volunteer Ready</div>
+              <div class="answer">{{volunteer.isVolunteerReady ? 'Yes':'No' }}</div>
+              <input
+                  v-show="activeEdit"
+                  v-model="volunteer.isVolunteerReady"
+                  type="checkbox"
+                  class="form-control"
+                />
+            </div>
+          </div>
+        
+
+          <div class = "info-subcontainer--certifications">
+            <div id="certifications" class="container-section">
+              <div class="prompt">Certifications</div>
+              <div class="answer">
+                <div v-for="(value, key) in certifications" :key="`certification-${key}-${value}`">
+                  <div v-if="value" class="certBox">
+                    <div :class="certKey[key]" class="certKey">
+                      {{ certKey[key] }} </div>
+                    <div class="certValue">{{ key }}</div>
+                </div>
               </div>
-              <div v-else-if="key === 'Approved and Ready'">
-                {{ volunteer.isVolunteerApproved && volunteer.isVolunteerReady }}
+            </div>
+          </div>
+        </div>
+        </div>
+            <div id="availability" class="container-section--availability">
+              <div class="prompt">Availability</div>
+              <div class="answer">
+                <div class = 'grid'>
+                  <div v-for='(cell, index) in volunteer.availabilityArray' :key = '`${index}`'>
+                    <div v-if="isNaN(cell) || cell.length == 0">
+                      <div class = 'cell-header'> {{cell}} </div>
+                    </div>
+                    <div v-else v-bind:class = "{'cell-true': cell, 'cell-false': !cell}">{{''}}</div>
+                  </div>
+                </div>
               </div>
-              <div v-else-if="key !== 'isVolunteerApproved'">
-                {{ volunteer[key] }}
-              </div>
-            </td>
-        </tbody>
-      </table> -->
-    </div>
+            </div>
+                    </div>
+                            </div>
+
+ 
       </div>
+    </div>
   </div>
-  </div>
+    </div>
+
+
+        <!-- <div class="contain">
+        <div class="subheader">Availability</div>
+          <div class="container-content">
+             <div class = 'grid'>
+               <div v-for='(cell, index) in volunteer.availabilityArray'
+                        :key = '`${index}`'>
+                                <div v-if="isNaN(cell) || cell.length == 0">
+                                  <div class = 'cell-header'>
+                                {{cell}} </div>
+                                </div>
+                                <div v-else v-bind:class = "{'cell-true': cell, 'cell-false': !cell}">
+                                {{''}}</div>
+                            </div>
+               </div>
+            </div>
+        </div> -->
+
 </template>
 
 <script>
 import UserService from '@/services/UserService'
+import phoneValidation from '@/utils/phone-validation'
+
 import axios from 'axios'
 
 export default {
   data () {
-    const volunteerProperties = ['firstname', 'lastname', 'isVolunteerApproved', 'hasAvailability', 'hasCertification', 'isVolunteerReady', 'Approved and Ready']
     return {
       msg: '',
       volunteer: {},
-      volunteerProperties,
       activeEdit: false,
       editBtnMsg: 'Edit',
       errors: [],
       saveFailed: false,
-      loading: false
+      loading: false,
+      certifications: {},
+      certKey: {},
+      
     }
   },
   
@@ -67,10 +159,106 @@ export default {
     var id = this.$route.params.id
     UserService.getVolunteer(this, id).then(volunteer =>{
       this.volunteer = volunteer
+      this.volunteer.phonePretty = phoneValidation.convertPhoneNumber(this.volunteer.phone)
+      this.setCertifications()
+      this.getAvailability()
       })
+    
   },
 
   methods: {
+    getAvailability() {
+      var daysOfWeek
+      var timesOfDay
+      const availability = this.volunteer.availability
+      var availabilityArray = Array(8).fill(false).map(() => Array(25).fill(false))
+      for (const day in availability) {
+        for (const time in availability[day]) {
+        // '$init' property and others are not skipped when nested
+        if (time !== '$init' && availability[day].hasOwnProperty([time])) {
+          if (!daysOfWeek) {
+            daysOfWeek = Object.keys(availability)
+            console.log(daysOfWeek)
+          }
+          if (!timesOfDay) {
+            timesOfDay = Object.keys(availability[day])
+          }
+          let dayIndex = daysOfWeek.indexOf(day) + 1
+          let timeIndex = timesOfDay.indexOf(time) + 1
+          if (availability[day][time]) {
+            availabilityArray[dayIndex][timeIndex] = true
+          }
+          daysOfWeek.forEach(function (value, index) {
+            availabilityArray[index + 1][0] = daysOfWeek[index]
+          })
+          timesOfDay.forEach(function (value, index) {
+            availabilityArray[0][index + 1] = timesOfDay[index]
+          })
+        }
+      }
+      }
+      availabilityArray[0][0] = ''
+      this.volunteer.availabilityArray = availabilityArray.flat()
+},
+
+    setCertifications(){
+    if (this.volunteer.algebra) {
+      if (this.volunteer.algebra.passed) {
+        this.certifications.Algebra = true
+      }
+    }
+    if (this.volunteer.geometry) {
+      if (this.volunteer.geometry.passed) {
+        this.certifications.Geometry = true
+      }
+    }
+    if (this.volunteer.trigonometry) {
+      if (this.volunteer.trigonometry.passed) {
+        this.certifications.Trigonometry = true
+      }
+    }
+    if (this.volunteer.precalculus) {
+      if (this.volunteer.precalculus.passed) {
+        this.certifications.Precalculus = true
+      }
+    }
+    if (this.volunteer.calculus) {
+      if (this.volunteer.calculus.passed) {
+        this.certifications.Calculus = true
+      }
+    }
+    if (this.volunteer.esl) {
+      if (this.volunteer.esl.passed) {
+        this.certifications.ESL = true
+      }
+    }
+    if (this.volunteer.planning) {
+      if (this.volunteer.planning.passed) {
+        this.certifications.Planning = true
+      }
+    }
+    if (this.volunteer.essays) {
+      if (this.volunteer.essays.passed) {
+        this.certifications.Essays = true
+      }
+    }
+    if (this.volunteer.applications) {
+      if (this.volunteer.applications.passed) {
+        this.certifications.Applications = true
+      }
+    }
+
+    this.certKey.Algebra = 'MATH'
+    this.certKey.Geometry = 'MATH'
+    this.certKey.Trigonometry = 'MATH'
+    this.certKey.Precalculus = 'MATH'
+    this.certKey.Calculus = 'MATH'
+    this.certKey.ESL = 'ESL'
+    this.certKey.Planning = 'COLLEGE'
+    this.certKey.Essays = 'COLLEGE'
+    this.certKey.Applications = 'COLLEGE'
+
+    },
         /**
      * Toggle editing state.
      * {Case A} if activeEdit === false: enter the editing state by setting activeEdit to true
@@ -102,10 +290,6 @@ export default {
     
     },
     
-    edited() {
-      var x = document.getElementById("edit");
-      x.style.backgroundColor = "yellow";
-    },
   }
 }
 </script>
@@ -116,26 +300,6 @@ body {
   font-size: 14px;
 }
 
-table {
-  border: 2px solid #16d2aa;
-  border-radius: 3px;
-  background-color: white;
-}
-
-th {
-  background-color: #16d2aa;
-  color: white;
-  cursor: pointer;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-th, td {
-  min-width: 120px;
-  padding: 10px 20px;
-}
 
 .header {
   display: flex;
@@ -149,13 +313,30 @@ th, td {
   color: #343440;
 }
 
+.info-subcontainer {
+  &--basic{
+    align-content: left;
+    justify-content: left;
+  }
+  &--certifications{
+    align-content: right;
+    justify-content: right;
+  }
+}
 .form-control {
   border: none;
   box-shadow: none;
   border-radius: 0;
-  // background-color: #f0f8fd;
-  width: 60px;
-  height: 30px;
+  background-color: #f0f8fd;
+}
+
+.form-control {
+  border-bottom: 3px solid #16d2aa;
+  margin-bottom: 10px;
+
+  &.invalid {
+    border-bottom: 3px solid #bf0000;
+  }
 }
 
 .form-control:focus {
@@ -203,19 +384,44 @@ button {
 .wrap-container {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
 }
 
 .contain {
-  margin: 30px 0 0 30px;
-  width: 475px;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  justify-content: center;
+}
+
+.container-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 20px;
+ &--availability {
+    @extend .container-section;
+    align-items: center;
+  }
+}
+
+.basic-info-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 40px
+  
 }
 
 .container-content {
-  display: flex;
   background-color: #f0f8fd;
   padding: 30px;
   text-align: left;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+ 
 }
 
 .subheader {
@@ -228,4 +434,74 @@ button {
   font-size: 20px;
 }
 
+.answer {
+  font-weight: 600;
+}
+
+.answer ul {
+  margin-left: 20px;
+}
+
+.volunteer-profile {
+  font-size: 16px;
+  font-family: $default-font;
+}
+
+.certBox {
+  display: flex;
+  height: 60px;
+  align-items: center;
+  padding-left: 20px;
+  border-bottom: 1px solid #cccccf;
+  font-weight: 600;
+}
+
+.certKey {
+  border-radius: 12px;
+  padding: 0 10px;
+  margin: 0 10px 0 0;
+  color: #ffffff;
+  font-size: 12px;
+}
+
+.ESL {
+  background-color: #1855d1;
+}
+
+.COLLEGE {
+  background-color: #fed766;
+}
+
+.MATH {
+  background-color: #f7aef8;
+}
+
+.grid{
+    display: grid;
+    margin: 20px;
+    grid-auto-flow: column;
+    grid-template-columns: 30px repeat(7, 1fr);
+    grid-template-rows: repeat(25, 1fr);
+    grid-gap: 2px;
+}
+
+.cell {
+height: 20px;
+  &-true {
+    @extend .cell;
+     border: 1px solid grey;
+    background-color:  #16d2aa;
+  }
+  &-false  {
+     border: 1px solid grey;
+      @extend .cell;
+    background-color: white;
+  }
+  &-header {
+    @extend .cell;
+    text-align: center;
+    background-color: transparent;
+
+  }
+}
 </style>
