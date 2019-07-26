@@ -1,13 +1,22 @@
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
-import Vue from 'vue'
-import router from './router'
-import App from './App'
+import Vue from "vue";
+import VueSocketIO from "vue-socket.io";
+import VueHeadful from "vue-headful";
+import App from "./App.vue";
+import router from "./router";
+import store from "./store";
 
-/* eslint-disable no-new */
+// Prevent production tip on startup
+Vue.config.productionTip = false;
+
+// Use vue-socket.io
+Vue.use(VueSocketIO, process.env.VUE_APP_SOCKET_ADDRESS);
+
+// Set up vue-headful
+Vue.component("vue-headful", VueHeadful);
+
+// Create Vue instance
 new Vue({
   router,
-  el: '#app',
-  components: { App },
-  template: '<App/>'
-})
+  store,
+  render: h => h(App)
+}).$mount("#app");

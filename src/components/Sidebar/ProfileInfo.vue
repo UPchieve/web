@@ -41,45 +41,46 @@
 </template>
 
 <script>
-import UserService from '../../services/UserService'
-import AuthService from '../../services/AuthService'
+import UserService from "@/services/UserService";
+import AuthService from "@/services/AuthService";
+import StudentAvatarUrl from "@/assets/defaultavatar3.png";
+import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 
 /**
  * @todo {1} Refactor this, apply naming convention to files and improve the
  *           the style of the block.
  */
 export default {
-  data () {
-    const user = UserService.getUser() || {}
+  data() {
+    const user = UserService.getUser() || {};
     const avatarUrl = // {1}
       user.picture ||
-      (user.isVolunteer
-        ? 'static/defaultavatar4.png'
-        : 'static/defaultavatar3.png')
+      (user.isVolunteer ? VolunteerAvatarUrl : StudentAvatarUrl);
+
     return {
       user,
       avatarStyle: {
         backgroundImage: `url(${avatarUrl})`
       }
-    }
+    };
   },
   computed: {
     name: {
       cache: false,
-      get () {
-        return `${this.user.firstname} ${this.user.lastname}`
+      get() {
+        return `${this.user.firstname} ${this.user.lastname}`;
       }
     }
   },
   methods: {
-    logout () {
-      AuthService.logout(this)
+    logout() {
+      AuthService.logout(this);
     }
   }
-}
+};
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .avatar {
   display: block;
   width: 60px;

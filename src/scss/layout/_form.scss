@@ -1,0 +1,149 @@
+.uc-form {
+  @include flex-container(column);
+  $size: 500px;
+
+  background: white;
+  font-size: 16px;
+
+  width: 100%;
+  max-width: $size;
+  min-height: $size;
+
+  // NOTE: this is to override bootstrap
+  a {
+    color: #73737a;
+  }
+}
+
+.uc-form-header {
+  @include flex-container(row, space-between);
+  padding: 25px;
+  padding-bottom: 0;
+}
+
+.uc-form-header-link {
+  $className: &;
+
+  color: #73737a;
+  font-weight: 600;
+  
+  &--active {
+    @extend #{$className};
+    color: $c-accent;
+  }
+}
+
+.uc-form-body {
+  @include flex-container(column);
+  @include child-spacing(top, 50px);
+
+  margin: auto 0;
+  padding: 50px;
+}
+
+.uc-form-label {
+  color: #343440;
+  font-weight: 400;
+  text-align: left;
+  margin: 0;
+}
+
+.uc-form-input {
+  border: none;
+  border-bottom: 3px solid $c-accent;
+  border-radius: 0;
+  box-shadow: none;
+
+  box-sizing: content-box;
+  padding: 6px 12px;
+
+  height: 30px;
+
+  &:focus {
+    outline: none;
+    border-bottom: 3px solid darken($c-accent, 15%);
+  }
+
+  &--invalid {
+    border-bottom: 3px solid #BF0000;
+  }
+}
+
+.uc-form-select {
+  @extend .uc-form-input;
+  width: 100%;
+}
+
+.uc-form-subtext {
+  color: #73737a;
+  font-size: 12px;
+  margin: 6px 0 0 0;
+  text-align: left;
+}
+
+.uc-form-button {
+  background: #f6f6f6;
+  border: none;
+  border-radius: 20px;
+  color: $c-accent;
+  
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+
+  min-height: 40px;
+  
+  &:hover, &:active {
+    color: white;
+    background: $c-accent;
+  }
+}
+
+/// Helper class for creating a basic form checkbox.
+///
+/// @example
+///   <div class="uc-form-checkbox">
+///     <input id="my-checkbox" type="checkbox" />
+///     <label for="my-checkbox">My Checkbox</label>
+///   </div>
+.uc-form-checkbox {
+  @include flex-container(row, flex-start, center);
+
+  input[type="checkbox"] {
+    @include flex-container(row, center, center);
+    $size: 20px;
+    
+    -webkit-appearance: none;
+    background-color: #f6f6f6;
+    border-radius: 3px;
+    border: 1px solid #99a1a7;
+    box-shadow: none;
+
+    min-width: $size;
+    width: $size;
+    min-height: $size;
+    height: $size;
+
+    margin: 0;
+    
+    &:checked {
+      background-color: white;
+      color: $c-accent;
+      font-size: 14px;
+
+      &:after {
+        content: '✔';
+      }
+    } 
+  }
+
+  label {
+    font-size: 12px;
+    color: #343440;
+    margin: 0 0 0 10px;
+
+    a {
+      color: $c-accent;
+    }
+  }
+}
