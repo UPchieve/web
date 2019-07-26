@@ -189,25 +189,25 @@ export default {
     },
 
     // Socket emits
-    emitDrawClick () {
+    emitDrawClick() {
       this.$socket.emit("drawClick", {
         sessionId: this.currentSession.sessionId,
         user: UserService.getUser()
       });
     },
-    emitSaveImage () {
+    emitSaveImage() {
       this.$socket.emit("saveImage", {
         sessionId: this.currentSession.sessionId,
         user: UserService.getUser()
       });
     },
-    emitUndoClick () {
+    emitUndoClick() {
       this.$socket.emit("undoClick", {
         sessionId: this.currentSession.sessionId,
         user: UserService.getUser()
       });
     },
-    emitClearClick () {
+    emitClearClick() {
       this.$socket.emit("clearClick", {
         sessionId: this.currentSession.sessionId,
         user: UserService.getUser()
@@ -227,7 +227,7 @@ export default {
         user: UserService.getUser()
       });
     },
-    emitDrawing () {
+    emitDrawing() {
       this.$socket.emit("drawing", {
         sessionId: this.currentSession.sessionId,
         user: UserService.getUser()
@@ -276,7 +276,7 @@ export default {
         user: UserService.getUser()
       });
     },
-    emitResetScreen (data) {
+    emitResetScreen(/* data */) {
       this.$socket.emit("resetScreen", {
         sessionId: this.currentSession.sessionId,
         user: UserService.getUser()
