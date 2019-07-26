@@ -33,11 +33,7 @@
           </p>
         </div>
 
-        <button
-          class="uc-form-button"
-          type="submit"
-          @click.prevent="submit()"
-        >
+        <button class="uc-form-button" type="submit" @click.prevent="submit()">
           Reset Password
         </button>
 
@@ -48,40 +44,39 @@
 </template>
 
 <script>
-import AuthService from '@/services/AuthService'
-import FormPageTemplate from '@/components/FormPageTemplate'
+import AuthService from "@/services/AuthService";
+import FormPageTemplate from "@/components/FormPageTemplate";
 
 export default {
   components: {
     FormPageTemplate
   },
-  data () {
+  data() {
     return {
-      msg: '',
+      msg: "",
       credentials: {
-        token: '',
-        password: '',
-        newpassword: ''
+        token: "",
+        password: "",
+        newpassword: ""
       }
-    }
+    };
   },
   methods: {
-    submit () {
+    submit() {
       AuthService.confirmReset(this, {
         token: this.$route.params.token,
         password: this.credentials.password,
         newpassword: this.credentials.newpassword
       })
         .then(() => {
-          this.showingSuccess = true
+          this.showingSuccess = true;
         })
         .catch(err => {
-          console.log(err)
-          this.msg = err.message
-        })
+          this.msg = err.message;
+        });
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

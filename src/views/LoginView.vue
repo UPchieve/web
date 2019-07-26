@@ -3,7 +3,9 @@
     <form class="uc-form">
       <div class="uc-form-header">
         <div class="uc-form-header-link--active">Log In</div>
-        <router-link to="signup" class="uc-form-header-link">Sign Up</router-link>
+        <router-link to="signup" class="uc-form-header-link"
+          >Sign Up</router-link
+        >
       </div>
 
       <div class="uc-form-body">
@@ -41,11 +43,7 @@
           </router-link>
         </div>
 
-        <button
-          class="uc-form-button"
-          type="submit"
-          @click.prevent="submit"
-        >
+        <button class="uc-form-button" type="submit" @click.prevent="submit">
           Login
         </button>
       </div>
@@ -56,50 +54,50 @@
 </template>
 
 <script>
-import AuthService from '@/services/AuthService'
-import FormPageTemplate from '@/components/FormPageTemplate'
-import FormFooter from '@/components/FormFooter'
+import AuthService from "@/services/AuthService";
+import FormPageTemplate from "@/components/FormPageTemplate";
+import FormFooter from "@/components/FormFooter";
 
 export default {
   components: {
     FormPageTemplate,
     FormFooter
   },
-  data () {
-    let error
-    if (this.$route.query['401'] === 'true') {
-      error = 'Your session has expired. Please login again'
+  data() {
+    let error;
+    if (this.$route.query["401"] === "true") {
+      error = "Your session has expired. Please login again";
     }
     return {
       credentials: {
-        email: '',
-        password: ''
+        email: "",
+        password: ""
       },
       error
-    }
+    };
   },
   methods: {
-    submit () {
+    submit() {
       AuthService.login(
         this,
         {
           email: this.credentials.email,
           password: this.credentials.password
         },
-        this.$route.query.redirect || '/'
-      )
+        this.$route.query.redirect || "/"
+      );
     }
   },
-  beforeRouteEnter (to, from, next) {
+  beforeRouteEnter(to, from, next) {
     if (AuthService.user.authenticated) {
       next({
-        path: '/'
-      })
+        path: "/"
+      });
     } else {
-      next()
+      next();
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

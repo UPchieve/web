@@ -7,10 +7,6 @@
         <router-link to="/login" class="uc-form-button" tag="button">
           Login
         </router-link>
-
-        <router-link to="/feedback" class="uc-form-button" tag="button">
-          Give Feedback
-        </router-link>
       </div>
 
       <form-footer />
@@ -19,20 +15,20 @@
 </template>
 
 <script>
-import FormPageTemplate from '@/components/FormPageTemplate'
-import FormFooter from '@/components/FormFooter'
+import FormPageTemplate from "@/components/FormPageTemplate";
+import FormFooter from "@/components/FormFooter";
 
 export default {
   components: {
     FormPageTemplate,
     FormFooter
   },
-  data () {
+  data() {
     return {
-      mainWebsiteUrl: process.env.MAIN_WEBSITE_URL
-    }
+      mainWebsiteUrl: process.env.VUE_APP_MAIN_WEBSITE_URL
+    };
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
