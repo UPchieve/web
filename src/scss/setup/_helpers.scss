@@ -1,19 +1,3 @@
-/// Media query helper. Activates above a minimum width.
-/// @param {string} $key - Key in $breakpoint-map
-@mixin breakpoint-above($key) {
-  @media screen and (min-width: get-breakpoint($key)) {
-    @content;
-  }
-}
-
-/// Media query helper. Activates below a maximum width.
-/// @param {string} $key - Key in $breakpoint-map
-@mixin breakpoint-below($key) {
-  @media screen and (max-width: get-breakpoint($key) - 0.02px) {
-    @content;
-  }
-}
-
 /// Helper to add basic flex styling.
 /// @param {string} $flex-direction [row]
 /// @param {string} $justify-content [initial]

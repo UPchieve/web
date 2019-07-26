@@ -3,7 +3,7 @@ const SimpleProgressWebpackPlugin = require("simple-progress-webpack-plugin");
 
 module.exports = {
   chainWebpack: config => {
-    // Import `global.scss` into all processed scss
+    // Import setup scss into all processed scss
     const types = ["vue-modules", "vue", "normal-modules", "normal"];
     types.forEach(type =>
       config.module
@@ -12,7 +12,7 @@ module.exports = {
         .use("style-resource")
         .loader("style-resources-loader")
         .options({
-          patterns: [path.resolve(__dirname, "./src/scss/global.scss")]
+          patterns: [path.resolve(__dirname, "./src/scss/setup/all.scss")]
         })
     );
 
