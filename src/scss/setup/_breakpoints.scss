@@ -9,17 +9,11 @@ $breakpoint-map: (
 );
 
 /// Returns a breakpoint by key.
+/// @requires {function} $validate-map-key
 /// @param {string} $key - Key in $breakpoint-map
 /// @return {number} width
 @function get-breakpoint($key) {
-  $width: map-get($breakpoint-map, $key);
-  
-  @if not $width {
-    $keys: map-keys($breakpoint-map);
-    @error 'Invalid breakpoint: #{$key}. Expected: #{$keys}.';
-  }
-
-  @return $width;
+  @return validate-map-key($breakpoint-map, $key);
 }
 
 /// Media query helper. Activates above a minimum width.

@@ -1,8 +1,27 @@
+/// Validates a map key and returns the associated value.
+/// @param {map} $map
+/// @param {string} $key
+/// @return $value
+@function validate-map-key($map, $key) {
+  $value: map-get($map, $key);
+
+  @if not $value {
+    $keys: map-keys($map);
+    @error "Invalid map key: '#{$key}'. Expected one of: [#{$keys}].";
+  }
+
+  @return $value;
+}
+
 /// Helper to add basic flex styling.
 /// @param {string} $flex-direction [row]
 /// @param {string} $justify-content [initial]
 /// @param {string} $align-items [initial]
-@mixin flex-container($flex-direction: row, $justify-content: initial, $align-items: initial) {
+@mixin flex-container(
+  $flex-direction: row,
+  $justify-content: initial,
+  $align-items: initial
+) {
   display: flex;
   flex-direction: $flex-direction;
   justify-content: $justify-content;
@@ -10,21 +29,30 @@
 }
 
 /// Helper to add spacing between direct child elements.
+/// @requires {function} $validate-map-key
 /// @param {string} $side - 'top', 'right', 'bottom', or 'left'
 /// @param {number} $spacing - the amount of spacing
 @mixin child-spacing($side, $spacing) {
-  $sides: (top: 0, right: 1, bottom: 2, left: 3);
+  $sides: (
+    top: 1,
+    right: 2,
+    bottom: 3,
+    left: 4
+  );
 
-  @if not map-has-key($map: $sides, $key: $side) {
-    $sides: map-keys($sides);
-    @error "Invalid side: #{$side}. Expected: #{$sides}.";
-  }
+  @if validate-map-key($sides, $side) {
+    & > * {
+      margin-#{$side}: $spacing;
 
-  & > * {
-    margin-#{$side}: $spacing;
-
-    &:first-child {
-      margin-#{$side}: 0;
+      @if $side == top or $side == left {
+        &:first-child {
+          margin-#{$side}: 0;
+        }
+      } @else {
+        &:last-child {
+          margin-#{$side}: 0;
+        }
+      }
     }
   }
 }

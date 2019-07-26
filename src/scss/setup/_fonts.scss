@@ -5,6 +5,7 @@ $font-weight-regular: 400;
 $font-weight-medium: 500;
 
 /// Helper to easily include text styles.
+/// @requires {function} $validate-map-key
 /// @param {string} $category - Scale category
 @mixin font-category($category) {
   $categories: (
@@ -19,16 +20,11 @@ $font-weight-medium: 500;
   );
 
   // Validate category and get list
-  @if not map-has-key($map: $categories, $key: $category) {
-    $categories: map-keys($map: $categories);
-    @error "Invalid category: #{$category}. Expected: #{$categories}.";
-  } @else {
-    $category: map-get($map: $categories, $key: $category);
-  }
+  $list: validate-map-key($categories, $category);
 
   // Set properties using category list
   font-family: $font-family-default;
-  font-size: nth($category, 1);
-  font-weight: nth($category, 2);
-  line-height: nth($category, 3);
+  font-size: nth($list, 1);
+  font-weight: nth($list, 2);
+  line-height: nth($list, 3);
 }
