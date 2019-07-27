@@ -319,9 +319,6 @@ export default {
   },
 
   methods: {
-
-   
-    
     getAvailability() {
       var daysOfWeek
       var timesOfDay
