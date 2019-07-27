@@ -161,7 +161,7 @@ export default {
     }
   },
   sockets: {
-    connect_error(error) {
+    connect_error() {
       this.connectionMsg = "The system seems to be having a problem reaching the server.";
       this.connectionMsgType = "warning";
     },
