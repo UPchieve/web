@@ -1,101 +1,264 @@
 <template>
   <div class="volunteer-profile">
-    <div class="header">
-      {{volunteer.firstname}}'s Profile
+    <div class="header"> {{volunteer.firstname}}'s Profile
       <button
-      class="editBtn btn"
-      @click="editApproval(volunteer)">
-      {{ editBtnMsg }}
+        class="editBtn btn"
+        @click="editProfile(volunteer)">
+        {{ editBtnMsg }}
       </button>
     </div>
     <div class = "wrap-container">
+      <div class = "contain">
+        <div v-if="errors.length" class="errors">
+          <h4 class="errors-heading">Please correct the following problem
+            <span v-if="errors.length > 1">s</span> before saving:</h4>
+          <ul class="errors-list">
+            <li v-for="error in errors" :key="error" >{{ error }}</li>
+          </ul>
+        </div>
+        <div v-if="saveFailed" class="errors">
+          <h4 class="errors-heading">Could not save data</h4>
+        </div>
+      </div>
       <div class="contain">
-        <div class="subheader">{{volunteer.firstname}} {{volunteer.nickname ? "\"" + volunteer.nickname + "\"": ''}} {{volunteer.lastname}} </div>
+        <div class="subheader">{{volunteer.firstname}} {{volunteer.nickname 
+          ? "\"" + volunteer.nickname + "\"": ''}} {{volunteer.lastname}} 
+        </div>
         <div class="container-content" >
           <div class="basic-info-container">
-          <div class = "info-subcontainer--basic">
-            <div id="email" class="container-section">
-              <div class="prompt">Email</div>
-              <div v-show="!activeEdit" class="answer">{{volunteer.email}}</div>
-              <div v-show="!volunteer.email && !activeEdit" class="answer">
-                (None given)
-              </div>
-              <input
-                v-show="activeEdit"
-                v-model="volunteer.email"
-                type="text"
-                class="form-control" />
-              </div>
-
-            <div id="phone" class="container-section">
-              <div class="prompt">Phone Number</div>
-              <div v-show="!activeEdit" class="answer">{{ volunteer.phonePretty }}</div>
-              <div v-show="!volunteer.phone && !activeEdit" class="answer">
-                (None given)
-              </div>
-              <input
-                v-show="activeEdit"
-                v-model="volunteer.phonePretty"
-                type="text"
-                class="form-control" />
-                <!-- :class="{'invalid': invalidInputs.indexOf('phone') > -1}" -->
-            </div>
+            <div class = "info-subcontainer">
               
+              <div id="firstname" class="container-section">
+                <div class="prompt">Firstname</div>
+                <div v-show="!activeEdit" class="answer">{{ volunteer.firstname }}</div>
+                <div v-show="!volunteer.firstname && !activeEdit" class="answer">
+                  (None given)
+                </div>
+                <input
+                  v-show="activeEdit"
+                  v-model="volunteer.firstname"
+                  type="text"
+                  class="form-control" 
+                  :class="{'invalid': invalidInputs.indexOf('firstname') > -1}"/>
+              </div>
 
-            <div id="college" class="container-section">
-              <div class="prompt">College</div>
-              <div class="answer">{{volunteer.college}}</div>
-            </div>
+              <div id="lastname" class="container-section">
+                <div class="prompt">Lastname</div>
+                <div v-show="!activeEdit" class="answer">{{ volunteer.lastname }}</div>
+                <div v-show="!volunteer.lastname && !activeEdit" class="answer">
+                  (None given)
+                </div>
+                <input
+                  v-show="activeEdit"
+                  v-model="volunteer.lastname"
+                  type="text"
+                  class="form-control" 
+                  :class="{'invalid': invalidInputs.indexOf('lastname') > -1}"/>
+              </div>
 
-            <div id="fav-subject" class="container-section">
-              <div class="prompt">Favorite Academic Subject</div>
-              <div class="answer">{{volunteer.favoriteAcademicSubject}}</div>
-            </div>
+              <div id="nickname" class="container-section">
+                <div class="prompt">Nickname</div>
+                <div v-show="!activeEdit" class="answer">{{ volunteer.nickname}}</div>
+                <div v-show="!volunteer.nickname && !activeEdit" class="answer">
+                  (None given)
+                </div>
+                <input
+                  v-show="activeEdit"
+                  v-model="volunteer.nickname"
+                  type="text"
+                  class="form-control"/>
+              </div>
+
+              <div id="ID" class="container-section">
+                <div class="prompt">ID</div>
+                <div class="answer">{{ volunteer._id }}</div>
+                <div v-show="!volunteer._id" class="answer">
+                  (None given)
+                </div>
+              </div>
             
-            <div id="volunteer-approved" class="container-section">
-              <div class="prompt">Volunteer Approved</div>
-              <div class="answer">{{volunteer.isVolunteerApproved ? 'Yes':'No' }} </div>
-              <input
+              <div id="gender" class="container-section">
+                <div class="prompt">Gender</div>
+                <div v-show="!activeEdit" class="answer">{{ volunteer.gender}}</div>
+                <div v-show="!volunteer.gender && !activeEdit" class="answer">
+                  (None given)
+                </div>
+                <input
                   v-show="activeEdit"
-                  v-model="volunteer.isVolunteerApproved"
-                  type="checkbox"
-                  class="form-control"
-                />
-            </div>
+                  v-model="volunteer.gender"
+                  type="text"
+                  class="form-control"/>
+              </div>
 
-            <div id="volunteer-approved-ready" class="container-section">
-              <div class="prompt">Volunteer Ready</div>
-              <div class="answer">{{volunteer.isVolunteerReady ? 'Yes':'No' }}</div>
-              <input
+              <div id="birthdate" class="container-section">
+                  <div class="prompt">Birthdate</div>
+                  <div v-show="!activeEdit" class="answer">{{ volunteer.birthdate}}</div>
+                  <div v-show="!volunteer.birthdate && !activeEdit" class="answer">
+                    (None given)
+                  </div>
+                  <input
+                    v-show="activeEdit"
+                    v-model="volunteer.birthdate"
+                    type="text"
+                    class="form-control"/>
+                </div>
+
+              <div id="email" class="container-section">
+                <div class="prompt">Email</div>
+                <div v-show="!activeEdit" class="answer">{{volunteer.email}}</div>
+                <div v-show="!volunteer.email && !activeEdit" class="answer">
+                  (None given)
+                </div>
+                <input
                   v-show="activeEdit"
-                  v-model="volunteer.isVolunteerReady"
-                  type="checkbox"
+                  v-model="volunteer.email"
+                  type="text"
+                  class="form-control" />
+              </div>
+
+              <div id="phone" class="container-section">
+                <div class="prompt">Phone Number</div>
+                <div v-show="!activeEdit" class="answer">{{ volunteer.phonePretty }}</div>
+                <div v-show="!volunteer.phone && !activeEdit" class="answer">
+                  (None given)
+                </div>
+                <input
+                  v-show="activeEdit"
+                  v-model="volunteer.phonePretty"
+                  type="text"
+                  class="form-control" 
+                  :class="{'invalid': invalidInputs.indexOf('phone') > -1}"/>
+              </div>
+              
+              <div id="college" class="container-section">
+                <div class="prompt">Your College</div>
+                <div v-show="!activeEdit" class="answer">{{ volunteer.college }}</div>
+                <div v-show="!volunteer.college && !activeEdit" class="answer">
+                  (None given)
+                </div>
+                <input
+                  v-show="activeEdit"
+                  v-model="volunteer.college"
+                  type="text"
+                  class="form-control"
+                  :class="{'invalid': invalidInputs.indexOf('college') > -1}"
+                />
+              </div>
+
+              <div id="highschool" class="container-section">
+                <div class="prompt">Your Highschool</div>
+                <div v-show="!activeEdit" class="answer">{{ volunteer.highschool }}</div>
+                <div v-show="!volunteer.highschool && !activeEdit" class="answer">
+                  (None given)
+                </div>
+                <input
+                  v-show="activeEdit"
+                  v-model="volunteer.highschool"
+                  type="text"
                   class="form-control"
                 />
+              </div>
+
+              <div id="favoriteAcademicSubject" class="container-section">
+                <div class="prompt">Your Favorite Academic Subject</div>
+                <div v-show="!activeEdit" class="answer">
+                  {{ volunteer.favoriteAcademicSubject }}
+                </div>
+                <div
+                  v-show="!volunteer.favoriteAcademicSubject && !activeEdit"
+                  class="answer"
+                >
+                  (None given)
+                </div>
+                <input
+                  v-show="activeEdit"
+                  v-model="volunteer.favoriteAcademicSubject"
+                  type="text"
+                  class="form-control"
+                  :class="{'invalid': invalidInputs.indexOf('favoriteAcademicSubject') > -1}"
+                />
+              </div>
+
+              <div id="test-user" class="container-section">
+                <div class="prompt">Test User</div>
+                <div class="answer">{{volunteer.isTestUser ? 'Yes':'No' }} </div>
+                <input
+                    v-show="activeEdit"
+                    v-model="volunteer.isTestUser"
+                    type="checkbox"
+                    class="form-control"
+                  />
+              </div>
+
+              <div id="admin" class="container-section">
+                <div class="prompt">Admin Access</div>
+                <div class="answer">{{volunteer.isAdmin ? 'Yes':'No' }} </div>
+                <input
+                    v-show="activeEdit"
+                    v-model="volunteer.isAdmin"
+                    type="checkbox"
+                    class="form-control"
+                  />
+              </div>
+            
+              <div id="volunteer-approved" class="container-section">
+                <div class="prompt">Volunteer Approved</div>
+                <div class="answer">{{volunteer.isVolunteerApproved ? 'Yes':'No' }} </div>
+                <input
+                    v-show="activeEdit"
+                    v-model="volunteer.isVolunteerApproved"
+                    type="checkbox"
+                    class="form-control"
+                  />
+              </div>
+
+              <div id="volunteer-approved-ready" class="container-section">
+                <div class="prompt">Volunteer Ready</div>
+                <div class="answer">{{volunteer.isVolunteerReady ? 'Yes':'No' }}</div>
+              </div>
             </div>
-          </div>
         
-
-          <div class = "info-subcontainer--certifications">
-            <div id="certifications" class="container-section">
-              <div class="prompt">Certifications</div>
-              <div class="answer">
-                <div v-for="(value, key) in certifications" :key="`certification-${key}-${value}`">
-                  <div v-if="value" class="certBox">
-                    <div :class="certKey[key]" class="certKey">
-                      {{ certKey[key] }} </div>
-                    <div class="certValue">{{ key }}</div>
+            <div class = "info-subcontainer">
+              <div id="certifications" class="container-section">
+                <div class="prompt">Certifications</div>
+                <div class="answer">
+                  <div v-show="!activeEdit">
+                    <div v-if="volunteer.hasCertification">
+                      <div v-for="key in Object.keys(certifications)" :key="`certification-${key}`">
+                        <div v-if="certifications[key]" class="certBox">
+                          <div  :class="certKey[key]" class="certKey">
+                            {{ certKey[key] }} 
+                          </div>
+                          <div class="certValue">{{ key }}</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div v-else> (No certifications to show)</div>
+                  </div>
+                  <div v-if="activeEdit">
+                    <div v-for="key in Object.keys(certifications)" :key = key>
+                      <div v-if="certifications.hasOwnProperty(key)" class = "certBox">
+                        <input 
+                        v-show="activeEdit"
+                        v-model="volunteer[key].passed"
+                        type="checkbox"
+                        class="form-control"
+                        @change="certifications[key] = volunteer[key].passed">
+                        <label  class="certValue"> {{key}} </label>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        </div>
-            <div id="availability" class="container-section--availability">
-              <div class="prompt">Availability</div>
-              <div class="answer">
+          
+          <div id="availability" class="container-section--availability">
+            <div class="prompt">Availability</div>
+            <div class="answer">
+              <div v-if="volunteer.hasSchedule">
                 <div class = 'grid'>
-                  <div v-for='(cell, index) in volunteer.availabilityArray' :key = '`${index}`'>
+                  <div v-for='(cell, index) in availabilityArray' :key = '`${index}`'>
                     <div v-if="isNaN(cell) || cell.length == 0">
                       <div class = 'cell-header'> {{cell}} </div>
                     </div>
@@ -103,39 +266,19 @@
                   </div>
                 </div>
               </div>
+              <div v-else> (No availability to show) </div>
             </div>
-            </div>
-            </div>
-
- 
+          </div>
+        </div>
       </div>
     </div>
-
-
-
-        <!-- <div class="contain">
-        <div class="subheader">Availability</div>
-          <div class="container-content">
-             <div class = 'grid'>
-               <div v-for='(cell, index) in volunteer.availabilityArray'
-                        :key = '`${index}`'>
-                                <div v-if="isNaN(cell) || cell.length == 0">
-                                  <div class = 'cell-header'>
-                                {{cell}} </div>
-                                </div>
-                                <div v-else v-bind:class = "{'cell-true': cell, 'cell-false': !cell}">
-                                {{''}}</div>
-                            </div>
-               </div>
-            </div>
-        </div> -->
-
+  </div>
 </template>
 
 <script>
 import UserService from '@/services/UserService'
 import phoneValidation from '@/utils/phone-validation'
-
+import validator from 'validator'
 import axios from 'axios'
 
 export default {
@@ -148,9 +291,20 @@ export default {
       errors: [],
       saveFailed: false,
       loading: false,
-      certifications: {},
+      certifications: {
+        'algebra':false,
+        'calculus':false,
+        'essays':false,
+        'precalculus': false,
+        'geometry': false,
+        'trigonometry': false,
+        'esl':false,
+        'planning': false,
+        'applications': false},
       certKey: {},
-      
+      availabilityArray: [],
+      invalidInputs: [],
+      errors: []
     }
   },
   
@@ -158,7 +312,6 @@ export default {
     var id = this.$route.params.id
     UserService.getVolunteer(this, id).then(volunteer =>{
       this.volunteer = volunteer
-      this.volunteer.phonePretty = phoneValidation.convertPhoneNumber(this.volunteer.phone)
       this.setCertifications()
       this.getAvailability()
       })
@@ -166,6 +319,9 @@ export default {
   },
 
   methods: {
+
+   
+    
     getAvailability() {
       var daysOfWeek
       var timesOfDay
@@ -177,7 +333,6 @@ export default {
         if (time !== '$init' && availability[day].hasOwnProperty([time])) {
           if (!daysOfWeek) {
             daysOfWeek = Object.keys(availability)
-            console.log(daysOfWeek)
           }
           if (!timesOfDay) {
             timesOfDay = Object.keys(availability[day])
@@ -197,65 +352,26 @@ export default {
       }
       }
       availabilityArray[0][0] = ''
-      this.volunteer.availabilityArray = availabilityArray.flat()
+      this.availabilityArray = availabilityArray.flat()
 },
 
-    setCertifications(){
-    if (this.volunteer.algebra) {
-      if (this.volunteer.algebra.passed) {
-        this.certifications.Algebra = true
+    setCertifications() {
+      for(const key in this.certifications){
+        if(this.volunteer.hasOwnProperty(key)){
+          if(this.volunteer[key].passed){
+            this.certifications[key] = true
+          }
+        }
       }
-    }
-    if (this.volunteer.geometry) {
-      if (this.volunteer.geometry.passed) {
-        this.certifications.Geometry = true
-      }
-    }
-    if (this.volunteer.trigonometry) {
-      if (this.volunteer.trigonometry.passed) {
-        this.certifications.Trigonometry = true
-      }
-    }
-    if (this.volunteer.precalculus) {
-      if (this.volunteer.precalculus.passed) {
-        this.certifications.Precalculus = true
-      }
-    }
-    if (this.volunteer.calculus) {
-      if (this.volunteer.calculus.passed) {
-        this.certifications.Calculus = true
-      }
-    }
-    if (this.volunteer.esl) {
-      if (this.volunteer.esl.passed) {
-        this.certifications.ESL = true
-      }
-    }
-    if (this.volunteer.planning) {
-      if (this.volunteer.planning.passed) {
-        this.certifications.Planning = true
-      }
-    }
-    if (this.volunteer.essays) {
-      if (this.volunteer.essays.passed) {
-        this.certifications.Essays = true
-      }
-    }
-    if (this.volunteer.applications) {
-      if (this.volunteer.applications.passed) {
-        this.certifications.Applications = true
-      }
-    }
-
-    this.certKey.Algebra = 'MATH'
-    this.certKey.Geometry = 'MATH'
-    this.certKey.Trigonometry = 'MATH'
-    this.certKey.Precalculus = 'MATH'
-    this.certKey.Calculus = 'MATH'
-    this.certKey.ESL = 'ESL'
-    this.certKey.Planning = 'COLLEGE'
-    this.certKey.Essays = 'COLLEGE'
-    this.certKey.Applications = 'COLLEGE'
+      this.certKey.algebra = 'MATH'
+      this.certKey.geometry = 'MATH'
+      this.certKey.trigonometry = 'MATH'
+      this.certKey.precalculus = 'MATH'
+      this.certKey.calculus = 'MATH'
+      this.certKey.esl = 'ESL'
+      this.certKey.planning = 'COLLEGE'
+      this.certKey.essays = 'COLLEGE'
+      this.certKey.applications = 'COLLEGE'
 
     },
         /**
@@ -263,7 +379,7 @@ export default {
      * {Case A} if activeEdit === false: enter the editing state by setting activeEdit to true
      * {Case B} if activeEdit === true: save profile changes & exit the editing state by setting activeEdit to false
      */
-    editApproval (user) {
+    editProfile (user) {
       // {Case A} Enter the editing state, then early exit
       if (!this.activeEdit) {
         this.editBtnMsg = 'Save'
@@ -273,22 +389,70 @@ export default {
       // {Case B} The remainder of this function saves new changes and exits the editing state
 
       // Start by erasing previous errors
+      this.errors = []
+      this.invalidInputs = []
       this.saveFailed = false
 
-      // form fields valid, so set profile
-      // wait for save to succeed before coming out of edit mode
-      UserService.editVolunteer(this, user)
-      .then(res => {
-        this.editBtnMsg = 'Edit'
-        this.activeEdit = false
-        this.saveFailed = false
-        return
-      }).catch(err => {
-        this.msg = err.message
-      })
-    
+      if (!user.email) {
+        this.errors.push('An email address is required.');
+        this.invalidInputs.push('inputEmail');
+      }
+
+      else if (!validator.isEmail(user.email)) {
+        // this is necessary because browsers ignore <input type="email"> until the
+        // user actually tries to submit the form
+        this.errors.push(user.email + ' is not a valid email address.');
+        this.invalidInputs.push('inputEmail');
+      }
+
+      // validating phone number
+      if (!user.phonePretty || !phoneValidation.validatePhoneNumber(user.phonePretty)) {
+          this.errors.push('Please enter a valid U. S. phone number.')
+          this.invalidInputs.push('phone')
+        }
+
+		    // a college name is required
+        if (!user.college) {
+          this.errors.push('A college is required.')
+          this.invalidInputs.push('college')
+		}
+		    // a favorite academic subject is required
+        if (!user.favoriteAcademicSubject) {
+          this.errors.push('A favorite academic subject is required.')
+          this.invalidInputs.push('favoriteAcademicSubject')
+        }
+
+        // a first name is required
+        if (!user.firstname) {
+          this.errors.push('A firstname is required.')
+          this.invalidInputs.push('firstname')
+        }
+      
+        // a first name is required
+        if (!user.lastname) {
+          this.errors.push('A lastname is required.')
+          this.invalidInputs.push('lastname')
+        }
+
+        // a birthdate is required
+        if (!UserService.validateBirthdate(user.birthdate)) {
+          this.errors.push('A birthdate is required.')
+          this.invalidInputs.push('birthdate')
+        }
+      if (!this.errors.length) {
+        // form fields valid, so set profile
+        // wait for save to succeed before coming out of edit mode
+        UserService.editVolunteer(this, user)
+        .then(res => {
+          this.editBtnMsg = 'Edit'
+          this.activeEdit = false
+          this.saveFailed = false
+          return
+        }).catch(err => {
+          this.msg = err.message
+        })
+      }
     },
-    
   }
 }
 </script>
@@ -312,16 +476,6 @@ body {
   color: #343440;
 }
 
-.info-subcontainer {
-  &--basic{
-    align-content: left;
-    justify-content: left;
-  }
-  &--certifications{
-    align-content: right;
-    justify-content: right;
-  }
-}
 .form-control {
   border: none;
   box-shadow: none;
@@ -348,6 +502,14 @@ input[type="text"] {
   margin : 0 auto;
   margin-bottom: 5px;
 }
+
+input[type="checkbox"] {
+  margin-right : 30px;
+  margin-bottom: 5px;
+  vertical-align:middle;
+}
+
+
 
 button {
   height: 30px;
@@ -450,9 +612,10 @@ button {
   display: flex;
   height: 60px;
   align-items: center;
-  padding-left: 20px;
+  justify-content: left;
   border-bottom: 1px solid #cccccf;
   font-weight: 600;
+  
 }
 
 .certKey {
@@ -503,4 +666,36 @@ height: 20px;
 
   }
 }
+  .errors {
+  text-align: left;
+  padding: 30px;
+}
+
+.errors-heading {
+  color: #bf0000;
+}
+
+.errors-list {
+  color: #bf0000;
+  margin-left: 40px;
+}
+ul {
+  padding: 15px;
+  height: 100%;
+  margin: auto;
+}
+
+.certValue {
+  flex-grow: 1;
+}
+
+.HELP{
+  display: flex;
+ 
+}
+
+// .checkbox input,.checkbox label{
+// 	display:inline-block;
+// 	vertical-align:middle;	
+// }
 </style>
