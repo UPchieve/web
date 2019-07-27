@@ -31,7 +31,10 @@
       >
         {{ connectionMsg }} {{ reconnectAttemptMsg }}
         <template v-if="reconnectAttemptMsg">
-          <button class="btn btn-in-msg-header btn-bg-dark" @click.prevent="tryReconnect">
+          <button
+            class="btn btn-in-msg-header btn-bg-dark"
+            @click.prevent="tryReconnect"
+          >
             Try Now
           </button>
         </template>
@@ -41,152 +44,154 @@
 </template>
 
 <script>
-import UserService from '@/services/UserService'
-import SessionService from '@/services/SessionService'
-import router from '@/router'
-
-const STUDENT_AVATAR_URL = '/static/defaultavatar3.png'
-const VOLUNTEER_AVATAR_URL = '/static/defaultavatar4.png'
+import UserService from "@/services/UserService";
+import SessionService from "@/services/SessionService";
+import router from "@/router";
+import StudentAvatarUrl from "@/assets/defaultavatar3.png";
+import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 
 /**
  * @todo {1} Refactoring candidate: use a modal instead.
  */
 export default {
-  data () {
+  data() {
     return {
       currentSession: SessionService.currentSession,
-      connectionMsg: '',
-      connectionMsgType: '',
-      reconnectAttemptMsg: ''
-    }
+      connectionMsg: "",
+      connectionMsgType: "",
+      reconnectAttemptMsg: ""
+    };
   },
   computed: {
-    waitingText () {
-      const user = UserService.getUser()
+    waitingText() {
+      const user = UserService.getUser();
       if (user.isVolunteer) {
-        return 'No student is in this session'
+        return "No student is in this session";
       }
-      return 'We are contacting our Academic Coaches for you right now - please hang tight while we try to connect you! This process can take 5-10 minutes.'
+      return "We are contacting our Academic Coaches for you right now - please hang tight while we try to connect you! This process can take 5-10 minutes.";
     },
-    partnerName () {
-      const partner = SessionService.getPartner()
-      return partner && partner.firstname
+    partnerName() {
+      const partner = SessionService.getPartner();
+      return partner && partner.firstname;
     },
-    partnerAvatar () {
-      const user = UserService.getUser()
-      let picture = ''
+    partnerAvatar() {
+      const user = UserService.getUser();
+      let picture = "";
       if (user.isVolunteer === false) {
-        picture = VOLUNTEER_AVATAR_URL
+        picture = VolunteerAvatarUrl;
       } else {
-        picture = STUDENT_AVATAR_URL
+        picture = StudentAvatarUrl;
       }
       return {
         backgroundImage: `url(${picture})`
-      }
+      };
     }
   },
   methods: {
-    end () {
-      let studentId = ''
-      let volunteerId = null
-      let subTopic = null
-      let topic = null
-      let sessionId = SessionService.currentSession.sessionId
+    end() {
+      let studentId = "";
+      let volunteerId = null;
+      let subTopic = null;
+      let topic = null;
+      let sessionId = SessionService.currentSession.sessionId;
+
       if (
         SessionService.currentSession &&
         SessionService.currentSession.data.student
       ) {
-        studentId = SessionService.currentSession.data.student._id
+        studentId = SessionService.currentSession.data.student._id;
       }
+
       if (
         SessionService.currentSession &&
         SessionService.currentSession.data.volunteer
       ) {
-        volunteerId = SessionService.currentSession.data.volunteer._id
+        volunteerId = SessionService.currentSession.data.volunteer._id;
       }
 
       if (
         SessionService.currentSession &&
         SessionService.currentSession.data.type
       ) {
-        topic = SessionService.currentSession.data.type
+        topic = SessionService.currentSession.data.type;
       }
+
       if (
         SessionService.currentSession &&
         SessionService.currentSession.data.subTopic
       ) {
-        subTopic = SessionService.currentSession.data.subTopic
+        subTopic = SessionService.currentSession.data.subTopic;
       }
 
-      const result = window.confirm('Do you really want to end the session?')
+      const result = window.confirm("Do you really want to end the session?");
+
       if (result) {
         if (volunteerId) {
           SessionService.endSession(this, sessionId)
-          .then(() => {
-            this.$socket.disconnect()
-            const url =
-              '/feedback/' +
-              sessionId +
-              '/' +
-              topic +
-              '/' +
-              subTopic +
-              '/' +
-              (UserService.getUser().isVolunteer ? 'volunteer' : 'student') +
-              '/' +
-              studentId +
-              '/' +
-              volunteerId
-            router.replace(url)
-          })
-          .catch(this.alertCouldNotEnd)
+            .then(() => {
+              this.$socket.disconnect();
+              const url =
+                "/feedback/" +
+                sessionId +
+                "/" +
+                topic +
+                "/" +
+                subTopic +
+                "/" +
+                (UserService.getUser().isVolunteer ? "volunteer" : "student") +
+                "/" +
+                studentId +
+                "/" +
+                volunteerId;
+              router.replace(url);
+            })
+            .catch(this.alertCouldNotEnd);
         } else {
           SessionService.endSession(this, sessionId)
-          .then(() => {
-            this.$socket.disconnect()
-            router.replace('/')
-          })
-          .catch(this.alertCouldNotEnd)
+            .then(() => {
+              this.$socket.disconnect();
+              router.replace("/");
+            })
+            .catch(this.alertCouldNotEnd);
         }
       }
     },
     alertCouldNotEnd() {
-      window.alert('Could not end session')
+      window.alert("Could not end session");
     },
     tryReconnect() {
       // socket must be closed before reopening for automatic reconnections
       // to resume
-      this.$socket.close()
-      this.$socket.open()
-      this.reconnectAttemptMsg = 'Waiting for server response.'
-      this.$emit('try-clicked')
+      this.$socket.close();
+      this.$socket.open();
+      this.reconnectAttemptMsg = "Waiting for server response.";
+      this.$emit("try-clicked");
     },
     connectionSuccess() {
-      this.connectionMsg = ''
-      this.reconnectAttemptMsg = ''
-      this.connectionMsgType = ''
+      this.connectionMsg = "";
+      this.reconnectAttemptMsg = "";
+      this.connectionMsgType = "";
     }
   },
   sockets: {
-    connect_error (error) {
-      console.log(`connection error: ${error}`)
-      this.connectionMsg = 'The system seems to be having a problem reaching the server.'
-      this.connectionMsgType = 'warning'
+    connect_error() {
+      this.connectionMsg =
+        "The system seems to be having a problem reaching the server.";
+      this.connectionMsgType = "warning";
     },
-    connect_timeout () {
-      console.log('connection timeout')
-      this.connectionMsg = 'The system seems to be having a problem reaching the server.'
-      this.connectionMsgType = 'warning'
+    connect_timeout() {
+      this.connectionMsg =
+        "The system seems to be having a problem reaching the server.";
+      this.connectionMsgType = "warning";
     },
-    reconnect_attempt () {
-      this.reconnectAttemptMsg = 'Trying periodically to reconnect.'
+    reconnect_attempt() {
+      this.reconnectAttemptMsg = "Trying periodically to reconnect.";
     },
     connect() {
-      this.connectionSuccess()
+      this.connectionSuccess();
     }
-
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -220,7 +225,7 @@ h1 {
 .avatar {
   width: 30px;
   height: 30px;
-  background-image: url('~@/assets/defaultAvatar@2x.png');
+  background-image: url("~@/assets/defaultAvatar@2x.png");
   background-size: cover;
 }
 
@@ -301,7 +306,6 @@ h1 {
   display: flex;
   align-items: center;
 }
-
 
 @media screen and (max-width: 700px) {
   .info {

@@ -23,13 +23,13 @@
 </template>
 
 <script>
-import SessionService from '@/services/SessionService'
-import UserService from '@/services/UserService'
+import SessionService from "@/services/SessionService";
+import UserService from "@/services/UserService";
 
-import SessionHeader from './SessionHeader'
-import Whiteboard from './Whiteboard'
-import SessionChat from './SessionChat'
-import Modal from '@/components/Modal'
+import SessionHeader from "./SessionHeader";
+import Whiteboard from "./Whiteboard";
+import SessionChat from "./SessionChat";
+import Modal from "@/components/Modal";
 
 export default {
   name: "session-view",
@@ -44,12 +44,12 @@ export default {
    * [1] Refactoring candidate: it'd be awesome if Dashboard could pass
    *     the topic directly
    */
-  data () {
+  data() {
     return {
       currentSession: SessionService.currentSession,
       sessionReconnecting: false,
       showModal: false,
-      btnLabels: ['Submit question', 'Exit session'],
+      btnLabels: ["Submit question", "Exit session"],
       message: `
         We don’t have any Academic Coaches
         available right now, but you can submit a
@@ -60,93 +60,93 @@ export default {
       clickHandlers: {
         main: () => {
           this.$router.push({
-            path: '/submit-question',
+            path: "/submit-question",
             query: {
-              topic: this.$route.path.split('/')[2], // [1]
+              topic: this.$route.path.split("/")[2], // [1]
               subTopic: this.$route.params.subTopic
             }
-          })
+          });
         },
         second: () => {
-          this.$router.push('/')
+          this.$router.push("/");
         }
       }
-    }
+    };
   },
-  mounted () {
-    const id = this.$route.params.sessionId
-    let promise
+  mounted() {
+    const id = this.$route.params.sessionId;
+    let promise;
 
-    this.sessionId = id
+    this.sessionId = id;
 
     if (!id) {
-      let type
-      if (this.$route.path.indexOf('session/college') !== -1) {
-        type = 'college'
+      let type;
+      if (this.$route.path.indexOf("session/college") !== -1) {
+        type = "college";
       } else {
-        type = 'math'
+        type = "math";
       }
       promise = SessionService.newSession(
         this,
         type,
         this.$route.params.subTopic
-      )
+      );
     } else {
-      promise = SessionService.useExistingSession(this, id)
+      promise = SessionService.useExistingSession(this, id);
     }
 
-    promise.then(sessionId => {
-      this.sessionId = this.currentSession.sessionId
-      this.$socket.connect()
-      this.joinSession(sessionId)
-	})
-    .catch(() => {
-      window.alert('Could not start new help session')
-      this.$router.replace('/')
-    })
+    promise
+      .then(sessionId => {
+        this.sessionId = this.currentSession.sessionId;
+        this.$socket.connect();
+        this.joinSession(sessionId);
+      })
+      .catch(() => {
+        window.alert("Could not start new help session");
+        this.$router.replace("/");
+      });
 
     // Offer the option to ask a question
-    const MODAL_TIMEOUT_MS = 24 * 60 * 60 * 1000
+    const MODAL_TIMEOUT_MS = 24 * 60 * 60 * 1000;
     setTimeout(() => {
       if (
         !UserService.getUser().isVolunteer &&
         SessionService.getPartner() === undefined
       ) {
-        this.showModal = true
+        this.showModal = true;
       }
-    }, MODAL_TIMEOUT_MS)
+    }, MODAL_TIMEOUT_MS);
   },
   sockets: {
-    bump () {
-      this.$router.push('/')
+    bump: function() {
+      this.$router.push("/");
     },
-    reconnect_attempt () {
-      this.sessionReconnecting = true
+    reconnect_attempt() {
+      this.sessionReconnecting = true;
     },
-    connect () {
+    connect() {
       if (this.sessionReconnecting) {
         if (this.currentSession && this.currentSession.sessionId) {
           // we still need to re-join the room after Socket.IO re-establishes the connection
-          this.joinSession(this.currentSession.sessionId)
-        }
-        else {
-          location.reload()
+          this.joinSession(this.currentSession.sessionId);
+        } else {
+          location.reload();
         }
       }
     }
   },
   methods: {
-    joinSession (sessionId) {
-      this.$socket.emit('join', {
+    joinSession(sessionId) {
+      this.$socket.emit("join", {
         sessionId,
         user: UserService.getUser()
-      })
+      });
     },
-    tryClicked () {
-      this.sessionReconnecting = true
+    tryClicked() {
+      this.sessionReconnecting = true;
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -183,7 +183,6 @@ export default {
   height: 100%;
   padding: 0;
 }
-
 
 @media screen and (max-width: 700px) {
   .whiteboard-container {
