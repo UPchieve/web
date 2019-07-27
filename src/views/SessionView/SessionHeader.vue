@@ -162,12 +162,10 @@ export default {
   },
   sockets: {
     connect_error(error) {
-      console.log(`connection error: ${error}`);
       this.connectionMsg = "The system seems to be having a problem reaching the server.";
       this.connectionMsgType = "warning";
     },
     connect_timeout() {
-      console.log("connection timeout");
       this.connectionMsg = "The system seems to be having a problem reaching the server.";
       this.connectionMsgType = "warning";
     },
