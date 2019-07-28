@@ -165,11 +165,13 @@ export default {
   },
   sockets: {
     connect_error() {
-      this.connectionMsg = "The system seems to be having a problem reaching the server.";
+      this.connectionMsg =
+        "The system seems to be having a problem reaching the server.";
       this.connectionMsgType = "warning";
     },
     connect_timeout() {
-      this.connectionMsg = "The system seems to be having a problem reaching the server.";
+      this.connectionMsg =
+        "The system seems to be having a problem reaching the server.";
       this.connectionMsgType = "warning";
     },
     reconnect_attempt() {
