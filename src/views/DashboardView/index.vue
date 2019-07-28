@@ -141,8 +141,12 @@ export default {
   data() {
     const user = UserService.getUser() || {};
     SessionService.getCurrentSession(this, user)
-      .then(path => { this.currentSessionPath = path })
-      .catch(err => { this.currentSessionPath = null })
+      .then(path => {
+        this.currentSessionPath = path;
+      })
+      .catch(() => {
+        this.currentSessionPath = null;
+      });
 
     const subtopics = {
       math: ["Algebra", "Geometry", "Trigonometry", "Precalculus", "Calculus"],
@@ -179,8 +183,8 @@ export default {
       return this.currentSessionPath;
     },
     rejoinHelpSession() {
-      const path = this.currentSessionPath ||
-        localStorage.getItem("currentSessionPath");
+      const path =
+        this.currentSessionPath || localStorage.getItem("currentSessionPath");
       if (path) {
         this.$router.push(path);
       } else {
