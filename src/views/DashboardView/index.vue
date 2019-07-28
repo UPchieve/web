@@ -184,7 +184,7 @@ export default {
     },
     rejoinHelpSession() {
       const path =
-        this.currentSessionPath || localStorage.getItem("currentSessionPath");
+        this.currentSessionPath;
       if (path) {
         this.$router.push(path);
       } else {
