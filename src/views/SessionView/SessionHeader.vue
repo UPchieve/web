@@ -31,7 +31,10 @@
       >
         {{ connectionMsg }} {{ reconnectAttemptMsg }}
         <template v-if="reconnectAttemptMsg">
-          <button class="btn btn-in-msg-header btn-bg-dark" @click.prevent="tryReconnect">
+          <button
+            class="btn btn-in-msg-header btn-bg-dark"
+            @click.prevent="tryReconnect"
+          >
             Try Now
           </button>
         </template>

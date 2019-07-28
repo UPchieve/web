@@ -124,8 +124,7 @@ export default {
         if (this.currentSession && this.currentSession.sessionId) {
           // we still need to re-join the room after Socket.IO re-establishes the connection
           this.joinSession(this.currentSession.sessionId);
-        }
-        else {
+        } else {
           location.reload();
         }
       }
@@ -133,7 +132,7 @@ export default {
   },
   methods: {
     joinSession(sessionId) {
-      this.$socket.emit('join', {
+      this.$socket.emit("join", {
         sessionId,
         user: UserService.getUser()
       });
