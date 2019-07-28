@@ -76,7 +76,7 @@ export default {
         this.currentSession.data = {};
 
         localStorage.removeItem("currentSessionPath");
-        return;
+        return Promise.reject(resp.data.err);
       }
 
       const { sessionId, data } = resp.data || {};
@@ -88,6 +88,7 @@ export default {
 
         const path = `/session/${type}/${subTopic}/${sessionId}`;
         localStorage.setItem("currentSessionPath", path);
+        return Promise.resolve(path)
       }
     });
   }
