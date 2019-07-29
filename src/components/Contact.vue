@@ -1,8 +1,8 @@
 <template>
-  <div class="row contactus-form">
-    <div class="header">
-      <h2>Contact Us!</h2>
-    </div>
+  <div class="contactus-form">
+    <h1 class="header">
+      Contact Us!
+    </h1>
     <table class="questions-table">
       <tr class="title-row">
         <td class="title-cell">
@@ -197,18 +197,17 @@ export default {
 
 <style lang="scss" scoped>
 .header {
-  height: 100px;
-  margin: 0;
-  padding-left: 30px;
-  margin-bottom: 40px;
+  margin: 0px;
   display: flex;
-  padding: 30px 0 30px 50px;
+  padding: 30px;
   font-size: 24px;
   border-bottom: 0.5px solid #cccccf;
   align-items: center;
   justify-content: space-between;
   font-weight: 600;
   background-color: white;
+  color: #343440;
+  margin-bottom: 40px;
 }
 
 .contactus-form {
@@ -218,6 +217,7 @@ export default {
   position: relative;
   vertical-align: middle;
   text-align: center;
+  padding-bottom: 20px;
 }
 
 .questions-table {
@@ -232,6 +232,7 @@ export default {
   -moz-border-radius: 5px;
   box-shadow: -9px 9px #2757ca;
   margin-bottom: 20px;
+  
 }
 
 .title-row {
@@ -352,7 +353,7 @@ export default {
   border-right: none;
   border-bottom: solid #16d2aa 1px;
   display: inline-block;
-  width: 350px;
+  width: 90%;
 }
 
 .submit-button-row {
@@ -394,7 +395,7 @@ export default {
   }
 
   .header {
-    padding: 1em 1em 1em 2em !important;
+    padding: 1em 1em 1em 3em !important;
   }
 
   table, thead, tbody, th, tr { 
@@ -406,21 +407,11 @@ export default {
   }
 
   .questions-table {
-    width: 95vw !important;
+    width: 75vw !important;
   }
 
   .question-cell {
     padding: 0em 1em 2em !important;
-  }
-
-  .checkbox-question-cell {
-    width: 36rem !important;
-    display: table-caption !important;
-    padding: 1.5em !important;
-  }
-
-  .checkbox-question-selection-cell {
-    padding-bottom: 1em !important;
   }
 
   .submit-button-cell {
