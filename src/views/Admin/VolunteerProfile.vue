@@ -48,7 +48,6 @@
 
 <script>
 import UserService from '@/services/UserService'
-import axios from 'axios'
 
 export default {
   data () {

@@ -1,62 +1,56 @@
-/* eslint-disable no-tabs */
-import moment from 'moment'
-
-import NetworkService from './NetworkService'
-import AuthService from './AuthService'
-import OnboardingService from './OnboardingService'
-
-import router from '@/router'
+import moment from "moment";
+import NetworkService from "./NetworkService";
+import AuthService from "./AuthService";
+import OnboardingService from "./OnboardingService";
+import router from "@/router";
 
 export default {
-  getAuth () {
-    return AuthService.user
+  getAuth() {
+    return AuthService.user;
   },
-  getUser () {
-    const auth = this.getAuth()
+  getUser() {
+    const auth = this.getAuth();
     if (auth.authenticated) {
-      return auth.data
+      return auth.data;
     }
-    return {}
+    return {};
   },
-  validateBirthdate (birthdate) {
-    const m = moment(birthdate, 'MM/DD/YYYY')
+  validateBirthdate(birthdate) {
+    const m = moment(birthdate, "MM/DD/YYYY");
     if (!m.isValid()) {
-      return 'Birthdate is invalid'
+      return "Birthdate is invalid";
     }
 
-    return true // No validation errors
+    return true; // No validation errors
   },
-  getOnboardingServiceInterest () {
-    const user = this.getUser()
-    return (user && user.onboardingServiceInterest) || []
+  getOnboardingServiceInterest() {
+    const user = this.getUser();
+    return (user && user.onboardingServiceInterest) || [];
   },
-  getOnboarding () {
-    return OnboardingService.status
+  getOnboarding() {
+    return OnboardingService.status;
   },
-
-  setProfile (context, data, redirect) {
+  setProfile(context, data, redirect) {
     return NetworkService.setProfile(context, data).then(
       res => {
         if (res.data) {
-          AuthService.storeUser(res.data.user)
-          context.msg = 'Set!'
+          AuthService.storeUser(res.data.user);
+          context.msg = "Set!";
         } else {
-          throw new Error()
+          throw new Error();
         }
         if (redirect) {
-          router.push(redirect)
+          router.push(redirect);
         }
-        return Promise.resolve(res)
+        return Promise.resolve(res);
       },
       res => {
-        context.msg = 'Error occurred'
-        console.log(res)
-        return Promise.reject(res)
+        context.msg = "Error occurred";
+        return Promise.reject(res);
       }
     )
   },
-
-  editVolunteer (context, data) {
+  editVolunteer(context, data) {
     return NetworkService.editVolunteer(context, data).then(res => {
       if (res.data.err) {
         return res.data.err
@@ -67,8 +61,7 @@ export default {
       }
     })
   },
-
-  getVolunteer (context, data) {
+  getVolunteer(context, data) {
     return NetworkService.getVolunteer(context, data).then(res => {
       if (res.data.err) {
         return res.data.err
@@ -79,8 +72,7 @@ export default {
       }
     })
   },
-
-  getVolunteers (context) {
+  getVolunteers(context) {
     return NetworkService.getVolunteers(context).then(res => {
       if (res.data.err) {
         return res.data.err
@@ -91,7 +83,7 @@ export default {
       }
     })
   },
-  getVolunteersAvailability (context, certifiedSubject) {
+  getVolunteersAvailability(context, certifiedSubject) {
     return NetworkService.getVolunteersAvailability(context, certifiedSubject).then(res => {
       if (res.data.err) {
         return res.data.err
@@ -102,4 +94,4 @@ export default {
       }
     })
   }
-}
+};

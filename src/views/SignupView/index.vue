@@ -32,9 +32,9 @@
 </template>
 
 <script>
-import FormPageTemplate from '@/components/FormPageTemplate'
-import StudentForm from './StudentForm'
-import VolunteerForm from './VolunteerForm'
+import FormPageTemplate from "@/components/FormPageTemplate";
+import StudentForm from "./StudentForm";
+import VolunteerForm from "./VolunteerForm";
 
 export default {
   name: "signup-view",
@@ -43,21 +43,20 @@ export default {
     StudentForm,
     VolunteerForm
   },
-  data () {
+  data() {
     return {
       userSelection: null
-    }
+    };
   },
   methods: {
-    selectVolunteer () {
-      this.userSelection = 'volunteer'
+    selectVolunteer() {
+      this.userSelection = "volunteer";
     },
-    selectStudent () {
-      this.userSelection = 'student'
+    selectStudent() {
+      this.userSelection = "student";
     }
   }
-}
+};
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

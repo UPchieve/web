@@ -7,9 +7,9 @@
 </template>
 
 <script>
-import SendVerification from './SendVerification'
-import CompleteProfile from './CompleteProfile'
-import AcademicSurvey from './AcademicSurvey'
+import SendVerification from "./SendVerification";
+import CompleteProfile from "./CompleteProfile";
+import AcademicSurvey from "./AcademicSurvey";
 
 export default {
   name: "onboarding-view",
@@ -18,7 +18,7 @@ export default {
     CompleteProfile,
     AcademicSurvey
   }
-}
+};
 </script>
 
 <style lang="scss" scoped></style>

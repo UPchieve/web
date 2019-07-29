@@ -153,8 +153,8 @@
 </template>
 
 <script>
-import UserService from '@/services/UserService'
-import SessionService from '@/services/SessionService'
+import UserService from "@/services/UserService";
+import SessionService from "@/services/SessionService";
 
 import ListSessions from './ListSessions'
 import VolunteerOnboardingChecklist from './VolunteerOnboardingChecklist'
@@ -165,14 +165,14 @@ export default {
     ListSessions,
     VolunteerOnboardingChecklist
   },
-  data () {
-    const user = UserService.getUser() || {}
-    SessionService.getCurrentSession(this, user)
+  data() {
+    const user = UserService.getUser() || {};
+    SessionService.getCurrentSession(this, user);
 
     const subtopics = {
-      math: ['Algebra', 'Geometry', 'Trigonometry', 'Precalculus', 'Calculus'],
-      esl: ['General Help'],
-      college: ['Planning', 'Applications', 'Essays']
+      math: ["Algebra", "Geometry", "Trigonometry", "Precalculus", "Calculus"],
+      esl: ["General Help"],
+      college: ["Planning", "Applications", "Essays"]
 
       // Temporarily changing to single word labels
       // 'college': ['College Planning', 'Application Help','Essay Editing']
@@ -180,70 +180,68 @@ export default {
       // Temporarily removing science and standardized testing
       // 'science': ['Biology','Chemistry'],
       // 'standardizedtest': ['SAT']
-    }
+    };
     return {
       user,
-      name: user.firstname || 'student',
+      name: user.firstname || "student",
       popUpStyle: {},
       showHelpPopUp: false,
-      pickedTopic: '',
-      pickedSubtopic: '',
+      pickedTopic: "",
+      pickedSubtopic: "",
       subtopics,
       coverStyle: {}
-    }
+    };
   },
   watch: {
     // Watch the help topic for changes, and reset the subtopic when it does.
-    pickedTopic: function () {
-      this.pickedSubtopic = ''
+    pickedTopic: function() {
+      this.pickedSubtopic = "";
     }
   },
   methods: {
-    hasActiveSession () {
-      return localStorage.getItem('currentSessionPath')
+    hasActiveSession() {
+      return localStorage.getItem("currentSessionPath");
     },
-    rejoinHelpSession () {
-      const path = localStorage.getItem('currentSessionPath')
+    rejoinHelpSession() {
+      const path = localStorage.getItem("currentSessionPath");
       if (path) {
-        this.$router.push(path)
-        console.log(`rejoining session: ${path}`)
+        this.$router.push(path);
       } else {
-        console.log(`session terminated`)
-        this.$router.push('/')
+        this.$router.push("/");
       }
     },
-    getHelp () {
+    getHelp() {
       this.popUpStyle = {
-        display: 'flex'
-      }
+        display: "flex"
+      };
       this.coverStyle = {
-        background: 'rgba(0,0,0,0.10)'
-      }
-      this.showHelpPopUp = true
+        background: "rgba(0,0,0,0.10)"
+      };
+      this.showHelpPopUp = true;
     },
-    capitalize (string) {
-      return string.charAt(0).toUpperCase() + string.slice(1)
+    capitalize(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
     },
-    getHelpCancel () {
-      this.popUpStyle = {}
-      this.coverStyle = {}
-      this.showHelpPopUp = false
+    getHelpCancel() {
+      this.popUpStyle = {};
+      this.coverStyle = {};
+      this.showHelpPopUp = false;
     },
-    getHelpNext () {
-      let topic = this.pickedTopic
-      let subTopic = this.pickedSubtopic
+    getHelpNext() {
+      let topic = this.pickedTopic;
+      let subTopic = this.pickedSubtopic;
       // Temp change all to math
       // topic = 'math';
-      topic = topic.toLowerCase()
-      subTopic = subTopic.toLowerCase()
-      if (subTopic === 'general help') {
-        subTopic = topic
+      topic = topic.toLowerCase();
+      subTopic = subTopic.toLowerCase();
+      if (subTopic === "general help") {
+        subTopic = topic;
       }
-      const linkName = `/session/${topic}/${subTopic}`
-      this.$router.push(linkName)
+      const linkName = `/session/${topic}/${subTopic}`;
+      this.$router.push(linkName);
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -261,11 +259,11 @@ export default {
 }
 
 .header-container::after {
-  content: '';
+  content: "";
   display: inline-block;
   width: 100%;
   height: 100%;
-  background-image: url('~@/assets/dashboardHeader@2x.png');
+  background-image: url("~@/assets/dashboardHeader@2x.png");
   background-repeat: no-repeat;
   background-size: cover;
   position: absolute;
@@ -417,7 +415,6 @@ h3 {
   width: 300px;
 }
 
-
 @media screen and (max-width: 700px) {
   .dashboard-body.row {
     display: block !important;
@@ -427,7 +424,7 @@ h3 {
   .dashboard-body p {
     padding: 1.2em !important;
   }
-   
+
   iframe {
     max-width: 100vw !important;
   }

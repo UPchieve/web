@@ -82,7 +82,10 @@
  * @todo {1} Solve this bug ('handleUndoOperation' is not defined)
  */
 
-import SessionService from '@/services/SessionService'
+import SessionService from "@/services/SessionService";
+import UserService from "@/services/UserService";
+import EraserIconUrl from "@/assets/eraser_icon_01_dark.png";
+import PenIconUrl from "@/assets/pen_icon_01_dark.png";
 
 // const CLEAR_BUTTON_ID = 'clearButton';
 // const UNDO_BUTTON_ID = 'undoButton';
@@ -95,429 +98,443 @@ import SessionService from '@/services/SessionService'
 // const CANVAS_HEIGHT = 400;
 
 // const LINE_FILL_STYLE = 'solid';
-let LOCAL_LINE_COLOR = 'rgba(52,52,64,.6)'
-let SERVER_LINE_COLOR = 'rgba(52,52,64,.6)'
-let SERVER_LINE_WIDTH = 5
-const LINE_WIDTH = 5
+let LOCAL_LINE_COLOR = "rgba(52,52,64,.6)";
+let SERVER_LINE_COLOR = "rgba(52,52,64,.6)";
+let SERVER_LINE_WIDTH = 5;
+const LINE_WIDTH = 5;
 // const LINE_CAP = 'round';
 
-const ERASING_LINE_COLOR = 'white'
-const ERASING_LINE_WIDTH = 20
+const ERASING_LINE_COLOR = "white";
+const ERASING_LINE_WIDTH = 20;
 
 // const DRAWING = false;
 
-let SERVER_DRAWING = false
+let SERVER_DRAWING = false;
 
-const ERASER_ICON = 'url("/static/eraser_icon_01_dark.png") 0 50, auto'
-const PEN_ICON = 'url("/static/pen_icon_01_dark.png") 0 50, auto'
-const TEXT_ICON = 'text'
+const ERASER_ICON = `url("${EraserIconUrl}") 0 50, auto`;
+const PEN_ICON = `url("${PenIconUrl}") 0 50, auto`;
+const TEXT_ICON = "text";
 
-let TEXT_POSITION_X = 10
-let TEXT_POSITION_Y = 10
+let TEXT_POSITION_X = 10;
+let TEXT_POSITION_Y = 10;
 
 // const ERASING = false;
-let INSERTING_TEXT = false
-let CURSOR_VISIBLE = false
-let CURSOR_REMOVED = false
+// let INSERTING_TEXT = false;
+let CURSOR_VISIBLE = false;
+// let CURSOR_REMOVED = false;
 
-let currentState = ''
+let currentState = "";
 
-let imageList = []
-let imageData
-window.App = {}
+let imageList = [];
+let imageData;
+window.App = {};
+const App = window.App;
 
 // const RESET_SCREEN_EVENT = 'reset';
 
-function compareImages (img1, img2) {
+function compareImages(img1, img2) {
   if (img1 !== null && img2 !== null) {
     if (img1.data.length !== img2.data.length) {
-      return false
+      return false;
     }
     for (let i = 0; i < img1.data.length; ++i) {
       if (img1.data[i] !== img2.data[i]) {
-        return false
+        return false;
       }
     }
-    return true
+    return true;
   }
-  return false
+  return false;
 }
 
-function saveImage (canvas, ctx) {
-  imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-  imageList.push(imageData)
+function saveImage(canvas, ctx) {
+  imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  imageList.push(imageData);
 }
 
 export default {
   directives: {
-    canvas (el) {
-      App.canvas = el
-      App.ctx = el.getContext('2d')
-      App.ctx.strokeStyle = LOCAL_LINE_COLOR
+    canvas(el) {
+      App.canvas = el;
+      App.ctx = el.getContext("2d");
+      App.ctx.strokeStyle = LOCAL_LINE_COLOR;
       // this.emitChangeColor(LOCAL_LINE_COLOR);
-      App.ctx.lineWidth = LINE_WIDTH
-      App.ctx.font = 'bold 64px Arial'
-      saveImage(App.canvas, App.ctx)
+      App.ctx.lineWidth = LINE_WIDTH;
+      App.ctx.font = "bold 64px Arial";
+      saveImage(App.canvas, App.ctx);
     }
   },
-  data () {
+  data() {
     return {
       currentSession: SessionService.currentSession,
-      showColors: 'hidden'
-    }
+      showColors: "hidden"
+    };
   },
-  mounted () {
-    this.resizeCanvas()
-    this.drawSetup()
-    window.addEventListener('resize', this.resizeCanvas)
+  mounted() {
+    this.resizeCanvas();
+    this.drawSetup();
+    window.addEventListener("resize", this.resizeCanvas);
   },
   methods: {
-    resizeCanvas () {
+    resizeCanvas() {
       const savedImage = App.ctx.getImageData(
         0,
         0,
         App.canvas.width,
         App.canvas.height
-      )
-      App.canvas.width = App.canvas.offsetWidth
-      App.canvas.height = App.canvas.offsetHeight
-      App.ctx.putImageData(savedImage, 0, 0)
+      );
+      App.canvas.width = App.canvas.offsetWidth;
+      App.canvas.height = App.canvas.offsetHeight;
+      App.ctx.putImageData(savedImage, 0, 0);
     },
 
     // Socket emits
-    emitDrawClick () {
-      this.$socket.emit('drawClick', {
-        sessionId: this.currentSession.sessionId
-      })
-    },
-    emitSaveImage () {
-      this.$socket.emit('saveImage', {
-        sessionId: this.currentSession.sessionId
-      })
-    },
-    emitUndoClick () {
-      this.$socket.emit('undoClick', {
-        sessionId: this.currentSession.sessionId
-      })
-    },
-    emitClearClick () {
-      this.$socket.emit('clearClick', {
-        sessionId: this.currentSession.sessionId
-      })
-    },
-    emitChangeColor (color) {
-      this.$socket.emit('changeColor', {
+    emitDrawClick() {
+      this.$socket.emit("drawClick", {
         sessionId: this.currentSession.sessionId,
-        color
-      })
+        user: UserService.getUser()
+      });
     },
-    emitChangeWidth (width) {
-      this.$socket.emit('changeWidth', {
+    emitSaveImage() {
+      this.$socket.emit("saveImage", {
         sessionId: this.currentSession.sessionId,
-        width
-      })
+        user: UserService.getUser()
+      });
     },
-    emitDrawing () {
-      this.$socket.emit('drawing', {
-        sessionId: this.currentSession.sessionId
-      })
-    },
-    emitEnd () {
-      this.$socket.emit('end', {
+    emitUndoClick() {
+      this.$socket.emit("undoClick", {
         sessionId: this.currentSession.sessionId,
-        whiteboardUrl: App.canvas.toDataURL()
-      })
+        user: UserService.getUser()
+      });
     },
-    emitDragStart (data) {
-      this.$socket.emit('dragStart', {
+    emitClearClick() {
+      this.$socket.emit("clearClick", {
         sessionId: this.currentSession.sessionId,
-        x: data.x,
-        y: data.y,
-        color: data.color
-      })
+        user: UserService.getUser()
+      });
     },
-    emitDragAction (data) {
-      this.$socket.emit('dragAction', {
+    emitChangeColor(color) {
+      this.$socket.emit("changeColor", {
         sessionId: this.currentSession.sessionId,
-        x: data.x,
-        y: data.y,
-        color: data.color
-      })
+        color,
+        user: UserService.getUser()
+      });
     },
-    emitDragEnd (data) {
-      this.$socket.emit('dragEnd', {
+    emitChangeWidth(width) {
+      this.$socket.emit("changeWidth", {
+        sessionId: this.currentSession.sessionId,
+        width,
+        user: UserService.getUser()
+      });
+    },
+    emitDrawing() {
+      this.$socket.emit("drawing", {
+        sessionId: this.currentSession.sessionId,
+        user: UserService.getUser()
+      });
+    },
+    emitEnd() {
+      this.$socket.emit("end", {
+        sessionId: this.currentSession.sessionId,
+        whiteboardUrl: App.canvas.toDataURL(),
+        user: UserService.getUser()
+      });
+    },
+    emitDragStart(data) {
+      this.$socket.emit("dragStart", {
         sessionId: this.currentSession.sessionId,
         x: data.x,
         y: data.y,
-        color: data.color
-      })
+        color: data.color,
+        user: UserService.getUser()
+      });
     },
-    emitInsertText (data) {
-      this.$socket.emit('insertText', {
+    emitDragAction(data) {
+      this.$socket.emit("dragAction", {
         sessionId: this.currentSession.sessionId,
         x: data.x,
         y: data.y,
-        text: data.text
-      })
+        color: data.color,
+        user: UserService.getUser()
+      });
     },
-    emitResetScreen (data) {
-      this.$socket.emit('resetScreen', {
-        sessionId: this.currentSession.sessionId
-      })
+    emitDragEnd(data) {
+      this.$socket.emit("dragEnd", {
+        sessionId: this.currentSession.sessionId,
+        x: data.x,
+        y: data.y,
+        color: data.color,
+        user: UserService.getUser()
+      });
+    },
+    emitInsertText(data) {
+      this.$socket.emit("insertText", {
+        sessionId: this.currentSession.sessionId,
+        x: data.x,
+        y: data.y,
+        text: data.text,
+        user: UserService.getUser()
+      });
+    },
+    emitResetScreen(/* data */) {
+      this.$socket.emit("resetScreen", {
+        sessionId: this.currentSession.sessionId,
+        user: UserService.getUser()
+      });
     },
 
     // UI events
 
-    hideBox () {
-      this.$el.querySelector('#textInputBox').style.visibility = 'hidden'
-      this.$el.querySelector('#textInputBox').value = ''
-      currentState = ''
+    hideBox() {
+      this.$el.querySelector("#textInputBox").style.visibility = "hidden";
+      this.$el.querySelector("#textInputBox").value = "";
+      currentState = "";
     },
-    changeColor (event) {
-      if (currentState === 'DRAWING') {
-        LOCAL_LINE_COLOR = event.target.style.backgroundColor
-        App.ctx.strokeStyle = LOCAL_LINE_COLOR
-        this.emitChangeColor(LOCAL_LINE_COLOR)
-        App.ctx.lineWidth = LINE_WIDTH
-        this.emitChangeWidth(LINE_WIDTH)
-      } else if (currentState === 'ERASING') {
-        App.ctx.strokeStyle = ERASING_LINE_COLOR
-        App.ctx.lineWidth = ERASING_LINE_WIDTH
+    changeColor(event) {
+      if (currentState === "DRAWING") {
+        LOCAL_LINE_COLOR = event.target.style.backgroundColor;
+        App.ctx.strokeStyle = LOCAL_LINE_COLOR;
+        this.emitChangeColor(LOCAL_LINE_COLOR);
+        App.ctx.lineWidth = LINE_WIDTH;
+        this.emitChangeWidth(LINE_WIDTH);
+      } else if (currentState === "ERASING") {
+        App.ctx.strokeStyle = ERASING_LINE_COLOR;
+        App.ctx.lineWidth = ERASING_LINE_WIDTH;
       }
     },
-    clear () {
-      App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height)
-      imageList = []
-      saveImage(App.canvas, App.ctx)
-      this.emitClearClick()
+    clear() {
+      App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
+      imageList = [];
+      saveImage(App.canvas, App.ctx);
+      this.emitClearClick();
     },
-    drawStart (event) {
+    drawStart(event) {
       if (!SERVER_DRAWING) {
-        this.emitDrawing()
-        if (!CURSOR_VISIBLE && currentState === 'INSERTING_TEXT') {
-          TEXT_POSITION_X = event.layerX - 10
-          TEXT_POSITION_Y = event.layerY + 34
-          CURSOR_VISIBLE = true
-          saveImage(App.canvas, App.ctx)
-          this.emitSaveImage()
+        this.emitDrawing();
+        if (!CURSOR_VISIBLE && currentState === "INSERTING_TEXT") {
+          TEXT_POSITION_X = event.layerX - 10;
+          TEXT_POSITION_Y = event.layerY + 34;
+          CURSOR_VISIBLE = true;
+          saveImage(App.canvas, App.ctx);
+          this.emitSaveImage();
           if (imageList.length > 0) {
-            imageData = imageList[imageList.length - 1]
-            App.ctx.putImageData(imageData, 0, 0)
+            imageData = imageList[imageList.length - 1];
+            App.ctx.putImageData(imageData, 0, 0);
           } else {
             imageData = App.ctx.getImageData(
               0,
               0,
               App.canvas.width,
               App.canvas.height
-            )
+            );
           }
 
-          imageList.push(imageData)
-          App.ctx.fillText('|', TEXT_POSITION_X, TEXT_POSITION_Y)
+          imageList.push(imageData);
+          App.ctx.fillText("|", TEXT_POSITION_X, TEXT_POSITION_Y);
           this.emitInsertText({
-            text: '|',
+            text: "|",
             x: TEXT_POSITION_X,
             y: TEXT_POSITION_Y
-          })
-          CURSOR_REMOVED = false
-        } else if (currentState === 'DRAWING' || currentState === 'ERASING') {
-          saveImage(App.canvas, App.ctx)
-          this.emitSaveImage()
-          App.canvas.isDrawing = true
+          });
+          // CURSOR_REMOVED = false;
+        } else if (currentState === "DRAWING" || currentState === "ERASING") {
+          saveImage(App.canvas, App.ctx);
+          this.emitSaveImage();
+          App.canvas.isDrawing = true;
 
           // const scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
           // const scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
 
-          const x = event.pageX
-          const y = event.pageY
+          const x = event.pageX;
+          const y = event.pageY;
 
           this.fillCircle(
             App.canvas,
             App.ctx,
-            'dragstart',
+            "dragstart",
             false,
             x,
             y,
             LOCAL_LINE_COLOR
-          )
+          );
           this.emitDragStart({
             x,
             y,
             color: LOCAL_LINE_COLOR
-          })
+          });
         }
       }
     },
-    drawEnd (event) {
+    drawEnd(event) {
       if (!SERVER_DRAWING) {
-        App.canvas.isDrawing = false
+        App.canvas.isDrawing = false;
 
         // const scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
         // const scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
 
-        const x = event.pageX
-        const y = event.pageY
+        const x = event.pageX;
+        const y = event.pageY;
 
         this.fillCircle(
           App.canvas,
           App.ctx,
-          'dragend',
+          "dragend",
           false,
           x,
           y,
           LOCAL_LINE_COLOR
-        )
+        );
         this.emitDragEnd({
           x,
           y,
           color: LOCAL_LINE_COLOR
-        })
-        saveImage(App.canvas, App.ctx)
-        this.emitSaveImage()
-        this.emitEnd()
+        });
+        saveImage(App.canvas, App.ctx);
+        this.emitSaveImage();
+        this.emitEnd();
       }
     },
-    draw (event) {
+    draw(event) {
       if (!SERVER_DRAWING) {
-        if (currentState === 'DRAWING' || currentState === 'ERASING') {
+        if (currentState === "DRAWING" || currentState === "ERASING") {
           if (!App.canvas.isDrawing) {
-            return
+            return;
           }
 
           // const scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
           // const scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
 
-          const x = event.pageX
-          const y = event.pageY
+          const x = event.pageX;
+          const y = event.pageY;
 
           this.fillCircle(
             App.canvas,
             App.ctx,
-            'drag',
+            "drag",
             false,
             x,
             y,
             LOCAL_LINE_COLOR
-          )
+          );
           this.emitDragAction({
             x,
             y,
             color: LOCAL_LINE_COLOR
-          })
+          });
         }
       }
     },
-    drawSetup () {
-      App.ctx.strokeStyle = LOCAL_LINE_COLOR
-      this.emitChangeColor(LOCAL_LINE_COLOR)
-      App.ctx.lineWidth = LINE_WIDTH
-      this.emitChangeWidth(LINE_WIDTH)
+    drawSetup() {
+      App.ctx.strokeStyle = LOCAL_LINE_COLOR;
+      this.emitChangeColor(LOCAL_LINE_COLOR);
+      App.ctx.lineWidth = LINE_WIDTH;
+      this.emitChangeWidth(LINE_WIDTH);
 
-      this.$el.querySelector('#textInputBox').value = ''
-      this.$el.querySelector('#textInputBox').style.visibility = 'hidden'
-      App.canvas.style.cursor = PEN_ICON
+      this.$el.querySelector("#textInputBox").value = "";
+      this.$el.querySelector("#textInputBox").style.visibility = "hidden";
+      App.canvas.style.cursor = PEN_ICON;
 
-      if (currentState === 'INSERTING_TEXT') {
-        saveImage(App.canvas, App.ctx)
-        this.emitSaveImage()
+      if (currentState === "INSERTING_TEXT") {
+        saveImage(App.canvas, App.ctx);
+        this.emitSaveImage();
       }
 
       if (imageList.length === 0) {
-        saveImage(App.canvas, App.ctx)
-        this.emitSaveImage()
+        saveImage(App.canvas, App.ctx);
+        this.emitSaveImage();
       }
 
-      currentState = 'DRAWING'
+      currentState = "DRAWING";
     },
 
-    keydown (e) {
+    keydown(e) {
       if (
-        this.$el.querySelector('#textInputBox').value === '' &&
+        this.$el.querySelector("#textInputBox").value === "" &&
         e.keyCode !== 8 &&
         e.keyCode !== 46
       ) {
         if (imageList.length > 0) {
-          imageData = imageList.pop()
-          App.ctx.putImageData(imageData, 0, 0)
+          imageData = imageList.pop();
+          App.ctx.putImageData(imageData, 0, 0);
         }
       }
     },
 
-    text () {
+    text() {
       if (imageList.length === 0) {
-        saveImage(App.canvas, App.ctx)
-        this.emitSaveImage()
+        saveImage(App.canvas, App.ctx);
+        this.emitSaveImage();
       }
-      saveImage(App.canvas, App.ctx)
-      this.emitSaveImage()
+      saveImage(App.canvas, App.ctx);
+      this.emitSaveImage();
 
-      currentState = 'INSERTING_TEXT'
-      INSERTING_TEXT = true
-      CURSOR_VISIBLE = false
-      App.canvas.style.cursor = TEXT_ICON
-      this.$el.querySelector('#textInputBox').style.visibility = 'visible'
-      this.$el.querySelector('#textInputBox').value = ''
+      currentState = "INSERTING_TEXT";
+      // INSERTING_TEXT = true;
+      CURSOR_VISIBLE = false;
+      App.canvas.style.cursor = TEXT_ICON;
+      this.$el.querySelector("#textInputBox").style.visibility = "visible";
+      this.$el.querySelector("#textInputBox").value = "";
     },
 
-    textBox () {
+    textBox() {
       if (CURSOR_VISIBLE) {
-        handleUndoOperation() // {1}
-        this.emitUndoClick()
-        CURSOR_VISIBLE = false
+        // handleUndoOperation(); // {1}
+        this.emitUndoClick();
+        CURSOR_VISIBLE = false;
       }
       this.insertText(
-        this.$el.querySelector('#whiteboardCanvas'),
-        this.$el.querySelector('#textInputBox').value
-      )
+        this.$el.querySelector("#whiteboardCanvas"),
+        this.$el.querySelector("#textInputBox").value
+      );
       this.emitInsertText({
-        text: this.$el.querySelector('#textInputBox').value,
+        text: this.$el.querySelector("#textInputBox").value,
         x: TEXT_POSITION_X,
         y: TEXT_POSITION_Y
-      })
+      });
     },
 
-    undo () {
+    undo() {
       const currentImage = App.ctx.getImageData(
         0,
         0,
         App.canvas.width,
         App.canvas.height
-      )
-      this.$el.querySelector('#textInputBox').value = ''
+      );
+      this.$el.querySelector("#textInputBox").value = "";
       if (imageList.length > 0) {
-        imageData = imageList.pop()
+        imageData = imageList.pop();
         while (compareImages(currentImage, imageData)) {
-          imageData = imageList.pop()
+          imageData = imageList.pop();
         }
         if (imageData !== null) {
-          App.ctx.putImageData(imageData, 0, 0)
+          App.ctx.putImageData(imageData, 0, 0);
         }
 
-        this.emitUndoClick()
+        this.emitUndoClick();
       }
     },
 
-    erase () {
+    erase() {
       if (imageList.length === 0) {
-        saveImage(App.canvas, App.ctx)
-        this.emitSaveImage()
+        saveImage(App.canvas, App.ctx);
+        this.emitSaveImage();
       }
-      if (currentState === 'INSERTING_TEXT') {
-        saveImage(App.canvas, App.ctx)
-        this.emitSaveImage()
+      if (currentState === "INSERTING_TEXT") {
+        saveImage(App.canvas, App.ctx);
+        this.emitSaveImage();
       }
-      currentState = 'ERASING'
-      App.ctx.strokeStyle = ERASING_LINE_COLOR
-      App.ctx.lineWidth = ERASING_LINE_WIDTH
-      App.canvas.style.cursor = ERASER_ICON
-      this.$el.querySelector('#textInputBox').value = ''
-      this.$el.querySelector('#textInputBox').style.visibility = 'hidden'
-      this.emitChangeColor(ERASING_LINE_COLOR)
-      this.emitChangeWidth(ERASING_LINE_WIDTH)
+      currentState = "ERASING";
+      App.ctx.strokeStyle = ERASING_LINE_COLOR;
+      App.ctx.lineWidth = ERASING_LINE_WIDTH;
+      App.canvas.style.cursor = ERASER_ICON;
+      this.$el.querySelector("#textInputBox").value = "";
+      this.$el.querySelector("#textInputBox").style.visibility = "hidden";
+      this.emitChangeColor(ERASING_LINE_COLOR);
+      this.emitChangeWidth(ERASING_LINE_WIDTH);
     },
 
     // Canvas manipulations
-    fillCircle (canvas, context, type, server, x, y, fillColor) {
+    fillCircle(canvas, context, type, server, x, y) {
       const scrollLeft =
         window.pageXOffset !== undefined
           ? window.pageXOffset
@@ -525,7 +542,7 @@ export default {
               document.documentElement ||
               document.body.parentNode ||
               document.body
-            ).scrollLeft
+            ).scrollLeft;
 
       const scrollTop =
         window.pageYOffset !== undefined
@@ -534,153 +551,151 @@ export default {
               document.documentElement ||
               document.body.parentNode ||
               document.body
-            ).scrollTop
+            ).scrollTop;
 
-      const rect = App.canvas.getBoundingClientRect()
+      const rect = App.canvas.getBoundingClientRect();
       if (server) {
-        App.ctx.strokeStyle = SERVER_LINE_COLOR
-        App.ctx.lineWidth = SERVER_LINE_WIDTH
-      } else if (currentState === 'ERASING') {
-        App.ctx.strokeStyle = ERASING_LINE_COLOR
-        App.ctx.lineWidth = ERASING_LINE_WIDTH
+        App.ctx.strokeStyle = SERVER_LINE_COLOR;
+        App.ctx.lineWidth = SERVER_LINE_WIDTH;
+      } else if (currentState === "ERASING") {
+        App.ctx.strokeStyle = ERASING_LINE_COLOR;
+        App.ctx.lineWidth = ERASING_LINE_WIDTH;
       }
-      if (currentState === 'DRAWING' || currentState === 'ERASING' || server) {
-        if (type === 'dragstart') {
+      if (currentState === "DRAWING" || currentState === "ERASING" || server) {
+        if (type === "dragstart") {
           if (imageList.length > 0) {
-            imageData = imageList[imageList.length - 1]
-            context.putImageData(imageData, 0, 0)
+            imageData = imageList[imageList.length - 1];
+            context.putImageData(imageData, 0, 0);
           }
-          context.beginPath()
+          context.beginPath();
           context.moveTo(
             x - scrollLeft - rect.left,
             y - scrollTop - rect.top + 5
-          )
-        } else if (type === 'drag') {
+          );
+        } else if (type === "drag") {
           context.lineTo(
             x - scrollLeft - rect.left,
             y - scrollTop - rect.top + 5
-          )
-          context.stroke()
+          );
+          context.stroke();
         } else {
-          context.closePath()
-          saveImage(canvas, context)
-          this.emitSaveImage()
+          context.closePath();
+          saveImage(canvas, context);
+          this.emitSaveImage();
         }
         if (server) {
-          App.ctx.strokeStyle = LOCAL_LINE_COLOR
-          App.ctx.lineWidth = LINE_WIDTH
+          App.ctx.strokeStyle = LOCAL_LINE_COLOR;
+          App.ctx.lineWidth = LINE_WIDTH;
         }
       }
     },
-    insertText (canvas, input) {
-      App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height)
+    insertText(canvas, input) {
+      App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
 
       if (imageList.length > 0) {
-        imageData = imageList.pop()
-        App.ctx.putImageData(imageData, 0, 0)
-        imageList.push(imageData)
+        imageData = imageList.pop();
+        App.ctx.putImageData(imageData, 0, 0);
+        imageList.push(imageData);
       }
-      App.ctx.fillText(input, TEXT_POSITION_X, TEXT_POSITION_Y)
+      App.ctx.fillText(input, TEXT_POSITION_X, TEXT_POSITION_Y);
     },
-    openColors () {
-      if (this.showColors === 'hidden') {
-        this.showColors = 'visible'
+    openColors() {
+      if (this.showColors === "hidden") {
+        this.showColors = "visible";
       } else {
-        this.showColors = 'hidden'
+        this.showColors = "hidden";
       }
     }
   },
   sockets: {
-    dstart (data) {
+    dstart(data) {
       this.fillCircle(
         App.canvas,
         App.ctx,
-        'dragstart',
+        "dragstart",
         true,
         data.x,
         data.y,
         data.color
-      )
+      );
     },
-    drag (data) {
+    drag(data) {
       this.fillCircle(
         App.canvas,
         App.ctx,
-        'drag',
+        "drag",
         true,
         data.x,
         data.y,
         data.color
-      )
+      );
     },
-    dend (data) {
+    dend(data) {
       this.fillCircle(
         App.canvas,
         App.ctx,
-        'dragend',
+        "dragend",
         true,
         data.x,
         data.y,
         data.color
-      )
+      );
     },
-    draw () {
-      console.log('SERVER DRAWING')
-      SERVER_DRAWING = true
+    draw() {
+      SERVER_DRAWING = true;
     },
-    end () {
-      console.log('SERVER DONE DRAWING')
-      SERVER_DRAWING = false
+    end() {
+      SERVER_DRAWING = false;
     },
-    save () {
+    save() {
       const imageData = App.ctx.getImageData(
         0,
         0,
         App.canvas.width,
         App.canvas.height
-      )
-      imageList.push(imageData)
+      );
+      imageList.push(imageData);
     },
-    undo () {
+    undo() {
       const currentImage = App.ctx.getImageData(
         0,
         0,
         App.canvas.width,
         App.canvas.height
-      )
+      );
       if (imageList.length > 0) {
-        imageData = imageList.pop()
+        imageData = imageList.pop();
         while (compareImages(currentImage, imageData)) {
-          imageData = imageList.pop()
+          imageData = imageList.pop();
         }
         if (imageData !== null) {
-          App.ctx.putImageData(imageData, 0, 0)
+          App.ctx.putImageData(imageData, 0, 0);
         }
       }
     },
-    clear () {
-      App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height)
-      imageList = []
-      saveImage(App.canvas, App.ctx)
+    clear() {
+      App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
+      imageList = [];
+      saveImage(App.canvas, App.ctx);
     },
-    color (newColor) {
-      SERVER_LINE_COLOR = newColor
+    color(newColor) {
+      SERVER_LINE_COLOR = newColor;
     },
-    width (newWidth) {
-      SERVER_LINE_WIDTH = newWidth
+    width(newWidth) {
+      SERVER_LINE_WIDTH = newWidth;
     },
-    text (data) {
-      App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height)
+    text(data) {
+      App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
 
       if (imageList.length > 0) {
-        imageData = imageList.pop()
-        App.ctx.putImageData(imageData, 0, 0)
-        imageList.push(imageData)
+        imageData = imageList.pop();
+        App.ctx.putImageData(imageData, 0, 0);
+        imageList.push(imageData);
       }
-      App.ctx.fillText(data.text, data.x, data.y)
+      App.ctx.fillText(data.text, data.x, data.y);
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -750,26 +765,26 @@ canvas {
 }
 
 #eraseButton {
-  background-image: url('~@/assets/eraser_icon.svg');
+  background-image: url("~@/assets/eraser_icon.svg");
 }
 
 #drawButton {
-  background-image: url('~@/assets/pen_icon.svg');
+  background-image: url("~@/assets/pen_icon.svg");
 }
 
 #undoButton {
-  background-image: url('~@/assets/undo_icon.svg');
+  background-image: url("~@/assets/undo_icon.svg");
 }
 
 #textButton {
-  background-image: url('~@/assets/Aa.png');
+  background-image: url("~@/assets/Aa.png");
 }
 
 #clearButton {
-  background-image: url('~@/assets/clear_icon.svg');
+  background-image: url("~@/assets/clear_icon.svg");
 }
 
 #openColorsButton {
-  background-image: url('~@/assets/color_icon.svg');
+  background-image: url("~@/assets/color_icon.svg");
 }
 </style>

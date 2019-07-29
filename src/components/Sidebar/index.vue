@@ -1,6 +1,6 @@
 <template>
-  <nav class="navbar">   
-    <div v-on:click="$emit('closeMenu')"> 
+  <nav class="navbar">
+    <div v-on:click="$emit('closeMenu')">
       <router-link tag="h1" to="/" />
     </div>
     <div v-if="auth.authenticated">
@@ -23,11 +23,11 @@
 </template>
 
 <script>
-import UserService from '@/services/UserService'
+import UserService from "@/services/UserService";
 
-import UserNav from './UserNav'
-import ProfileInfo from './ProfileInfo'
-import Footer from './Footer'
+import UserNav from "./UserNav";
+import ProfileInfo from "./ProfileInfo";
+import Footer from "./Footer";
 
 export default {
   components: {
@@ -35,12 +35,12 @@ export default {
     ProfileInfo,
     SidebarFooter: Footer // footer is reserved component name
   },
-  data () {
+  data() {
     return {
       auth: UserService.getAuth()
-    }
-  },
-}
+    };
+  }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -55,12 +55,12 @@ nav {
 }
 
 .navbar {
-    overflow: scroll;
-    scroll-padding-bottom: 100px;
-    display: flex;
-    flex-direction: column;;
-    justify-content: space-between;
-    flex-basis: 100%;
+  overflow: scroll;
+  scroll-padding-bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-basis: 100%;
 }
 
 h1,
@@ -76,11 +76,11 @@ h1 {
 }
 
 h1::before {
-  content: '';
+  content: "";
   display: inline-block;
   width: 100px;
   height: 43px;
-  background-image: url('~@/assets/logo-01.svg');
+  background-image: url("~@/assets/logo-01.svg");
   background-size: 100px 43px;
   top: 0;
   left: 0;
@@ -95,8 +95,6 @@ p.aboutText {
   margin: auto;
   text-align: left;
 }
-
-
 
 @media screen and (max-width: 700px) {
   .navbar {

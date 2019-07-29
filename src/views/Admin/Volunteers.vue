@@ -79,14 +79,9 @@
 
 <script>
 import UserService from '@/services/UserService'
-import VolunteerProfile from './VolunteerProfile'
 
 export default {
-  components: {
-    VolunteerProfile
-  },
-  
-  data () {
+  data() {
     const user = UserService.getUser()
 
     var volunteerProperties = ['firstname','lastname', '_id',

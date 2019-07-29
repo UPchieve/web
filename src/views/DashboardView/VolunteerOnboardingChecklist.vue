@@ -44,10 +44,6 @@
 <script>
 
 import UserService from '@/services/UserService'
-import SessionService from '@/services/SessionService'
-
-import ListSessions from './ListSessions'
-import VolunteerOnboardingChecklist from './VolunteerOnboardingChecklist'
 
 export default {
   data () {
