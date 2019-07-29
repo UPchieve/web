@@ -1,5 +1,5 @@
 <template>
-  <div class="profile">
+  <div v-if="user.isAdmin">
     <div class="header">
       Volunteers
     </div>
@@ -9,12 +9,22 @@
           <tr>
             <th v-for="key in volunteerProperties" v-bind:key="key.index">
               <div v-if="key === 'firstname' || key === 'lastname' || key === '_id'">
-                <label>Search by</label>
+                <label>Search</label>
                 <input
                   type="text"
                   v-model="appliedFilter[key]"
                   :placeholder="key"
                 />
+              </div>
+              <div v-else-if="key === 'numberOfHours'">
+                <label>less than</label>
+                <input
+                  type="text"
+                  class="hoursInput"
+                  v-model="appliedFilter[key]"
+                  :placeholder="'#'"
+                />
+                <label>hour(s)</label>
               </div>
               <div v-else-if="key != 'Status'">
                 <label>{{key}}</label>
@@ -75,10 +85,15 @@ export default {
   components: {
     VolunteerProfile
   },
+  
   data () {
+    const user = UserService.getUser()
+
     var volunteerProperties = ['firstname','lastname', '_id',
-      'isVolunteerApproved', 'isVolunteerReady', 'Status']
+      'isVolunteerApproved', 'hasCertification', 'numberOfHours', 'Status']
+    
     return {
+      user,
       search: '',
       volunteers: [],
       volunteerProperties,
@@ -94,11 +109,15 @@ export default {
           if (val) {
             resultItems = resultItems.filter(volunteer => {
               var result = volunteer[field]
+              var hours = Infinity
               if (typeof volunteer[field] === 'boolean') {
                 result = volunteer[field].toString()
               }
-              const filter = result.toLowerCase().includes(val)
-              return filter
+              else if (typeof volunteer[field] === 'number') {
+                hours = Number(this.appliedFilter[field])
+                return (volunteer[field] < hours)
+              }
+              return result.toLowerCase().includes(val)
             })
           }
         }
@@ -138,7 +157,7 @@ th {
 
 th, td {
   min-width: 120px;
-  padding: 10px 20px;
+  padding: 10px 0px;
 }
 
 .header {
@@ -163,11 +182,16 @@ input[type="text"] {
   box-shadow: none;
   border-radius: 0;
   background-color: white;
-  width: 100%;
+  width: 90%;
 }
 
 input::placeholder {
   color: lightgrey;
+  text-align: center;
+}
+
+input[class="hoursInput"] {
+  width: 25%;
 }
 
 select {
@@ -181,6 +205,7 @@ select {
 label {
   display: block;
   margin : 0 auto;
+  text-align: center;
   padding: 5px;
 }
 </style>

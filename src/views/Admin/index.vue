@@ -1,5 +1,5 @@
 <template>
-  <div class="admin-view">
+  <div class="admin-view" v-if="user.isAdmin">
     <div class="header">Admin Dashboard</div>
     <div class="parent">
       <div class="container-section linkBtn btn">
@@ -17,7 +17,20 @@
 </template>
 
 <script>
-export default {}
+import UserService from '../../services/UserService'
+
+export default {
+  data () {
+    const user = UserService.getUser()
+
+    var volunteerProperties = ['firstname','lastname', '_id',
+      'isVolunteerApproved', 'hasCertification', 'numberOfHours', 'Status']
+    
+    return {
+      user
+    }
+  }
+}
 </script>
 
 

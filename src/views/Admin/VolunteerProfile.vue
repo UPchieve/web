@@ -1,5 +1,5 @@
 <template>
-  <div v-if="volunteer" class="profile">
+  <div v-if="user.isAdmin" class="profile">
     <div class="header">
       {{volunteer.firstname}}'s Profile
       <button
@@ -52,8 +52,11 @@ import axios from 'axios'
 
 export default {
   data () {
+    const user = UserService.getUser()
     const volunteerProperties = ['firstname', 'lastname', 'isVolunteerApproved', 'hasAvailability', 'hasCertification', 'isVolunteerReady', 'Approved and Ready']
+    
     return {
+      user,
       msg: '',
       volunteer: {},
       volunteerProperties,
