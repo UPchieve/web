@@ -1,171 +1,223 @@
-import Vue from 'vue'
-import VueResource from 'vue-resource'
-import VueRouter from 'vue-router'
-import VueSocketio from 'vue-socket.io'
+import Vue from "vue";
+import VueResource from "vue-resource";
+import VueRouter from "vue-router";
 
-import Contact from './components/Contact'
-import Legal from './components/Legal'
-import Logout from './components/Logout'
-import LoginForm from './components/LoginForm'
-import Registration from './components/Registration'
-import ResetPasswordForm from './components/ResetPasswordForm'
-import SetPasswordForm from './components/SetPasswordForm'
-import Onboarding from './components/Onboarding'
-import Dashboard from './components/Dashboard'
-import Session from './components/Session'
-import Action from './components/Action'
-import Schedule from './components/Schedule'
-import Resources from './components/Resources'
-import Feedback from './components/Feedback'
-import Training from './components/Training'
-import Quiz from './components/Quiz'
-import Review from './components/Review'
-import Profile from './components/Profile'
-import Calendar from './components/Calendar'
-import SubmitQuestion from './components/views/SubmitQuestion'
-import Inbox from './components/views/Inbox'
-import SendAnswer from './components/views/SendAnswer'
+import ContactView from "./views/ContactView";
+import LegalView from "./views/LegalView";
+import LogoutView from "./views/LogoutView";
+import LoginView from "./views/LoginView";
+import SignupView from "./views/SignupView";
+import ResetPasswordView from "./views/ResetPasswordView";
+import SetPasswordView from "./views/SetPasswordView";
+import OnboardingView from "./views/OnboardingView";
+import DashboardView from "./views/DashboardView";
+import SessionView from "./views/SessionView";
+import ActionView from "./views/ActionView";
+import ScheduleView from "./views/ScheduleView";
+import ResourcesView from "./views/ResourcesView";
+import FeedbackView from "./views/FeedbackView";
+import TrainingView from "./views/TrainingView";
+import QuizView from "./views/QuizView";
+import ReviewView from "./views/ReviewView";
+import ProfileView from "./views/ProfileView";
+import CalendarView from "./views/CalendarView";
+import SubmitQuestionView from "./views/SubmitQuestionView";
+import InboxView from "./views/InboxView";
+import SendAnswerView from "./views/SendAnswerView";
 
-import AuthService from './services/AuthService'
-import OnboardingService from './services/OnboardingService'
+import AuthService from "./services/AuthService";
+import OnboardingService from "./services/OnboardingService";
 
-Vue.use(VueResource)
-Vue.use(VueRouter)
-Vue.use(VueSocketio, process.env.SOCKET_ADDRESS)
+Vue.use(VueResource);
+Vue.use(VueRouter);
 
-Vue.http.options.credentials = true
+Vue.http.options.credentials = true;
 
 const routes = [
   {
-    path: '/',
+    path: "/",
     redirect: () => {
       if (AuthService.user.authenticated) {
-        return '/dashboard'
+        return "/dashboard";
       }
-      return '/login'
+      return "/login";
     }
   },
-  { path: '/contact', name: 'Contact', component: Contact },
-  { path: '/legal', name: 'Legal', component: Legal },
-  { path: '/login', name: 'LoginForm', component: LoginForm },
-  { path: '/logout', name: 'Logout', component: Logout },
-  { path: '/signup', name: 'Registration', component: Registration },
-  { path: '/resetpassword', name: 'ResetPasswordForm', component: ResetPasswordForm },
-  { path: '/setpassword/:token', name: 'SetPasswordForm', component: SetPasswordForm },
-  { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { protected: true } },
+  { path: "/contact", name: "ContactView", component: ContactView },
+  { path: "/legal", name: "LegalView", component: LegalView },
   {
-    path: '/session/math/:subTopic/:sessionId?',
-    name: 'Session-math',
-    component: Session,
+    path: "/login",
+    name: "LoginView",
+    component: LoginView,
+    meta: { hideSidebar: true }
+  },
+  {
+    path: "/logout",
+    name: "LogoutView",
+    component: LogoutView,
+    meta: { hideSidebar: true }
+  },
+  {
+    path: "/signup",
+    name: "SignupView",
+    component: SignupView,
+    meta: { hideSidebar: true }
+  },
+  {
+    path: "/resetpassword",
+    name: "ResetPasswordView",
+    component: ResetPasswordView,
+    meta: { hideSidebar: true }
+  },
+  {
+    path: "/setpassword/:token",
+    name: "SetPasswordView",
+    component: SetPasswordView,
+    meta: { hideSidebar: true }
+  },
+  {
+    path: "/dashboard",
+    name: "DashboardView",
+    component: DashboardView,
     meta: { protected: true }
   },
   {
-    path: '/session/college/:subTopic/:sessionId?',
-    name: 'Session-college',
-    component: Session,
+    path: "/session/math/:subTopic/:sessionId?",
+    name: "SessionView-math",
+    component: SessionView,
     meta: { protected: true }
   },
-  { path: '/schedule', name: 'Schedule', component: Schedule, meta: { protected: true } },
   {
-    path: '/resources',
-    name: 'Resources',
-    component: Resources,
+    path: "/session/college/:subTopic/:sessionId?",
+    name: "SessionView-college",
+    component: SessionView,
+    meta: { protected: true }
+  },
+  {
+    path: "/schedule",
+    name: "ScheduleView",
+    component: ScheduleView,
+    meta: { protected: true }
+  },
+  {
+    path: "/resources",
+    name: "ResourcesView",
+    component: ResourcesView,
     meta: { protected: true, bypassOnboarding: true }
   },
   {
-    path: '/edu',
+    path: "/edu",
     component: () => {
-      window.location.href = '/edu'
+      window.location.href = "/edu";
     }
   },
   {
-    path: '/feedback/:sessionId/:userType/:studentId/:volunteerId',
-    name: 'Feedback',
-    component: Feedback,
+    path:
+      "/feedback/:sessionId/:topic/:subTopic/:userType/:studentId/:volunteerId",
+    name: "FeedbackView",
+    component: FeedbackView,
     meta: { protected: true }
   },
   {
-    path: '/action/:action/:data?',
-    name: 'Action',
-    component: Action,
+    path: "/action/:action/:data?",
+    name: "ActionView",
+    component: ActionView,
     meta: { bypassOnboarding: true }
   },
   {
-    path: '/onboarding/:step?',
-    name: 'Onboarding',
-    component: Onboarding,
-    meta: { protected: true }
-  },
-  { path: '/training', name: 'Training', component: Training, meta: { protected: true } },
-  {
-    path: '/training/:category/quiz',
-    name: 'Quiz',
-    component: Quiz,
+    path: "/onboarding/:step?",
+    name: "OnboardingView",
+    component: OnboardingView,
     meta: { protected: true }
   },
   {
-    path: '/training/:category/review',
-    name: 'Review',
-    component: Review,
+    path: "/training",
+    name: "TrainingView",
+    component: TrainingView,
     meta: { protected: true }
   },
-  { path: '/profile', name: 'Profile', component: Profile, meta: { protected: true } },
-  { path: '/calendar', name: 'Calendar', component: Calendar },
   {
-    path: '/submit-question',
-    name: 'SubmitQuestion',
-    component: SubmitQuestion,
+    path: "/training/:category/quiz",
+    name: "QuizView",
+    component: QuizView,
     meta: { protected: true }
   },
-  { path: '/inbox', name: 'Inbox', component: Inbox, meta: { protected: true } },
-  { path: '/send-answer', name: 'SendAnswer', component: SendAnswer, meta: { protected: true } }
-]
+  {
+    path: "/training/:category/review",
+    name: "ReviewView",
+    component: ReviewView,
+    meta: { protected: true }
+  },
+  {
+    path: "/profile",
+    name: "ProfileView",
+    component: ProfileView,
+    meta: { protected: true }
+  },
+  { path: "/calendar", name: "CalendarView", component: CalendarView },
+  {
+    path: "/submit-question",
+    name: "SubmitQuestionView",
+    component: SubmitQuestionView,
+    meta: { protected: true }
+  },
+  {
+    path: "/inbox",
+    name: "InboxView",
+    component: InboxView,
+    meta: { protected: true }
+  },
+  {
+    path: "/send-answer",
+    name: "SendAnswerView",
+    component: SendAnswerView,
+    meta: { protected: true }
+  }
+];
 
 /**
  * @todo Consider refactoring this file
  */
 const router = new VueRouter({
   routes,
-  linkActiveClass: 'active',
-  mode: 'history'
-})
+  linkActiveClass: "active",
+  mode: "history"
+});
 
-export default router
+export default router;
 
 // Router middleware to check authentication for protect routes
 router.beforeEach((to, from, next) => {
   if (to.matched.some(route => route.meta.protected)) {
     if (!AuthService.user.authenticated) {
-      console.log('Protected route requires login')
       next({
-        path: '/login',
+        path: "/login",
         query: {
           redirect: to.fullPath
         }
-      })
+      });
     } else if (!OnboardingService.isOnboarded()) {
-      console.log('User requires onboarding')
-      const route = OnboardingService.getOnboardingRoute()
+      const route = OnboardingService.getOnboardingRoute();
       if (
         to.path.indexOf(route) !== -1 ||
         to.matched.some(route => route.meta.bypassOnboarding)
       ) {
-        next()
+        next();
       } else {
         next({
           path: route,
           query: {
             redirect: to.fullPath
           }
-        })
+        });
       }
     } else {
-      next()
+      next();
     }
   } else {
-    next()
+    next();
   }
-})
+});
 
 // If endpoint returns 401, redirect to login (except for requests to get user's
 // session)
@@ -173,10 +225,10 @@ Vue.http.interceptors.push((request, next) => {
   next(response => {
     if (
       response.status === 401 &&
-      !(request.url.indexOf('/api/user') !== -1 && request.method === 'GET')
+      !(request.url.indexOf("/api/user") !== -1 && request.method === "GET")
     ) {
-      AuthService.removeUser()
-      router.push('/login?401=true')
+      AuthService.removeUser();
+      router.push("/login?401=true");
     }
-  })
-})
+  });
+});
