@@ -1,37 +1,22 @@
 <template>
-  <button :class="buttonClass">
-    <div>
-      <slot />
-    </div>
-    <upchieve-icon
-      v-if="buttonStyle === 'primary'"
-      icon="arrow"
-      color="inherit"
-    />
-  </button>
+  <button-template :primary="primary" :routeTo="routeTo" :class="buttonClasses">
+    <slot />
+  </button-template>
 </template>
 
 <script>
-import UpchieveIcon from "./UpchieveIcon";
-
-const buttonStyles = {
-  primary: true,
-  secondary: true
-}
+import ButtonTemplate from "./ButtonTemplate";
 
 export default {
-  components: { UpchieveIcon },
+  components: { ButtonTemplate },
   props: {
-    buttonStyle: {
-      type: String,
-      default: "primary",
-      validator: v => v in buttonStyles
-    },
-    reverse: Boolean
+    primary: Boolean,
+    reverse: Boolean,
+    routeTo: String
   },
   computed: {
-    buttonClass() {
-      const base = `LargeButton-${this.buttonStyle}`;
+    buttonClasses() {
+      const base = `LargeButton-${this.primary ? "primary" : "secondary"}`;
       return {
         [base]: true,
         [`${base}--reverse`]: this.reverse
@@ -43,8 +28,6 @@ export default {
 
 <style lang="scss" scoped>
 %LargeButton {
-  @include font-category("button");
-  @include flex-container(row, center, center);
   border: 1px solid rgba(0, 0, 0, 0); // for consistent button size
   border-radius: 20px;
   padding: 9px 23px; // subtracted 1px for border
@@ -52,7 +35,6 @@ export default {
 
 .LargeButton-primary {
   @extend %LargeButton;
-  @include child-spacing(left, 8px);
 
   background: $c-success-green;
   color: white;
