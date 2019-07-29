@@ -43,6 +43,8 @@ import AuthService from "./services/AuthService";
 
 const MOBILE_MODE_WIDTH = 700;
 
+//AuthService.checkAuth();
+
 export default {
   name: "App",
   components: {

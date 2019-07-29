@@ -175,6 +175,11 @@ export default {
     }
   },
 
+  isAuthenticated(context) {
+    this.checkAuth(context);
+    return this.user.authenticated;
+  },
+
   shouldFetch() {
     return Date.now() - this.user.lastFetch > USER_FETCH_LIMIT_SECONDS * 1000;
   },
