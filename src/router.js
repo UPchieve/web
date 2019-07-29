@@ -181,7 +181,7 @@ const routes = [
     path: '/admin',
     name: 'Admin',
     component: AdminView,
-    meta: { protected: true }
+    meta: { protected: true, requiresAdmin: true }
   },
   {
     path: '/admin/volunteer-coverage',
@@ -192,12 +192,12 @@ const routes = [
   { path: '/admin/volunteers',
     name: 'Volunteers',
     component: Volunteers,
-    meta: { protected: true }
+    meta: { protected: true, requiresAdmin: true }
   },
   { path: '/admin/volunteers/:id',
     name: 'VolunteerProfile',
     component: VolunteerProfile,
-    meta: { protected: true },
+    meta: { protected: true, requiresAdmin: true },
     props: true
   },
   {
@@ -246,6 +246,15 @@ router.beforeEach((to, from, next) => {
       }
     } else {
       next();
+    }
+  } if (to.matched.some(route => route.meta.requiresAdmin)) {
+    if (!AuthService.user.data.isAdmin) {
+      next({
+        path: '/login',
+        query: {
+          redirect: to.fullPath
+        }
+      })
     }
   } else {
     next();
