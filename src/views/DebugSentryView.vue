@@ -79,10 +79,10 @@ export default {
       );
     },
     debugSentryClient() {
-      if (!process.env.SENTRY_DSN) {
+      if (!process.env.VUE_APP_SENTRY_DSN) {
         this.msg = "No DSN configured";
       } else {
-        this.msg = "DSN: " + process.env.SENTRY_DSN;
+        this.msg = "DSN: " + process.env.VUE_APP_SENTRY_DSN;
       }
       throw new Error("Test of Sentry");
     }

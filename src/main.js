@@ -14,7 +14,7 @@ Vue.config.productionTip = false;
 Vue.use(VueSocketIO, process.env.VUE_APP_SOCKET_ADDRESS);
 
 Sentry.init({
-  dsn: process.env.SENTRY_DSN,
+  dsn: process.env.VUE_APP_SENTRY_DSN,
   integrations: [new Integrations.Vue({ Vue, attachProps: true })],
   environment: process.env.NODE_ENV,
   beforeSend(event, hint) {
