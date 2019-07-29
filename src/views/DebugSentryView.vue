@@ -40,11 +40,12 @@ export default {
   },
   methods: {
     debugSentryServer() {
-      this.$http.get(process.env.SERVER_ROOT + "/debug-sentry").then(
-        () => {
+      this.$http
+        .get(process.env.VUE_APP_SERVER_ROOT + "/debug-sentry")
+        .then(() => {
           this.msg = "Server debug did not throw error";
-        },
-        response => {
+        })
+        .catch(response => {
           if (response) {
             if (response.status) {
               this.msg = `Server responded with error ${response.status} (${
@@ -56,8 +57,7 @@ export default {
           } else {
             this.msg = "No server response";
           }
-        }
-      );
+        });
     },
     debugSentryApi() {
       NetworkService.debugSentryApi(this).then(
