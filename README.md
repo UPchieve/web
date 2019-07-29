@@ -53,13 +53,16 @@ npm run dev
 npm run build
 
 # run unit tests
-npm run unit
+npm run test
 
 # run e2e tests
 npm run e2e
 
-# run all tests
-npm test
+# run linter
+npm run lint
+
+# remove node_modules & dist then reinstall
+npm run clean-slate
 ```
 
 7. To track errors on Sentry using your own account, set the `SENTRY_DSN` environment variable in one of the local configuration files `config/prod.local.env.js` or `config/dev.local.env.js`. For example:
@@ -72,7 +75,5 @@ module.exports = {
 8. See [the web server repo](https://github.com/UPchieve/server) for server installation
 
 More information about our Vue setup:
+- [Vue CLI](https://cli.vuejs.org/guide/)
 - [Vue style guide](https://vuejs.org/v2/style-guide/)
-- [vue-loader](http://vuejs.github.io/vue-loader)
-- [Boilerplate Vue template this project used](http://vuejs-templates.github.io/webpack/)
-

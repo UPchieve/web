@@ -271,106 +271,102 @@
 </template>
 
 <script>
-import $ from 'jquery'
+import $ from "jquery";
 
-import validator from 'validator'
-
-import UserService from '@/services/UserService'
-import OnboardingService from '@/services/OnboardingService'
-
-import AutocompleteInput from './AutocompleteInput'
+import UserService from "@/services/UserService";
+import AutocompleteInput from "./AutocompleteInput";
 
 export default {
   components: {
     AutocompleteInput
   },
-  data () {
-    const user = UserService.getUser()
-    let button
-    user.race = user.race || []
-    user.birthdate = user.birthdate || ''
+  data() {
+    const user = UserService.getUser();
+    let button;
+    user.race = user.race || [];
+    user.birthdate = user.birthdate || "";
     if (!user.isVolunteer) {
-      button = 'NEXT'
+      button = "NEXT";
     } else {
-      button = 'DONE'
+      button = "DONE";
     }
     return {
       user,
       buttonMsg: button,
-      error: ''
-    }
+      error: ""
+    };
   },
   methods: {
-    submitProfile () {
-      this.error = ''
+    submitProfile() {
+      this.error = "";
 
-      const user = UserService.getUser()
+      const user = UserService.getUser();
       const birthdateValidation = UserService.validateBirthdate(
         this.user.birthdate
-      )
+      );
 
       if (!user.isVolunteer) {
-        if (!this.user.firstname || this.user.firstname === '') {
-          this.error = 'Please provide your full name'
-        } else if (!this.user.lastname || this.user.lastname === '') {
-          this.error = 'Please provide your full name'
-        } else if (!this.user.birthdate || this.user.birthdate === '') {
-          this.error = 'Please provide your birthday'
+        if (!this.user.firstname || this.user.firstname === "") {
+          this.error = "Please provide your full name";
+        } else if (!this.user.lastname || this.user.lastname === "") {
+          this.error = "Please provide your full name";
+        } else if (!this.user.birthdate || this.user.birthdate === "") {
+          this.error = "Please provide your birthday";
         } else if (birthdateValidation !== true) {
-          this.error = birthdateValidation
-        } else if (!this.user.gender || this.user.gender === '') {
-          this.error = 'Please select a gender'
+          this.error = birthdateValidation;
+        } else if (!this.user.gender || this.user.gender === "") {
+          this.error = "Please select a gender";
         } else if (!this.user.race.length) {
-          this.error = 'Please select a race'
-        } else if (!this.user.highschool || this.user.highschool === '') {
-          this.error = 'Please provide the name of your high school'
+          this.error = "Please select a race";
+        } else if (!this.user.highschool || this.user.highschool === "") {
+          this.error = "Please provide the name of your high school";
         } else if (
           !this.user.expectedGraduation ||
-          this.user.expectedGraduation === ''
+          this.user.expectedGraduation === ""
         ) {
-          this.error = 'Please provide your expected graduation year'
-        } else if (!this.user.referred || this.user.referred === '') {
-          this.error = 'Please provide your referral information'
+          this.error = "Please provide your expected graduation year";
+        } else if (!this.user.referred || this.user.referred === "") {
+          this.error = "Please provide your referral information";
         }
-      } else if (!this.user.firstname || this.user.firstname === '') {
-        this.error = 'Please provide your full name'
-      } else if (!this.user.lastname || this.user.lastname === '') {
-        this.error = 'Please provide your full name'
-      } else if (!this.user.birthdate || this.user.birthdate === '') {
-        this.error = 'Please provide your birthday'
+      } else if (!this.user.firstname || this.user.firstname === "") {
+        this.error = "Please provide your full name";
+      } else if (!this.user.lastname || this.user.lastname === "") {
+        this.error = "Please provide your full name";
+      } else if (!this.user.birthdate || this.user.birthdate === "") {
+        this.error = "Please provide your birthday";
       } else if (birthdateValidation !== true) {
-        this.error = birthdateValidation
-      } else if (!this.user.gender || this.user.gender === '') {
-        this.error = 'Please select a gender'
+        this.error = birthdateValidation;
+      } else if (!this.user.gender || this.user.gender === "") {
+        this.error = "Please select a gender";
       } else if (!this.user.race.length) {
-        this.error = 'Please select a race'
-      } else if (!this.user.phonePretty || this.user.phonePretty === '') {
-        this.error = 'Please provide your phone number'
-      } else if (!this.user.college || this.user.college === '') {
-        this.error = 'Please provide your college'
+        this.error = "Please select a race";
+      } else if (!this.user.phonePretty || this.user.phonePretty === "") {
+        this.error = "Please provide your phone number";
+      } else if (!this.user.college || this.user.college === "") {
+        this.error = "Please provide your college";
       } else if (
         !this.user.favoriteAcademicSubject ||
-        this.user.favoriteAcademicSubject === ''
+        this.user.favoriteAcademicSubject === ""
       ) {
-        this.error = 'Please provide your favorite academic subject'
+        this.error = "Please provide your favorite academic subject";
       } else if (!this.user.referred.length) {
-        this.error = 'Please provide your referral information'
+        this.error = "Please provide your referral information";
       }
 
-      if (this.error !== '') {
-        $('body').animate({ scrollTop: 0 })
-        return
+      if (this.error !== "") {
+        $("body").animate({ scrollTop: 0 });
+        return;
       }
 
-      this.buttonMsg = 'UPDATING...'
+      this.buttonMsg = "UPDATING...";
       if (!user.isVolunteer) {
-        UserService.setProfile(this, this.user, '/onboarding/academic')
+        UserService.setProfile(this, this.user, "/onboarding/academic");
       } else {
-        UserService.setProfile(this, this.user, '/')
+        UserService.setProfile(this, this.user, "/");
       }
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -461,7 +457,7 @@ select.form-control:focus {
   border: 1px solid #16d2aa;
 }
 
-button[type='submit'] {
+button[type="submit"] {
   width: 140px;
   height: 40px;
   background-color: #f6f6f6;
@@ -474,8 +470,8 @@ button[type='submit'] {
   float: right;
 }
 
-button[type='submit']:hover,
-button[type='submit']:active {
+button[type="submit"]:hover,
+button[type="submit"]:active {
   background-color: #16d2aa;
   color: #fff;
 }
@@ -497,8 +493,6 @@ button[type='submit']:active {
   background-color: #ffffff;
   border-left: 5px solid #1855d1;
 }
-
-
 
 @media screen and (max-width: 700px) {
   .header {

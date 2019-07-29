@@ -1,32 +1,31 @@
-import errorFromServer from '@/utils/error-from-server'
+import NetworkService from "./NetworkService";
 
-import NetworkService from './NetworkService'
-
-function _errHandler (context, err) {
-  if ((!err.body || !err.body.sentryEventId) && 
-  err.status !== 0 && err.status !== 401) {
-    context.$parent.$emit('async-error', err.body ? err.body.err : err)
+function _errHandler(context, err) {
+  if (
+    (!err.body || !err.body.sentryEventId) &&
+    err.status !== 0 &&
+    err.status !== 401
+  ) {
+    context.$parent.$emit("async-error", err.body ? err.body.err : err);
   }
-  console.error(new Error('Unable to check if message is clean'))
-  console.log(err)
-  throw err
+
+  throw err;
 }
 
 export default {
-  checkIfMessageIsClean (context, data) {
+  checkIfMessageIsClean(context, data) {
     return NetworkService.checkIfMessageIsClean(context, {
       content: data
-    }).then(
-      res => {
-        if ('err' in res.body) {
-          return _errHandler(context, res)
+    })
+      .then(res => {
+        if ("err" in res.body) {
+          return _errHandler(context, res);
         } else {
-          return res.body.isClean
+          return res.body.isClean;
         }
       })
       .catch(err => {
-        return _errHandler(context, err)
-      }
-    )
+        return _errHandler(context, err);
+      });
   }
-}
+};

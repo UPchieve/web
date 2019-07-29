@@ -3,7 +3,9 @@
     <form class="uc-form">
       <div class="uc-form-header">
         <div class="uc-form-header-link--active">Log In</div>
-        <router-link to="signup" class="uc-form-header-link">Sign Up</router-link>
+        <router-link to="signup" class="uc-form-header-link"
+          >Sign Up</router-link
+        >
       </div>
 
       <div class="uc-form-body">
@@ -41,11 +43,7 @@
           </router-link>
         </div>
 
-        <button
-          class="uc-form-button"
-          type="submit"
-          @click.prevent="submit"
-        >
+        <button class="uc-form-button" type="submit" @click.prevent="submit">
           Login
         </button>
       </div>
@@ -56,121 +54,62 @@
 </template>
 
 <script>
-import FormPageTemplate from '@/components/FormPageTemplate'
-
-import AuthService from '@/services/AuthService'
-
-import FormFooter from '@/components/FormFooter'
+import AuthService from "@/services/AuthService";
+import FormPageTemplate from "@/components/FormPageTemplate";
+import FormFooter from "@/components/FormFooter";
 
 export default {
   components: {
     FormPageTemplate,
-	  FormFooter
+    FormFooter
   },
-  data () {
-    let error
-    if (this.$route.query['401'] === 'true') {
-      error = 'Your session has expired. Please login again'
+  data() {
+    let error;
+    if (this.$route.query["401"] === "true") {
+      error = "Your session has expired. Please login again";
     }
     return {
       credentials: {
-        email: '',
-        password: ''
+        email: "",
+        password: ""
       },
       error
-    }
+    };
   },
   methods: {
-    submit () {
+    submit() {
       var promise = AuthService.login(
         this,
         {
           email: this.credentials.email,
           password: this.credentials.password
         },
-        this.$route.query.redirect || '/'
-      )
+        this.$route.query.redirect || "/"
+      );
       if (promise) {
         promise.catch(err => {
           // so it will be handled by parent ErrorFeedback component
-          this.$parent.$emit('async-error', err)
-        })
+          this.$parent.$emit("async-error", err);
+        });
       } else {
-        this.error = 'You must enter a username and password'
+        this.error = "You must enter a username and password";
       }
     }
   },
-  beforeRouteEnter (to, from, next) {
+  beforeRouteEnter(to, from, next) {
     if (AuthService.user.authenticated) {
       next({
-        path: '/'
-      })
+        path: "/"
+      });
     } else {
-      next()
+      next();
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
 .alert {
   margin-bottom: 0;
-}
-
-.background {
-  display: flex;
-  background-image: url('../assets/onboarding_background.png');
-  background-size: cover;
-  height: 100%;
-  font-size: 16px;
-  margin-left: -300px;
-  position: relative;
-  z-index: 2;
-}
-
-.main-page {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-}
-
-.logo-img {
-  width: 155px;
-  padding-bottom: 25px;
-}
-
-.logo-class {
-  flex: 1;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-
-.bottom-div {
-  flex: 1;
-}
-
-
-
-
-
-
-@media screen and (max-width: 488px) {
-  .background {
-    margin-left: 0em !important;
-    padding-left: 0em !important;
-  }
-
-  .logo-img {
-    width: 40% !important;
-    min-width: 110px !important;
-  }
-
-  .form-div {
-    width: 100vw !important;
-  }
 }
 </style>

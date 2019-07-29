@@ -2,7 +2,10 @@
   <div id="app">
     <div v-if="!$route.meta.hideSidebar" class="sidebar-wrapper">
       <!-- Sidebar -->
-      <div class="nav-container" v-bind:class="{forMobileMode: mobileMode, active: isActive}">
+      <div
+        class="nav-container"
+        v-bind:class="{ forMobileMode: mobileMode, active: isActive }"
+      >
         <sidebar v-on:closeMenu="closeMenu()" />
       </div>
 
@@ -12,7 +15,7 @@
           v-if="!isActive"
           @click="toggleMenu()"
           class="sidebar-hamburger"
-          v-bind:class="{white: $route.name === 'DashboardView'}"
+          v-bind:class="{ white: $route.name === 'DashboardView' }"
         />
 
         <button v-else @click="toggleMenu()" class="sidebar-exit" />
@@ -31,56 +34,55 @@
 </template>
 
 <script>
-import './scss/main.scss'
-import Sidebar from './components/Sidebar'
-import ErrorFeedback from './components/ErrorFeedback'
-import AuthService from './services/AuthService'
+import "./scss/main.scss";
+import Sidebar from "./components/Sidebar";
+import ErrorFeedback from "./components/ErrorFeedback";
+import AuthService from "./services/AuthService";
 
-const MOBILE_MODE_WIDTH = 700
+const MOBILE_MODE_WIDTH = 700;
 
 /**
  * @todo Examine this, huge code smell, refactoring might be needed
  */
-AuthService.checkAuth() // {1}
+AuthService.checkAuth(); // {1}
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
     Sidebar,
     ErrorFeedback
   },
-  created () {
-    AuthService.checkAuth(this) // {1}
+  created() {
+    AuthService.checkAuth(this); // {1}
 
     // Update mobileMode on window resize
-    window.addEventListener('resize', () => {
-      this.mobileMode = window.innerWidth <= MOBILE_MODE_WIDTH
-    })
+    window.addEventListener("resize", () => {
+      this.mobileMode = window.innerWidth <= MOBILE_MODE_WIDTH;
+    });
   },
-  data () {
+  data() {
     return {
       mobileMode: window.innerWidth <= MOBILE_MODE_WIDTH,
       isActive: false
-    }
+    };
   },
   methods: {
     toggleMenu() {
-      this.isActive = !this.isActive
+      this.isActive = !this.isActive;
     },
     closeMenu() {
       if (this.mobileMode) {
-        this.isActive = false
+        this.isActive = false;
       }
     }
   }
-}
+};
 </script>
 
 <style lang="scss">
 /*
  * @todo {1} Make this truly responsive
  */
-
 
 .toggleMenu.forMobileView {
   display: none;
@@ -133,8 +135,6 @@ body,
   /*------------------------------------------------------------------quickfix*/
 }
 
-
-
 @media screen and (max-width: 700px) {
   .toggleMenu.forMobileView {
     display: block !important;
@@ -153,14 +153,14 @@ body,
     width: 2em !important;
     height: 1.5em !important;
     margin: 0em 0em 0em 0.5em !important;
-    background: url('./assets/tealHamburgerMenu.png') !important;
+    background: url("./assets/tealHamburgerMenu.png") !important;
     background-size: auto 100% !important;
     background-position: top left !important;
     background-repeat: no-repeat !important;
     border: none !important;
   }
   .sidebar-hamburger.white {
-    background: url('./assets/whiteHamburgerMenu.png') !important;
+    background: url("./assets/whiteHamburgerMenu.png") !important;
     background-size: auto 100% !important;
     background-position: top left !important;
     background-repeat: no-repeat !important;
@@ -172,7 +172,7 @@ body,
     height: 1.5em !important;
     position: fixed !important;
     /* margin-top: 1em !important; */
-    background: url('./assets/exitMenuIcon.png') !important;
+    background: url("./assets/exitMenuIcon.png") !important;
     background-size: auto 100% !important;
     background-position: top left !important;
     background-repeat: no-repeat !important;
@@ -188,7 +188,7 @@ body,
   }
 
   .nav-container.forMobileMode.active {
-     margin-left: 0% !important;
+    margin-left: 0% !important;
   }
 
   .col-xs-12.view-container {

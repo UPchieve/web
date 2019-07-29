@@ -6,14 +6,14 @@
 </template>
 
 <script>
-export default {}
+export default {};
 </script>
 
 <style lang="scss" scoped>
 .FormPageTemplate {
   @include flex-container(column, center, center);
 
-  background: url('~@/assets/onboarding_background.png') no-repeat center fixed;
+  background: url("~@/assets/onboarding_background.png") no-repeat center fixed;
   background-size: cover;
 
   min-width: 300px;

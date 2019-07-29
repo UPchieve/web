@@ -2,13 +2,22 @@
   <div class="main-page">
     <div class="form-div">
       <form class="form-debug-sentry">
-        <button class="btn btn-lg btn-primary debug-btn" @click.prevent="debugSentryServer">
+        <button
+          class="btn btn-lg btn-primary debug-btn"
+          @click.prevent="debugSentryServer"
+        >
           Test Sentry on Server
         </button>
-        <button class="btn btn-lg btn-primary debug-btn" @click.prevent="debugSentryApi">
+        <button
+          class="btn btn-lg btn-primary debug-btn"
+          @click.prevent="debugSentryApi"
+        >
           Test Sentry on Server API
         </button>
-        <button class="btn btn-lg btn-primary debug-btn" @click.prevent="debugSentryClient">
+        <button
+          class="btn btn-lg btn-primary debug-btn"
+          @click.prevent="debugSentryClient"
+        >
           Test Sentry on Client
         </button>
         <p class="message">
@@ -20,62 +29,65 @@
 </template>
 
 <script>
-import NetworkService from '@/services/NetworkService'
-import errorFromServer from '@/utils/error-from-server'
+import NetworkService from "@/services/NetworkService";
+import errorFromServer from "@/utils/error-from-server";
 
 export default {
-  data () {
+  data() {
     return {
-      msg: ''
-    }
+      msg: ""
+    };
   },
   methods: {
-    debugSentryServer () {
-      this.$http.get(process.env.SERVER_ROOT + '/debug-sentry')
-      .then(response => {
-        this.msg = 'Server debug did not throw error'
-      },
-      response => {
-        if (response) {
-          if (response.status) {
-            this.msg = `Server responded with error ${response.status} (${response.statusText})`
+    debugSentryServer() {
+      this.$http.get(process.env.SERVER_ROOT + "/debug-sentry").then(
+        () => {
+          this.msg = "Server debug did not throw error";
+        },
+        response => {
+          if (response) {
+            if (response.status) {
+              this.msg = `Server responded with error ${response.status} (${
+                response.statusText
+              })`;
+            } else {
+              this.msg = "Network error";
+            }
           } else {
-            this.msg = 'Network error'
+            this.msg = "No server response";
           }
-        } else {
-          this.msg = 'No server response'
         }
-      })
+      );
     },
-    debugSentryApi () {
-      NetworkService.debugSentryApi(this)
-      .then(response => {
-        this.msg = 'Server API did not throw error'
-      },
-      response => {
-        if (response) {
-          if (response.status) {
-            this.msg = `Server responded with status code ${response.status}, see console for error`
-            console.log(response.data.err)
-            this.$parent.$emit('async-error', errorFromServer(response))
+    debugSentryApi() {
+      NetworkService.debugSentryApi(this).then(
+        () => {
+          this.msg = "Server API did not throw error";
+        },
+        response => {
+          if (response) {
+            if (response.status) {
+              this.msg = `Server responded with status code ${response.status}`;
+              this.$parent.$emit("async-error", errorFromServer(response));
+            } else {
+              this.msg = "Network error";
+            }
           } else {
-            this.msg = 'Network error'
+            this.msg = "No server response";
           }
-        } else {
-          this.msg = 'No server response'
         }
-      })
+      );
     },
-    debugSentryClient () {
+    debugSentryClient() {
       if (!process.env.SENTRY_DSN) {
-        this.msg = 'No DSN configured'
+        this.msg = "No DSN configured";
       } else {
-        this.msg = 'DSN: ' + process.env.SENTRY_DSN
+        this.msg = "DSN: " + process.env.SENTRY_DSN;
       }
-      throw new Error('Test of Sentry')
+      throw new Error("Test of Sentry");
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -116,7 +128,7 @@ button.debug-btn {
 
 @media screen and (max-width: 488px) {
   .form-div {
-    width: 100%
+    width: 100%;
   }
 
   .form-debug-sentry {

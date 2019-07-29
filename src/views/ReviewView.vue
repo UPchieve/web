@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import UserService from '@/services/UserService'
+import UserService from "@/services/UserService";
 
 /**
  * @todo {1} Refactor into global filters (https://vuejs.org/v2/guide/filters.html)
@@ -18,29 +18,29 @@ import UserService from '@/services/UserService'
 export default {
   filters: {
     // {1}
-    capitalize (value) {
-      if (!value) return ''
-      const valueStr = value.toString()
-      return valueStr.charAt(0).toUpperCase() + valueStr.slice(1)
+    capitalize(value) {
+      if (!value) return "";
+      const valueStr = value.toString();
+      return valueStr.charAt(0).toUpperCase() + valueStr.slice(1);
     },
-    uppercase (value) {
-      if (!value) return ''
-      return value.toString().toUpperCase()
+    uppercase(value) {
+      if (!value) return "";
+      return value.toString().toUpperCase();
     }
   },
-  data () {
-    const user = UserService.getUser()
-    const { category } = this.$route.params
+  data() {
+    const user = UserService.getUser();
+    const { category } = this.$route.params;
     return {
       user,
       category
-    }
+    };
   },
-  beforeMount () {
-    this.styleImages()
+  beforeMount() {
+    this.styleImages();
   },
   methods: {}
-}
+};
 </script>
 
 <style lang="scss" scoped>

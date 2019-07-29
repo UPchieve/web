@@ -1,33 +1,31 @@
-import * as sentry from '@sentry/browser'
-
-import feedbackHandler from '@/utils/error-feedback-handling'
+import feedbackHandler from "@/utils/error-feedback-handling";
 
 export default {
-  mounted () {
-    this.$on('async-error', function (err) {
-      this.captureError(err)
-    })
+  mounted() {
+    this.$on("async-error", function(err) {
+      this.captureError(err);
+    });
   },
-  data () {
+  data() {
     return {
       error: null,
       eventId: null
-    }
+    };
   },
   methods: {
-    captureError (err) {
-      this.error = err
-      feedbackHandler.captureExceptionWithFeedback(this, err)
+    captureError(err) {
+      this.error = err;
+      feedbackHandler.captureExceptionWithFeedback(this, err);
     }
   },
-  errorCaptured (err, vm, info) {
-    this.captureError(err)
-    return false
+  errorCaptured(err) {
+    this.captureError(err);
+    return false;
   },
-  render () {
+  render() {
     return this.$scopedSlots.default({
       error: this.error,
       eventId: this.eventId
-    })
+    });
   }
-}
+};
