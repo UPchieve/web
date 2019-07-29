@@ -25,6 +25,11 @@ export default {
       .post(`${AUTH_ROOT}/register/checkcred`, data)
       .then(this._successHandler, this._errorHandler)
   },
+  checkEmail (context, data) {
+    return context.$http
+      .post(`${AUTH_ROOT}/checkemail`, data)
+      .then(this._successHandler, this._errorHandler)
+  },
   register (context, data) {
     return context.$http
       .post(`${AUTH_ROOT}/register`, data)

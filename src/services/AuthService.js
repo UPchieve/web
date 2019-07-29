@@ -76,6 +76,14 @@ export default {
     })
   },
 
+  checkEmail (context, creds) {
+    return NetworkService.checkEmail(context, creds).then(res => {
+      if (res.data.err) {
+        throw new Error(res.data.err)
+      }
+    })
+  },
+
   sendReset (context, email, redirect) {
     return NetworkService.sendReset(context, { email }).then(res => {
       const data = { ...res.data }
