@@ -29,7 +29,9 @@
       </div>
     </div>
 
-    <router-view v-else />
+    <error-feedback v-else>
+      <router-view />
+    </error-feedback>
   </div>
 </template>
 
@@ -41,11 +43,6 @@ import AuthService from "./services/AuthService";
 
 const MOBILE_MODE_WIDTH = 700;
 
-/**
- * @todo Examine this, huge code smell, refactoring might be needed
- */
-AuthService.checkAuth(); // {1}
-
 export default {
   name: "App",
   components: {
@@ -53,7 +50,7 @@ export default {
     ErrorFeedback
   },
   created() {
-    AuthService.checkAuth(this); // {1}
+    AuthService.checkAuth(this);
 
     // Update mobileMode on window resize
     window.addEventListener("resize", () => {

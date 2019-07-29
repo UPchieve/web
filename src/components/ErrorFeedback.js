@@ -1,7 +1,9 @@
-import feedbackHandler from "@/utils/error-feedback-handling";
+import * as sentry from "@sentry/browser";
 
 export default {
   mounted() {
+    // the async-error event is used to capture exceptions that occur
+    // in promises, which are not by default handled by errorCaptured
     this.$on("async-error", function(err) {
       this.captureError(err);
     });
@@ -15,7 +17,18 @@ export default {
   methods: {
     captureError(err) {
       this.error = err;
-      feedbackHandler.captureExceptionWithFeedback(this, err);
+      sentry.withScope(function(scope) {
+        scope.addEventProcessor(function(event) {
+          this.eventId = err.sentryEventId || event.event_id;
+          // the err.breaking property is added by our app to distinguish errors
+          // that break usability
+          if (err.breaking) {
+            sentry.showReportDialog({ eventId: self.eventId });
+          }
+          return event;
+        });
+        sentry.captureException(err);
+      });
     }
   },
   errorCaptured(err) {
