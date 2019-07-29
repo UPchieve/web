@@ -246,7 +246,8 @@
                       <input 
                       v-model="volunteer[key].passed"
                       type="checkbox"
-                      @change="certifications[key] = volunteer[key].passed">
+                      @change="certifications[key] = volunteer[key].passed, 
+                      volunteer.hasCertification = checkHasCertification()">
                         {{key}} </label>
                     </div>
                   </div>
@@ -293,14 +294,17 @@ export default {
       saveFailed: false,
       certifications: {
         'algebra':false,
+        'applications': false,
+        'biology': false,
         'calculus':false,
-        'essays':false,
-        'precalculus': false,
-        'geometry': false,
-        'trigonometry': false,
+        'chemistry': false,
         'esl':false,
+        'essays':false,
+        'geometry': false,
+        'precalculus': false,
+        'trigonometry': false,
         'planning': false,
-        'applications': false},
+        },
       certKey: {}, //stores a map to larger category of each subtopic, used for label
       availabilityArray: [], //stores availability array in a simpler for to display
       invalidInputs: [], //tracks which inputs were invalids
@@ -318,7 +322,15 @@ export default {
   },
 
   methods: {
-    getAvailability() {
+
+    // updates the virtual hasCertification property
+    checkHasCertification () {
+      return Object.values(this.certifications).includes(true)
+    },
+
+    /* converts availability into 2D flat array with row and column headers to 
+    make it cleaner to display in grid form*/
+    getAvailability () {
       var daysOfWeek
       var timesOfDay
       const availability = this.volunteer.availability
@@ -352,7 +364,8 @@ export default {
       this.availabilityArray = availabilityArray.flat()
     },
 
-    setCertifications() {
+    // stores certifications that volunteer has in certification objects 
+    setCertifications () {
       for(const key in this.certifications){
         if(this.volunteer.hasOwnProperty(key)){
           if(this.volunteer[key].passed){
@@ -369,6 +382,8 @@ export default {
       this.certKey.planning = 'COLLEGE'
       this.certKey.essays = 'COLLEGE'
       this.certKey.applications = 'COLLEGE'
+      this.certKey.biology = 'SCIENCE'
+      this.certKey.chemistry = 'SCIENCE'
 
     },
         /**
@@ -389,6 +404,7 @@ export default {
       this.errors = []
       this.invalidInputs = []
       this.saveFailed = false
+      var checkEmailPromise = null
 
       // checks if email is a valid email
       if (!validator.isEmail(user.email)) {
@@ -398,7 +414,7 @@ export default {
           this.invalidInputs.push('email')
           }
       else { //if email is not valid check if email is taken by another user
-        const checkEmailPromise = AuthService.checkEmail(this, {
+          checkEmailPromise = AuthService.checkEmail(this, {
           email: user.email,
           userid: user._id
         })
@@ -444,7 +460,7 @@ export default {
         }
       
       //after checking email is not taken, display errors
-      checkEmailPromise.then (function processErrors() {
+      checkEmailPromise.then(function processErrors() {
         if (!this.errors.length) {
           // form fields valid, so set profile
           // wait for save to succeed before coming out of edit mode
@@ -643,10 +659,11 @@ input[type="checkbox"] {
   background-color: #f7aef8;
 }
 
-.HELP{
-  display: flex;
- 
+.SCIENCE {
+  background-color: lightgreen;
 }
+
+
 
 .grid{
     display: grid;
