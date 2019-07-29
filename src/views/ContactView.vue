@@ -13,7 +13,10 @@
           </p>
         </td>
       </tr>
-      <tr class="question-row" v-for="(question,index) in questions">
+      <tr
+        class="question-row"
+        v-for="(question,index) in questions"
+        :key="index">
         <td class="question-cell">
           <div class="question-title">{{ question.title }}</div>
           <!-- IF MUTLIPLE CHOICE -->
@@ -24,6 +27,7 @@
                 <td
                   class="checkbox-question-selection-title"
                   v-for="(label, index) in question.table_title"
+                  :key="index"
                 >
                   {{ label }}
                 </td>
@@ -31,6 +35,7 @@
               <tr
                 class="checkbox-question-row forMobileView"
                 v-for="(subquestion, subquestion_index) in question.options"
+                :key="subquestion_index"
               >                
                 <td
                   class="checkbox-question-selection-cell container"
@@ -168,17 +173,15 @@ export default {
   beforeMount () {
     var _self = this
     this.questions = this.contactQuestions
-    this.questions.map(function (question, key) {
+    this.questions.map(function (question) {
       if (question.qtype == 'multiple-checkbox')
         _self.userResponse[question.alias] = {}
     })
   },
   methods: {
     submitContactUs () {
-      console.log(this.userResponse)
       if (!this.isValidEmail(this.userResponse['email'])) {
         alert("A valid email required.")
-        e.preventDefault();
       }
       else {
         NetworkService.sendContact(this, {
@@ -188,7 +191,7 @@ export default {
       }
     },
     isValidEmail (address) {
-      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       return re.test(String(address).toLowerCase());
     },
   }
