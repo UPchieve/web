@@ -8,18 +8,43 @@
         >
           Test Sentry on Server
         </button>
-        <button
-          class="btn btn-lg btn-primary debug-btn"
-          @click.prevent="debugSentryApi"
-        >
-          Test Sentry on Server API
-        </button>
-        <button
-          class="btn btn-lg btn-primary debug-btn"
-          @click.prevent="debugSentryClient"
-        >
-          Test Sentry on Client
-        </button>
+        <div class="form-group">
+          <div class="form-check">
+            <input
+              id="serverApiBreaking"
+              v-model="serverApiBreaking"
+              type="checkbox"
+              class="form-check-input"
+            />
+            <label for="serverApiBreaking" class="form-check-label">
+              Breaking
+            </label>
+          </div>
+          <button
+            class="btn btn-lg btn-primary debug-btn"
+            @click.prevent="debugSentryApi"
+          >
+            Test Sentry on Server API
+          </button>
+        </div>
+        <div class="form-group">
+          <div class="form-check">
+            <input
+              id="clientBreaking"
+              v-model="clientBreaking"
+              type="checkbox"
+            />
+            <label for="clientBreaking" class="form-check-label">
+              Breaking
+            </label>
+          </div>
+          <button
+            class="btn btn-lg btn-primary debug-btn"
+            @click.prevent="debugSentryClient"
+          >
+            Test Sentry on Client
+          </button>
+        </div>
         <p class="message">
           {{ msg }}
         </p>
@@ -35,6 +60,8 @@ import errorFromServer from "@/utils/error-from-server";
 export default {
   data() {
     return {
+      serverApiBreaking: false,
+      clientBreaking: false,
       msg: ""
     };
   },
@@ -68,7 +95,11 @@ export default {
           if (response) {
             if (response.status) {
               this.msg = `Server responded with status code ${response.status}`;
-              this.$parent.$emit("async-error", errorFromServer(response));
+              let err = errorFromServer(response);
+              if (this.serverApiBreaking) {
+                err.breaking = true;
+              }
+              this.$parent.$emit("async-error", err);
             } else {
               this.msg = "Network error";
             }
@@ -84,7 +115,11 @@ export default {
       } else {
         this.msg = "DSN: " + process.env.VUE_APP_SENTRY_DSN;
       }
-      throw new Error("Test of Sentry");
+      let err = new Error("Test of Sentry");
+      if (this.clientBreaking) {
+        err.breaking = true;
+      }
+      throw err;
     }
   }
 };
@@ -124,6 +159,7 @@ button.debug-btn {
   color: white;
   font-weight: 600;
   background-color: #16d2aa;
+  width: 100%;
 }
 
 @media screen and (max-width: 488px) {

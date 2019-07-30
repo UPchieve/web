@@ -17,9 +17,11 @@ export default {
   methods: {
     captureError(err) {
       this.error = err;
+
+      let self = this;
       sentry.withScope(function(scope) {
         scope.addEventProcessor(function(event) {
-          this.eventId = err.sentryEventId || event.event_id;
+          self.eventId = err.sentryEventId || event.event_id;
           // the err.breaking property is added by our app to distinguish errors
           // that break usability
           if (err.breaking) {
