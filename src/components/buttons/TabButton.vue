@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import ButtonTemplate from './ButtonTemplate';
+import ButtonTemplate from "./ButtonTemplate";
 
 export default {
   components: {

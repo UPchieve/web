@@ -18,7 +18,7 @@
         'RadioButton-label--disabled': disabled
       }"
     >
-      <slot/>
+      <slot />
     </label>
   </div>
 </template>
@@ -39,10 +39,10 @@ export default {
   },
   computed: {
     checked() {
-      return this.$attrs.value === this.checkedValue
+      return this.$attrs.value === this.checkedValue;
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -71,8 +71,9 @@ export default {
   width: $size;
   height: $size;
 
-  &:before { // outside circle
-    content: '';
+  // outside circle
+  &:before {
+    content: "";
     border: 1px solid $c-border-grey;
     border-radius: 100%;
     position: absolute;
@@ -87,9 +88,10 @@ export default {
       border-color: $c-success-green;
     }
 
-    &:after { // inner circle
+    // inner circle
+    &:after {
       $inset: 3px;
-      content: '';
+      content: "";
       background: $c-success-green;
       border-radius: 100%;
       position: absolute;

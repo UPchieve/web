@@ -1,6 +1,10 @@
 <template>
   <div class="DropdownList">
-    <label :for="id" class="DropdownList-label" :class="{'DropdownList-label--disabled': disabled}">
+    <label
+      :for="id"
+      class="DropdownList-label"
+      :class="{ 'DropdownList-label--disabled': disabled }"
+    >
       {{ label }}
     </label>
 
@@ -11,12 +15,7 @@
       :value="value"
       @input="$emit('input', $event.target.value)"
     >
-      <option
-        v-if="disabledOption"
-        selected
-        disabled
-        value=""
-      >
+      <option v-if="disabledOption" selected disabled value="">
         {{ disabledOption }}
       </option>
 
@@ -41,7 +40,7 @@ export default {
     disabledOption: String,
     options: {}
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -74,4 +73,3 @@ export default {
   }
 }
 </style>
-

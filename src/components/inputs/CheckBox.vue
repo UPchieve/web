@@ -11,7 +11,7 @@
 
     <label
       class="CheckBox-label"
-      :class="{'CheckBox-label--checked': checked}"
+      :class="{ 'CheckBox-label--checked': checked }"
       :for="id"
     >
       <slot />
@@ -23,7 +23,7 @@
 export default {
   inheritAttrs: false,
   model: {
-    prop: 'checked',
+    prop: "checked",
     event: "change"
   },
   props: {
@@ -31,7 +31,7 @@ export default {
     id: {
       type: String,
       required: true
-    },
+    }
   }
 };
 </script>
@@ -61,7 +61,7 @@ export default {
   margin: 0; // bootstrap fix
 
   &:after {
-    content: '✓';
+    content: "✓";
     opacity: 0;
   }
 

@@ -1,5 +1,9 @@
 <template>
-  <i class="UpchieveIcon" :class="`ucif-${icon}`" :style="{ color, fontSize: size }" />
+  <i
+    class="UpchieveIcon"
+    :class="`ucif-${icon}`"
+    :style="{ color, fontSize: size }"
+  />
 </template>
 
 <script>

@@ -16,12 +16,12 @@
       :id="id"
       type="text"
       class="TextField-input"
-      :class="{['TextField-input--error']: showError}"
+      :class="{ ['TextField-input--error']: showError }"
       :disabled="disabled"
       :placeholder="placeholder"
       :value="value"
       @input="$emit('input', $event.target.value)"
-    >
+    />
 
     <div v-if="showError" class="TextField-error">{{ error }}</div>
   </div>
@@ -42,10 +42,10 @@ export default {
   },
   computed: {
     showError() {
-      return this.error && !this.disabled
+      return this.error && !this.disabled;
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
