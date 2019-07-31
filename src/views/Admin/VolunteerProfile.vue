@@ -487,6 +487,12 @@ export default {
 
 <style lang="scss" scoped>
 
+
+.volunteer-profile {
+  font-size: 16px;
+  font-family: $default-font;
+}
+
 .header {
   display: flex;
   padding: 30px;
@@ -525,7 +531,7 @@ export default {
 
 .wrap-container {
   display: flex;
-  flex-wrap: wrap;
+  width: auto;
   margin: 40px;
   flex-direction: column;
 }
@@ -545,8 +551,9 @@ export default {
     padding: 30px;
     display: flex;
     flex-flow: row;
+    flex-wrap: wrap-reverse;
     padding: 40px;
-    justify-content: space-around;
+    //justify-content: space-around;
 
 }
 
@@ -672,10 +679,10 @@ input[type="checkbox"] {
 
 .grid{
     display: grid;
-    margin: 20px;
     grid-auto-flow: column;
-    grid-template-columns: 30px repeat(7, 1fr);
-    grid-template-rows: repeat(25, 1fr);
+    padding: 20px;
+    grid-template-columns: 20px repeat(7, minmax(0, 1fr));
+    grid-template-rows: repeat(25, auto);
     grid-gap: 2px;
 }
 
@@ -683,7 +690,7 @@ input[type="checkbox"] {
 height: 20px;
   &--true {
     @extend .cell;
-     border: 1px solid grey;
+    border: 1px solid grey;
     background-color:  #16d2aa;
   }
   &--false  {
@@ -699,10 +706,25 @@ height: 20px;
   }
 }
 
-.volunteer-profile {
-  font-size: 16px;
-  font-family: $default-font;
+@media screen and (max-width: 700px) {
+  .header {
+    padding: 1em 20px 1em 3em !important;
+  }
+  .grid{
+    display: grid;
+    grid-auto-flow: column;
+    padding: 10px;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-rows: repeat(25, auto);
+    grid-gap: 2px;
+  }
+  .cell--header {
+    visibility: hidden;
+    width: 30px;
+  }
+  &::first-letter {
+    visibility:visible;
+  }
 }
-
 
 </style>
