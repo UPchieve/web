@@ -2,7 +2,6 @@
 <div class='volunteer-coverage'>
     <div class='header'>Volunteer Coverage </div>
         <div class='wrap-container'>
-
             <div class = 'container-metric'> 
                 <div class='subheader-metric'># hours w/ less than 
                     <form>
@@ -33,13 +32,23 @@
                     <div class = 'subject-selecter'>
                         <v-select v-model= 'selected' :options='topics' @input ='getAvailability'> </v-select>
                     </div>
-                    <div class = 'grid'>
-                        <div v-for='(cell, index) in availabilityTable'
-                        :key = '`${index}`'>
-                            <div v-bind:class = "[{'cell-header': typeof(cell) == 'string',
-                            'cell-data': typeof(cell) != 'string'}]" 
-                            :style = "{ '--rgb': getColor(cell), '--hour': getGradient(cell)}">
+                    <div class = 'table-layout'>
+                        <div class = 'subtable-days'>
+                            <div class = 'cell-header' v-for='(day) in availabilityTable.daysOfWeek' :key = '`${day}`'>
+                            {{day}}
+                            </div>
+                        </div>
+                        <div class = 'subtable-times' >
+                            <div class = 'cell-header' v-for='(time) in availabilityTable.timesOfDay' :key = '`${time}`'>
+                            {{time}}
+                            </div>
+                        </div>
+                        <div class = 'subtable-data'>
+                            <div v-for='(cell, index) in availabilityTable.table'
+                            :key = '`${index}`'>
+                                <div class = 'cell-data' :style = "{ '--rgb': getColor(cell), '--hour': getGradient(cell)}">
                                 {{cell}}
+                                </div> 
                             </div>
                         </div>
                     </div>
@@ -61,22 +70,18 @@ export default{
             greaterThanColor: '0, 255, 0', // highlighting color for > metric
             lessAndGreaterThanColor: '255, 0, 255', // highlighting color for intersection between < and >
             errorMsg: '',
-            // inputted values
+            // user inputted values
             lessThan : '', 
             greaterThan: '',
             // dropdown menu options
             selected : 'algebra', // default
             topics: ['algebra', 'applications', 'biology', 'calculus', 'chemistry', 'esl', 'essays', 'geometry', 'planning', 'precalculus', 'trigonometry'],
-            maxVolunteers : 0, // stores the max volunteers this week
-            minVolunteers : 0, // stores the min volunteers this week
-            /* 1D array that is a flattened 2D array that represents 
-            the calendar. It is stored 1D for ease with css grid
-            */
-            availabilityTable: [] 
-            }
-        },
+           // availability objects
+           availabilityTable: {}
+        }
+    },
  
-    created () {
+    created() {
        this.getAvailability(this.selected)
     },
 
@@ -86,10 +91,9 @@ export default{
         in the "certifiedSubject". */
         getAvailability (certifiedSubject) {
             UserService.getVolunteersAvailability(this, certifiedSubject).then(availability => {
-               
-                this.minVolunteers = availability.min // minimum # of volunteers available in any hour that week
-                this.maxVolunteers = availability.max // maximum # of volunteers available in any hour that week
-                this.availabilityTable = availability.table.flat()
+                this.availabilityTable = availability
+                //flattening table makes the implementation of css grid cleaner
+                this.availabilityTable.table = availability.table.flat()
                 return this.availabilityTable
             }).catch(err => {
                 this.errorMsg = err.message
@@ -103,9 +107,9 @@ export default{
         than (false)*/
         getNumHours (lessThan) {
             let totalHours = 0
-            if (this.availabilityTable && this.availabilityTable.length != 0){
-                this.availabilityTable.forEach(currentValue => {
-                    if (((typeof(currentValue) === 'number') && currentValue.length != 0) && 
+            if (this.availabilityTable.table && this.availabilityTable.table.length != 0){
+                this.availabilityTable.table.forEach(currentValue => {
+                    if (currentValue.length != 0 && 
                     ((lessThan && (this.lessThan.length !=0) && currentValue < this.lessThan) || 
                     (!lessThan && (this.greaterThan.length !=0) && currentValue > this.greaterThan))){
                         totalHours++ 
@@ -145,7 +149,7 @@ export default{
          * 0% or 100% opacity)
          */
         getGradient (cell) {
-            return (100-(((cell-this.minVolunteers)/(this.maxVolunteers - this.minVolunteers)) * (70) + 20) + '%')
+            return (100-(((cell-this.availabilityTable.min)/(this.availabilityTable.max - this.availabilityTable.min)) * (70) + 20) + '%')
         },
     }
 }
@@ -221,22 +225,50 @@ export default{
   background-color: white;
 }
 
-.grid{
+.table-layout {
     display: grid;
-    margin: 20px;
-    grid-auto-flow: column;
-    grid-template-columns: 30px repeat(7, 1fr);
-    grid-template-rows: repeat(25, 1fr);
-    grid-gap: 2px;
+    grid-template-areas: 
+    ". days"
+    "times data"
+}
 
+.subtable {
+    display: grid;
+    grid-gap: 2px;
+    &-days {
+        @extend .subtable;
+        grid-area: days;
+        grid-template-columns: repeat(7, 1fr);
+        grid-template-rows: 1fr;
+        margin-top: 20px;
+        margin-bottom: 5px;
+    }
+    &-times {
+        @extend .subtable;
+        grid-area: times;
+        justify-content:right;
+        grid-template-columns: min-content;
+        grid-template-rows: repeat(24, auto);
+        margin-right: 10px;
+        grid-auto-flow: column;
+        
+    }
+    &-data {
+        @extend .subtable;
+        grid-area: data;
+        grid-template-columns: repeat(7, 1fr);
+        grid-template-rows: repeat(24, 1fr);
+        grid-auto-flow: column;
+    }
 }
 
 .cell {
   color: gray;
     &-header {
         @extend .cell;
-        font: bold;
+        font-weight:500;
         overflow: hidden;
+        margin: 0px;
     }
     &-data {
         @extend .cell;
