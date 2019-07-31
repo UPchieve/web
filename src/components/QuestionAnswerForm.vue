@@ -28,79 +28,79 @@
 </template>
 
 <script>
-import Vue from 'vue'
+import Vue from "vue";
 
-import UserService from '@/services/UserService'
-import StudentQuestionService from '@/services/StudentQuestionService'
+import UserService from "@/services/UserService";
+import StudentQuestionService from "@/services/StudentQuestionService";
 
-import BtnOptions from './BtnOptions'
-import Btn from './Btn'
+import BtnOptions from "./BtnOptions";
+import Btn from "./Btn";
 
 function isValid() {
-  const valid = document.getElementById('message').value !== ''
-  return valid
+  const valid = document.getElementById("message").value !== "";
+  return valid;
 }
 
 function buildFormDataObjSubmitQuestion(context) {
-  const user = UserService.getUser()
+  const user = UserService.getUser();
 
-  const questionObj = new FormData()
+  const questionObj = new FormData();
   questionObj.append(
-    'topic',
+    "topic",
     context.$route.query.topic.charAt(0).toUpperCase() +
       context.$route.query.topic.slice(1)
-  )
+  );
   questionObj.append(
-    'subTopic',
+    "subTopic",
     context.$route.query.subTopic.charAt(0).toUpperCase() +
       context.$route.query.subTopic.slice(1)
-  )
+  );
   questionObj.append(
-    'student',
+    "student",
     `{ name: ${user.name}, email: ${user.email}, picture: ${user.picture} }`
-  )
-  questionObj.append('content', document.getElementById('message').value)
-  questionObj.append('attachments', document.getElementById('file').files[0])
+  );
+  questionObj.append("content", document.getElementById("message").value);
+  questionObj.append("attachments", document.getElementById("file").files[0]);
 
-  return questionObj
+  return questionObj;
 }
 
 function buildFormDataObjSendAnswer(context) {
-  const answerObj = new FormData()
-  answerObj.append('userEmail', context.user.email)
-  answerObj.append('questionId', context.$route.query.q)
-  answerObj.append('answerContent', document.getElementById('message').value)
-  answerObj.append('attachments', document.getElementById('file').files[0])
-  return answerObj
+  const answerObj = new FormData();
+  answerObj.append("userEmail", context.user.email);
+  answerObj.append("questionId", context.$route.query.q);
+  answerObj.append("answerContent", document.getElementById("message").value);
+  answerObj.append("attachments", document.getElementById("file").files[0]);
+  return answerObj;
 }
 
 function showModalRetry(context) {
-  context.modalContainer.modalBtnLabels = ['Retry']
+  context.modalContainer.modalBtnLabels = ["Retry"];
   context.modalContainer.modalOptions = {
     singleBtn: true,
     warn: true,
-    message: 'There was a problem sending the message'
-  }
+    message: "There was a problem sending the message"
+  };
   context.modalContainer.modalClickHandlers = {
     main: () => {
-      context.hideLoader()
-      context.modalContainer.showModal = false
+      context.hideLoader();
+      context.modalContainer.showModal = false;
     }
-  }
+  };
 }
 
 function showModalSuccess(context, message) {
-  context.modalContainer.modalBtnLabels = ['Go to home page']
+  context.modalContainer.modalBtnLabels = ["Go to home page"];
   context.modalContainer.modalOptions = {
     singleBtn: true,
     warn: false,
     message
-  }
+  };
   context.modalContainer.modalClickHandlers = {
     main: () => {
-      context.$router.push('/')
+      context.$router.push("/");
     }
-  }
+  };
 }
 
 export default {
@@ -129,17 +129,17 @@ export default {
         main: this.submitForm,
         second: this.cancel
       }
-    }
+    };
   },
   methods: {
     // File attachment
     attachFile() {
-      const click = new MouseEvent('click')
-      this.$el.querySelector('input[type="file"]').dispatchEvent(click)
+      const click = new MouseEvent("click");
+      this.$el.querySelector('input[type="file"]').dispatchEvent(click);
     },
     changeHandler(e) {
-      e.preventDefault()
-      Vue.set(this.fileList, 0, document.getElementById('file').files[0].name)
+      e.preventDefault();
+      Vue.set(this.fileList, 0, document.getElementById("file").files[0].name);
     },
 
     // Form feedback
@@ -149,86 +149,86 @@ export default {
         message: `
           Message is empty!
         `
-      }
-      this.modalContainer.modalBtnLabels = ['Write message']
+      };
+      this.modalContainer.modalBtnLabels = ["Write message"];
       this.modalContainer.modalClickHandlers = {
         main: () => {
-          this.modalContainer.showModal = false
+          this.modalContainer.showModal = false;
         }
-      }
-      this.modalContainer.showModal = true
+      };
+      this.modalContainer.showModal = true;
     },
     showLoader() {
-      document.querySelector('.form-loader').style = 'top: 0'
-      document.querySelector('.form-loader__dot:nth-child(1)').style =
-        'animation: a-loader-1 2s ease-out infinite'
-      document.querySelector('.form-loader__dot:nth-child(2)').style =
-        'animation: a-loader-1 1s 2s ease-out infinite'
+      document.querySelector(".form-loader").style = "top: 0";
+      document.querySelector(".form-loader__dot:nth-child(1)").style =
+        "animation: a-loader-1 2s ease-out infinite";
+      document.querySelector(".form-loader__dot:nth-child(2)").style =
+        "animation: a-loader-1 1s 2s ease-out infinite";
     },
     hideLoader() {
-      document.querySelector('.form-loader').style = ''
-      document.querySelector('.form-loader__dot:nth-child(1)').style = ''
-      document.querySelector('.form-loader__dot:nth-child(2)').style = ''
+      document.querySelector(".form-loader").style = "";
+      document.querySelector(".form-loader__dot:nth-child(1)").style = "";
+      document.querySelector(".form-loader__dot:nth-child(2)").style = "";
     },
     showResponseStateSubmitQuestion(res) {
-      if (res === 'notSent') {
-        showModalRetry(this)
+      if (res === "notSent") {
+        showModalRetry(this);
       } else {
         const message = `
           Thanks for submitting your question! You will receive a response to 
           your email address as soon as possible.
-        `
-        showModalSuccess(this, message)
+        `;
+        showModalSuccess(this, message);
       }
-      this.modalContainer.showModal = true
+      this.modalContainer.showModal = true;
     },
     showResponseStateSendAnswer(res) {
-      if (res === 'notSent') {
-        showModalRetry(this)
+      if (res === "notSent") {
+        showModalRetry(this);
       } else {
-        const message = 'Your answer has been sent!'
-        showModalSuccess(this, message)
+        const message = "Your answer has been sent!";
+        showModalSuccess(this, message);
       }
-      this.modalContainer.showModal = true
+      this.modalContainer.showModal = true;
     },
 
     // Form options (buttons)
     cancel() {
-      this.$router.push('/')
+      this.$router.push("/");
     },
     submitFormSubmitQuestion(formDataObj) {
       StudentQuestionService.createStudentQuestion(this, formDataObj).then(
         res => {
-          this.showResponseStateSubmitQuestion(res)
+          this.showResponseStateSubmitQuestion(res);
         }
-      )
+      );
     },
     submitFormSendAnswer(formDataObj) {
       StudentQuestionService.answerStudentQuestion(this, formDataObj).then(
         res => {
-          this.showResponseStateSendAnswer(res)
+          this.showResponseStateSendAnswer(res);
         }
-      )
+      );
     },
     submitForm(e) {
-      e.preventDefault()
+      e.preventDefault();
 
       if (isValid()) {
-        this.showLoader()
+        this.showLoader();
 
-        if (this.typeOfForm === 'submit-question') {
-          this.submitFormSubmitQuestion(buildFormDataObjSubmitQuestion(this))
-        } else if (this.typeOfForm === 'send-answer') {
+        if (this.typeOfForm === "submit-question") {
+          this.submitFormSubmitQuestion(buildFormDataObjSubmitQuestion(this));
+        } else if (this.typeOfForm === "send-answer") {
           this.submitFormSendAnswer(
             buildFormDataObjSendAnswer(this.modalContainer)
-          )
+          );
         }
       } else {
-        this.askForAMessage()
+        this.askForAMessage();
       }
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -256,7 +256,7 @@ export default {
 .form-body textarea:focus {
   outline: 0;
 }
-.form-body input[type='file'] {
+.form-body input[type="file"] {
   display: none;
 }
 

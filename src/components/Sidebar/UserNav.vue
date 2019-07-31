@@ -47,7 +47,6 @@
         </div>
       </template>
 
-
       <template v-if="user.isAdmin">
         <div v-on:click="$emit('closeMenu')">
           <router-link to="/admin" tag="li">
@@ -72,20 +71,20 @@
 </template>
 
 <script>
-import UserService from '@/services/UserService'
+import UserService from "@/services/UserService";
 
 export default {
   data() {
-    const auth = UserService.getAuth()
-    const user = UserService.getUser()
-    const onboarding = UserService.getOnboarding()
+    const auth = UserService.getAuth();
+    const user = UserService.getUser();
+    const onboarding = UserService.getOnboarding();
     return {
       auth,
       user,
       onboarding
-    }
+    };
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -136,7 +135,7 @@ li.active > a::before {
 }
 
 .icon::before {
-  content: '';
+  content: "";
   width: 20px;
   height: 20px;
   margin-right: 10px;
@@ -146,31 +145,31 @@ li.active > a::before {
 }
 
 .home.icon::before {
-  background-image: url('~@/assets/home_icon-01.svg');
+  background-image: url("~@/assets/home_icon-01.svg");
 }
 
 .math.icon::before {
-  background-image: url('~@/assets/math_icon-01.svg');
+  background-image: url("~@/assets/math_icon-01.svg");
 }
 
 .college.icon::before {
-  background-image: url('~@/assets/college_icon-01.svg');
+  background-image: url("~@/assets/college_icon-01.svg");
 }
 
 .schedule.icon::before {
-  background-image: url('~@/assets/calendar_icon-01.svg');
+  background-image: url("~@/assets/calendar_icon-01.svg");
 }
 
 .resources.icon::before {
-  background-image: url('~@/assets/resources_icon-01.svg');
+  background-image: url("~@/assets/resources_icon-01.svg");
 }
 
 .training.icon::before {
-  background-image: url('~@/assets/training_icon-01.svg');
+  background-image: url("~@/assets/training_icon-01.svg");
 }
 
 .profile.icon::before {
-  background-image: url('~@/assets/profile_icon-01.svg');
+  background-image: url("~@/assets/profile_icon-01.svg");
 }
 
 .profile-info {

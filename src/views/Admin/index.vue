@@ -3,9 +3,11 @@
     <div class="header">Admin Dashboard</div>
     <div class="parent">
       <div class="container-section linkBtn btn">
-        <router-link to="admin/volunteer-coverage" class="prompt">Volunteer Coverage</router-link>
+        <router-link to="admin/volunteer-coverage" class="prompt"
+          >Volunteer Coverage</router-link
+        >
       </div>
-      <div class = "container-section linkBtn btn">
+      <div class="container-section linkBtn btn">
         <router-link to="admin/edu" class="prompt">Edu Admin</router-link>
       </div>
     </div>
@@ -13,9 +15,8 @@
 </template>
 
 <script>
-export default {}
+export default {};
 </script>
-
 
 <style lang="scss" scoped>
 .container-section {
@@ -41,7 +42,7 @@ export default {}
 
   &:hover {
     a {
-      color:#2c3e50;
+      color: #2c3e50;
     }
   }
 }

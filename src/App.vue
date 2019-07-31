@@ -32,47 +32,47 @@
 </template>
 
 <script>
-import './scss/main.scss'
-import Sidebar from './components/Sidebar'
-import AuthService from './services/AuthService'
+import "./scss/main.scss";
+import Sidebar from "./components/Sidebar";
+import AuthService from "./services/AuthService";
 
-const MOBILE_MODE_WIDTH = 700
+const MOBILE_MODE_WIDTH = 700;
 
 /**
  * @todo Examine this, huge code smell, refactoring might be needed
  */
-AuthService.checkAuth() // {1}
+AuthService.checkAuth(); // {1}
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
     Sidebar
   },
   created() {
-    AuthService.checkAuth(this) // {1}
+    AuthService.checkAuth(this); // {1}
 
     // Update mobileMode on window resize
-    window.addEventListener('resize', () => {
-      this.mobileMode = window.innerWidth <= MOBILE_MODE_WIDTH
-    })
+    window.addEventListener("resize", () => {
+      this.mobileMode = window.innerWidth <= MOBILE_MODE_WIDTH;
+    });
   },
   data() {
     return {
       mobileMode: window.innerWidth <= MOBILE_MODE_WIDTH,
       isActive: false
-    }
+    };
   },
   methods: {
     toggleMenu() {
-      this.isActive = !this.isActive
+      this.isActive = !this.isActive;
     },
     closeMenu() {
       if (this.mobileMode) {
-        this.isActive = false
+        this.isActive = false;
       }
     }
   }
-}
+};
 </script>
 
 <style lang="scss">
@@ -149,14 +149,14 @@ body,
     width: 2em !important;
     height: 1.5em !important;
     margin: 0em 0em 0em 0.5em !important;
-    background: url('./assets/tealHamburgerMenu.png') !important;
+    background: url("./assets/tealHamburgerMenu.png") !important;
     background-size: auto 100% !important;
     background-position: top left !important;
     background-repeat: no-repeat !important;
     border: none !important;
   }
   .sidebar-hamburger.white {
-    background: url('./assets/whiteHamburgerMenu.png') !important;
+    background: url("./assets/whiteHamburgerMenu.png") !important;
     background-size: auto 100% !important;
     background-position: top left !important;
     background-repeat: no-repeat !important;
@@ -168,7 +168,7 @@ body,
     height: 1.5em !important;
     position: fixed !important;
     /* margin-top: 1em !important; */
-    background: url('./assets/exitMenuIcon.png') !important;
+    background: url("./assets/exitMenuIcon.png") !important;
     background-size: auto 100% !important;
     background-position: top left !important;
     background-repeat: no-repeat !important;
