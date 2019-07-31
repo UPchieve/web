@@ -176,8 +176,8 @@
 <script>
 import validator from "validator";
 
-import AuthService from '@/services/AuthService'
-import UserService from '@/services/UserService'
+import AuthService from "@/services/AuthService";
+import UserService from "@/services/UserService";
 
 import phoneValidation from "@/utils/phone-validation";
 
@@ -193,12 +193,12 @@ export default {
         terms: false
       },
       profile: {
-        firstName: '',
-        lastName: '',
-        college: '',
-        phone: '',
-        favoriteAcademicSubject: '',
-        userType: 'volunteer'
+        firstName: "",
+        lastName: "",
+        college: "",
+        phone: "",
+        favoriteAcademicSubject: "",
+        userType: "volunteer"
       },
       step: "step-1"
     };

@@ -74,15 +74,15 @@ export default {
     });
   },
 
-  checkEmail (context, creds) {
+  checkEmail(context, creds) {
     return NetworkService.checkEmail(context, creds).then(res => {
       if (res.data.err) {
-        throw new Error(res.data.err)
+        throw new Error(res.data.err);
       }
-    })
+    });
   },
 
-  sendReset (context, email, redirect) {
+  sendReset(context, email, redirect) {
     return NetworkService.sendReset(context, { email }).then(res => {
       const data = { ...res.data };
       if (!data) {
@@ -98,7 +98,7 @@ export default {
         setTimeout(() => {
           router.push(redirect);
         }, 2000);
-     }
+      }
     });
   },
 

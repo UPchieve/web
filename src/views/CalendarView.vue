@@ -98,9 +98,9 @@ export default {
     this.fetchData();
   },
   methods: {
-    fetchData () {
+    fetchData() {
       if (!this.user.hasAvailability) {
-        CalendarService.initAvailability(this, this.user._id)
+        CalendarService.initAvailability(this, this.user._id);
       }
 
       var originalAvailabilityPromise = CalendarService.getAvailability(

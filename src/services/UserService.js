@@ -48,50 +48,53 @@ export default {
         context.msg = "Error occurred";
         return Promise.reject(res);
       }
-    )
+    );
   },
   editVolunteer(context, data) {
     return NetworkService.editVolunteer(context, data).then(res => {
       if (res.data.err) {
-        return res.data.err
+        return res.data.err;
       } else if (res.data.volunteer) {
-        return res.data.volunteer
+        return res.data.volunteer;
       } else {
-        throw new Error()
+        throw new Error();
       }
-    })
+    });
   },
   getVolunteer(context, data) {
     return NetworkService.getVolunteer(context, data).then(res => {
       if (res.data.err) {
-        return res.data.err
+        return res.data.err;
       } else if (res.data.volunteer) {
-        return res.data.volunteer
+        return res.data.volunteer;
       } else {
-        throw new Error()
+        throw new Error();
       }
-    })
+    });
   },
   getVolunteers(context) {
     return NetworkService.getVolunteers(context).then(res => {
       if (res.data.err) {
-        return res.data.err
+        return res.data.err;
       } else if (res.data.volunteers) {
-        return res.data.volunteers
+        return res.data.volunteers;
       } else {
-        throw new Error()
+        throw new Error();
       }
-    })
+    });
   },
   getVolunteersAvailability(context, certifiedSubject) {
-    return NetworkService.getVolunteersAvailability(context, certifiedSubject).then(res => {
+    return NetworkService.getVolunteersAvailability(
+      context,
+      certifiedSubject
+    ).then(res => {
       if (res.data.err) {
-        return res.data.err
+        return res.data.err;
       } else if (res.data.userAvailabilityMap) {
-        return res.data.userAvailabilityMap
+        return res.data.userAvailabilityMap;
       } else {
-        throw new Error()
+        throw new Error();
       }
-    })
+    });
   }
 };

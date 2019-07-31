@@ -47,7 +47,6 @@
         </div>
       </template>
 
-
       <template v-if="user.isAdmin">
         <div v-on:click="$emit('closeMenu')">
           <router-link to="/admin" tag="li">

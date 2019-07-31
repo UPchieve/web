@@ -215,12 +215,12 @@ export default {
         terms: false
       },
       profile: {
-        firstName: '',
-        lastName: '',
-        highSchool: '',
-        heardFrom: '',
-        referred: '',
-        userType: 'student'
+        firstName: "",
+        lastName: "",
+        highSchool: "",
+        heardFrom: "",
+        referred: "",
+        userType: "student"
       },
       step: "step-1"
     };

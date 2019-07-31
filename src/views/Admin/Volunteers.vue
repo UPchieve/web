@@ -8,7 +8,11 @@
         <thead>
           <tr>
             <th v-for="key in volunteerProperties" v-bind:key="key.index">
-              <div v-if="key === 'firstname' || key === 'lastname' || key === '_id'">
+              <div
+                v-if="
+                  key === 'firstname' || key === 'lastname' || key === '_id'
+                "
+              >
                 <label>Search</label>
                 <input
                   type="text"
@@ -27,7 +31,7 @@
                 <label>hour(s)</label>
               </div>
               <div v-else-if="key != 'Status'">
-                <label>{{key}}</label>
+                <label>{{ key }}</label>
                 <select v-model="appliedFilter[key]">
                   <option></option>
                   <option>True</option>
@@ -35,10 +39,9 @@
                 </select>
               </div>
               <div v-else>
-                <label>{{key}}</label>
+                <label>{{ key }}</label>
               </div>
             </th>
-            
           </tr>
         </thead>
         <tbody>
@@ -48,18 +51,33 @@
                 <router-link
                   :to="{
                     name: 'VolunteerProfile',
-                    params: {id: volunteer._id}}">
-                  {{volunteer._id}}
+                    params: { id: volunteer._id }
+                  }"
+                >
+                  {{ volunteer._id }}
                 </router-link>
-                </div>
+              </div>
               <div v-else-if="key === 'Status'">
-                <div v-if="volunteer.isVolunteerApproved && volunteer.isVolunteerReady">
+                <div
+                  v-if="
+                    volunteer.isVolunteerApproved && volunteer.isVolunteerReady
+                  "
+                >
                   Approved and Ready!
                 </div>
-                <div v-else-if="volunteer.isVolunteerApproved && !volunteer.isVolunteerReady">
+                <div
+                  v-else-if="
+                    volunteer.isVolunteerApproved && !volunteer.isVolunteerReady
+                  "
+                >
                   Approved
                 </div>
-                <div v-else-if="!volunteer.isVolunteerApproved && !volunteer.isVolunteerReady">
+                <div
+                  v-else-if="
+                    !volunteer.isVolunteerApproved &&
+                      !volunteer.isVolunteerReady
+                  "
+                >
                   Hasn't Started
                 </div>
                 <div v-else>
@@ -78,55 +96,61 @@
 </template>
 
 <script>
-import UserService from '@/services/UserService'
+import UserService from "@/services/UserService";
 
 export default {
   data() {
-    const user = UserService.getUser()
+    const user = UserService.getUser();
 
-    var volunteerProperties = ['firstname','lastname', '_id',
-      'isVolunteerApproved', 'hasCertification', 'numberOfHours', 'Status']
-    
+    var volunteerProperties = [
+      "firstname",
+      "lastname",
+      "_id",
+      "isVolunteerApproved",
+      "hasCertification",
+      "numberOfHours",
+      "Status"
+    ];
+
     return {
       user,
-      search: '',
+      search: "",
       volunteers: [],
       volunteerProperties,
-      appliedFilter: {},
-    }
+      appliedFilter: {}
+    };
   },
   computed: {
     filteredItems() {
-      var resultItems = this.volunteers
+      var resultItems = this.volunteers;
       if (this.appliedFilter) {
         for (const field in this.appliedFilter) {
-          const val = this.appliedFilter[field].toLowerCase()
+          const val = this.appliedFilter[field].toLowerCase();
           if (val) {
             resultItems = resultItems.filter(volunteer => {
-              var result = volunteer[field]
-              var hours = Infinity
-              if (typeof volunteer[field] === 'boolean') {
-                result = volunteer[field].toString()
+              var result = volunteer[field];
+              var hours = Infinity;
+              if (typeof volunteer[field] === "boolean") {
+                result = volunteer[field].toString();
+              } else if (typeof volunteer[field] === "number") {
+                hours = Number(this.appliedFilter[field]);
+                return volunteer[field] < hours;
               }
-              else if (typeof volunteer[field] === 'number') {
-                hours = Number(this.appliedFilter[field])
-                return (volunteer[field] < hours)
-              }
-              return result.toLowerCase().includes(val)
-            })
+              return result.toLowerCase().includes(val);
+            });
           }
         }
       }
-      return resultItems
-      }
+      return resultItems;
+    }
   },
 
-  created () {
-    UserService.getVolunteers(this).then(volunteers =>{
-      this.volunteers = volunteers
-      })
-  },
-}
+  created() {
+    UserService.getVolunteers(this).then(volunteers => {
+      this.volunteers = volunteers;
+    });
+  }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -136,21 +160,29 @@ body {
 }
 
 table {
-  border: 2px solid #16d2aa;
-  border-radius: 3px;
-  background-color: white;
+  border: none;
+  background-color: #f0f8fd;
+  margin: 30px;
+  border-radius: 15px;
 }
 
 th {
-  background-color: #16d2aa;
-  color: white;
+  background-color: #e3f2fd;
+  color: #2c3e50;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
 }
+th:first-child {
+  border-radius: 15px 0 0 0;
+}
 
-th, td {
+th:last-child {
+  border-radius: 0 15px 0 0;
+}
+th,
+td {
   min-width: 120px;
   padding: 10px 0px;
 }
@@ -170,9 +202,9 @@ th, td {
 
 input[type="text"] {
   display: block;
-  margin : 0 auto;
+  margin: 0 auto;
   margin-bottom: 5px;
-  color: #73737a;
+  color: #2c3e50;
   border: none;
   box-shadow: none;
   border-radius: 0;
@@ -181,8 +213,9 @@ input[type="text"] {
 }
 
 input::placeholder {
-  color: lightgrey;
+  color: #73737a;
   text-align: center;
+  font-weight: 400;
 }
 
 input[class="hoursInput"] {
@@ -191,7 +224,7 @@ input[class="hoursInput"] {
 
 select {
   display: block;
-  margin : 0 auto;
+  margin: 0 auto;
   margin-bottom: 5px;
   color: #73737a;
   background: white;
@@ -199,7 +232,7 @@ select {
 
 label {
   display: block;
-  margin : 0 auto;
+  margin: 0 auto;
   text-align: center;
   padding: 5px;
 }

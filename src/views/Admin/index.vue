@@ -3,36 +3,35 @@
     <div class="header">Admin Dashboard</div>
     <div class="parent">
       <div class="container-section linkBtn btn">
-        <router-link to="admin/volunteer-coverage" class="prompt">Volunteer Coverage</router-link>
+        <router-link to="admin/volunteer-coverage" class="prompt"
+          >Volunteer Coverage</router-link
+        >
       </div>
-      <div class = "container-section linkBtn btn">
+      <div class="container-section linkBtn btn">
         <router-link to="admin/edu" class="prompt">Edu Admin</router-link>
       </div>
-      <div class = "container-section linkBtn btn">
+      <div class="container-section linkBtn btn">
         <router-link to="admin/volunteers" class="prompt"
-          >Volunteers</router-link>
+          >Volunteers</router-link
+        >
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import UserService from '../../services/UserService'
+import UserService from "../../services/UserService";
 
 export default {
-  data () {
-    const user = UserService.getUser()
+  data() {
+    const user = UserService.getUser();
 
-    var volunteerProperties = ['firstname','lastname', '_id',
-      'isVolunteerApproved', 'hasCertification', 'numberOfHours', 'Status']
-    
     return {
       user
-    }
+    };
   }
-}
+};
 </script>
-
 
 <style lang="scss" scoped>
 .container-section {
@@ -58,7 +57,7 @@ export default {
 
   &:hover {
     a {
-      color:#2c3e50;
+      color: #2c3e50;
     }
   }
 }

@@ -88,7 +88,11 @@
         </div>
       </div>
     </template>
-    <template v-else-if="user.isVolunteer && user.isVolunteerApproved && user.isVolunteerReady">
+    <template
+      v-else-if="
+        user.isVolunteer && user.isVolunteerApproved && user.isVolunteerReady
+      "
+    >
       <div class="dashboard-body row">
         <div class="col-lg-6 video">
           <p>
@@ -124,7 +128,12 @@
         </div>
       </div>
     </template>
-    <template  v-else-if="user.isVolunteer && (!user.isVolunteerApproved || !user.isVolunteerReady)">
+    <template
+      v-else-if="
+        user.isVolunteer &&
+          (!user.isVolunteerApproved || !user.isVolunteerReady)
+      "
+    >
       <div class="dashboard-body row">
         <div class="col-lg-6 video">
           <p>
@@ -144,7 +153,6 @@
         <div class="col-lg-6 help">
           <div class="help-container">
             <VolunteerOnboardingChecklist />
-
           </div>
         </div>
       </div>
@@ -156,8 +164,8 @@
 import UserService from "@/services/UserService";
 import SessionService from "@/services/SessionService";
 
-import ListSessions from './ListSessions'
-import VolunteerOnboardingChecklist from './VolunteerOnboardingChecklist'
+import ListSessions from "./ListSessions";
+import VolunteerOnboardingChecklist from "./VolunteerOnboardingChecklist";
 
 export default {
   name: "dashboard-view",

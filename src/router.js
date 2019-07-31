@@ -172,41 +172,43 @@ const routes = [
     meta: { protected: true }
   },
   {
-    path: '/send-answer',
-    name: 'SendAnswerView',
+    path: "/send-answer",
+    name: "SendAnswerView",
     component: SendAnswerView,
     meta: { protected: true }
   },
   {
-    path: '/admin',
-    name: 'Admin',
+    path: "/admin",
+    name: "Admin",
     component: AdminView,
     meta: { protected: true, requiresAdmin: true }
   },
   {
-    path: '/admin/volunteer-coverage',
-    name: 'VolunteerCoverage',
+    path: "/admin/volunteer-coverage",
+    name: "VolunteerCoverage",
     component: VolunteerCoverage,
     meta: { protected: true }
   },
-  { path: '/admin/volunteers',
-    name: 'Volunteers',
+  {
+    path: "/admin/volunteers",
+    name: "Volunteers",
     component: Volunteers,
     meta: { protected: true, requiresAdmin: true }
   },
-  { path: '/admin/volunteers/:id',
-    name: 'VolunteerProfile',
+  {
+    path: "/admin/volunteers/:id",
+    name: "VolunteerProfile",
     component: VolunteerProfile,
     meta: { protected: true, requiresAdmin: true },
     props: true
   },
   {
-    path: '/edu', // TODO: make this be "/admin/edu"
+    path: "/edu", // TODO: make this be "/admin/edu"
     component: () => {
-      window.location.href = '/edu'
+      window.location.href = "/edu";
     }
   }
-]
+];
 
 /**
  * @todo Consider refactoring this file
@@ -247,14 +249,15 @@ router.beforeEach((to, from, next) => {
     } else {
       next();
     }
-  } if (to.matched.some(route => route.meta.requiresAdmin)) {
+  }
+  if (to.matched.some(route => route.meta.requiresAdmin)) {
     if (!AuthService.user.data.isAdmin) {
       next({
-        path: '/login',
+        path: "/login",
         query: {
           redirect: to.fullPath
         }
-      })
+      });
     }
   } else {
     next();

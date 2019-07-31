@@ -25,7 +25,7 @@ export default {
       .post(`${AUTH_ROOT}/register/checkcred`, data)
       .then(this._successHandler, this._errorHandler);
   },
-  checkEmail (context, data) {
+  checkEmail(context, data) {
     return context.$http
       .post(`${AUTH_ROOT}/checkemail`, data)
       .then(this._successHandler, this._errorHandler);
@@ -68,22 +68,22 @@ export default {
   editVolunteer(context, data) {
     return context.$http
       .post(`${API_ROOT}/volunteers/${data._id}`, data)
-      .then(this._successHandler, this._errorHandler)
+      .then(this._successHandler, this._errorHandler);
   },
   getVolunteer(context, data) {
     return context.$http
       .get(`${API_ROOT}/volunteers/${data}`, data)
-      .then(this._successHandler, this._errorHandler)
+      .then(this._successHandler, this._errorHandler);
   },
   getVolunteersAvailability(context) {
     return context.$http
       .get(`${API_ROOT}/volunteers/availability`)
-      .then(this._successHandler, this._errorHandler)
+      .then(this._successHandler, this._errorHandler);
   },
   getVolunteers(context) {
     return context.$http
       .get(`${API_ROOT}/volunteers`)
-      .then(this._successHandler, this._errorHandler)
+      .then(this._successHandler, this._errorHandler);
   },
   newSession(context, data) {
     return context.$http

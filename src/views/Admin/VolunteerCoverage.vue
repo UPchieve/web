@@ -1,22 +1,21 @@
 <template>
- <div class = "header"> {{this.msg}} </div>
+  <div class="header">{{ this.msg }}</div>
 </template>
 
 <script>
 export default {
-  data () {
+  data() {
     return {
-      msg : 'Volunteer Coverage Will Be Added'
-    }
+      msg: "Volunteer Coverage Will Be Added"
+    };
   },
-  
-  methods: {
-    }
-}
+
+  methods: {}
+};
 </script>
 
 <style lang="scss" scoped>
-.header{
-    font: 200px;
+.header {
+  font: 200px;
 }
 </style>
