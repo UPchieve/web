@@ -298,7 +298,7 @@ export default {
         .then(() => {
           let user = UserService.getUser();
           UserService.setProfile(this, user);
-          
+
           // analytics: tracking when a user has signed up
           AnalyticsService.identify(user, user.isFakeUser);
           AnalyticsService.trackNoProperties("signed up", user.isFakeUser);

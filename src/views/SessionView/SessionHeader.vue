@@ -125,9 +125,7 @@ export default {
           SessionService.endSession(this, sessionId);
           router.replace("/");
         }
-
       }
-      
     }
   }
 };

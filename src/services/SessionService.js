@@ -25,18 +25,18 @@ export default {
     localStorage.removeItem("currentSessionPath");
 
     return NetworkService.endSession(context, { sessionId }).then(res => {
-      const { /* sessionId, */ data } = res.data || {}
+      const { /* sessionId, */ data } = res.data || {};
 
       // analytics: track when a help session has ended
       AnalyticsService.trackSessionEnded(
         this,
         data,
         UserService.getUser().isFakeUser
-      )
+      );
 
-      this.currentSession.sessionId = null
-      this.currentSession.data = {}
-    })
+      this.currentSession.sessionId = null;
+      this.currentSession.data = {};
+    });
   },
 
   newSession(context, sessionType, sessionSubTopic) {
@@ -56,8 +56,13 @@ export default {
       } else {
         router.replace("/");
       }
-      //analytics: track when a session has started
-      AnalyticsService.trackSessionStarted(this.currentSession, sessionType, sessionSubTopic, UserService.getUser().isFakeUser)
+      // analytics: track when a session has started
+      AnalyticsService.trackSessionStarted(
+        this.currentSession,
+        sessionType,
+        sessionSubTopic,
+        UserService.getUser().isFakeUser
+      );
 
       return sessionId;
     });

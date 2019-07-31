@@ -247,7 +247,7 @@ export default {
   methods: {
     submitFeedback() {
       // analytics: tracking feedback response data
-      AnalyticsService.trackFeedback(this, this.user.isFakeUser)
+      AnalyticsService.trackFeedback(this, this.user.isFakeUser);
 
       NetworkService.feedback(this, {
         sessionId: this.sessionId,
