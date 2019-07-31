@@ -56,31 +56,31 @@
             </v-select>
           </div>
           <div class="table-layout">
-            <div class="subtable-days">
+            <div class="subtable--days">
               <div
-                class="cell-header"
+                class="cell--header--days"
                 v-for="day in availabilityTable.daysOfWeek"
                 :key="`${day}`"
               >
                 {{ day }}
               </div>
             </div>
-            <div class="subtable-times">
+            <div class="subtable--times">
               <div
-                class="cell-header"
+                class="cell--header--times"
                 v-for="time in availabilityTable.timesOfDay"
                 :key="`${time}`"
               >
                 {{ time }}
               </div>
             </div>
-            <div class="subtable-data">
+            <div class="subtable--data">
               <div
                 v-for="(cell, index) in availabilityTable.table"
                 :key="`${index}`"
               >
                 <div
-                  class="cell-data"
+                  class="cell--data"
                   :style="{
                     '--rgb': getColor(cell),
                     '--hour': getGradient(cell)
@@ -297,12 +297,14 @@ export default {
   grid-template-areas:
     ". days"
     "times data";
+  grid-template-columns: auto 1fr;
+
 }
 
 .subtable {
   display: grid;
   grid-gap: 2px;
-  &-days {
+  &--days {
     @extend .subtable;
     grid-area: days;
     grid-template-columns: repeat(7, 1fr);
@@ -310,16 +312,16 @@ export default {
     margin-top: 20px;
     margin-bottom: 5px;
   }
-  &-times {
+  &--times {
     @extend .subtable;
     grid-area: times;
     justify-content: right;
     grid-template-columns: min-content;
-    grid-template-rows: repeat(24, auto);
+    grid-template-rows: repeat(24, 1fr);
     margin-right: 10px;
     grid-auto-flow: column;
   }
-  &-data {
+  &--data {
     @extend .subtable;
     grid-area: data;
     grid-template-columns: repeat(7, 1fr);
@@ -330,15 +332,31 @@ export default {
 
 .cell {
   color: gray;
-  &-header {
+  &--header {
     @extend .cell;
     font-weight: 500;
     overflow: hidden;
     margin: 0px;
   }
-  &-data {
+  &--data {
     @extend .cell;
     background-color: rgba(var(--rgb), (var(--hour)));
   }
+}
+
+@media only screen and (max-width: 800px) {
+  .header {
+    padding: 1em 20px 1em 3em !important;
+  }
+  .cell--header--days {
+    visibility: hidden;
+    width: 30px;
+
+    &::first-letter {
+      text-align: center;
+      visibility:visible;
+      }
+  } 
+  
 }
 </style>
