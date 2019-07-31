@@ -321,9 +321,9 @@
       <div id="availability" class="contain--availability">
         <div class="prompt">Availability</div>
         <div class="answer">
-          <div v-if="volunteer.hasAvailability">
-            <div class="grid">
-              <div v-for="(cell, index) in availabilityArray" :key="`${index}`">
+          <div v-if="this.displayAvailability">
+            <div class = 'grid'>
+              <div v-for='(cell, index) in availabilityArray' :key = '`${index}`'>
                 <div v-if="isNaN(cell) || cell.length == 0">
                   <div class="cell--header">{{ cell }}</div>
                 </div>
@@ -344,10 +344,11 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
-import phoneValidation from "@/utils/phone-validation";
-import AuthService from "@/services/AuthService";
-import validator from "validator";
+import UserService from '@/services/UserService'
+import phoneValidation from '@/utils/phone-validation'
+import AuthService from '@/services/AuthService'
+import validator from 'validator'
+import _ from "lodash";
 
 export default {
   data() {
@@ -372,20 +373,26 @@ export default {
       },
       certKey: {}, //stores a map to larger category of each subtopic, used for label
       availabilityArray: [], //stores availability array in a simpler for to display
-      invalidInputs: [] //tracks which inputs were invalids
-    };
+      invalidInputs: [], //tracks which inputs were invalids
+      displayAvailability: false //checks whether availability is empty, or filled with non-booleans
+    }
   },
-
-  created() {
-    var id = this.$route.params.id;
-    UserService.getVolunteer(this, id).then(volunteer => {
-      this.volunteer = volunteer;
-      this.setCertifications();
-      this.getAvailability();
-    });
+  
+  created () {
+    var id = this.$route.params.id
+    UserService.getVolunteer(this, id).then(volunteer =>{
+      this.volunteer = volunteer
+      this.setCertifications()
+      this.getAvailability()
+      this.displayAvailability = this.checkIfAvailability()
+      })
+    
   },
 
   methods: {
+    checkIfAvailability () {
+      return _.isBoolean(_.get(this.volunteer.availability, 'Sunday.4p', null))
+    },
     // updates the virtual hasCertification property
     checkHasCertification() {
       return Object.values(this.certifications).includes(true);
