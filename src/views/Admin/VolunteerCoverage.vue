@@ -55,7 +55,7 @@
             >
             </v-select>
           </div>
-          <div class="table-layout">
+          <div v-show="selected" class="table-layout">
             <div class="subtable--days">
               <div
                 class="cell--header--days"
