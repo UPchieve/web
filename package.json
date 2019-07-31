@@ -21,8 +21,10 @@
     "@vue/cli-plugin-unit-jest": "^3.9.0",
     "@vue/cli-service": "^3.9.0",
     "@vue/eslint-config-prettier": "^4.0.1",
+    "@vue/test-utils": "1.0.0-beta.29",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
+    "babel-jest": "^23.6.0",
     "bootstrap": "^3.3.7",
     "core-js": "^2.6.5",
     "eslint": "^5.16.0",
@@ -44,22 +46,8 @@
     "vue-template-compiler": "^2.6.10",
     "vuex": "^3.0.1"
   },
-  "devDependencies": {
-    "@vue/test-utils": "1.0.0-beta.29",
-    "babel-jest": "^23.6.0",
-    "lint-staged": "^9.2.0"
-  },
   "engines": {
     "node": ">= 11.7.0",
     "npm": ">= 6.0.0"
-  },
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.{js,vue}": [
-      "vue-cli-service lint",
-      "git add"
-    ]
   }
 }

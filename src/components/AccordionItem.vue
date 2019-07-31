@@ -14,31 +14,31 @@ export default {
   props: {
     label: {
       type: String,
-      default: ''
+      default: ""
     }
   },
   data() {
     return {
       accordionItemBulletClasses: {
-        'accordion-item__bullet': true,
-        'accordion-item__bullet--active': false
+        "accordion-item__bullet": true,
+        "accordion-item__bullet--active": false
       },
       accordionItemContentClasses: {
-        'accordion-item__content': true,
-        'accordion-item__content--active': false
+        "accordion-item__content": true,
+        "accordion-item__content--active": false
       }
-    }
+    };
   },
   methods: {
     slideToggle() {
-      this.accordionItemBulletClasses['accordion-item__bullet--active'] = !this
-        .accordionItemBulletClasses['accordion-item__bullet--active']
+      this.accordionItemBulletClasses["accordion-item__bullet--active"] = !this
+        .accordionItemBulletClasses["accordion-item__bullet--active"];
       this.accordionItemContentClasses[
-        'accordion-item__content--active'
-      ] = !this.accordionItemContentClasses['accordion-item__content--active']
+        "accordion-item__content--active"
+      ] = !this.accordionItemContentClasses["accordion-item__content--active"];
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

@@ -429,77 +429,78 @@
 </template>
 
 <script>
-import UserService from '@/services/UserService'
-import $ from 'jquery'
+import UserService from "@/services/UserService";
+import $ from "jquery";
 
 export default {
   data() {
-    const user = UserService.getUser()
+    const user = UserService.getUser();
     return {
       user,
-      buttonMsg: 'DONE',
-      error: ''
-    }
+      buttonMsg: "DONE",
+      error: ""
+    };
   },
   methods: {
     skipOnboarding() {
-      this.$router.push('/')
+      this.$router.push("/");
     },
     back() {
-      this.$router.push('/onboarding/profile')
+      this.$router.push("/onboarding/profile");
     },
     submitProfile() {
-      this.error = ''
+      this.error = "";
 
       if (!this.user.isVolunteer) {
         if (!this.user.groupIdentification.length) {
           this.error =
-            'If you don\'t identify with any of the groups, please select "None of the Above"'
+            'If you don\'t identify with any of the groups, please select "None of the Above"';
         } else if (!this.user.computerAccess.length) {
           this.error =
-            'If you don\'t have access to a computer or phone with internet access, please select "None"'
+            'If you don\'t have access to a computer or phone with internet access, please select "None"';
         } else if (
           !this.user.computerAccessLocation ||
-          this.user.computerAccessLocation === ''
+          this.user.computerAccessLocation === ""
         ) {
-          this.error = 'Please provide where you are accessing this site from'
-        } else if (!this.user.homeworkTime || this.user.homeworkTime === '') {
+          this.error = "Please provide where you are accessing this site from";
+        } else if (!this.user.homeworkTime || this.user.homeworkTime === "") {
           this.error =
-            'Please provide the times times you generally do your homework'
+            "Please provide the times times you generally do your homework";
         } else if (
           !this.user.difficultAcademicSubject ||
-          this.user.difficultAcademicSubject === ''
+          this.user.difficultAcademicSubject === ""
         ) {
           this.error =
-            'Please provide the academic subjects you find most difficult'
-        } else if (!this.user.gpa || this.user.gpa === '') {
-          this.error = 'Please provide your GPA'
+            "Please provide the academic subjects you find most difficult";
+        } else if (!this.user.gpa || this.user.gpa === "") {
+          this.error = "Please provide your GPA";
         } else if (!this.user.difficultCollegeProcess.length) {
           this.error =
-            'Please provide the aspects of the college process that are most difficult'
+            "Please provide the aspects of the college process that are most difficult";
         } else if (!this.user.highestLevelEducation.length) {
-          this.error = "Please provide your parent's highest level of education"
+          this.error =
+            "Please provide your parent's highest level of education";
         } else if (
           !this.user.hasGuidanceCounselor ||
-          this.user.hasGuidanceCounselor === ''
+          this.user.hasGuidanceCounselor === ""
         ) {
           this.error =
-            'Please provide whether or not you have a guidance counselor'
-        } else if (!this.user.heardFrom || this.user.heardFrom === '') {
-          this.error = 'Please provide where you heard about UPchieve'
+            "Please provide whether or not you have a guidance counselor";
+        } else if (!this.user.heardFrom || this.user.heardFrom === "") {
+          this.error = "Please provide where you heard about UPchieve";
         }
       }
 
-      if (this.error !== '') {
-        $('body').animate({ scrollTop: 0 })
-        return
+      if (this.error !== "") {
+        $("body").animate({ scrollTop: 0 });
+        return;
       }
 
-      this.buttonMsg = 'Updating...'
-      UserService.setProfile(this, this.user, '/')
+      this.buttonMsg = "Updating...";
+      UserService.setProfile(this, this.user, "/");
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -597,8 +598,8 @@ select.form-control:focus {
   border: 1px solid #16d2aa;
 }
 
-button[type='submit'],
-button[type='back'] {
+button[type="submit"],
+button[type="back"] {
   width: 140px;
   height: 40px;
   background-color: #f6f6f6;
@@ -611,10 +612,10 @@ button[type='back'] {
   float: right;
 }
 
-button[type='submit']:hover,
-button[type='submit']:active,
-button[type='back']:hover,
-button[type='back']:active {
+button[type="submit"]:hover,
+button[type="submit"]:active,
+button[type="back"]:hover,
+button[type="back"]:active {
   background-color: #16d2aa;
   color: #fff;
 }

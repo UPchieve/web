@@ -15,8 +15,8 @@
 </template>
 
 <script>
-import FormPageTemplate from '@/components/FormPageTemplate'
-import FormFooter from '@/components/FormFooter'
+import FormPageTemplate from "@/components/FormPageTemplate";
+import FormFooter from "@/components/FormFooter";
 
 export default {
   components: {
@@ -26,9 +26,9 @@ export default {
   data() {
     return {
       mainWebsiteUrl: process.env.VUE_APP_MAIN_WEBSITE_URL
-    }
+    };
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import ContentHeader from './ContentHeader'
+import ContentHeader from "./ContentHeader";
 
 export default {
   components: {
@@ -19,14 +19,14 @@ export default {
   props: {
     headerTitle: {
       type: String,
-      default: ''
+      default: ""
     }
   },
   data() {
-    return {}
+    return {};
   },
   methods: {}
-}
+};
 </script>
 
 <style lang="scss" scoped>

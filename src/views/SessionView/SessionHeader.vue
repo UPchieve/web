@@ -25,11 +25,11 @@
 </template>
 
 <script>
-import UserService from '@/services/UserService'
-import SessionService from '@/services/SessionService'
-import router from '@/router'
-import StudentAvatarUrl from '@/assets/defaultavatar3.png'
-import VolunteerAvatarUrl from '@/assets/defaultavatar4.png'
+import UserService from "@/services/UserService";
+import SessionService from "@/services/SessionService";
+import router from "@/router";
+import StudentAvatarUrl from "@/assets/defaultavatar3.png";
+import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 
 /**
  * @todo {1} Refactoring candidate: use a modal instead.
@@ -38,99 +38,99 @@ export default {
   data() {
     return {
       currentSession: SessionService.currentSession
-    }
+    };
   },
   computed: {
     waitingText() {
-      const user = UserService.getUser()
+      const user = UserService.getUser();
       if (user.isVolunteer) {
-        return 'No student is in this session'
+        return "No student is in this session";
       }
-      return 'We are contacting our Academic Coaches for you right now - please hang tight while we try to connect you! This process can take 5-10 minutes.'
+      return "We are contacting our Academic Coaches for you right now - please hang tight while we try to connect you! This process can take 5-10 minutes.";
     },
     partnerName() {
-      const partner = SessionService.getPartner()
-      return partner && partner.firstname
+      const partner = SessionService.getPartner();
+      return partner && partner.firstname;
     },
     partnerAvatar() {
-      const user = UserService.getUser()
-      let picture = ''
+      const user = UserService.getUser();
+      let picture = "";
       if (user.isVolunteer === false) {
-        picture = VolunteerAvatarUrl
+        picture = VolunteerAvatarUrl;
       } else {
-        picture = StudentAvatarUrl
+        picture = StudentAvatarUrl;
       }
       return {
         backgroundImage: `url(${picture})`
-      }
+      };
     }
   },
   methods: {
     end() {
-      let studentId = ''
-      let volunteerId = null
-      let subTopic = null
-      let topic = null
-      let sessionId = SessionService.currentSession.sessionId
+      let studentId = "";
+      let volunteerId = null;
+      let subTopic = null;
+      let topic = null;
+      let sessionId = SessionService.currentSession.sessionId;
 
       if (
         SessionService.currentSession &&
         SessionService.currentSession.data.student
       ) {
-        studentId = SessionService.currentSession.data.student._id
+        studentId = SessionService.currentSession.data.student._id;
       }
 
       if (
         SessionService.currentSession &&
         SessionService.currentSession.data.volunteer
       ) {
-        volunteerId = SessionService.currentSession.data.volunteer._id
+        volunteerId = SessionService.currentSession.data.volunteer._id;
       }
 
       if (
         SessionService.currentSession &&
         SessionService.currentSession.data.type
       ) {
-        topic = SessionService.currentSession.data.type
+        topic = SessionService.currentSession.data.type;
       }
 
       if (
         SessionService.currentSession &&
         SessionService.currentSession.data.subTopic
       ) {
-        subTopic = SessionService.currentSession.data.subTopic
+        subTopic = SessionService.currentSession.data.subTopic;
       }
 
-      const result = window.confirm('Do you really want to end the session?')
+      const result = window.confirm("Do you really want to end the session?");
 
       if (result) {
         if (volunteerId) {
-          this.$socket.disconnect()
-          SessionService.endSession(this, sessionId)
+          this.$socket.disconnect();
+          SessionService.endSession(this, sessionId);
           const url =
-            '/feedback/' +
+            "/feedback/" +
             sessionId +
-            '/' +
+            "/" +
             topic +
-            '/' +
+            "/" +
             subTopic +
-            '/' +
-            (UserService.getUser().isVolunteer ? 'volunteer' : 'student') +
-            '/' +
+            "/" +
+            (UserService.getUser().isVolunteer ? "volunteer" : "student") +
+            "/" +
             studentId +
-            '/' +
-            volunteerId
-          router.replace(url)
+            "/" +
+            volunteerId;
+          router.replace(url);
         } else {
-          SessionService.endSession(this, sessionId)
-          router.replace('/')
+          SessionService.endSession(this, sessionId);
+          router.replace("/");
         }
 
       }
       
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -156,7 +156,7 @@ h1 {
 .avatar {
   width: 30px;
   height: 30px;
-  background-image: url('~@/assets/defaultAvatar@2x.png');
+  background-image: url("~@/assets/defaultAvatar@2x.png");
   background-size: cover;
 }
 
