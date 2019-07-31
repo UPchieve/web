@@ -318,20 +318,33 @@
           </div>
         </div>
       </div>
-      <div id="availability" class="contain--availability">
+
+     <div id="availability" class="contain--availability">
         <div class="prompt">Availability</div>
         <div class="answer">
           <div v-if="this.displayAvailability">
-            <div class = 'grid'>
-              <div v-for='(cell, index) in availabilityArray' :key = '`${index}`'>
-                <div v-if="isNaN(cell) || cell.length == 0">
-                  <div class="cell--header">{{ cell }}</div>
-                </div>
+            <div class="table-layout">
+              <div class="subtable--days">
                 <div
-                  v-else
-                  v-bind:class="{ 'cell--true': cell, 'cell--false': !cell }"
-                >
-                  {{ "" }}
+                  class="cell--header--days"
+                  v-for="day in availability.daysOfWeek"
+                  :key="`${day}`">
+                  {{ day }}
+                </div>
+              </div>
+              <div class="subtable--times">
+                <div
+                  class="cell--header--times"
+                  v-for="time in availability.timesOfDay"
+                  :key="`${time}`">
+                  {{ time }}
+                </div>
+              </div>
+              <div class="subtable--data">
+                <div
+                  v-for="(cell, index) in availability.table"
+                  :key="`${index}`">
+                  <div :class = "{'cell--true': cell, 'cell--false': !cell}">{{''}}</div>
                 </div>
               </div>
             </div>
@@ -372,7 +385,7 @@ export default {
         planning: false
       },
       certKey: {}, //stores a map to larger category of each subtopic, used for label
-      availabilityArray: [], //stores availability array in a simpler for to display
+      availability: {}, //stores availability array in a simpler for to display
       invalidInputs: [], //tracks which inputs were invalids
       displayAvailability: false //checks whether availability is empty, or filled with non-booleans
     }
@@ -400,40 +413,30 @@ export default {
 
     /* converts availability into 2D flat array with row and column headers to 
     make it cleaner to display in grid form*/
-    getAvailability() {
-      var daysOfWeek;
-      var timesOfDay;
-      const availability = this.volunteer.availability;
-      //create 2d array of availability with headers for columns and rows
-      var availabilityArray = Array(8)
-        .fill(false)
-        .map(() => Array(25).fill(false));
-      for (const day in availability) {
-        for (const time in availability[day]) {
+    getAvailability () {
+      const tempAvailability = this.volunteer.availability
+      //create 2d array of availability with headers for columns and rows 
+      this.availability.table = Array(7).fill(false).map(() => Array(24).fill(false))
+      for (const day in tempAvailability) {
+        for (const time in tempAvailability[day]) {
           // '$init' property and others are not skipped when nested
-          if (time !== "$init" && availability[day].hasOwnProperty([time])) {
-            if (!daysOfWeek) {
-              daysOfWeek = Object.keys(availability);
+          if (time !== '$init' && tempAvailability[day].hasOwnProperty([time])) {
+            // saving headers automatically as property of this.availability
+            if (!this.availability.hasOwnProperty('daysOfWeek')) {
+              this.availability.daysOfWeek = Object.keys(tempAvailability)
             }
-            if (!timesOfDay) {
-              timesOfDay = Object.keys(availability[day]);
+            if (!this.availability.hasOwnProperty('timesOfDay')) {
+              this.availability.timesOfDay = Object.keys(tempAvailability[day])
             }
-            let dayIndex = daysOfWeek.indexOf(day) + 1;
-            let timeIndex = timesOfDay.indexOf(time) + 1;
-            if (availability[day][time]) {
-              availabilityArray[dayIndex][timeIndex] = true;
+            let dayIndex = this.availability.daysOfWeek.indexOf(day)
+            let timeIndex = this.availability.timesOfDay.indexOf(time)
+            if (tempAvailability[day][time]) {
+              this.availability.table[dayIndex][timeIndex] = true
             }
-            daysOfWeek.forEach(function(value, index) {
-              availabilityArray[index + 1][0] = daysOfWeek[index];
-            });
-            timesOfDay.forEach(function(value, index) {
-              availabilityArray[0][index + 1] = timesOfDay[index];
-            });
           }
         }
-      }
-      availabilityArray[0][0] = "";
-      this.availabilityArray = availabilityArray.flat();
+      }  
+      this.availability.table = this.availability.table.flat()
     },
 
     // stores certifications that volunteer has in certification objects
@@ -556,6 +559,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+
+.volunteer-profile {
+  font-size: 16px;
+  font-family: $default-font;
+}
+
 .header {
   display: flex;
   padding: 30px;
@@ -594,7 +604,7 @@ export default {
 
 .wrap-container {
   display: flex;
-  flex-wrap: wrap;
+  width: auto;
   margin: 40px;
   flex-direction: column;
 }
@@ -613,10 +623,13 @@ export default {
 }
 
 .info-subcontainer {
-  padding: 20px;
-  display: flex;
-  flex-flow: row;
-  justify-content: space-around;
+    padding: 30px;
+    display: flex;
+    flex-flow: row;
+    flex-wrap: wrap-reverse;
+    padding: 40px;
+    justify-content: space-around;
+
 }
 
 .info-subcontainer-content {
@@ -755,36 +768,78 @@ li {
   background-color: lightgreen;
 }
 
-.grid {
-  display: grid;
-  margin: 20px;
-  grid-auto-flow: column;
-  grid-template-columns: 30px repeat(7, 1fr);
-  grid-template-rows: repeat(25, 1fr);
-  grid-gap: 2px;
-}
 
 .cell {
   height: 20px;
   &--true {
     @extend .cell;
     border: 1px solid grey;
-    background-color: #16d2aa;
+    background-color:  #16d2aa;
   }
-  &--false {
-    border: 1px solid grey;
+  &--false  {
     @extend .cell;
+    border: 1px solid grey;
     background-color: white;
   }
   &--header {
     @extend .cell;
+    font-size: 50%;
     text-align: center;
     background-color: transparent;
   }
 }
+.table-layout {
+  display: grid;
+  grid-template-areas: 
+    ". days"
+    "times data";
+  grid-template-columns: auto 1fr;
+  padding: 5px;
 
-.volunteer-profile {
-  font-size: 16px;
-  font-family: $default-font;
 }
+
+.subtable {
+  display: grid;
+  grid-gap: 2px;
+  &--days {
+    @extend .subtable;
+    grid-area: days;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-template-rows: 1fr;
+    margin-top: 20px;
+    margin-bottom: 5px;
+  }
+  &--times {
+    @extend .subtable;
+    grid-area: times;
+    grid-template-columns: min-content;
+    grid-template-rows: repeat(24, 1fr);
+    margin-right: 10px;
+    grid-auto-flow: column;
+  }
+  &--data {
+    @extend .subtable;
+    grid-area: data;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-template-rows: repeat(24, 1fr);
+    grid-auto-flow: column;
+  }
+}
+
+@media only screen and (max-width: 1000px) {
+  .header {
+    padding: 1em 20px 1em 3em !important;
+  }
+  .cell--header--days {
+    visibility: hidden;
+    width: 30px;
+
+    &::first-letter {
+      text-align: center;
+      visibility:visible;
+      }
+  } 
+  
+}
+
 </style>
