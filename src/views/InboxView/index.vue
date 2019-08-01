@@ -10,11 +10,11 @@
 </template>
 
 <script>
-import StudentQuestionService from '@/services/StudentQuestionService'
-import UserService from '@/services/UserService'
+import StudentQuestionService from "@/services/StudentQuestionService";
+import UserService from "@/services/UserService";
 
-import ContentHeader from '@/components/ContentHeader'
-import HelpRequests from './HelpRequests'
+import ContentHeader from "@/components/ContentHeader";
+import HelpRequests from "./HelpRequests";
 
 export default {
   name: "inbox-view",
@@ -22,23 +22,23 @@ export default {
     ContentHeader,
     HelpRequests
   },
-  data () {
+  data() {
     return {
       user: UserService.getUser(),
       helpRequests: {
-        type: 'question',
+        type: "question",
         requests: []
       }
-    }
+    };
   },
-  mounted () {
+  mounted() {
     StudentQuestionService.getStudentQuestions(this, {}).then(questions => {
       questions.forEach(question => {
-        this.helpRequests.requests.push(question)
-      })
-    })
+        this.helpRequests.requests.push(question);
+      });
+    });
   }
-}
+};
 </script>
 
 <style lang="scss">

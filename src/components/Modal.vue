@@ -20,8 +20,8 @@
 </template>
 
 <script>
-import BtnOptions from './BtnOptions'
-import Btn from './Btn'
+import BtnOptions from "./BtnOptions";
+import Btn from "./Btn";
 
 export default {
   components: {
@@ -35,7 +35,7 @@ export default {
     },
     message: {
       type: String,
-      default: ''
+      default: ""
     },
     warn: {
       type: Boolean,
@@ -43,28 +43,28 @@ export default {
     },
     labels: {
       type: Array[String],
-      default: ['']
+      default: [""]
     },
     clickHandlers: {
       type: Object,
       required: true
     }
   },
-  data () {
+  data() {
     return {
       mainBtnLabel: this.labels[0],
       secondBtnLabel: this.labels[1] ? this.labels[1] : null,
       classes: {
-        'v-modal': true,
-        'v-modal--warn': this.warn
+        "v-modal": true,
+        "v-modal--warn": this.warn
       },
       dialogClasses: {
-        'v-modal-dialog': true,
-        'v-modal-dialog--warn': this.warn
+        "v-modal-dialog": true,
+        "v-modal-dialog--warn": this.warn
       }
-    }
+    };
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
