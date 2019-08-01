@@ -221,23 +221,31 @@
               <div class="answer">
                 {{ volunteer.isTestUser ? "Yes" : "No" }}
               </div>
-              <input
-                v-show="activeEdit"
-                v-model="volunteer.isTestUser"
-                type="checkbox"
-                class="form-control"
-              />
+              <div class="round">
+                <input
+                  v-show="activeEdit"
+                  v-model="volunteer.isTestUser"
+                  id="test"
+                  type="checkbox"
+                  class="form-control"
+                />
+                <label for="test" v-show="activeEdit"></label>
+              </div>
             </div>
 
             <div id="admin" class="info">
               <div class="prompt">Admin Access</div>
               <div class="answer">{{ volunteer.isAdmin ? "Yes" : "No" }}</div>
-              <input
-                v-show="activeEdit"
-                v-model="volunteer.isAdmin"
-                type="checkbox"
-                class="form-control"
-              />
+              <div class="round">
+                <input
+                  v-show="activeEdit"
+                  v-model="volunteer.isAdmin"
+                  id="isAdmin"
+                  type="checkbox"
+                  class="form-control"
+                />
+                <label for="isAdmin" v-show="activeEdit"></label>
+              </div>
             </div>
 
             <div id="volunteer-approved-ready" class="info">
@@ -274,44 +282,57 @@
                       v-if="certifications.hasOwnProperty(key)"
                       class="certBox"
                     >
-                      <label class="certValue">
+                      <div class="round">
                         <input
                           v-model="volunteer[key].passed"
                           type="checkbox"
+                          :id="key"
                           @change="
                             (certifications[key] = volunteer[key].passed),
                               (volunteer.hasCertification = checkHasCertification())
                           "
                         />
+                        <label :for="key" v-show="activeEdit"></label>
                         {{ key }}
-                      </label>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-                        <div id="volunteer-approved" class="info">
+            <div id="volunteer-approved" class="info">
               <div class="prompt">Volunteer Approved</div>
               <div class="answer">
                 {{ volunteer.isVolunteerApproved ? "Yes" : "No" }}
               </div>
             </div>
-            <div id="onboarding" class="info" v-for="(value, property) in volunteer.onboarding" :key="property.index">
+            <div
+              id="onboarding"
+              class="info"
+              v-for="(value, property) in volunteer.onboarding"
+              :key="property.index"
+            >
               <div class="subproperty">
                 <li>{{ property }}</li>
               </div>
               <div
+                class="round"
                 v-for="(value, type) in volunteer.onboarding[property]"
                 :key="type.index"
               >
-                <div class="subanswer" v-if="type === 'submitted' || type === 'passed'">
+                <div
+                  class="subanswer"
+                  v-if="type === 'submitted' || type === 'passed'"
+                >
                   {{ type }}:
                   {{ volunteer.onboarding[property][type] ? "Yes" : "No" }}
                   <input
                     v-show="activeEdit"
                     v-model="volunteer.onboarding[property][type]"
                     type="checkbox"
+                    :id="property + type"
                   />
+                  <label :for="property + type" v-show="activeEdit"></label>
                 </div>
               </div>
             </div>
@@ -319,7 +340,7 @@
         </div>
       </div>
 
-     <div id="availability" class="contain--availability">
+      <div id="availability" class="contain--availability">
         <div class="prompt">Availability</div>
         <div class="answer">
           <div v-if="this.displayAvailability">
@@ -328,7 +349,8 @@
                 <div
                   class="cell--header--days"
                   v-for="day in availability.daysOfWeek"
-                  :key="`${day}`">
+                  :key="`${day}`"
+                >
                   {{ day }}
                 </div>
               </div>
@@ -336,15 +358,19 @@
                 <div
                   class="cell--header--times"
                   v-for="time in availability.timesOfDay"
-                  :key="`${time}`">
+                  :key="`${time}`"
+                >
                   {{ time }}
                 </div>
               </div>
               <div class="subtable--data">
                 <div
                   v-for="(cell, index) in availability.table"
-                  :key="`${index}`">
-                  <div :class = "{'cell--true': cell, 'cell--false': !cell}">{{''}}</div>
+                  :key="`${index}`"
+                >
+                  <div :class="{ 'cell--true': cell, 'cell--false': !cell }">
+                    {{ "" }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -357,10 +383,10 @@
 </template>
 
 <script>
-import UserService from '@/services/UserService'
-import phoneValidation from '@/utils/phone-validation'
-import AuthService from '@/services/AuthService'
-import validator from 'validator'
+import UserService from "@/services/UserService";
+import phoneValidation from "@/utils/phone-validation";
+import AuthService from "@/services/AuthService";
+import validator from "validator";
 import _ from "lodash";
 
 export default {
@@ -388,23 +414,35 @@ export default {
       availability: {}, //stores availability array in a simpler for to display
       invalidInputs: [], //tracks which inputs were invalids
       displayAvailability: false //checks whether availability is empty, or filled with non-booleans
-    }
-  },
-  
-  created () {
-    var id = this.$route.params.id
-    UserService.getVolunteer(this, id).then(volunteer =>{
-      this.volunteer = volunteer
-      this.setCertifications()
-      this.getAvailability()
-      this.displayAvailability = this.checkIfAvailability()
-      })
-    
+    };
   },
 
+  created() {
+    var id = this.$route.params.id;
+    UserService.getVolunteer(this, id).then(volunteer => {
+      this.volunteer = volunteer;
+      this.setCertifications();
+      this.getAvailability();
+      this.displayAvailability = this.checkIfAvailability();
+    });
+  },
+  beforeRouteLeave(to, from, next) {
+    if (this.activeEdit) {
+      const answer = window.confirm(
+        "Do you really want to leave? You haven't saved!"
+      );
+      if (answer) {
+        next();
+      } else {
+        next(false);
+      }
+    } else {
+      next();
+    }
+  },
   methods: {
-    checkIfAvailability () {
-      return _.isBoolean(_.get(this.volunteer.availability, 'Sunday.4p', null))
+    checkIfAvailability() {
+      return _.isBoolean(_.get(this.volunteer.availability, "Sunday.4p", null));
     },
     // updates the virtual hasCertification property
     checkHasCertification() {
@@ -413,30 +451,35 @@ export default {
 
     /* converts availability into 2D flat array with row and column headers to 
     make it cleaner to display in grid form*/
-    getAvailability () {
-      const tempAvailability = this.volunteer.availability
-      //create 2d array of availability with headers for columns and rows 
-      this.availability.table = Array(7).fill(false).map(() => Array(24).fill(false))
+    getAvailability() {
+      const tempAvailability = this.volunteer.availability;
+      //create 2d array of availability with headers for columns and rows
+      this.availability.table = Array(7)
+        .fill(false)
+        .map(() => Array(24).fill(false));
       for (const day in tempAvailability) {
         for (const time in tempAvailability[day]) {
           // '$init' property and others are not skipped when nested
-          if (time !== '$init' && tempAvailability[day].hasOwnProperty([time])) {
+          if (
+            time !== "$init" &&
+            tempAvailability[day].hasOwnProperty([time])
+          ) {
             // saving headers automatically as property of this.availability
-            if (!this.availability.hasOwnProperty('daysOfWeek')) {
-              this.availability.daysOfWeek = Object.keys(tempAvailability)
+            if (!this.availability.hasOwnProperty("daysOfWeek")) {
+              this.availability.daysOfWeek = Object.keys(tempAvailability);
             }
-            if (!this.availability.hasOwnProperty('timesOfDay')) {
-              this.availability.timesOfDay = Object.keys(tempAvailability[day])
+            if (!this.availability.hasOwnProperty("timesOfDay")) {
+              this.availability.timesOfDay = Object.keys(tempAvailability[day]);
             }
-            let dayIndex = this.availability.daysOfWeek.indexOf(day)
-            let timeIndex = this.availability.timesOfDay.indexOf(time)
+            let dayIndex = this.availability.daysOfWeek.indexOf(day);
+            let timeIndex = this.availability.timesOfDay.indexOf(time);
             if (tempAvailability[day][time]) {
-              this.availability.table[dayIndex][timeIndex] = true
+              this.availability.table[dayIndex][timeIndex] = true;
             }
           }
         }
-      }  
-      this.availability.table = this.availability.table.flat()
+      }
+      this.availability.table = this.availability.table.flat();
     },
 
     // stores certifications that volunteer has in certification objects
@@ -559,8 +602,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
-
 .volunteer-profile {
   font-size: 16px;
   font-family: $default-font;
@@ -618,18 +659,18 @@ export default {
   }
   &--availability {
     background-color: #f0f8fd;
-    padding-bottom: 20px;
+    padding: 30px;
+    padding-top: 0px;
   }
 }
 
 .info-subcontainer {
-    padding: 30px;
-    display: flex;
-    flex-flow: row;
-    flex-wrap: wrap-reverse;
-    padding: 40px;
-    justify-content: space-around;
-
+  padding: 30px;
+  padding-bottom: 0px;
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap-reverse;
+  justify-content: space-around;
 }
 
 .info-subcontainer-content {
@@ -701,6 +742,49 @@ input[type="checkbox"] {
   vertical-align: middle;
 }
 
+.round {
+  position: relative;
+}
+
+.round label {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  cursor: pointer;
+  height: 18px;
+  left: 0;
+  position: absolute;
+  top: 3px;
+  width: 18px;
+}
+
+.round label:after {
+  border: 2px solid #fff;
+  border-top: none;
+  border-right: none;
+  content: "";
+  height: 5px;
+  left: 3px;
+  opacity: 0;
+  position: absolute;
+  top: 4px;
+  transform: rotate(-45deg);
+  width: 10px;
+}
+
+.round input[type="checkbox"] {
+  visibility: hidden;
+}
+
+.round input[type="checkbox"]:checked + label {
+  background-color: #16d2aa;
+  border-color: #16d2aa;
+}
+
+.round input[type="checkbox"]:checked + label:after {
+  opacity: 1;
+}
+
 .onboarding {
   margin: 0px 20px;
   font-weight: 600;
@@ -768,15 +852,14 @@ li {
   background-color: lightgreen;
 }
 
-
 .cell {
   height: 20px;
   &--true {
     @extend .cell;
     border: 1px solid grey;
-    background-color:  #16d2aa;
+    background-color: #16d2aa;
   }
-  &--false  {
+  &--false {
     @extend .cell;
     border: 1px solid grey;
     background-color: white;
@@ -790,12 +873,11 @@ li {
 }
 .table-layout {
   display: grid;
-  grid-template-areas: 
+  grid-template-areas:
     ". days"
     "times data";
   grid-template-columns: auto 1fr;
   padding: 5px;
-
 }
 
 .subtable {
@@ -836,10 +918,8 @@ li {
 
     &::first-letter {
       text-align: center;
-      visibility:visible;
-      }
-  } 
-  
+      visibility: visible;
+    }
+  }
 }
-
 </style>

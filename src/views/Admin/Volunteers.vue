@@ -3,6 +3,45 @@
     <div class="header">
       Volunteers
     </div>
+    <div>
+      <ul>
+        <li class="pagination-item">
+          <button type="button" @click="firstPage()" :disabled="onFirstPage()">
+            First
+          </button>
+        </li>
+        <li class="pagination-item">
+          <button
+            type="button"
+            @click="previousPage()"
+            :disabled="onFirstPage()"
+          >
+            Previous
+          </button>
+        </li>
+        <li v-for="page in pages" :key="page.name" class="pagination-item">
+          <button
+            type="button"
+            @click="middlePages(page.name)"
+            :disabled="page.isDisabled"
+            :class="{ active: isPageActive(page.name) }"
+            class="middleBtns"
+          >
+            {{ page.name }}
+          </button>
+        </li>
+        <li class="pagination-item">
+          <button type="button" @click="nextPage()" :disabled="onLastPage()">
+            Next
+          </button>
+        </li>
+        <li class="pagination-item">
+          <button type="button" @click="lastPage()" :disabled="onLastPage()">
+            Last
+          </button>
+        </li>
+      </ul>
+    </div>
     <div class="wrapper">
       <table>
         <thead>
@@ -45,7 +84,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="volunteer in filteredItems" v-bind:key="volunteer._id">
+          <tr v-for="volunteer in paginatedData" v-bind:key="volunteer._id">
             <td v-for="key in volunteerProperties" v-bind:key="key.index">
               <div v-if="key === '_id'">
                 <router-link
@@ -117,7 +156,10 @@ export default {
       search: "",
       volunteers: [],
       volunteerProperties,
-      appliedFilter: {}
+      appliedFilter: {},
+      perPage: 5,
+      maxVisibleButtons: 3,
+      currentPage: 0
     };
   },
   computed: {
@@ -142,18 +184,101 @@ export default {
         }
       }
       return resultItems;
+    },
+    totalPages() {
+      let l = this.filteredItems.length,
+        s = this.perPage;
+      return Math.ceil(l / s);
+    },
+    pages() {
+      const range = [];
+      for (let i = this.startPage; i <= this.endPage; i += 1) {
+        range.push({
+          name: i,
+          isDisabled: i === this.currentPage
+        });
+      }
+      return range;
+    },
+    paginatedData() {
+      const start = this.currentPage * this.perPage;
+      const end = start + this.perPage;
+      return this.filteredItems.slice(start, end);
+    },
+    startPage() {
+      if (this.currentPage <= 0) {
+        return 0;
+      }
+      if (this.currentPage === this.totalPages - 1) {
+        return Math.max(this.totalPages - this.maxVisibleButtons, 0);
+      }
+      return this.currentPage - 1;
+    },
+    endPage() {
+      return Math.min(
+        this.startPage + this.maxVisibleButtons - 1,
+        this.totalPages - 1
+      );
     }
   },
-
   created() {
     UserService.getVolunteers(this).then(volunteers => {
       this.volunteers = volunteers;
     });
+  },
+  methods: {
+    isPageActive(page) {
+      return this.currentPage === page;
+    },
+    firstPage() {
+      this.currentPage = 0;
+    },
+    previousPage() {
+      this.currentPage--;
+    },
+    middlePages(page) {
+      this.currentPage = page;
+    },
+    nextPage() {
+      this.currentPage++;
+    },
+    lastPage() {
+      this.currentPage = this.totalPages - 1;
+    },
+    onFirstPage() {
+      return this.currentPage === 0;
+    },
+    onLastPage() {
+      return this.currentPage === this.totalPages - 1;
+    }
   }
 };
 </script>
 
 <style lang="scss" scoped>
+.pagination {
+  list-style-type: none;
+}
+
+.pagination-item {
+  display: inline-block;
+}
+
+button {
+  background-color: #e3f2fd;
+  border: none;
+  border-radius: 5px;
+  margin: 3px;
+}
+
+.middleBtns {
+  margin: 1px;
+}
+.active {
+  background-color: #16d2aa;
+  color: #ffffff;
+}
+
 body {
   font-family: "Work Sans", Helvetica, Arial, sans-serif;
   font-size: 14px;

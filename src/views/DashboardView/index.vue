@@ -308,7 +308,8 @@ h3 {
 
 .col-lg-6.help {
   background-color: #e3f2fd;
-  padding: 50px 0;
+  padding: 30px 0;
+  overflow: auto;
 }
 
 .col-lg-6.video {
@@ -410,7 +411,7 @@ h3 {
 
 .help-container {
   width: 500px;
-  height: 300px;
+  height: 350px;
 }
 
 .intro_bold {
