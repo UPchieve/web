@@ -2,7 +2,6 @@
   <div class="calendar">
     <h1 class="header">
       <div class="header-title">Schedule</div>
-      <button class="btn" @click="save()">Update Schedule</button>
     </h1>
     <div v-if="hasUserSchedule">
       <div class="tz-selector-container">
@@ -85,6 +84,12 @@ export default {
       tzList: moment.tz.names(),
       selectedTz: ""
     };
+  },
+  beforeRouteLeave (to, from, next) {
+    // called when the route that renders this component is about to
+    // be navigated away from.
+    this.save()
+    next()
   },
   computed: {
     sortedTimes() {
