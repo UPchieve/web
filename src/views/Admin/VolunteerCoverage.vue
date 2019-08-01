@@ -158,24 +158,27 @@ export default {
         lessThan represents if we are calculating for less than (true) or greater 
         than (false)*/
     getNumHours(lessThan) {
-      let totalHours = 0;
+      const totalHours = 0;
+      const compareNumber = lessThan ? this.lessThan : this.greaterThan;
       if (
         this.availabilityTable.table &&
         this.availabilityTable.table.length != 0
       ) {
-        this.availabilityTable.table.forEach(currentValue => {
-          if (
-            currentValue.length != 0 &&
-            ((lessThan &&
-              this.lessThan.length != 0 &&
-              currentValue < this.lessThan) ||
-              (!lessThan &&
-                this.greaterThan.length != 0 &&
-                currentValue > this.greaterThan))
+        if (compareNumber.length != 0) {
+          return this.availabilityTable.table.reduce(function(
+            totalHours,
+            currentValue
           ) {
-            totalHours++;
-          }
-        });
+            if (
+              (!lessThan && currentValue > compareNumber) ||
+              (lessThan && currentValue < compareNumber)
+            ) {
+              totalHours++;
+            }
+            return totalHours;
+          },
+          totalHours);
+        }
       }
       return totalHours;
     },
@@ -298,7 +301,6 @@ export default {
     ". days"
     "times data";
   grid-template-columns: auto 1fr;
-
 }
 
 .subtable {
@@ -354,9 +356,8 @@ export default {
 
     &::first-letter {
       text-align: center;
-      visibility:visible;
-      }
-  } 
-  
+      visibility: visible;
+    }
+  }
 }
 </style>
