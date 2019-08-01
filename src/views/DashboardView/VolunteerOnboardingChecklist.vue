@@ -8,7 +8,11 @@
         <div id="checkbox-container" class="checklist">
           <div class="dropdown">
             <div class="round" v-for="type in checklist" :key="type.index">
-              <div class="dropdown__header" @click="toggleDropdown($event)">
+              <div
+                :class="{ active: !user.onboarding[type].submitted }"
+                class="dropdown__header"
+                @click="toggleDropdown($event)"
+              >
                 <input
                   type="checkbox"
                   :id="type"
@@ -58,7 +62,6 @@ export default {
     return {
       user,
       checklist,
-      editBtnMsg: "Save",
       activeEdit: false,
       saveFail: false
     };
@@ -76,7 +79,7 @@ export default {
       );
     },
     toggleDropdown(event) {
-      event.currentTarget.classList.toggle("is-active");
+      event.currentTarget.classList.toggle("active");
     }
   }
 };
@@ -175,7 +178,7 @@ h3 {
         opacity: 1;
       }
     }
-    &.is-active {
+    &.active {
       i.fa {
         &.fa-angle-up {
           transform: rotate(-135deg);

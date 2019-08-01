@@ -153,11 +153,10 @@ export default {
 
     return {
       user,
-      search: "",
       volunteers: [],
       volunteerProperties,
       appliedFilter: {},
-      perPage: 5,
+      perPage: 10,
       maxVisibleButtons: 3,
       currentPage: 0
     };
