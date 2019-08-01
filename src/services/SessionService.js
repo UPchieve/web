@@ -24,13 +24,10 @@ export default {
   endSession(context, sessionId) {
     localStorage.removeItem("currentSessionPath");
 
-    return NetworkService.endSession(context, { sessionId }).then(res => {
-      const { /* sessionId, */ data } = res.data || {};
-
+    return NetworkService.endSession(context, { sessionId }).then(() => {
       // analytics: track when a help session has ended
       AnalyticsService.trackSessionEnded(
-        this,
-        data,
+        this.currentSession.data,
         UserService.getUser().isFakeUser
       );
 

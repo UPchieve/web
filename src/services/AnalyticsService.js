@@ -71,7 +71,7 @@ export default {
   },
 
   // tracks when a help session has ended
-  trackSessionEnded(headerComponent, currentSession, isFakeUser) {
+  trackSessionEnded(currentSession, isFakeUser) {
     if (isFakeUser) return;
 
     // calculating time-related session info (session length, wait time, etc.)
@@ -118,12 +118,12 @@ export default {
     if (studentMessages > 0 && volunteerMessages > 0) {
       successfulSession = true;
     }
-
     window.analytics.track("session ended", {
       //if volunteer joined then report volunteerSessionLength otherwise report null
-      "volunteer session length": volunteerSessionLength
-        ? volunteerSessionLength
-        : null,
+      "volunteer session length":
+        volunteerSessionLength && UserService.getUser().isVolunteer
+          ? volunteerSessionLength
+          : null,
       "wait time": waitTime,
       "session length": sessionLength,
       "session topic": currentSession.type,
