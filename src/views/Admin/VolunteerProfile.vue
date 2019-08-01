@@ -914,6 +914,7 @@ li {
   }
   .cell--header--days {
     visibility: hidden;
+    margin-left: 45%;
     width: 30px;
 
     &::first-letter {
