@@ -46,8 +46,10 @@
 <script>
 import _ from "lodash";
 import moment from "moment-timezone";
+
 import UserService from "@/services/UserService";
 import CalendarService from "@/services/CalendarService";
+import AnalyticsService from "@/services/AnalyticsService";
 
 export default {
   data() {
@@ -236,6 +238,12 @@ export default {
         this,
         this.user._id,
         this.convertAvailability(this.availability, offset)
+      );
+      
+      // analytics: tracking whether a user has updated their availability
+      AnalyticsService.trackNoProperties(
+        "updated availability",
+        this.user.isFakeUser
       );
     }
   }
