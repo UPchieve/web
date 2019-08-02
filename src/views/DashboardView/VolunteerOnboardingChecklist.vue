@@ -5,7 +5,7 @@
         <h3>
           You need to be approved! To be approved, you need to do the following:
         </h3>
-        <div id="checkbox-container" class="checklist">
+        <div class="checklist">
           <div class="dropdown">
             <div class="round" v-for="type in checklist" :key="type.index">
               <div
@@ -32,16 +32,16 @@
         </div>
       </div>
     </template>
-    <template v-else-if="user.isVolunteerApproved && !user.isVolunteerReady">
-      <h3>You are approved! The next steps you need to take are:</h3>
-      <div class="checklist">
-        <div v-if="!user.hasAvailability">
+    <template v-if="!user.isVolunteerReady">
+      <h3>You need to get ready! The next steps you need to take are:</h3>
+      <ul class="checklist">
+        <li v-if="!user.hasAvailability">
           Schedule at least 1 hour of availability
-        </div>
-        <div v-if="!user.hasCertification">
+        </li>
+        <li v-if="!user.hasCertification">
           Get certified in at least 1 subject
-        </div>
-      </div>
+        </li>
+      </ul>
     </template>
   </div>
 </template>
@@ -87,15 +87,9 @@ export default {
 
 <style lang="scss" scoped>
 .checklist {
-  padding: 15px;
   font-size: 16px;
   text-align: left;
-}
-
-#checkbox-container {
-  margin: 10px 5px;
-  text-align: left;
-  padding: 15px;
+  margin: 15px 30px;
 }
 
 input[type="text"] {

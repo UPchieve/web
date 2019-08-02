@@ -177,6 +177,7 @@ export default {
                 hours = Number(this.appliedFilter[field]);
                 return volunteer[field] < hours;
               }
+              debugger
               return result.toLowerCase().includes(val);
             });
           }
