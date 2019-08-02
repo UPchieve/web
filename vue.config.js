@@ -23,7 +23,7 @@ module.exports = {
       // Add simple-progress-webpack-plugin
       config
         .plugin("simple-progress-webpack-plugin")
-        .use(SimpleProgressWebpackPlugin, [{ format: "compact" }]);
+        .use(SimpleProgressWebpackPlugin, [{ format: "minimal" }]);
     }
   }
 };
