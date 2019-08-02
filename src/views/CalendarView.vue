@@ -2,6 +2,7 @@
   <div class="calendar">
     <h1 class="header">
       <div class="header-title">Schedule</div>
+      <button class="btn" @click="save()">Update Schedule</button>
     </h1>
     <div v-if="hasUserSchedule">
       <div class="tz-selector-container">
@@ -91,6 +92,7 @@ export default {
     this.save()
     next()
   },
+
   computed: {
     sortedTimes() {
       return this.sortTimes();
@@ -101,8 +103,15 @@ export default {
   },
   created() {
     this.fetchData();
+    //to catch reloading and exiting page
+    window.addEventListener('beforeunload', this.leaving)
   },
   methods: {
+    leaving(event) {
+      this.save()
+      event.preventDefault()
+      event.returnValue = ''
+    },
     fetchData() {
       if (!this.user.hasSchedule) {
         CalendarService.initAvailability(this, this.user._id);
