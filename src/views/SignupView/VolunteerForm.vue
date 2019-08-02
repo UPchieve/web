@@ -178,6 +178,7 @@ import validator from "validator";
 
 import AuthService from "@/services/AuthService";
 import UserService from "@/services/UserService";
+import AnalyticsService from "@/services/AnalyticsService";
 
 import phoneValidation from "@/utils/phone-validation";
 
@@ -296,14 +297,12 @@ export default {
       })
         .then(() => {
           let user = UserService.getUser();
-          /*
-          user.firstname = this.profile.firstName
-          user.lastname = this.profile.lastName
-          user.college = this.profile.college
-          user.phone = this.profile.phone
-          user.favoriteAcademicSubject = this.profile.favoriteAcademicSubject
-          */
           UserService.setProfile(this, user);
+
+          // analytics: tracking when a user has signed up
+          AnalyticsService.identify(user, user.isFakeUser);
+          AnalyticsService.trackNoProperties("signed up", user.isFakeUser);
+
           this.step = "success-message";
         })
         .catch(err => {

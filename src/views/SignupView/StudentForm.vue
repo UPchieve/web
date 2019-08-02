@@ -178,6 +178,7 @@ import validator from "validator";
 
 import AuthService from "@/services/AuthService";
 import UserService from "@/services/UserService";
+import AnalyticsService from "@/services/AnalyticsService";
 
 export default {
   data() {
@@ -300,14 +301,13 @@ export default {
       })
         .then(() => {
           let user = UserService.getUser();
-          /*
-          user.firstname = this.profile.firstName
-          user.lastname = this.profile.lastName
-          user.highschool = this.profile.highSchool
-          */
           user.heardFrom = this.profile.heardFrom;
           user.referred = this.profile.referred;
           UserService.setProfile(this, user, "/");
+
+          // analytics: tracking when a user has signed up
+          AnalyticsService.identify(user, user.isFakeUser);
+          AnalyticsService.trackNoProperties("signed up", user.isFakeUser);
         })
         .catch(err => {
           this.msg = err.message;
