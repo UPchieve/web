@@ -173,12 +173,15 @@ export default {
               var hours = Infinity;
               if (typeof volunteer[field] === "boolean") {
                 result = volunteer[field].toString();
-              } else if (typeof volunteer[field] === "number") {
+              }
+              if (typeof volunteer[field] === "number") {
                 hours = Number(this.appliedFilter[field]);
                 return volunteer[field] < hours;
               }
-              debugger
-              return result.toLowerCase().includes(val);
+              if (result) {
+                return result.toLowerCase().includes(val);
+              }
+              return
             });
           }
         }
