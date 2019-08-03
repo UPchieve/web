@@ -49,5 +49,31 @@ export default {
         return Promise.reject(res);
       }
     );
+  },
+
+  getVolunteers(context) {
+    return NetworkService.getVolunteers(context).then(res => {
+      if (res.data.err) {
+        return res.data.err;
+      } else if (res.data.volunteers) {
+        return res.data.volunteers;
+      } else {
+        throw new Error();
+      }
+    });
+  },
+  getVolunteersAvailability(context, certifiedSubject) {
+    return NetworkService.getVolunteersAvailability(
+      context,
+      certifiedSubject
+    ).then(res => {
+      if (res.data.err) {
+        return res.data.err;
+      } else if (res.data.aggAvailabilities) {
+        return res.data.aggAvailabilities;
+      } else {
+        throw new Error();
+      }
+    });
   }
 };
