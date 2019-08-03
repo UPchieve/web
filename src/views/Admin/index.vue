@@ -1,15 +1,9 @@
 <template>
   <div class="admin-view">
     <div class="header">Admin Dashboard</div>
-    <div class="parent">
-      <div class="container-section linkBtn btn">
-        <router-link to="admin/volunteer-coverage" class="prompt"
-          >Volunteer Coverage</router-link
-        >
-      </div>
-      <div class="container-section linkBtn btn">
-        <router-link to="admin/edu" class="prompt">Edu Admin</router-link>
-      </div>
+    <div class="admin-directory">
+      <router-link to="admin/volunteer-coverage" class="admin-link btn">Volunteer Coverage</router-link>
+      <router-link to="admin/edu" class="admin-link btn">Edu Admin</router-link>
     </div>
   </div>
 </template>
@@ -19,39 +13,30 @@ export default {};
 </script>
 
 <style lang="scss" scoped>
-.container-section {
+.admin-directory {
+  padding: 60px 30px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  margin-bottom: 20px;
+  justify-content: center;
 }
 
-.linkBtn {
+.admin-link {
   background-color: #16d2aa;
   border-radius: 30px;
-  align-items: center;
   height: 50px;
-  justify-content: center;
+  line-height: 50px;
   font-size: 16px;
   font-weight: 600;
-
-  a {
-    color: white;
-    text-decoration: none;
-  }
+  color: #fff;
+  text-decoration: none;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-bottom: 30px;
+  max-width: 500px;
 
   &:hover {
-    a {
-      color: #2c3e50;
-    }
+    color: #2c3e50;
   }
-}
-
-.parent {
-  padding: 100px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 .header {
