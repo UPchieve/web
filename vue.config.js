@@ -1,5 +1,4 @@
 const path = require("path");
-const SimpleProgressWebpackPlugin = require("simple-progress-webpack-plugin");
 
 module.exports = {
   chainWebpack: config => {
@@ -15,15 +14,5 @@ module.exports = {
           patterns: [path.resolve(__dirname, "./src/scss/setup/all.scss")]
         })
     );
-
-    // Simplify dev build output
-    if (process.env.NODE_ENV === "development") {
-      // Remove vue-cli-service's progress output
-      config.plugins.delete("progress");
-      // Add simple-progress-webpack-plugin
-      config
-        .plugin("simple-progress-webpack-plugin")
-        .use(SimpleProgressWebpackPlugin, [{ format: "minimal" }]);
-    }
   }
 };
