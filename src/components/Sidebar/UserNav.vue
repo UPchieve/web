@@ -49,8 +49,8 @@
 
       <template v-if="user.isAdmin">
         <div v-on:click="$emit('closeMenu')">
-          <router-link to="/edu" tag="li">
-            <a class="resources icon">EDU Admin</a>
+          <router-link to="/admin" tag="li">
+            <a class="resources icon">Admin</a>
           </router-link>
         </div>
       </template>

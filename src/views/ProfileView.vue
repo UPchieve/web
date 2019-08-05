@@ -481,15 +481,17 @@ ul {
   justify-content: center;
   font-size: 16px;
   font-weight: 600;
-}
 
-.resetBtn a {
-  color: #2c3e50;
-}
+  a {
+    color: white;
+  }
 
-.resetBtn a:hover {
-  color: white;
-  text-decoration: none;
+  &:hover {
+    a {
+      color: #2c3e50;
+      text-decoration: none;
+    }
+  }
 }
 
 .container-content.cert {

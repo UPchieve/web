@@ -187,7 +187,7 @@ export default {
           const url = '/feedback/null/null/null/student/null/null'
           router.replace(url)
         }
-        if (user.isVolunteer) {
+        else {
           const url = '/feedback/null/null/null/volunteer/null/null'
           router.replace(url)
         }
