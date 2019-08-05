@@ -181,7 +181,6 @@ export default {
       if (path) {
         this.$router.push(path);
       } else {
-        // console.log(`session terminated`)
         const user = UserService.getUser()
         if (!user.isVolunteer) {
           const url = '/feedback/null/null/null/student/null/null'
