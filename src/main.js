@@ -1,6 +1,7 @@
 import Vue from "vue";
 import VueSocketIO from "vue-socket.io";
 import VueHeadful from "vue-headful";
+import vSelect from "vue-select";
 import App from "./components/App";
 import router from "./router";
 import store from "./store";
@@ -13,6 +14,9 @@ Vue.use(VueSocketIO, process.env.VUE_APP_SOCKET_ADDRESS);
 
 // Set up vue-headful
 Vue.component("vue-headful", VueHeadful);
+
+// Set up vue-select
+Vue.component("v-select", vSelect);
 
 // Create Vue instance
 new Vue({
