@@ -1,8 +1,5 @@
 <template>
-  <div
-    :class="{ background: !auth.authenticated && !user.verified }"
-    class="row"
-  >
+  <div class="row">
     <div class="col-sm-12">
       <iframe
         src="https://docs.google.com/forms/d/e/1FAIpQLScP9FUKeeH869Z1x4vk4JxyYFiPnDHwVKZAMYGa5eErOGhnFw/viewform?embedded=true"
@@ -22,6 +19,12 @@
 import UserService from "@/services/UserService";
 
 export default {
+  name: "ContactView",
+  created() {
+    if (!this.auth.authenticated && !this.user.verified) {
+      this.$store.dispatch('app/hideNavigation');
+    }
+  },
   data() {
     const auth = UserService.getAuth();
 
@@ -35,21 +38,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.background {
-  margin-left: -350px;
-  position: relative;
-  z-index: 2;
-}
-
-@media screen and (max-width: 700px) {
-  .background {
-    margin-left: 0em !important;
-    padding-left: 0em !important;
-    padding-top: 0.5em !important;
-  }
-
-  .col-sm-12 {
-    padding: 0em !important;
-  }
-}
 </style>

@@ -27,6 +27,7 @@ import SendAnswerView from "./views/SendAnswerView";
 
 import AuthService from "./services/AuthService";
 import OnboardingService from "./services/OnboardingService";
+import store from "./store";
 
 Vue.use(VueResource);
 Vue.use(VueRouter);
@@ -45,35 +46,18 @@ const routes = [
   },
   { path: "/contact", name: "ContactView", component: ContactView },
   { path: "/legal", name: "LegalView", component: LegalView },
-  {
-    path: "/login",
-    name: "LoginView",
-    component: LoginView,
-    meta: { hideSidebar: true }
-  },
-  {
-    path: "/logout",
-    name: "LogoutView",
-    component: LogoutView,
-    meta: { hideSidebar: true }
-  },
-  {
-    path: "/signup",
-    name: "SignupView",
-    component: SignupView,
-    meta: { hideSidebar: true }
-  },
+  { path: "/login", name: "LoginView", component: LoginView },
+  { path: "/logout", name: "LogoutView", component: LogoutView },
+  { path: "/signup", name: "SignupView", component: SignupView },
   {
     path: "/resetpassword",
     name: "ResetPasswordView",
-    component: ResetPasswordView,
-    meta: { hideSidebar: true }
+    component: ResetPasswordView
   },
   {
     path: "/setpassword/:token",
     name: "SetPasswordView",
-    component: SetPasswordView,
-    meta: { hideSidebar: true }
+    component: SetPasswordView
   },
   {
     path: "/dashboard",
@@ -217,6 +201,11 @@ router.beforeEach((to, from, next) => {
   } else {
     next();
   }
+});
+
+// Show navigation after each route change
+router.afterEach((/* to, from */) => {
+  store.dispatch("app/showNavigation");
 });
 
 // If endpoint returns 401, redirect to login (except for requests to get user's

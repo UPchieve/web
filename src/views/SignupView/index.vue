@@ -43,6 +43,9 @@ export default {
     StudentForm,
     VolunteerForm
   },
+  created() {
+    this.$store.dispatch("app/hideNavigation");
+  },
   data() {
     return {
       userSelection: null

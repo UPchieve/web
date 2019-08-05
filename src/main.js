@@ -1,7 +1,7 @@
 import Vue from "vue";
 import VueSocketIO from "vue-socket.io";
 import VueHeadful from "vue-headful";
-import App from "./App.vue";
+import App from "./components/App";
 import router from "./router";
 import store from "./store";
 

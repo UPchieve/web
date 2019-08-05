@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ background: !auth.authenticated && !user.verified }">
+  <div class="LegalView">
     <full-text-template header-title="Legal Policy">
       <section>
         <h2>Disclaimer</h2>
@@ -630,10 +630,16 @@ import Accordion from "@/components/Accordion";
 import AccordionItem from "@/components/AccordionItem";
 
 export default {
+  name: "LegalView",
   components: {
     FullTextTemplate,
     Accordion,
     AccordionItem
+  },
+  created() {
+    if (!this.auth.authenticated && !this.user.verified) {
+      this.$store.dispatch('app/hideNavigation');
+    }
   },
   data() {
     const auth = UserService.getAuth();
@@ -648,21 +654,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.background {
-  margin-left: -300px;
-  position: relative;
-  z-index: 2;
-  background-color: white;
-}
-
-@media screen and (max-width: 700px) {
-  .background {
-    margin-left: 0em !important;
-    padding-left: 0em !important;
-  }
-
-  .content-header {
-    padding: 2em !important;
-  }
+.LegalView {
+  background: white;
 }
 </style>
