@@ -702,14 +702,17 @@ export default {
 .whiteboard {
   height: 100%;
   display: flex;
+  overflow: scroll;
   flex-direction: column;
 }
 
 canvas {
-  width: 100%;
+  // Standardize to 4/3 aspect ratio with horizontal scroll
+  width: 133.3%;
   height: 100%;
   background: #fff;
   display: block;
+  overflow: scroll;
   cursor: not-allowed;
   flex: 1;
 }
