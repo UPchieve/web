@@ -34,6 +34,18 @@ export default {
   },
   created() {
     AuthService.checkAuth(this); // {1}
+    window.addEventListener("resize", this.handleResize);
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.handleResize);
+  },
+  methods: {
+    handleResize() {
+      this.$store.dispatch("app/windowResize", {
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    }
   },
   computed: {
     ...mapState({

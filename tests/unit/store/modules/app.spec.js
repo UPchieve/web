@@ -1,5 +1,7 @@
 import appModule from "@/store/modules/app";
-const { mutations, actions } = appModule;
+import { MAX_MOBILE_MODE_WIDTH } from "@/consts";
+
+const { mutations, actions, getters } = appModule;
 
 describe("app store module", () => {
   describe("mutations", () => {
@@ -23,6 +25,28 @@ describe("app store module", () => {
 
       mutations.setHideSidebar(state, false);
       expect(state.hideSidebar).toBe(false);
+    });
+
+    it("setWindowWidth", () => {
+      expect(typeof mutations.setWindowWidth).toBe("function");
+      const state = { windowWidth: 0 };
+
+      mutations.setWindowWidth(state, 100);
+      expect(state.windowWidth).toBe(100);
+
+      mutations.setWindowWidth(state, -100);
+      expect(state.windowWidth).toBe(0);
+    });
+
+    it("setWindowHeight", () => {
+      expect(typeof mutations.setWindowHeight).toBe("function");
+      const state = { windowHeight: 0 };
+
+      mutations.setWindowHeight(state, 100);
+      expect(state.windowHeight).toBe(100);
+
+      mutations.setWindowHeight(state, -100);
+      expect(state.windowHeight).toBe(0);
     });
   });
 
@@ -69,6 +93,28 @@ describe("app store module", () => {
       actions.hideNavigation({ commit });
       expect(commit).toHaveBeenNthCalledWith(1, "setHideHeader", true);
       expect(commit).toHaveBeenNthCalledWith(2, "setHideSidebar", true);
+    });
+
+    it("windowResize", () => {
+      expect(typeof actions.windowResize).toBe("function");
+      const commit = jest.fn();
+      const width = 800;
+      const height = 600;
+      actions.windowResize({ commit }, { width, height });
+      expect(commit).toHaveBeenNthCalledWith(1, "setWindowWidth", width);
+      expect(commit).toHaveBeenNthCalledWith(2, "setWindowHeight", height);
+    });
+  });
+
+  describe("getters", () => {
+    it("mobileMode", () => {
+      expect(getters.mobileMode({ windowWidth: 0 })).toBe(true);
+      expect(getters.mobileMode({ windowWidth: MAX_MOBILE_MODE_WIDTH })).toBe(
+        true
+      );
+      expect(
+        getters.mobileMode({ windowWidth: MAX_MOBILE_MODE_WIDTH + 1 })
+      ).toBe(false);
     });
   });
 });

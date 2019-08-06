@@ -1,11 +1,11 @@
 $app-header-height-map: (
   "default": 80px,
-  "small": 64px
+  "medium": 64px
 );
 
 $app-sidebar-width-map: (
   "default": 100%,
-  "small": 250px
+  "medium": 250px
 );
 
 /// Returns the `AppHeader` component height based on key.
