@@ -1,44 +1,42 @@
 <template>
-  <div>
+  <div class="session-header-wrapper">
     <div :class="{ inactive: !partnerName }" class="session-header">
-      <div class="main-session-header">
-        <div class="avatar-info-container">
-          <div :style="partnerAvatar" class="avatar" />
-          <div class="info">
-            <template v-if="partnerName">
-              <span class="volunteer-name">{{ partnerName }}</span>
-            </template>
-            <template v-else-if="currentSession.sessionId">
-              {{ waitingText }}
-            </template>
-            <template v-else>
-              Loading
-            </template>
-          </div>
-        </div>
-        <div class="button-container">
-          <div class="end-session">
-            <button class="btn btn-lg btn-block" @click.prevent="end">
-              End session
-            </button>
-          </div>
+      <div class="avatar-info-container">
+        <div :style="partnerAvatar" class="avatar" />
+        <div class="info">
+          <template v-if="partnerName">
+            <span class="volunteer-name">{{ partnerName }}</span>
+          </template>
+          <template v-else-if="currentSession.sessionId">
+            {{ waitingText }}
+          </template>
+          <template v-else>
+            Loading
+          </template>
         </div>
       </div>
-      <div
-        :class="[connectionMsgType]"
-        class="connection-message-header"
-        v-if="connectionMsg || reconnectAttemptMsg"
-      >
-        {{ connectionMsg }} {{ reconnectAttemptMsg }}
-        <template v-if="reconnectAttemptMsg">
-          <button
-            class="btn btn-in-msg-header btn-bg-dark"
-            @click.prevent="tryReconnect"
-          >
-            Try Now
+      <div class="button-container">
+        <div class="end-session">
+          <button class="btn btn-lg btn-block" @click.prevent="end">
+            End session
           </button>
-        </template>
+        </div>
       </div>
+    </div>
+    <div
+      :class="[connectionMsgType]"
+      class="connection-message"
+      v-if="connectionMsg || reconnectAttemptMsg"
+    >
+      {{ connectionMsg }} {{ reconnectAttemptMsg }}
+      <template v-if="reconnectAttemptMsg">
+        <button
+          class="connection-try-again"
+          @click.prevent="tryReconnect"
+        >
+          Try Now
+        </button>
+      </template>
     </div>
   </div>
 </template>
@@ -282,24 +280,34 @@ h1 {
   background-color: #73737a;
 }
 
-.connection-message-header {
+.connection-message {
   padding: 3px;
   background-color: #858585;
   color: #fff;
   text-align: center;
   font-weight: 600;
-  position: relative;
+  position: absolute;
+  width: 100%;
   bottom: 0;
-}
+  left: 0;
 
-.connection-message-header.warning {
-  background-color: #ffde5e;
-  color: #000;
-}
+  &.warning {
+    background-color: #ffde5e;
+    color: #000;
+  }
 
-.connection-message-header.success {
-  background-color: #fff;
-  color: #000;
+  &.success {
+    background-color: #fff;
+    color: #000;
+  }
+
+  .connection-try-again {
+    border: 0;
+    background: none;
+    padding: 0;
+    margin: 0;
+    text-decoration: underline;
+  }
 }
 
 .avatar-info-container {

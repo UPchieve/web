@@ -1,7 +1,7 @@
 <template>
   <div class="resources-page">
     <div v-if="!user.isVolunteer">
-      <div class="res-header">
+      <div class="header">
         Resources for Students
       </div>
       <div class="body">
@@ -164,8 +164,8 @@ export default {
 };
 </script>
 
-<style lang="scss">
-.res-header {
+<style lang="scss" scoped>
+.header {
   display: flex;
   padding: 30px;
   margin: 0;
@@ -216,7 +216,6 @@ li {
 }
 
 @media screen and (max-width: 700px) {
-  .res-header,
   .header {
     font-size: 24px;
     line-height: 1.2 !important;

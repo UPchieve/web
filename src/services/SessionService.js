@@ -2,6 +2,7 @@ import router from "@/router";
 
 import NetworkService from "./NetworkService";
 import UserService from "./UserService";
+import AnalyticsService from "./AnalyticsService";
 
 export default {
   loading: false,
@@ -23,6 +24,12 @@ export default {
   endSession(context, sessionId) {
     return NetworkService.endSession(context, { sessionId }).then(() => {
       localStorage.removeItem("currentSessionPath");
+      
+      // analytics: track when a help session has ended
+      AnalyticsService.trackSessionEnded(
+        this.currentSession.data,
+        UserService.getUser().isFakeUser
+      );
 
       this.currentSession.sessionId = null;
       this.currentSession.data = {};
@@ -46,6 +53,13 @@ export default {
       } else {
         router.replace("/");
       }
+      // analytics: track when a session has started
+      AnalyticsService.trackSessionStarted(
+        this.currentSession,
+        sessionType,
+        sessionSubTopic,
+        UserService.getUser().isFakeUser
+      );
 
       return sessionId;
     });
