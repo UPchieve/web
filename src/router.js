@@ -110,7 +110,8 @@ const routes = [
     meta: { protected: true, bypassOnboarding: true }
   },
   {
-    path: "/feedback/:sessionId/:topic/:subTopic/:userType/:studentId/:volunteerId",
+    path:
+      "/feedback/:sessionId/:topic/:subTopic/:userType/:studentId/:volunteerId",
     name: "FeedbackView",
     component: FeedbackView,
     meta: { protected: true }
