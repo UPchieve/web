@@ -2,6 +2,7 @@ import router from "@/router";
 
 import NetworkService from "./NetworkService";
 import UserService from "./UserService";
+import AnalyticsService from "./AnalyticsService";
 
 import errorFromServer from "@/utils/error-from-server";
 
@@ -26,6 +27,12 @@ export default {
     localStorage.removeItem("currentSessionPath");
 
     return NetworkService.endSession(context, { sessionId }).then(() => {
+      // analytics: track when a help session has ended
+      AnalyticsService.trackSessionEnded(
+        this.currentSession.data,
+        UserService.getUser().isFakeUser
+      );
+
       this.currentSession.sessionId = null;
       this.currentSession.data = {};
     });

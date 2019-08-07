@@ -98,6 +98,7 @@
 <script>
 import UserService from "@/services/UserService";
 import NetworkService from "@/services/NetworkService";
+import AnalyticsService from "@/services/AnalyticsService";
 
 export default {
   data() {
@@ -245,6 +246,9 @@ export default {
   },
   methods: {
     submitFeedback() {
+      // analytics: tracking feedback response data
+      AnalyticsService.trackFeedback(this, this.user.isFakeUser);
+
       NetworkService.feedback(this, {
         sessionId: this.sessionId,
         topic: this.topic,

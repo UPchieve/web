@@ -3,6 +3,7 @@ import Validator from "validator";
 import router from "@/router";
 
 import NetworkService from "./NetworkService";
+import AnalyticsService from "./AnalyticsService";
 import errorFromServer from "@/utils/error-from-server";
 
 const USER_FETCH_LIMIT_SECONDS = 5;

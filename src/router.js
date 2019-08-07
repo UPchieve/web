@@ -24,6 +24,8 @@ import CalendarView from "./views/CalendarView";
 import SubmitQuestionView from "./views/SubmitQuestionView";
 import InboxView from "./views/InboxView";
 import SendAnswerView from "./views/SendAnswerView";
+import AdminView from "./views/Admin";
+import VolunteerCoverage from "./views/Admin/VolunteerCoverage";
 
 import DebugSentryView from "./views/DebugSentryView";
 
@@ -108,14 +110,7 @@ const routes = [
     meta: { protected: true, bypassOnboarding: true }
   },
   {
-    path: "/edu",
-    component: () => {
-      window.location.href = "/edu";
-    }
-  },
-  {
-    path:
-      "/feedback/:sessionId/:topic/:subTopic/:userType/:studentId/:volunteerId",
+    path: "/feedback/:sessionId/:topic/:subTopic/:userType/:studentId/:volunteerId",
     name: "FeedbackView",
     component: FeedbackView,
     meta: { protected: true }
@@ -175,6 +170,24 @@ const routes = [
     name: "SendAnswerView",
     component: SendAnswerView,
     meta: { protected: true }
+  },
+  {
+    path: "/admin",
+    name: "Admin",
+    component: AdminView,
+    meta: { protected: true, requiresAdmin: true }
+  },
+  {
+    path: "/admin/volunteer-coverage",
+    name: "VolunteerCoverage",
+    component: VolunteerCoverage,
+    meta: { protected: true, requiresAdmin: true }
+  },
+  {
+    path: "/edu", // TODO: make this be "/admin/edu"
+    component: () => {
+      window.location.href = "/edu";
+    }
   }
 ];
 
@@ -225,6 +238,16 @@ router.beforeEach((to, from, next) => {
       }
     } else {
       next();
+    }
+  }
+  if (to.matched.some(route => route.meta.requiresAdmin)) {
+    if (!AuthService.user.data.isAdmin) {
+      next({
+        path: "/login",
+        query: {
+          redirect: to.fullPath
+        }
+      });
     }
   } else {
     next();

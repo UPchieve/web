@@ -3,6 +3,7 @@ import VueSocketIO from "vue-socket.io";
 import VueHeadful from "vue-headful";
 import * as Sentry from "@sentry/browser";
 import * as Integrations from "@sentry/integrations";
+import vSelect from "vue-select";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
@@ -29,6 +30,9 @@ Sentry.init({
 
 // Set up vue-headful
 Vue.component("vue-headful", VueHeadful);
+
+// Set up vue-select
+Vue.component("v-select", vSelect);
 
 // Create Vue instance
 new Vue({
