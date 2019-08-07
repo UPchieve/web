@@ -183,8 +183,7 @@ export default {
       return this.currentSessionPath;
     },
     rejoinHelpSession() {
-      const path =
-        this.currentSessionPath;
+      const path = this.currentSessionPath;
       if (path) {
         this.$router.push(path);
       } else {

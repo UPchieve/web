@@ -24,7 +24,7 @@ export default {
   endSession(context, sessionId) {
     return NetworkService.endSession(context, { sessionId }).then(() => {
       localStorage.removeItem("currentSessionPath");
-      
+
       // analytics: track when a help session has ended
       AnalyticsService.trackSessionEnded(
         this.currentSession.data,
