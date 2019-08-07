@@ -51,6 +51,9 @@ export default {
 
         if (res.status !== 401 && res.status !== 0 && res.data) {
           throw errorFromServer(res);
+        } else if (!res.data) {
+          // error is not a server response
+          throw res;
         }
       });
   },
