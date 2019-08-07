@@ -33,6 +33,13 @@ export default {
           throw new Error("No user returned from auth service");
         }
 
+        // analytics: tracking when a user has logged in
+        AnalyticsService.identify(this.user.data, this.user.data.isFakeUser);
+        AnalyticsService.trackNoProperties(
+          "logged in",
+          this.user.data.isFakeUser
+        );
+
         this.storeUser(data.user);
 
         if (redirect) {

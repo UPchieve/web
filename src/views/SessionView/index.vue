@@ -103,7 +103,7 @@ export default {
         this.sessionId = this.currentSession.sessionId;
         this.$socket.connect();
         this.joinSession(sessionId);
-       })
+      })
       .catch(err => {
         this.$parent.$emit("async-error", err);
       });

@@ -56,6 +56,13 @@ export default {
         } else {
           router.replace("/");
         }
+        // analytics: track when a session has started
+        AnalyticsService.trackSessionStarted(
+          this.currentSession,
+          sessionType,
+          sessionSubTopic,
+          UserService.getUser().isFakeUser
+        );
 
         return sessionId;
       })
