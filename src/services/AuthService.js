@@ -50,9 +50,12 @@ export default {
         context.error = "Could not login";
 
         if (res.status !== 401 && res.status !== 0 && res.data) {
-          throw errorFromServer(res);
+          const err = errorFromServer(res);
+          err.breaking = true;
+          throw err;
         } else if (!res.data) {
           // error is not a server response
+          res.breaking = true;
           throw res;
         }
       });
