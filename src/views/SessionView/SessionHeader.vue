@@ -194,16 +194,8 @@ export default {
   position: relative;
   height: 100px;
   background-color: #64e1c6;
-  padding: 0;
+  padding: 20px;
   text-align: left;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: space-between;
-}
-
-.main-session-header {
-  padding: 20px 20px 0 20px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -248,25 +240,6 @@ h1 {
 
 .btn:hover {
   color: #000000;
-}
-
-.btn.btn-in-msg-header {
-  font-size: 14px;
-  border-radius: 10px;
-  padding: 5px;
-  height: 30px;
-  vertical-align: baseline;
-  padding: 0 3px 0 3px;
-  height: auto;
-}
-
-.btn.btn-bg-dark {
-  background-color: #444;
-}
-
-.btn.btn-bg-dark:hover {
-  background-color: #000;
-  color: #fff;
 }
 
 .button-container {
