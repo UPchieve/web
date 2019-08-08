@@ -131,8 +131,8 @@
 import UserService from "@/services/UserService";
 import SessionService from "@/services/SessionService";
 
-import ListSessions from './ListSessions';
-import router from '../../router';
+import ListSessions from "./ListSessions";
+import router from "../../router";
 
 export default {
   name: "dashboard-view",
@@ -183,11 +183,11 @@ export default {
       } else {
         const user = UserService.getUser()
         if (!user.isVolunteer) {
-          const url = '/feedback/null/null/null/student/null/null'
+          const url = "/feedback/null/null/null/student/null/null"
           router.replace(url)
         }
         else {
-          const url = '/feedback/null/null/null/volunteer/null/null'
+          const url = "/feedback/null/null/null/volunteer/null/null"
           router.replace(url)
         }
       }
