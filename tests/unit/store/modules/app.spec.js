@@ -27,6 +27,17 @@ describe("app store module", () => {
       expect(state.hideSidebar).toBe(false);
     });
 
+    it("setIsSidebarCollapsed", () => {
+      expect(typeof mutations.setIsSidebarCollapsed).toBe("function");
+      const state = { isSidebarCollapsed: true };
+
+      mutations.setIsSidebarCollapsed(state, false);
+      expect(state.isSidebarCollapsed).toBe(false);
+
+      mutations.setIsSidebarCollapsed(state, true);
+      expect(state.isSidebarCollapsed).toBe(true);
+    });
+
     it("setWindowWidth", () => {
       expect(typeof mutations.setWindowWidth).toBe("function");
       const state = { windowWidth: 0 };
@@ -93,6 +104,20 @@ describe("app store module", () => {
       actions.hideNavigation({ commit });
       expect(commit).toHaveBeenNthCalledWith(1, "setHideHeader", true);
       expect(commit).toHaveBeenNthCalledWith(2, "setHideSidebar", true);
+    });
+
+    it("collapseSidebar", () => {
+      expect(typeof actions.collapseSidebar).toBe("function");
+      const commit = jest.fn();
+      actions.collapseSidebar({ commit });
+      expect(commit).toHaveBeenCalledWith("setIsSidebarCollapsed", true);
+    });
+
+    it("expandSidebar", () => {
+      expect(typeof actions.expandSidebar).toBe("function");
+      const commit = jest.fn();
+      actions.expandSidebar({ commit });
+      expect(commit).toHaveBeenCalledWith("setIsSidebarCollapsed", false);
     });
 
     it("windowResize", () => {
