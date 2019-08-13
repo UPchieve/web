@@ -1,7 +1,7 @@
 <template>
   <div
     class="AppHeaderHamburger"
-    :style="{background: $store.state.app.collapseSidebar ? 'limegreen' : 'red'}"
+    :style="{background: $store.state.app.isSidebarCollapsed ? 'limegreen' : 'red'}"
     v-on:click="handleClick"
   ></div>
 </template>

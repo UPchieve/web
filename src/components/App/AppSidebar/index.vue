@@ -1,7 +1,8 @@
 <template>
   <nav :class="{
     'AppSidebar': true,
-    'AppSidebar--header': !hideHeader
+    'AppSidebar--header': !hideHeader,
+    'AppSidebar--collapsed': mobileMode && isSidebarCollapsed
   }">
     <div v-on:click="$emit('closeMenu')">
       <router-link tag="h1" to="/" />
@@ -26,7 +27,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import UserService from "@/services/UserService";
 
 import UserNav from "./UserNav";
@@ -46,104 +47,40 @@ export default {
   },
   computed: {
     ...mapState({
-      hideHeader: state => state.app.hideHeader
+      hideHeader: state => state.app.hideHeader,
+      isSidebarCollapsed: state => state.app.isSidebarCollapsed
+    }),
+    ...mapGetters({
+      mobileMode: "app/mobileMode"
     })
   }
 };
 </script>
 
 <style lang="scss" scoped>
+$transition: transform 700ms;
+
 .AppSidebar {
   @include bind-app-sidebar-width(width);
 
   background: white;
   height: 100%;
+  overflow-y: auto;
 
   position: fixed;
   top: 0;
   left: 0;
   z-index: get-z("sidebar");
 
+  transition: $transition ease-out;
+
   &--header {
     @include bind-app-header-height(padding-top);
   }
+
+  &--collapsed {
+    transform: translateY(-100%);
+    transition: $transition ease-in;
+  }
 }
-
-// nav {
-//   height: 100%;
-//   border-radius: 0;
-//   border: none;
-
-//   background-color: #f6f6f6;
-//   color: #73737a;
-//   font-weight: 600;
-// }
-
-// .navbar {
-//   overflow: scroll;
-//   scroll-padding-bottom: 100px;
-//   display: flex;
-//   flex-direction: column;
-//   justify-content: space-between;
-//   flex-basis: 100%;
-// }
-
-// h1,
-// h2 {
-//   font-weight: normal;
-// }
-
-// h1 {
-//   margin-top: 29px;
-//   margin-bottom: 50px;
-//   font-size: 24px;
-//   cursor: pointer;
-// }
-
-// h1::before {
-//   content: "";
-//   display: inline-block;
-//   width: 100px;
-//   height: 43px;
-//   background-image: url("~@/assets/logo-01.svg");
-//   background-size: 100px 43px;
-//   top: 0;
-//   left: 0;
-// }
-
-// .navbar-footer {
-//   margin-top: 25px;
-// }
-
-// p.aboutText {
-//   width: 250px;
-//   margin: auto;
-//   text-align: left;
-// }
-
-// @media screen and (max-width: 700px) {
-//   .navbar {
-//     height: 100vh !important;
-//     padding: 1.5em !important;
-//   }
-
-//   h1 {
-//     width: 100px !important;
-//     margin-left: auto !important;
-//     margin-right: auto !important;
-//     margin-top: 0em !important;
-//   }
-
-//   p.aboutText {
-//     width: 100% !important;
-//   }
-
-//   .navbar-footer {
-//     margin: 1em 0em !important;
-//   }
-
-//   .navbar-nav {
-//     margin: 0em !important;
-//   }
-// }
 </style>
