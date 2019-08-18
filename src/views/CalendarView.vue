@@ -239,7 +239,7 @@ export default {
         this.user._id,
         this.convertAvailability(this.availability, offset)
       );
-      
+
       // analytics: tracking whether a user has updated their availability
       AnalyticsService.trackNoProperties(
         "updated availability",

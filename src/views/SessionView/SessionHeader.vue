@@ -30,10 +30,7 @@
     >
       {{ connectionMsg }} {{ reconnectAttemptMsg }}
       <template v-if="reconnectAttemptMsg">
-        <button
-          class="connection-try-again"
-          @click.prevent="tryReconnect"
-        >
+        <button class="connection-try-again" @click.prevent="tryReconnect">
           Try Now
         </button>
       </template>
@@ -125,27 +122,37 @@ export default {
 
       if (result) {
         if (volunteerId) {
-          this.$socket.disconnect();
-          SessionService.endSession(this, sessionId);
-          const url =
-            "/feedback/" +
-            sessionId +
-            "/" +
-            topic +
-            "/" +
-            subTopic +
-            "/" +
-            (UserService.getUser().isVolunteer ? "volunteer" : "student") +
-            "/" +
-            studentId +
-            "/" +
-            volunteerId;
-          router.replace(url);
+          SessionService.endSession(this, sessionId)
+            .then(() => {
+              this.$socket.disconnect();
+              const url =
+                "/feedback/" +
+                sessionId +
+                "/" +
+                topic +
+                "/" +
+                subTopic +
+                "/" +
+                (UserService.getUser().isVolunteer ? "volunteer" : "student") +
+                "/" +
+                studentId +
+                "/" +
+                volunteerId;
+              router.replace(url);
+            })
+            .catch(this.alertCouldNotEnd);
         } else {
-          SessionService.endSession(this, sessionId);
-          router.replace("/");
+          SessionService.endSession(this, sessionId)
+            .then(() => {
+              this.$socket.disconnect();
+              router.replace("/");
+            })
+            .catch(this.alertCouldNotEnd);
         }
       }
+    },
+    alertCouldNotEnd() {
+      window.alert("Could not end session");
     },
     tryReconnect() {
       // socket must be closed before reopening for automatic reconnections

@@ -90,7 +90,8 @@ const routes = [
     meta: { protected: true, bypassOnboarding: true }
   },
   {
-    path: "/feedback/:sessionId/:topic/:subTopic/:userType/:studentId/:volunteerId",
+    path:
+      "/feedback/:sessionId/:topic/:subTopic/:userType/:studentId/:volunteerId",
     name: "FeedbackView",
     component: FeedbackView,
     meta: { protected: true }
@@ -165,6 +166,14 @@ const routes = [
   {
     path: "/edu", // TODO: make this be "/admin/edu"
     component: () => {
+      if (process.env.NODE_ENV === "development") {
+        // The EDU admin route is rendered server-side with Express.js, so in local development
+        // we need to move to port 3000 (away from Vue's dev server on port 8080)
+        window.location.href = "http://localhost:3000/edu";
+        return;
+      }
+
+      // In non-development environments, we can simply use a relative link
       window.location.href = "/edu";
     }
   }
