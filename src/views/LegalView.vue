@@ -638,7 +638,7 @@ export default {
   },
   created() {
     if (!this.auth.authenticated && !this.user.verified) {
-      this.$store.dispatch('app/hideNavigation');
+      this.$store.dispatch("app/hideNavigation");
     }
   },
   data() {

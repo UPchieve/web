@@ -1,15 +1,19 @@
 <template>
   <nav
     :class="{
-    'AppSidebar': true,
-    'AppSidebar--header': !hideHeader,
-    'AppSidebar--collapsed': mobileMode && isSidebarCollapsed
-  }"
+      AppSidebar: true,
+      'AppSidebar--header': !hideHeader,
+      'AppSidebar--collapsed': mobileMode && isSidebarCollapsed
+    }"
   >
     <div v-if="mobileMode" class="AppSidebar-content">
       <div class="AppSidebar-content-links">
         <template v-if="$route.path.indexOf('/onboarding') !== -1">
-          <app-sidebar-link to="/onboarding/profile" icon="portrait" text="Basic profile" />
+          <app-sidebar-link
+            to="/onboarding/profile"
+            icon="portrait"
+            text="Basic profile"
+          />
           <app-sidebar-link
             v-if="!user.isVolunteer"
             to="/onboarding/academic"
@@ -26,22 +30,40 @@
             icon="graduation-cap"
             text="Training"
           />
-          <app-sidebar-link v-if="user.isVolunteer" to="/calendar" icon="calendar" text="Schedule" />
-          <app-sidebar-link v-if="user.isAdmin" to="/admin" icon="folder" text="Admin" />
+          <app-sidebar-link
+            v-if="user.isVolunteer"
+            to="/calendar"
+            icon="calendar"
+            text="Schedule"
+          />
+          <app-sidebar-link
+            v-if="user.isAdmin"
+            to="/admin"
+            icon="folder"
+            text="Admin"
+          />
           <app-sidebar-link to="/profile" icon="portrait" text="Profile" />
           <app-sidebar-link to="/resources" icon="folder" text="Resources" />
         </template>
 
         <template v-else>
-          <app-sidebar-link to="/login" text="Login"/>
+          <app-sidebar-link to="/login" text="Login" />
         </template>
 
         <app-sidebar-link to="/contact" icon="envelope" text="Contact us" />
         <app-sidebar-link to="/legal" icon="exclamation" text="Legal policy" />
       </div>
 
-      <div v-if="auth.authenticated" class="AppSidebar-final-link" v-on:click="logout">Log out</div>
-      <div v-else class="AppSidebar-final-link" v-on:click="backToWebsite">Back to website</div>
+      <div
+        v-if="auth.authenticated"
+        class="AppSidebar-final-link"
+        v-on:click="logout"
+      >
+        Log out
+      </div>
+      <div v-else class="AppSidebar-final-link" v-on:click="backToWebsite">
+        Back to website
+      </div>
     </div>
 
     <div v-else class="AppSidebar-content"></div>
@@ -69,17 +91,8 @@ import AuthService from "@/services/AuthService";
 import UserService from "@/services/UserService";
 import AppSidebarLink from "./AppSidebarLink";
 
-import UserNav from "./UserNav";
-import ProfileInfo from "./ProfileInfo";
-import Footer from "./Footer";
-
 export default {
-  components: {
-    AppSidebarLink,
-    UserNav,
-    ProfileInfo,
-    SidebarFooter: Footer // footer is reserved component name
-  },
+  components: { AppSidebarLink },
   data() {
     return {
       auth: UserService.getAuth(),

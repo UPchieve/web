@@ -22,7 +22,7 @@ export default {
   name: "ContactView",
   created() {
     if (!this.auth.authenticated && !this.user.verified) {
-      this.$store.dispatch('app/hideNavigation');
+      this.$store.dispatch("app/hideNavigation");
     }
   },
   data() {
@@ -37,5 +37,4 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

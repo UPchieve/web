@@ -1,7 +1,7 @@
 <template>
   <div v-if="mobileMode" class="AppHeader">
     <div class="AppHeader-user-info">
-      <img class="AppHeader-user-info-avatar" :src="avatarUrl"/>
+      <img class="AppHeader-user-info-avatar" :src="avatarUrl" />
       <span class="AppHeader-user-info-name">{{ name }}</span>
     </div>
     <app-header-hamburger />
@@ -13,12 +13,12 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import UserService from '@/services/UserService';
-import LogoImageUrl from '@/assets/header_logo.png';
+import { mapGetters } from "vuex";
+import UserService from "@/services/UserService";
+import LogoImageUrl from "@/assets/header_logo.png";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
 import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
-import AppHeaderHamburger from './AppHeaderHamburger';
+import AppHeaderHamburger from "./AppHeaderHamburger";
 
 export default {
   name: "AppHeader",
@@ -30,16 +30,18 @@ export default {
 
     return {
       name: user ? user.firstname : "Unknown",
-      avatarUrl: user.picture || (user.isVolunteer ? VolunteerAvatarUrl : StudentAvatarUrl),
+      avatarUrl:
+        user.picture ||
+        (user.isVolunteer ? VolunteerAvatarUrl : StudentAvatarUrl),
       logoUrl: LogoImageUrl
-    }
+    };
   },
   computed: {
     ...mapGetters({
-      mobileMode: 'app/mobileMode'
+      mobileMode: "app/mobileMode"
     })
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -83,5 +85,4 @@ export default {
     @include font-category("heading");
   }
 }
-
 </style>

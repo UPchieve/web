@@ -3,22 +3,24 @@
     <app-header v-if="!hideHeader" />
     <app-sidebar v-if="!hideSidebar" />
 
-    <div :class="{
-      'App-router-view-wrapper': true,
-      'App-router-view-wrapper--header': !hideHeader,
-      'App-router-view-wrapper--sidebar': !hideSidebar,
-    }">
+    <div
+      :class="{
+        'App-router-view-wrapper': true,
+        'App-router-view-wrapper--header': !hideHeader,
+        'App-router-view-wrapper--sidebar': !hideSidebar
+      }"
+    >
       <router-view />
     </div>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState } from "vuex";
 import AuthService from "@/services/AuthService";
 
 import "@/scss/main.scss";
-import AppHeader from './AppHeader';
+import AppHeader from "./AppHeader";
 import AppSidebar from "./AppSidebar";
 
 /**
@@ -58,18 +60,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
- .App {
-   min-height: 100vh;
- }
+.App {
+  min-height: 100vh;
+}
 
- .App-router-view-wrapper {
-   &--header {
-     @include bind-app-header-height(padding-top);
-   }
+.App-router-view-wrapper {
+  &--header {
+    @include bind-app-header-height(padding-top);
+  }
 
-   &--sidebar {
-     @include bind-app-sidebar-width(padding-left);
-     padding-left: 0;
-   }
- }
+  &--sidebar {
+    @include bind-app-sidebar-width(padding-left);
+    padding-left: 0;
+  }
+}
 </style>
