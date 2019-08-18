@@ -1,13 +1,22 @@
 <template>
-  <div
+  <upchieve-icon
     class="AppHeaderHamburger"
-    :style="{background: $store.state.app.isSidebarCollapsed ? 'limegreen' : 'red'}"
-    v-on:click="handleClick"
-  ></div>
+    :icon="icon"
+    v-on:click.native="handleClick"
+    size="16px"
+  />
 </template>
 
 <script>
+import UpchieveIcon from "@/components/UpchieveIcon";
+
 export default {
+  components: { UpchieveIcon },
+  computed: {
+    icon() {
+      return this.$store.state.app.isSidebarCollapsed ? "hamburger" : "cross";
+    }
+  },
   methods: {
     handleClick() {
       const action = this.$store.state.app.isSidebarCollapsed
@@ -22,10 +31,5 @@ export default {
 <style lang="scss" scoped>
 .AppHeaderHamburger {
   cursor: pointer;
-
-  width: 16px;
-  height: 12px;
-
-  transition: all 250ms ease-in;
 }
 </style>

@@ -35,8 +35,18 @@ const getWrapper = (isSidebarCollapsed = true) => {
 
 describe("AppHeaderHamburger.vue", () => {
   it("renders expected elements", () => {
-    const { wrapper } = getWrapper();
+    const { wrapper } = getWrapper(true);
     expect(wrapper.classes()).toEqual(["AppHeaderHamburger"]);
+  });
+
+  it("renders 'hamburger' if sidebar is collapsed", () => {
+    const { wrapper } = getWrapper(true);
+    expect(wrapper.vm.icon).toBe("hamburger");
+  });
+
+  it("renders 'cross' if sidebar is expanded", () => {
+    const { wrapper } = getWrapper(false);
+    expect(wrapper.vm.icon).toBe("cross");
   });
 
   it("calls handleClick when clicked", () => {

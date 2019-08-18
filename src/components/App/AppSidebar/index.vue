@@ -121,7 +121,7 @@ $transition: transform 700ms;
   left: 0;
   z-index: get-z("sidebar");
 
-  transition: $transition ease-out;
+  // transition: $transition ease-out;
 
   &--header {
     @include bind-app-header-height(padding-top);
@@ -129,7 +129,7 @@ $transition: transform 700ms;
 
   &--collapsed {
     transform: translateY(-100%);
-    transition: $transition ease-in;
+    // transition: $transition ease-in;
   }
 }
 
