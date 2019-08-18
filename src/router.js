@@ -32,8 +32,6 @@ import OnboardingService from "./services/OnboardingService";
 import store from "./store";
 
 Vue.use(VueResource);
-Vue.use(VueRouter);
-
 Vue.http.options.credentials = true;
 
 const routes = [

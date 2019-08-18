@@ -64,12 +64,12 @@ export default {
 
  .App-router-view-wrapper {
    &--header {
-     @include bind-app-header-height(margin-top);
+     @include bind-app-header-height(padding-top);
    }
 
    &--sidebar {
-     @include bind-app-sidebar-width(margin-left);
-     margin-left: 0;
+     @include bind-app-sidebar-width(padding-left);
+     padding-left: 0;
    }
  }
 </style>
