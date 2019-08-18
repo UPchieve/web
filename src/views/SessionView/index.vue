@@ -95,11 +95,16 @@ export default {
       promise = SessionService.useExistingSession(this, id);
     }
 
-    promise.then(sessionId => {
-      this.sessionId = this.currentSession.sessionId;
-      this.$socket.connect();
-      this.joinSession(sessionId);
-    });
+    promise
+      .then(sessionId => {
+        this.sessionId = this.currentSession.sessionId;
+        this.$socket.connect();
+        this.joinSession(sessionId);
+      })
+      .catch(() => {
+        window.alert("Could not start new help session");
+        this.$router.replace("/");
+      });
 
     // Offer the option to ask a question
     const MODAL_TIMEOUT_MS = 24 * 60 * 60 * 1000;
