@@ -9,12 +9,25 @@ const localVue = createLocalVue();
 localVue.use(VueRouter);
 localVue.use(Vuex);
 
+const getWrapper = (propsData = {}, app = {}) => {
+  const store = new Vuex.Store({
+    modules: {
+      app: {
+        ...appModule,
+        actions: {
+          ...appModule.actions,
+          ...app.actions
+        }
+      }
+    }
+  });
+
+  return shallowMount(AppSidebarLink, { localVue, store, propsData });
+};
+
 describe("AppSidebarLink", () => {
   it("renders expected elements", () => {
-    const wrapper = shallowMount(AppSidebarLink, {
-      localVue,
-      propsData: { to: "/", icon: "house", text: "Home" }
-    });
+    const wrapper = getWrapper({ to: "/", icon: "house", text: "Home" });
     expect(wrapper.is("router-link-stub")).toBe(true);
     expect(wrapper.classes()).toEqual(["AppSidebarLink"]);
     expect(wrapper.props("to")).toBe("/");
@@ -28,28 +41,17 @@ describe("AppSidebarLink", () => {
   });
 
   it("conditionally renders icon", () => {
-    const wrapper = shallowMount(AppSidebarLink, {
-      localVue,
-      propsData: { to: "/", text: "Home" }
-    });
+    const wrapper = getWrapper({ to: "/", text: "Home" });
     const icon = wrapper.find(UpchieveIcon);
     expect(icon.exists()).toBe(false);
   });
 
   it("collapses sidebar when clicked", () => {
     const collapseSidebar = jest.fn();
-    const wrapper = shallowMount(AppSidebarLink, {
-      localVue,
-      propsData: { to: "/", icon: "house", text: "Home" },
-      store: new Vuex.Store({
-        modules: {
-          app: {
-            ...appModule,
-            actions: { ...appModule.actions, collapseSidebar }
-          }
-        }
-      })
-    });
+    const wrapper = getWrapper(
+      { to: "/", icon: "house", text: "Home" },
+      { actions: { collapseSidebar } }
+    );
     wrapper.trigger("click");
     expect(collapseSidebar).toHaveBeenCalled();
   });

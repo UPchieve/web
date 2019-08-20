@@ -1,17 +1,18 @@
 <template>
   <router-link
-    class="AppSidebarLink"
+    :class="parentClass"
     active-class="AppSidebarLink--active"
     :to="to"
     tag="div"
     v-on:click.native="$store.dispatch('app/collapseSidebar')"
   >
-    <upchieve-icon v-if="icon" :icon="icon" style="padding-right: 16px;" />
+    <upchieve-icon v-if="icon" style="padding-right: 16px;" :icon="icon" :size="size" />
     <p>{{ text }}</p>
   </router-link>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import UpchieveIcon from "@/components/UpchieveIcon";
 
 export default {
@@ -25,6 +26,18 @@ export default {
     text: {
       type: String,
       required: true
+    }
+  },
+  computed: {
+    ...mapGetters({ mobileMode: "app/mobileMode" }),
+    size() {
+      return this.mobileMode ? "1em" : "1.5em";
+    },
+    parentClass() {
+      return {
+        AppSidebarLink: true,
+        "AppSidebarLink--desktop": !this.mobileMode
+      };
     }
   }
 };
@@ -46,6 +59,10 @@ export default {
     p {
       color: $c-success-green;
     }
+  }
+
+  &--desktop {
+    @include font-category("button");
   }
 }
 </style>
