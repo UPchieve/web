@@ -1,12 +1,12 @@
 <template>
-  <div class="AppSidebarLinks">
+  <div class="SidebarLinks">
     <template v-if="$route.path.indexOf('/onboarding') !== -1">
-      <app-sidebar-link
+      <sidebar-link
         to="/onboarding/profile"
         icon="portrait"
         text="Basic profile"
       />
-      <app-sidebar-link
+      <sidebar-link
         v-if="!isVolunteer"
         to="/onboarding/academic"
         icon="book"
@@ -15,44 +15,44 @@
     </template>
 
     <template v-else-if="authenticated">
-      <app-sidebar-link to="/dashboard" icon="house" text="Dashboard" />
-      <app-sidebar-link
+      <sidebar-link to="/dashboard" icon="house" text="Dashboard" />
+      <sidebar-link
         v-if="isVolunteer"
         to="/training"
         icon="graduation-cap"
         text="Training"
       />
-      <app-sidebar-link
+      <sidebar-link
         v-if="isVolunteer"
         to="/calendar"
         icon="calendar"
         text="Schedule"
       />
-      <app-sidebar-link
+      <sidebar-link
         v-if="isAdmin"
         to="/admin"
         icon="folder"
         text="Admin"
       />
-      <app-sidebar-link to="/profile" icon="portrait" text="Profile" />
-      <app-sidebar-link to="/resources" icon="folder" text="Resources" />
+      <sidebar-link to="/profile" icon="portrait" text="Profile" />
+      <sidebar-link to="/resources" icon="folder" text="Resources" />
     </template>
 
     <template v-else>
-      <app-sidebar-link to="/login" text="Login" />
+      <sidebar-link to="/login" text="Login" />
     </template>
 
-    <div v-if="!mobileMode" class="AppSidebarLinks-about">About UPchieve</div>
-    <app-sidebar-link to="/contact" icon="envelope" text="Contact us" />
-    <app-sidebar-link to="/legal" icon="exclamation" text="Legal policy" />
+    <div v-if="!mobileMode" class="SidebarLinks-about">About UPchieve</div>
+    <sidebar-link to="/contact" icon="envelope" text="Contact us" />
+    <sidebar-link to="/legal" icon="exclamation" text="Legal policy" />
   </div>
 </template>
 
 <script>
-import AppSidebarLink from './AppSidebarLink';
+import SidebarLink from './SidebarLink';
 
 export default {
-  components: { AppSidebarLink },
+  components: { SidebarLink },
   props: {
     authenticated: Boolean,
     isVolunteer: Boolean,
@@ -63,7 +63,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.AppSidebarLinks {
+.SidebarLinks {
   @include flex-container(column);
   @include child-spacing(top, 16px);
 

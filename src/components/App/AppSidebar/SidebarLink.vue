@@ -1,7 +1,7 @@
 <template>
   <router-link
     :class="parentClass"
-    active-class="AppSidebarLink--active"
+    active-class="SidebarLink--active"
     :to="to"
     tag="div"
     v-on:click.native="$store.dispatch('app/collapseSidebar')"
@@ -35,8 +35,8 @@ export default {
     },
     parentClass() {
       return {
-        AppSidebarLink: true,
-        "AppSidebarLink--desktop": !this.mobileMode
+        SidebarLink: true,
+        "SidebarLink--desktop": !this.mobileMode
       };
     }
   }
@@ -44,7 +44,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.AppSidebarLink {
+.SidebarLink {
   @include flex-container(row, initial, center);
   @include font-category("display-small");
 

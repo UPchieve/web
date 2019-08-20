@@ -2,8 +2,8 @@ import { shallowMount, createLocalVue } from "@vue/test-utils";
 import Vuex from "vuex";
 import appModule from "@/store/modules/app";
 import AppSidebar from "@/components/App/AppSidebar";
-import AppSidebarInfo from "@/components/App/AppSidebar/AppSidebarInfo";
-import AppSidebarLinks from "@/components/App/AppSidebar/AppSidebarLinks";
+import SidebarInfo from "@/components/App/AppSidebar/SidebarInfo";
+import SidebarLinks from "@/components/App/AppSidebar/SidebarLinks";
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -74,10 +74,10 @@ describe("AppSidebar", () => {
       const content = wrapper.find(".AppSidebar-content");
       expect(content.exists()).toBe(true);
 
-      const info = content.find(AppSidebarInfo);
+      const info = content.find(SidebarInfo);
       expect(info.exists()).toBe(false);
 
-      const links = content.find(AppSidebarLinks);
+      const links = content.find(SidebarLinks);
       expect(links.exists()).toBe(true);
 
       const finalLink = content.find(".AppSidebar-final-link");
@@ -91,10 +91,10 @@ describe("AppSidebar", () => {
       const content = wrapper.find(".AppSidebar-content");
       expect(content.exists()).toBe(true);
 
-      const info = content.find(AppSidebarInfo);
+      const info = content.find(SidebarInfo);
       expect(info.exists()).toBe(true);
 
-      const links = content.find(AppSidebarLinks);
+      const links = content.find(SidebarLinks);
       expect(links.exists()).toBe(true);
 
       const finalLink = content.find(".AppSidebar-final-link");

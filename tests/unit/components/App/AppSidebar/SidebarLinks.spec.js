@@ -1,7 +1,7 @@
 import { shallowMount, createLocalVue } from "@vue/test-utils";
 import Vuex from "vuex";
-import AppSidebarLinks from "@/components/App/AppSidebar/AppSidebarLinks";
-import AppSidebarLink from "@/components/App/AppSidebar/AppSidebarLink";
+import SidebarLinks from "@/components/App/AppSidebar/SidebarLinks";
+import SidebarLink from "@/components/App/AppSidebar/SidebarLink";
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -87,7 +87,7 @@ const getWrapper = (options = {}) => {
     ...options
   };
 
-  return shallowMount(AppSidebarLinks, {
+  return shallowMount(SidebarLinks, {
     localVue,
     mocks: { $route: { path: options.path } },
     propsData: {
@@ -99,23 +99,23 @@ const getWrapper = (options = {}) => {
   });
 };
 
-describe("AppSidebarLinks", () => {
+describe("SidebarLinks", () => {
   it("layout", () => {
     const wrapper = getWrapper();
-    expect(wrapper.classes("AppSidebarLinks")).toBe(true);
-    expect(wrapper.findAll(AppSidebarLink).length).toBeGreaterThan(0);
+    expect(wrapper.classes("SidebarLinks")).toBe(true);
+    expect(wrapper.findAll(SidebarLink).length).toBeGreaterThan(0);
 
-    const about = wrapper.find(".AppSidebarLinks-about");
+    const about = wrapper.find(".SidebarLinks-about");
     expect(about.exists()).toBe(true);
     expect(about.text()).toBe("About UPchieve");
 
     wrapper.setProps({ mobileMode: true });
-    expect(wrapper.find(".AppSidebarLinks-about").exists()).toBe(false);
+    expect(wrapper.find(".SidebarLinks-about").exists()).toBe(false);
   });
 
   describe("link tests", () => {
     const testLinks = (wrapper, expectedLinks) => {
-      const sidebarLinks = wrapper.findAll(AppSidebarLink);
+      const sidebarLinks = wrapper.findAll(SidebarLink);
       expect(sidebarLinks.length).toBe(expectedLinks.length);
       expectedLinks.forEach((link, i) => {
         const sidebarLink = sidebarLinks.at(i);

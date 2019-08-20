@@ -8,7 +8,7 @@
   >
     <div class="AppSidebar-content">
       <div class="uc-column">
-        <app-sidebar-info
+        <sidebar-info
           v-if="!mobileMode"
           style="margin-bottom: 64px;"
           :authenticated="auth.authenticated"
@@ -16,7 +16,7 @@
           :name="user.firstname"
         />
 
-        <app-sidebar-links
+        <sidebar-links
           :authenticated="auth.authenticated"
           :isVolunteer="user.isVolunteer"
           :isAdmin="user.isAdmin"
@@ -34,11 +34,11 @@
 import { mapState, mapGetters } from "vuex";
 import AuthService from "@/services/AuthService";
 import UserService from "@/services/UserService";
-import AppSidebarInfo from "./AppSidebarInfo";
-import AppSidebarLinks from "./AppSidebarLinks";
+import SidebarInfo from "./SidebarInfo";
+import SidebarLinks from "./SidebarLinks";
 
 export default {
-  components: { AppSidebarInfo, AppSidebarLinks },
+  components: { SidebarInfo, SidebarLinks },
   data() {
     return {
       auth: UserService.getAuth(),

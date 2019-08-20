@@ -1,17 +1,17 @@
 <template>
-  <div class="AppSidebarInfo">
+  <div class="SidebarInfo">
     <template v-if="authenticated">
-      <img class="AppSidebarInfo-avatar" :src="avatarUrl" />
-      <div class="AppSidebarInfo-name">{{ name }}</div>
-      <div class="AppSidebarInfo-type">{{ type }}</div>
-      <div class="AppSidebarInfo-status">
-        <div class="AppSidebarInfo-status-circle" :class="status.class" />
-        <div class="AppSidebarInfo-status-text">{{ status.text }}</div>
+      <img class="SidebarInfo-avatar" :src="avatarUrl" />
+      <div class="SidebarInfo-name">{{ name }}</div>
+      <div class="SidebarInfo-type">{{ type }}</div>
+      <div class="SidebarInfo-status">
+        <div class="SidebarInfo-status-circle" :class="status.class" />
+        <div class="SidebarInfo-status-text">{{ status.text }}</div>
       </div>
     </template>
 
     <template v-else>
-      <p class="AppSidebarInfo-description">
+      <p class="SidebarInfo-description">
         UPchieve is a volunteer-run ed-tech initiative with the goal of
         providing free, online, and on-demand educational and guidance services
         to disadvantaged students.
@@ -50,7 +50,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.AppSidebarInfo {
+.SidebarInfo {
   $spacing: 8px;
   @include flex-container(column, $align-items: flex-start);
   @include child-spacing(top, $spacing);

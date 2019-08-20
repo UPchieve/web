@@ -2,7 +2,7 @@ import { shallowMount, createLocalVue } from "@vue/test-utils";
 import VueRouter from "vue-router";
 import Vuex from "vuex";
 import appModule from "@/store/modules/app";
-import AppSidebarLink from "@/components/App/AppSidebar/AppSidebarLink";
+import SidebarLink from "@/components/App/AppSidebar/SidebarLink";
 import UpchieveIcon from "@/components/UpchieveIcon";
 
 const localVue = createLocalVue();
@@ -22,14 +22,14 @@ const getWrapper = (propsData = {}, app = {}) => {
     }
   });
 
-  return shallowMount(AppSidebarLink, { localVue, store, propsData });
+  return shallowMount(SidebarLink, { localVue, store, propsData });
 };
 
-describe("AppSidebarLink", () => {
+describe("SidebarLink", () => {
   it("renders expected elements", () => {
     const wrapper = getWrapper({ to: "/", icon: "house", text: "Home" });
     expect(wrapper.is("router-link-stub")).toBe(true);
-    expect(wrapper.classes()).toEqual(["AppSidebarLink"]);
+    expect(wrapper.classes()).toEqual(["SidebarLink"]);
     expect(wrapper.props("to")).toBe("/");
 
     const icon = wrapper.find(UpchieveIcon);
