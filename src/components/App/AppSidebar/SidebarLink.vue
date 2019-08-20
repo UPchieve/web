@@ -6,7 +6,12 @@
     tag="div"
     v-on:click.native="$store.dispatch('app/collapseSidebar')"
   >
-    <upchieve-icon v-if="icon" style="padding-right: 16px;" :icon="icon" :size="size" />
+    <upchieve-icon
+      v-if="icon"
+      style="padding-right: 16px;"
+      :icon="icon"
+      :size="size"
+    />
     <p>{{ text }}</p>
   </router-link>
 </template>

@@ -28,12 +28,16 @@
             v-if="!hasActiveSession()"
             class="btn getHelp"
             @click.prevent="getHelp()"
-          >Get help now</button>
+          >
+            Get help now
+          </button>
           <button
             v-if="hasActiveSession()"
             class="btn getHelp"
             @click.prevent="rejoinHelpSession()"
-          >Rejoin your coaching session</button>
+          >
+            Rejoin your coaching session
+          </button>
           <div v-if="showHelpPopUp" :style="popUpStyle" class="getHelpPopUp">
             <span>Select a help topic.</span>
             <select v-model="pickedTopic" class="form-control topic">
@@ -50,7 +54,8 @@
               <option
                 v-for="(subtopic, index) in subtopics[pickedTopic]"
                 :key="`subtopic-${index}`"
-              >{{ subtopic }}</option>
+                >{{ subtopic }}</option
+              >
             </select>
             <div class="helpBtns">
               <button
@@ -58,14 +63,18 @@
                 class="btn helpCancel"
                 type="cancel"
                 @click.prevent="getHelpCancel()"
-              >Cancel</button>
+              >
+                Cancel
+              </button>
               <button
                 v-if="showHelpPopUp"
                 class="btn helpNext"
                 type="next"
                 :disabled="pickedSubtopic === ''"
                 @click.prevent="getHelpNext()"
-              >Get help</button>
+              >
+                Get help
+              </button>
             </div>
           </div>
           <div class="disclaimer row">

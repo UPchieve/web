@@ -28,12 +28,7 @@
         icon="calendar"
         text="Schedule"
       />
-      <sidebar-link
-        v-if="isAdmin"
-        to="/admin"
-        icon="folder"
-        text="Admin"
-      />
+      <sidebar-link v-if="isAdmin" to="/admin" icon="folder" text="Admin" />
       <sidebar-link to="/profile" icon="portrait" text="Profile" />
       <sidebar-link to="/resources" icon="folder" text="Resources" />
     </template>
@@ -49,7 +44,7 @@
 </template>
 
 <script>
-import SidebarLink from './SidebarLink';
+import SidebarLink from "./SidebarLink";
 
 export default {
   components: { SidebarLink },
@@ -59,7 +54,7 @@ export default {
     isAdmin: Boolean,
     mobileMode: Boolean
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
