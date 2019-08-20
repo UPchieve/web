@@ -1,11 +1,16 @@
 <template>
-  <div class="whiteboard">
+  <div class="whiteboard" id="whiteboard">
     <canvas
       v-canvas
       id="whiteboardCanvas"
       @mousedown="drawStart"
       @mouseup="drawEnd"
       @mousemove="draw"
+      v-touch:start="drawStart"
+      v-touch:end="drawEnd"
+      v-touch:moving="draw"
+      width="1280"
+      height="800"
     />
     <div
       class="whiteboardTools row"
@@ -167,15 +172,41 @@ export default {
   data() {
     return {
       currentSession: SessionService.currentSession,
-      showColors: "hidden"
+      showColors: "hidden",
+      canvasHeight: null,
     };
   },
   mounted() {
+    const canvas = document.getElementById('whiteboardCanvas');
+    const whiteboard = document.getElementById('whiteboard');
+
+    // Determime and emit height of whiteboard container
+    this.canvasHeight = whiteboard.offsetHeight; 
+    if (localStorage.sessionCanvasHeight) {
+      canvas.height = localStorage.sessionCanvasHeight;
+      canvas.width = localStorage.sessionCanvasHeight * 1.33; 
+    } else {
+      canvas.height = this.canvasHeight;
+      canvas.width = this.canvasHeight * 1.33;  
+    }
+    if (this.isMobile()) {
+      alert('hello mobile');
+    }
+
+    this.emitCanvasLoaded();
     this.resizeCanvas();
     this.drawSetup();
     window.addEventListener("resize", this.resizeCanvas);
   },
   methods: {
+    isMobile() {
+      // Check if browser is mobile (can be moved into a file for future use)
+      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        return true;
+      } else {
+        return false;
+      }
+    },
     resizeCanvas() {
       const savedImage = App.ctx.getImageData(
         0,
@@ -183,12 +214,17 @@ export default {
         App.canvas.width,
         App.canvas.height
       );
-      App.canvas.width = App.canvas.offsetWidth;
-      App.canvas.height = App.canvas.offsetHeight;
       App.ctx.putImageData(savedImage, 0, 0);
     },
 
     // Socket emits
+    emitCanvasLoaded() {
+      this.$socket.emit("canvasLoaded", {
+        sessionId: this.currentSession.sessionId,
+        user: UserService.getUser(),
+        height: this.canvasHeight
+      });
+    },
     emitDrawClick() {
       this.$socket.emit("drawClick", {
         sessionId: this.currentSession.sessionId,
@@ -216,15 +252,15 @@ export default {
     emitChangeColor(color) {
       this.$socket.emit("changeColor", {
         sessionId: this.currentSession.sessionId,
-        color,
-        user: UserService.getUser()
+        user: UserService.getUser(),
+        color
       });
     },
     emitChangeWidth(width) {
       this.$socket.emit("changeWidth", {
         sessionId: this.currentSession.sessionId,
-        width,
-        user: UserService.getUser()
+        user: UserService.getUser(),
+        width
       });
     },
     emitDrawing() {
@@ -236,44 +272,44 @@ export default {
     emitEnd() {
       this.$socket.emit("end", {
         sessionId: this.currentSession.sessionId,
-        whiteboardUrl: App.canvas.toDataURL(),
-        user: UserService.getUser()
+        user: UserService.getUser(),
+        whiteboardUrl: App.canvas.toDataURL()
       });
     },
     emitDragStart(data) {
       this.$socket.emit("dragStart", {
         sessionId: this.currentSession.sessionId,
+        user: UserService.getUser(),
         x: data.x,
         y: data.y,
-        color: data.color,
-        user: UserService.getUser()
+        color: data.color
       });
     },
     emitDragAction(data) {
       this.$socket.emit("dragAction", {
         sessionId: this.currentSession.sessionId,
+        user: UserService.getUser(),
         x: data.x,
         y: data.y,
-        color: data.color,
-        user: UserService.getUser()
+        color: data.color
       });
     },
     emitDragEnd(data) {
       this.$socket.emit("dragEnd", {
         sessionId: this.currentSession.sessionId,
+        user: UserService.getUser(),
         x: data.x,
         y: data.y,
-        color: data.color,
-        user: UserService.getUser()
+        color: data.color
       });
     },
     emitInsertText(data) {
       this.$socket.emit("insertText", {
         sessionId: this.currentSession.sessionId,
+        user: UserService.getUser(),
         x: data.x,
         y: data.y,
-        text: data.text,
-        user: UserService.getUser()
+        text: data.text
       });
     },
     emitResetScreen(/* data */) {
@@ -342,11 +378,9 @@ export default {
           this.emitSaveImage();
           App.canvas.isDrawing = true;
 
-          // const scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
-          // const scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
-
-          const x = event.pageX;
-          const y = event.pageY;
+          var x = event.pageX;
+          var y = event.pageY;
+          const whiteboard = document.getElementById('whiteboard');
 
           this.fillCircle(
             App.canvas,
@@ -357,6 +391,9 @@ export default {
             y,
             LOCAL_LINE_COLOR
           );
+
+          x += whiteboard.scrollLeft;
+          y += whiteboard.scrollTop;
           this.emitDragStart({
             x,
             y,
@@ -369,11 +406,9 @@ export default {
       if (!SERVER_DRAWING) {
         App.canvas.isDrawing = false;
 
-        // const scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
-        // const scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
-
-        const x = event.pageX;
-        const y = event.pageY;
+        var x = event.pageX;
+        var y = event.pageY;
+        const whiteboard = document.getElementById('whiteboard');
 
         this.fillCircle(
           App.canvas,
@@ -384,6 +419,9 @@ export default {
           y,
           LOCAL_LINE_COLOR
         );
+
+        x += whiteboard.scrollLeft;
+        y += whiteboard.scrollTop;
         this.emitDragEnd({
           x,
           y,
@@ -401,11 +439,9 @@ export default {
             return;
           }
 
-          // const scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
-          // const scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
-
-          const x = event.pageX;
-          const y = event.pageY;
+          var x = event.pageX;
+          var y = event.pageY;
+          const whiteboard = document.getElementById('whiteboard');
 
           this.fillCircle(
             App.canvas,
@@ -416,6 +452,9 @@ export default {
             y,
             LOCAL_LINE_COLOR
           );
+
+          x += whiteboard.scrollLeft;
+          y += whiteboard.scrollTop;
           this.emitDragAction({
             x,
             y,
@@ -554,6 +593,7 @@ export default {
             ).scrollTop;
 
       const rect = App.canvas.getBoundingClientRect();
+
       if (server) {
         App.ctx.strokeStyle = SERVER_LINE_COLOR;
         App.ctx.lineWidth = SERVER_LINE_WIDTH;
@@ -567,15 +607,16 @@ export default {
             imageData = imageList[imageList.length - 1];
             context.putImageData(imageData, 0, 0);
           }
+
           context.beginPath();
           context.moveTo(
             x - scrollLeft - rect.left,
-            y - scrollTop - rect.top + 5
+            y - scrollTop - rect.top 
           );
         } else if (type === "drag") {
           context.lineTo(
             x - scrollLeft - rect.left,
-            y - scrollTop - rect.top + 5
+            y - scrollTop - rect.top
           );
           context.stroke();
         } else {
@@ -605,39 +646,59 @@ export default {
       } else {
         this.showColors = "hidden";
       }
-    }
+    } 
   },
-  sockets: {
+  sockets: {  
+    "session-change"() {
+      this.emitCanvasLoaded();      
+    },
+    size(data) {
+      // Receives broadcast of other user's screen size and resizes (or not) accordingly
+      const targetHeight = data.height;
+      if (targetHeight > this.canvasHeight) {
+        // Resize canvas and save dimensions to localstorage
+        const canvas = document.getElementById('whiteboardCanvas');
+        canvas.height = targetHeight;  
+        canvas.width = targetHeight * 1.33;
+        localStorage.sessionCanvasHeight = targetHeight;
+      } else {
+        localStorage.sessionCanvasHeight = this.canvasHeight;
+      }
+
+    },
     dstart(data) {
+      const whiteboard = document.getElementById('whiteboard');
       this.fillCircle(
         App.canvas,
         App.ctx,
         "dragstart",
         true,
-        data.x,
-        data.y,
+        data.x - whiteboard.scrollLeft,
+        data.y - whiteboard.scrollTop,
         data.color
       );
     },
     drag(data) {
+      const whiteboard = document.getElementById('whiteboard');
       this.fillCircle(
         App.canvas,
         App.ctx,
         "drag",
         true,
-        data.x,
-        data.y,
+        data.x - whiteboard.scrollLeft,
+        data.y - whiteboard.scrollTop,
         data.color
       );
     },
     dend(data) {
+      const whiteboard = document.getElementById('whiteboard');
       this.fillCircle(
         App.canvas,
         App.ctx,
         "dragend",
         true,
-        data.x,
-        data.y,
+        data.x - whiteboard.scrollLeft,
+        data.y - whiteboard.scrollTop,
         data.color
       );
     },
@@ -701,20 +762,15 @@ export default {
 <style lang="scss" scoped>
 .whiteboard {
   height: 100%;
-  display: flex;
   overflow: scroll;
   flex-direction: column;
 }
 
 canvas {
-  // Standardize to 4/3 aspect ratio with horizontal scroll
-  width: 133.3%;
-  height: 100%;
   background: #fff;
   display: block;
   overflow: scroll;
   cursor: not-allowed;
-  flex: 1;
 }
 
 .whiteboardTools {
