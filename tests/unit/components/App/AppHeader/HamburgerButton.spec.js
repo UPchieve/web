@@ -1,7 +1,7 @@
 import { shallowMount, createLocalVue } from "@vue/test-utils";
 import Vuex from "vuex";
 import appModule from "@/store/modules/app";
-import AppHeaderHamburger from "@/components/App/AppHeader/AppHeaderHamburger";
+import HamburgerButton from "@/components/App/AppHeader/HamburgerButton";
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -27,16 +27,16 @@ const getWrapper = (isSidebarCollapsed = true) => {
   });
 
   return {
-    wrapper: shallowMount(AppHeaderHamburger, { localVue, store }),
+    wrapper: shallowMount(HamburgerButton, { localVue, store }),
     expandSidebar,
     collapseSidebar
   };
 };
 
-describe("AppHeaderHamburger.vue", () => {
+describe("HamburgerButton", () => {
   it("renders expected elements", () => {
     const { wrapper } = getWrapper(true);
-    expect(wrapper.classes()).toEqual(["AppHeaderHamburger"]);
+    expect(wrapper.classes()).toEqual(["HamburgerButton"]);
   });
 
   it("renders 'hamburger' if sidebar is collapsed", () => {

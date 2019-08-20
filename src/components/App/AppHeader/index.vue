@@ -4,7 +4,7 @@
       <img class="AppHeader-user-info-avatar" :src="avatarUrl" />
       <span class="AppHeader-user-info-name">{{ name }}</span>
     </div>
-    <app-header-hamburger />
+    <hamburger-button />
   </div>
 
   <div v-else class="AppHeader" style="justify-content: center;">
@@ -18,13 +18,11 @@ import UserService from "@/services/UserService";
 import LogoImageUrl from "@/assets/header_logo.png";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
 import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
-import AppHeaderHamburger from "./AppHeaderHamburger";
+import HamburgerButton from "./HamburgerButton";
 
 export default {
   name: "AppHeader",
-  components: {
-    AppHeaderHamburger
-  },
+  components: { HamburgerButton },
   data() {
     const user = UserService.getUser() || {};
 

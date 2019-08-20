@@ -27,7 +27,7 @@ const getWrapper = (appState = {}) => {
   return shallowMount(App, { localVue, router, store });
 };
 
-describe("App.vue", () => {
+describe("App", () => {
   it("renders expected elements", () => {
     const wrapper = getWrapper();
     expect(wrapper.classes()).toEqual(["App"]);

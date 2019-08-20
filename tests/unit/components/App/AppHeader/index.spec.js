@@ -2,7 +2,7 @@ import { shallowMount, createLocalVue } from "@vue/test-utils";
 import Vuex from "vuex";
 import appModule from "@/store/modules/app";
 import AppHeader from "@/components/App/AppHeader";
-import AppHeaderHamburger from "@/components/App/AppHeader/AppHeaderHamburger";
+import HamburgerButton from "@/components/App/AppHeader/HamburgerButton";
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -22,7 +22,7 @@ const getWrapper = (mobileMode = false) => {
   return shallowMount(AppHeader, { localVue, store });
 };
 
-describe("AppHeader.vue", () => {
+describe("AppHeader", () => {
   it("renders expected elements when in mobile mode", () => {
     const wrapper = getWrapper(true);
     expect(wrapper.classes()).toEqual(["AppHeader"]);
@@ -43,7 +43,7 @@ describe("AppHeader.vue", () => {
     expect(name.text()).toBe("UPchieve");
 
     // Hamburger
-    expect(wrapper.find(AppHeaderHamburger).exists()).toBe(true);
+    expect(wrapper.find(HamburgerButton).exists()).toBe(true);
   });
 
   it("renders expected elements when not in mobile mode", () => {

@@ -1,6 +1,6 @@
 <template>
   <upchieve-icon
-    class="AppHeaderHamburger"
+    class="HamburgerButton"
     :icon="icon"
     v-on:click.native="handleClick"
     size="16px"
@@ -29,7 +29,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.AppHeaderHamburger {
+.HamburgerButton {
   cursor: pointer;
 }
 </style>
