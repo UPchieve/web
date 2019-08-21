@@ -1,17 +1,17 @@
 <template>
   <div class="StudentDashboard">
-    <dashboard-header />
+    <dashboard-banner />
     <subject-selection />
   </div>
 </template>
 
 <script>
-import DashboardHeader from '../DashboardBanner';
-import SubjectSelection from './SubjectSelection';
+import DashboardBanner from "../DashboardBanner";
+import SubjectSelection from "./SubjectSelection";
 
 export default {
   name: "student-dashboard",
-  components: { DashboardHeader, SubjectSelection }
+  components: { DashboardBanner, SubjectSelection }
 };
 </script>
 

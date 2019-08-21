@@ -1,6 +1,6 @@
 import { shallowMount, createLocalVue } from "@vue/test-utils";
-import DashboardBanner from "@/views/DashboardView/DashboardBanner";
 import StudentDashboard from "@/views/DashboardView/StudentDashboard";
+import DashboardBanner from "@/views/DashboardView/DashboardBanner";
 import SubjectSelection from "@/views/DashboardView/StudentDashboard/SubjectSelection";
 
 const localVue = createLocalVue();
