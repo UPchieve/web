@@ -203,8 +203,16 @@ const routes = [
     props: true
   },
   {
-    path: "/edu", // TODO: make this be "/admin/edu"
+    path: "/admin/edu",
     component: () => {
+      if (process.env.NODE_ENV === "development") {
+        // The EDU admin route is rendered server-side with Express.js, so in local development
+        // we need to move to port 3000 (away from Vue's dev server on port 8080)
+        window.location.href = "http://localhost:3000/edu";
+        return;
+      }
+
+      // In non-development environments, we can simply use a relative link
       window.location.href = "/edu";
     }
   }
