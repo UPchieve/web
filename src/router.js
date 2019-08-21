@@ -203,7 +203,7 @@ const routes = [
     props: true
   },
   {
-    path: "/admin/edu",
+    path: "/admin/edu", // TODO make the relative URL of these pages "/admin/edu"
     component: () => {
       if (process.env.NODE_ENV === "development") {
         // The EDU admin route is rendered server-side with Express.js, so in local development
