@@ -342,6 +342,9 @@ export default {
       this.emitClearClick();
     },
     drawStart(event) {
+      if (this.panEnabled) {
+        return;
+      }
       if (!SERVER_DRAWING) {
         this.emitDrawing();
         if (!CURSOR_VISIBLE && currentState === "INSERTING_TEXT") {
@@ -400,6 +403,9 @@ export default {
       }
     },
     drawEnd(event) {
+      if (this.panEnabled) {
+        return;
+      }
       if (!SERVER_DRAWING) {
         App.canvas.isDrawing = false;
 
@@ -430,6 +436,9 @@ export default {
       }
     },
     draw(event) {
+      if (this.panEnabled) {
+        return;
+      }
       if (!SERVER_DRAWING) {
         if (currentState === "DRAWING" || currentState === "ERASING") {
           if (!App.canvas.isDrawing) {
