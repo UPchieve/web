@@ -24,13 +24,10 @@
           >
             <div class="avatar" :style="message.avatarStyle" />
             <div class="contents">
-              <div class="name">
-                {{ message.name }}
-              </div>
               <span>{{ message.contents }}</span>
-              <div class="time">
-                {{ message.time }}
-              </div>
+            </div>
+            <div class="time">
+              {{ message.time }}
             </div>
           </div>
         </template>
@@ -233,22 +230,23 @@ export default {
 }
 
 .header {
-  height: 40px;
-  background-color: #1855d1;
-  color: #fff;
-  font-size: 12px;
-  font-weight: 600;
+  height: 60px;
+  padding: 18px;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 500;
   text-align: left;
-  padding: 13px;
   position: absolute;
+  color: white;
   width: 100%;
+  background: #1855D1;
 }
 
 .message-box {
-  height: calc(100% - 40px);
+  height: calc(100% - 60px);
   padding-bottom: 100px;
   overflow: hidden;
-  top: 40px;
+  top: 60px;
   position: relative;
 }
 
@@ -293,21 +291,26 @@ export default {
 
 .message {
   position: relative;
-  padding: 10px;
+  padding: 24px;
   display: flex;
   justify-content: flex-start;
-  background: #fff;
-  width: 100%;
+  // width: 100%;
 
   /* Safari needs this specified to lay out the message divs properly. */
   flex-shrink: 0;
 }
 
+span {
+  font-size: 16px;
+}
+
 .avatar {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   background-size: cover;
   margin-top: 5px;
+  border-radius: 16px;
+  margin-right: 12px;
 }
 
 .name {
@@ -315,17 +318,23 @@ export default {
 }
 
 .time {
-  font-size: 12px;
-  font-weight: 300;
+  font-size: 14px;
+  font-weight: 500;
   color: #73737a;
+  position: absolute;
+  bottom: 0;
+  
 }
 
 .contents {
   text-align: left;
   position: relative;
-  width: 200px;
+  padding: 12px;
   overflow-wrap: break-word;
   font-size: 16px;
+  background: #F1F3F6;
+  border-radius: 8px;
+  max-width: 80%;
 }
 
 .typing-indicator {
@@ -345,34 +354,43 @@ export default {
 
 textarea {
   width: 100%;
-  height: 100px;
+  height: 150px;
   border: none;
   position: absolute;
   left: 0;
   bottom: 0;
   border-top: 1px solid #979797;
-  padding: 10px 12px;
+  padding: 16px;
 }
 
 .left {
   float: left;
+  .contents {
+    text-align: left;
+    padding-left: 10px;
+  }
+  .time {
+    margin-left: 44px;
+  }
 }
 
 .right {
   float: right;
   display: flex;
   flex-direction: row-reverse;
+  .contents {
+    text-align: right;
+    padding-right: 10px;
+    background-color: #16D2AA;
+    span {
+      color: white;
+    }
+  }
+  .avatar {
+    display: none;
+  }
 }
 
-.right .contents {
-  text-align: right;
-  padding-right: 10px;
-}
-
-.left .contents {
-  text-align: left;
-  padding-left: 10px;
-}
 
 .message-content {
   width: 200px;
