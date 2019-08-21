@@ -8,7 +8,7 @@
       <h1 v-if="!mobileMode" class="DashboardBanner-greeting">
         Hello, {{ name }}!
       </h1>
-      <large-button primary reverse>Take a tour</large-button>
+      <!-- <large-button primary reverse>Take a tour</large-button> -->
     </div>
   </div>
 </template>
@@ -16,10 +16,10 @@
 <script>
 import { mapGetters } from "vuex";
 import UserService from "@/services/UserService";
-import LargeButton from "@/components/LargeButton";
+// import LargeButton from "@/components/LargeButton";
 
 export default {
-  components: { LargeButton },
+  // components: { LargeButton },
   data() {
     const user = UserService.getUser() || {};
 
