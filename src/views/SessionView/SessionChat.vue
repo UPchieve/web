@@ -354,7 +354,7 @@ span {
 
 textarea {
   width: 100%;
-  height: 150px;
+  height: 100px;
   border: none;
   position: absolute;
   left: 0;
