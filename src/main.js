@@ -22,6 +22,20 @@ Vue.component("vue-headful", VueHeadful);
 // Set up vue-select
 Vue.component("v-select", vSelect);
 
+// Give all components isMobile()
+Vue.mixin({
+  methods: {
+    isMobile() {
+      // Check if browser is mobile
+      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+  }
+})
+
 // Create Vue instance
 new Vue({
   router,

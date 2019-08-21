@@ -196,14 +196,6 @@ export default {
     window.addEventListener("resize", this.resizeCanvas);
   },
   methods: {
-    isMobile() {
-      // Check if browser is mobile (can be moved into a file for future use)
-      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        return true;
-      } else {
-        return false;
-      }
-    },
     resizeCanvas() {
       const savedImage = App.ctx.getImageData(
         0,
