@@ -75,9 +75,9 @@ export default {
       .get(`${API_ROOT}/volunteers/${data}`, data)
       .then(this._successHandler, this._errorHandler);
   },
-  getVolunteersAvailability(context) {
+  getVolunteersAvailability(context, certifiedSubject) {
     return context.$http
-      .get(`${API_ROOT}/volunteers/availability`)
+      .get(`${API_ROOT}/volunteers/availability/${certifiedSubject}`)
       .then(this._successHandler, this._errorHandler);
   },
   getVolunteers(context) {
