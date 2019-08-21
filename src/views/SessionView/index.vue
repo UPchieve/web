@@ -1,7 +1,7 @@
 <template>
   <div class="session">
     <div class="session-header-container">
-      <session-header />
+      <session-header @try-clicked="tryClicked" />
     </div>
     <div v-if="currentSession.sessionId" class="session-contents-container">
       <div class="col-sm-8 whiteboard-container">
@@ -47,6 +47,7 @@ export default {
   data() {
     return {
       currentSession: SessionService.currentSession,
+      sessionReconnecting: false,
       showModal: false,
       btnLabels: ["Submit question", "Exit session"],
       message: `
@@ -94,14 +95,16 @@ export default {
       promise = SessionService.useExistingSession(this, id);
     }
 
-    promise.then(sessionId => {
-      this.sessionId = this.currentSession.sessionId;
-      this.$socket.connect();
-      this.$socket.emit("join", {
-        sessionId,
-        user: UserService.getUser()
+    promise
+      .then(sessionId => {
+        this.sessionId = this.currentSession.sessionId;
+        this.$socket.connect();
+        this.joinSession(sessionId);
+      })
+      .catch(() => {
+        window.alert("Could not start new help session");
+        this.$router.replace("/");
       });
-    });
 
     // Offer the option to ask a question
     const MODAL_TIMEOUT_MS = 24 * 60 * 60 * 1000;
@@ -117,6 +120,30 @@ export default {
   sockets: {
     bump: function() {
       this.$router.push("/");
+    },
+    reconnect_attempt() {
+      this.sessionReconnecting = true;
+    },
+    connect() {
+      if (this.sessionReconnecting) {
+        if (this.currentSession && this.currentSession.sessionId) {
+          // we still need to re-join the room after Socket.IO re-establishes the connection
+          this.joinSession(this.currentSession.sessionId);
+        } else {
+          location.reload();
+        }
+      }
+    }
+  },
+  methods: {
+    joinSession(sessionId) {
+      this.$socket.emit("join", {
+        sessionId,
+        user: UserService.getUser()
+      });
+    },
+    tryClicked() {
+      this.sessionReconnecting = true;
     }
   }
 };

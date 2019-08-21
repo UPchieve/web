@@ -22,9 +22,9 @@ export default {
   },
 
   endSession(context, sessionId) {
-    localStorage.removeItem("currentSessionPath");
-
     return NetworkService.endSession(context, { sessionId }).then(() => {
+      localStorage.removeItem("currentSessionPath");
+
       // analytics: track when a help session has ended
       AnalyticsService.trackSessionEnded(
         this.currentSession.data,
@@ -90,7 +90,7 @@ export default {
         this.currentSession.data = {};
 
         localStorage.removeItem("currentSessionPath");
-        return;
+        return Promise.reject(resp.data.err);
       }
 
       const { sessionId, data } = resp.data || {};
@@ -102,6 +102,7 @@ export default {
 
         const path = `/session/${type}/${subTopic}/${sessionId}`;
         localStorage.setItem("currentSessionPath", path);
+        return Promise.resolve(path);
       }
     });
   }
