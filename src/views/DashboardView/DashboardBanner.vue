@@ -1,9 +1,13 @@
 <template>
   <div class="DashboardBanner">
-    <h1 v-if="mobileMode" class="DashboardBanner-greeting">Hello, {{ name }}!</h1>
+    <h1 v-if="mobileMode" class="DashboardBanner-greeting">
+      Hello, {{ name }}!
+    </h1>
 
     <div class="DashboardBanner-banner">
-      <h1 v-if="!mobileMode" class="DashboardBanner-greeting">Hello, {{ name }}!</h1>
+      <h1 v-if="!mobileMode" class="DashboardBanner-greeting">
+        Hello, {{ name }}!
+      </h1>
       <large-button primary reverse>Take a tour</large-button>
     </div>
   </div>
