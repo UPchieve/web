@@ -174,9 +174,8 @@ export default {
 .whiteboard-container {
   height: 100%;
   padding: 0;
-  border-top: 25px solid #eaeaeb;
-  border-left: 25px solid #eaeaeb;
-  border-right: 25px solid #eaeaeb;
+  border: 25px solid #E5E5E5;
+  background: #E5E5E5;
 }
 
 .chat-container {

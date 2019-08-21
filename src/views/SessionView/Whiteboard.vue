@@ -16,7 +16,6 @@
       class="whiteboardTools row"
       style="background-color:rgba(238,238,238,1)"
     >
-      <div class="header">Whiteboard Tools</div>
       <div class="toolset col-md-6">
         <button id="clearButton" class="whiteboardBtn" @click="clear" />
         <div class="colorWrapper">
@@ -174,6 +173,7 @@ export default {
       currentSession: SessionService.currentSession,
       showColors: "hidden",
       canvasHeight: null,
+      panEnabled: true
     };
   },
   mounted() {
@@ -188,9 +188,6 @@ export default {
     } else {
       canvas.height = this.canvasHeight;
       canvas.width = this.canvasHeight * 1.33;  
-    }
-    if (this.isMobile()) {
-      alert('hello mobile');
     }
 
     this.emitCanvasLoaded();
@@ -464,6 +461,15 @@ export default {
       }
     },
     drawSetup() {
+      if (this.isMobile()) {
+        if (this.panEnabled) {
+          document.getElementById('whiteboard').style.overflow = 'hidden';
+          this.panEnabled = !this.panEnabled;
+        } else {
+          document.getElementById('whiteboard').style.overflow = 'scroll';
+          this.panEnabled = !this.panEnabled;
+        }
+      }
       App.ctx.strokeStyle = LOCAL_LINE_COLOR;
       this.emitChangeColor(LOCAL_LINE_COLOR);
       App.ctx.lineWidth = LINE_WIDTH;
@@ -764,25 +770,30 @@ export default {
   height: 100%;
   overflow: scroll;
   flex-direction: column;
+  border-radius: 8px;
+  background-color: grey;
 }
 
 canvas {
   background: #fff;
   display: block;
-  overflow: scroll;
   cursor: not-allowed;
 }
 
 .whiteboardTools {
   padding: 10px 30px;
+  width: 100%;
+  margin: 0;
   width: 300px;
   height: 80px;
   display: flex;
   align-items: center;
-  align-self: center;
   flex-direction: column;
   position: absolute;
-  bottom: 0;
+  bottom: 20px;
+  border-radius: 8px;
+  left: 50%;
+  transform: translate(-50%, 0);
 }
 
 .header {
@@ -792,7 +803,7 @@ canvas {
 .toolset {
   display: flex;
   justify-content: center;
-  padding-top: 5px;
+  padding-top: 10px;
 }
 
 .colorContainer {
@@ -809,9 +820,9 @@ canvas {
 }
 
 .whiteboardBtn {
-  padding: 13px;
+  padding: 15px;
   border: none;
-  margin: 4px;
+  margin: 8px;
   background-repeat: no-repeat;
   background-position: center;
   background-color: rgb(238, 238, 238);
