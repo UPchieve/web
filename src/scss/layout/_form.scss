@@ -192,7 +192,8 @@
     padding: 10px 12px;
     cursor: pointer;
 
-    &:hover {
+    &:hover,
+    &[aria-selected=true] {
       background: #eee;
     }
   }
