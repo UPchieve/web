@@ -412,6 +412,8 @@ export default {
         });
     },
     autocompleteSchool(input) {
+      this.eligibility.highSchool = {};
+
       return new Promise(resolve => {
         if (input.length < 3) {
           return resolve([]);
