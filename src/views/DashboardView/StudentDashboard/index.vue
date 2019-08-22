@@ -17,11 +17,13 @@ export default {
 
 <style lang="scss" scoped>
 .StudentDashboard {
-  @include flex-container(column, center, center);
+  @include flex-container(column);
   @include child-spacing(top, 40px);
   padding: 40px 20px;
 
   @include breakpoint-above("medium") {
+    display: inline-flex;
+    min-width: 100%;
     padding: 40px;
   }
 }

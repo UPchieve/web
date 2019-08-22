@@ -1,0 +1,78 @@
+<template>
+  <div class="SubjectSelection">
+    <p v-if="mobileMode">Explore our subjects</p>
+    <subject-card
+      v-for="(card, index) in cards"
+      v-bind:key="index"
+      :title="card.title"
+      :subtitle="card.subtitle"
+      :svg-url="card.svgUrl"
+      :subjects="card.subjects"
+      :button-text="card.buttonText"
+    />
+  </div>
+</template>
+
+<script>
+import { mapGetters } from "vuex";
+import SubjectCard from "./SubjectCard";
+import MathSVG from "@/assets/subject_icons/math.svg";
+import CollegeSVG from "@/assets/subject_icons/college-counseling.svg";
+import ScienceSVG from "@/assets/subject_icons/science.svg";
+
+export default {
+  name: "subject-selection",
+  components: { SubjectCard },
+  data() {
+    const cards = [
+      {
+        title: "Math Tutoring",
+        svgUrl: MathSVG,
+        subjects: [
+          "Algebra",
+          "Calculus",
+          "Geometry",
+          "Precalculus",
+          "Trigenometry"
+        ].sort()
+      },
+      {
+        title: "College Counseling",
+        svgUrl: CollegeSVG,
+        subjects: ["Planning", "Applications", "Essays"].sort()
+      },
+      {
+        title: "Coming Soon",
+        subtitle: "Check back soon for new help topics like SAT, ESL, and Science!",
+        svgUrl: ScienceSVG,
+        buttonText: "Suggest a help topic"
+      }
+    ];
+
+    return { cards };
+  },
+  computed: {
+    ...mapGetters({ mobileMode: "app/mobileMode" })
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+.SubjectSelection {
+  @include flex-container(column);
+  @include child-spacing(top, 16px);
+
+  p {
+    @include font-category("heading");
+    margin: 0;
+    padding: 0;
+    text-align: left;
+  }
+
+  @include breakpoint-above("large") {
+    @include flex-container(row);
+    @include child-spacing(top, 0);
+    @include child-spacing(left, 40px);
+  }
+}
+</style>
