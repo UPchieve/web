@@ -1,0 +1,96 @@
+@font-face {
+  font-family: "upchieve_icon_font";
+  src: url("./upchieve_icon_font.ttf") format("truetype"),
+    url("./upchieve_icon_font.woff") format("woff"),
+    url("./upchieve_icon_font.svg") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="ucif-"],
+[class*=" ucif-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: "upchieve_icon_font" !important;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ucif-word-bubbles:before {
+  content: "\e900";
+}
+.ucif-undo:before {
+  content: "\e901";
+}
+.ucif-trash:before {
+  content: "\e902";
+}
+.ucif-search:before {
+  content: "\e903";
+}
+.ucif-portrait:before {
+  content: "\e904";
+}
+.ucif-pencil:before {
+  content: "\e905";
+}
+.ucif-pen:before {
+  content: "\e906";
+}
+.ucif-padlock:before {
+  content: "\e907";
+}
+.ucif-math-symbols:before {
+  content: "\e908";
+}
+.ucif-logout:before {
+  content: "\e909";
+}
+.ucif-house:before {
+  content: "\e90a";
+}
+.ucif-hamburger:before {
+  content: "\e90b";
+}
+.ucif-graduation-cap:before {
+  content: "\e90c";
+}
+.ucif-folder:before {
+  content: "\e90d";
+}
+.ucif-exclamation:before {
+  content: "\e90e";
+}
+.ucif-eraser:before {
+  content: "\e90f";
+}
+.ucif-envelope:before {
+  content: "\e910";
+}
+.ucif-ellipsis:before {
+  content: "\e911";
+}
+.ucif-drop:before {
+  content: "\e912";
+}
+.ucif-cross:before {
+  content: "\e913";
+}
+.ucif-caret:before {
+  content: "\e914";
+}
+.ucif-calendar:before {
+  content: "\e915";
+}
+.ucif-book:before {
+  content: "\e916";
+}
+.ucif-arrow:before {
+  content: "\e917";
+}
