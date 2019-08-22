@@ -55,7 +55,7 @@ export default {
       currentSession: SessionService.currentSession,
       connectionMsg: "",
       connectionMsgType: "",
-      reconnectAttemptMsg: ""
+      reconnectAttemptMsg: "",
     };
   },
   computed: {
@@ -82,7 +82,8 @@ export default {
         picture = StudentAvatarUrl;
       }
       return {
-        backgroundImage: `url(${picture})`
+        backgroundImage: `url(${picture})`,
+        marginLeft: this.isMobile() ? '50px' : '0'
       };
     }
   },
@@ -214,8 +215,9 @@ h1 {
 }
 
 .avatar {
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
   background-image: url("~@/assets/defaultAvatar@2x.png");
   background-size: cover;
 }
@@ -230,6 +232,8 @@ h1 {
 
 .volunteer-name {
   font-weight: 700;
+  font-size: 18px;
+  font-weight: normal;
 }
 
 .btn {
@@ -238,7 +242,7 @@ h1 {
   color: #fff;
   border: none;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500;
   background-color: inherit;
 }
 
@@ -292,6 +296,10 @@ h1 {
 @media screen and (max-width: 700px) {
   .info {
     width: auto !important;
+  }
+  .session-header {
+    border-radius: 0px 0px 20px 20px;
+    height: 80px;
   }
 }
 </style>

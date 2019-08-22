@@ -799,6 +799,7 @@ canvas {
 
 .header {
   font-size: 12px;
+  display: block;
 }
 
 .toolset {
@@ -857,5 +858,11 @@ canvas {
 
 #openColorsButton {
   background-image: url("~@/assets/color_icon.svg");
+}
+
+@media screen and (max-width: 700px) {
+  .whiteboard {
+    border-radius: 0;
+  }
 }
 </style>

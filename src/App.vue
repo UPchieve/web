@@ -135,8 +135,8 @@ body,
   .toggleMenu.forMobileView {
     display: block !important;
     position: absolute !important;
-    top: 2em !important;
-    left: 1em !important;
+    top: 29px;
+    left: 20px;
     z-index: 500 !important;
   }
 

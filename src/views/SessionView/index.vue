@@ -4,12 +4,16 @@
       <session-header @try-clicked="tryClicked" />
     </div>
     <div v-if="currentSession.sessionId" class="session-contents-container">
-      <div class="col-sm-8 whiteboard-container">
+      <div class="col-sm-8 whiteboard-container" id="whiteboard-container">
         <whiteboard />
       </div>
-      <div class="col-sm-4 chat-container">
-        <session-chat />
+      <div class="col-sm-4 chat-container" id="chat-container">
+        <session-chat/>
       </div>
+    </div>
+
+    <div class="toggleButton" id="toggleButton" @click="toggleWhiteboard">
+      <img id="toggleIcon" :src="getIconUrl()"/>
     </div>
 
     <modal
@@ -49,6 +53,8 @@ export default {
       currentSession: SessionService.currentSession,
       sessionReconnecting: false,
       showModal: false,
+      whiteboardOpen: false,
+      icon: "Pencil.png",
       btnLabels: ["Submit question", "Exit session"],
       message: `
         We don’t have any Academic Coaches
@@ -136,6 +142,25 @@ export default {
     }
   },
   methods: {
+    getIconUrl() {
+      return require('@/assets/'+this.icon);
+    },
+    toggleWhiteboard() {
+      if (!this.whiteboardOpen) {
+        document.getElementById("whiteboard-container").style.display = "block";
+        document.getElementById("chat-container").style.display = "none";
+        document.getElementById("toggleButton").classList.add("back");
+        this.icon = "Chat.png";
+        this.whiteboardOpen = true;
+      } else {
+        document.getElementById("whiteboard-container").style.display = "none";
+        document.getElementById("chat-container").style.display = "block";
+        document.getElementById("toggleButton").classList.remove("back");
+        this.icon = "Pencil.png";
+        this.whiteboardOpen = false;
+      }
+      
+    },
     joinSession(sessionId) {
       this.$socket.emit("join", {
         sessionId,
@@ -145,6 +170,7 @@ export default {
     tryClicked() {
       this.sessionReconnecting = true;
     }
+    
   }
 };
 </script>
@@ -178,20 +204,49 @@ export default {
   background: #E5E5E5;
 }
 
+.toggleButton {
+  display: none;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  border-radius: 20px;
+  background: #16D2AA;
+  width: 40px;
+  height: 40px;
+  img {
+    margin-top: 7px;
+    width: 26px;
+    height: 26px;
+  }
+  transition: 0.4s;
+}
+
+.toggleButton.back {
+  bottom: calc(100vh - 140px);
+}
+
 .chat-container {
   height: 100%;
   padding: 0;
 }
 
 @media screen and (max-width: 700px) {
-  .whiteboard-container {
-    width: 100% !important;
-    height: 65vh !important;
+  .session-contents-container {
+    height: 100%;
+    padding-top: 80px;
   }
-
+  .whiteboard-container {
+    width: 100%;
+    height: calc(100vh-80px);
+    border: 0;
+    display: none;
+  }
+  .toggleButton {
+    display: block;
+  }
   .chat-container {
-    width: 100% !important;
-    height: 60vh !important;
+    width: 100%;
+    height: calc(100vh-80px);
   }
 }
 </style>

@@ -77,7 +77,6 @@ export default {
       typingIndicatorShown: false
     };
   },
-
   methods: {
     showModerationWarning() {
       this.chatWarningIsShown = true;
@@ -363,6 +362,7 @@ textarea {
   padding: 16px;
 }
 
+
 .left {
   float: left;
   .contents {
@@ -390,9 +390,39 @@ textarea {
     display: none;
   }
 }
-
-
 .message-content {
   width: 200px;
+}
+
+@media screen and (max-width: 700px) {
+  .whiteboard {
+    border-radius: 0;
+  }
+  .header {
+    display: none !important;
+  }
+  .message-box {
+    height: 100%;
+    padding-bottom: 60px;
+    overflow: hidden;
+    top: 0;
+    position: relative;
+  }
+  textarea {
+    width: calc(100% - 100px);
+    height: 40px;
+    border: none;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    border: 1px solid #D6E0EF;
+    border-radius: 20px;
+    margin: 20px;
+    padding: 10px 16px;
+    resize: none;
+  }
+  .whiteboardButton {
+    display: block;
+  }
 }
 </style>
