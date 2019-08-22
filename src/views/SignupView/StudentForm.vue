@@ -16,15 +16,26 @@
     <div class="uc-column">
       <label for="inputHighschool" class="uc-form-label">High School</label>
 
-      <autocomplete
-        id="inputHighschool"
-        :search="autocompleteSchool"
-        :get-result-value="getSchoolDisplayName"
-        base-class="uc-autocomplete"
-        placeholder="Search for your high school"
-        aria-label="Search for your high school"
-        @submit="handleSelectHighSchool"
-      ></autocomplete>
+      <div class="school-search">
+        <autocomplete
+          id="inputHighschool"
+          class="school-search__autocomplete"
+          :search="autocompleteSchool"
+          :get-result-value="getSchoolDisplayName"
+          base-class="uc-autocomplete"
+          auto-select
+          placeholder="Search for your high school"
+          aria-label="Search for your high school"
+          @submit="handleSelectHighSchool"
+        ></autocomplete>
+
+        <div
+          v-if="eligibility.noSchoolResults"
+          class="school-search__no-results"
+        >
+          No results
+        </div>
+      </div>
 
       <p class="uc-form-subtext">
         We will never share your high school with third parties.
@@ -293,6 +304,7 @@ export default {
       errors: [],
       invalidInputs: [],
       eligibility: {
+        noSchoolResults: false,
         highSchool: {}
       },
       waitlist: {
@@ -416,12 +428,14 @@ export default {
 
       return new Promise(resolve => {
         if (input.length < 3) {
+          this.eligibility.noSchoolResults = false;
           return resolve([]);
         }
 
         NetworkService.searchSchool(this, { query: input })
           .then(response => response.body.results)
           .then(schools => {
+            this.eligibility.noSchoolResults = schools.length === 0;
             resolve(schools);
           });
       });
@@ -495,5 +509,26 @@ export default {
   color: #bf0000;
   font-size: 14px;
   text-align: left;
+}
+
+.school-search {
+  position: relative;
+
+  &__no-results {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    width: 100%;
+    padding: 10px 12px;
+    border: solid 1px #ccc;
+    border-top: none;
+    border-radius: 5px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    text-align: left;
+    font-size: 14px;
+    background: #fff;
+    color: #666;
+  }
 }
 </style>
