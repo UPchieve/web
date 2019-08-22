@@ -2,7 +2,11 @@
   <div class="profile">
     <div class="header">
       Profile
-      <button v-if="user.isVolunteer" class="editBtn btn" @click="editProfile()">
+      <button
+        v-if="user.isVolunteer"
+        class="editBtn btn"
+        @click="editProfile()"
+      >
         {{ editBtnMsg }}
       </button>
     </div>

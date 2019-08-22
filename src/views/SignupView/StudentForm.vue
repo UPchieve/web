@@ -15,7 +15,7 @@
 
     <div class="uc-column">
       <label for="inputHighschool" class="uc-form-label">High School</label>
-      
+
       <autocomplete
         id="inputHighschool"
         :search="autocompleteSchool"
@@ -53,14 +53,18 @@
     <div class="step-title">This school is not currently supported</div>
 
     <div class="uc-column">
-      <label for="inputWaitlistEmail" class="uc-form-label">Enter your email to be notified when UPchieve launches at your school</label>
-      
+      <label for="inputWaitlistEmail" class="uc-form-label"
+        >Enter your email to be notified when UPchieve launches at your
+        school</label
+      >
+
       <input
         id="inputWaitlistEmail"
         type="email"
         class="uc-form-input"
         v-bind:class="{
-          'uc-form-input--invalid': invalidInputs.indexOf('inputWaitlistEmail') > -1
+          'uc-form-input--invalid':
+            invalidInputs.indexOf('inputWaitlistEmail') > -1
         }"
         v-model="waitlist.email"
         autofocus
@@ -71,18 +75,21 @@
       </p>
     </div>
 
-    <button class="uc-form-button" type="submit" @click.prevent="submitWaitlist()">
+    <button
+      class="uc-form-button"
+      type="submit"
+      @click.prevent="submitWaitlist()"
+    >
       Submit
     </button>
 
     <div v-if="msg !== ''">{{ msg }}</div>
   </form>
 
-  <form
-    v-else-if="step === 'step-1-waitlist-success'"
-    class="uc-form-body"
-  >
-    <div class="step-title">Thank you. We hope to provide access to your school soon!</div>
+  <form v-else-if="step === 'step-1-waitlist-success'" class="uc-form-body">
+    <div class="step-title">
+      Thank you. We hope to provide access to your school soon!
+    </div>
   </form>
 
   <form
@@ -245,7 +252,7 @@
 
 <script>
 import validator from "validator";
-import Autocomplete from '@trevoreyre/autocomplete-vue';
+import Autocomplete from "@trevoreyre/autocomplete-vue";
 
 import AuthService from "@/services/AuthService";
 import UserService from "@/services/UserService";
@@ -321,12 +328,14 @@ export default {
         return;
       }
 
-      NetworkService.checkSchoolApproval(this, { schoolUpchieveId: this.eligibility.highSchool.upchieveId })
-        .then((response) => {
+      NetworkService.checkSchoolApproval(this, {
+        schoolUpchieveId: this.eligibility.highSchool.upchieveId
+      })
+        .then(response => {
           const isSchoolApproved = response.body.approved;
-          
+
           if (isSchoolApproved) {
-            this.step = "step-2"
+            this.step = "step-2";
           } else {
             this.step = "step-1-waitlist";
           }
@@ -395,7 +404,7 @@ export default {
         email: this.waitlist.email,
         schoolUpchieveId: this.eligibility.highSchool.upchieveId
       })
-        .then((response) => {
+        .then(() => {
           this.step = "step-1-waitlist-success";
         })
         .catch(err => {
@@ -410,10 +419,10 @@ export default {
 
         NetworkService.searchSchool(this, { query: input })
           .then(response => response.body.results)
-          .then((schools) => {
+          .then(schools => {
             resolve(schools);
-          })
-      })
+          });
+      });
     },
     getSchoolDisplayName(school) {
       return `${school.name} (${school.districtName}, ${school.state})`;
