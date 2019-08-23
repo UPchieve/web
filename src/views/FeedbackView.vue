@@ -7,9 +7,9 @@
     <table class="questions-table">
       <tr v-if="this.$route.params.userType === 'student'" class="title-row">
         <td class="title-cell">
-          Please help us improve UPchieve’s services by filling out this short
+          <!-- Please help us improve UPchieve’s services by filling out this short
           survey. Your responses are completely anonymous and greatly
-          appreciated.
+          appreciated. -->
         </td>
       </tr>
       <tr v-else class="title-row">
@@ -308,7 +308,7 @@ export default {
 
 .title-cell {
   display: table-cell;
-  height: 150px;
+  padding: 20px 0;
   vertical-align: middle;
   font-size: 19px;
   text-align: left;
@@ -340,6 +340,7 @@ export default {
 }
 
 .radio-question-table {
+  width: 100%;
   font-size: 15px;
 }
 
