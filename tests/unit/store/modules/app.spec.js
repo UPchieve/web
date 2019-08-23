@@ -38,6 +38,34 @@ describe("app store module", () => {
       expect(state.isSidebarCollapsed).toBe(true);
     });
 
+    it("setModalType", () => {
+      expect(typeof mutations.setModalType).toBe("function");
+      const state = { modalType: null };
+
+      mutations.setModalType(state, "SubjectModal");
+      expect(state.modalType).toBe("SubjectModal");
+    });
+
+    it("setModalData", () => {
+      expect(typeof mutations.setModalData).toBe("function");
+      const state = { modalData: null };
+      const data = { subject: "math" };
+
+      mutations.setModalData(state, data);
+      expect(state.modalData).toBe(data);
+    });
+
+    it("setIsModalShown", () => {
+      expect(typeof mutations.setIsModalShown).toBe("function");
+      const state = { isModalShown: false };
+
+      mutations.setIsModalShown(state, true);
+      expect(state.isModalShown).toBe(true);
+
+      mutations.setIsModalShown(state, false);
+      expect(state.isModalShown).toBe(false);
+    });
+
     it("setWindowWidth", () => {
       expect(typeof mutations.setWindowWidth).toBe("function");
       const state = { windowWidth: 0 };
@@ -118,6 +146,25 @@ describe("app store module", () => {
       const commit = jest.fn();
       actions.expandSidebar({ commit });
       expect(commit).toHaveBeenCalledWith("setIsSidebarCollapsed", false);
+    });
+
+    it("showModal", () => {
+      expect(typeof actions.showModal).toBe("function");
+      const commit = jest.fn();
+      const data = { modalType: "TestModal", modalData: "Test data." };
+      actions.showModal({ commit }, data);
+      expect(commit).toHaveBeenNthCalledWith(1, "setIsModalShown", true);
+      expect(commit).toHaveBeenNthCalledWith(2, "setModalType", data.modalType);
+      expect(commit).toHaveBeenNthCalledWith(3, "setModalData", data.modalData);
+    });
+
+    it("hideModal", () => {
+      expect(typeof actions.hideModal).toBe("function");
+      const commit = jest.fn();
+      actions.hideModal({ commit });
+      expect(commit).toHaveBeenNthCalledWith(1, "setIsModalShown", false);
+      expect(commit).toHaveBeenNthCalledWith(2, "setModalType", null);
+      expect(commit).toHaveBeenNthCalledWith(3, "setModalData", null);
     });
 
     it("windowResize", () => {

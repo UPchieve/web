@@ -233,9 +233,10 @@ router.beforeEach((to, from, next) => {
   }
 });
 
-// Show navigation after each route change
+// Called after each route change
 router.afterEach((/* to, from */) => {
   store.dispatch("app/showNavigation");
+  store.dispatch("app/hideModal");
 });
 
 // If endpoint returns 401, redirect to login (except for requests to get user's

@@ -29,51 +29,103 @@ describe("SubjectCard", () => {
       title: "Test Subject",
       subtitle: "Fake subtitle.",
       svgUrl: "test_url.svg",
-      subjects: ["Subject 1", "Subject 2", "Subject 3"],
+      subtopics: ["Subject 1", "Subject 2", "Subject 3"],
       buttonText: "Test Button"
     };
 
-    test("mobile", () => {
-      const wrapper = getWrapper(true, propsData);
-      expect(wrapper.classes("SubjectCard")).toBe(true);
+    describe("mobile", () => {
+      test("layout", () => {
+        const wrapper = getWrapper(true, propsData);
+        expect(wrapper.classes("SubjectCard")).toBe(true);
 
-      const icon = wrapper.find(".SubjectCard-icon");
-      expect(icon.exists()).toBe(true);
-      expect(icon.is("img")).toBe(true);
-      expect(icon.attributes("src")).toBe(propsData.svgUrl);
+        const icon = wrapper.find(".SubjectCard-icon");
+        expect(icon.exists()).toBe(true);
+        expect(icon.is("img")).toBe(true);
+        expect(icon.attributes("src")).toBe(propsData.svgUrl);
 
-      const title = wrapper.find(".SubjectCard-title");
-      expect(title.exists()).toBe(true);
-      expect(title.text()).toBe(propsData.title);
+        const title = wrapper.find(".SubjectCard-title");
+        expect(title.exists()).toBe(true);
+        expect(title.text()).toBe(propsData.title);
 
-      const subtitle = wrapper.find(".SubjectCard-subtitle");
-      expect(subtitle.exists()).toBe(false);
+        const subtitle = wrapper.find(".SubjectCard-subtitle");
+        expect(subtitle.exists()).toBe(false);
+      });
 
-      const button = wrapper.find(HyperlinkButton);
-      expect(button.exists()).toBe(true);
-      expect(button.text()).toBe(propsData.buttonText);
+      test("link button", () => {
+        const wrapper = getWrapper(true, propsData);
+
+        // No `routeTo`
+        let handleClick = jest.fn();
+        wrapper.setMethods({ handleClick });
+        wrapper.setProps({ routeTo: null });
+
+        const button = wrapper.find(HyperlinkButton);
+        expect(button.exists()).toBe(true);
+        expect(button.text()).toBe(propsData.buttonText);
+        expect(button.props().routeTo).toBeUndefined();
+        button.trigger("click");
+        expect(handleClick).toHaveBeenCalled();
+
+        // With `routeTo`
+        handleClick = jest.fn();
+        wrapper.setMethods({ handleClick });
+        wrapper.setProps({ routeTo: "/test" });
+
+        const routeButton = wrapper.find(HyperlinkButton);
+        expect(routeButton.exists()).toBe(true);
+        expect(routeButton.text()).toBe(propsData.buttonText);
+        expect(routeButton.props().routeTo).toBe("/test");
+        routeButton.trigger("click");
+        expect(handleClick).not.toHaveBeenCalled();
+      });
     });
 
-    test("desktop", () => {
-      const wrapper = getWrapper(false, propsData);
-      expect(wrapper.classes("SubjectCard")).toBe(true);
+    describe("desktop", () => {
+      test("layout", () => {
+        const wrapper = getWrapper(false, propsData);
+        expect(wrapper.classes("SubjectCard")).toBe(true);
 
-      const icon = wrapper.find(".SubjectCard-icon");
-      expect(icon.exists()).toBe(true);
-      expect(icon.is("img")).toBe(true);
-      expect(icon.attributes("src")).toBe(propsData.svgUrl);
+        const icon = wrapper.find(".SubjectCard-icon");
+        expect(icon.exists()).toBe(true);
+        expect(icon.is("img")).toBe(true);
+        expect(icon.attributes("src")).toBe(propsData.svgUrl);
 
-      const title = wrapper.find(".SubjectCard-title");
-      expect(title.exists()).toBe(true);
-      expect(title.text()).toBe(propsData.title);
+        const title = wrapper.find(".SubjectCard-title");
+        expect(title.exists()).toBe(true);
+        expect(title.text()).toBe(propsData.title);
 
-      const subtitle = wrapper.find(".SubjectCard-subtitle");
-      expect(subtitle.exists()).toBe(true);
-      expect(subtitle.text()).toBe(propsData.subtitle);
+        const subtitle = wrapper.find(".SubjectCard-subtitle");
+        expect(subtitle.exists()).toBe(true);
+        expect(subtitle.text()).toBe(propsData.subtitle);
+      });
 
-      const button = wrapper.find(LargeButton);
-      expect(button.exists()).toBe(true);
-      expect(button.text()).toBe(propsData.buttonText);
+      test("link button", () => {
+        const wrapper = getWrapper(false, propsData);
+
+        // No `routeTo`
+        let handleClick = jest.fn();
+        wrapper.setMethods({ handleClick });
+        wrapper.setProps({ routeTo: null });
+
+        const button = wrapper.find(LargeButton);
+        expect(button.exists()).toBe(true);
+        expect(button.text()).toBe(propsData.buttonText);
+        expect(button.props().routeTo).toBeUndefined();
+        button.trigger("click");
+        expect(handleClick).toHaveBeenCalled();
+
+        // With `routeTo`
+        handleClick = jest.fn();
+        wrapper.setMethods({ handleClick });
+        wrapper.setProps({ routeTo: "/test" });
+
+        const routeButton = wrapper.find(LargeButton);
+        expect(routeButton.exists()).toBe(true);
+        expect(routeButton.text()).toBe(propsData.buttonText);
+        expect(routeButton.props().routeTo).toBe("/test");
+        routeButton.trigger("click");
+        expect(handleClick).not.toHaveBeenCalled();
+      });
     });
   });
 });

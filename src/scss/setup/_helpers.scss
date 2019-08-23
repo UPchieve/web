@@ -21,7 +21,8 @@
     "below": -1,
     "above": 1,
     "sidebar": 10,
-    "header": 20
+    "header": 20,
+    "modal": 30
   );
 
   @return validate-map-key($map, $key);

@@ -7,8 +7,10 @@
       :title="card.title"
       :subtitle="card.subtitle"
       :svg-url="card.svgUrl"
-      :subjects="card.subjects"
+      :topic="card.topic"
+      :subtopics="card.subtopics"
       :button-text="card.buttonText"
+      :routeTo="card.routeTo"
     />
   </div>
 </template>
@@ -28,7 +30,8 @@ export default {
       {
         title: "Math Tutoring",
         svgUrl: MathSVG,
-        subjects: [
+        topic: "math",
+        subtopics: [
           "Algebra",
           "Calculus",
           "Geometry",
@@ -39,13 +42,15 @@ export default {
       {
         title: "College Counseling",
         svgUrl: CollegeSVG,
-        subjects: ["Planning", "Applications", "Essays"].sort()
+        topic: "college",
+        subtopics: ["Planning", "Applications", "Essays"].sort()
       },
       {
         title: "Coming Soon",
         subtitle: "Check back soon for new help topics like SAT, ESL, and Science!",
         svgUrl: ScienceSVG,
-        buttonText: "Suggest a help topic"
+        buttonText: "Suggest a help topic",
+        routeTo: "/contact"
       }
     ];
 

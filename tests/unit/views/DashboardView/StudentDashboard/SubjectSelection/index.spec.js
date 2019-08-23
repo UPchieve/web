@@ -24,13 +24,14 @@ const getWrapper = (mobileMode = false) => {
 
 describe("SubjectSelection", () => {
   const cards = [
-    { title: "Math Tutoring" },
-    { title: "College Counseling" },
+    { title: "Math Tutoring", topic: "math" },
+    { title: "College Counseling", topic: "college" },
     {
       title: "Coming Soon",
       subtitle:
         "Check back soon for new help topics like SAT, ESL, and Science!",
-      buttontext: "Suggest a help topic"
+      buttonText: "Suggest a help topic",
+      routeTo: "/contact"
     }
   ];
 
@@ -48,7 +49,7 @@ describe("SubjectSelection", () => {
 
       cards.forEach((card, i) => {
         for (let key in card)
-          expect(subjectCards.at(i).attributes()[key]).toBe(card[key]);
+          expect(subjectCards.at(i).props()[key]).toBe(card[key]);
       });
     });
 
@@ -64,7 +65,7 @@ describe("SubjectSelection", () => {
 
       cards.forEach((card, i) => {
         for (let key in card)
-          expect(subjectCards.at(i).attributes()[key]).toBe(card[key]);
+          expect(subjectCards.at(i).props()[key]).toBe(card[key]);
       });
     });
   });

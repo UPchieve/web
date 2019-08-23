@@ -6,6 +6,7 @@ import appModule from "@/store/modules/app";
 import App from "@/components/App";
 import AppHeader from "@/components/App/AppHeader";
 import AppSidebar from "@/components/App/AppSidebar";
+import AppModal from "@/components/App/AppModal";
 
 const localVue = createLocalVue();
 localVue.use(VueRouter);
@@ -33,6 +34,7 @@ describe("App", () => {
     expect(wrapper.classes()).toEqual(["App"]);
     expect(wrapper.find(AppHeader).exists()).toBe(true);
     expect(wrapper.find(AppSidebar).exists()).toBe(true);
+    expect(wrapper.find(AppModal).exists()).toBe(false);
     expect(wrapper.find("router-view-stub").exists()).toBe(true);
 
     const routerViewWrapper = wrapper.find(".App-router-view-wrapper");
@@ -64,5 +66,10 @@ describe("App", () => {
     expect(routerViewWrapper.classes("App-router-view-wrapper--sidebar")).toBe(
       false
     );
+  });
+
+  it("conditionally renders `AppModal`", () => {
+    const wrapper = getWrapper({ isModalShown: true });
+    expect(wrapper.find(AppModal).exists()).toBe(true);
   });
 });

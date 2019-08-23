@@ -5,7 +5,8 @@
 
       <div class="SubjectCard-mobile-column">
         <h2 class="SubjectCard-title">{{ title }}</h2>
-        <hyperlink-button primary>{{ buttonText }}</hyperlink-button>
+        <hyperlink-button v-if="routeTo" primary :routeTo="routeTo">{{ buttonText }}</hyperlink-button>
+        <hyperlink-button v-else primary @click.native="handleClick">{{ buttonText }}</hyperlink-button>
       </div>
     </template>
 
@@ -15,21 +16,23 @@
         <h2 class="SubjectCard-title">{{ title }}</h2>
         <p class="SubjectCard-subtitle">{{ subtitle }}</p>
         <dropdown-list
-          v-if="dropdownOptions"
-          v-model="value"
+          v-if="subtopics"
+          v-model="selectedSubtopic"
           class="SubjectCard-dropdown"
           disabledOption="Choose a subject"
-          :options="dropdownOptions"
+          :options="subtopics"
         />
       </div>
 
-      <large-button primary :disabled="dropdownOptions && value === ''">{{ buttonText }}</large-button>
+      <large-button v-if="routeTo" primary :routeTo="routeTo">{{ buttonText }}</large-button>
+      <large-button v-else primary @click.native="handleClick">{{ buttonText }}</large-button>
     </template>
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
+import { startSession } from '@/utils/session';
 import DropdownList from "@/components/DropdownList";
 import HyperlinkButton from "@/components/HyperlinkButton";
 import LargeButton from "@/components/LargeButton";
@@ -38,7 +41,7 @@ export default {
   components: { DropdownList, HyperlinkButton, LargeButton },
   data() {
     return {
-      value: ""
+      selectedSubtopic: ""
     };
   },
   props: {
@@ -54,21 +57,32 @@ export default {
       type: String,
       required: true
     },
-    subjects: Array,
+    topic: String,
+    subtopics: Array,
     buttonText: {
       type: String,
       default: "Start a chat"
-    }
+    },
+    routeTo: String
   },
   computed: {
     ...mapGetters({ mobileMode: "app/mobileMode" }),
-    dropdownOptions() {
-      if (this.subjects && this.subjects.length > 0) {
-        const options = {};
-        this.subjects.forEach(
-          subject => (options[subject.toLowerCase()] = subject)
-        );
-        return options;
+  },
+  methods: {
+    handleClick() {
+      if (!this.mobileMode && this.selectedSubtopic !== "") {
+        startSession(this.$router, this.topic, this.selectedSubtopic);
+      } else {
+        this.$store.dispatch("app/showModal", {
+          modalType: "SubjectSelectionModal",
+          modalData: {
+            backText: "Dashboard",
+            acceptText: "Start a chat",
+            topic: this.topic,
+            subtopics: this.subtopics,
+            svgUrl: this.svgUrl
+          }
+        });
       }
     }
   }

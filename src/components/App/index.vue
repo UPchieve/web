@@ -2,6 +2,7 @@
   <div id="app" class="App">
     <app-header v-if="!hideHeader" />
     <app-sidebar v-if="!hideSidebar" />
+    <app-modal v-if="isModalShown" />
 
     <div
       :class="{
@@ -22,6 +23,7 @@ import AuthService from "@/services/AuthService";
 import "@/scss/main.scss";
 import AppHeader from "./AppHeader";
 import AppSidebar from "./AppSidebar";
+import AppModal from "./AppModal";
 
 /**
  * @todo Examine this, huge code smell, refactoring might be needed
@@ -32,7 +34,8 @@ export default {
   name: "App",
   components: {
     AppHeader,
-    AppSidebar
+    AppSidebar,
+    AppModal
   },
   created() {
     AuthService.checkAuth(this); // {1}
@@ -53,7 +56,8 @@ export default {
   computed: {
     ...mapState({
       hideHeader: state => state.app.hideHeader,
-      hideSidebar: state => state.app.hideSidebar
+      hideSidebar: state => state.app.hideSidebar,
+      isModalShown: state => state.app.isModalShown
     })
   }
 };
