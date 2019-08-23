@@ -33,7 +33,12 @@
           v-if="eligibility.noSchoolResults"
           class="school-search__no-results"
         >
-          No results
+          <a
+            href="https://upchieve.org/invite-your-school"
+            target="_blank"
+          >
+            Can't find your high school?
+          </a>
         </div>
       </div>
 
@@ -529,6 +534,10 @@ export default {
     font-size: 14px;
     background: #fff;
     color: #666;
+
+    a {
+      text-decoration: underline;
+    }
   }
 }
 </style>
