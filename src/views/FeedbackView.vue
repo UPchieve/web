@@ -60,7 +60,11 @@
                       ]
                     "
                     type="radio"
-                    :name="`multiple-radio-${question.qid}_${subquestion_index.toString()}`"
+                    :name="
+                      `multiple-radio-${
+                        question.qid
+                      }_${subquestion_index.toString()}`
+                    "
                     :value="index"
                   />
                 </td>
@@ -75,18 +79,24 @@
                 v-bind:key="subquestion"
               >
                 <input
-                  :id="`radio-list-option_${question.options_alias[subquestion_index]}`"
-                  class="radio-list__option-input"
-                  v-model="
-                    userResponse[question.alias]
+                  :id="
+                    `radio-list-option_${
+                      question.options_alias[subquestion_index]
+                    }`
                   "
+                  class="radio-list__option-input"
+                  v-model="userResponse[question.alias]"
                   type="radio"
                   :name="`radio-list-${question.qid}`"
                   :value="question.options_alias[subquestion_index]"
                 />
                 <label
                   class="radio-list__option-label"
-                  :for="`radio-list-option_${question.options_alias[subquestion_index]}`"
+                  :for="
+                    `radio-list-option_${
+                      question.options_alias[subquestion_index]
+                    }`
+                  "
                 >
                   {{ subquestion }}
                 </label>
@@ -143,19 +153,9 @@ export default {
           alias: "rate-session",
           title: "Rate your session",
           secondary_title: "",
-          table_title: [
-            "1",
-            "2",
-            "3",
-            "4",
-            "5"
-          ],
-          options: [
-            "Rating"
-          ],
-          options_alias: [
-            "rating"
-          ]
+          table_title: ["1", "2", "3", "4", "5"],
+          options: ["Rating"],
+          options_alias: ["rating"]
         },
         {
           qid: "2",
@@ -196,12 +196,12 @@ export default {
           options: [
             "My coach was knowedgable about the topic.",
             "My coach was friendly and approachable.",
-            "I would like to receive help from this coach again.",
+            "I would like to receive help from this coach again."
           ],
           options_alias: [
             "coach-knowedgable",
             "coach-friendly",
-            "coach-help-again",
+            "coach-help-again"
           ]
         },
         {
