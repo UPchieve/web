@@ -1,7 +1,10 @@
 // This file is imported in App.vue.
 
-@import '~bootstrap/dist/css/bootstrap.css';
-@import 'vue-select/src/scss/vue-select.scss';
+@import "~bootstrap/dist/css/bootstrap.css";
+@import "~typeface-work-sans/index.css";
+@import "vue-select/src/scss/vue-select.scss";
 
-@import 'layout/utils';
-@import 'layout/form';
+@import "~@/assets/fonts/upchieve_icon_font.css";
+
+@import "layout/utils";
+@import "layout/form";

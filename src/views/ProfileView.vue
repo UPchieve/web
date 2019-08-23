@@ -319,7 +319,7 @@ button:hover {
 
 .profile {
   font-size: 16px;
-  font-family: $default-font;
+  font-family: $font-family-default;
 }
 
 .header {
