@@ -4,7 +4,8 @@
       :for="id"
       class="DropdownList-label"
       :class="{ 'DropdownList-label--disabled': disabled }"
-    >{{ label }}</label>
+      >{{ label }}</label
+    >
 
     <select
       :id="id"
@@ -13,8 +14,12 @@
       :value="value"
       @input="$emit('input', $event.target.value)"
     >
-      <option v-if="disabledOption" selected disabled value>{{ disabledOption }}</option>
-      <option v-for="(option, index) in options" :key="index" :value="option">{{ option }}</option>
+      <option v-if="disabledOption" selected disabled value>{{
+        disabledOption
+      }}</option>
+      <option v-for="(option, index) in options" :key="index" :value="option">{{
+        option
+      }}</option>
     </select>
   </div>
 </template>

@@ -2,17 +2,19 @@
   <div class="SubjectSelectionModal">
     <img v-if="!mobileMode" :src="modalData.svgUrl" />
     <h1 class="SubjectSelectionModal-title">{{ title }}</h1>
-    <h2
-      v-if="!mobileMode"
-      class="SubjectSelectionModal-subtitle"
-    >Choose a subject so we can connect you with the right tutor.</h2>
+    <h2 v-if="!mobileMode" class="SubjectSelectionModal-subtitle">
+      Choose a subject so we can connect you with the right tutor.
+    </h2>
 
     <div class="SubjectSelectionModal-subtopics">
       <div
         v-for="(subtopic, index) in modalData.subtopics"
         v-bind:key="index"
         class="SubjectSelectionModal-subtopic"
-        :class="{'SubjectSelectionModal-subtopic--selected': subtopic === selectedSubtopic}"
+        :class="{
+          'SubjectSelectionModal-subtopic--selected':
+            subtopic === selectedSubtopic
+        }"
         @click="setSelectedSubtopic(subtopic)"
       >
         <p class="SubjectSelectionModal-subtopic-title">{{ subtopic }}</p>
@@ -20,7 +22,8 @@
           v-if="mobileMode"
           primary
           @click.native="handleMobileStart(subtopic)"
-        >{{ modalData.acceptText }}</large-button>
+          >{{ modalData.acceptText }}</large-button
+        >
       </div>
     </div>
   </div>

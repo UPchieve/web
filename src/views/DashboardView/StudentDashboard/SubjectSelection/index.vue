@@ -47,7 +47,8 @@ export default {
       },
       {
         title: "Coming Soon",
-        subtitle: "Check back soon for new help topics like SAT, ESL, and Science!",
+        subtitle:
+          "Check back soon for new help topics like SAT, ESL, and Science!",
         svgUrl: ScienceSVG,
         buttonText: "Suggest a help topic",
         routeTo: "/contact"

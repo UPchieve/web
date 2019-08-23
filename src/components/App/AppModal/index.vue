@@ -5,7 +5,12 @@
     :back-text="modalData.backText"
     :accept-text="modalData.acceptText"
   >
-    <component v-if="modalType" v-bind:is="modalType" :modal-data="modalData" ref="AppModalChild" />
+    <component
+      v-if="modalType"
+      v-bind:is="modalType"
+      :modal-data="modalData"
+      ref="AppModalChild"
+    />
   </modal-template>
 </template>
 
