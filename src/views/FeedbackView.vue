@@ -426,6 +426,34 @@ export default {
   vertical-align: middle;
 }
 
+.radio-list {
+  padding: 15px 5px 20px 15px;
+  background: #f1f8fc;
+  font-size: 15px;
+
+  display: flex;
+  flex-wrap: wrap;
+
+  &__option {
+    flex-grow: 1;
+    flex-basis: 50%;
+    min-width: 270px;
+
+    margin: 7px 0;
+    display: flex;
+    align-items: center;
+  }
+
+  &__option-input {
+    margin: 0;
+  }
+
+  &__option-label {
+    margin: 2px 0 0 10px;
+    font-weight: normal;
+  }
+}
+
 .text-question-textarea {
   width: 100%;
   resize: none;
