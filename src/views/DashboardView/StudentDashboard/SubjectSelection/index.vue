@@ -75,10 +75,11 @@ export default {
     text-align: left;
   }
 
-  @include breakpoint-above("large") {
-    @include flex-container(row);
+  @include breakpoint-above("medium") {
     @include child-spacing(top, 0);
-    @include child-spacing(left, 40px);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 40px;
   }
 }
 </style>

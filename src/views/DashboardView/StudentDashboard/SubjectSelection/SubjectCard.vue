@@ -110,10 +110,8 @@ export default {
     @include flex-container(column, space-between, center);
     @include child-spacing(left, 0);
     @include child-spacing(top, 32px);
-    flex: 1;
     padding: 32px;
     padding-top: 24px;
-    min-width: 340px;
   }
 }
 
