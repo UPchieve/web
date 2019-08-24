@@ -234,8 +234,8 @@ router.beforeEach((to, from, next) => {
 });
 
 // Called after each route change
-router.afterEach((/* to, from */) => {
-  store.dispatch("app/showNavigation");
+router.afterEach((to, from) => {
+  if (to.name !== from.name) store.dispatch("app/showNavigation");
   store.dispatch("app/hideModal");
 });
 
