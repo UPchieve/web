@@ -121,6 +121,12 @@ p {
   border-radius: 8px;
   padding: 20px 24px;
 
+  @include breakpoint-below("tiny") {
+    @include flex-container(column, center, center);
+    @include child-spacing(left, 0);
+    @include child-spacing(top, 16px);
+  }
+
   @include breakpoint-above("medium") {
     color: $c-secondary-grey;
     cursor: pointer;

@@ -19,6 +19,8 @@
           }}</large-button>
         </div>
       </template>
+
+      <div class="ModalTemplate-form--bottom-padding"/>
     </div>
   </div>
 </template>
@@ -96,8 +98,14 @@ $header-height: 80px;
   height: calc(100% - #{$header-height});
   overflow: auto;
 
-  padding: 20px;
-  padding-top: 40px;
+  padding: 40px 20px 0 20px;
+
+  // Hack. Bottom padding does not get properly applied when the <slot> content
+  // causes overflow. We get around it by applying this class to a final empty
+  // <div>.
+  &--bottom-padding {
+    padding-top: 20px;
+  }
 
   @include breakpoint-above("medium") {
     @include flex-container(column);
@@ -112,8 +120,12 @@ $header-height: 80px;
     height: auto;
 
     margin: 0 auto;
-    padding: 40px;
-    padding-bottom: 24px;
+    padding: 40px 40px 0 40px;
+
+    &--bottom-padding {
+      margin: 0;
+      padding-top: 24px;
+    }
   }
 }
 
