@@ -7,9 +7,9 @@
     <table class="questions-table">
       <tr v-if="this.$route.params.userType === 'student'" class="title-row">
         <td class="title-cell">
-          Please help us improve UPchieve’s services by filling out this short
+          <!-- Please help us improve UPchieve’s services by filling out this short
           survey. Your responses are completely anonymous and greatly
-          appreciated.
+          appreciated. -->
         </td>
       </tr>
       <tr v-else class="title-row">
@@ -60,12 +60,48 @@
                       ]
                     "
                     type="radio"
-                    :name="question.qid + '_' + subquestion_index.toString()"
+                    :name="
+                      `multiple-radio-${
+                        question.qid
+                      }_${subquestion_index.toString()}`
+                    "
                     :value="index"
                   />
                 </td>
               </tr>
             </table>
+          </div>
+          <div v-else-if="question.qtype === 'radio-list'">
+            <div class="radio-list">
+              <div
+                class="radio-list__option"
+                v-for="(subquestion, subquestion_index) in question.options"
+                v-bind:key="subquestion"
+              >
+                <input
+                  :id="
+                    `radio-list-option_${
+                      question.options_alias[subquestion_index]
+                    }`
+                  "
+                  class="radio-list__option-input"
+                  v-model="userResponse[question.alias]"
+                  type="radio"
+                  :name="`radio-list-${question.qid}`"
+                  :value="question.options_alias[subquestion_index]"
+                />
+                <label
+                  class="radio-list__option-label"
+                  :for="
+                    `radio-list-option_${
+                      question.options_alias[subquestion_index]
+                    }`
+                  "
+                >
+                  {{ subquestion }}
+                </label>
+              </div>
+            </div>
           </div>
           <div v-else-if="question.qtype === 'text'">
             <div
@@ -80,7 +116,7 @@
             />
           </div>
           <div v-else>
-            something else
+            <!-- something else -->
           </div>
         </td>
       </tr>
@@ -114,63 +150,66 @@ export default {
         {
           qid: "1",
           qtype: "multiple-radio",
-          alias: "rate-coach",
-          title: "Please give feedback on the Academic Coach who helped you.",
+          alias: "rate-session",
+          title: "Rate your session",
           secondary_title: "",
-          table_title: [
-            "Strongly Disagree",
-            "Somewhat Agree",
-            "Neither",
-            "Somewhat Agree",
-            "Strongly Agree"
-          ],
-          options: [
-            "I was able to find the help/information I needed from my Academic Coach.",
-            "My Academic Coach was friendly and/or nice.",
-            "I would like to receive help from this Academic Coach again.",
-            "My Academic Coach was knowledgeable about the help topic.",
-            "As a result of this session, I feel more prepared to succeed and achieve my academic goals."
-          ],
-          options_alias: [
-            "find-help",
-            "nice",
-            "want-him/her-again",
-            "knowledgeable",
-            "achieve-goal"
-          ]
+          table_title: ["1", "2", "3", "4", "5"],
+          options: ["Rating"],
+          options_alias: ["rating"]
         },
         {
           qid: "2",
-          qtype: "multiple-radio",
-          alias: "rate-upchieve",
-          title: "Please give feedback on UPchieve’s services",
+          qtype: "radio-list",
+          alias: "session-goal",
+          title: "What was your primary goal today?",
           secondary_title: "",
-          table_title: [
-            "Strongly Disagree",
-            "Somewhat Agree",
-            "Neither",
-            "Somewhat Agree",
-            "Strongly Agree"
-          ],
           options: [
-            "UPchieve helps me succeed and achieve my academic goals.",
-            "I am likely to use UPchieve the next time I need help.",
-            "UPchieve’s app is easy to use.",
-            "UPchieve enables me to get help faster than before."
+            "Improve my understanding",
+            "Check my answers",
+            "Finish a homework assignment",
+            "Get advice",
+            "Prepare for a test",
+            "Other"
           ],
           options_alias: [
-            "achieve-goal",
-            "use-next-time",
-            "easy-to-use",
-            "get-help-faster"
+            "improve-understanding",
+            "check-answers",
+            "finish-homework",
+            "get-advice",
+            "test-prep",
+            "other"
           ]
         },
         {
           qid: "3",
+          qtype: "multiple-radio",
+          alias: "coach-ratings",
+          title: "Please tell us about your coach.",
+          secondary_title: "",
+          table_title: [
+            "Strongly Disagree",
+            "Somewhat Agree",
+            "Neither",
+            "Somewhat Agree",
+            "Strongly Agree"
+          ],
+          options: [
+            "My coach was knowedgable about the topic.",
+            "My coach was friendly and approachable.",
+            "I would like to receive help from this coach again."
+          ],
+          options_alias: [
+            "coach-knowedgable",
+            "coach-friendly",
+            "coach-help-again"
+          ]
+        },
+        {
+          qid: "4",
           qtype: "text",
           alias: "other-feedback",
           title:
-            "(Optional) Do you have any other feedback you would like to share?",
+            "(Optional) Do you have any other feedback you'd like to share?",
           secondary_title:
             "This can be about the web app, the Academic Coach who helped you, the services UPchieve offers, etc.",
           table_title: [],
@@ -240,7 +279,7 @@ export default {
       this.questions = this.volunteer_questions;
     }
     this.questions.map(function(question) {
-      if (question.qtype == "multiple-radio")
+      if (question.qtype === "multiple-radio")
         _self.userResponse[question.alias] = {};
     });
   },
@@ -308,7 +347,7 @@ export default {
 
 .title-cell {
   display: table-cell;
-  height: 150px;
+  padding: 20px 0;
   vertical-align: middle;
   font-size: 19px;
   text-align: left;
@@ -340,6 +379,7 @@ export default {
 }
 
 .radio-question-table {
+  width: 100%;
   font-size: 15px;
 }
 
@@ -384,6 +424,34 @@ export default {
   padding-right: 2px;
   text-align: center;
   vertical-align: middle;
+}
+
+.radio-list {
+  padding: 15px 5px 20px 15px;
+  background: #f1f8fc;
+  font-size: 15px;
+
+  display: flex;
+  flex-wrap: wrap;
+
+  &__option {
+    flex-grow: 1;
+    flex-basis: 50%;
+    min-width: 270px;
+
+    margin: 7px 0;
+    display: flex;
+    align-items: center;
+  }
+
+  &__option-input {
+    margin: 0;
+  }
+
+  &__option-label {
+    margin: 2px 0 0 10px;
+    font-weight: normal;
+  }
 }
 
 .text-question-textarea {
