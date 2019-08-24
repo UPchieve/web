@@ -20,7 +20,7 @@
         </div>
       </template>
 
-      <div class="ModalTemplate-form--bottom-padding"/>
+      <div class="ModalTemplate-form--bottom-padding" />
     </div>
   </div>
 </template>
