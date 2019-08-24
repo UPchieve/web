@@ -35,7 +35,7 @@
           v-if="eligibility.noSchoolResults"
           class="school-search__no-results"
         >
-          <a href="https://upchieve.org/invite-your-school" target="_blank">
+          <a href="https://upchieve.org/cant-find-school" target="_blank">
             Can't find your high school?
           </a>
         </div>
@@ -102,8 +102,7 @@
 
   <form v-else-if="step === 'step-1-waitlist-success'" class="uc-form-body">
     <div class="step-title">
-      Thank you! You'll be the first to know if we start helping students from
-      your school.
+      Thank you! You'll be the first to know when we expand to your school.
     </div>
   </form>
 
