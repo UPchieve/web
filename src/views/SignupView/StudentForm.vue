@@ -14,7 +14,9 @@
     <div class="step-title">Step 1 of 3: Check your eligibility</div>
 
     <div class="uc-column">
-      <label for="inputHighschool" class="uc-form-label">High School</label>
+      <label for="inputHighschool" class="uc-form-label"
+        >High School Name</label
+      >
 
       <div class="school-search">
         <autocomplete
@@ -33,18 +35,11 @@
           v-if="eligibility.noSchoolResults"
           class="school-search__no-results"
         >
-          <a
-            href="https://upchieve.org/invite-your-school"
-            target="_blank"
-          >
+          <a href="https://upchieve.org/invite-your-school" target="_blank">
             Can't find your high school?
           </a>
         </div>
       </div>
-
-      <p class="uc-form-subtext">
-        We will never share your high school with third parties.
-      </p>
     </div>
 
     <button class="uc-form-button" type="submit" @click.prevent="secondPage()">
@@ -66,12 +61,14 @@
       </ul>
     </div>
 
-    <div class="step-title">This school is not currently supported</div>
+    <div class="step-title">
+      Sorry! You're not currently eligible for UPchieve.
+    </div>
 
     <div class="uc-column">
       <label for="inputWaitlistEmail" class="uc-form-label"
-        >Enter your email to be notified when UPchieve launches at your
-        school</label
+        >If you want to be notified when we launch at your school, enter your
+        email below.</label
       >
 
       <input
@@ -87,7 +84,8 @@
       />
 
       <p class="uc-form-subtext">
-        We won't spam you, pinky promise
+        We will only use your email to contact you about your eligibility for
+        UPchieve. See our Privacy Policy for more info.
       </p>
     </div>
 
@@ -104,7 +102,8 @@
 
   <form v-else-if="step === 'step-1-waitlist-success'" class="uc-form-body">
     <div class="step-title">
-      Thank you. We hope to provide access to your school soon!
+      Thank you! You'll be the first to know if we start helping students from
+      your school.
     </div>
   </form>
 
@@ -137,7 +136,7 @@
       />
       <p class="uc-form-subtext">
         We will only use your email to contact you about your account. See our
-        Privacy Policy for more info.
+        <a href="/legal" target="_blank">Privacy Policy</a> for more info.
       </p>
     </div>
 
