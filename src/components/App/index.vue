@@ -69,6 +69,8 @@ export default {
 }
 
 .App-router-view-wrapper {
+  height: 100vh;
+
   &--header {
     @include bind-app-header-height(padding-top);
   }

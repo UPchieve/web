@@ -283,6 +283,7 @@ export default {
 }
 
 .messages {
+  background: white;
   position: relative;
   height: 100%;
   overflow: auto;
