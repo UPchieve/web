@@ -13,6 +13,21 @@
   @return $value;
 }
 
+/// Returns a z-index value based on key.
+/// @param {string} $key
+/// @return {number} z-index
+@function get-z($key) {
+  $map: (
+    "below": -1,
+    "above": 1,
+    "sidebar": 10,
+    "header": 20,
+    "modal": 30
+  );
+
+  @return validate-map-key($map, $key);
+}
+
 /// Helper to add basic flex styling.
 /// @param {string} $flex-direction [row]
 /// @param {string} $justify-content [initial]

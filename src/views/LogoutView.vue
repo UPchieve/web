@@ -23,6 +23,9 @@ export default {
     FormPageTemplate,
     FormFooter
   },
+  created() {
+    this.$store.dispatch("app/hideNavigation");
+  },
   data() {
     return {
       mainWebsiteUrl: process.env.VUE_APP_MAIN_WEBSITE_URL
