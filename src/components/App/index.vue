@@ -1,14 +1,14 @@
 <template>
   <div id="app" class="App">
-    <app-header v-if="!hideHeader" />
-    <app-sidebar v-if="!hideSidebar" />
-    <app-modal v-if="isModalShown" />
+    <app-header v-if="showHeader" />
+    <app-sidebar v-if="showSidebar" />
+    <app-modal v-if="showModal" />
 
     <div
       :class="{
         'App-router-view-wrapper': true,
-        'App-router-view-wrapper--header': !hideHeader,
-        'App-router-view-wrapper--sidebar': !hideSidebar
+        'App-router-view-wrapper--header': showHeader,
+        'App-router-view-wrapper--sidebar': showSidebar
       }"
     >
       <router-view />
@@ -39,8 +39,16 @@ export default {
   },
   created() {
     AuthService.checkAuth(this); // {1}
+
+    // Listen for resize event
     window.addEventListener("resize", this.handleResize);
     this.handleResize();
+
+    // Fetch user data
+    this.$store.dispatch("user/fetch", this);
+  },
+  beforeUpdate() {
+    this.$store.dispatch("user/fetch", this);
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.handleResize);
@@ -55,9 +63,9 @@ export default {
   },
   computed: {
     ...mapState({
-      hideHeader: state => state.app.hideHeader,
-      hideSidebar: state => state.app.hideSidebar,
-      isModalShown: state => state.app.isModalShown
+      showHeader: state => state.app.header.isShown,
+      showSidebar: state => state.app.sidebar.isShown,
+      showModal: state => state.app.modal.isShown
     })
   }
 };

@@ -1,11 +1,15 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import appModule from "./modules/app";
+import userModule from "./modules/user";
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
+export const storeOptions = {
   modules: {
-    app: appModule
+    app: appModule,
+    user: userModule
   }
-});
+};
+
+export default new Vuex.Store(storeOptions);

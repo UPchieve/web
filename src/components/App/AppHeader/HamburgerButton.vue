@@ -14,14 +14,14 @@ export default {
   components: { UpchieveIcon },
   computed: {
     icon() {
-      return this.$store.state.app.isSidebarCollapsed ? "hamburger" : "cross";
+      return this.$store.state.app.sidebar.isCollapsed ? "hamburger" : "cross";
     }
   },
   methods: {
     handleClick() {
-      const action = this.$store.state.app.isSidebarCollapsed
-        ? "app/expandSidebar"
-        : "app/collapseSidebar";
+      const action = this.$store.state.app.sidebar.isCollapsed
+        ? "app/sidebar/expand"
+        : "app/sidebar/collapse";
       this.$store.dispatch(action);
     }
   }

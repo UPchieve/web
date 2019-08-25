@@ -42,7 +42,7 @@ export default {
   methods: {
     handleCancel() {
       this.$emit("cancel");
-      this.$store.dispatch("app/hideModal");
+      this.$store.dispatch("app/modal/hide");
     }
   }
 };

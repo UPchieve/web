@@ -1,6 +1,7 @@
 import { shallowMount, createLocalVue } from "@vue/test-utils";
+import { merge } from "lodash";
 import Vuex from "vuex";
-import appModule from "@/store/modules/app";
+import { storeOptions } from "@/store";
 import AppSidebar from "@/components/App/AppSidebar";
 import SidebarInfo from "@/components/App/AppSidebar/SidebarInfo";
 import SidebarLinks from "@/components/App/AppSidebar/SidebarLinks";
@@ -11,26 +12,24 @@ localVue.use(Vuex);
 const getWrapper = (options = {}) => {
   options = {
     mobileMode: false,
-    hideHeader: false,
+    showHeader: true,
     isSidebarCollapsed: true,
     ...options
   };
 
-  const store = new Vuex.Store({
-    modules: {
-      app: {
-        ...appModule,
-        state: {
-          ...appModule.state,
-          hideHeader: options.hideHeader,
-          isSidebarCollapsed: options.isSidebarCollapsed
-        },
-        getters: {
-          mobileMode: () => options.mobileMode
+  const store = new Vuex.Store(
+    merge({}, storeOptions, {
+      modules: {
+        app: {
+          modules: {
+            header: { state: { isShown: options.showHeader } },
+            sidebar: { state: { isCollapsed: options.isSidebarCollapsed } }
+          },
+          getters: { mobileMode: () => options.mobileMode }
         }
       }
-    }
-  });
+    })
+  );
 
   return shallowMount(AppSidebar, { localVue, store });
 };
@@ -55,19 +54,19 @@ describe("AppSidebar", () => {
       expect(desktop.classes("AppSidebar--collapsed")).toBe(false);
     });
 
-    it("has header class when `hideHeader` is false", () => {
-      let mobile = getWrapper({ mobileMode: true, hideHeader: false });
-      let desktop = getWrapper({ mobileMode: false, hideHeader: false });
+    it("has header class when `showHeader` is true", () => {
+      let mobile = getWrapper({ mobileMode: true, showHeader: true });
+      let desktop = getWrapper({ mobileMode: false, showHeader: true });
       expect(mobile.classes("AppSidebar--header")).toBe(true);
       expect(desktop.classes("AppSidebar--header")).toBe(true);
 
-      mobile = getWrapper({ mobileMode: true, hideHeader: true });
-      desktop = getWrapper({ mobileMode: false, hideHeader: true });
+      mobile = getWrapper({ mobileMode: true, showHeader: false });
+      desktop = getWrapper({ mobileMode: false, showHeader: false });
       expect(mobile.classes("AppSidebar--header")).toBe(false);
       expect(desktop.classes("AppSidebar--header")).toBe(false);
     });
 
-    it("mobileMode: true", () => {
+    it("mobile", () => {
       const wrapper = getWrapper({ mobileMode: true });
       expect(wrapper.classes("AppSidebar")).toBe(true);
 
@@ -80,11 +79,14 @@ describe("AppSidebar", () => {
       const links = content.find(SidebarLinks);
       expect(links.exists()).toBe(true);
 
-      const finalLink = content.find(".AppSidebar-final-link");
-      expect(finalLink.exists()).toBe(true);
+      // Final link
+      expect(content.find(".AppSidebar-final-link").exists()).toBe(true);
+      expect(content.find(".AppSidebar-final-link--desktop").exists()).toBe(
+        false
+      );
     });
 
-    it("mobileMode: false", () => {
+    it("desktop", () => {
       const wrapper = getWrapper({ mobileMode: false });
       expect(wrapper.classes("AppSidebar")).toBe(true);
 
@@ -97,8 +99,11 @@ describe("AppSidebar", () => {
       const links = content.find(SidebarLinks);
       expect(links.exists()).toBe(true);
 
-      const finalLink = content.find(".AppSidebar-final-link");
-      expect(finalLink.exists()).toBe(true);
+      // Final link
+      expect(content.find(".AppSidebar-final-link").exists()).toBe(true);
+      expect(content.find(".AppSidebar-final-link--desktop").exists()).toBe(
+        true
+      );
     });
   });
 });

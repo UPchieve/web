@@ -1,8 +1,9 @@
 import { shallowMount, createLocalVue } from "@vue/test-utils";
+import { merge } from "lodash";
 import Vuex from "vuex";
 import VueRouter from "vue-router";
 import router from "@/router";
-import appModule from "@/store/modules/app";
+import { storeOptions } from "@/store";
 import App from "@/components/App";
 import AppHeader from "@/components/App/AppHeader";
 import AppSidebar from "@/components/App/AppSidebar";
@@ -12,18 +13,27 @@ const localVue = createLocalVue();
 localVue.use(VueRouter);
 localVue.use(Vuex);
 
-const getWrapper = (appState = {}) => {
-  const store = new Vuex.Store({
-    modules: {
-      app: {
-        ...appModule,
-        state: {
-          ...appModule.state,
-          ...appState
+const getWrapper = (options = {}) => {
+  options = {
+    showHeader: true,
+    showSidebar: true,
+    showModal: false,
+    ...options
+  };
+
+  const store = new Vuex.Store(
+    merge({}, storeOptions, {
+      modules: {
+        app: {
+          modules: {
+            header: { state: { isShown: options.showHeader } },
+            sidebar: { state: { isShown: options.showSidebar } },
+            modal: { state: { isShown: options.showModal } }
+          }
         }
       }
-    }
-  });
+    })
+  );
 
   return shallowMount(App, { localVue, router, store });
 };
@@ -31,7 +41,7 @@ const getWrapper = (appState = {}) => {
 describe("App", () => {
   it("renders expected elements", () => {
     const wrapper = getWrapper();
-    expect(wrapper.classes()).toEqual(["App"]);
+    expect(wrapper.classes("App")).toBe(true);
     expect(wrapper.find(AppHeader).exists()).toBe(true);
     expect(wrapper.find(AppSidebar).exists()).toBe(true);
     expect(wrapper.find(AppModal).exists()).toBe(false);
@@ -49,7 +59,7 @@ describe("App", () => {
   });
 
   it("conditionally renders `AppHeader`", () => {
-    const wrapper = getWrapper({ hideHeader: true });
+    const wrapper = getWrapper({ showHeader: false });
     expect(wrapper.find(AppHeader).exists()).toBe(false);
 
     const routerViewWrapper = wrapper.find(".App-router-view-wrapper");
@@ -59,7 +69,7 @@ describe("App", () => {
   });
 
   it("conditionally renders `AppSidebar`", () => {
-    const wrapper = getWrapper({ hideSidebar: true });
+    const wrapper = getWrapper({ showSidebar: false });
     expect(wrapper.find(AppSidebar).exists()).toBe(false);
 
     const routerViewWrapper = wrapper.find(".App-router-view-wrapper");
@@ -69,7 +79,7 @@ describe("App", () => {
   });
 
   it("conditionally renders `AppModal`", () => {
-    const wrapper = getWrapper({ isModalShown: true });
+    const wrapper = getWrapper({ showModal: true });
     expect(wrapper.find(AppModal).exists()).toBe(true);
   });
 });

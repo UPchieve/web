@@ -1,71 +1,67 @@
 import { shallowMount, createLocalVue } from "@vue/test-utils";
+import { merge } from "lodash";
 import Vuex from "vuex";
-import appModule from "@/store/modules/app";
+import { storeOptions } from "@/store";
 import HamburgerButton from "@/components/App/AppHeader/HamburgerButton";
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-const getWrapper = (isSidebarCollapsed = true) => {
-  const expandSidebar = jest.fn();
-  const collapseSidebar = jest.fn();
+const expand = jest.fn();
+const collapse = jest.fn();
 
-  const store = new Vuex.Store({
-    modules: {
-      app: {
-        ...appModule,
-        state: {
-          ...appModule.state,
-          isSidebarCollapsed
-        },
-        actions: {
-          expandSidebar,
-          collapseSidebar
+const getWrapper = (isCollapsed = true) => {
+  const store = new Vuex.Store(
+    merge({}, storeOptions, {
+      modules: {
+        app: {
+          modules: {
+            sidebar: {
+              state: { isCollapsed },
+              actions: { expand, collapse }
+            }
+          }
         }
       }
-    }
-  });
+    })
+  );
 
-  return {
-    wrapper: shallowMount(HamburgerButton, { localVue, store }),
-    expandSidebar,
-    collapseSidebar
-  };
+  return shallowMount(HamburgerButton, { localVue, store });
 };
 
 describe("HamburgerButton", () => {
   it("renders expected elements", () => {
-    const { wrapper } = getWrapper(true);
+    const wrapper = getWrapper(true);
     expect(wrapper.classes()).toEqual(["HamburgerButton"]);
   });
 
   it("renders 'hamburger' if sidebar is collapsed", () => {
-    const { wrapper } = getWrapper(true);
+    const wrapper = getWrapper(true);
     expect(wrapper.vm.icon).toBe("hamburger");
   });
 
   it("renders 'cross' if sidebar is expanded", () => {
-    const { wrapper } = getWrapper(false);
+    const wrapper = getWrapper(false);
     expect(wrapper.vm.icon).toBe("cross");
   });
 
   it("calls handleClick when clicked", () => {
     const handleClick = jest.fn();
-    const { wrapper } = getWrapper(true);
+    const wrapper = getWrapper(true);
     wrapper.setMethods({ handleClick });
     wrapper.trigger("click");
     expect(handleClick).toHaveBeenCalled();
   });
 
   it("expands sidebar if collapsed when clicked", () => {
-    const { wrapper, expandSidebar } = getWrapper(true);
+    const wrapper = getWrapper(true);
     wrapper.trigger("click");
-    expect(expandSidebar).toHaveBeenCalled();
+    expect(expand).toHaveBeenCalled();
   });
 
   it("collapses sidebar if expanded when clicked", () => {
-    const { wrapper, collapseSidebar } = getWrapper(false);
+    const wrapper = getWrapper(false);
     wrapper.trigger("click");
-    expect(collapseSidebar).toHaveBeenCalled();
+    expect(collapse).toHaveBeenCalled();
   });
 });

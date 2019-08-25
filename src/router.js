@@ -236,7 +236,7 @@ router.beforeEach((to, from, next) => {
 // Called after each route change
 router.afterEach((to, from) => {
   if (to.name !== from.name) store.dispatch("app/showNavigation");
-  store.dispatch("app/hideModal");
+  store.dispatch("app/modal/hide");
 });
 
 // If endpoint returns 401, redirect to login (except for requests to get user's

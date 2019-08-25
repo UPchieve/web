@@ -4,7 +4,7 @@
     active-class="SidebarLink--active"
     :to="to"
     tag="div"
-    v-on:click.native="$store.dispatch('app/collapseSidebar')"
+    @click.native="$store.dispatch('app/sidebar/collapse')"
   >
     <upchieve-icon
       v-if="icon"

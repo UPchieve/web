@@ -6,8 +6,8 @@
     :accept-text="modalData.acceptText"
   >
     <component
-      v-if="modalType"
-      v-bind:is="modalType"
+      v-if="modalComponent"
+      v-bind:is="modalComponent"
       :modal-data="modalData"
       ref="AppModalChild"
     />
@@ -15,15 +15,16 @@
 </template>
 
 <script>
-import ModalTemplate from "./ModalTemplate";
 import { mapState } from "vuex";
+import ModalTemplate from "./ModalTemplate";
+import SubjectSelectionModal from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectSelectionModal';
 
 export default {
-  components: { ModalTemplate },
+  components: { ModalTemplate, SubjectSelectionModal },
   computed: {
     ...mapState({
-      modalType: state => state.app.modalType,
-      modalData: state => state.app.modalData
+      modalComponent: state => state.app.modal.component,
+      modalData: state => state.app.modal.data
     })
   },
   methods: {

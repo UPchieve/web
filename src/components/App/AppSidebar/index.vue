@@ -2,7 +2,7 @@
   <nav
     :class="{
       AppSidebar: true,
-      'AppSidebar--header': !hideHeader,
+      'AppSidebar--header': showHeader,
       'AppSidebar--collapsed': mobileMode && isSidebarCollapsed
     }"
   >
@@ -55,8 +55,8 @@ export default {
   },
   computed: {
     ...mapState({
-      hideHeader: state => state.app.hideHeader,
-      isSidebarCollapsed: state => state.app.isSidebarCollapsed
+      showHeader: state => state.app.header.isShown,
+      isSidebarCollapsed: state => state.app.sidebar.isCollapsed
     }),
     ...mapGetters({ mobileMode: "app/mobileMode" }),
     finalLinkClass() {
