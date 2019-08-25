@@ -71,7 +71,7 @@
             />
           </div>
         </div>
-        <button id="drawButton" class="whiteboardBtn" @click="drawSetup" />
+        <button id="drawButton" class="whiteboardBtn" @click="drawSetup" :style="drawButtonStyle()" />
         <button id="eraseButton" class="whiteboardBtn" @click="erase" />
         <button id="undoButton" class="whiteboardBtn" @click="undo" />
         <!-- <button class='whiteboardBtn' id='textButton' v-on:click="text"></button> -->
@@ -205,7 +205,17 @@ export default {
       );
       App.ctx.putImageData(savedImage, 0, 0);
     },
-
+    drawButtonStyle() {
+      // Mobile specific drawn/pan indicator
+      if (!this.isMobile()) {
+        return;
+      }
+      if (!this.panEnabled) {
+        return {
+          backgroundColor: '#fff'
+        };
+      }
+    },
     // Socket emits
     emitCanvasLoaded() {
       this.$socket.emit("canvasLoaded", {
@@ -334,7 +344,7 @@ export default {
       this.emitClearClick();
     },
     drawStart(event) {
-      if (this.panEnabled) {
+      if (this.panEnabled && this.isMobile()) {
         return;
       }
       if (!SERVER_DRAWING) {
@@ -395,7 +405,7 @@ export default {
       }
     },
     drawEnd(event) {
-      if (this.panEnabled) {
+      if (this.panEnabled && this.isMobile()) {
         return;
       }
       if (!SERVER_DRAWING) {
@@ -428,7 +438,7 @@ export default {
       }
     },
     draw(event) {
-      if (this.panEnabled) {
+      if (this.panEnabled && this.isMobile()) {
         return;
       }
       if (!SERVER_DRAWING) {
@@ -805,7 +815,7 @@ canvas {
 .toolset {
   display: flex;
   justify-content: center;
-  padding-top: 10px;
+  padding-top: 8px;
 }
 
 .colorContainer {
@@ -822,12 +832,14 @@ canvas {
 }
 
 .whiteboardBtn {
-  padding: 15px;
+  padding: 20px;
   border: none;
-  margin: 8px;
+  margin: 3px;
+  border-radius: 8px;
   background-repeat: no-repeat;
   background-position: center;
   background-color: rgb(238, 238, 238);
+  transition: 0.2s;
 }
 
 .colorButton {
