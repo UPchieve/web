@@ -222,7 +222,7 @@ export default {
 }
 
 .toggleButton.back {
-  bottom: calc(100vh - 140px);
+  bottom: calc(100vh - 25rem);
 }
 
 .chat-container {
