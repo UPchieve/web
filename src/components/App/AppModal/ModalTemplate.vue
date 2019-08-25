@@ -53,7 +53,7 @@ export default {
 $header-height: 80px;
 
 .ModalTemplate {
-  animation: slideUp 1s forwards;
+  animation: slideUp 0.4s forwards;
   background: $c-information-blue;
 
   min-width: 100%;
@@ -95,7 +95,7 @@ $header-height: 80px;
 }
 
 .ModalTemplate-form {
-  animation: slideUp 1.5s forwards;
+  animation: slideUp 0.6s forwards;
   background: white;
   border-radius: 40px 40px 0 0;
 
