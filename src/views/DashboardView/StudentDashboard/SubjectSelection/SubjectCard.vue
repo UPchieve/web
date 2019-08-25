@@ -44,6 +44,7 @@ import { startSession } from "@/utils/session";
 import DropdownList from "@/components/DropdownList";
 import HyperlinkButton from "@/components/HyperlinkButton";
 import LargeButton from "@/components/LargeButton";
+import SubjectSelectionModal from './SubjectSelectionModal';
 
 export default {
   components: { DropdownList, HyperlinkButton, LargeButton },
@@ -82,7 +83,7 @@ export default {
         startSession(this.$router, this.topic, this.selectedSubtopic);
       } else {
         this.$store.dispatch("app/showModal", {
-          modalType: "SubjectSelectionModal",
+          modalType: SubjectSelectionModal,
           modalData: {
             backText: "Dashboard",
             acceptText: "Start a chat",

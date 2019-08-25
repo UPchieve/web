@@ -37,7 +37,7 @@ describe("AppModal", () => {
 
   it("renders SubjectSelectionModal", () => {
     const state = {
-      modalType: "SubjectSelectionModal",
+      modalType: SubjectSelectionModal,
       modalData: { subject: "math" }
     };
     const wrapper = getWrapper(state).find(ModalTemplate);

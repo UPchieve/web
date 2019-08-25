@@ -16,11 +16,10 @@
 
 <script>
 import ModalTemplate from "./ModalTemplate";
-import SubjectSelectionModal from "@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectSelectionModal";
 import { mapState } from "vuex";
 
 export default {
-  components: { ModalTemplate, SubjectSelectionModal },
+  components: { ModalTemplate },
   computed: {
     ...mapState({
       modalType: state => state.app.modalType,
