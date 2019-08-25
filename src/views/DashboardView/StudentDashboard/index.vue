@@ -6,12 +6,33 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 import DashboardBanner from "../DashboardBanner";
 import SubjectSelection from "./SubjectSelection";
 
+const headerData = {
+  component: "RejoinSessionHeader",
+  data: { important: true }
+};
+
 export default {
   name: "student-dashboard",
-  components: { DashboardBanner, SubjectSelection }
+  components: { DashboardBanner, SubjectSelection },
+  created() {
+    if (this.sessionPath) this.$store.dispatch("app/header/show", headerData);
+  },
+  computed: {
+    ...mapState({ sessionPath: state => state.user.sessionPath })
+  },
+  watch: {
+    sessionPath(value) {
+      if (!value) {
+        this.$store.dispatch("app/header/show");
+      } else {
+        this.$store.dispatch("app/header/show", headerData);
+      }
+    }
+  }
 };
 </script>
 

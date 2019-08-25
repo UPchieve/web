@@ -5,12 +5,20 @@
 
       <div class="SubjectCard-mobile-column">
         <h2 class="SubjectCard-title">{{ title }}</h2>
-        <hyperlink-button v-if="routeTo" primary :routeTo="routeTo">{{
-          buttonText
-        }}</hyperlink-button>
-        <hyperlink-button v-else primary @click.native="handleClick">{{
-          buttonText
-        }}</hyperlink-button>
+        <hyperlink-button
+          v-if="routeTo"
+          primary
+          :routeTo="routeTo"
+          :disabled="disabled"
+          >{{ buttonText }}</hyperlink-button
+        >
+        <hyperlink-button
+          v-else
+          primary
+          @click.native="handleClick"
+          :disabled="disabled"
+          >{{ buttonText }}</hyperlink-button
+        >
       </div>
     </template>
 
@@ -25,21 +33,30 @@
           class="SubjectCard-dropdown"
           disabledOption="Choose a subject"
           :options="subtopics"
+          :disabled="disabled"
         />
       </div>
 
-      <large-button v-if="routeTo" primary :routeTo="routeTo">{{
-        buttonText
-      }}</large-button>
-      <large-button v-else primary @click.native="handleClick">{{
-        buttonText
-      }}</large-button>
+      <hyperlink-button
+        v-if="routeTo"
+        primary
+        :routeTo="routeTo"
+        :disabled="disabled"
+        >{{ buttonText }}</hyperlink-button
+      >
+      <large-button
+        v-else
+        primary
+        @click.native="handleClick"
+        :disabled="disabled"
+        >{{ buttonText }}</large-button
+      >
     </template>
   </div>
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import { startSession } from "@/utils/session";
 import DropdownList from "@/components/DropdownList";
 import HyperlinkButton from "@/components/HyperlinkButton";
@@ -74,7 +91,11 @@ export default {
     routeTo: String
   },
   computed: {
-    ...mapGetters({ mobileMode: "app/mobileMode" })
+    ...mapState({ sessionPath: state => state.user.sessionPath }),
+    ...mapGetters({ mobileMode: "app/mobileMode" }),
+    disabled() {
+      return this.sessionPath !== null;
+    }
   },
   methods: {
     handleClick() {

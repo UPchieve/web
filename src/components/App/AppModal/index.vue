@@ -4,6 +4,7 @@
     v-on:accept="onAccept"
     :back-text="modalData.backText"
     :accept-text="modalData.acceptText"
+    :important="modalData.important"
   >
     <component
       v-if="modalComponent"
@@ -17,10 +18,11 @@
 <script>
 import { mapState } from "vuex";
 import ModalTemplate from "./ModalTemplate";
+import RejoinSessionModal from "./RejoinSessionModal";
 import SubjectSelectionModal from "@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectSelectionModal";
 
 export default {
-  components: { ModalTemplate, SubjectSelectionModal },
+  components: { ModalTemplate, RejoinSessionModal, SubjectSelectionModal },
   computed: {
     ...mapState({
       modalComponent: state => state.app.modal.component,

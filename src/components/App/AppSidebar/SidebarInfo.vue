@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
 import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 
@@ -36,13 +37,15 @@ export default {
     };
   },
   computed: {
+    ...mapState({ sessionPath: state => state.user.sessionPath }),
     type() {
       return this.isVolunteer ? "Volunteer" : "Student";
     },
     status() {
+      const session = this.sessionPath !== null;
       return {
-        class: null,
-        text: "Ready to chat"
+        class: session ? "SidebarInfo-status-circle--session" : null,
+        text: session ? "Chat in session" : "Ready to chat"
       };
     }
   }
@@ -85,12 +88,8 @@ export default {
       width: $size;
       height: $size;
 
-      &--warn {
+      &--session {
         background: $c-warning-orange;
-      }
-
-      &--error {
-        background: $c-error-red;
       }
     }
   }

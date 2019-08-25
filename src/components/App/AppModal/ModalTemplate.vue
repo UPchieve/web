@@ -1,5 +1,5 @@
 <template>
-  <div class="ModalTemplate">
+  <div class="ModalTemplate" :class="{ 'ModalTemplate--important': important }">
     <div v-if="mobileMode" class="ModalTemplate-header">
       <div class="ModalTemplate-header-close-button" @click="handleCancel">
         <upchieve-icon icon="arrow" />
@@ -33,8 +33,9 @@ import UpchieveIcon from "@/components/UpchieveIcon";
 export default {
   components: { LargeButton, UpchieveIcon },
   props: {
+    acceptText: { type: String, default: "Accept" },
     backText: { type: String, default: "Back" },
-    acceptText: { type: String, default: "Accept" }
+    important: Boolean
   },
   computed: {
     ...mapGetters({ mobileMode: "app/mobileMode" })
@@ -62,6 +63,10 @@ $header-height: 80px;
   top: 0;
   left: 0;
   z-index: get-z("modal");
+
+  &--important {
+    background: $c-warning-orange;
+  }
 
   @include breakpoint-above("medium") {
     animation: none;

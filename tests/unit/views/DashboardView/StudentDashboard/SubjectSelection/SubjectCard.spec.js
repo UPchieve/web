@@ -1,6 +1,7 @@
 import { shallowMount, createLocalVue } from "@vue/test-utils";
+import { merge } from "lodash";
 import Vuex from "vuex";
-import appModule from "@/store/modules/app";
+import { storeOptions } from "@/store";
 import SubjectCard from "@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectCard";
 import HyperlinkButton from "@/components/HyperlinkButton";
 import LargeButton from "@/components/LargeButton";
@@ -9,16 +10,11 @@ const localVue = createLocalVue();
 localVue.use(Vuex);
 
 const getWrapper = (mobileMode = false, propsData) => {
-  const store = new Vuex.Store({
-    modules: {
-      app: {
-        ...appModule,
-        getters: {
-          mobileMode: () => mobileMode
-        }
-      }
-    }
-  });
+  const store = new Vuex.Store(
+    merge({}, storeOptions, {
+      modules: { app: { getters: { mobileMode: () => mobileMode } } }
+    })
+  );
 
   return shallowMount(SubjectCard, { localVue, store, propsData });
 };
@@ -119,7 +115,7 @@ describe("SubjectCard", () => {
         wrapper.setMethods({ handleClick });
         wrapper.setProps({ routeTo: "/test" });
 
-        const routeButton = wrapper.find(LargeButton);
+        const routeButton = wrapper.find(HyperlinkButton);
         expect(routeButton.exists()).toBe(true);
         expect(routeButton.text()).toBe(propsData.buttonText);
         expect(routeButton.props().routeTo).toBe("/test");
