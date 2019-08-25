@@ -13,7 +13,7 @@ const getWrapper = (mobileMode = false) => {
     merge({}, storeOptions, {
       modules: {
         app: { getters: { mobileMode: () => mobileMode } },
-        user: { getters: {firstName: () => "Tester"}}
+        user: { getters: { firstName: () => "Tester" } }
       }
     })
   );
