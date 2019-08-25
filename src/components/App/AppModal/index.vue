@@ -17,7 +17,7 @@
 <script>
 import { mapState } from "vuex";
 import ModalTemplate from "./ModalTemplate";
-import SubjectSelectionModal from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectSelectionModal';
+import SubjectSelectionModal from "@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectSelectionModal";
 
 export default {
   components: { ModalTemplate, SubjectSelectionModal },
