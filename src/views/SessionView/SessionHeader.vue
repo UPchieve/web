@@ -42,7 +42,6 @@
 import UserService from "@/services/UserService";
 import SessionService from "@/services/SessionService";
 import router from "@/router";
-// import isMobile from '../../isMobile';
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
 import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 
