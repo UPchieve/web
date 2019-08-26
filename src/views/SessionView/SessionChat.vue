@@ -16,6 +16,33 @@
       </transition>
 
       <div class="messages">
+        <div
+          v-if="!user.isVolunteer"
+          class="waiting-cards"
+        >
+          <div class="waiting-cards__card" style="background: #16D2AA">
+            <img src="@/assets/Light.png"/><h1 style="float: right; width: calc(100% - 48px)">We’re looking for a coach for you...</h1>
+            <p>
+              Thanks for requesting help with UPchieve! We’re looking for a coach to pair with you now. This process typically takes 5-10 minutes.
+            </p>
+          </div>
+          <div class="waiting-cards__card" style="background: #1855D1">
+            <h1>While you wait...</h1>
+            <p>
+              While you’re waiting, you can write any problems you’re working on on the whiteboard. (Click on the pencil icon in the upper right corner of the screen to start.)
+            </p>
+          </div>
+          <div class="waiting-cards__card" style="background: #FF8C5F">
+            <h1>A couple of reminders:</h1>
+            <p>
+              1. Practice online safety! Don’t share personal information like your phone number or email. 
+            </p>
+            <p>
+              2. Click “End chat” when you’re done, and make sure to fill out the short feedback form that follows!
+            </p>
+          </div>
+        </div>
+
         <template v-for="(message, index) in messages">
           <div
             :key="`message-${index}`"
@@ -40,6 +67,7 @@
     </div>
 
     <textarea
+      class="message-textarea"
       @keydown.enter.prevent
       @keyup="handleMessage"
       v-model="newMessage"
@@ -351,7 +379,7 @@ span {
   opacity: 0;
 }
 
-textarea {
+.message-textarea {
   width: 100%;
   height: 100px;
   border: none;
@@ -394,13 +422,46 @@ textarea {
   width: 200px;
 }
 
+.waiting-cards {
+  padding: 20px;
+
+  &__card {
+    border-radius: 8px;
+    text-align: left;
+    padding: 16px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    
+    h1 {
+      font-size: 20px;
+      line-height: 125%;
+      margin-bottom: 16px;
+      margin-top: 0;
+      color: white;
+    }
+
+    img {
+      width: 32px;
+      height: 48px;
+      float: left;
+    }
+
+    p {
+      color: white;
+      line-height: 150%;
+    }
+  }
+}
+
 @media screen and (max-width: 700px) {
   .whiteboard {
     border-radius: 0;
   }
+
   .header {
     display: none !important;
   }
+
   .message-box {
     height: 100%;
     padding-bottom: 60px;
@@ -408,7 +469,8 @@ textarea {
     top: 0;
     position: relative;
   }
-  textarea {
+
+  .message-textarea {
     width: calc(100% - 100px);
     height: 40px;
     border: none;
@@ -417,10 +479,11 @@ textarea {
     bottom: 0;
     border: 1px solid #D6E0EF;
     border-radius: 20px;
-    margin: 20px;
+    margin: 10px 20px;
     padding: 10px 16px;
     resize: none;
   }
+
   .whiteboardButton {
     display: block;
   }

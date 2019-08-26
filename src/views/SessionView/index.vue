@@ -10,29 +10,6 @@
       <div class="col-sm-4 chat-container" id="chat-container">
         <session-chat/>
       </div>
-      <div v-if="!partnerName && isMobile()" class="mobileWaitingText" :style="waitingStyle">
-        <div class="waitingCard" style="background: #16D2AA">
-          <img src="@/assets/Light.png"/><h1 style="float: right; width: calc(100% - 48px)">We’re looking for a coach for you...</h1>
-          <p>
-            Thanks for requesting help with UPchieve! We’re looking for a coach to pair with you now. This process typically takes 5-10 minutes.
-          </p>
-        </div>
-        <div class="waitingCard" style="background: #1855D1">
-          <h1>While you wait...</h1>
-          <p>
-            While you’re waiting, you can write any problems you’re working on on the whiteboard. (Click on the pencil icon in the upper right corner of the screen to start.)
-          </p>
-        </div>
-        <div class="waitingCard" style="background: #FF8C5F">
-          <h1>A couple of reminders:</h1>
-          <p>
-            1. Practice online safety! Don’t share personal information like your phone number or email. 
-          </p>
-          <p>
-            2. Click “End chat” when you’re done, and make sure to fill out the short feedback form that follows!
-          </p>
-        </div>
-      </div>
     </div>
 
     <div class="toggleButton" id="toggleButton" @click="toggleWhiteboard">
@@ -86,7 +63,6 @@ export default {
         back to you within 24 hours! Would you
         like to submit a question now?
       `,
-      waitingStyle: "",
       clickHandlers: {
         main: () => {
           this.$router.push({
@@ -168,10 +144,6 @@ export default {
   computed: {
     partnerName() {
       const partner = SessionService.getPartner();
-      if (partner) {
-        // Make sure waiting screen won't show up again if volunteer disconnects
-        this.waitingStyle = "display: none";
-      }
       return partner && partner.firstname;
     }
   },
@@ -240,58 +212,28 @@ export default {
 .toggleButton {
   display: none;
   position: absolute;
-  bottom: 20px;
+  bottom: 10px;
   right: 20px;
   border-radius: 20px;
   background: #16D2AA;
   width: 40px;
   height: 40px;
+  transition: 0.4s;
+
   img {
     margin-top: 7px;
     width: 26px;
     height: 26px;
   }
-  transition: 0.4s;
 }
 
 .toggleButton.back {
-  bottom: calc(100vh - 25rem);
+  bottom: calc(100vh - 140px);
 }
 
 .chat-container {
   height: 100%;
   padding: 0;
-}
-
-.mobileWaitingText {
-  top: 80px;
-  background: #fff;
-  padding: 20px;
-  z-index: 20;
-  position: absolute;
-  .waitingCard {
-    border-radius: 8px;
-    text-align: left;
-    padding: 16px;
-    margin-bottom: 16px;
-    h1 {
-        font-size: 24px;
-        line-height: 125%;
-        margin-bottom: 16px;
-        margin-top: 0;
-        color: white;
-    }
-    img {
-      width: 32px;
-      height: 48px;
-      float: left;
-    }
-    p {
-      color: white;
-      font-size: 16px;
-      line-height: 150%;
-    }
-  }
 }
 
 @media screen and (max-width: 700px) {
