@@ -238,17 +238,3 @@ router.afterEach((to, from) => {
   if (to.name !== from.name) store.dispatch("app/showNavigation");
   store.dispatch("app/modal/hide");
 });
-
-// If endpoint returns 401, redirect to login (except for requests to get user's
-// session)
-Vue.http.interceptors.push((request, next) => {
-  next(response => {
-    if (
-      response.status === 401 &&
-      !(request.url.indexOf("/api/user") !== -1 && request.method === "GET")
-    ) {
-      AuthService.removeUser();
-      router.push("/login?401=true");
-    }
-  });
-});
