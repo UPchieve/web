@@ -34,7 +34,8 @@
         v-if="!isVolunteer"
         to="/resources"
         icon="folder"
-        text="Resources" />
+        text="Resources"
+      />
     </template>
 
     <template v-else>
