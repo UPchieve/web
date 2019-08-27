@@ -101,10 +101,6 @@ export default {
   },
   methods: {
     fetchData() {
-      if (!this.user.hasSchedule) {
-        CalendarService.initAvailability(this, this.user._id);
-      }
-
       var originalAvailabilityPromise = CalendarService.getAvailability(
         this,
         this.user._id
@@ -155,8 +151,10 @@ export default {
       return this.tzList.includes(tz);
     },
     convertAMPMtoTwentyFourHrs(hour) {
-      var hr = hour.substring(0, hour.length - 1);
-      var apm = hour.substring(hour.length - 1);
+      const hourRegex = /^(\d{1,2})([ap])$/
+      // capture the hour and the 'a/p' string
+      let [, hr, apm] = hour.match(hourRegex)
+
       if (apm === "a") {
         if (hr === "12") {
           return 0;
@@ -180,6 +178,13 @@ export default {
       }
       return hour + "a";
     },
+    /** 
+     * Converts an availability to another timezone offset from America/New_York.
+     * 
+     * @param {availability} the object to convert
+     * @param {offset} the user's time zone offset
+     * @return the converted availability object
+     */
     convertAvailability(availability, offset) {
       const succWeekday = {
         Sunday: "Monday",
