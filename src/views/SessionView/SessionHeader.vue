@@ -226,7 +226,7 @@ h1 {
   color: white;
   font-weight: 600;
   font-size: 16px;
-  width: 600px;
+  max-width: 600px;
 }
 
 .volunteer-name {

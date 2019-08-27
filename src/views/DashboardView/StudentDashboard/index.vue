@@ -1,0 +1,51 @@
+<template>
+  <div class="StudentDashboard">
+    <dashboard-banner />
+    <subject-selection />
+  </div>
+</template>
+
+<script>
+import { mapState } from "vuex";
+import DashboardBanner from "../DashboardBanner";
+import SubjectSelection from "./SubjectSelection";
+
+const headerData = {
+  component: "RejoinSessionHeader",
+  data: { important: true }
+};
+
+export default {
+  name: "student-dashboard",
+  components: { DashboardBanner, SubjectSelection },
+  created() {
+    if (this.sessionPath) this.$store.dispatch("app/header/show", headerData);
+  },
+  computed: {
+    ...mapState({ sessionPath: state => state.user.sessionPath })
+  },
+  watch: {
+    sessionPath(value) {
+      if (!value) {
+        this.$store.dispatch("app/header/show");
+      } else {
+        this.$store.dispatch("app/header/show", headerData);
+      }
+    }
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+.StudentDashboard {
+  @include flex-container(column);
+  @include child-spacing(top, 40px);
+  padding: 40px 20px;
+
+  @include breakpoint-above("medium") {
+    display: inline-flex;
+    min-width: 100%;
+    padding: 40px;
+  }
+}
+</style>

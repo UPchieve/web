@@ -33,7 +33,6 @@
           <div v-if="question.qtype === 'multiple-radio'">
             <table class="radio-question-table">
               <tr class="radio-question-row">
-                <td class="mobileRemove"></td>
                 <td
                   class="radio-question-selection-title"
                   v-for="(label, label_index) in question.table_title"
@@ -498,10 +497,6 @@ export default {
 }
 
 @media screen and (max-width: 700px) {
-  .mobileRemove {
-    display: none !important;
-  }
-
   .header {
     padding: 1em 1em 1em 2em !important;
   }
@@ -527,9 +522,19 @@ export default {
   }
 
   .radio-question-cell {
-    width: 36rem !important;
+    width: calc(100vw - 56.75px);
     display: table-caption !important;
     padding: 1.5em !important;
+  }
+
+  .radio-question-selection-title {
+    width: calc((100vw - 56.75px) / 5);
+    display: inline-block;
+    font-size: 12px;
+
+    &--rotate {
+      transform: rotate(-40deg);
+    }
   }
 
   .radio-question-selection-cell {
