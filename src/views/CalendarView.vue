@@ -151,9 +151,9 @@ export default {
       return this.tzList.includes(tz);
     },
     convertAMPMtoTwentyFourHrs(hour) {
-      const hourRegex = /^(\d{1,2})([ap])$/
+      const hourRegex = /^(\d{1,2})([ap])$/;
       // capture the hour and the 'a/p' string
-      let [, hr, apm] = hour.match(hourRegex)
+      let [, hr, apm] = hour.match(hourRegex);
 
       if (apm === "a") {
         if (hr === "12") {
@@ -178,9 +178,9 @@ export default {
       }
       return hour + "a";
     },
-    /** 
+    /**
      * Converts an availability to another timezone offset from America/New_York.
-     * 
+     *
      * @param {availability} the object to convert
      * @param {offset} the user's time zone offset
      * @return the converted availability object
