@@ -498,8 +498,8 @@ export default {
 }
 
 @media screen and (max-width: 700px) {
-  .mobileRemove {	
-    display: none !important;	
+  .mobileRemove {
+    display: none !important;
   }
 
   .header {
