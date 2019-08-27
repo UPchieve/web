@@ -8,12 +8,12 @@
         <whiteboard />
       </div>
       <div class="col-sm-4 chat-container" id="chat-container">
-        <session-chat/>
+        <session-chat />
       </div>
     </div>
 
     <div class="toggleButton" id="toggleButton" @click="toggleWhiteboard">
-      <img id="toggleIcon" :src="getIconUrl()"/>
+      <img id="toggleIcon" :src="getIconUrl()" />
     </div>
 
     <modal
@@ -149,7 +149,7 @@ export default {
   },
   methods: {
     getIconUrl() {
-      return require('@/assets/'+this.icon);
+      return require("@/assets/" + this.icon);
     },
     toggleWhiteboard() {
       if (!this.whiteboardOpen) {
@@ -175,7 +175,6 @@ export default {
     tryClicked() {
       this.sessionReconnecting = true;
     }
-    
   }
 };
 </script>
@@ -205,8 +204,8 @@ export default {
 .whiteboard-container {
   height: 100%;
   padding: 0;
-  border: 25px solid #E5E5E5;
-  background: #E5E5E5;
+  border: 25px solid #e5e5e5;
+  background: #e5e5e5;
 }
 
 .toggleButton {
@@ -215,7 +214,7 @@ export default {
   bottom: 10px;
   right: 20px;
   border-radius: 20px;
-  background: #16D2AA;
+  background: #16d2aa;
   width: 40px;
   height: 40px;
   transition: 0.4s;

@@ -71,7 +71,12 @@
             />
           </div>
         </div>
-        <button id="drawButton" class="whiteboardBtn" @click="drawSetup" :style="drawButtonStyle()" />
+        <button
+          id="drawButton"
+          class="whiteboardBtn"
+          @click="drawSetup"
+          :style="drawButtonStyle()"
+        />
         <button id="eraseButton" class="whiteboardBtn" @click="erase" />
         <button id="undoButton" class="whiteboardBtn" @click="undo" />
         <!-- <button class='whiteboardBtn' id='textButton' v-on:click="text"></button> -->
@@ -177,17 +182,17 @@ export default {
     };
   },
   mounted() {
-    const canvas = document.getElementById('whiteboardCanvas');
-    const whiteboard = document.getElementById('whiteboard');
+    const canvas = document.getElementById("whiteboardCanvas");
+    const whiteboard = document.getElementById("whiteboard");
 
     // Determime and emit height of whiteboard container
-    this.canvasHeight = whiteboard.offsetHeight; 
+    this.canvasHeight = whiteboard.offsetHeight;
     if (localStorage.sessionCanvasHeight) {
       canvas.height = localStorage.sessionCanvasHeight;
-      canvas.width = localStorage.sessionCanvasHeight * 1.33; 
+      canvas.width = localStorage.sessionCanvasHeight * 1.33;
     } else {
       canvas.height = this.canvasHeight;
-      canvas.width = this.canvasHeight * 1.33;  
+      canvas.width = this.canvasHeight * 1.33;
     }
 
     this.emitCanvasLoaded();
@@ -212,7 +217,7 @@ export default {
       }
       if (!this.panEnabled) {
         return {
-          backgroundColor: '#fff'
+          backgroundColor: "#fff"
         };
       }
     },
@@ -382,7 +387,7 @@ export default {
 
           var x = event.pageX;
           var y = event.pageY;
-          const whiteboard = document.getElementById('whiteboard');
+          const whiteboard = document.getElementById("whiteboard");
 
           this.fillCircle(
             App.canvas,
@@ -413,7 +418,7 @@ export default {
 
         var x = event.pageX;
         var y = event.pageY;
-        const whiteboard = document.getElementById('whiteboard');
+        const whiteboard = document.getElementById("whiteboard");
 
         this.fillCircle(
           App.canvas,
@@ -449,7 +454,7 @@ export default {
 
           var x = event.pageX;
           var y = event.pageY;
-          const whiteboard = document.getElementById('whiteboard');
+          const whiteboard = document.getElementById("whiteboard");
 
           this.fillCircle(
             App.canvas,
@@ -474,10 +479,10 @@ export default {
     drawSetup() {
       if (this.isMobile()) {
         if (this.panEnabled) {
-          document.getElementById('whiteboard').style.overflow = 'hidden';
+          document.getElementById("whiteboard").style.overflow = "hidden";
           this.panEnabled = !this.panEnabled;
         } else {
-          document.getElementById('whiteboard').style.overflow = 'scroll';
+          document.getElementById("whiteboard").style.overflow = "scroll";
           this.panEnabled = !this.panEnabled;
         }
       }
@@ -626,15 +631,9 @@ export default {
           }
 
           context.beginPath();
-          context.moveTo(
-            x - scrollLeft - rect.left,
-            y - scrollTop - rect.top 
-          );
+          context.moveTo(x - scrollLeft - rect.left, y - scrollTop - rect.top);
         } else if (type === "drag") {
-          context.lineTo(
-            x - scrollLeft - rect.left,
-            y - scrollTop - rect.top
-          );
+          context.lineTo(x - scrollLeft - rect.left, y - scrollTop - rect.top);
           context.stroke();
         } else {
           context.closePath();
@@ -663,28 +662,27 @@ export default {
       } else {
         this.showColors = "hidden";
       }
-    } 
+    }
   },
-  sockets: {  
+  sockets: {
     "session-change"() {
-      this.emitCanvasLoaded();      
+      this.emitCanvasLoaded();
     },
     size(data) {
       // Receives broadcast of other user's screen size and resizes (or not) accordingly
       const targetHeight = data.height;
       if (targetHeight > this.canvasHeight) {
         // Resize canvas and save dimensions to localstorage
-        const canvas = document.getElementById('whiteboardCanvas');
-        canvas.height = targetHeight;  
+        const canvas = document.getElementById("whiteboardCanvas");
+        canvas.height = targetHeight;
         canvas.width = targetHeight * 1.33;
         localStorage.sessionCanvasHeight = targetHeight;
       } else {
         localStorage.sessionCanvasHeight = this.canvasHeight;
       }
-
     },
     dstart(data) {
-      const whiteboard = document.getElementById('whiteboard');
+      const whiteboard = document.getElementById("whiteboard");
       this.fillCircle(
         App.canvas,
         App.ctx,
@@ -696,7 +694,7 @@ export default {
       );
     },
     drag(data) {
-      const whiteboard = document.getElementById('whiteboard');
+      const whiteboard = document.getElementById("whiteboard");
       this.fillCircle(
         App.canvas,
         App.ctx,
@@ -708,7 +706,7 @@ export default {
       );
     },
     dend(data) {
-      const whiteboard = document.getElementById('whiteboard');
+      const whiteboard = document.getElementById("whiteboard");
       this.fillCircle(
         App.canvas,
         App.ctx,

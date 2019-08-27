@@ -54,7 +54,7 @@ export default {
       currentSession: SessionService.currentSession,
       connectionMsg: "",
       connectionMsgType: "",
-      reconnectAttemptMsg: "",
+      reconnectAttemptMsg: ""
     };
   },
   computed: {
@@ -82,7 +82,7 @@ export default {
       }
       return {
         backgroundImage: `url(${picture})`,
-        marginLeft: this.isMobile() ? '50px' : '0'
+        marginLeft: this.isMobile() ? "50px" : "0"
       };
     }
   },

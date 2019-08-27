@@ -16,29 +16,35 @@
       </transition>
 
       <div class="messages">
-        <div
-          v-if="!user.isVolunteer"
-          class="waiting-cards"
-        >
+        <div v-if="!user.isVolunteer" class="waiting-cards">
           <div class="waiting-cards__card" style="background: #16D2AA">
-            <img src="@/assets/Light.png"/><h1 style="float: right; width: calc(100% - 48px)">We’re looking for a coach for you...</h1>
+            <img src="@/assets/Light.png" />
+            <h1 style="float: right; width: calc(100% - 48px)">
+              We’re looking for a coach for you...
+            </h1>
             <p>
-              Thanks for requesting help with UPchieve! We’re looking for a coach to pair with you now. This process typically takes 5-10 minutes.
+              Thanks for requesting help with UPchieve! We’re looking for a
+              coach to pair with you now. This process typically takes 5-10
+              minutes.
             </p>
           </div>
           <div class="waiting-cards__card" style="background: #1855D1">
             <h1>While you wait...</h1>
             <p>
-              While you’re waiting, you can write any problems you’re working on on the whiteboard. (Click on the pencil icon in the upper right corner of the screen to start.)
+              While you’re waiting, you can write any problems you’re working on
+              on the whiteboard. (Click on the pencil icon in the upper right
+              corner of the screen to start.)
             </p>
           </div>
           <div class="waiting-cards__card" style="background: #FF8C5F">
             <h1>A couple of reminders:</h1>
             <p>
-              1. Practice online safety! Don’t share personal information like your phone number or email. 
+              1. Practice online safety! Don’t share personal information like
+              your phone number or email.
             </p>
             <p>
-              2. Click “End chat” when you’re done, and make sure to fill out the short feedback form that follows!
+              2. Click “End chat” when you’re done, and make sure to fill out
+              the short feedback form that follows!
             </p>
           </div>
         </div>
@@ -259,14 +265,14 @@ export default {
 .header {
   height: 60px;
   padding: 18px;
-  font-family: 'Work Sans', sans-serif;
+  font-family: "Work Sans", sans-serif;
   font-size: 18px;
   font-weight: 500;
   text-align: left;
   position: absolute;
   color: white;
   width: 100%;
-  background: #1855D1;
+  background: #1855d1;
 }
 
 .message-box {
@@ -351,7 +357,6 @@ span {
   color: #73737a;
   position: absolute;
   bottom: 0;
-  
 }
 
 .contents {
@@ -360,7 +365,7 @@ span {
   padding: 12px;
   overflow-wrap: break-word;
   font-size: 16px;
-  background: #F1F3F6;
+  background: #f1f3f6;
   border-radius: 8px;
   max-width: 80%;
 }
@@ -391,7 +396,6 @@ span {
   padding: 16px;
 }
 
-
 .left {
   float: left;
   .contents {
@@ -410,7 +414,7 @@ span {
   .contents {
     text-align: right;
     padding-right: 10px;
-    background-color: #16D2AA;
+    background-color: #16d2aa;
     span {
       color: white;
     }
@@ -432,7 +436,7 @@ span {
     padding: 16px;
     margin-bottom: 16px;
     font-size: 14px;
-    
+
     h1 {
       font-size: 20px;
       line-height: 125%;
@@ -478,7 +482,7 @@ span {
     position: absolute;
     left: 0;
     bottom: 0;
-    border: 1px solid #D6E0EF;
+    border: 1px solid #d6e0ef;
     border-radius: 20px;
     margin: 10px 20px;
     padding: 10px 16px;
