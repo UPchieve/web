@@ -5,7 +5,11 @@
         <div :style="partnerAvatar" class="avatar" />
         <div class="info">
           <template v-if="isWaitingForVolunteer">
-            <span>We are contacting our Academic Coaches for you right now - please hang tight while we try to connect you! This process can take 5-10 minutes.</span>
+            <span
+              >We are contacting our Academic Coaches for you right now - please
+              hang tight while we try to connect you! This process can take 5-10
+              minutes.</span
+            >
           </template>
           <template v-else-if="isSessionInProgress">
             <span class="volunteer-name">{{ partnerName }}</span>
@@ -67,13 +71,22 @@ export default {
   },
   computed: {
     isWaitingForVolunteer() {
-      return this.currentSession.sessionId && !this.currentSession.data.volunteerJoinedAt;
+      return (
+        this.currentSession.sessionId &&
+        !this.currentSession.data.volunteerJoinedAt
+      );
     },
     isSessionInProgress() {
-      return this.currentSession.sessionId && this.currentSession.data.volunteerJoinedAt && !this.currentSession.data.endedAt;
+      return (
+        this.currentSession.sessionId &&
+        this.currentSession.data.volunteerJoinedAt &&
+        !this.currentSession.data.endedAt
+      );
     },
     isSessionOver() {
-      return this.currentSession.sessionId && !!this.currentSession.data.endedAt;
+      return (
+        this.currentSession.sessionId && !!this.currentSession.data.endedAt
+      );
     },
     partnerName() {
       const partner = SessionService.getPartner();
@@ -129,7 +142,9 @@ export default {
       }
 
       // quick hack to avoid confirming an already-ended session
-      const result = this.isSessionOver ? true : window.confirm("Do you really want to end the session?");
+      const result = this.isSessionOver
+        ? true
+        : window.confirm("Do you really want to end the session?");
 
       if (result) {
         if (volunteerId) {
