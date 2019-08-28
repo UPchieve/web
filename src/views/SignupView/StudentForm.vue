@@ -444,7 +444,7 @@ export default {
       });
     },
     getSchoolDisplayName(school) {
-      return `${school.name} (${school.districtName}, ${school.state})`;
+      return `${school.name} (${school.city}, ${school.state})`;
     },
     handleSelectHighSchool(school) {
       this.eligibility.highSchool = school;
