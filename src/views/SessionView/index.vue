@@ -65,8 +65,6 @@ export default {
     const id = this.$route.params.sessionId;
     let promise;
 
-    this.sessionId = id;
-
     if (!id) {
       let type;
       if (this.$route.path.indexOf("session/college") !== -1) {
@@ -85,7 +83,6 @@ export default {
 
     promise
       .then(sessionId => {
-        this.sessionId = this.currentSession.sessionId;
         this.$socket.connect();
         this.joinSession(sessionId);
       })
