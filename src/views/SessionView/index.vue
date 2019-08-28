@@ -31,6 +31,8 @@ import Whiteboard from "./Whiteboard";
 import SessionChat from "./SessionChat";
 import Modal from "@/components/Modal";
 
+import errorFromServer from "@/utils/error-from-server";
+
 export default {
   name: "session-view",
   components: {
@@ -104,17 +106,17 @@ export default {
         this.$socket.connect();
         this.joinSession(sessionId);
       })
-      .catch((err) => {
-        let errToReport
+      .catch(err => {
+        let errToReport;
         if (err.status !== 404 && err.status !== 0) {
-          errToReport = errorFromServer(err)
-          errToReport.breaking = true
+          errToReport = errorFromServer(err);
+          errToReport.breaking = true;
         } else {
-          errToReport = err
+          errToReport = err;
         }
         window.alert("Could not start new help session");
         this.$router.replace("/");
-        this.$parent.$emit('async-error', errToReport)
+        this.$parent.$emit("async-error", errToReport);
       });
 
     // Offer the option to ask a question
