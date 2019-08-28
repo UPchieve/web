@@ -37,28 +37,7 @@ export default {
   data() {
     return {
       currentSession: SessionService.currentSession,
-      sessionReconnecting: false,
-      message: `
-        We don’t have any Academic Coaches
-        available right now, but you can submit a
-        written question, and we will try to get
-        back to you within 24 hours! Would you
-        like to submit a question now?
-      `,
-      clickHandlers: {
-        main: () => {
-          this.$router.push({
-            path: "/submit-question",
-            query: {
-              topic: this.$route.path.split("/")[2], // [1]
-              subTopic: this.$route.params.subTopic
-            }
-          });
-        },
-        second: () => {
-          this.$router.push("/");
-        }
-      }
+      sessionReconnecting: false
     };
   },
   mounted() {
