@@ -4,7 +4,7 @@ import router from "@/router";
 
 import NetworkService from "./NetworkService";
 import AnalyticsService from "./AnalyticsService";
-import errorFromServer from "@/utils/error-from-server";
+import extractErrorToReport from "@/utils/extract-error-to-report";
 
 const USER_FETCH_LIMIT_SECONDS = 5;
 
@@ -49,15 +49,7 @@ export default {
       .catch(res => {
         context.error = "Could not login";
 
-        if (res.status !== 401 && res.status !== 0 && res.data) {
-          const err = errorFromServer(res);
-          err.breaking = true;
-          throw err;
-        } else if (!res.data) {
-          // error is not a server response
-          res.breaking = true;
-          throw res;
-        }
+        throw extractErrorToReport(res, res.status !== 401 && res.status !== 0, true);
       });
   },
 
@@ -67,8 +59,6 @@ export default {
         const data = { ...res.data };
         if (!data) {
           throw new Error("No user returned from auth service");
-        } else if (data.err) {
-          throw new Error(data.err);
         }
 
         this.storeUser(data.user);
@@ -82,23 +72,14 @@ export default {
         }
       })
       .catch(err => {
-        if (err.data) {
-          throw new Error(err.data.err);
-        }
+        throw extractErrorToReport(err, err.status !== 0, true);
       });
   },
 
   checkRegister(context, creds) {
     return NetworkService.checkRegister(context, creds)
-      .then(res => {
-        if (res.data.err) {
-          throw new Error(res.data.err);
-        }
-      })
       .catch(err => {
-        if (err.data) {
-          throw new Error(err.data.err);
-        }
+        throw extractErrorToReport(err, err.status !== 0, true);
       });
   },
 
@@ -108,9 +89,6 @@ export default {
         const data = { ...res.data };
         if (!data) {
           throw new Error("No user returned from auth service");
-        }
-        if (data.err) {
-          throw new Error(data.err);
         }
 
         context.msg = "Password reset email has been sent!";
@@ -122,9 +100,7 @@ export default {
         }
       })
       .catch(err => {
-        if (err.data) {
-          throw new Error(err.data.err);
-        }
+        throw extractErrorToReport(err, err.status !== 0, true);
       });
   },
 
@@ -134,8 +110,6 @@ export default {
         const data = { ...res.data };
         if (!data) {
           throw new Error("No user returned from auth service");
-        } else if (data.err) {
-          throw new Error(data.err);
         }
 
         context.msg = "Password has been reset!";
@@ -147,9 +121,7 @@ export default {
         }
       })
       .catch(err => {
-        if (err.data) {
-          throw new Error(err.data.err);
-        }
+        throw extractErrorToReport(err, err.status !== 0, true);
       });
   },
 
@@ -160,9 +132,10 @@ export default {
           this.removeUser();
           router.push("/logout");
         })
-        .catch(() => {
+        .catch((err) => {
           this.removeUser();
           router.push("/logout");
+          throw extractErrorToReport(err, err.status !== 401 && err.status !== 0, true);
         });
     } else {
       this.removeUser();
@@ -234,9 +207,7 @@ export default {
           this.user.authenticated = false;
           this.user.data = null;
         } else {
-          if (err.status && err.status !== 0) {
-            throw new Error(err.data.err);
-          }
+          throw extractErrorToReport(err, err.status !== 0, true);
         }
       });
   }

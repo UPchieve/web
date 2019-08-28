@@ -86,7 +86,7 @@ export default {
         return sessionId;
       })
       .catch(res => {
-        return errorFromServer(res);
+        throw errorFromServer(res);
       });
   },
 

@@ -6,7 +6,9 @@ function _errHandler(context, err) {
     err.status !== 0 &&
     err.status !== 401
   ) {
-    context.$parent.$emit("async-error", err.body ? err.body.err : err);
+    const errToReport = err.body ? err.body.err : err;
+    errToReport.breaking = true;
+    context.$parent.$emit("async-error", errToReport);
   }
 
   throw err;
