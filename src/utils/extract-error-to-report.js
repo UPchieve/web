@@ -8,7 +8,7 @@ const errorFromServer = require("@/utils/error-from-server");
 
 module.exports = function(err, breakingIfServer, breakingIfClient) {
   let errToReport;
-  if (err.data && err.data.err) {
+  if ((err.data && err.data.err) || (err.body && err.body.err) || err.status) {
     errToReport = errorFromServer(err);
     errToReport.breaking = breakingIfServer;
   } else {

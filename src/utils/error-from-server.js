@@ -4,7 +4,16 @@
  */
 
 module.exports = function(res) {
-  var err = Object.assign(new Error(), res.data.err);
-  err.sentryEventId = res.data.sentryEventId;
+  let err;
+  if (res.data && res.data.err) {
+    err = Object.assign(new Error(), res.data.err);
+    err.sentryEventId = res.data.sentryEventId;
+  } else if (res.body && res.body.err) {
+    err = Object.assign(new Error(), res.body.err);
+    err.sentryEventId = res.body.sentryEventId;
+  } else {
+    err = new Error(`Unknown server error: ${res.status}`);
+    err.status = res.status;
+  }
   return err;
 };

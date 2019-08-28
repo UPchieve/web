@@ -49,11 +49,9 @@ export default {
       .catch(res => {
         context.error = "Could not login";
 
-        throw extractErrorToReport(
-          res,
-          res.status !== 401 && res.status !== 0,
-          true
-        );
+        if (res.status !== 401 && res.status !== 0) {
+          throw extractErrorToReport(res, true, true);
+        }
       });
   },
 
