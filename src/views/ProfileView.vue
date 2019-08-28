@@ -270,7 +270,7 @@ export default {
             this.activeEdit = false;
             this.saveFailed = false;
           },
-          (err) => {
+          err => {
             this.saveFailed = true;
             this.$parent.$emit("async-error", err);
           }

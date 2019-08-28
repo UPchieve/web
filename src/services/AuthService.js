@@ -49,7 +49,11 @@ export default {
       .catch(res => {
         context.error = "Could not login";
 
-        throw extractErrorToReport(res, res.status !== 401 && res.status !== 0, true);
+        throw extractErrorToReport(
+          res,
+          res.status !== 401 && res.status !== 0,
+          true
+        );
       });
   },
 
@@ -77,10 +81,9 @@ export default {
   },
 
   checkRegister(context, creds) {
-    return NetworkService.checkRegister(context, creds)
-      .catch(err => {
-        throw extractErrorToReport(err, err.status !== 0, true);
-      });
+    return NetworkService.checkRegister(context, creds).catch(err => {
+      throw extractErrorToReport(err, err.status !== 0, true);
+    });
   },
 
   sendReset(context, email, redirect) {
@@ -132,10 +135,14 @@ export default {
           this.removeUser();
           router.push("/logout");
         })
-        .catch((err) => {
+        .catch(err => {
           this.removeUser();
           router.push("/logout");
-          throw extractErrorToReport(err, err.status !== 401 && err.status !== 0, true);
+          throw extractErrorToReport(
+            err,
+            err.status !== 401 && err.status !== 0,
+            true
+          );
         });
     } else {
       this.removeUser();
