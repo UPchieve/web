@@ -63,6 +63,9 @@ export default {
     FormPageTemplate,
     FormFooter
   },
+  created() {
+    this.$store.dispatch("app/hideNavigation");
+  },
   data() {
     let error;
     if (this.$route.query["401"] === "true") {

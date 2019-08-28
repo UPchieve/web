@@ -283,6 +283,7 @@ export default {
 }
 
 .messages {
+  background: white;
   position: relative;
   height: 100%;
   overflow: auto;
@@ -298,6 +299,9 @@ export default {
   justify-content: flex-start;
   background: #fff;
   width: 100%;
+
+  /* Safari needs this specified to lay out the message divs properly. */
+  flex-shrink: 0;
 }
 
 .avatar {

@@ -2,7 +2,11 @@
   <div class="profile">
     <div class="header">
       Profile
-      <button class="editBtn btn" @click="editProfile()">
+      <button
+        v-if="user.isVolunteer"
+        class="editBtn btn"
+        @click="editProfile()"
+      >
         {{ editBtnMsg }}
       </button>
     </div>
@@ -27,25 +31,6 @@
           <div id="email" class="container-section">
             <div class="prompt">Your Email</div>
             <div class="answer">{{ user.email }}</div>
-          </div>
-
-          <div v-if="!user.isVolunteer">
-            <div id="highschool" class="container-section">
-              <div class="prompt">Your High School's Name</div>
-              <div v-show="!activeEdit" class="answer">
-                {{ user.highschool }}
-              </div>
-              <div v-show="!user.highschool && !activeEdit" class="answer">
-                (None given)
-              </div>
-              <input
-                v-show="activeEdit"
-                v-model="user.highschool"
-                type="text"
-                class="form-control"
-                :class="{ invalid: invalidInputs.indexOf('highschool') > -1 }"
-              />
-            </div>
           </div>
           <div v-if="user.isVolunteer">
             <div id="phone" class="container-section">
@@ -274,12 +259,6 @@ export default {
           this.errors.push("Please tell us your favorite academic subject.");
           this.invalidInputs.push("favoriteAcademicSubject");
         }
-      } else {
-        // students must provide the name of their high school
-        if (!this.user.highschool) {
-          this.errors.push("Please tell us what high school you go to.");
-          this.invalidInputs.push("highschool");
-        }
       }
 
       if (!this.errors.length) {
@@ -340,7 +319,7 @@ button:hover {
 
 .profile {
   font-size: 16px;
-  font-family: $default-font;
+  font-family: $font-family-default;
 }
 
 .header {

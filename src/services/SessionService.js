@@ -24,9 +24,9 @@ export default {
   },
 
   endSession(context, sessionId) {
-    localStorage.removeItem("currentSessionPath");
-
     return NetworkService.endSession(context, { sessionId }).then(() => {
+      localStorage.removeItem("currentSessionPath");
+
       // analytics: track when a help session has ended
       AnalyticsService.trackSessionEnded(
         this.currentSession.data,
@@ -105,21 +105,19 @@ export default {
 
           const path = `/session/${type}/${subTopic}/${sessionId}`;
           localStorage.setItem("currentSessionPath", path);
+          return path;
         }
       })
       .catch(err => {
         if ((!err.data || !err.data.err) && err.status !== 0) {
-          context.$parent.$emit("async-error", errorFromServer(err));
-          return;
+          throw err;
         }
 
         this.currentSession.sessionId = null;
         this.currentSession.data = {};
-        if (err.status !== 404 && err.status !== 0) {
-          context.$parent.$emit("async-error", errorFromServer(err));
-        }
 
         localStorage.removeItem("currentSessionPath");
+        throw err.data.err;
       });
   }
 };

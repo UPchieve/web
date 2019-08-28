@@ -122,27 +122,37 @@ export default {
 
       if (result) {
         if (volunteerId) {
-          this.$socket.disconnect();
-          SessionService.endSession(this, sessionId);
-          const url =
-            "/feedback/" +
-            sessionId +
-            "/" +
-            topic +
-            "/" +
-            subTopic +
-            "/" +
-            (UserService.getUser().isVolunteer ? "volunteer" : "student") +
-            "/" +
-            studentId +
-            "/" +
-            volunteerId;
-          router.replace(url);
+          SessionService.endSession(this, sessionId)
+            .then(() => {
+              this.$socket.disconnect();
+              const url =
+                "/feedback/" +
+                sessionId +
+                "/" +
+                topic +
+                "/" +
+                subTopic +
+                "/" +
+                (UserService.getUser().isVolunteer ? "volunteer" : "student") +
+                "/" +
+                studentId +
+                "/" +
+                volunteerId;
+              router.replace(url);
+            })
+            .catch(this.alertCouldNotEnd);
         } else {
-          SessionService.endSession(this, sessionId);
-          router.replace("/");
+          SessionService.endSession(this, sessionId)
+            .then(() => {
+              this.$socket.disconnect();
+              router.replace("/");
+            })
+            .catch(this.alertCouldNotEnd);
         }
       }
+    },
+    alertCouldNotEnd() {
+      window.alert("Could not end session");
     },
     tryReconnect() {
       // socket must be closed before reopening for automatic reconnections
@@ -211,7 +221,7 @@ h1 {
   color: white;
   font-weight: 600;
   font-size: 16px;
-  width: 600px;
+  max-width: 600px;
 }
 
 .volunteer-name {

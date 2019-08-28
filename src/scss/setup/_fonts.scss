@@ -1,0 +1,30 @@
+/// Default font family.
+$font-family-default: 'Work Sans', Helvetica, Arial, sans-serif;
+
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+
+/// Helper to easily include text styles.
+/// @requires {function} $validate-map-key
+/// @param {string} $category - Scale category
+@mixin font-category($category) {
+  $categories: (
+    // category-name: (font-size, font-weight, line-height)
+    'display-large': (40px, $font-weight-medium, 1.25),
+    'display-small': (24px, $font-weight-medium, 1.25),
+    'heading': (18px, $font-weight-regular, 1.25),
+    'subheading': (16px, $font-weight-medium, 1.25),
+    'body': (16px, $font-weight-regular, 1.5),
+    'helper-text': (14px, $font-weight-regular, 1.5),
+    'button': (16px, $font-weight-medium, 1.25)
+  );
+
+  // Validate category and get list
+  $list: validate-map-key($categories, $category);
+
+  // Set properties using category list
+  font-family: $font-family-default;
+  font-size: nth($list, 1);
+  font-weight: nth($list, 2);
+  line-height: nth($list, 3);
+}

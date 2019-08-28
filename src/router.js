@@ -31,10 +31,9 @@ import DebugSentryView from "./views/DebugSentryView";
 
 import AuthService from "./services/AuthService";
 import OnboardingService from "./services/OnboardingService";
+import store from "./store";
 
 Vue.use(VueResource);
-Vue.use(VueRouter);
-
 Vue.http.options.credentials = true;
 
 const routes = [
@@ -49,35 +48,18 @@ const routes = [
   },
   { path: "/contact", name: "ContactView", component: ContactView },
   { path: "/legal", name: "LegalView", component: LegalView },
-  {
-    path: "/login",
-    name: "LoginView",
-    component: LoginView,
-    meta: { hideSidebar: true }
-  },
-  {
-    path: "/logout",
-    name: "LogoutView",
-    component: LogoutView,
-    meta: { hideSidebar: true }
-  },
-  {
-    path: "/signup",
-    name: "SignupView",
-    component: SignupView,
-    meta: { hideSidebar: true }
-  },
+  { path: "/login", name: "LoginView", component: LoginView },
+  { path: "/logout", name: "LogoutView", component: LogoutView },
+  { path: "/signup", name: "SignupView", component: SignupView },
   {
     path: "/resetpassword",
     name: "ResetPasswordView",
-    component: ResetPasswordView,
-    meta: { hideSidebar: true }
+    component: ResetPasswordView
   },
   {
     path: "/setpassword/:token",
     name: "SetPasswordView",
-    component: SetPasswordView,
-    meta: { hideSidebar: true }
+    component: SetPasswordView
   },
   {
     path: "/dashboard",
@@ -187,6 +169,14 @@ const routes = [
   {
     path: "/edu", // TODO: make this be "/admin/edu"
     component: () => {
+      if (process.env.NODE_ENV === "development") {
+        // The EDU admin route is rendered server-side with Express.js, so in local development
+        // we need to move to port 3000 (away from Vue's dev server on port 8080)
+        window.location.href = "http://localhost:3000/edu";
+        return;
+      }
+
+      // In non-development environments, we can simply use a relative link
       window.location.href = "/edu";
     }
   }
@@ -255,16 +245,8 @@ router.beforeEach((to, from, next) => {
   }
 });
 
-// If endpoint returns 401, redirect to login (except for requests to get user's
-// session)
-Vue.http.interceptors.push((request, next) => {
-  next(response => {
-    if (
-      response.status === 401 &&
-      !(request.url.indexOf("/api/user") !== -1 && request.method === "GET")
-    ) {
-      AuthService.removeUser();
-      router.push("/login?401=true");
-    }
-  });
+// Called after each route change
+router.afterEach((to, from) => {
+  if (to.name !== from.name) store.dispatch("app/showNavigation");
+  store.dispatch("app/modal/hide");
 });
