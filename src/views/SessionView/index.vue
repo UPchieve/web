@@ -11,14 +11,6 @@
         <session-chat />
       </div>
     </div>
-
-    <modal
-      v-if="showModal"
-      :labels="btnLabels"
-      :message="message"
-      :click-handlers="clickHandlers"
-      warn
-    />
   </div>
 </template>
 
@@ -29,15 +21,13 @@ import UserService from "@/services/UserService";
 import SessionHeader from "./SessionHeader";
 import Whiteboard from "./Whiteboard";
 import SessionChat from "./SessionChat";
-import Modal from "@/components/Modal";
 
 export default {
   name: "session-view",
   components: {
     SessionHeader,
     Whiteboard,
-    SessionChat,
-    Modal
+    SessionChat
   },
   /*
    * @notes
@@ -48,8 +38,6 @@ export default {
     return {
       currentSession: SessionService.currentSession,
       sessionReconnecting: false,
-      showModal: false,
-      btnLabels: ["Submit question", "Exit session"],
       message: `
         We don’t have any Academic Coaches
         available right now, but you can submit a
@@ -105,17 +93,6 @@ export default {
         window.alert("Could not start new help session");
         this.$router.replace("/");
       });
-
-    // Offer the option to ask a question
-    const MODAL_TIMEOUT_MS = 24 * 60 * 60 * 1000;
-    setTimeout(() => {
-      if (
-        !UserService.getUser().isVolunteer &&
-        SessionService.getPartner() === undefined
-      ) {
-        this.showModal = true;
-      }
-    }, MODAL_TIMEOUT_MS);
   },
   sockets: {
     bump: function() {
