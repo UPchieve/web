@@ -1,24 +1,32 @@
 <template>
   <div class="session-header-wrapper">
-    <div :class="{ inactive: !partnerName }" class="session-header">
+    <div :class="{ inactive: !isSessionInProgress }" class="session-header">
       <div class="avatar-info-container">
         <div :style="partnerAvatar" class="avatar" />
         <div class="info">
-          <template v-if="partnerName">
+          <template v-if="isWaitingForVolunteer">
+            <span>We are contacting our Academic Coaches for you right now - please hang tight while we try to connect you! This process can take 5-10 minutes.</span>
+          </template>
+          <template v-else-if="isSessionInProgress">
             <span class="volunteer-name">{{ partnerName }}</span>
           </template>
-          <template v-else-if="currentSession.sessionId">
-            {{ waitingText }}
+          <template v-else-if="isSessionOver">
+            <span>Your session with {{ partnerName }} has ended</span>
           </template>
           <template v-else>
-            Loading
+            Loading...
           </template>
         </div>
       </div>
       <div class="button-container">
         <div class="end-session">
           <button class="btn btn-lg btn-block" @click.prevent="end">
-            End session
+            <span v-if="isSessionOver">
+              Finish
+            </span>
+            <span v-else>
+              End session
+            </span>
           </button>
         </div>
       </div>
@@ -58,12 +66,14 @@ export default {
     };
   },
   computed: {
-    waitingText() {
-      const user = UserService.getUser();
-      if (user.isVolunteer) {
-        return "No student is in this session";
-      }
-      return "We are contacting our Academic Coaches for you right now - please hang tight while we try to connect you! This process can take 5-10 minutes.";
+    isWaitingForVolunteer() {
+      return this.currentSession.sessionId && !this.currentSession.data.volunteerJoinedAt;
+    },
+    isSessionInProgress() {
+      return this.currentSession.sessionId && this.currentSession.data.volunteerJoinedAt && !this.currentSession.data.endedAt;
+    },
+    isSessionOver() {
+      return this.currentSession.sessionId && !!this.currentSession.data.endedAt;
     },
     partnerName() {
       const partner = SessionService.getPartner();
@@ -118,7 +128,8 @@ export default {
         subTopic = SessionService.currentSession.data.subTopic;
       }
 
-      const result = window.confirm("Do you really want to end the session?");
+      // quick hack to avoid confirming an already-ended session
+      const result = this.isSessionOver ? true : window.confirm("Do you really want to end the session?");
 
       if (result) {
         if (volunteerId) {
