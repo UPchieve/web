@@ -12,10 +12,10 @@
             >
           </template>
           <template v-else-if="isSessionInProgress">
-            <span class="volunteer-name">{{ partnerName }}</span>
+            <span class="volunteer-name">{{ sessionPartner.firstname }}</span>
           </template>
           <template v-else-if="isSessionOver">
-            <span>Your session with {{ partnerName }} has ended</span>
+            <span>Your session with {{ sessionPartner.firstname }} has ended</span>
           </template>
           <template v-else>
             Loading...
@@ -51,6 +51,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import UserService from "@/services/UserService";
 import SessionService from "@/services/SessionService";
 import router from "@/router";
@@ -70,6 +71,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters({ sessionPartner: "user/sessionPartner" }),
     isWaitingForVolunteer() {
       return (
         this.currentSession.sessionId &&
@@ -87,10 +89,6 @@ export default {
       return (
         this.currentSession.sessionId && !!this.currentSession.data.endedAt
       );
-    },
-    partnerName() {
-      const partner = SessionService.getPartner();
-      return partner && partner.firstname;
     },
     partnerAvatar() {
       const user = UserService.getUser();

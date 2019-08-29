@@ -7,11 +7,13 @@ export default {
   namespaced: true,
   state: {
     user: {},
-    sessionPath: null
+    sessionPath: null,
+    session: {}
   },
   mutations: {
     setUser: (state, user = {}) => (state.user = user),
-    setSessionPath: (state, path = null) => (state.sessionPath = path)
+    setSessionPath: (state, path = null) => (state.sessionPath = path),
+    setSession: (state, session = {}) => (state.session = session)
   },
   actions: {
     fetch: ({ dispatch }, context) => {
@@ -28,6 +30,10 @@ export default {
       SessionService.getCurrentSession(context, state.user)
         .then(path => commit("setSessionPath", path))
         .catch(() => commit("setSessionPath", null));
+    },
+
+    fetchSession: ({ commit }) => {
+      commit("setSession", SessionService.currentSession.data);
     }
   },
   getters: {
@@ -43,6 +49,21 @@ export default {
       [getters.firstName, getters.lastName].join(" "),
 
     isVolunteer: state => state.user.isVolunteer,
-    isAdmin: state => state.user.isAdmin
+    isAdmin: state => state.user.isAdmin,
+
+    sessionPartner: state => {
+      if (
+        typeof state.session.volunteer !== "object" ||
+        typeof state.session.student !== "object"
+      ) {
+        return {};
+      }
+
+      if (state.isVolunteer) {
+        return state.session.student;
+      } else {
+        return state.session.volunteer;
+      }
+    }
   }
 };

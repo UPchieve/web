@@ -75,6 +75,8 @@ export default {
       SessionService.currentSession.sessionId = data._id;
       SessionService.currentSession.data = data;
 
+      this.$store.dispatch("user/fetchSession");
+
       // re-render the session's persisted whiteboard canvas
       const img = new Image();
       img.src = data.whiteboardUrl;
