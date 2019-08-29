@@ -149,15 +149,6 @@ export default {
 
   sockets: {
     "session-change"(data) {
-      // {1}
-      SessionService.currentSession.sessionId = data._id;
-      SessionService.currentSession.data = data;
-
-      // re-render the session's persisted whiteboard canvas
-      const img = new Image();
-      img.src = data.whiteboardUrl;
-      img.onload = () => window.App.ctx.drawImage(img, 0, 0);
-
       // index session's participants by user id
       const studentId = (data.student || {})._id;
       const volunteerId = (data.volunteer || {})._id;
