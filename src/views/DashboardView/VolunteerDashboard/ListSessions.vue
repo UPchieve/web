@@ -30,14 +30,12 @@
 <script>
 import UserService from "@/services/UserService";
 
-const openSessions = [];
-
 export default {
   data() {
     const user = UserService.getUser();
     return {
       user,
-      openSessions
+      openSessions: []
     };
   },
   mounted() {
