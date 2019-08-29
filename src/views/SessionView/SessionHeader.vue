@@ -15,7 +15,9 @@
             <span class="volunteer-name">{{ sessionPartner.firstname }}</span>
           </template>
           <template v-else-if="isSessionOver">
-            <span>Your session with {{ sessionPartner.firstname }} has ended</span>
+            <span
+              >Your session with {{ sessionPartner.firstname }} has ended</span
+            >
           </template>
           <template v-else>
             Loading...
