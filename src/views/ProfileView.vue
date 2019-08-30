@@ -94,7 +94,7 @@
             </div>
           </div>
 
-          <div class="container-section resetBtn btn">
+          <div class="container-section resetBtn">
             <router-link to="resetpassword" class="prompt"
               >Reset password</router-link
             >
@@ -303,18 +303,19 @@ button:hover {
 }
 
 .editBtn {
-  font-size: 20px;
+  background-color: #16d2aa;
+  border-radius: 30px;
+  width: 170px;
+  align-items: center;
+  height: 50px;
+  justify-content: center;
+  font-size: 16px;
   font-weight: 600;
-  color: #343440;
-  background-color: #fff;
-}
+  color: white;
 
-.editBtn:active,
-.editBtn:hover {
-  background-color: #fff;
-  color: #16d2aa;
-  box-shadow: none;
-  margin: 0px;
+  &:hover {
+    color: #2c3e50;
+  }
 }
 
 .profile {
@@ -375,15 +376,19 @@ ul {
 .wrap-container {
   display: flex;
   flex-wrap: wrap;
+  align-items: start;
 }
 
 .contain {
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  background: #fff;
   margin: 30px 0 0 30px;
   width: 475px;
 }
 
 .container-content {
-  background-color: #f0f8fd;
   padding: 30px;
   text-align: left;
 }
@@ -393,8 +398,7 @@ ul {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 80px;
-  background-color: #e3f2fd;
+  padding: 30px 0 0;
   font-size: 20px;
 }
 
@@ -452,29 +456,19 @@ ul {
 }
 
 .resetBtn {
-  background-color: #16d2aa;
-  border-radius: 30px;
-  width: 200px;
-  align-items: center;
-  height: 50px;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: 600;
-
+  padding: 20px 0 5px;
   a {
-    color: white;
-  }
+    color: darken($c-error-red, 25%);
 
-  &:hover {
-    a {
-      color: #2c3e50;
+    &:hover {
       text-decoration: none;
+      color: darken($c-error-red, 40%);
     }
   }
 }
 
 .container-content.cert {
-  padding: 0px;
+  padding: 30px 0 0;
 }
 
 .certBox {
@@ -482,7 +476,7 @@ ul {
   height: 60px;
   align-items: center;
   padding-left: 20px;
-  border-bottom: 1px solid #cccccf;
+  border-top: 1px solid #cccccf;
   font-weight: 600;
 }
 
