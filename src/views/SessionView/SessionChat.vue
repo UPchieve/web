@@ -174,7 +174,7 @@ export default {
           avatarStyle: {
             backgroundImage: `url(${picture})`
           },
-          time: moment(message.time).format("h:mm a")
+          time: moment(message.createdAt).format("h:mm a")
         };
       });
 
@@ -205,7 +205,7 @@ export default {
         avatarStyle: {
           backgroundImage: `url(${picture})`
         },
-        time: moment(data.time).format("h:mm a")
+        time: moment(data.createdAt).format("h:mm a")
       });
     }
   },
