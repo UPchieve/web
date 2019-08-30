@@ -376,7 +376,7 @@ ul {
 .wrap-container {
   display: flex;
   flex-wrap: wrap;
-  align-items: start;
+  align-items: flex-start;
 }
 
 .contain {
