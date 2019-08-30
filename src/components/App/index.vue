@@ -81,7 +81,7 @@ export default {
       const img = new Image();
       img.src = data.whiteboardUrl;
       img.onload = () => window.App.ctx.drawImage(img, 0, 0);
-    },
+    }
   }
 };
 </script>
