@@ -71,17 +71,6 @@ export default {
       });
   },
   sockets: {
-    "session-change"(data) {
-      SessionService.currentSession.sessionId = data._id;
-      SessionService.currentSession.data = data;
-
-      this.$store.dispatch("user/fetchSession");
-
-      // re-render the session's persisted whiteboard canvas
-      const img = new Image();
-      img.src = data.whiteboardUrl;
-      img.onload = () => window.App.ctx.drawImage(img, 0, 0);
-    },
     bump: function() {
       this.$router.push("/");
     },
