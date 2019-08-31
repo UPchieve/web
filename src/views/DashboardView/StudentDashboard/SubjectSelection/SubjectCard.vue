@@ -92,9 +92,12 @@ export default {
   },
   computed: {
     ...mapState({ sessionPath: state => state.user.sessionPath }),
-    ...mapGetters({ mobileMode: "app/mobileMode" }),
+    ...mapGetters({
+      mobileMode: "app/mobileMode",
+      isSessionAlive: "user/isSessionAlive"
+    }),
     disabled() {
-      return this.sessionPath !== null;
+      return this.isSessionAlive;
     }
   },
   methods: {

@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapGetters } from "vuex";
 import DashboardBanner from "../DashboardBanner";
 import SubjectSelection from "./SubjectSelection";
 
@@ -19,14 +19,16 @@ export default {
   name: "student-dashboard",
   components: { DashboardBanner, SubjectSelection },
   created() {
-    if (this.sessionPath) this.$store.dispatch("app/header/show", headerData);
+    if (this.isSessionAlive) {
+      this.$store.dispatch("app/header/show", headerData);
+    }
   },
   computed: {
-    ...mapState({ sessionPath: state => state.user.sessionPath })
+    ...mapGetters({ isSessionAlive: "user/isSessionAlive" })
   },
   watch: {
-    sessionPath(value) {
-      if (!value) {
+    isSessionAlive(isAlive) {
+      if (!isAlive) {
         this.$store.dispatch("app/header/show");
       } else {
         this.$store.dispatch("app/header/show", headerData);
