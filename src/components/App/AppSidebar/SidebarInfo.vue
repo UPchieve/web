@@ -5,8 +5,8 @@
       <div class="SidebarInfo-name">{{ name }}</div>
       <div class="SidebarInfo-type">{{ type }}</div>
       <div class="SidebarInfo-status">
-        <div class="SidebarInfo-status-circle" :class="status.class" />
-        <div class="SidebarInfo-status-text">{{ status.text }}</div>
+        <div class="SidebarInfo-status-circle" :class="sessionStatus.class" />
+        <div class="SidebarInfo-status-text">{{ sessionStatus.text }}</div>
       </div>
     </template>
 
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapGetters } from "vuex";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
 import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 
@@ -37,15 +37,18 @@ export default {
     };
   },
   computed: {
-    ...mapState({ sessionPath: state => state.user.sessionPath }),
+    ...mapGetters({
+      isSessionAlive: "user/isSessionAlive"
+    }),
     type() {
       return this.isVolunteer ? "Volunteer" : "Student";
     },
-    status() {
-      const session = this.sessionPath !== null;
+    sessionStatus() {
+      const inSession = this.isSessionAlive;
+
       return {
-        class: session ? "SidebarInfo-status-circle--session" : null,
-        text: session ? "Chat in session" : "Ready to chat"
+        class: inSession ? "SidebarInfo-status-circle--session" : null,
+        text: inSession ? "Chat in session" : "Ready to chat"
       };
     }
   }

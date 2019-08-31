@@ -49,9 +49,6 @@ export default {
     // Fetch user data
     this.$store.dispatch("user/fetch", this);
   },
-  beforeUpdate() {
-    this.$store.dispatch("user/fetch", this);
-  },
   beforeDestroy() {
     window.removeEventListener("resize", this.handleResize);
   },
@@ -71,15 +68,15 @@ export default {
     })
   },
   sockets: {
-    "session-change"(data) {
-      SessionService.currentSession.sessionId = data._id;
-      SessionService.currentSession.data = data;
+    "session-change"(sessionData) {
+      SessionService.currentSession.sessionId = sessionData._id;
+      SessionService.currentSession.data = sessionData;
 
-      this.$store.dispatch("user/fetchSession");
+      this.$store.dispatch("user/updateSession", sessionData);
 
       // re-render the session's persisted whiteboard canvas
       const img = new Image();
-      img.src = data.whiteboardUrl;
+      img.src = sessionData.whiteboardUrl;
       img.onload = () => window.App.ctx.drawImage(img, 0, 0);
     }
   }

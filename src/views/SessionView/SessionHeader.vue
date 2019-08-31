@@ -4,7 +4,7 @@
       <div class="avatar-info-container">
         <div :style="partnerAvatar" class="avatar" />
         <div class="info">
-          <template v-if="isWaitingForVolunteer">
+          <template v-if="isSessionWaitingForVolunteer">
             <span
               >We are contacting our Academic Coaches for you right now - please
               hang tight while we try to connect you! This process can take 5-10
@@ -27,7 +27,7 @@
       <div class="button-container">
         <div class="end-session">
           <button class="btn btn-lg btn-block" @click.prevent="end">
-            <span v-if="isSessionOver">
+            <span v-if="!isSessionAlive">
               Finish
             </span>
             <span v-else>
@@ -54,6 +54,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+
 import UserService from "@/services/UserService";
 import SessionService from "@/services/SessionService";
 import router from "@/router";
@@ -73,25 +74,14 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ sessionPartner: "user/sessionPartner" }),
-    isWaitingForVolunteer() {
-      return (
-        this.currentSession.sessionId &&
-        !this.currentSession.data.volunteerJoinedAt
-      );
-    },
-    isSessionInProgress() {
-      return (
-        this.currentSession.sessionId &&
-        this.currentSession.data.volunteerJoinedAt &&
-        !this.currentSession.data.endedAt
-      );
-    },
-    isSessionOver() {
-      return (
-        this.currentSession.sessionId && !!this.currentSession.data.endedAt
-      );
-    },
+    ...mapGetters({
+      sessionPartner: "user/sessionPartner",
+      isSessionAlive: "user/isSessionAlive",
+      isSessionWaitingForVolunteer: "user/isSessionWaitingForVolunteer",
+      isSessionInProgress: "user/isSessionInProgress",
+      isSessionOver: "user/isSessionOver"
+    }),
+
     partnerAvatar() {
       const user = UserService.getUser();
       let picture = "";
@@ -107,6 +97,18 @@ export default {
   },
   methods: {
     end() {
+      // Only ask for confirmation if session hasn't been ended by other user
+      const shouldEndSession = this.isSessionAlive
+        ? window.confirm("Do you really want to end the session?")
+        : true;
+
+      // Early exit if user didn't confirm
+      if (!shouldEndSession) {
+        return;
+      }
+
+      this.$store.dispatch("user/clearSession");
+
       let studentId = "";
       let volunteerId = null;
       let subTopic = null;
@@ -141,40 +143,33 @@ export default {
         subTopic = SessionService.currentSession.data.subTopic;
       }
 
-      // quick hack to avoid confirming an already-ended session
-      const result = this.isSessionOver
-        ? true
-        : window.confirm("Do you really want to end the session?");
-
-      if (result) {
-        if (volunteerId) {
-          SessionService.endSession(this, sessionId)
-            .then(() => {
-              this.$socket.disconnect();
-              const url =
-                "/feedback/" +
-                sessionId +
-                "/" +
-                topic +
-                "/" +
-                subTopic +
-                "/" +
-                (UserService.getUser().isVolunteer ? "volunteer" : "student") +
-                "/" +
-                studentId +
-                "/" +
-                volunteerId;
-              router.replace(url);
-            })
-            .catch(this.alertCouldNotEnd);
-        } else {
-          SessionService.endSession(this, sessionId)
-            .then(() => {
-              this.$socket.disconnect();
-              router.replace("/");
-            })
-            .catch(this.alertCouldNotEnd);
-        }
+      if (volunteerId) {
+        SessionService.endSession(this, sessionId)
+          .then(() => {
+            this.$socket.disconnect();
+            const url =
+              "/feedback/" +
+              sessionId +
+              "/" +
+              topic +
+              "/" +
+              subTopic +
+              "/" +
+              (UserService.getUser().isVolunteer ? "volunteer" : "student") +
+              "/" +
+              studentId +
+              "/" +
+              volunteerId;
+            router.replace(url);
+          })
+          .catch(this.alertCouldNotEnd);
+      } else {
+        SessionService.endSession(this, sessionId)
+          .then(() => {
+            this.$socket.disconnect();
+            router.replace("/");
+          })
+          .catch(this.alertCouldNotEnd);
       }
     },
     alertCouldNotEnd() {

@@ -102,7 +102,7 @@ export default {
 
         const path = `/session/${type}/${subTopic}/${sessionId}`;
         localStorage.setItem("currentSessionPath", path);
-        return Promise.resolve(path);
+        return Promise.resolve({ sessionPath: path, sessionData: data });
       }
     });
   }
