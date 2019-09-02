@@ -7,16 +7,18 @@ export default {
   namespaced: true,
   state: {
     user: {},
-    sessionPath: null
+    sessionPath: null,
+    session: {}
   },
   mutations: {
     setUser: (state, user = {}) => (state.user = user),
-    setSessionPath: (state, path = null) => (state.sessionPath = path)
+    setSessionPath: (state, path = null) => (state.sessionPath = path),
+    setSession: (state, session = {}) => (state.session = session)
   },
   actions: {
     fetch: ({ dispatch }, context) => {
       dispatch("fetchUser");
-      dispatch("fetchSessionPath", context);
+      dispatch("fetchSession", context);
     },
 
     fetchUser: ({ commit }) => {
@@ -24,10 +26,29 @@ export default {
       commit("setUser", user);
     },
 
-    fetchSessionPath: ({ commit, state }, context) => {
+    fetchSession: ({ commit, state }, context) => {
       SessionService.getCurrentSession(context, state.user)
-        .then(path => commit("setSessionPath", path))
-        .catch(() => commit("setSessionPath", null));
+        .then(({ sessionPath, sessionData }) => {
+          commit("setSessionPath", sessionPath);
+          commit("setSession", sessionData);
+        })
+        .catch(() => {
+          commit("setSessionPath", null);
+          commit("setSession", {});
+        });
+    },
+
+    updateSession: ({ commit }, sessionData) => {
+      const { type, subTopic, _id } = sessionData;
+      const sessionPath = `/session/${type}/${subTopic}/${_id}`;
+
+      commit("setSessionPath", sessionPath);
+      commit("setSession", sessionData);
+    },
+
+    clearSession: ({ commit }) => {
+      commit("setSessionPath", null);
+      commit("setSession", {});
     }
   },
   getters: {
@@ -43,6 +64,61 @@ export default {
       [getters.firstName, getters.lastName].join(" "),
 
     isVolunteer: state => state.user.isVolunteer,
-    isAdmin: state => state.user.isAdmin
+    isAdmin: state => state.user.isAdmin,
+
+    sessionPartner: (state, getters) => {
+      if (
+        typeof state.session.volunteer !== "object" ||
+        typeof state.session.student !== "object"
+      ) {
+        return {};
+      }
+
+      if (getters.isVolunteer) {
+        return state.session.student;
+      } else {
+        return state.session.volunteer;
+      }
+    },
+
+    isSessionAlive: state => {
+      // Early exit if the session doesn't exist
+      if (!state.session.createdAt) {
+        return false;
+      }
+
+      // True if the session hasn't ended
+      return !state.session.endedAt;
+    },
+
+    isSessionWaitingForVolunteer: state => {
+      // Early exit if the session doesn't exist
+      if (!state.session.createdAt) {
+        return false;
+      }
+
+      // True if volunteer hasn't joined
+      return !state.session.volunteerJoinedAt;
+    },
+
+    isSessionInProgress: state => {
+      // Early exit if the session doesn't exist
+      if (!state.session.createdAt) {
+        return false;
+      }
+
+      // True if volunteer has joined and the session hasn't ended
+      return !!state.session.volunteerJoinedAt && !state.session.endedAt;
+    },
+
+    isSessionOver: state => {
+      // Early exit if the session doesn't exist
+      if (!state.session.createdAt) {
+        return false;
+      }
+
+      // True if the session has ended
+      return !!state.session.endedAt;
+    }
   }
 };

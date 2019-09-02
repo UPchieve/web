@@ -53,7 +53,6 @@ const links = {
       TRAINING_LINK,
       CALENDAR_LINK,
       PROFILE_LINK,
-      RESOURCES_LINK,
       CONTACT_LINK,
       LEGAL_LINK
     ],
