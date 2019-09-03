@@ -43,7 +43,7 @@
               your phone number or email.
             </p>
             <p>
-              2. Click “End chat” when you’re done, and make sure to fill out
+              2. Click "End session" when you’re done, and make sure to fill out
               the short feedback form that follows!
             </p>
           </div>
