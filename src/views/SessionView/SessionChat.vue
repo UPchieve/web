@@ -1,7 +1,7 @@
 <template>
   <div class="chat">
     <vue-headful
-      :title="typingIndicatorShown ? `${otherUser} is typing...` : 'UPchieve'"
+      :title="typingIndicatorShown ? `${sessionPartner.firstname} is typing...` : 'UPchieve'"
     />
     <div class="header">Chat</div>
 
@@ -66,7 +66,7 @@
       </div>
       <transition name="fade">
         <div class="typing-indicator" v-show="typingIndicatorShown">
-          {{ this.otherUser }} is typing...
+          {{ this.sessionPartner.firstname }} is typing...
         </div>
       </transition>
     </div>
@@ -86,6 +86,7 @@ import { setTimeout, clearTimeout } from "timers";
 import moment from "moment";
 import _ from "lodash";
 
+import { mapGetters } from "vuex";
 import UserService from "@/services/UserService";
 import SessionService from "@/services/SessionService";
 import ModerationService from "@/services/ModerationService";
@@ -101,7 +102,6 @@ export default {
   data() {
     return {
       user: UserService.getUser(),
-      otherUser: null,
       messages: [],
       currentSession: SessionService.currentSession,
       newMessage: "",
@@ -109,6 +109,9 @@ export default {
       typingTimeout: null,
       typingIndicatorShown: false
     };
+  },
+  computed: {
+    ...mapGetters({ sessionPartner: "user/sessionPartner" })
   },
   methods: {
     showModerationWarning() {
@@ -163,8 +166,7 @@ export default {
 
       // Typing handler for when non-Enter/Backspace keys are pressed
       this.$socket.emit("typing", {
-        sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        sessionId: this.currentSession.sessionId
       });
 
       /** Every time a key is pressed, set an inactive timer
@@ -209,9 +211,8 @@ export default {
 
       this.messages = messages;
     },
-    "is-typing"(data) {
+    "is-typing"() {
       this.typingIndicatorShown = true;
-      this.otherUser = data;
     },
     "not-typing"() {
       this.typingIndicatorShown = false;
@@ -310,7 +311,7 @@ export default {
   height: 100%;
   overflow: auto;
   display: flex;
-  padding-bottom: 25px;
+  padding-bottom: 45px;
   flex-direction: column;
 }
 
@@ -363,10 +364,10 @@ span {
 
 .typing-indicator {
   position: absolute;
-  bottom: 0;
+  bottom: 108px;
+  left: 10px;
+  padding: 0;
   font-size: 13px;
-  margin-bottom: 100px;
-  padding: 8px;
   font-weight: 300;
   transition: 0.15s;
 }
@@ -450,10 +451,6 @@ span {
 }
 
 @media screen and (max-width: 700px) {
-  .whiteboard {
-    border-radius: 0;
-  }
-
   .header {
     display: none !important;
   }
@@ -480,8 +477,9 @@ span {
     resize: none;
   }
 
-  .whiteboardButton {
-    display: block;
+  .typing-indicator {
+    bottom: 58px;
+    left: 35px;
   }
 }
 </style>
