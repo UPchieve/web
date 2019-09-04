@@ -1,29 +1,48 @@
 <template>
   <div class="session-header-wrapper">
-    <div :class="{ inactive: !partnerName }" class="session-header">
+    <div :class="{ inactive: !isSessionInProgress }" class="session-header">
       <div class="avatar-info-container">
         <div :style="partnerAvatar" class="avatar" />
         <div class="info">
-          <template v-if="partnerName">
-            <span class="volunteer-name">{{ partnerName }}</span>
+          <template v-if="isSessionWaitingForVolunteer">
+            <span>Contacting coaches...</span>
           </template>
-          <template v-else-if="currentSession.sessionId">
-            {{ waitingText }}
+          <template v-else-if="isSessionInProgress">
+            <span class="volunteer-name">{{ sessionPartner.firstname }}</span>
+          </template>
+          <template v-else-if="isSessionOver">
+            <template v-if="sessionPartner.firstname">
+              <span
+                >Your session with {{ sessionPartner.firstname }} has
+                ended</span
+              >
+            </template>
+            <template v-else>
+              <span>Your session has ended</span>
+            </template>
           </template>
           <template v-else>
-            Loading
+            Loading...
           </template>
         </div>
       </div>
       <div class="button-container">
         <div class="end-session">
           <button class="btn btn-lg btn-block" @click.prevent="end">
-            End session
+            <span v-if="isSessionWaitingForVolunteer">
+              Cancel
+            </span>
+            <span v-else-if="isSessionOver">
+              Finish
+            </span>
+            <span v-else>
+              End session
+            </span>
           </button>
         </div>
       </div>
     </div>
-    <div
+    <!-- <div
       :class="[connectionMsgType]"
       class="connection-message"
       v-if="connectionMsg || reconnectAttemptMsg"
@@ -34,11 +53,13 @@
           Try Now
         </button>
       </template>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 import UserService from "@/services/UserService";
 import SessionService from "@/services/SessionService";
 import router from "@/router";
@@ -58,17 +79,14 @@ export default {
     };
   },
   computed: {
-    waitingText() {
-      const user = UserService.getUser();
-      if (user.isVolunteer) {
-        return "No student is in this session";
-      }
-      return "We are contacting our Academic Coaches for you right now - please hang tight while we try to connect you! This process can take 5-10 minutes.";
-    },
-    partnerName() {
-      const partner = SessionService.getPartner();
-      return partner && partner.firstname;
-    },
+    ...mapGetters({
+      sessionPartner: "user/sessionPartner",
+      isSessionAlive: "user/isSessionAlive",
+      isSessionWaitingForVolunteer: "user/isSessionWaitingForVolunteer",
+      isSessionInProgress: "user/isSessionInProgress",
+      isSessionOver: "user/isSessionOver"
+    }),
+
     partnerAvatar() {
       const user = UserService.getUser();
       let picture = "";
@@ -84,6 +102,18 @@ export default {
   },
   methods: {
     end() {
+      // Only ask for confirmation if session hasn't been ended by other user
+      const shouldEndSession = this.isSessionAlive
+        ? window.confirm("Do you really want to end the session?")
+        : true;
+
+      // Early exit if user didn't confirm
+      if (!shouldEndSession) {
+        return;
+      }
+
+      this.$store.dispatch("user/clearSession");
+
       let studentId = "";
       let volunteerId = null;
       let subTopic = null;
@@ -118,37 +148,33 @@ export default {
         subTopic = SessionService.currentSession.data.subTopic;
       }
 
-      const result = window.confirm("Do you really want to end the session?");
-
-      if (result) {
-        if (volunteerId) {
-          SessionService.endSession(this, sessionId)
-            .then(() => {
-              this.$socket.disconnect();
-              const url =
-                "/feedback/" +
-                sessionId +
-                "/" +
-                topic +
-                "/" +
-                subTopic +
-                "/" +
-                (UserService.getUser().isVolunteer ? "volunteer" : "student") +
-                "/" +
-                studentId +
-                "/" +
-                volunteerId;
-              router.replace(url);
-            })
-            .catch(this.alertCouldNotEnd);
-        } else {
-          SessionService.endSession(this, sessionId)
-            .then(() => {
-              this.$socket.disconnect();
-              router.replace("/");
-            })
-            .catch(this.alertCouldNotEnd);
-        }
+      if (volunteerId) {
+        SessionService.endSession(this, sessionId)
+          .then(() => {
+            this.$socket.disconnect();
+            const url =
+              "/feedback/" +
+              sessionId +
+              "/" +
+              topic +
+              "/" +
+              subTopic +
+              "/" +
+              (UserService.getUser().isVolunteer ? "volunteer" : "student") +
+              "/" +
+              studentId +
+              "/" +
+              volunteerId;
+            router.replace(url);
+          })
+          .catch(this.alertCouldNotEnd);
+      } else {
+        SessionService.endSession(this, sessionId)
+          .then(() => {
+            this.$socket.disconnect();
+            router.replace("/");
+          })
+          .catch(this.alertCouldNotEnd);
       }
     },
     alertCouldNotEnd() {
@@ -210,10 +236,12 @@ h1 {
 }
 
 .avatar {
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
   background-image: url("~@/assets/defaultAvatar@2x.png");
   background-size: cover;
+  flex-shrink: 0;
 }
 
 .info {
@@ -226,6 +254,8 @@ h1 {
 
 .volunteer-name {
   font-weight: 700;
+  font-size: 18px;
+  font-weight: normal;
 }
 
 .btn {
@@ -234,7 +264,7 @@ h1 {
   color: #fff;
   border: none;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500;
   background-color: inherit;
 }
 
@@ -288,6 +318,10 @@ h1 {
 @media screen and (max-width: 700px) {
   .info {
     width: auto !important;
+  }
+  .session-header {
+    border-radius: 0px 0px 20px 20px;
+    height: 80px;
   }
 }
 </style>

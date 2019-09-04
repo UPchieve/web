@@ -18,7 +18,9 @@
 
 <script>
 import { mapState } from "vuex";
+
 import AuthService from "@/services/AuthService";
+import SessionService from "@/services/SessionService";
 
 import "@/scss/main.scss";
 import AppHeader from "./AppHeader";
@@ -47,9 +49,6 @@ export default {
     // Fetch user data
     this.$store.dispatch("user/fetch", this);
   },
-  beforeUpdate() {
-    this.$store.dispatch("user/fetch", this);
-  },
   beforeDestroy() {
     window.removeEventListener("resize", this.handleResize);
   },
@@ -67,6 +66,19 @@ export default {
       showSidebar: state => state.app.sidebar.isShown,
       showModal: state => state.app.modal.isShown
     })
+  },
+  sockets: {
+    "session-change"(sessionData) {
+      SessionService.currentSession.sessionId = sessionData._id;
+      SessionService.currentSession.data = sessionData;
+
+      this.$store.dispatch("user/updateSession", sessionData);
+
+      // re-render the session's persisted whiteboard canvas
+      const img = new Image();
+      img.src = sessionData.whiteboardUrl;
+      img.onload = () => window.App.ctx.drawImage(img, 0, 0);
+    }
   }
 };
 </script>

@@ -239,14 +239,17 @@ router.afterEach((to, from) => {
   store.dispatch("app/modal/hide");
 });
 
-// If endpoint returns 401, redirect to login (except for requests to get user's
+// If endpoint returns 401, redirect to login (except for requests to get user or user's
 // session)
 Vue.http.interceptors.push((request, next) => {
   next(response => {
-    if (
-      response.status === 401 &&
-      !(request.url.indexOf("/api/user") !== -1 && request.method === "GET")
-    ) {
+    const is401 = response.status === 401;
+    const isGetUserAttempt =
+      request.url.indexOf("/api/user") !== -1 && request.method === "GET";
+    const isGetSessionAttempt =
+      request.url.indexOf("/api/session/current") !== -1;
+
+    if (is401 && !(isGetUserAttempt || isGetSessionAttempt)) {
       AuthService.removeUser();
       router.push("/login?401=true");
     }

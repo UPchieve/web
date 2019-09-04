@@ -1,17 +1,21 @@
 <template>
-  <div class="whiteboard">
+  <div class="whiteboard" id="whiteboard">
     <canvas
       v-canvas
       id="whiteboardCanvas"
       @mousedown="drawStart"
       @mouseup="drawEnd"
       @mousemove="draw"
+      v-touch:start="drawStart"
+      v-touch:end="drawEnd"
+      v-touch:moving="draw"
+      width="1280"
+      height="800"
     />
     <div
       class="whiteboardTools row"
       style="background-color:rgba(238,238,238,1)"
     >
-      <div class="header">Whiteboard Tools</div>
       <div class="toolset col-md-6">
         <button id="clearButton" class="whiteboardBtn" @click="clear" />
         <div class="colorWrapper">
@@ -67,7 +71,12 @@
             />
           </div>
         </div>
-        <button id="drawButton" class="whiteboardBtn" @click="drawSetup" />
+        <button
+          id="drawButton"
+          class="whiteboardBtn"
+          @click="drawSetup"
+          :style="drawButtonStyle"
+        />
         <button id="eraseButton" class="whiteboardBtn" @click="erase" />
         <button id="undoButton" class="whiteboardBtn" @click="undo" />
         <!-- <button class='whiteboardBtn' id='textButton' v-on:click="text"></button> -->
@@ -81,6 +90,8 @@
  * @todo {0} This component needs a lot of refactoring
  * @todo {1} Solve this bug ('handleUndoOperation' is not defined)
  */
+
+import { mapGetters } from "vuex";
 
 import SessionService from "@/services/SessionService";
 import UserService from "@/services/UserService";
@@ -167,10 +178,44 @@ export default {
   data() {
     return {
       currentSession: SessionService.currentSession,
-      showColors: "hidden"
+      showColors: "hidden",
+      canvasHeight: null,
+      panEnabled: true
     };
   },
+  computed: {
+    ...mapGetters({ mobileMode: "app/mobileMode" }),
+
+    drawButtonStyle() {
+      // Mobile specific drawn/pan indicator
+      if (!this.mobileMode) {
+        return {};
+      }
+
+      if (!this.panEnabled) {
+        return {
+          backgroundColor: "#fff"
+        };
+      }
+
+      return {};
+    }
+  },
   mounted() {
+    const canvas = document.getElementById("whiteboardCanvas");
+    const whiteboard = document.getElementById("whiteboard");
+
+    // Determime and emit height of whiteboard container
+    this.canvasHeight = whiteboard.offsetHeight;
+    if (localStorage.sessionCanvasHeight) {
+      canvas.height = localStorage.sessionCanvasHeight;
+      canvas.width = localStorage.sessionCanvasHeight * 1.33;
+    } else {
+      canvas.height = this.canvasHeight;
+      canvas.width = this.canvasHeight * 1.33;
+    }
+
+    this.emitCanvasLoaded();
     this.resizeCanvas();
     this.drawSetup();
     window.addEventListener("resize", this.resizeCanvas);
@@ -183,12 +228,16 @@ export default {
         App.canvas.width,
         App.canvas.height
       );
-      App.canvas.width = App.canvas.offsetWidth;
-      App.canvas.height = App.canvas.offsetHeight;
       App.ctx.putImageData(savedImage, 0, 0);
     },
-
     // Socket emits
+    emitCanvasLoaded() {
+      this.$socket.emit("canvasLoaded", {
+        sessionId: this.currentSession.sessionId,
+        user: UserService.getUser(),
+        height: this.canvasHeight
+      });
+    },
     emitDrawClick() {
       this.$socket.emit("drawClick", {
         sessionId: this.currentSession.sessionId,
@@ -216,15 +265,15 @@ export default {
     emitChangeColor(color) {
       this.$socket.emit("changeColor", {
         sessionId: this.currentSession.sessionId,
-        color,
-        user: UserService.getUser()
+        user: UserService.getUser(),
+        color
       });
     },
     emitChangeWidth(width) {
       this.$socket.emit("changeWidth", {
         sessionId: this.currentSession.sessionId,
-        width,
-        user: UserService.getUser()
+        user: UserService.getUser(),
+        width
       });
     },
     emitDrawing() {
@@ -236,44 +285,44 @@ export default {
     emitEnd() {
       this.$socket.emit("end", {
         sessionId: this.currentSession.sessionId,
-        whiteboardUrl: App.canvas.toDataURL(),
-        user: UserService.getUser()
+        user: UserService.getUser(),
+        whiteboardUrl: App.canvas.toDataURL()
       });
     },
     emitDragStart(data) {
       this.$socket.emit("dragStart", {
         sessionId: this.currentSession.sessionId,
+        user: UserService.getUser(),
         x: data.x,
         y: data.y,
-        color: data.color,
-        user: UserService.getUser()
+        color: data.color
       });
     },
     emitDragAction(data) {
       this.$socket.emit("dragAction", {
         sessionId: this.currentSession.sessionId,
+        user: UserService.getUser(),
         x: data.x,
         y: data.y,
-        color: data.color,
-        user: UserService.getUser()
+        color: data.color
       });
     },
     emitDragEnd(data) {
       this.$socket.emit("dragEnd", {
         sessionId: this.currentSession.sessionId,
+        user: UserService.getUser(),
         x: data.x,
         y: data.y,
-        color: data.color,
-        user: UserService.getUser()
+        color: data.color
       });
     },
     emitInsertText(data) {
       this.$socket.emit("insertText", {
         sessionId: this.currentSession.sessionId,
+        user: UserService.getUser(),
         x: data.x,
         y: data.y,
-        text: data.text,
-        user: UserService.getUser()
+        text: data.text
       });
     },
     emitResetScreen(/* data */) {
@@ -309,6 +358,9 @@ export default {
       this.emitClearClick();
     },
     drawStart(event) {
+      if (this.panEnabled && this.mobileMode) {
+        return;
+      }
       if (!SERVER_DRAWING) {
         this.emitDrawing();
         if (!CURSOR_VISIBLE && currentState === "INSERTING_TEXT") {
@@ -342,89 +394,153 @@ export default {
           this.emitSaveImage();
           App.canvas.isDrawing = true;
 
-          // const scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
-          // const scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+          let x = event.pageX;
+          let y = event.pageY;
 
-          const x = event.pageX;
-          const y = event.pageY;
+          if (this.mobileMode && event.touches && event.touches.length) {
+            const touchEvent = event.touches[0];
+            x = touchEvent.clientX;
+            y = touchEvent.clientY;
+          }
+
+          const whiteboard = document.getElementById("whiteboard");
+          const canvasRect = whiteboard.getBoundingClientRect();
+
+          const canvasOffsetX = canvasRect.left;
+          const canvasOffsetY = canvasRect.top;
+
+          const transmitX =
+            x - canvasOffsetX + whiteboard.scrollLeft - window.scrollX;
+          const transmitY =
+            y - canvasOffsetY + whiteboard.scrollTop - window.scrollY;
 
           this.fillCircle(
             App.canvas,
             App.ctx,
             "dragstart",
             false,
-            x,
-            y,
+            transmitX,
+            transmitY,
             LOCAL_LINE_COLOR
           );
+
           this.emitDragStart({
-            x,
-            y,
+            x: transmitX,
+            y: transmitY,
             color: LOCAL_LINE_COLOR
           });
         }
       }
     },
     drawEnd(event) {
+      if (this.panEnabled && this.mobileMode) {
+        return;
+      }
       if (!SERVER_DRAWING) {
         App.canvas.isDrawing = false;
 
-        // const scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
-        // const scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+        let x = event.pageX;
+        let y = event.pageY;
 
-        const x = event.pageX;
-        const y = event.pageY;
+        if (this.mobileMode && event.touches && event.touches.length) {
+          const touchEvent = event.touches[0];
+          x = touchEvent.clientX;
+          y = touchEvent.clientY;
+        }
+
+        const whiteboard = document.getElementById("whiteboard");
+        const canvasRect = whiteboard.getBoundingClientRect();
+
+        const canvasOffsetX = canvasRect.left;
+        const canvasOffsetY = canvasRect.top;
+
+        const transmitX =
+          x - canvasOffsetX + whiteboard.scrollLeft - window.scrollX;
+        const transmitY =
+          y - canvasOffsetY + whiteboard.scrollTop - window.scrollY;
 
         this.fillCircle(
           App.canvas,
           App.ctx,
           "dragend",
           false,
-          x,
-          y,
+          transmitX,
+          transmitY,
           LOCAL_LINE_COLOR
         );
+
         this.emitDragEnd({
-          x,
-          y,
+          x: transmitX,
+          y: transmitY,
           color: LOCAL_LINE_COLOR
         });
+
         saveImage(App.canvas, App.ctx);
         this.emitSaveImage();
         this.emitEnd();
       }
     },
     draw(event) {
+      if (this.panEnabled && this.mobileMode) {
+        return;
+      }
       if (!SERVER_DRAWING) {
         if (currentState === "DRAWING" || currentState === "ERASING") {
           if (!App.canvas.isDrawing) {
             return;
           }
 
-          // const scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
-          // const scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+          const whiteboard = document.getElementById("whiteboard");
+          const canvasRect = whiteboard.getBoundingClientRect();
 
-          const x = event.pageX;
-          const y = event.pageY;
+          let x = event.pageX;
+          let y = event.pageY;
+
+          if (this.mobileMode && event.touches && event.touches.length) {
+            const touchEvent = event.touches[0];
+            x = touchEvent.clientX;
+            y = touchEvent.clientY;
+          }
+
+          const canvasOffsetX = canvasRect.left;
+          const canvasOffsetY = canvasRect.top;
+
+          const transmitX =
+            x - canvasOffsetX + whiteboard.scrollLeft - window.scrollX;
+          const transmitY =
+            y - canvasOffsetY + whiteboard.scrollTop - window.scrollY;
 
           this.fillCircle(
             App.canvas,
             App.ctx,
             "drag",
             false,
-            x,
-            y,
+            transmitX,
+            transmitY,
             LOCAL_LINE_COLOR
           );
+
           this.emitDragAction({
-            x,
-            y,
+            x: transmitX,
+            y: transmitY,
             color: LOCAL_LINE_COLOR
           });
         }
       }
     },
     drawSetup() {
+      // Toggle between pan & draw on mobile
+      // @todo: clean this up (UI + code structure of toggle)
+      // if (this.mobileMode) {
+      //   if (this.panEnabled) {
+      //     document.getElementById("whiteboard").style.overflow = "hidden";
+      //     this.panEnabled = !this.panEnabled;
+      //   } else {
+      //     document.getElementById("whiteboard").style.overflow = "scroll";
+      //     this.panEnabled = !this.panEnabled;
+      //   }
+      // }
+
       App.ctx.strokeStyle = LOCAL_LINE_COLOR;
       this.emitChangeColor(LOCAL_LINE_COLOR);
       App.ctx.lineWidth = LINE_WIDTH;
@@ -535,25 +651,6 @@ export default {
 
     // Canvas manipulations
     fillCircle(canvas, context, type, server, x, y) {
-      const scrollLeft =
-        window.pageXOffset !== undefined
-          ? window.pageXOffset
-          : (
-              document.documentElement ||
-              document.body.parentNode ||
-              document.body
-            ).scrollLeft;
-
-      const scrollTop =
-        window.pageYOffset !== undefined
-          ? window.pageYOffset
-          : (
-              document.documentElement ||
-              document.body.parentNode ||
-              document.body
-            ).scrollTop;
-
-      const rect = App.canvas.getBoundingClientRect();
       if (server) {
         App.ctx.strokeStyle = SERVER_LINE_COLOR;
         App.ctx.lineWidth = SERVER_LINE_WIDTH;
@@ -567,16 +664,11 @@ export default {
             imageData = imageList[imageList.length - 1];
             context.putImageData(imageData, 0, 0);
           }
+
           context.beginPath();
-          context.moveTo(
-            x - scrollLeft - rect.left,
-            y - scrollTop - rect.top + 5
-          );
+          context.moveTo(x, y);
         } else if (type === "drag") {
-          context.lineTo(
-            x - scrollLeft - rect.left,
-            y - scrollTop - rect.top + 5
-          );
+          context.lineTo(x, y);
           context.stroke();
         } else {
           context.closePath();
@@ -608,6 +700,22 @@ export default {
     }
   },
   sockets: {
+    "session-change"() {
+      this.emitCanvasLoaded();
+    },
+    size(data) {
+      // Receives broadcast of other user's screen size and resizes (or not) accordingly
+      const targetHeight = data.height;
+      if (targetHeight > this.canvasHeight) {
+        // Resize canvas and save dimensions to localstorage
+        const canvas = document.getElementById("whiteboardCanvas");
+        canvas.height = targetHeight;
+        canvas.width = targetHeight * 1.33;
+        localStorage.sessionCanvasHeight = targetHeight;
+      } else {
+        localStorage.sessionCanvasHeight = this.canvasHeight;
+      }
+    },
     dstart(data) {
       this.fillCircle(
         App.canvas,
@@ -701,39 +809,43 @@ export default {
 <style lang="scss" scoped>
 .whiteboard {
   height: 100%;
-  display: flex;
+  overflow: scroll;
   flex-direction: column;
+  border-radius: 8px;
+  background-color: grey;
 }
 
 canvas {
-  width: 100%;
-  height: 100%;
   background: #fff;
   display: block;
   cursor: not-allowed;
-  flex: 1;
 }
 
 .whiteboardTools {
   padding: 10px 30px;
+  width: 100%;
+  margin: 0;
   width: 300px;
   height: 80px;
   display: flex;
   align-items: center;
-  align-self: center;
   flex-direction: column;
   position: absolute;
-  bottom: 0;
+  bottom: 20px;
+  border-radius: 8px;
+  left: 50%;
+  transform: translate(-50%, 0);
 }
 
 .header {
   font-size: 12px;
+  display: block;
 }
 
 .toolset {
   display: flex;
   justify-content: center;
-  padding-top: 5px;
+  padding-top: 8px;
 }
 
 .colorContainer {
@@ -750,12 +862,14 @@ canvas {
 }
 
 .whiteboardBtn {
-  padding: 13px;
+  padding: 20px;
   border: none;
-  margin: 4px;
+  margin: 3px;
+  border-radius: 8px;
   background-repeat: no-repeat;
   background-position: center;
   background-color: rgb(238, 238, 238);
+  transition: 0.2s;
 }
 
 .colorButton {
@@ -786,5 +900,11 @@ canvas {
 
 #openColorsButton {
   background-image: url("~@/assets/color_icon.svg");
+}
+
+@media screen and (max-width: 700px) {
+  .whiteboard {
+    border-radius: 0;
+  }
 }
 </style>

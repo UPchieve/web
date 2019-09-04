@@ -33,6 +33,7 @@
           <div v-if="question.qtype === 'multiple-radio'">
             <table class="radio-question-table">
               <tr class="radio-question-row">
+                <td class="mobileRemove"></td>
                 <td
                   class="radio-question-selection-title"
                   v-for="(label, label_index) in question.table_title"
@@ -152,7 +153,7 @@ export default {
           alias: "rate-session",
           title: "Rate your session",
           secondary_title: "",
-          table_title: ["1", "2", "3", "4", "5"],
+          table_title: ["1 (worst)", "2", "3", "4", "5 (best)"],
           options: ["Rating"],
           options_alias: ["rating"]
         },
@@ -497,6 +498,10 @@ export default {
 }
 
 @media screen and (max-width: 700px) {
+  .mobileRemove {
+    display: none !important;
+  }
+
   .header {
     padding: 1em 1em 1em 2em !important;
   }

@@ -336,6 +336,7 @@ input[type="checkbox"]:checked + label {
   font-weight: 600;
   color: #16d2aa;
   padding-right: 40px;
+  background: none;
 }
 
 .tz-selector-container {

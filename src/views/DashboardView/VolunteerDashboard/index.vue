@@ -7,7 +7,7 @@
     <div class="dashboard-body row">
       <div class="col-lg-6 video">
         <p>
-          <strong>New to UPchieve?</strong>Watch the video to learn how to use
+          <strong>New to UPchieve? </strong>Watch the video to learn how to use
           our services.
         </p>
         <div class="video">
@@ -23,12 +23,12 @@
       <div class="col-lg-6 help">
         <div class="help-container">
           <h2>You are ready to help!</h2>
-          <div v-if="hasActiveSession()">
+          <div v-if="isSessionInProgress">
             <button class="btn getHelp" @click.prevent="rejoinHelpSession()">
               Rejoin your coaching session
             </button>
           </div>
-          <div v-if="!hasActiveSession()">
+          <div v-else>
             <p>
               Only students who are waiting for a volunteer will show up below.
             </p>
@@ -41,8 +41,9 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from "vuex";
+
 import UserService from "@/services/UserService";
-import SessionService from "@/services/SessionService";
 
 import ListSessions from "./ListSessions";
 
@@ -53,13 +54,6 @@ export default {
   },
   data() {
     const user = UserService.getUser() || {};
-    SessionService.getCurrentSession(this, user)
-      .then(path => {
-        this.currentSessionPath = path;
-      })
-      .catch(() => {
-        this.currentSessionPath = null;
-      });
 
     const subtopics = {
       math: ["Algebra", "Geometry", "Trigonometry", "Precalculus", "Calculus"],
@@ -81,9 +75,16 @@ export default {
       pickedTopic: "",
       pickedSubtopic: "",
       subtopics,
-      coverStyle: {},
-      currentSessionPath: null
+      coverStyle: {}
     };
+  },
+  computed: {
+    ...mapState({
+      sessionPath: state => state.user.sessionPath
+    }),
+    ...mapGetters({
+      isSessionInProgress: "user/isSessionInProgress"
+    })
   },
   watch: {
     // Watch the help topic for changes, and reset the subtopic when it does.
@@ -92,11 +93,8 @@ export default {
     }
   },
   methods: {
-    hasActiveSession() {
-      return this.currentSessionPath;
-    },
     rejoinHelpSession() {
-      const path = this.currentSessionPath;
+      const path = this.sessionPath;
       if (path) {
         this.$router.push(path);
       } else {
@@ -170,7 +168,7 @@ export default {
   font-size: 36px;
   line-height: 42px;
   font-weight: 400;
-  z-index: 10;
+  z-index: 1;
   color: white;
 }
 
