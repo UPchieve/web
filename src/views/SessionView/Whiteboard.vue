@@ -197,6 +197,8 @@ export default {
           backgroundColor: "#fff"
         };
       }
+
+      return {};
     }
   },
   mounted() {
