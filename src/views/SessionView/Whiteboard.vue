@@ -212,7 +212,7 @@ export default {
     },
     drawButtonStyle() {
       // Mobile specific drawn/pan indicator
-      if (!this.isMobile()) {
+      if (!this.mobileMode) {
         return;
       }
       if (!this.panEnabled) {
@@ -349,7 +349,7 @@ export default {
       this.emitClearClick();
     },
     drawStart(event) {
-      if (this.panEnabled && this.isMobile()) {
+      if (this.panEnabled && this.mobileMode) {
         return;
       }
       if (!SERVER_DRAWING) {
@@ -385,65 +385,93 @@ export default {
           this.emitSaveImage();
           App.canvas.isDrawing = true;
 
-          var x = event.pageX;
-          var y = event.pageY;
+          let x = event.pageX;
+          let y = event.pageY;
+
+          if (this.mobileMode && event.touches && event.touches.length) {
+            const touchEvent = event.touches[0];
+            x = touchEvent.clientX;
+            y = touchEvent.clientY;
+          }
+
           const whiteboard = document.getElementById("whiteboard");
+          const canvasRect = whiteboard.getBoundingClientRect();
+
+          const canvasOffsetX = canvasRect.left;
+          const canvasOffsetY = canvasRect.top;
+
+          const windowOffsetX = window.scrollX;
+          const windowOffsetY = window.scrollY;
+
+          const transmitX = x - canvasOffsetX + whiteboard.scrollLeft - window.scrollX;
+          const transmitY = y - canvasOffsetY + whiteboard.scrollTop - window.scrollY;
 
           this.fillCircle(
             App.canvas,
             App.ctx,
             "dragstart",
             false,
-            x,
-            y,
+            transmitX,
+            transmitY,
             LOCAL_LINE_COLOR
           );
 
-          x += whiteboard.scrollLeft;
-          y += whiteboard.scrollTop;
           this.emitDragStart({
-            x,
-            y,
+            x: transmitX,
+            y: transmitY,
             color: LOCAL_LINE_COLOR
           });
         }
       }
     },
     drawEnd(event) {
-      if (this.panEnabled && this.isMobile()) {
+      if (this.panEnabled && this.mobileMode) {
         return;
       }
       if (!SERVER_DRAWING) {
         App.canvas.isDrawing = false;
 
-        var x = event.pageX;
-        var y = event.pageY;
+        let x = event.pageX;
+        let y = event.pageY;
+
+        if (this.mobileMode && event.touches && event.touches.length) {
+          const touchEvent = event.touches[0];
+          x = touchEvent.clientX;
+          y = touchEvent.clientY;
+        }
+
         const whiteboard = document.getElementById("whiteboard");
+        const canvasRect = whiteboard.getBoundingClientRect();
+
+        const canvasOffsetX = canvasRect.left;
+        const canvasOffsetY = canvasRect.top;
+
+        const transmitX = x - canvasOffsetX + whiteboard.scrollLeft - window.scrollX;
+        const transmitY = y - canvasOffsetY + whiteboard.scrollTop - window.scrollY;
 
         this.fillCircle(
           App.canvas,
           App.ctx,
           "dragend",
           false,
-          x,
-          y,
+          transmitX,
+          transmitY,
           LOCAL_LINE_COLOR
         );
 
-        x += whiteboard.scrollLeft;
-        y += whiteboard.scrollTop;
         this.emitDragEnd({
-          x,
-          y,
+          x: transmitX,
+          y: transmitY,
           color: LOCAL_LINE_COLOR
         });
+
         saveImage(App.canvas, App.ctx);
         this.emitSaveImage();
         this.emitEnd();
       }
     },
     draw(event) {
-      if (this.panEnabled && this.isMobile()) {
+      if (this.panEnabled && this.mobileMode) {
         return;
       }
       if (!SERVER_DRAWING) {
@@ -452,32 +480,46 @@ export default {
             return;
           }
 
-          var x = event.pageX;
-          var y = event.pageY;
           const whiteboard = document.getElementById("whiteboard");
+          const canvasRect = whiteboard.getBoundingClientRect();
+
+          let x = event.pageX;
+          let y = event.pageY;
+
+          if (this.mobileMode && event.touches && event.touches.length) {
+            const touchEvent = event.touches[0];
+            x = touchEvent.clientX;
+            y = touchEvent.clientY;
+          }
+
+          const canvasOffsetX = canvasRect.left;
+          const canvasOffsetY = canvasRect.top;
+
+          const transmitX = x - canvasOffsetX + whiteboard.scrollLeft - window.scrollX;
+          const transmitY = y - canvasOffsetY + whiteboard.scrollTop - window.scrollY;
 
           this.fillCircle(
             App.canvas,
             App.ctx,
             "drag",
             false,
-            x,
-            y,
+            transmitX,
+            transmitY,
             LOCAL_LINE_COLOR
           );
 
-          x += whiteboard.scrollLeft;
-          y += whiteboard.scrollTop;
           this.emitDragAction({
-            x,
-            y,
+            x: transmitX,
+            y: transmitY,
             color: LOCAL_LINE_COLOR
           });
         }
       }
     },
     drawSetup() {
-      if (this.isMobile()) {
+      // Toggle between pan & draw on mobile
+      // @todo: clean this up (UI + code structure of toggle)
+      if (this.mobileMode) {
         if (this.panEnabled) {
           document.getElementById("whiteboard").style.overflow = "hidden";
           this.panEnabled = !this.panEnabled;
@@ -486,6 +528,7 @@ export default {
           this.panEnabled = !this.panEnabled;
         }
       }
+
       App.ctx.strokeStyle = LOCAL_LINE_COLOR;
       this.emitChangeColor(LOCAL_LINE_COLOR);
       App.ctx.lineWidth = LINE_WIDTH;
@@ -596,26 +639,6 @@ export default {
 
     // Canvas manipulations
     fillCircle(canvas, context, type, server, x, y) {
-      const scrollLeft =
-        window.pageXOffset !== undefined
-          ? window.pageXOffset
-          : (
-              document.documentElement ||
-              document.body.parentNode ||
-              document.body
-            ).scrollLeft;
-
-      const scrollTop =
-        window.pageYOffset !== undefined
-          ? window.pageYOffset
-          : (
-              document.documentElement ||
-              document.body.parentNode ||
-              document.body
-            ).scrollTop;
-
-      const rect = App.canvas.getBoundingClientRect();
-
       if (server) {
         App.ctx.strokeStyle = SERVER_LINE_COLOR;
         App.ctx.lineWidth = SERVER_LINE_WIDTH;
@@ -631,9 +654,9 @@ export default {
           }
 
           context.beginPath();
-          context.moveTo(x - scrollLeft - rect.left, y - scrollTop - rect.top);
+          context.moveTo(x, y);
         } else if (type === "drag") {
-          context.lineTo(x - scrollLeft - rect.left, y - scrollTop - rect.top);
+          context.lineTo(x, y);
           context.stroke();
         } else {
           context.closePath();
@@ -682,38 +705,35 @@ export default {
       }
     },
     dstart(data) {
-      const whiteboard = document.getElementById("whiteboard");
       this.fillCircle(
         App.canvas,
         App.ctx,
         "dragstart",
         true,
-        data.x - whiteboard.scrollLeft,
-        data.y - whiteboard.scrollTop,
+        data.x,
+        data.y,
         data.color
       );
     },
     drag(data) {
-      const whiteboard = document.getElementById("whiteboard");
       this.fillCircle(
         App.canvas,
         App.ctx,
         "drag",
         true,
-        data.x - whiteboard.scrollLeft,
-        data.y - whiteboard.scrollTop,
+        data.x,
+        data.y,
         data.color
       );
     },
     dend(data) {
-      const whiteboard = document.getElementById("whiteboard");
       this.fillCircle(
         App.canvas,
         App.ctx,
         "dragend",
         true,
-        data.x - whiteboard.scrollLeft,
-        data.y - whiteboard.scrollTop,
+        data.x,
+        data.y,
         data.color
       );
     },
