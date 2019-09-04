@@ -251,6 +251,7 @@ export default {
 .chat {
   height: 100%;
   position: relative;
+  background: #fff;
 }
 
 .header {
