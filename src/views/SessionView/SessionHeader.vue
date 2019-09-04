@@ -42,7 +42,7 @@
         </div>
       </div>
     </div>
-    <div
+    <!-- <div
       :class="[connectionMsgType]"
       class="connection-message"
       v-if="connectionMsg || reconnectAttemptMsg"
@@ -53,7 +53,7 @@
           Try Now
         </button>
       </template>
-    </div>
+    </div> -->
   </div>
 </template>
 
