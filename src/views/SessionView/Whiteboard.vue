@@ -400,11 +400,10 @@ export default {
           const canvasOffsetX = canvasRect.left;
           const canvasOffsetY = canvasRect.top;
 
-          const windowOffsetX = window.scrollX;
-          const windowOffsetY = window.scrollY;
-
-          const transmitX = x - canvasOffsetX + whiteboard.scrollLeft - window.scrollX;
-          const transmitY = y - canvasOffsetY + whiteboard.scrollTop - window.scrollY;
+          const transmitX =
+            x - canvasOffsetX + whiteboard.scrollLeft - window.scrollX;
+          const transmitY =
+            y - canvasOffsetY + whiteboard.scrollTop - window.scrollY;
 
           this.fillCircle(
             App.canvas,
@@ -446,8 +445,10 @@ export default {
         const canvasOffsetX = canvasRect.left;
         const canvasOffsetY = canvasRect.top;
 
-        const transmitX = x - canvasOffsetX + whiteboard.scrollLeft - window.scrollX;
-        const transmitY = y - canvasOffsetY + whiteboard.scrollTop - window.scrollY;
+        const transmitX =
+          x - canvasOffsetX + whiteboard.scrollLeft - window.scrollX;
+        const transmitY =
+          y - canvasOffsetY + whiteboard.scrollTop - window.scrollY;
 
         this.fillCircle(
           App.canvas,
@@ -495,8 +496,10 @@ export default {
           const canvasOffsetX = canvasRect.left;
           const canvasOffsetY = canvasRect.top;
 
-          const transmitX = x - canvasOffsetX + whiteboard.scrollLeft - window.scrollX;
-          const transmitY = y - canvasOffsetY + whiteboard.scrollTop - window.scrollY;
+          const transmitX =
+            x - canvasOffsetX + whiteboard.scrollLeft - window.scrollX;
+          const transmitY =
+            y - canvasOffsetY + whiteboard.scrollTop - window.scrollY;
 
           this.fillCircle(
             App.canvas,

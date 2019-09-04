@@ -5,9 +5,7 @@
         <div :style="partnerAvatar" class="avatar" />
         <div class="info">
           <template v-if="isSessionWaitingForVolunteer">
-            <span
-              >Contacting coaches...</span
-            >
+            <span>Contacting coaches...</span>
           </template>
           <template v-else-if="isSessionInProgress">
             <span class="volunteer-name">{{ sessionPartner.firstname }}</span>

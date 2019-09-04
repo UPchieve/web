@@ -95,7 +95,7 @@ export default {
       }
 
       return this.whiteboardOpen;
-    },
+    }
   },
   mounted() {
     const id = this.$route.params.sessionId;
