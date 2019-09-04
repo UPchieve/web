@@ -189,7 +189,7 @@ export default {
     drawButtonStyle() {
       // Mobile specific drawn/pan indicator
       if (!this.mobileMode) {
-        return;
+        return {};
       }
 
       if (!this.panEnabled) {
