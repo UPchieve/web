@@ -6,9 +6,7 @@
         <div class="info">
           <template v-if="isSessionWaitingForVolunteer">
             <span
-              >We are contacting our Academic Coaches for you right now - please
-              hang tight while we try to connect you! This process can take 5-10
-              minutes.</span
+              >Contacting coaches...</span
             >
           </template>
           <template v-else-if="isSessionInProgress">
@@ -27,7 +25,10 @@
       <div class="button-container">
         <div class="end-session">
           <button class="btn btn-lg btn-block" @click.prevent="end">
-            <span v-if="!isSessionAlive">
+            <span v-if="isSessionWaitingForVolunteer">
+              Cancel
+            </span>
+            <span v-else-if="isSessionOver">
               Finish
             </span>
             <span v-else>
@@ -91,8 +92,7 @@ export default {
         picture = StudentAvatarUrl;
       }
       return {
-        backgroundImage: `url(${picture})`,
-        marginLeft: this.isMobile() ? "50px" : "0"
+        backgroundImage: `url(${picture})`
       };
     }
   },
@@ -237,6 +237,7 @@ h1 {
   border-radius: 18px;
   background-image: url("~@/assets/defaultAvatar@2x.png");
   background-size: cover;
+  flex-shrink: 0;
 }
 
 .info {
