@@ -168,7 +168,7 @@ export default {
   font-size: 36px;
   line-height: 42px;
   font-weight: 400;
-  z-index: 10;
+  z-index: 1;
   color: white;
 }
 
