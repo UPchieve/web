@@ -7,7 +7,7 @@
     <div class="dashboard-body row">
       <div class="col-lg-6 video">
         <p>
-          <strong>New to UPchieve?</strong>Watch the video to learn how to use
+          <strong>New to UPchieve? </strong>Watch the video to learn how to use
           our services.
         </p>
         <div class="video">
