@@ -180,7 +180,7 @@ export default {
       currentSession: SessionService.currentSession,
       showColors: "hidden",
       canvasHeight: null,
-      panEnabled: false
+      panEnabled: true
     };
   },
   computed: {
@@ -531,15 +531,15 @@ export default {
     drawSetup() {
       // Toggle between pan & draw on mobile
       // @todo: clean this up (UI + code structure of toggle)
-      if (this.mobileMode) {
-        if (this.panEnabled) {
-          document.getElementById("whiteboard").style.overflow = "hidden";
-          this.panEnabled = !this.panEnabled;
-        } else {
-          document.getElementById("whiteboard").style.overflow = "scroll";
-          this.panEnabled = !this.panEnabled;
-        }
-      }
+      // if (this.mobileMode) {
+      //   if (this.panEnabled) {
+      //     document.getElementById("whiteboard").style.overflow = "hidden";
+      //     this.panEnabled = !this.panEnabled;
+      //   } else {
+      //     document.getElementById("whiteboard").style.overflow = "scroll";
+      //     this.panEnabled = !this.panEnabled;
+      //   }
+      // }
 
       App.ctx.strokeStyle = LOCAL_LINE_COLOR;
       this.emitChangeColor(LOCAL_LINE_COLOR);
