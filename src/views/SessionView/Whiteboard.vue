@@ -91,6 +91,8 @@
  * @todo {1} Solve this bug ('handleUndoOperation' is not defined)
  */
 
+import { mapGetters } from "vuex";
+
 import SessionService from "@/services/SessionService";
 import UserService from "@/services/UserService";
 import EraserIconUrl from "@/assets/eraser_icon_01_dark.png";
@@ -180,6 +182,9 @@ export default {
       canvasHeight: null,
       panEnabled: true
     };
+  },
+  computed: {
+    ...mapGetters({ mobileMode: "app/mobileMode" })
   },
   mounted() {
     const canvas = document.getElementById("whiteboardCanvas");
