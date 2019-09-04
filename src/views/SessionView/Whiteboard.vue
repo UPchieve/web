@@ -180,7 +180,7 @@ export default {
       currentSession: SessionService.currentSession,
       showColors: "hidden",
       canvasHeight: null,
-      panEnabled: true
+      panEnabled: false
     };
   },
   computed: {
