@@ -16,6 +16,39 @@
       </transition>
 
       <div class="messages">
+        <div v-if="!user.isVolunteer" class="waiting-cards">
+          <div class="waiting-cards__card" style="background: #16D2AA">
+            <img src="@/assets/Light.png" />
+            <h1 style="float: right; width: calc(100% - 48px)">
+              We’re looking for a coach for you...
+            </h1>
+            <p>
+              Thanks for requesting help with UPchieve! We’re looking for a
+              coach to pair with you now. This process typically takes 5-10
+              minutes.
+            </p>
+          </div>
+          <div class="waiting-cards__card" style="background: #1855D1">
+            <h1>While you wait...</h1>
+            <p>
+              While you’re waiting, you can write any problems you’re working on
+              on the whiteboard. (Click on the pencil icon in the upper right
+              corner of the screen to start.)
+            </p>
+          </div>
+          <div class="waiting-cards__card" style="background: #FF8C5F">
+            <h1>A couple of reminders:</h1>
+            <p>
+              1. Practice online safety! Don’t share personal information like
+              your phone number or email.
+            </p>
+            <p>
+              2. Click "End session" when you’re done, and make sure to fill out
+              the short feedback form that follows!
+            </p>
+          </div>
+        </div>
+
         <template v-for="(message, index) in messages">
           <div
             :key="`message-${index}`"
@@ -24,13 +57,10 @@
           >
             <div class="avatar" :style="message.avatarStyle" />
             <div class="contents">
-              <div class="name">
-                {{ message.name }}
-              </div>
               <span>{{ message.contents }}</span>
-              <div class="time">
-                {{ message.time }}
-              </div>
+            </div>
+            <div class="time">
+              {{ message.time }}
             </div>
           </div>
         </template>
@@ -43,6 +73,7 @@
     </div>
 
     <textarea
+      class="message-textarea"
       @keydown.enter.prevent
       @keyup="handleMessage"
       v-model="newMessage"
@@ -80,7 +111,6 @@ export default {
       typingIndicatorShown: false
     };
   },
-
   methods: {
     showModerationWarning() {
       this.chatWarningIsShown = true;
@@ -221,25 +251,27 @@ export default {
 .chat {
   height: 100%;
   position: relative;
+  background: #fff;
 }
 
 .header {
-  height: 40px;
-  background-color: #1855d1;
-  color: #fff;
-  font-size: 12px;
-  font-weight: 600;
+  height: 60px;
+  padding: 18px;
+  font-family: "Work Sans", sans-serif;
+  font-size: 18px;
+  font-weight: 500;
   text-align: left;
-  padding: 13px;
   position: absolute;
+  color: white;
   width: 100%;
+  background: #1855d1;
 }
 
 .message-box {
-  height: calc(100% - 40px);
+  height: calc(100% - 60px);
   padding-bottom: 100px;
   overflow: hidden;
-  top: 40px;
+  top: 60px;
   position: relative;
 }
 
@@ -285,21 +317,26 @@ export default {
 
 .message {
   position: relative;
-  padding: 10px;
+  padding: 24px;
   display: flex;
   justify-content: flex-start;
-  background: #fff;
-  width: 100%;
+  // width: 100%;
 
   /* Safari needs this specified to lay out the message divs properly. */
   flex-shrink: 0;
 }
 
+span {
+  font-size: 16px;
+}
+
 .avatar {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   background-size: cover;
   margin-top: 5px;
+  border-radius: 16px;
+  margin-right: 12px;
 }
 
 .name {
@@ -307,17 +344,22 @@ export default {
 }
 
 .time {
-  font-size: 12px;
-  font-weight: 300;
+  font-size: 14px;
+  font-weight: 500;
   color: #73737a;
+  position: absolute;
+  bottom: 0;
 }
 
 .contents {
   text-align: left;
   position: relative;
-  width: 200px;
+  padding: 12px;
   overflow-wrap: break-word;
   font-size: 16px;
+  background: #f1f3f6;
+  border-radius: 8px;
+  max-width: 80%;
 }
 
 .typing-indicator {
@@ -335,7 +377,7 @@ export default {
   opacity: 0;
 }
 
-textarea {
+.message-textarea {
   width: 100%;
   height: 100px;
   border: none;
@@ -343,30 +385,104 @@ textarea {
   left: 0;
   bottom: 0;
   border-top: 1px solid #979797;
-  padding: 10px 12px;
+  padding: 16px;
 }
 
 .left {
   float: left;
+  .contents {
+    text-align: left;
+    padding-left: 10px;
+  }
+  .time {
+    margin-left: 44px;
+  }
 }
 
 .right {
   float: right;
   display: flex;
   flex-direction: row-reverse;
+  .contents {
+    text-align: right;
+    padding-right: 10px;
+    background-color: #16d2aa;
+    span {
+      color: white;
+    }
+  }
+  .avatar {
+    display: none;
+  }
 }
-
-.right .contents {
-  text-align: right;
-  padding-right: 10px;
-}
-
-.left .contents {
-  text-align: left;
-  padding-left: 10px;
-}
-
 .message-content {
   width: 200px;
+}
+
+.waiting-cards {
+  padding: 20px;
+
+  &__card {
+    border-radius: 8px;
+    text-align: left;
+    padding: 16px;
+    margin-bottom: 16px;
+    font-size: 14px;
+
+    h1 {
+      font-size: 20px;
+      line-height: 125%;
+      margin-bottom: 16px;
+      margin-top: 0;
+      color: white;
+    }
+
+    img {
+      width: 32px;
+      height: 48px;
+      float: left;
+    }
+
+    p {
+      color: white;
+      line-height: 150%;
+    }
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .whiteboard {
+    border-radius: 0;
+  }
+
+  .header {
+    display: none !important;
+  }
+
+  .message-box {
+    height: 100%;
+    padding-bottom: 60px;
+    overflow: hidden;
+    top: 0;
+    position: relative;
+  }
+
+  .message-textarea {
+    width: calc(100% - 100px);
+    height: 40px;
+    border: none;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    border: 1px solid #d6e0ef;
+    border-radius: 20px;
+    margin: 10px 20px;
+    padding: 10px 16px;
+    resize: none;
+  }
+
+  .whiteboardButton {
+    display: block;
+  }
 }
 </style>

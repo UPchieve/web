@@ -5,11 +5,7 @@
         <div :style="partnerAvatar" class="avatar" />
         <div class="info">
           <template v-if="isSessionWaitingForVolunteer">
-            <span
-              >We are contacting our Academic Coaches for you right now - please
-              hang tight while we try to connect you! This process can take 5-10
-              minutes.</span
-            >
+            <span>Contacting coaches...</span>
           </template>
           <template v-else-if="isSessionInProgress">
             <span class="volunteer-name">{{ sessionPartner.firstname }}</span>
@@ -33,7 +29,10 @@
       <div class="button-container">
         <div class="end-session">
           <button class="btn btn-lg btn-block" @click.prevent="end">
-            <span v-if="!isSessionAlive">
+            <span v-if="isSessionWaitingForVolunteer">
+              Cancel
+            </span>
+            <span v-else-if="isSessionOver">
               Finish
             </span>
             <span v-else>
@@ -237,10 +236,12 @@ h1 {
 }
 
 .avatar {
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
   background-image: url("~@/assets/defaultAvatar@2x.png");
   background-size: cover;
+  flex-shrink: 0;
 }
 
 .info {
@@ -253,6 +254,8 @@ h1 {
 
 .volunteer-name {
   font-weight: 700;
+  font-size: 18px;
+  font-weight: normal;
 }
 
 .btn {
@@ -261,7 +264,7 @@ h1 {
   color: #fff;
   border: none;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500;
   background-color: inherit;
 }
 
@@ -315,6 +318,10 @@ h1 {
 @media screen and (max-width: 700px) {
   .info {
     width: auto !important;
+  }
+  .session-header {
+    border-radius: 0px 0px 20px 20px;
+    height: 80px;
   }
 }
 </style>
