@@ -1,7 +1,11 @@
 <template>
   <div class="chat">
     <vue-headful
-      :title="typingIndicatorShown ? `${sessionPartner.firstname} is typing...` : 'UPchieve'"
+      :title="
+        typingIndicatorShown
+          ? `${sessionPartner.firstname} is typing...`
+          : 'UPchieve'
+      "
     />
     <div class="header">Chat</div>
 
@@ -31,8 +35,8 @@
           <div class="waiting-cards__card" style="background: #1855D1">
             <h1>While you wait...</h1>
             <p>
-              While you’re waiting, you can write out any problems you’re working on
-              in the chat or on the whiteboard.
+              While you’re waiting, you can write out any problems you’re
+              working on in the chat or on the whiteboard.
             </p>
           </div>
           <div class="waiting-cards__card" style="background: #FF8C5F">
