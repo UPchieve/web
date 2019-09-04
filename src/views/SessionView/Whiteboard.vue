@@ -75,7 +75,7 @@
           id="drawButton"
           class="whiteboardBtn"
           @click="drawSetup"
-          :style="drawButtonStyle()"
+          :style="drawButtonStyle"
         />
         <button id="eraseButton" class="whiteboardBtn" @click="erase" />
         <button id="undoButton" class="whiteboardBtn" @click="undo" />
@@ -184,7 +184,20 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ mobileMode: "app/mobileMode" })
+    ...mapGetters({ mobileMode: "app/mobileMode" }),
+
+    drawButtonStyle() {
+      // Mobile specific drawn/pan indicator
+      if (!this.mobileMode) {
+        return;
+      }
+
+      if (!this.panEnabled) {
+        return {
+          backgroundColor: "#fff"
+        };
+      }
+    }
   },
   mounted() {
     const canvas = document.getElementById("whiteboardCanvas");
@@ -214,17 +227,6 @@ export default {
         App.canvas.height
       );
       App.ctx.putImageData(savedImage, 0, 0);
-    },
-    drawButtonStyle() {
-      // Mobile specific drawn/pan indicator
-      if (!this.mobileMode) {
-        return;
-      }
-      if (!this.panEnabled) {
-        return {
-          backgroundColor: "#fff"
-        };
-      }
     },
     // Socket emits
     emitCanvasLoaded() {
