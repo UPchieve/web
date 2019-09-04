@@ -3,21 +3,46 @@
     <div class="session-header-container">
       <session-header @try-clicked="tryClicked" />
     </div>
-    <div v-if="currentSession.sessionId" class="session-contents-container">
-      <div class="col-sm-8 whiteboard-container" id="whiteboard-container">
+    <div
+      v-if="currentSession.sessionId"
+      class="session-contents-container"
+      v-bind:class="{
+        'session-contents-container--mobile': mobileMode
+      }"
+    >
+      <div
+        class="col-sm-8 whiteboard-container"
+        id="whiteboard-container"
+        v-bind:class="{
+          'whiteboard-container--hidden': shouldHideWhiteboardSection
+        }"
+      >
         <whiteboard />
       </div>
-      <div class="col-sm-4 chat-container" id="chat-container">
+      <div
+        class="col-sm-4 chat-container"
+        id="chat-container"
+        v-bind:class="{
+          'chat-container--hidden': shouldHideChatSection
+        }"
+      >
         <session-chat />
       </div>
     </div>
-    <div class="toggleButton" id="toggleButton" @click="toggleWhiteboard">
+    <div
+      v-if="mobileMode"
+      class="toggleButton"
+      id="toggleButton"
+      @click="toggleWhiteboard"
+    >
       <img id="toggleIcon" :src="getIconUrl()" />
     </div>
   </div>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 import SessionService from "@/services/SessionService";
 import UserService from "@/services/UserService";
 
@@ -32,6 +57,13 @@ export default {
     Whiteboard,
     SessionChat
   },
+  created() {
+    if (this.mobileMode) {
+      this.$store.dispatch("app/hideNavigation");
+    }
+
+    window.addEventListener("resize", this.handleResize);
+  },
   /*
    * @notes
    * [1] Refactoring candidate: it'd be awesome if Dashboard could pass
@@ -44,6 +76,26 @@ export default {
       icon: "Pencil.png",
       sessionReconnecting: false
     };
+  },
+  computed: {
+    ...mapGetters({ mobileMode: "app/mobileMode" }),
+
+    shouldHideWhiteboardSection() {
+      // Never hide chat section on desktop
+      if (!this.mobileMode) {
+        return false;
+      }
+
+      return !this.whiteboardOpen;
+    },
+    shouldHideChatSection() {
+      // Never hide chat section on desktop
+      if (!this.mobileMode) {
+        return false;
+      }
+
+      return this.whiteboardOpen;
+    },
   },
   mounted() {
     const id = this.$route.params.sessionId;
@@ -93,26 +145,23 @@ export default {
       }
     }
   },
-  computed: {
-    partnerName() {
-      const partner = SessionService.getPartner();
-      return partner && partner.firstname;
-    }
-  },
   methods: {
+    handleResize() {
+      if (this.mobileMode) {
+        this.$store.dispatch("app/hideNavigation");
+      } else {
+        this.$store.dispatch("app/showNavigation");
+      }
+    },
     getIconUrl() {
       return require("@/assets/" + this.icon);
     },
     toggleWhiteboard() {
       if (!this.whiteboardOpen) {
-        document.getElementById("whiteboard-container").style.display = "block";
-        document.getElementById("chat-container").style.display = "none";
         document.getElementById("toggleButton").classList.add("back");
         this.icon = "Chat.png";
         this.whiteboardOpen = true;
       } else {
-        document.getElementById("whiteboard-container").style.display = "none";
-        document.getElementById("chat-container").style.display = "block";
         document.getElementById("toggleButton").classList.remove("back");
         this.icon = "Pencil.png";
         this.whiteboardOpen = false;
@@ -144,13 +193,46 @@ export default {
 
 .session-header-container {
   position: absolute;
+  z-index: 3;
+  top: 0;
   left: 0;
   width: 100%;
+  background: #fff;
 }
 
 .session-contents-container {
   height: 100%;
   padding-top: 100px;
+
+  &--mobile {
+    padding-top: 80px;
+
+    .whiteboard-container,
+    .chat-container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: calc(100vh - 80px);
+      z-index: 2;
+    }
+
+    .whiteboard-container {
+      border: 0;
+
+      // Hide with z-index (not display: none) so canvas is accessible in DOM
+      &--hidden {
+        z-index: 0;
+      }
+    }
+
+    .chat-container {
+      // Hide with z-index (not display: none) so canvas is accessible in DOM
+      &--hidden {
+        z-index: 0;
+      }
+    }
+  }
 }
 
 .whiteboard-container {
@@ -161,8 +243,8 @@ export default {
 }
 
 .toggleButton {
-  display: none;
   position: absolute;
+  z-index: 3;
   bottom: 10px;
   right: 20px;
   border-radius: 20px;
@@ -185,25 +267,5 @@ export default {
 .chat-container {
   height: 100%;
   padding: 0;
-}
-
-@media screen and (max-width: 700px) {
-  .session-contents-container {
-    height: 100%;
-    padding-top: 80px;
-  }
-  .whiteboard-container {
-    width: 100%;
-    height: calc(100vh-80px);
-    border: 0;
-    display: none;
-  }
-  .toggleButton {
-    display: block;
-  }
-  .chat-container {
-    width: 100%;
-    height: calc(100vh-80px);
-  }
 }
 </style>
