@@ -69,7 +69,7 @@ export default {
   data() {
     let error;
     if (this.$route.query["401"] === "true") {
-      error = "Your session has expired. Please login again";
+      error = "Your session has expired. Please log in again";
     }
     return {
       credentials: {
