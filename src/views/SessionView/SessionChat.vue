@@ -23,8 +23,8 @@
         <div v-if="!user.isVolunteer" class="waiting-cards">
           <div class="waiting-cards__card">
             <p>
-              We’re searching for a coach to pair with you now.
-              This process sometimes takes 5 to 10 minutes.
+              We’re searching for a coach to pair with you now. This process
+              sometimes takes 5 to 10 minutes.
             </p>
           </div>
           <div class="waiting-cards__card">
