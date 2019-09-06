@@ -21,33 +21,16 @@
 
       <div class="messages">
         <div v-if="!user.isVolunteer" class="waiting-cards">
-          <div class="waiting-cards__card" style="background: #16D2AA">
-            <img src="@/assets/Light.png" />
-            <h1 style="float: right; width: calc(100% - 48px)">
-              We’re looking for a coach for you...
-            </h1>
+          <div class="waiting-cards__card">
             <p>
-              Thanks for requesting help with UPchieve! We’re looking for a
-              coach to pair with you now. This process typically takes 5-10
-              minutes.
+              We’re searching for a coach to pair with you now.
+              This process sometimes takes 5 to 10 minutes.
             </p>
           </div>
-          <div class="waiting-cards__card" style="background: #1855D1">
-            <h1>While you wait...</h1>
+          <div class="waiting-cards__card">
             <p>
               While you’re waiting, you can write out any problems you’re
-              working on in the chat or on the whiteboard.
-            </p>
-          </div>
-          <div class="waiting-cards__card" style="background: #FF8C5F">
-            <h1>A couple of reminders:</h1>
-            <p>
-              1. Practice online safety! Don’t share personal information like
-              your phone number or email.
-            </p>
-            <p>
-              2. Click "End session" when you’re done, and make sure to fill out
-              the short feedback form that follows!
+              working on using the whiteboard or chat.
             </p>
           </div>
         </div>
@@ -431,7 +414,9 @@ span {
     text-align: left;
     padding: 16px;
     margin-bottom: 16px;
-    font-size: 14px;
+    font-size: 16px;
+    font-weight: 500;
+    background-color: #68d3ab;
 
     h1 {
       font-size: 20px;
@@ -441,15 +426,13 @@ span {
       color: white;
     }
 
-    img {
-      width: 32px;
-      height: 48px;
-      float: left;
-    }
-
     p {
       color: white;
       line-height: 150%;
+
+      &:last-of-type {
+        margin-bottom: 0;
+      }
     }
   }
 }
