@@ -16,16 +16,10 @@
       class="whiteboardTools row"
       style="background-color:rgba(238,238,238,1)"
     >
-      <div
-        v-if="mobileMode"
-        class="mobile-whiteboard-notice"
-      >
+      <div v-if="mobileMode" class="mobile-whiteboard-notice">
         Whiteboard drawing is not supported on this device.
       </div>
-      <div
-        v-else
-        class="toolset col-md-6"
-      >
+      <div v-else class="toolset col-md-6">
         <button id="clearButton" class="whiteboardBtn" @click="clear" />
         <div class="colorWrapper">
           <button
