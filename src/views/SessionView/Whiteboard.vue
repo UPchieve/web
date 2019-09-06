@@ -16,7 +16,16 @@
       class="whiteboardTools row"
       style="background-color:rgba(238,238,238,1)"
     >
-      <div class="toolset col-md-6">
+      <div
+        v-if="mobileMode"
+        class="mobile-whiteboard-notice"
+      >
+        Whiteboard drawing is not supported on this device.
+      </div>
+      <div
+        v-else
+        class="toolset col-md-6"
+      >
         <button id="clearButton" class="whiteboardBtn" @click="clear" />
         <div class="colorWrapper">
           <button
@@ -835,6 +844,10 @@ canvas {
   border-radius: 8px;
   left: 50%;
   transform: translate(-50%, 0);
+
+  .mobile-whiteboard-notice {
+    margin: auto;
+  }
 }
 
 .header {
