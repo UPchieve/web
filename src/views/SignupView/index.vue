@@ -48,7 +48,7 @@ export default {
   },
   data() {
     return {
-      userSelection: null
+      userSelection: this.$route.params.highschoolId ? 'student' : null
     };
   },
   methods: {

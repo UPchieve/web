@@ -48,7 +48,7 @@ const routes = [
   { path: "/legal", name: "LegalView", component: LegalView },
   { path: "/login", name: "LoginView", component: LoginView },
   { path: "/logout", name: "LogoutView", component: LogoutView },
-  { path: "/signup", name: "SignupView", component: SignupView },
+  { path: "/signup/:highschoolId?", name: "SignupView", component: SignupView },
   {
     path: "/resetpassword",
     name: "ResetPasswordView",

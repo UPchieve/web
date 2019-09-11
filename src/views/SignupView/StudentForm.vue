@@ -327,6 +327,31 @@ export default {
       step: "step-1"
     };
   },
+  created () {
+    // bypass school search step if school's UPchieve ID provided in URL
+    const schoolUpchieveId = this.$route.params.highschoolId;
+    if (schoolUpchieveId) {
+      NetworkService.searchSchool(this, { query: schoolUpchieveId })
+        .then(res => {
+          if (res.body && res.body.results &&
+            res.body.results.isApproved) {
+            const school = res.body.results;
+            
+            // school matches UPchieve ID
+            this.eligibility.highSchool = school;
+            this.step = 'step-2';
+          } else {
+            // no school matches
+            this.eligibility.noSchoolResults = true;
+            this.eligibility.highSchool = {};
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          this.eligibility.highSchool = {};
+        })
+    }
+  },
   methods: {
     secondPage() {
       // reset error msg from server
