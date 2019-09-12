@@ -72,40 +72,17 @@ export default {
         } else {
           const { subTopic } = currentSession;
 
-          if (subTopic === "algebra") {
-            if (this.user.algebra.passed) {
-              results.push(currentSession);
-            }
-          }
-
-          if (subTopic === "geometry") {
-            if (this.user.geometry.passed) {
-              results.push(currentSession);
-            }
-          }
-
-          if (subTopic === "trigonometry") {
-            if (this.user.trigonometry.passed) {
-              results.push(currentSession);
-            }
-          }
-
-          if (subTopic === "esl") {
-            if (this.user.esl.passed) {
-              results.push(currentSession);
-            }
-          }
-
-          if (subTopic === "precalculus") {
-            if (this.user.precalculus.passed) {
-              results.push(currentSession);
-            }
-          }
-
-          if (subTopic === "calculus") {
-            if (this.user.calculus.passed) {
-              results.push(currentSession);
-            }
+          if (
+            [
+              "algebra",
+              "geometry",
+              "trigonometry",
+              "esl",
+              "precalculus",
+              "calculus"
+            ].some(s => s === subTopic && this.user.certifications[s].passed)
+          ) {
+            results.push(currentSession);
           }
         }
       }

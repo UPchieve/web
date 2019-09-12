@@ -163,8 +163,8 @@ export default {
       quizName = category.charAt(0).toUpperCase() + category.slice(1);
     }
     let tries = 0;
-    if (user[category]) {
-      ({ tries } = user[category]); // {1}
+    if (user.certifications[category]) {
+      ({ tries } = user.certifications[category]); // {1}
     }
     return {
       user,

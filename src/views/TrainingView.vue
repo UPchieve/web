@@ -142,22 +142,22 @@ export default {
       this.bools[supercategory] = !bool;
     },
     hasPassed(category) {
-      if (this.user[category]) {
-        return this.user[category].passed;
+      if (this.user.certifications[category]) {
+        return this.user.certifications[category].passed;
       }
 
       return false;
     },
     hasTries(category) {
-      if (this.user[category]) {
-        return this.user[category].tries < 3;
+      if (this.user.certifications[category]) {
+        return this.user.certifications[category].tries < 3;
       }
 
       return true;
     },
     getTries(category) {
-      if (this.user[category]) {
-        return this.user[category].tries;
+      if (this.user.certifications[category]) {
+        return this.user.certifications[category].tries;
       }
 
       return 0;
