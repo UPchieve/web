@@ -903,6 +903,10 @@ canvas {
 
 #clearButton {
   background-image: url("~@/assets/clear_icon.svg");
+  padding: 13px;
+  margin: 10px;
+  width: 0;
+  height: 0;
 }
 
 #openColorsButton {
