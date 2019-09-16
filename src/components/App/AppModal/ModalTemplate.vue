@@ -14,7 +14,7 @@
         <div class="ModalTemplate-seperator" />
         <div class="ModalTemplate-buttons">
           <large-button @click.native="handleCancel">Cancel</large-button>
-          <large-button primary @click.native="$emit('accept')">{{
+          <large-button primary @click.native="$emit('accept')" :disabled="!enableAccept">{{
             acceptText
           }}</large-button>
         </div>
@@ -35,6 +35,7 @@ export default {
   props: {
     acceptText: { type: String, default: "Accept" },
     backText: { type: String, default: "Back" },
+    enableAccept: Boolean,
     important: Boolean
   },
   computed: {
