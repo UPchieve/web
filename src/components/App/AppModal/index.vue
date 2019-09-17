@@ -28,7 +28,7 @@ export default {
   data() {
     return {
       enableAccept: false
-    }
+    };
   },
   computed: {
     ...mapState({
@@ -46,7 +46,7 @@ export default {
       if (child.onAccept) child.onAccept();
     },
     onEnableAccept(value) {
-      this.enableAccept = value
+      this.enableAccept = value;
     }
   }
 };
