@@ -50,6 +50,10 @@ import SessionHeader from "./SessionHeader";
 import Whiteboard from "./Whiteboard";
 import SessionChat from "./SessionChat";
 
+const headerData = {
+  component: "SessionHeader"
+};
+
 export default {
   name: "session-view",
   components: {
@@ -61,8 +65,8 @@ export default {
     if (this.mobileMode) {
       this.$store.dispatch("app/hideNavigation");
     } else {
-      this.$store.dispatch("app/showHeader");
-      this.$store.dispatch("app/hideSidebar");
+      this.$store.dispatch("app/header/show", headerData);
+      this.$store.dispatch("app/sidebar/hide");
     }
 
     window.addEventListener("resize", this.handleResize);
@@ -153,8 +157,8 @@ export default {
       if (this.mobileMode) {
         this.$store.dispatch("app/hideNavigation");
       } else {
-        this.$store.dispatch("app/showHeader");
-        this.$store.dispatch("app/hideSidebar");
+        this.$store.dispatch("app/header/show", headerData);
+        this.$store.dispatch("app/sidebar/hide");
       }
     },
     getIconUrl() {
