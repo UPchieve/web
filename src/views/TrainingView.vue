@@ -1,7 +1,7 @@
 <template>
   <div v-if="user.isVolunteer" class="training">
-    <h1 class="header">Volunteer Training</h1>
     <div class="body-container">
+      <h1 class="body-header">Volunteer Training</h1>
       <div v-for="supercategory in supercategories" :key="supercategory">
         <div
           v-if="supercategory !== 'esl'"
@@ -167,13 +167,35 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-a {
-  color: inherit;
-  text-decoration: none;
+.body-container {
+  max-width: 800px;
+  border-radius: 8px;
+  background: #fff;
+  padding: 40px 15px 80px;
+
+  @include breakpoint-above("medium") {
+    padding: 40px 40px 80px;
+  }
+
+  .body-header {
+    font-size: 24px;
+    font-weight: 500;
+    text-align: left;
+    margin: 0 0 35px 0;
+  }
 }
 
 .training {
-  color: #73737a;
+  padding: 10px;
+
+  @include breakpoint-above("medium") {
+    padding: 40px;
+  }
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
 .supercategory,
@@ -294,36 +316,12 @@ a {
   background-image: url("~@/assets/right_arrow.png");
 }
 
-.header {
-  display: flex;
-  padding: 30px;
-  margin: 0px;
-  font-size: 24px;
-  border-bottom: 0.5px solid #cccccf;
-  align-items: center;
-  justify-content: space-between;
-  font-weight: 600;
-  color: #343440;
-}
-
-.body-container {
-  margin: 0 0 30px 30px;
-}
-
 .certified {
   color: #16d2aa;
   font-weight: 600;
 }
 
 @media screen and (max-width: 700px) {
-  .header {
-    padding: 1em 1em 1em 3em !important;
-  }
-
-  .body-container {
-    margin: 1.5em !important;
-  }
-
   .supercategory,
   .category {
     width: auto !important;
