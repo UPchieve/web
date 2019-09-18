@@ -30,6 +30,20 @@ export default {
       dispatch("sidebar/hide");
     },
 
+    showHeader: ({ dispatch }) => {
+      dispatch("header/show");
+    },
+    hideHeader: ({ dispatch }) => {
+      dispatch("header/hide");
+    },
+
+    showSidebar: ({ dispatch }) => {
+      dispatch("sidebar/show");
+    },
+    hideSidebar: ({ dispatch }) => {
+      dispatch("sidebar/hide");
+    },
+
     windowResize: ({ commit }, { width, height }) => {
       commit("setWindowWidth", width);
       commit("setWindowHeight", height);
