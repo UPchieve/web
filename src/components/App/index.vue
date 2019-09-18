@@ -49,6 +49,9 @@ export default {
     // Fetch user data
     this.$store.dispatch("user/fetch", this);
   },
+  beforeUpdate() {
+    this.$store.dispatch("user/fetch", this);
+  },
   beforeDestroy() {
     window.removeEventListener("resize", this.handleResize);
   },
