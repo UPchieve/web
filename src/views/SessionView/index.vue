@@ -11,7 +11,7 @@
       }"
     >
       <div
-        class="col-sm-8 whiteboard-container"
+        class="whiteboard-container"
         id="whiteboard-container"
         v-bind:class="{
           'whiteboard-container--hidden': shouldHideWhiteboardSection
@@ -20,7 +20,7 @@
         <whiteboard />
       </div>
       <div
-        class="col-sm-4 chat-container"
+        class="chat-container"
         id="chat-container"
         v-bind:class="{
           'chat-container--hidden': shouldHideChatSection
@@ -50,6 +50,10 @@ import SessionHeader from "./SessionHeader";
 import Whiteboard from "./Whiteboard";
 import SessionChat from "./SessionChat";
 
+const headerData = {
+  component: "SessionHeader"
+};
+
 export default {
   name: "session-view",
   components: {
@@ -60,6 +64,9 @@ export default {
   created() {
     if (this.mobileMode) {
       this.$store.dispatch("app/hideNavigation");
+    } else {
+      this.$store.dispatch("app/header/show", headerData);
+      this.$store.dispatch("app/sidebar/hide");
     }
 
     window.addEventListener("resize", this.handleResize);
@@ -150,7 +157,8 @@ export default {
       if (this.mobileMode) {
         this.$store.dispatch("app/hideNavigation");
       } else {
-        this.$store.dispatch("app/showNavigation");
+        this.$store.dispatch("app/header/show", headerData);
+        this.$store.dispatch("app/sidebar/hide");
       }
     },
     getIconUrl() {
@@ -198,48 +206,86 @@ export default {
   left: 0;
   width: 100%;
   background: #fff;
+
+  @include breakpoint-above("medium") {
+    top: 20px;
+    left: unset;
+    right: 20px;
+    width: 400px;
+    height: 70px;
+    background: #fff;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    overflow: hidden;
+  }
 }
 
 .session-contents-container {
   height: 100%;
   padding-top: 100px;
+  display: flex;
+  background: $c-background-grey;
 
-  &--mobile {
+  @include breakpoint-above("medium") {
+    padding: 20px;
+    @include child-spacing(right, 15px);
+  }
+
+  @include breakpoint-below("medium") {
     padding-top: 80px;
+  }
+}
 
-    .whiteboard-container,
-    .chat-container {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: calc(100vh - 80px);
-      z-index: 2;
-    }
+.whiteboard-container,
+.chat-container {
+  @include breakpoint-above("medium") {
+    height: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+  }
 
-    .whiteboard-container {
-      border: 0;
-
-      // Hide with z-index (not display: none) so canvas is accessible in DOM
-      &--hidden {
-        z-index: 0;
-      }
-    }
-
-    .chat-container {
-      // Hide with z-index (not display: none) so canvas is accessible in DOM
-      &--hidden {
-        z-index: 0;
-      }
-    }
+  @include breakpoint-below("medium") {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 80px);
+    z-index: 2;
   }
 }
 
 .whiteboard-container {
-  height: 100%;
   padding: 0;
-  border: 25px solid #e5e5e5;
-  background: #e5e5e5;
+  flex-grow: 1;
+  overflow: hidden;
+
+  // Hide with z-index (not display: none) so canvas is accessible in DOM
+  &--hidden {
+    z-index: 0;
+  }
+
+  @include breakpoint-below("medium") {
+    background: #fff;
+  }
+}
+
+.chat-container {
+  padding: 0;
+
+  &--hidden {
+    // Hide with z-index (not display: none) so canvas is accessible in DOM
+    z-index: 0;
+  }
+
+  @include breakpoint-above("medium") {
+    min-width: 400px;
+    flex-basis: 400px;
+    position: relative;
+  }
+
+  @include breakpoint-below("medium") {
+    max-width: 100%;
+  }
 }
 
 .toggleButton {
@@ -262,10 +308,5 @@ export default {
 
 .toggleButton.back {
   bottom: calc(100vh - 140px);
-}
-
-.chat-container {
-  height: 100%;
-  padding: 0;
 }
 </style>

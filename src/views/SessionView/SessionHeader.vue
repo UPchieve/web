@@ -216,16 +216,25 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.session-header-wrapper {
+  height: 100%;
+}
+
 .session-header {
   position: relative;
-  height: 100px;
-  background-color: #64e1c6;
-  padding: 20px;
+  height: 100%;
+  background-color: $c-success-green;
+  padding: 0 20px;
   text-align: left;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+
+  @include breakpoint-below("medium") {
+    border-radius: 0px 0px 20px 20px;
+    height: 80px;
+  }
 }
 
 h1 {
@@ -253,9 +262,8 @@ h1 {
 }
 
 .volunteer-name {
-  font-weight: 700;
+  font-weight: 500;
   font-size: 18px;
-  font-weight: normal;
 }
 
 .btn {
@@ -313,15 +321,5 @@ h1 {
 .avatar-info-container {
   display: flex;
   align-items: center;
-}
-
-@media screen and (max-width: 700px) {
-  .info {
-    width: auto !important;
-  }
-  .session-header {
-    border-radius: 0px 0px 20px 20px;
-    height: 80px;
-  }
 }
 </style>
