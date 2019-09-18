@@ -10,8 +10,8 @@
         v-touch:start="drawStart"
         v-touch:end="drawEnd"
         v-touch:moving="draw"
-        width="2000"
-        height="1500"
+        width="1600"
+        height="1200"
       />
     </div>
     <div
