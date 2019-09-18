@@ -73,8 +73,20 @@
 
     <!-- Fix for bug in Chrome where the first two fields are parsed as a username and password
      even if the HTML5 autocomplete attributes are set to the right values -->
-    <input type="text" class="d-none" id="username" v-model="credentials.email" autocomplete="username" />
-    <input type="password" class="d-none" id="password" v-model="credentials.password" autocomplete="new-password" />
+    <input
+      type="text"
+      class="d-none"
+      id="username"
+      v-model="credentials.email"
+      autocomplete="username"
+    />
+    <input
+      type="password"
+      class="d-none"
+      id="password"
+      v-model="credentials.password"
+      autocomplete="new-password"
+    />
 
     <div class="uc-column">
       <label for="firstName" class="uc-form-label">First Name</label>
@@ -339,6 +351,6 @@ export default {
 }
 
 .d-none {
-  display: none !important
+  display: none !important;
 }
 </style>

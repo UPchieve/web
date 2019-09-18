@@ -175,9 +175,21 @@
   >
     <!-- Fix for bug in Chrome where the username and password are mapped to non-login fields
      even if the HTML5 autocomplete attributes are set to the right values -->
-    <input type="text" class="d-none" id="username" v-model="credentials.email" autocomplete="username" />
-    <input type="password" class="d-none" id="password" v-model="credentials.password" autocomplete="new-password" />
-  
+    <input
+      type="text"
+      class="d-none"
+      id="username"
+      v-model="credentials.email"
+      autocomplete="username"
+    />
+    <input
+      type="password"
+      class="d-none"
+      id="password"
+      v-model="credentials.password"
+      autocomplete="new-password"
+    />
+
     <div v-if="errors.length" class="step-errors">
       <h5>Please correct the following problems:</h5>
       <ul>
@@ -549,6 +561,6 @@ export default {
 }
 
 .d-none {
-  display: none !important
+  display: none !important;
 }
 </style>
