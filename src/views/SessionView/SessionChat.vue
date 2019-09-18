@@ -385,9 +385,9 @@ span {
   flex-direction: row-reverse;
   .contents {
     padding-right: 10px;
-    background-color: #16d2aa;
+    background-color: $c-background-blue;
     span {
-      color: white;
+      color: $c-soft-black;
     }
   }
   .avatar {
