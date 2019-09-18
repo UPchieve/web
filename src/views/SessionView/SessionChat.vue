@@ -7,7 +7,7 @@
           : 'UPchieve'
       "
     />
-    
+
     <div class="message-box">
       <transition name="chat-warning--slide">
         <div class="chat-warning" v-show="chatWarningIsShown">
@@ -28,8 +28,8 @@
           </div>
           <div class="waiting-cards__card">
             <p>
-              While you wait, write out the problem you’re
-              working on using the whiteboard or chat.
+              While you wait, write out the problem you’re working on using the
+              whiteboard or chat.
             </p>
           </div>
         </div>

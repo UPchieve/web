@@ -153,7 +153,7 @@ export default {
       if (this.mobileMode) {
         this.$store.dispatch("app/hideNavigation");
       } else {
-        this.$store.dispatch("app/showHeader");        
+        this.$store.dispatch("app/showHeader");
         this.$store.dispatch("app/hideSidebar");
       }
     },
@@ -254,7 +254,7 @@ export default {
   padding: 0;
   flex-grow: 1;
   overflow: hidden;
-  
+
   // Hide with z-index (not display: none) so canvas is accessible in DOM
   &--hidden {
     z-index: 0;

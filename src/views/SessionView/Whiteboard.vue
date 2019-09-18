@@ -76,11 +76,7 @@
             />
           </div>
         </div>
-        <button
-          id="drawButton"
-          class="whiteboardBtn"
-          @click="drawSetup"
-        />
+        <button id="drawButton" class="whiteboardBtn" @click="drawSetup" />
         <button id="eraseButton" class="whiteboardBtn" @click="erase" />
         <button id="undoButton" class="whiteboardBtn" @click="undo" />
         <!-- <button class='whiteboardBtn' id='textButton' v-on:click="text"></button> -->
