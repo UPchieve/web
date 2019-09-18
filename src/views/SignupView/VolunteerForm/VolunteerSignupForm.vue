@@ -21,6 +21,7 @@
         v-model="credentials.email"
         required
         autofocus
+        autocomplete="email"
       />
       <p class="uc-form-subtext">
         We will only use your email to contact you about your account. See our
@@ -41,6 +42,7 @@
         }"
         v-model="credentials.password"
         required
+        autocomplete="new-password"
       />
       <p class="uc-form-subtext">
         Keep your account safe by choosing a password with one number, one
@@ -69,9 +71,10 @@
 
     <div class="step-title">Step 2 of 2: Tell us about yourself!</div>
 
-    <!-- Fix for bug in Chrome where the username and password are filled in to non-login fields
+    <!-- Fix for bug in Chrome where the first two fields are parsed as a username and password
      even if the HTML5 autocomplete attributes are set to the right values -->
-    <input type="password" class="d-none" id="password" name="fakepassword" autocomplete="new-password" />
+    <input type="text" class="d-none" id="username" v-model="credentials.email" autocomplete="username" />
+    <input type="password" class="d-none" id="password" v-model="credentials.password" autocomplete="new-password" />
 
     <div class="uc-column">
       <label for="firstName" class="uc-form-label">First Name</label>

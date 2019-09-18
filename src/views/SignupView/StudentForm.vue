@@ -173,9 +173,10 @@
     class="uc-form-body"
     @submit.prevent="submit()"
   >
-    <!-- Fix for bug in Chrome where the username and password are filled in to non-login fields
+    <!-- Fix for bug in Chrome where the username and password are mapped to non-login fields
      even if the HTML5 autocomplete attributes are set to the right values -->
-    <input type="password" class="d-none" id="password" name="fakepassword" autocomplete="new-password" />
+    <input type="text" class="d-none" id="username" v-model="credentials.email" autocomplete="username" />
+    <input type="password" class="d-none" id="password" v-model="credentials.password" autocomplete="new-password" />
   
     <div v-if="errors.length" class="step-errors">
       <h5>Please correct the following problems:</h5>
