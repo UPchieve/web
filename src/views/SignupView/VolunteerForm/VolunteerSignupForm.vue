@@ -71,24 +71,26 @@
 
     <div class="step-title">Step 2 of 2: Tell us about yourself!</div>
 
-    <!-- Fix for bug in Chrome where the first two fields are parsed as a username and password
-     even if the HTML5 autocomplete attributes are set to the right values -->
-    <input
-      type="text"
-      class="d-none"
-      id="username"
-      v-model="credentials.email"
-      autocomplete="username"
-    />
-    <input
-      type="password"
-      class="d-none"
-      id="password"
-      v-model="credentials.password"
-      autocomplete="new-password"
-    />
-
     <div class="uc-column">
+      <!-- Fix for bug in Chrome where the first two fields are parsed as a username and password
+       even if the HTML5 autocomplete attributes are set to the right values -->
+      <label for="username" class="d-none">Username</label>
+      <input
+        type="text"
+        class="d-none"
+        id="username"
+        v-model="credentials.email"
+        autocomplete="username"
+      />
+      <label for="password" class="d-none">Password</label>
+      <input
+        type="password"
+        class="d-none"
+        id="password"
+        v-model="credentials.password"
+        autocomplete="new-password"
+      />
+
       <label for="firstName" class="uc-form-label">First Name</label>
       <input
         id="firstName"
