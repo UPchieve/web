@@ -6,12 +6,17 @@
       <div class="students-waiting dashboard-card">
         <div class="dashboard-card__title">Waiting Students</div>
         <div v-if="isSessionAlive">
-          <button class="btn rejoinSessionBtn" @click.prevent="rejoinHelpSession()">
+          <button
+            class="btn rejoinSessionBtn"
+            @click.prevent="rejoinHelpSession()"
+          >
             Rejoin your coaching session
           </button>
         </div>
         <div v-else>
-          <div class="dashboard-card__description">Students waiting for help will show up below.</div>
+          <div class="dashboard-card__description">
+            Students waiting for help will show up below.
+          </div>
           <list-sessions />
         </div>
       </div>
@@ -25,13 +30,12 @@
               :key="statIndex"
               class="volunteer-impact__stat"
             >
-              <div class="volunteer-impact__stat-label">{{  stat.label }}:</div>
-              <div class="volunteer-impact__stat-value">{{  stat.value }}</div>
+              <div class="volunteer-impact__stat-label">{{ stat.label }}:</div>
+              <div class="volunteer-impact__stat-value">{{ stat.value }}</div>
             </div>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </template>
@@ -93,19 +97,27 @@ export default {
     let numHoursSelected = 0;
 
     if (userHasSchedule) {
-      numHoursSelected = _.reduce(user.availability, (weeklyHourCount, dayHours) => {
-        // Tally up num hours for each day
-        const hoursSelectedForDay = _.reduce(dayHours, (dailyHourCount, hourVal) => {
-          // Add 1 if hour val is true
-          return dailyHourCount + (hourVal ? 1 : 0);
-        }, 0);
+      numHoursSelected = _.reduce(
+        user.availability,
+        (weeklyHourCount, dayHours) => {
+          // Tally up num hours for each day
+          const hoursSelectedForDay = _.reduce(
+            dayHours,
+            (dailyHourCount, hourVal) => {
+              // Add 1 if hour val is true
+              return dailyHourCount + (hourVal ? 1 : 0);
+            },
+            0
+          );
 
-        return weeklyHourCount + hoursSelectedForDay;
-      }, 0);
+          return weeklyHourCount + hoursSelectedForDay;
+        },
+        0
+      );
     }
 
     // (2) Certs obtained
-    const certsObtained = _.filter(upchieveTopics, (topic) => {
+    const certsObtained = _.filter(upchieveTopics, topic => {
       return _.get(user, `${topic}.passed`, false);
     });
 
@@ -113,7 +125,7 @@ export default {
 
     // (3) Requests filled
     const numRequestsFilled = _.get(user, "numPastSessions", "?");
-    
+
     // (4) Hours tutored
     const numHoursTutored = _.get(user, "numVolunteerSessionHours", "?");
 
@@ -121,16 +133,19 @@ export default {
       {
         label: "Hours of availability selected",
         value: `${numHoursSelected} hours selected`
-      }, {
+      },
+      {
         label: "Number of certifications obtained",
         value: `${numCertsObtained} certs obtained`
-      }, {
+      },
+      {
         label: "Number of requests filled",
         value: `${numRequestsFilled} requests filled`
-      }, {
+      },
+      {
         label: "Hours of tutoring completed",
         value: `${numHoursTutored} hours tutored`
-      },
+      }
     ];
 
     return {
@@ -161,7 +176,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .btn {
   height: 60px;
   background-color: #16d2aa;
