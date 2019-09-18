@@ -13,7 +13,12 @@ import RejoinSessionHeader from "./RejoinSessionHeader";
 
 export default {
   name: "app-header",
-  components: { HeaderTemplate, DefaultHeader, SessionHeader, RejoinSessionHeader },
+  components: {
+    HeaderTemplate,
+    DefaultHeader,
+    SessionHeader,
+    RejoinSessionHeader
+  },
   computed: {
     ...mapState({
       headerComponent: state => state.app.header.component || "DefaultHeader",
