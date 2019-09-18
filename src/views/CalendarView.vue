@@ -281,7 +281,7 @@ export default {
 .header {
   display: flex;
   margin: 0px;
-  align-items: start;
+  align-items: flex-start;
   justify-content: space-between;
 }
 
