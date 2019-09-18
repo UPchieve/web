@@ -69,6 +69,10 @@
 
     <div class="step-title">Step 2 of 2: Tell us about yourself!</div>
 
+    <!-- Fix for bug in Chrome where the username and password are filled in to non-login fields
+     even if the HTML5 autocomplete attributes are set to the right values -->
+    <input type="password" class="d-none" id="password" name="fakepassword" autocomplete="new-password" />
+
     <div class="uc-column">
       <label for="firstName" class="uc-form-label">First Name</label>
       <input
@@ -81,6 +85,7 @@
         v-model="profile.firstName"
         required
         autofocus
+        autocomplete="given-name"
       />
     </div>
 
@@ -95,6 +100,7 @@
         }"
         v-model="profile.lastName"
         required
+        autocomplete="family-name"
       />
     </div>
 
@@ -327,5 +333,9 @@ export default {
   color: #bf0000;
   font-size: 14px;
   text-align: left;
+}
+
+.d-none {
+  display: none !important
 }
 </style>

@@ -132,6 +132,7 @@
         v-model="credentials.email"
         required
         autofocus
+        autocomplete="email"
       />
       <p class="uc-form-subtext">
         We will only use your email to contact you about your account. See our
@@ -152,6 +153,7 @@
         }"
         v-model="credentials.password"
         required
+        autocomplete="new-password"
       />
       <p class="uc-form-subtext">
         Keep your account safe by choosing a password with one number, one
@@ -171,6 +173,10 @@
     class="uc-form-body"
     @submit.prevent="submit()"
   >
+    <!-- Fix for bug in Chrome where the username and password are filled in to non-login fields
+     even if the HTML5 autocomplete attributes are set to the right values -->
+    <input type="password" class="d-none" id="password" name="fakepassword" autocomplete="new-password" />
+  
     <div v-if="errors.length" class="step-errors">
       <h5>Please correct the following problems:</h5>
       <ul>
@@ -192,6 +198,7 @@
         v-model="profile.firstName"
         required
         autofocus
+        autocomplete="given-name"
       />
     </div>
 
@@ -206,6 +213,7 @@
         }"
         v-model="profile.lastName"
         required
+        autocomplete="family-name"
       />
     </div>
 
@@ -537,5 +545,9 @@ export default {
       text-decoration: underline;
     }
   }
+}
+
+.d-none {
+  display: none !important
 }
 </style>
