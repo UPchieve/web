@@ -1,4 +1,5 @@
 import UserService from "./UserService";
+import AuthService from "./AuthService";
 import NetworkService from "./NetworkService";
 
 import router from "@/router";
@@ -22,6 +23,7 @@ export default {
       .then(() => {
         const user = UserService.getUser();
         user.verified = true;
+        AuthService.storeUser(user);
         router.replace("/");
       })
       .catch(() => {
