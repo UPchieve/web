@@ -154,7 +154,6 @@ const MathJax = window.MathJax;
  */
 export default {
   data() {
-    const user = UserService.getUser();
     const { category } = this.$route.params;
     let quizName;
     if (category === "esl") {
@@ -162,12 +161,8 @@ export default {
     } else {
       quizName = category.charAt(0).toUpperCase() + category.slice(1);
     }
-    let tries = 0;
-    if (user[category]) {
-      ({ tries } = user[category]); // {1}
-    }
     return {
-      user,
+      user: {},
       category,
       questionText: "",
       quizName,
@@ -193,9 +188,18 @@ export default {
       showQuizReview: false,
       passedMsg: "",
       coverStyle: {},
-      tries,
+      tries: 0,
       qNumber: ""
     };
+  },
+  created() {
+    UserService.getUser().then(user => {
+      if (user[category]) {
+        let tries = 0;
+        ({ tries } = user[category]); // {1}
+        this.tries = tries;
+      }
+    });
   },
   beforeMount() {
     TrainingService.loadQuiz(this, this.category).then(quizLength => {

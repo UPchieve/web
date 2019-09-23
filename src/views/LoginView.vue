@@ -92,13 +92,15 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
-    if (AuthService.user.authenticated) {
-      next({
-        path: "/"
-      });
-    } else {
-      next();
-    }
+    AuthService.getAuth().then(auth => {
+      if (auth.authenticated) {
+        next({
+          path: "/"
+        });
+      } else {
+        next();
+      }
+    });
   }
 };
 </script>

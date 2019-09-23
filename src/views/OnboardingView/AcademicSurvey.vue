@@ -434,12 +434,14 @@ import $ from "jquery";
 
 export default {
   data() {
-    const user = UserService.getUser();
     return {
-      user,
+      user: {},
       buttonMsg: "DONE",
       error: ""
     };
+  },
+  created() {
+    UserService.getUser().then(user => this.user = user);
   },
   methods: {
     skipOnboarding() {

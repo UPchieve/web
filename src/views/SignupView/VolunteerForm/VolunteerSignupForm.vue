@@ -295,8 +295,8 @@ export default {
         college: this.profile.college,
         favoriteAcademicSubject: this.profile.favoriteAcademicSubject
       })
-        .then(() => {
-          let user = UserService.getUser();
+        .then(() => UserService.getUser())
+        .then(user => {
           UserService.setProfile(this, user);
 
           // analytics: tracking when a user has signed up

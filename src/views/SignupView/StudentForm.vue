@@ -480,8 +480,8 @@ export default {
         lastName: this.profile.lastName,
         highSchoolId: this.eligibility.highSchool.upchieveId
       })
-        .then(() => {
-          let user = UserService.getUser();
+        .then(() => UserService.getUser())
+        .then(user => {
           user.heardFrom = this.profile.heardFrom;
           user.referred = this.profile.referred;
           UserService.setProfile(this, user, "/");

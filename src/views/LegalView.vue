@@ -637,17 +637,20 @@ export default {
     AccordionItem
   },
   created() {
-    if (!this.auth.authenticated && !this.user.verified) {
-      this.$store.dispatch("app/hideNavigation");
-    }
+    Promise.all([UserService.getAuth(), UserService.getUser()])
+      .then(results => {
+        const [auth, user] = results;
+        this.auth = auth;
+        this.user = user;
+        if (!this.auth.authenticated && !this.user.verified) {
+          this.$store.dispatch("app/hideNavigation");
+        }
+      });
   },
   data() {
-    const auth = UserService.getAuth();
-
-    const user = UserService.getUser();
     return {
-      auth,
-      user
+      auth: null,
+      user: null
     };
   }
 };

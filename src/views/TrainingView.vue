@@ -83,7 +83,6 @@ export default {
     }
   },
   data() {
-    const user = UserService.getUser();
     const quizzes = {};
     quizzes.math = [
       "algebra",
@@ -128,13 +127,18 @@ export default {
     reviewMaterials.application =
       "https://drive.google.com/file/d/18J5ca1LSNgh_9MQqct02Myr5UMFp1VOu/view?usp=sharing";
     return {
-      user,
+      user: {},
       quizzes,
       bools,
       supercategories,
       colors,
       reviewMaterials
     };
+  },
+  created() {
+    UserService.getUser().then(user => {
+      this.user = user;
+    });
   },
   methods: {
     flipBool(supercategory) {

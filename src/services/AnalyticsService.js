@@ -118,22 +118,24 @@ export default {
     if (studentMessages > 0 && volunteerMessages > 0) {
       successfulSession = true;
     }
-    window.analytics.track("session ended", {
-      //if volunteer joined then report volunteerSessionLength otherwise report null
-      "volunteer session length":
-        volunteerSessionLength && UserService.getUser().isVolunteer
-          ? volunteerSessionLength
-          : null,
-      "wait time": waitTime,
-      "session length": sessionLength,
-      "session topic": currentSession.type,
-      "session subtopic": currentSession.subTopic,
-      "session id": currentSession.sessionId,
-      user: UserService.getUser().isVolunteer ? "volunteer" : "student",
-      "volunteer show time": volunteerShowed ? volunteerShowed : null,
-      "did volunteer show": volunteerShowed ? true : false,
-      "time ended": new Date(), // might be slightly off from the session's "endedAt"
-      "successful session": successfulSession
+    UserService.getUser().then(user => {
+      window.analytics.track("session ended", {
+        //if volunteer joined then report volunteerSessionLength otherwise report null
+        "volunteer session length":
+          volunteerSessionLength && user.isVolunteer
+            ? volunteerSessionLength
+            : null,
+        "wait time": waitTime,
+        "session length": sessionLength,
+        "session topic": currentSession.type,
+        "session subtopic": currentSession.subTopic,
+        "session id": currentSession.sessionId,
+        user: user.isVolunteer ? "volunteer" : "student",
+        "volunteer show time": volunteerShowed ? volunteerShowed : null,
+        "did volunteer show": volunteerShowed ? true : false,
+        "time ended": new Date(), // might be slightly off from the session's "endedAt"
+        "successful session": successfulSession
+      });
     });
   },
 
@@ -141,12 +143,14 @@ export default {
   trackSessionStarted(currentSession, topic, subTopic, isFakeUser) {
     if (isFakeUser) return;
 
-    window.analytics.track("session started", {
-      "session started date": new Date(),
-      user: UserService.getUser().isVolunteer ? "volunteer" : "student",
-      "session topic": topic,
-      "session subtopic": subTopic,
-      "session id": currentSession.sessionId
+    UserService.getUser().then(user => {
+      window.analytics.track("session started", {
+        "session started date": new Date(),
+        user: user.isVolunteer ? "volunteer" : "student",
+        "session topic": topic,
+        "session subtopic": subTopic,
+        "session id": currentSession.sessionId
+      });
     });
   }
 };

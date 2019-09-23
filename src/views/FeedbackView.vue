@@ -139,7 +139,7 @@ import AnalyticsService from "@/services/AnalyticsService";
 export default {
   data() {
     return {
-      user: UserService.getUser(),
+      user: null,
       sessionId: "",
       topic: "",
       subTopic: "",
@@ -263,6 +263,9 @@ export default {
       questions: [],
       userResponse: {}
     };
+  },
+  created() {
+    UserService.getUser().then(user => this.user = user);
   },
   beforeMount() {
     var _self = this;

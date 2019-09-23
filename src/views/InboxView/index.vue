@@ -24,12 +24,15 @@ export default {
   },
   data() {
     return {
-      user: UserService.getUser(),
+      user: {},
       helpRequests: {
         type: "question",
         requests: []
       }
     };
+  },
+  created() {
+    UserService.getUser(user => this.user = user);
   },
   mounted() {
     StudentQuestionService.getStudentQuestions(this, {}).then(questions => {

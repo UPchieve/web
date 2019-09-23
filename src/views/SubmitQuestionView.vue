@@ -34,13 +34,16 @@ export default {
   data() {
     return {
       // This component
-      user: UserService.getUser(),
+      user: {},
       // Modal
       showModal: false,
       modalBtnLabels: [],
       modalOptions: {},
       modalClickHandlers: {}
     };
+  },
+  created() {
+    UserService.getUser().then(user => this.user = user);
   }
 };
 </script>

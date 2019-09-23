@@ -174,6 +174,7 @@ export default {
   },
   data() {
     return {
+      user: {},
       currentSession: SessionService.currentSession,
       showColors: "hidden"
     };
@@ -182,64 +183,67 @@ export default {
     ...mapGetters({ mobileMode: "app/mobileMode" })
   },
   mounted() {
-    this.drawSetup();
+    UserService.getUser(this).then(user => {
+      this.user = user;
+      this.drawSetup();
+    });
   },
   methods: {
     emitDrawClick() {
       this.$socket.emit("drawClick", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: this.user
       });
     },
     emitSaveImage() {
       this.$socket.emit("saveImage", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: this.user
       });
     },
     emitUndoClick() {
       this.$socket.emit("undoClick", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: this.user
       });
     },
     emitClearClick() {
       this.$socket.emit("clearClick", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: this.user
       });
     },
     emitChangeColor(color) {
       this.$socket.emit("changeColor", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: this.user,
         color
       });
     },
     emitChangeWidth(width) {
       this.$socket.emit("changeWidth", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: this.user,
         width
       });
     },
     emitDrawing() {
       this.$socket.emit("drawing", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: this.user
       });
     },
     emitEnd() {
       this.$socket.emit("end", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: this.user,
         whiteboardUrl: App.canvas.toDataURL()
       });
     },
     emitDragStart(data) {
       this.$socket.emit("dragStart", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: this.user,
         x: data.x,
         y: data.y,
         color: data.color
@@ -248,7 +252,7 @@ export default {
     emitDragAction(data) {
       this.$socket.emit("dragAction", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: this.user,
         x: data.x,
         y: data.y,
         color: data.color
@@ -257,7 +261,7 @@ export default {
     emitDragEnd(data) {
       this.$socket.emit("dragEnd", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: this.user,
         x: data.x,
         y: data.y,
         color: data.color
@@ -266,7 +270,7 @@ export default {
     emitInsertText(data) {
       this.$socket.emit("insertText", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: this.user,
         x: data.x,
         y: data.y,
         text: data.text
@@ -275,7 +279,7 @@ export default {
     emitResetScreen(/* data */) {
       this.$socket.emit("resetScreen", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: this.user
       });
     },
 
@@ -483,6 +487,7 @@ export default {
       this.emitChangeColor(LOCAL_LINE_COLOR);
       App.ctx.lineWidth = LINE_WIDTH;
       this.emitChangeWidth(LINE_WIDTH);
+
 
       this.$el.querySelector("#textInputBox").value = "";
       this.$el.querySelector("#textInputBox").style.visibility = "hidden";

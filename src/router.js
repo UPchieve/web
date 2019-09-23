@@ -37,11 +37,14 @@ Vue.http.options.credentials = true;
 const routes = [
   {
     path: "/",
-    redirect: () => {
-      if (AuthService.user.authenticated) {
-        return "/dashboard";
-      }
-      return "/login";
+    beforeEnter: (to, from, next) => {
+      return AuthService.getAuth().then(auth => {
+        if (auth.authenticated) {
+          next("/dashboard");
+        } else {
+          next("/login");
+        }
+      });
     }
   },
   { path: "/contact", name: "ContactView", component: ContactView },
@@ -62,6 +65,10 @@ const routes = [
   {
     path: "/dashboard",
     name: "DashboardView",
+    beforeEnter: (to, from, next) => {
+      console.log(new Error('trace call to dashboard route'));
+      next();
+    },
     component: DashboardView,
     meta: { protected: true }
   },
@@ -193,41 +200,45 @@ export default router;
 // Router middleware to check authentication for protect routes
 router.beforeEach((to, from, next) => {
   if (to.matched.some(route => route.meta.protected)) {
-    if (!AuthService.user.authenticated) {
-      next({
-        path: "/login",
-        query: {
-          redirect: to.fullPath
-        }
-      });
-    } else if (!OnboardingService.isOnboarded()) {
-      const route = OnboardingService.getOnboardingRoute();
-      if (
-        to.path.indexOf(route) !== -1 ||
-        to.matched.some(route => route.meta.bypassOnboarding)
-      ) {
-        next();
-      } else {
+    AuthService.getAuth().then(auth => {
+      if (!auth.authenticated) {
         next({
-          path: route,
+          path: "/login",
+          query: {
+            redirect: to.fullPath
+          }
+        });
+      } else if (!OnboardingService.isOnboarded()) {
+        const route = OnboardingService.getOnboardingRoute();
+        if (
+          to.path.indexOf(route) !== -1 ||
+          to.matched.some(route => route.meta.bypassOnboarding)
+        ) {
+          next();
+        } else {
+          next({
+            path: route,
+            query: {
+              redirect: to.fullPath
+            }
+          });
+        }
+      } else {
+        next();
+      }
+    });
+  }
+  if (to.matched.some(route => route.meta.requiresAdmin)) {
+    AuthService.getAuth().then(auth => {
+      if (!auth.data.isAdmin) {
+        next({
+          path: "/login",
           query: {
             redirect: to.fullPath
           }
         });
       }
-    } else {
-      next();
-    }
-  }
-  if (to.matched.some(route => route.meta.requiresAdmin)) {
-    if (!AuthService.user.data.isAdmin) {
-      next({
-        path: "/login",
-        query: {
-          redirect: to.fullPath
-        }
-      });
-    }
+    });
   } else {
     next();
   }
@@ -250,7 +261,6 @@ Vue.http.interceptors.push((request, next) => {
       request.url.indexOf("/api/session/current") !== -1;
 
     if (is401 && !(isGetUserAttempt || isGetSessionAttempt)) {
-      AuthService.removeUser();
       router.push("/login?401=true");
     }
   });

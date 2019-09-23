@@ -87,7 +87,7 @@ import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 export default {
   data() {
     return {
-      user: UserService.getUser(),
+      user: {},
       messages: [],
       currentSession: SessionService.currentSession,
       newMessage: "",
@@ -95,6 +95,9 @@ export default {
       typingTimeout: null,
       typingIndicatorShown: false
     };
+  },
+  created() {
+    UserService.getUser(this).then(user => this.user = user);
   },
   computed: {
     ...mapGetters({ sessionPartner: "user/sessionPartner" })
@@ -109,7 +112,7 @@ export default {
     showNewMessage(message) {
       this.$socket.emit("message", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: this.user,
         message
       });
     },

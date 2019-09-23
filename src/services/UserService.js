@@ -5,15 +5,18 @@ import OnboardingService from "./OnboardingService";
 import router from "@/router";
 
 export default {
-  getAuth() {
-    return AuthService.user;
+  getAuth(context) {
+    return AuthService.getAuth(context);
   },
-  getUser() {
-    const auth = this.getAuth();
-    if (auth.authenticated) {
-      return auth.data;
-    }
-    return {};
+  getUser(context) {
+    console.log(new Error(context))
+    return this.getAuth(context)
+      .then(auth => {
+        if (auth.authenticated) {
+          return auth.user;
+        }
+        return Promise.resolve({});
+      });
   },
   validateBirthdate(birthdate) {
     const m = moment(birthdate, "MM/DD/YYYY");
@@ -24,8 +27,7 @@ export default {
     return true; // No validation errors
   },
   getOnboardingServiceInterest() {
-    const user = this.getUser();
-    return (user && user.onboardingServiceInterest) || [];
+    return this.getUser().then(user => (user && user.onboardingServiceInterest) || []);
   },
   getOnboarding() {
     return OnboardingService.status;
@@ -34,7 +36,6 @@ export default {
     return NetworkService.setProfile(context, data).then(
       res => {
         if (res.data) {
-          AuthService.storeUser(res.data.user);
           context.msg = "Set!";
         } else {
           throw new Error();

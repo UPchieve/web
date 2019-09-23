@@ -1,6 +1,7 @@
 import Validator from "validator";
 
 import router from "@/router";
+import Vue from "vue";
 
 import NetworkService from "./NetworkService";
 import AnalyticsService from "./AnalyticsService";
@@ -8,12 +9,6 @@ import AnalyticsService from "./AnalyticsService";
 const USER_FETCH_LIMIT_SECONDS = 5;
 
 export default {
-  user: {
-    authenticated: false,
-    data: null,
-    lastFetch: 0
-  },
-
   login(context, creds, redirect) {
     const { email, password } = creds;
     if (
@@ -31,14 +26,12 @@ export default {
         if (!data) {
           throw new Error("No user returned from auth service");
         }
-
-        this.storeUser(data.user);
-
+        
         // analytics: tracking when a user has logged in
-        AnalyticsService.identify(this.user.data, this.user.data.isFakeUser);
+        AnalyticsService.identify(data.user, data.user.isFakeUser);
         AnalyticsService.trackNoProperties(
           "logged in",
-          this.user.data.isFakeUser
+          data.user.isFakeUser
         );
 
         if (redirect) {
@@ -60,9 +53,7 @@ export default {
         } else if (data.err) {
           throw new Error(data.err);
         }
-
-        this.storeUser(data.user);
-
+        
         context.msg = "You have been signed up!";
 
         if (redirect) {
@@ -125,35 +116,68 @@ export default {
     if (context) {
       NetworkService.logout(context)
         .then(() => {
-          this.removeUser();
           router.push("/logout");
         })
         .catch(() => {
-          this.removeUser();
           router.push("/logout");
         });
-    } else {
-      this.removeUser();
     }
   },
+  
+  getAuth(context, options) {
+    console.log(new Error(context))
+    
+    const isGlobal = options && options.isGlobal
+    
+    const authPromise = !context || isGlobal 
+        ? NetworkService.userGlobal(Vue) 
+        : NetworkService.user(context);
+    return authPromise
+      .then(res => {
+        const data = { ...res.data };
+        if (!data) {
+          throw new Error("No user returned from auth service");
+        }
 
+        if (data.user) {
+          return {
+            authenticated: true,
+            user: data.user
+          };
+        } else {
+          return {
+            authenticated: false,
+            user: null
+          };
+        }
+      })
+      .catch((err) => {
+        return {
+          authenticated: false,
+          user: null,
+          err: err
+        };
+      });
+  },
+  /*
   checkAuth(context) {
-    const user = localStorage.getItem("user");
-    if (user) {
-      try {
-        this.user.data = JSON.parse(user);
-        this.user.authenticated = true;
-      } catch (e) {
-        this.logout(); // Error in LocalStorage, so logout
+    getAuth().then(auth => {
+      if (auth.user) {
+        try {
+          this.user.data = JSON.parse(user);
+          this.user.authenticated = true;
+        } catch (e) {
+          this.logout();
+        }
+      } else {
+        this.user.authenticated = false;
+        this.user.data = null;
       }
-    } else {
-      this.user.authenticated = false;
-      this.user.data = null;
-    }
-
-    if (context && this.shouldFetch()) {
-      this.fetchUser(context);
-    }
+  
+      if (context && this.shouldFetch()) {
+        this.fetchUser(context);
+      }
+    });
   },
 
   shouldFetch() {
@@ -191,8 +215,9 @@ export default {
           this.user.data = null;
         }
       })
-      .catch((/*err*/) => {
+      .catch((/*err) => {
         // console.log(err);
       });
   }
+*/
 };

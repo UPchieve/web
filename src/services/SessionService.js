@@ -12,27 +12,30 @@ export default {
   },
 
   getPartner() {
-    const user = UserService.getUser();
-    const session = this.currentSession.data || {};
-
-    if (user.isVolunteer) {
-      return session.student;
-    }
-    return session.volunteer;
+    return UserService.getUser().then(user => {
+      const session = this.currentSession.data || {};
+  
+      if (user.isVolunteer) {
+        return session.student;
+      }
+      return session.volunteer;
+    });
   },
 
   endSession(context, sessionId) {
     return NetworkService.endSession(context, { sessionId }).then(() => {
-      localStorage.removeItem("currentSessionPath");
-
-      // analytics: track when a help session has ended
-      AnalyticsService.trackSessionEnded(
-        this.currentSession.data,
-        UserService.getUser().isFakeUser
-      );
-
-      this.currentSession.sessionId = null;
-      this.currentSession.data = {};
+      return UserService.getUser(context).then(user => {
+        localStorage.removeItem("currentSessionPath");
+  
+        // analytics: track when a help session has ended
+        AnalyticsService.trackSessionEnded(
+          this.currentSession.data,
+          user.isFakeUser
+        );
+  
+        this.currentSession.sessionId = null;
+        this.currentSession.data = {};
+      });
     });
   },
 
@@ -41,27 +44,29 @@ export default {
       sessionType,
       sessionSubTopic
     }).then(res => {
-      const data = res.data || {};
-      const { sessionId } = data;
-
-      this.currentSession.sessionId = sessionId;
-
-      if (sessionId) {
-        const path = `/session/${sessionType}/${sessionSubTopic}/${sessionId}`;
-        localStorage.setItem("currentSessionPath", path);
-        router.replace(path);
-      } else {
-        router.replace("/");
-      }
-      // analytics: track when a session has started
-      AnalyticsService.trackSessionStarted(
-        this.currentSession,
-        sessionType,
-        sessionSubTopic,
-        UserService.getUser().isFakeUser
-      );
-
-      return sessionId;
+      return UserService.getUser(context).then(user => {
+        const data = res.data || {};
+        const { sessionId } = data;
+  
+        this.currentSession.sessionId = sessionId;
+  
+        if (sessionId) {
+          const path = `/session/${sessionType}/${sessionSubTopic}/${sessionId}`;
+          localStorage.setItem("currentSessionPath", path);
+          router.replace(path);
+        } else {
+          router.replace("/");
+        }
+        // analytics: track when a session has started
+        AnalyticsService.trackSessionStarted(
+          this.currentSession,
+          sessionType,
+          sessionSubTopic,
+          user.isFakeUser
+        );
+  
+        return sessionId;
+      });
     });
   },
 

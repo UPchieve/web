@@ -21,11 +21,12 @@ import UserService from "@/services/UserService";
 export default {
   // components: { LargeButton },
   data() {
-    const user = UserService.getUser() || {};
-
     return {
-      name: user.firstname || "Unknown"
+      name: "Unknown"
     };
+  },
+  created() {
+    UserService.getUser().then(user => this.name = user.firstname);
   },
   computed: {
     ...mapGetters({ mobileMode: "app/mobileMode" })

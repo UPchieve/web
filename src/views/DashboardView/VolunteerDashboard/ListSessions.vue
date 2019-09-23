@@ -32,19 +32,23 @@ import UserService from "@/services/UserService";
 
 export default {
   data() {
-    const user = UserService.getUser();
     return {
-      user,
+      user: {},
       openSessions: []
     };
+  },
+  created() {
+    UserService.getUser().then(user => this.user = user);
   },
   mounted() {
     // reconnect socket if it isn't already
     if (!this.$socket.connected) {
       this.$socket.connect();
     }
-    this.$socket.emit("list", {
-      user: UserService.getUser()
+    UserService.getUser().then(user => {
+      this.$socket.emit("list", {
+        user: user
+      });
     });
   },
   methods: {

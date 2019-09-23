@@ -49,9 +49,13 @@ export default {
   components: { SidebarInfo, SidebarLinks },
   data() {
     return {
-      auth: UserService.getAuth(),
-      user: UserService.getUser()
+      auth: { authenticated: false },
+      user: { isVolunteer: false }
     };
+  },
+  created() {
+    UserService.getAuth(this).then(auth => this.auth = auth);
+    UserService.getUser(this).then(user => this.user = user);
   },
   computed: {
     ...mapState({

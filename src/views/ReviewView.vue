@@ -29,12 +29,14 @@ export default {
     }
   },
   data() {
-    const user = UserService.getUser();
     const { category } = this.$route.params;
     return {
-      user,
+      user: {},
       category
     };
+  },
+  created() {
+    UserService.getUser().then(user => this.user = user);
   },
   beforeMount() {
     this.styleImages();

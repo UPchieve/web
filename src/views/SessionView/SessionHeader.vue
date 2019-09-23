@@ -72,6 +72,7 @@ import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 export default {
   data() {
     return {
+      user: {},
       currentSession: SessionService.currentSession,
       connectionMsg: "",
       connectionMsgType: "",
@@ -88,9 +89,8 @@ export default {
     }),
 
     partnerAvatar() {
-      const user = UserService.getUser();
       let picture = "";
-      if (user.isVolunteer === false) {
+      if (this.user.isVolunteer === false) {
         picture = VolunteerAvatarUrl;
       } else {
         picture = StudentAvatarUrl;
@@ -99,6 +99,9 @@ export default {
         backgroundImage: `url(${picture})`
       };
     }
+  },
+  created() {
+    UserService.getUser().then(user => this.user = user);
   },
   methods: {
     end() {
@@ -160,7 +163,7 @@ export default {
               "/" +
               subTopic +
               "/" +
-              (UserService.getUser().isVolunteer ? "volunteer" : "student") +
+              (this.user.isVolunteer ? "volunteer" : "student") +
               "/" +
               studentId +
               "/" +

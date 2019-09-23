@@ -281,20 +281,24 @@ export default {
     AutocompleteInput
   },
   data() {
-    const user = UserService.getUser();
-    let button;
-    user.race = user.race || [];
-    user.birthdate = user.birthdate || "";
-    if (!user.isVolunteer) {
-      button = "NEXT";
-    } else {
-      button = "DONE";
-    }
     return {
-      user,
+      user: {},
       buttonMsg: button,
       error: ""
     };
+  },
+  created() {
+    UserService.getUser(this).then(user => {
+      let button;
+      user.race = user.race || [];
+      user.birthdate = user.birthdate || "";
+      if (!user.isVolunteer) {
+        button = "NEXT";
+      } else {
+        button = "DONE";
+      }
+      this.user = user;
+    });
   },
   methods: {
     submitProfile() {

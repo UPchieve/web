@@ -139,83 +139,91 @@ import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 
 export default {
   data() {
-    const user = UserService.getUser();
-    const avatarUrl =
-      user.picture ||
-      (user.isVolunteer ? VolunteerAvatarUrl : StudentAvatarUrl);
-
-    const certifications = {};
-    if (user.algebra) {
-      if (user.algebra.passed) {
-        certifications.Algebra = true;
-      }
-    }
-    if (user.geometry) {
-      if (user.geometry.passed) {
-        certifications.Geometry = true;
-      }
-    }
-    if (user.trigonometry) {
-      if (user.trigonometry.passed) {
-        certifications.Trigonometry = true;
-      }
-    }
-    if (user.precalculus) {
-      if (user.precalculus.passed) {
-        certifications.Precalculus = true;
-      }
-    }
-    if (user.calculus) {
-      if (user.calculus.passed) {
-        certifications.Calculus = true;
-      }
-    }
-    if (user.esl) {
-      if (user.esl.passed) {
-        certifications.ESL = true;
-      }
-    }
-    if (user.planning) {
-      if (user.planning.passed) {
-        certifications.Planning = true;
-      }
-    }
-    if (user.essays) {
-      if (user.essays.passed) {
-        certifications.Essays = true;
-      }
-    }
-    if (user.applications) {
-      if (user.applications.passed) {
-        certifications.Applications = true;
-      }
-    }
-
-    const certKey = {};
-    certKey.Algebra = "MATH";
-    certKey.Geometry = "MATH";
-    certKey.Trigonometry = "MATH";
-    certKey.Precalculus = "MATH";
-    certKey.Calculus = "MATH";
-    certKey.ESL = "ESL";
-    certKey.Planning = "COLLEGE";
-    certKey.Essays = "COLLEGE";
-    certKey.Applications = "COLLEGE";
-
     return {
-      user,
-      activeEdit: false,
-      editBtnMsg: "Edit",
-      name: user.firstname || (user.isVolunteer ? "volunteer" : "student"),
-      avatarStyle: {
-        backgroundImage: `url(${avatarUrl})`
-      },
-      certifications,
-      certKey,
-      errors: [],
-      invalidInputs: [],
-      saveFailed: false
-    };
+        user: {},
+        activeEdit: false,
+        editBtnMsg: "Edit",
+        name: "Loading",
+        avatarStyle: {
+          backgroundImage: "none"
+        },
+        certifications: {},
+        certKey: {},
+        errors: [],
+        invalidInputs: [],
+        saveFailed: false
+      };
+  },
+  created() {
+    UserService.getUser().then(user => {
+      const avatarUrl =
+        user.picture ||
+        (user.isVolunteer ? VolunteerAvatarUrl : StudentAvatarUrl);
+  
+      const certifications = {};
+      if (user.algebra) {
+        if (user.algebra.passed) {
+          certifications.Algebra = true;
+        }
+      }
+      if (user.geometry) {
+        if (user.geometry.passed) {
+          certifications.Geometry = true;
+        }
+      }
+      if (user.trigonometry) {
+        if (user.trigonometry.passed) {
+          certifications.Trigonometry = true;
+        }
+      }
+      if (user.precalculus) {
+        if (user.precalculus.passed) {
+          certifications.Precalculus = true;
+        }
+      }
+      if (user.calculus) {
+        if (user.calculus.passed) {
+          certifications.Calculus = true;
+        }
+      }
+      if (user.esl) {
+        if (user.esl.passed) {
+          certifications.ESL = true;
+        }
+      }
+      if (user.planning) {
+        if (user.planning.passed) {
+          certifications.Planning = true;
+        }
+      }
+      if (user.essays) {
+        if (user.essays.passed) {
+          certifications.Essays = true;
+        }
+      }
+      if (user.applications) {
+        if (user.applications.passed) {
+          certifications.Applications = true;
+        }
+      }
+  
+      const certKey = {};
+      certKey.Algebra = "MATH";
+      certKey.Geometry = "MATH";
+      certKey.Trigonometry = "MATH";
+      certKey.Precalculus = "MATH";
+      certKey.Calculus = "MATH";
+      certKey.ESL = "ESL";
+      certKey.Planning = "COLLEGE";
+      certKey.Essays = "COLLEGE";
+      certKey.Applications = "COLLEGE";
+  
+      this.user = user;
+      this.name = user.firstname || (user.isVolunteer ? "volunteer" : "student");
+      this.avatarStyle.backgroundImage = `url(${avatarUrl})`;
+      this.certifications = certifications;
+      this.certKey = certKey;
+    });
   },
   methods: {
     /**

@@ -21,17 +21,20 @@ import UserService from "@/services/UserService";
 export default {
   name: "ContactView",
   created() {
-    if (!this.auth.authenticated && !this.user.verified) {
-      this.$store.dispatch("app/hideNavigation");
-    }
+    Promise.all([AuthService.getAuth(this), UserService.getUser(this)])
+      .then((result) => {
+        const [user, auth] = result
+        this.auth = auth;
+        this.user = user;
+        if (!this.auth.authenticated && !this.user.verified) {
+          this.$store.dispatch("app/hideNavigation");
+        }
+      });
   },
   data() {
-    const auth = UserService.getAuth();
-
-    const user = UserService.getUser();
     return {
-      auth,
-      user
+      auth: null,
+      user: null
     };
   }
 };

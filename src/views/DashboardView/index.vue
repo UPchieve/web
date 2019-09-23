@@ -12,8 +12,10 @@ export default {
   name: "dashboard-view",
   components: { VolunteerDashboard, StudentDashboard },
   data() {
-    const user = UserService.getUser() || {};
-    return { user };
+    return { user: { isVolunteer: false } };
+  },
+  created() {
+    UserService.getUser(this).then(user => this.user = user);
   }
 };
 </script>

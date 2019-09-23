@@ -22,8 +22,7 @@ export default {
     },
 
     fetchUser: ({ commit }) => {
-      const user = UserService.getUser();
-      commit("setUser", user);
+      UserService.getUser().then(user => commit("setUser", user));
     },
 
     fetchSession: ({ commit, state }, context) => {

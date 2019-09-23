@@ -50,7 +50,7 @@ export default {
   data() {
     return {
       // This component
-      user: UserService.getUser(),
+      user: {},
       hasAttachments: false,
       question: { student: { name: "" } },
       // Modal
@@ -61,12 +61,16 @@ export default {
     };
   },
   beforeCreate() {
-    StudentQuestionService.getStudentQuestions(this, {
-      _id: this.$route.query.q
-    }).then(questions => {
-      [this.question] = questions;
-      this.hasAttachments = this.question.attachments.length > 0;
-    });
+    UserService.then(user => {
+        this.user = user;
+        return StudentQuestionService.getStudentQuestions(this, {
+          _id: this.$route.query.q
+        });
+      })
+      .then(questions => {
+        [this.question] = questions;
+        this.hasAttachments = this.question.attachments.length > 0;
+      });
   },
   methods: {
     downloadFile() {
