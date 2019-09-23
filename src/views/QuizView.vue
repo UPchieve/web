@@ -194,9 +194,9 @@ export default {
   },
   created() {
     UserService.getUser().then(user => {
-      if (user[category]) {
+      if (user[this.category]) {
         let tries = 0;
-        ({ tries } = user[category]); // {1}
+        ({ tries } = user[this.category]); // {1}
         this.tries = tries;
       }
     });

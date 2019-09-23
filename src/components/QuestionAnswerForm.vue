@@ -42,28 +42,27 @@ function isValid() {
 }
 
 function buildFormDataObjSubmitQuestion(context) {
-  UserService.getUser()
-    .then(user => {
-      const questionObj = new FormData();
-      questionObj.append(
-        "topic",
-        context.$route.query.topic.charAt(0).toUpperCase() +
-          context.$route.query.topic.slice(1)
-      );
-      questionObj.append(
-        "subTopic",
-        context.$route.query.subTopic.charAt(0).toUpperCase() +
-          context.$route.query.subTopic.slice(1)
-      );
-      questionObj.append(
-        "student",
-        `{ name: ${user.name}, email: ${user.email}, picture: ${user.picture} }`
-      );
-      questionObj.append("content", document.getElementById("message").value);
-      questionObj.append("attachments", document.getElementById("file").files[0]);
-    
-      return questionObj;
-    });
+  UserService.getUser().then(user => {
+    const questionObj = new FormData();
+    questionObj.append(
+      "topic",
+      context.$route.query.topic.charAt(0).toUpperCase() +
+        context.$route.query.topic.slice(1)
+    );
+    questionObj.append(
+      "subTopic",
+      context.$route.query.subTopic.charAt(0).toUpperCase() +
+        context.$route.query.subTopic.slice(1)
+    );
+    questionObj.append(
+      "student",
+      `{ name: ${user.name}, email: ${user.email}, picture: ${user.picture} }`
+    );
+    questionObj.append("content", document.getElementById("message").value);
+    questionObj.append("attachments", document.getElementById("file").files[0]);
+
+    return questionObj;
+  });
 }
 
 function buildFormDataObjSendAnswer(context) {

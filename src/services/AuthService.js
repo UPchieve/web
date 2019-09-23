@@ -6,8 +6,6 @@ import Vue from "vue";
 import NetworkService from "./NetworkService";
 import AnalyticsService from "./AnalyticsService";
 
-const USER_FETCH_LIMIT_SECONDS = 5;
-
 export default {
   login(context, creds, redirect) {
     const { email, password } = creds;
@@ -26,13 +24,10 @@ export default {
         if (!data) {
           throw new Error("No user returned from auth service");
         }
-        
+
         // analytics: tracking when a user has logged in
         AnalyticsService.identify(data.user, data.user.isFakeUser);
-        AnalyticsService.trackNoProperties(
-          "logged in",
-          data.user.isFakeUser
-        );
+        AnalyticsService.trackNoProperties("logged in", data.user.isFakeUser);
 
         if (redirect) {
           router.push(redirect);
@@ -53,7 +48,7 @@ export default {
         } else if (data.err) {
           throw new Error(data.err);
         }
-        
+
         context.msg = "You have been signed up!";
 
         if (redirect) {
@@ -123,14 +118,13 @@ export default {
         });
     }
   },
-  
+
   getAuth(context, options) {
-    console.log(new Error(context))
-    
-    const isGlobal = options && options.isGlobal
-    
-    const authPromise = !context || isGlobal 
-        ? NetworkService.userGlobal(Vue) 
+    const isGlobal = options && options.isGlobal;
+
+    const authPromise =
+      !context || isGlobal
+        ? NetworkService.userGlobal(Vue)
         : NetworkService.user(context);
     return authPromise
       .then(res => {
@@ -151,14 +145,14 @@ export default {
           };
         }
       })
-      .catch((err) => {
+      .catch(err => {
         return {
           authenticated: false,
           user: null,
           err: err
         };
       });
-  },
+  }
   /*
   checkAuth(context) {
     getAuth().then(auth => {

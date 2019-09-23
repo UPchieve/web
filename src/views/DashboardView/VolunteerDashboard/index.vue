@@ -71,11 +71,6 @@ const upchieveTopics = [
 export default {
   name: "volunteer-dashboard",
   components: { ListSessions, DashboardBanner },
-  created() {
-    if (this.isSessionAlive) {
-      this.$store.dispatch("app/header/show", headerData);
-    }
-  },
   watch: {
     isSessionAlive(isAlive) {
       if (!isAlive) {
@@ -89,23 +84,21 @@ export default {
     return {
       user: {},
       name: "Student",
-      impactStats: [
-        { label: "Loading..." }
-      ]
-    }
+      impactStats: [{ label: "Loading..." }]
+    };
   },
   created() {
-    UserService.getUser()
+    UserService.getUser(this)
       .then(user => user || {})
       .then(user => {
-      // (1) Hours selected
+        // (1) Hours selected
         const userHasSchedule = _.chain(user)
           .get("availability.Thursday.5p")
           .isBoolean()
           .value();
-    
+
         let numHoursSelected = 0;
-    
+
         if (userHasSchedule) {
           numHoursSelected = _.reduce(
             user.availability,
@@ -119,26 +112,26 @@ export default {
                 },
                 0
               );
-    
+
               return weeklyHourCount + hoursSelectedForDay;
             },
             0
           );
         }
-    
+
         // (2) Certs obtained
         const certsObtained = _.filter(upchieveTopics, topic => {
           return _.get(user, `${topic}.passed`, false);
         });
-    
+
         const numCertsObtained = certsObtained.length;
-    
+
         // (3) Requests filled
         const numRequestsFilled = _.get(user, "numPastSessions", "?");
-    
+
         // (4) Hours tutored
         const numHoursTutored = _.get(user, "numVolunteerSessionHours", "?");
-    
+
         const impactStats = [
           {
             label: "Hours of availability selected",
@@ -156,10 +149,14 @@ export default {
             label: "Hours of tutoring completed",
             value: `${numHoursTutored} hours tutored`
           }
-        ]
+        ];
         this.user = user;
         this.name = user.firstname || "Student";
         this.impactStats = impactStats;
+
+        if (this.isSessionAlive) {
+          this.$store.dispatch("app/header/show", headerData);
+        }
       });
   },
   computed: {

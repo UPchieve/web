@@ -140,26 +140,26 @@ import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 export default {
   data() {
     return {
-        user: {},
-        activeEdit: false,
-        editBtnMsg: "Edit",
-        name: "Loading",
-        avatarStyle: {
-          backgroundImage: "none"
-        },
-        certifications: {},
-        certKey: {},
-        errors: [],
-        invalidInputs: [],
-        saveFailed: false
-      };
+      user: {},
+      activeEdit: false,
+      editBtnMsg: "Edit",
+      name: "Loading",
+      avatarStyle: {
+        backgroundImage: "none"
+      },
+      certifications: {},
+      certKey: {},
+      errors: [],
+      invalidInputs: [],
+      saveFailed: false
+    };
   },
   created() {
     UserService.getUser().then(user => {
       const avatarUrl =
         user.picture ||
         (user.isVolunteer ? VolunteerAvatarUrl : StudentAvatarUrl);
-  
+
       const certifications = {};
       if (user.algebra) {
         if (user.algebra.passed) {
@@ -206,7 +206,7 @@ export default {
           certifications.Applications = true;
         }
       }
-  
+
       const certKey = {};
       certKey.Algebra = "MATH";
       certKey.Geometry = "MATH";
@@ -217,9 +217,10 @@ export default {
       certKey.Planning = "COLLEGE";
       certKey.Essays = "COLLEGE";
       certKey.Applications = "COLLEGE";
-  
+
       this.user = user;
-      this.name = user.firstname || (user.isVolunteer ? "volunteer" : "student");
+      this.name =
+        user.firstname || (user.isVolunteer ? "volunteer" : "student");
       this.avatarStyle.backgroundImage = `url(${avatarUrl})`;
       this.certifications = certifications;
       this.certKey = certKey;

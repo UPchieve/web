@@ -97,7 +97,7 @@ export default {
     };
   },
   created() {
-    UserService.getUser(this).then(user => this.user = user);
+    UserService.getUser(this).then(user => (this.user = user));
   },
   computed: {
     ...mapGetters({ sessionPartner: "user/sessionPartner" })

@@ -66,7 +66,6 @@ const routes = [
     path: "/dashboard",
     name: "DashboardView",
     beforeEnter: (to, from, next) => {
-      console.log(new Error('trace call to dashboard route'));
       next();
     },
     component: DashboardView,

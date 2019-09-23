@@ -32,7 +32,7 @@ export default {
     };
   },
   created() {
-    UserService.getUser(user => this.user = user);
+    UserService.getUser(user => (this.user = user));
   },
   mounted() {
     StudentQuestionService.getStudentQuestions(this, {}).then(questions => {

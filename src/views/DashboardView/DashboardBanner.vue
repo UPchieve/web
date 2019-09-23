@@ -26,7 +26,7 @@ export default {
     };
   },
   created() {
-    UserService.getUser().then(user => this.name = user.firstname);
+    UserService.getUser().then(user => (this.name = user.firstname));
   },
   computed: {
     ...mapGetters({ mobileMode: "app/mobileMode" })

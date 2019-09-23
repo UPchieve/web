@@ -15,7 +15,7 @@ export default {
     return { user: { isVolunteer: false } };
   },
   created() {
-    UserService.getUser(this).then(user => this.user = user);
+    UserService.getUser(this).then(user => (this.user = user));
   }
 };
 </script>

@@ -488,7 +488,6 @@ export default {
       App.ctx.lineWidth = LINE_WIDTH;
       this.emitChangeWidth(LINE_WIDTH);
 
-
       this.$el.querySelector("#textInputBox").value = "";
       this.$el.querySelector("#textInputBox").style.visibility = "hidden";
       App.canvas.style.cursor = PEN_ICON;

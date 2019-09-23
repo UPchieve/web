@@ -54,8 +54,8 @@ export default {
     };
   },
   created() {
-    UserService.getAuth(this).then(auth => this.auth = auth);
-    UserService.getUser(this).then(user => this.user = user);
+    UserService.getAuth(this).then(auth => (this.auth = auth));
+    UserService.getUser(this).then(user => (this.user = user));
   },
   computed: {
     ...mapState({

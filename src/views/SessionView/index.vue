@@ -176,7 +176,6 @@ export default {
       }
     },
     joinSession(sessionId) {
-      console.log(new Error('joining session'))
       UserService.getUser(this).then(user => {
         this.$socket.emit("join", {
           sessionId,

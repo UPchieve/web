@@ -56,7 +56,7 @@ export default {
           "expectedGraduation"
         ];
       }
-  
+
       // Test if each required field is present, return true when field fails to
       // terminate iteration
       const hasInvalidField = requiredFields.some(fieldName => {
@@ -72,7 +72,7 @@ export default {
         }
         return false;
       });
-  
+
       return !hasInvalidField;
     });
   },

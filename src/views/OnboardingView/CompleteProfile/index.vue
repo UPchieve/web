@@ -283,7 +283,7 @@ export default {
   data() {
     return {
       user: {},
-      buttonMsg: button,
+      buttonMsg: "",
       error: ""
     };
   },
@@ -298,6 +298,7 @@ export default {
         button = "DONE";
       }
       this.user = user;
+      this.buttonMsg = button;
     });
   },
   methods: {

@@ -19,14 +19,12 @@
 <script>
 import { mapState } from "vuex";
 
-import AuthService from "@/services/AuthService";
 import SessionService from "@/services/SessionService";
 
 import "@/scss/main.scss";
 import AppHeader from "./AppHeader";
 import AppSidebar from "./AppSidebar";
 import AppModal from "./AppModal";
-
 
 export default {
   name: "App",

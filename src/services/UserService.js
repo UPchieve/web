@@ -9,14 +9,12 @@ export default {
     return AuthService.getAuth(context);
   },
   getUser(context) {
-    console.log(new Error(context))
-    return this.getAuth(context)
-      .then(auth => {
-        if (auth.authenticated) {
-          return auth.user;
-        }
-        return Promise.resolve({});
-      });
+    return this.getAuth(context).then(auth => {
+      if (auth.authenticated) {
+        return auth.user;
+      }
+      return Promise.resolve({});
+    });
   },
   validateBirthdate(birthdate) {
     const m = moment(birthdate, "MM/DD/YYYY");
@@ -27,7 +25,9 @@ export default {
     return true; // No validation errors
   },
   getOnboardingServiceInterest() {
-    return this.getUser().then(user => (user && user.onboardingServiceInterest) || []);
+    return this.getUser().then(
+      user => (user && user.onboardingServiceInterest) || []
+    );
   },
   getOnboarding() {
     return OnboardingService.status;

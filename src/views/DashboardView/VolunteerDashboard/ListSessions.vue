@@ -38,7 +38,7 @@ export default {
     };
   },
   created() {
-    UserService.getUser().then(user => this.user = user);
+    UserService.getUser().then(user => (this.user = user));
   },
   mounted() {
     // reconnect socket if it isn't already

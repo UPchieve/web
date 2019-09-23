@@ -53,8 +53,8 @@ export default {
   },
   userGlobal(Vue) {
     return Vue.http
-    .get(`${API_ROOT}/user`)
-    .then(this._successHandler, this._errorHandler);
+      .get(`${API_ROOT}/user`)
+      .then(this._successHandler, this._errorHandler);
   },
   sendVerification(context) {
     return context.$http
