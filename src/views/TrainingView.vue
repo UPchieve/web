@@ -122,11 +122,11 @@ export default {
     reviewMaterials.esl =
       "https://drive.google.com/open?id=1P99PIY89X6VdvCGMMzjNOS55Nvljkc8Lv6FxmjJzo8Y";
     reviewMaterials.planning =
-      "https://drive.google.com/file/d/1MXl7g4E4hdt05Pt8jl9gQvr1kfv-cKBU/view?usp=sharing";
+      "https://drive.google.com/open?id=1b_EHOgtrkkyWa6ge4fbKqxC7ZDgHrJxx";
     reviewMaterials.essay =
-      "https://drive.google.com/file/d/19IyuDkShzdaRvN0fAZqvYkpoMJPR-XfG/view?usp=sharing";
+      "https://drive.google.com/open?id=1lJXVI1f9Do60pNXcBQGSZThNXhYmtMvV";
     reviewMaterials.application =
-      "https://drive.google.com/file/d/18J5ca1LSNgh_9MQqct02Myr5UMFp1VOu/view?usp=sharing";
+      "https://drive.google.com/open?id=1gXmbGRaUz324-EiZMzph1KUYS8WhR9ax";
     return {
       user,
       quizzes,
