@@ -123,9 +123,9 @@ export default {
       "https://drive.google.com/open?id=1P99PIY89X6VdvCGMMzjNOS55Nvljkc8Lv6FxmjJzo8Y";
     reviewMaterials.planning =
       "https://drive.google.com/open?id=1b_EHOgtrkkyWa6ge4fbKqxC7ZDgHrJxx";
-    reviewMaterials.essay =
+    reviewMaterials.essays =
       "https://drive.google.com/open?id=1lJXVI1f9Do60pNXcBQGSZThNXhYmtMvV";
-    reviewMaterials.application =
+    reviewMaterials.applications =
       "https://drive.google.com/open?id=1gXmbGRaUz324-EiZMzph1KUYS8WhR9ax";
     return {
       user,
