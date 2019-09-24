@@ -199,6 +199,7 @@ export default {
         ({ tries } = user[this.category]); // {1}
         this.tries = tries;
       }
+      this.user = user;
     });
   },
   beforeMount() {
