@@ -82,7 +82,7 @@ export default {
       "11 pm"
     ];
     return {
-      user: null,
+      user: {},
       availability: {},
       timeRange,
       tzList: moment.tz.names(),
