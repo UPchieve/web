@@ -56,11 +56,10 @@ export default {
       const { type, subTopic, _id } = session;
 
       if (type && subTopic && _id) {
-        const path = `/session/${type}/${subTopic}/${_id}`;
-        localStorage.setItem("currentSessionPath", path);
-        this.$router.push(path);
+        this.$store.dispatch("user/updateSession", session);
+        this.$router.push(this.$store.state.user.sessionPath);
       } else {
-        localStorage.removeItem("currentSessionPath");
+        this.$store.dispatch("user/clearSession");
       }
     }
   },

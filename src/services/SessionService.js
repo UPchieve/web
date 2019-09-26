@@ -25,7 +25,7 @@ export default {
   endSession(context, sessionId) {
     return NetworkService.endSession(context, { sessionId }).then(() => {
       return UserService.getUser(context).then(user => {
-        localStorage.removeItem("currentSessionPath");
+        context.$store.dispatch("user/clearSession");
 
         // analytics: track when a help session has ended
         AnalyticsService.trackSessionEnded(
@@ -51,9 +51,9 @@ export default {
         this.currentSession.sessionId = sessionId;
 
         if (sessionId) {
-          const path = `/session/${sessionType}/${sessionSubTopic}/${sessionId}`;
-          localStorage.setItem("currentSessionPath", path);
-          router.replace(path);
+          const sessionData = { type: sessionType, subTopic: sessionSubTopic, _id: sessionId };
+          context.$store.dispatch("user/updateSession", sessionData);
+          router.replace(context.$store.state.user.sessionPath);
         } else {
           router.replace("/");
         }
@@ -94,7 +94,6 @@ export default {
         this.currentSession.sessionId = null;
         this.currentSession.data = {};
 
-        localStorage.removeItem("currentSessionPath");
         return Promise.reject(resp.data.err);
       }
 
@@ -106,7 +105,6 @@ export default {
         this.currentSession.data = data;
 
         const path = `/session/${type}/${subTopic}/${sessionId}`;
-        localStorage.setItem("currentSessionPath", path);
         return Promise.resolve({ sessionPath: path, sessionData: data });
       }
     });

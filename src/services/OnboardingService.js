@@ -1,5 +1,4 @@
 import UserService from "./UserService";
-import AuthService from "./AuthService";
 import NetworkService from "./NetworkService";
 
 import router from "@/router";
