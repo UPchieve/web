@@ -21,12 +21,6 @@ export default {
   confirmVerification(context, token) {
     return NetworkService.confirmVerification(context, { token })
       .then(() => {
-<<<<<<< HEAD
-=======
-        const user = UserService.getUser();
-        user.verified = true;
-        AuthService.storeUser(user);
->>>>>>> refs/heads/master
         router.replace("/");
       })
       .catch(() => {
