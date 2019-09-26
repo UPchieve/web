@@ -51,7 +51,11 @@ export default {
         this.currentSession.sessionId = sessionId;
 
         if (sessionId) {
-          const sessionData = { type: sessionType, subTopic: sessionSubTopic, _id: sessionId };
+          const sessionData = {
+            type: sessionType,
+            subTopic: sessionSubTopic,
+            _id: sessionId
+          };
           context.$store.dispatch("user/updateSession", sessionData);
           router.replace(context.$store.state.user.sessionPath);
         } else {
