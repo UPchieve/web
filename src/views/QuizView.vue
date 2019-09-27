@@ -188,7 +188,6 @@ export default {
       showQuizReview: false,
       passedMsg: "",
       coverStyle: {},
-      tries: 0,
       qNumber: ""
     };
   },
@@ -197,10 +196,11 @@ export default {
       user: state => state.user.user
     }),
     tries() {
+      const user = this.$store.state.user.user;
+
       let tries = 0;
       if (user[this.category]) {
         ({ tries } = user[this.category]); // {1}
-        this.tries = tries;
       }
       return tries;
     }

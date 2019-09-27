@@ -182,7 +182,7 @@ export default {
       user: state => state.user.user
     }),
     ...mapGetters({
-      mobileMode: "app/mobileMode",
+      mobileMode: "app/mobileMode"
     })
   },
   mounted() {

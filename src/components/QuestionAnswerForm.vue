@@ -30,7 +30,6 @@
 <script>
 import Vue from "vue";
 
-import UserService from "@/services/UserService";
 import StudentQuestionService from "@/services/StudentQuestionService";
 
 import BtnOptions from "./BtnOptions";
@@ -42,7 +41,7 @@ function isValid() {
 }
 
 function buildFormDataObjSubmitQuestion(context) {
-  const user = context.$store.state.user;
+  const user = context.$store.state.user.user;
   const questionObj = new FormData();
   questionObj.append(
     "topic",

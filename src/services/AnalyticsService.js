@@ -118,7 +118,7 @@ export default {
     if (studentMessages > 0 && volunteerMessages > 0) {
       successfulSession = true;
     }
-    const user = store.state.user;
+    const user = store.state.user.user;
     window.analytics.track("session ended", {
       //if volunteer joined then report volunteerSessionLength otherwise report null
       "volunteer session length":
@@ -142,7 +142,7 @@ export default {
   trackSessionStarted(currentSession, topic, subTopic, isFakeUser) {
     if (isFakeUser) return;
 
-    const user = store.state.user;
+    const user = store.state.user.user;
     window.analytics.track("session started", {
       "session started date": new Date(),
       user: user.isVolunteer ? "volunteer" : "student",

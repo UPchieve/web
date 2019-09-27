@@ -96,14 +96,14 @@ export default {
     },
     impactStats: function() {
       const user = this.$store.state.user.user;
-       // (1) Hours selected
+      // (1) Hours selected
       const userHasSchedule = _.chain(user)
         .get("availability.Thursday.5p")
         .isBoolean()
         .value();
-  
+
       let numHoursSelected = 0;
-  
+
       if (userHasSchedule) {
         numHoursSelected = _.reduce(
           user.availability,
@@ -117,26 +117,26 @@ export default {
               },
               0
             );
-  
+
             return weeklyHourCount + hoursSelectedForDay;
           },
           0
         );
       }
-  
+
       // (2) Certs obtained
       const certsObtained = _.filter(upchieveTopics, topic => {
         return _.get(user, `${topic}.passed`, false);
       });
-  
+
       const numCertsObtained = certsObtained.length;
-  
+
       // (3) Requests filled
       const numRequestsFilled = _.get(user, "numPastSessions", "?");
-  
+
       // (4) Hours tutored
       const numHoursTutored = _.get(user, "numVolunteerSessionHours", "?");
-  
+
       return [
         {
           label: "Hours of availability selected",

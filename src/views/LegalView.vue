@@ -623,7 +623,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapGetters, mapState } from "vuex";
 
 import FullTextTemplate from "@/components/FullTextTemplate";
 import Accordion from "@/components/Accordion";
@@ -645,10 +645,10 @@ export default {
     ...mapState({
       user: state => state.user.user
     }),
-    auth() {
-      return this.$store.state.user.user._id;
-    }
-  },
+    ...mapGetters({
+      auth: "user/isAuthenticated"
+    })
+  }
 };
 </script>
 
