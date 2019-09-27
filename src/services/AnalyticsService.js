@@ -1,5 +1,3 @@
-import store from "../store";
-
 export default {
   // for tracking only when events happen, not tracking any properties
   trackNoProperties(name, isFakeUser) {
@@ -71,7 +69,7 @@ export default {
   },
 
   // tracks when a help session has ended
-  trackSessionEnded(currentSession, isFakeUser) {
+  trackSessionEnded(context, currentSession, isFakeUser) {
     if (isFakeUser) return;
 
     // calculating time-related session info (session length, wait time, etc.)
@@ -118,7 +116,7 @@ export default {
     if (studentMessages > 0 && volunteerMessages > 0) {
       successfulSession = true;
     }
-    const user = store.state.user.user;
+    const user = context.$store.state.user.user;
     window.analytics.track("session ended", {
       //if volunteer joined then report volunteerSessionLength otherwise report null
       "volunteer session length":

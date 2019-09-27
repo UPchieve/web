@@ -2,7 +2,6 @@ import moment from "moment";
 import NetworkService from "./NetworkService";
 import AuthService from "./AuthService";
 import OnboardingService from "./OnboardingService";
-import router from "@/router";
 
 export default {
   getAuth(context) {
@@ -41,7 +40,7 @@ export default {
           throw new Error();
         }
         if (redirect) {
-          router.push(redirect);
+          context.$router.push(redirect);
         }
         return Promise.resolve(res);
       },

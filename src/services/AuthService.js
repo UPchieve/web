@@ -1,6 +1,5 @@
 import Validator from "validator";
 
-import router from "@/router";
 import Vue from "vue";
 
 import NetworkService from "./NetworkService";
@@ -30,7 +29,7 @@ export default {
         AnalyticsService.trackNoProperties("logged in", data.user.isFakeUser);
 
         if (redirect) {
-          router.push(redirect);
+          context.$router.push(redirect);
         }
       },
       () => {
@@ -53,7 +52,7 @@ export default {
 
         if (redirect) {
           setTimeout(() => {
-            router.push(redirect);
+            context.$router.push(redirect);
           }, 2000);
         }
       }
@@ -82,7 +81,7 @@ export default {
 
       if (redirect) {
         setTimeout(() => {
-          router.push(redirect);
+          context.$router.push(redirect);
         }, 2000);
       }
     });
@@ -101,7 +100,7 @@ export default {
 
       if (redirect) {
         setTimeout(() => {
-          router.push(redirect);
+          context.$router.push(redirect);
         }, 2000);
       }
     });
@@ -111,10 +110,10 @@ export default {
     if (context) {
       NetworkService.logout(context)
         .then(() => {
-          router.push("/logout");
+          context.$router.push("/logout");
         })
         .catch(() => {
-          router.push("/logout");
+          context.$router.push("/logout");
         });
     }
   },

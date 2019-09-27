@@ -1,8 +1,6 @@
 import UserService from "./UserService";
 import NetworkService from "./NetworkService";
 
-import router from "@/router";
-
 export default {
   status: {
     isOnboarded: false
@@ -20,7 +18,7 @@ export default {
   confirmVerification(context, token) {
     return NetworkService.confirmVerification(context, { token })
       .then(() => {
-        router.replace("/");
+        context.$router.replace("/");
       })
       .catch(() => {
         context.msg = "Error occurred";

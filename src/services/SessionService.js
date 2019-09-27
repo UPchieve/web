@@ -1,5 +1,3 @@
-import router from "@/router";
-
 import NetworkService from "./NetworkService";
 import UserService from "./UserService";
 import AnalyticsService from "./AnalyticsService";
@@ -29,6 +27,7 @@ export default {
 
         // analytics: track when a help session has ended
         AnalyticsService.trackSessionEnded(
+          context,
           this.currentSession.data,
           user.isFakeUser
         );
@@ -57,9 +56,9 @@ export default {
             _id: sessionId
           };
           context.$store.dispatch("user/updateSession", sessionData);
-          router.replace(context.$store.state.user.sessionPath);
+          context.$router.replace(context.$store.state.user.sessionPath);
         } else {
-          router.replace("/");
+          context.$router.replace("/");
         }
         // analytics: track when a session has started
         AnalyticsService.trackSessionStarted(
