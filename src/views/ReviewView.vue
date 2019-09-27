@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
+import { mapState } from "vuex";
 
 /**
  * @todo {1} Refactor into global filters (https://vuejs.org/v2/guide/filters.html)
@@ -31,12 +31,11 @@ export default {
   data() {
     const { category } = this.$route.params;
     return {
-      user: {},
       category
     };
   },
-  created() {
-    UserService.getUser().then(user => (this.user = user));
+  computed: {
+    ...mapState({ user: state => state.user.user })
   },
   beforeMount() {
     this.styleImages();

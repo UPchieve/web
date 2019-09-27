@@ -282,24 +282,23 @@ export default {
   },
   data() {
     return {
-      user: {},
-      buttonMsg: "",
       error: ""
     };
   },
-  created() {
-    UserService.getUser(this).then(user => {
-      let button;
+  computed: {
+    user: function() {
+      const user = this.$store.state.user.user;
       user.race = user.race || [];
       user.birthdate = user.birthdate || "";
-      if (!user.isVolunteer) {
-        button = "NEXT";
+      return user;
+    },
+    buttonMsg: function() {
+      if (!this.$store.getters.user.isVolunteer) {
+        return "NEXT";
       } else {
-        button = "DONE";
+        return "DONE";
       }
-      this.user = user;
-      this.buttonMsg = button;
-    });
+    }
   },
   methods: {
     submitProfile() {

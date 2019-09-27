@@ -16,27 +16,25 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
+import { mapState } from "vuex";
 
 export default {
   name: "ContactView",
   created() {
-    Promise.all([UserService.getAuth(this), UserService.getUser(this)]).then(
-      result => {
-        const [user, auth] = result;
-        this.auth = auth;
-        this.user = user;
-        if (!this.auth.authenticated && !this.user.verified) {
-          this.$store.dispatch("app/hideNavigation");
-        }
-      }
-    );
+    if (!this.user._id && !this.user.verified) {
+      this.$store.dispatch("app/hideNavigation");
+    }
   },
   data() {
     return {
       auth: null,
       user: null
     };
+  },
+  computed: {
+    ...mapState({
+      user: state => state.user.user
+    })
   }
 };
 </script>

@@ -429,19 +429,22 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 import UserService from "@/services/UserService";
 import $ from "jquery";
 
 export default {
   data() {
     return {
-      user: {},
       buttonMsg: "DONE",
       error: ""
     };
   },
-  created() {
-    UserService.getUser().then(user => (this.user = user));
+  computed: {
+    ...mapState({
+      user: state => state.user.user
+    })
   },
   methods: {
     skipOnboarding() {

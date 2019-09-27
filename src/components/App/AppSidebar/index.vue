@@ -11,21 +11,21 @@
         <sidebar-info
           v-if="!mobileMode"
           style="margin-bottom: 64px;"
-          :authenticated="auth.authenticated"
-          :isVolunteer="user.isVolunteer"
+          :authenticated="isAuthenticated"
+          :isVolunteer="isVolunteer"
           :name="user.firstname"
         />
 
         <sidebar-links
-          :authenticated="auth.authenticated"
-          :isVolunteer="user.isVolunteer"
+          :authenticated="isAuthenticated"
+          :isVolunteer="isVolunteer"
           :isAdmin="user.isAdmin"
           :mobileMode="mobileMode"
         />
       </div>
 
       <div
-        v-if="auth.authenticated"
+        v-if="isAuthenticated"
         :class="finalLinkClass"
         v-on:click="logout"
       >
@@ -41,28 +41,22 @@
 <script>
 import { mapState, mapGetters } from "vuex";
 import AuthService from "@/services/AuthService";
-import UserService from "@/services/UserService";
 import SidebarInfo from "./SidebarInfo";
 import SidebarLinks from "./SidebarLinks";
 
 export default {
   components: { SidebarInfo, SidebarLinks },
-  data() {
-    return {
-      auth: { authenticated: false },
-      user: { isVolunteer: false }
-    };
-  },
-  created() {
-    UserService.getAuth(this).then(auth => (this.auth = auth));
-    UserService.getUser(this).then(user => (this.user = user));
-  },
   computed: {
     ...mapState({
+      user: state => state.user.user,
       showHeader: state => state.app.header.isShown,
       isSidebarCollapsed: state => state.app.sidebar.isCollapsed
     }),
-    ...mapGetters({ mobileMode: "app/mobileMode" }),
+    ...mapGetters({
+      isAuthenticated: "user/isAuthenticated",
+      isVolunteer: "user/isVolunteer",
+      mobileMode: "app/mobileMode"
+    }),
     finalLinkClass() {
       return {
         "AppSidebar-final-link": true,

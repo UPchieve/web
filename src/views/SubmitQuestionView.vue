@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
+import { mapState } from "vuex";
 
 import BasicTemplate from "@/components/BasicTemplate";
 import QuestionAnswerForm from "@/components/QuestionAnswerForm";
@@ -33,8 +33,6 @@ export default {
   },
   data() {
     return {
-      // This component
-      user: {},
       // Modal
       showModal: false,
       modalBtnLabels: [],
@@ -42,8 +40,8 @@ export default {
       modalClickHandlers: {}
     };
   },
-  created() {
-    UserService.getUser().then(user => (this.user = user));
+  computed: {
+    ...mapState({ user: state => state.user.user })
   }
 };
 </script>

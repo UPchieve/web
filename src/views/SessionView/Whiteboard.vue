@@ -91,10 +91,9 @@
  * @todo {1} Solve this bug ('handleUndoOperation' is not defined)
  */
 
-import { mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 import SessionService from "@/services/SessionService";
-import UserService from "@/services/UserService";
 import EraserIconUrl from "@/assets/eraser_icon_01_dark.png";
 import PenIconUrl from "@/assets/pen_icon_01_dark.png";
 
@@ -174,19 +173,20 @@ export default {
   },
   data() {
     return {
-      user: {},
       currentSession: SessionService.currentSession,
       showColors: "hidden"
     };
   },
   computed: {
-    ...mapGetters({ mobileMode: "app/mobileMode" })
+    ...mapState({
+      user: state => state.user.user
+    }),
+    ...mapGetters({
+      mobileMode: "app/mobileMode",
+    })
   },
   mounted() {
-    UserService.getUser(this).then(user => {
-      this.user = user;
-      this.drawSetup();
-    });
+    this.drawSetup();
   },
   methods: {
     emitDrawClick() {

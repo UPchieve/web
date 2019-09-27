@@ -144,7 +144,8 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
+import { mapState } from "vuex";
+
 import TrainingService from "@/services/TrainingService";
 
 const MathJax = window.MathJax;
@@ -162,7 +163,6 @@ export default {
       quizName = category.charAt(0).toUpperCase() + category.slice(1);
     }
     return {
-      user: {},
       category,
       questionText: "",
       quizName,
@@ -192,15 +192,18 @@ export default {
       qNumber: ""
     };
   },
-  created() {
-    UserService.getUser().then(user => {
+  computed: {
+    ...mapState({
+      user: state => state.user.user
+    }),
+    tries() {
+      let tries = 0;
       if (user[this.category]) {
-        let tries = 0;
         ({ tries } = user[this.category]); // {1}
         this.tries = tries;
       }
-      this.user = user;
-    });
+      return tries;
+    }
   },
   beforeMount() {
     TrainingService.loadQuiz(this, this.category).then(quizLength => {

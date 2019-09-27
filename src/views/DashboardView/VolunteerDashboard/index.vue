@@ -44,8 +44,6 @@
 import _ from "lodash";
 import { mapState, mapGetters } from "vuex";
 
-import UserService from "@/services/UserService";
-
 import ListSessions from "./ListSessions";
 import DashboardBanner from "../DashboardBanner";
 
@@ -80,92 +78,84 @@ export default {
       }
     }
   },
-  data() {
-    return {
-      user: {},
-      name: "Student",
-      impactStats: [{ label: "Loading..." }]
-    };
-  },
   created() {
-    UserService.getUser(this)
-      .then(user => user || {})
-      .then(user => {
-        // (1) Hours selected
-        const userHasSchedule = _.chain(user)
-          .get("availability.Thursday.5p")
-          .isBoolean()
-          .value();
-
-        let numHoursSelected = 0;
-
-        if (userHasSchedule) {
-          numHoursSelected = _.reduce(
-            user.availability,
-            (weeklyHourCount, dayHours) => {
-              // Tally up num hours for each day
-              const hoursSelectedForDay = _.reduce(
-                dayHours,
-                (dailyHourCount, hourVal) => {
-                  // Add 1 if hour val is true
-                  return dailyHourCount + (hourVal ? 1 : 0);
-                },
-                0
-              );
-
-              return weeklyHourCount + hoursSelectedForDay;
-            },
-            0
-          );
-        }
-
-        // (2) Certs obtained
-        const certsObtained = _.filter(upchieveTopics, topic => {
-          return _.get(user, `${topic}.passed`, false);
-        });
-
-        const numCertsObtained = certsObtained.length;
-
-        // (3) Requests filled
-        const numRequestsFilled = _.get(user, "numPastSessions", "?");
-
-        // (4) Hours tutored
-        const numHoursTutored = _.get(user, "numVolunteerSessionHours", "?");
-
-        const impactStats = [
-          {
-            label: "Hours of availability selected",
-            value: `${numHoursSelected} hours selected`
-          },
-          {
-            label: "Number of certifications obtained",
-            value: `${numCertsObtained} certs obtained`
-          },
-          {
-            label: "Number of requests filled",
-            value: `${numRequestsFilled} requests filled`
-          },
-          {
-            label: "Hours of tutoring completed",
-            value: `${numHoursTutored} hours tutored`
-          }
-        ];
-        this.user = user;
-        this.name = user.firstname || "Student";
-        this.impactStats = impactStats;
-
-        if (this.isSessionAlive) {
-          this.$store.dispatch("app/header/show", headerData);
-        }
-      });
+    if (this.isSessionAlive) {
+      this.$store.dispatch("app/header/show", headerData);
+    }
   },
   computed: {
     ...mapState({
-      sessionPath: state => state.user.sessionPath
+      sessionPath: state => state.user.sessionPath,
+      user: state => state.user.user
     }),
     ...mapGetters({
       isSessionAlive: "user/isSessionAlive"
-    })
+    }),
+    name: function() {
+      return this.$store.getters.user.firstName || "Student";
+    },
+    impactStats: function() {
+      const user = this.$store.state.user.user;
+       // (1) Hours selected
+      const userHasSchedule = _.chain(user)
+        .get("availability.Thursday.5p")
+        .isBoolean()
+        .value();
+  
+      let numHoursSelected = 0;
+  
+      if (userHasSchedule) {
+        numHoursSelected = _.reduce(
+          user.availability,
+          (weeklyHourCount, dayHours) => {
+            // Tally up num hours for each day
+            const hoursSelectedForDay = _.reduce(
+              dayHours,
+              (dailyHourCount, hourVal) => {
+                // Add 1 if hour val is true
+                return dailyHourCount + (hourVal ? 1 : 0);
+              },
+              0
+            );
+  
+            return weeklyHourCount + hoursSelectedForDay;
+          },
+          0
+        );
+      }
+  
+      // (2) Certs obtained
+      const certsObtained = _.filter(upchieveTopics, topic => {
+        return _.get(user, `${topic}.passed`, false);
+      });
+  
+      const numCertsObtained = certsObtained.length;
+  
+      // (3) Requests filled
+      const numRequestsFilled = _.get(user, "numPastSessions", "?");
+  
+      // (4) Hours tutored
+      const numHoursTutored = _.get(user, "numVolunteerSessionHours", "?");
+  
+      return [
+        {
+          label: "Hours of availability selected",
+          value: `${numHoursSelected} hours selected`
+        },
+        {
+          label: "Number of certifications obtained",
+          value: `${numCertsObtained} certs obtained`
+        },
+        {
+          label: "Number of requests filled",
+          value: `${numRequestsFilled} requests filled`
+        },
+        {
+          label: "Hours of tutoring completed",
+          value: `${numHoursTutored} hours tutored`
+        }
+      ];
+    }
   },
   methods: {
     rejoinHelpSession() {

@@ -58,9 +58,8 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
-import UserService from "@/services/UserService";
 import SessionService from "@/services/SessionService";
 import router from "@/router";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
@@ -72,7 +71,6 @@ import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 export default {
   data() {
     return {
-      user: {},
       currentSession: SessionService.currentSession,
       connectionMsg: "",
       connectionMsgType: "",
@@ -80,6 +78,9 @@ export default {
     };
   },
   computed: {
+    ...mapState({
+      user: state => state.user.user
+    }),
     ...mapGetters({
       sessionPartner: "user/sessionPartner",
       isSessionAlive: "user/isSessionAlive",
@@ -99,9 +100,6 @@ export default {
         backgroundImage: `url(${picture})`
       };
     }
-  },
-  created() {
-    UserService.getUser().then(user => (this.user = user));
   },
   methods: {
     end() {

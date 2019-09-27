@@ -132,14 +132,14 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
+import { mapState } from "vuex";
+
 import NetworkService from "@/services/NetworkService";
 import AnalyticsService from "@/services/AnalyticsService";
 
 export default {
   data() {
     return {
-      user: null,
       sessionId: "",
       topic: "",
       subTopic: "",
@@ -264,8 +264,10 @@ export default {
       userResponse: {}
     };
   },
-  created() {
-    UserService.getUser().then(user => (this.user = user));
+  computed: {
+    ...mapState({
+      user: state => state.user.user
+    })
   },
   beforeMount() {
     var _self = this;

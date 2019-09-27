@@ -27,7 +27,6 @@ import SendAnswerView from "./views/SendAnswerView";
 import AdminView from "./views/Admin";
 import VolunteerCoverage from "./views/Admin/VolunteerCoverage";
 
-import AuthService from "./services/AuthService";
 import OnboardingService from "./services/OnboardingService";
 import store from "./store";
 
@@ -38,13 +37,11 @@ const routes = [
   {
     path: "/",
     beforeEnter: (to, from, next) => {
-      return AuthService.getAuth().then(auth => {
-        if (auth.authenticated) {
-          next("/dashboard");
-        } else {
-          next("/login");
-        }
-      });
+      if (store.getters["user/isAuthenticated"]) {
+        next("/dashboard");
+      } else {
+        next("/login");
+      }
     }
   },
   { path: "/contact", name: "ContactView", component: ContactView },
@@ -199,8 +196,8 @@ export default router;
 // Router middleware to check authentication for protect routes
 router.beforeEach((to, from, next) => {
   if (to.matched.some(route => route.meta.protected)) {
-    AuthService.getAuth().then(auth => {
-      if (!auth.authenticated) {
+    store.dispatch("user/fetchUser").then(() => {
+      if (!store.getters["user/isAuthenticated"]) {
         next({
           path: "/login",
           query: {
@@ -228,14 +225,16 @@ router.beforeEach((to, from, next) => {
     });
   }
   if (to.matched.some(route => route.meta.requiresAdmin)) {
-    AuthService.getAuth().then(auth => {
-      if (!auth.data.isAdmin) {
+    Vue.store.dispatch("user/fetchUser").then(() => {
+      if (!store.state.user.user.isAdmin) {
         next({
           path: "/login",
           query: {
             redirect: to.fullPath
           }
         });
+      } else {
+        next();
       }
     });
   } else {

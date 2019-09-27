@@ -132,6 +132,8 @@
 </template>
 
 <script>
+import { mapGetters, mapState } from "vuex";
+
 import UserService from "@/services/UserService";
 import phoneValidation from "@/utils/phone-validation";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
@@ -140,25 +142,48 @@ import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 export default {
   data() {
     return {
-      user: {},
       activeEdit: false,
       editBtnMsg: "Edit",
-      name: "Loading",
-      avatarStyle: {
-        backgroundImage: "none"
-      },
-      certifications: {},
-      certKey: {},
       errors: [],
       invalidInputs: [],
       saveFailed: false
     };
   },
-  created() {
-    UserService.getUser().then(user => {
+  computed: {
+    ...mapState({
+      user: state => state.user.user
+    }),
+    ...mapGetters({
+      avatarUrl: "user/avatarUrl"
+    }),
+    name() {
+      const user = this.$store.state.user.user;
+      return user.firstname || (user.isVolunteer ? "volunteer" : "student");
+    },
+    avatarStyle() {
+      const user = this.$store.state.user.user;
       const avatarUrl =
         user.picture ||
         (user.isVolunteer ? VolunteerAvatarUrl : StudentAvatarUrl);
+      return {
+        backgroundImage: `url(${avatarUrl})`
+      };
+    },
+    certKey() {
+      const certKey = {};
+      certKey.Algebra = "MATH";
+      certKey.Geometry = "MATH";
+      certKey.Trigonometry = "MATH";
+      certKey.Precalculus = "MATH";
+      certKey.Calculus = "MATH";
+      certKey.ESL = "ESL";
+      certKey.Planning = "COLLEGE";
+      certKey.Essays = "COLLEGE";
+      certKey.Applications = "COLLEGE";
+      return certKey;
+    },
+    certifications() {
+      const user = this.$store.state.user.user;
 
       const certifications = {};
       if (user.algebra) {
@@ -207,24 +232,8 @@ export default {
         }
       }
 
-      const certKey = {};
-      certKey.Algebra = "MATH";
-      certKey.Geometry = "MATH";
-      certKey.Trigonometry = "MATH";
-      certKey.Precalculus = "MATH";
-      certKey.Calculus = "MATH";
-      certKey.ESL = "ESL";
-      certKey.Planning = "COLLEGE";
-      certKey.Essays = "COLLEGE";
-      certKey.Applications = "COLLEGE";
-
-      this.user = user;
-      this.name =
-        user.firstname || (user.isVolunteer ? "volunteer" : "student");
-      this.avatarStyle.backgroundImage = `url(${avatarUrl})`;
-      this.certifications = certifications;
-      this.certKey = certKey;
-    });
+      return certifications;
+    }
   },
   methods: {
     /**

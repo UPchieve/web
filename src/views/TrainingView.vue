@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
+import { mapState } from "vuex";
 
 /**
  * @todo {1} Refactor into global filters (https://vuejs.org/v2/guide/filters.html)
@@ -127,7 +127,6 @@ export default {
     reviewMaterials.applications =
       "https://drive.google.com/open?id=1gXmbGRaUz324-EiZMzph1KUYS8WhR9ax";
     return {
-      user: {},
       quizzes,
       bools,
       supercategories,
@@ -135,10 +134,8 @@ export default {
       reviewMaterials
     };
   },
-  created() {
-    UserService.getUser().then(user => {
-      this.user = user;
-    });
+  computed: {
+    ...mapState({ user: state => state.user.user })
   },
   methods: {
     flipBool(supercategory) {

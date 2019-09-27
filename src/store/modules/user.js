@@ -22,7 +22,7 @@ export default {
     },
 
     fetchUser: ({ commit }) => {
-      UserService.getUser().then(user => commit("setUser", user));
+      return UserService.getUser().then(user => commit("setUser", user));
     },
 
     fetchSession: ({ commit, state }, context) => {
@@ -64,6 +64,8 @@ export default {
 
     isVolunteer: state => state.user.isVolunteer,
     isAdmin: state => state.user.isAdmin,
+
+    isAuthenticated: state => !!(state.user && state.user._id),
 
     sessionPartner: (state, getters) => {
       if (

@@ -28,27 +28,26 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
+import { mapState } from "vuex";
 
 export default {
   data() {
     return {
-      user: {},
       openSessions: []
     };
   },
-  created() {
-    UserService.getUser().then(user => (this.user = user));
+  computed: {
+    ...mapState({
+      user: state => state.user.user
+    })
   },
   mounted() {
     // reconnect socket if it isn't already
     if (!this.$socket.connected) {
       this.$socket.connect();
     }
-    UserService.getUser().then(user => {
-      this.$socket.emit("list", {
-        user: user
-      });
+    this.$socket.emit("list", {
+      user: this.user
     });
   },
   methods: {

@@ -10,8 +10,9 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 import StudentQuestionService from "@/services/StudentQuestionService";
-import UserService from "@/services/UserService";
 
 import ContentHeader from "@/components/ContentHeader";
 import HelpRequests from "./HelpRequests";
@@ -24,15 +25,16 @@ export default {
   },
   data() {
     return {
-      user: {},
       helpRequests: {
         type: "question",
         requests: []
       }
     };
   },
-  created() {
-    UserService.getUser(user => (this.user = user));
+  computed: {
+    ...mapState({
+      user: state => state.user.user
+    })
   },
   mounted() {
     StudentQuestionService.getStudentQuestions(this, {}).then(questions => {

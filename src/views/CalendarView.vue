@@ -46,10 +46,11 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 import _ from "lodash";
 import moment from "moment-timezone";
 
-import UserService from "@/services/UserService";
 import CalendarService from "@/services/CalendarService";
 import AnalyticsService from "@/services/AnalyticsService";
 
@@ -90,6 +91,9 @@ export default {
     };
   },
   computed: {
+    ...mapState({
+      user: state => state.user.user
+    }),
     sortedTimes() {
       return this.sortTimes();
     },
@@ -98,10 +102,7 @@ export default {
     }
   },
   created() {
-    UserService.getUser(this).then(user => {
-      this.user = user;
-      this.fetchData();
-    });
+    this.fetchData();
   },
   methods: {
     fetchData() {

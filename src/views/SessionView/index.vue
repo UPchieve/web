@@ -41,10 +41,9 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 import SessionService from "@/services/SessionService";
-import UserService from "@/services/UserService";
 
 import SessionHeader from "./SessionHeader";
 import Whiteboard from "./Whiteboard";
@@ -85,7 +84,12 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ mobileMode: "app/mobileMode" }),
+    ...mapState({
+      user: state => state.user.user
+    }),
+    ...mapGetters({
+      mobileMode: "app/mobileMode",
+    }),
 
     shouldHideWhiteboardSection() {
       // Never hide chat section on desktop
@@ -176,11 +180,9 @@ export default {
       }
     },
     joinSession(sessionId) {
-      UserService.getUser(this).then(user => {
-        this.$socket.emit("join", {
-          sessionId,
-          user: user
-        });
+      this.$socket.emit("join", {
+        sessionId,
+        user: this.user
       });
     },
     tryClicked() {
