@@ -1,19 +1,26 @@
 import { shallowMount, createLocalVue } from "@vue/test-utils";
 import Vuex from "vuex";
 import appModule from "@/store/modules/app";
+import userModule from "@/store/modules/user";
 import DashboardBanner from "@/views/DashboardView/DashboardBanner";
 // import LargeButton from "@/components/LargeButton";
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-const getWrapper = (mobileMode = false) => {
+const getWrapper = (mobileMode = false, firstName = "Tester") => {
   const store = new Vuex.Store({
     modules: {
       app: {
         ...appModule,
         getters: {
           mobileMode: () => mobileMode
+        }
+      },
+      user: {
+        ...userModule,
+        getters: {
+          firstName: () => firstName
         }
       }
     }
