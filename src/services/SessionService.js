@@ -62,6 +62,7 @@ export default {
         }
         // analytics: track when a session has started
         AnalyticsService.trackSessionStarted(
+          context,
           this.currentSession,
           sessionType,
           sessionSubTopic,
@@ -81,7 +82,7 @@ export default {
       this.currentSession.sessionId = sessionId;
 
       if (!sessionId) {
-        router.replace("/");
+        context.$router.replace("/");
       }
 
       return sessionId;

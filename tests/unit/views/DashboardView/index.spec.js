@@ -8,7 +8,7 @@ import StudentDashboard from "@/views/DashboardView/StudentDashboard";
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-const getWrapper = ( isAuthenticated = true, isVolunteer = false ) => {
+const getWrapper = (isAuthenticated = true, isVolunteer = false) => {
   const store = new Vuex.Store({
     modules: {
       user: {
@@ -20,7 +20,7 @@ const getWrapper = ( isAuthenticated = true, isVolunteer = false ) => {
       }
     }
   });
-  
+
   return shallowMount(DashboardView, { localVue, store });
 };
 

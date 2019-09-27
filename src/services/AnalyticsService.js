@@ -137,10 +137,10 @@ export default {
   },
 
   // tracks when a help session has started
-  trackSessionStarted(currentSession, topic, subTopic, isFakeUser) {
+  trackSessionStarted(context, currentSession, topic, subTopic, isFakeUser) {
     if (isFakeUser) return;
 
-    const user = store.state.user.user;
+    const user = context.$store.state.user.user;
     window.analytics.track("session started", {
       "session started date": new Date(),
       user: user.isVolunteer ? "volunteer" : "student",
