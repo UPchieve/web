@@ -23,7 +23,7 @@ export default {
         if (!data) {
           throw new Error("No user returned from auth service");
         }
-        
+
         // analytics: tracking when a user has logged in
         AnalyticsService.identify(data.user, data.user.isFakeUser);
         AnalyticsService.trackNoProperties("logged in", data.user.isFakeUser);
