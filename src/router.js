@@ -37,11 +37,16 @@ const routes = [
   {
     path: "/",
     beforeEnter: (to, from, next) => {
-      if (store.getters["user/isAuthenticated"]) {
-        next("/dashboard");
-      } else {
-        next("/login");
-      }
+      store
+        .dispatch("user/fetchUser")
+        .then(() => {
+          if (store.getters["user/isAuthenticated"]) {
+            next("/dashboard");
+          } else {
+            next("/login");
+          }
+        })
+        .catch(() => next("/login"));
     }
   },
   { path: "/contact", name: "ContactView", component: ContactView },
@@ -195,7 +200,20 @@ export default router;
 
 // Router middleware to check authentication for protect routes
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(route => route.meta.protected)) {
+  if (to.matched.some(route => route.meta.requiresAdmin)) {
+    store.dispatch("user/fetchUser").then(() => {
+      if (!store.state.user.user.isAdmin) {
+        next({
+          path: "/login",
+          query: {
+            redirect: to.fullPath
+          }
+        });
+      } else {
+        next();
+      }
+    });
+  } else if (to.matched.some(route => route.meta.protected)) {
     store.dispatch("user/fetchUser").then(() => {
       if (!store.getters["user/isAuthenticated"]) {
         next({
@@ -219,20 +237,6 @@ router.beforeEach((to, from, next) => {
             }
           });
         }
-      } else {
-        next();
-      }
-    });
-  }
-  if (to.matched.some(route => route.meta.requiresAdmin)) {
-    Vue.store.dispatch("user/fetchUser").then(() => {
-      if (!store.state.user.user.isAdmin) {
-        next({
-          path: "/login",
-          query: {
-            redirect: to.fullPath
-          }
-        });
       } else {
         next();
       }

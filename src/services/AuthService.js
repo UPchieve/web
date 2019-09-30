@@ -6,7 +6,7 @@ import NetworkService from "./NetworkService";
 import AnalyticsService from "./AnalyticsService";
 
 export default {
-  login(context, creds, redirect) {
+  login(context, creds) {
     const { email, password } = creds;
     if (
       !email ||
@@ -28,9 +28,7 @@ export default {
         AnalyticsService.identify(data.user, data.user.isFakeUser);
         AnalyticsService.trackNoProperties("logged in", data.user.isFakeUser);
 
-        if (redirect) {
-          context.$router.push(redirect);
-        }
+        return data;
       },
       () => {
         context.error = "Could not login";

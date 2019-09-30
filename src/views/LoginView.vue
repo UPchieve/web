@@ -81,14 +81,12 @@ export default {
   },
   methods: {
     submit() {
-      AuthService.login(
-        this,
-        {
-          email: this.credentials.email,
-          password: this.credentials.password
-        },
-        this.$route.query.redirect || "/"
-      );
+      AuthService.login(this, {
+        email: this.credentials.email,
+        password: this.credentials.password
+      }).then(() => {
+        this.$router.push(this.$route.query.redirect || "/");
+      });
     }
   },
   beforeRouteEnter(to, from, next) {
