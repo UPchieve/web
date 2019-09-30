@@ -37,16 +37,11 @@ const routes = [
   {
     path: "/",
     beforeEnter: (to, from, next) => {
-      store
-        .dispatch("user/fetchUser")
-        .then(() => {
-          if (store.getters["user/isAuthenticated"]) {
-            next("/dashboard");
-          } else {
-            next("/login");
-          }
-        })
-        .catch(() => next("/login"));
+      if (store.getters["user/isAuthenticated"]) {
+        next("/dashboard");
+      } else {
+        next("/login");
+      }
     }
   },
   { path: "/contact", name: "ContactView", component: ContactView },
