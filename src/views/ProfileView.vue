@@ -266,11 +266,7 @@ export default {
 
         // send only the necessary data
         const payloadUser = {};
-        const keys = ["firstname", "lastname", "email"];
-
-        if (this.user.isVolunteer) {
-          keys.push("phonePretty", "college", "favoriteAcademicSubject");
-        }
+        const keys = ["phonePretty", "college", "favoriteAcademicSubject"];
 
         keys.forEach(key => (payloadUser[key] = this.user[key]));
 
