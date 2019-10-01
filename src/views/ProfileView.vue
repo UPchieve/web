@@ -263,25 +263,17 @@ export default {
 
       if (!this.errors.length) {
         // form fields valid, so set profile
-        
+
         // send only the necessary data
         const payloadUser = {};
-        const keys = [
-          "firstname",
-          "lastname",
-          "email"
-        ];
-        
+        const keys = ["firstname", "lastname", "email"];
+
         if (this.user.isVolunteer) {
-          keys.push(
-            "phonePretty",
-            "college",
-            "favoriteAcademicSubject"
-          );
+          keys.push("phonePretty", "college", "favoriteAcademicSubject");
         }
-        
-        keys.forEach(key => payloadUser[key] = this.user[key]);
-        
+
+        keys.forEach(key => (payloadUser[key] = this.user[key]));
+
         // wait for save to succeed before coming out of edit mode
         UserService.setProfile(this, payloadUser).then(
           () => {
