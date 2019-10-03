@@ -53,10 +53,10 @@ export default {
   methods: {
     gotoSession(session) {
       const { type, subTopic, _id } = session;
+      const path = `/session/${type}/${subTopic}/${_id}`;
 
       if (type && subTopic && _id) {
-        this.$store.dispatch("user/updateSession", session);
-        this.$router.push(this.$store.state.user.sessionPath);
+        this.$router.push(path);
       } else {
         this.$store.dispatch("user/clearSession");
       }
