@@ -132,10 +132,10 @@ export default {
       const numCertsObtained = certsObtained.length;
 
       // (3) Requests filled
-      const numRequestsFilled = _.get(user, "numPastSessions", "?");
+      const numRequestsFilled = _.get(user, "numPastSessions", "--");
 
       // (4) Hours tutored
-      const numHoursTutored = _.get(user, "numVolunteerSessionHours", "?");
+      const numHoursTutored = _.get(user, "numVolunteerSessionHours", "--");
 
       return [
         {
