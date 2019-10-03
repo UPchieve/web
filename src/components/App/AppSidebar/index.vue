@@ -27,9 +27,6 @@
       <div v-if="isAuthenticated" :class="finalLinkClass" v-on:click="logout">
         Log out
       </div>
-      <div v-else :class="finalLinkClass" v-on:click="backToWebsite">
-        Back to website
-      </div>
     </div>
   </nav>
 </template>

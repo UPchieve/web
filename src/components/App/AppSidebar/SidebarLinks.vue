@@ -36,15 +36,11 @@
         icon="folder"
         text="Resources"
       />
-    </template>
 
-    <template v-else>
-      <sidebar-link to="/login" text="Login" />
+      <div v-if="!mobileMode" class="SidebarLinks-about">About UPchieve</div>
+      <sidebar-link to="/contact" icon="envelope" text="Contact us" />
+      <sidebar-link to="/legal" icon="exclamation" text="Legal policy" />
     </template>
-
-    <div v-if="!mobileMode" class="SidebarLinks-about">About UPchieve</div>
-    <sidebar-link to="/contact" icon="envelope" text="Contact us" />
-    <sidebar-link to="/legal" icon="exclamation" text="Legal policy" />
   </div>
 </template>
 
