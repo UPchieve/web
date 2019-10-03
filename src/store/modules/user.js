@@ -7,12 +7,10 @@ export default {
   namespaced: true,
   state: {
     user: {},
-    sessionPath: null,
     session: {}
   },
   mutations: {
     setUser: (state, user = {}) => (state.user = user),
-    setSessionPath: (state, path = null) => (state.sessionPath = path),
     setSession: (state, session = {}) => (state.session = session)
   },
   actions: {
@@ -27,26 +25,19 @@ export default {
 
     fetchSession: ({ commit, state }, context) => {
       SessionService.getCurrentSession(context, state.user)
-        .then(({ sessionPath, sessionData }) => {
-          commit("setSessionPath", sessionPath);
+        .then(({ sessionData }) => {
           commit("setSession", sessionData);
         })
         .catch(() => {
-          commit("setSessionPath", null);
           commit("setSession", {});
         });
     },
 
     updateSession: ({ commit }, sessionData) => {
-      const { type, subTopic, _id } = sessionData;
-      const sessionPath = `/session/${type}/${subTopic}/${_id}`;
-
-      commit("setSessionPath", sessionPath);
       commit("setSession", sessionData);
     },
 
     clearSession: ({ commit }) => {
-      commit("setSessionPath", null);
       commit("setSession", {});
     }
   },
@@ -66,6 +57,13 @@ export default {
     isAdmin: state => state.user.isAdmin,
 
     isAuthenticated: state => !!(state.user && state.user._id),
+
+    sessionPath: state => {
+      const { type, subTopic, _id } = state.session;
+      const path = `/session/${type}/${subTopic}/${_id}`;
+
+      return path;
+    },
 
     sessionPartner: (state, getters) => {
       if (

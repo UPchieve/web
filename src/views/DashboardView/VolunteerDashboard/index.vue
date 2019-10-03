@@ -85,11 +85,11 @@ export default {
   },
   computed: {
     ...mapState({
-      sessionPath: state => state.user.sessionPath,
       user: state => state.user.user
     }),
     ...mapGetters({
-      isSessionAlive: "user/isSessionAlive"
+      isSessionAlive: "user/isSessionAlive",
+      sessionPath: "user/sessionPath"
     }),
     name: function() {
       return this.$store.getters.user.firstName || "Student";

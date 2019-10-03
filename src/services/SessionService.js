@@ -56,7 +56,7 @@ export default {
             _id: sessionId
           };
           context.$store.dispatch("user/updateSession", sessionData);
-          context.$router.replace(context.$store.state.user.sessionPath);
+          context.$router.replace(context.$store.getters["user/sessionPath"]);
         } else {
           context.$router.replace("/");
         }
@@ -108,8 +108,7 @@ export default {
         this.currentSession.sessionId = sessionId;
         this.currentSession.data = data;
 
-        const path = `/session/${type}/${subTopic}/${sessionId}`;
-        return Promise.resolve({ sessionPath: path, sessionData: data });
+        return Promise.resolve({ sessionData: data });
       }
     });
   }

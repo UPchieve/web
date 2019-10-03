@@ -91,7 +91,6 @@ export default {
     routeTo: String
   },
   computed: {
-    ...mapState({ sessionPath: state => state.user.sessionPath }),
     ...mapGetters({
       mobileMode: "app/mobileMode",
       isSessionAlive: "user/isSessionAlive"
