@@ -92,7 +92,7 @@ export default {
     }),
 
     shouldHideWhiteboardSection() {
-      // Never hide chat section on desktop
+      // Never hide whiteboard section on desktop
       if (!this.mobileMode) {
         return false;
       }

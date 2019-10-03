@@ -243,6 +243,7 @@ a {
 .test {
   display: flex;
   flex-direction: column;
+  min-width: 143px;
 }
 
 .test-container,
