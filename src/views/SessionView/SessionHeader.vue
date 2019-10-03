@@ -166,14 +166,14 @@ export default {
               studentId +
               "/" +
               volunteerId;
-            router.replace(url);
+            router.push(url);
           })
           .catch(this.alertCouldNotEnd);
       } else {
         SessionService.endSession(this, sessionId)
           .then(() => {
             this.$socket.disconnect();
-            router.replace("/");
+            router.push("/");
           })
           .catch(this.alertCouldNotEnd);
       }
