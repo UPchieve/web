@@ -135,7 +135,12 @@ const routes = [
     component: ProfileView,
     meta: { protected: true }
   },
-  { path: "/calendar", name: "CalendarView", component: CalendarView },
+  {
+    path: "/calendar",
+    name: "CalendarView",
+    component: CalendarView,
+    meta: { protected: true }
+  },
   {
     path: "/submit-question",
     name: "SubmitQuestionView",
