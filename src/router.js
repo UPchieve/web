@@ -27,7 +27,6 @@ import SendAnswerView from "./views/SendAnswerView";
 import AdminView from "./views/Admin";
 import VolunteerCoverage from "./views/Admin/VolunteerCoverage";
 
-import OnboardingService from "./services/OnboardingService";
 import store from "./store";
 
 Vue.use(VueResource);
