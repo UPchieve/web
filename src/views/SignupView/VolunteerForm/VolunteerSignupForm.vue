@@ -114,7 +114,7 @@
 
     <div class="uc-column">
       <label for="college" class="uc-form-label">
-        What college do you go to?
+        College
       </label>
       <input
         id="college"
