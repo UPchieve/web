@@ -28,7 +28,7 @@ export default {
       AnalyticsService.trackSessionEnded(
         context,
         this.currentSession.data,
-        context.store.$state.user.isFakeUser
+        context.$store.state.user.isFakeUser
       );
 
       this.currentSession.sessionId = null;
