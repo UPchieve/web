@@ -9,17 +9,6 @@ export default {
     data: {}
   },
 
-  getPartner() {
-    return UserService.getUser().then(user => {
-      const session = this.currentSession.data || {};
-
-      if (user.isVolunteer) {
-        return session.student;
-      }
-      return session.volunteer;
-    });
-  },
-
   endSession(context, sessionId) {
     return NetworkService.endSession(context, { sessionId }).then(() => {
       context.$store.dispatch("user/clearSession");
