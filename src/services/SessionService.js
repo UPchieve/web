@@ -22,19 +22,17 @@ export default {
 
   endSession(context, sessionId) {
     return NetworkService.endSession(context, { sessionId }).then(() => {
-      return UserService.getUser(context).then(user => {
-        context.$store.dispatch("user/clearSession");
+      context.$store.dispatch("user/clearSession");
 
-        // analytics: track when a help session has ended
-        AnalyticsService.trackSessionEnded(
-          context,
-          this.currentSession.data,
-          user.isFakeUser
-        );
+      // analytics: track when a help session has ended
+      AnalyticsService.trackSessionEnded(
+        context,
+        this.currentSession.data,
+        context.store.$state.user.isFakeUser
+      );
 
-        this.currentSession.sessionId = null;
-        this.currentSession.data = {};
-      });
+      this.currentSession.sessionId = null;
+      this.currentSession.data = {};
     });
   },
 
@@ -43,34 +41,32 @@ export default {
       sessionType,
       sessionSubTopic
     }).then(res => {
-      return UserService.getUser(context).then(user => {
-        const data = res.data || {};
-        const { sessionId } = data;
+      const data = res.data || {};
+      const { sessionId } = data;
 
-        this.currentSession.sessionId = sessionId;
+      this.currentSession.sessionId = sessionId;
 
-        if (sessionId) {
-          const sessionData = {
-            type: sessionType,
-            subTopic: sessionSubTopic,
-            _id: sessionId
-          };
-          context.$store.dispatch("user/updateSession", sessionData);
-          context.$router.replace(context.$store.getters["user/sessionPath"]);
-        } else {
-          context.$router.replace("/");
-        }
-        // analytics: track when a session has started
-        AnalyticsService.trackSessionStarted(
-          context,
-          this.currentSession,
-          sessionType,
-          sessionSubTopic,
-          user.isFakeUser
-        );
+      if (sessionId) {
+        const sessionData = {
+          type: sessionType,
+          subTopic: sessionSubTopic,
+          _id: sessionId
+        };
+        context.$store.dispatch("user/updateSession", sessionData);
+        context.$router.replace(context.$store.getters["user/sessionPath"]);
+      } else {
+        context.$router.replace("/");
+      }
+      // analytics: track when a session has started
+      AnalyticsService.trackSessionStarted(
+        context,
+        this.currentSession,
+        sessionType,
+        sessionSubTopic,
+        context.$store.state.user.isFakeUser
+      );
 
-        return sessionId;
-      });
+      return sessionId;
     });
   },
 
