@@ -222,8 +222,8 @@ router.beforeEach((to, from, next) => {
             redirect: to.fullPath
           }
         });
-      } else if (!OnboardingService.isOnboarded()) {
-        const route = OnboardingService.getOnboardingRoute();
+      } else if (!store.getters["user/isEmailVerified"]) {
+        const route = "/onboarding/verify";
         if (
           to.path.indexOf(route) !== -1 ||
           to.matched.some(route => route.meta.bypassOnboarding)
