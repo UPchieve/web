@@ -200,8 +200,19 @@ export default router;
 
 // Router middleware to check authentication for protect routes
 router.beforeEach((to, from, next) => {
+  const getUser = () => {
+    if (store.getters["user/isAuthenticated"]) {
+      return new Promise(resolve => {
+        store.dispatch("user/fetchUser");
+        resolve();
+      });
+    } else {
+      return store.dispatch("user/fetchUser");
+    }
+  };
+
   if (to.matched.some(route => route.meta.requiresAdmin)) {
-    store.dispatch("user/fetchUser").then(() => {
+    getUser().then(() => {
       if (!store.state.user.user.isAdmin) {
         next({
           path: "/login",
@@ -214,7 +225,7 @@ router.beforeEach((to, from, next) => {
       }
     });
   } else if (to.matched.some(route => route.meta.protected)) {
-    store.dispatch("user/fetchUser").then(() => {
+    getUser().then(() => {
       if (!store.getters["user/isAuthenticated"]) {
         next({
           path: "/login",
