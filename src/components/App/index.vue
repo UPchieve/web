@@ -37,12 +37,9 @@ export default {
     // Listen for resize event
     window.addEventListener("resize", this.handleResize);
     this.handleResize();
-
-    // Fetch user data
-    this.$store.dispatch("user/fetch", this);
   },
   beforeUpdate() {
-    this.$store.dispatch("user/fetch", this);
+    this.$store.dispatch("user/fetchSession", this);
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.handleResize);
