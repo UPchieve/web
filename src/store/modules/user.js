@@ -58,6 +58,8 @@ export default {
 
     isAuthenticated: state => !!(state.user && state.user._id),
 
+    isEmailVerified: state => state.user.verified,
+
     sessionPath: state => {
       const { type, subTopic, _id } = state.session;
       const path = `/session/${type}/${subTopic}/${_id}`;
