@@ -1,5 +1,4 @@
 import NetworkService from "./NetworkService";
-import UserService from "./UserService";
 import AnalyticsService from "./AnalyticsService";
 
 export default {
