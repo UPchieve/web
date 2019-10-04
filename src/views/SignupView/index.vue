@@ -32,6 +32,7 @@
 </template>
 
 <script>
+import AuthService from "@/services/AuthService";
 import FormPageTemplate from "@/components/FormPageTemplate";
 import StudentForm from "./StudentForm";
 import VolunteerForm from "./VolunteerForm";
@@ -45,6 +46,12 @@ export default {
   },
   created() {
     this.$store.dispatch("app/hideNavigation");
+
+    AuthService.getAuth().then(auth => {
+      if (auth.authenticated) {
+        this.$router.replace("/dashboard");
+      }
+    });
   },
   data() {
     return {

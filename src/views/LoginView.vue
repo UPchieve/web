@@ -65,6 +65,12 @@ export default {
   },
   created() {
     this.$store.dispatch("app/hideNavigation");
+
+    AuthService.getAuth().then(auth => {
+      if (auth.authenticated) {
+        this.$router.replace("/dashboard");
+      }
+    });
   },
   data() {
     let error;
@@ -89,17 +95,6 @@ export default {
         this.$router.push(this.$route.query.redirect || "/");
       });
     }
-  },
-  beforeRouteEnter(to, from, next) {
-    AuthService.getAuth().then(auth => {
-      if (auth.authenticated) {
-        next({
-          path: "/"
-        });
-      } else {
-        next();
-      }
-    });
   }
 };
 </script>
