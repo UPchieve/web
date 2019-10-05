@@ -61,9 +61,6 @@ const routes = [
   {
     path: "/dashboard",
     name: "DashboardView",
-    beforeEnter: (to, from, next) => {
-      next();
-    },
     component: DashboardView,
     meta: { protected: true }
   },
