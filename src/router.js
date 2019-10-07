@@ -32,15 +32,28 @@ import store from "./store";
 Vue.use(VueResource);
 Vue.http.options.credentials = true;
 
+const getUser = () => {
+  if (store.getters["user/isAuthenticated"]) {
+    return new Promise(resolve => {
+      store.dispatch("user/fetchUser");
+      resolve();
+    });
+  } else {
+    return store.dispatch("user/fetchUser");
+  }
+};
+
 const routes = [
   {
     path: "/",
     beforeEnter: (to, from, next) => {
-      if (store.getters["user/isAuthenticated"]) {
-        next("/dashboard");
-      } else {
-        next("/login");
-      }
+      getUser().then(() => {
+        if (store.getters["user/isAuthenticated"]) {
+          next("/dashboard");
+        } else {
+          next("/login");
+        }
+      })
     }
   },
   { path: "/contact", name: "ContactView", component: ContactView },
@@ -196,17 +209,6 @@ export default router;
 
 // Router middleware to check authentication for protect routes
 router.beforeEach((to, from, next) => {
-  const getUser = () => {
-    if (store.getters["user/isAuthenticated"]) {
-      return new Promise(resolve => {
-        store.dispatch("user/fetchUser");
-        resolve();
-      });
-    } else {
-      return store.dispatch("user/fetchUser");
-    }
-  };
-
   if (to.matched.some(route => route.meta.requiresAdmin)) {
     getUser().then(() => {
       if (!store.state.user.user.isAdmin) {
