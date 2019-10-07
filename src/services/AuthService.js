@@ -108,9 +108,11 @@ export default {
     if (context) {
       NetworkService.logout(context)
         .then(() => {
+          context.$store.dispatch("user/clearUser");
           context.$router.push("/logout");
         })
         .catch(() => {
+          context.$store.dispatch("user/clearUser");
           context.$router.push("/logout");
         });
     }

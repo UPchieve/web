@@ -23,6 +23,10 @@ export default {
       return UserService.getUser().then(user => commit("setUser", user));
     },
 
+    clearUser: ({ commit }) => {
+      commit("setUser", {});
+    },
+
     fetchSession: ({ commit, state }, context) => {
       SessionService.getCurrentSession(context, state.user)
         .then(({ sessionData }) => {
