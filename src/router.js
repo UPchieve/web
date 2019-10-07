@@ -133,7 +133,16 @@ const routes = [
     path: "/onboarding/:step?",
     name: "OnboardingView",
     component: OnboardingView,
-    meta: { protected: true }
+    meta: { protected: true },
+    beforeEnter: (to, from, next) => {
+      getUser().then(() => {
+        if (store.getters["user/isEmailVerified"]) {
+          next("/dashboard");
+        } else {
+          next();
+        }
+      });
+    }
   },
   {
     path: "/training",
