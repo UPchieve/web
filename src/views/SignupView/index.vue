@@ -46,12 +46,6 @@ export default {
   },
   created() {
     this.$store.dispatch("app/hideNavigation");
-
-    AuthService.getAuth().then(auth => {
-      if (auth.authenticated) {
-        this.$router.replace("/dashboard");
-      }
-    });
   },
   data() {
     return {

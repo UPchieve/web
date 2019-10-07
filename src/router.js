@@ -58,9 +58,24 @@ const routes = [
   },
   { path: "/contact", name: "ContactView", component: ContactView },
   { path: "/legal", name: "LegalView", component: LegalView },
-  { path: "/login", name: "LoginView", component: LoginView },
-  { path: "/logout", name: "LogoutView", component: LogoutView },
-  { path: "/signup", name: "SignupView", component: SignupView },
+  {
+    path: "/login",
+    name: "LoginView",
+    component: LoginView,
+    meta: { loggedOutOnly: true }
+  },
+  {
+    path: "/logout",
+    name: "LogoutView",
+    component: LogoutView,
+    meta: { loggedOutOnly: true }
+  },
+  {
+    path: "/signup",
+    name: "SignupView",
+    component: SignupView,
+    meta: { loggedOutOnly: true }
+  },
   {
     path: "/resetpassword",
     name: "ResetPasswordView",
@@ -246,6 +261,14 @@ router.beforeEach((to, from, next) => {
             }
           });
         }
+      } else {
+        next();
+      }
+    });
+  } else if (to.matched.some(route => route.meta.loggedOutOnly)) {
+    getUser().then(() => {
+      if (store.getters["user/isAuthenticated"]) {
+        next("/dashboard");
       } else {
         next();
       }
