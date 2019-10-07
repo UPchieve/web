@@ -32,7 +32,6 @@
 </template>
 
 <script>
-import AuthService from "@/services/AuthService";
 import FormPageTemplate from "@/components/FormPageTemplate";
 import StudentForm from "./StudentForm";
 import VolunteerForm from "./VolunteerForm";
