@@ -623,7 +623,7 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
+import { mapGetters, mapState } from "vuex";
 
 import FullTextTemplate from "@/components/FullTextTemplate";
 import Accordion from "@/components/Accordion";
@@ -637,18 +637,17 @@ export default {
     AccordionItem
   },
   created() {
-    if (!this.auth.authenticated && !this.user.verified) {
+    if (!this.auth && !this.user.verified) {
       this.$store.dispatch("app/hideNavigation");
     }
   },
-  data() {
-    const auth = UserService.getAuth();
-
-    const user = UserService.getUser();
-    return {
-      auth,
-      user
-    };
+  computed: {
+    ...mapState({
+      user: state => state.user.user
+    }),
+    ...mapGetters({
+      auth: "user/isAuthenticated"
+    })
   }
 };
 </script>

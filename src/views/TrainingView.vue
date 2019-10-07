@@ -1,7 +1,7 @@
 <template>
   <div v-if="user.isVolunteer" class="training">
-    <h1 class="header">Volunteer Training</h1>
     <div class="body-container">
+      <h1 class="body-header">Volunteer Training</h1>
       <div v-for="supercategory in supercategories" :key="supercategory">
         <div
           v-if="supercategory !== 'esl'"
@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
+import { mapState } from "vuex";
 
 /**
  * @todo {1} Refactor into global filters (https://vuejs.org/v2/guide/filters.html)
@@ -83,7 +83,6 @@ export default {
     }
   },
   data() {
-    const user = UserService.getUser();
     const quizzes = {};
     quizzes.math = [
       "algebra",
@@ -110,31 +109,33 @@ export default {
     colors.science = "#9575CD";
     const reviewMaterials = {};
     reviewMaterials.algebra =
-      "https://drive.google.com/open?id=1UQCaewADDlYXT7vv4-GUuTg7rjLnIdeufGwLgezBo4Y";
+      "https://drive.google.com/open?id=105iP5lJdVti-r2reY8N3tKQOA0FtrjZW";
     reviewMaterials.geometry =
-      "https://docs.google.com/document/d/128AHz0DakobmILSTrbiQVix3677FhCNcazduc3896Lk/edit?usp=sharing";
+      "https://drive.google.com/open?id=1Ug_JbG8_Rok60B__o0E4WQ426WV9VmJe";
     reviewMaterials.trigonometry =
-      "https://drive.google.com/open?id=0B8mTVZa3-VGQUkxhd0R0Wmg1azZ5Z1pWUE8xa2g0MGZYemZF";
+      "https://drive.google.com/open?id=1cQ_JcY9IS29t4k8IaZHHJYKwV0FhkbX3";
     reviewMaterials.precalculus =
-      "https://drive.google.com/open?id=1_T6wdW1_aDvT5kkK2DslUTBllRdOAc_JJ4oxHzzoB6U";
+      "https://drive.google.com/open?id=1jOGiQNs_IWwh3cT2mW-1kj9I80NeotaT";
     reviewMaterials.calculus =
-      "https://drive.google.com/open?id=1dxBoVIZsmw4tuUkmDF2y1rmuS0tvxw_d";
+      "https://drive.google.com/open?id=1BePatfy99En5KwLEDVP2XTMdeMR0NEMx";
     reviewMaterials.esl =
       "https://drive.google.com/open?id=1P99PIY89X6VdvCGMMzjNOS55Nvljkc8Lv6FxmjJzo8Y";
     reviewMaterials.planning =
-      "https://drive.google.com/file/d/1MXl7g4E4hdt05Pt8jl9gQvr1kfv-cKBU/view?usp=sharing";
-    reviewMaterials.essay =
-      "https://drive.google.com/file/d/19IyuDkShzdaRvN0fAZqvYkpoMJPR-XfG/view?usp=sharing";
-    reviewMaterials.application =
-      "https://drive.google.com/file/d/18J5ca1LSNgh_9MQqct02Myr5UMFp1VOu/view?usp=sharing";
+      "https://drive.google.com/open?id=1b_EHOgtrkkyWa6ge4fbKqxC7ZDgHrJxx";
+    reviewMaterials.essays =
+      "https://drive.google.com/open?id=1lJXVI1f9Do60pNXcBQGSZThNXhYmtMvV";
+    reviewMaterials.applications =
+      "https://drive.google.com/open?id=1gXmbGRaUz324-EiZMzph1KUYS8WhR9ax";
     return {
-      user,
       quizzes,
       bools,
       supercategories,
       colors,
       reviewMaterials
     };
+  },
+  computed: {
+    ...mapState({ user: state => state.user.user })
   },
   methods: {
     flipBool(supercategory) {
@@ -167,13 +168,35 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-a {
-  color: inherit;
-  text-decoration: none;
+.body-container {
+  max-width: 800px;
+  border-radius: 8px;
+  background: #fff;
+  padding: 40px 15px 80px;
+
+  @include breakpoint-above("medium") {
+    padding: 40px 40px 80px;
+  }
+
+  .body-header {
+    font-size: 24px;
+    font-weight: 500;
+    text-align: left;
+    margin: 0 0 35px 0;
+  }
 }
 
 .training {
-  color: #73737a;
+  padding: 10px;
+
+  @include breakpoint-above("medium") {
+    padding: 40px;
+  }
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
 .supercategory,
@@ -220,6 +243,7 @@ a {
 .test {
   display: flex;
   flex-direction: column;
+  min-width: 143px;
 }
 
 .test-container,
@@ -294,36 +318,12 @@ a {
   background-image: url("~@/assets/right_arrow.png");
 }
 
-.header {
-  display: flex;
-  padding: 30px;
-  margin: 0px;
-  font-size: 24px;
-  border-bottom: 0.5px solid #cccccf;
-  align-items: center;
-  justify-content: space-between;
-  font-weight: 600;
-  color: #343440;
-}
-
-.body-container {
-  margin: 0 0 30px 30px;
-}
-
 .certified {
   color: #16d2aa;
   font-weight: 600;
 }
 
 @media screen and (max-width: 700px) {
-  .header {
-    padding: 1em 1em 1em 3em !important;
-  }
-
-  .body-container {
-    margin: 1.5em !important;
-  }
-
   .supercategory,
   .category {
     width: auto !important;

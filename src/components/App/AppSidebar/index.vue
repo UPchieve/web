@@ -11,28 +11,21 @@
         <sidebar-info
           v-if="!mobileMode"
           style="margin-bottom: 64px;"
-          :authenticated="auth.authenticated"
-          :isVolunteer="user.isVolunteer"
+          :authenticated="isAuthenticated"
+          :isVolunteer="isVolunteer"
           :name="user.firstname"
         />
 
         <sidebar-links
-          :authenticated="auth.authenticated"
-          :isVolunteer="user.isVolunteer"
+          :authenticated="isAuthenticated"
+          :isVolunteer="isVolunteer"
           :isAdmin="user.isAdmin"
           :mobileMode="mobileMode"
         />
       </div>
 
-      <div
-        v-if="auth.authenticated"
-        :class="finalLinkClass"
-        v-on:click="logout"
-      >
+      <div v-if="isAuthenticated" :class="finalLinkClass" v-on:click="logout">
         Log out
-      </div>
-      <div v-else :class="finalLinkClass" v-on:click="backToWebsite">
-        Back to website
       </div>
     </div>
   </nav>
@@ -41,24 +34,22 @@
 <script>
 import { mapState, mapGetters } from "vuex";
 import AuthService from "@/services/AuthService";
-import UserService from "@/services/UserService";
 import SidebarInfo from "./SidebarInfo";
 import SidebarLinks from "./SidebarLinks";
 
 export default {
   components: { SidebarInfo, SidebarLinks },
-  data() {
-    return {
-      auth: UserService.getAuth(),
-      user: UserService.getUser()
-    };
-  },
   computed: {
     ...mapState({
+      user: state => state.user.user,
       showHeader: state => state.app.header.isShown,
       isSidebarCollapsed: state => state.app.sidebar.isCollapsed
     }),
-    ...mapGetters({ mobileMode: "app/mobileMode" }),
+    ...mapGetters({
+      isAuthenticated: "user/isAuthenticated",
+      isVolunteer: "user/isVolunteer",
+      mobileMode: "app/mobileMode"
+    }),
     finalLinkClass() {
       return {
         "AppSidebar-final-link": true,
@@ -107,7 +98,7 @@ $transition: transform 700ms;
 .AppSidebar-content {
   @include flex-container(column, space-between, flex-start);
   height: 100%;
-  padding: 40px 20px;
+  padding: 40px 20px 40px 30px;
 }
 
 .AppSidebar-final-link {

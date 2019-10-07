@@ -333,7 +333,7 @@ export default {
 }
 
 .cell {
-  color: gray;
+  color: #000;
   &--header {
     @extend .cell;
     font-weight: 500;

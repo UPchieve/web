@@ -14,15 +14,17 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex";
+import { mapGetters } from "vuex";
 import * as sessionUtils from "@/utils/session";
 import LargeButton from "@/components/LargeButton";
 
 export default {
   components: { LargeButton },
   computed: {
-    ...mapState({ sessionPath: state => state.user.sessionPath }),
-    ...mapGetters({ mobileMode: "app/mobileMode" })
+    ...mapGetters({
+      mobileMode: "app/mobileMode",
+      sessionPath: "user/sessionPath"
+    })
   },
   watch: {
     // Hide modal if mobileMode becomes false

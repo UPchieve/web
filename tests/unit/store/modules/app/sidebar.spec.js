@@ -5,7 +5,7 @@ const { state, mutations, actions } = sidebarModule;
 describe("`app/sidebar` store module", () => {
   it("state", () => {
     expect(state).toEqual({
-      isShown: true,
+      isShown: false,
       isCollapsed: true
     });
   });

@@ -1,7 +1,7 @@
 <template>
   <div class="profile">
     <div class="header">
-      Profile
+      Your profile
       <button
         v-if="user.isVolunteer"
         class="editBtn btn"
@@ -132,6 +132,8 @@
 </template>
 
 <script>
+import { mapGetters, mapState } from "vuex";
+
 import UserService from "@/services/UserService";
 import phoneValidation from "@/utils/phone-validation";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
@@ -139,83 +141,99 @@ import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 
 export default {
   data() {
-    const user = UserService.getUser();
-    const avatarUrl =
-      user.picture ||
-      (user.isVolunteer ? VolunteerAvatarUrl : StudentAvatarUrl);
-
-    const certifications = {};
-    if (user.algebra) {
-      if (user.algebra.passed) {
-        certifications.Algebra = true;
-      }
-    }
-    if (user.geometry) {
-      if (user.geometry.passed) {
-        certifications.Geometry = true;
-      }
-    }
-    if (user.trigonometry) {
-      if (user.trigonometry.passed) {
-        certifications.Trigonometry = true;
-      }
-    }
-    if (user.precalculus) {
-      if (user.precalculus.passed) {
-        certifications.Precalculus = true;
-      }
-    }
-    if (user.calculus) {
-      if (user.calculus.passed) {
-        certifications.Calculus = true;
-      }
-    }
-    if (user.esl) {
-      if (user.esl.passed) {
-        certifications.ESL = true;
-      }
-    }
-    if (user.planning) {
-      if (user.planning.passed) {
-        certifications.Planning = true;
-      }
-    }
-    if (user.essays) {
-      if (user.essays.passed) {
-        certifications.Essays = true;
-      }
-    }
-    if (user.applications) {
-      if (user.applications.passed) {
-        certifications.Applications = true;
-      }
-    }
-
-    const certKey = {};
-    certKey.Algebra = "MATH";
-    certKey.Geometry = "MATH";
-    certKey.Trigonometry = "MATH";
-    certKey.Precalculus = "MATH";
-    certKey.Calculus = "MATH";
-    certKey.ESL = "ESL";
-    certKey.Planning = "COLLEGE";
-    certKey.Essays = "COLLEGE";
-    certKey.Applications = "COLLEGE";
-
     return {
-      user,
       activeEdit: false,
-      editBtnMsg: "Edit Profile",
-      name: user.firstname || (user.isVolunteer ? "volunteer" : "student"),
-      avatarStyle: {
-        backgroundImage: `url(${avatarUrl})`
-      },
-      certifications,
-      certKey,
+      editBtnMsg: "Edit",
       errors: [],
       invalidInputs: [],
       saveFailed: false
     };
+  },
+  computed: {
+    ...mapState({
+      user: state => state.user.user
+    }),
+    ...mapGetters({
+      avatarUrl: "user/avatarUrl"
+    }),
+    name() {
+      const user = this.$store.state.user.user;
+      return user.firstname || (user.isVolunteer ? "volunteer" : "student");
+    },
+    avatarStyle() {
+      const user = this.$store.state.user.user;
+      const avatarUrl =
+        user.picture ||
+        (user.isVolunteer ? VolunteerAvatarUrl : StudentAvatarUrl);
+      return {
+        backgroundImage: `url(${avatarUrl})`
+      };
+    },
+    certKey() {
+      const certKey = {};
+      certKey.Algebra = "MATH";
+      certKey.Geometry = "MATH";
+      certKey.Trigonometry = "MATH";
+      certKey.Precalculus = "MATH";
+      certKey.Calculus = "MATH";
+      certKey.ESL = "ESL";
+      certKey.Planning = "COLLEGE";
+      certKey.Essays = "COLLEGE";
+      certKey.Applications = "COLLEGE";
+      return certKey;
+    },
+    certifications() {
+      const user = this.$store.state.user.user;
+
+      const certifications = {};
+      if (user.algebra) {
+        if (user.algebra.passed) {
+          certifications.Algebra = true;
+        }
+      }
+      if (user.geometry) {
+        if (user.geometry.passed) {
+          certifications.Geometry = true;
+        }
+      }
+      if (user.trigonometry) {
+        if (user.trigonometry.passed) {
+          certifications.Trigonometry = true;
+        }
+      }
+      if (user.precalculus) {
+        if (user.precalculus.passed) {
+          certifications.Precalculus = true;
+        }
+      }
+      if (user.calculus) {
+        if (user.calculus.passed) {
+          certifications.Calculus = true;
+        }
+      }
+      if (user.esl) {
+        if (user.esl.passed) {
+          certifications.ESL = true;
+        }
+      }
+      if (user.planning) {
+        if (user.planning.passed) {
+          certifications.Planning = true;
+        }
+      }
+      if (user.essays) {
+        if (user.essays.passed) {
+          certifications.Essays = true;
+        }
+      }
+      if (user.applications) {
+        if (user.applications.passed) {
+          certifications.Applications = true;
+        }
+      }
+
+      return certifications;
+    }
   },
   methods: {
     /**
@@ -226,7 +244,7 @@ export default {
     editProfile() {
       // {Case A} Enter the editing state, then early exit
       if (!this.activeEdit) {
-        this.editBtnMsg = "Save Profile";
+        this.editBtnMsg = "Save";
         this.activeEdit = true;
         return;
       }
@@ -266,7 +284,7 @@ export default {
         // wait for save to succeed before coming out of edit mode
         UserService.setProfile(this, this.user).then(
           () => {
-            this.editBtnMsg = "Edit Profile";
+            this.editBtnMsg = "Edit";
             this.activeEdit = false;
             this.saveFailed = false;
           },
@@ -281,58 +299,83 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.avatar {
-  display: block;
-  width: 50px;
-  height: 50px;
-  background-size: cover;
-}
-
-button {
-  height: 30px;
-  border-radius: 20px;
-  padding: 0px 10px;
-  color: #16d2aa;
-  background-color: #f6f6f6;
-}
-
-button:active,
-button:hover {
-  background-color: #16d2aa;
-  color: #fff;
-}
-
-.editBtn {
-  background-color: #16d2aa;
-  border-radius: 30px;
-  width: 170px;
-  align-items: center;
-  height: 50px;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: 600;
-  color: white;
-
-  &:hover {
-    color: #2c3e50;
-  }
-}
-
 .profile {
   font-size: 16px;
   font-family: $font-family-default;
 }
 
+.wrap-container {
+  padding: 15px 15px 55px 15px;
+  @include flex-container(column);
+  align-items: stretch;
+
+  @include child-spacing(top, 16px);
+  @include child-spacing(right, 0);
+
+  @include breakpoint-above("large") {
+    padding: 40px;
+
+    @include child-spacing(top, 0);
+    @include child-spacing(right, 40px);
+
+    @include flex-container(row);
+
+    & > * {
+      flex-basis: 50%;
+    }
+  }
+}
+
 .header {
   display: flex;
-  padding: 30px;
   margin: 0;
   font-size: 24px;
-  border-bottom: 0.5px solid #cccccf;
   align-items: center;
   justify-content: space-between;
+  font-weight: 500;
+  padding: 25px 15px 10px 35px;
+
+  @include breakpoint-above("large") {
+    padding: 40px 40px 0 40px;
+  }
+}
+
+.contain {
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.container-content {
+  padding: 20px;
+  text-align: left;
+
+  @include breakpoint-above("large") {
+    padding: 40px;
+  }
+}
+
+.subheader {
   font-weight: 600;
-  color: #343440;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 15px 0;
+  font-size: 20px;
+}
+
+.container-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+ul {
+  padding: 0px;
+  height: 100%;
+  margin: auto;
 }
 
 .difficultCollegeProcessAnswer {
@@ -367,52 +410,6 @@ button:hover {
   margin-bottom: 15px;
 }
 
-ul {
-  padding: 15px;
-  height: 100%;
-  margin: auto;
-}
-
-.wrap-container {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-}
-
-.contain {
-  display: flex;
-  flex-direction: column;
-  border-radius: 8px;
-  background: #fff;
-  margin: 30px 0 0 30px;
-  width: 475px;
-}
-
-.container-content {
-  padding: 30px;
-  text-align: left;
-}
-
-.subheader {
-  font-weight: 600;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 30px 0 0;
-  font-size: 20px;
-}
-
-.container-section {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-bottom: 20px;
-}
-
-ul {
-  padding: 0px;
-}
-
 .answer {
   font-weight: 600;
 }
@@ -424,6 +421,43 @@ ul {
 .description {
   margin-top: 15px;
   font-size: 12px;
+}
+
+.avatar {
+  display: block;
+  width: 50px;
+  height: 50px;
+  background-size: cover;
+}
+
+button {
+  height: 30px;
+  border-radius: 20px;
+  padding: 0px 10px;
+  color: #16d2aa;
+  background-color: #f6f6f6;
+}
+
+button:active,
+button:hover {
+  background-color: #16d2aa;
+  color: #fff;
+}
+
+.editBtn {
+  background-color: #16d2aa;
+  border-radius: 30px;
+  width: 120px;
+  align-items: center;
+  height: 40px;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+
+  &:hover {
+    color: #2c3e50;
+  }
 }
 
 .form-control {
@@ -449,10 +483,6 @@ ul {
 
 .checkbox label {
   font-size: 16px;
-}
-
-.cert-info {
-  margin-bottom: 30px;
 }
 
 .resetBtn {
@@ -512,15 +542,5 @@ ul {
 .errors-list {
   color: #bf0000;
   margin-left: 40px;
-}
-
-@media screen and (max-width: 700px) {
-  .header {
-    padding: 1em 20px 1em 3em !important;
-  }
-
-  .contain {
-    margin: 1.5em !important;
-  }
 }
 </style>
