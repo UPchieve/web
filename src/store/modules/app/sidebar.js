@@ -1,7 +1,7 @@
 export default {
   namespaced: true,
   state: {
-    isShown: true,
+    isShown: false,
     isCollapsed: true
   },
   mutations: {

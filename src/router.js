@@ -27,28 +27,55 @@ import SendAnswerView from "./views/SendAnswerView";
 import AdminView from "./views/Admin";
 import VolunteerCoverage from "./views/Admin/VolunteerCoverage";
 
-import AuthService from "./services/AuthService";
-import OnboardingService from "./services/OnboardingService";
 import store from "./store";
 
 Vue.use(VueResource);
 Vue.http.options.credentials = true;
 
+const getUser = () => {
+  if (store.getters["user/isAuthenticated"]) {
+    return new Promise(resolve => {
+      store.dispatch("user/fetchUser");
+      resolve();
+    });
+  } else {
+    return store.dispatch("user/fetchUser");
+  }
+};
+
 const routes = [
   {
     path: "/",
-    redirect: () => {
-      if (AuthService.user.authenticated) {
-        return "/dashboard";
-      }
-      return "/login";
+    beforeEnter: (to, from, next) => {
+      getUser().then(() => {
+        if (store.getters["user/isAuthenticated"]) {
+          next("/dashboard");
+        } else {
+          next("/login");
+        }
+      });
     }
   },
   { path: "/contact", name: "ContactView", component: ContactView },
   { path: "/legal", name: "LegalView", component: LegalView },
-  { path: "/login", name: "LoginView", component: LoginView },
-  { path: "/logout", name: "LogoutView", component: LogoutView },
-  { path: "/signup", name: "SignupView", component: SignupView },
+  {
+    path: "/login",
+    name: "LoginView",
+    component: LoginView,
+    meta: { loggedOutOnly: true }
+  },
+  {
+    path: "/logout",
+    name: "LogoutView",
+    component: LogoutView,
+    meta: { loggedOutOnly: true }
+  },
+  {
+    path: "/signup",
+    name: "SignupView",
+    component: SignupView,
+    meta: { loggedOutOnly: true }
+  },
   {
     path: "/resetpassword",
     name: "ResetPasswordView",
@@ -106,7 +133,16 @@ const routes = [
     path: "/onboarding/:step?",
     name: "OnboardingView",
     component: OnboardingView,
-    meta: { protected: true }
+    meta: { protected: true },
+    beforeEnter: (to, from, next) => {
+      getUser().then(() => {
+        if (store.getters["user/isEmailVerified"]) {
+          next("/dashboard");
+        } else {
+          next();
+        }
+      });
+    }
   },
   {
     path: "/training",
@@ -132,7 +168,12 @@ const routes = [
     component: ProfileView,
     meta: { protected: true }
   },
-  { path: "/calendar", name: "CalendarView", component: CalendarView },
+  {
+    path: "/calendar",
+    name: "CalendarView",
+    component: CalendarView,
+    meta: { protected: true }
+  },
   {
     path: "/submit-question",
     name: "SubmitQuestionView",
@@ -192,42 +233,55 @@ export default router;
 
 // Router middleware to check authentication for protect routes
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(route => route.meta.protected)) {
-    if (!AuthService.user.authenticated) {
-      next({
-        path: "/login",
-        query: {
-          redirect: to.fullPath
-        }
-      });
-    } else if (!OnboardingService.isOnboarded()) {
-      const route = OnboardingService.getOnboardingRoute();
-      if (
-        to.path.indexOf(route) !== -1 ||
-        to.matched.some(route => route.meta.bypassOnboarding)
-      ) {
-        next();
-      } else {
+  if (to.matched.some(route => route.meta.requiresAdmin)) {
+    getUser().then(() => {
+      if (!store.state.user.user.isAdmin) {
         next({
-          path: route,
+          path: "/login",
           query: {
             redirect: to.fullPath
           }
         });
+      } else {
+        next();
       }
-    } else {
-      next();
-    }
-  }
-  if (to.matched.some(route => route.meta.requiresAdmin)) {
-    if (!AuthService.user.data.isAdmin) {
-      next({
-        path: "/login",
-        query: {
-          redirect: to.fullPath
+    });
+  } else if (to.matched.some(route => route.meta.protected)) {
+    getUser().then(() => {
+      if (!store.getters["user/isAuthenticated"]) {
+        next({
+          path: "/login",
+          query: {
+            redirect: to.fullPath
+          }
+        });
+      } else if (!store.getters["user/isEmailVerified"]) {
+        const route = "/onboarding/verify";
+        if (
+          to.path.indexOf(route) !== -1 ||
+          to.matched.some(route => route.meta.bypassOnboarding)
+        ) {
+          next();
+        } else {
+          next({
+            path: route,
+            query: {
+              redirect: to.fullPath
+            }
+          });
         }
-      });
-    }
+      } else {
+        next();
+      }
+    });
+  } else if (to.matched.some(route => route.meta.loggedOutOnly)) {
+    getUser().then(() => {
+      if (store.getters["user/isAuthenticated"]) {
+        next("/dashboard");
+      } else {
+        next();
+      }
+    });
   } else {
     next();
   }
@@ -250,7 +304,6 @@ Vue.http.interceptors.push((request, next) => {
       request.url.indexOf("/api/session/current") !== -1;
 
     if (is401 && !(isGetUserAttempt || isGetSessionAttempt)) {
-      AuthService.removeUser();
       router.push("/login?401=true");
     }
   });

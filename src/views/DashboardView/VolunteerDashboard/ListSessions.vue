@@ -28,15 +28,18 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
+import { mapState } from "vuex";
 
 export default {
   data() {
-    const user = UserService.getUser();
     return {
-      user,
       openSessions: []
     };
+  },
+  computed: {
+    ...mapState({
+      user: state => state.user.user
+    })
   },
   mounted() {
     // reconnect socket if it isn't already
@@ -44,19 +47,18 @@ export default {
       this.$socket.connect();
     }
     this.$socket.emit("list", {
-      user: UserService.getUser()
+      user: this.user
     });
   },
   methods: {
     gotoSession(session) {
       const { type, subTopic, _id } = session;
+      const path = `/session/${type}/${subTopic}/${_id}`;
 
       if (type && subTopic && _id) {
-        const path = `/session/${type}/${subTopic}/${_id}`;
-        localStorage.setItem("currentSessionPath", path);
         this.$router.push(path);
       } else {
-        localStorage.removeItem("currentSessionPath");
+        this.$store.dispatch("user/clearSession");
       }
     }
   },

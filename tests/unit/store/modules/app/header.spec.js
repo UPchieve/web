@@ -7,7 +7,7 @@ describe("`app/header` store module", () => {
     expect(state).toEqual({
       component: null,
       data: {},
-      isShown: true
+      isShown: false
     });
   });
 

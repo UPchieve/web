@@ -15,20 +15,15 @@
 
 <script>
 import { mapGetters } from "vuex";
-import UserService from "@/services/UserService";
 // import LargeButton from "@/components/LargeButton";
 
 export default {
   // components: { LargeButton },
-  data() {
-    const user = UserService.getUser() || {};
-
-    return {
-      name: user.firstname || "Unknown"
-    };
-  },
   computed: {
-    ...mapGetters({ mobileMode: "app/mobileMode" })
+    ...mapGetters({
+      mobileMode: "app/mobileMode",
+      name: "user/firstName"
+    })
   }
 };
 </script>

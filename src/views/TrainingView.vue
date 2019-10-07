@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
+import { mapState } from "vuex";
 
 /**
  * @todo {1} Refactor into global filters (https://vuejs.org/v2/guide/filters.html)
@@ -83,7 +83,6 @@ export default {
     }
   },
   data() {
-    const user = UserService.getUser();
     const quizzes = {};
     quizzes.math = [
       "algebra",
@@ -128,13 +127,15 @@ export default {
     reviewMaterials.applications =
       "https://drive.google.com/open?id=1gXmbGRaUz324-EiZMzph1KUYS8WhR9ax";
     return {
-      user,
       quizzes,
       bools,
       supercategories,
       colors,
       reviewMaterials
     };
+  },
+  computed: {
+    ...mapState({ user: state => state.user.user })
   },
   methods: {
     flipBool(supercategory) {
@@ -242,6 +243,7 @@ a {
 .test {
   display: flex;
   flex-direction: column;
+  min-width: 143px;
 }
 
 .test-container,
