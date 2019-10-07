@@ -53,7 +53,7 @@ const routes = [
         } else {
           next("/login");
         }
-      })
+      });
     }
   },
   { path: "/contact", name: "ContactView", component: ContactView },
