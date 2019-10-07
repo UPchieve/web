@@ -91,10 +91,9 @@
  * @todo {1} Solve this bug ('handleUndoOperation' is not defined)
  */
 
-import { mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 import SessionService from "@/services/SessionService";
-import UserService from "@/services/UserService";
 import EraserIconUrl from "@/assets/eraser_icon_01_dark.png";
 import PenIconUrl from "@/assets/pen_icon_01_dark.png";
 
@@ -179,7 +178,12 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ mobileMode: "app/mobileMode" })
+    ...mapState({
+      user: state => state.user.user
+    }),
+    ...mapGetters({
+      mobileMode: "app/mobileMode"
+    })
   },
   mounted() {
     this.drawSetup();
@@ -188,58 +192,58 @@ export default {
     emitDrawClick() {
       this.$socket.emit("drawClick", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: this.user
       });
     },
     emitSaveImage() {
       this.$socket.emit("saveImage", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: this.user
       });
     },
     emitUndoClick() {
       this.$socket.emit("undoClick", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: this.user
       });
     },
     emitClearClick() {
       this.$socket.emit("clearClick", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: this.user
       });
     },
     emitChangeColor(color) {
       this.$socket.emit("changeColor", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: this.user,
         color
       });
     },
     emitChangeWidth(width) {
       this.$socket.emit("changeWidth", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: this.user,
         width
       });
     },
     emitDrawing() {
       this.$socket.emit("drawing", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: this.user
       });
     },
     emitEnd() {
       this.$socket.emit("end", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: this.user,
         whiteboardUrl: App.canvas.toDataURL()
       });
     },
     emitDragStart(data) {
       this.$socket.emit("dragStart", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: this.user,
         x: data.x,
         y: data.y,
         color: data.color
@@ -248,7 +252,7 @@ export default {
     emitDragAction(data) {
       this.$socket.emit("dragAction", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: this.user,
         x: data.x,
         y: data.y,
         color: data.color
@@ -257,7 +261,7 @@ export default {
     emitDragEnd(data) {
       this.$socket.emit("dragEnd", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: this.user,
         x: data.x,
         y: data.y,
         color: data.color
@@ -266,7 +270,7 @@ export default {
     emitInsertText(data) {
       this.$socket.emit("insertText", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: this.user,
         x: data.x,
         y: data.y,
         text: data.text
@@ -275,7 +279,7 @@ export default {
     emitResetScreen(/* data */) {
       this.$socket.emit("resetScreen", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: this.user
       });
     },
 

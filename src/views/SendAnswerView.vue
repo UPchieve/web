@@ -33,7 +33,8 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
+import { mapState } from "vuex";
+
 import DownloadService from "@/services/DownloadService";
 import StudentQuestionService from "@/services/StudentQuestionService";
 
@@ -50,7 +51,6 @@ export default {
   data() {
     return {
       // This component
-      user: UserService.getUser(),
       hasAttachments: false,
       question: { student: { name: "" } },
       // Modal
@@ -59,6 +59,9 @@ export default {
       modalOptions: {},
       modalClickHandlers: {}
     };
+  },
+  computed: {
+    ...mapState({ user: state => state.user.user })
   },
   beforeCreate() {
     StudentQuestionService.getStudentQuestions(this, {

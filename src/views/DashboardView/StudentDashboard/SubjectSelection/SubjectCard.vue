@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex";
+import { mapGetters } from "vuex";
 import { startSession } from "@/utils/session";
 import DropdownList from "@/components/DropdownList";
 import HyperlinkButton from "@/components/HyperlinkButton";
@@ -91,7 +91,6 @@ export default {
     routeTo: String
   },
   computed: {
-    ...mapState({ sessionPath: state => state.user.sessionPath }),
     ...mapGetters({
       mobileMode: "app/mobileMode",
       isSessionAlive: "user/isSessionAlive"

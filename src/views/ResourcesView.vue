@@ -153,13 +153,11 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
+import { mapState } from "vuex";
 
 export default {
-  data() {
-    return {
-      user: UserService.getUser()
-    };
+  computed: {
+    ...mapState({ user: state => state.user.user })
   }
 };
 </script>

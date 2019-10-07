@@ -46,16 +46,16 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 import _ from "lodash";
 import moment from "moment-timezone";
 
-import UserService from "@/services/UserService";
 import CalendarService from "@/services/CalendarService";
 import AnalyticsService from "@/services/AnalyticsService";
 
 export default {
   data() {
-    const user = UserService.getUser();
     const timeRange = [
       "12 am",
       "1 am",
@@ -83,7 +83,6 @@ export default {
       "11 pm"
     ];
     return {
-      user,
       availability: {},
       timeRange,
       tzList: moment.tz.names(),
@@ -91,6 +90,9 @@ export default {
     };
   },
   computed: {
+    ...mapState({
+      user: state => state.user.user
+    }),
     sortedTimes() {
       return this.sortTimes();
     },
