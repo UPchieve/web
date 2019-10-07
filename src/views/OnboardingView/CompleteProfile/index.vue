@@ -293,7 +293,7 @@ export default {
       return user;
     },
     buttonMsg: function() {
-      if (!this.$store.getters.user.isVolunteer) {
+      if (!this.$store.getters["user/isVolunteer"]) {
         return "NEXT";
       } else {
         return "DONE";

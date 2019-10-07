@@ -91,9 +91,6 @@ export default {
       isSessionAlive: "user/isSessionAlive",
       sessionPath: "user/sessionPath"
     }),
-    name: function() {
-      return this.$store.getters.user.firstName || "Student";
-    },
     impactStats: function() {
       const user = this.$store.state.user.user;
       // (1) Hours selected
