@@ -4,7 +4,7 @@
     :style="coverStyle"
     class="training-quiz"
   >
-    <div v-if="popUpBool" :style="popUpCoverStyle" class="popUpCover" />
+    <div v-if="popUpBool" class="popUpCover" />
     <h1 id="quiz-name" class="header">
       {{ quizName }} Certification Quiz
       <router-link
@@ -185,7 +185,6 @@ export default {
       imageStyle: {},
       popUpStyle: {},
       popUpBool: false,
-      popUpCoverStyle: {},
       popUpBorderStyle: {},
       quizLength: 0,
       barWidth: 0,
@@ -331,18 +330,12 @@ export default {
           if (data.passed) {
             this.passedMsg = "You passed!";
             this.showDone = true;
-            this.popUpCoverStyle = {
-              backgroundColor: "#E3F2FD"
-            };
             this.popUpBorderStyle = {
               borderBottom: "5px solid #1855D1",
               borderLeft: "5px solid #1855D1"
             };
           } else {
             this.passedMsg = "You failed.";
-            this.popUpCoverStyle = {
-              backgroundColor: "#FEEAB2"
-            };
             this.popUpBorderStyle = {
               borderBottom: "5px solid #F44747",
               borderLeft: "5px solid #F44747"
@@ -361,14 +354,13 @@ export default {
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          width: "500px",
+          maxWidth: "500px",
           height: "300px",
           background: "#FFFFFF",
           zIndex: "5",
           position: "absolute",
-          top: "0",
-          bottom: "0",
-          left: "300px",
+          top: "150px",
+          left: "0",
           right: "0",
           margin: "auto"
         };
@@ -421,21 +413,27 @@ export default {
 <style lang="scss" scoped>
 .training-quiz {
   display: flex;
+  position: relative;
   flex-direction: column;
-  height: 100%;
-  color: #73737a;
   font-size: 16px;
+  background: #fff;
+  border-radius: 8px;
+  margin: 10px;
+  padding: 20px 15px;
+
+  @include breakpoint-above("medium") {
+    margin: 40px;
+    padding: 40px;
+  }
 }
 
 .header {
   display: flex;
-  padding: 30px;
   margin: 0px;
   font-size: 24px;
-  border-bottom: 0.5px solid #cccccf;
   align-items: center;
   justify-content: space-between;
-  font-weight: 600;
+  font-weight: 500;
   color: #343440;
 }
 
@@ -498,7 +496,7 @@ export default {
   background: #eeeeee;
   position: relative;
   top: -13px;
-  z-index: -1;
+  z-index: 0;
 }
 
 .rect.cover {
@@ -591,6 +589,15 @@ label {
   height: 100%;
   position: absolute;
   z-index: 2;
+  border-radius: 8px;
+  background: #fff;
+
+  /* temp fix to fit popup in parent with padding */
+  margin: -20px -15px;
+
+  @include breakpoint-above("medium") {
+    margin: -40px;
+  }
 }
 
 .passed {

@@ -1,5 +1,5 @@
 <template>
-  <div class="StudentDashboard">
+  <div class="student-dashboard">
     <dashboard-banner />
     <subject-selection />
   </div>
@@ -39,7 +39,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.StudentDashboard {
+.student-dashboard {
   @include flex-container(column);
   @include child-spacing(top, 40px);
   padding: 40px 20px;

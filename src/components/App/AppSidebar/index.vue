@@ -107,7 +107,7 @@ $transition: transform 700ms;
 .AppSidebar-content {
   @include flex-container(column, space-between, flex-start);
   height: 100%;
-  padding: 40px 20px;
+  padding: 40px 20px 40px 30px;
 }
 
 .AppSidebar-final-link {

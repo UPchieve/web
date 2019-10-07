@@ -1,43 +1,45 @@
 <template>
-  <div class="calendar">
-    <h1 class="header">
-      <div class="header-title">Schedule</div>
-      <button class="btn" @click="save()">Update Schedule</button>
-    </h1>
-    <div v-if="hasUserSchedule">
-      <div class="tz-selector-container">
-        <span>Time Zone: </span>
-        <select v-model="selectedTz">
-          <option v-for="tz in tzList" :key="tz">
-            {{ tz }}
-          </option>
-        </select>
+  <div class="calendar-container">
+    <div class="calendar">
+      <div class="header">
+        <div class="header-title">Schedule</div>
+        <button class="save-button" @click="save()">Save</button>
       </div>
-      <div class="dayTimeContainer">
-        <div class="timeLabelContainer">
-          <div v-for="time in timeRange" :key="time" class="timeLabel">
-            {{ time }}
-          </div>
+      <div v-if="hasUserSchedule">
+        <div class="tz-selector-container">
+          <span>Time Zone: </span>
+          <select v-model="selectedTz">
+            <option v-for="tz in tzList" :key="tz">
+              {{ tz }}
+            </option>
+          </select>
         </div>
-        <form class="dayTime">
-          <div v-for="(dayValue, day) in availability" :key="`day-${day}`">
-            <div class="dayLabel">{{ day }}</div>
-            <div class="times">
-              <div
-                v-for="sortedTime in sortedTimes[day]"
-                :key="sortedTime"
-                class="timeOfDay"
-              >
-                <input
-                  id="time"
-                  v-model="availability[day][sortedTime]"
-                  type="checkbox"
-                />
-                <label for="sortedTime" />
-              </div>
+        <div class="dayTimeContainer">
+          <div class="timeLabelContainer">
+            <div v-for="time in timeRange" :key="time" class="timeLabel">
+              {{ time }}
             </div>
           </div>
-        </form>
+          <form class="dayTime">
+            <div v-for="(dayValue, day) in availability" :key="`day-${day}`">
+              <div class="dayLabel">{{ day }}</div>
+              <div class="times">
+                <div
+                  v-for="sortedTime in sortedTimes[day]"
+                  :key="sortedTime"
+                  class="timeOfDay"
+                >
+                  <input
+                    id="time"
+                    v-model="availability[day][sortedTime]"
+                    type="checkbox"
+                  />
+                  <label for="sortedTime" />
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
@@ -256,24 +258,50 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.calendar-container {
+  padding: 10px;
+
+  @include breakpoint-above("medium") {
+    padding: 40px;
+  }
+}
+
 .calendar {
+  background: #fff;
+  border-radius: 8px;
   font-size: 12px;
   color: #343440;
+  padding: 20px 15px;
+
+  @include breakpoint-above("medium") {
+    padding: 40px;
+  }
 }
 
 .header {
   display: flex;
-  padding: 30px 0 30px 50px;
   margin: 0px;
-  font-size: 24px;
-  border-bottom: 0.5px solid #cccccf;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  font-weight: 600;
 }
 
 .header-title {
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.save-button {
+  font-size: 16px;
   font-weight: 600;
+  background: $c-success-green;
+  padding: 10px 45px;
+  border-radius: 30px;
+  color: #fff;
+  border: none;
+
+  &:hover {
+    color: #000;
+  }
 }
 
 .timeLabelContainer {
@@ -329,14 +357,6 @@ label {
 
 input[type="checkbox"]:checked + label {
   background-color: rgba(22, 210, 170, 0.5);
-}
-
-.btn {
-  font-size: 20px;
-  font-weight: 600;
-  color: #16d2aa;
-  padding-right: 40px;
-  background: none;
 }
 
 .tz-selector-container {

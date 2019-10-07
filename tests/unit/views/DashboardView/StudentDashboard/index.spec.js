@@ -13,7 +13,7 @@ const getWrapper = () => shallowMount(StudentDashboard, { localVue, store });
 describe("StudentDashboard", () => {
   test("layout", () => {
     const wrapper = getWrapper();
-    expect(wrapper.classes("StudentDashboard")).toBe(true);
+    expect(wrapper.classes("student-dashboard")).toBe(true);
 
     const banner = wrapper.find(DashboardBanner);
     expect(banner.exists()).toBe(true);
