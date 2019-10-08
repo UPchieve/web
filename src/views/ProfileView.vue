@@ -185,52 +185,28 @@ export default {
     certifications() {
       const user = this.$store.state.user.user;
 
-      const certifications = {};
-      if (user.algebra) {
-        if (user.algebra.passed) {
-          certifications.Algebra = true;
-        }
-      }
-      if (user.geometry) {
-        if (user.geometry.passed) {
-          certifications.Geometry = true;
-        }
-      }
-      if (user.trigonometry) {
-        if (user.trigonometry.passed) {
-          certifications.Trigonometry = true;
-        }
-      }
-      if (user.precalculus) {
-        if (user.precalculus.passed) {
-          certifications.Precalculus = true;
-        }
-      }
-      if (user.calculus) {
-        if (user.calculus.passed) {
-          certifications.Calculus = true;
-        }
-      }
-      if (user.esl) {
-        if (user.esl.passed) {
-          certifications.ESL = true;
-        }
-      }
-      if (user.planning) {
-        if (user.planning.passed) {
-          certifications.Planning = true;
-        }
-      }
-      if (user.essays) {
-        if (user.essays.passed) {
-          certifications.Essays = true;
-        }
-      }
-      if (user.applications) {
-        if (user.applications.passed) {
-          certifications.Applications = true;
-        }
-      }
+      const certifications = Object.keys(user.certifications)
+        .reduce((displayObj, key) => {
+          const displayKeys = {
+            algebra: "Algebra",
+            geometry: "Geometry",
+            trigonometry: "Trigonometry",
+            precalculus: "Precalculus",
+            calculus: "Calculus",
+            esl: "ESL",
+            planning: "Planning",
+            essays: "Essays",
+            applications: "Applications"
+          };
+
+          if (displayKeys[key]) {
+            if (user.certifications[key].passed) {
+              displayObj[displayKeys[key]] = true;
+            }
+          }
+          
+          return displayObj;
+        }, { });
 
       return certifications;
     }
