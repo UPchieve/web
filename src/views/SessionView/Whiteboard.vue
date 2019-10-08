@@ -8,8 +8,8 @@
         @mousemove="draw"
         @mouseup="drawEnd"
         @mouseleave="drawEnd"
-        width="1000"
-        height="750"
+        width="1600"
+        height="1200"
       />
     </div>
     <div
