@@ -5,11 +5,9 @@
         v-canvas
         id="whiteboardCanvas"
         @mousedown="drawStart"
-        @mouseup="drawEnd"
         @mousemove="draw"
-        v-touch:start="drawStart"
-        v-touch:end="drawEnd"
-        v-touch:moving="draw"
+        @mouseup="drawEnd"
+        @mouseleave="drawEnd"
         width="1600"
         height="1200"
       />
