@@ -123,7 +123,7 @@ export default {
 
       // (2) Certs obtained
       const certsObtained = _.filter(upchieveTopics, topic => {
-        return _.get(user, `${topic}.passed`, false);
+        return _.get(user, `certifications.${topic}.passed`, false);
       });
 
     const numCertsObtained = certsObtained.length;
