@@ -56,8 +56,18 @@ const routes = [
       });
     }
   },
-  { path: "/contact", name: "ContactView", component: ContactView },
-  { path: "/legal", name: "LegalView", component: LegalView },
+  {
+    path: "/contact",
+    name: "ContactView",
+    component: ContactView,
+    meta: { authOptional: true }
+  },
+  {
+    path: "/legal",
+    name: "LegalView",
+    component: LegalView,
+    meta: { authOptional: true }
+  },
   {
     path: "/login",
     name: "LoginView",
@@ -282,6 +292,9 @@ router.beforeEach((to, from, next) => {
         next();
       }
     });
+  } else if (to.matched.some(route => route.meta.authOptional)) {
+    getUser();
+    next();
   } else {
     next();
   }
