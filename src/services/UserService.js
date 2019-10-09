@@ -2,18 +2,18 @@ import moment from "moment";
 import NetworkService from "./NetworkService";
 import AuthService from "./AuthService";
 import OnboardingService from "./OnboardingService";
-import router from "@/router";
 
 export default {
-  getAuth() {
-    return AuthService.user;
+  getAuth(context) {
+    return AuthService.getAuth(context);
   },
-  getUser() {
-    const auth = this.getAuth();
-    if (auth.authenticated) {
-      return auth.data;
-    }
-    return {};
+  getUser(context) {
+    return this.getAuth(context).then(auth => {
+      if (auth.authenticated) {
+        return auth.user;
+      }
+      return Promise.resolve({});
+    });
   },
   validateBirthdate(birthdate) {
     const m = moment(birthdate, "MM/DD/YYYY");
@@ -24,8 +24,9 @@ export default {
     return true; // No validation errors
   },
   getOnboardingServiceInterest() {
-    const user = this.getUser();
-    return (user && user.onboardingServiceInterest) || [];
+    return this.getUser().then(
+      user => (user && user.onboardingServiceInterest) || []
+    );
   },
   getOnboarding() {
     return OnboardingService.status;
@@ -34,13 +35,12 @@ export default {
     return NetworkService.setProfile(context, data).then(
       res => {
         if (res.data) {
-          AuthService.storeUser(res.data.user);
           context.msg = "Set!";
         } else {
           throw new Error();
         }
         if (redirect) {
-          router.push(redirect);
+          context.$router.push(redirect);
         }
         return Promise.resolve(res);
       },
@@ -49,5 +49,31 @@ export default {
         return Promise.reject(res);
       }
     );
+  },
+
+  getVolunteers(context) {
+    return NetworkService.getVolunteers(context).then(res => {
+      if (res.data.err) {
+        return res.data.err;
+      } else if (res.data.volunteers) {
+        return res.data.volunteers;
+      } else {
+        throw new Error();
+      }
+    });
+  },
+  getVolunteersAvailability(context, certifiedSubject) {
+    return NetworkService.getVolunteersAvailability(
+      context,
+      certifiedSubject
+    ).then(res => {
+      if (res.data.err) {
+        return res.data.err;
+      } else if (res.data.aggAvailabilities) {
+        return res.data.aggAvailabilities;
+      } else {
+        throw new Error();
+      }
+    });
   }
 };

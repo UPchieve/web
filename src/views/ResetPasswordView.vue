@@ -47,6 +47,9 @@ export default {
   components: {
     FormPageTemplate
   },
+  created() {
+    this.$store.dispatch("app/hideNavigation");
+  },
   data() {
     return {
       email: "",

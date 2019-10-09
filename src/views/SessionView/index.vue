@@ -1,43 +1,74 @@
 <template>
   <div class="session">
     <div class="session-header-container">
-      <session-header />
+      <session-header @try-clicked="tryClicked" />
     </div>
-    <div v-if="currentSession.sessionId" class="session-contents-container">
-      <div class="col-sm-8 whiteboard-container">
+    <div
+      v-if="currentSession.sessionId"
+      class="session-contents-container"
+      v-bind:class="{
+        'session-contents-container--mobile': mobileMode
+      }"
+    >
+      <div
+        class="whiteboard-container"
+        id="whiteboard-container"
+        v-bind:class="{
+          'whiteboard-container--hidden': shouldHideWhiteboardSection
+        }"
+      >
         <whiteboard />
       </div>
-      <div class="col-sm-4 chat-container">
+      <div
+        class="chat-container"
+        id="chat-container"
+        v-bind:class="{
+          'chat-container--hidden': shouldHideChatSection
+        }"
+      >
         <session-chat />
       </div>
     </div>
-
-    <modal
-      v-if="showModal"
-      :labels="btnLabels"
-      :message="message"
-      :click-handlers="clickHandlers"
-      warn
-    />
+    <div
+      v-if="mobileMode"
+      class="toggleButton"
+      id="toggleButton"
+      @click="toggleWhiteboard"
+    >
+      <img id="toggleIcon" :src="getIconUrl()" />
+    </div>
   </div>
 </template>
 
 <script>
+import { mapState, mapGetters } from "vuex";
+
 import SessionService from "@/services/SessionService";
-import UserService from "@/services/UserService";
 
 import SessionHeader from "./SessionHeader";
 import Whiteboard from "./Whiteboard";
 import SessionChat from "./SessionChat";
-import Modal from "@/components/Modal";
+
+const headerData = {
+  component: "SessionHeader"
+};
 
 export default {
   name: "session-view",
   components: {
     SessionHeader,
     Whiteboard,
-    SessionChat,
-    Modal
+    SessionChat
+  },
+  created() {
+    if (this.mobileMode) {
+      this.$store.dispatch("app/hideNavigation");
+    } else {
+      this.$store.dispatch("app/header/show", headerData);
+      this.$store.dispatch("app/sidebar/hide");
+    }
+
+    window.addEventListener("resize", this.handleResize);
   },
   /*
    * @notes
@@ -47,36 +78,39 @@ export default {
   data() {
     return {
       currentSession: SessionService.currentSession,
-      showModal: false,
-      btnLabels: ["Submit question", "Exit session"],
-      message: `
-        We don’t have any Academic Coaches
-        available right now, but you can submit a
-        written question, and we will try to get
-        back to you within 24 hours! Would you
-        like to submit a question now?
-      `,
-      clickHandlers: {
-        main: () => {
-          this.$router.push({
-            path: "/submit-question",
-            query: {
-              topic: this.$route.path.split("/")[2], // [1]
-              subTopic: this.$route.params.subTopic
-            }
-          });
-        },
-        second: () => {
-          this.$router.push("/");
-        }
-      }
+      whiteboardOpen: false,
+      icon: "Pencil.png",
+      sessionReconnecting: false
     };
+  },
+  computed: {
+    ...mapState({
+      user: state => state.user.user
+    }),
+    ...mapGetters({
+      mobileMode: "app/mobileMode"
+    }),
+
+    shouldHideWhiteboardSection() {
+      // Never hide whiteboard section on desktop
+      if (!this.mobileMode) {
+        return false;
+      }
+
+      return !this.whiteboardOpen;
+    },
+    shouldHideChatSection() {
+      // Never hide chat section on desktop
+      if (!this.mobileMode) {
+        return false;
+      }
+
+      return this.whiteboardOpen;
+    }
   },
   mounted() {
     const id = this.$route.params.sessionId;
     let promise;
-
-    this.sessionId = id;
 
     if (!id) {
       let type;
@@ -94,29 +128,65 @@ export default {
       promise = SessionService.useExistingSession(this, id);
     }
 
-    promise.then(sessionId => {
-      this.sessionId = this.currentSession.sessionId;
-      this.$socket.connect();
-      this.$socket.emit("join", {
-        sessionId,
-        user: UserService.getUser()
+    promise
+      .then(sessionId => {
+        this.$socket.connect();
+        this.joinSession(sessionId);
+      })
+      .catch(() => {
+        window.alert("Could not start new help session");
+        this.$router.replace("/");
       });
-    });
-
-    // Offer the option to ask a question
-    const MODAL_TIMEOUT_MS = 24 * 60 * 60 * 1000;
-    setTimeout(() => {
-      if (
-        !UserService.getUser().isVolunteer &&
-        SessionService.getPartner() === undefined
-      ) {
-        this.showModal = true;
-      }
-    }, MODAL_TIMEOUT_MS);
   },
   sockets: {
     bump: function() {
       this.$router.push("/");
+    },
+    reconnect_attempt() {
+      this.sessionReconnecting = true;
+    },
+    connect() {
+      if (this.sessionReconnecting) {
+        if (this.currentSession && this.currentSession.sessionId) {
+          // we still need to re-join the room after Socket.IO re-establishes the connection
+          this.joinSession(this.currentSession.sessionId);
+        } else {
+          location.reload();
+        }
+      }
+    }
+  },
+  methods: {
+    handleResize() {
+      if (this.mobileMode) {
+        this.$store.dispatch("app/hideNavigation");
+      } else {
+        this.$store.dispatch("app/header/show", headerData);
+        this.$store.dispatch("app/sidebar/hide");
+      }
+    },
+    getIconUrl() {
+      return require("@/assets/" + this.icon);
+    },
+    toggleWhiteboard() {
+      if (!this.whiteboardOpen) {
+        document.getElementById("toggleButton").classList.add("back");
+        this.icon = "Chat.png";
+        this.whiteboardOpen = true;
+      } else {
+        document.getElementById("toggleButton").classList.remove("back");
+        this.icon = "Pencil.png";
+        this.whiteboardOpen = false;
+      }
+    },
+    joinSession(sessionId) {
+      this.$socket.emit("join", {
+        sessionId,
+        user: this.user
+      });
+    },
+    tryClicked() {
+      this.sessionReconnecting = true;
     }
   }
 };
@@ -135,37 +205,112 @@ export default {
 
 .session-header-container {
   position: absolute;
+  z-index: 3;
+  top: 0;
   left: 0;
   width: 100%;
+  background: #fff;
+
+  @include breakpoint-above("medium") {
+    top: 20px;
+    left: unset;
+    right: 20px;
+    width: 400px;
+    height: 70px;
+    background: #fff;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    overflow: hidden;
+  }
 }
 
 .session-contents-container {
   height: 100%;
   padding-top: 100px;
+  display: flex;
+  background: $c-background-grey;
+
+  @include breakpoint-above("medium") {
+    padding: 20px;
+    @include child-spacing(right, 15px);
+  }
+
+  @include breakpoint-below("medium") {
+    padding-top: 80px;
+  }
+}
+
+.whiteboard-container,
+.chat-container {
+  @include breakpoint-above("medium") {
+    height: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  @include breakpoint-below("medium") {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 80px);
+    z-index: 2;
+  }
 }
 
 .whiteboard-container {
-  height: 100%;
   padding: 0;
-  border-top: 25px solid #eaeaeb;
-  border-left: 25px solid #eaeaeb;
-  border-right: 25px solid #eaeaeb;
+  flex-grow: 1;
+  overflow: hidden;
+
+  // Hide with z-index (not display: none) so canvas is accessible in DOM
+  &--hidden {
+    z-index: 0;
+  }
+
+  @include breakpoint-below("medium") {
+    background: #fff;
+  }
 }
 
 .chat-container {
-  height: 100%;
   padding: 0;
+
+  &--hidden {
+    // Hide with z-index (not display: none) so canvas is accessible in DOM
+    z-index: 0;
+  }
+
+  @include breakpoint-above("medium") {
+    min-width: 400px;
+    flex-basis: 400px;
+    position: relative;
+  }
+
+  @include breakpoint-below("medium") {
+    max-width: 100%;
+  }
 }
 
-@media screen and (max-width: 700px) {
-  .whiteboard-container {
-    width: 100% !important;
-    height: 65vh !important;
-  }
+.toggleButton {
+  position: absolute;
+  z-index: 3;
+  bottom: 10px;
+  right: 20px;
+  border-radius: 20px;
+  background: #16d2aa;
+  width: 40px;
+  height: 40px;
+  transition: 0.4s;
 
-  .chat-container {
-    width: 100% !important;
-    height: 60vh !important;
+  img {
+    margin-top: 7px;
+    width: 26px;
+    height: 26px;
   }
+}
+
+.toggleButton.back {
+  bottom: calc(100vh - 140px);
 }
 </style>

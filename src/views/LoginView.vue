@@ -63,10 +63,13 @@ export default {
     FormPageTemplate,
     FormFooter
   },
+  created() {
+    this.$store.dispatch("app/hideNavigation");
+  },
   data() {
     let error;
     if (this.$route.query["401"] === "true") {
-      error = "Your session has expired. Please login again";
+      error = "Your session has expired. Please log in again";
     }
     return {
       credentials: {
@@ -78,23 +81,13 @@ export default {
   },
   methods: {
     submit() {
-      AuthService.login(
-        this,
-        {
-          email: this.credentials.email,
-          password: this.credentials.password
-        },
-        this.$route.query.redirect || "/"
-      );
-    }
-  },
-  beforeRouteEnter(to, from, next) {
-    if (AuthService.user.authenticated) {
-      next({
-        path: "/"
+      AuthService.login(this, {
+        email: this.credentials.email,
+        password: this.credentials.password
+      }).then(data => {
+        this.$store.commit("user/setUser", data.user);
+        this.$router.push(this.$route.query.redirect || "/");
       });
-    } else {
-      next();
     }
   }
 };

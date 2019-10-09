@@ -21,6 +21,7 @@
         v-model="credentials.email"
         required
         autofocus
+        autocomplete="email"
       />
       <p class="uc-form-subtext">
         We will only use your email to contact you about your account. See our
@@ -41,6 +42,7 @@
         }"
         v-model="credentials.password"
         required
+        autocomplete="new-password"
       />
       <p class="uc-form-subtext">
         Keep your account safe by choosing a password with one number, one
@@ -70,6 +72,25 @@
     <div class="step-title">Step 2 of 2: Tell us about yourself!</div>
 
     <div class="uc-column">
+      <!-- Fix for bug in Chrome where the first two fields are parsed as a username and password
+       even if the HTML5 autocomplete attributes are set to the right values -->
+      <label for="username" class="d-none">Username</label>
+      <input
+        type="text"
+        class="d-none"
+        id="username"
+        v-model="credentials.email"
+        autocomplete="username"
+      />
+      <label for="password" class="d-none">Password</label>
+      <input
+        type="password"
+        class="d-none"
+        id="password"
+        v-model="credentials.password"
+        autocomplete="new-password"
+      />
+
       <label for="firstName" class="uc-form-label">First Name</label>
       <input
         id="firstName"
@@ -81,6 +102,7 @@
         v-model="profile.firstName"
         required
         autofocus
+        autocomplete="given-name"
       />
     </div>
 
@@ -95,6 +117,7 @@
         }"
         v-model="profile.lastName"
         required
+        autocomplete="family-name"
       />
     </div>
 
@@ -114,7 +137,7 @@
 
     <div class="uc-column">
       <label for="college" class="uc-form-label">
-        What college do you go to?
+        College
       </label>
       <input
         id="college"
@@ -179,6 +202,7 @@ import validator from "validator";
 import AuthService from "@/services/AuthService";
 import RegistrationService from "@/services/RegistrationService";
 import UserService from "@/services/UserService";
+import AnalyticsService from "@/services/AnalyticsService";
 
 import phoneValidation from "@/utils/phone-validation";
 
@@ -294,16 +318,14 @@ export default {
         college: this.profile.college,
         favoriteAcademicSubject: this.profile.favoriteAcademicSubject
       })
-        .then(() => {
-          let user = UserService.getUser();
-          /*
-          user.firstname = this.profile.firstName
-          user.lastname = this.profile.lastName
-          user.college = this.profile.college
-          user.phone = this.profile.phone
-          user.favoriteAcademicSubject = this.profile.favoriteAcademicSubject
-          */
+        .then(() => UserService.getUser())
+        .then(user => {
           UserService.setProfile(this, user);
+
+          // analytics: tracking when a user has signed up
+          AnalyticsService.identify(user, user.isFakeUser);
+          AnalyticsService.trackNoProperties("signed up", user.isFakeUser);
+
           this.step = "success-message";
         })
         .catch(err => {
@@ -328,5 +350,9 @@ export default {
   color: #bf0000;
   font-size: 14px;
   text-align: left;
+}
+
+.d-none {
+  display: none !important;
 }
 </style>

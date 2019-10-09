@@ -1,9 +1,12 @@
 <template>
   <div class="chat">
     <vue-headful
-      :title="typingIndicatorShown ? `${otherUser} is typing...` : 'UPchieve'"
+      :title="
+        typingIndicatorShown
+          ? `${sessionPartner.firstname} is typing...`
+          : 'UPchieve'
+      "
     />
-    <div class="header">Chat</div>
 
     <div class="message-box">
       <transition name="chat-warning--slide">
@@ -16,6 +19,21 @@
       </transition>
 
       <div class="messages">
+        <div v-if="!user.isVolunteer" class="waiting-cards">
+          <div class="waiting-cards__card">
+            <p>
+              We’re searching for a coach to pair with you now. This process
+              sometimes takes 5 to 10 minutes.
+            </p>
+          </div>
+          <div class="waiting-cards__card">
+            <p>
+              While you wait, write out the problem you’re working on using the
+              whiteboard or chat.
+            </p>
+          </div>
+        </div>
+
         <template v-for="(message, index) in messages">
           <div
             :key="`message-${index}`"
@@ -24,29 +42,27 @@
           >
             <div class="avatar" :style="message.avatarStyle" />
             <div class="contents">
-              <div class="name">
-                {{ message.name }}
-              </div>
               <span>{{ message.contents }}</span>
-              <div class="time">
-                {{ message.time }}
-              </div>
+            </div>
+            <div class="time">
+              {{ message.time }}
             </div>
           </div>
         </template>
       </div>
       <transition name="fade">
         <div class="typing-indicator" v-show="typingIndicatorShown">
-          {{ this.otherUser }} is typing...
+          {{ this.sessionPartner.firstname }} is typing...
         </div>
       </transition>
     </div>
 
     <textarea
+      class="message-textarea"
       @keydown.enter.prevent
       @keyup="handleMessage"
       v-model="newMessage"
-      placeholder="Type here..."
+      placeholder="Type a message..."
     />
   </div>
 </template>
@@ -56,7 +72,7 @@ import { setTimeout, clearTimeout } from "timers";
 import moment from "moment";
 import _ from "lodash";
 
-import UserService from "@/services/UserService";
+import { mapState, mapGetters } from "vuex";
 import SessionService from "@/services/SessionService";
 import ModerationService from "@/services/ModerationService";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
@@ -70,8 +86,6 @@ import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 export default {
   data() {
     return {
-      user: UserService.getUser(),
-      otherUser: null,
       messages: [],
       currentSession: SessionService.currentSession,
       newMessage: "",
@@ -80,7 +94,14 @@ export default {
       typingIndicatorShown: false
     };
   },
-
+  computed: {
+    ...mapState({
+      user: state => state.user.user
+    }),
+    ...mapGetters({
+      sessionPartner: "user/sessionPartner"
+    })
+  },
   methods: {
     showModerationWarning() {
       this.chatWarningIsShown = true;
@@ -91,7 +112,7 @@ export default {
     showNewMessage(message) {
       this.$socket.emit("message", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: this.user,
         message
       });
     },
@@ -134,8 +155,7 @@ export default {
 
       // Typing handler for when non-Enter/Backspace keys are pressed
       this.$socket.emit("typing", {
-        sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        sessionId: this.currentSession.sessionId
       });
 
       /** Every time a key is pressed, set an inactive timer
@@ -149,15 +169,6 @@ export default {
 
   sockets: {
     "session-change"(data) {
-      // {1}
-      SessionService.currentSession.sessionId = data._id;
-      SessionService.currentSession.data = data;
-
-      // re-render the session's persisted whiteboard canvas
-      const img = new Image();
-      img.src = data.whiteboardUrl;
-      img.onload = () => window.App.ctx.drawImage(img, 0, 0);
-
       // index session's participants by user id
       const studentId = (data.student || {})._id;
       const volunteerId = (data.volunteer || {})._id;
@@ -183,15 +194,14 @@ export default {
           avatarStyle: {
             backgroundImage: `url(${picture})`
           },
-          time: moment(message.time).format("h:mm a")
+          time: moment(message.createdAt).format("h:mm a")
         };
       });
 
       this.messages = messages;
     },
-    "is-typing"(data) {
+    "is-typing"() {
       this.typingIndicatorShown = true;
-      this.otherUser = data;
     },
     "not-typing"() {
       this.typingIndicatorShown = false;
@@ -214,7 +224,7 @@ export default {
         avatarStyle: {
           backgroundImage: `url(${picture})`
         },
-        time: moment(data.time).format("h:mm a")
+        time: moment(data.createdAt).format("h:mm a")
       });
     }
   },
@@ -230,26 +240,19 @@ export default {
 .chat {
   height: 100%;
   position: relative;
-}
-
-.header {
-  height: 40px;
-  background-color: #1855d1;
-  color: #fff;
-  font-size: 12px;
-  font-weight: 600;
-  text-align: left;
-  padding: 13px;
-  position: absolute;
-  width: 100%;
+  background: #fff;
 }
 
 .message-box {
-  height: calc(100% - 40px);
-  padding-bottom: 100px;
+  height: calc(100% - 60px);
+  padding-bottom: 110px;
   overflow: hidden;
-  top: 40px;
+  top: 60px;
   position: relative;
+
+  @include breakpoint-above("medium") {
+    top: 70px;
+  }
 }
 
 .chat-warning {
@@ -283,28 +286,37 @@ export default {
 }
 
 .messages {
+  background: white;
   position: relative;
   height: 100%;
   overflow: auto;
   display: flex;
-  padding-bottom: 25px;
+  padding-bottom: 45px;
   flex-direction: column;
 }
 
 .message {
   position: relative;
-  padding: 10px;
+  padding: 24px;
   display: flex;
   justify-content: flex-start;
-  background: #fff;
-  width: 100%;
+  // width: 100%;
+
+  /* Safari needs this specified to lay out the message divs properly. */
+  flex-shrink: 0;
+}
+
+span {
+  font-size: 16px;
 }
 
 .avatar {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   background-size: cover;
   margin-top: 5px;
+  border-radius: 16px;
+  margin-right: 12px;
 }
 
 .name {
@@ -312,25 +324,30 @@ export default {
 }
 
 .time {
-  font-size: 12px;
-  font-weight: 300;
+  font-size: 14px;
+  font-weight: 500;
   color: #73737a;
+  position: absolute;
+  bottom: 0;
 }
 
 .contents {
   text-align: left;
   position: relative;
-  width: 200px;
+  padding: 10px 14px;
   overflow-wrap: break-word;
   font-size: 16px;
+  background: #f1f3f6;
+  border-radius: 20px;
+  max-width: 80%;
 }
 
 .typing-indicator {
   position: absolute;
-  bottom: 0;
+  bottom: 108px;
+  left: 10px;
+  padding: 0;
   font-size: 13px;
-  margin-bottom: 100px;
-  padding: 8px;
   font-weight: 300;
   transition: 0.15s;
 }
@@ -340,38 +357,106 @@ export default {
   opacity: 0;
 }
 
-textarea {
+.message-textarea {
   width: 100%;
   height: 100px;
   border: none;
   position: absolute;
   left: 0;
   bottom: 0;
-  border-top: 1px solid #979797;
-  padding: 10px 12px;
+  border: none;
+  border-top: 1px solid $c-border-grey;
+  padding: 16px;
+  resize: none;
+
+  &:focus {
+    outline: none;
+  }
 }
 
 .left {
   float: left;
+
+  .time {
+    margin-left: 44px;
+  }
 }
 
 .right {
   float: right;
   display: flex;
   flex-direction: row-reverse;
+  .contents {
+    padding-right: 10px;
+    background-color: $c-background-blue;
+    span {
+      color: $c-soft-black;
+    }
+  }
+  .avatar {
+    display: none;
+  }
 }
-
-.right .contents {
-  text-align: right;
-  padding-right: 10px;
-}
-
-.left .contents {
-  text-align: left;
-  padding-left: 10px;
-}
-
 .message-content {
   width: 200px;
+}
+
+.waiting-cards {
+  padding: 20px;
+
+  &__card {
+    border-radius: 8px;
+    text-align: left;
+    padding: 16px;
+    margin-bottom: 16px;
+    font-size: 16px;
+    font-weight: 500;
+    background-color: $c-information-blue;
+
+    h1 {
+      font-size: 20px;
+      line-height: 125%;
+      margin-bottom: 16px;
+      margin-top: 0;
+      color: white;
+    }
+
+    p {
+      color: white;
+      line-height: 150%;
+
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .message-box {
+    height: 100%;
+    padding-bottom: 60px;
+    overflow: hidden;
+    top: 0;
+    position: relative;
+  }
+
+  .message-textarea {
+    width: calc(100% - 100px);
+    height: 40px;
+    border: none;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    border: 1px solid #d6e0ef;
+    border-radius: 20px;
+    margin: 10px 20px;
+    padding: 10px 16px;
+  }
+
+  .typing-indicator {
+    bottom: 58px;
+    left: 35px;
+  }
 }
 </style>

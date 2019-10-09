@@ -1,5 +1,6 @@
 const AUTH_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/auth`;
 const API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/api`;
+const SCHOOL_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/school`;
 
 export default {
   _successHandler(res) {
@@ -50,6 +51,11 @@ export default {
       .get(`${API_ROOT}/user`)
       .then(this._successHandler, this._errorHandler);
   },
+  userGlobal(Vue) {
+    return Vue.http
+      .get(`${API_ROOT}/user`)
+      .then(this._successHandler, this._errorHandler);
+  },
   sendVerification(context) {
     return context.$http
       .post(`${API_ROOT}/verify/send`)
@@ -68,6 +74,16 @@ export default {
   setProfile(context, data) {
     return context.$http
       .put(`${API_ROOT}/user`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
+  getVolunteersAvailability(context, data) {
+    return context.$http
+      .get(`${API_ROOT}/volunteers/availability/${data}`)
+      .then(this._successHandler, this._errorHandler);
+  },
+  getVolunteers(context) {
+    return context.$http
+      .get(`${API_ROOT}/volunteers`)
       .then(this._successHandler, this._errorHandler);
   },
   newSession(context, data) {
@@ -110,9 +126,19 @@ export default {
       .post(`${API_ROOT}/calendar/save`, data)
       .then(this._successHandler, this._errorHandler);
   },
-  getSuggestions(context, data) {
+  searchSchool(context, { query }) {
     return context.$http
-      .post(`${API_ROOT}/complete`, data)
+      .get(`${SCHOOL_API_ROOT}/search?q=${encodeURIComponent(query)}`)
+      .then(this._successHandler, this._errorHandler);
+  },
+  checkSchoolApproval(context, { schoolUpchieveId }) {
+    return context.$http
+      .post(`${SCHOOL_API_ROOT}/check`, { schoolUpchieveId })
+      .then(this._successHandler, this._errorHandler);
+  },
+  joinSchoolApprovalWaitlist(context, { schoolUpchieveId, email }) {
+    return context.$http
+      .post(`${SCHOOL_API_ROOT}/approvalnotify`, { schoolUpchieveId, email })
       .then(this._successHandler, this._errorHandler);
   },
   checkIfMessageIsClean(context, data) {

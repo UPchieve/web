@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ background: !auth.authenticated && !user.verified }">
+  <div class="LegalView">
     <full-text-template header-title="Legal Policy">
       <section>
         <h2>Disclaimer</h2>
@@ -623,46 +623,43 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
+import { mapGetters } from "vuex";
 
 import FullTextTemplate from "@/components/FullTextTemplate";
 import Accordion from "@/components/Accordion";
 import AccordionItem from "@/components/AccordionItem";
 
 export default {
+  name: "LegalView",
   components: {
     FullTextTemplate,
     Accordion,
     AccordionItem
   },
-  data() {
-    const auth = UserService.getAuth();
-
-    const user = UserService.getUser();
-    return {
-      auth,
-      user
-    };
+  created() {
+    if (!this.isAuthenticated) {
+      this.$store.dispatch("app/hideNavigation");
+    }
+  },
+  computed: {
+    ...mapGetters({
+      isAuthenticated: "user/isAuthenticated"
+    })
+  },
+  watch: {
+    isAuthenticated(isAuthed) {
+      if (isAuthed) {
+        this.$store.dispatch("app/showNavigation");
+      } else {
+        this.$store.dispatch("app/hideNavigation");
+      }
+    }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.background {
-  margin-left: -300px;
-  position: relative;
-  z-index: 2;
-  background-color: white;
-}
-
-@media screen and (max-width: 700px) {
-  .background {
-    margin-left: 0em !important;
-    padding-left: 0em !important;
-  }
-
-  .content-header {
-    padding: 2em !important;
-  }
+.LegalView {
+  background: white;
 }
 </style>

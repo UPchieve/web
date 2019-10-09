@@ -1,18 +1,25 @@
 <template>
-  <div class="whiteboard">
-    <canvas
-      v-canvas
-      id="whiteboardCanvas"
-      @mousedown="drawStart"
-      @mouseup="drawEnd"
-      @mousemove="draw"
-    />
+  <div class="whiteboard" id="whiteboard">
+    <div class="canvas-wrapper" id="canvas-wrapper">
+      <canvas
+        v-canvas
+        id="whiteboardCanvas"
+        @mousedown="drawStart"
+        @mousemove="draw"
+        @mouseup="drawEnd"
+        @mouseleave="drawEnd"
+        width="1600"
+        height="1200"
+      />
+    </div>
     <div
       class="whiteboardTools row"
       style="background-color:rgba(238,238,238,1)"
     >
-      <div class="header">Whiteboard Tools</div>
-      <div class="toolset col-md-6">
+      <div v-if="mobileMode" class="mobile-whiteboard-notice">
+        Whiteboard drawing is not supported on this device.
+      </div>
+      <div v-else class="toolset col-md-6">
         <button id="clearButton" class="whiteboardBtn" @click="clear" />
         <div class="colorWrapper">
           <button
@@ -82,8 +89,9 @@
  * @todo {1} Solve this bug ('handleUndoOperation' is not defined)
  */
 
+import { mapState, mapGetters } from "vuex";
+
 import SessionService from "@/services/SessionService";
-import UserService from "@/services/UserService";
 import EraserIconUrl from "@/assets/eraser_icon_01_dark.png";
 import PenIconUrl from "@/assets/pen_icon_01_dark.png";
 
@@ -93,9 +101,6 @@ import PenIconUrl from "@/assets/pen_icon_01_dark.png";
 // const DRAW_BUTTON_ID = 'drawButton';
 // const TEXT_BUTTON_ID = 'textButton';
 // const TEXT_AREA_ID = 'textInputBox';
-
-// const CANVAS_WIDTH = 800;
-// const CANVAS_HEIGHT = 400;
 
 // const LINE_FILL_STYLE = 'solid';
 let LOCAL_LINE_COLOR = "rgba(52,52,64,.6)";
@@ -170,116 +175,109 @@ export default {
       showColors: "hidden"
     };
   },
+  computed: {
+    ...mapState({
+      user: state => state.user.user
+    }),
+    ...mapGetters({
+      mobileMode: "app/mobileMode"
+    })
+  },
   mounted() {
-    this.resizeCanvas();
     this.drawSetup();
-    window.addEventListener("resize", this.resizeCanvas);
   },
   methods: {
-    resizeCanvas() {
-      const savedImage = App.ctx.getImageData(
-        0,
-        0,
-        App.canvas.width,
-        App.canvas.height
-      );
-      App.canvas.width = App.canvas.offsetWidth;
-      App.canvas.height = App.canvas.offsetHeight;
-      App.ctx.putImageData(savedImage, 0, 0);
-    },
-
-    // Socket emits
     emitDrawClick() {
       this.$socket.emit("drawClick", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: { _id: this.user._id }
       });
     },
     emitSaveImage() {
       this.$socket.emit("saveImage", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: { _id: this.user._id }
       });
     },
     emitUndoClick() {
       this.$socket.emit("undoClick", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: { _id: this.user._id }
       });
     },
     emitClearClick() {
       this.$socket.emit("clearClick", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: { _id: this.user._id }
       });
     },
     emitChangeColor(color) {
       this.$socket.emit("changeColor", {
         sessionId: this.currentSession.sessionId,
-        color,
-        user: UserService.getUser()
+        user: { _id: this.user._id },
+        color
       });
     },
     emitChangeWidth(width) {
       this.$socket.emit("changeWidth", {
         sessionId: this.currentSession.sessionId,
-        width,
-        user: UserService.getUser()
+        user: { _id: this.user._id },
+        width
       });
     },
     emitDrawing() {
       this.$socket.emit("drawing", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: { _id: this.user._id }
       });
     },
     emitEnd() {
       this.$socket.emit("end", {
         sessionId: this.currentSession.sessionId,
-        whiteboardUrl: App.canvas.toDataURL(),
-        user: UserService.getUser()
+        user: { _id: this.user._id },
+        whiteboardUrl: App.canvas.toDataURL()
       });
     },
     emitDragStart(data) {
       this.$socket.emit("dragStart", {
         sessionId: this.currentSession.sessionId,
+        user: { _id: this.user._id },
         x: data.x,
         y: data.y,
-        color: data.color,
-        user: UserService.getUser()
+        color: data.color
       });
     },
     emitDragAction(data) {
       this.$socket.emit("dragAction", {
         sessionId: this.currentSession.sessionId,
+        user: { _id: this.user._id },
         x: data.x,
         y: data.y,
-        color: data.color,
-        user: UserService.getUser()
+        color: data.color
       });
     },
     emitDragEnd(data) {
       this.$socket.emit("dragEnd", {
         sessionId: this.currentSession.sessionId,
+        user: { _id: this.user._id },
         x: data.x,
         y: data.y,
-        color: data.color,
-        user: UserService.getUser()
+        color: data.color
       });
     },
     emitInsertText(data) {
       this.$socket.emit("insertText", {
         sessionId: this.currentSession.sessionId,
+        user: { _id: this.user._id },
         x: data.x,
         y: data.y,
-        text: data.text,
-        user: UserService.getUser()
+        text: data.text
       });
     },
     emitResetScreen(/* data */) {
       this.$socket.emit("resetScreen", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: { _id: this.user._id }
       });
     },
 
@@ -309,6 +307,10 @@ export default {
       this.emitClearClick();
     },
     drawStart(event) {
+      if (this.mobileMode) {
+        return;
+      }
+
       if (!SERVER_DRAWING) {
         this.emitDrawing();
         if (!CURSOR_VISIBLE && currentState === "INSERTING_TEXT") {
@@ -342,83 +344,137 @@ export default {
           this.emitSaveImage();
           App.canvas.isDrawing = true;
 
-          // const scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
-          // const scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+          let x = event.pageX;
+          let y = event.pageY;
 
-          const x = event.pageX;
-          const y = event.pageY;
+          if (this.mobileMode && event.touches && event.touches.length) {
+            const touchEvent = event.touches[0];
+            x = touchEvent.clientX;
+            y = touchEvent.clientY;
+          }
+
+          const whiteboard = document.getElementById("canvas-wrapper");
+          const canvasRect = whiteboard.getBoundingClientRect();
+
+          const canvasOffsetX = canvasRect.left;
+          const canvasOffsetY = canvasRect.top;
+
+          const transmitX =
+            x - canvasOffsetX + whiteboard.scrollLeft - window.scrollX;
+          const transmitY =
+            y - canvasOffsetY + whiteboard.scrollTop - window.scrollY;
 
           this.fillCircle(
             App.canvas,
             App.ctx,
             "dragstart",
             false,
-            x,
-            y,
+            transmitX,
+            transmitY,
             LOCAL_LINE_COLOR
           );
+
           this.emitDragStart({
-            x,
-            y,
+            x: transmitX,
+            y: transmitY,
             color: LOCAL_LINE_COLOR
           });
         }
       }
     },
     drawEnd(event) {
+      if (this.mobileMode) {
+        return;
+      }
+
       if (!SERVER_DRAWING) {
         App.canvas.isDrawing = false;
 
-        // const scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
-        // const scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+        let x = event.pageX;
+        let y = event.pageY;
 
-        const x = event.pageX;
-        const y = event.pageY;
+        if (this.mobileMode && event.touches && event.touches.length) {
+          const touchEvent = event.touches[0];
+          x = touchEvent.clientX;
+          y = touchEvent.clientY;
+        }
+
+        const whiteboard = document.getElementById("canvas-wrapper");
+        const canvasRect = whiteboard.getBoundingClientRect();
+
+        const canvasOffsetX = canvasRect.left;
+        const canvasOffsetY = canvasRect.top;
+
+        const transmitX =
+          x - canvasOffsetX + whiteboard.scrollLeft - window.scrollX;
+        const transmitY =
+          y - canvasOffsetY + whiteboard.scrollTop - window.scrollY;
 
         this.fillCircle(
           App.canvas,
           App.ctx,
           "dragend",
           false,
-          x,
-          y,
+          transmitX,
+          transmitY,
           LOCAL_LINE_COLOR
         );
+
         this.emitDragEnd({
-          x,
-          y,
+          x: transmitX,
+          y: transmitY,
           color: LOCAL_LINE_COLOR
         });
+
         saveImage(App.canvas, App.ctx);
         this.emitSaveImage();
         this.emitEnd();
       }
     },
     draw(event) {
+      if (this.mobileMode) {
+        return;
+      }
+
       if (!SERVER_DRAWING) {
         if (currentState === "DRAWING" || currentState === "ERASING") {
           if (!App.canvas.isDrawing) {
             return;
           }
 
-          // const scrollLeft = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
-          // const scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+          const whiteboard = document.getElementById("canvas-wrapper");
+          const canvasRect = whiteboard.getBoundingClientRect();
 
-          const x = event.pageX;
-          const y = event.pageY;
+          let x = event.pageX;
+          let y = event.pageY;
+
+          if (this.mobileMode && event.touches && event.touches.length) {
+            const touchEvent = event.touches[0];
+            x = touchEvent.clientX;
+            y = touchEvent.clientY;
+          }
+
+          const canvasOffsetX = canvasRect.left;
+          const canvasOffsetY = canvasRect.top;
+
+          const transmitX =
+            x - canvasOffsetX + whiteboard.scrollLeft - window.scrollX;
+          const transmitY =
+            y - canvasOffsetY + whiteboard.scrollTop - window.scrollY;
 
           this.fillCircle(
             App.canvas,
             App.ctx,
             "drag",
             false,
-            x,
-            y,
+            transmitX,
+            transmitY,
             LOCAL_LINE_COLOR
           );
+
           this.emitDragAction({
-            x,
-            y,
+            x: transmitX,
+            y: transmitY,
             color: LOCAL_LINE_COLOR
           });
         }
@@ -535,25 +591,6 @@ export default {
 
     // Canvas manipulations
     fillCircle(canvas, context, type, server, x, y) {
-      const scrollLeft =
-        window.pageXOffset !== undefined
-          ? window.pageXOffset
-          : (
-              document.documentElement ||
-              document.body.parentNode ||
-              document.body
-            ).scrollLeft;
-
-      const scrollTop =
-        window.pageYOffset !== undefined
-          ? window.pageYOffset
-          : (
-              document.documentElement ||
-              document.body.parentNode ||
-              document.body
-            ).scrollTop;
-
-      const rect = App.canvas.getBoundingClientRect();
       if (server) {
         App.ctx.strokeStyle = SERVER_LINE_COLOR;
         App.ctx.lineWidth = SERVER_LINE_WIDTH;
@@ -567,16 +604,11 @@ export default {
             imageData = imageList[imageList.length - 1];
             context.putImageData(imageData, 0, 0);
           }
+
           context.beginPath();
-          context.moveTo(
-            x - scrollLeft - rect.left,
-            y - scrollTop - rect.top + 5
-          );
+          context.moveTo(x, y);
         } else if (type === "drag") {
-          context.lineTo(
-            x - scrollLeft - rect.left,
-            y - scrollTop - rect.top + 5
-          );
+          context.lineTo(x, y);
           context.stroke();
         } else {
           context.closePath();
@@ -701,39 +733,50 @@ export default {
 <style lang="scss" scoped>
 .whiteboard {
   height: 100%;
-  display: flex;
-  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.canvas-wrapper {
+  height: 100%;
+  overflow: scroll;
 }
 
 canvas {
-  width: 100%;
-  height: 100%;
   background: #fff;
   display: block;
   cursor: not-allowed;
-  flex: 1;
 }
 
 .whiteboardTools {
   padding: 10px 30px;
+  width: 100%;
+  margin: 0;
   width: 300px;
   height: 80px;
   display: flex;
   align-items: center;
-  align-self: center;
   flex-direction: column;
   position: absolute;
-  bottom: 0;
+  bottom: 20px;
+  border-radius: 8px;
+  left: 50%;
+  transform: translate(-50%, 0);
+
+  .mobile-whiteboard-notice {
+    margin: auto;
+  }
 }
 
 .header {
   font-size: 12px;
+  display: block;
 }
 
 .toolset {
   display: flex;
   justify-content: center;
-  padding-top: 5px;
+  padding-top: 8px;
 }
 
 .colorContainer {
@@ -750,12 +793,14 @@ canvas {
 }
 
 .whiteboardBtn {
-  padding: 13px;
+  padding: 20px;
   border: none;
-  margin: 4px;
+  margin: 3px;
+  border-radius: 8px;
   background-repeat: no-repeat;
   background-position: center;
   background-color: rgb(238, 238, 238);
+  transition: 0.2s;
 }
 
 .colorButton {
@@ -782,6 +827,10 @@ canvas {
 
 #clearButton {
   background-image: url("~@/assets/clear_icon.svg");
+  padding: 13px;
+  margin: 10px 8px 10px 10px;
+  width: 0;
+  height: 0;
 }
 
 #openColorsButton {

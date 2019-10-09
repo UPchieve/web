@@ -1,7 +1,7 @@
 <template>
   <div class="contactus-form">
     <h1 class="header">
-      Contact Us!
+      Contact Us
     </h1>
     <table class="questions-table">
       <tr class="title-row">
@@ -112,62 +112,82 @@
 </template>
 
 <script>
-import NetworkService from '../services/NetworkService'
+import NetworkService from '../services/NetworkService';
+import { mapGetters } from "vuex";
+
+const contactQuestions = [{
+    qid: '1',
+    qtype: 'textline',
+    alias: 'email',
+    title:
+      'Email address *',
+    secondary_title:
+      '',
+    table_title: [],
+    options: []
+  }, {
+    qid: '2',
+    qtype: 'multiple-checkbox',
+    alias: 'subject',
+    title: 'Pick the topic that best matches what you are contacting \
+      us about.',
+    secondary_title: '',
+    table_title: [
+      ''
+    ],
+    options: [
+      'Technical issues while using the web app',
+      'Math question',
+      'College application question',
+      'Feedback',
+      'Other'
+    ],
+    options_alias: [
+      ' Technical Issues',
+      ' Math',
+      ' College',
+      ' Feedback',
+      ' Other'
+    ]
+  }, {
+    qid: '3',
+    qtype: 'textbox',
+    alias: 'more',
+    title:
+      'Tell us more!',
+    secondary_title:
+      '',
+    table_title: [],
+    options: []
+  }
+];
 
 export default {
+  name: "contact-view",
+  created() {
+    if (!this.isAuthenticated) {
+      this.$store.dispatch("app/hideNavigation");
+    }
+  },
   data () {
     return {
-      contactQuestions: [
-        {
-          qid: '1',
-          qtype: 'textline',
-          alias: 'email',
-          title:
-            'Email address *',
-          secondary_title:
-            '',
-          table_title: [],
-          options: []
-        },
-        {
-          qid: '2',
-          qtype: 'multiple-checkbox',
-          alias: 'subject',
-          title: 'Pick the topic that best matches what you are contacting \
-            us about.',
-          secondary_title: '',
-          table_title: [
-            ''
-          ],
-          options: [
-            'Technical issues while using the web app',
-            'Math question',
-            'College application question',
-            'Feedback',
-            'Other'
-          ],
-          options_alias: [
-            ' Technical Issues',
-            ' Math',
-            ' College',
-            ' Feedback',
-            ' Other'
-          ]
-        },
-        {
-          qid: '3',
-          qtype: 'textbox',
-          alias: 'more',
-          title:
-            'Tell us more!',
-          secondary_title:
-            '',
-          table_title: [],
-          options: []
-        }
-      ],
+      contactQuestions,
       questions: [],
-      userResponse: {},
+      userResponse: {}
+    }
+  },
+  computed: {
+    ...mapGetters({
+      isAuthenticated: "user/isAuthenticated"
+    })
+  },
+  watch: {
+    isAuthenticated(isAuthed) {
+      if (isAuthed) {
+        this.$store.dispatch("app/showNavigation");
+      } else {
+        this.$store.dispatch("app/hideNavigation");
+      }
     }
   },
   beforeMount () {
@@ -193,7 +213,7 @@ export default {
     isValidEmail (address) {
       var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       return re.test(String(address).toLowerCase());
-    },
+    }
   }
 }
 </script>

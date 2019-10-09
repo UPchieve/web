@@ -1,0 +1,57 @@
+$app-header-height-map: (
+  "default": 80px,
+  "medium": 64px
+);
+
+$app-sidebar-width-map: (
+  "default": 100%,
+  "medium": 250px
+);
+
+/// Returns the `AppHeader` component height based on key.
+/// @requires {function} validate-map-key
+/// @param {string} $key ["default]
+/// @return {number} height
+@function get-app-header-height($key: "default") {
+  @return validate-map-key($app-header-height-map, $key);
+}
+
+/// Returns the `AppSidebar` component width based on key.
+/// @requires {function} validate-map-key
+/// @param {string} $key ["default"]
+/// @return {number} width
+@function get-app-sidebar-width($key: "default") {
+  @return validate-map-key($app-sidebar-width-map, $key);
+}
+
+/// Binds a property to the `AppHeader` component height.
+/// @requires {map} breakpoint-map
+/// @requires {mixin} breakpoint-above
+/// @param {string} $property
+@mixin bind-app-header-height($property) {
+  #{$property}: get-app-header-height();
+
+  @each $key, $value in $app-header-height-map {
+    @if map-get($breakpoint-map, $key) {
+      @include breakpoint-above($key) {
+        #{$property}: $value;
+      }
+    }
+  }
+}
+
+/// Binds a property to the `AppSidebar` component width.
+/// @requires {map} breakpoint-map
+/// @requires {mixin} breakpoint-above
+/// @param {string} $property
+@mixin bind-app-sidebar-width($property) {
+  #{$property}: get-app-sidebar-width();
+
+  @each $key, $value in $app-sidebar-width-map {
+    @if map-get($breakpoint-map, $key) {
+      @include breakpoint-above($key) {
+        #{$property}: $value;
+      }
+    }
+  }
+}

@@ -1,7 +1,5 @@
-import router from "@/router";
-
 import NetworkService from "./NetworkService";
-import UserService from "./UserService";
+import AnalyticsService from "./AnalyticsService";
 
 export default {
   loading: false,
@@ -10,20 +8,17 @@ export default {
     data: {}
   },
 
-  getPartner() {
-    const user = UserService.getUser();
-    const session = this.currentSession.data || {};
-
-    if (user.isVolunteer) {
-      return session.student;
-    }
-    return session.volunteer;
-  },
-
   endSession(context, sessionId) {
-    localStorage.removeItem("currentSessionPath");
-
     return NetworkService.endSession(context, { sessionId }).then(() => {
+      context.$store.dispatch("user/clearSession");
+
+      // analytics: track when a help session has ended
+      AnalyticsService.trackSessionEnded(
+        context,
+        this.currentSession.data,
+        context.$store.state.user.isFakeUser
+      );
+
       this.currentSession.sessionId = null;
       this.currentSession.data = {};
     });
@@ -40,12 +35,24 @@ export default {
       this.currentSession.sessionId = sessionId;
 
       if (sessionId) {
-        const path = `/session/${sessionType}/${sessionSubTopic}/${sessionId}`;
-        localStorage.setItem("currentSessionPath", path);
-        router.replace(path);
+        const sessionData = {
+          type: sessionType,
+          subTopic: sessionSubTopic,
+          _id: sessionId
+        };
+        context.$store.dispatch("user/updateSession", sessionData);
+        context.$router.replace(context.$store.getters["user/sessionPath"]);
       } else {
-        router.replace("/");
+        context.$router.replace("/");
       }
+      // analytics: track when a session has started
+      AnalyticsService.trackSessionStarted(
+        context,
+        this.currentSession,
+        sessionType,
+        sessionSubTopic,
+        context.$store.state.user.isFakeUser
+      );
 
       return sessionId;
     });
@@ -59,7 +66,7 @@ export default {
       this.currentSession.sessionId = sessionId;
 
       if (!sessionId) {
-        router.replace("/");
+        context.$router.replace("/");
       }
 
       return sessionId;
@@ -75,8 +82,7 @@ export default {
         this.currentSession.sessionId = null;
         this.currentSession.data = {};
 
-        localStorage.removeItem("currentSessionPath");
-        return;
+        return Promise.reject(resp.data.err);
       }
 
       const { sessionId, data } = resp.data || {};
@@ -86,8 +92,7 @@ export default {
         this.currentSession.sessionId = sessionId;
         this.currentSession.data = data;
 
-        const path = `/session/${type}/${subTopic}/${sessionId}`;
-        localStorage.setItem("currentSessionPath", path);
+        return Promise.resolve({ sessionData: data });
       }
     });
   }

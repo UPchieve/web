@@ -1,18 +1,24 @@
 import Vue from "vue";
 import VueSocketIO from "vue-socket.io";
+import VueRouter from "vue-router";
 import VueHeadful from "vue-headful";
-import App from "./App.vue";
+import vSelect from "vue-select";
+import App from "./components/App";
 import router from "./router";
 import store from "./store";
 
 // Prevent production tip on startup
 Vue.config.productionTip = false;
 
-// Use vue-socket.io
+// Use plugins
 Vue.use(VueSocketIO, process.env.VUE_APP_SOCKET_ADDRESS);
+Vue.use(VueRouter);
 
 // Set up vue-headful
 Vue.component("vue-headful", VueHeadful);
+
+// Set up vue-select
+Vue.component("v-select", vSelect);
 
 // Create Vue instance
 new Vue({

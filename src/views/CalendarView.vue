@@ -1,57 +1,61 @@
 <template>
-  <div class="calendar">
-    <h1 class="header">
-      <div class="header-title">Schedule</div>
-      <button class="btn" @click="save()">Update Schedule</button>
-    </h1>
-    <div v-if="hasUserSchedule">
-      <div class="tz-selector-container">
-        <span>Time Zone: </span>
-        <select v-model="selectedTz">
-          <option v-for="tz in tzList" :key="tz">
-            {{ tz }}
-          </option>
-        </select>
+  <div class="calendar-container">
+    <div class="calendar">
+      <div class="header">
+        <div class="header-title">Schedule</div>
+        <button class="save-button" @click="save()">Save</button>
       </div>
-      <div class="dayTimeContainer">
-        <div class="timeLabelContainer">
-          <div v-for="time in timeRange" :key="time" class="timeLabel">
-            {{ time }}
-          </div>
+      <div v-if="hasUserSchedule">
+        <div class="tz-selector-container">
+          <span>Time Zone: </span>
+          <select v-model="selectedTz">
+            <option v-for="tz in tzList" :key="tz">
+              {{ tz }}
+            </option>
+          </select>
         </div>
-        <form class="dayTime">
-          <div v-for="(dayValue, day) in availability" :key="`day-${day}`">
-            <div class="dayLabel">{{ day }}</div>
-            <div class="times">
-              <div
-                v-for="sortedTime in sortedTimes[day]"
-                :key="sortedTime"
-                class="timeOfDay"
-              >
-                <input
-                  id="time"
-                  v-model="availability[day][sortedTime]"
-                  type="checkbox"
-                />
-                <label for="sortedTime" />
-              </div>
+        <div class="dayTimeContainer">
+          <div class="timeLabelContainer">
+            <div v-for="time in timeRange" :key="time" class="timeLabel">
+              {{ time }}
             </div>
           </div>
-        </form>
+          <form class="dayTime">
+            <div v-for="(dayValue, day) in availability" :key="`day-${day}`">
+              <div class="dayLabel">{{ day }}</div>
+              <div class="times">
+                <div
+                  v-for="sortedTime in sortedTimes[day]"
+                  :key="sortedTime"
+                  class="timeOfDay"
+                >
+                  <input
+                    id="time"
+                    v-model="availability[day][sortedTime]"
+                    type="checkbox"
+                  />
+                  <label for="sortedTime" />
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 import _ from "lodash";
 import moment from "moment-timezone";
-import UserService from "@/services/UserService";
+
 import CalendarService from "@/services/CalendarService";
+import AnalyticsService from "@/services/AnalyticsService";
 
 export default {
   data() {
-    const user = UserService.getUser();
     const timeRange = [
       "12 am",
       "1 am",
@@ -79,7 +83,6 @@ export default {
       "11 pm"
     ];
     return {
-      user,
       availability: {},
       timeRange,
       tzList: moment.tz.names(),
@@ -87,6 +90,9 @@ export default {
     };
   },
   computed: {
+    ...mapState({
+      user: state => state.user.user
+    }),
     sortedTimes() {
       return this.sortTimes();
     },
@@ -99,10 +105,6 @@ export default {
   },
   methods: {
     fetchData() {
-      if (!this.user.hasSchedule) {
-        CalendarService.initAvailability(this, this.user._id);
-      }
-
       var originalAvailabilityPromise = CalendarService.getAvailability(
         this,
         this.user._id
@@ -153,8 +155,10 @@ export default {
       return this.tzList.includes(tz);
     },
     convertAMPMtoTwentyFourHrs(hour) {
-      var hr = hour.substring(0, hour.length - 1);
-      var apm = hour.substring(hour.length - 1);
+      const hourRegex = /^(\d{1,2})([ap])$/;
+      // capture the hour and the 'a/p' string
+      let [, hr, apm] = hour.match(hourRegex);
+
       if (apm === "a") {
         if (hr === "12") {
           return 0;
@@ -178,6 +182,13 @@ export default {
       }
       return hour + "a";
     },
+    /**
+     * Converts an availability to another timezone offset from America/New_York.
+     *
+     * @param {availability} the object to convert
+     * @param {offset} the user's time zone offset
+     * @return the converted availability object
+     */
     convertAvailability(availability, offset) {
       const succWeekday = {
         Sunday: "Monday",
@@ -237,30 +248,62 @@ export default {
         this.user._id,
         this.convertAvailability(this.availability, offset)
       );
+
+      // analytics: tracking whether a user has updated their availability
+      AnalyticsService.trackNoProperties(
+        "updated availability",
+        this.user.isFakeUser
+      );
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
+.calendar-container {
+  padding: 10px;
+
+  @include breakpoint-above("medium") {
+    padding: 40px;
+  }
+}
+
 .calendar {
+  background: #fff;
+  border-radius: 8px;
   font-size: 12px;
   color: #343440;
+  padding: 20px 15px;
+
+  @include breakpoint-above("medium") {
+    padding: 40px;
+  }
 }
 
 .header {
   display: flex;
-  padding: 30px 0 30px 50px;
   margin: 0px;
-  font-size: 24px;
-  border-bottom: 0.5px solid #cccccf;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  font-weight: 600;
 }
 
 .header-title {
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.save-button {
+  font-size: 16px;
   font-weight: 600;
+  background: $c-success-green;
+  padding: 10px 45px;
+  border-radius: 30px;
+  color: #fff;
+  border: none;
+
+  &:hover {
+    color: #000;
+  }
 }
 
 .timeLabelContainer {
@@ -316,13 +359,6 @@ label {
 
 input[type="checkbox"]:checked + label {
   background-color: rgba(22, 210, 170, 0.5);
-}
-
-.btn {
-  font-size: 20px;
-  font-weight: 600;
-  color: #16d2aa;
-  padding-right: 40px;
 }
 
 .tz-selector-container {

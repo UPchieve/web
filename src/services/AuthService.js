@@ -1,19 +1,12 @@
 import Validator from "validator";
 
-import router from "@/router";
+import Vue from "vue";
 
 import NetworkService from "./NetworkService";
-
-const USER_FETCH_LIMIT_SECONDS = 5;
+import AnalyticsService from "./AnalyticsService";
 
 export default {
-  user: {
-    authenticated: false,
-    data: null,
-    lastFetch: 0
-  },
-
-  login(context, creds, redirect) {
+  login(context, creds) {
     const { email, password } = creds;
     if (
       !email ||
@@ -31,11 +24,11 @@ export default {
           throw new Error("No user returned from auth service");
         }
 
-        this.storeUser(data.user);
+        // analytics: tracking when a user has logged in
+        AnalyticsService.identify(data.user, data.user.isFakeUser);
+        AnalyticsService.trackNoProperties("logged in", data.user.isFakeUser);
 
-        if (redirect) {
-          router.push(redirect);
-        }
+        return data;
       },
       () => {
         context.error = "Could not login";
@@ -53,13 +46,11 @@ export default {
           throw new Error(data.err);
         }
 
-        this.storeUser(data.user);
-
         context.msg = "You have been signed up!";
 
         if (redirect) {
           setTimeout(() => {
-            router.push(redirect);
+            context.$router.push(redirect);
           }, 2000);
         }
       }
@@ -88,7 +79,7 @@ export default {
 
       if (redirect) {
         setTimeout(() => {
-          router.push(redirect);
+          context.$router.push(redirect);
         }, 2000);
       }
     });
@@ -107,7 +98,7 @@ export default {
 
       if (redirect) {
         setTimeout(() => {
-          router.push(redirect);
+          context.$router.push(redirect);
         }, 2000);
       }
     });
@@ -117,57 +108,24 @@ export default {
     if (context) {
       NetworkService.logout(context)
         .then(() => {
-          this.removeUser();
-          router.push("/logout");
+          context.$store.dispatch("user/clearUser");
+          context.$router.push("/logout");
         })
         .catch(() => {
-          this.removeUser();
-          router.push("/logout");
+          context.$store.dispatch("user/clearUser");
+          context.$router.push("/logout");
         });
-    } else {
-      this.removeUser();
     }
   },
 
-  checkAuth(context) {
-    const user = localStorage.getItem("user");
-    if (user) {
-      try {
-        this.user.data = JSON.parse(user);
-        this.user.authenticated = true;
-      } catch (e) {
-        this.logout(); // Error in LocalStorage, so logout
-      }
-    } else {
-      this.user.authenticated = false;
-      this.user.data = null;
-    }
+  getAuth(context, options) {
+    const isGlobal = options && options.isGlobal;
 
-    if (context && this.shouldFetch()) {
-      this.fetchUser(context);
-    }
-  },
-
-  shouldFetch() {
-    return Date.now() - this.user.lastFetch > USER_FETCH_LIMIT_SECONDS * 1000;
-  },
-
-  storeUser(userObj) {
-    this.user.authenticated = true;
-    this.user.data = userObj;
-    localStorage.setItem("user", JSON.stringify(userObj));
-  },
-
-  removeUser() {
-    localStorage.removeItem("user");
-    this.user.authenticated = false;
-    this.user.data = null;
-  },
-
-  fetchUser(context) {
-    this.user.lastFetch = Date.now();
-
-    NetworkService.user(context)
+    const authPromise =
+      !context || isGlobal
+        ? NetworkService.userGlobal(Vue)
+        : NetworkService.user(context);
+    return authPromise
       .then(res => {
         const data = { ...res.data };
         if (!data) {
@@ -175,16 +133,23 @@ export default {
         }
 
         if (data.user) {
-          this.user.authenticated = true;
-          this.user.data = data.user;
-          localStorage.setItem("user", JSON.stringify(data.user));
+          return {
+            authenticated: true,
+            user: data.user
+          };
         } else {
-          this.user.authenticated = false;
-          this.user.data = null;
+          return {
+            authenticated: false,
+            user: null
+          };
         }
       })
-      .catch((/*err*/) => {
-        // console.log(err);
+      .catch(err => {
+        return {
+          authenticated: false,
+          user: null,
+          err: err
+        };
       });
   }
 };
