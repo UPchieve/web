@@ -7,16 +7,17 @@
       <tr class="title-row">
         <td class="title-cell">
           <p>
-          Fill out this form, and we will get back to you as soon as possible! 
-          We will respond to you via email using the email address you put 
-          below.
+            Fill out this form, and we will get back to you as soon as possible!
+            We will respond to you via email using the email address you put
+            below.
           </p>
         </td>
       </tr>
       <tr
         class="question-row"
-        v-for="(question,index) in questions"
-        :key="index">
+        v-for="(question, index) in questions"
+        :key="index"
+      >
         <td class="question-cell">
           <div class="question-title">{{ question.title }}</div>
           <!-- IF MUTLIPLE CHOICE -->
@@ -36,7 +37,7 @@
                 class="checkbox-question-row forMobileView"
                 v-for="(subquestion, subquestion_index) in question.options"
                 :key="subquestion_index"
-              >                
+              >
                 <td
                   class="checkbox-question-selection-cell container"
                   v-for="index in question.table_title.length"
@@ -54,16 +55,19 @@
                   />
                   <span class="checkmark"></span>
                 </td>
-                <td class="checkbox-question-cell">{{ subquestion }}
-                <div v-if="subquestion === 'Other'" class="other-input">
+                <td class="checkbox-question-cell">
+                  {{ subquestion }}
+                  <div v-if="subquestion === 'Other'" class="other-input">
                     <input
                       v-model="
                         userResponse[question.alias][
                           question.options_alias[subquestion_index]
-                      ]
-                    "
-                    type="text" class="text-line"/>
-                </div>
+                        ]
+                      "
+                      type="text"
+                      class="text-line"
+                    />
+                  </div>
                 </td>
               </tr>
             </table>
@@ -89,10 +93,11 @@
             >
               {{ question.secondary_title }}
             </div>
-                <input
-                  class="text-line" type="email"
-                  v-model="userResponse[question.alias]"
-                />
+            <input
+              class="text-line"
+              type="email"
+              v-model="userResponse[question.alias]"
+            />
           </div>
           <!-- ELSE -->
           <div v-else>
@@ -112,51 +117,49 @@
 </template>
 
 <script>
-import NetworkService from '../services/NetworkService';
+import NetworkService from "../services/NetworkService";
 import { mapGetters } from "vuex";
 
-const contactQuestions = [{
-    qid: '1',
-    qtype: 'textline',
-    alias: 'email',
-    title:
-      'Email address *',
-    secondary_title:
-      '',
+const contactQuestions = [
+  {
+    qid: "1",
+    qtype: "textline",
+    alias: "email",
+    title: "Email address *",
+    secondary_title: "",
     table_title: [],
     options: []
-  }, {
-    qid: '2',
-    qtype: 'multiple-checkbox',
-    alias: 'subject',
-    title: 'Pick the topic that best matches what you are contacting \
-      us about.',
-    secondary_title: '',
-    table_title: [
-      ''
-    ],
+  },
+  {
+    qid: "2",
+    qtype: "multiple-checkbox",
+    alias: "subject",
+    title:
+      "Pick the topic that best matches what you are contacting \
+      us about.",
+    secondary_title: "",
+    table_title: [""],
     options: [
-      'Technical issues while using the web app',
-      'Math question',
-      'College application question',
-      'Feedback',
-      'Other'
+      "Technical issues while using the web app",
+      "Math question",
+      "College application question",
+      "Feedback",
+      "Other"
     ],
     options_alias: [
-      ' Technical Issues',
-      ' Math',
-      ' College',
-      ' Feedback',
-      ' Other'
+      " Technical Issues",
+      " Math",
+      " College",
+      " Feedback",
+      " Other"
     ]
-  }, {
-    qid: '3',
-    qtype: 'textbox',
-    alias: 'more',
-    title:
-      'Tell us more!',
-    secondary_title:
-      '',
+  },
+  {
+    qid: "3",
+    qtype: "textbox",
+    alias: "more",
+    title: "Tell us more!",
+    secondary_title: "",
     table_title: [],
     options: []
   }
@@ -169,12 +172,12 @@ export default {
       this.$store.dispatch("app/hideNavigation");
     }
   },
-  data () {
+  data() {
     return {
       contactQuestions,
       questions: [],
       userResponse: {}
-    }
+    };
   },
   computed: {
     ...mapGetters({
@@ -190,32 +193,31 @@ export default {
       }
     }
   },
-  beforeMount () {
-    var _self = this
-    this.questions = this.contactQuestions
-    this.questions.map(function (question) {
-      if (question.qtype == 'multiple-checkbox')
-        _self.userResponse[question.alias] = {}
-    })
+  beforeMount() {
+    var _self = this;
+    this.questions = this.contactQuestions;
+    this.questions.map(function(question) {
+      if (question.qtype == "multiple-checkbox")
+        _self.userResponse[question.alias] = {};
+    });
   },
   methods: {
-    submitContactUs () {
-      if (!this.isValidEmail(this.userResponse['email'])) {
-        alert("A valid email required.")
-      }
-      else {
+    submitContactUs() {
+      if (!this.isValidEmail(this.userResponse["email"])) {
+        alert("A valid email required.");
+      } else {
         NetworkService.sendContact(this, {
-        responseData: this.userResponse,
-        })
-        this.$router.push('/')
+          responseData: this.userResponse
+        });
+        this.$router.push("/");
       }
     },
-    isValidEmail (address) {
+    isValidEmail(address) {
       var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       return re.test(String(address).toLowerCase());
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -255,7 +257,6 @@ export default {
   -moz-border-radius: 5px;
   box-shadow: -9px 9px #2757ca;
   margin-bottom: 20px;
-  
 }
 
 .title-row {
@@ -410,8 +411,6 @@ export default {
   color: #fff;
 }
 
-
-
 @media screen and (max-width: 488px) {
   .mobileRemove {
     display: none !important;
@@ -421,9 +420,13 @@ export default {
     padding: 1em 1em 1em 3em !important;
   }
 
-  table, thead, tbody, th, tr { 
-		display: block !important; 
-	}
+  table,
+  thead,
+  tbody,
+  th,
+  tr {
+    display: block !important;
+  }
 
   .title-cell {
     padding: 1.5em 1em 1em !important;

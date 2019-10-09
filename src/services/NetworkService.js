@@ -69,7 +69,7 @@ export default {
   sendContact(context, data) {
     return context.$http
       .post(`${AUTH_ROOT}/contact/send`, data)
-      .then(this._successHandler, this._errorHandler)
+      .then(this._successHandler, this._errorHandler);
   },
   setProfile(context, data) {
     return context.$http
