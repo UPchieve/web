@@ -162,7 +162,7 @@ export default {
     } else {
       quizName = category.charAt(0).toUpperCase() + category.slice(1);
     }
- 
+
     return {
       category,
       questionText: "",

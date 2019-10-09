@@ -126,7 +126,7 @@ export default {
         return _.get(user, `certifications.${topic}.passed`, false);
       });
 
-    const numCertsObtained = certsObtained.length;
+      const numCertsObtained = certsObtained.length;
 
       // (3) Requests filled
       const numRequestsFilled = _.get(user, "numPastSessions", "--");

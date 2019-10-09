@@ -19,7 +19,10 @@ export default {
 
     const listPassed = [];
     for (var property in userData.certifications) {
-      if (userData.certifications[property] && userData.certifications[property].hasOwnProperty("passed")) {
+      if (
+        userData.certifications[property] &&
+        userData.certifications[property].hasOwnProperty("passed")
+      ) {
         if (userData.certifications[property].passed) {
           listPassed.push(property);
         }

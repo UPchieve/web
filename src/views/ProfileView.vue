@@ -185,8 +185,8 @@ export default {
     certifications() {
       const user = this.$store.state.user.user;
 
-      const certifications = Object.keys(user.certifications)
-        .reduce((displayObj, key) => {
+      const certifications = Object.keys(user.certifications).reduce(
+        (displayObj, key) => {
           const displayKeys = {
             algebra: "Algebra",
             geometry: "Geometry",
@@ -204,9 +204,11 @@ export default {
               displayObj[displayKeys[key]] = true;
             }
           }
-          
+
           return displayObj;
-        }, { });
+        },
+        {}
+      );
 
       return certifications;
     }
