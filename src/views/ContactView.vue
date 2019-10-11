@@ -20,7 +20,6 @@
       >
         <td class="question-cell">
           <div class="question-title">{{ question.title }}</div>
-          <!-- IF MUTLIPLE CHOICE -->
           <div v-if="question.qtype === 'multiple-checkbox'">
             <table class="checkbox-question-table">
               <tr class="checkbox-question-row">
@@ -72,7 +71,6 @@
               </tr>
             </table>
           </div>
-          <!-- IF TEXT-->
           <div v-else-if="question.qtype === 'textbox'">
             <div
               class="question-secondary-title"
@@ -85,7 +83,6 @@
               v-model="userResponse[question.alias]"
             />
           </div>
-          <!-- IF LINE-->
           <div v-else-if="question.qtype === 'textline'">
             <div
               class="question-secondary-title"
@@ -98,10 +95,6 @@
               type="email"
               v-model="userResponse[question.alias]"
             />
-          </div>
-          <!-- ELSE -->
-          <div v-else>
-            something else
           </div>
         </td>
       </tr>
