@@ -100,7 +100,7 @@
 <script>
 import UserService from "@/services/UserService";
 
-import { allSubtopics } from "@/utils/topics";
+import { allSubtopicNames } from "@/utils/topics";
 
 export default {
   data() {
@@ -116,7 +116,7 @@ export default {
       greaterThan: "",
       // dropdown menu options
       selected: "algebra", // default
-      topics: Object.keys(allSubtopics()),
+      topics: allSubtopicNames(),
       // availability objects
       availabilityTable: {}
     };
