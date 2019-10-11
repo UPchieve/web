@@ -54,7 +54,7 @@
 <script>
 import { mapState } from "vuex";
 
-import { topics } from "@/utils/topics";
+import { topics, allSubtopics } from "@/utils/topics";
 
 export default {
   data() {
@@ -80,7 +80,15 @@ export default {
 
     const supercategories = Object.entries(topics)
       .map(([, topicObj]) => topicObj.displayName);
-      
+   
+   
+    const categoryKeys = Object.entries(allSubtopics())
+      .map(([key, subtopicObj]) => [subtopicObj.displayName, key])
+      .reduce((result, [displayName, key]) => {
+        result[displayName] = key;
+        return result;
+      }, {});
+   
     const colors = {};
     colors.esl = "#1855D1";
     colors.math = "#F7AEF8";
@@ -112,11 +120,12 @@ export default {
       bools,
       supercategories,
       colors,
-      reviewMaterials
+      reviewMaterials,
+      categoryKeys
     };
   },
   computed: {
-    ...mapState({ user: state => state.user.user })
+    ...mapState({ user: state => state.user.user }),
   },
   methods: {
     flipBool(supercategory) {
@@ -124,22 +133,22 @@ export default {
       this.bools[supercategory] = !bool;
     },
     hasPassed(category) {
-      if (this.user.certifications[category]) {
-        return this.user.certifications[category].passed;
+      if (this.user.certifications[this.categoryKeys[category]]) {
+        return this.user.certifications[this.categoryKeys[category]].passed;
       }
 
       return false;
     },
     hasTries(category) {
-      if (this.user.certifications[category]) {
-        return this.user.certifications[category].tries < 3;
+      if (this.user.certifications[this.categoryKeys[category]]) {
+        return this.user.certifications[this.categoryKeys[category]].tries < 3;
       }
 
       return true;
     },
     getTries(category) {
-      if (this.user.certifications[category]) {
-        return this.user.certifications[category].tries;
+      if (this.user.certifications[this.categoryKeys[category]]) {
+        return this.user.certifications[this.categoryKeys[category]].tries;
       }
 
       return 0;
