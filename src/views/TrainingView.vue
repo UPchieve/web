@@ -30,7 +30,7 @@
             <div class="test">
               <router-link
                 v-if="!hasPassed(category) && hasTries(category)"
-                :to="'/training/' + category + '/quiz'"
+                :to="'/training/' + categoryKeys[category] + '/quiz'"
                 tag="div"
                 class="test-container"
               >
