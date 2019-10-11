@@ -8,7 +8,7 @@
           class="supercategory"
           @click="flipBool(supercategory)"
         >
-          {{ supercategory  }}
+          {{ supercategory }}
           <div v-if="bools[supercategory]" class="arrow up" />
           <div v-if="!bools[supercategory]" class="arrow down" />
         </div>
@@ -63,13 +63,14 @@ export default {
     const quizzes = Object.entries(topics)
       .map(([, topicObj]) => [
         topicObj.displayName,
-        Object.entries(topicObj.subtopics)
-          .map(([, subtopicObj]) => subtopicObj.displayName)
+        Object.entries(topicObj.subtopics).map(
+          ([, subtopicObj]) => subtopicObj.displayName
+        )
       ])
       .reduce((result, [key, value]) => {
         result[key] = value;
         return result;
-       }, {});
+      }, {});
 
     const bools = Object.entries(topics)
       .map(([, topicObj]) => topicObj.displayName)
@@ -78,24 +79,24 @@ export default {
         return result;
       }, {});
 
-    const supercategories = Object.entries(topics)
-      .map(([, topicObj]) => topicObj.displayName);
-   
-   
+    const supercategories = Object.entries(topics).map(
+      ([, topicObj]) => topicObj.displayName
+    );
+
     const categoryKeys = Object.entries(allSubtopics())
       .map(([key, subtopicObj]) => [subtopicObj.displayName, key])
       .reduce((result, [displayName, key]) => {
         result[displayName] = key;
         return result;
       }, {});
-   
+
     const colors = {};
     colors.esl = "#1855D1";
     colors.math = "#F7AEF8";
     colors["College Counseling"] = "#FED766";
     colors.science = "#9575CD";
     colors.default = "#36D2AA";
-    
+
     const reviewMaterials = {};
     reviewMaterials.algebra =
       "https://drive.google.com/open?id=105iP5lJdVti-r2reY8N3tKQOA0FtrjZW";
@@ -125,7 +126,7 @@ export default {
     };
   },
   computed: {
-    ...mapState({ user: state => state.user.user }),
+    ...mapState({ user: state => state.user.user })
   },
   methods: {
     flipBool(supercategory) {

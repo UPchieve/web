@@ -32,17 +32,16 @@ export default {
       math: MathSVG,
       college: CollegeSVG
     };
-  
-    const cards = Object.entries(topics)
-      .map(([key, topicObj]) => {
-        return {
-          title: topicObj.displayName,
-          svgUrl: svgUrls[key],
-          topic: key,
-          subtopics: Object.keys(topicObj.subtopics).sort()
-        };
-      });
-      
+
+    const cards = Object.entries(topics).map(([key, topicObj]) => {
+      return {
+        title: topicObj.displayName,
+        svgUrl: svgUrls[key],
+        topic: key,
+        subtopics: Object.keys(topicObj.subtopics).sort()
+      };
+    });
+
     cards.push({
       title: "Coming Soon",
       subtitle:

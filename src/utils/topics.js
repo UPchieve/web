@@ -24,16 +24,16 @@ export const topics = {
  */
 export function allSubtopics() {
   return Object.entries(topics)
-    .flatMap(([key, topicObj]) => Object.entries(topicObj.subtopics))
+    .flatMap(([, topicObj]) => Object.entries(topicObj.subtopics))
     .reduce((result, [key, subtopicObj]) => {
       result[key] = subtopicObj;
       return result;
-    }, { });
+    }, {});
 }
-  
+
 /**
  * Array of all subtopic names
  */
 export function allSubtopicNames() {
-   return Object.keys(allSubtopics());
+  return Object.keys(allSubtopics());
 }

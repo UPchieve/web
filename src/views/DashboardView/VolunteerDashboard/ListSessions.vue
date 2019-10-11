@@ -76,8 +76,9 @@ export default {
           const { subTopic } = currentSession;
 
           if (
-            Object.keys(allSubtopics())
-              .some(s => s === subTopic && this.user.certifications[s].passed)
+            Object.keys(allSubtopics()).some(
+              s => s === subTopic && this.user.certifications[s].passed
+            )
           ) {
             results.push(currentSession);
           }

@@ -174,11 +174,10 @@ export default {
     certKey() {
       return Object.entries(topics)
         .flatMap(([key, topicObj]) => {
-          return Object.entries(topicObj.subtopics)
-            .map(([subtopicKey, subtopicObj]) => [
-              subtopicObj.displayName,
-              key.toUpperCase()
-            ]);
+          return Object.entries(topicObj.subtopics).map(([, subtopicObj]) => [
+            subtopicObj.displayName,
+            key.toUpperCase()
+          ]);
         })
         .reduce((result, [displayName, key]) => {
           result[displayName] = key;
