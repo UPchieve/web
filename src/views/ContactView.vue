@@ -16,25 +16,28 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
   name: "ContactView",
   created() {
-    if (!this.user._id && !this.user.verified) {
+    if (!this.isAuthenticated) {
       this.$store.dispatch("app/hideNavigation");
     }
   },
-  data() {
-    return {
-      auth: null,
-      user: null
-    };
-  },
   computed: {
-    ...mapState({
-      user: state => state.user.user
+    ...mapGetters({
+      isAuthenticated: "user/isAuthenticated"
     })
+  },
+  watch: {
+    isAuthenticated(isAuthed) {
+      if (isAuthed) {
+        this.$store.dispatch("app/showNavigation");
+      } else {
+        this.$store.dispatch("app/hideNavigation");
+      }
+    }
   }
 };
 </script>

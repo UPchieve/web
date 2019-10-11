@@ -623,7 +623,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex";
+import { mapGetters } from "vuex";
 
 import FullTextTemplate from "@/components/FullTextTemplate";
 import Accordion from "@/components/Accordion";
@@ -637,17 +637,23 @@ export default {
     AccordionItem
   },
   created() {
-    if (!this.auth && !this.user.verified) {
+    if (!this.isAuthenticated) {
       this.$store.dispatch("app/hideNavigation");
     }
   },
   computed: {
-    ...mapState({
-      user: state => state.user.user
-    }),
     ...mapGetters({
-      auth: "user/isAuthenticated"
+      isAuthenticated: "user/isAuthenticated"
     })
+  },
+  watch: {
+    isAuthenticated(isAuthed) {
+      if (isAuthed) {
+        this.$store.dispatch("app/showNavigation");
+      } else {
+        this.$store.dispatch("app/hideNavigation");
+      }
+    }
   }
 };
 </script>
