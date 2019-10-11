@@ -54,13 +54,17 @@
 <script>
 import { mapState } from "vuex";
 
+import { topics } from "@/utils/topics";
+
 export default {
   data() {
+    // array destructuring syntax [, value] ignores the first entry, in this
+    // case the key
     const quizzes = Object.entries(topics)
-      .map(([key, topicObj]) => [
+      .map(([, topicObj]) => [
         topicObj.displayName,
         Object.entries(topicObj.subtopics)
-          .map(([subtopicKey, subtopicObj]) => subtopicObj.displayName)
+          .map(([, subtopicObj]) => subtopicObj.displayName)
       ])
       .reduce((result, [key, value]) => {
         result[key] = value;
@@ -68,14 +72,14 @@ export default {
        }, {});
 
     const bools = Object.entries(topics)
-      .map(([key, topicObj]) => topicObj.displayName)
-      .reduce(result, key => {
+      .map(([, topicObj]) => topicObj.displayName)
+      .reduce((result, key) => {
         result[key] = false;
         return result;
       }, {});
 
     const supercategories = Object.entries(topics)
-      .map(([key, topicObj]) => topicObj.displayName);
+      .map(([, topicObj]) => topicObj.displayName);
       
     const colors = {};
     colors.esl = "#1855D1";
@@ -141,7 +145,7 @@ export default {
       return 0;
     },
     colorFor(supercategory) {
-      return colors[supercategory] || colors.default;
+      return this.colors[supercategory] || this.colors.default;
     }
   }
 };
