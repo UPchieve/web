@@ -1,6 +1,7 @@
 const AUTH_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/auth`;
 const API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/api`;
 const SCHOOL_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/school`;
+const CONTACT_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/contact`;
 
 export default {
   _successHandler(res) {
@@ -68,7 +69,7 @@ export default {
   },
   sendContact(context, data) {
     return context.$http
-      .post(`${AUTH_ROOT}/contact/send`, data)
+      .post(`${CONTACT_API_ROOT}/send`, data)
       .then(this._successHandler, this._errorHandler);
   },
   setProfile(context, data) {
