@@ -29,6 +29,7 @@
 
 <script>
 import { mapState } from "vuex";
+import { allSubtopics } from "@/utils/topics";
 
 export default {
   data() {
@@ -75,14 +76,8 @@ export default {
           const { subTopic } = currentSession;
 
           if (
-            [
-              "algebra",
-              "geometry",
-              "trigonometry",
-              "esl",
-              "precalculus",
-              "calculus"
-            ].some(s => s === subTopic && this.user.certifications[s].passed)
+            Object.keys(allSubtopics())
+              .some(s => s === subTopic && this.user.certifications[s].passed)
           ) {
             results.push(currentSession);
           }

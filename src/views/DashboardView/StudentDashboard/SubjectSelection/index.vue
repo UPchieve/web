@@ -22,38 +22,35 @@ import MathSVG from "@/assets/subject_icons/math.svg";
 import CollegeSVG from "@/assets/subject_icons/college-counseling.svg";
 import ScienceSVG from "@/assets/subject_icons/science.svg";
 
+import { topics } from "@/utils/topics";
+
 export default {
   name: "subject-selection",
   components: { SubjectCard },
   data() {
-    const cards = [
-      {
-        title: "Math Tutoring",
-        svgUrl: MathSVG,
-        topic: "math",
-        subtopics: [
-          "Algebra",
-          "Calculus",
-          "Geometry",
-          "Precalculus",
-          "Trigonometry"
-        ].sort()
-      },
-      {
-        title: "College Counseling",
-        svgUrl: CollegeSVG,
-        topic: "college",
-        subtopics: ["Planning", "Applications", "Essays"].sort()
-      },
-      {
-        title: "Coming Soon",
-        subtitle:
-          "Check back soon for new help topics like SAT, ESL, and Science!",
-        svgUrl: ScienceSVG,
-        buttonText: "Suggest a help topic",
-        routeTo: "/contact"
-      }
-    ];
+    const svgUrls = {
+      math: MathSVG,
+      college: CollegeSVG
+    };
+  
+    const cards = Object.entries(topics)
+      .map(([key, topicObj]) => {
+        return {
+          title: topicObj.displayName,
+          svgUrl: svgUrls[key],
+          topic: key,
+          subtopics: Object.keys(topicObj.subtopics).sort()
+        };
+      });
+      
+    cards.push({
+      title: "Coming Soon",
+      subtitle:
+        "Check back soon for new help topics like SAT, ESL, and Science!",
+      svgUrl: ScienceSVG,
+      buttonText: "Suggest a help topic",
+      routeTo: "/contact"
+    });
 
     return { cards };
   },

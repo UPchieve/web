@@ -139,6 +139,8 @@ import phoneValidation from "@/utils/phone-validation";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
 import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 
+import { topics, allSubtopics } from "@/utils/topics";
+
 export default {
   data() {
     return {
@@ -170,38 +172,29 @@ export default {
       };
     },
     certKey() {
-      const certKey = {};
-      certKey.Algebra = "MATH";
-      certKey.Geometry = "MATH";
-      certKey.Trigonometry = "MATH";
-      certKey.Precalculus = "MATH";
-      certKey.Calculus = "MATH";
-      certKey.ESL = "ESL";
-      certKey.Planning = "COLLEGE";
-      certKey.Essays = "COLLEGE";
-      certKey.Applications = "COLLEGE";
-      return certKey;
+      return Object.entries(topics)
+        .flatMap(([key, topicObj]) => {
+          return Object.entries(topicObj.subtopics)
+            .map(([subtopicKey, subtopicObj]) => [
+              subtopicObj.displayName,
+              key.toUpperCase()
+            ]);
+        })
+        .reduce((result, [displayName, key]) => {
+          result[displayName] = key;
+          return result;
+        }, {});
     },
     certifications() {
       const user = this.$store.state.user.user;
 
       const certifications = Object.keys(user.certifications).reduce(
         (displayObj, key) => {
-          const displayKeys = {
-            algebra: "Algebra",
-            geometry: "Geometry",
-            trigonometry: "Trigonometry",
-            precalculus: "Precalculus",
-            calculus: "Calculus",
-            esl: "ESL",
-            planning: "Planning",
-            essays: "Essays",
-            applications: "Applications"
-          };
+          const subtopics = allSubtopics();
 
-          if (displayKeys[key]) {
+          if (subtopics[key]) {
             if (user.certifications[key].passed) {
-              displayObj[displayKeys[key]] = true;
+              displayObj[subtopics[key].displayName || subtopics[key]] = true;
             }
           }
 

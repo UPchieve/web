@@ -47,24 +47,14 @@ import { mapState, mapGetters } from "vuex";
 import ListSessions from "./ListSessions";
 import DashboardBanner from "../DashboardBanner";
 
+import { allSubtopicNames } from "@/utils/topics";
+
 const headerData = {
   component: "RejoinSessionHeader",
   data: { important: true }
 };
 
-const upchieveTopics = [
-  "algebra",
-  "applications",
-  "biology",
-  "calculus",
-  "chemistry",
-  "esl",
-  "essays",
-  "geometry",
-  "planning",
-  "precalculus",
-  "trigonometry"
-];
+const upchieveTopics = allSubtopicNames();
 
 export default {
   name: "volunteer-dashboard",

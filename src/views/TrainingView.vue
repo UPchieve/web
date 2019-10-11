@@ -4,30 +4,18 @@
       <h1 class="body-header">Volunteer Training</h1>
       <div v-for="supercategory in supercategories" :key="supercategory">
         <div
-          v-if="supercategory !== 'esl'"
-          :style="{ backgroundColor: colors[supercategory] }"
+          :style="{ backgroundColor: colorFor(supercategory) }"
           class="supercategory"
           @click="flipBool(supercategory)"
         >
-          {{ supercategory | capitalize }}
-          <div v-if="bools[supercategory]" class="arrow up" />
-          <div v-if="!bools[supercategory]" class="arrow down" />
-        </div>
-        <div
-          v-if="supercategory === 'esl'"
-          :style="{ backgroundColor: colors[supercategory] }"
-          class="supercategory"
-          @click="flipBool(supercategory)"
-        >
-          {{ supercategory | uppercase }}
+          {{ supercategory  }}
           <div v-if="bools[supercategory]" class="arrow up" />
           <div v-if="!bools[supercategory]" class="arrow down" />
         </div>
         <div v-for="category in quizzes[supercategory]" :key="category">
           <div v-show="bools[supercategory]" class="category">
             <div>
-              <span v-if="category !== 'esl'">{{ category | capitalize }}</span>
-              <span v-if="category === 'esl'">{{ category | uppercase }}</span>
+              {{ category }}
               <div class="review">
                 <div class="review-container">
                   <div class="review-label">
@@ -66,47 +54,36 @@
 <script>
 import { mapState } from "vuex";
 
-/**
- * @todo {1} Refactor into global filters (https://vuejs.org/v2/guide/filters.html)
- */
 export default {
-  filters: {
-    // {1}
-    capitalize(value) {
-      if (!value) return "";
-      const valueStr = value.toString();
-      return valueStr.charAt(0).toUpperCase() + valueStr.slice(1);
-    },
-    uppercase(value) {
-      if (!value) return "";
-      return value.toString().toUpperCase();
-    }
-  },
   data() {
-    const quizzes = {};
-    quizzes.math = [
-      "algebra",
-      "geometry",
-      "trigonometry",
-      "precalculus",
-      "calculus"
-    ];
-    quizzes.esl = ["esl"];
-    quizzes["college Counseling"] = ["planning", "essays", "applications"];
-    // quizzes['science'] = ['biology', 'chemistry'];
-    const bools = {};
-    bools.math = false;
-    bools.esl = false;
-    bools["college Counseling"] = false;
-    bools.science = false;
-    // Science Currently Removed due to quiz issues -Will
-    // var supercategories = ['esl', 'math', 'college Counseling', 'science'];
-    const supercategories = ["esl", "math", "college Counseling"];
+    const quizzes = Object.entries(topics)
+      .map(([key, topicObj]) => [
+        topicObj.displayName,
+        Object.entries(topicObj.subtopics)
+          .map(([subtopicKey, subtopicObj]) => subtopicObj.displayName)
+      ])
+      .reduce((result, [key, value]) => {
+        result[key] = value;
+        return result;
+       }, {});
+
+    const bools = Object.entries(topics)
+      .map(([key, topicObj]) => topicObj.displayName)
+      .reduce(result, key => {
+        result[key] = false;
+        return result;
+      }, {});
+
+    const supercategories = Object.entries(topics)
+      .map(([key, topicObj]) => topicObj.displayName);
+      
     const colors = {};
     colors.esl = "#1855D1";
     colors.math = "#F7AEF8";
-    colors["college Counseling"] = "#FED766";
+    colors["College Counseling"] = "#FED766";
     colors.science = "#9575CD";
+    colors.default = "#36D2AA";
+    
     const reviewMaterials = {};
     reviewMaterials.algebra =
       "https://drive.google.com/open?id=105iP5lJdVti-r2reY8N3tKQOA0FtrjZW";
@@ -162,6 +139,9 @@ export default {
       }
 
       return 0;
+    },
+    colorFor(supercategory) {
+      return colors[supercategory] || colors.default;
     }
   }
 };
