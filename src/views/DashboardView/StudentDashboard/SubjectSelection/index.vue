@@ -41,7 +41,10 @@ export default {
         topic: key,
         subtopics: Object.keys(topicObj.subtopics).sort(),
         subtopicDisplayNames: Object.entries(topicObj.subtopics)
-          .map(([subtopicKey, subtopicObj]) => [subtopicKey, subtopicObj.displayName])
+          .map(([subtopicKey, subtopicObj]) => [
+            subtopicKey,
+            subtopicObj.displayName
+          ])
           .reduce((result, [subtopicKey, displayName]) => {
             result[subtopicKey] = displayName;
             return result;

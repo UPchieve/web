@@ -17,7 +17,9 @@
         }"
         @click="setSelectedSubtopic(subtopic)"
       >
-        <p class="SubjectSelectionModal-subtopic-title">{{ modalData.subtopicDisplayNames[subtopic] || subtopic }}</p>
+        <p class="SubjectSelectionModal-subtopic-title">
+          {{ modalData.subtopicDisplayNames[subtopic] || subtopic }}
+        </p>
         <large-button
           v-if="mobileMode"
           primary
@@ -37,7 +39,7 @@ import LargeButton from "@/components/LargeButton";
 export default {
   components: { LargeButton },
   props: {
-    modalData: { type: Object, required: true },
+    modalData: { type: Object, required: true }
   },
   data() {
     return {
