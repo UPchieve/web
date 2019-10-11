@@ -361,6 +361,7 @@ export default {
   -moz-border-radius: 3px;
   border-radius: 3px;
   border-color: #16d2aa;
+  padding: 10px;
 }
 .other-input {
   display: inline-block;
