@@ -7,9 +7,10 @@
       <tr class="title-row">
         <td class="title-cell">
           <p>
-            Fill out this form, and we will get back to you as soon as possible!
-            We will respond to you via email using the email address you put
-            below.
+            Let us know how we can help you by filling out this form! We will
+            get back to you as soon as possible. Alternatively, you can always
+            email us directly at
+            <a href="mailto:support@upchieve.org">support@upchieve.org</a>.
           </p>
         </td>
       </tr>
