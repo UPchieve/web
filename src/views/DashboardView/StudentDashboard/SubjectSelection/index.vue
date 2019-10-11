@@ -9,6 +9,7 @@
       :svg-url="card.svgUrl"
       :topic="card.topic"
       :subtopics="card.subtopics"
+      :subtopicDisplayNames="card.subtopicDisplayNames"
       :button-text="card.buttonText"
       :routeTo="card.routeTo"
     />
@@ -38,7 +39,13 @@ export default {
         title: topicObj.displayName,
         svgUrl: svgUrls[key],
         topic: key,
-        subtopics: Object.keys(topicObj.subtopics).sort()
+        subtopics: Object.keys(topicObj.subtopics).sort(),
+        subtopicDisplayNames: Object.entries(topicObj.subtopics)
+          .map(([subtopicKey, subtopicObj]) => [subtopicKey, subtopicObj.displayName])
+          .reduce((result, [subtopicKey, displayName]) => {
+            result[subtopicKey] = displayName;
+            return result;
+          }, {})
       };
     });
 

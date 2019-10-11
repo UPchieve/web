@@ -83,6 +83,8 @@ export default {
       ([, topicObj]) => topicObj.displayName
     );
 
+    // todo consider refactoring so that we identify categories by the
+    // key rather than by the display name
     const categoryKeys = Object.entries(allSubtopics())
       .map(([key, subtopicObj]) => [subtopicObj.displayName, key])
       .reduce((result, [displayName, key]) => {
