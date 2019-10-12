@@ -113,12 +113,7 @@ export default {
     let promise;
 
     if (!id) {
-      let type;
-      if (this.$route.path.indexOf("session/college") !== -1) {
-        type = "college";
-      } else {
-        type = "math";
-      }
+      let type = this.$route.params.topic;
       promise = SessionService.newSession(
         this,
         type,

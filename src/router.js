@@ -29,6 +29,8 @@ import VolunteerCoverage from "./views/Admin/VolunteerCoverage";
 
 import store from "./store";
 
+import { topics } from "./utils/topics";
+
 Vue.use(VueResource);
 Vue.http.options.credentials = true;
 
@@ -103,16 +105,17 @@ const routes = [
     meta: { protected: true }
   },
   {
-    path: "/session/math/:subTopic/:sessionId?",
-    name: "SessionView-math",
+    path: "/session/:topic/:subTopic/:sessionId?",
+    name: "SessionView",
     component: SessionView,
-    meta: { protected: true }
-  },
-  {
-    path: "/session/college/:subTopic/:sessionId?",
-    name: "SessionView-college",
-    component: SessionView,
-    meta: { protected: true }
+    meta: { protected: true },
+    beforeEnter: (to, from, next) => {
+      if (to.params.topic in topics) {
+        next();
+      } else {
+        next("/dashboard");
+      }
+    }
   },
   {
     path: "/schedule",

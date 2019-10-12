@@ -5,6 +5,8 @@
 </template>
 
 <script>
+import { topics } from "@/utils/topics";
+
 export default {
   props: {
     label: {
@@ -13,12 +15,15 @@ export default {
     }
   },
   data() {
+    const classes = Object.entries(topics)
+      .map(([key, topicObj]) => ["topic-label--" + key, this.label === topicObj.displayName])
+      .reduce((result, [key, value]) => {
+        result[key] = value;
+        return result;
+      }, { "topic-label" : true });
+  
     return {
-      classes: {
-        "topic-label": true,
-        "topic-label--math": this.label.toLowerCase() === "math",
-        "topic-label--college": this.label.toLowerCase() === "college"
-      }
+      classes: classes
     };
   }
 };

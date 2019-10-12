@@ -4,8 +4,8 @@
       <h1 class="body-header">Volunteer Training</h1>
       <div v-for="supercategory in supercategories" :key="supercategory">
         <div
-          :style="{ backgroundColor: colorFor(supercategory) }"
           class="supercategory"
+          :style="{ backgroundColor: colorFor(supercategory) }"
           @click="flipBool(supercategory)"
         >
           {{ supercategory }}
