@@ -44,8 +44,8 @@
         </div>
         <div v-else class="startBody">
           <div v-if="showNoQuiz" class="instructions">
-            A {{ quizName }} quiz has not yet been created. If you would like
-            to begin tutoring students on this topic, please contact UPchieve.
+            A {{ quizName }} quiz has not yet been created. If you would like to
+            begin tutoring students on this topic, please contact UPchieve.
           </div>
           <router-link
             v-if="showNoQuiz"
