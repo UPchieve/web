@@ -1,5 +1,8 @@
 <template>
-  <div class="contact-wrapper" :class="{ 'contact-wrapper--noAuth': !isAuthenticated }">
+  <div
+    class="contact-wrapper"
+    :class="{ 'contact-wrapper--noAuth': !isAuthenticated }"
+  >
     <div class="contact" :class="{ 'contact--noAuth': !isAuthenticated }">
       <div class="contact__header">
         Contact Us
@@ -122,7 +125,8 @@ export default {
 
   &--noAuth {
     @include flex-container(row, center, center);
-    background: url("~@/assets/onboarding_background.png") no-repeat center fixed;
+    background: url("~@/assets/onboarding_background.png") no-repeat center
+      fixed;
     background-size: cover;
     min-height: 100vh;
   }
