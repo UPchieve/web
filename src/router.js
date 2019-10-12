@@ -13,7 +13,6 @@ import OnboardingView from "./views/OnboardingView";
 import DashboardView from "./views/DashboardView";
 import SessionView from "./views/SessionView";
 import ActionView from "./views/ActionView";
-import ScheduleView from "./views/ScheduleView";
 import ResourcesView from "./views/ResourcesView";
 import FeedbackView from "./views/FeedbackView";
 import TrainingView from "./views/TrainingView";
@@ -21,9 +20,6 @@ import QuizView from "./views/QuizView";
 import ReviewView from "./views/ReviewView";
 import ProfileView from "./views/ProfileView";
 import CalendarView from "./views/CalendarView";
-import SubmitQuestionView from "./views/SubmitQuestionView";
-import InboxView from "./views/InboxView";
-import SendAnswerView from "./views/SendAnswerView";
 import AdminView from "./views/Admin";
 import VolunteerCoverage from "./views/Admin/VolunteerCoverage";
 
@@ -115,12 +111,6 @@ const routes = [
     meta: { protected: true }
   },
   {
-    path: "/schedule",
-    name: "ScheduleView",
-    component: ScheduleView,
-    meta: { protected: true }
-  },
-  {
     path: "/resources",
     name: "ResourcesView",
     component: ResourcesView,
@@ -182,24 +172,6 @@ const routes = [
     path: "/calendar",
     name: "CalendarView",
     component: CalendarView,
-    meta: { protected: true }
-  },
-  {
-    path: "/submit-question",
-    name: "SubmitQuestionView",
-    component: SubmitQuestionView,
-    meta: { protected: true }
-  },
-  {
-    path: "/inbox",
-    name: "InboxView",
-    component: InboxView,
-    meta: { protected: true }
-  },
-  {
-    path: "/send-answer",
-    name: "SendAnswerView",
-    component: SendAnswerView,
     meta: { protected: true }
   },
   {
@@ -293,8 +265,9 @@ router.beforeEach((to, from, next) => {
       }
     });
   } else if (to.matched.some(route => route.meta.authOptional)) {
-    getUser();
-    next();
+    getUser().then(() => {
+      next();
+    });
   } else {
     next();
   }
