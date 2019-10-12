@@ -286,8 +286,9 @@ router.beforeEach((to, from, next) => {
       }
     });
   } else if (to.matched.some(route => route.meta.authOptional)) {
-    getUser();
-    next();
+    getUser().then(() => {
+      next();
+    });
   } else {
     next();
   }
