@@ -9,7 +9,7 @@
       </div>
 
       <div class="contact-form contact__form">
-        <div class="contact-form__section">
+        <div v-if="!hasValidEmail" class="contact-form__section">
           <div class="contact-form__label">Your email</div>
           <input
             class="contact-form__text"
@@ -85,7 +85,13 @@ export default {
   computed: {
     ...mapGetters({
       isAuthenticated: "user/isAuthenticated"
-    })
+    }),
+
+    hasValidEmail() {
+      if (!this.isAuthenticated) return false;
+
+      return this.isValidEmail(this.$store.state.user.user.email);
+    }
   },
   watch: {
     isAuthenticated(isAuthed) {
@@ -98,9 +104,13 @@ export default {
   },
   methods: {
     submitContactUs() {
-      if (!this.isValidEmail(this.contactFormData.email)) {
+      if (!this.isAuthenticated && !this.isValidEmail(this.contactFormData.email)) {
         alert("A valid email is required.");
       } else {
+        if (this.hasValidEmail) {
+          this.contactFormData.email = this.$store.state.user.user.email
+        }
+
         NetworkService.sendContact(this, {
           responseData: this.contactFormData
         });
