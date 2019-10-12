@@ -1,7 +1,7 @@
 <template>
   <div v-if="user.isVolunteer" class="training">
     <div class="body-container">
-      <h1 class="body-header">Volunteer Training</h1>
+      <div class="body-header">Volunteer Training</div>
       <div v-for="supercategory in supercategories" :key="supercategory">
         <div
           class="supercategory"
