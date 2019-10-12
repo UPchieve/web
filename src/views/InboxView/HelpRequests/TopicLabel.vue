@@ -16,12 +16,18 @@ export default {
   },
   data() {
     const classes = Object.entries(topics)
-      .map(([key, topicObj]) => ["topic-label--" + key, this.label === topicObj.displayName])
-      .reduce((result, [key, value]) => {
-        result[key] = value;
-        return result;
-      }, { "topic-label" : true });
-  
+      .map(([key, topicObj]) => [
+        "topic-label--" + key,
+        this.label === topicObj.displayName
+      ])
+      .reduce(
+        (result, [key, value]) => {
+          result[key] = value;
+          return result;
+        },
+        { "topic-label": true }
+      );
+
     return {
       classes: classes
     };
