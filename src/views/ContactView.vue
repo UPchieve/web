@@ -1,176 +1,82 @@
 <template>
-  <div class="contactus-form">
-    <h1 class="header">
-      Contact Us
-    </h1>
-    <table class="questions-table">
-      <tr class="title-row">
-        <td class="title-cell">
-          <p>
-            Let us know how we can help you by filling out this form! We will
-            get back to you as soon as possible. Alternatively, you can always
-            email us directly at
-            <a href="mailto:support@upchieve.org">support@upchieve.org</a>.
-          </p>
-        </td>
-      </tr>
-      <tr
-        class="question-row"
-        v-for="(question, index) in questions"
-        :key="index"
-      >
-        <td class="question-cell">
-          <div class="question-title">{{ question.title }}</div>
-          <div v-if="question.qtype === 'multiple-checkbox'">
-            <table class="checkbox-question-table">
-              <tr class="checkbox-question-row">
-                <td class="mobileRemove"></td>
-                <td
-                  class="checkbox-question-selection-title"
-                  v-for="(label, index) in question.table_title"
-                  :key="index"
-                >
-                  {{ label }}
-                </td>
-              </tr>
-              <tr
-                class="checkbox-question-row forMobileView"
-                v-for="(subquestion, subquestion_index) in question.options"
-                :key="subquestion_index"
-              >
-                <td
-                  class="checkbox-question-selection-cell container"
-                  v-for="index in question.table_title.length"
-                  :key="index"
-                >
-                  <input
-                    v-model="
-                      userResponse[question.alias][
-                        question.options_alias[subquestion_index]
-                      ]
-                    "
-                    type="checkbox"
-                    :name="question.qid + '_' + subquestion_index.toString()"
-                    :value="index"
-                  />
-                  <span class="checkmark"></span>
-                </td>
-                <td class="checkbox-question-cell">
-                  {{ subquestion }}
-                  <div v-if="subquestion === 'Other'" class="other-input">
-                    <input
-                      v-model="
-                        userResponse[question.alias][
-                          question.options_alias[subquestion_index]
-                        ]
-                      "
-                      type="text"
-                      class="text-line"
-                    />
-                  </div>
-                </td>
-              </tr>
-            </table>
-          </div>
-          <div v-else-if="question.qtype === 'textbox'">
-            <div
-              class="question-secondary-title"
-              v-if="question.secondary_title.length != 0"
-            >
-              {{ question.secondary_title }}
-            </div>
-            <textarea
-              class="text-question-textarea"
-              v-model="userResponse[question.alias]"
-            />
-          </div>
-          <div v-else-if="question.qtype === 'textline'">
-            <div
-              class="question-secondary-title"
-              v-if="question.secondary_title.length != 0"
-            >
-              {{ question.secondary_title }}
-            </div>
-            <input
-              class="text-line"
-              type="email"
-              v-model="userResponse[question.alias]"
-            />
-          </div>
-        </td>
-      </tr>
-      <tr class="submit-button-row">
-        <td class="submit-button-cell">
-          <button class="submit-button" v-on:click="submitContactUs">
-            SUBMIT
-          </button>
-        </td>
-      </tr>
-    </table>
+  <div class="contact-wrapper" :class="{ 'contact-wrapper--noAuth': !isAuthenticated }">
+    <div class="contact" :class="{ 'contact--noAuth': !isAuthenticated }">
+      <div class="contact__header">
+        Contact Us
+      </div>
+
+      <div class="contact-form contact__form">
+        <div class="contact-form__section">
+          <div class="contact-form__label">Your email</div>
+          <input
+            class="contact-form__text"
+            type="text"
+            v-model="contactFormData.email"
+          />
+        </div>
+
+        <div class="contact-form__section">
+          <div class="contact-form__label">Select reason</div>
+          <v-select
+            class="contact-form__select"
+            v-model="contactFormData.topic"
+            :options="contactTopics"
+            :searchable="false"
+          ></v-select>
+        </div>
+
+        <div class="contact-form__section">
+          <div class="contact-form__label">Message</div>
+          <textarea
+            class="contact-form__textarea"
+            v-model="contactFormData.message"
+            rows="5"
+          />
+        </div>
+
+        <div class="contact-form__section">
+          <large-button
+            class="contact-form__submit"
+            primary
+            @click.native="submitContactUs"
+            >Send</large-button
+          >
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import NetworkService from "../services/NetworkService";
 import { mapGetters } from "vuex";
-
-const contactQuestions = [
-  {
-    qid: "1",
-    qtype: "textline",
-    alias: "email",
-    title: "Email address *",
-    secondary_title: "",
-    table_title: [],
-    options: []
-  },
-  {
-    qid: "2",
-    qtype: "multiple-checkbox",
-    alias: "subject",
-    title:
-      "Pick the topic that best matches what you are contacting \
-      us about.",
-    secondary_title: "",
-    table_title: [""],
-    options: [
-      "Technical issues while using the web app",
-      "Math question",
-      "College application question",
-      "Feedback",
-      "Other"
-    ],
-    options_alias: [
-      " Technical Issues",
-      " Math",
-      " College",
-      " Feedback",
-      " Other"
-    ]
-  },
-  {
-    qid: "3",
-    qtype: "textbox",
-    alias: "more",
-    title: "Tell us more!",
-    secondary_title: "",
-    table_title: [],
-    options: []
-  }
-];
+import NetworkService from "../services/NetworkService";
+import LargeButton from "@/components/LargeButton";
 
 export default {
   name: "contact-view",
+  components: { LargeButton },
   created() {
     if (!this.isAuthenticated) {
       this.$store.dispatch("app/hideNavigation");
     }
   },
   data() {
+    const contactTopics = [
+      "Feedback",
+      "Technical issue",
+      "Incident report",
+      "Feature request",
+      "Subject suggestion",
+      "Other"
+    ];
+
     return {
-      contactQuestions,
-      questions: [],
-      userResponse: {}
+      contactTopics,
+      contactFormData: {
+        email: "",
+        topic: contactTopics[0],
+        message: ""
+      }
     };
   },
   computed: {
@@ -187,21 +93,13 @@ export default {
       }
     }
   },
-  beforeMount() {
-    var _self = this;
-    this.questions = this.contactQuestions;
-    this.questions.map(function(question) {
-      if (question.qtype == "multiple-checkbox")
-        _self.userResponse[question.alias] = {};
-    });
-  },
   methods: {
     submitContactUs() {
-      if (!this.isValidEmail(this.userResponse["email"])) {
-        alert("A valid email required.");
+      if (!this.isValidEmail(this.contactFormData.email)) {
+        alert("A valid email is required.");
       } else {
         NetworkService.sendContact(this, {
-          responseData: this.userResponse
+          responseData: this.contactFormData
         });
         this.$router.push("/");
       }
@@ -215,228 +113,84 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.header {
-  margin: 0px;
-  display: flex;
-  padding: 30px;
-  font-size: 24px;
-  border-bottom: 0.5px solid #cccccf;
-  align-items: center;
-  justify-content: space-between;
-  font-weight: 600;
-  background-color: white;
-  color: #343440;
-  margin-bottom: 40px;
-}
+.contact-wrapper {
+  padding: 40px 20px;
 
-.contactus-form {
-  background-color: #e5f2fc;
-  min-height: 100%;
-  width: 100%;
-  position: relative;
-  vertical-align: middle;
-  text-align: center;
-  padding-bottom: 20px;
-}
-
-.questions-table {
-  width: 75%;
-  max-width: 750px;
-  margin: auto;
-  background-color: white;
-  vertical-align: middle;
-  display: table;
-  border-radius: 5px;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  box-shadow: -9px 9px #2757ca;
-  margin-bottom: 20px;
-}
-
-.title-row {
-  display: table-row;
-}
-
-.title-cell {
-  display: table-cell;
-  height: 150px;
-  vertical-align: middle;
-  font-size: 19px;
-  text-align: left;
-  padding-left: 60px;
-  padding-right: 60px;
-  padding-bottom: 30px;
-  padding-top: 30px;
-}
-
-.question-row {
-  display: table-row;
-}
-
-.question-cell {
-  display: table-cell;
-  vertical-align: middle;
-  font-size: 19px;
-  text-align: left;
-  padding-left: 60px;
-  padding-right: 60px;
-  padding-bottom: 40px;
-}
-
-.question-title {
-  padding-bottom: 10px;
-}
-
-.question-secondary-title {
-  font-size: 15px;
-  padding-bottom: 10px;
-}
-
-.checkbox-question-table {
-  font-size: 15px;
-  width: 100%;
-  margin: auto;
-}
-
-.checkbox-question-table tr:nth-child(even) {
-  background: #f1f8fc;
-}
-
-.checkbox-question-table tr:nth-child(odd) {
-  background: #e5f2fc;
-}
-
-.checkbox-question-table tr:nth-child(1) {
-  background: white;
-}
-
-.checkbox-question-row {
-  display: table-row;
-}
-
-.checkbox-question-cell {
-  display: table-cell;
-  vertical-align: middle;
-  width: 100%;
-  padding-top: 20px;
-  padding-bottom: 25px;
-}
-
-.checkbox-question-selection-title {
-  display: table-cell;
-  padding-left: 2px;
-  padding-right: 2px;
-  text-align: center;
-  vertical-align: middle;
-  padding-top: 8px;
-  padding-bottom: 15px;
-}
-
-.checkbox-question-selection-cell {
-  display: table-cell;
-  padding-left: 20px;
-  padding-right: 20px;
-  text-align: left;
-  vertical-align: middle;
-}
-
-.checkbox-question-selection-cell input {
-  height: 15px;
-  width: 15px;
-}
-
-.text-question-textarea {
-  width: 100%;
-  resize: none;
-  font-size: 15px;
-  height: 200px;
-  border-width: 3px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
-  border-color: #16d2aa;
-  padding: 10px;
-}
-.other-input {
-  display: inline-block;
-  padding-left: 10px;
-}
-
-.text-line {
-  background-color: transparent;
-  color: #2c3e50;
-  outline: none;
-  outline-style: none;
-  border-top: none;
-  border-left: none;
-  border-right: none;
-  border-bottom: solid #16d2aa 1px;
-  display: inline-block;
-  width: 90%;
-}
-
-.submit-button-row {
-  display: table-row;
-}
-
-.submit-button-cell {
-  display: table-cell;
-  text-align: right;
-  padding-right: 60px;
-  padding-bottom: 80px;
-}
-
-.submit-button {
-  width: 180px;
-  height: 50px;
-  background-color: #f6f6f6;
-  color: #16d2aa;
-  border: none;
-  font-weight: 600;
-  border-radius: 50px;
-  -webkit-border-radius: 50px;
-  -moz-border-radius: 50px;
-  font-size: 15px;
-  float: right;
-}
-
-.submit-button:hover,
-.submit-button:active {
-  background-color: #16d2aa;
-  color: #fff;
-}
-
-@media screen and (max-width: 488px) {
-  .mobileRemove {
-    display: none !important;
+  @include breakpoint-above("large") {
+    padding: 40px;
   }
 
-  .header {
-    padding: 1em 1em 1em 3em !important;
+  &--noAuth {
+    @include flex-container(row, center, center);
+    background: url("~@/assets/onboarding_background.png") no-repeat center fixed;
+    background-size: cover;
+    min-height: 100vh;
+  }
+}
+
+.contact {
+  @include flex-container(column, space-between, flex-start);
+  max-width: 800px;
+  padding: 40px 20px;
+  border-radius: 8px;
+  background: #fff;
+
+  @include breakpoint-above("large") {
+    padding: 40px 40px 60px;
   }
 
-  table,
-  thead,
-  tbody,
-  th,
-  tr {
-    display: block !important;
+  &__header {
+    color: $c-soft-black;
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 30px;
   }
 
-  .title-cell {
-    padding: 1.5em 1em 1em !important;
+  &__form {
+    align-self: stretch;
   }
 
-  .questions-table {
-    width: 75vw !important;
+  &--noAuth {
+    border-radius: 0;
+    margin-left: auto;
+    margin-right: auto;
+    flex-basis: 500px;
+  }
+}
+
+.contact-form {
+  @include child-spacing(top, 30px);
+  max-width: 500px;
+
+  &__section {
+    @include flex-container(column, space-between, stretch);
   }
 
-  .question-cell {
-    padding: 0em 1em 2em !important;
+  &__label {
+    font-size: 16px;
+    font-weight: 600;
+    align-self: flex-start;
+    margin-bottom: 10px;
   }
 
-  .submit-button-cell {
-    padding-left: 1.2em !important;
+  &__text,
+  &__textarea {
+    border: solid 1px $c-border-grey;
+    border-radius: 4px;
+    font-size: 16px;
+    padding: 10px 15px;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  &__textarea {
+    resize: none;
+  }
+
+  &__select {
+    font-size: 16px;
   }
 }
 </style>
