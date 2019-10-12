@@ -118,15 +118,6 @@
           </div>
         </div>
       </div>
-
-      <div v-if="false" class="profile-pic contain">
-        <div class="subheader">Profile Picture</div>
-        <div class="container-content">
-          <div id="profilePic" class="container-section">
-            <div :style="avatarStyle" class="answer avatar" />
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
