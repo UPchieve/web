@@ -20,8 +20,6 @@ import QuizView from "./views/QuizView";
 import ReviewView from "./views/ReviewView";
 import ProfileView from "./views/ProfileView";
 import CalendarView from "./views/CalendarView";
-import SubmitQuestionView from "./views/SubmitQuestionView";
-import SendAnswerView from "./views/SendAnswerView";
 import AdminView from "./views/Admin";
 import VolunteerCoverage from "./views/Admin/VolunteerCoverage";
 

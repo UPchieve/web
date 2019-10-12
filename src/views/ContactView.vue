@@ -104,11 +104,14 @@ export default {
   },
   methods: {
     submitContactUs() {
-      if (!this.isAuthenticated && !this.isValidEmail(this.contactFormData.email)) {
+      if (
+        !this.isAuthenticated &&
+        !this.isValidEmail(this.contactFormData.email)
+      ) {
         alert("A valid email is required.");
       } else {
         if (this.hasValidEmail) {
-          this.contactFormData.email = this.$store.state.user.user.email
+          this.contactFormData.email = this.$store.state.user.user.email;
         }
 
         NetworkService.sendContact(this, {
