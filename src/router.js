@@ -13,7 +13,6 @@ import OnboardingView from "./views/OnboardingView";
 import DashboardView from "./views/DashboardView";
 import SessionView from "./views/SessionView";
 import ActionView from "./views/ActionView";
-import ScheduleView from "./views/ScheduleView";
 import ResourcesView from "./views/ResourcesView";
 import FeedbackView from "./views/FeedbackView";
 import TrainingView from "./views/TrainingView";
@@ -112,12 +111,6 @@ const routes = [
     path: "/session/college/:subTopic/:sessionId?",
     name: "SessionView-college",
     component: SessionView,
-    meta: { protected: true }
-  },
-  {
-    path: "/schedule",
-    name: "ScheduleView",
-    component: ScheduleView,
     meta: { protected: true }
   },
   {
