@@ -8,6 +8,12 @@
         Contact Us
       </div>
 
+      <div class="contact__description">
+        Fill out this form and we'll get back to you as soon as possible!
+        Alternatively, you can always email us directly at
+        <a href="mailto:support@upchieve.org">support@upchieve.org</a>.
+      </div>
+
       <div class="contact-form contact__form">
         <div v-if="!hasValidEmail" class="contact-form__section">
           <div class="contact-form__label">Your email</div>
@@ -67,7 +73,6 @@ export default {
     const contactTopics = [
       "Feedback",
       "Technical issue",
-      "Incident report",
       "Feature request",
       "Subject suggestion",
       "Other"
@@ -160,7 +165,14 @@ export default {
     color: $c-soft-black;
     font-size: 24px;
     font-weight: 500;
-    margin-bottom: 30px;
+  }
+
+  &__description {
+    max-width: 500px;
+    text-align: left;
+    margin: 10px 0 35px;
+    color: $c-secondary-grey;
+    font-size: 14px;
   }
 
   &__form {
