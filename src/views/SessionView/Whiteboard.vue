@@ -96,16 +96,12 @@ let SERVER_DRAWING = false;
 const ERASER_ICON = `url("${EraserIconUrl}") 0 50, auto`;
 const PEN_ICON = `url("${PenIconUrl}") 0 50, auto`;
 
-let CURSOR_VISIBLE = false;
-
 let currentState = "";
 
 let imageList = [];
 let imageData;
 window.App = {};
 const App = window.App;
-
-// const RESET_SCREEN_EVENT = 'reset';
 
 function compareImages(img1, img2) {
   if (img1 !== null && img2 !== null) {
@@ -231,12 +227,6 @@ export default {
         x: data.x,
         y: data.y,
         color: data.color
-      });
-    },
-    emitResetScreen(/* data */) {
-      this.$socket.emit("resetScreen", {
-        sessionId: this.currentSession.sessionId,
-        user: { _id: this.user._id }
       });
     },
 
