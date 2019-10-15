@@ -14,6 +14,7 @@ const getWrapper = (options = {}) => {
     mobileMode: false,
     showHeader: true,
     isSidebarCollapsed: true,
+    isAuthenticated: true,
     ...options
   };
 
@@ -26,6 +27,9 @@ const getWrapper = (options = {}) => {
             sidebar: { state: { isCollapsed: options.isSidebarCollapsed } }
           },
           getters: { mobileMode: () => options.mobileMode }
+        },
+        user: {
+          getters: { isAuthenticated: () => options.isAuthenticated }
         }
       }
     })

@@ -19,18 +19,12 @@
 <script>
 import { mapState } from "vuex";
 
-import AuthService from "@/services/AuthService";
 import SessionService from "@/services/SessionService";
 
 import "@/scss/main.scss";
 import AppHeader from "./AppHeader";
 import AppSidebar from "./AppSidebar";
 import AppModal from "./AppModal";
-
-/**
- * @todo Examine this, huge code smell, refactoring might be needed
- */
-AuthService.checkAuth(); // {1}
 
 export default {
   name: "App",
@@ -40,17 +34,12 @@ export default {
     AppModal
   },
   created() {
-    AuthService.checkAuth(this); // {1}
-
     // Listen for resize event
     window.addEventListener("resize", this.handleResize);
     this.handleResize();
-
-    // Fetch user data
-    this.$store.dispatch("user/fetch", this);
   },
   beforeUpdate() {
-    this.$store.dispatch("user/fetch", this);
+    this.$store.dispatch("user/fetchSession", this);
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.handleResize);

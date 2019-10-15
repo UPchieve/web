@@ -72,8 +72,7 @@ import { setTimeout, clearTimeout } from "timers";
 import moment from "moment";
 import _ from "lodash";
 
-import { mapGetters } from "vuex";
-import UserService from "@/services/UserService";
+import { mapState, mapGetters } from "vuex";
 import SessionService from "@/services/SessionService";
 import ModerationService from "@/services/ModerationService";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
@@ -87,7 +86,6 @@ import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 export default {
   data() {
     return {
-      user: UserService.getUser(),
       messages: [],
       currentSession: SessionService.currentSession,
       newMessage: "",
@@ -97,7 +95,12 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ sessionPartner: "user/sessionPartner" })
+    ...mapState({
+      user: state => state.user.user
+    }),
+    ...mapGetters({
+      sessionPartner: "user/sessionPartner"
+    })
   },
   methods: {
     showModerationWarning() {
@@ -109,7 +112,7 @@ export default {
     showNewMessage(message) {
       this.$socket.emit("message", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: this.user,
         message
       });
     },

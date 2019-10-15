@@ -5,11 +5,9 @@
         v-canvas
         id="whiteboardCanvas"
         @mousedown="drawStart"
-        @mouseup="drawEnd"
         @mousemove="draw"
-        v-touch:start="drawStart"
-        v-touch:end="drawEnd"
-        v-touch:moving="draw"
+        @mouseup="drawEnd"
+        @mouseleave="drawEnd"
         width="1600"
         height="1200"
       />
@@ -91,10 +89,9 @@
  * @todo {1} Solve this bug ('handleUndoOperation' is not defined)
  */
 
-import { mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 import SessionService from "@/services/SessionService";
-import UserService from "@/services/UserService";
 import EraserIconUrl from "@/assets/eraser_icon_01_dark.png";
 import PenIconUrl from "@/assets/pen_icon_01_dark.png";
 
@@ -179,7 +176,12 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ mobileMode: "app/mobileMode" })
+    ...mapState({
+      user: state => state.user.user
+    }),
+    ...mapGetters({
+      mobileMode: "app/mobileMode"
+    })
   },
   mounted() {
     this.drawSetup();
@@ -188,58 +190,58 @@ export default {
     emitDrawClick() {
       this.$socket.emit("drawClick", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: { _id: this.user._id }
       });
     },
     emitSaveImage() {
       this.$socket.emit("saveImage", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: { _id: this.user._id }
       });
     },
     emitUndoClick() {
       this.$socket.emit("undoClick", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: { _id: this.user._id }
       });
     },
     emitClearClick() {
       this.$socket.emit("clearClick", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: { _id: this.user._id }
       });
     },
     emitChangeColor(color) {
       this.$socket.emit("changeColor", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: { _id: this.user._id },
         color
       });
     },
     emitChangeWidth(width) {
       this.$socket.emit("changeWidth", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: { _id: this.user._id },
         width
       });
     },
     emitDrawing() {
       this.$socket.emit("drawing", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: { _id: this.user._id }
       });
     },
     emitEnd() {
       this.$socket.emit("end", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: { _id: this.user._id },
         whiteboardUrl: App.canvas.toDataURL()
       });
     },
     emitDragStart(data) {
       this.$socket.emit("dragStart", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: { _id: this.user._id },
         x: data.x,
         y: data.y,
         color: data.color
@@ -248,7 +250,7 @@ export default {
     emitDragAction(data) {
       this.$socket.emit("dragAction", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: { _id: this.user._id },
         x: data.x,
         y: data.y,
         color: data.color
@@ -257,7 +259,7 @@ export default {
     emitDragEnd(data) {
       this.$socket.emit("dragEnd", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: { _id: this.user._id },
         x: data.x,
         y: data.y,
         color: data.color
@@ -266,7 +268,7 @@ export default {
     emitInsertText(data) {
       this.$socket.emit("insertText", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: { _id: this.user._id },
         x: data.x,
         y: data.y,
         text: data.text
@@ -275,7 +277,7 @@ export default {
     emitResetScreen(/* data */) {
       this.$socket.emit("resetScreen", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: { _id: this.user._id }
       });
     },
 

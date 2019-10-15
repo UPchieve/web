@@ -3,7 +3,7 @@ export default {
   state: {
     component: null,
     data: {},
-    isShown: true
+    isShown: false
   },
   mutations: {
     setComponent: (state, component = null) => (state.component = component),

@@ -144,7 +144,8 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
+import { mapState } from "vuex";
+
 import TrainingService from "@/services/TrainingService";
 
 const MathJax = window.MathJax;
@@ -154,7 +155,6 @@ const MathJax = window.MathJax;
  */
 export default {
   data() {
-    const user = UserService.getUser();
     const { category } = this.$route.params;
     let quizName;
     if (category === "esl") {
@@ -162,12 +162,7 @@ export default {
     } else {
       quizName = category.charAt(0).toUpperCase() + category.slice(1);
     }
-    let tries = 0;
-    if (user[category]) {
-      ({ tries } = user[category]); // {1}
-    }
     return {
-      user,
       category,
       questionText: "",
       quizName,
@@ -193,9 +188,22 @@ export default {
       showQuizReview: false,
       passedMsg: "",
       coverStyle: {},
-      tries,
       qNumber: ""
     };
+  },
+  computed: {
+    ...mapState({
+      user: state => state.user.user
+    }),
+    tries() {
+      const user = this.$store.state.user.user;
+
+      let tries = 0;
+      if (user[this.category]) {
+        ({ tries } = user[this.category]); // {1}
+      }
+      return tries;
+    }
   },
   beforeMount() {
     TrainingService.loadQuiz(this, this.category).then(quizLength => {
