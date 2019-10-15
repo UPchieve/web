@@ -23,42 +23,42 @@
         <button id="clearButton" class="whiteboardBtn" @click="clear" />
         <div class="colorWrapper">
           <button
-            id="openColorsButton"
+            id="colorsButton"
             class="whiteboardBtn"
-            @click="openColors"
+            @click="toggleColorsMenu"
           />
           <div
             :style="{ visibility: showColors }"
             class="toolset col-md-6 colorContainer"
           >
-            <button
+            <div
               class="colorButton greyBtn"
-              style="background-color: rgba(52,52,64,.6)"
+              style="background-color: rgba(52,52,64)"
               @click="changeColor"
             />
-            <button
+            <div
               class="colorButton navyBtn"
-              style="background-color: rgba(38,51,104,1)"
+              style="background-color: rgba(38,51,104)"
               @click="changeColor"
             />
-            <button
+            <div
               class="colorButton redBtn"
-              style="background-color: rgba(244,71,71,1)"
+              style="background-color: rgba(244,71,71)"
               @click="changeColor"
             />
-            <button
+            <div
               class="colorButton yellowBtn"
-              style="background-color: rgba(255,208,115,.6)"
+              style="background-color: rgba(255,208,115)"
               @click="changeColor"
             />
-            <button
+            <div
               class="colorButton greenBtn"
-              style="background-color: rgba(22,210,170,.6)"
+              style="background-color: rgba(22,210,170)"
               @click="changeColor"
             />
-            <button
+            <div
               class="colorButton blueBtn"
-              style="background-color: rgba(24,85,209,.6)"
+              style="background-color: rgba(24,85,209)"
               @click="changeColor"
             />
           </div>
@@ -242,6 +242,8 @@ export default {
         App.ctx.strokeStyle = ERASING_LINE_COLOR;
         App.ctx.lineWidth = ERASING_LINE_WIDTH;
       }
+
+      this.toggleColorsMenu();
     },
     clear() {
       App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
@@ -464,7 +466,7 @@ export default {
         }
       }
     },
-    openColors() {
+    toggleColorsMenu() {
       if (this.showColors === "hidden") {
         this.showColors = "visible";
       } else {
@@ -605,14 +607,31 @@ canvas {
 .colorContainer {
   position: absolute;
   bottom: 85%;
-  height: 30px;
-  width: 130px;
-  padding: 0px 10px 0px 15px;
+  height: 35px;
+  width: 138px;
   border: 1px solid #979797;
   background-color: #fff;
   border-radius: 5px;
   z-index: 1;
+  display: flex;
   align-items: center;
+  justify-content: space-around;
+  padding: 0 7px;
+}
+
+.colorButton {
+  cursor: pointer;
+  margin: 0;
+  height: 15px;
+  width: 15px;
+  border-radius: 15px;
+  box-sizing: content-box;
+  border: solid 1px #fff;
+  transition: border-color 0.3s;
+
+  &:hover {
+    border: solid 1px #000;
+  }
 }
 
 .whiteboardBtn {
@@ -624,12 +643,10 @@ canvas {
   background-position: center;
   background-color: rgb(238, 238, 238);
   transition: 0.2s;
-}
 
-.colorButton {
-  margin: 10px 2px;
-  height: 17px;
-  border-radius: 10px;
+  &:focus {
+    outline: none;
+  }
 }
 
 #eraseButton {
@@ -652,7 +669,7 @@ canvas {
   height: 0;
 }
 
-#openColorsButton {
+#colorsButton {
   background-image: url("~@/assets/color_icon.svg");
 }
 </style>
