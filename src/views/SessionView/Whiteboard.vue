@@ -436,7 +436,7 @@ export default {
       currentState = "ERASING";
       App.ctx.strokeStyle = ERASING_LINE_COLOR;
       App.ctx.lineWidth = ERASING_LINE_WIDTH;
-      App.canvas.style.cursor = ERASOR_ICON;
+      App.canvas.style.cursor = ERASER_ICON;
 
       this.emitChangeColor(ERASING_LINE_COLOR);
       this.emitChangeWidth(ERASING_LINE_WIDTH);
