@@ -151,12 +151,6 @@ export default {
     this.drawSetup();
   },
   methods: {
-    emitDrawClick() {
-      this.$socket.emit("drawClick", {
-        sessionId: this.currentSession.sessionId,
-        user: { _id: this.user._id }
-      });
-    },
     emitSaveImage() {
       this.$socket.emit("saveImage", {
         sessionId: this.currentSession.sessionId,
