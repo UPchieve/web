@@ -194,7 +194,8 @@ export default {
     emitUndoClick() {
       this.$socket.emit("undoClick", {
         sessionId: this.currentSession.sessionId,
-        user: { _id: this.user._id }
+        user: { _id: this.user._id },
+        whiteboardUrl: App.canvas.toDataURL()
       });
     },
     emitClearClick() {
