@@ -1,15 +1,15 @@
 <template>
   <div class="FormFooter">
     <router-link to="/contact" tag="div">
-      <a class="contact icon" target="_blank">Contact Us</a>
+      <a class="contact icon">Contact Us</a>
     </router-link>
 
     <router-link to="/legal" tag="div">
-      <a class="privacy icon" target="_blank">Legal Policy</a>
+      <a class="privacy icon">Legal Policy</a>
     </router-link>
 
     <div>
-      <a href="https://upchieve.org/" target="_blank">Our Website</a>
+      <a href="https://upchieve.org/">Our Website</a>
     </div>
   </div>
 </template>

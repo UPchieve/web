@@ -36,7 +36,7 @@ export default {
           "Calculus",
           "Geometry",
           "Precalculus",
-          "Trigenometry"
+          "Trigonometry"
         ].sort()
       },
       {

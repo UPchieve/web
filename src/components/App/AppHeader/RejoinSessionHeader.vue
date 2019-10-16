@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex";
+import { mapGetters } from "vuex";
 import * as sessionUtils from "@/utils/session";
 import HyperlinkButton from "@/components/HyperlinkButton";
 import LargeButton from "@/components/LargeButton";
@@ -31,13 +31,11 @@ export default {
   name: "rejoin-session-header",
   components: { HyperlinkButton, LargeButton },
   computed: {
-    ...mapState({
-      sessionPath: state => state.user.sessionPath
-    }),
     ...mapGetters({
       mobileMode: "app/mobileMode",
       avatarUrl: "user/avatarUrl",
-      name: "user/firstName"
+      name: "user/firstName",
+      sessionPath: "user/sessionPath"
     }),
     message() {
       return `You have a chat in session${this.mobileMode ? "" : "."}`;

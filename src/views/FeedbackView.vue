@@ -132,14 +132,14 @@
 </template>
 
 <script>
-import UserService from "@/services/UserService";
+import { mapState } from "vuex";
+
 import NetworkService from "@/services/NetworkService";
 import AnalyticsService from "@/services/AnalyticsService";
 
 export default {
   data() {
     return {
-      user: UserService.getUser(),
       sessionId: "",
       topic: "",
       subTopic: "",
@@ -153,7 +153,7 @@ export default {
           alias: "rate-session",
           title: "Rate your session",
           secondary_title: "",
-          table_title: ["1 (worst)", "2", "3", "4", "5 (best)"],
+          table_title: ["1", "2", "3", "4", "5"],
           options: ["Rating"],
           options_alias: ["rating"]
         },
@@ -263,6 +263,11 @@ export default {
       questions: [],
       userResponse: {}
     };
+  },
+  computed: {
+    ...mapState({
+      user: state => state.user.user
+    })
   },
   beforeMount() {
     var _self = this;

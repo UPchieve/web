@@ -7,7 +7,6 @@
           : 'UPchieve'
       "
     />
-    <div class="header">Chat</div>
 
     <div class="message-box">
       <transition name="chat-warning--slide">
@@ -29,8 +28,8 @@
           </div>
           <div class="waiting-cards__card">
             <p>
-              While you’re waiting, you can write out any problems you’re
-              working on using the whiteboard or chat.
+              While you wait, write out the problem you’re working on using the
+              whiteboard or chat.
             </p>
           </div>
         </div>
@@ -63,7 +62,7 @@
       @keydown.enter.prevent
       @keyup="handleMessage"
       v-model="newMessage"
-      placeholder="Type here..."
+      placeholder="Type a message..."
     />
   </div>
 </template>
@@ -73,8 +72,7 @@ import { setTimeout, clearTimeout } from "timers";
 import moment from "moment";
 import _ from "lodash";
 
-import { mapGetters } from "vuex";
-import UserService from "@/services/UserService";
+import { mapState, mapGetters } from "vuex";
 import SessionService from "@/services/SessionService";
 import ModerationService from "@/services/ModerationService";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
@@ -88,7 +86,6 @@ import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 export default {
   data() {
     return {
-      user: UserService.getUser(),
       messages: [],
       currentSession: SessionService.currentSession,
       newMessage: "",
@@ -98,7 +95,12 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ sessionPartner: "user/sessionPartner" })
+    ...mapState({
+      user: state => state.user.user
+    }),
+    ...mapGetters({
+      sessionPartner: "user/sessionPartner"
+    })
   },
   methods: {
     showModerationWarning() {
@@ -110,7 +112,7 @@ export default {
     showNewMessage(message) {
       this.$socket.emit("message", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: this.user,
         message
       });
     },
@@ -241,25 +243,16 @@ export default {
   background: #fff;
 }
 
-.header {
-  height: 60px;
-  padding: 18px;
-  font-family: "Work Sans", sans-serif;
-  font-size: 18px;
-  font-weight: 500;
-  text-align: left;
-  position: absolute;
-  color: white;
-  width: 100%;
-  background: #1855d1;
-}
-
 .message-box {
   height: calc(100% - 60px);
-  padding-bottom: 100px;
+  padding-bottom: 110px;
   overflow: hidden;
   top: 60px;
   position: relative;
+
+  @include breakpoint-above("medium") {
+    top: 70px;
+  }
 }
 
 .chat-warning {
@@ -341,11 +334,11 @@ span {
 .contents {
   text-align: left;
   position: relative;
-  padding: 12px;
+  padding: 10px 14px;
   overflow-wrap: break-word;
   font-size: 16px;
   background: #f1f3f6;
-  border-radius: 8px;
+  border-radius: 20px;
   max-width: 80%;
 }
 
@@ -371,16 +364,19 @@ span {
   position: absolute;
   left: 0;
   bottom: 0;
-  border-top: 1px solid #979797;
+  border: none;
+  border-top: 1px solid $c-border-grey;
   padding: 16px;
+  resize: none;
+
+  &:focus {
+    outline: none;
+  }
 }
 
 .left {
   float: left;
-  .contents {
-    text-align: left;
-    padding-left: 10px;
-  }
+
   .time {
     margin-left: 44px;
   }
@@ -391,11 +387,10 @@ span {
   display: flex;
   flex-direction: row-reverse;
   .contents {
-    text-align: right;
     padding-right: 10px;
-    background-color: #16d2aa;
+    background-color: $c-background-blue;
     span {
-      color: white;
+      color: $c-soft-black;
     }
   }
   .avatar {
@@ -416,7 +411,7 @@ span {
     margin-bottom: 16px;
     font-size: 16px;
     font-weight: 500;
-    background-color: #68d3ab;
+    background-color: $c-information-blue;
 
     h1 {
       font-size: 20px;
@@ -438,10 +433,6 @@ span {
 }
 
 @media screen and (max-width: 700px) {
-  .header {
-    display: none !important;
-  }
-
   .message-box {
     height: 100%;
     padding-bottom: 60px;
@@ -461,7 +452,6 @@ span {
     border-radius: 20px;
     margin: 10px 20px;
     padding: 10px 16px;
-    resize: none;
   }
 
   .typing-indicator {

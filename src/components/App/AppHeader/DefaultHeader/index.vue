@@ -10,7 +10,9 @@
     </template>
 
     <template v-else>
-      <img class="DefaultHeader-logo" :src="logoUrl" />
+      <router-link to="/">
+        <img class="DefaultHeader-logo" :src="logoUrl" />
+      </router-link>
     </template>
   </div>
 </template>

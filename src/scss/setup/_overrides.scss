@@ -1,0 +1,8 @@
+// vue-select overrides
+$vs-border-color: $c-border-grey;
+
+.v-select {
+  .vs__dropdown-toggle {
+    padding: 5px 9px 9px 6px;
+  }
+}

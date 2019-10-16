@@ -1,6 +1,7 @@
 const AUTH_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/auth`;
 const API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/api`;
 const SCHOOL_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/school`;
+const CONTACT_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/contact`;
 
 export default {
   _successHandler(res) {
@@ -51,6 +52,11 @@ export default {
       .get(`${API_ROOT}/user`)
       .then(this._successHandler, this._errorHandler);
   },
+  userGlobal(Vue) {
+    return Vue.http
+      .get(`${API_ROOT}/user`)
+      .then(this._successHandler, this._errorHandler);
+  },
   sendVerification(context) {
     return context.$http
       .post(`${API_ROOT}/verify/send`)
@@ -59,6 +65,11 @@ export default {
   confirmVerification(context, data) {
     return context.$http
       .post(`${API_ROOT}/verify/confirm`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
+  sendContact(context, data) {
+    return context.$http
+      .post(`${CONTACT_API_ROOT}/send`, data)
       .then(this._successHandler, this._errorHandler);
   },
   setProfile(context, data) {
