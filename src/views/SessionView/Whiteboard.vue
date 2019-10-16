@@ -1,17 +1,17 @@
 <template>
   <div class="whiteboard" id="whiteboard">
-    <canvas
-      v-canvas
-      id="whiteboardCanvas"
-      @mousedown="drawStart"
-      @mouseup="drawEnd"
-      @mousemove="draw"
-      v-touch:start="drawStart"
-      v-touch:end="drawEnd"
-      v-touch:moving="draw"
-      width="1280"
-      height="800"
-    />
+    <div class="canvas-wrapper" id="canvas-wrapper">
+      <canvas
+        v-canvas
+        id="whiteboardCanvas"
+        @mousedown="drawStart"
+        @mousemove="draw"
+        @mouseup="drawEnd"
+        @mouseleave="drawEnd"
+        width="1600"
+        height="1200"
+      />
+    </div>
     <div
       class="whiteboardTools row"
       style="background-color:rgba(238,238,238,1)"
@@ -74,12 +74,7 @@
             />
           </div>
         </div>
-        <button
-          id="drawButton"
-          class="whiteboardBtn"
-          @click="drawSetup"
-          :style="drawButtonStyle"
-        />
+        <button id="drawButton" class="whiteboardBtn" @click="drawSetup" />
         <button id="eraseButton" class="whiteboardBtn" @click="erase" />
         <button id="undoButton" class="whiteboardBtn" @click="undo" />
         <!-- <button class='whiteboardBtn' id='textButton' v-on:click="text"></button> -->
@@ -94,10 +89,9 @@
  * @todo {1} Solve this bug ('handleUndoOperation' is not defined)
  */
 
-import { mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 import SessionService from "@/services/SessionService";
-import UserService from "@/services/UserService";
 import EraserIconUrl from "@/assets/eraser_icon_01_dark.png";
 import PenIconUrl from "@/assets/pen_icon_01_dark.png";
 
@@ -107,9 +101,6 @@ import PenIconUrl from "@/assets/pen_icon_01_dark.png";
 // const DRAW_BUTTON_ID = 'drawButton';
 // const TEXT_BUTTON_ID = 'textButton';
 // const TEXT_AREA_ID = 'textInputBox';
-
-// const CANVAS_WIDTH = 800;
-// const CANVAS_HEIGHT = 400;
 
 // const LINE_FILL_STYLE = 'solid';
 let LOCAL_LINE_COLOR = "rgba(52,52,64,.6)";
@@ -181,121 +172,76 @@ export default {
   data() {
     return {
       currentSession: SessionService.currentSession,
-      showColors: "hidden",
-      canvasHeight: null,
-      panEnabled: true
+      showColors: "hidden"
     };
   },
   computed: {
-    ...mapGetters({ mobileMode: "app/mobileMode" }),
-
-    drawButtonStyle() {
-      // Mobile specific drawn/pan indicator
-      if (!this.mobileMode) {
-        return {};
-      }
-
-      if (!this.panEnabled) {
-        return {
-          backgroundColor: "#fff"
-        };
-      }
-
-      return {};
-    }
+    ...mapState({
+      user: state => state.user.user
+    }),
+    ...mapGetters({
+      mobileMode: "app/mobileMode"
+    })
   },
   mounted() {
-    const canvas = document.getElementById("whiteboardCanvas");
-    const whiteboard = document.getElementById("whiteboard");
-
-    // Determime and emit height of whiteboard container
-    this.canvasHeight = whiteboard.offsetHeight;
-    if (localStorage.sessionCanvasHeight) {
-      canvas.height = localStorage.sessionCanvasHeight;
-      canvas.width = localStorage.sessionCanvasHeight * 1.33;
-    } else {
-      canvas.height = this.canvasHeight;
-      canvas.width = this.canvasHeight * 1.33;
-    }
-
-    this.emitCanvasLoaded();
-    this.resizeCanvas();
     this.drawSetup();
-    window.addEventListener("resize", this.resizeCanvas);
   },
   methods: {
-    resizeCanvas() {
-      const savedImage = App.ctx.getImageData(
-        0,
-        0,
-        App.canvas.width,
-        App.canvas.height
-      );
-      App.ctx.putImageData(savedImage, 0, 0);
-    },
-    // Socket emits
-    emitCanvasLoaded() {
-      this.$socket.emit("canvasLoaded", {
-        sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
-        height: this.canvasHeight
-      });
-    },
     emitDrawClick() {
       this.$socket.emit("drawClick", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: { _id: this.user._id }
       });
     },
     emitSaveImage() {
       this.$socket.emit("saveImage", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: { _id: this.user._id }
       });
     },
     emitUndoClick() {
       this.$socket.emit("undoClick", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: { _id: this.user._id }
       });
     },
     emitClearClick() {
       this.$socket.emit("clearClick", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: { _id: this.user._id }
       });
     },
     emitChangeColor(color) {
       this.$socket.emit("changeColor", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: { _id: this.user._id },
         color
       });
     },
     emitChangeWidth(width) {
       this.$socket.emit("changeWidth", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: { _id: this.user._id },
         width
       });
     },
     emitDrawing() {
       this.$socket.emit("drawing", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: { _id: this.user._id }
       });
     },
     emitEnd() {
       this.$socket.emit("end", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: { _id: this.user._id },
         whiteboardUrl: App.canvas.toDataURL()
       });
     },
     emitDragStart(data) {
       this.$socket.emit("dragStart", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: { _id: this.user._id },
         x: data.x,
         y: data.y,
         color: data.color
@@ -304,7 +250,7 @@ export default {
     emitDragAction(data) {
       this.$socket.emit("dragAction", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: { _id: this.user._id },
         x: data.x,
         y: data.y,
         color: data.color
@@ -313,7 +259,7 @@ export default {
     emitDragEnd(data) {
       this.$socket.emit("dragEnd", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: { _id: this.user._id },
         x: data.x,
         y: data.y,
         color: data.color
@@ -322,7 +268,7 @@ export default {
     emitInsertText(data) {
       this.$socket.emit("insertText", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser(),
+        user: { _id: this.user._id },
         x: data.x,
         y: data.y,
         text: data.text
@@ -331,7 +277,7 @@ export default {
     emitResetScreen(/* data */) {
       this.$socket.emit("resetScreen", {
         sessionId: this.currentSession.sessionId,
-        user: UserService.getUser()
+        user: { _id: this.user._id }
       });
     },
 
@@ -361,9 +307,10 @@ export default {
       this.emitClearClick();
     },
     drawStart(event) {
-      if (this.panEnabled && this.mobileMode) {
+      if (this.mobileMode) {
         return;
       }
+
       if (!SERVER_DRAWING) {
         this.emitDrawing();
         if (!CURSOR_VISIBLE && currentState === "INSERTING_TEXT") {
@@ -406,7 +353,7 @@ export default {
             y = touchEvent.clientY;
           }
 
-          const whiteboard = document.getElementById("whiteboard");
+          const whiteboard = document.getElementById("canvas-wrapper");
           const canvasRect = whiteboard.getBoundingClientRect();
 
           const canvasOffsetX = canvasRect.left;
@@ -436,9 +383,10 @@ export default {
       }
     },
     drawEnd(event) {
-      if (this.panEnabled && this.mobileMode) {
+      if (this.mobileMode) {
         return;
       }
+
       if (!SERVER_DRAWING) {
         App.canvas.isDrawing = false;
 
@@ -451,7 +399,7 @@ export default {
           y = touchEvent.clientY;
         }
 
-        const whiteboard = document.getElementById("whiteboard");
+        const whiteboard = document.getElementById("canvas-wrapper");
         const canvasRect = whiteboard.getBoundingClientRect();
 
         const canvasOffsetX = canvasRect.left;
@@ -484,16 +432,17 @@ export default {
       }
     },
     draw(event) {
-      if (this.panEnabled && this.mobileMode) {
+      if (this.mobileMode) {
         return;
       }
+
       if (!SERVER_DRAWING) {
         if (currentState === "DRAWING" || currentState === "ERASING") {
           if (!App.canvas.isDrawing) {
             return;
           }
 
-          const whiteboard = document.getElementById("whiteboard");
+          const whiteboard = document.getElementById("canvas-wrapper");
           const canvasRect = whiteboard.getBoundingClientRect();
 
           let x = event.pageX;
@@ -532,18 +481,6 @@ export default {
       }
     },
     drawSetup() {
-      // Toggle between pan & draw on mobile
-      // @todo: clean this up (UI + code structure of toggle)
-      // if (this.mobileMode) {
-      //   if (this.panEnabled) {
-      //     document.getElementById("whiteboard").style.overflow = "hidden";
-      //     this.panEnabled = !this.panEnabled;
-      //   } else {
-      //     document.getElementById("whiteboard").style.overflow = "scroll";
-      //     this.panEnabled = !this.panEnabled;
-      //   }
-      // }
-
       App.ctx.strokeStyle = LOCAL_LINE_COLOR;
       this.emitChangeColor(LOCAL_LINE_COLOR);
       App.ctx.lineWidth = LINE_WIDTH;
@@ -703,22 +640,6 @@ export default {
     }
   },
   sockets: {
-    "session-change"() {
-      this.emitCanvasLoaded();
-    },
-    size(data) {
-      // Receives broadcast of other user's screen size and resizes (or not) accordingly
-      const targetHeight = data.height;
-      if (targetHeight > this.canvasHeight) {
-        // Resize canvas and save dimensions to localstorage
-        const canvas = document.getElementById("whiteboardCanvas");
-        canvas.height = targetHeight;
-        canvas.width = targetHeight * 1.33;
-        localStorage.sessionCanvasHeight = targetHeight;
-      } else {
-        localStorage.sessionCanvasHeight = this.canvasHeight;
-      }
-    },
     dstart(data) {
       this.fillCircle(
         App.canvas,
@@ -812,10 +733,13 @@ export default {
 <style lang="scss" scoped>
 .whiteboard {
   height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.canvas-wrapper {
+  height: 100%;
   overflow: scroll;
-  flex-direction: column;
-  border-radius: 8px;
-  background-color: grey;
 }
 
 canvas {
@@ -903,15 +827,13 @@ canvas {
 
 #clearButton {
   background-image: url("~@/assets/clear_icon.svg");
+  padding: 13px;
+  margin: 10px 8px 10px 10px;
+  width: 0;
+  height: 0;
 }
 
 #openColorsButton {
   background-image: url("~@/assets/color_icon.svg");
-}
-
-@media screen and (max-width: 700px) {
-  .whiteboard {
-    border-radius: 0;
-  }
 }
 </style>

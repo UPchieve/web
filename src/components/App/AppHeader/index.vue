@@ -8,11 +8,17 @@
 import { mapState } from "vuex";
 import HeaderTemplate from "./HeaderTemplate";
 import DefaultHeader from "./DefaultHeader";
+import SessionHeader from "./SessionHeader";
 import RejoinSessionHeader from "./RejoinSessionHeader";
 
 export default {
   name: "app-header",
-  components: { HeaderTemplate, DefaultHeader, RejoinSessionHeader },
+  components: {
+    HeaderTemplate,
+    DefaultHeader,
+    SessionHeader,
+    RejoinSessionHeader
+  },
   computed: {
     ...mapState({
       headerComponent: state => state.app.header.component || "DefaultHeader",

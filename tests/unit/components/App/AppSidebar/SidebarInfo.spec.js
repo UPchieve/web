@@ -17,9 +17,6 @@ describe("SidebarInfo", () => {
     expect(loggedIn.classes("SidebarInfo")).toBe(true);
     expect(loggedOut.classes("SidebarInfo")).toBe(true);
 
-    expect(loggedIn.find(".SidebarInfo-description").exists()).toBe(false);
-    expect(loggedOut.find(".SidebarInfo-description").exists()).toBe(true);
-
     expect(loggedIn.find(".SidebarInfo-avatar").exists()).toBe(true);
     expect(loggedOut.find(".SidebarInfo-avatar").exists()).toBe(false);
 

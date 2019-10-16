@@ -1,5 +1,3 @@
-import UserService from "./UserService";
-
 export default {
   // for tracking only when events happen, not tracking any properties
   trackNoProperties(name, isFakeUser) {
@@ -71,7 +69,7 @@ export default {
   },
 
   // tracks when a help session has ended
-  trackSessionEnded(currentSession, isFakeUser) {
+  trackSessionEnded(context, currentSession, isFakeUser) {
     if (isFakeUser) return;
 
     // calculating time-related session info (session length, wait time, etc.)
@@ -118,10 +116,11 @@ export default {
     if (studentMessages > 0 && volunteerMessages > 0) {
       successfulSession = true;
     }
+    const user = context.$store.state.user.user;
     window.analytics.track("session ended", {
       //if volunteer joined then report volunteerSessionLength otherwise report null
       "volunteer session length":
-        volunteerSessionLength && UserService.getUser().isVolunteer
+        volunteerSessionLength && user.isVolunteer
           ? volunteerSessionLength
           : null,
       "wait time": waitTime,
@@ -129,7 +128,7 @@ export default {
       "session topic": currentSession.type,
       "session subtopic": currentSession.subTopic,
       "session id": currentSession.sessionId,
-      user: UserService.getUser().isVolunteer ? "volunteer" : "student",
+      user: user.isVolunteer ? "volunteer" : "student",
       "volunteer show time": volunteerShowed ? volunteerShowed : null,
       "did volunteer show": volunteerShowed ? true : false,
       "time ended": new Date(), // might be slightly off from the session's "endedAt"
@@ -138,12 +137,13 @@ export default {
   },
 
   // tracks when a help session has started
-  trackSessionStarted(currentSession, topic, subTopic, isFakeUser) {
+  trackSessionStarted(context, currentSession, topic, subTopic, isFakeUser) {
     if (isFakeUser) return;
 
+    const user = context.$store.state.user.user;
     window.analytics.track("session started", {
       "session started date": new Date(),
-      user: UserService.getUser().isVolunteer ? "volunteer" : "student",
+      user: user.isVolunteer ? "volunteer" : "student",
       "session topic": topic,
       "session subtopic": subTopic,
       "session id": currentSession.sessionId

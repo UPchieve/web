@@ -1,19 +1,22 @@
 <template>
-  <volunteer-dashboard v-if="user.isVolunteer" />
+  <volunteer-dashboard v-if="isVolunteer" />
   <student-dashboard v-else />
 </template>
 
 <script>
-import UserService from "@/services/UserService";
+import { mapGetters } from "vuex";
+
 import VolunteerDashboard from "./VolunteerDashboard";
 import StudentDashboard from "./StudentDashboard";
 
 export default {
   name: "dashboard-view",
   components: { VolunteerDashboard, StudentDashboard },
-  data() {
-    const user = UserService.getUser() || {};
-    return { user };
+  computed: {
+    ...mapGetters({
+      isAuthenticated: "user/isAuthenticated",
+      isVolunteer: "user/isVolunteer"
+    })
   }
 };
 </script>

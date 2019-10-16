@@ -10,7 +10,6 @@ localVue.use(Vuex);
 const CONTACT_LINK = { to: "/contact", icon: "envelope", text: "Contact us" };
 const DASHBOARD_LINK = { to: "/dashboard", icon: "house", text: "Dashboard" };
 const LEGAL_LINK = { to: "/legal", icon: "exclamation", text: "Legal policy" };
-const LOGIN_LINK = { to: "/login", text: "Login" };
 const PROFILE_LINK = { to: "/profile", icon: "portrait", text: "Profile" };
 const RESOURCES_LINK = { to: "/resources", icon: "folder", text: "Resources" };
 
@@ -40,7 +39,7 @@ const FIRST_TIME_SURVEY_LINK = {
 // Links organized by route & user type. Array indices of the links are important.
 const links = {
   default: {
-    loggedOut: [LOGIN_LINK, CONTACT_LINK, LEGAL_LINK],
+    loggedOut: [],
     student: [
       DASHBOARD_LINK,
       PROFILE_LINK,
@@ -66,13 +65,8 @@ const links = {
     ]
   },
   onboarding: {
-    student: [
-      BASIC_PROFILE_LINK,
-      FIRST_TIME_SURVEY_LINK,
-      CONTACT_LINK,
-      LEGAL_LINK
-    ],
-    volunteer: [BASIC_PROFILE_LINK, CONTACT_LINK, LEGAL_LINK]
+    student: [BASIC_PROFILE_LINK, FIRST_TIME_SURVEY_LINK],
+    volunteer: [BASIC_PROFILE_LINK]
   }
 };
 
@@ -100,7 +94,7 @@ const getWrapper = (options = {}) => {
 
 describe("SidebarLinks", () => {
   it("layout", () => {
-    const wrapper = getWrapper();
+    const wrapper = getWrapper({ authenticated: true });
     expect(wrapper.classes("SidebarLinks")).toBe(true);
     expect(wrapper.findAll(SidebarLink).length).toBeGreaterThan(0);
 

@@ -9,14 +9,6 @@
         <div class="SidebarInfo-status-text">{{ sessionStatus.text }}</div>
       </div>
     </template>
-
-    <template v-else>
-      <p class="SidebarInfo-description">
-        UPchieve is a volunteer-run ed-tech initiative with the goal of
-        providing free, online, and on-demand educational and guidance services
-        to disadvantaged students.
-      </p>
-    </template>
   </div>
 </template>
 

@@ -18,7 +18,11 @@ const getWrapper = (mobileMode = false) => {
     })
   );
 
-  return shallowMount(DefaultHeader, { localVue, store });
+  return shallowMount(DefaultHeader, {
+    localVue,
+    store,
+    stubs: ["router-link", "router-view"]
+  });
 };
 
 describe("DefaultHeader", () => {
