@@ -28,7 +28,7 @@
             @click="toggleColorsMenu"
           />
           <div
-            :style="{ visibility: showColors }"
+            :style="{ visibility: showColorMenu }"
             class="toolset col-md-6 colorContainer"
           >
             <div
@@ -64,7 +64,7 @@
           </div>
         </div>
         <button id="drawButton" class="whiteboardBtn" @click="drawSetup" />
-        <button id="eraseButton" class="whiteboardBtn" @click="erase" />
+        <button id="eraseButton" class="whiteboardBtn" @click="eraseSetup" />
         <button id="undoButton" class="whiteboardBtn" @click="undo" />
       </div>
     </div>
@@ -83,15 +83,11 @@ import SessionService from "@/services/SessionService";
 import EraserIconUrl from "@/assets/eraser_icon.svg";
 import PenIconUrl from "@/assets/pen_icon.svg";
 
-let LOCAL_LINE_COLOR = "rgba(52,52,64,.6)";
-let SERVER_LINE_COLOR = "rgba(52,52,64,.6)";
-let SERVER_LINE_WIDTH = 5;
-const LINE_WIDTH = 5;
+const DEFAULT_LINE_COLOR = "rgba(52, 52, 64, 0.6)";
+const DRAW_LINE_WIDTH = 5;
 
 const ERASING_LINE_COLOR = "white";
 const ERASING_LINE_WIDTH = 20;
-
-let SERVER_DRAWING = false;
 
 const ERASER_ICON = `url("${EraserIconUrl}") 0 50, auto`;
 const PEN_ICON = `url("${PenIconUrl}") 0 50, auto`;
@@ -126,8 +122,6 @@ export default {
     canvas(el) {
       App.canvas = el;
       App.ctx = el.getContext("2d");
-      App.ctx.strokeStyle = LOCAL_LINE_COLOR;
-      App.ctx.lineWidth = LINE_WIDTH;
       saveImage(App.canvas, App.ctx);
     }
   },
@@ -135,8 +129,10 @@ export default {
     return {
       whiteboardMode: "",
       currentSession: SessionService.currentSession,
+      isPartnerDrawing: false,
       isDragging: false,
-      showColors: "hidden"
+      selectedColor: DEFAULT_LINE_COLOR,
+      showColorMenu: "hidden"
     };
   },
   computed: {
@@ -147,18 +143,37 @@ export default {
       mobileMode: "app/mobileMode"
     }),
 
+    lineWidth() {
+      if (this.whiteboardMode === "ERASING") {
+        return ERASING_LINE_WIDTH;
+      } else {
+        return DRAW_LINE_WIDTH;
+      }
+    },
+    lineColor() {
+      if (this.whiteboardMode === "ERASING") {
+        return ERASING_LINE_COLOR;
+      } else {
+        return this.selectedColor;
+      }
+    },
+
     canDraw() {
       if (this.mobileMode) {
         // No drawing on mobile
         return false;
       }
 
-      if (SERVER_DRAWING) {
+      if (this.isPartnerDrawing) {
         // Other user is busy drawing
         return false;
       }
 
-      if (!(this.whiteboardMode === "DRAWING" || this.whiteboardMode === "ERASING")) {
+      if (
+        !(
+          this.whiteboardMode === "DRAWING" || this.whiteboardMode === "ERASING"
+        )
+      ) {
         // Not in draw or erase mode
         return false;
       }
@@ -188,82 +203,42 @@ export default {
         user: { _id: this.user._id }
       });
     },
-    emitChangeColor(color) {
-      this.$socket.emit("changeColor", {
-        sessionId: this.currentSession.sessionId,
-        user: { _id: this.user._id },
-        color
-      });
-    },
-    emitChangeWidth(width) {
-      this.$socket.emit("changeWidth", {
-        sessionId: this.currentSession.sessionId,
-        user: { _id: this.user._id },
-        width
-      });
-    },
-    emitDrawing() {
-      this.$socket.emit("drawing", {
+    emitDragStart(data) {
+      this.$socket.emit("dragStart", {
+        ...data,
         sessionId: this.currentSession.sessionId,
         user: { _id: this.user._id }
       });
     },
-    emitEnd() {
-      this.$socket.emit("end", {
+    emitDragAction(data) {
+      this.$socket.emit("dragAction", {
+        ...data,
+        sessionId: this.currentSession.sessionId,
+        user: { _id: this.user._id }
+      });
+    },
+    emitDragEnd(data) {
+      this.$socket.emit("dragEnd", {
+        ...data,
         sessionId: this.currentSession.sessionId,
         user: { _id: this.user._id },
         whiteboardUrl: App.canvas.toDataURL()
       });
     },
-    emitDragStart(data) {
-      this.$socket.emit("dragStart", {
-        sessionId: this.currentSession.sessionId,
-        user: { _id: this.user._id },
-        x: data.x,
-        y: data.y,
-        color: data.color
-      });
-    },
-    emitDragAction(data) {
-      this.$socket.emit("dragAction", {
-        sessionId: this.currentSession.sessionId,
-        user: { _id: this.user._id },
-        x: data.x,
-        y: data.y,
-        color: data.color
-      });
-    },
-    emitDragEnd(data) {
-      this.$socket.emit("dragEnd", {
-        sessionId: this.currentSession.sessionId,
-        user: { _id: this.user._id },
-        x: data.x,
-        y: data.y,
-        color: data.color
-      });
-    },
 
     // UI events
     changeColor(event) {
-      if (this.whiteboardMode === "DRAWING") {
-        LOCAL_LINE_COLOR = event.target.style.backgroundColor;
-        App.ctx.strokeStyle = LOCAL_LINE_COLOR;
-        this.emitChangeColor(LOCAL_LINE_COLOR);
-        App.ctx.lineWidth = LINE_WIDTH;
-        this.emitChangeWidth(LINE_WIDTH);
-      } else if (this.whiteboardMode === "ERASING") {
-        App.ctx.strokeStyle = ERASING_LINE_COLOR;
-        App.ctx.lineWidth = ERASING_LINE_WIDTH;
-      }
-
+      this.selectedColor = event.target.style.backgroundColor;
       this.toggleColorsMenu();
     },
+
     clear() {
       App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
       imageList = [];
       saveImage(App.canvas, App.ctx);
       this.emitClearClick();
     },
+
     drawStart(event) {
       if (!this.canDraw) {
         return;
@@ -291,21 +266,29 @@ export default {
         App.canvas,
         App.ctx,
         "dragstart",
-        false,
         transmitX,
         transmitY,
-        LOCAL_LINE_COLOR
+        this.lineColor,
+        this.lineWidth
       );
 
       this.emitDragStart({
         x: transmitX,
         y: transmitY,
-        color: LOCAL_LINE_COLOR
+        color: this.lineColor,
+        width: this.lineWidth
       });
     },
+
     drawEnd(event) {
       if (!this.canDraw) {
-        return
+        return;
+      }
+
+      if (!this.isDragging) {
+        // (isDragging = true) means mouse is being held down and dragged.
+        // If not true, this is just a regular "mousemove" event
+        return;
       }
 
       this.isDragging = false;
@@ -328,22 +311,23 @@ export default {
         App.canvas,
         App.ctx,
         "dragend",
-        false,
         transmitX,
         transmitY,
-        LOCAL_LINE_COLOR
+        this.lineColor,
+        this.lineWidth
       );
 
       this.emitDragEnd({
         x: transmitX,
         y: transmitY,
-        color: LOCAL_LINE_COLOR
+        color: this.lineColor,
+        width: this.lineWidth
       });
 
       saveImage(App.canvas, App.ctx);
       this.emitSaveImage();
-      this.emitEnd();
     },
+
     draw(event) {
       if (!this.canDraw) {
         return;
@@ -373,32 +357,38 @@ export default {
         App.canvas,
         App.ctx,
         "drag",
-        false,
         transmitX,
         transmitY,
-        LOCAL_LINE_COLOR
+        this.lineColor,
+        this.lineWidth
       );
 
       this.emitDragAction({
         x: transmitX,
         y: transmitY,
-        color: LOCAL_LINE_COLOR
+        color: this.lineColor,
+        width: this.lineWidth
       });
     },
-    drawSetup() {
-      App.ctx.strokeStyle = LOCAL_LINE_COLOR;
-      this.emitChangeColor(LOCAL_LINE_COLOR);
-      App.ctx.lineWidth = LINE_WIDTH;
-      this.emitChangeWidth(LINE_WIDTH);
 
+    drawSetup() {
+      this.whiteboardMode = "DRAWING";
       App.canvas.style.cursor = PEN_ICON;
 
       if (imageList.length === 0) {
         saveImage(App.canvas, App.ctx);
         this.emitSaveImage();
       }
+    },
 
-      this.whiteboardMode = "DRAWING";
+    eraseSetup() {
+      if (imageList.length === 0) {
+        saveImage(App.canvas, App.ctx);
+        this.emitSaveImage();
+      }
+
+      this.whiteboardMode = "ERASING";
+      App.canvas.style.cursor = ERASER_ICON;
     },
 
     undo() {
@@ -422,71 +412,43 @@ export default {
       }
     },
 
-    erase() {
-      if (imageList.length === 0) {
-        saveImage(App.canvas, App.ctx);
-        this.emitSaveImage();
-      }
-
-      this.whiteboardMode = "ERASING";
-      App.ctx.strokeStyle = ERASING_LINE_COLOR;
-      App.ctx.lineWidth = ERASING_LINE_WIDTH;
-      App.canvas.style.cursor = ERASER_ICON;
-
-      this.emitChangeColor(ERASING_LINE_COLOR);
-      this.emitChangeWidth(ERASING_LINE_WIDTH);
-    },
-
     // Canvas manipulations
-    fillCircle(canvas, context, type, server, x, y) {
-      if (server) {
-        App.ctx.strokeStyle = SERVER_LINE_COLOR;
-        App.ctx.lineWidth = SERVER_LINE_WIDTH;
-      } else if (this.whiteboardMode === "ERASING") {
-        App.ctx.strokeStyle = ERASING_LINE_COLOR;
-        App.ctx.lineWidth = ERASING_LINE_WIDTH;
-      }
-      if (this.whiteboardMode === "DRAWING" || this.whiteboardMode === "ERASING" || server) {
-        if (type === "dragstart") {
-          if (imageList.length > 0) {
-            imageData = imageList[imageList.length - 1];
-            context.putImageData(imageData, 0, 0);
-          }
+    fillCircle(canvas, context, type, x, y, color, width) {
+      App.ctx.strokeStyle = color;
+      App.ctx.lineWidth = width;
 
-          context.beginPath();
-          context.moveTo(x, y);
-        } else if (type === "drag") {
-          context.lineTo(x, y);
-          context.stroke();
-        } else {
-          context.closePath();
-          saveImage(canvas, context);
-          this.emitSaveImage();
-        }
-        if (server) {
-          App.ctx.strokeStyle = LOCAL_LINE_COLOR;
-          App.ctx.lineWidth = LINE_WIDTH;
-        }
+      if (type === "dragstart") {
+        App.ctx.beginPath();
+        App.ctx.moveTo(x, y);
+      } else if (type === "drag") {
+        App.ctx.lineTo(x, y);
+        App.ctx.stroke();
+      } else {
+        App.ctx.closePath();
+        saveImage(canvas, App.ctx);
+        this.emitSaveImage();
       }
     },
     toggleColorsMenu() {
-      if (this.showColors === "hidden") {
-        this.showColors = "visible";
+      if (this.showColorMenu === "hidden") {
+        this.showColorMenu = "visible";
       } else {
-        this.showColors = "hidden";
+        this.showColorMenu = "hidden";
       }
     }
   },
   sockets: {
     dstart(data) {
+      this.isPartnerDrawing = true;
+
       this.fillCircle(
         App.canvas,
         App.ctx,
         "dragstart",
-        true,
         data.x,
         data.y,
-        data.color
+        data.color,
+        data.width
       );
     },
     drag(data) {
@@ -494,37 +456,24 @@ export default {
         App.canvas,
         App.ctx,
         "drag",
-        true,
         data.x,
         data.y,
-        data.color
+        data.color,
+        data.width
       );
     },
     dend(data) {
+      this.isPartnerDrawing = false;
+
       this.fillCircle(
         App.canvas,
         App.ctx,
         "dragend",
-        true,
         data.x,
         data.y,
-        data.color
+        data.color,
+        data.width
       );
-    },
-    draw() {
-      SERVER_DRAWING = true;
-    },
-    end() {
-      SERVER_DRAWING = false;
-    },
-    save() {
-      const imageData = App.ctx.getImageData(
-        0,
-        0,
-        App.canvas.width,
-        App.canvas.height
-      );
-      imageList.push(imageData);
     },
     undo() {
       const currentImage = App.ctx.getImageData(
@@ -547,12 +496,6 @@ export default {
       App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
       imageList = [];
       saveImage(App.canvas, App.ctx);
-    },
-    color(newColor) {
-      SERVER_LINE_COLOR = newColor;
-    },
-    width(newWidth) {
-      SERVER_LINE_WIDTH = newWidth;
     }
   }
 };
