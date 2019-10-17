@@ -57,6 +57,7 @@ export default {
   methods: {
     setSelectedSubtopic(subject) {
       this.selectedSubtopic = subject;
+      this.$emit("enable-accept", subject !== "");
     },
     handleMobileStart(subject) {
       this.setSelectedSubtopic(subject);

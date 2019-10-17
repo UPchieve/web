@@ -4,11 +4,13 @@
     v-on:accept="onAccept"
     :back-text="modalData.backText"
     :accept-text="modalData.acceptText"
+    :enable-accept="enableAccept"
     :important="modalData.important"
   >
     <component
       v-if="modalComponent"
       v-bind:is="modalComponent"
+      v-on:enable-accept="onEnableAccept"
       :modal-data="modalData"
       ref="AppModalChild"
     />
@@ -23,6 +25,11 @@ import SubjectSelectionModal from "@/views/DashboardView/StudentDashboard/Subjec
 
 export default {
   components: { ModalTemplate, RejoinSessionModal, SubjectSelectionModal },
+  data() {
+    return {
+      enableAccept: false
+    };
+  },
   computed: {
     ...mapState({
       modalComponent: state => state.app.modal.component,
@@ -37,6 +44,9 @@ export default {
     onAccept() {
       const child = this.$refs.AppModalChild;
       if (child.onAccept) child.onAccept();
+    },
+    onEnableAccept(value) {
+      this.enableAccept = value;
     }
   }
 };
