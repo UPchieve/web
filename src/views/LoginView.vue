@@ -3,7 +3,7 @@
     <form class="uc-form">
       <div class="uc-form-header">
         <div class="uc-form-header-link--active">Log In</div>
-        <router-link to="signup" class="uc-form-header-link"
+        <router-link to="/signup" class="uc-form-header-link"
           >Sign Up</router-link
         >
       </div>
@@ -38,7 +38,7 @@
             class="uc-form-input"
             required
           />
-          <router-link to="resetpassword" class="uc-form-subtext">
+          <router-link to="/resetpassword" class="uc-form-subtext">
             Forgot password?
           </router-link>
         </div>
