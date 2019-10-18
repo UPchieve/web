@@ -299,7 +299,7 @@ export default {
         this.errors.push("You must read and accept the user agreement.");
       }
 
-      console.log(this.formData);
+      // console.log(this.formData);
     }
   }
 };
