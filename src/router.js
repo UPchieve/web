@@ -111,6 +111,12 @@ const routes = [
     meta: { protected: true }
   },
   {
+    path: "/s/:sessionIdBase64",
+    name: "SessionView-compact",
+    component: SessionView,
+    meta: { protected: true }
+  },
+  {
     path: "/resources",
     name: "ResourcesView",
     component: ResourcesView,
