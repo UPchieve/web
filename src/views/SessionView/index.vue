@@ -146,7 +146,9 @@ export default {
   },
   sockets: {
     bump: function() {
-      window.alert("Another volunteer is already helping this student. We apologize for the inconvenience. Thank you for volunteering with UPchieve!");
+      window.alert(
+        "Another volunteer is already helping this student. We apologize for the inconvenience. Thank you for volunteering with UPchieve!"
+      );
       this.$router.push("/");
     },
     reconnect_attempt() {
