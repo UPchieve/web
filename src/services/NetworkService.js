@@ -1,4 +1,4 @@
-import Vue from 'vue'
+import Vue from "vue";
 
 const AUTH_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/auth`;
 const API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/api`;

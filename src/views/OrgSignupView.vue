@@ -21,7 +21,9 @@
         </div>
 
         <div class="step-header">
-          <div class="step-header__title">Welcome {{ orgManifest.name }} Employee!</div>
+          <div class="step-header__title">
+            Welcome {{ orgManifest.name }} Employee!
+          </div>
           <div class="step-header__subtitle">
             Not with {{ orgManifest.name }}?
             <a href="https://upchieve.org/volunteer">Click here</a>
@@ -218,9 +220,9 @@ export default {
 
     NetworkService.getOrgManifest(orgId).then(data => {
       const orgManifest = data.body.orgManifest;
-      if (!orgManifest) return next("/signup")
+      if (!orgManifest) return next("/signup");
       return next(_this => _this.setOrgManifest(orgManifest));
-    })
+    });
   },
   created() {
     this.$store.dispatch("app/hideNavigation");
@@ -252,10 +254,10 @@ export default {
 
     isValidOrgEmail(email) {
       const requiredDomains = this.orgManifest.requiredEmailDomains;
-      if (!(requiredDomains && requiredDomains.length)) return false
+      if (!(requiredDomains && requiredDomains.length)) return false;
 
-      const domain = email.split('@')[1];
-      return domain && requiredDomains.indexOf(domain) >= 0
+      const domain = email.split("@")[1];
+      return domain && requiredDomains.indexOf(domain) >= 0;
     },
 
     formStepTwo() {
@@ -275,7 +277,11 @@ export default {
 
         this.invalidInputs.push("inputEmail");
       } else if (!this.isValidOrgEmail(this.formData.email)) {
-        this.errors.push(`Email must end with ${this.orgManifest.requiredEmailDomains.join(' or ')}`);
+        this.errors.push(
+          `Email must end with ${this.orgManifest.requiredEmailDomains.join(
+            " or "
+          )}`
+        );
         this.invalidInputs.push("inputEmail");
       }
 
