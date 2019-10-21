@@ -21,9 +21,9 @@
         </div>
 
         <div class="step-header">
-          <div class="step-header__title">Welcome [Company Name] Employee!</div>
+          <div class="step-header__title">Welcome {{ orgManifest.name }} Employee!</div>
           <div class="step-header__subtitle">
-            Not a [Company Name] employee?
+            Not with {{ orgManifest.name }}?
             <a href="https://upchieve.org/volunteer">Click here</a>
           </div>
         </div>
@@ -205,7 +205,7 @@ import validator from "validator";
 
 import FormPageTemplate from "@/components/FormPageTemplate";
 import AuthService from "@/services/AuthService";
-// import UserService from "@/services/UserService";
+import NetworkService from "@/services/NetworkService";
 
 import phoneValidation from "@/utils/phone-validation";
 
@@ -213,11 +213,24 @@ export default {
   components: {
     FormPageTemplate
   },
+  beforeRouteEnter(to, from, next) {
+    const orgId = to.params.orgId;
+
+    NetworkService.getOrgManifest(orgId).then(data => {
+      const orgManifest = data.body.orgManifest;
+      if (!orgManifest) return next("/signup")
+      return next(_this => _this.setOrgManifest(orgManifest));
+    })
+  },
   created() {
     this.$store.dispatch("app/hideNavigation");
   },
   data() {
     return {
+      orgManifest: {
+        name: "",
+        requiredEmailDomains: []
+      },
       formStep: 1,
       formData: {
         email: "",
@@ -233,6 +246,18 @@ export default {
     };
   },
   methods: {
+    setOrgManifest(orgManifest) {
+      this.orgManifest = orgManifest;
+    },
+
+    isValidOrgEmail(email) {
+      const requiredDomains = this.orgManifest.requiredEmailDomains;
+      if (!(requiredDomains && requiredDomains.length)) return false
+
+      const domain = email.split('@')[1];
+      return domain && requiredDomains.indexOf(domain) >= 0
+    },
+
     formStepTwo() {
       // validate input
       this.errors = [];
@@ -249,7 +274,11 @@ export default {
         );
 
         this.invalidInputs.push("inputEmail");
+      } else if (!this.isValidOrgEmail(this.formData.email)) {
+        this.errors.push(`Email must end with ${this.orgManifest.requiredEmailDomains.join(' or ')}`);
+        this.invalidInputs.push("inputEmail");
       }
+
       if (!this.formData.password) {
         this.errors.push("A password is required.");
         this.invalidInputs.push("inputPassword");
