@@ -2,12 +2,9 @@
   <div class="SessionFulfilledModal">
     <h1 class="SessionFulfilledModal-title">Session Fulfilled</h1>
     <div class="SessionFulfilledModal-message">{{ message }}</div>
-    <large-button
-      v-if="mobileMode"
-      primary
-      @click.native="onAccept"
-      >{{ modalData.acceptText }}</large-button
-    >
+    <large-button v-if="mobileMode" primary @click.native="onAccept">{{
+      modalData.acceptText
+    }}</large-button>
   </div>
 </template>
 
@@ -27,11 +24,11 @@ export default {
     }),
     message() {
       return (
-        this.isSessionOver ?
-          "This session has already ended." :
-          "Another volunteer has already joined this session."
-      ) +
-      " We apologize for the inconvenience. Thank you for volunteering with UPchieve!";
+        (this.isSessionOver
+          ? "This session has already ended."
+          : "Another volunteer has already joined this session.") +
+        " We apologize for the inconvenience. Thank you for volunteering with UPchieve!"
+      );
     }
   },
   methods: {
@@ -39,7 +36,7 @@ export default {
       this.$router.push("/");
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

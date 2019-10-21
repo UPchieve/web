@@ -13,7 +13,9 @@
       <template v-if="!mobileMode">
         <div class="ModalTemplate-seperator" />
         <div class="ModalTemplate-buttons">
-          <large-button v-if="!alertModal" @click.native="handleCancel">Cancel</large-button>
+          <large-button v-if="!alertModal" @click.native="handleCancel"
+            >Cancel</large-button
+          >
           <large-button
             primary
             @click.native="$emit('accept')"
