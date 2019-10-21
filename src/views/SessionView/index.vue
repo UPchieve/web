@@ -50,6 +50,8 @@ import SessionHeader from "./SessionHeader";
 import Whiteboard from "./Whiteboard";
 import SessionChat from "./SessionChat";
 
+import SessionFulfilledModal from "./SessionFulfilledModal";
+
 const headerData = {
   component: "SessionHeader"
 };
@@ -146,10 +148,13 @@ export default {
   },
   sockets: {
     bump: function() {
-      window.alert(
-        "Another volunteer is already helping this student. We apologize for the inconvenience. Thank you for volunteering with UPchieve!"
-      );
-      this.$router.push("/");
+      this.$store.dispatch("app/modal/show", {
+        component: SessionFulfilledModal,
+        data: {
+          acceptText: "Return to Dashboard",
+          alertModal: true
+        }
+      });
     },
     reconnect_attempt() {
       this.sessionReconnecting = true;
