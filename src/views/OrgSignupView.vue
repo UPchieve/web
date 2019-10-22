@@ -198,7 +198,10 @@
 
         <div v-if="serverErrorMsg !== ''">{{ serverErrorMsg }}</div>
       </form>
-      <div v-if="formStep === 'success'" class="uc-form-body">You've been sent a verification email! Check your work email for a link to confirm your account.</div>
+      <div v-if="formStep === 'success'" class="uc-form-body">
+        You've been sent a verification email! Check your work email for a link
+        to confirm your account.
+      </div>
     </div>
   </form-page-template>
 </template>
@@ -336,7 +339,7 @@ export default {
       }
 
       if (!this.errors.length) {
-        this.register()
+        this.register();
       }
     },
 
@@ -356,7 +359,7 @@ export default {
         phone: this.formData.phone,
         terms: this.formData.terms
       })
-        .then(msg => {
+        .then(() => {
           this.formStep = "success";
         })
         .catch(err => {
