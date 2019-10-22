@@ -13,7 +13,9 @@
       <template v-if="!mobileMode">
         <div class="ModalTemplate-seperator" />
         <div class="ModalTemplate-buttons">
-          <large-button @click.native="handleCancel">Cancel</large-button>
+          <large-button v-if="!alertModal" @click.native="handleCancel"
+            >Cancel</large-button
+          >
           <large-button
             primary
             @click.native="$emit('accept')"
@@ -39,6 +41,7 @@ export default {
     acceptText: { type: String, default: "Accept" },
     backText: { type: String, default: "Back" },
     enableAccept: Boolean,
+    alertModal: Boolean,
     important: Boolean
   },
   computed: {
