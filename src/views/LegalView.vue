@@ -29,7 +29,9 @@
       <section>
         <h2>Terms of Service</h2>
 
-        <p><em>Date of Last Revision: May 12, 2018</em></p>
+        <p>
+          <em>Date of Last Revision: May 12, 2018</em>
+        </p>
 
         <p>
           These Terms of Service (“Terms” or “Terms of Service”) explain your
@@ -42,16 +44,17 @@
 
         <p>
           These Terms, together with our Privacy Policy and Disclaimer, form the
-          agreement with you regarding the use of the Website (the "Agreement").
+          agreement with you regarding the use of the Website (the "User
+          Agreement").
         </p>
 
         <p>
-          <strong
-            >Please read the Agreement carefully. By continuing to use the
-            Services, you agree that you have read and are bound by these Terms.
-            If you do not agree to these Terms, you must not use the Website or
-            engage in UPchieve’s Services.</strong
-          >
+          <strong>
+            Please read the Terms carefully. By continuing to use the Services,
+            you agree that you have read and are bound by these Terms. If you do
+            not agree to these Terms, you must not use the Website or engage in
+            UPchieve’s Services.
+          </strong>
         </p>
 
         <p>
@@ -188,9 +191,7 @@
           </accordion-item>
 
           <accordion-item label="Prohibited Conduct">
-            <p>
-              YOU AGREE NOT TO:
-            </p>
+            <p>YOU AGREE NOT TO:</p>
             <ol type="a">
               <li>
                 Use the Website for any commercial use or purpose unless
@@ -256,7 +257,7 @@
           </accordion-item>
 
           <accordion-item
-            label="How We Will Resolve Conflicts Between Us Concerning the Services "
+            label="How We Will Resolve Conflicts Between Us Concerning the Services"
           >
             <p>
               <strong>DISPUTE RESOLUTION -- VENUE.</strong> You agree to be
@@ -332,18 +333,18 @@
           <accordion-item label="Changes to the Terms of Service">
             <p>
               <strong>TERMINATION BY US.</strong> We reserve the right to
-              terminate this Agreement in our sole discretion. We may terminate
-              this Agreement prior to sending you written notification. For
-              example, we will terminate the account of any User who threatens
-              or harasses any other User.
+              terminate this User Agreement in our sole discretion. We may
+              terminate this User Agreement prior to sending you written
+              notification. For example, we will terminate the account of any
+              User who threatens or harasses any other User.
             </p>
 
             <p>
               <strong>MODIFICATIONS.</strong> UPchieve reserves the right, at
               our discretion, to change, modify, add, or remove portions of the
               Terms at any time. Please check the Terms and other sections of
-              the Agreement periodically for changes. Your continued use of the
-              Website after the posting of changes constitutes your binding
+              the User Agreement periodically for changes. Your continued use of
+              the Website after the posting of changes constitutes your binding
               acceptance of such changes. For any material changes to the Terms,
               UPchieve will make reasonable effort to provide notice to you of
               such amended Terms, such as by an email notification to the
@@ -362,7 +363,9 @@
       <section>
         <h2>Privacy Policy</h2>
 
-        <p><em>Date of Last Revision: May 12, 2017</em></p>
+        <p>
+          <em>Date of Last Revision: May 12, 2017</em>
+        </p>
 
         <p>
           UPchieve takes your privacy seriously. We know you trust us to help
@@ -380,12 +383,12 @@
         </p>
 
         <p>
-          <strong
-            >Please read the Policy carefully. By continuing to use the
-            Services, you agree that you have read and are bound by this Policy.
-            If you do not agree to this Policy, you must not use the Website or
-            engage in UPchieve’s Services.</strong
-          >
+          <strong>
+            Please read the Policy carefully. By continuing to use the Services,
+            you agree that you have read and are bound by this Policy. If you do
+            not agree to this Policy, you must not use the Website or engage in
+            UPchieve’s Services.
+          </strong>
         </p>
 
         <accordion>
@@ -448,12 +451,24 @@
             </p>
 
             <ul>
-              <li><strong>Email address</strong></li>
-              <li><strong>Full name</strong></li>
-              <li><strong>Birthdate</strong></li>
-              <li><strong>Gender</strong></li>
-              <li><strong>Race / ethnicity</strong></li>
-              <li><strong>School name</strong></li>
+              <li>
+                <strong>Email address</strong>
+              </li>
+              <li>
+                <strong>Full name</strong>
+              </li>
+              <li>
+                <strong>Birthdate</strong>
+              </li>
+              <li>
+                <strong>Gender</strong>
+              </li>
+              <li>
+                <strong>Race / ethnicity</strong>
+              </li>
+              <li>
+                <strong>School name</strong>
+              </li>
             </ul>
           </accordion-item>
 
@@ -471,9 +486,9 @@
               </li>
 
               <li>
-                <strong
-                  >Information we get from your use of our Services.</strong
-                >
+                <strong>
+                  Information we get from your use of our Services.
+                </strong>
                 When you use our Website, we collect information including but
                 not limited to: which Services you use, at what time you use the
                 Services, and how long your interactions with other Users last.
@@ -558,9 +573,9 @@
             </ul>
 
             <p>
-              <strong
-                >Completely anonymized and consolidated information</strong
-              >
+              <strong>
+                Completely anonymized and consolidated information
+              </strong>
               will be shared in our annual reports (which will be available on
               our Website to all visitors) and in our applications for funding.
               Anonymized and consolidated means that the information will not
@@ -614,6 +629,160 @@
               to provide notice to you of such changes. Your continued use of
               the Website after the posting of changes constitutes your binding
               acceptance of such changes.
+            </p>
+          </accordion-item>
+        </accordion>
+      </section>
+
+      <section>
+        <h2 id="volunteer">Volunteer Agreement</h2>
+
+        <p>
+          <em>Date of Last Revision: May 12, 2017</em>
+        </p>
+
+        <p>
+          The below Volunteer Agreement (“Volunteer Agreement”) applies only to
+          volunteers and covers your rights and obligations in connection with
+          our website, app.upchieve.org (“Website”). We refer to our Website
+          visitors who select "Volunteer" during account creation as volunteers
+          ("Volunteers").
+        </p>
+
+        <p>
+          <strong>
+            Please read the Volunteer Agreement carefully. By continuing to use
+            the Website, you agree that you have read and are bound by this
+            Volunteer Agreement. If you do not agree to this Volunteer
+            Agreement, you must not use the Website.
+          </strong>
+        </p>
+
+        <accordion>
+          <accordion-item label="Volunteer Capacity">
+            <p>
+              You have agreed to work as a volunteer for UPchieve and do so of
+              your own volition, and any services you perform under this
+              Agreement will be performed strictly in a volunteer capacity. You
+              acknowledge that, as a volunteer, your time and service in this
+              capacity are given without promise, expectation or receipt of any
+              form of compensation, benefits or other remuneration by UPchieve
+              or any other person or entity.
+            </p>
+          </accordion-item>
+
+          <accordion-item label="Release">
+            <p>
+              You agree that you, your assignees, heirs, guardians and legal
+              representatives will not make any claim against or sue UPchieve or
+              its employees, officers, directors, agents or contractors for any
+              injury or damage resulting from the negligence or other acts,
+              however caused, by UPchieve or any of its employees, officers,
+              directors, agents, contractors, recipients of services provided by
+              UPchieve, or any other person in connection with your work as a
+              volunteer for UPchieve. YOU HEREBY RELEASE AND FOREVER DISCHARGE
+              UPCHIEVE AND ITS EMPLOYEES, OFFICERS, DIRECTORS, MEMBERS, AGENTS
+              AND CONTRACTORS FROM ALL ACTIONS, CLAIMS OR DEMANDS THAT YOU, YOUR
+              HEIRS, GUARDIANS AND LEGAL REPRESENTATIVES NOW HAVE OR MAY HAVE IN
+              THE FUTURE, FOR ANY AND ALL INJURY OR DAMAGE RESULTING FROM YOUR
+              WORK AS A VOLUNTEER FOR UPCHIEVE.
+            </p>
+          </accordion-item>
+
+          <accordion-item label="Indemnification">
+            <p>
+              You agree to indemnify, defend and hold harmless UPchieve and its
+              employees, officers, directors, agents, contractors and volunteers
+              from any loss, liability, damage, or cost it may incur due to or
+              in any way connected with your work as a volunteer for UPchieve,
+              whether caused by the negligence of UPchieve or otherwise.
+            </p>
+          </accordion-item>
+
+          <accordion-item label="Confidentiality">
+            <p>
+              In connection with your work as a volunteer for UPchieve, you
+              understand and acknowledge that you may receive (without regard to
+              intention, mode or medium of communication) information about the
+              individuals to whom UPchieve provides services. You shall treat
+              all such information as absolutely confidential, and will not
+              disclose such information to any person other than as strictly
+              necessary in connection with your work as a volunteer for
+              UPchieve.
+            </p>
+          </accordion-item>
+
+          <accordion-item label="Background Check">
+            <p>
+              You authorize UPchieve and/or any third party acting on UPchieve’s
+              behalf to conduct or otherwise carry out an investigation of your
+              background, references, character, past employment, consumer
+              reports, driving history, credit history, education, criminal
+              history and such other information that may be required in
+              connection with your application for volunteerism.
+            </p>
+          </accordion-item>
+
+          <accordion-item label="Property Rights">
+            <p>
+              You understand and agree that any materials or tools provided by
+              or on behalf of UPchieve are and shall remain the property of
+              UPchieve. No licenses or rights under any patent, copyright,
+              trademark, trade name, trade secret or other intellectual property
+              are granted or are implied to be granted to you or any other
+              person by reason of this Agreement or your work as a volunteer for
+              UPchieve.
+            </p>
+          </accordion-item>
+
+          <accordion-item label="Termination">
+            <p>
+              You agree that UPchieve may terminate this Agreement, and/or your
+              participation as a volunteer for UPchieve, at any time, without
+              notice or cause.
+            </p>
+          </accordion-item>
+
+          <accordion-item label="Interpretation">
+            <p>
+              Whenever possible, each provision of this Agreement will be
+              interpreted in such manner as to be effective and valid under
+              applicable law, but if any provision of this Agreement is held to
+              be invalid, illegal, or unenforceable in any respect under any
+              applicable law or rule, such invalidity, illegality or
+              unenforceability will not affect any other provision or the
+              enforcement of such provision, and such invalid, void or otherwise
+              unenforceable provisions shall be null and void. To the fullest
+              extent permitted by law, any invalid, void or otherwise
+              enforceable provisions shall be automatically replaced by other
+              provisions which are as similar as possible to such terms but are
+              valid and enforceable.
+            </p>
+          </accordion-item>
+
+          <accordion-item label="Jurisdiction & Waiver of Jury Trial">
+            <p>
+              This Agreement shall be governed and construed in accordance with
+              the laws of the State of New York, without regard to the laws of
+              conflict of laws. You agree that any dispute regarding the
+              interpretation or validity of, or otherwise arising out of this
+              Agreement, shall be subject to the exclusive jurisdiction of the
+              federal or state courts located in New York, New York, and you
+              hereby agree to submit to the personal and exclusive jurisdiction
+              and venue of such courts and not to seek the transfer of any case
+              or proceeding out of such courts. YOU HEREBY IRREVOCABLY WAIVE ANY
+              AND ALL RIGHT TO TRIAL BY JURY IN ANY LEGAL PROCEEDING ARISING OUT
+              OF OR RELATING TO THIS AGREEMENT.
+            </p>
+          </accordion-item>
+
+          <accordion-item label="Amendments">
+            <p>
+              This Agreement represents the entire understanding and agreement
+              relating to your work as a volunteer for UPchieve and the matters
+              contained herein, and may only be amended, modified or waived by a
+              separate writing executed by UPchieve and you expressly setting
+              forth such amendment, modification or waiver.
             </p>
           </accordion-item>
         </accordion>
