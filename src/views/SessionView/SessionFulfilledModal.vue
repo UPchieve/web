@@ -19,7 +19,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      mobileMode: "app/mobileMode",
+      mobileMode: "app/mobileMode"
     }),
     message() {
       return (
