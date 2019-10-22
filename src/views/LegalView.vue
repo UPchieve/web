@@ -47,7 +47,7 @@
 
         <p>
           <strong
-            >Please read the User Agreement carefully. By continuing to use the
+            >Please read the Terms carefully. By continuing to use the
             Services, you agree that you have read and are bound by these Terms.
             If you do not agree to these Terms, you must not use the Website or
             engage in UPchieve’s Services.</strong
