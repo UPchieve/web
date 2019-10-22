@@ -256,7 +256,9 @@
             </p>
           </accordion-item>
 
-          <accordion-item label="How We Will Resolve Conflicts Between Us Concerning the Services ">
+          <accordion-item
+            label="How We Will Resolve Conflicts Between Us Concerning the Services"
+          >
             <p>
               <strong>DISPUTE RESOLUTION -- VENUE.</strong> You agree to be
               subject to the jurisdiction of New York. You agree that any
@@ -470,7 +472,8 @@
             </ul>
           </accordion-item>
 
-          <accordion-item label="How We Collect and Store Your Personal Information">
+          <accordion-item
+            label="How We Collect and Store Your Personal Information">
             <p>We collect information about you in the following ways:</p>
 
             <ul>
@@ -593,7 +596,9 @@
             </p>
           </accordion-item>
 
-          <accordion-item label="We May Share Your Personal Information For Safety or Legal Reasons">
+          <accordion-item
+            label="We May Share Your Personal Information For Safety or Legal Reasons"
+          >
             <p>
               If we have reason to believe that disclosing your personal
               information is required by law, is reasonable to protect someone
@@ -783,7 +788,7 @@
       </section>
     </full-text-template>
   </div>
-</template>;
+</template>
 
 
 <script>
