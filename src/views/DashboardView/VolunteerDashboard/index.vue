@@ -1,7 +1,13 @@
 <template>
   <div class="volunteer-dashboard">
     <dashboard-banner>
-      <large-button v-if="isNewVolunteer" primary reverse @click.native="goToCoachGuide">Getting Started</large-button>
+      <large-button
+        v-if="isNewVolunteer"
+        primary
+        reverse
+        @click.native="goToCoachGuide"
+        >Getting Started</large-button
+      >
     </dashboard-banner>
 
     <div class="volunteer-dashboard__body">
