@@ -308,6 +308,7 @@ export default {
       );
 
       AuthService.register(this, {
+        isVolunteer: true,
         code: RegistrationService.data.registrationCode,
         email: this.credentials.email,
         password: this.credentials.password,
