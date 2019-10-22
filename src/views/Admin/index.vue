@@ -2,7 +2,7 @@
   <div class="admin-view">
     <div class="header">Admin Dashboard</div>
     <div class="admin-directory">
-      <router-link to="admin/volunteer-coverage" class="admin-link btn"
+      <router-link to="/admin/volunteer-coverage" class="admin-link btn"
         >Volunteer Coverage</router-link
       >
       <router-link to="/edu" class="admin-link btn">Edu Admin</router-link>

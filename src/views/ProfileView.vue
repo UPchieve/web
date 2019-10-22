@@ -95,7 +95,7 @@
           </div>
 
           <div class="container-section resetBtn">
-            <router-link to="resetpassword" class="prompt"
+            <router-link to="/resetpassword" class="prompt"
               >Reset password</router-link
             >
           </div>
