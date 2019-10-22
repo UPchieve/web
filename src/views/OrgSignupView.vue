@@ -336,7 +336,9 @@ export default {
         this.invalidInputs.push("phone");
       }
       if (!this.formData.terms) {
-        this.errors.push("You must read and accept the user agreement and volunteer agreement.");
+        this.errors.push(
+          "You must read and accept the user agreement and volunteer agreement."
+        );
       }
 
       if (!this.errors.length) {
