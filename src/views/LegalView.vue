@@ -473,7 +473,8 @@
           </accordion-item>
 
           <accordion-item
-            label="How We Collect and Store Your Personal Information">
+            label="How We Collect and Store Your Personal Information"
+          >
             <p>We collect information about you in the following ways:</p>
 
             <ul>
@@ -789,7 +790,6 @@
     </full-text-template>
   </div>
 </template>
-
 
 <script>
 import { mapGetters } from "vuex";
