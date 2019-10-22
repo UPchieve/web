@@ -42,12 +42,12 @@
 
         <p>
           These Terms, together with our Privacy Policy and Disclaimer, form the
-          agreement with you regarding the use of the Website (the "Agreement").
+          agreement with you regarding the use of the Website (the "User Agreement").
         </p>
 
         <p>
           <strong
-            >Please read the Agreement carefully. By continuing to use the
+            >Please read the User Agreement carefully. By continuing to use the
             Services, you agree that you have read and are bound by these Terms.
             If you do not agree to these Terms, you must not use the Website or
             engage in UPchieve’s Services.</strong
@@ -332,8 +332,8 @@
           <accordion-item label="Changes to the Terms of Service">
             <p>
               <strong>TERMINATION BY US.</strong> We reserve the right to
-              terminate this Agreement in our sole discretion. We may terminate
-              this Agreement prior to sending you written notification. For
+              terminate this User Agreement in our sole discretion. We may terminate
+              this User Agreement prior to sending you written notification. For
               example, we will terminate the account of any User who threatens
               or harasses any other User.
             </p>
@@ -342,7 +342,7 @@
               <strong>MODIFICATIONS.</strong> UPchieve reserves the right, at
               our discretion, to change, modify, add, or remove portions of the
               Terms at any time. Please check the Terms and other sections of
-              the Agreement periodically for changes. Your continued use of the
+              the User Agreement periodically for changes. Your continued use of the
               Website after the posting of changes constitutes your binding
               acceptance of such changes. For any material changes to the Terms,
               UPchieve will make reasonable effort to provide notice to you of
