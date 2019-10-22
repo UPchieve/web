@@ -9,7 +9,7 @@
       </div>
 
       <form
-        v-if="formStep === 1"
+        v-if="formStep === 'step-1'"
         class="uc-form-body"
         @submit.prevent="formStepTwo()"
       >
@@ -81,7 +81,7 @@
         <div v-if="serverErrorMsg !== ''">{{ serverErrorMsg }}</div>
       </form>
       <form
-        v-if="formStep === 2"
+        v-if="formStep === 'step-2'"
         class="uc-form-body"
         @submit.prevent="submitSignupForm()"
       >
@@ -198,6 +198,7 @@
 
         <div v-if="serverErrorMsg !== ''">{{ serverErrorMsg }}</div>
       </form>
+      <div v-if="formStep === 'success'" class="uc-form-body">You've been sent a verification email! Check your work email for a link to confirm your account.</div>
     </div>
   </form-page-template>
 </template>
@@ -233,7 +234,7 @@ export default {
         name: "",
         requiredEmailDomains: []
       },
-      formStep: 1,
+      formStep: "step-1",
       formData: {
         email: "",
         password: "",
@@ -299,7 +300,7 @@ export default {
         password: this.formData.password
       })
         .then(() => {
-          this.formStep = 2;
+          this.formStep = "step-2";
           this.serverErrorMsg = "";
         })
         .catch(err => {
@@ -334,7 +335,33 @@ export default {
         this.errors.push("You must read and accept the user agreement.");
       }
 
-      // console.log(this.formData);
+      if (!this.errors.length) {
+        this.register()
+      }
+    },
+
+    register() {
+      // convert phone number
+      this.formData.phone = phoneValidation.convertPhoneNumber(
+        this.formData.phone
+      );
+
+      AuthService.register(this, {
+        isVolunteer: true,
+        volunteerPartnerOrg: this.$route.params.orgId,
+        email: this.formData.email,
+        password: this.formData.password,
+        firstName: this.formData.firstName,
+        lastName: this.formData.lastName,
+        phone: this.formData.phone,
+        terms: this.formData.terms
+      })
+        .then(msg => {
+          this.formStep = "success";
+        })
+        .catch(err => {
+          this.serverErrorMsg = err.message;
+        });
     }
   }
 };
