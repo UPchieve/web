@@ -24,9 +24,9 @@ export default {
     message() {
       return (
         (this.modalData.isSessionEnded
-          ? "This session has already ended."
+          ? "The student has already ended their session."
           : "Another volunteer has already joined this session.") +
-        " We apologize for the inconvenience. Thank you for volunteering with UPchieve!"
+        " Thanks for trying, we really appreciate it!"
       );
     }
   },
