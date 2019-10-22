@@ -26,7 +26,7 @@ import SubjectSelectionModal from "@/views/DashboardView/StudentDashboard/Subjec
 import SessionFulfilledModal from "@/views/SessionView/SessionFulfilledModal";
 
 export default {
-  components: { ModalTemplate, RejoinSessionModal, SubjectSelectionModal },
+  components: { ModalTemplate, RejoinSessionModal, SubjectSelectionModal, SessionFulfilledModal },
   data() {
     return {
       enableAccept: false

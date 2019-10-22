@@ -147,12 +147,13 @@ export default {
       });
   },
   sockets: {
-    bump: function() {
+    bump: function(data) {
       this.$store.dispatch("app/modal/show", {
         component: SessionFulfilledModal,
         data: {
           acceptText: "Return to Dashboard",
-          alertModal: true
+          alertModal: true,
+          isSessionEnded: !!data.endedAt
         }
       });
     },

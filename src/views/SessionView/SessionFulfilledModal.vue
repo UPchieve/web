@@ -20,11 +20,10 @@ export default {
   computed: {
     ...mapGetters({
       mobileMode: "app/mobileMode",
-      isSessionOver: "user/isSessionOver"
     }),
     message() {
       return (
-        (this.isSessionOver
+        (this.modalData.isSessionEnded
           ? "This session has already ended."
           : "Another volunteer has already joined this session.") +
         " We apologize for the inconvenience. Thank you for volunteering with UPchieve!"
