@@ -23,6 +23,7 @@ import ProfileView from "./views/ProfileView";
 import CalendarView from "./views/CalendarView";
 import AdminView from "./views/Admin";
 import VolunteerCoverage from "./views/Admin/VolunteerCoverage";
+import VolunteerGuideView from "./views/VolunteerGuideView";
 
 import store from "./store";
 
@@ -198,6 +199,12 @@ const routes = [
     name: "VolunteerCoverage",
     component: VolunteerCoverage,
     meta: { protected: true, requiresAdmin: true }
+  },
+  {
+    path: "/coach-guide",
+    name: "VolunteerGuide",
+    component: VolunteerGuideView,
+    meta: { protected: true }
   },
   {
     path: "/edu", // TODO: make this be "/admin/edu"
