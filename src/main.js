@@ -22,7 +22,7 @@ Vue.component("vue-headful", VueHeadful);
 // Set up vue-select
 Vue.component("v-select", vSelect);
 
-// Set up vue-phone-number input
+// Set up vue-phone-number-input
 Vue.component("vue-phone-number-input", VuePhoneNumberInput);
 
 // Create Vue instance
