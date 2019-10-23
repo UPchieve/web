@@ -253,9 +253,10 @@ export default {
         // mark field invalid
         if (
           !this.user.phonePretty ||
-          !phoneValidation.validatePhoneNumber(this.user.phonePretty)
+          (!phoneValidation.validatePhoneNumber(this.user.phonePretty) &&
+            this.user.phonePretty[0] !== "+")
         ) {
-          this.errors.push("Please enter a valid U. S. phone number.");
+          this.errors.push("Please enter a valid U.S. phone number.");
           this.invalidInputs.push("phone");
         }
         // a college name is required
