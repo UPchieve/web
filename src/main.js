@@ -3,6 +3,8 @@ import VueSocketIO from "vue-socket.io";
 import VueRouter from "vue-router";
 import VueHeadful from "vue-headful";
 import vSelect from "vue-select";
+import VuePhoneNumberInput from "vue-phone-number-input";
+
 import App from "./components/App";
 import router from "./router";
 import store from "./store";
@@ -19,6 +21,9 @@ Vue.component("vue-headful", VueHeadful);
 
 // Set up vue-select
 Vue.component("v-select", vSelect);
+
+// Set up vue-phone-number input
+Vue.component("vue-phone-number-input", VuePhoneNumberInput);
 
 // Create Vue instance
 new Vue({
