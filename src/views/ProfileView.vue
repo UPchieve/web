@@ -35,10 +35,10 @@
           <div v-if="user.isVolunteer">
             <div id="phone" class="container-section">
               <div class="prompt">Your Phone Number</div>
-              <div v-show="!activeEdit" class="answer">
+              <div v-show="!activeEdit && user.phonePretty" class="answer">
                 {{ internationalPhoneInfo.number }}
               </div>
-              <div v-show="!user.phone && !activeEdit" class="answer">
+              <div v-show="!user.phonePretty && !activeEdit" class="answer">
                 (None given)
               </div>
 
@@ -178,7 +178,7 @@ export default {
       return user.firstname || (user.isVolunteer ? "volunteer" : "student");
     },
     internationalPhoneInfo() {
-      if (!this.user.isVolunteer) return null;
+      if (!this.user.isVolunteer || !this.user.phonePretty) return false;
 
       const num =
         this.user.phonePretty[0] === "+"
