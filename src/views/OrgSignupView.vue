@@ -171,8 +171,8 @@
             :error="
               invalidInputs.indexOf('phone') > -1 && !phoneInputInfo.isValid
             "
-            :color="'#555'"
-            :valid-color="'#16ba97'"
+            color="#555"
+            valid-color="#16ba97"
             @update="onPhoneInputUpdate"
           />
           <p class="uc-form-subtext">
