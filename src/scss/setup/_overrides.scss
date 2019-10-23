@@ -21,3 +21,7 @@ $vs-border-color: $c-border-grey;
     }
   }
 }
+
+.profile #VuePhoneNumberInput_phone_number {
+  margin-left: -1px !important;
+}
