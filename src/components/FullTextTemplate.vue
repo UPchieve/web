@@ -57,7 +57,7 @@ export default {
     font-size: 18px;
     margin: 0 0 15px;
   }
-  
+
   p {
     margin-bottom: 20px;
   }

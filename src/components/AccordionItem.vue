@@ -1,10 +1,20 @@
 <template>
   <div class="accordion-item" :class="{ 'accordion-item--open': isOpen }">
-    <div class="accordion-item__title" :class="{ 'accordion-item__title--open': isOpen }" @click="toggle">
-      <span class="accordion-item__bullet" :class="{ 'accordion-item__bullet--open': isOpen }"></span>
+    <div
+      class="accordion-item__title"
+      :class="{ 'accordion-item__title--open': isOpen }"
+      @click="toggle"
+    >
+      <span
+        class="accordion-item__bullet"
+        :class="{ 'accordion-item__bullet--open': isOpen }"
+      ></span>
       <span>{{ label }}</span>
     </div>
-    <div class="accordion-item__content" :class="{ 'accordion-item__content--open': isOpen }">
+    <div
+      class="accordion-item__content"
+      :class="{ 'accordion-item__content--open': isOpen }"
+    >
       <slot />
     </div>
   </div>
@@ -21,7 +31,7 @@ export default {
   data() {
     return {
       isOpen: false
-    }
+    };
   },
   methods: {
     toggle() {
@@ -75,7 +85,7 @@ export default {
     }
 
     &:after {
-      content: '';
+      content: "";
       position: absolute;
       display: block;
       height: 6px;
