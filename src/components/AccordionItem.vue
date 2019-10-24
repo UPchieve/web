@@ -1,9 +1,10 @@
 <template>
-  <div class="accordion-item">
-    <div class="accordion-item__title" @click="slideToggle">
-      <span :class="accordionItemBulletClasses">▸</span>{{ label }}
+  <div class="accordion-item" :class="{ 'accordion-item--open': isOpen }">
+    <div class="accordion-item__title" :class="{ 'accordion-item__title--open': isOpen }" @click="toggle">
+      <span class="accordion-item__bullet" :class="{ 'accordion-item__bullet--open': isOpen }"></span>
+      <span>{{ label }}</span>
     </div>
-    <div :class="accordionItemContentClasses">
+    <div class="accordion-item__content" :class="{ 'accordion-item__content--open': isOpen }">
       <slot />
     </div>
   </div>
@@ -19,23 +20,12 @@ export default {
   },
   data() {
     return {
-      accordionItemBulletClasses: {
-        "accordion-item__bullet": true,
-        "accordion-item__bullet--active": false
-      },
-      accordionItemContentClasses: {
-        "accordion-item__content": true,
-        "accordion-item__content--active": false
-      }
-    };
+      isOpen: false
+    }
   },
   methods: {
-    slideToggle() {
-      this.accordionItemBulletClasses["accordion-item__bullet--active"] = !this
-        .accordionItemBulletClasses["accordion-item__bullet--active"];
-      this.accordionItemContentClasses[
-        "accordion-item__content--active"
-      ] = !this.accordionItemContentClasses["accordion-item__content--active"];
+    toggle() {
+      this.isOpen = !this.isOpen;
     }
   }
 };
@@ -44,37 +34,74 @@ export default {
 <style lang="scss" scoped>
 .accordion-item {
   overflow: hidden;
-}
-.accordion-item__title {
-  background: $c-backdrop;
-  padding: 16px 20px;
-  font-weight: bold;
-  border-bottom: 2px solid $c-shadow-header;
-}
-.accordion-item__title:hover {
-  cursor: pointer;
-  background: $c-backdrop-clear;
-}
-.accordion-item__bullet {
-  margin-right: 8px;
-  position: relative;
-  display: inline-block;
-  transition: all 0.2s ease-in-out;
-}
-.accordion-item__bullet--active {
-  transform: rotate(90deg);
-}
-.accordion-item__content {
-  background: $c-backdrop-clear;
-  transition: all 0.2s ease-in-out;
-  padding: 0 20px;
-  height: 0;
-}
-.accordion-item__content--active {
-  padding: 20px 20px;
-  height: auto;
-}
-.accordion-item__content p:last-child {
-  margin-bottom: 0;
+
+  &:not(:last-of-type) {
+    border-bottom: 1px solid $c-border-grey;
+  }
+
+  &__title {
+    font-size: 16px;
+    padding: 24px 0;
+    cursor: pointer;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+
+    &--open {
+      color: $c-success-green;
+    }
+  }
+
+  &__bullet {
+    margin-right: 15px;
+    position: relative;
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: solid 1px $c-soft-black;
+    border-radius: 100%;
+    text-align: center;
+    padding-top: 4px;
+
+    &--open {
+      background: $c-success-green;
+      border-color: $c-success-green;
+      color: #fff;
+
+      &:after {
+        border-color: #fff !important;
+        transform: translateY(calc(-50% + 1px)) translateX(-50%) rotate(225deg) !important;
+      }
+    }
+
+    &:after {
+      content: '';
+      position: absolute;
+      display: block;
+      height: 6px;
+      width: 6px;
+      top: calc(50%);
+      left: 50%;
+      transform: translateY(calc(-50% - 1px)) translateX(-50%) rotate(45deg);
+      border: solid 1px #000;
+      border-left: none;
+      border-top: none;
+    }
+  }
+
+  &__content {
+    padding: 0;
+    height: 0;
+    font-size: 14px;
+
+    &--open {
+      padding: 0 20px 25px 39px;
+      height: auto;
+    }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+  }
 }
 </style>
