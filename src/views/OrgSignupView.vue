@@ -163,15 +163,17 @@
           <label for="phoneNumber" class="uc-form-label"
             >What's your phone number?</label
           >
-          <input
+          <vue-phone-number-input
             id="phoneNumber"
-            type="tel"
-            class="uc-form-input"
-            v-bind:class="{
-              'uc-form-input--invalid': invalidInputs.indexOf('phone') > -1
-            }"
+            class="phone-input"
             v-model="formData.phone"
-            required
+            :required="true"
+            :error="
+              invalidInputs.indexOf('phone') > -1 && !phoneInputInfo.isValid
+            "
+            color="#555"
+            valid-color="#16ba97"
+            @update="onPhoneInputUpdate"
           />
           <p class="uc-form-subtext">
             We only use this to notify you of incoming student requests. You can
@@ -214,9 +216,8 @@ import FormPageTemplate from "@/components/FormPageTemplate";
 import AuthService from "@/services/AuthService";
 import NetworkService from "@/services/NetworkService";
 
-import phoneValidation from "@/utils/phone-validation";
-
 export default {
+  name: "org-signup-view",
   components: {
     FormPageTemplate
   },
@@ -247,6 +248,7 @@ export default {
         phone: "",
         terms: false
       },
+      phoneInputInfo: {},
       errors: [],
       invalidInputs: [],
       serverErrorMsg: ""
@@ -263,6 +265,10 @@ export default {
 
       const domain = email.split("@")[1];
       return domain && requiredDomains.indexOf(domain) >= 0;
+    },
+
+    onPhoneInputUpdate(phoneInputInfo) {
+      this.phoneInputInfo = phoneInputInfo;
     },
 
     formStepTwo() {
@@ -329,10 +335,8 @@ export default {
       if (!this.formData.phone) {
         this.errors.push("You must enter a phone number.");
         this.invalidInputs.push("phone");
-      } else if (!phoneValidation.validatePhoneNumber(this.formData.phone)) {
-        this.errors.push(
-          this.formData.phone + " is not a valid U.S. phone number."
-        );
+      } else if (!this.phoneInputInfo.isValid || !this.phoneInputInfo.e164) {
+        this.errors.push(this.formData.phone + " is not a valid phone number.");
         this.invalidInputs.push("phone");
       }
       if (!this.formData.terms) {
@@ -347,11 +351,6 @@ export default {
     },
 
     register() {
-      // convert phone number
-      this.formData.phone = phoneValidation.convertPhoneNumber(
-        this.formData.phone
-      );
-
       AuthService.register(this, {
         isVolunteer: true,
         volunteerPartnerOrg: this.$route.params.orgId,
@@ -359,7 +358,7 @@ export default {
         password: this.formData.password,
         firstName: this.formData.firstName,
         lastName: this.formData.lastName,
-        phone: this.formData.phone,
+        phone: this.phoneInputInfo.e164,
         terms: this.formData.terms
       })
         .then(() => {
@@ -404,6 +403,10 @@ export default {
     width: 100%;
     height: 45px;
   }
+}
+
+.phone-input {
+  margin: 10px 0 2px;
 }
 
 .step-errors {
