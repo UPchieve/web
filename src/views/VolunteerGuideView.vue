@@ -26,7 +26,7 @@
           </p>
 
           <div class="block-section">
-            <strong>Quick Tips:</strong>
+            <p><strong>Quick Tips:</strong></p>
             <ul>
               <li>
                 <strong>Want to get more requests?</strong> Students are most
@@ -52,7 +52,7 @@
           </p>
 
           <div class="block-section">
-            <strong>Quick Tips:</strong>
+            <p><strong>Quick Tips:</strong></p>
             <ul>
               <li>
                 <strong>Want to get more requests?</strong> Algebra and Geometry
@@ -101,7 +101,7 @@
           </p>
 
           <div class="block-section">
-            <strong>Quick Tips:</strong>
+            <p><strong>Quick Tips:</strong></p>
             <ul>
               <li>
                 <strong>Not sure how much time you have?</strong> No problem!
@@ -204,7 +204,7 @@
           </div>
 
           <div class="block-section">
-            <strong>Quick Tips:</strong>
+            <p><strong>Quick Tips:</strong></p>
             <ul>
               <li>
                 <strong>Need to step away for a few mins?</strong> Don’t forget
@@ -241,7 +241,158 @@
             generalizing the approaches that you teach them so they can apply it
             to other problems.
           </p>
+
+          <div class="block-section">
+            <p>
+              <strong>Here’s how a typical tutoring session might go:</strong>
+            </p>
+
+            <ol>
+              <li>
+                Start with identifying the problem type.
+                <ul>
+                  <li>
+                    (“It seems like this is about solving a system of linear
+                    equations. Is that what you covered in class today?”)
+                  </li>
+                </ul>
+              </li>
+              <li>
+                Ask them if they know the relevant definitions or formulas.
+                <ul>
+                  <li>
+                    (“This is the formula you use to find the area of a circle.
+                    Does it look familiar to you?”)
+                  </li>
+                </ul>
+              </li>
+              <li>
+                Ask them if they know what the first (or second or third) step
+                is.
+                <ul>
+                  <li>
+                    If they do, have them complete it on the whiteboard.
+                  </li>
+                  <li>
+                    If they don’t, tell them, and ask them if they know how to
+                    complete that step.
+                  </li>
+                  <li>
+                    (“So the first step is to calculate the degree of the
+                    numerator. Do you know how to do that?)
+                  </li>
+                </ul>
+              </li>
+              <li>
+                Guide them through the problem step-by-step, explaining relevant
+                concepts and trying to generalize where possible so they can
+                solve similar problems.
+                <ul>
+                  <li>
+                    (“Anytime you need to find the asymptote, you will start by
+                    comparing the degree of the numerator and denominator.
+                    There’s only 3 possible cases / rules that you need to
+                    memorize!”)
+                  </li>
+                </ul>
+              </li>
+              <li>
+                Stop them when they start to go wrong. Try to explain why what
+                they did was wrong and ask them if it makes sense.
+                <ul>
+                  <li>
+                    (“Almost! There’s one more number that needs to be excluded
+                    from the domain though because it leads to division by 0.”)
+                  </li>
+                </ul>
+              </li>
+              <li>
+                At the end of the problem, ask a student if they know what the
+                answer is now and check their final answer.
+                <ul>
+                  <li>
+                    “That’s correct, awesome job!”
+                  </li>
+                </ul>
+              </li>
+            </ol>
+          </div>
+
+          <div class="block-section">
+            <p><strong>Quick Tips:</strong></p>
+            <ul>
+              <li>
+                <strong>Can I give the student the answer?</strong>
+                Try your best to lead the student to the answer instead. You can
+                check answers (that is, tell them if it is right or wrong), but
+                generally you should not give them the answer.
+              </li>
+              <li>
+                <strong>How do I know what the student already knows?</strong>
+                Check what they’ve covered so far in class, and ask if the
+                methods you’re showing them look familiar. Don’t assume they’ve
+                already learned anything.
+              </li>
+              <li>
+                <strong>What if I’m stuck?</strong>
+                When in doubt, Google liberally. We promise you’re better at
+                Googling than the student, and a few minutes is worth making
+                sure you’re giving them accurate advice! If you really can’t
+                figure it out, you can apologize and let them know you’re not
+                sure.
+              </li>
+            </ul>
+          </div>
         </accordion-item>
+      </div>
+    </section>
+    <section>
+      <div class="block-section">
+        <h2>Feedback & technical issues</h2>
+        <p>
+          UPchieve is a small nonprofit start-up, so we apologize ahead of time
+          for any bugs you encounter or anything that doesn’t work as well as
+          we’d like it to yet. You can help us improve in several ways:
+        </p>
+        <ul>
+          <li>
+            Fill out the feedback form after every session, especially if you
+            encounter a bug, needed a special feature we don’t have yet, or got
+            positive feedback from a student. Tell us what they said!
+          </li>
+          <li>
+            Submit the
+            <router-link to="/contact">contact form</router-link> when you
+            encounter a bug outside of a session.
+          </li>
+          <li>
+            Respond to all the surveys we email you. We promise we read every
+            response and take your feedback seriously!
+          </li>
+        </ul>
+      </div>
+      <div class="block-section">
+        <p><strong>Quick Tips:</strong></p>
+        <ul>
+          <li>
+            <strong>How can I better help you fix bugs?</strong>
+            Take screenshots of bugs whenever possible. Try to include as much
+            detail as possible about what you did leading up to the bug. Tell us
+            what device and browser you were using too!
+          </li>
+          <li>
+            <strong>Are there other ways to help UPchieve?</strong>
+            Yes! You can help us recruit more coaches,
+            <a href="https://secure.givelively.org/donate/upchieve"
+              >make a donation</a
+            >, or check out
+            <a href="https://upchieve.org/volunteer"
+              >our other volunteer opportunities</a
+            >. If you have an idea of how you can help that’s not listed, feel
+            free to reach out via the
+            <router-link to="/contact">contact form</router-link>!
+          </li>
+        </ul>
       </div>
     </section>
   </full-text-template>
@@ -255,8 +406,8 @@
 
   <router-link to="/calendar">Schedule</router-link>
 
-          <p>
-            <strong>Quick Tips:</strong>
+          <div class="block-section">
+            <p><strong>Quick Tips:</strong></p>
             <ul>
               <li>
                 <strong></strong>
@@ -265,7 +416,7 @@
                 <strong></strong>
               </li>
             </ul>
-          </p>
+          </div>
     
 -->
 </template>
