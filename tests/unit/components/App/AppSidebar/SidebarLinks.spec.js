@@ -52,10 +52,10 @@ const links = {
       DASHBOARD_LINK,
       TRAINING_LINK,
       CALENDAR_LINK,
+      GUIDE_LINK,
       PROFILE_LINK,
       CONTACT_LINK,
-      LEGAL_LINK,
-      GUIDE_LINK
+      LEGAL_LINK
     ],
     admin: [
       DASHBOARD_LINK,
