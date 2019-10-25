@@ -1,6 +1,9 @@
 <template>
   <div class="full-text-template">
-    <div class="full-text-template__header">{{ headerTitle }}</div>
+    <div v-if="headerTitle" class="full-text-template__header">
+      {{ headerTitle }}
+    </div>
+    <div v-if="ledeText" class="full-text-template__lede">{{ ledeText }}</div>
     <div class="full-text-template__content">
       <slot />
     </div>
@@ -11,6 +14,10 @@
 export default {
   props: {
     headerTitle: {
+      type: String,
+      default: ""
+    },
+    ledeText: {
       type: String,
       default: ""
     }
@@ -39,6 +46,12 @@ export default {
     font-size: 24px;
     font-weight: 500;
     text-align: left;
+  }
+
+  &__lede {
+    text-align: left;
+    font-size: 16px;
+    margin: 10px 0;
   }
 
   &__content {
