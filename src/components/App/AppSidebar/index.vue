@@ -104,7 +104,7 @@ $transition: transform 700ms;
 .AppSidebar-final-link {
   @include font-category("display-small");
   cursor: pointer;
-  margin-top: 40px;
+  margin: 40px 0 20px;
 
   &--desktop {
     @include font-category("button");
