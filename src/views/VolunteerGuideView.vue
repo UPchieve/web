@@ -1,7 +1,7 @@
 <template>
   <full-text-template
     header-title="Welcome to UPchieve!"
-    lede-text="This guide will help make sure you are prepared to help students on our platform!"
+    lede-text="This guide will help make sure you are prepared to support students on our platform!"
   >
     <section>
       <h2>Become an "Active" Coach</h2>

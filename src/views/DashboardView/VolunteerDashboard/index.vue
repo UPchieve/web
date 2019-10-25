@@ -6,7 +6,7 @@
         primary
         reverse
         @click.native="goToCoachGuide"
-        >Getting Started</large-button
+        >Get Started</large-button
       >
     </dashboard-banner>
 
