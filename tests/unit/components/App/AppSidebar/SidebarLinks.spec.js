@@ -20,6 +20,7 @@ const TRAINING_LINK = {
   icon: "graduation-cap",
   text: "Training"
 };
+const GUIDE_LINK = { to: "/coach-guide", icon: "book", text: "Coach Guide" };
 
 // Admin links
 const ADMIN_LINK = { to: "/admin", icon: "folder", text: "Admin" };
@@ -53,7 +54,8 @@ const links = {
       CALENDAR_LINK,
       PROFILE_LINK,
       CONTACT_LINK,
-      LEGAL_LINK
+      LEGAL_LINK,
+      GUIDE_LINK
     ],
     admin: [
       DASHBOARD_LINK,

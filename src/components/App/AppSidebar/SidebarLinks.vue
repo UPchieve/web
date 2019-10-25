@@ -28,6 +28,12 @@
         icon="calendar"
         text="Schedule"
       />
+      <sidebar-link
+        v-if="isVolunteer"
+        to="/coach-guide"
+        icon="book"
+        text="Coach Guide"
+      />
       <sidebar-link v-if="isAdmin" to="/admin" icon="folder" text="Admin" />
       <sidebar-link to="/profile" icon="portrait" text="Profile" />
       <sidebar-link
