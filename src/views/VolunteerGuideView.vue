@@ -137,7 +137,10 @@
           </p>
 
           <p>
-            [SCREENSHOT FROM DECK HERE]
+            <img
+              style="max-height: 350px; max-width: 100%; margin: 10px 0 20px;"
+              src="~@/assets/example-session-screenshot.png"
+            />
           </p>
 
           <p>
