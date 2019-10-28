@@ -2,7 +2,7 @@ Links
 -----
 - Task: _link to Notion task (or remove this line)_
 - Server repo PR: _link to companion PR in server repo (or remove this line)_
-- Dependancy PRs: _links to PRs that must be merged prior this one (or remove this line)_
+- Dependency PRs: _links to PRs that must be merged prior this one (or remove this line)_
 
 Description
 -----------
