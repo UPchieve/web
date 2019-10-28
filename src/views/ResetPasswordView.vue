@@ -4,11 +4,11 @@
       <div class="uc-form-header">
         <div class="uc-form-header-link--active">Reset Your Password</div>
         <div class="link-container">
-          <router-link to="login" class="uc-form-header-link"
+          <router-link to="/login" class="uc-form-header-link"
             >Log In</router-link
           >
           <div>/</div>
-          <router-link to="signup" class="uc-form-header-link"
+          <router-link to="/signup" class="uc-form-header-link"
             >Sign Up</router-link
           >
         </div>

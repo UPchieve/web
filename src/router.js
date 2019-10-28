@@ -7,6 +7,7 @@ import LegalView from "./views/LegalView";
 import LogoutView from "./views/LogoutView";
 import LoginView from "./views/LoginView";
 import SignupView from "./views/SignupView";
+import OrgSignupView from "./views/OrgSignupView";
 import ResetPasswordView from "./views/ResetPasswordView";
 import SetPasswordView from "./views/SetPasswordView";
 import OnboardingView from "./views/OnboardingView";
@@ -22,6 +23,7 @@ import ProfileView from "./views/ProfileView";
 import CalendarView from "./views/CalendarView";
 import AdminView from "./views/Admin";
 import VolunteerCoverage from "./views/Admin/VolunteerCoverage";
+import VolunteerGuideView from "./views/VolunteerGuideView";
 
 import store from "./store";
 
@@ -85,6 +87,12 @@ const routes = [
     meta: { loggedOutOnly: true }
   },
   {
+    path: "/signup/:orgId",
+    name: "OrgSignupView",
+    component: OrgSignupView,
+    meta: { loggedOutOnly: true }
+  },
+  {
     path: "/resetpassword",
     name: "ResetPasswordView",
     component: ResetPasswordView
@@ -112,6 +120,12 @@ const routes = [
         next("/dashboard");
       }
     }
+  },
+  {
+    path: "/s/:sessionIdBase64",
+    name: "SessionView-compact",
+    component: SessionView,
+    meta: { protected: true }
   },
   {
     path: "/resources",
@@ -188,6 +202,12 @@ const routes = [
     name: "VolunteerCoverage",
     component: VolunteerCoverage,
     meta: { protected: true, requiresAdmin: true }
+  },
+  {
+    path: "/coach-guide",
+    name: "VolunteerGuide",
+    component: VolunteerGuideView,
+    meta: { protected: true }
   },
   {
     path: "/edu", // TODO: make this be "/admin/edu"

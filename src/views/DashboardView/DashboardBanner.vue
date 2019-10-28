@@ -8,17 +8,16 @@
       <h1 v-if="!mobileMode" class="DashboardBanner-greeting">
         Hello, {{ name }}!
       </h1>
-      <!-- <large-button primary reverse>Take a tour</large-button> -->
+
+      <slot></slot>
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
-// import LargeButton from "@/components/LargeButton";
 
 export default {
-  // components: { LargeButton },
   computed: {
     ...mapGetters({
       mobileMode: "app/mobileMode",

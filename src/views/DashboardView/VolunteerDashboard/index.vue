@@ -1,6 +1,14 @@
 <template>
   <div class="volunteer-dashboard">
-    <dashboard-banner />
+    <dashboard-banner>
+      <large-button
+        v-if="isNewVolunteer"
+        primary
+        reverse
+        @click.native="goToCoachGuide"
+        >Get Started</large-button
+      >
+    </dashboard-banner>
 
     <div class="volunteer-dashboard__body">
       <div class="students-waiting dashboard-card">
@@ -46,6 +54,7 @@ import { mapState, mapGetters } from "vuex";
 
 import ListSessions from "./ListSessions";
 import DashboardBanner from "../DashboardBanner";
+import LargeButton from "@/components/LargeButton";
 
 import { allSubtopicNames } from "@/utils/topics";
 
@@ -58,7 +67,7 @@ const upchieveTopics = allSubtopicNames();
 
 export default {
   name: "volunteer-dashboard",
-  components: { ListSessions, DashboardBanner },
+  components: { ListSessions, DashboardBanner, LargeButton },
   watch: {
     isSessionAlive(isAlive) {
       if (!isAlive) {
@@ -81,7 +90,12 @@ export default {
       isSessionAlive: "user/isSessionAlive",
       sessionPath: "user/sessionPath"
     }),
-    impactStats: function() {
+
+    isNewVolunteer() {
+      return this.user.pastSessions.length === 0;
+    },
+
+    impactStats() {
       const user = this.$store.state.user.user;
       // (1) Hours selected
       const userHasSchedule = _.chain(user)
@@ -152,6 +166,10 @@ export default {
       } else {
         this.$router.push("/");
       }
+    },
+
+    goToCoachGuide() {
+      this.$router.push("/coach-guide");
     }
   }
 };

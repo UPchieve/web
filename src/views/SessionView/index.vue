@@ -42,12 +42,15 @@
 
 <script>
 import { mapState, mapGetters } from "vuex";
+import base64url from "base64url";
 
 import SessionService from "@/services/SessionService";
 
 import SessionHeader from "./SessionHeader";
 import Whiteboard from "./Whiteboard";
 import SessionChat from "./SessionChat";
+
+import SessionFulfilledModal from "./SessionFulfilledModal";
 
 const headerData = {
   component: "SessionHeader"
@@ -109,7 +112,12 @@ export default {
     }
   },
   mounted() {
-    const id = this.$route.params.sessionId;
+    const id =
+      this.$route.path.indexOf("/s/") === -1
+        ? this.$route.params.sessionId
+        : base64url
+            .toBuffer(this.$route.params.sessionIdBase64)
+            .toString("hex");
     let promise;
 
     if (!id) {
@@ -134,8 +142,15 @@ export default {
       });
   },
   sockets: {
-    bump: function() {
-      this.$router.push("/");
+    bump: function(data) {
+      this.$store.dispatch("app/modal/show", {
+        component: SessionFulfilledModal,
+        data: {
+          acceptText: "Return to Dashboard",
+          alertModal: true,
+          isSessionEnded: !!data.endedAt
+        }
+      });
     },
     reconnect_attempt() {
       this.sessionReconnecting = true;
