@@ -19,7 +19,7 @@
               <div class="review">
                 <div class="review-container">
                   <div class="review-label">
-                    <a :href="reviewMaterials[category]" target="_blank"
+                    <a :href="reviewMaterials[categoryKeys[category]]" target="_blank"
                       >Review</a
                     >
                   </div>
