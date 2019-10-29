@@ -92,12 +92,11 @@ export default {
         return result;
       }, {});
 
-    const colors = {};
-    colors.esl = "#1855D1";
-    colors.math = "#F7AEF8";
-    colors["College Counseling"] = "#FED766";
-    colors.science = "#9575CD";
-    colors.default = "#36D2AA";
+    const supercategoryColors = {
+      "Math Tutoring": "#16D2AA",
+      "College Counseling": "#F1C026",
+      default: "#1855D1"
+    };
 
     const reviewMaterials = {};
     reviewMaterials.algebra =
@@ -122,7 +121,7 @@ export default {
       quizzes,
       bools,
       supercategories,
-      colors,
+      supercategoryColors,
       reviewMaterials,
       categoryKeys
     };
@@ -157,7 +156,7 @@ export default {
       return 0;
     },
     colorFor(supercategory) {
-      return this.colors[supercategory] || this.colors.default;
+      return this.supercategoryColors[supercategory] || this.supercategoryColors.default;
     }
   }
 };
