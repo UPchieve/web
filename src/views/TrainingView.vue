@@ -6,14 +6,14 @@
         <div
           class="supercategory"
           :style="{ backgroundColor: colorFor(supercategory) }"
-          @click="flipBool(supercategory)"
+          @click="toggleSupercategoryShown(supercategory)"
         >
           {{ supercategory }}
-          <div v-if="bools[supercategory]" class="arrow up" />
-          <div v-if="!bools[supercategory]" class="arrow down" />
+          <div v-if="supercategoryMenuDisplayStates[supercategory]" class="arrow up" />
+          <div v-if="!supercategoryMenuDisplayStates[supercategory]" class="arrow down" />
         </div>
         <div v-for="category in quizzes[supercategory]" :key="category">
-          <div v-show="bools[supercategory]" class="category">
+          <div v-show="supercategoryMenuDisplayStates[supercategory]" class="category">
             <div>
               {{ category }}
               <div class="review">
@@ -72,7 +72,7 @@ export default {
         return result;
       }, {});
 
-    const bools = Object.entries(topics)
+    const supercategoryMenuDisplayStates = Object.entries(topics)
       .map(([, topicObj]) => topicObj.displayName)
       .reduce((result, key) => {
         result[key] = false;
@@ -119,7 +119,7 @@ export default {
       "https://drive.google.com/open?id=1gXmbGRaUz324-EiZMzph1KUYS8WhR9ax";
     return {
       quizzes,
-      bools,
+      supercategoryMenuDisplayStates,
       supercategories,
       supercategoryColors,
       reviewMaterials,
@@ -130,9 +130,9 @@ export default {
     ...mapState({ user: state => state.user.user })
   },
   methods: {
-    flipBool(supercategory) {
-      const bool = this.bools[supercategory];
-      this.bools[supercategory] = !bool;
+    toggleSupercategoryShown(supercategory) {
+      const isShown = this.supercategoryMenuDisplayStates[supercategory];
+      this.supercategoryMenuDisplayStates[supercategory] = !isShown;
     },
     hasPassed(category) {
       if (this.user.certifications[this.categoryKeys[category]]) {
