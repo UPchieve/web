@@ -9,17 +9,28 @@
           @click="toggleSupercategoryShown(supercategory)"
         >
           {{ supercategory }}
-          <div v-if="supercategoryMenuDisplayStates[supercategory]" class="arrow up" />
-          <div v-if="!supercategoryMenuDisplayStates[supercategory]" class="arrow down" />
+          <div
+            v-if="supercategoryMenuDisplayStates[supercategory]"
+            class="arrow up"
+          />
+          <div
+            v-if="!supercategoryMenuDisplayStates[supercategory]"
+            class="arrow down"
+          />
         </div>
         <div v-for="category in quizzes[supercategory]" :key="category">
-          <div v-show="supercategoryMenuDisplayStates[supercategory]" class="category">
+          <div
+            v-show="supercategoryMenuDisplayStates[supercategory]"
+            class="category"
+          >
             <div>
               {{ category }}
               <div class="review">
                 <div class="review-container">
                   <div class="review-label">
-                    <a :href="reviewMaterials[categoryKeys[category]]" target="_blank"
+                    <a
+                      :href="reviewMaterials[categoryKeys[category]]"
+                      target="_blank"
                       >Review</a
                     >
                   </div>
@@ -156,7 +167,10 @@ export default {
       return 0;
     },
     colorFor(supercategory) {
-      return this.supercategoryColors[supercategory] || this.supercategoryColors.default;
+      return (
+        this.supercategoryColors[supercategory] ||
+        this.supercategoryColors.default
+      );
     }
   }
 };
