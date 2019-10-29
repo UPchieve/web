@@ -70,18 +70,14 @@ export default {
 
       for (let i = 0; i < socketSessions.length; i++) {
         const currentSession = socketSessions[i];
-        if (socketSessions[i].type === "college") {
-          results.push(currentSession);
-        } else {
-          const { subTopic } = currentSession;
+        const { subTopic } = currentSession;
 
-          if (
-            Object.keys(allSubtopics()).some(
-              s => s === subTopic && this.user.certifications[s].passed
-            )
-          ) {
-            results.push(currentSession);
-          }
+        if (
+          Object.keys(allSubtopics()).some(
+            s => s === subTopic && this.user.certifications[s].passed
+          )
+        ) {
+          results.push(currentSession);
         }
       }
 
