@@ -51,7 +51,7 @@
               <div v-if="hasPassed(category)" class="test-container certified">
                 Certified!
               </div>
-              <div class="numTries">
+              <div v-if="!hasPassed(category)" class="numTries">
                 You have used {{ getTries(category) }}/3 tries.
               </div>
             </div>
