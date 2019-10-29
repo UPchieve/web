@@ -522,18 +522,15 @@ button:hover {
   margin: 0 10px 0 0;
   color: #ffffff;
   font-size: 12px;
-}
-
-.ESL {
-  background-color: #1855d1;
+  background-color: #1855D1;
 }
 
 .COLLEGE {
-  background-color: #fed766;
+  background-color: #F1C026;
 }
 
 .MATH {
-  background-color: #f7aef8;
+  background-color: #16D2AA;
 }
 
 .errors {
