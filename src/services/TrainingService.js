@@ -16,7 +16,7 @@ export default {
     this.idCorrectAnswerMap = {};
     this.category = category;
     return NetworkService.getQuestions(context, { category }).then(res => {
-      this.questions = res.data.questions;
+      this.questions = res.data.questions || [];
       return this.questions.length;
     });
   },

@@ -33,6 +33,7 @@
           class="SubjectCard-dropdown"
           disabledOption="Choose a subject"
           :options="subtopics"
+          :optionDisplay="subtopicDisplayNames"
           :disabled="disabled"
         />
       </div>
@@ -84,6 +85,7 @@ export default {
     },
     topic: String,
     subtopics: Array,
+    subtopicDisplayNames: Object,
     buttonText: {
       type: String,
       default: "Start a chat"
@@ -111,6 +113,7 @@ export default {
             acceptText: "Start a chat",
             topic: this.topic,
             subtopics: this.subtopics,
+            subtopicDisplayNames: this.subtopicDisplayNames,
             svgUrl: this.svgUrl
           }
         });

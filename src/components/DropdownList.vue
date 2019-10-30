@@ -18,7 +18,7 @@
         disabledOption
       }}</option>
       <option v-for="(option, index) in options" :key="index" :value="option">{{
-        option
+        optionDisplay[option] || option
       }}</option>
     </select>
   </div>
@@ -32,7 +32,8 @@ export default {
     value: String,
     disabled: Boolean,
     disabledOption: String,
-    options: Array
+    options: Array,
+    optionDisplay: Object
   }
 };
 </script>

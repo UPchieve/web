@@ -56,24 +56,14 @@ import ListSessions from "./ListSessions";
 import DashboardBanner from "../DashboardBanner";
 import LargeButton from "@/components/LargeButton";
 
+import { allSubtopicNames } from "@/utils/topics";
+
 const headerData = {
   component: "RejoinSessionHeader",
   data: { important: true }
 };
 
-const upchieveTopics = [
-  "algebra",
-  "applications",
-  "biology",
-  "calculus",
-  "chemistry",
-  "esl",
-  "essays",
-  "geometry",
-  "planning",
-  "precalculus",
-  "trigonometry"
-];
+const upchieveTopics = allSubtopicNames();
 
 export default {
   name: "volunteer-dashboard",
@@ -137,7 +127,7 @@ export default {
 
       // (2) Certs obtained
       const certsObtained = _.filter(upchieveTopics, topic => {
-        return _.get(user, `${topic}.passed`, false);
+        return _.get(user, `certifications.${topic}.passed`, false);
       });
 
       const numCertsObtained = certsObtained.length;
