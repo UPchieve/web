@@ -104,8 +104,8 @@ export default {
       }, {});
 
     const supercategoryColors = {
-      "Math Tutoring": "#16D2AA",
-      "College Counseling": "#F1C026",
+      "Math Tutoring": "#ef9bf9",
+      "College Counseling": "#f3c639",
       default: "#1855D1"
     };
 
