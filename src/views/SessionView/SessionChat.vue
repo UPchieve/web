@@ -216,7 +216,7 @@ export default {
           picture = StudentAvatarUrl;
         }
       }
-      
+
       this.messages.push({
         contents: data.contents,
         name: data.name,
@@ -395,7 +395,7 @@ span {
       color: $c-soft-black;
     }
   }
-  
+
   .avatar {
     display: none;
   }
