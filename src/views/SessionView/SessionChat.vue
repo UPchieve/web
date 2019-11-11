@@ -387,13 +387,15 @@ span {
   float: right;
   display: flex;
   flex-direction: row-reverse;
+
   .contents {
-    padding-right: 10px;
     background-color: $c-background-blue;
+
     span {
       color: $c-soft-black;
     }
   }
+  
   .avatar {
     display: none;
   }
