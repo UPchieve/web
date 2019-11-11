@@ -35,18 +35,25 @@
           <div v-if="user.isVolunteer">
             <div id="phone" class="container-section">
               <div class="prompt">Your Phone Number</div>
-              <div v-show="!activeEdit" class="answer">
-                {{ user.phonePretty }}
+              <div v-show="!activeEdit && user.phonePretty" class="answer">
+                {{ internationalPhoneInfo.number }}
               </div>
-              <div v-show="!user.phone && !activeEdit" class="answer">
+              <div v-show="!user.phonePretty && !activeEdit" class="answer">
                 (None given)
               </div>
-              <input
+
+              <vue-phone-number-input
+                class="phone-input"
                 v-show="activeEdit"
-                v-model="user.phonePretty"
-                type="text"
-                class="form-control"
-                :class="{ invalid: invalidInputs.indexOf('phone') > -1 }"
+                v-model="phoneNational"
+                :default-country-code="internationalPhoneInfo.country"
+                :error="
+                  invalidInputs.indexOf('phone') > -1 && !phoneInputInfo.isValid
+                "
+                :required="true"
+                color="#555"
+                valid-color="#16ba97"
+                @update="onPhoneInputUpdate"
               />
 
               <div class="description">
@@ -95,7 +102,7 @@
           </div>
 
           <div class="container-section resetBtn">
-            <router-link to="resetpassword" class="prompt"
+            <router-link to="/resetpassword" class="prompt"
               >Reset password</router-link
             >
           </div>
@@ -123,22 +130,43 @@
 </template>
 
 <script>
+import PhoneNumber from "awesome-phonenumber";
 import { mapGetters, mapState } from "vuex";
 
 import UserService from "@/services/UserService";
-import phoneValidation from "@/utils/phone-validation";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
 import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 
+import { topics, allSubtopics } from "@/utils/topics";
+
 export default {
+  name: "profile-view",
   data() {
     return {
       activeEdit: false,
       editBtnMsg: "Edit",
       errors: [],
       invalidInputs: [],
-      saveFailed: false
+      saveFailed: false,
+      phoneNational: "",
+      phoneInputInfo: {}
     };
+  },
+  created() {
+    if (this.user.isVolunteer && this.user.phonePretty) {
+      const num =
+        this.user.phonePretty[0] === "+"
+          ? this.user.phonePretty
+          : `+1 ${this.user.phonePretty}`;
+      const pn = new PhoneNumber(num);
+      this.phoneNational = pn.getNumber("national");
+
+      // Hack to initially mock the vue-phone-number-input data
+      this.phoneInputInfo = {
+        isValid: true,
+        e164: pn.getNumber("international")
+      };
+    }
   },
   computed: {
     ...mapState({
@@ -151,6 +179,20 @@ export default {
       const user = this.$store.state.user.user;
       return user.firstname || (user.isVolunteer ? "volunteer" : "student");
     },
+    internationalPhoneInfo() {
+      if (!this.user.isVolunteer || !this.user.phonePretty) return false;
+
+      const num =
+        this.user.phonePretty[0] === "+"
+          ? this.user.phonePretty
+          : `+1 ${this.user.phonePretty}`;
+      const pn = new PhoneNumber(num);
+
+      return {
+        number: pn.getNumber("international"),
+        country: pn.getRegionCode()
+      };
+    },
     avatarStyle() {
       const user = this.$store.state.user.user;
       const avatarUrl =
@@ -161,72 +203,44 @@ export default {
       };
     },
     certKey() {
-      const certKey = {};
-      certKey.Algebra = "MATH";
-      certKey.Geometry = "MATH";
-      certKey.Trigonometry = "MATH";
-      certKey.Precalculus = "MATH";
-      certKey.Calculus = "MATH";
-      certKey.ESL = "ESL";
-      certKey.Planning = "COLLEGE";
-      certKey.Essays = "COLLEGE";
-      certKey.Applications = "COLLEGE";
-      return certKey;
+      return Object.entries(topics)
+        .flatMap(([key, topicObj]) => {
+          return Object.entries(topicObj.subtopics).map(([, subtopicObj]) => [
+            subtopicObj.displayName,
+            key.toUpperCase()
+          ]);
+        })
+        .reduce((result, [displayName, key]) => {
+          result[displayName] = key;
+          return result;
+        }, {});
     },
     certifications() {
       const user = this.$store.state.user.user;
 
-      const certifications = {};
-      if (user.algebra) {
-        if (user.algebra.passed) {
-          certifications.Algebra = true;
-        }
-      }
-      if (user.geometry) {
-        if (user.geometry.passed) {
-          certifications.Geometry = true;
-        }
-      }
-      if (user.trigonometry) {
-        if (user.trigonometry.passed) {
-          certifications.Trigonometry = true;
-        }
-      }
-      if (user.precalculus) {
-        if (user.precalculus.passed) {
-          certifications.Precalculus = true;
-        }
-      }
-      if (user.calculus) {
-        if (user.calculus.passed) {
-          certifications.Calculus = true;
-        }
-      }
-      if (user.esl) {
-        if (user.esl.passed) {
-          certifications.ESL = true;
-        }
-      }
-      if (user.planning) {
-        if (user.planning.passed) {
-          certifications.Planning = true;
-        }
-      }
-      if (user.essays) {
-        if (user.essays.passed) {
-          certifications.Essays = true;
-        }
-      }
-      if (user.applications) {
-        if (user.applications.passed) {
-          certifications.Applications = true;
-        }
-      }
+      const certifications = Object.keys(user.certifications).reduce(
+        (displayObj, key) => {
+          const subtopics = allSubtopics();
+
+          if (subtopics[key]) {
+            if (user.certifications[key].passed) {
+              displayObj[subtopics[key].displayName || subtopics[key]] = true;
+            }
+          }
+
+          return displayObj;
+        },
+        {}
+      );
 
       return certifications;
     }
   },
   methods: {
+    onPhoneInputUpdate(phoneInputInfo) {
+      this.phoneInputInfo = phoneInputInfo;
+    },
+
     /**
      * Toggle editing state.
      * {Case A} if activeEdit === false: enter the editing state by setting activeEdit to true
@@ -252,26 +266,17 @@ export default {
         // volunteers must provide a phone number, so display error message and
         // mark field invalid
         if (
-          !this.user.phonePretty ||
-          !phoneValidation.validatePhoneNumber(this.user.phonePretty)
+          this.user.phonePretty &&
+          (!this.phoneInputInfo.isValid || !this.phoneInputInfo.e164)
         ) {
-          this.errors.push("Please enter a valid U. S. phone number.");
+          this.errors.push("Please enter a valid phone number.");
           this.invalidInputs.push("phone");
-        }
-        // a college name is required
-        if (!this.user.college) {
-          this.errors.push("Please tell us what college you go to.");
-          this.invalidInputs.push("college");
-        }
-        // a favorite academic subject is required
-        if (!this.user.favoriteAcademicSubject) {
-          this.errors.push("Please tell us your favorite academic subject.");
-          this.invalidInputs.push("favoriteAcademicSubject");
         }
       }
 
       if (!this.errors.length) {
         // form fields valid, so set profile
+        this.user.phonePretty = this.phoneInputInfo.e164;
 
         // send only the necessary data
         const payloadUser = {};
@@ -366,7 +371,6 @@ export default {
 .container-section {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
   margin-bottom: 20px;
 }
 
@@ -416,8 +420,12 @@ ul {
   margin-left: 20px;
 }
 
+.phone-input {
+  margin: 5px 0 0;
+}
+
 .description {
-  margin-top: 15px;
+  margin-top: 10px;
   font-size: 12px;
 }
 
@@ -514,18 +522,15 @@ button:hover {
   margin: 0 10px 0 0;
   color: #ffffff;
   font-size: 12px;
-}
-
-.ESL {
   background-color: #1855d1;
 }
 
 .COLLEGE {
-  background-color: #fed766;
+  background-color: #f1c026;
 }
 
 .MATH {
-  background-color: #f7aef8;
+  background-color: #16d2aa;
 }
 
 .errors {

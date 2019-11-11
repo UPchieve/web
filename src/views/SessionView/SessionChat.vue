@@ -37,7 +37,7 @@
         <template v-for="(message, index) in messages">
           <div
             :key="`message-${index}`"
-            :class="message.email === user.email ? 'right' : 'left'"
+            :class="message.userId === user._id ? 'right' : 'left'"
             class="message"
           >
             <div class="avatar" :style="message.avatarStyle" />
@@ -189,7 +189,7 @@ export default {
         return {
           contents: message.contents,
           name: user.firstname,
-          email: user.email,
+          userId: user._id,
           isVolunteer: user.isVolunteer,
           avatarStyle: {
             backgroundImage: `url(${picture})`
@@ -216,10 +216,11 @@ export default {
           picture = StudentAvatarUrl;
         }
       }
+
       this.messages.push({
         contents: data.contents,
         name: data.name,
-        email: data.email,
+        userId: data.userId,
         isVolunteer: data.isVolunteer,
         avatarStyle: {
           backgroundImage: `url(${picture})`
@@ -386,13 +387,15 @@ span {
   float: right;
   display: flex;
   flex-direction: row-reverse;
+
   .contents {
-    padding-right: 10px;
     background-color: $c-background-blue;
+
     span {
       color: $c-soft-black;
     }
   }
+
   .avatar {
     display: none;
   }

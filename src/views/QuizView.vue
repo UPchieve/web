@@ -37,7 +37,24 @@
       <div v-if="qNumber" class="questionNumber">Question {{ qNumber }}</div>
       <br />
       <div class="body">
-        <div class="startBody">
+        <div v-if="quizLoading" class="loadingBody">
+          <div class="loadingMessage">
+            Loading quiz...
+          </div>
+        </div>
+        <div v-else class="startBody">
+          <div v-if="showNoQuiz" class="instructions">
+            A {{ quizName }} quiz has not yet been created. If you would like to
+            begin tutoring students on this topic, please contact UPchieve.
+          </div>
+          <router-link
+            v-if="showNoQuiz"
+            class="contact btn"
+            type="button"
+            to="/contact"
+          >
+            CONTACT US
+          </router-link>
           <div v-if="showStartMsg" class="instructions">
             This test will have {{ quizLength }} questions, and it is
             untimed.<br />
@@ -162,6 +179,7 @@ export default {
     } else {
       quizName = category.charAt(0).toUpperCase() + category.slice(1);
     }
+
     return {
       category,
       questionText: "",
@@ -169,8 +187,9 @@ export default {
       items: [],
       picked: "",
       scoreMsg: "",
-      showStartMsg: true,
-      showStart: true,
+      quizLoading: true,
+      showStartMsg: false,
+      showStart: false,
       showPrevious: false,
       showNext: false,
       showSubmit: false,
@@ -199,15 +218,21 @@ export default {
       const user = this.$store.state.user.user;
 
       let tries = 0;
-      if (user[this.category]) {
-        ({ tries } = user[this.category]); // {1}
+      if (user.certifications[this.category]) {
+        ({ tries } = user.certifications[this.category]); // {1}
       }
       return tries;
+    },
+    showNoQuiz() {
+      return !this.quizLength;
     }
   },
   beforeMount() {
     TrainingService.loadQuiz(this, this.category).then(quizLength => {
+      this.quizLoading = false;
       this.quizLength = quizLength;
+      this.showStartMsg = !!quizLength;
+      this.showStart = !!quizLength;
     });
   },
   updated() {
@@ -462,6 +487,14 @@ export default {
   height: inherit;
 }
 
+.loadingBody {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: inherit;
+}
+
 .quizBody {
   display: flex;
   flex-direction: column;
@@ -544,6 +577,11 @@ export default {
 
 .instructions {
   margin: 50px 0;
+}
+
+.loadingMessage {
+  font-size: 2rem;
+  margin: 75px 0;
 }
 
 .questionNumber {

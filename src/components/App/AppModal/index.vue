@@ -4,11 +4,14 @@
     v-on:accept="onAccept"
     :back-text="modalData.backText"
     :accept-text="modalData.acceptText"
+    :alert-modal="modalData.alertModal"
+    :enable-accept="enableAccept"
     :important="modalData.important"
   >
     <component
       v-if="modalComponent"
       v-bind:is="modalComponent"
+      v-on:enable-accept="onEnableAccept"
       :modal-data="modalData"
       ref="AppModalChild"
     />
@@ -20,14 +23,29 @@ import { mapState } from "vuex";
 import ModalTemplate from "./ModalTemplate";
 import RejoinSessionModal from "./RejoinSessionModal";
 import SubjectSelectionModal from "@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectSelectionModal";
+import SessionFulfilledModal from "@/views/SessionView/SessionFulfilledModal";
 
 export default {
-  components: { ModalTemplate, RejoinSessionModal, SubjectSelectionModal },
+  components: {
+    ModalTemplate,
+    RejoinSessionModal,
+    SubjectSelectionModal,
+    SessionFulfilledModal
+  },
+  data() {
+    return {
+      enableAccept: false
+    };
+  },
   computed: {
     ...mapState({
       modalComponent: state => state.app.modal.component,
       modalData: state => state.app.modal.data
     })
+  },
+  mounted() {
+    // enable the accept button by default if an alert modal
+    this.enableAccept = !!this.modalData.alertModal;
   },
   methods: {
     onCancel() {
@@ -37,6 +55,9 @@ export default {
     onAccept() {
       const child = this.$refs.AppModalChild;
       if (child.onAccept) child.onAccept();
+    },
+    onEnableAccept(value) {
+      this.enableAccept = value;
     }
   }
 };
