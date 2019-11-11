@@ -92,7 +92,7 @@ export default {
     }),
 
     isNewVolunteer() {
-      return this.user.pastSessions.length === 0;
+      return this.user.numPastSessions === 0;
     },
 
     impactStats() {
