@@ -11,10 +11,7 @@
         </p>
       </div>
     </div>
-    <div
-      class="typing-indicator"
-      v-if="isStillMessaging"
-    >
+    <div class="typing-indicator" v-if="isStillMessaging">
       <span></span>
       <span></span>
       <span></span>
@@ -43,35 +40,41 @@ export default {
 
     isStillMessaging() {
       return this.unsentBotMessages.length > 0;
-    },
+    }
   },
 
   created() {
-    const botMessages = [{
+    const botMessages = [
+      {
         msg: `Hey ${this.firstName}! I'm the UPchieve Bot.`
-      }, {
+      },
+      {
         msg: "Right now we’re searching for a coach to pair you with."
-      }, {
-        msg: "This process sometimes takes 5 to 10 minutes.",
-      }, {
-        msg: "While you wait, write out the problem you’re working on using the whiteboard or chat."
-    }];
+      },
+      {
+        msg: "This process sometimes takes 5 to 10 minutes."
+      },
+      {
+        msg:
+          "While you wait, write out the problem you’re working on using the whiteboard or chat."
+      }
+    ];
 
-    this.unsentBotMessages = botMessages
+    this.unsentBotMessages = botMessages;
 
-    setTimeout(this.showBotMessage, 1500)
-    this.botInterval = setInterval(this.showBotMessage, 4500)
+    setTimeout(this.showBotMessage, 1500);
+    this.botInterval = setInterval(this.showBotMessage, 4500);
   },
 
   methods: {
     showBotMessage() {
-      const newMessage = this.unsentBotMessages.shift()
+      const newMessage = this.unsentBotMessages.shift();
 
       if (!newMessage) {
-        return clearInterval(this.botInterval)
+        return clearInterval(this.botInterval);
       }
 
-      this.sentBotMessages.push(newMessage)
+      this.sentBotMessages.push(newMessage);
     }
   }
 };
@@ -110,7 +113,7 @@ export default {
 }
 
 .typing-indicator {
-  $ti-color-bg: #E6E7ED;
+  $ti-color-bg: #e6e7ed;
   background-color: $ti-color-bg;
   will-change: transform;
   width: auto;
@@ -125,7 +128,7 @@ export default {
     width: 9px;
     float: left;
     margin: 0 2px;
-    background-color: #9E9EA1;
+    background-color: #9e9ea1;
     display: block;
     border-radius: 50%;
     opacity: 0.4;

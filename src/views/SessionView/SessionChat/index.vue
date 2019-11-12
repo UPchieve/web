@@ -235,7 +235,7 @@ export default {
   background: #fff;
 }
 
-.message-box {  
+.message-box {
   height: 100%;
   padding-bottom: 60px;
   overflow: hidden;
