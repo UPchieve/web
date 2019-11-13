@@ -4,6 +4,7 @@ import VueRouter from "vue-router";
 import VueHeadful from "vue-headful";
 import vSelect from "vue-select";
 import VuePhoneNumberInput from "vue-phone-number-input";
+import VTooltip from "v-tooltip";
 
 import App from "./components/App";
 import router from "./router";
@@ -15,6 +16,10 @@ Vue.config.productionTip = false;
 // Use plugins
 Vue.use(VueSocketIO, process.env.VUE_APP_SOCKET_ADDRESS);
 Vue.use(VueRouter);
+Vue.use(VTooltip, {
+  defaultDelay: { show: 1000, hide: 200 },
+  defaultTemplate: '<div class="uc-tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
+});
 
 // Set up vue-headful
 Vue.component("vue-headful", VueHeadful);

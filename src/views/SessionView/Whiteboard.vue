@@ -20,11 +20,12 @@
         Whiteboard drawing is not supported on this device.
       </div>
       <div v-else class="toolset col-md-6">
-        <button id="clearButton" class="whiteboardBtn" @click="clear" />
+        <button id="clearButton" class="whiteboardBtn" v-tooltip="'Clear'" @click="clear" />
         <div class="colorWrapper">
           <button
             id="openColorsButton"
             class="whiteboardBtn"
+            v-tooltip="'Choose Color...'"
             @click="openColors"
           />
           <div
@@ -74,10 +75,10 @@
             />
           </div>
         </div>
-        <button id="drawButton" class="whiteboardBtn" @click="drawSetup" />
-        <button id="eraseButton" class="whiteboardBtn" @click="erase" />
-        <button id="undoButton" class="whiteboardBtn" @click="undo" />
-        <!-- <button class='whiteboardBtn' id='textButton' v-on:click="text"></button> -->
+        <button id="drawButton" class="whiteboardBtn" v-tooltip="'Draw'" @click="drawSetup" />
+        <button id="eraseButton" class="whiteboardBtn" v-tooltip="'Erase'" @click="erase" />
+        <button id="undoButton" class="whiteboardBtn" v-tooltip="'Undo'" @click="undo" />
+        <!-- <button class='whiteboardBtn' id='textButton' v-tooltip="'Draw Text'" v-on:click="text"></button> -->
       </div>
     </div>
   </div>

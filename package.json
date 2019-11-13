@@ -41,6 +41,7 @@
     "sass-loader": "^7.1.0",
     "style-resources-loader": "^1.2.1",
     "typeface-work-sans": "0.0.72",
+    "v-tooltip": "^2.0.2",
     "validator": "^6.3.0",
     "vue": "^2.6.10",
     "vue-headful": "^2.0.1",
