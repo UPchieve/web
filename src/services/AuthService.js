@@ -30,7 +30,7 @@ export default {
 
         // connect socket
         context.$socket.connect();
-        
+
         return data;
       },
       () => {
