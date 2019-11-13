@@ -28,6 +28,9 @@ export default {
         AnalyticsService.identify(data.user, data.user.isFakeUser);
         AnalyticsService.trackNoProperties("logged in", data.user.isFakeUser);
 
+        // connect socket
+        context.$socket.connect();
+        
         return data;
       },
       () => {
@@ -106,6 +109,10 @@ export default {
         .catch(() => {
           context.$store.dispatch("user/clearUser");
           context.$router.push("/logout");
+        })
+        .finally(() => {
+          // disconnect socket
+          context.$socket.disconnect();
         });
     }
   },
