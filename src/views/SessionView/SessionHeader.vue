@@ -328,26 +328,26 @@ h1 {
 
 .loading-ellipsis {
   &:after {
-    content: '';
+    content: "";
     animation: 2s ellip infinite;
   }
 }
 
 @keyframes ellip {
   20% {
-    content: '.'
+    content: ".";
   }
 
   40% {
-    content: '..'
+    content: "..";
   }
 
   60% {
-    content: '...'
+    content: "...";
   }
 
   80% {
-    content: '...'
+    content: "...";
   }
 }
 </style>
