@@ -19,7 +19,9 @@ Vue.use(VueRouter);
 Vue.use(VTooltip, {
   defaultDelay: { show: 1000, hide: 200 },
   defaultTemplate:
-    '<div class="uc-tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
+    '<div class="uc-tooltip" role="tooltip"><div class="uc-tooltip-arrow"></div><div class="uc-tooltip-inner"></div></div>',
+  defaultArrowSelector: '.uc-tooltip-arrow, .tooltip__arrow',
+  defaultInnerSelector: '.uc-tooltip-inner, .tooltip__inner'
 });
 
 // Set up vue-headful
