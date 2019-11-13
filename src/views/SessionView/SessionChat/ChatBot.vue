@@ -63,7 +63,7 @@ export default {
     this.unsentBotMessages = botMessages;
 
     setTimeout(() => {
-      this.showBotMessage()
+      this.showBotMessage();
       this.botInterval = setInterval(this.showBotMessage, 4500);
     }, 3000);
   },
