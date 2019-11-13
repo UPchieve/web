@@ -286,7 +286,7 @@ h1 {
 }
 
 .session-header.inactive {
-  background-color: #73737a;
+  background-color: #7a91a8;
 }
 
 .connection-message {
