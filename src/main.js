@@ -18,7 +18,8 @@ Vue.use(VueSocketIO, process.env.VUE_APP_SOCKET_ADDRESS);
 Vue.use(VueRouter);
 Vue.use(VTooltip, {
   defaultDelay: { show: 1000, hide: 200 },
-  defaultTemplate: '<div class="uc-tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
+  defaultTemplate:
+    '<div class="uc-tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
 });
 
 // Set up vue-headful
