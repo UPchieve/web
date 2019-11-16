@@ -149,9 +149,7 @@ export default {
     ...mapState({ user: state => state.user.user }),
 
     topicsToDisplay() {
-      return this.user.mathCoachingOnly
-        ? _.pick(topics, 'math')
-        : topics;
+      return this.user.mathCoachingOnly ? _.pick(topics, "math") : topics;
     },
 
     supercategories() {
