@@ -149,6 +149,7 @@ export default {
     ...mapState({ user: state => state.user.user }),
 
     topicsToDisplay() {
+      // Only display math topics to certain flagged volunteers
       return this.user.mathCoachingOnly ? _.pick(topics, "math") : topics;
     },
 
