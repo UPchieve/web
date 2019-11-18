@@ -7,6 +7,8 @@ import * as Integrations from "@sentry/integrations";
 import vSelect from "vue-select";
 import VuePhoneNumberInput from "vue-phone-number-input";
 
+import Socket from "socket.io-client";
+
 import App from "./components/App";
 import router from "./router";
 import store from "./store";
@@ -15,7 +17,10 @@ import store from "./store";
 Vue.config.productionTip = false;
 
 // Set up SocketIO
-Vue.use(VueSocketIO, process.env.VUE_APP_SOCKET_ADDRESS);
+const socket = Socket(process.env.VUE_APP_SOCKET_ADDRESS, {
+  autoConnect: false
+});
+Vue.use(VueSocketIO, socket);
 
 // Set up Vue Router
 Vue.use(VueRouter);
