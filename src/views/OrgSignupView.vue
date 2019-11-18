@@ -261,7 +261,7 @@ export default {
 
     isValidOrgEmail(email) {
       const requiredDomains = this.orgManifest.requiredEmailDomains;
-      if (!(requiredDomains && requiredDomains.length)) return false;
+      if (!(requiredDomains && requiredDomains.length)) return true;
 
       const domain = email.split("@")[1];
       return domain && requiredDomains.indexOf(domain) >= 0;

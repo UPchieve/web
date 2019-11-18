@@ -63,6 +63,7 @@
 </template>
 
 <script>
+import _ from "lodash";
 import { mapState } from "vuex";
 
 import { topics, allSubtopics } from "@/utils/topics";
@@ -82,17 +83,6 @@ export default {
         result[key] = value;
         return result;
       }, {});
-
-    const supercategoryMenuDisplayStates = Object.entries(topics)
-      .map(([, topicObj]) => topicObj.displayName)
-      .reduce((result, key) => {
-        result[key] = false;
-        return result;
-      }, {});
-
-    const supercategories = Object.entries(topics).map(
-      ([, topicObj]) => topicObj.displayName
-    );
 
     // todo consider refactoring so that we identify categories by the
     // key rather than by the display name
@@ -128,18 +118,48 @@ export default {
       "https://drive.google.com/open?id=1lJXVI1f9Do60pNXcBQGSZThNXhYmtMvV";
     reviewMaterials.applications =
       "https://drive.google.com/open?id=1gXmbGRaUz324-EiZMzph1KUYS8WhR9ax";
+
     return {
       quizzes,
-      supercategoryMenuDisplayStates,
-      supercategories,
       supercategoryColors,
       reviewMaterials,
-      categoryKeys
+      categoryKeys,
+      supercategoryMenuDisplayStates: {}
     };
   },
-  computed: {
-    ...mapState({ user: state => state.user.user })
+
+  created() {
+    const displayStates = Object.entries(this.topicsToDisplay)
+      .map(([, topicObj]) => topicObj.displayName)
+      .reduce((result, key) => {
+        result[key] = false;
+        return result;
+      }, {});
+
+    // If there's only 1 supercategory, open the collapsible by default
+    if (_.size(displayStates) === 1) {
+      const singleSupercategoryKey = Object.keys(displayStates)[0];
+      displayStates[singleSupercategoryKey] = true;
+    }
+
+    this.supercategoryMenuDisplayStates = displayStates;
   },
+
+  computed: {
+    ...mapState({ user: state => state.user.user }),
+
+    topicsToDisplay() {
+      // Only display math topics to certain flagged volunteers
+      return this.user.mathCoachingOnly ? _.pick(topics, "math") : topics;
+    },
+
+    supercategories() {
+      return Object.entries(this.topicsToDisplay).map(
+        ([, topicObj]) => topicObj.displayName
+      );
+    }
+  },
+
   methods: {
     toggleSupercategoryShown(supercategory) {
       const isShown = this.supercategoryMenuDisplayStates[supercategory];
