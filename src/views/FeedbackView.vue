@@ -579,7 +579,7 @@ export default {
   .question-cell {
     padding: 0em 1em 2em !important;
   }
-  
+
   .star-rating-row {
     padding-bottom: 1em !important;
   }
