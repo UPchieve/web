@@ -47,6 +47,12 @@
                         question.options_alias[subquestion_index]
                       ]
                     "
+                    inactive-color="#ffffff"
+                    active-color="#36d2aa"
+                    border-color="#36d2aa"
+                    border-width="4"
+                    star-size="30"
+                    padding="1"
                   >
                   </vue-star-rating>
                 </td>
