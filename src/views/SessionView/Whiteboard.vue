@@ -235,12 +235,6 @@ export default {
         color: data.color
       });
     },
-    emitResetScreen(/* data */) {
-      this.$socket.emit("resetScreen", {
-        sessionId: this.currentSession.sessionId,
-        user: { _id: this.user._id }
-      });
-    },
 
     // UI events
     changeColor(event) {
