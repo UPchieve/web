@@ -103,8 +103,6 @@ let imageData;
 window.App = {};
 const App = window.App;
 
-// const RESET_SCREEN_EVENT = 'reset';
-
 function compareImages(img1, img2) {
   if (img1 !== null && img2 !== null) {
     if (img1.data.length !== img2.data.length) {
