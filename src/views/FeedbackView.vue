@@ -414,6 +414,24 @@ export default {
   padding-bottom: 10px;
 }
 
+.star-rating-table {
+  width: 100%;
+  font-size: 15px;
+}
+
+.star-rating-row {
+  display: table-row;
+}
+
+.star-rating-cell {
+  width: 50%;
+  display: table-cell;
+  vertical-align: middle;
+  padding-left: 15px;
+  padding-top: 20px;
+  padding-bottom: 25px;
+}
+
 .radio-question-table {
   width: 100%;
   font-size: 15px;
@@ -560,6 +578,16 @@ export default {
 
   .question-cell {
     padding: 0em 1em 2em !important;
+  }
+  
+  .star-rating-row {
+    padding-bottom: 1em !important;
+  }
+
+  .star-rating-cell {
+    width: calc(100vw - 56.75px);
+    display: table-caption !important;
+    padding: 0.5em 1.5em 0.5em 1.5em !important;
   }
 
   .radio-question-cell {
