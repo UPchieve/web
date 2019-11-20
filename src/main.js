@@ -6,6 +6,7 @@ import * as Sentry from "@sentry/browser";
 import * as Integrations from "@sentry/integrations";
 import vSelect from "vue-select";
 import VuePhoneNumberInput from "vue-phone-number-input";
+import VueStarRating from "vue-star-rating";
 
 import Socket from "socket.io-client";
 
@@ -43,6 +44,9 @@ Vue.component("v-select", vSelect);
 
 // Set up vue-phone-number-input
 Vue.component("vue-phone-number-input", VuePhoneNumberInput);
+
+// Set up vue-star-rating
+Vue.component("vue-star-rating", VueStarRating);
 
 // Create Vue instance
 new Vue({

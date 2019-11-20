@@ -30,6 +30,23 @@
       >
         <td class="question-cell">
           <div class="question-title">{{ question.title }}</div>
+          <div v-if="question.qtype === 'star-rating'">
+            <table class="star-rating-table">
+              <tr
+                class="star-rating-row forMobileView"
+                v-for="(subquestion, subquestion_index) in question.options"
+                v-bind:key="subquestion"
+              >
+                <vue-star-rating
+                  v-model="
+                    userResponse[question.alias][
+                      question.options_alias[subquestion_index]
+                    ]"
+                >
+                </vue-star-rating>
+              </tr>
+            </table>
+          </div>
           <div v-if="question.qtype === 'multiple-radio'">
             <table class="radio-question-table">
               <tr class="radio-question-row">
@@ -149,11 +166,10 @@ export default {
       student_questions: [
         {
           qid: "1",
-          qtype: "multiple-radio",
+          qtype: "star-rating",
           alias: "rate-session",
           title: "Rate your session",
           secondary_title: "",
-          table_title: ["1", "2", "3", "4", "5"],
           options: ["Rating"],
           options_alias: ["rating"]
         },
@@ -284,7 +300,7 @@ export default {
       this.questions = this.volunteer_questions;
     }
     this.questions.map(function(question) {
-      if (question.qtype === "multiple-radio")
+      if (question.qtype === "multiple-radio" || question.qtype === "star-rating")
         _self.userResponse[question.alias] = {};
     });
   },
