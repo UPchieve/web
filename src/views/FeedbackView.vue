@@ -45,7 +45,8 @@
                     v-model="
                       userResponse[question.alias][
                         question.options_alias[subquestion_index]
-                      ]"
+                      ]
+                    "
                   >
                   </vue-star-rating>
                 </td>
@@ -305,7 +306,10 @@ export default {
       this.questions = this.volunteer_questions;
     }
     this.questions.map(function(question) {
-      if (question.qtype === "multiple-radio" || question.qtype === "star-rating")
+      if (
+        question.qtype === "multiple-radio" ||
+        question.qtype === "star-rating"
+      )
         _self.userResponse[question.alias] = {};
     });
   },
