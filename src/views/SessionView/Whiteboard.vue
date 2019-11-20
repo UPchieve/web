@@ -96,8 +96,6 @@ let SERVER_DRAWING = false;
 const ERASER_ICON = `url("${EraserIconUrl}") 0 50, auto`;
 const PEN_ICON = `url("${PenIconUrl}") 0 50, auto`;
 
-let CURSOR_VISIBLE = false;
-
 let currentState = "";
 
 let imageList = [];
@@ -262,7 +260,7 @@ export default {
 
       if (!SERVER_DRAWING) {
         this.emitDrawing();
-        
+
         if (currentState === "DRAWING" || currentState === "ERASING") {
           saveImage(App.canvas, App.ctx);
           this.emitSaveImage();
