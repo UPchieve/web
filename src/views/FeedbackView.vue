@@ -37,13 +37,18 @@
                 v-for="(subquestion, subquestion_index) in question.options"
                 v-bind:key="subquestion"
               >
-                <vue-star-rating
-                  v-model="
-                    userResponse[question.alias][
-                      question.options_alias[subquestion_index]
-                    ]"
-                >
-                </vue-star-rating>
+                <td class="star-rating-cell">
+                  {{ subquestion }}
+                </td>
+                <td class="star-rating-cell">
+                  <vue-star-rating
+                    v-model="
+                      userResponse[question.alias][
+                        question.options_alias[subquestion_index]
+                      ]"
+                  >
+                  </vue-star-rating>
+                </td>
               </tr>
             </table>
           </div>
