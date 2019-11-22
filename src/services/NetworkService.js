@@ -1,3 +1,5 @@
+import Vue from "vue";
+
 const AUTH_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/auth`;
 const API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/api`;
 const SCHOOL_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/school`;
@@ -30,6 +32,11 @@ export default {
   checkRegister(context, data) {
     return context.$http
       .post(`${AUTH_ROOT}/register/checkcred`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
+  getOrgManifest(orgId) {
+    return Vue.http
+      .get(`${AUTH_ROOT}/org-manifest?orgId=${encodeURIComponent(orgId)}`)
       .then(this._successHandler, this._errorHandler);
   },
   register(context, data) {
@@ -165,26 +172,6 @@ export default {
   feedback(context, data) {
     return context.$http
       .post(`${API_ROOT}/feedback`, data)
-      .then(this._successHandler, this._errorHandler);
-  },
-  createStudentQuestion(context, data) {
-    return context.$http
-      .post(`${API_ROOT}/student-questions/create`, data)
-      .then(this._successHandler, this._errorHandler);
-  },
-  getStudentQuestions(context, data) {
-    return context.$http
-      .post(`${API_ROOT}/student-questions/get`, data)
-      .then(this._successHandler, this._errorHandler);
-  },
-  answerStudentQuestion(context, data) {
-    return context.$http
-      .post(`${API_ROOT}/student-questions/answer`, data)
-      .then(this._successHandler, this._errorHandler);
-  },
-  getAttachment(context, data) {
-    return context.$http
-      .get(`${API_ROOT}/download/${data}`)
       .then(this._successHandler, this._errorHandler);
   }
 };

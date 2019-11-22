@@ -1,23 +1,23 @@
 <template>
   <div class="full-text-template">
-    <content-header :header-title="headerTitle" />
+    <div v-if="headerTitle" class="full-text-template__header">
+      {{ headerTitle }}
+    </div>
+    <div v-if="ledeText" class="full-text-template__lede">{{ ledeText }}</div>
     <div class="full-text-template__content">
-      <div class="full-text-template__wrap">
-        <slot />
-      </div>
+      <slot />
     </div>
   </div>
 </template>
 
 <script>
-import ContentHeader from "./ContentHeader";
-
 export default {
-  components: {
-    ContentHeader
-  },
   props: {
     headerTitle: {
+      type: String,
+      default: ""
+    },
+    ledeText: {
       type: String,
       default: ""
     }
@@ -30,39 +30,55 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.full-text-template__content {
-  text-align: left;
-}
+.full-text-template {
+  color: $c-soft-black;
+  border-radius: 8px;
+  background: white;
+  margin: 10px;
+  padding: 20px 15px;
 
-.full-text-template__wrap {
-  max-width: 800px;
-  padding: 40px 20px;
-}
+  @include breakpoint-above("medium") {
+    margin: 40px;
+    padding: 40px;
+  }
 
-section {
-  margin-bottom: 64px;
-}
+  &__header {
+    font-size: 24px;
+    font-weight: 500;
+    text-align: left;
+  }
 
-/*
-* @notes
-* [1] Refactoring candidate: this shoudln't be done, but I had to do it since
-*     Bootstap interferes with this :/
-*/
-.full-text-template__content h2 {
-  /* [1] */
-  font-weight: bold;
-  font-size: 20px;
-  margin-top: 0;
-}
+  &__lede {
+    text-align: left;
+    font-size: 16px;
+    margin: 10px 0;
+  }
 
-.full-text-template__content p {
-  /* [1] */
-  margin-bottom: 20px;
-}
+  &__content {
+    margin: 40px 0 20px;
+    text-align: left;
+  }
 
-.v-panel {
-  background: $c-backdrop;
-  padding: 20px;
-  margin-bottom: 20px;
+  section {
+    &:not(:last-of-type) {
+      margin-bottom: 60px;
+    }
+  }
+
+  h2 {
+    font-weight: 500;
+    font-size: 18px;
+    margin: 0 0 15px;
+  }
+
+  p {
+    margin-bottom: 20px;
+  }
+
+  .highlight {
+    background: $c-background-blue;
+    padding: 20px;
+    border-radius: 4px;
+  }
 }
 </style>

@@ -28,6 +28,9 @@ export default {
         AnalyticsService.identify(data.user, data.user.isFakeUser);
         AnalyticsService.trackNoProperties("logged in", data.user.isFakeUser);
 
+        // connect socket
+        context.$socket.connect();
+
         return data;
       },
       () => {
@@ -36,25 +39,17 @@ export default {
     );
   },
 
-  register(context, creds, profile, redirect) {
-    return NetworkService.register(context, { ...creds, ...profile }).then(
-      res => {
-        const data = { ...res.data };
-        if (!data) {
-          throw new Error("No user returned from auth service");
-        } else if (data.err) {
-          throw new Error(data.err);
-        }
-
-        context.msg = "You have been signed up!";
-
-        if (redirect) {
-          setTimeout(() => {
-            context.$router.push(redirect);
-          }, 2000);
-        }
+  register(context, signupData) {
+    return NetworkService.register(context, signupData).then(res => {
+      const data = { ...res.data };
+      if (!data) {
+        throw new Error("No user returned from auth service");
+      } else if (data.err) {
+        throw new Error(data.err);
       }
-    );
+
+      context.msg = "You have been signed up!";
+    });
   },
 
   checkRegister(context, creds) {
@@ -114,6 +109,10 @@ export default {
         .catch(() => {
           context.$store.dispatch("user/clearUser");
           context.$router.push("/logout");
+        })
+        .finally(() => {
+          // disconnect socket
+          context.$socket.disconnect();
         });
     }
   },

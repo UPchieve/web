@@ -4,34 +4,33 @@
       <div class="body-header">Volunteer Training</div>
       <div v-for="supercategory in supercategories" :key="supercategory">
         <div
-          v-if="supercategory !== 'esl'"
-          :style="{ backgroundColor: colors[supercategory] }"
           class="supercategory"
-          @click="flipBool(supercategory)"
+          :style="{ backgroundColor: colorFor(supercategory) }"
+          @click="toggleSupercategoryShown(supercategory)"
         >
-          {{ supercategory | capitalize }}
-          <div v-if="bools[supercategory]" class="arrow up" />
-          <div v-if="!bools[supercategory]" class="arrow down" />
-        </div>
-        <div
-          v-if="supercategory === 'esl'"
-          :style="{ backgroundColor: colors[supercategory] }"
-          class="supercategory"
-          @click="flipBool(supercategory)"
-        >
-          {{ supercategory | uppercase }}
-          <div v-if="bools[supercategory]" class="arrow up" />
-          <div v-if="!bools[supercategory]" class="arrow down" />
+          {{ supercategory }}
+          <div
+            v-if="supercategoryMenuDisplayStates[supercategory]"
+            class="arrow up"
+          />
+          <div
+            v-if="!supercategoryMenuDisplayStates[supercategory]"
+            class="arrow down"
+          />
         </div>
         <div v-for="category in quizzes[supercategory]" :key="category">
-          <div v-show="bools[supercategory]" class="category">
+          <div
+            v-show="supercategoryMenuDisplayStates[supercategory]"
+            class="category"
+          >
             <div>
-              <span v-if="category !== 'esl'">{{ category | capitalize }}</span>
-              <span v-if="category === 'esl'">{{ category | uppercase }}</span>
+              {{ category }}
               <div class="review">
                 <div class="review-container">
                   <div class="review-label">
-                    <a :href="reviewMaterials[category]" target="_blank"
+                    <a
+                      :href="reviewMaterials[categoryKeys[category]]"
+                      target="_blank"
                       >Review</a
                     >
                   </div>
@@ -42,7 +41,7 @@
             <div class="test">
               <router-link
                 v-if="!hasPassed(category) && hasTries(category)"
-                :to="'/training/' + category + '/quiz'"
+                :to="'/training/' + categoryKeys[category] + '/quiz'"
                 tag="div"
                 class="test-container"
               >
@@ -52,7 +51,7 @@
               <div v-if="hasPassed(category)" class="test-container certified">
                 Certified!
               </div>
-              <div class="numTries">
+              <div v-if="!hasPassed(category)" class="numTries">
                 You have used {{ getTries(category) }}/3 tries.
               </div>
             </div>
@@ -64,49 +63,42 @@
 </template>
 
 <script>
+import _ from "lodash";
 import { mapState } from "vuex";
 
-/**
- * @todo {1} Refactor into global filters (https://vuejs.org/v2/guide/filters.html)
- */
+import { topics, allSubtopics } from "@/utils/topics";
+
 export default {
-  filters: {
-    // {1}
-    capitalize(value) {
-      if (!value) return "";
-      const valueStr = value.toString();
-      return valueStr.charAt(0).toUpperCase() + valueStr.slice(1);
-    },
-    uppercase(value) {
-      if (!value) return "";
-      return value.toString().toUpperCase();
-    }
-  },
   data() {
-    const quizzes = {};
-    quizzes.math = [
-      "algebra",
-      "geometry",
-      "trigonometry",
-      "precalculus",
-      "calculus"
-    ];
-    quizzes.esl = ["esl"];
-    quizzes["college Counseling"] = ["planning", "essays", "applications"];
-    // quizzes['science'] = ['biology', 'chemistry'];
-    const bools = {};
-    bools.math = false;
-    bools.esl = false;
-    bools["college Counseling"] = false;
-    bools.science = false;
-    // Science Currently Removed due to quiz issues -Will
-    // var supercategories = ['esl', 'math', 'college Counseling', 'science'];
-    const supercategories = ["esl", "math", "college Counseling"];
-    const colors = {};
-    colors.esl = "#1855D1";
-    colors.math = "#F7AEF8";
-    colors["college Counseling"] = "#FED766";
-    colors.science = "#9575CD";
+    // array destructuring syntax [, value] ignores the first entry, in this
+    // case the key
+    const quizzes = Object.entries(topics)
+      .map(([, topicObj]) => [
+        topicObj.displayName,
+        Object.entries(topicObj.subtopics).map(
+          ([, subtopicObj]) => subtopicObj.displayName
+        )
+      ])
+      .reduce((result, [key, value]) => {
+        result[key] = value;
+        return result;
+      }, {});
+
+    // todo consider refactoring so that we identify categories by the
+    // key rather than by the display name
+    const categoryKeys = Object.entries(allSubtopics())
+      .map(([key, subtopicObj]) => [subtopicObj.displayName, key])
+      .reduce((result, [displayName, key]) => {
+        result[displayName] = key;
+        return result;
+      }, {});
+
+    const supercategoryColors = {
+      "Math Tutoring": "#ef9bf9",
+      "College Counseling": "#f3c639",
+      default: "#1855D1"
+    };
+
     const reviewMaterials = {};
     reviewMaterials.algebra =
       "https://drive.google.com/open?id=105iP5lJdVti-r2reY8N3tKQOA0FtrjZW";
@@ -126,42 +118,79 @@ export default {
       "https://drive.google.com/open?id=1lJXVI1f9Do60pNXcBQGSZThNXhYmtMvV";
     reviewMaterials.applications =
       "https://drive.google.com/open?id=1gXmbGRaUz324-EiZMzph1KUYS8WhR9ax";
+
     return {
       quizzes,
-      bools,
-      supercategories,
-      colors,
-      reviewMaterials
+      supercategoryColors,
+      reviewMaterials,
+      categoryKeys,
+      supercategoryMenuDisplayStates: {}
     };
   },
-  computed: {
-    ...mapState({ user: state => state.user.user })
+
+  created() {
+    const displayStates = Object.entries(this.topicsToDisplay)
+      .map(([, topicObj]) => topicObj.displayName)
+      .reduce((result, key) => {
+        result[key] = false;
+        return result;
+      }, {});
+
+    // If there's only 1 supercategory, open the collapsible by default
+    if (_.size(displayStates) === 1) {
+      const singleSupercategoryKey = Object.keys(displayStates)[0];
+      displayStates[singleSupercategoryKey] = true;
+    }
+
+    this.supercategoryMenuDisplayStates = displayStates;
   },
+
+  computed: {
+    ...mapState({ user: state => state.user.user }),
+
+    topicsToDisplay() {
+      // Only display math topics to certain flagged volunteers
+      return this.user.mathCoachingOnly ? _.pick(topics, "math") : topics;
+    },
+
+    supercategories() {
+      return Object.entries(this.topicsToDisplay).map(
+        ([, topicObj]) => topicObj.displayName
+      );
+    }
+  },
+
   methods: {
-    flipBool(supercategory) {
-      const bool = this.bools[supercategory];
-      this.bools[supercategory] = !bool;
+    toggleSupercategoryShown(supercategory) {
+      const isShown = this.supercategoryMenuDisplayStates[supercategory];
+      this.supercategoryMenuDisplayStates[supercategory] = !isShown;
     },
     hasPassed(category) {
-      if (this.user[category]) {
-        return this.user[category].passed;
+      if (this.user.certifications[this.categoryKeys[category]]) {
+        return this.user.certifications[this.categoryKeys[category]].passed;
       }
 
       return false;
     },
     hasTries(category) {
-      if (this.user[category]) {
-        return this.user[category].tries < 3;
+      if (this.user.certifications[this.categoryKeys[category]]) {
+        return this.user.certifications[this.categoryKeys[category]].tries < 3;
       }
 
       return true;
     },
     getTries(category) {
-      if (this.user[category]) {
-        return this.user[category].tries;
+      if (this.user.certifications[this.categoryKeys[category]]) {
+        return this.user.certifications[this.categoryKeys[category]].tries;
       }
 
       return 0;
+    },
+    colorFor(supercategory) {
+      return (
+        this.supercategoryColors[supercategory] ||
+        this.supercategoryColors.default
+      );
     }
   }
 };

@@ -489,7 +489,7 @@ export default {
     },
     submit() {
       AuthService.register(this, {
-        code: undefined,
+        isVolunteer: false,
         email: this.credentials.email,
         password: this.credentials.password,
         terms: this.credentials.terms,
