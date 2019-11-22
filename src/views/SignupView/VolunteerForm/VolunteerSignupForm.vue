@@ -1,5 +1,9 @@
 <template>
-  <form v-if="step == 'step-1'" class="uc-form-body" @submit.prevent="submit()">
+  <form
+    v-if="step == 'step-1'"
+    class="uc-form-body"
+    @submit.prevent="nextPage()"
+  >
     <div v-if="errors.length" class="step-errors">
       <h5>Please correct the following problems:</h5>
       <ul>
@@ -50,7 +54,7 @@
       </p>
     </div>
 
-    <button class="uc-form-button" type="submit" @click.prevent="nextPage()">
+    <button class="uc-form-button" type="submit">
       Continue
     </button>
 
@@ -60,7 +64,7 @@
   <form
     v-else-if="step == 'step-2'"
     class="uc-form-body"
-    @submit.prevent="submit()"
+    @submit.prevent="checkInputs($event)"
   >
     <div v-if="errors.length" class="step-errors">
       <h5>Please correct the following problems:</h5>
@@ -181,7 +185,7 @@
       </label>
     </div>
 
-    <button class="uc-form-button" type="submit" @click="checkInputs($event)">
+    <button class="uc-form-button" type="submit">
       Sign Up
     </button>
 
@@ -263,7 +267,7 @@ export default {
           this.msg = err.message;
         });
     },
-    checkInputs(e) {
+    checkInputs() {
       this.errors = [];
       this.invalidInputs = [];
 
@@ -297,8 +301,8 @@ export default {
       if (!this.credentials.terms) {
         this.errors.push("You must read and accept the user agreement.");
       }
-      if (this.errors.length) {
-        e.preventDefault();
+      if (!this.errors.length) {
+        this.submit();
       }
     },
     submit() {
