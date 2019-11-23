@@ -50,9 +50,10 @@
                     inactive-color="#ffffff"
                     active-color="#36d2aa"
                     border-color="#36d2aa"
-                    border-width="4"
-                    star-size="30"
-                    padding="1"
+                    :border-width="4"
+                    :star-size="30"
+                    :padding="1"
+                    :show-rating="false"
                   >
                   </vue-star-rating>
                 </td>
