@@ -42,7 +42,7 @@
       </div>
     </div>
 
-    <button class="uc-form-button" type="submit" @click.prevent="secondPage()">
+    <button class="uc-form-button" type="submit">
       Continue
     </button>
 
@@ -89,11 +89,7 @@
       </p>
     </div>
 
-    <button
-      class="uc-form-button"
-      type="submit"
-      @click.prevent="submitWaitlist()"
-    >
+    <button class="uc-form-button" type="submit">
       Submit
     </button>
 
@@ -161,7 +157,7 @@
       </p>
     </div>
 
-    <button class="uc-form-button" type="submit" @click.prevent="thirdPage()">
+    <button class="uc-form-button" type="submit">
       Continue
     </button>
 
@@ -171,7 +167,7 @@
   <form
     v-else-if="step === 'step-3'"
     class="uc-form-body"
-    @submit.prevent="submit()"
+    @submit.prevent="checkInputs()"
   >
     <!-- Fix for bug in Chrome where the username and password are mapped to non-login fields
      even if the HTML5 autocomplete attributes are set to the right values -->
@@ -275,7 +271,7 @@
       </label>
     </div>
 
-    <button class="uc-form-button" type="submit" @click="checkInputs($event)">
+    <button class="uc-form-button" type="submit">
       Sign Up
     </button>
 
@@ -470,7 +466,7 @@ export default {
     handleSelectHighSchool(school) {
       this.eligibility.highSchool = school;
     },
-    checkInputs(e) {
+    checkInputs() {
       this.errors = [];
       this.invalidInputs = [];
 
@@ -487,8 +483,8 @@ export default {
         // necessary because the CSS hides the browser's validation message
         this.errors.push("You must read and accept the user agreement.");
       }
-      if (this.errors.length) {
-        e.preventDefault();
+      if (!this.errors.length) {
+        this.submit();
       }
     },
     submit() {
