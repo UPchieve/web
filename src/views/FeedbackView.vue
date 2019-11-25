@@ -37,9 +37,6 @@
                 v-bind:key="subquestion"
               >
                 <td class="star-rating-cell">
-                  {{ subquestion }}
-                </td>
-                <td class="star-rating-cell">
                   <vue-star-rating
                     v-model="
                       userResponse[question.alias][
@@ -434,7 +431,6 @@ export default {
   width: 50%;
   display: table-cell;
   vertical-align: middle;
-  padding-left: 15px;
   padding-top: 20px;
   padding-bottom: 25px;
 }
@@ -593,8 +589,8 @@ export default {
 
   .star-rating-cell {
     width: calc(100vw - 56.75px);
-    display: table-caption !important;
-    padding: 0.5em 1.5em 0.5em 1.5em !important;
+    display: table-caption;
+    padding: 0.5em 0;
   }
 
   .radio-question-cell {
