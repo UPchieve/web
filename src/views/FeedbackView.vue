@@ -29,6 +29,33 @@
       >
         <td class="question-cell">
           <div class="question-title">{{ question.title }}</div>
+          <div v-if="question.qtype === 'star-rating'">
+            <table class="star-rating-table">
+              <tr
+                class="star-rating-row forMobileView"
+                v-for="(subquestion, subquestion_index) in question.options"
+                v-bind:key="subquestion"
+              >
+                <td class="star-rating-cell">
+                  <vue-star-rating
+                    v-model="
+                      userResponse[question.alias][
+                        question.options_alias[subquestion_index]
+                      ]
+                    "
+                    inactive-color="#ffffff"
+                    active-color="#36d2aa"
+                    border-color="#36d2aa"
+                    :border-width="4"
+                    :star-size="30"
+                    :padding="1"
+                    :show-rating="false"
+                  >
+                  </vue-star-rating>
+                </td>
+              </tr>
+            </table>
+          </div>
           <div v-if="question.qtype === 'multiple-radio'">
             <table class="radio-question-table">
               <tr class="radio-question-row">
@@ -148,11 +175,10 @@ export default {
       student_questions: [
         {
           qid: "1",
-          qtype: "multiple-radio",
+          qtype: "star-rating",
           alias: "rate-session",
           title: "Rate your session",
           secondary_title: "",
-          table_title: ["1", "2", "3", "4", "5"],
           options: ["Rating"],
           options_alias: ["rating"]
         },
@@ -218,11 +244,10 @@ export default {
       volunteer_questions: [
         {
           qid: "1",
-          qtype: "multiple-radio",
+          qtype: "star-rating",
           alias: "rate-session",
           title: "Rate your session",
           secondary_title: "",
-          table_title: ["1", "2", "3", "4", "5"],
           options: ["Rating"],
           options_alias: ["rating"]
         },
@@ -290,7 +315,10 @@ export default {
       this.questions = this.volunteer_questions;
     }
     this.questions.map(function(question) {
-      if (question.qtype === "multiple-radio")
+      if (
+        question.qtype === "multiple-radio" ||
+        question.qtype === "star-rating"
+      )
         _self.userResponse[question.alias] = {};
     });
   },
@@ -387,6 +415,23 @@ export default {
 .question-secondary-title {
   font-size: 15px;
   padding-bottom: 10px;
+}
+
+.star-rating-table {
+  width: 100%;
+  font-size: 15px;
+}
+
+.star-rating-row {
+  display: table-row;
+}
+
+.star-rating-cell {
+  width: 50%;
+  display: table-cell;
+  vertical-align: middle;
+  padding-top: 20px;
+  padding-bottom: 25px;
 }
 
 .radio-question-table {
@@ -535,6 +580,16 @@ export default {
 
   .question-cell {
     padding: 0em 1em 2em !important;
+  }
+
+  .star-rating-row {
+    padding-bottom: 1em !important;
+  }
+
+  .star-rating-cell {
+    width: calc(100vw - 56.75px);
+    display: table-caption;
+    padding: 0.5em 0;
   }
 
   .radio-question-cell {
