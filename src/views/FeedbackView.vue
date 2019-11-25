@@ -244,11 +244,10 @@ export default {
       volunteer_questions: [
         {
           qid: "1",
-          qtype: "multiple-radio",
+          qtype: "star-rating",
           alias: "rate-session",
           title: "Rate your session",
           secondary_title: "",
-          table_title: ["1", "2", "3", "4", "5"],
           options: ["Rating"],
           options_alias: ["rating"]
         },
