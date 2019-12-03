@@ -112,12 +112,7 @@ export default {
     }
   },
   mounted() {
-    const id =
-      this.$route.path.indexOf("/s/") === -1
-        ? this.$route.params.sessionId
-        : base64url
-            .toBuffer(this.$route.params.sessionIdBase64)
-            .toString("hex");
+    const id = this.getSessionId();
     let promise;
 
     if (!id) {
@@ -143,12 +138,23 @@ export default {
   },
   sockets: {
     bump: function(data) {
+      const sessionId = this.getSessionId();
+      const topic = this.$route.params.topic ? this.$route.params.topic : null;
+      const subTopic = this.$route.params.subTopic
+        ? this.$route.params.subTopic
+        : null;
+
       this.$store.dispatch("app/modal/show", {
         component: SessionFulfilledModal,
         data: {
-          acceptText: "Return to Dashboard",
+          acceptText: "Send Feedback",
+          cancelText: "Return to Dashboard",
           alertModal: true,
-          isSessionEnded: !!data.endedAt
+          isSessionEnded: !!data.endedAt,
+          sessionId: sessionId,
+          topic: topic,
+          subTopic: subTopic,
+          volunteerId: this.user._id
         }
       });
     },
@@ -167,6 +173,13 @@ export default {
     }
   },
   methods: {
+    getSessionId() {
+      return this.$route.path.indexOf("/s/") === -1
+        ? this.$route.params.sessionId
+        : base64url
+            .toBuffer(this.$route.params.sessionIdBase64)
+            .toString("hex");
+    },
     handleResize() {
       if (this.mobileMode) {
         this.$store.dispatch("app/hideNavigation");

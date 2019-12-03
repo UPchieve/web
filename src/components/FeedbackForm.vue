@@ -6,12 +6,17 @@
     <table class="questions-table">
       <tr class="title-row">
         <td class="title-cell">
-          <div v-if="leadParagraphs && leadParagraphs.length" style="padding-top: 40px; padding-bottom: 30px">
+          <div
+            v-if="leadParagraphs && leadParagraphs.length"
+            style="padding-top: 40px; padding-bottom: 30px"
+          >
             <p
               v-for="(paragraph, paragraph_index) in leadParagraphs"
               :style="paragraph.style"
               v-bind:key="paragraph_index"
-            >{{ paragraph.text }}</p>
+            >
+              {{ paragraph.text }}
+            </p>
           </div>
         </td>
       </tr>
@@ -157,16 +162,11 @@ import AnalyticsService from "@/services/AnalyticsService";
 import NetworkService from "@/services/NetworkService";
 
 export default {
-  props: [
-    "headerText",
-    "leadParagraphs",
-    "questions",
-    "metadata"
-  ],
+  props: ["headerText", "leadParagraphs", "questions", "metadata"],
   data() {
     return {
       userResponse: {}
-    }
+    };
   },
   computed: {
     ...mapState({
@@ -187,22 +187,24 @@ export default {
     submitFeedback() {
       // analytics: tracking feedback response data
       AnalyticsService.trackFeedback(this, this.user.isFakeUser);
-      
+
       // submit data
-      NetworkService.feedback(this, Object.assign(
+      NetworkService.feedback(
+        this,
+        Object.assign(
           {
             feedbackFor: this.feedbackFor,
             responseData: this.userResponse
-          }, 
+          },
           this.metadata
         )
       );
-      
+
       // emit form submit event to parent
       this.$emit("form-submit", this.userResponse);
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

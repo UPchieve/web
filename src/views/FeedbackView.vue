@@ -170,7 +170,8 @@ export default {
           style: "font-weight: 600"
         },
         {
-          text: "You just helped a student get one step closer to achieving their academic goals! Thanks so much for your help! Now, to make UPchieve even better, please take a few minutes to fill out this feedback form."
+          text:
+            "You just helped a student get one step closer to achieving their academic goals! Thanks so much for your help! Now, to make UPchieve even better, please take a few minutes to fill out this feedback form."
         }
       );
     }

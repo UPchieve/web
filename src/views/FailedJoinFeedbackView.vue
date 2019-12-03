@@ -10,6 +10,8 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 import FeedbackForm from "@/components/FeedbackForm";
 
 export default {
@@ -25,7 +27,8 @@ export default {
           style: "font-weight: 300"
         },
         {
-          text: "Dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Etiam non quam lacus suspendisse faucibus interdum posuere. Enim ut sem viverra aliquet eget sit. Risus at ultrices mi tempus imperdiet nulla malesuada pellentesque elit. Semper feugiat nibh sed pulvinar proin gravida hendrerit. Amet massa vitae tortor condimentum lacinia quis. Vitae semper quis lectus nulla at volutpat diam. A cras semper auctor neque vitae tempus quam pellentesque nec. Lorem ipsum dolor sit amet consectetur adipiscing elit pellentesque."
+          text:
+            "Dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Etiam non quam lacus suspendisse faucibus interdum posuere. Enim ut sem viverra aliquet eget sit. Risus at ultrices mi tempus imperdiet nulla malesuada pellentesque elit. Semper feugiat nibh sed pulvinar proin gravida hendrerit. Amet massa vitae tortor condimentum lacinia quis. Vitae semper quis lectus nulla at volutpat diam. A cras semper auctor neque vitae tempus quam pellentesque nec. Lorem ipsum dolor sit amet consectetur adipiscing elit pellentesque."
         }
       ],
       questions: [
@@ -47,16 +50,12 @@ export default {
             "Sed do eiusmod tempor",
             "Incididunt ut labore et dolore"
           ],
-          options_alias: [
-            "sample1-foo",
-            "sample1-bar",
-            "sample1-baz"
-          ]
+          options_alias: ["sample1-foo", "sample1-bar", "sample1-baz"]
         },
         {
           qid: "2",
           qtype: "multiple-radio",
-          alias: "sample1",
+          alias: "sample2",
           title: "Feugiat nisl pretium fusce id velit",
           secondary_title: "",
           table_title: [
@@ -71,6 +70,12 @@ export default {
             "Mattis nunc sed blandit libero volutpat sed cras ornare.",
             "Malesuada pellentesque elit eget gravida cum sociis.",
             "In cursus turpis massa tincidunt."
+          ],
+          options_alias: [
+            "sample2-foo",
+            "sample2-bar",
+            "sample2-baz",
+            "sample2-qux"
           ]
         },
         {
@@ -81,11 +86,12 @@ export default {
           secondary_title:
             "Viverra mauris in aliquam sem fringilla ut. Nibh sit amet commodo nulla facilisi nullam vehicula. Mattis ullamcorper velit sed ullamcorper morbi tincidunt ornare massa eget.",
           table_title: [],
-          options: []
+          options: [],
+          options_alias: []
         }
       ],
       metadata: {}
-    }
+    };
   },
   computed: {
     ...mapState({
@@ -97,7 +103,6 @@ export default {
       sessionId: this.$route.params.sessionId,
       topic: this.$route.params.topic,
       subTopic: this.$route.params.subTopic,
-      studentId: this.$route.params.studentId,
       volunteerId: this.$route.params.volunteerId,
       userType: "volunteer"
     };
@@ -108,5 +113,5 @@ export default {
       this.$router.push("/");
     }
   }
-}
+};
 </script>

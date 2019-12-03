@@ -2,6 +2,9 @@
   <div class="SessionFulfilledModal">
     <h1 class="SessionFulfilledModal-title">Session Fulfilled</h1>
     <div class="SessionFulfilledModal-message">{{ message }}</div>
+    <large-button v-if="mobileMode" @click.native="onCancel">{{
+      modalData.cancelText
+    }}</large-button>
     <large-button v-if="mobileMode" primary @click.native="onAccept">{{
       modalData.acceptText
     }}</large-button>
@@ -32,6 +35,17 @@ export default {
   },
   methods: {
     onAccept() {
+      this.$router.push({
+        name: "FailedJoinFeedbackView",
+        params: {
+          sessionId: this.modalData.sessionId,
+          topic: this.modalData.topic,
+          subTopic: this.modalData.subTopic,
+          volunteerId: this.modalData.volunteerId
+        }
+      });
+    },
+    onCancel() {
       this.$router.push("/");
     }
   }

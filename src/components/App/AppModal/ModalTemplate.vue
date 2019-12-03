@@ -13,9 +13,9 @@
       <template v-if="!mobileMode">
         <div class="ModalTemplate-seperator" />
         <div class="ModalTemplate-buttons">
-          <large-button v-if="!alertModal" @click.native="handleCancel"
-            >Cancel</large-button
-          >
+          <large-button v-if="!alertModal" @click.native="handleCancel">{{
+            cancelText
+          }}</large-button>
           <large-button
             primary
             @click.native="$emit('accept')"
@@ -38,6 +38,7 @@ import UpchieveIcon from "@/components/UpchieveIcon";
 export default {
   components: { LargeButton, UpchieveIcon },
   props: {
+    cancelText: { type: String, default: "Cancel" },
     acceptText: { type: String, default: "Accept" },
     backText: { type: String, default: "Back" },
     enableAccept: Boolean,
