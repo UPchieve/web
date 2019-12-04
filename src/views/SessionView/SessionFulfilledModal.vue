@@ -2,11 +2,11 @@
   <div class="SessionFulfilledModal">
     <h1 class="SessionFulfilledModal-title">Session Fulfilled</h1>
     <div class="SessionFulfilledModal-message">{{ message }}</div>
-    <large-button v-if="mobileMode" @click.native="onCancel">{{
-      modalData.cancelText
-    }}</large-button>
     <large-button v-if="mobileMode" primary @click.native="onAccept">{{
       modalData.acceptText
+    }}</large-button>
+    <large-button v-if="mobileMode" secondary @click.native="onCancel">{{
+      modalData.cancelText
     }}</large-button>
   </div>
 </template>

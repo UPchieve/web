@@ -149,7 +149,7 @@ export default {
         data: {
           acceptText: "Send Feedback",
           cancelText: "Return to Dashboard",
-          alertModal: true,
+          enableAcceptByDefault: true,
           isSessionEnded: !!data.endedAt,
           sessionId: sessionId,
           topic: topic,

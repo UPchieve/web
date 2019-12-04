@@ -4,6 +4,7 @@
     v-on:accept="onAccept"
     :back-text="modalData.backText"
     :accept-text="modalData.acceptText"
+    :cancel-text="modalData.cancelText"
     :alert-modal="modalData.alertModal"
     :enable-accept="enableAccept"
     :important="modalData.important"
@@ -44,8 +45,8 @@ export default {
     })
   },
   mounted() {
-    // enable the accept button by default if an alert modal
-    this.enableAccept = !!this.modalData.alertModal;
+    // enable the accept button by default if an alert modal or if specified
+    this.enableAccept = !!this.modalData.alertModal || !!this.modalData.enableAcceptByDefault;
   },
   methods: {
     onCancel() {
