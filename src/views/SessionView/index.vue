@@ -147,9 +147,14 @@ export default {
       this.$store.dispatch("app/modal/show", {
         component: SessionFulfilledModal,
         data: {
-          acceptText: "Send Feedback",
+          // prevents student from seeing the feedback form
+          userType: this.user.isVolunteer ? "volunteer" : "student",
+          acceptText: this.user.isVolunteer
+            ? "Send Feedback"
+            : "Return to Dashboard",
           cancelText: "Return to Dashboard",
           enableAcceptByDefault: true,
+          alertModal: !this.user.isVolunteer,
           isSessionEnded: !!data.endedAt,
           sessionId: sessionId,
           topic: topic,
