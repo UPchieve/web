@@ -46,7 +46,8 @@ export default {
   },
   mounted() {
     // enable the accept button by default if an alert modal or if specified
-    this.enableAccept = !!this.modalData.alertModal || !!this.modalData.enableAcceptByDefault;
+    this.enableAccept =
+      !!this.modalData.alertModal || !!this.modalData.enableAcceptByDefault;
   },
   methods: {
     onCancel() {
