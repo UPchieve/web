@@ -4,7 +4,7 @@
     :lead-paragraphs="leadParagraphs"
     :questions="questions"
     :metadata="metadata"
-    feedback-for="failedJoin"
+    :feedback-for="feedbackFor"
     @form-submit="submitting"
   />
 </template>
@@ -161,8 +161,10 @@ export default {
     };
 
     if (this.metadata.userType === "student") {
+      this.feedbackFor = "studentSession";
       this.questions = this.student_questions;
     } else {
+      this.feedbackFor = "volunteerSession";
       this.questions = this.volunteer_questions;
       this.leadParagraphs.push(
         {

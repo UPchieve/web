@@ -62,6 +62,7 @@ export default {
     }
     // sends information
     window.analytics.track("feedback", {
+      "feedback for": feedbackComponent.feedbackFor,
       "session id": feedbackComponent.metadata.sessionId,
       user: feedbackComponent.metadata.userType,
       "student id": feedbackComponent.metadata.studentId,

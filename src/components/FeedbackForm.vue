@@ -162,7 +162,7 @@ import AnalyticsService from "@/services/AnalyticsService";
 import NetworkService from "@/services/NetworkService";
 
 export default {
-  props: ["headerText", "leadParagraphs", "questions", "metadata"],
+  props: ["headerText", "leadParagraphs", "questions", "metadata", "feedbackFor"],
   data() {
     return {
       userResponse: {}
