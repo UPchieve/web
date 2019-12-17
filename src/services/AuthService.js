@@ -118,12 +118,14 @@ export default {
   },
 
   getAuth(context, options) {
-    const isGlobal = options && options.isGlobal;
+    const { isGlobal, withStats } = options
+      ? options
+      : { isGlobal: false, withStats: false };
 
     const authPromise =
       !context || isGlobal
-        ? NetworkService.userGlobal(Vue)
-        : NetworkService.user(context);
+        ? NetworkService.userGlobal(Vue, withStats)
+        : NetworkService.user(context, withStats);
     return authPromise
       .then(res => {
         const data = { ...res.data };

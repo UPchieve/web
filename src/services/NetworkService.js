@@ -54,14 +54,14 @@ export default {
       .post(`${AUTH_ROOT}/reset/confirm`, data)
       .then(this._successHandler, this._errorHandler);
   },
-  user(context) {
+  user(context, withStats) {
     return context.$http
-      .get(`${API_ROOT}/user`)
+      .get(`${API_ROOT}/user?withStats=${withStats}`)
       .then(this._successHandler, this._errorHandler);
   },
-  userGlobal(Vue) {
+  userGlobal(Vue, withStats) {
     return Vue.http
-      .get(`${API_ROOT}/user`)
+      .get(`${API_ROOT}/user?withStats=${withStats}`)
       .then(this._successHandler, this._errorHandler);
   },
   sendVerification(context) {

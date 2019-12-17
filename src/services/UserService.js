@@ -4,11 +4,11 @@ import AuthService from "./AuthService";
 import OnboardingService from "./OnboardingService";
 
 export default {
-  getAuth(context) {
-    return AuthService.getAuth(context);
+  getAuth(context, options) {
+    return AuthService.getAuth(context, options);
   },
-  getUser(context) {
-    return this.getAuth(context).then(auth => {
+  getUser(context, withStats) {
+    return this.getAuth(context, { withStats }).then(auth => {
       if (auth.authenticated) {
         return auth.user;
       }

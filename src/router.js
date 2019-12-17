@@ -32,14 +32,14 @@ import { topics } from "./utils/topics";
 Vue.use(VueResource);
 Vue.http.options.credentials = true;
 
-const getUser = () => {
+const getUser = withStats => {
   if (store.getters["user/isAuthenticated"]) {
     return new Promise(resolve => {
-      store.dispatch("user/fetchUser");
+      store.dispatch("user/fetchUser", { withStats: !!withStats });
       resolve();
     });
   } else {
-    return store.dispatch("user/fetchUser");
+    return store.dispatch("user/fetchUser", { withStats: !!withStats });
   }
 };
 
@@ -106,7 +106,11 @@ const routes = [
     path: "/dashboard",
     name: "DashboardView",
     component: DashboardView,
-    meta: { protected: true }
+    meta: { protected: true },
+    beforeEnter: (to, from, next) => {
+      // ensure stats are displayed on dashboard
+      getUser(true).then(() => next());
+    }
   },
   {
     path: "/session/:topic/:subTopic/:sessionId?",

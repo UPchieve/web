@@ -153,7 +153,10 @@ export default {
         },
         {
           label: "Hours of tutoring completed",
-          value: `${numHoursTutored} hours tutored`
+          value:
+            numHoursTutored !== null
+              ? `${numHoursTutored} hours tutored`
+              : "Computing..."
         }
       ];
     }

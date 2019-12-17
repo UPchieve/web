@@ -15,12 +15,14 @@ export default {
   },
   actions: {
     fetch: ({ dispatch }, context) => {
-      dispatch("fetchUser");
+      dispatch("fetchUser", { withStats: false });
       dispatch("fetchSession", context);
     },
 
-    fetchUser: ({ commit }) => {
-      return UserService.getUser().then(user => commit("setUser", user));
+    fetchUser: ({ commit }, options) => {
+      return UserService.getUser(null, !!(options && options.withStats)).then(
+        user => commit("setUser", user)
+      );
     },
 
     clearUser: ({ commit }) => {
