@@ -13,26 +13,28 @@
           >
         </div>
       </div>
-
       <div class="uc-form-body">
-        <div class="uc-column">
-          <label for="inputEmail" class="uc-form-label"
-            >Please enter your email address</label
-          >
-          <input
-            id="inputEmail"
-            v-model="email"
-            type="email"
-            class="uc-form-input"
-            required
-            autofocus
-          />
+        <div v-if="this.loggedIn === false">
+          <div class="uc-column">
+            <label for="inputEmail" class="uc-form-label"
+              >Please enter your email address</label
+            >
+            <input
+              id="inputEmail"
+              v-model="email"
+              type="email"
+              class="uc-form-input"
+              required
+              autofocus
+            />
+          </div>
         </div>
-
-        <button class="uc-form-button" type="submit" @click.prevent="submit()">
-          Enter
-        </button>
-
+        <div v-else>Send password reset email to {{ this.email }}?</div>
+      </div>
+      <button class="uc-form-button" type="submit" @click.prevent="submit()">
+        SEND
+      </button>
+      <div class="errors">
         <div v-if="msg !== ''">{{ msg }}</div>
       </div>
     </form>
@@ -41,6 +43,7 @@
 
 <script>
 import AuthService from "@/services/AuthService";
+import UserService from "@/services/UserService";
 import FormPageTemplate from "@/components/FormPageTemplate";
 
 export default {
@@ -52,13 +55,28 @@ export default {
   },
   data() {
     return {
+      /* allows differentiation between resetting password
+      when logged in vs. forgetting password before logged in*/
+      loggedIn: null,
       email: "",
       msg: ""
     };
   },
+  mounted() {
+    let auth = UserService.getAuth();
+    if (auth.authenticated) {
+      let user = UserService.getUser();
+      this.email = user.email;
+      this.loggedIn = true;
+    } else {
+      this.loggedIn = false;
+    }
+  },
   methods: {
     submit() {
-      AuthService.sendReset(this, this.email);
+      AuthService.sendReset(this, this.email).catch(err => {
+        this.msg = err.message;
+      });
     }
   }
 };
@@ -74,5 +92,11 @@ export default {
   .uc-form-header {
     @include flex-container(column, center, center);
   }
+}
+
+.errors {
+  padding: 20px;
+  font-size: 16px;
+  text-align: center;
 }
 </style>

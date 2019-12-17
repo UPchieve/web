@@ -4,20 +4,6 @@
       <div class="uc-form-header">Reset Your Password</div>
       <div class="uc-form-body">
         <div class="uc-column">
-          <label for="inputEmail" class="uc-form-label">
-            Please enter your email address
-          </label>
-          <input
-            id="inputEmail"
-            type="email"
-            class="uc-form-input"
-            v-model="credentials.email"
-            required
-            autofocus
-          />
-        </div>
-
-        <div class="uc-column">
           <label for="inputPassword" class="uc-form-label">
             Create a new password
           </label>
@@ -73,7 +59,6 @@ export default {
       msg: "",
       credentials: {
         token: "",
-        email: "",
         password: "",
         newpassword: ""
       }
@@ -83,7 +68,6 @@ export default {
     submit() {
       AuthService.confirmReset(this, {
         token: this.$route.params.token,
-        email: this.credentials.email,
         password: this.credentials.password,
         newpassword: this.credentials.newpassword
       })
