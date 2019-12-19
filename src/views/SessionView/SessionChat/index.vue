@@ -32,7 +32,7 @@
               <span>{{ message.contents }}</span>
             </div>
             <div class="time">
-              {{ message.time }}
+              {{ message.createdAt | formatTime }}
             </div>
           </div>
         </template>
@@ -56,7 +56,6 @@
 
 <script>
 import { setTimeout, clearTimeout } from "timers";
-import moment from "moment";
 import _ from "lodash";
 import { mapState, mapGetters } from "vuex";
 
@@ -76,7 +75,6 @@ export default {
   components: { ChatBot },
   data() {
     return {
-      messages: [],
       currentSession: SessionService.currentSession,
       newMessage: "",
       chatWarningIsShown: false,
@@ -86,7 +84,18 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: state => state.user.user,
+      messages: state => (state.user.session.messages || [])
+        .map(message => {
+          // compute avatar style from picture
+          let picture = message.picture;
+          if (!picture || picture === "") {
+            picture = message.isVolunteer ? VolunteerAvatarUrl : StudentAvatarUrl;
+          }
+          
+          message.avatarStyle = { backgroundImage: `url(${picture})` };
+          return message;
+        })
     }),
     ...mapGetters({
       sessionPartner: "user/sessionPartner",
@@ -159,38 +168,6 @@ export default {
   },
 
   sockets: {
-    "session-change"(data) {
-      // index session's participants by user id
-      const studentId = (data.student || {})._id;
-      const volunteerId = (data.volunteer || {})._id;
-
-      const participants = {};
-      participants[studentId] = data.student;
-      participants[volunteerId] = data.volunteer;
-
-      // re-load the session's persisted messages
-      const messages = data.messages.map(message => {
-        let { picture } = message;
-        const user = participants[message.user] || {};
-
-        if (!picture || picture === "") {
-          picture = user.isVolunteer ? VolunteerAvatarUrl : StudentAvatarUrl;
-        }
-
-        return {
-          contents: message.contents,
-          name: user.firstname,
-          userId: user._id,
-          isVolunteer: user.isVolunteer,
-          avatarStyle: {
-            backgroundImage: `url(${picture})`
-          },
-          time: moment(message.createdAt).format("h:mm a")
-        };
-      });
-
-      this.messages = messages;
-    },
     "is-typing"() {
       this.typingIndicatorShown = true;
     },
@@ -198,26 +175,7 @@ export default {
       this.typingIndicatorShown = false;
     },
     messageSend(data) {
-      // {1}
-      let { picture } = data;
-      if (!picture || picture === "") {
-        if (data.isVolunteer === true) {
-          picture = VolunteerAvatarUrl;
-        } else {
-          picture = StudentAvatarUrl;
-        }
-      }
-
-      this.messages.push({
-        contents: data.contents,
-        name: data.name,
-        userId: data.userId,
-        isVolunteer: data.isVolunteer,
-        avatarStyle: {
-          backgroundImage: `url(${picture})`
-        },
-        time: moment(data.createdAt).format("h:mm a")
-      });
+      this.$store.dispatch("user/addMessage", data);
     }
   },
 
