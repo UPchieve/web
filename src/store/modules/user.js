@@ -11,7 +11,10 @@ export default {
   },
   mutations: {
     setUser: (state, user = {}) => (state.user = user),
-    setSession: (state, session = {}) => (state.session = session)
+    setSession: (state, session = {}) => (state.session = session),
+    addMessage: (state, message) => {
+      if (message) state.session.messages.push(message);
+    }
   },
   actions: {
     fetch: ({ dispatch }, context) => {
@@ -39,6 +42,10 @@ export default {
 
     updateSession: ({ commit }, sessionData) => {
       commit("setSession", sessionData);
+    },
+
+    addMessage: ({ commit }, message) => {
+      commit("addMessage", message);
     },
 
     clearSession: ({ commit }) => {
