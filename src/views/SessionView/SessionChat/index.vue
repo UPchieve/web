@@ -365,7 +365,7 @@ span {
     width: calc(100% - 100px);
     height: 40px;
     border: none;
-    position: absolute;
+    position: fixed;
     left: 0;
     bottom: 0;
     border: 1px solid #d6e0ef;
