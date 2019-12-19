@@ -50,7 +50,7 @@ Vue.component("vue-phone-number-input", VuePhoneNumberInput);
 Vue.component("vue-star-rating", VueStarRating);
 
 // Filter for formatting times
-Vue.filter('formatTime', (value) => {
+Vue.filter("formatTime", value => {
   if (value) {
     return moment(value).format("h:mm a");
   }

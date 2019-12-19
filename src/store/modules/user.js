@@ -47,7 +47,7 @@ export default {
     addMessage: ({ commit }, message) => {
       commit("addMessage", message);
     },
-    
+
     clearSession: ({ commit }) => {
       commit("setSession", {});
     }

@@ -85,14 +85,16 @@ export default {
   computed: {
     ...mapState({
       user: state => state.user.user,
-      messages: state => (state.user.session.messages || [])
-        .map(message => {
+      messages: state =>
+        (state.user.session.messages || []).map(message => {
           // compute avatar style from picture
           let picture = message.picture;
           if (!picture || picture === "") {
-            picture = message.isVolunteer ? VolunteerAvatarUrl : StudentAvatarUrl;
+            picture = message.isVolunteer
+              ? VolunteerAvatarUrl
+              : StudentAvatarUrl;
           }
-          
+
           message.avatarStyle = { backgroundImage: `url(${picture})` };
           return message;
         })
