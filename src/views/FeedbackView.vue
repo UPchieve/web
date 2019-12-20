@@ -1,4 +1,3 @@
-<!--suppress ALL -->
 <template>
   <div class="feedback-form">
     <div class="header">
@@ -30,6 +29,33 @@
       >
         <td class="question-cell">
           <div class="question-title">{{ question.title }}</div>
+          <div v-if="question.qtype === 'star-rating'">
+            <table class="star-rating-table">
+              <tr
+                class="star-rating-row forMobileView"
+                v-for="(subquestion, subquestion_index) in question.options"
+                v-bind:key="subquestion"
+              >
+                <td class="star-rating-cell">
+                  <vue-star-rating
+                    v-model="
+                      userResponse[question.alias][
+                        question.options_alias[subquestion_index]
+                      ]
+                    "
+                    inactive-color="#ffffff"
+                    active-color="#36d2aa"
+                    border-color="#36d2aa"
+                    :border-width="4"
+                    :star-size="30"
+                    :padding="1"
+                    :show-rating="false"
+                  >
+                  </vue-star-rating>
+                </td>
+              </tr>
+            </table>
+          </div>
           <div v-if="question.qtype === 'multiple-radio'">
             <table class="radio-question-table">
               <tr class="radio-question-row">
@@ -149,11 +175,10 @@ export default {
       student_questions: [
         {
           qid: "1",
-          qtype: "multiple-radio",
+          qtype: "star-rating",
           alias: "rate-session",
           title: "Rate your session",
           secondary_title: "",
-          table_title: ["1", "2", "3", "4", "5"],
           options: ["Rating"],
           options_alias: ["rating"]
         },
@@ -219,43 +244,49 @@ export default {
       volunteer_questions: [
         {
           qid: "1",
-          qtype: "text",
-          alias: "asked-unprepared-questions",
-          title:
-            "Did the student ask you any questions that you weren’t prepared to answer?",
-          secondary_title:
-            "Don’t worry! We use this to improve our training and certification materials and won’t hold it against you.",
-          table_title: [],
-          options: []
+          qtype: "star-rating",
+          alias: "rate-session",
+          title: "Rate your session",
+          secondary_title: "",
+          options: ["Rating"],
+          options_alias: ["rating"]
         },
         {
           qid: "2",
-          qtype: "text",
-          alias: "app-features-needed",
-          title:
-            "Were there any app features that you needed or that would have been helpful during this session?",
+          qtype: "multiple-radio",
+          alias: "session-experience",
+          title: "Please tell us about your experience.",
           secondary_title: "",
-          table_title: [],
-          options: []
+          table_title: [
+            "Strongly Disagree",
+            "Somewhat Agree",
+            "Neither",
+            "Somewhat Agree",
+            "Strongly Agree"
+          ],
+          options: [
+            "I feel like I helped the student.",
+            "I found it easy to answer the student’s question(s).",
+            "I feel like this was a good use of my time.",
+            "I feel more fulfilled as a result of this volunteer experience.",
+            "I plan on volunteering with UPchieve again."
+          ],
+          options_alias: [
+            "feel-like-helped-student",
+            "easy-to-answer-questions",
+            "good-use-of-time",
+            "feel-more-fulfilled",
+            "plan-on-volunteering-again"
+          ]
         },
         {
           qid: "3",
           qtype: "text",
-          alias: "technical-difficulties",
-          title:
-            "Did you encounter any technical difficulties/bugs while using the app?",
-          secondary_title:
-            "If yes, please describe the issue in as much detail as possible so that our tech team can replicate and fix it.",
-          table_title: [],
-          options: []
-        },
-        {
-          qid: "4",
-          qtype: "text",
           alias: "other-feedback",
           title:
-            "(Optional) Do you have any other feedback you’d like to share with us?",
-          secondary_title: "",
+            "(Optional) Do you have any other feedback you’d like to share?",
+          secondary_title:
+            "This can be about any technical issues you encountered, features you would have liked, concepts or topics you felt unprepared for, or the experience of volunteering with UPchieve in general.",
           table_title: [],
           options: []
         }
@@ -284,7 +315,10 @@ export default {
       this.questions = this.volunteer_questions;
     }
     this.questions.map(function(question) {
-      if (question.qtype === "multiple-radio")
+      if (
+        question.qtype === "multiple-radio" ||
+        question.qtype === "star-rating"
+      )
         _self.userResponse[question.alias] = {};
     });
   },
@@ -381,6 +415,23 @@ export default {
 .question-secondary-title {
   font-size: 15px;
   padding-bottom: 10px;
+}
+
+.star-rating-table {
+  width: 100%;
+  font-size: 15px;
+}
+
+.star-rating-row {
+  display: table-row;
+}
+
+.star-rating-cell {
+  width: 50%;
+  display: table-cell;
+  vertical-align: middle;
+  padding-top: 20px;
+  padding-bottom: 25px;
 }
 
 .radio-question-table {
@@ -529,6 +580,16 @@ export default {
 
   .question-cell {
     padding: 0em 1em 2em !important;
+  }
+
+  .star-rating-row {
+    padding-bottom: 1em !important;
+  }
+
+  .star-rating-cell {
+    width: calc(100vw - 56.75px);
+    display: table-caption;
+    padding: 0.5em 0;
   }
 
   .radio-question-cell {

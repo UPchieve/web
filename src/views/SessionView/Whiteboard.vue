@@ -67,17 +67,6 @@
               style="background-color: rgba(24,85,209,.6)"
               @click="changeColor"
             />
-
-            <textarea
-              id="textInputBox"
-              rows="4"
-              cols="50"
-              style="visibility:hidden"
-              placeholder="Type Here"
-              @input="textBox"
-              @keydown="keydown"
-              @keyup.enter="hideBox"
-            />
           </div>
         </div>
         <button
@@ -98,7 +87,6 @@
           v-tooltip="'Undo'"
           @click="undo"
         />
-        <!-- <button class='whiteboardBtn' id='textButton' v-tooltip="'Draw Text'" v-on:click="text"></button> -->
       </div>
     </div>
   </div>
@@ -116,38 +104,18 @@ import SessionService from "@/services/SessionService";
 import EraserIconUrl from "@/assets/eraser_icon_01_dark.png";
 import PenIconUrl from "@/assets/pen_icon_01_dark.png";
 
-// const CLEAR_BUTTON_ID = 'clearButton';
-// const UNDO_BUTTON_ID = 'undoButton';
-// const ERASE_BUTTON_ID = 'eraseButton';
-// const DRAW_BUTTON_ID = 'drawButton';
-// const TEXT_BUTTON_ID = 'textButton';
-// const TEXT_AREA_ID = 'textInputBox';
-
-// const LINE_FILL_STYLE = 'solid';
 let LOCAL_LINE_COLOR = "rgba(52,52,64,.6)";
 let SERVER_LINE_COLOR = "rgba(52,52,64,.6)";
 let SERVER_LINE_WIDTH = 5;
 const LINE_WIDTH = 5;
-// const LINE_CAP = 'round';
 
 const ERASING_LINE_COLOR = "white";
 const ERASING_LINE_WIDTH = 20;
-
-// const DRAWING = false;
 
 let SERVER_DRAWING = false;
 
 const ERASER_ICON = `url("${EraserIconUrl}") 0 50, auto`;
 const PEN_ICON = `url("${PenIconUrl}") 0 50, auto`;
-const TEXT_ICON = "text";
-
-let TEXT_POSITION_X = 10;
-let TEXT_POSITION_Y = 10;
-
-// const ERASING = false;
-// let INSERTING_TEXT = false;
-let CURSOR_VISIBLE = false;
-// let CURSOR_REMOVED = false;
 
 let currentState = "";
 
@@ -155,8 +123,6 @@ let imageList = [];
 let imageData;
 window.App = {};
 const App = window.App;
-
-// const RESET_SCREEN_EVENT = 'reset';
 
 function compareImages(img1, img2) {
   if (img1 !== null && img2 !== null) {
@@ -286,29 +252,8 @@ export default {
         color: data.color
       });
     },
-    emitInsertText(data) {
-      this.$socket.emit("insertText", {
-        sessionId: this.currentSession.sessionId,
-        user: { _id: this.user._id },
-        x: data.x,
-        y: data.y,
-        text: data.text
-      });
-    },
-    emitResetScreen(/* data */) {
-      this.$socket.emit("resetScreen", {
-        sessionId: this.currentSession.sessionId,
-        user: { _id: this.user._id }
-      });
-    },
 
     // UI events
-
-    hideBox() {
-      this.$el.querySelector("#textInputBox").style.visibility = "hidden";
-      this.$el.querySelector("#textInputBox").value = "";
-      currentState = "";
-    },
     changeColor(event) {
       if (currentState === "DRAWING") {
         LOCAL_LINE_COLOR = event.target.style.backgroundColor;
@@ -334,33 +279,8 @@ export default {
 
       if (!SERVER_DRAWING) {
         this.emitDrawing();
-        if (!CURSOR_VISIBLE && currentState === "INSERTING_TEXT") {
-          TEXT_POSITION_X = event.layerX - 10;
-          TEXT_POSITION_Y = event.layerY + 34;
-          CURSOR_VISIBLE = true;
-          saveImage(App.canvas, App.ctx);
-          this.emitSaveImage();
-          if (imageList.length > 0) {
-            imageData = imageList[imageList.length - 1];
-            App.ctx.putImageData(imageData, 0, 0);
-          } else {
-            imageData = App.ctx.getImageData(
-              0,
-              0,
-              App.canvas.width,
-              App.canvas.height
-            );
-          }
 
-          imageList.push(imageData);
-          App.ctx.fillText("|", TEXT_POSITION_X, TEXT_POSITION_Y);
-          this.emitInsertText({
-            text: "|",
-            x: TEXT_POSITION_X,
-            y: TEXT_POSITION_Y
-          });
-          // CURSOR_REMOVED = false;
-        } else if (currentState === "DRAWING" || currentState === "ERASING") {
+        if (currentState === "DRAWING" || currentState === "ERASING") {
           saveImage(App.canvas, App.ctx);
           this.emitSaveImage();
           App.canvas.isDrawing = true;
@@ -507,14 +427,7 @@ export default {
       App.ctx.lineWidth = LINE_WIDTH;
       this.emitChangeWidth(LINE_WIDTH);
 
-      this.$el.querySelector("#textInputBox").value = "";
-      this.$el.querySelector("#textInputBox").style.visibility = "hidden";
       App.canvas.style.cursor = PEN_ICON;
-
-      if (currentState === "INSERTING_TEXT") {
-        saveImage(App.canvas, App.ctx);
-        this.emitSaveImage();
-      }
 
       if (imageList.length === 0) {
         saveImage(App.canvas, App.ctx);
@@ -524,52 +437,6 @@ export default {
       currentState = "DRAWING";
     },
 
-    keydown(e) {
-      if (
-        this.$el.querySelector("#textInputBox").value === "" &&
-        e.keyCode !== 8 &&
-        e.keyCode !== 46
-      ) {
-        if (imageList.length > 0) {
-          imageData = imageList.pop();
-          App.ctx.putImageData(imageData, 0, 0);
-        }
-      }
-    },
-
-    text() {
-      if (imageList.length === 0) {
-        saveImage(App.canvas, App.ctx);
-        this.emitSaveImage();
-      }
-      saveImage(App.canvas, App.ctx);
-      this.emitSaveImage();
-
-      currentState = "INSERTING_TEXT";
-      // INSERTING_TEXT = true;
-      CURSOR_VISIBLE = false;
-      App.canvas.style.cursor = TEXT_ICON;
-      this.$el.querySelector("#textInputBox").style.visibility = "visible";
-      this.$el.querySelector("#textInputBox").value = "";
-    },
-
-    textBox() {
-      if (CURSOR_VISIBLE) {
-        // handleUndoOperation(); // {1}
-        this.emitUndoClick();
-        CURSOR_VISIBLE = false;
-      }
-      this.insertText(
-        this.$el.querySelector("#whiteboardCanvas"),
-        this.$el.querySelector("#textInputBox").value
-      );
-      this.emitInsertText({
-        text: this.$el.querySelector("#textInputBox").value,
-        x: TEXT_POSITION_X,
-        y: TEXT_POSITION_Y
-      });
-    },
-
     undo() {
       const currentImage = App.ctx.getImageData(
         0,
@@ -577,7 +444,7 @@ export default {
         App.canvas.width,
         App.canvas.height
       );
-      this.$el.querySelector("#textInputBox").value = "";
+
       if (imageList.length > 0) {
         imageData = imageList.pop();
         while (compareImages(currentImage, imageData)) {
@@ -596,16 +463,11 @@ export default {
         saveImage(App.canvas, App.ctx);
         this.emitSaveImage();
       }
-      if (currentState === "INSERTING_TEXT") {
-        saveImage(App.canvas, App.ctx);
-        this.emitSaveImage();
-      }
+
       currentState = "ERASING";
       App.ctx.strokeStyle = ERASING_LINE_COLOR;
       App.ctx.lineWidth = ERASING_LINE_WIDTH;
       App.canvas.style.cursor = ERASER_ICON;
-      this.$el.querySelector("#textInputBox").value = "";
-      this.$el.querySelector("#textInputBox").style.visibility = "hidden";
       this.emitChangeColor(ERASING_LINE_COLOR);
       this.emitChangeWidth(ERASING_LINE_WIDTH);
     },
@@ -642,16 +504,7 @@ export default {
         }
       }
     },
-    insertText(canvas, input) {
-      App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
 
-      if (imageList.length > 0) {
-        imageData = imageList.pop();
-        App.ctx.putImageData(imageData, 0, 0);
-        imageList.push(imageData);
-      }
-      App.ctx.fillText(input, TEXT_POSITION_X, TEXT_POSITION_Y);
-    },
     openColors() {
       if (this.showColors === "hidden") {
         this.showColors = "visible";
@@ -736,16 +589,6 @@ export default {
     },
     width(newWidth) {
       SERVER_LINE_WIDTH = newWidth;
-    },
-    text(data) {
-      App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
-
-      if (imageList.length > 0) {
-        imageData = imageList.pop();
-        App.ctx.putImageData(imageData, 0, 0);
-        imageList.push(imageData);
-      }
-      App.ctx.fillText(data.text, data.x, data.y);
     }
   }
 };
@@ -840,10 +683,6 @@ canvas {
 
 #undoButton {
   background-image: url("~@/assets/undo_icon.svg");
-}
-
-#textButton {
-  background-image: url("~@/assets/Aa.png");
 }
 
 #clearButton {

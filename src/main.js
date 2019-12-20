@@ -7,6 +7,10 @@ import * as Integrations from "@sentry/integrations";
 import vSelect from "vue-select";
 import VuePhoneNumberInput from "vue-phone-number-input";
 import VTooltip from "v-tooltip";
+import VueStarRating from "vue-star-rating";
+
+import Socket from "socket.io-client";
+import moment from "moment";
 
 import App from "./components/App";
 import router from "./router";
@@ -16,7 +20,10 @@ import store from "./store";
 Vue.config.productionTip = false;
 
 // Set up SocketIO
-Vue.use(VueSocketIO, process.env.VUE_APP_SOCKET_ADDRESS);
+const socket = Socket(process.env.VUE_APP_SOCKET_ADDRESS, {
+  autoConnect: false
+});
+Vue.use(VueSocketIO, socket);
 
 // Set up Vue Router
 Vue.use(VueRouter);
@@ -46,6 +53,16 @@ Vue.component("v-select", vSelect);
 
 // Set up vue-phone-number-input
 Vue.component("vue-phone-number-input", VuePhoneNumberInput);
+
+// Set up vue-star-rating
+Vue.component("vue-star-rating", VueStarRating);
+
+// Filter for formatting times
+Vue.filter("formatTime", value => {
+  if (value) {
+    return moment(value).format("h:mm a");
+  }
+});
 
 // Create Vue instance
 new Vue({

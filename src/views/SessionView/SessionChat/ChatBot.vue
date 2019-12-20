@@ -49,14 +49,12 @@ export default {
         msg: `Hey ${this.firstName}! I'm the UPchieve Bot.`
       },
       {
-        msg: "Right now we’re searching for a coach to pair you with."
-      },
-      {
-        msg: "This process sometimes takes 5 to 10 minutes."
+        msg:
+          "Right now we're searching for a live coach to pair you with. This process should only take 5-10 minutes, so please hang tight!"
       },
       {
         msg:
-          "While you wait, write out the problem you’re working on using the whiteboard or chat."
+          "While you're waiting, you can save time by telling us what you need help with in the chat! You can also write out a problem you're working on on the whiteboard."
       }
     ];
 
