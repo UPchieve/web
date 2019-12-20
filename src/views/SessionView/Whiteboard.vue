@@ -600,11 +600,15 @@ canvas {
   display: flex;
   align-items: center;
   flex-direction: column;
-  position: absolute;
+  position: fixed;
   bottom: 20px;
   border-radius: 8px;
   left: 50%;
   transform: translate(-50%, 0);
+
+  @include breakpoint-above("medium") {
+    position: absolute;
+  }
 
   .mobile-whiteboard-notice {
     margin: auto;
