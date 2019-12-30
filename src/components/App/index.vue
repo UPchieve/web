@@ -25,6 +25,8 @@
 <script>
 import { mapState } from "vuex";
 
+import VuePageVisibility from "vue-page-visibility-awesome";
+
 import SessionService from "@/services/SessionService";
 
 import "@/scss/main.scss";
@@ -37,7 +39,8 @@ export default {
   components: {
     AppHeader,
     AppSidebar,
-    AppModal
+    AppModal,
+    VuePageVisibility
   },
   created() {
     // Listen for resize event
