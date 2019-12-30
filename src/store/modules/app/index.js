@@ -12,13 +12,15 @@ export default {
   },
   state: {
     windowWidth: 0,
-    windowHeight: 0
+    windowHeight: 0,
+    pageHidden: false
   },
   mutations: {
     setWindowWidth: (state, width = 0) =>
       (state.windowWidth = Math.max(0, width)),
     setWindowHeight: (state, height = 0) =>
-      (state.windowHeight = Math.max(0, height))
+      (state.windowHeight = Math.max(0, height)),
+    setPageHidden: (state, hidden = false) => (state.pageHidden = !!hidden)
   },
   actions: {
     showNavigation: ({ dispatch }) => {
@@ -33,6 +35,13 @@ export default {
     windowResize: ({ commit }, { width, height }) => {
       commit("setWindowWidth", width);
       commit("setWindowHeight", height);
+    },
+
+    documentInactive: ({ commit }) => {
+      commit("setPageHidden", true);
+    },
+    documentActive: ({ commit }) => {
+      commit("setPageHidden", false);
     }
   },
   getters: {
