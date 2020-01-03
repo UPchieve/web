@@ -100,35 +100,21 @@ export default {
     }
   },
   created() {
-    this.fetchData();
+    this.initScheduleData();
   },
   methods: {
-    fetchData() {
-      var originalAvailabilityPromise = CalendarService.getAvailability(
-        this,
-        this.user._id
-      );
-      var userTimezonePromise = CalendarService.getTimezone(
-        this,
-        this.user._id
-      );
+    initScheduleData() {
+      const userTimezone = this.user.timezone;
+      const hasValidTimezone = userTimezone && this.userTzInList(userTimezone);
+      this.selectedTz = hasValidTimezone ? userTimezone : moment.tz.guess();
 
-      Promise.all([originalAvailabilityPromise, userTimezonePromise]).then(
-        ([originalAvailability, userTimezone]) => {
-          if (userTimezone && this.userTzInList(userTimezone)) {
-            this.selectedTz = userTimezone;
-          } else {
-            this.selectedTz = moment.tz.guess();
-          }
-
-          var estNow = moment.tz("America/New_York").hour();
-          var userNow = moment.tz(this.selectedTz).hour();
-          var offset = userNow - estNow;
-          this.availability = this.convertAvailability(
-            originalAvailability,
-            offset
-          );
-        }
+      const originalAvailability = this.user.availability;
+      const estNow = moment.tz("America/New_York").hour();
+      const userNow = moment.tz(this.selectedTz).hour();
+      const offset = userNow - estNow;
+      this.availability = this.convertAvailability(
+        originalAvailability,
+        offset
       );
     },
     sortTimes() {
