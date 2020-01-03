@@ -30,7 +30,6 @@
                   class="timeOfDay"
                 >
                   <input
-                    id="time"
                     v-model="availability[day][sortedTime]"
                     type="checkbox"
                   />
