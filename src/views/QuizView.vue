@@ -271,9 +271,9 @@ export default {
         return;
       }
 
-      MathJax.Hub.Queue(
-        ["Typeset", MathJax.Hub, questionText],
-        ["Typeset", MathJax.Hub, answerChoices]
+      window.MathJax.Hub.Queue(
+        ["Typeset", window.MathJax.Hub, questionText],
+        ["Typeset", window.MathJax.Hub, answerChoices]
       );
     },
     reload() {
