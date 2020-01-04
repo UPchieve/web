@@ -239,6 +239,14 @@ export default {
     this.rerenderMathJaxElements();
   },
   methods: {
+    /**
+     * TODO:
+     * for stuff that has regular text after some MathJax,
+     * causes problems with multiple innerTexts after removing inner el's
+     * --
+     * so, instead of deleting the MathJax el's, try just clearing all the
+     * innerHTML of the quiz options + question text
+     */
     clearMathJaxElements() {
       const quizBody = document.querySelector(".quizBody");
 
