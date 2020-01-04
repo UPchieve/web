@@ -122,9 +122,9 @@ export default {
             this.selectedTz = moment.tz.guess();
           }
 
-          var estNow = moment.tz("America/New_York").hour();
-          var userNow = moment.tz(this.selectedTz).hour();
-          var offset = userNow - estNow;
+          var estUtcOffset = moment.tz.zone("America/New_York").parse(Date.now());
+          var userUtcOffset = moment.tz.zone(this.selectedTz).parse(Date.now());
+          var offset = (estUtcOffset - userUtcOffset) / 60;
           this.availability = this.convertAvailability(
             originalAvailability,
             offset
