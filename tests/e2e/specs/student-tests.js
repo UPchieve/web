@@ -22,10 +22,13 @@ describe("Student tests", () => {
   });
 
   it("Should log out successfully", () => {
-    cy.get("a")
-      .contains("Logout")
+    cy.get("body")
+      .contains("Log out")
       .click();
 
-    cy.location("pathname").should("eq", "/logout");
+    cy.get("body", { timeout: 50000 }).should($p => {
+      expect($p.first()).to.contain("logged out");
+    });
+    //cy.location("pathname", { timeout: 5000 }).should("eq", "/logout");
   });
 });
