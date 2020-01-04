@@ -165,8 +165,6 @@ import { mapState } from "vuex";
 
 import TrainingService from "@/services/TrainingService";
 
-const MathJax = window.MathJax;
-
 /**
  * @note {1} Why the extra parens: https://stackoverflow.com/a/27386370
  */
