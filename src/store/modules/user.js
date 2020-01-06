@@ -11,9 +11,19 @@ export default {
   },
   mutations: {
     setUser: (state, user = {}) => (state.user = user),
+
     setSession: (state, session = {}) => (state.session = session),
+
     addMessage: (state, message) => {
       if (message) state.session.messages.push(message);
+    },
+
+    setAvailability: (state, availability) => {
+      if (availability) state.user.availability = availability;
+    },
+
+    setTimezone: (state, timezone) => {
+      if (timezone) state.user.timezone = timezone;
     }
   },
   actions: {
@@ -28,6 +38,14 @@ export default {
 
     clearUser: ({ commit }) => {
       commit("setUser", {});
+    },
+
+    updateAvailability: ({ commit }, availability) => {
+      commit("setAvailability", availability);
+    },
+
+    updateTimezone: ({ commit }, timezone) => {
+      commit("setTimezone", timezone);
     },
 
     fetchSession: ({ commit, state }, context) => {
