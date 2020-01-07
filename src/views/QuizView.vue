@@ -165,8 +165,6 @@ import { mapState } from "vuex";
 
 import TrainingService from "@/services/TrainingService";
 
-const MathJax = window.MathJax;
-
 /**
  * @note {1} Why the extra parens: https://stackoverflow.com/a/27386370
  */
@@ -244,21 +242,29 @@ export default {
 
       // Remove any MathJax-rendered elements from the DOM.
       // Do this before updating to avoid rendering artifacts being left behind
-      const mathJaxElements = quizBody.querySelectorAll(
-        "[class*=mjx],[class*=MathJax],[id*=MathJax]"
+      const mathJaxElements = Array.from(
+        quizBody.querySelectorAll("[class*=mjx],[class*=MathJax],[id*=MathJax]")
       );
-      Array.from(mathJaxElements).forEach(e => e.remove());
+
+      const mathJaxParentElements = Array.from(
+        quizBody.querySelectorAll(".MathJax_Preview")
+      ).map(e => e.parentElement);
+
+      mathJaxElements.forEach(e => e.remove());
 
       // MathJax slices up the DOM nodes it renders as math formulas. We need to
       // rejoin these under the first child's data attribute to avoid artifacts
       // being left behind
-      const questionText = quizBody.querySelector(".questionText");
-      questionText.firstChild.data = questionText.innerText;
+      mathJaxParentElements.forEach(parentEl => {
+        if (!(parentEl && parentEl.firstChild)) return;
 
-      // Remove all child nodes but the first
-      Array.from(questionText.childNodes)
-        .slice(1)
-        .forEach(e => e.remove());
+        parentEl.firstChild.data = parentEl.innerText;
+
+        // Remove all child nodes but the first
+        Array.from(parentEl.childNodes)
+          .slice(1)
+          .forEach(e => e.remove());
+      });
     },
 
     rerenderMathJaxElements() {
@@ -271,9 +277,9 @@ export default {
         return;
       }
 
-      MathJax.Hub.Queue(
-        ["Typeset", MathJax.Hub, questionText],
-        ["Typeset", MathJax.Hub, answerChoices]
+      window.MathJax.Hub.Queue(
+        ["Typeset", window.MathJax.Hub, questionText],
+        ["Typeset", window.MathJax.Hub, answerChoices]
       );
     },
     reload() {
