@@ -237,34 +237,34 @@ export default {
     this.rerenderMathJaxElements();
   },
   methods: {
-    /**
-     * TODO:
-     * for stuff that has regular text after some MathJax,
-     * causes problems with multiple innerTexts after removing inner el's
-     * --
-     * so, instead of deleting the MathJax el's, try just clearing all the
-     * innerHTML of the quiz options + question text
-     */
     clearMathJaxElements() {
       const quizBody = document.querySelector(".quizBody");
 
       // Remove any MathJax-rendered elements from the DOM.
       // Do this before updating to avoid rendering artifacts being left behind
-      const mathJaxElements = quizBody.querySelectorAll(
-        "[class*=mjx],[class*=MathJax],[id*=MathJax]"
+      const mathJaxElements = Array.from(
+        quizBody.querySelectorAll("[class*=mjx],[class*=MathJax],[id*=MathJax]")
       );
-      Array.from(mathJaxElements).forEach(e => e.remove());
+
+      const mathJaxParentElements = Array.from(
+        quizBody.querySelectorAll(".MathJax_Preview")
+      ).map(e => e.parentElement);
+
+      mathJaxElements.forEach(e => e.remove());
 
       // MathJax slices up the DOM nodes it renders as math formulas. We need to
       // rejoin these under the first child's data attribute to avoid artifacts
       // being left behind
-      const questionText = quizBody.querySelector(".questionText");
-      questionText.firstChild.data = questionText.innerText;
+      mathJaxParentElements.forEach(parentEl => {
+        if (!(parentEl && parentEl.firstChild)) return;
 
-      // Remove all child nodes but the first
-      Array.from(questionText.childNodes)
-        .slice(1)
-        .forEach(e => e.remove());
+        parentEl.firstChild.data = parentEl.innerText;
+
+        // Remove all child nodes but the first
+        Array.from(parentEl.childNodes)
+          .slice(1)
+          .forEach(e => e.remove());
+      });
     },
 
     rerenderMathJaxElements() {
