@@ -132,10 +132,12 @@ export default {
         }
 
         if (data.user) {
-          return {
+          const auth = {
             authenticated: true,
             user: data.user
           };
+          auth.user.date = new Date(res.headers.get("Date"));
+          return auth;
         } else {
           return {
             authenticated: false,
