@@ -109,9 +109,7 @@ export default {
       this.selectedTz = hasValidTimezone ? userTimezone : moment.tz.guess();
 
       const originalAvailability = this.user.availability;
-      var estUtcOffset = moment.tz
-        .zone("America/New_York")
-        .parse(Date.now());
+      var estUtcOffset = moment.tz.zone("America/New_York").parse(Date.now());
       var userUtcOffset = moment.tz.zone(this.selectedTz).parse(Date.now());
       var offset = (estUtcOffset - userUtcOffset) / 60;
       this.availability = this.convertAvailability(
