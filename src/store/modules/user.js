@@ -11,9 +11,35 @@ export default {
   },
   mutations: {
     setUser: (state, user = {}) => (state.user = user),
+
+    updateUser: (state, user = {}) => {
+      if (
+        !user.date ||
+        !state.user.date ||
+        user.date.getTime() >= state.user.date.getTime()
+      ) {
+        state.user = user;
+      }
+    },
+
     setSession: (state, session = {}) => (state.session = session),
+
     addMessage: (state, message) => {
       if (message) state.session.messages.push(message);
+    },
+
+    setAvailability: (state, availability, date) => {
+      if (availability) {
+        state.user.availability = availability;
+        state.user.date = date;
+      }
+    },
+
+    setTimezone: (state, timezone, date) => {
+      if (timezone) {
+        state.user.timezone = timezone;
+        state.user.date = date;
+      }
     }
   },
   actions: {
@@ -23,11 +49,19 @@ export default {
     },
 
     fetchUser: ({ commit }) => {
-      return UserService.getUser().then(user => commit("setUser", user));
+      return UserService.getUser().then(user => commit("updateUser", user));
     },
 
     clearUser: ({ commit }) => {
       commit("setUser", {});
+    },
+
+    updateAvailability: ({ commit }, availability, date = Date.now()) => {
+      commit("setAvailability", availability, date);
+    },
+
+    updateTimezone: ({ commit }, timezone, date = Date.now()) => {
+      commit("setTimezone", timezone, date);
     },
 
     fetchSession: ({ commit, state }, context) => {

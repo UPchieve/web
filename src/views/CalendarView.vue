@@ -30,7 +30,6 @@
                   class="timeOfDay"
                 >
                   <input
-                    id="time"
                     v-model="availability[day][sortedTime]"
                     type="checkbox"
                   />
@@ -101,37 +100,23 @@ export default {
     }
   },
   created() {
-    this.fetchData();
+    this.initScheduleData();
   },
   methods: {
-    fetchData() {
-      var originalAvailabilityPromise = CalendarService.getAvailability(
-        this,
-        this.user._id
-      );
-      var userTimezonePromise = CalendarService.getTimezone(
-        this,
-        this.user._id
-      );
+    initScheduleData() {
+      const userTimezone = this.user.timezone;
+      const hasValidTimezone = userTimezone && this.userTzInList(userTimezone);
+      this.selectedTz = hasValidTimezone ? userTimezone : moment.tz.guess();
 
-      Promise.all([originalAvailabilityPromise, userTimezonePromise]).then(
-        ([originalAvailability, userTimezone]) => {
-          if (userTimezone && this.userTzInList(userTimezone)) {
-            this.selectedTz = userTimezone;
-          } else {
-            this.selectedTz = moment.tz.guess();
-          }
-
-          var estUtcOffset = moment.tz
-            .zone("America/New_York")
-            .parse(Date.now());
-          var userUtcOffset = moment.tz.zone(this.selectedTz).parse(Date.now());
-          var offset = (estUtcOffset - userUtcOffset) / 60;
-          this.availability = this.convertAvailability(
-            originalAvailability,
-            offset
-          );
-        }
+      const originalAvailability = this.user.availability;
+      var estUtcOffset = moment.tz
+        .zone("America/New_York")
+        .parse(Date.now());
+      var userUtcOffset = moment.tz.zone(this.selectedTz).parse(Date.now());
+      var offset = (estUtcOffset - userUtcOffset) / 60;
+      this.availability = this.convertAvailability(
+        originalAvailability,
+        offset
       );
     },
     sortTimes() {
