@@ -19,25 +19,12 @@
       </transition>
 
       <div class="messages">
-        <div v-if="!user.isVolunteer" class="waiting-cards">
-          <div class="waiting-cards__card">
-            <p>
-              We’re searching for a coach to pair with you now. This process
-              sometimes takes 5 to 10 minutes.
-            </p>
-          </div>
-          <div class="waiting-cards__card">
-            <p>
-              While you wait, write out the problem you’re working on using the
-              whiteboard or chat.
-            </p>
-          </div>
-        </div>
+        <chat-bot v-if="!user.isVolunteer && isSessionWaitingForVolunteer" />
 
         <template v-for="(message, index) in messages">
           <div
             :key="`message-${index}`"
-            :class="message.email === user.email ? 'right' : 'left'"
+            :class="message.userId === user._id ? 'right' : 'left'"
             class="message"
           >
             <div class="avatar" :style="message.avatarStyle" />
@@ -45,7 +32,7 @@
               <span>{{ message.contents }}</span>
             </div>
             <div class="time">
-              {{ message.time }}
+              {{ message.createdAt | formatTime }}
             </div>
           </div>
         </template>
@@ -69,10 +56,10 @@
 
 <script>
 import { setTimeout, clearTimeout } from "timers";
-import moment from "moment";
 import _ from "lodash";
-
 import { mapState, mapGetters } from "vuex";
+
+import ChatBot from "./ChatBot";
 import SessionService from "@/services/SessionService";
 import ModerationService from "@/services/ModerationService";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
@@ -84,9 +71,10 @@ import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
  *           router/sockets.js
  */
 export default {
+  name: "session-chat",
+  components: { ChatBot },
   data() {
     return {
-      messages: [],
       currentSession: SessionService.currentSession,
       newMessage: "",
       chatWarningIsShown: false,
@@ -96,10 +84,24 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: state => state.user.user,
+      messages: state =>
+        (state.user.session.messages || []).map(message => {
+          // compute avatar style from picture
+          let picture = message.picture;
+          if (!picture || picture === "") {
+            picture = message.isVolunteer
+              ? VolunteerAvatarUrl
+              : StudentAvatarUrl;
+          }
+
+          message.avatarStyle = { backgroundImage: `url(${picture})` };
+          return message;
+        })
     }),
     ...mapGetters({
-      sessionPartner: "user/sessionPartner"
+      sessionPartner: "user/sessionPartner",
+      isSessionWaitingForVolunteer: "user/isSessionWaitingForVolunteer"
     })
   },
   methods: {
@@ -168,38 +170,6 @@ export default {
   },
 
   sockets: {
-    "session-change"(data) {
-      // index session's participants by user id
-      const studentId = (data.student || {})._id;
-      const volunteerId = (data.volunteer || {})._id;
-
-      const participants = {};
-      participants[studentId] = data.student;
-      participants[volunteerId] = data.volunteer;
-
-      // re-load the session's persisted messages
-      const messages = data.messages.map(message => {
-        let { picture } = message;
-        const user = participants[message.user] || {};
-
-        if (!picture || picture === "") {
-          picture = user.isVolunteer ? VolunteerAvatarUrl : StudentAvatarUrl;
-        }
-
-        return {
-          contents: message.contents,
-          name: user.firstname,
-          email: user.email,
-          isVolunteer: user.isVolunteer,
-          avatarStyle: {
-            backgroundImage: `url(${picture})`
-          },
-          time: moment(message.createdAt).format("h:mm a")
-        };
-      });
-
-      this.messages = messages;
-    },
     "is-typing"() {
       this.typingIndicatorShown = true;
     },
@@ -207,25 +177,7 @@ export default {
       this.typingIndicatorShown = false;
     },
     messageSend(data) {
-      // {1}
-      let { picture } = data;
-      if (!picture || picture === "") {
-        if (data.isVolunteer === true) {
-          picture = VolunteerAvatarUrl;
-        } else {
-          picture = StudentAvatarUrl;
-        }
-      }
-      this.messages.push({
-        contents: data.contents,
-        name: data.name,
-        email: data.email,
-        isVolunteer: data.isVolunteer,
-        avatarStyle: {
-          backgroundImage: `url(${picture})`
-        },
-        time: moment(data.createdAt).format("h:mm a")
-      });
+      this.$store.dispatch("user/addMessage", data);
     }
   },
 
@@ -244,13 +196,15 @@ export default {
 }
 
 .message-box {
-  height: calc(100% - 60px);
-  padding-bottom: 110px;
+  height: 100%;
+  padding-bottom: 60px;
   overflow: hidden;
-  top: 60px;
+  top: 0;
   position: relative;
 
   @include breakpoint-above("medium") {
+    height: calc(100% - 60px);
+    padding-bottom: 110px;
     top: 70px;
   }
 }
@@ -268,6 +222,7 @@ export default {
   transition: all 0.15s ease-in;
   z-index: 1;
 }
+
 .chat-warning__close {
   font-size: 3.5rem;
   width: 40px;
@@ -280,6 +235,7 @@ export default {
   top: 50%;
   transform: translateY(-50%);
 }
+
 .chat-warning--slide-enter,
 .chat-warning--slide-leave-to {
   top: -64px;
@@ -386,66 +342,30 @@ span {
   float: right;
   display: flex;
   flex-direction: row-reverse;
+
   .contents {
-    padding-right: 10px;
     background-color: $c-background-blue;
+
     span {
       color: $c-soft-black;
     }
   }
+
   .avatar {
     display: none;
   }
 }
+
 .message-content {
   width: 200px;
 }
 
-.waiting-cards {
-  padding: 20px;
-
-  &__card {
-    border-radius: 8px;
-    text-align: left;
-    padding: 16px;
-    margin-bottom: 16px;
-    font-size: 16px;
-    font-weight: 500;
-    background-color: $c-information-blue;
-
-    h1 {
-      font-size: 20px;
-      line-height: 125%;
-      margin-bottom: 16px;
-      margin-top: 0;
-      color: white;
-    }
-
-    p {
-      color: white;
-      line-height: 150%;
-
-      &:last-of-type {
-        margin-bottom: 0;
-      }
-    }
-  }
-}
-
-@media screen and (max-width: 700px) {
-  .message-box {
-    height: 100%;
-    padding-bottom: 60px;
-    overflow: hidden;
-    top: 0;
-    position: relative;
-  }
-
+@include breakpoint-below("medium") {
   .message-textarea {
     width: calc(100% - 100px);
     height: 40px;
     border: none;
-    position: absolute;
+    position: fixed;
     left: 0;
     bottom: 0;
     border: 1px solid #d6e0ef;

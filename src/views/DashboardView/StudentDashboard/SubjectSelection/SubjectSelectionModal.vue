@@ -17,7 +17,9 @@
         }"
         @click="setSelectedSubtopic(subtopic)"
       >
-        <p class="SubjectSelectionModal-subtopic-title">{{ subtopic }}</p>
+        <p class="SubjectSelectionModal-subtopic-title">
+          {{ modalData.subtopicDisplayNames[subtopic] || subtopic }}
+        </p>
         <large-button
           v-if="mobileMode"
           primary

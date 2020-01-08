@@ -37,7 +37,24 @@
       <div v-if="qNumber" class="questionNumber">Question {{ qNumber }}</div>
       <br />
       <div class="body">
-        <div class="startBody">
+        <div v-if="quizLoading" class="loadingBody">
+          <div class="loadingMessage">
+            Loading quiz...
+          </div>
+        </div>
+        <div v-else class="startBody">
+          <div v-if="showNoQuiz" class="instructions">
+            A {{ quizName }} quiz has not yet been created. If you would like to
+            begin tutoring students on this topic, please contact UPchieve.
+          </div>
+          <router-link
+            v-if="showNoQuiz"
+            class="contact btn"
+            type="button"
+            to="/contact"
+          >
+            CONTACT US
+          </router-link>
           <div v-if="showStartMsg" class="instructions">
             This test will have {{ quizLength }} questions, and it is
             untimed.<br />
@@ -148,8 +165,6 @@ import { mapState } from "vuex";
 
 import TrainingService from "@/services/TrainingService";
 
-const MathJax = window.MathJax;
-
 /**
  * @note {1} Why the extra parens: https://stackoverflow.com/a/27386370
  */
@@ -162,6 +177,7 @@ export default {
     } else {
       quizName = category.charAt(0).toUpperCase() + category.slice(1);
     }
+
     return {
       category,
       questionText: "",
@@ -169,8 +185,9 @@ export default {
       items: [],
       picked: "",
       scoreMsg: "",
-      showStartMsg: true,
-      showStart: true,
+      quizLoading: true,
+      showStartMsg: false,
+      showStart: false,
       showPrevious: false,
       showNext: false,
       showSubmit: false,
@@ -199,15 +216,21 @@ export default {
       const user = this.$store.state.user.user;
 
       let tries = 0;
-      if (user[this.category]) {
-        ({ tries } = user[this.category]); // {1}
+      if (user.certifications[this.category]) {
+        ({ tries } = user.certifications[this.category]); // {1}
       }
       return tries;
+    },
+    showNoQuiz() {
+      return !this.quizLength;
     }
   },
   beforeMount() {
     TrainingService.loadQuiz(this, this.category).then(quizLength => {
+      this.quizLoading = false;
       this.quizLength = quizLength;
+      this.showStartMsg = !!quizLength;
+      this.showStart = !!quizLength;
     });
   },
   updated() {
@@ -219,21 +242,29 @@ export default {
 
       // Remove any MathJax-rendered elements from the DOM.
       // Do this before updating to avoid rendering artifacts being left behind
-      const mathJaxElements = quizBody.querySelectorAll(
-        "[class*=mjx],[class*=MathJax],[id*=MathJax]"
+      const mathJaxElements = Array.from(
+        quizBody.querySelectorAll("[class*=mjx],[class*=MathJax],[id*=MathJax]")
       );
-      Array.from(mathJaxElements).forEach(e => e.remove());
+
+      const mathJaxParentElements = Array.from(
+        quizBody.querySelectorAll(".MathJax_Preview")
+      ).map(e => e.parentElement);
+
+      mathJaxElements.forEach(e => e.remove());
 
       // MathJax slices up the DOM nodes it renders as math formulas. We need to
       // rejoin these under the first child's data attribute to avoid artifacts
       // being left behind
-      const questionText = quizBody.querySelector(".questionText");
-      questionText.firstChild.data = questionText.innerText;
+      mathJaxParentElements.forEach(parentEl => {
+        if (!(parentEl && parentEl.firstChild)) return;
 
-      // Remove all child nodes but the first
-      Array.from(questionText.childNodes)
-        .slice(1)
-        .forEach(e => e.remove());
+        parentEl.firstChild.data = parentEl.innerText;
+
+        // Remove all child nodes but the first
+        Array.from(parentEl.childNodes)
+          .slice(1)
+          .forEach(e => e.remove());
+      });
     },
 
     rerenderMathJaxElements() {
@@ -246,9 +277,9 @@ export default {
         return;
       }
 
-      MathJax.Hub.Queue(
-        ["Typeset", MathJax.Hub, questionText],
-        ["Typeset", MathJax.Hub, answerChoices]
+      window.MathJax.Hub.Queue(
+        ["Typeset", window.MathJax.Hub, questionText],
+        ["Typeset", window.MathJax.Hub, answerChoices]
       );
     },
     reload() {
@@ -462,6 +493,14 @@ export default {
   height: inherit;
 }
 
+.loadingBody {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: inherit;
+}
+
 .quizBody {
   display: flex;
   flex-direction: column;
@@ -544,6 +583,11 @@ export default {
 
 .instructions {
   margin: 50px 0;
+}
+
+.loadingMessage {
+  font-size: 2rem;
+  margin: 75px 0;
 }
 
 .questionNumber {

@@ -121,12 +121,7 @@ export default {
     let promise;
 
     if (!id) {
-      let type;
-      if (this.$route.path.indexOf("session/college") !== -1) {
-        type = "college";
-      } else {
-        type = "math";
-      }
+      let type = this.$route.params.topic;
       promise = SessionService.newSession(
         this,
         type,
@@ -219,7 +214,7 @@ export default {
 }
 
 .session-header-container {
-  position: absolute;
+  position: fixed;
   z-index: 3;
   top: 0;
   left: 0;
@@ -227,6 +222,7 @@ export default {
   background: #fff;
 
   @include breakpoint-above("medium") {
+    position: absolute;
     top: 20px;
     left: unset;
     right: 20px;
@@ -308,7 +304,7 @@ export default {
 }
 
 .toggleButton {
-  position: absolute;
+  position: fixed;
   z-index: 3;
   bottom: 10px;
   right: 20px;
@@ -326,6 +322,6 @@ export default {
 }
 
 .toggleButton.back {
-  bottom: calc(100vh - 140px);
+  bottom: calc(100% - 140px);
 }
 </style>

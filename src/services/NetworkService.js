@@ -124,11 +124,6 @@ export default {
       .post(`${API_ROOT}/training/score`, data)
       .then(this._successHandler, this._errorHandler);
   },
-  initAvailability(context, data) {
-    return context.$http
-      .post(`${API_ROOT}/calendar/init`, data)
-      .then(this._successHandler, this._errorHandler);
-  },
   updateAvailability(context, data) {
     return context.$http
       .post(`${API_ROOT}/calendar/save`, data)
@@ -154,16 +149,6 @@ export default {
       .post(`${API_ROOT}/moderate/message`, data)
       .then(this._successHandler, this._errorHandler);
   },
-  getAvailability(context, data) {
-    return context.$http
-      .post(`${API_ROOT}/calendar/get`, data)
-      .then(this._successHandler, this._errorHandler);
-  },
-  getTimezone(context, data) {
-    return context.$http
-      .post(`${API_ROOT}/calendar/tz/get`, data)
-      .then(this._successHandler, this._errorHandler);
-  },
   updateTimezone(context, data) {
     return context.$http
       .post(`${API_ROOT}/calendar/tz/save`, data)
@@ -172,26 +157,6 @@ export default {
   feedback(context, data) {
     return context.$http
       .post(`${API_ROOT}/feedback`, data)
-      .then(this._successHandler, this._errorHandler);
-  },
-  createStudentQuestion(context, data) {
-    return context.$http
-      .post(`${API_ROOT}/student-questions/create`, data)
-      .then(this._successHandler, this._errorHandler);
-  },
-  getStudentQuestions(context, data) {
-    return context.$http
-      .post(`${API_ROOT}/student-questions/get`, data)
-      .then(this._successHandler, this._errorHandler);
-  },
-  answerStudentQuestion(context, data) {
-    return context.$http
-      .post(`${API_ROOT}/student-questions/answer`, data)
-      .then(this._successHandler, this._errorHandler);
-  },
-  getAttachment(context, data) {
-    return context.$http
-      .get(`${API_ROOT}/download/${data}`)
       .then(this._successHandler, this._errorHandler);
   }
 };

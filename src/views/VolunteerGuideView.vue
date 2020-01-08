@@ -396,29 +396,6 @@
       </div>
     </section>
   </full-text-template>
-
-  <!-- 
-  
-  <div>
-    <accordion-item label=""></accordion-item>
-    <accordion-item label=""></accordion-item>
-  </div>
-
-  <router-link to="/calendar">Schedule</router-link>
-
-          <div class="block-section">
-            <p><strong>Quick Tips:</strong></p>
-            <ul>
-              <li>
-                <strong></strong>
-              </li>
-              <li>
-                <strong></strong>
-              </li>
-            </ul>
-          </div>
-    
--->
 </template>
 
 <script>

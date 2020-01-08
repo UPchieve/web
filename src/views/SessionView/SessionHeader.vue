@@ -5,7 +5,9 @@
         <div :style="partnerAvatar" class="avatar" />
         <div class="info">
           <template v-if="isSessionWaitingForVolunteer">
-            <span>Contacting coaches...</span>
+            <span>
+              Contacting coaches<span class="loading-ellipsis"></span>
+            </span>
           </template>
           <template v-else-if="isSessionInProgress">
             <span class="volunteer-name">{{ sessionPartner.firstname }}</span>
@@ -286,7 +288,7 @@ h1 {
 }
 
 .session-header.inactive {
-  background-color: #73737a;
+  background-color: #7a91a8;
 }
 
 .connection-message {
@@ -322,5 +324,30 @@ h1 {
 .avatar-info-container {
   display: flex;
   align-items: center;
+}
+
+.loading-ellipsis {
+  &:after {
+    content: "";
+    animation: 2s ellip infinite;
+  }
+}
+
+@keyframes ellip {
+  20% {
+    content: ".";
+  }
+
+  40% {
+    content: "..";
+  }
+
+  60% {
+    content: "...";
+  }
+
+  80% {
+    content: "...";
+  }
 }
 </style>
