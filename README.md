@@ -1,4 +1,4 @@
-# UPchieve web client
+# UPchieve web client 
 
 > Online tutoring platform built with Vue.js and Webpack
 
