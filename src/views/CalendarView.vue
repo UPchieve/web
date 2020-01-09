@@ -109,9 +109,9 @@ export default {
       this.selectedTz = hasValidTimezone ? userTimezone : moment.tz.guess();
 
       const originalAvailability = this.user.availability;
-      const estNow = moment.tz("America/New_York").hour();
-      const userNow = moment.tz(this.selectedTz).hour();
-      const offset = userNow - estNow;
+      var estUtcOffset = moment.tz.zone("America/New_York").parse(Date.now());
+      var userUtcOffset = moment.tz.zone(this.selectedTz).parse(Date.now());
+      var offset = (estUtcOffset - userUtcOffset) / 60;
       this.availability = this.convertAvailability(
         originalAvailability,
         offset
@@ -224,9 +224,10 @@ export default {
       return convertedAvailability;
     },
     save() {
-      var estNow = moment.tz("America/New_York").hour();
-      var userNow = moment.tz(this.selectedTz).hour();
-      var offset = estNow - userNow;
+      const estUtcOffset = moment.tz.zone("America/New_York").parse(Date.now());
+      const userUtcOffset = moment.tz.zone(this.selectedTz).parse(Date.now());
+      // offsets returned by zone.utcOffset() are returned in minutes and inverted for POSIX compatibility
+      const offset = (userUtcOffset - estUtcOffset) / 60;
       CalendarService.updateTimezone(this, this.user._id, this.selectedTz);
       CalendarService.updateAvailability(
         this,
