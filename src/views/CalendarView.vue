@@ -1,9 +1,11 @@
 <template>
-  <div class="calendar-container">
+  <div class="calendar-container" @change="someThingChanged()">
     <div class="calendar">
       <div class="header">
         <div class="header-title">Schedule</div>
-        <button class="save-button" @click="save()">Save</button>
+        <button v-bind:class="saveButtonClass" @click="save()">
+          <span v-html="saveLabel"></span>
+        </button>
       </div>
       <div v-if="hasUserSchedule">
         <div class="tz-selector-container">
@@ -53,6 +55,12 @@ import moment from "moment-timezone";
 import CalendarService from "@/services/CalendarService";
 import AnalyticsService from "@/services/AnalyticsService";
 
+const saveStates = {
+  SAVED: "saved",
+  UNSAVED: "unsaved",
+  ERROR: "error"
+};
+
 export default {
   data() {
     const timeRange = [
@@ -85,13 +93,24 @@ export default {
       availability: {},
       timeRange,
       tzList: moment.tz.names(),
-      selectedTz: ""
+      selectedTz: "",
+      saveState: saveStates.SAVED
     };
   },
   computed: {
     ...mapState({
       user: state => state.user.user
     }),
+    saveButtonClass() {
+      return ["save-button", "save-button--" + this.saveState];
+    },
+    saveLabel() {
+      if (this.saveState == saveStates.SAVED) {
+        return "Saved &#x2714;";
+      } else {
+        return "Save";
+      }
+    },
     sortedTimes() {
       return this.sortTimes();
     },
@@ -103,6 +122,9 @@ export default {
     this.initScheduleData();
   },
   methods: {
+    someThingChanged() {
+      this.saveState = saveStates.UNSAVED;
+    },
     initScheduleData() {
       const userTimezone = this.user.timezone;
       const hasValidTimezone = userTimezone && this.userTzInList(userTimezone);
@@ -233,7 +255,13 @@ export default {
         this,
         this.user._id,
         this.convertAvailability(this.availability, offset)
-      );
+      ).then(response => {
+        if (response.status == 200) {
+          this.saveState = saveStates.SAVED;
+        } else {
+          this.saveState = saveStates.ERROR;
+        }
+      });
 
       // analytics: tracking whether a user has updated their availability
       AnalyticsService.trackNoProperties(
@@ -281,7 +309,6 @@ export default {
 .save-button {
   font-size: 16px;
   font-weight: 600;
-  background: $c-success-green;
   padding: 10px 45px;
   border-radius: 30px;
   color: #fff;
@@ -289,6 +316,18 @@ export default {
 
   &:hover {
     color: #000;
+  }
+
+  &--unsaved {
+    background: $c-success-green;
+  }
+
+  &--saved {
+    background: $c-secondary-grey;
+  }
+
+  &--error {
+    background: $c-error-red !important;
   }
 }
 
