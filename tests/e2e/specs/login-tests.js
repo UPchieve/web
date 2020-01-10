@@ -33,6 +33,7 @@ describe("Successful Log in and log out", () => {
 
     it("Should log out successfully", () => {
       cy.get(".AppSidebar-final-link").click();
+      cy.wait(1000);
       cy.location("pathname").should("eq", "/logout");
     });
   });
@@ -56,6 +57,7 @@ describe("Successful Log in and log out", () => {
 
     it("Should log out successfully", () => {
       cy.get(".AppSidebar-final-link").click();
+      cy.wait(1000);
       cy.location("pathname").should("eq", "/logout");
     });
   });
