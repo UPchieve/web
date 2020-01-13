@@ -1,7 +1,7 @@
 <template>
   <full-text-template header-title="Legal Policy">
     <section>
-      <h2>Disclaimer</h2>
+      <h2 id="disclaimer">Disclaimer</h2>
 
       <p>
         You are solely responsible for your communications and interactions with
@@ -15,7 +15,7 @@
     </section>
 
     <section>
-      <h2>Contact us!</h2>
+      <h2 id="contact">Contact us!</h2>
 
       <div class="highlight">
         If you have any questions, comments, or concerns about our Services,
@@ -25,7 +25,7 @@
     </section>
 
     <section>
-      <h2>Terms of Service</h2>
+      <h2 id="terms">Terms of Service</h2>
 
       <p>
         <em>Date of Last Revision: May 12, 2018</em>
@@ -356,7 +356,7 @@
     </section>
 
     <section>
-      <h2>Privacy Policy</h2>
+      <h2 id="privacypolicy">Privacy Policy</h2>
 
       <p>
         <em>Date of Last Revision: May 12, 2017</em>

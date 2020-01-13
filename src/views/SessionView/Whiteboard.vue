@@ -7,7 +7,7 @@
         @mousedown="drawStart"
         @mousemove="draw"
         @mouseup="drawEnd"
-        @mouseleave="drawEnd"
+        @mouseleave="handleMouseLeave"
         width="1600"
         height="1200"
       />
@@ -250,6 +250,11 @@ export default {
       imageList = [];
       saveImage(App.canvas, App.ctx);
       this.emitClearClick();
+    },
+    handleMouseLeave(event) {
+      if (App.canvas.isDrawing) {
+        this.drawEnd(event);
+      }
     },
     drawStart(event) {
       if (this.mobileMode) {
