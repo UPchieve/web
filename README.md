@@ -1,4 +1,4 @@
-# UPchieve web client
+# UPchieve web client 
 
 > Online tutoring platform built with Vue.js and Webpack
 
@@ -70,3 +70,26 @@ npm run clean-slate
 More information about our Vue setup:
 - [Vue CLI](https://cli.vuejs.org/guide/)
 - [Vue style guide](https://vuejs.org/v2/style-guide/)
+
+
+## Build Setup Docker Alternative
+
+This can also be run with docker and no other software. Use these instructions to rebuild your image as you iterate. It is assumed that you have Docker installed and running.
+
+1. Download the repository.
+``` bash
+#Clone the repository
+git clone https://github.com/UPchieve/web.git
+```
+
+2. Move into the repository.
+``` bash
+#Enter the repository
+cd web
+```
+
+3. The below command will make the program visible at localhost:8080, so do that.
+``` bash
+#The first time this is run it may take a few minutes, but afterwards it should be faster. Rerun with each change to see updates
+docker build -t upchieve/web . && docker run -it -p 8080:8080 --rm --name upchieve-web-prototype-1 upchieve/web
+``` 
