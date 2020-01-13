@@ -1,4 +1,4 @@
-# UPchieve web client 
+# UPchieve web client
 
 > Online tutoring platform built with Vue.js and Webpack
 
@@ -88,7 +88,7 @@ git clone https://github.com/UPchieve/web.git
 cd web
 ```
 
-3. The below command will make the program visible at localhost:8080, so do that.
+3. The below command will make the program visible at localhost:8080
 ``` bash
 #The first time this is run it may take a few minutes, but afterwards it should be faster. Rerun with each change to see updates
 docker build -t upchieve/web . && docker run -it -p 8080:8080 --rm --name upchieve-web-prototype-1 upchieve/web
