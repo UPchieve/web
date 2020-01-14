@@ -122,6 +122,11 @@ function saveImage(canvas, ctx) {
   imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   imageList.push(imageData);
 
+  while (imageList.length > 10) {
+    imageList.shift();
+  }
+}
+
 function undoChange(App) {
   const currentImage = App.ctx.getImageData(
     0,
