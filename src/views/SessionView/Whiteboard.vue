@@ -121,6 +121,27 @@ function compareImages(img1, img2) {
 function saveImage(canvas, ctx) {
   imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   imageList.push(imageData);
+
+function undoChange(App) {
+  const currentImage = App.ctx.getImageData(
+    0,
+    0,
+    App.canvas.width,
+    App.canvas.height
+  );
+
+  if (imageList.length > 1) {
+    imageData = imageList.pop();
+    while (compareImages(currentImage, imageData)) {
+      imageData = imageList.pop();
+    }
+    if (imageData !== null) {
+      App.ctx.putImageData(imageData, 0, 0);
+
+      // Since this image was unique, add it back to the list
+      imageList.push(imageData);
+    }
+  }
 }
 
 export default {
@@ -422,24 +443,8 @@ export default {
     },
 
     undo() {
-      const currentImage = App.ctx.getImageData(
-        0,
-        0,
-        App.canvas.width,
-        App.canvas.height
-      );
-
-      if (imageList.length > 0) {
-        imageData = imageList.pop();
-        while (compareImages(currentImage, imageData)) {
-          imageData = imageList.pop();
-        }
-        if (imageData !== null) {
-          App.ctx.putImageData(imageData, 0, 0);
-        }
-
-        this.emitUndoClick();
-      }
+      undoChange(App);
+      this.emitUndoClick();
     },
 
     erase() {
@@ -547,21 +552,7 @@ export default {
       imageList.push(imageData);
     },
     undo() {
-      const currentImage = App.ctx.getImageData(
-        0,
-        0,
-        App.canvas.width,
-        App.canvas.height
-      );
-      if (imageList.length > 0) {
-        imageData = imageList.pop();
-        while (compareImages(currentImage, imageData)) {
-          imageData = imageList.pop();
-        }
-        if (imageData !== null) {
-          App.ctx.putImageData(imageData, 0, 0);
-        }
-      }
+      undoChange(App);
     },
     clear() {
       App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
