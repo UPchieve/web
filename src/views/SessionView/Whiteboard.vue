@@ -286,8 +286,6 @@ export default {
         this.emitDrawing();
 
         if (currentState === "DRAWING" || currentState === "ERASING") {
-          saveImage(App.canvas, App.ctx);
-          this.emitSaveImage();
           App.canvas.isDrawing = true;
 
           let x = event.pageX;
@@ -479,8 +477,6 @@ export default {
           context.stroke();
         } else {
           context.closePath();
-          saveImage(canvas, context);
-          this.emitSaveImage();
         }
         if (server) {
           App.ctx.strokeStyle = LOCAL_LINE_COLOR;
