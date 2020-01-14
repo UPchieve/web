@@ -472,11 +472,6 @@ export default {
       }
       if (currentState === "DRAWING" || currentState === "ERASING" || server) {
         if (type === "dragstart") {
-          if (imageList.length > 0) {
-            imageData = imageList[imageList.length - 1];
-            context.putImageData(imageData, 0, 0);
-          }
-
           context.beginPath();
           context.moveTo(x, y);
         } else if (type === "drag") {
