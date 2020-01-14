@@ -534,13 +534,7 @@ export default {
       SERVER_DRAWING = false;
     },
     save() {
-      const imageData = App.ctx.getImageData(
-        0,
-        0,
-        App.canvas.width,
-        App.canvas.height
-      );
-      imageList.push(imageData);
+      saveImage(App.canvas, App.ctx);
     },
     undo() {
       undoChange(App);
