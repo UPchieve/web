@@ -58,7 +58,8 @@ import AnalyticsService from "@/services/AnalyticsService";
 const saveStates = {
   SAVED: "saved",
   UNSAVED: "unsaved",
-  ERROR: "error"
+  ERROR: "error",
+  SAVING: "saving"
 };
 
 export default {
@@ -94,7 +95,7 @@ export default {
       timeRange,
       tzList: moment.tz.names(),
       selectedTz: "",
-      saveState: saveStates.SAVED
+      saveState: saveStates.UNSAVED
     };
   },
   computed: {
@@ -105,10 +106,13 @@ export default {
       return ["save-button", "save-button--" + this.saveState];
     },
     saveLabel() {
-      if (this.saveState == saveStates.SAVED) {
-        return "Saved &#x2714;";
-      } else {
-        return "Save";
+      switch (this.saveState) {
+        case saveStates.SAVED:
+          return "Saved &#x2714;";
+        case saveStates.SAVING:
+          return "Saving...";
+        default:
+          return "Save";
       }
     },
     sortedTimes() {
@@ -246,6 +250,7 @@ export default {
       return convertedAvailability;
     },
     save() {
+      this.saveState = saveStates.SAVING;
       const estUtcOffset = moment.tz.zone("America/New_York").parse(Date.now());
       const userUtcOffset = moment.tz.zone(this.selectedTz).parse(Date.now());
       // offsets returned by zone.utcOffset() are returned in minutes and inverted for POSIX compatibility
@@ -328,6 +333,10 @@ export default {
 
   &--error {
     background: $c-error-red !important;
+  }
+
+  &--saving {
+    background: $c-disabled-grey;
   }
 }
 
