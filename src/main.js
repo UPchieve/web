@@ -9,6 +9,7 @@ import VuePhoneNumberInput from "vue-phone-number-input";
 import VueStarRating from "vue-star-rating";
 
 import Socket from "socket.io-client";
+import moment from "moment";
 
 import App from "./components/App";
 import router from "./router";
@@ -47,6 +48,13 @@ Vue.component("vue-phone-number-input", VuePhoneNumberInput);
 
 // Set up vue-star-rating
 Vue.component("vue-star-rating", VueStarRating);
+
+// Filter for formatting times
+Vue.filter("formatTime", value => {
+  if (value) {
+    return moment(value).format("h:mm a");
+  }
+});
 
 // Create Vue instance
 new Vue({

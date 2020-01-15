@@ -1,9 +1,11 @@
 <template>
-  <div class="calendar-container">
+  <div class="calendar-container" @change="someThingChanged()">
     <div class="calendar">
       <div class="header">
         <div class="header-title">Schedule</div>
-        <button class="save-button" @click="save()">Save</button>
+        <button v-bind:class="saveButtonClass" @click="save()">
+          <span v-html="saveLabel"></span>
+        </button>
       </div>
       <div v-if="hasUserSchedule">
         <div class="tz-selector-container">
@@ -30,7 +32,6 @@
                   class="timeOfDay"
                 >
                   <input
-                    id="time"
                     v-model="availability[day][sortedTime]"
                     type="checkbox"
                   />
@@ -53,6 +54,13 @@ import moment from "moment-timezone";
 
 import CalendarService from "@/services/CalendarService";
 import AnalyticsService from "@/services/AnalyticsService";
+
+const saveStates = {
+  SAVED: "saved",
+  UNSAVED: "unsaved",
+  ERROR: "error",
+  SAVING: "saving"
+};
 
 export default {
   data() {
@@ -86,13 +94,27 @@ export default {
       availability: {},
       timeRange,
       tzList: moment.tz.names(),
-      selectedTz: ""
+      selectedTz: "",
+      saveState: saveStates.UNSAVED
     };
   },
   computed: {
     ...mapState({
       user: state => state.user.user
     }),
+    saveButtonClass() {
+      return ["save-button", "save-button--" + this.saveState];
+    },
+    saveLabel() {
+      switch (this.saveState) {
+        case saveStates.SAVED:
+          return "Saved &#x2714;";
+        case saveStates.SAVING:
+          return "Saving...";
+        default:
+          return "Save";
+      }
+    },
     sortedTimes() {
       return this.sortTimes();
     },
@@ -101,35 +123,24 @@ export default {
     }
   },
   created() {
-    this.fetchData();
+    this.initScheduleData();
   },
   methods: {
-    fetchData() {
-      var originalAvailabilityPromise = CalendarService.getAvailability(
-        this,
-        this.user._id
-      );
-      var userTimezonePromise = CalendarService.getTimezone(
-        this,
-        this.user._id
-      );
+    someThingChanged() {
+      this.saveState = saveStates.UNSAVED;
+    },
+    initScheduleData() {
+      const userTimezone = this.user.timezone;
+      const hasValidTimezone = userTimezone && this.userTzInList(userTimezone);
+      this.selectedTz = hasValidTimezone ? userTimezone : moment.tz.guess();
 
-      Promise.all([originalAvailabilityPromise, userTimezonePromise]).then(
-        ([originalAvailability, userTimezone]) => {
-          if (userTimezone && this.userTzInList(userTimezone)) {
-            this.selectedTz = userTimezone;
-          } else {
-            this.selectedTz = moment.tz.guess();
-          }
-
-          var estNow = moment.tz("America/New_York").hour();
-          var userNow = moment.tz(this.selectedTz).hour();
-          var offset = userNow - estNow;
-          this.availability = this.convertAvailability(
-            originalAvailability,
-            offset
-          );
-        }
+      const originalAvailability = this.user.availability;
+      var estUtcOffset = moment.tz.zone("America/New_York").parse(Date.now());
+      var userUtcOffset = moment.tz.zone(this.selectedTz).parse(Date.now());
+      var offset = (estUtcOffset - userUtcOffset) / 60;
+      this.availability = this.convertAvailability(
+        originalAvailability,
+        offset
       );
     },
     sortTimes() {
@@ -239,15 +250,23 @@ export default {
       return convertedAvailability;
     },
     save() {
-      var estNow = moment.tz("America/New_York").hour();
-      var userNow = moment.tz(this.selectedTz).hour();
-      var offset = estNow - userNow;
+      this.saveState = saveStates.SAVING;
+      const estUtcOffset = moment.tz.zone("America/New_York").parse(Date.now());
+      const userUtcOffset = moment.tz.zone(this.selectedTz).parse(Date.now());
+      // offsets returned by zone.utcOffset() are returned in minutes and inverted for POSIX compatibility
+      const offset = (userUtcOffset - estUtcOffset) / 60;
       CalendarService.updateTimezone(this, this.user._id, this.selectedTz);
       CalendarService.updateAvailability(
         this,
         this.user._id,
         this.convertAvailability(this.availability, offset)
-      );
+      ).then(response => {
+        if (response.status == 200) {
+          this.saveState = saveStates.SAVED;
+        } else {
+          this.saveState = saveStates.ERROR;
+        }
+      });
 
       // analytics: tracking whether a user has updated their availability
       AnalyticsService.trackNoProperties(
@@ -295,7 +314,6 @@ export default {
 .save-button {
   font-size: 16px;
   font-weight: 600;
-  background: $c-success-green;
   padding: 10px 45px;
   border-radius: 30px;
   color: #fff;
@@ -303,6 +321,22 @@ export default {
 
   &:hover {
     color: #000;
+  }
+
+  &--unsaved {
+    background: $c-success-green;
+  }
+
+  &--saved {
+    background: $c-secondary-grey;
+  }
+
+  &--error {
+    background: $c-error-red !important;
+  }
+
+  &--saving {
+    background: $c-disabled-grey;
   }
 }
 
