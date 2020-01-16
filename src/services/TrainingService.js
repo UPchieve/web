@@ -69,9 +69,8 @@ export default {
     }
     this.idAnswerMap[question._id] = picked;
   },
-  submitQuiz(context, userid) {
+  submitQuiz(context) {
     return NetworkService.getQuizScore(context, {
-      userid,
       idAnswerMap: this.idAnswerMap,
       category: this.category
     }).then(res => {
