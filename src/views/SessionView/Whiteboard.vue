@@ -121,6 +121,32 @@ function compareImages(img1, img2) {
 function saveImage(canvas, ctx) {
   imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   imageList.push(imageData);
+
+  while (imageList.length > 10) {
+    imageList.shift();
+  }
+}
+
+function undoChange(App) {
+  const currentImage = App.ctx.getImageData(
+    0,
+    0,
+    App.canvas.width,
+    App.canvas.height
+  );
+
+  if (imageList.length > 1) {
+    imageData = imageList.pop();
+    while (compareImages(currentImage, imageData)) {
+      imageData = imageList.pop();
+    }
+    if (imageData !== null) {
+      App.ctx.putImageData(imageData, 0, 0);
+
+      // Since this image was unique, add it back to the list
+      imageList.push(imageData);
+    }
+  }
 }
 
 export default {
@@ -265,8 +291,6 @@ export default {
         this.emitDrawing();
 
         if (currentState === "DRAWING" || currentState === "ERASING") {
-          saveImage(App.canvas, App.ctx);
-          this.emitSaveImage();
           App.canvas.isDrawing = true;
 
           let x = event.pageX;
@@ -422,24 +446,8 @@ export default {
     },
 
     undo() {
-      const currentImage = App.ctx.getImageData(
-        0,
-        0,
-        App.canvas.width,
-        App.canvas.height
-      );
-
-      if (imageList.length > 0) {
-        imageData = imageList.pop();
-        while (compareImages(currentImage, imageData)) {
-          imageData = imageList.pop();
-        }
-        if (imageData !== null) {
-          App.ctx.putImageData(imageData, 0, 0);
-        }
-
-        this.emitUndoClick();
-      }
+      undoChange(App);
+      this.emitUndoClick();
     },
 
     erase() {
@@ -467,11 +475,6 @@ export default {
       }
       if (currentState === "DRAWING" || currentState === "ERASING" || server) {
         if (type === "dragstart") {
-          if (imageList.length > 0) {
-            imageData = imageList[imageList.length - 1];
-            context.putImageData(imageData, 0, 0);
-          }
-
           context.beginPath();
           context.moveTo(x, y);
         } else if (type === "drag") {
@@ -479,8 +482,6 @@ export default {
           context.stroke();
         } else {
           context.closePath();
-          saveImage(canvas, context);
-          this.emitSaveImage();
         }
         if (server) {
           App.ctx.strokeStyle = LOCAL_LINE_COLOR;
@@ -538,30 +539,10 @@ export default {
       SERVER_DRAWING = false;
     },
     save() {
-      const imageData = App.ctx.getImageData(
-        0,
-        0,
-        App.canvas.width,
-        App.canvas.height
-      );
-      imageList.push(imageData);
+      saveImage(App.canvas, App.ctx);
     },
     undo() {
-      const currentImage = App.ctx.getImageData(
-        0,
-        0,
-        App.canvas.width,
-        App.canvas.height
-      );
-      if (imageList.length > 0) {
-        imageData = imageList.pop();
-        while (compareImages(currentImage, imageData)) {
-          imageData = imageList.pop();
-        }
-        if (imageData !== null) {
-          App.ctx.putImageData(imageData, 0, 0);
-        }
-      }
+      undoChange(App);
     },
     clear() {
       App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
