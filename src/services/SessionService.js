@@ -59,41 +59,48 @@ export default {
   },
 
   useExistingSession(context, sessionId) {
-    return NetworkService.checkSession(context, { sessionId }).then(res => {
-      const data = res.data || {};
-      const { sessionId } = data;
+    return NetworkService.checkSession(context, { sessionId })
+      .then(res => {
+        const data = res.data || {};
+        const { sessionId } = data;
 
-      this.currentSession.sessionId = sessionId;
+        this.currentSession.sessionId = sessionId;
 
-      if (!sessionId) {
-        context.$router.replace("/");
-      }
-
-      return sessionId;
-    });
+        return sessionId;
+      })
+      .catch(res => {
+        if (res.status === 404) {
+          context.$router.replace("/");
+        } else {
+          throw res;
+        }
+      });
   },
 
   getCurrentSession(context, user) {
     return NetworkService.currentSession(context, {
       user_id: user._id,
       is_volunteer: user.isVolunteer
-    }).then(resp => {
-      if (resp.data.err) {
+    })
+      .then(resp => {
+        const { sessionId, data } = resp.data || {};
+        const { type, subTopic } = data;
+
+        if (type && subTopic && sessionId) {
+          this.currentSession.sessionId = sessionId;
+          this.currentSession.data = data;
+
+          return Promise.resolve({ sessionData: data });
+        }
+      })
+      .catch(resp => {
         this.currentSession.sessionId = null;
         this.currentSession.data = {};
 
-        return Promise.reject(resp.data.err);
-      }
+        const err = new Error(resp.data.err);
+        err.status = resp.status;
 
-      const { sessionId, data } = resp.data || {};
-      const { type, subTopic } = data;
-
-      if (type && subTopic && sessionId) {
-        this.currentSession.sessionId = sessionId;
-        this.currentSession.data = data;
-
-        return Promise.resolve({ sessionData: data });
-      }
-    });
+        throw err;
+      });
   }
 };

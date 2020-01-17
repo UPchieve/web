@@ -284,6 +284,7 @@
 <script>
 import validator from "validator";
 import Autocomplete from "@trevoreyre/autocomplete-vue";
+import * as Sentry from "@sentry/browser";
 
 import AuthService from "@/services/AuthService";
 import UserService from "@/services/UserService";
@@ -411,6 +412,9 @@ export default {
         })
         .catch(err => {
           this.msg = err.message;
+          if (err.status !== 409 && err.status !== 422) {
+            Sentry.captureException(err);
+          }
         });
     },
     submitWaitlist() {
@@ -509,6 +513,9 @@ export default {
         })
         .catch(err => {
           this.msg = err.message;
+          if (err.status !== 422) {
+            Sentry.captureException(err);
+          }
         });
     }
   }

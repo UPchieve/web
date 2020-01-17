@@ -202,6 +202,7 @@
 
 <script>
 import validator from "validator";
+import * as Sentry from "@sentry/browser";
 
 import AuthService from "@/services/AuthService";
 import RegistrationService from "@/services/RegistrationService";
@@ -265,6 +266,9 @@ export default {
         })
         .catch(err => {
           this.msg = err.message;
+          if (err.status !== 409) {
+            Sentry.captureException(err);
+          }
         });
     },
     checkInputs() {
@@ -335,6 +339,9 @@ export default {
         })
         .catch(err => {
           this.msg = err.message;
+          if (err.status !== 422) {
+            Sentry.captureException(err);
+          }
         });
     }
   }

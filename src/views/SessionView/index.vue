@@ -43,6 +43,7 @@
 <script>
 import { mapState, mapGetters } from "vuex";
 import base64url from "base64url";
+import * as Sentry from "@sentry/browser";
 
 import SessionService from "@/services/SessionService";
 
@@ -136,9 +137,10 @@ export default {
         this.$socket.connect();
         this.joinSession(sessionId);
       })
-      .catch(() => {
+      .catch(err => {
         window.alert("Could not start new help session");
         this.$router.replace("/");
+        Sentry.captureException(err);
       });
   },
   sockets: {

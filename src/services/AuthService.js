@@ -44,18 +44,28 @@ export default {
       const data = { ...res.data };
       if (!data) {
         throw new Error("No user returned from auth service");
-      } else if (data.err) {
-        throw new Error(data.err);
       }
 
       context.msg = "You have been signed up!";
+    }).catch(res => {
+      if (res.data && res.data.err) {
+        const err = new Error(res.data.err);
+        err.status = res.status;
+        throw err;
+      } else {
+        throw res;
+      }
     });
   },
 
   checkRegister(context, creds) {
-    return NetworkService.checkRegister(context, creds).then(res => {
-      if (res.data.err) {
-        throw new Error(res.data.err);
+    return NetworkService.checkRegister(context, creds).catch(res => {
+      if (res.data && res.data.err) {
+        const err = new Error(res.data.err);
+        err.status = res.status;
+        throw err;
+      } else {
+        throw res;
       }
     });
   },
@@ -66,9 +76,6 @@ export default {
       if (!data) {
         throw new Error("No user returned from auth service");
       }
-      if (data.err) {
-        throw new Error(data.err);
-      }
 
       context.msg = "Password reset email has been sent!";
 
@@ -77,7 +84,15 @@ export default {
           context.$router.push(redirect);
         }, 2000);
       }
-    });
+    }).catch(res => {
+      if (res.data && res.data.err) {
+        const err = new Error(res.data.err);
+        err.status = res.status;
+        throw err;
+      } else {
+        throw res;
+      }
+    })
   },
 
   confirmReset(context, credentials, redirect) {

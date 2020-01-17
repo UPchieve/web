@@ -40,6 +40,8 @@
 </template>
 
 <script>
+import * as Sentry from "@sentry/browser";
+
 import AuthService from "@/services/AuthService";
 import FormPageTemplate from "@/components/FormPageTemplate";
 
@@ -58,7 +60,12 @@ export default {
   },
   methods: {
     submit() {
-      AuthService.sendReset(this, this.email);
+      AuthService.sendReset(this, this.email)
+        .catch(err => {
+          if (err.status !== 422) {
+            Sentry.captureException(err);
+          }
+        });
     }
   }
 };
