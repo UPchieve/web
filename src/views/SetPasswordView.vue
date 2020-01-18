@@ -58,6 +58,8 @@
 </template>
 
 <script>
+import * as Sentry from "@sentry/browser";
+
 import AuthService from "@/services/AuthService";
 import FormPageTemplate from "@/components/FormPageTemplate";
 

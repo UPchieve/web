@@ -100,28 +100,30 @@ export default {
   },
 
   confirmReset(context, credentials, redirect) {
-    return NetworkService.confirmReset(context, credentials).then(res => {
-      const data = { ...res.data };
-      if (!data) {
-        throw new Error("No user returned from auth service");
-      }
+    return NetworkService.confirmReset(context, credentials)
+      .then(res => {
+        const data = { ...res.data };
+        if (!data) {
+          throw new Error("No user returned from auth service");
+        }
 
-      context.msg = "Password has been reset!";
+        context.msg = "Password has been reset!";
 
-      if (redirect) {
-        setTimeout(() => {
-          context.$router.push(redirect);
-        }, 2000);
-      }
-    }).catch(res => {
-      if (res.data && res.data.err) {
-        const err = new Error(res.data.err);
-        err.status = res.status;
-        throw err;
-      } else {
-        throw res;
-      }
-    });
+        if (redirect) {
+          setTimeout(() => {
+            context.$router.push(redirect);
+          }, 2000);
+        }
+      })
+      .catch(res => {
+        if (res.data && res.data.err) {
+          const err = new Error(res.data.err);
+          err.status = res.status;
+          throw err;
+        } else {
+          throw res;
+        }
+      });
   },
 
   logout(context) {
