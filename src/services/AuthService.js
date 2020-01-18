@@ -104,8 +104,6 @@ export default {
       const data = { ...res.data };
       if (!data) {
         throw new Error("No user returned from auth service");
-      } else if (data.err) {
-        throw new Error(data.err);
       }
 
       context.msg = "Password has been reset!";
@@ -114,6 +112,14 @@ export default {
         setTimeout(() => {
           context.$router.push(redirect);
         }, 2000);
+      }
+    }).catch(res => {
+      if (res.data && res.data.err) {
+        const err = new Error(res.data.err);
+        err.status = res.status;
+        throw err;
+      } else {
+        throw res;
       }
     });
   },

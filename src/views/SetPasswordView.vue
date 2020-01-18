@@ -91,7 +91,10 @@ export default {
           this.showingSuccess = true;
         })
         .catch(err => {
-          this.msg = err.message;
+          this.msg = err.message || err;
+          if (err.status !== 422) {
+            Sentry.captureException(err);
+          }
         });
     }
   }
