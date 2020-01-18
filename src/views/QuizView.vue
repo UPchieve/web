@@ -365,7 +365,7 @@ export default {
     submit() {
       TrainingService.saveAnswer(this, this.picked);
       if (TrainingService.hasCompleted()) {
-        TrainingService.submitQuiz(this, this.user._id).then(data => {
+        TrainingService.submitQuiz(this).then(data => {
           if (data.passed) {
             this.passedMsg = "You passed!";
             this.showDone = true;

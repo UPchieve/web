@@ -213,7 +213,7 @@ export default {
           secondary_title: "",
           table_title: [
             "Strongly Disagree",
-            "Somewhat Agree",
+            "Somewhat Disagree",
             "Neither",
             "Somewhat Agree",
             "Strongly Agree"
@@ -259,7 +259,7 @@ export default {
           secondary_title: "",
           table_title: [
             "Strongly Disagree",
-            "Somewhat Agree",
+            "Somewhat Disagree",
             "Neither",
             "Somewhat Agree",
             "Strongly Agree"
