@@ -1,6 +1,8 @@
 import NetworkService from "./NetworkService";
 import AnalyticsService from "./AnalyticsService";
 
+import errorFromHttpResponse from "../utils/error-from-http-response.js";
+
 export default {
   loading: false,
   currentSession: {
@@ -97,10 +99,7 @@ export default {
         this.currentSession.sessionId = null;
         this.currentSession.data = {};
 
-        const err = new Error(resp.data.err);
-        err.status = resp.status;
-
-        throw err;
+        throw errorFromHttpResponse(resp);
       });
   }
 };

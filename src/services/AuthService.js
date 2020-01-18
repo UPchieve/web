@@ -5,6 +5,8 @@ import Vue from "vue";
 import NetworkService from "./NetworkService";
 import AnalyticsService from "./AnalyticsService";
 
+import errorFromHttpResponse from "../utils/error-from-http-response";
+
 export default {
   login(context, creds) {
     const { email, password } = creds;
@@ -50,25 +52,13 @@ export default {
         context.msg = "You have been signed up!";
       })
       .catch(res => {
-        if (res.data && res.data.err) {
-          const err = new Error(res.data.err);
-          err.status = res.status;
-          throw err;
-        } else {
-          throw res;
-        }
+        throw errorFromHttpResponse(res);
       });
   },
 
   checkRegister(context, creds) {
     return NetworkService.checkRegister(context, creds).catch(res => {
-      if (res.data && res.data.err) {
-        const err = new Error(res.data.err);
-        err.status = res.status;
-        throw err;
-      } else {
-        throw res;
-      }
+      throw errorFromHttpResponse(res);
     });
   },
 
@@ -89,13 +79,7 @@ export default {
         }
       })
       .catch(res => {
-        if (res.data && res.data.err) {
-          const err = new Error(res.data.err);
-          err.status = res.status;
-          throw err;
-        } else {
-          throw res;
-        }
+        throw errorFromHttpResponse(res);
       });
   },
 
@@ -116,13 +100,7 @@ export default {
         }
       })
       .catch(res => {
-        if (res.data && res.data.err) {
-          const err = new Error(res.data.err);
-          err.status = res.status;
-          throw err;
-        } else {
-          throw res;
-        }
+        throw errorFromHttpResponse(res);
       });
   },
 
