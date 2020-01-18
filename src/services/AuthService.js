@@ -40,22 +40,24 @@ export default {
   },
 
   register(context, signupData) {
-    return NetworkService.register(context, signupData).then(res => {
-      const data = { ...res.data };
-      if (!data) {
-        throw new Error("No user returned from auth service");
-      }
+    return NetworkService.register(context, signupData)
+      .then(res => {
+        const data = { ...res.data };
+        if (!data) {
+          throw new Error("No user returned from auth service");
+        }
 
-      context.msg = "You have been signed up!";
-    }).catch(res => {
-      if (res.data && res.data.err) {
-        const err = new Error(res.data.err);
-        err.status = res.status;
-        throw err;
-      } else {
-        throw res;
-      }
-    });
+        context.msg = "You have been signed up!";
+      })
+      .catch(res => {
+        if (res.data && res.data.err) {
+          const err = new Error(res.data.err);
+          err.status = res.status;
+          throw err;
+        } else {
+          throw res;
+        }
+      });
   },
 
   checkRegister(context, creds) {
@@ -71,28 +73,30 @@ export default {
   },
 
   sendReset(context, email, redirect) {
-    return NetworkService.sendReset(context, { email }).then(res => {
-      const data = { ...res.data };
-      if (!data) {
-        throw new Error("No user returned from auth service");
-      }
+    return NetworkService.sendReset(context, { email })
+      .then(res => {
+        const data = { ...res.data };
+        if (!data) {
+          throw new Error("No user returned from auth service");
+        }
 
-      context.msg = "Password reset email has been sent!";
+        context.msg = "Password reset email has been sent!";
 
-      if (redirect) {
-        setTimeout(() => {
-          context.$router.push(redirect);
-        }, 2000);
-      }
-    }).catch(res => {
-      if (res.data && res.data.err) {
-        const err = new Error(res.data.err);
-        err.status = res.status;
-        throw err;
-      } else {
-        throw res;
-      }
-    })
+        if (redirect) {
+          setTimeout(() => {
+            context.$router.push(redirect);
+          }, 2000);
+        }
+      })
+      .catch(res => {
+        if (res.data && res.data.err) {
+          const err = new Error(res.data.err);
+          err.status = res.status;
+          throw err;
+        } else {
+          throw res;
+        }
+      });
   },
 
   confirmReset(context, credentials, redirect) {

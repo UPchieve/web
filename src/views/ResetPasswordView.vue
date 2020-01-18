@@ -60,12 +60,11 @@ export default {
   },
   methods: {
     submit() {
-      AuthService.sendReset(this, this.email)
-        .catch(err => {
-          if (err.status !== 422) {
-            Sentry.captureException(err);
-          }
-        });
+      AuthService.sendReset(this, this.email).catch(err => {
+        if (err.status !== 422) {
+          Sentry.captureException(err);
+        }
+      });
     }
   }
 };

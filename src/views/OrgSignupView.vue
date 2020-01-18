@@ -225,19 +225,20 @@ export default {
   beforeRouteEnter(to, from, next) {
     const orgId = to.params.orgId;
 
-    NetworkService.getOrgManifest(orgId).then(data => {
-      const orgManifest = data.body.orgManifest;
-      if (!orgManifest) return next("/signup");
-      return next(_this => _this.setOrgManifest(orgManifest));
-    })
-    .catch(err => {
-      if (err.status !== 404) {
-        // we shouldn't get 422 here, since semantics of GET request are expected
-        // to be correct regardless of user input
-        Sentry.captureException(err);
-      }
-      return next("/signup");
-    });
+    NetworkService.getOrgManifest(orgId)
+      .then(data => {
+        const orgManifest = data.body.orgManifest;
+        if (!orgManifest) return next("/signup");
+        return next(_this => _this.setOrgManifest(orgManifest));
+      })
+      .catch(err => {
+        if (err.status !== 404) {
+          // we shouldn't get 422 here, since semantics of GET request are expected
+          // to be correct regardless of user input
+          Sentry.captureException(err);
+        }
+        return next("/signup");
+      });
   },
   created() {
     this.$store.dispatch("app/hideNavigation");
