@@ -14,6 +14,14 @@ module.exports = (on, config) => {
   //  watchOptions: {}
   // }))
 
+  // import Vue CLI environment variables into Cypress
+  // original code at https://github.com/vuejs/vue-cli/issues/2447
+  Object.entries(process.env)
+    .filter(([key]) => key.startsWith("VUE_APP"))
+    .forEach(([key, value]) => {
+      config.env[key.replace("VUE_APP_", "")] = value;
+    });
+
   return Object.assign({}, config, {
     fixturesFolder: "tests/e2e/fixtures",
     integrationFolder: "tests/e2e/specs",
