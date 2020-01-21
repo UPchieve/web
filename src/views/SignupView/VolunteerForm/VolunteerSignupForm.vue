@@ -329,11 +329,10 @@ export default {
       })
         .then(() => UserService.getUser())
         .then(user => {
-          UserService.setProfile(this, user)
-            .catch(err => {
-              this.msg = err.message;
-              Sentry.captureException(err);
-            });
+          UserService.setProfile(this, user).catch(err => {
+            this.msg = err.message;
+            Sentry.captureException(err);
+          });
 
           // analytics: tracking when a user has signed up
           AnalyticsService.identify(user, user.isFakeUser);
