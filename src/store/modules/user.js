@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/browser";
+
 import UserService from "@/services/UserService";
 import SessionService from "@/services/SessionService";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
@@ -69,8 +71,11 @@ export default {
         .then(({ sessionData }) => {
           commit("setSession", sessionData);
         })
-        .catch(() => {
+        .catch(err => {
           commit("setSession", {});
+          if (err.status !== 404) {
+            Sentry.captureException(err);
+          }
         });
     },
 

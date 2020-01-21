@@ -5,6 +5,8 @@ import Vue from "vue";
 import NetworkService from "./NetworkService";
 import AnalyticsService from "./AnalyticsService";
 
+import errorFromHttpResponse from "../utils/error-from-http-response";
+
 export default {
   login(context, creds) {
     const { email, password } = creds;
@@ -40,63 +42,66 @@ export default {
   },
 
   register(context, signupData) {
-    return NetworkService.register(context, signupData).then(res => {
-      const data = { ...res.data };
-      if (!data) {
-        throw new Error("No user returned from auth service");
-      } else if (data.err) {
-        throw new Error(data.err);
-      }
+    return NetworkService.register(context, signupData)
+      .then(res => {
+        const data = { ...res.data };
+        if (!data) {
+          throw new Error("No user returned from auth service");
+        }
 
-      context.msg = "You have been signed up!";
-    });
+        context.msg = "You have been signed up!";
+      })
+      .catch(res => {
+        throw errorFromHttpResponse(res);
+      });
   },
 
   checkRegister(context, creds) {
-    return NetworkService.checkRegister(context, creds).then(res => {
-      if (res.data.err) {
-        throw new Error(res.data.err);
-      }
+    return NetworkService.checkRegister(context, creds).catch(res => {
+      throw errorFromHttpResponse(res);
     });
   },
 
   sendReset(context, email, redirect) {
-    return NetworkService.sendReset(context, { email }).then(res => {
-      const data = { ...res.data };
-      if (!data) {
-        throw new Error("No user returned from auth service");
-      }
-      if (data.err) {
-        throw new Error(data.err);
-      }
+    return NetworkService.sendReset(context, { email })
+      .then(res => {
+        const data = { ...res.data };
+        if (!data) {
+          throw new Error("No user returned from auth service");
+        }
 
-      context.msg = "Password reset email has been sent!";
+        context.msg = "Password reset email has been sent!";
 
-      if (redirect) {
-        setTimeout(() => {
-          context.$router.push(redirect);
-        }, 2000);
-      }
-    });
+        if (redirect) {
+          setTimeout(() => {
+            context.$router.push(redirect);
+          }, 2000);
+        }
+      })
+      .catch(res => {
+        throw errorFromHttpResponse(res);
+      });
   },
 
   confirmReset(context, credentials, redirect) {
-    return NetworkService.confirmReset(context, credentials).then(res => {
-      const data = { ...res.data };
-      if (!data) {
-        throw new Error("No user returned from auth service");
-      } else if (data.err) {
-        throw new Error(data.err);
-      }
+    return NetworkService.confirmReset(context, credentials)
+      .then(res => {
+        const data = { ...res.data };
+        if (!data) {
+          throw new Error("No user returned from auth service");
+        }
 
-      context.msg = "Password has been reset!";
+        context.msg = "Password has been reset!";
 
-      if (redirect) {
-        setTimeout(() => {
-          context.$router.push(redirect);
-        }, 2000);
-      }
-    });
+        if (redirect) {
+          setTimeout(() => {
+            context.$router.push(redirect);
+          }, 2000);
+        }
+      })
+      .catch(res => {
+        throw errorFromHttpResponse(res);
+      });
   },
 
   logout(context) {

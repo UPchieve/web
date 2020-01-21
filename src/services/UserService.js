@@ -2,6 +2,7 @@ import moment from "moment";
 import NetworkService from "./NetworkService";
 import AuthService from "./AuthService";
 import OnboardingService from "./OnboardingService";
+import errorFromHttpResponse from "../utils/error-from-http-response";
 
 export default {
   getAuth(context) {
@@ -46,7 +47,7 @@ export default {
       },
       res => {
         context.msg = "Error occurred";
-        return Promise.reject(res);
+        return Promise.reject(errorFromHttpResponse(res));
       }
     );
   },

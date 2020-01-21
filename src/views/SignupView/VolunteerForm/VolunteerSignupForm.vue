@@ -202,6 +202,7 @@
 
 <script>
 import validator from "validator";
+import * as Sentry from "@sentry/browser";
 
 import AuthService from "@/services/AuthService";
 import RegistrationService from "@/services/RegistrationService";
@@ -265,6 +266,9 @@ export default {
         })
         .catch(err => {
           this.msg = err.message;
+          if (err.status !== 409) {
+            Sentry.captureException(err);
+          }
         });
     },
     checkInputs() {
@@ -325,7 +329,10 @@ export default {
       })
         .then(() => UserService.getUser())
         .then(user => {
-          UserService.setProfile(this, user);
+          UserService.setProfile(this, user).catch(err => {
+            this.msg = err.message;
+            Sentry.captureException(err);
+          });
 
           // analytics: tracking when a user has signed up
           AnalyticsService.identify(user, user.isFakeUser);
@@ -335,6 +342,9 @@ export default {
         })
         .catch(err => {
           this.msg = err.message;
+          if (err.status !== 422) {
+            Sentry.captureException(err);
+          }
         });
     }
   }
