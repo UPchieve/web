@@ -23,3 +23,22 @@
 //
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+const AUTH_ROOT = `${Cypress.env("SERVER_ROOT")}/auth`;
+
+Cypress.Commands.add("login", user => {
+  cy.request({
+    method: "POST",
+    url: `${AUTH_ROOT}/login`,
+    body: {
+      email: user.email,
+      password: user.password
+    }
+  });
+});
+
+Cypress.Commands.add("logout", () => {
+  cy.request({
+    url: `${AUTH_ROOT}/logout`
+  });
+});
