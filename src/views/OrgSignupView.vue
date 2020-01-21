@@ -211,6 +211,7 @@
 
 <script>
 import validator from "validator";
+import * as Sentry from "@sentry/browser";
 
 import FormPageTemplate from "@/components/FormPageTemplate";
 import AuthService from "@/services/AuthService";
@@ -224,11 +225,20 @@ export default {
   beforeRouteEnter(to, from, next) {
     const orgId = to.params.orgId;
 
-    NetworkService.getOrgManifest(orgId).then(data => {
-      const orgManifest = data.body.orgManifest;
-      if (!orgManifest) return next("/signup");
-      return next(_this => _this.setOrgManifest(orgManifest));
-    });
+    NetworkService.getOrgManifest(orgId)
+      .then(data => {
+        const orgManifest = data.body.orgManifest;
+        if (!orgManifest) return next("/signup");
+        return next(_this => _this.setOrgManifest(orgManifest));
+      })
+      .catch(err => {
+        if (err.status !== 404) {
+          // we shouldn't get 422 here, since semantics of GET request are expected
+          // to be correct regardless of user input
+          Sentry.captureException(err);
+        }
+        return next("/signup");
+      });
   },
   created() {
     this.$store.dispatch("app/hideNavigation");
@@ -315,6 +325,9 @@ export default {
         })
         .catch(err => {
           this.serverErrorMsg = err.message;
+          if (err.status !== 409) {
+            Sentry.captureException(err);
+          }
         });
     },
 
@@ -366,6 +379,9 @@ export default {
         })
         .catch(err => {
           this.serverErrorMsg = err.message;
+          if (err.status !== 422) {
+            Sentry.captureException(err);
+          }
         });
     }
   }

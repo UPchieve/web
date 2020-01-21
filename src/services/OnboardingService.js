@@ -6,8 +6,9 @@ export default {
       .then(() => {
         context.msg = "Email sent!";
       })
-      .catch(() => {
+      .catch(err => {
         context.msg = "Error occurred";
+        throw err;
       });
   },
   confirmVerification(context, token) {
