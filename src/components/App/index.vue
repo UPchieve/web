@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 import SessionService from "@/services/SessionService";
 
@@ -39,7 +39,9 @@ export default {
     this.handleResize();
   },
   beforeUpdate() {
-    this.$store.dispatch("user/fetchSession", this);
+    if (this.userAuthenticated) {
+      this.$store.dispatch("user/fetchSession", this);
+    }
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.handleResize);
@@ -57,6 +59,9 @@ export default {
       showHeader: state => state.app.header.isShown,
       showSidebar: state => state.app.sidebar.isShown,
       showModal: state => state.app.modal.isShown
+    }),
+    ...mapGetters({
+      userAuthenticated: "user/isAuthenticated"
     })
   },
   sockets: {
