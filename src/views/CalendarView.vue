@@ -405,19 +405,19 @@ input[type="checkbox"]:checked + label {
     padding-top: 0em !important;
     padding-bottom: 0em !important;
   }
-  
+
   .dayTimeScrollContainer {
     display: flex;
     align-items: flex-start;
     overflow-x: scroll;
   }
-  
+
   .calendar-container {
     width: 100%;
     position: absolute;
     overflow-x: hidden;
   }
-  
+
   input[type="checkbox"] {
     position: relative;
     margin-top: 0;
