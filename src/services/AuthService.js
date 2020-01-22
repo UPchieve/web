@@ -19,26 +19,21 @@ export default {
       return undefined;
     }
 
-    return NetworkService.login(context, creds).then(
-      res => {
-        const data = { ...res.data };
-        if (!data) {
-          throw new Error("No user returned from auth service");
-        }
-
-        // analytics: tracking when a user has logged in
-        AnalyticsService.identify(data.user, data.user.isFakeUser);
-        AnalyticsService.trackNoProperties("logged in", data.user.isFakeUser);
-
-        // connect socket
-        context.$socket.connect();
-
-        return data;
-      },
-      () => {
-        context.error = "Could not login";
+    return NetworkService.login(context, creds).then(res => {
+      const data = { ...res.data };
+      if (!data) {
+        throw new Error("No user returned from auth service");
       }
-    );
+
+      // analytics: tracking when a user has logged in
+      AnalyticsService.identify(data.user, data.user.isFakeUser);
+      AnalyticsService.trackNoProperties("logged in", data.user.isFakeUser);
+
+      // connect socket
+      context.$socket.connect();
+
+      return data;
+    });
   },
 
   register(context, signupData) {
