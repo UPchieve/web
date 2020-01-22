@@ -84,10 +84,14 @@ export default {
       AuthService.login(this, {
         email: this.credentials.email,
         password: this.credentials.password
-      }).then(data => {
-        this.$store.commit("user/setUser", data.user);
-        this.$router.push(this.$route.query.redirect || "/");
-      });
+      })
+        .then(data => {
+          this.$store.commit("user/setUser", data.user);
+          this.$router.push(this.$route.query.redirect || "/");
+        })
+        .catch(() => {
+          this.error = "Oops! The email or password you entered is incorrect.";
+        });
     }
   }
 };
