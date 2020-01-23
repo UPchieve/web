@@ -400,7 +400,7 @@ input[type="checkbox"]:checked + label {
   padding-top: 30px;
 }
 
-@media screen and (max-width: #{get-app-sidebar-width("medium") + 1210px}) {
+@media screen and (max-width: #{get-app-sidebar-width("medium") + 960px}) {
   .dayTimeScrollContainer {
     display: flex;
     align-items: flex-start;
