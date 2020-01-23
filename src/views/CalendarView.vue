@@ -400,7 +400,7 @@ input[type="checkbox"]:checked + label {
   padding-top: 30px;
 }
 
-@media screen and (max-width: 700px) {
+@media screen and (max-width: get-breakpoint("medium")) {
   .btn {
     padding-top: 0em !important;
     padding-bottom: 0em !important;
