@@ -16,30 +16,32 @@
             </option>
           </select>
         </div>
-        <div class="dayTimeContainer">
-          <div class="timeLabelContainer">
-            <div v-for="time in timeRange" :key="time" class="timeLabel">
-              {{ time }}
-            </div>
-          </div>
-          <form class="dayTime">
-            <div v-for="(dayValue, day) in availability" :key="`day-${day}`">
-              <div class="dayLabel">{{ day }}</div>
-              <div class="times">
-                <div
-                  v-for="sortedTime in sortedTimes[day]"
-                  :key="sortedTime"
-                  class="timeOfDay"
-                >
-                  <input
-                    v-model="availability[day][sortedTime]"
-                    type="checkbox"
-                  />
-                  <label for="sortedTime" />
-                </div>
+        <div class="dayTimeScrollContainer">
+          <div class="dayTimeContainer">
+            <div class="timeLabelContainer">
+              <div v-for="time in timeRange" :key="time" class="timeLabel">
+                {{ time }}
               </div>
             </div>
-          </form>
+            <form class="dayTime">
+              <div v-for="(dayValue, day) in availability" :key="`day-${day}`">
+                <div class="dayLabel">{{ day }}</div>
+                <div class="times">
+                  <div
+                    v-for="sortedTime in sortedTimes[day]"
+                    :key="sortedTime"
+                    class="timeOfDay"
+                  >
+                    <input
+                      v-model="availability[day][sortedTime]"
+                      type="checkbox"
+                    />
+                    <label for="sortedTime" />
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -398,7 +400,34 @@ input[type="checkbox"]:checked + label {
   padding-top: 30px;
 }
 
-@media screen and (max-width: 700px) {
+@media screen and (max-width: #{get-app-sidebar-width("medium") + 960px}) {
+  .dayTimeScrollContainer {
+    display: flex;
+    align-items: flex-start;
+    overflow-x: scroll;
+  }
+
+  .calendar-container {
+    width: 100%;
+    @each $key, $value in $app-sidebar-width-map {
+      @if map-get($breakpoint-map, $key) {
+        @include breakpoint-above($key) {
+          width: calc(100% - #{$value});
+        }
+      }
+    }
+    position: absolute;
+    overflow-x: hidden;
+  }
+
+  input[type="checkbox"] {
+    position: relative;
+    margin-top: 0;
+    margin-bottom: -40px;
+  }
+}
+
+@media screen and (max-width: get-breakpoint("medium")) {
   .btn {
     padding-top: 0em !important;
     padding-bottom: 0em !important;
