@@ -409,6 +409,13 @@ input[type="checkbox"]:checked + label {
 
   .calendar-container {
     width: 100%;
+    @each $key, $value in $app-sidebar-width-map {
+      @if map-get($breakpoint-map, $key) {
+        @include breakpoint-above($key) {
+          width: calc(100% - #{$value});
+        }
+      }
+    }
     position: absolute;
     overflow-x: hidden;
   }
