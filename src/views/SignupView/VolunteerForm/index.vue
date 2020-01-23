@@ -1,5 +1,5 @@
 <template>
-  <code-form v-if="!validRegistrationCode" />
+  <code-form v-if="!isValidRegistrationCode" />
   <volunteer-signup-form v-else />
 </template>
 
