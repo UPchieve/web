@@ -18,7 +18,6 @@ import ResourcesView from "./views/ResourcesView";
 import FeedbackView from "./views/FeedbackView";
 import TrainingView from "./views/TrainingView";
 import QuizView from "./views/QuizView";
-import ReviewView from "./views/ReviewView";
 import ProfileView from "./views/ProfileView";
 import CalendarView from "./views/CalendarView";
 import AdminView from "./views/Admin";
@@ -171,12 +170,6 @@ const routes = [
     path: "/training/:category/quiz",
     name: "QuizView",
     component: QuizView,
-    meta: { protected: true }
-  },
-  {
-    path: "/training/:category/review",
-    name: "ReviewView",
-    component: ReviewView,
     meta: { protected: true }
   },
   {
