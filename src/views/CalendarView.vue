@@ -400,12 +400,7 @@ input[type="checkbox"]:checked + label {
   padding-top: 30px;
 }
 
-@media screen and (max-width: get-breakpoint("medium")) {
-  .btn {
-    padding-top: 0em !important;
-    padding-bottom: 0em !important;
-  }
-
+@media screen and (max-width: #{get-app-sidebar-width("medium") + 1210px}) {
   .dayTimeScrollContainer {
     display: flex;
     align-items: flex-start;
@@ -422,6 +417,13 @@ input[type="checkbox"]:checked + label {
     position: relative;
     margin-top: 0;
     margin-bottom: -40px;
+  }
+}
+
+@media screen and (max-width: get-breakpoint("medium")) {
+  .btn {
+    padding-top: 0em !important;
+    padding-bottom: 0em !important;
   }
 }
 </style>
