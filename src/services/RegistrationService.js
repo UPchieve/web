@@ -3,20 +3,24 @@ import NetworkService from "./NetworkService";
 export default {
   data: {
     registrationCode: null,
-    validRegistrationCode: false
+    isValidRegistrationCode: false
   },
 
   checkCode(context, code) {
-    return NetworkService.checkCode(context, { code }).then(res => {
-      const data = res.data || {};
+    return NetworkService.checkCode(context, { code })
+      .then(res => {
+        const data = res.data || {};
 
-      this.data.validRegistrationCode = data.valid === true;
+        this.data.isValidRegistrationCode = data.isValid === true;
 
-      if (data.valid) {
-        this.data.registrationCode = code;
-      }
+        if (this.data.isValidRegistrationCode) {
+          this.data.registrationCode = code;
+        }
 
-      return this.data.validRegistrationCode;
-    });
+        return this.data.isValidRegistrationCode;
+      })
+      .catch(() => {
+        return false;
+      });
   }
 };
