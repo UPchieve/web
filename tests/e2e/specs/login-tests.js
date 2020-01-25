@@ -1,17 +1,16 @@
 /**
  *
- * @file Tests user authenication (login/ logout) and failed attempts for both
+ * @file Tests user authenication (login and logout) and failed attempts for both
  *
  */
 
 /**
  * @summary Tests authenicating a volunteer and student successfully
  */
-
 describe("Successful Log in and log out", () => {
   before(() => {
     cy.fixture("users/student1").as("student");
-    cy.fixture("users/Volunteer1").as("volunteer");
+    cy.fixture("users/volunteer1").as("volunteer");
   });
 
   describe("Authenicate a student logging in and out", () => {
@@ -64,7 +63,6 @@ describe("Successful Log in and log out", () => {
 /**
  * @summary Tests failing to log in
  */
-
 describe("Fail logging in", () => {
   beforeEach(() => {
     cy.fixture("users/student1").as("student");
