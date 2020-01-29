@@ -10,7 +10,7 @@
 describe("Successful Log in and log out", () => {
   before(() => {
     cy.fixture("users/student1").as("student");
-    cy.fixture("users/volunteer1").as("volunteer");
+    cy.fixture("users/Volunteer1").as("volunteer");
   });
 
   describe("Authenicate a student logging in and out", () => {
