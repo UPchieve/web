@@ -127,15 +127,15 @@
 
     <div class="uc-column">
       <label for="phoneNumber" class="uc-form-label">Phone Number</label>
-      <input
+      <vue-phone-number-input
         id="phoneNumber"
-        type="tel"
-        class="uc-form-input"
-        v-bind:class="{
-          'uc-form-input--invalid': invalidInputs.indexOf('phone') > -1
-        }"
+        class="phone-input"
         v-model="profile.phone"
-        required
+        :required="true"
+        :error="invalidInputs.indexOf('phone') > -1 && !phoneInputInfo.isValid"
+        color="#555"
+        valid-color="#16ba97"
+        @update="onPhoneInputUpdate"
       />
     </div>
 
@@ -209,8 +209,6 @@ import RegistrationService from "@/services/RegistrationService";
 import UserService from "@/services/UserService";
 import AnalyticsService from "@/services/AnalyticsService";
 
-import phoneValidation from "@/utils/phone-validation";
-
 export default {
   data() {
     return {
@@ -229,7 +227,8 @@ export default {
         phone: "",
         favoriteAcademicSubject: ""
       },
-      step: "step-1"
+      step: "step-1",
+      phoneInputInfo: {}
     };
   },
   methods: {
@@ -288,10 +287,8 @@ export default {
       if (!this.profile.phone) {
         this.errors.push("You must enter a phone number.");
         this.invalidInputs.push("phone");
-      } else if (!phoneValidation.validatePhoneNumber(this.profile.phone)) {
-        this.errors.push(
-          this.profile.phone + " is not a valid U.S. phone number."
-        );
+      } else if (!this.phoneInputInfo.isValid || !this.phoneInputInfo.e164) {
+        this.errors.push(this.profile.phone + " is not a valid phone number.");
         this.invalidInputs.push("phone");
       }
       if (!this.profile.college) {
@@ -310,11 +307,6 @@ export default {
       }
     },
     submit() {
-      // convert phone number
-      this.profile.phone = phoneValidation.convertPhoneNumber(
-        this.profile.phone
-      );
-
       AuthService.register(this, {
         isVolunteer: true,
         code: RegistrationService.data.registrationCode,
@@ -323,7 +315,7 @@ export default {
         terms: this.credentials.terms,
         firstName: this.profile.firstName,
         lastName: this.profile.lastName,
-        phone: this.profile.phone,
+        phone: this.phoneInputInfo.e164,
         college: this.profile.college,
         favoriteAcademicSubject: this.profile.favoriteAcademicSubject
       })
@@ -346,6 +338,9 @@ export default {
             Sentry.captureException(err);
           }
         });
+    },
+    onPhoneInputUpdate(phoneInputInfo) {
+      this.phoneInputInfo = phoneInputInfo;
     }
   }
 };
@@ -354,6 +349,10 @@ export default {
 <style lang="scss" scoped>
 .uc-form-body {
   @include child-spacing(top, 25px);
+}
+
+.phone-input {
+  margin: 10px 0 2px;
 }
 
 .step-title {
