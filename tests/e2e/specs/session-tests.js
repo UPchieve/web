@@ -32,14 +32,14 @@ describe("Session activity", () => {
     });
 
     it("Should send a chat message", function() {
-      const chatMessage = "Hi, I have an algebra question.";
+      const STUDENT_ALGEBRA_MSG = "Hi, I have an algebra question.";
 
       cy.get(".message-box .messages")
         .find(".message")
         .should("have.length", 0);
 
       cy.get(".chat .message-textarea")
-        .type(chatMessage)
+        .type(STUDENT_ALGEBRA_MSG)
         .type("{enter}");
 
       cy.get(".message-box .messages")
@@ -48,7 +48,7 @@ describe("Session activity", () => {
 
       cy.get(".message-box .messages .message .contents span").should(
         "have.text",
-        chatMessage
+        STUDENT_ALGEBRA_MSG
       );
     });
 
