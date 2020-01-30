@@ -3,7 +3,7 @@ describe("Session activity", () => {
     cy.fixture("users/student1").as("student");
   });
 
-  describe("Student session activity without volunteer", () => {
+  describe("Student-only session activity", () => {
     beforeEach(function() {
       cy.login(this.student);
     });
@@ -11,11 +11,11 @@ describe("Session activity", () => {
     it("Should start an algebra session", function() {
       cy.visit("/dashboard");
 
-      cy.get(".SubjectCard:first-of-type .LargeButton-primary")
+      cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
         .should("be.visible")
         .click();
 
-      cy.get(".SubjectSelectionModal-subtopic:first-of-type")
+      cy.get(".SubjectSelectionModal-subtopic:nth-of-type(1)")
         .should("be.visible")
         .click();
 
