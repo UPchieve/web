@@ -50,6 +50,11 @@ export default {
       dispatch("fetchSession", context);
     },
 
+    clear: ({ commit }) => {
+      commit("setUser", {});
+      commit("setSession", {});
+    },
+
     fetchUser: ({ commit }) => {
       return UserService.getUser().then(user => commit("updateUser", user));
     },
