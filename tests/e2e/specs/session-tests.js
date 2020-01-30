@@ -52,7 +52,14 @@ describe("Session activity", () => {
     });
 
     it("Should cancel the session", function() {
-      cy.get(".end-session button span").should("contain.text", "Cancel");
+      cy.get(".end-session button")
+        .should("contain.text", "Cancel")
+        .click();
+
+      cy.location("pathname").should("eq", "/dashboard");
+      cy.get(".RejoinSessionHeader").should("not.exist");
+    });
+  });
 
   describe("Student and volunteer session activity", function() {
     it("Should start an essays session", function() {
