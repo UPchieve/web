@@ -98,7 +98,7 @@ describe("Session activity", () => {
       cy.login(this.student);
 
       cy.get(".session-header__dashboard-link").click();
-      cy.wait(5000);
+      cy.wait(8000);
 
       cy.location("pathname").should("eq", "/dashboard");
       cy.get(".RejoinSessionHeader").should("exist");

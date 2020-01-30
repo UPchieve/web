@@ -26,11 +26,13 @@ describe("Successful Log in and log out", () => {
         .should("have.value", this.student.password);
 
       cy.get("button[type=submit]").click();
-
       cy.location("pathname").should("eq", "/dashboard");
     });
 
-    it("Should log out successfully", () => {
+    it("Should log out successfully", function() {
+      cy.login(this.student);
+      cy.location("pathname").should("eq", "/dashboard");
+
       cy.get(".AppSidebar-final-link").click();
       cy.location("pathname").should("eq", "/logout");
     });
@@ -49,11 +51,13 @@ describe("Successful Log in and log out", () => {
         .should("have.value", this.volunteer.password);
 
       cy.get("button[type=submit]").click();
-
       cy.location("pathname").should("eq", "/dashboard");
     });
 
-    it("Should log out successfully", () => {
+    it("Should log out successfully", function() {
+      cy.login(this.volunteer);
+      cy.location("pathname").should("eq", "/dashboard");
+
       cy.get(".AppSidebar-final-link").click();
       cy.location("pathname").should("eq", "/logout");
     });
