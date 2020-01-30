@@ -63,14 +63,6 @@ export default {
       commit("setUser", {});
     },
 
-    updateAvailability: ({ commit }, availability, date = Date.now()) => {
-      commit("setAvailability", availability, date);
-    },
-
-    updateTimezone: ({ commit }, timezone, date = Date.now()) => {
-      commit("setTimezone", timezone, date);
-    },
-
     fetchSession: ({ commit, state }, context) => {
       SessionService.getCurrentSession(context, state.user)
         .then(({ sessionData }) => {
@@ -84,16 +76,24 @@ export default {
         });
     },
 
+    clearSession: ({ commit }) => {
+      commit("setSession", {});
+    },
+
     updateSession: ({ commit }, sessionData) => {
       commit("setSession", sessionData);
     },
 
-    addMessage: ({ commit }, message) => {
-      commit("addMessage", message);
+    updateAvailability: ({ commit }, availability, date = Date.now()) => {
+      commit("setAvailability", availability, date);
     },
 
-    clearSession: ({ commit }) => {
-      commit("setSession", {});
+    updateTimezone: ({ commit }, timezone, date = Date.now()) => {
+      commit("setTimezone", timezone, date);
+    },
+
+    addMessage: ({ commit }, message) => {
+      commit("addMessage", message);
     }
   },
   getters: {
