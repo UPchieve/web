@@ -54,9 +54,37 @@ describe("Session activity", () => {
     it("Should cancel the session", function() {
       cy.get(".end-session button span").should("contain.text", "Cancel");
 
-      cy.get(".end-session button span").click();
+  describe("Student and volunteer session activity", function() {
+    it("Should start an essays session", function() {
+      cy.login(this.student);
+      cy.visit("/dashboard");
+
+      cy.get(".SubjectCard:nth-of-type(2) .LargeButton-primary")
+        .should("be.visible")
+        .click();
+
+      cy.get(".SubjectSelectionModal-subtopic:nth-of-type(2)")
+        .should("be.visible")
+        .click();
+
+      cy.get(".ModalTemplate-form .LargeButton-primary")
+        .should("be.visible")
+        .click();
+
+      cy.location("pathname").should("eq", "/session/college/essays");
+      cy.wait(7000);
+
+      const sessionUrlPattern = /^\/session\/college\/essays\/\w{24}$/;
+      cy.location("pathname").should("match", sessionUrlPattern);
+    });
+
+    it("Should return to dashboard during active session", function() {
+      cy.login(this.student);
+
+      cy.get(".session-header__dashboard-link").click();
 
       cy.location("pathname").should("eq", "/dashboard");
+      cy.get(".RejoinSessionHeader").should("exist");
     });
   });
 });
