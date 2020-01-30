@@ -67,7 +67,7 @@ describe("Session activity", () => {
     const STUDENT_ESSAY_MSG = "Hi, I have an essay question.";
     const VOLUNTEER_ESSAY_MSG = "Hello! What's your essay question?";
 
-    it("Should start an essays session", function() {
+    it("Should start an essay session", function() {
       cy.login(this.student);
       cy.visit("/dashboard");
 
@@ -104,7 +104,7 @@ describe("Session activity", () => {
       cy.get(".RejoinSessionHeader").should("exist");
     });
 
-    it("Should switch to volunteer account and find student help request on dashboard", function() {
+    it("Should switch to volunteer account and see student help request on dashboard", function() {
       cy.login(this.volunteer);
       cy.visit("/dashboard");
       cy.wait(5000);
@@ -152,7 +152,7 @@ describe("Session activity", () => {
       ).should("have.text", VOLUNTEER_ESSAY_MSG);
     });
 
-    it("Should cancel the essay session", function() {
+    it("Should end the essay session and direct volunteer to feedback form", function() {
       cy.login(this.volunteer);
 
       cy.get(".end-session button")
