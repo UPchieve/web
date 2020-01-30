@@ -4,7 +4,7 @@ describe("Session activity", () => {
     cy.fixture("users/Volunteer1").as("volunteer");
   });
 
-  describe("Student-only session activity", () => {
+  describe("Student-only algebra session activity", () => {
     beforeEach(function() {
       cy.login(this.student);
     });
@@ -27,8 +27,8 @@ describe("Session activity", () => {
       cy.location("pathname").should("eq", "/session/math/algebra");
       cy.wait(7000);
 
-      const sessionUrlPattern = /^\/session\/math\/algebra\/\w{24}$/;
-      cy.location("pathname").should("match", sessionUrlPattern);
+      const SESSION_URL_PATTERN = /^\/session\/math\/algebra\/\w{24}$/;
+      cy.location("pathname").should("match", SESSION_URL_PATTERN);
     });
 
     it("Should send a chat message", function() {
@@ -62,7 +62,7 @@ describe("Session activity", () => {
     });
   });
 
-  describe("Student and volunteer session activity", function() {
+  describe("Student and volunteer essay session activity", function() {
     const ESSAYS_SESSION_URL_PATTERN = /^\/session\/college\/essays\/\w{24}$/;
     const STUDENT_ESSAY_MSG = "Hi, I have an essay question.";
     const VOLUNTEER_ESSAY_MSG = "Hello! What's your essay question?";
@@ -87,6 +87,7 @@ describe("Session activity", () => {
       cy.wait(7000);
 
       cy.location("pathname").should("match", ESSAYS_SESSION_URL_PATTERN);
+      cy.wait(4000);
 
       cy.get(".chat .message-textarea")
         .type(STUDENT_ESSAY_MSG)
