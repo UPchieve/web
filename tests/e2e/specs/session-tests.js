@@ -151,5 +151,16 @@ describe("Session activity", () => {
         ".message-box .messages .message:nth-of-type(2) .contents span"
       ).should("have.text", VOLUNTEER_ESSAY_MSG);
     });
+
+    it("Should cancel the essay session", function() {
+      cy.login(this.volunteer);
+
+      cy.get(".end-session button")
+        .should("contain.text", "End session")
+        .click();
+
+      const VOLUNTEER_FEEDBACK_URL_PATTERN = /^\/feedback\/\w{24}\/college\/essays\/volunteer\/\w{24}\/\w{24}$/;
+      cy.location("pathname").should("match", VOLUNTEER_FEEDBACK_URL_PATTERN);
+    });
   });
 });
