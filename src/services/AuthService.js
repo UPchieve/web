@@ -103,11 +103,11 @@ export default {
     if (context) {
       NetworkService.logout(context)
         .then(() => {
-          context.$store.dispatch("user/clearUser");
+          context.$store.dispatch("user/clear");
           context.$router.push("/logout");
         })
         .catch(() => {
-          context.$store.dispatch("user/clearUser");
+          context.$store.dispatch("user/clear");
           context.$router.push("/logout");
         })
         .finally(() => {
