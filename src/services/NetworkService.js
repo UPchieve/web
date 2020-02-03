@@ -34,9 +34,13 @@ export default {
       .post(`${AUTH_ROOT}/register/checkcred`, data)
       .then(this._successHandler, this._errorHandler);
   },
-  getOrgManifest(orgId) {
+  getVolunteerPartner(partnerId) {
     return Vue.http
-      .get(`${AUTH_ROOT}/org-manifest?orgId=${encodeURIComponent(orgId)}`)
+      .get(
+        `${AUTH_ROOT}/partner/volunteer?partnerId=${encodeURIComponent(
+          partnerId
+        )}`
+      )
       .then(this._successHandler, this._errorHandler);
   },
   register(context, data) {

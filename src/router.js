@@ -7,7 +7,7 @@ import LegalView from "./views/LegalView";
 import LogoutView from "./views/LogoutView";
 import LoginView from "./views/LoginView";
 import SignupView from "./views/SignupView";
-import OrgSignupView from "./views/OrgSignupView";
+import VolunteerPartnerSignupView from "./views/VolunteerPartnerSignupView";
 import ResetPasswordView from "./views/ResetPasswordView";
 import SetPasswordView from "./views/SetPasswordView";
 import OnboardingView from "./views/OnboardingView";
@@ -86,9 +86,9 @@ const routes = [
     meta: { loggedOutOnly: true }
   },
   {
-    path: "/signup/:orgId",
-    name: "OrgSignupView",
-    component: OrgSignupView,
+    path: "/signup/:partnerId",
+    name: "VolunteerPartnerSignupView",
+    component: VolunteerPartnerSignupView,
     meta: { loggedOutOnly: true }
   },
   {

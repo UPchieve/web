@@ -22,10 +22,10 @@
 
         <div class="step-header">
           <div class="step-header__title">
-            Welcome {{ orgManifest.name }} Employee!
+            Welcome {{ volunteerPartner.name }} Employee!
           </div>
           <div class="step-header__subtitle">
-            Not with {{ orgManifest.name }}?
+            Not with {{ volunteerPartner.name }}?
             <a href="https://upchieve.org/volunteer">Click here</a>
           </div>
         </div>
@@ -218,18 +218,18 @@ import AuthService from "@/services/AuthService";
 import NetworkService from "@/services/NetworkService";
 
 export default {
-  name: "org-signup-view",
+  name: "volunteer-partner-signup-view",
   components: {
     FormPageTemplate
   },
   beforeRouteEnter(to, from, next) {
-    const orgId = to.params.orgId;
+    const partnerId = to.params.partnerId;
 
-    NetworkService.getOrgManifest(orgId)
+    NetworkService.getVolunteerPartner(partnerId)
       .then(data => {
-        const orgManifest = data.body.orgManifest;
-        if (!orgManifest) return next("/signup");
-        return next(_this => _this.setOrgManifest(orgManifest));
+        const volunteerPartner = data.body.volunteerPartner;
+        if (!volunteerPartner) return next("/signup");
+        return next(_this => _this.setVolunteerPartner(volunteerPartner));
       })
       .catch(err => {
         if (err.status !== 404) {
@@ -245,7 +245,7 @@ export default {
   },
   data() {
     return {
-      orgManifest: {
+      volunteerPartner: {
         name: "",
         requiredEmailDomains: []
       },
@@ -265,12 +265,12 @@ export default {
     };
   },
   methods: {
-    setOrgManifest(orgManifest) {
-      this.orgManifest = orgManifest;
+    setVolunteerPartner(volunteerPartner) {
+      this.volunteerPartner = volunteerPartner;
     },
 
-    isValidOrgEmail(email) {
-      const requiredDomains = this.orgManifest.requiredEmailDomains;
+    isValidPartnerEmail(email) {
+      const requiredDomains = this.volunteerPartner.requiredEmailDomains;
       if (!(requiredDomains && requiredDomains.length)) return true;
 
       const domain = email.split("@")[1];
@@ -297,9 +297,9 @@ export default {
         );
 
         this.invalidInputs.push("inputEmail");
-      } else if (!this.isValidOrgEmail(this.formData.email)) {
+      } else if (!this.isValidPartnerEmail(this.formData.email)) {
         this.errors.push(
-          `Email must end with ${this.orgManifest.requiredEmailDomains.join(
+          `Email must end with ${this.volunteerPartner.requiredEmailDomains.join(
             " or "
           )}`
         );
@@ -366,7 +366,7 @@ export default {
     register() {
       AuthService.register(this, {
         isVolunteer: true,
-        volunteerPartnerOrg: this.$route.params.orgId,
+        volunteerPartnerOrg: this.$route.params.partnerId,
         email: this.formData.email,
         password: this.formData.password,
         firstName: this.formData.firstName,
