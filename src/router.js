@@ -8,6 +8,7 @@ import LogoutView from "./views/LogoutView";
 import LoginView from "./views/LoginView";
 import SignupView from "./views/SignupView";
 import VolunteerPartnerSignupView from "./views/VolunteerPartnerSignupView";
+import StudentPartnerSignupView from "./views/StudentPartnerSignupView";
 import ResetPasswordView from "./views/ResetPasswordView";
 import SetPasswordView from "./views/SetPasswordView";
 import OnboardingView from "./views/OnboardingView";
@@ -83,6 +84,12 @@ const routes = [
     path: "/signup",
     name: "SignupView",
     component: SignupView,
+    meta: { loggedOutOnly: true }
+  },
+  {
+    path: "/signup/student/:partnerId",
+    name: "StudentPartnerSignupView",
+    component: StudentPartnerSignupView,
     meta: { loggedOutOnly: true }
   },
   {

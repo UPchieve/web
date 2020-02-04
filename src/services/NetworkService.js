@@ -43,6 +43,15 @@ export default {
       )
       .then(this._successHandler, this._errorHandler);
   },
+  getStudentPartner(partnerId) {
+    return Vue.http
+      .get(
+        `${AUTH_ROOT}/partner/student?partnerId=${encodeURIComponent(
+          partnerId
+        )}`
+      )
+      .then(this._successHandler, this._errorHandler);
+  },
   register(context, data) {
     return context.$http
       .post(`${AUTH_ROOT}/register`, data)
