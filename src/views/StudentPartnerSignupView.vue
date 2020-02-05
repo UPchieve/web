@@ -148,6 +148,41 @@
           />
         </div>
 
+        <div v-if="studentPartner.highSchoolSignup" class="uc-form-checkbox">
+          <input
+            id="highSchoolCheckbox"
+            v-model="isHighSchoolStudent"
+            type="checkbox"
+          />
+          <label for="highSchoolCheckbox">
+            Are you currently a high school student?
+          </label>
+        </div>
+
+        <div v-if="showHighSchoolSelector" class="uc-column">
+          <label for="inputHighschool" class="uc-form-label"
+            >High School Name</label
+          >
+
+          <div class="school-search">
+            <autocomplete
+              id="inputHighschool"
+              class="school-search__autocomplete"
+              :search="autocompleteSchool"
+              :get-result-value="getSchoolDisplayName"
+              base-class="uc-autocomplete"
+              auto-select
+              placeholder="Search for your high school"
+              aria-label="Search for your high school"
+              @submit="handleSelectHighSchool"
+            ></autocomplete>
+
+            <div v-if="noHighSchoolResults" class="school-search__no-results">
+              No results
+            </div>
+          </div>
+        </div>
+
         <div class="uc-form-checkbox">
           <input
             id="userAgreement"
@@ -174,6 +209,7 @@
 <script>
 import validator from "validator";
 import * as Sentry from "@sentry/browser";
+import Autocomplete from "@trevoreyre/autocomplete-vue";
 
 import FormPageTemplate from "@/components/FormPageTemplate";
 import AuthService from "@/services/AuthService";
@@ -182,7 +218,8 @@ import NetworkService from "@/services/NetworkService";
 export default {
   name: "student-partner-signup-view",
   components: {
-    FormPageTemplate
+    FormPageTemplate,
+    Autocomplete
   },
   beforeRouteEnter(to, from, next) {
     const partnerId = to.params.partnerId;
@@ -208,14 +245,18 @@ export default {
   data() {
     return {
       studentPartner: {
-        name: ""
+        name: "",
+        highSchoolSignup: false
       },
       formStep: "step-1",
+      isHighSchoolStudent: false,
+      noHighSchoolResults: false,
       formData: {
         email: "",
         password: "",
         firstName: "",
         lastName: "",
+        highSchoolUpchieveId: "",
         terms: false
       },
       errors: [],
@@ -223,9 +264,42 @@ export default {
       serverErrorMsg: ""
     };
   },
+  computed: {
+    showHighSchoolSelector() {
+      if (!this.studentPartner.highSchoolSignup) return false;
+      return this.isHighSchoolStudent;
+    }
+  },
   methods: {
     setStudentPartner(studentPartner) {
       this.studentPartner = studentPartner;
+    },
+
+    autocompleteSchool(input) {
+      this.formData.highSchoolUpchieveId = "";
+
+      return new Promise(resolve => {
+        if (input.length < 3) {
+          this.noHighSchoolResults = false;
+          return resolve([]);
+        }
+
+        NetworkService.searchSchool(this, { query: input })
+          .then(response => response.body.results)
+          .then(schools => {
+            this.noHighSchoolResults = schools.length === 0;
+            resolve(schools);
+          });
+      });
+    },
+
+    getSchoolDisplayName(school) {
+      return `${school.name} (${school.city}, ${school.state})`;
+    },
+
+    handleSelectHighSchool(school) {
+      this.formData.highSchoolUpchieveId = school.upchieveId;
+      this.noHighSchoolResults = false;
     },
 
     formStepTwo() {
@@ -303,6 +377,7 @@ export default {
         password: this.formData.password,
         firstName: this.formData.firstName,
         lastName: this.formData.lastName,
+        highSchoolId: this.formData.highSchoolUpchieveId,
         terms: this.formData.terms
       })
         .then(() => {
@@ -346,6 +421,28 @@ export default {
   color: #bf0000;
   font-size: 14px;
   text-align: left;
+}
+
+.school-search {
+  position: relative;
+  margin-bottom: 30px;
+
+  &__no-results {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    width: 100%;
+    padding: 10px 12px;
+    border: solid 1px #ccc;
+    border-top: none;
+    border-radius: 5px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    text-align: left;
+    font-size: 14px;
+    background: #fff;
+    color: #666;
+  }
 }
 
 .d-none {
