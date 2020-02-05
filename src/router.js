@@ -93,7 +93,7 @@ const routes = [
     meta: { loggedOutOnly: true }
   },
   {
-    path: "/signup/:partnerId",
+    path: "/signup/volunteer/:partnerId",
     name: "VolunteerPartnerSignupView",
     component: VolunteerPartnerSignupView,
     meta: { loggedOutOnly: true }
