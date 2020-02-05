@@ -1,13 +1,12 @@
 /**
  *
- * @file Tests user authenication (login/ logout) and failed attempts for both
+ * @file Tests user authenication (login and logout) and failed attempts for both
  *
  */
 
 /**
  * @summary Tests authenicating a volunteer and student successfully
  */
-
 describe("Successful Log in and log out", () => {
   before(() => {
     cy.fixture("users/student1").as("student");
@@ -27,13 +26,14 @@ describe("Successful Log in and log out", () => {
         .should("have.value", this.student.password);
 
       cy.get("button[type=submit]").click();
-
       cy.location("pathname").should("eq", "/dashboard");
     });
 
-    it("Should log out successfully", () => {
+    it("Should log out successfully", function() {
+      cy.login(this.student);
+      cy.location("pathname").should("eq", "/dashboard");
+
       cy.get(".AppSidebar-final-link").click();
-      cy.wait(1000);
       cy.location("pathname").should("eq", "/logout");
     });
   });
@@ -51,13 +51,14 @@ describe("Successful Log in and log out", () => {
         .should("have.value", this.volunteer.password);
 
       cy.get("button[type=submit]").click();
-
       cy.location("pathname").should("eq", "/dashboard");
     });
 
-    it("Should log out successfully", () => {
+    it("Should log out successfully", function() {
+      cy.login(this.volunteer);
+      cy.location("pathname").should("eq", "/dashboard");
+
       cy.get(".AppSidebar-final-link").click();
-      cy.wait(1000);
       cy.location("pathname").should("eq", "/logout");
     });
   });
@@ -66,7 +67,6 @@ describe("Successful Log in and log out", () => {
 /**
  * @summary Tests failing to log in
  */
-
 describe("Fail logging in", () => {
   beforeEach(() => {
     cy.fixture("users/student1").as("student");
