@@ -4,7 +4,7 @@
       <img class="SidebarInfo-avatar" :src="avatarUrl" />
       <div class="SidebarInfo-name">{{ name }}</div>
       <div class="SidebarInfo-type">{{ type }}</div>
-      <div class="SidebarInfo-status">
+      <div v-if="isEmailVerified" class="SidebarInfo-status">
         <div class="SidebarInfo-status-circle" :class="sessionStatus.class" />
         <div class="SidebarInfo-status-text">{{ sessionStatus.text }}</div>
       </div>
@@ -30,7 +30,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      isSessionAlive: "user/isSessionAlive"
+      isSessionAlive: "user/isSessionAlive",
+      isEmailVerified: "user/isEmailVerified"
     }),
     type() {
       return this.isVolunteer ? "Volunteer" : "Student";
