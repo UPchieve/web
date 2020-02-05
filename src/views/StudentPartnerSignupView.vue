@@ -306,7 +306,7 @@ export default {
         terms: this.formData.terms
       })
         .then(() => {
-          window.alert("TODO: login and direct to dashboard");
+          this.$router.push("/dashboard");
         })
         .catch(err => {
           this.serverErrorMsg = err.message;
