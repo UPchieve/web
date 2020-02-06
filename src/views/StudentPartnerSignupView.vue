@@ -22,10 +22,11 @@
 
         <div class="step-header">
           <div class="step-header__title">
-            Welcome, {{ studentPartner.name }} student!
+            Welcome {{ studentPartner.name }} Student!
           </div>
           <div class="step-header__subtitle">
-            Not with {{ studentPartner.name }}? Weird.
+            Not with {{ studentPartner.name }}?
+            <router-link to="/signup">Click here</router-link>
           </div>
         </div>
 
@@ -94,7 +95,7 @@
         <div class="step-header">
           <div class="step-header__title">Finish creating your account</div>
           <div class="step-header__subtitle">
-            You’re just a minute away from getting help!
+            You're moments away from unlimited free tutoring!
           </div>
         </div>
 
