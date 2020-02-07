@@ -25,6 +25,7 @@
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
 const AUTH_ROOT = `${Cypress.env("SERVER_ROOT")}/auth`;
+const API_ROOT = `${Cypress.env("SERVER_ROOT")}/api`;
 
 Cypress.Commands.add("login", user => {
   cy.request({
@@ -40,5 +41,15 @@ Cypress.Commands.add("login", user => {
 Cypress.Commands.add("logout", () => {
   cy.request({
     url: `${AUTH_ROOT}/logout`
+  });
+});
+
+Cypress.Commands.add("deleteUserByEmail", email => {
+  cy.request({
+    method: "DELETE",
+    url: `${API_ROOT}/user`,
+    body: {
+      email
+    }
   });
 });
