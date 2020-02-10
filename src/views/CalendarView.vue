@@ -257,10 +257,10 @@ export default {
       const userUtcOffset = moment.tz.zone(this.selectedTz).parse(Date.now());
       // offsets returned by zone.utcOffset() are returned in minutes and inverted for POSIX compatibility
       const offset = (userUtcOffset - estUtcOffset) / 60;
-      CalendarService.updateTimezone(this, this.selectedTz);
-      CalendarService.updateAvailability(
+      CalendarService.updateSchedule(
         this,
-        this.convertAvailability(this.availability, offset)
+        this.convertAvailability(this.availability, offset),
+        this.selectedTz
       ).then(response => {
         if (response.status == 200) {
           this.saveState = saveStates.SAVED;

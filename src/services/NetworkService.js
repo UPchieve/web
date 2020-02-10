@@ -137,7 +137,7 @@ export default {
       .post(`${API_ROOT}/training/score`, data)
       .then(this._successHandler, this._errorHandler);
   },
-  updateAvailability(context, data) {
+  updateSchedule(context, data) {
     return context.$http
       .post(`${API_ROOT}/calendar/save`, data)
       .then(this._successHandler, this._errorHandler);
@@ -160,11 +160,6 @@ export default {
   checkIfMessageIsClean(context, data) {
     return context.$http
       .post(`${API_ROOT}/moderate/message`, data)
-      .then(this._successHandler, this._errorHandler);
-  },
-  updateTimezone(context, data) {
-    return context.$http
-      .post(`${API_ROOT}/calendar/tz/save`, data)
       .then(this._successHandler, this._errorHandler);
   },
   feedback(context, data) {
