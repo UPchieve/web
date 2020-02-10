@@ -1,18 +1,6 @@
 <template>
   <div class="SidebarLinks">
-    <template v-if="$route.path.indexOf('/onboarding') !== -1">
-      <sidebar-link
-        to="/onboarding/profile"
-        icon="portrait"
-        text="Basic profile"
-      />
-      <sidebar-link
-        v-if="!isVolunteer"
-        to="/onboarding/academic"
-        icon="book"
-        text="First time use survey"
-      />
-    </template>
+    <template v-if="$route.path.indexOf('/onboarding') !== -1"></template>
 
     <template v-else-if="authenticated">
       <sidebar-link to="/dashboard" icon="house" text="Dashboard" />

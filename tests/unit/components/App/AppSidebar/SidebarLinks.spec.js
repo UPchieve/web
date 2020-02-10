@@ -25,18 +25,6 @@ const GUIDE_LINK = { to: "/coach-guide", icon: "book", text: "Coach Guide" };
 // Admin links
 const ADMIN_LINK = { to: "/admin", icon: "folder", text: "Admin" };
 
-// Onboarding links
-const BASIC_PROFILE_LINK = {
-  to: "/onboarding/profile",
-  icon: "portrait",
-  text: "Basic profile"
-};
-const FIRST_TIME_SURVEY_LINK = {
-  to: "/onboarding/academic",
-  icon: "book",
-  text: "First time use survey"
-};
-
 // Links organized by route & user type. Array indices of the links are important.
 const links = {
   default: {
@@ -67,8 +55,8 @@ const links = {
     ]
   },
   onboarding: {
-    student: [BASIC_PROFILE_LINK, FIRST_TIME_SURVEY_LINK],
-    volunteer: [BASIC_PROFILE_LINK]
+    student: [],
+    volunteer: []
   }
 };
 
