@@ -1,12 +1,9 @@
 import NetworkService from "./NetworkService";
 
 export default {
-  updateAvailability(context, availability) {
+  updateSchedule(context, availability, tz) {
     context.$store.dispatch("user/updateAvailability", availability);
-    return NetworkService.updateAvailability(context, { availability });
-  },
-  updateTimezone(context, tz) {
     context.$store.dispatch("user/updateTimezone", tz);
-    return NetworkService.updateTimezone(context, { tz });
+    return NetworkService.updateSchedule(context, { availability, tz });
   }
 };
