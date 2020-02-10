@@ -22,17 +22,17 @@
 
         <div class="step-header">
           <div class="step-header__title">
-            Welcome {{ orgManifest.name }} Employee!
+            Welcome {{ studentPartner.name }} Student!
           </div>
           <div class="step-header__subtitle">
-            Not with {{ orgManifest.name }}?
-            <a href="https://upchieve.org/volunteer">Click here</a>
+            Not with {{ studentPartner.name }}?
+            <router-link to="/signup">Click here</router-link>
           </div>
         </div>
 
         <div class="uc-column">
           <label for="inputEmail" class="uc-form-label"
-            >What's your work email?</label
+            >What's your email?</label
           >
           <input
             id="inputEmail"
@@ -95,90 +95,93 @@
         <div class="step-header">
           <div class="step-header__title">Finish creating your account</div>
           <div class="step-header__subtitle">
-            You’re just a few minutes away from helping low-income students!
+            You're moments away from unlimited free tutoring!
           </div>
         </div>
 
-        <div class="uc-column">
-          <!-- Fix for bug in Chrome where the first two fields are parsed as a username and password
-          even if the HTML5 autocomplete attributes are set to the right values -->
-          <label for="username" class="d-none">Username</label>
-          <input
-            type="text"
-            class="d-none"
-            id="username"
-            v-model="formData.email"
-            autocomplete="username"
-          />
-          <label for="password" class="d-none">Password</label>
-          <input
-            type="password"
-            class="d-none"
-            id="password"
-            v-model="formData.password"
-            autocomplete="new-password"
-          />
+        <!-- Fix for bug in Chrome where the first two fields are parsed as a username and password
+        even if the HTML5 autocomplete attributes are set to the right values -->
+        <label for="username" class="d-none">Username</label>
+        <input
+          type="text"
+          class="d-none"
+          id="username"
+          v-model="formData.email"
+          autocomplete="username"
+        />
+        <label for="password" class="d-none">Password</label>
+        <input
+          type="password"
+          class="d-none"
+          id="password"
+          v-model="formData.password"
+          autocomplete="new-password"
+        />
 
-          <div class="uc-column">
-            <label for="firstName" class="uc-form-label"
-              >What's your name?</label
-            >
-            <div class="uc-row name-fields">
-              <div class="uc-column">
-                <input
-                  id="firstName"
-                  type="text"
-                  class="uc-form-input"
-                  v-bind:class="{
-                    'uc-form-input--invalid':
-                      invalidInputs.indexOf('firstName') > -1
-                  }"
-                  v-model="formData.firstName"
-                  required
-                  autofocus
-                  autocomplete="given-name"
-                />
-                <p class="uc-form-subtext">First Name</p>
-              </div>
-              <div class="uc-column">
-                <input
-                  id="lastName"
-                  type="text"
-                  class="uc-form-input"
-                  v-bind:class="{
-                    'uc-form-input--invalid':
-                      invalidInputs.indexOf('lastName') > -1
-                  }"
-                  v-model="formData.lastName"
-                  required
-                  autocomplete="family-name"
-                />
-                <p class="uc-form-subtext">Last Name</p>
-              </div>
+        <div class="uc-column">
+          <label for="firstName" class="uc-form-label">First Name</label>
+          <input
+            id="firstName"
+            type="text"
+            class="uc-form-input"
+            v-bind:class="{
+              'uc-form-input--invalid': invalidInputs.indexOf('firstName') > -1
+            }"
+            v-model="formData.firstName"
+            required
+            autofocus
+            autocomplete="given-name"
+          />
+        </div>
+
+        <div class="uc-column">
+          <label for="lastName" class="uc-form-label">Last Name</label>
+          <input
+            id="lastName"
+            type="text"
+            class="uc-form-input"
+            v-bind:class="{
+              'uc-form-input--invalid': invalidInputs.indexOf('lastName') > -1
+            }"
+            v-model="formData.lastName"
+            required
+            autocomplete="family-name"
+          />
+        </div>
+
+        <div v-if="studentPartner.highSchoolSignup" class="uc-form-checkbox">
+          <input
+            id="highSchoolCheckbox"
+            v-model="isHighSchoolStudent"
+            type="checkbox"
+          />
+          <label for="highSchoolCheckbox">
+            Are you currently a high school student?
+          </label>
+        </div>
+
+        <div v-if="showHighSchoolSelector" class="uc-column">
+          <label for="inputHighschool" class="uc-form-label"
+            >High School Name</label
+          >
+
+          <div class="school-search">
+            <autocomplete
+              id="inputHighschool"
+              class="school-search__autocomplete"
+              :search="autocompleteSchool"
+              :get-result-value="getSchoolDisplayName"
+              base-class="uc-autocomplete"
+              auto-select
+              placeholder="Search for your high school"
+              aria-label="Search for your high school"
+              @submit="handleSelectHighSchool"
+            ></autocomplete>
+
+            <div v-if="noHighSchoolResults" class="school-search__no-results">
+              No results
             </div>
           </div>
-        </div>
-
-        <div class="uc-column">
-          <label for="phoneNumber" class="uc-form-label"
-            >What's your phone number?</label
-          >
-          <vue-phone-number-input
-            id="phoneNumber"
-            class="phone-input"
-            v-model="formData.phone"
-            :required="true"
-            :error="
-              invalidInputs.indexOf('phone') > -1 && !phoneInputInfo.isValid
-            "
-            color="#555"
-            valid-color="#16ba97"
-            @update="onPhoneInputUpdate"
-          />
-          <p class="uc-form-subtext">
-            We only use this to notify you of incoming student requests. You can
-            customize when you receive requests.
-          </p>
         </div>
 
         <div class="uc-form-checkbox">
@@ -190,8 +193,7 @@
           />
           <label for="userAgreement">
             I have read and accept the
-            <a href="/legal" target="_blank">user agreement</a> and
-            <a href="/legal#volunteer" target="_blank">volunteer agreement</a>.
+            <a href="/legal" target="_blank">user agreement</a>.
           </label>
         </div>
 
@@ -201,10 +203,6 @@
 
         <div v-if="serverErrorMsg !== ''">{{ serverErrorMsg }}</div>
       </form>
-      <div v-if="formStep === 'success'" class="uc-form-body">
-        You've been sent a verification email! Check your work email for a link
-        to confirm your account.
-      </div>
     </div>
   </form-page-template>
 </template>
@@ -212,24 +210,26 @@
 <script>
 import validator from "validator";
 import * as Sentry from "@sentry/browser";
+import Autocomplete from "@trevoreyre/autocomplete-vue";
 
 import FormPageTemplate from "@/components/FormPageTemplate";
 import AuthService from "@/services/AuthService";
 import NetworkService from "@/services/NetworkService";
 
 export default {
-  name: "org-signup-view",
+  name: "student-partner-signup-view",
   components: {
-    FormPageTemplate
+    FormPageTemplate,
+    Autocomplete
   },
   beforeRouteEnter(to, from, next) {
-    const orgId = to.params.orgId;
+    const partnerId = to.params.partnerId;
 
-    NetworkService.getOrgManifest(orgId)
+    NetworkService.getStudentPartner(partnerId)
       .then(data => {
-        const orgManifest = data.body.orgManifest;
-        if (!orgManifest) return next("/signup");
-        return next(_this => _this.setOrgManifest(orgManifest));
+        const studentPartner = data.body.studentPartner;
+        if (!studentPartner) return next("/signup");
+        return next(_this => _this.setStudentPartner(studentPartner));
       })
       .catch(err => {
         if (err.status !== 404) {
@@ -245,40 +245,62 @@ export default {
   },
   data() {
     return {
-      orgManifest: {
+      studentPartner: {
         name: "",
-        requiredEmailDomains: []
+        highSchoolSignup: false
       },
       formStep: "step-1",
+      isHighSchoolStudent: false,
+      noHighSchoolResults: false,
       formData: {
         email: "",
         password: "",
         firstName: "",
         lastName: "",
-        phone: "",
+        highSchoolUpchieveId: "",
         terms: false
       },
-      phoneInputInfo: {},
       errors: [],
       invalidInputs: [],
       serverErrorMsg: ""
     };
   },
+  computed: {
+    showHighSchoolSelector() {
+      if (!this.studentPartner.highSchoolSignup) return false;
+      return this.isHighSchoolStudent;
+    }
+  },
   methods: {
-    setOrgManifest(orgManifest) {
-      this.orgManifest = orgManifest;
+    setStudentPartner(studentPartner) {
+      this.studentPartner = studentPartner;
     },
 
-    isValidOrgEmail(email) {
-      const requiredDomains = this.orgManifest.requiredEmailDomains;
-      if (!(requiredDomains && requiredDomains.length)) return true;
+    autocompleteSchool(input) {
+      this.formData.highSchoolUpchieveId = "";
 
-      const domain = email.split("@")[1];
-      return domain && requiredDomains.indexOf(domain) >= 0;
+      return new Promise(resolve => {
+        if (input.length < 3) {
+          this.noHighSchoolResults = false;
+          return resolve([]);
+        }
+
+        NetworkService.searchSchool(this, { query: input })
+          .then(response => response.body.results)
+          .then(schools => {
+            this.noHighSchoolResults = schools.length === 0;
+            resolve(schools);
+          });
+      });
     },
 
-    onPhoneInputUpdate(phoneInputInfo) {
-      this.phoneInputInfo = phoneInputInfo;
+    getSchoolDisplayName(school) {
+      return `${school.name} (${school.city}, ${school.state})`;
+    },
+
+    handleSelectHighSchool(school) {
+      this.formData.highSchoolUpchieveId = school.upchieveId;
+      this.noHighSchoolResults = false;
     },
 
     formStepTwo() {
@@ -297,19 +319,13 @@ export default {
         );
 
         this.invalidInputs.push("inputEmail");
-      } else if (!this.isValidOrgEmail(this.formData.email)) {
-        this.errors.push(
-          `Email must end with ${this.orgManifest.requiredEmailDomains.join(
-            " or "
-          )}`
-        );
-        this.invalidInputs.push("inputEmail");
       }
 
       if (!this.formData.password) {
         this.errors.push("A password is required.");
         this.invalidInputs.push("inputPassword");
       }
+
       if (this.errors.length) {
         return;
       }
@@ -345,17 +361,8 @@ export default {
       if (!this.formData.lastName) {
         this.invalidInputs.push("lastName");
       }
-      if (!this.formData.phone) {
-        this.errors.push("You must enter a phone number.");
-        this.invalidInputs.push("phone");
-      } else if (!this.phoneInputInfo.isValid || !this.phoneInputInfo.e164) {
-        this.errors.push(this.formData.phone + " is not a valid phone number.");
-        this.invalidInputs.push("phone");
-      }
       if (!this.formData.terms) {
-        this.errors.push(
-          "You must read and accept the user agreement and volunteer agreement."
-        );
+        this.errors.push("You must read and accept the user agreement.");
       }
 
       if (!this.errors.length) {
@@ -365,17 +372,17 @@ export default {
 
     register() {
       AuthService.register(this, {
-        isVolunteer: true,
-        volunteerPartnerOrg: this.$route.params.orgId,
+        isVolunteer: false,
+        studentPartnerOrg: this.$route.params.partnerId,
         email: this.formData.email,
         password: this.formData.password,
         firstName: this.formData.firstName,
         lastName: this.formData.lastName,
-        phone: this.phoneInputInfo.e164,
+        highSchoolId: this.formData.highSchoolUpchieveId,
         terms: this.formData.terms
       })
         .then(() => {
-          this.formStep = "success";
+          this.$router.push("/dashboard");
         })
         .catch(err => {
           this.serverErrorMsg = err.message;
@@ -411,24 +418,32 @@ export default {
   }
 }
 
-.name-fields {
-  @include child-spacing(right, 15px);
-
-  input {
-    box-sizing: border-box;
-    width: 100%;
-    height: 45px;
-  }
-}
-
-.phone-input {
-  margin: 10px 0 2px;
-}
-
 .step-errors {
   color: #bf0000;
   font-size: 14px;
   text-align: left;
+}
+
+.school-search {
+  position: relative;
+  margin-bottom: 30px;
+
+  &__no-results {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    width: 100%;
+    padding: 10px 12px;
+    border: solid 1px #ccc;
+    border-top: none;
+    border-radius: 5px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    text-align: left;
+    font-size: 14px;
+    background: #fff;
+    color: #666;
+  }
 }
 
 .d-none {
