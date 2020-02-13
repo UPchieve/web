@@ -29,8 +29,9 @@
                 <div class="review-container">
                   <div class="review-label">
                     <a
-                      :href="reviewMaterials[categoryKeys[category]]"
-                      target="_blank"
+                      v-on:click.prevent="
+                        getReviewMaterial(categoryKeys[category])
+                      "
                       >Review</a
                     >
                   </div>
@@ -67,6 +68,7 @@ import _ from "lodash";
 import { mapState } from "vuex";
 
 import { topics, allSubtopics } from "@/utils/topics";
+import NetworkService from "@/services/NetworkService";
 
 export default {
   data() {
@@ -191,6 +193,13 @@ export default {
         this.supercategoryColors[supercategory] ||
         this.supercategoryColors.default
       );
+    },
+    getReviewMaterial(category) {
+      NetworkService.getReviewMaterial(this, category).then(response => {
+        if (response.status === 204) {
+          window.location = this.reviewMaterials[category];
+        }
+      });
     }
   }
 };
@@ -226,6 +235,7 @@ export default {
 a {
   color: inherit;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .supercategory,
