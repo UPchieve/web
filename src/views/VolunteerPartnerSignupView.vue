@@ -325,7 +325,7 @@ export default {
         })
         .catch(err => {
           this.serverErrorMsg = err.message;
-          if (err.status !== 409) {
+          if (err.status !== 409 && err.status !== 422) {
             Sentry.captureException(err);
           }
         });
