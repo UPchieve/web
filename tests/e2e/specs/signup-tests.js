@@ -11,7 +11,9 @@ describe("Student and volunteer signup", () => {
 
       cy.deleteUserByEmail(this.newStudent.email);
 
-      const approvedHighschoolsUrl = `${Cypress.env("SERVER_ROOT")}/school/findeligible`
+      const approvedHighschoolsUrl = `${Cypress.env(
+        "SERVER_ROOT"
+      )}/school/findeligible`;
       cy.request({
         url: approvedHighschoolsUrl,
         qs: {
@@ -35,43 +37,42 @@ describe("Student and volunteer signup", () => {
         .contains("Student")
         .click();
 
-      cy.get("@approvedHighschools")
-        .then(response => {
-          const highSchool = response.body.eligibleSchools[0]
-          
-          cy.get("#inputHighschool")
-            .type(highSchool.name)
-            .should("have.value", highSchool.name);
-  
-          cy.get(".uc-autocomplete-result:first").click();
-          
-          cy.get("button[type=submit]").click();
-  
-          cy.get("#inputEmail")
-            .type(this.newStudent.email)
-            .should("have.value", this.newStudent.email);
-  
-          cy.get("#inputPassword")
-            .type(this.newStudent.password)
-            .should("have.value", this.newStudent.password);
-  
-          cy.get("button[type=submit]").click();
-  
-          cy.get("#firstName")
-            .type(this.newStudent.firstName)
-            .should("have.value", this.newStudent.firstName);
-  
-          cy.get("#lastName")
-            .type(this.newStudent.lastName)
-            .should("have.value", this.newStudent.lastName);
-  
-          cy.get("#userAgreement").click();
-  
-          cy.get("button[type=submit]").click();
+      cy.get("@approvedHighschools").then(response => {
+        const highSchool = response.body.eligibleSchools[0];
 
-          cy.wait("@setProfile");
-          cy.location("pathname").should("eq", "/dashboard");
-        });
+        cy.get("#inputHighschool")
+          .type(highSchool.name)
+          .should("have.value", highSchool.name);
+
+        cy.get(".uc-autocomplete-result:first").click();
+
+        cy.get("button[type=submit]").click();
+
+        cy.get("#inputEmail")
+          .type(this.newStudent.email)
+          .should("have.value", this.newStudent.email);
+
+        cy.get("#inputPassword")
+          .type(this.newStudent.password)
+          .should("have.value", this.newStudent.password);
+
+        cy.get("button[type=submit]").click();
+
+        cy.get("#firstName")
+          .type(this.newStudent.firstName)
+          .should("have.value", this.newStudent.firstName);
+
+        cy.get("#lastName")
+          .type(this.newStudent.lastName)
+          .should("have.value", this.newStudent.lastName);
+
+        cy.get("#userAgreement").click();
+
+        cy.get("button[type=submit]").click();
+
+        cy.wait("@setProfile");
+        cy.location("pathname").should("eq", "/dashboard");
+      });
     });
   });
 
