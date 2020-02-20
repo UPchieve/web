@@ -93,6 +93,9 @@ describe("Student and volunteer signup", () => {
     });
 
     it("Should successfully create a new volunteer account", function() {
+      cy.server();
+      cy.route("PUT", "/api/user").as("setProfile");
+
       cy.visit("/signup");
 
       cy.location("pathname").should("eq", "/signup");
@@ -144,6 +147,7 @@ describe("Student and volunteer signup", () => {
 
         cy.get("button[type=submit]").click();
 
+        cy.wait("@setProfile");
         cy.get("div.uc-form-body").should("contain", "verification email");
       });
     });
