@@ -150,7 +150,8 @@ export default {
         data: {
           acceptText: "Return to Dashboard",
           alertModal: true,
-          isSessionEnded: !!data.endedAt
+          isSessionEnded: !!data.endedAt,
+          volunteerJoined: !!data.volunteer
         }
       });
     },
