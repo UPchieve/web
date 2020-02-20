@@ -1,6 +1,6 @@
 <template>
   <div class="SessionFulfilledModal">
-    <h1 class="SessionFulfilledModal-title">Session Fulfilled</h1>
+    <h1 class="SessionFulfilledModal-title">{{ title }}</h1>
     <div class="SessionFulfilledModal-message">{{ message }}</div>
     <large-button v-if="mobileMode" primary @click.native="onAccept">{{
       modalData.acceptText
@@ -22,12 +22,25 @@ export default {
       mobileMode: "app/mobileMode"
     }),
     message() {
-      return (
-        (this.modalData.isSessionEnded
-          ? "The student has already ended their session."
-          : "Another volunteer has already joined this session.") +
-        " Thanks for trying, we really appreciate it!"
-      );
+      const thankYouMessage = "Thanks for trying, we really appreciate it!";
+      let text = "";
+
+      if (this.modalData.isSessionEnded && !this.modalData.volunteerJoined) {
+        text = "The session was canceled.";
+      } else if (this.modalData.isSessionEnded) {
+        text = "The student has already ended their session.";
+      } else {
+        text = "Another volunteer has already joined this session.";
+      }
+
+      return `${text} ${thankYouMessage}`;
+    },
+    title() {
+      if (this.modalData.isSessionEnded && !this.modalData.volunteeredJoined) {
+        return "Session Canceled";
+      } else {
+        return "Session Fulfilled";
+      }
     }
   },
   methods: {
