@@ -77,6 +77,21 @@ describe("Student and volunteer signup", () => {
   });
 
   describe("Volunteer signup", () => {
+    before(function() {
+      cy.login(this.volunteer);
+
+      cy.deleteUserByEmail(this.newVolunteer.email);
+
+      const validCodesUrl = `${Cypress.env(
+        "SERVER_ROOT"
+      )}/auth/register/volunteercodes`;
+      cy.request({
+        url: validCodesUrl
+      }).as("volunteerCodes");
+
+      cy.logout();
+    });
+
     it("Should successfully create a new volunteer account", function() {
       cy.visit("/signup");
 
@@ -86,47 +101,51 @@ describe("Student and volunteer signup", () => {
         .contains("Volunteer")
         .click();
 
-      cy.get("#inputRegistrationCode")
-        .type(this.newVolunteer.code)
-        .should("have.value", this.newVolunteer.code);
+      cy.get("@volunteerCodes").then(response => {
+        const code = response.body.volunteerCodes[0];
 
-      cy.get("button[type=submit]").click();
+        cy.get("#inputRegistrationCode")
+          .type(code)
+          .should("have.value", code);
 
-      cy.get("#inputEmail")
-        .type(this.newVolunteer.email)
-        .should("have.value", this.newVolunteer.email);
+        cy.get("button[type=submit]").click();
 
-      cy.get("#inputPassword")
-        .type(this.newVolunteer.password)
-        .should("have.value", this.newVolunteer.password);
+        cy.get("#inputEmail")
+          .type(this.newVolunteer.email)
+          .should("have.value", this.newVolunteer.email);
 
-      cy.get("button[type=submit]").click();
+        cy.get("#inputPassword")
+          .type(this.newVolunteer.password)
+          .should("have.value", this.newVolunteer.password);
 
-      cy.get("#firstName")
-        .type(this.newVolunteer.firstName)
-        .should("have.value", this.newVolunteer.firstName);
+        cy.get("button[type=submit]").click();
 
-      cy.get("#lastName")
-        .type(this.newVolunteer.lastName)
-        .should("have.value", this.newVolunteer.lastName);
+        cy.get("#firstName")
+          .type(this.newVolunteer.firstName)
+          .should("have.value", this.newVolunteer.firstName);
 
-      cy.get("#phoneNumber")
-        .type(this.newVolunteer.phoneNumber)
-        .should("have.value", this.newVolunteer.phoneNumber);
+        cy.get("#lastName")
+          .type(this.newVolunteer.lastName)
+          .should("have.value", this.newVolunteer.lastName);
 
-      cy.get("#college")
-        .type(this.newVolunteer.college)
-        .should("have.value", this.newVolunteer.college);
+        cy.get("#phoneNumber_phone_number")
+          .type(this.newVolunteer.phoneNumber)
+          .should("have.value", this.newVolunteer.phoneNumber);
 
-      cy.get("#favoriteAcademicSubject")
-        .type(this.newVolunteer.favoriteAcademicSubject)
-        .should("have.value", this.newVolunteer.favoriteAcademicSubject);
+        cy.get("#college")
+          .type(this.newVolunteer.college)
+          .should("have.value", this.newVolunteer.college);
 
-      cy.get("#userAgreement").click();
+        cy.get("#favoriteAcademicSubject")
+          .type(this.newVolunteer.favoriteAcademicSubject)
+          .should("have.value", this.newVolunteer.favoriteAcademicSubject);
 
-      cy.get("button[type=submit]").click();
+        cy.get("#userAgreement").click();
 
-      cy.get("div.uc-form-body").should("contain", "verification email");
+        cy.get("button[type=submit]").click();
+
+        cy.get("div.uc-form-body").should("contain", "verification email");
+      });
     });
   });
 });
