@@ -8,7 +8,18 @@ describe("Student and volunteer signup", () => {
   describe("Student signup", () => {
     before(function() {
       cy.login(this.volunteer);
+
       cy.deleteUserByEmail(this.newStudent.email);
+
+      const approvedHighschoolsUrl = `${Cypress.env("SERVER_ROOT")}/school/findeligible`
+      cy.request({
+        url: approvedHighschoolsUrl,
+        qs: {
+          skip: 0,
+          limit: 1
+        }
+      }).as("approvedHighschools");
+
       cy.logout();
     });
 
@@ -21,33 +32,39 @@ describe("Student and volunteer signup", () => {
         .contains("Student")
         .click();
 
-      cy.get("#inputHighschool")
-        .type(this.newStudent.highSchool)
-        .should("have.value", this.newStudent.highSchool);
-
-      cy.get("button[type=submit]").click();
-
-      cy.get("#inputEmail")
-        .type(this.newStudent.email)
-        .should("have.value", this.newStudent.email);
-
-      cy.get("#inputPassword")
-        .type(this.newStudent.password)
-        .should("have.value", this.newStudent.password);
-
-      cy.get("button[type=submit]").click();
-
-      cy.get("#firstName")
-        .type(this.newStudent.firstName)
-        .should("have.value", this.newStudent.firstName);
-
-      cy.get("#lastName")
-        .type(this.newStudent.lastName)
-        .should("have.value", this.newStudent.lastName);
-
-      cy.get("#userAgreement").click();
-
-      cy.get("button[type=submit]").click();
+      cy.get("@approvedHighschools")
+        .then(response => {
+          const highSchool = response.body.eligibleSchools[0]
+          
+          cy.get("#inputHighschool")
+            .type(highSchool.name)
+            .should("have.value", highSchool.name);
+  
+          cy.get(".uc-autocomplete-result:first").click();
+          
+          cy.get("button[type=submit]").click();
+  
+          cy.get("#inputEmail")
+            .type(this.newStudent.email)
+            .should("have.value", this.newStudent.email);
+  
+          cy.get("#inputPassword")
+            .type(this.newStudent.password)
+            .should("have.value", this.newStudent.password);
+  
+          cy.get("button[type=submit]").click();
+  
+          cy.get("#firstName")
+            .type(this.newStudent.firstName)
+            .should("have.value", this.newStudent.firstName);
+  
+          cy.get("#lastName")
+            .type(this.newStudent.lastName)
+            .should("have.value", this.newStudent.lastName);
+  
+          cy.get("#userAgreement").click();
+  
+          cy.get("button[type=submit]").click();
 
       cy.location("pathname").should("eq", "/dashboard");
     });
