@@ -36,7 +36,7 @@ export default {
       return `${text} ${thankYouMessage}`;
     },
     title() {
-      if (this.modalData.isSessionEnded && !this.modalData.volunteeredJoined) {
+      if (this.modalData.isSessionEnded && !this.modalData.volunteerJoined) {
         return "Session Canceled";
       } else {
         return "Session Fulfilled";
