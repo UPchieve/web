@@ -40,11 +40,7 @@ export default {
           text = "The student has canceled their request.";
         }
       } else if (volunteerJoined && !isSessionVolunteer && this.isVolunteer) {
-        if (!isSessionEnded) {
-          text = "Another volunteer has already joined this session.";
-        } else {
-          text = "This session was fulfilled by another volunteer.";
-        }
+        text = "Another volunteer has already joined this session.";
       } else {
         text = "This session has already finished.";
       }
