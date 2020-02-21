@@ -104,87 +104,96 @@ describe("Student and volunteer signup", () => {
         .contains("Volunteer")
         .click();
 
-      cy.get("@volunteerCodes").then(response => {
-        const code = response.body.volunteerCodes[0];
+      cy.get("@volunteerCodes")
+        .then(response => {
+          const code = response.body.volunteerCodes[0];
 
-        cy.get("#inputRegistrationCode")
-          .type(code)
-          .should("have.value", code);
+          cy.get("#inputRegistrationCode")
+            .type(code)
+            .should("have.value", code);
 
-        cy.get("button[type=submit]").click();
+          cy.get("button[type=submit]").click();
 
-        cy.get("#inputEmail")
-          .type(this.newVolunteer.email)
-          .should("have.value", this.newVolunteer.email);
+          cy.get("#inputEmail")
+            .type(this.newVolunteer.email)
+            .should("have.value", this.newVolunteer.email);
 
-        cy.get("#inputPassword")
-          .type(this.newVolunteer.password)
-          .should("have.value", this.newVolunteer.password);
+          cy.get("#inputPassword")
+            .type(this.newVolunteer.password)
+            .should("have.value", this.newVolunteer.password);
 
-        cy.get("button[type=submit]").click();
+          cy.get("button[type=submit]").click();
 
-        cy.get("#firstName")
-          .type(this.newVolunteer.firstName)
-          .should("have.value", this.newVolunteer.firstName);
+          cy.get("#firstName")
+            .type(this.newVolunteer.firstName)
+            .should("have.value", this.newVolunteer.firstName);
 
-        cy.get("#lastName")
-          .type(this.newVolunteer.lastName)
-          .should("have.value", this.newVolunteer.lastName);
+          cy.get("#lastName")
+            .type(this.newVolunteer.lastName)
+            .should("have.value", this.newVolunteer.lastName);
 
-        cy.get("#phoneNumber_phone_number")
-          .type(this.newVolunteer.phoneNumber)
-          .should("have.value", this.newVolunteer.phoneNumber);
+          cy.get("#phoneNumber_phone_number")
+            .type(this.newVolunteer.phoneNumber)
+            .should("have.value", this.newVolunteer.phoneNumber);
 
-        cy.get("#college")
-          .type(this.newVolunteer.college)
-          .should("have.value", this.newVolunteer.college);
+          cy.get("#college")
+            .type(this.newVolunteer.college)
+            .should("have.value", this.newVolunteer.college);
 
-        cy.get("#favoriteAcademicSubject")
-          .type(this.newVolunteer.favoriteAcademicSubject)
-          .should("have.value", this.newVolunteer.favoriteAcademicSubject);
+          cy.get("#favoriteAcademicSubject")
+            .type(this.newVolunteer.favoriteAcademicSubject)
+            .should("have.value", this.newVolunteer.favoriteAcademicSubject);
 
-        cy.get("#userAgreement").click();
+          cy.get("#userAgreement").click();
 
-        cy.get("button[type=submit]").click();
+          cy.get("button[type=submit]").click();
 
-        cy.wait("@setProfile").its("responseBody.user._id").as("userId");
-        cy.get("div.uc-form-body").should("contain", "verification email");
+          cy.wait("@setProfile")
+            .its("responseBody.user._id")
+            .as("userId");
+          cy.get("div.uc-form-body").should("contain", "verification email");
 
-        cy.route("POST", "/api/verify/confirm").as("confirmVerification");
-  
-        return cy.get("@userId");
-      })
-      .then(userid => {
-        cy.login(this.volunteer);
+          cy.route("POST", "/api/verify/confirm").as("confirmVerification");
 
-        const verificationTokenUrl = `${Cypress.env(
-          "SERVER_ROOT"
-        )}/api/verificationtoken`;
+          return cy.get("@userId");
+        })
+        .then(userid => {
+          cy.login(this.volunteer);
 
-        cy.request({
-          url: verificationTokenUrl,
-          qs: { userid }
-        }).its("body.verificationToken").as("token");
+          const verificationTokenUrl = `${Cypress.env(
+            "SERVER_ROOT"
+          )}/api/verificationtoken`;
 
-        cy.logout();
-        // We need to be logged in as the new volunteer for the
-        // confirmation step. Normally, a new user would still be logged
-        // in after signing up and then checking email, but for this
-        // test we had to log in as the admin to get the token
-        cy.login(this.newVolunteer);
+          cy.request({
+            url: verificationTokenUrl,
+            qs: { userid }
+          })
+            .its("body.verificationToken")
+            .as("token");
 
-        return cy.get("@token");
-      })
-      .then(token => {
-        const verifyPath = `/action/verify/${token}`;
+          cy.logout();
+          // We need to be logged in as the new volunteer for the
+          // confirmation step. Normally, a new user would still be logged
+          // in after signing up and then checking email, but for this
+          // test we had to log in as the admin to get the token
+          cy.login(this.newVolunteer);
 
-        cy.visit(verifyPath);
+          return cy.get("@token");
+        })
+        .then(token => {
+          const verifyPath = `/action/verify/${token}`;
 
-        cy.location("pathname").should("eq", verifyPath);
+          cy.visit(verifyPath);
 
-        cy.wait("@confirmVerification");
-        cy.location("pathname").should("eq", "/dashboard");
-      });
+          cy.location("pathname").should("eq", verifyPath);
+
+          cy.wait("@confirmVerification");
+          cy.location("pathname").should("eq", "/dashboard");
+          cy.get(".SidebarInfo-name").should(
+            "contain",
+            this.newVolunteer.firstName
+          );
+        });
     });
   });
 });
