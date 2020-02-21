@@ -17,6 +17,7 @@ import SessionView from "./views/SessionView";
 import ActionView from "./views/ActionView";
 import ResourcesView from "./views/ResourcesView";
 import FeedbackView from "./views/FeedbackView";
+import FailedJoinFeedbackView from "./views/FailedJoinFeedbackView";
 import TrainingView from "./views/TrainingView";
 import QuizView from "./views/QuizView";
 import ProfileView from "./views/ProfileView";
@@ -144,6 +145,12 @@ const routes = [
       "/feedback/:sessionId/:topic/:subTopic/:userType/:studentId/:volunteerId",
     name: "FeedbackView",
     component: FeedbackView,
+    meta: { protected: true }
+  },
+  {
+    path: "/feedback-failed-join/:sessionId/:volunteerId",
+    name: "FailedJoinFeedbackView",
+    component: FailedJoinFeedbackView,
     meta: { protected: true }
   },
   {

@@ -55,17 +55,18 @@ export default {
       }
     }
     // adds to volunteer score
-    if (feedbackComponent.userType === "student") {
+    if (feedbackComponent.metadata.userType === "student") {
       volunteerScore = aggResponses.reduce(function(acc, val) {
         return acc + val;
       }, 0);
     }
     // sends information
     window.analytics.track("feedback", {
-      "session id": feedbackComponent.sessionId,
-      user: feedbackComponent.userType,
-      "student id": feedbackComponent.studentId,
-      "volunteer id": feedbackComponent.volunteerId,
+      "feedback for": feedbackComponent.feedbackFor,
+      "session id": feedbackComponent.metadata.sessionId,
+      user: feedbackComponent.metadata.userType,
+      "student id": feedbackComponent.metadata.studentId,
+      "volunteer id": feedbackComponent.metadata.volunteerId,
       "volunteer score": volunteerScore
       // can get answers to specific response using aggResponses
     });

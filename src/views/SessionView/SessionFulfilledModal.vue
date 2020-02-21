@@ -5,6 +5,12 @@
     <large-button v-if="mobileMode" primary @click.native="onAccept">{{
       modalData.acceptText
     }}</large-button>
+    <large-button
+      v-if="mobileMode && modalData.userType === 'volunteer'"
+      secondary
+      @click.native="onCancel"
+      >{{ modalData.cancelText }}</large-button
+    >
   </div>
 </template>
 
@@ -32,6 +38,21 @@ export default {
   },
   methods: {
     onAccept() {
+      if (this.modalData.userType === "volunteer") {
+        this.$router.push({
+          name: "FailedJoinFeedbackView",
+          params: {
+            sessionId: this.modalData.sessionId,
+            topic: this.modalData.topic,
+            subTopic: this.modalData.subTopic,
+            volunteerId: this.modalData.volunteerId
+          }
+        });
+      } else {
+        this.$router.push("/");
+      }
+    },
+    onCancel() {
       this.$router.push("/");
     }
   }
