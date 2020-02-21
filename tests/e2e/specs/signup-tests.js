@@ -147,47 +147,44 @@ describe("Student and volunteer signup", () => {
 
         cy.get("button[type=submit]").click();
 
-        cy.wait("@setProfile");
+        cy.wait("@setProfile").its("responseBody.user._id").as("userId");
         cy.get("div.uc-form-body").should("contain", "verification email");
+
+        cy.route("POST", "/api/verify/confirm").as("confirmVerification");
+  
+        return cy.get("@userId");
+      })
+      .then(userid => {
+        cy.login(this.volunteer);
+
+        const verificationTokenUrl = `${Cypress.env(
+          "SERVER_ROOT"
+        )}/api/verificationtoken`;
+
+        cy.request({
+          url: verificationTokenUrl,
+          qs: { userid }
+        }).its("body.verificationToken").as("token");
+
+        cy.logout();
+        // We need to be logged in as the new volunteer for the
+        // confirmation step. Normally, a new user would still be logged
+        // in after signing up and then checking email, but for this
+        // test we had to log in as the admin to get the token
+        cy.login(this.newVolunteer);
+
+        return cy.get("@token");
+      })
+      .then(token => {
+        const verifyPath = `/action/verify/${token}`;
+
+        cy.visit(verifyPath);
+
+        cy.location("pathname").should("eq", verifyPath);
+
+        cy.wait("@confirmVerification");
+        cy.location("pathname").should("eq", "/dashboard");
       });
-    });
-
-    it("Should verify successfully", function() {
-      cy.server();
-      cy.route("POST", "/api/verify/confirm").as("confirmVerification");
-
-      cy.login(this.newVolunteer);
-      cy.request({
-        url: `${Cypress.env("SERVER_ROOT")}/api/user`
-      }).as("getProfile");
-      cy.logout();
-
-      cy.login(this.volunteer);
-
-      const verificationTokenUrl = `${Cypress.env(
-        "SERVER_ROOT"
-      )}/api/verificationtoken`;
-      cy.get("@getProfile")
-        .its("body.user._id")
-        .then(userid => {
-          return cy.request({
-            url: verificationTokenUrl,
-            qs: { userid }
-          });
-        })
-        .then(response => {
-          const token = response.body.verificationToken;
-          const verifyPath = `/action/verify/${token}`;
-
-          cy.visit(verifyPath);
-
-          cy.location("pathname").should("eq", verifyPath);
-
-          cy.wait("@confirmVerification");
-          cy.location("pathname").should("eq", "/dashboard");
-        });
-
-      cy.logout();
     });
   });
 });
