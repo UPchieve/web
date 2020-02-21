@@ -151,7 +151,9 @@ export default {
           acceptText: "Return to Dashboard",
           alertModal: true,
           isSessionEnded: !!data.endedAt,
-          volunteerJoined: !!data.volunteer
+          volunteerJoined: !!data.volunteer,
+          isSessionVolunteer: this.user._id === data.volunteer,
+          isSessionStudent: this.user._id === data.student
         }
       });
     },
