@@ -19,24 +19,42 @@ export default {
   },
   computed: {
     ...mapGetters({
-      mobileMode: "app/mobileMode"
+      mobileMode: "app/mobileMode",
+      isVolunteer: "user/isVolunteer"
     }),
     message() {
+      const {
+        isSessionEnded,
+        volunteerJoined,
+        isSessionVolunteer,
+        isSessionStudent
+      } = this.modalData;
       const thankYouMessage = "Thanks for trying, we really appreciate it!";
       let text = "";
 
-      if (this.modalData.isSessionEnded && !this.modalData.volunteerJoined) {
-        text = "The session was canceled.";
-      } else if (this.modalData.isSessionEnded) {
-        text = "The student has already ended their session.";
+      if (isSessionEnded && !volunteerJoined) {
+        if (isSessionStudent) {
+          text = "You have canceled your request.";
+        }
+        if (this.isVolunteer) {
+          text = "The student has canceled their request.";
+        }
+      } else if (volunteerJoined && !isSessionVolunteer && this.isVolunteer) {
+        if (!isSessionEnded) {
+          text = "Another volunteer has already joined this session.";
+        } else {
+          text = "This session was fulfilled by another volunteer.";
+        }
       } else {
-        text = "Another volunteer has already joined this session.";
+        text = "This session has already finished.";
       }
 
       return `${text} ${thankYouMessage}`;
     },
     title() {
-      if (this.modalData.isSessionEnded && !this.modalData.volunteerJoined) {
+      const { isSessionEnded, volunteerJoined } = this.modalData;
+
+      if (isSessionEnded && !volunteerJoined) {
         return "Session Canceled";
       } else {
         return "Session Fulfilled";
