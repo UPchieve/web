@@ -151,5 +151,43 @@ describe("Student and volunteer signup", () => {
         cy.get("div.uc-form-body").should("contain", "verification email");
       });
     });
+
+    it("Should verify successfully", function() {
+      cy.server();
+      cy.route("POST", "/api/verify/confirm").as("confirmVerification");
+
+      cy.login(this.newVolunteer);
+      cy.request({
+        url: `${Cypress.env("SERVER_ROOT")}/api/user`
+      }).as("getProfile");
+      cy.logout();
+
+      cy.login(this.volunteer);
+
+      const verificationTokenUrl = `${Cypress.env(
+        "SERVER_ROOT"
+      )}/api/verificationtoken`;
+      cy.get("@getProfile")
+        .its("body.user._id")
+        .then(userid => {
+          return cy.request({
+            url: verificationTokenUrl,
+            qs: { userid }
+          });
+        })
+        .then(response => {
+          const token = response.body.verificationToken;
+          const verifyPath = `/action/verify/${token}`;
+
+          cy.visit(verifyPath);
+
+          cy.location("pathname").should("eq", verifyPath);
+
+          cy.wait("@confirmVerification");
+          cy.location("pathname").should("eq", "/dashboard");
+        });
+
+      cy.logout();
+    });
   });
 });
