@@ -37,15 +37,15 @@ export default {
           text = "You have canceled your request.";
         }
         if (this.isVolunteer) {
-          text = "The student has canceled their request.";
+          text = `The student has canceled their request. ${thankYouMessage}`;
         }
       } else if (volunteerJoined && !isSessionVolunteer && this.isVolunteer) {
-        text = "Another volunteer has already joined this session.";
+        text = `Another volunteer has already joined this session. ${thankYouMessage}`;
       } else {
         text = "This session has already finished.";
       }
 
-      return `${text} ${thankYouMessage}`;
+      return text;
     },
     title() {
       const { isSessionEnded, volunteerJoined } = this.modalData;
