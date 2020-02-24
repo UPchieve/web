@@ -1,6 +1,6 @@
 <template>
   <div class="SessionFulfilledModal">
-    <h1 class="SessionFulfilledModal-title">Session Fulfilled</h1>
+    <h1 class="SessionFulfilledModal-title">{{ title }}</h1>
     <div class="SessionFulfilledModal-message">{{ message }}</div>
     <large-button v-if="mobileMode" primary @click.native="onAccept">{{
       modalData.acceptText
@@ -19,15 +19,42 @@ export default {
   },
   computed: {
     ...mapGetters({
-      mobileMode: "app/mobileMode"
+      mobileMode: "app/mobileMode",
+      isVolunteer: "user/isVolunteer"
     }),
     message() {
-      return (
-        (this.modalData.isSessionEnded
-          ? "The student has already ended their session."
-          : "Another volunteer has already joined this session.") +
-        " Thanks for trying, we really appreciate it!"
-      );
+      const {
+        isSessionEnded,
+        volunteerJoined,
+        isSessionVolunteer,
+        isSessionStudent
+      } = this.modalData;
+      const thankYouMessage = "Thanks for trying, we really appreciate it!";
+      let text = "";
+
+      if (isSessionEnded && !volunteerJoined) {
+        if (isSessionStudent) {
+          text = "You have canceled your request.";
+        }
+        if (this.isVolunteer) {
+          text = `The student has canceled their request. ${thankYouMessage}`;
+        }
+      } else if (volunteerJoined && !isSessionVolunteer && this.isVolunteer) {
+        text = `Another volunteer has already joined this session. ${thankYouMessage}`;
+      } else {
+        text = "This session has already finished.";
+      }
+
+      return text;
+    },
+    title() {
+      const { isSessionEnded, volunteerJoined } = this.modalData;
+
+      if (isSessionEnded && !volunteerJoined) {
+        return "Session Canceled";
+      } else {
+        return "Session Fulfilled";
+      }
     }
   },
   methods: {
