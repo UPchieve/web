@@ -225,5 +225,23 @@ describe("Student and volunteer signup", () => {
           );
         });
     });
+
+    it("Should not accept invalid code", function() {
+      cy.visit("/signup");
+
+      cy.location("pathname").should("eq", "/signup");
+
+      cy.get("button")
+        .contains("Volunteer")
+        .click();
+
+      cy.get("#inputRegistrationCode")
+        .type(this.newVolunteer.code)
+        .should("have.value", this.newVolunteer.code);
+
+      cy.get("button[type=submit]").click();
+
+      cy.get(".uc-form-body:last-child").should("contain", "invalid");
+    });
   });
 });
