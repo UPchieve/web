@@ -1,3 +1,7 @@
 {
-  "pluginsFile": "tests/e2e/plugins/index.js"
+  "pluginsFile": "tests/e2e/plugins/index.js",
+  "env": {
+    "CLIENT_ROOT": "http://localhost:8080",
+    "SERVER_ROOT": "http://localhost:3000"
+  }
 }
