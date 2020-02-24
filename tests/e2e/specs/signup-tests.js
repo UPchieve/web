@@ -244,4 +244,71 @@ describe("Student and volunteer signup", () => {
       cy.get(".uc-form-body:last-child").should("contain", "invalid");
     });
   });
+
+  describe("Fail verification", function() {
+    before(function() {
+      cy.login(this.volunteer);
+
+      cy.deleteUserByEmail(this.newVolunteer.email);
+
+      // get valid codes from server
+      const validCodesUrl = `${Cypress.env(
+        "SERVER_ROOT"
+      )}/auth/register/volunteercodes`;
+      const registerUrl = `${Cypress.env("SERVER_ROOT")}/auth/register`;
+      const setProfileUrl = `${Cypress.env("SERVER_ROOT")}/api/user`;
+
+      cy.request({
+        url: validCodesUrl
+      })
+        .then(response => {
+          const code = response.body.volunteerCodes[0];
+
+          cy.logout();
+
+          // register unverified new volunteer
+          return cy.request({
+            url: registerUrl,
+            method: "POST",
+            body: {
+              isVolunteer: true,
+              email: this.newVolunteer.email,
+              password: this.newVolunteer.password,
+              code,
+              college: this.newVolunteer.college,
+              phone: this.newVolunteer.phoneNumber,
+              firstName: this.newVolunteer.firstName,
+              lastName: this.newVolunteer.lastName,
+              terms: true
+            }
+          });
+        })
+        .then(response => {
+          const user = response.body.user;
+          user.email = this.newVolunteer.email;
+          user.college = this.newVolunteer.college;
+          user.phonePretty = this.newVolunteer.phoneNumber;
+          (user.firstname = this.newVolunteer.firstName.trim()),
+            (user.lastname = this.newVolunteer.lastName.trim());
+
+          cy.request({
+            url: setProfileUrl,
+            method: "PUT",
+            body: user
+          });
+        });
+    });
+
+    it("Should not accept invalid verification token", function() {
+      cy.server();
+      cy.route("POST", "/api/verify/confirm").as("verifyAPI");
+
+      cy.visit("/action/verify/00aa11bb22cc33dd44ee55ff66778899");
+
+      cy.wait("@verifyAPI").then(function(xhr) {
+        const response = xhr.status;
+        expect(response).to.equal(500);
+      });
+    });
+  });
 });
