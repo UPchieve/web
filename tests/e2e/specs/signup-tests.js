@@ -98,8 +98,7 @@ describe("Student and volunteer signup", () => {
 
       cy.get("button[type=submit]").click();
 
-      cy.get(".step-title")
-        .should("contain", "Thank you!")
+      cy.get(".step-title").should("contain", "Thank you!");
     });
   });
 
