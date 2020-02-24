@@ -74,6 +74,33 @@ describe("Student and volunteer signup", () => {
         cy.location("pathname").should("eq", "/dashboard");
       });
     });
+
+    it("Should add student to waitlist", function() {
+      cy.visit("/signup");
+
+      cy.location("pathname").should("eq", "/signup");
+
+      cy.get("button")
+        .contains("Student")
+        .click();
+
+      cy.get("#inputHighschool")
+        .type(this.newStudent.highSchool)
+        .should("have.value", this.newStudent.highSchool);
+
+      cy.get(".uc-autocomplete-result:first").click();
+
+      cy.get("button[type=submit]").click();
+
+      cy.get("#inputWaitlistEmail")
+        .type(this.newStudent.email)
+        .should("have.value", this.newStudent.email);
+
+      cy.get("button[type=submit]").click();
+
+      cy.get(".step-title")
+        .should("contain", "Thank you!")
+    });
   });
 
   describe("Volunteer signup", () => {
