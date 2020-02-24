@@ -193,6 +193,10 @@ describe("Student and volunteer signup", () => {
             "contain",
             this.newVolunteer.firstName
           );
+          cy.get(".DashboardBanner-greeting").should(
+            "contain",
+            this.newVolunteer.firstName
+          );
         });
     });
   });
