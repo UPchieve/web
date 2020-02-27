@@ -1,6 +1,6 @@
 /**
  *
- * @file Test user authenication (login and logout) and failed attempts for both
+ * @file Tests user authenication (login and logout) and failed attempts for both
  *
  */
 
