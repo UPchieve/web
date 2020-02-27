@@ -1,5 +1,3 @@
-const CLIENT_ROOT = Cypress.env("CLIENT_ROOT");
-
 describe("Student partner activity", () => {
   before(function() {
     cy.fixture("users/partnerStudent1").as("partnerStudent");
@@ -14,7 +12,7 @@ describe("Student partner activity", () => {
     });
 
     it("Should successfully use student partner signup to create account", function() {
-      cy.visit(`${CLIENT_ROOT}/signup/student/example`);
+      cy.visit("/signup/student/example");
 
       cy.location("pathname").should("eq", "/signup/student/example");
 
