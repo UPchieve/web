@@ -307,7 +307,7 @@ describe("Student and volunteer signup", () => {
 
       cy.wait("@verifyAPI").then(function(xhr) {
         const response = xhr.status;
-        expect(response).to.equal(500);
+        expect(response).to.equal(404);
       });
     });
   });
