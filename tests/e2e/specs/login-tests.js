@@ -18,6 +18,10 @@ describe("Successful Log in and log out", () => {
   });
 
   describe("Authenicate a student logging in and out", () => {
+    before(function() {
+      cy.logout();
+    });
+
     it("Should log in successfully", function() {
       cy.visit(CLIENT_ROOT);
 
