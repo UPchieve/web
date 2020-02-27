@@ -14,9 +14,8 @@
       <div class="personal-info contain">
         <div v-if="errors.length" class="errors">
           <h4 class="errors-heading">
-            Please correct the following problem<span v-if="errors.length > 1"
-              >s</span
-            >
+            Please correct the following problem
+            <span v-if="errors.length > 1">s</span>
             before saving:
           </h4>
           <ul class="errors-list">
@@ -203,17 +202,17 @@ export default {
       };
     },
     certKey() {
-      return Object.entries(topics)
-        .flatMap(([key, topicObj]) => {
-          return Object.entries(topicObj.subtopics).map(([, subtopicObj]) => [
-            subtopicObj.displayName,
-            key.toUpperCase()
-          ]);
-        })
-        .reduce((result, [displayName, key]) => {
-          result[displayName] = key;
-          return result;
-        }, {});
+      let subtopicObj = {};
+
+      for (let [topicName, topicData] of Object.entries(topics)) {
+        for (let topic in topicData.subtopics) {
+          if (topicData.subtopics.hasOwnProperty(topic)) {
+            const { displayName } = topicData.subtopics[topic];
+            subtopicObj[displayName] = topicName.toUpperCase();
+          }
+        }
+      }
+      return subtopicObj;
     },
     certifications() {
       const user = this.$store.state.user.user;

@@ -1,3 +1,5 @@
+const CLIENT_ROOT = Cypress.env("CLIENT_ROOT");
+
 describe("Student and volunteer signup", () => {
   before(function() {
     cy.fixture("users/newStudent1").as("newStudent");
@@ -29,7 +31,7 @@ describe("Student and volunteer signup", () => {
       cy.server();
       cy.route("PUT", "/api/user").as("setProfile");
 
-      cy.visit("/signup");
+      cy.visit(`${CLIENT_ROOT}/signup`);
 
       cy.location("pathname").should("eq", "/signup");
 
@@ -76,7 +78,7 @@ describe("Student and volunteer signup", () => {
     });
 
     it("Should add student to waitlist", function() {
-      cy.visit("/signup");
+      cy.visit(`${CLIENT_ROOT}/signup`);
 
       cy.location("pathname").should("eq", "/signup");
 
@@ -122,7 +124,7 @@ describe("Student and volunteer signup", () => {
       cy.server();
       cy.route("PUT", "/api/user").as("setProfile");
 
-      cy.visit("/signup");
+      cy.visit(`${CLIENT_ROOT}/signup`);
 
       cy.location("pathname").should("eq", "/signup");
 
@@ -209,7 +211,7 @@ describe("Student and volunteer signup", () => {
         .then(token => {
           const verifyPath = `/action/verify/${token}`;
 
-          cy.visit(verifyPath);
+          cy.visit(`${CLIENT_ROOT}${verifyPath}`);
 
           cy.location("pathname").should("eq", verifyPath);
 
@@ -227,7 +229,7 @@ describe("Student and volunteer signup", () => {
     });
 
     it("Should not accept invalid code", function() {
-      cy.visit("/signup");
+      cy.visit(`${CLIENT_ROOT}/signup`);
 
       cy.location("pathname").should("eq", "/signup");
 
@@ -303,11 +305,11 @@ describe("Student and volunteer signup", () => {
       cy.server();
       cy.route("POST", "/api/verify/confirm").as("verifyAPI");
 
-      cy.visit("/action/verify/00aa11bb22cc33dd44ee55ff66778899");
+      cy.visit(`${CLIENT_ROOT}/action/verify/00aa11bb22cc33dd44ee55ff66778899`);
 
       cy.wait("@verifyAPI").then(function(xhr) {
         const response = xhr.status;
-        expect(response).to.equal(500);
+        expect(response).to.equal(404);
       });
     });
   });

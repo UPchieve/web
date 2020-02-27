@@ -23,12 +23,15 @@ export const topics = {
  * Object containing subtopic information from all topics
  */
 export function allSubtopics() {
-  return Object.entries(topics)
-    .flatMap(([, topicObj]) => Object.entries(topicObj.subtopics))
-    .reduce((result, [key, subtopicObj]) => {
-      result[key] = subtopicObj;
-      return result;
-    }, {});
+  let subtopicObj = {};
+
+  for (let topic in topics) {
+    if (topics.hasOwnProperty(topic)) {
+      subtopicObj = Object.assign(subtopicObj, topics[topic].subtopics);
+    }
+  }
+
+  return subtopicObj;
 }
 
 /**
