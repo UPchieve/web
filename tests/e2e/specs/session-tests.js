@@ -1,5 +1,3 @@
-const CLIENT_ROOT = Cypress.env("CLIENT_ROOT");
-
 describe("Session activity", () => {
   before(function() {
     cy.fixture("users/student1").as("student");
@@ -12,7 +10,7 @@ describe("Session activity", () => {
     });
 
     it("Should start an algebra session", function() {
-      cy.visit(`${CLIENT_ROOT}/dashboard`);
+      cy.visit("/dashboard");
 
       cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
         .should("be.visible")
@@ -71,7 +69,7 @@ describe("Session activity", () => {
 
     it("Should start an essay session", function() {
       cy.login(this.student);
-      cy.visit(`${CLIENT_ROOT}/dashboard`);
+      cy.visit("/dashboard");
 
       cy.get(".SubjectCard:nth-of-type(2) .LargeButton-primary")
         .should("be.visible")
@@ -108,7 +106,7 @@ describe("Session activity", () => {
 
     it("Should switch to volunteer account and see student help request on dashboard", function() {
       cy.login(this.volunteer);
-      cy.visit(`${CLIENT_ROOT}/dashboard`);
+      cy.visit("/dashboard");
       cy.wait(5000);
 
       cy.get(".session-list tbody tr:nth-of-type(1) td:nth-of-type(1)").should(

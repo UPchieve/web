@@ -8,7 +8,6 @@
  * @summary Tests authenicating a volunteer and student successfully
  */
 
-const CLIENT_ROOT = Cypress.env("CLIENT_ROOT");
 const SERVER_ROOT = Cypress.env("SERVER_ROOT");
 
 describe("Successful Log in and log out", () => {
@@ -23,7 +22,7 @@ describe("Successful Log in and log out", () => {
     });
 
     it("Should log in successfully", function() {
-      cy.visit(CLIENT_ROOT);
+      cy.visit("/");
 
       cy.get("#inputEmail")
         .type(this.student.email)
@@ -48,7 +47,7 @@ describe("Successful Log in and log out", () => {
 
   describe("Authenicate a volunteer logging in and out", () => {
     it("Should log in successfully", function() {
-      cy.visit(CLIENT_ROOT);
+      cy.visit("/");
 
       cy.get("#inputEmail")
         .type(this.volunteer.email)
@@ -83,7 +82,7 @@ describe("Fail logging in", () => {
   it("Use incorrect email", function() {
     cy.server();
     cy.route(`${SERVER_ROOT}/api/user`).as("userAPI");
-    cy.visit(`${CLIENT_ROOT}/login`);
+    cy.visit("/login");
 
     cy.get("#inputEmail")
       .type("fake@email.com")
@@ -104,7 +103,7 @@ describe("Fail logging in", () => {
   it("Use incorrect password", function() {
     cy.server();
     cy.route(`${SERVER_ROOT}/api/user`).as("userAPI");
-    cy.visit(`${CLIENT_ROOT}/login`);
+    cy.visit("/login");
 
     cy.get("#inputEmail")
       .type(this.student.email)
