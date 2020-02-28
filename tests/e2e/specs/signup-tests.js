@@ -255,8 +255,6 @@ describe("Student and volunteer signup", () => {
       const validCodesUrl = `${Cypress.env(
         "SERVER_ROOT"
       )}/auth/register/volunteercodes`;
-      const registerUrl = `${Cypress.env("SERVER_ROOT")}/auth/register`;
-      const setProfileUrl = `${Cypress.env("SERVER_ROOT")}/api/user`;
 
       cy.request({
         url: validCodesUrl
@@ -267,35 +265,9 @@ describe("Student and volunteer signup", () => {
           cy.logout();
 
           // register unverified new volunteer
-          return cy.request({
-            url: registerUrl,
-            method: "POST",
-            body: {
-              isVolunteer: true,
-              email: this.newVolunteer.email,
-              password: this.newVolunteer.password,
-              code,
-              college: this.newVolunteer.college,
-              phone: this.newVolunteer.phoneNumber,
-              firstName: this.newVolunteer.firstName,
-              lastName: this.newVolunteer.lastName,
-              terms: true
-            }
-          });
-        })
-        .then(response => {
-          const user = response.body.user;
-          user.email = this.newVolunteer.email;
-          user.college = this.newVolunteer.college;
-          user.phonePretty = this.newVolunteer.phoneNumber;
-          (user.firstname = this.newVolunteer.firstName.trim()),
-            (user.lastname = this.newVolunteer.lastName.trim());
-
-          cy.request({
-            url: setProfileUrl,
-            method: "PUT",
-            body: user
-          });
+          const userObj = Object.assign({}, this.newVolunteer);
+          userObj.code = code;
+          cy.createUser(userObj);
         });
     });
 
