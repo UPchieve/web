@@ -66,8 +66,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint",
-      "pre-push": "./run-cypress.sh"
+      "pre-push": "./bin/run-cypress.sh"
     }
   }
 }
