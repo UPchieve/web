@@ -251,21 +251,12 @@ describe("Student and volunteer signup", () => {
 
       cy.deleteUserByEmail(this.newVolunteer.email);
 
-      // get valid codes from server
-      const validCodesUrl = `${Cypress.env(
-        "SERVER_ROOT"
-      )}/auth/register/volunteercodes`;
-
-      cy.request({
-        url: validCodesUrl
-      }).then(response => {
-        const code = response.body.volunteerCodes[0];
-
+      cy.getVolunteerCodes().then(codes => {
         cy.logout();
 
         // register unverified new volunteer
         const userObj = Object.assign({}, this.newVolunteer);
-        userObj.code = code;
+        userObj.code = codes[0];
         cy.createUser(userObj);
       });
     });

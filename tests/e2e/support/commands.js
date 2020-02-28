@@ -60,9 +60,9 @@ Cypress.Commands.add("getVolunteerCodes", () => {
     "SERVER_ROOT"
   )}/auth/register/volunteercodes`;
 
-  cy.request({
+  return cy.request({
     url: validCodesUrl
-  });
+  }).then(response => response.body.volunteerCodes);
 });
 
 Cypress.Commands.add("createUser", userObj => {
