@@ -65,12 +65,10 @@ Cypress.Commands.add("getSessionId", url => {
   return sessionId;
 });
 
-Cypress.Commands.add("clearSession", sessionId => {
+Cypress.Commands.add("endAllSessions", () => {
   cy.request({
     method: "POST",
-    url: `${API_ROOT}/session/end`,
-    body: {
-      sessionId
-    }
+    url: `${API_ROOT}/session/end-all`,
+    body: {}
   });
 });
