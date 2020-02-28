@@ -60,9 +60,11 @@ Cypress.Commands.add("getVolunteerCodes", () => {
     "SERVER_ROOT"
   )}/auth/register/volunteercodes`;
 
-  return cy.request({
-    url: validCodesUrl
-  }).then(response => response.body.volunteerCodes);
+  return cy
+    .request({
+      url: validCodesUrl
+    })
+    .its("body.volunteerCodes");
 });
 
 Cypress.Commands.add("createUser", userObj => {
@@ -97,4 +99,15 @@ Cypress.Commands.add("createUser", userObj => {
       body: user
     });
   });
+});
+
+Cypress.Commands.add("getVerificationToken", userid => {
+  const verificationTokenUrl = `${Cypress.env(
+    "SERVER_ROOT"
+  )}/api/verificationtoken`;
+
+  cy.request({
+    url: verificationTokenUrl,
+    qs: { userid }
+  }).its("body.verificationToken");
 });

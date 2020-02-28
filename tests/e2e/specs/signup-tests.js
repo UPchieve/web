@@ -186,16 +186,7 @@ describe("Student and volunteer signup", () => {
         .then(userid => {
           cy.login(this.volunteer);
 
-          const verificationTokenUrl = `${Cypress.env(
-            "SERVER_ROOT"
-          )}/api/verificationtoken`;
-
-          cy.request({
-            url: verificationTokenUrl,
-            qs: { userid }
-          })
-            .its("body.verificationToken")
-            .as("token");
+          cy.getVerificationToken(userid).as("token");
 
           cy.logout();
           // We need to be logged in as the new volunteer for the
