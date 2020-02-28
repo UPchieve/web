@@ -271,7 +271,6 @@ describe("Session activity", () => {
 
   describe("Student and volunteer revisiting a session that has ended", () => {
     const CALCULUS_SESSION_URL_PATTERN = /^\/session\/math\/calculus\/\w{24}$/;
-    let sessionId = "";
 
     beforeEach(function() {
       cy.login(this.student);
@@ -279,15 +278,13 @@ describe("Session activity", () => {
     });
 
     afterEach(function() {
-      if (sessionId) {
-        // only session participants can end a session
-        cy.login(this.student);
-        cy.clearSession(sessionId);
-        sessionId = "";
-      }
+      // Have a student end their own session
+      cy.login(this.student);
+      cy.endAllSessions();
     });
 
     it("Should see 'Session Canceled' when a student visits a canceled session", function() {
+      let sessionId = "";
       cy.wait(3000);
       cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
         .should("be.visible")
@@ -334,6 +331,7 @@ describe("Session activity", () => {
     });
 
     it("Should see 'Session Canceled' when a volunteer visits a canceled session", function() {
+      let sessionId = "";
       cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
         .should("be.visible")
         .click();
@@ -383,6 +381,7 @@ describe("Session activity", () => {
     });
 
     it("Should see 'Session Fulfilled' when another volunteer visits an active fulfilled session", function() {
+      let sessionId = "";
       cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
         .should("be.visible")
         .click();
@@ -436,6 +435,7 @@ describe("Session activity", () => {
     });
 
     it("Should see 'Session Fulfilled' when a volunteer vists a previous fulfilled session", function() {
+      let sessionId = "";
       cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
         .should("be.visible")
         .click();
@@ -485,6 +485,7 @@ describe("Session activity", () => {
     });
 
     it("Should see 'Session Fulfilled' when a student vists a previous fulfilled session", function() {
+      let sessionId = "";
       cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
         .should("be.visible")
         .click();
