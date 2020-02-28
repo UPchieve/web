@@ -54,6 +54,17 @@ Cypress.Commands.add("deleteUserByEmail", email => {
   });
 });
 
+Cypress.Commands.add("getVolunteerCodes", () => {
+  //get valid codes from server
+  const validCodesUrl = `${Cypress.env(
+    "SERVER_ROOT"
+  )}/auth/register/volunteercodes`;
+
+  cy.request({
+    url: validCodesUrl
+  });
+});
+
 Cypress.Commands.add("createUser", userObj => {
   const registerUrl = `${Cypress.env("SERVER_ROOT")}/auth/register`;
   const setProfileUrl = `${Cypress.env("SERVER_ROOT")}/api/user`;
@@ -79,7 +90,7 @@ Cypress.Commands.add("createUser", userObj => {
     user.phonePretty = userObj.phoneNumber;
     (user.firstname = userObj.firstName.trim()),
       (user.lastname = userObj.lastName.trim());
-  
+
     cy.request({
       url: setProfileUrl,
       method: "PUT",
