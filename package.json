@@ -60,14 +60,5 @@
   "engines": {
     "node": ">= 11.7.0",
     "npm": ">= 6.0.0"
-  },
-  "devDependencies": {
-    "husky": "^4.2.3"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint",
-      "pre-push": "./run-cypress.sh"
-    }
   }
 }
