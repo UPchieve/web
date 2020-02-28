@@ -162,5 +162,111 @@ describe("Session activity", () => {
       const VOLUNTEER_FEEDBACK_URL_PATTERN = /^\/feedback\/\w{24}\/college\/essays\/volunteer\/\w{24}\/\w{24}$/;
       cy.location("pathname").should("match", VOLUNTEER_FEEDBACK_URL_PATTERN);
     });
+
+    it("Should submit volunteer feedback form", function() {
+      cy.get(".vue-star-rating-pointer")
+        .eq(2)
+        .click();
+
+      cy.get(".radio-question-selection-cell")
+        .eq(4)
+        .click();
+
+      cy.get(".radio-question-selection-cell")
+        .eq(6)
+        .click();
+
+      cy.get(".radio-question-selection-cell")
+        .eq(13)
+        .click();
+
+      cy.get(".radio-question-selection-cell")
+        .eq(18)
+        .click();
+
+      cy.get(".radio-question-selection-cell")
+        .eq(22)
+        .click();
+
+      cy.get(".text-question-textarea").type(
+        "Hey, the review materials were great! They helped me prepare for my tutoring session."
+      );
+
+      cy.get(".submit-button").click();
+
+      cy.location("pathname").should("eq", "/dashboard");
+    });
+
+    it("Should visit Student feedback form and submit feedback", function() {
+      const CALCULUS_SESSION_URL_PATTERN = /^\/session\/math\/calculus\/\w{24}$/;
+      const STUDENT_FEEDBACK_URL_PATTERN = /^\/feedback\/\w{24}\/math\/calculus\/student\/\w{24}\/\w{24}$/;
+
+      cy.login(this.student);
+
+      cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
+        .should("be.visible")
+        .click();
+
+      cy.get(".SubjectSelectionModal-subtopic:nth-of-type(2)")
+        .should("be.visible")
+        .click();
+
+      cy.get(".ModalTemplate-form .LargeButton-primary")
+        .should("be.visible")
+        .click();
+
+      cy.wait(6000);
+      cy.location("pathname").should("match", CALCULUS_SESSION_URL_PATTERN);
+
+      cy.login(this.volunteer);
+      cy.visit("/dashboard");
+      cy.wait(5000);
+      cy.get(".session-list tbody tr:nth-of-type(1)")
+        .should("be.visible")
+        .click();
+
+      cy.location("pathname").should("match", CALCULUS_SESSION_URL_PATTERN);
+
+      cy.wait(5000);
+      cy.login(this.student);
+      cy.visit("/dashboard");
+      cy.get(".LargeButton-primary--reverse").click();
+      cy.get(".end-session button")
+        .should("contain.text", "End session")
+        .click();
+
+      cy.wait(5000);
+      cy.location("pathname").should("match", STUDENT_FEEDBACK_URL_PATTERN);
+
+      cy.get(".vue-star-rating-pointer")
+        .eq(2)
+        .click();
+
+      cy.get(".radio-list__option")
+        .eq(3)
+        .click();
+
+      cy.get(".radio-question-selection-cell")
+        .eq(4)
+        .click();
+
+      cy.get(".radio-question-selection-cell")
+        .eq(6)
+        .click();
+
+      cy.get(".radio-question-selection-cell")
+        .eq(13)
+        .click();
+
+      cy.get(".text-question-textarea").type(
+        "It was lit, very cool, nice 100."
+      );
+
+      cy.get(".submit-button").click();
+
+      cy.location("pathname").should("eq", "/dashboard");
+    });
+
+    
   });
 });
