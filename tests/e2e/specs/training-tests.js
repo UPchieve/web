@@ -36,9 +36,9 @@ describe("Training quizzes", function() {
             cy.getVerificationToken().as("token");
             cy.logout();
 
-            const verifyUserUrl = `${Cypress.env(
-              "SERVER_ROOT"
-            )}/api/verify/confirm`;
+              const verifyUserUrl = `${Cypress.env(
+                "SERVER_ROOT"
+              )}/api/verify/confirm?userid=${user._id}`;
 
             cy.login(this.untrainedVolunteer);
             cy.request({
