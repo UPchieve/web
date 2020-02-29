@@ -1,0 +1,45 @@
+name: CI
+
+on:
+    push:
+      branches: master
+    pull_request:
+      branches: master
+jobs:
+# This workflow contains a single job called "build"
+  ci:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    steps:
+    # To save time, detach and pull some of the largest docker files
+    - run: (docker pull mongo:4.2.3-bionic && docker pull mongo:4.2.3-bionic) &
+    # Download Mongo to get the client
+    - run: sudo wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
+    - run: sudo echo "deb http://repo.mongodb.org/apt/debian stretch/mongodb-org/4.2 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list
+    - run: sudo apt-get update && sudo apt-get install -y mongodb-org=4.2.3 mongodb-org-server=4.2.3 mongodb-org-shell=4.2.3 mongodb-org-mongos=4.2.3 mongodb-org-tools=4.2.3
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '11.7.0'
+    # Create directories to put in web and server
+    - run: mkdir server
+    - run: mkdir web
+    # Checks-out tthe server repository under $GITHUB_WORKSPACE/server
+    - uses: actions/checkout@v2
+      with:
+        repository: 'ti2ger92/server'
+        path: 'server'
+    # Checks-out this web repository under $GITHUB_WORKSPACE/web
+    - uses: actions/checkout@v2
+      with:
+        path: 'web'
+    # Start the mongo container
+    - run: docker run -d -p 27017:27017 --name mongo-container mongo:4.2.3-bionic
+    # Sets up the database and loads appropriate database
+    - run: cd server && bash bin/setup -y
+    # Start the serverin a detached environment to allow it to start
+    - run: (cd server && npm run dev) &
+    # Wait for the server to startup
+    - run: sleep 20
+    - run: cd web && docker build -t upchieve/webcypresstest .
+    - run: docker run --network host --entrypoint bin/cypress_container.sh upchieve/webcypresstest

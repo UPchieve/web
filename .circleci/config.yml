@@ -1,10 +1,11 @@
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 
-version: 2
+version: 4
 jobs:
   build:
     docker:
-      - image: circleci/node:11-browsers
+      - image: cypress/included:3.4.1
+      - image: tylerwcb/upchieve-server:latest
 
     working_directory: ~/repo
 
@@ -20,6 +21,7 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-      - run: npm run test
-      - run: npm run lint:prod
-      - run: npm run build
+      #- run: npm run test
+      #- run: npm run lint:prod
+      #- run: npm run build
+      - run: bin/cypress_container.sh

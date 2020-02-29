@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM cypress/included:3.4.1
 
 # install simple http server for serving static content
 RUN npm install -g http-server
