@@ -121,8 +121,6 @@ describe("Training quizzes", function() {
           cy.get("button.start").click();
 
           questions.forEach((question, i) => {
-            cy.log(JSON.stringify(categoryQuestions));
-            cy.log(JSON.stringify(question));
             const correctAnswer = categoryQuestions.filter(
               cq => cq._id === question._id
             )[0].correctAnswer;
