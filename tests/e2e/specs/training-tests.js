@@ -175,4 +175,29 @@ describe("Training quizzes", function() {
           });
       });
   });
+
+  it("Should not allow incomplete answers", function() {
+    cy.wait("@getQuestions")
+      .its("response.body.questions")
+      .then(questions => {
+        cy.get("button.start").click();
+
+        questions.forEach((question, i) => {
+          if (i > 0) {
+            cy.get("form.possibleAnswers > div:first-child")
+              .children(".options")
+              .children("input[type=radio]")
+              .click();
+          }
+
+          if (i < questions.length - 1) {
+            cy.get("button[type=next]").click();
+          } else {
+            cy.get("button[type=submit]").click();
+          }
+        });
+
+        cy.get(".score").should("contain", "must answer all questions");
+      });
+  });
 });
