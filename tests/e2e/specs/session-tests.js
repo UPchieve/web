@@ -426,7 +426,7 @@ describe("Session activity", () => {
           cy.location("pathname").should("eq", "/dashboard");
           cy.login(this.student);
           cy.visit("/dashboard");
-          cy.wait(5000)
+          cy.wait(5000);
           cy.get(".HyperlinkButton--reverse")
             .should("contain.text", "End chat")
             .click();
