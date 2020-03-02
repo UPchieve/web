@@ -6,6 +6,11 @@ describe("Session activity", () => {
   });
 
   describe("Student-only algebra session activity", () => {
+    before(function() {
+      cy.login(this.student);
+      cy.endAllSessions();
+    });
+
     beforeEach(function() {
       cy.login(this.student);
     });
@@ -67,6 +72,16 @@ describe("Session activity", () => {
     const ESSAYS_SESSION_URL_PATTERN = /^\/session\/college\/essays\/\w{24}$/;
     const STUDENT_ESSAY_MSG = "Hi, I have an essay question.";
     const VOLUNTEER_ESSAY_MSG = "Hello! What's your essay question?";
+
+    before(function() {
+      cy.login(this.student);
+      cy.endAllSessions();
+      cy.logout();
+
+      cy.login(this.volunteer);
+      cy.endAllSessions();
+      cy.logout();
+    });
 
     it("Should start an essay session", function() {
       cy.login(this.student);
