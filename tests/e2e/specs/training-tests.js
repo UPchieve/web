@@ -189,7 +189,7 @@ describe("Training quizzes", function() {
       });
   });
 
-  it("Should render MathJax on quiz pages and quiz review page", function() {
+  it.only("Should render MathJax on quiz pages and quiz review page", function() {
     cy.wait("@getQuestions")
       .its("response.body.questions")
       .then(questions => {
@@ -197,34 +197,44 @@ describe("Training quizzes", function() {
 
         questions.forEach((question, i) => {
           if (question.questionText.includes("\\")) {
-            cy.get("div.questionText > script[type~=math\\/tex]").should(
-              "exist"
-            );
+            cy.get("div.questionText .mjx-chtml").should("exist");
           }
 
-          if (question.possibleAnswers.some(answer => answer.txt.includes("\\"))) {
-            cy.get(".possibleAnswers label > script[type~=math\\/tex]").should(
-              "exist"
-            );
-          }
+          question.possibleAnswers
+            .filter(answer => answer.txt.includes("\\"))
+            .forEach(answer => {
+              cy.get(`#answer-${answer.val} .mjx-chtml`).should("exist");
+            });
 
           answerQuestion(i, questions.length, "a");
         });
 
         cy.get(".reviewBtn").click();
 
-        if (questions.some(question => question.questionText.includes("\\"))) {
-          cy.get("div.questionText > script[type~=math\\/tex]").should("exist");
-        }
+        questions
+          .forEach((question, i) => {
+            
+          });
 
-        if (
-          questions.some(question =>
-            question.possibleAnswers.some(answer => answer.txt.includes("\\"))
-          )
-        ) {
-          cy.get(".possibleAnswers label > script[type~=math\\/tex]").should(
-            "exist"
-          );
+        for (let i = 0; i < questions.length; i++) {
+          const question = questions[i];
+          
+          // assert that MathJax is rendered in question text
+          if (question.questionText.includes("\\")) {
+            cy.get(".questionNumber")
+              .contains((i + 1).toString())
+              .parent(".question")
+              .children("div.questionText")
+              .children(".mjx-chtml", { timeout: 25000 })
+              .should("exist");
+          }
+          
+          // assert that MathJax is rendered in answers
+          question.possibleAnswers
+            .filter(answer => answer.txt.includes("\\"))
+            .forEach(answer => {
+              cy.get(`#answer-${answer.val} .mjx-chtml`).should("exist");
+            });
         }
       });
   });
