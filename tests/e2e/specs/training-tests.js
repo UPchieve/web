@@ -211,14 +211,9 @@ describe("Training quizzes", function() {
 
         cy.get(".reviewBtn").click();
 
-        questions
-          .forEach((question, i) => {
-            
-          });
-
         for (let i = 0; i < questions.length; i++) {
           const question = questions[i];
-          
+
           // assert that MathJax is rendered in question text
           if (question.questionText.includes("\\")) {
             cy.get(".questionNumber")
@@ -228,7 +223,7 @@ describe("Training quizzes", function() {
               .children(".mjx-chtml", { timeout: 25000 })
               .should("exist");
           }
-          
+
           // assert that MathJax is rendered in answers
           question.possibleAnswers
             .filter(answer => answer.txt.includes("\\"))
