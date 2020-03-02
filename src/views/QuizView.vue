@@ -268,19 +268,43 @@ export default {
     },
 
     rerenderMathJaxElements() {
-      // Re-render MathJax in question text and answer choices
-      const quiz = document.querySelector(".quizBody");
-      const questionText = quiz.querySelector(".questionText");
-      const answerChoices = quiz.querySelector(".possibleAnswers");
+      if (this.showQuizReview) {
+        // Re-render MathJax in all question text and answers in quiz review
+        const questions = document.querySelectorAll(".review .question");
 
-      if (!questionText || !answerChoices) {
-        return;
+        if (!questions || !questions.length) {
+          return;
+        }
+
+        window.MathJax.Hub.Queue(
+          ...Array.from(questions).map(question => [
+            "Typeset",
+            window.MathJax.Hub,
+            question.querySelector(".questionText")
+          ]),
+          ...Array.from(questions)
+            .flatMap(question => question.querySelectorAll(".possibleAnswers"))
+            .map(answer => ["Typeset", window.MathJax.Hub, answer])
+        );
+      } else {
+        // Re-render MathJax in question text and answer choices
+        const quiz = document.querySelector(".quizBody");
+        const questionText = quiz.querySelector(".questionText");
+        const answerChoices = quiz.querySelectorAll(".possibleAnswers");
+
+        if (!questionText || !answerChoices || !answerChoices.length) {
+          return;
+        }
+
+        window.MathJax.Hub.Queue(
+          ["Typeset", window.MathJax.Hub, questionText],
+          ...Array.from(answerChoices).map(answerChoice => [
+            "Typeset",
+            window.MathJax.Hub,
+            answerChoice
+          ])
+        );
       }
-
-      window.MathJax.Hub.Queue(
-        ["Typeset", window.MathJax.Hub, questionText],
-        ["Typeset", window.MathJax.Hub, answerChoices]
-      );
     },
     reload() {
       this.$router.go(this.$router.currentRoute);
