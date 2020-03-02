@@ -283,7 +283,9 @@ export default {
             question.querySelector(".questionText")
           ]),
           ...Array.from(questions)
-            .flatMap(question => question.querySelectorAll(".possibleAnswers"))
+            .flatMap(question =>
+              Array.from(question.querySelectorAll(".possibleAnswers div"))
+            )
             .map(answer => ["Typeset", window.MathJax.Hub, answer])
         );
       } else {
