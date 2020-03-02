@@ -1,3 +1,15 @@
+// Helper function to answer a question and click to the
+// next question or submit the test
+const answerQuestion = function(index, numOfQuestions, answer) {
+  cy.get(`input[type=radio][value=${answer}]`).click();
+
+  if (index < numOfQuestions - 1) {
+    cy.get("button[type=next]").click();
+  } else {
+    cy.get("button[type=submit]").click();
+  }
+};
+
 describe("Training quizzes", function() {
   beforeEach(function() {
     cy.fixture("users/volunteer1").as("adminVolunteer");
@@ -125,13 +137,7 @@ describe("Training quizzes", function() {
               cq => cq._id === question._id
             )[0].correctAnswer;
 
-            cy.get(`input[type=radio][value=${correctAnswer}]`).click();
-
-            if (i < questions.length - 1) {
-              cy.get("button[type=next]").click();
-            } else {
-              cy.get("button[type=submit]").click();
-            }
+            answerQuestion(i, questions.length, correctAnswer);
           });
 
           cy.wait("@score")
@@ -152,16 +158,7 @@ describe("Training quizzes", function() {
         cy.get("button.start").click();
 
         questions.forEach((question, i) => {
-          cy.get("form.possibleAnswers > div:first-child")
-            .children(".options")
-            .children("input[type=radio]")
-            .click();
-
-          if (i < questions.length - 1) {
-            cy.get("button[type=next]").click();
-          } else {
-            cy.get("button[type=submit]").click();
-          }
+          answerQuestion(i, questions.length, "a");
         });
 
         cy.wait("@score")
@@ -181,17 +178,10 @@ describe("Training quizzes", function() {
         cy.get("button.start").click();
 
         questions.forEach((question, i) => {
-          if (i > 0) {
-            cy.get("form.possibleAnswers > div:first-child")
-              .children(".options")
-              .children("input[type=radio]")
-              .click();
-          }
-
-          if (i < questions.length - 1) {
+          if (i == 0) {
             cy.get("button[type=next]").click();
           } else {
-            cy.get("button[type=submit]").click();
+            answerQuestion(i, questions.length, "a");
           }
         });
 
