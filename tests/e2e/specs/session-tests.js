@@ -284,7 +284,6 @@ describe("Session activity", () => {
     });
 
     it("Should see 'Session Canceled' when a student visits a canceled session", function() {
-      let sessionId = "";
       cy.wait(3000);
       cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
         .should("be.visible")
@@ -302,10 +301,9 @@ describe("Session activity", () => {
       cy.location("pathname")
         .should("match", CALCULUS_SESSION_URL_PATTERN)
         .then(() => cy.url())
-        .then(url => cy.getSessionId(url))
-        .then(id => {
-          sessionId = id;
-          cy.url().should("contain", sessionId);
+        .then(url => cy.getSessionId(url).as("sessionId"))
+        .then(() => {
+          cy.url().should("contain", this.sessionId);
           cy.wait(6000);
           cy.get(".end-session button")
             .should("contain.text", "Cancel" || "End session")
@@ -314,7 +312,7 @@ describe("Session activity", () => {
         })
         .then(() => {
           cy.location("pathname").should("eq", "/dashboard");
-          cy.visit(`/session/math/calculus/${sessionId}`);
+          cy.visit(`/session/math/calculus/${this.sessionId}`);
           cy.wait(9000);
           return cy.get(".SessionFulfilledModal").children();
         })
@@ -331,7 +329,6 @@ describe("Session activity", () => {
     });
 
     it("Should see 'Session Canceled' when a volunteer visits a canceled session", function() {
-      let sessionId = "";
       cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
         .should("be.visible")
         .click();
@@ -348,10 +345,9 @@ describe("Session activity", () => {
       cy.location("pathname")
         .should("match", CALCULUS_SESSION_URL_PATTERN)
         .then(() => cy.url())
-        .then(url => cy.getSessionId(url))
-        .then(id => {
-          sessionId = id;
-          cy.url().should("contain", sessionId);
+        .then(url => cy.getSessionId(url).as("sessionId"))
+        .then(() => {
+          cy.url().should("contain", this.sessionId);
           cy.wait(6000);
           cy.get(".end-session button")
             .should("contain.text", "Cancel")
@@ -361,7 +357,7 @@ describe("Session activity", () => {
         .then(() => {
           cy.location("pathname").should("eq", "/dashboard");
           cy.login(this.volunteer);
-          cy.visit(`/session/math/calculus/${sessionId}`);
+          cy.visit(`/session/math/calculus/${this.sessionId}`);
           cy.wait(9000);
           return cy.get(".SessionFulfilledModal").children();
         })
@@ -376,12 +372,10 @@ describe("Session activity", () => {
         })
         .then(() => {
           cy.location("pathname").should("eq", "/dashboard");
-          sessionId = "";
         });
     });
 
     it("Should see 'Session Fulfilled' when another volunteer visits an active fulfilled session", function() {
-      let sessionId = "";
       cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
         .should("be.visible")
         .click();
@@ -398,18 +392,17 @@ describe("Session activity", () => {
       cy.location("pathname")
         .should("match", CALCULUS_SESSION_URL_PATTERN)
         .then(() => cy.url())
-        .then(url => cy.getSessionId(url))
-        .then(id => {
-          sessionId = id;
-          cy.url().should("contain", sessionId);
+        .then(url => cy.getSessionId(url).as("sessionId"))
+        .then(() => {
+          cy.url().should("contain", this.sessionId);
           cy.wait(6000);
           cy.login(this.volunteer);
-          cy.visit(`/session/math/calculus/${sessionId}`);
+          cy.visit(`/session/math/calculus/${this.sessionId}`);
           cy.wait(9000);
         })
         .then(() => {
           cy.login(this.volunteer2);
-          cy.visit(`/session/math/calculus/${sessionId}`);
+          cy.visit(`/session/math/calculus/${this.sessionId}`);
           cy.wait(9000);
           return cy.get(".SessionFulfilledModal").children();
         })
@@ -424,18 +417,11 @@ describe("Session activity", () => {
         })
         .then(() => {
           cy.location("pathname").should("eq", "/dashboard");
-          cy.login(this.student);
-          cy.visit("/dashboard");
-          cy.wait(5000);
-          cy.get(".HyperlinkButton--reverse")
-            .should("contain.text", "End chat")
-            .click();
-          sessionId = "";
+          cy.logout();
         });
     });
 
     it("Should see 'Session Fulfilled' when a volunteer vists a previous fulfilled session", function() {
-      let sessionId = "";
       cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
         .should("be.visible")
         .click();
@@ -452,20 +438,19 @@ describe("Session activity", () => {
       cy.location("pathname")
         .should("match", CALCULUS_SESSION_URL_PATTERN)
         .then(() => cy.url())
-        .then(url => cy.getSessionId(url))
-        .then(id => {
-          sessionId = id;
-          cy.url().should("contain", sessionId);
+        .then(url => cy.getSessionId(url).as("sessionId"))
+        .then(() => {
+          cy.url().should("contain", this.sessionId);
           cy.wait(6000);
           cy.login(this.volunteer);
-          cy.visit(`/session/math/calculus/${sessionId}`);
+          cy.visit(`/session/math/calculus/${this.sessionId}`);
           cy.wait(9000);
           cy.get(".end-session button")
             .should("contain.text", "End session")
             .click();
         })
         .then(() => {
-          cy.visit(`/session/math/calculus/${sessionId}`);
+          cy.visit(`/session/math/calculus/${this.sessionId}`);
           cy.wait(9000);
           return cy.get(".SessionFulfilledModal").children();
         })
@@ -480,12 +465,10 @@ describe("Session activity", () => {
         })
         .then(() => {
           cy.location("pathname").should("eq", "/dashboard");
-          sessionId = "";
         });
     });
 
     it("Should see 'Session Fulfilled' when a student vists a previous fulfilled session", function() {
-      let sessionId = "";
       cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
         .should("be.visible")
         .click();
@@ -502,16 +485,15 @@ describe("Session activity", () => {
       cy.location("pathname")
         .should("match", CALCULUS_SESSION_URL_PATTERN)
         .then(() => cy.url())
-        .then(url => cy.getSessionId(url))
-        .then(id => {
-          sessionId = id;
-          cy.url().should("contain", sessionId);
+        .then(url => cy.getSessionId(url).as("sessionId"))
+        .then(() => {
+          cy.url().should("contain", this.sessionId);
           cy.wait(6000);
           cy.login(this.volunteer);
-          cy.visit(`/session/math/calculus/${sessionId}`);
+          cy.visit(`/session/math/calculus/${this.sessionId}`);
           cy.wait(6000);
           cy.login(this.student);
-          cy.visit(`/session/math/calculus/${sessionId}`);
+          cy.visit(`/session/math/calculus/${this.sessionId}`);
           cy.wait(9000);
           return cy
             .get(".end-session button")
@@ -520,7 +502,7 @@ describe("Session activity", () => {
         })
         .then(() => {
           cy.wait(8000);
-          cy.visit(`/session/math/calculus/${sessionId}`);
+          cy.visit(`/session/math/calculus/${this.sessionId}`);
           cy.wait(9000);
           return cy.get(".SessionFulfilledModal").children();
         })
@@ -535,7 +517,6 @@ describe("Session activity", () => {
         })
         .then(() => {
           cy.location("pathname").should("eq", "/dashboard");
-          sessionId = "";
         });
     });
   });
