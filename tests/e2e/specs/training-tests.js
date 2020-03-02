@@ -189,7 +189,7 @@ describe("Training quizzes", function() {
       });
   });
 
-  it.only("Should render MathJax on quiz pages and quiz review page", function() {
+  it("Should render MathJax on quiz pages and quiz review page", function() {
     cy.wait("@getQuestions")
       .its("response.body.questions")
       .then(questions => {
