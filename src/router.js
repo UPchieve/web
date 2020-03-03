@@ -24,6 +24,7 @@ import CalendarView from "./views/CalendarView";
 import AdminView from "./views/Admin";
 import VolunteerCoverage from "./views/Admin/VolunteerCoverage";
 import VolunteerGuideView from "./views/VolunteerGuideView";
+import ZwibView from "./views/ZwibView";
 
 import store from "./store";
 
@@ -207,6 +208,12 @@ const routes = [
     path: "/coach-guide",
     name: "VolunteerGuide",
     component: VolunteerGuideView,
+    meta: { protected: true }
+  },
+  {
+    path: "/zwib/:roomId",
+    name: "ZwibView",
+    component: ZwibView,
     meta: { protected: true }
   },
   {
