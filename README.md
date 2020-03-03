@@ -82,7 +82,7 @@ This can also be run with docker and no other software. Use these instructions t
 git clone https://github.com/UPchieve/web.git
 ```
 
-2. Move into the repository.
+2. Move into the repository
 ``` bash
 #Enter the repository
 cd web
