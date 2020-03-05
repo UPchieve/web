@@ -211,12 +211,6 @@ const routes = [
     meta: { protected: true }
   },
   {
-    path: "/zwib/:roomId",
-    name: "ZwibView",
-    component: ZwibView,
-    meta: { protected: true }
-  },
-  {
     path: "/edu", // TODO: make this be "/admin/edu"
     component: () => {
       if (process.env.NODE_ENV === "development") {
