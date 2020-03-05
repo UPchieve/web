@@ -14,5 +14,9 @@ module.exports = {
           patterns: [path.resolve(__dirname, "./src/scss/setup/all.scss")]
         })
     );
+
+    const svgRule = config.module.rule("svg");
+    svgRule.uses.clear();
+    svgRule.use("vue-svg-loader").loader("vue-svg-loader");
   }
 };
