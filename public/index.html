@@ -31,7 +31,10 @@
     <div id="app"></div>
     <!-- built files will be auto injected -->
     
-    <script src="/static/js/zwibbler2.js"></script>
+    <!-- Load Zwibbler -->
+    <script src="<%= VUE_APP_ZWIBBLER_URL %>"></script>
+
+    <!-- Load MathJax -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML"></script>
     <script type="text/x-mathjax-config">
       MathJax.Hub.Config({

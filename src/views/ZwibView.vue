@@ -14,7 +14,7 @@ export default {
 
   mounted() {
     const zwibblerCtx = window.Zwibbler.create("zwib-div", {
-      collaborationServer: "ws://localhost:3000/socket/{name}"
+      collaborationServer: "ws://localhost:3000/whiteboard/room/{name}"
     });
 
     this.zwibblerCtx = zwibblerCtx;
