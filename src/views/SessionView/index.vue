@@ -4,7 +4,7 @@
       <session-header @try-clicked="tryClicked" />
     </div>
     <div
-      v-if="currentSession.sessionId"
+      v-if="session._id"
       class="session-contents-container"
       v-bind:class="{
         'session-contents-container--mobile': mobileMode
@@ -81,7 +81,6 @@ export default {
    */
   data() {
     return {
-      currentSession: SessionService.currentSession,
       whiteboardOpen: false,
       icon: "Pencil.png",
       sessionReconnecting: false
@@ -89,7 +88,8 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: state => state.user.user,
+      session: state => state.user.session
     }),
     ...mapGetters({
       mobileMode: "app/mobileMode"
@@ -162,9 +162,9 @@ export default {
     },
     connect() {
       if (this.sessionReconnecting) {
-        if (this.currentSession && this.currentSession.sessionId) {
+        if (this.session && this.session._id) {
           // we still need to re-join the room after Socket.IO re-establishes the connection
-          this.joinSession(this.currentSession.sessionId);
+          this.joinSession(this.session._id);
         } else {
           location.reload();
         }
