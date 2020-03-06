@@ -77,12 +77,12 @@
 </template>
 
 <script>
-import SelectionIcon from "@/assets/selection_icon.svg";
-import ClearIcon from "@/assets/clear_icon.svg";
-import ColorPickerIcon from "@/assets/color_icon.svg";
-import PenIcon from "@/assets/pen_icon.svg";
-import UndoIcon from "@/assets/undo_icon.svg";
-import RedoIcon from "@/assets/redo_icon.svg";
+import SelectionIcon from "@/assets/whiteboard_icons/selection.svg";
+import ClearIcon from "@/assets/whiteboard_icons/clear.svg";
+import ColorPickerIcon from "@/assets/whiteboard_icons/color_picker.svg";
+import PenIcon from "@/assets/whiteboard_icons/pen.svg";
+import UndoIcon from "@/assets/whiteboard_icons/undo.svg";
+import RedoIcon from "@/assets/whiteboard_icons/redo.svg";
 
 export default {
   data() {
@@ -166,19 +166,28 @@ export default {
 
 #toolbar {
   background-color: rgb(238, 238, 238);
-  padding: 10px 30px;
   margin: 0;
   height: 80px;
   display: flex;
   align-items: center;
+  justify-content: space-around;
   position: fixed;
   bottom: 20px;
   border-radius: 8px;
   list-style-type: none;
+  left: 20px;
+  width: 400px;
+  padding-left: 0;
 }
 
 .tool__item {
-  padding: 2em;
+  padding: 1em;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
 
   &:hover {
     border: 1px solid blue;
@@ -186,6 +195,10 @@ export default {
 
   &-color-picker {
     position: relative;
+  }
+
+  &-svg {
+    width: 20px;
   }
 }
 
