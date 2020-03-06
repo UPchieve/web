@@ -7,6 +7,7 @@ import * as Integrations from "@sentry/integrations";
 import vSelect from "vue-select";
 import VuePhoneNumberInput from "vue-phone-number-input";
 import VueStarRating from "vue-star-rating";
+import VuePageVisibility from "vue-page-visibility-awesome";
 
 import Socket from "socket.io-client";
 import moment from "moment";
@@ -48,6 +49,9 @@ Vue.component("vue-phone-number-input", VuePhoneNumberInput);
 
 // Set up vue-star-rating
 Vue.component("vue-star-rating", VueStarRating);
+
+// Set up vue-page-visibility
+Vue.component("vue-page-visibility", VuePageVisibility);
 
 // Filter for formatting times
 Vue.filter("formatTime", value => {

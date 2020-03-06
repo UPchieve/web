@@ -1,12 +1,9 @@
 <template>
   <div class="chat">
-    <vue-headful
-      :title="
-        typingIndicatorShown
-          ? `${sessionPartner.firstname} is typing...`
-          : 'UPchieve'
-      "
-    />
+    <vue-page-visibility @documentActive="documentActive">
+    </vue-page-visibility>
+
+    <vue-headful :title="titleText" />
 
     <div class="message-box">
       <transition name="chat-warning--slide">
@@ -59,6 +56,8 @@ import { setTimeout, clearTimeout } from "timers";
 import _ from "lodash";
 import { mapState, mapGetters } from "vuex";
 
+import VuePageVisibility from "vue-page-visibility-awesome";
+
 import ChatBot from "./ChatBot";
 import SessionService from "@/services/SessionService";
 import ModerationService from "@/services/ModerationService";
@@ -72,14 +71,15 @@ import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
  */
 export default {
   name: "session-chat",
-  components: { ChatBot },
+  components: { ChatBot, VuePageVisibility },
   data() {
     return {
       currentSession: SessionService.currentSession,
       newMessage: "",
       chatWarningIsShown: false,
       typingTimeout: null,
-      typingIndicatorShown: false
+      typingIndicatorShown: false,
+      joinIndicatorSeen: false
     };
   },
   computed: {
@@ -97,12 +97,30 @@ export default {
 
           message.avatarStyle = { backgroundImage: `url(${picture})` };
           return message;
-        })
+        }),
+      pageHidden: state => state.app.pageHidden
     }),
     ...mapGetters({
       sessionPartner: "user/sessionPartner",
-      isSessionWaitingForVolunteer: "user/isSessionWaitingForVolunteer"
-    })
+      isSessionWaitingForVolunteer: "user/isSessionWaitingForVolunteer",
+      isSessionInProgress: "user/isSessionInProgress"
+    }),
+    joinIndicatorShown() {
+      return this.isSessionInProgress && !this.joinIndicatorSeen;
+    },
+    titleText() {
+      if (this.typingIndicatorShown) {
+        return `${this.sessionPartner.firstname} is typing...`;
+      } else if (this.joinIndicatorShown && this.pageHidden) {
+        return `${this.sessionPartner.firstname} has joined!`;
+      } else {
+        return "UPchieve";
+      }
+    }
+  },
+  mounted() {
+    // ensure indicator is visible when user is in a new session
+    this.joinIndicatorSeen = false;
   },
   methods: {
     showModerationWarning() {
@@ -166,6 +184,11 @@ export default {
       this.typingTimeout = setTimeout(() => {
         this.notTyping();
       }, 2000);
+    },
+    documentActive() {
+      if (this.joinIndicatorShown) {
+        this.joinIndicatorSeen = true;
+      }
     }
   },
 

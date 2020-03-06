@@ -16,7 +16,8 @@ describe("`app` store module", () => {
   it("state", () => {
     expect(state).toEqual({
       windowWidth: 0,
-      windowHeight: 0
+      windowHeight: 0,
+      pageHidden: false
     });
   });
 
@@ -41,6 +42,17 @@ describe("`app` store module", () => {
 
       mutations.setWindowHeight(state, -100);
       expect(state.windowHeight).toBe(0);
+    });
+
+    it("setPageHidden", () => {
+      expect(typeof mutations.setPageHidden).toBe("function");
+      const state = { pageHidden: false };
+
+      mutations.setPageHidden(state, true);
+      expect(state.pageHidden).toBe(true);
+
+      mutations.setPageHidden(state, false);
+      expect(state.pageHidden).toBe(false);
     });
   });
 
@@ -69,6 +81,19 @@ describe("`app` store module", () => {
       actions.windowResize({ commit }, { width, height });
       expect(commit).toHaveBeenNthCalledWith(1, "setWindowWidth", width);
       expect(commit).toHaveBeenNthCalledWith(2, "setWindowHeight", height);
+    });
+
+    it("documentInactive", () => {
+      expect(typeof actions.documentInactive).toBe("function");
+      const commit = jest.fn();
+      actions.documentInactive({ commit });
+      expect(commit).toHaveBeenNthCalledWith(1, "setPageHidden", true);
+    });
+    it("documentActive", () => {
+      expect(typeof actions.documentInactive).toBe("function");
+      const commit = jest.fn();
+      actions.documentActive({ commit });
+      expect(commit).toHaveBeenNthCalledWith(1, "setPageHidden", false);
     });
   });
 

@@ -1,5 +1,11 @@
 <template>
   <div id="app" class="App">
+    <vue-page-visibility
+      @documentInactive="documentInactive"
+      @documentActive="documentActive"
+    >
+    </vue-page-visibility>
+
     <app-header v-if="showHeader" />
     <app-sidebar v-if="showSidebar" />
     <app-modal v-if="showModal" />
@@ -19,6 +25,8 @@
 <script>
 import { mapState, mapGetters } from "vuex";
 
+import VuePageVisibility from "vue-page-visibility-awesome";
+
 import SessionService from "@/services/SessionService";
 
 import "@/scss/main.scss";
@@ -31,7 +39,8 @@ export default {
   components: {
     AppHeader,
     AppSidebar,
-    AppModal
+    AppModal,
+    VuePageVisibility
   },
   created() {
     // Listen for resize event
@@ -52,6 +61,12 @@ export default {
         width: window.innerWidth,
         height: window.innerHeight
       });
+    },
+    documentInactive() {
+      this.$store.dispatch("app/documentInactive");
+    },
+    documentActive() {
+      this.$store.dispatch("app/documentActive");
     }
   },
   computed: {
