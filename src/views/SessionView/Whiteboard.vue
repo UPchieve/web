@@ -1,6 +1,17 @@
 <template>
   <div class="zwib-wrapper">
-    <div id="zwib-div"></div>
+    <cross-icon
+      v-if="showDeleteStroke"
+      :style="{
+        position: 'absolute',
+        top: deleteIconCoordinates.y - 50,
+        left: deleteIconCoordinates.x + deleteIconCoordinates.width + 10,
+        zIndex: '1000'
+      }"
+      v-on:click="deleteSelectedNodes"
+      class="tool__item-svg tool__item-delete"
+    />
+    <div id="zwib-div" :style="mousePointer"></div>
     <ul id="toolbar">
       <li
         class="tool__item"
@@ -66,6 +77,13 @@
       >
         <PenIcon class="tool__item-svg" />
       </li>
+      <li
+        class="tool__item"
+        v-bind:class="selectedTool === 'text' ? 'selected-tool' : ''"
+        @click="useTextTool"
+      >
+        <TextIcon class="tool__item-svg" />
+      </li>
       <li class="tool__item" @click="undo">
         <UndoIcon class="tool__item-svg" />
       </li>
@@ -84,6 +102,8 @@ import ColorPickerIcon from "@/assets/whiteboard_icons/color_picker.svg";
 import PenIcon from "@/assets/whiteboard_icons/pen.svg";
 import UndoIcon from "@/assets/whiteboard_icons/undo.svg";
 import RedoIcon from "@/assets/whiteboard_icons/redo.svg";
+import CrossIcon from "@/assets/cross.svg";
+import TextIcon from "@/assets/text.svg";
 
 export default {
   components: {
@@ -92,24 +112,47 @@ export default {
     ColorPickerIcon,
     PenIcon,
     UndoIcon,
-    RedoIcon
+    RedoIcon,
+    CrossIcon,
+    TextIcon
   },
   data() {
     return {
       zwibbler: null,
       selectedTool: "pen",
-      showColorPicker: false
+      showColorPicker: false,
+      deleteIconCoordinates: {},
+      showDeleteStroke: false,
+      isMouseDown: false
     };
   },
   computed: {
     ...mapState({
       session: state => state.user.session
-    })
+    }),
+    mousePointer() {
+      // I NEED TO CLEAN THIS UP!!!!!!
+      if (this.selectedTool === "pen") return { cursor: "crosshair" };
+      if (this.selectedTool === "pick") return { cursor: "default" };
+      if (this.selectedTool === "text") return { cursor: "text" };
+      return { cursor: "default" };
+    }
   },
   mounted() {
+    document.addEventListener("click", () => {
+      var rect = this.zwibblerCtx.getBoundingRectangle(
+        this.zwibblerCtx.getSelectedNodes()
+      );
+      if (this.selectedTool === "pick" && rect.x && rect.y) {
+        this.deleteIconCoordinates = rect;
+        this.showDeleteStroke = true;
+      }
+    });
+
     const zwibblerCtx = window.Zwibbler.create("zwib-div", {
       showToolbar: false,
       showColourPanel: false,
+      autoPickToolText: false,
       collaborationServer: "ws://localhost:3000/whiteboard/room/{name}"
     });
 
@@ -130,6 +173,7 @@ export default {
       this.selectedTool = "";
       this.showColorPicker = false;
       this.useBrushTool();
+      this.showDeleteStroke = false;
     },
     toggleColorPicker() {
       this.showColorPicker = !this.showColorPicker;
@@ -139,18 +183,29 @@ export default {
       this.selectedTool = "pen";
       this.showColorPicker = false;
     },
+    useTextTool() {
+      this.zwibblerCtx.useTextTool();
+      this.selectedTool = "text";
+      this.showColorPicker = false;
+    },
     undo() {
       this.zwibblerCtx.undo();
       this.showColorPicker = false;
+      this.showDeleteStroke = false;
     },
     redo() {
       this.zwibblerCtx.redo();
       this.showColorPicker = false;
+      this.showDeleteStroke = false;
     },
     setColor(color) {
       // Second parameter indicates whether the colour should affect the fill or outline colour.
       const useFill = true;
       this.zwibblerCtx.setColour(color, useFill);
+    },
+    deleteSelectedNodes() {
+      this.zwibblerCtx.deleteNodes(this.zwibblerCtx.getSelectedNodes());
+      this.showDeleteStroke = !this.showDeleteStroke;
     }
   }
 };
@@ -161,6 +216,7 @@ export default {
   margin: 20px;
   height: 100%;
   width: 100%;
+  position: relative;
 }
 
 #zwib-div {
@@ -204,6 +260,10 @@ export default {
 
   &-svg {
     width: 20px;
+  }
+
+  &-delete {
+    fill: #b55050;
   }
 }
 
