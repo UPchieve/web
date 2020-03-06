@@ -77,6 +77,7 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 import SelectionIcon from "@/assets/whiteboard_icons/selection.svg";
 import ClearIcon from "@/assets/whiteboard_icons/clear.svg";
 import ColorPickerIcon from "@/assets/whiteboard_icons/color_picker.svg";
@@ -85,13 +86,6 @@ import UndoIcon from "@/assets/whiteboard_icons/undo.svg";
 import RedoIcon from "@/assets/whiteboard_icons/redo.svg";
 
 export default {
-  data() {
-    return {
-      zwibbler: null,
-      selectedTool: "pen",
-      showColorPicker: false
-    };
-  },
   components: {
     SelectionIcon,
     ClearIcon,
@@ -100,19 +94,30 @@ export default {
     UndoIcon,
     RedoIcon
   },
+  data() {
+    return {
+      zwibbler: null,
+      selectedTool: "pen",
+      showColorPicker: false
+    };
+  },
+  computed: {
+    ...mapState({
+      session: state => state.user.session
+    })
+  },
   mounted() {
     const zwibblerCtx = window.Zwibbler.create("zwib-div", {
       showToolbar: false,
       showColourPanel: false,
-      collaborationServer: "ws://localhost:3000/socket/{name}"
+      collaborationServer: "ws://localhost:3000/whiteboard/room/{name}"
     });
 
     this.zwibblerCtx = zwibblerCtx;
 
-    const roomIdParam = this.$route.params.sessionId || "";
-    const roomId = zwibblerCtx.createSharedSession(roomIdParam);
+    zwibblerCtx.createSharedSession(this.session._id);
+
     this.useBrushTool();
-    console.log("Room ID:", roomId);
   },
   methods: {
     usePickTool() {
