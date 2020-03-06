@@ -275,6 +275,7 @@ export default {
 }
 
 .whiteboard-container {
+  background: #fff;
   padding: 0;
   flex-grow: 1;
   overflow: hidden;
@@ -282,10 +283,6 @@ export default {
   // Hide with z-index (not display: none) so canvas is accessible in DOM
   &--hidden {
     z-index: 0;
-  }
-
-  @include breakpoint-below("medium") {
-    background: #fff;
   }
 }
 
