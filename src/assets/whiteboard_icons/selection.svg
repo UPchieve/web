@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="17px" viewBox="0 0 18 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>selection_icon</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0.888888889" y="0.888888889" width="13.3333333" height="13.3333333"></rect>
+        <mask id="mask-2" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="13.3333333" height="13.3333333" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="selection_icon">
+            <polygon id="pointer-head" fill="#343440" points="9.51677153 8.9342559 17.4641648 8.9342559 9.51677153 16.8816492"></polygon>
+            <polygon id="pointer-stem" stroke="#343440" fill="#343440" points="11.8159822 12.8105556 13.3770773 11.2494605 17.350774 15.2231571 15.7896789 16.7842523"></polygon>
+            <use id="Rectangle" stroke="#343440" mask="url(#mask-2)" stroke-width="2" stroke-dasharray="3,3" xlink:href="#path-1"></use>
+        </g>
+    </g>
+</svg>
