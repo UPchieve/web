@@ -6,28 +6,21 @@
     tag="div"
     @click.native="$store.dispatch('app/sidebar/collapse')"
   >
-    <upchieve-icon
-      v-if="icon"
-      style="padding-right: 16px;"
-      :icon="icon"
-      :size="size"
-    />
+    <slot></slot>
     <p>{{ text }}</p>
   </router-link>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
-import UpchieveIcon from "@/components/UpchieveIcon";
 
 export default {
-  components: { UpchieveIcon },
   props: {
     to: {
       type: String,
       required: true
     },
-    icon: String,
+    icon: Object,
     text: {
       type: String,
       required: true
@@ -69,5 +62,11 @@ export default {
   &--desktop {
     @include font-category("button");
   }
+}
+
+.icon {
+  padding-right: 16px;
+  width: 16px;
+  height: 16px;
 }
 </style>

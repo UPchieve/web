@@ -3,46 +3,68 @@
     <template v-if="$route.path.indexOf('/onboarding') !== -1"></template>
 
     <template v-else-if="authenticated">
-      <sidebar-link to="/dashboard" icon="house" text="Dashboard" />
-      <sidebar-link
-        v-if="isVolunteer"
-        to="/training"
-        icon="graduation-cap"
-        text="Training"
-      />
-      <sidebar-link
-        v-if="isVolunteer"
-        to="/calendar"
-        icon="calendar"
-        text="Schedule"
-      />
-      <sidebar-link
-        v-if="isVolunteer"
-        to="/coach-guide"
-        icon="book"
-        text="Coach Guide"
-      />
-      <sidebar-link v-if="isAdmin" to="/admin" icon="folder" text="Admin" />
-      <sidebar-link to="/profile" icon="portrait" text="Profile" />
-      <sidebar-link
-        v-if="!isVolunteer"
-        to="/resources"
-        icon="folder"
-        text="Resources"
-      />
+      <sidebar-link to="/dashboard" text="Dashboard">
+        <house-icon class="icon" />
+      </sidebar-link>
+
+      <sidebar-link v-if="isVolunteer" to="/training" text="Training">
+        <graduation-cap-icon class="icon" />
+      </sidebar-link>
+
+      <sidebar-link v-if="isVolunteer" to="/calendar" text="Schedule">
+        <calendar-icon class="icon" />
+      </sidebar-link>
+
+      <sidebar-link v-if="isVolunteer" to="/coach-guide" text="Coach Guide">
+        <book-icon class="icon" />
+      </sidebar-link>
+
+      <sidebar-link v-if="isAdmin" to="/admin" text="Admin">
+        <folder-icon class="icon" />
+      </sidebar-link>
+
+      <sidebar-link to="/profile" text="Profile">
+        <portrait-icon class="icon" />
+      </sidebar-link>
+
+      <sidebar-link v-if="!isVolunteer" to="/resources" text="Resources">
+        <folder-icon class="icon" />
+      </sidebar-link>
 
       <div v-if="!mobileMode" class="SidebarLinks-about">About UPchieve</div>
-      <sidebar-link to="/contact" icon="envelope" text="Contact us" />
-      <sidebar-link to="/legal" icon="exclamation" text="Legal policy" />
+      <sidebar-link to="/contact" text="Contact us">
+        <envelope-icon class="icon" />
+      </sidebar-link>
+      <sidebar-link to="/legal" text="Legal policy">
+        <exclamation-icon class="icon" />
+      </sidebar-link>
     </template>
   </div>
 </template>
 
 <script>
 import SidebarLink from "./SidebarLink";
+import HouseIcon from "@/assets/sidebar_icons/house.svg";
+import GraduationCapIcon from "@/assets/sidebar_icons/graduation-cap.svg";
+import CalendarIcon from "@/assets/sidebar_icons/calendar.svg";
+import BookIcon from "@/assets/sidebar_icons/book.svg";
+import FolderIcon from "@/assets/sidebar_icons/folder.svg";
+import EnvelopeIcon from "@/assets/sidebar_icons/envelope.svg";
+import ExclamationIcon from "@/assets/sidebar_icons/exclamation.svg";
+import PortraitIcon from "@/assets/sidebar_icons/portrait.svg";
 
 export default {
-  components: { SidebarLink },
+  components: {
+    SidebarLink,
+    HouseIcon,
+    GraduationCapIcon,
+    CalendarIcon,
+    BookIcon,
+    FolderIcon,
+    EnvelopeIcon,
+    ExclamationIcon,
+    PortraitIcon
+  },
   props: {
     authenticated: Boolean,
     isVolunteer: Boolean,
@@ -63,5 +85,10 @@ export default {
     margin-top: 40px;
     text-align: left;
   }
+}
+
+.icon {
+  margin-right: 0.8em;
+  width: 24px;
 }
 </style>
