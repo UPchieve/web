@@ -20,8 +20,12 @@
       >
         <SelectionIcon class="tool__item-svg" />
       </li>
-      <li class="tool__item" @click="clearWhiteboard">
-        <ClearIcon class="tool__item-svg" />
+      <li
+        class="tool__item"
+        v-bind:class="selectedTool === 'pen' ? 'selected-tool' : ''"
+        @click="useBrushTool"
+      >
+        <PenIcon class="tool__item-svg" />
       </li>
       <li class="tool__item tool__item-color-picker" @click="toggleColorPicker">
         <ColorPickerIcon class="tool__item-svg" />
@@ -29,8 +33,8 @@
           <li>
             <button
               class="color-button"
-              style="background-color: rgba(52, 52, 64, 0.6)"
-              @click="setColor('rgba(52, 52, 64, 0.6)')"
+              style="background-color: rgba(10, 10, 10, 1)"
+              @click="setColor('rgba(10, 10, 10, 1)')"
             />
           </li>
           <li>
@@ -70,25 +74,14 @@
           </li>
         </ul>
       </li>
-      <li
-        class="tool__item"
-        v-bind:class="selectedTool === 'pen' ? 'selected-tool' : ''"
-        @click="useBrushTool"
-      >
-        <PenIcon class="tool__item-svg" />
-      </li>
-      <li
-        class="tool__item"
-        v-bind:class="selectedTool === 'text' ? 'selected-tool' : ''"
-        @click="useTextTool"
-      >
-        <TextIcon class="tool__item-svg" />
-      </li>
       <li class="tool__item" @click="undo">
         <UndoIcon class="tool__item-svg" />
       </li>
       <li class="tool__item" @click="redo">
         <RedoIcon class="tool__item-svg" />
+      </li>
+      <li class="tool__item" @click="clearWhiteboard">
+        <ClearIcon class="tool__item-svg" />
       </li>
     </ul>
   </div>
@@ -103,7 +96,6 @@ import PenIcon from "@/assets/whiteboard_icons/pen.svg";
 import UndoIcon from "@/assets/whiteboard_icons/undo.svg";
 import RedoIcon from "@/assets/whiteboard_icons/redo.svg";
 import CrossIcon from "@/assets/cross.svg";
-import TextIcon from "@/assets/text.svg";
 
 export default {
   components: {
@@ -113,8 +105,7 @@ export default {
     PenIcon,
     UndoIcon,
     RedoIcon,
-    CrossIcon,
-    TextIcon
+    CrossIcon
   },
   data() {
     return {
@@ -131,10 +122,8 @@ export default {
       session: state => state.user.session
     }),
     mousePointer() {
-      // I NEED TO CLEAN THIS UP!!!!!!
       if (this.selectedTool === "pen") return { cursor: "crosshair" };
       if (this.selectedTool === "pick") return { cursor: "default" };
-      if (this.selectedTool === "text") return { cursor: "text" };
       return { cursor: "default" };
     }
   },
@@ -169,7 +158,7 @@ export default {
       this.showColorPicker = false;
     },
     clearWhiteboard() {
-      this.zwibblerCtx.newDocument();
+      this.zwibblerCtx.deletePage(this.zwibblerCtx.getCurrentPage());
       this.selectedTool = "";
       this.showColorPicker = false;
       this.useBrushTool();
@@ -181,11 +170,6 @@ export default {
     useBrushTool() {
       this.zwibblerCtx.useBrushTool();
       this.selectedTool = "pen";
-      this.showColorPicker = false;
-    },
-    useTextTool() {
-      this.zwibblerCtx.useTextTool();
-      this.selectedTool = "text";
       this.showColorPicker = false;
     },
     undo() {
@@ -213,32 +197,31 @@ export default {
 
 <style lang="scss">
 .zwib-wrapper {
-  margin: 20px;
   height: 100%;
   width: 100%;
   position: relative;
 }
 
 #zwib-div {
-  margin: 10px;
   height: 100%;
   width: 100%;
 }
 
-#toolbar {
-  background-color: rgb(238, 238, 238);
-  margin: 0;
+ul#toolbar {
+  list-style-type: none;
+  padding-left: 0;
+  width: 400px;
   height: 80px;
+  position: absolute;
+  bottom: 60px;
+  left: 0;
+  right: 0;
+  margin: auto;
   display: flex;
   align-items: center;
   justify-content: space-around;
-  position: fixed;
-  bottom: 20px;
   border-radius: 8px;
-  list-style-type: none;
-  left: 20px;
-  width: 400px;
-  padding-left: 0;
+  background-color: rgb(238, 238, 238);
 }
 
 .tool__item {
@@ -250,8 +233,20 @@ export default {
   width: 100%;
   height: 100%;
 
+  &:first-child {
+    border-radius: 8px 0 0 8px;
+  }
+
+  &:last-child {
+    border-radius: 0 8px 8px 0;
+  }
+
   &:hover {
-    border: 1px solid blue;
+    cursor: pointer;
+  }
+
+  &:not(.selected-tool):hover {
+    background: #ddd;
   }
 
   &-color-picker {
@@ -268,7 +263,7 @@ export default {
 }
 
 .selected-tool {
-  background-color: #65b965;
+  background-color: #ddd;
 }
 
 .color-button {
