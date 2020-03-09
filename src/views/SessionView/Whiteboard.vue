@@ -1,6 +1,17 @@
 <template>
   <div class="zwib-wrapper">
-    <div id="zwib-div"></div>
+    <cross-icon
+      v-if="showDeleteStroke"
+      :style="{
+        position: 'absolute',
+        top: deleteIconCoordinates.y - 50,
+        left: deleteIconCoordinates.x + deleteIconCoordinates.width + 10,
+        zIndex: '1000'
+      }"
+      v-on:click="deleteSelectedNodes"
+      class="tool__item-svg tool__item-delete"
+    />
+    <div id="zwib-div" :style="mousePointer"></div>
     <ul id="toolbar">
       <li
         class="tool__item"
@@ -22,8 +33,8 @@
           <li>
             <button
               class="color-button"
-              style="background-color: rgba(52, 52, 64, 0.6)"
-              @click="setColor('rgba(52, 52, 64, 0.6)')"
+              style="background-color: rgba(10, 10, 10, 1)"
+              @click="setColor('rgba(10, 10, 10, 1)')"
             />
           </li>
           <li>
@@ -84,6 +95,7 @@ import ColorPickerIcon from "@/assets/whiteboard_icons/color_picker.svg";
 import PenIcon from "@/assets/whiteboard_icons/pen.svg";
 import UndoIcon from "@/assets/whiteboard_icons/undo.svg";
 import RedoIcon from "@/assets/whiteboard_icons/redo.svg";
+import CrossIcon from "@/assets/cross.svg";
 
 export default {
   components: {
@@ -92,24 +104,44 @@ export default {
     ColorPickerIcon,
     PenIcon,
     UndoIcon,
-    RedoIcon
+    RedoIcon,
+    CrossIcon
   },
   data() {
     return {
       zwibbler: null,
       selectedTool: "pen",
-      showColorPicker: false
+      showColorPicker: false,
+      deleteIconCoordinates: {},
+      showDeleteStroke: false,
+      isMouseDown: false
     };
   },
   computed: {
     ...mapState({
       session: state => state.user.session
-    })
+    }),
+    mousePointer() {
+      if (this.selectedTool === "pen") return { cursor: "crosshair" };
+      if (this.selectedTool === "pick") return { cursor: "default" };
+      return { cursor: "default" };
+    }
   },
   mounted() {
+    document.addEventListener("click", () => {
+      var rect = this.zwibblerCtx.getBoundingRectangle(
+        this.zwibblerCtx.getSelectedNodes()
+      );
+      if (this.selectedTool === "pick" && rect.x && rect.y) {
+        this.deleteIconCoordinates = rect;
+        this.showDeleteStroke = true;
+      }
+    });
+
     const zwibblerCtx = window.Zwibbler.create("zwib-div", {
       showToolbar: false,
       showColourPanel: false,
+      autoPickToolText: false,
       collaborationServer: `${
         process.env.VUE_APP_WEBSOCKET_ROOT
       }/whiteboard/room/{name}`
@@ -128,10 +160,11 @@ export default {
       this.showColorPicker = false;
     },
     clearWhiteboard() {
-      this.zwibblerCtx.newDocument();
+      this.zwibblerCtx.deletePage(this.zwibblerCtx.getCurrentPage());
       this.selectedTool = "";
       this.showColorPicker = false;
       this.useBrushTool();
+      this.showDeleteStroke = false;
     },
     toggleColorPicker() {
       this.showColorPicker = !this.showColorPicker;
@@ -144,15 +177,21 @@ export default {
     undo() {
       this.zwibblerCtx.undo();
       this.showColorPicker = false;
+      this.showDeleteStroke = false;
     },
     redo() {
       this.zwibblerCtx.redo();
       this.showColorPicker = false;
+      this.showDeleteStroke = false;
     },
     setColor(color) {
       // Second parameter indicates whether the colour should affect the fill or outline colour.
       const useFill = true;
       this.zwibblerCtx.setColour(color, useFill);
+    },
+    deleteSelectedNodes() {
+      this.zwibblerCtx.deleteNodes(this.zwibblerCtx.getSelectedNodes());
+      this.showDeleteStroke = !this.showDeleteStroke;
     }
   }
 };
@@ -218,6 +257,10 @@ ul#toolbar {
 
   &-svg {
     width: 20px;
+  }
+
+  &-delete {
+    fill: #b55050;
   }
 }
 
