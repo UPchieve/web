@@ -110,7 +110,9 @@ export default {
     const zwibblerCtx = window.Zwibbler.create("zwib-div", {
       showToolbar: false,
       showColourPanel: false,
-      collaborationServer: "ws://localhost:3000/whiteboard/room/{name}"
+      collaborationServer: `${
+        process.env.VUE_APP_WEBSOCKET_ROOT
+      }/whiteboard/room/{name}`
     });
 
     this.zwibblerCtx = zwibblerCtx;
