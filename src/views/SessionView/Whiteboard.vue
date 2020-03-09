@@ -202,7 +202,7 @@ export default {
 
 #toolbar {
   max-width: 400px;
-  height: 80px;
+  height: 70px;
   position: absolute;
   bottom: 60px;
   left: 0;
@@ -258,22 +258,22 @@ export default {
   left: 0;
   right: 0;
   margin: 0 auto;
-  bottom: 70px;
+  bottom: 58px;
   display: flex;
   justify-content: space-around;
   background-color: #fff;
   border: 1px solid #d8d8d8;
   border-radius: 5px;
-  width: 225px;
+  width: 200px;
   padding: 10px 8px;
   cursor: default;
 }
 
 .color-button {
-  height: 24px;
-  width: 24px;
+  height: 22px;
+  width: 22px;
+  border-radius: 22px;
   cursor: pointer;
-  border-radius: 24px;
   border: solid 2px #fff;
   transition: border-color 0.2s;
 
