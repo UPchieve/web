@@ -54,6 +54,25 @@ Cypress.Commands.add("deleteUserByEmail", email => {
   });
 });
 
+Cypress.Commands.add("getSessionId", url => {
+  let index = url.length - 1;
+
+  while (url[index - 1] !== "/") {
+    index--;
+  }
+  const sessionId = url.slice(index, url.length);
+
+  return sessionId;
+});
+
+Cypress.Commands.add("endAllSessions", () => {
+  cy.request({
+    method: "POST",
+    url: `${API_ROOT}/session/end-all`,
+    body: {}
+  });
+});
+
 Cypress.Commands.add("getVolunteerCodes", () => {
   //get valid codes from server
   const validCodesUrl = `${Cypress.env(

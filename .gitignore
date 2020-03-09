@@ -21,3 +21,6 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Licensed third party software
+public/static/js/zwibbler2.js
