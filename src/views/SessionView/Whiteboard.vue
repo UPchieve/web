@@ -201,7 +201,7 @@ export default {
 }
 
 #toolbar {
-  width: 400px;
+  max-width: 400px;
   height: 80px;
   position: absolute;
   bottom: 60px;
