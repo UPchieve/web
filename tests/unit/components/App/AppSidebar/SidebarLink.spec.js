@@ -5,6 +5,7 @@ import Vuex from "vuex";
 import { storeOptions } from "@/store";
 import SidebarLink from "@/components/App/AppSidebar/SidebarLink";
 import UpchieveIcon from "@/components/UpchieveIcon";
+import HouseIcon from "@/assets/sidebar_icons/house.svg";
 
 const localVue = createLocalVue();
 localVue.use(VueRouter);
@@ -17,19 +18,22 @@ const getWrapper = (propsData = {}, collapse) => {
     })
   );
 
-  return shallowMount(SidebarLink, { localVue, store, propsData });
+  return shallowMount(SidebarLink, {
+    localVue,
+    store,
+    propsData,
+    slots: {
+      default: HouseIcon
+  } });
 };
 
 describe("SidebarLink", () => {
   it("renders expected elements", () => {
-    const wrapper = getWrapper({ to: "/", icon: "house", text: "Home" });
+    const wrapper = getWrapper({ to: "/", icon: HouseIcon, text: "Home" });
     expect(wrapper.is("router-link-stub")).toBe(true);
     expect(wrapper.classes()).toEqual(["SidebarLink"]);
     expect(wrapper.props("to")).toBe("/");
-
-    const icon = wrapper.find(UpchieveIcon);
-    expect(icon.exists()).toBe(true);
-    expect(icon.props("icon")).toBe("house");
+    expect(wrapper.contains(HouseIcon)).toBe(true);
 
     const text = wrapper.find("p");
     expect(text.text()).toBe("Home");
@@ -44,7 +48,7 @@ describe("SidebarLink", () => {
   it("collapses sidebar when clicked", () => {
     const collapse = jest.fn();
     const wrapper = getWrapper(
-      { to: "/", icon: "house", text: "Home" },
+      { to: "/", icon: HouseIcon, text: "Home" },
       collapse
     );
     wrapper.trigger("click");
