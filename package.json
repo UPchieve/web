@@ -63,7 +63,8 @@
     "npm": ">= 6.0.0"
   },
   "devDependencies": {
-    "husky": "^4.2.3"
+    "husky": "^4.2.3",
+    "vue-jest": "^3.0.5"
   },
   "husky": {
     "hooks": {
