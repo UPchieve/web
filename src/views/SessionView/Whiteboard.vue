@@ -112,6 +112,7 @@ export default {
       showToolbar: false,
       showColourPanel: false,
       autoPickToolText: false,
+      defaultBrushWidth: 5,
       collaborationServer: `${
         process.env.VUE_APP_WEBSOCKET_ROOT
       }/whiteboard/room/{name}`
