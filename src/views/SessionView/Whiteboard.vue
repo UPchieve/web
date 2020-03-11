@@ -89,7 +89,7 @@ export default {
   },
   data() {
     return {
-      zwibbler: null,
+      zwibblerCtx: null,
       selectedTool: "pen",
       showColorPicker: false,
       deleteIconCoordinates: {},
