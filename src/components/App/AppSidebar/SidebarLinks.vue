@@ -44,14 +44,14 @@
 
 <script>
 import SidebarLink from "./SidebarLink";
-import HouseIcon from "@/assets/sidebar_icons/house.svg";
-import GraduationCapIcon from "@/assets/sidebar_icons/graduation-cap.svg";
-import CalendarIcon from "@/assets/sidebar_icons/calendar.svg";
-import BookIcon from "@/assets/sidebar_icons/book.svg";
-import FolderIcon from "@/assets/sidebar_icons/folder.svg";
-import EnvelopeIcon from "@/assets/sidebar_icons/envelope.svg";
-import ExclamationIcon from "@/assets/sidebar_icons/exclamation.svg";
-import PortraitIcon from "@/assets/sidebar_icons/portrait.svg";
+import HouseIcon from "@/assets/sidebar_icons/house.svg?inline";
+import GraduationCapIcon from "@/assets/sidebar_icons/graduation-cap.svg?inline";
+import CalendarIcon from "@/assets/sidebar_icons/calendar.svg?inline";
+import BookIcon from "@/assets/sidebar_icons/book.svg?inline";
+import FolderIcon from "@/assets/sidebar_icons/folder.svg?inline";
+import EnvelopeIcon from "@/assets/sidebar_icons/envelope.svg?inline";
+import ExclamationIcon from "@/assets/sidebar_icons/exclamation.svg?inline";
+import PortraitIcon from "@/assets/sidebar_icons/portrait.svg?inline";
 
 export default {
   components: {
