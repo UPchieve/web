@@ -1,17 +1,6 @@
 <template>
   <div class="zwib-wrapper">
-    <cross-icon
-      v-if="showDeleteStroke"
-      :style="{
-        position: 'absolute',
-        top: deleteIconCoordinates.y - 50,
-        left: deleteIconCoordinates.x + deleteIconCoordinates.width + 10,
-        zIndex: '1000'
-      }"
-      v-on:click="deleteSelectedNodes"
-      class="tool__item-svg tool__item-delete"
-    />
-    <div id="zwib-div" :style="mousePointer"></div>
+    <div id="zwib-div" :style="mouseCursor"></div>
     <div id="toolbar">
       <div
         class="tool__item"
@@ -80,13 +69,14 @@
 
 <script>
 import { mapState } from "vuex";
-import SelectionIcon from "@/assets/whiteboard_icons/selection.svg";
-import ClearIcon from "@/assets/whiteboard_icons/clear.svg";
-import ColorPickerIcon from "@/assets/whiteboard_icons/color_picker.svg";
-import PenIcon from "@/assets/whiteboard_icons/pen.svg";
-import UndoIcon from "@/assets/whiteboard_icons/undo.svg";
-import RedoIcon from "@/assets/whiteboard_icons/redo.svg";
-import CrossIcon from "@/assets/cross.svg";
+import SelectionIcon from "@/assets/whiteboard_icons/selection.svg?inline";
+import ClearIcon from "@/assets/whiteboard_icons/clear.svg?inline";
+import ColorPickerIcon from "@/assets/whiteboard_icons/color_picker.svg?inline";
+import PenIcon from "@/assets/whiteboard_icons/pen.svg?inline";
+import UndoIcon from "@/assets/whiteboard_icons/undo.svg?inline";
+import RedoIcon from "@/assets/whiteboard_icons/redo.svg?inline";
+import DeleteSelectionIcon from "@/assets/whiteboard_icons/delete_selection.svg";
+import RotateIcon from "@/assets/whiteboard_icons/rotate.svg";
 
 export default {
   components: {
@@ -95,8 +85,7 @@ export default {
     ColorPickerIcon,
     PenIcon,
     UndoIcon,
-    RedoIcon,
-    CrossIcon
+    RedoIcon
   },
   data() {
     return {
@@ -112,23 +101,13 @@ export default {
     ...mapState({
       session: state => state.user.session
     }),
-    mousePointer() {
+    mouseCursor() {
       if (this.selectedTool === "pen") return { cursor: "crosshair" };
       if (this.selectedTool === "pick") return { cursor: "default" };
       return { cursor: "default" };
     }
   },
   mounted() {
-    document.addEventListener("click", () => {
-      var rect = this.zwibblerCtx.getBoundingRectangle(
-        this.zwibblerCtx.getSelectedNodes()
-      );
-      if (this.selectedTool === "pick" && rect.x && rect.y) {
-        this.deleteIconCoordinates = rect;
-        this.showDeleteStroke = true;
-      }
-    });
-
     const zwibblerCtx = window.Zwibbler.create("zwib-div", {
       showToolbar: false,
       showColourPanel: false,
@@ -139,9 +118,9 @@ export default {
     });
 
     this.zwibblerCtx = zwibblerCtx;
-
-    zwibblerCtx.createSharedSession(this.session._id);
-
+    this.zwibblerCtx.createSharedSession(this.session._id);
+    this.setSelectionHandles();
+    // Set brush tool to default tool
     this.useBrushTool();
   },
   methods: {
@@ -151,7 +130,7 @@ export default {
       this.showColorPicker = false;
     },
     clearWhiteboard() {
-      this.zwibblerCtx.deletePage(this.zwibblerCtx.getCurrentPage());
+      this.zwibblerCtx.deleteNodes(this.zwibblerCtx.getAllNodes());
       this.selectedTool = "";
       this.showColorPicker = false;
       this.useBrushTool();
@@ -183,6 +162,25 @@ export default {
     deleteSelectedNodes() {
       this.zwibblerCtx.deleteNodes(this.zwibblerCtx.getSelectedNodes());
       this.showDeleteStroke = !this.showDeleteStroke;
+    },
+    setSelectionHandles() {
+      this.zwibblerCtx.removeSelectionHandles();
+      this.zwibblerCtx.addSelectionHandle(
+        0.5,
+        0.0,
+        0,
+        -30,
+        RotateIcon,
+        "rotate"
+      );
+      this.zwibblerCtx.addSelectionHandle(
+        1.0,
+        0.0,
+        20,
+        -30,
+        DeleteSelectionIcon,
+        () => this.zwibblerCtx.deleteSelection()
+      );
     }
   }
 };
@@ -226,6 +224,11 @@ export default {
 
   &:first-child {
     border-radius: 8px 0 0 8px;
+
+    & svg {
+      width: 26px;
+      height: 26px;
+    }
   }
 
   &:last-child {
