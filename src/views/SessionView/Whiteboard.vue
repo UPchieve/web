@@ -164,15 +164,11 @@ export default {
       this.showDeleteStroke = !this.showDeleteStroke;
     },
     setSelectionHandles() {
+      // Remove all pre-defined selection handles.
       this.zwibblerCtx.removeSelectionHandles();
-      this.zwibblerCtx.addSelectionHandle(
-        0.5,
-        0.0,
-        0,
-        -30,
-        RotateIcon,
-        "rotate"
-      );
+
+      // Add custom selection handle for deleting selection,
+      // positioned in the top-right of the selection.
       this.zwibblerCtx.addSelectionHandle(
         1.0,
         0.0,
@@ -181,6 +177,31 @@ export default {
         DeleteSelectionIcon,
         () => this.zwibblerCtx.deleteSelection()
       );
+
+      // Add rotation handle with custom icon,
+      // positioned in the top-middle of the selection.
+      this.zwibblerCtx.addSelectionHandle(
+        0.5,
+        0.0,
+        0,
+        -30,
+        RotateIcon,
+        "rotate"
+      );
+
+      // Re-add default scaling handles.
+
+      // Position scaling handles at all four corners of the selection.
+      this.zwibblerCtx.addSelectionHandle(0.0, 0.0, 0, 0, "", "scale");
+      this.zwibblerCtx.addSelectionHandle(1.0, 0.0, 0, 0, "", "scale");
+      this.zwibblerCtx.addSelectionHandle(1.0, 1.0, 0, 0, "", "scale");
+      this.zwibblerCtx.addSelectionHandle(0.0, 1.0, 0, 0, "", "scale");
+
+      // Position more scaling handles at the midpoints of each side of the selection.
+      this.zwibblerCtx.addSelectionHandle(0.5, 0.0, 0, 0, "", "scale");
+      this.zwibblerCtx.addSelectionHandle(1.0, 0.5, 0, 0, "", "scale");
+      this.zwibblerCtx.addSelectionHandle(0.5, 1.0, 0, 0, "", "scale");
+      this.zwibblerCtx.addSelectionHandle(0.0, 0.5, 0, 0, "", "scale");
     }
   }
 };
