@@ -3,7 +3,7 @@
     <div id="zwib-div" :style="mouseCursor"></div>
     <div id="toolbar">
       <div
-        class="tool__item"
+        class="tool__item tool__item-pick"
         v-bind:class="selectedTool === 'pick' ? 'selected-tool' : ''"
         @click="usePickTool"
       >
@@ -245,11 +245,6 @@ export default {
 
   &:first-child {
     border-radius: 8px 0 0 8px;
-
-    & svg {
-      width: 26px;
-      height: 26px;
-    }
   }
 
   &:last-child {
@@ -264,12 +259,18 @@ export default {
     background: #e2e2e2;
   }
 
-  &-svg {
-    width: 20px;
+  &-pick {
+    // Pick tool / select tool
+    & svg {
+      width: 26px;
+      height: 26px;
+
+      padding: 3px 0 0 3px;
+    }
   }
 
-  &-delete {
-    fill: #b55050;
+  &-svg {
+    width: 20px;
   }
 }
 
