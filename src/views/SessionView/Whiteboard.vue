@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 import SelectionIcon from "@/assets/whiteboard_icons/selection.svg?inline";
 import ClearIcon from "@/assets/whiteboard_icons/clear.svg?inline";
 import ColorPickerIcon from "@/assets/whiteboard_icons/color_picker.svg?inline";
@@ -87,6 +87,12 @@ export default {
     UndoIcon,
     RedoIcon
   },
+  props: {
+    isVisible: {
+      type: Boolean,
+      required: true
+    }
+  },
   data() {
     return {
       zwibblerCtx: null,
@@ -100,6 +106,9 @@ export default {
   computed: {
     ...mapState({
       session: state => state.user.session
+    }),
+    ...mapGetters({
+      mobileMode: "app/mobileMode"
     }),
     mouseCursor() {
       if (this.selectedTool === "pen") return { cursor: "crosshair" };
@@ -123,6 +132,31 @@ export default {
     this.setSelectionHandles();
     // Set brush tool to default tool
     this.useBrushTool();
+
+    this.zwibblerCtx.on("document-changed", info => {
+      const isRemoteChange = info.remote;
+      const isWhiteboardHidden = this.mobileMode && !this.isVisible;
+      const shouldResizeView = isRemoteChange && isWhiteboardHidden;
+
+      /**
+       * If mobile user is viewing chat when new whiteboard changes are made,
+       * resize the view so they can see everything on the whiteboard
+       */
+      if (shouldResizeView) {
+        /**
+         * Note: this event can fire before the new doc changes are available in the whiteboard context,
+         * so we wait 500ms before calling `getAllNodes`
+         */
+        setTimeout(() => {
+          // Set the Zwibbler view to a rectangle that fits all whiteboard nodes
+          this.zwibblerCtx.setViewRectangle(
+            this.zwibblerCtx.getBoundingRectangle(
+              this.zwibblerCtx.getAllNodes()
+            )
+          );
+        }, 500);
+      }
+    });
   },
   methods: {
     usePickTool() {

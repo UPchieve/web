@@ -17,7 +17,7 @@
           'whiteboard-container--hidden': shouldHideWhiteboardSection
         }"
       >
-        <whiteboard />
+        <whiteboard :isVisible="whiteboardOpen" />
       </div>
       <div
         class="chat-container"
