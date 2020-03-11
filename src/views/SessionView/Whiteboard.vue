@@ -220,6 +220,10 @@ export default {
   width: 100%;
 }
 
+.zwibbler-scrollbar {
+  cursor: default;
+}
+
 #toolbar {
   max-width: 400px;
   height: 70px;
