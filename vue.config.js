@@ -15,7 +15,7 @@ module.exports = {
         })
     );
 
-    // https://vue-svg-loader.js.org/faq.html
+    // https://vue-svg-loader.js.org/faq.html#how-to-use-both-inline-and-external-svgs
     const svgRule = config.module.rule("svg");
     svgRule.uses.clear();
     svgRule
