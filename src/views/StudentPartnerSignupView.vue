@@ -27,9 +27,14 @@
             >
             <span v-else>Welcome to UPchieve!</span>
           </div>
-          <div v-if="studentPartner.name" class="step-header__subtitle">
-            Not with {{ studentPartner.name }}?
-            <router-link to="/signup">Click here</router-link>
+          <div class="step-header__subtitle">
+            <span v-if="studentPartner.name"
+              >Not with {{ studentPartner.name }}?
+              <router-link to="/signup">Click here</router-link></span
+            >
+            <span v-else
+              >We're a free online tutoring platform for HS students</span
+            >
           </div>
         </div>
 
