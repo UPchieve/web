@@ -4,6 +4,7 @@
     <div id="toolbar">
       <div
         class="tool__item tool__item-pick"
+        title="Pick tool"
         v-bind:class="selectedTool === 'pick' ? 'selected-tool' : ''"
         @click="usePickTool"
       >
@@ -11,6 +12,7 @@
       </div>
       <div
         class="tool__item"
+        title="Brush tool"
         v-bind:class="selectedTool === 'pen' ? 'selected-tool' : ''"
         @click="useBrushTool"
       >
@@ -18,52 +20,59 @@
       </div>
       <div
         class="tool__item tool__item-color-picker"
+        title="Color picker"
         @click="toggleColorPicker"
       >
         <ColorPickerIcon class="tool__item-svg" />
         <div v-if="showColorPicker" class="color-bar">
           <button
             class="color-button"
+            title="Black"
             style="background-color: rgba(10, 10, 10, 1)"
             @click="setColor('rgba(10, 10, 10, 1)')"
           />
           <button
             class="color-button"
+            title="Navy"
             style="background-color: rgba(38, 51, 104, 1)"
             @click="setColor('rgba(38, 51, 104, 1)')"
           />
           <button
             class="color-button"
+            title="Red"
             style="background-color: rgba(244, 71, 71, 1)"
             @click="setColor('rgba(244, 71, 71, 1)')"
           />
           <button
             class="color-button"
-            style="background-color: rgba(255, 208, 115, 0.6)"
-            @click="setColor('rgba(255, 208, 115, 0.6)')"
+            title="Sand"
+            style="background-color: rgba(249, 227, 183, 1)"
+            @click="setColor('rgba(249, 227, 183, 1)')"
           />
           <button
             class="color-button"
-            style="background-color: rgba(22, 210, 170, 0.6)"
-            @click="setColor('rgba(22, 210, 170, 0.6)')"
+            title="Teal"
+            style="background-color: rgba(123, 222, 201, 1)"
+            @click="setColor('rgba(123, 222, 201, 1)')"
           />
           <button
             class="color-button"
-            style="background-color: rgba(24, 85, 209, 0.6)"
-            @click="setColor('rgba(24, 85, 209, 0.6)')"
+            title="Light Blue"
+            style="background-color: rgba(119, 151, 216, 1)"
+            @click="setColor('rgba(119, 151, 216, 1)')"
           />
         </div>
       </div>
-      <div class="tool__item" @click="usePanTool">
+      <div class="tool__item" title="Drag tool" @click="usePanTool">
         <PanIcon class="tool__item-svg" />
       </div>
-      <div class="tool__item" @click="undo">
+      <div class="tool__item" title="Undo" @click="undo">
         <UndoIcon class="tool__item-svg" />
       </div>
-      <div class="tool__item" @click="redo">
+      <div class="tool__item" title="Redo" @click="redo">
         <RedoIcon class="tool__item-svg" />
       </div>
-      <div class="tool__item" @click="clearWhiteboard">
+      <div class="tool__item" title="Clear whiteboard" @click="clearWhiteboard">
         <ClearIcon class="tool__item-svg" />
       </div>
     </div>
