@@ -54,6 +54,9 @@
           />
         </div>
       </div>
+      <div class="tool__item" @click="usePanTool">
+        <PanIcon class="tool__item-svg" />
+      </div>
       <div class="tool__item" @click="undo">
         <UndoIcon class="tool__item-svg" />
       </div>
@@ -77,6 +80,7 @@ import UndoIcon from "@/assets/whiteboard_icons/undo.svg?inline";
 import RedoIcon from "@/assets/whiteboard_icons/redo.svg?inline";
 import DeleteSelectionIcon from "@/assets/whiteboard_icons/delete_selection.svg";
 import RotateIcon from "@/assets/whiteboard_icons/rotate.svg";
+import PanIcon from "@/assets/whiteboard_icons/grab.svg?inline";
 
 export default {
   components: {
@@ -85,7 +89,8 @@ export default {
     ColorPickerIcon,
     PenIcon,
     UndoIcon,
-    RedoIcon
+    RedoIcon,
+    PanIcon
   },
   props: {
     isVisible: {
@@ -98,8 +103,6 @@ export default {
       zwibblerCtx: null,
       selectedTool: "pen",
       showColorPicker: false,
-      deleteIconCoordinates: {},
-      showDeleteStroke: false,
       isMouseDown: false
     };
   },
@@ -113,6 +116,7 @@ export default {
     mouseCursor() {
       if (this.selectedTool === "pen") return { cursor: "crosshair" };
       if (this.selectedTool === "pick") return { cursor: "default" };
+      if (this.selectedTool === "pan") return { cursor: "grab" };
       return { cursor: "default" };
     }
   },
@@ -169,7 +173,6 @@ export default {
       this.selectedTool = "";
       this.showColorPicker = false;
       this.useBrushTool();
-      this.showDeleteStroke = false;
     },
     toggleColorPicker() {
       this.showColorPicker = !this.showColorPicker;
@@ -182,21 +185,20 @@ export default {
     undo() {
       this.zwibblerCtx.undo();
       this.showColorPicker = false;
-      this.showDeleteStroke = false;
     },
     redo() {
       this.zwibblerCtx.redo();
       this.showColorPicker = false;
-      this.showDeleteStroke = false;
+    },
+    usePanTool() {
+      this.zwibblerCtx.usePanTool();
+      this.selectedTool = "pan";
+      this.showColorPicker = false;
     },
     setColor(color) {
       // Second parameter indicates whether the colour should affect the fill or outline colour.
       const useFill = true;
       this.zwibblerCtx.setColour(color, useFill);
-    },
-    deleteSelectedNodes() {
-      this.zwibblerCtx.deleteNodes(this.zwibblerCtx.getSelectedNodes());
-      this.showDeleteStroke = !this.showDeleteStroke;
     },
     setSelectionHandles() {
       // Remove all pre-defined selection handles.
