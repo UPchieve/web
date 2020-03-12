@@ -149,7 +149,7 @@
           />
         </div>
 
-        <div v-if="studentPartner.highSchoolSignup" class="uc-form-checkbox">
+        <div v-if="showHighSchoolCheckbox" class="uc-form-checkbox">
           <input
             id="highSchoolCheckbox"
             v-model="isHighSchoolStudent"
@@ -247,7 +247,8 @@ export default {
     return {
       studentPartner: {
         name: "",
-        highSchoolSignup: false
+        highSchoolSignup: false,
+        highSchoolSignupRequired: false
       },
       formStep: "step-1",
       isHighSchoolStudent: false,
@@ -266,8 +267,25 @@ export default {
     };
   },
   computed: {
-    showHighSchoolSelector() {
+    showHighSchoolCheckbox() {
+      // Don't show if high school input is disabled
       if (!this.studentPartner.highSchoolSignup) return false;
+
+      // Don't show if high school input is required
+      if (this.studentPartner.highSchoolSignupRequired) return false;
+
+      // Only show if high school input is enabled but not required, i.e. optional
+      return true;
+    },
+
+    showHighSchoolSelector() {
+      // No high school input
+      if (!this.studentPartner.highSchoolSignup) return false;
+
+      // Require high school input
+      if (this.studentPartner.highSchoolSignupRequired) return true;
+
+      // Optional high school input, so show if the checkbox is selected
       return this.isHighSchoolStudent;
     }
   },
@@ -360,6 +378,13 @@ export default {
       }
       if (!this.formData.lastName) {
         this.invalidInputs.push("lastName");
+      }
+      if (
+        this.studentPartner.highSchoolSignupRequired &&
+        !this.formData.highSchoolUpchieveId
+      ) {
+        this.errors.push("You must select your high school.");
+        this.invalidInputs.push("inputHighschool");
       }
       if (!this.formData.terms) {
         this.errors.push("You must read and accept the user agreement.");

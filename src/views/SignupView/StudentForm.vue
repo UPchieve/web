@@ -355,7 +355,7 @@ export default {
       this.invalidInputs = [];
 
       if (!this.eligibility.highSchool.upchieveId) {
-        this.errors.push("You must select a high school.");
+        this.errors.push("You must select your high school.");
       }
       if (this.errors.length) {
         return;
