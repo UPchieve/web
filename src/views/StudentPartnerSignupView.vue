@@ -22,9 +22,12 @@
 
         <div class="step-header">
           <div class="step-header__title">
-            Welcome {{ studentPartner.name }} Student!
+            <span v-if="studentPartner.name"
+              >Welcome {{ studentPartner.name }} Student!</span
+            >
+            <span v-else>Welcome to UPchieve!</span>
           </div>
-          <div class="step-header__subtitle">
+          <div v-if="studentPartner.name" class="step-header__subtitle">
             Not with {{ studentPartner.name }}?
             <router-link to="/signup">Click here</router-link>
           </div>
