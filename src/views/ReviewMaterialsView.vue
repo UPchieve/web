@@ -40,8 +40,8 @@ export default {
   },
   methods: {
     getCategoryMaterials() {
-      const LONG_REVIEW_TEXT = "Long Review Guide";
-      const SHORT_REVIEW_TEXT = "Short Review Guide";
+      const TOPICS_AND_RESOURCES = "Topics & Resources";
+      const CONCEPT_REVIEW = "Concept Review";
 
       switch (this.category) {
         case "algebra":
@@ -66,65 +66,65 @@ export default {
         case "geometry":
           this.reviewMaterials = [
             {
-              title: LONG_REVIEW_TEXT,
+              title: TOPICS_AND_RESOURCES,
               pdf: require(`../assets/review_materials/geometry/geometry-long-guide.pdf`),
-              image: require(`../assets/review_materials/geometry/geometry-long-guide.png`)
+              image: require(`../assets/review_materials/geometry/geometry-topics-and-resources.png`)
             },
             {
-              title: SHORT_REVIEW_TEXT,
+              title: CONCEPT_REVIEW,
               pdf: require(`../assets/review_materials/geometry/geometry-short-guide.pdf`),
-              image: require(`../assets/review_materials/geometry/geometry-short-guide.png`)
+              image: require(`../assets/review_materials/geometry/geometry-concept-review.png`)
             }
           ];
           break;
         case "trigonometry":
           this.reviewMaterials = [
             {
-              title: LONG_REVIEW_TEXT,
+              title: TOPICS_AND_RESOURCES,
               pdf: require(`../assets/review_materials/trigonometry/trigonometry-long-guide.pdf`),
-              image: require(`../assets/review_materials/trigonometry/trigonometry-long-guide.png`)
+              image: require(`../assets/review_materials/trigonometry/trigonometry-topics-and-resources.png`)
             },
             {
-              title: SHORT_REVIEW_TEXT,
+              title: CONCEPT_REVIEW,
               pdf: require(`../assets/review_materials/trigonometry/trigonometry-short-guide.pdf`),
-              image: require(`../assets/review_materials/trigonometry/trigonometry-short-guide.png`)
+              image: require(`../assets/review_materials/trigonometry/trigonometry-concept-review.png`)
             }
           ];
           break;
         case "precalculus":
           this.reviewMaterials = [
             {
-              title: LONG_REVIEW_TEXT,
+              title: TOPICS_AND_RESOURCES,
               pdf: require(`../assets/review_materials/precalculus/precalculus-long-guide.pdf`),
-              image: require(`../assets/review_materials/precalculus/precalculus-long-guide.png`)
+              image: require(`../assets/review_materials/precalculus/precalculus-topics-and-resources.png`)
             },
             {
-              title: SHORT_REVIEW_TEXT,
+              title: CONCEPT_REVIEW,
               pdf: require(`../assets/review_materials/precalculus/precalculus-short-guide.pdf`),
-              image: require(`../assets/review_materials/precalculus/precalculus-short-guide.png`)
+              image: require(`../assets/review_materials/precalculus/precalculus-concept-review.png`)
             }
           ];
           break;
         case "calculus":
           this.reviewMaterials = [
             {
-              title: LONG_REVIEW_TEXT,
+              title: TOPICS_AND_RESOURCES,
               pdf: require(`../assets/review_materials/calculus/calculus-long-guide.pdf`),
-              image: require(`../assets/review_materials/calculus/calculus-long-guide.png`)
+              image: require(`../assets/review_materials/calculus/calculus-topics-and-resources.png`)
             },
             {
-              title: SHORT_REVIEW_TEXT,
+              title: CONCEPT_REVIEW,
               pdf: require(`../assets/review_materials/calculus/calculus-short-guide.pdf`),
-              image: require(`../assets/review_materials/calculus/calculus-short-guide.png`)
+              image: require(`../assets/review_materials/calculus/calculus-concept-review.png`)
             }
           ];
           break;
         case "planning":
           this.reviewMaterials = [
             {
-              title: "College Planning Guide",
+              title: "College Planning",
               pdf: require(`../assets/review_materials/planning/college-planning-guide.pdf`),
-              image: require(`../assets/review_materials/planning/college-planning-guide.png`)
+              image: require(`../assets/review_materials/planning/college-planning.png`)
             }
           ];
           break;
