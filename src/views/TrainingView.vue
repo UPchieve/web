@@ -325,10 +325,15 @@ a {
 .review-container .arrow.right {
   height: 1.3em;
   width: 1.3em;
+  transition: padding-left 0.1s ease-in;
 }
 
 .review-container .arrow.right::after {
   background-size: 24%;
+}
+
+.review-container:hover .arrow.right {
+  padding-left: 6px;
 }
 
 .arrow.down::after {
