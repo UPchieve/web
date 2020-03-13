@@ -374,7 +374,6 @@ a {
   }
 }
 
-
 @media screen and (max-width: 340px) {
   .category,
   .review {
