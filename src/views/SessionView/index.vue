@@ -17,7 +17,10 @@
           'whiteboard-container--hidden': shouldHideWhiteboardSection
         }"
       >
-        <whiteboard :isVisible="whiteboardOpen" />
+        <whiteboard
+          :shouldCreateSession="isNewSession"
+          :isVisible="whiteboardOpen"
+        />
       </div>
       <div
         class="chat-container"
@@ -83,7 +86,8 @@ export default {
     return {
       whiteboardOpen: false,
       icon: "Pencil.png",
-      sessionReconnecting: false
+      sessionReconnecting: false,
+      isNewSession: false
     };
   },
   computed: {
@@ -128,8 +132,10 @@ export default {
         type,
         this.$route.params.subTopic
       );
+      this.isNewSession = true;
     } else {
       promise = SessionService.useExistingSession(this, id);
+      this.isNewSession = false;
     }
 
     promise

@@ -107,6 +107,10 @@ export default {
     PanIcon
   },
   props: {
+    shouldCreateSession: {
+      type: Boolean,
+      default: true
+    },
     isVisible: {
       type: Boolean,
       required: true
@@ -146,8 +150,16 @@ export default {
     });
 
     this.zwibblerCtx = zwibblerCtx;
-    this.zwibblerCtx.createSharedSession(this.session._id);
+
+    if (this.shouldCreateSession) {
+      this.zwibblerCtx.createSharedSession(this.session._id);
+    } else {
+      this.zwibblerCtx.joinSharedSession(this.session._id);
+    }
+
+    // Set up custom selection handles
     this.setSelectionHandles();
+
     // Set brush tool to default tool
     this.useBrushTool();
 
