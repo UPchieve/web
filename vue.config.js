@@ -14,5 +14,11 @@ module.exports = {
           patterns: [path.resolve(__dirname, "./src/scss/setup/all.scss")]
         })
     );
+
+    config.module
+      .rule("pdf")
+      .test(/\.pdf$/)
+      .use("file-loader")
+      .loader("file-loader");
   }
 };
