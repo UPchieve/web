@@ -54,8 +54,10 @@
               <div v-if="hasPassed(category)" class="test-container certified">
                 Certified!
               </div>
-              <div v-if="!hasPassed(category)" class="numTries">
-                You have used {{ getTries(category) }}/3 tries.
+              <div v-if="!mobileMode">
+                <div v-if="!hasPassed(category)" class="numTries">
+                  You have used {{ getTries(category) }}/3 tries.
+                </div>
               </div>
             </div>
           </div>
@@ -67,7 +69,7 @@
 
 <script>
 import _ from "lodash";
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 import { topics, allSubtopics } from "@/utils/topics";
 
@@ -128,6 +130,9 @@ export default {
   },
 
   computed: {
+    ...mapGetters({
+      mobileMode: "app/mobileMode"
+    }),
     ...mapState({ user: state => state.user.user }),
 
     topicsToDisplay() {
@@ -248,7 +253,7 @@ a {
 }
 
 .review {
-  font-size: 12px;
+  font-size: 16px;
   text-align: start;
   display: inline-block;
 }
@@ -353,9 +358,27 @@ a {
   }
 }
 
+@media screen and (max-width: 460px) {
+  .category,
+  .review {
+    font-size: 14px;
+  }
+  .category-label {
+    width: 60%;
+  }
+}
+
 @media screen and (max-width: 375px) {
   .category-label {
     width: 70%;
+  }
+}
+
+
+@media screen and (max-width: 340px) {
+  .category,
+  .review {
+    font-size: 12px;
   }
 }
 </style>
