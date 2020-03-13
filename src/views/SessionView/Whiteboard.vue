@@ -3,6 +3,14 @@
     <div id="zwib-div" :style="mouseCursor"></div>
     <div id="toolbar">
       <div
+        class="tool__item"
+        title="Drag tool"
+        v-bind:class="selectedTool === 'pan' ? 'selected-tool' : ''"
+        @click="usePanTool"
+      >
+        <PanIcon class="tool__item-svg" />
+      </div>
+      <div
         class="tool__item tool__item-pick"
         title="Pick tool"
         v-bind:class="selectedTool === 'pick' ? 'selected-tool' : ''"
@@ -62,9 +70,6 @@
             @click="setColor('rgba(119, 151, 216, 1)')"
           />
         </div>
-      </div>
-      <div class="tool__item" title="Drag tool" @click="usePanTool">
-        <PanIcon class="tool__item-svg" />
       </div>
       <div class="tool__item" title="Undo" @click="undo">
         <UndoIcon class="tool__item-svg" />
