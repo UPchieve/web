@@ -47,75 +47,70 @@ export default {
         case "algebra":
           this.reviewMaterials = [
             {
-              title: "Concept Review",
+              title: CONCEPT_REVIEW,
               pdf: require(`../assets/review_materials/algebra/algebra-concept-review.pdf`),
               image: require(`../assets/review_materials/algebra/algebra-concept-review.png`)
             },
             {
-              title: "Topics & Resources",
+              title: TOPICS_AND_RESOURCES,
               pdf: require(`../assets/review_materials/algebra/algebra-topics-and-resources.pdf`),
               image: require(`../assets/review_materials/algebra/algebra-topics-and-resources.png`)
-            },
-            {
-              title: "Overall Guide",
-              pdf: require(`../assets/review_materials/algebra/algebra-overall-guide.pdf`),
-              image: require(`../assets/review_materials/algebra/algebra-overall-guide.png`)
             }
           ];
           break;
         case "geometry":
           this.reviewMaterials = [
             {
-              title: TOPICS_AND_RESOURCES,
-              pdf: require(`../assets/review_materials/geometry/geometry-long-guide.pdf`),
-              image: require(`../assets/review_materials/geometry/geometry-topics-and-resources.png`)
+              title: CONCEPT_REVIEW,
+              pdf: require(`../assets/review_materials/geometry/geometry-concept-review.pdf`),
+              image: require(`../assets/review_materials/geometry/geometry-concept-review.png`)
             },
             {
-              title: CONCEPT_REVIEW,
-              pdf: require(`../assets/review_materials/geometry/geometry-short-guide.pdf`),
-              image: require(`../assets/review_materials/geometry/geometry-concept-review.png`)
+              title: TOPICS_AND_RESOURCES,
+              pdf: require(`../assets/review_materials/geometry/geometry-topics-and-resources.pdf`),
+              image: require(`../assets/review_materials/geometry/geometry-topics-and-resources.png`)
             }
           ];
           break;
         case "trigonometry":
           this.reviewMaterials = [
             {
-              title: TOPICS_AND_RESOURCES,
-              pdf: require(`../assets/review_materials/trigonometry/trigonometry-long-guide.pdf`),
-              image: require(`../assets/review_materials/trigonometry/trigonometry-topics-and-resources.png`)
+              title: CONCEPT_REVIEW,
+              pdf: require(`../assets/review_materials/trigonometry/trigonometry-concept-review.pdf`),
+              image: require(`../assets/review_materials/trigonometry/trigonometry-concept-review.png`)
             },
             {
-              title: CONCEPT_REVIEW,
-              pdf: require(`../assets/review_materials/trigonometry/trigonometry-short-guide.pdf`),
-              image: require(`../assets/review_materials/trigonometry/trigonometry-concept-review.png`)
+              title: TOPICS_AND_RESOURCES,
+              pdf: require(`../assets/review_materials/trigonometry/trigonometry-topics-and-resources.pdf`),
+              image: require(`../assets/review_materials/trigonometry/trigonometry-topics-and-resources.png`)
             }
           ];
           break;
         case "precalculus":
           this.reviewMaterials = [
             {
-              title: TOPICS_AND_RESOURCES,
-              pdf: require(`../assets/review_materials/precalculus/precalculus-long-guide.pdf`),
-              image: require(`../assets/review_materials/precalculus/precalculus-topics-and-resources.png`)
+              title: CONCEPT_REVIEW,
+              pdf: require(`../assets/review_materials/precalculus/precalculus-concept-review.pdf`),
+              image: require(`../assets/review_materials/precalculus/precalculus-concept-review.png`)
             },
             {
-              title: CONCEPT_REVIEW,
-              pdf: require(`../assets/review_materials/precalculus/precalculus-short-guide.pdf`),
-              image: require(`../assets/review_materials/precalculus/precalculus-concept-review.png`)
+              title: TOPICS_AND_RESOURCES,
+              pdf: require(`../assets/review_materials/precalculus/precalculus-topics-and-resources.pdf`),
+              image: require(`../assets/review_materials/precalculus/precalculus-topics-and-resources.png`)
             }
           ];
           break;
         case "calculus":
           this.reviewMaterials = [
             {
-              title: TOPICS_AND_RESOURCES,
-              pdf: require(`../assets/review_materials/calculus/calculus-long-guide.pdf`),
-              image: require(`../assets/review_materials/calculus/calculus-topics-and-resources.png`)
+              title: CONCEPT_REVIEW,
+              pdf: require(`../assets/review_materials/calculus/calculus-concept-review.pdf`),
+              image: require(`../assets/review_materials/calculus/calculus-concept-review.png`)
             },
             {
-              title: CONCEPT_REVIEW,
-              pdf: require(`../assets/review_materials/calculus/calculus-short-guide.pdf`),
-              image: require(`../assets/review_materials/calculus/calculus-concept-review.png`)
+              title: TOPICS_AND_RESOURCES,
+              pdf: require(`../assets/review_materials/calculus/calculus-topics-and-resources.pdf`),
+              image: require(`../assets/review_materials/calculus/calculus-topics-and-resources.png`)
             }
           ];
           break;
@@ -123,7 +118,7 @@ export default {
           this.reviewMaterials = [
             {
               title: "College Planning",
-              pdf: require(`../assets/review_materials/planning/college-planning-guide.pdf`),
+              pdf: require(`../assets/review_materials/planning/college-planning.pdf`),
               image: require(`../assets/review_materials/planning/college-planning.png`)
             }
           ];
