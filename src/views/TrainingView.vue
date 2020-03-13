@@ -23,17 +23,19 @@
             v-show="supercategoryMenuDisplayStates[supercategory]"
             class="category"
           >
-            <div>
-              {{ category }}
+            <div class="category-label">
+              <span>
+                {{ category }}
+              </span>
               <div class="review">
                 <div class="review-container">
                   <div class="review-label">
-                    <a
-                      v-on:click.prevent="
-                        getReviewMaterial(categoryKeys[category])
-                      "
-                      >Review</a
+                    <router-link
+                      :to="'/training/review/' + categoryKeys[category]"
+                      tag="a"
                     >
+                      Review
+                    </router-link>
                   </div>
                   <div class="arrow right" />
                 </div>
@@ -68,7 +70,6 @@ import _ from "lodash";
 import { mapState } from "vuex";
 
 import { topics, allSubtopics } from "@/utils/topics";
-import NetworkService from "@/services/NetworkService";
 
 export default {
   data() {
@@ -101,30 +102,9 @@ export default {
       default: "#1855D1"
     };
 
-    const reviewMaterials = {};
-    reviewMaterials.algebra =
-      "https://drive.google.com/open?id=105iP5lJdVti-r2reY8N3tKQOA0FtrjZW";
-    reviewMaterials.geometry =
-      "https://drive.google.com/open?id=1Ug_JbG8_Rok60B__o0E4WQ426WV9VmJe";
-    reviewMaterials.trigonometry =
-      "https://drive.google.com/open?id=1cQ_JcY9IS29t4k8IaZHHJYKwV0FhkbX3";
-    reviewMaterials.precalculus =
-      "https://drive.google.com/open?id=1jOGiQNs_IWwh3cT2mW-1kj9I80NeotaT";
-    reviewMaterials.calculus =
-      "https://drive.google.com/open?id=1BePatfy99En5KwLEDVP2XTMdeMR0NEMx";
-    reviewMaterials.esl =
-      "https://drive.google.com/open?id=1P99PIY89X6VdvCGMMzjNOS55Nvljkc8Lv6FxmjJzo8Y";
-    reviewMaterials.planning =
-      "https://drive.google.com/open?id=1b_EHOgtrkkyWa6ge4fbKqxC7ZDgHrJxx";
-    reviewMaterials.essays =
-      "https://drive.google.com/open?id=1lJXVI1f9Do60pNXcBQGSZThNXhYmtMvV";
-    reviewMaterials.applications =
-      "https://drive.google.com/open?id=1gXmbGRaUz324-EiZMzph1KUYS8WhR9ax";
-
     return {
       quizzes,
       supercategoryColors,
-      reviewMaterials,
       categoryKeys,
       supercategoryMenuDisplayStates: {}
     };
@@ -193,13 +173,6 @@ export default {
         this.supercategoryColors[supercategory] ||
         this.supercategoryColors.default
       );
-    },
-    getReviewMaterial(category) {
-      NetworkService.getReviewMaterial(this, category).then(response => {
-        if (response.status === 204) {
-          window.location = this.reviewMaterials[category];
-        }
-      });
     }
   }
 };
@@ -277,6 +250,14 @@ a {
 .review {
   font-size: 12px;
   text-align: start;
+  display: inline-block;
+}
+
+.category-label {
+  width: 55%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .test {
@@ -366,6 +347,15 @@ a {
   .supercategory,
   .category {
     width: auto !important;
+  }
+  .test {
+    min-width: initial;
+  }
+}
+
+@media screen and (max-width: 375px) {
+  .category-label {
+    width: 70%;
   }
 }
 </style>
