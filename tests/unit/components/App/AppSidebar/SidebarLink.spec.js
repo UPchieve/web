@@ -42,7 +42,7 @@ describe("SidebarLink", () => {
   });
 
   it("conditionally renders icon", () => {
-    const wrapper = getWrapper({ to: "/", text: "Home" });
+    // const wrapper = getWrapper({ to: "/", text: "Home" });
     // const icon = wrapper.find(UpchieveIcon);
     // expect(icon.exists()).toBe(false);
   });
