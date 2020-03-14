@@ -144,6 +144,7 @@ export default {
       showColourPanel: false,
       autoPickToolText: false,
       defaultBrushWidth: 5,
+      scrollbars: this.mobileMode ? false : true,
       collaborationServer: `${
         process.env.VUE_APP_WEBSOCKET_ROOT
       }/whiteboard/room/{name}`
