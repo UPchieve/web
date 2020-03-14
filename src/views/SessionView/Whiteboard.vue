@@ -290,8 +290,8 @@ export default {
 #toolbar {
   max-width: 400px;
   height: 70px;
-  position: absolute;
-  bottom: 40px;
+  position: fixed;
+  bottom: 0;
   left: 0;
   right: 0;
   margin: auto;
@@ -300,6 +300,11 @@ export default {
   justify-content: space-around;
   border-radius: 8px;
   background-color: rgb(238, 238, 238);
+
+  @include breakpoint-above("medium") {
+    position: absolute;
+    bottom: 40px;
+  }
 }
 
 .tool__item {
