@@ -1,21 +1,32 @@
 <template>
   <div class="wrapper">
-    <h1 class="header-title">{{ category }} Review Materials</h1>
-    <div class="review-materials">
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        class="review-materials__link"
-        v-for="review in reviewMaterials"
-        :href="review.pdf"
-        :key="review.title"
-      >
-        <div class="review-materials__content">
-          <div class="image-overlay"></div>
-          <img :src="review.image" class="review-materials__image" />
-          <span class="review-materials__title">{{ review.title }}</span>
-        </div>
-      </a>
+    <div v-if="error">
+      <p class="error-message">
+        Please click
+        <router-link to="/training">
+          here
+        </router-link>
+        to see our available categories and their associated review materials.
+      </p>
+    </div>
+    <div v-else>
+      <h1 class="header-title">{{ category }} Review Materials</h1>
+      <div class="review-materials">
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          class="review-materials__link"
+          v-for="review in reviewMaterials"
+          :href="review.pdf"
+          :key="review.title"
+        >
+          <div class="review-materials__content">
+            <div class="image-overlay"></div>
+            <img :src="review.image" class="review-materials__image" />
+            <span class="review-materials__title">{{ review.title }}</span>
+          </div>
+        </a>
+      </div>
     </div>
   </div>
 </template>
@@ -28,7 +39,8 @@ export default {
   data() {
     return {
       reviewMaterials: [],
-      category: ""
+      category: "",
+      error: false
     };
   },
   mounted() {
@@ -36,81 +48,28 @@ export default {
     const { category } = params;
     this.category = category;
     this.getCategoryMaterials();
-    this.getReviewMaterials();
+    if (!this.error) {
+      this.getReviewMaterials();
+    }
   },
   methods: {
     getCategoryMaterials() {
-      const TOPICS_AND_RESOURCES = "Topics & Resources";
-      const CONCEPT_REVIEW = "Concept Review";
-
       switch (this.category) {
         case "algebra":
-          this.reviewMaterials = [
-            {
-              title: CONCEPT_REVIEW,
-              pdf: require(`../assets/review_materials/algebra/algebra-concept-review.pdf`),
-              image: require(`../assets/review_materials/algebra/algebra-concept-review.png`)
-            },
-            {
-              title: TOPICS_AND_RESOURCES,
-              pdf: require(`../assets/review_materials/algebra/algebra-topics-and-resources.pdf`),
-              image: require(`../assets/review_materials/algebra/algebra-topics-and-resources.png`)
-            }
-          ];
-          break;
         case "geometry":
-          this.reviewMaterials = [
-            {
-              title: CONCEPT_REVIEW,
-              pdf: require(`../assets/review_materials/geometry/geometry-concept-review.pdf`),
-              image: require(`../assets/review_materials/geometry/geometry-concept-review.png`)
-            },
-            {
-              title: TOPICS_AND_RESOURCES,
-              pdf: require(`../assets/review_materials/geometry/geometry-topics-and-resources.pdf`),
-              image: require(`../assets/review_materials/geometry/geometry-topics-and-resources.png`)
-            }
-          ];
-          break;
         case "trigonometry":
-          this.reviewMaterials = [
-            {
-              title: CONCEPT_REVIEW,
-              pdf: require(`../assets/review_materials/trigonometry/trigonometry-concept-review.pdf`),
-              image: require(`../assets/review_materials/trigonometry/trigonometry-concept-review.png`)
-            },
-            {
-              title: TOPICS_AND_RESOURCES,
-              pdf: require(`../assets/review_materials/trigonometry/trigonometry-topics-and-resources.pdf`),
-              image: require(`../assets/review_materials/trigonometry/trigonometry-topics-and-resources.png`)
-            }
-          ];
-          break;
         case "precalculus":
-          this.reviewMaterials = [
-            {
-              title: CONCEPT_REVIEW,
-              pdf: require(`../assets/review_materials/precalculus/precalculus-concept-review.pdf`),
-              image: require(`../assets/review_materials/precalculus/precalculus-concept-review.png`)
-            },
-            {
-              title: TOPICS_AND_RESOURCES,
-              pdf: require(`../assets/review_materials/precalculus/precalculus-topics-and-resources.pdf`),
-              image: require(`../assets/review_materials/precalculus/precalculus-topics-and-resources.png`)
-            }
-          ];
-          break;
         case "calculus":
           this.reviewMaterials = [
             {
-              title: CONCEPT_REVIEW,
-              pdf: require(`../assets/review_materials/calculus/calculus-concept-review.pdf`),
-              image: require(`../assets/review_materials/calculus/calculus-concept-review.png`)
+              title: "Topics & Resources",
+              pdf: this.importConceptReview("pdf"),
+              image: this.importConceptReview("png")
             },
             {
-              title: TOPICS_AND_RESOURCES,
-              pdf: require(`../assets/review_materials/calculus/calculus-topics-and-resources.pdf`),
-              image: require(`../assets/review_materials/calculus/calculus-topics-and-resources.png`)
+              title: "Concept Review",
+              pdf: this.importTopicsAndResources("pdf"),
+              image: this.importTopicsAndResources("png")
             }
           ];
           break;
@@ -142,11 +101,23 @@ export default {
           ];
           break;
         default:
+          this.error = true;
           break;
       }
     },
     getReviewMaterials() {
+      // Recieves no content - used for tracking user actions
       NetworkService.getReviewMaterials(this, this.category);
+    },
+    importConceptReview(ext) {
+      return require(`../assets/review_materials/${this.category}/${
+        this.category
+      }-concept-review.${ext}`);
+    },
+    importTopicsAndResources(ext) {
+      return require(`../assets/review_materials/${this.category}/${
+        this.category
+      }-topics-and-resources.${ext}`);
     }
   }
 };
@@ -222,6 +193,10 @@ export default {
     rgba(0, 0, 0, 0) 100%
   );
   height: 140px;
+}
+
+.error-message {
+  font-size: 16px;
 }
 
 @media screen and (max-width: 375px) {
