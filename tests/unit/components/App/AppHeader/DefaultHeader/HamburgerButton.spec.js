@@ -41,19 +41,19 @@ describe.skip("HamburgerButton", () => {
   });
 
   it("renders 'hamburger' if sidebar is collapsed", () => {
-    const wrapper = getWrapper(true);
+    // const wrapper = getWrapper(true);
     // expect(wrapper.vm.icon).toBe(HamburgerIcon);
   });
 
   it("renders 'cross' if sidebar is expanded", () => {
-    const wrapper = getWrapper(false);
+    // const wrapper = getWrapper(false);
     // expect(wrapper.vm.icon).toBe(CrossIcon);
   });
 
   // The tests below are failing to trigger the handleClick function
   it("calls handleClick when clicked", () => {
-    const handleClick = jest.fn();
-    const wrapper = getWrapper(true);
+    // const handleClick = jest.fn();
+    // const wrapper = getWrapper(true);
     // const icon = wrapper.find(HamburgerIcon);
     // icon.trigger("click");
     /**
@@ -67,7 +67,7 @@ describe.skip("HamburgerButton", () => {
   });
 
   it("expands sidebar if collapsed when clicked", () => {
-    const wrapper = getWrapper(true);
+    // const wrapper = getWrapper(true);
     // // const icon = wrapper.find(HamburgerIcon);
     // icon.trigger("click");
     /**
@@ -81,7 +81,7 @@ describe.skip("HamburgerButton", () => {
   });
 
   it("collapses sidebar if expanded when clicked", () => {
-    const wrapper = getWrapper(false);
+    // const wrapper = getWrapper(false);
     // const icon = wrapper.find(CrossIcon);
     /**
      *
