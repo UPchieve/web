@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import ArrowIcon from "@/assets/arrow.svg?inline";
+import ArrowIcon from "@/assets/arrow.svg";
 
 export default {
   components: { ArrowIcon },

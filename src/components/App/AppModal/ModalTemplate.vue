@@ -33,7 +33,7 @@
 <script>
 import { mapGetters } from "vuex";
 import LargeButton from "@/components/LargeButton";
-import ArrowIcon from "@/assets/arrow.svg?inline";
+import ArrowIcon from "@/assets/arrow.svg";
 
 export default {
   components: { LargeButton, ArrowIcon },

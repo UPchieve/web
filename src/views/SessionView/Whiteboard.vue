@@ -81,15 +81,15 @@
 
 <script>
 import { mapState, mapGetters } from "vuex";
-import SelectionIcon from "@/assets/whiteboard_icons/selection.svg?inline";
-import ClearIcon from "@/assets/whiteboard_icons/clear.svg?inline";
-import ColorPickerIcon from "@/assets/whiteboard_icons/color_picker.svg?inline";
-import PenIcon from "@/assets/whiteboard_icons/pen.svg?inline";
-import UndoIcon from "@/assets/whiteboard_icons/undo.svg?inline";
-import RedoIcon from "@/assets/whiteboard_icons/redo.svg?inline";
-import DeleteSelectionIcon from "@/assets/whiteboard_icons/delete_selection.svg";
-import RotateIcon from "@/assets/whiteboard_icons/rotate.svg";
-import PanIcon from "@/assets/whiteboard_icons/grab.svg?inline";
+import SelectionIcon from "@/assets/whiteboard_icons/selection.svg";
+import ClearIcon from "@/assets/whiteboard_icons/clear.svg";
+import ColorPickerIcon from "@/assets/whiteboard_icons/color_picker.svg";
+import PenIcon from "@/assets/whiteboard_icons/pen.svg";
+import UndoIcon from "@/assets/whiteboard_icons/undo.svg";
+import RedoIcon from "@/assets/whiteboard_icons/redo.svg";
+import PanIcon from "@/assets/whiteboard_icons/grab.svg";
+import DeleteSelectionIcon from "@/assets/whiteboard_icons/delete_selection.png";
+import RotateIcon from "@/assets/whiteboard_icons/rotate.png";
 
 export default {
   components: {

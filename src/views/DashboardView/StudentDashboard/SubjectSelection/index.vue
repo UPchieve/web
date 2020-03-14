@@ -19,9 +19,9 @@
 <script>
 import { mapGetters } from "vuex";
 import SubjectCard from "./SubjectCard";
-import MathSVG from "@/assets/subject_icons/math.svg?inline";
-import CollegeSVG from "@/assets/subject_icons/college-counseling.svg?inline";
-import ScienceSVG from "@/assets/subject_icons/science.svg?inline";
+import MathSVG from "@/assets/subject_icons/math.svg";
+import CollegeSVG from "@/assets/subject_icons/college-counseling.svg";
+import ScienceSVG from "@/assets/subject_icons/science.svg";
 
 import { topics } from "@/utils/topics";
 

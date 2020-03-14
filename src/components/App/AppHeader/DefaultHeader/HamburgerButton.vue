@@ -3,8 +3,8 @@
 </template>
 
 <script>
-import HambugerIcon from "@/assets/hamburger.svg?inline";
-import CrossIcon from "@/assets/cross.svg?inline";
+import HambugerIcon from "@/assets/hamburger.svg";
+import CrossIcon from "@/assets/cross.svg";
 
 export default {
   computed: {
