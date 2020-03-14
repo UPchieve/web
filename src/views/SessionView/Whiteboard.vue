@@ -33,42 +33,42 @@
       >
         <ColorPickerIcon class="tool__item-svg" />
         <div v-if="showColorPicker" class="color-bar">
-          <button
+          <div
             class="color-button"
             title="Black"
             style="background-color: rgba(10, 10, 10, 1)"
             @click="setColor('rgba(10, 10, 10, 1)')"
-          />
-          <button
+          ></div>
+          <div
             class="color-button"
             title="Navy"
             style="background-color: rgba(38, 51, 104, 1)"
             @click="setColor('rgba(38, 51, 104, 1)')"
-          />
-          <button
+          ></div>
+          <div
             class="color-button"
             title="Red"
             style="background-color: rgba(244, 71, 71, 1)"
             @click="setColor('rgba(244, 71, 71, 1)')"
-          />
-          <button
+          ></div>
+          <div
             class="color-button"
             title="Sand"
             style="background-color: rgba(249, 227, 183, 1)"
             @click="setColor('rgba(249, 227, 183, 1)')"
-          />
-          <button
+          ></div>
+          <div
             class="color-button"
             title="Teal"
             style="background-color: rgba(123, 222, 201, 1)"
             @click="setColor('rgba(123, 222, 201, 1)')"
-          />
-          <button
+          ></div>
+          <div
             class="color-button"
             title="Light Blue"
             style="background-color: rgba(119, 151, 216, 1)"
             @click="setColor('rgba(119, 151, 216, 1)')"
-          />
+          ></div>
         </div>
       </div>
       <div class="tool__item" title="Undo" @click="undo">
