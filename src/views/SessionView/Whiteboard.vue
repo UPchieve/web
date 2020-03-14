@@ -3,6 +3,14 @@
     <div id="zwib-div" :style="mouseCursor"></div>
     <div id="toolbar">
       <div
+        class="tool__item"
+        title="Drag tool"
+        v-bind:class="selectedTool === 'pan' ? 'selected-tool' : ''"
+        @click="usePanTool"
+      >
+        <PanIcon class="tool__item-svg" />
+      </div>
+      <div
         class="tool__item tool__item-pick"
         title="Pick tool"
         v-bind:class="selectedTool === 'pick' ? 'selected-tool' : ''"
@@ -25,46 +33,43 @@
       >
         <ColorPickerIcon class="tool__item-svg" />
         <div v-if="showColorPicker" class="color-bar">
-          <button
+          <div
             class="color-button"
             title="Black"
             style="background-color: rgba(10, 10, 10, 1)"
             @click="setColor('rgba(10, 10, 10, 1)')"
-          />
-          <button
+          ></div>
+          <div
             class="color-button"
             title="Navy"
             style="background-color: rgba(38, 51, 104, 1)"
             @click="setColor('rgba(38, 51, 104, 1)')"
-          />
-          <button
+          ></div>
+          <div
             class="color-button"
             title="Red"
             style="background-color: rgba(244, 71, 71, 1)"
             @click="setColor('rgba(244, 71, 71, 1)')"
-          />
-          <button
+          ></div>
+          <div
             class="color-button"
             title="Sand"
             style="background-color: rgba(249, 227, 183, 1)"
             @click="setColor('rgba(249, 227, 183, 1)')"
-          />
-          <button
+          ></div>
+          <div
             class="color-button"
             title="Teal"
             style="background-color: rgba(123, 222, 201, 1)"
             @click="setColor('rgba(123, 222, 201, 1)')"
-          />
-          <button
+          ></div>
+          <div
             class="color-button"
             title="Light Blue"
             style="background-color: rgba(119, 151, 216, 1)"
             @click="setColor('rgba(119, 151, 216, 1)')"
-          />
+          ></div>
         </div>
-      </div>
-      <div class="tool__item" title="Drag tool" @click="usePanTool">
-        <PanIcon class="tool__item-svg" />
       </div>
       <div class="tool__item" title="Undo" @click="undo">
         <UndoIcon class="tool__item-svg" />
@@ -102,6 +107,10 @@ export default {
     PanIcon
   },
   props: {
+    shouldCreateSession: {
+      type: Boolean,
+      default: true
+    },
     isVisible: {
       type: Boolean,
       required: true
@@ -135,14 +144,23 @@ export default {
       showColourPanel: false,
       autoPickToolText: false,
       defaultBrushWidth: 5,
+      scrollbars: this.mobileMode ? false : true,
       collaborationServer: `${
         process.env.VUE_APP_WEBSOCKET_ROOT
       }/whiteboard/room/{name}`
     });
 
     this.zwibblerCtx = zwibblerCtx;
-    this.zwibblerCtx.createSharedSession(this.session._id);
+
+    if (this.shouldCreateSession) {
+      this.zwibblerCtx.createSharedSession(this.session._id);
+    } else {
+      this.zwibblerCtx.joinSharedSession(this.session._id);
+    }
+
+    // Set up custom selection handles
     this.setSelectionHandles();
+
     // Set brush tool to default tool
     this.useBrushTool();
 
@@ -272,8 +290,8 @@ export default {
 #toolbar {
   max-width: 400px;
   height: 70px;
-  position: absolute;
-  bottom: 40px;
+  position: fixed;
+  bottom: 0;
   left: 0;
   right: 0;
   margin: auto;
@@ -282,6 +300,11 @@ export default {
   justify-content: space-around;
   border-radius: 8px;
   background-color: rgb(238, 238, 238);
+
+  @include breakpoint-above("medium") {
+    position: absolute;
+    bottom: 40px;
+  }
 }
 
 .tool__item {
