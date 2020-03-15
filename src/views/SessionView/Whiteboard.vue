@@ -1,37 +1,37 @@
 <template>
   <div class="zwib-wrapper">
     <div id="zwib-div" :style="mouseCursor"></div>
-    <div id="toolbar">
+    <div id="toolbar" class="toolbar">
       <div
-        class="tool__item"
+        class="toolbar-item toolbar-item--drag"
         title="Drag tool"
         v-bind:class="selectedTool === 'pan' ? 'selected-tool' : ''"
         @click="usePanTool"
       >
-        <PanIcon class="tool__item-svg" />
+        <PanIcon class="toolbar-item__svg" />
       </div>
       <div
-        class="tool__item tool__item-pick"
+        class="toolbar-item toolbar-item--pick"
         title="Pick tool"
         v-bind:class="selectedTool === 'pick' ? 'selected-tool' : ''"
         @click="usePickTool"
       >
-        <SelectionIcon class="tool__item-svg" />
+        <SelectionIcon class="toolbar-item__svg" />
       </div>
       <div
-        class="tool__item"
+        class="toolbar-item toolbar-item--brush"
         title="Brush tool"
         v-bind:class="selectedTool === 'pen' ? 'selected-tool' : ''"
         @click="useBrushTool"
       >
-        <PenIcon class="tool__item-svg" />
+        <PenIcon class="toolbar-item__svg" />
       </div>
       <div
-        class="tool__item tool__item-color-picker"
+        class="toolbar-item toolbar-item--color-picker"
         title="Color picker"
         @click="toggleColorPicker"
       >
-        <ColorPickerIcon class="tool__item-svg" />
+        <ColorPickerIcon class="toolbar-item__svg" />
         <div v-if="showColorPicker" class="color-bar">
           <div
             class="color-button"
@@ -71,14 +71,18 @@
           ></div>
         </div>
       </div>
-      <div class="tool__item" title="Undo" @click="undo">
-        <UndoIcon class="tool__item-svg" />
+      <div class="toolbar-item toolbar-item--undo" title="Undo" @click="undo">
+        <UndoIcon class="toolbar-item__svg" />
       </div>
-      <div class="tool__item" title="Redo" @click="redo">
-        <RedoIcon class="tool__item-svg" />
+      <div class="toolbar-item toolbar-item--redo" title="Redo" @click="redo">
+        <RedoIcon class="toolbar-item__svg" />
       </div>
-      <div class="tool__item" title="Clear whiteboard" @click="clearWhiteboard">
-        <ClearIcon class="tool__item-svg" />
+      <div
+        class="toolbar-item toolbar-item--clear"
+        title="Clear whiteboard"
+        @click="clearWhiteboard"
+      >
+        <ClearIcon class="toolbar-item__svg" />
       </div>
     </div>
   </div>
@@ -285,7 +289,7 @@ export default {
   cursor: default;
 }
 
-#toolbar {
+.toolbar {
   max-width: 400px;
   height: 70px;
   position: fixed;
@@ -305,7 +309,7 @@ export default {
   }
 }
 
-.tool__item {
+.toolbar-item {
   padding: 1em;
   border: 1px solid transparent;
   display: flex;
@@ -330,9 +334,8 @@ export default {
     background: #e2e2e2;
   }
 
-  &-pick {
-    // Pick tool / select tool
-    & svg {
+  &--pick {
+    & .toolbar-item__svg {
       width: 26px;
       height: 26px;
 
@@ -340,7 +343,7 @@ export default {
     }
   }
 
-  &-svg {
+  &__svg {
     width: 20px;
   }
 }
