@@ -197,9 +197,7 @@ export default {
     },
     clearWhiteboard() {
       this.zwibblerCtx.deleteNodes(this.zwibblerCtx.getAllNodes());
-      this.selectedTool = "";
       this.showColorPicker = false;
-      this.useBrushTool();
     },
     toggleColorPicker() {
       this.showColorPicker = !this.showColorPicker;
