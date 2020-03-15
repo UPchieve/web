@@ -76,27 +76,27 @@ export default {
         case "planning":
           this.reviewMaterials = [
             {
-              title: "College Planning",
-              pdf: require(`../assets/review_materials/planning/college-planning.pdf`),
-              image: require(`../assets/review_materials/planning/college-planning.png`)
+              title: "College Planning Review",
+              pdf: require(`../assets/review_materials/planning/college-planning-review.pdf`),
+              image: require(`../assets/review_materials/planning/college-planning-review.png`)
             }
           ];
           break;
         case "essays":
           this.reviewMaterials = [
             {
-              title: "Essay Editing Guide",
-              pdf: require(`../assets/review_materials/essays/essay-editing-guide.pdf`),
-              image: require(`../assets/review_materials/essays/essay-editing-guide.png`)
+              title: "College Essays Review",
+              pdf: require(`../assets/review_materials/essays/college-essays-review.pdf`),
+              image: require(`../assets/review_materials/essays/college-essays-review.png`)
             }
           ];
           break;
         case "applications":
           this.reviewMaterials = [
             {
-              title: "Application Help Guide",
-              pdf: require(`../assets/review_materials/applications/application-help-guide.pdf`),
-              image: require(`../assets/review_materials/applications/application-help-guide.png`)
+              title: "College Applications Review",
+              pdf: require(`../assets/review_materials/applications/college-applications-review.pdf`),
+              image: require(`../assets/review_materials/applications/college-applications-review.png`)
             }
           ];
           break;
@@ -150,13 +150,13 @@ export default {
     margin-right: 2em;
     display: block;
     margin-bottom: 1em;
+    width: 40%;
   }
 
   &__content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 200px;
     background-color: white;
     border-radius: 5px;
     border: 1px solid gray;
@@ -192,21 +192,18 @@ export default {
     rgba(0, 0, 0, 0.4) 0%,
     rgba(0, 0, 0, 0) 100%
   );
-  height: 140px;
+  height: 160px;
 }
 
 .error-message {
   font-size: 16px;
 }
 
-@media screen and (max-width: 375px) {
+@media screen and (max-width: 760px) {
   .review-materials {
     &__link {
+      width: 100%;
       margin-right: 0;
-    }
-
-    &__content {
-      width: initial;
     }
   }
 }
