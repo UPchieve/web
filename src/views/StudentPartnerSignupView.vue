@@ -187,7 +187,9 @@
             ></autocomplete>
 
             <div v-if="noHighSchoolResults" class="school-search__no-results">
-              No results
+              <a href="https://upchieve.org/cant-find-school" target="_blank">
+                Can't find your high school?
+              </a>
             </div>
           </div>
         </div>
@@ -477,6 +479,10 @@ export default {
     font-size: 14px;
     background: #fff;
     color: #666;
+
+    a {
+      text-decoration: underline;
+    }
   }
 }
 
