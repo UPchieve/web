@@ -322,18 +322,25 @@ a {
   background-position: center;
 }
 
-.review-container .arrow.right {
-  height: 1.3em;
-  width: 1.3em;
-  transition: padding-left 0.1s ease-in;
-}
+.review-container {
+  & .arrow.right {
+    height: 1.3em;
+    width: 1.3em;
+    padding-left: 0px;
+    transition: padding-left 0.1s ease-in;
 
-.review-container .arrow.right::after {
-  background-size: 24%;
-}
+    &::after {
+      background-size: 24%;
+    }
+  }
 
-.review-container:hover .arrow.right {
-  padding-left: 6px;
+  &:hover {
+    color: #5a5a5f;
+
+    .arrow.right {
+      padding-left: 3px;
+    }
+  }
 }
 
 .arrow.down::after {
