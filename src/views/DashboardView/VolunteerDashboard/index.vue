@@ -11,7 +11,34 @@
     </dashboard-banner>
 
     <div class="volunteer-dashboard__body">
-      <div class="students-waiting dashboard-card">
+      <div v-if="!isOnboarded" class="dashboard-card">
+        <div class="dashboard-card__title">Your Onboarding Process</div>
+        <div>
+          <div v-if="!hasSelectedAvailability">
+            <img
+              src="@/assets/onboarding_icons/calendar-icon.png"
+              class="onboarding-icon"
+            />
+            <h4>Select availability</h4>
+            <p>
+              Select at least one hour of availability so that we know when we
+              can text you.
+            </p>
+          </div>
+          <div v-if="!isCertified">
+            <img
+              src="@/assets/onboarding_icons/quiz-icon.png"
+              class="onboarding-icon"
+            />
+            <h4>Get a certification</h4>
+            <p>
+              Pass at least one quiz so that we know what subjects you can help
+              students with.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div v-else class="students-waiting dashboard-card">
         <div class="dashboard-card__title">Waiting Students</div>
         <div v-if="isSessionAlive">
           <button
@@ -81,6 +108,10 @@ export default {
     if (this.isSessionAlive) {
       this.$store.dispatch("app/header/show", headerData);
     }
+
+    if (this.isNewUser) {
+      this.showOnboardingModal();
+    }
   },
   computed: {
     ...mapState({
@@ -88,7 +119,11 @@ export default {
     }),
     ...mapGetters({
       isSessionAlive: "user/isSessionAlive",
-      sessionPath: "user/sessionPath"
+      sessionPath: "user/sessionPath",
+      isNewUser: "user/isNewUser",
+      isOnboarded: "user/isOnboarded",
+      availabilityLastModifiedAt: "user/availabilityLastModifiedAt",
+      certifications: "user/certifications"
     }),
 
     isNewVolunteer() {
@@ -156,6 +191,22 @@ export default {
           value: `${numHoursTutored} hours tutored`
         }
       ];
+    },
+
+    isCertified() {
+      let isCertified = false;
+
+      for (let index in this.certifications) {
+        if (this.certifications[index].passed) {
+          isCertified = true;
+          break;
+        }
+      }
+      return isCertified;
+    },
+
+    hasSelectedAvailability() {
+      return !!this.availabilityLastModifiedAt;
     }
   },
   methods: {
@@ -170,6 +221,13 @@ export default {
 
     goToCoachGuide() {
       this.$router.push("/coach-guide");
+    },
+
+    showOnboardingModal() {
+      this.$store.dispatch("app/modal/show", {
+        component: "OnboardingModal",
+        data: { alertModal: true, acceptText: "Get started" }
+      });
     }
   }
 };
@@ -268,5 +326,9 @@ export default {
   &__stat-value {
     font-weight: bold;
   }
+}
+
+.onboarding-icon {
+  width: 60px;
 }
 </style>
