@@ -1,0 +1,91 @@
+diff --git a/node_modules/cypress-visual-regression/dist/command.js b/node_modules/cypress-visual-regression/dist/command.js
+index 035f9f2..7c26a9d 100644
+--- a/node_modules/cypress-visual-regression/dist/command.js
++++ b/node_modules/cypress-visual-regression/dist/command.js
+@@ -2,20 +2,14 @@
+ 
+ function compareSnapshotCommand() {
+   Cypress.Commands.add('compareSnapshot', { prevSubject: 'optional' }, (subject, name, errorThreshold = 0.0) => {
+-    let title = 'actual';
+-    if (Cypress.env('type') === 'base') {
+-      title = 'base';
+-    }
+-
++    cy.wait(500)
+     // take snapshot
+     if (subject) {
+-      cy.get(subject).screenshot(`${name}-${title}`);
++      cy.get(subject).screenshot(`/actual/${name}`);
+     } else {
+-      cy.screenshot(`${name}-${title}`);
++      cy.screenshot(`/actual/${name}`);
+     } 
+ 
+-    // run visual tests
+-    if (Cypress.env('type') === 'actual') {
+       const options = {
+         fileName: name,
+         specDirectory: Cypress.spec.name
+@@ -25,7 +19,6 @@ function compareSnapshotCommand() {
+           throw new Error(`${name} images are different`);
+         }
+       });
+-    }
+   });
+ }
+ 
+diff --git a/node_modules/cypress-visual-regression/dist/plugin.js b/node_modules/cypress-visual-regression/dist/plugin.js
+index f89d188..9d8b704 100644
+--- a/node_modules/cypress-visual-regression/dist/plugin.js
++++ b/node_modules/cypress-visual-regression/dist/plugin.js
+@@ -6,37 +6,31 @@ const { PNG } = require('pngjs');
+ const pixelmatch = require('pixelmatch');
+ 
+ // TODO: allow user to define/update
+-const SNAPSHOT_DIRECTORY = process.env.SNAPSHOT_DIRECTORY || path.join(__dirname, '..', '..', '..', 'cypress', 'snapshots');
++// const SNAPSHOT_DIRECTORY = process.env.SNAPSHOT_DIRECTORY || path.join(__dirname, '..', '..', '..', 'cypress', 'snapshots');
++const SNAPSHOT_DIRECTORY = "tests/e2e/screenshots"
+ 
+ function compareSnapshotsPlugin(args) {
+   return new Promise((resolve, reject) => {
++
+     const options = {
+-      actualImage: path.join(SNAPSHOT_DIRECTORY, 'actual', args.specDirectory, `${args.fileName}-actual.png`),
+-      expectedImage: path.join(SNAPSHOT_DIRECTORY, 'base', args.specDirectory, `${args.fileName}-base.png`),
+-      diffImage: path.join(SNAPSHOT_DIRECTORY, 'diff', args.specDirectory, `${args.fileName}-diff.png`)
++      actualImage: path.join(SNAPSHOT_DIRECTORY, args.specDirectory, 'actual', `${args.fileName}.png`),
++      expectedImage: path.join(SNAPSHOT_DIRECTORY, args.specDirectory, 'base', `${args.fileName}.png`),
++      diffImage: path.join(SNAPSHOT_DIRECTORY, args.specDirectory, 'diff', `${args.fileName}.png`)
+     };
+ 
+-    const diffFolder = path.join(SNAPSHOT_DIRECTORY, 'diff');
+-    if (!fs.existsSync(diffFolder)) {
+-      mkdirp(diffFolder, err => {
+-        if (err) {
+-          console.log(err); // eslint-disable-line no-console
+-        }
+-      });
+-    }
++    const diffFolder = path.join(SNAPSHOT_DIRECTORY, args.specDirectory, 'diff');
+ 
+-    const specFolder = path.join(diffFolder, args.specDirectory);
+-    if (!fs.existsSync(specFolder)) {
+-      mkdirp(specFolder, err => {
+-        if (err) {
+-          console.log(err); // eslint-disable-line no-console
+-        }
+-      });
++    if (!fs.existsSync(diffFolder)) {
++      mkdirp(diffFolder)
++        .catch(error => {
++          console.log(error)
++        })
+     }
+  
+     /* eslint-disable func-names */
+     fs.createReadStream(options.actualImage).pipe(new PNG()).on('parsed', function () {
+       const imgActual = this;
++
+       fs.createReadStream(options.expectedImage).pipe(new PNG()).on('parsed', function () {
+         const imgExpected = this;
+         const diff = new PNG({
