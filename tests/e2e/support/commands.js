@@ -27,6 +27,10 @@
 const AUTH_ROOT = `${Cypress.env("SERVER_ROOT")}/auth`;
 const API_ROOT = `${Cypress.env("SERVER_ROOT")}/api`;
 
+const compareSnapshotCommand = require("cypress-visual-regression/dist/command");
+
+compareSnapshotCommand();
+
 Cypress.Commands.add("login", user => {
   cy.request({
     method: "POST",
@@ -72,3 +76,17 @@ Cypress.Commands.add("endAllSessions", () => {
     body: {}
   });
 });
+
+Cypress.Commands.add(
+  "captureBaseSnapshot",
+  { prevSubject: "optional" },
+  (subject, name) => {
+    cy.wait(500);
+
+    if (subject) {
+      cy.get(subject).screenshot(`/base/${name}`);
+    } else {
+      cy.screenshot(`/base/${name}`);
+    }
+  }
+);

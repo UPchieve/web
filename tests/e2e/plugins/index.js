@@ -7,6 +7,7 @@
 
 /* eslint-disable import/no-extraneous-dependencies, global-require, arrow-body-style */
 // const webpack = require('@cypress/webpack-preprocessor')
+const getCompareSnapshotsPlugin = require("cypress-visual-regression/dist/plugin");
 
 module.exports = (on, config) => {
   // on('file:preprocessor', webpack({
@@ -21,6 +22,8 @@ module.exports = (on, config) => {
     .forEach(([key, value]) => {
       config.env[key.replace("VUE_APP_", "")] = value;
     });
+
+  getCompareSnapshotsPlugin(on);
 
   return Object.assign({}, config, {
     fixturesFolder: "tests/e2e/fixtures",

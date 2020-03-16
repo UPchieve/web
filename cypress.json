@@ -5,5 +5,7 @@
     "SERVER_ROOT": "http://localhost:3000"
   },
   "baseUrl": "http://localhost:8080",
-  "videoCompression": 0
+  "videoCompression": 0,
+  "screenshotsFolder": "tests/e2e/screenshots/",
+  "trashAssetsBeforeRuns": true
 }
