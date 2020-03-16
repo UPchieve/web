@@ -9,7 +9,8 @@ export default {
   namespaced: true,
   state: {
     user: {},
-    session: {}
+    session: {},
+    isNewUser: false
   },
   mutations: {
     setUser: (state, user = {}) => (state.user = user),
@@ -42,6 +43,10 @@ export default {
         state.user.timezone = timezone;
         state.user.date = date;
       }
+    },
+
+    setIsNewUser: (state, isNewUserFlag) => {
+      state.isNewUser = isNewUserFlag;
     }
   },
   actions: {
@@ -94,6 +99,10 @@ export default {
 
     addMessage: ({ commit }, message) => {
       commit("addMessage", message);
+    },
+
+    showNewUserFirstSteps: ({ commit }, isNewUserFlag) => {
+      commit("setIsNewUser", isNewUserFlag);
     }
   },
   getters: {
@@ -110,6 +119,12 @@ export default {
 
     isVolunteer: state => state.user.isVolunteer,
     isAdmin: state => state.user.isAdmin,
+    isOnboarded: state => state.user.isOnboarded,
+    isNewUser: state => state.isNewUser,
+
+    certifications: state => state.user.certifications,
+
+    availabilityLastModifiedAt: state => state.user.availabilityLastModifiedAt,
 
     isAuthenticated: state => !!(state.user && state.user._id),
 
