@@ -72,3 +72,61 @@ Cypress.Commands.add("endAllSessions", () => {
     body: {}
   });
 });
+
+Cypress.Commands.add("getVolunteerCodes", () => {
+  //get valid codes from server
+  const validCodesUrl = `${Cypress.env(
+    "SERVER_ROOT"
+  )}/auth/register/volunteercodes`;
+
+  return cy
+    .request({
+      url: validCodesUrl
+    })
+    .its("body.volunteerCodes");
+});
+
+Cypress.Commands.add("createUser", userObj => {
+  const registerUrl = `${Cypress.env("SERVER_ROOT")}/auth/register`;
+  const setProfileUrl = `${Cypress.env("SERVER_ROOT")}/api/user`;
+
+  cy.request({
+    url: registerUrl,
+    method: "POST",
+    body: {
+      isVolunteer: userObj.isVolunteer,
+      email: userObj.email,
+      password: userObj.password,
+      code: userObj.code,
+      college: userObj.college,
+      phone: userObj.phoneNumber,
+      firstName: userObj.firstName,
+      lastName: userObj.lastName,
+      terms: true
+    }
+  }).then(response => {
+    const user = response.body.user;
+    user.email = userObj.email;
+    user.college = userObj.college;
+    user.phonePretty = userObj.phoneNumber;
+    (user.firstname = userObj.firstName.trim()),
+      (user.lastname = userObj.lastName.trim());
+
+    cy.request({
+      url: setProfileUrl,
+      method: "PUT",
+      body: user
+    });
+  });
+});
+
+Cypress.Commands.add("getVerificationToken", userid => {
+  const verificationTokenUrl = `${Cypress.env(
+    "SERVER_ROOT"
+  )}/api/verificationtoken`;
+
+  cy.request({
+    url: verificationTokenUrl,
+    qs: { userid }
+  }).its("body.verificationToken");
+});
