@@ -14,5 +14,23 @@ module.exports = {
           patterns: [path.resolve(__dirname, "./src/scss/setup/all.scss")]
         })
     );
+
+    // https://vue-svg-loader.js.org/faq.html#how-to-use-both-inline-and-external-svgs
+    const svgRule = config.module.rule("svg");
+    svgRule.uses.clear();
+    svgRule
+      .use("vue-svg-loader")
+      .loader("vue-svg-loader")
+      .options({
+        svgo: {
+          plugins: [{ removeViewBox: false }]
+        }
+      });
+
+    config.module
+      .rule("pdf")
+      .test(/\.pdf$/)
+      .use("file-loader")
+      .loader("file-loader");
   }
 };

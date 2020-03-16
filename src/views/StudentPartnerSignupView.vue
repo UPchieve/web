@@ -22,11 +22,19 @@
 
         <div class="step-header">
           <div class="step-header__title">
-            Welcome {{ studentPartner.name }} Student!
+            <span v-if="studentPartner.name"
+              >Welcome {{ studentPartner.name }} Student!</span
+            >
+            <span v-else>Welcome to UPchieve!</span>
           </div>
           <div class="step-header__subtitle">
-            Not with {{ studentPartner.name }}?
-            <router-link to="/signup">Click here</router-link>
+            <span v-if="studentPartner.name"
+              >Not with {{ studentPartner.name }}?
+              <router-link to="/signup">Click here</router-link></span
+            >
+            <span v-else
+              >We're a free online tutoring platform for HS students</span
+            >
           </div>
         </div>
 
@@ -149,7 +157,7 @@
           />
         </div>
 
-        <div v-if="studentPartner.highSchoolSignup" class="uc-form-checkbox">
+        <div v-if="showHighSchoolCheckbox" class="uc-form-checkbox">
           <input
             id="highSchoolCheckbox"
             v-model="isHighSchoolStudent"
@@ -179,7 +187,9 @@
             ></autocomplete>
 
             <div v-if="noHighSchoolResults" class="school-search__no-results">
-              No results
+              <a href="https://upchieve.org/cant-find-school" target="_blank">
+                Can't find your high school?
+              </a>
             </div>
           </div>
         </div>
@@ -247,7 +257,8 @@ export default {
     return {
       studentPartner: {
         name: "",
-        highSchoolSignup: false
+        highSchoolSignup: false,
+        highSchoolSignupRequired: false
       },
       formStep: "step-1",
       isHighSchoolStudent: false,
@@ -266,8 +277,25 @@ export default {
     };
   },
   computed: {
-    showHighSchoolSelector() {
+    showHighSchoolCheckbox() {
+      // Don't show if high school input is disabled
       if (!this.studentPartner.highSchoolSignup) return false;
+
+      // Don't show if high school input is required
+      if (this.studentPartner.highSchoolSignupRequired) return false;
+
+      // Only show if high school input is enabled but not required, i.e. optional
+      return true;
+    },
+
+    showHighSchoolSelector() {
+      // No high school input
+      if (!this.studentPartner.highSchoolSignup) return false;
+
+      // Require high school input
+      if (this.studentPartner.highSchoolSignupRequired) return true;
+
+      // Optional high school input, so show if the checkbox is selected
       return this.isHighSchoolStudent;
     }
   },
@@ -361,6 +389,13 @@ export default {
       if (!this.formData.lastName) {
         this.invalidInputs.push("lastName");
       }
+      if (
+        this.studentPartner.highSchoolSignupRequired &&
+        !this.formData.highSchoolUpchieveId
+      ) {
+        this.errors.push("You must select your high school.");
+        this.invalidInputs.push("inputHighschool");
+      }
       if (!this.formData.terms) {
         this.errors.push("You must read and accept the user agreement.");
       }
@@ -444,6 +479,10 @@ export default {
     font-size: 14px;
     background: #fff;
     color: #666;
+
+    a {
+      text-decoration: underline;
+    }
   }
 }
 

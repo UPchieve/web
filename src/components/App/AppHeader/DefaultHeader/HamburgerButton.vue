@@ -1,20 +1,17 @@
 <template>
-  <upchieve-icon
-    class="HamburgerButton"
-    :icon="icon"
-    v-on:click.native="handleClick"
-    size="16px"
-  />
+  <component class="icon" :is="icon" v-on:click="handleClick" />
 </template>
 
 <script>
-import UpchieveIcon from "@/components/UpchieveIcon";
+import HambugerIcon from "@/assets/hamburger.svg";
+import CrossIcon from "@/assets/cross.svg";
 
 export default {
-  components: { UpchieveIcon },
   computed: {
     icon() {
-      return this.$store.state.app.sidebar.isCollapsed ? "hamburger" : "cross";
+      return this.$store.state.app.sidebar.isCollapsed
+        ? HambugerIcon
+        : CrossIcon;
     }
   },
   methods: {
@@ -29,7 +26,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.HamburgerButton {
+.icon {
   cursor: pointer;
+  width: 16px;
+  height: 16px;
 }
 </style>

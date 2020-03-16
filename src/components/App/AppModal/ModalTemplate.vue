@@ -2,7 +2,7 @@
   <div class="ModalTemplate" :class="{ 'ModalTemplate--important': important }">
     <div v-if="mobileMode" class="ModalTemplate-header">
       <div class="ModalTemplate-header-close-button" @click="handleCancel">
-        <upchieve-icon icon="arrow" />
+        <arrow-icon class="icon" />
         <p>{{ backText }}</p>
       </div>
     </div>
@@ -33,10 +33,10 @@
 <script>
 import { mapGetters } from "vuex";
 import LargeButton from "@/components/LargeButton";
-import UpchieveIcon from "@/components/UpchieveIcon";
+import ArrowIcon from "@/assets/arrow.svg";
 
 export default {
-  components: { LargeButton, UpchieveIcon },
+  components: { LargeButton, ArrowIcon },
   props: {
     acceptText: { type: String, default: "Accept" },
     backText: { type: String, default: "Back" },
@@ -93,10 +93,16 @@ $header-height: 80px;
     @include font-category("helper-text");
     color: white;
     cursor: pointer;
+    align-items: center;
 
-    .UpchieveIcon {
-      color: white;
-      transform: rotateY(180deg) translateY(2px);
+    .icon {
+      fill: white;
+      height: 16px;
+      transform: rotateY(180deg);
+    }
+    & p {
+      line-height: 1em;
+      margin: 0;
     }
   }
 }

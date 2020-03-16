@@ -1,6 +1,6 @@
 <template>
   <div class="SubjectSelectionModal">
-    <img v-if="!mobileMode" :src="modalData.svgUrl" />
+    <component v-if="!mobileMode" :is="modalData.svg" class="icon" />
     <h1 class="SubjectSelectionModal-title">{{ title }}</h1>
     <h2 v-if="!mobileMode" class="SubjectSelectionModal-subtitle">
       Choose a subject so we can connect you with the right tutor.
@@ -77,6 +77,10 @@ h2,
 p {
   margin: 0;
   padding: 0;
+}
+
+.icon {
+  align-self: center;
 }
 
 .SubjectSelectionModal {

@@ -6,7 +6,7 @@
       v-bind:key="index"
       :title="card.title"
       :subtitle="card.subtitle"
-      :svg-url="card.svgUrl"
+      :svg="card.svg"
       :topic="card.topic"
       :subtopics="card.subtopics"
       :subtopicDisplayNames="card.subtopicDisplayNames"
@@ -29,7 +29,7 @@ export default {
   name: "subject-selection",
   components: { SubjectCard },
   data() {
-    const svgUrls = {
+    const svgs = {
       math: MathSVG,
       college: CollegeSVG
     };
@@ -37,7 +37,7 @@ export default {
     const cards = Object.entries(topics).map(([key, topicObj]) => {
       return {
         title: topicObj.displayName,
-        svgUrl: svgUrls[key],
+        svg: svgs[key],
         topic: key,
         subtopics: Object.keys(topicObj.subtopics).sort(),
         subtopicDisplayNames: Object.entries(topicObj.subtopics)
@@ -56,7 +56,7 @@ export default {
       title: "Coming Soon",
       subtitle:
         "Check back soon for new help topics like SAT, ESL, and Science!",
-      svgUrl: ScienceSVG,
+      svg: ScienceSVG,
       buttonText: "Suggest a help topic",
       routeTo: "/contact"
     });

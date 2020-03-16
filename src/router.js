@@ -24,6 +24,7 @@ import CalendarView from "./views/CalendarView";
 import AdminView from "./views/Admin";
 import VolunteerCoverage from "./views/Admin/VolunteerCoverage";
 import VolunteerGuideView from "./views/VolunteerGuideView";
+import ReviewMaterialsView from "./views/ReviewMaterialsView";
 
 import store from "./store";
 
@@ -171,6 +172,12 @@ const routes = [
     path: "/training",
     name: "TrainingView",
     component: TrainingView,
+    meta: { protected: true }
+  },
+  {
+    path: "/training/review/:category",
+    name: "ReviewMaterialsView",
+    component: ReviewMaterialsView,
     meta: { protected: true }
   },
   {

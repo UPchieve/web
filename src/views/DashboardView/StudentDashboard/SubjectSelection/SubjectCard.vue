@@ -1,7 +1,7 @@
 <template>
   <div class="SubjectCard">
     <template v-if="mobileMode">
-      <img class="SubjectCard-icon" :src="svgUrl" />
+      <component class="SubjectCard-icon" v-bind:is="svg" />
 
       <div class="SubjectCard-mobile-column">
         <h2 class="SubjectCard-title">{{ title }}</h2>
@@ -24,7 +24,7 @@
 
     <template v-else>
       <div class="SubjectCard-desktop-column">
-        <img class="SubjectCard-icon" :src="svgUrl" />
+        <component class="SubjectCard-icon" v-bind:is="svg" />
         <h2 class="SubjectCard-title">{{ title }}</h2>
         <p class="SubjectCard-subtitle">{{ subtitle }}</p>
         <dropdown-list
@@ -79,8 +79,8 @@ export default {
       type: String,
       default: "Join a chat room to start."
     },
-    svgUrl: {
-      type: String,
+    svg: {
+      type: Object,
       required: true
     },
     topic: String,
@@ -114,7 +114,7 @@ export default {
             topic: this.topic,
             subtopics: this.subtopics,
             subtopicDisplayNames: this.subtopicDisplayNames,
-            svgUrl: this.svgUrl
+            svg: this.svg
           }
         });
       }
