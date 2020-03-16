@@ -26,5 +26,11 @@ module.exports = {
           plugins: [{ removeViewBox: false }]
         }
       });
+
+    config.module
+      .rule("pdf")
+      .test(/\.pdf$/)
+      .use("file-loader")
+      .loader("file-loader");
   }
 };
