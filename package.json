@@ -54,6 +54,7 @@
     "vue-select": "^3.1.0",
     "vue-socket.io": "^2.1.0",
     "vue-star-rating": "^1.6.1",
+    "vue-svg-loader": "^0.16.0",
     "vue-template-compiler": "^2.6.10",
     "vuex": "^3.0.1"
   },
@@ -62,7 +63,8 @@
     "npm": ">= 6.0.0"
   },
   "devDependencies": {
-    "husky": "^4.2.3"
+    "husky": "^4.2.3",
+    "vue-jest": "^3.0.5"
   },
   "husky": {
     "hooks": {
