@@ -15,7 +15,8 @@
     "test": "vue-cli-service test:unit",
     "test:watch": "vue-cli-service test:unit --watch",
     "clean-slate": "npx rimraf node_modules dist && npm install",
-    "cypress": "npx cypress run"
+    "cypress": "npx cypress run",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@sentry/browser": "^5.9.0",
@@ -35,6 +36,7 @@
     "base64url": "^3.0.1",
     "bootstrap": "^3.3.7",
     "core-js": "^2.6.5",
+    "cypress-visual-regression": "^1.0.7",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
     "jquery": "^3.4.1",
@@ -64,6 +66,7 @@
   },
   "devDependencies": {
     "husky": "^4.2.3",
+    "patch-package": "^6.2.1",
     "vue-jest": "^3.0.5"
   },
   "husky": {
