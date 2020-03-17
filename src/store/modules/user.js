@@ -119,11 +119,6 @@ export default {
 
     isVolunteer: state => state.user.isVolunteer,
     isAdmin: state => state.user.isAdmin,
-    isOnboarded: state => state.user.isOnboarded,
-
-    certifications: state => state.user.certifications,
-
-    availabilityLastModifiedAt: state => state.user.availabilityLastModifiedAt,
 
     isAuthenticated: state => !!(state.user && state.user._id),
 
