@@ -12,29 +12,33 @@
 
     <div class="volunteer-dashboard__body">
       <div v-if="!user.isOnboarded" class="dashboard-card">
-        <div class="dashboard-card__title">Your Onboarding Process</div>
+        <div class="dashboard-card__title">>Remaining Onboarding Steps</div>
         <div>
-          <div v-if="!hasSelectedAvailability">
+          <div v-if="!hasSelectedAvailability" class="onboarding-step">
             <img
               src="@/assets/onboarding_icons/calendar-icon.png"
               class="onboarding-icon"
             />
-            <h4>Select availability</h4>
-            <p>
-              Select at least one hour of availability so that we know when we
-              can text you.
-            </p>
+            <div>
+              <h4>Select availability</h4>
+              <p>
+                Select at least one hour of availability so that we know when we
+                can text you.
+              </p>
+            </div>
           </div>
-          <div v-if="!isCertified">
+          <div v-if="!isCertified" class="onboarding-step">
             <img
               src="@/assets/onboarding_icons/quiz-icon.png"
               class="onboarding-icon"
             />
-            <h4>Get a certification</h4>
-            <p>
-              Pass at least one quiz so that we know what subjects you can help
-              students with.
-            </p>
+            <div>
+              <h4>Get a certification</h4>
+              <p>
+                Pass at least one quiz so that we know what subjects you can
+                help students with.
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -325,7 +329,21 @@ export default {
   }
 }
 
+.onboarding-step {
+  display: flex;
+  justify-content: space-between;
+
+  &:first-child {
+    margin-bottom: 3em;
+  }
+
+  & div {
+    text-align: left;
+    margin-left: 2em;
+  }
+}
+
 .onboarding-icon {
-  width: 60px;
+  width: 80px;
 }
 </style>
