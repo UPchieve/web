@@ -12,7 +12,7 @@
 
     <div class="volunteer-dashboard__body">
       <div v-if="!user.isOnboarded" class="dashboard-card">
-        <div class="dashboard-card__title">>Remaining Onboarding Steps</div>
+        <div class="dashboard-card__title">Remaining Onboarding Steps</div>
         <div>
           <div v-if="!hasSelectedAvailability" class="onboarding-step">
             <img
