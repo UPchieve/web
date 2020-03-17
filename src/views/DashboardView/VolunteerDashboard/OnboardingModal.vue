@@ -1,18 +1,18 @@
 <template>
   <div class="OnboardingModal">
-    <div class="title-container">
+    <div class="OnboardingModal-title-container">
       <h1 class="OnboardingModal-title">Woohoo! Your account is verified.</h1>
-      <p class="subtitle">
+      <p class="OnboardingModal-subtitle">
         There are just two steps left to complete before you can begin helping
         students:
       </p>
     </div>
     <div class="OnboardingModal-message"></div>
-    <div class="steps-container">
+    <div class="OnboardingModal-steps-container">
       <div>
         <img
           src="@/assets/onboarding_icons/calendar-icon.png"
-          class="modal-icon"
+          class="OnboardingModal-icon"
         />
         <h4>Select availability</h4>
         <p>
@@ -21,7 +21,10 @@
         </p>
       </div>
       <div>
-        <img src="@/assets/onboarding_icons/quiz-icon.png" class="modal-icon" />
+        <img
+          src="@/assets/onboarding_icons/quiz-icon.png"
+          class="OnboardingModal-icon"
+        />
         <h4>Get a certification</h4>
         <p>
           Pass at least one quiz so that we know what subjects you can help
@@ -58,7 +61,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .OnboardingModal {
   @include flex-container(column);
   @include child-spacing(top, 24px);
@@ -78,23 +81,27 @@ export default {
   @include font-category("body");
 }
 
-.title-container {
+.OnboardingModal-title-container {
   margin: 0 auto;
   width: 80%;
 }
 
-.subtitle {
+.OnboardingModal-subtitle {
   font-size: 16px;
   color: $c-secondary-grey;
 }
 
-.modal-icon {
+.OnboardingModal-icon {
   width: 100px;
   margin-bottom: 0.6em;
 }
 
-.steps-container {
+.OnboardingModal-steps-container {
   display: flex;
   justify-content: space-around;
+}
+
+.ModalTemplate-buttons {
+  justify-content: center !important;
 }
 </style>
