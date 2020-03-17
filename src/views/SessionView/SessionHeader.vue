@@ -24,7 +24,7 @@
             </template>
           </template>
           <template v-else>
-            Loading...
+            Loading<span class="loading-ellipsis"></span>
           </template>
         </div>
       </div>
