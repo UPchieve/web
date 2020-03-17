@@ -51,7 +51,7 @@ export default {
   },
   methods: {
     onAccept() {
-      this.$store.dispatch("user/showNewUserFirstSteps", false);
+      this.$store.dispatch("user/firstDashboardVisit", false);
       this.$router.push("/calendar");
     }
   }

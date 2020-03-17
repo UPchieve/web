@@ -10,7 +10,7 @@ export default {
   state: {
     user: {},
     session: {},
-    isNewUser: false
+    isFirstDashboardVisit: false
   },
   mutations: {
     setUser: (state, user = {}) => (state.user = user),
@@ -45,8 +45,8 @@ export default {
       }
     },
 
-    setIsNewUser: (state, isNewUserFlag) => {
-      state.isNewUser = isNewUserFlag;
+    setIsFirstDashboardVisit: (state, isFirstDashboardVisit) => {
+      state.isFirstDashboardVisit = isFirstDashboardVisit;
     }
   },
   actions: {
@@ -101,8 +101,8 @@ export default {
       commit("addMessage", message);
     },
 
-    showNewUserFirstSteps: ({ commit }, isNewUserFlag) => {
-      commit("setIsNewUser", isNewUserFlag);
+    firstDashboardVisit: ({ commit }, isFirstDashboardVisit) => {
+      commit("setIsFirstDashboardVisit", isFirstDashboardVisit);
     }
   },
   getters: {
@@ -120,7 +120,6 @@ export default {
     isVolunteer: state => state.user.isVolunteer,
     isAdmin: state => state.user.isAdmin,
     isOnboarded: state => state.user.isOnboarded,
-    isNewUser: state => state.isNewUser,
 
     certifications: state => state.user.certifications,
 

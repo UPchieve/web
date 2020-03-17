@@ -109,18 +109,18 @@ export default {
       this.$store.dispatch("app/header/show", headerData);
     }
 
-    if (this.isNewUser) {
+    if (this.isFirstDashboardVisit) {
       this.showOnboardingModal();
     }
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: state => state.user.user,
+      isFirstDashboardVisit: state => state.user.isFirstDashboardVisit
     }),
     ...mapGetters({
       isSessionAlive: "user/isSessionAlive",
       sessionPath: "user/sessionPath",
-      isNewUser: "user/isNewUser",
       isOnboarded: "user/isOnboarded",
       availabilityLastModifiedAt: "user/availabilityLastModifiedAt",
       certifications: "user/certifications"

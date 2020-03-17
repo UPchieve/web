@@ -14,7 +14,7 @@ export default {
   confirmVerification(context, token) {
     return NetworkService.confirmVerification(context, { token })
       .then(() => {
-        context.$store.dispatch("user/showNewUserFirstSteps", true);
+        context.$store.dispatch("user/firstDashboardVisit", true);
         context.$router.replace("/");
       })
       .catch(() => {
