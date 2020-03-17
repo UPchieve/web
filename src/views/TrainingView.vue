@@ -2,6 +2,12 @@
   <div v-if="user.isVolunteer" class="training">
     <div class="body-container">
       <div class="body-header">Volunteer Training</div>
+      <p class="instructions">
+        Pass at least one quiz so that we know what subjects you can help
+        students with. We recommend giving each quiz a try before reviewing the
+        provided materials in order to establish a baseline. Quizzes have 10-15
+        questions and take about 15 minutes each!
+      </p>
       <div v-for="supercategory in supercategories" :key="supercategory">
         <div
           class="supercategory"
@@ -198,7 +204,7 @@ export default {
     font-size: 24px;
     font-weight: 500;
     text-align: left;
-    margin: 0 0 35px 0;
+    margin: 0 0 20px 0;
   }
 }
 
@@ -358,6 +364,12 @@ a {
 .certified {
   color: #16d2aa;
   font-weight: 600;
+}
+
+.instructions {
+  text-align: left;
+  font-size: 16px;
+  color: $c-secondary-grey;
 }
 
 @media screen and (max-width: 700px) {

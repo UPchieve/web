@@ -2,7 +2,15 @@
   <div class="calendar-container" @change="someThingChanged()">
     <div class="calendar">
       <div class="header">
-        <div class="header-title">Schedule</div>
+        <div class="instructions-container">
+          <div class="header-title">Schedule</div>
+          <p class="instructions">
+            Select at least one hour of availability so that we know when we can
+            text you. We recommend selecting times where you're free at least
+            60% of the time. No need to wait in front of a computer for a
+            request to come in—we'll text you if a student needs your help!
+          </p>
+        </div>
         <button v-bind:class="saveButtonClass" @click="save()">
           <span v-html="saveLabel"></span>
         </button>
@@ -302,9 +310,7 @@ export default {
 
 .header {
   display: flex;
-  margin: 0px;
-  align-items: flex-start;
-  justify-content: space-between;
+  flex-direction: column;
 }
 
 .header-title {
@@ -319,6 +325,7 @@ export default {
   border-radius: 30px;
   color: #fff;
   border: none;
+  align-self: flex-end;
 
   &:hover {
     color: #000;
@@ -398,6 +405,16 @@ input[type="checkbox"]:checked + label {
 
 .tz-selector-container {
   padding-top: 30px;
+}
+
+.instructions-container {
+  text-align: left;
+}
+
+.instructions {
+  font-size: 16px;
+  color: $c-secondary-grey;
+  margin: 15px 0;
 }
 
 @media screen and (max-width: #{get-app-sidebar-width("medium") + 960px}) {

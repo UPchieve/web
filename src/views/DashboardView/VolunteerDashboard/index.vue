@@ -11,7 +11,38 @@
     </dashboard-banner>
 
     <div class="volunteer-dashboard__body">
-      <div class="students-waiting dashboard-card">
+      <div v-if="!user.isOnboarded" class="dashboard-card">
+        <div class="dashboard-card__title">Remaining Onboarding Steps</div>
+        <div>
+          <div v-if="!hasSelectedAvailability" class="onboarding-step">
+            <img
+              src="@/assets/onboarding_icons/calendar-icon.png"
+              class="onboarding-icon"
+            />
+            <div>
+              <h4>Select availability</h4>
+              <p>
+                Select at least one hour of availability so that we know when we
+                can text you.
+              </p>
+            </div>
+          </div>
+          <div v-if="!isCertified" class="onboarding-step">
+            <img
+              src="@/assets/onboarding_icons/quiz-icon.png"
+              class="onboarding-icon"
+            />
+            <div>
+              <h4>Get a certification</h4>
+              <p>
+                Pass at least one quiz so that we know what subjects you can
+                help students with.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-else class="students-waiting dashboard-card">
         <div class="dashboard-card__title">Waiting Students</div>
         <div v-if="isSessionAlive">
           <button
@@ -81,10 +112,15 @@ export default {
     if (this.isSessionAlive) {
       this.$store.dispatch("app/header/show", headerData);
     }
+
+    if (this.isFirstDashboardVisit) {
+      this.showOnboardingModal();
+    }
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: state => state.user.user,
+      isFirstDashboardVisit: state => state.user.isFirstDashboardVisit
     }),
     ...mapGetters({
       isSessionAlive: "user/isSessionAlive",
@@ -156,6 +192,22 @@ export default {
           value: `${numHoursTutored} hours tutored`
         }
       ];
+    },
+
+    isCertified() {
+      let isCertified = false;
+
+      for (let index in this.user.certifications) {
+        if (this.user.certifications[index].passed) {
+          isCertified = true;
+          break;
+        }
+      }
+      return isCertified;
+    },
+
+    hasSelectedAvailability() {
+      return !!this.user.availabilityLastModifiedAt;
     }
   },
   methods: {
@@ -170,6 +222,13 @@ export default {
 
     goToCoachGuide() {
       this.$router.push("/coach-guide");
+    },
+
+    showOnboardingModal() {
+      this.$store.dispatch("app/modal/show", {
+        component: "OnboardingModal",
+        data: { alertModal: true, acceptText: "Get started" }
+      });
     }
   }
 };
@@ -268,5 +327,26 @@ export default {
   &__stat-value {
     font-weight: bold;
   }
+}
+
+.onboarding-step {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+
+  &:first-child {
+    margin: 2.5em 0 3em;
+  }
+
+  & div {
+    text-align: left;
+    margin-left: 2em;
+  }
+}
+
+.onboarding-icon {
+  width: 70px;
+  height: 70px;
 }
 </style>

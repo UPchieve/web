@@ -24,13 +24,15 @@ import ModalTemplate from "./ModalTemplate";
 import RejoinSessionModal from "./RejoinSessionModal";
 import SubjectSelectionModal from "@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectSelectionModal";
 import SessionFulfilledModal from "@/views/SessionView/SessionFulfilledModal";
+import OnboardingModal from "@/views/DashboardView/VolunteerDashboard/OnboardingModal.vue";
 
 export default {
   components: {
     ModalTemplate,
     RejoinSessionModal,
     SubjectSelectionModal,
-    SessionFulfilledModal
+    SessionFulfilledModal,
+    OnboardingModal
   },
   data() {
     return {
