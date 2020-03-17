@@ -61,7 +61,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .OnboardingModal {
   @include flex-container(column);
   @include child-spacing(top, 24px);
@@ -99,9 +99,5 @@ export default {
 .OnboardingModal-steps-container {
   display: flex;
   justify-content: space-around;
-}
-
-.ModalTemplate-buttons {
-  justify-content: center !important;
 }
 </style>
