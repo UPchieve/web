@@ -332,9 +332,11 @@ export default {
 .onboarding-step {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
 
   &:first-child {
-    margin-bottom: 3em;
+    margin: 2.5em 0 3em;
   }
 
   & div {
@@ -344,6 +346,7 @@ export default {
 }
 
 .onboarding-icon {
-  width: 80px;
+  width: 70px;
+  height: 70px;
 }
 </style>
