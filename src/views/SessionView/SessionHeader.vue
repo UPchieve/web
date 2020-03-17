@@ -5,7 +5,7 @@
         <div :style="partnerAvatar" class="avatar" />
         <div class="info">
           <template v-if="isSessionWaitingForVolunteer">
-            <span>
+            <span class="loading-message">
               Contacting coaches<span class="loading-ellipsis"></span>
             </span>
           </template>
@@ -24,7 +24,9 @@
             </template>
           </template>
           <template v-else>
-            Loading<span class="loading-ellipsis"></span>
+            <span class="loading-message">
+              Loading<span class="loading-ellipsis"></span>
+            </span>
           </template>
         </div>
       </div>
@@ -326,28 +328,38 @@ h1 {
   align-items: center;
 }
 
+.loading-message {
+  display: inline-flex;
+  align-self: flex-end;
+}
+
 .loading-ellipsis {
+  display: inline-flex;
+
   &:after {
-    content: "";
-    animation: 2s ellip infinite;
+    content: "...";
+    display: inline-block;
+    width: 25px;
+    overflow: hidden;
+    animation: 1.2s ellip infinite;
   }
 }
 
 @keyframes ellip {
-  20% {
-    content: ".";
+  0% {
+    width: 0px;
   }
 
-  40% {
-    content: "..";
+  33% {
+    width: 5px;
   }
 
-  60% {
-    content: "...";
+  66% {
+    width: 10px;
   }
 
-  80% {
-    content: "...";
+  100% {
+    width: 25px;
   }
 }
 </style>
