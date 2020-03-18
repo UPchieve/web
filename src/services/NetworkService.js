@@ -67,6 +67,11 @@ export default {
       .post(`${AUTH_ROOT}/reset/confirm`, data)
       .then(this._successHandler, this._errorHandler);
   },
+  verifyReset(context, data) {
+    return context.$http
+      .post(`${AUTH_ROOT}/reset/verify`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
   user(context) {
     return context.$http
       .get(`${API_ROOT}/user`)
