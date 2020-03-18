@@ -2,6 +2,12 @@
   <div v-if="user.isVolunteer" class="training">
     <div class="body-container">
       <div class="body-header">Volunteer Training</div>
+      <p class="instructions">
+        Pass at least one quiz so that we know what subjects you can help
+        students with. We recommend giving each quiz a try before reviewing the
+        provided materials in order to establish a baseline. Quizzes have 10-15
+        questions and take about 15 minutes each!
+      </p>
       <div v-for="supercategory in supercategories" :key="supercategory">
         <div
           class="supercategory"
@@ -23,17 +29,19 @@
             v-show="supercategoryMenuDisplayStates[supercategory]"
             class="category"
           >
-            <div>
-              {{ category }}
+            <div class="category-label">
+              <span>
+                {{ category }}
+              </span>
               <div class="review">
                 <div class="review-container">
                   <div class="review-label">
-                    <a
-                      v-on:click.prevent="
-                        getReviewMaterial(categoryKeys[category])
-                      "
-                      >Review</a
+                    <router-link
+                      :to="'/training/review/' + categoryKeys[category]"
+                      tag="a"
                     >
+                      Review
+                    </router-link>
                   </div>
                   <div class="arrow right" />
                 </div>
@@ -52,8 +60,10 @@
               <div v-if="hasPassed(category)" class="test-container certified">
                 Certified!
               </div>
-              <div v-if="!hasPassed(category)" class="numTries">
-                You have used {{ getTries(category) }}/3 tries.
+              <div v-if="!mobileMode">
+                <div v-if="!hasPassed(category)" class="numTries">
+                  You have used {{ getTries(category) }}/3 tries.
+                </div>
               </div>
             </div>
           </div>
@@ -65,10 +75,9 @@
 
 <script>
 import _ from "lodash";
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 import { topics, allSubtopics } from "@/utils/topics";
-import NetworkService from "@/services/NetworkService";
 
 export default {
   data() {
@@ -101,30 +110,9 @@ export default {
       default: "#1855D1"
     };
 
-    const reviewMaterials = {};
-    reviewMaterials.algebra =
-      "https://drive.google.com/open?id=105iP5lJdVti-r2reY8N3tKQOA0FtrjZW";
-    reviewMaterials.geometry =
-      "https://drive.google.com/open?id=1Ug_JbG8_Rok60B__o0E4WQ426WV9VmJe";
-    reviewMaterials.trigonometry =
-      "https://drive.google.com/open?id=1cQ_JcY9IS29t4k8IaZHHJYKwV0FhkbX3";
-    reviewMaterials.precalculus =
-      "https://drive.google.com/open?id=1jOGiQNs_IWwh3cT2mW-1kj9I80NeotaT";
-    reviewMaterials.calculus =
-      "https://drive.google.com/open?id=1BePatfy99En5KwLEDVP2XTMdeMR0NEMx";
-    reviewMaterials.esl =
-      "https://drive.google.com/open?id=1P99PIY89X6VdvCGMMzjNOS55Nvljkc8Lv6FxmjJzo8Y";
-    reviewMaterials.planning =
-      "https://drive.google.com/open?id=1b_EHOgtrkkyWa6ge4fbKqxC7ZDgHrJxx";
-    reviewMaterials.essays =
-      "https://drive.google.com/open?id=1lJXVI1f9Do60pNXcBQGSZThNXhYmtMvV";
-    reviewMaterials.applications =
-      "https://drive.google.com/open?id=1gXmbGRaUz324-EiZMzph1KUYS8WhR9ax";
-
     return {
       quizzes,
       supercategoryColors,
-      reviewMaterials,
       categoryKeys,
       supercategoryMenuDisplayStates: {}
     };
@@ -148,6 +136,9 @@ export default {
   },
 
   computed: {
+    ...mapGetters({
+      mobileMode: "app/mobileMode"
+    }),
     ...mapState({ user: state => state.user.user }),
 
     topicsToDisplay() {
@@ -193,13 +184,6 @@ export default {
         this.supercategoryColors[supercategory] ||
         this.supercategoryColors.default
       );
-    },
-    getReviewMaterial(category) {
-      NetworkService.getReviewMaterial(this, category).then(response => {
-        if (response.status === 204) {
-          window.location = this.reviewMaterials[category];
-        }
-      });
     }
   }
 };
@@ -220,7 +204,7 @@ export default {
     font-size: 24px;
     font-weight: 500;
     text-align: left;
-    margin: 0 0 35px 0;
+    margin: 0 0 20px 0;
   }
 }
 
@@ -275,8 +259,16 @@ a {
 }
 
 .review {
-  font-size: 12px;
+  font-size: 16px;
   text-align: start;
+  display: inline-block;
+}
+
+.category-label {
+  width: 55%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .test {
@@ -336,13 +328,25 @@ a {
   background-position: center;
 }
 
-.review-container .arrow.right {
-  height: 1.3em;
-  width: 1.3em;
-}
+.review-container {
+  & .arrow.right {
+    height: 1.3em;
+    width: 1.3em;
+    padding-left: 0px;
+    transition: padding-left 0.1s ease-in;
 
-.review-container .arrow.right::after {
-  background-size: 24%;
+    &::after {
+      background-size: 24%;
+    }
+  }
+
+  &:hover {
+    color: #5a5a5f;
+
+    .arrow.right {
+      padding-left: 3px;
+    }
+  }
 }
 
 .arrow.down::after {
@@ -362,10 +366,42 @@ a {
   font-weight: 600;
 }
 
+.instructions {
+  text-align: left;
+  font-size: 16px;
+  color: $c-secondary-grey;
+}
+
 @media screen and (max-width: 700px) {
   .supercategory,
   .category {
     width: auto !important;
+  }
+  .test {
+    min-width: initial;
+  }
+}
+
+@media screen and (max-width: 460px) {
+  .category,
+  .review {
+    font-size: 14px;
+  }
+  .category-label {
+    width: 60%;
+  }
+}
+
+@media screen and (max-width: 375px) {
+  .category-label {
+    width: 70%;
+  }
+}
+
+@media screen and (max-width: 340px) {
+  .category,
+  .review {
+    font-size: 12px;
   }
 }
 </style>

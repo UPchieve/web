@@ -9,7 +9,8 @@ export default {
   namespaced: true,
   state: {
     user: {},
-    session: {}
+    session: {},
+    isFirstDashboardVisit: false
   },
   mutations: {
     setUser: (state, user = {}) => (state.user = user),
@@ -42,6 +43,10 @@ export default {
         state.user.timezone = timezone;
         state.user.date = date;
       }
+    },
+
+    setIsFirstDashboardVisit: (state, isFirstDashboardVisit) => {
+      state.isFirstDashboardVisit = isFirstDashboardVisit;
     }
   },
   actions: {
@@ -94,6 +99,10 @@ export default {
 
     addMessage: ({ commit }, message) => {
       commit("addMessage", message);
+    },
+
+    firstDashboardVisit: ({ commit }, isFirstDashboardVisit) => {
+      commit("setIsFirstDashboardVisit", isFirstDashboardVisit);
     }
   },
   getters: {
