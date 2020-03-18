@@ -37,10 +37,8 @@
       <div v-if="qNumber" class="questionNumber">Question {{ qNumber }}</div>
       <br />
       <div class="body">
-        <div v-if="quizLoading" class="loadingBody">
-          <div class="loadingMessage">
-            Loading quiz...
-          </div>
+        <div v-if="true" class="loadingBody">
+          <loading-message message="Loading quiz" />
         </div>
         <div v-else class="startBody">
           <div v-if="showNoQuiz" class="instructions">
@@ -163,6 +161,7 @@
 <script>
 import { mapState } from "vuex";
 
+import LoadingMessage from "@/components/LoadingMessage";
 import TrainingService from "@/services/TrainingService";
 
 /**
@@ -207,6 +206,9 @@ export default {
       coverStyle: {},
       qNumber: ""
     };
+  },
+  components: {
+    LoadingMessage
   },
   computed: {
     ...mapState({
@@ -494,11 +496,7 @@ export default {
 }
 
 .loadingBody {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: inherit;
+  margin: 0 auto;
 }
 
 .quizBody {
