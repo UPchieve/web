@@ -1,7 +1,7 @@
 <template>
   <div class="action">
     <p v-if="!isValidVerificationToken" class="message">
-      This url is no longer valid. Please check your inbox for the most recent
+      This URL is no longer valid. Please check your inbox for the most recent
       verification email sent to you.
     </p>
   </div>
