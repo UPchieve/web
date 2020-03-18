@@ -37,7 +37,7 @@
       <div v-if="qNumber" class="questionNumber">Question {{ qNumber }}</div>
       <br />
       <div class="body">
-        <div v-if="true" class="loadingBody">
+        <div v-if="quizLoading" class="loadingBody">
           <loading-message message="Loading quiz" />
         </div>
         <div v-else class="startBody">
