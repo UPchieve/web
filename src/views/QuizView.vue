@@ -87,19 +87,19 @@
         </div>
         <div v-if="showQuizReview" class="review">
           <div
-            v-for="(question, index) in questionsReview"
-            :key="`question-${index}`"
+            v-for="(question, qIndex) in questionsReview"
+            :key="`question-${qIndex}`"
             class="question"
           >
-            <div class="questionNumber">Question {{ index + 1 }}</div>
+            <div class="questionNumber">Question {{ qIndex + 1 }}</div>
             <br />
             <div class="questionText">{{ question.questionText }}</div>
             <div :style="question.imageStyle" class="questionImage" />
             <div class="possibleAnswers">
               <div
-                v-for="(answer, index) in question.possibleAnswers"
-                :key="`answer-${index}`"
-                :id="'answer-' + answer.val"
+                v-for="(answer, aIndex) in question.possibleAnswers"
+                :key="`question-${qIndex}-answer-${aIndex}`"
+                :id="`question-${qIndex}-answer-${answer.val}`"
               >
                 {{ answer.val }}. {{ answer.txt }}
               </div>
