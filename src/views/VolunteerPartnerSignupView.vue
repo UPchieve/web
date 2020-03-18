@@ -22,7 +22,7 @@
 
         <div class="step-header">
           <div class="step-header__title">
-            Welcome {{ volunteerPartner.name }} Employee!
+            {{ welcomeTitle }}
           </div>
           <div class="step-header__subtitle">
             Not with {{ volunteerPartner.name }}?
@@ -31,9 +31,9 @@
         </div>
 
         <div class="uc-column">
-          <label for="inputEmail" class="uc-form-label"
-            >What's your work email?</label
-          >
+          <label for="inputEmail" class="uc-form-label">{{
+            emailInputLabel
+          }}</label>
           <input
             id="inputEmail"
             type="email"
@@ -263,6 +263,23 @@ export default {
       invalidInputs: [],
       serverErrorMsg: ""
     };
+  },
+  computed: {
+    hasEmailValidation() {
+      const requiredDomains = this.volunteerPartner.requiredEmailDomains;
+      return requiredDomains && requiredDomains.length;
+    },
+
+    welcomeTitle() {
+      const typeOfPerson = this.hasEmailValidation ? "Employee" : "Volunteer";
+      return `Welcome ${this.volunteerPartner.name} ${typeOfPerson}!`;
+    },
+
+    emailInputLabel() {
+      return this.hasEmailValidation
+        ? "What's your work email?"
+        : "What's your email?";
+    }
   },
   methods: {
     setVolunteerPartner(volunteerPartner) {
