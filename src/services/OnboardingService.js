@@ -17,8 +17,9 @@ export default {
         context.$store.dispatch("user/firstDashboardVisit", true);
         context.$router.replace("/");
       })
-      .catch(() => {
+      .catch(err => {
         context.msg = "Error occurred";
+        throw err;
       });
   }
 };
