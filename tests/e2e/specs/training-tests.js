@@ -228,9 +228,9 @@ describe("Training quizzes", function() {
           question.possibleAnswers
             .filter(answer => answer.txt.includes("\\"))
             .forEach(answer => {
-              cy.get(`#question-${i}-answer-${answer.val} .mjx-chtml`).should(
-                "exist"
-              );
+              cy.get(`#question-${i}-answer-${answer.val} .mjx-chtml`, {
+                timeout: 25000
+              }).should("exist");
             });
         }
       });
