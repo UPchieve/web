@@ -13,7 +13,7 @@ jobs:
 
     steps:
     # To save time, detach and pull some of the largest docker files
-    - run: (docker pull mongo:4.2.3-bionic && docker pull mongo:4.2.3-bionic) &
+    - run: (docker pull mongo:4.2.3-bionic && docker pull cypress/included:3.4.1) &
     # Download Mongo to get the client
     - run: sudo wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
     - run: sudo echo "deb http://repo.mongodb.org/apt/debian stretch/mongodb-org/4.2 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list
