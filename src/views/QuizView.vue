@@ -277,15 +277,23 @@ export default {
         }
 
         window.MathJax.Hub.Queue(
-          ...Array.from(questions).map(question => [
-            "Typeset",
-            window.MathJax.Hub,
-            question.querySelector(".questionText")
-          ]),
+          ...Array.from(questions)
+            .filter(
+              question =>
+                question
+                  .querySelector(".questionText")
+                  .innerHTML.indexOf("\\") !== -1
+            )
+            .map(question => [
+              "Typeset",
+              window.MathJax.Hub,
+              question.querySelector(".questionText")
+            ]),
           ...Array.from(questions)
             .flatMap(question =>
               Array.from(question.querySelectorAll(".possibleAnswers div"))
             )
+            .filter(answer => answer.innerHTML.indexOf("\\") !== -1)
             .map(answer => ["Typeset", window.MathJax.Hub, answer])
         );
       } else {
