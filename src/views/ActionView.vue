@@ -25,9 +25,12 @@ export default {
     const { data } = this.$route.params;
 
     if (action === "verify") {
-      OnboardingService.confirmVerification(this, data).catch(
-        () => (this.isValidVerificationToken = false)
-      );
+      OnboardingService.confirmVerification(this, data)
+        .then(() => {
+          this.$store.dispatch("user/firstDashboardVisit", true);
+          this.$router.replace("/");
+        })
+        .catch(() => (this.isValidVerificationToken = false));
     } else {
       router.replace("/");
     }

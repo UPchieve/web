@@ -12,14 +12,9 @@ export default {
       });
   },
   confirmVerification(context, token) {
-    return NetworkService.confirmVerification(context, { token })
-      .then(() => {
-        context.$store.dispatch("user/firstDashboardVisit", true);
-        context.$router.replace("/");
-      })
-      .catch(err => {
-        context.msg = "Error occurred";
-        throw err;
-      });
+    return NetworkService.confirmVerification(context, { token }).catch(err => {
+      context.msg = "Error occurred";
+      throw err;
+    });
   }
 };
