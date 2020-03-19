@@ -162,6 +162,7 @@
 
 <script>
 import { mapState } from "vuex";
+import "core-js/fn/array/flat-map";
 
 import TrainingService from "@/services/TrainingService";
 
