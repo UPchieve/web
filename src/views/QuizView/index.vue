@@ -42,6 +42,7 @@
               There's no time limit, but we recommend setting aside at least 15
               minutes.
             </p>
+            <p>You have {{ 3 - tries }}/3 tries left to pass this quiz.</p>
             <p>Once you feel ready, press "Start Quiz" below!</p>
           </div>
           <button class="btn" type="start" @click.prevent="startQuiz()">
