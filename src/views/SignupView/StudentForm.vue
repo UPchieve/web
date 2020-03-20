@@ -42,6 +42,25 @@
       </div>
     </div>
 
+    <div class="uc-column">
+      <label for="inputZipCode" class="uc-form-label"
+        >What zip code do you live in?</label
+      >
+      <input
+        id="inputZipCode"
+        type="text"
+        pattern="[0-9]{5}"
+        class="uc-form-input"
+        v-bind:class="{
+          'uc-form-input--invalid': invalidInputs.indexOf('inputZipCode') > -1
+        }"
+        v-model="eligibility.zipCode"
+        required
+        placeholder="5 digit zip code"
+        aria-label="5 digit zip code"
+      />
+    </div>
+
     <button class="uc-form-button" type="submit">
       Continue
     </button>
@@ -356,6 +375,10 @@ export default {
 
       if (!this.eligibility.highSchool.upchieveId) {
         this.errors.push("You must select your high school.");
+      }
+      if (!this.eligibility.zipCode) {
+        this.errors.push("You must enter your zip code");
+        this.invalidInputs.push("inputZipCode");
       }
       if (this.errors.length) {
         return;
