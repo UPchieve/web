@@ -345,7 +345,8 @@ export default {
       invalidInputs: [],
       eligibility: {
         noSchoolResults: false,
-        highSchool: {}
+        highSchool: {},
+        zipCode: ""
       },
       waitlist: {
         email: ""
@@ -384,13 +385,14 @@ export default {
         return;
       }
 
-      NetworkService.checkSchoolApproval(this, {
-        schoolUpchieveId: this.eligibility.highSchool.upchieveId
+      NetworkService.checkStudentEligbility(this, {
+        schoolUpchieveId: this.eligibility.highSchool.upchieveId,
+        zipCode: this.eligibility.zipCode
       })
         .then(response => {
-          const isSchoolApproved = response.body.approved;
+          const isEligible = response.body.isEligible;
 
-          if (isSchoolApproved) {
+          if (isEligible) {
             this.step = "step-2";
           } else {
             this.step = "step-1-waitlist";
