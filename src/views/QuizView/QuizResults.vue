@@ -1,14 +1,19 @@
 <template>
-  <div :style="[popUpStyle, popUpBorderStyle]" class="passScoreContainer">
-    <div class="passed">{{ passedMsg }}</div>
-    <div class="score">{{ scoreMsg }}</div>
-    <div class="btnContainer">
-      <button class="reviewBtn btn" type="button" @click="showReview">
-        REVIEW TEST
+  <div :style="[popUpStyle, popUpBorderStyle]" class="score-container">
+    <div>
+      <h2>{{ headerMsg }}</h2>
+      <p :style="scoreStyle" class="score">{{ scoreMsg }}</p>
+      <p class="instructions">
+        {{ instructionMsg }}
+      </p>
+    </div>
+    <div class="btn-container">
+      <button class="review-btn btn" type="button" @click="showReview">
+        Review answers
       </button>
-      <button v-if="showRetakeQuiz" class="btn" @click.prevent="reload()">
-        RETAKE TEST
-      </button>
+      <router-link :to="rightBtn.route" tag="button" class="btn">{{
+        rightBtn.text
+      }}</router-link>
     </div>
   </div>
 </template>
@@ -23,48 +28,51 @@ export default {
     return {
       scoreMsg: "",
       showRetakeQuiz: false,
+      headerMsg: "",
+      instructionMsg: "",
+      category: "",
+      rightBtn: { text: "", route: "" },
       popUpStyle: {},
-      popUpBool: false,
       popUpBorderStyle: {},
-      passedMsg: ""
+      scoreStyle: {}
     };
   },
   mounted() {
+    const { category } = this.$route.params;
+    this.category = category;
+
     if (this.quizResults.passed) {
-      this.passedMsg = "You passed!";
+      this.headerMsg = "What a rockstar! You passed!";
+      this.instructionMsg =
+        "Now that you have this certification, you'll be notified of student requests for help in this subject. If you want to help students with even more subjects, just pass more quizzes!";
       this.popUpBorderStyle = {
-        borderBottom: "5px solid #1855D1",
-        borderLeft: "5px solid #1855D1"
+        borderBottom: "5px solid #16D2AA",
+        borderLeft: "5px solid #16D2AA"
+      };
+      this.scoreStyle = { color: "#16D2AA" };
+      this.rightBtn = {
+        text: "Take another quiz",
+        route: "/training"
       };
     } else {
-      this.passedMsg = "You failed.";
+      this.headerMsg = "You failed this time, but don't give up!";
+      this.instructionMsg =
+        "Please try attempting this quiz again after reviewing your incorrect answers and checking out the subject-specific review materials we provide on the Training page.";
       this.popUpBorderStyle = {
         borderBottom: "5px solid #F44747",
         borderLeft: "5px solid #F44747"
       };
-      if (this.quizResults.tries < 3) {
-        this.showRetakeQuiz = true;
-      }
+      this.scoreStyle = { color: "#F44747" };
+      this.leftBtn = { text: "Review answers", route: "" };
+      this.rightBtn = {
+        text: "Keep studying",
+        route: `/training/review/${this.category}`
+      };
     }
 
     this.scoreMsg = `Score: ${this.quizResults.score} out of ${
       this.quizLength
     } correct.`;
-
-    this.popUpStyle = {
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      maxWidth: "500px",
-      height: "300px",
-      background: "#FFFFFF",
-      zIndex: "5",
-      position: "absolute",
-      top: "150px",
-      left: "0",
-      right: "0",
-      margin: "auto"
-    };
   },
   methods: {
     reload() {
@@ -78,6 +86,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+h2 {
+  font-size: 20px;
+}
+
+// todo: make global button to import
 .btn {
   background: #f6f6f6;
   border-radius: 20px;
@@ -98,61 +111,70 @@ export default {
   margin: 50px 0;
 }
 
-.loadingMessage {
-  font-size: 2rem;
-  margin: 75px 0;
-}
-
-.btnContainer {
+.btn-container {
   display: flex;
   justify-content: space-between;
-  margin: 50px 75px;
+  width: 80%;
+  margin: 4em auto;
+
+  & .btn:first-of-type {
+    margin-left: 15px;
+  }
+
+  & .btn:last-of-type {
+    margin-right: 15px;
+  }
 }
 
-.btnContainer btn {
-  min-width: 100px;
-}
-
-.btnContainer .btn:first-of-type {
-  margin-right: 15px;
-}
-
-.btnContainer .btn:last-of-type {
-  margin-left: 15px;
+// override global style from router-link
+.btn.active {
+  box-shadow: initial;
 }
 
 .score {
   margin-top: 20px;
-}
-
-.passed {
   font-weight: 600;
-  margin-top: 75px;
 }
 
-.review {
-  width: 600px;
-  align-self: center;
+.instructions {
+  width: 80%;
+  margin: 1.4em auto 0;
 }
 
-.review .question {
-  border-bottom: 0.5px solid #cccccf;
-  padding: 20px;
-  margin: 0px;
+.score-container {
+  margin-top: 1em;
+  padding-top: 1em;
 }
 
-@media screen and (max-width: 700px) {
-  .btnContainer {
-    margin: 2em !important;
-  }
-
-  .passScoreContainer {
+@media screen and (max-width: 890px) {
+  .btn-container {
     width: 100%;
-    left: 0 !important;
   }
 
-  .reviewBtn {
-    margin: 0% auto !important;
+  .score-container {
+    width: 100%;
+    left: 0;
+  }
+
+  .review-btn {
+    margin: 0% auto;
+  }
+
+  .btn {
+    width: 120px;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .btn-container {
+    flex-direction: column;
+    align-items: center;
+    margin: 2em 0;
+  }
+
+  .btn {
+    width: 80%;
+    margin-bottom: 1.6em;
   }
 }
 </style>
