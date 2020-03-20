@@ -1,49 +1,56 @@
 <template>
-  <div class="body">
-    <progress-bar :barWidth="barWidth" :quizLength="quizLength" />
-    <div v-if="questionNumber" class="questionNumber">
-      Question {{ questionNumber }}
+  <div class="container">
+    <div class="progress-bar-container">
+      <progress-bar :barWidth="barWidth" :quizLength="quizLength" />
     </div>
-    <div class="quizBody">
+    <div class="quiz-body">
+      <div v-if="questionNumber" class="question-number">
+        Question {{ questionNumber }}
+      </div>
       <div class="questionText">{{ questionText }}</div>
-      <div :style="imageStyle" class="questionImage" />
-      <form class="possibleAnswers">
+      <div :style="imageStyle" class="question-image" />
+      <form class="possible-answers">
         <div v-for="(item, index) in items" :key="`item-${index}`">
           <div class="options">
-            <input :value="item.val" v-model="picked" type="radio" />
+            <input
+              :value="item.val"
+              v-model="picked"
+              type="radio"
+              :id="item.val"
+            />
             <label :for="item.val" :id="'answer-' + item.val">
               {{ item.val }}. {{ item.txt }}
             </label>
           </div>
         </div>
-        <p>{{ scoreMsg }}</p>
-        <div class="btnContainer">
-          <button
-            v-if="showPrevious"
-            class="prev btn"
-            type="previous"
-            @click.prevent="previous()"
-          >
-            PREVIOUS
-          </button>
-          <button
-            v-if="showNext"
-            class="next btn"
-            type="next"
-            @click.prevent="next()"
-          >
-            NEXT
-          </button>
-          <button
-            v-if="showSubmit"
-            class="submit btn"
-            type="submit"
-            @click.prevent="submit()"
-          >
-            SUBMIT TEST
-          </button>
-        </div>
+        <p class="quiz-error">{{ errorMsg }}</p>
       </form>
+      <div class="btn-container">
+        <button
+          v-if="showPrevious"
+          class="prev btn"
+          type="previous"
+          @click.prevent="previous()"
+        >
+          PREVIOUS
+        </button>
+        <button
+          v-if="showNext"
+          class="next btn"
+          type="next"
+          @click.prevent="next()"
+        >
+          NEXT
+        </button>
+        <button
+          v-if="showSubmit"
+          class="submit btn"
+          type="submit"
+          @click.prevent="submit()"
+        >
+          SUBMIT TEST
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -66,7 +73,7 @@ export default {
       questionText: "",
       items: [],
       imageStyle: {},
-      scoreMsg: ""
+      errorMsg: ""
     };
   },
   components: {
@@ -80,7 +87,7 @@ export default {
   },
   methods: {
     clearMathJaxElements() {
-      const quizBody = document.querySelector(".quizBody");
+      const quizBody = document.querySelector(".quiz-body");
 
       // Remove any MathJax-rendered elements from the DOM.
       // Do this before updating to avoid rendering artifacts being left behind
@@ -111,9 +118,9 @@ export default {
 
     rerenderMathJaxElements() {
       // Re-render MathJax in question text and answer choices
-      const quiz = document.querySelector(".quizBody");
+      const quiz = document.querySelector(".quiz-body");
       const questionText = quiz.querySelector(".questionText");
-      const answerChoices = quiz.querySelector(".possibleAnswers");
+      const answerChoices = quiz.querySelector(".possible-answers");
 
       if (!questionText || !answerChoices) {
         return;
@@ -149,7 +156,8 @@ export default {
           height: "300px",
           display: "flex",
           backgroundSize: "100%",
-          backgroundRepeat: "no-repeat"
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "center"
         };
       } else {
         this.imageStyle = {};
@@ -176,8 +184,8 @@ export default {
       if (!TrainingService.hasPrevious(this)) {
         this.showPrevious = false;
       }
-      if (this.scoreMsg) {
-        this.scoreMsg = "";
+      if (this.errorMsg) {
+        this.errorMsg = "";
       }
       this.showSubmit = false;
       this.showNext = true;
@@ -201,7 +209,7 @@ export default {
     submit() {
       TrainingService.saveAnswer(this, this.picked);
       if (!TrainingService.hasCompleted()) {
-        this.scoreMsg =
+        this.errorMsg =
           "You must answer all questions before submitting the quiz!";
       } else {
         this.$emit("submitQuiz");
@@ -212,29 +220,29 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.questionImage {
-  background-position: center;
+.container {
+  width: 100%;
+  margin: 0 auto;
 }
 
-.body {
-  display: flex;
-  flex-direction: column;
+.progress-bar-container {
+  margin: 2em auto;
+  width: 90%;
+  max-width: 600px;
 }
 
-.quizBody {
-  display: flex;
-  flex-direction: column;
+.quiz-body {
   width: 400px;
   text-align: left;
-  align-self: center;
+  margin: 0 auto;
 }
 
 input[type="radio"]:checked {
   background-color: #16d2aa;
 }
 
-.possibleAnswers {
-  margin: 20px 50px;
+.possible-answers {
+  margin: 2em;
 }
 
 label {
@@ -246,29 +254,20 @@ label {
   margin-bottom: 10px;
 }
 
-.questionNumber {
+.question-number {
   font-weight: 600;
   width: 400px;
   align-self: center;
   text-align: left;
+  margin-bottom: 1.4em;
 }
 
-.btn.next,
-.btn.submit {
-  float: right;
-}
-
-.btn.previous {
-  float: left;
-}
-
+// todo: make global button
 .btn {
   background: #f6f6f6;
   border-radius: 20px;
-  width: 140px;
-  box-sizing: content-box;
-  height: 26px;
-  line-height: 26px;
+  width: 160px;
+  padding: 0.6em 0;
   color: #16d2aa;
   font-weight: 600;
 }
@@ -278,36 +277,55 @@ label {
   color: #fff;
 }
 
-.btnContainer {
+.quiz-error {
+  color: $c-error-red;
+  margin: 2em 0;
+}
+
+.btn-container {
   display: flex;
   justify-content: space-between;
-  margin: 50px 75px;
-}
+  position: absolute;
+  left: 0;
+  width: 100%;
 
-.btnContainer btn {
-  min-width: 100px;
-}
+  max-width: 600px;
+  left: 0;
+  right: 0;
+  margin: 2em auto 0;
 
-.btnContainer .btn:first-of-type {
-  margin-right: 15px;
-}
+  & .btn:first-of-type {
+    margin-left: 15px;
+  }
 
-.btnContainer .btn:last-of-type {
-  margin-left: 15px;
+  & .btn:last-of-type {
+    margin-right: 15px;
+  }
 }
 
 @media screen and (max-width: 700px) {
-  .body {
-    padding: 1em 0em !important;
+  .question-number,
+  .quiz-body {
+    width: 100%;
   }
 
-  .questionNumber,
-  .quizBody {
+  .btn-container {
+    width: 100%;
+  }
+
+  .progress-bar-container {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .btn {
+    width: 120px;
+  }
+
+  // override inline styling
+  .question-image {
     width: 100% !important;
-  }
-
-  .btnContainer {
-    margin: 2em !important;
   }
 }
 </style>
