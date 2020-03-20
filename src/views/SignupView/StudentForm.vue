@@ -378,7 +378,7 @@ export default {
         this.errors.push("You must select your high school.");
       }
 
-      const zipCodeRegex = /^\d{5}$/
+      const zipCodeRegex = /^\d{5}$/;
       const zipCode = this.eligibility.zipCode;
 
       if (!zipCode || !zipCodeRegex.test(zipCode)) {
