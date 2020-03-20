@@ -29,9 +29,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.progressBar {
-  margin: 50px;
-}
 
 .circles {
   display: flex;
@@ -64,11 +61,5 @@ export default {
 .rect.cover {
   background: #16d2aa;
   top: -20px;
-}
-
-@media screen and (max-width: 700px) {
-  .progressBar {
-    margin: 2em !important;
-  }
 }
 </style>
