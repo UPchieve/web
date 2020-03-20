@@ -5,11 +5,11 @@
       :key="`question-${index}`"
       class="question"
     >
-      <div class="questionNumber">Question {{ index + 1 }}</div>
+      <div class="question-number">Question {{ index + 1 }}</div>
       <br />
-      <div class="questionText">{{ question.questionText }}</div>
-      <div :style="question.imageStyle" class="questionImage" />
-      <div class="possibleAnswers">
+      <div class="question-text">{{ question.questionText }}</div>
+      <div :style="question.imageStyle" class="question-image" />
+      <div class="possible-answers">
         <div
           v-for="(answer, index) in question.possibleAnswers"
           :key="`answer-${index}`"
@@ -56,7 +56,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.questionImage {
+.question-image {
   background-position: center;
 }
 
@@ -65,20 +65,20 @@ export default {
   text-align: left;
 }
 
-.questionNumber {
+.question-number {
   font-weight: 600;
   width: 400px;
   align-self: center;
   text-align: left;
 }
 
-.possibleAnswers {
+.possible-answers {
   margin: 20px 50px;
 }
 
 .review {
   width: 600px;
-  align-self: center;
+  margin: 4em auto 0;
 }
 
 .review .question {
@@ -87,13 +87,19 @@ export default {
   margin: 0px;
 }
 
-@media screen and (max-width: 700px) {
-
-  .questionNumber {
-    width: 100% !important;
+@media screen and (max-width: 1000px) {
+  .question-number {
+    width: 100%;
   }
 
   .review {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  // override inline styling on image
+  .question-image {
     width: 100% !important;
   }
 }
