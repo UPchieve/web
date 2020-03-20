@@ -51,7 +51,7 @@ export default {
         question.imageStyle = {};
       }
     });
-  },
+  }
 };
 </script>
 

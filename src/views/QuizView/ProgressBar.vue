@@ -29,7 +29,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .circles {
   display: flex;
   justify-content: space-between;
