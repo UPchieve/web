@@ -377,8 +377,12 @@ export default {
       if (!this.eligibility.highSchool.upchieveId) {
         this.errors.push("You must select your high school.");
       }
-      if (!this.eligibility.zipCode) {
-        this.errors.push("You must enter your zip code");
+
+      const zipCodeRegex = /^\d{5}$/
+      const zipCode = this.eligibility.zipCode;
+
+      if (!zipCode || !zipCodeRegex.test(zipCode)) {
+        this.errors.push("You must enter a valid zip code");
         this.invalidInputs.push("inputZipCode");
       }
       if (this.errors.length) {
