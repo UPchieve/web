@@ -44,6 +44,8 @@ describe("Student and volunteer signup", () => {
           .type(highSchool.name)
           .should("have.value", highSchool.name);
 
+        cy.get("#inputZipCode").type("11201");
+
         cy.get(".uc-autocomplete-result:first").click();
 
         cy.get("button[type=submit]").click();
