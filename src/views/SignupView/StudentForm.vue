@@ -524,7 +524,8 @@ export default {
         terms: this.credentials.terms,
         firstName: this.profile.firstName,
         lastName: this.profile.lastName,
-        highSchoolId: this.eligibility.highSchool.upchieveId
+        highSchoolId: this.eligibility.highSchool.upchieveId,
+        zipCode: this.eligibility.zipCode
       })
         .then(() => UserService.getUser())
         .then(user => {
