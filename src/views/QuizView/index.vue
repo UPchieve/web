@@ -36,17 +36,18 @@
         </router-link>
         <div v-if="showQuizStart" class="quiz-start">
           <div class="instructions">
+            <h2 class="instructions-header">Get ready, set...</h2>
+            <p>You're about to start a quiz with {{ quizLength }} questions.</p>
             <p>
-              This quiz will have {{ quizLength }} questions, and it is untimed.
+              There's no time limit, but we recommend setting aside at least 15
+              minutes.
             </p>
-            <p>You have {{ 3 - tries }}/3 tries left to pass this quiz.</p>
-            <p>Once you feel ready, click on start!</p>
+            <p>Once you feel ready, press "Start Quiz" below!</p>
           </div>
-          <button class="start btn" type="start" @click.prevent="startQuiz()">
+          <button class="btn" type="start" @click.prevent="startQuiz()">
             Start Quiz
           </button>
         </div>
-        <!-- </div> -->
 
         <quiz-questions
           v-if="showQuizQuestions"
@@ -182,10 +183,6 @@ export default {
   color: #343440;
 }
 
-.start {
-  text-transform: uppercase;
-}
-
 .loading-body {
   margin: 5em auto 0;
 }
@@ -202,11 +199,10 @@ export default {
   border-bottom: 5px solid #1855d1;
   border-left: 5px solid #1855d1;
   padding-top: 1em;
-  margin-top: 1em;
+  margin-top: 1.6em;
 
-  & p:nth-child(2) {
-    margin-top: -0.6em;
-    margin-bottom: 1.4em;
+  & p:nth-child(3) {
+    margin-top: -0.3em;
   }
 }
 
@@ -227,7 +223,13 @@ export default {
 }
 
 .instructions {
-  margin: 50px 0;
+  width: 80%;
+  margin: 4em auto;
+
+  &-header {
+    font-size: 20px;
+    margin-bottom: 1em;
+  }
 }
 
 @media screen and (max-width: 700px) {
