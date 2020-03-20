@@ -4,8 +4,8 @@
     :style="coverStyle"
     class="training-quiz"
   >
-    <h1 id="quiz-name" class="header">
-      {{ quizName }} Certification Quiz
+    <div id="quiz-name" :class="showQuizReview ? 'done-header' : 'header'">
+      <h1 class="title">{{ quizName }} Certification Quiz</h1>
       <router-link
         v-if="showQuizReview"
         to="/dashboard"
@@ -13,40 +13,40 @@
         class="done btn"
         >DONE</router-link
       >
-    </h1>
+    </div>
     <div class="quiz-inner">
-      <br />
-      <div class="body">
-        <div v-if="quizLoading" class="loadingBody">
-          <loading-message message="Loading quiz" />
+      <div v-if="quizLoading" class="loading-body">
+        <loading-message message="Loading quiz" />
+      </div>
+      <div v-else-if="loadingQuizResults" class="loading-body">
+        <loading-message message="Getting your quiz results" />
+      </div>
+      <div v-else>
+        <div v-if="showNoQuiz" class="instructions">
+          A {{ quizName }} quiz has not yet been created. If you would like to
+          begin tutoring students on this topic, please contact UPchieve.
         </div>
-        <div v-else class="startBody">
-          <div v-if="showNoQuiz" class="instructions">
-            A {{ quizName }} quiz has not yet been created. If you would like to
-            begin tutoring students on this topic, please contact UPchieve.
+        <router-link
+          v-if="showNoQuiz"
+          class="contact btn"
+          type="button"
+          to="/contact"
+        >
+          CONTACT US
+        </router-link>
+        <div v-if="showQuizStart" class="quiz-start">
+          <div class="instructions">
+            <p>
+              This quiz will have {{ quizLength }} questions, and it is untimed.
+            </p>
+            <p>You have {{ 3 - tries }}/3 tries left to pass this quiz.</p>
+            <p>Once you feel ready, click on start!</p>
           </div>
-          <router-link
-            v-if="showNoQuiz"
-            class="contact btn"
-            type="button"
-            to="/contact"
-          >
-            CONTACT US
-          </router-link>
-          <div v-if="showQuizStart">
-            <div class="instructions">
-              <p>
-                This test will have {{ quizLength }} questions, and it is
-                untimed.
-              </p>
-              <p>You have {{ 3 - tries }}/3 tries left to pass this test.</p>
-              <p>Once you feel ready, click on start!</p>
-            </div>
-            <button class="start btn" type="start" @click.prevent="startQuiz()">
-              START TEST
-            </button>
-          </div>
+          <button class="start btn" type="start" @click.prevent="startQuiz()">
+            Start Quiz
+          </button>
         </div>
+        <!-- </div> -->
 
         <quiz-questions
           v-if="showQuizQuestions"
@@ -96,7 +96,8 @@ export default {
       showQuizResults: false,
       showQuizReview: false,
       showQuizStart: false,
-      quizResults: {}
+      quizResults: {},
+      loadingQuizResults: false
     };
   },
   components: {
@@ -131,9 +132,11 @@ export default {
       this.showQuizStart = false;
     },
     submitQuiz() {
+      this.showQuizQuestions = false;
+      this.loadingQuizResults = true;
       TrainingService.submitQuiz(this).then(data => {
         this.quizResults = data;
-        this.showQuizQuestions = false;
+        this.loadingQuizResults = false;
         this.showQuizResults = true;
       });
     },
@@ -155,52 +158,56 @@ export default {
   border-radius: 8px;
   margin: 10px;
   padding: 20px 15px;
+  max-width: 1000px;
+  padding-bottom: 8em;
 
   @include breakpoint-above("medium") {
     margin: 40px;
     padding: 40px;
+    padding-bottom: 8em;
   }
 }
 
-.header {
+.header,
+.done-header {
   display: flex;
-  margin: 0px;
-  font-size: 24px;
   align-items: center;
   justify-content: space-between;
+}
+
+.title {
+  font-size: 24px;
+  margin: 0;
   font-weight: 500;
   color: #343440;
 }
 
-.body {
-  display: flex;
-  flex-direction: column;
+.start {
+  text-transform: uppercase;
 }
 
-.startBody {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: inherit;
-}
-
-.loadingBody {
-  margin: 0 auto;
+.loading-body {
+  margin: 5em auto 0;
 }
 
 .quiz-inner {
   display: flex;
   flex-direction: column;
+  min-height: 200px;
 }
 
-.btn.next,
-.btn.submit {
-  float: right;
-}
+.quiz-start {
+  padding-bottom: 3em;
+  width: 100%;
+  border-bottom: 5px solid #1855d1;
+  border-left: 5px solid #1855d1;
+  padding-top: 1em;
+  margin-top: 1em;
 
-.btn.previous {
-  float: left;
+  & p:nth-child(2) {
+    margin-top: -0.6em;
+    margin-bottom: 1.4em;
+  }
 }
 
 .btn {
@@ -225,27 +232,42 @@ export default {
 
 @media screen and (max-width: 700px) {
   .header {
-    padding: 1em 1em 1em 3em !important;
+    padding: 1em 1em 1em 3em;
   }
 
   .col-xs-12.view-container {
-    padding: 0em !important;
+    padding: 0em;
   }
 
   .quiz-inner {
-    padding: 2em !important;
-  }
-
-  .body {
-    padding: 1em 0em !important;
-  }
-
-  .btnContainer {
-    margin: 2em !important;
+    padding: 2em;
   }
 
   .done.btn {
-    width: 6em !important;
+    width: 6em;
+  }
+}
+
+@media screen and (max-width: 426px) {
+  .header {
+    padding: 1em 0;
+  }
+
+  .quiz-inner {
+    padding: initial;
+  }
+
+  .done-header {
+    flex-direction: column;
+  }
+
+  .done.btn {
+    margin-top: 2em;
+    width: 80%;
+  }
+
+  .instructions {
+    padding: 0 1em;
   }
 }
 </style>
