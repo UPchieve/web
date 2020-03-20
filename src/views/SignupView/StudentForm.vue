@@ -15,7 +15,7 @@
 
     <div class="uc-column">
       <label for="inputHighschool" class="uc-form-label"
-        >High School Name</label
+        >What school do you go to?</label
       >
 
       <div class="school-search">
@@ -26,8 +26,8 @@
           :get-result-value="getSchoolDisplayName"
           base-class="uc-autocomplete"
           auto-select
-          placeholder="Search for your high school"
-          aria-label="Search for your high school"
+          placeholder="Search for your school"
+          aria-label="Search for your school"
           @submit="handleSelectHighSchool"
         ></autocomplete>
 
