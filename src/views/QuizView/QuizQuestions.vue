@@ -48,7 +48,7 @@
           type="submit"
           @click.prevent="submit()"
         >
-          SUBMIT TEST
+          SUBMIT QUIZ
         </button>
       </div>
     </div>
