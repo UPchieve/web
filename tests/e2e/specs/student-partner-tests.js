@@ -1,7 +1,7 @@
 describe("Student partner activity", () => {
   before(function() {
     cy.fixture("users/partnerStudent1").as("partnerStudent");
-    cy.fixture("users/Volunteer1").as("volunteer");
+    cy.fixture("users/volunteer1").as("volunteer");
   });
 
   describe("Student partner signup", () => {
