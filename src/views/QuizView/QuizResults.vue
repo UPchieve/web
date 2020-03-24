@@ -1,5 +1,5 @@
 <template>
-  <div :style="[popUpStyle, popUpBorderStyle]" class="score-container">
+  <div :style="popUpBorderStyle" class="score-container">
     <div>
       <h2>{{ headerMsg }}</h2>
       <p :style="scoreStyle" class="score">{{ scoreMsg }}</p>
@@ -32,7 +32,6 @@ export default {
       instructionMsg: "",
       category: "",
       rightBtn: { text: "", route: "" },
-      popUpStyle: {},
       popUpBorderStyle: {},
       scoreStyle: {}
     };

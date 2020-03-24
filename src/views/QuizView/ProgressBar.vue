@@ -1,5 +1,5 @@
 <template>
-  <div class="progressBar">
+  <div>
     <div class="circles">
       <div
         v-for="n in quizLength"
