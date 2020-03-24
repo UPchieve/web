@@ -15,7 +15,7 @@
 
     <div class="uc-column">
       <label for="inputHighschool" class="uc-form-label"
-        >High School Name</label
+        >What school do you go to?</label
       >
 
       <div class="school-search">
@@ -26,8 +26,8 @@
           :get-result-value="getSchoolDisplayName"
           base-class="uc-autocomplete"
           auto-select
-          placeholder="Search for your high school"
-          aria-label="Search for your high school"
+          placeholder="Search for your school"
+          aria-label="Search for your school"
           @submit="handleSelectHighSchool"
         ></autocomplete>
 
@@ -40,6 +40,25 @@
           </a>
         </div>
       </div>
+    </div>
+
+    <div class="uc-column">
+      <label for="inputZipCode" class="uc-form-label"
+        >What zip code do you live in?</label
+      >
+      <input
+        id="inputZipCode"
+        type="text"
+        pattern="[0-9]{5}"
+        class="uc-form-input"
+        v-bind:class="{
+          'uc-form-input--invalid': invalidInputs.indexOf('inputZipCode') > -1
+        }"
+        v-model="eligibility.zipCode"
+        required
+        placeholder="5 digit zip code"
+        aria-label="5 digit zip code"
+      />
     </div>
 
     <button class="uc-form-button" type="submit">
@@ -326,7 +345,8 @@ export default {
       invalidInputs: [],
       eligibility: {
         noSchoolResults: false,
-        highSchool: {}
+        highSchool: {},
+        zipCode: ""
       },
       waitlist: {
         email: ""
@@ -357,17 +377,26 @@ export default {
       if (!this.eligibility.highSchool.upchieveId) {
         this.errors.push("You must select your high school.");
       }
+
+      const zipCodeRegex = /^\d{5}$/;
+      const zipCode = this.eligibility.zipCode;
+
+      if (!zipCode || !zipCodeRegex.test(zipCode)) {
+        this.errors.push("You must enter a valid zip code");
+        this.invalidInputs.push("inputZipCode");
+      }
       if (this.errors.length) {
         return;
       }
 
-      NetworkService.checkSchoolApproval(this, {
-        schoolUpchieveId: this.eligibility.highSchool.upchieveId
+      NetworkService.checkStudentEligbility(this, {
+        schoolUpchieveId: this.eligibility.highSchool.upchieveId,
+        zipCode: this.eligibility.zipCode
       })
         .then(response => {
-          const isSchoolApproved = response.body.approved;
+          const isEligible = response.body.isEligible;
 
-          if (isSchoolApproved) {
+          if (isEligible) {
             this.step = "step-2";
           } else {
             this.step = "step-1-waitlist";
@@ -499,7 +528,8 @@ export default {
         terms: this.credentials.terms,
         firstName: this.profile.firstName,
         lastName: this.profile.lastName,
-        highSchoolId: this.eligibility.highSchool.upchieveId
+        highSchoolId: this.eligibility.highSchool.upchieveId,
+        zipCode: this.eligibility.zipCode
       })
         .then(() => UserService.getUser())
         .then(user => {

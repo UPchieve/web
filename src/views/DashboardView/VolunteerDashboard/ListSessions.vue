@@ -72,6 +72,14 @@ export default {
         const currentSession = socketSessions[i];
         const { subTopic } = currentSession;
 
+        // Show test accounts to admin and test volunteer accounts
+        if (
+          (!this.user.isAdmin || !this.user.isTestUser) &&
+          currentSession.student.isTestUser
+        ) {
+          continue;
+        }
+
         if (
           Object.keys(allSubtopics()).some(
             s => s === subTopic && this.user.certifications[s].passed
