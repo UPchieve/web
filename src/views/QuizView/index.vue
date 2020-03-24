@@ -1,9 +1,5 @@
 <template>
-  <div
-    v-if="user.isVolunteer && tries < 3"
-    :style="coverStyle"
-    class="training-quiz"
-  >
+  <div v-if="user.isVolunteer" :style="coverStyle" class="training-quiz">
     <div id="quiz-name" :class="showQuizReview ? 'done-header' : 'header'">
       <h1 class="title">{{ quizName }} Certification Quiz</h1>
       <router-link
@@ -35,19 +31,26 @@
           CONTACT US
         </router-link>
         <div v-if="showQuizStart" class="quiz-start">
-          <div class="instructions">
-            <h2 class="instructions-header">Get ready, set...</h2>
-            <p>You're about to start a quiz with {{ quizLength }} questions.</p>
-            <p>
-              There's no time limit, but we recommend setting aside at least 15
-              minutes.
-            </p>
-            <p>You have {{ 3 - tries }}/3 tries left to pass this quiz.</p>
-            <p>Once you feel ready, press "Start Quiz" below!</p>
+          <div v-if="tries === 3" class="exceeded-tries">
+            <p>You have no more tries.</p>
           </div>
-          <button class="btn" type="start" @click.prevent="startQuiz()">
-            Start Quiz
-          </button>
+          <div v-else>
+            <div class="instructions">
+              <h2 class="instructions-header">Get ready, set...</h2>
+              <p>
+                You're about to start a quiz with {{ quizLength }} questions.
+              </p>
+              <p>
+                There's no time limit, but we recommend setting aside at least
+                15 minutes.
+              </p>
+              <p>You have {{ 3 - tries }}/3 tries left to pass this quiz.</p>
+              <p>Once you feel ready, press "Start Quiz" below!</p>
+            </div>
+            <button class="btn" type="start" @click.prevent="startQuiz()">
+              Start Quiz
+            </button>
+          </div>
         </div>
 
         <quiz-questions
@@ -231,6 +234,9 @@ export default {
     font-size: 20px;
     margin-bottom: 1em;
   }
+}
+.exceeded-tries {
+  margin: 4em 0;
 }
 
 @media screen and (max-width: 700px) {
