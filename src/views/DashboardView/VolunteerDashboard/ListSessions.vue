@@ -69,15 +69,21 @@ export default {
       const socketSessions = sessions.filter(session => !session.volunteer);
 
       for (let i = 0; i < socketSessions.length; i++) {
-        const currentSession = socketSessions[i];
-        const { subTopic } = currentSession;
+        const session = socketSessions[i];
+        const { subTopic } = session;
+
+        const isAdminOrTestUser = this.user.isAdmin || this.user.isTestUser;
+        // Show test accounts to admin and test volunteer accounts
+        if (session.student.isTestUser && !isAdminOrTestUser) {
+          continue;
+        }
 
         if (
           Object.keys(allSubtopics()).some(
             s => s === subTopic && this.user.certifications[s].passed
           )
         ) {
-          results.push(currentSession);
+          results.push(session);
         }
       }
 

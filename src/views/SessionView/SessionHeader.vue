@@ -5,9 +5,7 @@
         <div :style="partnerAvatar" class="avatar" />
         <div class="info">
           <template v-if="isSessionWaitingForVolunteer">
-            <span class="loading-message">
-              Contacting coaches<span class="loading-ellipsis"></span>
-            </span>
+            <loading-message message="Contacting coaches" />
           </template>
           <template v-else-if="isSessionInProgress">
             <span class="volunteer-name">{{ sessionPartner.firstname }}</span>
@@ -24,9 +22,7 @@
             </template>
           </template>
           <template v-else>
-            <span class="loading-message">
-              Loading<span class="loading-ellipsis"></span>
-            </span>
+            <loading-message message="Loading" />
           </template>
         </div>
       </div>
@@ -68,6 +64,7 @@ import SessionService from "@/services/SessionService";
 import router from "@/router";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
 import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
+import LoadingMessage from "@/components/LoadingMessage";
 
 /**
  * @todo {1} Refactoring candidate: use a modal instead.
@@ -80,6 +77,9 @@ export default {
       connectionMsgType: "",
       reconnectAttemptMsg: ""
     };
+  },
+  components: {
+    LoadingMessage
   },
   computed: {
     ...mapState({
@@ -326,40 +326,5 @@ h1 {
 .avatar-info-container {
   display: flex;
   align-items: center;
-}
-
-.loading-message {
-  display: inline-flex;
-  align-self: flex-end;
-}
-
-.loading-ellipsis {
-  display: inline-flex;
-
-  &:after {
-    content: "...";
-    display: inline-block;
-    width: 25px;
-    overflow: hidden;
-    animation: 1.2s ellip infinite;
-  }
-}
-
-@keyframes ellip {
-  0% {
-    width: 0px;
-  }
-
-  33% {
-    width: 5px;
-  }
-
-  66% {
-    width: 10px;
-  }
-
-  100% {
-    width: 25px;
-  }
 }
 </style>
