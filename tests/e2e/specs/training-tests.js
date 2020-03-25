@@ -130,7 +130,7 @@ describe("Training quizzes", function() {
         cy.login(this.untrainedVolunteer);
 
         cy.get("@categoryQuestions").then(categoryQuestions => {
-          cy.get("button.start").click();
+          cy.get("button[type=start]").click();
 
           questions.forEach((question, i) => {
             const correctAnswer = categoryQuestions.filter(
@@ -143,9 +143,12 @@ describe("Training quizzes", function() {
           cy.wait("@score")
             .its("response.body")
             .then(data => {
-              cy.get(".passed").should("contain", "passed");
+              cy.get(".score-container h2").should("contain", "passed");
 
-              cy.get(".score").should("contain", data.score.toString());
+              cy.get(".score-container .score").should(
+                "contain",
+                data.score.toString()
+              );
             });
         });
       });
@@ -155,7 +158,7 @@ describe("Training quizzes", function() {
     cy.wait("@getQuestions")
       .its("response.body.questions")
       .then(questions => {
-        cy.get("button.start").click();
+        cy.get("button[type=start]").click();
 
         questions.forEach((question, i) => {
           answerQuestion(i, questions.length, "a");
@@ -164,9 +167,12 @@ describe("Training quizzes", function() {
         cy.wait("@score")
           .its("response.body")
           .then(data => {
-            cy.get(".passed").should("contain", "failed");
+            cy.get(".score-container h2").should("contain", "failed");
 
-            cy.get(".score").should("contain", data.score.toString());
+            cy.get(".score-container .score").should(
+              "contain",
+              data.score.toString()
+            );
           });
       });
   });
@@ -175,7 +181,7 @@ describe("Training quizzes", function() {
     cy.wait("@getQuestions")
       .its("response.body.questions")
       .then(questions => {
-        cy.get("button.start").click();
+        cy.get("button[type=start]").click();
 
         questions.forEach((question, i) => {
           if (i == 0) {
@@ -185,7 +191,7 @@ describe("Training quizzes", function() {
           }
         });
 
-        cy.get(".score").should("contain", "must answer all questions");
+        cy.get(".quiz-error").should("contain", "must answer all questions");
       });
   });
 
@@ -193,7 +199,7 @@ describe("Training quizzes", function() {
     cy.wait("@getQuestions")
       .its("response.body.questions")
       .then(questions => {
-        cy.get("button.start").click();
+        cy.get("button[type=start]").click();
 
         questions.forEach((question, i) => {
           if (question.questionText.includes("\\")) {
@@ -209,17 +215,17 @@ describe("Training quizzes", function() {
           answerQuestion(i, questions.length, "a");
         });
 
-        cy.get(".reviewBtn").click();
+        cy.get(".review-btn").click();
 
         for (let i = 0; i < questions.length; i++) {
           const question = questions[i];
 
           // assert that MathJax is rendered in question text
           if (question.questionText.includes("\\")) {
-            cy.get(".questionNumber")
+            cy.get(".question-number")
               .contains((i + 1).toString())
               .parent(".question")
-              .children("div.questionText")
+              .children(".question-text")
               .children(".mjx-chtml", { timeout: 25000 })
               .should("exist");
           }

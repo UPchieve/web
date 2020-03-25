@@ -14,7 +14,9 @@
         </div>
       </div>
 
-      <div class="uc-form-body">
+      <div v-if="msg !== ''" class="message">{{ msg }}</div>
+
+      <div v-else class="uc-form-body">
         <div class="uc-column">
           <label for="inputEmail" class="uc-form-label"
             >Please enter your email address</label
@@ -32,8 +34,6 @@
         <button class="uc-form-button" type="submit" @click.prevent="submit()">
           Enter
         </button>
-
-        <div v-if="msg !== ''">{{ msg }}</div>
       </div>
     </form>
   </form-page-template>
@@ -80,5 +80,9 @@ export default {
   .uc-form-header {
     @include flex-container(column, center, center);
   }
+}
+
+.message {
+  margin-top: 40%;
 }
 </style>

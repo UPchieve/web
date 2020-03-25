@@ -13,7 +13,7 @@ describe("Student and volunteer signup", () => {
 
       const approvedHighschoolsUrl = `${Cypress.env(
         "SERVER_ROOT"
-      )}/school/findeligible`;
+      )}/eligibility/school/findeligible`;
       cy.request({
         url: approvedHighschoolsUrl,
         qs: {
@@ -43,6 +43,8 @@ describe("Student and volunteer signup", () => {
         cy.get("#inputHighschool")
           .type(highSchool.name)
           .should("have.value", highSchool.name);
+
+        cy.get("#inputZipCode").type("11201");
 
         cy.get(".uc-autocomplete-result:first").click();
 

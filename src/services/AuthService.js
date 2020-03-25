@@ -99,6 +99,12 @@ export default {
       });
   },
 
+  verifyReset(context, token) {
+    return NetworkService.verifyReset(context, token).catch(err => {
+      throw errorFromHttpResponse(err);
+    });
+  },
+
   logout(context) {
     if (context) {
       NetworkService.logout(context)
