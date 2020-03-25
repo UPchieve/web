@@ -1,7 +1,7 @@
 export const topics = {
   math: {
     subtopics: {
-      prealgebra: { displayName: "Prealgebra" },
+      prealgebra: { displayName: "Pre-algebra" },
       algebra: { displayName: "Algebra" },
       geometry: { displayName: "Geometry" },
       trigonometry: { displayName: "Trigonometry" },
