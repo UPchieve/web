@@ -101,5 +101,26 @@ export default {
 
         throw errorFromHttpResponse(resp);
       });
+  },
+
+  getLatestSession(context, user) {
+    return NetworkService.latestSession(context, { user_id: user._id })
+      .then(resp => {
+        const { sessionId, data } = resp.data || {};
+        const { type, subTopic } = data;
+
+        if (type && subTopic && sessionId) {
+          this.currentSession.sessionId = sessionId;
+          this.currentSession.data = data;
+
+          return Promise.resolve({ sessionData: data });
+        }
+      })
+      .catch(resp => {
+        this.currentSession.sessionId = null;
+        this.currentSession.data = {};
+
+        throw errorFromHttpResponse(resp);
+      });
   }
 };
