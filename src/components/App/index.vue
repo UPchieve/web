@@ -41,6 +41,7 @@ export default {
   beforeUpdate() {
     if (this.userAuthenticated) {
       this.$store.dispatch("user/fetchSession", this);
+      this.$store.dispatch("user/fetchLatestSession", this);
     }
   },
   beforeDestroy() {
