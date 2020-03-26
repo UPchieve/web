@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import { startSession } from "@/utils/session";
 import DropdownList from "@/components/DropdownList";
 import HyperlinkButton from "@/components/HyperlinkButton";
@@ -67,8 +67,16 @@ export default {
   components: { DropdownList, HyperlinkButton, LargeButton },
   data() {
     return {
-      selectedSubtopic: ""
+      selectedSubtopic: "",
+      timeoutId: null,
+      disableButton: false
     };
+  },
+  mounted() {
+    this.checkOrEnforceWaitingPeriod();
+  },
+  beforeDestroy() {
+    clearTimeout(this.timeoutId);
   },
   props: {
     title: {
@@ -93,12 +101,22 @@ export default {
     routeTo: String
   },
   computed: {
+    ...mapState({
+      latestSession: state => state.user.latestSession
+    }),
     ...mapGetters({
       mobileMode: "app/mobileMode",
       isSessionAlive: "user/isSessionAlive"
     }),
     disabled() {
-      return this.isSessionAlive;
+      return this.isSessionAlive || this.disableButton;
+    }
+  },
+  watch: {
+    // When a user ends a session, this component mounts before the latestSession in the store
+    // is updated with the endedAt property. This helps us get the updated latestSession from the store
+    latestSession() {
+      this.checkOrEnforceWaitingPeriod();
     }
   },
   methods: {
@@ -117,6 +135,23 @@ export default {
             svg: this.svg
           }
         });
+      }
+    },
+    calculateTimeSinceLastSession() {
+      const sessionEndDateInMS = new Date(this.latestSession.endedAt).getTime();
+      const currentDateInMS = new Date().getTime();
+      return currentDateInMS - sessionEndDateInMS;
+    },
+    checkOrEnforceWaitingPeriod() {
+      const timeSinceLastSession = this.calculateTimeSinceLastSession();
+      const fiveMinutes = 1000 * 60 * 5;
+      const timeLeft = fiveMinutes - timeSinceLastSession;
+
+      if (timeSinceLastSession < fiveMinutes) {
+        this.disableButton = true;
+        this.timeoutId = setTimeout(() => {
+          this.disableButton = false;
+        }, timeLeft);
       }
     }
   }
