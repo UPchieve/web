@@ -117,18 +117,20 @@ export default {
     },
 
     rerenderMathJaxElements() {
-      // Re-render MathJax in question text and answer choices
       const quiz = document.querySelector(".quiz-body");
       const questionText = quiz.querySelector(".questionText");
-      const answerChoices = quiz.querySelector(".possible-answers");
+      const answerChoices = quiz.querySelectorAll(".possible-answers div");
 
-      if (!questionText || !answerChoices) {
+      if (!questionText || !answerChoices || !answerChoices.length) {
         return;
       }
-
       window.MathJax.Hub.Queue(
         ["Typeset", window.MathJax.Hub, questionText],
-        ["Typeset", window.MathJax.Hub, answerChoices]
+        ...Array.from(answerChoices).map(answerChoice => [
+          "Typeset",
+          window.MathJax.Hub,
+          answerChoice.querySelector(".options label")
+        ])
       );
     },
     updateProgressBar() {

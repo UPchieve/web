@@ -1,3 +1,15 @@
+// Helper function to answer a question and click to the
+// next question or submit the test
+const answerQuestion = function(index, numOfQuestions, answer) {
+  cy.get(`input[type=radio][value=${answer}]`).click();
+
+  if (index < numOfQuestions - 1) {
+    cy.get("button[type=next]").click();
+  } else {
+    cy.get("button[type=submit]").click();
+  }
+};
+
 describe("Training quizzes", function() {
   beforeEach(function() {
     cy.fixture("users/volunteer1").as("adminVolunteer");
@@ -118,28 +130,25 @@ describe("Training quizzes", function() {
         cy.login(this.untrainedVolunteer);
 
         cy.get("@categoryQuestions").then(categoryQuestions => {
-          cy.get("button.start").click();
+          cy.get("button[type=start]").click();
 
           questions.forEach((question, i) => {
             const correctAnswer = categoryQuestions.filter(
               cq => cq._id === question._id
             )[0].correctAnswer;
 
-            cy.get(`input[type=radio][value=${correctAnswer}]`).click();
-
-            if (i < questions.length - 1) {
-              cy.get("button[type=next]").click();
-            } else {
-              cy.get("button[type=submit]").click();
-            }
+            answerQuestion(i, questions.length, correctAnswer);
           });
 
           cy.wait("@score")
             .its("response.body")
             .then(data => {
-              cy.get(".passed").should("contain", "passed");
+              cy.get(".score-container h2").should("contain", "passed");
 
-              cy.get(".score").should("contain", data.score.toString());
+              cy.get(".score-container .score").should(
+                "contain",
+                data.score.toString()
+              );
             });
         });
       });
@@ -149,27 +158,21 @@ describe("Training quizzes", function() {
     cy.wait("@getQuestions")
       .its("response.body.questions")
       .then(questions => {
-        cy.get("button.start").click();
+        cy.get("button[type=start]").click();
 
         questions.forEach((question, i) => {
-          cy.get("form.possibleAnswers > div:first-child")
-            .children(".options")
-            .children("input[type=radio]")
-            .click();
-
-          if (i < questions.length - 1) {
-            cy.get("button[type=next]").click();
-          } else {
-            cy.get("button[type=submit]").click();
-          }
+          answerQuestion(i, questions.length, "a");
         });
 
         cy.wait("@score")
           .its("response.body")
           .then(data => {
-            cy.get(".passed").should("contain", "failed");
+            cy.get(".score-container h2").should("contain", "failed");
 
-            cy.get(".score").should("contain", data.score.toString());
+            cy.get(".score-container .score").should(
+              "contain",
+              data.score.toString()
+            );
           });
       });
   });
@@ -178,24 +181,64 @@ describe("Training quizzes", function() {
     cy.wait("@getQuestions")
       .its("response.body.questions")
       .then(questions => {
-        cy.get("button.start").click();
+        cy.get("button[type=start]").click();
 
         questions.forEach((question, i) => {
-          if (i > 0) {
-            cy.get("form.possibleAnswers > div:first-child")
-              .children(".options")
-              .children("input[type=radio]")
-              .click();
-          }
-
-          if (i < questions.length - 1) {
+          if (i == 0) {
             cy.get("button[type=next]").click();
           } else {
-            cy.get("button[type=submit]").click();
+            answerQuestion(i, questions.length, "a");
           }
         });
 
-        cy.get(".score").should("contain", "must answer all questions");
+        cy.get(".quiz-error").should("contain", "must answer all questions");
+      });
+  });
+
+  it("Should render MathJax on quiz pages and quiz review page", function() {
+    cy.wait("@getQuestions")
+      .its("response.body.questions")
+      .then(questions => {
+        cy.get("button[type=start]").click();
+
+        questions.forEach((question, i) => {
+          if (question.questionText.includes("\\")) {
+            cy.get("div.questionText .mjx-chtml").should("exist");
+          }
+
+          question.possibleAnswers
+            .filter(answer => answer.txt.includes("\\"))
+            .forEach(answer => {
+              cy.get(`#answer-${answer.val} .mjx-chtml`).should("exist");
+            });
+
+          answerQuestion(i, questions.length, "a");
+        });
+
+        cy.get(".review-btn").click();
+
+        for (let i = 0; i < questions.length; i++) {
+          const question = questions[i];
+
+          // assert that MathJax is rendered in question text
+          if (question.questionText.includes("\\")) {
+            cy.get(".question-number")
+              .contains((i + 1).toString())
+              .parent(".question")
+              .children(".question-text")
+              .children(".mjx-chtml", { timeout: 25000 })
+              .should("exist");
+          }
+
+          // assert that MathJax is rendered in answers
+          question.possibleAnswers
+            .filter(answer => answer.txt.includes("\\"))
+            .forEach(answer => {
+              cy.get(`#question-${i}-answer-${answer.val} .mjx-chtml`, {
+                timeout: 25000
+              }).should("exist");
+            });
+        }
       });
   });
 });

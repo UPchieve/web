@@ -27,6 +27,8 @@
 </template>
 
 <script>
+import "core-js/fn/array/flat-map";
+
 import TrainingService from "@/services/TrainingService";
 
 export default {
@@ -51,6 +53,32 @@ export default {
         question.imageStyle = {};
       }
     });
+  },
+  updated() {
+    this.rerenderMathJaxElements();
+  },
+  methods: {
+    rerenderMathJaxElements() {
+      // Re-render MathJax in all question text and answers in quiz review
+      const questions = document.querySelectorAll(".review .question");
+
+      if (!questions || !questions.length) {
+        return;
+      }
+
+      window.MathJax.Hub.Queue(
+        ...Array.from(questions)
+          .map(question => question.querySelector(".question-text"))
+          .filter(questionText => questionText.innerHTML.indexOf("\\") !== -1)
+          .map(questionText => ["Typeset", window.MathJax.Hub, questionText]),
+        ...Array.from(questions)
+          .flatMap(question =>
+            Array.from(question.querySelectorAll(".possible-answers div"))
+          )
+          .filter(answer => answer.innerHTML.indexOf("\\") !== -1)
+          .map(answer => ["Typeset", window.MathJax.Hub, answer])
+      );
+    }
   }
 };
 </script>
