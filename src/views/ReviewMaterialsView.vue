@@ -55,6 +55,7 @@ export default {
   methods: {
     getCategoryMaterials() {
       switch (this.category) {
+        case "prealgebra":
         case "algebra":
         case "geometry":
         case "trigonometry":
