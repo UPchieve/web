@@ -113,8 +113,6 @@ export default {
     }
   },
   watch: {
-    // When a user ends a session, this component mounts before the latestSession in the store
-    // is updated with the endedAt property. This helps us get the updated latestSession from the store
     latestSession() {
       this.checkOrEnforceWaitingPeriod();
     }
@@ -138,20 +136,22 @@ export default {
       }
     },
     calculateTimeSinceLastSession() {
-      const sessionEndDateInMS = new Date(this.latestSession.endedAt).getTime();
+      const sessionCreatedAtInMS = new Date(
+        this.latestSession.createdAt
+      ).getTime();
       const currentDateInMS = new Date().getTime();
-      return currentDateInMS - sessionEndDateInMS;
+      return currentDateInMS - sessionCreatedAtInMS;
     },
     checkOrEnforceWaitingPeriod() {
       const timeSinceLastSession = this.calculateTimeSinceLastSession();
       const fiveMinutes = 1000 * 60 * 5;
-      const timeLeft = fiveMinutes - timeSinceLastSession;
+      const timeLeftUntilFiveMinutes = fiveMinutes - timeSinceLastSession;
 
       if (timeSinceLastSession < fiveMinutes) {
         this.disableButton = true;
         this.timeoutId = setTimeout(() => {
           this.disableButton = false;
-        }, timeLeft);
+        }, timeLeftUntilFiveMinutes);
       }
     }
   }
