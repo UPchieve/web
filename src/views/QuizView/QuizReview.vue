@@ -66,18 +66,14 @@ export default {
         return;
       }
 
-      window.MathJax.Hub.Queue(
-        ...Array.from(questions)
-          .map(question => question.querySelector(".question-text"))
-          .filter(questionText => questionText.innerHTML.indexOf("\\") !== -1)
-          .map(questionText => ["Typeset", window.MathJax.Hub, questionText]),
-        ...Array.from(questions)
-          .flatMap(question =>
-            Array.from(question.querySelectorAll(".possible-answers div"))
-          )
-          .filter(answer => answer.innerHTML.indexOf("\\") !== -1)
-          .map(answer => ["Typeset", window.MathJax.Hub, answer])
-      );
+      window.MathJax.Hub.Queue([
+        "Typeset",
+        window.MathJax.Hub,
+        Array.from(questions).flatMap(question => [
+          question.querySelector(".question-text"),
+          ...Array.from(question.querySelectorAll(".possible-answers div"))
+        ])
+      ]);
     }
   }
 };
