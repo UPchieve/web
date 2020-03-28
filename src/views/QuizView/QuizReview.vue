@@ -1,11 +1,11 @@
 <template>
   <div class="review">
     <div
-      v-for="(question, index) in questionsReview"
-      :key="`question-${index}`"
+      v-for="(question, qIndex) in questionsReview"
+      :key="`question-${qIndex}`"
       class="question"
     >
-      <div class="question-number">Question {{ index + 1 }}</div>
+      <div class="question-number">Question {{ qIndex + 1 }}</div>
       <br />
       <div class="question-text">{{ question.questionText }}</div>
       <div :style="question.imageStyle" class="question-image" />
@@ -13,7 +13,7 @@
         <div
           v-for="(answer, index) in question.possibleAnswers"
           :key="`answer-${index}`"
-          :id="'answer-' + answer.val"
+          :id="'question-' + qIndex + '-answer-' + answer.val"
         >
           {{ answer.val }}. {{ answer.txt }}
         </div>
