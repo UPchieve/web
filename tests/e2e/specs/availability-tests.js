@@ -5,7 +5,7 @@ const THURSDAY_8AM_SELECTOR =
 
 describe("Volunteer availability", () => {
   before(function() {
-    cy.fixture("users/Volunteer1").as("volunteer");
+    cy.fixture("users/volunteer1").as("volunteer");
   });
 
   describe("Modify availability calendar", () => {
