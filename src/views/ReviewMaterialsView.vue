@@ -64,13 +64,13 @@ export default {
           this.reviewMaterials = [
             {
               title: "Topics & Resources",
-              pdf: this.importConceptReview("pdf"),
-              image: this.importConceptReview("png")
+              pdf: this.importTopicsAndResources("pdf"),
+              image: this.importTopicsAndResources("png")
             },
             {
               title: "Concept Review",
-              pdf: this.importTopicsAndResources("pdf"),
-              image: this.importTopicsAndResources("png")
+              pdf: this.importConceptReview("pdf"),
+              image: this.importConceptReview("png")
             }
           ];
           break;
