@@ -1,7 +1,7 @@
 describe("Session activity", () => {
   before(function() {
     cy.fixture("users/student1").as("student");
-    cy.fixture("users/Volunteer1").as("volunteer");
+    cy.fixture("users/volunteer1").as("volunteer");
     cy.fixture("users/volunteer2").as("volunteer2");
   });
 
