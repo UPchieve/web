@@ -149,8 +149,24 @@ export default {
 
       if (timeSinceLastSession < fiveMinutes) {
         this.disableButton = true;
+        const headerData = {
+          component: "WaitingPeriodHeader",
+          data: {
+            important: true,
+            timeLeft: timeLeftUntilFiveMinutes
+          }
+        };
+
+        // Show waiting period header if there's no active session
+        if (!this.isSessionAlive) {
+          this.$store.dispatch("app/header/show", headerData);
+        }
+
         this.timeoutId = setTimeout(() => {
           this.disableButton = false;
+          if (!this.isSessionAlive) {
+            this.$store.dispatch("app/header/hide");
+          }
         }, timeLeftUntilFiveMinutes);
       }
     }

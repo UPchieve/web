@@ -10,6 +10,7 @@ import HeaderTemplate from "./HeaderTemplate";
 import DefaultHeader from "./DefaultHeader";
 import SessionHeader from "./SessionHeader";
 import RejoinSessionHeader from "./RejoinSessionHeader";
+import WaitingPeriodHeader from "./WaitingPeriodHeader";
 
 export default {
   name: "app-header",
@@ -17,7 +18,8 @@ export default {
     HeaderTemplate,
     DefaultHeader,
     SessionHeader,
-    RejoinSessionHeader
+    RejoinSessionHeader,
+    WaitingPeriodHeader
   },
   computed: {
     ...mapState({
