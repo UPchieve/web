@@ -87,11 +87,11 @@ export default {
 
 <style lang="scss" scoped>
 .App {
-  min-height: 100vh;
+  height: 100%;
 }
 
 .App-router-view-wrapper {
-  height: 100vh;
+  height: 100%;
 
   &--header {
     @include bind-app-header-height(padding-top);

@@ -37,20 +37,23 @@
           </div>
         </template>
       </div>
+    </div>
+
+    <div class="chat-footer">
       <transition name="fade">
         <div class="typing-indicator" v-show="typingIndicatorShown">
           {{ this.sessionPartner.firstname }} is typing...
         </div>
       </transition>
-    </div>
 
-    <textarea
-      class="message-textarea"
-      @keydown.enter.prevent
-      @keyup="handleMessage"
-      v-model="newMessage"
-      placeholder="Type a message..."
-    />
+      <textarea
+        class="message-textarea"
+        @keydown.enter.prevent
+        @keyup="handleMessage"
+        v-model="newMessage"
+        placeholder="Type a message..."
+      />
+    </div>
   </div>
 </template>
 
@@ -182,7 +185,7 @@ export default {
   },
 
   updated() {
-    let msgBox = document.querySelector(".messages");
+    const msgBox = document.querySelector(".message-box");
     msgBox.scrollTop = msgBox.scrollHeight;
   }
 };
@@ -193,19 +196,19 @@ export default {
   height: 100%;
   position: relative;
   background: #fff;
+  display: flex;
+  flex-direction: column;
 }
 
 .message-box {
   height: 100%;
-  padding-bottom: 60px;
-  overflow: hidden;
+  overflow: scroll;
   top: 0;
   position: relative;
+  padding-bottom: 50px;
 
   @include breakpoint-above("medium") {
-    height: calc(100% - 60px);
-    padding-bottom: 110px;
-    top: 70px;
+    margin-top: 70px;
   }
 }
 
@@ -244,10 +247,7 @@ export default {
 .messages {
   background: white;
   position: relative;
-  height: 100%;
-  overflow: auto;
   display: flex;
-  padding-bottom: 45px;
   flex-direction: column;
 }
 
@@ -256,7 +256,6 @@ export default {
   padding: 24px;
   display: flex;
   justify-content: flex-start;
-  // width: 100%;
 
   /* Safari needs this specified to lay out the message divs properly. */
   flex-shrink: 0;
@@ -298,36 +297,9 @@ span {
   max-width: 80%;
 }
 
-.typing-indicator {
-  position: absolute;
-  bottom: 108px;
-  left: 10px;
-  padding: 0;
-  font-size: 13px;
-  font-weight: 300;
-  transition: 0.15s;
-}
-
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
-}
-
-.message-textarea {
-  width: 100%;
-  height: 100px;
-  border: none;
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  border: none;
-  border-top: 1px solid $c-border-grey;
-  padding: 16px;
-  resize: none;
-
-  &:focus {
-    outline: none;
-  }
 }
 
 .left {
@@ -360,23 +332,52 @@ span {
   width: 200px;
 }
 
-@include breakpoint-below("medium") {
-  .message-textarea {
-    width: calc(100% - 100px);
-    height: 40px;
-    border: none;
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    border: 1px solid #d6e0ef;
-    border-radius: 20px;
-    margin: 10px 20px;
-    padding: 10px 16px;
+.chat-footer {
+  width: 100%;
+  height: 100px;
+  position: relative;
+  background: #fff;
+
+  @include breakpoint-below("medium") {
+    height: 66px;
+    padding: 0 80px 0 20px;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.typing-indicator {
+  position: absolute;
+  bottom: 110px;
+  left: 25px;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 300;
+  transition: 0.25s;
+
+  @include breakpoint-below("medium") {
+    bottom: 55px;
+    left: 35px;
+  }
+}
+
+.message-textarea {
+  height: 100%;
+  width: 100%;
+  border: none;
+  border-top: 1px solid $c-border-grey;
+  padding: 16px;
+  resize: none;
+
+  &:focus {
+    outline: none;
   }
 
-  .typing-indicator {
-    bottom: 58px;
-    left: 35px;
+  @include breakpoint-below("medium") {
+    height: 40px;
+    border: 1px solid #d6e0ef;
+    border-radius: 20px;
+    padding: 10px 16px;
   }
 }
 </style>

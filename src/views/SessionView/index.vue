@@ -274,12 +274,8 @@ export default {
   }
 
   @include breakpoint-below("medium") {
-    position: absolute;
-    bottom: 0;
-    left: 0;
     width: 100%;
-    height: calc(100vh - 80px);
-    z-index: 2;
+    height: 100%;
   }
 }
 
@@ -288,10 +284,14 @@ export default {
   padding: 0;
   flex-grow: 1;
   overflow: hidden;
+  position: relative;
 
-  // Hide with z-index (not display: none) so canvas is accessible in DOM
   &--hidden {
-    z-index: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: -500px;
+    left: -500px;
   }
 }
 
@@ -299,8 +299,7 @@ export default {
   padding: 0;
 
   &--hidden {
-    // Hide with z-index (not display: none) so canvas is accessible in DOM
-    z-index: 0;
+    display: none;
   }
 
   @include breakpoint-above("medium") {
