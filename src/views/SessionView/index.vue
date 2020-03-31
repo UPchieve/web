@@ -77,6 +77,9 @@ export default {
 
     window.addEventListener("resize", this.handleResize);
   },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.handleResize);
+  },
   /*
    * @notes
    * [1] Refactoring candidate: it'd be awesome if Dashboard could pass
