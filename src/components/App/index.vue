@@ -41,6 +41,10 @@ export default {
   beforeUpdate() {
     if (this.userAuthenticated) {
       this.$store.dispatch("user/fetchSession", this);
+
+      if (!this.isVolunteer) {
+        this.$store.dispatch("user/fetchLatestSession", this);
+      }
     }
   },
   beforeDestroy() {
@@ -61,7 +65,8 @@ export default {
       showModal: state => state.app.modal.isShown
     }),
     ...mapGetters({
-      userAuthenticated: "user/isAuthenticated"
+      userAuthenticated: "user/isAuthenticated",
+      isVolunteer: "user/isVolunteer"
     })
   },
   sockets: {

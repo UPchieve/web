@@ -132,6 +132,11 @@ export default {
       .post(`${API_ROOT}/session/current`, data)
       .then(this._successHandler, this._errorHandler);
   },
+  latestSession(context, data) {
+    return context.$http
+      .post(`${API_ROOT}/session/latest`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
   getQuestions(context, data) {
     return context.$http
       .post(`${API_ROOT}/training/questions`, data)

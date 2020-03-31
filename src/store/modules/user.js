@@ -10,6 +10,7 @@ export default {
   state: {
     user: {},
     session: {},
+    latestSession: {},
     isFirstDashboardVisit: false
   },
   mutations: {
@@ -26,6 +27,8 @@ export default {
     },
 
     setSession: (state, session = {}) => (state.session = session),
+
+    setLatestSession: (state, session = {}) => (state.latestSession = session),
 
     addMessage: (state, message) => {
       if (message) state.session.messages.push(message);
@@ -75,6 +78,19 @@ export default {
         })
         .catch(err => {
           commit("setSession", {});
+          if (err.status !== 404) {
+            Sentry.captureException(err);
+          }
+        });
+    },
+
+    fetchLatestSession: ({ commit, state }, context) => {
+      SessionService.getLatestSession(context, state.user)
+        .then(({ sessionData }) => {
+          commit("setLatestSession", sessionData);
+        })
+        .catch(err => {
+          commit("setLatestSession", {});
           if (err.status !== 404) {
             Sentry.captureException(err);
           }

@@ -107,14 +107,24 @@ export default {
   },
   methods: {
     end() {
-      // Only ask for confirmation if session hasn't been ended by other user
-      const shouldEndSession = this.isSessionAlive
-        ? window.confirm("Do you really want to end the session?")
-        : true;
+      if (this.isSessionWaitingForVolunteer) {
+        const shouldEndSession = window.confirm(
+          "Are you sure you want to cancel this request? If you've been waiting less than 5 minutes, you won't be able to make another request right away."
+        );
 
-      // Early exit if user didn't confirm
-      if (!shouldEndSession) {
-        return;
+        if (!shouldEndSession) {
+          return;
+        }
+      } else {
+        // Only ask for confirmation if session hasn't been ended by other user
+        const shouldEndSession = this.isSessionAlive
+          ? window.confirm("Do you really want to end the session?")
+          : true;
+
+        // Early exit if user didn't confirm
+        if (!shouldEndSession) {
+          return;
+        }
       }
 
       this.$store.dispatch("user/clearSession");
