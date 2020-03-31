@@ -1,11 +1,11 @@
 <template>
   <div class="review">
     <div
-      v-for="(question, index) in questionsReview"
-      :key="`question-${index}`"
+      v-for="(question, qIndex) in questionsReview"
+      :key="`question-${qIndex}`"
       class="question"
     >
-      <div class="question-number">Question {{ index + 1 }}</div>
+      <div class="question-number">Question {{ qIndex + 1 }}</div>
       <br />
       <div class="question-text">{{ question.questionText }}</div>
       <div :style="question.imageStyle" class="question-image" />
@@ -13,7 +13,7 @@
         <div
           v-for="(answer, index) in question.possibleAnswers"
           :key="`answer-${index}`"
-          :id="'answer-' + answer.val"
+          :id="'question-' + qIndex + '-answer-' + answer.val"
         >
           {{ answer.val }}. {{ answer.txt }}
         </div>
@@ -66,18 +66,14 @@ export default {
         return;
       }
 
-      window.MathJax.Hub.Queue(
-        ...Array.from(questions)
-          .map(question => question.querySelector(".question-text"))
-          .filter(questionText => questionText.innerHTML.indexOf("\\") !== -1)
-          .map(questionText => ["Typeset", window.MathJax.Hub, questionText]),
-        ...Array.from(questions)
-          .flatMap(question =>
-            Array.from(question.querySelectorAll(".possible-answers div"))
-          )
-          .filter(answer => answer.innerHTML.indexOf("\\") !== -1)
-          .map(answer => ["Typeset", window.MathJax.Hub, answer])
-      );
+      window.MathJax.Hub.Queue([
+        "Typeset",
+        window.MathJax.Hub,
+        Array.from(questions).flatMap(question => [
+          question.querySelector(".question-text"),
+          ...Array.from(question.querySelectorAll(".possible-answers div"))
+        ])
+      ]);
     }
   }
 };
