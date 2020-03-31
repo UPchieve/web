@@ -124,14 +124,16 @@ export default {
       if (!questionText || !answerChoices || !answerChoices.length) {
         return;
       }
-      window.MathJax.Hub.Queue(
-        ["Typeset", window.MathJax.Hub, questionText],
-        ...Array.from(answerChoices).map(answerChoice => [
-          "Typeset",
-          window.MathJax.Hub,
-          answerChoice.querySelector(".options label")
-        ])
-      );
+      window.MathJax.Hub.Queue([
+        "Typeset",
+        window.MathJax.Hub,
+        [
+          questionText,
+          ...Array.from(answerChoices).map(answerChoice =>
+            answerChoice.querySelector(".options label")
+          )
+        ]
+      ]);
     },
     updateProgressBar() {
       // When switching to a new question, clear any mathjax elements so they
