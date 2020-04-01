@@ -210,7 +210,9 @@ export default {
      * @param {offset} the user's time zone offset
      * @return the converted availability object
      */
-    convertAvailability(availability, offset) {
+    convertAvailability(availability, rawOffset) {
+      const offset = Math.floor(rawOffset);
+
       const succWeekday = {
         Sunday: "Monday",
         Monday: "Tuesday",
