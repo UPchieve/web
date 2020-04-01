@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <!-- inherit from the material theme -->
+  <style name="UPchieve" parent="android:Theme.DeviceDefault.NoActionBar">
+    <!-- <item name="android:windowBackground">@android:color/black</item> -->
+    <!-- <item name="android:colorBackground">@android:color/black</item> -->
+  </style>
+  <style name="UPchieveNoLoading" parent="android:Theme.Material">
+    <!-- Main theme colors -->
+    <!--   your app branding color for the app bar -->
+    <item name="android:colorPrimary">#fc373e</item>
+    <!--   darker variant for the status bar and contextual app bars -->
+    <item name="android:colorPrimaryDark">#cf2e33</item>
+    <!--   theme UI controls like checkboxes and text fields -->
+    <item name="android:colorAccent">#fc373e</item>
+  </style>
+
+  <style name="UPchieveSheet" parent="@android:style/Theme.Material">
+    <item name="android:windowNoTitle">true</item>
+    <!-- <item name="android:windowIsFloating">true</item> -->
+    <item name="android:windowContentOverlay">@null</item>
+    <item name="android:windowIsTranslucent">true</item>
+    <item name="android:windowAnimationStyle">@android:style/Animation</item>
+    <item name="android:colorBackgroundCacheHint">@null</item>
+    <item name="android:windowBackground">@android:color/transparent</item>
+    <item name="android:backgroundDimEnabled">false</item>
+  </style>
+</resources>

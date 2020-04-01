@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "877923781231",
+    "firebase_url": "https://upchieve-a3ea2.firebaseio.com",
+    "project_id": "upchieve-a3ea2",
+    "storage_bucket": "upchieve-a3ea2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:877923781231:android:3d7ad6464b1aeb37a21b9a",
+        "android_client_info": {
+          "package_name": "org.upchieve.main"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "877923781231-5pm0jsho3lago4p4j0dgcojhv1qtgn82.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDN0I5SHHWSeepBErsujLknXZPJInvhFtE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "877923781231-5pm0jsho3lago4p4j0dgcojhv1qtgn82.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "877923781231-3v03ov1gak6a2tdlejghd12evs4fm8os.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.upchieve.main"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

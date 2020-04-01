@@ -1,0 +1,10 @@
+/node_modules
+/build
+/components
+/cordova
+/dist
+/.gradle
+!/cordova/platforms/android/AndroidManifest.xml
+cordova_build.json
+npm-debug.log
+current_app
