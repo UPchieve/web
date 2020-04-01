@@ -211,6 +211,7 @@ export default {
      * @return the converted availability object
      */
     convertAvailability(availability, rawOffset) {
+      // Round down fractional offsets
       const offset = Math.floor(rawOffset);
 
       const succWeekday = {
