@@ -10,9 +10,8 @@
   <plugin name="cordova-plugin-whitelist" spec="1" />
   <access origin="*" />
   <!-- https://stackoverflow.com/questions/47731745/android-cordova-app-with-iframes-chrome-63-no-request-headers-cookies -->
-  <allow-navigation href="*://upchieve.app" />
-  <allow-navigation href="*://*.upchieve.app" />
-  <allow-navigation href="*://*.facebook.com" />
+  <allow-navigation href="*://upchieve.org" />
+  <allow-navigation href="*://*.upchieve.org" />
   <allow-navigation href="*://*.xip.io" />
   <allow-navigation href="gap://ready" />
 
@@ -96,38 +95,33 @@
     <preference name="KeyboardShrinksView" value="true" />
     <preference name="HideKeyboardFormAccessoryBar" value="true" />
     <preference name="FadeSplashScreenDuration" value="300"/>
-    <icon height="180" src="res/ios/icons/icon-60@3x.png" width="180" />
-    <icon height="60" src="res/ios/icons/icon-60.png" width="60" />
-    <icon height="120" src="res/ios/icons/icon-60@2x.png" width="120" />
-    <icon height="76" src="res/ios/icons/icon-76.png" width="76" />
-    <icon height="152" src="res/ios/icons/icon-76@2x.png" width="152" />
-    <icon height="40" src="res/ios/icons/icon-40.png" width="40" />
-    <icon height="80" src="res/ios/icons/icon-40@2x.png" width="80" />
-    <icon height="57" src="res/ios/icons/icon.png" width="57" />
-    <icon height="114" src="res/ios/icons/icon@2x.png" width="114" />
-    <icon height="72" src="res/ios/icons/icon-72.png" width="72" />
-    <icon height="144" src="res/ios/icons/icon-72@2x.png" width="144" />
-    <!-- <icon height="167" src="res/ios/icons/icon-167.png" width="167" /> -->
     <icon height="29" src="res/ios/icons/icon-small.png" width="29" />
-    <icon height="58" src="res/ios/icons/icon-small@2x.png" width="58" />
+    <icon height="58" src="res/ios/icons/icon-small-2x.png" width="58" />
+    <icon height="87" src="res/ios/icons/icon-small-3x.png" width="87" />
+    <icon height="40" src="res/ios/icons/icon-40.png" width="40" />
+    <icon height="80" src="res/ios/icons/icon-40-2x.png" width="80" />
+    <icon height="120" src="res/ios/icons/icon-40-3x.png" width="120" />
     <icon height="50" src="res/ios/icons/icon-50.png" width="50" />
-    <icon height="100" src="res/ios/icons/icon-50@2x.png" width="100" />
-    <icon height="167" src="res/ios/icons/icon-83.5@2x.png" width="167" />
-    <icon height="20" src="res/ios/icons/icon-20.png" width="20" />
-    <icon height="48" src="res/ios/icons/icon-24@2x.png" width="48" />
-    <icon height="55" src="res/ios/icons/icon-27.5@2x.png" width="55" />
-    <icon height="88" src="res/ios/icons/icon-44@2x.png" width="88" />
-    <icon height="172" src="res/ios/icons/icon-86@2x.png" width="172" />
-    <icon height="196" src="res/ios/icons/icon-98@2x.png" width="196" />
+    <icon height="100" src="res/ios/icons/icon-50-2x.png" width="100" />
+    <icon height="57" src="res/ios/icons/icon-57.png" width="57" />
+    <icon height="114" src="res/ios/icons/icon-57-2x.png" width="114" />
+    <icon height="60" src="res/ios/icons/icon-60.png" width="60" />
+    <icon height="120" src="res/ios/icons/icon-60-2x.png" width="120" />
+    <icon height="180" src="res/ios/icons/icon-60-3x.png" width="180" />
+    <icon height="72" src="res/ios/icons/icon-72.png" width="72" />
+    <icon height="144" src="res/ios/icons/icon-72-2x.png" width="144" />
+    <icon height="76" src="res/ios/icons/icon-76.png" width="76" />
+    <icon height="152" src="res/ios/icons/icon-76-2x.png" width="152" />
+    <icon height="167" src="res/ios/icons/icon-83.5-2x.png" width="167" />
     <icon height="1024" src="res/ios/icons/icon-1024.png" width="1024" />
-    <splash src="res/screen/ios/Default@2x~iphone~anyany.png"/>
-    <splash src="res/screen/ios/Default@2x~iphone~comany.png"/>
-    <splash src="res/screen/ios/Default@3x~iphone~anyany.png"/>
-    <splash src="res/screen/ios/Default@3x~iphone~comany.png"/>
-    <splash src="res/screen/ios/Default@2x~ipad~anyany.png"/>
-    <splash src="res/screen/ios/Default@2x~ipad~comany.png"/>
-    <splash src="res/screen/ios/Default@2x~iphone~comcom.png"/>
-    <splash src="res/screen/ios/Default@3x~iphone~anycom.png"/>
+    <splash src="res/ios/screens/Default@2x~iphone~anyany.png"/>
+    <splash src="res/ios/screens/Default@2x~iphone~comany.png"/>
+    <splash src="res/ios/screens/Default@3x~iphone~anyany.png"/>
+    <splash src="res/ios/screens/Default@3x~iphone~comany.png"/>
+    <splash src="res/ios/screens/Default@2x~ipad~anyany.png"/>
+    <splash src="res/ios/screens/Default@2x~ipad~comany.png"/>
+    <splash src="res/ios/screens/Default@2x~iphone~comcom.png"/>
+    <splash src="res/ios/screens/Default@3x~iphone~anycom.png"/>
 
     <feature name="CDVWKWebViewEngine">
       <param name="ios-package" value="CDVWKWebViewEngine" />
