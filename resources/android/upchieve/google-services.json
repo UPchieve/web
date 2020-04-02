@@ -8,7 +8,7 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:877923781231:android:3d7ad6464b1aeb37a21b9a",
+        "mobilesdk_app_id": "1:877923781231:android:55f2cae74267f273a21b9a",
         "android_client_info": {
           "package_name": "org.upchieve.mobile"
         }
@@ -32,7 +32,7 @@
               "client_type": 3
             },
             {
-              "client_id": "877923781231-3v03ov1gak6a2tdlejghd12evs4fm8os.apps.googleusercontent.com",
+              "client_id": "877923781231-ul8f17kkpfkh5pm2reh6ockq0cuvbd99.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
                 "bundle_id": "org.upchieve.mobile"
