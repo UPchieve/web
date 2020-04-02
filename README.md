@@ -74,14 +74,82 @@ Be sure to bump the version number in package.json before running deploy
 ### Dependencies
 
   - `npm install -g cordova`
+  - `npm install -g gulp`
   - iOS
     - [XCode](https://developer.apple.com/xcode/)
     - `npm install -g ios-sim ios-deploy`
   - Android:
     [Android SDK](https://developer.android.com/sdk/installing/index.html)
 
+### Available portal calls
+ `app.exit`
+ `app.exitWithoutAnimation`
+ `app.isLoaded`
+ `app.triggerRepaint`
+ `app.getDeviceId`
+ `app.onPause`
+ `app.onResume`
+ `app.onBack`
+ `app.rate`
 
-### MISC
+ `share.any`
+ `share.multi`
+
+ `keyboard.show`
+ `keyboard.close`
+ `keyboard.onShow`
+ `keyboard.onHide`
+ `keyboard.disableScroll`
+ `keyboard.hideAccessoryBar`
+ `keyboard.showAccessoryBar`
+
+ `launcher.check`
+ `launcher.launch`
+
+ `intents.start`
+
+ `orientation.lock`
+ `orientation.unlock`
+ `orientation.get`
+ `orientation.onChange`
+
+ `networkInformation.onOnline`
+ `networkInformation.onOffline`
+ `networkInformation.getType`
+
+ `push.register`
+ `push.subscribeToTopic`
+ `push.getBadgeNumber`
+ `push.setBadgeNumber`
+ `push.getHasPermission`
+ `push.setContextId`
+ `push.onData`
+ `push.registerAction`
+
+ `top.getData`
+ `top.onData`
+ `top.clearEventListeners`
+
+ `browser.openWindow`
+ `browser.closeWindow`
+ `browser.show`
+ `browser.reply`
+
+ `deepLink.getPath`
+ `deepLink.onRoute`
+
+ `geolocation.getCurrentPosition`
+
+ `permissions.check`
+ `permissions.request`
+
+ `statusBar.setOverlaysWebview`
+ `statusBar.setBackgroundColor`
+ `statusBar.hide`
+ `statusBar.show`
+ `statusBar.getIsVisible`
+
+### MISC notes
 when releasing, using autosigning may break fcm?
 
 Add provisioning profile for the app you added https://developer.apple.com/account/ios/profile/
