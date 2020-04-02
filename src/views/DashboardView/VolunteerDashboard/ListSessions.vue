@@ -52,6 +52,9 @@ export default {
       user: this.user
     });
   },
+  beforeDestroy() {
+    this.$socket.disconnect();
+  },
   methods: {
     gotoSession(session) {
       const { type, subTopic, _id } = session;
