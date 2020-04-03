@@ -33,7 +33,7 @@ PortalService.listen();
 
 window.addEventListener("load", () => {
   // Let the app know the JS is ready
-  // TODO: wait until vue is done with first render
+  // FIXME: wait until vue is done with first render
   PortalService.call("app.isLoaded");
 });
 

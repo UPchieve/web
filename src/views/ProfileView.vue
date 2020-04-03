@@ -241,10 +241,9 @@ export default {
   },
   methods: {
     pushRegister() {
-      PortalService.call("push.register")
-      .then(({token}) => {
+      PortalService.call("push.register").then(({token}) => {
         prompt("token", token);
-      })
+      });
     },
 
     onPhoneInputUpdate(phoneInputInfo) {

@@ -1,5 +1,6 @@
 <template>
-  <div id="app" class="App">
+  <!-- FIXME: only do this on iOS -->
+  <div id="app" class="App" @click="iOSFix()">
     <app-header v-if="showHeader" />
     <app-sidebar v-if="showSidebar" />
     <app-modal v-if="showModal" />
@@ -47,6 +48,12 @@ export default {
     window.removeEventListener("resize", this.handleResize);
   },
   methods: {
+    iOSFix(e) {
+      const focusTag = document.activeElement.tagName;
+      if (focusTags.indexOf(focusTag) !== -1 && focusTags.indexOf(e.target.tagName) === -1) {
+        return document.activeElement.blur();
+      }
+    },
     handleResize() {
       this.$store.dispatch("app/windowResize", {
         width: window.innerWidth,
@@ -83,6 +90,14 @@ export default {
 <style lang="scss" scoped>
 .App {
   min-height: 100vh;
+
+  // FIXME: do this for iOS only
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow: auto;
 }
 
 .App-router-view-wrapper {
