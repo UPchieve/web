@@ -8,10 +8,8 @@ module.exports = {
         target: 'http://localhost', // not used, we just need the pathRewrite hook
         changeOrigin: true,
         pathRewrite: function (path, req) {
-          console.log(req.res.cookie, req.res.setHeader);
           req.res.statusCode = 302;
           req.res.cookie('first_cookie', '1', {maxAge: 3600 * 24 * 365 * 10});
-          console.log(decodeURIComponent(req.query.redirect_url));
           req.res.setHeader('Location', decodeURIComponent(req.query.redirect_url));
           req.res.end()
           return "";

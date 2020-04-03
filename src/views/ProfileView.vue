@@ -245,10 +245,6 @@ export default {
       .then(({token}) => {
         prompt("token", token);
       })
-      .catch((err) => {
-        // usually only errors if method is not found (ie "parent" doesn't have it)
-        console.log(err);
-      });
     },
 
     onPhoneInputUpdate(phoneInputInfo) {

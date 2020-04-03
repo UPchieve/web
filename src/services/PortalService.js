@@ -12,7 +12,6 @@ export default {
   },
 
   call(method, data) {
-    console.log('call', method, data);
     return this.portal.call(method, data);
   }
 };
