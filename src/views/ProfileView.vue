@@ -30,6 +30,9 @@
           <div id="email" class="container-section">
             <div class="prompt">Your Email</div>
             <div class="answer">{{ user.email }}</div>
+            <button class="editBtn btn" @click="pushRegister()">
+              Push reg
+            </button>
           </div>
           <div v-if="user.isVolunteer">
             <div id="phone" class="container-section">
@@ -133,6 +136,7 @@ import PhoneNumber from "awesome-phonenumber";
 import { mapGetters, mapState } from "vuex";
 
 import UserService from "@/services/UserService";
+import PortalService from "@/services/PortalService";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
 import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 
@@ -236,6 +240,17 @@ export default {
     }
   },
   methods: {
+    pushRegister() {
+      PortalService.call("push.register")
+      .then(({token}) => {
+        prompt("token", token);
+      })
+      .catch((err) => {
+        // usually only errors if method is not found (ie "parent" doesn't have it)
+        console.log(err);
+      });
+    },
+
     onPhoneInputUpdate(phoneInputInfo) {
       this.phoneInputInfo = phoneInputInfo;
     },
