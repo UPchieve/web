@@ -45,7 +45,8 @@ If emulator fails, https://stackoverflow.com/a/51693703
 ```
 npm run local-ios
 cd cordova
-cordova plugin add cordova-plugin-wkwebview-engine
+cordova plugin add cordova-plugin-ionic-webview@2.5.3
+cd ..
 npm run local-ios
 ```
 

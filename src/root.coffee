@@ -99,13 +99,13 @@ if window.location.href.indexOf('?redirected') isnt -1
 
 iOSVersion = parseInt(navigator.userAgent.match(/OS ((\d+_?){2,3})\s/)?[1])
 if isiOS and iOSVersion >= 8 and not CookieService.get 'iframe_cookie_set'
-  setTimeout ->
-    matches = EXTERNAL_URL.match /^https?\:\/\/([^\/:?#]+)(?:[\/:?#]|$)/i
+  getCookiePerms = ->
+    matches = EXTERNAL_URL.match /^https?\:\/\/([^\/?#]+)/i
     base = matches?[0]
     if base
       window.location.href = "#{base}/setCookie?redirect_url=" +
-                       encodeURIComponent(window.location.href + '?redirected')
-  , 250 # unsure if necessary, but ^^ sometimes hangs
+                   encodeURIComponent("#{window.location.href}?redirected")
+  document.addEventListener 'deviceready', getCookiePerms, false
 else if config.PLATFORM is 'native'
   document.addEventListener 'deviceready', onDeviceReady, false
 else
