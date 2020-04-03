@@ -2,7 +2,7 @@
   <form-page-template>
     <form class="uc-form">
       <div class="uc-form-header">Reset Your Password</div>
-      <div class="uc-form-body">
+      <div v-if="isValidResetToken" class="uc-form-body">
         <div class="uc-column">
           <label for="inputEmail" class="uc-form-label">
             Please enter your email address
@@ -53,6 +53,9 @@
 
         <div v-if="msg !== ''">{{ msg }}</div>
       </div>
+      <div v-else class="uc-form-body">
+        <p>{{ msg }}</p>
+      </div>
     </form>
   </form-page-template>
 </template>
@@ -69,6 +72,14 @@ export default {
   },
   created() {
     this.$store.dispatch("app/hideNavigation");
+    const { token } = this.$route.params;
+    AuthService.verifyReset(this, { token }).catch(err => {
+      if (err.status !== 404 && err.status !== 422) {
+        Sentry.captureException(err);
+      }
+      this.msg = err.message;
+      this.isValidResetToken = false;
+    });
   },
   data() {
     return {
@@ -78,7 +89,8 @@ export default {
         email: "",
         password: "",
         newpassword: ""
-      }
+      },
+      isValidResetToken: true
     };
   },
   methods: {

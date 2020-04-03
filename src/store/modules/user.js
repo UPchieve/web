@@ -9,7 +9,9 @@ export default {
   namespaced: true,
   state: {
     user: {},
-    session: {}
+    session: {},
+    latestSession: {},
+    isFirstDashboardVisit: false
   },
   mutations: {
     setUser: (state, user = {}) => (state.user = user),
@@ -25,6 +27,8 @@ export default {
     },
 
     setSession: (state, session = {}) => (state.session = session),
+
+    setLatestSession: (state, session = {}) => (state.latestSession = session),
 
     addMessage: (state, message) => {
       if (message) state.session.messages.push(message);
@@ -42,6 +46,10 @@ export default {
         state.user.timezone = timezone;
         state.user.date = date;
       }
+    },
+
+    setIsFirstDashboardVisit: (state, isFirstDashboardVisit) => {
+      state.isFirstDashboardVisit = isFirstDashboardVisit;
     }
   },
   actions: {
@@ -76,6 +84,19 @@ export default {
         });
     },
 
+    fetchLatestSession: ({ commit, state }, context) => {
+      SessionService.getLatestSession(context, state.user)
+        .then(({ sessionData }) => {
+          commit("setLatestSession", sessionData);
+        })
+        .catch(err => {
+          commit("setLatestSession", {});
+          if (err.status !== 404) {
+            Sentry.captureException(err);
+          }
+        });
+    },
+
     clearSession: ({ commit }) => {
       commit("setSession", {});
     },
@@ -94,6 +115,10 @@ export default {
 
     addMessage: ({ commit }, message) => {
       commit("addMessage", message);
+    },
+
+    firstDashboardVisit: ({ commit }, isFirstDashboardVisit) => {
+      commit("setIsFirstDashboardVisit", isFirstDashboardVisit);
     }
   },
   getters: {

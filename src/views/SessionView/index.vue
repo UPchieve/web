@@ -4,7 +4,7 @@
       <session-header @try-clicked="tryClicked" />
     </div>
     <div
-      v-if="currentSession.sessionId"
+      v-if="session._id"
       class="session-contents-container"
       v-bind:class="{
         'session-contents-container--mobile': mobileMode
@@ -17,7 +17,10 @@
           'whiteboard-container--hidden': shouldHideWhiteboardSection
         }"
       >
-        <whiteboard />
+        <whiteboard
+          :shouldCreateSession="isNewSession"
+          :isVisible="whiteboardOpen"
+        />
       </div>
       <div
         class="chat-container"
@@ -74,6 +77,9 @@ export default {
 
     window.addEventListener("resize", this.handleResize);
   },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.handleResize);
+  },
   /*
    * @notes
    * [1] Refactoring candidate: it'd be awesome if Dashboard could pass
@@ -81,15 +87,16 @@ export default {
    */
   data() {
     return {
-      currentSession: SessionService.currentSession,
       whiteboardOpen: false,
       icon: "Pencil.png",
-      sessionReconnecting: false
+      sessionReconnecting: false,
+      isNewSession: false
     };
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: state => state.user.user,
+      session: state => state.user.session
     }),
     ...mapGetters({
       mobileMode: "app/mobileMode"
@@ -128,8 +135,10 @@ export default {
         type,
         this.$route.params.subTopic
       );
+      this.isNewSession = true;
     } else {
       promise = SessionService.useExistingSession(this, id);
+      this.isNewSession = false;
     }
 
     promise
@@ -162,9 +171,9 @@ export default {
     },
     connect() {
       if (this.sessionReconnecting) {
-        if (this.currentSession && this.currentSession.sessionId) {
+        if (this.session && this.session._id) {
           // we still need to re-join the room after Socket.IO re-establishes the connection
-          this.joinSession(this.currentSession.sessionId);
+          this.joinSession(this.session._id);
         } else {
           location.reload();
         }
@@ -265,27 +274,24 @@ export default {
   }
 
   @include breakpoint-below("medium") {
-    position: absolute;
-    bottom: 0;
-    left: 0;
     width: 100%;
-    height: calc(100vh - 80px);
-    z-index: 2;
+    height: 100%;
   }
 }
 
 .whiteboard-container {
+  background: #fff;
   padding: 0;
   flex-grow: 1;
   overflow: hidden;
+  position: relative;
 
-  // Hide with z-index (not display: none) so canvas is accessible in DOM
   &--hidden {
-    z-index: 0;
-  }
-
-  @include breakpoint-below("medium") {
-    background: #fff;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: -500px;
+    left: -500px;
   }
 }
 
@@ -293,8 +299,7 @@ export default {
   padding: 0;
 
   &--hidden {
-    // Hide with z-index (not display: none) so canvas is accessible in DOM
-    z-index: 0;
+    display: none;
   }
 
   @include breakpoint-above("medium") {

@@ -5,9 +5,7 @@
         <div :style="partnerAvatar" class="avatar" />
         <div class="info">
           <template v-if="isSessionWaitingForVolunteer">
-            <span>
-              Contacting coaches<span class="loading-ellipsis"></span>
-            </span>
+            <loading-message message="Contacting coaches" />
           </template>
           <template v-else-if="isSessionInProgress">
             <span class="volunteer-name">{{ sessionPartner.firstname }}</span>
@@ -24,7 +22,7 @@
             </template>
           </template>
           <template v-else>
-            Loading...
+            <loading-message message="Loading" />
           </template>
         </div>
       </div>
@@ -66,6 +64,7 @@ import SessionService from "@/services/SessionService";
 import router from "@/router";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
 import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
+import LoadingMessage from "@/components/LoadingMessage";
 
 /**
  * @todo {1} Refactoring candidate: use a modal instead.
@@ -78,6 +77,9 @@ export default {
       connectionMsgType: "",
       reconnectAttemptMsg: ""
     };
+  },
+  components: {
+    LoadingMessage
   },
   computed: {
     ...mapState({
@@ -105,14 +107,24 @@ export default {
   },
   methods: {
     end() {
-      // Only ask for confirmation if session hasn't been ended by other user
-      const shouldEndSession = this.isSessionAlive
-        ? window.confirm("Do you really want to end the session?")
-        : true;
+      if (this.isSessionWaitingForVolunteer) {
+        const shouldEndSession = window.confirm(
+          "Are you sure you want to cancel this request? If you've been waiting less than 5 minutes, you won't be able to make another request right away."
+        );
 
-      // Early exit if user didn't confirm
-      if (!shouldEndSession) {
-        return;
+        if (!shouldEndSession) {
+          return;
+        }
+      } else {
+        // Only ask for confirmation if session hasn't been ended by other user
+        const shouldEndSession = this.isSessionAlive
+          ? window.confirm("Do you really want to end the session?")
+          : true;
+
+        // Early exit if user didn't confirm
+        if (!shouldEndSession) {
+          return;
+        }
       }
 
       this.$store.dispatch("user/clearSession");
@@ -324,30 +336,5 @@ h1 {
 .avatar-info-container {
   display: flex;
   align-items: center;
-}
-
-.loading-ellipsis {
-  &:after {
-    content: "";
-    animation: 2s ellip infinite;
-  }
-}
-
-@keyframes ellip {
-  20% {
-    content: ".";
-  }
-
-  40% {
-    content: "..";
-  }
-
-  60% {
-    content: "...";
-  }
-
-  80% {
-    content: "...";
-  }
 }
 </style>

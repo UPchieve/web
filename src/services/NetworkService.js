@@ -2,7 +2,7 @@ import Vue from "vue";
 
 const AUTH_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/auth`;
 const API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/api`;
-const SCHOOL_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/school`;
+const ELIGIBILITY_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/eligibility`;
 const CONTACT_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/contact`;
 
 export default {
@@ -67,6 +67,11 @@ export default {
       .post(`${AUTH_ROOT}/reset/confirm`, data)
       .then(this._successHandler, this._errorHandler);
   },
+  verifyReset(context, data) {
+    return context.$http
+      .post(`${AUTH_ROOT}/reset/verify`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
   user(context) {
     return context.$http
       .get(`${API_ROOT}/user`)
@@ -127,6 +132,11 @@ export default {
       .post(`${API_ROOT}/session/current`, data)
       .then(this._successHandler, this._errorHandler);
   },
+  latestSession(context, data) {
+    return context.$http
+      .post(`${API_ROOT}/session/latest`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
   getQuestions(context, data) {
     return context.$http
       .post(`${API_ROOT}/training/questions`, data)
@@ -137,7 +147,7 @@ export default {
       .post(`${API_ROOT}/training/score`, data)
       .then(this._successHandler, this._errorHandler);
   },
-  getReviewMaterial(context, data) {
+  getReviewMaterials(context, data) {
     return context.$http
       .get(`${API_ROOT}/training/review/${data}`)
       .then(this._successHandler, this._errorHandler);
@@ -149,17 +159,22 @@ export default {
   },
   searchSchool(context, { query }) {
     return context.$http
-      .get(`${SCHOOL_API_ROOT}/search?q=${encodeURIComponent(query)}`)
+      .get(
+        `${ELIGIBILITY_API_ROOT}/school/search?q=${encodeURIComponent(query)}`
+      )
       .then(this._successHandler, this._errorHandler);
   },
-  checkSchoolApproval(context, { schoolUpchieveId }) {
+  checkStudentEligbility(context, { schoolUpchieveId, zipCode }) {
     return context.$http
-      .post(`${SCHOOL_API_ROOT}/check`, { schoolUpchieveId })
+      .post(`${ELIGIBILITY_API_ROOT}/check`, { schoolUpchieveId, zipCode })
       .then(this._successHandler, this._errorHandler);
   },
   joinSchoolApprovalWaitlist(context, { schoolUpchieveId, email }) {
     return context.$http
-      .post(`${SCHOOL_API_ROOT}/approvalnotify`, { schoolUpchieveId, email })
+      .post(`${ELIGIBILITY_API_ROOT}/school/approvalnotify`, {
+        schoolUpchieveId,
+        email
+      })
       .then(this._successHandler, this._errorHandler);
   },
   checkIfMessageIsClean(context, data) {

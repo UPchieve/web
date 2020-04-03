@@ -2,7 +2,7 @@ describe("Student and volunteer signup", () => {
   before(function() {
     cy.fixture("users/newStudent1").as("newStudent");
     cy.fixture("users/newVolunteer1").as("newVolunteer");
-    cy.fixture("users/Volunteer1").as("volunteer");
+    cy.fixture("users/volunteer1").as("volunteer");
   });
 
   describe("Student signup", () => {
@@ -13,7 +13,7 @@ describe("Student and volunteer signup", () => {
 
       const approvedHighschoolsUrl = `${Cypress.env(
         "SERVER_ROOT"
-      )}/school/findeligible`;
+      )}/eligibility/school/findeligible`;
       cy.request({
         url: approvedHighschoolsUrl,
         qs: {
@@ -43,6 +43,8 @@ describe("Student and volunteer signup", () => {
         cy.get("#inputHighschool")
           .type(highSchool.name)
           .should("have.value", highSchool.name);
+
+        cy.get("#inputZipCode").type("11201");
 
         cy.get(".uc-autocomplete-result:first").click();
 
@@ -186,16 +188,7 @@ describe("Student and volunteer signup", () => {
         .then(userid => {
           cy.login(this.volunteer);
 
-          const verificationTokenUrl = `${Cypress.env(
-            "SERVER_ROOT"
-          )}/api/verificationtoken`;
-
-          cy.request({
-            url: verificationTokenUrl,
-            qs: { userid }
-          })
-            .its("body.verificationToken")
-            .as("token");
+          cy.getVerificationToken(userid).as("token");
 
           cy.logout();
           // We need to be logged in as the new volunteer for the
@@ -251,52 +244,14 @@ describe("Student and volunteer signup", () => {
 
       cy.deleteUserByEmail(this.newVolunteer.email);
 
-      // get valid codes from server
-      const validCodesUrl = `${Cypress.env(
-        "SERVER_ROOT"
-      )}/auth/register/volunteercodes`;
-      const registerUrl = `${Cypress.env("SERVER_ROOT")}/auth/register`;
-      const setProfileUrl = `${Cypress.env("SERVER_ROOT")}/api/user`;
+      cy.getVolunteerCodes().then(codes => {
+        cy.logout();
 
-      cy.request({
-        url: validCodesUrl
-      })
-        .then(response => {
-          const code = response.body.volunteerCodes[0];
-
-          cy.logout();
-
-          // register unverified new volunteer
-          return cy.request({
-            url: registerUrl,
-            method: "POST",
-            body: {
-              isVolunteer: true,
-              email: this.newVolunteer.email,
-              password: this.newVolunteer.password,
-              code,
-              college: this.newVolunteer.college,
-              phone: this.newVolunteer.phoneNumber,
-              firstName: this.newVolunteer.firstName,
-              lastName: this.newVolunteer.lastName,
-              terms: true
-            }
-          });
-        })
-        .then(response => {
-          const user = response.body.user;
-          user.email = this.newVolunteer.email;
-          user.college = this.newVolunteer.college;
-          user.phonePretty = this.newVolunteer.phoneNumber;
-          (user.firstname = this.newVolunteer.firstName.trim()),
-            (user.lastname = this.newVolunteer.lastName.trim());
-
-          cy.request({
-            url: setProfileUrl,
-            method: "PUT",
-            body: user
-          });
-        });
+        // register unverified new volunteer
+        const userObj = Object.assign({}, this.newVolunteer);
+        userObj.code = codes[0];
+        cy.createUser(userObj);
+      });
     });
 
     it("Should not accept invalid verification token", function() {

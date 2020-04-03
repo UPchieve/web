@@ -3,32 +3,22 @@
     <div>
       <slot />
     </div>
-    <upchieve-icon
-      v-if="primary"
-      icon="arrow"
-      color="inherit"
-      class="ButtonTemplate-icon"
-    />
+    <arrow-icon v-if="primary" class="ButtonTemplate-icon arrow-icon" />
   </router-link>
 
   <button v-else class="ButtonTemplate">
     <div>
       <slot />
     </div>
-    <upchieve-icon
-      v-if="primary"
-      icon="arrow"
-      color="inherit"
-      class="ButtonTemplate-icon"
-    />
+    <arrow-icon v-if="primary" class="ButtonTemplate-icon arrow-icon" />
   </button>
 </template>
 
 <script>
-import UpchieveIcon from "@/components/UpchieveIcon";
+import ArrowIcon from "@/assets/arrow.svg";
 
 export default {
-  components: { UpchieveIcon },
+  components: { ArrowIcon },
   props: {
     primary: Boolean,
     routeTo: String
@@ -50,5 +40,11 @@ export default {
 .ButtonTemplate-icon {
   margin-top: 2px; // nudge down
   margin-left: 8px; // space between text
+}
+
+.arrow-icon {
+  fill: currentColor;
+  height: 16px;
+  width: 16px;
 }
 </style>

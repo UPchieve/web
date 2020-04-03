@@ -5,6 +5,7 @@ import { storeOptions } from "@/store";
 import SubjectCard from "@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectCard";
 import HyperlinkButton from "@/components/HyperlinkButton";
 import LargeButton from "@/components/LargeButton";
+// import TestIcon from "@/assets/sidebar_icons/house.svg";
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -24,7 +25,7 @@ describe("SubjectCard", () => {
     const propsData = {
       title: "Test Subject",
       subtitle: "Fake subtitle.",
-      svgUrl: "test_url.svg",
+      svg: {},
       subtopics: ["Subject 1", "Subject 2", "Subject 3"],
       buttonText: "Test Button"
     };
@@ -34,10 +35,8 @@ describe("SubjectCard", () => {
         const wrapper = getWrapper(true, propsData);
         expect(wrapper.classes("SubjectCard")).toBe(true);
 
-        const icon = wrapper.find(".SubjectCard-icon");
-        expect(icon.exists()).toBe(true);
-        expect(icon.is("img")).toBe(true);
-        expect(icon.attributes("src")).toBe(propsData.svgUrl);
+        // const icon = wrapper.find(".SubjectCard-icon");
+        // expect(icon.contains(propsData.svg)).toBe(true);
 
         const title = wrapper.find(".SubjectCard-title");
         expect(title.exists()).toBe(true);
@@ -81,10 +80,8 @@ describe("SubjectCard", () => {
         const wrapper = getWrapper(false, propsData);
         expect(wrapper.classes("SubjectCard")).toBe(true);
 
-        const icon = wrapper.find(".SubjectCard-icon");
-        expect(icon.exists()).toBe(true);
-        expect(icon.is("img")).toBe(true);
-        expect(icon.attributes("src")).toBe(propsData.svgUrl);
+        // const icon = wrapper.find(".SubjectCard-icon");
+        // expect(icon.contains(propsData.svg)).toBe(true);
 
         const title = wrapper.find(".SubjectCard-title");
         expect(title.exists()).toBe(true);
