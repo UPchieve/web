@@ -130,10 +130,13 @@
     </config-file>
     <config-file target="*-Info.plist" parent="NSCameraUsageDescription">
       <string>For chatting with tutor</string>
-    </config-file>
+    </config-file> -->
     <config-file target="*-Info.plist" parent="NSLocationWhenInUseUsageDescription">
       <string>For determining if eligible for free tutoring</string>
-    </config-file>-->
+    </config-file>
+    <config-file target="*-Info.plist" parent="NSLocationAlwaysUsageDescription">
+      <string>For determining if eligible for free tutoring</string>
+    </config-file>
 
     <!-- <plugin name="cordova-labs-local-webserver" spec="https://github.com/claydotio/cordova-local-webserver.git" /> -->
 
