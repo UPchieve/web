@@ -13,6 +13,7 @@
   <allow-navigation href="*://upchieve.org" />
   <allow-navigation href="*://*.upchieve.org" />
   <allow-navigation href="*://*.xip.io" />
+  <allow-navigation href="http://localhost" />
   <allow-navigation href="gap://ready" />
 
   <!-- http://ourcodeworld.com/articles/read/388/cordova-pause-and-resume-event-not-firing -->
@@ -123,25 +124,24 @@
     <splash src="res/ios/screens/Default@2x~iphone~comcom.png"/>
     <splash src="res/ios/screens/Default@3x~iphone~anycom.png"/>
 
-    <feature name="CDVWKWebViewEngine">
-      <param name="ios-package" value="CDVWKWebViewEngine" />
-    </feature>
-    <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
     <preference name="SplashScreen" value="Default" />
-    <config-file target="*-Info.plist" parent="NSPhotoLibraryUsageDescription">
-      <string>For uploading profile picture, reviews, and chat messages</string>
+    <!-- <config-file target="*-Info.plist" parent="NSPhotoLibraryUsageDescription">
+      <string>For uploading pictures of math problems</string>
     </config-file>
     <config-file target="*-Info.plist" parent="NSCameraUsageDescription">
-      <string>For uploading profile picture, reviews, and chat messages</string>
+      <string>For chatting with tutor</string>
     </config-file>
     <config-file target="*-Info.plist" parent="NSLocationWhenInUseUsageDescription">
-      <string>For zooming to current location in map of campgrounds</string>
-    </config-file>
-    <config-file target="*-Info.plist" parent="NSLocationAlwaysUsageDescription">
-      <string>For recommending places to review when you've arrived</string>
-    </config-file>
+      <string>For determining if eligible for free tutoring</string>
+    </config-file>-->
+
     <!-- <plugin name="cordova-labs-local-webserver" spec="https://github.com/claydotio/cordova-local-webserver.git" /> -->
-    <plugin name="cordova-plugin-wkwebview-engine" spec="~1.2.1" />
+
+    <!-- note that this should not be upgraded to v4 unless they add support for loading over http instead of non-http schemes. needed for cookie redir -->
+    <plugin name="cordova-plugin-ionic-webview" spec="^2.5.3" />
+    <preference name="WKPort" value="___WK_WEBVIEW_PORT_PLACEHOLDER___" />
+    <preference name="WKSuspendInBackground" value="false" />
+    <preference name="ScrollEnabled" value="true" />
     <resource-file src="GoogleService-Info.plist" />
     <resource-file src="res/ios/images/close.png"/>
     <resource-file src="res/ios/images/close@2x.png"/>
