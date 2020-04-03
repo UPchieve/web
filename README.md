@@ -107,9 +107,6 @@ Be sure to bump the version number in package.json before running deploy
  `keyboard.hideAccessoryBar`
  `keyboard.showAccessoryBar`
 
- `launcher.check`
- `launcher.launch`
-
  `intents.start`
 
  `orientation.lock`
