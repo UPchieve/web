@@ -151,14 +151,14 @@ export default {
 
     isEmailVerified: state => state.user.verified,
 
-    hasOneCertification: state => {
+    hasCertification: state => {
       return _.some(state.user.certifications, { passed: true });
     },
 
     hasSelectedAvailability: state => !!state.user.availabilityLastModifiedAt,
 
     isOnboarded: (state, getters) => {
-      return getters.hasSelectedAvailability && getters.hasOneCertification;
+      return getters.hasSelectedAvailability && getters.hasCertification;
     },
 
     sessionPath: state => {

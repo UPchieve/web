@@ -27,7 +27,7 @@
               </p>
             </div>
           </div>
-          <div v-if="!hasOneCertification" class="onboarding-step">
+          <div v-if="!hasCertification" class="onboarding-step">
             <img
               src="@/assets/onboarding_icons/quiz-icon.png"
               class="onboarding-icon"
@@ -129,7 +129,7 @@ export default {
       isSessionAlive: "user/isSessionAlive",
       sessionPath: "user/sessionPath",
       isOnboarded: "user/isOnboarded",
-      hasOneCertification: "user/hasOneCertification",
+      hasCertification: "user/hasCertification",
       hasSelectedAvailability: "user/hasSelectedAvailability"
     }),
 
