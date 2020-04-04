@@ -335,5 +335,6 @@ export default {
 .onboarding-icon {
   width: 70px;
   height: 70px;
+  flex-shrink: 0;
 }
 </style>
