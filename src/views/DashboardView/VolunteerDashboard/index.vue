@@ -128,7 +128,7 @@ export default {
     }),
 
     isNewVolunteer() {
-      return this.user.numPastSessions === 0;
+      return this.user.pastSessions.length === 0;
     },
 
     impactStats() {
@@ -169,7 +169,7 @@ export default {
       const numCertsObtained = certsObtained.length;
 
       // (3) Requests filled
-      const numRequestsFilled = _.get(user, "numPastSessions", "--");
+      const numRequestsFilled = _.get(user, "pastSessions.length", "--");
 
       // (4) Hours tutored
       const numHoursTutored = _.get(user, "numVolunteerSessionHours", "--");
