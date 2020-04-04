@@ -70,7 +70,7 @@
     "hooks": {
       "pre-push": "./bin/run-cypress.sh",
       "pre-commit": "./bin/lint-restage.sh",
-      "post-commit": "git stash pop -q"
+      "post-commit": "./bin/restore-unstaged-changes.sh"
     }
   }
 }
