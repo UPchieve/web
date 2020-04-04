@@ -116,11 +116,14 @@ export default {
     if (this.isFirstDashboardVisit) {
       this.showOnboardingModal();
     }
+
+    this.$store.dispatch("user/fetchVolunteerStats", this);
   },
   computed: {
     ...mapState({
       user: state => state.user.user,
-      isFirstDashboardVisit: state => state.user.isFirstDashboardVisit
+      isFirstDashboardVisit: state => state.user.isFirstDashboardVisit,
+      volunteerStats: state => state.user.volunteerStats
     }),
     ...mapGetters({
       isSessionAlive: "user/isSessionAlive",
@@ -175,7 +178,7 @@ export default {
       const numRequestsFilled = _.get(user, "pastSessions.length", "--");
 
       // (4) Hours tutored
-      const numHoursTutored = _.get(user, "numVolunteerSessionHours", "--");
+      const numHoursTutored = this.volunteerStats.hoursTutored || "--";
 
       return [
         {

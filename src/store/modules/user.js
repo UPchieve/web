@@ -2,6 +2,7 @@ import * as Sentry from "@sentry/browser";
 import _ from "lodash";
 
 import UserService from "@/services/UserService";
+import NetworkService from "@/services/NetworkService";
 import SessionService from "@/services/SessionService";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
 import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
@@ -12,6 +13,7 @@ export default {
     user: {},
     session: {},
     latestSession: {},
+    volunteerStats: {},
     isFirstDashboardVisit: false
   },
   mutations: {
@@ -26,6 +28,8 @@ export default {
         state.user = user;
       }
     },
+
+    setVolunteerStats: (state, stats = {}) => (state.volunteerStats = stats),
 
     setSession: (state, session = {}) => (state.session = session),
 
@@ -66,6 +70,12 @@ export default {
 
     fetchUser: ({ commit }) => {
       return UserService.getUser().then(user => commit("updateUser", user));
+    },
+
+    fetchVolunteerStats: ({ commit }, contextTodo) => {
+      return NetworkService.volunteerStats(contextTodo).then(res =>
+        commit("setVolunteerStats", res.body.volunteerStats)
+      );
     },
 
     clearUser: ({ commit }) => {
