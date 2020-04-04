@@ -10,7 +10,7 @@ module.exports = {
         pathRewrite: function (path, req) {
           req.res.statusCode = 302;
           req.res.cookie('first_cookie', '1', {maxAge: 3600 * 24 * 365 * 10});
-          req.res.setHeader('Location', decodeURIComponent(req.query.redirect_url));
+          req.res.setHeader('Location', 'http://localhost:12380?redirected');
           req.res.end()
           return "";
         }

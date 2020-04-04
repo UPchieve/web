@@ -49,6 +49,7 @@ export default {
   },
   methods: {
     iOSFix(e) {
+      const focusTags = ['INPUT', 'TEXTAREA', 'SELECT'];
       const focusTag = document.activeElement.tagName;
       if (focusTags.indexOf(focusTag) !== -1 && focusTags.indexOf(e.target.tagName) === -1) {
         return document.activeElement.blur();
