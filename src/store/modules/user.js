@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/browser";
+import _ from "lodash";
 
 import UserService from "@/services/UserService";
 import SessionService from "@/services/SessionService";
@@ -139,6 +140,16 @@ export default {
     isAuthenticated: state => !!(state.user && state.user._id),
 
     isEmailVerified: state => state.user.verified,
+
+    hasOneCertification: state => {
+      return _.some(state.user.certifications, { passed: true });
+    },
+
+    hasSelectedAvailability: state => !!state.user.availabilityLastModifiedAt,
+
+    isOnboarded: (state, getters) => {
+      return getters.hasSelectedAvailability && getters.hasOneCertification;
+    },
 
     sessionPath: state => {
       const { type, subTopic, _id } = state.session;

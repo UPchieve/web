@@ -11,7 +11,7 @@
     </dashboard-banner>
 
     <div class="volunteer-dashboard__body">
-      <div v-if="!user.isOnboarded" class="dashboard-card">
+      <div v-if="!isOnboarded" class="dashboard-card">
         <div class="dashboard-card__title">Remaining Onboarding Steps</div>
         <div>
           <div v-if="!hasSelectedAvailability" class="onboarding-step">
@@ -27,7 +27,7 @@
               </p>
             </div>
           </div>
-          <div v-if="!isCertified" class="onboarding-step">
+          <div v-if="!hasOneCertification" class="onboarding-step">
             <img
               src="@/assets/onboarding_icons/quiz-icon.png"
               class="onboarding-icon"
@@ -124,7 +124,10 @@ export default {
     }),
     ...mapGetters({
       isSessionAlive: "user/isSessionAlive",
-      sessionPath: "user/sessionPath"
+      sessionPath: "user/sessionPath",
+      isOnboarded: "user/isOnboarded",
+      hasOneCertification: "user/hasOneCertification",
+      hasSelectedAvailability: "user/hasSelectedAvailability"
     }),
 
     isNewVolunteer() {
@@ -192,22 +195,6 @@ export default {
           value: `${numHoursTutored} hours tutored`
         }
       ];
-    },
-
-    isCertified() {
-      let isCertified = false;
-
-      for (let index in this.user.certifications) {
-        if (this.user.certifications[index].passed) {
-          isCertified = true;
-          break;
-        }
-      }
-      return isCertified;
-    },
-
-    hasSelectedAvailability() {
-      return !!this.user.availabilityLastModifiedAt;
     }
   },
   methods: {
