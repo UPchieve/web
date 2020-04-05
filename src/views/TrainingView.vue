@@ -74,7 +74,6 @@
 </template>
 
 <script>
-import _ from "lodash";
 import { mapState, mapGetters } from "vuex";
 
 import { topics, allSubtopics } from "@/utils/topics";
@@ -119,18 +118,12 @@ export default {
   },
 
   created() {
-    const displayStates = Object.entries(this.topicsToDisplay)
+    const displayStates = Object.entries(topics)
       .map(([, topicObj]) => topicObj.displayName)
       .reduce((result, key) => {
         result[key] = false;
         return result;
       }, {});
-
-    // If there's only 1 supercategory, open the collapsible by default
-    if (_.size(displayStates) === 1) {
-      const singleSupercategoryKey = Object.keys(displayStates)[0];
-      displayStates[singleSupercategoryKey] = true;
-    }
 
     this.supercategoryMenuDisplayStates = displayStates;
   },
@@ -141,15 +134,8 @@ export default {
     }),
     ...mapState({ user: state => state.user.user }),
 
-    topicsToDisplay() {
-      // Only display math topics to certain flagged volunteers
-      return this.user.mathCoachingOnly ? _.pick(topics, "math") : topics;
-    },
-
     supercategories() {
-      return Object.entries(this.topicsToDisplay).map(
-        ([, topicObj]) => topicObj.displayName
-      );
+      return Object.entries(topics).map(([, topicObj]) => topicObj.displayName);
     }
   },
 

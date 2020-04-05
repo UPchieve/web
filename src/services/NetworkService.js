@@ -82,6 +82,11 @@ export default {
       .get(`${API_ROOT}/user`)
       .then(this._successHandler, this._errorHandler);
   },
+  volunteerStats(context) {
+    return context.$http
+      .get(`${API_ROOT}/user/volunteer-stats`)
+      .then(this._successHandler, this._errorHandler);
+  },
   sendVerification(context) {
     return context.$http
       .post(`${API_ROOT}/verify/send`)

@@ -72,6 +72,7 @@ export default {
     border-radius: 100%;
     text-align: center;
     padding-top: 4px;
+    flex-shrink: 0;
 
     &--open {
       background: $c-success-green;

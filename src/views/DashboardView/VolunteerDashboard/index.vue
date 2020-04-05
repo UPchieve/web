@@ -11,7 +11,7 @@
     </dashboard-banner>
 
     <div class="volunteer-dashboard__body">
-      <div v-if="!user.isOnboarded" class="dashboard-card">
+      <div v-if="!isOnboarded" class="dashboard-card">
         <div class="dashboard-card__title">Remaining Onboarding Steps</div>
         <div>
           <div v-if="!hasSelectedAvailability" class="onboarding-step">
@@ -27,7 +27,7 @@
               </p>
             </div>
           </div>
-          <div v-if="!isCertified" class="onboarding-step">
+          <div v-if="!hasCertification" class="onboarding-step">
             <img
               src="@/assets/onboarding_icons/quiz-icon.png"
               class="onboarding-icon"
@@ -116,19 +116,25 @@ export default {
     if (this.isFirstDashboardVisit) {
       this.showOnboardingModal();
     }
+
+    this.$store.dispatch("user/fetchVolunteerStats", this);
   },
   computed: {
     ...mapState({
       user: state => state.user.user,
-      isFirstDashboardVisit: state => state.user.isFirstDashboardVisit
+      isFirstDashboardVisit: state => state.user.isFirstDashboardVisit,
+      volunteerStats: state => state.user.volunteerStats
     }),
     ...mapGetters({
       isSessionAlive: "user/isSessionAlive",
-      sessionPath: "user/sessionPath"
+      sessionPath: "user/sessionPath",
+      isOnboarded: "user/isOnboarded",
+      hasCertification: "user/hasCertification",
+      hasSelectedAvailability: "user/hasSelectedAvailability"
     }),
 
     isNewVolunteer() {
-      return this.user.numPastSessions === 0;
+      return this.user.pastSessions.length === 0;
     },
 
     impactStats() {
@@ -169,10 +175,10 @@ export default {
       const numCertsObtained = certsObtained.length;
 
       // (3) Requests filled
-      const numRequestsFilled = _.get(user, "numPastSessions", "--");
+      const numRequestsFilled = _.get(user, "pastSessions.length", "--");
 
       // (4) Hours tutored
-      const numHoursTutored = _.get(user, "numVolunteerSessionHours", "--");
+      const numHoursTutored = this.volunteerStats.hoursTutored || "--";
 
       return [
         {
@@ -192,22 +198,6 @@ export default {
           value: `${numHoursTutored} hours tutored`
         }
       ];
-    },
-
-    isCertified() {
-      let isCertified = false;
-
-      for (let index in this.user.certifications) {
-        if (this.user.certifications[index].passed) {
-          isCertified = true;
-          break;
-        }
-      }
-      return isCertified;
-    },
-
-    hasSelectedAvailability() {
-      return !!this.user.availabilityLastModifiedAt;
     }
   },
   methods: {
@@ -348,5 +338,6 @@ export default {
 .onboarding-icon {
   width: 70px;
   height: 70px;
+  flex-shrink: 0;
 }
 </style>
