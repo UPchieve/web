@@ -62,13 +62,16 @@ Copy relevant assets to resources/android|ios/build/... then delete the res fold
 https://easyappicon.com/
 
 #### iOS storyboards
-https://pgicons.abiro.com/
+Rachel made
 
 ### Commands
 
   - `npm run local-android` - Build and run debug APK on local device (plug in via USB)
   - `npm run build-android` - Build unaligned debug APK
   - `npm run release-android` - Build unaligned release APK
+
+  - `npm run local-ios`
+  - `npm run release-ios`
 
 Be sure to bump the version number in package.json before running deploy
 

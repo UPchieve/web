@@ -2,7 +2,7 @@ module.exports =
   # APP_URL: 'https://app.upchieve.org'
   # APP_URL: 'http://192.168.0.109.xip.io:8080'
   APP_URL: 'http://167.172.145.56:3000'
-  IOS_APP_ID: '1160535565' # FIXME: replace
+  IOS_APP_ID: '1506076042'
   PACKAGE_KEY: 'org.upchieve.mobile'
   CLASS_NAME: 'UPchieve'
   APP_KEY: 'upchieve'
