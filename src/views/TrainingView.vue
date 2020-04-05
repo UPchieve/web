@@ -74,7 +74,6 @@
 </template>
 
 <script>
-import _ from "lodash";
 import { mapState, mapGetters } from "vuex";
 
 import { topics, allSubtopics } from "@/utils/topics";
