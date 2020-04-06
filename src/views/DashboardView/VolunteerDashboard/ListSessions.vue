@@ -45,11 +45,15 @@ export default {
   mounted() {
     // reconnect socket if it isn't already
     if (!this.$socket.connected) {
+      this.$socket.io.opts.transports = ["polling"];
       this.$socket.connect();
     }
     this.$socket.emit("list", {
       user: this.user
     });
+  },
+  beforeDestroy() {
+    this.$socket.disconnect();
   },
   methods: {
     gotoSession(session) {
