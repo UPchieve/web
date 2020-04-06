@@ -76,7 +76,6 @@ class PortalService
     portal.on 'push.getBadgeNumber', @pushGetBadgeNumber
     portal.on 'push.setBadgeNumber', @pushSetBadgeNumber
     portal.on 'push.getHasPermission', @pushGetHasPermission
-    portal.on 'push.setContextId', @pushSetContextId
     portal.on 'push.onData', @pushOnData
     portal.on 'push.registerAction', @pushRegisterAction
 
@@ -483,9 +482,6 @@ class PortalService
 
   pushSetBadgeNumber: ({number}) ->
     promiseTimeout PushNotificationService.setBadgeNumber number
-
-  pushSetContextId: ({contextId}) ->
-    promiseTimeout PushNotificationService.setContextId contextId
 
   pushGetBadgeNumber: ->
     promiseTimeout PushNotificationService.getBadgeNumber()

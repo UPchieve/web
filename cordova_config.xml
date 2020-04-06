@@ -168,7 +168,7 @@
 
   <allow-navigation href="___URL_PLACEHOLDER___*" />
   <plugin name="cordova-plugin-dialogs" spec="~1.3.3" />
-  <plugin name="phonegap-plugin-push" spec="https://github.com/claydotio/phonegap-plugin-push.git" />
+  <plugin name="phonegap-plugin-push" spec="~2.3.0" />
   <plugin name="cordova-plugin-x-socialsharing" spec="https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin.git" />
   <plugin name="cordova-plugin-android-idfa" spec="https://github.com/claydotio/cordova-plugin-android-idfa.git" />
   <plugin name="cordova-plugin-statusbar" spec="~2.4.1" />
