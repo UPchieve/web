@@ -381,25 +381,12 @@ gulp.task 'codova:move:client:cordovaWww',  ->
     .pipe gulp.dest paths.build.cordovaWww
 
 gulp.task 'cordova:setup:android', (cb) ->
-  Promise.all [
-    fs.readFileAsync './current_app', {encoding: 'utf-8'}
-    .catch -> null
-    new Promise (resolve, reject) ->
-      fs.exists './cordova', resolve
-  ]
-  .then ([currentApp, cordovaExists]) ->
+  new Promise (resolve, reject) ->
+    fs.exists './cordova', resolve
+  .then (cordovaExists) ->
     # check if previously built app was the same as specified app
     if not cordovaExists
       runSequence(
-        'cordova:create:android'
-        'cordova:platform:android'
-        ->
-          fs.writeFile './current_app', config.APP_KEY, -> null
-          cb()
-      )
-    else if currentApp isnt config.APP_KEY
-      runSequence(
-        'cordova:clean'
         'cordova:create:android'
         'cordova:platform:android'
         ->
@@ -411,24 +398,12 @@ gulp.task 'cordova:setup:android', (cb) ->
   return null
 
 gulp.task 'cordova:setup:ios', (cb) ->
-  Promise.all [
-    fs.readFileAsync './current_app', {encoding: 'utf-8'}
-    new Promise (resolve, reject) ->
-      fs.exists './cordova', resolve
-  ]
-  .then ([currentApp, cordovaExists]) ->
+  new Promise (resolve, reject) ->
+    fs.exists './cordova', resolve
+  .then (cordovaExists) ->
     # check if previously built app was the same as specified app
     if not cordovaExists
       runSequence(
-        'cordova:create:ios'
-        'cordova:platform:ios'
-        ->
-          fs.writeFile './current_app', config.APP_KEY, -> null
-          cb()
-      )
-    else if currentApp isnt config.APP_KEY
-      runSequence(
-        'cordova:clean'
         'cordova:create:ios'
         'cordova:platform:ios'
         ->

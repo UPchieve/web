@@ -63,6 +63,7 @@
       <application android:icon="@mipmap/ic_launcher" />
     </edit-config>
 
+    <allow-intent href="market:*" />
 
     <resource-file src="google-services.json" target="app/google-services.json" />
     <config-file target="app/src/main/AndroidManifest.xml" parent="/*">
@@ -121,6 +122,9 @@
     <splash src="res/ios/screens/Default@3x~universal~anyany.png"/>
     <splash src="res/ios/screens/Default@3x~universal~comany.png"/>
     <splash src="res/ios/screens/Default@3x~universal~comany.png"/>
+
+    <allow-intent href="itms:*" />
+    <allow-intent href="itms-apps:*" />
 
     <preference name="SplashScreen" value="Default" />
     <!-- <config-file target="*-Info.plist" parent="NSPhotoLibraryUsageDescription">
