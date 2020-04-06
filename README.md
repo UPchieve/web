@@ -1,11 +1,58 @@
 # UPchieve Native
 
-### Getting Started
+## Installation
+### Dependencies
+- `npm install -g cordova`
+- `npm install -g gulp`
+
+### Code
 ```
+git clone git@github.com:austinhallock/upchieve-native.git
+cd upchieve-native
 npm install
 ```
 
-### Getting Started (Android)
+### iOS
+#### iOS Dependencies
+- Install [xcode](https://apps.apple.com/us/app/xcode/id497799835?mt=12) if you don't have it
+- `npm install -g ios-sim ios-deploy`
+- install [cocoapods](https://guides.cocoapods.org/using/getting-started)
+- `pod setup`
+
+#### Building app
+
+```
+npm run local-ios
+cd cordova
+cordova plugin add cordova-plugin-ionic-webview@2.5.3
+cd ..
+npm run local-ios
+```
+
+- open xcode
+- find and open upchieve-native/platforms/ios/UPchieve.xworkspace
+- xcode->preferences -> accounts tab. add/plus icon (bottom left). on your upchieve account, verify that under teams is "Upchieve, Inc". close. (if it's not there, you need to be added as dev)
+- Click on "UPchieve" in folder view on left, then "Signing" tab. select team -> "Upchieve" (for both dev and release sections?)
+- Build settings -> search "signing", change to "release" to "iOS developer"
+
+#### Problem solving
+If `npm run local-ios` errors about `'xcodebuild' requires xcode`, run:
+```
+xcode-select --install
+sudo xcode-select --switch /Library/Developer/CommandLineTools
+```
+---
+`Module 'FirebaseInstanceID' not found`
+```
+cd platforms/ios
+pod install
+```
+
+
+### Android
+#### Android dependencies
+- [Android SDK](https://developer.android.com/sdk/installing/index.html)
+
 ```
 npm run local-android
 ```
@@ -40,31 +87,21 @@ npm run local-android
 
 If emulator fails, https://stackoverflow.com/a/51693703
 
-
-### Getting Started (iOS)
-```
-npm run local-ios
-cd cordova
-cordova plugin add cordova-plugin-ionic-webview@2.5.3
-cd ..
-npm run local-ios
-```
-
-### Generating assets
-#### iOS icons, Android splash
+## Generating assets
+### iOS icons, Android splash
 ```
 splashicon-generator --imagespath="resources"
 ```
 
 Copy relevant assets to resources/android|ios/build/... then delete the res folder that command creates
 
-#### Android adaptive icons
+### Android adaptive icons
 https://easyappicon.com/
 
-#### iOS storyboards
+### iOS storyboards
 Rachel made
 
-### Commands
+## Commands
 
   - `npm run local-android` - Build and run debug APK on local device (plug in via USB)
   - `npm run build-android` - Build unaligned debug APK
@@ -75,17 +112,7 @@ Rachel made
 
 Be sure to bump the version number in package.json before running deploy
 
-### Dependencies
-
-  - `npm install -g cordova`
-  - `npm install -g gulp`
-  - iOS
-    - [XCode](https://developer.apple.com/xcode/)
-    - `npm install -g ios-sim ios-deploy`
-  - Android:
-    [Android SDK](https://developer.android.com/sdk/installing/index.html)
-
-### Available portal calls
+## Available portal calls
  `app.exit`
  `app.exitWithoutAnimation`
  `app.isLoaded`
@@ -150,7 +177,7 @@ Be sure to bump the version number in package.json before running deploy
  `statusBar.show`
  `statusBar.getIsVisible`
 
-### MISC notes
+## MISC notes
 when releasing, using autosigning may break fcm?
 
 Add provisioning profile for the app you added https://developer.apple.com/account/ios/profile/

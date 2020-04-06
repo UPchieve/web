@@ -390,7 +390,6 @@ gulp.task 'cordova:setup:android', (cb) ->
         'cordova:create:android'
         'cordova:platform:android'
         ->
-          fs.writeFile './current_app', config.APP_KEY, -> null
           cb()
       )
     else
@@ -407,7 +406,6 @@ gulp.task 'cordova:setup:ios', (cb) ->
         'cordova:create:ios'
         'cordova:platform:ios'
         ->
-          fs.writeFile './current_app', config.APP_KEY, -> null
           cb()
       )
     else
