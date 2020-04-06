@@ -33,7 +33,23 @@ npm run local-ios
 - find and open upchieve-native/platforms/ios/UPchieve.xworkspace
 - xcode->preferences -> accounts tab. add/plus icon (bottom left). on your upchieve account, verify that under teams is "Upchieve, Inc". close. (if it's not there, you need to be added as dev)
 - Click on "UPchieve" in folder view on left, then "Signing" tab. select team -> "Upchieve" (for both dev and release sections?)
-- Build settings -> search "signing", change to "release" to "iOS developer"
+- Build settings -> search "signing", "basic" blue tab to "all", change to "release" to "iOS developer"
+
+#### Releasing
+- Bump version in package.json
+- `npm run release-ios`
+- Xcode:
+  - Product -> Archive
+    - Validate app
+      - Check upload symbols to Apple (or don't, doesn't matter a ton)
+      - Automatically manage signing
+      - Next until Validate
+    - Distribute app
+      - iOS app store
+      - Upload
+      - Check upload symbols to Apple (or don't, doesn't matter a ton)
+      - Automatically manage signing
+      - Upload
 
 #### Problem solving
 If `npm run local-ios` errors about `'xcodebuild' requires xcode`, run:
@@ -53,6 +69,7 @@ pod install
 #### Android dependencies
 - [Android SDK](https://developer.android.com/sdk/installing/index.html)
 
+#### Building app
 ```
 npm run local-android
 ```
@@ -86,6 +103,11 @@ npm run local-android
 ```
 
 If emulator fails, https://stackoverflow.com/a/51693703
+
+#### Releasing
+- bump version in package.json
+- `npm run release-android`
+- Upload app bundle to Google Play (`cordova/platforms/android/app/build/outputs/bundle/release/app.aab`)
 
 ## Generating assets
 ### iOS icons, Android splash
