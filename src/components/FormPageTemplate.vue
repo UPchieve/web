@@ -21,6 +21,10 @@ export default {};
 
   padding: 20px;
 
+  @include breakpoint-below("medium") {
+    padding: 20px 10px;
+  }
+
   // Cancel out the logo's height to maintain vertical centering of the main form.
   // With short enough viewports, this isn't helpful, so only above 700px.
   @media screen and (min-height: 700px) {

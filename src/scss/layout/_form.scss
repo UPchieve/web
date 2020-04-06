@@ -39,6 +39,10 @@
 
   margin: auto 0;
   padding: 50px;
+
+  @include breakpoint-below("medium") {
+    padding: 50px 20px;
+  }
 }
 
 .uc-form-label {
