@@ -89,7 +89,7 @@ Cypress.Commands.add("createUser", userObj => {
     const user = response.body.user;
     user.email = userObj.email;
     user.college = userObj.college;
-    user.phonePretty = userObj.phoneNumber;
+    user.phone = userObj.phoneNumber;
     (user.firstname = userObj.firstName.trim()),
       (user.lastname = userObj.lastName.trim());
 
@@ -166,7 +166,7 @@ Cypress.Commands.add("createUser", userObj => {
     const user = response.body.user;
     user.email = userObj.email;
     user.college = userObj.college;
-    user.phonePretty = userObj.phoneNumber;
+    user.phone = userObj.phoneNumber;
     (user.firstname = userObj.firstName.trim()),
       (user.lastname = userObj.lastName.trim());
 
