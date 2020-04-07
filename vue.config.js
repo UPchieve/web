@@ -4,7 +4,7 @@ module.exports = {
   devServer: {
     disableHostCheck: true,
     proxy: {
-      '/setCookie': {
+      '/setcookie': {
         target: 'http://localhost', // not used, we just need the pathRewrite hook
         changeOrigin: true,
         pathRewrite: function (path, req) {

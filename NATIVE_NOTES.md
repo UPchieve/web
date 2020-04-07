@@ -70,4 +70,41 @@ onclick: if Environment.isIos()
 # Server
 https://github.com/UPchieve/server/compare/cordova-link for example of using FCM. That'll work for iOS, Android and web push.
 
-You'll need to store push tokens for users. Should store in a way where users can have multiple push tokens. 
+You'll need to store push tokens for users. Should store in a way where users can have multiple push tokens.
+
+
+
+
+
+install xcode if you don't have it https://apps.apple.com/us/app/xcode/id497799835?mt=12
+install cocoapods: https://guides.cocoapods.org/using/getting-started
+`pod setup`
+
+git clone git@github.com:austinhallock/upchieve-native.git
+cd upchieve-native
+npm install
+npm run local-ios
+cd cordova
+cordova plugin add cordova-plugin-ionic-webview@2.5.3
+cd ../
+npm run local-ios
+it'll probably error saying something about missing ios-deploy.
+if it errors about `'xcodebuild' requires xcode`, run:
+```
+xcode-select --install
+sudo xcode-select --switch /Library/Developer/CommandLineTools
+```
+
+open xcode
+file -> open (or it might just go straight to the 'welcome to xcode'... from there do 'open another project')
+  -> find and open upchieve-native/platforms/ios/UPchieve.xworkspace
+
+xcode->preferences. accounts tab. add icon (bottom left). on your upchieve account, verify that under teams is "Upchieve, Inc". close. (if it's not there, you need to be added as dev)
+
+"general" tab. select team -> "Upchieve".
+
+
+
+
+
+you may need some other global dependencies here like gulp and coffee. if you get errors, let me know
