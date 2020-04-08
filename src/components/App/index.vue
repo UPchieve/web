@@ -75,11 +75,6 @@ export default {
       SessionService.currentSession.data = sessionData;
 
       this.$store.dispatch("user/updateSession", sessionData);
-
-      // re-render the session's persisted whiteboard canvas
-      const img = new Image();
-      img.src = sessionData.whiteboardUrl;
-      img.onload = () => window.App.ctx.drawImage(img, 0, 0);
     }
   }
 };
