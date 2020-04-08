@@ -55,12 +55,9 @@
     <resource-file src="res/icons/android/close-icon-144-xxhdpi.png" target="app/src/main/res/drawable-xxhdpi/close.png" />
     <resource-file src="res/icons/android/close-icon-192-xxxhdpi.png" target="app/src/main/res/drawable-xxxhdpi/close.png" />
 
-    <edit-config file="app/src/main/AndroidManifest.xml" target="/manifest/application">
-      <application android:allowBackup="false" android:usesCleartextTraffic="true"/>
-    </edit-config>
-    <edit-config file="app/src/main/AndroidManifest.xml" target="/manifest/application">
-      <!-- if round icon is specified, it seems to always be used? android:roundIcon="@mipmap/ic_launcher_round" />-->
-      <application android:icon="@mipmap/ic_launcher" />
+    <!-- https://cordova.apache.org/docs/en/latest/plugin_ref/spec.html#managing-edit-config-conflicts -->
+    <edit-config file="AndroidManifest.xml" target="/manifest/application/*/.." mode="merge">
+      <application android:allowBackup="false" android:usesCleartextTraffic="true" android:icon="@mipmap/ic_launcher" />
     </edit-config>
 
     <allow-intent href="market:*" />
