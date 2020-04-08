@@ -190,6 +190,7 @@
   <plugin name="cordova-plugin-device" spec="~1.1.7" />
   <plugin name="cordova-plugin-geolocation" spec="~4.0.1" />
   <plugin name="cordova-plugin-permission" spec="^0.1.0" />
+  <plugin name="cordova-open-native-settings" spec="~1.5.2" />
   <plugin name="cordova-android-support-gradle-release" spec="~1.2.0">
       <variable name="ANDROID_SUPPORT_VERSION" value="27.+" />
   </plugin>

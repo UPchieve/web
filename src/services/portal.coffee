@@ -62,6 +62,8 @@ class PortalService
 
     portal.on 'intents.start', @intentsStart
 
+    portal.on 'settings.open', @settingsOpen
+
     portal.on 'orientation.lock', @orientationLock
     portal.on 'orientation.unlock', @orientationUnlock
     portal.on 'orientation.get', @orientationGet
@@ -433,6 +435,19 @@ class PortalService
       }, (-> null), ((err) -> throw new Error err)
     , 0
     return null
+
+  #
+  # SETTINGS
+  #
+
+  settingsOpen: ({setting, openAsApplication}) ->
+    openAsApplication ?= false
+    promiseTimeout new Promise (resolve, reject) ->
+      window.cordova.plugins.settings.open(
+        [setting, openAsApplication]
+        resolve
+        reject
+      )
 
   #
   # ORIENTATION
