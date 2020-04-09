@@ -75,6 +75,7 @@ export default {
           component: "NotificationsModal",
           data: {
             backText: "Dashboard",
+            acceptText: "Yes, please notify me!",
             selectedSubtopic: this.selectedSubtopic,
             topic: this.modalData.topic
           }
