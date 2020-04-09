@@ -27,6 +27,9 @@ import AppHeader from "./AppHeader";
 import AppSidebar from "./AppSidebar";
 import AppModal from "./AppModal";
 
+import * as Sentry from "@sentry/browser";
+import NetworkService from "../../services/NetworkService";
+
 export default {
   name: "App",
   components: {
@@ -38,6 +41,7 @@ export default {
     // Listen for resize event
     window.addEventListener("resize", this.handleResize);
     this.handleResize();
+    this.$store.dispatch("app/checkEnvironment", this);
   },
   beforeUpdate() {
     if (this.userAuthenticated) {
@@ -49,9 +53,12 @@ export default {
   },
   methods: {
     iOSFix(e) {
-      const focusTags = ['INPUT', 'TEXTAREA', 'SELECT'];
+      const focusTags = ["INPUT", "TEXTAREA", "SELECT"];
       const focusTag = document.activeElement.tagName;
-      if (focusTags.indexOf(focusTag) !== -1 && focusTags.indexOf(e.target.tagName) === -1) {
+      if (
+        focusTags.indexOf(focusTag) !== -1 &&
+        focusTags.indexOf(e.target.tagName) === -1
+      ) {
         return document.activeElement.blur();
       }
     },
@@ -66,7 +73,9 @@ export default {
     ...mapState({
       showHeader: state => state.app.header.isShown,
       showSidebar: state => state.app.sidebar.isShown,
-      showModal: state => state.app.modal.isShown
+      showModal: state => state.app.modal.isShown,
+      user: state => state.user.user,
+      isMobileApp: state => state.app.isMobileApp
     }),
     ...mapGetters({
       userAuthenticated: "user/isAuthenticated"
@@ -83,6 +92,33 @@ export default {
       const img = new Image();
       img.src = sessionData.whiteboardUrl;
       img.onload = () => window.App.ctx.drawImage(img, 0, 0);
+    }
+  },
+  watch: {
+    // Check if the student allows push notification on initial log in
+    user(newUserState, oldUserState) {
+      if (this.isMobileApp) {
+        const oldUserStateIsEmpty =
+          Object.keys(oldUserState).length === 0 &&
+          oldUserState.constructor === Object;
+        const newUserStateIsEmpty =
+          Object.keys(newUserState).length === 0 &&
+          newUserState.constructor === Object;
+
+        const initialLogIn = oldUserStateIsEmpty && !newUserStateIsEmpty;
+
+        if (initialLogIn && !newUserState.isVolunteer) {
+          NetworkService.checkPushToken(this)
+            .then(() => {
+              this.$store.dispatch("user/updateHasPushToken", true);
+            })
+            .catch(err => {
+              if (err.status !== 404) {
+                Sentry.captureException(err);
+              }
+            });
+        }
+      }
     }
   }
 };
