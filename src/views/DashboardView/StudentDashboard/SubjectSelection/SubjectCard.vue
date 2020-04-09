@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import { startSession } from "@/utils/session";
 import DropdownList from "@/components/DropdownList";
 import HyperlinkButton from "@/components/HyperlinkButton";
@@ -67,8 +67,16 @@ export default {
   components: { DropdownList, HyperlinkButton, LargeButton },
   data() {
     return {
-      selectedSubtopic: ""
+      selectedSubtopic: "",
+      timeoutId: null,
+      disableButton: false
     };
+  },
+  mounted() {
+    this.checkOrEnforceWaitingPeriod();
+  },
+  beforeDestroy() {
+    clearTimeout(this.timeoutId);
   },
   props: {
     title: {
@@ -93,12 +101,20 @@ export default {
     routeTo: String
   },
   computed: {
+    ...mapState({
+      latestSession: state => state.user.latestSession
+    }),
     ...mapGetters({
       mobileMode: "app/mobileMode",
       isSessionAlive: "user/isSessionAlive"
     }),
     disabled() {
-      return this.isSessionAlive;
+      return this.isSessionAlive || this.disableButton;
+    }
+  },
+  watch: {
+    latestSession() {
+      this.checkOrEnforceWaitingPeriod();
     }
   },
   methods: {
@@ -117,6 +133,41 @@ export default {
             svg: this.svg
           }
         });
+      }
+    },
+    calculateTimeSinceLastSession() {
+      const sessionCreatedAtInMS = new Date(
+        this.latestSession.createdAt
+      ).getTime();
+      const currentDateInMS = new Date().getTime();
+      return currentDateInMS - sessionCreatedAtInMS;
+    },
+    checkOrEnforceWaitingPeriod() {
+      const timeSinceLastSession = this.calculateTimeSinceLastSession();
+      const fiveMinutes = 1000 * 60 * 5;
+      const timeLeftUntilFiveMinutes = fiveMinutes - timeSinceLastSession;
+
+      if (timeSinceLastSession < fiveMinutes) {
+        this.disableButton = true;
+        const headerData = {
+          component: "WaitingPeriodHeader",
+          data: {
+            important: true,
+            timeLeft: timeLeftUntilFiveMinutes
+          }
+        };
+
+        // Show waiting period header if there's no active session
+        if (!this.isSessionAlive) {
+          this.$store.dispatch("app/header/show", headerData);
+        }
+
+        this.timeoutId = setTimeout(() => {
+          this.disableButton = false;
+          if (!this.isSessionAlive) {
+            this.$store.dispatch("app/header/hide");
+          }
+        }, timeLeftUntilFiveMinutes);
       }
     }
   }

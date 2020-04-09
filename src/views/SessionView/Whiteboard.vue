@@ -292,7 +292,7 @@ export default {
 .toolbar {
   max-width: 400px;
   height: 70px;
-  position: fixed;
+  position: absolute;
   bottom: 50px;
   left: 0;
   right: 0;

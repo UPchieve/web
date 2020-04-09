@@ -101,5 +101,16 @@ export default {
 
         throw errorFromHttpResponse(resp);
       });
+  },
+
+  getLatestSession(context, user) {
+    return NetworkService.latestSession(context, { user_id: user._id })
+      .then(resp => {
+        const { data } = resp.data || {};
+        return Promise.resolve({ sessionData: data });
+      })
+      .catch(resp => {
+        throw errorFromHttpResponse(resp);
+      });
   }
 };

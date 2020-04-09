@@ -1,6 +1,8 @@
 import * as Sentry from "@sentry/browser";
+import _ from "lodash";
 
 import UserService from "@/services/UserService";
+import NetworkService from "@/services/NetworkService";
 import SessionService from "@/services/SessionService";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
 import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
@@ -10,6 +12,8 @@ export default {
   state: {
     user: {},
     session: {},
+    latestSession: {},
+    volunteerStats: {},
     isFirstDashboardVisit: false,
     hasPushToken: false
   },
@@ -26,7 +30,11 @@ export default {
       }
     },
 
+    setVolunteerStats: (state, stats = {}) => (state.volunteerStats = stats),
+
     setSession: (state, session = {}) => (state.session = session),
+
+    setLatestSession: (state, session = {}) => (state.latestSession = session),
 
     addMessage: (state, message) => {
       if (message) state.session.messages.push(message);
@@ -69,6 +77,12 @@ export default {
       return UserService.getUser().then(user => commit("updateUser", user));
     },
 
+    fetchVolunteerStats: ({ commit }, contextTodo) => {
+      return NetworkService.volunteerStats(contextTodo).then(res =>
+        commit("setVolunteerStats", res.body.volunteerStats)
+      );
+    },
+
     clearUser: ({ commit }) => {
       commit("setUser", {});
     },
@@ -80,6 +94,19 @@ export default {
         })
         .catch(err => {
           commit("setSession", {});
+          if (err.status !== 404) {
+            Sentry.captureException(err);
+          }
+        });
+    },
+
+    fetchLatestSession: ({ commit, state }, context) => {
+      SessionService.getLatestSession(context, state.user)
+        .then(({ sessionData }) => {
+          commit("setLatestSession", sessionData);
+        })
+        .catch(err => {
+          commit("setLatestSession", {});
           if (err.status !== 404) {
             Sentry.captureException(err);
           }
@@ -132,6 +159,16 @@ export default {
     isAuthenticated: state => !!(state.user && state.user._id),
 
     isEmailVerified: state => state.user.verified,
+
+    hasCertification: state => {
+      return _.some(state.user.certifications, { passed: true });
+    },
+
+    hasSelectedAvailability: state => !!state.user.availabilityLastModifiedAt,
+
+    isOnboarded: (state, getters) => {
+      return getters.hasSelectedAvailability && getters.hasCertification;
+    },
 
     sessionPath: state => {
       const { type, subTopic, _id } = state.session;

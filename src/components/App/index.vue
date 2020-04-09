@@ -46,6 +46,10 @@ export default {
   beforeUpdate() {
     if (this.userAuthenticated) {
       this.$store.dispatch("user/fetchSession", this);
+
+      if (!this.isVolunteer) {
+        this.$store.dispatch("user/fetchLatestSession", this);
+      }
     }
   },
   beforeDestroy() {
@@ -78,7 +82,8 @@ export default {
       isMobileApp: state => state.app.isMobileApp
     }),
     ...mapGetters({
-      userAuthenticated: "user/isAuthenticated"
+      userAuthenticated: "user/isAuthenticated",
+      isVolunteer: "user/isVolunteer"
     })
   },
   sockets: {
@@ -138,7 +143,7 @@ export default {
 }
 
 .App-router-view-wrapper {
-  height: 100vh;
+  height: 100%;
 
   &--header {
     @include bind-app-header-height(padding-top);

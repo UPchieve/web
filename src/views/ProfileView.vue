@@ -34,10 +34,10 @@
           <div v-if="user.isVolunteer">
             <div id="phone" class="container-section">
               <div class="prompt">Your Phone Number</div>
-              <div v-show="!activeEdit && user.phonePretty" class="answer">
+              <div v-show="!activeEdit && user.phone" class="answer">
                 {{ internationalPhoneInfo.number }}
               </div>
-              <div v-show="!user.phonePretty && !activeEdit" class="answer">
+              <div v-show="!activeEdit && !user.phone" class="answer">
                 (None given)
               </div>
 
@@ -153,11 +153,9 @@ export default {
     };
   },
   created() {
-    if (this.user.isVolunteer && this.user.phonePretty) {
+    if (this.user.isVolunteer && this.user.phone) {
       const num =
-        this.user.phonePretty[0] === "+"
-          ? this.user.phonePretty
-          : `+1 ${this.user.phonePretty}`;
+        this.user.phone[0] === "+" ? this.user.phone : `+1${this.user.phone}`;
       const pn = new PhoneNumber(num);
       this.phoneNational = pn.getNumber("national");
 
@@ -180,12 +178,10 @@ export default {
       return user.firstname || (user.isVolunteer ? "volunteer" : "student");
     },
     internationalPhoneInfo() {
-      if (!this.user.isVolunteer || !this.user.phonePretty) return false;
+      if (!this.user.isVolunteer || !this.user.phone) return false;
 
       const num =
-        this.user.phonePretty[0] === "+"
-          ? this.user.phonePretty
-          : `+1 ${this.user.phonePretty}`;
+        this.user.phone[0] === "+" ? this.user.phone : `+1 ${this.user.phone}`;
       const pn = new PhoneNumber(num);
 
       return {
@@ -266,7 +262,7 @@ export default {
         // volunteers must provide a phone number, so display error message and
         // mark field invalid
         if (
-          this.user.phonePretty &&
+          this.user.phone &&
           (!this.phoneInputInfo.isValid || !this.phoneInputInfo.e164)
         ) {
           this.errors.push("Please enter a valid phone number.");
@@ -276,11 +272,11 @@ export default {
 
       if (!this.errors.length) {
         // form fields valid, so set profile
-        this.user.phonePretty = this.phoneInputInfo.e164;
+        this.user.phone = this.phoneInputInfo.e164;
 
         // send only the necessary data
         const payloadUser = {};
-        const keys = ["phonePretty", "college", "favoriteAcademicSubject"];
+        const keys = ["phone", "college", "favoriteAcademicSubject"];
 
         keys.forEach(key => (payloadUser[key] = this.user[key]));
 

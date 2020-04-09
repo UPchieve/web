@@ -29,9 +29,6 @@ export default {
       AnalyticsService.identify(data.user, data.user.isFakeUser);
       AnalyticsService.trackNoProperties("logged in", data.user.isFakeUser);
 
-      // connect socket
-      context.$socket.connect();
-
       return data;
     });
   },

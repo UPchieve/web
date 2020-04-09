@@ -10,6 +10,10 @@
 @import 'layout/utils';
 @import 'layout/form';
 
+html {
+  height: 100%;
+}
+
 body {
   background: $c-background-grey;
   color: $c-soft-black;
@@ -20,5 +24,5 @@ body {
 
   text-align: center;
 
-  min-height: 100vh;
+  height: 100%;
 }

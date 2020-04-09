@@ -226,7 +226,7 @@ describe("Training quizzes", function() {
               .contains((i + 1).toString())
               .parent(".question")
               .children(".question-text")
-              .children(".mjx-chtml", { timeout: 25000 })
+              .children(".mjx-chtml")
               .should("exist");
           }
 
@@ -234,9 +234,9 @@ describe("Training quizzes", function() {
           question.possibleAnswers
             .filter(answer => answer.txt.includes("\\"))
             .forEach(answer => {
-              cy.get(`#question-${i}-answer-${answer.val} .mjx-chtml`, {
-                timeout: 25000
-              }).should("exist");
+              cy.get(`#question-${i}-answer-${answer.val} .mjx-chtml`).should(
+                "exist"
+              );
             });
         }
       });
