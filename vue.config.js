@@ -4,14 +4,14 @@ module.exports = {
   devServer: {
     disableHostCheck: true,
     proxy: {
-      '/setcookie': {
-        target: 'http://localhost', // not used, we just need the pathRewrite hook
+      "/setcookie": {
+        target: "http://localhost", // not used, we just need the pathRewrite hook
         changeOrigin: true,
-        pathRewrite: function (path, req) {
+        pathRewrite: function(path, req) {
           req.res.statusCode = 302;
-          req.res.cookie('first_cookie', '1', {maxAge: 3600 * 24 * 365 * 10});
-          req.res.setHeader('Location', 'http://localhost:12380?redirected');
-          req.res.end()
+          req.res.cookie("first_cookie", "1", { maxAge: 3600 * 24 * 365 * 10 });
+          req.res.setHeader("Location", "http://localhost:12380?redirected");
+          req.res.end();
           return "";
         }
       }
