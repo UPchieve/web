@@ -49,7 +49,6 @@ export default {
   computed: {
     ...mapState({
       isMobileApp: state => state.app.isMobileApp,
-      hasPushToken: state => state.user.hasPushToken,
       user: state => state.user.user
     }),
     ...mapGetters({ mobileMode: "app/mobileMode" }),
@@ -67,10 +66,7 @@ export default {
     handleMobileStart(subject) {
       this.setSelectedSubtopic(subject);
 
-      // Show notification modal if past sessions is a multiple of 3
-      const showNotificationModal = this.user.pastSessions % 3 === 0;
-
-      if (this.isMobileApp && !this.hasPushToken && showNotificationModal) {
+      if (this.isMobileApp && !this.user.hasSentPushTokenRegister) {
         this.$store.dispatch("app/modal/show", {
           component: "NotificationsModal",
           data: {
