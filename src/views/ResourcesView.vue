@@ -147,7 +147,7 @@
     </div>
     <div class="end-msg">
       Have ideas for additional resources to add to this page? Email
-      <a>info@upchieve.org!</a>
+      <a href="mailto:info@upchieve.org">info@upchieve.org!</a>
     </div>
   </div>
 </template>
