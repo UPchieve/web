@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 import { startSession } from "@/utils/session";
 import LargeButton from "@/components/LargeButton";
 
@@ -47,6 +47,11 @@ export default {
     };
   },
   computed: {
+    ...mapState({
+      isMobileApp: state => state.app.isMobileApp,
+      hasPushToken: state => state.user.hasPushToken,
+      user: state => state.user.user
+    }),
     ...mapGetters({ mobileMode: "app/mobileMode" }),
     title() {
       return this.modalData.topic
@@ -61,7 +66,22 @@ export default {
     },
     handleMobileStart(subject) {
       this.setSelectedSubtopic(subject);
-      this.onAccept();
+
+      // Show notification modal if past sessions is a multiple of 3
+      const showNotificationModal = this.user.numPastSessions % 3 === 0;
+
+      if (this.isMobileApp && !this.hasPushToken && showNotificationModal) {
+        this.$store.dispatch("app/modal/show", {
+          component: "NotificationsModal",
+          data: {
+            backText: "Dashboard",
+            selectedSubtopic: this.selectedSubtopic,
+            topic: this.modalData.topic
+          }
+        });
+      } else {
+        this.onAccept();
+      }
     },
     onAccept() {
       if (this.selectedSubtopic === "") return;
