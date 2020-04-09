@@ -77,6 +77,9 @@ export default {
 
     window.addEventListener("resize", this.handleResize);
   },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.handleResize);
+  },
   /*
    * @notes
    * [1] Refactoring candidate: it'd be awesome if Dashboard could pass
@@ -314,7 +317,7 @@ export default {
 .toggleButton {
   position: fixed;
   z-index: 3;
-  bottom: 10px;
+  bottom: 30px;
   right: 20px;
   border-radius: 20px;
   background: #16d2aa;
