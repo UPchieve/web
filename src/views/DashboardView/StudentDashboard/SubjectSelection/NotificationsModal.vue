@@ -31,6 +31,7 @@ import LargeButton from "@/components/LargeButton";
 import PortalService from "@/services/PortalService";
 import NetworkService from "@/services/NetworkService";
 import LoadingMessage from "@/components/LoadingMessage";
+import UserService from "@/services/UserService";
 import * as Sentry from "@sentry/browser";
 
 export default {
@@ -46,8 +47,7 @@ export default {
   },
   computed: {
     ...mapState({
-      isMobileApp: state => state.app.isMobileApp,
-      hasPushToken: state => state.user.hasPushToken
+      isMobileApp: state => state.app.isMobileApp
     }),
     ...mapGetters({ mobileMode: "app/mobileMode" }),
     title() {
@@ -62,8 +62,10 @@ export default {
 
       try {
         this.isLoadingSession = true;
+
         const { token } = await PortalService.call("push.register");
-        await NetworkService.savePushToken(this, { token: token });
+        await NetworkService.savePushToken(this, { token });
+        await UserService.setHasSentPushTokenRegister(this);
 
         startSession(this.$router, topic, selectedSubtopic);
       } catch (error) {
@@ -74,12 +76,22 @@ export default {
         startSession(this.$router, topic, selectedSubtopic);
       }
     },
-    onClose() {
+    async onClose() {
       this.$emit("cancel");
       this.$store.dispatch("app/modal/hide");
+
       const { topic, selectedSubtopic } = this.modalData;
 
-      startSession(this.$router, topic, selectedSubtopic);
+      try {
+        await UserService.setHasSentPushTokenRegister(this);
+
+        startSession(this.$router, topic, selectedSubtopic);
+      } catch (error) {
+        if (error.status !== 422) {
+          Sentry.captureException(error);
+        }
+        startSession(this.$router, topic, selectedSubtopic);
+      }
     }
   }
 };
