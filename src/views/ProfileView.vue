@@ -30,9 +30,6 @@
           <div id="email" class="container-section">
             <div class="prompt">Your Email</div>
             <div class="answer">{{ user.email }}</div>
-            <button class="editBtn btn" @click="pushRegister()">
-              Push reg
-            </button>
           </div>
           <div v-if="user.isVolunteer">
             <div id="phone" class="container-section">
@@ -240,12 +237,6 @@ export default {
     }
   },
   methods: {
-    pushRegister() {
-      PortalService.call("push.register").then(({token}) => {
-        prompt("token", token);
-      });
-    },
-
     onPhoneInputUpdate(phoneInputInfo) {
       this.phoneInputInfo = phoneInputInfo;
     },
