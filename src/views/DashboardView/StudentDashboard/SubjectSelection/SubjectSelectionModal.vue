@@ -68,7 +68,7 @@ export default {
       this.setSelectedSubtopic(subject);
 
       // Show notification modal if past sessions is a multiple of 3
-      const showNotificationModal = this.user.numPastSessions % 3 === 0;
+      const showNotificationModal = this.user.pastSessions % 3 === 0;
 
       if (this.isMobileApp && !this.hasPushToken && showNotificationModal) {
         this.$store.dispatch("app/modal/show", {
