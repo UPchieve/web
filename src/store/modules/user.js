@@ -10,7 +10,8 @@ export default {
   state: {
     user: {},
     session: {},
-    isFirstDashboardVisit: false
+    isFirstDashboardVisit: false,
+    hasPushToken: false
   },
   mutations: {
     setUser: (state, user = {}) => (state.user = user),
@@ -47,6 +48,10 @@ export default {
 
     setIsFirstDashboardVisit: (state, isFirstDashboardVisit) => {
       state.isFirstDashboardVisit = isFirstDashboardVisit;
+    },
+
+    setHasPushToken: (state, hasPushToken) => {
+      state.hasPushToken = hasPushToken;
     }
   },
   actions: {
@@ -103,6 +108,10 @@ export default {
 
     firstDashboardVisit: ({ commit }, isFirstDashboardVisit) => {
       commit("setIsFirstDashboardVisit", isFirstDashboardVisit);
+    },
+
+    updateHasPushToken: ({ commit }, hasPushToken) => {
+      commit("setHasPushToken", hasPushToken);
     }
   },
   getters: {
