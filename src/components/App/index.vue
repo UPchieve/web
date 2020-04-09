@@ -140,6 +140,10 @@ export default {
   top: 0;
   left: 0;
   overflow: auto;
+
+  @media only screen and (orientation: landscape) {
+    min-height: initial;
+  }
 }
 
 .App-router-view-wrapper {
