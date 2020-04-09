@@ -75,7 +75,7 @@ $transition: transform 700ms;
   @include bind-app-sidebar-width(width);
 
   background: white;
-  height: 100%;
+  min-height: 100%;
   overflow-y: auto;
 
   position: fixed;
@@ -99,6 +99,10 @@ $transition: transform 700ms;
   @include flex-container(column, space-between, flex-start);
   height: 100%;
   padding: 40px 20px 40px 30px;
+
+  @media only screen and (min-width: 768px) and (max-width: 1200px) and (orientation: landscape) {
+    padding-left: 3em;
+  }
 }
 
 .AppSidebar-final-link {
