@@ -26,6 +26,7 @@ import "@/scss/main.scss";
 import AppHeader from "./AppHeader";
 import AppSidebar from "./AppSidebar";
 import AppModal from "./AppModal";
+import PortalService from "@/services/PortalService";
 
 export default {
   name: "App",
@@ -34,11 +35,15 @@ export default {
     AppSidebar,
     AppModal
   },
-  created() {
+  async created() {
     // Listen for resize event
     window.addEventListener("resize", this.handleResize);
     this.handleResize();
-    this.$store.dispatch("app/checkEnvironment", this);
+    await this.$store.dispatch("app/checkEnvironment", this);
+
+    if (this.isMobileApp) {
+      document.addEventListener("click", this.handleExternalURLs, false);
+    }
   },
   beforeUpdate() {
     if (this.userAuthenticated) {
@@ -51,6 +56,7 @@ export default {
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.handleResize);
+    document.removeEventListener("click", this.handleExternalURLs);
   },
   methods: {
     iOSFix(e) {
@@ -68,13 +74,24 @@ export default {
         width: window.innerWidth,
         height: window.innerHeight
       });
+    },
+    handleExternalURLs(event) {
+      const externalLinkPattern = /^https?:\/\//i;
+      if (externalLinkPattern.test(event.srcElement.href)) {
+        const { href } = event.srcElement;
+        PortalService.call("browser.openWindow", {
+          url: href,
+          target: "_system"
+        });
+      }
     }
   },
   computed: {
     ...mapState({
       showHeader: state => state.app.header.isShown,
       showSidebar: state => state.app.sidebar.isShown,
-      showModal: state => state.app.modal.isShown
+      showModal: state => state.app.modal.isShown,
+      isMobileApp: state => state.app.isMobileApp
     }),
     ...mapGetters({
       userAuthenticated: "user/isAuthenticated",
