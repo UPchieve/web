@@ -293,7 +293,7 @@ export default {
   max-width: 400px;
   height: 70px;
   position: fixed;
-  bottom: 0;
+  bottom: 50px;
   left: 0;
   right: 0;
   margin: auto;

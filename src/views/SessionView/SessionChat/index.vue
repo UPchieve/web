@@ -197,7 +197,7 @@ export default {
 
 .message-box {
   height: 100%;
-  padding-bottom: 60px;
+  padding-bottom: 80px;
   overflow: hidden;
   top: 0;
   position: relative;
@@ -246,9 +246,9 @@ export default {
   position: relative;
   height: 100%;
   overflow: auto;
-  display: flex;
-  padding-bottom: 45px;
-  flex-direction: column;
+  // display: flex;
+  // padding-bottom: 45px;
+  // flex-direction: column;
 }
 
 .message {
@@ -256,7 +256,7 @@ export default {
   padding: 24px;
   display: flex;
   justify-content: flex-start;
-  // width: 100%;
+  width: 100%;
 
   /* Safari needs this specified to lay out the message divs properly. */
   flex-shrink: 0;
@@ -367,7 +367,7 @@ span {
     border: none;
     position: fixed;
     left: 0;
-    bottom: 0;
+    bottom: 20px;
     border: 1px solid #d6e0ef;
     border-radius: 20px;
     margin: 10px 20px;
