@@ -133,7 +133,6 @@ import PhoneNumber from "awesome-phonenumber";
 import { mapGetters, mapState } from "vuex";
 
 import UserService from "@/services/UserService";
-import PortalService from "@/services/PortalService";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
 import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 
