@@ -28,6 +28,7 @@ export default {
     display: inline-block;
     width: 25px;
     overflow: hidden;
+    -webkit-animation: 1.2s ellip infinite;
     animation: 1.2s ellip infinite;
   }
 }
