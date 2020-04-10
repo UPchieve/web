@@ -60,6 +60,9 @@ export default {
   },
   methods: {
     iOSFix(e) {
+      if (!e) {
+        return;
+      }
       const focusTags = ["INPUT", "TEXTAREA", "SELECT"];
       const focusTag = document.activeElement.tagName;
       if (
@@ -76,9 +79,17 @@ export default {
       });
     },
     handleExternalURLs(event) {
-      const externalLinkPattern = /^https?:\/\//i;
-      if (externalLinkPattern.test(event.srcElement.href)) {
-        const { href } = event.srcElement;
+      const isATag = event.target.tagName.toLowerCase() === "a";
+      const isSameHost = window.location.hostname === event.target.hostname;
+      const mailToLinkPattern = /^mailto:/i;
+
+      // Open native mobile browser or email if the a tag has a different host or
+      // if the a tag has "mailto" in its href
+      if (
+        isATag &&
+        (!isSameHost || mailToLinkPattern.test(event.srcElement.href))
+      ) {
+        const { href } = event.target;
         PortalService.call("browser.openWindow", {
           url: href,
           target: "_system"
