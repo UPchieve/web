@@ -110,8 +110,8 @@ $transition: transform 700ms;
   @include font-category("display-small");
   cursor: pointer;
   margin: 40px 0 20px;
-  position: absolute;
   bottom: 40px;
+  text-align: left;
 
   &--desktop {
     @include font-category("button");
