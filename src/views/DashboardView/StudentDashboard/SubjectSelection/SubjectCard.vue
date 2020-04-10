@@ -121,11 +121,15 @@ export default {
   },
   methods: {
     handleClick() {
+      const hasSentPushTokenRegister = window.localStorage.getItem(
+        "hasSentPushTokenRegister"
+      );
+
       // show the notifications modal for tablet users on the mobile app
       if (
         this.isMobileApp &&
         this.selectedSubtopic !== "" &&
-        !this.user.hasSentPushTokenRegister
+        !hasSentPushTokenRegister
       ) {
         this.$store.dispatch("app/modal/show", {
           component: "NotificationsModal",

@@ -76,8 +76,5 @@ export default {
         throw new Error();
       }
     });
-  },
-  setHasSentPushTokenRegister(context) {
-    return NetworkService.setHasSentPushTokenRegister(context);
   }
 };

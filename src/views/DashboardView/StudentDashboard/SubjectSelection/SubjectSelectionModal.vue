@@ -65,8 +65,11 @@ export default {
     },
     handleMobileStart(subject) {
       this.setSelectedSubtopic(subject);
+      const hasSentPushTokenRegister = window.localStorage.getItem(
+        "hasSentPushTokenRegister"
+      );
 
-      if (this.isMobileApp && !this.user.hasSentPushTokenRegister) {
+      if (this.isMobileApp && !hasSentPushTokenRegister) {
         this.$store.dispatch("app/modal/show", {
           component: "NotificationsModal",
           data: {

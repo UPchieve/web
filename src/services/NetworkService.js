@@ -196,10 +196,5 @@ export default {
     return context.$http
       .post(`${API_ROOT}/push-token/save`, data)
       .then(this._successHandler, this._errorHandler);
-  },
-  setHasSentPushTokenRegister(context, data) {
-    return context.$http
-      .post(`${API_ROOT}/push-token/register-attempt`, data)
-      .then(this._successHandler, this._errorHandler);
   }
 };

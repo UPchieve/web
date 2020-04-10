@@ -30,7 +30,6 @@ import LargeButton from "@/components/LargeButton";
 import PortalService from "@/services/PortalService";
 import NetworkService from "@/services/NetworkService";
 import LoadingMessage from "@/components/LoadingMessage";
-import UserService from "@/services/UserService";
 import * as Sentry from "@sentry/browser";
 
 export default {
@@ -58,13 +57,13 @@ export default {
   methods: {
     async handlePushNotification() {
       const { topic, selectedSubtopic } = this.modalData;
+      window.localStorage.setItem("hasSentPushTokenRegister", true);
 
       try {
         this.isLoadingSession = true;
 
         const { token } = await PortalService.call("push.register");
         await NetworkService.savePushToken(this, { token });
-        await UserService.setHasSentPushTokenRegister(this);
 
         startSession(this.$router, topic, selectedSubtopic);
       } catch (error) {
@@ -78,19 +77,10 @@ export default {
     async onClose() {
       this.$emit("cancel");
       this.$store.dispatch("app/modal/hide");
+      window.localStorage.setItem("hasSentPushTokenRegister", true);
 
       const { topic, selectedSubtopic } = this.modalData;
-
-      try {
-        await UserService.setHasSentPushTokenRegister(this);
-
-        startSession(this.$router, topic, selectedSubtopic);
-      } catch (error) {
-        if (error.status !== 422) {
-          Sentry.captureException(error);
-        }
-        startSession(this.$router, topic, selectedSubtopic);
-      }
+      startSession(this.$router, topic, selectedSubtopic);
     }
   }
 };
