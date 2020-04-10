@@ -1,6 +1,5 @@
 <template>
-  <!-- FIXME: only do this on iOS -->
-  <div id="app" class="App" @click="iOSFix()">
+  <div id="app" class="App" :class="isIOS && 'is-ios'">
     <app-header v-if="showHeader" />
     <app-sidebar v-if="showSidebar" />
     <app-modal v-if="showModal" />
@@ -27,6 +26,7 @@ import AppHeader from "./AppHeader";
 import AppSidebar from "./AppSidebar";
 import AppModal from "./AppModal";
 import PortalService from "@/services/PortalService";
+import getOperatingSystem from "@/utils/get-operating-system";
 
 export default {
   name: "App",
@@ -34,6 +34,11 @@ export default {
     AppHeader,
     AppSidebar,
     AppModal
+  },
+  data() {
+    return {
+      isIOS: false
+    };
   },
   async created() {
     // Listen for resize event
@@ -60,6 +65,11 @@ export default {
         }, 1000);
       }
     }
+
+    if (getOperatingSystem() === "iOS") {
+      this.isIOS = true;
+      document.addEventListener("click", this.iOSFocusElements, false);
+    }
   },
   beforeUpdate() {
     if (this.userAuthenticated) {
@@ -75,7 +85,7 @@ export default {
     document.removeEventListener("click", this.handleExternalURLs);
   },
   methods: {
-    iOSFix(e) {
+    iOSFocusElements(e) {
       if (!e) {
         return;
       }
@@ -143,9 +153,10 @@ export default {
 
 <style lang="scss" scoped>
 .App {
-  min-height: 100vh;
+  height: 100%;
+}
 
-  // FIXME: do this for iOS only
+.is-ios {
   position: fixed;
   width: 100%;
   height: 100%;
