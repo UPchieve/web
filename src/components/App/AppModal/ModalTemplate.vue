@@ -10,7 +10,7 @@
     <div class="ModalTemplate-form">
       <slot />
 
-      <template v-if="!mobileMode">
+      <template v-if="!mobileMode && showTemplateButtons">
         <div class="ModalTemplate-seperator" />
         <div class="ModalTemplate-buttons">
           <large-button v-if="!alertModal" @click.native="handleCancel"
@@ -42,7 +42,8 @@ export default {
     backText: { type: String, default: "Back" },
     enableAccept: Boolean,
     alertModal: Boolean,
-    important: Boolean
+    important: Boolean,
+    showTemplateButtons: { type: Boolean, default: true }
   },
   computed: {
     ...mapGetters({ mobileMode: "app/mobileMode" })

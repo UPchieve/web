@@ -7,6 +7,7 @@
     :alert-modal="modalData.alertModal"
     :enable-accept="enableAccept"
     :important="modalData.important"
+    :showTemplateButtons="modalData.showTemplateButtons"
   >
     <component
       v-if="modalComponent"
