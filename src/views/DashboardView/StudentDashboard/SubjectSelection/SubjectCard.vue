@@ -102,7 +102,9 @@ export default {
   },
   computed: {
     ...mapState({
-      latestSession: state => state.user.latestSession
+      latestSession: state => state.user.latestSession,
+      isMobileApp: state => state.app.isMobileApp,
+      user: state => state.user.user
     }),
     ...mapGetters({
       mobileMode: "app/mobileMode",
@@ -119,7 +121,23 @@ export default {
   },
   methods: {
     handleClick() {
-      if (!this.mobileMode && this.selectedSubtopic !== "") {
+      // show the notifications modal for tablet users on the mobile app
+      if (
+        this.isMobileApp &&
+        this.selectedSubtopic !== "" &&
+        !this.user.hasSentPushTokenRegister
+      ) {
+        this.$store.dispatch("app/modal/show", {
+          component: "NotificationsModal",
+          data: {
+            backText: "Dashboard",
+            acceptText: "Yes, please notify me!",
+            selectedSubtopic: this.selectedSubtopic,
+            topic: this.topic,
+            showTemplateButtons: false
+          }
+        });
+      } else if (!this.mobileMode && this.selectedSubtopic !== "") {
         startSession(this.$router, this.topic, this.selectedSubtopic);
       } else {
         this.$store.dispatch("app/modal/show", {
