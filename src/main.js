@@ -31,12 +31,6 @@ Vue.use(VueRouter);
 // Set up PortalGun (connection to native app)
 PortalService.listen();
 
-window.addEventListener("load", () => {
-  // Let the app know the JS is ready
-  // FIXME: wait until vue is done with first render
-  PortalService.call("app.isLoaded");
-});
-
 const handlePortalData = data => {
   // TODO: don't route immediately if push is received while app is open.
   // can detect with `if (data._isPush && data._original?.additionalData?.foreground)`
