@@ -23,6 +23,7 @@
 import { mapState } from "vuex";
 import ModalTemplate from "./ModalTemplate";
 import RejoinSessionModal from "./RejoinSessionModal";
+import UpgradeAppModal from "./UpgradeAppModal";
 import SubjectSelectionModal from "@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectSelectionModal";
 import NotificationsModal from "@/views/DashboardView/StudentDashboard/SubjectSelection/NotificationsModal";
 import SessionFulfilledModal from "@/views/SessionView/SessionFulfilledModal";
@@ -35,7 +36,8 @@ export default {
     SubjectSelectionModal,
     NotificationsModal,
     SessionFulfilledModal,
-    OnboardingModal
+    OnboardingModal,
+    UpgradeAppModal
   },
   data() {
     return {

@@ -43,7 +43,22 @@ export default {
     PortalService.call("app.isLoaded");
 
     if (this.isMobileApp) {
+      const LATEST_APP_VERSION = "0.1.2";
+      const versionNumberRegex = /(?:upchieve)\/(?:[a-zA-Z0-9]+\/)?([0-9.]+)/;
+      const userVersonNumber = navigator.userAgent.match(versionNumberRegex)[1];
       document.addEventListener("click", this.handleExternalURLs, false);
+
+      if (userVersonNumber < LATEST_APP_VERSION) {
+        // show modal after children components have mounted
+        setTimeout(() => {
+          this.$store.dispatch("app/modal/show", {
+            component: "UpgradeAppModal",
+            data: {
+              showTemplateButtons: false
+            }
+          });
+        }, 1000);
+      }
     }
   },
   beforeUpdate() {
