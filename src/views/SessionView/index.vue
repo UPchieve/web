@@ -317,13 +317,17 @@ export default {
 .toggleButton {
   position: fixed;
   z-index: 3;
-  bottom: 30px;
+  bottom: 10px;
   right: 20px;
   border-radius: 20px;
   background: #16d2aa;
   width: 40px;
   height: 40px;
   transition: 0.4s;
+
+  @include breakpoint-below("medium") {
+    bottom: 32px;
+  }
 
   img {
     margin-top: 7px;
