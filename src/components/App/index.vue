@@ -40,6 +40,7 @@ export default {
     window.addEventListener("resize", this.handleResize);
     this.handleResize();
     await this.$store.dispatch("app/checkEnvironment", this);
+    PortalService.call("app.isLoaded");
 
     if (this.isMobileApp) {
       document.addEventListener("click", this.handleExternalURLs, false);
