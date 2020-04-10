@@ -37,14 +37,14 @@ window.addEventListener("load", () => {
   PortalService.call("app.isLoaded");
 });
 
-const handlePortalData = (data) => {
+const handlePortalData = data => {
   // TODO: don't route immediately if push is received while app is open.
   // can detect with `if (data._isPush && data._original?.additionalData?.foreground)`
   // and show own UI for notification
-  if(data.path) {
+  if (data.path) {
     router.push(data.path);
   }
-}
+};
 
 // Has data when app is opened w/ cold start from push notification
 PortalService.call("top.getData").then(handlePortalData);
