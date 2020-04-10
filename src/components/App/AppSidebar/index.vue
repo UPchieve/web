@@ -75,7 +75,7 @@ $transition: transform 700ms;
   @include bind-app-sidebar-width(width);
 
   background: white;
-  min-height: 100%;
+  height: 100%;
   overflow-y: auto;
 
   position: fixed;
@@ -96,12 +96,13 @@ $transition: transform 700ms;
 }
 
 .AppSidebar-content {
-  @include flex-container(column, space-between, flex-start);
   height: 100%;
   padding: 40px 20px 40px 30px;
+  position: relative;
 
   @media only screen and (min-width: 768px) and (max-width: 1200px) and (orientation: landscape) {
-    padding-left: 3em;
+    padding-left: 2em;
+    height: initial;
   }
 }
 
@@ -109,9 +110,17 @@ $transition: transform 700ms;
   @include font-category("display-small");
   cursor: pointer;
   margin: 40px 0 20px;
+  position: absolute;
+  bottom: 40px;
 
   &--desktop {
     @include font-category("button");
+
+    @media only screen and (min-width: 768px) and (max-width: 1200px) and (orientation: landscape) {
+      position: initial;
+      text-align: left;
+      margin: 4em 0 1em;
+    }
   }
 }
 </style>
