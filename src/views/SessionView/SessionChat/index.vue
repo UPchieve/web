@@ -202,8 +202,6 @@ export default {
 
 .message-box {
   height: 100%;
-  // padding-bottom: 80px;
-  // overflow: hidden;
   overflow: scroll;
   top: 0;
   position: relative;
@@ -211,7 +209,7 @@ export default {
 
   @include breakpoint-above("medium") {
     margin-top: 70px;
-    padding-bottom: 50px;
+    padding-bottom: 0;
   }
 }
 
@@ -252,9 +250,7 @@ export default {
   position: relative;
   height: 100%;
   overflow: auto;
-  // display: flex;
-  // padding-bottom: 45px;
-  // flex-direction: column;
+  padding-bottom: 20px;
 }
 
 .message {
@@ -382,13 +378,10 @@ span {
 
   @include breakpoint-below("medium") {
     height: 40px;
-    // border: none;
-    // position: relative;
-    // left: 0;
-    // bottom: 20px;
     border: 1px solid #d6e0ef;
     border-radius: 20px;
     padding: 10px 16px;
+    line-height: 18px;
   }
 }
 </style>

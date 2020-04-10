@@ -326,7 +326,7 @@ export default {
   transition: 0.4s;
 
   @include breakpoint-below("medium") {
-    bottom: 32px;
+    bottom: 33px;
   }
 
   img {
