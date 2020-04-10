@@ -9,14 +9,13 @@
         An UPchieve volunteer is on the way! This could take up to 10 minutes.
         Do you want us to send you a notification once they’ve entered the chat?
       </h2>
+
+      <div v-if="!mobileMode" class="seperator" />
       <div class="NotificationsModal-buttons">
-        <large-button v-if="mobileMode" @click.native="onClose()"
+        <large-button @click.native="onClose()"
           >Nah, I'll check every minute.</large-button
         >
-        <large-button
-          v-if="mobileMode"
-          primary
-          @click.native="handlePushNotification()"
+        <large-button primary @click.native="handlePushNotification()"
           >Yes, please notify me!</large-button
         >
       </div>
@@ -105,22 +104,20 @@ p {
   padding: 0;
 }
 
-.icon {
-  align-self: center;
-}
-
 .NotificationsContainer {
   display: flex;
   height: 100%;
+
+  // set a min-height for when loading message shows
+  @include breakpoint-above("medium") {
+    min-height: 200px;
+  }
 }
 
 .NotificationsModal {
   @include flex-container(column);
   @include child-spacing(top, 24px);
   height: 100%;
-  @include breakpoint-above("medium") {
-    @include child-spacing(top, 16px);
-  }
 }
 
 .NotificationsModal-title {
@@ -133,35 +130,6 @@ p {
 .NotificationsModal-subtitle {
   @include font-category("heading");
   color: $c-secondary-grey;
-}
-
-.NotificationsModal-subtopic {
-  @include flex-container(row, space-between, center);
-  @include child-spacing(left, 16px);
-  @include font-category("button");
-
-  border: 1px solid $c-border-grey;
-  border-radius: 8px;
-  padding: 20px 24px;
-
-  @include breakpoint-below("tiny") {
-    @include flex-container(column, center, center);
-    @include child-spacing(left, 0);
-    @include child-spacing(top, 16px);
-  }
-
-  @include breakpoint-above("medium") {
-    color: $c-secondary-grey;
-    cursor: pointer;
-    border-radius: 4px;
-    justify-content: center;
-    padding: 10px;
-
-    &--selected {
-      border-color: $c-success-green;
-      color: $c-success-green;
-    }
-  }
 }
 
 .NotificationsModal-buttons {
@@ -178,15 +146,13 @@ p {
   @include breakpoint-above("medium") {
     @include child-spacing(top, 0);
 
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: auto;
-    grid-gap: 24px;
-
-    margin: 40px 0;
+    flex-direction: row;
+    justify-content: space-around;
+    margin-top: 1.4em;
+    margin-bottom: 0;
 
     & > button {
-      padding: initial;
+      padding: 0.8em;
     }
   }
 }
@@ -195,5 +161,12 @@ p {
   @include font-category("display-small");
   margin: 0 auto;
   align-self: center;
+}
+
+.seperator {
+  border: 1px solid $c-border-grey;
+  width: 100%;
+  height: 1px;
+  margin-top: 2em;
 }
 </style>
