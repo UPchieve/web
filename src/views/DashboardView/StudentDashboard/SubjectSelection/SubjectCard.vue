@@ -67,13 +67,8 @@ export default {
   components: { DropdownList, HyperlinkButton, LargeButton },
   data() {
     return {
-      selectedSubtopic: "",
-      timeoutId: null,
-      disableButton: false
+      selectedSubtopic: ""
     };
-  },
-  mounted() {
-    this.checkOrEnforceWaitingPeriod();
   },
   beforeDestroy() {
     clearTimeout(this.timeoutId);
@@ -98,7 +93,8 @@ export default {
       type: String,
       default: "Start a chat"
     },
-    routeTo: String
+    routeTo: String,
+    disableSubjectCard: Boolean
   },
   computed: {
     ...mapState({
@@ -111,12 +107,7 @@ export default {
       isSessionAlive: "user/isSessionAlive"
     }),
     disabled() {
-      return this.isSessionAlive || this.disableButton;
-    }
-  },
-  watch: {
-    latestSession() {
-      this.checkOrEnforceWaitingPeriod();
+      return this.isSessionAlive || this.disableSubjectCard;
     }
   },
   methods: {
@@ -155,41 +146,6 @@ export default {
             svg: this.svg
           }
         });
-      }
-    },
-    calculateTimeSinceLastSession() {
-      const sessionCreatedAtInMS = new Date(
-        this.latestSession.createdAt
-      ).getTime();
-      const currentDateInMS = new Date().getTime();
-      return currentDateInMS - sessionCreatedAtInMS;
-    },
-    checkOrEnforceWaitingPeriod() {
-      const timeSinceLastSession = this.calculateTimeSinceLastSession();
-      const fiveMinutes = 1000 * 60 * 5;
-      const timeLeftUntilFiveMinutes = fiveMinutes - timeSinceLastSession;
-
-      if (timeSinceLastSession < fiveMinutes) {
-        this.disableButton = true;
-        const headerData = {
-          component: "WaitingPeriodHeader",
-          data: {
-            important: true,
-            timeLeft: timeLeftUntilFiveMinutes
-          }
-        };
-
-        // Show waiting period header if there's no active session
-        if (!this.isSessionAlive) {
-          this.$store.dispatch("app/header/show", headerData);
-        }
-
-        this.timeoutId = setTimeout(() => {
-          this.disableButton = false;
-          if (!this.isSessionAlive) {
-            this.$store.dispatch("app/header/hide");
-          }
-        }, timeLeftUntilFiveMinutes);
       }
     }
   }
