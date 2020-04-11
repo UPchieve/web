@@ -318,6 +318,10 @@ export default {
   width: 100%;
   height: 100%;
 
+  @include breakpoint-below("tiny") {
+    padding: 0;
+  }
+
   &:first-child {
     border-radius: 8px 0 0 8px;
   }
