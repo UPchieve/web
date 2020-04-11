@@ -62,6 +62,7 @@ import { startSession } from "@/utils/session";
 import DropdownList from "@/components/DropdownList";
 import HyperlinkButton from "@/components/HyperlinkButton";
 import LargeButton from "@/components/LargeButton";
+import getCookie from "@/utils/get-cookie";
 
 export default {
   components: { DropdownList, HyperlinkButton, LargeButton },
@@ -112,9 +113,7 @@ export default {
   },
   methods: {
     handleClick() {
-      const hasSentPushTokenRegister = window.localStorage.getItem(
-        "hasSentPushTokenRegister"
-      );
+      const hasSentPushTokenRegister = getCookie("hasSentPushTokenRegister");
 
       // show the notifications modal for tablet users on the mobile app
       if (

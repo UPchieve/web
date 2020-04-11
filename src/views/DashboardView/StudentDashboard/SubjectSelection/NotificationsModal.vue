@@ -30,6 +30,7 @@ import LargeButton from "@/components/LargeButton";
 import PortalService from "@/services/PortalService";
 import NetworkService from "@/services/NetworkService";
 import LoadingMessage from "@/components/LoadingMessage";
+import setCookie from "@/utils/set-cookie";
 import * as Sentry from "@sentry/browser";
 
 export default {
@@ -57,7 +58,7 @@ export default {
   methods: {
     async handlePushNotification() {
       const { topic, selectedSubtopic } = this.modalData;
-      window.localStorage.setItem("hasSentPushTokenRegister", true);
+      setCookie("hasSentPushTokenRegister", true);
 
       try {
         this.isLoadingSession = true;
@@ -77,7 +78,7 @@ export default {
     async onClose() {
       this.$emit("cancel");
       this.$store.dispatch("app/modal/hide");
-      window.localStorage.setItem("hasSentPushTokenRegister", true);
+      setCookie("hasSentPushTokenRegister", true);
 
       const { topic, selectedSubtopic } = this.modalData;
       startSession(this.$router, topic, selectedSubtopic);

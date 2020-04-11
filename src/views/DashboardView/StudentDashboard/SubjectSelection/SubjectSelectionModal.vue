@@ -35,6 +35,7 @@
 import { mapState, mapGetters } from "vuex";
 import { startSession } from "@/utils/session";
 import LargeButton from "@/components/LargeButton";
+import getCookie from "@/utils/get-cookie";
 
 export default {
   components: { LargeButton },
@@ -65,9 +66,7 @@ export default {
     },
     handleMobileStart(subject) {
       this.setSelectedSubtopic(subject);
-      const hasSentPushTokenRegister = window.localStorage.getItem(
-        "hasSentPushTokenRegister"
-      );
+      const hasSentPushTokenRegister = getCookie("hasSentPushTokenRegister");
 
       if (this.isMobileApp && !hasSentPushTokenRegister) {
         this.$store.dispatch("app/modal/show", {
