@@ -178,6 +178,7 @@ export default {
   @include font-category("heading");
   margin: 0;
   padding: 0;
+  text-align: left;
 
   @include breakpoint-above("medium") {
     @include font-category("display-small");
