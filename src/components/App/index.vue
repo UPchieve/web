@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="App" :class="isIOS && 'is-ios'">
+  <div id="app" class="App">
     <app-header v-if="showHeader" />
     <app-sidebar v-if="showSidebar" />
     <app-modal v-if="showModal" />
@@ -149,19 +149,6 @@ export default {
 <style lang="scss" scoped>
 .App {
   height: 100%;
-}
-
-.is-ios {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  overflow: auto;
-
-  @media only screen and (orientation: landscape) {
-    min-height: initial;
-  }
 }
 
 .App-router-view-wrapper {
