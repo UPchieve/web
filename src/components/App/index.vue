@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="App">
+  <div id="app" class="App" :class="isIOS && 'is-ios'">
     <app-header v-if="showHeader" />
     <app-sidebar v-if="showSidebar" />
     <app-modal v-if="showModal" />
@@ -64,11 +64,11 @@ export default {
           });
         }, 1000);
       }
-    }
 
-    if (getOperatingSystem() === "iOS") {
-      this.isIOS = true;
-      document.addEventListener("click", this.iOSFocusElements, false);
+      if (getOperatingSystem() === "iOS") {
+        this.isIOS = true;
+        document.addEventListener("click", this.iOSFocusElements, false);
+      }
     }
   },
   beforeUpdate() {
@@ -82,7 +82,14 @@ export default {
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.handleResize);
-    document.removeEventListener("click", this.handleExternalURLs);
+
+    if (this.isMobileApp) {
+      document.removeEventListener("click", this.handleExternalURLs);
+
+      if (getOperatingSystem() === "iOS") {
+        document.addEventListener("click", this.iOSFocusElements, false);
+      }
+    }
   },
   methods: {
     iOSFocusElements(e) {
@@ -149,6 +156,19 @@ export default {
 <style lang="scss" scoped>
 .App {
   height: 100%;
+}
+
+.is-ios {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow: auto;
+
+  @media only screen and (orientation: landscape) {
+    min-height: initial;
+  }
 }
 
 .App-router-view-wrapper {
