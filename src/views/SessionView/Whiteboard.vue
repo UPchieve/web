@@ -307,6 +307,13 @@ export default {
     position: absolute;
     bottom: 40px;
   }
+
+  @include breakpoint-latest-iphones {
+    max-width: 100%;
+    height: 100px;
+    bottom: 0;
+    border-radius: 0;
+  }
 }
 
 .toolbar-item {
@@ -370,6 +377,10 @@ export default {
   width: 200px;
   padding: 10px 8px;
   cursor: default;
+
+  @include breakpoint-latest-iphones {
+    bottom: 88px;
+  }
 }
 
 .color-button {
