@@ -191,5 +191,10 @@ export default {
     return context.$http
       .post(`${API_ROOT}/feedback`, data)
       .then(this._successHandler, this._errorHandler);
+  },
+  savePushToken(context, data) {
+    return context.$http
+      .post(`${API_ROOT}/push-token/save`, data)
+      .then(this._successHandler, this._errorHandler);
   }
 };

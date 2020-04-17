@@ -9,6 +9,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import calculateWaitingPeriodCountdown from "@/utils/calculate-waiting-period-countdown";
 
 export default {
   name: "waiting-period-header",
@@ -21,22 +22,10 @@ export default {
     }),
     message() {
       const { timeLeft } = this.headerData;
-      // Display countdown as counting down from 5 to 1
-      let countdown = Math.floor(this.convertMsToMinutes(timeLeft) + 1);
+      const countdown = calculateWaitingPeriodCountdown(timeLeft);
       const minuteTextFormat = countdown === 1 ? "minute" : "minutes";
 
-      if (countdown > 5) {
-        countdown = 5;
-      }
-
-      return `You must wait at least ${countdown.toFixed(
-        0
-      )} ${minuteTextFormat} before requesting a new session.`;
-    }
-  },
-  methods: {
-    convertMsToMinutes(time) {
-      return time / 60000;
+      return `You must wait at least ${countdown} ${minuteTextFormat} before requesting a new session.`;
     }
   }
 };

@@ -96,18 +96,31 @@ $transition: transform 700ms;
 }
 
 .AppSidebar-content {
-  @include flex-container(column, space-between, flex-start);
   height: 100%;
   padding: 40px 20px 40px 30px;
+  position: relative;
+
+  @media screen and (min-width: get-breakpoint("medium")) and (max-width: get-breakpoint("huge")) and (orientation: landscape) {
+    padding-left: 2em;
+    height: initial;
+  }
 }
 
 .AppSidebar-final-link {
   @include font-category("display-small");
   cursor: pointer;
   margin: 40px 0 20px;
+  bottom: 40px;
+  text-align: left;
 
   &--desktop {
     @include font-category("button");
+
+    @media screen and (min-width: get-breakpoint("medium")) and (max-width: get-breakpoint("huge")) and (orientation: landscape) {
+      position: initial;
+      text-align: left;
+      margin: 4em 0 1em;
+    }
   }
 }
 </style>

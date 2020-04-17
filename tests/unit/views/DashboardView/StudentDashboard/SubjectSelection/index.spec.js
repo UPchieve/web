@@ -15,7 +15,8 @@ const getWrapper = (mobileMode = false) => {
         getters: {
           mobileMode: () => mobileMode
         }
-      }
+      },
+      user: { state: { latestSession: {} } }
     }
   });
 
@@ -40,9 +41,9 @@ describe("SubjectSelection", () => {
       const wrapper = getWrapper(true);
       expect(wrapper.classes("SubjectSelection")).toBe(true);
 
-      const p = wrapper.find("p");
-      expect(p.exists()).toBe(true);
-      expect(p.text()).toBe("Explore our subjects");
+      const header = wrapper.find("h2");
+      expect(header.exists()).toBe(true);
+      expect(header.text()).toBe("Explore our subjects");
 
       const subjectCards = wrapper.findAll(SubjectCard);
       expect(subjectCards.length).toBe(cards.length);

@@ -185,7 +185,7 @@ export default {
   },
 
   updated() {
-    const msgBox = document.querySelector(".message-box");
+    const msgBox = document.querySelector(".messages");
     msgBox.scrollTop = msgBox.scrollHeight;
   }
 };
@@ -205,10 +205,11 @@ export default {
   overflow: scroll;
   top: 0;
   position: relative;
-  padding-bottom: 50px;
+  padding-bottom: 20px;
 
   @include breakpoint-above("medium") {
     margin-top: 70px;
+    padding-bottom: 0;
   }
 }
 
@@ -247,8 +248,9 @@ export default {
 .messages {
   background: white;
   position: relative;
-  display: flex;
-  flex-direction: column;
+  height: 100%;
+  overflow: auto;
+  padding-bottom: 20px;
 }
 
 .message {
@@ -256,6 +258,7 @@ export default {
   padding: 24px;
   display: flex;
   justify-content: flex-start;
+  width: 100%;
 
   /* Safari needs this specified to lay out the message divs properly. */
   flex-shrink: 0;
@@ -340,7 +343,7 @@ span {
 
   @include breakpoint-below("medium") {
     height: 66px;
-    padding: 0 80px 0 20px;
+    padding: 0 80px 40px 20px;
     display: flex;
     align-items: center;
   }
@@ -356,7 +359,7 @@ span {
   transition: 0.25s;
 
   @include breakpoint-below("medium") {
-    bottom: 55px;
+    bottom: 75px;
     left: 35px;
   }
 }
@@ -378,6 +381,7 @@ span {
     border: 1px solid #d6e0ef;
     border-radius: 20px;
     padding: 10px 16px;
+    line-height: 18px;
   }
 }
 </style>

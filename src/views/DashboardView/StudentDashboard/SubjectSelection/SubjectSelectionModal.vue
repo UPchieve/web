@@ -32,9 +32,10 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 import { startSession } from "@/utils/session";
 import LargeButton from "@/components/LargeButton";
+import getCookie from "@/utils/get-cookie";
 
 export default {
   components: { LargeButton },
@@ -47,6 +48,10 @@ export default {
     };
   },
   computed: {
+    ...mapState({
+      isMobileApp: state => state.app.isMobileApp,
+      user: state => state.user.user
+    }),
     ...mapGetters({ mobileMode: "app/mobileMode" }),
     title() {
       return this.modalData.topic
@@ -61,7 +66,21 @@ export default {
     },
     handleMobileStart(subject) {
       this.setSelectedSubtopic(subject);
-      this.onAccept();
+      const hasSentPushTokenRegister = getCookie("hasSentPushTokenRegister");
+
+      if (this.isMobileApp && !hasSentPushTokenRegister) {
+        this.$store.dispatch("app/modal/show", {
+          component: "NotificationsModal",
+          data: {
+            backText: "Dashboard",
+            acceptText: "Yes, please notify me!",
+            selectedSubtopic: this.selectedSubtopic,
+            topic: this.modalData.topic
+          }
+        });
+      } else {
+        this.onAccept();
+      }
     },
     onAccept() {
       if (this.selectedSubtopic === "") return;

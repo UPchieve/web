@@ -325,6 +325,10 @@ export default {
   height: 40px;
   transition: 0.4s;
 
+  @include breakpoint-below("medium") {
+    bottom: 33px;
+  }
+
   img {
     margin-top: 7px;
     width: 26px;

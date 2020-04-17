@@ -293,7 +293,7 @@ export default {
   max-width: 400px;
   height: 70px;
   position: absolute;
-  bottom: 0;
+  bottom: 50px;
   left: 0;
   right: 0;
   margin: auto;
@@ -307,6 +307,13 @@ export default {
     position: absolute;
     bottom: 40px;
   }
+
+  @include breakpoint-latest-iphones {
+    max-width: 100%;
+    height: 100px;
+    bottom: 0;
+    border-radius: 0;
+  }
 }
 
 .toolbar-item {
@@ -317,6 +324,10 @@ export default {
   justify-content: center;
   width: 100%;
   height: 100%;
+
+  @include breakpoint-below("tiny") {
+    padding: 0;
+  }
 
   &:first-child {
     border-radius: 8px 0 0 8px;
@@ -366,6 +377,10 @@ export default {
   width: 200px;
   padding: 10px 8px;
   cursor: default;
+
+  @include breakpoint-latest-iphones {
+    bottom: 88px;
+  }
 }
 
 .color-button {

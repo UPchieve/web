@@ -48,12 +48,13 @@
         </button>
       </div>
 
-      <form-footer />
+      <form-footer v-if="!isMobileApp" />
     </form>
   </form-page-template>
 </template>
 
 <script>
+import { mapState } from "vuex";
 import AuthService from "@/services/AuthService";
 import FormPageTemplate from "@/components/FormPageTemplate";
 import FormFooter from "@/components/FormFooter";
@@ -65,6 +66,11 @@ export default {
   },
   created() {
     this.$store.dispatch("app/hideNavigation");
+  },
+  computed: {
+    ...mapState({
+      isMobileApp: state => state.app.isMobileApp
+    })
   },
   data() {
     let error;

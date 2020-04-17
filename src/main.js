@@ -12,6 +12,7 @@ import Socket from "socket.io-client";
 import moment from "moment";
 
 import App from "./components/App";
+import PortalService from "./services/PortalService";
 import router from "./router";
 import store from "./store";
 
@@ -26,6 +27,24 @@ Vue.use(VueSocketIO, socket);
 
 // Set up Vue Router
 Vue.use(VueRouter);
+
+// Set up PortalGun (connection to native app)
+PortalService.listen();
+
+const handlePortalData = data => {
+  // TODO: don't route immediately if push is received while app is open.
+  // can detect with `if (data._isPush && data._original?.additionalData?.foreground)`
+  // and show own UI for notification
+  if (data.path) {
+    router.push(data.path);
+  }
+};
+
+// Has data when app is opened w/ cold start from push notification
+PortalService.call("top.getData").then(handlePortalData);
+
+// Called any time app is running (warm start) & push notification is received
+PortalService.call("top.onData", handlePortalData);
 
 // Set up Sentry error tracking
 Sentry.init({

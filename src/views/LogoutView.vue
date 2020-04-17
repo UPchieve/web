@@ -9,12 +9,13 @@
         </router-link>
       </div>
 
-      <form-footer />
+      <form-footer v-if="!isMobileApp" />
     </div>
   </form-page-template>
 </template>
 
 <script>
+import { mapState } from "vuex";
 import FormPageTemplate from "@/components/FormPageTemplate";
 import FormFooter from "@/components/FormFooter";
 
@@ -25,6 +26,11 @@ export default {
   },
   created() {
     this.$store.dispatch("app/hideNavigation");
+  },
+  computed: {
+    ...mapState({
+      isMobileApp: state => state.app.isMobileApp
+    })
   },
   data() {
     return {

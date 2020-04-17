@@ -34,6 +34,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import FormPageTemplate from "@/components/FormPageTemplate";
 import StudentForm from "./StudentForm";
 import VolunteerForm from "./VolunteerForm";
@@ -45,8 +46,17 @@ export default {
     StudentForm,
     VolunteerForm
   },
+
   created() {
     this.$store.dispatch("app/hideNavigation");
+    if (this.mobileMode) {
+      this.selectStudent();
+    }
+  },
+  computed: {
+    ...mapGetters({
+      mobileMode: "app/mobileMode"
+    })
   },
   data() {
     return {

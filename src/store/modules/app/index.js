@@ -12,13 +12,15 @@ export default {
   },
   state: {
     windowWidth: 0,
-    windowHeight: 0
+    windowHeight: 0,
+    isMobileApp: false
   },
   mutations: {
     setWindowWidth: (state, width = 0) =>
       (state.windowWidth = Math.max(0, width)),
     setWindowHeight: (state, height = 0) =>
-      (state.windowHeight = Math.max(0, height))
+      (state.windowHeight = Math.max(0, height)),
+    setIsMobileApp: (state, isMobileApp) => (state.isMobileApp = isMobileApp)
   },
   actions: {
     showNavigation: ({ dispatch }) => {
@@ -33,6 +35,16 @@ export default {
     windowResize: ({ commit }, { width, height }) => {
       commit("setWindowWidth", width);
       commit("setWindowHeight", height);
+    },
+
+    checkEnvironment: ({ commit }) => {
+      const mobileAppDetectionString = "upchieve/";
+      const isMobileApp =
+        navigator.userAgent.indexOf(mobileAppDetectionString) !== -1
+          ? true
+          : false;
+
+      commit("setIsMobileApp", isMobileApp);
     }
   },
   getters: {

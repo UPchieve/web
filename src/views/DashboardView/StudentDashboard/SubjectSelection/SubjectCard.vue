@@ -62,18 +62,14 @@ import { startSession } from "@/utils/session";
 import DropdownList from "@/components/DropdownList";
 import HyperlinkButton from "@/components/HyperlinkButton";
 import LargeButton from "@/components/LargeButton";
+import getCookie from "@/utils/get-cookie";
 
 export default {
   components: { DropdownList, HyperlinkButton, LargeButton },
   data() {
     return {
-      selectedSubtopic: "",
-      timeoutId: null,
-      disableButton: false
+      selectedSubtopic: ""
     };
-  },
-  mounted() {
-    this.checkOrEnforceWaitingPeriod();
   },
   beforeDestroy() {
     clearTimeout(this.timeoutId);
@@ -98,28 +94,44 @@ export default {
       type: String,
       default: "Start a chat"
     },
-    routeTo: String
+    routeTo: String,
+    disableSubjectCard: Boolean
   },
   computed: {
     ...mapState({
-      latestSession: state => state.user.latestSession
+      latestSession: state => state.user.latestSession,
+      isMobileApp: state => state.app.isMobileApp,
+      user: state => state.user.user
     }),
     ...mapGetters({
       mobileMode: "app/mobileMode",
       isSessionAlive: "user/isSessionAlive"
     }),
     disabled() {
-      return this.isSessionAlive || this.disableButton;
-    }
-  },
-  watch: {
-    latestSession() {
-      this.checkOrEnforceWaitingPeriod();
+      return this.isSessionAlive || this.disableSubjectCard;
     }
   },
   methods: {
     handleClick() {
-      if (!this.mobileMode && this.selectedSubtopic !== "") {
+      const hasSentPushTokenRegister = getCookie("hasSentPushTokenRegister");
+
+      // show the notifications modal for tablet users on the mobile app
+      if (
+        this.isMobileApp &&
+        this.selectedSubtopic !== "" &&
+        !hasSentPushTokenRegister
+      ) {
+        this.$store.dispatch("app/modal/show", {
+          component: "NotificationsModal",
+          data: {
+            backText: "Dashboard",
+            acceptText: "Yes, please notify me!",
+            selectedSubtopic: this.selectedSubtopic,
+            topic: this.topic,
+            showTemplateButtons: false
+          }
+        });
+      } else if (!this.mobileMode && this.selectedSubtopic !== "") {
         startSession(this.$router, this.topic, this.selectedSubtopic);
       } else {
         this.$store.dispatch("app/modal/show", {
@@ -133,41 +145,6 @@ export default {
             svg: this.svg
           }
         });
-      }
-    },
-    calculateTimeSinceLastSession() {
-      const sessionCreatedAtInMS = new Date(
-        this.latestSession.createdAt
-      ).getTime();
-      const currentDateInMS = new Date().getTime();
-      return currentDateInMS - sessionCreatedAtInMS;
-    },
-    checkOrEnforceWaitingPeriod() {
-      const timeSinceLastSession = this.calculateTimeSinceLastSession();
-      const fiveMinutes = 1000 * 60 * 5;
-      const timeLeftUntilFiveMinutes = fiveMinutes - timeSinceLastSession;
-
-      if (timeSinceLastSession < fiveMinutes) {
-        this.disableButton = true;
-        const headerData = {
-          component: "WaitingPeriodHeader",
-          data: {
-            important: true,
-            timeLeft: timeLeftUntilFiveMinutes
-          }
-        };
-
-        // Show waiting period header if there's no active session
-        if (!this.isSessionAlive) {
-          this.$store.dispatch("app/header/show", headerData);
-        }
-
-        this.timeoutId = setTimeout(() => {
-          this.disableButton = false;
-          if (!this.isSessionAlive) {
-            this.$store.dispatch("app/header/hide");
-          }
-        }, timeLeftUntilFiveMinutes);
       }
     }
   }
@@ -201,6 +178,7 @@ export default {
   @include font-category("heading");
   margin: 0;
   padding: 0;
+  text-align: left;
 
   @include breakpoint-above("medium") {
     @include font-category("display-small");
