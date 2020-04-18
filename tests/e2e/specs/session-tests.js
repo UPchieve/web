@@ -9,6 +9,8 @@ describe("Session activity", () => {
     before(function() {
       cy.login(this.student);
       cy.endAllSessions();
+
+      cy.clock(Date.now());
     });
 
     beforeEach(function() {
@@ -17,6 +19,8 @@ describe("Session activity", () => {
 
     it("Should start an algebra session", function() {
       cy.visit("/dashboard");
+
+      cy.tick(5 * 60 * 1000);
 
       cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
         .should("be.visible")
@@ -81,11 +85,15 @@ describe("Session activity", () => {
       cy.login(this.volunteer);
       cy.endAllSessions();
       cy.logout();
+
+      cy.clock(Date.now());
     });
 
     it("Should start an essay session", function() {
       cy.login(this.student);
       cy.visit("/dashboard");
+
+      cy.tick(5 * 60 * 1000);
 
       cy.get(".SubjectCard:nth-of-type(2) .LargeButton-primary")
         .should("be.visible")
@@ -289,6 +297,7 @@ describe("Session activity", () => {
 
     beforeEach(function() {
       cy.login(this.student);
+      cy.clock(Date.now());
       cy.visit("/dashboard");
     });
 
@@ -299,7 +308,7 @@ describe("Session activity", () => {
     });
 
     it("Should see 'Session Canceled' when a student visits a canceled session", function() {
-      cy.wait(3000);
+      cy.tick(5 * 60 * 1000);
       cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
         .should("be.visible")
         .click();
@@ -344,6 +353,7 @@ describe("Session activity", () => {
     });
 
     it("Should see 'Session Canceled' when a volunteer visits a canceled session", function() {
+      cy.tick(5 * 60 * 1000);
       cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
         .should("be.visible")
         .click();
@@ -391,6 +401,7 @@ describe("Session activity", () => {
     });
 
     it("Should see 'Session Fulfilled' when another volunteer visits an active fulfilled session", function() {
+      cy.tick(5 * 60 * 1000);
       cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
         .should("be.visible")
         .click();
@@ -437,6 +448,7 @@ describe("Session activity", () => {
     });
 
     it("Should see 'Session Fulfilled' when a volunteer vists a previous fulfilled session", function() {
+      cy.tick(5 * 60 * 1000);
       cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
         .should("be.visible")
         .click();
@@ -484,6 +496,7 @@ describe("Session activity", () => {
     });
 
     it("Should see 'Session Fulfilled' when a student vists a previous fulfilled session", function() {
+      cy.tick(5 * 60 * 1000);
       cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
         .should("be.visible")
         .click();
