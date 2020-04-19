@@ -34,13 +34,16 @@ describe("Session activity", () => {
 
       cy.location("pathname").should("eq", "/session/math/algebra");
       // restore clock so that engine.io will work correctly
-      cy.clock().then((clock) => clock.restore());
+      cy.clock().then(clock => clock.restore());
       cy.wait(7000);
 
       const SESSION_URL_PATTERN = /^\/session\/math\/algebra\/\w{24}$/;
       cy.location("pathname").should("match", SESSION_URL_PATTERN);
 
-      cy.vuex().its("getters").its("user/isSessionAlive").should("be.true");
+      cy.vuex()
+        .its("getters")
+        .its("user/isSessionAlive")
+        .should("be.true");
 
       const STUDENT_ALGEBRA_MSG = "Hi, I have an algebra question.";
 
@@ -107,25 +110,29 @@ describe("Session activity", () => {
 
       cy.location("pathname").should("eq", "/session/college/essays");
       // restore clock so that engine.io will work correctly
-      cy.clock().then((clock) => clock.restore());
+      cy.clock().then(clock => clock.restore());
       cy.wait(7000);
 
       cy.location("pathname").should("match", ESSAYS_SESSION_URL_PATTERN);
       cy.wait(4000);
 
-      cy.vuex().its("getters").its("user/isSessionAlive").should("be.true");
+      cy.vuex()
+        .its("getters")
+        .its("user/isSessionAlive")
+        .should("be.true");
 
       cy.get(".chat .message-textarea")
         .type(STUDENT_ESSAY_MSG)
         .type("{enter}");
 
       cy.get(".message-box .messages")
-      .find(".message")
-      .should("have.length", 1);
+        .find(".message")
+        .should("have.length", 1);
 
-      cy.get(
-          ".message-box .messages .message .contents span"
-        ).should("have.text", STUDENT_ESSAY_MSG);
+      cy.get(".message-box .messages .message .contents span").should(
+        "have.text",
+        STUDENT_ESSAY_MSG
+      );
     });
 
     it("Should return to dashboard during active session", function() {
@@ -163,13 +170,14 @@ describe("Session activity", () => {
 
       cy.location("pathname").should("match", ESSAYS_SESSION_URL_PATTERN);
       // restore clock so that engine.io will work correctly
-      cy.clock().then((clock) => clock.restore());
+      cy.clock().then(clock => clock.restore());
 
       cy.wait(5000);
 
-      cy.get(
-        ".message-box .messages .message .contents span"
-      ).should("have.text", STUDENT_ESSAY_MSG);
+      cy.get(".message-box .messages .message .contents span").should(
+        "have.text",
+        STUDENT_ESSAY_MSG
+      );
     });
 
     it("Should send a chat response to the student", function() {
