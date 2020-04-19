@@ -92,6 +92,8 @@ describe("Student and volunteer signup", () => {
 
       cy.get(".uc-autocomplete-result:first").click();
 
+      cy.get("#inputZipCode").type("10001");
+
       cy.get("button[type=submit]").click();
 
       cy.get("#inputWaitlistEmail")
