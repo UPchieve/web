@@ -39,7 +39,8 @@ describe("Session activity", () => {
       cy.location("pathname").should("match", SESSION_URL_PATTERN);
     });
 
-    it("Should send a chat message", function() {
+      cy.vuex().its("getters").its("user/isSessionAlive").should("be.true");
+
       const STUDENT_ALGEBRA_MSG = "Hi, I have an algebra question.";
 
       cy.get(".message-box .messages")
@@ -109,6 +110,8 @@ describe("Session activity", () => {
       cy.location("pathname").should("match", ESSAYS_SESSION_URL_PATTERN);
       cy.wait(4000);
 
+      cy.vuex().its("getters").its("user/isSessionAlive").should("be.true");
+
       cy.get(".chat .message-textarea")
         .type(STUDENT_ESSAY_MSG)
         .type("{enter}");
@@ -152,7 +155,7 @@ describe("Session activity", () => {
       cy.wait(5000);
 
       cy.get(
-        ".message-box .messages .message:nth-of-type(1) .contents span"
+        ".message-box .messages .message .contents span"
       ).should("have.text", STUDENT_ESSAY_MSG);
     });
 
