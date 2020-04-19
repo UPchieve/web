@@ -206,8 +206,6 @@ describe("Student and volunteer signup", () => {
 
           cy.visit(verifyPath);
 
-          cy.location("pathname").should("eq", verifyPath);
-
           cy.wait("@confirmVerification");
           cy.location("pathname").should("eq", "/dashboard");
           cy.get(".SidebarInfo-name").should(
