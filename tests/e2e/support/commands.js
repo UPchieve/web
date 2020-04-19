@@ -188,3 +188,7 @@ Cypress.Commands.add("getVerificationToken", userid => {
     qs: { userid }
   }).its("body.verificationToken");
 });
+
+Cypress.Commands.add("vuex", () => {
+  cy.window().its("app.$store");
+});
