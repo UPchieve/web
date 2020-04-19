@@ -33,11 +33,12 @@ describe("Session activity", () => {
         .click();
 
       cy.location("pathname").should("eq", "/session/math/algebra");
+      // restore clock so that engine.io will work correctly
+      cy.clock().then((clock) => clock.restore());
       cy.wait(7000);
 
       const SESSION_URL_PATTERN = /^\/session\/math\/algebra\/\w{24}$/;
       cy.location("pathname").should("match", SESSION_URL_PATTERN);
-    });
 
       cy.vuex().its("getters").its("user/isSessionAlive").should("be.true");
 
@@ -105,6 +106,8 @@ describe("Session activity", () => {
         .click();
 
       cy.location("pathname").should("eq", "/session/college/essays");
+      // restore clock so that engine.io will work correctly
+      cy.clock().then((clock) => clock.restore());
       cy.wait(7000);
 
       cy.location("pathname").should("match", ESSAYS_SESSION_URL_PATTERN);
@@ -115,6 +118,14 @@ describe("Session activity", () => {
       cy.get(".chat .message-textarea")
         .type(STUDENT_ESSAY_MSG)
         .type("{enter}");
+
+      cy.get(".message-box .messages")
+      .find(".message")
+      .should("have.length", 1);
+
+      cy.get(
+          ".message-box .messages .message .contents span"
+        ).should("have.text", STUDENT_ESSAY_MSG);
     });
 
     it("Should return to dashboard during active session", function() {
@@ -151,6 +162,8 @@ describe("Session activity", () => {
         .click();
 
       cy.location("pathname").should("match", ESSAYS_SESSION_URL_PATTERN);
+      // restore clock so that engine.io will work correctly
+      cy.clock().then((clock) => clock.restore());
 
       cy.wait(5000);
 
