@@ -34,6 +34,15 @@ export default {
       .post(`${AUTH_ROOT}/register/checkcred`, data)
       .then(this._successHandler, this._errorHandler);
   },
+  checkStudentPartnerSignupCode(partnerSignupCode) {
+    return Vue.http
+      .get(
+        `${AUTH_ROOT}/partner/student/code?partnerSignupCode=${encodeURIComponent(
+          partnerSignupCode
+        )}`
+      )
+      .then(this._successHandler, this._errorHandler);
+  },
   getVolunteerPartner(partnerId) {
     return Vue.http
       .get(
