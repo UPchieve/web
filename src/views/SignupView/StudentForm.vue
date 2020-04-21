@@ -37,7 +37,7 @@
           type="text"
           class="uc-form-input"
           v-model="partnerSignupCode"
-          placeholder="ORG123"
+          placeholder="Code"
           aria-label="Registration code"
         />
       </div>
