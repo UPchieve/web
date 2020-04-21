@@ -12,7 +12,9 @@
     </div>
 
     <template v-if="showSignupCodeDecision">
-      <div class="step-title step-title--center">Do you have a sign-up code?</div>
+      <div class="step-title step-title--center">
+        Do you have a sign-up code?
+      </div>
       <div class="uc-column">
         <button class="uc-form-button" @click="signupCodeYes">
           Yes
@@ -29,9 +31,7 @@
       <div class="uc-column">
         <div class="back-button" @click="backToSignupCodeDecision">Back</div>
 
-        <label for="inputPartnerCode" class="uc-form-label"
-          >Sign-up code</label
-        >
+        <label for="inputPartnerCode" class="uc-form-label">Sign-up code</label>
         <input
           id="inputPartnerCode"
           type="text"
@@ -445,9 +445,9 @@ export default {
           // Redirect to student partner signup page
           this.$router.push(studentPartnerRoute);
         })
-        .catch(error => {
+        .catch(() => {
           this.errors.push("Invalid sign-up code");
-        })
+        });
     },
 
     secondPage() {
@@ -658,7 +658,7 @@ export default {
   color: #777;
 
   &:before {
-    content: '←';
+    content: "←";
     padding-right: 5px;
   }
 }
