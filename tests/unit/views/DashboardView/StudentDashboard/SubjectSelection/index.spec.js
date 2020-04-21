@@ -28,6 +28,11 @@ describe("SubjectSelection", () => {
     { title: "Math Tutoring", topic: "math" },
     { title: "College Counseling", topic: "college" },
     {
+      title: "Refer a friend",
+      subtitle: "Refer a friend and you will get a $10 gift card!",
+      buttonText: "Refer"
+    },
+    {
       title: "Coming Soon",
       subtitle:
         "Check back soon for new help topics like SAT, ESL, and Science!",
