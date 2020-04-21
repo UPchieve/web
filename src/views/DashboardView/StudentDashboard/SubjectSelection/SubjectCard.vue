@@ -133,6 +133,17 @@ export default {
         });
       } else if (!this.mobileMode && this.selectedSubtopic !== "") {
         startSession(this.$router, this.topic, this.selectedSubtopic);
+      } else if (this.buttonText === "Refer") {
+        this.$store.dispatch("app/modal/show", {
+          component: "ReferralModal",
+          data: {
+            backText: "Dashboard",
+            title: "Refer a friend",
+            acceptText: "Close",
+            svg: this.svg,
+            showAccept: false
+          }
+        });
       } else {
         this.$store.dispatch("app/modal/show", {
           component: "SubjectSelectionModal",
