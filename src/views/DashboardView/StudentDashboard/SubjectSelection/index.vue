@@ -29,6 +29,7 @@ import MathSVG from "@/assets/subject_icons/math.svg";
 import CollegeSVG from "@/assets/subject_icons/college-counseling.svg";
 import ScienceSVG from "@/assets/subject_icons/science.svg";
 import calculateWaitingPeriodCountdown from "@/utils/calculate-waiting-period-countdown";
+import ReferralSVG from "@/assets/dashboard_icons/student/referral-2.svg";
 
 import { topics } from "@/utils/topics";
 
@@ -60,6 +61,13 @@ export default {
             return result;
           }, {})
       };
+    });
+
+    cards.push({
+      title: "Refer a friend",
+      subtitle: "Refer a friend and you will get a $10 gift card!",
+      svg: ReferralSVG,
+      buttonText: "Refer"
     });
 
     cards.push({
