@@ -115,6 +115,7 @@ p {
     cursor: pointer;
     border: 0;
     width: 100%;
+    background-color: transparent;
 
     @include breakpoint-above("medium") {
       text-overflow: initial;
