@@ -64,10 +64,10 @@ export default {
     });
 
     cards.push({
-      title: "Refer a friend",
-      subtitle: "Refer a friend and you will get a $10 gift card!",
+      title: "Invite Your Friends",
+      subtitle: "Share UPchieve with a friend and you could win up to $100!",
       svg: ReferralSVG,
-      buttonText: "Refer"
+      buttonText: "Learn More"
     });
 
     // @note - "Coming Soon" is temporarily disabled
