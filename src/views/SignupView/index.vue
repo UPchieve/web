@@ -74,4 +74,10 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.uc-form-body {
+  .uc-column {
+    margin-top: 25px;
+  }
+}
+</style>

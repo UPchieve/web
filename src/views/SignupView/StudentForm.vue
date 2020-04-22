@@ -1,6 +1,57 @@
 <template>
   <form
-    v-if="step === 'step-1'"
+    v-if="step === 'partner-signup-code'"
+    class="uc-form-body"
+    @submit.prevent="submitPartnerSignupCode()"
+  >
+    <div v-if="errors.length" class="step-errors">
+      <h5>Please correct the following problems:</h5>
+      <ul>
+        <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
+      </ul>
+    </div>
+
+    <template v-if="showSignupCodeDecision">
+      <div class="step-title step-title--center">
+        Do you have a sign-up code?
+      </div>
+      <div class="uc-column">
+        <button class="uc-form-button" @click="signupCodeYes">
+          Yes
+        </button>
+      </div>
+      <div class="uc-column">
+        <button class="uc-form-button" @click="firstPage">
+          No
+        </button>
+      </div>
+    </template>
+
+    <template v-else>
+      <div class="uc-column">
+        <div class="back-button" @click="backToSignupCodeDecision">Back</div>
+
+        <label for="inputPartnerCode" class="uc-form-label">Sign-up code</label>
+        <input
+          id="inputPartnerCode"
+          type="text"
+          class="uc-form-input"
+          v-model="partnerSignupCode"
+          placeholder="Code"
+          aria-label="Registration code"
+        />
+      </div>
+
+      <button class="uc-form-button enter-signup-code-button" type="submit">
+        Enter
+      </button>
+    </template>
+
+    <div v-if="msg !== ''">{{ msg }}</div>
+  </form>
+
+  <form
+    v-else-if="step === 'step-1'"
     class="uc-form-body"
     @submit.prevent="secondPage()"
   >
@@ -338,6 +389,8 @@ export default {
     ];
 
     return {
+      partnerSignupCode: "",
+      showSignupCodeDecision: true,
       heardFromOptions,
       referredOptions,
       msg: "",
@@ -362,10 +415,41 @@ export default {
         heardFrom: "",
         referred: ""
       },
-      step: "step-1"
+      step: "partner-signup-code"
     };
   },
   methods: {
+    firstPage() {
+      this.step = "step-1";
+    },
+
+    signupCodeYes() {
+      this.showSignupCodeDecision = false;
+    },
+
+    backToSignupCodeDecision() {
+      this.errors = [];
+      this.invalidInputs = [];
+      this.showSignupCodeDecision = true;
+    },
+
+    submitPartnerSignupCode() {
+      this.errors = [];
+      this.invalidInputs = [];
+
+      NetworkService.checkStudentPartnerSignupCode(this.partnerSignupCode)
+        .then(res => {
+          const studentPartnerKey = res.body.studentPartnerKey;
+          const studentPartnerRoute = `/signup/student/${studentPartnerKey}`;
+
+          // Redirect to student partner signup page
+          this.$router.push(studentPartnerRoute);
+        })
+        .catch(() => {
+          this.errors.push("Invalid sign-up code");
+        });
+    },
+
     secondPage() {
       // reset error msg from server
       this.msg = "";
@@ -561,6 +645,27 @@ export default {
 .step-title {
   font-weight: bold;
   text-align: left;
+
+  &--center {
+    text-align: center;
+  }
+}
+
+.back-button {
+  display: flex;
+  margin-bottom: 25px;
+  cursor: pointer;
+  align-self: flex-start;
+  color: #777;
+
+  &:before {
+    content: "←";
+    padding-right: 5px;
+  }
+}
+
+.enter-signup-code-button {
+  margin-bottom: 25px;
 }
 
 .step-errors {
