@@ -28,12 +28,20 @@ describe("SubjectSelection", () => {
     { title: "Math Tutoring", topic: "math" },
     { title: "College Counseling", topic: "college" },
     {
+      title: "Invite Your Friends",
+      subtitle: "Share UPchieve with a friend and you could win up to $100!",
+      buttonText: "Learn More"
+    }
+    // @note - "Coming Soon" is temporarily disabled
+    /**
+    {
       title: "Coming Soon",
       subtitle:
         "Check back soon for new help topics like SAT, ESL, and Science!",
       buttonText: "Suggest a help topic",
       routeTo: "/contact"
     }
+    **/
   ];
 
   describe("layout", () => {

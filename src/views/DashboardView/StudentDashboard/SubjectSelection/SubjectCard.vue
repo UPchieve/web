@@ -133,6 +133,14 @@ export default {
         });
       } else if (!this.mobileMode && this.selectedSubtopic !== "") {
         startSession(this.$router, this.topic, this.selectedSubtopic);
+      } else if (this.title === "Invite Your Friends") {
+        this.$store.dispatch("app/modal/show", {
+          component: "ReferralModal",
+          data: {
+            svg: this.svg,
+            showAccept: false
+          }
+        });
       } else {
         this.$store.dispatch("app/modal/show", {
           component: "SubjectSelectionModal",
