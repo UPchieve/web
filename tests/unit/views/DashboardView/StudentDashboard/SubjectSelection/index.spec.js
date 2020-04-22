@@ -31,7 +31,9 @@ describe("SubjectSelection", () => {
       title: "Refer a friend",
       subtitle: "Refer a friend and you will get a $10 gift card!",
       buttonText: "Refer"
-    },
+    }
+    // @note - "Coming Soon" is temporarily disabled
+    /**
     {
       title: "Coming Soon",
       subtitle:
@@ -39,6 +41,7 @@ describe("SubjectSelection", () => {
       buttonText: "Suggest a help topic",
       routeTo: "/contact"
     }
+    **/
   ];
 
   describe("layout", () => {

@@ -27,7 +27,7 @@ import { mapState, mapGetters } from "vuex";
 import SubjectCard from "./SubjectCard";
 import MathSVG from "@/assets/subject_icons/math.svg";
 import CollegeSVG from "@/assets/subject_icons/college-counseling.svg";
-import ScienceSVG from "@/assets/subject_icons/science.svg";
+// import ScienceSVG from "@/assets/subject_icons/science.svg";
 import calculateWaitingPeriodCountdown from "@/utils/calculate-waiting-period-countdown";
 import ReferralSVG from "@/assets/dashboard_icons/student/referral-2.svg";
 
@@ -70,6 +70,8 @@ export default {
       buttonText: "Refer"
     });
 
+    // @note - "Coming Soon" is temporarily disabled
+    /**
     cards.push({
       title: "Coming Soon",
       subtitle:
@@ -78,6 +80,7 @@ export default {
       buttonText: "Suggest a help topic",
       routeTo: "/contact"
     });
+    **/
 
     return {
       cards,
