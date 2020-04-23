@@ -13,7 +13,7 @@ export default {};
 .FormPageTemplate {
   @include flex-container(column, center, center);
 
-  background: url("~@/assets/onboarding_background.png") no-repeat center fixed;
+  background: url("~@/assets/onboarding_background.png") no-repeat center;
   background-size: cover;
 
   min-width: 300px;
