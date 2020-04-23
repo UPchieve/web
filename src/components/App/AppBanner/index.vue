@@ -7,10 +7,12 @@
 <script>
 import { mapState } from "vuex";
 import BannerTemplate from "./BannerTemplate";
+import MobileAppNoticeBanner from "./MobileAppNoticeBanner";
 
 export default {
   components: {
-    BannerTemplate
+    BannerTemplate,
+    MobileAppNoticeBanner
   },
   computed: {
     ...mapState({
