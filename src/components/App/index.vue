@@ -3,6 +3,7 @@
     <app-header v-if="showHeader" />
     <app-sidebar v-if="showSidebar" />
     <app-modal v-if="showModal" />
+    <app-banner v-if="showBanner" />
 
     <div
       :class="{
@@ -25,6 +26,7 @@ import "@/scss/main.scss";
 import AppHeader from "./AppHeader";
 import AppSidebar from "./AppSidebar";
 import AppModal from "./AppModal";
+import AppBanner from "./AppBanner";
 import PortalService from "@/services/PortalService";
 import getOperatingSystem from "@/utils/get-operating-system";
 
@@ -33,7 +35,8 @@ export default {
   components: {
     AppHeader,
     AppSidebar,
-    AppModal
+    AppModal,
+    AppBanner
   },
   data() {
     return {
@@ -135,12 +138,30 @@ export default {
       showHeader: state => state.app.header.isShown,
       showSidebar: state => state.app.sidebar.isShown,
       showModal: state => state.app.modal.isShown,
-      isMobileApp: state => state.app.isMobileApp
+      showBanner: state => state.app.banner.isShown,
+      isMobileApp: state => state.app.isMobileApp,
+      user: state => state.user.user
     }),
     ...mapGetters({
       userAuthenticated: "user/isAuthenticated",
-      isVolunteer: "user/isVolunteer"
+      isVolunteer: "user/isVolunteer",
+      mobileMode: "app/mobileMode"
     })
+  },
+  watch: {
+    user(currentUserValue, previousUserValue) {
+      const nowLoggedIn = currentUserValue._id && !previousUserValue._id;
+      if (
+        nowLoggedIn &&
+        this.mobileMode &&
+        !this.isMobileApp &&
+        !this.isVolunteer
+      ) {
+        this.$store.dispatch("app/banner/show", {
+          component: "MobileAppNoticeBanner"
+        });
+      }
+    }
   },
   sockets: {
     "session-change"(sessionData) {
