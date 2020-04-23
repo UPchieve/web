@@ -20,6 +20,7 @@
             primary
             @click.native="$emit('accept')"
             :disabled="!enableAccept"
+            v-if="showAccept"
             >{{ acceptText }}</large-button
           >
         </div>
@@ -43,7 +44,8 @@ export default {
     enableAccept: Boolean,
     alertModal: Boolean,
     important: Boolean,
-    showTemplateButtons: { type: Boolean, default: true }
+    showTemplateButtons: { type: Boolean, default: true },
+    showAccept: { type: Boolean, default: true }
   },
   computed: {
     ...mapGetters({ mobileMode: "app/mobileMode" })
