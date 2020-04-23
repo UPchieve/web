@@ -325,8 +325,6 @@ import Autocomplete from "@trevoreyre/autocomplete-vue";
 import * as Sentry from "@sentry/browser";
 
 import AuthService from "@/services/AuthService";
-import UserService from "@/services/UserService";
-import AnalyticsService from "@/services/AnalyticsService";
 import NetworkService from "@/services/NetworkService";
 
 export default {
