@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapState } from "vuex";
 import FormPageTemplate from "@/components/FormPageTemplate";
 import StudentForm from "./StudentForm";
 import VolunteerForm from "./VolunteerForm";
@@ -49,13 +49,13 @@ export default {
 
   created() {
     this.$store.dispatch("app/hideNavigation");
-    if (this.mobileMode) {
+    if (this.isMobileApp) {
       this.selectStudent();
     }
   },
   computed: {
-    ...mapGetters({
-      mobileMode: "app/mobileMode"
+    ...mapState({
+      isMobileApp: state => state.app.isMobileApp
     })
   },
   data() {
