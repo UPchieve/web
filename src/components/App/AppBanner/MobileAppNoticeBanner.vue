@@ -26,7 +26,6 @@ import { GOOGLE_PLAY_STORE_LINK, APP_STORE_LINK } from "@/consts";
 export default {
   name: "mobile-app-notice-banner",
   components: { AppStoreLogo },
-  props: ["close"],
   data() {
     return { logoUrl: LogoImageUrl };
   },
