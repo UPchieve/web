@@ -206,8 +206,6 @@ import * as Sentry from "@sentry/browser";
 
 import AuthService from "@/services/AuthService";
 import RegistrationService from "@/services/RegistrationService";
-import UserService from "@/services/UserService";
-import AnalyticsService from "@/services/AnalyticsService";
 
 export default {
   data() {
