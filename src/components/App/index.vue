@@ -139,6 +139,7 @@ export default {
       showSidebar: state => state.app.sidebar.isShown,
       showModal: state => state.app.modal.isShown,
       showBanner: state => state.app.banner.isShown,
+      bannerComponent: state => state.app.banner.component,
       isMobileApp: state => state.app.isMobileApp,
       user: state => state.user.user
     }),
@@ -161,6 +162,14 @@ export default {
           component: "MobileAppNoticeBanner"
         });
       }
+    },
+    /**
+     * This is a workaround for MobileAppNoticeBanner.vue not properly watching "mobileMode".
+     * Hides the MobileAppNoticeBanner if not in mobile mode
+     */
+    mobileMode(isMobileMode) {
+      if (!isMobileMode && this.bannerComponent === "MobileAppNoticeBanner")
+        this.$store.dispatch("app/banner/hide");
     }
   },
   sockets: {
