@@ -1,6 +1,57 @@
 <template>
   <form
-    v-if="step === 'step-1'"
+    v-if="step === 'partner-signup-code'"
+    class="uc-form-body"
+    @submit.prevent="submitPartnerSignupCode()"
+  >
+    <div v-if="errors.length" class="step-errors">
+      <h5>Please correct the following problems:</h5>
+      <ul>
+        <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
+      </ul>
+    </div>
+
+    <template v-if="showSignupCodeDecision">
+      <div class="step-title step-title--center">
+        Do you have a sign-up code?
+      </div>
+      <div class="uc-column">
+        <button class="uc-form-button" @click="signupCodeYes">
+          Yes
+        </button>
+      </div>
+      <div class="uc-column">
+        <button class="uc-form-button" @click="firstPage">
+          No
+        </button>
+      </div>
+    </template>
+
+    <template v-else>
+      <div class="uc-column">
+        <div class="back-button" @click="backToSignupCodeDecision">Back</div>
+
+        <label for="inputPartnerCode" class="uc-form-label">Sign-up code</label>
+        <input
+          id="inputPartnerCode"
+          type="text"
+          class="uc-form-input"
+          v-model="partnerSignupCode"
+          placeholder="Code"
+          aria-label="Registration code"
+        />
+      </div>
+
+      <button class="uc-form-button enter-signup-code-button" type="submit">
+        Enter
+      </button>
+    </template>
+
+    <div v-if="msg !== ''">{{ msg }}</div>
+  </form>
+
+  <form
+    v-else-if="step === 'step-1'"
     class="uc-form-body"
     @submit.prevent="secondPage()"
   >
@@ -245,38 +296,6 @@
       />
     </div>
 
-    <div class="uc-column">
-      <label for="heardFrom" class="uc-form-label">
-        How did you hear about us?
-      </label>
-      <select v-model="profile.heardFrom" class="uc-form-select">
-        <option value="" disabled>Select an option</option>
-        <option
-          v-for="option in heardFromOptions"
-          v-bind:key="option"
-          v-bind:value="option"
-        >
-          {{ option }}
-        </option>
-      </select>
-    </div>
-
-    <div class="uc-column">
-      <label for="referred" class="uc-form-label">
-        Do you get help from any of these organizations?
-      </label>
-      <select v-model="profile.referred" class="uc-form-select">
-        <option value="" disabled>Select an option</option>
-        <option
-          v-for="option in referredOptions"
-          v-bind:key="option"
-          v-bind:value="option"
-        >
-          {{ option }}
-        </option>
-      </select>
-    </div>
-
     <div class="uc-form-checkbox">
       <input
         id="userAgreement"
@@ -306,8 +325,6 @@ import Autocomplete from "@trevoreyre/autocomplete-vue";
 import * as Sentry from "@sentry/browser";
 
 import AuthService from "@/services/AuthService";
-import UserService from "@/services/UserService";
-import AnalyticsService from "@/services/AnalyticsService";
 import NetworkService from "@/services/NetworkService";
 
 export default {
@@ -315,31 +332,9 @@ export default {
     Autocomplete
   },
   data() {
-    const heardFromOptions = [
-      "Flyer",
-      "Email",
-      "Internet search",
-      "Friend",
-      "Family member",
-      "Teacher",
-      "School",
-      "Social media",
-      "Other"
-    ];
-
-    const referredOptions = [
-      "Big Brothers Big Sisters of NYC",
-      "Breakthrough New York",
-      "East Harlem Tutorial Program",
-      "First Graduate",
-      "Oasis - A Heaven for Women and Children",
-      "NYC Mission Society",
-      "None of the above"
-    ];
-
     return {
-      heardFromOptions,
-      referredOptions,
+      partnerSignupCode: "",
+      showSignupCodeDecision: true,
       msg: "",
       errors: [],
       invalidInputs: [],
@@ -358,14 +353,43 @@ export default {
       },
       profile: {
         firstName: "",
-        lastName: "",
-        heardFrom: "",
-        referred: ""
+        lastName: ""
       },
-      step: "step-1"
+      step: "partner-signup-code"
     };
   },
   methods: {
+    firstPage() {
+      this.step = "step-1";
+    },
+
+    signupCodeYes() {
+      this.showSignupCodeDecision = false;
+    },
+
+    backToSignupCodeDecision() {
+      this.errors = [];
+      this.invalidInputs = [];
+      this.showSignupCodeDecision = true;
+    },
+
+    submitPartnerSignupCode() {
+      this.errors = [];
+      this.invalidInputs = [];
+
+      NetworkService.checkStudentPartnerSignupCode(this.partnerSignupCode)
+        .then(res => {
+          const studentPartnerKey = res.body.studentPartnerKey;
+          const studentPartnerRoute = `/signup/student/${studentPartnerKey}`;
+
+          // Redirect to student partner signup page
+          this.$router.push(studentPartnerRoute);
+        })
+        .catch(() => {
+          this.errors.push("Invalid sign-up code");
+        });
+    },
+
     secondPage() {
       // reset error msg from server
       this.msg = "";
@@ -529,17 +553,11 @@ export default {
         firstName: this.profile.firstName,
         lastName: this.profile.lastName,
         highSchoolId: this.eligibility.highSchool.upchieveId,
-        zipCode: this.eligibility.zipCode
+        zipCode: this.eligibility.zipCode,
+        referredByCode: this.$route.query.referral
       })
-        .then(() => UserService.getUser())
-        .then(user => {
-          user.heardFrom = this.profile.heardFrom;
-          user.referred = this.profile.referred;
-          UserService.setProfile(this, user, "/");
-
-          // analytics: tracking when a user has signed up
-          AnalyticsService.identify(user, user.isFakeUser);
-          AnalyticsService.trackNoProperties("signed up", user.isFakeUser);
+        .then(() => {
+          this.$router.push("/dashboard");
         })
         .catch(err => {
           this.msg = err.message;
@@ -560,6 +578,27 @@ export default {
 .step-title {
   font-weight: bold;
   text-align: left;
+
+  &--center {
+    text-align: center;
+  }
+}
+
+.back-button {
+  display: flex;
+  margin-bottom: 25px;
+  cursor: pointer;
+  align-self: flex-start;
+  color: #777;
+
+  &:before {
+    content: "←";
+    padding-right: 5px;
+  }
+}
+
+.enter-signup-code-button {
+  margin-bottom: 25px;
 }
 
 .step-errors {

@@ -206,8 +206,6 @@ import * as Sentry from "@sentry/browser";
 
 import AuthService from "@/services/AuthService";
 import RegistrationService from "@/services/RegistrationService";
-import UserService from "@/services/UserService";
-import AnalyticsService from "@/services/AnalyticsService";
 
 export default {
   data() {
@@ -319,17 +317,7 @@ export default {
         college: this.profile.college,
         favoriteAcademicSubject: this.profile.favoriteAcademicSubject
       })
-        .then(() => UserService.getUser())
-        .then(user => {
-          UserService.setProfile(this, user).catch(err => {
-            this.msg = err.message;
-            Sentry.captureException(err);
-          });
-
-          // analytics: tracking when a user has signed up
-          AnalyticsService.identify(user, user.isFakeUser);
-          AnalyticsService.trackNoProperties("signed up", user.isFakeUser);
-
+        .then(() => {
           this.step = "success-message";
         })
         .catch(err => {

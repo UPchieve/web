@@ -8,6 +8,7 @@
     :enable-accept="enableAccept"
     :important="modalData.important"
     :showTemplateButtons="modalData.showTemplateButtons"
+    :show-accept="modalData.showAccept"
   >
     <component
       v-if="modalComponent"
@@ -26,6 +27,7 @@ import RejoinSessionModal from "./RejoinSessionModal";
 import UpgradeAppModal from "./UpgradeAppModal";
 import SubjectSelectionModal from "@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectSelectionModal";
 import NotificationsModal from "@/views/DashboardView/StudentDashboard/SubjectSelection/NotificationsModal";
+import ReferralModal from "@/views/DashboardView/StudentDashboard/ReferralModal";
 import SessionFulfilledModal from "@/views/SessionView/SessionFulfilledModal";
 import OnboardingModal from "@/views/DashboardView/VolunteerDashboard/OnboardingModal.vue";
 
@@ -35,6 +37,7 @@ export default {
     RejoinSessionModal,
     SubjectSelectionModal,
     NotificationsModal,
+    ReferralModal,
     SessionFulfilledModal,
     OnboardingModal,
     UpgradeAppModal

@@ -2,7 +2,6 @@ import moment from "moment";
 import NetworkService from "./NetworkService";
 import AuthService from "./AuthService";
 import OnboardingService from "./OnboardingService";
-import errorFromHttpResponse from "../utils/error-from-http-response";
 
 export default {
   getAuth(context) {
@@ -32,24 +31,8 @@ export default {
   getOnboarding() {
     return OnboardingService.status;
   },
-  setProfile(context, data, redirect) {
-    return NetworkService.setProfile(context, data).then(
-      res => {
-        if (res.data) {
-          context.msg = "Set!";
-        } else {
-          throw new Error();
-        }
-        if (redirect) {
-          context.$router.push(redirect);
-        }
-        return Promise.resolve(res);
-      },
-      res => {
-        context.msg = "Error occurred";
-        return Promise.reject(errorFromHttpResponse(res));
-      }
-    );
+  setProfile(data) {
+    return NetworkService.setProfile(data);
   },
 
   getVolunteers(context) {
