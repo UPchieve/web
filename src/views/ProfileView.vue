@@ -280,7 +280,7 @@ export default {
         keys.forEach(key => (payloadUser[key] = this.user[key]));
 
         // wait for save to succeed before coming out of edit mode
-        UserService.setProfile(this, payloadUser).then(
+        UserService.setProfile(payloadUser).then(
           () => {
             this.editBtnMsg = "Edit";
             this.activeEdit = false;

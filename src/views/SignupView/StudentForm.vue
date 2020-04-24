@@ -296,38 +296,6 @@
       />
     </div>
 
-    <div class="uc-column">
-      <label for="heardFrom" class="uc-form-label">
-        How did you hear about us?
-      </label>
-      <select v-model="profile.heardFrom" class="uc-form-select">
-        <option value="" disabled>Select an option</option>
-        <option
-          v-for="option in heardFromOptions"
-          v-bind:key="option"
-          v-bind:value="option"
-        >
-          {{ option }}
-        </option>
-      </select>
-    </div>
-
-    <div class="uc-column">
-      <label for="referred" class="uc-form-label">
-        Do you get help from any of these organizations?
-      </label>
-      <select v-model="profile.referred" class="uc-form-select">
-        <option value="" disabled>Select an option</option>
-        <option
-          v-for="option in referredOptions"
-          v-bind:key="option"
-          v-bind:value="option"
-        >
-          {{ option }}
-        </option>
-      </select>
-    </div>
-
     <div class="uc-form-checkbox">
       <input
         id="userAgreement"
@@ -357,8 +325,6 @@ import Autocomplete from "@trevoreyre/autocomplete-vue";
 import * as Sentry from "@sentry/browser";
 
 import AuthService from "@/services/AuthService";
-import UserService from "@/services/UserService";
-import AnalyticsService from "@/services/AnalyticsService";
 import NetworkService from "@/services/NetworkService";
 
 export default {
@@ -366,33 +332,9 @@ export default {
     Autocomplete
   },
   data() {
-    const heardFromOptions = [
-      "Flyer",
-      "Email",
-      "Internet search",
-      "Friend",
-      "Family member",
-      "Teacher",
-      "School",
-      "Social media",
-      "Other"
-    ];
-
-    const referredOptions = [
-      "Big Brothers Big Sisters of NYC",
-      "Breakthrough New York",
-      "East Harlem Tutorial Program",
-      "First Graduate",
-      "Oasis - A Heaven for Women and Children",
-      "NYC Mission Society",
-      "None of the above"
-    ];
-
     return {
       partnerSignupCode: "",
       showSignupCodeDecision: true,
-      heardFromOptions,
-      referredOptions,
       msg: "",
       errors: [],
       invalidInputs: [],
@@ -411,9 +353,7 @@ export default {
       },
       profile: {
         firstName: "",
-        lastName: "",
-        heardFrom: "",
-        referred: ""
+        lastName: ""
       },
       step: "partner-signup-code"
     };
@@ -616,15 +556,8 @@ export default {
         zipCode: this.eligibility.zipCode,
         referredByCode: this.$route.query.referral
       })
-        .then(() => UserService.getUser())
-        .then(user => {
-          user.heardFrom = this.profile.heardFrom;
-          user.referred = this.profile.referred;
-          UserService.setProfile(this, user, "/");
-
-          // analytics: tracking when a user has signed up
-          AnalyticsService.identify(user, user.isFakeUser);
-          AnalyticsService.trackNoProperties("signed up", user.isFakeUser);
+        .then(() => {
+          this.$router.push("/dashboard");
         })
         .catch(err => {
           this.msg = err.message;

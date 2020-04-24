@@ -111,8 +111,8 @@ export default {
       .post(`${CONTACT_API_ROOT}/send`, data)
       .then(this._successHandler, this._errorHandler);
   },
-  setProfile(context, data) {
-    return context.$http
+  setProfile(data) {
+    return Vue.http
       .put(`${API_ROOT}/user`, data)
       .then(this._successHandler, this._errorHandler);
   },
