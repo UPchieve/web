@@ -26,3 +26,10 @@ body {
 
   height: 100%;
 }
+
+.disable-scroll {
+  height: 100%;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
