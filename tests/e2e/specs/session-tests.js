@@ -477,25 +477,34 @@ describe("Session activity", () => {
         .should("be.visible")
         .click();
 
-      cy.wait(10000);
-      cy.location("pathname")
+      cy.location("pathname", {
+        timeout: 10000
+      })
         .should("match", CALCULUS_SESSION_URL_PATTERN)
         .then(() => cy.url())
         .then(url => cy.getSessionId(url).as("sessionId"))
         .then(() => {
           cy.url().should("contain", this.sessionId);
-          cy.wait(6000);
+          cy.vuex()
+            .its("getters")
+            .its("user/isSessionWaitingForVolunteer")
+            .should("be.true");
           cy.login(this.volunteer);
           cy.visit(`/session/math/calculus/${this.sessionId}`);
-          cy.wait(9000);
+          cy.vuex()
+            .its("getters")
+            .its("user/isSessionInProgress")
+            .should("be.true");
           cy.get(".end-session button")
             .should("contain.text", "End session")
             .click();
         })
         .then(() => {
           cy.visit(`/session/math/calculus/${this.sessionId}`);
-          cy.wait(9000);
-          return cy.get(".SessionFulfilledModal").children();
+          return cy.get(
+            ".SessionFulfilledModal",
+            { timeout: 10000 }
+          ).children();
         })
         .then(modalElement => {
           const modalTitle = modalElement[0];
