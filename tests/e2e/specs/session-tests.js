@@ -10,7 +10,7 @@ describe("Session activity", () => {
       cy.login(this.student);
       cy.endAllSessions();
 
-      cy.clock(Date.now() + 5 * 60 * 1000);
+      cy.clock(Date.now() + 6 * 60 * 1000);
     });
 
     beforeEach(function() {
@@ -89,7 +89,7 @@ describe("Session activity", () => {
       cy.endAllSessions();
       cy.logout();
 
-      cy.clock(Date.now() + 5 * 60 * 1000);
+      cy.clock(Date.now() + 6 * 60 * 1000);
     });
 
     it("Should start an essay session", function() {
@@ -246,6 +246,8 @@ describe("Session activity", () => {
       const STUDENT_FEEDBACK_URL_PATTERN = /^\/feedback\/\w{24}\/math\/calculus\/student\/\w{24}\/\w{24}$/;
 
       cy.login(this.student);
+      cy.clock(Date.now() + 6 * 60 * 1000);
+      cy.visit("/dashboard");
 
       cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
         .should("be.visible")
@@ -317,7 +319,7 @@ describe("Session activity", () => {
 
     beforeEach(function() {
       cy.login(this.student);
-      cy.clock(Date.now() + 5 * 60 * 1000);
+      cy.clock(Date.now() + 6 * 60 * 1000);
       cy.visit("/dashboard");
     });
 
