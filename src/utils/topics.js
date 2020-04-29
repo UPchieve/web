@@ -17,6 +17,12 @@ export const topics = {
       applications: { displayName: "Applications" }
     },
     displayName: "College Counseling"
+  },
+  science: {
+    subtopics: {
+      biology: { displayName: "Biology" }
+    },
+    displayName: "Science Tutoring"
   }
 };
 
