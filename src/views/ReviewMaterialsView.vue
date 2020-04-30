@@ -9,6 +9,12 @@
         to see our available categories and their associated review materials.
       </p>
     </div>
+    <div v-else-if="reviewMaterials.length === 0">
+      <h1 class="header-title">{{ category }} Review Materials</h1>
+      <p class="error-message">
+        We currently do not have any review materials for {{ category }}.
+      </p>
+    </div>
     <div v-else>
       <h1 class="header-title">{{ category }} Review Materials</h1>
       <div class="review-materials">
@@ -100,6 +106,9 @@ export default {
               image: require(`../assets/review_materials/applications/college-applications-review.png`)
             }
           ];
+          break;
+        case "biology":
+          this.reviewMaterials = [];
           break;
         default:
           this.error = true;
