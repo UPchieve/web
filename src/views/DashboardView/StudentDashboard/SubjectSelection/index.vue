@@ -27,8 +27,9 @@ import { mapState, mapGetters } from "vuex";
 import SubjectCard from "./SubjectCard";
 import MathSVG from "@/assets/subject_icons/math.svg";
 import CollegeSVG from "@/assets/subject_icons/college-counseling.svg";
-import ScienceSVG from "@/assets/subject_icons/science.svg";
+// import ScienceSVG from "@/assets/subject_icons/science.svg";
 import calculateWaitingPeriodCountdown from "@/utils/calculate-waiting-period-countdown";
+import ReferralSVG from "@/assets/dashboard_icons/student/referral.svg";
 
 import { topics } from "@/utils/topics";
 
@@ -63,6 +64,15 @@ export default {
     });
 
     cards.push({
+      title: "Invite Your Friends",
+      subtitle: "Share UPchieve with a friend and you could win up to $100!",
+      svg: ReferralSVG,
+      buttonText: "Learn More"
+    });
+
+    // @note - "Coming Soon" is temporarily disabled
+    /**
+    cards.push({
       title: "Coming Soon",
       subtitle:
         "Check back soon for new help topics like SAT, ESL, and Science!",
@@ -70,6 +80,7 @@ export default {
       buttonText: "Suggest a help topic",
       routeTo: "/contact"
     });
+    **/
 
     return {
       cards,

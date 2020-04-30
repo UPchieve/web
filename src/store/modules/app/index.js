@@ -2,13 +2,15 @@ import { MAX_MOBILE_MODE_WIDTH } from "@/consts";
 import header from "./header";
 import sidebar from "./sidebar";
 import modal from "./modal";
+import banner from "./banner";
 
 export default {
   namespaced: true,
   modules: {
     header,
     sidebar,
-    modal
+    modal,
+    banner
   },
   state: {
     windowWidth: 0,

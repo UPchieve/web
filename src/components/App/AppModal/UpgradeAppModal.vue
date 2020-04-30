@@ -22,6 +22,7 @@
 import { mapGetters } from "vuex";
 import LargeButton from "@/components/LargeButton";
 import getOperatingSystem from "@/utils/get-operating-system";
+import { GOOGLE_PLAY_STORE_LINK, APP_STORE_LINK } from "@/consts";
 
 export default {
   components: { LargeButton },
@@ -37,10 +38,10 @@ export default {
     // @todo: set a link to the respective os app store
     const device = getOperatingSystem();
     if (device === "Android") {
-      this.appStoreLink = "";
+      this.appStoreLink = GOOGLE_PLAY_STORE_LINK;
     }
     if (device === "iOS") {
-      this.appStoreLink = "";
+      this.appStoreLink = APP_STORE_LINK;
     }
   },
   computed: {
