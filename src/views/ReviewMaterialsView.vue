@@ -12,7 +12,8 @@
     <div v-else-if="reviewMaterials.length === 0">
       <h1 class="header-title">{{ category }} Review Materials</h1>
       <p class="error-message">
-        We currently do not have any review materials for {{ category }}.
+        Sorry, we do not currently have review materials for {{ category }}.
+        Please check back later!
       </p>
     </div>
     <div v-else>
