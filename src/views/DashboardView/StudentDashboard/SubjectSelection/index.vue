@@ -27,7 +27,7 @@ import { mapState, mapGetters } from "vuex";
 import SubjectCard from "./SubjectCard";
 import MathSVG from "@/assets/subject_icons/math.svg";
 import CollegeSVG from "@/assets/subject_icons/college-counseling.svg";
-// import ScienceSVG from "@/assets/subject_icons/science.svg";
+import ScienceSVG from "@/assets/subject_icons/science.svg";
 import calculateWaitingPeriodCountdown from "@/utils/calculate-waiting-period-countdown";
 import ReferralSVG from "@/assets/dashboard_icons/student/referral.svg";
 
@@ -42,7 +42,8 @@ export default {
   data() {
     const svgs = {
       math: MathSVG,
-      college: CollegeSVG
+      college: CollegeSVG,
+      science: ScienceSVG
     };
 
     const cards = Object.entries(topics).map(([key, topicObj]) => {
@@ -83,7 +84,7 @@ export default {
     **/
 
     return {
-      cards,
+      cards: cards.filter(card => card.title !== "Science Tutoring"),
       disableSubjectCard: false,
       waitingPeriodTimeoutId: null,
       hasWaitingPeriod: false,

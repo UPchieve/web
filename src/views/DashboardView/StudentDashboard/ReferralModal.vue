@@ -5,7 +5,7 @@
     <h2 class="ReferralModal-subtitle">
       Every friend you refer to UPchieve will get you one entry into our monthly
       drawing for a $100 gift card. Make sure your friends use the link below to
-      sign up! Next drawing will be on {{ nextMonth }} 4th.
+      sign up! Next drawing will be on {{ nextMonth }} 8th.
     </h2>
 
     <div>
