@@ -26,8 +26,8 @@ const getWrapper = (mobileMode = false) => {
 describe("SubjectSelection", () => {
   const cards = [
     { title: "Math Tutoring", topic: "math" },
-    { title: "College Counseling", topic: "college" },
     { title: "Science Tutoring", topic: "science" },
+    { title: "College Counseling", topic: "college" },
     {
       title: "Invite Your Friends",
       subtitle: "Share UPchieve with a friend and you could win up to $100!",

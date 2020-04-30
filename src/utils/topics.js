@@ -10,6 +10,12 @@ export const topics = {
     },
     displayName: "Math Tutoring"
   },
+  science: {
+    subtopics: {
+      biology: { displayName: "Biology" }
+    },
+    displayName: "Science Tutoring"
+  },
   college: {
     subtopics: {
       planning: { displayName: "Planning" },
@@ -17,12 +23,6 @@ export const topics = {
       applications: { displayName: "Applications" }
     },
     displayName: "College Counseling"
-  },
-  science: {
-    subtopics: {
-      biology: { displayName: "Biology" }
-    },
-    displayName: "Science Tutoring"
   }
 };
 
