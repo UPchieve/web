@@ -84,7 +84,7 @@ export default {
     **/
 
     return {
-      cards: cards.filter(card => card.title !== "Science Tutoring"),
+      cards,
       disableSubjectCard: false,
       waitingPeriodTimeoutId: null,
       hasWaitingPeriod: false,
