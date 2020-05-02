@@ -47,6 +47,14 @@ export default {
     showTemplateButtons: { type: Boolean, default: true },
     showAccept: { type: Boolean, default: true }
   },
+  mounted() {
+    const body = document.querySelector("body");
+    body.classList.add("disable-scroll");
+  },
+  beforeDestroy() {
+    const body = document.querySelector("body");
+    body.classList.remove("disable-scroll");
+  },
   computed: {
     ...mapGetters({ mobileMode: "app/mobileMode" })
   },
@@ -82,6 +90,8 @@ $header-height: 80px;
     animation: none;
     background: rgba(0, 0, 0, 0.4);
     padding: (get-app-header-height("medium") + 20px) 40px;
+    display: flex;
+    align-items: center;
   }
 }
 
