@@ -1,3 +1,32 @@
+function clickSubjectButton(title) {
+  cy.get(".SubjectCard-title")
+    .contains(title)
+    .parents(".SubjectCard")
+    .children(".LargeButton-primary")
+    .should("be.visible")
+    .click();
+}
+
+function clickSubtopicButton(title) {
+  cy.get(".SubjectSelectionModal-subtopic-title")
+    .contains(title)
+    .parents(".SubjectSelectionModal-subtopic")
+    .should("be.visible")
+    .click();
+}
+
+function clickStartChat() {
+  cy.get(".ModalTemplate-form .LargeButton-primary")
+    .should("be.visible")
+    .click();
+}
+
+function startSession(topicTitle, subtopicTitle) {
+  clickSubjectButton(topicTitle);
+  clickSubtopicButton(subtopicTitle);
+  clickStartChat();
+}
+
 describe("Session activity", () => {
   before(function() {
     cy.fixture("users/student1").as("student");
@@ -20,17 +49,11 @@ describe("Session activity", () => {
     it("Should start an algebra session", function() {
       cy.visit("/dashboard");
 
-      cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
-        .should("be.visible")
-        .click();
+      clickSubjectButton("Math Tutoring");
 
-      cy.get(".SubjectSelectionModal-subtopic:nth-of-type(1)")
-        .should("be.visible")
-        .click();
+      clickSubtopicButton("Algebra");
 
-      cy.get(".ModalTemplate-form .LargeButton-primary")
-        .should("be.visible")
-        .click();
+      clickStartChat();
 
       cy.location("pathname").should("eq", "/session/math/algebra");
       // restore clock so that engine.io will work correctly
@@ -96,17 +119,11 @@ describe("Session activity", () => {
       cy.login(this.student);
       cy.visit("/dashboard");
 
-      cy.get(".SubjectCard:nth-of-type(2) .LargeButton-primary")
-        .should("be.visible")
-        .click();
+      clickSubjectButton("College Counseling");
 
-      cy.get(".SubjectSelectionModal-subtopic:nth-of-type(2)")
-        .should("be.visible")
-        .click();
+      clickSubtopicButton("Essays");
 
-      cy.get(".ModalTemplate-form .LargeButton-primary")
-        .should("be.visible")
-        .click();
+      clickStartChat();
 
       cy.location("pathname").should("eq", "/session/college/essays");
       // restore clock so that engine.io will work correctly
@@ -249,17 +266,7 @@ describe("Session activity", () => {
       cy.clock(Date.now() + 6 * 60 * 1000);
       cy.visit("/dashboard");
 
-      cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
-        .should("be.visible")
-        .click();
-
-      cy.get(".SubjectSelectionModal-subtopic:nth-of-type(2)")
-        .should("be.visible")
-        .click();
-
-      cy.get(".ModalTemplate-form .LargeButton-primary")
-        .should("be.visible")
-        .click();
+      startSession("Math Tutoring", "Calculus");
 
       cy.wait(6000);
       cy.location("pathname").should("match", CALCULUS_SESSION_URL_PATTERN);
@@ -333,17 +340,7 @@ describe("Session activity", () => {
     });
 
     it("Should see 'Session Canceled' when a student visits a canceled session", function() {
-      cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
-        .should("be.visible")
-        .click();
-
-      cy.get(".SubjectSelectionModal-subtopic:nth-of-type(2)")
-        .should("be.visible")
-        .click();
-
-      cy.get(".ModalTemplate-form .LargeButton-primary")
-        .should("be.visible")
-        .click();
+      startSession("Math Tutoring", "Calculus");
 
       cy.wait(10000);
       cy.location("pathname")
@@ -377,17 +374,7 @@ describe("Session activity", () => {
     });
 
     it("Should see 'Session Canceled' when a volunteer visits a canceled session", function() {
-      cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
-        .should("be.visible")
-        .click();
-
-      cy.get(".SubjectSelectionModal-subtopic:nth-of-type(2)")
-        .should("be.visible")
-        .click();
-
-      cy.get(".ModalTemplate-form .LargeButton-primary")
-        .should("be.visible")
-        .click();
+      startSession("Math Tutoring", "Calculus");
 
       cy.wait(10000);
       cy.location("pathname")
@@ -424,17 +411,7 @@ describe("Session activity", () => {
     });
 
     it("Should see 'Session Fulfilled' when another volunteer visits an active fulfilled session", function() {
-      cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
-        .should("be.visible")
-        .click();
-
-      cy.get(".SubjectSelectionModal-subtopic:nth-of-type(2)")
-        .should("be.visible")
-        .click();
-
-      cy.get(".ModalTemplate-form .LargeButton-primary")
-        .should("be.visible")
-        .click();
+      startSession("Math Tutoring", "Calculus");
 
       cy.wait(10000);
       cy.location("pathname")
@@ -470,17 +447,7 @@ describe("Session activity", () => {
     });
 
     it("Should see 'Session Fulfilled' when a volunteer vists a previous fulfilled session", function() {
-      cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
-        .should("be.visible")
-        .click();
-
-      cy.get(".SubjectSelectionModal-subtopic:nth-of-type(2)")
-        .should("be.visible")
-        .click();
-
-      cy.get(".ModalTemplate-form .LargeButton-primary")
-        .should("be.visible")
-        .click();
+      startSession("Math Tutoring", "Calculus");
 
       cy.location("pathname", {
         timeout: 10000
@@ -526,17 +493,7 @@ describe("Session activity", () => {
     });
 
     it("Should see 'Session Fulfilled' when a student vists a previous fulfilled session", function() {
-      cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
-        .should("be.visible")
-        .click();
-
-      cy.get(".SubjectSelectionModal-subtopic:nth-of-type(2)")
-        .should("be.visible")
-        .click();
-
-      cy.get(".ModalTemplate-form .LargeButton-primary")
-        .should("be.visible")
-        .click();
+      startSession("Math Tutoring", "Calculus");
 
       cy.wait(10000);
       cy.location("pathname")
