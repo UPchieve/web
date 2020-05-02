@@ -273,7 +273,10 @@ describe("Session activity", () => {
 
       cy.location("pathname").should("match", CALCULUS_SESSION_URL_PATTERN);
 
-      cy.wait(5000);
+      cy.vuex({ timeout: 15000 })
+        .its("getters")
+        .its("user/isSessionInProgress")
+        .should("be.true");
       cy.login(this.student);
       cy.visit("/dashboard");
       cy.get(".LargeButton-primary--reverse").click();
@@ -493,7 +496,7 @@ describe("Session activity", () => {
             .should("be.true");
           cy.login(this.volunteer);
           cy.visit(`/session/math/calculus/${this.sessionId}`);
-          cy.vuex()
+          cy.vuex({ timeout: 15000 })
             .its("getters")
             .its("user/isSessionInProgress")
             .should("be.true");
