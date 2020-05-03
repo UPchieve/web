@@ -65,7 +65,7 @@ describe("Session activity", () => {
 
       cy.vuex()
         .its("getters")
-        .its("user/isSessionAlive")
+        .its("user/isSessionAlive", { timeout: 60000 })
         .should("be.true");
 
       const STUDENT_ALGEBRA_MSG = "Hi, I have an algebra question.";
@@ -135,7 +135,7 @@ describe("Session activity", () => {
 
       cy.vuex()
         .its("getters")
-        .its("user/isSessionAlive")
+        .its("user/isSessionAlive", { timeout: 60000 })
         .should("be.true");
 
       cy.get(".chat .message-textarea")
@@ -280,9 +280,9 @@ describe("Session activity", () => {
 
       cy.location("pathname").should("match", CALCULUS_SESSION_URL_PATTERN);
 
-      cy.vuex({ timeout: 15000 })
+      cy.vuex()
         .its("getters")
-        .its("user/isSessionInProgress")
+        .its("user/isSessionInProgress", { timeout: 60000 })
         .should("be.true");
       cy.login(this.student);
       cy.visit("/dashboard");
@@ -342,24 +342,28 @@ describe("Session activity", () => {
     it("Should see 'Session Canceled' when a student visits a canceled session", function() {
       startSession("Math Tutoring", "Calculus");
 
-      cy.wait(10000);
-      cy.location("pathname")
+      cy.location("pathname", { timeout: 60000 })
         .should("match", CALCULUS_SESSION_URL_PATTERN)
         .then(() => cy.url())
         .then(url => cy.getSessionId(url).as("sessionId"))
         .then(() => {
           cy.url().should("contain", this.sessionId);
-          cy.wait(6000);
+          cy.vuex()
+            .its("getters")
+            .its("user/isSessionWaitingForVolunteer", { timeout: 60000 })
+            .should("be.true");
           cy.get(".end-session button")
             .should("contain.text", "Cancel" || "End session")
             .click();
-          cy.wait(6000);
         })
         .then(() => {
-          cy.location("pathname").should("eq", "/dashboard");
+          cy.location("pathname", { timeout: 60000 }).should(
+            "eq",
+            "/dashboard"
+          );
           cy.visit(`/session/math/calculus/${this.sessionId}`);
           return cy
-            .get(".SessionFulfilledModal", { timeout: 15000 })
+            .get(".SessionFulfilledModal", { timeout: 60000 })
             .children();
         })
         .then(modalElement => {
@@ -377,25 +381,30 @@ describe("Session activity", () => {
     it("Should see 'Session Canceled' when a volunteer visits a canceled session", function() {
       startSession("Math Tutoring", "Calculus");
 
-      cy.wait(10000);
-      cy.location("pathname")
+      cy.location("pathname", { timeout: 60000 })
         .should("match", CALCULUS_SESSION_URL_PATTERN)
         .then(() => cy.url())
         .then(url => cy.getSessionId(url).as("sessionId"))
         .then(() => {
           cy.url().should("contain", this.sessionId);
-          cy.wait(6000);
+          cy.vuex()
+            .its("getters")
+            .its("user/isSessionWaitingForVolunteer", { timeout: 60000 })
+            .should("be.true");
           cy.get(".end-session button")
             .should("contain.text", "Cancel")
             .click();
-          cy.wait(6000);
         })
         .then(() => {
-          cy.location("pathname").should("eq", "/dashboard");
+          cy.location("pathname", { timeout: 60000 }).should(
+            "eq",
+            "/dashboard"
+          );
           cy.login(this.volunteer);
           cy.visit(`/session/math/calculus/${this.sessionId}`);
-          cy.wait(9000);
-          return cy.get(".SessionFulfilledModal").children();
+          return cy
+            .get(".SessionFulfilledModal", { timeout: 60000 })
+            .children();
         })
         .then(modalElement => {
           const modalTitle = modalElement[0];
@@ -414,23 +423,29 @@ describe("Session activity", () => {
     it("Should see 'Session Fulfilled' when another volunteer visits an active fulfilled session", function() {
       startSession("Math Tutoring", "Calculus");
 
-      cy.wait(10000);
-      cy.location("pathname")
+      cy.location("pathname", { timeout: 10000 })
         .should("match", CALCULUS_SESSION_URL_PATTERN)
         .then(() => cy.url())
         .then(url => cy.getSessionId(url).as("sessionId"))
         .then(() => {
           cy.url().should("contain", this.sessionId);
-          cy.wait(6000);
+          cy.vuex()
+            .its("getters")
+            .its("user/isSessionWaitingForVolunteer", { timeout: 60000 })
+            .should("be.true");
           cy.login(this.volunteer);
           cy.visit(`/session/math/calculus/${this.sessionId}`);
-          cy.wait(9000);
+          cy.vuex()
+            .its("getters")
+            .its("user/isSessionInProgress", { timeout: 60000 })
+            .should("be.true");
         })
         .then(() => {
           cy.login(this.volunteer2);
           cy.visit(`/session/math/calculus/${this.sessionId}`);
-          cy.wait(9000);
-          return cy.get(".SessionFulfilledModal").children();
+          return cy
+            .get(".SessionFulfilledModal", { timeout: 60000 })
+            .children();
         })
         .then(modalElement => {
           const modalTitle = modalElement[0];
@@ -460,13 +475,13 @@ describe("Session activity", () => {
           cy.url().should("contain", this.sessionId);
           cy.vuex()
             .its("getters")
-            .its("user/isSessionWaitingForVolunteer")
+            .its("user/isSessionWaitingForVolunteer", { timeout: 60000 })
             .should("be.true");
           cy.login(this.volunteer);
           cy.visit(`/session/math/calculus/${this.sessionId}`);
-          cy.vuex({ timeout: 15000 })
+          cy.vuex()
             .its("getters")
-            .its("user/isSessionInProgress")
+            .its("user/isSessionInProgress", { timeout: 60000 })
             .should("be.true");
           cy.get(".end-session button")
             .should("contain.text", "End session")
@@ -475,7 +490,7 @@ describe("Session activity", () => {
         .then(() => {
           cy.visit(`/session/math/calculus/${this.sessionId}`);
           return cy
-            .get(".SessionFulfilledModal", { timeout: 10000 })
+            .get(".SessionFulfilledModal", { timeout: 60000 })
             .children();
         })
         .then(modalElement => {
@@ -495,30 +510,42 @@ describe("Session activity", () => {
     it("Should see 'Session Fulfilled' when a student vists a previous fulfilled session", function() {
       startSession("Math Tutoring", "Calculus");
 
-      cy.wait(10000);
-      cy.location("pathname")
+      cy.location("pathname", { timeout: 10000 })
         .should("match", CALCULUS_SESSION_URL_PATTERN)
         .then(() => cy.url())
         .then(url => cy.getSessionId(url).as("sessionId"))
         .then(() => {
           cy.url().should("contain", this.sessionId);
-          cy.wait(6000);
+          cy.vuex()
+            .its("getters")
+            .its("user/isSessionWaitingForVolunteer", { timeout: 60000 })
+            .should("be.true");
           cy.login(this.volunteer);
           cy.visit(`/session/math/calculus/${this.sessionId}`);
-          cy.wait(6000);
+          cy.vuex()
+            .its("getters")
+            .its("user/isSessionInProgress", { timeout: 60000 })
+            .should("be.true");
           cy.login(this.student);
           cy.visit(`/session/math/calculus/${this.sessionId}`);
-          cy.wait(9000);
+          cy.vuex()
+            .its("getters")
+            .its("user/isSessionInProgress", { timeout: 60000 })
+            .should("be.true");
           return cy
             .get(".end-session button")
             .should("contain.text", "End session")
             .click();
         })
         .then(() => {
-          cy.wait(8000);
+          cy.location("pathname", { timeout: 60000 }).should(
+            "not.equal",
+            `/session/math/calculus/${this.sessionId}`
+          );
           cy.visit(`/session/math/calculus/${this.sessionId}`);
-          cy.wait(9000);
-          return cy.get(".SessionFulfilledModal").children();
+          return cy
+            .get(".SessionFulfilledModal", { timeout: 60000 })
+            .children();
         })
         .then(modalElement => {
           const modalTitle = modalElement[0];
