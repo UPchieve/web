@@ -358,8 +358,7 @@ describe("Session activity", () => {
         .then(() => {
           cy.location("pathname").should("eq", "/dashboard");
           cy.visit(`/session/math/calculus/${this.sessionId}`);
-          cy.wait(9000);
-          return cy.get(".SessionFulfilledModal").children();
+          return cy.get(".SessionFulfilledModal", { timeout: 15000 }).children();
         })
         .then(modalElement => {
           const modalTitle = modalElement[0];
