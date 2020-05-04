@@ -27,9 +27,10 @@ import { mapState, mapGetters } from "vuex";
 import SubjectCard from "./SubjectCard";
 import MathSVG from "@/assets/subject_icons/math.svg";
 import CollegeSVG from "@/assets/subject_icons/college-counseling.svg";
-// import ScienceSVG from "@/assets/subject_icons/science.svg";
+import ScienceSVG from "@/assets/subject_icons/science.svg";
 import calculateWaitingPeriodCountdown from "@/utils/calculate-waiting-period-countdown";
 import ReferralSVG from "@/assets/dashboard_icons/student/referral.svg";
+import LightBulbSVG from "@/assets/dashboard_icons/student/light-bulb.svg";
 
 import { topics } from "@/utils/topics";
 
@@ -42,7 +43,8 @@ export default {
   data() {
     const svgs = {
       math: MathSVG,
-      college: CollegeSVG
+      college: CollegeSVG,
+      science: ScienceSVG
     };
 
     const cards = Object.entries(topics).map(([key, topicObj]) => {
@@ -70,17 +72,14 @@ export default {
       buttonText: "Learn More"
     });
 
-    // @note - "Coming Soon" is temporarily disabled
-    /**
     cards.push({
-      title: "Coming Soon",
+      title: "Feedback",
       subtitle:
-        "Check back soon for new help topics like SAT, ESL, and Science!",
-      svg: ScienceSVG,
-      buttonText: "Suggest a help topic",
+        "Help us improve by telling us what new subjects and features you want!",
+      svg: LightBulbSVG,
+      buttonText: "Give feedback",
       routeTo: "/contact"
     });
-    **/
 
     return {
       cards,

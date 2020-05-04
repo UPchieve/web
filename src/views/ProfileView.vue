@@ -528,6 +528,10 @@ button:hover {
   background-color: #16d2aa;
 }
 
+.SCIENCE {
+  background-color: #9675ce;
+}
+
 .errors {
   text-align: left;
   padding: 30px;

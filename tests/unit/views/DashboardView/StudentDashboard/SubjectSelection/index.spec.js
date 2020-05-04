@@ -26,22 +26,20 @@ const getWrapper = (mobileMode = false) => {
 describe("SubjectSelection", () => {
   const cards = [
     { title: "Math Tutoring", topic: "math" },
+    { title: "Science Tutoring", topic: "science" },
     { title: "College Counseling", topic: "college" },
     {
       title: "Invite Your Friends",
       subtitle: "Share UPchieve with a friend and you could win up to $100!",
       buttonText: "Learn More"
-    }
-    // @note - "Coming Soon" is temporarily disabled
-    /**
+    },
     {
-      title: "Coming Soon",
+      title: "Feedback",
       subtitle:
-        "Check back soon for new help topics like SAT, ESL, and Science!",
-      buttonText: "Suggest a help topic",
+        "Help us improve by telling us what new subjects and features you want!",
+      buttonText: "Give feedback",
       routeTo: "/contact"
     }
-    **/
   ];
 
   describe("layout", () => {
