@@ -27,7 +27,6 @@ describe("Student and volunteer signup", () => {
 
     it("Should successfully create a new student account", function() {
       cy.server();
-      cy.route("PUT", "/api/user").as("setProfile");
 
       cy.visit("/signup");
 
@@ -35,6 +34,10 @@ describe("Student and volunteer signup", () => {
 
       cy.get("button")
         .contains("Student")
+        .click();
+
+      cy.get("button")
+        .contains("No")
         .click();
 
       cy.get("@approvedHighschools").then(response => {
@@ -72,7 +75,6 @@ describe("Student and volunteer signup", () => {
 
         cy.get("button[type=submit]").click();
 
-        cy.wait("@setProfile");
         cy.location("pathname").should("eq", "/dashboard");
       });
     });
@@ -84,6 +86,10 @@ describe("Student and volunteer signup", () => {
 
       cy.get("button")
         .contains("Student")
+        .click();
+
+      cy.get("button")
+        .contains("No")
         .click();
 
       cy.get("#inputHighschool")
@@ -124,7 +130,7 @@ describe("Student and volunteer signup", () => {
 
     it("Should successfully create a new volunteer account", function() {
       cy.server();
-      cy.route("PUT", "/api/user").as("setProfile");
+      cy.route("POST", "/auth/register").as("register");
 
       cy.visit("/signup");
 
@@ -178,7 +184,7 @@ describe("Student and volunteer signup", () => {
 
           cy.get("button[type=submit]").click();
 
-          cy.wait("@setProfile")
+          cy.wait("@register")
             .its("responseBody.user._id")
             .as("userId");
           cy.get("div.uc-form-body").should("contain", "verification email");
