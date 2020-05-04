@@ -1,0 +1,81 @@
+<template>
+  <div class="user-preview">
+    <div class="user-preview__left">
+      <div class="user-preview__icon">{{ userIcon }}</div>
+    </div>
+    <div class="user-preview__middle">
+      <div class="user-preview__title">
+        {{ user.firstname }} {{ user.lastname }}
+      </div>
+      <div class="user-preview__subtitle">joined {{ userSince }}</div>
+    </div>
+    <div class="user-preview__right">
+      <div>{{ numSessions }} sessions</div>
+    </div>
+  </div>
+</template>
+
+<script>
+import moment from "moment";
+
+export default {
+  props: {
+    user: Object
+  },
+  computed: {
+    userIcon() {
+      return this.user.isVolunteer ? "🍎" : "🎓";
+    },
+    userSince() {
+      return moment(this.user.createdAt).fromNow();
+    },
+    numSessions() {
+      return this.user.pastSessions ? this.user.pastSessions.length : 0;
+    }
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+.user-preview {
+  display: flex;
+  flex-direction: row;
+  width: 350px;
+  background: #fff;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-radius: 3px;
+  font-size: 14px;
+
+  &:hover {
+    cursor: pointer;
+    background: #f9f9f9;
+  }
+
+  &__left {
+    flex-shrink: 1;
+  }
+
+  &__icon {
+    font-size: 28px;
+  }
+
+  &__middle {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex-grow: 1;
+    margin-left: 20px;
+  }
+
+  &__title {
+    font-weight: 600;
+  }
+
+  &__subtitle {
+    font-size: 13px;
+    color: $c-secondary-grey;
+  }
+}
+</style>
