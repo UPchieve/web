@@ -17,12 +17,6 @@
       <div class="session-detail__section-title">Started</div>
       <div>{{ createdAt }}</div>
     </div>
-    <div class="session-detail__section">
-      <div class="session-detail__section-title">
-        Notifications
-      </div>
-      <div>{{ session.notifications ? session.notifications.length : 0 }}</div>
-    </div>
     <div v-if="session.volunteer" class="session-detail__section">
       <div class="session-detail__section-title">Volunteer joined</div>
       <div>{{ volunteerJoinedAt }}</div>
@@ -30,6 +24,12 @@
     <div class="session-detail__section">
       <div class="session-detail__section-title">Ended</div>
       <div>{{ endedAt }}</div>
+    </div>
+    <div class="session-detail__section">
+      <div class="session-detail__section-title">
+        Notifications
+      </div>
+      <div>{{ session.notifications ? session.notifications.length : 0 }}</div>
     </div>
     <div v-if="session.messages.length" class="session-detail__section">
       <div class="session-detail__section-title">
