@@ -27,10 +27,6 @@ export default {
 .chat-message {
   text-align: left;
 
-  &--right {
-    text-align: right;
-  }
-
   &__content {
     max-width: 250px;
     background: #eaffff;
