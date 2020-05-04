@@ -27,7 +27,6 @@ describe("Student and volunteer signup", () => {
 
     it("Should successfully create a new student account", function() {
       cy.server();
-      cy.route("PUT", "/api/user").as("setProfile");
 
       cy.visit("/signup");
 
@@ -37,6 +36,10 @@ describe("Student and volunteer signup", () => {
         .contains("Student")
         .click();
 
+      cy.get("button")
+        .contains("No")
+        .click();
+
       cy.get("@approvedHighschools").then(response => {
         const highSchool = response.body.eligibleSchools[0];
 
@@ -44,9 +47,9 @@ describe("Student and volunteer signup", () => {
           .type(highSchool.name)
           .should("have.value", highSchool.name);
 
-        cy.get("#inputZipCode").type("11201");
-
         cy.get(".uc-autocomplete-result:first").click();
+
+        cy.get("#inputZipCode").type("11201");
 
         cy.get("button[type=submit]").click();
 
@@ -72,7 +75,6 @@ describe("Student and volunteer signup", () => {
 
         cy.get("button[type=submit]").click();
 
-        cy.wait("@setProfile");
         cy.location("pathname").should("eq", "/dashboard");
       });
     });
@@ -86,11 +88,17 @@ describe("Student and volunteer signup", () => {
         .contains("Student")
         .click();
 
+      cy.get("button")
+        .contains("No")
+        .click();
+
       cy.get("#inputHighschool")
         .type(this.newStudent.highSchool)
         .should("have.value", this.newStudent.highSchool);
 
       cy.get(".uc-autocomplete-result:first").click();
+
+      cy.get("#inputZipCode").type("10001");
 
       cy.get("button[type=submit]").click();
 
@@ -122,7 +130,7 @@ describe("Student and volunteer signup", () => {
 
     it("Should successfully create a new volunteer account", function() {
       cy.server();
-      cy.route("PUT", "/api/user").as("setProfile");
+      cy.route("POST", "/auth/register").as("register");
 
       cy.visit("/signup");
 
@@ -176,7 +184,7 @@ describe("Student and volunteer signup", () => {
 
           cy.get("button[type=submit]").click();
 
-          cy.wait("@setProfile")
+          cy.wait("@register")
             .its("responseBody.user._id")
             .as("userId");
           cy.get("div.uc-form-body").should("contain", "verification email");
@@ -203,8 +211,6 @@ describe("Student and volunteer signup", () => {
           const verifyPath = `/action/verify/${token}`;
 
           cy.visit(verifyPath);
-
-          cy.location("pathname").should("eq", verifyPath);
 
           cy.wait("@confirmVerification");
           cy.location("pathname").should("eq", "/dashboard");
