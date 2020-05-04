@@ -14,7 +14,7 @@
       <user-preview :user="session.volunteer" />
     </div>
     <div class="session-detail__section">
-      <div class="session-detail__section-title">Created</div>
+      <div class="session-detail__section-title">Started</div>
       <div>{{ createdAt }}</div>
     </div>
     <div class="session-detail__section">

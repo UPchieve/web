@@ -2,7 +2,7 @@
   <router-link :to="`/admin/sessions/${session._id}`" class="session-list-item">
     <div class="session-list-item__column session-list-item__column">
       <div class="bold">{{ session.subTopic }}</div>
-      <div>{{ started }}</div>
+      <div>{{ createdAt }}</div>
     </div>
     <div class="session-list-item__column">{{ status }}</div>
     <div class="session-list-item__column">
@@ -29,7 +29,7 @@ export default {
   },
 
   computed: {
-    started() {
+    createdAt() {
       return moment(this.session.createdAt).format("l, h:mm a");
     },
 
