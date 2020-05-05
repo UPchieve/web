@@ -1,3 +1,32 @@
+function clickSubjectButton(title) {
+  cy.get(".SubjectCard-title")
+    .contains(title)
+    .parents(".SubjectCard")
+    .children(".LargeButton-primary")
+    .should("be.visible")
+    .click();
+}
+
+function clickSubtopicButton(title) {
+  cy.get(".SubjectSelectionModal-subtopic-title")
+    .contains(title)
+    .parents(".SubjectSelectionModal-subtopic")
+    .should("be.visible")
+    .click();
+}
+
+function clickStartChat() {
+  cy.get(".ModalTemplate-form .LargeButton-primary")
+    .should("be.visible")
+    .click();
+}
+
+function startSession(topicTitle, subtopicTitle) {
+  clickSubjectButton(topicTitle);
+  clickSubtopicButton(subtopicTitle);
+  clickStartChat();
+}
+
 describe("Session activity", () => {
   before(function() {
     cy.fixture("users/student1").as("student");
@@ -9,6 +38,8 @@ describe("Session activity", () => {
     before(function() {
       cy.login(this.student);
       cy.endAllSessions();
+
+      cy.clock(Date.now() + 6 * 60 * 1000);
     });
 
     beforeEach(function() {
@@ -18,26 +49,25 @@ describe("Session activity", () => {
     it("Should start an algebra session", function() {
       cy.visit("/dashboard");
 
-      cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
-        .should("be.visible")
-        .click();
+      clickSubjectButton("Math Tutoring");
 
-      cy.get(".SubjectSelectionModal-subtopic:nth-of-type(1)")
-        .should("be.visible")
-        .click();
+      clickSubtopicButton("Algebra");
 
-      cy.get(".ModalTemplate-form .LargeButton-primary")
-        .should("be.visible")
-        .click();
+      clickStartChat();
 
       cy.location("pathname").should("eq", "/session/math/algebra");
+      // restore clock so that engine.io will work correctly
+      cy.clock().then(clock => clock.restore());
       cy.wait(7000);
 
       const SESSION_URL_PATTERN = /^\/session\/math\/algebra\/\w{24}$/;
       cy.location("pathname").should("match", SESSION_URL_PATTERN);
-    });
 
-    it("Should send a chat message", function() {
+      cy.vuex()
+        .its("getters")
+        .its("user/isSessionAlive", { timeout: 60000 })
+        .should("be.true");
+
       const STUDENT_ALGEBRA_MSG = "Hi, I have an algebra question.";
 
       cy.get(".message-box .messages")
@@ -81,33 +111,45 @@ describe("Session activity", () => {
       cy.login(this.volunteer);
       cy.endAllSessions();
       cy.logout();
+
+      cy.clock(Date.now() + 6 * 60 * 1000);
     });
 
     it("Should start an essay session", function() {
       cy.login(this.student);
       cy.visit("/dashboard");
 
-      cy.get(".SubjectCard:nth-of-type(2) .LargeButton-primary")
-        .should("be.visible")
-        .click();
+      clickSubjectButton("College Counseling");
 
-      cy.get(".SubjectSelectionModal-subtopic:nth-of-type(2)")
-        .should("be.visible")
-        .click();
+      clickSubtopicButton("Essays");
 
-      cy.get(".ModalTemplate-form .LargeButton-primary")
-        .should("be.visible")
-        .click();
+      clickStartChat();
 
       cy.location("pathname").should("eq", "/session/college/essays");
+      // restore clock so that engine.io will work correctly
+      cy.clock().then(clock => clock.restore());
       cy.wait(7000);
 
       cy.location("pathname").should("match", ESSAYS_SESSION_URL_PATTERN);
       cy.wait(4000);
 
+      cy.vuex()
+        .its("getters")
+        .its("user/isSessionAlive", { timeout: 60000 })
+        .should("be.true");
+
       cy.get(".chat .message-textarea")
         .type(STUDENT_ESSAY_MSG)
         .type("{enter}");
+
+      cy.get(".message-box .messages")
+        .find(".message")
+        .should("have.length", 1);
+
+      cy.get(".message-box .messages .message .contents span").should(
+        "have.text",
+        STUDENT_ESSAY_MSG
+      );
     });
 
     it("Should return to dashboard during active session", function() {
@@ -144,12 +186,15 @@ describe("Session activity", () => {
         .click();
 
       cy.location("pathname").should("match", ESSAYS_SESSION_URL_PATTERN);
+      // restore clock so that engine.io will work correctly
+      cy.clock().then(clock => clock.restore());
 
       cy.wait(5000);
 
-      cy.get(
-        ".message-box .messages .message:nth-of-type(1) .contents span"
-      ).should("have.text", STUDENT_ESSAY_MSG);
+      cy.get(".message-box .messages .message .contents span").should(
+        "have.text",
+        STUDENT_ESSAY_MSG
+      );
     });
 
     it("Should send a chat response to the student", function() {
@@ -218,18 +263,10 @@ describe("Session activity", () => {
       const STUDENT_FEEDBACK_URL_PATTERN = /^\/feedback\/\w{24}\/math\/calculus\/student\/\w{24}\/\w{24}$/;
 
       cy.login(this.student);
+      cy.clock(Date.now() + 6 * 60 * 1000);
+      cy.visit("/dashboard");
 
-      cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
-        .should("be.visible")
-        .click();
-
-      cy.get(".SubjectSelectionModal-subtopic:nth-of-type(2)")
-        .should("be.visible")
-        .click();
-
-      cy.get(".ModalTemplate-form .LargeButton-primary")
-        .should("be.visible")
-        .click();
+      startSession("Math Tutoring", "Calculus");
 
       cy.wait(6000);
       cy.location("pathname").should("match", CALCULUS_SESSION_URL_PATTERN);
@@ -243,7 +280,10 @@ describe("Session activity", () => {
 
       cy.location("pathname").should("match", CALCULUS_SESSION_URL_PATTERN);
 
-      cy.wait(5000);
+      cy.vuex()
+        .its("getters")
+        .its("user/isSessionInProgress", { timeout: 60000 })
+        .should("be.true");
       cy.login(this.student);
       cy.visit("/dashboard");
       cy.get(".LargeButton-primary--reverse").click();
@@ -289,6 +329,7 @@ describe("Session activity", () => {
 
     beforeEach(function() {
       cy.login(this.student);
+      cy.clock(Date.now() + 6 * 60 * 1000);
       cy.visit("/dashboard");
     });
 
@@ -299,37 +340,31 @@ describe("Session activity", () => {
     });
 
     it("Should see 'Session Canceled' when a student visits a canceled session", function() {
-      cy.wait(3000);
-      cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
-        .should("be.visible")
-        .click();
+      startSession("Math Tutoring", "Calculus");
 
-      cy.get(".SubjectSelectionModal-subtopic:nth-of-type(2)")
-        .should("be.visible")
-        .click();
-
-      cy.get(".ModalTemplate-form .LargeButton-primary")
-        .should("be.visible")
-        .click();
-
-      cy.wait(10000);
-      cy.location("pathname")
+      cy.location("pathname", { timeout: 60000 })
         .should("match", CALCULUS_SESSION_URL_PATTERN)
         .then(() => cy.url())
         .then(url => cy.getSessionId(url).as("sessionId"))
         .then(() => {
           cy.url().should("contain", this.sessionId);
-          cy.wait(6000);
+          cy.vuex()
+            .its("getters")
+            .its("user/isSessionWaitingForVolunteer", { timeout: 60000 })
+            .should("be.true");
           cy.get(".end-session button")
             .should("contain.text", "Cancel" || "End session")
             .click();
-          cy.wait(6000);
         })
         .then(() => {
-          cy.location("pathname").should("eq", "/dashboard");
+          cy.location("pathname", { timeout: 60000 }).should(
+            "eq",
+            "/dashboard"
+          );
           cy.visit(`/session/math/calculus/${this.sessionId}`);
-          cy.wait(9000);
-          return cy.get(".SessionFulfilledModal").children();
+          return cy
+            .get(".SessionFulfilledModal", { timeout: 60000 })
+            .children();
         })
         .then(modalElement => {
           const modalTitle = modalElement[0];
@@ -344,37 +379,32 @@ describe("Session activity", () => {
     });
 
     it("Should see 'Session Canceled' when a volunteer visits a canceled session", function() {
-      cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
-        .should("be.visible")
-        .click();
+      startSession("Math Tutoring", "Calculus");
 
-      cy.get(".SubjectSelectionModal-subtopic:nth-of-type(2)")
-        .should("be.visible")
-        .click();
-
-      cy.get(".ModalTemplate-form .LargeButton-primary")
-        .should("be.visible")
-        .click();
-
-      cy.wait(10000);
-      cy.location("pathname")
+      cy.location("pathname", { timeout: 60000 })
         .should("match", CALCULUS_SESSION_URL_PATTERN)
         .then(() => cy.url())
         .then(url => cy.getSessionId(url).as("sessionId"))
         .then(() => {
           cy.url().should("contain", this.sessionId);
-          cy.wait(6000);
+          cy.vuex()
+            .its("getters")
+            .its("user/isSessionWaitingForVolunteer", { timeout: 60000 })
+            .should("be.true");
           cy.get(".end-session button")
             .should("contain.text", "Cancel")
             .click();
-          cy.wait(6000);
         })
         .then(() => {
-          cy.location("pathname").should("eq", "/dashboard");
+          cy.location("pathname", { timeout: 60000 }).should(
+            "eq",
+            "/dashboard"
+          );
           cy.login(this.volunteer);
           cy.visit(`/session/math/calculus/${this.sessionId}`);
-          cy.wait(9000);
-          return cy.get(".SessionFulfilledModal").children();
+          return cy
+            .get(".SessionFulfilledModal", { timeout: 60000 })
+            .children();
         })
         .then(modalElement => {
           const modalTitle = modalElement[0];
@@ -391,35 +421,31 @@ describe("Session activity", () => {
     });
 
     it("Should see 'Session Fulfilled' when another volunteer visits an active fulfilled session", function() {
-      cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
-        .should("be.visible")
-        .click();
+      startSession("Math Tutoring", "Calculus");
 
-      cy.get(".SubjectSelectionModal-subtopic:nth-of-type(2)")
-        .should("be.visible")
-        .click();
-
-      cy.get(".ModalTemplate-form .LargeButton-primary")
-        .should("be.visible")
-        .click();
-
-      cy.wait(10000);
-      cy.location("pathname")
+      cy.location("pathname", { timeout: 10000 })
         .should("match", CALCULUS_SESSION_URL_PATTERN)
         .then(() => cy.url())
         .then(url => cy.getSessionId(url).as("sessionId"))
         .then(() => {
           cy.url().should("contain", this.sessionId);
-          cy.wait(6000);
+          cy.vuex()
+            .its("getters")
+            .its("user/isSessionWaitingForVolunteer", { timeout: 60000 })
+            .should("be.true");
           cy.login(this.volunteer);
           cy.visit(`/session/math/calculus/${this.sessionId}`);
-          cy.wait(9000);
+          cy.vuex()
+            .its("getters")
+            .its("user/isSessionInProgress", { timeout: 60000 })
+            .should("be.true");
         })
         .then(() => {
           cy.login(this.volunteer2);
           cy.visit(`/session/math/calculus/${this.sessionId}`);
-          cy.wait(9000);
-          return cy.get(".SessionFulfilledModal").children();
+          return cy
+            .get(".SessionFulfilledModal", { timeout: 60000 })
+            .children();
         })
         .then(modalElement => {
           const modalTitle = modalElement[0];
@@ -437,37 +463,35 @@ describe("Session activity", () => {
     });
 
     it("Should see 'Session Fulfilled' when a volunteer vists a previous fulfilled session", function() {
-      cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
-        .should("be.visible")
-        .click();
+      startSession("Math Tutoring", "Calculus");
 
-      cy.get(".SubjectSelectionModal-subtopic:nth-of-type(2)")
-        .should("be.visible")
-        .click();
-
-      cy.get(".ModalTemplate-form .LargeButton-primary")
-        .should("be.visible")
-        .click();
-
-      cy.wait(10000);
-      cy.location("pathname")
+      cy.location("pathname", {
+        timeout: 10000
+      })
         .should("match", CALCULUS_SESSION_URL_PATTERN)
         .then(() => cy.url())
         .then(url => cy.getSessionId(url).as("sessionId"))
         .then(() => {
           cy.url().should("contain", this.sessionId);
-          cy.wait(6000);
+          cy.vuex()
+            .its("getters")
+            .its("user/isSessionWaitingForVolunteer", { timeout: 60000 })
+            .should("be.true");
           cy.login(this.volunteer);
           cy.visit(`/session/math/calculus/${this.sessionId}`);
-          cy.wait(9000);
+          cy.vuex()
+            .its("getters")
+            .its("user/isSessionInProgress", { timeout: 60000 })
+            .should("be.true");
           cy.get(".end-session button")
             .should("contain.text", "End session")
             .click();
         })
         .then(() => {
           cy.visit(`/session/math/calculus/${this.sessionId}`);
-          cy.wait(9000);
-          return cy.get(".SessionFulfilledModal").children();
+          return cy
+            .get(".SessionFulfilledModal", { timeout: 60000 })
+            .children();
         })
         .then(modalElement => {
           const modalTitle = modalElement[0];
@@ -484,42 +508,44 @@ describe("Session activity", () => {
     });
 
     it("Should see 'Session Fulfilled' when a student vists a previous fulfilled session", function() {
-      cy.get(".SubjectCard:nth-of-type(1) .LargeButton-primary")
-        .should("be.visible")
-        .click();
+      startSession("Math Tutoring", "Calculus");
 
-      cy.get(".SubjectSelectionModal-subtopic:nth-of-type(2)")
-        .should("be.visible")
-        .click();
-
-      cy.get(".ModalTemplate-form .LargeButton-primary")
-        .should("be.visible")
-        .click();
-
-      cy.wait(10000);
-      cy.location("pathname")
+      cy.location("pathname", { timeout: 10000 })
         .should("match", CALCULUS_SESSION_URL_PATTERN)
         .then(() => cy.url())
         .then(url => cy.getSessionId(url).as("sessionId"))
         .then(() => {
           cy.url().should("contain", this.sessionId);
-          cy.wait(6000);
+          cy.vuex()
+            .its("getters")
+            .its("user/isSessionWaitingForVolunteer", { timeout: 60000 })
+            .should("be.true");
           cy.login(this.volunteer);
           cy.visit(`/session/math/calculus/${this.sessionId}`);
-          cy.wait(6000);
+          cy.vuex()
+            .its("getters")
+            .its("user/isSessionInProgress", { timeout: 60000 })
+            .should("be.true");
           cy.login(this.student);
           cy.visit(`/session/math/calculus/${this.sessionId}`);
-          cy.wait(9000);
+          cy.vuex()
+            .its("getters")
+            .its("user/isSessionInProgress", { timeout: 60000 })
+            .should("be.true");
           return cy
             .get(".end-session button")
             .should("contain.text", "End session")
             .click();
         })
         .then(() => {
-          cy.wait(8000);
+          cy.location("pathname", { timeout: 60000 }).should(
+            "not.equal",
+            `/session/math/calculus/${this.sessionId}`
+          );
           cy.visit(`/session/math/calculus/${this.sessionId}`);
-          cy.wait(9000);
-          return cy.get(".SessionFulfilledModal").children();
+          return cy
+            .get(".SessionFulfilledModal", { timeout: 60000 })
+            .children();
         })
         .then(modalElement => {
           const modalTitle = modalElement[0];

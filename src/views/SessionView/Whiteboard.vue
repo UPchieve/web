@@ -169,7 +169,7 @@ export default {
     this.useBrushTool();
 
     this.zwibblerCtx.on("document-changed", info => {
-      const isRemoteChange = info.remote;
+      const isRemoteChange = info && info.remote;
       const isWhiteboardHidden = this.mobileMode && !this.isVisible;
       const shouldResizeView = isRemoteChange && isWhiteboardHidden;
 
