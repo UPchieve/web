@@ -23,7 +23,7 @@
       <div class="session-detail__section-title">Volunteer joined</div>
       <div>{{ volunteerJoinedAt }}</div>
     </div>
-    <div class="session-detail__section">
+    <div v-if="endedAt" class="session-detail__section">
       <div class="session-detail__section-title">Ended</div>
       <div>{{ endedAt }}</div>
     </div>
@@ -71,6 +71,7 @@ export default {
       return moment(this.session.volunteerJoinedAt).format("l, h:mm:ss a");
     },
     endedAt() {
+      if (!this.session.endedAt) return null;
       return moment(this.session.endedAt).format("l, h:mm:ss a");
     }
   },
