@@ -10,7 +10,7 @@
       <div class="user-preview__subtitle">joined {{ userSince }}</div>
     </div>
     <div class="user-preview__right">
-      <div>{{ numSessions }} sessions</div>
+      <div>{{ sessions }}</div>
     </div>
   </div>
 </template>
@@ -29,8 +29,9 @@ export default {
     userSince() {
       return moment(this.user.createdAt).fromNow();
     },
-    numSessions() {
-      return this.user.pastSessions ? this.user.pastSessions.length : 0;
+    sessions() {
+      const count = this.user.pastSessions ? this.user.pastSessions.length : 0;
+      return `${count} session${count === 1 ? "" : "s"}`;
     }
   }
 };
