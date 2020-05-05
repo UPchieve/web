@@ -23,6 +23,8 @@ import ProfileView from "./views/ProfileView";
 import CalendarView from "./views/CalendarView";
 import AdminView from "./views/Admin";
 import VolunteerCoverage from "./views/Admin/VolunteerCoverage";
+import AdminSessions from "./views/Admin/AdminSessions";
+import AdminSessionDetail from "./views/Admin/AdminSessionDetail";
 import VolunteerGuideView from "./views/VolunteerGuideView";
 import ReviewMaterialsView from "./views/ReviewMaterialsView";
 
@@ -215,6 +217,18 @@ const routes = [
     path: "/admin/volunteer-coverage",
     name: "VolunteerCoverage",
     component: VolunteerCoverage,
+    meta: { protected: true, requiresAdmin: true }
+  },
+  {
+    path: "/admin/sessions",
+    name: "AdminSessions",
+    component: AdminSessions,
+    meta: { protected: true, requiresAdmin: true }
+  },
+  {
+    path: "/admin/sessions/:sessionId",
+    name: "AdminSessionDetail",
+    component: AdminSessionDetail,
     meta: { protected: true, requiresAdmin: true }
   },
   {
