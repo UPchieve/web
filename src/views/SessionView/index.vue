@@ -79,6 +79,7 @@ export default {
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.handleResize);
+    clearTimeout(this.delayWaitlistTimeoutId);
   },
   /*
    * @notes
@@ -90,7 +91,8 @@ export default {
       whiteboardOpen: false,
       icon: "Pencil.png",
       sessionReconnecting: false,
-      isNewSession: false
+      isNewSession: false,
+      delayWaitlistTimeoutId: null
     };
   },
   computed: {
@@ -145,7 +147,17 @@ export default {
       .then(sessionId => {
         this.$socket.io.opts.transports = ["polling", "websocket"];
         this.$socket.connect();
-        this.joinSession(sessionId);
+
+        const isNewStudent =
+          !this.user.isVolunteer &&
+          this.user.pastSessions &&
+          this.user.pastSessions.length === 0;
+
+        if (this.isNewSession && isNewStudent) {
+          this.delayWaitlistTimeoutId = setTimeout(() => {
+            this.joinSession(sessionId);
+          }, 1000 * 60);
+        } else this.joinSession(sessionId);
       })
       .catch(err => {
         window.alert("Could not start new help session");
