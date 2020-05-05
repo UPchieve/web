@@ -60,7 +60,7 @@ export default {
 .session-list-item {
   display: flex;
   justify-content: space-between;
-  padding: 20px 30px;
+  padding: 20px 40px;
   text-decoration: none;
   color: $c-soft-black;
 

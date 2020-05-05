@@ -74,6 +74,7 @@ export default {
   background: #fff;
   margin: 10px;
   border-radius: 8px;
+  overflow: hidden;
 
   @include breakpoint-above("medium") {
     margin: 40px;

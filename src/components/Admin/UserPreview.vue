@@ -46,7 +46,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-  border-radius: 3px;
+  border-radius: 4px;
   font-size: 14px;
 
   &:hover {
@@ -56,6 +56,7 @@ export default {
 
   &__left {
     flex-shrink: 1;
+    margin: 0 14px 0 5px;
   }
 
   &__icon {
@@ -67,7 +68,6 @@ export default {
     flex-direction: column;
     align-items: flex-start;
     flex-grow: 1;
-    margin-left: 20px;
   }
 
   &__title {
@@ -77,6 +77,10 @@ export default {
   &__subtitle {
     font-size: 13px;
     color: $c-secondary-grey;
+  }
+
+  &__right {
+    margin-right: 5px;
   }
 }
 </style>
