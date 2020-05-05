@@ -39,7 +39,7 @@ export default {
         else return "✅ Paired, in progress";
       } else {
         if (!this.session.volunteer) return "❌ Not paired";
-        else return "✅ Paired";
+        else return "✅ Paired, ended";
       }
     },
 
