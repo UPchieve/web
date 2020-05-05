@@ -1,0 +1,37 @@
+name: CI
+
+on:
+    push:
+      branches: master
+    pull_request:
+      branches: master
+jobs:
+# This workflow contains a single job called "build"
+  ci:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    steps:
+    # To save time, detach and pull some of the largest docker files
+    - run: (docker pull mongo:4.2.3-bionic && docker pull cypress/included:3.2.0) &
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '11.7.0'
+    # Create directories to put in web and server
+    - run: mkdir server
+    - run: mkdir web
+    # Checks-out tthe server repository under $GITHUB_WORKSPACE/server
+    - uses: actions/checkout@v2
+      with:
+        repository: 'upchieve/server'
+        path: 'server'
+    # Checks-out this web repository under $GITHUB_WORKSPACE/web
+    - uses: actions/checkout@v2
+      with:
+        path: 'web'
+    # Create an empty directory to use for the volume, and start the container
+    - run: cd server && mkdir mongo-volume && docker-compose up -d
+    - run: sleep 5
+    - run: cd web && docker build -t upchieve/web . && docker run -d -p 8080:8080 --rm --name upchieve-web-prototype-1 upchieve/web
+    - run: sleep 5
+    - run: cd web && docker build -f bin/Cypress_Dockerfile -t upchieve/cypress . && docker run --rm --name cypress-test upchieve/cypress
