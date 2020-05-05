@@ -1,6 +1,8 @@
 <template>
   <div v-if="session._id" class="session-detail">
-    <router-link to="/admin/sessions">← Back to sessions</router-link>
+    <router-link class="back-button" to="/admin/sessions"
+      >← Back to sessions</router-link
+    >
 
     <div class="session-detail__title">{{ session.subTopic }} session</div>
     <div class="session-detail__subtitle">ID: {{ session._id }}</div>
@@ -121,6 +123,19 @@ export default {
   &__section-title {
     color: $c-secondary-grey;
     font-size: 16px;
+  }
+}
+
+.back-button {
+  display: inline-flex;
+  color: #417db1;
+  border-radius: 20px;
+  padding: 5px 15px;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: none;
+    background: #f7fcfe;
   }
 }
 </style>

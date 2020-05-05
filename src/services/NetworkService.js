@@ -151,9 +151,9 @@ export default {
       .post(`${API_ROOT}/session/latest`, data)
       .then(this._successHandler, this._errorHandler);
   },
-  adminGetSessions() {
+  adminGetSessions(page) {
     return Vue.http
-      .get(`${API_ROOT}/sessions`)
+      .get(`${API_ROOT}/sessions?page=${page}`)
       .then(this._successHandler, this._errorHandler);
   },
   adminGetSession(sessionId) {
