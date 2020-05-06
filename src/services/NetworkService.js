@@ -151,6 +151,16 @@ export default {
       .post(`${API_ROOT}/session/latest`, data)
       .then(this._successHandler, this._errorHandler);
   },
+  adminGetSessions(page) {
+    return Vue.http
+      .get(`${API_ROOT}/sessions?page=${page}`)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminGetSession(sessionId) {
+    return Vue.http
+      .get(`${API_ROOT}/session/${sessionId}`)
+      .then(this._successHandler, this._errorHandler);
+  },
   getQuestions(context, data) {
     return context.$http
       .post(`${API_ROOT}/training/questions`, data)
