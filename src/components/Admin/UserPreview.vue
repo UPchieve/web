@@ -41,7 +41,9 @@ export default {
 .user-preview {
   display: flex;
   flex-direction: row;
-  width: 350px;
+  min-width: 300px;
+  width: 100%;
+  max-width: 400px;
   background: #fff;
   justify-content: space-between;
   align-items: center;

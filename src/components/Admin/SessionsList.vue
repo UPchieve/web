@@ -30,11 +30,7 @@ export default {
 }
 
 .sessions-list {
-  min-width: 900px;
+  min-width: 750px;
   max-width: 1200px;
-
-  .session-list-item {
-    color: #000;
-  }
 }
 </style>
