@@ -46,7 +46,11 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 25px;
+  padding: 15px 5px;
+
+  @include breakpoint-above("medium") {
+    padding: 15px 25px;
+  }
 
   &__title {
     font-size: 16px;

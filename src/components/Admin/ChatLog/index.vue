@@ -37,8 +37,9 @@ export default {
 
 <style lang="scss" scoped>
 .chat-log {
-  min-width: 400px;
-  max-width: 500px;
+  min-width: 300px;
+  width: 100%;
+  max-width: 400px;
   font-size: 14px;
 
   &__header {
