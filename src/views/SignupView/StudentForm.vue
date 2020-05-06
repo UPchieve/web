@@ -568,6 +568,7 @@ export default {
         referredByCode: this.$route.query.referral
       })
         .then(() => {
+          this.$store.dispatch("user/firstDashboardVisit", true);
           this.$router.push("/dashboard");
         })
         .catch(err => {
