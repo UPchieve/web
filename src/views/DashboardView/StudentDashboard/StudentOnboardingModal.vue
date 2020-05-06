@@ -1,6 +1,9 @@
 <template>
   <div class="OnboardingModal">
     <div class="OnboardingModal-container">
+      <div class="OnboardingModal-icon" v-if="views[step].icon">
+        <span>{{ views[step].icon }}</span>
+      </div>
       <h1 class="OnboardingModal-title">
         {{ views[step].title }}
       </h1>
@@ -40,8 +43,9 @@ export default {
         {
           title: "Welcome to UPChieve!",
           subtitle:
-            "You’re almost ready to get started! We just need to lay down some ground rules.",
-          button: "I'm listening"
+            "You’re almost ready to get started! We just need to lay down some ground rules. 📋",
+          button: "I'm listening",
+          icon: "🎉"
         },
         {
           title: "Rule #1: Be patient when making a request.",
@@ -55,7 +59,7 @@ export default {
           title: "Rule #2: Play nice with your coach.",
           subtitle:
             "Our coaches are real people with real feelings — No 🤖 here. They’re eager to help you, so please be kind and respectful.",
-          button: "I promise to bring my best self!"
+          button: "I promise to bring my best self"
         },
         {
           title: "Rule #3: Stay safe out there.",
@@ -110,6 +114,10 @@ p {
 
   &-container {
     min-height: 180px;
+  }
+
+  &-icon {
+    font-size: 10rem;
   }
 }
 
