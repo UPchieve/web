@@ -49,9 +49,9 @@ export default {
 
   created() {
     this.$store.dispatch("app/hideNavigation");
-    if (this.isMobileApp) {
-      this.selectStudent();
-    }
+
+    if (this.isMobileApp || this.$route.query.student) this.selectStudent();
+    else if (this.$route.query.volunteer) this.selectVolunteer();
   },
   computed: {
     ...mapState({
