@@ -1,9 +1,6 @@
 <template>
   <div class="OnboardingModal">
     <div class="OnboardingModal-container">
-      <div class="OnboardingModal-icon" v-if="views[step].icon">
-        <span>{{ views[step].icon }}</span>
-      </div>
       <h1 class="OnboardingModal-title">
         {{ views[step].title }}
       </h1>
@@ -41,18 +38,17 @@ export default {
       step: 0,
       views: [
         {
-          title: "Welcome to UPChieve!",
+          title: "Welcome to UPchieve! 🎉",
           subtitle:
-            "You’re almost ready to get started! We just need to lay down some ground rules. 📋",
-          button: "I'm listening",
-          icon: "🎉"
+            "You’re almost ready to get started! We just need to lay down some ground rules.",
+          button: "I'm listening"
         },
         {
           title: "Rule #1: Be patient when making a request.",
           subtitle:
             "Pairing you with a coach can take up to 10 minutes. We know waiting’s hard, but we promise a coach is on their way 🏃🏿‍♂️ Don’t leave ‘em hanging!",
           tip:
-            "Our coaches are patient, too 💕. Ask as many questions as you want in the same session! There’s no time limit ❌⌛",
+            "Our coaches are patient, too. Ask as many questions as you want in the same session! There’s no time limit.",
           button: "Patience, check"
         },
         {
@@ -68,9 +64,9 @@ export default {
           button: "Got it, I’m here to learn"
         },
         {
-          title: "You’re ready for your first session!",
+          title: "You’re ready for your first session! 💯",
           subtitle:
-            "Thank you for listening. We can tell this is going to be the beginning of a beautiful friendship 🤝",
+            "Thank you for listening. We can tell this is going to be the beginning of a beautiful friendship.",
           button: "Take me to my dashboard"
         }
       ]
@@ -114,10 +110,6 @@ p {
 
   &-container {
     min-height: 180px;
-  }
-
-  &-icon {
-    font-size: 10rem;
   }
 }
 
