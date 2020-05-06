@@ -41,10 +41,14 @@ const handlePortalData = data => {
 };
 
 // Has data when app is opened w/ cold start from push notification
-PortalService.call("top.getData").then(handlePortalData);
+PortalService.call("top.getData")
+  .then(handlePortalData)
+  // eslint-disable-next-line no-console
+  .catch(() => console.log("Portal Gun is unavailable"));
 
 // Called any time app is running (warm start) & push notification is received
-PortalService.call("top.onData", handlePortalData);
+PortalService.call("top.onData", handlePortalData) // eslint-disable-next-line no-console
+  .catch(() => console.log("Portal Gun is unavailable"));
 
 // Set up Sentry error tracking
 Sentry.init({
