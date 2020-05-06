@@ -320,6 +320,7 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 import validator from "validator";
 import Autocomplete from "@trevoreyre/autocomplete-vue";
 import * as Sentry from "@sentry/browser";
@@ -357,6 +358,16 @@ export default {
       },
       step: "partner-signup-code"
     };
+  },
+  mounted() {
+    if (!this.isMobileApp) {
+      this.firstPage();
+    }
+  },
+  computed: {
+    ...mapState({
+      isMobileApp: state => state.app.isMobileApp
+    })
   },
   methods: {
     firstPage() {
@@ -557,6 +568,7 @@ export default {
         referredByCode: this.$route.query.referral
       })
         .then(() => {
+          this.$store.dispatch("user/firstDashboardVisit", true);
           this.$router.push("/dashboard");
         })
         .catch(err => {

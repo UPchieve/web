@@ -29,7 +29,8 @@ import SubjectSelectionModal from "@/views/DashboardView/StudentDashboard/Subjec
 import NotificationsModal from "@/views/DashboardView/StudentDashboard/SubjectSelection/NotificationsModal";
 import ReferralModal from "@/views/DashboardView/StudentDashboard/ReferralModal";
 import SessionFulfilledModal from "@/views/SessionView/SessionFulfilledModal";
-import OnboardingModal from "@/views/DashboardView/VolunteerDashboard/OnboardingModal.vue";
+import VolunteerOnboardingModal from "@/views/DashboardView/VolunteerDashboard/VolunteerOnboardingModal.vue";
+import StudentOnboardingModal from "@/views/DashboardView/StudentDashboard/StudentOnboardingModal";
 
 export default {
   components: {
@@ -39,8 +40,9 @@ export default {
     NotificationsModal,
     ReferralModal,
     SessionFulfilledModal,
-    OnboardingModal,
-    UpgradeAppModal
+    VolunteerOnboardingModal,
+    UpgradeAppModal,
+    StudentOnboardingModal
   },
   data() {
     return {
