@@ -119,7 +119,7 @@ export default {
   max-width: 800px;
   background: #fff;
   margin: 10px;
-  padding: 30px 20px;
+  padding: 20px 15px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -143,6 +143,7 @@ export default {
   }
 
   &__section {
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -150,7 +151,7 @@ export default {
     font-size: 20px;
 
     &--chat {
-      margin-bottom: 40px;
+      margin: 20px 0 40px;
     }
 
     &--feedback {
