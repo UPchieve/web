@@ -23,7 +23,7 @@
       <div class="session-detail__section-title">Volunteer joined</div>
       <div>{{ volunteerJoinedAt }}</div>
     </div>
-    <div class="session-detail__section">
+    <div v-if="endedAt" class="session-detail__section">
       <div class="session-detail__section-title">Ended</div>
       <div>{{ endedAt }}</div>
     </div>
@@ -33,7 +33,10 @@
       </div>
       <div>{{ session.notifications ? session.notifications.length : 0 }}</div>
     </div>
-    <div v-if="session.messages.length" class="session-detail__section">
+    <div
+      v-if="session.messages.length"
+      class="session-detail__section session-detail__section--chat"
+    >
       <div class="session-detail__section-title">
         Chat log ({{ session.messages.length }})
       </div>
@@ -43,19 +46,39 @@
         :volunteer="session.volunteer"
       />
     </div>
+    <div
+      v-if="studentFeedback"
+      class="session-detail__section session-detail__section--feedback"
+    >
+      <div class="session-detail__section-title">
+        Student feedback
+      </div>
+      <feedback-preview :feedback="studentFeedback" />
+    </div>
+    <div
+      v-if="volunteerFeedback"
+      class="session-detail__section session-detail__section--feedback"
+    >
+      <div class="session-detail__section-title">
+        Volunteer feedback
+      </div>
+      <feedback-preview :feedback="volunteerFeedback" />
+    </div>
   </div>
 </template>
 
 <script>
 import moment from "moment";
+import { find } from "lodash";
 import NetworkService from "@/services/NetworkService";
 import UserPreview from "@/components/Admin/UserPreview";
 import ChatLog from "@/components/Admin/ChatLog";
+import FeedbackPreview from "@/components/Admin/FeedbackPreview";
 
 export default {
   name: "AdminSessionDetail",
 
-  components: { UserPreview, ChatLog },
+  components: { UserPreview, ChatLog, FeedbackPreview },
 
   data() {
     return {
@@ -71,7 +94,14 @@ export default {
       return moment(this.session.volunteerJoinedAt).format("l, h:mm:ss a");
     },
     endedAt() {
+      if (!this.session.endedAt) return null;
       return moment(this.session.endedAt).format("l, h:mm:ss a");
+    },
+    studentFeedback() {
+      return find(this.session.feedbacks, { userType: "student" }, {});
+    },
+    volunteerFeedback() {
+      return find(this.session.feedbacks, { userType: "volunteer" }, {});
     }
   },
 
@@ -89,7 +119,7 @@ export default {
   max-width: 800px;
   background: #fff;
   margin: 10px;
-  padding: 30px 20px;
+  padding: 20px 15px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -113,11 +143,20 @@ export default {
   }
 
   &__section {
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     margin: 10px 0;
     font-size: 20px;
+
+    &--chat {
+      margin: 20px 0 40px;
+    }
+
+    &--feedback {
+      margin-bottom: 20px;
+    }
   }
 
   &__section-title {
