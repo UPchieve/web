@@ -1,3 +1,4 @@
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const path = require("path");
 
 module.exports = {
@@ -14,6 +15,15 @@ module.exports = {
           req.res.end();
           return "";
         }
+      }
+    }
+  },
+  configureWebpack: config => {
+    if (process.env.BUNDLE_ANALYZER) {
+      return {
+        plugins: [
+          new BundleAnalyzerPlugin()
+        ]
       }
     }
   },

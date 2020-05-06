@@ -12,9 +12,9 @@
 2. Run the following command to get the version number of both NPM and Node. Node has to be >= 11.7.0 and NPM has to be >= 6.0.0 for this project.
 ``` bash
 # Get NPM version
-npm -v 
+npm -v
 
-# Get Node version 
+# Get Node version
 node -v
 ```
 
@@ -51,6 +51,9 @@ npm run dev
 
 # build for production with minification
 npm run build
+
+# build and start [Bundle Analyzer](https://github.com/webpack-contrib/webpack-bundle-analyzer)
+BUNDLE_ANALYZER=1 npm run build
 
 # run unit tests
 npm run test
@@ -92,4 +95,4 @@ cd web
 ``` bash
 #The first time this is run it may take a few minutes, but afterwards it should be faster. Rerun with each change to see updates
 docker build -t upchieve/web . && docker run -it -p 8080:8080 --rm --name upchieve-web-prototype-1 upchieve/web
-``` 
+```
