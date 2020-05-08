@@ -35,20 +35,16 @@ const handlePortalData = data => {
   // TODO: don't route immediately if push is received while app is open.
   // can detect with `if (data._isPush && data._original?.additionalData?.foreground)`
   // and show own UI for notification
-  if (data.path) {
+  if (data && data.path) {
     router.push(data.path);
   }
 };
 
 // Has data when app is opened w/ cold start from push notification
-PortalService.call("top.getData")
-  .then(handlePortalData)
-  // eslint-disable-next-line no-console
-  .catch(() => console.log("Portal Gun is unavailable"));
+PortalService.call("top.getData").then(handlePortalData);
 
 // Called any time app is running (warm start) & push notification is received
-PortalService.call("top.onData", handlePortalData) // eslint-disable-next-line no-console
-  .catch(() => console.log("Portal Gun is unavailable"));
+PortalService.call("top.onData", handlePortalData);
 
 // Set up Sentry error tracking
 Sentry.init({

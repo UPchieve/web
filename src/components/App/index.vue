@@ -48,10 +48,7 @@ export default {
     window.addEventListener("resize", this.handleResize);
     this.handleResize();
     await this.$store.dispatch("app/checkEnvironment", this);
-    PortalService.call("app.isLoaded").catch(() =>
-      // eslint-disable-next-line no-console
-      console.log("Portal Gun is unavailable")
-    );
+    PortalService.call("app.isLoaded");
 
     if (this.isMobileApp) {
       const LATEST_APP_VERSION = "0.1.2";
@@ -132,10 +129,7 @@ export default {
         PortalService.call("browser.openWindow", {
           url: href,
           target: "_system"
-        }).catch(() =>
-          // eslint-disable-next-line no-console
-          console.log("Portal Gun is unavailable")
-        );
+        });
       }
     }
   },
