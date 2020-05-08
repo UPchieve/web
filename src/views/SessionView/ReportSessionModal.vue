@@ -1,16 +1,16 @@
 <template>
   <div class="report-modal">
-    <div class="report-modal__title">Report this session</div>
-    <div class="report-modal__info">
+    <h1 class="report-modal__title">Report this session</h1>
+    <h2 class="report-modal__subtitle">
       Here's some copy explaining when you should report a session
-    </div>
+    </h2>
     <textarea
       class="report-modal__message"
       v-model="reportMessage"
-      placeholder="Explain what happened..."
+      placeholder="(Optional) Explain what happened"
+      rows="3"
     />
     <div class="report-modal__footer">
-      <div class="report-modal__seperator" />
       <div class="report-modal__buttons">
         <large-button @click.native="cancel">Cancel</large-button>
         <large-button primary @click.native="submit">Submit</large-button>
@@ -67,10 +67,24 @@ export default {
     @include child-spacing(top, 16px);
   }
 
-  &__seperator {
-    border: 1px solid $c-border-grey;
-    width: 100%;
-    height: 1px;
+  &__title {
+    @include font-category("display-small");
+  }
+
+  &__subtitle {
+    @include font-category("body");
+    color: $c-secondary-grey;
+  }
+
+  &__message {
+    padding: 10px;
+    border: solid 1px $c-border-grey;
+    border-radius: 5px;
+    resize: none;
+
+    &:focus {
+      outline: none;
+    }
   }
 
   &__buttons {
