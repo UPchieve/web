@@ -18,7 +18,7 @@
         </div>
       </transition>
       <transition name="chat-warning--slide">
-        <div class="chat-warning" v-show="connectionWarningIsShown">
+        <div class="chat-warning" v-show="isSessionConnectionFailure">
           Please check your Internet connection
         </div>
       </transition>
@@ -111,9 +111,9 @@ export default {
     ...mapGetters({
       sessionPartner: "user/sessionPartner",
       isSessionWaitingForVolunteer: "user/isSessionWaitingForVolunteer",
-      isSessionOver: "user/isSessionOver"
+      isSessionAlive: "user/isSessionAlive"
     }),
-    connectionWarningIsShown: function() {
+    isSessionConnectionFailure: function() {
       return !this.isSessionConnectionAlive && this.isSessionAlive;
     }
   },
