@@ -29,14 +29,6 @@ export default {
   data() {
     return { logoUrl: LogoImageUrl };
   },
-  mounted() {
-    const body = document.querySelector("body");
-    body.classList.add("disable-scroll");
-  },
-  beforeDestroy() {
-    const body = document.querySelector("body");
-    body.classList.remove("disable-scroll");
-  },
   computed: {
     mobileAppStoreLink() {
       if (this.mobileAppStore === "Google Play Store") {

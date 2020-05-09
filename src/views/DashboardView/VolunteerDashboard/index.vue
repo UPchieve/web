@@ -216,7 +216,7 @@ export default {
 
     showOnboardingModal() {
       this.$store.dispatch("app/modal/show", {
-        component: "OnboardingModal",
+        component: "VolunteerOnboardingModal",
         data: { alertModal: true, acceptText: "Get started" }
       });
     }

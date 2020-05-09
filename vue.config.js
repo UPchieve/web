@@ -1,3 +1,4 @@
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 const path = require("path");
 
 module.exports = {
@@ -15,6 +16,14 @@ module.exports = {
           return "";
         }
       }
+    }
+  },
+  configureWebpack: () => {
+    if (process.env.BUNDLE_ANALYZER) {
+      // merges into config https://cli.vuejs.org/guide/webpack.html#simple-configuration
+      return {
+        plugins: [new BundleAnalyzerPlugin()]
+      };
     }
   },
   chainWebpack: config => {
