@@ -18,21 +18,20 @@ export default {
     return Promise.reject(res);
   },
   _faultTolerantHttp(http, method, onRetry, url, data) {
-    const promise =
-      ["get", "delete", "head", "jsonp"].indexOf(method) !== -1
-        ? http[method](url, { timeout: FAULT_TOLERANT_HTTP_TIMEOUT }).then(
-            this._successHandler,
-            this._errorHandler
-          )
-        : http[method](url, data, {
-            timeout: FAULT_TOLERANT_HTTP_TIMEOUT
-          }).then(this._successHandler, this._errorHandler);
-
     return {
       isAborted: false,
       retryHttp: function() {
         return promiseRetry(
           retry => {
+            const promise =
+              ["get", "delete", "head", "jsonp"].indexOf(method) !== -1
+                ? http[method](url, {
+                    timeout: FAULT_TOLERANT_HTTP_TIMEOUT
+                  }).then(this._successHandler, this._errorHandler)
+                : http[method](url, data, {
+                    timeout: FAULT_TOLERANT_HTTP_TIMEOUT
+                  }).then(this._successHandler, this._errorHandler);
+
             return promise.catch(res => {
               if (res.status === 0 && !this.isAborted) {
                 if (onRetry) {
