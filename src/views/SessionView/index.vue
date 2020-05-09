@@ -55,6 +55,7 @@ import Whiteboard from "./Whiteboard";
 import SessionChat from "./SessionChat";
 
 import SessionFulfilledModal from "./SessionFulfilledModal";
+import TroubleStartingModal from "./TroubleStartingModal";
 
 const headerData = {
   component: "SessionHeader"
@@ -133,7 +134,12 @@ export default {
       promise = SessionService.newSession(
         this,
         type,
-        this.$route.params.subTopic
+        this.$route.params.subTopic,
+        {
+          onRetry(res, abort) {
+            this.showTroubleStartingModal(abort);
+          }
+        }
       );
       this.isNewSession = true;
     } else {
@@ -175,6 +181,9 @@ export default {
     },
     reconnect_attempt() {
       this.$store.dispatch("user/sessionReconnectAttempt");
+      if (!this.session || !this.session._id) {
+        this.showTroubleStartingModal();
+      }
     },
     connect() {
       if (!this.isSessionConnectionAlive) {
@@ -209,6 +218,16 @@ export default {
       this.$socket.emit("join", {
         sessionId,
         user: this.user
+      });
+    },
+    showTroubleStartingModal(abort) {
+      this.$store.dispatch("app/modal/show", {
+        component: TroubleStartingModal,
+        data: {
+          acceptText: "Abort Session",
+          alertModal: true,
+          abortFunction: abort
+        }
       });
     },
     tryClicked() {
