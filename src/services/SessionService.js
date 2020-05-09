@@ -26,11 +26,17 @@ export default {
     });
   },
 
-  newSession(context, sessionType, sessionSubTopic) {
-    return NetworkService.newSession(context, {
-      sessionType,
-      sessionSubTopic
-    }).then(res => {
+  newSession(context, sessionType, sessionSubTopic, options) {
+    const onRetry = options && options.onRetry;
+
+    return NetworkService.newSession(
+      context,
+      {
+        sessionType,
+        sessionSubTopic
+      },
+      onRetry
+    ).then(res => {
       const data = res.data || {};
       const { sessionId } = data;
 
