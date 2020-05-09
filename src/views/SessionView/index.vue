@@ -136,7 +136,7 @@ export default {
         type,
         this.$route.params.subTopic,
         {
-          onRetry(res, abort) {
+          onRetry: (res, abort) => {
             this.showTroubleStartingModal(abort);
           }
         }
