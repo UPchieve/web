@@ -19,7 +19,7 @@
       </transition>
       <transition name="chat-warning--slide">
         <div class="chat-warning" v-show="connectionWarningIsShown">
-         Please check your Internet connection
+          Please check your Internet connection
         </div>
       </transition>
 
@@ -106,7 +106,7 @@ export default {
           message.avatarStyle = { backgroundImage: `url(${picture})` };
           return message;
         }),
-      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
+      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive
     }),
     ...mapGetters({
       sessionPartner: "user/sessionPartner",
