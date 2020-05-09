@@ -43,7 +43,7 @@
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.26",
     "node-sass": "^4.13.1",
-    "portal-gun": "git://github.com/claydotio/portal-gun.git",
+    "portal-gun": "github:claydotio/portal-gun",
     "sass-loader": "^7.1.0",
     "style-resources-loader": "^1.2.1",
     "typeface-work-sans": "0.0.72",
