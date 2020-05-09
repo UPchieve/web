@@ -32,6 +32,7 @@ jobs:
     # Create an empty directory to use for the volume, and start the container
     - run: cd server && mkdir mongo-volume && docker-compose up -d
     - run: sleep 5
-    - run: (cd web && npm install && npm run dev) &
-    - run: sleep 60
+    - run: cd web && npm install
+    - run: (cd web && npm run dev) &
+    - run: sleep 30
     - run: cd web && docker build -f bin/Cypress_Dockerfile -t upchieve/cypress . && docker run --rm --network host --name cypress-test upchieve/cypress
