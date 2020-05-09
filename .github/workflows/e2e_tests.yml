@@ -13,7 +13,7 @@ jobs:
 
     steps:
     # To save time, detach and pull some of the largest docker files
-    - run: (docker pull mongo:4.2.3-bionic && docker pull cypress/included:3.2.0) &
+    - run: (docker pull mongo:4.2.3-bionic && docker pull cypress/included:3.4.1) &
     - uses: actions/setup-node@v1
       with:
         node-version: '11.7.0'
@@ -32,6 +32,6 @@ jobs:
     # Create an empty directory to use for the volume, and start the container
     - run: cd server && mkdir mongo-volume && docker-compose up -d
     - run: sleep 5
-    - run: cd web && docker build -t upchieve/web . && docker run -d -p 8080:8080 --rm --name upchieve-web-prototype-1 upchieve/web
-    - run: sleep 5
-    - run: cd web && docker build -f bin/Cypress_Dockerfile -t upchieve/cypress . && docker run --rm --name cypress-test upchieve/cypress
+    - run: (cd web && npm install && npm run dev) &
+    - run: sleep 60
+    - run: cd web && docker build -f bin/Cypress_Dockerfile -t upchieve/cypress . && docker run --rm --network host --name cypress-test upchieve/cypress
