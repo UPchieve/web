@@ -86,7 +86,7 @@ export default {
       .get(`${API_ROOT}/user`)
       .then(this._successHandler, this._errorHandler);
   },
-  userGlobal(Vue) {
+  userGlobal() {
     return Vue.http
       .get(`${API_ROOT}/user`)
       .then(this._successHandler, this._errorHandler);
