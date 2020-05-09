@@ -117,7 +117,7 @@ export default {
       commit("setSession", {});
     },
 
-    sessionReconnectAttempt: ({ commit }) => {
+    sessionDisconnected: ({ commit }) => {
       commit("setIsSessionConnectionAlive", false);
     },
 

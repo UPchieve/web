@@ -167,6 +167,7 @@ export default {
         SessionService.endSession(this, sessionId)
           .then(() => {
             this.$socket.disconnect();
+            this.$store.dispatch("user/sessionDisconnected");
             const url =
               "/feedback/" +
               sessionId +
@@ -187,6 +188,7 @@ export default {
         SessionService.endSession(this, sessionId)
           .then(() => {
             this.$socket.disconnect();
+            this.$store.dispatch("user/sessionDisconnected");
             router.push("/");
           })
           .catch(this.alertCouldNotEnd);

@@ -180,7 +180,7 @@ export default {
       });
     },
     reconnect_attempt() {
-      this.$store.dispatch("user/sessionReconnectAttempt");
+      this.$store.dispatch("user/sessionDisconnected");
       if (!this.session || !this.session._id) {
         this.showTroubleStartingModal();
       }
