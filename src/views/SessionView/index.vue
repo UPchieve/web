@@ -89,14 +89,14 @@ export default {
     return {
       whiteboardOpen: false,
       icon: "Pencil.png",
-      sessionReconnecting: false,
       isNewSession: false
     };
   },
   computed: {
     ...mapState({
       user: state => state.user.user,
-      session: state => state.user.session
+      session: state => state.user.session,
+      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive
     }),
     ...mapGetters({
       mobileMode: "app/mobileMode"
@@ -143,12 +143,18 @@ export default {
 
     promise
       .then(sessionId => {
+        this.$store.dispatch("user/updateSession", { _id: sessionId });
         this.$socket.io.opts.transports = ["polling", "websocket"];
-        this.$socket.connect();
-        this.joinSession(sessionId);
+        if (this.$socket.connected) {
+          this.joinSession(sessionId);
+        } else {
+          this.$socket.connect();
+        }
       })
       .catch(err => {
-        window.alert("Could not start new help session");
+        if (err.status !== 0) {
+          window.alert("Could not start new help session");
+        }
         this.$router.replace("/");
         Sentry.captureException(err);
       });
@@ -168,16 +174,11 @@ export default {
       });
     },
     reconnect_attempt() {
-      this.sessionReconnecting = true;
+      this.$store.dispatch("user/sessionReconnectAttempt");
     },
     connect() {
-      if (this.sessionReconnecting) {
-        if (this.session && this.session._id) {
-          // we still need to re-join the room after Socket.IO re-establishes the connection
-          this.joinSession(this.session._id);
-        } else {
-          location.reload();
-        }
+      if (!this.isSessionConnectionAlive) {
+        this.joinSession(this.session._id);
       }
     }
   },
@@ -212,6 +213,13 @@ export default {
     },
     tryClicked() {
       this.sessionReconnecting = true;
+    }
+  },
+  watch: {
+    isSessionConnectionAlive(newValue, oldValue) {
+      if (newValue && !oldValue) {
+        this.$store.dispatch("app/modal/hide");
+      }
     }
   }
 };
