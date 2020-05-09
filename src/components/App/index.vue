@@ -178,6 +178,7 @@ export default {
       SessionService.currentSession.data = sessionData;
 
       this.$store.dispatch("user/updateSession", sessionData);
+      this.$store.dispatch("user/sessionConnected");
     }
   }
 };
