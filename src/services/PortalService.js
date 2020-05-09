@@ -12,6 +12,11 @@ export default {
   },
 
   call(method, data) {
-    return this.portal.call(method, data);
+    return (
+      this.portal
+        .call(method, data)
+        // eslint-disable-next-line no-console
+        .catch(() => console.log("Portal Gun is unavailable."))
+    );
   }
 };

@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import DashboardBanner from "../DashboardBanner";
 import SubjectSelection from "./SubjectSelection";
 
@@ -22,8 +22,20 @@ export default {
     if (this.isSessionAlive) {
       this.$store.dispatch("app/header/show", headerData);
     }
+
+    if (this.isFirstDashboardVisit) {
+      this.$store.dispatch("app/modal/show", {
+        component: "StudentOnboardingModal",
+        data: {
+          showTemplateButtons: false
+        }
+      });
+    }
   },
   computed: {
+    ...mapState({
+      isFirstDashboardVisit: state => state.user.isFirstDashboardVisit
+    }),
     ...mapGetters({ isSessionAlive: "user/isSessionAlive" })
   },
   watch: {

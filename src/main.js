@@ -35,7 +35,7 @@ const handlePortalData = data => {
   // TODO: don't route immediately if push is received while app is open.
   // can detect with `if (data._isPush && data._original?.additionalData?.foreground)`
   // and show own UI for notification
-  if (data.path) {
+  if (data && data.path) {
     router.push(data.path);
   }
 };
