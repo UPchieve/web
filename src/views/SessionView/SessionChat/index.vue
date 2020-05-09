@@ -17,6 +17,11 @@
           >
         </div>
       </transition>
+      <transition name="chat-warning--slide">
+        <div class="chat-warning" v-show="connectionWarningIsShown">
+         Please check your Internet connection
+        </div>
+      </transition>
 
       <div class="messages">
         <chat-bot v-if="!user.isVolunteer && isSessionWaitingForVolunteer" />
@@ -100,12 +105,17 @@ export default {
 
           message.avatarStyle = { backgroundImage: `url(${picture})` };
           return message;
-        })
+        }),
+      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
     }),
     ...mapGetters({
       sessionPartner: "user/sessionPartner",
-      isSessionWaitingForVolunteer: "user/isSessionWaitingForVolunteer"
-    })
+      isSessionWaitingForVolunteer: "user/isSessionWaitingForVolunteer",
+      isSessionOver: "user/isSessionOver"
+    }),
+    connectionWarningIsShown: function() {
+      return !this.isSessionConnectionAlive && this.isSessionAlive;
+    }
   },
   methods: {
     showModerationWarning() {
