@@ -305,8 +305,7 @@ export default {
       }
     },
     submit() {
-      AuthService.register(this, {
-        isVolunteer: true,
+      AuthService.registerVolunteer(this, {
         code: RegistrationService.data.registrationCode,
         email: this.credentials.email,
         password: this.credentials.password,
