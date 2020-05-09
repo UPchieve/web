@@ -1,5 +1,6 @@
 import Vue from "vue";
 import promiseRetry from "promise-retry";
+import errcode from "err-code";
 
 const AUTH_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/auth`;
 const API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/api`;
@@ -23,6 +24,13 @@ export default {
       retryHttp: function() {
         return promiseRetry(
           retry => {
+            if (this.isAborted) {
+              // early exit
+              return Promise.reject(
+                errcode(new Error("Aborted by user"), "EUSERABORTED")
+              );
+            }
+
             const promise =
               ["get", "delete", "head", "jsonp"].indexOf(method) !== -1
                 ? http[method](url, {
@@ -33,7 +41,7 @@ export default {
                   }).then(this._successHandler, this._errorHandler);
 
             return promise.catch(res => {
-              if (res.status === 0 && !this.isAborted) {
+              if (res.status === 0) {
                 if (onRetry) {
                   onRetry(res, () => {
                     this.isAborted = true;
