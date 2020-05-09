@@ -17,7 +17,7 @@
       :subtopicDisplayNames="card.subtopicDisplayNames"
       :button-text="card.buttonText"
       :routeTo="card.routeTo"
-      :disableSubjectCard="disableSubjectCard"
+      :disableSubjectCard="isCardDisabled(card)"
     />
   </div>
 </template>
@@ -61,7 +61,8 @@ export default {
           .reduce((result, [subtopicKey, displayName]) => {
             result[subtopicKey] = displayName;
             return result;
-          }, {})
+          }, {}),
+        isTutoringCard: true
       };
     });
 
@@ -163,6 +164,9 @@ export default {
       } else {
         this.hasWaitingPeriod = false;
       }
+    },
+    isCardDisabled(card) {
+      return card.isTutoringCard && this.disableSubjectCard;
     }
   }
 };
