@@ -158,7 +158,7 @@ export default {
         }
       })
       .catch(err => {
-        if (err.status !== 0) {
+        if (err.status !== 0 && err.code !== "EUSERABORTED") {
           window.alert("Could not start new help session");
         }
         this.$router.replace("/");
