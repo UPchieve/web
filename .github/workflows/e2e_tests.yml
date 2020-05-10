@@ -13,7 +13,7 @@ jobs:
 
     steps:
     # To save time, detach and pull some of the largest docker files
-    - run: (docker pull mongo:4.2.3-bionic && docker pull cypress/included:3.4.1) &
+    - run: (docker pull mongo:4.2.3-bionic && docker pull node:11) &
     - uses: actions/setup-node@v1
       with:
         node-version: '11.7.0'
@@ -33,6 +33,7 @@ jobs:
     - run: cd server && mkdir mongo-volume && docker-compose up -d
     - run: sleep 5
     - run: cd web && npm install
+    - run: ls /home/runner/work/web/web/
     - uses: cypress-io/github-action@v1
       with:
         browser: chrome
