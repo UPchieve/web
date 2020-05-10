@@ -37,3 +37,4 @@ jobs:
       with:
         browser: chrome
         start: npm run e2e
+        config-file: web/cypress.json
