@@ -30,7 +30,7 @@ jobs:
       with:
         path: 'web'
     # Create an empty directory to use for the volume, and start the container
-    - run: cd server && mkdir mongo-volume && docker-compose up
+    - run: cd server && cp config.example.js config.js && mkdir mongo-volume && docker-compose up
     - run: sleep 5
     - run: cd web && npm install
     - uses: cypress-io/github-action@v1
