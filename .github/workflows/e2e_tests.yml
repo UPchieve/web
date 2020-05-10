@@ -13,7 +13,7 @@ jobs:
 
     steps:
     # To save time, detach and pull some of the largest docker files
-    - run: (docker pull mongo:4.2.3-bionic && docker pull node:11) &
+    - run: (docker pull node:11 && docker pull mongo:4.2.3-bionic) &
     - uses: actions/setup-node@v1
       with:
         node-version: '11.7.0'
