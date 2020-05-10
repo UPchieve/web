@@ -33,9 +33,8 @@ jobs:
     - run: cd server && mkdir mongo-volume && docker-compose up -d
     - run: sleep 5
     - run: cd web && npm install
-    - run: ls /home/runner/work/web/web/
     - uses: cypress-io/github-action@v1
       with:
+        working-directory: ./web
         browser: chrome
         start: npm run e2e
-        config-file: web/cypress.json
