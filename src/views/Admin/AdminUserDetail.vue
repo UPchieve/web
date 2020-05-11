@@ -1,6 +1,28 @@
 <template>
   <div v-if="user._id" class="user-detail">
     <div class="user-detail__body">
+      <div>
+        <span
+          v-if="user.isAdmin"
+          class="user-detail__account-notice user-detail__account-notice--admin"
+          >Admin</span
+        >
+        <span
+          v-if="user.isBanned"
+          class="user-detail__account-notice user-detail__account-notice--ban"
+          >Banned</span
+        >
+        <span
+          v-if="user.isTestUser"
+          class="user-detail__account-notice user-detail__account-notice--test"
+          >Test account</span
+        >
+        <span
+          v-if="user.isFakeUser"
+          class="user-detail__account-notice user-detail__account-notice--fake"
+          >Fake account</span
+        >
+      </div>
       <div class="user-detail__title">
         {{ user.firstname }} {{ user.lastname }}
       </div>
@@ -114,6 +136,32 @@ export default {
     color: $c-secondary-grey;
     font-size: 18px;
     margin-bottom: 20px;
+  }
+
+  &__account-notice {
+    margin-right: 8px;
+    font-size: 14px;
+    border-radius: 3px;
+    background: #000;
+    color: #fff;
+    padding: 5px 7px;
+    font-weight: 500;
+
+    &--ban {
+      background: $c-error-red;
+    }
+
+    &--test {
+      background: $c-warning-orange;
+    }
+
+    &--fake {
+      background: #9e5fff;
+    }
+
+    &--admin {
+      background: $c-success-green;
+    }
   }
 
   &__section {
