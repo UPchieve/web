@@ -5,7 +5,7 @@
     </div>
     <div class="user-preview__middle">
       <div class="user-preview__title">
-        {{ user.firstname }} {{ user.lastname }}
+        {{ user.firstname }}
       </div>
       <div class="user-preview__subtitle">joined {{ userSince }}</div>
     </div>
