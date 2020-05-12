@@ -186,7 +186,15 @@ export default {
       }
     },
     connect() {
-      if (!this.isSessionConnectionAlive) {
+      this.$store.dispatch("user/sessionConnected");
+
+      if (!this.session || !this.session._id 
+        || (
+          (!this.session.student || this.session.student._id !== this.user._id) &&
+          (!this.session.volunteer || this.session.volunteer._id !== this.user._id)
+        )
+      ) {
+        // join the session if we haven't done so already
         this.joinSession(this.session._id);
       }
     }
