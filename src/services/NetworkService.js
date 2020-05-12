@@ -19,47 +19,46 @@ export default {
     return Promise.reject(res);
   },
   _faultTolerantHttp(http, method, onRetry, url, data) {
-    return {
-      isAborted: false,
-      retryHttp: function() {
-        return promiseRetry(
-          retry => {
-            if (this.isAborted) {
-              // early exit
-              return Promise.reject(
-                errcode(new Error("Aborted by user"), "EUSERABORTED")
-              );
+    const promiseToRetry = () => {
+      return (
+        ["get", "delete", "head", "jsonp"].indexOf(method) !== -1
+          ? http[method](url, {
+              timeout: FAULT_TOLERANT_HTTP_TIMEOUT
+            })
+          : http[method](url, data, {
+              timeout: FAULT_TOLERANT_HTTP_TIMEOUT
+            })
+      ).then(this._successHandler, this._errorHandler);
+    };
+
+    // object property specifying whether this function is aborted
+    const requestState = { isAborted: false }
+
+    return promiseRetry(
+      retry => {
+        if (requestState.isAborted) {
+          // early exit
+          throw errcode(new Error("Aborted by user"), "EUSERABORTED");
+        }
+
+        return promiseToRetry().catch(res => {
+          if (res.status === 0) {
+            if (onRetry) {
+              onRetry(res, () => {
+                requestState.isAborted = true;
+              });
             }
-
-            const promise =
-              ["get", "delete", "head", "jsonp"].indexOf(method) !== -1
-                ? http[method](url, {
-                    timeout: FAULT_TOLERANT_HTTP_TIMEOUT
-                  }).then(this._successHandler, this._errorHandler)
-                : http[method](url, data, {
-                    timeout: FAULT_TOLERANT_HTTP_TIMEOUT
-                  }).then(this._successHandler, this._errorHandler);
-
-            return promise.catch(res => {
-              if (res.status === 0) {
-                if (onRetry) {
-                  onRetry(res, () => {
-                    this.isAborted = true;
-                  });
-                }
-                retry(res);
-              }
-
-              throw res;
-            });
-          },
-          {
-            retries: FAULT_TOLERANT_HTTP_MAX_RETRIES,
-            maxTimeout: FAULT_TOLERANT_HTTP_MAX_RETRY_TIMEOUT
+            retry(res);
           }
-        );
+
+          throw res;
+        });
+      },
+      {
+        retries: FAULT_TOLERANT_HTTP_MAX_RETRIES,
+        maxTimeout: FAULT_TOLERANT_HTTP_MAX_RETRY_TIMEOUT
       }
-    }.retryHttp();
+    );
   },
 
   // Server route defintions
