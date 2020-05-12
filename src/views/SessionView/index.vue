@@ -149,7 +149,6 @@ export default {
 
     promise
       .then(sessionId => {
-        this.$store.dispatch("user/updateSession", { _id: sessionId });
         this.$socket.io.opts.transports = ["polling", "websocket"];
         if (this.$socket.connected) {
           this.joinSession(sessionId);
@@ -188,14 +187,16 @@ export default {
     connect() {
       this.$store.dispatch("user/sessionConnected");
 
-      if (!this.session || !this.session._id 
-        || (
+      if (this.session && this.session._id) {
+        if (
           (!this.session.student || this.session.student._id !== this.user._id) &&
           (!this.session.volunteer || this.session.volunteer._id !== this.user._id)
-        )
-      ) {
-        // join the session if we haven't done so already
-        this.joinSession(this.session._id);
+        ) {
+          // join the session if we haven't done so already
+          this.joinSession(this.session._id);
+        }
+      } else if (this.$route.params.sessionId) {
+        this.joinSession(this.$route.params.sessionId);
       }
     }
   },
