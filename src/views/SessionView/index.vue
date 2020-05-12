@@ -55,7 +55,7 @@ import Whiteboard from "./Whiteboard";
 import SessionChat from "./SessionChat";
 
 import SessionFulfilledModal from "./SessionFulfilledModal";
-import TroubleStartingModal from "./TroubleStartingModal";
+import ConnectionTroubleModal from "./ConnectionTroubleModal";
 
 const headerData = {
   component: "SessionHeader"
@@ -230,9 +230,18 @@ export default {
       });
     },
     showTroubleStartingModal(abort) {
+      const TROUBLE_STARTING_MESSAGE = `
+        The system seems to be having a problem starting your new session.
+        Please check your Internet connection.
+      `;
+      
+      this.showConnectionTroubleModal(abort, TROUBLE_STARTING_MESSAGE);
+    },
+    showConnectionTroubleModal(abort, message) {
       this.$store.dispatch("app/modal/show", {
-        component: TroubleStartingModal,
+        component: ConnectionTroubleModal,
         data: {
+          message,
           acceptText: "Abort Session",
           alertModal: true,
           abortFunction: abort

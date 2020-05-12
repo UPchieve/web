@@ -1,9 +1,8 @@
 <template>
-  <div class="TroubleStartingModal">
-    <h1 class="TroubleStartingModal-title">Connection Problems</h1>
-    <div class="TroubleStartingModal-message">
-      The system seems to be having a problem starting your new session. Please
-      check your Internet connection.
+  <div class="ConnectionTroubleModal">
+    <h1 class="ConnectionTroubleModal-title">Connection Problems</h1>
+    <div class="ConnectionTroubleModal-message">
+      {{ modalData.message }}
     </div>
     <large-button v-if="mobileMode" primary @click.native="onAccept">{{
       modalData.acceptText
@@ -36,7 +35,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.TroubleStartingModal {
+.ConnectionTroubleModal {
   @include flex-container(column);
   @include child-spacing(top, 24px);
   @include breakpoint-above("medium") {
@@ -44,14 +43,14 @@ export default {
   }
 }
 
-.TroubleStartingModal-title {
+.ConnectionTroubleModal-title {
   @include font-category("display-small");
   @include breakpoint-above("medium") {
     margin-top: 24px;
   }
 }
 
-.TroubleStartingModal-message {
+.ConnectionTroubleModal-message {
   @include font-category("body");
 }
 </style>
