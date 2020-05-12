@@ -143,7 +143,15 @@ export default {
       );
       this.isNewSession = true;
     } else {
-      promise = SessionService.useExistingSession(this, id);
+      promise = SessionService.useExistingSession(
+        this, 
+        id,
+        {
+          onRetry: (res, abort) => {
+            this.showTroubleJoiningModal(abort);
+          }
+        }
+      );
       this.isNewSession = false;
     }
 
@@ -236,6 +244,14 @@ export default {
       `;
       
       this.showConnectionTroubleModal(abort, TROUBLE_STARTING_MESSAGE);
+    },
+    showTroubleJoiningModal(abort) {
+      const TROUBLE_JOINING_MESSAGE = `
+        The system seems to be having a problem joining your session.
+        Please check your Internet connection.
+      `;
+      
+      this.showConnectionTroubleModal(abort, TROUBLE_JOINING_MESSAGE);
     },
     showConnectionTroubleModal(abort, message) {
       this.$store.dispatch("app/modal/show", {

@@ -66,9 +66,14 @@ export default {
     });
   },
 
-  useExistingSession(context, sessionId) {
-    return NetworkService.checkSession(context, { sessionId })
-      .then(res => {
+  useExistingSession(context, sessionId, options) {
+    const onRetry = options && options.onRetry;
+
+    return NetworkService.checkSession(
+      context, 
+      { sessionId },
+      onRetry
+    ).then(res => {
         const data = res.data || {};
         const { sessionId } = data;
 
