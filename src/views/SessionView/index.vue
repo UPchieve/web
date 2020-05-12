@@ -100,7 +100,8 @@ export default {
       isSessionConnectionAlive: state => state.user.isSessionConnectionAlive
     }),
     ...mapGetters({
-      mobileMode: "app/mobileMode"
+      mobileMode: "app/mobileMode",
+      isAuthenticated: "user/isAuthenticated"
     }),
 
     shouldHideWhiteboardSection() {
@@ -157,6 +158,11 @@ export default {
 
     promise
       .then(sessionId => {
+        // ensure we restore user when we get a successful response
+        if (!this.isAuthenticated) {
+          this.$store.dispatch("user/fetchUser");
+        }
+
         this.$socket.io.opts.transports = ["polling", "websocket"];
         if (this.$socket.connected) {
           this.joinSession(sessionId);
