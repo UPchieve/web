@@ -126,7 +126,7 @@
     </div>
 
     <div class="uc-column">
-      <label for="phoneNumber" class="uc-form-label">Phone Number</label>
+      <label for="phoneNumber" class="uc-form-label">Cell Phone Number</label>
       <vue-phone-number-input
         id="phoneNumber"
         class="phone-input"
@@ -137,6 +137,10 @@
         valid-color="#16ba97"
         @update="onPhoneInputUpdate"
       />
+      <p class="uc-form-subtext">
+        UPchieve notifies volunteers of incoming student requests via text. You
+        can customize when you receive requests.
+      </p>
     </div>
 
     <div class="uc-column">
