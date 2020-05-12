@@ -48,7 +48,7 @@
         <div>{{ user.zipCode }}</div>
       </div>
     </div>
-    <sessions-list :sessions="sessions" />
+    <sessions-list :sessions="user.pastSessions" />
   </div>
 </template>
 
@@ -77,10 +77,6 @@ export default {
   },
 
   computed: {
-    sessions() {
-      return [...this.user.pastSessions].reverse();
-    },
-
     createdAt() {
       return moment(this.user.createdAt).format("l, h:mm a");
     },
