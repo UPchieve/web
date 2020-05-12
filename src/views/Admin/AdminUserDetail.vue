@@ -48,7 +48,10 @@
         <div>{{ user.zipCode }}</div>
       </div>
     </div>
-    <sessions-list :sessions="user.pastSessions" />
+    <sessions-list
+      v-if="user.pastSessions.length"
+      :sessions="user.pastSessions"
+    />
   </div>
 </template>
 
