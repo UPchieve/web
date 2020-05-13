@@ -166,7 +166,8 @@ export default {
       }
     },
     isCardDisabled(card) {
-      return card.isTutoringCard && this.disableSubjectCard;
+      console.log(this.isSessionAlive);
+      return card.isTutoringCard && (this.disableSubjectCard || this.isSessionAlive);
     }
   }
 };
