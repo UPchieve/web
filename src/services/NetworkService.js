@@ -166,6 +166,11 @@ export default {
       .get(`${API_ROOT}/session/${sessionId}`)
       .then(this._successHandler, this._errorHandler);
   },
+  adminGetUser(userId) {
+    return Vue.http
+      .get(`${API_ROOT}/user/${userId}`)
+      .then(this._successHandler, this._errorHandler);
+  },
   getQuestions(context, data) {
     return context.$http
       .post(`${API_ROOT}/training/questions`, data)
