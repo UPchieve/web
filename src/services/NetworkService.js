@@ -20,19 +20,18 @@ export default {
   },
   _faultTolerantHttp(http, method, onRetry, url, data) {
     const promiseToRetry = () => {
-      return (
-        ["get", "delete", "head", "jsonp"].indexOf(method) !== -1
-          ? http[method](url, {
-              timeout: FAULT_TOLERANT_HTTP_TIMEOUT
-            })
-          : http[method](url, data, {
-              timeout: FAULT_TOLERANT_HTTP_TIMEOUT
-            })
+      return (["get", "delete", "head", "jsonp"].indexOf(method) !== -1
+        ? http[method](url, {
+            timeout: FAULT_TOLERANT_HTTP_TIMEOUT
+          })
+        : http[method](url, data, {
+            timeout: FAULT_TOLERANT_HTTP_TIMEOUT
+          })
       ).then(this._successHandler, this._errorHandler);
     };
 
     // object property specifying whether this function is aborted
-    const requestState = { isAborted: false }
+    const requestState = { isAborted: false };
 
     return promiseRetry(
       retry => {

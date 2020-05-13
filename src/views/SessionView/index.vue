@@ -144,15 +144,11 @@ export default {
       );
       this.isNewSession = true;
     } else {
-      promise = SessionService.useExistingSession(
-        this, 
-        id,
-        {
-          onRetry: (res, abort) => {
-            this.showTroubleJoiningModal(abort);
-          }
+      promise = SessionService.useExistingSession(this, id, {
+        onRetry: (res, abort) => {
+          this.showTroubleJoiningModal(abort);
         }
-      );
+      });
       this.isNewSession = false;
     }
 
@@ -203,8 +199,10 @@ export default {
 
       if (this.session && this.session._id) {
         if (
-          (!this.session.student || this.session.student._id !== this.user._id) &&
-          (!this.session.volunteer || this.session.volunteer._id !== this.user._id)
+          (!this.session.student ||
+            this.session.student._id !== this.user._id) &&
+          (!this.session.volunteer ||
+            this.session.volunteer._id !== this.user._id)
         ) {
           // join the session if we haven't done so already
           this.joinSession(this.session._id);
@@ -238,17 +236,21 @@ export default {
       }
     },
     joinSession(sessionId) {
-      this.$queuedSocket.emit("join", {
-        sessionId,
-        user: this.user
-      }, 1);
+      this.$queuedSocket.emit(
+        "join",
+        {
+          sessionId,
+          user: this.user
+        },
+        1
+      );
     },
     showTroubleStartingModal(abort) {
       const TROUBLE_STARTING_MESSAGE = `
         The system seems to be having a problem starting your new session.
         Please check your Internet connection.
       `;
-      
+
       this.showConnectionTroubleModal(abort, TROUBLE_STARTING_MESSAGE);
     },
     showTroubleJoiningModal(abort) {
@@ -256,7 +258,7 @@ export default {
         The system seems to be having a problem joining your session.
         Please check your Internet connection.
       `;
-      
+
       this.showConnectionTroubleModal(abort, TROUBLE_JOINING_MESSAGE);
     },
     showConnectionTroubleModal(abort, message) {
