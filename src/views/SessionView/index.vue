@@ -173,9 +173,9 @@ export default {
       .catch(err => {
         if (err.status !== 0 && err.code !== "EUSERABORTED") {
           window.alert("Could not start new help session");
+          Sentry.captureException(err);
         }
         this.$router.replace("/");
-        Sentry.captureException(err);
       });
   },
   sockets: {
