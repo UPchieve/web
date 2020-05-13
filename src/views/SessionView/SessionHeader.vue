@@ -127,8 +127,6 @@ export default {
         }
       }
 
-      this.$store.dispatch("user/clearSession");
-
       let studentId = "";
       let volunteerId = null;
       let subTopic = null;
