@@ -174,9 +174,6 @@ export default {
   },
   sockets: {
     "session-change"(sessionData) {
-      SessionService.currentSession.sessionId = sessionData._id;
-      SessionService.currentSession.data = sessionData;
-
       this.$store.dispatch("user/updateSession", sessionData);
     }
   }

@@ -72,7 +72,6 @@ import LoadingMessage from "@/components/LoadingMessage";
 export default {
   data() {
     return {
-      currentSession: SessionService.currentSession,
       connectionMsg: "",
       connectionMsgType: "",
       reconnectAttemptMsg: ""
@@ -83,7 +82,8 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: state => state.user.user,
+      session: state => state.user.session
     }),
     ...mapGetters({
       sessionPartner: "user/sessionPartner",
@@ -133,34 +133,22 @@ export default {
       let volunteerId = null;
       let subTopic = null;
       let topic = null;
-      let sessionId = SessionService.currentSession.sessionId;
+      let sessionId = this.session._id;
 
-      if (
-        SessionService.currentSession &&
-        SessionService.currentSession.data.student
-      ) {
-        studentId = SessionService.currentSession.data.student._id;
+      if (this.session.student) {
+        studentId = this.session.student._id;
       }
 
-      if (
-        SessionService.currentSession &&
-        SessionService.currentSession.data.volunteer
-      ) {
-        volunteerId = SessionService.currentSession.data.volunteer._id;
+      if (this.session.volunteer) {
+        volunteerId = this.session.volunteer._id;
       }
 
-      if (
-        SessionService.currentSession &&
-        SessionService.currentSession.data.type
-      ) {
-        topic = SessionService.currentSession.data.type;
+      if (this.session.type) {
+        topic = this.session.type;
       }
 
-      if (
-        SessionService.currentSession &&
-        SessionService.currentSession.data.subTopic
-      ) {
-        subTopic = SessionService.currentSession.data.subTopic;
+      if (this.session.subTopic) {
+        subTopic = this.session.subTopic;
       }
 
       SessionService.endSession(this, sessionId)

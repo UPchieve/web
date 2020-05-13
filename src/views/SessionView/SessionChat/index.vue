@@ -83,7 +83,6 @@ export default {
   components: { ChatBot },
   data() {
     return {
-      currentSession: SessionService.currentSession,
       newMessage: "",
       chatWarningIsShown: false,
       typingTimeout: null,
@@ -93,6 +92,7 @@ export default {
   computed: {
     ...mapState({
       user: state => state.user.user,
+      currentSession: state => state.user.session,
       messages: state =>
         (state.user.session.messages || []).map(message => {
           // compute avatar style from picture
@@ -126,7 +126,7 @@ export default {
     },
     showNewMessage(message) {
       this.$socket.emit("message", {
-        sessionId: this.currentSession.sessionId,
+        sessionId: this.currentSession._id,
         user: this.user,
         message
       });
@@ -137,7 +137,7 @@ export default {
     notTyping() {
       // Tell the server that the user is no longer typing
       this.$socket.emit("notTyping", {
-        sessionId: this.currentSession.sessionId
+        sessionId: this.currentSession._id
       });
     },
     handleMessage(event) {
@@ -170,7 +170,7 @@ export default {
 
       // Typing handler for when non-Enter/Backspace keys are pressed
       this.$socket.emit("typing", {
-        sessionId: this.currentSession.sessionId
+        sessionId: this.currentSession._id
       });
 
       /** Every time a key is pressed, set an inactive timer

@@ -5,24 +5,18 @@ import errorFromHttpResponse from "../utils/error-from-http-response.js";
 
 export default {
   loading: false,
-  currentSession: {
-    sessionId: null,
-    data: {}
-  },
 
   endSession(context, sessionId) {
     return NetworkService.endSession(context, { sessionId }).then(() => {
+      const currentSessionData = context.$store.state.user.session;
       context.$store.dispatch("user/clearSession");
 
       // analytics: track when a help session has ended
       AnalyticsService.trackSessionEnded(
         context,
-        this.currentSession.data,
+        currentSessionData,
         context.$store.state.user.isFakeUser
       );
-
-      this.currentSession.sessionId = null;
-      this.currentSession.data = {};
     });
   },
 
@@ -40,7 +34,10 @@ export default {
       const data = res.data || {};
       const { sessionId } = data;
 
-      this.currentSession.sessionId = sessionId;
+      const currentSession = {
+        sessionId,
+        data: context.$store.state.user.session
+      }
 
       if (sessionId) {
         const sessionData = {
@@ -56,7 +53,7 @@ export default {
       // analytics: track when a session has started
       AnalyticsService.trackSessionStarted(
         context,
-        this.currentSession,
+        currentSession,
         sessionType,
         sessionSubTopic,
         context.$store.state.user.isFakeUser
@@ -76,8 +73,6 @@ export default {
     ).then(res => {
         const data = res.data || {};
         const { sessionId } = data;
-
-        this.currentSession.sessionId = sessionId;
 
         return sessionId;
       })
@@ -100,16 +95,10 @@ export default {
         const { type, subTopic } = data;
 
         if (type && subTopic && sessionId) {
-          this.currentSession.sessionId = sessionId;
-          this.currentSession.data = data;
-
           return Promise.resolve({ sessionData: data });
         }
       })
       .catch(resp => {
-        this.currentSession.sessionId = null;
-        this.currentSession.data = {};
-
         throw errorFromHttpResponse(resp);
       });
   },
