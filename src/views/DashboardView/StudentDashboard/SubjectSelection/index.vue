@@ -166,7 +166,6 @@ export default {
       }
     },
     isCardDisabled(card) {
-      console.log(this.isSessionAlive);
       return card.isTutoringCard && (this.disableSubjectCard || this.isSessionAlive);
     }
   }
