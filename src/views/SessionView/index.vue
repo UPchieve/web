@@ -238,10 +238,10 @@ export default {
       }
     },
     joinSession(sessionId) {
-      this.$socket.emit("join", {
+      this.$queuedSocket.emit("join", {
         sessionId,
         user: this.user
-      });
+      }, 1);
     },
     showTroubleStartingModal(abort) {
       const TROUBLE_STARTING_MESSAGE = `
