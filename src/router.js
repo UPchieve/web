@@ -25,6 +25,7 @@ import AdminView from "./views/Admin";
 import VolunteerCoverage from "./views/Admin/VolunteerCoverage";
 import AdminSessions from "./views/Admin/AdminSessions";
 import AdminSessionDetail from "./views/Admin/AdminSessionDetail";
+import AdminUserDetail from "./views/Admin/AdminUserDetail";
 import VolunteerGuideView from "./views/VolunteerGuideView";
 import ReviewMaterialsView from "./views/ReviewMaterialsView";
 
@@ -229,6 +230,12 @@ const routes = [
     path: "/admin/sessions/:sessionId",
     name: "AdminSessionDetail",
     component: AdminSessionDetail,
+    meta: { protected: true, requiresAdmin: true }
+  },
+  {
+    path: "/admin/users/:userId",
+    name: "AdminUserDetail",
+    component: AdminUserDetail,
     meta: { protected: true, requiresAdmin: true }
   },
   {

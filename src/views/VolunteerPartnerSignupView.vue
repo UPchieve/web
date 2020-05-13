@@ -161,7 +161,7 @@
 
         <div class="uc-column">
           <label for="phoneNumber" class="uc-form-label"
-            >What's your phone number?</label
+            >What's your cell phone number?</label
           >
           <vue-phone-number-input
             id="phoneNumber"
@@ -176,8 +176,8 @@
             @update="onPhoneInputUpdate"
           />
           <p class="uc-form-subtext">
-            We only use this to notify you of incoming student requests. You can
-            customize when you receive requests.
+            UPchieve notifies volunteers of incoming student requests via text.
+            You can customize when you receive requests.
           </p>
         </div>
 
