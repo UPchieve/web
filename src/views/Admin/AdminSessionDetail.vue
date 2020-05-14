@@ -1,9 +1,5 @@
 <template>
   <div v-if="session._id" class="session-detail">
-    <router-link class="back-button" to="/admin/sessions"
-      >← Back to sessions</router-link
-    >
-
     <div class="session-detail__title">{{ session.subTopic }} session</div>
     <div class="session-detail__subtitle">ID: {{ session._id }}</div>
 
