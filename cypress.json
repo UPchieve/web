@@ -1,5 +1,6 @@
 {
   "pluginsFile": "tests/e2e/plugins/index.js",
+  "integrationFolder": "tests/e2e/specs",
   "env": {
     "CLIENT_ROOT": "http://localhost:8080",
     "SERVER_ROOT": "http://localhost:3000"
