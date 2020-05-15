@@ -98,6 +98,24 @@ Cypress.Commands.add("getVerificationToken", userid => {
   }).its("body.verificationToken");
 });
 
+Cypress.Commands.add("createNewSession", ({ sessionSubTopic, sessionType }) => {
+  const createNewSessionUrl = `${API_ROOT}/session/new`;
+
+  return cy
+    .request({
+      url: createNewSessionUrl,
+      method: "POST",
+      body: {
+        sessionSubTopic,
+        sessionType
+      }
+    })
+    .then(response => {
+      const { sessionId } = response.body;
+      return sessionId;
+    });
+});
+
 Cypress.Commands.add("getSessionId", url => {
   let index = url.length - 1;
 
