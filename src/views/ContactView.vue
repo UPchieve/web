@@ -48,8 +48,9 @@
             class="contact-form__submit"
             primary
             @click.native="submitContactUs"
-            >Send</large-button
           >
+            <span v-html="sendLabel"></span>
+          </large-button>
         </div>
       </div>
     </div>
@@ -60,6 +61,12 @@
 import { mapGetters } from "vuex";
 import NetworkService from "../services/NetworkService";
 import LargeButton from "@/components/LargeButton";
+
+const sendStates = {
+  UNSENT: "Send",
+  SENT: "Sent",
+  ERROR: "Error"
+};
 
 export default {
   name: "contact-view",
@@ -84,14 +91,24 @@ export default {
         email: "",
         topic: contactTopics[0],
         message: ""
-      }
+      },
+      sendState: sendStates.UNSENT
     };
   },
   computed: {
     ...mapGetters({
       isAuthenticated: "user/isAuthenticated"
     }),
-
+    sendLabel() {
+      switch (this.sendState) {
+        case sendStates.ERROR:
+          return "There was an error sending your feedback";
+        case sendStates.SENT:
+          return "Your feedback has been sent";
+        default:
+          return "Send";
+      }
+    },
     hasValidEmail() {
       if (!this.isAuthenticated) return false;
 
@@ -114,6 +131,7 @@ export default {
         !this.isValidEmail(this.contactFormData.email)
       ) {
         alert("A valid email is required.");
+        this.sendState = sendStates.ERROR;
       } else {
         if (this.hasValidEmail) {
           this.contactFormData.email = this.$store.state.user.user.email;
@@ -122,7 +140,7 @@ export default {
         NetworkService.sendContact(this, {
           responseData: this.contactFormData
         });
-        this.$router.push("/");
+        this.sendState = sendStates.SENT;
       }
     },
     isValidEmail(address) {
