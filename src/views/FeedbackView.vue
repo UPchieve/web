@@ -106,9 +106,7 @@
               >
                 <input
                   :id="
-                    `radio-list-option_${
-                      question.options_alias[subquestion_index]
-                    }`
+                    `radio-list-option_${question.options_alias[subquestion_index]}`
                   "
                   class="radio-list__option-input"
                   v-model="userResponse[question.alias]"
@@ -119,9 +117,7 @@
                 <label
                   class="radio-list__option-label"
                   :for="
-                    `radio-list-option_${
-                      question.options_alias[subquestion_index]
-                    }`
+                    `radio-list-option_${question.options_alias[subquestion_index]}`
                   "
                 >
                   {{ subquestion }}
