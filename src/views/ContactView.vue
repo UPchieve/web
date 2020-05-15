@@ -63,7 +63,7 @@ import NetworkService from "../services/NetworkService";
 import LargeButton from "@/components/LargeButton";
 
 const sendStates = {
-  UNSENT: "Send",
+  UNSENT: "Unsent",
   SENT: "Sent",
   ERROR: "Error"
 };
