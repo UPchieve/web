@@ -13,7 +13,7 @@ jobs:
 
     steps:
     # To save time, detach and pull some of the largest docker files
-    - run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+    - run: echo "${GITHUB_REF##*/}"
     # - run: (docker pull node:11 && docker pull mongo:4.2.3-bionic) &
     # - uses: actions/setup-node@v1
     #   with:
