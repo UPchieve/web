@@ -21,11 +21,18 @@ jobs:
     # - run: mkdir server
     # - run: mkdir web
     # # Checks-out tthe server repository under $GITHUB_WORKSPACE/server
-    - uses: actions/checkout@v2
+    - name: Checkout a matching feature branch from server repo (IF THIS FAILS THAT IS FINE)
+      uses: actions/checkout@v2
       with:
         repository: 'upchieve/server'
         path: 'server'
         ref: ${{ github.head_ref }}
+    - name: Checkout a master branch from server repo (this should not fail)
+      if: ${{ failure() }}
+      uses: actions/checkout@v2
+      with:
+        repository: 'upchieve/server'
+        path: 'server'
     # # Checks-out this web repository under $GITHUB_WORKSPACE/web
     # - uses: actions/checkout@v2
     #   with:
