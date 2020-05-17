@@ -29,7 +29,10 @@
       <div class="button-container">
         <div class="end-session">
           <button class="btn btn-lg btn-block" @click.prevent="end">
-            <span v-if="isSessionWaitingForVolunteer">
+            <span v-if="didEndSession">
+              Ending session ...
+            </span>
+            <span v-else-if="isSessionWaitingForVolunteer">
               Cancel
             </span>
             <span v-else-if="isSessionOver">
@@ -75,7 +78,8 @@ export default {
       currentSession: SessionService.currentSession,
       connectionMsg: "",
       connectionMsgType: "",
-      reconnectAttemptMsg: ""
+      reconnectAttemptMsg: "",
+      didEndSession: false
     };
   },
   components: {
@@ -126,6 +130,11 @@ export default {
           return;
         }
       }
+
+      if (this.didEndSession) {
+        return;
+      }
+      this.didEndSession = true;
 
       this.$store.dispatch("user/clearSession");
 
@@ -193,6 +202,7 @@ export default {
       }
     },
     alertCouldNotEnd() {
+      this.didEndSession = false;
       window.alert("Could not end session");
     },
     tryReconnect() {
