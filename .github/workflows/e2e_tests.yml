@@ -13,7 +13,6 @@ jobs:
 
     steps:
     # To save time, detach and pull some of the largest docker files
-    - run: echo "${GITHUB_REF##*/}"
     # - run: (docker pull node:11 && docker pull mongo:4.2.3-bionic) &
     # - uses: actions/setup-node@v1
     #   with:
@@ -22,11 +21,11 @@ jobs:
     # - run: mkdir server
     # - run: mkdir web
     # # Checks-out tthe server repository under $GITHUB_WORKSPACE/server
-    # - uses: actions/checkout@v2
-    #   with:
-    #     repository: 'upchieve/server'
-    #     path: 'server'
-    #     ref: ''
+    - uses: actions/checkout@v2
+      with:
+        repository: 'upchieve/server'
+        path: 'server'
+        ref: ${{ github.head_ref }}
     # # Checks-out this web repository under $GITHUB_WORKSPACE/web
     # - uses: actions/checkout@v2
     #   with:
