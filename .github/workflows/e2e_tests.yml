@@ -13,28 +13,30 @@ jobs:
 
     steps:
     # To save time, detach and pull some of the largest docker files
-    - run: (docker pull node:11 && docker pull mongo:4.2.3-bionic) &
-    - uses: actions/setup-node@v1
-      with:
-        node-version: '11.7.0'
-    # Create directories to put in web and server
-    - run: mkdir server
-    - run: mkdir web
-    # Checks-out tthe server repository under $GITHUB_WORKSPACE/server
-    - uses: actions/checkout@v2
-      with:
-        repository: 'upchieve/server'
-        path: 'server'
-    # Checks-out this web repository under $GITHUB_WORKSPACE/web
-    - uses: actions/checkout@v2
-      with:
-        path: 'web'
-    # Create an empty directory to use for the volume, and start the container
-    - run: cd server && cp config.example.ts config.ts && mkdir mongo-volume && docker-compose up -d
-    - run: sleep 60
-    - run: cd web && npm install
-    - uses: cypress-io/github-action@v1
-      with:
-        working-directory: ./web
-        browser: chrome
-        start: npm run e2e
+    - run: echo $GITHUB_REF
+    # - run: (docker pull node:11 && docker pull mongo:4.2.3-bionic) &
+    # - uses: actions/setup-node@v1
+    #   with:
+    #     node-version: '11.7.0'
+    # # Create directories to put in web and server
+    # - run: mkdir server
+    # - run: mkdir web
+    # # Checks-out tthe server repository under $GITHUB_WORKSPACE/server
+    # - uses: actions/checkout@v2
+    #   with:
+    #     repository: 'upchieve/server'
+    #     path: 'server'
+    #     ref: ''
+    # # Checks-out this web repository under $GITHUB_WORKSPACE/web
+    # - uses: actions/checkout@v2
+    #   with:
+    #     path: 'web'
+    # # Create an empty directory to use for the volume, and start the container
+    # - run: cd server && cp config.example.ts config.ts && mkdir mongo-volume && docker-compose up -d
+    # - run: sleep 60
+    # - run: cd web && npm install
+    # - uses: cypress-io/github-action@v1
+    #   with:
+    #     working-directory: ./web
+    #     browser: chrome
+    #     start: npm run e2e
