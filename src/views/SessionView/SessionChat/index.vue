@@ -74,7 +74,7 @@ import _ from "lodash";
 import { mapState, mapGetters } from "vuex";
 
 import ChatBot from "./ChatBot";
-import LoadingMessage from "@/components/LoadingMessage"
+import LoadingMessage from "@/components/LoadingMessage";
 import ModerationService from "@/services/ModerationService";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
 import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
