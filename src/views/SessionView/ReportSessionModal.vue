@@ -2,18 +2,22 @@
   <div class="report-modal">
     <h1 class="report-modal__title">Report this session</h1>
     <h2 class="report-modal__subtitle">
-      Here's some copy explaining when you should report a session
+      We encourage volunteers to report sessions in which students have either
+      misused the platform (e.g., by not seeking or actively participating in
+      tutoring) or not treated you with respect (e.g., by getting impatient or
+      swearing). We will review the entire chat log and, if needed, issue the
+      student a warning or take disciplinary action.
     </h2>
     <textarea
       class="report-modal__message"
       v-model="reportMessage"
-      placeholder="(Optional) Explain what happened"
+      placeholder="(Optional) Write a 1-2 sentence summary of why you're reporting the student"
       rows="3"
     />
     <div class="report-modal__footer">
       <div class="report-modal__buttons">
         <large-button @click.native="cancel">Cancel</large-button>
-        <large-button primary @click.native="submit">Submit</large-button>
+        <large-button primary @click.native="submit">Report</large-button>
       </div>
     </div>
   </div>
@@ -74,6 +78,7 @@ export default {
   &__subtitle {
     @include font-category("body");
     color: $c-secondary-grey;
+    font-size: 15px;
   }
 
   &__message {
