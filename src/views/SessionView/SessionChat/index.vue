@@ -9,17 +9,23 @@
     />
 
     <div class="message-box">
-      <transition name="chat-warning--slide">
-        <div class="chat-warning" v-show="chatWarningIsShown">
+      <transition name="chat-warning">
+        <div
+          class="chat-warning chat-warning--moderation"
+          v-show="moderationWarningIsShown"
+        >
           Messages cannot contain personal information or profanity
           <span class="chat-warning__close" @click="hideModerationWarning"
             >×</span
           >
         </div>
       </transition>
-      <transition name="chat-warning--slide">
-        <div class="chat-warning" v-show="isSessionConnectionFailure">
-          Please check your Internet connection
+      <transition name="chat-warning">
+        <div
+          class="chat-warning chat-warning--connection"
+          v-show="isSessionConnectionFailure"
+        >
+          <loading-message message="Attempting to connect" />
         </div>
       </transition>
 
@@ -68,6 +74,7 @@ import _ from "lodash";
 import { mapState, mapGetters } from "vuex";
 
 import ChatBot from "./ChatBot";
+import LoadingMessage from "@/components/LoadingMessage"
 import ModerationService from "@/services/ModerationService";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
 import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
@@ -79,11 +86,11 @@ import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
  */
 export default {
   name: "session-chat",
-  components: { ChatBot },
+  components: { ChatBot, LoadingMessage },
   data() {
     return {
       newMessage: "",
-      chatWarningIsShown: false,
+      moderationWarningIsShown: false,
       typingTimeout: null,
       typingIndicatorShown: false
     };
@@ -118,10 +125,10 @@ export default {
   },
   methods: {
     showModerationWarning() {
-      this.chatWarningIsShown = true;
+      this.moderationWarningIsShown = true;
     },
     hideModerationWarning() {
-      this.chatWarningIsShown = false;
+      this.moderationWarningIsShown = false;
     },
     showNewMessage(message) {
       this.$socket.emit("message", {
@@ -231,27 +238,35 @@ export default {
   position: absolute;
   left: 0;
   top: 0;
-  padding: 12px 52px 12px 12px;
-  transition: all 0.15s ease-in;
+  padding: 12px;
   z-index: 1;
-}
+  transition: all 0.15s ease-in;
 
-.chat-warning__close {
-  font-size: 3.5rem;
-  width: 40px;
-  padding: 10px;
-  margin-right: 5px;
-  cursor: pointer;
-  display: block;
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-}
+  &-enter,
+  &-leave-to {
+    top: -64px;
+  }
 
-.chat-warning--slide-enter,
-.chat-warning--slide-leave-to {
-  top: -64px;
+  &--moderation {
+    padding-right: 52px;
+  }
+
+  &--connection {
+    background: rgba(110, 140, 171, 0.87);
+  }
+
+  &__close {
+    font-size: 3.5rem;
+    width: 40px;
+    padding: 10px;
+    margin-right: 5px;
+    cursor: pointer;
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
 }
 
 .messages {
@@ -259,7 +274,7 @@ export default {
   position: relative;
   height: 100%;
   overflow: auto;
-  padding-bottom: 20px;
+  padding-bottom: 35px;
 }
 
 .message {
