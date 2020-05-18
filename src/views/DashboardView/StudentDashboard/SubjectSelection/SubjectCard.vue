@@ -108,7 +108,7 @@ export default {
       isSessionAlive: "user/isSessionAlive"
     }),
     disabled() {
-      return this.isSessionAlive || this.disableSubjectCard;
+      return this.disableSubjectCard;
     }
   },
   methods: {

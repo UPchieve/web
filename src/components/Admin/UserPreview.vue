@@ -1,18 +1,18 @@
 <template>
-  <div class="user-preview">
+  <router-link :to="`/admin/users/${user._id}`" class="user-preview">
     <div class="user-preview__left">
       <div class="user-preview__icon">{{ userIcon }}</div>
     </div>
     <div class="user-preview__middle">
       <div class="user-preview__title">
-        {{ user.firstname }} {{ user.lastname }}
+        {{ user.firstname }}
       </div>
       <div class="user-preview__subtitle">joined {{ userSince }}</div>
     </div>
     <div class="user-preview__right">
       <div>{{ sessions }}</div>
     </div>
-  </div>
+  </router-link>
 </template>
 
 <script>
@@ -50,10 +50,13 @@ export default {
   padding: 10px;
   border-radius: 4px;
   font-size: 14px;
+  color: $c-soft-black;
+  text-decoration: none;
 
   &:hover {
     cursor: pointer;
     background: #f9f9f9;
+    text-decoration: none;
   }
 
   &__left {
