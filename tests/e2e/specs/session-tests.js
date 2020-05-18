@@ -112,8 +112,6 @@ describe("Session activity", () => {
         .then(() => clickSubjectButton("College Counseling"))
         .then(() => clickSubtopicButton("Essays"))
         .then(() => clickStartChat())
-        .location("pathname")
-        .should("eq", "/session/college/essays")
         .clock()
         .then(clock => clock.restore())
         .location("pathname")
