@@ -72,15 +72,6 @@ export default {
       }
     }
   },
-  beforeUpdate() {
-    if (this.userAuthenticated) {
-      this.$store.dispatch("user/fetchSession", this);
-
-      if (!this.isVolunteer) {
-        this.$store.dispatch("user/fetchLatestSession", this);
-      }
-    }
-  },
   beforeDestroy() {
     window.removeEventListener("resize", this.handleResize);
 
@@ -168,6 +159,20 @@ export default {
     mobileMode(isMobileMode) {
       if (!isMobileMode && this.bannerComponent === "MobileAppNoticeBanner")
         this.$store.dispatch("app/banner/hide");
+    },
+
+    /**
+     * On route transition, fetch current session (for students, also most recent session)
+     * @todo: Fetch these much less frequently (only once?)
+     */
+    $route() {
+      if (this.userAuthenticated) {
+        this.$store.dispatch("user/fetchSession", this);
+
+        if (!this.isVolunteer) {
+          this.$store.dispatch("user/fetchLatestSession", this);
+        }
+      }
     }
   },
   sockets: {

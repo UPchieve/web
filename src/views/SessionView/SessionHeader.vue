@@ -27,18 +27,20 @@
         </div>
       </div>
       <div class="button-container">
-        <div class="end-session">
-          <button class="btn btn-lg btn-block" @click.prevent="end">
-            <span v-if="isSessionWaitingForVolunteer">
-              Cancel
-            </span>
-            <span v-else-if="isSessionOver">
-              Finish
-            </span>
-            <span v-else>
-              End session
-            </span>
-          </button>
+        <div v-if="user.isVolunteer" class="report-btn" @click="reportSession">
+          Report
+        </div>
+
+        <div class="end-session-btn" @click.prevent="end">
+          <span v-if="isSessionWaitingForVolunteer">
+            Cancel
+          </span>
+          <span v-else-if="isSessionOver">
+            Finish
+          </span>
+          <span v-else>
+            End session
+          </span>
         </div>
       </div>
     </div>
@@ -171,6 +173,14 @@ export default {
         })
         .catch(this.alertCouldNotEnd);
     },
+    reportSession() {
+      this.$store.dispatch("app/modal/show", {
+        component: "ReportSessionModal",
+        data: {
+          showTemplateButtons: false
+        }
+      });
+    },
     alertCouldNotEnd() {
       window.alert("Could not end session");
     },
@@ -260,22 +270,35 @@ h1 {
   font-size: 18px;
 }
 
-.btn {
-  width: auto;
-  height: 40px;
-  color: #fff;
-  border: none;
-  font-size: 16px;
-  font-weight: 500;
-  background-color: inherit;
-}
-
-.btn:hover {
-  color: #000000;
-}
-
 .button-container {
   display: flex;
+  align-items: center;
+}
+
+.report-btn {
+  font-weight: 500;
+  cursor: pointer;
+  color: #fff;
+  padding: 0 5px;
+  margin-right: 10px;
+
+  &:hover {
+    color: #e8e8e8;
+  }
+}
+
+.end-session-btn {
+  font-weight: 500;
+  cursor: pointer;
+  border: solid 1px #fff;
+  color: #fff;
+  font-size: 14px;
+  padding: 5px 10px;
+  border-radius: 5px;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
 }
 
 .session-header.inactive {
