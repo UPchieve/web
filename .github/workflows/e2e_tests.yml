@@ -30,7 +30,7 @@ jobs:
         path: 'server'
         ref: ${{ github.head_ref }}
     - name: Checkout a master branch from server repo (this should not fail)
-    if: env.HAS_SAME_SERVER_BRANCH == 0
+      if: env.HAS_SAME_SERVER_BRANCH == 0
       uses: actions/checkout@v2
       with:
         repository: 'upchieve/server'
