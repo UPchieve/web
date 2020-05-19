@@ -30,7 +30,7 @@ describe("SubjectSelection", () => {
     { title: "College Counseling", topic: "college" },
     {
       title: "Invite Your Friends",
-      subtitle: "Share UPchieve with a friend and you could win up to $100!",
+      subtitle: "Share UPchieve with a friend!",
       buttonText: "Learn More"
     },
     {
