@@ -143,7 +143,6 @@ export default {
 
     promise
       .then(sessionId => {
-        this.$socket.io.opts.transports = ["polling", "websocket"];
         this.$socket.connect();
         this.joinSession(sessionId);
       })
