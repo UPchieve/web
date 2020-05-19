@@ -159,7 +159,6 @@ export default {
           this.$store.dispatch("user/fetchUser");
         }
 
-        this.$socket.io.opts.transports = ["polling", "websocket"];
         if (this.$socket.connected) {
           this.joinSession(sessionId);
         } else {
