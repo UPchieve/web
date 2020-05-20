@@ -44,6 +44,9 @@
         </div>
 
         <div class="contact-form__section">
+          <div v-if="this.sendState == 'Error'" class="errors">
+            There was an error sending your feedback
+          </div>
           <large-button
             class="contact-form__submit"
             primary
@@ -101,8 +104,6 @@ export default {
     }),
     sendLabel() {
       switch (this.sendState) {
-        case sendStates.ERROR:
-          return "There was an error sending your feedback";
         case sendStates.SENT:
           return "Your feedback has been sent";
         default:
@@ -239,5 +240,11 @@ export default {
   &__select {
     font-size: 16px;
   }
+}
+
+.errors {
+  color: #bf0000;
+  font-size: 14px;
+  text-align: center;
 }
 </style>
