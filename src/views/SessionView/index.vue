@@ -55,6 +55,7 @@ import Whiteboard from "./Whiteboard";
 import SessionChat from "./SessionChat";
 
 import SessionFulfilledModal from "./SessionFulfilledModal";
+import ConnectionTroubleModal from "./ConnectionTroubleModal";
 
 const headerData = {
   component: "SessionHeader"
@@ -89,17 +90,18 @@ export default {
     return {
       whiteboardOpen: false,
       icon: "Pencil.png",
-      sessionReconnecting: false,
       isNewSession: false
     };
   },
   computed: {
     ...mapState({
       user: state => state.user.user,
-      session: state => state.user.session
+      session: state => state.user.session,
+      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive
     }),
     ...mapGetters({
-      mobileMode: "app/mobileMode"
+      mobileMode: "app/mobileMode",
+      isAuthenticated: "user/isAuthenticated"
     }),
 
     shouldHideWhiteboardSection() {
@@ -133,23 +135,43 @@ export default {
       promise = SessionService.newSession(
         this,
         type,
-        this.$route.params.subTopic
+        this.$route.params.subTopic,
+        {
+          onRetry: (res, abort) => {
+            this.showTroubleStartingModal(abort);
+          }
+        }
       );
       this.isNewSession = true;
     } else {
-      promise = SessionService.useExistingSession(this, id);
+      promise = SessionService.useExistingSession(this, id, {
+        onRetry: (res, abort) => {
+          this.showTroubleJoiningModal(abort);
+        }
+      });
       this.isNewSession = false;
     }
 
     promise
       .then(sessionId => {
-        this.$socket.connect();
-        this.joinSession(sessionId);
+        // ensure we restore user when we get a successful response
+        if (!this.isAuthenticated) {
+          this.$store.dispatch("user/fetchUser");
+        }
+
+        if (this.$socket.connected) {
+          this.joinSession(sessionId);
+          this.$store.dispatch("user/sessionConnected");
+        } else {
+          this.$socket.connect();
+        }
       })
       .catch(err => {
-        window.alert("Could not start new help session");
+        if (err.status !== 0 && err.code !== "EUSERABORTED") {
+          window.alert("Could not start new help session");
+          Sentry.captureException(err);
+        }
         this.$router.replace("/");
-        Sentry.captureException(err);
       });
   },
   sockets: {
@@ -167,16 +189,26 @@ export default {
       });
     },
     reconnect_attempt() {
-      this.sessionReconnecting = true;
+      this.$store.dispatch("user/sessionDisconnected");
+      if (!this.session || !this.session._id) {
+        this.showTroubleStartingModal();
+      }
     },
     connect() {
-      if (this.sessionReconnecting) {
-        if (this.session && this.session._id) {
-          // we still need to re-join the room after Socket.IO re-establishes the connection
+      this.$store.dispatch("user/sessionConnected");
+
+      if (this.session && this.session._id) {
+        if (
+          (!this.session.student ||
+            this.session.student._id !== this.user._id) &&
+          (!this.session.volunteer ||
+            this.session.volunteer._id !== this.user._id)
+        ) {
+          // join the session if we haven't done so already
           this.joinSession(this.session._id);
-        } else {
-          location.reload();
         }
+      } else if (this.$route.params.sessionId) {
+        this.joinSession(this.$route.params.sessionId);
       }
     }
   },
@@ -204,13 +236,51 @@ export default {
       }
     },
     joinSession(sessionId) {
-      this.$socket.emit("join", {
-        sessionId,
-        user: this.user
+      this.$queuedSocket.emit(
+        "join",
+        {
+          sessionId,
+          user: this.user
+        },
+        1
+      );
+    },
+    showTroubleStartingModal(abort) {
+      const TROUBLE_STARTING_MESSAGE = `
+        The system seems to be having a problem starting your new session.
+        Please check your Internet connection.
+      `;
+
+      this.showConnectionTroubleModal(abort, TROUBLE_STARTING_MESSAGE);
+    },
+    showTroubleJoiningModal(abort) {
+      const TROUBLE_JOINING_MESSAGE = `
+        The system seems to be having a problem joining your session.
+        Please check your Internet connection.
+      `;
+
+      this.showConnectionTroubleModal(abort, TROUBLE_JOINING_MESSAGE);
+    },
+    showConnectionTroubleModal(abort, message) {
+      this.$store.dispatch("app/modal/show", {
+        component: ConnectionTroubleModal,
+        data: {
+          message,
+          acceptText: "Abort Session",
+          alertModal: true,
+          abortFunction: abort
+        }
       });
     },
     tryClicked() {
       this.sessionReconnecting = true;
+    }
+  },
+  watch: {
+    isSessionConnectionAlive(newValue, oldValue) {
+      if (newValue && !oldValue) {
+        this.$store.dispatch("app/modal/hide");
+      }
     }
   }
 };

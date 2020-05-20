@@ -8,7 +8,7 @@ import vSelect from "vue-select";
 import VuePhoneNumberInput from "vue-phone-number-input";
 import VueStarRating from "vue-star-rating";
 
-import Socket from "socket.io-client";
+import Socket from "queued-socket.io";
 import moment from "moment";
 
 import App from "./components/App";
@@ -20,10 +20,12 @@ import store from "./store";
 Vue.config.productionTip = false;
 
 // Set up SocketIO
-const socket = Socket(process.env.VUE_APP_SOCKET_ADDRESS, {
+const socket = Socket.connect(process.env.VUE_APP_SOCKET_ADDRESS, {
   autoConnect: false
 });
 Vue.use(VueSocketIO, socket);
+
+Vue.prototype.$queuedSocket = Socket;
 
 // Set up Vue Router
 Vue.use(VueRouter);
