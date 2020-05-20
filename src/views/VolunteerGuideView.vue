@@ -7,11 +7,11 @@
       <h2>Become an "Active" Coach</h2>
 
       <p>
-            Now that you’ve created your account, you still need to 
-            set up your availability and pass at least one certification quiz 
-            before you can start receiving students requests. Read about how to 
-            complete each of these steps below. We’ve also included some quick tips 
-            on how to maximize your requests and impact.
+        Now that you’ve created your account, you still need to set up your
+        availability and pass at least one certification quiz before you can
+        start receiving students requests. Read about how to complete each of
+        these steps below. We’ve also included some quick tips on how to
+        maximize your requests and impact.
       </p>
 
       <div>
@@ -55,9 +55,9 @@
             <p><strong>Quick Tips:</strong></p>
             <ul>
               <li>
-                <strong>Want to get more requests?</strong> Pre-algebra, Algebra, and Geometry
-                are our most popular subjects. Make sure you take those quizzes
-                ASAP if you can!
+                <strong>Want to get more requests?</strong> Pre-algebra,
+                Algebra, and Geometry are our most popular subjects. Make sure
+                you take those quizzes ASAP if you can!
               </li>
               <li>
                 <strong>Want to be a hero?</strong> We have the least coverage
@@ -111,11 +111,12 @@
                 how to do that.
               </li>
               <li>
-                <strong>Not near a computer?</strong> No problem! Our app now fully works 
-                on mobile browsers! If you prefer to use a computer, you can still start 
-                a session on your phone and then switch over to your computer. As long as 
-                you don’t click “End Session”, there will be a button to
-                rejoin your active session on the Dashboard!
+                <strong>Not near a computer?</strong> No problem! Our app now
+                fully works on mobile browsers! If you prefer to use a computer,
+                you can still start a session on your phone and then switch over
+                to your computer. As long as you don’t click “End Session”,
+                there will be a button to rejoin your active session on the
+                Dashboard!
               </li>
               <li>
                 <strong>Need a few minutes to get ready?</strong> No problem! If
@@ -211,10 +212,10 @@
                 to let the student know how long you’ll be gone.
               </li>
               <li>
-                <strong>Student not responding?</strong> Don’t leave right away! Make a few
-                attempts to get their attention and wait at least 15 minutes
-                before ending the session. They might just be distracted working
-                on their homework!
+                <strong>Student not responding?</strong> Don’t leave right away!
+                Make a few attempts to get their attention and wait at least 15
+                minutes before ending the session. They might just be distracted
+                working on their homework!
               </li>
               <li>
                 <strong>Experiencing technical difficulties?</strong> Try
