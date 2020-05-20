@@ -27,18 +27,20 @@
         </div>
       </div>
       <div class="button-container">
-        <div class="end-session">
-          <button class="btn btn-lg btn-block" @click.prevent="end">
-            <span v-if="isSessionWaitingForVolunteer">
-              Cancel
-            </span>
-            <span v-else-if="isSessionOver">
-              Finish
-            </span>
-            <span v-else>
-              End session
-            </span>
-          </button>
+        <div v-if="user.isVolunteer" class="report-btn" @click="reportSession">
+          Report
+        </div>
+
+        <div class="end-session-btn" @click="end">
+          <span v-if="isSessionWaitingForVolunteer">
+            Cancel
+          </span>
+          <span v-else-if="isSessionOver">
+            Finish
+          </span>
+          <span v-else>
+            End session
+          </span>
         </div>
       </div>
     </div>
@@ -72,7 +74,6 @@ import LoadingMessage from "@/components/LoadingMessage";
 export default {
   data() {
     return {
-      currentSession: SessionService.currentSession,
       connectionMsg: "",
       connectionMsgType: "",
       reconnectAttemptMsg: ""
@@ -83,7 +84,8 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: state => state.user.user,
+      session: state => state.user.session
     }),
     ...mapGetters({
       sessionPartner: "user/sessionPartner",
@@ -127,48 +129,34 @@ export default {
         }
       }
 
-      this.$store.dispatch("user/clearSession");
-
       let studentId = "";
       let volunteerId = null;
       let subTopic = null;
       let topic = null;
-      let sessionId = SessionService.currentSession.sessionId;
+      let sessionId = this.session._id;
 
-      if (
-        SessionService.currentSession &&
-        SessionService.currentSession.data.student
-      ) {
-        studentId = SessionService.currentSession.data.student._id;
+      if (this.session.student) {
+        studentId = this.session.student._id;
       }
 
-      if (
-        SessionService.currentSession &&
-        SessionService.currentSession.data.volunteer
-      ) {
-        volunteerId = SessionService.currentSession.data.volunteer._id;
+      if (this.session.volunteer) {
+        volunteerId = this.session.volunteer._id;
       }
 
-      if (
-        SessionService.currentSession &&
-        SessionService.currentSession.data.type
-      ) {
-        topic = SessionService.currentSession.data.type;
+      if (this.session.type) {
+        topic = this.session.type;
       }
 
-      if (
-        SessionService.currentSession &&
-        SessionService.currentSession.data.subTopic
-      ) {
-        subTopic = SessionService.currentSession.data.subTopic;
+      if (this.session.subTopic) {
+        subTopic = this.session.subTopic;
       }
 
-      if (volunteerId) {
-        SessionService.endSession(this, sessionId)
-          .then(() => {
-            this.$socket.disconnect();
-            const url =
-              "/feedback/" +
+      SessionService.endSession(this, sessionId)
+        .then(() => {
+          this.$socket.disconnect();
+          this.$store.dispatch("user/sessionDisconnected");
+          const url = volunteerId
+            ? "/feedback/" +
               sessionId +
               "/" +
               topic +
@@ -179,18 +167,19 @@ export default {
               "/" +
               studentId +
               "/" +
-              volunteerId;
-            router.push(url);
-          })
-          .catch(this.alertCouldNotEnd);
-      } else {
-        SessionService.endSession(this, sessionId)
-          .then(() => {
-            this.$socket.disconnect();
-            router.push("/");
-          })
-          .catch(this.alertCouldNotEnd);
-      }
+              volunteerId
+            : "/";
+          router.push(url);
+        })
+        .catch(this.alertCouldNotEnd);
+    },
+    reportSession() {
+      this.$store.dispatch("app/modal/show", {
+        component: "ReportSessionModal",
+        data: {
+          showTemplateButtons: false
+        }
+      });
     },
     alertCouldNotEnd() {
       window.alert("Could not end session");
@@ -281,22 +270,35 @@ h1 {
   font-size: 18px;
 }
 
-.btn {
-  width: auto;
-  height: 40px;
-  color: #fff;
-  border: none;
-  font-size: 16px;
-  font-weight: 500;
-  background-color: inherit;
-}
-
-.btn:hover {
-  color: #000000;
-}
-
 .button-container {
   display: flex;
+  align-items: center;
+}
+
+.report-btn {
+  font-weight: 500;
+  cursor: pointer;
+  color: #fff;
+  padding: 0 5px;
+  margin-right: 10px;
+
+  &:hover {
+    color: #e8e8e8;
+  }
+}
+
+.end-session-btn {
+  font-weight: 500;
+  cursor: pointer;
+  border: solid 1px #fff;
+  color: #fff;
+  font-size: 14px;
+  padding: 5px 10px;
+  border-radius: 5px;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
 }
 
 .session-header.inactive {

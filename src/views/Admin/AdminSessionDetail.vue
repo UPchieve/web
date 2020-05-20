@@ -20,7 +20,7 @@
       <div>{{ volunteerJoinedAt }}</div>
     </div>
     <div v-if="endedAt" class="session-detail__section">
-      <div class="session-detail__section-title">Ended</div>
+      <div class="session-detail__section-title">Ended by {{ endedBy }}</div>
       <div>{{ endedAt }}</div>
     </div>
     <div class="session-detail__section">
@@ -92,6 +92,11 @@ export default {
     endedAt() {
       if (!this.session.endedAt) return null;
       return moment(this.session.endedAt).format("l, h:mm:ss a");
+    },
+    endedBy() {
+      return this.session.endedBy === this.session.student._id
+        ? this.session.student.firstname
+        : this.session.volunteer.firstname;
     },
     studentFeedback() {
       return find(this.session.feedbacks, { userType: "student" }, {});
