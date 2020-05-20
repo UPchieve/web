@@ -161,6 +161,7 @@ export default {
 
         if (this.$socket.connected) {
           this.joinSession(sessionId);
+          this.$store.dispatch("user/sessionConnected");
         } else {
           this.$socket.connect();
         }
