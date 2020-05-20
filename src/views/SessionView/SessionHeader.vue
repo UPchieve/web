@@ -31,7 +31,7 @@
           Report
         </div>
 
-        <div class="end-session-btn" @click.prevent="end">
+        <div class="end-session-btn" @click="end">
           <span v-if="isSessionWaitingForVolunteer">
             Cancel
           </span>
