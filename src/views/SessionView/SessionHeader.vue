@@ -30,7 +30,7 @@
         <div class="end-session">
           <button class="btn btn-lg btn-block" @click.prevent="end">
             <span v-if="didEndSession">
-              Ending session ...
+              <loading-message message="Ending session" />
             </span>
             <span v-else-if="isSessionWaitingForVolunteer">
               Cancel
