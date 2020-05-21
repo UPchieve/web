@@ -45,7 +45,6 @@
 
 <script>
 import { mapState, mapGetters } from "vuex";
-import base64url from "base64url";
 import * as Sentry from "@sentry/browser";
 
 import SessionService from "@/services/SessionService";
@@ -122,12 +121,8 @@ export default {
     }
   },
   mounted() {
-    const id =
-      this.$route.path.indexOf("/s/") === -1
-        ? this.$route.params.sessionId
-        : base64url
-            .toBuffer(this.$route.params.sessionIdBase64)
-            .toString("hex");
+    const id = this.$route.params.sessionId;
+
     let promise;
 
     if (!id) {
