@@ -43,10 +43,11 @@
           />
         </div>
 
+        <div v-if="this.sendState == 'Error'" class="errors">
+          There was an error sending your feedback
+        </div>
+
         <div class="contact-form__section">
-          <div v-if="this.sendState == 'Error'" class="errors">
-            There was an error sending your feedback
-          </div>
           <large-button
             class="contact-form__submit"
             primary
@@ -95,7 +96,7 @@ export default {
         topic: contactTopics[0],
         message: ""
       },
-      sendState: sendStates.UNSENT
+      sendState: sendStates.ERROR
     };
   },
   computed: {
@@ -105,7 +106,7 @@ export default {
     sendLabel() {
       switch (this.sendState) {
         case sendStates.SENT:
-          return "Your feedback has been sent";
+          return "Thank you for your feedback";
         default:
           return "Send";
       }
