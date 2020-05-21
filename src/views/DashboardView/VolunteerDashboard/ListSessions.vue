@@ -15,7 +15,10 @@
           @click="gotoSession(session)"
         >
           <td>{{ session.student.firstname }}</td>
-          <td>
+          <td v-if="isIntegratedMath(session.subTopic)">
+            {{ formatIntegratedMath(session.subTopic) }}
+          </td>
+          <td v-else>
             {{
               session.subTopic.charAt(0).toUpperCase() +
                 session.subTopic.substr(1)
@@ -29,7 +32,8 @@
 
 <script>
 import { mapState } from "vuex";
-import { allSubtopics } from "@/utils/topics";
+import { topics, allSubtopics } from "@/utils/topics";
+import isIntegratedMath from "@/utils/is-integrated-math";
 
 export default {
   data() {
@@ -64,6 +68,12 @@ export default {
       } else {
         this.$store.dispatch("user/clearSession");
       }
+    },
+    isIntegratedMath(subTopic) {
+      return isIntegratedMath(subTopic);
+    },
+    formatIntegratedMath(subTopic) {
+      return topics.math.subtopics[subTopic].displayName;
     }
   },
   sockets: {
