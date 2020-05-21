@@ -17,7 +17,7 @@
       :subtopicDisplayNames="card.subtopicDisplayNames"
       :button-text="card.buttonText"
       :routeTo="card.routeTo"
-      :disableSubjectCard="disableSubjectCard"
+      :disableSubjectCard="isCardDisabled(card)"
     />
   </div>
 </template>
@@ -61,13 +61,14 @@ export default {
           .reduce((result, [subtopicKey, displayName]) => {
             result[subtopicKey] = displayName;
             return result;
-          }, {})
+          }, {}),
+        isTutoringCard: true
       };
     });
 
     cards.push({
       title: "Invite Your Friends",
-      subtitle: "Share UPchieve with a friend and you could win up to $100!",
+      subtitle: "Share UPchieve with a friend!",
       svg: ReferralSVG,
       buttonText: "Learn More"
     });
@@ -163,6 +164,11 @@ export default {
       } else {
         this.hasWaitingPeriod = false;
       }
+    },
+    isCardDisabled(card) {
+      return (
+        card.isTutoringCard && (this.disableSubjectCard || this.isSessionAlive)
+      );
     }
   }
 };

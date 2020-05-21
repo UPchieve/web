@@ -1,9 +1,15 @@
 import Vue from "vue";
+import promiseRetry from "promise-retry";
+import errcode from "err-code";
 
 const AUTH_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/auth`;
 const API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/api`;
 const ELIGIBILITY_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/eligibility`;
 const CONTACT_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/contact`;
+
+const FAULT_TOLERANT_HTTP_TIMEOUT = 10000;
+const FAULT_TOLERANT_HTTP_MAX_RETRY_TIMEOUT = 100000;
+const FAULT_TOLERANT_HTTP_MAX_RETRIES = 10;
 
 export default {
   _successHandler(res) {
@@ -11,6 +17,47 @@ export default {
   },
   _errorHandler(res) {
     return Promise.reject(res);
+  },
+  _faultTolerantHttp(http, method, onRetry, url, data) {
+    const promiseToRetry = () => {
+      return (["get", "delete", "head", "jsonp"].indexOf(method) !== -1
+        ? http[method](url, {
+            timeout: FAULT_TOLERANT_HTTP_TIMEOUT
+          })
+        : http[method](url, data, {
+            timeout: FAULT_TOLERANT_HTTP_TIMEOUT
+          })
+      ).then(this._successHandler, this._errorHandler);
+    };
+
+    // object property specifying whether this function is aborted
+    const requestState = { isAborted: false };
+
+    return promiseRetry(
+      retry => {
+        if (requestState.isAborted) {
+          // early exit
+          throw errcode(new Error("Aborted by user"), "EUSERABORTED");
+        }
+
+        return promiseToRetry().catch(res => {
+          if (res.status === 0) {
+            if (onRetry) {
+              onRetry(res, () => {
+                requestState.isAborted = true;
+              });
+            }
+            retry(res);
+          }
+
+          throw res;
+        });
+      },
+      {
+        retries: FAULT_TOLERANT_HTTP_MAX_RETRIES,
+        maxTimeout: FAULT_TOLERANT_HTTP_MAX_RETRY_TIMEOUT
+      }
+    );
   },
 
   // Server route defintions
@@ -91,7 +138,7 @@ export default {
       .get(`${API_ROOT}/user`)
       .then(this._successHandler, this._errorHandler);
   },
-  userGlobal(Vue) {
+  userGlobal() {
     return Vue.http
       .get(`${API_ROOT}/user`)
       .then(this._successHandler, this._errorHandler);
@@ -131,20 +178,28 @@ export default {
       .get(`${API_ROOT}/volunteers`)
       .then(this._successHandler, this._errorHandler);
   },
-  newSession(context, data) {
-    return context.$http
-      .post(`${API_ROOT}/session/new`, data)
-      .then(this._successHandler, this._errorHandler);
+  newSession(context, data, onRetry) {
+    return this._faultTolerantHttp(
+      context.$http,
+      "post",
+      onRetry,
+      `${API_ROOT}/session/new`,
+      data
+    );
   },
   endSession(context, data) {
     return context.$http
       .post(`${API_ROOT}/session/end`, data)
       .then(this._successHandler, this._errorHandler);
   },
-  checkSession(context, data) {
-    return context.$http
-      .post(`${API_ROOT}/session/check`, data)
-      .then(this._successHandler, this._errorHandler);
+  checkSession(context, data, onRetry) {
+    return this._faultTolerantHttp(
+      context.$http,
+      "post",
+      onRetry,
+      `${API_ROOT}/session/check`,
+      data
+    );
   },
   currentSession(context, data) {
     return context.$http
@@ -154,6 +209,11 @@ export default {
   latestSession(context, data) {
     return context.$http
       .post(`${API_ROOT}/session/latest`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
+  reportSession({ sessionId, reportMessage }) {
+    return Vue.http
+      .post(`${API_ROOT}/session/${sessionId}/report`, { reportMessage })
       .then(this._successHandler, this._errorHandler);
   },
   adminGetSessions(page) {

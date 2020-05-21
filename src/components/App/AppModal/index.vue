@@ -31,6 +31,7 @@ import ReferralModal from "@/views/DashboardView/StudentDashboard/ReferralModal"
 import SessionFulfilledModal from "@/views/SessionView/SessionFulfilledModal";
 import VolunteerOnboardingModal from "@/views/DashboardView/VolunteerDashboard/VolunteerOnboardingModal.vue";
 import StudentOnboardingModal from "@/views/DashboardView/StudentDashboard/StudentOnboardingModal";
+import ReportSessionModal from "@/views/SessionView/ReportSessionModal";
 
 export default {
   components: {
@@ -42,7 +43,8 @@ export default {
     SessionFulfilledModal,
     VolunteerOnboardingModal,
     UpgradeAppModal,
-    StudentOnboardingModal
+    StudentOnboardingModal,
+    ReportSessionModal
   },
   data() {
     return {

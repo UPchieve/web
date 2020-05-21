@@ -1,7 +1,5 @@
 import Validator from "validator";
 
-import Vue from "vue";
-
 import NetworkService from "./NetworkService";
 import AnalyticsService from "./AnalyticsService";
 
@@ -139,7 +137,7 @@ export default {
 
     const authPromise =
       !context || isGlobal
-        ? NetworkService.userGlobal(Vue)
+        ? NetworkService.userGlobal()
         : NetworkService.user(context);
     return authPromise
       .then(res => {
