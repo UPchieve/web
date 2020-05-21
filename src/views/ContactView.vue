@@ -96,7 +96,7 @@ export default {
         topic: contactTopics[0],
         message: ""
       },
-      sendState: sendStates.ERROR
+      sendState: sendStates.UNSENT
     };
   },
   computed: {
