@@ -69,7 +69,9 @@ export default {
       };
     }
 
-    this.scoreMsg = `Score: ${this.quizResults.score} out of ${this.quizLength} correct.`;
+    this.scoreMsg = `Score: ${this.quizResults.score} out of ${
+      this.quizLength
+    } correct.`;
   },
   methods: {
     reload() {

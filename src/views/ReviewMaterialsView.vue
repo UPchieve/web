@@ -121,10 +121,14 @@ export default {
       NetworkService.getReviewMaterials(this, this.category);
     },
     importConceptReview(ext) {
-      return require(`../assets/review_materials/${this.category}/${this.category}-concept-review.${ext}`);
+      return require(`../assets/review_materials/${this.category}/${
+        this.category
+      }-concept-review.${ext}`);
     },
     importTopicsAndResources(ext) {
-      return require(`../assets/review_materials/${this.category}/${this.category}-topics-and-resources.${ext}`);
+      return require(`../assets/review_materials/${this.category}/${
+        this.category
+      }-topics-and-resources.${ext}`);
     }
   }
 };
