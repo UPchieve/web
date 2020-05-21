@@ -43,13 +43,18 @@
           />
         </div>
 
+        <div v-if="this.sendState == 'Error'" class="errors">
+          There was an error sending your feedback
+        </div>
+
         <div class="contact-form__section">
           <large-button
             class="contact-form__submit"
             primary
             @click.native="submitContactUs"
-            >Send</large-button
           >
+            <span v-html="sendLabel"></span>
+          </large-button>
         </div>
       </div>
     </div>
@@ -60,6 +65,12 @@
 import { mapGetters } from "vuex";
 import NetworkService from "../services/NetworkService";
 import LargeButton from "@/components/LargeButton";
+
+const sendStates = {
+  UNSENT: "Unsent",
+  SENT: "Sent",
+  ERROR: "Error"
+};
 
 export default {
   name: "contact-view",
@@ -84,14 +95,22 @@ export default {
         email: "",
         topic: contactTopics[0],
         message: ""
-      }
+      },
+      sendState: sendStates.UNSENT
     };
   },
   computed: {
     ...mapGetters({
       isAuthenticated: "user/isAuthenticated"
     }),
-
+    sendLabel() {
+      switch (this.sendState) {
+        case sendStates.SENT:
+          return "Thank you for your feedback";
+        default:
+          return "Send";
+      }
+    },
     hasValidEmail() {
       if (!this.isAuthenticated) return false;
 
@@ -114,6 +133,7 @@ export default {
         !this.isValidEmail(this.contactFormData.email)
       ) {
         alert("A valid email is required.");
+        this.sendState = sendStates.ERROR;
       } else {
         if (this.hasValidEmail) {
           this.contactFormData.email = this.$store.state.user.user.email;
@@ -122,7 +142,7 @@ export default {
         NetworkService.sendContact(this, {
           responseData: this.contactFormData
         });
-        this.$router.push("/");
+        this.sendState = sendStates.SENT;
       }
     },
     isValidEmail(address) {
@@ -221,5 +241,11 @@ export default {
   &__select {
     font-size: 16px;
   }
+}
+
+.errors {
+  color: #bf0000;
+  font-size: 14px;
+  text-align: center;
 }
 </style>
