@@ -27,7 +27,7 @@ function startSession(topicTitle, subtopicTitle) {
   clickStartChat();
 }
 
-describe("Session activity", () => {
+describe.skip("Session activity", () => {
   before(function() {
     cy.fixture("users/student1").as("student");
     cy.fixture("users/volunteer1").as("volunteer");
@@ -89,7 +89,7 @@ describe("Session activity", () => {
     });
 
     it("Should cancel the session", function() {
-      cy.get(".end-session button")
+      cy.get(".end-session-btn")
         .should("contain.text", "Cancel")
         .click();
 
@@ -216,7 +216,7 @@ describe("Session activity", () => {
     it("Should end the essay session and direct volunteer to feedback form", function() {
       cy.login(this.volunteer);
 
-      cy.get(".end-session button")
+      cy.get(".end-session-btn")
         .should("contain.text", "End session")
         .click();
 
@@ -287,7 +287,7 @@ describe("Session activity", () => {
       cy.login(this.student);
       cy.visit("/dashboard");
       cy.get(".LargeButton-primary--reverse").click();
-      cy.get(".end-session button")
+      cy.get(".end-session-btn")
         .should("contain.text", "End session")
         .click();
 
@@ -352,7 +352,7 @@ describe("Session activity", () => {
             .its("getters")
             .its("user/isSessionWaitingForVolunteer", { timeout: 60000 })
             .should("be.true");
-          cy.get(".end-session button")
+          cy.get(".end-session-btn")
             .should("contain.text", "Cancel" || "End session")
             .click();
         })
@@ -391,7 +391,7 @@ describe("Session activity", () => {
             .its("getters")
             .its("user/isSessionWaitingForVolunteer", { timeout: 60000 })
             .should("be.true");
-          cy.get(".end-session button")
+          cy.get(".end-session-btn")
             .should("contain.text", "Cancel")
             .click();
         })
@@ -483,7 +483,7 @@ describe("Session activity", () => {
             .its("getters")
             .its("user/isSessionInProgress", { timeout: 60000 })
             .should("be.true");
-          cy.get(".end-session button")
+          cy.get(".end-session-btn")
             .should("contain.text", "End session")
             .click();
         })
@@ -533,7 +533,7 @@ describe("Session activity", () => {
             .its("user/isSessionInProgress", { timeout: 60000 })
             .should("be.true");
           return cy
-            .get(".end-session button")
+            .get(".end-session-btn")
             .should("contain.text", "End session")
             .click();
         })

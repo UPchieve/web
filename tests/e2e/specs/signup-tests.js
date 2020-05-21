@@ -36,10 +36,6 @@ describe("Student and volunteer signup", () => {
         .contains("Student")
         .click();
 
-      cy.get("button")
-        .contains("No")
-        .click();
-
       cy.get("@approvedHighschools").then(response => {
         const highSchool = response.body.eligibleSchools[0];
 
@@ -86,10 +82,6 @@ describe("Student and volunteer signup", () => {
 
       cy.get("button")
         .contains("Student")
-        .click();
-
-      cy.get("button")
-        .contains("No")
         .click();
 
       cy.get("#inputHighschool")
