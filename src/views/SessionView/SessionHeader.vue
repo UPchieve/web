@@ -4,7 +4,10 @@
       <div class="avatar-info-container">
         <div :style="partnerAvatar" class="avatar" />
         <div class="info">
-          <template v-if="isSessionWaitingForVolunteer">
+          <template v-if="isSessionEnding">
+            <loading-message message="Ending session" />
+          </template>
+          <template v-else-if="isSessionWaitingForVolunteer">
             <loading-message message="Contacting coaches" />
           </template>
           <template v-else-if="isSessionInProgress">
@@ -76,7 +79,8 @@ export default {
     return {
       connectionMsg: "",
       connectionMsgType: "",
-      reconnectAttemptMsg: ""
+      reconnectAttemptMsg: "",
+      isSessionEnding: false
     };
   },
   components: {
@@ -128,6 +132,11 @@ export default {
           return;
         }
       }
+
+      if (this.isSessionEnding) {
+        return;
+      }
+      this.isSessionEnding = true;
 
       let studentId = "";
       let volunteerId = null;
@@ -182,6 +191,7 @@ export default {
       });
     },
     alertCouldNotEnd() {
+      this.isSessionEnding = false;
       window.alert("Could not end session");
     },
     tryReconnect() {
