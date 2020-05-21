@@ -14,7 +14,8 @@ export default {
     session: {},
     latestSession: {},
     volunteerStats: {},
-    isFirstDashboardVisit: false
+    isFirstDashboardVisit: false,
+    isSessionConnectionAlive: false
   },
   mutations: {
     setUser: (state, user = {}) => (state.user = user),
@@ -55,6 +56,10 @@ export default {
 
     setIsFirstDashboardVisit: (state, isFirstDashboardVisit) => {
       state.isFirstDashboardVisit = isFirstDashboardVisit;
+    },
+
+    setIsSessionConnectionAlive: (state, isSessionConnectionAlive) => {
+      state.isSessionConnectionAlive = isSessionConnectionAlive;
     }
   },
   actions: {
@@ -110,6 +115,14 @@ export default {
 
     clearSession: ({ commit }) => {
       commit("setSession", {});
+    },
+
+    sessionDisconnected: ({ commit }) => {
+      commit("setIsSessionConnectionAlive", false);
+    },
+
+    sessionConnected: ({ commit }) => {
+      commit("setIsSessionConnectionAlive", true);
     },
 
     updateSession: ({ commit }, sessionData) => {

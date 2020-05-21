@@ -20,8 +20,6 @@
 <script>
 import { mapState, mapGetters } from "vuex";
 
-import SessionService from "@/services/SessionService";
-
 import "@/scss/main.scss";
 import AppHeader from "./AppHeader";
 import AppSidebar from "./AppSidebar";
@@ -71,15 +69,6 @@ export default {
       if (getOperatingSystem() === "iOS") {
         this.isIOS = true;
         document.addEventListener("click", this.iOSFocusElements, false);
-      }
-    }
-  },
-  beforeUpdate() {
-    if (this.userAuthenticated) {
-      this.$store.dispatch("user/fetchSession", this);
-
-      if (!this.isVolunteer) {
-        this.$store.dispatch("user/fetchLatestSession", this);
       }
     }
   },
@@ -170,13 +159,24 @@ export default {
     mobileMode(isMobileMode) {
       if (!isMobileMode && this.bannerComponent === "MobileAppNoticeBanner")
         this.$store.dispatch("app/banner/hide");
+    },
+
+    /**
+     * On route transition, fetch current session (for students, also most recent session)
+     * @todo: Fetch these much less frequently (only once?)
+     */
+    $route() {
+      if (this.userAuthenticated) {
+        this.$store.dispatch("user/fetchSession", this);
+
+        if (!this.isVolunteer) {
+          this.$store.dispatch("user/fetchLatestSession", this);
+        }
+      }
     }
   },
   sockets: {
     "session-change"(sessionData) {
-      SessionService.currentSession.sessionId = sessionData._id;
-      SessionService.currentSession.data = sessionData;
-
       this.$store.dispatch("user/updateSession", sessionData);
     }
   }

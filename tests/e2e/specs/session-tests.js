@@ -81,7 +81,7 @@ describe("Session activity", () => {
     });
 
     it("Should cancel the session", function() {
-      cy.get(".end-session button")
+      cy.get(".end-session-btn")
         .should("contain.text", "Cancel")
         .click()
         .location("pathname")
@@ -177,7 +177,7 @@ describe("Session activity", () => {
     it("Should end the essay session and direct volunteer to feedback form", function() {
       const VOLUNTEER_FEEDBACK_URL_PATTERN = /^\/feedback\/\w{24}\/college\/essays\/volunteer\/\w{24}\/\w{24}$/;
       cy.login(this.volunteer)
-        .get(".end-session button")
+        .get(".end-session-btn")
         .should("contain.text", "End session")
         .click()
         .location("pathname")
@@ -238,7 +238,7 @@ describe("Session activity", () => {
         .visit("/dashboard")
         .get(".LargeButton-primary--reverse")
         .click()
-        .get(".end-session button")
+        .get(".end-session-btn")
         .should("contain.text", "End session")
         .click()
         .location("pathname")
@@ -296,7 +296,7 @@ describe("Session activity", () => {
         .its("getters")
         .its("user/isSessionWaitingForVolunteer")
         .should("be.true")
-        .get(".end-session button")
+        .get(".end-session-btn")
         .should("contain.text", "Cancel" || "End session")
         .click()
         .location("pathname")
@@ -322,7 +322,7 @@ describe("Session activity", () => {
         .its("getters")
         .its("user/isSessionWaitingForVolunteer")
         .should("be.true")
-        .get(".end-session button")
+        .get(".end-session-btn")
         .should("contain.text", "Cancel")
         .click()
         .location("pathname")
@@ -388,7 +388,7 @@ describe("Session activity", () => {
         .its("getters")
         .its("user/isSessionInProgress")
         .should("be.true")
-        .get(".end-session button")
+        .get(".end-session-btn")
         .should("contain.text", "End session")
         .click()
         .visit(this.sessionUrl)
@@ -426,7 +426,7 @@ describe("Session activity", () => {
         .its("getters")
         .its("user/isSessionInProgress")
         .should("be.true")
-        .get(".end-session button")
+        .get(".end-session-btn")
         .should("contain.text", "End session")
         .click()
         .location("pathname")

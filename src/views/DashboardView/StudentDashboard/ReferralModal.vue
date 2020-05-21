@@ -3,9 +3,8 @@
     <component v-if="!mobileMode" :is="modalData.svg" class="icon" />
     <h1 class="ReferralModal-title">Invite Your Friends</h1>
     <h2 class="ReferralModal-subtitle">
-      Every friend you refer to UPchieve will get you one entry into our monthly
-      drawing for a $100 gift card. Make sure your friends use the link below to
-      sign up! Next drawing will be on {{ nextMonth }} 8th.
+      Sharing is caring! Your friends can create their very own UPchieve account
+      using the link below.
     </h2>
 
     <div>
@@ -26,7 +25,6 @@
 
 <script>
 import { mapState, mapGetters } from "vuex";
-import moment from "moment";
 
 export default {
   props: {
@@ -50,12 +48,6 @@ export default {
       } else {
         return `${process.env.VUE_APP_SERVER_ROOT}/referral/${referralCode}`;
       }
-    },
-    nextMonth() {
-      return moment()
-        .add(1, "month")
-        .startOf("month")
-        .format("MMMM");
     }
   },
   methods: {

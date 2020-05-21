@@ -45,17 +45,16 @@ export default {
   mounted() {
     // reconnect socket if it isn't already
     if (!this.$socket.connected) {
-      this.$socket.io.opts.transports = ["polling"];
       this.$socket.connect();
+      this.$socket.on("connect", this.emitList);
+    } else {
+      this.emitList();
     }
-    this.$socket.emit("list", {
-      user: this.user
-    });
-  },
-  beforeDestroy() {
-    this.$socket.disconnect();
   },
   methods: {
+    emitList() {
+      this.$socket.emit("list");
+    },
     gotoSession(session) {
       const { type, subTopic, _id } = session;
       const path = `/session/${type}/${subTopic}/${_id}`;
