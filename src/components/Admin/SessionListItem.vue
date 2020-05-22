@@ -1,7 +1,7 @@
 <template>
   <router-link :to="`/admin/sessions/${session._id}`" class="session-list-item">
     <div class="session-list-item__column session-list-item__column">
-      <div class="bold">{{ session.subTopic }}</div>
+      <div class="bold">{{ subTopicDisplayName }}</div>
       <div>{{ createdAt }}</div>
     </div>
     <div class="session-list-item__column">{{ status }}</div>
@@ -16,6 +16,7 @@
 
 <script>
 import moment from "moment";
+import { topics } from "@/utils/topics";
 
 const pluralize = num => {
   return num === 1 ? "" : "s";
@@ -51,6 +52,11 @@ export default {
     notifications() {
       const numNotifs = this.session.notifications.length;
       return `${numNotifs} notification${pluralize(numNotifs)}`;
+    },
+
+    subTopicDisplayName() {
+      const { type, subTopic } = this.session;
+      return topics[type].subtopics[subTopic].displayName;
     }
   }
 };
