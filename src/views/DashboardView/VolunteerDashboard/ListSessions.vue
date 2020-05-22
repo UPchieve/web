@@ -41,8 +41,9 @@ export default {
     })
   },
   mounted() {
-    // reconnect socket if it isn't already
     this.allSubtopics = allSubtopics();
+
+    // reconnect socket if it isn't already
     if (!this.$socket.connected) {
       this.$socket.connect();
       this.$socket.on("connect", this.emitList);
