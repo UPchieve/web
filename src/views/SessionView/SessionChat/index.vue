@@ -35,7 +35,7 @@
         <template v-for="(message, index) in messages">
           <div
             :key="`message-${index}`"
-            :class="message.userId === user._id ? 'right' : 'left'"
+            :class="message.user === user._id ? 'right' : 'left'"
             class="message"
           >
             <div class="avatar" :style="message.avatarStyle" />
@@ -101,13 +101,12 @@ export default {
       currentSession: state => state.user.session,
       messages: state =>
         (state.user.session.messages || []).map(message => {
-          // compute avatar style from picture
-          let picture = message.picture;
-          if (!picture || picture === "") {
-            picture = message.isVolunteer
-              ? VolunteerAvatarUrl
-              : StudentAvatarUrl;
-          }
+          const isVolunteerMessage =
+            state.user.session.volunteer &&
+            message.user === state.user.session.volunteer._id;
+          const picture = isVolunteerMessage
+            ? VolunteerAvatarUrl
+            : StudentAvatarUrl;
 
           message.avatarStyle = { backgroundImage: `url(${picture})` };
           return message;
@@ -133,8 +132,7 @@ export default {
     showNewMessage(message) {
       this.$socket.emit("message", {
         sessionId: this.currentSession._id,
-        user: this.user,
-        message
+        contents: message
       });
     },
     clearMessageInput() {
