@@ -52,7 +52,7 @@ export default {
         title: topicObj.displayName,
         svg: svgs[key],
         topic: key,
-        subtopics: Object.keys(topicObj.subtopics),
+        subtopics: Object.keys(topicObj.subtopics).sort(),
         subtopicDisplayNames: Object.entries(topicObj.subtopics)
           .map(([subtopicKey, subtopicObj]) => [
             subtopicKey,
