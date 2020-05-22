@@ -109,6 +109,8 @@ export default {
           ];
           break;
         case "biology":
+        case "chemistry":
+        case "physics":
           this.reviewMaterials = [];
           break;
         default:
