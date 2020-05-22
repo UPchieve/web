@@ -66,6 +66,9 @@ export default {
       };
     });
 
+    // Temporarily hide Chemistry and Physics from students
+    cards[1].subtopics = ["biology"];
+
     cards.push({
       title: "Invite Your Friends",
       subtitle: "Share UPchieve with a friend!",
