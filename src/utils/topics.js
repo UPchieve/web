@@ -12,7 +12,9 @@ export const topics = {
   },
   science: {
     subtopics: {
-      biology: { displayName: "Biology" }
+      biology: { displayName: "Biology" },
+      chemistry: { displayName: "Chemistry" },
+      physics: { displayName: "Physics" }
     },
     displayName: "Science Tutoring"
   },
