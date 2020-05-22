@@ -10,14 +10,14 @@
       </p>
     </div>
     <div v-else-if="reviewMaterials.length === 0">
-      <h1 class="header-title">{{ category }} Review Materials</h1>
+      <h1 class="header-title">{{ categoryDisplayName }} Review Materials</h1>
       <p class="error-message">
-        Sorry, we do not currently have review materials for {{ category }}.
-        Please check back later!
+        Sorry, we do not currently have review materials for
+        {{ categoryDisplayName }}. Please check back later!
       </p>
     </div>
     <div v-else>
-      <h1 class="header-title">{{ category }} Review Materials</h1>
+      <h1 class="header-title">{{ categoryDisplayName }} Review Materials</h1>
       <div class="review-materials">
         <a
           target="_blank"
@@ -40,6 +40,9 @@
 
 <script>
 import NetworkService from "@/services/NetworkService";
+import isPhysics from "@/utils/is-physics";
+import { PHYSICS_MAPPING } from "@/consts";
+import { allSubtopics } from "@/utils/topics";
 
 export default {
   components: {},
@@ -54,6 +57,10 @@ export default {
     const { params } = this.$route;
     const { category } = params;
     this.category = category;
+
+    // format physics from lowercase 'physicsone' -> 'physicsOne'
+    if (isPhysics(category)) this.category = PHYSICS_MAPPING[category];
+
     this.getCategoryMaterials();
     if (!this.error) {
       this.getReviewMaterials();
@@ -110,7 +117,7 @@ export default {
           break;
         case "biology":
         case "chemistry":
-        case "physics":
+        case "physicsOne":
           this.reviewMaterials = [];
           break;
         default:
@@ -131,6 +138,14 @@ export default {
       return require(`../assets/review_materials/${this.category}/${
         this.category
       }-topics-and-resources.${ext}`);
+    }
+  },
+  computed: {
+    categoryDisplayName() {
+      const subtopics = allSubtopics();
+      if (this.category) return subtopics[this.category].displayName;
+
+      return "";
     }
   }
 };

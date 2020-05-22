@@ -16,10 +16,7 @@
         >
           <td>{{ session.student.firstname }}</td>
           <td>
-            {{
-              session.subTopic.charAt(0).toUpperCase() +
-                session.subTopic.substr(1)
-            }}
+            {{ subtopicDisplayName(session.subTopic) }}
           </td>
         </tr>
       </tbody>
@@ -34,7 +31,8 @@ import { allSubtopics } from "@/utils/topics";
 export default {
   data() {
     return {
-      openSessions: []
+      openSessions: [],
+      allSubtopics: {}
     };
   },
   computed: {
@@ -44,6 +42,7 @@ export default {
   },
   mounted() {
     // reconnect socket if it isn't already
+    this.allSubtopics = allSubtopics();
     if (!this.$socket.connected) {
       this.$socket.connect();
       this.$socket.on("connect", this.emitList);
@@ -64,6 +63,9 @@ export default {
       } else {
         this.$store.dispatch("user/clearSession");
       }
+    },
+    subtopicDisplayName(subtopic) {
+      return this.allSubtopics[subtopic].displayName;
     }
   },
   sockets: {
