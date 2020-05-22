@@ -4,13 +4,13 @@ export const topics = {
       prealgebra: { displayName: "Pre-algebra" },
       algebra: { displayName: "Algebra" },
       geometry: { displayName: "Geometry" },
-      integratedMathOne: { displayName: "Integrated Math 1" },
       trigonometry: { displayName: "Trigonometry" },
-      integratedMathTwo: { displayName: "Integrated Math 2" },
       precalculus: { displayName: "Precalculus" },
+      calculus: { displayName: "Calculus" },
+      integratedMathOne: { displayName: "Integrated Math 1" },
+      integratedMathTwo: { displayName: "Integrated Math 2" },
       integratedMathThree: { displayName: "Integrated Math 3" },
-      integratedMathFour: { displayName: "Integrated Math 4" },
-      calculus: { displayName: "Calculus" }
+      integratedMathFour: { displayName: "Integrated Math 4" }
     },
     displayName: "Math Tutoring"
   },
