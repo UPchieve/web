@@ -20,8 +20,6 @@
 <script>
 import { mapState, mapGetters } from "vuex";
 
-import SessionService from "@/services/SessionService";
-
 import "@/scss/main.scss";
 import AppHeader from "./AppHeader";
 import AppSidebar from "./AppSidebar";
@@ -179,9 +177,6 @@ export default {
   },
   sockets: {
     "session-change"(sessionData) {
-      SessionService.currentSession.sessionId = sessionData._id;
-      SessionService.currentSession.data = sessionData;
-
       this.$store.dispatch("user/updateSession", sessionData);
     }
   }

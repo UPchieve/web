@@ -4,7 +4,10 @@
       <div class="avatar-info-container">
         <div :style="partnerAvatar" class="avatar" />
         <div class="info">
-          <template v-if="isSessionWaitingForVolunteer">
+          <template v-if="isSessionEnding">
+            <loading-message message="Ending session" />
+          </template>
+          <template v-else-if="isSessionWaitingForVolunteer">
             <loading-message message="Contacting coaches" />
           </template>
           <template v-else-if="isSessionInProgress">
@@ -31,7 +34,7 @@
           Report
         </div>
 
-        <div class="end-session-btn" @click.prevent="end">
+        <div class="end-session-btn" @click="end">
           <span v-if="isSessionWaitingForVolunteer">
             Cancel
           </span>
@@ -74,10 +77,10 @@ import LoadingMessage from "@/components/LoadingMessage";
 export default {
   data() {
     return {
-      currentSession: SessionService.currentSession,
       connectionMsg: "",
       connectionMsgType: "",
-      reconnectAttemptMsg: ""
+      reconnectAttemptMsg: "",
+      isSessionEnding: false
     };
   },
   components: {
@@ -85,7 +88,8 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: state => state.user.user,
+      session: state => state.user.session
     }),
     ...mapGetters({
       sessionPartner: "user/sessionPartner",
@@ -129,48 +133,39 @@ export default {
         }
       }
 
-      this.$store.dispatch("user/clearSession");
+      if (this.isSessionEnding) {
+        return;
+      }
+      this.isSessionEnding = true;
 
       let studentId = "";
       let volunteerId = null;
       let subTopic = null;
       let topic = null;
-      let sessionId = SessionService.currentSession.sessionId;
+      let sessionId = this.session._id;
 
-      if (
-        SessionService.currentSession &&
-        SessionService.currentSession.data.student
-      ) {
-        studentId = SessionService.currentSession.data.student._id;
+      if (this.session.student) {
+        studentId = this.session.student._id;
       }
 
-      if (
-        SessionService.currentSession &&
-        SessionService.currentSession.data.volunteer
-      ) {
-        volunteerId = SessionService.currentSession.data.volunteer._id;
+      if (this.session.volunteer) {
+        volunteerId = this.session.volunteer._id;
       }
 
-      if (
-        SessionService.currentSession &&
-        SessionService.currentSession.data.type
-      ) {
-        topic = SessionService.currentSession.data.type;
+      if (this.session.type) {
+        topic = this.session.type;
       }
 
-      if (
-        SessionService.currentSession &&
-        SessionService.currentSession.data.subTopic
-      ) {
-        subTopic = SessionService.currentSession.data.subTopic;
+      if (this.session.subTopic) {
+        subTopic = this.session.subTopic;
       }
 
-      if (volunteerId) {
-        SessionService.endSession(this, sessionId)
-          .then(() => {
-            this.$socket.disconnect();
-            const url =
-              "/feedback/" +
+      SessionService.endSession(this, sessionId)
+        .then(() => {
+          this.$socket.disconnect();
+          this.$store.dispatch("user/sessionDisconnected");
+          const url = volunteerId
+            ? "/feedback/" +
               sessionId +
               "/" +
               topic +
@@ -181,18 +176,11 @@ export default {
               "/" +
               studentId +
               "/" +
-              volunteerId;
-            router.push(url);
-          })
-          .catch(this.alertCouldNotEnd);
-      } else {
-        SessionService.endSession(this, sessionId)
-          .then(() => {
-            this.$socket.disconnect();
-            router.push("/");
-          })
-          .catch(this.alertCouldNotEnd);
-      }
+              volunteerId
+            : "/";
+          router.push(url);
+        })
+        .catch(this.alertCouldNotEnd);
     },
     reportSession() {
       this.$store.dispatch("app/modal/show", {
@@ -203,6 +191,7 @@ export default {
       });
     },
     alertCouldNotEnd() {
+      this.isSessionEnding = false;
       window.alert("Could not end session");
     },
     tryReconnect() {
