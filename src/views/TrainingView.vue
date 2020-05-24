@@ -37,7 +37,10 @@
                 <div class="review-container">
                   <div class="review-label">
                     <router-link
-                      :to="'/training/review/' + categoryKeys[category]"
+                      :to="
+                        '/training/review/' +
+                          categoryKeys[category].toLowerCase()
+                      "
                       tag="a"
                     >
                       Review
@@ -50,7 +53,9 @@
             <div class="test">
               <router-link
                 v-if="!hasPassed(category) && hasTries(category)"
-                :to="'/training/' + categoryKeys[category] + '/quiz'"
+                :to="
+                  '/training/' + categoryKeys[category].toLowerCase() + '/quiz'
+                "
                 tag="div"
                 class="test-container"
               >

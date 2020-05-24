@@ -80,14 +80,23 @@ import QuizQuestions from "./QuizQuestions";
 import QuizResults from "./QuizResults";
 import QuizReview from "./QuizReview";
 
+import isPhysics from "@/utils/is-physics";
+import { PHYSICS_MAPPING } from "@/consts";
+import { allSubtopics } from "@/utils/topics";
+
 export default {
   data() {
-    const { category } = this.$route.params;
+    const subtopics = allSubtopics();
+    let { category } = this.$route.params;
     let quizName;
+
+    // format physics from lowercase 'physicsone' -> 'physicsOne'
+    if (isPhysics(category)) category = PHYSICS_MAPPING[category];
+
     if (category === "esl") {
       quizName = category.toUpperCase();
     } else {
-      quizName = category.charAt(0).toUpperCase() + category.slice(1);
+      quizName = subtopics[category].displayName;
     }
 
     return {
