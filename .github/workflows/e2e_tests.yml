@@ -18,10 +18,10 @@ jobs:
         if curl --head --silent --fail "https://github.com/UPchieve/server/tree/${{ github.head_ref }}" 2> /dev/null;
          then
           echo "found companion branch"
-          export HAS_SAME_SERVER_BRANCH=1
+          echo "::set-env name=HAS_SAME_SERVER_BRANCH::1"
          else
           echo "did not find companion branch"
-          export HAS_SAME_SERVER_BRANCH=0
+          echo "::set-env name=HAS_SAME_SERVER_BRANCH::0"
         fi
         echo $HAS_SAME_SERVER_BRANCH
     # To save time, detach and pull some of the largest docker files
