@@ -14,11 +14,13 @@ jobs:
     steps:
     - name: See whether a corresponding branch exists
       run: |
-        echo "${{ github.head_ref }}"
-        if curl --head --silent --fail "https://github.com/UPchieve/web/tree/${{ github.head_ref }}" 2> /dev/null;
+        echo "https://github.com/UPchieve/server/tree/${{ github.head_ref }}"
+        if curl --head --silent --fail "https://github.com/UPchieve/server/tree/${{ github.head_ref }}" 2> /dev/null;
          then
+          echo "found companion branch"
           export HAS_SAME_SERVER_BRANCH=1
          else
+          echo "did not find companion branch"
           export HAS_SAME_SERVER_BRANCH=0
         fi
     # To save time, detach and pull some of the largest docker files
@@ -30,7 +32,6 @@ jobs:
     # - run: mkdir server
     # - run: mkdir web
     # # Checks-out tthe server repository under $GITHUB_WORKSPACE/server
-    - run: export HAS_SAME_SERVER_BRANCH=0
     - name: Checkout a matching feature branch from server repo (if it exists)
       if: env.HAS_SAME_SERVER_BRANCH == 1
       uses: actions/checkout@v2
