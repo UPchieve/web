@@ -23,6 +23,7 @@ jobs:
           echo "did not find companion branch"
           export HAS_SAME_SERVER_BRANCH=0
         fi
+        echo $HAS_SAME_SERVER_BRANCH
     # To save time, detach and pull some of the largest docker files
     # - run: (docker pull node:11 && docker pull mongo:4.2.3-bionic) &
     # - uses: actions/setup-node@v1
@@ -32,6 +33,8 @@ jobs:
     # - run: mkdir server
     # - run: mkdir web
     # # Checks-out tthe server repository under $GITHUB_WORKSPACE/server
+    - name: check var continues
+      run: echo $HAS_SAME_SERVER_BRANCH
     - name: Checkout a matching feature branch from server repo (if it exists)
       if: env.HAS_SAME_SERVER_BRANCH == 1
       uses: actions/checkout@v2
