@@ -159,6 +159,7 @@ p {
     border-radius: 4px;
     justify-content: center;
     padding: 10px;
+    font-size: 15px;
 
     &--selected {
       border-color: $c-success-green;

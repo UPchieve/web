@@ -6,7 +6,11 @@ export const topics = {
       geometry: { displayName: "Geometry" },
       trigonometry: { displayName: "Trigonometry" },
       precalculus: { displayName: "Precalculus" },
-      calculus: { displayName: "Calculus" }
+      calculus: { displayName: "Calculus" },
+      integratedMathOne: { displayName: "Integrated Math 1" },
+      integratedMathTwo: { displayName: "Integrated Math 2" },
+      integratedMathThree: { displayName: "Integrated Math 3" },
+      integratedMathFour: { displayName: "Integrated Math 4" }
     },
     displayName: "Math Tutoring"
   },
