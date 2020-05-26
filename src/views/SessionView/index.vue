@@ -205,6 +205,14 @@ export default {
       } else if (this.$route.params.sessionId) {
         this.joinSession(this.$route.params.sessionId);
       }
+    },
+    "partner-status"(data) {
+      console.log(data)
+      console.log(data.isSessionPartnerConnectionAlive)
+      this.$store.dispatch(
+        "user/updateSessionPartnerStatus",
+        data.isSessionPartnerConnectionAlive
+      );
     }
   },
   methods: {
