@@ -207,8 +207,6 @@ export default {
       }
     },
     "partner-status"(data) {
-      console.log(data)
-      console.log(data.isSessionPartnerConnectionAlive)
       this.$store.dispatch(
         "user/updateSessionPartnerStatus",
         data.isSessionPartnerConnectionAlive
