@@ -11,7 +11,8 @@
             <loading-message message="Contacting coaches" />
           </template>
           <template v-else-if="isSessionInProgress">
-            <span class="volunteer-name">{{ sessionPartner.firstname }}</span><br />
+            <span class="volunteer-name">{{ sessionPartner.firstname }}</span
+            ><br />
             <template v-if="isSessionConnectionAlive">
               <span class="partner-status">
                 <template v-if="isSessionPartnerConnectionAlive">
@@ -101,7 +102,8 @@ export default {
       user: state => state.user.user,
       session: state => state.user.session,
       isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
-      isSessionPartnerConnectionAlive: state => state.user.isSessionPartnerConnectionAlive
+      isSessionPartnerConnectionAlive: state =>
+        state.user.isSessionPartnerConnectionAlive
     }),
     ...mapGetters({
       sessionPartner: "user/sessionPartner",

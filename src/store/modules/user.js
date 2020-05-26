@@ -63,7 +63,10 @@ export default {
       state.isSessionConnectionAlive = isSessionConnectionAlive;
     },
 
-    setIsSessionPartnerConnectionAlive: (state, isSessionPartnerConnectionAlive) => {
+    setIsSessionPartnerConnectionAlive: (
+      state,
+      isSessionPartnerConnectionAlive
+    ) => {
       state.isSessionPartnerConnectionAlive = isSessionPartnerConnectionAlive;
     }
   },
@@ -134,8 +137,14 @@ export default {
       commit("setSession", sessionData);
     },
 
-    updateSessionPartnerStatus: ({ commit }, isSessionPartnerConnectionAlive) => {
-      commit("setIsSessionPartnerConnectionAlive", isSessionPartnerConnectionAlive);
+    updateSessionPartnerStatus: (
+      { commit },
+      isSessionPartnerConnectionAlive
+    ) => {
+      commit(
+        "setIsSessionPartnerConnectionAlive",
+        isSessionPartnerConnectionAlive
+      );
     },
 
     updateAvailability: ({ commit }, availability, date = Date.now()) => {
