@@ -147,7 +147,7 @@ $header-height: 80px;
     box-shadow: 0px 0px 40px rgba(0, 0, 0, 0.04);
 
     max-width: 600px;
-    max-height: 520px;
+    max-height: 100vh;
     height: auto;
 
     margin: 0 auto;

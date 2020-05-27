@@ -82,6 +82,7 @@
 import { mapState, mapGetters } from "vuex";
 
 import { topics, allSubtopics } from "@/utils/topics";
+import isIntegratedMath from "@/utils/is-integrated-math";
 
 export default {
   data() {
@@ -98,6 +99,12 @@ export default {
         result[key] = value;
         return result;
       }, {});
+
+    // hide integrated math topics from quiz selection
+    const filteredMathQuizzes = quizzes["Math Tutoring"].filter(
+      topic => !isIntegratedMath(topic)
+    );
+    quizzes["Math Tutoring"] = filteredMathQuizzes;
 
     // todo consider refactoring so that we identify categories by the
     // key rather than by the display name
