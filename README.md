@@ -68,7 +68,7 @@ npm run lint
 npm run clean-slate
 ```
 
-7. See [the web server repo](https://github.com/UPchieve/server) for server installation
+7. See [the web server repo](https://github.com/UPchieve/server) for server installation.
 
 More information about our Vue setup:
 - [Vue CLI](https://cli.vuejs.org/guide/)
