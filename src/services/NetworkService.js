@@ -211,9 +211,19 @@ export default {
       .post(`${API_ROOT}/session/${sessionId}/report`, { reportMessage })
       .then(this._successHandler, this._errorHandler);
   },
-  adminGetSessions(page) {
+  adminGetSessions({
+    page,
+    showBannedUsers,
+    showTestUsers,
+    sessionActivityFrom,
+    sessionActivityTo,
+    minMessagesSent,
+    minSessionLength
+  }) {
     return Vue.http
-      .get(`${API_ROOT}/sessions?page=${page}`)
+      .get(
+        `${API_ROOT}/sessions?page=${page}&showBannedUsers=${showBannedUsers}&showTestUsers=${showTestUsers}&minSessionLength=${minSessionLength}&sessionActivityFrom=${sessionActivityFrom}&sessionActivityTo=${sessionActivityTo}&minMessagesSent=${minMessagesSent}`
+      )
       .then(this._successHandler, this._errorHandler);
   },
   adminGetSession(sessionId) {
