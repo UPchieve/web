@@ -122,7 +122,7 @@ describe("Student and volunteer signup", () => {
 
     it("Should successfully create a new volunteer account", function() {
       cy.server();
-      cy.route("POST", "/auth/register").as("register");
+      cy.route("POST", "/auth/register/volunteer").as("registerVolunteer");
 
       cy.visit("/signup");
 
@@ -176,7 +176,7 @@ describe("Student and volunteer signup", () => {
 
           cy.get("button[type=submit]").click();
 
-          cy.wait("@register")
+          cy.wait("@registerVolunteer")
             .its("responseBody.user._id")
             .as("userId");
           cy.get("div.uc-form-body").should("contain", "verification email");
@@ -248,7 +248,7 @@ describe("Student and volunteer signup", () => {
         // register unverified new volunteer
         const userObj = Object.assign({}, this.newVolunteer);
         userObj.code = codes[0];
-        cy.createUser(userObj);
+        cy.createVolunteer(userObj);
       });
     });
 

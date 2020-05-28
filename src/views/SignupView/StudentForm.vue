@@ -556,8 +556,7 @@ export default {
       }
     },
     submit() {
-      AuthService.register(this, {
-        isVolunteer: false,
+      AuthService.registerStudent(this, {
         email: this.credentials.email,
         password: this.credentials.password,
         terms: this.credentials.terms,

@@ -20,12 +20,33 @@ jobs:
     # Create directories to put in web and server
     - run: mkdir server
     - run: mkdir web
-    # Checks-out tthe server repository under $GITHUB_WORKSPACE/server
-    - uses: actions/checkout@v2
+    # Check whether there is a branch with the same name in server
+    - name: Check for branch of same name in server repo
+      run: |
+        if curl --head --silent --fail "https://github.com/UPchieve/server/tree/${{ github.head_ref }}" 2> /dev/null;
+         then
+          echo "found companion branch"
+          echo "::set-env name=HAS_SAME_SERVER_BRANCH::1"
+         else
+          echo "did not find companion branch"
+          echo "::set-env name=HAS_SAME_SERVER_BRANCH::0"
+        fi
+    # If no matching branch is found in server, checkout master to $GITHUB_WORKSPACE/server
+    - name: Checkout a master branch from server repo (if there is no matching branch in server)
+      if: env.HAS_SAME_SERVER_BRANCH == 0
+      uses: actions/checkout@v2
       with:
         repository: 'upchieve/server'
         path: 'server'
-    # Checks-out this web repository under $GITHUB_WORKSPACE/web
+    # If a matching branch is found in server, checkout that branch to $GITHUB_WORKSPACE/server
+    - name: Checkout a matching feature branch from server repo (if it exists)
+      if: env.HAS_SAME_SERVER_BRANCH == 1
+      uses: actions/checkout@v2
+      with:
+        repository: 'upchieve/server'
+        path: 'server'
+        ref: ${{ github.head_ref }}
+    # Checks-out this web repository to $GITHUB_WORKSPACE/web
     - uses: actions/checkout@v2
       with:
         path: 'web'

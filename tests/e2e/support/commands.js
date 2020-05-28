@@ -67,14 +67,13 @@ Cypress.Commands.add("getVolunteerCodes", () => {
     .its("body.volunteerCodes");
 });
 
-Cypress.Commands.add("createUser", userObj => {
-  const registerUrl = `${Cypress.env("SERVER_ROOT")}/auth/register`;
+Cypress.Commands.add("createVolunteer", userObj => {
+  const registerUrl = `${Cypress.env("SERVER_ROOT")}/auth/register/volunteer`;
 
   cy.request({
     url: registerUrl,
     method: "POST",
     body: {
-      isVolunteer: userObj.isVolunteer,
       email: userObj.email,
       password: userObj.password,
       code: userObj.code,
