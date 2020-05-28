@@ -406,8 +406,7 @@ export default {
     },
 
     register() {
-      AuthService.register(this, {
-        isVolunteer: false,
+      AuthService.registerStudent(this, {
         studentPartnerOrg: this.$route.params.partnerId,
         partnerUserId: this.$route.query.uid,
         email: this.formData.email,
