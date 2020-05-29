@@ -31,8 +31,22 @@ export default {
     });
   },
 
-  register(context, signupData) {
-    return NetworkService.register(context, signupData)
+  registerVolunteer(context, signupData) {
+    return NetworkService.registerVolunteer(context, signupData)
+      .then(res => {
+        const data = { ...res.data };
+        if (!data) {
+          throw new Error("No user returned from auth service");
+        }
+
+        context.msg = "You have been signed up!";
+      })
+      .catch(res => {
+        throw errorFromHttpResponse(res);
+      });
+  },
+  registerStudent(context, signupData) {
+    return NetworkService.registerStudent(context, signupData)
       .then(res => {
         const data = { ...res.data };
         if (!data) {

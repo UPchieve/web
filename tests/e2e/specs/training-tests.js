@@ -51,7 +51,7 @@ describe("Training quizzes", function() {
             cy.getVolunteerCodes().then(codes => {
               userObj.code = codes[0];
 
-              cy.createUser(userObj);
+              cy.createVolunteer(userObj);
             });
           });
 
