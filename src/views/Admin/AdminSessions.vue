@@ -85,9 +85,9 @@ export default {
     this.filters.sessionActivityTo =
       sessionActivityTo || this.filters.sessionActivityTo;
     this.filters.minMessagesSent =
-      minMessagesSent || this.filters.minMessagesSent;
+      parseInt(minMessagesSent) || this.filters.minMessagesSent;
     this.filters.minSessionLength =
-      minSessionLength || this.filters.minSessionLength;
+      parseInt(minSessionLength) || this.filters.minSessionLength;
     this.setPage(page);
   },
 
