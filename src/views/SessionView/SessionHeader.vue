@@ -66,7 +66,6 @@
 import { mapState, mapGetters } from "vuex";
 
 import SessionService from "@/services/SessionService";
-import router from "@/router";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
 import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 import LoadingMessage from "@/components/LoadingMessage";
@@ -138,30 +137,9 @@ export default {
       }
       this.isSessionEnding = true;
 
-      let studentId = "";
-      let volunteerId = null;
-      let subTopic = null;
-      let topic = null;
       let sessionId = this.session._id;
 
-      if (this.session.student) {
-        studentId = this.session.student._id;
-      }
-
-      if (this.session.volunteer) {
-        volunteerId = this.session.volunteer._id;
-      }
-
-      if (this.session.type) {
-        topic = this.session.type;
-      }
-
-      if (this.session.subTopic) {
-        subTopic = this.session.subTopic;
-      }
-
-      SessionService.endSession(this, sessionId)
-        .catch(this.alertCouldNotEnd);
+      SessionService.endSession(this, sessionId).catch(this.alertCouldNotEnd);
     },
     reportSession() {
       this.$store.dispatch("app/modal/show", {
