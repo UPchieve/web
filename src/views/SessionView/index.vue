@@ -278,22 +278,26 @@ export default {
         this.$socket.disconnect();
         this.$store.dispatch("user/sessionDisconnected");
 
-        // redirect user to feedback form
-        const url = volunteerId
-          ? "/feedback/" +
-            oldValue._id +
-            "/" +
-            oldValue.type +
-            "/" +
-            oldValue.subTopic +
-            "/" +
-            (this.user.isVolunteer ? "volunteer" : "student") +
-            "/" +
-            (oldValue.student ? oldValue.student._id : null) +
-            "/" +
-            (oldValue.volunteer ? oldValue.volunteer._id : null)
-          : "/";
-        router.push(url);
+        if (oldValue.volunteer) {
+          // if session had a volunteer, redirect user to feedback form
+          const url = oldValue.volunteer._id
+            ? "/feedback/" +
+              oldValue._id +
+              "/" +
+              oldValue.type +
+              "/" +
+              oldValue.subTopic +
+              "/" +
+              (this.user.isVolunteer ? "volunteer" : "student") +
+              "/" +
+              (oldValue.student ? oldValue.student._id : null) +
+              "/" +
+              (oldValue.volunteer ? oldValue.volunteer._id : null)
+            : "/";
+          this.$router.push(url);
+        } else {
+          this.$router.push("/");
+        }
       }
     },
     isSessionConnectionAlive(newValue, oldValue) {
