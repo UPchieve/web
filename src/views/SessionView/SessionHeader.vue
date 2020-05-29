@@ -161,25 +161,6 @@ export default {
       }
 
       SessionService.endSession(this, sessionId)
-        .then(() => {
-          this.$socket.disconnect();
-          this.$store.dispatch("user/sessionDisconnected");
-          const url = volunteerId
-            ? "/feedback/" +
-              sessionId +
-              "/" +
-              topic +
-              "/" +
-              subTopic +
-              "/" +
-              (this.user.isVolunteer ? "volunteer" : "student") +
-              "/" +
-              studentId +
-              "/" +
-              volunteerId
-            : "/";
-          router.push(url);
-        })
         .catch(this.alertCouldNotEnd);
     },
     reportSession() {

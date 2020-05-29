@@ -272,6 +272,30 @@ export default {
     }
   },
   watch: {
+    session(newValue, oldValue) {
+      if (!newValue.createdAt && oldValue.createdAt) {
+        // disconnect socket
+        this.$socket.disconnect();
+        this.$store.dispatch("user/sessionDisconnected");
+
+        // redirect user to feedback form
+        const url = volunteerId
+          ? "/feedback/" +
+            oldValue._id +
+            "/" +
+            oldValue.type +
+            "/" +
+            oldValue.subTopic +
+            "/" +
+            (this.user.isVolunteer ? "volunteer" : "student") +
+            "/" +
+            (oldValue.student ? oldValue.student._id : null) +
+            "/" +
+            (oldValue.volunteer ? oldValue.volunteer._id : null)
+          : "/";
+        router.push(url);
+      }
+    },
     isSessionConnectionAlive(newValue, oldValue) {
       if (newValue && !oldValue) {
         this.$store.dispatch("app/modal/hide");
