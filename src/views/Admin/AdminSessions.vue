@@ -59,13 +59,35 @@ export default {
           .format("YYYY-MM-DD"),
         sessionActivityTo: moment().format("YYYY-MM-DD"),
         minMessagesSent: 0,
-        minSessionLength: 0 // in minutes,
+        minSessionLength: 1 // in minutes,
       }
     };
   },
 
   async created() {
-    const page = parseInt(this.$route.query.page) || this.page;
+    const {
+      query: {
+        page: pageQuery,
+        showBannedUsers,
+        showTestUsers,
+        sessionActivityFrom,
+        sessionActivityTo,
+        minMessagesSent,
+        minSessionLength
+      }
+    } = this.$route;
+    const page = parseInt(pageQuery) || this.page;
+    this.filters.showBannedUsers =
+      showBannedUsers || this.filters.showBannedUsers;
+    this.filters.showTestUsers = showTestUsers || this.filters.showTestUsers;
+    this.filters.sessionActivityFrom =
+      sessionActivityFrom || this.filters.sessionActivityFrom;
+    this.filters.sessionActivityTo =
+      sessionActivityTo || this.filters.sessionActivityTo;
+    this.filters.minMessagesSent =
+      minMessagesSent || this.filters.minMessagesSent;
+    this.filters.minSessionLength =
+      minSessionLength || this.filters.minSessionLength;
     this.setPage(page);
   },
 
