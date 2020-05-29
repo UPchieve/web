@@ -9,6 +9,7 @@
           id="show-banned-users"
           type="checkbox"
           :value="showBannedUsers"
+          :checked="showBannedUsers"
           @change="toggleShowBannedUsers"
         />
       </div>
@@ -20,6 +21,7 @@
           id="show-test-users"
           type="checkbox"
           :value="showTestUsers"
+          :checked="showTestUsers"
           @change="toggleShowTestUsers"
         />
       </div>
