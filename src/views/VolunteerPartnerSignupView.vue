@@ -381,7 +381,7 @@ export default {
     },
 
     register() {
-      AuthService.registerVolunteer(this, {
+      AuthService.registerPartnerVolunteer(this, {
         volunteerPartnerOrg: this.$route.params.partnerId,
         partnerUserId: this.$route.query.uid,
         email: this.formData.email,

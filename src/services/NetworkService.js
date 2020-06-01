@@ -103,9 +103,14 @@ export default {
       )
       .then(this._successHandler, this._errorHandler);
   },
-  registerVolunteer(context, data) {
+  registerOpenVolunteer(context, data) {
     return context.$http
-      .post(`${AUTH_ROOT}/register/volunteer`, data)
+      .post(`${AUTH_ROOT}/register/volunteer/partner`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
+  registerPartnerVolunteer(context, data) {
+    return context.$http
+      .post(`${AUTH_ROOT}/register/volunteer/partner`, data)
       .then(this._successHandler, this._errorHandler);
   },
   registerStudent(context, data) {

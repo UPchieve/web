@@ -307,7 +307,7 @@ export default {
       }
     },
     submit() {
-      AuthService.registerVolunteer(this, {
+      AuthService.registerOpenVolunteer(this, {
         email: this.credentials.email,
         password: this.credentials.password,
         terms: this.credentials.terms,
