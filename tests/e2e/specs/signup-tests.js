@@ -113,7 +113,7 @@ describe("Student and volunteer signup", () => {
 
     it("Should successfully create a new volunteer account", function() {
       cy.server();
-      cy.route("POST", "/auth/register/volunteer").as("registerVolunteer");
+      cy.route("POST", "/auth/register/volunteer/open").as("registerOpenVolunteer");
 
       cy.visit("/signup");
 
@@ -157,7 +157,7 @@ describe("Student and volunteer signup", () => {
 
       cy.get("button[type=submit]").click();
 
-      cy.wait("@registerVolunteer")
+      cy.wait("@registerOpenVolunteer")
         .its("responseBody.user._id")
         .as("userId");
 
