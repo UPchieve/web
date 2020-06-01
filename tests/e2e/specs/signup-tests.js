@@ -204,17 +204,9 @@ describe("Student and volunteer signup", () => {
   describe("Fail verification", function() {
     before(function() {
       cy.login(this.volunteer);
-
       cy.deleteUserByEmail(this.newVolunteer.email);
-
-      cy.getVolunteerCodes().then(codes => {
-        cy.logout();
-
-        // register unverified new volunteer
-        const userObj = Object.assign({}, this.newVolunteer);
-        userObj.code = codes[0];
-        cy.createVolunteer(userObj);
-      });
+      cy.logout();
+      cy.createOpenVolunteer(this.newVolunteer);
     });
 
     it("Should not accept invalid verification token", function() {

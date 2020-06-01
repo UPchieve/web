@@ -54,21 +54,10 @@ Cypress.Commands.add("deleteUserByEmail", email => {
   });
 });
 
-Cypress.Commands.add("getVolunteerCodes", () => {
-  //get valid codes from server
-  const validCodesUrl = `${Cypress.env(
+Cypress.Commands.add("createOpenVolunteer", userObj => {
+  const registerUrl = `${Cypress.env(
     "SERVER_ROOT"
-  )}/auth/register/volunteercodes`;
-
-  return cy
-    .request({
-      url: validCodesUrl
-    })
-    .its("body.volunteerCodes");
-});
-
-Cypress.Commands.add("createVolunteer", userObj => {
-  const registerUrl = `${Cypress.env("SERVER_ROOT")}/auth/register/volunteer`;
+  )}/auth/register/volunteer/open`;
 
   cy.request({
     url: registerUrl,
@@ -76,7 +65,6 @@ Cypress.Commands.add("createVolunteer", userObj => {
     body: {
       email: userObj.email,
       password: userObj.password,
-      code: userObj.code,
       college: userObj.college,
       phone: userObj.phoneNumber,
       firstName: userObj.firstName,

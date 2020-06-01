@@ -105,7 +105,7 @@ export default {
   },
   registerOpenVolunteer(context, data) {
     return context.$http
-      .post(`${AUTH_ROOT}/register/volunteer/partner`, data)
+      .post(`${AUTH_ROOT}/register/volunteer/open`, data)
       .then(this._successHandler, this._errorHandler);
   },
   registerPartnerVolunteer(context, data) {
