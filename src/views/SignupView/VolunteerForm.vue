@@ -207,9 +207,7 @@
 <script>
 import validator from "validator";
 import * as Sentry from "@sentry/browser";
-
 import AuthService from "@/services/AuthService";
-import RegistrationService from "@/services/RegistrationService";
 
 export default {
   data() {
@@ -310,7 +308,6 @@ export default {
     },
     submit() {
       AuthService.registerVolunteer(this, {
-        code: RegistrationService.data.registrationCode,
         email: this.credentials.email,
         password: this.credentials.password,
         terms: this.credentials.terms,

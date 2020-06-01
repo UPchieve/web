@@ -71,11 +71,6 @@ export default {
       .get(`${AUTH_ROOT}/logout`)
       .then(this._successHandler, this._errorHandler);
   },
-  checkCode(context, data) {
-    return context.$http
-      .post(`${AUTH_ROOT}/register/check`, data)
-      .then(this._successHandler, this._errorHandler);
-  },
   checkRegister(context, data) {
     return context.$http
       .post(`${AUTH_ROOT}/register/checkcred`, data)
