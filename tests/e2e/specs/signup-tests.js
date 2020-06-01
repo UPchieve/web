@@ -107,16 +107,7 @@ describe("Student and volunteer signup", () => {
   describe("Volunteer signup", () => {
     before(function() {
       cy.login(this.volunteer);
-
       cy.deleteUserByEmail(this.newVolunteer.email);
-
-      const validCodesUrl = `${Cypress.env(
-        "SERVER_ROOT"
-      )}/auth/register/volunteercodes`;
-      cy.request({
-        url: validCodesUrl
-      }).as("volunteerCodes");
-
       cy.logout();
     });
 
@@ -132,59 +123,49 @@ describe("Student and volunteer signup", () => {
         .contains("Volunteer")
         .click();
 
-      cy.get("@volunteerCodes")
-        .then(response => {
-          const code = response.body.volunteerCodes[0];
+      cy.get("#inputEmail")
+        .type(this.newVolunteer.email)
+        .should("have.value", this.newVolunteer.email);
 
-          cy.get("#inputRegistrationCode")
-            .type(code)
-            .should("have.value", code);
+      cy.get("#inputPassword")
+        .type(this.newVolunteer.password)
+        .should("have.value", this.newVolunteer.password);
 
-          cy.get("button[type=submit]").click();
+      cy.get("button[type=submit]").click();
 
-          cy.get("#inputEmail")
-            .type(this.newVolunteer.email)
-            .should("have.value", this.newVolunteer.email);
+      cy.get("#firstName")
+        .type(this.newVolunteer.firstName)
+        .should("have.value", this.newVolunteer.firstName);
 
-          cy.get("#inputPassword")
-            .type(this.newVolunteer.password)
-            .should("have.value", this.newVolunteer.password);
+      cy.get("#lastName")
+        .type(this.newVolunteer.lastName)
+        .should("have.value", this.newVolunteer.lastName);
 
-          cy.get("button[type=submit]").click();
+      cy.get("#phoneNumber_phone_number")
+        .type(this.newVolunteer.phoneNumber)
+        .should("have.value", this.newVolunteer.phoneNumber);
 
-          cy.get("#firstName")
-            .type(this.newVolunteer.firstName)
-            .should("have.value", this.newVolunteer.firstName);
+      cy.get("#college")
+        .type(this.newVolunteer.college)
+        .should("have.value", this.newVolunteer.college);
 
-          cy.get("#lastName")
-            .type(this.newVolunteer.lastName)
-            .should("have.value", this.newVolunteer.lastName);
+      cy.get("#favoriteAcademicSubject")
+        .type(this.newVolunteer.favoriteAcademicSubject)
+        .should("have.value", this.newVolunteer.favoriteAcademicSubject);
 
-          cy.get("#phoneNumber_phone_number")
-            .type(this.newVolunteer.phoneNumber)
-            .should("have.value", this.newVolunteer.phoneNumber);
+      cy.get("#userAgreement").click();
 
-          cy.get("#college")
-            .type(this.newVolunteer.college)
-            .should("have.value", this.newVolunteer.college);
+      cy.get("button[type=submit]").click();
 
-          cy.get("#favoriteAcademicSubject")
-            .type(this.newVolunteer.favoriteAcademicSubject)
-            .should("have.value", this.newVolunteer.favoriteAcademicSubject);
+      cy.wait("@registerVolunteer")
+        .its("responseBody.user._id")
+        .as("userId");
 
-          cy.get("#userAgreement").click();
+      cy.get("div.uc-form-body").should("contain", "verification email");
 
-          cy.get("button[type=submit]").click();
+      cy.route("POST", "/api/verify/confirm").as("confirmVerification");
 
-          cy.wait("@registerVolunteer")
-            .its("responseBody.user._id")
-            .as("userId");
-          cy.get("div.uc-form-body").should("contain", "verification email");
-
-          cy.route("POST", "/api/verify/confirm").as("confirmVerification");
-
-          return cy.get("@userId");
-        })
+      cy.get("@userId")
         .then(userid => {
           cy.login(this.volunteer);
 
@@ -215,24 +196,6 @@ describe("Student and volunteer signup", () => {
             this.newVolunteer.firstName
           );
         });
-    });
-
-    it("Should not accept invalid code", function() {
-      cy.visit("/signup");
-
-      cy.location("pathname").should("eq", "/signup");
-
-      cy.get("button")
-        .contains("Volunteer")
-        .click();
-
-      cy.get("#inputRegistrationCode")
-        .type(this.newVolunteer.code)
-        .should("have.value", this.newVolunteer.code);
-
-      cy.get("button[type=submit]").click();
-
-      cy.get(".uc-form-body:last-child").should("contain", "invalid");
     });
   });
 
