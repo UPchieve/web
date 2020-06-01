@@ -113,7 +113,9 @@ describe("Student and volunteer signup", () => {
 
     it("Should successfully create a new volunteer account", function() {
       cy.server();
-      cy.route("POST", "/auth/register/volunteer/open").as("registerOpenVolunteer");
+      cy.route("POST", "/auth/register/volunteer/open").as(
+        "registerOpenVolunteer"
+      );
 
       cy.visit("/signup");
 
