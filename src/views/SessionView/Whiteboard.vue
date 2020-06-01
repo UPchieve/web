@@ -133,7 +133,8 @@ export default {
       session: state => state.user.session
     }),
     ...mapGetters({
-      mobileMode: "app/mobileMode"
+      mobileMode: "app/mobileMode",
+      isVolunteer: "user/isVolunteer"
     }),
     mouseCursor() {
       if (this.selectedTool === "pen") return { cursor: "crosshair" };
@@ -169,6 +170,10 @@ export default {
     this.useBrushTool();
 
     this.zwibblerCtx.on("document-changed", info => {
+      if (this.zwibblerCtx.getPageCount() === 0 && this.isVolunteer === false) {
+        this.zwibblerCtx.newDocument();
+      }
+
       const isRemoteChange = info && info.remote;
       const isWhiteboardHidden = this.mobileMode && !this.isVisible;
       const shouldResizeView = isRemoteChange && isWhiteboardHidden;
