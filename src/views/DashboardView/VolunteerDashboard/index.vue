@@ -11,70 +11,79 @@
     </dashboard-banner>
 
     <div class="volunteer-dashboard__body">
-      <div v-if="!isOnboarded" class="dashboard-card">
-        <div class="dashboard-card__title">Remaining Onboarding Steps</div>
-        <div>
-          <div v-if="!hasSelectedAvailability" class="onboarding-step">
-            <img
-              src="@/assets/onboarding_icons/calendar-icon.png"
-              class="onboarding-icon"
-            />
-            <div>
-              <h4>Select availability</h4>
-              <p>
-                Select at least one hour of availability so that we know when we
-                can text you.
-              </p>
-            </div>
-          </div>
-          <div v-if="!hasCertification" class="onboarding-step">
-            <img
-              src="@/assets/onboarding_icons/quiz-icon.png"
-              class="onboarding-icon"
-            />
-            <div>
-              <h4>Get a certification</h4>
-              <p>
-                Pass at least one quiz so that we know what subjects you can
-                help students with.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div v-else class="students-waiting dashboard-card">
-        <div class="dashboard-card__title">Waiting Students</div>
-        <div v-if="isSessionAlive">
-          <button
-            class="btn rejoinSessionBtn"
-            @click.prevent="rejoinHelpSession()"
-          >
-            Rejoin your coaching session
-          </button>
-        </div>
-        <div v-else>
-          <div class="dashboard-card__description">
-            Students waiting for help will show up below.
-          </div>
-          <list-sessions />
-        </div>
-      </div>
-      <div class="dashboard-card">
-        <div class="dashboard-card__title">Your Impact Summary</div>
-
-        <div class="volunteer-impact">
-          <div class="volunteer-impact__stats">
-            <div
-              v-for="(stat, statIndex) in impactStats"
-              :key="statIndex"
-              class="volunteer-impact__stat"
+      <template v-if="user.isApproved && isOnboarded">
+        <div class="students-waiting dashboard-card">
+          <div class="dashboard-card__title">Waiting Students</div>
+          <div v-if="isSessionAlive">
+            <button
+              class="btn rejoinSessionBtn"
+              @click.prevent="rejoinHelpSession()"
             >
-              <div class="volunteer-impact__stat-label">{{ stat.label }}:</div>
-              <div class="volunteer-impact__stat-value">{{ stat.value }}</div>
+              Rejoin your coaching session
+            </button>
+          </div>
+          <div v-else>
+            <div class="dashboard-card__description">
+              Students waiting for help will show up below.
+            </div>
+            <list-sessions />
+          </div>
+        </div>
+        <div class="dashboard-card">
+          <div class="dashboard-card__title">Your Impact Summary</div>
+
+          <div class="volunteer-impact">
+            <div class="volunteer-impact__stats">
+              <div
+                v-for="(stat, statIndex) in impactStats"
+                :key="statIndex"
+                class="volunteer-impact__stat"
+              >
+                <div class="volunteer-impact__stat-label">
+                  {{ stat.label }}:
+                </div>
+                <div class="volunteer-impact__stat-value">{{ stat.value }}</div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </template>
+      <template v-else>
+        <div v-if="!user.isApproved" class="dashboard-card">
+          <h3>Approval steps</h3>
+        </div>
+        <div v-if="!isOnboarded" class="dashboard-card">
+          <div class="dashboard-card__title">Remaining Onboarding Steps</div>
+          <div>
+            <div v-if="!hasSelectedAvailability" class="onboarding-step">
+              <img
+                src="@/assets/onboarding_icons/calendar-icon.png"
+                class="onboarding-icon"
+              />
+              <div>
+                <h4>Select availability</h4>
+                <p>
+                  Select at least one hour of availability so that we know when
+                  we can text you.
+                </p>
+              </div>
+            </div>
+            <div v-if="!hasCertification" class="onboarding-step">
+              <img
+                src="@/assets/onboarding_icons/quiz-icon.png"
+                class="onboarding-icon"
+              />
+              <div>
+                <h4>Get a certification</h4>
+                <p>
+                  Pass at least one quiz so that we know what subjects you can
+                  help students with.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
     </div>
   </div>
 </template>
