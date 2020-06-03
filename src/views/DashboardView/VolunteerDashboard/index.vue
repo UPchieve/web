@@ -50,7 +50,41 @@
       </template>
       <template v-else>
         <div v-if="!user.isApproved" class="dashboard-card">
-          <h3>Approval steps</h3>
+          <verification-icon />
+          <h3>Volunteer Verification</h3>
+          <p>
+            Provide proof of identity and provide references to become an
+            approved volunteer
+          </p>
+
+          <div v-if="hasSelectedAvailability" class="onboarding-step">
+            <div class="onboarding-step-action-container">
+              <div class="icon-ring">
+                <person-icon />
+              </div>
+              <div class="onboarding-step-action">
+                <h4>Proof of identity</h4>
+                <p @click="showPhotoUploadModal">
+                  Add photo
+                </p>
+              </div>
+            </div>
+            <right-caret />
+          </div>
+          <div v-if="hasCertification" class="onboarding-step">
+            <div class="onboarding-step-action-container">
+              <div class="icon-ring">
+                <person-card-icon />
+              </div>
+              <div class="onboarding-step-action">
+                <h4>Reference check</h4>
+                <p @click="showReferencesModal">
+                  Add references
+                </p>
+              </div>
+            </div>
+            <right-caret />
+          </div>
         </div>
         <div v-if="!isOnboarded" class="dashboard-card">
           <div class="dashboard-card__title">Remaining Onboarding Steps</div>
@@ -95,6 +129,10 @@ import { mapState, mapGetters } from "vuex";
 import ListSessions from "./ListSessions";
 import DashboardBanner from "../DashboardBanner";
 import LargeButton from "@/components/LargeButton";
+import PersonCardIcon from "@/assets/person-card.svg";
+import PersonIcon from "@/assets/person.svg";
+import RightCaret from "@/assets/right-caret.svg";
+import VerificationIcon from "@/assets/verification.svg";
 
 import { allSubtopicNames } from "@/utils/topics";
 
@@ -107,7 +145,15 @@ const upchieveTopics = allSubtopicNames();
 
 export default {
   name: "volunteer-dashboard",
-  components: { ListSessions, DashboardBanner, LargeButton },
+  components: {
+    ListSessions,
+    DashboardBanner,
+    LargeButton,
+    PersonCardIcon,
+    PersonIcon,
+    RightCaret,
+    VerificationIcon
+  },
   watch: {
     isSessionAlive(isAlive) {
       if (!isAlive) {
@@ -228,6 +274,18 @@ export default {
         component: "VolunteerOnboardingModal",
         data: { alertModal: true, acceptText: "Get started" }
       });
+    },
+    showPhotoUploadModal() {
+      this.$store.dispatch("app/modal/show", {
+        component: "PhotoUploadModal",
+        data: { showTemplateButtons: false }
+      });
+    },
+    showReferencesModal() {
+      this.$store.dispatch("app/modal/show", {
+        component: "ReferencesModal",
+        data: { showTemplateButtons: false }
+      });
     }
   }
 };
@@ -333,14 +391,15 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
+  margin: 1em 0;
+  text-align: left;
 
-  &:first-child {
-    margin: 2.5em 0 3em;
+  &-action-container {
+    @include flex-container(row, center, center);
   }
 
-  & div {
-    text-align: left;
-    margin-left: 2em;
+  &-action {
+    margin-left: 1em;
   }
 }
 
@@ -348,5 +407,13 @@ export default {
   width: 70px;
   height: 70px;
   flex-shrink: 0;
+}
+
+.icon-ring {
+  @include flex-container(row, center, center);
+  height: 60px;
+  width: 60px;
+  border-radius: 50%;
+  border: 1px solid $c-border-grey;
 }
 </style>
