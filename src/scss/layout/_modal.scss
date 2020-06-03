@@ -95,12 +95,6 @@ $header-height: 80px;
   }
 }
 
-.modal-separator {
-  border: 1px solid $c-border-grey;
-  width: 100%;
-  height: 1px;
-}
-
 .modal-buttons {
   @include flex-container(row, flex-end);
   @include child-spacing(left, 16px);
@@ -117,6 +111,6 @@ $header-height: 80px;
 }
 
 .modal-close-icon {
-    width: 20px;
-    cursor: pointer;
+  width: 20px;
+  cursor: pointer;
 }
