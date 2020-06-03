@@ -120,13 +120,15 @@
       </template>
     </div>
 
-    <modal v-if="showPhotoUploadModal" :closeModal="togglePhotoUploadModal">
-      <photo-upload-modal :closeModal="togglePhotoUploadModal" />
-    </modal>
+    <photo-upload-modal
+      v-if="showPhotoUploadModal"
+      :closeModal="togglePhotoUploadModal"
+    />
 
-    <modal v-if="showReferencesModal" :closeModal="toggleReferencesModal">
-      <references-modal :closeModal="toggleReferencesModal" />
-    </modal>
+    <references-modal
+      v-if="showReferencesModal"
+      :closeModal="toggleReferencesModal"
+    />
   </div>
 </template>
 
@@ -136,7 +138,6 @@ import { mapState, mapGetters } from "vuex";
 
 import ListSessions from "./ListSessions";
 import DashboardBanner from "../DashboardBanner";
-import Modal from "@/components/Modal";
 import PhotoUploadModal from "./PhotoUploadModal";
 import ReferencesModal from "./ReferencesModal";
 import LargeButton from "@/components/LargeButton";
@@ -159,7 +160,6 @@ export default {
   components: {
     ListSessions,
     DashboardBanner,
-    Modal,
     PhotoUploadModal,
     ReferencesModal,
     LargeButton,

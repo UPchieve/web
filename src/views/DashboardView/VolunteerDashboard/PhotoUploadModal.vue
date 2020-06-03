@@ -1,42 +1,46 @@
 <template>
-  <div>
-    <header>
-      <h1 class="title">Proof of identity</h1>
-      <cross-icon class="modal-close-icon" @click="closeModal" />
-    </header>
-    <p class="subtitle">
-      Upload a picture of your photo ID so we can verify that it's you. This may
-      be a driver's license, passport, or student ID.
-    </p>
+  <modal :closeModal="closeModal">
+    <div>
+      <header>
+        <h1 class="title">Proof of identity</h1>
+        <cross-icon class="modal-close-icon" @click="closeModal" />
+      </header>
+      <p class="subtitle">
+        Upload a picture of your photo ID so we can verify that it's you. This
+        may be a driver's license, passport, or student ID.
+      </p>
 
-    <div v-if="photo" class="photo-id-container">
-      <img :src="photo" class="photo-id-img" />
-      <div class="trash-icon-container" @click="removePhoto">
-        <trash-icon class="trash-icon" />
+      <div v-if="photo" class="photo-id-container">
+        <img :src="photo" class="photo-id-img" />
+        <div class="trash-icon-container" @click="removePhoto">
+          <trash-icon class="trash-icon" />
+        </div>
       </div>
+      <label v-else class="photo-id-label">
+        <input type="file" class="photo-id-input" @change="submitPhoto" />
+        <button class="upload-photo-btn">Upload Photo</button>
+      </label>
+
+      <separator v-if="!mobileMode" />
+
+      <large-button @click="submitPhoto" class="save-btn" :disabled="!photo">
+        Save
+      </large-button>
     </div>
-    <label v-else class="photo-id-label">
-      <input type="file" class="photo-id-input" @change="submitPhoto" />
-      <button class="upload-photo-btn">Upload Photo</button>
-    </label>
-
-    <div v-if="!mobileMode" class="modal-separator" />
-
-    <large-button @click="submitPhoto" class="save-btn" :disabled="!photo">
-      Save
-    </large-button>
-  </div>
+  </modal>
 </template>
 
 <script>
 import { mapState, mapGetters } from "vuex";
+import Modal from "@/components/Modal";
+import Separator from "@/components/Separator";
 import LargeButton from "@/components/LargeButton";
 import TrashIcon from "@/assets/trash.svg";
 import CrossIcon from "@/assets/cross.svg";
 
 export default {
   name: "volunteer-dashboard",
-  components: { LargeButton, TrashIcon, CrossIcon },
+  components: { Modal, Separator, LargeButton, TrashIcon, CrossIcon },
   props: {
     closeModal: { type: Function, required: true }
   },
