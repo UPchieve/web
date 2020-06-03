@@ -64,7 +64,7 @@
               </div>
               <div class="onboarding-step-action">
                 <h4>Proof of identity</h4>
-                <p @click="showPhotoUploadModal">
+                <p @click="togglePhotoUploadModal">
                   Add photo
                 </p>
               </div>
@@ -78,7 +78,7 @@
               </div>
               <div class="onboarding-step-action">
                 <h4>Reference check</h4>
-                <p @click="showReferencesModal">
+                <p @click="toggleReferencesModal">
                   Add references
                 </p>
               </div>
@@ -119,6 +119,14 @@
         </div>
       </template>
     </div>
+
+    <modal v-if="showPhotoUploadModal" :closeModal="togglePhotoUploadModal">
+      <photo-upload-modal :closeModal="togglePhotoUploadModal" />
+    </modal>
+
+    <modal v-if="showReferencesModal" :closeModal="toggleReferencesModal">
+      <references-modal :closeModal="toggleReferencesModal" />
+    </modal>
   </div>
 </template>
 
@@ -128,6 +136,9 @@ import { mapState, mapGetters } from "vuex";
 
 import ListSessions from "./ListSessions";
 import DashboardBanner from "../DashboardBanner";
+import Modal from "@/components/Modal";
+import PhotoUploadModal from "./PhotoUploadModal";
+import ReferencesModal from "./ReferencesModal";
 import LargeButton from "@/components/LargeButton";
 import PersonCardIcon from "@/assets/person-card.svg";
 import PersonIcon from "@/assets/person.svg";
@@ -148,6 +159,9 @@ export default {
   components: {
     ListSessions,
     DashboardBanner,
+    Modal,
+    PhotoUploadModal,
+    ReferencesModal,
     LargeButton,
     PersonCardIcon,
     PersonIcon,
@@ -173,6 +187,12 @@ export default {
     }
 
     this.$store.dispatch("user/fetchVolunteerStats", this);
+  },
+  data() {
+    return {
+      showPhotoUploadModal: false,
+      showReferencesModal: false
+    };
   },
   computed: {
     ...mapState({
@@ -275,17 +295,11 @@ export default {
         data: { alertModal: true, acceptText: "Get started" }
       });
     },
-    showPhotoUploadModal() {
-      this.$store.dispatch("app/modal/show", {
-        component: "PhotoUploadModal",
-        data: { showTemplateButtons: false }
-      });
+    togglePhotoUploadModal() {
+      this.showPhotoUploadModal = !this.showPhotoUploadModal;
     },
-    showReferencesModal() {
-      this.$store.dispatch("app/modal/show", {
-        component: "ReferencesModal",
-        data: { showTemplateButtons: false }
-      });
+    toggleReferencesModal() {
+      this.showReferencesModal = !this.showReferencesModal;
     }
   }
 };

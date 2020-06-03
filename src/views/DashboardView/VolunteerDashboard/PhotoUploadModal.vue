@@ -2,7 +2,7 @@
   <div>
     <header>
       <h1 class="title">Proof of identity</h1>
-      <cross-icon class="cross-icon" @click="closeModal" />
+      <cross-icon class="modal-close-icon" @click="closeModal" />
     </header>
     <p class="subtitle">
       Upload a picture of your photo ID so we can verify that it's you. This may
@@ -20,7 +20,7 @@
       <button class="upload-photo-btn">Upload Photo</button>
     </label>
 
-    <div v-if="!mobileMode" class="seperator" />
+    <div v-if="!mobileMode" class="modal-separator" />
 
     <large-button @click="submitPhoto" class="save-btn" :disabled="!photo">
       Save
@@ -37,6 +37,9 @@ import CrossIcon from "@/assets/cross.svg";
 export default {
   name: "volunteer-dashboard",
   components: { LargeButton, TrashIcon, CrossIcon },
+  props: {
+    closeModal: { type: Function, required: true }
+  },
   data() {
     return {
       photo: ""
@@ -61,9 +64,6 @@ export default {
     removePhoto() {
       event.stopPropagation();
       this.photo = "";
-    },
-    closeModal() {
-      this.$store.dispatch("app/modal/hide");
     }
   }
 };
@@ -160,11 +160,6 @@ header {
 
 .trash-icon {
   fill: white;
-}
-
-.cross-icon {
-  width: 20px;
-  cursor: pointer;
 }
 
 .seperator {

@@ -2,7 +2,7 @@
   <div class="reference-modal">
     <header>
       <h1 class="title">Reference check</h1>
-      <cross-icon class="cross-icon" @click="closeModal" />
+      <cross-icon class="modal-close-icon" @click="closeModal" />
     </header>
     <div v-if="step === 0">
       <p class="subtitle">
@@ -92,7 +92,7 @@
       </button>
     </div>
 
-    <div v-if="!mobileMode" class="seperator" />
+    <div v-if="!mobileMode" class="modal-separator" />
 
     <div class="buttons-container">
       <large-button class="btn" @click.native="previousStep" v-if="step === 1"
@@ -131,6 +131,9 @@ import CrossIcon from "@/assets/cross.svg";
 export default {
   name: "reference-modal",
   components: { LargeButton, TrashIcon, CrossIcon },
+  props: {
+    closeModal: { type: Function, required: true }
+  },
   data() {
     return {
       linkedIn: "",
@@ -193,9 +196,6 @@ export default {
     // @todo: server side - save the linkedIn
     addLinkedIn() {
       this.nextStep();
-    },
-    closeModal() {
-      this.$store.dispatch("app/modal/hide");
     }
   }
 };
