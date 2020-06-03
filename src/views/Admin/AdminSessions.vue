@@ -55,7 +55,7 @@ export default {
         showBannedUsers: "",
         showTestUsers: "",
         sessionActivityFrom: moment()
-          .startOf("month")
+          .subtract(7, "days")
           .format("YYYY-MM-DD"),
         sessionActivityTo: moment().format("YYYY-MM-DD"),
         minMessagesSent: 0,
