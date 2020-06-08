@@ -268,9 +268,16 @@ export default {
       )
       .then(this._successHandler, this._errorHandler);
   },
-  checkStudentEligbility(context, { schoolUpchieveId, zipCode }) {
+  checkStudentEligibility(
+    context,
+    { schoolUpchieveId, zipCode, referredByCode }
+  ) {
     return context.$http
-      .post(`${ELIGIBILITY_API_ROOT}/check`, { schoolUpchieveId, zipCode })
+      .post(`${ELIGIBILITY_API_ROOT}/check`, {
+        schoolUpchieveId,
+        zipCode,
+        referredByCode
+      })
       .then(this._successHandler, this._errorHandler);
   },
   joinSchoolApprovalWaitlist(context, { schoolUpchieveId, email }) {
