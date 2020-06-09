@@ -306,8 +306,6 @@ export default {
         communicatesEffectively,
         trustworthyWithChildren
       };
-
-      console.log(data);
     },
     isValidForm() {
       const {
