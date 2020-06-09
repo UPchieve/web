@@ -233,7 +233,7 @@ export default {
   },
   adminGetIneligibleStudents(page) {
     return Vue.http
-      .get(`${API_ROOT}/user/ineligible-students?page=${page}`)
+      .get(`${ELIGIBILITY_API_ROOT}/ineligible-students?page=${page}`)
       .then(this._successHandler, this._errorHandler);
   },
   adminGetSchool(schoolId) {
