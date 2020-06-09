@@ -273,7 +273,7 @@ export default {
       )
       .then(this._successHandler, this._errorHandler);
   },
-  checkStudentEligbility(
+  checkStudentEligibility(
     context,
     { schoolUpchieveId, zipCode, referredByCode }
   ) {
