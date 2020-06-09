@@ -26,6 +26,8 @@ import VolunteerCoverage from "./views/Admin/VolunteerCoverage";
 import AdminSessions from "./views/Admin/AdminSessions";
 import AdminSessionDetail from "./views/Admin/AdminSessionDetail";
 import AdminUserDetail from "./views/Admin/AdminUserDetail";
+import AdminIneligibleStudents from "./views/Admin/AdminIneligibleStudents";
+import AdminSchoolDetail from "./views/Admin/AdminSchoolDetail";
 import VolunteerGuideView from "./views/VolunteerGuideView";
 import ReviewMaterialsView from "./views/ReviewMaterialsView";
 
@@ -230,6 +232,18 @@ const routes = [
     path: "/admin/users/:userId",
     name: "AdminUserDetail",
     component: AdminUserDetail,
+    meta: { protected: true, requiresAdmin: true }
+  },
+  {
+    path: "/admin/ineligible-students",
+    name: "AdminIneligibleStudents",
+    component: AdminIneligibleStudents,
+    meta: { protected: true, requiresAdmin: true }
+  },
+  {
+    path: "/admin/school/:schoolId",
+    name: "AdminSchoolDetail",
+    component: AdminSchoolDetail,
     meta: { protected: true, requiresAdmin: true }
   },
   {

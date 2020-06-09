@@ -41,7 +41,13 @@
       </div>
       <div v-if="schoolName" class="user-detail__section">
         <div class="user-detail__section-title">School</div>
-        <div>{{ schoolName }}</div>
+        <router-link
+          v-if="schoolName"
+          :to="`/admin/school/${user.approvedHighschool._id}`"
+          class="user-detail__section"
+        >
+          {{ schoolName }}
+        </router-link>
       </div>
       <div v-if="user.zipCode" class="user-detail__section">
         <div class="user-detail__section-title">Zip code</div>

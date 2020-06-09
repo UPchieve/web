@@ -249,6 +249,21 @@ export default {
       .get(`${API_ROOT}/user/${userId}`)
       .then(this._successHandler, this._errorHandler);
   },
+  adminGetIneligibleStudents(page) {
+    return Vue.http
+      .get(`${ELIGIBILITY_API_ROOT}/ineligible-students?page=${page}`)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminGetSchool(schoolId) {
+    return Vue.http
+      .get(`${ELIGIBILITY_API_ROOT}/school/${schoolId}`)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminUpdateSchoolApproval(data) {
+    return Vue.http
+      .post(`${ELIGIBILITY_API_ROOT}/school/approval`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
   getQuestions(context, data) {
     return context.$http
       .post(`${API_ROOT}/training/questions`, data)
