@@ -225,10 +225,18 @@ export default {
     minMessagesSent,
     minSessionLength
   }) {
+    const queryString = new URLSearchParams({
+      page,
+      showBannedUsers,
+      showTestUsers,
+      sessionActivityFrom,
+      sessionActivityTo,
+      minMessagesSent,
+      minSessionLength
+    }).toString();
+
     return Vue.http
-      .get(
-        `${API_ROOT}/sessions?page=${page}&showBannedUsers=${showBannedUsers}&showTestUsers=${showTestUsers}&minSessionLength=${minSessionLength}&sessionActivityFrom=${sessionActivityFrom}&sessionActivityTo=${sessionActivityTo}&minMessagesSent=${minMessagesSent}`
-      )
+      .get(`${API_ROOT}/sessions?${queryString}`)
       .then(this._successHandler, this._errorHandler);
   },
   adminGetSession(sessionId) {
