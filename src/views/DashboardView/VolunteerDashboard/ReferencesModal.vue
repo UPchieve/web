@@ -15,6 +15,7 @@
         </p>
         <input
           type="text"
+          pattern=".*linkedin\.com.*\/in\/.*"
           v-model="linkedIn"
           placeholder="linkedin.com/in/example"
           class="linkedin-input"
@@ -236,6 +237,10 @@ input {
 
 .linkedin-input {
   margin: 1.4em 0;
+
+  &:invalid {
+    outline-color: $c-error-red;
+  }
 }
 
 label {
