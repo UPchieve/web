@@ -118,8 +118,8 @@ header {
 }
 
 .photo-id-img {
-  width: 100%;
-  border-radius: 5px;
+  max-width: 100%;
+  max-height: 300px;
 }
 
 .photo-id-label {
