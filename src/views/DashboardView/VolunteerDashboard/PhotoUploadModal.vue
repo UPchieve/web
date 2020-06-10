@@ -64,8 +64,7 @@ export default {
     ...mapGetters({ mobileMode: "app/mobileMode" })
   },
   methods: {
-    // @todo: server side - add photo url to user
-    submitPhoto(event) {
+    addPhoto(event) {
       const { files } = event.target;
       const file = files[0];
       this.photo = URL.createObjectURL(file);
@@ -73,6 +72,14 @@ export default {
     removePhoto() {
       event.stopPropagation();
       this.photo = "";
+    },
+    submitPhoto() {
+      /**
+       * @todo: save photo
+       * Submit to AWS
+       * Send img URL to server to be saved on user
+       * Update Vuex with img URL & photo ID status
+       */
     }
   }
 };
