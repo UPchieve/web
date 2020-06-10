@@ -17,7 +17,12 @@
         </div>
       </div>
       <label v-else class="photo-id-label">
-        <input type="file" class="photo-id-input" @change="submitPhoto" />
+        <input
+          type="file"
+          accept="image/png, image/jpeg"
+          class="photo-id-input"
+          @change="addPhoto"
+        />
         <button class="upload-photo-btn">Upload Photo</button>
       </label>
 
