@@ -16,7 +16,7 @@
         <input
           type="text"
           pattern=".*linkedin\.com.*\/in\/.*"
-          v-model="linkedIn"
+          v-model="linkedInUrl"
           placeholder="linkedin.com/in/example"
           class="linkedin-input"
         />
@@ -42,7 +42,7 @@
               <h4>Reference {{ index + 1 }}</h4>
               <trash-icon
                 class="trash-icon"
-                v-if="reference.status !== 'VERIFIED'"
+                v-if="reference.status !== 'APPROVED'"
                 @click="removeReference(index)"
               />
             </div>
@@ -52,12 +52,32 @@
               <span
                 class="reference-status-indicator"
                 :class="{
-                  verified: reference.status === 'VERIFIED',
-                  pending: reference.status === 'WAITING ON RESPONSE',
+                  approved: reference.status === 'APPROVED',
+                  pending:
+                    reference.status === 'UNSENT' ||
+                    reference.status === 'SENT' ||
+                    reference.status === 'SUBMITTED',
                   rejected: reference.status === 'REJECTED'
                 }"
               ></span>
-              <span>{{ reference.status }}</span>
+              <span>
+                <template
+                  v-if="
+                    reference.status === 'UNSENT' || reference.status === 'SENT'
+                  "
+                >
+                  PENDING
+                </template>
+                <template v-else-if="reference.status === 'SUBMITTED'">
+                  IN REVIEW
+                </template>
+                <template v-else-if="reference.status === 'APPROVED'">
+                  APPROVED
+                </template>
+                <template v-else-if="reference.status === 'REJECTED'">
+                  REJECTED
+                </template>
+              </span>
             </div>
           </div>
         </div>
@@ -106,13 +126,13 @@
         <large-button
           class="btn skip-btn"
           @click.native="nextStep"
-          v-if="step === 0 && !linkedIn"
+          v-if="step === 0 && !linkedInUrl"
           >Skip</large-button
         >
         <large-button
           class="btn skip-btn"
           @click.native="addLinkedIn"
-          v-if="step === 0 && linkedIn"
+          v-if="step === 0 && linkedInUrl"
           >Next</large-button
         >
 
@@ -129,6 +149,7 @@
 
 <script>
 import { mapState, mapGetters } from "vuex";
+import NetworkService from "@/services/NetworkService";
 import Modal from "@/components/Modal";
 import Separator from "@/components/Separator";
 import LargeButton from "@/components/LargeButton";
@@ -143,7 +164,7 @@ export default {
   },
   data() {
     return {
-      linkedIn: "",
+      linkedInUrl: "",
       references: [],
       newReferenceName: "",
       newReferenceEmail: "",
@@ -152,13 +173,9 @@ export default {
     };
   },
   mounted() {
-    this.references = this.user.references || [
-      {
-        name: "Jane Doe",
-        email: "janedoe@gmail.com",
-        status: "WAITING ON RESPONSE"
-      }
-    ];
+    // @todo: use vuex
+    // (rn if you add a reference then close + open the modal, it's gone)
+    this.references = this.user.references.slice();
   },
   computed: {
     ...mapState({
@@ -166,10 +183,10 @@ export default {
     }),
     ...mapGetters({ mobileMode: "app/mobileMode" }),
     totalReferencesNeeded() {
-      return this.linkedIn ? 1 : 2;
+      return this.linkedInUrl ? 1 : 2;
     },
     stepOneButtonText() {
-      return this.linkedIn ? "Next" : "Skip";
+      return this.linkedInUrl ? "Next" : "Skip";
     }
   },
   methods: {
@@ -184,24 +201,31 @@ export default {
       this.newReferenceEmail = "";
       this.isAddReferenceMode = !this.isAddReferenceMode;
     },
-    // @todo: server side - save the new reference
+    // @todo: use vuex
+    // (rn if you add a reference then close + open the modal, it's gone)
     addReference() {
       const newReference = {
         name: this.newReferenceName,
         email: this.newReferenceEmail,
-        status: "WAITING ON RESPONSE"
+        status: "UNSENT"
       };
       this.references.push(newReference);
+      NetworkService.addReference({
+        referenceName: this.newReferenceName,
+        referenceEmail: this.newReferenceEmail
+      });
       this.toggleAddReferenceMode();
     },
-    // @todo: server side - remove the reference
     removeReference(position) {
+      NetworkService.deleteReference({
+        referenceEmail: this.references[position].email
+      });
       this.references = this.references.filter(
         (_, index) => position !== index
       );
     },
-    // @todo: server side - save the linkedIn
     addLinkedIn() {
+      NetworkService.addLinkedIn({ linkedInUrl: this.linkedInUrl });
       this.nextStep();
     }
   }
@@ -330,7 +354,7 @@ label {
   }
 }
 
-.verified {
+.approved {
   background-color: $c-success-green;
 }
 

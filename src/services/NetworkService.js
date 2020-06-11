@@ -285,5 +285,27 @@ export default {
     return context.$http
       .post(`${API_ROOT}/push-token/save`, data)
       .then(this._successHandler, this._errorHandler);
+  },
+  addReference({ referenceName, referenceEmail }) {
+    return Vue.http
+      .post(`${API_ROOT}/user/volunteer-approval/reference`, {
+        referenceName,
+        referenceEmail
+      })
+      .then(this._successHandler, this._errorHandler);
+  },
+  deleteReference({ referenceEmail }) {
+    return Vue.http
+      .post(`${API_ROOT}/user/volunteer-approval/reference/delete`, {
+        referenceEmail
+      })
+      .then(this._successHandler, this._errorHandler);
+  },
+  addLinkedIn({ linkedInUrl }) {
+    return Vue.http
+      .post(`${API_ROOT}/user/volunteer-approval/linkedin`, {
+        linkedInUrl
+      })
+      .then(this._successHandler, this._errorHandler);
   }
 };
