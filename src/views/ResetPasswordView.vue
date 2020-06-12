@@ -21,13 +21,7 @@
         </div>
       </div>
 
-      <loading-message
-        v-if="isSendingEmail"
-        class="message"
-        message="Sending email"
-      />
-
-      <div v-else-if="msg" class="message">{{ msg }}</div>
+      <div v-if="msg" class="message">{{ msg }}</div>
 
       <div v-else class="uc-form-body">
         <div class="uc-column">
@@ -44,9 +38,17 @@
           />
         </div>
 
-        <button class="uc-form-button" type="submit" @click.prevent="submit()">
+        <button
+          class="uc-form-button"
+          type="submit"
+          @click.prevent="submit()"
+          :disabled="isSendingEmail"
+        >
           Enter
         </button>
+
+        <loader v-if="isSendingEmail" overlay />
+
         <p v-if="error" class="error">{{ error }}</p>
       </div>
     </form>
@@ -59,12 +61,12 @@ import { mapState } from "vuex";
 
 import AuthService from "@/services/AuthService";
 import FormPageTemplate from "@/components/FormPageTemplate";
-import LoadingMessage from "@/components/LoadingMessage";
+import Loader from "@/components/Loader";
 
 export default {
   components: {
     FormPageTemplate,
-    LoadingMessage
+    Loader
   },
   created() {
     this.$store.dispatch("app/hideNavigation");
@@ -101,6 +103,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.uc-form {
+  position: relative;
+}
+
 .link-container {
   @include flex-container(row, space-evenly);
   min-width: 150px;

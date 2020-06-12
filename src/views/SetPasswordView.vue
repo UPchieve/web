@@ -2,12 +2,7 @@
   <form-page-template>
     <form class="uc-form">
       <div class="uc-form-header">Reset Your Password</div>
-      <loading-message
-        v-if="isResettingPassword"
-        class="loading-message"
-        message="We're resetting your password"
-      />
-      <div v-else-if="isValidResetToken && !showSuccess" class="uc-form-body">
+      <div v-if="isValidResetToken && !showSuccess" class="uc-form-body">
         <div class="uc-column">
           <label for="inputEmail" class="uc-form-label">
             Please enter your email address
@@ -56,6 +51,8 @@
           Reset Password
         </button>
 
+        <loader v-if="isResettingPassword" overlay />
+
         <div v-if="msg">{{ msg }}</div>
       </div>
       <div v-else-if="showSuccess" class="success-message">
@@ -76,13 +73,13 @@ import { mapState } from "vuex";
 import AuthService from "@/services/AuthService";
 import FormPageTemplate from "@/components/FormPageTemplate";
 import LargeButton from "@/components/LargeButton";
-import LoadingMessage from "@/components/LoadingMessage";
+import Loader from "@/components/Loader";
 
 export default {
   components: {
     FormPageTemplate,
     LargeButton,
-    LoadingMessage
+    Loader
   },
   created() {
     this.$store.dispatch("app/hideNavigation");
@@ -144,6 +141,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.uc-form {
+  position: relative;
+}
+
 .uc-form-header {
   font-size: 24px;
   font-weight: bold;
