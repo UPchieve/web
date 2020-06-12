@@ -28,7 +28,11 @@
 
       <separator v-if="!mobileMode" />
 
-      <large-button @click="submitPhoto" class="save-btn" :disabled="!photo">
+      <large-button
+        @click.native="submitPhoto"
+        class="save-btn"
+        :disabled="!photo"
+      >
         Save
       </large-button>
     </div>
@@ -36,6 +40,8 @@
 </template>
 
 <script>
+import axios from "axios";
+import NetworkService from "@/services/NetworkService";
 import { mapState, mapGetters } from "vuex";
 import Modal from "@/components/Modal";
 import Separator from "@/components/Separator";
@@ -51,7 +57,8 @@ export default {
   },
   data() {
     return {
-      photo: ""
+      photo: "",
+      file: undefined
     };
   },
   mounted() {
@@ -67,6 +74,7 @@ export default {
     addPhoto(event) {
       const { files } = event.target;
       const file = files[0];
+      this.file = file;
       this.photo = URL.createObjectURL(file);
     },
     removePhoto() {
@@ -74,12 +82,14 @@ export default {
       this.photo = "";
     },
     submitPhoto() {
-      /**
-       * @todo: save photo
-       * Submit to AWS
-       * Send img URL to server to be saved on user
-       * Update Vuex with img URL & photo ID status
-       */
+      // @todo: error handling
+      // @todo: after submitting, show "in review" + allow uploading new photo?
+      NetworkService.getPhotoUploadUrl().then(res => {
+        const { uploadUrl } = res.body;
+        axios.put(uploadUrl, this.file, {
+          "Content-Type": this.file.type
+        });
+      });
     }
   }
 };

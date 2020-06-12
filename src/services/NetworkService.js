@@ -307,5 +307,10 @@ export default {
         linkedInUrl
       })
       .then(this._successHandler, this._errorHandler);
+  },
+  getPhotoUploadUrl() {
+    return Vue.http
+      .get(`${API_ROOT}/user/volunteer-approval/photo-url`)
+      .then(this._successHandler, this._errorHandler);
   }
 };
