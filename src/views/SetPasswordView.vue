@@ -155,10 +155,6 @@ export default {
   }
 }
 
-.loading-message {
-  margin: auto 0;
-}
-
 .success-message {
   @include flex-container(column, center, center);
   margin: auto 0;
