@@ -21,7 +21,13 @@
         </div>
       </div>
 
-      <div v-if="msg" class="message">{{ msg }}</div>
+      <loading-message
+        v-if="isSendingEmail"
+        class="message"
+        message="Sending email"
+      />
+
+      <div v-else-if="msg" class="message">{{ msg }}</div>
 
       <div v-else class="uc-form-body">
         <div class="uc-column">
@@ -53,10 +59,12 @@ import { mapState } from "vuex";
 
 import AuthService from "@/services/AuthService";
 import FormPageTemplate from "@/components/FormPageTemplate";
+import LoadingMessage from "@/components/LoadingMessage";
 
 export default {
   components: {
-    FormPageTemplate
+    FormPageTemplate,
+    LoadingMessage
   },
   created() {
     this.$store.dispatch("app/hideNavigation");
@@ -66,7 +74,7 @@ export default {
       email: "",
       msg: "",
       error: "",
-      wasSubmitted: false
+      isSendingEmail: false
     };
   },
   computed: {
@@ -76,17 +84,17 @@ export default {
   },
   methods: {
     submit() {
-      if (this.wasSubmitted) return;
-
-      this.wasSubmitted = true;
+      this.isSendingEmail = true;
       this.error = "";
-      AuthService.sendReset(this, this.email).catch(err => {
-        this.error = err.message;
-        this.wasSubmitted = false;
-        if (err.status !== 422) {
-          Sentry.captureException(err);
-        }
-      });
+      AuthService.sendReset(this, this.email)
+        .then(() => (this.isSendingEmail = false))
+        .catch(err => {
+          this.error = err.message;
+          this.isSendingEmail = false;
+          if (err.status !== 422) {
+            Sentry.captureException(err);
+          }
+        });
     }
   }
 };

@@ -2,7 +2,12 @@
   <form-page-template>
     <form class="uc-form">
       <div class="uc-form-header">Reset Your Password</div>
-      <div v-if="isValidResetToken && !showSuccess" class="uc-form-body">
+      <loading-message
+        v-if="isResettingPassword"
+        class="loading-message"
+        message="We're resetting your password"
+      />
+      <div v-else-if="isValidResetToken && !showSuccess" class="uc-form-body">
         <div class="uc-column">
           <label for="inputEmail" class="uc-form-label">
             Please enter your email address
@@ -71,11 +76,13 @@ import { mapState } from "vuex";
 import AuthService from "@/services/AuthService";
 import FormPageTemplate from "@/components/FormPageTemplate";
 import LargeButton from "@/components/LargeButton";
+import LoadingMessage from "@/components/LoadingMessage";
 
 export default {
   components: {
     FormPageTemplate,
-    LargeButton
+    LargeButton,
+    LoadingMessage
   },
   created() {
     this.$store.dispatch("app/hideNavigation");
@@ -98,8 +105,8 @@ export default {
         newpassword: ""
       },
       isValidResetToken: true,
-      wasSubmitted: false,
-      showSuccess: true
+      isResettingPassword: false,
+      showSuccess: false
     };
   },
   computed: {
@@ -112,8 +119,7 @@ export default {
   },
   methods: {
     submit() {
-      if (this.wasSubmitted) return;
-      this.wasSubmitted = true;
+      this.isResettingPassword = true;
 
       AuthService.confirmReset(this, {
         token: this.$route.params.token,
@@ -121,8 +127,12 @@ export default {
         password: this.credentials.password,
         newpassword: this.credentials.newpassword
       })
-        .then(() => (this.showSuccess = true))
+        .then(() => {
+          this.isResettingPassword = false;
+          this.showSuccess = true;
+        })
         .catch(err => {
+          this.isResettingPassword = false;
           this.msg = err.message || err;
           if (err.status !== 422) {
             Sentry.captureException(err);
@@ -142,6 +152,10 @@ export default {
   &-link--success {
     color: $c-success-green;
   }
+}
+
+.loading-message {
+  margin: auto 0;
 }
 
 .success-message {
