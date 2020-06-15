@@ -2,7 +2,7 @@
   <form-page-template>
     <form class="uc-form">
       <div class="uc-form-header">Reset Your Password</div>
-      <div v-if="isValidResetToken" class="uc-form-body">
+      <div v-if="isValidResetToken && !showSuccess" class="uc-form-body">
         <div class="uc-column">
           <label for="inputEmail" class="uc-form-label">
             Please enter your email address
@@ -51,7 +51,13 @@
           Reset Password
         </button>
 
-        <div v-if="msg !== ''">{{ msg }}</div>
+        <loader v-if="isResettingPassword" overlay />
+
+        <div v-if="msg">{{ msg }}</div>
+      </div>
+      <div v-else-if="showSuccess" class="success-message">
+        <p>Your password has been successfully reset!</p>
+        <large-button primary routeTo="/">{{ redirectText }}</large-button>
       </div>
       <div v-else class="uc-form-body">
         <p>{{ msg }}</p>
@@ -62,13 +68,18 @@
 
 <script>
 import * as Sentry from "@sentry/browser";
+import { mapState } from "vuex";
 
 import AuthService from "@/services/AuthService";
 import FormPageTemplate from "@/components/FormPageTemplate";
+import LargeButton from "@/components/LargeButton";
+import Loader from "@/components/Loader";
 
 export default {
   components: {
-    FormPageTemplate
+    FormPageTemplate,
+    LargeButton,
+    Loader
   },
   created() {
     this.$store.dispatch("app/hideNavigation");
@@ -90,11 +101,23 @@ export default {
         password: "",
         newpassword: ""
       },
-      isValidResetToken: true
+      isValidResetToken: true,
+      isResettingPassword: false,
+      showSuccess: false
     };
+  },
+  computed: {
+    ...mapState({
+      user: state => state.user.user
+    }),
+    redirectText() {
+      return this.user ? "Home" : "Log in";
+    }
   },
   methods: {
     submit() {
+      this.isResettingPassword = true;
+
       AuthService.confirmReset(this, {
         token: this.$route.params.token,
         email: this.credentials.email,
@@ -102,9 +125,11 @@ export default {
         newpassword: this.credentials.newpassword
       })
         .then(() => {
-          this.showingSuccess = true;
+          this.isResettingPassword = false;
+          this.showSuccess = true;
         })
         .catch(err => {
+          this.isResettingPassword = false;
           this.msg = err.message || err;
           if (err.status !== 422) {
             Sentry.captureException(err);
@@ -116,9 +141,23 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.uc-form {
+  position: relative;
+}
+
 .uc-form-header {
   font-size: 24px;
   font-weight: bold;
   justify-content: center;
+
+  &-link--success {
+    color: $c-success-green;
+  }
+}
+
+.success-message {
+  @include flex-container(column, center, center);
+  margin: auto 0;
+  padding: 50px;
 }
 </style>
