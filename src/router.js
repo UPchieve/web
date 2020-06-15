@@ -346,9 +346,11 @@ router.afterEach((to, from) => {
 
   // Google Analytics
   if (window.ga) {
+    const isAuthenticated = store.getters["user/isAuthenticated"];
+    const isVolunteer = store.getters["user/isVolunteer"];
     window.ga("set", "page", router.currentRoute.path);
-    window.ga("set", "dimension1", store.getters["user/isVolunteer"]);
-    window.ga("set", "dimension2", store.getters["user/isAuthenticated"]);
+    window.ga("set", "dimension2", isAuthenticated);
+    if (isAuthenticated) window.ga("set", "dimension1", isVolunteer);
     window.ga("send", "pageview");
   }
 });
