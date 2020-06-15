@@ -343,6 +343,14 @@ router.beforeEach((to, from, next) => {
 router.afterEach((to, from) => {
   if (to.name !== from.name) store.dispatch("app/showNavigation");
   store.dispatch("app/modal/hide");
+
+  // Google Analytics
+  if (window.ga) {
+    window.ga("set", "page", router.currentRoute.path);
+    window.ga("set", "dimension1", store.getters["user/isVolunteer"]);
+    window.ga("set", "dimension2", store.getters["user/isAuthenticated"]);
+    window.ga("send", "pageview");
+  }
 });
 
 // If endpoint returns 401, redirect to login (except for requests to get user or user's
