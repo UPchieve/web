@@ -343,6 +343,16 @@ router.beforeEach((to, from, next) => {
 router.afterEach((to, from) => {
   if (to.name !== from.name) store.dispatch("app/showNavigation");
   store.dispatch("app/modal/hide");
+
+  // Google Analytics
+  if (window.ga) {
+    const isAuthenticated = store.getters["user/isAuthenticated"];
+    const isVolunteer = store.getters["user/isVolunteer"];
+    window.ga("set", "page", router.currentRoute.path);
+    window.ga("set", "dimension2", isAuthenticated);
+    if (isAuthenticated) window.ga("set", "dimension1", isVolunteer);
+    window.ga("send", "pageview");
+  }
 });
 
 // If endpoint returns 401, redirect to login (except for requests to get user or user's
