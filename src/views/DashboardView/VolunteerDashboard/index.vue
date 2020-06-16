@@ -262,6 +262,8 @@ export default {
       // (4) Hours tutored
       const numHoursTutored = this.volunteerStats.hoursTutored || "--";
 
+      const numElapsedAvailabilityHours = user.elapsedAvailability;
+
       return [
         {
           label: "Hours of availability selected",
@@ -278,6 +280,10 @@ export default {
         {
           label: "Hours of tutoring completed",
           value: `${numHoursTutored} hours tutored`
+        },
+        {
+          label: "Hours of elapsed availability",
+          value: `${numElapsedAvailabilityHours} hours elapsed`
         }
       ];
     }
