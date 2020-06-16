@@ -1,20 +1,20 @@
 <template>
   <div
-    class="modal"
+    class="upc-modal"
     :class="{ 'modal--important': important }"
     @click="handleClose"
   >
-    <div v-if="mobileMode" class="modal-header">
-      <div class="modal-header-close-button" @click="closeModal">
+    <div v-if="mobileMode" class="upc-modal-header">
+      <div class="upc-modal-header-close-button" @click="closeModal">
         <arrow-icon class="icon" />
         <p>Back</p>
       </div>
     </div>
 
-    <div class="modal-form">
+    <div class="upc-modal-form">
       <slot />
 
-      <div class="modal-form--bottom-padding" />
+      <div class="upc-modal-form--bottom-padding" />
     </div>
   </div>
 </template>
@@ -43,7 +43,7 @@ export default {
   methods: {
     handleClose(event) {
       const { target } = event;
-      if (target.classList.contains("modal")) this.closeModal();
+      if (target.classList.contains("upc-modal")) this.closeModal();
     }
   }
 };

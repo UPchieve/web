@@ -3,7 +3,7 @@
     <div class="reference-modal">
       <header>
         <h1 class="title">Reference check</h1>
-        <cross-icon class="modal-close-icon" @click="closeModal" />
+        <cross-icon class="upc-modal-close-icon" @click="closeModal" />
       </header>
       <div v-if="step === 0">
         <p class="subtitle">

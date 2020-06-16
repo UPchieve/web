@@ -3,7 +3,7 @@
     <div>
       <header>
         <h1 class="title">Proof of identity</h1>
-        <cross-icon class="modal-close-icon" @click="closeModal" />
+        <cross-icon class="upc-modal-close-icon" @click="closeModal" />
       </header>
       <p class="subtitle">
         Upload a picture of your photo ID so we can verify that it's you. This
