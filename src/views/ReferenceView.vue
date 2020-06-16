@@ -2,7 +2,10 @@
   <div class="reference-form-container">
     <div class="reference-form">
       <img class="header-img" src="@/assets/reference-form-header.png" />
-      <div class="questions-container">
+      <div v-if="didSubmit" class="did-submit">
+        <h3>Reference submitted!</h3>
+      </div>
+      <div v-else class="questions-container">
         <h1 class="title">UPchieve Applicant Reference Evaluation</h1>
         <p>
           Please answer the following questions honestly based on your knowledge
@@ -174,6 +177,7 @@ export default {
   data() {
     return {
       error: "",
+      didSubmit: false,
       affiliation: "",
       relationshipLength: "",
       rejectionReason: "",
@@ -277,8 +281,13 @@ export default {
         trustworthyWithChildren
       };
 
-      // @todo: error handling
-      NetworkService.saveReferenceForm(this.$route.params.referenceId, data);
+      NetworkService.saveReferenceForm(this.$route.params.referenceId, data)
+        .then(() => {
+          this.didSubmit = true;
+        })
+        .catch(() => {
+          this.error = "Error submitting form, please try again.";
+        });
     },
     isValidForm() {
       const {
@@ -311,6 +320,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.did-submit {
+  h3 {
+    text-align: center;
+    padding: 50px 0 200px;
+  }
+}
 textarea.uc-form-input {
   resize: none;
   height: 80px;
@@ -350,6 +365,7 @@ textarea.uc-form-input {
   background-color: #e5f2fc;
   text-align: left;
   padding: 2em 0;
+  min-height: 100%;
 }
 
 .reference-form {
