@@ -9,32 +9,6 @@
           of/experience with the applicant. It should take less than 10 minutes
           to complete and all answers will remain confidential.
         </p>
-        <div class="question-col">
-          <label for="reference-name" class="uc-form-label">Your Name</label>
-          <input
-            type="text"
-            id="reference-name"
-            class="uc-form-input"
-            v-model="referenceName"
-            required
-            placeholder="Your answer"
-          />
-        </div>
-
-        <div class="question-col">
-          <label for="applicant-name" class="uc-form-label">
-            Name of the UPchieve applicant for whom you are a personal
-            reference.
-          </label>
-          <input
-            type="text"
-            id="applicant-name"
-            class="uc-form-input"
-            v-model="applicantName"
-            required
-            placeholder="Your answer"
-          />
-        </div>
 
         <div class="question-col">
           <label for="affiliation" class="uc-form-label"
@@ -199,8 +173,6 @@ export default {
   data() {
     return {
       error: "",
-      referenceName: "",
-      applicantName: "",
       affiliation: "",
       relationshipLength: "",
       rejectionReason: "",
@@ -214,7 +186,7 @@ export default {
         {
           qid: "1",
           qtype: "multiple-radio",
-          title: "The applicant is",
+          title: "The applicant is...",
           secondary_title: "",
           tableTitle: [
             "Strongly Disagree",
@@ -240,8 +212,7 @@ export default {
         {
           qid: "2",
           qtype: "multiple-radio",
-          title:
-            "I would trust the applicant to spend time with a child alone:",
+          title: "",
           secondary_title: "",
           tableTitle: [
             "Strongly Disagree",
@@ -294,8 +265,6 @@ export default {
       } = this.multipleRadioResponse;
 
       const data = {
-        referenceName: this.referenceName,
-        applicantName: this.applicantName,
         affiliation: this.affiliation,
         relationshipLength: this.relationshipLength,
         rejectionReason: this.rejectionReason,
@@ -317,8 +286,6 @@ export default {
       } = this.multipleRadioResponse;
 
       const requiredInputs = {
-        referenceName: this.referenceName,
-        applicantName: this.applicantName,
         affiliation: this.affiliation,
         relationshipLength: this.relationshipLength,
         rejectionReason: this.rejectionReason,
@@ -340,9 +307,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-textarea {
+textarea.uc-form-input {
   resize: none;
   height: 80px;
+  border: 2px solid #1855d1;
+  margin-top: 10px;
+
+  &:focus {
+    border-bottom: 2px solid #1855d1;
+  }
 }
 
 .uc-form {
