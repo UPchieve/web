@@ -1,5 +1,5 @@
 <template>
-  <modal>
+  <modal :closeModal="closeModal">
     <div class="reference-modal">
       <header>
         <h1 class="title">Reference check</h1>
