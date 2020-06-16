@@ -7,7 +7,7 @@
     <div v-if="mobileMode" class="modal-header">
       <div class="modal-header-close-button" @click="closeModal">
         <arrow-icon class="icon" />
-        <p>{{ backText }}</p>
+        <p>Back</p>
       </div>
     </div>
 
