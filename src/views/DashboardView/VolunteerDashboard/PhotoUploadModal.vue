@@ -5,37 +5,50 @@
         <h1 class="title">Proof of identity</h1>
         <cross-icon class="modal-close-icon" @click="closeModal" />
       </header>
-      <p class="subtitle">
-        Upload a picture of your photo ID so we can verify that it's you. This
-        may be a driver's license, passport, or student ID.
-      </p>
-
-      <div v-if="photo" class="photo-id-container">
-        <img :src="photo" class="photo-id-img" />
-        <div class="trash-icon-container" @click="removePhoto">
-          <trash-icon class="trash-icon" />
-        </div>
+      <div v-if="user.photoIdStatus === 'SUBMITTED'">
+        <p class="subtitle">
+          Your ID photo is in review
+        </p>
       </div>
-      <label v-else class="photo-id-label">
-        <input
-          type="file"
-          accept="image/png, image/jpeg"
-          class="photo-id-input"
-          @change="addPhoto"
-        />
-        <button class="upload-photo-btn">Upload Photo</button>
-      </label>
+      <div v-else>
+        <p class="subtitle">
+          Upload a picture of your photo ID so we can verify that it's you. This
+          may be a driver's license, passport, or student ID.
+        </p>
 
-      <separator v-if="!mobileMode" />
+        <div v-if="photo" class="photo-id-container">
+          <img :src="photo" class="photo-id-img" />
+          <div class="trash-icon-container" @click="removePhoto">
+            <trash-icon class="trash-icon" />
+          </div>
+        </div>
+        <label v-else class="photo-id-label">
+          <input
+            type="file"
+            accept="image/png, image/jpeg"
+            class="photo-id-input"
+            @change="addPhoto"
+          />
+          <button class="upload-photo-btn">Upload Photo</button>
+        </label>
 
-      <large-button @click="submitPhoto" class="save-btn" :disabled="!photo">
-        Save
-      </large-button>
+        <separator v-if="!mobileMode" />
+
+        <large-button
+          @click.native="submitPhoto"
+          class="submit-btn"
+          :disabled="!photo"
+        >
+          Submit
+        </large-button>
+      </div>
     </div>
   </modal>
 </template>
 
 <script>
+import axios from "axios";
+import NetworkService from "@/services/NetworkService";
 import { mapState, mapGetters } from "vuex";
 import Modal from "@/components/Modal";
 import Separator from "@/components/Separator";
@@ -51,7 +64,8 @@ export default {
   },
   data() {
     return {
-      photo: ""
+      photo: "",
+      file: undefined
     };
   },
   mounted() {
@@ -67,6 +81,7 @@ export default {
     addPhoto(event) {
       const { files } = event.target;
       const file = files[0];
+      this.file = file;
       this.photo = URL.createObjectURL(file);
     },
     removePhoto() {
@@ -74,12 +89,13 @@ export default {
       this.photo = "";
     },
     submitPhoto() {
-      /**
-       * @todo: save photo
-       * Submit to AWS
-       * Send img URL to server to be saved on user
-       * Update Vuex with img URL & photo ID status
-       */
+      // @todo: error handling
+      NetworkService.getPhotoUploadUrl().then(res => {
+        const { uploadUrl } = res.body;
+        axios.put(uploadUrl, this.file, {
+          "Content-Type": this.file.type
+        });
+      });
     }
   }
 };
@@ -110,7 +126,7 @@ header {
   color: $c-secondary-grey;
 }
 
-.save-btn {
+.submit-btn {
   background-color: $c-success-green;
   border-color: transparent;
   color: white;
