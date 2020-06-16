@@ -6,6 +6,7 @@ const AUTH_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/auth`;
 const API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/api`;
 const ELIGIBILITY_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/eligibility`;
 const CONTACT_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/contact`;
+const REFERENCE_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/reference`;
 
 const FAULT_TOLERANT_HTTP_TIMEOUT = 10000;
 const FAULT_TOLERANT_HTTP_MAX_RETRY_TIMEOUT = 100000;
@@ -301,11 +302,21 @@ export default {
       })
       .then(this._successHandler, this._errorHandler);
   },
+  saveReferenceForm(referenceId, data) {
+    return Vue.http
+      .post(`${REFERENCE_API_ROOT}/${referenceId}/submit`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
   addLinkedIn({ linkedInUrl }) {
     return Vue.http
       .post(`${API_ROOT}/user/volunteer-approval/linkedin`, {
         linkedInUrl
       })
+      .then(this._successHandler, this._errorHandler);
+  },
+  getPhotoUploadUrl() {
+    return Vue.http
+      .get(`${API_ROOT}/user/volunteer-approval/photo-url`)
       .then(this._successHandler, this._errorHandler);
   }
 };

@@ -57,28 +57,35 @@
             approved volunteer
           </p>
 
-          <div v-if="hasSelectedAvailability" class="onboarding-step">
+          <div class="onboarding-step" @click="togglePhotoUploadModal">
             <div class="onboarding-step-action-container">
               <div class="icon-ring">
                 <person-icon />
               </div>
               <div class="onboarding-step-action">
                 <h4>Proof of identity</h4>
-                <p @click="togglePhotoUploadModal">
+                <p
+                  v-if="
+                    user.photoIdStatus === 'EMPTY' ||
+                      user.photoIdStatus === 'REJECTED'
+                  "
+                >
                   Add photo
                 </p>
+                <p v-if="user.photoIdStatus === 'SUBMITTED'">In review</p>
+                <p v-if="user.photoIdStatus === 'APPROVED'">Completed</p>
               </div>
             </div>
             <right-caret />
           </div>
-          <div v-if="hasCertification" class="onboarding-step">
+          <div class="onboarding-step" @click="toggleReferencesModal">
             <div class="onboarding-step-action-container">
               <div class="icon-ring">
                 <person-card-icon />
               </div>
               <div class="onboarding-step-action">
                 <h4>Reference check</h4>
-                <p @click="toggleReferencesModal">
+                <p>
                   Add references
                 </p>
               </div>
@@ -255,6 +262,8 @@ export default {
       // (4) Hours tutored
       const numHoursTutored = this.volunteerStats.hoursTutored || "--";
 
+      const numElapsedAvailabilityHours = user.elapsedAvailability;
+
       return [
         {
           label: "Hours of availability selected",
@@ -271,6 +280,10 @@ export default {
         {
           label: "Hours of tutoring completed",
           value: `${numHoursTutored} hours tutored`
+        },
+        {
+          label: "Hours of elapsed availability",
+          value: `${numElapsedAvailabilityHours} hours elapsed`
         }
       ];
     }
@@ -414,6 +427,10 @@ export default {
 
   &-action {
     margin-left: 1em;
+  }
+
+  &:hover {
+    cursor: pointer;
   }
 }
 
