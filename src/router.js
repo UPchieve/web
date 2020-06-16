@@ -28,6 +28,7 @@ import AdminSessionDetail from "./views/Admin/AdminSessionDetail";
 import AdminUserDetail from "./views/Admin/AdminUserDetail";
 import VolunteerGuideView from "./views/VolunteerGuideView";
 import ReviewMaterialsView from "./views/ReviewMaterialsView";
+import ReferenceView from "./views/ReferenceView";
 
 import store from "./store";
 
@@ -83,6 +84,12 @@ const routes = [
     name: "LogoutView",
     component: LogoutView,
     meta: { loggedOutOnly: true }
+  },
+  {
+    path: "/reference-form/:referenceId",
+    name: "ReferenceView",
+    component: ReferenceView,
+    meta: { authOptional: true }
   },
   {
     path: "/signup",
