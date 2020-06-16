@@ -66,7 +66,7 @@
                     reference.status === 'UNSENT' || reference.status === 'SENT'
                   "
                 >
-                  PENDING
+                  WAITING ON RESPONSE
                 </template>
                 <template v-else-if="reference.status === 'SUBMITTED'">
                   IN REVIEW
