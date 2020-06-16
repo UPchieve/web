@@ -167,6 +167,7 @@
 </template>
 
 <script>
+import NetworkService from "@/services/NetworkService";
 import { mapState, mapGetters } from "vuex";
 
 export default {
@@ -275,6 +276,9 @@ export default {
         communicatesEffectively,
         trustworthyWithChildren
       };
+
+      // @todo: error handling
+      NetworkService.saveReferenceForm(this.$route.params.referenceId, data);
     },
     isValidForm() {
       const {

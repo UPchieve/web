@@ -86,7 +86,7 @@ const routes = [
     meta: { loggedOutOnly: true }
   },
   {
-    path: "/reference-form",
+    path: "/reference-form/:referenceId",
     name: "ReferenceView",
     component: ReferenceView,
     meta: { authOptional: true }
