@@ -333,7 +333,6 @@ export default {
 
 .volunteer-dashboard {
   @include flex-container(column);
-  @include child-spacing(top, 40px);
   padding: 40px 15px;
 
   @include breakpoint-above("medium") {
@@ -345,6 +344,7 @@ export default {
   &__body {
     @include child-spacing(top, 16px);
     @include child-spacing(right, 0);
+    margin-top: 40px;
 
     @include breakpoint-above("huge") {
       @include child-spacing(top, 0);
