@@ -50,7 +50,48 @@
       </template>
       <template v-else>
         <div v-if="!user.isApproved" class="dashboard-card">
-          <h3>Approval steps</h3>
+          <verification-icon />
+          <h3>Volunteer Verification</h3>
+          <p>
+            Provide proof of identity and provide references to become an
+            approved volunteer
+          </p>
+
+          <div class="onboarding-step" @click="togglePhotoUploadModal">
+            <div class="onboarding-step-action-container">
+              <div class="icon-ring">
+                <person-icon />
+              </div>
+              <div class="onboarding-step-action">
+                <h4>Proof of identity</h4>
+                <p
+                  v-if="
+                    user.photoIdStatus === 'EMPTY' ||
+                      user.photoIdStatus === 'REJECTED'
+                  "
+                >
+                  Add photo
+                </p>
+                <p v-if="user.photoIdStatus === 'SUBMITTED'">In review</p>
+                <p v-if="user.photoIdStatus === 'APPROVED'">Completed</p>
+              </div>
+            </div>
+            <right-caret />
+          </div>
+          <div class="onboarding-step" @click="toggleReferencesModal">
+            <div class="onboarding-step-action-container">
+              <div class="icon-ring">
+                <person-card-icon />
+              </div>
+              <div class="onboarding-step-action">
+                <h4>Reference check</h4>
+                <p>
+                  Add references
+                </p>
+              </div>
+            </div>
+            <right-caret />
+          </div>
         </div>
         <div v-if="!isOnboarded" class="dashboard-card">
           <div class="dashboard-card__title">Remaining Onboarding Steps</div>
@@ -85,6 +126,16 @@
         </div>
       </template>
     </div>
+
+    <photo-upload-modal
+      v-if="showPhotoUploadModal"
+      :closeModal="togglePhotoUploadModal"
+    />
+
+    <references-modal
+      v-if="showReferencesModal"
+      :closeModal="toggleReferencesModal"
+    />
   </div>
 </template>
 
@@ -94,7 +145,13 @@ import { mapState, mapGetters } from "vuex";
 
 import ListSessions from "./ListSessions";
 import DashboardBanner from "../DashboardBanner";
+import PhotoUploadModal from "./PhotoUploadModal";
+import ReferencesModal from "./ReferencesModal";
 import LargeButton from "@/components/LargeButton";
+import PersonCardIcon from "@/assets/person-card.svg";
+import PersonIcon from "@/assets/person.svg";
+import RightCaret from "@/assets/right-caret.svg";
+import VerificationIcon from "@/assets/verification.svg";
 
 import { allSubtopicNames } from "@/utils/topics";
 
@@ -107,7 +164,17 @@ const upchieveTopics = allSubtopicNames();
 
 export default {
   name: "volunteer-dashboard",
-  components: { ListSessions, DashboardBanner, LargeButton },
+  components: {
+    ListSessions,
+    DashboardBanner,
+    PhotoUploadModal,
+    ReferencesModal,
+    LargeButton,
+    PersonCardIcon,
+    PersonIcon,
+    RightCaret,
+    VerificationIcon
+  },
   watch: {
     isSessionAlive(isAlive) {
       if (!isAlive) {
@@ -127,6 +194,12 @@ export default {
     }
 
     this.$store.dispatch("user/fetchVolunteerStats", this);
+  },
+  data() {
+    return {
+      showPhotoUploadModal: false,
+      showReferencesModal: false
+    };
   },
   computed: {
     ...mapState({
@@ -234,6 +307,12 @@ export default {
         component: "VolunteerOnboardingModal",
         data: { alertModal: true, acceptText: "Get started" }
       });
+    },
+    togglePhotoUploadModal() {
+      this.showPhotoUploadModal = !this.showPhotoUploadModal;
+    },
+    toggleReferencesModal() {
+      this.showReferencesModal = !this.showReferencesModal;
     }
   }
 };
@@ -267,7 +346,6 @@ export default {
 
 .volunteer-dashboard {
   @include flex-container(column);
-  @include child-spacing(top, 40px);
   padding: 40px 15px;
 
   @include breakpoint-above("medium") {
@@ -279,6 +357,7 @@ export default {
   &__body {
     @include child-spacing(top, 16px);
     @include child-spacing(right, 0);
+    margin-top: 40px;
 
     @include breakpoint-above("huge") {
       @include child-spacing(top, 0);
@@ -339,14 +418,19 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
+  margin: 1em 0;
+  text-align: left;
 
-  &:first-child {
-    margin: 2.5em 0 3em;
+  &-action-container {
+    @include flex-container(row, center, center);
   }
 
-  & div {
-    text-align: left;
-    margin-left: 2em;
+  &-action {
+    margin-left: 1em;
+  }
+
+  &:hover {
+    cursor: pointer;
   }
 }
 
@@ -354,5 +438,13 @@ export default {
   width: 70px;
   height: 70px;
   flex-shrink: 0;
+}
+
+.icon-ring {
+  @include flex-container(row, center, center);
+  height: 60px;
+  width: 60px;
+  border-radius: 50%;
+  border: 1px solid $c-border-grey;
 }
 </style>

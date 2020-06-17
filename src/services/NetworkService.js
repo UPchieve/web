@@ -287,9 +287,36 @@ export default {
       .post(`${API_ROOT}/push-token/save`, data)
       .then(this._successHandler, this._errorHandler);
   },
+  addReference({ referenceName, referenceEmail }) {
+    return Vue.http
+      .post(`${API_ROOT}/user/volunteer-approval/reference`, {
+        referenceName,
+        referenceEmail
+      })
+      .then(this._successHandler, this._errorHandler);
+  },
+  deleteReference({ referenceEmail }) {
+    return Vue.http
+      .post(`${API_ROOT}/user/volunteer-approval/reference/delete`, {
+        referenceEmail
+      })
+      .then(this._successHandler, this._errorHandler);
+  },
   saveReferenceForm(referenceId, data) {
     return Vue.http
       .post(`${REFERENCE_API_ROOT}/${referenceId}/submit`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
+  addLinkedIn({ linkedInUrl }) {
+    return Vue.http
+      .post(`${API_ROOT}/user/volunteer-approval/linkedin`, {
+        linkedInUrl
+      })
+      .then(this._successHandler, this._errorHandler);
+  },
+  getPhotoUploadUrl() {
+    return Vue.http
+      .get(`${API_ROOT}/user/volunteer-approval/photo-url`)
       .then(this._successHandler, this._errorHandler);
   }
 };
