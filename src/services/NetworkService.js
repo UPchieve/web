@@ -217,9 +217,27 @@ export default {
       .post(`${API_ROOT}/session/${sessionId}/report`, { reportMessage })
       .then(this._successHandler, this._errorHandler);
   },
-  adminGetSessions(page) {
+  adminGetSessions({
+    page,
+    showBannedUsers,
+    showTestUsers,
+    sessionActivityFrom,
+    sessionActivityTo,
+    minMessagesSent,
+    minSessionLength
+  }) {
+    const queryParams = new URLSearchParams({
+      page,
+      showBannedUsers,
+      showTestUsers,
+      sessionActivityFrom,
+      sessionActivityTo,
+      minMessagesSent,
+      minSessionLength
+    }).toString();
+
     return Vue.http
-      .get(`${API_ROOT}/sessions?page=${page}`)
+      .get(`${API_ROOT}/sessions?${queryParams}`)
       .then(this._successHandler, this._errorHandler);
   },
   adminGetSession(sessionId) {
@@ -230,6 +248,21 @@ export default {
   adminGetUser(userId) {
     return Vue.http
       .get(`${API_ROOT}/user/${userId}`)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminGetIneligibleStudents(page) {
+    return Vue.http
+      .get(`${ELIGIBILITY_API_ROOT}/ineligible-students?page=${page}`)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminGetSchool(schoolId) {
+    return Vue.http
+      .get(`${ELIGIBILITY_API_ROOT}/school/${schoolId}`)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminUpdateSchoolApproval(data) {
+    return Vue.http
+      .post(`${ELIGIBILITY_API_ROOT}/school/approval`, data)
       .then(this._successHandler, this._errorHandler);
   },
   getQuestions(context, data) {
@@ -259,9 +292,16 @@ export default {
       )
       .then(this._successHandler, this._errorHandler);
   },
-  checkStudentEligbility(context, { schoolUpchieveId, zipCode }) {
+  checkStudentEligibility(
+    context,
+    { schoolUpchieveId, zipCode, referredByCode }
+  ) {
     return context.$http
-      .post(`${ELIGIBILITY_API_ROOT}/check`, { schoolUpchieveId, zipCode })
+      .post(`${ELIGIBILITY_API_ROOT}/check`, {
+        schoolUpchieveId,
+        zipCode,
+        referredByCode
+      })
       .then(this._successHandler, this._errorHandler);
   },
   joinSchoolApprovalWaitlist(context, { schoolUpchieveId, email }) {

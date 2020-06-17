@@ -44,13 +44,6 @@
             >
           </li>
           <li>
-            <a
-              href="https://www.commonapp.org/files/CommonAppRequirementsTracker.pdf"
-              target="_blank"
-              >Application Requirements & Deadline Tracker</a
-            >
-          </li>
-          <li>
             <a href="https://fafsa.ed.gov/" target="_blank"
               >Free Application for Federal Student Aid (FAFSA)</a
             >
@@ -80,13 +73,6 @@
           <li>
             <a href="https://www.wolframalpha.com/" target="_blank"
               >Online Calculator (can graph and solve equations)</a
-            >
-          </li>
-          <li>
-            <a
-              href="http://math.stackexchange.com/questions/tagged/calculus "
-              target="_blank"
-              >Calculus Forum</a
             >
           </li>
         </ul>
