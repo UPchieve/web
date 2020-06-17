@@ -57,44 +57,32 @@
             approved volunteer
           </p>
 
-          <div class="onboarding-step" @click="togglePhotoUploadModal">
-            <div class="onboarding-step-action-container">
-              <div class="icon-ring">
-                <person-icon />
-              </div>
-              <div class="onboarding-step-action">
-                <h4>Proof of identity</h4>
-                <p
-                  v-if="
-                    user.photoIdStatus === 'EMPTY' ||
-                      user.photoIdStatus === 'REJECTED'
-                  "
-                >
-                  Add photo
-                </p>
-                <p v-if="user.photoIdStatus === 'SUBMITTED'">In review</p>
-                <p v-if="user.photoIdStatus === 'APPROVED'">Completed</p>
-              </div>
-            </div>
-            <right-caret />
-          </div>
-          <div class="onboarding-step" @click="toggleReferencesModal">
-            <div class="onboarding-step-action-container">
-              <div class="icon-ring">
-                <person-card-icon />
-              </div>
-              <div class="onboarding-step-action">
-                <h4>Reference check</h4>
-                <p>
-                  Add references
-                </p>
-              </div>
-            </div>
-            <right-caret />
-          </div>
+          <account-action
+            title="Proof of identity"
+            :subtitle="photoIdAction.subtitle"
+            :status="photoIdAction.status"
+            @click.native="togglePhotoUploadModal"
+          >
+            <person-icon />
+          </account-action>
+
+          <account-action
+            title="Reference check"
+            :subtitle="referenceAction.subtitle"
+            :status="referenceAction.status"
+            @click.native="toggleReferencesModal"
+          >
+            <person-card-icon />
+          </account-action>
         </div>
         <div v-if="!isOnboarded" class="dashboard-card">
-          <div class="dashboard-card__title">Remaining Onboarding Steps</div>
+          <!-- @todo: user avatar icon -->
+          <verification-icon />
+          <h3>Set up your account</h3>
+          <p>
+            Select your availability and take quizes to get certified in various
+            subjects!
+          </p>
           <div>
             <div v-if="!hasSelectedAvailability" class="onboarding-step">
               <img
@@ -142,17 +130,15 @@
 <script>
 import _ from "lodash";
 import { mapState, mapGetters } from "vuex";
-
 import ListSessions from "./ListSessions";
 import DashboardBanner from "../DashboardBanner";
+import AccountAction from "./AccountAction";
 import PhotoUploadModal from "./PhotoUploadModal";
 import ReferencesModal from "./ReferencesModal";
 import LargeButton from "@/components/LargeButton";
 import PersonCardIcon from "@/assets/person-card.svg";
 import PersonIcon from "@/assets/person.svg";
-import RightCaret from "@/assets/right-caret.svg";
 import VerificationIcon from "@/assets/verification.svg";
-
 import { allSubtopicNames } from "@/utils/topics";
 
 const headerData = {
@@ -167,12 +153,12 @@ export default {
   components: {
     ListSessions,
     DashboardBanner,
+    AccountAction,
     PhotoUploadModal,
     ReferencesModal,
     LargeButton,
     PersonCardIcon,
     PersonIcon,
-    RightCaret,
     VerificationIcon
   },
   watch: {
@@ -217,6 +203,73 @@ export default {
 
     isNewVolunteer() {
       return !this.user.pastSessions || !this.user.pastSessions.length;
+    },
+
+    photoIdAction() {
+      switch (this.user.photoIdStatus) {
+        case "EMPTY":
+          return {
+            subtitle: "Add photo",
+            status: "DEFAULT"
+          };
+        case "SUBMITTED":
+          return {
+            subtitle: "In review",
+            status: "PENDING"
+          };
+        case "APPROVED":
+          return {
+            subtitle: "Completed",
+            status: "COMPLETED"
+          };
+        case "REJECTED":
+          return {
+            subtitle: "Please upload a different photo",
+            status: "ERROR"
+          };
+        default:
+          return {
+            subtitle: "Add photo",
+            status: "DEFAULT"
+          };
+      }
+    },
+
+    referenceAction() {
+      const linkedInStatus = this.user.linkedInStatus;
+      const referenceStatuses = this.user.references.map(r => r.status);
+      const statuses = [linkedInStatus, ...referenceStatuses].filter(
+        s => s !== "EMPTY" // linkedInStatus defaults to "EMPTY"
+      );
+
+      if (statuses.length === 0)
+        return {
+          subtitle: "Add references",
+          status: "Default"
+        };
+
+      if (statuses.some(s => s === "REJECTED"))
+        return {
+          subtitle: "Action required",
+          status: "ERROR"
+        };
+
+      if (statuses.length === 1)
+        return {
+          subtitle: "Incomplete: 1 out of 2 references submitted",
+          status: "PROGRESS"
+        };
+
+      if (statuses[0] === "APPROVED" && statuses[1] === "APPROVED")
+        return {
+          subtitle: "Completed",
+          status: "COMPLETED"
+        };
+
+      return {
+        subtitle: "Pending",
+        status: "PENDING"
+      };
     },
 
     impactStats() {
@@ -421,16 +474,9 @@ export default {
   margin: 1em 0;
   text-align: left;
 
-  &-action-container {
-    @include flex-container(row, center, center);
-  }
-
-  &-action {
-    margin-left: 1em;
-  }
-
-  &:hover {
-    cursor: pointer;
+  & div {
+    text-align: left;
+    margin-left: 2em;
   }
 }
 
