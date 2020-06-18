@@ -26,6 +26,8 @@ import VolunteerCoverage from "./views/Admin/VolunteerCoverage";
 import AdminSessions from "./views/Admin/AdminSessions";
 import AdminSessionDetail from "./views/Admin/AdminSessionDetail";
 import AdminUserDetail from "./views/Admin/AdminUserDetail";
+import AdminIneligibleStudents from "./views/Admin/AdminIneligibleStudents";
+import AdminSchoolDetail from "./views/Admin/AdminSchoolDetail";
 import VolunteerGuideView from "./views/VolunteerGuideView";
 import ReviewMaterialsView from "./views/ReviewMaterialsView";
 import ReferenceView from "./views/ReferenceView";
@@ -240,6 +242,18 @@ const routes = [
     meta: { protected: true, requiresAdmin: true }
   },
   {
+    path: "/admin/ineligible-students",
+    name: "AdminIneligibleStudents",
+    component: AdminIneligibleStudents,
+    meta: { protected: true, requiresAdmin: true }
+  },
+  {
+    path: "/admin/school/:schoolId",
+    name: "AdminSchoolDetail",
+    component: AdminSchoolDetail,
+    meta: { protected: true, requiresAdmin: true }
+  },
+  {
     path: "/coach-guide",
     name: "VolunteerGuide",
     component: VolunteerGuideView,
@@ -336,6 +350,16 @@ router.beforeEach((to, from, next) => {
 router.afterEach((to, from) => {
   if (to.name !== from.name) store.dispatch("app/showNavigation");
   store.dispatch("app/modal/hide");
+
+  // Google Analytics
+  if (window.ga) {
+    const isAuthenticated = store.getters["user/isAuthenticated"];
+    const isVolunteer = store.getters["user/isVolunteer"];
+    window.ga("set", "page", router.currentRoute.path);
+    window.ga("set", "dimension2", isAuthenticated);
+    if (isAuthenticated) window.ga("set", "dimension1", isVolunteer);
+    window.ga("send", "pageview");
+  }
 });
 
 // If endpoint returns 401, redirect to login (except for requests to get user or user's
