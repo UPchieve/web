@@ -83,34 +83,26 @@
             Select your availability and take quizes to get certified in various
             subjects!
           </p>
-          <div>
-            <div v-if="!hasSelectedAvailability" class="onboarding-step">
-              <img
-                src="@/assets/onboarding_icons/calendar-icon.png"
-                class="onboarding-icon"
-              />
-              <div>
-                <h4>Select availability</h4>
-                <p>
-                  Select at least one hour of availability so that we know when
-                  we can text you.
-                </p>
-              </div>
-            </div>
-            <div v-if="!hasCertification" class="onboarding-step">
-              <img
-                src="@/assets/onboarding_icons/quiz-icon.png"
-                class="onboarding-icon"
-              />
-              <div>
-                <h4>Get a certification</h4>
-                <p>
-                  Pass at least one quiz so that we know what subjects you can
-                  help students with.
-                </p>
-              </div>
-            </div>
-          </div>
+
+          <account-action
+            title="Select availability"
+            :subtitle="availabilityAction.subtitle"
+            :status="availabilityAction.status"
+            @click.native="clickAvailabilityAction"
+          >
+            <!-- @todo: use the right icon -->
+            <person-card-icon />
+          </account-action>
+
+          <account-action
+            title="Get a certification"
+            :subtitle="certificationAction.subtitle"
+            :status="certificationAction.status"
+            @click.native="clickCertificationAction"
+          >
+            <!-- @todo: use the right icon -->
+            <person-card-icon />
+          </account-action>
         </div>
       </template>
     </div>
@@ -245,7 +237,7 @@ export default {
       if (statuses.length === 0)
         return {
           subtitle: "Add references",
-          status: "Default"
+          status: "DEFAULT"
         };
 
       if (statuses.some(s => s === "REJECTED"))
@@ -269,6 +261,32 @@ export default {
       return {
         subtitle: "Pending",
         status: "PENDING"
+      };
+    },
+
+    availabilityAction() {
+      if (this.hasSelectedAvailability)
+        return {
+          subtitle: "Completed",
+          status: "COMPLETED"
+        };
+
+      return {
+        subtitle: "Select at least one hour",
+        status: "DEFAULT"
+      };
+    },
+
+    certificationAction() {
+      if (this.hasCertification)
+        return {
+          subtitle: "Completed",
+          status: "COMPLETED"
+        };
+
+      return {
+        subtitle: "Take a quiz",
+        status: "DEFAULT"
       };
     },
 
@@ -366,6 +384,12 @@ export default {
     },
     toggleReferencesModal() {
       this.showReferencesModal = !this.showReferencesModal;
+    },
+    clickAvailabilityAction() {
+      this.$router.push("/calendar");
+    },
+    clickCertificationAction() {
+      this.$router.push("/training");
     }
   }
 };
@@ -464,33 +488,5 @@ export default {
   &__stat-value {
     font-weight: bold;
   }
-}
-
-.onboarding-step {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-  margin: 1em 0;
-  text-align: left;
-
-  & div {
-    text-align: left;
-    margin-left: 2em;
-  }
-}
-
-.onboarding-icon {
-  width: 70px;
-  height: 70px;
-  flex-shrink: 0;
-}
-
-.icon-ring {
-  @include flex-container(row, center, center);
-  height: 60px;
-  width: 60px;
-  border-radius: 50%;
-  border: 1px solid $c-border-grey;
 }
 </style>
