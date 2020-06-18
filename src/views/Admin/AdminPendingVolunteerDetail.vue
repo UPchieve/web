@@ -42,14 +42,14 @@
           LinkedIn
           <span
             class="user-detail__account-notice user-detail__status"
-            :class="statusColor(linkedInUrlStatus)"
-            >{{ statusText(linkedInUrlStatus) }}</span
+            :class="statusColor(linkedInStatus)"
+            >{{ statusText(linkedInStatus) }}</span
           >
         </p>
         <a :href="volunteer.linkedInUrl" target="_blank" rel="noopener">{{
           volunteer.linkedInUrl
         }}</a>
-        <select name="linked-in-status" v-model="linkedInUrlStatus">
+        <select name="linked-in-status" v-model="linkedInStatus">
           <option value selected disabled>Review required...</option>
           <option value="REJECTED">Reject</option>
           <option value="APPROVED">Approve</option>
@@ -104,7 +104,7 @@ export default {
     return {
       volunteer: {},
       photoIdStatus: "",
-      linkedInUrlStatus: "",
+      linkedInStatus: "",
       showReferenceForm: false,
       chosenReferenceIndex: 0,
       referencesStatus: []
@@ -113,7 +113,7 @@ export default {
   async created() {
     this.volunteer = await getUser(this.$route.params.userId);
     this.photoIdStatus = this.volunteer.photoIdStatus;
-    this.linkedInUrlStatus = this.volunteer.linkedInUrlStatus;
+    this.linkedInStatus = this.volunteer.linkedInStatus;
     this.referencesStatus = this.volunteer.references.map(
       reference => reference.status
     );
@@ -122,7 +122,7 @@ export default {
     // @todo: server side
     handleSubmit() {
       console.log(this.photoIdStatus);
-      console.log(this.linkedInUrlStatus);
+      console.log(this.linkedInStatus);
       console.log(this.referencesStatus);
     },
     toggleReferenceView(referenceIndex) {
