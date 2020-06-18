@@ -41,7 +41,7 @@ export default {
   flex-direction: row;
   align-items: center;
   padding: 0 20px;
-  margin: 1em 0;
+  padding: 12px;
   cursor: pointer;
 
   &__icon-container {
@@ -65,11 +65,15 @@ export default {
 
   &__title {
     font-size: 18px;
-    font-weight: 500;
+    font-weight: 400;
   }
 
   &__subtitle {
     color: $c-secondary-grey;
+  }
+
+  &__caret {
+    margin-right: 7px;
   }
 
   &--progress {

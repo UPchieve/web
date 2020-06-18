@@ -12,21 +12,23 @@
 
     <div class="volunteer-dashboard__body">
       <template v-if="user.isApproved && isOnboarded">
-        <div class="students-waiting dashboard-card">
-          <div class="dashboard-card__title">Waiting Students</div>
-          <div v-if="isSessionAlive">
-            <button
-              class="btn rejoinSessionBtn"
-              @click.prevent="rejoinHelpSession()"
-            >
-              Rejoin your coaching session
-            </button>
-          </div>
-          <div v-else>
-            <div class="dashboard-card__description">
-              Students waiting for help will show up below.
+        <div class="dashboard-card">
+          <div class="students-waiting">
+            <div class="dashboard-card__title">Waiting Students</div>
+            <div v-if="isSessionAlive">
+              <button
+                class="btn rejoinSessionBtn"
+                @click.prevent="rejoinHelpSession()"
+              >
+                Rejoin your coaching session
+              </button>
             </div>
-            <list-sessions />
+            <div v-else>
+              <div class="dashboard-card__subtitle">
+                Students waiting for help will show up below.
+              </div>
+              <list-sessions />
+            </div>
           </div>
         </div>
         <div class="dashboard-card">
@@ -50,12 +52,14 @@
       </template>
       <template v-else>
         <div v-if="!user.isApproved" class="dashboard-card">
-          <verification-icon />
-          <h3>Volunteer Verification</h3>
-          <p>
-            Provide proof of identity and provide references to become an
-            approved volunteer
-          </p>
+          <div class="dashboard-card__icon">
+            <verification-icon />
+          </div>
+          <div class="dashboard-card__title">Volunteer verification</div>
+          <div class="dashboard-card__subtitle">
+            Provide proof of identity and references to become an approved
+            volunteer
+          </div>
 
           <account-action
             title="Proof of identity"
@@ -75,14 +79,16 @@
             <person-card-icon />
           </account-action>
         </div>
-        <div v-if="!isOnboarded" class="dashboard-card">
+        <div class="dashboard-card">
           <!-- @todo: user avatar icon -->
-          <verification-icon />
-          <h3>Set up your account</h3>
-          <p>
+          <div class="dashboard-card__icon">
+            <verification-icon />
+          </div>
+          <div class="dashboard-card__title">Set up your account</div>
+          <div class="dashboard-card__subtitle">
             Select your availability and take quizes to get certified in various
             subjects!
-          </p>
+          </div>
 
           <account-action
             title="Select availability"
@@ -452,30 +458,64 @@ export default {
 .dashboard-card {
   background: #fff;
   border-radius: 8px;
-  padding: 40px 10px;
+  padding: 40px 0 24px;
 
-  @include breakpoint-above("medium") {
-    padding: 40px 30px;
+  &__icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 24px;
   }
 
   &__title {
-    margin: 0 0 15px;
+    margin-bottom: 4px;
     font-size: 24px;
     font-weight: 500;
     line-height: 1.25;
   }
 
-  &__description {
+  &__subtitle {
     font-size: 16px;
     color: $c-secondary-grey;
-    margin: 15px 0;
+    margin-bottom: 24px;
+    padding: 0 15px;
+
+    @include breakpoint-above("medium") {
+      padding: 0 42px;
+    }
+  }
+
+  .account-action {
+    margin: 0 10px;
+
+    @include breakpoint-above("medium") {
+      margin: 0 20px;
+    }
+  }
+}
+
+.students-waiting {
+  padding: 0;
+
+  @include breakpoint-above("medium") {
+    padding: 0 30px;
   }
 }
 
 .volunteer-impact {
+  padding: 0 10px;
+
+  @include breakpoint-above("medium") {
+    padding: 0 30px;
+  }
+
   &__stats {
     width: 100%;
     padding: 10px 5px 0;
+  }
+
+  &__stat-label {
+    text-align: left;
   }
 
   &__stat {
@@ -487,6 +527,7 @@ export default {
 
   &__stat-value {
     font-weight: bold;
+    text-align: right;
   }
 }
 </style>
