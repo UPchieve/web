@@ -13,6 +13,9 @@
       <router-link to="/admin/volunteers/pending" class="admin-link btn"
         >Pending Volunteers</router-link
       >
+      <router-link to="/admin/ineligible-students" class="admin-link btn"
+        >Ineligible Students</router-link
+      >
     </div>
   </div>
 </template>

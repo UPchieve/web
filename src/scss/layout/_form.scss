@@ -26,7 +26,7 @@
 
   color: #73737a;
   font-weight: 600;
-  
+
   &--active {
     @extend #{$className};
     color: $c-accent;
@@ -86,20 +86,26 @@
 }
 
 .uc-form-button {
-  background: #f6f6f6;
+  background-color: #f6f6f6;
   border: none;
   border-radius: 20px;
   color: $c-accent;
-  
+
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
 
   min-height: 40px;
-  
-  &:hover, &:active {
+
+  &:hover,
+  &:active {
     color: white;
-    background: $c-accent;
+    background-color: $c-accent;
+  }
+
+  &:disabled {
+    background-color: #f6f6f6;
+    color: $c-secondary-grey;
   }
 }
 
@@ -116,7 +122,7 @@
   input[type="checkbox"] {
     @include flex-container(row, center, center);
     $size: 20px;
-    
+
     -webkit-appearance: none;
     background-color: #f6f6f6;
     border-radius: 3px;
@@ -129,7 +135,7 @@
     height: $size;
 
     margin: 0;
-    
+
     &:checked {
       background-color: white;
       color: $c-accent;
@@ -138,7 +144,7 @@
       &:after {
         content: '✔';
       }
-    } 
+    }
   }
 
   label {

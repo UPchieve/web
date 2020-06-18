@@ -12,21 +12,23 @@
 
     <div class="volunteer-dashboard__body">
       <template v-if="user.isApproved && isOnboarded">
-        <div class="students-waiting dashboard-card">
-          <div class="dashboard-card__title">Waiting Students</div>
-          <div v-if="isSessionAlive">
-            <button
-              class="btn rejoinSessionBtn"
-              @click.prevent="rejoinHelpSession()"
-            >
-              Rejoin your coaching session
-            </button>
-          </div>
-          <div v-else>
-            <div class="dashboard-card__description">
-              Students waiting for help will show up below.
+        <div class="dashboard-card">
+          <div class="students-waiting">
+            <div class="dashboard-card__title">Waiting Students</div>
+            <div v-if="isSessionAlive">
+              <button
+                class="btn rejoinSessionBtn"
+                @click.prevent="rejoinHelpSession()"
+              >
+                Rejoin your coaching session
+              </button>
             </div>
-            <list-sessions />
+            <div v-else>
+              <div class="dashboard-card__subtitle">
+                Students waiting for help will show up below.
+              </div>
+              <list-sessions />
+            </div>
           </div>
         </div>
         <div class="dashboard-card">
@@ -50,79 +52,63 @@
       </template>
       <template v-else>
         <div v-if="!user.isApproved" class="dashboard-card">
-          <verification-icon />
-          <h3>Volunteer Verification</h3>
-          <p>
-            Provide proof of identity and provide references to become an
-            approved volunteer
-          </p>
+          <div class="dashboard-card__icon">
+            <verification-icon />
+          </div>
+          <div class="dashboard-card__title">Volunteer verification</div>
+          <div class="dashboard-card__subtitle">
+            Provide proof of identity and references to become an approved
+            volunteer
+          </div>
 
-          <div class="onboarding-step" @click="togglePhotoUploadModal">
-            <div class="onboarding-step-action-container">
-              <div class="icon-ring">
-                <person-icon />
-              </div>
-              <div class="onboarding-step-action">
-                <h4>Proof of identity</h4>
-                <p
-                  v-if="
-                    user.photoIdStatus === 'EMPTY' ||
-                      user.photoIdStatus === 'REJECTED'
-                  "
-                >
-                  Add photo
-                </p>
-                <p v-if="user.photoIdStatus === 'SUBMITTED'">In review</p>
-                <p v-if="user.photoIdStatus === 'APPROVED'">Completed</p>
-              </div>
-            </div>
-            <right-caret />
-          </div>
-          <div class="onboarding-step" @click="toggleReferencesModal">
-            <div class="onboarding-step-action-container">
-              <div class="icon-ring">
-                <person-card-icon />
-              </div>
-              <div class="onboarding-step-action">
-                <h4>Reference check</h4>
-                <p>
-                  Add references
-                </p>
-              </div>
-            </div>
-            <right-caret />
-          </div>
+          <account-action
+            title="Proof of identity"
+            :subtitle="photoIdAction.subtitle"
+            :status="photoIdAction.status"
+            @click.native="togglePhotoUploadModal"
+          >
+            <person-icon />
+          </account-action>
+
+          <account-action
+            title="Reference check"
+            :subtitle="referenceAction.subtitle"
+            :status="referenceAction.status"
+            @click.native="toggleReferencesModal"
+          >
+            <person-card-icon />
+          </account-action>
         </div>
-        <div v-if="!isOnboarded" class="dashboard-card">
-          <div class="dashboard-card__title">Remaining Onboarding Steps</div>
-          <div>
-            <div v-if="!hasSelectedAvailability" class="onboarding-step">
-              <img
-                src="@/assets/onboarding_icons/calendar-icon.png"
-                class="onboarding-icon"
-              />
-              <div>
-                <h4>Select availability</h4>
-                <p>
-                  Select at least one hour of availability so that we know when
-                  we can text you.
-                </p>
-              </div>
-            </div>
-            <div v-if="!hasCertification" class="onboarding-step">
-              <img
-                src="@/assets/onboarding_icons/quiz-icon.png"
-                class="onboarding-icon"
-              />
-              <div>
-                <h4>Get a certification</h4>
-                <p>
-                  Pass at least one quiz so that we know what subjects you can
-                  help students with.
-                </p>
-              </div>
-            </div>
+        <div class="dashboard-card">
+          <!-- @todo: user avatar icon -->
+          <div class="dashboard-card__icon">
+            <verification-icon />
           </div>
+          <div class="dashboard-card__title">Set up your account</div>
+          <div class="dashboard-card__subtitle">
+            Select your availability and take quizes to get certified in various
+            subjects!
+          </div>
+
+          <account-action
+            title="Select availability"
+            :subtitle="availabilityAction.subtitle"
+            :status="availabilityAction.status"
+            @click.native="clickAvailabilityAction"
+          >
+            <!-- @todo: use the right icon -->
+            <person-card-icon />
+          </account-action>
+
+          <account-action
+            title="Get a certification"
+            :subtitle="certificationAction.subtitle"
+            :status="certificationAction.status"
+            @click.native="clickCertificationAction"
+          >
+            <!-- @todo: use the right icon -->
+            <person-card-icon />
+          </account-action>
         </div>
       </template>
     </div>
@@ -142,17 +128,15 @@
 <script>
 import _ from "lodash";
 import { mapState, mapGetters } from "vuex";
-
 import ListSessions from "./ListSessions";
 import DashboardBanner from "../DashboardBanner";
+import AccountAction from "./AccountAction";
 import PhotoUploadModal from "./PhotoUploadModal";
 import ReferencesModal from "./ReferencesModal";
 import LargeButton from "@/components/LargeButton";
 import PersonCardIcon from "@/assets/person-card.svg";
 import PersonIcon from "@/assets/person.svg";
-import RightCaret from "@/assets/right-caret.svg";
 import VerificationIcon from "@/assets/verification.svg";
-
 import { allSubtopicNames } from "@/utils/topics";
 
 const headerData = {
@@ -167,12 +151,12 @@ export default {
   components: {
     ListSessions,
     DashboardBanner,
+    AccountAction,
     PhotoUploadModal,
     ReferencesModal,
     LargeButton,
     PersonCardIcon,
     PersonIcon,
-    RightCaret,
     VerificationIcon
   },
   watch: {
@@ -217,6 +201,99 @@ export default {
 
     isNewVolunteer() {
       return !this.user.pastSessions || !this.user.pastSessions.length;
+    },
+
+    photoIdAction() {
+      switch (this.user.photoIdStatus) {
+        case "EMPTY":
+          return {
+            subtitle: "Add photo",
+            status: "DEFAULT"
+          };
+        case "SUBMITTED":
+          return {
+            subtitle: "In review",
+            status: "PENDING"
+          };
+        case "APPROVED":
+          return {
+            subtitle: "Completed",
+            status: "COMPLETED"
+          };
+        case "REJECTED":
+          return {
+            subtitle: "Please upload a different photo",
+            status: "ERROR"
+          };
+        default:
+          return {
+            subtitle: "Add photo",
+            status: "DEFAULT"
+          };
+      }
+    },
+
+    referenceAction() {
+      const linkedInStatus = this.user.linkedInStatus;
+      const referenceStatuses = this.user.references.map(r => r.status);
+      const statuses = [linkedInStatus, ...referenceStatuses].filter(
+        s => s !== "EMPTY" // linkedInStatus defaults to "EMPTY"
+      );
+
+      if (statuses.length === 0)
+        return {
+          subtitle: "Add references",
+          status: "DEFAULT"
+        };
+
+      if (statuses.some(s => s === "REJECTED"))
+        return {
+          subtitle: "Action required",
+          status: "ERROR"
+        };
+
+      if (statuses.length === 1)
+        return {
+          subtitle: "Incomplete: 1 out of 2 references submitted",
+          status: "PROGRESS"
+        };
+
+      if (statuses[0] === "APPROVED" && statuses[1] === "APPROVED")
+        return {
+          subtitle: "Completed",
+          status: "COMPLETED"
+        };
+
+      return {
+        subtitle: "Pending",
+        status: "PENDING"
+      };
+    },
+
+    availabilityAction() {
+      if (this.hasSelectedAvailability)
+        return {
+          subtitle: "Completed",
+          status: "COMPLETED"
+        };
+
+      return {
+        subtitle: "Select at least one hour",
+        status: "DEFAULT"
+      };
+    },
+
+    certificationAction() {
+      if (this.hasCertification)
+        return {
+          subtitle: "Completed",
+          status: "COMPLETED"
+        };
+
+      return {
+        subtitle: "Take a quiz",
+        status: "DEFAULT"
+      };
     },
 
     impactStats() {
@@ -313,6 +390,12 @@ export default {
     },
     toggleReferencesModal() {
       this.showReferencesModal = !this.showReferencesModal;
+    },
+    clickAvailabilityAction() {
+      this.$router.push("/calendar");
+    },
+    clickCertificationAction() {
+      this.$router.push("/training");
     }
   }
 };
@@ -375,30 +458,64 @@ export default {
 .dashboard-card {
   background: #fff;
   border-radius: 8px;
-  padding: 40px 10px;
+  padding: 40px 0 24px;
 
-  @include breakpoint-above("medium") {
-    padding: 40px 30px;
+  &__icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 24px;
   }
 
   &__title {
-    margin: 0 0 15px;
+    margin-bottom: 4px;
     font-size: 24px;
     font-weight: 500;
     line-height: 1.25;
   }
 
-  &__description {
+  &__subtitle {
     font-size: 16px;
     color: $c-secondary-grey;
-    margin: 15px 0;
+    margin-bottom: 24px;
+    padding: 0 15px;
+
+    @include breakpoint-above("medium") {
+      padding: 0 42px;
+    }
+  }
+
+  .account-action {
+    margin: 0 10px;
+
+    @include breakpoint-above("medium") {
+      margin: 0 20px;
+    }
+  }
+}
+
+.students-waiting {
+  padding: 0;
+
+  @include breakpoint-above("medium") {
+    padding: 0 30px;
   }
 }
 
 .volunteer-impact {
+  padding: 0 10px;
+
+  @include breakpoint-above("medium") {
+    padding: 0 30px;
+  }
+
   &__stats {
     width: 100%;
     padding: 10px 5px 0;
+  }
+
+  &__stat-label {
+    text-align: left;
   }
 
   &__stat {
@@ -410,41 +527,7 @@ export default {
 
   &__stat-value {
     font-weight: bold;
+    text-align: right;
   }
-}
-
-.onboarding-step {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-  margin: 1em 0;
-  text-align: left;
-
-  &-action-container {
-    @include flex-container(row, center, center);
-  }
-
-  &-action {
-    margin-left: 1em;
-  }
-
-  &:hover {
-    cursor: pointer;
-  }
-}
-
-.onboarding-icon {
-  width: 70px;
-  height: 70px;
-  flex-shrink: 0;
-}
-
-.icon-ring {
-  @include flex-container(row, center, center);
-  height: 60px;
-  width: 60px;
-  border-radius: 50%;
-  border: 1px solid $c-border-grey;
 }
 </style>

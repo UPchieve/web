@@ -3,18 +3,25 @@
     <form class="uc-form">
       <div class="uc-form-header">
         <div class="uc-form-header-link--active">Reset Your Password</div>
-        <div class="link-container">
-          <router-link to="/login" class="uc-form-header-link"
-            >Log In</router-link
-          >
-          <div>/</div>
-          <router-link to="/signup" class="uc-form-header-link"
-            >Sign Up</router-link
-          >
+
+        <div class="link-container link-container--end" v-if="user">
+          <router-link to="/" class="uc-form-header-link">
+            Home
+          </router-link>
+        </div>
+
+        <div class="link-container" v-else>
+          <router-link to="/login" class="uc-form-header-link">
+            Log In
+          </router-link>
+          <span>/</span>
+          <router-link to="/signup" class="uc-form-header-link">
+            Sign Up
+          </router-link>
         </div>
       </div>
 
-      <div v-if="msg !== ''" class="message">{{ msg }}</div>
+      <div v-if="msg" class="message">{{ msg }}</div>
 
       <div v-else class="uc-form-body">
         <div class="uc-column">
@@ -31,9 +38,18 @@
           />
         </div>
 
-        <button class="uc-form-button" type="submit" @click.prevent="submit()">
+        <button
+          class="uc-form-button"
+          type="submit"
+          @click.prevent="submit()"
+          :disabled="isSendingEmail"
+        >
           Enter
         </button>
+
+        <loader v-if="isSendingEmail" overlay />
+
+        <p v-if="error" class="error">{{ error }}</p>
       </div>
     </form>
   </form-page-template>
@@ -41,13 +57,16 @@
 
 <script>
 import * as Sentry from "@sentry/browser";
+import { mapState } from "vuex";
 
 import AuthService from "@/services/AuthService";
 import FormPageTemplate from "@/components/FormPageTemplate";
+import Loader from "@/components/Loader";
 
 export default {
   components: {
-    FormPageTemplate
+    FormPageTemplate,
+    Loader
   },
   created() {
     this.$store.dispatch("app/hideNavigation");
@@ -55,25 +74,46 @@ export default {
   data() {
     return {
       email: "",
-      msg: ""
+      msg: "",
+      error: "",
+      isSendingEmail: false
     };
+  },
+  computed: {
+    ...mapState({
+      user: state => state.user.user
+    })
   },
   methods: {
     submit() {
-      AuthService.sendReset(this, this.email).catch(err => {
-        if (err.status !== 422) {
-          Sentry.captureException(err);
-        }
-      });
+      this.isSendingEmail = true;
+      this.error = "";
+      AuthService.sendReset(this, this.email)
+        .then(() => (this.isSendingEmail = false))
+        .catch(err => {
+          this.error = err.message;
+          this.isSendingEmail = false;
+          if (err.status !== 422) {
+            Sentry.captureException(err);
+          }
+        });
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
+.uc-form {
+  position: relative;
+}
+
 .link-container {
   @include flex-container(row, space-evenly);
   min-width: 150px;
+
+  &--end {
+    justify-content: flex-end;
+  }
 }
 
 @include breakpoint-below("tiny") {
@@ -84,5 +124,9 @@ export default {
 
 .message {
   margin-top: 40%;
+}
+
+.error {
+  color: $c-error-red;
 }
 </style>

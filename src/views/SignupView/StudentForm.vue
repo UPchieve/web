@@ -424,9 +424,10 @@ export default {
         return;
       }
 
-      NetworkService.checkStudentEligbility(this, {
+      NetworkService.checkStudentEligibility(this, {
         schoolUpchieveId: this.eligibility.highSchool.upchieveId,
-        zipCode: this.eligibility.zipCode
+        zipCode: this.eligibility.zipCode,
+        referredByCode: this.$route.query.referral
       })
         .then(response => {
           const isEligible = response.body.isEligible;
