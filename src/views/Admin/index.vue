@@ -9,6 +9,10 @@
         >Sessions</router-link
       >
       <router-link to="/edu" class="admin-link btn">Edu Admin</router-link>
+
+      <router-link to="/admin/volunteers/pending" class="admin-link btn"
+        >Pending Volunteers</router-link
+      >
     </div>
   </div>
 </template>

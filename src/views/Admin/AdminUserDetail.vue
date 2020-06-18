@@ -1,57 +1,62 @@
 <template>
   <div v-if="user._id" class="user-detail">
-    <div class="user-detail__body">
-      <div>
-        <span
-          v-if="user.isAdmin"
-          class="user-detail__account-notice user-detail__account-notice--admin"
-          >Admin</span
-        >
-        <span
-          v-if="user.isBanned"
-          class="user-detail__account-notice user-detail__account-notice--ban"
-          >Banned</span
-        >
-        <span
-          v-if="user.isTestUser"
-          class="user-detail__account-notice user-detail__account-notice--test"
-          >Test account</span
-        >
-        <span
-          v-if="user.isFakeUser"
-          class="user-detail__account-notice user-detail__account-notice--fake"
-          >Fake account</span
-        >
-      </div>
-      <div class="user-detail__title">
-        {{ user.firstname }} {{ user.lastname }}
-      </div>
-      <div class="user-detail__subtitle">ID: {{ user._id }}</div>
-      <div class="user-detail__section">
-        <div class="user-detail__section-title">Joined</div>
-        <div>{{ createdAt }}</div>
-      </div>
-      <div class="user-detail__section">
-        <div class="user-detail__section-title">Email</div>
-        <div>{{ user.email }}</div>
-      </div>
-      <div v-if="partnerOrg" class="user-detail__section">
-        <div class="user-detail__section-title">Partner organization</div>
-        <div>{{ partnerOrg }}</div>
-      </div>
-      <div v-if="schoolName" class="user-detail__section">
-        <div class="user-detail__section-title">School</div>
-        <div>{{ schoolName }}</div>
-      </div>
-      <div v-if="user.zipCode" class="user-detail__section">
-        <div class="user-detail__section-title">Zip code</div>
-        <div>{{ user.zipCode }}</div>
-      </div>
-    </div>
-    <sessions-list
-      v-if="user.pastSessions.length"
-      :sessions="user.pastSessions"
+    <admin-pending-volunteer-detail
+      v-if="user.isVolunteer && !user.isApproved"
     />
+    <template v-else>
+      <div class="user-detail__body">
+        <div>
+          <span
+            v-if="user.isAdmin"
+            class="user-detail__account-notice user-detail__account-notice--admin"
+            >Admin</span
+          >
+          <span
+            v-if="user.isBanned"
+            class="user-detail__account-notice user-detail__account-notice--ban"
+            >Banned</span
+          >
+          <span
+            v-if="user.isTestUser"
+            class="user-detail__account-notice user-detail__account-notice--test"
+            >Test account</span
+          >
+          <span
+            v-if="user.isFakeUser"
+            class="user-detail__account-notice user-detail__account-notice--fake"
+            >Fake account</span
+          >
+        </div>
+        <div class="user-detail__title">
+          {{ user.firstname }} {{ user.lastname }}
+        </div>
+        <div class="user-detail__subtitle">ID: {{ user._id }}</div>
+        <div class="user-detail__section">
+          <div class="user-detail__section-title">Joined</div>
+          <div>{{ createdAt }}</div>
+        </div>
+        <div class="user-detail__section">
+          <div class="user-detail__section-title">Email</div>
+          <div>{{ user.email }}</div>
+        </div>
+        <div v-if="partnerOrg" class="user-detail__section">
+          <div class="user-detail__section-title">Partner organization</div>
+          <div>{{ partnerOrg }}</div>
+        </div>
+        <div v-if="schoolName" class="user-detail__section">
+          <div class="user-detail__section-title">School</div>
+          <div>{{ schoolName }}</div>
+        </div>
+        <div v-if="user.zipCode" class="user-detail__section">
+          <div class="user-detail__section-title">Zip code</div>
+          <div>{{ user.zipCode }}</div>
+        </div>
+      </div>
+      <sessions-list
+        v-if="user.pastSessions.length"
+        :sessions="user.pastSessions"
+      />
+    </template>
   </div>
 </template>
 
@@ -59,6 +64,7 @@
 import moment from "moment";
 import NetworkService from "@/services/NetworkService";
 import SessionsList from "@/components/Admin/SessionsList";
+import AdminPendingVolunteerDetail from "@/views/Admin/AdminPendingVolunteerDetail";
 
 const getUser = async userId => {
   const {
@@ -71,7 +77,7 @@ const getUser = async userId => {
 export default {
   name: "AdminUserDetail",
 
-  components: { SessionsList },
+  components: { AdminPendingVolunteerDetail, SessionsList },
 
   data() {
     return {
