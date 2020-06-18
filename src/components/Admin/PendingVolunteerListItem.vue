@@ -2,7 +2,9 @@
   <tr class="list-item">
     <td class="list-item__cell">{{ createdAt }}</td>
     <td class="list-item__cell bold">
-      <router-link :to="`/admin/users/${volunteer._id}`">{{ fullName }}</router-link>
+      <router-link :to="`/admin/users/${volunteer._id}`">{{
+        fullName
+      }}</router-link>
     </td>
     <td class="list-item__cell">{{ volunteer.email }}</td>
   </tr>

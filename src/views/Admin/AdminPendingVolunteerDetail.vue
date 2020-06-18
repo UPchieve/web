@@ -9,7 +9,9 @@
   </div>
   <div v-else-if="volunteer._id" class="user-detail">
     <div class="user-detail__body">
-      <div class="user-detail__title">{{ volunteer.firstname }} {{ volunteer.lastname }}</div>
+      <div class="user-detail__title">
+        {{ volunteer.firstname }} {{ volunteer.lastname }}
+      </div>
       <div class="user-detail__subtitle">ID: {{ volunteer._id }}</div>
       <div class="user-detail__section">
         <div class="user-detail__section-title">Joined</div>
@@ -25,7 +27,8 @@
           <span
             class="user-detail__account-notice user-detail__status"
             :class="statusColor(photoIdStatus)"
-          >{{ statusText(photoIdStatus) }}</span>
+            >{{ statusText(photoIdStatus) }}</span
+          >
         </p>
         <div>{{ volunteer.photoId }}</div>
         <select name="photo-id-status" v-model="photoIdStatus">
@@ -40,9 +43,12 @@
           <span
             class="user-detail__account-notice user-detail__status"
             :class="statusColor(linkedInUrlStatus)"
-          >{{ statusText(linkedInUrlStatus) }}</span>
+            >{{ statusText(linkedInUrlStatus) }}</span
+          >
         </p>
-        <a :href="volunteer.linkedInUrl" target="_blank" rel="noopener">{{ volunteer.linkedInUrl }}</a>
+        <a :href="volunteer.linkedInUrl" target="_blank" rel="noopener">{{
+          volunteer.linkedInUrl
+        }}</a>
         <select name="linked-in-status" v-model="linkedInUrlStatus">
           <option value selected disabled>Review required...</option>
           <option value="REJECTED">Reject</option>
@@ -51,22 +57,29 @@
       </div>
       <div class="user-detail__section">
         <div class="user-detail__section-title">References</div>
-        <div v-for="(reference, index) in volunteer.references" :key="reference._id">
+        <div
+          v-for="(reference, index) in volunteer.references"
+          :key="reference._id"
+        >
           <p>
             <span
               @click="toggleReferenceView(index)"
               class="reference-form-link"
-            >{{ reference.name }}</span>
+              >{{ reference.name }}</span
+            >
             {{ " " }}
             <span
               class="user-detail__account-notice user-detail__status"
               :class="statusColor(referencesStatus[index])"
-            >{{ statusText(referencesStatus[index]) }}</span>
+              >{{ statusText(referencesStatus[index]) }}</span
+            >
           </p>
         </div>
       </div>
     </div>
-    <large-button @click="handleSubmit" type="button" class="save-btn">Save</large-button>
+    <large-button @click="handleSubmit" type="button" class="save-btn"
+      >Save</large-button
+    >
   </div>
 </template>
 
