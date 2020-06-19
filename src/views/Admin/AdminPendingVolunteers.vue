@@ -64,7 +64,6 @@ export default {
       this.$router.push({ path: "/admin/volunteers/pending", query: { page } });
       const { volunteers, isLastPage } = await getPendingVolunteers(page);
       this.volunteers = volunteers;
-
       this.isLastPage = isLastPage;
     },
 

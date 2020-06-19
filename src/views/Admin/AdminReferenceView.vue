@@ -4,9 +4,12 @@
       <div class="page-control__button" @click="closeReferenceView">
         <span>← Back</span>
       </div>
-      <!-- todo: select option when given a value -->
-      <select name="reference-form" @change="updateReferenceStatus">
-        <option value selected disabled>Review required...</option>
+      <select
+        name="reference-form"
+        @change="updateReferenceStatus"
+        :value="referenceStatusText"
+      >
+        <option selected disabled value="SUBMITTED">Review required...</option>
         <option value="REJECTED">Reject</option>
         <option value="APPROVED">Approve</option>
       </select>
