@@ -245,9 +245,9 @@ export default {
       .get(`${API_ROOT}/session/${sessionId}`)
       .then(this._successHandler, this._errorHandler);
   },
-  adminGetPendingVolunteers() {
+  adminGetPendingVolunteers(page) {
     return Vue.http
-      .get(`${API_ROOT}/volunteers/pending`)
+      .get(`${API_ROOT}/volunteers/pending?page=${page}`)
       .then(this._successHandler, this._errorHandler);
   },
   adminGetUser(userId) {
@@ -268,6 +268,11 @@ export default {
   adminUpdateSchoolApproval(data) {
     return Vue.http
       .post(`${ELIGIBILITY_API_ROOT}/school/approval`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminReviewPendingVolunteer(data) {
+    return Vue.http
+      .post(`${API_ROOT}/volunteers/pending`, data)
       .then(this._successHandler, this._errorHandler);
   },
   getQuestions(context, data) {

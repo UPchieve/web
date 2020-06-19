@@ -30,9 +30,14 @@
             >{{ statusText(photoIdStatus) }}</span
           >
         </p>
+        <div class="user-detail__photo-container">
+          <img class="user-detail__photo" :src="volunteer.photoUrl" />
+        </div>
         <div>{{ volunteer.photoId }}</div>
         <select name="photo-id-status" v-model="photoIdStatus">
-          <option selected disabled>Review required...</option>
+          <option selected disabled value="SUBMITTED"
+            >Review required...</option
+          >
           <option value="REJECTED">Reject</option>
           <option value="APPROVED">Approve</option>
         </select>
@@ -46,11 +51,13 @@
             >{{ statusText(linkedInStatus) }}</span
           >
         </p>
-        <a :href="volunteer.linkedInUrl" target="_blank" rel="noopener">{{
-          volunteer.linkedInUrl
-        }}</a>
+        <a :href="volunteer.linkedInUrl" target="_blank" rel="noopener">
+          {{ volunteer.linkedInUrl }}
+        </a>
         <select name="linked-in-status" v-model="linkedInStatus">
-          <option value selected disabled>Review required...</option>
+          <option value="SUBMITTED" selected disabled
+            >Review required...</option
+          >
           <option value="REJECTED">Reject</option>
           <option value="APPROVED">Approve</option>
         </select>
@@ -76,10 +83,11 @@
           </p>
         </div>
       </div>
+      <p v-if="error" class="error">{{ error }}</p>
+      <large-button @click.native="handleSubmit" type="button" class="save-btn"
+        >Save</large-button
+      >
     </div>
-    <large-button @click="handleSubmit" type="button" class="save-btn"
-      >Save</large-button
-    >
   </div>
 </template>
 
@@ -102,6 +110,7 @@ export default {
   components: { AdminReferenceView, LargeButton },
   data() {
     return {
+      error: "",
       volunteer: {},
       photoIdStatus: "",
       linkedInStatus: "",
@@ -119,11 +128,19 @@ export default {
     );
   },
   methods: {
-    // @todo: server side
-    handleSubmit() {
-      console.log(this.photoIdStatus);
-      console.log(this.linkedInStatus);
-      console.log(this.referencesStatus);
+    async handleSubmit() {
+      this.error = "";
+      const data = {
+        photoIdStatus: this.photoIdStatus,
+        linkedInStatus: this.linkedInStatus,
+        referencesStatus: this.referencesStatus,
+        volunteerId: this.volunteer._id
+      };
+      try {
+        await NetworkService.adminReviewPendingVolunteer(data);
+      } catch (error) {
+        this.error = "There was an error updating the volunteer's status.";
+      }
     },
     toggleReferenceView(referenceIndex) {
       this.chosenReferenceIndex = referenceIndex;
@@ -229,17 +246,40 @@ export default {
     color: $c-secondary-grey;
     font-size: 16px;
   }
+
+  &__photo-container {
+    width: 100%;
+    @include breakpoint-above("medium") {
+      width: 400px;
+    }
+  }
+
+  &__photo {
+    width: 100%;
+  }
 }
 
 .reference-form-link {
-  color: blue;
+  color: $c-information-blue;
   text-decoration: underline;
   cursor: pointer;
 }
 
 .save-btn {
-  margin-left: auto;
+  margin-top: 3em;
   color: #fff;
   background-color: $c-success-green;
+  border: none;
+
+  &:hover {
+    background-color: darken($c-success-green, 5%);
+  }
+}
+
+.error {
+  color: $c-error-red;
+  text-align: left;
+  margin-top: 2em;
+  font-size: 16px;
 }
 </style>
