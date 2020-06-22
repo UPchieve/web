@@ -11,7 +11,7 @@
     </dashboard-banner>
 
     <div class="volunteer-dashboard__body">
-      <template v-if="user.isApproved && isOnboarded">
+      <template v-if="user.isApproved && user.isOnboarded">
         <div class="dashboard-card">
           <div class="students-waiting">
             <div class="dashboard-card__title">Waiting Students</div>
@@ -194,7 +194,6 @@ export default {
     ...mapGetters({
       isSessionAlive: "user/isSessionAlive",
       sessionPath: "user/sessionPath",
-      isOnboarded: "user/isOnboarded",
       hasCertification: "user/hasCertification",
       hasSelectedAvailability: "user/hasSelectedAvailability"
     }),

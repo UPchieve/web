@@ -170,10 +170,6 @@ export default {
 
     hasSelectedAvailability: state => !!state.user.availabilityLastModifiedAt,
 
-    isOnboarded: (state, getters) => {
-      return getters.hasSelectedAvailability && getters.hasCertification;
-    },
-
     sessionPath: state => {
       const { type, subTopic, _id } = state.session;
       const path = `/session/${type}/${subTopic}/${_id}`;
