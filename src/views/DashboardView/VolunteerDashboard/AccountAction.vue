@@ -9,7 +9,8 @@
     }"
   >
     <div class="account-action__icon-container">
-      <slot></slot>
+      <check-icon v-if="status === 'COMPLETED'" />
+      <slot v-else></slot>
     </div>
     <div class="account-action__body">
       <div class="account-action__title">{{ title }}</div>
@@ -21,11 +22,13 @@
 
 <script>
 import RightCaret from "@/assets/right-caret.svg";
+import CheckIcon from "@/assets/check.svg";
 
 export default {
   name: "account-action",
   components: {
-    RightCaret
+    RightCaret,
+    CheckIcon
   },
   props: {
     title: String,
