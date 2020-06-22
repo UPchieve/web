@@ -80,9 +80,8 @@
           </account-action>
         </div>
         <div class="dashboard-card">
-          <!-- @todo: user avatar icon -->
           <div class="dashboard-card__icon">
-            <verification-icon />
+            <onboarding-icon />
           </div>
           <div class="dashboard-card__title">Set up your account</div>
           <div class="dashboard-card__subtitle">
@@ -96,8 +95,7 @@
             :status="availabilityAction.status"
             @click.native="clickAvailabilityAction"
           >
-            <!-- @todo: use the right icon -->
-            <person-card-icon />
+            <calendar-icon />
           </account-action>
 
           <account-action
@@ -106,8 +104,7 @@
             :status="certificationAction.status"
             @click.native="clickCertificationAction"
           >
-            <!-- @todo: use the right icon -->
-            <person-card-icon />
+            <certification-icon />
           </account-action>
         </div>
       </template>
@@ -136,7 +133,10 @@ import ReferencesModal from "./ReferencesModal";
 import LargeButton from "@/components/LargeButton";
 import PersonCardIcon from "@/assets/person-card.svg";
 import PersonIcon from "@/assets/person.svg";
+import CalendarIcon from "@/assets/calendar.svg";
+import CertificationIcon from "@/assets/certification.svg";
 import VerificationIcon from "@/assets/verification.svg";
+import OnboardingIcon from "@/assets/onboarding.svg";
 import { allSubtopicNames } from "@/utils/topics";
 
 const headerData = {
@@ -157,7 +157,10 @@ export default {
     LargeButton,
     PersonCardIcon,
     PersonIcon,
-    VerificationIcon
+    CalendarIcon,
+    CertificationIcon,
+    VerificationIcon,
+    OnboardingIcon
   },
   watch: {
     isSessionAlive(isAlive) {
