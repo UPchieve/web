@@ -68,9 +68,6 @@ export default {
       file: undefined
     };
   },
-  mounted() {
-    this.photo = this.user.photo;
-  },
   computed: {
     ...mapState({
       user: state => state.user.user
@@ -94,6 +91,9 @@ export default {
         const { uploadUrl } = res.body;
         axios.put(uploadUrl, this.file, {
           "Content-Type": this.file.type
+        });
+        this.$store.dispatch("user/addToUser", {
+          photoIdStatus: "SUBMITTED"
         });
       });
     }

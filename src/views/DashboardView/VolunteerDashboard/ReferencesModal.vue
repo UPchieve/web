@@ -89,12 +89,18 @@
               <trash-icon class="trash-icon" @click="toggleAddReferenceMode" />
             </header>
             <label for="reference-name">Name</label>
-            <input type="text" id="reference-name" v-model="newReferenceName" />
+            <input
+              type="text"
+              id="reference-name"
+              v-model="newReferenceName"
+              required
+            />
             <label for="reference-email">Email</label>
             <input
               type="email"
               id="reference-email"
               v-model="newReferenceEmail"
+              required
             />
             <large-button
               class="btn save-btn"
@@ -173,8 +179,6 @@ export default {
     };
   },
   mounted() {
-    // @todo: use vuex
-    // (rn if you add a reference then close + open the modal, it's gone)
     this.references = this.user.references.slice();
   },
   computed: {
@@ -201,8 +205,6 @@ export default {
       this.newReferenceEmail = "";
       this.isAddReferenceMode = !this.isAddReferenceMode;
     },
-    // @todo: use vuex
-    // (rn if you add a reference then close + open the modal, it's gone)
     addReference() {
       const newReference = {
         name: this.newReferenceName,
@@ -215,6 +217,9 @@ export default {
         referenceEmail: this.newReferenceEmail
       });
       this.toggleAddReferenceMode();
+      this.$store.dispatch("user/addToUser", {
+        references: this.references
+      });
     },
     removeReference(position) {
       NetworkService.deleteReference({
@@ -223,6 +228,9 @@ export default {
       this.references = this.references.filter(
         (_, index) => position !== index
       );
+      this.$store.dispatch("user/addToUser", {
+        references: this.references
+      });
     },
     addLinkedIn() {
       NetworkService.addLinkedIn({ linkedInUrl: this.linkedInUrl });
@@ -319,6 +327,10 @@ label {
 .trash-icon {
   fill: $c-soft-black;
   width: 25px;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 .reference {
@@ -388,5 +400,9 @@ label {
 .cross-icon {
   width: 20px;
   cursor: pointer;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
 </style>
