@@ -347,6 +347,8 @@ router.afterEach((to, from) => {
   // Google Analytics
   if (window.gtag) {
     // Send page view
+    // @todo: put GA ID in config
+    // @todo: only track on prod
     window.gtag("config", "UA-133171872-1", {
       page_path: router.currentRoute.path,
       custom_map: { dimension1: "is_volunteer", dimension2: "is_authenticated" }
