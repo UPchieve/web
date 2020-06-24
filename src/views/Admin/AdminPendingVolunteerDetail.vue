@@ -133,11 +133,13 @@ export default {
       const data = {
         photoIdStatus: this.photoIdStatus,
         linkedInStatus: this.linkedInStatus,
-        referencesStatus: this.referencesStatus,
-        volunteerId: this.volunteer._id
+        referencesStatus: this.referencesStatus
       };
       try {
-        await NetworkService.adminReviewPendingVolunteer(data);
+        await NetworkService.adminReviewPendingVolunteer({
+          volunteerId: this.volunteer._id,
+          data
+        });
       } catch (error) {
         this.error = "There was an error updating the volunteer's status.";
       }

@@ -270,9 +270,9 @@ export default {
       .post(`${ELIGIBILITY_API_ROOT}/school/approval`, data)
       .then(this._successHandler, this._errorHandler);
   },
-  adminReviewPendingVolunteer(data) {
+  adminReviewPendingVolunteer({ volunteerId, data }) {
     return Vue.http
-      .post(`${API_ROOT}/volunteers/pending`, data)
+      .post(`${API_ROOT}/volunteers/pending/${volunteerId}`, data)
       .then(this._successHandler, this._errorHandler);
   },
   getQuestions(context, data) {
