@@ -236,6 +236,7 @@ export default {
     addLinkedIn() {
       NetworkService.addLinkedIn({ linkedInUrl: this.linkedInUrl });
       this.$store.dispatch("user/addToUser", {
+        linkedInStatus: "SUBMITTED",
         linkedInUrl: this.linkedInUrl
       });
       this.nextStep();
