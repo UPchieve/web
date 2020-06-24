@@ -111,10 +111,6 @@ export default {
     PanIcon
   },
   props: {
-    shouldCreateSession: {
-      type: Boolean,
-      default: true
-    },
     isVisible: {
       type: Boolean,
       required: true
@@ -156,11 +152,8 @@ export default {
 
     this.zwibblerCtx = zwibblerCtx;
 
-    if (this.shouldCreateSession) {
-      this.zwibblerCtx.createSharedSession(this.session._id);
-    } else {
-      this.zwibblerCtx.joinSharedSession(this.session._id);
-    }
+    // Join or create shared zwibbler session
+    this.zwibblerCtx.joinSharedSession(this.session._id, true);
 
     // Set up custom selection handles
     this.setSelectionHandles();

@@ -17,10 +17,7 @@
           'whiteboard-container--hidden': shouldHideWhiteboardSection
         }"
       >
-        <whiteboard
-          :shouldCreateSession="isNewSession"
-          :isVisible="whiteboardOpen"
-        />
+        <whiteboard :isVisible="whiteboardOpen" />
       </div>
       <div
         class="chat-container"
@@ -88,8 +85,7 @@ export default {
   data() {
     return {
       whiteboardOpen: false,
-      icon: "Pencil.png",
-      isNewSession: false
+      icon: "Pencil.png"
     };
   },
   computed: {
@@ -137,14 +133,12 @@ export default {
           }
         }
       );
-      this.isNewSession = true;
     } else {
       promise = SessionService.useExistingSession(this, id, {
         onRetry: (res, abort) => {
           this.showTroubleJoiningModal(abort);
         }
       });
-      this.isNewSession = false;
     }
 
     promise
