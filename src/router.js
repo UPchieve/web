@@ -245,7 +245,8 @@ const routes = [
   {
     path: "/admin/volunteers/pending",
     name: "AdminPendingVolunteers",
-    component: AdminPendingVolunteers
+    component: AdminPendingVolunteers,
+    meta: { protected: true, requiresAdmin: true }
   },
   {
     path: "/admin/ineligible-students",
