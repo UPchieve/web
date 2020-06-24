@@ -180,6 +180,7 @@ export default {
   },
   mounted() {
     this.references = this.user.references.slice();
+    this.linkedInUrl = this.user.linkedInUrl;
   },
   computed: {
     ...mapState({
@@ -234,6 +235,9 @@ export default {
     },
     addLinkedIn() {
       NetworkService.addLinkedIn({ linkedInUrl: this.linkedInUrl });
+      this.$store.dispatch("user/addToUser", {
+        linkedInUrl: this.linkedInUrl
+      });
       this.nextStep();
     }
   }
