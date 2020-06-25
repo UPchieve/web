@@ -359,13 +359,22 @@ router.afterEach((to, from) => {
   store.dispatch("app/modal/hide");
 
   // Google Analytics
-  if (window.ga) {
+  if (window.gtag) {
+    // Send page view
+    // @todo: put GA ID in config
+    // @todo: only track on prod
+    window.gtag("config", "UA-133171872-1", {
+      page_path: router.currentRoute.path,
+      custom_map: { dimension1: "is_volunteer", dimension2: "is_authenticated" }
+    });
+
     const isAuthenticated = store.getters["user/isAuthenticated"];
     const isVolunteer = store.getters["user/isVolunteer"];
-    window.ga("set", "page", router.currentRoute.path);
-    window.ga("set", "dimension2", isAuthenticated);
-    if (isAuthenticated) window.ga("set", "dimension1", isVolunteer);
-    window.ga("send", "pageview");
+    const gtagDimensions = { is_authenticated: isAuthenticated ? "1" : "0" };
+    if (isAuthenticated) gtagDimensions.is_volunteer = isVolunteer ? "1" : "0";
+
+    // Send custom dimensions data
+    window.gtag("event", "upc_page_transition", gtagDimensions);
   }
 });
 
