@@ -119,6 +119,11 @@
       v-if="showReferencesModal"
       :closeModal="toggleReferencesModal"
     />
+
+    <volunteer-welcome-modal
+      v-if="showWelcomeModal"
+      :closeModal="toggleWelcomeModal"
+    />
   </div>
 </template>
 
@@ -130,6 +135,7 @@ import DashboardBanner from "../DashboardBanner";
 import AccountAction from "./AccountAction";
 import PhotoUploadModal from "./PhotoUploadModal";
 import ReferencesModal from "./ReferencesModal";
+import VolunteerWelcomeModal from "@/views/DashboardView/VolunteerDashboard/VolunteerWelcomeModal.vue";
 import LargeButton from "@/components/LargeButton";
 import PersonCardIcon from "@/assets/person-card.svg";
 import PersonIcon from "@/assets/person.svg";
@@ -160,7 +166,8 @@ export default {
     CalendarIcon,
     CertificationIcon,
     VerificationIcon,
-    OnboardingIcon
+    OnboardingIcon,
+    VolunteerWelcomeModal
   },
   watch: {
     isSessionAlive(isAlive) {
@@ -177,7 +184,7 @@ export default {
     }
 
     if (this.isFirstDashboardVisit) {
-      this.showOnboardingModal();
+      this.toggleWelcomeModal();
     }
 
     this.$store.dispatch("user/fetchVolunteerStats", this);
@@ -185,7 +192,8 @@ export default {
   data() {
     return {
       showPhotoUploadModal: false,
-      showReferencesModal: false
+      showReferencesModal: false,
+      showWelcomeModal: false
     };
   },
   computed: {
@@ -386,6 +394,9 @@ export default {
         component: "VolunteerOnboardingModal",
         data: { alertModal: true, acceptText: "Get started" }
       });
+    },
+    toggleWelcomeModal() {
+      this.showWelcomeModal = !this.showWelcomeModal;
     },
     togglePhotoUploadModal() {
       this.showPhotoUploadModal = !this.showPhotoUploadModal;
