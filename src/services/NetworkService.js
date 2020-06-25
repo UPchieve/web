@@ -4,9 +4,15 @@ import errcode from "err-code";
 
 const AUTH_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/auth`;
 const API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/api`;
-const ELIGIBILITY_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/eligibility`;
-const CONTACT_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/contact`;
-const REFERENCE_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/reference`;
+const ELIGIBILITY_API_ROOT = `${
+  process.env.VUE_APP_SERVER_ROOT
+}/api-public/eligibility`;
+const CONTACT_API_ROOT = `${
+  process.env.VUE_APP_SERVER_ROOT
+}/api-public/contact`;
+const REFERENCE_API_ROOT = `${
+  process.env.VUE_APP_SERVER_ROOT
+}/api-public/reference`;
 
 const FAULT_TOLERANT_HTTP_TIMEOUT = 10000;
 const FAULT_TOLERANT_HTTP_MAX_RETRY_TIMEOUT = 100000;
@@ -270,9 +276,9 @@ export default {
       .post(`${ELIGIBILITY_API_ROOT}/school/approval`, data)
       .then(this._successHandler, this._errorHandler);
   },
-  adminReviewPendingVolunteer(data) {
+  adminReviewPendingVolunteer({ volunteerId, data }) {
     return Vue.http
-      .post(`${API_ROOT}/volunteers/pending`, data)
+      .post(`${API_ROOT}/volunteers/pending/${volunteerId}`, data)
       .then(this._successHandler, this._errorHandler);
   },
   getQuestions(context, data) {

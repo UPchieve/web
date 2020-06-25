@@ -95,6 +95,7 @@ export default {
         this.$store.dispatch("user/addToUser", {
           photoIdStatus: "SUBMITTED"
         });
+        this.closeModal();
       });
     }
   }
