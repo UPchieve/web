@@ -102,6 +102,11 @@
               v-model="newReferenceEmail"
               required
             />
+
+            <p v-if="addReferenceError" class="error">
+              {{ addReferenceError }}
+            </p>
+
             <large-button
               class="btn save-btn"
               @click.native="addReference"
@@ -159,6 +164,7 @@ import NetworkService from "@/services/NetworkService";
 import Modal from "@/components/Modal";
 import Separator from "@/components/Separator";
 import LargeButton from "@/components/LargeButton";
+import validator from "validator";
 import TrashIcon from "@/assets/trash.svg";
 import CrossIcon from "@/assets/cross.svg";
 
@@ -170,6 +176,7 @@ export default {
   },
   data() {
     return {
+      addReferenceError: "",
       linkedInUrl: "",
       references: [],
       newReferenceName: "",
@@ -207,6 +214,17 @@ export default {
       this.isAddReferenceMode = !this.isAddReferenceMode;
     },
     addReference() {
+      if (!this.newReferenceName || !this.newReferenceEmail) {
+        this.addReferenceError = "Please fill out all of the form fields.";
+        return;
+      }
+      if (!validator.isEmail(this.newReferenceEmail)) {
+        this.addReferenceError = "Please enter a valid email address.";
+        return;
+      }
+
+      this.addReferenceError = "";
+
       const newReference = {
         name: this.newReferenceName,
         email: this.newReferenceEmail,
@@ -409,5 +427,10 @@ label {
   &:hover {
     cursor: pointer;
   }
+}
+
+.error {
+  color: $c-error-red;
+  margin: 1em 0;
 }
 </style>
