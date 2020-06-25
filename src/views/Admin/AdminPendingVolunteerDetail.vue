@@ -22,45 +22,29 @@
         <div>{{ volunteer.email }}</div>
       </div>
       <div class="user-detail__section">
-        <p class="user-detail__section-title">
+        <div class="user-detail__section-title ">
           Photo Id
           <span
             class="user-detail__account-notice user-detail__status"
             :class="statusColor(photoIdStatus)"
             >{{ statusText(photoIdStatus) }}</span
           >
-        </p>
+          <select
+            name="photo-id-status"
+            v-model="photoIdStatus"
+            class="user-detail__photo-id-select"
+          >
+            <option selected disabled value="SUBMITTED"
+              >Review required...</option
+            >
+            <option value="REJECTED">Reject</option>
+            <option value="APPROVED">Approve</option>
+          </select>
+        </div>
         <div class="user-detail__photo-container">
           <img class="user-detail__photo" :src="volunteer.photoUrl" />
         </div>
         <div>{{ volunteer.photoId }}</div>
-        <select name="photo-id-status" v-model="photoIdStatus">
-          <option selected disabled value="SUBMITTED"
-            >Review required...</option
-          >
-          <option value="REJECTED">Reject</option>
-          <option value="APPROVED">Approve</option>
-        </select>
-      </div>
-      <div class="user-detail__section" v-if="volunteer.linkedInUrl">
-        <p class="user-detail__section-title">
-          LinkedIn
-          <span
-            class="user-detail__account-notice user-detail__status"
-            :class="statusColor(linkedInStatus)"
-            >{{ statusText(linkedInStatus) }}</span
-          >
-        </p>
-        <a :href="volunteer.linkedInUrl" target="_blank" rel="noopener">
-          {{ volunteer.linkedInUrl }}
-        </a>
-        <select name="linked-in-status" v-model="linkedInStatus">
-          <option value="SUBMITTED" selected disabled
-            >Review required...</option
-          >
-          <option value="REJECTED">Reject</option>
-          <option value="APPROVED">Approve</option>
-        </select>
       </div>
       <div class="user-detail__section">
         <div class="user-detail__section-title">References</div>
@@ -113,7 +97,6 @@ export default {
       error: "",
       volunteer: {},
       photoIdStatus: "",
-      linkedInStatus: "",
       showReferenceForm: false,
       chosenReferenceIndex: 0,
       referencesStatus: []
@@ -122,7 +105,6 @@ export default {
   async created() {
     this.volunteer = await getUser(this.$route.params.userId);
     this.photoIdStatus = this.volunteer.photoIdStatus;
-    this.linkedInStatus = this.volunteer.linkedInStatus;
     this.referencesStatus = this.volunteer.references.map(
       reference => reference.status
     );
@@ -132,7 +114,6 @@ export default {
       this.error = "";
       const data = {
         photoIdStatus: this.photoIdStatus,
-        linkedInStatus: this.linkedInStatus,
         referencesStatus: this.referencesStatus
       };
       try {
@@ -258,6 +239,10 @@ export default {
 
   &__photo {
     width: 100%;
+  }
+
+  &__photo-id-select {
+    margin-bottom: 0.8em;
   }
 }
 
