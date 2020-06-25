@@ -283,6 +283,14 @@ export default {
   width: 100%;
 }
 
+.zwibbler-canvas-holder,
+.zwib-wrapper,
+#zwib-div {
+  &:focus {
+    outline: none;
+  }
+}
+
 .zwibbler-scrollbar {
   cursor: default;
 }
