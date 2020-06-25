@@ -4,9 +4,15 @@ import errcode from "err-code";
 
 const AUTH_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/auth`;
 const API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/api`;
-const ELIGIBILITY_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/eligibility`;
-const CONTACT_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/contact`;
-const REFERENCE_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/reference`;
+const ELIGIBILITY_API_ROOT = `${
+  process.env.VUE_APP_SERVER_ROOT
+}/api-public/eligibility`;
+const CONTACT_API_ROOT = `${
+  process.env.VUE_APP_SERVER_ROOT
+}/api-public/contact`;
+const REFERENCE_API_ROOT = `${
+  process.env.VUE_APP_SERVER_ROOT
+}/api-public/reference`;
 
 const FAULT_TOLERANT_HTTP_TIMEOUT = 10000;
 const FAULT_TOLERANT_HTTP_MAX_RETRY_TIMEOUT = 100000;
