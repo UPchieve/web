@@ -21,7 +21,7 @@
       <div
         class="toolbar-item toolbar-item--brush"
         title="Brush tool"
-        v-bind:class="selectedTool === 'pen' ? 'selected-tool' : ''"
+        v-bind:class="selectedTool === 'brush' ? 'selected-tool' : ''"
         @click="useBrushTool"
       >
         <PenIcon class="toolbar-item__svg" />
@@ -119,7 +119,7 @@ export default {
   data() {
     return {
       zwibblerCtx: null,
-      selectedTool: "pen",
+      selectedTool: "",
       showColorPicker: false,
       isMouseDown: false
     };
@@ -132,7 +132,7 @@ export default {
       mobileMode: "app/mobileMode"
     }),
     mouseCursor() {
-      if (this.selectedTool === "pen") return { cursor: "crosshair" };
+      if (this.selectedTool === "brush") return { cursor: "crosshair" };
       if (this.selectedTool === "pick") return { cursor: "default" };
       if (this.selectedTool === "pan") return { cursor: "grab" };
       return { cursor: "default" };
@@ -142,6 +142,7 @@ export default {
     const zwibblerCtx = window.Zwibbler.create("zwib-div", {
       showToolbar: false,
       showColourPanel: false,
+      autoPickTool: false,
       autoPickToolText: false,
       defaultBrushWidth: 5,
       scrollbars: this.mobileMode ? false : true,
@@ -158,8 +159,15 @@ export default {
     // Set up custom selection handles
     this.setSelectionHandles();
 
-    // Set brush tool to default tool
-    this.useBrushTool();
+    this.zwibblerCtx.on("connected", () => {
+      // Set brush tool to default tool
+      this.useBrushTool();
+
+      // Don't start setting selected tool until connected
+      this.zwibblerCtx.on("tool-changed", toolname => {
+        this.selectedTool = toolname;
+      });
+    });
 
     this.zwibblerCtx.on("document-changed", info => {
       const isRemoteChange = info && info.remote;
@@ -189,7 +197,6 @@ export default {
   methods: {
     usePickTool() {
       this.zwibblerCtx.usePickTool();
-      this.selectedTool = "pick";
       this.showColorPicker = false;
     },
     clearWhiteboard() {
@@ -201,7 +208,6 @@ export default {
     },
     useBrushTool() {
       this.zwibblerCtx.useBrushTool();
-      this.selectedTool = "pen";
       this.showColorPicker = false;
     },
     undo() {
@@ -214,7 +220,6 @@ export default {
     },
     usePanTool() {
       this.zwibblerCtx.usePanTool();
-      this.selectedTool = "pan";
       this.showColorPicker = false;
     },
     setColor(color) {
