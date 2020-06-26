@@ -78,6 +78,16 @@
           >
             <person-card-icon />
           </account-action>
+
+          <!-- @todo: fix -->
+          <account-action
+            title="Background Information"
+            :subtitle="referenceAction.subtitle"
+            :status="referenceAction.status"
+            @click.native="goToBackgroundInfo"
+          >
+            <person-card-icon />
+          </account-action>
         </div>
         <div class="dashboard-card">
           <div class="dashboard-card__icon">
@@ -406,6 +416,9 @@ export default {
     },
     clickCertificationAction() {
       this.$router.push("/training");
+    },
+    goToBackgroundInfo() {
+      this.$router.push("/background");
     }
   }
 };
