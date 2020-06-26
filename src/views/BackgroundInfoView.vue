@@ -283,7 +283,7 @@ export default {
       heardFrom: ""
     };
   },
-
+  // @todo: favorite academic subject and college
   computed: {
     ...mapState({
       user: state => state.user.user
