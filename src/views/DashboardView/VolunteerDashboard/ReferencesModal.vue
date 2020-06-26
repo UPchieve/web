@@ -5,27 +5,9 @@
         <h1 class="title">Reference check</h1>
         <cross-icon class="upc-modal-close-icon" @click="closeModal" />
       </header>
-      <div v-if="step === 0">
+      <div>
         <p class="subtitle">
-          Step 1: Add your LinkedIn (optional)
-        </p>
-        <p>
-          Adding your LinkedIn allows us to quickly verify your credentials and
-          require 1 less reference from you!
-        </p>
-        <input
-          type="text"
-          pattern=".*linkedin\.com.*\/in\/.*"
-          v-model="linkedInUrl"
-          placeholder="linkedin.com/in/example"
-          class="linkedin-input"
-        />
-      </div>
-      <div v-else-if="step === 1">
-        <p class="subtitle">
-          Step 2: Provide {{ totalReferencesNeeded }} reference{{
-            totalReferencesNeeded === 1 ? "" : "s"
-          }}
+          Provide 2 references
         </p>
         <p>
           Please provide the name and email for your references. We will contact
@@ -119,9 +101,7 @@
         <button
           class="add-reference-btn"
           @click="toggleAddReferenceMode"
-          v-if="
-            !isAddReferenceMode && references.length < totalReferencesNeeded
-          "
+          v-if="!isAddReferenceMode && references.length < 2"
         >
           Add reference
         </button>
@@ -130,27 +110,7 @@
       <separator v-if="!mobileMode" />
 
       <div class="buttons-container">
-        <large-button class="btn" @click.native="previousStep" v-if="step === 1"
-          >Back</large-button
-        >
-
-        <large-button
-          class="btn skip-btn"
-          @click.native="nextStep"
-          v-if="step === 0 && !linkedInUrl"
-          >Skip</large-button
-        >
-        <large-button
-          class="btn skip-btn"
-          @click.native="addLinkedIn"
-          v-if="step === 0 && linkedInUrl"
-          >Next</large-button
-        >
-
-        <large-button
-          class="btn done-btn"
-          v-if="step === 1"
-          @click.native="closeModal"
+        <large-button class="btn done-btn" @click.native="closeModal"
           >Done</large-button
         >
       </div>
@@ -177,37 +137,22 @@ export default {
   data() {
     return {
       addReferenceError: "",
-      linkedInUrl: "",
       references: [],
       newReferenceName: "",
       newReferenceEmail: "",
-      step: 0,
       isAddReferenceMode: false
     };
   },
   mounted() {
     this.references = this.user.references.slice();
-    this.linkedInUrl = this.user.linkedInUrl;
   },
   computed: {
     ...mapState({
       user: state => state.user.user
     }),
-    ...mapGetters({ mobileMode: "app/mobileMode" }),
-    totalReferencesNeeded() {
-      return this.linkedInUrl ? 1 : 2;
-    },
-    stepOneButtonText() {
-      return this.linkedInUrl ? "Next" : "Skip";
-    }
+    ...mapGetters({ mobileMode: "app/mobileMode" })
   },
   methods: {
-    nextStep() {
-      this.step += 1;
-    },
-    previousStep() {
-      this.step -= 1;
-    },
     toggleAddReferenceMode() {
       this.newReferenceName = "";
       this.newReferenceEmail = "";
@@ -250,14 +195,6 @@ export default {
       this.$store.dispatch("user/addToUser", {
         references: this.references
       });
-    },
-    addLinkedIn() {
-      NetworkService.addLinkedIn({ linkedInUrl: this.linkedInUrl });
-      this.$store.dispatch("user/addToUser", {
-        linkedInStatus: "SUBMITTED",
-        linkedInUrl: this.linkedInUrl
-      });
-      this.nextStep();
     }
   }
 };
@@ -287,14 +224,6 @@ input {
 
   &::placeholder {
     color: $c-secondary-grey;
-  }
-}
-
-.linkedin-input {
-  margin: 1.4em 0;
-
-  &:invalid {
-    outline-color: $c-error-red;
   }
 }
 
@@ -344,7 +273,7 @@ label {
 }
 
 .buttons-container {
-  @include flex-container(row, space-between, center);
+  @include flex-container(row, flex-end);
 }
 
 .trash-icon {

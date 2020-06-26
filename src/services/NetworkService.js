@@ -363,13 +363,6 @@ export default {
       .post(`${REFERENCE_API_ROOT}/${referenceId}/submit`, data)
       .then(this._successHandler, this._errorHandler);
   },
-  addLinkedIn({ linkedInUrl }) {
-    return Vue.http
-      .post(`${API_ROOT}/user/volunteer-approval/linkedin`, {
-        linkedInUrl
-      })
-      .then(this._successHandler, this._errorHandler);
-  },
   getPhotoUploadUrl() {
     return Vue.http
       .get(`${API_ROOT}/user/volunteer-approval/photo-url`)

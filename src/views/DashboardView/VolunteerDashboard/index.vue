@@ -244,11 +244,7 @@ export default {
     },
 
     referenceAction() {
-      const linkedInStatus = this.user.linkedInStatus;
-      const referenceStatuses = this.user.references.map(r => r.status);
-      const statuses = [linkedInStatus, ...referenceStatuses].filter(
-        s => s !== "EMPTY" // linkedInStatus defaults to "EMPTY"
-      );
+      const statuses = this.user.references.map(r => r.status);
 
       if (statuses.length === 0)
         return {
