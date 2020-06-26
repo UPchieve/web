@@ -393,10 +393,6 @@ textarea.uc-form-input {
   }
 }
 
-.header-img {
-  width: 100%;
-}
-
 .question-col {
   @include flex-container(column, flex-start);
   width: 60%;

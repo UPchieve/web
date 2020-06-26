@@ -22,6 +22,8 @@ export default {
 
 <style lang="scss" scoped>
 .header-img {
+  border-top-right-radius: inherit;
+  border-top-left-radius: inherit;
   width: 100%;
 }
 
