@@ -244,8 +244,7 @@ export default {
     },
 
     referenceAction() {
-      const referenceStatuses = this.user.references.map(r => r.status);
-      const statuses = referenceStatuses.filter(s => s !== "EMPTY");
+      const statuses = this.user.references.map(r => r.status);
 
       if (statuses.length === 0)
         return {
