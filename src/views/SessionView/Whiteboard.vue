@@ -196,20 +196,20 @@ export default {
     });
   },
   methods: {
+    usePanTool() {
+      this.zwibblerCtx.usePanTool();
+      this.showColorPicker = false;
+    },
     usePickTool() {
       this.zwibblerCtx.usePickTool();
       this.showColorPicker = false;
     },
-    clearWhiteboard() {
-      this.zwibblerCtx.deleteNodes(this.zwibblerCtx.getAllNodes());
+    useBrushTool() {
+      this.zwibblerCtx.useBrushTool();
       this.showColorPicker = false;
     },
     toggleColorPicker() {
       this.showColorPicker = !this.showColorPicker;
-    },
-    useBrushTool() {
-      this.zwibblerCtx.useBrushTool();
-      this.showColorPicker = false;
     },
     undo() {
       this.zwibblerCtx.undo();
@@ -219,8 +219,8 @@ export default {
       this.zwibblerCtx.redo();
       this.showColorPicker = false;
     },
-    usePanTool() {
-      this.zwibblerCtx.usePanTool();
+    clearWhiteboard() {
+      this.zwibblerCtx.deleteNodes(this.zwibblerCtx.getAllNodes());
       this.showColorPicker = false;
     },
     setColor(color) {
