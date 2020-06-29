@@ -145,6 +145,7 @@ export default {
       autoPickTool: false,
       autoPickToolText: false,
       defaultBrushWidth: 5,
+      defaultSmoothness: "sharpest",
       scrollbars: this.mobileMode ? false : true,
       collaborationServer: `${
         process.env.VUE_APP_WEBSOCKET_ROOT
