@@ -13,7 +13,7 @@ describe("Student and volunteer signup", () => {
 
       const approvedHighschoolsUrl = `${Cypress.env(
         "SERVER_ROOT"
-      )}/eligibility/school/findeligible`;
+      )}/api-public/eligibility/school/findeligible`;
       cy.request({
         url: approvedHighschoolsUrl,
         qs: {
