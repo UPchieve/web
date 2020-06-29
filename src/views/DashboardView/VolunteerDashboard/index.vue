@@ -67,7 +67,7 @@
             :status="photoIdAction.status"
             @click.native="togglePhotoUploadModal"
           >
-            <person-icon />
+            <person-card-icon />
           </account-action>
 
           <account-action
@@ -76,7 +76,7 @@
             :status="referenceAction.status"
             @click.native="toggleReferencesModal"
           >
-            <person-card-icon />
+            <references-icon />
           </account-action>
         </div>
         <div class="dashboard-card">
@@ -138,7 +138,7 @@ import ReferencesModal from "./ReferencesModal";
 import VolunteerWelcomeModal from "@/views/DashboardView/VolunteerDashboard/VolunteerWelcomeModal.vue";
 import LargeButton from "@/components/LargeButton";
 import PersonCardIcon from "@/assets/person-card.svg";
-import PersonIcon from "@/assets/person.svg";
+import ReferencesIcon from "@/assets/references-icon.svg";
 import CalendarIcon from "@/assets/calendar.svg";
 import CertificationIcon from "@/assets/certification.svg";
 import VerificationIcon from "@/assets/verification.svg";
@@ -162,7 +162,7 @@ export default {
     ReferencesModal,
     LargeButton,
     PersonCardIcon,
-    PersonIcon,
+    ReferencesIcon,
     CalendarIcon,
     CertificationIcon,
     VerificationIcon,
