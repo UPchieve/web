@@ -67,7 +67,7 @@
             :status="photoIdAction.status"
             @click.native="togglePhotoUploadModal"
           >
-            <person-icon />
+            <person-card-icon />
           </account-action>
 
           <account-action
@@ -76,7 +76,7 @@
             :status="referenceAction.status"
             @click.native="toggleReferencesModal"
           >
-            <person-card-icon />
+            <references-icon />
           </account-action>
 
           <!-- @todo: fix -->
@@ -148,7 +148,7 @@ import ReferencesModal from "./ReferencesModal";
 import VolunteerWelcomeModal from "@/views/DashboardView/VolunteerDashboard/VolunteerWelcomeModal.vue";
 import LargeButton from "@/components/LargeButton";
 import PersonCardIcon from "@/assets/person-card.svg";
-import PersonIcon from "@/assets/person.svg";
+import ReferencesIcon from "@/assets/references-icon.svg";
 import CalendarIcon from "@/assets/calendar.svg";
 import CertificationIcon from "@/assets/certification.svg";
 import VerificationIcon from "@/assets/verification.svg";
@@ -172,7 +172,7 @@ export default {
     ReferencesModal,
     LargeButton,
     PersonCardIcon,
-    PersonIcon,
+    ReferencesIcon,
     CalendarIcon,
     CertificationIcon,
     VerificationIcon,
@@ -254,8 +254,7 @@ export default {
     },
 
     referenceAction() {
-      const referenceStatuses = this.user.references.map(r => r.status);
-      const statuses = referenceStatuses.filter(s => s !== "EMPTY");
+      const statuses = this.user.references.map(r => r.status);
 
       if (statuses.length === 0)
         return {
