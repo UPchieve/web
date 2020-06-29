@@ -1,6 +1,6 @@
 <template>
-  <div class="zwib-wrapper">
-    <div id="zwib-div" :style="mouseCursor"></div>
+  <div class="zwib-wrapper" :class="toolClass">
+    <div id="zwib-div"></div>
     <div id="toolbar" class="toolbar">
       <div
         class="toolbar-item toolbar-item--drag"
@@ -131,11 +131,11 @@ export default {
     ...mapGetters({
       mobileMode: "app/mobileMode"
     }),
-    mouseCursor() {
-      if (this.selectedTool === "brush") return { cursor: "crosshair" };
-      if (this.selectedTool === "pick") return { cursor: "default" };
-      if (this.selectedTool === "pan") return { cursor: "grab" };
-      return { cursor: "default" };
+    toolClass() {
+      if (this.selectedTool === "brush") return "zwib-wrapper--brush";
+      if (this.selectedTool === "pick") return "zwib-wrapper--pick";
+      if (this.selectedTool === "pan") return "zwib-wrapper--pan";
+      return "zwib-wrapper--default";
     }
   },
   mounted() {
@@ -276,6 +276,30 @@ export default {
   height: 100%;
   width: 100%;
   position: relative;
+
+  &--brush {
+    .zwibbler-canvas-holder {
+      cursor: crosshair !important;
+    }
+  }
+
+  &--pick {
+    .zwibbler-canvas-holder {
+      cursor: default !important;
+    }
+  }
+
+  &--pan {
+    .zwibbler-canvas-holder {
+      cursor: grab !important;
+    }
+  }
+
+  &--default {
+    .zwibbler-canvas-holder {
+      cursor: default !important;
+    }
+  }
 }
 
 #zwib-div {
