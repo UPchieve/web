@@ -23,6 +23,7 @@
 //
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+import "cypress-file-upload";
 
 const AUTH_ROOT = `${Cypress.env("SERVER_ROOT")}/auth`;
 const API_ROOT = `${Cypress.env("SERVER_ROOT")}/api`;
