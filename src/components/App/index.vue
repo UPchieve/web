@@ -18,8 +18,8 @@
 </template>
 
 <script>
+import * as Sentry from "@sentry/browser";
 import { mapState, mapGetters } from "vuex";
-
 import "@/scss/main.scss";
 import AppHeader from "./AppHeader";
 import AppSidebar from "./AppSidebar";
@@ -176,6 +176,15 @@ export default {
     }
   },
   sockets: {
+    error(error) {
+      Sentry.captureException(error);
+    },
+    connect_error(error) {
+      Sentry.captureException(error);
+    },
+    reconnect_error(error) {
+      Sentry.captureException(error);
+    },
     "session-change"(sessionData) {
       this.$store.dispatch("user/updateSession", sessionData);
     }
