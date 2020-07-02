@@ -1,300 +1,262 @@
 <template>
   <div class="background-info">
-    <h1 class="header">Background Information</h1>
-    <div class="wrap-container">
-      <div class="container-content">
-        <div class="uc-form-col">
-          <p>I am currently... *</p>
-          <p class="description">Select all that apply.</p>
-          <div class="uc-form-checkbox">
-            <input
-              type="checkbox"
-              value="A high school student"
-              v-model="occupationalStatus"
-              id="high-school-student"
-            />
-            <label for="high-school-student">
-              A high school student
-            </label>
-          </div>
+    <h1 class="background-info__header">Background Information</h1>
+    <div class="background-info__wrapper">
+      <form class="background-info__form" @submit="submit">
+        <p class="background-info__subheader">
+          Our students, and school partners, are interested in learning more
+          about the volunteers at UPchieve! Please fill in the following
+          background information- who knows, it might help us pair you with the
+          right student!
+        </p>
 
-          <div class="uc-form-checkbox">
-            <input
-              type="checkbox"
-              value="An undergraduate student"
-              v-model="occupationalStatus"
-              id="undergraduate-student"
-            />
-            <label for="undergraduate-student">
-              An undergraduate student
-            </label>
-          </div>
+        <ol>
+          <li class="uc-form-col">
+            <p>
+              I am currently...<span class="background-info__question-required"
+                >*</span
+              >
+            </p>
+            <p class="background-info__question-description">
+              Select all that apply.
+            </p>
+            <p v-if="showInputErrors && occupation.length === 0" class="error">
+              Please fill out this field.
+            </p>
+            <div
+              class="uc-form-checkbox"
+              v-for="option in options.occupations"
+              :key="option"
+            >
+              <input
+                type="checkbox"
+                :value="option"
+                v-model="occupation"
+                :id="option"
+              />
+              <label class="uc-form-label" :for="option">
+                {{ option }}
+              </label>
+            </div>
+          </li>
 
-          <div class="uc-form-checkbox">
-            <input
-              type="checkbox"
-              value="A graduate student"
-              v-model="occupationalStatus"
-              id="graduate-student"
-            />
-            <label for="graduate-student">
-              A graduate student
-            </label>
-          </div>
-
-          <div class="uc-form-checkbox">
-            <input
-              type="checkbox"
-              value="Working full-time"
-              v-model="occupationalStatus"
-              id="full-time"
-            />
-            <label for="full-time">
-              Working full-time
-            </label>
-          </div>
-
-          <div class="uc-form-checkbox">
-            <input
-              type="checkbox"
-              value="Working part-time"
-              v-model="occupationalStatus"
-              id="part-time"
-            />
-            <label for="part-time">
-              Working part-time
-            </label>
-          </div>
-
-          <div class="uc-form-checkbox">
-            <input
-              type="checkbox"
-              value="Unemployed"
-              v-model="occupationalStatus"
-              id="unemployed"
-            />
-            <label for="unemployed">Unemployed</label>
-          </div>
-
-          <div class="uc-form-checkbox">
-            <input
-              type="checkbox"
-              value="Caregiver"
-              v-model="occupationalStatus"
-              id="caregiver"
-            />
-            <label for="caregiver">Caregiver</label>
-          </div>
-
-          <div class="uc-form-checkbox">
-            <input
-              type="checkbox"
-              value="Retired"
-              v-model="occupationalStatus"
-              id="retired"
-            />
-            <label for="retired">Retired</label>
-          </div>
-        </div>
-
-        <div class="uc-column">
-          <label for="linkedin" class="uc-form-label">
-            LinkedIn Profile
-          </label>
-          <p class="description">
-            Please provide us the link to your LinkedIn profile to expedite the
-            application process. If you do not have a LinkedIn profile, type in
-            upchieve.org.
-          </p>
-          <input
-            type="text"
-            pattern=".*linkedin\.com.*\/in\/.*"
-            v-model="linkedInUrl"
-            placeholder="linkedin.com/in/example"
-            class="linkedin-input uc-form-input"
-            in="linkedin"
-          />
-        </div>
-
-        <div class="uc-form-col">
-          <fieldset aria-required="true">
-            <p class="title">
-              I am prepared to help students with the following subjects. *
+          <li class="uc-form-col">
+            <p>
+              Do you identify with any of the following statements?<span
+                class="background-info__question-required"
+                >*</span
+              >
+            </p>
+            <p class="background-info__question-description">
+              Select all that apply.
+            </p>
+            <p v-if="showInputErrors && background.length === 0" class="error">
+              Please fill out this field.
             </p>
 
-            <p class="description">Select all that apply</p>
+            <div
+              class="uc-form-checkbox"
+              v-for="option in options.background"
+              :key="option"
+            >
+              <input
+                type="checkbox"
+                :value="option"
+                v-model="background"
+                :id="option"
+              />
+              <label class="uc-form-label" :for="option">
+                {{ option }}
+              </label>
+            </div>
+          </li>
 
+          <li class="uc-form-col">
+            <label for="linkedin" class="uc-form-label">
+              If you have one, please provide us with a link to your LinkedIn
+              profile.
+            </label>
+            <p class="background-info__question-description">(optional)</p>
+
+            <input
+              type="text"
+              pattern=".*linkedin\.com.*\/in\/.*"
+              v-model="linkedInUrl"
+              placeholder="linkedin.com/in/example"
+              class="linkedin-input uc-form-input"
+              id="linkedin"
+            />
+          </li>
+
+          <li class="uc-form-col">
+            <p>
+              How much prior tutoring and/or college counseling experience do
+              you have?<span class="background-info__question-required">*</span>
+            </p>
+            <p v-if="showInputErrors && !experience" class="error">
+              Please fill out this field.
+            </p>
+
+            <div
+              v-for="option in options.experience"
+              :key="option"
+              class="uc-form-radio"
+            >
+              <input
+                type="radio"
+                name="experience"
+                :value="option"
+                v-model="experience"
+                :id="option"
+              />
+              <label class="uc-form-label" :for="option">
+                {{ option }}
+              </label>
+            </div>
+          </li>
+
+          <li class="uc-form-col">
+            <p>
+              Are you proficient in another language?
+            </p>
+            <p class="background-info__question-description">
+              Select all that apply. (optional)
+            </p>
+
+            <div
+              class="uc-form-checkbox"
+              v-for="option in options.languages"
+              :key="option"
+            >
+              <input
+                type="checkbox"
+                :value="option"
+                v-model="languages"
+                :id="option"
+              />
+              <label class="uc-form-label" :for="option">
+                {{ option }}
+              </label>
+            </div>
             <div class="uc-form-checkbox">
               <input
                 type="checkbox"
-                value="Lower-level Math (Pre-algebra, Algebra, or Geometry)"
-                v-model="topicKnowledge"
-                id="lower-level-math"
+                value="other"
+                id="other"
+                @change="toggleAddLanguages"
               />
-              <label for="lower-level-math">
-                Lower-level Math (Pre-algebra, Algebra, or Geometry)
-              </label>
+              <label for="other">Other</label>
             </div>
-
-            <div class="uc-form-checkbox">
-              <input
-                type="checkbox"
-                value="Higher-level Math (up to and including AP Calculus BC)"
-                v-model="topicKnowledge"
-                id="high-level-math"
-              />
-              <label for="high-level-math">
-                Higher-level Math (up to and including AP Calculus BC)
-              </label>
-            </div>
-
-            <div class="uc-form-checkbox">
-              <input
-                type="checkbox"
-                value="Biology (up to and including AP Bio)"
-                v-model="topicKnowledge"
-                id="biology"
-              />
-              <label for="biology">
-                Biology (up to and including AP Bio)
-              </label>
-            </div>
-
-            <div class="uc-form-checkbox">
-              <input
-                type="checkbox"
-                value="Chemistry (up to and including AP Chem)"
-                v-model="topicKnowledge"
-                id="chemistry"
-              />
-              <label for="chemistry">
-                Chemistry (up to and including AP Chem)
-              </label>
-            </div>
-
-            <div class="uc-form-checkbox">
-              <input
-                type="checkbox"
-                value="Physics (up to and including AP Physics 1)"
-                v-model="topicKnowledge"
-                id="physics"
-              />
-              <label for="physics">
-                Physics (up to and including AP Physics 1)
-              </label>
-            </div>
-
-            <div class="uc-form-checkbox">
-              <input
-                type="checkbox"
-                value="College Counseling"
-                v-model="topicKnowledge"
-                id="college-counseling"
-              />
-              <label for="college-counseling">
-                College Counseling
-              </label>
-            </div>
-
-            <div class="uc-form-checkbox">
-              <input
-                type="checkbox"
-                value="Standardized Testing (SAT Math or Reading)"
-                v-model="topicKnowledge"
-                id="standardized-testing"
-              />
-              <label for="standardized-testing">
-                Standardized Testing (SAT Math or Reading)
-              </label>
-            </div>
-          </fieldset>
-        </div>
-
-        <div class="uc-form-col">
-          <label class="uc-form-label">
-            Please write 1-2 sentences about any relevant prior experience you
-            may have.
-
-            <span class="required" aria-hidden="true">*</span>
-          </label>
-
-          <div class="description">
-            Sample questions: For high school students: Which courses have you
-            taken and what grades did you receive? For college students: What's
-            your major and which courses have you taken? (For undergrads, AP
-            courses are still relevant!) For those out of school: Do you work in
-            a relevant field? Do you have prior tutoring or mentoring
-            experience?
-          </div>
-          <textarea
-            class="uc-form-input"
-            aria-required="true"
-            v-model="experience"
-          ></textarea>
-        </div>
-
-        <div class="uc-form-col">
-          <label class="uc-form-label">
-            How did you find out about us?
-            <span class="required" aria-hidden="true">*</span>
-          </label>
-
-          <select
-            aria-required="true"
-            v-model="heardFrom"
-            class="uc-form-select"
-          >
-            <option value="School">School</option>
-
-            <option value="Work">Work</option>
-
-            <option value="Teacher">Teacher</option>
-
-            <option value="Co-worker">Co-worker</option>
-
-            <option value="Friend">Friend</option>
-
-            <option value="Social media">Social media</option>
-
-            <option value="Other">Other</option>
-          </select>
-        </div>
-
-        <button @click="submit" class="uc-form-button">Submit</button>
-      </div>
+            <input
+              type="text"
+              v-model="addedLanguages"
+              class=" uc-form-input"
+              v-if="showAddLanguages"
+              placeholder="Enter a language"
+            />
+          </li>
+        </ol>
+        <p class="error form-error" v-if="formError">{{ formError }}</p>
+        <button class="uc-form-button submit-btn" :disabled="invalidForm()">
+          Submit
+        </button>
+      </form>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
-
 export default {
   name: "background-info-view",
   data() {
     return {
-      errors: [],
+      options: {
+        occupations: [
+          "A high school student",
+          "An undergraduate student",
+          "A graduate student",
+          "Working full-time",
+          "Working part-time",
+          "Unemployed",
+          "Caregiver",
+          "Retired"
+        ],
+        background: [
+          "From a low-income background",
+          "Raised by a single parent",
+          "First-generation college student",
+          "First or second generation immigrant",
+          "Belong to a racial/ethnic minority group",
+          "Went to a Title 1/low-income high school"
+        ],
+        experience: [
+          "No prior experience",
+          "Less than 6 months",
+          "6-12 months",
+          "1-2 years",
+          "3-5 years",
+          "5+ years"
+        ],
+        languages: [
+          "Spanish",
+          "Mandarin",
+          "Cantonese",
+          "Tagalog",
+          "Vietnamese",
+          "Arabic ",
+          "French",
+          "Korean",
+          "Russian",
+          "German"
+        ]
+      },
+      showInputErrors: false,
+      formError: "",
       invalidInputs: [],
-      saveFailed: false,
-      occupationalStatus: [],
+      occupation: [],
       linkedInUrl: "",
-      topicKnowledge: [],
       experience: "",
-      heardFrom: ""
+      background: [],
+      languages: [],
+      showAddLanguages: false,
+      addedLanguages: "",
+      wasSubmitted: false
     };
   },
-  // @todo: favorite academic subject and college
-  computed: {
-    ...mapState({
-      user: state => state.user.user
-    })
-  },
+
   methods: {
-    submit() {
-      console.log(this.occupationalStatus);
-      console.log(this.topicKnowledge);
-      console.log(this.experience);
-      console.log(this.heardFrom);
+    submit(event) {
+      event.preventDefault();
+
+      this.showInputErrors = false;
+      if (this.wasSubmitted) return;
+      if (this.invalidForm()) {
+        this.showInputErrors = true;
+        this.formError = "Please answer the required fields above.";
+        return;
+      }
+
+      this.wasSubmitted = true;
+
+      const data = {
+        occupation: this.occupation,
+        experience: this.experience,
+        background: this.background,
+        languages: this.languages,
+        addedLanguages: this.addedLanguages,
+        linkedInUrl: this.linkedInUrl
+      };
+      console.log(data);
+    },
+    toggleAddLanguages() {
+      this.showAddLanguages = !this.showAddLanguages;
+    },
+    invalidForm() {
+      return (
+        this.background.length === 0 ||
+        this.occupation.length === 0 ||
+        !this.experience
+      );
     }
   }
 };
@@ -313,6 +275,14 @@ export default {
   margin: 4em 0;
 }
 
+.uc-form-radio {
+  margin-bottom: 0.6em;
+
+  & label {
+    margin-left: 15px;
+  }
+}
+
 textarea {
   width: 100%;
   height: 80px;
@@ -320,54 +290,82 @@ textarea {
 
 .background-info {
   @include font-category("body");
-}
 
-.wrap-container {
-  max-width: 70%;
-  padding: 15px 15px 55px 15px;
-  @include flex-container(column);
-  align-items: stretch;
+  &__wrapper {
+    max-width: 100%;
+    margin: 15px 15px 55px 40px;
+    @include flex-container(column);
+    align-items: stretch;
+    background-color: #fff;
+    border-radius: 8px;
 
-  @include child-spacing(top, 16px);
-  @include child-spacing(right, 0);
+    @include child-spacing(top, 16px);
+    @include child-spacing(right, 0);
 
-  @include breakpoint-above("large") {
-    padding: 40px;
+    @include breakpoint-above("large") {
+      padding: 40px;
+      max-width: 70%;
 
-    @include child-spacing(top, 0);
-    @include child-spacing(right, 40px);
+      @include child-spacing(top, 0);
+      @include child-spacing(right, 40px);
 
-    @include flex-container(row);
+      @include flex-container(row);
+    }
+  }
+
+  &__header {
+    display: flex;
+    margin: 0;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 500;
+    padding: 25px 15px 10px 35px;
+    @include font-category("display-small");
+
+    @include breakpoint-above("large") {
+      padding: 40px 40px 0 40px;
+    }
+  }
+
+  &__subheading {
+    @include font-category("subheading");
+  }
+
+  &__form {
+    border-radius: 8px;
+    padding: 20px;
+    text-align: left;
+    max-width: 80%;
+
+    @include breakpoint-above("large") {
+      padding: 40px;
+    }
+  }
+
+  &__question-description {
+    @include font-category("helper-text");
+    margin-top: 10px;
+    color: $c-secondary-grey;
+  }
+
+  &__question-required {
+    color: $c-information-blue;
   }
 }
 
-.header {
-  display: flex;
-  margin: 0;
-  align-items: center;
-  justify-content: space-between;
-  font-weight: 500;
-  padding: 25px 15px 10px 35px;
-  @include font-category("display-small");
-
-  @include breakpoint-above("large") {
-    padding: 40px 40px 0 40px;
-  }
+.linkedin-input {
+  width: 60%;
 }
 
-.container-content {
-  background-color: #fff;
-  border-radius: 8px;
-  padding: 20px;
-  text-align: left;
-
-  @include breakpoint-above("large") {
-    padding: 40px;
-  }
+.submit-btn {
+  width: 200px;
 }
 
-.description {
-  margin-top: 10px;
-  @include font-category("helper-text");
+.error {
+  color: $c-error-red;
+}
+
+.form-error {
+  margin-bottom: 2em;
 }
 </style>
