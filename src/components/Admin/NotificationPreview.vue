@@ -4,11 +4,14 @@
     <div class="notification-preview__section">{{ sentAt }}</div>
     <div class="notification-preview__section">
       <router-link :to="`/admin/users/${volunteer._id}`">
-        {{ volunteer.firstname }}
+        to {{ volunteer.firstname }}
       </router-link>
     </div>
     <div class="notification-preview__section">
       {{ organization }} volunteer
+    </div>
+    <div class="notification-preview__section">
+      {{ priorityGroup }}
     </div>
   </div>
 </template>
@@ -40,6 +43,12 @@ export default {
 
     organization() {
       return this.volunteer.volunteerPartnerOrg || "regular";
+    },
+
+    priorityGroup() {
+      return this.notification.priorityGroup
+        ? this.notification.priorityGroup
+        : "No priority group stored";
     }
   }
 };
@@ -48,12 +57,14 @@ export default {
 <style lang="scss" scoped>
 .notification-preview {
   display: flex;
-  padding: 20px 0;
+  padding: 10px 0;
+  height: 70px;
+  align-items: center;
 
   &__section {
-    flex-grow: 1;
-    min-width: 190px;
-    max-width: 220px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 180px;
     text-align: left;
   }
 }
