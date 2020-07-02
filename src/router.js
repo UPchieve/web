@@ -24,6 +24,7 @@ import CalendarView from "./views/CalendarView";
 import AdminView from "./views/Admin";
 import VolunteerCoverage from "./views/Admin/VolunteerCoverage";
 import AdminSessions from "./views/Admin/AdminSessions";
+import AdminSessionNotifications from "./views/Admin/AdminSessionNotifications";
 import AdminSessionDetail from "./views/Admin/AdminSessionDetail";
 import AdminUserDetail from "./views/Admin/AdminUserDetail";
 import AdminIneligibleStudents from "./views/Admin/AdminIneligibleStudents";
@@ -226,6 +227,12 @@ const routes = [
     path: "/admin/sessions/:sessionId",
     name: "AdminSessionDetail",
     component: AdminSessionDetail,
+    meta: { protected: true, requiresAdmin: true }
+  },
+  {
+    path: "/admin/sessions/:sessionId/notifications",
+    name: "AdminSessionNotifications",
+    component: AdminSessionNotifications,
     meta: { protected: true, requiresAdmin: true }
   },
   {
