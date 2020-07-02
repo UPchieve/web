@@ -417,7 +417,7 @@ export default {
       this.$router.push("/training");
     },
     goToBackgroundInfo() {
-      this.$router.push("/background");
+      this.$router.push("/background-information");
     }
   }
 };
