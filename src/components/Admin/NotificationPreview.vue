@@ -10,6 +10,9 @@
     <div class="notification-preview__section">
       {{ organization }} volunteer
     </div>
+    <div class="notification-preview__section">
+      {{ priorityGroup }}
+    </div>
   </div>
 </template>
 
@@ -40,6 +43,12 @@ export default {
 
     organization() {
       return this.volunteer.volunteerPartnerOrg || "regular";
+    },
+
+    priorityGroup() {
+      return this.notification.priorityGroup
+        ? this.notification.priorityGroup
+        : "No priority group stored";
     }
   }
 };
