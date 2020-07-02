@@ -198,7 +198,8 @@ export default {
           "First-generation college student",
           "First or second generation immigrant",
           "Belong to a racial/ethnic minority group",
-          "Went to a Title 1/low-income high school"
+          "Went to a Title 1/low-income high school",
+          "Were you eligible for free or reduced-priced lunch"
         ],
         experience: [
           "No prior experience",
