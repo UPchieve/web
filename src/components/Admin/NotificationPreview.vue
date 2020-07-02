@@ -57,12 +57,14 @@ export default {
 <style lang="scss" scoped>
 .notification-preview {
   display: flex;
-  padding: 20px 0;
+  padding: 10px 0;
+  height: 70px;
+  align-items: center;
 
   &__section {
-    flex-grow: 1;
-    min-width: 190px;
-    max-width: 220px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 180px;
     text-align: left;
   }
 }
