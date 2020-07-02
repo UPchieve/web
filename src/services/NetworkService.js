@@ -244,6 +244,11 @@ export default {
       .get(`${API_ROOT}/session/${sessionId}`)
       .then(this._successHandler, this._errorHandler);
   },
+  adminGetSessionNotifications(sessionId) {
+    return Vue.http
+      .get(`${API_ROOT}/session/${sessionId}/notifications`)
+      .then(this._successHandler, this._errorHandler);
+  },
   adminGetUser(userId) {
     return Vue.http
       .get(`${API_ROOT}/user/${userId}`)
