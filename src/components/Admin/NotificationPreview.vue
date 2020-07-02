@@ -4,7 +4,7 @@
     <div class="notification-preview__section">{{ sentAt }}</div>
     <div class="notification-preview__section">
       <router-link :to="`/admin/users/${volunteer._id}`">
-        {{ volunteer.firstname }}
+        to {{ volunteer.firstname }}
       </router-link>
     </div>
     <div class="notification-preview__section">

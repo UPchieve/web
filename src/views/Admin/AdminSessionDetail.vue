@@ -27,9 +27,12 @@
       <div class="session-detail__section-title">
         Notifications
       </div>
-      <router-link :to="`/admin/sessions/${session._id}/notifications`">{{
-        session.notifications ? session.notifications.length : 0
-      }}</router-link>
+      <router-link :to="`/admin/sessions/${session._id}/notifications`"
+        >{{
+          session.notifications ? session.notifications.length : 0
+        }}
+        sent</router-link
+      >
     </div>
     <div
       v-if="session.messages.length"
