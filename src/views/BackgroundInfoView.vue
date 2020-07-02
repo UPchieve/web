@@ -2,7 +2,15 @@
   <div class="background-info">
     <h1 class="background-info__header">Background Information</h1>
     <div class="background-info__wrapper">
-      <form class="background-info__form" @submit="submit">
+      <div v-if="hasCompletedBackgroundInfo">
+        <p class="background-info__subheader">
+          <!-- @todo: copy -->
+          Thank you for submitting your background information. Our students,
+          and school partners, are interested in learning more about the
+          volunteers at UPchieve!
+        </p>
+      </div>
+      <form class="background-info__form" @submit="submitForm" v-else>
         <p class="background-info__subheader">
           Our students, and school partners, are interested in learning more
           about the volunteers at UPchieve! Please fill in the following
@@ -166,6 +174,9 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+import NetworkService from "@/services/NetworkService";
+
 export default {
   name: "background-info-view",
   data() {
@@ -203,7 +214,7 @@ export default {
           "Cantonese",
           "Tagalog",
           "Vietnamese",
-          "Arabic ",
+          "Arabic",
           "French",
           "Korean",
           "Russian",
@@ -223,30 +234,70 @@ export default {
       wasSubmitted: false
     };
   },
-
+  computed: {
+    ...mapState({
+      user: state => state.user.user
+    }),
+    hasCompletedBackgroundInfo() {
+      return (
+        this.user.occupation && this.user.experience && this.user.background
+      );
+    }
+  },
   methods: {
-    submit(event) {
+    async submitForm(event) {
       event.preventDefault();
 
       this.showInputErrors = false;
+      this.formError = "";
+
       if (this.wasSubmitted) return;
       if (this.invalidForm()) {
         this.showInputErrors = true;
         this.formError = "Please answer the required fields above.";
         return;
       }
-
       this.wasSubmitted = true;
+
+      // determine if submitting background information is the final approval step
+      let isFinalApprovalStep;
+      if (!this.user.isApproved && !this.user.volunteerPartnerOrg) {
+        const referencesStatus = this.user.references.map(
+          reference => reference.status
+        );
+        const statuses = [...referencesStatus, this.user.photoIdStatus];
+
+        isFinalApprovalStep = statuses.every(status => status === "APPROVED");
+      }
 
       const data = {
         occupation: this.occupation,
         experience: this.experience,
         background: this.background,
-        languages: this.languages,
-        addedLanguages: this.addedLanguages,
-        linkedInUrl: this.linkedInUrl
+        isPartnerVolunteer: !!this.user.volunteerPartnerOrg,
+        isFinalApprovalStep
       };
-      console.log(data);
+
+      if (this.linkedInUrl) data.linkedInUrl = this.linkedInUrl;
+      if (this.languages.length > 0) {
+        const languages = Array.from(this.languages);
+        if (this.addedLanguages) languages.push(this.addedLanguages);
+        data.languages = languages;
+      }
+
+      try {
+        await NetworkService.addBackgroundInfo(data);
+        this.wasSubmitted = false;
+        // the mandatory fields to have completed background information
+        this.$store.dispatch("user/addToUser", {
+          occupation: data.occupation,
+          experience: data.experience,
+          background: data.background
+        });
+      } catch (error) {
+        this.formError = "Sorry, we had some trouble saving your information.";
+        this.wasSubmitted = false;
+      }
     },
     toggleAddLanguages() {
       this.showAddLanguages = !this.showAddLanguages;
@@ -354,7 +405,11 @@ textarea {
 }
 
 .linkedin-input {
-  width: 60%;
+  width: 100%;
+
+  @include breakpoint-above("medium") {
+    width: 80%;
+  }
 }
 
 .submit-btn {

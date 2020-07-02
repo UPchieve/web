@@ -57,33 +57,32 @@
           </div>
           <div class="dashboard-card__title">Volunteer verification</div>
           <div class="dashboard-card__subtitle">
-            Provide proof of identity and references to become an approved
-            volunteer
+            {{ approvalCardSubheader }}
           </div>
+          <template v-if="!user.volunteerPartnerOrg">
+            <account-action
+              title="Proof of identity"
+              :subtitle="photoIdAction.subtitle"
+              :status="photoIdAction.status"
+              @click.native="togglePhotoUploadModal"
+            >
+              <person-card-icon />
+            </account-action>
 
-          <account-action
-            title="Proof of identity"
-            :subtitle="photoIdAction.subtitle"
-            :status="photoIdAction.status"
-            @click.native="togglePhotoUploadModal"
-          >
-            <person-card-icon />
-          </account-action>
+            <account-action
+              title="Reference check"
+              :subtitle="referenceAction.subtitle"
+              :status="referenceAction.status"
+              @click.native="toggleReferencesModal"
+            >
+              <references-icon />
+            </account-action>
+          </template>
 
-          <account-action
-            title="Reference check"
-            :subtitle="referenceAction.subtitle"
-            :status="referenceAction.status"
-            @click.native="toggleReferencesModal"
-          >
-            <references-icon />
-          </account-action>
-
-          <!-- @todo: fix -->
           <account-action
             title="Background Information"
-            :subtitle="referenceAction.subtitle"
-            :status="referenceAction.status"
+            :subtitle="backgroundInfoAction.subtitle"
+            :status="backgroundInfoAction.status"
             @click.native="goToBackgroundInfo"
           >
             <person-card-icon />
@@ -312,6 +311,19 @@ export default {
       };
     },
 
+    backgroundInfoAction() {
+      if (this.user.background && this.user.occupation && this.user.experience)
+        return {
+          subtitle: "Completed",
+          status: "COMPLETED"
+        };
+
+      return {
+        subtitle: "Add your background information",
+        status: "DEFAULT"
+      };
+    },
+
     impactStats() {
       const user = this.$store.state.user.user;
       // (1) Hours selected
@@ -379,6 +391,13 @@ export default {
           value: `${numElapsedAvailabilityHours} hours elapsed`
         }
       ];
+    },
+
+    approvalCardSubheader() {
+      if (this.user.volunteerPartnerOrg)
+        return "Provide background information to become an approved volunteer";
+
+      return "Provide proof of identity and references to become an approved volunteer";
     }
   },
   methods: {

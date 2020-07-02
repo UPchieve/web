@@ -367,5 +367,10 @@ export default {
     return Vue.http
       .get(`${API_ROOT}/user/volunteer-approval/photo-url`)
       .then(this._successHandler, this._errorHandler);
+  },
+  addBackgroundInfo(data) {
+    return Vue.http
+      .post(`${API_ROOT}/user/volunteer-approval/background-information`, data)
+      .then(this._successHandler, this._errorHandler);
   }
 };
