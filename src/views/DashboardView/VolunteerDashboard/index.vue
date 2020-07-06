@@ -85,7 +85,7 @@
             :status="backgroundInfoAction.status"
             @click.native="goToBackgroundInfo"
           >
-            <person-card-icon />
+            <person-icon />
           </account-action>
         </div>
         <div class="dashboard-card">
@@ -147,6 +147,7 @@ import ReferencesModal from "./ReferencesModal";
 import VolunteerWelcomeModal from "@/views/DashboardView/VolunteerDashboard/VolunteerWelcomeModal.vue";
 import LargeButton from "@/components/LargeButton";
 import PersonCardIcon from "@/assets/person-card.svg";
+import PersonIcon from "@/assets/person.svg";
 import ReferencesIcon from "@/assets/references-icon.svg";
 import CalendarIcon from "@/assets/calendar.svg";
 import CertificationIcon from "@/assets/certification.svg";
@@ -171,6 +172,7 @@ export default {
     ReferencesModal,
     LargeButton,
     PersonCardIcon,
+    PersonIcon,
     ReferencesIcon,
     CalendarIcon,
     CertificationIcon,
@@ -312,7 +314,7 @@ export default {
     },
 
     backgroundInfoAction() {
-      if (this.user.background && this.user.occupation && this.user.experience)
+      if (this.hasCompletedBackgroundInfo)
         return {
           subtitle: "Completed",
           status: "COMPLETED"
@@ -322,6 +324,16 @@ export default {
         subtitle: "Add your background information",
         status: "DEFAULT"
       };
+    },
+
+    hasCompletedBackgroundInfo() {
+      return (
+        this.user.background &&
+        this.user.background.length > 0 &&
+        this.user.occupation &&
+        this.user.occupation.length > 0 &&
+        this.user.experience
+      );
     },
 
     impactStats() {
