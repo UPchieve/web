@@ -113,14 +113,10 @@ export default {
     async handleSubmit() {
       this.error = "";
 
-      const hasCompletedBackgroundInfo =
-        this.volunteer.occupation &&
-        this.volunteer.experience &&
-        this.volunteer.background;
       const data = {
         photoIdStatus: this.photoIdStatus,
         referencesStatus: this.referencesStatus,
-        hasCompletedBackgroundInfo
+        volunteerId: this.volunteer._id
       };
       try {
         await NetworkService.adminReviewPendingVolunteer({
