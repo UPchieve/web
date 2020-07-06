@@ -260,26 +260,14 @@ export default {
       }
       this.wasSubmitted = true;
 
-      // determine if submitting background information is the final approval step
-      let isFinalApprovalStep;
-      if (!this.user.isApproved && !this.user.volunteerPartnerOrg) {
-        const referencesStatus = this.user.references.map(
-          reference => reference.status
-        );
-        const statuses = [...referencesStatus, this.user.photoIdStatus];
-
-        isFinalApprovalStep = statuses.every(status => status === "APPROVED");
-      }
-
       const data = {
         occupation: this.occupation,
         experience: this.experience,
         background: this.background,
-        isPartnerVolunteer: !!this.user.volunteerPartnerOrg,
-        isFinalApprovalStep
+        languages: this.languages,
+        linkedInUrl: this.linkedInUrl
       };
 
-      if (this.linkedInUrl) data.linkedInUrl = this.linkedInUrl;
       if (this.languages.length > 0) {
         const languages = Array.from(this.languages);
         if (this.addedLanguages) languages.push(this.addedLanguages);
@@ -290,11 +278,13 @@ export default {
         await NetworkService.addBackgroundInfo(data);
         this.wasSubmitted = false;
         // the mandatory fields to have completed background information
-        this.$store.dispatch("user/addToUser", {
+        const update = {
           occupation: data.occupation,
           experience: data.experience,
           background: data.background
-        });
+        };
+
+        this.$store.dispatch("user/addToUser", update);
       } catch (error) {
         this.formError = "Sorry, we had some trouble saving your information.";
         this.wasSubmitted = false;
