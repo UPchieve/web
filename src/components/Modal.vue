@@ -7,7 +7,7 @@
     <div v-if="mobileMode" class="upc-modal-header">
       <div class="upc-modal-header-close-button" @click="closeModal">
         <arrow-icon class="icon" />
-        <p>Back</p>
+        <p>{{ backText }}</p>
       </div>
     </div>
 
@@ -27,7 +27,8 @@ export default {
   components: { ArrowIcon },
   props: {
     closeModal: { type: Function, required: true },
-    important: Boolean
+    important: Boolean,
+    backText: { type: String, default: "Back" }
   },
   mounted() {
     const body = document.querySelector("body");

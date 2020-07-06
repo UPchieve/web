@@ -31,6 +31,7 @@
           />
           <button class="upload-photo-btn">Upload Photo</button>
         </label>
+        <p v-if="error" class="error">{{ error }}</p>
 
         <separator v-if="!mobileMode" />
 
@@ -65,7 +66,8 @@ export default {
   data() {
     return {
       photo: "",
-      file: undefined
+      file: undefined,
+      error: ""
     };
   },
   computed: {
@@ -78,6 +80,13 @@ export default {
     addPhoto(event) {
       const { files } = event.target;
       const file = files[0];
+      const twentyFiveMegaBytes = 25 * 1000000;
+      if (file.size > twentyFiveMegaBytes) {
+        this.error =
+          "This photo is too large. Please upload a photo less than 25mb.";
+        return;
+      }
+      this.error = "";
       this.file = file;
       this.photo = URL.createObjectURL(file);
     },
@@ -86,16 +95,24 @@ export default {
       this.photo = "";
     },
     submitPhoto() {
-      // @todo: error handling
+      if (!this.photo) {
+        this.error = "Please upload a photo before submitting.";
+        return;
+      }
+      this.error = "";
       NetworkService.getPhotoUploadUrl().then(res => {
         const { uploadUrl } = res.body;
-        axios.put(uploadUrl, this.file, {
-          "Content-Type": this.file.type
-        });
-        this.$store.dispatch("user/addToUser", {
-          photoIdStatus: "SUBMITTED"
-        });
-        this.closeModal();
+        if (uploadUrl) {
+          axios.put(uploadUrl, this.file, {
+            "Content-Type": this.file.type
+          });
+          this.$store.dispatch("user/addToUser", {
+            photoIdStatus: "SUBMITTED"
+          });
+          this.closeModal();
+        } else {
+          this.error = "Sorry, we had trouble uploading your photo.";
+        }
       });
     }
   }
@@ -200,5 +217,11 @@ header {
   width: 100%;
   height: 1px;
   margin-top: 2em;
+}
+
+.error {
+  color: $c-error-red;
+  text-align: left;
+  margin-bottom: 1em;
 }
 </style>
