@@ -67,6 +67,20 @@
           </p>
         </div>
       </div>
+      <div class="user-detail__section">
+        <div class="user-detail__section-title ">
+          Background Information
+          <span
+            class="user-detail__account-notice user-detail__status"
+            :class="
+              statusColor(hasCompletedBackgroundInfo ? 'APPROVED' : 'SUBMITTED')
+            "
+            >{{
+              statusText(hasCompletedBackgroundInfo ? "COMPLETED" : "PENDING")
+            }}</span
+          >
+        </div>
+      </div>
       <p v-if="error" class="error">{{ error }}</p>
       <large-button @click.native="handleSubmit" type="button" class="save-btn"
         >Save</large-button
@@ -145,7 +159,8 @@ export default {
       return status;
     },
     statusColor(status) {
-      if (status === "SUBMITTED") return "user-detail__status--pending";
+      if (status === "SUBMITTED" || status === "PENDING")
+        return "user-detail__status--pending";
       if (status === "APPROVED") return "user-detail__status--approved";
       if (status === "REJECTED") return "user-detail__status--rejected";
     }
@@ -153,6 +168,15 @@ export default {
   computed: {
     createdAt() {
       return moment(this.volunteer.createdAt).format("l, h:mm a");
+    },
+    hasCompletedBackgroundInfo() {
+      return (
+        this.volunteer.background &&
+        this.volunteer.background.length > 0 &&
+        this.volunteer.occupation &&
+        this.volunteer.occupation.length > 0 &&
+        this.volunteer.experience
+      );
     }
   }
 };
