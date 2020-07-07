@@ -51,11 +51,12 @@
         <div
           v-for="(reference, index) in volunteer.references"
           :key="reference._id"
+          class="reference"
         >
           <p>
             <span
               @click="toggleReferenceView(index)"
-              class="reference-form-link"
+              class="reference__form-link"
               >{{ reference.name }}</span
             >
             {{ " " }}
@@ -64,6 +65,9 @@
               :class="statusColor(referencesStatus[index])"
               >{{ statusText(referencesStatus[index]) }}</span
             >
+          </p>
+          <p class="reference__email">
+            {{ reference.email }}
           </p>
         </div>
       </div>
@@ -246,10 +250,18 @@ export default {
   }
 }
 
-.reference-form-link {
-  color: $c-information-blue;
-  text-decoration: underline;
-  cursor: pointer;
+.reference {
+  margin-bottom: 1em;
+
+  &__form-link {
+    color: $c-information-blue;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  &__email {
+    text-align: left;
+  }
 }
 
 .save-btn {
