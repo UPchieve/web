@@ -1,6 +1,7 @@
 describe("Volunteer dashboard", () => {
   before(function() {
     cy.fixture("users/volunteer3").as("openVolunteer");
+    cy.fixture("users/partnerVolunteer").as("partnerVolunteer");
   });
 
   describe("Open Volunteer", () => {
@@ -171,6 +172,90 @@ describe("Volunteer dashboard", () => {
         cy.get(".account-action")
           .then(accountActionElems => accountActionElems[1])
           .contains("Pending");
+      });
+    });
+  });
+
+  describe("Partner Volunteer", () => {
+    describe("Not approved", () => {
+      beforeEach(function() {
+        cy.login(this.partnerVolunteer);
+        cy.server();
+        cy.visit("/");
+      });
+
+      it("Should see add background information account action", function() {
+        cy.get(".account-action")
+          .then(accountActionElems => accountActionElems[0])
+          .contains("Background Information");
+      });
+
+      it("Should see not be able to submit background info when required fields are empty", function() {
+        cy.server();
+
+        cy.get(".account-action")
+          .then(accountActionElems => accountActionElems[0])
+          .contains("Background Information")
+          .click();
+
+        cy.route({
+          url: "/api/user/volunteer-approval/background-information",
+          method: "POST",
+          status: 200,
+          response: {}
+        });
+
+        cy.get(".uc-form-col")
+          .eq(0)
+          .get(".uc-form-checkbox input")
+          .eq(2)
+          .check();
+
+        cy.get(".uc-form-col")
+          .eq(1)
+          .get(".uc-form-checkbox input")
+          .eq(4)
+          .check();
+
+        cy.get(".submit-btn").should("be.disabled");
+      });
+
+      it.only("Should success message after submitting background info", function() {
+        cy.server();
+
+        cy.get(".account-action")
+          .then(accountActionElems => accountActionElems[0])
+          .contains("Background Information")
+          .click();
+
+        cy.get(".uc-form-col")
+          .eq(0)
+          .find(".uc-form-checkbox input")
+          .eq(2)
+          .check();
+
+        cy.get(".uc-form-col")
+          .eq(1)
+          .find(".uc-form-checkbox input")
+          .eq(1)
+          .check();
+
+        cy.get(".uc-form-col")
+          .eq(3)
+          .find(".uc-form-radio input")
+          .eq(3)
+          .check();
+
+        cy.route({
+          url: "/api/user/volunteer-approval/background-information",
+          method: "POST",
+          status: 200,
+          response: {}
+        });
+
+        cy.get(".submit-btn").click();
+
+        cy.get(".background-info__wrapper").contains("Thank you");
       });
     });
   });
