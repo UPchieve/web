@@ -168,6 +168,18 @@ export default {
         return;
       }
 
+      if (!this.isUniqueEmail(this.newReferenceEmail)) {
+        this.addReferenceError =
+          "Looks like you've entered this reference in already.";
+        return;
+      }
+
+      if (this.user.email === this.newReferenceEmail) {
+        this.addReferenceError =
+          "Please enter the email address of your reference.";
+        return;
+      }
+
       this.addReferenceError = "";
 
       const newReference = {
@@ -195,6 +207,16 @@ export default {
       this.$store.dispatch("user/addToUser", {
         references: this.references
       });
+    },
+    isUniqueEmail(email) {
+      let isUnique = true;
+      for (const reference of this.references) {
+        if (reference.email === email) {
+          isUnique = false;
+          break;
+        }
+      }
+      return isUnique;
     }
   }
 };
