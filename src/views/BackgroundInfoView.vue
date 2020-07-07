@@ -3,7 +3,7 @@
     <h1 class="background-info__header">Background Information</h1>
     <div class="background-info__wrapper">
       <div v-if="hasCompletedBackgroundInfo">
-        <p class="background-info__subheader">
+        <p class="background-info__completed-message">
           <!-- @todo: copy -->
           Thank you for submitting your background information. Our students,
           and school partners, are interested in learning more about the
@@ -11,7 +11,7 @@
         </p>
       </div>
       <form class="background-info__form" @submit="submitForm" v-else>
-        <p class="background-info__subheader">
+        <p>
           Our students, and school partners, are interested in learning more
           about the volunteers at UPchieve! Please fill in the following
           background information- who knows, it might help us pair you with the
@@ -80,10 +80,10 @@
           </li>
 
           <li class="uc-form-col">
-            <label for="linkedin" class="uc-form-label">
+            <p>
               If you have one, please provide us with a link to your LinkedIn
               profile.
-            </label>
+            </p>
             <p class="background-info__question-description">(optional)</p>
 
             <input
@@ -309,6 +309,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+input:invalid {
+  border-bottom: $c-error-red solid 3px;
+}
+
+ol {
+  padding-inline-start: 30px;
+  @include breakpoint-above("medium") {
+    padding-inline-start: 40px;
+  }
+}
+
 .uc-form-checkbox {
   margin-bottom: 0.6em;
 
@@ -339,23 +350,18 @@ textarea {
 
   &__wrapper {
     max-width: 100%;
-    margin: 15px 15px 55px 40px;
-    @include flex-container(column);
-    align-items: stretch;
+    margin: 15px;
     background-color: #fff;
     border-radius: 8px;
 
-    @include child-spacing(top, 16px);
-    @include child-spacing(right, 0);
+    @include breakpoint-above("medium") {
+      padding: 40px;
+      max-width: 90%;
+      margin: 15px 15px 55px 40px;
+    }
 
     @include breakpoint-above("large") {
-      padding: 40px;
       max-width: 70%;
-
-      @include child-spacing(top, 0);
-      @include child-spacing(right, 40px);
-
-      @include flex-container(row);
     }
   }
 
@@ -365,26 +371,26 @@ textarea {
     align-items: center;
     justify-content: space-between;
     font-weight: 500;
-    padding: 25px 15px 10px 35px;
+    padding: 25px 15px 10px 15px;
     @include font-category("display-small");
 
-    @include breakpoint-above("large") {
+    @include breakpoint-above("medium") {
       padding: 40px 40px 0 40px;
     }
   }
 
-  &__subheading {
-    @include font-category("subheading");
+  &__completed-message {
+    padding: 1em;
   }
 
   &__form {
     border-radius: 8px;
     padding: 20px;
     text-align: left;
-    max-width: 80%;
+    max-width: 95%;
 
     @include breakpoint-above("large") {
-      padding: 40px;
+      max-width: 80%;
     }
   }
 
@@ -400,7 +406,7 @@ textarea {
 }
 
 .linkedin-input {
-  width: 100%;
+  width: 90%;
 
   @include breakpoint-above("medium") {
     width: 80%;
