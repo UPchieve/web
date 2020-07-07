@@ -10,7 +10,7 @@
   >
     <div class="account-action__icon-container">
       <check-icon v-if="status === 'COMPLETED'" />
-      <slot v-else></slot>
+      <component v-else :is="icon"></component>
     </div>
     <div class="account-action__body">
       <div class="account-action__title">{{ title }}</div>
@@ -33,7 +33,8 @@ export default {
   props: {
     title: String,
     subtitle: String,
-    status: String
+    status: String,
+    icon: Object
   }
 };
 </script>
