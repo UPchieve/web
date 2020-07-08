@@ -89,6 +89,12 @@ const routes = [
   },
   {
     path: "/signup",
+    beforeEnter: (to, from, next) => {
+      next("/sign-up");
+    }
+  },
+  {
+    path: "/sign-up/:type?/:step?",
     name: "SignupView",
     component: SignupView,
     meta: { loggedOutOnly: true }

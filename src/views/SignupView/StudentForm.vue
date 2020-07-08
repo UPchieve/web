@@ -372,6 +372,7 @@ export default {
   methods: {
     firstPage() {
       this.step = "step-1";
+      this.$router.push("/sign-up/student/eligibility");
     },
 
     signupCodeYes() {
@@ -434,8 +435,10 @@ export default {
 
           if (isEligible) {
             this.step = "step-2";
+            this.$router.push("/sign-up/student/account");
           } else {
             this.step = "step-1-waitlist";
+            this.$router.push("/sign-up/student/waitlist");
           }
         })
         .catch(err => {
@@ -474,6 +477,7 @@ export default {
       })
         .then(() => {
           this.step = "step-3";
+          this.$router.push("/sign-up/student/name");
         })
         .catch(err => {
           this.msg = err.message;
@@ -507,6 +511,7 @@ export default {
       })
         .then(() => {
           this.step = "step-1-waitlist-success";
+          this.$router.push("/sign-up/student/waitlist-success");
         })
         .catch(err => {
           this.msg = err.message;
