@@ -179,7 +179,7 @@ export default {
         this.volunteer.background.length > 0 &&
         this.volunteer.occupation &&
         this.volunteer.occupation.length > 0 &&
-        this.volunteer.experience
+        this.volunteer.country
       );
     }
   }

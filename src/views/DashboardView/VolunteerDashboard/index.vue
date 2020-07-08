@@ -313,7 +313,7 @@ export default {
         this.user.background.length > 0 &&
         this.user.occupation &&
         this.user.occupation.length > 0 &&
-        this.user.experience
+        this.user.country
       );
     },
 
