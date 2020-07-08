@@ -51,9 +51,9 @@ export default {
     this.$store.dispatch("app/hideNavigation");
 
     if (this.$route.params)
-      if (this.isMobileApp || this.$route.params.type === "student")
+      if (this.isMobileApp || this.$route.params.userType === "student")
         this.userSelection = "student";
-      else if (this.$route.params.type === "volunteer")
+      else if (this.$route.params.userType === "volunteer")
         this.userSelection = "volunteer";
   },
   computed: {

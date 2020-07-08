@@ -94,7 +94,7 @@ const routes = [
     }
   },
   {
-    path: "/sign-up/:type?/:step?",
+    path: "/sign-up/:userType?/:step?",
     name: "SignupView",
     component: SignupView,
     meta: { loggedOutOnly: true }
