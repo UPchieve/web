@@ -100,13 +100,6 @@ const routes = [
     meta: { loggedOutOnly: true }
   },
   {
-    path: "/referral/:referredByCode",
-    beforeEnter: (to, from, next) => {
-      const referredByCode = to.params.referredByCode;
-      next(`/signup?referral=${referredByCode}`);
-    }
-  },
-  {
     path: "/signup/student/:partnerId",
     name: "StudentPartnerSignupView",
     component: StudentPartnerSignupView,
@@ -117,6 +110,13 @@ const routes = [
     name: "VolunteerPartnerSignupView",
     component: VolunteerPartnerSignupView,
     meta: { loggedOutOnly: true }
+  },
+  {
+    path: "/referral/:referredByCode",
+    beforeEnter: (to, from, next) => {
+      const referredByCode = to.params.referredByCode;
+      next(`/signup?referral=${referredByCode}`);
+    }
   },
   {
     path: "/resetpassword",
