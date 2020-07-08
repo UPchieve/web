@@ -479,7 +479,7 @@ export default {
       })
         .then(() => {
           this.step = "step-3";
-          this.$router.push("/sign-up/student/name");
+          this.$router.push("/sign-up/student/about");
         })
         .catch(err => {
           this.msg = err.message;
