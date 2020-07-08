@@ -98,6 +98,59 @@
 
           <li class="uc-form-col">
             <p>
+              Where do you currently live?<span
+                class="background-info__question-required"
+                >*</span
+              >
+            </p>
+
+            <label class="uc-form-label location-label">Country</label>
+            <select
+              class="uc-form-select location-input"
+              onfocus="this.size=10;"
+              onblur="this.size=1;"
+              onchange="this.size=1; this.blur();"
+              v-model="country"
+            >
+              <option selected disabled value="">Select a country...</option>
+              <option
+                v-for="country in countries"
+                :key="country"
+                :value="country"
+                >{{ country }}</option
+              ></select
+            >
+            <template v-if="country === 'United States of America'">
+              <label class="uc-form-label location-label">State</label>
+              <select
+                class="uc-form-select location-input"
+                onfocus="this.size=10;"
+                onblur="this.size=1;"
+                onchange="this.size=1; this.blur();"
+                v-model="state"
+              >
+                <option selected disabled value="">Select a state...</option>
+                <option v-for="state in states" :key="state" :value="state">{{
+                  state
+                }}</option>
+              </select>
+            </template>
+            <template v-if="country">
+              <label class="uc-form-label location-label">City</label>
+              <input
+                type="text"
+                v-model="city"
+                placeholder="Enter a city..."
+                class="uc-form-input location-input"
+              />
+            </template>
+            <p v-if="showInputErrors && !experience" class="error">
+              Please fill out these fields.
+            </p>
+          </li>
+
+          <li class="uc-form-col">
+            <p>
               How much prior tutoring and/or college counseling experience do
               you have?<span class="background-info__question-required">*</span>
             </p>
@@ -176,6 +229,7 @@
 <script>
 import { mapState } from "vuex";
 import NetworkService from "@/services/NetworkService";
+import { COUNTRIES, STATES } from "@/consts";
 
 export default {
   name: "background-info-view",
@@ -193,20 +247,19 @@ export default {
           "Retired"
         ],
         background: [
-          "From a low-income background",
-          "Raised by a single parent",
-          "First-generation college student",
-          "First or second generation immigrant",
-          "Belong to a racial/ethnic minority group",
-          "Went to a Title 1/low-income high school",
-          "Were you eligible for free or reduced-priced lunch"
+          "I went to a public high school.",
+          "I was eligible for free or reduced price lunch at school..",
+          "My parent(s) never attended college.",
+          "I was raised by a single parent.",
+          "English was not my first language.",
+          "I am a first or second generation immigrant.",
+          "None of the above."
         ],
         experience: [
           "No prior experience",
-          "Less than 6 months",
-          "6-12 months",
+          "0-1 years",
           "1-2 years",
-          "3-5 years",
+          "2-5 years",
           "5+ years"
         ],
         languages: [
@@ -224,7 +277,6 @@ export default {
       },
       showInputErrors: false,
       formError: "",
-      invalidInputs: [],
       occupation: [],
       linkedInUrl: "",
       experience: "",
@@ -232,7 +284,10 @@ export default {
       languages: [],
       showAddLanguages: false,
       addedLanguages: "",
-      wasSubmitted: false
+      wasSubmitted: false,
+      country: "",
+      state: "",
+      city: ""
     };
   },
   computed: {
@@ -247,6 +302,15 @@ export default {
         this.user.occupation.length > 0 &&
         this.user.experience
       );
+    },
+    countries() {
+      return COUNTRIES;
+    },
+    states() {
+      return STATES;
+    },
+    isUnitedStatesSelected() {
+      return this.country === "United States of America";
     }
   },
   methods: {
@@ -269,7 +333,10 @@ export default {
         experience: this.experience,
         background: this.background,
         languages: this.languages,
-        linkedInUrl: this.linkedInUrl
+        linkedInUrl: this.linkedInUrl,
+        country: this.country,
+        state: this.isUnitedStatesSelected ? this.state : "",
+        city: this.city
       };
 
       if (this.languages.length > 0) {
@@ -301,7 +368,10 @@ export default {
       return (
         this.background.length === 0 ||
         this.occupation.length === 0 ||
-        !this.experience
+        !this.experience ||
+        !this.country ||
+        !this.city ||
+        (this.isUnitedStatesSelected && !this.state)
       );
     }
   }
@@ -401,11 +471,18 @@ textarea {
   }
 
   &__question-required {
-    color: $c-information-blue;
+    color: $c-error-red;
   }
 }
 
-.linkedin-input {
+.location-label {
+  display: block;
+  margin-top: 1.4em;
+  margin-bottom: 0.5em;
+}
+
+.linkedin-input,
+.location-input {
   width: 90%;
 
   @include breakpoint-above("medium") {
