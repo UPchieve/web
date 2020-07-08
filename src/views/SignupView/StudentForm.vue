@@ -360,7 +360,9 @@ export default {
     };
   },
   mounted() {
-    if (!this.isMobileApp) {
+    if (this.isMobileApp) {
+      this.$router.push("/sign-up/student/partner-code");
+    } else {
       this.firstPage();
     }
   },
