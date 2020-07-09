@@ -50,6 +50,12 @@ export default {
   created() {
     this.$store.dispatch("app/hideNavigation");
 
+    if (this.$route.query.referral)
+      window.localStorage.setItem(
+        "upcReferredByCode",
+        this.$route.query.referral
+      );
+
     if (this.$route.params)
       if (this.isMobileApp || this.$route.params.userType === "student")
         this.userSelection = "student";

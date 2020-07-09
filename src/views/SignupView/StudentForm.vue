@@ -430,7 +430,7 @@ export default {
       NetworkService.checkStudentEligibility(this, {
         schoolUpchieveId: this.eligibility.highSchool.upchieveId,
         zipCode: this.eligibility.zipCode,
-        referredByCode: this.$route.query.referral
+        referredByCode: window.localStorage.getItem("upcReferredByCode")
       })
         .then(response => {
           const isEligible = response.body.isEligible;
@@ -572,9 +572,10 @@ export default {
         lastName: this.profile.lastName,
         highSchoolId: this.eligibility.highSchool.upchieveId,
         zipCode: this.eligibility.zipCode,
-        referredByCode: this.$route.query.referral
+        referredByCode: window.localStorage.getItem("upcReferredByCode")
       })
         .then(() => {
+          window.localStorage.removeItem("upcReferredByCode");
           this.$store.dispatch("user/firstDashboardVisit", true);
           this.$router.push("/dashboard");
         })

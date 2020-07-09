@@ -115,7 +115,7 @@ const routes = [
     path: "/referral/:referredByCode",
     beforeEnter: (to, from, next) => {
       const referredByCode = to.params.referredByCode;
-      next(`/signup?referral=${referredByCode}`);
+      next(`/sign-up?referral=${referredByCode}`);
     }
   },
   {
