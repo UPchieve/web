@@ -108,9 +108,9 @@ describe("Volunteer dashboard", () => {
           .get(".done-btn")
           .click();
 
-        cy.get(".account-action")
-          .then(accountActionElems => accountActionElems[1])
-          .contains("Incomplete: 1 out of 2 references submitted");
+        cy.get(".account-action").contains(
+          "Incomplete: 1 out of 2 references submitted"
+        );
       });
 
       it("Should remove a reference", function() {
@@ -137,9 +137,7 @@ describe("Volunteer dashboard", () => {
           .get(".done-btn")
           .click();
 
-        cy.get(".account-action")
-          .then(accountActionElems => accountActionElems[1])
-          .contains("Add references");
+        cy.get(".account-action").contains("Add references");
       });
 
       it("Should add two references", function() {
@@ -169,9 +167,7 @@ describe("Volunteer dashboard", () => {
 
         cy.get(".done-btn").click();
 
-        cy.get(".account-action")
-          .then(accountActionElems => accountActionElems[1])
-          .contains("Pending");
+        cy.get(".account-action").contains("Pending");
       });
     });
   });
@@ -185,17 +181,14 @@ describe("Volunteer dashboard", () => {
       });
 
       it("Should see add background information account action", function() {
-        cy.get(".account-action")
-          .then(accountActionElems => accountActionElems[0])
-          .contains("Background Information");
+        cy.get(".account-action").contains("Background information");
       });
 
       it("Should see not be able to submit background info when required fields are empty", function() {
         cy.server();
 
         cy.get(".account-action")
-          .then(accountActionElems => accountActionElems[0])
-          .contains("Background Information")
+          .contains("Background information")
           .click();
 
         cy.route({
@@ -220,12 +213,11 @@ describe("Volunteer dashboard", () => {
         cy.get(".submit-btn").should("be.disabled");
       });
 
-      it.only("Should success message after submitting background info", function() {
+      it.only("Should show success message after submitting background info", function() {
         cy.server();
 
         cy.get(".account-action")
-          .then(accountActionElems => accountActionElems[0])
-          .contains("Background Information")
+          .contains("Background information")
           .click();
 
         cy.get(".uc-form-col")
@@ -240,11 +232,37 @@ describe("Volunteer dashboard", () => {
           .eq(1)
           .check();
 
+        // Select country - United States of America
         cy.get(".uc-form-col")
           .eq(3)
-          .find(".uc-form-radio input")
+          .find(".location-input")
+          .click()
+          .find(".vs__dropdown-option")
+          .eq(0)
+          .click();
+
+        // Select state - New York
+        cy.get(".uc-form-col")
           .eq(3)
-          .check();
+          .find(".location-input")
+          .eq(1)
+          .click()
+          .find(".vs__dropdown-option")
+          // new york
+          .eq(31)
+          .click();
+
+        cy.get("#city").type("New York City");
+
+        cy.get(".radio-question-selection-cell")
+          .eq(1)
+          .click()
+          .get(".radio-question-selection-cell")
+          .eq(6)
+          .click()
+          .get(".radio-question-selection-cell")
+          .eq(13)
+          .click();
 
         cy.route({
           url: "/api/user/volunteer-approval/background-information",
