@@ -27,7 +27,12 @@
       <div class="session-detail__section-title">
         Notifications
       </div>
-      <div>{{ session.notifications ? session.notifications.length : 0 }}</div>
+      <router-link :to="`/admin/sessions/${session._id}/notifications`"
+        >{{
+          session.notifications ? session.notifications.length : 0
+        }}
+        sent</router-link
+      >
     </div>
     <div
       v-if="session.messages.length"
@@ -94,6 +99,7 @@ export default {
       return moment(this.session.endedAt).format("l, h:mm:ss a");
     },
     endedBy() {
+      if (this.session.endedBy === null) return "worker";
       return this.session.endedBy === this.session.student._id
         ? this.session.student.firstname
         : this.session.volunteer.firstname;

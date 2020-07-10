@@ -28,9 +28,9 @@ describe("Student and volunteer signup", () => {
     it("Should successfully create a new student account", function() {
       cy.server();
 
-      cy.visit("/signup");
+      cy.visit("/sign-up");
 
-      cy.location("pathname").should("eq", "/signup");
+      cy.location("pathname").should("eq", "/sign-up");
 
       cy.get("button")
         .contains("Student")
@@ -76,9 +76,9 @@ describe("Student and volunteer signup", () => {
     });
 
     it("Should add student to waitlist", function() {
-      cy.visit("/signup");
+      cy.visit("/sign-up");
 
-      cy.location("pathname").should("eq", "/signup");
+      cy.location("pathname").should("eq", "/sign-up");
 
       cy.get("button")
         .contains("Student")
@@ -117,9 +117,9 @@ describe("Student and volunteer signup", () => {
         "registerOpenVolunteer"
       );
 
-      cy.visit("/signup");
+      cy.visit("/sign-up");
 
-      cy.location("pathname").should("eq", "/signup");
+      cy.location("pathname").should("eq", "/sign-up");
 
       cy.get("button")
         .contains("Volunteer")

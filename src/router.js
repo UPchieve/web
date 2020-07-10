@@ -24,6 +24,7 @@ import CalendarView from "./views/CalendarView";
 import AdminView from "./views/Admin";
 import VolunteerCoverage from "./views/Admin/VolunteerCoverage";
 import AdminSessions from "./views/Admin/AdminSessions";
+import AdminSessionNotifications from "./views/Admin/AdminSessionNotifications";
 import AdminSessionDetail from "./views/Admin/AdminSessionDetail";
 import AdminUserDetail from "./views/Admin/AdminUserDetail";
 import AdminPendingVolunteers from "./views/Admin/AdminPendingVolunteers";
@@ -96,16 +97,15 @@ const routes = [
   },
   {
     path: "/signup",
+    beforeEnter: (to, from, next) => {
+      next("/sign-up");
+    }
+  },
+  {
+    path: "/sign-up/:userType?/:step?",
     name: "SignupView",
     component: SignupView,
     meta: { loggedOutOnly: true }
-  },
-  {
-    path: "/referral/:referredByCode",
-    beforeEnter: (to, from, next) => {
-      const referredByCode = to.params.referredByCode;
-      next(`/signup?referral=${referredByCode}`);
-    }
   },
   {
     path: "/signup/student/:partnerId",
@@ -118,6 +118,13 @@ const routes = [
     name: "VolunteerPartnerSignupView",
     component: VolunteerPartnerSignupView,
     meta: { loggedOutOnly: true }
+  },
+  {
+    path: "/referral/:referredByCode",
+    beforeEnter: (to, from, next) => {
+      const referredByCode = to.params.referredByCode;
+      next(`/sign-up?referral=${referredByCode}`);
+    }
   },
   {
     path: "/resetpassword",
@@ -237,6 +244,12 @@ const routes = [
     meta: { protected: true, requiresAdmin: true }
   },
   {
+    path: "/admin/sessions/:sessionId/notifications",
+    name: "AdminSessionNotifications",
+    component: AdminSessionNotifications,
+    meta: { protected: true, requiresAdmin: true }
+  },
+  {
     path: "/admin/users/:userId",
     name: "AdminUserDetail",
     component: AdminUserDetail,
@@ -288,7 +301,10 @@ const routes = [
 const router = new VueRouter({
   routes,
   linkActiveClass: "active",
-  mode: "history"
+  mode: "history",
+  scrollBehavior() {
+    return { x: 0, y: 0 };
+  }
 });
 
 export default router;

@@ -360,7 +360,9 @@ export default {
     };
   },
   mounted() {
-    if (!this.isMobileApp) {
+    if (this.isMobileApp) {
+      this.$router.push("/sign-up/student/partner-code");
+    } else {
       this.firstPage();
     }
   },
@@ -372,6 +374,7 @@ export default {
   methods: {
     firstPage() {
       this.step = "step-1";
+      this.$router.push("/sign-up/student/eligibility");
     },
 
     signupCodeYes() {
@@ -427,15 +430,17 @@ export default {
       NetworkService.checkStudentEligibility(this, {
         schoolUpchieveId: this.eligibility.highSchool.upchieveId,
         zipCode: this.eligibility.zipCode,
-        referredByCode: this.$route.query.referral
+        referredByCode: window.localStorage.getItem("upcReferredByCode")
       })
         .then(response => {
           const isEligible = response.body.isEligible;
 
           if (isEligible) {
             this.step = "step-2";
+            this.$router.push("/sign-up/student/account");
           } else {
             this.step = "step-1-waitlist";
+            this.$router.push("/sign-up/student/waitlist");
           }
         })
         .catch(err => {
@@ -474,6 +479,7 @@ export default {
       })
         .then(() => {
           this.step = "step-3";
+          this.$router.push("/sign-up/student/about");
         })
         .catch(err => {
           this.msg = err.message;
@@ -507,6 +513,7 @@ export default {
       })
         .then(() => {
           this.step = "step-1-waitlist-success";
+          this.$router.push("/sign-up/student/waitlist-success");
         })
         .catch(err => {
           this.msg = err.message;
@@ -565,9 +572,10 @@ export default {
         lastName: this.profile.lastName,
         highSchoolId: this.eligibility.highSchool.upchieveId,
         zipCode: this.eligibility.zipCode,
-        referredByCode: this.$route.query.referral
+        referredByCode: window.localStorage.getItem("upcReferredByCode")
       })
         .then(() => {
+          window.localStorage.removeItem("upcReferredByCode");
           this.$store.dispatch("user/firstDashboardVisit", true);
           this.$router.push("/dashboard");
         })
