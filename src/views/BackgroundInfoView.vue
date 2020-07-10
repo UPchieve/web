@@ -104,43 +104,32 @@
             </p>
 
             <label class="uc-form-label location-label">Country</label>
-            <select
-              class="uc-form-select location-input"
-              onfocus="this.size=10;"
-              onblur="this.size=1;"
-              onchange="this.size=1; this.blur();"
+            <v-select
+              class="location-input"
               v-model="country"
-            >
-              <option selected disabled value="">Select a country...</option>
-              <option
-                v-for="country in countries"
-                :key="country"
-                :value="country"
-                >{{ country }}</option
-              ></select
-            >
+              :options="countries"
+              :searchable="true"
+            />
             <template v-if="country === 'United States of America'">
               <label class="uc-form-label location-label">State</label>
-              <select
-                class="uc-form-select location-input"
-                onfocus="this.size=10;"
-                onblur="this.size=1;"
-                onchange="this.size=1; this.blur();"
+              <v-select
+                class="location-input"
+                id="state"
                 v-model="state"
-              >
-                <option selected disabled value="">Select a state...</option>
-                <option v-for="state in states" :key="state" :value="state">{{
-                  state
-                }}</option>
-              </select>
+                :options="states"
+                :searchable="true"
+              />
             </template>
             <template v-if="country">
-              <label class="uc-form-label location-label">City</label>
+              <label class="uc-form-label location-label" for="city"
+                >City</label
+              >
               <input
                 type="text"
                 v-model="city"
                 placeholder="Enter a city..."
                 class="uc-form-input location-input"
+                id="city"
               />
             </template>
             <p v-if="showInputErrors && !experience" class="error">
