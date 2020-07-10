@@ -228,7 +228,7 @@ export default {
     NetworkService.getVolunteerPartner(partnerId)
       .then(data => {
         const volunteerPartner = data.body.volunteerPartner;
-        if (!volunteerPartner) return next("/signup");
+        if (!volunteerPartner) return next("/sign-up");
         return next(_this => _this.setVolunteerPartner(volunteerPartner));
       })
       .catch(err => {
@@ -237,7 +237,7 @@ export default {
           // to be correct regardless of user input
           Sentry.captureException(err);
         }
-        return next("/signup");
+        return next("/sign-up");
       });
   },
   created() {

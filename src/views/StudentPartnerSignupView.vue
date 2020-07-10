@@ -30,7 +30,7 @@
           <div class="step-header__subtitle">
             <span v-if="studentPartner.name"
               >Not with {{ studentPartner.name }}?
-              <router-link to="/signup">Click here</router-link></span
+              <router-link to="/sign-up">Click here</router-link></span
             >
             <span v-else
               >We're a free online tutoring platform for HS students</span
@@ -238,7 +238,7 @@ export default {
     NetworkService.getStudentPartner(partnerId)
       .then(data => {
         const studentPartner = data.body.studentPartner;
-        if (!studentPartner) return next("/signup");
+        if (!studentPartner) return next("/sign-up");
         return next(_this => _this.setStudentPartner(studentPartner));
       })
       .catch(err => {
@@ -247,7 +247,7 @@ export default {
           // to be correct regardless of user input
           Sentry.captureException(err);
         }
-        return next("/signup");
+        return next("/sign-up");
       });
   },
   created() {

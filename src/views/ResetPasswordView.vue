@@ -15,7 +15,7 @@
             Log In
           </router-link>
           <span>/</span>
-          <router-link to="/signup" class="uc-form-header-link">
+          <router-link to="/sign-up" class="uc-form-header-link">
             Sign Up
           </router-link>
         </div>

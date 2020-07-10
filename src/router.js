@@ -89,16 +89,15 @@ const routes = [
   },
   {
     path: "/signup",
+    beforeEnter: (to, from, next) => {
+      next("/sign-up");
+    }
+  },
+  {
+    path: "/sign-up/:userType?/:step?",
     name: "SignupView",
     component: SignupView,
     meta: { loggedOutOnly: true }
-  },
-  {
-    path: "/referral/:referredByCode",
-    beforeEnter: (to, from, next) => {
-      const referredByCode = to.params.referredByCode;
-      next(`/signup?referral=${referredByCode}`);
-    }
   },
   {
     path: "/signup/student/:partnerId",
@@ -111,6 +110,13 @@ const routes = [
     name: "VolunteerPartnerSignupView",
     component: VolunteerPartnerSignupView,
     meta: { loggedOutOnly: true }
+  },
+  {
+    path: "/referral/:referredByCode",
+    beforeEnter: (to, from, next) => {
+      const referredByCode = to.params.referredByCode;
+      next(`/sign-up?referral=${referredByCode}`);
+    }
   },
   {
     path: "/resetpassword",
