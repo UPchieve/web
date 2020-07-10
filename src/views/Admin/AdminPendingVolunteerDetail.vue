@@ -51,11 +51,12 @@
         <div
           v-for="(reference, index) in volunteer.references"
           :key="reference._id"
+          class="reference"
         >
           <p>
             <span
               @click="toggleReferenceView(index)"
-              class="reference-form-link"
+              class="reference__form-link"
               >{{ reference.name }}</span
             >
             {{ " " }}
@@ -65,6 +66,23 @@
               >{{ statusText(referencesStatus[index]) }}</span
             >
           </p>
+          <p class="reference__email">
+            {{ reference.email }}
+          </p>
+        </div>
+      </div>
+      <div class="user-detail__section">
+        <div class="user-detail__section-title ">
+          Background Information
+          <span
+            class="user-detail__account-notice user-detail__status"
+            :class="
+              statusColor(hasCompletedBackgroundInfo ? 'APPROVED' : 'SUBMITTED')
+            "
+            >{{
+              statusText(hasCompletedBackgroundInfo ? "COMPLETED" : "PENDING")
+            }}</span
+          >
         </div>
       </div>
       <p v-if="error" class="error">{{ error }}</p>
@@ -112,9 +130,11 @@ export default {
   methods: {
     async handleSubmit() {
       this.error = "";
+
       const data = {
         photoIdStatus: this.photoIdStatus,
-        referencesStatus: this.referencesStatus
+        referencesStatus: this.referencesStatus,
+        volunteerId: this.volunteer._id
       };
       try {
         await NetworkService.adminReviewPendingVolunteer({
@@ -143,7 +163,8 @@ export default {
       return status;
     },
     statusColor(status) {
-      if (status === "SUBMITTED") return "user-detail__status--pending";
+      if (status === "SUBMITTED" || status === "PENDING")
+        return "user-detail__status--pending";
       if (status === "APPROVED") return "user-detail__status--approved";
       if (status === "REJECTED") return "user-detail__status--rejected";
     }
@@ -151,6 +172,15 @@ export default {
   computed: {
     createdAt() {
       return moment(this.volunteer.createdAt).format("l, h:mm a");
+    },
+    hasCompletedBackgroundInfo() {
+      return (
+        this.volunteer.background &&
+        this.volunteer.background.length > 0 &&
+        this.volunteer.occupation &&
+        this.volunteer.occupation.length > 0 &&
+        this.volunteer.experience
+      );
     }
   }
 };
@@ -246,10 +276,18 @@ export default {
   }
 }
 
-.reference-form-link {
-  color: $c-information-blue;
-  text-decoration: underline;
-  cursor: pointer;
+.reference {
+  margin-bottom: 1em;
+
+  &__form-link {
+    color: $c-information-blue;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  &__email {
+    text-align: left;
+  }
 }
 
 .save-btn {

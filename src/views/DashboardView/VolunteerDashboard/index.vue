@@ -57,27 +57,30 @@
           </div>
           <div class="dashboard-card__title">Volunteer verification</div>
           <div class="dashboard-card__subtitle">
-            Provide proof of identity and references to become an approved
-            volunteer
+            {{ approvalCardSubheader }}
           </div>
-
-          <account-action
-            title="Proof of identity"
-            :subtitle="photoIdAction.subtitle"
-            :status="photoIdAction.status"
-            @click.native="togglePhotoUploadModal"
-          >
-            <person-card-icon />
-          </account-action>
-
-          <account-action
-            title="Reference check"
-            :subtitle="referenceAction.subtitle"
-            :status="referenceAction.status"
-            @click.native="toggleReferencesModal"
-          >
-            <references-icon />
-          </account-action>
+          <template v-if="!user.volunteerPartnerOrg">
+            <account-action
+              v-for="accountAction in openVolunteerApprovalAccountActions"
+              :key="accountAction.title"
+              :title="accountAction.title"
+              :subtitle="accountAction.subtitle"
+              :status="accountAction.status"
+              :icon="accountAction.icon"
+              @click.native="accountAction.clickFn"
+            />
+          </template>
+          <template v-else>
+            <account-action
+              v-for="accountAction in partnerVolunteerApprovalAccountActions"
+              :key="accountAction.title"
+              :title="accountAction.title"
+              :subtitle="accountAction.subtitle"
+              :status="accountAction.status"
+              :icon="accountAction.icon"
+              @click.native="accountAction.clickFn"
+            />
+          </template>
         </div>
         <div class="dashboard-card">
           <div class="dashboard-card__icon">
@@ -90,22 +93,14 @@
           </div>
 
           <account-action
-            title="Select availability"
-            :subtitle="availabilityAction.subtitle"
-            :status="availabilityAction.status"
-            @click.native="clickAvailabilityAction"
-          >
-            <calendar-icon />
-          </account-action>
-
-          <account-action
-            title="Get a certification"
-            :subtitle="certificationAction.subtitle"
-            :status="certificationAction.status"
-            @click.native="clickCertificationAction"
-          >
-            <certification-icon />
-          </account-action>
+            v-for="accountAction in onboaringAccountActions"
+            :key="accountAction.title"
+            :title="accountAction.title"
+            :subtitle="accountAction.subtitle"
+            :status="accountAction.status"
+            :icon="accountAction.icon"
+            @click.native="accountAction.clickFn"
+          />
         </div>
       </template>
     </div>
@@ -138,6 +133,7 @@ import ReferencesModal from "./ReferencesModal";
 import VolunteerWelcomeModal from "@/views/DashboardView/VolunteerDashboard/VolunteerWelcomeModal.vue";
 import LargeButton from "@/components/LargeButton";
 import PersonCardIcon from "@/assets/person-card.svg";
+import PersonIcon from "@/assets/person.svg";
 import ReferencesIcon from "@/assets/references-icon.svg";
 import CalendarIcon from "@/assets/calendar.svg";
 import CertificationIcon from "@/assets/certification.svg";
@@ -161,10 +157,6 @@ export default {
     PhotoUploadModal,
     ReferencesModal,
     LargeButton,
-    PersonCardIcon,
-    ReferencesIcon,
-    CalendarIcon,
-    CertificationIcon,
     VerificationIcon,
     OnboardingIcon,
     VolunteerWelcomeModal
@@ -302,6 +294,29 @@ export default {
       };
     },
 
+    backgroundInfoAction() {
+      if (this.hasCompletedBackgroundInfo)
+        return {
+          subtitle: "Completed",
+          status: "COMPLETED"
+        };
+
+      return {
+        subtitle: "Add your background information",
+        status: "DEFAULT"
+      };
+    },
+
+    hasCompletedBackgroundInfo() {
+      return (
+        this.user.background &&
+        this.user.background.length > 0 &&
+        this.user.occupation &&
+        this.user.occupation.length > 0 &&
+        this.user.experience
+      );
+    },
+
     impactStats() {
       const user = this.$store.state.user.user;
       // (1) Hours selected
@@ -369,6 +384,89 @@ export default {
           value: `${numElapsedAvailabilityHours} hours elapsed`
         }
       ];
+    },
+
+    approvalCardSubheader() {
+      if (this.user.volunteerPartnerOrg)
+        return "Provide background information to become an approved volunteer";
+
+      return "Provide proof of identity and references to become an approved volunteer";
+    },
+    openVolunteerApprovalAccountActions() {
+      const accountActions = [
+        {
+          title: "Proof of identity",
+          subtitle: this.photoIdAction.subtitle,
+          status: this.photoIdAction.status,
+          clickFn: this.togglePhotoUploadModal,
+          icon: PersonCardIcon,
+          priority: this.addSortPriorityNum(this.photoIdAction.status)
+        },
+        {
+          title: "Reference check",
+          subtitle: this.referenceAction.subtitle,
+          status: this.referenceAction.status,
+          clickFn: this.toggleReferencesModal,
+          icon: ReferencesIcon,
+          priority: this.addSortPriorityNum(this.referenceAction.status)
+        },
+        {
+          title: "Background information",
+          subtitle: this.backgroundInfoAction.subtitle,
+          status: this.backgroundInfoAction.status,
+          clickFn: this.goToBackgroundInfo,
+          icon: PersonIcon,
+          priority: this.addSortPriorityNum(this.backgroundInfoAction.status)
+        }
+      ];
+
+      return accountActions.sort((a, b) => a.priority - b.priority);
+    },
+
+    partnerVolunteerApprovalAccountActions() {
+      const accountActions = [
+        {
+          title: "Proof of identity",
+          // @todo: change copy for subtitle
+          subtitle: "Completed",
+          status: "COMPLETED",
+          clickFn: () => {},
+          icon: PersonCardIcon,
+          priority: this.addSortPriorityNum("COMPLETED")
+        },
+        {
+          title: "Background information",
+          subtitle: this.backgroundInfoAction.subtitle,
+          status: this.backgroundInfoAction.status,
+          clickFn: this.goToBackgroundInfo,
+          icon: PersonIcon,
+          priority: this.addSortPriorityNum(this.backgroundInfoAction.status)
+        }
+      ];
+
+      return accountActions.sort((a, b) => a.priority - b.priority);
+    },
+
+    onboaringAccountActions() {
+      const onboaringActions = [
+        {
+          title: "Select availability",
+          subtitle: this.availabilityAction.subtitle,
+          status: this.availabilityAction.status,
+          clickFn: this.clickAvailabilityAction,
+          icon: CalendarIcon,
+          priority: this.addSortPriorityNum(this.availabilityAction.status)
+        },
+        {
+          title: "Get a certification",
+          subtitle: this.certificationAction.subtitle,
+          status: this.certificationAction.status,
+          clickFn: this.clickCertificationAction,
+          icon: CertificationIcon,
+          priority: this.addSortPriorityNum(this.certificationAction.status)
+        }
+      ];
+      return onboaringActions.sort((a, b) => a.priority - b.priority);
     }
   },
   methods: {
@@ -405,6 +503,16 @@ export default {
     },
     clickCertificationAction() {
       this.$router.push("/training");
+    },
+    goToBackgroundInfo() {
+      this.$router.push("/background-information");
+    },
+    addSortPriorityNum(status) {
+      if (status === "COMPLETED") return 0;
+      if (status === "ERROR") return 1;
+      if (status === "PENDING") return 2;
+      if (status === "PROGRESS") return 3;
+      if (status === "DEFAULT") return 4;
     }
   }
 };

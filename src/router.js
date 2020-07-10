@@ -33,6 +33,7 @@ import AdminSchoolDetail from "./views/Admin/AdminSchoolDetail";
 import VolunteerGuideView from "./views/VolunteerGuideView";
 import ReviewMaterialsView from "./views/ReviewMaterialsView";
 import ReferenceView from "./views/ReferenceView";
+import BackgroundInfoView from "./views/BackgroundInfoView";
 
 import store from "./store";
 
@@ -277,6 +278,12 @@ const routes = [
     path: "/coach-guide",
     name: "VolunteerGuide",
     component: VolunteerGuideView,
+    meta: { protected: true }
+  },
+  {
+    path: "/background-information",
+    name: "BackgroundInfoView",
+    component: BackgroundInfoView,
     meta: { protected: true }
   },
   {
