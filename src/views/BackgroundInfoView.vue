@@ -493,7 +493,6 @@ textarea {
 
   &__wrapper {
     max-width: 100%;
-    margin: 15px;
     background-color: #fff;
     border-radius: 8px;
 
@@ -578,7 +577,6 @@ textarea {
 .question-row {
   overflow: hidden;
   width: 100%;
-  padding-right: 2em;
   display: inline-block;
   margin-bottom: 4em;
 
