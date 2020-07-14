@@ -57,6 +57,5 @@ module.exports = {
       .test(/\.pdf$/)
       .use("file-loader")
       .loader("file-loader");
-  },
-  filenameHashing: process.env.NODE_ENV !== "development"
+  }
 };
