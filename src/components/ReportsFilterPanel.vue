@@ -2,8 +2,8 @@
   <div class="filter-panel">
     <div class="col">
       <div class="joined-container">
-        <label for="joined-after" class="col"
-          >Joined after
+        <label for="joined-after" class="col">
+          Joined after
           <input
             id="joined-after"
             type="date"
@@ -12,8 +12,8 @@
           />
         </label>
 
-        <label for="joined-before" class="col"
-          >Joined before
+        <label for="joined-before" class="col">
+          Joined before
           <input
             id="joined-before"
             type="date"
@@ -26,8 +26,8 @@
 
     <div class="col">
       <div class="session-range-container">
-        <label for="session-range-from" class="col"
-          >Session from
+        <label for="session-range-from" class="col">
+          Session from
           <input
             id="session-range-from"
             type="date"
@@ -36,8 +36,8 @@
           />
         </label>
 
-        <label for="session-range-to" class="col"
-          >Session to
+        <label for="session-range-to" class="col">
+          Session to
           <input
             id="session-range-to"
             type="date"
@@ -50,24 +50,22 @@
 
     <div class="col">
       <div>
-        <label for="student-partner-org" class="col"
-          >Student partner org
+        <label for="student-partner-org" class="col">
+          Student partner org
           <v-select
             id="student-partner-org"
             class="student-partner-org"
-            :options="studentPartnerOrgs"
+            :options="partnerOrgs"
+            :value="studentPartnerOrg"
             :searchable="true"
             @input="setStudentPartnerOrg"
           />
         </label>
 
         <div class="high-school">
-          <label for="high-school" class="col"
-            >High school
-            <school-list
-              :setHighSchool="setHighSchool"
-              placeholder="Search for a school"
-            />
+          <label for="high-school" class="col">
+            High school
+            <school-list :setHighSchool="setHighSchool" placeholder="Search for a school" />
           </label>
         </div>
       </div>
@@ -130,7 +128,7 @@ export default {
     }
   },
   computed: {
-    studentPartnerOrgs() {
+    partnerOrgs() {
       return [];
     }
   }

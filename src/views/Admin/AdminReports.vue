@@ -50,7 +50,7 @@ export default {
         joinedAfter: this.joinedAfter,
         sessionRangeFrom: this.sessionRangeFrom,
         sessionRangeTo: this.sessionRangeTo,
-        highSchoolId: this.highSchool._id,
+        highSchoolId: this.highSchool._id ? this.highSchool._id : "",
         studentPartnerOrg: this.studentPartnerOrg
       };
 
@@ -71,7 +71,7 @@ export default {
         joinedAfter: this.joinedAfter,
         sessionRangeFrom: this.sessionRangeFrom,
         sessionRangeTo: this.sessionRangeTo,
-        highSchoolId: this.highSchool._id,
+        highSchoolId: this.highSchool._id ? this.highSchool._id : "",
         studentPartnerOrg: this.studentPartnerOrg
       };
 
@@ -152,10 +152,7 @@ export default {
       this.highSchool = highSchool;
     },
 
-    setStudentPartnerOrg(event) {
-      const {
-        target: { value }
-      } = event;
+    setStudentPartnerOrg(value) {
       this.studentPartnerOrg = value;
     },
 
