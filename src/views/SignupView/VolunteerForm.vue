@@ -192,8 +192,6 @@
     <button class="uc-form-button" type="submit">
       Sign Up
     </button>
-
-    <!-- <div v-if="msg !== ''">{{ msg }}</div> -->
   </form>
 
   <div v-else-if="step == 'success-message'" class="uc-form-body">
@@ -231,6 +229,9 @@ export default {
       phoneInputInfo: {}
     };
   },
+  mounted() {
+    this.$router.push("/sign-up/volunteer/account");
+  },
   methods: {
     nextPage() {
       // validate input
@@ -262,6 +263,7 @@ export default {
       })
         .then(() => {
           this.step = "step-2";
+          this.$router.push("/sign-up/volunteer/about");
         })
         .catch(err => {
           this.msg = err.message;

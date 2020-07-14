@@ -1,6 +1,6 @@
 <template>
-  <div class="zwib-wrapper">
-    <div id="zwib-div" :style="mouseCursor"></div>
+  <div class="zwib-wrapper" :class="toolClass">
+    <div id="zwib-div"></div>
     <div id="toolbar" class="toolbar">
       <div
         class="toolbar-item toolbar-item--drag"
@@ -21,7 +21,7 @@
       <div
         class="toolbar-item toolbar-item--brush"
         title="Brush tool"
-        v-bind:class="selectedTool === 'pen' ? 'selected-tool' : ''"
+        v-bind:class="selectedTool === 'brush' ? 'selected-tool' : ''"
         @click="useBrushTool"
       >
         <PenIcon class="toolbar-item__svg" />
@@ -111,10 +111,6 @@ export default {
     PanIcon
   },
   props: {
-    shouldCreateSession: {
-      type: Boolean,
-      default: true
-    },
     isVisible: {
       type: Boolean,
       required: true
@@ -123,7 +119,7 @@ export default {
   data() {
     return {
       zwibblerCtx: null,
-      selectedTool: "pen",
+      selectedTool: "",
       showColorPicker: false,
       isMouseDown: false
     };
@@ -135,19 +131,21 @@ export default {
     ...mapGetters({
       mobileMode: "app/mobileMode"
     }),
-    mouseCursor() {
-      if (this.selectedTool === "pen") return { cursor: "crosshair" };
-      if (this.selectedTool === "pick") return { cursor: "default" };
-      if (this.selectedTool === "pan") return { cursor: "grab" };
-      return { cursor: "default" };
+    toolClass() {
+      if (this.selectedTool === "brush") return "zwib-wrapper--brush";
+      if (this.selectedTool === "pick") return "zwib-wrapper--pick";
+      if (this.selectedTool === "pan") return "zwib-wrapper--pan";
+      return "zwib-wrapper--default";
     }
   },
   mounted() {
     const zwibblerCtx = window.Zwibbler.create("zwib-div", {
       showToolbar: false,
       showColourPanel: false,
+      autoPickTool: false,
       autoPickToolText: false,
       defaultBrushWidth: 5,
+      defaultSmoothness: "sharpest",
       scrollbars: this.mobileMode ? false : true,
       collaborationServer: `${
         process.env.VUE_APP_WEBSOCKET_ROOT
@@ -156,17 +154,21 @@ export default {
 
     this.zwibblerCtx = zwibblerCtx;
 
-    if (this.shouldCreateSession) {
-      this.zwibblerCtx.createSharedSession(this.session._id);
-    } else {
-      this.zwibblerCtx.joinSharedSession(this.session._id);
-    }
+    // Join or create shared zwibbler session
+    this.zwibblerCtx.joinSharedSession(this.session._id, true);
 
     // Set up custom selection handles
     this.setSelectionHandles();
 
-    // Set brush tool to default tool
-    this.useBrushTool();
+    this.zwibblerCtx.on("connected", () => {
+      // Set brush tool to default tool
+      this.useBrushTool();
+
+      // Don't start setting selected tool until connected
+      this.zwibblerCtx.on("tool-changed", toolname => {
+        this.selectedTool = toolname;
+      });
+    });
 
     this.zwibblerCtx.on("document-changed", info => {
       const isRemoteChange = info && info.remote;
@@ -194,22 +196,20 @@ export default {
     });
   },
   methods: {
-    usePickTool() {
-      this.zwibblerCtx.usePickTool();
-      this.selectedTool = "pick";
+    usePanTool() {
+      this.zwibblerCtx.usePanTool();
       this.showColorPicker = false;
     },
-    clearWhiteboard() {
-      this.zwibblerCtx.deleteNodes(this.zwibblerCtx.getAllNodes());
+    usePickTool() {
+      this.zwibblerCtx.usePickTool();
+      this.showColorPicker = false;
+    },
+    useBrushTool() {
+      this.zwibblerCtx.useBrushTool();
       this.showColorPicker = false;
     },
     toggleColorPicker() {
       this.showColorPicker = !this.showColorPicker;
-    },
-    useBrushTool() {
-      this.zwibblerCtx.useBrushTool();
-      this.selectedTool = "pen";
-      this.showColorPicker = false;
     },
     undo() {
       this.zwibblerCtx.undo();
@@ -219,9 +219,8 @@ export default {
       this.zwibblerCtx.redo();
       this.showColorPicker = false;
     },
-    usePanTool() {
-      this.zwibblerCtx.usePanTool();
-      this.selectedTool = "pan";
+    clearWhiteboard() {
+      this.zwibblerCtx.deleteNodes(this.zwibblerCtx.getAllNodes());
       this.showColorPicker = false;
     },
     setColor(color) {
@@ -278,11 +277,43 @@ export default {
   height: 100%;
   width: 100%;
   position: relative;
+
+  &--brush {
+    .zwibbler-canvas-holder {
+      cursor: crosshair !important;
+    }
+  }
+
+  &--pick {
+    .zwibbler-canvas-holder {
+      cursor: default !important;
+    }
+  }
+
+  &--pan {
+    .zwibbler-canvas-holder {
+      cursor: grab !important;
+    }
+  }
+
+  &--default {
+    .zwibbler-canvas-holder {
+      cursor: default !important;
+    }
+  }
 }
 
 #zwib-div {
   height: 100%;
   width: 100%;
+}
+
+.zwibbler-canvas-holder,
+.zwib-wrapper,
+#zwib-div {
+  &:focus {
+    outline: none;
+  }
 }
 
 .zwibbler-scrollbar {

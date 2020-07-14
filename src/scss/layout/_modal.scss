@@ -70,7 +70,7 @@ $header-height: 80px;
   height: calc(100% - #{$header-height});
   overflow: auto;
 
-  padding: 40px 20px 0 20px;
+  padding: 40px 20px 75px 20px;
 
   // Hack. Bottom padding does not get properly applied when the <slot> content
   // causes overflow. We get around it by applying this class to a final empty
