@@ -4,7 +4,6 @@
     <div class="background-info__wrapper">
       <div v-if="hasCompletedBackgroundInfo">
         <p class="background-info__completed-message">
-          <!-- @todo: copy -->
           Thank you for submitting your background information. Our students,
           and school partners, are interested in learning more about the
           volunteers at UPchieve!
@@ -98,34 +97,139 @@
 
           <li class="uc-form-col">
             <p>
-              How much prior tutoring and/or college counseling experience do
-              you have?<span class="background-info__question-required">*</span>
+              Where do you currently live?<span
+                class="background-info__question-required"
+                >*</span
+              >
+            </p>
+
+            <label class="uc-form-label location-label">Country</label>
+            <v-select
+              class="location-input"
+              v-model="country"
+              :options="countries"
+              :searchable="true"
+            />
+            <template v-if="country === 'United States of America'">
+              <label class="uc-form-label location-label">State</label>
+              <v-select
+                class="location-input"
+                id="state"
+                v-model="state"
+                :options="states"
+                :searchable="true"
+              />
+            </template>
+            <template v-if="country">
+              <label class="uc-form-label location-label" for="city"
+                >City</label
+              >
+              <input
+                type="text"
+                v-model="city"
+                placeholder="Enter a city..."
+                class="uc-form-input location-input"
+                id="city"
+              />
+            </template>
+            <p v-if="showInputErrors && !experience" class="error">
+              Please fill out these fields.
+            </p>
+          </li>
+
+          <li class="uc-form-col">
+            <p>
+              How much prior experience do you have with the following
+              activities?<span class="background-info__question-required"
+                >*</span
+              >
             </p>
             <p v-if="showInputErrors && !experience" class="error">
               Please fill out this field.
             </p>
 
-            <div
-              v-for="option in options.experience"
-              :key="option"
-              class="uc-form-radio"
-            >
-              <input
-                type="radio"
-                name="experience"
-                :value="option"
-                v-model="experience"
-                :id="option"
-              />
-              <label class="uc-form-label" :for="option">
-                {{ option }}
-              </label>
-            </div>
+            <table class="questions-table">
+              <tr class="question-row">
+                <div class="position-wrapper">
+                  <div class="question-scroll-container">
+                    <tr class="radio-question-row">
+                      <td class="mobile-remove"></td>
+                      <td
+                        class="radio-question-selection-title"
+                        v-for="title in experienceRadioQuestion.columnTitle"
+                        v-bind:key="title"
+                      >
+                        {{ title }}
+                      </td>
+                    </tr>
+                    <tr
+                      class="radio-question-row"
+                      v-for="(subquestion,
+                      subquestionIndex) in experienceRadioQuestion.options"
+                      :key="subquestion"
+                    >
+                      <td class="radio-question-cell">{{ subquestion }}</td>
+                      <td
+                        class="radio-question-selection-cell"
+                        v-for="index in experienceRadioQuestion.columnTitle
+                          .length"
+                        :key="index"
+                      >
+                        <input
+                          class="uc-form-input"
+                          v-model="
+                            experience[
+                              experienceRadioQuestion.optionsAlias[
+                                subquestionIndex
+                              ]
+                            ]
+                          "
+                          type="radio"
+                          :value="index"
+                        />
+                      </td>
+                    </tr>
+                    <div class="mobile-pinned-questions-container">
+                      <tr class="radio-question-row">
+                        <td class="mobile-remove mobile-remove--shadow"></td>
+                        <td
+                          class="radio-question-selection-title radio-question-selection-title--hidden"
+                          v-for="title in experienceRadioQuestion.columnTitle"
+                          v-bind:key="title"
+                        >
+                          {{ title }}
+                        </td>
+                      </tr>
+                      <tr
+                        class="radio-question-row"
+                        v-for="subquestion in experienceRadioQuestion.options"
+                        v-bind:key="subquestion"
+                      >
+                        <td
+                          class="radio-question-cell radio-question-cell--shadow"
+                        >
+                          {{ subquestion }}
+                        </td>
+                        <td
+                          class="radio-question-selection-cell--hidden"
+                          v-for="index in experienceRadioQuestion.columnTitle
+                            .length"
+                          v-bind:key="index"
+                        >
+                          <input class="uc-form-input" type="radio" />
+                        </td>
+                      </tr>
+                    </div>
+                  </div>
+                </div>
+              </tr>
+            </table>
           </li>
 
           <li class="uc-form-col">
             <p>
-              Are you proficient in another language?
+              Are there any other languages (besides English) that you would
+              feel comfortable tutoring a student in?
             </p>
             <p class="background-info__question-description">
               Select all that apply. (optional)
@@ -176,6 +280,7 @@
 <script>
 import { mapState } from "vuex";
 import NetworkService from "@/services/NetworkService";
+import { COUNTRIES, STATES } from "@/consts";
 
 export default {
   name: "background-info-view",
@@ -193,21 +298,13 @@ export default {
           "Retired"
         ],
         background: [
-          "From a low-income background",
-          "Raised by a single parent",
-          "First-generation college student",
-          "First or second generation immigrant",
-          "Belong to a racial/ethnic minority group",
-          "Went to a Title 1/low-income high school",
-          "Were you eligible for free or reduced-priced lunch"
-        ],
-        experience: [
-          "No prior experience",
-          "Less than 6 months",
-          "6-12 months",
-          "1-2 years",
-          "3-5 years",
-          "5+ years"
+          "I went to a public high school.",
+          "I was eligible for free or reduced price lunch at school..",
+          "My parent(s) never attended college.",
+          "I was raised by a single parent.",
+          "English was not my first language.",
+          "I am a first or second generation immigrant.",
+          "None of the above."
         ],
         languages: [
           "Spanish",
@@ -224,15 +321,32 @@ export default {
       },
       showInputErrors: false,
       formError: "",
-      invalidInputs: [],
       occupation: [],
       linkedInUrl: "",
-      experience: "",
+      experience: {
+        tutoring: "",
+        collegeCounseling: "",
+        mentoring: ""
+      },
       background: [],
       languages: [],
       showAddLanguages: false,
       addedLanguages: "",
-      wasSubmitted: false
+      wasSubmitted: false,
+      country: "",
+      state: "",
+      city: "",
+      experienceRadioQuestion: {
+        columnTitle: [
+          "No prior experience",
+          "0-1 years",
+          "1-2 years",
+          "2-5 years",
+          "5+ years"
+        ],
+        options: ["Tutoring", "College Counseling", "Mentoring"],
+        optionsAlias: ["tutoring", "collegeCounseling", "mentoring"]
+      }
     };
   },
   computed: {
@@ -245,8 +359,17 @@ export default {
         this.user.background.length > 0 &&
         this.user.occupation &&
         this.user.occupation.length > 0 &&
-        this.user.experience
+        this.user.country
       );
+    },
+    countries() {
+      return COUNTRIES;
+    },
+    states() {
+      return STATES;
+    },
+    isUnitedStatesSelected() {
+      return this.country === "United States of America";
     }
   },
   methods: {
@@ -264,12 +387,23 @@ export default {
       }
       this.wasSubmitted = true;
 
+      const { tutoring, collegeCounseling, mentoring } = this.experience;
+      const { columnTitle } = this.experienceRadioQuestion;
+      const experience = {
+        tutoring: columnTitle[tutoring - 1],
+        collegeCounseling: columnTitle[collegeCounseling - 1],
+        mentoring: columnTitle[mentoring - 1]
+      };
+
       const data = {
         occupation: this.occupation,
-        experience: this.experience,
+        experience,
         background: this.background,
         languages: this.languages,
-        linkedInUrl: this.linkedInUrl
+        linkedInUrl: this.linkedInUrl,
+        country: this.country,
+        state: this.isUnitedStatesSelected ? this.state : "",
+        city: this.city
       };
 
       if (this.languages.length > 0) {
@@ -281,10 +415,12 @@ export default {
       try {
         await NetworkService.addBackgroundInfo(data);
         this.wasSubmitted = false;
-        // the mandatory fields to have completed background information
+
+        // mandatory fields: occupation, experience, country / state / city, background
+        // update is a subset of mandatory fields
         const update = {
           occupation: data.occupation,
-          experience: data.experience,
+          country: data.country,
           background: data.background
         };
 
@@ -298,10 +434,17 @@ export default {
       this.showAddLanguages = !this.showAddLanguages;
     },
     invalidForm() {
+      const { tutoring, collegeCounseling, mentoring } = this.experience;
+
       return (
         this.background.length === 0 ||
         this.occupation.length === 0 ||
-        !this.experience
+        !tutoring ||
+        !collegeCounseling ||
+        !mentoring ||
+        !this.country ||
+        !this.city ||
+        (this.isUnitedStatesSelected && !this.state)
       );
     }
   }
@@ -350,7 +493,6 @@ textarea {
 
   &__wrapper {
     max-width: 100%;
-    margin: 15px;
     background-color: #fff;
     border-radius: 8px;
 
@@ -361,7 +503,7 @@ textarea {
     }
 
     @include breakpoint-above("large") {
-      max-width: 70%;
+      max-width: 800px;
     }
   }
 
@@ -401,11 +543,18 @@ textarea {
   }
 
   &__question-required {
-    color: $c-information-blue;
+    color: $c-error-red;
   }
 }
 
-.linkedin-input {
+.location-label {
+  display: block;
+  margin-top: 1.4em;
+  margin-bottom: 0.5em;
+}
+
+.linkedin-input,
+.location-input {
   width: 90%;
 
   @include breakpoint-above("medium") {
@@ -423,5 +572,120 @@ textarea {
 
 .form-error {
   margin-bottom: 2em;
+}
+
+.question-row {
+  overflow: hidden;
+  width: 100%;
+  display: inline-block;
+  margin-bottom: 4em;
+
+  @include breakpoint-above("medium") {
+    width: 100%;
+  }
+}
+
+.question-scroll-container {
+  overflow-x: auto;
+}
+
+.position-wrapper {
+  position: relative;
+}
+
+.mobile-pinned-questions-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.questions-container {
+  padding: 1em;
+  width: 100%;
+  width: 100vw;
+
+  @include breakpoint-above("medium") {
+    width: 100%;
+    padding: 4em;
+  }
+}
+
+.questions-table {
+  width: 100%;
+  font-size: 13px;
+  display: inline-block;
+
+  @include breakpoint-above("large") {
+    display: table;
+    font-size: 15px;
+  }
+}
+
+.radio-question-row:nth-child(even) {
+  background: #f1f8fc;
+}
+
+.radio-question-row:nth-child(odd) {
+  background: #e5f2fc;
+}
+
+.radio-question-row:nth-child(1) {
+  background: white;
+}
+
+.radio-question-cell {
+  width: 175px;
+  padding: 1.4em 1.2em 1.6em 1em;
+
+  &--shadow {
+    box-shadow: 5px 0 5px -1px #e0e0e0;
+
+    @media screen and (min-width: 620px) and (max-width: 770px) {
+      box-shadow: none;
+    }
+
+    @include breakpoint-above("medium") {
+      box-shadow: 5px 0 5px -1px #e0e0e0;
+    }
+
+    @include breakpoint-above("large") {
+      box-shadow: none;
+    }
+  }
+}
+
+.radio-question-selection-title {
+  display: table-cell;
+  padding-left: 14px;
+  padding-right: 14px;
+  text-align: center;
+  vertical-align: middle;
+  padding-top: 8px;
+  padding-bottom: 15px;
+
+  &--hidden {
+    visibility: hidden;
+  }
+}
+
+.radio-question-selection-cell {
+  text-align: center;
+  vertical-align: middle;
+
+  &--hidden {
+    display: none;
+  }
+}
+
+.mobile-remove {
+  &--shadow {
+    box-shadow: 5px 0 5px -1px #ffffff;
+
+    @include breakpoint-above("medium") {
+      box-shadow: none;
+    }
+  }
 }
 </style>
