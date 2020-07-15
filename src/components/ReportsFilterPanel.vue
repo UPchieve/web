@@ -65,7 +65,10 @@
         <div class="high-school">
           <label for="high-school" class="col">
             High school
-            <school-list :setHighSchool="setHighSchool" placeholder="Search for a school" />
+            <school-list
+              :setHighSchool="setHighSchool"
+              placeholder="Search for a school"
+            />
           </label>
         </div>
       </div>

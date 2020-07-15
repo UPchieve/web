@@ -153,7 +153,7 @@ export default {
     },
 
     setStudentPartnerOrg(value) {
-      this.studentPartnerOrg = value;
+      this.studentPartnerOrg = value || "";
     },
 
     setJoinedBefore(event) {
