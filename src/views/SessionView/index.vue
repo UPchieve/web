@@ -299,12 +299,16 @@ export default {
     top: 20px;
     left: unset;
     right: 20px;
-    width: 400px;
+    width: 300px;
     height: 70px;
     background: #fff;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     overflow: hidden;
+  }
+
+  @include breakpoint-above("large") {
+    width: 400px;
   }
 }
 
@@ -362,6 +366,10 @@ export default {
   }
 
   @include breakpoint-above("medium") {
+    min-width: 300px;
+  }
+
+  @include breakpoint-above("large") {
     min-width: 400px;
     flex-basis: 400px;
     position: relative;
