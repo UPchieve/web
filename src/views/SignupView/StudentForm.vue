@@ -192,7 +192,7 @@
       </ul>
     </div>
 
-    <div class="step-title">Step 2 of 3: Choose your log-in details</div>
+    <div class="step-title">Choose your log-in details</div>
 
     <div class="uc-column">
       <label for="inputEmail" class="uc-form-label">What's your email?</label>
@@ -271,7 +271,7 @@
       </ul>
     </div>
 
-    <div class="step-title">Step 3 of 3: Tell us about yourself!</div>
+    <div class="step-title">Tell us about yourself!</div>
 
     <div class="uc-column">
       <label for="firstName" class="uc-form-label">First Name</label>
@@ -489,7 +489,7 @@ export default {
         this.invalidInputs.push("inputEmail");
       } else if (!validator.isEmail(this.credentials.email)) {
         // this is necessary because browsers ignore <input type="email"> until the
-        // user actually tries to submit the form, which does not occur until step 3
+        // user actually tries to submit the form
         this.errors.push(
           this.credentials.email + " is not a valid email address."
         );
