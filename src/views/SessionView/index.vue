@@ -367,12 +367,13 @@ export default {
 
   @include breakpoint-above("medium") {
     min-width: 300px;
+    flex-basis: 300px;
+    position: relative;
   }
 
   @include breakpoint-above("large") {
     min-width: 400px;
     flex-basis: 400px;
-    position: relative;
   }
 
   @include breakpoint-below("medium") {
