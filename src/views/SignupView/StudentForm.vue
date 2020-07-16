@@ -1,6 +1,25 @@
 <template>
+  <div v-if="step === 'welcome'" class="uc-form-body uc-form-body--center">
+    <div class="welcome-icon-wrapper">
+      <img src="@/assets/onboarding_icons/quiz-icon.png" class="welcome-icon" />
+    </div>
+    <h3>Great! Let's get started</h3>
+    <p>
+      As a first step, we'd like you to complete a brief questionnaire to make
+      sure you're eligible for our services.
+    </p>
+    <p>
+      <strong>Don't worry if you don't pass the next step!</strong>
+      You may still be eligible but we'll need to collect additional info from
+      you and your parents.
+    </p>
+    <button class="uc-form-button-big" @click="eligibilityPage">
+      Continue
+    </button>
+  </div>
+
   <form
-    v-if="step === 'partner-signup-code'"
+    v-else-if="step === 'partner-signup-code'"
     class="uc-form-body"
     @submit.prevent="submitPartnerSignupCode()"
   >
@@ -21,7 +40,7 @@
         </button>
       </div>
       <div class="uc-column">
-        <button class="uc-form-button" @click="firstPage">
+        <button class="uc-form-button" @click="welcomePage">
           No
         </button>
       </div>
@@ -51,9 +70,9 @@
   </form>
 
   <form
-    v-else-if="step === 'step-1'"
-    class="uc-form-body"
-    @submit.prevent="secondPage()"
+    v-else-if="step === 'eligibility'"
+    class="uc-form-body uc-form-body--center"
+    @submit.prevent="submitEligibility()"
   >
     <div v-if="errors.length" class="step-errors">
       <h5>Please correct the following problems:</h5>
@@ -62,7 +81,7 @@
       </ul>
     </div>
 
-    <div class="step-title">Step 1 of 3: Check your eligibility</div>
+    <h3>Check your eligibility</h3>
 
     <div class="uc-column">
       <label for="inputHighschool" class="uc-form-label"
@@ -112,68 +131,57 @@
       />
     </div>
 
-    <button class="uc-form-button" type="submit">
-      Continue
-    </button>
-
-    <div v-if="msg !== ''">{{ msg }}</div>
-  </form>
-
-  <form
-    v-else-if="step === 'step-1-waitlist'"
-    class="uc-form-body"
-    @submit.prevent="submitWaitlist()"
-  >
-    <div v-if="errors.length" class="step-errors">
-      <h5>Please correct the following problems:</h5>
-      <ul>
-        <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
-      </ul>
-    </div>
-
-    <div class="step-title">
-      Sorry! You're not currently eligible for UPchieve.
-    </div>
-
     <div class="uc-column">
-      <label for="inputWaitlistEmail" class="uc-form-label"
-        >If you want to be notified when we launch at your school, enter your
-        email below.</label
+      <label for="inputEligibilityEmail" class="uc-form-label"
+        >What's your email?</label
       >
-
       <input
-        id="inputWaitlistEmail"
+        id="inputEligibilityEmail"
         type="email"
         class="uc-form-input"
         v-bind:class="{
           'uc-form-input--invalid':
-            invalidInputs.indexOf('inputWaitlistEmail') > -1
+            invalidInputs.indexOf('inputEligibilityEmail') > -1
         }"
-        v-model="waitlist.email"
-        autofocus
+        v-model="eligibility.email"
+        required
+        placeholder="Email"
+        aria-label="Email"
       />
-
       <p class="uc-form-subtext">
-        We will only use your email to contact you about your eligibility for
-        UPchieve. See our Privacy Policy for more info.
+        We will only use this email to notify you if your eligibility status
+        changes in the future. We will never sell or share your data.
       </p>
     </div>
 
-    <button class="uc-form-button" type="submit">
-      Submit
+    <button class="uc-form-button-big" type="submit">
+      Check my eligibility
     </button>
 
     <div v-if="msg !== ''">{{ msg }}</div>
   </form>
 
-  <form v-else-if="step === 'step-1-waitlist-success'" class="uc-form-body">
-    <div class="step-title">
-      Thank you! You'll be the first to know when we expand to your school.
+  <div v-else-if="step === 'ineligible'" class="uc-form-body">
+    <div class="ineligible-icon-wrapper">
+      <error-badge />
     </div>
-  </form>
+    <h3>Sorry, we can't verify your eligibility yet.</h3>
+
+    <p class="small-paragraph">
+      Unfortunately, we aren’t able to verify your eligibility based on the
+      information you’ve entered so far. We will reach out to you via email if
+      there are any changes!
+    </p>
+
+    <p class="small-paragraph">Continue to see other ways you can register</p>
+
+    <button class="uc-form-button-big" @click="ineligibleContinue">
+      Continue
+    </button>
+  </div>
 
   <form
-    v-else-if="step === 'step-2'"
+    v-else-if="step === 'account'"
     class="uc-form-body"
     @submit.prevent="thirdPage()"
   >
@@ -235,7 +243,7 @@
   </form>
 
   <form
-    v-else-if="step === 'step-3'"
+    v-else-if="step === 'about'"
     class="uc-form-body"
     @submit.prevent="checkInputs()"
   >
@@ -324,13 +332,14 @@ import { mapState } from "vuex";
 import validator from "validator";
 import Autocomplete from "@trevoreyre/autocomplete-vue";
 import * as Sentry from "@sentry/browser";
-
 import AuthService from "@/services/AuthService";
 import NetworkService from "@/services/NetworkService";
+import ErrorBadge from "@/assets/error_badge.svg";
 
 export default {
   components: {
-    Autocomplete
+    Autocomplete,
+    ErrorBadge
   },
   data() {
     return {
@@ -344,9 +353,6 @@ export default {
         highSchool: {},
         zipCode: ""
       },
-      waitlist: {
-        email: ""
-      },
       credentials: {
         email: "",
         password: "",
@@ -356,14 +362,14 @@ export default {
         firstName: "",
         lastName: ""
       },
-      step: "partner-signup-code"
+      step: ""
     };
   },
   mounted() {
     if (this.isMobileApp) {
-      this.$router.push("/sign-up/student/partner-code");
+      this.partnerCodePage();
     } else {
-      this.firstPage();
+      this.welcomePage();
     }
   },
   computed: {
@@ -372,8 +378,18 @@ export default {
     })
   },
   methods: {
-    firstPage() {
-      this.step = "step-1";
+    partnerCodePage() {
+      this.step = "partner-signup-code";
+      this.$router.push("/sign-up/student/partner-code");
+    },
+
+    welcomePage() {
+      this.step = "welcome";
+      this.$router.push("/sign-up/student/welcome");
+    },
+
+    eligibilityPage() {
+      this.step = "eligibility";
       this.$router.push("/sign-up/student/eligibility");
     },
 
@@ -404,7 +420,7 @@ export default {
         });
     },
 
-    secondPage() {
+    submitEligibility() {
       // reset error msg from server
       this.msg = "";
 
@@ -423,6 +439,17 @@ export default {
         this.errors.push("You must enter a valid zip code");
         this.invalidInputs.push("inputZipCode");
       }
+
+      if (!this.eligibility.email) {
+        this.errors.push("An email address is required.");
+        this.invalidInputs.push("inputEligibilityEmail");
+      } else if (!validator.isEmail(this.eligibility.email)) {
+        this.errors.push(
+          this.eligibility.email + " is not a valid email address."
+        );
+        this.invalidInputs.push("inputEligibilityEmail");
+      }
+
       if (this.errors.length) {
         return;
       }
@@ -430,17 +457,20 @@ export default {
       NetworkService.checkStudentEligibility(this, {
         schoolUpchieveId: this.eligibility.highSchool.upchieveId,
         zipCode: this.eligibility.zipCode,
+        email: this.eligibility.email,
         referredByCode: window.localStorage.getItem("upcReferredByCode")
       })
         .then(response => {
           const isEligible = response.body.isEligible;
 
           if (isEligible) {
-            this.step = "step-2";
+            this.step = "account";
             this.$router.push("/sign-up/student/account");
+            // autofill the user's email
+            this.credentials.email = this.eligibility.email;
           } else {
-            this.step = "step-1-waitlist";
-            this.$router.push("/sign-up/student/waitlist");
+            this.step = "ineligible";
+            this.$router.push("/sign-up/student/ineligible");
           }
         })
         .catch(err => {
@@ -478,7 +508,7 @@ export default {
         password: this.credentials.password
       })
         .then(() => {
-          this.step = "step-3";
+          this.step = "about";
           this.$router.push("/sign-up/student/about");
         })
         .catch(err => {
@@ -488,36 +518,8 @@ export default {
           }
         });
     },
-    submitWaitlist() {
-      // reset error msg from server
-      this.msg = "";
-
-      // validate input
-      this.errors = [];
-      this.invalidInputs = [];
-
-      if (!this.waitlist.email) {
-        this.errors.push("An email address is required.");
-      } else if (!validator.isEmail(this.waitlist.email)) {
-        this.errors.push(
-          this.waitlist.email + " is not a valid email address."
-        );
-      }
-      if (this.errors.length) {
-        return;
-      }
-
-      NetworkService.joinSchoolApprovalWaitlist(this, {
-        email: this.waitlist.email,
-        schoolUpchieveId: this.eligibility.highSchool.upchieveId
-      })
-        .then(() => {
-          this.step = "step-1-waitlist-success";
-          this.$router.push("/sign-up/student/waitlist-success");
-        })
-        .catch(err => {
-          this.msg = err.message;
-        });
+    ineligibleContinue() {
+      alert("todo");
     },
     autocompleteSchool(input) {
       this.eligibility.highSchool = {};
@@ -615,6 +617,24 @@ export default {
     content: "←";
     padding-right: 5px;
   }
+}
+
+.welcome-icon-wrapper {
+  background: $c-sat;
+  padding: 20px;
+  border-radius: 35px;
+
+  img {
+    height: 30px;
+    width: 30px;
+    margin-left: 4px;
+    margin-right: -4px;
+  }
+}
+
+p.small-paragraph {
+  color: $c-secondary-grey;
+  font-size: 14px;
 }
 
 .enter-signup-code-button {

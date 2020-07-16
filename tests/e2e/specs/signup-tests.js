@@ -75,7 +75,7 @@ describe("Student and volunteer signup", () => {
       });
     });
 
-    it("Should add student to waitlist", function() {
+    it("Should not let ineligible student sign up", function() {
       cy.visit("/sign-up");
 
       cy.location("pathname").should("eq", "/sign-up");
@@ -92,15 +92,13 @@ describe("Student and volunteer signup", () => {
 
       cy.get("#inputZipCode").type("10001");
 
-      cy.get("button[type=submit]").click();
-
-      cy.get("#inputWaitlistEmail")
+      cy.get("#inputEligibilityEmail")
         .type(this.newStudent.email)
         .should("have.value", this.newStudent.email);
 
       cy.get("button[type=submit]").click();
 
-      cy.get(".step-title").should("contain", "Thank you!");
+      cy.get("h3").should("contain", "Sorry");
     });
   });
 
