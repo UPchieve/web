@@ -216,6 +216,11 @@ export default {
       .post(`${API_ROOT}/session/${sessionId}/report`, { reportMessage })
       .then(this._successHandler, this._errorHandler);
   },
+  getSessionPhotoUploadUrl(sessionId) {
+    return Vue.http
+      .get(`${API_ROOT}/session/${sessionId}/photo-url`)
+      .then(this._successHandler, this._errorHandler);
+  },
   adminGetSessions({
     page,
     showBannedUsers,
