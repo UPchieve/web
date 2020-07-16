@@ -78,6 +78,14 @@
         <RedoIcon class="toolbar-item__svg" />
       </div>
       <div
+        v-if="!isVolunteer"
+        class="toolbar-item toolbar-item--photo"
+        title="Redo"
+        @click="uploadPhoto"
+      >
+        <PhotoUploadIcon class="toolbar-item__svg" />
+      </div>
+      <div
         class="toolbar-item toolbar-item--clear"
         title="Clear whiteboard"
         @click="clearWhiteboard"
@@ -99,6 +107,7 @@ import RedoIcon from "@/assets/whiteboard_icons/redo.svg";
 import PanIcon from "@/assets/whiteboard_icons/grab.svg";
 import DeleteSelectionIcon from "@/assets/whiteboard_icons/delete_selection.png";
 import RotateIcon from "@/assets/whiteboard_icons/rotate.png";
+import PhotoUploadIcon from "@/assets/whiteboard_icons/photo-upload.svg";
 
 export default {
   components: {
@@ -108,7 +117,8 @@ export default {
     PenIcon,
     UndoIcon,
     RedoIcon,
-    PanIcon
+    PanIcon,
+    PhotoUploadIcon
   },
   props: {
     isVisible: {
@@ -129,7 +139,8 @@ export default {
       session: state => state.user.session
     }),
     ...mapGetters({
-      mobileMode: "app/mobileMode"
+      mobileMode: "app/mobileMode",
+      isVolunteer: "user/isVolunteer"
     }),
     toolClass() {
       if (this.selectedTool === "brush") return "zwib-wrapper--brush";
@@ -218,6 +229,9 @@ export default {
     redo() {
       this.zwibblerCtx.redo();
       this.showColorPicker = false;
+    },
+    uploadPhoto() {
+      this.zwibblerCtx.insertImage();
     },
     clearWhiteboard() {
       this.zwibblerCtx.deleteNodes(this.zwibblerCtx.getAllNodes());
