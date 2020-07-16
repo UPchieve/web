@@ -2,6 +2,7 @@
   <div class="zwib-wrapper" :class="toolClass">
     <div id="zwib-div"></div>
     <div id="toolbar" class="toolbar">
+      <p v-if="error" class="error">{{ error }}</p>
       <div
         class="toolbar-item toolbar-item--drag"
         title="Drag tool"
@@ -80,10 +81,16 @@
       <div
         v-if="!isVolunteer"
         class="toolbar-item toolbar-item--photo"
-        title="Redo"
-        @click="uploadPhoto"
+        title="Upload photo"
+        @click="openFileDialog"
       >
-        <PhotoUploadIcon class="toolbar-item__svg" />
+        <input
+          type="file"
+          class="upload-photo"
+          accept="image/png, image/jpeg"
+          @change="uploadPhoto"
+        />
+        <PhotoUploadIcon class="toolbar-item__svg--photo" />
       </div>
       <div
         class="toolbar-item toolbar-item--clear"
@@ -108,6 +115,8 @@ import PanIcon from "@/assets/whiteboard_icons/grab.svg";
 import DeleteSelectionIcon from "@/assets/whiteboard_icons/delete_selection.png";
 import RotateIcon from "@/assets/whiteboard_icons/rotate.png";
 import PhotoUploadIcon from "@/assets/whiteboard_icons/photo-upload.svg";
+import NetworkService from "@/services/NetworkService";
+import axios from "axios";
 
 export default {
   components: {
@@ -131,7 +140,8 @@ export default {
       zwibblerCtx: null,
       selectedTool: "",
       showColorPicker: false,
-      isMouseDown: false
+      isMouseDown: false,
+      error: ""
     };
   },
   computed: {
@@ -147,6 +157,13 @@ export default {
       if (this.selectedTool === "pick") return "zwib-wrapper--pick";
       if (this.selectedTool === "pan") return "zwib-wrapper--pan";
       return "zwib-wrapper--default";
+    }
+  },
+  updated() {
+    if (this.error) {
+      setTimeout(() => {
+        this.error = "";
+      }, 2000);
     }
   },
   mounted() {
@@ -230,8 +247,41 @@ export default {
       this.zwibblerCtx.redo();
       this.showColorPicker = false;
     },
-    uploadPhoto() {
-      this.zwibblerCtx.insertImage();
+    async uploadPhoto(event) {
+      const { files } = event.target;
+      const file = files[0];
+      const tenMegaBytes = 10 * 1000000;
+      if (file.size > tenMegaBytes) {
+        this.error =
+          "The photo is too large. Please upload a photo less than 10mb.";
+        return;
+      }
+      this.insertPhoto(file);
+
+      const response = await NetworkService.getSessionPhotoUploadUrl(
+        this.session._id
+      );
+      const {
+        body: { uploadUrl }
+      } = response;
+
+      if (uploadUrl)
+        axios.put(uploadUrl, file, {
+          "Content-Type": file.type
+        });
+    },
+    openFileDialog() {
+      document.querySelector(".upload-photo").click();
+    },
+    insertPhoto(file) {
+      const reader = new FileReader();
+      // convert file to base64
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        this.zwibblerCtx.createNode("ImageNode", {
+          url: reader.result
+        });
+      };
     },
     clearWhiteboard() {
       this.zwibblerCtx.deleteNodes(this.zwibblerCtx.getAllNodes());
@@ -401,6 +451,10 @@ export default {
 
   &__svg {
     width: 20px;
+
+    &--photo {
+      height: 26px;
+    }
   }
 }
 
@@ -443,5 +497,15 @@ export default {
   &:active {
     outline: none;
   }
+}
+
+.upload-photo {
+  display: none !important;
+}
+
+.error {
+  color: $c-error-red;
+  position: absolute;
+  bottom: 65px;
 }
 </style>
