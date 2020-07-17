@@ -519,7 +519,7 @@ export default {
         });
     },
     ineligibleContinue() {
-      alert("todo");
+      this.$router.push("https://upchieve.org/parents");
     },
     autocompleteSchool(input) {
       this.eligibility.highSchool = {};
