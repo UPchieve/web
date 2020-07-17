@@ -309,6 +309,11 @@ export default {
       .get(`${API_ROOT}/reports/usage-report?${queryParams}`)
       .then(this._successHandler, this._errorHandler);
   },
+  adminGetStudentPartners() {
+    return Vue.http
+      .get(`${AUTH_ROOT}/partner/student-partners`)
+      .then(this._successHandler, this._errorHandler);
+  },
   getQuestions(context, data) {
     return context.$http
       .post(`${API_ROOT}/training/questions`, data)

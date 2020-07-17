@@ -61,23 +61,24 @@
             @input="setStudentPartnerOrg"
           />
         </label>
-
-        <div class="high-school">
-          <label for="high-school" class="col">
-            High school
-            <school-list
-              :setHighSchool="setHighSchool"
-              placeholder="Search for a school"
-            />
-          </label>
-        </div>
       </div>
     </div>
-    <div class="col"></div>
+    <div class="col">
+      <div>
+        <label for="high-school" class="col">
+          High school
+          <school-list
+            :setHighSchool="setHighSchool"
+            placeholder="Search for a school"
+          />
+        </label>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import NetworkService from "@/services/NetworkService";
 import SchoolList from "@/components/SchoolList";
 
 export default {
@@ -130,10 +131,17 @@ export default {
       required: true
     }
   },
-  computed: {
-    partnerOrgs() {
-      return [];
-    }
+  data() {
+    return {
+      partnerOrgs: []
+    };
+  },
+  async mounted() {
+    const response = await NetworkService.adminGetStudentPartners();
+    const {
+      body: { partnerOrgs }
+    } = response;
+    this.partnerOrgs = partnerOrgs;
   }
 };
 </script>
@@ -167,10 +175,6 @@ export default {
 
 .student-partner-org {
   width: 250px;
-}
-
-.high-school {
-  margin-top: 1em;
 }
 
 .btn {
