@@ -264,6 +264,7 @@ export default {
       })
         .then(() => {
           this.step = "step-2";
+          this.$router.push("/sign-up/volunteer/about");
         })
         .catch(err => {
           this.msg = err.message;

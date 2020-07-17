@@ -41,6 +41,8 @@ export default {
         isValid => {
           if (!isValid) {
             this.msg = "Sorry, that code is invalid";
+          } else {
+            this.$router.push("/sign-up/volunteer/account");
           }
         }
       );

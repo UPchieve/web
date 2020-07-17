@@ -3,7 +3,7 @@
     <form class="uc-form">
       <div class="uc-form-header">
         <div class="uc-form-header-link--active">Log In</div>
-        <router-link to="/signup" class="uc-form-header-link"
+        <router-link to="/sign-up" class="uc-form-header-link"
           >Sign Up</router-link
         >
       </div>

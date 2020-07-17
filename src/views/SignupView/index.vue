@@ -50,8 +50,17 @@ export default {
   created() {
     this.$store.dispatch("app/hideNavigation");
 
-    if (this.isMobileApp || this.$route.query.student) this.selectStudent();
-    else if (this.$route.query.volunteer) this.selectVolunteer();
+    if (this.$route.query.referral)
+      window.localStorage.setItem(
+        "upcReferredByCode",
+        this.$route.query.referral
+      );
+
+    if (this.$route.params)
+      if (this.isMobileApp || this.$route.params.userType === "student")
+        this.userSelection = "student";
+      else if (this.$route.params.userType === "volunteer")
+        this.userSelection = "volunteer";
   },
   computed: {
     ...mapState({
@@ -65,9 +74,11 @@ export default {
   },
   methods: {
     selectVolunteer() {
+      this.$router.push("/sign-up/volunteer");
       this.userSelection = "volunteer";
     },
     selectStudent() {
+      this.$router.push("/sign-up/student");
       this.userSelection = "student";
     }
   }
