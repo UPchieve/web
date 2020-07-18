@@ -51,6 +51,11 @@
           <div class="user-detail__section-title">Zip code</div>
           <div>{{ user.zipCode }}</div>
         </div>
+        <div class="user-detail__section">
+          <div class="user-detail__section-title">Background Information</div>
+          <div v-if="!user.background">--</div>
+          <background-info v-else :user="user" />
+        </div>
       </div>
       <sessions-list
         v-if="user.pastSessions.length"
@@ -64,6 +69,7 @@
 import moment from "moment";
 import NetworkService from "@/services/NetworkService";
 import SessionsList from "@/components/Admin/SessionsList";
+import BackgroundInfo from "@/components/Admin/BackgroundInfo";
 import AdminPendingVolunteerDetail from "@/views/Admin/AdminPendingVolunteerDetail";
 
 const getUser = async userId => {
@@ -77,7 +83,7 @@ const getUser = async userId => {
 export default {
   name: "AdminUserDetail",
 
-  components: { AdminPendingVolunteerDetail, SessionsList },
+  components: { AdminPendingVolunteerDetail, SessionsList, BackgroundInfo },
 
   data() {
     return {
