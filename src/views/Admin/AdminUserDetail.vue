@@ -51,7 +51,7 @@
           <div class="user-detail__section-title">Zip code</div>
           <div>{{ user.zipCode }}</div>
         </div>
-        <div class="user-detail__section">
+        <div v-if="user.isVolunteer" class="user-detail__section">
           <div class="user-detail__section-title">Background Information</div>
           <div v-if="!user.background">--</div>
           <background-info v-else :user="user" />
