@@ -84,6 +84,7 @@
             }}</span
           >
         </div>
+        <background-info v-if="hasCompletedBackgroundInfo" :user="volunteer" />
       </div>
       <p v-if="error" class="error">{{ error }}</p>
       <large-button @click.native="handleSubmit" type="button" class="save-btn"
@@ -98,6 +99,7 @@ import moment from "moment";
 import NetworkService from "@/services/NetworkService";
 import AdminReferenceView from "@/views/Admin/AdminReferenceView";
 import LargeButton from "@/components/LargeButton";
+import BackgroundInfo from "@/components/Admin/BackgroundInfo";
 
 const getUser = async userId => {
   const {
@@ -109,7 +111,7 @@ const getUser = async userId => {
 
 export default {
   name: "AdminPendingVolunteerDetail",
-  components: { AdminReferenceView, LargeButton },
+  components: { AdminReferenceView, LargeButton, BackgroundInfo },
   data() {
     return {
       error: "",
