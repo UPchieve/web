@@ -124,12 +124,12 @@
     <allow-intent href="itms-apps:*" />
 
     <preference name="SplashScreen" value="Default" />
-    <!-- <config-file target="*-Info.plist" parent="NSPhotoLibraryUsageDescription">
+    <config-file target="*-Info.plist" parent="NSPhotoLibraryUsageDescription">
       <string>For uploading pictures of math problems</string>
     </config-file>
     <config-file target="*-Info.plist" parent="NSCameraUsageDescription">
-      <string>For chatting with tutor</string>
-    </config-file> -->
+      <string>For whiteboard sessions with a tutor</string>
+    </config-file>
     <config-file target="*-Info.plist" parent="NSLocationWhenInUseUsageDescription">
       <string>For determining if eligible for free tutoring</string>
     </config-file>
