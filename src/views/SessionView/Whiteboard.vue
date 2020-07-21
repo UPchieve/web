@@ -87,7 +87,7 @@
         <input
           type="file"
           class="upload-photo"
-          accept="image/png, image/jpeg"
+          accept="image/jpg, image/png"
           @change="uploadPhoto"
         />
         <PhotoUploadIcon class="toolbar-item__svg--photo" />
@@ -278,9 +278,26 @@ export default {
       // convert file to base64
       reader.readAsDataURL(file);
       reader.onload = () => {
-        this.zwibblerCtx.createNode("ImageNode", {
+        const img = new Image();
+        const node = this.zwibblerCtx.createNode("ImageNode", {
           url: reader.result
         });
+        img.src = reader.result;
+        img.onload = () => {
+          const whiteboard = document.querySelector(".whiteboard-container");
+          const whiteboardWidth = whiteboard.clientWidth;
+          const whiteboardHeight = whiteboard.clientHeight;
+          let scaleFactor = 1;
+
+          // scale image below the whiteboard width and height
+          if (img.width > whiteboardWidth) {
+            scaleFactor = 1 / (img.width / whiteboardWidth + 1);
+            this.zwibblerCtx.scaleNode(node, scaleFactor, scaleFactor);
+          } else if (img.height > whiteboardHeight) {
+            scaleFactor = 1 / (img.height / whiteboardHeight + 1);
+            this.zwibblerCtx.scaleNode(node, scaleFactor, scaleFactor);
+          } else this.zwibblerCtx.scaleNode(node, scaleFactor, scaleFactor);
+        };
       };
     },
     clearWhiteboard() {
