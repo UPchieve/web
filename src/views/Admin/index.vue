@@ -13,6 +13,10 @@
       <router-link to="/admin/ineligible-students" class="admin-link btn"
         >Ineligible Students</router-link
       >
+
+      <router-link to="/admin/reports" class="admin-link btn"
+        >Reports</router-link
+      >
     </div>
   </div>
 </template>
