@@ -27,6 +27,57 @@
         <PenIcon class="toolbar-item__svg" />
       </div>
       <div
+        class="toolbar-item toolbar-item--shapes"
+        title="Shapes"
+        @click="toggleShapes"
+        :class="isShapeSelected ? 'selected-tool' : ''"
+      >
+        <ShapesIcon class="toolbar-item__svg" />
+        <div v-if="showShapes" class="shapes-bar">
+          <div
+            class="toolbar-item shapes-bar__toolbar-item"
+            :class="selectedTool === 'line' ? 'selected-tool' : ''"
+            @click="useLineTool"
+          >
+            <line-icon class="shapes-bar__shape-icon" title="Line tool" />
+          </div>
+          <div
+            class="toolbar-item shapes-bar__toolbar-item"
+            :class="selectedTool === 'circle' ? 'selected-tool' : ''"
+            @click="useCircleTool"
+          >
+            <circle-icon class="shapes-bar__shape-icon" title="Circle tool" />
+          </div>
+          <div
+            class="toolbar-item shapes-bar__toolbar-item"
+            :class="selectedTool === 'polygon' ? 'selected-tool' : ''"
+            @click="useTriangleTool"
+          >
+            <triangle-icon
+              class="shapes-bar__shape-icon"
+              title="Triangle tool"
+            />
+          </div>
+          <div
+            class="toolbar-item shapes-bar__toolbar-item"
+            :class="selectedTool === 'rectangle' ? 'selected-tool' : ''"
+            @click="useRectangleTool"
+          >
+            <rectangle-icon
+              class="shapes-bar__shape-icon"
+              title="Rectangle tool"
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        class="toolbar-item toolbar-item--text"
+        title="Text"
+        @click="useTextTool"
+      >
+        <TextIcon class="toolbar-item__svg" />
+      </div>
+      <div
         class="toolbar-item toolbar-item--color-picker"
         title="Color picker"
         @click="toggleColorPicker"
@@ -99,6 +150,12 @@ import RedoIcon from "@/assets/whiteboard_icons/redo.svg";
 import PanIcon from "@/assets/whiteboard_icons/grab.svg";
 import DeleteSelectionIcon from "@/assets/whiteboard_icons/delete_selection.png";
 import RotateIcon from "@/assets/whiteboard_icons/rotate.png";
+import ShapesIcon from "@/assets/whiteboard_icons/shapes.svg";
+import TextIcon from "@/assets/whiteboard_icons/text.svg";
+import CircleIcon from "@/assets/whiteboard_icons/circle.svg";
+import RectangleIcon from "@/assets/whiteboard_icons/rectangle.svg";
+import TriangleIcon from "@/assets/whiteboard_icons/triangle.svg";
+import LineIcon from "@/assets/whiteboard_icons/line.svg";
 
 export default {
   components: {
@@ -108,7 +165,13 @@ export default {
     PenIcon,
     UndoIcon,
     RedoIcon,
-    PanIcon
+    PanIcon,
+    ShapesIcon,
+    TextIcon,
+    CircleIcon,
+    RectangleIcon,
+    TriangleIcon,
+    LineIcon
   },
   props: {
     isVisible: {
@@ -121,6 +184,7 @@ export default {
       zwibblerCtx: null,
       selectedTool: "",
       showColorPicker: false,
+      showShapes: false,
       isMouseDown: false
     };
   },
@@ -135,7 +199,21 @@ export default {
       if (this.selectedTool === "brush") return "zwib-wrapper--brush";
       if (this.selectedTool === "pick") return "zwib-wrapper--pick";
       if (this.selectedTool === "pan") return "zwib-wrapper--pan";
+      if (this.selectedTool === "line") return "zwib-wrapper--line";
+      if (this.selectedTool === "circle") return "zwib-wrapper--circle";
+      if (this.selectedTool === "rectangle") return "zwib-wrapper--rectangle";
+      if (this.selectedTool === "polygon") return "zwib-wrapper--triangle";
+      if (this.selectedTool === "text") return "zwib-wrapper--text";
+
       return "zwib-wrapper--default";
+    },
+    isShapeSelected() {
+      return (
+        this.selectedTool === "line" ||
+        this.selectedTool === "circle" ||
+        this.selectedTool === "polygon" ||
+        this.selectedTool === "rectangle"
+      );
     }
   },
   mounted() {
@@ -167,6 +245,7 @@ export default {
       // Don't start setting selected tool until connected
       this.zwibblerCtx.on("tool-changed", toolname => {
         this.selectedTool = toolname;
+        this.hideHoveredToolbars();
       });
     });
 
@@ -198,30 +277,55 @@ export default {
   methods: {
     usePanTool() {
       this.zwibblerCtx.usePanTool();
-      this.showColorPicker = false;
     },
     usePickTool() {
       this.zwibblerCtx.usePickTool();
-      this.showColorPicker = false;
     },
     useBrushTool() {
       this.zwibblerCtx.useBrushTool();
-      this.showColorPicker = false;
+    },
+    useLineTool() {
+      this.zwibblerCtx.useLineTool(
+        {},
+        {
+          singleLine: true
+        }
+      );
+    },
+    useCircleTool() {
+      this.zwibblerCtx.useCircleTool();
+    },
+    useTriangleTool() {
+      this.zwibblerCtx.usePolygonTool(3, 0);
+    },
+    useRectangleTool() {
+      this.zwibblerCtx.useRectangleTool({ strokeStyle: "rgba(0, 0, 0, 0)" });
+    },
+    useTextTool() {
+      this.zwibblerCtx.useTextTool();
     },
     toggleColorPicker() {
       this.showColorPicker = !this.showColorPicker;
+      this.showShapes = false;
+    },
+    toggleShapes() {
+      this.showShapes = !this.showShapes;
+      this.showColorPicker = false;
     },
     undo() {
       this.zwibblerCtx.undo();
-      this.showColorPicker = false;
+      this.hideHoveredToolbars();
     },
     redo() {
       this.zwibblerCtx.redo();
+      this.hideHoveredToolbars();
+    },
+    hideHoveredToolbars() {
       this.showColorPicker = false;
+      this.showShapes = false;
     },
     clearWhiteboard() {
       this.zwibblerCtx.deleteNodes(this.zwibblerCtx.getAllNodes());
-      this.showColorPicker = false;
     },
     setColor(color) {
       // Second parameter indicates whether the colour should affect the fill or outline colour.
@@ -296,6 +400,30 @@ export default {
     }
   }
 
+  &--circle {
+    .zwibbler-canvas-holder {
+      cursor: url("../../assets/whiteboard_icons/circle.png"), auto !important;
+    }
+  }
+
+  &--rectangle {
+    .zwibbler-canvas-holder {
+      cursor: url("../../assets/whiteboard_icons/rectangle.png"), auto !important;
+    }
+  }
+
+  &--triangle {
+    .zwibbler-canvas-holder {
+      cursor: url("../../assets/whiteboard_icons/triangle.png"), auto !important;
+    }
+  }
+
+  &--text {
+    .zwibbler-canvas-holder {
+      cursor: text !important;
+    }
+  }
+
   &--default {
     .zwibbler-canvas-holder {
       cursor: default !important;
@@ -321,7 +449,7 @@ export default {
 }
 
 .toolbar {
-  max-width: 400px;
+  max-width: 550px;
   height: 70px;
   position: absolute;
   bottom: 50px;
@@ -388,6 +516,9 @@ export default {
   &__svg {
     width: 20px;
   }
+  &--shapes {
+    position: relative;
+  }
 }
 
 .selected-tool {
@@ -428,6 +559,34 @@ export default {
 
   &:active {
     outline: none;
+  }
+}
+
+.shapes-bar {
+  @include flex-container(row, space-around);
+  position: absolute;
+  left: -50px;
+  margin: 0 auto;
+  bottom: 58px;
+  background-color: #fff;
+  border: 1px solid #d8d8d8;
+  border-radius: 5px;
+
+  @include breakpoint-latest-iphones {
+    bottom: 88px;
+  }
+
+  &__toolbar-item {
+    border-radius: initial !important;
+  }
+
+  &__shape-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  & .selected-tool {
+    background-color: darken(#e2e2e2, 15%);
   }
 }
 </style>
