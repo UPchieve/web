@@ -11,13 +11,17 @@
       }"
     >
       <div
-        class="whiteboard-container"
-        id="whiteboard-container"
+        class="auxiliary-container"
+        id="auxiliary-container"
         v-bind:class="{
-          'whiteboard-container--hidden': shouldHideWhiteboardSection
+          'auxiliary-container--hidden': shouldHideAuxiliarySection
         }"
       >
-        <whiteboard :isVisible="whiteboardOpen" />
+        <whiteboard
+          v-if="auxiliaryType === 'WHITEBOARD'"
+          :isVisible="auxiliaryOpen"
+        />
+        <document-editor v-else />
       </div>
       <div
         class="chat-container"
@@ -33,7 +37,7 @@
       v-if="mobileMode"
       class="toggleButton"
       id="toggleButton"
-      @click="toggleWhiteboard"
+      @click="toggleAuxiliary"
     >
       <img id="toggleIcon" :src="getIconUrl()" />
     </div>
@@ -43,13 +47,11 @@
 <script>
 import { mapState, mapGetters } from "vuex";
 import * as Sentry from "@sentry/browser";
-
 import SessionService from "@/services/SessionService";
-
 import SessionHeader from "./SessionHeader";
-import Whiteboard from "./Whiteboard";
 import SessionChat from "./SessionChat";
-
+import Whiteboard from "./Whiteboard";
+import DocumentEditor from "./DocumentEditor";
 import SessionFulfilledModal from "./SessionFulfilledModal";
 import ConnectionTroubleModal from "./ConnectionTroubleModal";
 
@@ -61,8 +63,9 @@ export default {
   name: "session-view",
   components: {
     SessionHeader,
+    SessionChat,
     Whiteboard,
-    SessionChat
+    DocumentEditor
   },
   created() {
     if (this.mobileMode) {
@@ -84,7 +87,7 @@ export default {
    */
   data() {
     return {
-      whiteboardOpen: false,
+      auxiliaryOpen: false,
       icon: "Pencil.png"
     };
   },
@@ -99,13 +102,20 @@ export default {
       isAuthenticated: "user/isAuthenticated"
     }),
 
-    shouldHideWhiteboardSection() {
-      // Never hide whiteboard section on desktop
+    auxiliaryType() {
+      const documentEditorSubTopics = ["planning", "essays", "applications"];
+      if (documentEditorSubTopics.includes(this.session.subTopic))
+        return "DOCUMENT";
+      else return "WHITEBOARD";
+    },
+
+    shouldHideAuxiliarySection() {
+      // Never hide auxiliary section (whiteboard/document) on desktop
       if (!this.mobileMode) {
         return false;
       }
 
-      return !this.whiteboardOpen;
+      return !this.auxiliaryOpen;
     },
     shouldHideChatSection() {
       // Never hide chat section on desktop
@@ -113,7 +123,7 @@ export default {
         return false;
       }
 
-      return this.whiteboardOpen;
+      return this.auxiliaryOpen;
     }
   },
   mounted() {
@@ -213,15 +223,15 @@ export default {
     getIconUrl() {
       return require("@/assets/" + this.icon);
     },
-    toggleWhiteboard() {
-      if (!this.whiteboardOpen) {
+    toggleAuxiliary() {
+      if (!this.auxiliaryOpen) {
         document.getElementById("toggleButton").classList.add("back");
         this.icon = "Chat.png";
-        this.whiteboardOpen = true;
+        this.auxiliaryOpen = true;
       } else {
         document.getElementById("toggleButton").classList.remove("back");
         this.icon = "Pencil.png";
-        this.whiteboardOpen = false;
+        this.auxiliaryOpen = false;
       }
     },
     joinSession(sessionId) {
@@ -324,7 +334,7 @@ export default {
   }
 }
 
-.whiteboard-container,
+.auxiliary-container,
 .chat-container {
   @include breakpoint-above("medium") {
     height: 100%;
@@ -338,7 +348,7 @@ export default {
   }
 }
 
-.whiteboard-container {
+.auxiliary-container {
   background: #fff;
   padding: 0;
   flex-grow: 1;
