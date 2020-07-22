@@ -190,7 +190,7 @@
   <form
     v-else-if="step === 'account'"
     class="uc-form-body"
-    @submit.prevent="thirdPage()"
+    @submit.prevent="submitAccountForm()"
   >
     <div v-if="errors.length" class="step-errors">
       <h5>Please correct the following problems:</h5>
@@ -199,26 +199,41 @@
       </ul>
     </div>
 
-    <div class="step-title">Choose your log-in details</div>
+    <div class="step-title">Finish creating your account</div>
 
     <div class="uc-column">
-      <label for="inputEmail" class="uc-form-label">What's your email?</label>
-      <input
-        id="inputEmail"
-        type="email"
-        class="uc-form-input"
-        v-bind:class="{
-          'uc-form-input--invalid': invalidInputs.indexOf('inputEmail') > -1
-        }"
-        v-model="credentials.email"
-        required
-        autofocus
-        autocomplete="email"
-      />
-      <p class="uc-form-subtext">
-        We will only use your email to contact you about your account. See our
-        <a href="/legal" target="_blank">Privacy Policy</a> for more info.
-      </p>
+      <label for="firstName" class="uc-form-label">What's your name?</label>
+      <div class="uc-row name-fields">
+        <div class="uc-column">
+          <input
+            id="firstName"
+            type="text"
+            class="uc-form-input"
+            v-bind:class="{
+              'uc-form-input--invalid': invalidInputs.indexOf('firstName') > -1
+            }"
+            v-model="profile.firstName"
+            required
+            autofocus
+            autocomplete="given-name"
+          />
+          <p class="uc-form-subtext">First Name</p>
+        </div>
+        <div class="uc-column">
+          <input
+            id="lastName"
+            type="text"
+            class="uc-form-input"
+            v-bind:class="{
+              'uc-form-input--invalid': invalidInputs.indexOf('lastName') > -1
+            }"
+            v-model="profile.lastName"
+            required
+            autocomplete="family-name"
+          />
+          <p class="uc-form-subtext">Last Name</p>
+        </div>
+      </div>
     </div>
 
     <div class="uc-column">
@@ -237,78 +252,9 @@
         autocomplete="new-password"
       />
       <p class="uc-form-subtext">
-        Keep your account safe by choosing a password with one number, one
-        uppercase letter, and one lowercase letter.
+        Must have at least one number, one uppercase letter, and one lowercase
+        letter.
       </p>
-    </div>
-
-    <button class="uc-form-button" type="submit">
-      Continue
-    </button>
-
-    <div v-if="msg !== ''">{{ msg }}</div>
-  </form>
-
-  <form
-    v-else-if="step === 'about'"
-    class="uc-form-body"
-    @submit.prevent="checkInputs()"
-  >
-    <!-- Fix for bug in Chrome where the username and password are mapped to non-login fields
-     even if the HTML5 autocomplete attributes are set to the right values -->
-    <input
-      type="text"
-      class="d-none"
-      id="username"
-      v-model="credentials.email"
-      autocomplete="username"
-    />
-    <input
-      type="password"
-      class="d-none"
-      id="password"
-      v-model="credentials.password"
-      autocomplete="new-password"
-    />
-
-    <div v-if="errors.length" class="step-errors">
-      <h5>Please correct the following problems:</h5>
-      <ul>
-        <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
-      </ul>
-    </div>
-
-    <div class="step-title">Tell us about yourself!</div>
-
-    <div class="uc-column">
-      <label for="firstName" class="uc-form-label">First Name</label>
-      <input
-        id="firstName"
-        type="text"
-        class="uc-form-input"
-        v-bind:class="{
-          'uc-form-input--invalid': invalidInputs.indexOf('firstName') > -1
-        }"
-        v-model="profile.firstName"
-        required
-        autofocus
-        autocomplete="given-name"
-      />
-    </div>
-
-    <div class="uc-column">
-      <label for="lastName" class="uc-form-label">Last Name</label>
-      <input
-        id="lastName"
-        type="text"
-        class="uc-form-input"
-        v-bind:class="{
-          'uc-form-input--invalid': invalidInputs.indexOf('lastName') > -1
-        }"
-        v-model="profile.lastName"
-        required
-        autocomplete="family-name"
-      />
     </div>
 
     <div class="uc-form-checkbox">
@@ -319,18 +265,17 @@
         required
       />
       <label for="userAgreement">
-        I have read and accept the
-        <a href="/legal" target="_blank">user agreement</a>.
+        I am at least 13 years of age and have read and accept the
+        <a href="/legal" target="_blank">User Agreement</a>.
       </label>
     </div>
 
-    <button class="uc-form-button" type="submit">
-      Sign Up
+    <button class="uc-form-button-big" type="submit">
+      Create my account
     </button>
 
     <div v-if="msg !== ''">{{ msg }}</div>
   </form>
-
   <div v-else class="uc-form-body">Unexpected Error</div>
 </template>
 
@@ -477,54 +422,13 @@ export default {
             this.$router.push("/sign-up/student/ineligible");
           }
         })
-        .catch(err => {
-          this.msg = err.message;
+        .catch(res => {
+          this.errors.push(res.body.message);
         });
     },
     accountPage() {
       this.step = "account";
       this.$router.push("/sign-up/student/account");
-    },
-    thirdPage() {
-      // reset error msg from server
-      this.msg = "";
-
-      // validate input
-      this.errors = [];
-      this.invalidInputs = [];
-      if (!this.credentials.email) {
-        this.errors.push("An email address is required.");
-        this.invalidInputs.push("inputEmail");
-      } else if (!validator.isEmail(this.credentials.email)) {
-        // this is necessary because browsers ignore <input type="email"> until the
-        // user actually tries to submit the form
-        this.errors.push(
-          this.credentials.email + " is not a valid email address."
-        );
-        this.invalidInputs.push("inputEmail");
-      }
-      if (!this.credentials.password) {
-        this.errors.push("A password is required.");
-        this.invalidInputs.push("inputPassword");
-      }
-      if (this.errors.length) {
-        return;
-      }
-
-      AuthService.checkRegister(this, {
-        email: this.credentials.email,
-        password: this.credentials.password
-      })
-        .then(() => {
-          this.step = "about";
-          this.$router.push("/sign-up/student/about");
-        })
-        .catch(err => {
-          this.msg = err.message;
-          if (err.status !== 409 && err.status !== 422) {
-            Sentry.captureException(err);
-          }
-        });
     },
     ineligibleContinue() {
       window.location = "https://upchieve.org/parents";
@@ -552,7 +456,7 @@ export default {
     handleSelectHighSchool(school) {
       this.eligibility.highSchool = school;
     },
-    checkInputs() {
+    submitAccountForm() {
       this.errors = [];
       this.invalidInputs = [];
 
@@ -569,9 +473,12 @@ export default {
         // necessary because the CSS hides the browser's validation message
         this.errors.push("You must read and accept the user agreement.");
       }
-      if (!this.errors.length) {
-        this.submit();
+      if (!this.credentials.password) {
+        this.errors.push("A password is required.");
+        this.invalidInputs.push("inputPassword");
       }
+
+      if (!this.errors.length) this.submit();
     },
     submit() {
       AuthService.registerStudent(this, {
@@ -590,7 +497,7 @@ export default {
           this.$router.push("/dashboard");
         })
         .catch(err => {
-          this.msg = err.message;
+          this.errors.push(err.message);
           if (err.status !== 422) {
             Sentry.captureException(err);
           }
@@ -627,8 +534,6 @@ export default {
   }
 }
 
-
-
 .title-wrapper {
   h3 {
     margin: 0 0 5px 0;
@@ -636,6 +541,16 @@ export default {
 
   p {
     font-size: 14px;
+  }
+}
+
+.name-fields {
+  @include child-spacing(right, 15px);
+
+  input {
+    box-sizing: border-box;
+    width: 100%;
+    height: 45px;
   }
 }
 

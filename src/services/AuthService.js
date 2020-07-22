@@ -38,8 +38,6 @@ export default {
         if (!data) {
           throw new Error("No user returned from auth service");
         }
-
-        context.msg = "You have been signed up!";
       })
       .catch(res => {
         throw errorFromHttpResponse(res);
@@ -52,8 +50,6 @@ export default {
         if (!data) {
           throw new Error("No user returned from auth service");
         }
-
-        context.msg = "You have been signed up!";
       })
       .catch(res => {
         throw errorFromHttpResponse(res);
