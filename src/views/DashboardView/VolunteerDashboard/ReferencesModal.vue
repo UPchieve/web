@@ -6,12 +6,9 @@
         <cross-icon class="upc-modal-close-icon" @click="closeModal" />
       </header>
       <div>
-        <p class="subtitle">
-          Provide 2 references
-        </p>
         <p>
-          Please provide the name and email for your references. We will contact
-          them via email requesting them to fill out a reference form
+          Please provide us with two references we may contact. We will reach
+          out to them via email and ask them to fill out a short form.
         </p>
 
         <div class="references-container">
@@ -160,7 +157,7 @@ export default {
     },
     addReference() {
       if (!this.newReferenceName || !this.newReferenceEmail) {
-        this.addReferenceError = "Please fill out all of the form fields.";
+        this.addReferenceError = "Please fill out all fields.";
         return;
       }
       if (!validator.isEmail(this.newReferenceEmail)) {
@@ -170,13 +167,13 @@ export default {
 
       if (!this.isUniqueEmail(this.newReferenceEmail)) {
         this.addReferenceError =
-          "Looks like you've entered this reference in already.";
+          "Looks like you've used this reference already.";
         return;
       }
 
       if (this.user.email === this.newReferenceEmail) {
         this.addReferenceError =
-          "Please enter the email address of your reference.";
+          "Your reference cannot have the same email address as you.";
         return;
       }
 
