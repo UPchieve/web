@@ -4,17 +4,14 @@
     <div class="background-info__wrapper">
       <div v-if="hasCompletedBackgroundInfo">
         <p class="background-info__completed-message">
-          Thank you for submitting your background information. Our students,
-          and school partners, are interested in learning more about the
-          volunteers at UPchieve!
+          Thank you for submitting your background information!
         </p>
       </div>
       <form class="background-info__form" @submit="submitForm" v-else>
         <p>
-          Our students, and school partners, are interested in learning more
-          about the volunteers at UPchieve! Please fill in the following
-          background information- who knows, it might help us pair you with the
-          right student!
+          Please provide some basic background information so that we can
+          learn more about you! Don't worry: this information will be kept
+          private unless we receive your permission to share it.
         </p>
 
         <ol>
