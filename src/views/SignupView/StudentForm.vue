@@ -1,25 +1,6 @@
 <template>
-  <div v-if="step === 'welcome'" class="uc-form-body uc-form-body--center">
-    <div class="welcome-icon-wrapper">
-      <img src="@/assets/onboarding_icons/quiz-icon.png" class="welcome-icon" />
-    </div>
-    <h3>Great! Let's get started</h3>
-    <p>
-      As a first step, we'd like you to complete a brief questionnaire to make
-      sure you're eligible for our services.
-    </p>
-    <p>
-      <strong>Don't worry if you don't pass the next step!</strong>
-      You may still be eligible but we'll need to collect additional info from
-      you and your parents.
-    </p>
-    <button class="uc-form-button-big" @click="eligibilityPage">
-      Continue
-    </button>
-  </div>
-
   <form
-    v-else-if="step === 'partner-signup-code'"
+    v-if="step === 'partner-signup-code'"
     class="uc-form-body"
     @submit.prevent="submitPartnerSignupCode()"
   >
@@ -40,7 +21,7 @@
         </button>
       </div>
       <div class="uc-column">
-        <button class="uc-form-button" @click="welcomePage">
+        <button class="uc-form-button" @click="eligibilityPage">
           No
         </button>
       </div>
@@ -81,7 +62,13 @@
       </ul>
     </div>
 
-    <h3>Check your eligibility</h3>
+    <div class="uc-column title-wrapper">
+      <h3>Great! Let's get started</h3>
+      <p>
+        First, we need to ask you a few quick questions to make sure you're
+        eligible for our services.
+      </p>
+    </div>
 
     <div class="uc-column">
       <label for="inputHighschool" class="uc-form-label"
@@ -150,7 +137,7 @@
       />
       <p class="uc-form-subtext">
         We will only use this email to notify you if your eligibility status
-        changes in the future. We will never sell or share your data.
+        changes in the future.
       </p>
     </div>
 
@@ -161,19 +148,39 @@
     <div v-if="msg !== ''">{{ msg }}</div>
   </form>
 
-  <div v-else-if="step === 'ineligible'" class="uc-form-body">
+  <div
+    v-else-if="step === 'eligible'"
+    class="uc-form-body uc-form-body--center"
+  >
+    <div>
+      <verification-badge />
+      <h3>Woohoo, you're eligible!</h3>
+      <p>
+        Finish setting up your free account
+      </p>
+    </div>
+    <div>
+      <button class="uc-form-button-big" @click="accountPage">
+        Continue
+      </button>
+    </div>
+  </div>
+
+  <div
+    v-else-if="step === 'ineligible'"
+    class="uc-form-body uc-form-body--center"
+  >
     <div class="ineligible-icon-wrapper">
       <error-badge />
     </div>
     <h3>Sorry, we can't verify your eligibility yet.</h3>
 
     <p class="small-paragraph">
-      Unfortunately, we aren’t able to verify your eligibility based on the
-      information you’ve entered so far. We will reach out to you via email if
-      there are any changes!
+      We weren’t able to verify your eligibility based on the information you’ve
+      entered so far.
+      <strong>Don’t worry: you may still be eligible!</strong> We just need your
+      parent/guardian to answer some more questions first!
     </p>
-
-    <p class="small-paragraph">Continue to see other ways you can register</p>
 
     <button class="uc-form-button-big" @click="ineligibleContinue">
       Continue
@@ -334,11 +341,13 @@ import Autocomplete from "@trevoreyre/autocomplete-vue";
 import * as Sentry from "@sentry/browser";
 import AuthService from "@/services/AuthService";
 import NetworkService from "@/services/NetworkService";
+import VerificationBadge from "@/assets/verification.svg";
 import ErrorBadge from "@/assets/error_badge.svg";
 
 export default {
   components: {
     Autocomplete,
+    VerificationBadge,
     ErrorBadge
   },
   data() {
@@ -369,7 +378,7 @@ export default {
     if (this.isMobileApp) {
       this.partnerCodePage();
     } else {
-      this.welcomePage();
+      this.eligibilityPage();
     }
   },
   computed: {
@@ -381,11 +390,6 @@ export default {
     partnerCodePage() {
       this.step = "partner-signup-code";
       this.$router.push("/sign-up/student/partner-code");
-    },
-
-    welcomePage() {
-      this.step = "welcome";
-      this.$router.push("/sign-up/student/welcome");
     },
 
     eligibilityPage() {
@@ -464,8 +468,8 @@ export default {
           const isEligible = response.body.isEligible;
 
           if (isEligible) {
-            this.step = "account";
-            this.$router.push("/sign-up/student/account");
+            this.step = "eligible";
+            this.$router.push("/sign-up/student/eligible");
             // autofill the user's email
             this.credentials.email = this.eligibility.email;
           } else {
@@ -476,6 +480,10 @@ export default {
         .catch(err => {
           this.msg = err.message;
         });
+    },
+    accountPage() {
+      this.step = "account";
+      this.$router.push("/sign-up/student/account");
     },
     thirdPage() {
       // reset error msg from server
@@ -619,16 +627,15 @@ export default {
   }
 }
 
-.welcome-icon-wrapper {
-  background: $c-sat;
-  padding: 20px;
-  border-radius: 35px;
 
-  img {
-    height: 30px;
-    width: 30px;
-    margin-left: 4px;
-    margin-right: -4px;
+
+.title-wrapper {
+  h3 {
+    margin: 0 0 5px 0;
+  }
+
+  p {
+    font-size: 14px;
   }
 }
 
