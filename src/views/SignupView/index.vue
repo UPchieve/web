@@ -24,7 +24,7 @@
             type="submit"
             @click.prevent="selectStudent()"
           >
-            I need a tutor/coach
+            I need an Academic Coach
           </button>
 
           <button
@@ -32,7 +32,7 @@
             type="submit"
             @click.prevent="selectVolunteer()"
           >
-            I'd like to become a coach
+            I’d like to become an Academic Coach
           </button>
         </div>
       </div>
