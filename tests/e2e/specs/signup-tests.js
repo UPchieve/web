@@ -6,7 +6,7 @@ describe("Student and volunteer signup", () => {
   });
 
   describe("Student signup", () => {
-    before(function() {
+    beforeEach(function() {
       cy.login(this.volunteer);
 
       cy.deleteUserByEmail(this.newStudent.email);
@@ -33,11 +33,7 @@ describe("Student and volunteer signup", () => {
       cy.location("pathname").should("eq", "/sign-up");
 
       cy.get("button")
-        .contains("I need a tutor")
-        .click();
-
-      cy.get("button")
-        .contains("Continue")
+        .contains("I need an Academic Coach")
         .click();
 
       cy.get("@approvedHighschools").then(response => {
@@ -57,13 +53,11 @@ describe("Student and volunteer signup", () => {
 
         cy.get("button[type=submit]").click();
 
-        cy.get("#inputEmail").should("have.value", this.newStudent.email);
+        cy.get("h3").should("contain", "Woohoo");
 
-        cy.get("#inputPassword")
-          .type(this.newStudent.password)
-          .should("have.value", this.newStudent.password);
-
-        cy.get("button[type=submit]").click();
+        cy.get("button")
+          .contains("Continue")
+          .click();
 
         cy.get("#firstName")
           .type(this.newStudent.firstName)
@@ -72,6 +66,10 @@ describe("Student and volunteer signup", () => {
         cy.get("#lastName")
           .type(this.newStudent.lastName)
           .should("have.value", this.newStudent.lastName);
+
+        cy.get("#inputPassword")
+          .type(this.newStudent.password)
+          .should("have.value", this.newStudent.password);
 
         cy.get("#userAgreement").click();
 
@@ -87,11 +85,7 @@ describe("Student and volunteer signup", () => {
       cy.location("pathname").should("eq", "/sign-up");
 
       cy.get("button")
-        .contains("I need a tutor")
-        .click();
-
-      cy.get("button")
-        .contains("Continue")
+        .contains("I need an Academic Coach")
         .click();
 
       cy.get("#inputHighschool")
@@ -137,7 +131,7 @@ describe("Student and volunteer signup", () => {
       cy.location("pathname").should("eq", "/sign-up");
 
       cy.get("button")
-        .contains("I'd like to become a coach")
+        .contains("I’d like to become an Academic Coach")
         .click();
 
       cy.get("@volunteerCodes")
@@ -231,7 +225,7 @@ describe("Student and volunteer signup", () => {
       cy.location("pathname").should("eq", "/sign-up");
 
       cy.get("button")
-        .contains("I'd like to become a coach")
+        .contains("I’d like to become an Academic Coach")
         .click();
 
       cy.get("#inputRegistrationCode")
