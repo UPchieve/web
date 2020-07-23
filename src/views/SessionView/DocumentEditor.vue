@@ -44,6 +44,10 @@ export default {
     });
 
     this.quillEditor.on("text-change", this.quillTextChange);
+
+    this.$socket.emit("requestQuillState", {
+      sessionId: this.currentSession._id
+    });
   },
   methods: {
     quillTextChange(delta, oldDelta, source) {
@@ -56,6 +60,10 @@ export default {
     }
   },
   sockets: {
+    quillState({ delta }) {
+      this.quillEditor.setContents(delta);
+    },
+
     partnerQuillDelta({ delta }) {
       this.quillEditor.updateContents(delta);
     }
