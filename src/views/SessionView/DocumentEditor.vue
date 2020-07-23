@@ -22,11 +22,25 @@ export default {
   mounted() {
     this.quillEditor = new Quill("#quill-container", {
       placeholder: "Type or paste something...",
-      modules: {
-        toolbar: [[{ header: [1, 2, false] }], ["bold", "italic", "underline"]]
-      },
       theme: "snow",
-      formats: ["bold", "italic", "underline", "header"]
+      formats: [
+        "header",
+        "bold",
+        "italic",
+        "underline",
+        "strike",
+        "color",
+        "background",
+        "list"
+      ],
+      modules: {
+        toolbar: [
+          [{ header: [1, 2, false] }],
+          ["bold", "italic", "underline", "strike"],
+          [{ color: [] }, { background: [] }],
+          [{ list: "ordered" }, { list: "bullet" }]
+        ]
+      }
     });
 
     this.quillEditor.on("text-change", this.quillTextChange);
