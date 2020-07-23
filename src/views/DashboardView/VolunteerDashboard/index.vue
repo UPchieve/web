@@ -309,8 +309,6 @@ export default {
 
     hasCompletedBackgroundInfo() {
       return (
-        this.user.background &&
-        this.user.background.length > 0 &&
         this.user.occupation &&
         this.user.occupation.length > 0 &&
         this.user.country

@@ -29,7 +29,8 @@ export default {
         "country",
         "state",
         "city",
-        "background",
+        "company",
+        "college",
         "languages",
         "linkedInUrl"
       ];

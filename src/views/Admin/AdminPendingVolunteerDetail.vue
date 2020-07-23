@@ -177,8 +177,6 @@ export default {
     },
     hasCompletedBackgroundInfo() {
       return (
-        this.volunteer.background &&
-        this.volunteer.background.length > 0 &&
         this.volunteer.occupation &&
         this.volunteer.occupation.length > 0 &&
         this.volunteer.country
@@ -280,15 +278,12 @@ export default {
 
 .reference {
   margin-bottom: 1em;
+  text-align: left;
 
   &__form-link {
     color: $c-information-blue;
     text-decoration: underline;
     cursor: pointer;
-  }
-
-  &__email {
-    text-align: left;
   }
 }
 
