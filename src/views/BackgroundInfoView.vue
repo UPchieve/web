@@ -87,12 +87,16 @@
 
             <input
               type="text"
-              pattern=".*linkedin\.com.*\/in\/.*"
+              :pattern="linkedInUrlPattern.source"
               v-model="linkedInUrl"
-              placeholder="linkedin.com/in/example"
+              placeholder="https://www.linkedin.com/in/yourname"
               class="linkedin-input uc-form-input"
               id="linkedin"
             />
+            <p v-if="!isValidLinkedInUrl" class="error">
+              Your url should be in this format:
+              https://www.linkedin.com/in/yourname
+            </p>
           </li>
 
           <li class="uc-form-col">
@@ -370,6 +374,13 @@ export default {
     },
     isUnitedStatesSelected() {
       return this.country === "United States of America";
+    },
+    linkedInUrlPattern() {
+      return /https?:\/\/(www\.)?linkedin\.com.*\/in\/.{1,}$/;
+    },
+    isValidLinkedInUrl() {
+      if (!this.linkedInUrl) return true;
+      return this.linkedInUrlPattern.test(this.linkedInUrl);
     }
   },
   methods: {
@@ -444,7 +455,8 @@ export default {
         !mentoring ||
         !this.country ||
         !this.city ||
-        (this.isUnitedStatesSelected && !this.state)
+        (this.isUnitedStatesSelected && !this.state) ||
+        !this.isValidLinkedInUrl
       );
     }
   }
