@@ -1,7 +1,7 @@
 <template>
   <div class="background-info">
-    <h1 class="background-info__header">Background Information</h1>
     <div class="background-info__wrapper">
+      <h1 class="background-info__header">Background Information</h1>
       <div v-if="hasCompletedBackgroundInfo">
         <p class="background-info__completed-message">
           Thank you for submitting your background information. Our students,
@@ -45,37 +45,31 @@
                 {{ option }}
               </label>
             </div>
-          </li>
-
-          <li class="uc-form-col">
-            <p>
-              Do you identify with any of the following statements?<span
-                class="background-info__question-required"
-                >*</span
+            <template v-if="isCollegeEducated">
+              <label class="uc-form-label location-label" for="college"
+                >What college/university do you currently attend?</label
               >
-            </p>
-            <p class="background-info__question-description">
-              Select all that apply.
-            </p>
-            <p v-if="showInputErrors && background.length === 0" class="error">
-              Please fill out this field.
-            </p>
-
-            <div
-              class="uc-form-checkbox"
-              v-for="option in options.background"
-              :key="option"
-            >
               <input
-                type="checkbox"
-                :value="option"
-                v-model="background"
-                :id="option"
+                type="text"
+                v-model="college"
+                placeholder="Enter a college..."
+                class="uc-form-input location-input"
+                id="college"
               />
-              <label class="uc-form-label" :for="option">
-                {{ option }}
-              </label>
-            </div>
+            </template>
+
+            <template v-if="isWorkingFullTime">
+              <label class="uc-form-label location-label" for="company"
+                >What company do you currently work at?</label
+              >
+              <input
+                type="text"
+                v-model="company"
+                placeholder="Enter your company..."
+                class="uc-form-input location-input"
+                id="company"
+              />
+            </template>
           </li>
 
           <li class="uc-form-col">
@@ -301,15 +295,6 @@ export default {
           "Caregiver",
           "Retired"
         ],
-        background: [
-          "I went to a public high school.",
-          "I was eligible for free or reduced price lunch at school..",
-          "My parent(s) never attended college.",
-          "I was raised by a single parent.",
-          "English was not my first language.",
-          "I am a first or second generation immigrant.",
-          "None of the above."
-        ],
         languages: [
           "Spanish",
           "Mandarin",
@@ -332,7 +317,6 @@ export default {
         collegeCounseling: "",
         mentoring: ""
       },
-      background: [],
       languages: [],
       showAddLanguages: false,
       addedLanguages: "",
@@ -340,6 +324,8 @@ export default {
       country: "",
       state: "",
       city: "",
+      college: "",
+      company: "",
       experienceRadioQuestion: {
         columnTitle: [
           "No prior experience",
@@ -359,8 +345,6 @@ export default {
     }),
     hasCompletedBackgroundInfo() {
       return (
-        this.user.background &&
-        this.user.background.length > 0 &&
         this.user.occupation &&
         this.user.occupation.length > 0 &&
         this.user.country
@@ -381,6 +365,18 @@ export default {
     isValidLinkedInUrl() {
       if (!this.linkedInUrl) return true;
       return this.linkedInUrlPattern.test(this.linkedInUrl);
+    },
+    isCollegeEducated() {
+      return (
+        this.occupation.includes("An undergraduate student") ||
+        this.occupation.includes("A graduate student")
+      );
+    },
+    isWorkingFullTime() {
+      return (
+        this.occupation.includes("Working full-time") &&
+        !this.user.volunteerPartnerOrg
+      );
     }
   },
   methods: {
@@ -409,12 +405,13 @@ export default {
       const data = {
         occupation: this.occupation,
         experience,
-        background: this.background,
         languages: this.languages,
         linkedInUrl: this.linkedInUrl,
         country: this.country,
         state: this.isUnitedStatesSelected ? this.state : "",
-        city: this.city
+        city: this.city,
+        college: this.college,
+        company: this.company
       };
 
       if (this.languages.length > 0) {
@@ -427,12 +424,11 @@ export default {
         await NetworkService.addBackgroundInfo(data);
         this.wasSubmitted = false;
 
-        // mandatory fields: occupation, experience, country / state / city, background
+        // mandatory fields: occupation, experience, country / state / city,
         // update is a subset of mandatory fields
         const update = {
           occupation: data.occupation,
-          country: data.country,
-          background: data.background
+          country: data.country
         };
 
         this.$store.dispatch("user/addToUser", update);
@@ -448,7 +444,6 @@ export default {
       const { tutoring, collegeCounseling, mentoring } = this.experience;
 
       return (
-        this.background.length === 0 ||
         this.occupation.length === 0 ||
         !tutoring ||
         !collegeCounseling ||
@@ -456,7 +451,9 @@ export default {
         !this.country ||
         !this.city ||
         (this.isUnitedStatesSelected && !this.state) ||
-        !this.isValidLinkedInUrl
+        !this.isValidLinkedInUrl ||
+        (this.isCollegeEducated && !this.college) ||
+        (this.isWorkingFullTime && !this.company)
       );
     }
   }
@@ -520,16 +517,14 @@ textarea {
   }
 
   &__header {
-    display: flex;
     margin: 0;
-    align-items: center;
-    justify-content: space-between;
+    text-align: left;
     font-weight: 500;
-    padding: 25px 15px 10px 15px;
+    padding: 40px 20px 20px 20px;
     @include font-category("display-small");
 
     @include breakpoint-above("medium") {
-      padding: 40px 40px 0 40px;
+      padding: 20px;
     }
   }
 
