@@ -189,7 +189,7 @@
 
   <form
     v-else-if="step === 'account'"
-    class="uc-form-body"
+    class="uc-form-body uc-form-body--center"
     @submit.prevent="submitAccountForm()"
   >
     <div v-if="errors.length" class="step-errors">
