@@ -202,8 +202,8 @@
         <div v-if="serverErrorMsg !== ''">{{ serverErrorMsg }}</div>
       </form>
       <div v-if="formStep === 'success'" class="uc-form-body">
-        You've been sent a verification email! Check your work email for a link
-        to confirm your account.
+        You've been sent a verification email! Please check your inbox to finish
+        creating your account.
       </div>
     </div>
   </form-page-template>

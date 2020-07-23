@@ -55,7 +55,7 @@
           <div class="dashboard-card__icon">
             <verification-icon />
           </div>
-          <div class="dashboard-card__title">Volunteer verification</div>
+          <div class="dashboard-card__title">Approval process</div>
           <div class="dashboard-card__subtitle">
             {{ approvalCardSubheader }}
           </div>
@@ -86,10 +86,10 @@
           <div class="dashboard-card__icon">
             <onboarding-icon />
           </div>
-          <div class="dashboard-card__title">Set up your account</div>
+          <div class="dashboard-card__title">Onboarding process</div>
           <div class="dashboard-card__subtitle">
-            Select your availability and take quizes to get certified in various
-            subjects!
+            Before you can begin helping students, you’ll need to complete our
+            volunteer onboarding process.
           </div>
 
           <account-action
@@ -209,12 +209,12 @@ export default {
       switch (this.user.photoIdStatus) {
         case "EMPTY":
           return {
-            subtitle: "Add photo",
+            subtitle: "Upload a photo ID",
             status: "DEFAULT"
           };
         case "SUBMITTED":
           return {
-            subtitle: "In review",
+            subtitle: "Pending review",
             status: "PENDING"
           };
         case "APPROVED":
@@ -229,7 +229,7 @@ export default {
           };
         default:
           return {
-            subtitle: "Add photo",
+            subtitle: "Upload a photo ID",
             status: "DEFAULT"
           };
       }
@@ -240,19 +240,19 @@ export default {
 
       if (statuses.length === 0)
         return {
-          subtitle: "Add references",
+          subtitle: "Provide 2 references",
           status: "DEFAULT"
         };
 
       if (statuses.some(s => s === "REJECTED"))
         return {
-          subtitle: "Action required",
+          subtitle: "Contact UPchieve support",
           status: "ERROR"
         };
 
       if (statuses.length === 1)
         return {
-          subtitle: "Incomplete: 1 out of 2 references submitted",
+          subtitle: "In progress: provide 1 additional reference",
           status: "PROGRESS"
         };
 
@@ -262,8 +262,14 @@ export default {
           status: "COMPLETED"
         };
 
+      if (statuses[0] === "SUBMITTED" && statuses[1] === "SUBMITTED")
+        return {
+          subtitle: "Pending review",
+          status: "PENDING"
+        };
+
       return {
-        subtitle: "Pending",
+        subtitle: "Waiting on references to submit",
         status: "PENDING"
       };
     },
@@ -289,7 +295,7 @@ export default {
         };
 
       return {
-        subtitle: "Take a quiz",
+        subtitle: "Pass at least one quiz",
         status: "DEFAULT"
       };
     },
@@ -302,7 +308,7 @@ export default {
         };
 
       return {
-        subtitle: "Add your background information",
+        subtitle: "Fill out form",
         status: "DEFAULT"
       };
     },
@@ -388,9 +394,9 @@ export default {
 
     approvalCardSubheader() {
       if (this.user.volunteerPartnerOrg)
-        return "Provide background information to become an approved volunteer";
+        return "Just one step left to get approved to volunteer with UPchieve!";
 
-      return "Provide proof of identity and references to become an approved volunteer";
+      return "Complete our screening process to get approved to volunteer with UPchieve.";
     },
     openVolunteerApprovalAccountActions() {
       const accountActions = [
@@ -458,7 +464,7 @@ export default {
           priority: this.addSortPriorityNum(this.availabilityAction.status)
         },
         {
-          title: "Get a certification",
+          title: "Obtain a certification",
           subtitle: this.certificationAction.subtitle,
           status: this.certificationAction.status,
           clickFn: this.clickCertificationAction,
