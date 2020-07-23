@@ -195,8 +195,8 @@
   </form>
 
   <div v-else-if="step == 'success-message'" class="uc-form-body">
-    You've been sent a verification email! Please check your inbox to
-    finish creating your account.
+    You've been sent a verification email! Please check your inbox to finish
+    creating your account.
   </div>
 
   <div v-else class="uc-form-body">Unexpected Error</div>

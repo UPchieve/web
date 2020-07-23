@@ -88,7 +88,7 @@
           </div>
           <div class="dashboard-card__title">Onboarding process</div>
           <div class="dashboard-card__subtitle">
-            Before you can begin helping students, you’ll need to complete our 
+            Before you can begin helping students, you’ll need to complete our
             volunteer onboarding process.
           </div>
 
@@ -261,7 +261,7 @@ export default {
           subtitle: "Completed",
           status: "COMPLETED"
         };
-        
+
       if (statuses[0] === "SUBMITTED" && statuses[1] === "SUBMITTED")
         return {
           subtitle: "Pending review",

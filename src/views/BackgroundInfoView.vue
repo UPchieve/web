@@ -9,9 +9,9 @@
       </div>
       <form class="background-info__form" @submit="submitForm" v-else>
         <p>
-          Please provide some basic background information so that we can
-          learn more about you! Don't worry: this information will be kept
-          private unless we receive your permission to share it.
+          Please provide some basic background information so that we can learn
+          more about you! Don't worry: this information will be kept private
+          unless we receive your permission to share it.
         </p>
 
         <ol>
