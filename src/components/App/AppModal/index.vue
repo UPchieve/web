@@ -30,8 +30,6 @@ import NotificationsModal from "@/views/DashboardView/StudentDashboard/SubjectSe
 import ReferralModal from "@/views/DashboardView/StudentDashboard/ReferralModal";
 import SessionFulfilledModal from "@/views/SessionView/SessionFulfilledModal";
 import VolunteerOnboardingModal from "@/views/DashboardView/VolunteerDashboard/VolunteerOnboardingModal.vue";
-import ReferencesModal from "@/views/DashboardView/VolunteerDashboard/ReferencesModal.vue";
-import PhotoUploadModal from "@/views/DashboardView/VolunteerDashboard/PhotoUploadModal.vue";
 import StudentOnboardingModal from "@/views/DashboardView/StudentDashboard/StudentOnboardingModal";
 import ReportSessionModal from "@/views/SessionView/ReportSessionModal";
 
@@ -46,9 +44,7 @@ export default {
     VolunteerOnboardingModal,
     UpgradeAppModal,
     StudentOnboardingModal,
-    ReportSessionModal,
-    ReferencesModal,
-    PhotoUploadModal
+    ReportSessionModal
   },
   data() {
     return {

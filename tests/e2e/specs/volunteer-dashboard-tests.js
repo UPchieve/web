@@ -30,7 +30,7 @@ describe("Volunteer dashboard", () => {
 
         cy.get(".account-action")
           .then(accountActionElems => accountActionElems[0])
-          .contains("In review");
+          .contains("Pending review");
       });
 
       it("Should unsuccessfully upload a photo id", function() {
@@ -54,7 +54,7 @@ describe("Volunteer dashboard", () => {
 
         cy.get(".account-action")
           .then(accountActionElems => accountActionElems[0])
-          .contains("Add photo");
+          .contains("Upload a photo ID");
       });
 
       it("Should upload a photo id and remove it", function() {
@@ -72,7 +72,7 @@ describe("Volunteer dashboard", () => {
 
         cy.get(".account-action")
           .then(accountActionElems => accountActionElems[0])
-          .contains("Add photo");
+          .contains("Upload a photo ID");
       });
     });
 
@@ -89,8 +89,10 @@ describe("Volunteer dashboard", () => {
       });
 
       it("Should see incomplete status when only one reference is added", function() {
-        cy.get("#reference-name")
-          .type("Jane Doe")
+        cy.get("#reference-first-name")
+          .type("Jane")
+          .get("#reference-last-name")
+          .type("Doe")
           .get("#reference-email")
           .type("janedoe@anon.com");
 
@@ -109,13 +111,15 @@ describe("Volunteer dashboard", () => {
           .click();
 
         cy.get(".account-action").contains(
-          "Incomplete: 1 out of 2 references submitted"
+          "In progress: provide 1 additional reference"
         );
       });
 
       it("Should remove a reference", function() {
-        cy.get("#reference-name")
-          .type("Jane Doe")
+        cy.get("#reference-first-name")
+          .type("Jane")
+          .get("#reference-last-name")
+          .type("Doe")
           .get("#reference-email")
           .type("janedoe@anon.com");
 
@@ -137,12 +141,14 @@ describe("Volunteer dashboard", () => {
           .get(".done-btn")
           .click();
 
-        cy.get(".account-action").contains("Add references");
+        cy.get(".account-action").contains("Provide 2 references");
       });
 
       it("Should add two references", function() {
-        cy.get("#reference-name")
-          .type("Jane Doe")
+        cy.get("#reference-first-name")
+          .type("Jane")
+          .get("#reference-last-name")
+          .type("Doe")
           .get("#reference-email")
           .type("janedoe@anon.com");
 
@@ -158,8 +164,10 @@ describe("Volunteer dashboard", () => {
           .get(".add-reference-btn")
           .click();
 
-        cy.get("#reference-name")
-          .type("John Doe")
+        cy.get("#reference-first-name")
+          .type("John")
+          .get("#reference-last-name")
+          .type("Doe")
           .get("#reference-email")
           .type("johndoe@anon.com")
           .get(".save-btn")
@@ -167,7 +175,7 @@ describe("Volunteer dashboard", () => {
 
         cy.get(".done-btn").click();
 
-        cy.get(".account-action").contains("Pending");
+        cy.get(".account-action").contains("Waiting on references to submit");
       });
     });
   });
