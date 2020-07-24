@@ -286,6 +286,51 @@ export default {
       .post(`${API_ROOT}/volunteers/pending/${volunteerId}`, data)
       .then(this._successHandler, this._errorHandler);
   },
+  adminGetSessionReport({
+    joinedBefore,
+    joinedAfter,
+    sessionRangeFrom,
+    sessionRangeTo,
+    highSchoolId,
+    studentPartnerOrg
+  }) {
+    const queryParams = new URLSearchParams({
+      joinedBefore,
+      joinedAfter,
+      sessionRangeFrom,
+      sessionRangeTo,
+      highSchoolId,
+      studentPartnerOrg
+    }).toString();
+    return Vue.http
+      .get(`${API_ROOT}/reports/session-report?${queryParams}`)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminGetUsageReport({
+    joinedBefore,
+    joinedAfter,
+    sessionRangeFrom,
+    sessionRangeTo,
+    highSchoolId,
+    studentPartnerOrg
+  }) {
+    const queryParams = new URLSearchParams({
+      joinedBefore,
+      joinedAfter,
+      sessionRangeFrom,
+      sessionRangeTo,
+      highSchoolId,
+      studentPartnerOrg
+    }).toString();
+    return Vue.http
+      .get(`${API_ROOT}/reports/usage-report?${queryParams}`)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminGetStudentPartners() {
+    return Vue.http
+      .get(`${AUTH_ROOT}/partner/student-partners`)
+      .then(this._successHandler, this._errorHandler);
+  },
   getQuestions(context, data) {
     return context.$http
       .post(`${API_ROOT}/training/questions`, data)

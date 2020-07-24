@@ -30,6 +30,7 @@ import AdminUserDetail from "./views/Admin/AdminUserDetail";
 import AdminPendingVolunteers from "./views/Admin/AdminPendingVolunteers";
 import AdminIneligibleStudents from "./views/Admin/AdminIneligibleStudents";
 import AdminSchoolDetail from "./views/Admin/AdminSchoolDetail";
+import AdminReports from "./views/Admin/AdminReports";
 import VolunteerGuideView from "./views/VolunteerGuideView";
 import ReviewMaterialsView from "./views/ReviewMaterialsView";
 import ReferenceView from "./views/ReferenceView";
@@ -272,6 +273,12 @@ const routes = [
     path: "/admin/school/:schoolId",
     name: "AdminSchoolDetail",
     component: AdminSchoolDetail,
+    meta: { protected: true, requiresAdmin: true }
+  },
+  {
+    path: "/admin/reports",
+    name: "AdminReports",
+    component: AdminReports,
     meta: { protected: true, requiresAdmin: true }
   },
   {
