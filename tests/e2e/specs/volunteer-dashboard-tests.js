@@ -213,7 +213,7 @@ describe("Volunteer dashboard", () => {
         cy.get(".submit-btn").should("be.disabled");
       });
 
-      it.only("Should show success message after submitting background info", function() {
+      it("Should show success message after submitting background info", function() {
         cy.server();
 
         cy.get(".account-action")
@@ -226,15 +226,11 @@ describe("Volunteer dashboard", () => {
           .eq(2)
           .check();
 
-        cy.get(".uc-form-col")
-          .eq(1)
-          .find(".uc-form-checkbox input")
-          .eq(1)
-          .check();
+        cy.get("#college").type("UPchieve University");
 
         // Select country - United States of America
         cy.get(".uc-form-col")
-          .eq(3)
+          .eq(2)
           .find(".location-input")
           .click()
           .find(".vs__dropdown-option")
@@ -243,7 +239,7 @@ describe("Volunteer dashboard", () => {
 
         // Select state - New York
         cy.get(".uc-form-col")
-          .eq(3)
+          .eq(2)
           .find(".location-input")
           .eq(1)
           .click()
