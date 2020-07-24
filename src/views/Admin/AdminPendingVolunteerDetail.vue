@@ -57,7 +57,7 @@
             <span
               @click="toggleReferenceView(index)"
               class="reference__form-link"
-              >{{ reference.name }}</span
+              >{{ reference.firstName }} {{ reference.lastName }}</span
             >
             {{ " " }}
             <span

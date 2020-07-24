@@ -25,7 +25,7 @@
                 @click="removeReference(index)"
               />
             </div>
-            <p>{{ reference.name }}</p>
+            <p>{{ reference.firstName }} {{ reference.lastName }}</p>
             <p>{{ reference.email }}</p>
             <div class="reference-status">
               <span
@@ -67,13 +67,26 @@
               <h4>Reference {{ references.length + 1 }}</h4>
               <trash-icon class="trash-icon" @click="toggleAddReferenceMode" />
             </header>
-            <label for="reference-name">Name</label>
-            <input
-              type="text"
-              id="reference-name"
-              v-model="newReferenceName"
-              required
-            />
+            <div class="reference-name-container">
+              <div>
+                <label for="reference-first-name">First name</label>
+                <input
+                  type="text"
+                  id="reference-first-name"
+                  v-model="newReferenceFirstName"
+                  required
+                />
+              </div>
+              <div>
+                <label for="reference-last-name">Last name</label>
+                <input
+                  type="text"
+                  id="reference-last-name"
+                  v-model="newReferenceLastName"
+                  required
+                />
+              </div>
+            </div>
             <label for="reference-email">Email</label>
             <input
               type="email"
@@ -89,7 +102,13 @@
             <large-button
               class="btn save-btn"
               @click.native="addReference"
-              :disabled="!(newReferenceName && newReferenceEmail)"
+              :disabled="
+                !(
+                  newReferenceFirstName &&
+                  newReferenceLastName &&
+                  newReferenceEmail
+                )
+              "
               >Save</large-button
             >
           </div>
@@ -135,7 +154,8 @@ export default {
     return {
       addReferenceError: "",
       references: [],
-      newReferenceName: "",
+      newReferenceFirstName: "",
+      newReferenceLastName: "",
       newReferenceEmail: "",
       isAddReferenceMode: false
     };
@@ -151,12 +171,17 @@ export default {
   },
   methods: {
     toggleAddReferenceMode() {
-      this.newReferenceName = "";
+      this.newReferenceFirstName = "";
+      this.newReferenceLastName = "";
       this.newReferenceEmail = "";
       this.isAddReferenceMode = !this.isAddReferenceMode;
     },
     addReference() {
-      if (!this.newReferenceName || !this.newReferenceEmail) {
+      if (
+        !this.newReferenceFirstName ||
+        !this.newReferenceLastName ||
+        !this.newReferenceEmail
+      ) {
         this.addReferenceError = "Please fill out all fields.";
         return;
       }
@@ -180,13 +205,15 @@ export default {
       this.addReferenceError = "";
 
       const newReference = {
-        name: this.newReferenceName,
+        firstName: this.newReferenceFirstName,
+        lastName: this.newReferenceLastName,
         email: this.newReferenceEmail,
         status: "UNSENT"
       };
       this.references.push(newReference);
       NetworkService.addReference({
-        referenceName: this.newReferenceName,
+        referenceFirstName: this.newReferenceFirstName,
+        referenceLastName: this.newReferenceLastName,
         referenceEmail: this.newReferenceEmail
       });
       this.toggleAddReferenceMode();
@@ -320,6 +347,10 @@ label {
   @include flex-container(row, space-between, center);
   color: $c-secondary-grey;
   @include font-category("body");
+}
+
+.reference-name-container {
+  @include flex-container(row, space-between);
 }
 
 .reference-status {
