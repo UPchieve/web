@@ -351,6 +351,14 @@ label {
 
 .reference-name-container {
   @include flex-container(row, space-between);
+
+  & > div {
+    flex-grow: 1;
+
+    &:first-child {
+      margin-right: 20px;
+    }
+  }
 }
 
 .reference-status {
