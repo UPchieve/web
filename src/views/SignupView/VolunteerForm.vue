@@ -143,39 +143,6 @@
       </p>
     </div>
 
-    <div class="uc-column">
-      <label for="college" class="uc-form-label">
-        College
-      </label>
-      <input
-        id="college"
-        type="text"
-        class="uc-form-input"
-        v-bind:class="{
-          'uc-form-input--invalid': invalidInputs.indexOf('college') > -1
-        }"
-        v-model="profile.college"
-        required
-      />
-    </div>
-
-    <div class="uc-column">
-      <label for="favoriteAcademicSubject" class="uc-form-label">
-        What’s your favorite academic subject?
-      </label>
-      <input
-        id="favoriteAcademicSubject"
-        type="text"
-        class="uc-form-input"
-        v-bind:class="{
-          'uc-form-input--invalid':
-            invalidInputs.indexOf('favoriteAcademicSubject') > -1
-        }"
-        v-model="profile.favoriteAcademicSubject"
-        required
-      />
-    </div>
-
     <div class="uc-form-checkbox">
       <input
         id="userAgreement"
@@ -221,9 +188,7 @@ export default {
       profile: {
         firstName: "",
         lastName: "",
-        college: "",
-        phone: "",
-        favoriteAcademicSubject: ""
+        phone: ""
       },
       step: "step-1",
       phoneInputInfo: {}
@@ -293,14 +258,6 @@ export default {
         this.errors.push(this.profile.phone + " is not a valid phone number.");
         this.invalidInputs.push("phone");
       }
-      if (!this.profile.college) {
-        this.errors.push("Please enter the name of the college you go to.");
-        this.invalidInputs.push("college");
-      }
-      if (!this.profile.favoriteAcademicSubject) {
-        this.errors.push("Please enter your favorite academic subject.");
-        this.invalidInputs.push("favoriteAcademicSubject");
-      }
       if (!this.credentials.terms) {
         this.errors.push("You must read and accept the user agreement.");
       }
@@ -315,9 +272,7 @@ export default {
         terms: this.credentials.terms,
         firstName: this.profile.firstName,
         lastName: this.profile.lastName,
-        phone: this.phoneInputInfo.e164,
-        college: this.profile.college,
-        favoriteAcademicSubject: this.profile.favoriteAcademicSubject
+        phone: this.phoneInputInfo.e164
       })
         .then(() => {
           this.step = "success-message";

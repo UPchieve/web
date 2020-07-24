@@ -147,14 +147,6 @@ describe("Student and volunteer signup", () => {
         .type(this.newVolunteer.phoneNumber)
         .should("have.value", this.newVolunteer.phoneNumber);
 
-      cy.get("#college")
-        .type(this.newVolunteer.college)
-        .should("have.value", this.newVolunteer.college);
-
-      cy.get("#favoriteAcademicSubject")
-        .type(this.newVolunteer.favoriteAcademicSubject)
-        .should("have.value", this.newVolunteer.favoriteAcademicSubject);
-
       cy.get("#userAgreement").click();
 
       cy.get("button[type=submit]").click();
