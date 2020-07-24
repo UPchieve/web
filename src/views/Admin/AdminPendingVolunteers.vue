@@ -57,7 +57,6 @@ export default {
     }
   },
   methods: {
-    // @todo: set up page params
     async setPage(page) {
       this.page = page;
       this.volunteers = [];
