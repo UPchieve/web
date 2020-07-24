@@ -46,27 +46,27 @@
               </label>
             </div>
             <template v-if="isCollegeEducated">
-              <label class="uc-form-label location-label" for="college"
+              <label class="uc-form-label occupations-label" for="college"
                 >What college/university do you currently attend?</label
               >
               <input
                 type="text"
                 v-model="college"
                 placeholder="Enter a college..."
-                class="uc-form-input location-input"
+                class="uc-form-input occupations-input"
                 id="college"
               />
             </template>
 
             <template v-if="isWorkingFullTime">
-              <label class="uc-form-label location-label" for="company"
+              <label class="uc-form-label occupations-label" for="company"
                 >What company do you currently work at?</label
               >
               <input
                 type="text"
                 v-model="company"
                 placeholder="Enter your company..."
-                class="uc-form-input location-input"
+                class="uc-form-input occupations-input"
                 id="company"
               />
             </template>
@@ -554,14 +554,16 @@ textarea {
   }
 }
 
-.location-label {
+.location-label,
+.occupations-label {
   display: block;
   margin-top: 1.4em;
   margin-bottom: 0.5em;
 }
 
 .linkedin-input,
-.location-input {
+.location-input,
+.occupations-input {
   width: 90%;
 
   @include breakpoint-above("medium") {
