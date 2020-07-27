@@ -17,7 +17,12 @@
           'whiteboard-container--hidden': shouldHideWhiteboardSection
         }"
       >
-        <whiteboard :isVisible="whiteboardOpen" />
+        <whiteboard
+          :isVisible="whiteboardOpen"
+          :isWhiteboardOpen="whiteboardOpen"
+          :toggleWhiteboard="toggleWhiteboard"
+          ref="whiteboard"
+        />
       </div>
       <div
         class="chat-container"
@@ -37,6 +42,14 @@
     >
       <img id="toggleIcon" :src="getIconUrl()" />
     </div>
+    <div
+      v-if="mobileMode"
+      class="toggleButton toggleButton__photo-upload"
+      :class="shouldHideChatSection ? 'photo-upload--hidden' : ''"
+      @click="openFileDialog"
+    >
+      <photo-upload-icon class="photo-upload--icon" />
+    </div>
   </div>
 </template>
 
@@ -53,6 +66,8 @@ import SessionChat from "./SessionChat";
 import SessionFulfilledModal from "./SessionFulfilledModal";
 import ConnectionTroubleModal from "./ConnectionTroubleModal";
 
+import PhotoUploadIcon from "@/assets/whiteboard_icons/photo-upload.svg";
+
 const headerData = {
   component: "SessionHeader"
 };
@@ -62,7 +77,8 @@ export default {
   components: {
     SessionHeader,
     Whiteboard,
-    SessionChat
+    SessionChat,
+    PhotoUploadIcon
   },
   created() {
     if (this.mobileMode) {
@@ -263,6 +279,9 @@ export default {
     },
     tryClicked() {
       this.sessionReconnecting = true;
+    },
+    openFileDialog() {
+      this.$refs.whiteboard.openFileDialog();
     }
   },
   watch: {
@@ -381,13 +400,14 @@ export default {
   }
 }
 
-.toggleButton {
+.toggleButton,
+.toggleButton__photo-upload {
   position: fixed;
   z-index: 3;
   bottom: 10px;
   right: 20px;
   border-radius: 20px;
-  background: #16d2aa;
+  background-color: #16d2aa;
   width: 40px;
   height: 40px;
   transition: 0.4s;
@@ -396,7 +416,14 @@ export default {
     bottom: 33px;
   }
 
-  img {
+  &__photo-upload {
+    background-color: white;
+    border: 1px solid $c-border-grey;
+    right: 80px;
+  }
+
+  img,
+  svg {
     margin-top: 7px;
     width: 26px;
     height: 26px;
@@ -405,5 +432,13 @@ export default {
 
 .toggleButton.back {
   bottom: calc(100% - 140px);
+}
+
+.photo-upload--hidden {
+  display: none !important;
+}
+
+.photo-upload--icon {
+  margin-top: 5px !important;
 }
 </style>
