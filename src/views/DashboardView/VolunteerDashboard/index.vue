@@ -11,82 +11,134 @@
     </dashboard-banner>
 
     <div class="volunteer-dashboard__body">
-      <div v-if="!user.isOnboarded" class="dashboard-card">
-        <div class="dashboard-card__title">Remaining Onboarding Steps</div>
-        <div>
-          <div v-if="!hasSelectedAvailability" class="onboarding-step">
-            <img
-              src="@/assets/onboarding_icons/calendar-icon.png"
-              class="onboarding-icon"
-            />
-            <div>
-              <h4>Select availability</h4>
-              <p>
-                Select at least one hour of availability so that we know when we
-                can text you.
-              </p>
+      <template v-if="user.isApproved && user.isOnboarded">
+        <div class="dashboard-card">
+          <div class="students-waiting">
+            <div class="dashboard-card__title">Waiting Students</div>
+            <div v-if="isSessionAlive">
+              <button
+                class="btn rejoinSessionBtn"
+                @click.prevent="rejoinHelpSession()"
+              >
+                Rejoin your coaching session
+              </button>
             </div>
-          </div>
-          <div v-if="!hasCertification" class="onboarding-step">
-            <img
-              src="@/assets/onboarding_icons/quiz-icon.png"
-              class="onboarding-icon"
-            />
-            <div>
-              <h4>Get a certification</h4>
-              <p>
-                Pass at least one quiz so that we know what subjects you can
-                help students with.
-              </p>
+            <div v-else>
+              <div class="dashboard-card__subtitle">
+                Students waiting for help will show up below.
+              </div>
+              <list-sessions />
             </div>
           </div>
         </div>
-      </div>
-      <div v-else class="students-waiting dashboard-card">
-        <div class="dashboard-card__title">Waiting Students</div>
-        <div v-if="isSessionAlive">
-          <button
-            class="btn rejoinSessionBtn"
-            @click.prevent="rejoinHelpSession()"
-          >
-            Rejoin your coaching session
-          </button>
-        </div>
-        <div v-else>
-          <div class="dashboard-card__description">
-            Students waiting for help will show up below.
-          </div>
-          <list-sessions />
-        </div>
-      </div>
-      <div class="dashboard-card">
-        <div class="dashboard-card__title">Your Impact Summary</div>
+        <div class="dashboard-card">
+          <div class="dashboard-card__title">Your Impact Summary</div>
 
-        <div class="volunteer-impact">
-          <div class="volunteer-impact__stats">
-            <div
-              v-for="(stat, statIndex) in impactStats"
-              :key="statIndex"
-              class="volunteer-impact__stat"
-            >
-              <div class="volunteer-impact__stat-label">{{ stat.label }}:</div>
-              <div class="volunteer-impact__stat-value">{{ stat.value }}</div>
+          <div class="volunteer-impact">
+            <div class="volunteer-impact__stats">
+              <div
+                v-for="(stat, statIndex) in impactStats"
+                :key="statIndex"
+                class="volunteer-impact__stat"
+              >
+                <div class="volunteer-impact__stat-label">
+                  {{ stat.label }}:
+                </div>
+                <div class="volunteer-impact__stat-value">{{ stat.value }}</div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </template>
+      <template v-else>
+        <div v-if="!user.isApproved" class="dashboard-card">
+          <div class="dashboard-card__icon">
+            <verification-icon />
+          </div>
+          <div class="dashboard-card__title">Approval process</div>
+          <div class="dashboard-card__subtitle">
+            {{ approvalCardSubheader }}
+          </div>
+          <template v-if="!user.volunteerPartnerOrg">
+            <account-action
+              v-for="accountAction in openVolunteerApprovalAccountActions"
+              :key="accountAction.title"
+              :title="accountAction.title"
+              :subtitle="accountAction.subtitle"
+              :status="accountAction.status"
+              :icon="accountAction.icon"
+              @click.native="accountAction.clickFn"
+            />
+          </template>
+          <template v-else>
+            <account-action
+              v-for="accountAction in partnerVolunteerApprovalAccountActions"
+              :key="accountAction.title"
+              :title="accountAction.title"
+              :subtitle="accountAction.subtitle"
+              :status="accountAction.status"
+              :icon="accountAction.icon"
+              @click.native="accountAction.clickFn"
+            />
+          </template>
+        </div>
+        <div class="dashboard-card">
+          <div class="dashboard-card__icon">
+            <onboarding-icon />
+          </div>
+          <div class="dashboard-card__title">Onboarding process</div>
+          <div class="dashboard-card__subtitle">
+            Before you can begin helping students, you’ll need to complete our
+            volunteer onboarding process.
+          </div>
+
+          <account-action
+            v-for="accountAction in onboaringAccountActions"
+            :key="accountAction.title"
+            :title="accountAction.title"
+            :subtitle="accountAction.subtitle"
+            :status="accountAction.status"
+            :icon="accountAction.icon"
+            @click.native="accountAction.clickFn"
+          />
+        </div>
+      </template>
     </div>
+
+    <photo-upload-modal
+      v-if="showPhotoUploadModal"
+      :closeModal="togglePhotoUploadModal"
+    />
+
+    <references-modal
+      v-if="showReferencesModal"
+      :closeModal="toggleReferencesModal"
+    />
+
+    <volunteer-welcome-modal
+      v-if="showWelcomeModal"
+      :closeModal="toggleWelcomeModal"
+    />
   </div>
 </template>
 
 <script>
 import _ from "lodash";
 import { mapState, mapGetters } from "vuex";
-
 import ListSessions from "./ListSessions";
 import DashboardBanner from "../DashboardBanner";
+import AccountAction from "./AccountAction";
+import PhotoUploadModal from "./PhotoUploadModal";
+import ReferencesModal from "./ReferencesModal";
+import VolunteerWelcomeModal from "@/views/DashboardView/VolunteerDashboard/VolunteerWelcomeModal.vue";
 import LargeButton from "@/components/LargeButton";
-
+import PersonCardIcon from "@/assets/person-card.svg";
+import PersonIcon from "@/assets/person.svg";
+import ReferencesIcon from "@/assets/references-icon.svg";
+import CalendarIcon from "@/assets/calendar.svg";
+import CertificationIcon from "@/assets/certification.svg";
+import VerificationIcon from "@/assets/verification.svg";
+import OnboardingIcon from "@/assets/onboarding.svg";
 import { allSubtopicNames } from "@/utils/topics";
 
 const headerData = {
@@ -98,7 +150,17 @@ const upchieveTopics = allSubtopicNames();
 
 export default {
   name: "volunteer-dashboard",
-  components: { ListSessions, DashboardBanner, LargeButton },
+  components: {
+    ListSessions,
+    DashboardBanner,
+    AccountAction,
+    PhotoUploadModal,
+    ReferencesModal,
+    LargeButton,
+    VerificationIcon,
+    OnboardingIcon,
+    VolunteerWelcomeModal
+  },
   watch: {
     isSessionAlive(isAlive) {
       if (!isAlive) {
@@ -114,10 +176,17 @@ export default {
     }
 
     if (this.isFirstDashboardVisit) {
-      this.showOnboardingModal();
+      this.toggleWelcomeModal();
     }
 
     this.$store.dispatch("user/fetchVolunteerStats", this);
+  },
+  data() {
+    return {
+      showPhotoUploadModal: false,
+      showReferencesModal: false,
+      showWelcomeModal: false
+    };
   },
   computed: {
     ...mapState({
@@ -134,6 +203,122 @@ export default {
 
     isNewVolunteer() {
       return !this.user.pastSessions || !this.user.pastSessions.length;
+    },
+
+    photoIdAction() {
+      switch (this.user.photoIdStatus) {
+        case "EMPTY":
+          return {
+            subtitle: "Upload a photo ID",
+            status: "DEFAULT"
+          };
+        case "SUBMITTED":
+          return {
+            subtitle: "Pending review",
+            status: "PENDING"
+          };
+        case "APPROVED":
+          return {
+            subtitle: "Completed",
+            status: "COMPLETED"
+          };
+        case "REJECTED":
+          return {
+            subtitle: "Please upload a different photo",
+            status: "ERROR"
+          };
+        default:
+          return {
+            subtitle: "Upload a photo ID",
+            status: "DEFAULT"
+          };
+      }
+    },
+
+    referenceAction() {
+      const statuses = this.user.references.map(r => r.status);
+
+      if (statuses.length === 0)
+        return {
+          subtitle: "Provide 2 references",
+          status: "DEFAULT"
+        };
+
+      if (statuses.some(s => s === "REJECTED"))
+        return {
+          subtitle: "Contact UPchieve support",
+          status: "ERROR"
+        };
+
+      if (statuses.length === 1)
+        return {
+          subtitle: "In progress: provide 1 additional reference",
+          status: "PROGRESS"
+        };
+
+      if (statuses[0] === "APPROVED" && statuses[1] === "APPROVED")
+        return {
+          subtitle: "Completed",
+          status: "COMPLETED"
+        };
+
+      if (statuses[0] === "SUBMITTED" && statuses[1] === "SUBMITTED")
+        return {
+          subtitle: "Pending review",
+          status: "PENDING"
+        };
+
+      return {
+        subtitle: "Waiting on references to submit",
+        status: "PENDING"
+      };
+    },
+
+    availabilityAction() {
+      if (this.hasSelectedAvailability)
+        return {
+          subtitle: "Completed",
+          status: "COMPLETED"
+        };
+
+      return {
+        subtitle: "Select at least one hour",
+        status: "DEFAULT"
+      };
+    },
+
+    certificationAction() {
+      if (this.hasCertification)
+        return {
+          subtitle: "Completed",
+          status: "COMPLETED"
+        };
+
+      return {
+        subtitle: "Pass at least one quiz",
+        status: "DEFAULT"
+      };
+    },
+
+    backgroundInfoAction() {
+      if (this.hasCompletedBackgroundInfo)
+        return {
+          subtitle: "Completed",
+          status: "COMPLETED"
+        };
+
+      return {
+        subtitle: "Fill out form",
+        status: "DEFAULT"
+      };
+    },
+
+    hasCompletedBackgroundInfo() {
+      return (
+        this.user.occupation &&
+        this.user.occupation.length > 0 &&
+        this.user.country
+      );
     },
 
     impactStats() {
@@ -203,6 +388,89 @@ export default {
           value: `${numElapsedAvailabilityHours} hours elapsed`
         }
       ];
+    },
+
+    approvalCardSubheader() {
+      if (this.user.volunteerPartnerOrg)
+        return "Just one step left to get approved to volunteer with UPchieve!";
+
+      return "Complete our screening process to get approved to volunteer with UPchieve.";
+    },
+    openVolunteerApprovalAccountActions() {
+      const accountActions = [
+        {
+          title: "Proof of identity",
+          subtitle: this.photoIdAction.subtitle,
+          status: this.photoIdAction.status,
+          clickFn: this.togglePhotoUploadModal,
+          icon: PersonCardIcon,
+          priority: this.addSortPriorityNum(this.photoIdAction.status)
+        },
+        {
+          title: "Reference check",
+          subtitle: this.referenceAction.subtitle,
+          status: this.referenceAction.status,
+          clickFn: this.toggleReferencesModal,
+          icon: ReferencesIcon,
+          priority: this.addSortPriorityNum(this.referenceAction.status)
+        },
+        {
+          title: "Background information",
+          subtitle: this.backgroundInfoAction.subtitle,
+          status: this.backgroundInfoAction.status,
+          clickFn: this.goToBackgroundInfo,
+          icon: PersonIcon,
+          priority: this.addSortPriorityNum(this.backgroundInfoAction.status)
+        }
+      ];
+
+      return accountActions.sort((a, b) => a.priority - b.priority);
+    },
+
+    partnerVolunteerApprovalAccountActions() {
+      const accountActions = [
+        {
+          title: "Proof of identity",
+          // @todo: change copy for subtitle
+          subtitle: "Completed",
+          status: "COMPLETED",
+          clickFn: () => {},
+          icon: PersonCardIcon,
+          priority: this.addSortPriorityNum("COMPLETED")
+        },
+        {
+          title: "Background information",
+          subtitle: this.backgroundInfoAction.subtitle,
+          status: this.backgroundInfoAction.status,
+          clickFn: this.goToBackgroundInfo,
+          icon: PersonIcon,
+          priority: this.addSortPriorityNum(this.backgroundInfoAction.status)
+        }
+      ];
+
+      return accountActions.sort((a, b) => a.priority - b.priority);
+    },
+
+    onboaringAccountActions() {
+      const onboaringActions = [
+        {
+          title: "Select availability",
+          subtitle: this.availabilityAction.subtitle,
+          status: this.availabilityAction.status,
+          clickFn: this.clickAvailabilityAction,
+          icon: CalendarIcon,
+          priority: this.addSortPriorityNum(this.availabilityAction.status)
+        },
+        {
+          title: "Obtain a certification",
+          subtitle: this.certificationAction.subtitle,
+          status: this.certificationAction.status,
+          clickFn: this.clickCertificationAction,
+          icon: CertificationIcon,
+          priority: this.addSortPriorityNum(this.certificationAction.status)
+        }
+      ];
+      return onboaringActions.sort((a, b) => a.priority - b.priority);
     }
   },
   methods: {
@@ -224,6 +492,31 @@ export default {
         component: "VolunteerOnboardingModal",
         data: { alertModal: true, acceptText: "Get started" }
       });
+    },
+    toggleWelcomeModal() {
+      this.showWelcomeModal = !this.showWelcomeModal;
+    },
+    togglePhotoUploadModal() {
+      this.showPhotoUploadModal = !this.showPhotoUploadModal;
+    },
+    toggleReferencesModal() {
+      this.showReferencesModal = !this.showReferencesModal;
+    },
+    clickAvailabilityAction() {
+      this.$router.push("/calendar");
+    },
+    clickCertificationAction() {
+      this.$router.push("/training");
+    },
+    goToBackgroundInfo() {
+      this.$router.push("/background-information");
+    },
+    addSortPriorityNum(status) {
+      if (status === "COMPLETED") return 0;
+      if (status === "ERROR") return 1;
+      if (status === "PENDING") return 2;
+      if (status === "PROGRESS") return 3;
+      if (status === "DEFAULT") return 4;
     }
   }
 };
@@ -257,7 +550,6 @@ export default {
 
 .volunteer-dashboard {
   @include flex-container(column);
-  @include child-spacing(top, 40px);
   padding: 40px 15px;
 
   @include breakpoint-above("medium") {
@@ -269,6 +561,7 @@ export default {
   &__body {
     @include child-spacing(top, 16px);
     @include child-spacing(right, 0);
+    margin-top: 40px;
 
     @include breakpoint-above("huge") {
       @include child-spacing(top, 0);
@@ -286,30 +579,64 @@ export default {
 .dashboard-card {
   background: #fff;
   border-radius: 8px;
-  padding: 40px 10px;
+  padding: 40px 0 24px;
 
-  @include breakpoint-above("medium") {
-    padding: 40px 30px;
+  &__icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 24px;
   }
 
   &__title {
-    margin: 0 0 15px;
+    margin-bottom: 4px;
     font-size: 24px;
     font-weight: 500;
     line-height: 1.25;
   }
 
-  &__description {
+  &__subtitle {
     font-size: 16px;
     color: $c-secondary-grey;
-    margin: 15px 0;
+    margin-bottom: 24px;
+    padding: 0 15px;
+
+    @include breakpoint-above("medium") {
+      padding: 0 42px;
+    }
+  }
+
+  .account-action {
+    margin: 0 10px;
+
+    @include breakpoint-above("medium") {
+      margin: 0 20px;
+    }
+  }
+}
+
+.students-waiting {
+  padding: 0;
+
+  @include breakpoint-above("medium") {
+    padding: 0 30px;
   }
 }
 
 .volunteer-impact {
+  padding: 0 10px;
+
+  @include breakpoint-above("medium") {
+    padding: 0 30px;
+  }
+
   &__stats {
     width: 100%;
     padding: 10px 5px 0;
+  }
+
+  &__stat-label {
+    text-align: left;
   }
 
   &__stat {
@@ -321,28 +648,7 @@ export default {
 
   &__stat-value {
     font-weight: bold;
+    text-align: right;
   }
-}
-
-.onboarding-step {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-
-  &:first-child {
-    margin: 2.5em 0 3em;
-  }
-
-  & div {
-    text-align: left;
-    margin-left: 2em;
-  }
-}
-
-.onboarding-icon {
-  width: 70px;
-  height: 70px;
-  flex-shrink: 0;
 }
 </style>
