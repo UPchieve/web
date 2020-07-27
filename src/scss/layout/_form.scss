@@ -124,13 +124,14 @@
 }
 
 .uc-form-button-big {
+  font-size: 14px;
   background-color: $c-background-grey;
   border: none;
   border-radius: 50px;
   color: $c-soft-black;
-  padding: 15px 35px;
-  font-weight: 600;
-  min-width: 300px;
+  padding: 13px 32px;
+  font-weight: 500;
+  min-width: 250px;
 
   &:hover,
   &:active {
