@@ -257,6 +257,7 @@ export default {
         return;
       }
       this.insertPhoto(file);
+      this.usePickTool();
 
       const response = await NetworkService.getSessionPhotoUploadUrl(
         this.session._id
