@@ -431,7 +431,7 @@ export default {
       this.$router.push("/sign-up/student/account");
     },
     ineligibleContinue() {
-      window.location = "https://upchieve.org/parents";
+      window.location = "https://upchieve.org/request-access";
     },
     autocompleteSchool(input) {
       this.eligibility.highSchool = {};
