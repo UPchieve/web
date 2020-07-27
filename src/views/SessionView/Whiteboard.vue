@@ -133,6 +133,14 @@ export default {
     isVisible: {
       type: Boolean,
       required: true
+    },
+    isWhiteboardOpen: {
+      type: Boolean,
+      required: true
+    },
+    toggleWhiteboard: {
+      type: Function,
+      required: true
     }
   },
   data() {
@@ -250,8 +258,11 @@ export default {
     async uploadPhoto(event) {
       const { files } = event.target;
       const file = files[0];
-      const tenMegaBytes = 10 * 1000000;
-      if (file.size > tenMegaBytes) {
+      const tenMegabytes = 10 * 1000000;
+
+      if (!this.isWhiteboardOpen && this.mobileMode) this.toggleWhiteboard();
+
+      if (file.size > tenMegabytes) {
         this.error =
           "The photo is too large. Please upload a photo less than 10mb.";
         return;
