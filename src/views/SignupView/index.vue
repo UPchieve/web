@@ -18,7 +18,7 @@
           </p>
         </div>
         <div class="btn-container">
-          <h4>How can we help you?</h4>
+          <h4 class="uc-subheader">How can we help you?</h4>
           <button
             class="uc-form-button-big"
             type="submit"
@@ -95,6 +95,11 @@ export default {
 <style lang="scss" scoped>
 .uc-form-header {
   flex-direction: row-reverse;
+}
+
+.uc-subheader {
+  color: $c-secondary-grey;
+  font-weight: 600;
 }
 
 .uc-form-body {
