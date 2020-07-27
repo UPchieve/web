@@ -143,6 +143,12 @@ export default {
 
     firstDashboardVisit: ({ commit }, isFirstDashboardVisit) => {
       commit("setIsFirstDashboardVisit", isFirstDashboardVisit);
+    },
+
+    addToUser: ({ commit, state }, data) => {
+      const { user } = state;
+      const updatedUser = { ...user, ...data };
+      commit("updateUser", updatedUser);
     }
   },
   getters: {

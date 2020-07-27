@@ -42,17 +42,7 @@ describe("Training quizzes", function() {
           cy.logout();
 
           cy.get("@untrainedVolunteer").then(untrainedVolunteer => {
-            const userObj = Object.assign({}, untrainedVolunteer);
-
-            cy.get("@adminVolunteer").then(adminVolunteer =>
-              cy.login(adminVolunteer)
-            );
-
-            cy.getVolunteerCodes().then(codes => {
-              userObj.code = codes[0];
-
-              cy.createVolunteer(userObj);
-            });
+            cy.createOpenVolunteer(untrainedVolunteer);
           });
 
           cy.request({
