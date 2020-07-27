@@ -1,5 +1,9 @@
 <template>
-  <div class="ModalTemplate" :class="{ 'ModalTemplate--important': important }">
+  <div
+    class="ModalTemplate"
+    :class="{ 'ModalTemplate--important': important }"
+    @click="closeModal"
+  >
     <div v-if="mobileMode" class="ModalTemplate-header">
       <div class="ModalTemplate-header-close-button" @click="handleCancel">
         <arrow-icon class="icon" />
@@ -62,6 +66,10 @@ export default {
     handleCancel() {
       this.$emit("cancel");
       this.$store.dispatch("app/modal/hide");
+    },
+    closeModal(event) {
+      const { target } = event;
+      if (target.classList.contains("ModalTemplate")) this.handleCancel();
     }
   }
 };

@@ -1,100 +1,53 @@
 <template>
-  <div :class="classes">
-    <div :class="dialogClasses">
-      <div class="v-modal-dialog__content">
-        {{ message }}
+  <div
+    class="upc-modal"
+    :class="{ 'modal--important': important }"
+    @click="handleClose"
+  >
+    <div v-if="mobileMode" class="upc-modal-header">
+      <div class="upc-modal-header-close-button" @click="closeModal">
+        <arrow-icon class="icon" />
+        <p>{{ backText }}</p>
       </div>
-      <btn
-        v-if="singleBtn"
-        :label="mainBtnLabel"
-        :click-handler="clickHandlers.main"
-      />
-      <btn-options
-        v-else
-        :main-btn-label="mainBtnLabel"
-        :second-btn-label="secondBtnLabel"
-        :click-handlers="clickHandlers"
-      />
+    </div>
+
+    <div class="upc-modal-form">
+      <slot />
+
+      <div class="upc-modal-form--bottom-padding" />
     </div>
   </div>
 </template>
 
 <script>
-import BtnOptions from "./BtnOptions";
-import Btn from "./Btn";
+import { mapGetters } from "vuex";
+import ArrowIcon from "@/assets/arrow.svg";
 
 export default {
-  components: {
-    BtnOptions,
-    Btn
-  },
+  components: { ArrowIcon },
   props: {
-    singleBtn: {
-      type: Boolean,
-      default: false
-    },
-    message: {
-      type: String,
-      default: ""
-    },
-    warn: {
-      type: Boolean,
-      default: false
-    },
-    labels: {
-      type: Array[String],
-      default: [""]
-    },
-    clickHandlers: {
-      type: Object,
-      required: true
-    }
+    closeModal: { type: Function, required: true },
+    important: Boolean,
+    backText: { type: String, default: "Back" }
   },
-  data() {
-    return {
-      mainBtnLabel: this.labels[0],
-      secondBtnLabel: this.labels[1] ? this.labels[1] : null,
-      classes: {
-        "v-modal": true,
-        "v-modal--warn": this.warn
-      },
-      dialogClasses: {
-        "v-modal-dialog": true,
-        "v-modal-dialog--warn": this.warn
-      }
-    };
+  mounted() {
+    const body = document.querySelector("body");
+    body.classList.add("disable-scroll");
+  },
+  beforeDestroy() {
+    const body = document.querySelector("body");
+    body.classList.remove("disable-scroll");
+  },
+  computed: {
+    ...mapGetters({ mobileMode: "app/mobileMode" })
+  },
+  methods: {
+    handleClose(event) {
+      const { target } = event;
+      if (target.classList.contains("upc-modal")) this.closeModal();
+    }
   }
 };
 </script>
 
-<style lang="scss" scoped>
-.v-modal {
-  position: fixed;
-  top: 0;
-  left: 300px;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  background: $c-backdrop;
-}
-.v-modal--warn {
-  background: $c-backdrop-warn;
-}
-
-.v-modal-dialog {
-  background: #fff;
-  width: 80%;
-  max-width: 480px;
-  padding: 40px;
-  box-shadow: -4px 4px $c-shadow;
-}
-.v-modal-dialog__content {
-  margin-bottom: 40px;
-}
-.v-modal-dialog--warn {
-  box-shadow: -4px 4px $c-shadow-warn;
-}
-</style>
+<style lang="scss" scoped></style>

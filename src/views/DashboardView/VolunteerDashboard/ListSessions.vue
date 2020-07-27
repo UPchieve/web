@@ -100,15 +100,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.session-list {
+  padding: 10px 20px;
+}
+
 .session-row {
   cursor: pointer;
 }
 
 .session-row td {
   text-align: left;
-}
-
-.session-list {
-  padding: 20px;
 }
 </style>
