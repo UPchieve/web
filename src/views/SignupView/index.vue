@@ -36,6 +36,7 @@
           </button>
         </div>
       </div>
+      <form-footer v-if="!isMobileApp" />
     </div>
   </form-page-template>
 </template>
@@ -45,13 +46,15 @@ import { mapState } from "vuex";
 import FormPageTemplate from "@/components/FormPageTemplate";
 import StudentForm from "./StudentForm";
 import VolunteerForm from "./VolunteerForm";
+import FormFooter from "@/components/FormFooter";
 
 export default {
   name: "signup-view",
   components: {
     FormPageTemplate,
     StudentForm,
-    VolunteerForm
+    VolunteerForm,
+    FormFooter
   },
 
   created() {
