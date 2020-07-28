@@ -27,11 +27,14 @@ import AdminSessions from "./views/Admin/AdminSessions";
 import AdminSessionNotifications from "./views/Admin/AdminSessionNotifications";
 import AdminSessionDetail from "./views/Admin/AdminSessionDetail";
 import AdminUserDetail from "./views/Admin/AdminUserDetail";
+import AdminPendingVolunteers from "./views/Admin/AdminPendingVolunteers";
 import AdminIneligibleStudents from "./views/Admin/AdminIneligibleStudents";
 import AdminSchoolDetail from "./views/Admin/AdminSchoolDetail";
 import AdminReports from "./views/Admin/AdminReports";
 import VolunteerGuideView from "./views/VolunteerGuideView";
 import ReviewMaterialsView from "./views/ReviewMaterialsView";
+import ReferenceView from "./views/ReferenceView";
+import BackgroundInfoView from "./views/BackgroundInfoView";
 
 import store from "./store";
 
@@ -87,6 +90,12 @@ const routes = [
     name: "LogoutView",
     component: LogoutView,
     meta: { loggedOutOnly: true }
+  },
+  {
+    path: "/reference-form/:referenceId",
+    name: "ReferenceView",
+    component: ReferenceView,
+    meta: { authOptional: true }
   },
   {
     path: "/signup",
@@ -249,6 +258,12 @@ const routes = [
     meta: { protected: true, requiresAdmin: true }
   },
   {
+    path: "/admin/volunteers/pending",
+    name: "AdminPendingVolunteers",
+    component: AdminPendingVolunteers,
+    meta: { protected: true, requiresAdmin: true }
+  },
+  {
     path: "/admin/ineligible-students",
     name: "AdminIneligibleStudents",
     component: AdminIneligibleStudents,
@@ -270,6 +285,12 @@ const routes = [
     path: "/coach-guide",
     name: "VolunteerGuide",
     component: VolunteerGuideView,
+    meta: { protected: true }
+  },
+  {
+    path: "/background-information",
+    name: "BackgroundInfoView",
+    component: BackgroundInfoView,
     meta: { protected: true }
   },
   {

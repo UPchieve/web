@@ -4,8 +4,15 @@ import errcode from "err-code";
 
 const AUTH_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/auth`;
 const API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/api`;
-const ELIGIBILITY_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/eligibility`;
-const CONTACT_API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/contact`;
+const ELIGIBILITY_API_ROOT = `${
+  process.env.VUE_APP_SERVER_ROOT
+}/api-public/eligibility`;
+const CONTACT_API_ROOT = `${
+  process.env.VUE_APP_SERVER_ROOT
+}/api-public/contact`;
+const REFERENCE_API_ROOT = `${
+  process.env.VUE_APP_SERVER_ROOT
+}/api-public/reference`;
 
 const FAULT_TOLERANT_HTTP_TIMEOUT = 10000;
 const FAULT_TOLERANT_HTTP_MAX_RETRY_TIMEOUT = 100000;
@@ -71,11 +78,6 @@ export default {
       .get(`${AUTH_ROOT}/logout`)
       .then(this._successHandler, this._errorHandler);
   },
-  checkCode(context, data) {
-    return context.$http
-      .post(`${AUTH_ROOT}/register/check`, data)
-      .then(this._successHandler, this._errorHandler);
-  },
   checkRegister(context, data) {
     return context.$http
       .post(`${AUTH_ROOT}/register/checkcred`, data)
@@ -108,9 +110,14 @@ export default {
       )
       .then(this._successHandler, this._errorHandler);
   },
-  registerVolunteer(context, data) {
+  registerOpenVolunteer(context, data) {
     return context.$http
-      .post(`${AUTH_ROOT}/register/volunteer`, data)
+      .post(`${AUTH_ROOT}/register/volunteer/open`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
+  registerPartnerVolunteer(context, data) {
+    return context.$http
+      .post(`${AUTH_ROOT}/register/volunteer/partner`, data)
       .then(this._successHandler, this._errorHandler);
   },
   registerStudent(context, data) {
@@ -244,6 +251,11 @@ export default {
       .get(`${API_ROOT}/session/${sessionId}`)
       .then(this._successHandler, this._errorHandler);
   },
+  adminGetPendingVolunteers(page) {
+    return Vue.http
+      .get(`${API_ROOT}/volunteers/pending?page=${page}`)
+      .then(this._successHandler, this._errorHandler);
+  },
   adminGetSessionNotifications(sessionId) {
     return Vue.http
       .get(`${API_ROOT}/session/${sessionId}/notifications`)
@@ -267,6 +279,11 @@ export default {
   adminUpdateSchoolApproval(data) {
     return Vue.http
       .post(`${ELIGIBILITY_API_ROOT}/school/approval`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminReviewPendingVolunteer({ volunteerId, data }) {
+    return Vue.http
+      .post(`${API_ROOT}/volunteers/pending/${volunteerId}`, data)
       .then(this._successHandler, this._errorHandler);
   },
   adminGetSessionReport({
@@ -374,6 +391,37 @@ export default {
   savePushToken(context, data) {
     return context.$http
       .post(`${API_ROOT}/push-token/save`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
+  addReference({ referenceFirstName, referenceLastName, referenceEmail }) {
+    return Vue.http
+      .post(`${API_ROOT}/user/volunteer-approval/reference`, {
+        referenceFirstName,
+        referenceLastName,
+        referenceEmail
+      })
+      .then(this._successHandler, this._errorHandler);
+  },
+  deleteReference({ referenceEmail }) {
+    return Vue.http
+      .post(`${API_ROOT}/user/volunteer-approval/reference/delete`, {
+        referenceEmail
+      })
+      .then(this._successHandler, this._errorHandler);
+  },
+  saveReferenceForm(referenceId, data) {
+    return Vue.http
+      .post(`${REFERENCE_API_ROOT}/${referenceId}/submit`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
+  getPhotoUploadUrl() {
+    return Vue.http
+      .get(`${API_ROOT}/user/volunteer-approval/photo-url`)
+      .then(this._successHandler, this._errorHandler);
+  },
+  addBackgroundInfo(data) {
+    return Vue.http
+      .post(`${API_ROOT}/user/volunteer-approval/background-information`, data)
       .then(this._successHandler, this._errorHandler);
   }
 };

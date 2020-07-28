@@ -9,6 +9,7 @@
 
 @import 'layout/utils';
 @import 'layout/form';
+@import 'layout/modal';
 
 html {
   height: 100%;
@@ -28,8 +29,5 @@ body {
 }
 
 .disable-scroll {
-  height: 100%;
   overflow: hidden;
-  position: fixed;
-  width: 100%;
 }

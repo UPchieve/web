@@ -61,43 +61,6 @@
                 periods that you select in your schedule.
               </div>
             </div>
-
-            <div id="college" class="container-section">
-              <div class="prompt">Your College</div>
-              <div v-show="!activeEdit" class="answer">{{ user.college }}</div>
-              <div v-show="!user.college && !activeEdit" class="answer">
-                (None given)
-              </div>
-              <input
-                v-show="activeEdit"
-                v-model="user.college"
-                type="text"
-                class="form-control"
-                :class="{ invalid: invalidInputs.indexOf('college') > -1 }"
-              />
-            </div>
-
-            <div id="favoriteAcademicSubject" class="container-section">
-              <div class="prompt">Your Favorite Academic Subject</div>
-              <div v-show="!activeEdit" class="answer">
-                {{ user.favoriteAcademicSubject }}
-              </div>
-              <div
-                v-show="!user.favoriteAcademicSubject && !activeEdit"
-                class="answer"
-              >
-                (None given)
-              </div>
-              <input
-                v-show="activeEdit"
-                v-model="user.favoriteAcademicSubject"
-                type="text"
-                class="form-control"
-                :class="{
-                  invalid: invalidInputs.indexOf('favoriteAcademicSubject') > -1
-                }"
-              />
-            </div>
           </div>
 
           <div class="container-section resetBtn">
@@ -131,11 +94,7 @@
 <script>
 import PhoneNumber from "awesome-phonenumber";
 import { mapGetters, mapState } from "vuex";
-
 import UserService from "@/services/UserService";
-import StudentAvatarUrl from "@/assets/defaultavatar3.png";
-import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
-
 import { topics, allSubtopics } from "@/utils/topics";
 
 export default {
@@ -186,15 +145,6 @@ export default {
       return {
         number: pn.getNumber("international"),
         country: pn.getRegionCode()
-      };
-    },
-    avatarStyle() {
-      const user = this.$store.state.user.user;
-      const avatarUrl =
-        user.picture ||
-        (user.isVolunteer ? VolunteerAvatarUrl : StudentAvatarUrl);
-      return {
-        backgroundImage: `url(${avatarUrl})`
       };
     },
     certKey() {
@@ -275,7 +225,7 @@ export default {
 
         // send only the necessary data
         const payloadUser = {};
-        const keys = ["phone", "college", "favoriteAcademicSubject"];
+        const keys = ["phone"];
 
         keys.forEach(key => (payloadUser[key] = this.user[key]));
 
@@ -375,14 +325,6 @@ ul {
   margin: auto;
 }
 
-.difficultCollegeProcessAnswer {
-  width: 400px;
-  display: flex;
-  align-items: left;
-  margin-left: 150px;
-  flex-direction: column;
-}
-
 .basic-info {
   display: flex;
   flex-direction: column;
@@ -422,13 +364,6 @@ ul {
 .description {
   margin-top: 10px;
   font-size: 12px;
-}
-
-.avatar {
-  display: block;
-  width: 50px;
-  height: 50px;
-  background-size: cover;
 }
 
 button {
@@ -480,10 +415,6 @@ button:hover {
 .form-control:focus {
   border-bottom: 3px solid #16d2aa;
   box-shadow: none;
-}
-
-.checkbox label {
-  font-size: 16px;
 }
 
 .resetBtn {
