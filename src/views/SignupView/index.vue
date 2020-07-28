@@ -5,30 +5,38 @@
         <router-link to="/login" class="uc-form-header-link"
           >Log In</router-link
         >
-        <div class="uc-form-header-link--active">Sign Up</div>
       </div>
 
       <volunteer-form v-if="this.userSelection === 'volunteer'" />
       <student-form v-else-if="this.userSelection === 'student'" />
-      <div v-else class="uc-form-body">
-        <b>Are you a student or a volunteer?</b>
+      <div v-else class="uc-form-body uc-form-body--center">
+        <div>
+          <h3 class="">Welcome to UPchieve!</h3>
+          <p class="uc-form-text">
+            We are a nonprofit that provides free, online tutoring and college
+            counseling to eligible high school students.
+          </p>
+        </div>
+        <div class="btn-container">
+          <h4 class="uc-subheader">How can we help you?</h4>
+          <button
+            class="uc-form-button-big"
+            type="submit"
+            @click.prevent="selectStudent()"
+          >
+            I need an Academic Coach
+          </button>
 
-        <button
-          class="uc-form-button"
-          type="submit"
-          @click.prevent="selectStudent()"
-        >
-          Student
-        </button>
-
-        <button
-          class="uc-form-button"
-          type="submit"
-          @click.prevent="selectVolunteer()"
-        >
-          Volunteer
-        </button>
+          <button
+            class="uc-form-button-big"
+            type="submit"
+            @click.prevent="selectVolunteer()"
+          >
+            I’d like to become an Academic Coach
+          </button>
+        </div>
       </div>
+      <form-footer v-if="!isMobileApp" />
     </div>
   </form-page-template>
 </template>
@@ -38,13 +46,15 @@ import { mapState } from "vuex";
 import FormPageTemplate from "@/components/FormPageTemplate";
 import StudentForm from "./StudentForm";
 import VolunteerForm from "./VolunteerForm";
+import FormFooter from "@/components/FormFooter";
 
 export default {
   name: "signup-view",
   components: {
     FormPageTemplate,
     StudentForm,
-    VolunteerForm
+    VolunteerForm,
+    FormFooter
   },
 
   created() {
@@ -86,9 +96,25 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.uc-form-header {
+  flex-direction: row-reverse;
+}
+
+.uc-subheader {
+  color: $c-secondary-grey;
+  font-weight: 600;
+}
+
 .uc-form-body {
   .uc-column {
     margin-top: 25px;
+  }
+}
+
+.btn-container {
+  margin-bottom: 25px;
+  button:first-of-type {
+    margin: 15px 0 15px;
   }
 }
 </style>
