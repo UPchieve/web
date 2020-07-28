@@ -11,6 +11,7 @@
       <table>
         <tr>
           <th>Created At</th>
+          <th>Email</th>
           <th>Median income</th>
           <th>Zip code</th>
           <th>School</th>

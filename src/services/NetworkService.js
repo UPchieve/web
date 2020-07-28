@@ -360,21 +360,14 @@ export default {
   },
   checkStudentEligibility(
     context,
-    { schoolUpchieveId, zipCode, referredByCode }
+    { schoolUpchieveId, zipCode, email, referredByCode }
   ) {
     return context.$http
       .post(`${ELIGIBILITY_API_ROOT}/check`, {
         schoolUpchieveId,
         zipCode,
+        email,
         referredByCode
-      })
-      .then(this._successHandler, this._errorHandler);
-  },
-  joinSchoolApprovalWaitlist(context, { schoolUpchieveId, email }) {
-    return context.$http
-      .post(`${ELIGIBILITY_API_ROOT}/school/approvalnotify`, {
-        schoolUpchieveId,
-        email
       })
       .then(this._successHandler, this._errorHandler);
   },
