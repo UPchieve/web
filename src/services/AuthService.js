@@ -31,20 +31,32 @@ export default {
     });
   },
 
-  registerVolunteer(context, signupData) {
-    return NetworkService.registerVolunteer(context, signupData)
+  registerOpenVolunteer(context, signupData) {
+    return NetworkService.registerOpenVolunteer(context, signupData)
       .then(res => {
         const data = { ...res.data };
         if (!data) {
           throw new Error("No user returned from auth service");
         }
-
-        context.msg = "You have been signed up!";
       })
       .catch(res => {
         throw errorFromHttpResponse(res);
       });
   },
+
+  registerPartnerVolunteer(context, signupData) {
+    return NetworkService.registerPartnerVolunteer(context, signupData)
+      .then(res => {
+        const data = { ...res.data };
+        if (!data) {
+          throw new Error("No user returned from auth service");
+        }
+      })
+      .catch(res => {
+        throw errorFromHttpResponse(res);
+      });
+  },
+
   registerStudent(context, signupData) {
     return NetworkService.registerStudent(context, signupData)
       .then(res => {
@@ -52,8 +64,6 @@ export default {
         if (!data) {
           throw new Error("No user returned from auth service");
         }
-
-        context.msg = "You have been signed up!";
       })
       .catch(res => {
         throw errorFromHttpResponse(res);
