@@ -299,7 +299,7 @@ export default {
       this.zwibblerCtx.usePolygonTool(3, 0);
     },
     useRectangleTool() {
-      this.zwibblerCtx.useRectangleTool({ strokeStyle: "rgba(0, 0, 0, 0)" });
+      this.zwibblerCtx.useRectangleTool();
     },
     useTextTool() {
       this.zwibblerCtx.useTextTool();
