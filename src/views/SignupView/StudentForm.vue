@@ -555,7 +555,7 @@ export default {
 }
 
 p.small-paragraph {
-  color: $c-secondary-grey;
+  color: $c-soft-black;
   font-size: 14px;
 }
 
