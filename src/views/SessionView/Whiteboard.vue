@@ -186,7 +186,9 @@ export default {
       selectedTool: "",
       showColorPicker: false,
       showShapes: false,
-      isMouseDown: false
+      isMouseDown: false,
+      // used to determine the beginning and end node of a shape
+      shapeNodes: []
     };
   },
   computed: {
@@ -252,6 +254,10 @@ export default {
         this.selectedTool = toolname;
         this.hideHoveredToolbars();
       });
+    });
+
+    this.zwibblerCtx.on("nodes-added", nodes => {
+      if (this.isShapeSelected) this.shapeNodes.push(nodes[0]);
     });
 
     this.zwibblerCtx.on("document-changed", info => {
@@ -376,6 +382,15 @@ export default {
       this.zwibblerCtx.addSelectionHandle(1.0, 0.5, 0, 0, "", "scale");
       this.zwibblerCtx.addSelectionHandle(0.5, 1.0, 0, 0, "", "scale");
       this.zwibblerCtx.addSelectionHandle(0.0, 0.5, 0, 0, "", "scale");
+    }
+  },
+  watch: {
+    shapeNodes() {
+      // Use the pick tool after the end node for a shape was added
+      if (this.shapeNodes.length === 2 && this.isShapeSelected) {
+        this.usePickTool();
+        this.shapeNodes = [];
+      }
     }
   }
 };
