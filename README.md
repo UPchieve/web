@@ -35,6 +35,25 @@ npm run local-ios
 - Click on "UPchieve" in folder view on left, then "Signing" tab. select team -> "Upchieve" (for both dev and release sections?)
 - Build settings -> search "signing", "basic" blue tab to "all", change to "release" to "iOS developer"
 
+#### TestFlight
+*Similar to the steps for [releasing](#releasing)
+- Bump version in package.json
+- Ensure `APP_URL` in config.coffee is pointing to staging
+- `npm run local-ios`
+- Open the UPchieve.workspace folder in Xcode
+- Bump the `build` value up for subsequent builds
+- In the menu bar click Window -> Organizer (opens the Organizer window) -> Archives
+- If no archives are present
+    - Click Product in the menu bar -> Archive (This must be done in the UPchieve.workspace window and not the Organizer window)
+    - Ensure that you are using the correct team `UPchieve Inc` and have proper credentials
+- Open up the Organizer window, Archives -> Validate App -> see [Validate app](#releasing) in Releasing
+- If there are issues validating the app make sure that `UPchieve Inc` is the team selected and that the provisioning profile and signing certificate are both correct
+    - In the UPchieve.workspace window visit Targets -> Upchieve -> Signing & Capabilities -> Signing drop-down to verify
+    - Try to validate the app again. If the same issue occurs contact team developers, your user permissions may need to be changed to allow for uploading a build
+- After validating the app, click “Distribute App”, see [Distribute App](#releasing) in Releasing
+- Visit https://appstoreconnect.apple.com/ 
+- Click on my apps -> UPchieve -> TestFlight
+
 #### Releasing
 - Bump version in package.json
 - `npm run release-ios`
