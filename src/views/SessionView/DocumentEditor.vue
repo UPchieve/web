@@ -7,6 +7,9 @@
 <script>
 import { mapState } from "vuex";
 import Quill from "quill";
+import QuillCursors from "quill-cursors";
+
+Quill.register("modules/cursors", QuillCursors);
 
 export default {
   data() {
@@ -34,6 +37,10 @@ export default {
         "list"
       ],
       modules: {
+        cursors: {
+          selectionChangeSource: "cursor-api",
+          transformOnTextChange: true
+        },
         toolbar: [
           [{ header: [1, 2, false] }],
           ["bold", "italic", "underline", "strike"],
@@ -44,17 +51,31 @@ export default {
     });
 
     this.quillEditor.on("text-change", this.quillTextChange);
+    this.quillEditor.on("selection-change", this.quillSelectionChange);
 
     this.$socket.emit("requestQuillState", {
       sessionId: this.currentSession._id
     });
+
+    this.quillEditor
+      .getModule("cursors")
+      .createCursor("partnerCursor", "Partner", "#16D2AA");
   },
   methods: {
     quillTextChange(delta, oldDelta, source) {
-      if (source == "user") {
+      if (source === "user") {
         this.$socket.emit("transmitQuillDelta", {
           sessionId: this.currentSession._id,
           delta
+        });
+      }
+    },
+
+    quillSelectionChange(range, oldRange, source) {
+      if (source === "user") {
+        this.$socket.emit("transmitQuillSelection", {
+          sessionId: this.currentSession._id,
+          range
         });
       }
     }
@@ -66,6 +87,10 @@ export default {
 
     partnerQuillDelta({ delta }) {
       this.quillEditor.updateContents(delta);
+    },
+
+    quillPartnerSelection({ range }) {
+      this.quillEditor.getModule("cursors").moveCursor("partnerCursor", range);
     }
   }
 };
@@ -86,6 +111,10 @@ export default {
   .ql-toolbar.ql-snow {
     border-width: 0 0 1px 0;
     border-color: $c-border-grey;
+  }
+
+  .ql-cursor-flag {
+    display: none;
   }
 }
 </style>
