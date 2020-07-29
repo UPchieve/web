@@ -125,14 +125,14 @@ export default {
     },
     devicePlatform() {
       if (
-        this.session.browser === "Chrome WebView" ||
-        this.session.browser === "WebKit"
+        this.session.userAgent.browser === "Chrome WebView" ||
+        this.session.userAgent.browser === "WebKit"
       )
         return "Mobile app";
 
       if (
-        this.session.device === "Apple" ||
-        this.session.operatingSystem === "Android"
+        this.session.userAgent.device === "Apple" ||
+        this.session.userAgent.operatingSystem === "Android"
       )
         return "Mobile web";
 
