@@ -41,7 +41,7 @@ npm run local-ios
 - Ensure `APP_URL` in config.coffee is pointing to staging
 - `npm run local-ios`
 - Open the UPchieve.workspace folder in Xcode
-- Bump the version value up for `Bundle version string (short)` - Targets -> UPchieve -> Info -> Bundle version string (short). Otherwise when trying to upload the app an error message will pop up stating “This bundle is invalid. The key CFBundleVersion in the Info.plist file must contain a higher version than that of the previously uploaded version.”
+- Bump the `build` value up for subsequent builds
 - In the menu bar click Window -> Organizer (opens the Organizer window) -> Archives
 - If no archives are present
     - Click Product in the menu bar -> Archive (This must be done in the UPchieve.workspace window and not the Organizer window)
