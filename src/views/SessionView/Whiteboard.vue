@@ -206,6 +206,11 @@ export default {
       });
     });
 
+    // disallow dragging and pasting to the whiteboard
+    this.zwibblerCtx.on("paste", () => {
+      return false;
+    });
+
     this.zwibblerCtx.on("document-changed", info => {
       const isRemoteChange = info && info.remote;
       const isWhiteboardHidden = this.mobileMode && !this.isVisible;
