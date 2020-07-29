@@ -12,8 +12,21 @@
       <user-preview :user="session.volunteer" />
     </div>
     <div class="session-detail__section">
-      <div class="session-detail__section-title">Started</div>
-      <div>{{ createdAt }}</div>
+      <div class="session-detail__section">
+        <div class="session-detail__section-title">Started</div>
+        <div>{{ createdAt }}</div>
+        <div class="session-detail__section--device">
+          <div>{{ devicePlatform }} - {{ session.userAgent.device }}</div>
+          <div>
+            {{ session.userAgent.browser }}:
+            {{ session.userAgent.browserVersion }}
+          </div>
+          <div>
+            {{ session.userAgent.operatingSystem }}:
+            {{ session.userAgent.operatingSystemVersion }}
+          </div>
+        </div>
+      </div>
     </div>
     <div v-if="session.volunteer" class="session-detail__section">
       <div class="session-detail__section-title">Volunteer joined</div>
@@ -118,6 +131,21 @@ export default {
     },
     volunteerFeedback() {
       return find(this.session.feedbacks, { userType: "volunteer" }, {});
+    },
+    devicePlatform() {
+      if (
+        this.session.browser === "Chrome WebView" ||
+        this.session.browser === "WebKit"
+      )
+        return "Mobile app";
+
+      if (
+        this.session.device === "Apple" ||
+        this.session.operatingSystem === "Android"
+      )
+        return "Mobile web";
+
+      return "Desktop";
     }
   },
 
@@ -175,7 +203,15 @@ export default {
     }
 
     &--image {
-      width: 100%;
+      width: 60%;
+    }
+
+    &--device {
+      text-align: left;
+      font-size: 14px;
+      padding: 5px 10px;
+      margin: 5px 0;
+      border-left: solid #ececec 5px;
     }
   }
 
