@@ -83,7 +83,9 @@
         title="Color picker"
         @click="toggleColorPicker"
       >
-        <ColorPickerIcon class="toolbar-item__svg" />
+        <ColorPickerIcon
+          class="toolbar-item__svg  toolbar-item__svg--color-picker"
+        />
         <div v-if="showColorPicker" class="color-bar">
           <div
             class="color-button"
@@ -526,6 +528,11 @@ export default {
         height: 22px;
         width: 22px;
       }
+    }
+
+    &--color-picker {
+      height: 25px;
+      width: 25px;
     }
   }
   &--shapes {
