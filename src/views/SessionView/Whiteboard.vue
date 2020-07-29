@@ -260,6 +260,7 @@ export default {
 
     this.zwibblerCtx.on("nodes-added", nodes => {
       if (this.isShapeSelected) this.shapeNodes.push(nodes[0]);
+      if (this.selectedTool === "text") this.usePickTool();
     });
 
     this.zwibblerCtx.on("document-changed", info => {
