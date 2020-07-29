@@ -1,5 +1,8 @@
 <template>
-  <div class="session">
+  <div
+    class="session"
+    :class="{ 'session--whiteboard': auxiliaryType === 'WHITEBOARD' }"
+  >
     <div class="session-header-container">
       <session-header @try-clicked="tryClicked" />
     </div>
@@ -294,6 +297,12 @@ export default {
 .session {
   position: relative; /*[1]*/
   height: 100%; /*[1]*/
+
+  &--whiteboard {
+    .toggleButton.back {
+      bottom: calc(100% - 140px);
+    }
+  }
 }
 
 .session-header-container {
@@ -402,9 +411,5 @@ export default {
     width: 26px;
     height: 26px;
   }
-}
-
-.toggleButton.back {
-  bottom: calc(100% - 140px);
 }
 </style>
