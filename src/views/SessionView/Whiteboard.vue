@@ -32,7 +32,7 @@
         @click="toggleShapes"
         :class="isShapeSelected ? 'selected-tool' : ''"
       >
-        <ShapesIcon class="toolbar-item__svg" />
+        <ShapesIcon class="toolbar-item__svg toolbar-item__svg--shapes" />
         <div v-if="showShapes" class="shapes-bar">
           <div
             class="toolbar-item shapes-bar__toolbar-item"
@@ -72,6 +72,7 @@
       </div>
       <div
         class="toolbar-item toolbar-item--text"
+        :class="selectedTool === 'text' ? 'selected-tool' : ''"
         title="Text"
         @click="useTextTool"
       >
@@ -224,6 +225,7 @@ export default {
       autoPickToolText: false,
       defaultBrushWidth: 5,
       defaultSmoothness: "sharpest",
+      multilineText: true,
       scrollbars: this.mobileMode ? false : true,
       collaborationServer: `${
         process.env.VUE_APP_WEBSOCKET_ROOT
@@ -237,6 +239,9 @@ export default {
 
     // Set up custom selection handles
     this.setSelectionHandles();
+
+    // disable showing hints on the canvas
+    this.zwibblerCtx.setConfig("showHints", false);
 
     this.zwibblerCtx.on("connected", () => {
       // Set brush tool to default tool
@@ -382,7 +387,10 @@ export default {
   width: 100%;
   position: relative;
 
-  &--brush {
+  &--brush,
+  &--circle,
+  &--rectangle,
+  &--triangle {
     .zwibbler-canvas-holder {
       cursor: crosshair !important;
     }
@@ -397,24 +405,6 @@ export default {
   &--pan {
     .zwibbler-canvas-holder {
       cursor: grab !important;
-    }
-  }
-
-  &--circle {
-    .zwibbler-canvas-holder {
-      cursor: url("../../assets/whiteboard_icons/circle.png"), auto !important;
-    }
-  }
-
-  &--rectangle {
-    .zwibbler-canvas-holder {
-      cursor: url("../../assets/whiteboard_icons/rectangle.png"), auto !important;
-    }
-  }
-
-  &--triangle {
-    .zwibbler-canvas-holder {
-      cursor: url("../../assets/whiteboard_icons/triangle.png"), auto !important;
     }
   }
 
@@ -515,6 +505,13 @@ export default {
 
   &__svg {
     width: 20px;
+
+    &--shapes {
+      @include breakpoint-below("medium") {
+        height: 22px;
+        width: 22px;
+      }
+    }
   }
   &--shapes {
     position: relative;
@@ -578,6 +575,10 @@ export default {
 
   &__toolbar-item {
     border-radius: initial !important;
+
+    @include breakpoint-below("tiny") {
+      padding: 1em;
+    }
   }
 
   &__shape-icon {
