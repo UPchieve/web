@@ -42,7 +42,7 @@
       id="toggleButton"
       @click="toggleAuxiliary"
     >
-      <img id="toggleIcon" :src="getIconUrl()" />
+      <img id="toggleIcon" :src="toggleIconSrc" />
     </div>
   </div>
 </template>
@@ -90,8 +90,7 @@ export default {
    */
   data() {
     return {
-      auxiliaryOpen: false,
-      icon: "Pencil.png"
+      auxiliaryOpen: false
     };
   },
   computed: {
@@ -110,6 +109,13 @@ export default {
       if (documentEditorSubTopics.includes(this.session.subTopic))
         return "DOCUMENT";
       else return "WHITEBOARD";
+    },
+
+    toggleIconSrc() {
+      if (this.auxiliaryOpen) return require(`@/assets/Chat.png`);
+      else if (this.auxiliaryType === "WHITEBOARD")
+        return require(`@/assets/Pencil.png`);
+      else return require(`@/assets/doc_editor_icon.png`);
     },
 
     shouldHideAuxiliarySection() {
@@ -223,17 +229,12 @@ export default {
         this.$store.dispatch("app/sidebar/hide");
       }
     },
-    getIconUrl() {
-      return require("@/assets/" + this.icon);
-    },
     toggleAuxiliary() {
       if (!this.auxiliaryOpen) {
         document.getElementById("toggleButton").classList.add("back");
-        this.icon = "Chat.png";
         this.auxiliaryOpen = true;
       } else {
         document.getElementById("toggleButton").classList.remove("back");
-        this.icon = "Pencil.png";
         this.auxiliaryOpen = false;
       }
     },
