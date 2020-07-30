@@ -536,6 +536,10 @@ export default {
     bottom: 0;
     border-radius: 0;
   }
+
+  @media only screen and (orientation: landscape) and (max-height: 500px) {
+    bottom: 0;
+  }
 }
 
 .toolbar-item {
