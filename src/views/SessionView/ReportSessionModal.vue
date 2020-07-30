@@ -2,18 +2,28 @@
   <div class="report-modal">
     <h1 class="report-modal__title">Report this session</h1>
     <h2 class="report-modal__subtitle">
-      We encourage volunteers to report sessions in which students have either
-      misused the platform (e.g., by not seeking or actively participating in
-      tutoring) or not treated you with respect (e.g., by getting impatient or
-      swearing). We will review the entire chat log and, if needed, issue the
-      student a warning or take disciplinary action.
+      We will review the entire chat log and, if needed, issue the student a
+      warning or take disciplinary action.
     </h2>
-    <textarea
-      class="report-modal__message"
-      v-model="reportMessage"
-      placeholder="(Optional) Write a 1-2 sentence summary of why you're reporting the student"
-      rows="3"
-    />
+
+    <div class="report-modal__section">
+      <div class="report-modal__label">Select reason</div>
+      <v-select
+        class="report-modal__select"
+        v-model="reportReason"
+        :options="reportReasonOptions"
+        :searchable="false"
+      ></v-select>
+    </div>
+    <div class="report-modal__section">
+      <div class="report-modal__label">Message</div>
+      <textarea
+        class="report-modal__message"
+        v-model="reportMessage"
+        placeholder="(Optional) Write a 1-2 sentence summary of what happened"
+        rows="3"
+      />
+    </div>
     <div class="report-modal__footer">
       <div class="report-modal__buttons">
         <large-button @click.native="cancel">Cancel</large-button>
@@ -28,6 +38,12 @@ import { mapState } from "vuex";
 import NetworkService from "@/services/NetworkService";
 import LargeButton from "@/components/LargeButton";
 
+const reportReasonOptions = [
+  "Student behavior",
+  "Technical issue",
+  "Another reason"
+];
+
 export default {
   components: { LargeButton },
   props: {
@@ -35,6 +51,8 @@ export default {
   },
   data() {
     return {
+      reportReasonOptions,
+      reportReason: null,
       reportMessage: ""
     };
   },
@@ -48,6 +66,7 @@ export default {
       try {
         await NetworkService.reportSession({
           sessionId: this.currentSession._id,
+          reportReason: this.reportReason,
           reportMessage: this.reportMessage
         });
       } catch (error) {
@@ -66,10 +85,6 @@ export default {
 <style lang="scss" scoped>
 .report-modal {
   @include flex-container(column);
-  @include child-spacing(top, 24px);
-  @include breakpoint-above("medium") {
-    @include child-spacing(top, 16px);
-  }
 
   &__title {
     @include font-category("display-small");
@@ -77,8 +92,27 @@ export default {
 
   &__subtitle {
     @include font-category("body");
+    margin: 0 0 35px;
     color: $c-secondary-grey;
     font-size: 15px;
+  }
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: stretch;
+
+    &:not(:last-of-type) {
+      margin-bottom: 20px;
+    }
+  }
+
+  &__label {
+    align-self: flex-start;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 5px;
   }
 
   &__message {
