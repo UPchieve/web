@@ -43,6 +43,20 @@
   @include breakpoint-below("medium") {
     padding: 50px 20px;
   }
+
+  &--center {
+    @include flex-container(column, center, center);
+  }
+
+  h3 {
+    line-height: 1.3em;
+  }
+}
+
+.uc-form-text {
+  @include breakpoint-above("small") {
+    padding: 0 25px;
+  }
 }
 
 .uc-form-label {
@@ -96,6 +110,28 @@
   text-transform: uppercase;
 
   min-height: 40px;
+
+  &:hover,
+  &:active {
+    color: white;
+    background-color: $c-accent;
+  }
+
+  &:disabled {
+    background-color: #f6f6f6;
+    color: $c-secondary-grey;
+  }
+}
+
+.uc-form-button-big {
+  font-size: 14px;
+  background-color: $c-background-grey;
+  border: none;
+  border-radius: 50px;
+  color: $c-soft-black;
+  padding: 13px 32px;
+  font-weight: 500;
+  min-width: 250px;
 
   &:hover,
   &:active {

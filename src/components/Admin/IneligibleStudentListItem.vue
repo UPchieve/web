@@ -1,7 +1,10 @@
 <template>
   <tr class="list-item">
-    <td class="list-item__column list-item__column">
+    <td class="list-item__column">
       {{ createdAt }}
+    </td>
+    <td class="list-item__column">
+      {{ email }}
     </td>
     <td class="list-item__column">
       {{ student.medianIncome }}
@@ -37,6 +40,9 @@ export default {
   computed: {
     createdAt() {
       return moment(this.student.createdAt).format("l, h:mm a");
+    },
+    email() {
+      return this.student.email || "--";
     },
     schoolApprovalStatus() {
       return this.student.isApproved ? "Approved" : "Not approved";

@@ -21,7 +21,7 @@
         </button>
       </div>
       <div class="uc-column">
-        <button class="uc-form-button" @click="firstPage">
+        <button class="uc-form-button" @click="eligibilityPage">
           No
         </button>
       </div>
@@ -51,9 +51,9 @@
   </form>
 
   <form
-    v-else-if="step === 'step-1'"
-    class="uc-form-body"
-    @submit.prevent="secondPage()"
+    v-else-if="step === 'eligibility'"
+    class="uc-form-body uc-form-body--center"
+    @submit.prevent="submitEligibility()"
   >
     <div v-if="errors.length" class="step-errors">
       <h5>Please correct the following problems:</h5>
@@ -62,7 +62,13 @@
       </ul>
     </div>
 
-    <div class="step-title">Step 1 of 3: Check your eligibility</div>
+    <div class="uc-column title-wrapper">
+      <h3>Great! Let's get started</h3>
+      <p>
+        First, we need to ask you a few quick questions to make sure you're
+        eligible for our services.
+      </p>
+    </div>
 
     <div class="uc-column">
       <label for="inputHighschool" class="uc-form-label"
@@ -112,70 +118,79 @@
       />
     </div>
 
-    <button class="uc-form-button" type="submit">
-      Continue
-    </button>
-
-    <div v-if="msg !== ''">{{ msg }}</div>
-  </form>
-
-  <form
-    v-else-if="step === 'step-1-waitlist'"
-    class="uc-form-body"
-    @submit.prevent="submitWaitlist()"
-  >
-    <div v-if="errors.length" class="step-errors">
-      <h5>Please correct the following problems:</h5>
-      <ul>
-        <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
-      </ul>
-    </div>
-
-    <div class="step-title">
-      Sorry! You're not currently eligible for UPchieve.
-    </div>
-
     <div class="uc-column">
-      <label for="inputWaitlistEmail" class="uc-form-label"
-        >If you want to be notified when we launch at your school, enter your
-        email below.</label
+      <label for="inputEligibilityEmail" class="uc-form-label"
+        >What's your email?</label
       >
-
       <input
-        id="inputWaitlistEmail"
+        id="inputEligibilityEmail"
         type="email"
         class="uc-form-input"
         v-bind:class="{
           'uc-form-input--invalid':
-            invalidInputs.indexOf('inputWaitlistEmail') > -1
+            invalidInputs.indexOf('inputEligibilityEmail') > -1
         }"
-        v-model="waitlist.email"
-        autofocus
+        v-model="eligibility.email"
+        required
+        placeholder="Email"
+        aria-label="Email"
       />
-
       <p class="uc-form-subtext">
-        We will only use your email to contact you about your eligibility for
-        UPchieve. See our Privacy Policy for more info.
+        We will only use this email to notify you if your eligibility status
+        changes in the future.
       </p>
     </div>
 
-    <button class="uc-form-button" type="submit">
-      Submit
+    <button class="uc-form-button-big" type="submit">
+      Check my eligibility
     </button>
 
     <div v-if="msg !== ''">{{ msg }}</div>
   </form>
 
-  <form v-else-if="step === 'step-1-waitlist-success'" class="uc-form-body">
-    <div class="step-title">
-      Thank you! You'll be the first to know when we expand to your school.
+  <div
+    v-else-if="step === 'eligible'"
+    class="uc-form-body uc-form-body--center"
+  >
+    <div>
+      <verification-badge />
+      <h3>Woohoo, you're eligible!</h3>
+      <p>
+        Finish setting up your free account
+      </p>
     </div>
-  </form>
+    <div>
+      <button class="uc-form-button-big" @click="accountPage">
+        Continue
+      </button>
+    </div>
+  </div>
+
+  <div
+    v-else-if="step === 'ineligible'"
+    class="uc-form-body uc-form-body--center"
+  >
+    <div class="ineligible-icon-wrapper">
+      <error-badge />
+    </div>
+    <h3>Sorry, we can't verify your eligibility yet.</h3>
+
+    <p class="small-paragraph">
+      We weren’t able to verify your eligibility based on the information you’ve
+      entered so far.
+      <strong>Don’t worry: you may still be eligible!</strong> We just need your
+      parent/guardian to answer some more questions first!
+    </p>
+
+    <button class="uc-form-button-big" @click="ineligibleContinue">
+      Continue
+    </button>
+  </div>
 
   <form
-    v-else-if="step === 'step-2'"
-    class="uc-form-body"
-    @submit.prevent="thirdPage()"
+    v-else-if="step === 'account'"
+    class="uc-form-body uc-form-body--center"
+    @submit.prevent="submitAccountForm()"
   >
     <div v-if="errors.length" class="step-errors">
       <h5>Please correct the following problems:</h5>
@@ -184,26 +199,41 @@
       </ul>
     </div>
 
-    <div class="step-title">Step 2 of 3: Choose your log-in details</div>
+    <div class="step-title">Finish creating your account</div>
 
     <div class="uc-column">
-      <label for="inputEmail" class="uc-form-label">What's your email?</label>
-      <input
-        id="inputEmail"
-        type="email"
-        class="uc-form-input"
-        v-bind:class="{
-          'uc-form-input--invalid': invalidInputs.indexOf('inputEmail') > -1
-        }"
-        v-model="credentials.email"
-        required
-        autofocus
-        autocomplete="email"
-      />
-      <p class="uc-form-subtext">
-        We will only use your email to contact you about your account. See our
-        <a href="/legal" target="_blank">Privacy Policy</a> for more info.
-      </p>
+      <label for="firstName" class="uc-form-label">What's your name?</label>
+      <div class="uc-row name-fields">
+        <div class="uc-column">
+          <input
+            id="firstName"
+            type="text"
+            class="uc-form-input"
+            v-bind:class="{
+              'uc-form-input--invalid': invalidInputs.indexOf('firstName') > -1
+            }"
+            v-model="profile.firstName"
+            required
+            autofocus
+            autocomplete="given-name"
+          />
+          <p class="uc-form-subtext">First Name</p>
+        </div>
+        <div class="uc-column">
+          <input
+            id="lastName"
+            type="text"
+            class="uc-form-input"
+            v-bind:class="{
+              'uc-form-input--invalid': invalidInputs.indexOf('lastName') > -1
+            }"
+            v-model="profile.lastName"
+            required
+            autocomplete="family-name"
+          />
+          <p class="uc-form-subtext">Last Name</p>
+        </div>
+      </div>
     </div>
 
     <div class="uc-column">
@@ -222,78 +252,9 @@
         autocomplete="new-password"
       />
       <p class="uc-form-subtext">
-        Keep your account safe by choosing a password with one number, one
-        uppercase letter, and one lowercase letter.
+        Must have at least one number, one uppercase letter, and one lowercase
+        letter.
       </p>
-    </div>
-
-    <button class="uc-form-button" type="submit">
-      Continue
-    </button>
-
-    <div v-if="msg !== ''">{{ msg }}</div>
-  </form>
-
-  <form
-    v-else-if="step === 'step-3'"
-    class="uc-form-body"
-    @submit.prevent="checkInputs()"
-  >
-    <!-- Fix for bug in Chrome where the username and password are mapped to non-login fields
-     even if the HTML5 autocomplete attributes are set to the right values -->
-    <input
-      type="text"
-      class="d-none"
-      id="username"
-      v-model="credentials.email"
-      autocomplete="username"
-    />
-    <input
-      type="password"
-      class="d-none"
-      id="password"
-      v-model="credentials.password"
-      autocomplete="new-password"
-    />
-
-    <div v-if="errors.length" class="step-errors">
-      <h5>Please correct the following problems:</h5>
-      <ul>
-        <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
-      </ul>
-    </div>
-
-    <div class="step-title">Step 3 of 3: Tell us about yourself!</div>
-
-    <div class="uc-column">
-      <label for="firstName" class="uc-form-label">First Name</label>
-      <input
-        id="firstName"
-        type="text"
-        class="uc-form-input"
-        v-bind:class="{
-          'uc-form-input--invalid': invalidInputs.indexOf('firstName') > -1
-        }"
-        v-model="profile.firstName"
-        required
-        autofocus
-        autocomplete="given-name"
-      />
-    </div>
-
-    <div class="uc-column">
-      <label for="lastName" class="uc-form-label">Last Name</label>
-      <input
-        id="lastName"
-        type="text"
-        class="uc-form-input"
-        v-bind:class="{
-          'uc-form-input--invalid': invalidInputs.indexOf('lastName') > -1
-        }"
-        v-model="profile.lastName"
-        required
-        autocomplete="family-name"
-      />
     </div>
 
     <div class="uc-form-checkbox">
@@ -304,18 +265,17 @@
         required
       />
       <label for="userAgreement">
-        I have read and accept the
-        <a href="/legal" target="_blank">user agreement</a>.
+        I am at least 13 years of age and have read and accept the
+        <a href="/legal" target="_blank">User Agreement</a>.
       </label>
     </div>
 
-    <button class="uc-form-button" type="submit">
-      Sign Up
+    <button class="uc-form-button-big" type="submit">
+      Create my account
     </button>
 
     <div v-if="msg !== ''">{{ msg }}</div>
   </form>
-
   <div v-else class="uc-form-body">Unexpected Error</div>
 </template>
 
@@ -324,13 +284,16 @@ import { mapState } from "vuex";
 import validator from "validator";
 import Autocomplete from "@trevoreyre/autocomplete-vue";
 import * as Sentry from "@sentry/browser";
-
 import AuthService from "@/services/AuthService";
 import NetworkService from "@/services/NetworkService";
+import VerificationBadge from "@/assets/verification.svg";
+import ErrorBadge from "@/assets/error_badge.svg";
 
 export default {
   components: {
-    Autocomplete
+    Autocomplete,
+    VerificationBadge,
+    ErrorBadge
   },
   data() {
     return {
@@ -344,9 +307,6 @@ export default {
         highSchool: {},
         zipCode: ""
       },
-      waitlist: {
-        email: ""
-      },
       credentials: {
         email: "",
         password: "",
@@ -356,14 +316,14 @@ export default {
         firstName: "",
         lastName: ""
       },
-      step: "partner-signup-code"
+      step: ""
     };
   },
   mounted() {
     if (this.isMobileApp) {
-      this.$router.push("/sign-up/student/partner-code");
+      this.partnerCodePage();
     } else {
-      this.firstPage();
+      this.eligibilityPage();
     }
   },
   computed: {
@@ -372,8 +332,13 @@ export default {
     })
   },
   methods: {
-    firstPage() {
-      this.step = "step-1";
+    partnerCodePage() {
+      this.step = "partner-signup-code";
+      this.$router.push("/sign-up/student/partner-code");
+    },
+
+    eligibilityPage() {
+      this.step = "eligibility";
       this.$router.push("/sign-up/student/eligibility");
     },
 
@@ -404,7 +369,7 @@ export default {
         });
     },
 
-    secondPage() {
+    submitEligibility() {
       // reset error msg from server
       this.msg = "";
 
@@ -423,6 +388,17 @@ export default {
         this.errors.push("You must enter a valid zip code");
         this.invalidInputs.push("inputZipCode");
       }
+
+      if (!this.eligibility.email) {
+        this.errors.push("An email address is required.");
+        this.invalidInputs.push("inputEligibilityEmail");
+      } else if (!validator.isEmail(this.eligibility.email)) {
+        this.errors.push(
+          this.eligibility.email + " is not a valid email address."
+        );
+        this.invalidInputs.push("inputEligibilityEmail");
+      }
+
       if (this.errors.length) {
         return;
       }
@@ -430,94 +406,32 @@ export default {
       NetworkService.checkStudentEligibility(this, {
         schoolUpchieveId: this.eligibility.highSchool.upchieveId,
         zipCode: this.eligibility.zipCode,
+        email: this.eligibility.email,
         referredByCode: window.localStorage.getItem("upcReferredByCode")
       })
         .then(response => {
           const isEligible = response.body.isEligible;
 
           if (isEligible) {
-            this.step = "step-2";
-            this.$router.push("/sign-up/student/account");
+            this.step = "eligible";
+            this.$router.push("/sign-up/student/eligible");
+            // autofill the user's email
+            this.credentials.email = this.eligibility.email;
           } else {
-            this.step = "step-1-waitlist";
-            this.$router.push("/sign-up/student/waitlist");
+            this.step = "ineligible";
+            this.$router.push("/sign-up/student/ineligible");
           }
         })
-        .catch(err => {
-          this.msg = err.message;
+        .catch(res => {
+          this.errors.push(res.body.message);
         });
     },
-    thirdPage() {
-      // reset error msg from server
-      this.msg = "";
-
-      // validate input
-      this.errors = [];
-      this.invalidInputs = [];
-      if (!this.credentials.email) {
-        this.errors.push("An email address is required.");
-        this.invalidInputs.push("inputEmail");
-      } else if (!validator.isEmail(this.credentials.email)) {
-        // this is necessary because browsers ignore <input type="email"> until the
-        // user actually tries to submit the form, which does not occur until step 3
-        this.errors.push(
-          this.credentials.email + " is not a valid email address."
-        );
-        this.invalidInputs.push("inputEmail");
-      }
-      if (!this.credentials.password) {
-        this.errors.push("A password is required.");
-        this.invalidInputs.push("inputPassword");
-      }
-      if (this.errors.length) {
-        return;
-      }
-
-      AuthService.checkRegister(this, {
-        email: this.credentials.email,
-        password: this.credentials.password
-      })
-        .then(() => {
-          this.step = "step-3";
-          this.$router.push("/sign-up/student/about");
-        })
-        .catch(err => {
-          this.msg = err.message;
-          if (err.status !== 409 && err.status !== 422) {
-            Sentry.captureException(err);
-          }
-        });
+    accountPage() {
+      this.step = "account";
+      this.$router.push("/sign-up/student/account");
     },
-    submitWaitlist() {
-      // reset error msg from server
-      this.msg = "";
-
-      // validate input
-      this.errors = [];
-      this.invalidInputs = [];
-
-      if (!this.waitlist.email) {
-        this.errors.push("An email address is required.");
-      } else if (!validator.isEmail(this.waitlist.email)) {
-        this.errors.push(
-          this.waitlist.email + " is not a valid email address."
-        );
-      }
-      if (this.errors.length) {
-        return;
-      }
-
-      NetworkService.joinSchoolApprovalWaitlist(this, {
-        email: this.waitlist.email,
-        schoolUpchieveId: this.eligibility.highSchool.upchieveId
-      })
-        .then(() => {
-          this.step = "step-1-waitlist-success";
-          this.$router.push("/sign-up/student/waitlist-success");
-        })
-        .catch(err => {
-          this.msg = err.message;
-        });
+    ineligibleContinue() {
+      window.location = "https://upchieve.org/request-access";
     },
     autocompleteSchool(input) {
       this.eligibility.highSchool = {};
@@ -542,7 +456,7 @@ export default {
     handleSelectHighSchool(school) {
       this.eligibility.highSchool = school;
     },
-    checkInputs() {
+    submitAccountForm() {
       this.errors = [];
       this.invalidInputs = [];
 
@@ -559,9 +473,12 @@ export default {
         // necessary because the CSS hides the browser's validation message
         this.errors.push("You must read and accept the user agreement.");
       }
-      if (!this.errors.length) {
-        this.submit();
+      if (!this.credentials.password) {
+        this.errors.push("A password is required.");
+        this.invalidInputs.push("inputPassword");
       }
+
+      if (!this.errors.length) this.submit();
     },
     submit() {
       AuthService.registerStudent(this, {
@@ -580,7 +497,7 @@ export default {
           this.$router.push("/dashboard");
         })
         .catch(err => {
-          this.msg = err.message;
+          this.errors.push(err.message);
           if (err.status !== 422) {
             Sentry.captureException(err);
           }
@@ -615,6 +532,31 @@ export default {
     content: "←";
     padding-right: 5px;
   }
+}
+
+.title-wrapper {
+  h3 {
+    margin: 0 0 5px 0;
+  }
+
+  p {
+    font-size: 14px;
+  }
+}
+
+.name-fields {
+  @include child-spacing(right, 15px);
+
+  input {
+    box-sizing: border-box;
+    width: 100%;
+    height: 45px;
+  }
+}
+
+p.small-paragraph {
+  color: $c-soft-black;
+  font-size: 14px;
 }
 
 .enter-signup-code-button {

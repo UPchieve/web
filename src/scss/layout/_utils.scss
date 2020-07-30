@@ -1,5 +1,6 @@
 .uc-column {
   @include flex-container(column);
+  align-self: stretch;
 }
 
 .uc-row {
