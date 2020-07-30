@@ -3,7 +3,7 @@
   "private": true,
   "description": "",
   "main": "server.js",
-  "version": "0.1.3",
+  "version": "1.1.0",
   "scripts": {
     "test": "NODE_ENV=test node_modules/gulp/bin/gulp.js test",
     "local-android": "node_modules/gulp/bin/gulp.js run:android",
