@@ -190,7 +190,9 @@ export default {
       showShapes: false,
       isMouseDown: false,
       // used to determine the beginning and end node of a shape
-      shapeNodes: []
+      shapeNodes: [],
+      // default scale factor for safari trackpad
+      previousScale: 1
     };
   },
   computed: {
@@ -230,7 +232,7 @@ export default {
       defaultBrushWidth: 5,
       defaultSmoothness: "sharpest",
       multilineText: true,
-      scrollbars: this.mobileMode ? false : true,
+      scrollbars: false,
       collaborationServer: `${
         process.env.VUE_APP_WEBSOCKET_ROOT
       }/whiteboard/room/{name}`
@@ -262,6 +264,16 @@ export default {
       if (this.isShapeSelected) this.shapeNodes.push(nodes[0]);
       if (this.selectedTool === "text") this.usePickTool();
     });
+
+    const zwibblerContainer = document.querySelector("#zwib-div");
+    zwibblerContainer.addEventListener("wheel", this.trackpadListener, false);
+    // Safari doesn't register wheel events for the trackpad pinch
+    zwibblerContainer.addEventListener("gesturestart", this.safariTrackpadZoom);
+    zwibblerContainer.addEventListener(
+      "gesturechange",
+      this.safariTrackpadZoom
+    );
+    zwibblerContainer.addEventListener("gestureend", this.safariTrackpadZoom);
 
     this.zwibblerCtx.on("document-changed", info => {
       const isRemoteChange = info && info.remote;
@@ -385,7 +397,50 @@ export default {
       this.zwibblerCtx.addSelectionHandle(1.0, 0.5, 0, 0, "", "scale");
       this.zwibblerCtx.addSelectionHandle(0.5, 1.0, 0, 0, "", "scale");
       this.zwibblerCtx.addSelectionHandle(0.0, 0.5, 0, 0, "", "scale");
+    },
+    trackpadListener(event) {
+      event.preventDefault();
+      // zoom in and out when pinching trackpad
+      // otherwise pan the whiteboard
+      if (event.ctrlKey) {
+        const { deltaY } = event;
+        if (deltaY > 0) this.zwibblerCtx.zoomOut();
+        else this.zwibblerCtx.zoomIn();
+      } else {
+        const { deltaX, deltaY } = event;
+        const rect = this.zwibblerCtx.getViewRectangle();
+        rect.x += deltaX;
+        rect.y += deltaY;
+        this.zwibblerCtx.setViewRectangle(rect);
+      }
+    },
+    safariTrackpadZoom(event) {
+      event.preventDefault();
+      const { scale } = event;
+      if (scale > this.previousScale) this.zwibblerCtx.zoomOut();
+      else this.zwibblerCtx.zoomIn();
+      this.previousScale = scale;
     }
+  },
+  destroyed() {
+    const zwibblerContainer = document.querySelector("#zwib-div");
+    zwibblerContainer.removeEventListener(
+      "wheel",
+      this.trackpadListener,
+      false
+    );
+    zwibblerContainer.removeEventListener(
+      "gesturestart",
+      this.safariTrackpadZoom
+    );
+    zwibblerContainer.removeEventListener(
+      "gesturechange",
+      this.safariTrackpadZoom
+    );
+    zwibblerContainer.removeEventListener(
+      "gestureend",
+      this.safariTrackpadZoom
+    );
   },
   watch: {
     shapeNodes() {
