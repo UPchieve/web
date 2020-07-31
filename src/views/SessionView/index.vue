@@ -92,21 +92,16 @@ export default {
     ...mapState({
       user: state => state.user.user,
       session: state => state.user.session,
-      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive
+      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
+      windowWidth: state => state.app.windowWidth
     }),
     ...mapGetters({
       mobileMode: "app/mobileMode",
       isAuthenticated: "user/isAuthenticated"
     }),
     isMobileMode() {
-      // values taken from _breakpoints file
-      const MAX_LANDSCAPE_HEIGHT = 576;
-      const MAX_LANDSCAPE_WIDTH = 768;
-      const isLandscapeMode =
-        window.innerWidth > window.innerHeight &&
-        window.innerWidth > MAX_LANDSCAPE_WIDTH &&
-        window.innerHeight < MAX_LANDSCAPE_HEIGHT;
-      return this.mobileMode || isLandscapeMode;
+      const largeScreenBreakpoint = 992;
+      return this.windowWidth <= largeScreenBreakpoint || this.mobileMode;
     },
     shouldHideWhiteboardSection() {
       // Never hide whiteboard section on desktop
@@ -303,60 +298,41 @@ export default {
   width: 100%;
   background: #fff;
 
-  @include breakpoint-above("medium") {
+  @include breakpoint-above("large") {
     position: absolute;
     top: 20px;
     left: unset;
     right: 20px;
-    width: 300px;
+    width: 400px;
     height: 70px;
     background: #fff;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     overflow: hidden;
   }
-  @include breakpoint-above("large") {
-    width: 400px;
-  }
-
-  @include breakpoint-mobile-landscape {
-    top: 0;
-    left: 0;
-    width: 100%;
-  }
 }
 
 .session-contents-container {
   height: 100%;
-  padding-top: 100px;
+  padding-top: 80px;
   display: flex;
   background: $c-background-grey;
 
-  @include breakpoint-above("medium") {
+  @include breakpoint-above("large") {
     padding: 20px;
     @include child-spacing(right, 15px);
-  }
-
-  @include breakpoint-below("medium") {
-    padding-top: 80px;
-  }
-
-  @include breakpoint-mobile-landscape {
-    padding: 0;
   }
 }
 
 .whiteboard-container,
 .chat-container {
-  @include breakpoint-above("medium") {
+  width: 100%;
+  height: 100%;
+
+  @include breakpoint-above("large") {
     height: 100%;
     border-radius: 8px;
     overflow: hidden;
-  }
-
-  @include breakpoint-below("medium") {
-    width: 100%;
-    height: 100%;
   }
 }
 
@@ -374,10 +350,6 @@ export default {
     top: -500px;
     left: -500px;
   }
-
-  @include breakpoint-mobile-landscape {
-    margin-right: 0;
-  }
 }
 
 .chat-container {
@@ -388,18 +360,10 @@ export default {
     display: none;
   }
 
-  @include breakpoint-above("medium") {
-    min-width: 300px;
-    flex-basis: 300px;
-    position: relative;
-  }
   @include breakpoint-above("large") {
     min-width: 400px;
     flex-basis: 400px;
-  }
-
-  @include breakpoint-mobile-landscape {
-    flex-basis: 100%;
+    position: relative;
   }
 }
 
@@ -414,7 +378,7 @@ export default {
   height: 40px;
   transition: 0.4s;
 
-  @include breakpoint-below("medium") {
+  @include breakpoint-below("large") {
     bottom: 33px;
   }
 
