@@ -198,10 +198,6 @@ export default {
     LineIcon
   },
   props: {
-    isVisible: {
-      type: Boolean,
-      required: true
-    },
     isWhiteboardOpen: {
       type: Boolean,
       required: true
@@ -334,7 +330,7 @@ export default {
 
     this.zwibblerCtx.on("document-changed", info => {
       const isRemoteChange = info && info.remote;
-      const isWhiteboardHidden = this.mobileMode && !this.isVisible;
+      const isWhiteboardHidden = this.mobileMode && !this.isWhiteboardOpen;
       const shouldResizeView = isRemoteChange && isWhiteboardHidden;
 
       /**
