@@ -11,7 +11,18 @@
             <loading-message message="Contacting coaches" />
           </template>
           <template v-else-if="isSessionInProgress">
-            <span class="volunteer-name">{{ sessionPartner.firstname }}</span>
+            <span class="volunteer-name">{{ sessionPartner.firstname }}</span
+            ><br />
+            <template v-if="isSessionConnectionAlive">
+              <span class="partner-status">
+                <template v-if="isSessionPartnerConnectionAlive">
+                  Online
+                </template>
+                <template v-else>
+                  Offline
+                </template>
+              </span>
+            </template>
           </template>
           <template v-else-if="isSessionOver">
             <template v-if="sessionPartner.firstname">
@@ -89,7 +100,10 @@ export default {
   computed: {
     ...mapState({
       user: state => state.user.user,
-      session: state => state.user.session
+      session: state => state.user.session,
+      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
+      isSessionPartnerConnectionAlive: state =>
+        state.user.isSessionPartnerConnectionAlive
     }),
     ...mapGetters({
       sessionPartner: "user/sessionPartner",
@@ -278,6 +292,11 @@ h1 {
 .volunteer-name {
   font-weight: 500;
   font-size: 18px;
+}
+
+.partner-status {
+  font-weight: 400;
+  font-size: 14px;
 }
 
 .button-container {

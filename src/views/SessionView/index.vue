@@ -218,6 +218,12 @@ export default {
       } else if (this.$route.params.sessionId) {
         this.joinSession(this.$route.params.sessionId);
       }
+    },
+    "partner-status"(data) {
+      this.$store.dispatch(
+        "user/updateSessionPartnerStatus",
+        data.isSessionPartnerConnectionAlive
+      );
     }
   },
   methods: {

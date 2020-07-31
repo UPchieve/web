@@ -15,7 +15,8 @@ export default {
     latestSession: {},
     volunteerStats: {},
     isFirstDashboardVisit: false,
-    isSessionConnectionAlive: false
+    isSessionConnectionAlive: false,
+    isSessionPartnerConnectionAlive: false
   },
   mutations: {
     setUser: (state, user = {}) => (state.user = user),
@@ -60,6 +61,13 @@ export default {
 
     setIsSessionConnectionAlive: (state, isSessionConnectionAlive) => {
       state.isSessionConnectionAlive = isSessionConnectionAlive;
+    },
+
+    setIsSessionPartnerConnectionAlive: (
+      state,
+      isSessionPartnerConnectionAlive
+    ) => {
+      state.isSessionPartnerConnectionAlive = isSessionPartnerConnectionAlive;
     }
   },
   actions: {
@@ -127,6 +135,16 @@ export default {
 
     updateSession: ({ commit }, sessionData) => {
       commit("setSession", sessionData);
+    },
+
+    updateSessionPartnerStatus: (
+      { commit },
+      isSessionPartnerConnectionAlive
+    ) => {
+      commit(
+        "setIsSessionPartnerConnectionAlive",
+        isSessionPartnerConnectionAlive
+      );
     },
 
     updateAvailability: ({ commit }, availability, date = Date.now()) => {
