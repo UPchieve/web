@@ -389,6 +389,7 @@ export default {
 
 .chat-container {
   padding: 0;
+  max-width: 100%;
 
   &--hidden {
     display: none;
@@ -403,10 +404,6 @@ export default {
   @include breakpoint-above("large") {
     min-width: 400px;
     flex-basis: 400px;
-  }
-
-  @include breakpoint-below("medium") {
-    max-width: 100%;
   }
 }
 
