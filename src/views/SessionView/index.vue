@@ -319,12 +319,15 @@ export default {
     top: 20px;
     left: unset;
     right: 20px;
-    width: 400px;
+    width: 300px;
     height: 70px;
     background: #fff;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     overflow: hidden;
+  }
+  @include breakpoint-above("large") {
+    width: 400px;
   }
 }
 
@@ -376,19 +379,20 @@ export default {
 
 .chat-container {
   padding: 0;
+  max-width: 100%;
 
   &--hidden {
     display: none;
   }
 
   @include breakpoint-above("medium") {
-    min-width: 400px;
-    flex-basis: 400px;
+    min-width: 300px;
+    flex-basis: 300px;
     position: relative;
   }
-
-  @include breakpoint-below("medium") {
-    max-width: 100%;
+  @include breakpoint-above("large") {
+    min-width: 400px;
+    flex-basis: 400px;
   }
 }
 

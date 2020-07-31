@@ -6,6 +6,7 @@
         class="toolbar-item toolbar-item--drag"
         title="Drag tool"
         v-bind:class="selectedTool === 'pan' ? 'selected-tool' : ''"
+        v-if="!mobileMode"
         @click="usePanTool"
       >
         <PanIcon class="toolbar-item__svg" />
@@ -27,11 +28,65 @@
         <PenIcon class="toolbar-item__svg" />
       </div>
       <div
+        class="toolbar-item toolbar-item--shapes"
+        title="Shapes"
+        @click="toggleShapes"
+        :class="isShapeSelected ? 'selected-tool' : ''"
+      >
+        <ShapesIcon class="toolbar-item__svg toolbar-item__svg--shapes" />
+        <div v-if="showShapes" class="shapes-bar">
+          <div
+            class="toolbar-item shapes-bar__toolbar-item"
+            :class="selectedTool === 'line' ? 'selected-tool' : ''"
+            @click="useLineTool"
+          >
+            <line-icon class="shapes-bar__shape-icon" title="Line tool" />
+          </div>
+          <div
+            class="toolbar-item shapes-bar__toolbar-item"
+            :class="selectedTool === 'circle' ? 'selected-tool' : ''"
+            @click="useCircleTool"
+          >
+            <circle-icon class="shapes-bar__shape-icon" title="Circle tool" />
+          </div>
+          <div
+            class="toolbar-item shapes-bar__toolbar-item"
+            :class="selectedTool === 'polygon' ? 'selected-tool' : ''"
+            @click="useTriangleTool"
+          >
+            <triangle-icon
+              class="shapes-bar__shape-icon"
+              title="Triangle tool"
+            />
+          </div>
+          <div
+            class="toolbar-item shapes-bar__toolbar-item"
+            :class="selectedTool === 'rectangle' ? 'selected-tool' : ''"
+            @click="useRectangleTool"
+          >
+            <rectangle-icon
+              class="shapes-bar__shape-icon"
+              title="Rectangle tool"
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        class="toolbar-item toolbar-item--text"
+        :class="selectedTool === 'text' ? 'selected-tool' : ''"
+        title="Text"
+        @click="useTextTool"
+      >
+        <TextIcon class="toolbar-item__svg" />
+      </div>
+      <div
         class="toolbar-item toolbar-item--color-picker"
         title="Color picker"
         @click="toggleColorPicker"
       >
-        <ColorPickerIcon class="toolbar-item__svg" />
+        <ColorPickerIcon
+          class="toolbar-item__svg  toolbar-item__svg--color-picker"
+        />
         <div v-if="showColorPicker" class="color-bar">
           <div
             class="color-button"
@@ -99,6 +154,12 @@ import RedoIcon from "@/assets/whiteboard_icons/redo.svg";
 import PanIcon from "@/assets/whiteboard_icons/grab.svg";
 import DeleteSelectionIcon from "@/assets/whiteboard_icons/delete_selection.png";
 import RotateIcon from "@/assets/whiteboard_icons/rotate.png";
+import ShapesIcon from "@/assets/whiteboard_icons/shapes.svg";
+import TextIcon from "@/assets/whiteboard_icons/text.svg";
+import CircleIcon from "@/assets/whiteboard_icons/circle.svg";
+import RectangleIcon from "@/assets/whiteboard_icons/rectangle.svg";
+import TriangleIcon from "@/assets/whiteboard_icons/triangle.svg";
+import LineIcon from "@/assets/whiteboard_icons/line.svg";
 
 export default {
   components: {
@@ -108,7 +169,13 @@ export default {
     PenIcon,
     UndoIcon,
     RedoIcon,
-    PanIcon
+    PanIcon,
+    ShapesIcon,
+    TextIcon,
+    CircleIcon,
+    RectangleIcon,
+    TriangleIcon,
+    LineIcon
   },
   props: {
     isVisible: {
@@ -121,7 +188,12 @@ export default {
       zwibblerCtx: null,
       selectedTool: "",
       showColorPicker: false,
-      isMouseDown: false
+      showShapes: false,
+      isMouseDown: false,
+      // used to determine the beginning and end node of a shape
+      shapeNodes: [],
+      // default scale factor for safari trackpad
+      previousScale: 1
     };
   },
   computed: {
@@ -135,7 +207,21 @@ export default {
       if (this.selectedTool === "brush") return "zwib-wrapper--brush";
       if (this.selectedTool === "pick") return "zwib-wrapper--pick";
       if (this.selectedTool === "pan") return "zwib-wrapper--pan";
+      if (this.selectedTool === "line") return "zwib-wrapper--line";
+      if (this.selectedTool === "circle") return "zwib-wrapper--circle";
+      if (this.selectedTool === "rectangle") return "zwib-wrapper--rectangle";
+      if (this.selectedTool === "polygon") return "zwib-wrapper--triangle";
+      if (this.selectedTool === "text") return "zwib-wrapper--text";
+
       return "zwib-wrapper--default";
+    },
+    isShapeSelected() {
+      return (
+        this.selectedTool === "line" ||
+        this.selectedTool === "circle" ||
+        this.selectedTool === "polygon" ||
+        this.selectedTool === "rectangle"
+      );
     }
   },
   mounted() {
@@ -146,7 +232,8 @@ export default {
       autoPickToolText: false,
       defaultBrushWidth: 5,
       defaultSmoothness: "sharpest",
-      scrollbars: this.mobileMode ? false : true,
+      multilineText: true,
+      scrollbars: false,
       collaborationServer: `${
         process.env.VUE_APP_WEBSOCKET_ROOT
       }/whiteboard/room/{name}`
@@ -160,6 +247,9 @@ export default {
     // Set up custom selection handles
     this.setSelectionHandles();
 
+    // disable showing hints on the canvas
+    this.zwibblerCtx.setConfig("showHints", false);
+
     this.zwibblerCtx.on("connected", () => {
       // Set brush tool to default tool
       this.useBrushTool();
@@ -167,8 +257,29 @@ export default {
       // Don't start setting selected tool until connected
       this.zwibblerCtx.on("tool-changed", toolname => {
         this.selectedTool = toolname;
+        this.hideHoveredToolbars();
       });
     });
+
+    this.zwibblerCtx.on("nodes-added", nodes => {
+      if (this.isShapeSelected) this.shapeNodes.push(nodes[0]);
+      if (this.selectedTool === "text") this.usePickTool();
+    });
+
+    if (!this.mobileMode) {
+      const zwibblerContainer = document.querySelector("#zwib-div");
+      zwibblerContainer.addEventListener("wheel", this.trackpadListener, false);
+      // Safari doesn't register wheel events for the trackpad pinch
+      zwibblerContainer.addEventListener(
+        "gesturestart",
+        this.safariTrackpadZoom
+      );
+      zwibblerContainer.addEventListener(
+        "gesturechange",
+        this.safariTrackpadZoom
+      );
+      zwibblerContainer.addEventListener("gestureend", this.safariTrackpadZoom);
+    }
 
     this.zwibblerCtx.on("document-changed", info => {
       const isRemoteChange = info && info.remote;
@@ -198,30 +309,55 @@ export default {
   methods: {
     usePanTool() {
       this.zwibblerCtx.usePanTool();
-      this.showColorPicker = false;
     },
     usePickTool() {
       this.zwibblerCtx.usePickTool();
-      this.showColorPicker = false;
     },
     useBrushTool() {
       this.zwibblerCtx.useBrushTool();
-      this.showColorPicker = false;
+    },
+    useLineTool() {
+      this.zwibblerCtx.useLineTool(
+        {},
+        {
+          singleLine: true
+        }
+      );
+    },
+    useCircleTool() {
+      this.zwibblerCtx.useCircleTool();
+    },
+    useTriangleTool() {
+      this.zwibblerCtx.usePolygonTool(3, 0);
+    },
+    useRectangleTool() {
+      this.zwibblerCtx.useRectangleTool();
+    },
+    useTextTool() {
+      this.zwibblerCtx.useTextTool();
     },
     toggleColorPicker() {
       this.showColorPicker = !this.showColorPicker;
+      this.showShapes = false;
+    },
+    toggleShapes() {
+      this.showShapes = !this.showShapes;
+      this.showColorPicker = false;
     },
     undo() {
       this.zwibblerCtx.undo();
-      this.showColorPicker = false;
+      this.hideHoveredToolbars();
     },
     redo() {
       this.zwibblerCtx.redo();
+      this.hideHoveredToolbars();
+    },
+    hideHoveredToolbars() {
       this.showColorPicker = false;
+      this.showShapes = false;
     },
     clearWhiteboard() {
       this.zwibblerCtx.deleteNodes(this.zwibblerCtx.getAllNodes());
-      this.showColorPicker = false;
     },
     setColor(color) {
       // Second parameter indicates whether the colour should affect the fill or outline colour.
@@ -267,6 +403,60 @@ export default {
       this.zwibblerCtx.addSelectionHandle(1.0, 0.5, 0, 0, "", "scale");
       this.zwibblerCtx.addSelectionHandle(0.5, 1.0, 0, 0, "", "scale");
       this.zwibblerCtx.addSelectionHandle(0.0, 0.5, 0, 0, "", "scale");
+    },
+    trackpadListener(event) {
+      event.preventDefault();
+      // zoom in and out when pinching trackpad
+      // otherwise pan the whiteboard
+      if (event.ctrlKey) {
+        const { deltaY } = event;
+        if (deltaY > 0) this.zwibblerCtx.zoomOut();
+        else this.zwibblerCtx.zoomIn();
+      } else {
+        const { deltaX, deltaY } = event;
+        const rect = this.zwibblerCtx.getViewRectangle();
+        rect.x += deltaX;
+        rect.y += deltaY;
+        this.zwibblerCtx.setViewRectangle(rect);
+      }
+    },
+    safariTrackpadZoom(event) {
+      event.preventDefault();
+      const { scale } = event;
+      if (scale > this.previousScale) this.zwibblerCtx.zoomIn();
+      else this.zwibblerCtx.zoomOut();
+      this.previousScale = scale;
+    }
+  },
+  destroyed() {
+    if (!this.mobileMode) {
+      const zwibblerContainer = document.querySelector("#zwib-div");
+      zwibblerContainer.removeEventListener(
+        "wheel",
+        this.trackpadListener,
+        false
+      );
+      zwibblerContainer.removeEventListener(
+        "gesturestart",
+        this.safariTrackpadZoom
+      );
+      zwibblerContainer.removeEventListener(
+        "gesturechange",
+        this.safariTrackpadZoom
+      );
+      zwibblerContainer.removeEventListener(
+        "gestureend",
+        this.safariTrackpadZoom
+      );
+    }
+  },
+  watch: {
+    shapeNodes() {
+      // Use the pick tool after the end node for a shape was added
+      if (this.shapeNodes.length === 2 && this.isShapeSelected) {
+        this.usePickTool();
+        this.shapeNodes = [];
+      }
     }
   }
 };
@@ -278,7 +468,10 @@ export default {
   width: 100%;
   position: relative;
 
-  &--brush {
+  &--brush,
+  &--circle,
+  &--rectangle,
+  &--triangle {
     .zwibbler-canvas-holder {
       cursor: crosshair !important;
     }
@@ -293,6 +486,12 @@ export default {
   &--pan {
     .zwibbler-canvas-holder {
       cursor: grab !important;
+    }
+  }
+
+  &--text {
+    .zwibbler-canvas-holder {
+      cursor: text !important;
     }
   }
 
@@ -321,7 +520,7 @@ export default {
 }
 
 .toolbar {
-  max-width: 400px;
+  max-width: 550px;
   height: 70px;
   position: absolute;
   bottom: 50px;
@@ -344,6 +543,10 @@ export default {
     height: 100px;
     bottom: 0;
     border-radius: 0;
+  }
+
+  @media only screen and (orientation: landscape) and (max-height: 500px) {
+    bottom: 0;
   }
 }
 
@@ -387,6 +590,21 @@ export default {
 
   &__svg {
     width: 20px;
+
+    &--shapes {
+      @include breakpoint-below("medium") {
+        height: 22px;
+        width: 22px;
+      }
+    }
+
+    &--color-picker {
+      height: 25px;
+      width: 25px;
+    }
+  }
+  &--shapes {
+    position: relative;
   }
 }
 
@@ -428,6 +646,38 @@ export default {
 
   &:active {
     outline: none;
+  }
+}
+
+.shapes-bar {
+  @include flex-container(row, space-around);
+  position: absolute;
+  left: -50px;
+  margin: 0 auto;
+  bottom: 58px;
+  background-color: #fff;
+  border: 1px solid #d8d8d8;
+  border-radius: 5px;
+
+  @include breakpoint-latest-iphones {
+    bottom: 88px;
+  }
+
+  &__toolbar-item {
+    border-radius: initial !important;
+
+    @include breakpoint-below("tiny") {
+      padding: 1em;
+    }
+  }
+
+  &__shape-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  & .selected-tool {
+    background-color: darken(#e2e2e2, 15%);
   }
 }
 </style>
