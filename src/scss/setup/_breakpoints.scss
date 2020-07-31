@@ -41,10 +41,3 @@ $breakpoint-map: (
     @content;
   }
 }
-
-/// Media query helper for mobile landscape devices
-@mixin breakpoint-mobile-landscape() {
-  @media only screen and (min-device-width: 768px) and (max-device-height: 576px) and (orientation: landscape) {
-    @content;
-  }
-}
