@@ -6,6 +6,7 @@
         class="toolbar-item toolbar-item--drag"
         title="Drag tool"
         v-bind:class="selectedTool === 'pan' ? 'selected-tool' : ''"
+        v-if="!mobileMode"
         @click="usePanTool"
       >
         <PanIcon class="toolbar-item__svg" />
@@ -265,15 +266,20 @@ export default {
       if (this.selectedTool === "text") this.usePickTool();
     });
 
-    const zwibblerContainer = document.querySelector("#zwib-div");
-    zwibblerContainer.addEventListener("wheel", this.trackpadListener, false);
-    // Safari doesn't register wheel events for the trackpad pinch
-    zwibblerContainer.addEventListener("gesturestart", this.safariTrackpadZoom);
-    zwibblerContainer.addEventListener(
-      "gesturechange",
-      this.safariTrackpadZoom
-    );
-    zwibblerContainer.addEventListener("gestureend", this.safariTrackpadZoom);
+    if (!this.mobileMode) {
+      const zwibblerContainer = document.querySelector("#zwib-div");
+      zwibblerContainer.addEventListener("wheel", this.trackpadListener, false);
+      // Safari doesn't register wheel events for the trackpad pinch
+      zwibblerContainer.addEventListener(
+        "gesturestart",
+        this.safariTrackpadZoom
+      );
+      zwibblerContainer.addEventListener(
+        "gesturechange",
+        this.safariTrackpadZoom
+      );
+      zwibblerContainer.addEventListener("gestureend", this.safariTrackpadZoom);
+    }
 
     this.zwibblerCtx.on("document-changed", info => {
       const isRemoteChange = info && info.remote;
@@ -423,24 +429,26 @@ export default {
     }
   },
   destroyed() {
-    const zwibblerContainer = document.querySelector("#zwib-div");
-    zwibblerContainer.removeEventListener(
-      "wheel",
-      this.trackpadListener,
-      false
-    );
-    zwibblerContainer.removeEventListener(
-      "gesturestart",
-      this.safariTrackpadZoom
-    );
-    zwibblerContainer.removeEventListener(
-      "gesturechange",
-      this.safariTrackpadZoom
-    );
-    zwibblerContainer.removeEventListener(
-      "gestureend",
-      this.safariTrackpadZoom
-    );
+    if (!this.mobileMode) {
+      const zwibblerContainer = document.querySelector("#zwib-div");
+      zwibblerContainer.removeEventListener(
+        "wheel",
+        this.trackpadListener,
+        false
+      );
+      zwibblerContainer.removeEventListener(
+        "gesturestart",
+        this.safariTrackpadZoom
+      );
+      zwibblerContainer.removeEventListener(
+        "gesturechange",
+        this.safariTrackpadZoom
+      );
+      zwibblerContainer.removeEventListener(
+        "gestureend",
+        this.safariTrackpadZoom
+      );
+    }
   },
   watch: {
     shapeNodes() {
