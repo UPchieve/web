@@ -423,8 +423,8 @@ export default {
     safariTrackpadZoom(event) {
       event.preventDefault();
       const { scale } = event;
-      if (scale > this.previousScale) this.zwibblerCtx.zoomOut();
-      else this.zwibblerCtx.zoomIn();
+      if (scale > this.previousScale) this.zwibblerCtx.zoomIn();
+      else this.zwibblerCtx.zoomOut();
       this.previousScale = scale;
     }
   },
