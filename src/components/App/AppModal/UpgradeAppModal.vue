@@ -6,18 +6,21 @@
     <h2 class="UpgradeAppModal-subtitle">
       Visit the app store to download the latest version.
     </h2>
-    <h3 class="UpgradeAppModal-release-header">
-      The latest version includes the following update(s):
-    </h3>
-    <ul class="UpgradeAppModal-release-note-list">
-      <li
-        v-for="note in newReleaseNotes"
-        :key="note"
-        class="UpgradeAppModal-release-note"
-      >
-        {{ note }}
-      </li>
-    </ul>
+    <div class="UpgradeAppModal-release-notes">
+      <h3 class="UpgradeAppModal-release-notes__header">
+        The latest version includes the following update(s):
+      </h3>
+      <ul class="UpgradeAppModal-release-notes__list">
+        <li
+          v-for="note in newReleaseNotes"
+          :key="note"
+          class="UpgradeAppModal-release-notes__note"
+        >
+          {{ note }}
+        </li>
+      </ul>
+    </div>
+
     <div v-if="!mobileMode" class="seperator" />
 
     <div class="UpgradeAppModal-buttons">
@@ -85,18 +88,22 @@ p {
   @include child-spacing(top, 24px);
   height: 100%;
 
-  &-release-header {
+  &-release-notes {
+    @include flex-container(column, center, center);
     margin-top: 2em;
-    font-size: 16px;
-  }
 
-  &-release-note-list {
-    margin-top: 0;
-  }
+    &__header {
+      @include font-category("heading");
+    }
 
-  &-release-note {
-    font-size: 16px;
-    text-align: left;
+    &__list {
+      margin-top: 0;
+    }
+
+    &__note {
+      @include font-category("body");
+      text-align: left;
+    }
   }
 }
 
