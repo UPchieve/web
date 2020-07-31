@@ -7,7 +7,7 @@
       v-if="session._id"
       class="session-contents-container"
       v-bind:class="{
-        'session-contents-container--mobile': mobileMode
+        'session-contents-container--mobile': isMobileMode
       }"
     >
       <div
@@ -30,7 +30,7 @@
       </div>
     </div>
     <div
-      v-if="mobileMode"
+      v-if="isMobileMode"
       class="toggleButton"
       id="toggleButton"
       @click="toggleWhiteboard"
@@ -65,7 +65,7 @@ export default {
     SessionChat
   },
   created() {
-    if (this.mobileMode) {
+    if (this.isMobileMode) {
       this.$store.dispatch("app/hideNavigation");
     } else {
       this.$store.dispatch("app/header/show", headerData);
@@ -98,10 +98,19 @@ export default {
       mobileMode: "app/mobileMode",
       isAuthenticated: "user/isAuthenticated"
     }),
-
+    isMobileMode() {
+      // values taken from _breakpoints file
+      const MAX_LANDSCAPE_HEIGHT = 576;
+      const MAX_LANDSCAPE_WIDTH = 768;
+      const isLandscapeMode =
+        window.innerWidth > window.innerHeight &&
+        window.innerWidth > MAX_LANDSCAPE_WIDTH &&
+        window.innerHeight < MAX_LANDSCAPE_HEIGHT;
+      return this.mobileMode || isLandscapeMode;
+    },
     shouldHideWhiteboardSection() {
       // Never hide whiteboard section on desktop
-      if (!this.mobileMode) {
+      if (!this.isMobileMode) {
         return false;
       }
 
@@ -109,7 +118,7 @@ export default {
     },
     shouldHideChatSection() {
       // Never hide chat section on desktop
-      if (!this.mobileMode) {
+      if (!this.isMobileMode) {
         return false;
       }
 
@@ -203,7 +212,7 @@ export default {
   },
   methods: {
     handleResize() {
-      if (this.mobileMode) {
+      if (this.isMobileMode) {
         this.$store.dispatch("app/hideNavigation");
       } else {
         this.$store.dispatch("app/header/show", headerData);
@@ -309,6 +318,12 @@ export default {
   @include breakpoint-above("large") {
     width: 400px;
   }
+
+  @include breakpoint-mobile-landscape {
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
 }
 
 .session-contents-container {
@@ -324,6 +339,10 @@ export default {
 
   @include breakpoint-below("medium") {
     padding-top: 80px;
+  }
+
+  @include breakpoint-mobile-landscape {
+    padding: 0;
   }
 }
 
@@ -355,6 +374,10 @@ export default {
     top: -500px;
     left: -500px;
   }
+
+  @include breakpoint-mobile-landscape {
+    margin-right: 0;
+  }
 }
 
 .chat-container {
@@ -373,6 +396,10 @@ export default {
   @include breakpoint-above("large") {
     min-width: 400px;
     flex-basis: 400px;
+  }
+
+  @include breakpoint-mobile-landscape {
+    flex-basis: 100%;
   }
 }
 

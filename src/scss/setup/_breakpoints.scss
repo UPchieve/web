@@ -1,11 +1,11 @@
 /// Breakpoint key-value pairs
 $breakpoint-map: (
-  'tiny': 414px,
-  'small': 576px,
-  'medium': 768px,
-  'large': 992px,
-  'huge': 1200px,
-  'massive': 1800px
+  "tiny": 414px,
+  "small": 576px,
+  "medium": 768px,
+  "large": 992px,
+  "huge": 1200px,
+  "massive": 1800px
 );
 
 /// Returns a breakpoint by key.
@@ -38,6 +38,13 @@ $breakpoint-map: (
   @media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2),
     only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3),
     only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+    @content;
+  }
+}
+
+/// Media query helper for mobile landscape devices
+@mixin breakpoint-mobile-landscape() {
+  @media only screen and (min-device-width: 768px) and (max-device-height: 576px) and (orientation: landscape) {
     @content;
   }
 }
