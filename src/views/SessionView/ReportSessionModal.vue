@@ -2,21 +2,23 @@
   <div class="report-modal">
     <h1 class="report-modal__title">Report this session</h1>
     <h2 class="report-modal__subtitle">
-      We will review the entire chat log and, if needed, issue the student a
-      warning or take disciplinary action.
+      We strongly encourage volunteers to report any technical issues or bad
+      student behavior that they encounter during their session. We’ll review
+      your session and get back to you ASAP.
     </h2>
 
     <div class="report-modal__section">
-      <div class="report-modal__label">Select reason</div>
+      <div class="report-modal__label">Reason for reporting</div>
       <v-select
-        class="report-modal__select"
+        class="report-modal__select report-modal__select--required"
         v-model="reportReason"
         :options="reportReasonOptions"
         :searchable="false"
+        :clearable="false"
       ></v-select>
     </div>
     <div class="report-modal__section">
-      <div class="report-modal__label">Message</div>
+      <div class="report-modal__label">Tell us what happened</div>
       <textarea
         class="report-modal__message"
         v-model="reportMessage"
@@ -27,7 +29,9 @@
     <div class="report-modal__footer">
       <div class="report-modal__buttons">
         <large-button @click.native="cancel">Cancel</large-button>
-        <large-button primary @click.native="submit">Report</large-button>
+        <large-button primary @click.native="submit" :disabled="!isFormComplete"
+          >Report</large-button
+        >
       </div>
     </div>
   </div>
@@ -39,9 +43,11 @@ import NetworkService from "@/services/NetworkService";
 import LargeButton from "@/components/LargeButton";
 
 const reportReasonOptions = [
-  "Student behavior",
   "Technical issue",
-  "Another reason"
+  "Student was rude",
+  "Student was unresponsive",
+  "Student was misusing platform",
+  "Other"
 ];
 
 export default {
@@ -59,7 +65,10 @@ export default {
   computed: {
     ...mapState({
       currentSession: state => state.user.session
-    })
+    }),
+    isFormComplete() {
+      return !!this.reportReason;
+    }
   },
   methods: {
     async submit() {
@@ -111,7 +120,7 @@ export default {
   &__label {
     align-self: flex-start;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 500;
     margin-bottom: 5px;
   }
 
