@@ -43,7 +43,7 @@
       <img id="toggleIcon" :src="getIconUrl()" />
     </div>
     <div
-      v-if="mobileMode"
+      v-if="showPhotoUpload"
       class="toggleButton toggleButton__photo-upload"
       :class="shouldHideChatSection ? 'photo-upload--hidden' : ''"
       @click="openFileDialog"
@@ -67,6 +67,7 @@ import SessionFulfilledModal from "./SessionFulfilledModal";
 import ConnectionTroubleModal from "./ConnectionTroubleModal";
 
 import PhotoUploadIcon from "@/assets/whiteboard_icons/photo-upload.svg";
+import isOutdatedMobileAppVersion from "@/utils/is-outdated-mobile-app-version";
 
 const headerData = {
   component: "SessionHeader"
@@ -108,7 +109,8 @@ export default {
     ...mapState({
       user: state => state.user.user,
       session: state => state.user.session,
-      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive
+      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
+      isMobileApp: state => state.app.isMobileApp
     }),
     ...mapGetters({
       mobileMode: "app/mobileMode",
@@ -130,6 +132,14 @@ export default {
       }
 
       return this.whiteboardOpen;
+    },
+    showPhotoUpload() {
+      if (!this.isVolunteer && this.mobileMode) {
+        if (this.isMobileApp && isOutdatedMobileAppVersion()) return false;
+        return true;
+      }
+
+      return false;
     }
   },
   mounted() {

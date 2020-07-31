@@ -79,7 +79,7 @@
         <RedoIcon class="toolbar-item__svg" />
       </div>
       <div
-        v-if="!isVolunteer"
+        v-if="showPhotoUpload"
         class="toolbar-item toolbar-item--photo"
         title="Upload photo"
         @click="openFileDialog"
@@ -117,6 +117,7 @@ import RotateIcon from "@/assets/whiteboard_icons/rotate.png";
 import PhotoUploadIcon from "@/assets/whiteboard_icons/photo-upload.svg";
 import NetworkService from "@/services/NetworkService";
 import axios from "axios";
+import isOutdatedMobileAppVersion from "@/utils/is-outdated-mobile-app-version";
 
 export default {
   components: {
@@ -154,7 +155,8 @@ export default {
   },
   computed: {
     ...mapState({
-      session: state => state.user.session
+      session: state => state.user.session,
+      isMobileApp: state => state.app.isMobileApp
     }),
     ...mapGetters({
       mobileMode: "app/mobileMode",
@@ -165,6 +167,14 @@ export default {
       if (this.selectedTool === "pick") return "zwib-wrapper--pick";
       if (this.selectedTool === "pan") return "zwib-wrapper--pan";
       return "zwib-wrapper--default";
+    },
+    showPhotoUpload() {
+      if (!this.isVolunteer) {
+        if (this.isMobileApp && isOutdatedMobileAppVersion()) return false;
+        return true;
+      }
+
+      return false;
     }
   },
   updated() {
