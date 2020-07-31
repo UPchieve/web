@@ -218,9 +218,12 @@ export default {
       .post(`${API_ROOT}/session/latest`, data)
       .then(this._successHandler, this._errorHandler);
   },
-  reportSession({ sessionId, reportMessage }) {
+  reportSession({ sessionId, reportReason, reportMessage }) {
     return Vue.http
-      .post(`${API_ROOT}/session/${sessionId}/report`, { reportMessage })
+      .post(`${API_ROOT}/session/${sessionId}/report`, {
+        reportReason,
+        reportMessage
+      })
       .then(this._successHandler, this._errorHandler);
   },
   adminGetSessions({

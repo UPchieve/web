@@ -1,5 +1,8 @@
 <template>
-  <div class="session">
+  <div
+    class="session"
+    :class="{ 'session--whiteboard': auxiliaryType === 'WHITEBOARD' }"
+  >
     <div class="session-header-container">
       <session-header @try-clicked="tryClicked" />
     </div>
@@ -11,13 +14,17 @@
       }"
     >
       <div
-        class="whiteboard-container"
-        id="whiteboard-container"
+        class="auxiliary-container"
+        id="auxiliary-container"
         v-bind:class="{
-          'whiteboard-container--hidden': shouldHideWhiteboardSection
+          'auxiliary-container--hidden': shouldHideAuxiliarySection
         }"
       >
-        <whiteboard :isVisible="whiteboardOpen" />
+        <whiteboard
+          v-if="auxiliaryType === 'WHITEBOARD'"
+          :isVisible="auxiliaryOpen"
+        />
+        <document-editor v-else />
       </div>
       <div
         class="chat-container"
@@ -33,9 +40,9 @@
       v-if="isMobileMode"
       class="toggleButton"
       id="toggleButton"
-      @click="toggleWhiteboard"
+      @click="toggleAuxiliary"
     >
-      <img id="toggleIcon" :src="getIconUrl()" />
+      <img id="toggleIcon" :src="toggleIconSrc" />
     </div>
   </div>
 </template>
@@ -43,13 +50,11 @@
 <script>
 import { mapState, mapGetters } from "vuex";
 import * as Sentry from "@sentry/browser";
-
 import SessionService from "@/services/SessionService";
-
 import SessionHeader from "./SessionHeader";
-import Whiteboard from "./Whiteboard";
 import SessionChat from "./SessionChat";
-
+import Whiteboard from "./Whiteboard";
+import DocumentEditor from "./DocumentEditor";
 import SessionFulfilledModal from "./SessionFulfilledModal";
 import ConnectionTroubleModal from "./ConnectionTroubleModal";
 
@@ -61,8 +66,9 @@ export default {
   name: "session-view",
   components: {
     SessionHeader,
+    SessionChat,
     Whiteboard,
-    SessionChat
+    DocumentEditor
   },
   created() {
     if (this.isMobileMode) {
@@ -84,8 +90,7 @@ export default {
    */
   data() {
     return {
-      whiteboardOpen: false,
-      icon: "Pencil.png"
+      auxiliaryOpen: false
     };
   },
   computed: {
@@ -99,17 +104,33 @@ export default {
       mobileMode: "app/mobileMode",
       isAuthenticated: "user/isAuthenticated"
     }),
+
     isMobileMode() {
       const largeScreenBreakpoint = 992;
       return this.windowWidth <= largeScreenBreakpoint || this.mobileMode;
     },
-    shouldHideWhiteboardSection() {
-      // Never hide whiteboard section on desktop
-      if (!this.isMobileMode) {
+
+    auxiliaryType() {
+      const documentEditorSubTopics = ["planning", "essays", "applications"];
+      if (documentEditorSubTopics.includes(this.session.subTopic))
+        return "DOCUMENT";
+      else return "WHITEBOARD";
+    },
+
+    toggleIconSrc() {
+      if (this.auxiliaryOpen) return require(`@/assets/Chat.png`);
+      else if (this.auxiliaryType === "WHITEBOARD")
+        return require(`@/assets/Pencil.png`);
+      else return require(`@/assets/doc_editor_icon.png`);
+    },
+
+    shouldHideAuxiliarySection() {
+      // Never hide auxiliary section (whiteboard/document) on desktop
+      if (!this.mobileMode) {
         return false;
       }
 
-      return !this.whiteboardOpen;
+      return !this.auxiliaryOpen;
     },
     shouldHideChatSection() {
       // Never hide chat section on desktop
@@ -117,7 +138,7 @@ export default {
         return false;
       }
 
-      return this.whiteboardOpen;
+      return this.auxiliaryOpen;
     }
   },
   mounted() {
@@ -214,18 +235,13 @@ export default {
         this.$store.dispatch("app/sidebar/hide");
       }
     },
-    getIconUrl() {
-      return require("@/assets/" + this.icon);
-    },
-    toggleWhiteboard() {
-      if (!this.whiteboardOpen) {
+    toggleAuxiliary() {
+      if (!this.auxiliaryOpen) {
         document.getElementById("toggleButton").classList.add("back");
-        this.icon = "Chat.png";
-        this.whiteboardOpen = true;
+        this.auxiliaryOpen = true;
       } else {
         document.getElementById("toggleButton").classList.remove("back");
-        this.icon = "Pencil.png";
-        this.whiteboardOpen = false;
+        this.auxiliaryOpen = false;
       }
     },
     joinSession(sessionId) {
@@ -288,6 +304,12 @@ export default {
 .session {
   position: relative; /*[1]*/
   height: 100%; /*[1]*/
+
+  &--whiteboard {
+    .toggleButton.back {
+      bottom: calc(100% - 140px);
+    }
+  }
 }
 
 .session-header-container {
@@ -303,12 +325,15 @@ export default {
     top: 20px;
     left: unset;
     right: 20px;
-    width: 400px;
+    width: 300px;
     height: 70px;
     background: #fff;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     overflow: hidden;
+  }
+  @include breakpoint-above("large") {
+    width: 400px;
   }
 }
 
@@ -324,7 +349,7 @@ export default {
   }
 }
 
-.whiteboard-container,
+.auxiliary-container,
 .chat-container {
   width: 100%;
   height: 100%;
@@ -336,7 +361,7 @@ export default {
   }
 }
 
-.whiteboard-container {
+.auxiliary-container {
   background: #fff;
   padding: 0;
   flex-grow: 1;
@@ -387,9 +412,5 @@ export default {
     width: 26px;
     height: 26px;
   }
-}
-
-.toggleButton.back {
-  bottom: calc(100% - 140px);
 }
 </style>
