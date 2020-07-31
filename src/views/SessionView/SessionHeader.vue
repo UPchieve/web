@@ -245,7 +245,7 @@ export default {
   justify-content: space-between;
   align-items: center;
 
-  @include breakpoint-below("medium") {
+  @include breakpoint-below("large") {
     border-radius: 0px 0px 20px 20px;
     height: 80px;
   }

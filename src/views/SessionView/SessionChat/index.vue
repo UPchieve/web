@@ -223,7 +223,7 @@ export default {
   position: relative;
   padding-bottom: 20px;
 
-  @include breakpoint-above("medium") {
+  @include breakpoint-above("large") {
     margin-top: 70px;
     padding-bottom: 0;
   }
@@ -365,7 +365,7 @@ span {
   position: relative;
   background: #fff;
 
-  @include breakpoint-below("medium") {
+  @include breakpoint-below("large") {
     height: 66px;
     padding: 0 80px 40px 20px;
     display: flex;
@@ -382,7 +382,7 @@ span {
   font-weight: 300;
   transition: 0.25s;
 
-  @include breakpoint-below("medium") {
+  @include breakpoint-below("large") {
     bottom: 75px;
     left: 35px;
   }
@@ -400,7 +400,7 @@ span {
     outline: none;
   }
 
-  @include breakpoint-below("medium") {
+  @include breakpoint-below("large") {
     height: 40px;
     border: 1px solid #d6e0ef;
     border-radius: 20px;
