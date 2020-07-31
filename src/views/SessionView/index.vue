@@ -23,7 +23,7 @@
         <whiteboard
           v-if="auxiliaryType === 'WHITEBOARD'"
           :isWhiteboardOpen="auxiliaryOpen"
-          :toggleWhiteboard="toggleWhiteboard"
+          :toggleWhiteboard="toggleAuxiliary"
           ref="whiteboard"
         />
         <document-editor v-else />
