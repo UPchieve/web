@@ -6,11 +6,22 @@
     <h2 class="UpgradeAppModal-subtitle">
       Visit the app store to download the latest version.
     </h2>
+    <h3 class="UpgradeAppModal-release-header">
+      The latest version includes the following update(s):
+    </h3>
+    <ul class="UpgradeAppModal-release-note-list">
+      <li
+        v-for="note in newReleaseNotes"
+        :key="note"
+        class="UpgradeAppModal-release-note"
+      >
+        {{ note }}
+      </li>
+    </ul>
     <div v-if="!mobileMode" class="seperator" />
 
     <div class="UpgradeAppModal-buttons">
       <large-button @click.native="onClose()">No thanks.</large-button>
-      <!-- @TODO: Add link to app store for ios and android -->
       <a :href="appStoreLink" target="_blank" class="UpgradeAppModal-link">
         <large-button primary>Take me to the app store!</large-button>
       </a>
@@ -35,7 +46,6 @@ export default {
     };
   },
   mounted() {
-    // @todo: set a link to the respective os app store
     const device = getOperatingSystem();
     if (device === "Android") {
       this.appStoreLink = GOOGLE_PLAY_STORE_LINK;
@@ -45,7 +55,13 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({ mobileMode: "app/mobileMode" })
+    ...mapGetters({ mobileMode: "app/mobileMode" }),
+    newReleaseNotes() {
+      return [
+        "Take + send photos to your coaches",
+        "Share photos from your phone’s library"
+      ];
+    }
   },
   methods: {
     onClose() {
@@ -68,6 +84,20 @@ p {
   @include flex-container(column);
   @include child-spacing(top, 24px);
   height: 100%;
+
+  &-release-header {
+    margin-top: 2em;
+    font-size: 16px;
+  }
+
+  &-release-note-list {
+    margin-top: 0;
+  }
+
+  &-release-note {
+    font-size: 16px;
+    text-align: left;
+  }
 }
 
 .UpgradeAppModal-title {
