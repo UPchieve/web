@@ -444,7 +444,7 @@ export default {
         });
         img.src = reader.result;
         img.onload = () => {
-          const whiteboard = document.querySelector(".whiteboard-container");
+          const whiteboard = document.querySelector("#zwib-div");
           const whiteboardWidth = whiteboard.clientWidth;
           const whiteboardHeight = whiteboard.clientHeight;
           let scaleFactor = 1;
