@@ -43,6 +43,10 @@
           <div class="user-detail__section-title">Partner organization</div>
           <div>{{ partnerOrg }}</div>
         </div>
+        <div v-if="user.partnerSite" class="user-detail__section">
+          <div class="user-detail__section-title">Partner site</div>
+          <div>{{ user.partnerSite }}</div>
+        </div>
         <div v-if="schoolName" class="user-detail__section">
           <div class="user-detail__section-title">School</div>
           <div>{{ schoolName }}</div>
