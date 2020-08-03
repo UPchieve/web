@@ -88,8 +88,14 @@
 }
 
 .uc-form-select {
-  @extend .uc-form-input;
   width: 100%;
+  margin: 5px 0 0;
+
+  &--invalid {
+    .vs__dropdown-toggle {
+      border-color: $c-error-red;
+    }
+  }
 }
 
 .uc-form-subtext {

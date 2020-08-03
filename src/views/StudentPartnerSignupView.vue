@@ -38,6 +38,24 @@
           </div>
         </div>
 
+        <div v-if="requirePartnerSite" class="uc-column">
+          <label for="inputSite" class="uc-form-label"
+            >Which site do you belong to?</label
+          >
+          <v-select
+            id="inputSite"
+            class="uc-form-select"
+            v-bind:class="{
+              'uc-form-select--invalid': invalidInputs.indexOf('inputSite') > -1
+            }"
+            v-model="formData.partnerSite"
+            :options="studentPartner.sites"
+            :searchable="false"
+            :clearable="false"
+            required
+          />
+        </div>
+
         <div class="uc-column">
           <label for="inputEmail" class="uc-form-label"
             >What's your email?</label
@@ -258,12 +276,14 @@ export default {
       studentPartner: {
         name: "",
         highSchoolSignup: false,
-        highSchoolSignupRequired: false
+        highSchoolSignupRequired: false,
+        sites: []
       },
       formStep: "step-1",
       isHighSchoolStudent: false,
       noHighSchoolResults: false,
       formData: {
+        partnerSite: "",
         email: "",
         password: "",
         firstName: "",
@@ -297,6 +317,10 @@ export default {
 
       // Optional high school input, so show if the checkbox is selected
       return this.isHighSchoolStudent;
+    },
+
+    requirePartnerSite() {
+      return !!this.studentPartner.sites;
     }
   },
   methods: {
@@ -335,6 +359,11 @@ export default {
       // validate input
       this.errors = [];
       this.invalidInputs = [];
+
+      if (this.requirePartnerSite && !this.formData.partnerSite) {
+        this.errors.push("You must select your site");
+        this.invalidInputs.push("inputSite");
+      }
 
       if (!this.formData.email) {
         this.errors.push("An email address is required.");
@@ -409,6 +438,7 @@ export default {
       AuthService.registerStudent(this, {
         studentPartnerOrg: this.$route.params.partnerId,
         partnerUserId: this.$route.query.uid,
+        partnerSite: this.formData.partnerSite,
         email: this.formData.email,
         password: this.formData.password,
         firstName: this.formData.firstName,
