@@ -2,6 +2,7 @@
   <div class="zwib-wrapper" :class="toolClass">
     <div id="zwib-div"></div>
     <div id="toolbar" class="toolbar">
+      <p v-if="error" class="error">{{ error }}</p>
       <div
         class="toolbar-item toolbar-item--drag"
         title="Drag tool"
@@ -133,6 +134,20 @@
         <RedoIcon class="toolbar-item__svg" />
       </div>
       <div
+        v-if="showPhotoUpload"
+        class="toolbar-item toolbar-item--photo"
+        title="Upload photo"
+        @click="openFileDialog"
+      >
+        <input
+          type="file"
+          class="upload-photo"
+          accept="image/jpg, image/png"
+          @change="uploadPhoto"
+        />
+        <PhotoUploadIcon class="toolbar-item__svg--photo" />
+      </div>
+      <div
         class="toolbar-item toolbar-item--clear"
         title="Clear whiteboard"
         @click="clearWhiteboard"
@@ -145,6 +160,9 @@
 
 <script>
 import { mapState, mapGetters } from "vuex";
+import axios from "axios";
+import NetworkService from "@/services/NetworkService";
+import isOutdatedMobileAppVersion from "@/utils/is-outdated-mobile-app-version";
 import SelectionIcon from "@/assets/whiteboard_icons/selection.svg";
 import ClearIcon from "@/assets/whiteboard_icons/clear.svg";
 import ColorPickerIcon from "@/assets/whiteboard_icons/color_picker.svg";
@@ -154,6 +172,7 @@ import RedoIcon from "@/assets/whiteboard_icons/redo.svg";
 import PanIcon from "@/assets/whiteboard_icons/grab.svg";
 import DeleteSelectionIcon from "@/assets/whiteboard_icons/delete_selection.png";
 import RotateIcon from "@/assets/whiteboard_icons/rotate.png";
+import PhotoUploadIcon from "@/assets/whiteboard_icons/photo-upload.svg";
 import ShapesIcon from "@/assets/whiteboard_icons/shapes.svg";
 import TextIcon from "@/assets/whiteboard_icons/text.svg";
 import CircleIcon from "@/assets/whiteboard_icons/circle.svg";
@@ -170,6 +189,7 @@ export default {
     UndoIcon,
     RedoIcon,
     PanIcon,
+    PhotoUploadIcon,
     ShapesIcon,
     TextIcon,
     CircleIcon,
@@ -178,8 +198,12 @@ export default {
     LineIcon
   },
   props: {
-    isVisible: {
+    isWhiteboardOpen: {
       type: Boolean,
+      required: true
+    },
+    toggleWhiteboard: {
+      type: Function,
       required: true
     }
   },
@@ -188,8 +212,9 @@ export default {
       zwibblerCtx: null,
       selectedTool: "",
       showColorPicker: false,
-      showShapes: false,
       isMouseDown: false,
+      error: "",
+      showShapes: false,
       // used to determine the beginning and end node of a shape
       shapeNodes: [],
       // default scale factor for safari trackpad
@@ -198,10 +223,12 @@ export default {
   },
   computed: {
     ...mapState({
-      session: state => state.user.session
+      session: state => state.user.session,
+      isMobileApp: state => state.app.isMobileApp
     }),
     ...mapGetters({
-      mobileMode: "app/mobileMode"
+      mobileMode: "app/mobileMode",
+      isVolunteer: "user/isVolunteer"
     }),
     toolClass() {
       if (this.selectedTool === "brush") return "zwib-wrapper--brush";
@@ -215,6 +242,14 @@ export default {
 
       return "zwib-wrapper--default";
     },
+    showPhotoUpload() {
+      if (!this.isVolunteer) {
+        if (this.isMobileApp && isOutdatedMobileAppVersion()) return false;
+        return true;
+      }
+
+      return false;
+    },
     isShapeSelected() {
       return (
         this.selectedTool === "line" ||
@@ -222,6 +257,13 @@ export default {
         this.selectedTool === "polygon" ||
         this.selectedTool === "rectangle"
       );
+    }
+  },
+  updated() {
+    if (this.error) {
+      setTimeout(() => {
+        this.error = "";
+      }, 2000);
     }
   },
   mounted() {
@@ -261,6 +303,11 @@ export default {
       });
     });
 
+    // disallow dragging and pasting to the whiteboard
+    this.zwibblerCtx.on("paste", () => {
+      return false;
+    });
+
     this.zwibblerCtx.on("nodes-added", nodes => {
       if (this.isShapeSelected) this.shapeNodes.push(nodes[0]);
       if (this.selectedTool === "text") this.usePickTool();
@@ -283,7 +330,7 @@ export default {
 
     this.zwibblerCtx.on("document-changed", info => {
       const isRemoteChange = info && info.remote;
-      const isWhiteboardHidden = this.mobileMode && !this.isVisible;
+      const isWhiteboardHidden = this.mobileMode && !this.isWhiteboardOpen;
       const shouldResizeView = isRemoteChange && isWhiteboardHidden;
 
       /**
@@ -355,6 +402,63 @@ export default {
     hideHoveredToolbars() {
       this.showColorPicker = false;
       this.showShapes = false;
+    },
+    async uploadPhoto(event) {
+      const { files } = event.target;
+      const file = files[0];
+      const tenMegabytes = 10 * 1000000;
+
+      if (!this.isWhiteboardOpen && this.mobileMode) this.toggleWhiteboard();
+
+      if (file.size > tenMegabytes) {
+        this.error =
+          "The photo is too large. Please upload a photo less than 10mb.";
+        return;
+      }
+      this.insertPhoto(file);
+      this.usePickTool();
+
+      const response = await NetworkService.getSessionPhotoUploadUrl(
+        this.session._id
+      );
+      const {
+        body: { uploadUrl }
+      } = response;
+
+      if (uploadUrl)
+        axios.put(uploadUrl, file, {
+          "Content-Type": file.type
+        });
+    },
+    openFileDialog() {
+      document.querySelector(".upload-photo").click();
+    },
+    insertPhoto(file) {
+      const reader = new FileReader();
+      // convert file to base64
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const img = new Image();
+        const node = this.zwibblerCtx.createNode("ImageNode", {
+          url: reader.result
+        });
+        img.src = reader.result;
+        img.onload = () => {
+          const whiteboard = document.querySelector("#zwib-div");
+          const whiteboardWidth = whiteboard.clientWidth;
+          const whiteboardHeight = whiteboard.clientHeight;
+          let scaleFactor = 1;
+
+          // scale image below the whiteboard width and height
+          if (img.width > whiteboardWidth) {
+            scaleFactor = 1 / (img.width / whiteboardWidth + 1);
+            this.zwibblerCtx.scaleNode(node, scaleFactor, scaleFactor);
+          } else if (img.height > whiteboardHeight) {
+            scaleFactor = 1 / (img.height / whiteboardHeight + 1);
+            this.zwibblerCtx.scaleNode(node, scaleFactor, scaleFactor);
+          } else this.zwibblerCtx.scaleNode(node, scaleFactor, scaleFactor);
+        };
+      };
     },
     clearWhiteboard() {
       this.zwibblerCtx.deleteNodes(this.zwibblerCtx.getAllNodes());
@@ -591,6 +695,10 @@ export default {
   &__svg {
     width: 20px;
 
+    &--photo {
+      height: 26px;
+    }
+
     &--shapes {
       @include breakpoint-below("medium") {
         height: 22px;
@@ -603,6 +711,7 @@ export default {
       width: 25px;
     }
   }
+
   &--shapes {
     position: relative;
   }
@@ -647,6 +756,16 @@ export default {
   &:active {
     outline: none;
   }
+}
+
+.upload-photo {
+  display: none !important;
+}
+
+.error {
+  color: $c-error-red;
+  position: absolute;
+  bottom: 65px;
 }
 
 .shapes-bar {

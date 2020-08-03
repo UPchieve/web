@@ -226,6 +226,11 @@ export default {
       })
       .then(this._successHandler, this._errorHandler);
   },
+  getSessionPhotoUploadUrl(sessionId) {
+    return Vue.http
+      .get(`${API_ROOT}/session/${sessionId}/photo-url`)
+      .then(this._successHandler, this._errorHandler);
+  },
   adminGetSessions({
     page,
     showBannedUsers,
