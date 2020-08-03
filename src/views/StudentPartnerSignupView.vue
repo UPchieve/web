@@ -283,7 +283,7 @@ export default {
       isHighSchoolStudent: false,
       noHighSchoolResults: false,
       formData: {
-        partnerSite: "",
+        partnerSite: undefined,
         email: "",
         password: "",
         firstName: "",
