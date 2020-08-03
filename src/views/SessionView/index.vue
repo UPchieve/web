@@ -22,7 +22,9 @@
       >
         <whiteboard
           v-if="auxiliaryType === 'WHITEBOARD'"
-          :isVisible="auxiliaryOpen"
+          :isWhiteboardOpen="auxiliaryOpen"
+          :toggleWhiteboard="toggleAuxiliary"
+          ref="whiteboard"
         />
         <document-editor v-else />
       </div>
@@ -44,6 +46,14 @@
     >
       <img id="toggleIcon" :src="toggleIconSrc" />
     </div>
+    <div
+      v-if="showPhotoUpload"
+      class="toggleButton toggleButton__photo-upload"
+      :class="shouldHideChatSection ? 'photo-upload--hidden' : ''"
+      @click="openFileDialog"
+    >
+      <photo-upload-icon class="photo-upload--icon" />
+    </div>
   </div>
 </template>
 
@@ -57,6 +67,8 @@ import Whiteboard from "./Whiteboard";
 import DocumentEditor from "./DocumentEditor";
 import SessionFulfilledModal from "./SessionFulfilledModal";
 import ConnectionTroubleModal from "./ConnectionTroubleModal";
+import PhotoUploadIcon from "@/assets/whiteboard_icons/photo-upload.svg";
+import isOutdatedMobileAppVersion from "@/utils/is-outdated-mobile-app-version";
 
 const headerData = {
   component: "SessionHeader"
@@ -68,6 +80,7 @@ export default {
     SessionHeader,
     SessionChat,
     Whiteboard,
+    PhotoUploadIcon,
     DocumentEditor
   },
   created() {
@@ -97,7 +110,8 @@ export default {
     ...mapState({
       user: state => state.user.user,
       session: state => state.user.session,
-      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive
+      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
+      isMobileApp: state => state.app.isMobileApp
     }),
     ...mapGetters({
       mobileMode: "app/mobileMode",
@@ -133,6 +147,16 @@ export default {
       }
 
       return this.auxiliaryOpen;
+    },
+    showPhotoUpload() {
+      if (this.auxiliaryType !== "WHITEBOARD") return false;
+
+      if (!this.isVolunteer && this.mobileMode) {
+        if (this.isMobileApp && isOutdatedMobileAppVersion()) return false;
+        return true;
+      }
+
+      return false;
     }
   },
   mounted() {
@@ -277,6 +301,9 @@ export default {
     },
     tryClicked() {
       this.sessionReconnecting = true;
+    },
+    openFileDialog() {
+      this.$refs.whiteboard.openFileDialog();
     }
   },
   watch: {
@@ -326,6 +353,7 @@ export default {
     border-top-right-radius: 8px;
     overflow: hidden;
   }
+
   @include breakpoint-above("large") {
     width: 400px;
   }
@@ -390,19 +418,21 @@ export default {
     flex-basis: 300px;
     position: relative;
   }
+
   @include breakpoint-above("large") {
     min-width: 400px;
     flex-basis: 400px;
   }
 }
 
-.toggleButton {
+.toggleButton,
+.toggleButton__photo-upload {
   position: fixed;
   z-index: 3;
   bottom: 10px;
   right: 20px;
   border-radius: 20px;
-  background: #16d2aa;
+  background-color: #16d2aa;
   width: 40px;
   height: 40px;
   transition: 0.4s;
@@ -411,10 +441,25 @@ export default {
     bottom: 33px;
   }
 
-  img {
+  &__photo-upload {
+    background-color: white;
+    border: 1px solid $c-border-grey;
+    right: 80px;
+  }
+
+  img,
+  svg {
     margin-top: 7px;
     width: 26px;
     height: 26px;
   }
+}
+
+.photo-upload--hidden {
+  display: none !important;
+}
+
+.photo-upload--icon {
+  margin-top: 5px !important;
 }
 </style>

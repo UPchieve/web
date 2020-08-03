@@ -78,6 +78,15 @@
       </div>
       <feedback-preview :feedback="volunteerFeedback" />
     </div>
+    <div v-if="session.photos.length > 0" class="session-detail__section">
+      <div class="session-detail__section-title">Photos</div>
+      <img
+        v-for="(image, index) in session.photos"
+        :key="index"
+        :src="image"
+        class="session-detail__section--image"
+      />
+    </div>
   </div>
 </template>
 
@@ -191,6 +200,10 @@ export default {
 
     &--feedback {
       margin-bottom: 20px;
+    }
+
+    &--image {
+      width: 60%;
     }
 
     &--device {
