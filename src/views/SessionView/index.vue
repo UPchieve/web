@@ -10,14 +10,14 @@
       v-if="session._id"
       class="session-contents-container"
       v-bind:class="{
-        'session-contents-container--mobile': isMobileMode,
+        'session-contents-container--mobile': isMobileMode
       }"
     >
       <div
         class="auxiliary-container"
         id="auxiliary-container"
         v-bind:class="{
-          'auxiliary-container--hidden': shouldHideAuxiliarySection,
+          'auxiliary-container--hidden': shouldHideAuxiliarySection
         }"
       >
         <whiteboard
@@ -32,7 +32,7 @@
         class="chat-container"
         id="chat-container"
         v-bind:class="{
-          'chat-container--hidden': shouldHideChatSection,
+          'chat-container--hidden': shouldHideChatSection
         }"
       >
         <session-chat />
@@ -72,7 +72,7 @@ import isOutdatedMobileAppVersion from "@/utils/is-outdated-mobile-app-version";
 import isMobileDevice from "@/utils/is-mobile-device";
 
 const headerData = {
-  component: "SessionHeader",
+  component: "SessionHeader"
 };
 
 export default {
@@ -82,7 +82,7 @@ export default {
     SessionChat,
     Whiteboard,
     PhotoUploadIcon,
-    DocumentEditor,
+    DocumentEditor
   },
   created() {
     if (this.isMobileMode) {
@@ -104,21 +104,21 @@ export default {
    */
   data() {
     return {
-      auxiliaryOpen: false,
+      auxiliaryOpen: false
     };
   },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
-      session: (state) => state.user.session,
-      isSessionConnectionAlive: (state) => state.user.isSessionConnectionAlive,
-      windowWidth: (state) => state.app.windowWidth,
-      windowHeight: (state) => state.app.windowHeight,
-      isMobileApp: (state) => state.app.isMobileApp,
+      user: state => state.user.user,
+      session: state => state.user.session,
+      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
+      windowWidth: state => state.app.windowWidth,
+      windowHeight: state => state.app.windowHeight,
+      isMobileApp: state => state.app.isMobileApp
     }),
     ...mapGetters({
       mobileMode: "app/mobileMode",
-      isAuthenticated: "user/isAuthenticated",
+      isAuthenticated: "user/isAuthenticated"
     }),
 
     isMobileMode() {
@@ -179,7 +179,7 @@ export default {
       }
 
       return false;
-    },
+    }
   },
   mounted() {
     const id = this.$route.params.sessionId;
@@ -195,19 +195,19 @@ export default {
         {
           onRetry: (res, abort) => {
             this.showTroubleStartingModal(abort);
-          },
+          }
         }
       );
     } else {
       promise = SessionService.useExistingSession(this, id, {
         onRetry: (res, abort) => {
           this.showTroubleJoiningModal(abort);
-        },
+        }
       });
     }
 
     promise
-      .then((sessionId) => {
+      .then(sessionId => {
         // ensure we restore user when we get a successful response
         if (!this.isAuthenticated) {
           this.$store.dispatch("user/fetchUser");
@@ -220,7 +220,7 @@ export default {
           this.$socket.connect();
         }
       })
-      .catch((err) => {
+      .catch(err => {
         if (err.status !== 0 && err.code !== "EUSERABORTED") {
           window.alert("Could not start new help session");
           Sentry.captureException(err);
@@ -238,8 +238,8 @@ export default {
           isSessionEnded: !!data.endedAt,
           volunteerJoined: !!data.volunteer,
           isSessionVolunteer: this.user._id === data.volunteer,
-          isSessionStudent: this.user._id === data.student,
-        },
+          isSessionStudent: this.user._id === data.student
+        }
       });
     },
     reconnect_attempt() {
@@ -264,7 +264,7 @@ export default {
       } else if (this.$route.params.sessionId) {
         this.joinSession(this.$route.params.sessionId);
       }
-    },
+    }
   },
   methods: {
     handleResize() {
@@ -289,7 +289,7 @@ export default {
         "join",
         {
           sessionId,
-          user: this.user,
+          user: this.user
         },
         1
       );
@@ -317,8 +317,8 @@ export default {
           message,
           acceptText: "Abort Session",
           alertModal: true,
-          abortFunction: abort,
-        },
+          abortFunction: abort
+        }
       });
     },
     tryClicked() {
@@ -326,15 +326,15 @@ export default {
     },
     openFileDialog() {
       this.$refs.whiteboard.openFileDialog();
-    },
+    }
   },
   watch: {
     isSessionConnectionAlive(newValue, oldValue) {
       if (newValue && !oldValue) {
         this.$store.dispatch("app/modal/hide");
       }
-    },
-  },
+    }
+  }
 };
 </script>
 
