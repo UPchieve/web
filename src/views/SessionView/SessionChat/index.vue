@@ -214,6 +214,10 @@ export default {
   background: #fff;
   display: flex;
   flex-direction: column;
+
+  @include breakpoint-latest-iphones-landscape {
+    padding-left: 1.4em;
+  }
 }
 
 .message-box {

@@ -41,3 +41,13 @@ $breakpoint-map: (
     @content;
   }
 }
+
+/// Landscape Media query helper for iPhone 11, iPhone 11 Pro, iPhone Xs screens.
+/// @param {string} $key - Key in $breakpoint-map
+@mixin breakpoint-latest-iphones-landscape() {
+  @media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape),
+    only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape),
+    only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) {
+    @content;
+  }
+}
