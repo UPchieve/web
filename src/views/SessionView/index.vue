@@ -69,6 +69,7 @@ import SessionFulfilledModal from "./SessionFulfilledModal";
 import ConnectionTroubleModal from "./ConnectionTroubleModal";
 import PhotoUploadIcon from "@/assets/whiteboard_icons/photo-upload.svg";
 import isOutdatedMobileAppVersion from "@/utils/is-outdated-mobile-app-version";
+import isMobileDevice from "@/utils/is-mobile-device";
 
 const headerData = {
   component: "SessionHeader"
@@ -112,6 +113,7 @@ export default {
       session: state => state.user.session,
       isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
       windowWidth: state => state.app.windowWidth,
+      windowHeight: state => state.app.windowHeight,
       isMobileApp: state => state.app.isMobileApp
     }),
     ...mapGetters({
@@ -122,6 +124,14 @@ export default {
     isMobileMode() {
       const largeScreenBreakpoint = 992;
       return this.windowWidth <= largeScreenBreakpoint || this.mobileMode;
+    },
+
+    isMobileDevice() {
+      return isMobileDevice();
+    },
+
+    isMobileDeviceLandscape() {
+      return this.isMobileDevice && this.windowWidth > this.windowHeight;
     },
 
     auxiliaryType() {
@@ -139,14 +149,17 @@ export default {
     },
 
     shouldHideAuxiliarySection() {
+      if (this.isMobileDeviceLandscape) return !this.auxiliaryOpen;
+
       // Never hide auxiliary section (whiteboard/document) on desktop
-      if (!this.mobileMode) {
+      if (!this.isMobileMode) {
         return false;
       }
 
       return !this.auxiliaryOpen;
     },
     shouldHideChatSection() {
+      if (this.isMobileDeviceLandscape) return this.auxiliaryOpen;
       // Never hide chat section on desktop
       if (!this.isMobileMode) {
         return false;
@@ -157,7 +170,10 @@ export default {
     showPhotoUpload() {
       if (this.auxiliaryType !== "WHITEBOARD") return false;
 
-      if (!this.isVolunteer && this.mobileMode) {
+      if (
+        !this.isVolunteer &&
+        (this.isMobileMode || this.isMobileDeviceLandscape)
+      ) {
         if (this.isMobileApp && isOutdatedMobileAppVersion()) return false;
         return true;
       }
@@ -252,7 +268,7 @@ export default {
   },
   methods: {
     handleResize() {
-      if (this.isMobileMode) {
+      if (this.isMobileMode || this.isMobileDeviceLandscape) {
         this.$store.dispatch("app/hideNavigation");
       } else {
         this.$store.dispatch("app/header/show", headerData);

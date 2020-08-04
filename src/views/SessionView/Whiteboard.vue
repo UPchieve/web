@@ -7,7 +7,7 @@
         class="toolbar-item toolbar-item--drag"
         title="Drag tool"
         v-bind:class="selectedTool === 'pan' ? 'selected-tool' : ''"
-        v-if="!mobileMode"
+        v-if="!isMobileDevice"
         @click="usePanTool"
       >
         <PanIcon class="toolbar-item__svg" />
@@ -179,6 +179,7 @@ import CircleIcon from "@/assets/whiteboard_icons/circle.svg";
 import RectangleIcon from "@/assets/whiteboard_icons/rectangle.svg";
 import TriangleIcon from "@/assets/whiteboard_icons/triangle.svg";
 import LineIcon from "@/assets/whiteboard_icons/line.svg";
+import isMobileDevice from "@/utils/is-mobile-device";
 
 export default {
   components: {
@@ -257,6 +258,9 @@ export default {
         this.selectedTool === "polygon" ||
         this.selectedTool === "rectangle"
       );
+    },
+    isMobileDevice() {
+      return isMobileDevice();
     }
   },
   updated() {
@@ -655,7 +659,6 @@ export default {
 }
 
 .toolbar-item {
-  padding: 1em;
   border: 1px solid transparent;
   display: flex;
   align-items: center;
@@ -665,6 +668,10 @@ export default {
 
   @include breakpoint-below("tiny") {
     padding: 0;
+  }
+
+  @include breakpoint-above("large") {
+    padding: 1em;
   }
 
   &:first-child {
