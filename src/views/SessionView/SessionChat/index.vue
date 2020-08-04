@@ -367,7 +367,7 @@ span {
 
   @include breakpoint-below("large") {
     height: 66px;
-    padding: 0 80px 40px 20px;
+    padding: 0 140px 40px 20px;
     display: flex;
     align-items: center;
   }
