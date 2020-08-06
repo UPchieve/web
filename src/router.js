@@ -30,6 +30,8 @@ import AdminUserDetail from "./views/Admin/AdminUserDetail";
 import AdminPendingVolunteers from "./views/Admin/AdminPendingVolunteers";
 import AdminIneligibleStudents from "./views/Admin/AdminIneligibleStudents";
 import AdminSchoolDetail from "./views/Admin/AdminSchoolDetail";
+import AdminSchools from "./views/Admin/AdminSchools";
+import AdminAddSchool from "./views/Admin/AdminAddSchool";
 import AdminReports from "./views/Admin/AdminReports";
 import VolunteerGuideView from "./views/VolunteerGuideView";
 import ReviewMaterialsView from "./views/ReviewMaterialsView";
@@ -270,9 +272,21 @@ const routes = [
     meta: { protected: true, requiresAdmin: true }
   },
   {
+    path: "/admin/school/new",
+    name: "AdminAddSchool",
+    component: AdminAddSchool,
+    meta: { protected: true, requiresAdmin: true }
+  },
+  {
     path: "/admin/school/:schoolId",
     name: "AdminSchoolDetail",
     component: AdminSchoolDetail,
+    meta: { protected: true, requiresAdmin: true }
+  },
+  {
+    path: "/admin/schools",
+    name: "AdminSchools",
+    component: AdminSchools,
     meta: { protected: true, requiresAdmin: true }
   },
   {
