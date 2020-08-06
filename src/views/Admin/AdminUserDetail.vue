@@ -3,8 +3,17 @@
     <admin-pending-volunteer-detail
       v-if="user.isVolunteer && !user.isApproved"
     />
+    <admin-edit-user-detail
+      v-else-if="isEditMode"
+      :user="user"
+      :toggleEditMode="toggleEditMode"
+      :getUser="getUser"
+    />
     <template v-else>
       <div class="user-detail__body">
+        <button class="edit-btn btn" @click="toggleEditMode()">
+          Edit
+        </button>
         <div>
           <span
             v-if="user.isAdmin"
@@ -75,6 +84,7 @@ import NetworkService from "@/services/NetworkService";
 import SessionsList from "@/components/Admin/SessionsList";
 import BackgroundInfo from "@/components/Admin/BackgroundInfo";
 import AdminPendingVolunteerDetail from "@/views/Admin/AdminPendingVolunteerDetail";
+import AdminEditUserDetail from "@/views/Admin/AdminEditUserDetail";
 
 const getUser = async userId => {
   const {
@@ -87,11 +97,17 @@ const getUser = async userId => {
 export default {
   name: "AdminUserDetail",
 
-  components: { AdminPendingVolunteerDetail, SessionsList, BackgroundInfo },
+  components: {
+    AdminPendingVolunteerDetail,
+    SessionsList,
+    BackgroundInfo,
+    AdminEditUserDetail
+  },
 
   data() {
     return {
-      user: {}
+      user: {},
+      isEditMode: false
     };
   },
 
@@ -112,9 +128,17 @@ export default {
       return school.nameStored ? school.nameStored : school.SCH_NAME;
     }
   },
+  methods: {
+    toggleEditMode() {
+      this.isEditMode = !this.isEditMode;
+    },
+    async getUser() {
+      this.user = await getUser(this.$route.params.userId);
+    }
+  },
 
   async created() {
-    this.user = await getUser(this.$route.params.userId);
+    this.getUser();
   }
 };
 </script>
@@ -191,6 +215,21 @@ export default {
   &__section-title {
     color: $c-secondary-grey;
     font-size: 16px;
+  }
+}
+
+.edit-btn {
+  @include font-category("body");
+  background-color: $c-success-green;
+  border-radius: 30px;
+  width: 120px;
+  height: 40px;
+  font-weight: 600;
+  color: white;
+  margin-left: auto;
+
+  &:hover {
+    color: #2c3e50;
   }
 }
 </style>
