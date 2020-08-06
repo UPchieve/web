@@ -56,9 +56,10 @@
             id="student-partner-org"
             class="student-partner-org"
             :options="partnerOrgs"
-            :value="studentPartnerOrg"
+            :value="studentPartnerOrgDisplay"
             :searchable="true"
             @input="setStudentPartnerOrg"
+            label="displayName"
           />
         </label>
       </div>
@@ -68,6 +69,7 @@
         <label for="high-school" class="col">
           High school
           <school-list
+            class="high-school-list"
             :setHighSchool="setHighSchool"
             placeholder="Search for a school"
           />
@@ -118,7 +120,7 @@ export default {
       type: Function,
       required: true
     },
-    studentPartnerOrg: {
+    studentPartnerOrgDisplay: {
       type: String,
       required: true
     },
@@ -174,7 +176,11 @@ export default {
 }
 
 .student-partner-org {
-  width: 250px;
+  width: 400px;
+}
+
+.high-school-list {
+  width: 400px;
 }
 
 .btn {
