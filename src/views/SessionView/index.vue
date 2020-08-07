@@ -10,7 +10,7 @@
       v-if="session._id"
       class="session-contents-container"
       v-bind:class="{
-        'session-contents-container--mobile': mobileMode
+        'session-contents-container--mobile': isMobileMode
       }"
     >
       <div
@@ -39,7 +39,7 @@
       </div>
     </div>
     <div
-      v-if="mobileMode"
+      v-if="isMobileMode"
       class="toggleButton"
       id="toggleButton"
       @click="toggleAuxiliary"
@@ -69,6 +69,7 @@ import SessionFulfilledModal from "./SessionFulfilledModal";
 import ConnectionTroubleModal from "./ConnectionTroubleModal";
 import PhotoUploadIcon from "@/assets/whiteboard_icons/photo-upload.svg";
 import isOutdatedMobileAppVersion from "@/utils/is-outdated-mobile-app-version";
+import isMobileDevice from "@/utils/is-mobile-device";
 
 const headerData = {
   component: "SessionHeader"
@@ -84,7 +85,7 @@ export default {
     DocumentEditor
   },
   created() {
-    if (this.mobileMode) {
+    if (this.isMobileMode) {
       this.$store.dispatch("app/hideNavigation");
     } else {
       this.$store.dispatch("app/header/show", headerData);
@@ -111,12 +112,27 @@ export default {
       user: state => state.user.user,
       session: state => state.user.session,
       isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
+      windowWidth: state => state.app.windowWidth,
+      windowHeight: state => state.app.windowHeight,
       isMobileApp: state => state.app.isMobileApp
     }),
     ...mapGetters({
       mobileMode: "app/mobileMode",
       isAuthenticated: "user/isAuthenticated"
     }),
+
+    isMobileMode() {
+      const largeScreenBreakpoint = 992;
+      return this.windowWidth <= largeScreenBreakpoint || this.mobileMode;
+    },
+
+    isMobileDevice() {
+      return isMobileDevice();
+    },
+
+    isMobileDeviceLandscape() {
+      return this.isMobileDevice && this.windowWidth > this.windowHeight;
+    },
 
     auxiliaryType() {
       const documentEditorSubTopics = ["planning", "essays", "applications"];
@@ -133,16 +149,19 @@ export default {
     },
 
     shouldHideAuxiliarySection() {
+      if (this.isMobileDeviceLandscape) return !this.auxiliaryOpen;
+
       // Never hide auxiliary section (whiteboard/document) on desktop
-      if (!this.mobileMode) {
+      if (!this.isMobileMode) {
         return false;
       }
 
       return !this.auxiliaryOpen;
     },
     shouldHideChatSection() {
+      if (this.isMobileDeviceLandscape) return this.auxiliaryOpen;
       // Never hide chat section on desktop
-      if (!this.mobileMode) {
+      if (!this.isMobileMode) {
         return false;
       }
 
@@ -151,7 +170,10 @@ export default {
     showPhotoUpload() {
       if (this.auxiliaryType !== "WHITEBOARD") return false;
 
-      if (!this.isVolunteer && this.mobileMode) {
+      if (
+        !this.isVolunteer &&
+        (this.isMobileMode || this.isMobileDeviceLandscape)
+      ) {
         if (this.isMobileApp && isOutdatedMobileAppVersion()) return false;
         return true;
       }
@@ -246,7 +268,7 @@ export default {
   },
   methods: {
     handleResize() {
-      if (this.mobileMode) {
+      if (this.isMobileMode || this.isMobileDeviceLandscape) {
         this.$store.dispatch("app/hideNavigation");
       } else {
         this.$store.dispatch("app/header/show", headerData);
@@ -341,7 +363,7 @@ export default {
   width: 100%;
   background: #fff;
 
-  @include breakpoint-above("medium") {
+  @include breakpoint-above("large") {
     position: absolute;
     top: 20px;
     left: unset;
@@ -361,31 +383,25 @@ export default {
 
 .session-contents-container {
   height: 100%;
-  padding-top: 100px;
+  padding-top: 80px;
   display: flex;
   background: $c-background-grey;
 
-  @include breakpoint-above("medium") {
+  @include breakpoint-above("large") {
     padding: 20px;
     @include child-spacing(right, 15px);
-  }
-
-  @include breakpoint-below("medium") {
-    padding-top: 80px;
   }
 }
 
 .auxiliary-container,
 .chat-container {
-  @include breakpoint-above("medium") {
+  width: 100%;
+  height: 100%;
+
+  @include breakpoint-above("large") {
     height: 100%;
     border-radius: 8px;
     overflow: hidden;
-  }
-
-  @include breakpoint-below("medium") {
-    width: 100%;
-    height: 100%;
   }
 }
 
@@ -413,15 +429,10 @@ export default {
     display: none;
   }
 
-  @include breakpoint-above("medium") {
-    min-width: 300px;
-    flex-basis: 300px;
-    position: relative;
-  }
-
   @include breakpoint-above("large") {
     min-width: 400px;
     flex-basis: 400px;
+    position: relative;
   }
 }
 
@@ -437,7 +448,7 @@ export default {
   height: 40px;
   transition: 0.4s;
 
-  @include breakpoint-below("medium") {
+  @include breakpoint-below("large") {
     bottom: 33px;
   }
 
