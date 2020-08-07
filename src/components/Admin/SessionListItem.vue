@@ -12,7 +12,7 @@
       <div>{{ session.studentFirstName }}</div>
     </div>
     <div class="session-list-item__column">
-      <div>{{ session.studentRating }}</div>
+      <div>{{ studentRating }}</div>
     </div>
   </router-link>
 </template>
@@ -55,6 +55,10 @@ export default {
     subTopicDisplayName() {
       const { type, subTopic } = this.session;
       return topics[type].subtopics[subTopic].displayName;
+    },
+
+    studentRating() {
+      return this.session.studentRating ? this.session.studentRating : "-";
     }
   }
 };
