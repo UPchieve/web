@@ -35,15 +35,15 @@
       </div>
     </div>
     <template v-if="schools.length > 0">
-      <page-control
-        :page="page"
-        :isFirstPage="isFirstPage"
-        :isLastPage="isLastPage"
-        @nextPage="nextPage"
-        @previousPage="previousPage"
-      />
       <div class="list-wrapper">
         <div class="list">
+          <page-control
+            :page="page"
+            :isFirstPage="isFirstPage"
+            :isLastPage="isLastPage"
+            @nextPage="nextPage"
+            @previousPage="previousPage"
+          />
           <school-list-item
             v-for="school in schools"
             :key="school._id"
@@ -86,8 +86,7 @@ export default {
     const {
       query: { page: pageQuery, name, city, state }
     } = this.$route;
-    const page = parseInt(pageQuery);
-    this.page = page || this.page;
+    const page = parseInt(pageQuery) || this.page;
     this.name = name || this.name;
     this.city = city || this.city;
     this.state = state || this.state;
@@ -217,8 +216,7 @@ select {
 }
 
 .list {
-  min-width: 750px;
-  max-width: 1200px;
+  width: 800px;
 }
 
 .uc-form-label {
