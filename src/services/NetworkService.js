@@ -274,6 +274,18 @@ export default {
       .get(`${API_ROOT}/user/${userId}`)
       .then(this._successHandler, this._errorHandler);
   },
+  adminGetUsers({ page, firstName, lastName, email }) {
+    const queryParams = new URLSearchParams({
+      page,
+      firstName,
+      lastName,
+      email
+    }).toString();
+
+    return Vue.http
+      .get(`${API_ROOT}/users?${queryParams}`)
+      .then(this._successHandler, this._errorHandler);
+  },
   adminGetIneligibleStudents(page) {
     return Vue.http
       .get(`${ELIGIBILITY_API_ROOT}/ineligible-students?page=${page}`)
