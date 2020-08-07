@@ -9,7 +9,10 @@
       <div>{{ messages }}</div>
     </div>
     <div class="session-list-item__column">
-      <div>{{ notifications }}</div>
+      <div>{{ session.studentFirstName }}</div>
+    </div>
+    <div class="session-list-item__column">
+      <div>{{ session.studentSessionRating }}</div>
     </div>
   </router-link>
 </template>
@@ -47,11 +50,6 @@ export default {
     messages() {
       const numMsgs = this.session.messages.length;
       return `${numMsgs} message${pluralize(numMsgs)}`;
-    },
-
-    notifications() {
-      const numNotifs = this.session.notifications.length;
-      return `${numNotifs} notification${pluralize(numNotifs)}`;
     },
 
     subTopicDisplayName() {
