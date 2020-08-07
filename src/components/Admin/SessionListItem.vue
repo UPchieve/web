@@ -12,7 +12,7 @@
       <div>{{ session.studentFirstName }}</div>
     </div>
     <div class="session-list-item__column">
-      <div>{{ session.studentSessionRating }}</div>
+      <div>{{ session.studentRating }}</div>
     </div>
   </router-link>
 </template>
