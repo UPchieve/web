@@ -9,7 +9,10 @@
       <div>{{ messages }}</div>
     </div>
     <div class="session-list-item__column">
-      <div>{{ notifications }}</div>
+      <div>{{ session.studentFirstName }}</div>
+    </div>
+    <div class="session-list-item__column">
+      <div>{{ studentRating }}</div>
     </div>
   </router-link>
 </template>
@@ -49,14 +52,13 @@ export default {
       return `${numMsgs} message${pluralize(numMsgs)}`;
     },
 
-    notifications() {
-      const numNotifs = this.session.notifications.length;
-      return `${numNotifs} notification${pluralize(numNotifs)}`;
-    },
-
     subTopicDisplayName() {
       const { type, subTopic } = this.session;
       return topics[type].subtopics[subTopic].displayName;
+    },
+
+    studentRating() {
+      return this.session.studentRating ? this.session.studentRating : "-";
     }
   }
 };
