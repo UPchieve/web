@@ -300,6 +300,11 @@ export default {
       .post(`${ELIGIBILITY_API_ROOT}/school/new`, data)
       .then(this._successHandler, this._errorHandler);
   },
+  adminUpdateSchool(schoolId, data) {
+    return Vue.http
+      .put(`${ELIGIBILITY_API_ROOT}/school/${schoolId}`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
   adminUpdateSchoolApproval(data) {
     return Vue.http
       .post(`${ELIGIBILITY_API_ROOT}/school/approval`, data)

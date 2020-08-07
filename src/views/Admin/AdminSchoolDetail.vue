@@ -1,44 +1,61 @@
 <template>
   <div v-if="school._id" class="school-detail">
-    <div class="school-detail__body">
-      <div class="page-control__button" @click="goBack">
-        <span>← Back</span>
+    <admin-edit-school
+      v-if="isEditMode"
+      :school="school"
+      :toggleEditMode="toggleEditMode"
+      :getSchool="getSchool"
+    />
+    <template v-else>
+      <div class="school-detail__body">
+        <div class="page-control">
+          <div class="page-control__back-button" @click="goBack">
+            <span>← Back</span>
+          </div>
+          <button
+            class="page-control__edit-button btn"
+            @click="toggleEditMode()"
+          >
+            Edit
+          </button>
+        </div>
+        <div class="school-detail__title">
+          {{ school.name }}
+        </div>
+        <div class="school-detail__subtitle">ID: {{ school._id }}</div>
+        <div class="school-detail__section">
+          <div class="school-detail__section-title">City</div>
+          <div>{{ school.city }}</div>
+        </div>
+        <div class="school-detail__section">
+          <div class="school-detail__section-title">State</div>
+          <div>{{ school.state }}</div>
+        </div>
+        <div class="school-detail__section">
+          <div class="school-detail__section-title">Zip code</div>
+          <div>{{ school.zipCode }}</div>
+        </div>
+        <div class="school-detail__section">
+          <div class="school-detail__section-title">Status</div>
+          <div>{{ schoolApprovalStatus }}</div>
+          <input
+            type="checkbox"
+            id="toggle"
+            class="checkbox"
+            :checked="school.isApproved"
+            @change="toggleSchoolApproval"
+          />
+          <label for="toggle" class="switch"></label>
+          <p v-if="error" class="error">{{ error }}</p>
+        </div>
       </div>
-      <div class="school-detail__title">
-        {{ school.name }}
-      </div>
-      <div class="school-detail__subtitle">ID: {{ school._id }}</div>
-      <div class="school-detail__section">
-        <div class="school-detail__section-title">City</div>
-        <div>{{ school.city }}</div>
-      </div>
-      <div class="school-detail__section">
-        <div class="school-detail__section-title">State</div>
-        <div>{{ school.state }}</div>
-      </div>
-      <div class="school-detail__section">
-        <div class="school-detail__section-title">Zip code</div>
-        <div>{{ school.zipCode }}</div>
-      </div>
-      <div class="school-detail__section">
-        <div class="school-detail__section-title">Status</div>
-        <div>{{ schoolApprovalStatus }}</div>
-        <input
-          type="checkbox"
-          id="toggle"
-          class="checkbox"
-          :checked="school.isApproved"
-          @change="toggleSchoolApproval"
-        />
-        <label for="toggle" class="switch"></label>
-        <p v-if="error" class="error">{{ error }}</p>
-      </div>
-    </div>
+    </template>
   </div>
 </template>
 
 <script>
 import NetworkService from "@/services/NetworkService";
+import AdminEditSchool from "@/views/Admin/AdminEditSchool";
 
 const getSchool = async schoolId => {
   const {
@@ -51,15 +68,18 @@ const getSchool = async schoolId => {
 export default {
   name: "AdminSchoolDetail",
 
+  components: { AdminEditSchool },
+
   data() {
     return {
       school: {},
-      error: ""
+      error: "",
+      isEditMode: false
     };
   },
 
   async created() {
-    this.school = await getSchool(this.$route.params.schoolId);
+    this.getSchool();
   },
 
   computed: {
@@ -88,6 +108,14 @@ export default {
       } catch (error) {
         this.error = "There was an error updating the school's approval status";
       }
+    },
+
+    toggleEditMode() {
+      this.isEditMode = !this.isEditMode;
+    },
+
+    async getSchool() {
+      this.school = await getSchool(this.$route.params.schoolId);
     }
   }
 };
@@ -98,21 +126,18 @@ export default {
   background: #fff;
   margin: 10px;
   border-radius: 8px;
-  overflow: hidden;
+  padding: 10px;
+  max-width: 800px;
 
   @include breakpoint-above("medium") {
     margin: 40px;
+    padding: 40px;
   }
 
   &__body {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: 20px 15px;
-
-    @include breakpoint-above("medium") {
-      padding: 40px;
-    }
   }
 
   &__title {
@@ -142,16 +167,34 @@ export default {
   }
 }
 
-.page-control__button {
-  display: inline-flex;
-  align-items: center;
-  color: #417db1;
-  border-radius: 20px;
-  padding: 5px 15px;
-  cursor: pointer;
+.page-control {
+  @include flex-container(row, space-between, center);
+  width: 100%;
 
-  &:hover {
-    background: #f7fcfe;
+  &__back-button {
+    display: inline-flex;
+    align-items: center;
+    color: #417db1;
+    border-radius: 20px;
+    padding: 5px 15px;
+    cursor: pointer;
+
+    &:hover {
+      background: #f7fcfe;
+    }
+  }
+
+  &__edit-button {
+    @include font-category("body");
+    background-color: $c-success-green;
+    border-radius: 30px;
+    width: 120px;
+    height: 40px;
+    font-weight: 600;
+    color: white;
+    &:hover {
+      color: #2c3e50;
+    }
   }
 }
 
