@@ -24,6 +24,10 @@
       <router-link to="/admin/users" class="admin-link btn"
         >Search Users</router-link
       >
+
+      <router-link to="/admin/schools" class="admin-link btn"
+        >Schools</router-link
+      >
     </div>
   </div>
 </template>
