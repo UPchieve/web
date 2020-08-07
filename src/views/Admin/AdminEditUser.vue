@@ -88,7 +88,7 @@
 import NetworkService from "@/services/NetworkService";
 
 export default {
-  name: "AdminEditUserDetail",
+  name: "AdminEditUser",
 
   props: {
     user: { type: Object, required: true },

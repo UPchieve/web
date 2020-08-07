@@ -3,7 +3,7 @@
     <admin-pending-volunteer-detail
       v-if="user.isVolunteer && !user.isApproved"
     />
-    <admin-edit-user-detail
+    <admin-edit-user
       v-else-if="isEditMode"
       :user="user"
       :toggleEditMode="toggleEditMode"
@@ -84,7 +84,7 @@ import NetworkService from "@/services/NetworkService";
 import SessionsList from "@/components/Admin/SessionsList";
 import BackgroundInfo from "@/components/Admin/BackgroundInfo";
 import AdminPendingVolunteerDetail from "@/views/Admin/AdminPendingVolunteerDetail";
-import AdminEditUserDetail from "@/views/Admin/AdminEditUserDetail";
+import AdminEditUser from "@/views/Admin/AdminEditUser";
 
 const getUser = async userId => {
   const {
@@ -101,7 +101,7 @@ export default {
     AdminPendingVolunteerDetail,
     SessionsList,
     BackgroundInfo,
-    AdminEditUserDetail
+    AdminEditUser
   },
 
   data() {
@@ -149,6 +149,7 @@ export default {
   margin: 10px;
   border-radius: 8px;
   overflow: hidden;
+  max-width: 800px;
 
   @include breakpoint-above("medium") {
     margin: 40px;
