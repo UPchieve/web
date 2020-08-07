@@ -123,6 +123,7 @@ select {
   margin: 40px;
   padding: 40px;
   text-align: left;
+  max-width: 800px;
 
   &__form {
     min-height: 500px;
