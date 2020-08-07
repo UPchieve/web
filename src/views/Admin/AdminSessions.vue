@@ -13,7 +13,17 @@
       :setMinMessagesSent="setMinMessagesSent"
       :minSessionLength="filters.minSessionLength"
       :setMinSessionLength="setMinSessionLength"
+      :studentRating="filters.studentRating"
+      :setStudentRating="setStudentRating"
+      :volunteerRating="filters.volunteerRating"
+      :setVolunteerRating="setVolunteerRating"
       :submitFilters="submitFilters"
+      :firstTimeStudent="filters.firstTimeStudent"
+      :toggleFirstTimeStudent="toggleFirstTimeStudent"
+      :firstTimeVolunteer="filters.firstTimeVolunteer"
+      :toggleFirstTimeVolunteer="toggleFirstTimeVolunteer"
+      :isReported="filters.isReported"
+      :toggleIsReported="toggleIsReported"
     />
     <page-control
       :page="page"
@@ -59,7 +69,12 @@ export default {
           .format("YYYY-MM-DD"),
         sessionActivityTo: moment().format("YYYY-MM-DD"),
         minMessagesSent: 0,
-        minSessionLength: 1 // in minutes,
+        minSessionLength: 1, // in minutes,
+        studentRating: "",
+        volunteerRating: "",
+        firstTimeStudent: "",
+        firstTimeVolunteer: "",
+        isReported: ""
       }
     };
   },
@@ -73,7 +88,12 @@ export default {
         sessionActivityFrom,
         sessionActivityTo,
         minMessagesSent,
-        minSessionLength
+        minSessionLength,
+        studentRating,
+        volunteerRating,
+        firstTimeStudent,
+        firstTimeVolunteer,
+        isReported
       }
     } = this.$route;
     const page = parseInt(pageQuery) || this.page;
@@ -88,6 +108,14 @@ export default {
       parseInt(minMessagesSent) || this.filters.minMessagesSent;
     this.filters.minSessionLength =
       parseInt(minSessionLength) || this.filters.minSessionLength;
+    this.filters.studentRating = studentRating || this.filters.studentRating;
+    this.filters.volunteerRating =
+      volunteerRating || this.filters.volunteerRating;
+    this.filters.firstTimeStudent =
+      firstTimeStudent || this.filters.firstTimeStudent;
+    this.filters.firstTimeVolunteer =
+      firstTimeVolunteer || this.filters.firstTimeVolunteer;
+    this.filters.isReported = isReported || this.filters.isReported;
     this.setPage(page);
   },
 
@@ -146,6 +174,34 @@ export default {
         target: { value }
       } = event;
       this.filters.sessionActivityTo = value;
+    },
+
+    setStudentRating(event) {
+      const {
+        target: { value }
+      } = event;
+      this.filters.studentRating = value;
+    },
+
+    setVolunteerRating(event) {
+      const {
+        target: { value }
+      } = event;
+      this.filters.volunteerRating = value;
+    },
+
+    toggleFirstTimeStudent() {
+      this.filters.firstTimeStudent = this.filters.firstTimeStudent ? "" : "1";
+    },
+
+    toggleFirstTimeVolunteer() {
+      this.filters.firstTimeVolunteer = this.filters.firstTimeVolunteer
+        ? ""
+        : "1";
+    },
+
+    toggleIsReported() {
+      this.filters.isReported = this.filters.isReported ? "" : "1";
     },
 
     async submitFilters() {

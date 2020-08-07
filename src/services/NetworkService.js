@@ -238,7 +238,12 @@ export default {
     sessionActivityFrom,
     sessionActivityTo,
     minMessagesSent,
-    minSessionLength
+    minSessionLength,
+    studentRating,
+    volunteerRating,
+    firstTimeStudent,
+    firstTimeVolunteer,
+    isReported
   }) {
     const queryParams = new URLSearchParams({
       page,
@@ -247,7 +252,12 @@ export default {
       sessionActivityFrom,
       sessionActivityTo,
       minMessagesSent,
-      minSessionLength
+      minSessionLength,
+      studentRating,
+      volunteerRating,
+      firstTimeStudent,
+      firstTimeVolunteer,
+      isReported
     }).toString();
 
     return Vue.http

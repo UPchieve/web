@@ -78,6 +78,71 @@
       </div>
     </div>
 
+    <div class="col">
+      <div>
+        <label for="student-rating" class="rating-label">Student rating</label>
+        <input
+          id="student-rating"
+          class="rating-input small-input"
+          type="text"
+          :value="studentRating"
+          @input="setStudentRating"
+        />
+      </div>
+
+      <div class="min-session-container">
+        <label for="volunteer-rating" class="rating-label"
+          >Volunteer rating</label
+        >
+        <input
+          id="volunteer-rating"
+          class="rating-input small-input"
+          type="text"
+          :value="volunteerRating"
+          @input="setVolunteerRating"
+        />
+      </div>
+    </div>
+
+    <div class="col">
+      <label class="show-user-type-label">First time:</label>
+      <div>
+        <label>
+          Student
+          <input
+            id="show-banned-users"
+            type="checkbox"
+            :value="firstTimeStudent"
+            :checked="firstTimeStudent"
+            @change="toggleFirstTimeStudent"
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          Volunteer
+          <input
+            id="show-banned-users"
+            type="checkbox"
+            :value="firstTimeVolunteer"
+            :checked="firstTimeVolunteer"
+            @change="toggleFirstTimeVolunteer"
+          />
+        </label>
+      </div>
+    </div>
+
+    <div class="col">
+      <label class="show-user-type-label">Reported</label>
+      <input
+        id="show-banned-users"
+        type="checkbox"
+        :value="isReported"
+        :checked="isReported"
+        @change="toggleIsReported"
+      />
+    </div>
+
     <div>
       <button class="btn" type="button" @click="submitFilters">
         Update
@@ -114,6 +179,26 @@ export default {
       type: Number,
       required: true
     },
+    studentRating: {
+      type: String,
+      required: true
+    },
+    volunteerRating: {
+      type: String,
+      required: true
+    },
+    firstTimeStudent: {
+      type: String,
+      required: true
+    },
+    firstTimeVolunteer: {
+      type: String,
+      required: true
+    },
+    isReported: {
+      type: String,
+      required: true
+    },
     toggleShowBannedUsers: {
       type: Function,
       required: true
@@ -138,6 +223,26 @@ export default {
       type: Function,
       required: true
     },
+    setStudentRating: {
+      type: Function,
+      required: true
+    },
+    setVolunteerRating: {
+      type: Function,
+      required: true
+    },
+    toggleFirstTimeStudent: {
+      type: Function,
+      required: true
+    },
+    toggleFirstTimeVolunteer: {
+      type: Function,
+      required: true
+    },
+    toggleIsReported: {
+      type: Function,
+      required: true
+    },
     submitFilters: {
       type: Function,
       required: true
@@ -153,7 +258,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-input[type="number"] {
+input[type="number"],
+.small-input {
   width: 60px;
 }
 
@@ -162,6 +268,7 @@ input[type="number"] {
   flex-wrap: wrap;
   margin: 10px;
   border-radius: 8px;
+  text-align: left;
 
   @include breakpoint-above("medium") {
     margin: 40px;
@@ -180,7 +287,6 @@ input[type="number"] {
 
 .show-user-type-label {
   width: 140px;
-  text-align: left;
 }
 
 .min-session-container {
@@ -189,7 +295,6 @@ input[type="number"] {
 
 .min-length-label {
   width: 180px;
-  text-align: left;
 
   &:nth-of-type(2) {
     margin-top: 0.2em;
@@ -199,6 +304,10 @@ input[type="number"] {
 .min-session-length {
   display: inline-block;
   vertical-align: top;
+}
+
+.rating-label {
+  width: 120px;
 }
 
 .btn {
