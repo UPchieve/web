@@ -26,6 +26,7 @@ import VolunteerCoverage from "./views/Admin/VolunteerCoverage";
 import AdminSessions from "./views/Admin/AdminSessions";
 import AdminSessionNotifications from "./views/Admin/AdminSessionNotifications";
 import AdminSessionDetail from "./views/Admin/AdminSessionDetail";
+import AdminUsers from "./views/Admin/AdminUsers";
 import AdminUserDetail from "./views/Admin/AdminUserDetail";
 import AdminPendingVolunteers from "./views/Admin/AdminPendingVolunteers";
 import AdminIneligibleStudents from "./views/Admin/AdminIneligibleStudents";
@@ -249,6 +250,12 @@ const routes = [
     path: "/admin/sessions/:sessionId/notifications",
     name: "AdminSessionNotifications",
     component: AdminSessionNotifications,
+    meta: { protected: true, requiresAdmin: true }
+  },
+  {
+    path: "/admin/users",
+    name: "AdminUsers",
+    component: AdminUsers,
     meta: { protected: true, requiresAdmin: true }
   },
   {

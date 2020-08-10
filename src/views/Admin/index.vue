@@ -20,6 +20,10 @@
       <router-link to="/admin/reports" class="admin-link btn"
         >Reports</router-link
       >
+
+      <router-link to="/admin/users" class="admin-link btn"
+        >Search Users</router-link
+      >
     </div>
   </div>
 </template>
