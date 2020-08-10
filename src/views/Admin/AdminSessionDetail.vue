@@ -166,7 +166,7 @@ export default {
 
     // Set quill document after the DOM has been updated to show session div
     this.$nextTick(() => {
-      if (this.session.type === "college") {
+      if (this.session.quillDoc) {
         const container = document.querySelector(".quill-container");
         this.quillEditor = new Quill(container);
         this.quillEditor.enable(false);
