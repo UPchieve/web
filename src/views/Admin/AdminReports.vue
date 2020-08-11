@@ -12,7 +12,7 @@
       :sessionRangeFrom="sessionRangeFrom"
       :sessionRangeTo="sessionRangeTo"
       :highSchool="highSchool"
-      :studentPartnerOrg="studentPartnerOrg"
+      :studentPartnerOrgDisplay="studentPartnerOrgDisplay"
     />
 
     <button type="button" class="btn" @click="generateSessionReport">
@@ -40,7 +40,8 @@ export default {
       sessionRangeFrom: "",
       sessionRangeTo: "",
       highSchool: "",
-      studentPartnerOrg: ""
+      studentPartnerOrg: "",
+      studentPartnerOrgDisplay: ""
     };
   },
   methods: {
@@ -153,7 +154,13 @@ export default {
     },
 
     setStudentPartnerOrg(value) {
-      this.studentPartnerOrg = value || "";
+      if (!value) {
+        this.studentPartnerOrg = "";
+        this.studentPartnerOrgDisplay = "";
+      } else {
+        this.studentPartnerOrg = value.key;
+        this.studentPartnerOrgDisplay = value.displayName;
+      }
     },
 
     setJoinedBefore(event) {

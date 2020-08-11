@@ -2,28 +2,28 @@
   <div class="admin-view">
     <div class="header">Admin Dashboard</div>
     <div class="admin-directory">
-      <router-link to="/admin/volunteer-coverage" class="admin-link btn"
-        >Volunteer Coverage</router-link
-      >
       <router-link to="/admin/sessions" class="admin-link btn"
         >Sessions</router-link
       >
-      <router-link to="/edu" class="admin-link btn">Edu Admin</router-link>
-
+      <router-link to="/admin/users" class="admin-link btn"
+        >Search Users</router-link
+      >
       <router-link to="/admin/volunteers/pending" class="admin-link btn"
         >Pending Volunteers</router-link
       >
       <router-link to="/admin/ineligible-students" class="admin-link btn"
         >Ineligible Students</router-link
       >
-
-      <router-link to="/admin/reports" class="admin-link btn"
-        >Reports</router-link
-      >
-
       <router-link to="/admin/schools" class="admin-link btn"
         >Schools</router-link
       >
+      <router-link to="/admin/reports" class="admin-link btn"
+        >Reports</router-link
+      >
+      <router-link to="/admin/volunteer-coverage" class="admin-link btn"
+        >Volunteer Coverage</router-link
+      >
+      <router-link to="/edu" class="admin-link btn">Edu Admin</router-link>
     </div>
   </div>
 </template>

@@ -274,6 +274,23 @@ export default {
       .get(`${API_ROOT}/user/${userId}`)
       .then(this._successHandler, this._errorHandler);
   },
+  adminUpdateUser(userId, data) {
+    return Vue.http
+      .put(`${API_ROOT}/user/${userId}`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminGetUsers({ page, firstName, lastName, email }) {
+    const queryParams = new URLSearchParams({
+      page,
+      firstName,
+      lastName,
+      email
+    }).toString();
+
+    return Vue.http
+      .get(`${API_ROOT}/users?${queryParams}`)
+      .then(this._successHandler, this._errorHandler);
+  },
   adminGetIneligibleStudents(page) {
     return Vue.http
       .get(`${ELIGIBILITY_API_ROOT}/ineligible-students?page=${page}`)
@@ -358,6 +375,11 @@ export default {
   adminGetStudentPartners() {
     return Vue.http
       .get(`${AUTH_ROOT}/partner/student-partners`)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminGetVolunteerPartners() {
+    return Vue.http
+      .get(`${AUTH_ROOT}/partner/volunteer-partners`)
       .then(this._successHandler, this._errorHandler);
   },
   getQuestions(context, data) {
