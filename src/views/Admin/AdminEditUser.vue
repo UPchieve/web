@@ -86,6 +86,7 @@
 
 <script>
 import NetworkService from "@/services/NetworkService";
+import { isEmpty } from "lodash";
 
 export default {
   name: "AdminEditUser",
@@ -153,14 +154,18 @@ export default {
         firstName: this.firstName,
         lastName: this.lastName,
         email: this.email,
-        partnerOrg: this.partnerOrg ? this.partnerOrg.key : "",
+        partnerOrg: isEmpty(this.partnerOrg) ? "" : this.partnerOrg.key,
         partnerSite: "",
         isVerified: this.isVerified,
         isBanned: this.isBanned,
         isDeactivated: this.isDeactivated
       };
 
-      if (this.partnerOrg && this.partnerOrg.sites.includes(this.partnerSite)) {
+      if (
+        !isEmpty(this.partnerOrg) &&
+        this.partnerOrg.sites &&
+        this.partnerOrg.sites.includes(this.partnerSite)
+      ) {
         data.partnerSite = this.partnerSite;
       }
 

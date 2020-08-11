@@ -26,6 +26,11 @@
             >Banned</span
           >
           <span
+            v-if="user.isDeactivated"
+            class="user-detail__account-notice user-detail__account-notice--deactivated"
+            >Deactivated</span
+          >
+          <span
             v-if="user.isTestUser"
             class="user-detail__account-notice user-detail__account-notice--test"
             >Test account</span
@@ -188,6 +193,10 @@ export default {
     font-weight: 500;
 
     &--ban {
+      background: $c-error-red;
+    }
+
+    &--deactivated {
       background: $c-error-red;
     }
 
