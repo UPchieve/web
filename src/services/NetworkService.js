@@ -338,7 +338,8 @@ export default {
     sessionRangeFrom,
     sessionRangeTo,
     highSchoolId,
-    studentPartnerOrg
+    studentPartnerOrg,
+    studentPartnerSite
   }) {
     const queryParams = new URLSearchParams({
       joinedBefore,
@@ -346,7 +347,8 @@ export default {
       sessionRangeFrom,
       sessionRangeTo,
       highSchoolId,
-      studentPartnerOrg
+      studentPartnerOrg,
+      studentPartnerSite
     }).toString();
     return Vue.http
       .get(`${API_ROOT}/reports/session-report?${queryParams}`)
@@ -358,7 +360,8 @@ export default {
     sessionRangeFrom,
     sessionRangeTo,
     highSchoolId,
-    studentPartnerOrg
+    studentPartnerOrg,
+    studentPartnerSite
   }) {
     const queryParams = new URLSearchParams({
       joinedBefore,
@@ -366,7 +369,8 @@ export default {
       sessionRangeFrom,
       sessionRangeTo,
       highSchoolId,
-      studentPartnerOrg
+      studentPartnerOrg,
+      studentPartnerSite
     }).toString();
     return Vue.http
       .get(`${API_ROOT}/reports/usage-report?${queryParams}`)
