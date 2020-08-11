@@ -1,6 +1,6 @@
 <template>
   <div class="zwib-wrapper" :class="toolClass">
-    <div id="zwib-div"></div>
+    <div id="zwib-div" ref="zwibDiv"></div>
     <div id="toolbar" class="toolbar">
       <p v-if="error" class="whiteboard-error">{{ error }}</p>
       <div
@@ -314,7 +314,7 @@ export default {
     });
 
     if (!this.mobileMode) {
-      const zwibblerContainer = document.querySelector("#zwib-div");
+      const zwibblerContainer = this.$refs.zwibDiv;
       zwibblerContainer.addEventListener("wheel", this.trackpadListener, false);
       // Safari doesn't register wheel events for the trackpad pinch
       zwibblerContainer.addEventListener(
@@ -532,9 +532,9 @@ export default {
       this.previousScale = scale;
     }
   },
-  destroyed() {
+  beforeDestroy() {
     if (!this.mobileMode) {
-      const zwibblerContainer = document.querySelector("#zwib-div");
+      const zwibblerContainer = this.$refs.zwibDiv;
       zwibblerContainer.removeEventListener(
         "wheel",
         this.trackpadListener,
