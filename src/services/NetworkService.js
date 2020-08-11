@@ -311,6 +311,27 @@ export default {
       .get(`${ELIGIBILITY_API_ROOT}/school/${schoolId}`)
       .then(this._successHandler, this._errorHandler);
   },
+  adminGetSchools({ name, state, city, page }) {
+    const queryParams = new URLSearchParams({
+      name,
+      state,
+      city,
+      page
+    }).toString();
+    return Vue.http
+      .get(`${ELIGIBILITY_API_ROOT}/schools?${queryParams}`)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminCreateSchool(data) {
+    return Vue.http
+      .post(`${ELIGIBILITY_API_ROOT}/school/new`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminUpdateSchool(schoolId, data) {
+    return Vue.http
+      .put(`${ELIGIBILITY_API_ROOT}/school/${schoolId}`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
   adminUpdateSchoolApproval(data) {
     return Vue.http
       .post(`${ELIGIBILITY_API_ROOT}/school/approval`, data)
@@ -327,7 +348,8 @@ export default {
     sessionRangeFrom,
     sessionRangeTo,
     highSchoolId,
-    studentPartnerOrg
+    studentPartnerOrg,
+    studentPartnerSite
   }) {
     const queryParams = new URLSearchParams({
       joinedBefore,
@@ -335,7 +357,8 @@ export default {
       sessionRangeFrom,
       sessionRangeTo,
       highSchoolId,
-      studentPartnerOrg
+      studentPartnerOrg,
+      studentPartnerSite
     }).toString();
     return Vue.http
       .get(`${API_ROOT}/reports/session-report?${queryParams}`)
@@ -347,7 +370,8 @@ export default {
     sessionRangeFrom,
     sessionRangeTo,
     highSchoolId,
-    studentPartnerOrg
+    studentPartnerOrg,
+    studentPartnerSite
   }) {
     const queryParams = new URLSearchParams({
       joinedBefore,
@@ -355,7 +379,8 @@ export default {
       sessionRangeFrom,
       sessionRangeTo,
       highSchoolId,
-      studentPartnerOrg
+      studentPartnerOrg,
+      studentPartnerSite
     }).toString();
     return Vue.http
       .get(`${API_ROOT}/reports/usage-report?${queryParams}`)

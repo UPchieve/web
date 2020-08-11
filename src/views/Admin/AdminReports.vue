@@ -1,24 +1,81 @@
 <template>
   <div class="admin-reports">
-    <reports-filter-panel
-      :setSessionRangeFrom="setSessionRangeFrom"
-      :setSessionRangeTo="setSessionRangeTo"
-      :setHighSchool="setHighSchool"
-      :setStudentPartnerOrg="setStudentPartnerOrg"
-      :setJoinedBefore="setJoinedBefore"
-      :setJoinedAfter="setJoinedAfter"
-      :joinedBefore="joinedBefore"
-      :joinedAfter="joinedAfter"
-      :sessionRangeFrom="sessionRangeFrom"
-      :sessionRangeTo="sessionRangeTo"
-      :highSchool="highSchool"
-      :studentPartnerOrgDisplay="studentPartnerOrgDisplay"
-    />
+    <div class="filter-panel">
+      <div class="col">
+        <div class="filter-panel__joined">
+          <label for="joined-after" class="col">
+            Joined after
+            <input id="joined-after" type="date" v-model="joinedAfter" />
+          </label>
 
-    <button type="button" class="btn" @click="generateSessionReport">
+          <label for="joined-before" class="col">
+            Joined before
+            <input id="joined-before" type="date" v-model="joinedBefore" />
+          </label>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="filter-panel__session-range">
+          <label for="session-range-from" class="col">
+            Session from
+            <input
+              id="session-range-from"
+              type="date"
+              v-model="sessionRangeFrom"
+            />
+          </label>
+
+          <label for="session-range-to" class="col">
+            Session to
+            <input id="session-range-to" type="date" v-model="sessionRangeTo" />
+          </label>
+        </div>
+      </div>
+
+      <div class="col">
+        <div>
+          <label for="student-partner-org" class="col">
+            Student partner org
+            <v-select
+              id="student-partner-org"
+              class="filter-panel__partner-select"
+              :options="listedPartnerOrgs"
+              label="displayName"
+              v-model="studentPartnerOrg"
+            />
+          </label>
+        </div>
+        <div class="col" v-if="studentPartnerOrg && studentPartnerOrg.sites">
+          <label for="partner-site">Partner Site</label>
+          <v-select
+            id="partner-sites"
+            class="filter-panel__partner-select"
+            :options="partnerSites"
+            v-model="studentPartnerSite"
+          />
+        </div>
+      </div>
+      <div class="col">
+        <div>
+          <label for="high-school" class="col">
+            High school
+            <school-list
+              class="filter-panel__high-school-list"
+              :setHighSchool="setHighSchool"
+              placeholder="Search for a school"
+            />
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <p class="error">{{ error }}</p>
+
+    <button type="button" class="report-btn" @click="generateSessionReport">
       Generate Session Report
     </button>
-    <button type="button" class="btn" @click="generateUsageReport">
+    <button type="button" class="report-btn" @click="generateUsageReport">
       Generate Usage Report
     </button>
   </div>
@@ -26,12 +83,12 @@
 
 <script>
 import NetworkService from "@/services/NetworkService";
-import ReportsFilterPanel from "@/components/ReportsFilterPanel";
+import SchoolList from "@/components/SchoolList";
 import moment from "moment";
 
 export default {
   name: "AdminReports",
-  components: { ReportsFilterPanel },
+  components: { SchoolList },
 
   data() {
     return {
@@ -40,19 +97,36 @@ export default {
       sessionRangeFrom: "",
       sessionRangeTo: "",
       highSchool: "",
-      studentPartnerOrg: "",
-      studentPartnerOrgDisplay: ""
+      studentPartnerOrg: {},
+      studentPartnerSite: "",
+      listedPartnerOrgs: [],
+      error: ""
     };
+  },
+  async mounted() {
+    const response = await NetworkService.adminGetStudentPartners();
+    const {
+      body: { partnerOrgs }
+    } = response;
+    this.listedPartnerOrgs = partnerOrgs;
   },
   methods: {
     async generateSessionReport() {
+      this.error = "";
+
       const data = {
         joinedBefore: this.joinedBefore,
         joinedAfter: this.joinedAfter,
         sessionRangeFrom: this.sessionRangeFrom,
         sessionRangeTo: this.sessionRangeTo,
         highSchoolId: this.highSchool._id ? this.highSchool._id : "",
-        studentPartnerOrg: this.studentPartnerOrg
+        // partner org can be "null" from clearing the v-select, check for if exists and then get the partnerOrg
+        studentPartnerOrg: this.isValidStudentPartnerOrg
+          ? this.studentPartnerOrg.key
+          : "",
+        studentPartnerSite: this.isValidPartnerSite
+          ? this.studentPartnerSite
+          : ""
       };
 
       const response = await NetworkService.adminGetSessionReport(data);
@@ -60,20 +134,32 @@ export default {
         body: { sessions }
       } = response;
 
-      this.exportToCsv(
-        `${this.fileTitle} ${this.todaysDate} Session Report`,
-        sessions
-      );
+      if (sessions.length === 0) {
+        this.error = "No sessions meet the criteria";
+      } else {
+        this.exportToCsv(
+          `${this.fileTitle} ${this.todaysDate} Session Report`,
+          sessions
+        );
+      }
     },
 
     async generateUsageReport() {
+      this.error = "";
+
       const data = {
         joinedBefore: this.joinedBefore,
         joinedAfter: this.joinedAfter,
         sessionRangeFrom: this.sessionRangeFrom,
         sessionRangeTo: this.sessionRangeTo,
         highSchoolId: this.highSchool._id ? this.highSchool._id : "",
-        studentPartnerOrg: this.studentPartnerOrg
+        // partner org can be "null" from clearing the v-select, check for if exists and then get the partnerOrg
+        studentPartnerOrg: this.isValidStudentPartnerOrg
+          ? this.studentPartnerOrg.key
+          : "",
+        studentPartnerSite: this.isValidPartnerSite
+          ? this.studentPartnerSite
+          : ""
       };
 
       const response = await NetworkService.adminGetUsageReport(data);
@@ -81,10 +167,14 @@ export default {
         body: { students }
       } = response;
 
-      this.exportToCsv(
-        `${this.fileTitle} ${this.todaysDate} Usage Report`,
-        students
-      );
+      if (students.length === 0) {
+        this.error = "No students meet the criteria";
+      } else {
+        this.exportToCsv(
+          `${this.fileTitle} ${this.todaysDate} Usage Report`,
+          students
+        );
+      }
     },
 
     // https://gist.github.com/changhuixu/de092ee55a9e115abba988910bd68d41#file-csv-data-service-ts
@@ -135,46 +225,8 @@ export default {
       }
     },
 
-    setSessionRangeFrom(event) {
-      const {
-        target: { value }
-      } = event;
-      this.sessionRangeFrom = value;
-    },
-
-    setSessionRangeTo(event) {
-      const {
-        target: { value }
-      } = event;
-      this.sessionRangeTo = value;
-    },
-
     setHighSchool(highSchool) {
       this.highSchool = highSchool;
-    },
-
-    setStudentPartnerOrg(value) {
-      if (!value) {
-        this.studentPartnerOrg = "";
-        this.studentPartnerOrgDisplay = "";
-      } else {
-        this.studentPartnerOrg = value.key;
-        this.studentPartnerOrgDisplay = value.displayName;
-      }
-    },
-
-    setJoinedBefore(event) {
-      const {
-        target: { value }
-      } = event;
-      this.joinedBefore = value;
-    },
-
-    setJoinedAfter(event) {
-      const {
-        target: { value }
-      } = event;
-      this.joinedAfter = value;
     }
   },
   computed: {
@@ -184,9 +236,26 @@ export default {
     fileTitle() {
       let title = "";
       if (this.highSchool.name) title = this.highSchool.name;
-      if (this.studentPartnerOrg) title = this.studentPartnerOrg;
+      if (this.studentPartnerOrg.displayName)
+        title = this.studentPartnerOrg.displayName;
+      if (this.isValidPartnerSite) title = this.studentPartnerSite;
 
       return title;
+    },
+    partnerSites() {
+      if (this.studentPartnerOrg && this.studentPartnerOrg.sites)
+        return ["All sites", ...this.studentPartnerOrg.sites];
+      return [];
+    },
+    isValidPartnerSite() {
+      return (
+        this.studentPartnerOrg &&
+        this.studentPartnerOrg.sites &&
+        this.studentPartnerOrg.sites.includes(this.studentPartnerSite)
+      );
+    },
+    isValidStudentPartnerOrg() {
+      return this.studentPartnerOrg && this.studentPartnerOrg.key;
     }
   }
 };
@@ -196,15 +265,44 @@ export default {
 .admin-reports {
   background: #fff;
   margin: 10px;
+  padding: 10px;
   border-radius: 8px;
   overflow: hidden;
 
   @include breakpoint-above("medium") {
     margin: 40px;
+    padding: 40px;
   }
 }
 
-.btn {
+.filter-panel {
+  @include flex-container(row, space-between, flex-start);
+  flex-wrap: wrap;
+  border-radius: 8px;
+
+  &__joined {
+    @include flex-container(row);
+  }
+
+  &__session-range {
+    @include flex-container(row);
+  }
+
+  &__partner-select,
+  &__high-school-list {
+    width: 400px;
+  }
+}
+
+.col {
+  @include flex-container(column, flex-start, flex-start);
+  margin: 0.4em 0;
+  @include breakpoint-above("medium") {
+    margin-right: 10px;
+  }
+}
+
+.report-btn {
   height: 60px;
   background-color: white;
   border: 1px solid $c-border-grey;
@@ -214,11 +312,17 @@ export default {
   width: 250px;
   margin-bottom: 1em;
   display: block;
-  margin-left: 2em;
 
   &:hover {
     background-color: $c-success-green;
     color: white;
   }
+}
+
+.error {
+  color: $c-error-red;
+  text-align: left;
+  margin: 2em 0;
+  font-size: 16px;
 }
 </style>
