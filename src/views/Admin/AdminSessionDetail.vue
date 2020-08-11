@@ -15,7 +15,7 @@
       <div class="session-detail__section">
         <div class="session-detail__section-title">Started</div>
         <div>{{ createdAt }}</div>
-        <div class="session-detail__section--device">
+        <div v-if="session.userAgent" class="session-detail__section--device">
           <div>{{ devicePlatform }} - {{ session.userAgent.device }}</div>
           <div>
             {{ session.userAgent.browser }}:
