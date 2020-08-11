@@ -15,7 +15,7 @@
       <div class="session-detail__section">
         <div class="session-detail__section-title">Started</div>
         <div>{{ createdAt }}</div>
-        <div class="session-detail__section--device">
+        <div v-if="session.userAgent" class="session-detail__section--device">
           <div>{{ devicePlatform }} - {{ session.userAgent.device }}</div>
           <div>
             {{ session.userAgent.browser }}:
@@ -131,9 +131,11 @@ export default {
     },
     endedBy() {
       if (this.session.endedBy === null) return "worker";
-      return this.session.endedBy === this.session.student._id
-        ? this.session.student.firstname
-        : this.session.volunteer.firstname;
+      const endedBy =
+        this.session.endedBy === this.session.student._id
+          ? this.session.student
+          : this.session.volunteer;
+      return endedBy ? endedBy.firstname : "?";
     },
     studentFeedback() {
       return find(this.session.feedbacks, { userType: "student" }, {});
