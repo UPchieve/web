@@ -131,9 +131,11 @@ export default {
     },
     endedBy() {
       if (this.session.endedBy === null) return "worker";
-      return this.session.endedBy === this.session.student._id
-        ? this.session.student.firstname
-        : this.session.volunteer.firstname;
+      const endedBy =
+        this.session.endedBy === this.session.student._id
+          ? this.session.student
+          : this.session.volunteer;
+      return endedBy ? endedBy.firstname : "?";
     },
     studentFeedback() {
       return find(this.session.feedbacks, { userType: "student" }, {});
