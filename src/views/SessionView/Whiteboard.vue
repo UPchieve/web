@@ -2,7 +2,7 @@
   <div class="zwib-wrapper" :class="toolClass">
     <div id="zwib-div"></div>
     <div id="toolbar" class="toolbar">
-      <p v-if="error" class="error">{{ error }}</p>
+      <p v-if="error" class="whiteboard-error">{{ error }}</p>
       <div
         class="toolbar-item toolbar-item--drag"
         title="Drag tool"
@@ -762,7 +762,7 @@ export default {
   display: none !important;
 }
 
-.error {
+.whiteboard-error {
   color: $c-error-red;
   position: absolute;
   bottom: 65px;
