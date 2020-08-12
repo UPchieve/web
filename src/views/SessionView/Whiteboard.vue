@@ -415,50 +415,51 @@ export default {
           "The photo is too large. Please upload a photo less than 10mb.";
         return;
       }
-      this.insertPhoto(file);
       this.usePickTool();
 
       const response = await NetworkService.getSessionPhotoUploadUrl(
         this.session._id
       );
       const {
-        body: { uploadUrl }
+        body: { uploadUrl, imageUrl }
       } = response;
 
-      if (uploadUrl)
-        axios.put(uploadUrl, file, {
+      if (uploadUrl) {
+        // TODO: add loading spinner
+        console.log("uploading...");
+        await axios.put(uploadUrl, file, {
           "Content-Type": file.type
         });
+        // TODO: hide loading spinner
+        console.log("done uploading");
+
+        this.insertPhoto(imageUrl);
+      }
     },
     openFileDialog() {
       document.querySelector(".upload-photo").click();
     },
-    insertPhoto(file) {
-      const reader = new FileReader();
-      // convert file to base64
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        const img = new Image();
-        const node = this.zwibblerCtx.createNode("ImageNode", {
-          url: reader.result
-        });
-        img.src = reader.result;
-        img.onload = () => {
-          const whiteboard = document.querySelector("#zwib-div");
-          const whiteboardWidth = whiteboard.clientWidth;
-          const whiteboardHeight = whiteboard.clientHeight;
-          let scaleFactor = 1;
+    insertPhoto(imageUrl) {
+      const nodeId = this.zwibblerCtx.createNode("ImageNode", {
+        url: imageUrl
+      });
 
-          // scale image below the whiteboard width and height
-          if (img.width > whiteboardWidth) {
-            scaleFactor = 1 / (img.width / whiteboardWidth + 1);
-            this.zwibblerCtx.scaleNode(node, scaleFactor, scaleFactor);
-          } else if (img.height > whiteboardHeight) {
-            scaleFactor = 1 / (img.height / whiteboardHeight + 1);
-            this.zwibblerCtx.scaleNode(node, scaleFactor, scaleFactor);
-          } else this.zwibblerCtx.scaleNode(node, scaleFactor, scaleFactor);
-        };
-      };
+      this.zwibblerCtx.on("resource-loaded", () => {
+        const nodeDimensions = this.zwibblerCtx.getNodeRectangle(nodeId);
+        const whiteboard = document.querySelector("#zwib-div");
+        const whiteboardWidth = whiteboard.clientWidth;
+        const whiteboardHeight = whiteboard.clientHeight;
+        let scaleFactor = 1;
+
+        // scale image below the whiteboard width and height
+        if (nodeDimensions.width > whiteboardWidth) {
+          scaleFactor = 1 / (nodeDimensions.width / whiteboardWidth + 1);
+          this.zwibblerCtx.scaleNode(nodeId, scaleFactor, scaleFactor);
+        } else if (nodeDimensions.height > whiteboardHeight) {
+          scaleFactor = 1 / (nodeDimensions.height / whiteboardHeight + 1);
+          this.zwibblerCtx.scaleNode(nodeId, scaleFactor, scaleFactor);
+        } else this.zwibblerCtx.scaleNode(nodeId, scaleFactor, scaleFactor);
+      });
     },
     clearWhiteboard() {
       this.zwibblerCtx.deleteNodes(this.zwibblerCtx.getAllNodes());
