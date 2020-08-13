@@ -362,7 +362,7 @@ export const STATES_WITH_ABBREVIATIONS = [
   { label: "Northern Mariana Islands", value: "MP" },
   { label: "Ohio", value: "OH" },
   { label: "Oklahoma", value: "OK" },
-  { label: "Oregan", value: "OR" },
+  { label: "Oregon", value: "OR" },
   { label: "Palau", value: "PW" },
   { label: "Pennsylvania", value: "PA" },
   { label: "Puerto Rico", value: "PR" },
