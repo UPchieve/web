@@ -155,6 +155,9 @@
         <ClearIcon class="toolbar-item__svg" />
       </div>
     </div>
+    <div v-if="isLoading" class="loading-overlay">
+      <loader />
+    </div>
   </div>
 </template>
 
@@ -179,6 +182,7 @@ import CircleIcon from "@/assets/whiteboard_icons/circle.svg";
 import RectangleIcon from "@/assets/whiteboard_icons/rectangle.svg";
 import TriangleIcon from "@/assets/whiteboard_icons/triangle.svg";
 import LineIcon from "@/assets/whiteboard_icons/line.svg";
+import Loader from "@/components/Loader";
 
 export default {
   components: {
@@ -195,7 +199,8 @@ export default {
     CircleIcon,
     RectangleIcon,
     TriangleIcon,
-    LineIcon
+    LineIcon,
+    Loader
   },
   props: {
     isWhiteboardOpen: {
@@ -218,7 +223,8 @@ export default {
       // used to determine the beginning and end node of a shape
       shapeNodes: [],
       // default scale factor for safari trackpad
-      previousScale: 1
+      previousScale: 1,
+      isLoading: false
     };
   },
   computed: {
@@ -415,50 +421,53 @@ export default {
           "The photo is too large. Please upload a photo less than 10mb.";
         return;
       }
-      this.insertPhoto(file);
       this.usePickTool();
 
       const response = await NetworkService.getSessionPhotoUploadUrl(
         this.session._id
       );
       const {
-        body: { uploadUrl }
+        body: { uploadUrl, imageUrl }
       } = response;
 
-      if (uploadUrl)
-        axios.put(uploadUrl, file, {
+      if (uploadUrl) {
+        this.isLoading = true;
+        await axios.put(uploadUrl, file, {
           "Content-Type": file.type
         });
+
+        this.insertPhoto(imageUrl);
+      }
     },
     openFileDialog() {
       document.querySelector(".upload-photo").click();
     },
-    insertPhoto(file) {
-      const reader = new FileReader();
-      // convert file to base64
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        const img = new Image();
-        const node = this.zwibblerCtx.createNode("ImageNode", {
-          url: reader.result
-        });
-        img.src = reader.result;
-        img.onload = () => {
-          const whiteboard = document.querySelector("#zwib-div");
-          const whiteboardWidth = whiteboard.clientWidth;
-          const whiteboardHeight = whiteboard.clientHeight;
-          let scaleFactor = 1;
+    insertPhoto(imageUrl) {
+      const nodeId = this.zwibblerCtx.createNode("ImageNode", {
+        url: imageUrl,
+        opacity: 0
+      });
 
-          // scale image below the whiteboard width and height
-          if (img.width > whiteboardWidth) {
-            scaleFactor = 1 / (img.width / whiteboardWidth + 1);
-            this.zwibblerCtx.scaleNode(node, scaleFactor, scaleFactor);
-          } else if (img.height > whiteboardHeight) {
-            scaleFactor = 1 / (img.height / whiteboardHeight + 1);
-            this.zwibblerCtx.scaleNode(node, scaleFactor, scaleFactor);
-          } else this.zwibblerCtx.scaleNode(node, scaleFactor, scaleFactor);
-        };
-      };
+      this.zwibblerCtx.on("resource-loaded", () => {
+        const nodeDimensions = this.zwibblerCtx.getNodeRectangle(nodeId);
+        const whiteboard = document.querySelector("#zwib-div");
+        const whiteboardWidth = whiteboard.clientWidth;
+        const whiteboardHeight = whiteboard.clientHeight;
+        let scaleFactor = 1;
+
+        // scale image below the whiteboard width and height
+        if (nodeDimensions.width > whiteboardWidth) {
+          scaleFactor = 1 / (nodeDimensions.width / whiteboardWidth + 1);
+          this.zwibblerCtx.scaleNode(nodeId, scaleFactor, scaleFactor);
+        } else if (nodeDimensions.height > whiteboardHeight) {
+          scaleFactor = 1 / (nodeDimensions.height / whiteboardHeight + 1);
+          this.zwibblerCtx.scaleNode(nodeId, scaleFactor, scaleFactor);
+        } else this.zwibblerCtx.scaleNode(nodeId, scaleFactor, scaleFactor);
+
+        // Keep opacity at 0 until image has been resized (avoids flashing full size)
+        this.zwibblerCtx.setNodeProperty(nodeId, "opacity", 1);
+        this.isLoading = false;
+      });
     },
     clearWhiteboard() {
       this.zwibblerCtx.deleteNodes(this.zwibblerCtx.getAllNodes());
@@ -798,5 +807,17 @@ export default {
   & .selected-tool {
     background-color: darken(#e2e2e2, 15%);
   }
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
