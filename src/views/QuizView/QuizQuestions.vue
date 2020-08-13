@@ -82,6 +82,11 @@ export default {
   mounted() {
     this.getFirstQuestion();
   },
+  beforeUpdate() {
+    // manually set questionText since MathJax's generated DOM elements interfere
+    // with Vue's template engine when changing the text
+    document.querySelector(".questionText").innerHTML = this.questionText;
+  },
   updated() {
     this.rerenderMathJaxElements();
   },
