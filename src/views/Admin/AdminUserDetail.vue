@@ -3,8 +3,17 @@
     <admin-pending-volunteer-detail
       v-if="user.isVolunteer && !user.isApproved"
     />
+    <admin-edit-user
+      v-else-if="isEditMode"
+      :user="user"
+      :toggleEditMode="toggleEditMode"
+      :getUser="getUser"
+    />
     <template v-else>
       <div class="user-detail__body">
+        <button class="edit-btn btn" @click="toggleEditMode()">
+          Edit
+        </button>
         <div>
           <span
             v-if="user.isAdmin"
@@ -15,6 +24,11 @@
             v-if="user.isBanned"
             class="user-detail__account-notice user-detail__account-notice--ban"
             >Banned</span
+          >
+          <span
+            v-if="user.isDeactivated"
+            class="user-detail__account-notice user-detail__account-notice--deactivated"
+            >Deactivated</span
           >
           <span
             v-if="user.isTestUser"
@@ -75,6 +89,7 @@ import NetworkService from "@/services/NetworkService";
 import SessionsList from "@/components/Admin/SessionsList";
 import BackgroundInfo from "@/components/Admin/BackgroundInfo";
 import AdminPendingVolunteerDetail from "@/views/Admin/AdminPendingVolunteerDetail";
+import AdminEditUser from "@/views/Admin/AdminEditUser";
 
 const getUser = async userId => {
   const {
@@ -87,11 +102,17 @@ const getUser = async userId => {
 export default {
   name: "AdminUserDetail",
 
-  components: { AdminPendingVolunteerDetail, SessionsList, BackgroundInfo },
+  components: {
+    AdminPendingVolunteerDetail,
+    SessionsList,
+    BackgroundInfo,
+    AdminEditUser
+  },
 
   data() {
     return {
-      user: {}
+      user: {},
+      isEditMode: false
     };
   },
 
@@ -112,9 +133,17 @@ export default {
       return school.nameStored ? school.nameStored : school.SCH_NAME;
     }
   },
+  methods: {
+    toggleEditMode() {
+      this.isEditMode = !this.isEditMode;
+    },
+    async getUser() {
+      this.user = await getUser(this.$route.params.userId);
+    }
+  },
 
   async created() {
-    this.user = await getUser(this.$route.params.userId);
+    this.getUser();
   }
 };
 </script>
@@ -125,6 +154,7 @@ export default {
   margin: 10px;
   border-radius: 8px;
   overflow: hidden;
+  max-width: 800px;
 
   @include breakpoint-above("medium") {
     margin: 40px;
@@ -166,6 +196,10 @@ export default {
       background: $c-error-red;
     }
 
+    &--deactivated {
+      background: $c-error-red;
+    }
+
     &--test {
       background: $c-warning-orange;
     }
@@ -191,6 +225,21 @@ export default {
   &__section-title {
     color: $c-secondary-grey;
     font-size: 16px;
+  }
+}
+
+.edit-btn {
+  @include font-category("body");
+  background-color: $c-success-green;
+  border-radius: 30px;
+  width: 120px;
+  height: 40px;
+  font-weight: 600;
+  color: white;
+  margin-left: auto;
+
+  &:hover {
+    color: #2c3e50;
   }
 }
 </style>

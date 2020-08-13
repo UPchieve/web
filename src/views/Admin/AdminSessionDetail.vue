@@ -15,7 +15,7 @@
       <div class="session-detail__section">
         <div class="session-detail__section-title">Started</div>
         <div>{{ createdAt }}</div>
-        <div class="session-detail__section--device">
+        <div v-if="session.userAgent" class="session-detail__section--device">
           <div>{{ devicePlatform }} - {{ session.userAgent.device }}</div>
           <div>
             {{ session.userAgent.browser }}:
@@ -87,6 +87,13 @@
         class="session-detail__section--image"
       />
     </div>
+    <div
+      v-if="session.quillDoc"
+      class="session-detail__section session-detail__section--document"
+    >
+      <h2 class="session-detail__section-title">Document</h2>
+      <div class="quill-container"></div>
+    </div>
   </div>
 </template>
 
@@ -97,6 +104,7 @@ import NetworkService from "@/services/NetworkService";
 import UserPreview from "@/components/Admin/UserPreview";
 import ChatLog from "@/components/Admin/ChatLog";
 import FeedbackPreview from "@/components/Admin/FeedbackPreview";
+import Quill from "quill";
 
 export default {
   name: "AdminSessionDetail",
@@ -105,7 +113,8 @@ export default {
 
   data() {
     return {
-      session: {}
+      session: {},
+      quillEditor: null
     };
   },
 
@@ -122,9 +131,11 @@ export default {
     },
     endedBy() {
       if (this.session.endedBy === null) return "worker";
-      return this.session.endedBy === this.session.student._id
-        ? this.session.student.firstname
-        : this.session.volunteer.firstname;
+      const endedBy =
+        this.session.endedBy === this.session.student._id
+          ? this.session.student
+          : this.session.volunteer;
+      return endedBy ? endedBy.firstname : "?";
     },
     studentFeedback() {
       return find(this.session.feedbacks, { userType: "student" }, {});
@@ -154,6 +165,16 @@ export default {
       body: { session }
     } = await NetworkService.adminGetSession(this.$route.params.sessionId);
     this.session = session;
+
+    // Set quill document after the DOM has been updated to show session div
+    this.$nextTick(() => {
+      if (this.session.quillDoc) {
+        const container = document.querySelector(".quill-container");
+        this.quillEditor = new Quill(container);
+        this.quillEditor.enable(false);
+        this.quillEditor.setContents(JSON.parse(this.session.quillDoc));
+      }
+    });
   }
 };
 </script>
@@ -212,6 +233,11 @@ export default {
       padding: 5px 10px;
       margin: 5px 0;
       border-left: solid #ececec 5px;
+    }
+
+    &--document {
+      height: 500px;
+      overflow-y: auto;
     }
   }
 

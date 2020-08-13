@@ -238,7 +238,12 @@ export default {
     sessionActivityFrom,
     sessionActivityTo,
     minMessagesSent,
-    minSessionLength
+    minSessionLength,
+    studentRating,
+    volunteerRating,
+    firstTimeStudent,
+    firstTimeVolunteer,
+    isReported
   }) {
     const queryParams = new URLSearchParams({
       page,
@@ -247,7 +252,12 @@ export default {
       sessionActivityFrom,
       sessionActivityTo,
       minMessagesSent,
-      minSessionLength
+      minSessionLength,
+      studentRating,
+      volunteerRating,
+      firstTimeStudent,
+      firstTimeVolunteer,
+      isReported
     }).toString();
 
     return Vue.http
@@ -274,6 +284,23 @@ export default {
       .get(`${API_ROOT}/user/${userId}`)
       .then(this._successHandler, this._errorHandler);
   },
+  adminUpdateUser(userId, data) {
+    return Vue.http
+      .put(`${API_ROOT}/user/${userId}`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminGetUsers({ page, firstName, lastName, email }) {
+    const queryParams = new URLSearchParams({
+      page,
+      firstName,
+      lastName,
+      email
+    }).toString();
+
+    return Vue.http
+      .get(`${API_ROOT}/users?${queryParams}`)
+      .then(this._successHandler, this._errorHandler);
+  },
   adminGetIneligibleStudents(page) {
     return Vue.http
       .get(`${ELIGIBILITY_API_ROOT}/ineligible-students?page=${page}`)
@@ -282,6 +309,27 @@ export default {
   adminGetSchool(schoolId) {
     return Vue.http
       .get(`${ELIGIBILITY_API_ROOT}/school/${schoolId}`)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminGetSchools({ name, state, city, page }) {
+    const queryParams = new URLSearchParams({
+      name,
+      state,
+      city,
+      page
+    }).toString();
+    return Vue.http
+      .get(`${ELIGIBILITY_API_ROOT}/schools?${queryParams}`)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminCreateSchool(data) {
+    return Vue.http
+      .post(`${ELIGIBILITY_API_ROOT}/school/new`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminUpdateSchool(schoolId, data) {
+    return Vue.http
+      .put(`${ELIGIBILITY_API_ROOT}/school/${schoolId}`, data)
       .then(this._successHandler, this._errorHandler);
   },
   adminUpdateSchoolApproval(data) {
@@ -300,7 +348,8 @@ export default {
     sessionRangeFrom,
     sessionRangeTo,
     highSchoolId,
-    studentPartnerOrg
+    studentPartnerOrg,
+    studentPartnerSite
   }) {
     const queryParams = new URLSearchParams({
       joinedBefore,
@@ -308,7 +357,8 @@ export default {
       sessionRangeFrom,
       sessionRangeTo,
       highSchoolId,
-      studentPartnerOrg
+      studentPartnerOrg,
+      studentPartnerSite
     }).toString();
     return Vue.http
       .get(`${API_ROOT}/reports/session-report?${queryParams}`)
@@ -320,7 +370,8 @@ export default {
     sessionRangeFrom,
     sessionRangeTo,
     highSchoolId,
-    studentPartnerOrg
+    studentPartnerOrg,
+    studentPartnerSite
   }) {
     const queryParams = new URLSearchParams({
       joinedBefore,
@@ -328,7 +379,8 @@ export default {
       sessionRangeFrom,
       sessionRangeTo,
       highSchoolId,
-      studentPartnerOrg
+      studentPartnerOrg,
+      studentPartnerSite
     }).toString();
     return Vue.http
       .get(`${API_ROOT}/reports/usage-report?${queryParams}`)
@@ -337,6 +389,11 @@ export default {
   adminGetStudentPartners() {
     return Vue.http
       .get(`${AUTH_ROOT}/partner/student-partners`)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminGetVolunteerPartners() {
+    return Vue.http
+      .get(`${AUTH_ROOT}/partner/volunteer-partners`)
       .then(this._successHandler, this._errorHandler);
   },
   getQuestions(context, data) {
