@@ -39,6 +39,7 @@ import VolunteerGuideView from "./views/VolunteerGuideView";
 import ReviewMaterialsView from "./views/ReviewMaterialsView";
 import ReferenceView from "./views/ReferenceView";
 import BackgroundInfoView from "./views/BackgroundInfoView";
+import TrainingCourseView from "./views/TrainingCourseView";
 
 import store from "./store";
 
@@ -211,6 +212,12 @@ const routes = [
     path: "/training/:category/quiz",
     name: "QuizView",
     component: QuizView,
+    meta: { protected: true }
+  },
+  {
+    path: "/training/course/:courseKey",
+    name: "TrainingCourseView",
+    component: TrainingCourseView,
     meta: { protected: true }
   },
   {
