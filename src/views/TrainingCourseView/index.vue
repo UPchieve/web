@@ -126,8 +126,12 @@ export default {
     border-radius: 8px;
     padding: 20px 10px;
 
+    @include breakpoint-above("medium") {
+      padding: 20px;
+    }
+
     @include breakpoint-above("large") {
-      padding: 40px 30px;
+      padding: 40px;
     }
   }
 
@@ -138,9 +142,13 @@ export default {
 
   &__description {
     text-align: left;
-    font-size: 16px;
+    font-size: 18px;
     color: $c-secondary-grey;
-    margin: 20px 0 0;
+    margin: 20px 0 30px;
+
+    @include breakpoint-above("large") {
+      margin: 30px 0 40px;
+    }
   }
 }
 </style>
