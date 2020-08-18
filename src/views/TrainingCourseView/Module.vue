@@ -19,6 +19,7 @@
         v-for="material in module.materials"
         :key="material.materialKey"
         :material="material"
+        v-on:material-completed="$emit('material-completed', $event)"
       />
     </div>
   </div>
@@ -36,15 +37,7 @@ export default {
     RightCaret
   },
   props: {
-    module: Object,
-    isStarted: {
-      type: Boolean,
-      default: true
-    },
-    isCompleted: {
-      type: Boolean,
-      default: true
-    }
+    module: Object
   },
   data() {
     return {
@@ -52,12 +45,19 @@ export default {
     };
   },
   computed: {
+    isCompleted() {
+      return this.module.materials.every(
+        mat => mat.isCompleted || !mat.isRequired
+      );
+    },
+    isStarted() {
+      return this.module.materials.some(mat => mat.isCompleted);
+    },
     statusClass() {
       if (this.isCompleted) return "module--completed";
       else if (this.isStarted) return "module--started";
       return "module--not-started";
     },
-
     statusText() {
       if (this.isCompleted) return "Complete";
       else if (this.isStarted) return "Started";

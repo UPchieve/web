@@ -18,7 +18,9 @@
       </div>
     </div>
     <div v-if="showMaterial" class="material__content">
-      <div>{{ material.materialKey }} ({{ material.type }})</div>
+      <div @click="materialClicked">
+        {{ material.materialKey }} ({{ material.type }})
+      </div>
     </div>
   </div>
 </template>
@@ -37,15 +39,7 @@ export default {
     SlideIcon
   },
   props: {
-    material: Object,
-    isStarted: {
-      type: Boolean,
-      default: true
-    },
-    isCompleted: {
-      type: Boolean,
-      default: false
-    }
+    material: Object
   },
   data() {
     return {
@@ -54,20 +48,24 @@ export default {
   },
   computed: {
     statusClass() {
-      if (this.isCompleted) return "material--completed";
-      else if (this.isStarted) return "material--started";
-      return "material--not-started";
+      if (!this.material.isRequired) return "material--optional";
+      else if (this.material.isCompleted) return "material--completed";
+      else return "material--not-started";
     },
 
     statusText() {
-      if (this.isCompleted) return "Complete";
-      else if (this.isStarted) return "Started";
-      return "Not started";
+      if (!this.material.isRequired) return "Optional";
+      else if (this.material.isCompleted) return "Complete";
+      else return "Not started";
     }
   },
   methods: {
     toggleMaterial() {
       this.showMaterial = !this.showMaterial;
+    },
+    materialClicked() {
+      // TODO: fire on each material's version of "completed"
+      this.$emit("material-completed", this.material.materialKey);
     }
   }
 };
@@ -149,6 +147,17 @@ export default {
     padding: 50px;
   }
 
+  &--optional {
+    .material__icon-wrapper {
+      border-color: $c-soft-black;
+
+      svg {
+        filter: invert(15%) sepia(3%) saturate(3319%) hue-rotate(202deg)
+          brightness(95%) contrast(83%);
+      }
+    }
+  }
+
   &--completed {
     .material__status {
       color: $c-success-green;
@@ -161,12 +170,6 @@ export default {
         filter: invert(56%) sepia(68%) saturate(488%) hue-rotate(117deg)
           brightness(103%) contrast(96%);
       }
-    }
-  }
-
-  &--started {
-    .material__status {
-      color: $c-warning-orange;
     }
   }
 }
