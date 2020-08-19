@@ -25,6 +25,10 @@
           v-model="partnerOrg"
         />
       </div>
+      <div class="row">
+        <label for="email" class="uc-form-label">High school</label>
+        <input id="email" type="text" v-model="highSchool" />
+      </div>
 
       <div>
         <button class="uc-form-button" type="button" @click="getUsers">
@@ -76,19 +80,28 @@ export default {
       email: "",
       listedPartnerOrgs: [],
       partnerOrg: {},
-      partnerSite: ""
+      partnerSite: "",
+      highSchool: ""
     };
   },
 
   async created() {
     const {
-      query: { page: pageQuery, firstName, lastName, email }
+      query: {
+        page: pageQuery,
+        firstName,
+        lastName,
+        email,
+        partnerOrg,
+        highSchool
+      }
     } = this.$route;
     const page = parseInt(pageQuery);
     this.page = page || this.page;
     this.firstName = firstName || this.firstName;
     this.lastName = lastName || this.lastName;
     this.email = email || this.email;
+    this.highSchool = highSchool || this.highSchool;
 
     const [
       studentPartnersResponse,
@@ -106,6 +119,14 @@ export default {
     } = volunteerPartnersResponse;
 
     this.listedPartnerOrgs = [...studentPartnerOrgs, ...volunteerPartnerOrgs];
+    if (partnerOrg) {
+      for (let org of this.listedPartnerOrgs) {
+        if (org.key === partnerOrg) {
+          this.partnerOrg = org;
+          break;
+        }
+      }
+    }
 
     this.$nextTick(() => {
       document
@@ -140,7 +161,8 @@ export default {
         firstName: this.firstName,
         lastName: this.lastName,
         email: this.email,
-        partnerOrg: isEmpty(this.partnerOrg) ? "" : this.partnerOrg.key
+        partnerOrg: isEmpty(this.partnerOrg) ? "" : this.partnerOrg.key,
+        highSchool: this.highSchool
       };
       this.$router.push({
         path: "/admin/users",
@@ -168,6 +190,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+input {
+  width: 400px;
+  padding: 0.4em 0;
+  padding-left: 0.5em;
+  border: 1px solid #d6e0ef;
+}
+
 .admin-users {
   background: #fff;
   margin: 10px;
