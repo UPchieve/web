@@ -10,19 +10,27 @@
           :module="module"
           v-on:material-completed="trackMaterialProgress"
         />
+        <quiz-link
+          :isDisabled="!course.isComplete"
+          :quizKey="course.quizKey"
+          :certification="quizCertification"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import Module from "./Module";
+import { mapState } from "vuex";
 import NetworkService from "@/services/NetworkService";
+import Module from "./Module";
+import QuizLink from "./QuizLink";
 
 export default {
   name: "TrainingCourseView",
   components: {
-    Module
+    Module,
+    QuizLink
   },
   data() {
     return {
@@ -43,8 +51,16 @@ export default {
     } = await NetworkService.getTrainingCourse(courseKey);
     this.course = course;
   },
+  computed: {
+    ...mapState({
+      certifications: state => state.user.user.certifications
+    }),
+    quizCertification() {
+      return this.certifications[this.course.quizKey];
+    }
+  },
   methods: {
-    trackMaterialProgress(materialKey) {
+    async trackMaterialProgress(materialKey) {
       this.course.modules.forEach(mod => {
         mod.materials.forEach(mat => {
           if (mat.materialKey === materialKey) {
@@ -53,10 +69,15 @@ export default {
         });
       });
 
-      NetworkService.recordTrainingCourseProgress(
+      const {
+        body: { progress, isComplete }
+      } = await NetworkService.recordTrainingCourseProgress(
         this.course.courseKey,
         materialKey
       );
+
+      this.course.progress = progress;
+      this.course.isComplete = isComplete;
     }
   }
 };
