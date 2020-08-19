@@ -289,12 +289,14 @@ export default {
       .put(`${API_ROOT}/user/${userId}`, data)
       .then(this._successHandler, this._errorHandler);
   },
-  adminGetUsers({ page, firstName, lastName, email }) {
+  adminGetUsers({ page, firstName, lastName, email, partnerOrg, highSchool }) {
     const queryParams = new URLSearchParams({
       page,
       firstName,
       lastName,
-      email
+      email,
+      partnerOrg,
+      highSchool
     }).toString();
 
     return Vue.http

@@ -15,6 +15,20 @@
           <input id="email" type="text" v-model="email" />
         </div>
       </div>
+      <div class="row">
+        <label for="partner-org" class="uc-form-label">Partner org</label>
+        <v-select
+          id="partner-org"
+          class="option-select"
+          :options="listedPartnerOrgs"
+          label="displayName"
+          v-model="partnerOrg"
+        />
+      </div>
+      <div class="row">
+        <label for="email" class="uc-form-label">High school</label>
+        <input id="email" type="text" v-model="highSchool" />
+      </div>
 
       <div>
         <button class="uc-form-button" type="button" @click="getUsers">
@@ -41,6 +55,7 @@
 import NetworkService from "@/services/NetworkService";
 import PageControl from "@/components/Admin/PageControl";
 import UserListItem from "@/components/Admin/UserListItem";
+import { isEmpty } from "lodash";
 
 const getUsers = async data => {
   const {
@@ -62,19 +77,56 @@ export default {
       users: [],
       firstName: "",
       lastName: "",
-      email: ""
+      email: "",
+      listedPartnerOrgs: [],
+      partnerOrg: {},
+      partnerSite: "",
+      highSchool: ""
     };
   },
 
   async created() {
     const {
-      query: { page: pageQuery, firstName, lastName, email }
+      query: {
+        page: pageQuery,
+        firstName,
+        lastName,
+        email,
+        partnerOrg,
+        highSchool
+      }
     } = this.$route;
     const page = parseInt(pageQuery);
     this.page = page || this.page;
     this.firstName = firstName || this.firstName;
     this.lastName = lastName || this.lastName;
     this.email = email || this.email;
+    this.highSchool = highSchool || this.highSchool;
+
+    const [
+      studentPartnersResponse,
+      volunteerPartnersResponse
+    ] = await Promise.all([
+      NetworkService.adminGetVolunteerPartners(),
+      NetworkService.adminGetStudentPartners()
+    ]);
+
+    const {
+      body: { partnerOrgs: studentPartnerOrgs }
+    } = studentPartnersResponse;
+    const {
+      body: { partnerOrgs: volunteerPartnerOrgs }
+    } = volunteerPartnersResponse;
+
+    this.listedPartnerOrgs = [...studentPartnerOrgs, ...volunteerPartnerOrgs];
+    if (partnerOrg) {
+      for (let org of this.listedPartnerOrgs) {
+        if (org.key === partnerOrg) {
+          this.partnerOrg = org;
+          break;
+        }
+      }
+    }
 
     this.$nextTick(() => {
       document
@@ -108,7 +160,9 @@ export default {
       const data = {
         firstName: this.firstName,
         lastName: this.lastName,
-        email: this.email
+        email: this.email,
+        partnerOrg: isEmpty(this.partnerOrg) ? "" : this.partnerOrg.key,
+        highSchool: this.highSchool
       };
       this.$router.push({
         path: "/admin/users",
@@ -136,27 +190,37 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+input {
+  width: 400px;
+  padding: 0.4em 0;
+  padding-left: 0.5em;
+  border: 1px solid #d6e0ef;
+}
+
 .admin-users {
   background: #fff;
   margin: 10px;
+  padding: 10px;
   border-radius: 8px;
-  overflow: hidden;
 
   @include breakpoint-above("medium") {
     margin: 40px;
+    padding: 40px;
   }
 }
 
 .search-panel {
   text-align: left;
-
-  @include breakpoint-above("medium") {
-    margin: 40px;
-  }
 }
 
 .row {
   margin-bottom: 1em;
+  margin-left: 0;
+}
+
+.option-select {
+  display: inline-block;
+  width: 400px;
 }
 
 .list-wrapper {
