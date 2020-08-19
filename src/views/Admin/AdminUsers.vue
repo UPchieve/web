@@ -15,6 +15,16 @@
           <input id="email" type="text" v-model="email" />
         </div>
       </div>
+      <div class="row">
+        <label for="partner-org" class="uc-form-label">Partner org</label>
+        <v-select
+          id="partner-org"
+          class="option-select"
+          :options="listedPartnerOrgs"
+          label="displayName"
+          v-model="partnerOrg"
+        />
+      </div>
 
       <div>
         <button class="uc-form-button" type="button" @click="getUsers">
@@ -41,6 +51,7 @@
 import NetworkService from "@/services/NetworkService";
 import PageControl from "@/components/Admin/PageControl";
 import UserListItem from "@/components/Admin/UserListItem";
+import { isEmpty } from "lodash";
 
 const getUsers = async data => {
   const {
@@ -62,7 +73,10 @@ export default {
       users: [],
       firstName: "",
       lastName: "",
-      email: ""
+      email: "",
+      listedPartnerOrgs: [],
+      partnerOrg: {},
+      partnerSite: ""
     };
   },
 
@@ -75,6 +89,23 @@ export default {
     this.firstName = firstName || this.firstName;
     this.lastName = lastName || this.lastName;
     this.email = email || this.email;
+
+    const [
+      studentPartnersResponse,
+      volunteerPartnersResponse
+    ] = await Promise.all([
+      NetworkService.adminGetVolunteerPartners(),
+      NetworkService.adminGetStudentPartners()
+    ]);
+
+    const {
+      body: { partnerOrgs: studentPartnerOrgs }
+    } = studentPartnersResponse;
+    const {
+      body: { partnerOrgs: volunteerPartnerOrgs }
+    } = volunteerPartnersResponse;
+
+    this.listedPartnerOrgs = [...studentPartnerOrgs, ...volunteerPartnerOrgs];
 
     this.$nextTick(() => {
       document
@@ -108,7 +139,8 @@ export default {
       const data = {
         firstName: this.firstName,
         lastName: this.lastName,
-        email: this.email
+        email: this.email,
+        partnerOrg: isEmpty(this.partnerOrg) ? "" : this.partnerOrg.key
       };
       this.$router.push({
         path: "/admin/users",
@@ -139,24 +171,27 @@ export default {
 .admin-users {
   background: #fff;
   margin: 10px;
+  padding: 10px;
   border-radius: 8px;
-  overflow: hidden;
 
   @include breakpoint-above("medium") {
     margin: 40px;
+    padding: 40px;
   }
 }
 
 .search-panel {
   text-align: left;
-
-  @include breakpoint-above("medium") {
-    margin: 40px;
-  }
 }
 
 .row {
   margin-bottom: 1em;
+  margin-left: 0;
+}
+
+.option-select {
+  display: inline-block;
+  width: 400px;
 }
 
 .list-wrapper {
