@@ -42,11 +42,9 @@ export default {
       body: { course }
     } = await NetworkService.getTrainingCourse(courseKey);
     this.course = course;
-    this.trackMaterialProgress();
   },
   methods: {
     trackMaterialProgress(materialKey) {
-      // TODO: lodash?
       this.course.modules.forEach(mod => {
         mod.materials.forEach(mat => {
           if (mat.materialKey === materialKey) {
