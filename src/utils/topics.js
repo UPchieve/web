@@ -29,6 +29,14 @@ export const topics = {
       applications: { displayName: "Applications" }
     },
     displayName: "College Counseling"
+  },
+  training: {
+    subtopics: {
+      upchieve101: { displayName: "UPchieve 101" },
+      tutoringSkills: { displayName: "Tutoring Skills" },
+      collegeSkills: { displayName: "College Counseling Skills" }
+    },
+    displayName: "UPchieve Training"
   }
 };
 
