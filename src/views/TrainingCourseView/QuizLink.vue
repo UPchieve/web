@@ -49,7 +49,7 @@ export default {
   },
   methods: {
     onClick() {
-      if (this.isDisabled) return;
+      if (this.isDisabled || this.isCompleted) return;
       else this.$router.push(`/training/${this.quizKey}/quiz`);
     }
   }
@@ -125,6 +125,14 @@ export default {
   &--completed {
     .quiz-link__status {
       color: $c-success-green;
+    }
+
+    .quiz-link__cell {
+      cursor: default;
+    }
+
+    .quiz-link__caret {
+      display: none;
     }
   }
 
