@@ -19,14 +19,45 @@
       </div>
     </div>
     <div v-if="showMaterial" class="material__content">
-      <div @click="materialClicked">
-        {{ material.materialKey }} ({{ material.type }})
+      <div v-if="material.description" class="material__description">
+        {{ material.description }}
       </div>
+
+      <link-material
+        v-if="material.type === 'link'"
+        :linkUrl="material.linkUrl"
+        :label="'Go to module'"
+      />
+      <resources-material
+        v-else-if="material.type === 'resources'"
+        :links="material.links"
+      />
+      <slideshow-material
+        v-else-if="material.type === 'slideshow'"
+        :resourceId="material.resourceId"
+      />
+      <document-material
+        v-else-if="material.type === 'document'"
+        :resourceId="material.resourceId"
+      />
+      <video-material
+        v-else-if="material.type === 'video'"
+        :resourceId="material.resourceId"
+      />
+
+      <button class="material__complete-btn" @click="materialClicked">
+        Mark complete
+      </button>
     </div>
   </div>
 </template>
 
 <script>
+import LinkMaterial from "./Link";
+import ResourcesMaterial from "./Resources";
+import SlideshowMaterial from "./Slideshow";
+import DocumentMaterial from "./Document";
+import VideoMaterial from "./Video";
 import RightCaret from "@/assets/right-caret.svg";
 import BookIcon from "@/assets/sidebar_icons/book.svg";
 import VideoIcon from "@/assets/video.svg";
@@ -35,6 +66,11 @@ import LinkIcon from "@/assets/link.svg";
 
 export default {
   components: {
+    LinkMaterial,
+    ResourcesMaterial,
+    SlideshowMaterial,
+    DocumentMaterial,
+    VideoMaterial,
     RightCaret,
     BookIcon,
     VideoIcon,
@@ -67,7 +103,6 @@ export default {
       this.showMaterial = !this.showMaterial;
     },
     materialClicked() {
-      // TODO: fire on each material's version of "completed"
       this.$emit("material-completed", this.material.materialKey);
     }
   }
@@ -147,7 +182,22 @@ export default {
   }
 
   &__content {
-    padding: 50px;
+    text-align: left;
+    font-weight: 500;
+    padding: 40px 10px;
+
+    @include breakpoint-above("large") {
+      padding: 40px 60px;
+    }
+  }
+
+  &__description {
+    font-size: 16px;
+    padding: 10px 0 30px;
+  }
+
+  &__complete-btn {
+    margin: 35px 0 10px;
   }
 
   &--optional {
