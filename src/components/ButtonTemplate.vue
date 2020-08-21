@@ -3,14 +3,20 @@
     <div>
       <slot />
     </div>
-    <arrow-icon v-if="primary" class="ButtonTemplate-icon arrow-icon" />
+    <arrow-icon
+      v-if="primary && showArrow"
+      class="ButtonTemplate-icon arrow-icon"
+    />
   </router-link>
 
   <button v-else class="ButtonTemplate">
     <div>
       <slot />
     </div>
-    <arrow-icon v-if="primary" class="ButtonTemplate-icon arrow-icon" />
+    <arrow-icon
+      v-if="primary && showArrow"
+      class="ButtonTemplate-icon arrow-icon"
+    />
   </button>
 </template>
 
@@ -18,10 +24,12 @@
 import ArrowIcon from "@/assets/arrow.svg";
 
 export default {
+  name: "ButtonTemplate",
   components: { ArrowIcon },
   props: {
     primary: Boolean,
-    routeTo: String
+    routeTo: String,
+    showArrow: Boolean
   }
 };
 </script>

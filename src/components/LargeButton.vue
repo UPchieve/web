@@ -1,5 +1,10 @@
 <template>
-  <button-template :primary="primary" :routeTo="routeTo" :class="buttonClasses">
+  <button-template
+    :primary="primary"
+    :routeTo="routeTo"
+    :class="buttonClasses"
+    :showArrow="showArrow"
+  >
     <slot />
   </button-template>
 </template>
@@ -8,11 +13,16 @@
 import ButtonTemplate from "./ButtonTemplate";
 
 export default {
+  name: "LargeButton",
   components: { ButtonTemplate },
   props: {
     primary: Boolean,
     reverse: Boolean,
-    routeTo: String
+    routeTo: String,
+    showArrow: {
+      type: Boolean,
+      default: true
+    }
   },
   computed: {
     buttonClasses() {
