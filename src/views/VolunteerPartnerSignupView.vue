@@ -315,11 +315,15 @@ export default {
 
         this.invalidInputs.push("inputEmail");
       } else if (!this.isValidPartnerEmail(this.formData.email)) {
-        this.errors.push(
-          `Email must end with ${this.volunteerPartner.requiredEmailDomains.join(
-            " or "
-          )}`
-        );
+        if (this.volunteerPartner.requiredEmailDomains.length < 5) {
+          this.errors.push(
+            `Email must end with ${this.volunteerPartner.requiredEmailDomains.join(
+              " or "
+            )}`
+          );
+        } else {
+          this.errors.push("You must use your company email address");
+        }
         this.invalidInputs.push("inputEmail");
       }
 
