@@ -5,7 +5,7 @@
       ref="docIframe"
       allowFullScreen
       :src="
-        `https://docs.google.com/document/d/e/${resourceId}/pub?embedded=true`
+        `https://docs.google.com/document/d/${resourceId}/preview`
       "
     ></iframe>
     <div class="document__toolbar">
@@ -42,8 +42,7 @@ export default {
   &__iframe {
     width: 100%;
     height: 400px;
-    border: solid $c-border-grey 1px;
-    border-bottom: none;
+    border: none;
   }
 
   &__toolbar {
