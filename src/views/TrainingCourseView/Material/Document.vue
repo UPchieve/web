@@ -4,9 +4,7 @@
       class="document__iframe"
       ref="docIframe"
       allowFullScreen
-      :src="
-        `https://docs.google.com/document/d/${resourceId}/preview`
-      "
+      :src="`https://docs.google.com/document/d/${resourceId}/preview`"
     ></iframe>
     <div class="document__toolbar">
       <div class="document__fullscreen" @click="enterFullScreen">
