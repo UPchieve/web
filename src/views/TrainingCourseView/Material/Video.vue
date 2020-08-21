@@ -1,6 +1,12 @@
 <template>
   <div class="video">
-    <h4>Resource ID: {{ resourceId }}</h4>
+    <iframe
+      class="video__iframe"
+      :src="`https://player.vimeo.com/video/${resourceId}`"
+      frameborder="0"
+      allow="autoplay; fullscreen"
+      allowfullscreen
+    ></iframe>
   </div>
 </template>
 
@@ -15,5 +21,10 @@ export default {
 <style lang="scss" scoped>
 .video {
   color: black;
+
+  &__iframe {
+    width: 100%;
+    height: 400px;
+  }
 }
 </style>
