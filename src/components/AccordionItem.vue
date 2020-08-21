@@ -5,11 +5,30 @@
       :class="{ 'accordion-item__title--open': isOpen }"
       @click="toggle"
     >
-      <span
-        class="accordion-item__bullet"
-        :class="{ 'accordion-item__bullet--open': isOpen }"
-      ></span>
-      <span>{{ label }}</span>
+      <div class="accordion-item__title-container">
+        <span
+          class="accordion-item__bullet"
+          :class="{
+            'accordion-item__bullet--open': isOpen,
+            'accordion-item__bullet--large': buttonSize === 'large',
+            'accordion-item__bullet--large-open':
+              buttonSize === 'large' && isOpen
+          }"
+        ></span>
+        <div class="accordion-item__labels">
+          <span
+            :class="{ 'accordion-item__labels-header': buttonSize === 'large' }"
+            >{{ label }}</span
+          >
+          <span v-if="sublabel" class="accordion-item__labels-sublabel">
+            {{ sublabel }}
+          </span>
+        </div>
+      </div>
+      <div v-if="alertMessage" class="accordion-item__alert">
+        <alert-icon class="accordion-item__alert--icon" />
+        {{ alertMessage }}
+      </div>
     </div>
     <div
       class="accordion-item__content"
@@ -21,9 +40,23 @@
 </template>
 
 <script>
+import AlertIcon from "@/assets/alert.svg";
 export default {
+  components: {
+    AlertIcon
+  },
   props: {
     label: {
+      type: String,
+      default: ""
+    },
+    sublabel: {
+      type: String
+    },
+    buttonSize: {
+      type: String
+    },
+    alertMessage: {
       type: String,
       default: ""
     }
@@ -60,6 +93,30 @@ export default {
     &--open {
       color: $c-success-green;
     }
+
+    @include breakpoint-below("large") {
+      @include flex-container(column);
+    }
+  }
+
+  &__title-container {
+    @include flex-container(row);
+  }
+
+  &__labels {
+    @include flex-container(column);
+    text-align: left;
+    color: $c-soft-black;
+
+    &-header {
+      @include font-category("heading");
+      font-weight: 500;
+    }
+
+    &-sublabel {
+      color: $c-secondary-grey;
+      margin: 0.4em 0;
+    }
   }
 
   &__bullet {
@@ -74,17 +131,6 @@ export default {
     padding-top: 4px;
     flex-shrink: 0;
 
-    &--open {
-      background: $c-success-green;
-      border-color: $c-success-green;
-      color: #fff;
-
-      &:after {
-        border-color: #fff !important;
-        transform: translateY(calc(-50% + 1px)) translateX(-50%) rotate(225deg) !important;
-      }
-    }
-
     &:after {
       content: "";
       position: absolute;
@@ -97,6 +143,33 @@ export default {
       border: solid 1px #000;
       border-left: none;
       border-top: none;
+    }
+
+    &--large {
+      height: 48px;
+      width: 48px;
+
+      &:after {
+        height: 12px;
+        width: 12px;
+      }
+    }
+
+    &--open {
+      background: $c-success-green;
+      border-color: $c-success-green;
+      color: #fff;
+
+      &:after {
+        border-color: #fff;
+        transform: translateY(calc(-50% + 1px)) translateX(-50%) rotate(225deg);
+      }
+    }
+
+    &--large-open {
+      &:after {
+        transform: translateY(calc(-33% + 1px)) translateX(-50%) rotate(225deg);
+      }
     }
   }
 
@@ -112,6 +185,21 @@ export default {
 
     p:last-child {
       margin-bottom: 0;
+    }
+  }
+
+  &__alert {
+    @include flex-container(row, flex-start, center);
+    margin-left: auto;
+    color: $c-error-red;
+
+    @include breakpoint-below("large") {
+      flex-basis: 100%;
+      margin-left: 60px;
+    }
+
+    &--icon {
+      margin-right: 0.6em;
     }
   }
 }
