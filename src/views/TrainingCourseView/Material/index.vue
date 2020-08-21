@@ -45,8 +45,13 @@
         :resourceId="material.resourceId"
       />
 
-      <button class="material__complete-btn" @click="materialClicked">
-        Mark complete
+      <button
+        v-if="this.material.isRequired"
+        :disabled="this.material.isCompleted"
+        class="material__complete-btn"
+        @click="materialClicked"
+      >
+        Mark as complete
       </button>
     </div>
   </div>
@@ -198,6 +203,21 @@ export default {
 
   &__complete-btn {
     margin: 35px 0 10px;
+    background: $c-success-green;
+    border: none;
+    border-radius: 25px;
+    padding: 9px 18px;
+    color: #fff;
+    cursor: pointer;
+
+    &:hover {
+      background: darken($color: $c-success-green, $amount: 3%);
+    }
+
+    &:disabled {
+      cursor: default;
+      background: lighten($color: $c-success-green, $amount: 40%);
+    }
   }
 
   &--optional {
