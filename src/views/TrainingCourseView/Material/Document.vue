@@ -62,7 +62,7 @@ export default {
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    
+
     svg {
       fill: #9a9a9a;
     }
