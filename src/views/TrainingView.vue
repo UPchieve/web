@@ -89,7 +89,7 @@
                 primary
                 :showArrow="false"
                 :routeTo="
-                  trainingIsComplete(cert.key)
+                  !trainingIsComplete(cert.key)
                     ? getTrainingCourseLink(cert.key)
                     : null
                 "
@@ -174,7 +174,7 @@
                 primary
                 :showArrow="false"
                 :routeTo="
-                  hasCertCompleted(cert.key) ? getCertQuizLink(cert.key) : null
+                  !hasCertCompleted(cert.key) ? getCertQuizLink(cert.key) : null
                 "
                 class="action-buttons__quiz"
                 :disabled="hasCertCompleted(cert.key)"
