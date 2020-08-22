@@ -318,9 +318,6 @@ export default {
       if (amount === 1) return `${amount} course required`;
       return `${amount} courses required`;
     },
-    isMathSubject() {
-      return this.currentSubjectType === "math";
-    },
     additionalSubjectsColHeaders() {
       if (this.currentSubjectType === "math")
         return ["Integrated Math", "Included Certifications", ""];
