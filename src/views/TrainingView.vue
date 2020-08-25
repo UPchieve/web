@@ -3,7 +3,7 @@
     <div class="body-container">
       <div class="body-header">Volunteer Training and Certifications</div>
       <p class="instructions">
-        On this page you can explore the trainings and certifications required
+        On this page you can explore the training and certifications required
         for each school subject that we offer. Start by selecting a subject
         (Math, Science, etc.) and review both the required training and
         certifications. Once you complete the required training and at least one
@@ -83,8 +83,8 @@ export default {
       currentSubjectType: "math",
       math: {
         training: [
-          { displayName: "UPchieve 101", key: "upchieve101" },
-          { displayName: "Tutoring Skills", key: "tutoringSkills" }
+          { displayName: "UPchieve 101", key: "upchieve101" }
+          // { displayName: "Tutoring Skills", key: "tutoringSkills" }
         ],
         certifications: [
           {
@@ -197,8 +197,8 @@ export default {
       },
       science: {
         training: [
-          { displayName: "UPchieve 101", key: "upchieve101" },
-          { displayName: "Tutoring Skills", key: "tutoringSkills" }
+          { displayName: "UPchieve 101", key: "upchieve101" }
+          // { displayName: "Tutoring Skills", key: "tutoringSkills" }
         ],
         certifications: [
           {
@@ -215,22 +215,23 @@ export default {
             displayName: "Physics 1",
             subjectsIncluded: [{ displayName: "Physics 1", key: "physicsOne" }],
             key: "physicsOne"
-          },
-          {
-            displayName: "Physics 2",
-            subjectsIncluded: [{ displayName: "Physics 2", key: "physicsTwo" }],
-            key: "physicsTwo"
-          },
-          {
-            displayName: "Environmental Science",
-            subjectsIncluded: [
-              {
-                displayName: "Environmental Science",
-                key: "environmentalScience"
-              }
-            ],
-            key: "environmentalScience"
           }
+          // @note: temporarily hidden
+          // {
+          //   displayName: "Physics 2",
+          //   subjectsIncluded: [{ displayName: "Physics 2", key: "physicsTwo" }],
+          //   key: "physicsTwo"
+          // },
+          // {
+          //   displayName: "Environmental Science",
+          //   subjectsIncluded: [
+          //     {
+          //       displayName: "Environmental Science",
+          //       key: "environmentalScience"
+          //     }
+          //   ],
+          //   key: "environmentalScience"
+          // }
         ],
         additionalSubjects: []
       },
@@ -308,10 +309,11 @@ export default {
     currentSubject() {
       return this[this.currentSubjectType];
     },
+    // get the amount of required training material a user must complete
     requiredTrainingMessage() {
       let amount = 0;
       for (let subject of this.currentSubject.training) {
-        if (!this.user.trainingCourses[subject.key].isComplete) amount++;
+        if (!this.user.certifications[subject.key].passed) amount++;
       }
 
       if (!amount) return "";
