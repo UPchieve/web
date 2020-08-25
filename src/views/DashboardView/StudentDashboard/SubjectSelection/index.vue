@@ -47,24 +47,26 @@ export default {
       science: ScienceSVG
     };
 
-    const cards = Object.entries(topics).map(([key, topicObj]) => {
-      return {
-        title: topicObj.displayName,
-        svg: svgs[key],
-        topic: key,
-        subtopics: Object.keys(topicObj.subtopics),
-        subtopicDisplayNames: Object.entries(topicObj.subtopics)
-          .map(([subtopicKey, subtopicObj]) => [
-            subtopicKey,
-            subtopicObj.displayName
-          ])
-          .reduce((result, [subtopicKey, displayName]) => {
-            result[subtopicKey] = displayName;
-            return result;
-          }, {}),
-        isTutoringCard: true
-      };
-    });
+    const cards = Object.entries(topics)
+      .filter(([key]) => key !== "training")
+      .map(([key, topicObj]) => {
+        return {
+          title: topicObj.displayName,
+          svg: svgs[key],
+          topic: key,
+          subtopics: Object.keys(topicObj.subtopics),
+          subtopicDisplayNames: Object.entries(topicObj.subtopics)
+            .map(([subtopicKey, subtopicObj]) => [
+              subtopicKey,
+              subtopicObj.displayName
+            ])
+            .reduce((result, [subtopicKey, displayName]) => {
+              result[subtopicKey] = displayName;
+              return result;
+            }, {}),
+          isTutoringCard: true
+        };
+      });
 
     // Temporarily hide Physics from students
     cards[1].subtopics = ["biology", "chemistry"];
