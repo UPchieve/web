@@ -2,11 +2,13 @@ export const topics = {
   math: {
     subtopics: {
       prealgebra: { displayName: "Pre-algebra" },
-      algebra: { displayName: "Algebra" },
+      algebraOne: { displayName: "Algebra 1" },
+      algebraTwo: { displayName: "Algebra 2" },
       geometry: { displayName: "Geometry" },
       trigonometry: { displayName: "Trigonometry" },
       precalculus: { displayName: "Precalculus" },
-      calculus: { displayName: "Calculus" },
+      calculusAB: { displayName: "Calculus AB" },
+      calculusBC: { displayName: "Calculus BC" },
       integratedMathOne: { displayName: "Integrated Math 1" },
       integratedMathTwo: { displayName: "Integrated Math 2" },
       integratedMathThree: { displayName: "Integrated Math 3" },
