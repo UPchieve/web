@@ -31,10 +31,7 @@
           CONTACT US
         </router-link>
         <div v-if="showQuizStart" class="quiz-start">
-          <div v-if="tries === 3" class="exceeded-tries">
-            <p>You have no more tries.</p>
-          </div>
-          <div v-else>
+          <div>
             <div class="instructions">
               <h2 class="instructions-header">Get ready, set...</h2>
               <p>
@@ -44,7 +41,6 @@
                 There's no time limit, but we recommend setting aside at least
                 15 minutes.
               </p>
-              <p>You have {{ 3 - tries }}/3 tries left to pass this quiz.</p>
               <p>Once you feel ready, press "Start Quiz" below!</p>
             </div>
             <button class="btn" type="start" @click.prevent="startQuiz()">
