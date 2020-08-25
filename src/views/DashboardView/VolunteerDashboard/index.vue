@@ -486,7 +486,7 @@ export default {
           title: "Complete UPchieve 101",
           subtitle: this.trainingAction.subtitle,
           status: this.trainingAction.status,
-          clickFn: this.clickCertificationAction,
+          clickFn: this.clickUpchieve101Action,
           icon: TrainingIcon,
           priority: this.addSortPriorityNum(this.trainingAction.status)
         },
@@ -536,6 +536,9 @@ export default {
     },
     clickCertificationAction() {
       this.$router.push("/training");
+    },
+    clickUpchieve101Action() {
+      this.$router.push("/training/course/upchieve101");
     },
     goToBackgroundInfo() {
       this.$router.push("/background-information");
