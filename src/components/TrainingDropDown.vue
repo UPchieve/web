@@ -386,6 +386,10 @@ a {
     grid-column-start: auto;
   }
 
+  @media only screen and (min-width: 992px) and (max-width: 1280px) {
+    display: initial;
+  }
+
   &__quiz-btn {
     width: 180px;
   }
