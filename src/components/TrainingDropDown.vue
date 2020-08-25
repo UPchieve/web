@@ -78,6 +78,7 @@
         <router-link
           :to="getCertReviewLink(cert.key)"
           class="action-btns__review-link"
+          v-if="showReviewLink(cert.key)"
         >
           <span class="action-btns__review-link--text">Review</span>
           <arrow-icon class="action-btns__review-link--arrow-icon" />
@@ -154,18 +155,23 @@ export default {
     getTrainingCourseLink(cert) {
       return `/training/course/${cert}`;
     },
+    showReviewLink(cert) {
+      if (this.trainingCourse) {
+        return this.user.certifications[cert].passed;
+      }
+      return true;
+    },
     isComplete(cert) {
       if (this.trainingCourse) {
-        const { isComplete } = this.user.trainingCourses[cert];
-        return isComplete;
+        return this.user.certifications[cert].passed;
       }
       return this.user.subjects.includes(cert);
     },
     progressStatus(cert) {
       if (this.trainingCourse) {
-        const { progress, isComplete } = this.user.trainingCourses[cert];
+        const { progress } = this.user.trainingCourses[cert];
         if (progress === 0) return "Not started";
-        if (isComplete) return "Completed";
+        if (this.user.certifications[cert].passed) return "Completed";
         return "In progress";
       }
 
@@ -174,9 +180,9 @@ export default {
     },
     actionButtonText(cert) {
       if (this.trainingCourse) {
-        const { progress, isComplete } = this.user.trainingCourses[cert];
+        const { progress } = this.user.trainingCourses[cert];
         if (progress === 0) return "Start course";
-        if (isComplete) return "Complete";
+        if (this.user.certifications[cert].passed) return "Complete";
         return "Resume course";
       }
 
@@ -185,8 +191,8 @@ export default {
     },
     progressBarNumber(cert) {
       const { progress, isComplete } = this.user.trainingCourses[cert];
-      // If user has not completed the course quiz show 99%
-      if (progress === 100 && !isComplete) return 99;
+      // If user has not completed the course quiz show 99% in the progress bar
+      if (isComplete && !this.user.certifications[cert].passed) return 99;
       else return progress;
     }
   }
