@@ -139,6 +139,7 @@ import CalendarIcon from "@/assets/calendar.svg";
 import CertificationIcon from "@/assets/certification.svg";
 import VerificationIcon from "@/assets/verification.svg";
 import OnboardingIcon from "@/assets/onboarding.svg";
+import TrainingIcon from "@/assets/sidebar_icons/graduation-cap.svg";
 import { allSubtopicNames } from "@/utils/topics";
 
 const headerData = {
@@ -288,14 +289,30 @@ export default {
     },
 
     certificationAction() {
-      if (this.hasCertification)
+      for (let cert in this.user.certifications) {
+        // skip certification for check for required training
+        if (cert === "upchieve101") continue;
+        if (this.user.certifications[cert].passed)
+          return {
+            subtitle: "Completed",
+            status: "COMPLETED"
+          };
+      }
+      return {
+        subtitle: "Pass at least one quiz",
+        status: "DEFAULT"
+      };
+    },
+
+    trainingAction() {
+      if (this.hasCompletedUpchieve101)
         return {
           subtitle: "Completed",
           status: "COMPLETED"
         };
 
       return {
-        subtitle: "Pass at least one quiz",
+        subtitle: "Go through our training",
         status: "DEFAULT"
       };
     },
@@ -319,6 +336,10 @@ export default {
         this.user.occupation.length > 0 &&
         this.user.country
       );
+    },
+
+    hasCompletedUpchieve101() {
+      return this.user.certifications.upchieve101.passed;
     },
 
     impactStats() {
@@ -462,7 +483,15 @@ export default {
           priority: this.addSortPriorityNum(this.availabilityAction.status)
         },
         {
-          title: "Obtain a certification",
+          title: "Complete UPchieve 101",
+          subtitle: this.trainingAction.subtitle,
+          status: this.trainingAction.status,
+          clickFn: this.clickCertificationAction,
+          icon: TrainingIcon,
+          priority: this.addSortPriorityNum(this.trainingAction.status)
+        },
+        {
+          title: "Unlock a subject",
           subtitle: this.certificationAction.subtitle,
           status: this.certificationAction.status,
           clickFn: this.clickCertificationAction,
