@@ -139,7 +139,7 @@ import CalendarIcon from "@/assets/calendar.svg";
 import CertificationIcon from "@/assets/certification.svg";
 import VerificationIcon from "@/assets/verification.svg";
 import OnboardingIcon from "@/assets/onboarding.svg";
-import TrainingIcon from "@/assets/sidebar_icons/graduation-cap.svg";
+import TrainingIcon from "@/assets/training_icon.svg";
 import { allSubtopicNames } from "@/utils/topics";
 
 const headerData = {
