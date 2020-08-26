@@ -147,9 +147,11 @@ export default {
 
   methods: {
     getQuizLink(cert) {
+      if (this.trainingCourse) return `/training/course/${cert}`;
       return `/training/${cert}/quiz`;
     },
     getCertReviewLink(cert) {
+      if (this.trainingCourse) return `/training/course/${cert}`;
       return `/training/review/${cert}`;
     },
     getTrainingCourseLink(cert) {
