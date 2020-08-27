@@ -164,12 +164,10 @@ export default {
       return true;
     },
     isComplete(cert) {
-      let certKey = cert;
       if (this.trainingCourse) {
         return this.user.certifications[cert].passed;
       }
-      if (certKey === "algebra") certKey = "algebraOne";
-      return this.user.subjects.includes(certKey);
+      return this.user.subjects.some(sub => sub.indexOf(cert) >= 0);
     },
     progressStatus(cert) {
       if (this.trainingCourse) {
@@ -179,7 +177,8 @@ export default {
         return "In progress";
       }
 
-      if (this.user.subjects.includes(cert)) return "Completed";
+      if (this.user.subjects.some(sub => sub.indexOf(cert) >= 0))
+        return "Completed";
       else return "Not started";
     },
     actionButtonText(cert) {
@@ -190,7 +189,8 @@ export default {
         return "Resume course";
       }
 
-      if (this.user.subjects.includes(cert)) return "Complete";
+      if (this.user.subjects.some(sub => sub.indexOf(cert) >= 0))
+        return "Complete";
       else return "Start quiz";
     },
     progressBarNumber(cert) {
