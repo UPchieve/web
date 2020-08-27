@@ -164,10 +164,12 @@ export default {
       return true;
     },
     isComplete(cert) {
+      let certKey = cert;
       if (this.trainingCourse) {
         return this.user.certifications[cert].passed;
       }
-      return this.user.subjects.includes(cert);
+      if (certKey === "algebra") certKey = "algebraOne";
+      return this.user.subjects.includes(certKey);
     },
     progressStatus(cert) {
       if (this.trainingCourse) {
