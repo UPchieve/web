@@ -398,6 +398,7 @@ a {
     flex-basis: 100%;
     padding-bottom: 0.8em;
     font-size: 16px;
+    border-bottom: 4px solid transparent;
 
     &:hover {
       cursor: pointer;
