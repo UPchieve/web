@@ -163,7 +163,7 @@ export default {
     subjects() {
       const user = this.$store.state.user.user;
 
-      const certifications = user.subjects.reduce(
+      const subjects = user.subjects.reduce(
         (displayObj, key) => {
           const subtopics = allSubtopics();
 
@@ -176,7 +176,7 @@ export default {
         {}
       );
 
-      return certifications;
+      return subjects;
     }
   },
   methods: {
