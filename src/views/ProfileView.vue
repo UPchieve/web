@@ -163,18 +163,15 @@ export default {
     subjects() {
       const user = this.$store.state.user.user;
 
-      const subjects = user.subjects.reduce(
-        (displayObj, key) => {
-          const subtopics = allSubtopics();
+      const subjects = user.subjects.reduce((displayObj, key) => {
+        const subtopics = allSubtopics();
 
-          if (subtopics[key]) {
-            displayObj[subtopics[key].displayName || subtopics[key]] = true;
-          }
+        if (subtopics[key]) {
+          displayObj[subtopics[key].displayName || subtopics[key]] = true;
+        }
 
-          return displayObj;
-        },
-        {}
-      );
+        return displayObj;
+      }, {});
 
       return subjects;
     }
