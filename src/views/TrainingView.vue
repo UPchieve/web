@@ -98,8 +98,8 @@ export default {
             displayName: "Algebra",
             subjectsIncluded: [
               { displayName: "Pre-algebra", key: "prealgebra" },
-              { displayName: "Algebra 1", key: "algebra" },
-              { displayName: "Algebra 2", key: "algebra" }
+              { displayName: "Algebra 1", key: "algebraOne" },
+              { displayName: "Algebra 2", key: "algebraTwo" }
             ],
             key: "algebra"
           },
@@ -124,8 +124,8 @@ export default {
             displayName: "Precalculus",
             subjectsIncluded: [
               { displayName: "Pre-algebra", key: "prealgebra" },
-              { displayName: "Algebra 1", key: "algebra" },
-              { displayName: "Algebra 2", key: "algebra" },
+              { displayName: "Algebra 1", key: "algebraOne" },
+              { displayName: "Algebra 2", key: "algebraTwo" },
               { displayName: "Trigonometry", key: "trigonometry" },
               { displayName: "Precalculus", key: "precalculus" }
             ],
@@ -135,8 +135,8 @@ export default {
             displayName: "Calculus AB",
             subjectsIncluded: [
               { displayName: "Pre-algebra", key: "prealgebra" },
-              { displayName: "Algebra 1", key: "algebra" },
-              { displayName: "Algebra 2", key: "algebra" },
+              { displayName: "Algebra 1", key: "algebraOne" },
+              { displayName: "Algebra 2", key: "algebraTwo" },
               { displayName: "Trigonometry", key: "trigonometry" },
               { displayName: "Precalculus", key: "precalculus" },
               { displayName: "Calculus AB", key: "calculusAB" }
@@ -147,8 +147,8 @@ export default {
             displayName: "Calculus BC",
             subjectsIncluded: [
               { displayName: "Pre-algebra", key: "prealgebra" },
-              { displayName: "Algebra 1", key: "algebra" },
-              { displayName: "Algebra 2", key: "algebra" },
+              { displayName: "Algebra 1", key: "algebraOne" },
+              { displayName: "Algebra 2", key: "algebraTwo" },
               { displayName: "Trigonometry", key: "trigonometry" },
               { displayName: "Precalculus", key: "precalculus" },
               { displayName: "Calculus AB", key: "calculusAB" },
