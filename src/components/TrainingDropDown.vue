@@ -307,7 +307,7 @@ a {
         width: 100px;
       }
       @include breakpoint-above("huge") {
-        min-width: 120px;
+        min-width: 125px;
       }
     }
   }
