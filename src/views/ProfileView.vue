@@ -72,10 +72,10 @@
       </div>
 
       <div v-if="user.isVolunteer" class="cert-info contain">
-        <div class="subheader">Certifications and Tutoring Topics</div>
+        <div class="subheader">Unlocked Subjects</div>
         <div class="container-content cert">
           <div
-            v-for="(value, key) in certifications"
+            v-for="(value, key) in subjects"
             :key="`certification-${key}-${value}`"
           >
             <div v-if="value" class="certBox">
@@ -160,17 +160,15 @@ export default {
       }
       return subtopicObj;
     },
-    certifications() {
+    subjects() {
       const user = this.$store.state.user.user;
 
-      const certifications = Object.keys(user.certifications).reduce(
+      const certifications = user.subjects.reduce(
         (displayObj, key) => {
           const subtopics = allSubtopics();
 
           if (subtopics[key]) {
-            if (user.certifications[key].passed) {
-              displayObj[subtopics[key].displayName || subtopics[key]] = true;
-            }
+            displayObj[subtopics[key].displayName || subtopics[key]] = true;
           }
 
           return displayObj;
