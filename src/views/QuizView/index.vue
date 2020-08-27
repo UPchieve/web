@@ -91,8 +91,10 @@ export default {
 
     if (category === "esl") {
       quizName = category.toUpperCase();
-    } else {
+    } else if (subtopics[category]) {
       quizName = subtopics[category].displayName;
+    } else {
+      quizName = category.charAt(0).toUpperCase() + category.slice(1);;
     }
 
     return {
