@@ -1,5 +1,5 @@
 <template>
-  <div v-if="user.isVolunteer" class="training">
+  <div v-if="user.isVolunteer" class="training-view">
     <div class="body-container">
       <div class="body-header">Volunteer Training and Certifications</div>
       <p class="instructions">
@@ -40,7 +40,7 @@
         sublabel="Complete at least 1 certification quiz in order to begin tutoring students"
         buttonSize="large"
       >
-        <training-drop-down
+        <subject-certs-drop-down
           :headers="['Certification', 'Included Subjects', 'Actions']"
           :certData="currentSubject.certifications"
         />
@@ -52,7 +52,7 @@
         buttonSize="large"
         v-if="currentSubject.additionalSubjects.length > 0"
       >
-        <training-drop-down
+        <additional-subjects-drop-down
           :headers="additionalSubjectsColHeaders"
           :certData="currentSubject.additionalSubjects"
         />
@@ -65,12 +65,16 @@
 import { mapState } from "vuex";
 import AccordionItem from "@/components/AccordionItem";
 import TrainingDropDown from "@/components/TrainingDropDown";
+import SubjectCertsDropDown from "@/components/SubjectCertsDropDown";
+import AdditionalSubjectsDropDown from "@/components/AdditionalSubjectsDropDown";
 
 export default {
   name: "Training",
   components: {
     AccordionItem,
-    TrainingDropDown
+    TrainingDropDown,
+    SubjectCertsDropDown,
+    AdditionalSubjectsDropDown
   },
   data() {
     return {
@@ -370,7 +374,7 @@ export default {
   }
 }
 
-.training {
+.training-view {
   padding: 10px;
 
   @include breakpoint-above("large") {

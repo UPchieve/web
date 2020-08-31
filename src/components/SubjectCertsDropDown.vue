@@ -17,38 +17,37 @@
           <span
             class="training__status"
             :class="{
-              'training__status--progress':
-                progressStatus(cert.key) === 'In progress',
-              'training__status--completed':
-                progressStatus(cert.key) === 'Completed'
+              'training__status--completed': isComplete(cert.key)
             }"
             >{{ progressStatus(cert.key) }}</span
           >
         </div>
-        <alert-icon v-if="!isComplete(cert.key)" class="alert-icon" />
       </div>
 
-      <div class="training__progress-bar" :key="`bar-${index}`">
-        <div
-          class="training__progress-bar--bg"
-          :style="{ width: progressBarNumber(cert.key) + '%' }"
+      <div
+        :key="`subjects-${cert.displayName}-${index}`"
+        class="training__subjects-included"
+      >
+        <span v-if="isLargeDevice" class="training__subjects-included--mobile"
+          >Included subjects:</span
         >
-          <span
-            class="training__progress-bar--number"
-            :class="{
-              'training__progress-bar--number-center':
-                progressBarNumber(cert.key) < 30
-            }"
-            >{{ progressBarNumber(cert.key) }}%</span
-          >
-        </div>
+        <span
+          v-for="subject in cert.subjectsIncluded"
+          :key="subject.displayName"
+          class="training__subjects-included--subject"
+          :class="{
+            'training__subjects-included--completed':
+              user.subjects.includes(subject.key) ||
+              hasCompletedIncludedSubject(subject.key)
+          }"
+          >{{ subject.displayName }}</span
+        >
       </div>
 
       <div class="action-btns" :key="`action-btns-${index}`">
         <router-link
-          :to="`/training/course/${cert.key}`"
+          :to="`/training/review/${cert.key}`"
           class="action-btns__review-link"
-          v-if="isComplete(cert.key)"
         >
           <span class="action-btns__review-link--text">Review</span>
           <arrow-icon class="action-btns__review-link--arrow-icon" />
@@ -57,9 +56,7 @@
         <large-button
           primary
           :showArrow="false"
-          :routeTo="
-            !isComplete(cert.key) ? `/training/course/${cert.key}` : null
-          "
+          :routeTo="!isComplete(cert.key) ? `/training/${cert.key}/quiz` : null"
           class="action-btns__quiz-btn"
           :disabled="isComplete(cert.key)"
         >
@@ -80,15 +77,13 @@ import { mapState } from "vuex";
 import CheckMark from "@/components/CheckMark";
 import LargeButton from "@/components/LargeButton";
 import ArrowIcon from "@/assets/arrow.svg";
-import AlertIcon from "@/assets/alert.svg";
 
 export default {
-  name: "TrainingDropDown",
+  name: "SubjectCertsDropDown",
   components: {
     CheckMark,
     LargeButton,
-    ArrowIcon,
-    AlertIcon
+    ArrowIcon
   },
   props: {
     headers: {
@@ -121,22 +116,12 @@ export default {
       return this.user.certifications[cert].passed;
     },
     progressStatus(cert) {
-      const { progress } = this.user.trainingCourses[cert];
-      if (progress === 0) return "Not started";
       if (this.isComplete(cert)) return "Completed";
-      return "In progress";
-    },
-    progressBarNumber(cert) {
-      const { progress, isComplete } = this.user.trainingCourses[cert];
-      // If user has not completed the course quiz show 99% in the progress bar
-      if (isComplete && !this.isComplete(cert)) return 99;
-      else return progress;
+      else return "Not started";
     },
     actionButtonText(cert) {
-      const { progress } = this.user.trainingCourses[cert];
-      if (progress === 0) return "Start course";
       if (this.isComplete(cert)) return "Complete";
-      return "Resume course";
+      else return "Start quiz";
     },
     // Checks if a user has completed a quiz for a subject when the subject hasn't been added to the user's subject property yet
     hasCompletedIncludedSubject(subject) {
@@ -153,9 +138,5 @@ a {
   color: inherit;
   text-decoration: none;
   cursor: pointer;
-}
-
-.alert-icon {
-  margin-left: 0.5em;
 }
 </style>
