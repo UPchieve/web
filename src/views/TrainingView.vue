@@ -161,7 +161,7 @@ export default {
           {
             displayName: "Integrated Math 1",
             subjectsIncluded: [
-              { displayName: "Algebra", key: "algebra" },
+              { displayName: "Algebra", key: "algebraOne" },
               { displayName: "Geometry", key: "geometry" },
               { displayName: "Statistics", key: "statistics" }
             ],
@@ -170,7 +170,7 @@ export default {
           {
             displayName: "Integrated Math 2",
             subjectsIncluded: [
-              { displayName: "Algebra", key: "algebra" },
+              { displayName: "Algebra", key: "algebraOne" },
               { displayName: "Geometry", key: "geometry" },
               { displayName: "Trigonometry", key: "trigonometry" },
               { displayName: "Statistics", key: "statistics" }
