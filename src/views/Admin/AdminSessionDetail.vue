@@ -94,6 +94,13 @@
       <h2 class="session-detail__section-title">Document</h2>
       <div class="quill-container"></div>
     </div>
+    <div
+      v-if="session.whiteboardDoc"
+      class="session-detail__section session-detail__section--whiteboard"
+    >
+      <h2 class="session-detail__section-title">Whiteboard</h2>
+      <div id="zwibbler-container"></div>
+    </div>
   </div>
 </template>
 
@@ -114,7 +121,8 @@ export default {
   data() {
     return {
       session: {},
-      quillEditor: null
+      quillEditor: null,
+      zwibblerCtx: null
     };
   },
 
@@ -173,6 +181,15 @@ export default {
         this.quillEditor = new Quill(container);
         this.quillEditor.enable(false);
         this.quillEditor.setContents(JSON.parse(this.session.quillDoc));
+      }
+
+      if (this.session.whiteboardDoc) {
+        this.zwibblerCtx = window.Zwibbler.create("zwibbler-container", {
+          showToolbar: false,
+          showColourPanel: false
+        });
+
+        this.zwibblerCtx.load(this.session.whiteboardDoc);
       }
     });
   }
@@ -258,5 +275,10 @@ export default {
     text-decoration: none;
     background: #f7fcfe;
   }
+}
+
+#zwibbler-container {
+  height: 500px;
+  width: 500px;
 }
 </style>
