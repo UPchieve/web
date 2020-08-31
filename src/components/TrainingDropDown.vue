@@ -112,6 +112,7 @@ import CheckMark from "@/components/CheckMark";
 import LargeButton from "@/components/LargeButton";
 import ArrowIcon from "@/assets/arrow.svg";
 import AlertIcon from "@/assets/alert.svg";
+import isIntegratedMath from "@/utils/is-integrated-math";
 
 export default {
   name: "TrainingDropDown",
@@ -168,6 +169,7 @@ export default {
     isComplete(cert) {
       if (this.user.certifications[cert])
         return this.user.certifications[cert].passed;
+      if (isIntegratedMath(cert)) return this.user.subjects.includes(cert);
 
       return false;
     },
@@ -203,7 +205,7 @@ export default {
     hasCompletedIncludedSubject(subject) {
       let cert = subject;
       if (subject.match(/^algebra/i)) cert = "algebra";
-      return this.user.certifications[cert].passed;
+      return this.isComplete(cert);
     }
   }
 };
