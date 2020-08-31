@@ -64,7 +64,9 @@
           :key="subject.displayName"
           class="training__subjects-included--subject"
           :class="{
-            'training__subjects-included--completed': isComplete(subject.key)
+            'training__subjects-included--completed':
+              user.subjects.includes(subject.key) ||
+              hasCompletedIncludedSubject(subject.key)
           }"
           >{{ subject.displayName }}</span
         >
@@ -164,33 +166,31 @@ export default {
       return true;
     },
     isComplete(cert) {
-      if (this.trainingCourse) {
+      if (this.user.certifications[cert])
         return this.user.certifications[cert].passed;
-      }
-      return this.user.subjects.some(sub => sub.indexOf(cert) >= 0);
+
+      return false;
     },
     progressStatus(cert) {
       if (this.trainingCourse) {
         const { progress } = this.user.trainingCourses[cert];
         if (progress === 0) return "Not started";
-        if (this.user.certifications[cert].passed) return "Completed";
+        if (this.isComplete(cert)) return "Completed";
         return "In progress";
       }
 
-      if (this.user.subjects.some(sub => sub.indexOf(cert) >= 0))
-        return "Completed";
+      if (this.isComplete(cert)) return "Completed";
       else return "Not started";
     },
     actionButtonText(cert) {
       if (this.trainingCourse) {
         const { progress } = this.user.trainingCourses[cert];
         if (progress === 0) return "Start course";
-        if (this.user.certifications[cert].passed) return "Complete";
+        if (this.isComplete(cert)) return "Complete";
         return "Resume course";
       }
 
-      if (this.user.subjects.some(sub => sub.indexOf(cert) >= 0))
-        return "Complete";
+      if (this.isComplete(cert)) return "Complete";
       else return "Start quiz";
     },
     progressBarNumber(cert) {
@@ -198,6 +198,12 @@ export default {
       // If user has not completed the course quiz show 99% in the progress bar
       if (isComplete && !this.user.certifications[cert].passed) return 99;
       else return progress;
+    },
+    // Checks if a user has completed a quiz for a subject when the subject hasn't been added to the user's subject property yet
+    hasCompletedIncludedSubject(subject) {
+      let cert = subject;
+      if (subject.match(/^algebra/i)) cert = "algebra";
+      return this.user.certifications[cert].passed;
     }
   }
 };
