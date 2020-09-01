@@ -535,14 +535,14 @@ export default {
       } else {
         const { deltaX, deltaY } = event;
         const rect = this.zwibblerCtx.getViewRectangle();
-        
+
         // Pan along x-axis
         if (deltaX < 0 && rect.x > -500) rect.x += deltaX;
-        else if (deltaX > 0 && (rect.x + rect.width) < 2000) rect.x += deltaX;
+        else if (deltaX > 0 && rect.x + rect.width < 2000) rect.x += deltaX;
 
         // Pan along y-axis
         if (deltaY < 0 && rect.y > -500) rect.y += deltaY;
-        else if (deltaY > 0 && (rect.y + rect.height) < 2000) rect.y += deltaY;
+        else if (deltaY > 0 && rect.y + rect.height < 2000) rect.y += deltaY;
 
         this.zwibblerCtx.setViewRectangle(rect);
       }
