@@ -527,11 +527,9 @@ export default {
         const canvasScale = this.zwibblerCtx.getCanvasScale();
         const { deltaY } = event;
         if (deltaY > 0) {
-          if (canvasScale >= this.minZoom)
-            this.zwibblerCtx.zoomOut();
+          if (canvasScale >= this.minZoom) this.zwibblerCtx.zoomOut();
         } else if (deltaY < 0) {
-          if (canvasScale < this.maxZoom)
-            this.zwibblerCtx.zoomIn();
+          if (canvasScale < this.maxZoom) this.zwibblerCtx.zoomIn();
         }
       } else {
         const { deltaX, deltaY } = event;
@@ -546,11 +544,9 @@ export default {
       const canvasScale = this.zwibblerCtx.getCanvasScale();
       const { scale } = event;
       if (scale > this.previousScale) {
-        if (canvasScale < this.maxZoom)
-          this.zwibblerCtx.zoomIn();
+        if (canvasScale < this.maxZoom) this.zwibblerCtx.zoomIn();
       } else if (scale < this.previousScale) {
-        if (canvasScale >= this.minZoom)
-          this.zwibblerCtx.zoomOut();
+        if (canvasScale >= this.minZoom) this.zwibblerCtx.zoomOut();
       }
       this.previousScale = scale;
     }
