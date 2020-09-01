@@ -280,7 +280,7 @@ export default {
       autoPickTool: false,
       autoPickToolText: false,
       defaultBrushWidth: 5,
-      allowZoom: false,
+      allowZoom: this.mobileMode,
       defaultSmoothness: "sharpest",
       multilineText: true,
       scrollbars: false,
