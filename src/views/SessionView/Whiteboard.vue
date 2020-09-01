@@ -284,6 +284,7 @@ export default {
       defaultSmoothness: "sharpest",
       multilineText: true,
       scrollbars: false,
+      background: "grid",
       collaborationServer: `${
         process.env.VUE_APP_WEBSOCKET_ROOT
       }/whiteboard/room/{name}`
