@@ -438,6 +438,9 @@ export default {
 
         this.insertPhoto(imageUrl);
       }
+
+      // Reset the file input
+      event.target.value = "";
     },
     openFileDialog() {
       document.querySelector(".upload-photo").click();
