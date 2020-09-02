@@ -286,7 +286,7 @@ export default {
     this.zwibblerCtx = zwibblerCtx;
 
     // Set paper size
-    this.zwibblerCtx.setPaperSize(1000, 3000);
+    this.zwibblerCtx.setPaperSize(1000, 2000);
 
     // Zoom to full width
     this.zwibblerCtx.setViewRectangle({ x: 0, y: 0, width: 1000, height: 1 });
