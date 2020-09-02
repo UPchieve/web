@@ -4,15 +4,6 @@
     <div id="toolbar" class="toolbar">
       <p v-if="error" class="whiteboard-error">{{ error }}</p>
       <div
-        class="toolbar-item toolbar-item--drag"
-        title="Drag tool"
-        v-bind:class="selectedTool === 'pan' ? 'selected-tool' : ''"
-        v-if="!mobileMode"
-        @click="usePanTool"
-      >
-        <PanIcon class="toolbar-item__svg" />
-      </div>
-      <div
         class="toolbar-item toolbar-item--pick"
         title="Pick tool"
         v-bind:class="selectedTool === 'pick' ? 'selected-tool' : ''"
@@ -172,7 +163,6 @@ import ColorPickerIcon from "@/assets/whiteboard_icons/color_picker.svg";
 import PenIcon from "@/assets/whiteboard_icons/pen.svg";
 import UndoIcon from "@/assets/whiteboard_icons/undo.svg";
 import RedoIcon from "@/assets/whiteboard_icons/redo.svg";
-import PanIcon from "@/assets/whiteboard_icons/grab.svg";
 import DeleteSelectionIcon from "@/assets/whiteboard_icons/delete_selection.png";
 import RotateIcon from "@/assets/whiteboard_icons/rotate.png";
 import PhotoUploadIcon from "@/assets/whiteboard_icons/photo-upload.svg";
@@ -192,7 +182,6 @@ export default {
     PenIcon,
     UndoIcon,
     RedoIcon,
-    PanIcon,
     PhotoUploadIcon,
     ShapesIcon,
     TextIcon,
@@ -240,7 +229,6 @@ export default {
     toolClass() {
       if (this.selectedTool === "brush") return "zwib-wrapper--brush";
       if (this.selectedTool === "pick") return "zwib-wrapper--pick";
-      if (this.selectedTool === "pan") return "zwib-wrapper--pan";
       if (this.selectedTool === "line") return "zwib-wrapper--line";
       if (this.selectedTool === "circle") return "zwib-wrapper--circle";
       if (this.selectedTool === "rectangle") return "zwib-wrapper--rectangle";
@@ -373,9 +361,6 @@ export default {
     });
   },
   methods: {
-    usePanTool() {
-      this.zwibblerCtx.usePanTool();
-    },
     usePickTool() {
       this.zwibblerCtx.usePickTool();
     },
@@ -535,31 +520,20 @@ export default {
     },
     trackpadListener(event) {
       event.preventDefault();
-      // zoom in and out when pinching trackpad
-      // otherwise pan the whiteboard
-      if (event.ctrlKey) {
-        const canvasScale = this.zwibblerCtx.getCanvasScale();
-        const { deltaY } = event;
-        if (deltaY > 0) {
-          if (canvasScale >= this.minZoom) this.zwibblerCtx.zoomOut();
-        } else if (deltaY < 0) {
-          if (canvasScale < this.maxZoom) this.zwibblerCtx.zoomIn();
-        }
-      } else {
-        const { deltaY } = event;
-        const rect = this.zwibblerCtx.getViewRectangle();
 
-        // Pan up
-        if (deltaY < 0 && rect.y > 0) rect.y += deltaY;
-        // Pan down
-        else if (deltaY > 0 && rect.y + rect.height < 3000) rect.y += deltaY;
+      const { deltaY } = event;
+      const rect = this.zwibblerCtx.getViewRectangle();
 
-        // correct for over-scrolling
-        if (rect.y < 0) rect.y = 0;
-        else if (rect.y + rect.height > 3000) rect.y = 3000 - rect.height;
+      // Scroll up
+      if (deltaY < 0 && rect.y > 0) rect.y += deltaY;
+      // Scroll down
+      else if (deltaY > 0 && rect.y + rect.height < 3000) rect.y += deltaY;
 
-        this.zwibblerCtx.setViewRectangle(rect);
-      }
+      // correct for over-scrolling
+      if (rect.y < 0) rect.y = 0;
+      else if (rect.y + rect.height > 3000) rect.y = 3000 - rect.height;
+
+      this.zwibblerCtx.setViewRectangle(rect);
     },
     safariTrackpadZoom(event) {
       event.preventDefault();
@@ -625,12 +599,6 @@ export default {
   &--pick {
     .zwibbler-canvas-holder {
       cursor: default !important;
-    }
-  }
-
-  &--pan {
-    .zwibbler-canvas-holder {
-      cursor: grab !important;
     }
   }
 
