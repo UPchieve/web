@@ -210,8 +210,6 @@ export default {
       showShapes: false,
       // used to determine the beginning and end node of a shape
       shapeNodes: [],
-      // default scale factor for safari trackpad
-      previousScale: 1,
       isLoading: false,
       minZoom: 0.5,
       maxZoom: 2.5
@@ -326,16 +324,6 @@ export default {
     if (!this.mobileMode) {
       const zwibblerContainer = this.$refs.zwibDiv;
       zwibblerContainer.addEventListener("wheel", this.trackpadListener, false);
-      // Safari doesn't register wheel events for the trackpad pinch
-      zwibblerContainer.addEventListener(
-        "gesturestart",
-        this.safariTrackpadZoom
-      );
-      zwibblerContainer.addEventListener(
-        "gesturechange",
-        this.safariTrackpadZoom
-      );
-      zwibblerContainer.addEventListener("gestureend", this.safariTrackpadZoom);
     }
 
     this.zwibblerCtx.on("document-changed", info => {
@@ -537,17 +525,6 @@ export default {
       else if (rect.y + rect.height > 3000) rect.y = 3000 - rect.height;
 
       this.zwibblerCtx.setViewRectangle(rect);
-    },
-    safariTrackpadZoom(event) {
-      event.preventDefault();
-      const canvasScale = this.zwibblerCtx.getCanvasScale();
-      const { scale } = event;
-      if (scale > this.previousScale) {
-        if (canvasScale < this.maxZoom) this.zwibblerCtx.zoomIn();
-      } else if (scale < this.previousScale) {
-        if (canvasScale >= this.minZoom) this.zwibblerCtx.zoomOut();
-      }
-      this.previousScale = scale;
     }
   },
   beforeDestroy() {
@@ -557,18 +534,6 @@ export default {
         "wheel",
         this.trackpadListener,
         false
-      );
-      zwibblerContainer.removeEventListener(
-        "gesturestart",
-        this.safariTrackpadZoom
-      );
-      zwibblerContainer.removeEventListener(
-        "gesturechange",
-        this.safariTrackpadZoom
-      );
-      zwibblerContainer.removeEventListener(
-        "gestureend",
-        this.safariTrackpadZoom
       );
     }
   },
