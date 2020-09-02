@@ -7,7 +7,7 @@
       <session-header @try-clicked="tryClicked" />
     </div>
     <div
-      v-if="session._id"
+      v-if="sessionId"
       class="session-contents-container"
       v-bind:class="{
         'session-contents-container--mobile': mobileMode
@@ -22,6 +22,7 @@
       >
         <whiteboard
           v-if="auxiliaryType === 'WHITEBOARD'"
+          :sessionId="sessionId"
           :isWhiteboardOpen="auxiliaryOpen"
           :toggleWhiteboard="toggleAuxiliary"
           ref="whiteboard"
@@ -103,7 +104,8 @@ export default {
    */
   data() {
     return {
-      auxiliaryOpen: false
+      auxiliaryOpen: false,
+      sessionId: null
     };
   },
   computed: {
@@ -186,6 +188,7 @@ export default {
 
     promise
       .then(sessionId => {
+        this.sessionId = sessionId;
         // ensure we restore user when we get a successful response
         if (!this.isAuthenticated) {
           this.$store.dispatch("user/fetchUser");

@@ -203,6 +203,10 @@ export default {
     Loader
   },
   props: {
+    sessionId: {
+      type: String,
+      required: true
+    },
     isWhiteboardOpen: {
       type: Boolean,
       required: true
@@ -229,7 +233,6 @@ export default {
   },
   computed: {
     ...mapState({
-      session: state => state.user.session,
       isMobileApp: state => state.app.isMobileApp
     }),
     ...mapGetters({
@@ -290,7 +293,7 @@ export default {
     this.zwibblerCtx = zwibblerCtx;
 
     // Join or create shared zwibbler session
-    this.zwibblerCtx.joinSharedSession(this.session._id, true);
+    this.zwibblerCtx.joinSharedSession(this.sessionId, true);
 
     // Set up custom selection handles
     this.setSelectionHandles();
@@ -424,7 +427,7 @@ export default {
       this.usePickTool();
 
       const response = await NetworkService.getSessionPhotoUploadUrl(
-        this.session._id
+        this.sessionId
       );
       const {
         body: { uploadUrl, imageUrl }
