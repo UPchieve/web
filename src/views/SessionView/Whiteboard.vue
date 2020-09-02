@@ -86,7 +86,7 @@
         @click="toggleColorPicker"
       >
         <ColorPickerIcon
-          class="toolbar-item__svg  toolbar-item__svg--color-picker"
+          class="toolbar-item__svg toolbar-item__svg--color-picker"
         />
         <div v-if="showColorPicker" class="color-bar">
           <div
@@ -142,7 +142,7 @@
         <input
           type="file"
           class="upload-photo"
-          accept="image/jpg, image/png"
+          accept="image/*"
           @change="uploadPhoto"
         />
         <PhotoUploadIcon class="toolbar-item__svg--photo" />
@@ -183,6 +183,7 @@ import RectangleIcon from "@/assets/whiteboard_icons/rectangle.svg";
 import TriangleIcon from "@/assets/whiteboard_icons/triangle.svg";
 import LineIcon from "@/assets/whiteboard_icons/line.svg";
 import Loader from "@/components/Loader";
+import * as Sentry from "@sentry/browser";
 
 export default {
   components: {
@@ -275,7 +276,7 @@ export default {
       }, 2000);
     }
   },
-  mounted() {
+  async mounted() {
     const zwibblerCtx = window.Zwibbler.create("zwib-div", {
       showToolbar: false,
       showColourPanel: false,
@@ -293,7 +294,11 @@ export default {
     this.zwibblerCtx = zwibblerCtx;
 
     // Join or create shared zwibbler session
-    this.zwibblerCtx.joinSharedSession(this.sessionId, true);
+    try {
+      await this.zwibblerCtx.joinSharedSession(this.sessionId, true);
+    } catch (error) {
+      Sentry.captureException(error);
+    }
 
     // Set up custom selection handles
     this.setSelectionHandles();
@@ -341,7 +346,6 @@ export default {
       const isRemoteChange = info && info.remote;
       const isWhiteboardHidden = this.mobileMode && !this.isWhiteboardOpen;
       const shouldResizeView = isRemoteChange && isWhiteboardHidden;
-
       /**
        * If mobile user is viewing chat when new whiteboard changes are made,
        * resize the view so they can see everything on the whiteboard
@@ -436,7 +440,9 @@ export default {
       if (uploadUrl) {
         this.isLoading = true;
         await axios.put(uploadUrl, file, {
-          "Content-Type": file.type
+          headers: {
+            "Content-Type": file.type
+          }
         });
 
         this.insertPhoto(imageUrl);
