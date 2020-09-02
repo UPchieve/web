@@ -303,6 +303,9 @@ export default {
       // Set brush tool to default tool
       this.useBrushTool();
 
+      // Zoom to full width
+      this.zwibblerCtx.setViewRectangle({ x: 0, y: 0, width: 1000, height: 1 });
+
       // Don't start setting selected tool until connected
       this.zwibblerCtx.on("tool-changed", toolname => {
         this.selectedTool = toolname;
