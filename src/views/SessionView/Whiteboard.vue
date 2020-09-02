@@ -142,7 +142,7 @@
         <input
           type="file"
           class="upload-photo"
-          accept="image/jpeg, image/png"
+          accept="image/*"
           @change="uploadPhoto"
         />
         <PhotoUploadIcon class="toolbar-item__svg--photo" />
