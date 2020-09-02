@@ -437,7 +437,9 @@ export default {
       if (uploadUrl) {
         this.isLoading = true;
         await axios.put(uploadUrl, file, {
-          "Content-Type": file.type
+          headers: {
+            "Content-Type": file.type
+          }
         });
 
         this.insertPhoto(imageUrl);
