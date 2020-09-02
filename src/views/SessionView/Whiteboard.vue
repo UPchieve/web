@@ -284,6 +284,7 @@ export default {
       defaultSmoothness: "sharpest",
       multilineText: true,
       scrollbars: false,
+      background: "grid",
       collaborationServer: `${
         process.env.VUE_APP_WEBSOCKET_ROOT
       }/whiteboard/room/{name}`
@@ -534,8 +535,17 @@ export default {
       } else {
         const { deltaX, deltaY } = event;
         const rect = this.zwibblerCtx.getViewRectangle();
-        rect.x += deltaX;
-        rect.y += deltaY;
+
+        // Pan left
+        if (deltaX < 0 && rect.x > -500) rect.x += deltaX;
+        // Pan right
+        else if (deltaX > 0 && rect.x + rect.width < 2000) rect.x += deltaX;
+
+        // Pan up
+        if (deltaY < 0 && rect.y > -500) rect.y += deltaY;
+        // Pan down
+        else if (deltaY > 0 && rect.y + rect.height < 2000) rect.y += deltaY;
+
         this.zwibblerCtx.setViewRectangle(rect);
       }
     },
