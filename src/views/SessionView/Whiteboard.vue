@@ -268,7 +268,7 @@ export default {
       autoPickTool: false,
       autoPickToolText: false,
       defaultBrushWidth: 5,
-      allowZoom: false,
+      allowZoom: this.mobileMode,
       pageView: true,
       pageInflation: 0,
       pageShadow: false,
