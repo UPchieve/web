@@ -280,7 +280,11 @@ export default {
       autoPickTool: false,
       autoPickToolText: false,
       defaultBrushWidth: 5,
-      allowZoom: this.mobileMode,
+      allowZoom: false,
+      pageView: true,
+      pageInflation: 0,
+      pageShadow: false,
+      outsidePageColour: "#fff",
       defaultSmoothness: "sharpest",
       multilineText: true,
       scrollbars: false,
@@ -291,6 +295,12 @@ export default {
     });
 
     this.zwibblerCtx = zwibblerCtx;
+
+    // Set paper size
+    this.zwibblerCtx.setPaperSize(1000, 3000);
+
+    // Zoom to full width
+    this.zwibblerCtx.setViewRectangle({ x: 0, y: 0, width: 1000, height: 1 });
 
     // Join or create shared zwibbler session
     this.zwibblerCtx.joinSharedSession(this.session._id, true);
@@ -527,7 +537,7 @@ export default {
       event.preventDefault();
       // zoom in and out when pinching trackpad
       // otherwise pan the whiteboard
-      if (event.ctrlKey || this.selectedTool === "pan") {
+      if (event.ctrlKey) {
         const canvasScale = this.zwibblerCtx.getCanvasScale();
         const { deltaY } = event;
         if (deltaY > 0) {
@@ -536,18 +546,17 @@ export default {
           if (canvasScale < this.maxZoom) this.zwibblerCtx.zoomIn();
         }
       } else {
-        const { deltaX, deltaY } = event;
+        const { deltaY } = event;
         const rect = this.zwibblerCtx.getViewRectangle();
 
-        // Pan left
-        if (deltaX < 0 && rect.x > -500) rect.x += deltaX;
-        // Pan right
-        else if (deltaX > 0 && rect.x + rect.width < 2000) rect.x += deltaX;
-
         // Pan up
-        if (deltaY < 0 && rect.y > -500) rect.y += deltaY;
+        if (deltaY < 0 && rect.y > 0) rect.y += deltaY;
         // Pan down
-        else if (deltaY > 0 && rect.y + rect.height < 2000) rect.y += deltaY;
+        else if (deltaY > 0 && rect.y + rect.height < 3000) rect.y += deltaY;
+
+        // correct for over-scrolling
+        if (rect.y < 0) rect.y = 0;
+        else if (rect.y + rect.height > 3000) rect.y = 3000 - rect.height;
 
         this.zwibblerCtx.setViewRectangle(rect);
       }
