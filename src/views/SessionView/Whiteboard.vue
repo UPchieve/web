@@ -529,7 +529,7 @@ export default {
       this.zwibblerCtx.addSelectionHandle(1.0, 0.5, 0, 0, "", "scale");
       this.zwibblerCtx.addSelectionHandle(0.5, 1.0, 0, 0, "", "scale");
       this.zwibblerCtx.addSelectionHandle(0.0, 0.5, 0, 0, "", "scale");
-    },
+    }
   },
   beforeDestroy() {
     window.removeEventListener(
