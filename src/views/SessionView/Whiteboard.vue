@@ -270,14 +270,14 @@ export default {
       autoPickTool: false,
       autoPickToolText: false,
       defaultBrushWidth: 5,
-      allowZoom: this.mobileMode,
+      allowZoom: false,
       pageView: true,
       pageInflation: 0,
       pageShadow: false,
       outsidePageColour: "#fff",
       defaultSmoothness: "sharpest",
       multilineText: true,
-      scrollbars: false,
+      scrollbars: true,
       defaultFontSize: 32,
       background: "grid",
       collaborationServer: `${
@@ -339,11 +339,6 @@ export default {
       if (this.isShapeSelected) this.shapeNodes.push(nodes[0]);
       if (this.selectedTool === "text") this.usePickTool();
     });
-
-    if (!this.mobileMode) {
-      const zwibblerContainer = this.$refs.zwibDiv;
-      zwibblerContainer.addEventListener("wheel", this.trackpadListener, false);
-    }
 
     this.zwibblerCtx.on("document-changed", info => {
       const isRemoteChange = info && info.remote;
@@ -528,35 +523,6 @@ export default {
       this.zwibblerCtx.addSelectionHandle(1.0, 0.5, 0, 0, "", "scale");
       this.zwibblerCtx.addSelectionHandle(0.5, 1.0, 0, 0, "", "scale");
       this.zwibblerCtx.addSelectionHandle(0.0, 0.5, 0, 0, "", "scale");
-    },
-    trackpadListener(event) {
-      event.preventDefault();
-
-      const { deltaY } = event;
-      const rect = this.zwibblerCtx.getViewRectangle();
-
-      // Scroll up
-      if (deltaY < 0 && rect.y > 0) rect.y += deltaY;
-      // Scroll down
-      else if (deltaY > 0 && rect.y + rect.height < this.canvasHeight)
-        rect.y += deltaY;
-
-      // correct for over-scrolling
-      if (rect.y < 0) rect.y = 0;
-      else if (rect.y + rect.height > this.canvasHeight)
-        rect.y = this.canvasHeight - rect.height;
-
-      this.zwibblerCtx.setViewRectangle(rect);
-    }
-  },
-  beforeDestroy() {
-    if (!this.mobileMode) {
-      const zwibblerContainer = this.$refs.zwibDiv;
-      zwibblerContainer.removeEventListener(
-        "wheel",
-        this.trackpadListener,
-        false
-      );
     }
   },
   watch: {
