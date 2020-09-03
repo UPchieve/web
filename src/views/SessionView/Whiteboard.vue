@@ -335,6 +335,12 @@ export default {
       false
     );
 
+    window.addEventListener(
+      "resize",
+      this.handleWindowResize,
+      false
+    );
+
     if (!this.mobileMode) {
       const zwibblerContainer = this.$refs.zwibDiv;
       zwibblerContainer.addEventListener("wheel", this.trackpadListener, false);
@@ -375,6 +381,9 @@ export default {
     },
     handleOrientationChange() {
       setTimeout(this.resizeViewRectangle, 100);
+    },
+    handleWindowResize() {
+      setTimeout(this.resizeViewRectangle, 1000);
     },
     usePickTool() {
       this.zwibblerCtx.usePickTool();
@@ -559,6 +568,11 @@ export default {
     window.removeEventListener(
       "orientationchange",
       this.handleOrientationChange,
+      false
+    );
+    window.removeEventListener(
+      "resize",
+      this.handleWindowResize,
       false
     );
     if (!this.mobileMode) {
