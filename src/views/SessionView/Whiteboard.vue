@@ -215,8 +215,8 @@ export default {
       // used to determine the beginning and end node of a shape
       shapeNodes: [],
       isLoading: false,
-      minZoom: 0.5,
-      maxZoom: 2.5
+      canvasHeight: 2500,
+      canvasWidth: 1000
     };
   },
   computed: {
@@ -286,10 +286,15 @@ export default {
     this.zwibblerCtx = zwibblerCtx;
 
     // Set paper size
-    this.zwibblerCtx.setPaperSize(1000, 2000);
+    this.zwibblerCtx.setPaperSize(this.canvasWidth, this.canvasHeight);
 
     // Zoom to full width
-    this.zwibblerCtx.setViewRectangle({ x: 0, y: 0, width: 1000, height: 1 });
+    this.zwibblerCtx.setViewRectangle({
+      x: 0,
+      y: 0,
+      width: this.canvasWidth,
+      height: 1
+    });
 
     // Join or create shared zwibbler session
     this.zwibblerCtx.joinSharedSession(this.sessionId, true);
@@ -305,7 +310,12 @@ export default {
       this.useBrushTool();
 
       // Zoom to full width
-      this.zwibblerCtx.setViewRectangle({ x: 0, y: 0, width: 1000, height: 1 });
+      this.zwibblerCtx.setViewRectangle({
+        x: 0,
+        y: 0,
+        width: this.canvasWidth,
+        height: 1
+      });
 
       // Don't start setting selected tool until connected
       this.zwibblerCtx.on("tool-changed", toolname => {
@@ -521,11 +531,13 @@ export default {
       // Scroll up
       if (deltaY < 0 && rect.y > 0) rect.y += deltaY;
       // Scroll down
-      else if (deltaY > 0 && rect.y + rect.height < 3000) rect.y += deltaY;
+      else if (deltaY > 0 && rect.y + rect.height < this.canvasHeight)
+        rect.y += deltaY;
 
       // correct for over-scrolling
       if (rect.y < 0) rect.y = 0;
-      else if (rect.y + rect.height > 3000) rect.y = 3000 - rect.height;
+      else if (rect.y + rect.height > this.canvasHeight)
+        rect.y = this.canvasHeight - rect.height;
 
       this.zwibblerCtx.setViewRectangle(rect);
     }
