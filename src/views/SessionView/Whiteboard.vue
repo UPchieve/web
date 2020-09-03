@@ -216,7 +216,7 @@ export default {
       // used to determine the beginning and end node of a shape
       shapeNodes: [],
       isLoading: false,
-      canvasHeight: 2500,
+      canvasHeight: 2800,
       canvasWidth: 1000
     };
   },
