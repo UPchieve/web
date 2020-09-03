@@ -214,7 +214,7 @@ export default {
     },
 
     showUpchieve101Notice() {
-      if (!user.isApproved || !user.isOnboarded) return false;
+      if (!this.user.isApproved || !this.user.isOnboarded) return false;
       if (this.user.certifications.upchieve101.passed) return false;
       return new Date(this.user.createdAt) < new Date("9/8/20");
     },
