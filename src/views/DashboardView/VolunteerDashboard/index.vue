@@ -10,6 +10,13 @@
       >
     </dashboard-banner>
 
+    <div v-if="showUpchieve101Notice" class="dashboard-notice">
+      <router-link to="training/course/upchieve101"
+        >Reminder: Please complete UPchieve 101 before October 1st
+        →</router-link
+      >
+    </div>
+
     <div class="volunteer-dashboard__body">
       <template v-if="user.isApproved && user.isOnboarded">
         <div class="dashboard-card">
@@ -204,6 +211,12 @@ export default {
 
     isNewVolunteer() {
       return !this.user.pastSessions || !this.user.pastSessions.length;
+    },
+
+    showUpchieve101Notice() {
+      if (!user.isApproved || !user.isOnboarded) return false;
+      if (this.user.certifications.upchieve101.passed) return false;
+      return new Date(this.user.createdAt) < new Date("9/8/20");
     },
 
     photoIdAction() {
@@ -681,6 +694,24 @@ export default {
   &__stat-value {
     font-weight: bold;
     text-align: right;
+  }
+}
+
+.dashboard-notice {
+  padding: 15px;
+  background: $c-warning-orange;
+  border-radius: 8px;
+  margin: 20px 0 -20px;
+  font-weight: 500;
+  font-size: 16px;
+
+  a {
+    color: #fff;
+
+    &:hover {
+      color: #f3f3f3;
+      text-decoration: none;
+    }
   }
 }
 </style>
