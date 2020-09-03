@@ -335,11 +335,7 @@ export default {
       false
     );
 
-    window.addEventListener(
-      "resize",
-      this.handleWindowResize,
-      false
-    );
+    window.addEventListener("resize", this.handleWindowResize, false);
 
     if (!this.mobileMode) {
       const zwibblerContainer = this.$refs.zwibDiv;
@@ -570,11 +566,7 @@ export default {
       this.handleOrientationChange,
       false
     );
-    window.removeEventListener(
-      "resize",
-      this.handleWindowResize,
-      false
-    );
+    window.removeEventListener("resize", this.handleWindowResize, false);
     if (!this.mobileMode) {
       const zwibblerContainer = this.$refs.zwibDiv;
       zwibblerContainer.removeEventListener(
