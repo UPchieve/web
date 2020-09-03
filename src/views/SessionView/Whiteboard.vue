@@ -335,11 +335,7 @@ export default {
       false
     );
 
-    window.addEventListener(
-      "resize",
-      this.handleWindowResize,
-      false
-    );
+    window.addEventListener("resize", this.handleWindowResize, false);
 
     this.zwibblerCtx.on("document-changed", info => {
       const isRemoteChange = info && info.remote;
@@ -546,11 +542,7 @@ export default {
       this.handleOrientationChange,
       false
     );
-    window.removeEventListener(
-      "resize",
-      this.handleWindowResize,
-      false
-    );
+    window.removeEventListener("resize", this.handleWindowResize, false);
   },
   watch: {
     shapeNodes() {
