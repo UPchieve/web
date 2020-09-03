@@ -119,11 +119,13 @@ export default {
             ],
             key: "trigonometry"
           },
-          // {
-          //   displayName: "Statistics",
-          //   subjectsIncluded: [{ displayName: "Statistics", key: "statistics" }],
-          //   key: "statistics"
-          // },
+          {
+            displayName: "Statistics",
+            subjectsIncluded: [
+              { displayName: "Statistics", key: "statistics" }
+            ],
+            key: "statistics"
+          },
           {
             displayName: "Precalculus",
             subjectsIncluded: [
@@ -219,23 +221,22 @@ export default {
             displayName: "Physics 1",
             subjectsIncluded: [{ displayName: "Physics 1", key: "physicsOne" }],
             key: "physicsOne"
+          },
+          {
+            displayName: "Physics 2",
+            subjectsIncluded: [{ displayName: "Physics 2", key: "physicsTwo" }],
+            key: "physicsTwo"
+          },
+          {
+            displayName: "Environmental Science",
+            subjectsIncluded: [
+              {
+                displayName: "Environmental Science",
+                key: "environmentalScience"
+              }
+            ],
+            key: "environmentalScience"
           }
-          // @note: temporarily hidden
-          // {
-          //   displayName: "Physics 2",
-          //   subjectsIncluded: [{ displayName: "Physics 2", key: "physicsTwo" }],
-          //   key: "physicsTwo"
-          // },
-          // {
-          //   displayName: "Environmental Science",
-          //   subjectsIncluded: [
-          //     {
-          //       displayName: "Environmental Science",
-          //       key: "environmentalScience"
-          //     }
-          //   ],
-          //   key: "environmentalScience"
-          // }
         ],
         additionalSubjects: []
       },

@@ -6,6 +6,7 @@ export const topics = {
       algebraTwo: { displayName: "Algebra 2" },
       geometry: { displayName: "Geometry" },
       trigonometry: { displayName: "Trigonometry" },
+      statistics: { displayName: "Statistics" },
       precalculus: { displayName: "Precalculus" },
       calculusAB: { displayName: "Calculus AB" },
       calculusBC: { displayName: "Calculus BC" },
@@ -20,7 +21,9 @@ export const topics = {
     subtopics: {
       biology: { displayName: "Biology" },
       chemistry: { displayName: "Chemistry" },
-      physicsOne: { displayName: "Physics 1" }
+      physicsOne: { displayName: "Physics 1" },
+      physicsTwo: { displayName: "Physics 2" },
+      environmentalScience: { displayName: "Environmental Science" }
     },
     displayName: "Science Tutoring"
   },
