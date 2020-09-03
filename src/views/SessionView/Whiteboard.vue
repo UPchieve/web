@@ -278,6 +278,7 @@ export default {
       defaultSmoothness: "sharpest",
       multilineText: true,
       scrollbars: false,
+      defaultFontSize: 32,
       background: "grid",
       collaborationServer: `${
         process.env.VUE_APP_WEBSOCKET_ROOT
