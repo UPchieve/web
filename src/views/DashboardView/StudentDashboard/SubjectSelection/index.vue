@@ -68,8 +68,21 @@ export default {
         };
       });
 
-    // Temporarily hide Physics from students
-    cards[1].subtopics = ["biology", "chemistry"];
+    // Temporarily hide Statistics and Calculus BC from students
+    cards[0].subtopics = cards[0].subtopics.filter(subject => {
+      const temporarilyHiddenSubjects = ["statistics", "calculusBC"];
+      return !temporarilyHiddenSubjects.includes(subject);
+    });
+
+    // Temporarily hide Physics subjects and Environmental Science from students
+    cards[1].subtopics = cards[1].subtopics.filter(subject => {
+      const temporarilyHiddenSubjects = [
+        "physicsOne",
+        "physicsTwo",
+        "environmentalScience"
+      ];
+      return !temporarilyHiddenSubjects.includes(subject);
+    });
 
     cards.push({
       title: "Invite Your Friends",
