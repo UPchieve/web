@@ -291,12 +291,7 @@ export default {
     this.zwibblerCtx.setPaperSize(this.canvasWidth, this.canvasHeight);
 
     // Zoom to full width
-    this.zwibblerCtx.setViewRectangle({
-      x: 0,
-      y: 0,
-      width: this.canvasWidth,
-      height: 1
-    });
+    this.resizeViewRectangle();
 
     // Join or create shared zwibbler session
     try {
@@ -315,13 +310,7 @@ export default {
       // Set brush tool to default tool
       this.useBrushTool();
 
-      // Zoom to full width
-      this.zwibblerCtx.setViewRectangle({
-        x: 0,
-        y: 0,
-        width: this.canvasWidth,
-        height: 1
-      });
+      this.resizeViewRectangle();
 
       // Don't start setting selected tool until connected
       this.zwibblerCtx.on("tool-changed", toolname => {
@@ -339,6 +328,12 @@ export default {
       if (this.isShapeSelected) this.shapeNodes.push(nodes[0]);
       if (this.selectedTool === "text") this.usePickTool();
     });
+
+    window.addEventListener(
+      "orientationchange",
+      this.handleOrientationChange,
+      false
+    );
 
     this.zwibblerCtx.on("document-changed", info => {
       const isRemoteChange = info && info.remote;
@@ -365,6 +360,17 @@ export default {
     });
   },
   methods: {
+    resizeViewRectangle() {
+      this.zwibblerCtx.setViewRectangle({
+        x: 0,
+        y: 0,
+        width: this.canvasWidth,
+        height: 1
+      });
+    },
+    handleOrientationChange() {
+      setTimeout(this.resizeViewRectangle, 100);
+    },
     usePickTool() {
       this.zwibblerCtx.usePickTool();
     },
@@ -523,7 +529,14 @@ export default {
       this.zwibblerCtx.addSelectionHandle(1.0, 0.5, 0, 0, "", "scale");
       this.zwibblerCtx.addSelectionHandle(0.5, 1.0, 0, 0, "", "scale");
       this.zwibblerCtx.addSelectionHandle(0.0, 0.5, 0, 0, "", "scale");
-    }
+    },
+  },
+  beforeDestroy() {
+    window.removeEventListener(
+      "orientationchange",
+      this.handleOrientationChange,
+      false
+    );
   },
   watch: {
     shapeNodes() {
