@@ -335,6 +335,12 @@ export default {
       false
     );
 
+    window.addEventListener(
+      "resize",
+      this.handleWindowResize,
+      false
+    );
+
     this.zwibblerCtx.on("document-changed", info => {
       const isRemoteChange = info && info.remote;
       const isWhiteboardHidden = this.mobileMode && !this.isWhiteboardOpen;
@@ -370,6 +376,9 @@ export default {
     },
     handleOrientationChange() {
       setTimeout(this.resizeViewRectangle, 100);
+    },
+    handleWindowResize() {
+      setTimeout(this.resizeViewRectangle, 1000);
     },
     usePickTool() {
       this.zwibblerCtx.usePickTool();
@@ -535,6 +544,11 @@ export default {
     window.removeEventListener(
       "orientationchange",
       this.handleOrientationChange,
+      false
+    );
+    window.removeEventListener(
+      "resize",
+      this.handleWindowResize,
       false
     );
   },
