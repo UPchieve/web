@@ -104,7 +104,9 @@ export default {
         const { uploadUrl } = res.body;
         if (uploadUrl) {
           axios.put(uploadUrl, this.file, {
-            "Content-Type": this.file.type
+            headers: {
+              "Content-Type": this.file.type
+            }
           });
           this.$store.dispatch("user/addToUser", {
             photoIdStatus: "SUBMITTED"
