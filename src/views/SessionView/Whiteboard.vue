@@ -1,6 +1,6 @@
 <template>
   <div class="zwib-wrapper" :class="toolClass">
-    <div id="zwib-div" ref="zwibDiv"></div>
+    <div id="zwib-div" :class="{ 'whiteboard-open': isWhiteboardOpen }" ref="zwibDiv"></div>
     <div id="toolbar" class="toolbar">
       <p v-if="error" class="whiteboard-error">{{ error }}</p>
       <div
@@ -593,6 +593,16 @@ export default {
 #zwib-div {
   height: 100%;
   width: 100%;
+
+  &.whiteboard-open {
+    @media only screen and (orientation: landscape) and (max-height: 500px) {
+      position: fixed !important;
+      top: 0;
+      left: 0;
+      background: #fff;
+      z-index: 100;
+    }
+  }
 }
 
 .zwibbler-canvas-holder,
