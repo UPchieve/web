@@ -267,7 +267,6 @@ export default {
   margin: 10px;
   padding: 10px;
   border-radius: 8px;
-  overflow: hidden;
 
   @include breakpoint-above("medium") {
     margin: 40px;
