@@ -611,9 +611,11 @@ export default {
 
 .zwibbler-canvas-holder,
 .zwib-wrapper,
+.zwibbler-overlay,
 #zwib-div {
+  outline: none !important;
   &:focus {
-    outline: none;
+    outline: none !important;
   }
 }
 
