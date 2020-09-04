@@ -3,7 +3,6 @@
     <div class="material__cell" @click="toggleMaterial">
       <div class="material__icon-wrapper">
         <video-icon v-if="material.type === 'video'" />
-        <slide-icon v-else-if="material.type === 'slideshow'" />
         <link-icon v-else-if="material.type === 'link'" />
         <book-icon v-else />
       </div>
@@ -32,10 +31,6 @@
         v-else-if="material.type === 'resources'"
         :links="material.links"
       />
-      <slideshow-material
-        v-else-if="material.type === 'slideshow'"
-        :resourceId="material.resourceId"
-      />
       <document-material
         v-else-if="material.type === 'document'"
         :resourceId="material.resourceId"
@@ -60,26 +55,22 @@
 <script>
 import LinkMaterial from "./Link";
 import ResourcesMaterial from "./Resources";
-import SlideshowMaterial from "./Slideshow";
 import DocumentMaterial from "./Document";
 import VideoMaterial from "./Video";
 import RightCaret from "@/assets/right-caret.svg";
 import BookIcon from "@/assets/sidebar_icons/book.svg";
 import VideoIcon from "@/assets/video.svg";
-import SlideIcon from "@/assets/slide.svg";
 import LinkIcon from "@/assets/link.svg";
 
 export default {
   components: {
     LinkMaterial,
     ResourcesMaterial,
-    SlideshowMaterial,
     DocumentMaterial,
     VideoMaterial,
     RightCaret,
     BookIcon,
     VideoIcon,
-    SlideIcon,
     LinkIcon
   },
   props: {
