@@ -378,7 +378,7 @@ export default {
       setTimeout(this.resizeViewRectangle, 100);
     },
     handleWindowResize() {
-      setTimeout(this.resizeViewRectangle, 1000);
+      setTimeout(this.resizeViewRectangle, 100);
     },
     usePickTool() {
       this.zwibblerCtx.usePickTool();
