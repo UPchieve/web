@@ -639,7 +639,6 @@ export default {
 }
 
 .toolbar-item {
-  padding: 1em;
   border: 1px solid transparent;
   display: flex;
   align-items: center;
