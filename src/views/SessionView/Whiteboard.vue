@@ -627,7 +627,7 @@ export default {
   position: absolute;
   bottom: 50px;
   left: 0;
-  right: 0;
+  right: 20px;
   margin: auto;
   display: flex;
   align-items: center;

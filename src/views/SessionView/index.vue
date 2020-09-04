@@ -332,6 +332,7 @@ export default {
   &--whiteboard {
     .toggleButton.back {
       bottom: calc(100% - 140px);
+      right: 35px;
     }
   }
 }
