@@ -212,6 +212,27 @@
           </div>
         </div>
 
+        <div v-if="showCollegeCheckbox" class="uc-form-checkbox">
+          <input
+            id="collegeCheckbox"
+            v-model="isCollegeStudent"
+            type="checkbox"
+          />
+          <label for="collegeCheckbox">
+            Are you currently a college student?
+          </label>
+        </div>
+
+        <div v-if="showCollegeInput" class="uc-column">
+          <label for="college" class="uc-form-label">College</label>
+          <input
+            id="college"
+            type="text"
+            class="uc-form-input"
+            v-model="formData.college"
+          />
+        </div>
+
         <div class="uc-form-checkbox">
           <input
             id="userAgreement"
@@ -276,11 +297,13 @@ export default {
       studentPartner: {
         name: "",
         highSchoolSignup: false,
-        highSchoolSignupRequired: false,
+        collegeSignup: false,
+        schoolSignupRequired: false,
         sites: []
       },
       formStep: "step-1",
       isHighSchoolStudent: false,
+      isCollegeStudent: false,
       noHighSchoolResults: false,
       formData: {
         partnerSite: undefined,
@@ -289,6 +312,7 @@ export default {
         firstName: "",
         lastName: "",
         highSchoolUpchieveId: "",
+        college: "",
         terms: false
       },
       errors: [],
@@ -302,7 +326,7 @@ export default {
       if (!this.studentPartner.highSchoolSignup) return false;
 
       // Don't show if high school input is required
-      if (this.studentPartner.highSchoolSignupRequired) return false;
+      if (this.onlyHighSchoolRequired) return false;
 
       // Only show if high school input is enabled but not required, i.e. optional
       return true;
@@ -313,14 +337,52 @@ export default {
       if (!this.studentPartner.highSchoolSignup) return false;
 
       // Require high school input
-      if (this.studentPartner.highSchoolSignupRequired) return true;
+      if (this.onlyHighSchoolRequired) return true;
 
       // Optional high school input, so show if the checkbox is selected
       return this.isHighSchoolStudent;
     },
 
+    showCollegeCheckbox() {
+      // Don't show if high school input is disabled
+      if (!this.studentPartner.collegeSignup) return false;
+
+      // Don't show if high school input is required
+      if (this.onlyCollegeRequired) return false;
+
+      // Only show if high school input is enabled but not required, i.e. optional
+      return true;
+    },
+
+    showCollegeInput() {
+      // Don't show if college input is disabled
+      if (!this.studentPartner.collegeSignup) return false;
+
+      // Show if college input is required
+      if (this.onlyCollegeRequired) return true;
+
+      // Only show if high school input is enabled but not required, i.e. optional
+      return this.isCollegeStudent;
+    },
+
     requirePartnerSite() {
       return !!this.studentPartner.sites;
+    },
+
+    onlyHighSchoolRequired() {
+      return (
+        this.studentPartner.highSchoolSignup &&
+        !this.studentPartner.collegeSignup &&
+        this.studentPartner.schoolSignupRequired
+      );
+    },
+
+    onlyCollegeRequired() {
+      return (
+        this.studentPartner.collegeSignup &&
+        !this.studentPartner.highSchoolSignup &&
+        this.studentPartner.schoolSignupRequired
+      );
     }
   },
   methods: {
@@ -418,12 +480,36 @@ export default {
       if (!this.formData.lastName) {
         this.invalidInputs.push("lastName");
       }
-      if (
-        this.studentPartner.highSchoolSignupRequired &&
-        !this.formData.highSchoolUpchieveId
-      ) {
+      if (this.onlyHighSchoolRequired && !this.formData.highSchoolUpchieveId) {
         this.errors.push("You must select your high school.");
         this.invalidInputs.push("inputHighschool");
+      }
+      if (this.onlyCollegeRequired && !this.formData.college) {
+        this.errors.push("You must enter a college.");
+        this.invalidInputs.push("college");
+      }
+
+      if (this.studentPartner.schoolSignupRequired) {
+        // If both student and college options are true the student must select one
+        if (
+          this.studentPartner.highSchoolSignup &&
+          this.studentPartner.collegeSignup &&
+          !this.isHighSchoolStudent &&
+          !this.isCollegeStudent
+        )
+          this.errors.push(
+            "You must select if you're a high school or college student."
+          );
+
+        if (this.isHighSchoolStudent && !this.formData.highSchoolUpchieveId) {
+          this.errors.push("You must select your high school.");
+          this.invalidInputs.push("inputHighschool");
+        }
+
+        if (this.isCollegeStudent && !this.formData.college) {
+          this.errors.push("You must enter a college.");
+          this.invalidInputs.push("college");
+        }
       }
       if (!this.formData.terms) {
         this.errors.push("You must read and accept the user agreement.");
@@ -444,6 +530,7 @@ export default {
         firstName: this.formData.firstName,
         lastName: this.formData.lastName,
         highSchoolId: this.formData.highSchoolUpchieveId,
+        college: this.formData.college,
         terms: this.formData.terms
       })
         .then(() => {
