@@ -1,6 +1,10 @@
 <template>
   <div class="zwib-wrapper" :class="toolClass">
-    <div id="zwib-div" :class="{ 'whiteboard-open': isWhiteboardOpen }" ref="zwibDiv"></div>
+    <div
+      id="zwib-div"
+      :class="{ 'whiteboard-open': isWhiteboardOpen }"
+      ref="zwibDiv"
+    ></div>
     <div id="toolbar" class="toolbar">
       <p v-if="error" class="whiteboard-error">{{ error }}</p>
       <div
