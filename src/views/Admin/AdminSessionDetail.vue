@@ -95,7 +95,7 @@
       <div class="quill-container"></div>
     </div>
     <div
-      v-if="session.whiteboardDoc"
+      v-if="isWhiteboardSession"
       class="session-detail__section session-detail__section--whiteboard"
     >
       <h2 class="session-detail__section-title">Whiteboard</h2>
@@ -165,6 +165,9 @@ export default {
         return "Mobile web";
 
       return "Desktop";
+    },
+    isWhiteboardSession() {
+      return this.session.type !== "College";
     }
   },
 
@@ -183,13 +186,16 @@ export default {
         this.quillEditor.setContents(JSON.parse(this.session.quillDoc));
       }
 
-      if (this.session.whiteboardDoc) {
+      if (this.isWhiteboardSession) {
         this.zwibblerCtx = window.Zwibbler.create("zwibbler-container", {
           showToolbar: false,
-          showColourPanel: false
+          showColourPanel: false,
+          collaborationServer: `${
+            process.env.VUE_APP_WEBSOCKET_ROOT
+          }/whiteboard/admin/{name}`
         });
 
-        this.zwibblerCtx.load(this.session.whiteboardDoc);
+        this.zwibblerCtx.joinSharedSession(this.session._id, false);
       }
     });
   }
