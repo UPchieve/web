@@ -193,8 +193,7 @@ export default {
           collaborationServer: `${
             process.env.VUE_APP_WEBSOCKET_ROOT
           }/whiteboard/admin/{name}`,
-          readOnly: true,
-
+          readOnly: true
         });
 
         this.zwibblerCtx.joinSharedSession(this.session._id, false);
