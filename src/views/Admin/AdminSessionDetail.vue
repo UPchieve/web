@@ -192,7 +192,9 @@ export default {
           showColourPanel: false,
           collaborationServer: `${
             process.env.VUE_APP_WEBSOCKET_ROOT
-          }/whiteboard/admin/{name}`
+          }/whiteboard/admin/{name}`,
+          readOnly: true,
+
         });
 
         this.zwibblerCtx.joinSharedSession(this.session._id, false);
