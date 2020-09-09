@@ -167,7 +167,7 @@ export default {
       return "Desktop";
     },
     isWhiteboardSession() {
-      return this.session.type !== "College";
+      return this.session.type !== "college";
     }
   },
 
