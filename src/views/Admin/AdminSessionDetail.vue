@@ -198,6 +198,16 @@ export default {
         });
 
         this.zwibblerCtx.joinSharedSession(this.session._id, false);
+
+        this.zwibblerCtx.on("connected", () => {
+          this.zwibblerCtx.usePanTool();
+
+          this.zwibblerCtx.setViewRectangle(
+            this.zwibblerCtx.getBoundingRectangle(
+              this.zwibblerCtx.getAllNodes()
+            )
+          );
+        });
       }
     });
   }
