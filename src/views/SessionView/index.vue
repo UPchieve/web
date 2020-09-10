@@ -117,7 +117,8 @@ export default {
     }),
     ...mapGetters({
       mobileMode: "app/mobileMode",
-      isAuthenticated: "user/isAuthenticated"
+      isAuthenticated: "user/isAuthenticated",
+      isVolunteer: "user/isVolunteer"
     }),
 
     auxiliaryType() {
