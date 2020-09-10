@@ -25,6 +25,7 @@
           :sessionId="sessionId"
           :isWhiteboardOpen="auxiliaryOpen"
           :toggleWhiteboard="toggleAuxiliary"
+          :isSessionOver="isSessionOver"
           ref="whiteboard"
         />
         <document-editor v-else />
@@ -118,7 +119,8 @@ export default {
     ...mapGetters({
       mobileMode: "app/mobileMode",
       isAuthenticated: "user/isAuthenticated",
-      isVolunteer: "user/isVolunteer"
+      isVolunteer: "user/isVolunteer",
+      isSessionOver: "user/isSessionOver"
     }),
 
     auxiliaryType() {

@@ -215,6 +215,10 @@ export default {
     toggleWhiteboard: {
       type: Function,
       required: true
+    },
+    isSessionOver: {
+      type: Boolean,
+      required: true
     }
   },
   data() {
@@ -582,6 +586,10 @@ export default {
         this.usePickTool();
         this.shapeNodes = [];
       }
+    },
+    isSessionOver(isSessionOver, oldIsSessionOver) {
+      if (isSessionOver && !oldIsSessionOver)
+        this.zwibblerCtx.setConfig("readOnly", true);
     }
   }
 };
