@@ -94,6 +94,13 @@
       <h2 class="session-detail__section-title">Document</h2>
       <div class="quill-container"></div>
     </div>
+    <div
+      v-if="isWhiteboardSession"
+      class="session-detail__section session-detail__section--whiteboard"
+    >
+      <h2 class="session-detail__section-title">Whiteboard</h2>
+      <div id="zwibbler-container"></div>
+    </div>
   </div>
 </template>
 
@@ -114,7 +121,8 @@ export default {
   data() {
     return {
       session: {},
-      quillEditor: null
+      quillEditor: null,
+      zwibblerCtx: null
     };
   },
 
@@ -157,6 +165,9 @@ export default {
         return "Mobile web";
 
       return "Desktop";
+    },
+    isWhiteboardSession() {
+      return this.session.type !== "college";
     }
   },
 
@@ -173,6 +184,29 @@ export default {
         this.quillEditor = new Quill(container);
         this.quillEditor.enable(false);
         this.quillEditor.setContents(JSON.parse(this.session.quillDoc));
+      }
+
+      if (this.isWhiteboardSession) {
+        this.zwibblerCtx = window.Zwibbler.create("zwibbler-container", {
+          showToolbar: false,
+          showColourPanel: false,
+          collaborationServer: `${
+            process.env.VUE_APP_WEBSOCKET_ROOT
+          }/whiteboard/admin/{name}`,
+          readOnly: true
+        });
+
+        this.zwibblerCtx.joinSharedSession(this.session._id, false);
+
+        this.zwibblerCtx.on("connected", () => {
+          this.zwibblerCtx.usePanTool();
+
+          this.zwibblerCtx.setViewRectangle(
+            this.zwibblerCtx.getBoundingRectangle(
+              this.zwibblerCtx.getAllNodes()
+            )
+          );
+        });
       }
     });
   }
@@ -258,5 +292,10 @@ export default {
     text-decoration: none;
     background: #f7fcfe;
   }
+}
+
+#zwibbler-container {
+  height: 500px;
+  width: 500px;
 }
 </style>

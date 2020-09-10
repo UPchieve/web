@@ -119,6 +119,7 @@ export default {
     ...mapGetters({
       mobileMode: "app/mobileMode",
       isAuthenticated: "user/isAuthenticated",
+      isVolunteer: "user/isVolunteer",
       isSessionOver: "user/isSessionOver"
     }),
 
