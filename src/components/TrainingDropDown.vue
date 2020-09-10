@@ -25,7 +25,6 @@
             >{{ progressStatus(cert.key) }}</span
           >
         </div>
-        <alert-icon v-if="!isComplete(cert.key)" class="alert-icon" />
       </div>
 
       <div class="training__progress-bar" :key="`bar-${index}`">
@@ -80,15 +79,13 @@ import { mapState } from "vuex";
 import CheckMark from "@/components/CheckMark";
 import LargeButton from "@/components/LargeButton";
 import ArrowIcon from "@/assets/arrow.svg";
-import AlertIcon from "@/assets/alert.svg";
 
 export default {
   name: "TrainingDropDown",
   components: {
     CheckMark,
     LargeButton,
-    ArrowIcon,
-    AlertIcon
+    ArrowIcon
   },
   props: {
     headers: {
