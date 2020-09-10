@@ -21,7 +21,7 @@
             >{{ label }}</span
           >
           <span v-if="sublabel" class="accordion-item__labels-sublabel">
-            {{ sublabel }}
+            {{ sublabelMessage }}
           </span>
         </div>
       </div>
@@ -61,6 +61,17 @@ export default {
       default: ""
     }
   },
+  computed: {
+    isIntegratedMathDropDown() {
+      return this.isOpen && this.label === "Integrated Math";
+    },
+    sublabelMessage() {
+      if (this.isIntegratedMathDropDown)
+        return "Integrated math describes the style of mathematics education which integrates multiple strands of mathematics. The integrated sequence is meant to take math learning out of silos and teach students how to bridge connections among topics.";
+      else return this.sublabel;
+    }
+  },
+
   data() {
     return {
       isOpen: false
