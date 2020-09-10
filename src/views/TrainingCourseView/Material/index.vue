@@ -207,17 +207,6 @@ export default {
     }
   }
 
-  &--optional {
-    .material__icon-wrapper {
-      border-color: $c-soft-black;
-
-      svg {
-        filter: invert(15%) sepia(3%) saturate(3319%) hue-rotate(202deg)
-          brightness(95%) contrast(83%);
-      }
-    }
-  }
-
   &--completed {
     .material__status {
       color: $c-success-green;
