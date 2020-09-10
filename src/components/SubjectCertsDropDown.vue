@@ -115,7 +115,7 @@ export default {
       else return "Not started";
     },
     actionButtonText(cert) {
-      if (this.isComplete(cert)) return "Complete";
+      if (this.isComplete(cert)) return "Completed";
       else return "Start quiz";
     },
     // Checks if a user has completed a quiz for a subject when the subject hasn't been added to the user's subject property yet

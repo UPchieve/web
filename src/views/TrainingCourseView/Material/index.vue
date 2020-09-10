@@ -86,7 +86,7 @@ export default {
 
     statusText() {
       if (!this.material.isRequired) return "Optional";
-      else if (this.material.isCompleted) return "Complete";
+      else if (this.material.isCompleted) return "Completed";
       else return "Not started";
     }
   },
@@ -204,17 +204,6 @@ export default {
     &:disabled {
       cursor: default;
       background: lighten($color: $c-success-green, $amount: 40%);
-    }
-  }
-
-  &--optional {
-    .material__icon-wrapper {
-      border-color: $c-soft-black;
-
-      svg {
-        filter: invert(15%) sepia(3%) saturate(3319%) hue-rotate(202deg)
-          brightness(95%) contrast(83%);
-      }
     }
   }
 

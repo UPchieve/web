@@ -132,7 +132,7 @@ export default {
     actionButtonText(cert) {
       const { progress } = this.user.trainingCourses[cert];
       if (progress === 0) return "Start course";
-      if (this.isComplete(cert)) return "Complete";
+      if (this.isComplete(cert)) return "Completed";
       return "Resume course";
     },
     // Checks if a user has completed a quiz for a subject when the subject hasn't been added to the user's subject property yet
