@@ -13,11 +13,11 @@
       <div class="material__right">
         <right-caret
           class="material__caret"
-          :class="{ 'material__caret--open': showMaterial }"
+          :class="{ 'material__caret--open': isOpen }"
         />
       </div>
     </div>
-    <div v-if="showMaterial" class="material__content">
+    <div v-if="isOpen" class="material__content">
       <div v-if="material.description" class="material__description">
         {{ material.description }}
       </div>
@@ -74,12 +74,8 @@ export default {
     LinkIcon
   },
   props: {
-    material: Object
-  },
-  data() {
-    return {
-      showMaterial: false
-    };
+    material: Object,
+    isOpen: Boolean
   },
   computed: {
     statusClass() {
@@ -96,7 +92,7 @@ export default {
   },
   methods: {
     toggleMaterial() {
-      this.showMaterial = !this.showMaterial;
+      this.$emit("material-toggled", this.material.materialKey);
     },
     materialClicked() {
       this.$emit("material-completed", this.material.materialKey);
