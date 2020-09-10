@@ -152,7 +152,8 @@
       color: $c-warning-orange;
     }
 
-    &--completed {
+    &--completed,
+    &--unlocked {
       color: $c-success-green;
     }
 
