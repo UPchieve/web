@@ -94,7 +94,7 @@ describe("Training quizzes", function() {
     cy.contains("span", "Algebra")
       .parent(".training__cert-title")
       .parent(".training__cert")
-      .next(".training__subjects-included")
+      .next(".training__subjects-unlocked")
       .next(".action-btns")
       .children("button")
       .click();
