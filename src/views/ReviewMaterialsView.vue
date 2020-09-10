@@ -73,8 +73,12 @@ export default {
         case "algebra":
         case "geometry":
         case "trigonometry":
+        case "statistics":
         case "precalculus":
         case "calculus":
+        case "biology":
+        case "physicsOne":
+        case "physicsTwo":
           this.reviewMaterials = [
             {
               title: "Topics & Resources",
@@ -115,9 +119,7 @@ export default {
             }
           ];
           break;
-        case "biology":
         case "chemistry":
-        case "physicsOne":
           this.reviewMaterials = [];
           break;
         default:
@@ -143,6 +145,7 @@ export default {
   computed: {
     categoryDisplayName() {
       const subtopics = allSubtopics();
+      if (this.category === "algebra") return "Algebra";
       if (this.category) return subtopics[this.category].displayName;
 
       return "";
