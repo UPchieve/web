@@ -41,7 +41,7 @@
         buttonSize="large"
       >
         <subject-certs-drop-down
-          :headers="['Certification', 'Included Subjects', 'Actions']"
+          :headers="['Certification', 'Subjects Unlocked', 'Actions']"
           :certData="currentSubject.certifications"
         />
       </accordion-item>

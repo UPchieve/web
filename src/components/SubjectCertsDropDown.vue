@@ -26,20 +26,15 @@
 
       <div
         :key="`subjects-${cert.displayName}-${index}`"
-        class="training__subjects-included"
+        class="training__subjects-unlocked"
       >
-        <span v-if="isLargeDevice" class="training__subjects-included--mobile"
-          >Included subjects:</span
+        <span v-if="isLargeDevice" class="training__subjects-unlocked--mobile"
+          >Subjects Unlocked:</span
         >
         <span
           v-for="subject in cert.subjectsIncluded"
           :key="subject.displayName"
-          class="training__subjects-included--subject"
-          :class="{
-            'training__subjects-included--completed':
-              user.subjects.includes(subject.key) ||
-              hasCompletedIncludedSubject(subject.key)
-          }"
+          class="training__subjects-unlocked--subject"
           >{{ subject.displayName }}</span
         >
       </div>
@@ -124,7 +119,7 @@ export default {
       else return "Start quiz";
     },
     // Checks if a user has completed a quiz for a subject when the subject hasn't been added to the user's subject property yet
-    hasCompletedIncludedSubject(subject) {
+    hasCompletedUnlockedSubject(subject) {
       let cert = subject;
       if (subject.match(/^algebra/i)) cert = "algebra";
       return this.isComplete(cert);

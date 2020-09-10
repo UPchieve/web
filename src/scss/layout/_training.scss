@@ -112,7 +112,7 @@
     }
   }
 
-  &__subjects-included {
+  &__subjects-unlocked {
     @include flex-container(row, flex-start, center);
     grid-column-start: span 3;
     flex-flow: row wrap;
@@ -133,13 +133,9 @@
 
     &--subject {
       font-size: 12px;
-      color: $c-secondary-grey;
+      color: $c-soft-black;
       display: inline-block;
       margin-right: 1em;
-    }
-
-    &--completed {
-      color: $c-soft-black;
     }
 
     &--mobile {
@@ -166,47 +162,46 @@
   }
 }
 
-
 .action-btns {
+  @include flex-container(row, flex-start, center);
+  grid-column-start: span 3;
+
+  @include breakpoint-above("large") {
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    justify-self: center;
+    grid-column-start: auto;
+  }
+
+  @media only screen and (min-width: 992px) and (max-width: 1280px) {
+    display: initial;
+  }
+
+  &__quiz-btn {
+    width: 180px;
+  }
+
+  &__review-link {
     @include flex-container(row, flex-start, center);
-    grid-column-start: span 3;
-  
-    @include breakpoint-above("large") {
-      justify-content: center;
-      align-items: center;
-      align-self: center;
-      justify-self: center;
-      grid-column-start: auto;
+    color: $c-success-green;
+    margin-right: 1.5em;
+    align-self: start;
+
+    &--text {
+      margin-right: 0.4em;
     }
-  
-    @media only screen and (min-width: 992px) and (max-width: 1280px) {
-      display: initial;
+
+    &--arrow-icon {
+      width: 20px;
+      fill: $c-success-green;
     }
-  
-    &__quiz-btn {
-      width: 180px;
+    &:hover {
+      color: $c-secondary-grey;
     }
-  
-    &__review-link {
-      @include flex-container(row, flex-start, center);
-      color: $c-success-green;
-      margin-right: 1.5em;
-      align-self: start;
-  
-      &--text {
-        margin-right: 0.4em;
-      }
-  
-      &--arrow-icon {
-        width: 20px;
-        fill: $c-success-green;
-      }
-      &:hover {
-        color: $c-secondary-grey;
-      }
-  
-      &:hover &--arrow-icon {
-        fill: $c-secondary-grey;
-      }
+
+    &:hover &--arrow-icon {
+      fill: $c-secondary-grey;
     }
   }
+}
