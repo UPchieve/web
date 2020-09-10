@@ -588,7 +588,8 @@ export default {
       }
     },
     isSessionOver(isSessionOver, oldIsSessionOver) {
-      if (isSessionOver && !oldIsSessionOver) this.zwibblerCtx.setConfig("readOnly", true);
+      if (isSessionOver && !oldIsSessionOver)
+        this.zwibblerCtx.setConfig("readOnly", true);
     }
   }
 };
