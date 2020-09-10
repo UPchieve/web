@@ -86,7 +86,7 @@ export default {
 
     statusText() {
       if (!this.material.isRequired) return "Optional";
-      else if (this.material.isCompleted) return "Complete";
+      else if (this.material.isCompleted) return "Completed";
       else return "Not started";
     }
   },
