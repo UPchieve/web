@@ -62,8 +62,8 @@ export default {
       return "module--not-started";
     },
     statusText() {
-      if (this.isCompleted) return "Complete";
-      else if (this.isStarted) return "Started";
+      if (this.isCompleted) return "Completed";
+      else if (this.isStarted) return "In progress";
       return "Not started";
     }
   },

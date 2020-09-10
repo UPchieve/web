@@ -42,8 +42,8 @@ export default {
     },
     statusText() {
       if (this.isDisabled) return "Locked";
-      else if (this.isCompleted) return "Complete";
-      else if (this.isStarted) return "Started";
+      else if (this.isCompleted) return "Completed";
+      else if (this.isStarted) return "In progress";
       return "Not started";
     }
   },
