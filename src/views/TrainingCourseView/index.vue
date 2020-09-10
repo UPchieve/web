@@ -38,13 +38,6 @@ export default {
     };
   },
   async created() {
-    /**
-     * TODO
-     * display quiz (when modules all completed)
-     * material views
-     * new material icons (link + resources)
-     */
-
     const courseKey = this.$route.params.courseKey;
     const {
       body: { course }

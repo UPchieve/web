@@ -19,7 +19,9 @@
         v-for="material in module.materials"
         :key="material.materialKey"
         :material="material"
+        :isOpen="material.materialKey === openMaterial"
         v-on:material-completed="$emit('material-completed', $event)"
+        v-on:material-toggled="toggleMaterial"
       />
     </div>
   </div>
@@ -41,7 +43,8 @@ export default {
   },
   data() {
     return {
-      showMaterials: false
+      showMaterials: false,
+      openMaterial: ""
     };
   },
   computed: {
@@ -67,6 +70,10 @@ export default {
   methods: {
     toggleMaterials() {
       this.showMaterials = !this.showMaterials;
+    },
+    toggleMaterial(materialKey) {
+      if (materialKey === this.openMaterial) this.openMaterial = "";
+      else this.openMaterial = materialKey;
     }
   }
 };
