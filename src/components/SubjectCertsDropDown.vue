@@ -11,13 +11,16 @@
         class="training__cert"
         :key="`cert-title-${cert.displayName}-${index}`"
       >
-        <check-mark :checked="isComplete(cert.key)" />
+        <check-mark
+          :checked="isComplete(cert.key) || hasUnlockedSubject(cert.key)"
+        />
         <div class="training__cert-title">
           <span>{{ cert.displayName }}</span>
           <span
             class="training__status"
             :class="{
-              'training__status--completed': isComplete(cert.key)
+              'training__status--completed': isComplete(cert.key),
+              'training__status--unlocked': hasUnlockedSubject(cert.key)
             }"
             >{{ progressStatus(cert.key) }}</span
           >
@@ -51,9 +54,13 @@
         <large-button
           primary
           :showArrow="false"
-          :routeTo="!isComplete(cert.key) ? `/training/${cert.key}/quiz` : null"
+          :routeTo="
+            !isComplete(cert.key) || hasUnlockedSubject(cert.key)
+              ? `/training/${cert.key}/quiz`
+              : null
+          "
           class="action-btns__quiz-btn"
-          :disabled="isComplete(cert.key)"
+          :disabled="isComplete(cert.key) || hasUnlockedSubject(cert.key)"
         >
           <span>{{ actionButtonText(cert.key) }}</span>
         </large-button>
@@ -110,19 +117,19 @@ export default {
     isComplete(cert) {
       return this.user.certifications[cert].passed;
     },
+    hasUnlockedSubject(cert) {
+      if (cert === "algebra") return this.user.subjects.includes("algebraOne");
+      return this.user.subjects.includes(cert);
+    },
     progressStatus(cert) {
       if (this.isComplete(cert)) return "Completed";
+      if (this.hasUnlockedSubject(cert)) return "Unlocked";
       else return "Not started";
     },
     actionButtonText(cert) {
-      if (this.isComplete(cert)) return "Completed";
+      if (this.isComplete(cert) || this.hasUnlockedSubject(cert))
+        return "Completed";
       else return "Start quiz";
-    },
-    // Checks if a user has completed a quiz for a subject when the subject hasn't been added to the user's subject property yet
-    hasCompletedUnlockedSubject(subject) {
-      let cert = subject;
-      if (subject.match(/^algebra/i)) cert = "algebra";
-      return this.isComplete(cert);
     }
   }
 };

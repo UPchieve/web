@@ -91,18 +91,8 @@ export default {
       });
     },
     progressStatus(includedSubjects) {
-      if (this.isComplete(includedSubjects)) return "Completed";
+      if (this.isComplete(includedSubjects)) return "Unlocked";
       else return "Not started";
-    },
-    // Checks if a user has completed a quiz for a subject when the subject hasn't been added to the user's subject property yet
-    hasCompletedUnlockedSubject(subject) {
-      let cert = subject;
-      if (subject.match(/^algebra/i)) cert = "algebra";
-
-      if (this.user.certifications[cert])
-        return this.user.certifications[cert].passed;
-
-      return false;
     }
   }
 };
