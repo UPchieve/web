@@ -9,7 +9,7 @@
     :important="modalData.important"
     :showTemplateButtons="modalData.showTemplateButtons"
     :show-accept="modalData.showAccept"
-    :modalComponentName="modalComponent.name"
+    :modalComponentName="modalComponent && modalComponent.name"
   >
     <component
       v-if="modalComponent"
