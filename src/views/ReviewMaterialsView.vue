@@ -75,6 +75,7 @@ export default {
         case "trigonometry":
         case "precalculus":
         case "calculus":
+        case "physicsOne":
           this.reviewMaterials = [
             {
               title: "Topics & Resources",
@@ -117,7 +118,6 @@ export default {
           break;
         case "biology":
         case "chemistry":
-        case "physicsOne":
           this.reviewMaterials = [];
           break;
         default:
