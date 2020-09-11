@@ -13,6 +13,7 @@ import { mapGetters } from "vuex";
 import LargeButton from "@/components/LargeButton";
 
 export default {
+  name: "SessionFulfilledModal",
   components: { LargeButton },
   props: {
     modalData: { type: Object, required: true }
