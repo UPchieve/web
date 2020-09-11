@@ -6,7 +6,7 @@
     <div v-if="completedFeedback">
       <div class="questions-table">
         <h3 class="feedback-submitted">
-          Thank you for the feedback!
+          Thank you for your feedback!
         </h3>
       </div>
     </div>
