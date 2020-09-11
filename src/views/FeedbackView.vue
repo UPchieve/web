@@ -359,7 +359,7 @@ export default {
         volunteerId: this.volunteerId
       });
       this.isSubmittingFeedback = false;
-      this.$router.push("/");
+      this.completedFeedback = true;
     }
   }
 };
