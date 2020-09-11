@@ -448,6 +448,15 @@ export default {
       .post(`${API_ROOT}/feedback`, data)
       .then(this._successHandler, this._errorHandler);
   },
+  getFeedback({ sessionId, userType }) {
+    const queryParams = new URLSearchParams({
+      sessionId,
+      userType
+    }).toString();
+    return Vue.http
+      .get(`${API_ROOT}/feedback?${queryParams}`)
+      .then(this._successHandler, this._errorHandler);
+  },
   savePushToken(context, data) {
     return context.$http
       .post(`${API_ROOT}/push-token/save`, data)
