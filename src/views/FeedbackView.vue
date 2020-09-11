@@ -3,7 +3,14 @@
     <div class="header">
       <h2>Help improve UPchieve!</h2>
     </div>
-    <table class="questions-table">
+    <div v-if="completedFeedback">
+      <div class="questions-table">
+        <h3 class="feedback-submitted">
+          Thank you for the feedback!
+        </h3>
+      </div>
+    </div>
+    <table class="questions-table" v-else>
       <tr v-if="this.$route.params.userType === 'student'" class="title-row">
         <td class="title-cell">
           <!-- Please help us improve UPchieve’s services by filling out this short
@@ -292,7 +299,9 @@ export default {
         }
       ],
       questions: [],
-      userResponse: {}
+      userResponse: {},
+      isSubmittingFeedback: false,
+      completedFeedback: false
     };
   },
   computed: {
@@ -300,7 +309,7 @@ export default {
       user: state => state.user.user
     })
   },
-  beforeMount() {
+  async beforeMount() {
     var _self = this;
     this.sessionId = this.$route.params.sessionId;
     this.topic = this.$route.params.topic;
@@ -308,6 +317,18 @@ export default {
     this.userType = this.$route.params.userType;
     this.studentId = this.$route.params.studentId;
     this.volunteerId = this.$route.params.volunteerId;
+
+    const {
+      body: { feedback }
+    } = await NetworkService.getFeedback({
+      sessionId: this.sessionId,
+      userType: this.userType
+    });
+
+    if (feedback) {
+      this.completedFeedback = true;
+      return;
+    }
 
     if (this.userType === "student") {
       this.questions = this.student_questions;
@@ -324,6 +345,7 @@ export default {
   },
   methods: {
     submitFeedback() {
+      if (this.isSubmittingFeedback) return;
       // analytics: tracking feedback response data
       AnalyticsService.trackFeedback(this, this.user.isFakeUser);
 
@@ -336,6 +358,7 @@ export default {
         studentId: this.studentId,
         volunteerId: this.volunteerId
       });
+      this.isSubmittingFeedback = false;
       this.$router.push("/");
     }
   }
@@ -551,6 +574,10 @@ export default {
 .submit-button:active {
   background-color: #16d2aa;
   color: #fff;
+}
+
+.feedback-submitted {
+  margin: 4em 0;
 }
 
 @media screen and (max-width: 700px) {
