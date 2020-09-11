@@ -317,9 +317,11 @@ export default {
       } else if (!this.isValidPartnerEmail(this.formData.email)) {
         if (this.volunteerPartner.requiredEmailDomains.length < 5) {
           this.errors.push(
-            `Email must end with ${this.volunteerPartner.requiredEmailDomains.join(
-              " or "
-            )}`
+            `This page currently only accepts the following domains: ${this.volunteerPartner.requiredEmailDomains.join(
+              ", "
+            )}. If you work at ${
+              this.volunteerPartner.name
+            } but don’t have this email domain, please contact our team at support@upchieve.org!`
           );
         } else {
           this.errors.push("You must use your company email address");
