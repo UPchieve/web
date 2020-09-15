@@ -225,7 +225,8 @@ export default {
       shapeNodes: [],
       isLoading: false,
       canvasHeight: 2800,
-      canvasWidth: 1000
+      canvasWidth: 1000,
+      pingPongInterval: null
     };
   },
   computed: {
@@ -315,16 +316,18 @@ export default {
     this.zwibblerCtx.setConfig("showHints", false);
 
     this.zwibblerCtx.on("connected", () => {
-      window.wsConnection = this.zwibblerCtx.zc.Pb.Pb;
-      window.zOnMessage = window.wsConnection.onmessage;
-      window.wsConnection.onmessage = messageEvent => {
-        if (messageEvent.data === "p0ng") console.log("received pong!");
-        else window.zOnMessage(messageEvent);
+      const zwibblerWsConnection = this.zwibblerCtx.zc.Pb.Pb;
+      const zwibblerOnMessage = zwibblerWsConnection.onmessage;
+      // Intercept Zwibbler's websocket message handler
+      zwibblerWsConnection.onmessage = messageEvent => {
+        // Forward message to Zwibbler unless it's our "pong" response
+        if (messageEvent.data !== "p0ng") zwibblerOnMessage(messageEvent);
       };
 
-      window.setInterval(() => {
-        window.wsConnection.send("p1ng");
-      }, 30 * 1000);
+      // Ping server every 45 seconds to keep the connection open
+      this.pingPongInterval = window.setInterval(() => {
+        zwibblerWsConnection.send("p1ng");
+      }, 45 * 1000);
 
       // Set brush tool to default tool
       this.useBrushTool();
@@ -562,6 +565,7 @@ export default {
       false
     );
     window.removeEventListener("resize", this.handleWindowResize, false);
+    window.clearInterval(this.pingPongInterval);
   },
   watch: {
     shapeNodes() {
