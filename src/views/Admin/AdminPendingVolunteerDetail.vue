@@ -109,7 +109,7 @@ export default {
   components: { AdminReferenceView, LargeButton, BackgroundInfo },
   props: {
     volunteer: { type: Object, required: true },
-    toggleEditMode: { type: Function, required: true },
+    toggleEditMode: { type: Function, required: true }
   },
   data() {
     return {
