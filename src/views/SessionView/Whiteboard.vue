@@ -317,10 +317,10 @@ export default {
     this.zwibblerCtx.on("connected", () => {
       window.wsConnection = this.zwibblerCtx.zc.Pb.Pb;
       window.zOnMessage = window.wsConnection.onmessage;
-      window.wsConnection.onmessage = (messageEvent) => {
-        if (messageEvent.data === "p0ng") console.log("received pong!")
+      window.wsConnection.onmessage = messageEvent => {
+        if (messageEvent.data === "p0ng") console.log("received pong!");
         else window.zOnMessage(messageEvent);
-      }
+      };
 
       window.setInterval(() => {
         window.wsConnection.send("p1ng");
