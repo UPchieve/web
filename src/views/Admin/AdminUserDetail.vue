@@ -1,13 +1,15 @@
 <template>
   <div v-if="user._id" class="user-detail">
-    <admin-pending-volunteer-detail
-      v-if="user.isVolunteer && !user.isApproved"
-    />
     <admin-edit-user
-      v-else-if="isEditMode"
+      v-if="isEditMode"
       :user="user"
       :toggleEditMode="toggleEditMode"
       :getUser="getUser"
+    />
+    <admin-pending-volunteer-detail
+      v-else-if="user.isVolunteer && !user.isApproved"
+      :toggleEditMode="toggleEditMode"
+      :volunteer="user"
     />
     <template v-else>
       <div class="user-detail__body">
