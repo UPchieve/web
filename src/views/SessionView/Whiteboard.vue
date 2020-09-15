@@ -316,6 +316,7 @@ export default {
     this.zwibblerCtx.setConfig("showHints", false);
 
     this.zwibblerCtx.on("connected", () => {
+      // @todo access the connection in a less sketchy way
       const zwibblerWsConnection = this.zwibblerCtx.zc.Pb.Pb;
       const zwibblerOnMessage = zwibblerWsConnection.onmessage;
       // Intercept Zwibbler's websocket message handler
