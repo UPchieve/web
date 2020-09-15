@@ -9,6 +9,9 @@
   </div>
   <div v-else-if="volunteer._id" class="user-detail">
     <div class="user-detail__body">
+      <button class="edit-btn btn" @click="toggleEditMode()">
+        Edit
+      </button>
       <div class="user-detail__title">
         {{ volunteer.firstname }} {{ volunteer.lastname }}
       </div>
@@ -101,21 +104,17 @@ import AdminReferenceView from "@/views/Admin/AdminReferenceView";
 import LargeButton from "@/components/LargeButton";
 import BackgroundInfo from "@/components/Admin/BackgroundInfo";
 
-const getUser = async userId => {
-  const {
-    body: { user }
-  } = await NetworkService.adminGetUser(userId);
-
-  return user;
-};
-
 export default {
   name: "AdminPendingVolunteerDetail",
   components: { AdminReferenceView, LargeButton, BackgroundInfo },
+  props: {
+    volunteer: { type: Object, required: true },
+    toggleEditMode: { type: Function, required: true },
+    getUser: { type: Function, required: true }
+  },
   data() {
     return {
       error: "",
-      volunteer: {},
       photoIdStatus: "",
       showReferenceForm: false,
       chosenReferenceIndex: 0,
@@ -123,7 +122,7 @@ export default {
     };
   },
   async created() {
-    this.volunteer = await getUser(this.$route.params.userId);
+    await this.getUser();
     this.photoIdStatus = this.volunteer.photoIdStatus;
     this.referencesStatus = this.volunteer.references.map(
       reference => reference.status
@@ -303,5 +302,20 @@ export default {
   text-align: left;
   margin-top: 2em;
   font-size: 16px;
+}
+
+.edit-btn {
+  @include font-category("body");
+  background-color: $c-success-green;
+  border-radius: 30px;
+  width: 120px;
+  height: 40px;
+  font-weight: 600;
+  color: white;
+  margin-left: auto;
+
+  &:hover {
+    color: #2c3e50;
+  }
 }
 </style>
