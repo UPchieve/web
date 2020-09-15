@@ -315,6 +315,17 @@ export default {
     this.zwibblerCtx.setConfig("showHints", false);
 
     this.zwibblerCtx.on("connected", () => {
+      window.wsConnection = this.zwibblerCtx.zc.Pb.Pb;
+      window.zOnMessage = window.wsConnection.onmessage;
+      window.wsConnection.onmessage = (messageEvent) => {
+        if (messageEvent.data === "p0ng") console.log("received pong!")
+        else window.zOnMessage(messageEvent);
+      }
+
+      window.setInterval(() => {
+        window.wsConnection.send("p1ng");
+      }, 30 * 1000);
+
       // Set brush tool to default tool
       this.useBrushTool();
 
