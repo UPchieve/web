@@ -110,7 +110,6 @@ export default {
   props: {
     volunteer: { type: Object, required: true },
     toggleEditMode: { type: Function, required: true },
-    getUser: { type: Function, required: true }
   },
   data() {
     return {
@@ -122,7 +121,6 @@ export default {
     };
   },
   async created() {
-    await this.getUser();
     this.photoIdStatus = this.volunteer.photoIdStatus;
     this.referencesStatus = this.volunteer.references.map(
       reference => reference.status

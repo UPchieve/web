@@ -10,7 +10,6 @@
       v-else-if="user.isVolunteer && !user.isApproved"
       :toggleEditMode="toggleEditMode"
       :volunteer="user"
-      :getUser="getUser"
     />
     <template v-else>
       <div class="user-detail__body">
