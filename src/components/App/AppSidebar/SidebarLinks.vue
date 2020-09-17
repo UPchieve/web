@@ -15,10 +15,6 @@
         <calendar-icon class="icon" />
       </sidebar-link>
 
-      <sidebar-link v-if="isVolunteer" to="/coach-guide" text="Coach Guide">
-        <book-icon class="icon" />
-      </sidebar-link>
-
       <sidebar-link v-if="isAdmin" to="/admin" text="Admin">
         <folder-icon class="icon" />
       </sidebar-link>

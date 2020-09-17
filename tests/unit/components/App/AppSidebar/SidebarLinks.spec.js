@@ -2,14 +2,6 @@ import { shallowMount, createLocalVue } from "@vue/test-utils";
 import Vuex from "vuex";
 import SidebarLinks from "@/components/App/AppSidebar/SidebarLinks";
 import SidebarLink from "@/components/App/AppSidebar/SidebarLink";
-// import HouseIcon from "@/assets/sidebar_icons/house.svg";
-// import GraduationCapIcon from "@/assets/sidebar_icons/graduation-cap.svg";
-// import CalendarIcon from "@/assets/sidebar_icons/calendar.svg";
-// import BookIcon from "@/assets/sidebar_icons/book.svg";
-// import FolderIcon from "@/assets/sidebar_icons/folder.svg";
-// import EnvelopeIcon from "@/assets/sidebar_icons/envelope.svg";
-// import ExclamationIcon from "@/assets/sidebar_icons/exclamation.svg";
-// import PortraitIcon from "@/assets/sidebar_icons/portrait.svg";
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -37,39 +29,8 @@ const TRAINING_LINK = {
 
   text: "Training"
 };
-const GUIDE_LINK = { to: "/coach-guide", text: "Coach Guide" };
-
 // Admin links
 const ADMIN_LINK = { to: "/admin", text: "Admin" };
-
-/** Original test links below */
-// General links
-// const CONTACT_LINK = { to: "/contact", icon: EnvelopeIcon, text: "Contact us" };
-// const DASHBOARD_LINK = { to: "/dashboard", icon: HouseIcon, text: "Dashboard" };
-// const LEGAL_LINK = {
-//   to: "/legal",
-//   icon: ExclamationIcon,
-//   text: "Legal policy"
-// };
-// const PROFILE_LINK = { to: "/profile", icon: PortraitIcon, text: "Profile" };
-// const RESOURCES_LINK = {
-//   to: "/resources",
-//   icon: FolderIcon,
-//   text: "Resources"
-// };
-
-// // Volunteer links
-// const CALENDAR_LINK = { to: "/calendar", icon: CalendarIcon, text: "Schedule" };
-
-// const TRAINING_LINK = {
-//   to: "/training",
-//   icon: GraduationCapIcon,
-//   text: "Training"
-// };
-// const GUIDE_LINK = { to: "/coach-guide", icon: BookIcon, text: "Coach Guide" };
-
-// // Admin links
-// const ADMIN_LINK = { to: "/admin", icon: FolderIcon, text: "Admin" };
 
 // Links organized by route & user type. Array indices of the links are important.
 const links = {
@@ -86,7 +47,6 @@ const links = {
       DASHBOARD_LINK,
       TRAINING_LINK,
       CALENDAR_LINK,
-      GUIDE_LINK,
       PROFILE_LINK,
       CONTACT_LINK,
       LEGAL_LINK

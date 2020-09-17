@@ -1,14 +1,6 @@
 <template>
   <div class="volunteer-dashboard">
-    <dashboard-banner>
-      <large-button
-        v-if="isNewVolunteer"
-        primary
-        reverse
-        @click.native="goToCoachGuide"
-        >Get Started</large-button
-      >
-    </dashboard-banner>
+    <dashboard-banner />
 
     <div v-if="showUpchieve101Notice" class="dashboard-notice">
       <router-link to="training/course/upchieve101"
@@ -523,10 +515,6 @@ export default {
       } else {
         this.$router.push("/");
       }
-    },
-
-    goToCoachGuide() {
-      this.$router.push("/coach-guide");
     },
 
     showOnboardingModal() {
