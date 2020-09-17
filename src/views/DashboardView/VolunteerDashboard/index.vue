@@ -4,7 +4,7 @@
 
     <div v-if="showUpchieve101Notice" class="dashboard-notice">
       <router-link to="training/course/upchieve101"
-        >Reminder: Please complete UPchieve 101 before October 1st
+        >Reminder: Please complete UPchieve 101 before October 18th
         →</router-link
       >
     </div>
@@ -206,7 +206,7 @@ export default {
     showUpchieve101Notice() {
       if (!this.user.isApproved || !this.user.isOnboarded) return false;
       if (this.user.certifications.upchieve101.passed) return false;
-      return new Date(this.user.createdAt) < new Date("9/8/20");
+      return new Date(this.user.createdAt) < new Date("9/18/20");
     },
 
     photoIdAction() {
