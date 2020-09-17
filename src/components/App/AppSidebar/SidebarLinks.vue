@@ -43,7 +43,6 @@ import SidebarLink from "./SidebarLink";
 import HouseIcon from "@/assets/sidebar_icons/house.svg";
 import GraduationCapIcon from "@/assets/sidebar_icons/graduation-cap.svg";
 import CalendarIcon from "@/assets/sidebar_icons/calendar.svg";
-import BookIcon from "@/assets/sidebar_icons/book.svg";
 import FolderIcon from "@/assets/sidebar_icons/folder.svg";
 import EnvelopeIcon from "@/assets/sidebar_icons/envelope.svg";
 import ExclamationIcon from "@/assets/sidebar_icons/exclamation.svg";
@@ -55,7 +54,6 @@ export default {
     HouseIcon,
     GraduationCapIcon,
     CalendarIcon,
-    BookIcon,
     FolderIcon,
     EnvelopeIcon,
     ExclamationIcon,

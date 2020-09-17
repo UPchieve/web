@@ -130,7 +130,6 @@ import AccountAction from "./AccountAction";
 import PhotoUploadModal from "./PhotoUploadModal";
 import ReferencesModal from "./ReferencesModal";
 import VolunteerWelcomeModal from "@/views/DashboardView/VolunteerDashboard/VolunteerWelcomeModal.vue";
-import LargeButton from "@/components/LargeButton";
 import PersonCardIcon from "@/assets/person-card.svg";
 import PersonIcon from "@/assets/person.svg";
 import ReferencesIcon from "@/assets/references-icon.svg";
@@ -156,7 +155,6 @@ export default {
     AccountAction,
     PhotoUploadModal,
     ReferencesModal,
-    LargeButton,
     VerificationIcon,
     OnboardingIcon,
     VolunteerWelcomeModal
