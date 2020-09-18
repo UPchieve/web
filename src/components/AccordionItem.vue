@@ -30,7 +30,8 @@
             to bridge connections among topics. Some US states (and therefore,
             some of UPchieve's school partners) only offer integrated math
             subjects.
-            <span class="accordion-item__labels-sublabel--bold">Don't be afraid to pick up an integrated math request</span
+            <span class="accordion-item__labels-sublabel--bold"
+              >Don't be afraid to pick up an integrated math request</span
             >—as long as you've completed the underlying certifications, you'll
             be able to help!
           </span>
