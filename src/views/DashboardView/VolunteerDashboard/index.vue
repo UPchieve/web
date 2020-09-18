@@ -320,7 +320,7 @@ export default {
         return {
           subtitle: "In progress",
           status: "PENDING"
-        }
+        };
 
       return {
         subtitle: "Go through our training",
