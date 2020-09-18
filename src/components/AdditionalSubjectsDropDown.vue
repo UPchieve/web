@@ -29,7 +29,7 @@
         class="training__subjects-unlocked"
       >
         <span v-if="isLargeDevice" class="training__subjects-unlocked--mobile"
-          >Included Certifications:</span
+          >Required Certifications:</span
         >
         <span
           v-for="subject in cert.subjectsIncluded"
