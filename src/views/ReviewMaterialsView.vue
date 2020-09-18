@@ -12,8 +12,8 @@
     <div v-else-if="reviewMaterials.length === 0">
       <h1 class="header-title">{{ categoryDisplayName }} Review Materials</h1>
       <p class="error-message">
-        Sorry, we do not currently have review materials for
-        {{ categoryDisplayName }}. Please check back later!
+        Sorry, review materials for {{ categoryDisplayName }} are currently
+        under development. Check back soon!
       </p>
     </div>
     <div v-else>
@@ -75,7 +75,6 @@ export default {
         case "trigonometry":
         case "statistics":
         case "precalculus":
-        case "calculus":
         case "biology":
         case "physicsOne":
         case "physicsTwo":
@@ -120,8 +119,12 @@ export default {
           ];
           break;
         case "chemistry":
+        case "environmentalScience":
+        case "calculusBC":
+        case "calculusAB":
           this.reviewMaterials = [];
           break;
+        // case for a user entering a subject that we do not support
         default:
           this.error = true;
           break;
