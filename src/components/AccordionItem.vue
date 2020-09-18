@@ -20,8 +20,22 @@
             :class="{ 'accordion-item__labels-header': buttonSize === 'large' }"
             >{{ label }}</span
           >
-          <span v-if="sublabel" class="accordion-item__labels-sublabel">
-            {{ sublabelMessage }}
+          <span
+            v-if="sublabel && isIntegratedMathDropDown"
+            class="accordion-item__labels-sublabel"
+          >
+            Integrated math describes the style of mathematics education which
+            integrates multiple strands of mathematics. The integrated sequence
+            is meant to take math learning out of silos and teach students how
+            to bridge connections among topics. Some US states (and therefore,
+            some of UPchieve's school partners) only offer integrated math
+            subjects.
+            <span class="accordion-item__labels-sublabel--bold">Don't be afraid to pick up an integrated math request</span
+            >—as long as you've completed the underlying certifications, you'll
+            be able to help!
+          </span>
+          <span v-else class="accordion-item__labels-sublabel">
+            {{ sublabel }}
           </span>
         </div>
       </div>
@@ -64,11 +78,6 @@ export default {
   computed: {
     isIntegratedMathDropDown() {
       return this.isOpen && this.label === "Integrated Math";
-    },
-    sublabelMessage() {
-      if (this.isIntegratedMathDropDown)
-        return "Integrated math describes the style of mathematics education which integrates multiple strands of mathematics. The integrated sequence is meant to take math learning out of silos and teach students how to bridge connections among topics.";
-      else return this.sublabel;
     }
   },
 
@@ -127,6 +136,10 @@ export default {
     &-sublabel {
       color: $c-secondary-grey;
       margin: 0.4em 0;
+
+      &--bold {
+        font-weight: 600;
+      }
     }
   }
 

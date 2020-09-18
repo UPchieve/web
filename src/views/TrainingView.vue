@@ -326,11 +326,9 @@ export default {
       return `${amount} courses required`;
     },
     additionalSubjectsColHeaders() {
-      if (this.currentSubjectType === "math")
-        return ["Integrated Math", "Included Certifications", ""];
       if (this.currentSubjectType === "college")
-        return ["Additional Subjects", "Required Training", ""];
-      else return ["Additional Subjects", "Included Certifications", ""];
+        return ["Subject", "Required Training", ""];
+      else return ["Subject", "Required Certifications", ""];
     },
     additionalSubjectsAccordionHeader() {
       if (this.currentSubjectType === "math")
