@@ -3,7 +3,7 @@
     <div class="quiz-link__cell" @click="onClick">
       <check-mark class="quiz-link__icon" :checked="isCompleted" />
       <div class="quiz-link__left">
-        <div class="quiz-link__name">QUIZ</div>
+        <div class="quiz-link__name">{{ quizName }}</div>
         <div class="quiz-link__status">{{ statusText }}</div>
       </div>
       <div class="quiz-link__right">
@@ -24,6 +24,7 @@ export default {
   },
   props: {
     quizKey: String,
+    quizName: String,
     certification: Object,
     isDisabled: Boolean
   },

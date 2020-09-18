@@ -13,6 +13,7 @@
         <quiz-link
           :isDisabled="!course.isComplete"
           :quizKey="course.quizKey"
+          :quizName="course.quizName"
           :certification="quizCertification"
         />
       </div>
