@@ -9,7 +9,6 @@ export default {
   endSession(context, sessionId) {
     return NetworkService.endSession(context, { sessionId }).then(() => {
       const currentSessionData = context.$store.state.user.session;
-      context.$store.dispatch("user/clearSession");
 
       // analytics: track when a help session has ended
       AnalyticsService.trackSessionEnded(

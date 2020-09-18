@@ -14,7 +14,8 @@
           class="chat-warning chat-warning--moderation"
           v-show="moderationWarningIsShown"
         >
-          Messages cannot contain personal information or profanity
+          Messages cannot contain personal information, profanity, or links to
+          third party video services
           <span class="chat-warning__close" @click="hideModerationWarning"
             >×</span
           >

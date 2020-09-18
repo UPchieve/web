@@ -1,17 +1,12 @@
 <template>
   <div class="zwib-wrapper" :class="toolClass">
-    <div id="zwib-div" ref="zwibDiv"></div>
+    <div
+      id="zwib-div"
+      :class="{ 'whiteboard-open': isWhiteboardOpen }"
+      ref="zwibDiv"
+    ></div>
     <div id="toolbar" class="toolbar">
       <p v-if="error" class="whiteboard-error">{{ error }}</p>
-      <div
-        class="toolbar-item toolbar-item--drag"
-        title="Drag tool"
-        v-bind:class="selectedTool === 'pan' ? 'selected-tool' : ''"
-        v-if="!mobileMode"
-        @click="usePanTool"
-      >
-        <PanIcon class="toolbar-item__svg" />
-      </div>
       <div
         class="toolbar-item toolbar-item--pick"
         title="Pick tool"
@@ -172,7 +167,6 @@ import ColorPickerIcon from "@/assets/whiteboard_icons/color_picker.svg";
 import PenIcon from "@/assets/whiteboard_icons/pen.svg";
 import UndoIcon from "@/assets/whiteboard_icons/undo.svg";
 import RedoIcon from "@/assets/whiteboard_icons/redo.svg";
-import PanIcon from "@/assets/whiteboard_icons/grab.svg";
 import DeleteSelectionIcon from "@/assets/whiteboard_icons/delete_selection.png";
 import RotateIcon from "@/assets/whiteboard_icons/rotate.png";
 import PhotoUploadIcon from "@/assets/whiteboard_icons/photo-upload.svg";
@@ -193,7 +187,6 @@ export default {
     PenIcon,
     UndoIcon,
     RedoIcon,
-    PanIcon,
     PhotoUploadIcon,
     ShapesIcon,
     TextIcon,
@@ -215,6 +208,10 @@ export default {
     toggleWhiteboard: {
       type: Function,
       required: true
+    },
+    isSessionOver: {
+      type: Boolean,
+      required: true
     }
   },
   data() {
@@ -222,14 +219,14 @@ export default {
       zwibblerCtx: null,
       selectedTool: "",
       showColorPicker: false,
-      isMouseDown: false,
       error: "",
       showShapes: false,
       // used to determine the beginning and end node of a shape
       shapeNodes: [],
-      // default scale factor for safari trackpad
-      previousScale: 1,
-      isLoading: false
+      isLoading: false,
+      canvasHeight: 2800,
+      canvasWidth: 1000,
+      pingPongInterval: null
     };
   },
   computed: {
@@ -243,7 +240,6 @@ export default {
     toolClass() {
       if (this.selectedTool === "brush") return "zwib-wrapper--brush";
       if (this.selectedTool === "pick") return "zwib-wrapper--pick";
-      if (this.selectedTool === "pan") return "zwib-wrapper--pan";
       if (this.selectedTool === "line") return "zwib-wrapper--line";
       if (this.selectedTool === "circle") return "zwib-wrapper--circle";
       if (this.selectedTool === "rectangle") return "zwib-wrapper--rectangle";
@@ -283,15 +279,28 @@ export default {
       autoPickTool: false,
       autoPickToolText: false,
       defaultBrushWidth: 5,
+      allowZoom: false,
+      pageView: true,
+      pageInflation: 0,
+      pageShadow: false,
+      outsidePageColour: "#fff",
       defaultSmoothness: "sharpest",
       multilineText: true,
-      scrollbars: false,
+      scrollbars: true,
+      defaultFontSize: 32,
+      background: "grid",
       collaborationServer: `${
         process.env.VUE_APP_WEBSOCKET_ROOT
       }/whiteboard/room/{name}`
     });
 
     this.zwibblerCtx = zwibblerCtx;
+
+    // Set paper size
+    this.zwibblerCtx.setPaperSize(this.canvasWidth, this.canvasHeight);
+
+    // Zoom to full width
+    this.resizeViewRectangle();
 
     // Join or create shared zwibbler session
     try {
@@ -307,8 +316,24 @@ export default {
     this.zwibblerCtx.setConfig("showHints", false);
 
     this.zwibblerCtx.on("connected", () => {
+      // @todo access the connection in a less sketchy way
+      const zwibblerWsConnection = this.zwibblerCtx.zc.Pb.Pb;
+      const zwibblerOnMessage = zwibblerWsConnection.onmessage;
+      // Intercept Zwibbler's websocket message handler
+      zwibblerWsConnection.onmessage = messageEvent => {
+        // Forward message to Zwibbler unless it's our "pong" response
+        if (messageEvent.data !== "p0ng") zwibblerOnMessage(messageEvent);
+      };
+
+      // Ping server every 45 seconds to keep the connection open
+      this.pingPongInterval = window.setInterval(() => {
+        zwibblerWsConnection.send("p1ng");
+      }, 45 * 1000);
+
       // Set brush tool to default tool
       this.useBrushTool();
+
+      this.resizeViewRectangle();
 
       // Don't start setting selected tool until connected
       this.zwibblerCtx.on("tool-changed", toolname => {
@@ -327,20 +352,13 @@ export default {
       if (this.selectedTool === "text") this.usePickTool();
     });
 
-    if (!this.mobileMode) {
-      const zwibblerContainer = this.$refs.zwibDiv;
-      zwibblerContainer.addEventListener("wheel", this.trackpadListener, false);
-      // Safari doesn't register wheel events for the trackpad pinch
-      zwibblerContainer.addEventListener(
-        "gesturestart",
-        this.safariTrackpadZoom
-      );
-      zwibblerContainer.addEventListener(
-        "gesturechange",
-        this.safariTrackpadZoom
-      );
-      zwibblerContainer.addEventListener("gestureend", this.safariTrackpadZoom);
-    }
+    window.addEventListener(
+      "orientationchange",
+      this.handleOrientationChange,
+      false
+    );
+
+    window.addEventListener("resize", this.handleWindowResize, false);
 
     this.zwibblerCtx.on("document-changed", info => {
       const isRemoteChange = info && info.remote;
@@ -367,8 +385,19 @@ export default {
     });
   },
   methods: {
-    usePanTool() {
-      this.zwibblerCtx.usePanTool();
+    resizeViewRectangle() {
+      this.zwibblerCtx.setViewRectangle({
+        x: 0,
+        y: 0,
+        width: this.canvasWidth,
+        height: 1
+      });
+    },
+    handleOrientationChange() {
+      setTimeout(this.resizeViewRectangle, 100);
+    },
+    handleWindowResize() {
+      setTimeout(this.resizeViewRectangle, 100);
     },
     usePickTool() {
       this.zwibblerCtx.usePickTool();
@@ -528,52 +557,16 @@ export default {
       this.zwibblerCtx.addSelectionHandle(1.0, 0.5, 0, 0, "", "scale");
       this.zwibblerCtx.addSelectionHandle(0.5, 1.0, 0, 0, "", "scale");
       this.zwibblerCtx.addSelectionHandle(0.0, 0.5, 0, 0, "", "scale");
-    },
-    trackpadListener(event) {
-      event.preventDefault();
-      // zoom in and out when pinching trackpad
-      // otherwise pan the whiteboard
-      if (event.ctrlKey) {
-        const { deltaY } = event;
-        if (deltaY > 0) this.zwibblerCtx.zoomOut();
-        else this.zwibblerCtx.zoomIn();
-      } else {
-        const { deltaX, deltaY } = event;
-        const rect = this.zwibblerCtx.getViewRectangle();
-        rect.x += deltaX;
-        rect.y += deltaY;
-        this.zwibblerCtx.setViewRectangle(rect);
-      }
-    },
-    safariTrackpadZoom(event) {
-      event.preventDefault();
-      const { scale } = event;
-      if (scale > this.previousScale) this.zwibblerCtx.zoomIn();
-      else this.zwibblerCtx.zoomOut();
-      this.previousScale = scale;
     }
   },
   beforeDestroy() {
-    if (!this.mobileMode) {
-      const zwibblerContainer = this.$refs.zwibDiv;
-      zwibblerContainer.removeEventListener(
-        "wheel",
-        this.trackpadListener,
-        false
-      );
-      zwibblerContainer.removeEventListener(
-        "gesturestart",
-        this.safariTrackpadZoom
-      );
-      zwibblerContainer.removeEventListener(
-        "gesturechange",
-        this.safariTrackpadZoom
-      );
-      zwibblerContainer.removeEventListener(
-        "gestureend",
-        this.safariTrackpadZoom
-      );
-    }
+    window.removeEventListener(
+      "orientationchange",
+      this.handleOrientationChange,
+      false
+    );
+    window.removeEventListener("resize", this.handleWindowResize, false);
+    window.clearInterval(this.pingPongInterval);
   },
   watch: {
     shapeNodes() {
@@ -582,6 +575,10 @@ export default {
         this.usePickTool();
         this.shapeNodes = [];
       }
+    },
+    isSessionOver(isSessionOver, oldIsSessionOver) {
+      if (isSessionOver && !oldIsSessionOver)
+        this.zwibblerCtx.setConfig("readOnly", true);
     }
   }
 };
@@ -608,12 +605,6 @@ export default {
     }
   }
 
-  &--pan {
-    .zwibbler-canvas-holder {
-      cursor: grab !important;
-    }
-  }
-
   &--text {
     .zwibbler-canvas-holder {
       cursor: text !important;
@@ -630,13 +621,25 @@ export default {
 #zwib-div {
   height: 100%;
   width: 100%;
+
+  &.whiteboard-open {
+    @media only screen and (orientation: landscape) and (max-height: 500px) {
+      position: fixed !important;
+      top: 0;
+      left: 0;
+      background: #fff;
+      z-index: 100;
+    }
+  }
 }
 
 .zwibbler-canvas-holder,
 .zwib-wrapper,
+.zwibbler-overlay,
 #zwib-div {
+  outline: none !important;
   &:focus {
-    outline: none;
+    outline: none !important;
   }
 }
 
@@ -650,7 +653,7 @@ export default {
   position: absolute;
   bottom: 50px;
   left: 0;
-  right: 0;
+  right: 20px;
   margin: auto;
   display: flex;
   align-items: center;
@@ -676,7 +679,6 @@ export default {
 }
 
 .toolbar-item {
-  padding: 1em;
   border: 1px solid transparent;
   display: flex;
   align-items: center;

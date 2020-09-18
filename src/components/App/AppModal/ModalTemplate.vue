@@ -5,7 +5,11 @@
     @click="closeModal"
   >
     <div v-if="mobileMode" class="ModalTemplate-header">
-      <div class="ModalTemplate-header-close-button" @click="handleCancel">
+      <div
+        class="ModalTemplate-header-close-button"
+        @click="handleCancel"
+        v-if="!isSessionFulfilledModal"
+      >
         <arrow-icon class="icon" />
         <p>{{ backText }}</p>
       </div>
@@ -49,7 +53,8 @@ export default {
     alertModal: Boolean,
     important: Boolean,
     showTemplateButtons: { type: Boolean, default: true },
-    showAccept: { type: Boolean, default: true }
+    showAccept: { type: Boolean, default: true },
+    modalComponentName: String
   },
   mounted() {
     const body = document.querySelector("body");
@@ -60,7 +65,10 @@ export default {
     body.classList.remove("disable-scroll");
   },
   computed: {
-    ...mapGetters({ mobileMode: "app/mobileMode" })
+    ...mapGetters({ mobileMode: "app/mobileMode" }),
+    isSessionFulfilledModal() {
+      return this.modalComponentName === "SessionFulfilledModal";
+    }
   },
   methods: {
     handleCancel() {
@@ -68,6 +76,8 @@ export default {
       this.$store.dispatch("app/modal/hide");
     },
     closeModal(event) {
+      // users must interact with the modal button to close session related modals
+      if (this.isSessionFulfilledModal) return;
       const { target } = event;
       if (target.classList.contains("ModalTemplate")) this.handleCancel();
     }
