@@ -1,6 +1,9 @@
 <template>
   <div>
-    <div class="circles">
+    <div v-if="hasManyQuestions" class="question-indicator">
+      <p>{{ questionNumber }} of {{ quizLength }}</p>
+    </div>
+    <div v-else class="circles">
       <div
         v-for="n in quizLength"
         :key="`circle-${n}`"
@@ -23,7 +26,13 @@
 export default {
   props: {
     quizLength: { type: Number, required: true },
-    barWidth: { type: Number, required: true }
+    barWidth: { type: Number, required: true },
+    questionNumber: { type: Number, required: true }
+  },
+  computed: {
+    hasManyQuestions() {
+      return this.quizLength > 16;
+    }
   }
 };
 </script>
@@ -46,7 +55,7 @@ export default {
 }
 
 #circle-1 {
-  background: #16d2aa;
+  background-color: $c-success-green;
 }
 
 .rect {
@@ -58,7 +67,11 @@ export default {
 }
 
 .rect.cover {
-  background: #16d2aa;
+  background-color: $c-success-green;
   top: -20px;
+}
+
+.question-indicator {
+  margin-bottom: 1em;
 }
 </style>

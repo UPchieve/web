@@ -1,7 +1,11 @@
 <template>
   <div class="container">
     <div class="progress-bar-container">
-      <progress-bar :barWidth="barWidth" :quizLength="quizLength" />
+      <progress-bar
+        :barWidth="barWidth"
+        :quizLength="quizLength"
+        :questionNumber="questionNumber"
+      />
     </div>
     <div class="quiz-body">
       <div v-if="questionNumber" class="question-number">
@@ -68,7 +72,7 @@ export default {
       showPrevious: false,
       showNext: false,
       showSubmit: false,
-      questionNumber: "",
+      questionNumber: 0,
       barWidth: 0,
       questionText: "",
       items: [],
@@ -150,10 +154,12 @@ export default {
       this.barWidth = (100 / (this.quizLength - 1)) * index;
       for (let i = 1; i < this.quizLength + 1; i++) {
         const element = document.getElementById(`circle-${i}`);
-        if (i < index + 2) {
-          element.style.background = "#16D2AA";
-        } else {
-          element.style.background = "#EEEEEE";
+        if (element) {
+          if (i < index + 2) {
+            element.style.background = "#16D2AA";
+          } else {
+            element.style.background = "#EEEEEE";
+          }
         }
       }
     },
