@@ -423,6 +423,14 @@ export default {
     openVolunteerApprovalAccountActions() {
       const accountActions = [
         {
+          title: "Background information",
+          subtitle: this.backgroundInfoAction.subtitle,
+          status: this.backgroundInfoAction.status,
+          clickFn: this.goToBackgroundInfo,
+          icon: PersonIcon,
+          priority: this.addSortPriorityNum(this.backgroundInfoAction.status)
+        },
+        {
           title: "Proof of identity",
           subtitle: this.photoIdAction.subtitle,
           status: this.photoIdAction.status,
@@ -437,14 +445,6 @@ export default {
           clickFn: this.toggleReferencesModal,
           icon: ReferencesIcon,
           priority: this.addSortPriorityNum(this.referenceAction.status)
-        },
-        {
-          title: "Background information",
-          subtitle: this.backgroundInfoAction.subtitle,
-          status: this.backgroundInfoAction.status,
-          clickFn: this.goToBackgroundInfo,
-          icon: PersonIcon,
-          priority: this.addSortPriorityNum(this.backgroundInfoAction.status)
         }
       ];
 
@@ -454,6 +454,14 @@ export default {
     partnerVolunteerApprovalAccountActions() {
       const accountActions = [
         {
+          title: "Background information",
+          subtitle: this.backgroundInfoAction.subtitle,
+          status: this.backgroundInfoAction.status,
+          clickFn: this.goToBackgroundInfo,
+          icon: PersonIcon,
+          priority: this.addSortPriorityNum(this.backgroundInfoAction.status)
+        },
+        {
           title: "Proof of identity",
           // @todo: change copy for subtitle
           subtitle: "Completed",
@@ -461,14 +469,6 @@ export default {
           clickFn: () => {},
           icon: PersonCardIcon,
           priority: this.addSortPriorityNum("COMPLETED")
-        },
-        {
-          title: "Background information",
-          subtitle: this.backgroundInfoAction.subtitle,
-          status: this.backgroundInfoAction.status,
-          clickFn: this.goToBackgroundInfo,
-          icon: PersonIcon,
-          priority: this.addSortPriorityNum(this.backgroundInfoAction.status)
         }
       ];
 
@@ -478,20 +478,20 @@ export default {
     onboaringAccountActions() {
       const onboaringActions = [
         {
-          title: "Select availability",
-          subtitle: this.availabilityAction.subtitle,
-          status: this.availabilityAction.status,
-          clickFn: this.clickAvailabilityAction,
-          icon: CalendarIcon,
-          priority: this.addSortPriorityNum(this.availabilityAction.status)
-        },
-        {
           title: "Complete UPchieve 101",
           subtitle: this.trainingAction.subtitle,
           status: this.trainingAction.status,
           clickFn: this.clickUpchieve101Action,
           icon: TrainingIcon,
           priority: this.addSortPriorityNum(this.trainingAction.status)
+        },
+        {
+          title: "Select availability",
+          subtitle: this.availabilityAction.subtitle,
+          status: this.availabilityAction.status,
+          clickFn: this.clickAvailabilityAction,
+          icon: CalendarIcon,
+          priority: this.addSortPriorityNum(this.availabilityAction.status)
         },
         {
           title: "Unlock a subject",
