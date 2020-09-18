@@ -45,17 +45,26 @@ export default {
         text: "Ready to chat"
       };
 
+      if (this.isVolunteer) {
+        status.text = "Ready to help";
+      }
+
       if (inSession) {
         status.class = "SidebarInfo-status-circle--session";
         status.text = "Chat in session";
       }
 
+      if (this.isVolunteer && !this.user.isOnboarded) {
+        status.class = "SidebarInfo-status-circle--onboarding";
+        status.text = "Onboarding";
+      }
+
       if (
         this.isVolunteer &&
-        (!this.user.isOnboarded || !this.user.isApproved)
+        (this.user.isOnboarded && !this.user.isApproved)
       ) {
         status.class = "SidebarInfo-status-circle--onboarding";
-        status.text = "Approval & Onboarding";
+        status.text = "Pending approval";
       }
 
       return status;
