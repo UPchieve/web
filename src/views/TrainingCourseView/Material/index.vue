@@ -25,7 +25,7 @@
       <link-material
         v-if="material.type === 'link'"
         :linkUrl="material.linkUrl"
-        :label="'Go to module'"
+        :label="'Go to link'"
       />
       <resources-material
         v-else-if="material.type === 'resources'"
