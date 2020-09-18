@@ -84,15 +84,13 @@ export default {
 
   methods: {
     isComplete(includedSubjects) {
-      return includedSubjects.every(subject => {
-        let cert = subject.key;
-        if (cert.match(/^algebra/i)) cert = "algebra";
-        return this.user.certifications[cert].passed;
-      });
+      return includedSubjects.every(subject =>
+        this.user.subjects.includes(subject.key)
+      );
     },
     progressStatus(includedSubjects) {
       if (this.isComplete(includedSubjects)) return "Unlocked";
-      else return "Not started";
+      else return "Locked";
     }
   }
 };
