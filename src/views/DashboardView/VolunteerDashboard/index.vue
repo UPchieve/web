@@ -308,10 +308,18 @@ export default {
     },
 
     trainingAction() {
-      if (this.hasCompletedUpchieve101)
+      const passedQuiz = this.user.certifications.upchieve101.passed;
+      if (passedQuiz)
         return {
           subtitle: "Completed",
           status: "COMPLETED"
+        };
+
+      const startedCourse = this.user.trainingCourses.upchieve101.progress > 0;
+      if (startedCourse)
+        return {
+          subtitle: "In progress",
+          status: "PENDING"
         };
 
       return {
@@ -339,10 +347,6 @@ export default {
         this.user.occupation.length > 0 &&
         this.user.country
       );
-    },
-
-    hasCompletedUpchieve101() {
-      return this.user.certifications.upchieve101.passed;
     },
 
     impactStats() {
