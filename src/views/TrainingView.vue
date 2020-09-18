@@ -1,188 +1,353 @@
 <template>
-  <div v-if="user.isVolunteer" class="training">
+  <div v-if="user.isVolunteer" class="training-view">
     <div class="body-container">
-      <div class="body-header">Volunteer Training</div>
+      <div class="body-header">Volunteer Training and Certifications</div>
       <p class="instructions">
-        Pass at least one quiz so that we know what subjects you can help
-        students with. We recommend giving each quiz a try before reviewing the
-        provided materials in order to establish a baseline. Quizzes have 10-15
-        questions and take about 15 minutes each!
+        On this page you can explore the training and certifications required
+        for each school subject that we offer. Start by selecting a subject
+        (Math, Science, etc.) and review both the required training and
+        certifications. Once you complete the required training and at least one
+        certification per subject, then you'll be able to start tutoring for
+        that subject.
       </p>
-      <div v-for="supercategory in supercategories" :key="supercategory">
-        <div
-          class="supercategory"
-          :style="{ backgroundColor: colorFor(supercategory) }"
-          @click="toggleSupercategoryShown(supercategory)"
+      <div class="subject-types">
+        <p
+          v-for="subjectType in subjectTypes"
+          :key="subjectType.key"
+          @click="showSubjectTraining(subjectType.key)"
+          class="subject-types__header-type"
+          :class="subjectType.key === currentSubjectType ? 'is-selected' : null"
         >
-          {{ supercategory }}
-          <div
-            v-if="supercategoryMenuDisplayStates[supercategory]"
-            class="arrow up"
-          />
-          <div
-            v-if="!supercategoryMenuDisplayStates[supercategory]"
-            class="arrow down"
-          />
-        </div>
-        <div v-for="category in quizzes[supercategory]" :key="category">
-          <div
-            v-show="supercategoryMenuDisplayStates[supercategory]"
-            class="category"
-          >
-            <div class="category-label">
-              <span>
-                {{ category }}
-              </span>
-              <div class="review">
-                <div class="review-container">
-                  <div class="review-label">
-                    <router-link
-                      :to="
-                        '/training/review/' +
-                          categoryKeys[category].toLowerCase()
-                      "
-                      tag="a"
-                    >
-                      Review
-                    </router-link>
-                  </div>
-                  <div class="arrow right" />
-                </div>
-              </div>
-            </div>
-            <div class="test">
-              <router-link
-                v-if="!hasPassed(category) && hasTries(category)"
-                :to="
-                  '/training/' + categoryKeys[category].toLowerCase() + '/quiz'
-                "
-                tag="div"
-                class="test-container"
-              >
-                <div class="test-label">Take test</div>
-                <div class="arrow right" />
-              </router-link>
-              <div v-if="hasPassed(category)" class="test-container certified">
-                Certified!
-              </div>
-              <div v-if="!mobileMode">
-                <div v-if="!hasPassed(category)" class="numTries">
-                  You have used {{ getTries(category) }}/3 tries.
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+          {{ subjectType.displayName }}
+        </p>
       </div>
+
+      <accordion-item
+        label="Training Courses"
+        sublabel="Complete the training in order to begin tutoring students"
+        buttonSize="large"
+        :alertMessage="requiredTrainingMessage"
+      >
+        <training-drop-down
+          :headers="['Training', 'Progress', 'Actions']"
+          :certData="currentSubject.training"
+          trainingCourse
+        />
+      </accordion-item>
+
+      <accordion-item
+        label="Subject Certifications"
+        sublabel="Complete at least 1 certification quiz in order to begin tutoring students"
+        buttonSize="large"
+      >
+        <subject-certs-drop-down
+          :headers="['Certification', 'Subjects Unlocked', 'Actions']"
+          :certData="currentSubject.certifications"
+        />
+      </accordion-item>
+
+      <accordion-item
+        :label="additionalSubjectsAccordionHeader.header"
+        :sublabel="additionalSubjectsAccordionHeader.subheader"
+        buttonSize="large"
+        v-if="currentSubject.additionalSubjects.length > 0"
+      >
+        <additional-subjects-drop-down
+          :headers="additionalSubjectsColHeaders"
+          :certData="currentSubject.additionalSubjects"
+        />
+      </accordion-item>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState, mapGetters } from "vuex";
-
-import { topics, allSubtopics } from "@/utils/topics";
-import isIntegratedMath from "@/utils/is-integrated-math";
+import { mapState } from "vuex";
+import AccordionItem from "@/components/AccordionItem";
+import TrainingDropDown from "@/components/TrainingDropDown";
+import SubjectCertsDropDown from "@/components/SubjectCertsDropDown";
+import AdditionalSubjectsDropDown from "@/components/AdditionalSubjectsDropDown";
 
 export default {
-  data() {
-    // array destructuring syntax [, value] ignores the first entry, in this
-    // case the key
-    const quizzes = Object.entries(topics)
-      .map(([, topicObj]) => [
-        topicObj.displayName,
-        Object.entries(topicObj.subtopics).map(
-          ([, subtopicObj]) => subtopicObj.displayName
-        )
-      ])
-      .reduce((result, [key, value]) => {
-        result[key] = value;
-        return result;
-      }, {});
-
-    // hide integrated math topics from quiz selection
-    const filteredMathQuizzes = quizzes["Math Tutoring"].filter(
-      topic => !isIntegratedMath(topic)
-    );
-    quizzes["Math Tutoring"] = filteredMathQuizzes;
-
-    // todo consider refactoring so that we identify categories by the
-    // key rather than by the display name
-    const categoryKeys = Object.entries(allSubtopics())
-      .map(([key, subtopicObj]) => [subtopicObj.displayName, key])
-      .reduce((result, [displayName, key]) => {
-        result[displayName] = key;
-        return result;
-      }, {});
-
-    const supercategoryColors = {
-      "Math Tutoring": "#EF9BF9",
-      "Science Tutoring": "#9675CE",
-      "College Counseling": "#F3C639",
-      default: "#1855D1"
-    };
-
-    return {
-      quizzes,
-      supercategoryColors,
-      categoryKeys,
-      supercategoryMenuDisplayStates: {}
-    };
+  name: "Training",
+  components: {
+    AccordionItem,
+    TrainingDropDown,
+    SubjectCertsDropDown,
+    AdditionalSubjectsDropDown
   },
+  data() {
+    return {
+      subjectTypes: [
+        { displayName: "Math", key: "math" },
+        { displayName: "Science", key: "science" },
+        { displayName: "College Counseling", key: "college" }
+        // { displayName: "Standardized Testing", key: "sat" }
+      ],
+      currentSubjectType: "math",
+      math: {
+        training: [
+          { displayName: "UPchieve 101", key: "upchieve101" }
+          // { displayName: "Tutoring Skills", key: "tutoringSkills" }
+        ],
+        certifications: [
+          {
+            displayName: "Pre-algebra",
+            subjectsIncluded: [
+              { displayName: "Pre-algebra", key: "prealgebra" }
+            ],
+            key: "prealgebra"
+          },
+          {
+            displayName: "Algebra",
+            subjectsIncluded: [
+              { displayName: "Pre-algebra", key: "prealgebra" },
+              { displayName: "Algebra 1", key: "algebraOne" },
+              { displayName: "Algebra 2", key: "algebraTwo" }
+            ],
+            key: "algebra"
+          },
+          {
+            displayName: "Geometry",
+            subjectsIncluded: [{ displayName: "Geometry", key: "geometry" }],
+            key: "geometry"
+          },
+          {
+            displayName: "Trigonometry",
+            subjectsIncluded: [
+              { displayName: "Trigonometry", key: "trigonometry" }
+            ],
+            key: "trigonometry"
+          },
+          {
+            displayName: "Statistics",
+            subjectsIncluded: [
+              { displayName: "Statistics", key: "statistics" }
+            ],
+            key: "statistics"
+          },
+          {
+            displayName: "Precalculus",
+            subjectsIncluded: [
+              { displayName: "Pre-algebra", key: "prealgebra" },
+              { displayName: "Algebra 1", key: "algebraOne" },
+              { displayName: "Algebra 2", key: "algebraTwo" },
+              { displayName: "Trigonometry", key: "trigonometry" },
+              { displayName: "Precalculus", key: "precalculus" }
+            ],
+            key: "precalculus"
+          },
+          {
+            displayName: "Calculus AB",
+            subjectsIncluded: [
+              { displayName: "Pre-algebra", key: "prealgebra" },
+              { displayName: "Algebra 1", key: "algebraOne" },
+              { displayName: "Algebra 2", key: "algebraTwo" },
+              { displayName: "Trigonometry", key: "trigonometry" },
+              { displayName: "Precalculus", key: "precalculus" },
+              { displayName: "Calculus AB", key: "calculusAB" }
+            ],
+            key: "calculusAB"
+          },
+          {
+            displayName: "Calculus BC",
+            subjectsIncluded: [
+              { displayName: "Pre-algebra", key: "prealgebra" },
+              { displayName: "Algebra 1", key: "algebraOne" },
+              { displayName: "Algebra 2", key: "algebraTwo" },
+              { displayName: "Trigonometry", key: "trigonometry" },
+              { displayName: "Precalculus", key: "precalculus" },
+              { displayName: "Calculus AB", key: "calculusAB" },
+              { displayName: "Calculus BC", key: "calculusBC" }
+            ],
+            key: "calculusBC"
+          }
+        ],
+        additionalSubjects: [
+          {
+            displayName: "Integrated Math 1",
+            subjectsIncluded: [
+              { displayName: "Algebra", key: "algebraOne" },
+              { displayName: "Geometry", key: "geometry" },
+              { displayName: "Statistics", key: "statistics" }
+            ],
+            key: "integratedMathOne"
+          },
+          {
+            displayName: "Integrated Math 2",
+            subjectsIncluded: [
+              { displayName: "Algebra", key: "algebraOne" },
+              { displayName: "Geometry", key: "geometry" },
+              { displayName: "Trigonometry", key: "trigonometry" },
+              { displayName: "Statistics", key: "statistics" }
+            ],
+            key: "integratedMathTwo"
+          },
+          {
+            displayName: "Integrated Math 3",
+            subjectsIncluded: [
+              { displayName: "Precalculus", key: "precalculus" },
+              { displayName: "Statistics", key: "statistics" }
+            ],
+            key: "integratedMathThree"
+          },
+          {
+            displayName: "Integrated Math 4",
+            subjectsIncluded: [
+              { displayName: "Precalculus", key: "precalculus" }
+            ],
 
-  created() {
-    const displayStates = Object.entries(topics)
-      .map(([, topicObj]) => topicObj.displayName)
-      .reduce((result, key) => {
-        result[key] = false;
-        return result;
-      }, {});
-
-    this.supercategoryMenuDisplayStates = displayStates;
+            key: "integratedMathFour"
+          }
+        ]
+      },
+      science: {
+        training: [
+          { displayName: "UPchieve 101", key: "upchieve101" }
+          // { displayName: "Tutoring Skills", key: "tutoringSkills" }
+        ],
+        certifications: [
+          {
+            displayName: "Biology",
+            subjectsIncluded: [{ displayName: "Biology", key: "biology" }],
+            key: "biology"
+          },
+          {
+            displayName: "Chemistry",
+            subjectsIncluded: [{ displayName: "Chemistry", key: "chemistry" }],
+            key: "chemistry"
+          },
+          {
+            displayName: "Physics 1",
+            subjectsIncluded: [{ displayName: "Physics 1", key: "physicsOne" }],
+            key: "physicsOne"
+          },
+          {
+            displayName: "Physics 2",
+            subjectsIncluded: [{ displayName: "Physics 2", key: "physicsTwo" }],
+            key: "physicsTwo"
+          },
+          {
+            displayName: "Environmental Science",
+            subjectsIncluded: [
+              {
+                displayName: "Environmental Science",
+                key: "environmentalScience"
+              }
+            ],
+            key: "environmentalScience"
+          }
+        ],
+        additionalSubjects: []
+      },
+      college: {
+        training: [
+          { displayName: "UPchieve 101", key: "upchieve101" }
+          // { displayName: "College Counseling", key: "collegeCounseling" }
+        ],
+        certifications: [
+          {
+            displayName: "Essays",
+            subjectsIncluded: [{ displayName: "Essays", key: "essays" }],
+            key: "essays"
+          },
+          {
+            displayName: "Planning",
+            subjectsIncluded: [{ displayName: "Planning", key: "planning" }],
+            key: "planning"
+          },
+          {
+            displayName: "Applications",
+            subjectsIncluded: [
+              { displayName: "Applications", key: "applications" }
+            ],
+            key: "applications"
+          }
+        ],
+        additionalSubjects: [
+          // {
+          //   displayName: "College Planning",
+          //   subjectsIncluded: [
+          //     { displayName: "UPchieve 101", key: "upchieve101" },
+          //     { displayName: "College Counseling", key: "collegeCounseling" }
+          //   ],
+          //   key: "planning"
+          // },
+          // {
+          //   displayName: "College Applications",
+          //   subjectsIncluded: [
+          //     { displayName: "UPchieve 101", key: "upchieve101" },
+          //     { displayName: "College Counseling", key: "collegeCounseling" }
+          //   ],
+          //   key: "applications"
+          // }
+        ]
+      },
+      sat: {
+        training: [
+          { displayName: "UPchieve 101", key: "upchieve101" },
+          { displayName: "SAT Strategies ", key: "satStrategies" }
+        ],
+        certifications: [
+          {
+            displayName: "SAT Math",
+            subjectsIncluded: [{ displayName: "SAT Math", key: "satMath" }],
+            key: "satMath"
+          },
+          {
+            displayName: "SAT Reading",
+            subjectsIncluded: [
+              { displayName: "SAT Reading", key: "satReading" }
+            ],
+            key: "satReading"
+          }
+        ],
+        additionalSubjects: []
+      }
+    };
   },
 
   computed: {
-    ...mapGetters({
-      mobileMode: "app/mobileMode"
+    ...mapState({
+      user: state => state.user.user
     }),
-    ...mapState({ user: state => state.user.user }),
+    currentSubject() {
+      return this[this.currentSubjectType];
+    },
+    // get the amount of required training material a user must complete
+    requiredTrainingMessage() {
+      let amount = 0;
+      for (let subject of this.currentSubject.training) {
+        if (!this.user.certifications[subject.key].passed) amount++;
+      }
 
-    supercategories() {
-      return Object.entries(topics).map(([, topicObj]) => topicObj.displayName);
+      if (!amount) return "";
+      if (amount === 1) return `${amount} course required`;
+      return `${amount} courses required`;
+    },
+    additionalSubjectsColHeaders() {
+      if (this.currentSubjectType === "college")
+        return ["Subject", "Required Training", ""];
+      else return ["Subject", "Required Certifications", ""];
+    },
+    additionalSubjectsAccordionHeader() {
+      if (this.currentSubjectType === "math")
+        return {
+          header: "Integrated Math",
+          subheader: "Click here to learn more about Integrated Math"
+        };
+      else
+        return {
+          header: "Additional Subjects",
+          subheader:
+            "Tutor for these subjects automatically by completing the required training courses"
+        };
     }
   },
 
   methods: {
-    toggleSupercategoryShown(supercategory) {
-      const isShown = this.supercategoryMenuDisplayStates[supercategory];
-      this.supercategoryMenuDisplayStates[supercategory] = !isShown;
-    },
-    hasPassed(category) {
-      if (this.user.certifications[this.categoryKeys[category]]) {
-        return this.user.certifications[this.categoryKeys[category]].passed;
-      }
-
-      return false;
-    },
-    hasTries(category) {
-      if (this.user.certifications[this.categoryKeys[category]]) {
-        return this.user.certifications[this.categoryKeys[category]].tries < 3;
-      }
-
-      return true;
-    },
-    getTries(category) {
-      if (this.user.certifications[this.categoryKeys[category]]) {
-        return this.user.certifications[this.categoryKeys[category]].tries;
-      }
-
-      return 0;
-    },
-    colorFor(supercategory) {
-      return (
-        this.supercategoryColors[supercategory] ||
-        this.supercategoryColors.default
-      );
+    showSubjectTraining(subject) {
+      this.currentSubjectType = subject;
     }
   }
 };
@@ -190,12 +355,13 @@ export default {
 
 <style lang="scss" scoped>
 .body-container {
-  max-width: 800px;
+  max-width: 1200px;
+  width: 100%;
   border-radius: 8px;
   background: #fff;
   padding: 40px 15px 80px;
 
-  @include breakpoint-above("medium") {
+  @include breakpoint-above("large") {
     padding: 40px 40px 80px;
   }
 
@@ -207,10 +373,10 @@ export default {
   }
 }
 
-.training {
+.training-view {
   padding: 10px;
 
-  @include breakpoint-above("medium") {
+  @include breakpoint-above("large") {
     padding: 40px;
   }
 }
@@ -221,186 +387,29 @@ a {
   cursor: pointer;
 }
 
-.supercategory,
-.category {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 450px;
-  height: 60px;
-}
-
-.supercategory,
-.header {
-  text-align: start;
-  font-size: 24px;
-}
-
-.supercategory {
-  color: #fff;
-  margin-top: 20px;
-  font-size: 20px;
-  font-weight: 600;
-  cursor: pointer;
-  text-shadow: 0px 0px 2px #00000027;
-  padding: 0px 17px 0 20px;
-}
-
-.category {
-  font-size: 16px;
-  border: 1px solid #eeeeee;
-  text-align: left;
-  padding: 0px 20px;
-}
-
-.category span {
-  font-weight: 600;
-}
-
-.review {
-  font-size: 16px;
-  text-align: start;
-  display: inline-block;
-}
-
-.category-label {
-  width: 55%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.test {
-  display: flex;
-  flex-direction: column;
-  min-width: 143px;
-}
-
-.test-container,
-.review-container {
-  display: flex;
-  align-items: center;
-}
-
-.test-container {
-  cursor: default;
-}
-
-.test-container:not(.certified) {
-  cursor: pointer;
-}
-
-.test-container:not(.certified):hover {
-  color: #5a5a5f;
-}
-
-.test-container .arrow.right {
-  padding-left: 3px;
-  transition: padding-left 0.1s ease-in;
-}
-
-.test-container:hover .arrow.right {
-  padding-left: 6px;
-}
-
-.test-container .arrow.right::after {
-  background-size: 38%;
-}
-
-.numTries {
-  font-size: 12px;
-}
-
-.arrow {
-  height: 1em;
-  width: 1em;
-  position: relative;
-}
-
-.arrow::after {
-  content: "";
-  z-index: 2;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-.review-container {
-  & .arrow.right {
-    height: 1.3em;
-    width: 1.3em;
-    padding-left: 0px;
-    transition: padding-left 0.1s ease-in;
-
-    &::after {
-      background-size: 24%;
-    }
-  }
-
-  &:hover {
-    color: #5a5a5f;
-
-    .arrow.right {
-      padding-left: 3px;
-    }
-  }
-}
-
-.arrow.down::after {
-  background-image: url("~@/assets/down_arrow.png");
-}
-
-.arrow.up::after {
-  background-image: url("~@/assets/up_arrow.png");
-}
-
-.arrow.right::after {
-  background-image: url("~@/assets/right_arrow.png");
-}
-
-.certified {
-  color: #16d2aa;
-  font-weight: 600;
-}
-
 .instructions {
   text-align: left;
   font-size: 16px;
   color: $c-secondary-grey;
 }
 
-@media screen and (max-width: 700px) {
-  .supercategory,
-  .category {
-    width: auto !important;
-  }
-  .test {
-    min-width: initial;
+.subject-types {
+  @include flex-container(row, space-around, center);
+  margin-top: 2em;
+
+  &__header-type {
+    flex-basis: 100%;
+    padding-bottom: 0.8em;
+    font-size: 16px;
+    border-bottom: 4px solid transparent;
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 }
 
-@media screen and (max-width: 460px) {
-  .category,
-  .review {
-    font-size: 14px;
-  }
-  .category-label {
-    width: 60%;
-  }
-}
-
-@media screen and (max-width: 375px) {
-  .category-label {
-    width: 70%;
-  }
-}
-
-@media screen and (max-width: 340px) {
-  .category,
-  .review {
-    font-size: 12px;
-  }
+.is-selected {
+  border-bottom: 4px solid $c-success-green;
 }
 </style>

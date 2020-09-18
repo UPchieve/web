@@ -1,14 +1,13 @@
 <template>
   <div class="volunteer-dashboard">
-    <dashboard-banner>
-      <large-button
-        v-if="isNewVolunteer"
-        primary
-        reverse
-        @click.native="goToCoachGuide"
-        >Get Started</large-button
+    <dashboard-banner />
+
+    <div v-if="showUpchieve101Notice" class="dashboard-notice">
+      <router-link to="training/course/upchieve101"
+        >Reminder: Please complete UPchieve 101 before October 18th
+        →</router-link
       >
-    </dashboard-banner>
+    </div>
 
     <div class="volunteer-dashboard__body">
       <template v-if="user.isApproved && user.isOnboarded">
@@ -131,7 +130,6 @@ import AccountAction from "./AccountAction";
 import PhotoUploadModal from "./PhotoUploadModal";
 import ReferencesModal from "./ReferencesModal";
 import VolunteerWelcomeModal from "@/views/DashboardView/VolunteerDashboard/VolunteerWelcomeModal.vue";
-import LargeButton from "@/components/LargeButton";
 import PersonCardIcon from "@/assets/person-card.svg";
 import PersonIcon from "@/assets/person.svg";
 import ReferencesIcon from "@/assets/references-icon.svg";
@@ -139,6 +137,7 @@ import CalendarIcon from "@/assets/calendar.svg";
 import CertificationIcon from "@/assets/certification.svg";
 import VerificationIcon from "@/assets/verification.svg";
 import OnboardingIcon from "@/assets/onboarding.svg";
+import TrainingIcon from "@/assets/training_icon.svg";
 import { allSubtopicNames } from "@/utils/topics";
 
 const headerData = {
@@ -156,7 +155,6 @@ export default {
     AccountAction,
     PhotoUploadModal,
     ReferencesModal,
-    LargeButton,
     VerificationIcon,
     OnboardingIcon,
     VolunteerWelcomeModal
@@ -203,6 +201,12 @@ export default {
 
     isNewVolunteer() {
       return !this.user.pastSessions || !this.user.pastSessions.length;
+    },
+
+    showUpchieve101Notice() {
+      if (!this.user.isApproved || !this.user.isOnboarded) return false;
+      if (this.user.certifications.upchieve101.passed) return false;
+      return new Date(this.user.createdAt) < new Date("9/18/20");
     },
 
     photoIdAction() {
@@ -288,14 +292,38 @@ export default {
     },
 
     certificationAction() {
-      if (this.hasCertification)
+      for (let cert in this.user.certifications) {
+        // skip certification for check for required training
+        if (cert === "upchieve101") continue;
+        if (this.user.certifications[cert].passed)
+          return {
+            subtitle: "Completed",
+            status: "COMPLETED"
+          };
+      }
+      return {
+        subtitle: "Pass at least one quiz",
+        status: "DEFAULT"
+      };
+    },
+
+    trainingAction() {
+      const passedQuiz = this.user.certifications.upchieve101.passed;
+      if (passedQuiz)
         return {
           subtitle: "Completed",
           status: "COMPLETED"
         };
 
+      const startedCourse = this.user.trainingCourses.upchieve101.progress > 0;
+      if (startedCourse)
+        return {
+          subtitle: "In progress",
+          status: "PENDING"
+        };
+
       return {
-        subtitle: "Pass at least one quiz",
+        subtitle: "Go through our training",
         status: "DEFAULT"
       };
     },
@@ -399,6 +427,14 @@ export default {
     openVolunteerApprovalAccountActions() {
       const accountActions = [
         {
+          title: "Background information",
+          subtitle: this.backgroundInfoAction.subtitle,
+          status: this.backgroundInfoAction.status,
+          clickFn: this.goToBackgroundInfo,
+          icon: PersonIcon,
+          priority: this.addSortPriorityNum(this.backgroundInfoAction.status)
+        },
+        {
           title: "Proof of identity",
           subtitle: this.photoIdAction.subtitle,
           status: this.photoIdAction.status,
@@ -413,14 +449,6 @@ export default {
           clickFn: this.toggleReferencesModal,
           icon: ReferencesIcon,
           priority: this.addSortPriorityNum(this.referenceAction.status)
-        },
-        {
-          title: "Background information",
-          subtitle: this.backgroundInfoAction.subtitle,
-          status: this.backgroundInfoAction.status,
-          clickFn: this.goToBackgroundInfo,
-          icon: PersonIcon,
-          priority: this.addSortPriorityNum(this.backgroundInfoAction.status)
         }
       ];
 
@@ -430,6 +458,14 @@ export default {
     partnerVolunteerApprovalAccountActions() {
       const accountActions = [
         {
+          title: "Background information",
+          subtitle: this.backgroundInfoAction.subtitle,
+          status: this.backgroundInfoAction.status,
+          clickFn: this.goToBackgroundInfo,
+          icon: PersonIcon,
+          priority: this.addSortPriorityNum(this.backgroundInfoAction.status)
+        },
+        {
           title: "Proof of identity",
           // @todo: change copy for subtitle
           subtitle: "Completed",
@@ -437,14 +473,6 @@ export default {
           clickFn: () => {},
           icon: PersonCardIcon,
           priority: this.addSortPriorityNum("COMPLETED")
-        },
-        {
-          title: "Background information",
-          subtitle: this.backgroundInfoAction.subtitle,
-          status: this.backgroundInfoAction.status,
-          clickFn: this.goToBackgroundInfo,
-          icon: PersonIcon,
-          priority: this.addSortPriorityNum(this.backgroundInfoAction.status)
         }
       ];
 
@@ -454,6 +482,14 @@ export default {
     onboaringAccountActions() {
       const onboaringActions = [
         {
+          title: "Complete UPchieve 101",
+          subtitle: this.trainingAction.subtitle,
+          status: this.trainingAction.status,
+          clickFn: this.clickUpchieve101Action,
+          icon: TrainingIcon,
+          priority: this.addSortPriorityNum(this.trainingAction.status)
+        },
+        {
           title: "Select availability",
           subtitle: this.availabilityAction.subtitle,
           status: this.availabilityAction.status,
@@ -462,7 +498,7 @@ export default {
           priority: this.addSortPriorityNum(this.availabilityAction.status)
         },
         {
-          title: "Obtain a certification",
+          title: "Unlock a subject",
           subtitle: this.certificationAction.subtitle,
           status: this.certificationAction.status,
           clickFn: this.clickCertificationAction,
@@ -481,10 +517,6 @@ export default {
       } else {
         this.$router.push("/");
       }
-    },
-
-    goToCoachGuide() {
-      this.$router.push("/coach-guide");
     },
 
     showOnboardingModal() {
@@ -507,6 +539,9 @@ export default {
     },
     clickCertificationAction() {
       this.$router.push("/training");
+    },
+    clickUpchieve101Action() {
+      this.$router.push("/training/course/upchieve101");
     },
     goToBackgroundInfo() {
       this.$router.push("/background-information");
@@ -649,6 +684,24 @@ export default {
   &__stat-value {
     font-weight: bold;
     text-align: right;
+  }
+}
+
+.dashboard-notice {
+  padding: 15px;
+  background: $c-warning-orange;
+  border-radius: 8px;
+  margin: 20px 0 -20px;
+  font-weight: 500;
+  font-size: 16px;
+
+  a {
+    color: #fff;
+
+    &:hover {
+      color: #f3f3f3;
+      text-decoration: none;
+    }
   }
 }
 </style>

@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
 import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 
@@ -29,6 +29,9 @@ export default {
     };
   },
   computed: {
+    ...mapState({
+      user: state => state.user.user
+    }),
     ...mapGetters({
       isSessionAlive: "user/isSessionAlive"
     }),
@@ -38,10 +41,33 @@ export default {
     sessionStatus() {
       const inSession = this.isSessionAlive;
 
-      return {
-        class: inSession ? "SidebarInfo-status-circle--session" : null,
-        text: inSession ? "Chat in session" : "Ready to chat"
+      const status = {
+        text: "Ready to chat"
       };
+
+      if (this.isVolunteer) {
+        status.text = "Ready to help";
+      }
+
+      if (inSession) {
+        status.class = "SidebarInfo-status-circle--session";
+        status.text = "Chat in session";
+      }
+
+      if (this.isVolunteer && !this.user.isOnboarded) {
+        status.class = "SidebarInfo-status-circle--onboarding";
+        status.text = "Onboarding";
+      }
+
+      if (
+        this.isVolunteer &&
+        (this.user.isOnboarded && !this.user.isApproved)
+      ) {
+        status.class = "SidebarInfo-status-circle--onboarding";
+        status.text = "Pending approval";
+      }
+
+      return status;
     }
   }
 };
@@ -83,7 +109,8 @@ export default {
       width: $size;
       height: $size;
 
-      &--session {
+      &--session,
+      &--onboarding {
         background: $c-warning-orange;
       }
     }

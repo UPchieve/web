@@ -2,11 +2,14 @@ export const topics = {
   math: {
     subtopics: {
       prealgebra: { displayName: "Pre-algebra" },
-      algebra: { displayName: "Algebra" },
+      algebraOne: { displayName: "Algebra 1" },
+      algebraTwo: { displayName: "Algebra 2" },
       geometry: { displayName: "Geometry" },
       trigonometry: { displayName: "Trigonometry" },
+      statistics: { displayName: "Statistics" },
       precalculus: { displayName: "Precalculus" },
-      calculus: { displayName: "Calculus" },
+      calculusAB: { displayName: "Calculus AB" },
+      calculusBC: { displayName: "Calculus BC" },
       integratedMathOne: { displayName: "Integrated Math 1" },
       integratedMathTwo: { displayName: "Integrated Math 2" },
       integratedMathThree: { displayName: "Integrated Math 3" },
@@ -18,7 +21,9 @@ export const topics = {
     subtopics: {
       biology: { displayName: "Biology" },
       chemistry: { displayName: "Chemistry" },
-      physicsOne: { displayName: "Physics 1" }
+      physicsOne: { displayName: "Physics 1" },
+      physicsTwo: { displayName: "Physics 2" },
+      environmentalScience: { displayName: "Environmental Science" }
     },
     displayName: "Science Tutoring"
   },
@@ -29,6 +34,14 @@ export const topics = {
       applications: { displayName: "Applications" }
     },
     displayName: "College Counseling"
+  },
+  training: {
+    subtopics: {
+      upchieve101: { displayName: "UPchieve 101" },
+      tutoringSkills: { displayName: "Tutoring Skills" },
+      collegeSkills: { displayName: "College Counseling Skills" }
+    },
+    displayName: "UPchieve Training"
   }
 };
 

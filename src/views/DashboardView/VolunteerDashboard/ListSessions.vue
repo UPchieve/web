@@ -86,7 +86,7 @@ export default {
 
         if (
           Object.keys(allSubtopics()).some(
-            s => s === subTopic && this.user.certifications[s].passed
+            s => s === subTopic && this.user.subjects.includes(s)
           )
         ) {
           results.push(session);

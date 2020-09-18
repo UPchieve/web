@@ -89,13 +89,14 @@ describe("Training quizzes", function() {
 
     cy.location("pathname").should("eq", "/training");
 
-    cy.contains(".supercategory", "Math").click();
+    cy.contains("span", "Subject Certifications").click();
 
-    cy.contains("div", "Algebra")
-      .parent(".category")
-      .children(".test")
-      .children(".test-container")
-      .children(".test-label")
+    cy.contains("span", "Algebra")
+      .parent(".training__cert-title")
+      .parent(".training__cert")
+      .next(".training__subjects-unlocked")
+      .next(".action-btns")
+      .children("button")
       .click();
   });
 

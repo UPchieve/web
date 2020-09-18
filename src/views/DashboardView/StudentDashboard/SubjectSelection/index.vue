@@ -47,27 +47,42 @@ export default {
       science: ScienceSVG
     };
 
-    const cards = Object.entries(topics).map(([key, topicObj]) => {
-      return {
-        title: topicObj.displayName,
-        svg: svgs[key],
-        topic: key,
-        subtopics: Object.keys(topicObj.subtopics),
-        subtopicDisplayNames: Object.entries(topicObj.subtopics)
-          .map(([subtopicKey, subtopicObj]) => [
-            subtopicKey,
-            subtopicObj.displayName
-          ])
-          .reduce((result, [subtopicKey, displayName]) => {
-            result[subtopicKey] = displayName;
-            return result;
-          }, {}),
-        isTutoringCard: true
-      };
+    const cards = Object.entries(topics)
+      .filter(([key]) => key !== "training")
+      .map(([key, topicObj]) => {
+        return {
+          title: topicObj.displayName,
+          svg: svgs[key],
+          topic: key,
+          subtopics: Object.keys(topicObj.subtopics),
+          subtopicDisplayNames: Object.entries(topicObj.subtopics)
+            .map(([subtopicKey, subtopicObj]) => [
+              subtopicKey,
+              subtopicObj.displayName
+            ])
+            .reduce((result, [subtopicKey, displayName]) => {
+              result[subtopicKey] = displayName;
+              return result;
+            }, {}),
+          isTutoringCard: true
+        };
+      });
+
+    // Temporarily hide Statistics and Calculus BC from students
+    cards[0].subtopics = cards[0].subtopics.filter(subject => {
+      const temporarilyHiddenSubjects = ["statistics", "calculusBC"];
+      return !temporarilyHiddenSubjects.includes(subject);
     });
 
-    // Temporarily hide Physics from students
-    cards[1].subtopics = ["biology", "chemistry"];
+    // Temporarily hide Physics subjects and Environmental Science from students
+    cards[1].subtopics = cards[1].subtopics.filter(subject => {
+      const temporarilyHiddenSubjects = [
+        "physicsOne",
+        "physicsTwo",
+        "environmentalScience"
+      ];
+      return !temporarilyHiddenSubjects.includes(subject);
+    });
 
     cards.push({
       title: "Invite Your Friends",

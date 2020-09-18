@@ -53,7 +53,7 @@ describe("Volunteer dashboard", () => {
           .should("not.exist");
 
         cy.get(".account-action")
-          .then(accountActionElems => accountActionElems[0])
+          .then(accountActionElems => accountActionElems[1])
           .contains("Upload a photo ID");
       });
 
@@ -71,7 +71,7 @@ describe("Volunteer dashboard", () => {
           .should("not.exist");
 
         cy.get(".account-action")
-          .then(accountActionElems => accountActionElems[0])
+          .then(accountActionElems => accountActionElems[1])
           .contains("Upload a photo ID");
       });
     });

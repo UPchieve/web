@@ -413,6 +413,18 @@ export default {
       .get(`${API_ROOT}/training/review/${data}`)
       .then(this._successHandler, this._errorHandler);
   },
+  getTrainingCourse(courseKey) {
+    return Vue.http
+      .get(`${API_ROOT}/training/course/${courseKey}`)
+      .then(this._successHandler, this._errorHandler);
+  },
+  recordTrainingCourseProgress(courseKey, materialKey) {
+    return Vue.http
+      .post(`${API_ROOT}/training/course/${courseKey}/progress`, {
+        materialKey
+      })
+      .then(this._successHandler, this._errorHandler);
+  },
   updateSchedule(context, data) {
     return context.$http
       .post(`${API_ROOT}/calendar/save`, data)

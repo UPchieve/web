@@ -35,10 +35,10 @@ import AdminSchools from "./views/Admin/AdminSchools";
 import AdminAddSchool from "./views/Admin/AdminAddSchool";
 import AdminEditSchool from "./views/Admin/AdminEditSchool";
 import AdminReports from "./views/Admin/AdminReports";
-import VolunteerGuideView from "./views/VolunteerGuideView";
 import ReviewMaterialsView from "./views/ReviewMaterialsView";
 import ReferenceView from "./views/ReferenceView";
 import BackgroundInfoView from "./views/BackgroundInfoView";
+import TrainingCourseView from "./views/TrainingCourseView";
 
 import store from "./store";
 
@@ -214,6 +214,12 @@ const routes = [
     meta: { protected: true }
   },
   {
+    path: "/training/course/:courseKey",
+    name: "TrainingCourseView",
+    component: TrainingCourseView,
+    meta: { protected: true }
+  },
+  {
     path: "/profile",
     name: "ProfileView",
     component: ProfileView,
@@ -308,12 +314,6 @@ const routes = [
     name: "AdminReports",
     component: AdminReports,
     meta: { protected: true, requiresAdmin: true }
-  },
-  {
-    path: "/coach-guide",
-    name: "VolunteerGuide",
-    component: VolunteerGuideView,
-    meta: { protected: true }
   },
   {
     path: "/background-information",

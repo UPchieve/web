@@ -19,6 +19,8 @@
 </template>
 
 <script>
+import { topics } from "@/utils/topics";
+
 export default {
   props: {
     quizResults: { type: Object, required: true },
@@ -39,11 +41,15 @@ export default {
   mounted() {
     const { category } = this.$route.params;
     this.category = category;
+    const isTrainingCategory = Object.keys(topics.training.subtopics).includes(
+      category
+    );
 
     if (this.quizResults.passed) {
       this.headerMsg = "What a rockstar! You passed!";
-      this.instructionMsg =
-        "Now that you have this certification, you'll be notified of student requests for help in this subject. If you want to help students with even more subjects, just pass more quizzes!";
+      this.instructionMsg = isTrainingCategory
+        ? "Now that you have this certification, you're one step closer to being able to help students!"
+        : "Now that you have this certification, you'll be notified of student requests for help in this subject. If you want to help students with even more subjects, just pass more quizzes!";
       this.popUpBorderStyle = {
         borderBottom: "5px solid #16D2AA",
         borderLeft: "5px solid #16D2AA"
@@ -55,8 +61,9 @@ export default {
       };
     } else {
       this.headerMsg = "You failed this time, but don't give up!";
-      this.instructionMsg =
-        "Please try attempting this quiz again after reviewing your incorrect answers and checking out the subject-specific review materials we provide on the Training page.";
+      this.instructionMsg = isTrainingCategory
+        ? "Please try taking this quiz again after reviewing your incorrect answers and checking out the training course materials again."
+        : "Please try taking this quiz again after reviewing your incorrect answers and checking out the subject-specific review materials we provide on the Training page.";
       this.popUpBorderStyle = {
         borderBottom: "5px solid #F44747",
         borderLeft: "5px solid #F44747"
