@@ -115,7 +115,7 @@ export default {
       lessThan: "",
       greaterThan: "",
       // dropdown menu options
-      selected: "algebra", // default
+      selected: "algebraOne", // default
       topics: allSubtopicNames(),
       // availability objects
       availabilityTable: {}
@@ -131,7 +131,9 @@ export default {
         the number of volunteers available at that day and hour block who are certified
         in the "certifiedSubject". */
     getAvailability(certifiedSubject) {
-      UserService.getVolunteersAvailability(this, certifiedSubject)
+      let cert = certifiedSubject;
+      if (certifiedSubject.match(/^algebra/i)) cert = "algebra";
+      UserService.getVolunteersAvailability(this, cert)
         .then(availability => {
           this.availabilityTable = availability;
           //flattening table makes the implementation of css grid cleaner
