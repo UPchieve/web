@@ -226,7 +226,8 @@ export default {
       isLoading: false,
       canvasHeight: 2800,
       canvasWidth: 1000,
-      pingPongInterval: null
+      pingPongInterval: null,
+      isConnected: false
     };
   },
   computed: {
@@ -315,7 +316,13 @@ export default {
     // disable showing hints on the canvas
     this.zwibblerCtx.setConfig("showHints", false);
 
+    // read-only until connected
+    this.zwibblerCtx.setConfig("readOnly", true);
+
     this.zwibblerCtx.on("connected", () => {
+      this.isConnected = true;
+      this.zwibblerCtx.setConfig("readOnly", false);
+
       // @todo access the connection in a less sketchy way
       const zwibblerWsConnection = this.zwibblerCtx.zc.Pb.Pb;
       const zwibblerOnMessage = zwibblerWsConnection.onmessage;
@@ -340,6 +347,19 @@ export default {
         this.selectedTool = toolname;
         this.hideHoveredToolbars();
       });
+    });
+
+    this.zwibblerCtx.on("connect-error", () => {
+      this.isConnected = false;
+      this.zwibblerCtx.setConfig("readOnly", true);
+      let reconnectInterval = window.setInterval(async () => {
+        if (!this.isConnected) {
+          this.zwibblerCtx.joinSharedSession(this.sessionId, true);
+        } else {
+          console.log("clearing interval");
+          window.clearInterval(reconnectInterval);
+        }
+      }, 5 * 1000);
     });
 
     // disallow dragging and pasting to the whiteboard
