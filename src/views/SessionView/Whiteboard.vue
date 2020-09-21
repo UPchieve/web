@@ -356,7 +356,6 @@ export default {
         if (!this.isConnected) {
           this.zwibblerCtx.joinSharedSession(this.sessionId, true);
         } else {
-          console.log("clearing interval");
           window.clearInterval(reconnectInterval);
         }
       }, 5 * 1000);
