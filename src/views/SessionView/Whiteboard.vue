@@ -227,12 +227,14 @@ export default {
       canvasHeight: 2800,
       canvasWidth: 1000,
       pingPongInterval: null,
-      isConnected: false
+      isConnected: false,
+      hadConnectionIssue: false
     };
   },
   computed: {
     ...mapState({
-      isMobileApp: state => state.app.isMobileApp
+      isMobileApp: state => state.app.isMobileApp,
+      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive
     }),
     ...mapGetters({
       mobileMode: "app/mobileMode",
@@ -350,15 +352,11 @@ export default {
     });
 
     this.zwibblerCtx.on("connect-error", () => {
+      this.zwibblerCtx.stopSharing();
       this.isConnected = false;
+      this.hadConnectionIssue = true;
+      window.clearInterval(this.pingPongInterval);
       this.zwibblerCtx.setConfig("readOnly", true);
-      let reconnectInterval = window.setInterval(async () => {
-        if (!this.isConnected) {
-          this.zwibblerCtx.joinSharedSession(this.sessionId, true);
-        } else {
-          window.clearInterval(reconnectInterval);
-        }
-      }, 5 * 1000);
     });
 
     // disallow dragging and pasting to the whiteboard
@@ -598,6 +596,21 @@ export default {
     isSessionOver(isSessionOver, oldIsSessionOver) {
       if (isSessionOver && !oldIsSessionOver)
         this.zwibblerCtx.setConfig("readOnly", true);
+    },
+    isSessionConnectionAlive(newValue, oldValue) {
+      if (!this.hadConnectionIssue) {
+        console.log("Early exit because hadConnectionIssue === false")
+        return
+      }
+      if (this.isConnected) {
+        console.log("Early exit because isConnected === true");
+        return;
+      }
+      if (newValue && !oldValue) {
+        console.log("Now attempting reconnect");
+        this.zwibblerCtx.newDocument();
+        this.zwibblerCtx.joinSharedSession(this.sessionId, false);
+      }
     }
   }
 };
