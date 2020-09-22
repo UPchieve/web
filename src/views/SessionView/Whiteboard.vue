@@ -598,16 +598,10 @@ export default {
         this.zwibblerCtx.setConfig("readOnly", true);
     },
     isSessionConnectionAlive(newValue, oldValue) {
-      if (!this.hadConnectionIssue) {
-        console.log("Early exit because hadConnectionIssue === false")
-        return
-      }
-      if (this.isConnected) {
-        console.log("Early exit because isConnected === true");
-        return;
-      }
+      if (!this.hadConnectionIssue) return; // On initial connection, early exit
+      if (this.isConnected) return; // Already connected, so early exit
       if (newValue && !oldValue) {
-        console.log("Now attempting reconnect");
+        // Socket.io just reconnected, so try reconnecting Zwibbler (but first clear the document)
         this.zwibblerCtx.newDocument();
         this.zwibblerCtx.joinSharedSession(this.sessionId, false);
       }
