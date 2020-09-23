@@ -54,8 +54,6 @@ export default {
 
     subTopicDisplayName() {
       const { type, subTopic } = this.session;
-      if (subTopic === "algebra") return "Algebra";
-      if (subTopic === "calculus") return "Calculus";
       return topics[type].subtopics[subTopic].displayName;
     },
 
