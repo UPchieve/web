@@ -16,7 +16,7 @@
 import { mapGetters, mapState } from "vuex";
 import DashboardBanner from "../DashboardBanner";
 import SubjectSelection from "./SubjectSelection";
-import moment from "moment";
+import moment from "moment-timezone";
 
 const headerData = {
   component: "RejoinSessionHeader",
