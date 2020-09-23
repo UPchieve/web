@@ -63,6 +63,28 @@
             </div>
           </div>
 
+          <div v-if="user.isVolunteer" class="container-section">
+            <div class="prompt">Account status</div>
+            <div class="answer">
+              <toggle-button
+                :disabled="!activeEdit"
+                :value="isAccountActive"
+                :labels="{ checked: 'Active', unchecked: 'Deactivated' }"
+                :width="95"
+                :color="{
+                  checked: '#16D2AA',
+                  unchecked: '#F44747',
+                  disabled: '#AAAAAA'
+                }"
+                @change="toggleAccountActive"
+              />
+            </div>
+            <div class="description">
+              Deactivate your account to stop receiving emails and text
+              notifications. You can reactivate it at any time.
+            </div>
+          </div>
+
           <div class="container-section resetBtn">
             <router-link to="/resetpassword" class="prompt"
               >Reset password</router-link
@@ -107,10 +129,12 @@ export default {
       invalidInputs: [],
       saveFailed: false,
       phoneNational: "",
-      phoneInputInfo: {}
+      phoneInputInfo: {},
+      isAccountActive: true
     };
   },
   created() {
+    this.isAccountActive = !this.user.isDeactivated;
     if (this.user.isVolunteer && this.user.phone) {
       const num =
         this.user.phone[0] === "+" ? this.user.phone : `+1${this.user.phone}`;
@@ -181,6 +205,10 @@ export default {
       this.phoneInputInfo = phoneInputInfo;
     },
 
+    toggleAccountActive({ value }) {
+      this.isAccountActive = value;
+    },
+
     /**
      * Toggle editing state.
      * {Case A} if activeEdit === false: enter the editing state by setting activeEdit to true
@@ -217,10 +245,11 @@ export default {
       if (!this.errors.length) {
         // form fields valid, so set profile
         this.user.phone = this.phoneInputInfo.e164;
+        this.user.isDeactivated = !this.isAccountActive;
 
         // send only the necessary data
         const payloadUser = {};
-        const keys = ["phone"];
+        const keys = ["phone", "isDeactivated"];
 
         keys.forEach(key => (payloadUser[key] = this.user[key]));
 
@@ -346,6 +375,10 @@ ul {
 
 .answer {
   font-weight: 600;
+}
+
+.answer .vue-js-switch {
+  margin: 5px 0;
 }
 
 .answer ul {
