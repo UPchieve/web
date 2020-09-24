@@ -1,7 +1,7 @@
 <template>
   <div class="SubjectSelectionModal">
     <div v-if="showSurvey" class="presession-survey-container">
-      <presession-survey v-on:surveyCompleted="onSurveyCompleted" />
+      <presession-survey v-on:survey-completed="onSurveyCompleted" />
     </div>
     <div v-else>
       <component v-if="!mobileMode" :is="modalData.svg" class="icon" />
@@ -114,6 +114,7 @@ p {
 }
 
 .SubjectSelectionModal {
+  min-height: 300px;
   @include flex-container(column);
   @include child-spacing(top, 24px);
   @include breakpoint-above("medium") {
