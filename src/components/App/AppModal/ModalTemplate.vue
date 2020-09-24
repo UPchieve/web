@@ -139,6 +139,7 @@ $header-height: 80px;
 }
 
 .ModalTemplate-form {
+  position: relative;
   animation: slideUp 0.6s forwards;
   background: white;
   border-radius: 40px 40px 0 0;

@@ -58,7 +58,6 @@
 
 <script>
 import { mapGetters, mapState } from "vuex";
-import { startSession } from "@/utils/session";
 import DropdownList from "@/components/DropdownList";
 import HyperlinkButton from "@/components/HyperlinkButton";
 import LargeButton from "@/components/LargeButton";
@@ -131,8 +130,6 @@ export default {
             showTemplateButtons: false
           }
         });
-      } else if (!this.mobileMode && this.selectedSubtopic !== "") {
-        startSession(this.$router, this.topic, this.selectedSubtopic);
       } else if (this.title === "Invite Your Friends") {
         this.$store.dispatch("app/modal/show", {
           component: "ReferralModal",
@@ -146,11 +143,12 @@ export default {
           component: "SubjectSelectionModal",
           data: {
             backText: "Dashboard",
-            acceptText: "Start a chat",
+            acceptText: this.topic === "college" ? "Start a chat" : "Continue",
             topic: this.topic,
             subtopics: this.subtopics,
             subtopicDisplayNames: this.subtopicDisplayNames,
-            svg: this.svg
+            svg: this.svg,
+            preSelectedSubtopic: this.selectedSubtopic
           }
         });
       }
