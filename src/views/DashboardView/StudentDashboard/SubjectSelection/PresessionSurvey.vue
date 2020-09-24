@@ -1,8 +1,6 @@
 <template>
   <div class="presession-survey">
-    <large-button
-      primary
-      @click.native="submitSurvey"
+    <large-button primary @click.native="submitSurvey"
       >Start a chat</large-button
     >
   </div>
