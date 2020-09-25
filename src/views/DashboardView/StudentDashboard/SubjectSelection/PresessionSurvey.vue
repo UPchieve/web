@@ -189,11 +189,11 @@ export default {
       font-size: 13px;
     }
 
-    input[type=radio] {
+    input[type="radio"] {
       margin: 0 8px 0 0;
     }
 
-    input[type=text] {
+    input[type="text"] {
       margin: 0 0 0 10px;
       width: 250px;
     }
