@@ -218,6 +218,11 @@ export default {
       .post(`${API_ROOT}/session/latest`, data)
       .then(this._successHandler, this._errorHandler);
   },
+  getSession(sessionId) {
+    return Vue.http
+      .get(`${API_ROOT}/session/${sessionId}`)
+      .then(this._successHandler, this._errorHandler);
+  },
   reportSession({ sessionId, reportReason, reportMessage }) {
     return Vue.http
       .post(`${API_ROOT}/session/${sessionId}/report`, {
@@ -266,7 +271,7 @@ export default {
   },
   adminGetSession(sessionId) {
     return Vue.http
-      .get(`${API_ROOT}/session/${sessionId}`)
+      .get(`${API_ROOT}/session/${sessionId}/admin`)
       .then(this._successHandler, this._errorHandler);
   },
   adminGetPendingVolunteers(page) {
@@ -508,6 +513,11 @@ export default {
   submitPresessionSurvey(sessionId, responseData) {
     return Vue.http
       .post(`${API_ROOT}/survey/presession/${sessionId}`, { responseData })
+      .then(this._successHandler, this._errorHandler);
+  },
+  getPresessionSurvey(sessionId) {
+    return Vue.http
+      .get(`${API_ROOT}/survey/presession/${sessionId}`)
       .then(this._successHandler, this._errorHandler);
   }
 };
