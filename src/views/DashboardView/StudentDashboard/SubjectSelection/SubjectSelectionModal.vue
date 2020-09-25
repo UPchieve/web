@@ -114,7 +114,7 @@ p {
 }
 
 .SubjectSelectionModal {
-  min-height: 300px;
+  min-height: 350px;
   @include flex-container(column);
   @include child-spacing(top, 24px);
   @include breakpoint-above("medium") {

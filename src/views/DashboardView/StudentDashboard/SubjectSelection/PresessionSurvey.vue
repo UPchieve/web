@@ -140,6 +140,9 @@ export default {
   height: 100%;
   width: 100%;
   padding: 30px 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   &__title {
     font-weight: 500;
@@ -151,6 +154,49 @@ export default {
     color: $c-secondary-grey;
     font-size: 16px;
     line-height: 1.5;
+    margin-bottom: 10px;
+  }
+
+  .LargeButton-primary {
+    max-width: 175px;
+    margin-top: 15px;
+  }
+}
+
+.question {
+  align-self: stretch;
+  margin: 7px 20px;
+
+  &__title {
+    margin-bottom: 5px;
+    text-align: left;
+    font-weight: 500;
+    color: $c-secondary-grey;
+  }
+
+  &__options {
+    text-align: left;
+    padding-left: 15px;
+  }
+
+  &__option {
+    label {
+      font-weight: 400;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      font-size: 13px;
+    }
+
+    input[type=radio] {
+      margin: 0 8px 0 0;
+    }
+
+    input[type=text] {
+      margin: 0 0 0 10px;
+      width: 250px;
+    }
   }
 }
 </style>
