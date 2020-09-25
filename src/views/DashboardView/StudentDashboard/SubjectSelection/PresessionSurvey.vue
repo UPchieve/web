@@ -95,8 +95,7 @@ const questions = [
         key: "can-do-it"
       },
       {
-        displayName:
-          "I am very comfortable with this topic.",
+        displayName: "I am very comfortable with this topic.",
         key: "very-confident"
       }
     ]
