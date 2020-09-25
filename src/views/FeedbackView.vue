@@ -10,7 +10,7 @@
         </h3>
       </div>
     </div>
-    <table class="questions-table" v-else>
+    <table class="questions-table" v-else-if="user.isVolunteer">
       <tr v-if="this.$route.params.userType === 'student'" class="title-row">
         <td class="title-cell">
           <!-- Please help us improve UPchieve’s services by filling out this short
@@ -161,6 +161,175 @@
         </td>
       </tr>
     </table>
+
+    <div class="questions-container" v-else>
+      <header class="feedback__header-container">
+        <h1 class="feedback__header">Session Feedback</h1>
+        <template v-if="session.createdAt">
+          <p class="feedback__subheader">
+            {{ sessionSubject }} session with {{ session.volunteer }}
+          </p>
+          <p class="feedback__subheader">
+            {{ sessionDate }} at {{ sessionTime }}
+          </p>
+        </template>
+      </header>
+
+      <!-- question 1 -->
+      <div class="feedback__question-block">
+        <h2 class="feedback__question">
+          <span class="feedback__question-number">1.</span>Your goal for this
+          session was to {{ sessionGoal }}. On a scale of 1 to 5, did UPchieve
+          help you achieve your goal?
+        </h2>
+
+        <div class="feedback__radio-container">
+          <label
+            class="feedback__radio-label"
+            v-for="(option, index) in studentOptions[0].options"
+            :key="`${studentOptions[0].alias}-${index}`"
+          >
+            <input
+              type="radio"
+              :name="studentOptions[0].alias"
+              :value="index + 1"
+              class="feedback__radio-input uc-form-input"
+              v-model="userResponse[studentOptions[0].alias]"
+            />
+            <span class="feedback__radio-option-num">{{ index + 1 }}</span>
+            <p class="feedback__radio-option">{{ option }}</p>
+          </label>
+        </div>
+      </div>
+
+      <!-- question 2 -->
+      <div class="feedback__question-block">
+        <h2 class="feedback__question">
+          <span class="feedback__question-number">2.</span
+          >{{
+            isCollegeSubject
+              ? "How are you feeling about the college application process?"
+              : "What is your level of understanding now that you’ve completed your session?"
+          }}
+        </h2>
+
+        <div class="feedback__radio-container">
+          <label
+            class="feedback__radio-label"
+            v-for="(option, index) in studentOptions[1].options"
+            :key="`${studentOptions[1].alias}-${index}`"
+          >
+            <input
+              type="radio"
+              :name="studentOptions[1].alias"
+              :value="index + 1"
+              class="feedback__radio-input uc-form-input"
+              v-model="userResponse[studentOptions[1].alias]"
+            />
+            <span class="feedback__radio-option-num">{{ index + 1 }}</span>
+            <p class="feedback__radio-option">
+              {{ option }}
+            </p>
+          </label>
+        </div>
+      </div>
+
+      <!-- question 3 -->
+      <div class="feedback__question-block">
+        <h2 class="feedback__question">
+          <span class="feedback__question-number">3.</span
+          >{{
+            isCollegeSubject
+            ? "How well did your coach help you achieve your goal?"
+            : "Please rate the Academic Coach who helped you.",
+          }}
+        </h2>
+
+        <div class="feedback__radio-container">
+          <label
+            class="feedback__radio-label"
+            v-for="(option, index) in studentOptions[2].options"
+            :key="`${studentOptions[2].alias}-${index}`"
+          >
+            <input
+              type="radio"
+              :name="studentOptions[2].alias"
+              :value="index + 1"
+              class="feedback__radio-input uc-form-input"
+              v-model="userResponse[studentOptions[2].alias]"
+            />
+            <span class="feedback__radio-option-num">{{ index + 1 }}</span>
+            <p class="feedback__radio-option">{{ option }}</p>
+          </label>
+        </div>
+      </div>
+
+      <!-- question 4 -->
+      <div class="feedback__question-block">
+        <h2 class="feedback__question">
+          <span class="feedback__question-number">4.</span>Would you like to
+          favorite your coach, {{ session.volunteer }}?
+        </h2>
+        <p class="feedback__subtext">
+          Favoriting a coach will increase your chances of being paired with
+          them in the future.
+        </p>
+
+        <div
+          v-for="option in studentOptions[3].options"
+          :key="`${studentOptions[3].alias}-${option}`"
+        >
+          <label class="feedback__radio-row-label">
+            <input
+              type="radio"
+              :name="studentOptions[3].alias"
+              :value="option"
+              class="feedback__radio-row-input uc-form-input"
+              v-model="userResponse[studentOptions[3].alias]"
+            />
+            <span class="feedback__radio-row-option">{{ option }}</span></label
+          >
+        </div>
+      </div>
+
+      <!-- question 5 -->
+      <div class="feedback__question-block">
+        <h2 class="feedback__question">
+          <span class="feedback__question-number">5.</span>What could your coach
+          have done better?
+        </h2>
+        <textarea
+          class="feedback__textarea"
+          placeholder="Your feedback..."
+          name="coach-feedback"
+          v-model="userResponse['coach-feedback']"
+        ></textarea>
+      </div>
+      <div class="feedback__question-block">
+        <h2 class="feedback__question">
+          <span class="feedback__question-number">6.</span>(Optional) Do you
+          have any other feedback you’d like to share with UPchieve?
+          <p class="feedback__subtext">
+            This can be about the website, about your coach, about the
+            services/features UPchieve provides, about any technical issues you
+            encountered, etc. We read every single comment, every day!
+          </p>
+        </h2>
+        <textarea
+          class="feedback__textarea"
+          placeholder="Your feedback..."
+          name="other-feedback"
+          v-model="userResponse['other-feedback']"
+        ></textarea>
+      </div>
+      <large-button
+        class="feedback__submit-button"
+        primary
+        @click.native="submitFeedback"
+      >
+        Finish Session
+      </large-button>
+    </div>
   </div>
 </template>
 
@@ -169,8 +338,14 @@ import { mapState } from "vuex";
 
 import NetworkService from "@/services/NetworkService";
 import AnalyticsService from "@/services/AnalyticsService";
+import LargeButton from "@/components/LargeButton";
+import { topics } from "@/utils/topics";
+import moment from "moment";
+import { formatSurveyAnswers } from "@/utils/survey";
 
 export default {
+  name: "FeedbackView",
+  components: { LargeButton },
   data() {
     return {
       sessionId: "",
@@ -179,75 +354,8 @@ export default {
       userType: "",
       studentId: "",
       volunteerId: "",
-      student_questions: [
-        {
-          qid: "1",
-          qtype: "star-rating",
-          alias: "rate-session",
-          title: "Rate your session",
-          secondary_title: "",
-          options: ["Rating"],
-          options_alias: ["rating"]
-        },
-        {
-          qid: "2",
-          qtype: "radio-list",
-          alias: "session-goal",
-          title: "What was your primary goal today?",
-          secondary_title: "",
-          options: [
-            "Improve my understanding",
-            "Check my answers",
-            "Finish a homework assignment",
-            "Get advice",
-            "Prepare for a test",
-            "Other"
-          ],
-          options_alias: [
-            "improve-understanding",
-            "check-answers",
-            "finish-homework",
-            "get-advice",
-            "test-prep",
-            "other"
-          ]
-        },
-        {
-          qid: "3",
-          qtype: "multiple-radio",
-          alias: "coach-ratings",
-          title: "Please tell us about your coach.",
-          secondary_title: "",
-          table_title: [
-            "Strongly Disagree",
-            "Somewhat Disagree",
-            "Neither",
-            "Somewhat Agree",
-            "Strongly Agree"
-          ],
-          options: [
-            "My coach was knowedgable about the topic.",
-            "My coach was friendly and approachable.",
-            "I would like to receive help from this coach again."
-          ],
-          options_alias: [
-            "coach-knowedgable",
-            "coach-friendly",
-            "coach-help-again"
-          ]
-        },
-        {
-          qid: "4",
-          qtype: "text",
-          alias: "other-feedback",
-          title:
-            "(Optional) Do you have any other feedback you'd like to share?",
-          secondary_title:
-            "This can be about the web app, the Academic Coach who helped you, the services UPchieve offers, etc.",
-          table_title: [],
-          options: []
-        }
-      ],
+      session: {},
+      presessionSurvey: {},
       volunteer_questions: [
         {
           qid: "1",
@@ -301,13 +409,61 @@ export default {
       questions: [],
       userResponse: {},
       isSubmittingFeedback: false,
-      completedFeedback: false
+      completedFeedback: false,
+      studentOptions: [
+        {
+          options: ["Not at all", "", "Kind of", "", "Yes, completely!"],
+          alias: "session-goal"
+        },
+        {
+          options: [
+            "I don’t know how to do this at all.",
+            "I think I know how to do it, but I need help.",
+            "I can do this with help.",
+            "I can do this on my own.",
+            "I’m very confident"
+          ],
+          alias: "subject-understanding"
+        },
+        {
+          options: ["Terrible", "", "Decent", "", "Amazing"],
+          alias: "coach-rating"
+        },
+        {
+          options: ["Yes", "No"],
+          alias: "favorite-coach"
+        }
+      ]
     };
   },
   computed: {
     ...mapState({
       user: state => state.user.user
-    })
+    }),
+    sessionSubject() {
+      const { type, subTopic } = this.session;
+      return topics[type].subtopics[subTopic].displayName;
+    },
+    sessionTime() {
+      return moment(this.session.createdAt)
+        .local()
+        .format("LT");
+    },
+    sessionDate() {
+      return moment(this.session.createdAt)
+        .local()
+        .format("MMMM Do, YYYY");
+    },
+    isCollegeSubject() {
+      return this.topic === "college";
+    },
+    sessionGoal() {
+      if (this.presessionSurvey.createdAt)
+        return formatSurveyAnswers(
+          this.presessionSurvey.responseData["primary-goal"].answer
+        ).toLowerCase();
+      return "";
+    }
   },
   async beforeMount() {
     var _self = this;
@@ -318,36 +474,71 @@ export default {
     this.studentId = this.$route.params.studentId;
     this.volunteerId = this.$route.params.volunteerId;
 
+    const [
+      feedbackResponse,
+      sessionResponse,
+      presessionResponse
+    ] = await Promise.all([
+      NetworkService.getFeedback({
+        sessionId: this.sessionId,
+        userType: this.userType
+      }),
+      NetworkService.getSession(this.sessionId),
+      NetworkService.getPresessionSurvey(this.sessionId)
+    ]);
+
     const {
       body: { feedback }
-    } = await NetworkService.getFeedback({
-      sessionId: this.sessionId,
-      userType: this.userType
-    });
+    } = feedbackResponse;
+    const {
+      body: { session }
+    } = sessionResponse;
+    const {
+      body: { survey }
+    } = presessionResponse;
+
+    this.session = session;
+    this.presessionSurvey = survey;
 
     if (feedback) {
       this.completedFeedback = true;
       return;
     }
 
-    if (this.userType === "student") {
-      this.questions = this.student_questions;
-    } else {
+    if (this.userType === "volunteer") {
       this.questions = this.volunteer_questions;
+
+      this.questions.map(function(question) {
+        if (
+          question.qtype === "multiple-radio" ||
+          question.qtype === "star-rating"
+        )
+          _self.userResponse[question.alias] = {};
+      });
+    } else {
+      this.userResponse = {
+        "session-goal": "",
+        "subject-understanding": "",
+        "coach-rating": "",
+        "favorite-coach": "",
+        "coach-feedback": "",
+        "other-feedback": ""
+      };
     }
-    this.questions.map(function(question) {
-      if (
-        question.qtype === "multiple-radio" ||
-        question.qtype === "star-rating"
-      )
-        _self.userResponse[question.alias] = {};
-    });
   },
   methods: {
     submitFeedback() {
       if (this.isSubmittingFeedback) return;
       // analytics: tracking feedback response data
       AnalyticsService.trackFeedback(this, this.user.isFakeUser);
+
+      if (
+        this.userType === "student" &&
+        this.userResponse[this.studentOptions[3].alias]
+      ) {
+        this.userResponse[this.studentOptions[3].alias] =
+          this.userResponse[this.studentOptions[3].alias] === "Yes";
+      }
 
       NetworkService.feedback(this, {
         sessionId: this.sessionId,
@@ -366,6 +557,125 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+label {
+  font-weight: 400;
+  @include font-category("helper-text");
+}
+
+input[type="radio"] {
+  margin: 0;
+}
+
+.feedback {
+  &__header-container {
+    margin-bottom: 3em;
+  }
+
+  &__header {
+    @include font-category("display-small");
+  }
+  &__subheader {
+    font-size: 22px;
+    color: $c-secondary-grey;
+    margin: 0;
+  }
+  &__question-block {
+    margin-bottom: 2em;
+  }
+
+  &__question {
+    text-align: left;
+    @include font-category("heading");
+
+    &-number {
+      margin-right: 5px;
+    }
+  }
+  &__subtext {
+    text-align: left;
+    @include font-category("helper-text");
+    color: $c-secondary-grey;
+  }
+
+  &__textarea {
+    width: 100%;
+    height: 120px;
+    border: 1px solid $c-border-grey;
+    border-radius: 5px;
+    padding: 1em;
+    resize: none;
+  }
+
+  &__radio-container {
+    display: flex;
+    flex-direction: column;
+
+    @include breakpoint-above("medium") {
+      flex-direction: row;
+      justify-content: space-around;
+    }
+  }
+
+  &__radio-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1em;
+
+    @include breakpoint-above("medium") {
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 0;
+      width: 100px;
+    }
+  }
+
+  &__radio-option {
+    text-align: left;
+    margin: 0;
+
+    @include breakpoint-above("medium") {
+      text-align: center;
+    }
+
+    &-num {
+      padding-left: 0.5em;
+      padding-right: 1em;
+
+      @include breakpoint-above("medium") {
+        padding: 0;
+      }
+    }
+  }
+  &__radio-row-label {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__radio-row-input {
+    margin: 0;
+  }
+
+  &__radio-row-option {
+    padding-left: 0.5em;
+  }
+
+  &__submit-button {
+    margin: 0 auto;
+  }
+}
+
+.questions-container {
+  width: 90%;
+  margin: auto;
+  background-color: white;
+  padding: 2.8em;
+  border-radius: 5px;
+  text-align: left;
+
+  @include breakpoint-above("medium") {
+    max-width: 800px;
+  }
+}
 .header {
   height: 100px;
   margin: 0;
