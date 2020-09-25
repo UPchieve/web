@@ -93,7 +93,8 @@ const questions = [
         key: "can-do-it"
       },
       {
-        displayName: "Check my answers",
+        displayName:
+          "I am very confident with this and want to take it to the next level.",
         key: "very-confident"
       }
     ]
