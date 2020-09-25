@@ -292,12 +292,15 @@
         </div>
       </div>
 
-      <!-- question 5 -->
+      <!-- question 4 -->
       <div class="feedback__question-block">
         <h2 class="feedback__question">
-          <span class="feedback__question-number">5.</span>What could your coach
+          <span class="feedback__question-number">4.</span>What could your coach
           have done better?
         </h2>
+        <p class="feedback__subtext">
+          This feedback will be anonymous! You can be honest. :)
+        </p>
         <textarea
           class="feedback__textarea"
           placeholder="Your feedback..."
@@ -305,9 +308,11 @@
           v-model="userResponse['coach-feedback']"
         ></textarea>
       </div>
+
+      <!-- question 5 -->
       <div class="feedback__question-block">
         <h2 class="feedback__question">
-          <span class="feedback__question-number">6.</span>(Optional) Do you
+          <span class="feedback__question-number">5.</span>(Optional) Do you
           have any other feedback you’d like to share with UPchieve?
           <p class="feedback__subtext">
             This can be about the website, about your coach, about the
@@ -417,11 +422,11 @@ export default {
         },
         {
           options: [
-            "I don’t know how to do this at all.",
+            "I don't know how to do this at all.",
             "I think I know how to do it, but I need help.",
             "I can do this with help.",
-            "I can do this on my own.",
-            "I’m very confident"
+            "I can do this on my own, but I don't fully understand it.",
+            "I am very comfortable with this topic."
           ],
           alias: "subject-understanding"
         },
