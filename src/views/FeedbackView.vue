@@ -267,34 +267,6 @@
       <!-- question 4 -->
       <div class="feedback__question-block">
         <h2 class="feedback__question">
-          <span class="feedback__question-number">4.</span>Would you like to
-          favorite your coach, {{ session.volunteer }}?
-        </h2>
-        <p class="feedback__subtext">
-          Favoriting a coach will increase your chances of being paired with
-          them in the future.
-        </p>
-
-        <div
-          v-for="option in studentOptions[3].options"
-          :key="`${studentOptions[3].alias}-${option}`"
-        >
-          <label class="feedback__radio-row-label">
-            <input
-              type="radio"
-              :name="studentOptions[3].alias"
-              :value="option"
-              class="feedback__radio-row-input uc-form-input"
-              v-model="userResponse[studentOptions[3].alias]"
-            />
-            <span class="feedback__radio-row-option">{{ option }}</span></label
-          >
-        </div>
-      </div>
-
-      <!-- question 4 -->
-      <div class="feedback__question-block">
-        <h2 class="feedback__question">
           <span class="feedback__question-number">4.</span>What could your coach
           have done better?
         </h2>
@@ -433,10 +405,6 @@ export default {
         {
           options: ["Terrible", "", "Decent", "", "Amazing"],
           alias: "coach-rating"
-        },
-        {
-          options: ["Yes", "No"],
-          alias: "favorite-coach"
         }
       ]
     };
@@ -525,7 +493,6 @@ export default {
         "session-goal": "",
         "subject-understanding": "",
         "coach-rating": "",
-        "favorite-coach": "",
         "coach-feedback": "",
         "other-feedback": ""
       };
@@ -536,14 +503,6 @@ export default {
       if (this.isSubmittingFeedback) return;
       // analytics: tracking feedback response data
       AnalyticsService.trackFeedback(this, this.user.isFakeUser);
-
-      if (
-        this.userType === "student" &&
-        this.userResponse[this.studentOptions[3].alias]
-      ) {
-        this.userResponse[this.studentOptions[3].alias] =
-          this.userResponse[this.studentOptions[3].alias] === "Yes";
-      }
 
       NetworkService.feedback(this, {
         sessionId: this.sessionId,
