@@ -7,29 +7,31 @@
       This info will help us find the best coach to pair you with
     </div>
 
-    <div v-for="question in questions" :key="question.title" class="question">
-      <div class="question__title">{{ question.title }}</div>
-      <div class="question__options">
-        <div
-          v-for="option in question.options"
-          :key="option.key"
-          class="question__option"
-        >
-          <label>
-            <input
-              v-model="responses[question.key].answer"
-              type="radio"
-              :name="`${question.key}_${option.key}`"
-              :value="option.key"
-            />
-            <span>{{ option.displayName }}</span>
-            <input
-              v-if="option.key === 'other'"
-              :disabled="responses[question.key].answer !== 'other'"
-              type="text"
-              v-model="responses[question.key].other"
-            />
-          </label>
+    <div class="questions-container">
+      <div v-for="question in questions" :key="question.title" class="question">
+        <div class="question__title">{{ question.title }}</div>
+        <div class="question__options">
+          <div
+            v-for="option in question.options"
+            :key="option.key"
+            class="question__option"
+          >
+            <label>
+              <input
+                v-model="responses[question.key].answer"
+                type="radio"
+                :name="`${question.key}_${option.key}`"
+                :value="option.key"
+              />
+              <span>{{ option.displayName }}</span>
+              <input
+                v-if="option.key === 'other'"
+                :disabled="responses[question.key].answer !== 'other'"
+                type="text"
+                v-model="responses[question.key].other"
+              />
+            </label>
+          </div>
         </div>
       </div>
     </div>
@@ -94,7 +96,7 @@ const questions = [
       },
       {
         displayName:
-          "I am very confident with this and want to take it to the next level.",
+          "I am very comfortable with this topic.",
         key: "very-confident"
       }
     ]
@@ -164,15 +166,23 @@ export default {
   }
 }
 
+.questions-container {
+  @include breakpoint-above("medium") {
+    height: 321px;
+    overflow-y: scroll;
+  }
+}
+
 .question {
   align-self: stretch;
-  margin: 7px 20px;
+  margin: 15px 20px 35px;
 
   &__title {
     margin-bottom: 5px;
     text-align: left;
     font-weight: 500;
     color: $c-secondary-grey;
+    font-size: 18px;
   }
 
   &__options {
@@ -187,7 +197,7 @@ export default {
       flex-direction: row;
       align-items: center;
       justify-content: flex-start;
-      font-size: 13px;
+      font-size: 16px;
     }
 
     input[type="radio"] {
