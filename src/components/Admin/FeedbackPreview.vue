@@ -20,8 +20,14 @@
     >
       {{ partnerRating.name }}: <strong>{{ partnerRating.value }}/5</strong>
     </div>
+    <div v-if="subjectUnderstanding" class="feedback-preview__written">
+      Understanding on subject: {{ subjectUnderstanding }}
+    </div>
     <div v-if="writtenFeedback" class="feedback-preview__written">
       {{ writtenFeedback }}
+    </div>
+    <div v-if="coachFeedback" class="feedback-preview__written">
+      Feedback on coach: {{ coachFeedback }}
     </div>
   </div>
 </template>
@@ -43,6 +49,27 @@ export default {
 
     writtenFeedback() {
       return get(this.feedback, "responseData.other-feedback", null);
+    },
+
+    coachFeedback() {
+      return get(this.feedback, "responseData.coach-feedback", null);
+    },
+
+    subjectUnderstanding() {
+      const subjectUnderstandingDisplay = [
+        "I don’t know how to do this at all.",
+        "I think I know how to do it, but I need help.",
+        "I can do this with help.",
+        "I can do this on my own.",
+        "I’m very confident"
+      ];
+      const understanding = get(
+        this.feedback,
+        "responseData.subject-understanding",
+        null
+      );
+      if (understanding) return subjectUnderstandingDisplay[understanding];
+      return "";
     },
 
     partnerRatings() {
