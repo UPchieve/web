@@ -219,7 +219,7 @@
           of understanding now that you’ve completed your session?"
         </h2>
 
-        <ul>
+        <ul class="feedback__radio-list-row">
           <li
             v-for="(option, index) in studentOptions[1].options"
             :key="`${studentOptions[1].alias}-${index}`"
@@ -650,7 +650,7 @@ label {
     margin: 0;
   }
   &__question-block {
-    margin-bottom: 2em;
+    margin-bottom: 3em;
   }
 
   &__question {
@@ -683,6 +683,7 @@ label {
   &__radio-list {
     display: flex;
     flex-direction: column;
+    margin-top: 1.4em;
 
     @include breakpoint-above("medium") {
       flex-direction: row;
@@ -692,6 +693,10 @@ label {
     &__radio-list-item {
       display: flex;
     }
+  }
+
+  &__radio-list-row {
+    margin-top: 1.4em;
   }
 
   &__radio-label {
