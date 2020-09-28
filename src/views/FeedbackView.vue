@@ -1,16 +1,20 @@
 <template>
-  <div class="feedback-form">
-    <div class="header">
+  <div
+    class="feedback-form"
+    :class="isStudentTutoringSession && 'feedback-form--tutoring'"
+  >
+    <div class="header" v-if="!isStudentTutoringSession">
       <h2>Help improve UPchieve!</h2>
     </div>
     <div v-if="completedFeedback">
       <div class="questions-table">
-        <h3 class="feedback-submitted">
-          Thank you for your feedback!
-        </h3>
+        <h3 class="feedback-submitted">Thank you for your feedback!</h3>
       </div>
     </div>
-    <table class="questions-table" v-else-if="user.isVolunteer">
+    <table
+      class="questions-table"
+      v-else-if="user.isVolunteer || !isStudentTutoringSession"
+    >
       <tr v-if="this.$route.params.userType === 'student'" class="title-row">
         <td class="title-cell">
           <!-- Please help us improve UPchieve’s services by filling out this short
@@ -183,89 +187,100 @@
           help you achieve your goal?
         </h2>
 
-        <div class="feedback__radio-container">
-          <label
-            class="feedback__radio-label"
+        <ul class="feedback__radio-list">
+          <li
+            class="feedback__radio-list-item"
             v-for="(option, index) in studentOptions[0].options"
             :key="`${studentOptions[0].alias}-${index}`"
           >
             <input
               type="radio"
+              :id="`${studentOptions[0].alias}-${index}`"
               :name="studentOptions[0].alias"
               :value="index + 1"
               class="feedback__radio-input uc-form-input"
               v-model="userResponse[studentOptions[0].alias]"
             />
-            <span class="feedback__radio-option-num">{{ index + 1 }}</span>
-            <p class="feedback__radio-option">{{ option }}</p>
-          </label>
-        </div>
+            <label
+              class="feedback__radio-label"
+              :for="`${studentOptions[0].alias}-${index}`"
+            >
+              <span class="feedback__radio-option-num">{{ index + 1 }}</span>
+              <p class="feedback__radio-option">{{ option }}</p>
+            </label>
+          </li>
+        </ul>
       </div>
 
       <!-- question 2 -->
       <div class="feedback__question-block">
         <h2 class="feedback__question">
-          <span class="feedback__question-number">2.</span
-          >{{
-            isCollegeSubject
-              ? "How are you feeling about the college application process?"
-              : "What is your level of understanding now that you’ve completed your session?"
-          }}
+          <span class="feedback__question-number">2.</span>"What is your level
+          of understanding now that you’ve completed your session?"
         </h2>
 
-        <div class="feedback__radio-container">
-          <label
-            class="feedback__radio-label"
+        <ul>
+          <li
             v-for="(option, index) in studentOptions[1].options"
             :key="`${studentOptions[1].alias}-${index}`"
           >
             <input
               type="radio"
+              :id="`${studentOptions[1].alias}-${index}`"
               :name="studentOptions[1].alias"
               :value="index + 1"
-              class="feedback__radio-input uc-form-input"
+              class="feedback__radio-row-input uc-form-input"
               v-model="userResponse[studentOptions[1].alias]"
             />
-            <span class="feedback__radio-option-num">{{ index + 1 }}</span>
-            <p class="feedback__radio-option">
-              {{ option }}
-            </p>
-          </label>
-        </div>
+            <label
+              class="feedback__radio-row-label"
+              :for="`${studentOptions[1].alias}-${index}`"
+            >
+              <span class="feedback__radio-row-option">
+                {{ option }}
+              </span>
+            </label>
+          </li>
+        </ul>
       </div>
 
       <!-- question 3 -->
       <div class="feedback__question-block">
         <h2 class="feedback__question">
-          <span class="feedback__question-number">3.</span
-          >{{
-            isCollegeSubject
-            ? "How well did your coach help you achieve your goal?"
-            : "Please rate the Academic Coach who helped you.",
-          }}
+          <span class="feedback__question-number">3.</span>
+          "Please rate the Academic Coach who helped you.
         </h2>
 
-        <div class="feedback__radio-container">
-          <label
-            class="feedback__radio-label"
+        <ul class="feedback__radio-list">
+          <li
+            class="feedback__radio-list-item"
             v-for="(option, index) in studentOptions[2].options"
             :key="`${studentOptions[2].alias}-${index}`"
           >
             <input
               type="radio"
+              :id="`${studentOptions[2].alias}-${index}`"
               :name="studentOptions[2].alias"
               :value="index + 1"
               class="feedback__radio-input uc-form-input"
               v-model="userResponse[studentOptions[2].alias]"
             />
-            <span class="feedback__radio-option-num">{{ index + 1 }}</span>
-            <p class="feedback__radio-option">{{ option }}</p>
-          </label>
-        </div>
+            <label
+              class="feedback__radio-label"
+              :for="`${studentOptions[2].alias}-${index}`"
+            >
+              <span class="feedback__radio-option-num">{{ index + 1 }}</span>
+              <p class="feedback__radio-option">{{ option }}</p>
+            </label>
+          </li>
+        </ul>
       </div>
 
       <!-- question 4 -->
-      <div class="feedback__question-block">
+      <div
+        class="feedback__question-block"
+        v-if="userResponse['coach-rating'] <= 3"
+      >
         <h2 class="feedback__question">
           <span class="feedback__question-number">4.</span>What could your coach
           have done better?
@@ -284,8 +299,8 @@
       <!-- question 5 -->
       <div class="feedback__question-block">
         <h2 class="feedback__question">
-          <span class="feedback__question-number">5.</span>(Optional) Do you
-          have any other feedback you’d like to share with UPchieve?
+          (Optional) Do you have any other feedback you’d like to share with
+          UPchieve?
           <p class="feedback__subtext">
             This can be about the website, about your coach, about the
             services/features UPchieve provides, about any technical issues you
@@ -333,6 +348,75 @@ export default {
       volunteerId: "",
       session: {},
       presessionSurvey: {},
+      student_questions: [
+        {
+          qid: "1",
+          qtype: "star-rating",
+          alias: "rate-session",
+          title: "Rate your session",
+          secondary_title: "",
+          options: ["Rating"],
+          options_alias: ["rating"]
+        },
+        {
+          qid: "2",
+          qtype: "radio-list",
+          alias: "session-goal",
+          title: "What was your primary goal today?",
+          secondary_title: "",
+          options: [
+            "Improve my understanding",
+            "Check my answers",
+            "Finish a homework assignment",
+            "Get advice",
+            "Prepare for a test",
+            "Other"
+          ],
+          options_alias: [
+            "improve-understanding",
+            "check-answers",
+            "finish-homework",
+            "get-advice",
+            "test-prep",
+            "other"
+          ]
+        },
+        {
+          qid: "3",
+          qtype: "multiple-radio",
+          alias: "coach-ratings",
+          title: "Please tell us about your coach.",
+          secondary_title: "",
+          table_title: [
+            "Strongly Disagree",
+            "Somewhat Disagree",
+            "Neither",
+            "Somewhat Agree",
+            "Strongly Agree"
+          ],
+          options: [
+            "My coach was knowedgable about the topic.",
+            "My coach was friendly and approachable.",
+            "I would like to receive help from this coach again."
+          ],
+          options_alias: [
+            "coach-knowedgable",
+            "coach-friendly",
+            "coach-help-again"
+          ]
+        },
+        {
+          qid: "4",
+          qtype: "text",
+          alias: "other-feedback",
+          title:
+            "(Optional) Do you have any other feedback you'd like to share?",
+          secondary_title:
+            "This can be about the web app, the Academic Coach who helped you, the services UPchieve offers, etc.",
+          table_title: [],
+          options: []
+        }
+      ],
       volunteer_questions: [
         {
           qid: "1",
@@ -430,22 +514,40 @@ export default {
     isCollegeSubject() {
       return this.topic === "college";
     },
+    isStudentTutoringSession() {
+      return !this.user.isVolunteer && !this.isCollegeSubject;
+    },
     sessionGoal() {
-      if (this.presessionSurvey.createdAt)
+      if (this.presessionSurvey && this.presessionSurvey.createdAt) {
+        if (
+          this.presessionSurvey.responseData["primary-goal"].answer === "other"
+        )
+          return this.presessionSurvey.responseData[
+            "primary-goal"
+          ].other.toLowerCase();
+
         return formatSurveyAnswers(
           this.presessionSurvey.responseData["primary-goal"].answer
         ).toLowerCase();
-      return "";
+      }
+
+      return "get help";
     }
   },
   async beforeMount() {
-    var _self = this;
     this.sessionId = this.$route.params.sessionId;
     this.topic = this.$route.params.topic;
     this.subTopic = this.$route.params.subTopic;
     this.userType = this.$route.params.userType;
     this.studentId = this.$route.params.studentId;
     this.volunteerId = this.$route.params.volunteerId;
+
+    if (this.isStudentTutoringSession) {
+      this.$store.dispatch("app/sidebar/hide");
+      this.$store.dispatch("app/header/show", {
+        component: "SessionHeader"
+      });
+    }
 
     const [
       feedbackResponse,
@@ -478,17 +580,21 @@ export default {
       return;
     }
 
-    if (this.userType === "volunteer") {
+    if (this.userType === "student" && this.isCollegeSubject)
+      this.questions = this.student_questions;
+    else if (this.userType === "volunteer")
       this.questions = this.volunteer_questions;
 
-      this.questions.map(function(question) {
+    if (this.questions.length > 0)
+      this.questions.map(question => {
         if (
           question.qtype === "multiple-radio" ||
           question.qtype === "star-rating"
         )
-          _self.userResponse[question.alias] = {};
+          this.userResponse[question.alias] = {};
       });
-    } else {
+
+    if (this.isStudentTutoringSession)
       this.userResponse = {
         "session-goal": "",
         "subject-understanding": "",
@@ -496,7 +602,6 @@ export default {
         "coach-feedback": "",
         "other-feedback": ""
       };
-    }
   },
   methods: {
     submitFeedback() {
@@ -521,13 +626,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+ul {
+  list-style-type: none;
+  padding-inline-start: 0;
+}
+
 label {
   font-weight: 400;
   @include font-category("helper-text");
-}
-
-input[type="radio"] {
-  margin: 0;
 }
 
 .feedback {
@@ -568,15 +674,23 @@ input[type="radio"] {
     border-radius: 5px;
     padding: 1em;
     resize: none;
+    &:focus {
+      outline: none;
+      border-color: $c-success-green;
+    }
   }
 
-  &__radio-container {
+  &__radio-list {
     display: flex;
     flex-direction: column;
 
     @include breakpoint-above("medium") {
       flex-direction: row;
       justify-content: space-around;
+    }
+
+    &__radio-list-item {
+      display: flex;
     }
   }
 
@@ -626,6 +740,30 @@ input[type="radio"] {
   &__submit-button {
     margin: 0 auto;
   }
+
+  // styles to change the radio button
+  &__radio-input,
+  &__radio-row-input {
+    display: none;
+  }
+
+  &__radio-input + label:before,
+  &__radio-row-input + label:before {
+    content: "";
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    padding: 3px;
+    background-clip: content-box;
+    border: 1px solid $c-secondary-grey;
+    border-radius: 50%;
+  }
+
+  &__radio-input:checked + label:before,
+  &__radio-row-input:checked + label:before {
+    background-color: $c-success-green;
+    border: 1px solid $c-success-green;
+  }
 }
 
 .questions-container {
@@ -662,6 +800,11 @@ input[type="radio"] {
   position: relative;
   vertical-align: middle;
   text-align: center;
+
+  &--tutoring {
+    padding: 4em 0;
+    background-color: $c-background-grey;
+  }
 }
 
 .questions-table {
