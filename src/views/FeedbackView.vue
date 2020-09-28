@@ -279,7 +279,7 @@
       <!-- question 4 -->
       <div
         class="feedback__question-block"
-        v-if="userResponse['coach-rating'] <= 3"
+        v-if="userResponse['coach-rating'] && userResponse['coach-rating'] <= 3"
       >
         <h2 class="feedback__question">
           <span class="feedback__question-number">4.</span>What could your coach
