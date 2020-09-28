@@ -161,14 +161,15 @@ export default {
 
   .LargeButton-primary {
     max-width: 175px;
-    margin-top: 15px;
+    margin: 15px 0;
   }
 }
 
 .questions-container {
+  overflow-y: scroll;
+
   @include breakpoint-above("medium") {
     height: 321px;
-    overflow-y: scroll;
   }
 }
 
