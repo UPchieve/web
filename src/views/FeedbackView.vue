@@ -215,12 +215,13 @@
       <!-- question 2 -->
       <div class="feedback__question-block">
         <h2 class="feedback__question">
-          <span class="feedback__question-number">2.</span>"What is your level
-          of understanding now that you’ve completed your session?"
+          <span class="feedback__question-number">2.</span>What is your level of
+          understanding now that you’ve completed your session?
         </h2>
 
         <ul class="feedback__radio-list-row">
           <li
+            class="feedback__radio-list-row-item"
             v-for="(option, index) in studentOptions[1].options"
             :key="`${studentOptions[1].alias}-${index}`"
           >
@@ -248,7 +249,7 @@
       <div class="feedback__question-block">
         <h2 class="feedback__question">
           <span class="feedback__question-number">3.</span>
-          "Please rate the Academic Coach who helped you.
+          Please rate the Academic Coach who helped you.
         </h2>
 
         <ul class="feedback__radio-list">
@@ -689,14 +690,22 @@ label {
       flex-direction: row;
       justify-content: space-around;
     }
+  }
 
-    &__radio-list-item {
-      display: flex;
-    }
+  &__radio-list-item {
+    display: flex;
   }
 
   &__radio-list-row {
     margin-top: 1.4em;
+
+    @include breakpoint-above("medium") {
+      margin-left: 4em;
+    }
+  }
+
+  &__radio-list-row-item {
+    margin-bottom: 0.8em;
   }
 
   &__radio-label {
