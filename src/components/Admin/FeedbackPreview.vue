@@ -18,10 +18,12 @@
       :key="partnerRating.name"
       class="feedback-preview__rating"
     >
-      {{ partnerRating.name }}: <strong>{{ partnerRating.value }}/5</strong>
-    </div>
-    <div v-if="subjectUnderstanding" class="feedback-preview__written">
-      Understanding on subject: {{ subjectUnderstanding }}
+      <template v-if="partnerRating.name === 'subject-understanding'">
+        {{ partnerRating.name }}: <strong>{{ subjectUnderstanding }}</strong>
+      </template>
+      <template v-else-if="Number(partnerRating.value)">
+        {{ partnerRating.name }}: <strong>{{ partnerRating.value }}/5</strong>
+      </template>
     </div>
     <div v-if="writtenFeedback" class="feedback-preview__written">
       {{ writtenFeedback }}
@@ -33,7 +35,7 @@
 </template>
 
 <script>
-import { get } from "lodash";
+import { get, isEmpty } from "lodash";
 
 export default {
   name: "FeedbackPreview",
@@ -63,21 +65,25 @@ export default {
         "I can do this on my own.",
         "I’m very confident"
       ];
-      const understanding = get(
+      const path = get(
         this.feedback,
         "responseData.subject-understanding",
         null
       );
-      if (understanding) return subjectUnderstandingDisplay[understanding];
+      if (path) return subjectUnderstandingDisplay[path];
       return "";
     },
 
     partnerRatings() {
-      const path =
-        get(this.feedback, "userType") === "student"
-          ? "responseData.coach-ratings"
-          : "responseData.session-experience";
-      const ratings = get(this.feedback, path, {});
+      const isStudent = get(this.feedback, "userType") === "student";
+      let path = isStudent
+        ? "responseData.coach-ratings"
+        : "responseData.session-experience";
+      let ratings = get(this.feedback, path, {});
+
+      if (isStudent && isEmpty(ratings))
+        ratings = get(this.feedback, "responseData", {});
+
       return Object.keys(ratings).map(r => ({
         name: r,
         value: ratings[r]
