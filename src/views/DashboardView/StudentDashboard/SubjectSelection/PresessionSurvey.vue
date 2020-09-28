@@ -202,6 +202,10 @@ export default {
 
     input[type="radio"] {
       margin: 0 8px 0 0;
+      padding: 0;
+      height: 16px;
+      width: 16px;
+      flex-shrink: 0;
     }
 
     input[type="text"] {
