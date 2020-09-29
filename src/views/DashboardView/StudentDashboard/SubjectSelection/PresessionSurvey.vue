@@ -16,19 +16,19 @@
             :key="option.displayName"
             class="question__option"
           >
-            <label>
-              <input
-                v-model="responses[question.key].answer"
-                type="radio"
-                :name="`${question.key}_${option.value}`"
-                :value="option.value"
-              />
+            <input
+              v-model="responses[question.key].answer"
+              type="radio"
+              :id="`${question.key}_${option.value}`"
+              :value="option.value"
+            />
+            <label :for="`${question.key}_${option.value}`">
               <span>{{ option.displayName }}</span>
               <input
                 v-if="option.value === 'other'"
-                :disabled="responses[question.key].answer !== 'other'"
                 type="text"
                 v-model="responses[question.key].other"
+                :disabled="responses[question.key].answer !== 'other'"
               />
             </label>
           </div>
@@ -198,14 +198,27 @@ export default {
       align-items: center;
       justify-content: flex-start;
       font-size: 16px;
+
+      &:before {
+        content: "";
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        padding: 3px;
+        background-clip: content-box;
+        border: 1px solid #77778B;
+        border-radius: 50%;
+        margin-right: 8px;
+      }
     }
 
     input[type="radio"] {
-      margin: 0 8px 0 0;
-      padding: 0;
-      height: 16px;
-      width: 16px;
-      flex-shrink: 0;
+      display: none;
+
+      &:checked + label:before {
+        background-color: #16D2AA;
+        border: 1px solid #16D2AA;
+      }
     }
 
     input[type="text"] {
