@@ -13,19 +13,19 @@
         <div class="question__options">
           <div
             v-for="option in question.options"
-            :key="option.key"
+            :key="option.displayName"
             class="question__option"
           >
             <label>
               <input
                 v-model="responses[question.key].answer"
                 type="radio"
-                :name="`${question.key}_${option.key}`"
-                :value="option.key"
+                :name="`${question.key}_${option.value}`"
+                :value="option.value"
               />
               <span>{{ option.displayName }}</span>
               <input
-                v-if="option.key === 'other'"
+                v-if="option.value === 'other'"
                 :disabled="responses[question.key].answer !== 'other'"
                 type="text"
                 v-model="responses[question.key].other"
@@ -52,27 +52,27 @@ const questions = [
     options: [
       {
         displayName: "Solve a specific question",
-        key: "specific-question"
+        value: "specific-question"
       },
       {
         displayName: "Complete a homework assignment",
-        key: "complete-homework"
+        value: "complete-homework"
       },
       {
         displayName: "Prepare for a quiz/test",
-        key: "test-prep"
+        value: "test-prep"
       },
       {
         displayName: "Check my answers",
-        key: "check-answers"
+        value: "check-answers"
       },
       {
         displayName: "Improve my understanding of a topic",
-        key: "improve-understanding"
+        value: "improve-understanding"
       },
       {
         displayName: "Other",
-        key: "other"
+        value: "other"
       }
     ]
   },
@@ -83,20 +83,20 @@ const questions = [
     options: [
       {
         displayName: "I don't know how to do this at all.",
-        key: "not-at-all"
+        value: 1
       },
       {
         displayName: "I think I know how to do it, but I need help.",
-        key: "need-some-help"
+        value: 2
       },
       {
         displayName:
           "I can do this on my own, but I don't fully understand it.",
-        key: "can-do-it"
+        value: 3
       },
       {
         displayName: "I am very comfortable with this topic.",
-        key: "very-confident"
+        value: 4
       }
     ]
   }
