@@ -206,7 +206,7 @@ export default {
         height: 24px;
         padding: 3px;
         background-clip: content-box;
-        border: 1px solid #77778B;
+        border: 1px solid #77778b;
         border-radius: 50%;
         margin-right: 8px;
       }
@@ -216,8 +216,8 @@ export default {
       display: none;
 
       &:checked + label:before {
-        background-color: #16D2AA;
-        border: 1px solid #16D2AA;
+        background-color: #16d2aa;
+        border: 1px solid #16d2aa;
       }
     }
 
