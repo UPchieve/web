@@ -36,13 +36,18 @@
       </div>
     </div>
 
-    <large-button primary @click.native="submitSurvey" :disabled="!isComplete"
-      >Start a chat</large-button
-    >
+    <div v-if="!mobileMode" class="presession-survey__separator" />
+    <div class="presession-survey__buttons">
+      <large-button @click.native="cancel()">Cancel</large-button>
+      <large-button primary @click.native="submitSurvey" :disabled="!isComplete"
+        >Start a chat</large-button
+      >
+    </div>
   </div>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import LargeButton from "@/components/LargeButton";
 
 const questions = [
@@ -120,6 +125,7 @@ export default {
   },
 
   computed: {
+    ...mapGetters({ mobileMode: "app/mobileMode" }),
     isComplete() {
       return (
         !!this.responses["primary-goal"].answer &&
@@ -132,6 +138,9 @@ export default {
     submitSurvey() {
       this.$store.dispatch("user/updatePresessionSurvey", this.responses);
       this.$emit("survey-completed");
+    },
+    cancel() {
+      this.$store.dispatch("app/modal/hide");
     }
   }
 };
@@ -141,10 +150,14 @@ export default {
 .presession-survey {
   height: 100%;
   width: 100%;
-  padding: 30px 15px;
+  padding: 40px 20px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  @include breakpoint-above("medium") {
+    padding: 40px 40px 0;
+  }
 
   &__title {
     font-weight: 500;
@@ -159,9 +172,26 @@ export default {
     margin-bottom: 10px;
   }
 
-  .LargeButton-primary {
-    max-width: 175px;
-    margin: 15px 0;
+  &__separator {
+    border: 1px solid #d6e0ef;
+    width: 100%;
+    height: 1px;
+  }
+
+  &__buttons {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+
+    button {
+      margin: 15px 0 25px;
+
+      &:first-child {
+        margin-right: 16px;
+      }
+    }
   }
 }
 
@@ -204,6 +234,8 @@ export default {
         display: inline-block;
         width: 24px;
         height: 24px;
+        min-width: 24px;
+        min-height: 24px;
         padding: 3px;
         background-clip: content-box;
         border: 1px solid #77778b;
