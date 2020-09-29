@@ -183,8 +183,9 @@
       <div class="feedback__question-block">
         <h2 class="feedback__question">
           <span class="feedback__question-number">1.</span>Your goal for this
-          session was to {{ sessionGoal }}. On a scale of 1 to 5, did UPchieve
-          help you achieve your goal?
+          session was to
+          <span class="feedback__session-goal">{{ sessionGoal }}</span
+          >. On a scale of 1 to 5, did UPchieve help you achieve your goal?
         </h2>
 
         <ul class="feedback__radio-list">
@@ -620,7 +621,7 @@ export default {
         volunteerId: this.volunteerId
       });
       this.isSubmittingFeedback = false;
-      this.completedFeedback = true;
+      this.$router.push("/");
     }
   }
 };
@@ -767,6 +768,8 @@ label {
     display: inline-block;
     width: 24px;
     height: 24px;
+    min-width: 24px;
+    min-height: 24px;
     padding: 3px;
     background-clip: content-box;
     border: 1px solid $c-secondary-grey;
@@ -777,6 +780,11 @@ label {
   &__radio-row-input:checked + label:before {
     background-color: $c-success-green;
     border: 1px solid $c-success-green;
+  }
+
+  &__session-goal {
+    font-weight: 600;
+    color: $c-success-green;
   }
 }
 
