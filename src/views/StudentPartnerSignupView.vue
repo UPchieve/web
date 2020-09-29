@@ -489,28 +489,28 @@ export default {
         this.invalidInputs.push("college");
       }
 
-      if (this.studentPartner.schoolSignupRequired) {
-        // If both student and college options are true the student must select one
-        if (
-          this.studentPartner.highSchoolSignup &&
-          this.studentPartner.collegeSignup &&
-          !this.isHighSchoolStudent &&
-          !this.isCollegeStudent
-        )
-          this.errors.push(
-            "You must select if you're a high school or college student."
-          );
+      // If school sign up is required and both student and college options are true the student must select one
+      if (
+        this.studentPartner.schoolSignupRequired &&
+        this.studentPartner.highSchoolSignup &&
+        this.studentPartner.collegeSignup &&
+        !this.isHighSchoolStudent &&
+        !this.isCollegeStudent
+      )
+        this.errors.push(
+          "You must select if you're a high school or college student."
+        );
 
-        if (this.isHighSchoolStudent && !this.formData.highSchoolUpchieveId) {
-          this.errors.push("You must select your high school.");
-          this.invalidInputs.push("inputHighschool");
-        }
-
-        if (this.isCollegeStudent && !this.formData.college) {
-          this.errors.push("You must enter a college.");
-          this.invalidInputs.push("college");
-        }
+      if (this.isHighSchoolStudent && !this.formData.highSchoolUpchieveId) {
+        this.errors.push("You must select your high school.");
+        this.invalidInputs.push("inputHighschool");
       }
+
+      if (this.isCollegeStudent && !this.formData.college) {
+        this.errors.push("You must enter a college.");
+        this.invalidInputs.push("college");
+      }
+
       if (!this.formData.terms) {
         this.errors.push("You must read and accept the user agreement.");
       }
