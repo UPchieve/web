@@ -482,7 +482,6 @@ export default {
           options: [
             "I don't know how to do this at all.",
             "I think I know how to do it, but I need help.",
-            "I can do this with help.",
             "I can do this on my own, but I don't fully understand it.",
             "I am very comfortable with this topic."
           ],
