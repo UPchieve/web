@@ -15,7 +15,8 @@ export default {
     latestSession: {},
     volunteerStats: {},
     isFirstDashboardVisit: false,
-    isSessionConnectionAlive: false
+    isSessionConnectionAlive: false,
+    presessionSurvey: {}
   },
   mutations: {
     setUser: (state, user = {}) => (state.user = user),
@@ -60,7 +61,10 @@ export default {
 
     setIsSessionConnectionAlive: (state, isSessionConnectionAlive) => {
       state.isSessionConnectionAlive = isSessionConnectionAlive;
-    }
+    },
+
+    setPresessionSurvey: (state, presessionSurvey = {}) =>
+      (state.presessionSurvey = presessionSurvey)
   },
   actions: {
     fetch: ({ dispatch }, context) => {
@@ -149,6 +153,14 @@ export default {
       const { user } = state;
       const updatedUser = { ...user, ...data };
       commit("updateUser", updatedUser);
+    },
+
+    updatePresessionSurvey: ({ commit }, surveyData) => {
+      commit("setPresessionSurvey", surveyData);
+    },
+
+    clearPresessionSurvey: ({ commit }) => {
+      commit("setPresessionSurvey", {});
     }
   },
   getters: {

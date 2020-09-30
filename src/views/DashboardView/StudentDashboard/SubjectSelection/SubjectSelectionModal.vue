@@ -1,31 +1,36 @@
 <template>
   <div class="SubjectSelectionModal">
-    <component v-if="!mobileMode" :is="modalData.svg" class="icon" />
-    <h1 class="SubjectSelectionModal-title">{{ title }}</h1>
-    <h2 v-if="!mobileMode" class="SubjectSelectionModal-subtitle">
-      Choose a subject so we can connect you with the right tutor.
-    </h2>
+    <div v-if="showSurvey" class="presession-survey-container">
+      <presession-survey v-on:survey-completed="onSurveyCompleted" />
+    </div>
+    <div v-else>
+      <component v-if="!mobileMode" :is="modalData.svg" class="icon" />
+      <h1 class="SubjectSelectionModal-title">{{ title }}</h1>
+      <h2 v-if="!mobileMode" class="SubjectSelectionModal-subtitle">
+        Choose a subject so we can connect you with the right tutor.
+      </h2>
 
-    <div class="SubjectSelectionModal-subtopics">
-      <div
-        v-for="(subtopic, index) in modalData.subtopics"
-        v-bind:key="index"
-        class="SubjectSelectionModal-subtopic"
-        :class="{
-          'SubjectSelectionModal-subtopic--selected':
-            subtopic === selectedSubtopic
-        }"
-        @click="setSelectedSubtopic(subtopic)"
-      >
-        <p class="SubjectSelectionModal-subtopic-title">
-          {{ modalData.subtopicDisplayNames[subtopic] || subtopic }}
-        </p>
-        <large-button
-          v-if="mobileMode"
-          primary
-          @click.native="handleMobileStart(subtopic)"
-          >{{ modalData.acceptText }}</large-button
+      <div class="SubjectSelectionModal-subtopics">
+        <div
+          v-for="(subtopic, index) in modalData.subtopics"
+          v-bind:key="index"
+          class="SubjectSelectionModal-subtopic"
+          :class="{
+            'SubjectSelectionModal-subtopic--selected':
+              subtopic === selectedSubtopic
+          }"
+          @click="setSelectedSubtopic(subtopic)"
         >
+          <p class="SubjectSelectionModal-subtopic-title">
+            {{ modalData.subtopicDisplayNames[subtopic] || subtopic }}
+          </p>
+          <large-button
+            v-if="mobileMode"
+            primary
+            @click.native="handleMobileStart(subtopic)"
+            >{{ modalData.acceptText }}</large-button
+          >
+        </div>
       </div>
     </div>
   </div>
@@ -35,16 +40,18 @@
 import { mapState, mapGetters } from "vuex";
 import { startSession } from "@/utils/session";
 import LargeButton from "@/components/LargeButton";
+import PresessionSurvey from "./PresessionSurvey";
 import getCookie from "@/utils/get-cookie";
 
 export default {
-  components: { LargeButton },
+  components: { LargeButton, PresessionSurvey },
   props: {
     modalData: { type: Object, required: true }
   },
   data() {
     return {
-      selectedSubtopic: ""
+      selectedSubtopic: this.modalData.preSelectedSubtopic || "",
+      showSurvey: this.modalData.preSelectedSubtopic ? true : false
     };
   },
   computed: {
@@ -84,6 +91,10 @@ export default {
     },
     onAccept() {
       if (this.selectedSubtopic === "") return;
+      if (this.modalData.topic === "college") this.onSurveyCompleted();
+      else this.showSurvey = true;
+    },
+    onSurveyCompleted() {
       startSession(this.$router, this.modalData.topic, this.selectedSubtopic);
     }
   }
@@ -103,6 +114,7 @@ p {
 }
 
 .SubjectSelectionModal {
+  min-height: 350px;
   @include flex-container(column);
   @include child-spacing(top, 24px);
   @include breakpoint-above("medium") {
@@ -166,5 +178,14 @@ p {
       color: $c-success-green;
     }
   }
+}
+
+.presession-survey-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: #fff;
 }
 </style>

@@ -62,6 +62,7 @@
 <script>
 import { mapState, mapGetters } from "vuex";
 import * as Sentry from "@sentry/browser";
+import NetworkService from "@/services/NetworkService";
 import SessionService from "@/services/SessionService";
 import SessionHeader from "./SessionHeader";
 import SessionChat from "./SessionChat";
@@ -114,7 +115,8 @@ export default {
       user: state => state.user.user,
       session: state => state.user.session,
       isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
-      isMobileApp: state => state.app.isMobileApp
+      isMobileApp: state => state.app.isMobileApp,
+      presessionSurvey: state => state.user.presessionSurvey
     }),
     ...mapGetters({
       mobileMode: "app/mobileMode",
@@ -192,6 +194,16 @@ export default {
     promise
       .then(sessionId => {
         this.sessionId = sessionId;
+
+        // If we have a pre-session survey, submit it now
+        if (Object.keys(this.presessionSurvey).length) {
+          NetworkService.submitPresessionSurvey(
+            sessionId,
+            this.presessionSurvey
+          );
+          this.$store.dispatch("user/clearPresessionSurvey");
+        }
+
         // ensure we restore user when we get a successful response
         if (!this.isAuthenticated) {
           this.$store.dispatch("user/fetchUser");

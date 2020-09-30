@@ -1,16 +1,20 @@
 <template>
-  <div class="feedback-form">
-    <div class="header">
+  <div
+    class="feedback-form"
+    :class="isStudentTutoringSession && 'feedback-form--tutoring'"
+  >
+    <div class="header" v-if="!isStudentTutoringSession">
       <h2>Help improve UPchieve!</h2>
     </div>
     <div v-if="completedFeedback">
       <div class="questions-table">
-        <h3 class="feedback-submitted">
-          Thank you for your feedback!
-        </h3>
+        <h3 class="feedback-submitted">Thank you for your feedback!</h3>
       </div>
     </div>
-    <table class="questions-table" v-else>
+    <table
+      class="questions-table"
+      v-else-if="user.isVolunteer || !isStudentTutoringSession"
+    >
       <tr v-if="this.$route.params.userType === 'student'" class="title-row">
         <td class="title-cell">
           <!-- Please help us improve UPchieve’s services by filling out this short
@@ -161,6 +165,165 @@
         </td>
       </tr>
     </table>
+
+    <div class="questions-container" v-else>
+      <header class="feedback__header-container">
+        <h1 class="feedback__header">Session Feedback</h1>
+        <template v-if="session.createdAt">
+          <p class="feedback__subheader">
+            {{ sessionSubject }} session with {{ session.volunteer }}
+          </p>
+          <p class="feedback__subheader">
+            {{ sessionDate }} at {{ sessionTime }}
+          </p>
+        </template>
+      </header>
+
+      <!-- question 1 -->
+      <div class="feedback__question-block">
+        <h2 class="feedback__question">
+          <span class="feedback__question-number">1.</span>Your goal for this
+          session was to
+          <span class="feedback__session-goal">{{ sessionGoal }}</span
+          >. On a scale of 1 to 5, did UPchieve help you achieve your goal?
+        </h2>
+
+        <ul class="feedback__radio-list">
+          <li
+            class="feedback__radio-list-item"
+            v-for="(option, index) in studentOptions[0].options"
+            :key="`${studentOptions[0].alias}-${index}`"
+          >
+            <input
+              type="radio"
+              :id="`${studentOptions[0].alias}-${index}`"
+              :name="studentOptions[0].alias"
+              :value="index + 1"
+              class="feedback__radio-input uc-form-input"
+              v-model="userResponse[studentOptions[0].alias]"
+            />
+            <label
+              class="feedback__radio-label"
+              :for="`${studentOptions[0].alias}-${index}`"
+            >
+              <span class="feedback__radio-option-num">{{ index + 1 }}</span>
+              <p class="feedback__radio-option">{{ option }}</p>
+            </label>
+          </li>
+        </ul>
+      </div>
+
+      <!-- question 2 -->
+      <div class="feedback__question-block">
+        <h2 class="feedback__question">
+          <span class="feedback__question-number">2.</span>What is your level of
+          understanding now that you’ve completed your session?
+        </h2>
+
+        <ul class="feedback__radio-list-row">
+          <li
+            class="feedback__radio-list-row-item"
+            v-for="(option, index) in studentOptions[1].options"
+            :key="`${studentOptions[1].alias}-${index}`"
+          >
+            <input
+              type="radio"
+              :id="`${studentOptions[1].alias}-${index}`"
+              :name="studentOptions[1].alias"
+              :value="index + 1"
+              class="feedback__radio-row-input uc-form-input"
+              v-model="userResponse[studentOptions[1].alias]"
+            />
+            <label
+              class="feedback__radio-row-label"
+              :for="`${studentOptions[1].alias}-${index}`"
+            >
+              <span class="feedback__radio-row-option">
+                {{ option }}
+              </span>
+            </label>
+          </li>
+        </ul>
+      </div>
+
+      <!-- question 3 -->
+      <div class="feedback__question-block">
+        <h2 class="feedback__question">
+          <span class="feedback__question-number">3.</span>
+          Please rate the Academic Coach who helped you.
+        </h2>
+
+        <ul class="feedback__radio-list">
+          <li
+            class="feedback__radio-list-item"
+            v-for="(option, index) in studentOptions[2].options"
+            :key="`${studentOptions[2].alias}-${index}`"
+          >
+            <input
+              type="radio"
+              :id="`${studentOptions[2].alias}-${index}`"
+              :name="studentOptions[2].alias"
+              :value="index + 1"
+              class="feedback__radio-input uc-form-input"
+              v-model="userResponse[studentOptions[2].alias]"
+            />
+            <label
+              class="feedback__radio-label"
+              :for="`${studentOptions[2].alias}-${index}`"
+            >
+              <span class="feedback__radio-option-num">{{ index + 1 }}</span>
+              <p class="feedback__radio-option">{{ option }}</p>
+            </label>
+          </li>
+        </ul>
+      </div>
+
+      <!-- question 4 -->
+      <div
+        class="feedback__question-block"
+        v-if="userResponse['coach-rating'] && userResponse['coach-rating'] <= 3"
+      >
+        <h2 class="feedback__question">
+          <span class="feedback__question-number">4.</span>What could your coach
+          have done better?
+        </h2>
+        <p class="feedback__subtext">
+          This feedback will be anonymous! You can be honest. :)
+        </p>
+        <textarea
+          class="feedback__textarea"
+          placeholder="Your feedback..."
+          name="coach-feedback"
+          v-model="userResponse['coach-feedback']"
+        ></textarea>
+      </div>
+
+      <!-- question 5 -->
+      <div class="feedback__question-block">
+        <h2 class="feedback__question">
+          (Optional) Do you have any other feedback you’d like to share with
+          UPchieve?
+          <p class="feedback__subtext">
+            This can be about the website, about your coach, about the
+            services/features UPchieve provides, about any technical issues you
+            encountered, etc. We read every single comment, every day!
+          </p>
+        </h2>
+        <textarea
+          class="feedback__textarea"
+          placeholder="Your feedback..."
+          name="other-feedback"
+          v-model="userResponse['other-feedback']"
+        ></textarea>
+      </div>
+      <large-button
+        class="feedback__submit-button"
+        primary
+        @click.native="submitFeedback"
+      >
+        Finish Session
+      </large-button>
+    </div>
   </div>
 </template>
 
@@ -169,8 +332,14 @@ import { mapState } from "vuex";
 
 import NetworkService from "@/services/NetworkService";
 import AnalyticsService from "@/services/AnalyticsService";
+import LargeButton from "@/components/LargeButton";
+import { topics } from "@/utils/topics";
+import moment from "moment";
+import { formatSurveyAnswers } from "@/utils/survey";
 
 export default {
+  name: "FeedbackView",
+  components: { LargeButton },
   data() {
     return {
       sessionId: "",
@@ -179,6 +348,8 @@ export default {
       userType: "",
       studentId: "",
       volunteerId: "",
+      session: {},
+      presessionSurvey: {},
       student_questions: [
         {
           qid: "1",
@@ -301,16 +472,70 @@ export default {
       questions: [],
       userResponse: {},
       isSubmittingFeedback: false,
-      completedFeedback: false
+      completedFeedback: false,
+      studentOptions: [
+        {
+          options: ["Not at all", "", "Kind of", "", "Yes, completely!"],
+          alias: "session-goal"
+        },
+        {
+          options: [
+            "I don't know how to do this at all.",
+            "I think I know how to do it, but I need help.",
+            "I can do this on my own, but I don't fully understand it.",
+            "I am very comfortable with this topic."
+          ],
+          alias: "subject-understanding"
+        },
+        {
+          options: ["Terrible", "", "Decent", "", "Amazing"],
+          alias: "coach-rating"
+        }
+      ]
     };
   },
   computed: {
     ...mapState({
       user: state => state.user.user
-    })
+    }),
+    sessionSubject() {
+      const { type, subTopic } = this.session;
+      return topics[type].subtopics[subTopic].displayName;
+    },
+    sessionTime() {
+      return moment(this.session.createdAt)
+        .local()
+        .format("LT");
+    },
+    sessionDate() {
+      return moment(this.session.createdAt)
+        .local()
+        .format("MMMM Do, YYYY");
+    },
+    isCollegeSubject() {
+      return this.topic === "college";
+    },
+    isStudentTutoringSession() {
+      return !this.user.isVolunteer && !this.isCollegeSubject;
+    },
+    sessionGoal() {
+      if (this.presessionSurvey && this.presessionSurvey.createdAt) {
+        if (
+          this.presessionSurvey.responseData["primary-goal"].answer === "other"
+        )
+          return this.presessionSurvey.responseData[
+            "primary-goal"
+          ].other.toLowerCase();
+
+        return formatSurveyAnswers(
+          this.presessionSurvey.responseData["primary-goal"].answer
+        ).toLowerCase();
+      }
+
+      return "get help";
+    }
   },
   async beforeMount() {
-    var _self = this;
     this.sessionId = this.$route.params.sessionId;
     this.topic = this.$route.params.topic;
     this.subTopic = this.$route.params.subTopic;
@@ -318,30 +543,66 @@ export default {
     this.studentId = this.$route.params.studentId;
     this.volunteerId = this.$route.params.volunteerId;
 
+    if (this.isStudentTutoringSession) {
+      this.$store.dispatch("app/sidebar/hide");
+      this.$store.dispatch("app/header/show", {
+        component: "SessionHeader"
+      });
+    }
+
+    const [
+      feedbackResponse,
+      sessionResponse,
+      presessionResponse
+    ] = await Promise.all([
+      NetworkService.getFeedback({
+        sessionId: this.sessionId,
+        userType: this.userType
+      }),
+      NetworkService.getSession(this.sessionId),
+      NetworkService.getPresessionSurvey(this.sessionId)
+    ]);
+
     const {
       body: { feedback }
-    } = await NetworkService.getFeedback({
-      sessionId: this.sessionId,
-      userType: this.userType
-    });
+    } = feedbackResponse;
+    const {
+      body: { session }
+    } = sessionResponse;
+    const {
+      body: { survey }
+    } = presessionResponse;
+
+    this.session = session;
+    this.presessionSurvey = survey;
 
     if (feedback) {
       this.completedFeedback = true;
       return;
     }
 
-    if (this.userType === "student") {
+    if (this.userType === "student" && this.isCollegeSubject)
       this.questions = this.student_questions;
-    } else {
+    else if (this.userType === "volunteer")
       this.questions = this.volunteer_questions;
-    }
-    this.questions.map(function(question) {
-      if (
-        question.qtype === "multiple-radio" ||
-        question.qtype === "star-rating"
-      )
-        _self.userResponse[question.alias] = {};
-    });
+
+    if (this.questions.length > 0)
+      this.questions.map(question => {
+        if (
+          question.qtype === "multiple-radio" ||
+          question.qtype === "star-rating"
+        )
+          this.userResponse[question.alias] = {};
+      });
+
+    if (this.isStudentTutoringSession)
+      this.userResponse = {
+        "session-goal": "",
+        "subject-understanding": "",
+        "coach-rating": "",
+        "coach-feedback": "",
+        "other-feedback": ""
+      };
   },
   methods: {
     submitFeedback() {
@@ -359,13 +620,185 @@ export default {
         volunteerId: this.volunteerId
       });
       this.isSubmittingFeedback = false;
-      this.completedFeedback = true;
+      this.$router.push("/");
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
+ul {
+  list-style-type: none;
+  padding-inline-start: 0;
+}
+
+label {
+  font-weight: 400;
+  @include font-category("helper-text");
+}
+
+.feedback {
+  &__header-container {
+    margin-bottom: 3em;
+  }
+
+  &__header {
+    @include font-category("display-small");
+  }
+  &__subheader {
+    font-size: 22px;
+    color: $c-secondary-grey;
+    margin: 0;
+  }
+  &__question-block {
+    margin-bottom: 3em;
+  }
+
+  &__question {
+    text-align: left;
+    @include font-category("heading");
+
+    &-number {
+      margin-right: 5px;
+    }
+  }
+  &__subtext {
+    text-align: left;
+    @include font-category("helper-text");
+    color: $c-secondary-grey;
+  }
+
+  &__textarea {
+    width: 100%;
+    height: 120px;
+    border: 1px solid $c-border-grey;
+    border-radius: 5px;
+    padding: 1em;
+    resize: none;
+    &:focus {
+      outline: none;
+      border-color: $c-success-green;
+    }
+  }
+
+  &__radio-list {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1.4em;
+
+    @include breakpoint-above("medium") {
+      flex-direction: row;
+      justify-content: space-around;
+    }
+  }
+
+  &__radio-list-item {
+    display: flex;
+  }
+
+  &__radio-list-row {
+    margin-top: 1.4em;
+
+    @include breakpoint-above("medium") {
+      margin-left: 4em;
+    }
+  }
+
+  &__radio-list-row-item {
+    margin-bottom: 0.8em;
+  }
+
+  &__radio-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1em;
+
+    @include breakpoint-above("medium") {
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 0;
+      width: 100px;
+    }
+  }
+
+  &__radio-option {
+    text-align: left;
+    margin: 0;
+
+    @include breakpoint-above("medium") {
+      text-align: center;
+    }
+
+    &-num {
+      padding-left: 0.5em;
+      padding-right: 1em;
+
+      @include breakpoint-above("medium") {
+        padding: 0;
+      }
+    }
+  }
+  &__radio-row-label {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__radio-row-input {
+    margin: 0;
+  }
+
+  &__radio-row-option {
+    padding-left: 0.5em;
+  }
+
+  &__submit-button {
+    margin: 0 auto;
+  }
+
+  // styles to change the radio button
+  &__radio-input,
+  &__radio-row-input {
+    display: none;
+  }
+
+  &__radio-input + label:before,
+  &__radio-row-input + label:before {
+    content: "";
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    padding: 3px;
+    background-clip: content-box;
+    border: 1px solid $c-secondary-grey;
+    border-radius: 50%;
+  }
+
+  &__radio-input:checked + label:before,
+  &__radio-row-input:checked + label:before {
+    background-color: $c-success-green;
+    border: 1px solid $c-success-green;
+  }
+
+  &__session-goal {
+    font-weight: 600;
+    color: $c-success-green;
+  }
+}
+
+.questions-container {
+  width: 90%;
+  margin: auto;
+  background-color: white;
+  padding: 2.8em;
+  border-radius: 5px;
+  text-align: left;
+
+  @include breakpoint-above("medium") {
+    max-width: 800px;
+  }
+}
 .header {
   height: 100px;
   margin: 0;
@@ -388,6 +821,11 @@ export default {
   position: relative;
   vertical-align: middle;
   text-align: center;
+
+  &--tutoring {
+    padding: 4em 0;
+    background-color: $c-background-grey;
+  }
 }
 
 .questions-table {
