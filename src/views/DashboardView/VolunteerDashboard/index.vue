@@ -176,8 +176,6 @@ export default {
     if (this.isFirstDashboardVisit) {
       this.toggleWelcomeModal();
     }
-
-    this.$store.dispatch("user/fetchVolunteerStats", this);
   },
   data() {
     return {
@@ -189,8 +187,7 @@ export default {
   computed: {
     ...mapState({
       user: state => state.user.user,
-      isFirstDashboardVisit: state => state.user.isFirstDashboardVisit,
-      volunteerStats: state => state.user.volunteerStats
+      isFirstDashboardVisit: state => state.user.isFirstDashboardVisit
     }),
     ...mapGetters({
       isSessionAlive: "user/isSessionAlive",
@@ -390,7 +387,7 @@ export default {
       const numRequestsFilled = _.get(user, "pastSessions.length", "--");
 
       // (4) Hours tutored
-      const numHoursTutored = this.volunteerStats.hoursTutored || "--";
+      const numHoursTutored = Number(this.user.hoursTutored).toFixed(2) || "--";
 
       const numElapsedAvailabilityHours = user.elapsedAvailability;
 
