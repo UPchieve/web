@@ -154,7 +154,7 @@
         title="Reset whiteboard"
         @click="resetWhiteboard"
       >
-        <ClearIcon class="toolbar-item__svg" />
+        <ResetIcon class="toolbar-item__svg" />
       </div>
     </div>
     <div v-if="isLoading" class="loading-overlay">
@@ -183,6 +183,7 @@ import CircleIcon from "@/assets/whiteboard_icons/circle.svg";
 import RectangleIcon from "@/assets/whiteboard_icons/rectangle.svg";
 import TriangleIcon from "@/assets/whiteboard_icons/triangle.svg";
 import LineIcon from "@/assets/whiteboard_icons/line.svg";
+import ResetIcon from "@/assets/whiteboard_icons/reset.svg";
 import Loader from "@/components/Loader";
 import * as Sentry from "@sentry/browser";
 
@@ -201,6 +202,7 @@ export default {
     RectangleIcon,
     TriangleIcon,
     LineIcon,
+    ResetIcon,
     Loader
   },
   props: {
@@ -460,7 +462,6 @@ export default {
       this.zwibblerCtx.addSelectionHandle(0.0, 0.5, 0, 0, "", "scale");
     },
     async resetWhiteboard() {
-      this.isResetting = true;
       window.clearInterval(this.pingPongInterval);
       await NetworkService.resetSession({ sessionId: this.sessionId });
       this.zwibblerCtx.destroy();
@@ -629,7 +630,6 @@ export default {
   },
   sockets: {
     resetWhiteboard() {
-      this.isResetting = true;
       window.clearInterval(this.pingPongInterval);
       this.zwibblerCtx.destroy();
       this.loadZwibbler();
