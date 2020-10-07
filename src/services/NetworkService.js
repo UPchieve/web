@@ -199,6 +199,11 @@ export default {
       .post(`${API_ROOT}/session/end`, data)
       .then(this._successHandler, this._errorHandler);
   },
+  resetSession(data) {
+    return Vue.http
+      .post(`${API_ROOT}/session/reset`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
   checkSession(context, data, onRetry) {
     return this._faultTolerantHttp(
       context.$http,
