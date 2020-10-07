@@ -463,7 +463,7 @@ export default {
     },
     async resetWhiteboard() {
       window.clearInterval(this.pingPongInterval);
-      await NetworkService.resetSession({ sessionId: this.sessionId });
+      await NetworkService.resetWhiteboard({ sessionId: this.sessionId });
       this.zwibblerCtx.destroy();
       this.loadZwibbler();
       this.$socket.emit("resetWhiteboard", {
