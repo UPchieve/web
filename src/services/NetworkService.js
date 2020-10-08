@@ -13,6 +13,7 @@ const CONTACT_API_ROOT = `${
 const REFERENCE_API_ROOT = `${
   process.env.VUE_APP_SERVER_ROOT
 }/api-public/reference`;
+const WHITEBOARD_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/whiteboard`;
 
 const FAULT_TOLERANT_HTTP_TIMEOUT = 10000;
 const FAULT_TOLERANT_HTTP_MAX_RETRY_TIMEOUT = 100000;
@@ -234,6 +235,11 @@ export default {
   getSessionPhotoUploadUrl(sessionId) {
     return Vue.http
       .get(`${API_ROOT}/session/${sessionId}/photo-url`)
+      .then(this._successHandler, this._errorHandler);
+  },
+  resetWhiteboard(data) {
+    return Vue.http
+      .post(`${WHITEBOARD_ROOT}/reset`, data)
       .then(this._successHandler, this._errorHandler);
   },
   adminGetSessions({
