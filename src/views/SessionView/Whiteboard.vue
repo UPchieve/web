@@ -10,6 +10,11 @@
       :class="{ 'whiteboard-open': isWhiteboardOpen }"
       ref="zwibDiv"
     ></div>
+    <transition name="reset-whiteboard-error">
+      <p class="reset-whiteboard-error " v-show="resetWhiteboardError">
+        Unable to reset the whiteboard.
+      </p>
+    </transition>
     <div id="toolbar" class="toolbar">
       <p v-if="error" class="whiteboard-error">{{ error }}</p>
       <div
@@ -246,7 +251,8 @@ export default {
       isConnected: false,
       hadConnectionIssue: false,
       showResetWhiteboardModal: false,
-      shouldResetWhiteboard: false
+      shouldResetWhiteboard: false,
+      resetWhiteboardError: false
     };
   },
   computed: {
@@ -477,8 +483,17 @@ export default {
       this.showResetWhiteboardModal = !this.showResetWhiteboardModal;
     },
     async resetWhiteboard() {
+      try {
+        await NetworkService.resetWhiteboard({ sessionId: this.sessionId });
+      } catch (error) {
+        this.resetWhiteboardError = true;
+        setTimeout(() => {
+          this.resetWhiteboardError = false;
+        }, 2000);
+        return;
+      }
+
       window.clearInterval(this.pingPongInterval);
-      await NetworkService.resetWhiteboard({ sessionId: this.sessionId });
       this.zwibblerCtx.destroy();
       this.loadZwibbler();
       this.$socket.emit("resetWhiteboard", {
@@ -911,5 +926,24 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.reset-whiteboard-error {
+  width: 100%;
+  background-color: $c-error-red;
+  color: #fff;
+  font-weight: normal;
+  min-height: 40px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 12px;
+  z-index: 1;
+  transition: all 0.15s ease-in;
+
+  &-enter,
+  &-leave-to {
+    top: -64px;
+  }
 }
 </style>
