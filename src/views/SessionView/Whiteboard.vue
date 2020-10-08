@@ -1,5 +1,10 @@
 <template>
   <div class="zwib-wrapper" :class="toolClass">
+    <reset-whiteboard-modal
+      v-if="resetWhiteboardModal"
+      :setShouldResetWhiteboard="setShouldResetWhiteboard"
+      :closeModal="toggleResetWhiteboardModal"
+    />
     <div
       id="zwib-div"
       :class="{ 'whiteboard-open': isWhiteboardOpen }"
@@ -150,11 +155,11 @@
         <ClearIcon class="toolbar-item__svg" />
       </div>
       <div
-        class="toolbar-item toolbar-item--clear"
+        class="toolbar-item toolbar-item--reset"
         title="Reset whiteboard"
-        @click="resetWhiteboard"
+        @click="toggleResetWhiteboardModal"
       >
-        <ResetIcon class="toolbar-item__svg" />
+        <ResetIcon class="toolbar-item__svg--reset" />
       </div>
     </div>
     <div v-if="isLoading" class="loading-overlay">
@@ -185,6 +190,7 @@ import TriangleIcon from "@/assets/whiteboard_icons/triangle.svg";
 import LineIcon from "@/assets/whiteboard_icons/line.svg";
 import ResetIcon from "@/assets/whiteboard_icons/reset.svg";
 import Loader from "@/components/Loader";
+import ResetWhiteboardModal from "./ResetWhiteboardModal";
 import * as Sentry from "@sentry/browser";
 
 export default {
@@ -203,7 +209,8 @@ export default {
     TriangleIcon,
     LineIcon,
     ResetIcon,
-    Loader
+    Loader,
+    ResetWhiteboardModal
   },
   props: {
     sessionId: {
@@ -237,7 +244,9 @@ export default {
       canvasWidth: 1000,
       pingPongInterval: null,
       isConnected: false,
-      hadConnectionIssue: false
+      hadConnectionIssue: false,
+      resetWhiteboardModal: false,
+      shouldResetWhiteboard: false
     };
   },
   computed: {
@@ -461,6 +470,12 @@ export default {
       this.zwibblerCtx.addSelectionHandle(0.5, 1.0, 0, 0, "", "scale");
       this.zwibblerCtx.addSelectionHandle(0.0, 0.5, 0, 0, "", "scale");
     },
+    setShouldResetWhiteboard(value) {
+      this.shouldResetWhiteboard = value;
+    },
+    toggleResetWhiteboardModal() {
+      this.resetWhiteboardModal = !this.resetWhiteboardModal;
+    },
     async resetWhiteboard() {
       window.clearInterval(this.pingPongInterval);
       await NetworkService.resetWhiteboard({ sessionId: this.sessionId });
@@ -469,6 +484,7 @@ export default {
       this.$socket.emit("resetWhiteboard", {
         sessionId: this.sessionId
       });
+      this.setShouldResetWhiteboard(false);
     },
     async loadZwibbler() {
       const zwibblerCtx = window.Zwibbler.create("zwib-div", {
@@ -626,6 +642,9 @@ export default {
         this.zwibblerCtx.newDocument();
         this.zwibblerCtx.joinSharedSession(this.sessionId, false);
       }
+    },
+    shouldResetWhiteboard(currentValue) {
+      if (currentValue) this.resetWhiteboard();
     }
   },
   sockets: {
@@ -774,6 +793,10 @@ export default {
 
     &--photo {
       height: 26px;
+    }
+
+    &--reset {
+      width: 28px;
     }
 
     &--shapes {
