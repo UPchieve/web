@@ -884,6 +884,7 @@ export default {
 
   &__toolbar-item {
     border-radius: initial !important;
+    padding: 0.5em;
 
     @include breakpoint-below("tiny") {
       padding: 1em;
