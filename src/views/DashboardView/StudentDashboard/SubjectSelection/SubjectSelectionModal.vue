@@ -61,6 +61,8 @@ export default {
     }),
     ...mapGetters({ mobileMode: "app/mobileMode" }),
     title() {
+      if (this.modalData.topic === "college")
+        return `Choose a ${this.modalData.topic} counseling subject`;
       return this.modalData.topic
         ? `Choose a ${this.modalData.topic} subject`
         : "Choose a subject";
@@ -124,8 +126,10 @@ p {
 
 .SubjectSelectionModal-title {
   @include font-category("display-small");
+  margin-bottom: 1em;
   @include breakpoint-above("medium") {
     margin-top: 24px;
+    margin-bottom: 0;
   }
 }
 
