@@ -1,7 +1,7 @@
 <template>
   <div class="zwib-wrapper" :class="toolClass">
     <reset-whiteboard-modal
-      v-if="resetWhiteboardModal"
+      v-if="showResetWhiteboardModal"
       :setShouldResetWhiteboard="setShouldResetWhiteboard"
       :closeModal="toggleResetWhiteboardModal"
     />
@@ -245,7 +245,7 @@ export default {
       pingPongInterval: null,
       isConnected: false,
       hadConnectionIssue: false,
-      resetWhiteboardModal: false,
+      showResetWhiteboardModal: false,
       shouldResetWhiteboard: false
     };
   },
@@ -474,7 +474,7 @@ export default {
       this.shouldResetWhiteboard = value;
     },
     toggleResetWhiteboardModal() {
-      this.resetWhiteboardModal = !this.resetWhiteboardModal;
+      this.showResetWhiteboardModal = !this.showResetWhiteboardModal;
     },
     async resetWhiteboard() {
       window.clearInterval(this.pingPongInterval);
