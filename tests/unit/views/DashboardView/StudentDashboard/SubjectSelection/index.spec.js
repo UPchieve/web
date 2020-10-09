@@ -34,7 +34,7 @@ describe("SubjectSelection", () => {
       buttonText: "Learn More"
     },
     {
-      title: "Feedback",
+      title: "Give Feedback",
       subtitle:
         "Help us improve by telling us what new subjects and features you want!",
       buttonText: "Give feedback",

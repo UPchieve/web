@@ -1,10 +1,20 @@
 <template>
   <div class="zwib-wrapper" :class="toolClass">
+    <reset-whiteboard-modal
+      v-if="showResetWhiteboardModal"
+      :setShouldResetWhiteboard="setShouldResetWhiteboard"
+      :closeModal="toggleResetWhiteboardModal"
+    />
     <div
       id="zwib-div"
       :class="{ 'whiteboard-open': isWhiteboardOpen }"
       ref="zwibDiv"
     ></div>
+    <transition name="reset-whiteboard-error">
+      <p class="reset-whiteboard-error " v-show="resetWhiteboardError">
+        Unable to reset the whiteboard.
+      </p>
+    </transition>
     <div id="toolbar" class="toolbar">
       <p v-if="error" class="whiteboard-error">{{ error }}</p>
       <div
@@ -149,6 +159,13 @@
       >
         <ClearIcon class="toolbar-item__svg" />
       </div>
+      <div
+        class="toolbar-item toolbar-item--reset"
+        title="Reset whiteboard"
+        @click="toggleResetWhiteboardModal"
+      >
+        <ResetIcon class="toolbar-item__svg--reset" />
+      </div>
     </div>
     <div v-if="isLoading" class="loading-overlay">
       <loader />
@@ -176,7 +193,9 @@ import CircleIcon from "@/assets/whiteboard_icons/circle.svg";
 import RectangleIcon from "@/assets/whiteboard_icons/rectangle.svg";
 import TriangleIcon from "@/assets/whiteboard_icons/triangle.svg";
 import LineIcon from "@/assets/whiteboard_icons/line.svg";
+import ResetIcon from "@/assets/whiteboard_icons/reset.svg";
 import Loader from "@/components/Loader";
+import ResetWhiteboardModal from "./ResetWhiteboardModal";
 import * as Sentry from "@sentry/browser";
 
 export default {
@@ -194,7 +213,9 @@ export default {
     RectangleIcon,
     TriangleIcon,
     LineIcon,
-    Loader
+    ResetIcon,
+    Loader,
+    ResetWhiteboardModal
   },
   props: {
     sessionId: {
@@ -228,7 +249,10 @@ export default {
       canvasWidth: 1000,
       pingPongInterval: null,
       isConnected: false,
-      hadConnectionIssue: false
+      hadConnectionIssue: false,
+      showResetWhiteboardModal: false,
+      shouldResetWhiteboard: false,
+      resetWhiteboardError: false
     };
   },
   computed: {
@@ -275,131 +299,8 @@ export default {
       }, 2000);
     }
   },
-  async mounted() {
-    const zwibblerCtx = window.Zwibbler.create("zwib-div", {
-      showToolbar: false,
-      showColourPanel: false,
-      autoPickTool: false,
-      autoPickToolText: false,
-      defaultBrushWidth: 5,
-      allowZoom: false,
-      pageView: true,
-      pageInflation: 0,
-      pageShadow: false,
-      outsidePageColour: "#fff",
-      defaultSmoothness: "sharpest",
-      multilineText: true,
-      scrollbars: true,
-      defaultFontSize: 32,
-      background: "grid",
-      collaborationServer: `${
-        process.env.VUE_APP_WEBSOCKET_ROOT
-      }/whiteboard/room/{name}`
-    });
-
-    this.zwibblerCtx = zwibblerCtx;
-
-    // Set paper size
-    this.zwibblerCtx.setPaperSize(this.canvasWidth, this.canvasHeight);
-
-    // Zoom to full width
-    this.resizeViewRectangle();
-
-    // Join or create shared zwibbler session
-    try {
-      await this.zwibblerCtx.joinSharedSession(this.sessionId, true);
-    } catch (error) {
-      Sentry.captureException(error);
-    }
-
-    // Set up custom selection handles
-    this.setSelectionHandles();
-
-    // disable showing hints on the canvas
-    this.zwibblerCtx.setConfig("showHints", false);
-
-    // read-only until connected
-    this.zwibblerCtx.setConfig("readOnly", true);
-
-    this.zwibblerCtx.on("connected", () => {
-      this.isConnected = true;
-      this.zwibblerCtx.setConfig("readOnly", false);
-
-      // @todo access the connection in a less sketchy way
-      const zwibblerWsConnection = this.zwibblerCtx.zc.Pb.Pb;
-      const zwibblerOnMessage = zwibblerWsConnection.onmessage;
-      // Intercept Zwibbler's websocket message handler
-      zwibblerWsConnection.onmessage = messageEvent => {
-        // Forward message to Zwibbler unless it's our "pong" response
-        if (messageEvent.data !== "p0ng") zwibblerOnMessage(messageEvent);
-      };
-
-      // Ping server every 45 seconds to keep the connection open
-      this.pingPongInterval = window.setInterval(() => {
-        zwibblerWsConnection.send("p1ng");
-      }, 45 * 1000);
-
-      // Set brush tool to default tool
-      this.useBrushTool();
-
-      this.resizeViewRectangle();
-
-      // Don't start setting selected tool until connected
-      this.zwibblerCtx.on("tool-changed", toolname => {
-        this.selectedTool = toolname;
-        this.hideHoveredToolbars();
-      });
-    });
-
-    this.zwibblerCtx.on("connect-error", () => {
-      this.zwibblerCtx.stopSharing();
-      this.isConnected = false;
-      this.hadConnectionIssue = true;
-      window.clearInterval(this.pingPongInterval);
-      this.zwibblerCtx.setConfig("readOnly", true);
-    });
-
-    // disallow dragging and pasting to the whiteboard
-    this.zwibblerCtx.on("paste", () => {
-      return false;
-    });
-
-    this.zwibblerCtx.on("nodes-added", nodes => {
-      if (this.isShapeSelected) this.shapeNodes.push(nodes[0]);
-      if (this.selectedTool === "text") this.usePickTool();
-    });
-
-    window.addEventListener(
-      "orientationchange",
-      this.handleOrientationChange,
-      false
-    );
-
-    window.addEventListener("resize", this.handleWindowResize, false);
-
-    this.zwibblerCtx.on("document-changed", info => {
-      const isRemoteChange = info && info.remote;
-      const isWhiteboardHidden = this.mobileMode && !this.isWhiteboardOpen;
-      const shouldResizeView = isRemoteChange && isWhiteboardHidden;
-      /**
-       * If mobile user is viewing chat when new whiteboard changes are made,
-       * resize the view so they can see everything on the whiteboard
-       */
-      if (shouldResizeView) {
-        /**
-         * Note: this event can fire before the new doc changes are available in the whiteboard context,
-         * so we wait 500ms before calling `getAllNodes`
-         */
-        setTimeout(() => {
-          // Set the Zwibbler view to a rectangle that fits all whiteboard nodes
-          this.zwibblerCtx.setViewRectangle(
-            this.zwibblerCtx.getBoundingRectangle(
-              this.zwibblerCtx.getAllNodes()
-            )
-          );
-        }, 500);
-      }
-    });
+  mounted() {
+    this.loadZwibbler();
   },
   methods: {
     resizeViewRectangle() {
@@ -574,6 +475,157 @@ export default {
       this.zwibblerCtx.addSelectionHandle(1.0, 0.5, 0, 0, "", "scale");
       this.zwibblerCtx.addSelectionHandle(0.5, 1.0, 0, 0, "", "scale");
       this.zwibblerCtx.addSelectionHandle(0.0, 0.5, 0, 0, "", "scale");
+    },
+    setShouldResetWhiteboard(value) {
+      this.shouldResetWhiteboard = value;
+    },
+    toggleResetWhiteboardModal() {
+      this.showResetWhiteboardModal = !this.showResetWhiteboardModal;
+    },
+    async resetWhiteboard() {
+      try {
+        await NetworkService.resetWhiteboard({ sessionId: this.sessionId });
+      } catch (error) {
+        this.resetWhiteboardError = true;
+        setTimeout(() => {
+          this.resetWhiteboardError = false;
+        }, 2000);
+        return;
+      }
+
+      window.clearInterval(this.pingPongInterval);
+      this.zwibblerCtx.destroy();
+      this.loadZwibbler();
+      this.$socket.emit("resetWhiteboard", {
+        sessionId: this.sessionId
+      });
+      this.setShouldResetWhiteboard(false);
+    },
+    async loadZwibbler() {
+      const zwibblerCtx = window.Zwibbler.create("zwib-div", {
+        showToolbar: false,
+        showColourPanel: false,
+        autoPickTool: false,
+        autoPickToolText: false,
+        defaultBrushWidth: 5,
+        allowZoom: false,
+        pageView: true,
+        pageInflation: 0,
+        pageShadow: false,
+        outsidePageColour: "#fff",
+        defaultSmoothness: "sharpest",
+        multilineText: true,
+        scrollbars: true,
+        defaultFontSize: 32,
+        background: "grid",
+        collaborationServer: `${
+          process.env.VUE_APP_WEBSOCKET_ROOT
+        }/whiteboard/room/{name}`
+      });
+
+      this.zwibblerCtx = zwibblerCtx;
+
+      // Set paper size
+      this.zwibblerCtx.setPaperSize(this.canvasWidth, this.canvasHeight);
+
+      // Zoom to full width
+      this.resizeViewRectangle();
+
+      // Join or create shared zwibbler session
+      try {
+        await this.zwibblerCtx.joinSharedSession(this.sessionId, true);
+      } catch (error) {
+        Sentry.captureException(error);
+      }
+
+      // Set up custom selection handles
+      this.setSelectionHandles();
+
+      // disable showing hints on the canvas
+      this.zwibblerCtx.setConfig("showHints", false);
+
+      // read-only until connected
+      this.zwibblerCtx.setConfig("readOnly", true);
+
+      this.zwibblerCtx.on("connected", () => {
+        this.isConnected = true;
+        this.zwibblerCtx.setConfig("readOnly", false);
+
+        // @todo access the connection in a less sketchy way
+        const zwibblerWsConnection = this.zwibblerCtx.zc.Pb.Pb;
+        const zwibblerOnMessage = zwibblerWsConnection.onmessage;
+        // Intercept Zwibbler's websocket message handler
+        zwibblerWsConnection.onmessage = messageEvent => {
+          // Forward message to Zwibbler unless it's our "pong" response
+          if (messageEvent.data !== "p0ng") zwibblerOnMessage(messageEvent);
+        };
+
+        // Ping server every 45 seconds to keep the connection open
+        this.pingPongInterval = window.setInterval(() => {
+          zwibblerWsConnection.send("p1ng");
+        }, 45 * 1000);
+
+        // Set brush tool to default tool
+        this.useBrushTool();
+
+        this.resizeViewRectangle();
+
+        // Don't start setting selected tool until connected
+        this.zwibblerCtx.on("tool-changed", toolname => {
+          this.selectedTool = toolname;
+          this.hideHoveredToolbars();
+        });
+      });
+
+      this.zwibblerCtx.on("connect-error", () => {
+        this.zwibblerCtx.stopSharing();
+        this.isConnected = false;
+        this.hadConnectionIssue = true;
+        window.clearInterval(this.pingPongInterval);
+        this.zwibblerCtx.setConfig("readOnly", true);
+      });
+
+      // disallow dragging and pasting to the whiteboard
+      this.zwibblerCtx.on("paste", () => {
+        return false;
+      });
+
+      this.zwibblerCtx.on("nodes-added", nodes => {
+        if (this.isShapeSelected) this.shapeNodes.push(nodes[0]);
+        if (this.selectedTool === "text") this.usePickTool();
+      });
+
+      window.addEventListener(
+        "orientationchange",
+        this.handleOrientationChange,
+        false
+      );
+
+      window.addEventListener("resize", this.handleWindowResize, false);
+
+      this.zwibblerCtx.on("document-changed", info => {
+        const isRemoteChange = info && info.remote;
+        const isWhiteboardHidden = this.mobileMode && !this.isWhiteboardOpen;
+        const shouldResizeView = isRemoteChange && isWhiteboardHidden;
+        /**
+         * If mobile user is viewing chat when new whiteboard changes are made,
+         * resize the view so they can see everything on the whiteboard
+         */
+        if (shouldResizeView) {
+          /**
+           * Note: this event can fire before the new doc changes are available in the whiteboard context,
+           * so we wait 500ms before calling `getAllNodes`
+           */
+          setTimeout(() => {
+            // Set the Zwibbler view to a rectangle that fits all whiteboard nodes
+            this.zwibblerCtx.setViewRectangle(
+              this.zwibblerCtx.getBoundingRectangle(
+                this.zwibblerCtx.getAllNodes()
+              )
+            );
+          }, 500);
+        }
+      });
     }
   },
   beforeDestroy() {
@@ -605,6 +657,16 @@ export default {
         this.zwibblerCtx.newDocument();
         this.zwibblerCtx.joinSharedSession(this.sessionId, false);
       }
+    },
+    shouldResetWhiteboard(currentValue) {
+      if (currentValue) this.resetWhiteboard();
+    }
+  },
+  sockets: {
+    resetWhiteboard() {
+      window.clearInterval(this.pingPongInterval);
+      this.zwibblerCtx.destroy();
+      this.loadZwibbler();
     }
   }
 };
@@ -748,6 +810,10 @@ export default {
       height: 26px;
     }
 
+    &--reset {
+      width: 28px;
+    }
+
     &--shapes {
       @include breakpoint-below("medium") {
         height: 22px;
@@ -833,6 +899,7 @@ export default {
 
   &__toolbar-item {
     border-radius: initial !important;
+    padding: 0.5em;
 
     @include breakpoint-below("tiny") {
       padding: 1em;
@@ -859,5 +926,24 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.reset-whiteboard-error {
+  width: 100%;
+  background-color: $c-error-red;
+  color: #fff;
+  font-weight: normal;
+  min-height: 40px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 12px;
+  z-index: 1;
+  transition: all 0.15s ease-in;
+
+  &-enter,
+  &-leave-to {
+    top: -64px;
+  }
 }
 </style>

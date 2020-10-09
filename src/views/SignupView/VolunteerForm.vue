@@ -152,7 +152,8 @@
       />
       <label for="userAgreement">
         I have read and accept the
-        <a href="/legal" target="_blank">user agreement</a>.
+        <a href="/legal" target="_blank">user agreement</a> and
+        <a href="/legal#volunteer" target="_blank">volunteer agreement</a>.
       </label>
     </div>
 
