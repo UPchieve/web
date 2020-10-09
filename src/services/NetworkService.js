@@ -284,9 +284,9 @@ export default {
       .get(`${API_ROOT}/session/${sessionId}/notifications`)
       .then(this._successHandler, this._errorHandler);
   },
-  adminGetUser(userId) {
+  adminGetUser(userId, page) {
     return Vue.http
-      .get(`${API_ROOT}/user/${userId}`)
+      .get(`${API_ROOT}/user/${userId}?page=${page}`)
       .then(this._successHandler, this._errorHandler);
   },
   adminUpdateUser(userId, data) {
