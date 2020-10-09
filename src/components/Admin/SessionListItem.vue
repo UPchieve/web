@@ -48,7 +48,9 @@ export default {
     },
 
     messages() {
-      const numMsgs = this.session.messages.length;
+      const numMsgs = this.session.messages
+        ? this.session.messages.length
+        : this.session.numMessages;
       return `${numMsgs} message${pluralize(numMsgs)}`;
     },
 
