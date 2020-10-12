@@ -50,7 +50,7 @@ export default {
     messages() {
       const numMsgs = this.session.messages
         ? this.session.messages.length
-        : this.session.numMessages;
+        : this.session.totalMessages;
       return `${numMsgs} message${pluralize(numMsgs)}`;
     },
 
