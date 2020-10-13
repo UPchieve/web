@@ -387,8 +387,9 @@ export default {
       const numRequestsFilled = _.get(user, "pastSessions.length", "--");
 
       // (4) Hours tutored
-      const numHoursTutored =
-        this.user.hoursTutored > 0 ? this.user.hoursTutored : "--";
+      const numHoursTutored = Number(this.user.hoursTutored)
+        ? this.user.hoursTutored
+        : "--";
 
       const numElapsedAvailabilityHours = user.elapsedAvailability;
 
