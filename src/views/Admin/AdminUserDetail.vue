@@ -85,7 +85,10 @@
         @previousPage="previousPage"
         :showPageNumber="user.pastSessions.length > 0"
       />
-      <sessions-list v-if="user.pastSessions.length" :sessions="pastSessions" />
+      <sessions-list
+        v-if="user.pastSessions.length"
+        :sessions="sortedPastSessions"
+      />
     </template>
   </div>
 </template>
@@ -156,9 +159,7 @@ export default {
     isFirstPage() {
       return this.page === 1;
     },
-    // @todo: When the query for getting all sessions is optimized SessionList component
-    //        will start looping through sessions from the end of the list to the start
-    pastSessions() {
+    sortedPastSessions() {
       const descendingPastSessions = [];
       for (let i = this.user.pastSessions.length - 1; i >= 0; i--) {
         const session = this.user.pastSessions[i];
