@@ -10,7 +10,9 @@
       </div>
     </div>
     <div class="page-control__center">
-      <div class="page-control__title">Page {{ page }}</div>
+      <div v-if="showPageNumber" class="page-control__title">
+        Page {{ page }}
+      </div>
     </div>
     <div class="page-control__right">
       <div v-if="!isLastPage" class="page-control__button" @click="nextPage">
@@ -27,7 +29,8 @@ export default {
   props: {
     page: Number,
     isFirstPage: Boolean,
-    isLastPage: Boolean
+    isLastPage: Boolean,
+    showPageNumber: { type: Boolean, default: true }
   },
 
   methods: {
