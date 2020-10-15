@@ -62,9 +62,7 @@ export default {
   methods: {
     emitList() {
       this.$socket.emit("list");
-      this.emitListIntervalId = setInterval(() => {
-        this.$socket.emit("list");
-      }, 1000 * 60);
+      this.startWaitTimePolling();
     },
     gotoSession(session) {
       const { type, subTopic, _id } = session;
@@ -81,13 +79,12 @@ export default {
     },
     waitTime(time) {
       const newTime = new Date().getTime() - new Date(time).getTime();
-      const seconds = (newTime / 1000).toFixed(0);
-      const minutes = (newTime / (1000 * 60)).toFixed(0);
-      const hours = (newTime / (1000 * 60 * 60)).toFixed(0);
+      const seconds = Number((newTime / 1000).toFixed(0));
+      const minutes = Number((newTime / (1000 * 60)).toFixed(0));
+      const hours = Number((newTime / (1000 * 60 * 60)).toFixed(0));
 
       if (seconds < 60) {
-        if (seconds === 1) return `${seconds} sec`;
-        return `${seconds} secs`;
+        return "< 1 min";
       }
       if (minutes < 60) {
         if (minutes === 1) return `${minutes} min`;
@@ -97,10 +94,24 @@ export default {
         if (hours === 1) return `${hours} hr`;
         return `${hours} hrs`;
       }
+    },
+    // Polls for open sessions to update the wait times for waiting students
+    // Only polls for sessions if there are currently open sessions
+    startWaitTimePolling() {
+      this.emitListIntervalId = setInterval(() => {
+        if (this.openSessions.length === 0) {
+          clearInterval(this.emitListIntervalId);
+          this.emitListIntervalId = null;
+        } else this.$socket.emit("list");
+      }, 1000 * 60);
     }
   },
   sockets: {
     sessions(sessions) {
+      // Start polling for open sessions if no timer is currently running
+      if (sessions.length > 0 && !this.emitListIntervalId)
+        this.startWaitTimePolling();
+
       const results = [];
       const socketSessions = sessions.filter(session => !session.volunteer);
 
