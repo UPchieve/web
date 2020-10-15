@@ -5,6 +5,7 @@
         <tr>
           <th>Student</th>
           <th>Help Topic</th>
+          <th>Wait Time</th>
         </tr>
       </thead>
       <tbody>
@@ -17,6 +18,9 @@
           <td>{{ session.student.firstname }}</td>
           <td>
             {{ subtopicDisplayName(session.subTopic) }}
+          </td>
+          <td>
+            {{ waitTime(session.createdAt) }}
           </td>
         </tr>
       </tbody>
@@ -32,7 +36,8 @@ export default {
   data() {
     return {
       openSessions: [],
-      allSubtopics: {}
+      allSubtopics: {},
+      emitListIntervalId: null
     };
   },
   computed: {
@@ -51,9 +56,15 @@ export default {
       this.emitList();
     }
   },
+  beforeDestroy() {
+    clearInterval(this.emitListIntervalId);
+  },
   methods: {
     emitList() {
       this.$socket.emit("list");
+      this.emitListIntervalId = setInterval(() => {
+        this.$socket.emit("list");
+      }, 1000 * 60);
     },
     gotoSession(session) {
       const { type, subTopic, _id } = session;
@@ -67,6 +78,25 @@ export default {
     },
     subtopicDisplayName(subtopic) {
       return this.allSubtopics[subtopic].displayName;
+    },
+    waitTime(time) {
+      const newTime = new Date().getTime() - new Date(time).getTime();
+      const seconds = (newTime / 1000).toFixed(0);
+      const minutes = (newTime / (1000 * 60)).toFixed(0);
+      const hours = (newTime / (1000 * 60 * 60)).toFixed(0);
+
+      if (seconds < 60) {
+        if (seconds === 1) return `${seconds} sec`;
+        return `${seconds} secs`;
+      }
+      if (minutes < 60) {
+        if (minutes === 1) return `${minutes} min`;
+        return `${minutes} mins`;
+      }
+      if (hours < 24) {
+        if (hours === 1) return `${hours} hr`;
+        return `${hours} hrs`;
+      }
     }
   },
   sockets: {
