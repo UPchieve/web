@@ -62,7 +62,7 @@ export default {
   methods: {
     emitList() {
       this.$socket.emit("list");
-      this.startWaitTimePolling();
+      this.startWaitTimeRefresh();
     },
     gotoSession(session) {
       const { type, subTopic, _id } = session;
@@ -95,22 +95,22 @@ export default {
         return `${hours} hrs`;
       }
     },
-    // Polls for open sessions to update the wait times for waiting students
-    // Only polls for sessions if there are currently open sessions
-    startWaitTimePolling() {
+    // Refresh the wait time on open sessions for waiting students
+    // Force a re-render on this instance to show updated wait times if there are open sessions
+    startWaitTimeRefresh() {
       this.emitListIntervalId = setInterval(() => {
         if (this.openSessions.length === 0) {
           clearInterval(this.emitListIntervalId);
           this.emitListIntervalId = null;
-        } else this.$socket.emit("list");
+        } else this.$forceUpdate();
       }, 1000 * 60);
     }
   },
   sockets: {
     sessions(sessions) {
-      // Start polling for open sessions if no timer is currently running
+      // Start refreshing for open sessions if no timer is currently running
       if (sessions.length > 0 && !this.emitListIntervalId)
-        this.startWaitTimePolling();
+        this.startWaitTimeRefresh();
 
       const results = [];
       const socketSessions = sessions.filter(session => !session.volunteer);
