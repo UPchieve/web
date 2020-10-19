@@ -1,6 +1,8 @@
 <template>
   <div class="FormPageTemplate">
-    <img class="logo" src="~@/assets/p_logo_white.png" />
+    <header>
+      <img class="logo" src="~@/assets/p_logo_white.png" alt="UPchieve" />
+    </header>
     <slot></slot>
   </div>
 </template>
