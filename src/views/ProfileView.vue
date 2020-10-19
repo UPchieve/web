@@ -1,5 +1,10 @@
 <template>
   <div class="profile">
+    <deactivate-account-modal
+      v-if="showDeactivateAccountModal"
+      :closeModal="toggleDeactivatedAccountModal"
+      :setIsAccountActive="setIsAccountActive"
+    />
     <div class="header">
       Your profile
       <button
@@ -77,6 +82,7 @@
                   disabled: '#AAAAAA'
                 }"
                 @change="toggleAccountActive"
+                :sync="true"
               />
             </div>
             <div class="description">
@@ -118,9 +124,13 @@ import PhoneNumber from "awesome-phonenumber";
 import { mapGetters, mapState } from "vuex";
 import UserService from "@/services/UserService";
 import { topics, allSubtopics } from "@/utils/topics";
+import DeactivateAccountModal from "./DeactivateAccountModal";
 
 export default {
   name: "profile-view",
+  components: {
+    DeactivateAccountModal
+  },
   data() {
     return {
       activeEdit: false,
@@ -130,7 +140,8 @@ export default {
       saveFailed: false,
       phoneNational: "",
       phoneInputInfo: {},
-      isAccountActive: true
+      isAccountActive: true,
+      showDeactivateAccountModal: false
     };
   },
   created() {
@@ -206,6 +217,18 @@ export default {
     },
 
     toggleAccountActive({ value }) {
+      if (!value) {
+        this.toggleDeactivatedAccountModal();
+        return;
+      }
+      this.setIsAccountActive(true);
+    },
+
+    toggleDeactivatedAccountModal() {
+      this.showDeactivateAccountModal = !this.showDeactivateAccountModal;
+    },
+
+    setIsAccountActive(value) {
       this.isAccountActive = value;
     },
 
