@@ -1,12 +1,12 @@
 <template>
   <form-page-template>
-    <form class="uc-form">
-      <div class="uc-form-header">
-        <div class="uc-form-header-link--active">Log In</div>
+    <form class="uc-form" aria-labelledby="loginFormHeader">
+      <nav class="uc-form-header">
+        <div class="uc-form-header-link--active" id="loginFormHeader">Log In</div>
         <router-link to="/sign-up" class="uc-form-header-link"
           >Sign Up</router-link
         >
-      </div>
+      </nav>
 
       <div class="uc-form-body">
         <div
