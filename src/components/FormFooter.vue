@@ -30,7 +30,7 @@ export default {};
   margin-top: auto;
 
   a {
-    color: #73737a;
+    color: #000;
     text-transform: uppercase;
   }
 

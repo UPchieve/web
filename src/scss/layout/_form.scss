@@ -29,7 +29,7 @@
 
   &--active {
     @extend #{$className};
-    color: $c-accent;
+    color: $c-shadow;
   }
 }
 
@@ -106,12 +106,12 @@
 }
 
 .uc-form-button {
-  background-color: #f6f6f6;
-  border: none;
+  background-color: white;
+  border: 1px solid $c-accent;
   border-radius: 20px;
-  color: $c-accent;
+  color: scale-color($c-accent, $lightness: -60%);
 
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 600;
   text-transform: uppercase;
 
