@@ -4,8 +4,7 @@
 
     <div v-if="showUpchieve101Notice" class="dashboard-notice">
       <router-link to="training/course/upchieve101"
-        >Reminder: Please complete UPchieve 101 before October 18th
-        →</router-link
+        >Please complete UPchieve 101 to remain an active coach →</router-link
       >
     </div>
 
