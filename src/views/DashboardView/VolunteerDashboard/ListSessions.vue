@@ -5,6 +5,7 @@
         <tr>
           <th>Student</th>
           <th>Help Topic</th>
+          <th>Wait Time</th>
         </tr>
       </thead>
       <tbody>
@@ -17,6 +18,9 @@
           <td>{{ session.student.firstname }}</td>
           <td>
             {{ subtopicDisplayName(session.subTopic) }}
+          </td>
+          <td>
+            {{ waitTime(session.createdAt) }}
           </td>
         </tr>
       </tbody>
@@ -32,7 +36,8 @@ export default {
   data() {
     return {
       openSessions: [],
-      allSubtopics: {}
+      allSubtopics: {},
+      emitListIntervalId: null
     };
   },
   computed: {
@@ -51,9 +56,13 @@ export default {
       this.emitList();
     }
   },
+  beforeDestroy() {
+    clearInterval(this.emitListIntervalId);
+  },
   methods: {
     emitList() {
       this.$socket.emit("list");
+      this.startWaitTimeRefresh();
     },
     gotoSession(session) {
       const { type, subTopic, _id } = session;
@@ -67,10 +76,42 @@ export default {
     },
     subtopicDisplayName(subtopic) {
       return this.allSubtopics[subtopic].displayName;
+    },
+    waitTime(time) {
+      const newTime = new Date().getTime() - new Date(time).getTime();
+      const seconds = Number((newTime / 1000).toFixed(0));
+      const minutes = Number((newTime / (1000 * 60)).toFixed(0));
+      const hours = Number((newTime / (1000 * 60 * 60)).toFixed(0));
+
+      if (seconds < 60) {
+        return "< 1 min";
+      }
+      if (minutes < 60) {
+        if (minutes === 1) return `${minutes} min`;
+        return `${minutes} mins`;
+      }
+      if (hours < 24) {
+        if (hours === 1) return `${hours} hr`;
+        return `${hours} hrs`;
+      }
+    },
+    // Refresh the wait time on open sessions for waiting students
+    // Force a re-render on this instance to show updated wait times if there are open sessions
+    startWaitTimeRefresh() {
+      this.emitListIntervalId = setInterval(() => {
+        if (this.openSessions.length === 0) {
+          clearInterval(this.emitListIntervalId);
+          this.emitListIntervalId = null;
+        } else this.$forceUpdate();
+      }, 1000 * 60);
     }
   },
   sockets: {
     sessions(sessions) {
+      // Start refreshing for open sessions if no timer is currently running
+      if (sessions.length > 0 && !this.emitListIntervalId)
+        this.startWaitTimeRefresh();
+
       const results = [];
       const socketSessions = sessions.filter(session => !session.volunteer);
 

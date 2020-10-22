@@ -305,7 +305,8 @@ export default {
       eligibility: {
         noSchoolResults: false,
         highSchool: {},
-        zipCode: ""
+        zipCode: "",
+        email: ""
       },
       credentials: {
         email: "",
@@ -454,7 +455,7 @@ export default {
       return `${school.name} (${school.city}, ${school.state})`;
     },
     handleSelectHighSchool(school) {
-      this.eligibility.highSchool = school;
+      this.eligibility.highSchool = school || {};
     },
     submitAccountForm() {
       this.errors = [];

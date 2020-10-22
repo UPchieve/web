@@ -72,7 +72,11 @@ export default {
   computed: {
     ...mapState({
       isMobileApp: state => state.app.isMobileApp
-    })
+    }),
+    isValidForm() {
+      const { email, password } = this.credentials;
+      return email && password;
+    }
   },
   data() {
     let error;
@@ -89,6 +93,7 @@ export default {
   },
   methods: {
     submit() {
+      if (!this.isValidForm) return;
       AuthService.login(this, {
         email: this.credentials.email,
         password: this.credentials.password

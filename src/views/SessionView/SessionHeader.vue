@@ -34,17 +34,21 @@
           Report
         </div>
 
-        <div class="end-session-btn" @click="end">
-          <span v-if="isSessionWaitingForVolunteer">
-            Cancel
-          </span>
-          <span v-else-if="isSessionOver">
-            Finish
-          </span>
-          <span v-else>
-            End session
-          </span>
-        </div>
+        <span
+          v-if="isSessionWaitingForVolunteer"
+          @click="end"
+          class="end-session-btn"
+        >
+          Cancel
+        </span>
+        <span
+          v-else-if="isSessionOver"
+          @click="goToFeedbackPage"
+          class="end-session-btn"
+        >
+          Finish
+        </span>
+        <span v-else @click="end" class="end-session-btn"> End session </span>
       </div>
     </div>
     <!-- <div
@@ -138,47 +142,13 @@ export default {
       }
       this.isSessionEnding = true;
 
-      let studentId = "";
-      let volunteerId = null;
-      let subTopic = null;
-      let topic = null;
-      let sessionId = this.session._id;
-
-      if (this.session.student) {
-        studentId = this.session.student._id;
-      }
-
-      if (this.session.volunteer) {
-        volunteerId = this.session.volunteer._id;
-      }
-
-      if (this.session.type) {
-        topic = this.session.type;
-      }
-
-      if (this.session.subTopic) {
-        subTopic = this.session.subTopic;
-      }
+      const sessionId = this.session._id;
 
       SessionService.endSession(this, sessionId)
         .then(() => {
           this.$socket.disconnect();
           this.$store.dispatch("user/sessionDisconnected");
-          const url = volunteerId
-            ? "/feedback/" +
-              sessionId +
-              "/" +
-              topic +
-              "/" +
-              subTopic +
-              "/" +
-              (this.user.isVolunteer ? "volunteer" : "student") +
-              "/" +
-              studentId +
-              "/" +
-              volunteerId
-            : "/";
-          router.push(url);
+          this.goToFeedbackPage();
         })
         .catch(this.alertCouldNotEnd);
     },
@@ -206,6 +176,34 @@ export default {
       this.connectionMsg = "";
       this.reconnectAttemptMsg = "";
       this.connectionMsgType = "";
+    },
+    goToFeedbackPage() {
+      const sessionId = this.session._id;
+      let studentId = "";
+      let volunteerId = null;
+      let subTopic = null;
+      let topic = null;
+
+      if (this.session.student) studentId = this.session.student._id;
+      if (this.session.volunteer) volunteerId = this.session.volunteer._id;
+      if (this.session.type) topic = this.session.type;
+      if (this.session.subTopic) subTopic = this.session.subTopic;
+
+      const url = volunteerId
+        ? "/feedback/" +
+          sessionId +
+          "/" +
+          topic +
+          "/" +
+          subTopic +
+          "/" +
+          (this.user.isVolunteer ? "volunteer" : "student") +
+          "/" +
+          studentId +
+          "/" +
+          volunteerId
+        : "/";
+      router.push(url);
     }
   },
   sockets: {
