@@ -2,7 +2,9 @@
   <form-page-template>
     <form class="uc-form" aria-labelledby="loginFormHeader">
       <nav class="uc-form-header">
-        <div class="uc-form-header-link--active" id="loginFormHeader">Log In</div>
+        <div class="uc-form-header-link--active" id="loginFormHeader">
+          Log In
+        </div>
         <router-link to="/sign-up" class="uc-form-header-link"
           >Sign Up</router-link
         >
