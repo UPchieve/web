@@ -3,6 +3,8 @@
     <div class="session-detail__title">{{ session.subTopic }} session</div>
     <div class="session-detail__subtitle">ID: {{ session._id }}</div>
 
+    <session-flags :flags="session.flags" />
+
     <div v-if="session.student" class="session-detail__section">
       <div class="session-detail__section-title">Student</div>
       <user-preview :user="session.student" />
@@ -112,11 +114,12 @@ import UserPreview from "@/components/Admin/UserPreview";
 import ChatLog from "@/components/Admin/ChatLog";
 import FeedbackPreview from "@/components/Admin/FeedbackPreview";
 import Quill from "quill";
+import SessionFlags from "@/components/Admin/SessionFlags";
 
 export default {
   name: "AdminSessionDetail",
 
-  components: { UserPreview, ChatLog, FeedbackPreview },
+  components: { UserPreview, ChatLog, FeedbackPreview, SessionFlags },
 
   data() {
     return {
