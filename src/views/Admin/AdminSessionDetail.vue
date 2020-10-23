@@ -4,6 +4,10 @@
     <div class="session-detail__subtitle">ID: {{ session._id }}</div>
 
     <session-flags :flags="session.flags" />
+    <!-- @todo: update session when session is reviewed -->
+    <!-- @todo: css -->
+    <div v-if="session.reviewedStudent === false">Review Student</div>
+    <div v-if="session.reviewedVolunteer === false">Review Volunteer</div>
 
     <div v-if="session.student" class="session-detail__section">
       <div class="session-detail__section-title">Student</div>
