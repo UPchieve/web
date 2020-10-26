@@ -8,11 +8,17 @@
 
     <session-flags :flags="session.flags" />
 
-    <section class="session-detail__section session-detail__review">
+    <section
+      class="session-detail__section"
+      v-if="
+        session.reviewedStudent === false || session.reviewedVolunteer === false
+      "
+    >
       <h3 class="session-detail__section-title">Review Session</h3>
       <p v-if="reviewError">
         There was an issue submitting your review for this session.
       </p>
+
       <div class="uc-form-checkbox" v-if="session.reviewedStudent === false">
         <input
           id="session-detail__review-student"
@@ -41,6 +47,8 @@
         </label>
       </div>
     </section>
+
+    <separator class="separator" />
 
     <div v-if="session.student" class="session-detail__section">
       <div class="session-detail__section-title">Student</div>
@@ -152,11 +160,18 @@ import ChatLog from "@/components/Admin/ChatLog";
 import FeedbackPreview from "@/components/Admin/FeedbackPreview";
 import Quill from "quill";
 import SessionFlags from "@/components/Admin/SessionFlags";
+import Separator from "@/components/Separator";
 
 export default {
   name: "AdminSessionDetail",
 
-  components: { UserPreview, ChatLog, FeedbackPreview, SessionFlags },
+  components: {
+    UserPreview,
+    ChatLog,
+    FeedbackPreview,
+    SessionFlags,
+    Separator
+  },
 
   data() {
     return {
@@ -340,13 +355,9 @@ export default {
     }
   }
 
-  &__review {
-    margin: 1em 0;
-
-    &-label {
-      @include font-category("helper-text");
-      font-weight: 600;
-    }
+  &__review-label {
+    @include font-category("helper-text");
+    font-weight: 600;
   }
 
   &__section-title {
@@ -388,5 +399,9 @@ export default {
   &:hover {
     background: #f7fcfe;
   }
+}
+
+.separator {
+  margin: 2em 0;
 }
 </style>
