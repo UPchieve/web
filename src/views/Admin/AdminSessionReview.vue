@@ -1,31 +1,32 @@
 <template>
   <div class="admin-sessions">
-    <div class="filter-panel">
-      <div class="col">
-        <div>
-          <label for="review-students" class="show-user-type-label"
-            >Review Students</label
-          >
-          <input
-            id="review-students"
-            type="checkbox"
-            v-model="filters.reviewStudent"
-            true-value="1"
-            false-value=""
-          />
-          <label for="review-volunteers" class="show-user-type-label"
-            >Review Volunteers</label
-          >
-          <input
-            id="review-volunteers"
-            type="checkbox"
-            v-model="filters.reviewVolunteer"
-            true-value="1"
-            false-value=""
-          />
-        </div>
+    <section class="filter-panel">
+      <div class="uc-form-checkbox">
+        <input
+          type="checkbox"
+          id="review-students"
+          v-model="filters.reviewStudent"
+          true-value="1"
+          false-value=""
+        />
+        <label for="review-students" class="show-user-type-label">
+          Review Students
+        </label>
       </div>
-    </div>
+
+      <div class="uc-form-checkbox">
+        <input
+          type="checkbox"
+          id="review-volunteers"
+          v-model="filters.reviewVolunteer"
+          true-value="1"
+          false-value=""
+        />
+        <label for="review-volunteers" class="show-user-type-label">
+          Review Volunteers
+        </label>
+      </div>
+    </section>
     <div class="sessions-filter-button">
       <button class="btn" type="button" @click="submitFilters">
         Update
@@ -64,8 +65,8 @@ export default {
       sessions: [],
       isLastPage: false,
       filters: {
-        reviewStudent: "",
-        reviewVolunteer: ""
+        reviewStudent: "1",
+        reviewVolunteer: "1"
       }
     };
   },
@@ -148,52 +149,8 @@ export default {
   }
 }
 
-input[type="number"],
-.small-input {
-  width: 60px;
-}
-
-.filter-panel {
-  @include flex-container(row);
-  flex-wrap: wrap;
-
-  border-radius: 8px;
-  text-align: left;
-}
-.session-activity-container {
-  @include flex-container(row);
-}
-
-.col {
-  @include flex-container(column);
-  flex-basis: 25%;
-  margin-bottom: 2.4em;
-  margin-right: 1em;
-}
-
 .show-user-type-label {
   width: 140px;
-}
-
-.min-session-container {
-  margin-top: 0.4em;
-}
-
-.min-length-label {
-  width: 180px;
-
-  &:nth-of-type(2) {
-    margin-top: 0.2em;
-  }
-}
-
-.min-session-length {
-  display: inline-block;
-  vertical-align: top;
-}
-
-.rating-label {
-  width: 120px;
 }
 
 .sessions-filter-button {
@@ -216,7 +173,7 @@ input[type="number"],
   }
 }
 
-.first-time-label {
-  width: 80px;
+.uc-form-checkbox {
+  margin-bottom: 1em;
 }
 </style>
