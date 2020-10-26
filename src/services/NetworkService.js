@@ -291,7 +291,12 @@ export default {
       users
     }).toString();
     return Vue.http
-      .get(`${API_ROOT}/sessions/review?${queryParams}`)
+      .get(`${API_ROOT}/session/review?${queryParams}`)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminUpdateSession(sessionId, data) {
+    return Vue.http
+      .put(`${API_ROOT}/session/${sessionId}`, data)
       .then(this._successHandler, this._errorHandler);
   },
   adminGetUser(userId, page) {
