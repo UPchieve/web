@@ -1,5 +1,5 @@
 <template>
-  <modal :closeModal="() => false">
+  <modal :closeModal="() => false" :backText="''">
     <div class="trouble-matching-modal">
       <header>
         <h1 class="trouble-matching-modal__title">
@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import Modal from "@/components/Modal";
 import Separator from "@/components/Separator";
 import LargeButton from "@/components/LargeButton";
@@ -38,6 +39,27 @@ export default {
   props: {
     endSession: { type: Function, required: true },
     closeModal: { type: Function, required: true }
+  },
+  computed: {
+    ...mapGetters({ mobileMode: "app/mobileMode" })
+  },
+  mounted() {
+    // Session toggle buttons are rendered on a higher stacking context
+    // than this modal in mobile. Hide the buttons when mounted
+    if (this.mobileMode) this.displaySessionToggleButtons(false);
+  },
+  beforeDestroy() {
+    if (this.mobileMode) this.displaySessionToggleButtons(true);
+  },
+  methods: {
+    displaySessionToggleButtons(show) {
+      const toggleElements = Array.from(
+        document.querySelectorAll(".toggleButton")
+      );
+      for (const element of toggleElements) {
+        element.style.position = show ? "fixed" : "static";
+      }
+    }
   }
 };
 </script>
@@ -61,6 +83,12 @@ export default {
     margin-top: 16px;
     @include flex-container(row, flex-end);
     @include child-spacing(left, 16px);
+
+    @include breakpoint-below("tiny") {
+      @include flex-container(column, flex-start);
+      @include child-spacing(left, 0);
+      @include child-spacing(bottom, 20px);
+    }
 
     &--cancel {
       background-color: $c-disabled-grey;

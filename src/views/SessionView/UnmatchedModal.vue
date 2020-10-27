@@ -1,5 +1,5 @@
 <template>
-  <modal :closeModal="() => false">
+  <modal :closeModal="() => false" :backText="''">
     <div class="unmatched-modal">
       <header>
         <h1 class="unmatched-modal__title">
@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import Modal from "@/components/Modal";
 import Separator from "@/components/Separator";
 import LargeButton from "@/components/LargeButton";
@@ -35,6 +36,21 @@ export default {
   components: { LargeButton, Modal, Separator },
   props: {
     endSession: { type: Function, required: true }
+  },
+  computed: {
+    ...mapGetters({ mobileMode: "app/mobileMode" })
+  },
+  mounted() {
+    // Session toggle buttons are rendered on a higher stacking context
+    // than this modal in mobile. Hide the buttons when mounted
+    if (this.mobileMode) {
+      const sessionToggleButtons = Array.from(
+        document.querySelectorAll(".toggleButton")
+      );
+      for (const element of sessionToggleButtons) {
+        element.style.position = "static";
+      }
+    }
   }
 };
 </script>
