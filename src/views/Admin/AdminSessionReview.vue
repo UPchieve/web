@@ -76,8 +76,16 @@ export default {
       query: { page: pageQuery, users }
     } = this.$route;
     const page = parseInt(pageQuery) || this.page;
-    if (users === "students") this.filters.reviewStudent = "1";
-    if (users === "volunteers") this.filters.reviewVolunteer = "1";
+
+    // set filters to match url users query
+    if (users === "students") {
+      this.filters.reviewStudent = "1";
+      this.filters.reviewVolunteer = "";
+    }
+    if (users === "volunteers") {
+      this.filters.reviewVolunteer = "1";
+      this.filters.reviewStudent = "";
+    }
 
     this.setPage(page);
   },
