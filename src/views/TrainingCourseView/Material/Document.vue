@@ -7,14 +7,50 @@
       frameborder="0"
       class="document__iframe"
       allowfullscreen
+      @load="loaded"
+      :key="reloadAttempts"
     ></iframe>
+    <loader v-if="!isLoaded" overlay />
   </div>
 </template>
 
 <script>
+import Loader from "@/components/Loader";
+
 export default {
+  name: "Document",
   props: {
     resourceId: String
+  },
+  components: { Loader },
+  data() {
+    return {
+      isLoaded: false,
+      isLoadedIntervalId: null,
+      reloadAttempts: 0
+    };
+  },
+  mounted() {
+    /**
+     * Sometimes the iframe request responds with a '204' status code and doesn't
+     * load anything for the user to see. Force the iframe to make a request for
+     * the URL of the document to embed in the iframe every 2 seconds until it's loaded
+     **/
+    this.isLoadedIntervalId = setInterval(() => {
+      if (this.isLoaded) clearInterval(this.isLoadedIntervalId);
+      else this.forceRerender();
+    }, 1000 * 2);
+  },
+  beforeDestroy() {
+    clearInterval(this.isLoadedIntervalId);
+  },
+  methods: {
+    loaded() {
+      this.isLoaded = true;
+    },
+    forceRerender() {
+      this.reloadAttempts += 1;
+    }
   }
 };
 </script>
@@ -23,6 +59,7 @@ export default {
 .document {
   display: flex;
   flex-direction: column;
+  position: relative;
 
   &__iframe {
     width: 100%;
