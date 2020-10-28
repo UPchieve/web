@@ -16,7 +16,7 @@
 
       <footer class="unmatched-modal__footer">
         <div class="unmatched-modal__buttons">
-          <large-button primary @click.native="endSession"
+          <large-button primary @click.native="end"
             >Back to dashboard</large-button
           >
         </div>
@@ -27,6 +27,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import NetworkService from "@/services/NetworkService";
 import Modal from "@/components/Modal";
 import Separator from "@/components/Separator";
 import LargeButton from "@/components/LargeButton";
@@ -35,6 +36,7 @@ export default {
   name: "UnmatchedModal",
   components: { LargeButton, Modal, Separator },
   props: {
+    sessionId: { type: String, required: true },
     endSession: { type: Function, required: true }
   },
   computed: {
@@ -50,6 +52,15 @@ export default {
       for (const element of sessionToggleButtons) {
         element.style.position = "static";
       }
+    }
+  },
+  methods: {
+    async end() {
+      const data = {
+        timeout: 45
+      };
+      await NetworkService.timedOutSession(this.sessionId, data);
+      this.endSession();
     }
   }
 };

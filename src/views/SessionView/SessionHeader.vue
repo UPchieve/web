@@ -55,8 +55,13 @@
       v-if="showTroubleMatchingModal"
       :closeModal="toggleTroubleMatchingModal"
       :endSession="endSession"
+      :sessionId="session._id"
     />
-    <unmatched-modal v-if="showUnmatchedModal" :endSession="endSession" />
+    <unmatched-modal
+      v-if="showUnmatchedModal"
+      :endSession="endSession"
+      :sessionId="session._id"
+    />
     <!-- <div
       :class="[connectionMsgType]"
       class="connection-message"

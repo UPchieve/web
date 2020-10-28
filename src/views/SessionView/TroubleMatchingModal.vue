@@ -18,9 +18,7 @@
             class="trouble-matching-modal__buttons--cancel"
             >Keep Waiting</large-button
           >
-          <large-button primary @click.native="endSession"
-            >End Session</large-button
-          >
+          <large-button primary @click.native="end">End Session</large-button>
         </div>
       </div>
     </div>
@@ -29,6 +27,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import NetworkService from "@/services/NetworkService";
 import Modal from "@/components/Modal";
 import Separator from "@/components/Separator";
 import LargeButton from "@/components/LargeButton";
@@ -37,6 +36,7 @@ export default {
   name: "TroubleMatchingModal",
   components: { LargeButton, Modal, Separator },
   props: {
+    sessionId: { type: String, required: true },
     endSession: { type: Function, required: true },
     closeModal: { type: Function, required: true }
   },
@@ -59,6 +59,13 @@ export default {
       for (const element of toggleElements) {
         element.style.position = show ? "fixed" : "static";
       }
+    },
+    async end() {
+      const data = {
+        timeout: 15
+      };
+      await NetworkService.timedOutSession(this.sessionId, data);
+      this.endSession();
     }
   }
 };
