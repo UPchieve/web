@@ -610,11 +610,17 @@ export default {
       // analytics: tracking feedback response data
       AnalyticsService.trackFeedback(this, this.user.isFakeUser);
 
+      const responseData = this.userResponse;
+      for (const key in responseData) {
+        if (responseData.hasOwnProperty(key) && responseData[key] === "")
+          delete responseData[key];
+      }
+
       NetworkService.feedback(this, {
         sessionId: this.sessionId,
         topic: this.topic,
         subTopic: this.subTopic,
-        responseData: this.userResponse,
+        responseData,
         userType: this.userType,
         studentId: this.studentId,
         volunteerId: this.volunteerId
