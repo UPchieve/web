@@ -598,8 +598,8 @@ export default {
 
       this.zwibblerCtx.on("nodes-removed", nodes => {
         /**
-         * If an imageNode is being removed disable
-         * the ability to undo a photo deletion
+         * If an imageNode is being removed clear the undo stack
+         * to disable the ability to undo a photo deletion
          *
          * @note: the whiteboard would crash when one user undos a photo
          * deletion that was deleted by the other user
