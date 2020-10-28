@@ -1,7 +1,54 @@
 <template>
   <div v-if="session._id" class="session-detail">
+    <div class="page-control__button" @click="goBack">
+      <span>← Back</span>
+    </div>
     <div class="session-detail__title">{{ session.subTopic }} session</div>
     <div class="session-detail__subtitle">ID: {{ session._id }}</div>
+
+    <session-flags :flags="session.flags" />
+
+    <section
+      class="session-detail__section"
+      v-if="
+        session.reviewedStudent === false || session.reviewedVolunteer === false
+      "
+    >
+      <h3 class="session-detail__section-title">Review Session</h3>
+      <p v-if="reviewError">
+        There was an issue submitting your review for this session.
+      </p>
+
+      <div class="uc-form-checkbox" v-if="session.reviewedStudent === false">
+        <input
+          id="session-detail__review-student"
+          type="checkbox"
+          @click="reviewedUser($event, 'student')"
+        />
+        <label
+          class="session-detail__review-label"
+          for="session-detail__review-student"
+        >
+          Reviewed Student
+        </label>
+      </div>
+
+      <div class="uc-form-checkbox" v-if="session.reviewedVolunteer === false">
+        <input
+          id="session-detail__review-volunteer"
+          type="checkbox"
+          @click="reviewedUser($event, 'volunteer')"
+        />
+        <label
+          for="session-detail__review-volunteer"
+          class="session-detail__review-label"
+        >
+          Reviewed Volunteer
+        </label>
+      </div>
+    </section>
+
+    <separator class="separator" />
 
     <div v-if="session.student" class="session-detail__section">
       <div class="session-detail__section-title">Student</div>
@@ -112,17 +159,26 @@ import UserPreview from "@/components/Admin/UserPreview";
 import ChatLog from "@/components/Admin/ChatLog";
 import FeedbackPreview from "@/components/Admin/FeedbackPreview";
 import Quill from "quill";
+import SessionFlags from "@/components/Admin/SessionFlags";
+import Separator from "@/components/Separator";
 
 export default {
   name: "AdminSessionDetail",
 
-  components: { UserPreview, ChatLog, FeedbackPreview },
+  components: {
+    UserPreview,
+    ChatLog,
+    FeedbackPreview,
+    SessionFlags,
+    Separator
+  },
 
   data() {
     return {
       session: {},
       quillEditor: null,
-      zwibblerCtx: null
+      zwibblerCtx: null,
+      reviewError: false
     };
   },
 
@@ -209,6 +265,30 @@ export default {
         });
       }
     });
+  },
+
+  methods: {
+    async reviewedUser(event, user) {
+      const {
+        target: { checked }
+      } = event;
+      this.reviewError = false;
+      const sessionId = this.session._id;
+      const data = {};
+
+      if (user === "student") data.reviewedStudent = checked;
+      if (user === "volunteer") data.reviewedVolunteer = checked;
+
+      try {
+        await NetworkService.adminUpdateSession(sessionId, data);
+      } catch (error) {
+        this.reviewError = true;
+      }
+    },
+
+    goBack() {
+      this.$router.go(-1);
+    }
   }
 };
 </script>
@@ -275,6 +355,11 @@ export default {
     }
   }
 
+  &__review-label {
+    @include font-category("helper-text");
+    font-weight: 600;
+  }
+
   &__section-title {
     color: $c-secondary-grey;
     font-size: 16px;
@@ -297,5 +382,26 @@ export default {
 #zwibbler-container {
   height: 500px;
   width: 500px;
+}
+
+.uc-form-checkbox {
+  margin: 0.5em 0;
+}
+
+.page-control__button {
+  display: inline-flex;
+  align-items: center;
+  color: #417db1;
+  border-radius: 20px;
+  padding: 5px 15px;
+  cursor: pointer;
+
+  &:hover {
+    background: #f7fcfe;
+  }
+}
+
+.separator {
+  margin: 2em 0;
 }
 </style>

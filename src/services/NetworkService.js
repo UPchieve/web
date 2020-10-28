@@ -285,6 +285,20 @@ export default {
       .get(`${API_ROOT}/session/${sessionId}/notifications`)
       .then(this._successHandler, this._errorHandler);
   },
+  adminGetSessionsToReview({ page, users }) {
+    const queryParams = new URLSearchParams({
+      page,
+      users
+    }).toString();
+    return Vue.http
+      .get(`${API_ROOT}/session/review?${queryParams}`)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminUpdateSession(sessionId, data) {
+    return Vue.http
+      .put(`${API_ROOT}/session/${sessionId}`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
   adminGetUser(userId, page) {
     return Vue.http
       .get(`${API_ROOT}/user/${userId}?page=${page}`)
