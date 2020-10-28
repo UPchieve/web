@@ -5,6 +5,9 @@
       <router-link to="/admin/sessions" class="admin-link btn"
         >Sessions</router-link
       >
+      <router-link to="/admin/sessions/review" class="admin-link btn">
+        Session Review
+      </router-link>
       <router-link to="/admin/users" class="admin-link btn"
         >Search Users</router-link
       >
