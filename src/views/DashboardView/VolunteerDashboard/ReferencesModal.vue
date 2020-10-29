@@ -7,8 +7,15 @@
       </header>
       <div>
         <p>
-          Please provide us with two references we may contact. We will reach
-          out to them via email and ask them to fill out a short form.
+          Before providing the name and email for your references, please make
+          sure they’re eligible by reviewing our
+          <a
+            href="https://upc-training-materials.s3.us-east-2.amazonaws.com/choosing-references.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            >References Guide</a
+          >. We will contact them via email requesting them to fill out a
+          reference form.
         </p>
 
         <div class="references-container">
