@@ -5,7 +5,11 @@
     @click="handleClose"
   >
     <div v-if="mobileMode" class="upc-modal-header">
-      <div class="upc-modal-header-close-button" @click="closeModal">
+      <div
+        v-if="backText"
+        class="upc-modal-header-close-button"
+        @click="closeModal"
+      >
         <arrow-icon class="icon" />
         <p>{{ backText }}</p>
       </div>
