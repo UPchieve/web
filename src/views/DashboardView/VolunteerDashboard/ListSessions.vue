@@ -108,6 +108,11 @@ export default {
   },
   sockets: {
     sessions(sessions) {
+      if (this.user.isBanned) {
+        this.openSessions = [];
+        return;
+      }
+
       // Start refreshing for open sessions if no timer is currently running
       if (sessions.length > 0 && !this.emitListIntervalId)
         this.startWaitTimeRefresh();
