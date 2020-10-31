@@ -100,7 +100,8 @@ export default {
       isSessionEnding: false,
       showTroubleMatchingModal: false,
       showUnmatchedModal: false,
-      hasSeenTroubleMatchingModal: false
+      hasSeenTroubleMatchingModal: false,
+      isWaitingIntervalId: null
     };
   },
   components: {
