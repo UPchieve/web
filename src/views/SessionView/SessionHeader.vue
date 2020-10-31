@@ -249,6 +249,13 @@ export default {
       this.showUnmatchedModal = !this.showUnmatchedModal;
     },
     isWaitingTooLong() {
+      if (this.session.volunteer) {
+        clearInterval(this.isWaitingIntervalId);
+        this.showTroubleMatchingModal = false;
+        this.showUnmatchedModal = false;
+        return;
+      }
+
       const fifteenMins = 1000 * 60 * 15;
       const fifteenMinsFromSessionStart =
         new Date(this.session.createdAt).getTime() + fifteenMins;
