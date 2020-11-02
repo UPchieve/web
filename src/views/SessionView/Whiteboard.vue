@@ -252,8 +252,7 @@ export default {
       hadConnectionIssue: false,
       showResetWhiteboardModal: false,
       shouldResetWhiteboard: false,
-      resetWhiteboardError: false,
-      selectedImageNodes: []
+      resetWhiteboardError: false
     };
   },
   computed: {
@@ -594,34 +593,6 @@ export default {
       this.zwibblerCtx.on("nodes-added", nodes => {
         if (this.isShapeSelected) this.shapeNodes.push(nodes[0]);
         if (this.selectedTool === "text") this.usePickTool();
-      });
-
-      this.zwibblerCtx.on("nodes-removed", nodes => {
-        /**
-         * If an imageNode is being removed clear the undo stack
-         * to disable the ability to undo a photo deletion
-         *
-         * @note: the whiteboard would crash when one user undos a photo
-         * deletion that was deleted by the other user
-         */
-        if (nodes.some(node => this.selectedImageNodes.includes(node))) {
-          this.selectedImageNodes = [];
-          this.zwibblerCtx.clearUndo();
-        }
-      });
-
-      this.zwibblerCtx.on("selected-nodes", () => {
-        const nodes = this.zwibblerCtx.getSelectedNodes();
-        // Keep a reference to the previously selected image
-        // nodes if there are no nodes currently selected
-        if (nodes.length === 0 && this.selectedImageNodes.length > 0) return;
-
-        const selectedImageNodes = [];
-        for (const node of nodes) {
-          const isImageNode = this.zwibblerCtx.getNodeProperty(node, "url");
-          if (isImageNode) selectedImageNodes.push(node);
-        }
-        this.selectedImageNodes = selectedImageNodes;
       });
 
       window.addEventListener(
