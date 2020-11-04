@@ -10,7 +10,7 @@
     <div class="list-wrapper">
       <table>
         <tr>
-          <th>Joined</th>
+          <th>Waiting since</th>
           <th>Name</th>
           <th>Email</th>
         </tr>
