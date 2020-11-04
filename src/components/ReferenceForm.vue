@@ -280,12 +280,6 @@ export default {
     })
   },
   async mounted() {
-    try {
-      await NetworkService.checkReference(this.$route.params.referenceId);
-    } catch (error) {
-      this.isNoLongerReference = true;
-    }
-
     if (this.isAdminReview) {
       this.affiliation = this.reference.affiliation;
       this.relationshipLength = this.reference.relationshipLength;
@@ -296,6 +290,12 @@ export default {
       this.multipleRadioResponse.agreeableAndApproachable = this.reference.agreeableAndApproachable;
       this.multipleRadioResponse.communicatesEffectively = this.reference.communicatesEffectively;
       this.multipleRadioResponse.trustworthyWithChildren = this.reference.trustworthyWithChildren;
+    } else {
+      try {
+        await NetworkService.checkReference(this.$route.params.referenceId);
+      } catch (error) {
+        this.isNoLongerReference = true;
+      }
     }
   },
 
