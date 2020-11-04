@@ -29,10 +29,10 @@ import NetworkService from "@/services/NetworkService";
 import PendingVolunteerListItem from "@/components/Admin/PendingVolunteerListItem";
 import PageControl from "@/components/Admin/PageControl";
 
-const getPendingVolunteers = async page => {
+const getVolunteersToReview = async page => {
   const {
     body: { volunteers, isLastPage }
-  } = await NetworkService.adminGetPendingVolunteers(page);
+  } = await NetworkService.adminGetVolunteersToReview(page);
 
   return { volunteers, isLastPage };
 };
@@ -60,8 +60,8 @@ export default {
     async setPage(page) {
       this.page = page;
       this.volunteers = [];
-      this.$router.push({ path: "/admin/volunteers/pending", query: { page } });
-      const { volunteers, isLastPage } = await getPendingVolunteers(page);
+      this.$router.push({ path: "/admin/volunteers/review", query: { page } });
+      const { volunteers, isLastPage } = await getVolunteersToReview(page);
       this.volunteers = volunteers;
       this.isLastPage = isLastPage;
     },

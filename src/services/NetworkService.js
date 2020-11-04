@@ -280,9 +280,14 @@ export default {
       .get(`${API_ROOT}/session/${sessionId}/admin`)
       .then(this._successHandler, this._errorHandler);
   },
-  adminGetPendingVolunteers(page) {
+  adminReviewPendingVolunteer({ volunteerId, data }) {
     return Vue.http
-      .get(`${API_ROOT}/volunteers/pending?page=${page}`)
+      .post(`${API_ROOT}/volunteers/review/${volunteerId}`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminGetVolunteersToReview(page) {
+    return Vue.http
+      .get(`${API_ROOT}/volunteers/review?page=${page}`)
       .then(this._successHandler, this._errorHandler);
   },
   adminGetSessionNotifications(sessionId) {
@@ -362,11 +367,6 @@ export default {
   adminUpdateSchoolApproval(data) {
     return Vue.http
       .post(`${ELIGIBILITY_API_ROOT}/school/approval`, data)
-      .then(this._successHandler, this._errorHandler);
-  },
-  adminReviewPendingVolunteer({ volunteerId, data }) {
-    return Vue.http
-      .post(`${API_ROOT}/volunteers/pending/${volunteerId}`, data)
       .then(this._successHandler, this._errorHandler);
   },
   adminGetSessionReport({

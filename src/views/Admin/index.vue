@@ -8,11 +8,11 @@
       <router-link to="/admin/sessions/review" class="admin-link btn">
         Session Review
       </router-link>
+      <router-link to="/admin/volunteers/review" class="admin-link btn">
+        Volunteer Review
+      </router-link>
       <router-link to="/admin/users" class="admin-link btn"
         >Search Users</router-link
-      >
-      <router-link to="/admin/volunteers/pending" class="admin-link btn"
-        >Pending Volunteers</router-link
       >
       <router-link to="/admin/ineligible-students" class="admin-link btn"
         >Ineligible Students</router-link
