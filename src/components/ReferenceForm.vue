@@ -1,7 +1,10 @@
 <template>
   <div>
-    <div v-if="didSubmit" class="did-submit">
+    <div v-if="didSubmit" class="helper-message">
       <h3>Reference submitted!</h3>
+    </div>
+    <div v-else-if="isNoLongerReference" class="helper-message">
+      <h3>You've been removed as a reference.</h3>
     </div>
     <div
       v-else
@@ -209,6 +212,7 @@ export default {
     return {
       error: "",
       didSubmit: false,
+      isNoLongerReference: false,
       affiliation: "",
       relationshipLength: "",
       rejectionReason: "",
@@ -275,7 +279,13 @@ export default {
       mobileMode: "app/mobileMode"
     })
   },
-  mounted() {
+  async mounted() {
+    try {
+      await NetworkService.checkReference(this.$route.params.referenceId);
+    } catch (error) {
+      this.isNoLongerReference = true;
+    }
+
     if (this.isAdminReview) {
       this.affiliation = this.reference.affiliation;
       this.relationshipLength = this.reference.relationshipLength;
@@ -362,7 +372,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.did-submit {
+.helper-message {
   h3 {
     text-align: center;
     padding: 50px 0 200px;

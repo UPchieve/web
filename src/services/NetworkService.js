@@ -515,6 +515,11 @@ export default {
       })
       .then(this._successHandler, this._errorHandler);
   },
+  checkReference(referenceId) {
+    return Vue.http
+      .get(`${REFERENCE_API_ROOT}/${referenceId}`)
+      .then(this._successHandler, this._errorHandler);
+  },
   saveReferenceForm(referenceId, data) {
     return Vue.http
       .post(`${REFERENCE_API_ROOT}/${referenceId}/submit`, data)
