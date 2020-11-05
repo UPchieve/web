@@ -522,11 +522,13 @@ export default {
       if (this.presessionSurvey && this.presessionSurvey.createdAt) {
         if (
           this.presessionSurvey.responseData["primary-goal"].answer === "other"
-        )
-          return this.presessionSurvey.responseData[
-            "primary-goal"
-          ].other.toLowerCase();
-
+        ) {
+          if (this.presessionSurvey.responseData["primary-goal"].other)
+            return this.presessionSurvey.responseData[
+              "primary-goal"
+            ].other.toLowerCase();
+          else return "get help";
+        }
         return formatSurveyAnswers(
           this.presessionSurvey.responseData["primary-goal"].answer
         ).toLowerCase();

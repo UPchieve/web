@@ -232,6 +232,11 @@ export default {
       .get(`${API_ROOT}/session/${sessionId}/photo-url`)
       .then(this._successHandler, this._errorHandler);
   },
+  timedOutSession(sessionId, data) {
+    return Vue.http
+      .post(`${API_ROOT}/session/${sessionId}/timed-out`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
   resetWhiteboard(data) {
     return Vue.http
       .post(`${WHITEBOARD_ROOT}/reset`, data)

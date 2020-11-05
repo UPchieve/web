@@ -51,6 +51,17 @@
         <span v-else @click="end" class="end-session-btn"> End session </span>
       </div>
     </div>
+    <trouble-matching-modal
+      v-if="showTroubleMatchingModal"
+      :closeModal="toggleTroubleMatchingModal"
+      :endSession="endSession"
+      :sessionId="session._id"
+    />
+    <unmatched-modal
+      v-if="showUnmatchedModal"
+      :endSession="endSession"
+      :sessionId="session._id"
+    />
     <!-- <div
       :class="[connectionMsgType]"
       class="connection-message"
@@ -74,6 +85,8 @@ import router from "@/router";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
 import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 import LoadingMessage from "@/components/LoadingMessage";
+import TroubleMatchingModal from "@/views/SessionView/TroubleMatchingModal";
+import UnmatchedModal from "@/views/SessionView/UnmatchedModal";
 
 /**
  * @todo {1} Refactoring candidate: use a modal instead.
@@ -84,11 +97,34 @@ export default {
       connectionMsg: "",
       connectionMsgType: "",
       reconnectAttemptMsg: "",
-      isSessionEnding: false
+      isSessionEnding: false,
+      showTroubleMatchingModal: false,
+      showUnmatchedModal: false,
+      hasSeenTroubleMatchingModal: false,
+      isWaitingIntervalId: null
     };
   },
   components: {
-    LoadingMessage
+    LoadingMessage,
+    TroubleMatchingModal,
+    UnmatchedModal
+  },
+  mounted() {
+    // Show a modal if a student has been waiting too long to get matched with a volunteer
+    if (!this.user.isVolunteer) {
+      /**
+       * There's a re-render that is triggered when fetching for the current session.
+       * If the modal is shown before this re-render occurs it will not display on
+       * the screen. Set a timeout to display the modal after those initial re-renders
+       **/
+      setTimeout(() => {
+        this.isWaitingTooLong();
+      }, 500);
+
+      this.isWaitingIntervalId = setInterval(() => {
+        this.isWaitingTooLong();
+      }, 1000 * 60);
+    }
   },
   computed: {
     ...mapState({
@@ -141,7 +177,9 @@ export default {
         return;
       }
       this.isSessionEnding = true;
-
+      this.endSession();
+    },
+    endSession() {
       const sessionId = this.session._id;
 
       SessionService.endSession(this, sessionId)
@@ -204,6 +242,38 @@ export default {
           volunteerId
         : "/";
       router.push(url);
+    },
+    toggleTroubleMatchingModal() {
+      this.showTroubleMatchingModal = !this.showTroubleMatchingModal;
+    },
+    toggleUnmatchedModal() {
+      this.showUnmatchedModal = !this.showUnmatchedModal;
+    },
+    isWaitingTooLong() {
+      if (this.session.volunteer) {
+        clearInterval(this.isWaitingIntervalId);
+        this.showTroubleMatchingModal = false;
+        this.showUnmatchedModal = false;
+        return;
+      }
+
+      const fifteenMins = 1000 * 60 * 15;
+      const fifteenMinsFromSessionStart =
+        new Date(this.session.createdAt).getTime() + fifteenMins;
+      const fortyFiveMinsFromSessionStart =
+        fifteenMinsFromSessionStart + fifteenMins * 2;
+
+      if (Date.now() >= fortyFiveMinsFromSessionStart) {
+        // Students must end their session after 45 minutes of waiting
+        this.toggleUnmatchedModal();
+        clearInterval(this.isWaitingIntervalId);
+      } else if (
+        Date.now() >= fifteenMinsFromSessionStart &&
+        !this.hasSeenTroubleMatchingModal
+      ) {
+        this.toggleTroubleMatchingModal();
+        this.hasSeenTroubleMatchingModal = true;
+      }
     }
   },
   sockets: {
@@ -222,6 +292,17 @@ export default {
     },
     connect() {
       this.connectionSuccess();
+    }
+  },
+  watch: {
+    // Close possibly open modals that are triggered by a long waiting period
+    // and clear the isWaiting interval when a volunteer joins the session
+    isSessionWaitingForVolunteer(value, prevValue) {
+      if (!value && prevValue) {
+        this.showTroubleMatchingModal = false;
+        this.showUnmatchedModal = false;
+        clearInterval(this.isWaitingIntervalId);
+      }
     }
   }
 };
