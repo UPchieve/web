@@ -14,7 +14,7 @@ export default {
       !Validator.isEmail(email) ||
       password.length < 1
     ) {
-      return undefined;
+      return Promise.reject("Invalid login form submission");
     }
 
     return NetworkService.login(context, creds).then(res => {

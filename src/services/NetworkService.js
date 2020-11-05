@@ -151,11 +151,6 @@ export default {
       .get(`${API_ROOT}/user`)
       .then(this._successHandler, this._errorHandler);
   },
-  volunteerStats(context) {
-    return context.$http
-      .get(`${API_ROOT}/user/volunteer-stats`)
-      .then(this._successHandler, this._errorHandler);
-  },
   sendVerification(context) {
     return context.$http
       .post(`${API_ROOT}/verify/send`)
@@ -237,6 +232,11 @@ export default {
       .get(`${API_ROOT}/session/${sessionId}/photo-url`)
       .then(this._successHandler, this._errorHandler);
   },
+  timedOutSession(sessionId, data) {
+    return Vue.http
+      .post(`${API_ROOT}/session/${sessionId}/timed-out`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
   resetWhiteboard(data) {
     return Vue.http
       .post(`${WHITEBOARD_ROOT}/reset`, data)
@@ -290,9 +290,23 @@ export default {
       .get(`${API_ROOT}/session/${sessionId}/notifications`)
       .then(this._successHandler, this._errorHandler);
   },
-  adminGetUser(userId) {
+  adminGetSessionsToReview({ page, users }) {
+    const queryParams = new URLSearchParams({
+      page,
+      users
+    }).toString();
     return Vue.http
-      .get(`${API_ROOT}/user/${userId}`)
+      .get(`${API_ROOT}/session/review?${queryParams}`)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminUpdateSession(sessionId, data) {
+    return Vue.http
+      .put(`${API_ROOT}/session/${sessionId}`, data)
+      .then(this._successHandler, this._errorHandler);
+  },
+  adminGetUser(userId, page) {
+    return Vue.http
+      .get(`${API_ROOT}/user/${userId}?page=${page}`)
       .then(this._successHandler, this._errorHandler);
   },
   adminUpdateUser(userId, data) {

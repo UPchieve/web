@@ -77,9 +77,17 @@
           <background-info v-else :user="user" />
         </div>
       </div>
+      <page-control
+        :page="page"
+        :isFirstPage="isFirstPage"
+        :isLastPage="isLastPage"
+        @nextPage="nextPage"
+        @previousPage="previousPage"
+        :showPageNumber="user.pastSessions.length > 0"
+      />
       <sessions-list
         v-if="user.pastSessions.length"
-        :sessions="user.pastSessions"
+        :sessions="sortedPastSessions"
       />
     </template>
   </div>
@@ -92,11 +100,12 @@ import SessionsList from "@/components/Admin/SessionsList";
 import BackgroundInfo from "@/components/Admin/BackgroundInfo";
 import AdminPendingVolunteerDetail from "@/views/Admin/AdminPendingVolunteerDetail";
 import AdminEditUser from "@/views/Admin/AdminEditUser";
+import PageControl from "@/components/Admin/PageControl";
 
-const getUser = async userId => {
+const getUser = async (userId, page) => {
   const {
     body: { user }
-  } = await NetworkService.adminGetUser(userId);
+  } = await NetworkService.adminGetUser(userId, page);
 
   return user;
 };
@@ -108,14 +117,27 @@ export default {
     AdminPendingVolunteerDetail,
     SessionsList,
     BackgroundInfo,
-    AdminEditUser
+    AdminEditUser,
+    PageControl
   },
 
   data() {
     return {
       user: {},
-      isEditMode: false
+      isEditMode: false,
+      page: 1
     };
+  },
+
+  async created() {
+    window.addEventListener("keyup", this.goBack);
+    const { page } = this.$route.query;
+    this.page = parseInt(page) || this.page;
+    this.getUser();
+  },
+
+  beforeDestroy() {
+    window.removeEventListener("keyup", this.goBack);
   },
 
   computed: {
@@ -133,19 +155,50 @@ export default {
       if (!school) return null;
 
       return school.nameStored ? school.nameStored : school.SCH_NAME;
+    },
+    isFirstPage() {
+      return this.page === 1;
+    },
+    sortedPastSessions() {
+      const descendingPastSessions = [];
+      for (let i = this.user.pastSessions.length - 1; i >= 0; i--) {
+        const session = this.user.pastSessions[i];
+        descendingPastSessions.push(session);
+      }
+
+      return descendingPastSessions;
     }
   },
   methods: {
     toggleEditMode() {
       this.isEditMode = !this.isEditMode;
     },
+    setPage(page) {
+      this.page = page;
+      this.getUser();
+    },
+    nextPage() {
+      this.setPage(this.page + 1);
+    },
+    previousPage() {
+      this.setPage(this.page - 1);
+    },
+    goBack(event) {
+      // If backspace button is pressed go back
+      if (event.keyCode === 8) this.$router.go(-1);
+    },
     async getUser() {
-      this.user = await getUser(this.$route.params.userId);
-    }
-  },
+      const pageLimit = 10;
+      this.user = await getUser(this.$route.params.userId, this.page);
+      this.isLastPage = pageLimit * this.page >= this.user.numPastSessions;
 
-  async created() {
-    this.getUser();
+      // show page query in the url if the user has had past sessions
+      if (this.user.numPastSessions > 0)
+        this.$router.push({
+          path: `/admin/users/${this.user._id}`,
+          query: { page: this.page }
+        });
+    }
   }
 };
 </script>

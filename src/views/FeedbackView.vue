@@ -522,11 +522,13 @@ export default {
       if (this.presessionSurvey && this.presessionSurvey.createdAt) {
         if (
           this.presessionSurvey.responseData["primary-goal"].answer === "other"
-        )
-          return this.presessionSurvey.responseData[
-            "primary-goal"
-          ].other.toLowerCase();
-
+        ) {
+          if (this.presessionSurvey.responseData["primary-goal"].other)
+            return this.presessionSurvey.responseData[
+              "primary-goal"
+            ].other.toLowerCase();
+          else return "get help";
+        }
         return formatSurveyAnswers(
           this.presessionSurvey.responseData["primary-goal"].answer
         ).toLowerCase();
@@ -610,11 +612,17 @@ export default {
       // analytics: tracking feedback response data
       AnalyticsService.trackFeedback(this, this.user.isFakeUser);
 
+      const responseData = this.userResponse;
+      for (const key in responseData) {
+        if (responseData.hasOwnProperty(key) && responseData[key] === "")
+          delete responseData[key];
+      }
+
       NetworkService.feedback(this, {
         sessionId: this.sessionId,
         topic: this.topic,
         subTopic: this.subTopic,
-        responseData: this.userResponse,
+        responseData,
         userType: this.userType,
         studentId: this.studentId,
         volunteerId: this.volunteerId

@@ -4,8 +4,7 @@
 
     <div v-if="showUpchieve101Notice" class="dashboard-notice">
       <router-link to="training/course/upchieve101"
-        >Reminder: Please complete UPchieve 101 before October 18th
-        →</router-link
+        >Please complete UPchieve 101 to remain an active coach →</router-link
       >
     </div>
 
@@ -176,8 +175,6 @@ export default {
     if (this.isFirstDashboardVisit) {
       this.toggleWelcomeModal();
     }
-
-    this.$store.dispatch("user/fetchVolunteerStats", this);
   },
   data() {
     return {
@@ -189,8 +186,7 @@ export default {
   computed: {
     ...mapState({
       user: state => state.user.user,
-      isFirstDashboardVisit: state => state.user.isFirstDashboardVisit,
-      volunteerStats: state => state.user.volunteerStats
+      isFirstDashboardVisit: state => state.user.isFirstDashboardVisit
     }),
     ...mapGetters({
       isSessionAlive: "user/isSessionAlive",
@@ -390,7 +386,7 @@ export default {
       const numRequestsFilled = _.get(user, "pastSessions.length", "--");
 
       // (4) Hours tutored
-      const numHoursTutored = this.volunteerStats.hoursTutored || "--";
+      const numHoursTutored = Number(this.user.hoursTutored) || "--";
 
       const numElapsedAvailabilityHours = user.elapsedAvailability;
 
