@@ -1,11 +1,9 @@
 <template>
   <div>
-    <div v-if="didSubmit" class="helper-message">
-      <h3>Reference submitted!</h3>
-    </div>
-    <div v-else-if="isNoLongerReference" class="helper-message">
-      <h3>You've been removed as a reference.</h3>
-    </div>
+    <h3 v-if="didSubmit" class="helper-message">Reference submitted!</h3>
+    <h3 v-else-if="isNoLongerReference" class="helper-message">
+      Sorry, you've been removed as a reference.
+    </h3>
     <div
       v-else
       class="questions-container"
@@ -373,10 +371,8 @@ export default {
 
 <style lang="scss" scoped>
 .helper-message {
-  h3 {
-    text-align: center;
-    padding: 50px 0 200px;
-  }
+  text-align: center;
+  padding: 50px 0 100px;
 }
 textarea.uc-form-input {
   resize: none;
