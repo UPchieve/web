@@ -1,7 +1,11 @@
 <template>
   <div class="FormPageTemplate">
-    <img class="logo" src="~@/assets/p_logo_white.png" />
-    <slot></slot>
+    <header>
+      <img class="logo" src="~@/assets/p_logo_white.png" alt="UPchieve" />
+    </header>
+    <main>
+      <slot></slot>
+    </main>
   </div>
 </template>
 
@@ -12,6 +16,12 @@ export default {};
 <style lang="scss" scoped>
 .FormPageTemplate {
   @include flex-container(column, center, center);
+
+  main {
+    @include flex-container(column, center, center);
+
+    width: 100%;
+  }
 
   background: url("~@/assets/onboarding_background.png") no-repeat center;
   background-size: cover;
