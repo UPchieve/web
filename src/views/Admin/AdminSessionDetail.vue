@@ -15,7 +15,7 @@
       "
     >
       <h3 class="session-detail__section-title">Review Session</h3>
-      <p v-if="reviewError">
+      <p v-if="reviewError" class="error">
         There was an issue submitting your review for this session.
       </p>
 
@@ -146,6 +146,9 @@
       class="session-detail__section session-detail__section--whiteboard"
     >
       <h2 class="session-detail__section-title">Whiteboard</h2>
+      <p v-if="loadingWhiteboardError" class="error">
+        {{ loadingWhiteboardError }}
+      </p>
       <div id="zwibbler-container"></div>
     </div>
   </div>
@@ -178,7 +181,8 @@ export default {
       session: {},
       quillEditor: null,
       zwibblerCtx: null,
-      reviewError: false
+      reviewError: false,
+      loadingWhiteboardError: ""
     };
   },
 
@@ -234,7 +238,7 @@ export default {
     this.session = session;
 
     // Set quill document after the DOM has been updated to show session div
-    this.$nextTick(() => {
+    this.$nextTick(async () => {
       if (this.session.quillDoc) {
         const container = document.querySelector(".quill-container");
         this.quillEditor = new Quill(container);
@@ -252,7 +256,11 @@ export default {
           readOnly: true
         });
 
-        this.zwibblerCtx.joinSharedSession(this.session._id, false);
+        try {
+          await this.zwibblerCtx.joinSharedSession(this.session._id, false);
+        } catch (error) {
+          this.loadingWhiteboardError = "Failed to load the whiteboard.";
+        }
 
         this.zwibblerCtx.on("connected", () => {
           this.zwibblerCtx.usePanTool();
@@ -403,5 +411,10 @@ export default {
 
 .separator {
   margin: 2em 0;
+}
+
+.error {
+  color: $c-error-red;
+  margin: 1em 0;
 }
 </style>
