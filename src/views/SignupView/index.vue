@@ -18,7 +18,9 @@
           </p>
         </div>
         <nav class="btn-container" aria-labelledby="signupMenuSubheader">
-          <h4 class="uc-subheader" id="signupMenuSubheader">How can we help you?</h4>
+          <h4 class="uc-subheader" id="signupMenuSubheader">
+            How can we help you?
+          </h4>
           <button
             class="uc-form-button-big"
             type="submit"

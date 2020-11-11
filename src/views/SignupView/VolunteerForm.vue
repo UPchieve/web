@@ -5,7 +5,12 @@
     aria-label="Volunteer signup"
     @submit.prevent="nextPage()"
   >
-    <div v-if="errors.length" class="step-errors" role="alert" aria-labelledby="errorsHeading">
+    <div
+      v-if="errors.length"
+      class="step-errors"
+      role="alert"
+      aria-labelledby="errorsHeading"
+    >
       <h5 id="errorsHeading">Please correct the following problems:</h5>
       <ul>
         <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
@@ -68,8 +73,15 @@
     aria-label="Volunteer information"
     @submit.prevent="checkInputs($event)"
   >
-    <div v-if="errors.length" class="step-errors" role="alert" aria-labelledby="volunteerInformationErrorsHeading">
-      <h5 id="volunteerInformationErrorsHeading">Please correct the following problems:</h5>
+    <div
+      v-if="errors.length"
+      class="step-errors"
+      role="alert"
+      aria-labelledby="volunteerInformationErrorsHeading"
+    >
+      <h5 id="volunteerInformationErrorsHeading">
+        Please correct the following problems:
+      </h5>
       <ul>
         <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
       </ul>

@@ -5,7 +5,12 @@
     aria-label="Student signup"
     @submit.prevent="submitPartnerSignupCode()"
   >
-    <div v-if="errors.length" class="step-errors" role="alert" aria-labelledby="errorHeading">
+    <div
+      v-if="errors.length"
+      class="step-errors"
+      role="alert"
+      aria-labelledby="errorHeading"
+    >
       <h5 id="errorHeading">Please correct the following problems:</h5>
       <ul>
         <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
@@ -30,7 +35,13 @@
 
     <template v-else>
       <div class="uc-column">
-        <button class="back-button" type="button" @click="backToSignupCodeDecision">Back</button>
+        <button
+          class="back-button"
+          type="button"
+          @click="backToSignupCodeDecision"
+        >
+          Back
+        </button>
 
         <label for="inputPartnerCode" class="uc-form-label">Sign-up code</label>
         <input
@@ -57,8 +68,15 @@
     aria-label="Student eligibility"
     @submit.prevent="submitEligibility()"
   >
-    <div v-if="errors.length" class="step-errors" role="alert" aria-labelledby="eligibilityErrorHeading">
-      <h5 id="eligibilityErrorHeading">Please correct the following problems:</h5>
+    <div
+      v-if="errors.length"
+      class="step-errors"
+      role="alert"
+      aria-labelledby="eligibilityErrorHeading"
+    >
+      <h5 id="eligibilityErrorHeading">
+        Please correct the following problems:
+      </h5>
       <ul>
         <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
       </ul>
@@ -195,7 +213,12 @@
     aria-label="Student account"
     @submit.prevent="submitAccountForm()"
   >
-    <div v-if="errors.length" class="step-errors" role="alert" aria-labelledby="accountErrorsHeading">
+    <div
+      v-if="errors.length"
+      class="step-errors"
+      role="alert"
+      aria-labelledby="accountErrorsHeading"
+    >
       <h5 id="accountErrorsHeading">Please correct the following problems:</h5>
       <ul>
         <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
