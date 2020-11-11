@@ -1,7 +1,7 @@
 <template>
   <form-page-template>
     <div class="uc-form">
-      <nav class="uc-form-header">
+      <nav class="uc-form-header" aria-label="Other options">
         <router-link to="/login" class="uc-form-header-link"
           >Log In</router-link
         >
@@ -17,8 +17,8 @@
             counseling to eligible high school students.
           </p>
         </div>
-        <div class="btn-container">
-          <h4 class="uc-subheader">How can we help you?</h4>
+        <nav class="btn-container" aria-labelledby="signupMenuSubheader">
+          <h4 class="uc-subheader" id="signupMenuSubheader">How can we help you?</h4>
           <button
             class="uc-form-button-big"
             type="submit"
@@ -34,7 +34,7 @@
           >
             I’d like to become an Academic Coach
           </button>
-        </div>
+        </nav>
       </div>
       <form-footer v-if="!isMobileApp" />
     </div>
