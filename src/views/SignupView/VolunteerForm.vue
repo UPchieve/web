@@ -2,10 +2,11 @@
   <form
     v-if="step == 'step-1'"
     class="uc-form-body"
+    aria-label="Volunteer signup"
     @submit.prevent="nextPage()"
   >
-    <div v-if="errors.length" class="step-errors">
-      <h5>Please correct the following problems:</h5>
+    <div v-if="errors.length" class="step-errors" role="alert" aria-labelledby="errorsHeading">
+      <h5 id="errorsHeading">Please correct the following problems:</h5>
       <ul>
         <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
       </ul>
@@ -58,16 +59,17 @@
       Continue
     </button>
 
-    <div v-if="msg !== ''">{{ msg }}</div>
+    <div v-if="msg !== ''" role="alert">{{ msg }}</div>
   </form>
 
   <form
     v-else-if="step == 'step-2'"
     class="uc-form-body"
+    aria-label="Volunteer information"
     @submit.prevent="checkInputs($event)"
   >
-    <div v-if="errors.length" class="step-errors">
-      <h5>Please correct the following problems:</h5>
+    <div v-if="errors.length" class="step-errors" role="alert" aria-labelledby="volunteerInformationErrorsHeading">
+      <h5 id="volunteerInformationErrorsHeading">Please correct the following problems:</h5>
       <ul>
         <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
       </ul>
