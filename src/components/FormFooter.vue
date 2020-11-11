@@ -1,5 +1,5 @@
 <template>
-  <nav class="FormFooter">
+  <nav class="FormFooter" aria-label="More information">
     <div>
       <router-link to="/contact" target="_blank">Contact Us</router-link>
     </div>
