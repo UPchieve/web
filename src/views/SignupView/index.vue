@@ -1,11 +1,11 @@
 <template>
   <form-page-template>
     <div class="uc-form">
-      <div class="uc-form-header">
+      <nav class="uc-form-header">
         <router-link to="/login" class="uc-form-header-link"
           >Log In</router-link
         >
-      </div>
+      </nav>
 
       <volunteer-form v-if="this.userSelection === 'volunteer'" />
       <student-form v-else-if="this.userSelection === 'student'" />
