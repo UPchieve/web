@@ -102,14 +102,13 @@ export default {
       currentSession: state => state.user.session,
       messages: state =>
         (state.user.session.messages || []).map(message => {
-          // compute avatar style from picture
-          let picture = message.picture;
-          if (!picture || picture === "") {
-            picture = message.isVolunteer
-              ? VolunteerAvatarUrl
-              : StudentAvatarUrl;
-          }
-
+          const {
+            user: { user }
+          } = state;
+          // Display an avatar in the chat for the other user
+          const picture = user.isVolunteer
+            ? StudentAvatarUrl
+            : VolunteerAvatarUrl;
           message.avatarStyle = { backgroundImage: `url(${picture})` };
           return message;
         }),
