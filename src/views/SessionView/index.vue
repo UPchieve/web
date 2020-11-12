@@ -192,7 +192,7 @@ export default {
     }
 
     promise
-      .then(sessionId => {
+      .then(async sessionId => {
         this.sessionId = sessionId;
 
         // If we have a pre-session survey, submit it now
@@ -209,12 +209,9 @@ export default {
           this.$store.dispatch("user/fetchUser");
         }
 
-        if (this.$socket.connected) {
-          this.joinSession(sessionId);
-          this.$store.dispatch("user/sessionConnected");
-        } else {
-          this.$socket.connect();
-        }
+        if (!this.$socket.connected) await this.$socket.connect();
+        this.joinSession(sessionId);
+        this.$store.dispatch("user/sessionConnected");
       })
       .catch(err => {
         if (err.status !== 0 && err.code !== "EUSERABORTED") {
@@ -246,20 +243,9 @@ export default {
     },
     connect() {
       this.$store.dispatch("user/sessionConnected");
-
-      if (this.session && this.session._id) {
-        if (
-          (!this.session.student ||
-            this.session.student._id !== this.user._id) &&
-          (!this.session.volunteer ||
-            this.session.volunteer._id !== this.user._id)
-        ) {
-          // join the session if we haven't done so already
-          this.joinSession(this.session._id);
-        }
-      } else if (this.$route.params.sessionId) {
-        this.joinSession(this.$route.params.sessionId);
-      }
+    },
+    redirect: function() {
+      this.$router.push("/");
     }
   },
   methods: {
