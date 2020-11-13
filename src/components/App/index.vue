@@ -180,7 +180,7 @@ export default {
     connect_error(error) {
       // these are handled internally and shouldn't be forwarded to Sentry
       if (
-        error.message === "xhr poll error" || 
+        error.message === "xhr poll error" ||
         error.message === "websocket error"
       ) {
         return;
