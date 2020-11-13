@@ -177,7 +177,7 @@ export default {
     error(error) {
       // these are handled internally and shouldn't be forwarded to Sentry
       if (error.message === "xhr poll error") {
-        return
+        return;
       }
       Sentry.captureException(error);
     },
