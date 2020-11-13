@@ -175,25 +175,19 @@ export default {
   },
   sockets: {
     error(error) {
-      // these are handled internally and shouldn't be forwarded to Sentry
-      if (error.message === "xhr poll error") {
-        console.log("xhr poll error in error event")
-        return;
-      }
       Sentry.captureException(error);
     },
     connect_error(error) {
-      if (error.message === "xhr poll error") {
-        console.log("xhr poll error in connect_error event")
+      // these are handled internally and shouldn't be forwarded to Sentry
+      if (
+        error.message === "xhr poll error" || 
+        error.message === "websocket error"
+      ) {
         return;
       }
       Sentry.captureException(error);
     },
     reconnect_error(error) {
-      if (error.message === "xhr poll error") {
-        console.log("xhr poll error in reconnect_error event")
-        return;
-      }
       Sentry.captureException(error);
     },
     "session-change"(sessionData) {
