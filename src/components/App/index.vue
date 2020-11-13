@@ -175,6 +175,9 @@ export default {
   },
   sockets: {
     error(error) {
+      if (error.message === "xhr poll error") {
+        return
+      }
       Sentry.captureException(error);
     },
     connect_error(error) {
