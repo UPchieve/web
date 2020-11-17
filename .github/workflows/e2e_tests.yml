@@ -54,7 +54,7 @@ jobs:
     - run: cd server && cp config.example.ts config.ts && mkdir mongo-volume && docker-compose up -d
     - run: sleep 60
     - run: cd web && npm install
-    - uses: cypress-io/github-action@v1
+    - uses: cypress-io/github-action@v2
       with:
         working-directory: ./web
         browser: chrome
