@@ -126,6 +126,9 @@ export default {
       }, 1000 * 60);
     }
   },
+  beforeDestroy() {
+    this.$socket.disconnect();
+  },
   computed: {
     ...mapState({
       user: state => state.user.user,
@@ -184,7 +187,6 @@ export default {
 
       SessionService.endSession(this, sessionId)
         .then(() => {
-          this.$socket.disconnect();
           this.$store.dispatch("user/sessionDisconnected");
           this.goToFeedbackPage();
         })

@@ -8,7 +8,7 @@
       <chat-message
         v-for="message in messages"
         :message="message"
-        :key="message._id"
+        :key="`message-${message.user}-${message.createdAt}`"
         class="chat-log__message"
         :class="{
           'chat-log__message--right':
