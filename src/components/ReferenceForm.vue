@@ -1,8 +1,9 @@
 <template>
   <div>
-    <div v-if="didSubmit" class="did-submit">
-      <h3>Reference submitted!</h3>
-    </div>
+    <h3 v-if="didSubmit" class="helper-message">Reference submitted!</h3>
+    <h3 v-else-if="isNoLongerReference" class="helper-message">
+      Sorry, you've been removed as a reference.
+    </h3>
     <div
       v-else
       class="questions-container"
@@ -209,6 +210,7 @@ export default {
     return {
       error: "",
       didSubmit: false,
+      isNoLongerReference: false,
       affiliation: "",
       relationshipLength: "",
       rejectionReason: "",
@@ -275,7 +277,7 @@ export default {
       mobileMode: "app/mobileMode"
     })
   },
-  mounted() {
+  async mounted() {
     if (this.isAdminReview) {
       this.affiliation = this.reference.affiliation;
       this.relationshipLength = this.reference.relationshipLength;
@@ -286,6 +288,12 @@ export default {
       this.multipleRadioResponse.agreeableAndApproachable = this.reference.agreeableAndApproachable;
       this.multipleRadioResponse.communicatesEffectively = this.reference.communicatesEffectively;
       this.multipleRadioResponse.trustworthyWithChildren = this.reference.trustworthyWithChildren;
+    } else {
+      try {
+        await NetworkService.checkReference(this.$route.params.referenceId);
+      } catch (error) {
+        this.isNoLongerReference = true;
+      }
     }
   },
 
@@ -362,11 +370,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.did-submit {
-  h3 {
-    text-align: center;
-    padding: 50px 0 200px;
-  }
+.helper-message {
+  text-align: center;
+  padding: 50px 0 100px;
 }
 textarea.uc-form-input {
   resize: none;

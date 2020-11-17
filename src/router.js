@@ -281,7 +281,7 @@ const routes = [
     meta: { protected: true, requiresAdmin: true }
   },
   {
-    path: "/admin/volunteers/pending",
+    path: "/admin/volunteers/review",
     name: "AdminPendingVolunteers",
     component: AdminPendingVolunteers,
     meta: { protected: true, requiresAdmin: true }

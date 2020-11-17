@@ -246,7 +246,7 @@ export default {
 
       if (statuses.some(s => s === "REJECTED"))
         return {
-          subtitle: "Contact UPchieve support",
+          subtitle: "Provide new reference(s)",
           status: "ERROR"
         };
 
