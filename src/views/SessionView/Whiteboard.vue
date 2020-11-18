@@ -552,7 +552,7 @@ export default {
         this.zwibblerCtx.setConfig("readOnly", false);
 
         // @todo access the connection in a less sketchy way
-        const zwibblerWsConnection = this.zwibblerCtx.fc.Rb.Rb;
+        const zwibblerWsConnection = this.zwibblerCtx.mc.Yb.Yb;
         const zwibblerOnMessage = zwibblerWsConnection.onmessage;
         // Intercept Zwibbler's websocket message handler
         zwibblerWsConnection.onmessage = messageEvent => {
