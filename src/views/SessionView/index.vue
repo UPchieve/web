@@ -243,9 +243,6 @@ export default {
     },
     connect() {
       this.$store.dispatch("user/sessionConnected");
-    },
-    redirect: function() {
-      this.$router.push("/");
     }
   },
   methods: {

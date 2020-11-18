@@ -195,6 +195,9 @@ export default {
     },
     "session-change"(sessionData) {
       this.$store.dispatch("user/updateSession", sessionData);
+    },
+    redirect() {
+      this.$router.push("/");
     }
   }
 };
