@@ -48,7 +48,7 @@ export default {
     };
 
     const cards = Object.entries(topics)
-      // @temporarily hide SAT card
+      // @note: temporarily hide SAT card
       .filter(([key]) => key !== "training" && key !== "sat")
       .map(([key, topicObj]) => {
         return {
