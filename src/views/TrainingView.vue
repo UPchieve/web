@@ -286,6 +286,7 @@ export default {
       sat: {
         training: [
           { displayName: "UPchieve 101", key: "upchieve101" }
+          // Hide until SAT Strategies is completed
           // { displayName: "SAT Strategies ", key: "satStrategies" }
         ],
         certifications: [
