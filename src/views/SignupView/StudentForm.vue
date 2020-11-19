@@ -2,10 +2,16 @@
   <form
     v-if="step === 'partner-signup-code'"
     class="uc-form-body"
+    aria-label="Student signup"
     @submit.prevent="submitPartnerSignupCode()"
   >
-    <div v-if="errors.length" class="step-errors">
-      <h5>Please correct the following problems:</h5>
+    <div
+      v-if="errors.length"
+      class="step-errors"
+      role="alert"
+      aria-labelledby="errorHeading"
+    >
+      <h5 id="errorHeading">Please correct the following problems:</h5>
       <ul>
         <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
       </ul>
@@ -29,7 +35,13 @@
 
     <template v-else>
       <div class="uc-column">
-        <div class="back-button" @click="backToSignupCodeDecision">Back</div>
+        <button
+          class="back-button"
+          type="button"
+          @click="backToSignupCodeDecision"
+        >
+          Back
+        </button>
 
         <label for="inputPartnerCode" class="uc-form-label">Sign-up code</label>
         <input
@@ -47,16 +59,24 @@
       </button>
     </template>
 
-    <div v-if="msg !== ''">{{ msg }}</div>
+    <div v-if="msg !== ''" role="alert">{{ msg }}</div>
   </form>
 
   <form
     v-else-if="step === 'eligibility'"
     class="uc-form-body uc-form-body--center"
+    aria-label="Student eligibility"
     @submit.prevent="submitEligibility()"
   >
-    <div v-if="errors.length" class="step-errors">
-      <h5>Please correct the following problems:</h5>
+    <div
+      v-if="errors.length"
+      class="step-errors"
+      role="alert"
+      aria-labelledby="eligibilityErrorHeading"
+    >
+      <h5 id="eligibilityErrorHeading">
+        Please correct the following problems:
+      </h5>
       <ul>
         <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
       </ul>
@@ -145,7 +165,7 @@
       Check my eligibility
     </button>
 
-    <div v-if="msg !== ''">{{ msg }}</div>
+    <div v-if="msg !== ''" role="alert">{{ msg }}</div>
   </form>
 
   <div
@@ -190,10 +210,16 @@
   <form
     v-else-if="step === 'account'"
     class="uc-form-body uc-form-body--center"
+    aria-label="Student account"
     @submit.prevent="submitAccountForm()"
   >
-    <div v-if="errors.length" class="step-errors">
-      <h5>Please correct the following problems:</h5>
+    <div
+      v-if="errors.length"
+      class="step-errors"
+      role="alert"
+      aria-labelledby="accountErrorsHeading"
+    >
+      <h5 id="accountErrorsHeading">Please correct the following problems:</h5>
       <ul>
         <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
       </ul>
@@ -274,7 +300,7 @@
       Create my account
     </button>
 
-    <div v-if="msg !== ''">{{ msg }}</div>
+    <div v-if="msg !== ''" role="alert">{{ msg }}</div>
   </form>
   <div v-else class="uc-form-body">Unexpected Error</div>
 </template>

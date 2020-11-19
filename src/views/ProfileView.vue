@@ -155,7 +155,7 @@ export default {
       // Hack to initially mock the vue-phone-number-input data
       this.phoneInputInfo = {
         isValid: true,
-        e164: pn.getNumber("international")
+        e164: pn.getNumber("e164")
       };
     }
   },
