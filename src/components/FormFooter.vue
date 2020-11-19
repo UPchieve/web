@@ -1,5 +1,5 @@
 <template>
-  <div class="FormFooter">
+  <nav class="FormFooter" aria-label="More information">
     <div>
       <router-link to="/contact" target="_blank">Contact Us</router-link>
     </div>
@@ -9,7 +9,7 @@
     <div>
       <a href="https://upchieve.org/" target="_blank">Our Website</a>
     </div>
-  </div>
+  </nav>
 </template>
 
 <script>
