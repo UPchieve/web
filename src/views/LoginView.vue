@@ -1,7 +1,7 @@
 <template>
   <form-page-template>
     <form class="uc-form" aria-labelledby="loginFormHeader">
-      <nav class="uc-form-header">
+      <nav class="uc-form-header" aria-label="Options">
         <div class="uc-form-header-link--active" id="loginFormHeader">
           Log In
         </div>
