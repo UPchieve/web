@@ -285,7 +285,7 @@ export default {
       },
       sat: {
         training: [
-          { displayName: "UPchieve 101", key: "upchieve101" },
+          { displayName: "UPchieve 101", key: "upchieve101" }
           // { displayName: "SAT Strategies ", key: "satStrategies" }
         ],
         certifications: [
