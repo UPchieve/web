@@ -118,6 +118,12 @@ export default {
           target: "_system"
         });
       }
+    },
+    isExemptSocketError(error) {
+      return (
+        error.message === "xhr poll error" ||
+        error.message === "websocket error"
+      );
     }
   },
   computed: {
@@ -175,16 +181,23 @@ export default {
   },
   sockets: {
     error(error) {
+      if (this.isExemptSocketError(error)) return;
       Sentry.captureException(error);
     },
     connect_error(error) {
+      // these are handled internally and shouldn't be forwarded to Sentry
+      if (this.isExemptSocketError(error)) return;
       Sentry.captureException(error);
     },
     reconnect_error(error) {
+      if (this.isExemptSocketError(error)) return;
       Sentry.captureException(error);
     },
     "session-change"(sessionData) {
       this.$store.dispatch("user/updateSession", sessionData);
+    },
+    redirect() {
+      this.$router.push("/");
     }
   }
 };

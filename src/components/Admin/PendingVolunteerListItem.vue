@@ -1,6 +1,6 @@
 <template>
   <tr class="list-item">
-    <td class="list-item__cell">{{ createdAt }}</td>
+    <td class="list-item__cell">{{ readyForReviewAt }}</td>
     <td class="list-item__cell bold">
       <router-link :to="`/admin/users/${volunteer._id}`">{{
         fullName
@@ -19,8 +19,8 @@ export default {
     volunteer: { type: Object, required: true }
   },
   computed: {
-    createdAt() {
-      return moment(this.volunteer.createdAt).format("l, h:mm a");
+    readyForReviewAt() {
+      return moment(this.volunteer.readyForReviewAt).format("l, h:mm a");
     },
 
     fullName() {

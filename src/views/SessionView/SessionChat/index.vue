@@ -22,12 +22,19 @@
         </div>
       </transition>
       <transition name="chat-warning">
-        <div
+        <loading-message
+          message="Attempting to connect"
           class="chat-warning chat-warning--connection"
           v-show="isSessionConnectionFailure"
+        />
+      </transition>
+      <transition name="chat-warning">
+        <p
+          class="chat-warning chat-warning--message-error"
+          v-show="isMessageError"
         >
-          <loading-message message="Attempting to connect" />
-        </div>
+          Failed to send message
+        </p>
       </transition>
 
       <div class="messages">
@@ -93,7 +100,8 @@ export default {
       newMessage: "",
       moderationWarningIsShown: false,
       typingTimeout: null,
-      typingIndicatorShown: false
+      typingIndicatorShown: false,
+      isMessageError: false
     };
   },
   computed: {
@@ -102,14 +110,13 @@ export default {
       currentSession: state => state.user.session,
       messages: state =>
         (state.user.session.messages || []).map(message => {
-          // compute avatar style from picture
-          let picture = message.picture;
-          if (!picture || picture === "") {
-            picture = message.isVolunteer
-              ? VolunteerAvatarUrl
-              : StudentAvatarUrl;
-          }
-
+          const {
+            user: { user }
+          } = state;
+          // Display an avatar in the chat for the other user
+          const picture = user.isVolunteer
+            ? StudentAvatarUrl
+            : VolunteerAvatarUrl;
           message.avatarStyle = { backgroundImage: `url(${picture})` };
           return message;
         }),
@@ -198,6 +205,13 @@ export default {
     },
     messageSend(data) {
       this.$store.dispatch("user/addMessage", data);
+    },
+    messageError() {
+      if (this.isMessageError) return;
+      this.isMessageError = true;
+      setTimeout(() => {
+        this.isMessageError = false;
+      }, 1000);
     }
   },
 
@@ -212,7 +226,7 @@ export default {
 .chat {
   height: 100%;
   position: relative;
-  background: #fff;
+  background-color: #fff;
   display: flex;
   flex-direction: column;
 }
@@ -232,7 +246,7 @@ export default {
 
 .chat-warning {
   width: 100%;
-  background: $c-shadow-warn;
+  background-color: $c-shadow-warn;
   color: #fff;
   font-weight: normal;
   min-height: 40px;
@@ -253,7 +267,11 @@ export default {
   }
 
   &--connection {
-    background: rgba(110, 140, 171, 0.87);
+    background-color: rgba(110, 140, 171, 0.87);
+  }
+
+  &--message-error {
+    background-color: $c-error-red;
   }
 
   &__close {
@@ -271,7 +289,7 @@ export default {
 }
 
 .messages {
-  background: white;
+  background-color: white;
   position: relative;
   height: 100%;
   overflow: auto;
@@ -320,7 +338,7 @@ span {
   padding: 10px 14px;
   overflow-wrap: break-word;
   font-size: 16px;
-  background: #f1f3f6;
+  background-color: #f1f3f6;
   border-radius: 20px;
   max-width: 80%;
 }
@@ -364,7 +382,7 @@ span {
   width: 100%;
   height: 100px;
   position: relative;
-  background: #fff;
+  background-color: #fff;
 
   @include breakpoint-below("medium") {
     height: 66px;
