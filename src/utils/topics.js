@@ -42,6 +42,13 @@ export const topics = {
       collegeSkills: { displayName: "College Counseling Skills" }
     },
     displayName: "UPchieve Training"
+  },
+  sat: {
+    subtopics: {
+      satMath: { displayName: "SAT Math" },
+      satReading: { displayName: "SAT Reading" }
+    },
+    displayName: "Standardized Testing"
   }
 };
 
