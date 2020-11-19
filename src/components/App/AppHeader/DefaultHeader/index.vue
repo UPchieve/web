@@ -2,7 +2,7 @@
   <div class="DefaultHeader">
     <template v-if="mobileMode">
       <div class="DefaultHeader-user-info">
-        <img class="DefaultHeader-user-info-avatar" :src="avatarUrl" />
+        <img class="DefaultHeader-user-info-avatar" :src="avatarUrl" alt="" />
         <span class="DefaultHeader-user-info-name">{{ name }}</span>
       </div>
 
