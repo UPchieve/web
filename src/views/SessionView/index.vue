@@ -50,7 +50,10 @@
       @click="toggleAuxiliary"
     >
       <div class="toggleButton__wrapper">
-        <span class="toggleButton__message-indicator" v-if="!hasSeenNewMessage"></span>
+        <span
+          class="toggleButton__message-indicator"
+          v-if="!hasSeenNewMessage"
+        ></span>
         <img id="toggleIcon" :src="toggleIconSrc" />
       </div>
     </div>
