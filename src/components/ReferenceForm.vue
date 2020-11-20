@@ -10,7 +10,7 @@
       :class="isAdminReview && 'admin-review'"
     >
       <fieldset :disabled="isAdminReview">
-        <legend v-if="!isAdminReview">
+        <legend class="heading-legend" v-if="!isAdminReview">
           <h1 class="title">UPchieve Applicant Reference Evaluation</h1>
         </legend>
         <legend v-else>Evaluation Responses</legend>
@@ -577,5 +577,10 @@ textarea.uc-form-input {
 
 .radio-answer-row {
   @include flex-container(row, flex-start, center);
+}
+
+.heading-legend {
+  border-bottom: 0;
+  margin-bottom: 0;
 }
 </style>
