@@ -28,6 +28,7 @@ import AppBanner from "./AppBanner";
 import PortalService from "@/services/PortalService";
 import getOperatingSystem from "@/utils/get-operating-system";
 import isOutdatedMobileAppVersion from "@/utils/is-outdated-mobile-app-version";
+import requestNotificationPermission from "@/utils/request-notification-permission";
 
 export default {
   name: "App",
@@ -39,7 +40,8 @@ export default {
   },
   data() {
     return {
-      isIOS: false
+      isIOS: false,
+      docHiddenProperty: ""
     };
   },
   async created() {
@@ -48,6 +50,9 @@ export default {
     this.handleResize();
     await this.$store.dispatch("app/checkEnvironment", this);
     PortalService.call("app.isLoaded");
+
+    requestNotificationPermission();
+    this.setVisibilityListener();
 
     if (this.isMobileApp) {
       document.addEventListener("click", this.handleExternalURLs, false);
@@ -124,6 +129,28 @@ export default {
         error.message === "xhr poll error" ||
         error.message === "websocket error"
       );
+    },
+    setVisibilityListener() {
+      let visibilityChange;
+      // Opera 12.10 and Firefox 18 and later support
+      if (typeof document.hidden !== "undefined") {
+        this.docHiddenProperty = "hidden";
+        visibilityChange = "visibilitychange";
+      } else if (typeof document.msHidden !== "undefined") {
+        this.docHiddenProperty = "msHidden";
+        visibilityChange = "msvisibilitychange";
+      } else if (typeof document.webkitHidden !== "undefined") {
+        this.docHiddenProperty = "webkitHidden";
+        visibilityChange = "webkitvisibilitychange";
+      }
+
+      document.addEventListener(visibilityChange, this.handleVisibilityChange);
+    },
+    async handleVisibilityChange() {
+      await this.$store.dispatch(
+        "app/updateWebPageVisibility",
+        this.docHiddenProperty
+      );
     }
   },
   computed: {
@@ -134,6 +161,7 @@ export default {
       showBanner: state => state.app.banner.isShown,
       bannerComponent: state => state.app.banner.component,
       isMobileApp: state => state.app.isMobileApp,
+      isWebPageHidden: state => state.app.isWebPageHidden,
       user: state => state.user.user
     }),
     ...mapGetters({
