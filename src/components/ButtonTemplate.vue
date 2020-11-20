@@ -31,11 +31,7 @@ export default {
     routeTo: String,
     showArrow: Boolean,
     buttonType: {
-      type: String,
-      validator: function(value) {
-        // Must be specified if not a router link
-        return !!this.routeTo || !!value;
-      }
+      type: String
     }
   }
 };

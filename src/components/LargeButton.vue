@@ -25,11 +25,7 @@ export default {
       default: true
     },
     buttonType: {
-      type: String,
-      validator: function(value) {
-        // Must be specified if not a router link
-        return !!this.routeTo || !!value;
-      }
+      type: String
     }
   },
   computed: {
