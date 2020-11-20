@@ -10,9 +10,9 @@
   </router-link>
 
   <button :type="buttonType" v-else class="ButtonTemplate">
-    <div>
+    <span>
       <slot />
-    </div>
+    </span>
     <arrow-icon
       v-if="primary && showArrow"
       class="ButtonTemplate-icon arrow-icon"
