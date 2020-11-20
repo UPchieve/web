@@ -18,6 +18,7 @@
             10 minutes to complete and all answers will remain confidential.
           </p>
         </legend>
+        <legend v-else>Evaluation Responses</legend>
         <div class="question-col">
           <label for="affiliation" class="uc-form-label"
             >In what capacity do you know the applicant?</label
