@@ -9,15 +9,16 @@
       class="questions-container"
       :class="isAdminReview && 'admin-review'"
     >
-      <template v-if="!isAdminReview">
-        <h1 class="title">UPchieve Applicant Reference Evaluation</h1>
-        <p>
+      <fieldset :disabled="isAdminReview">
+        <legend v-if="!isAdminReview">
+          <h1 class="title">UPchieve Applicant Reference Evaluation</h1>
+        </legend>
+        <legend v-else>Evaluation Responses</legend>
+        <p v-if="!isAdminReview">
           Please answer the following questions honestly based on your knowledge
           of/experience with the applicant. It should take less than 10 minutes
           to complete and all answers will remain confidential.
         </p>
-      </template>
-      <fieldset :disabled="isAdminReview">
         <div class="question-col">
           <label for="affiliation" class="uc-form-label"
             >In what capacity do you know the applicant?</label

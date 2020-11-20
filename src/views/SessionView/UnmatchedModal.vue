@@ -16,7 +16,7 @@
 
       <footer class="unmatched-modal__footer">
         <div class="unmatched-modal__buttons">
-          <large-button primary @click.native="end"
+          <large-button button-type="button" primary @click.native="end"
             >Back to dashboard</large-button
           >
         </div>

@@ -49,6 +49,7 @@
 
         <div class="contact-form__section">
           <large-button
+            button-type="button"
             class="contact-form__submit"
             primary
             @click.native="submitContactUs"

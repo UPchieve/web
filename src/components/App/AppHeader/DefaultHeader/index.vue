@@ -2,7 +2,7 @@
   <div class="DefaultHeader">
     <template v-if="mobileMode">
       <div class="DefaultHeader-user-info">
-        <img class="DefaultHeader-user-info-avatar" :src="avatarUrl" />
+        <img class="DefaultHeader-user-info-avatar" :src="avatarUrl" alt="" />
         <span class="DefaultHeader-user-info-name">{{ name }}</span>
       </div>
 
@@ -11,7 +11,7 @@
 
     <template v-else>
       <router-link to="/">
-        <img class="DefaultHeader-logo" :src="logoUrl" />
+        <img class="DefaultHeader-logo" :src="logoUrl" alt="UPchieve" />
       </router-link>
     </template>
   </div>

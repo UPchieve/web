@@ -52,6 +52,7 @@
         </router-link>
 
         <large-button
+          button-type="button"
           primary
           :showArrow="false"
           :routeTo="

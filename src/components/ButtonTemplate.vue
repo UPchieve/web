@@ -9,10 +9,10 @@
     />
   </router-link>
 
-  <button v-else class="ButtonTemplate">
-    <div>
+  <button :type="buttonType" v-else class="ButtonTemplate">
+    <span>
       <slot />
-    </div>
+    </span>
     <arrow-icon
       v-if="primary && showArrow"
       class="ButtonTemplate-icon arrow-icon"
@@ -29,7 +29,10 @@ export default {
   props: {
     primary: Boolean,
     routeTo: String,
-    showArrow: Boolean
+    showArrow: Boolean,
+    buttonType: {
+      type: String
+    }
   }
 };
 </script>

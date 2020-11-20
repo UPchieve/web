@@ -1,5 +1,6 @@
 <template>
   <button-template
+    :buttonType="buttonType"
     :primary="primary"
     :routeTo="routeTo"
     :class="buttonClasses"
@@ -22,6 +23,9 @@ export default {
     showArrow: {
       type: Boolean,
       default: true
+    },
+    buttonType: {
+      type: String
     }
   },
   computed: {

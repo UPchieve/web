@@ -47,6 +47,7 @@
       >
       <large-button
         v-else
+        button-type="button"
         primary
         @click.native="handleClick"
         :disabled="disabled"

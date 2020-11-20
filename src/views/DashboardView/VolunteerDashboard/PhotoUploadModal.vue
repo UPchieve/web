@@ -36,6 +36,7 @@
         <separator v-if="!mobileMode" />
 
         <large-button
+          button-type="button"
           @click.native="submitPhoto"
           class="submit-btn"
           :disabled="!photo"

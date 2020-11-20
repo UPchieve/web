@@ -4,9 +4,13 @@
     <div class="ConnectionTroubleModal-message">
       {{ modalData.message }}
     </div>
-    <large-button v-if="mobileMode" primary @click.native="onAccept">{{
-      modalData.acceptText
-    }}</large-button>
+    <large-button
+      v-if="mobileMode"
+      button-type="button"
+      primary
+      @click.native="onAccept"
+      >{{ modalData.acceptText }}</large-button
+    >
   </div>
 </template>
 
