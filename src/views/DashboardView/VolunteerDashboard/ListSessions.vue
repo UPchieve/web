@@ -31,22 +31,28 @@
 <script>
 import { mapState } from "vuex";
 import { allSubtopics } from "@/utils/topics";
+import newWaitingStudentAudio from "@/assets/audio/new-waiting-student.mp3";
+import sendWebNotification from "@/utils/send-web-notification";
+import requestNotificationPermission from "@/utils/request-notification-permission";
 
 export default {
   data() {
     return {
       openSessions: [],
       allSubtopics: {},
-      emitListIntervalId: null
+      emitListIntervalId: null,
+      isInitialMount: false
     };
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: state => state.user.user,
+      isWebPageHidden: state => state.app.isWebPageHidden
     })
   },
   mounted() {
     this.allSubtopics = allSubtopics();
+    this.isInitialMount = true;
 
     // reconnect socket if it isn't already
     if (!this.$socket.connected) {
@@ -67,6 +73,9 @@ export default {
     gotoSession(session) {
       const { type, subTopic, _id } = session;
       const path = `/session/${type}/${subTopic}/${_id}`;
+
+      // Best practice to ask for permission after a user gesture
+      requestNotificationPermission();
 
       if (type && subTopic && _id) {
         this.$router.push(path);
@@ -139,7 +148,36 @@ export default {
         }
       }
 
+      const prevOpenSessions = this.openSessions;
       this.openSessions = results;
+
+      // Look for the new session added
+      let newSession;
+      for (const session of this.openSessions) {
+        const { _id: sessionId } = session;
+        let isOldSession = false;
+        for (const oldSession of prevOpenSessions) {
+          if (oldSession._id === sessionId) isOldSession = true;
+        }
+
+        if (!isOldSession) newSession = session;
+      }
+
+      if (!this.isInitialMount && newSession) {
+        const audio = new Audio(newWaitingStudentAudio);
+        audio.play();
+
+        if (this.isWebPageHidden)
+          sendWebNotification(
+            `A student started a new ${this.subtopicDisplayName(
+              newSession.subTopic
+            )} session`,
+            {
+              body: "Go to the dashboard"
+            }
+          );
+      }
+      this.isInitialMount = false;
     }
   }
 };
