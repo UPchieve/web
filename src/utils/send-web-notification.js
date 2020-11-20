@@ -1,4 +1,4 @@
-import LogoIcon from "@/assets/logo.png";
+import LogoIcon from "@/assets/logo-02.png";
 
 const sendWebNotification = (title, data) => {
   // Check browser support
