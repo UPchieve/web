@@ -37,7 +37,10 @@
           'chat-container--hidden': shouldHideChatSection
         }"
       >
-        <session-chat />
+        <session-chat
+          :shouldHideChatSection="shouldHideChatSection"
+          :setHasSeenNewMessage="setHasSeenNewMessage"
+        />
       </div>
     </div>
     <div
@@ -46,7 +49,10 @@
       id="toggleButton"
       @click="toggleAuxiliary"
     >
-      <img id="toggleIcon" :src="toggleIconSrc" />
+      <div class="toggleButton__wrapper">
+        <span class="toggleButton__message-indicator" v-if="!hasSeenNewMessage"></span>
+        <img id="toggleIcon" :src="toggleIconSrc" />
+      </div>
     </div>
     <div
       v-if="showPhotoUpload"
@@ -107,7 +113,8 @@ export default {
   data() {
     return {
       auxiliaryOpen: false,
-      sessionId: null
+      sessionId: null,
+      hasSeenNewMessage: true
     };
   },
   computed: {
@@ -262,6 +269,8 @@ export default {
         document.getElementById("toggleButton").classList.remove("back");
         this.auxiliaryOpen = false;
       }
+
+      if (this.shouldHideAuxiliarySection) this.hasSeenNewMessage = true;
     },
     joinSession(sessionId) {
       this.$queuedSocket.emit(
@@ -305,6 +314,9 @@ export default {
     },
     openFileDialog() {
       this.$refs.whiteboard.openFileDialog();
+    },
+    setHasSeenNewMessage(value) {
+      this.hasSeenNewMessage = value;
     }
   },
   watch: {
@@ -455,6 +467,21 @@ export default {
     width: 26px;
     height: 26px;
   }
+}
+
+.toggleButton__wrapper {
+  position: relative;
+}
+
+.toggleButton__message-indicator {
+  position: absolute;
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: $c-error-red;
+  top: 0;
+  right: 0;
+  border-radius: 50%;
 }
 
 .photo-upload--hidden {
