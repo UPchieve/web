@@ -11,7 +11,7 @@
 
     <template v-else>
       <router-link to="/">
-        <img class="DefaultHeader-logo" :src="logoUrl" />
+        <img class="DefaultHeader-logo" :src="logoUrl" alt="UPchieve" />
       </router-link>
     </template>
   </div>
