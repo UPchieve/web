@@ -32,9 +32,9 @@ export default {
     showArrow: Boolean,
     buttonType: {
       type: String,
-      validator: function () {
+      validator: function(value) {
         // Must be specified if not a router link
-        return !!routeTo || !!value;
+        return !!this.routeTo || !!value;
       }
     }
   }

@@ -13,7 +13,11 @@
         <hyperlink-button reverse @click.native="end"
           >End chat</hyperlink-button
         >
-        <large-button button-type="button" primary reverse @click.native="rejoin"
+        <large-button
+          button-type="button"
+          primary
+          reverse
+          @click.native="rejoin"
           >Return to chat</large-button
         >
       </div>

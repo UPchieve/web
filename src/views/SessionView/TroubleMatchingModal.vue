@@ -19,7 +19,9 @@
             class="trouble-matching-modal__buttons--cancel"
             >Keep Waiting</large-button
           >
-          <large-button button-type="button" primary @click.native="end">End Session</large-button>
+          <large-button button-type="button" primary @click.native="end"
+            >End Session</large-button
+          >
         </div>
       </div>
     </div>

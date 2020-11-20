@@ -21,7 +21,10 @@
       <template v-if="!mobileMode && showTemplateButtons">
         <div class="ModalTemplate-seperator" />
         <div class="ModalTemplate-buttons">
-          <large-button v-if="!alertModal" button-type="button" @click.native="handleCancel"
+          <large-button
+            v-if="!alertModal"
+            button-type="button"
+            @click.native="handleCancel"
             >Cancel</large-button
           >
           <large-button

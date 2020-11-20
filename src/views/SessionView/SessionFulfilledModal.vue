@@ -2,9 +2,13 @@
   <div class="SessionFulfilledModal">
     <h1 class="SessionFulfilledModal-title">{{ title }}</h1>
     <div class="SessionFulfilledModal-message">{{ message }}</div>
-    <large-button v-if="mobileMode" button-type="button" primary @click.native="onAccept">{{
-      modalData.acceptText
-    }}</large-button>
+    <large-button
+      v-if="mobileMode"
+      button-type="button"
+      primary
+      @click.native="onAccept"
+      >{{ modalData.acceptText }}</large-button
+    >
   </div>
 </template>
 

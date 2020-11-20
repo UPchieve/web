@@ -134,7 +134,10 @@
       <separator v-if="!mobileMode" />
 
       <div class="buttons-container">
-        <large-button button-type="button" class="btn done-btn" @click.native="closeModal"
+        <large-button
+          button-type="button"
+          class="btn done-btn"
+          @click.native="closeModal"
           >Done</large-button
         >
       </div>

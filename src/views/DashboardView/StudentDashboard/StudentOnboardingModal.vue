@@ -14,7 +14,11 @@
 
     <div v-if="!mobileMode" class="seperator" />
     <div class="OnboardingModal-buttons">
-      <large-button button-type="button" @click.native="nextStep()" class="large-button">
+      <large-button
+        button-type="button"
+        @click.native="nextStep()"
+        class="large-button"
+      >
         <div class="next-button">
           {{ views[step].button }} <arrow-icon class="icon" />
         </div>

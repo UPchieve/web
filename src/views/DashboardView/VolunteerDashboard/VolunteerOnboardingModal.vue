@@ -32,7 +32,12 @@
         </p>
       </div>
     </div>
-    <large-button v-if="mobileMode" button-type="button" primary @click.native="onAccept">
+    <large-button
+      v-if="mobileMode"
+      button-type="button"
+      primary
+      @click.native="onAccept"
+    >
       {{ modalData.acceptText }}
     </large-button>
   </div>

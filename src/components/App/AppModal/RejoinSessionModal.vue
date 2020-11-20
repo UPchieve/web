@@ -7,8 +7,12 @@
     </h2>
 
     <div class="RejoinSessionModal-buttons">
-      <large-button button-type="button" primary @click.native="rejoin">Return to chat</large-button>
-      <large-button button-type="button" secondary @click.native="end">End chat</large-button>
+      <large-button button-type="button" primary @click.native="rejoin"
+        >Return to chat</large-button
+      >
+      <large-button button-type="button" secondary @click.native="end"
+        >End chat</large-button
+      >
     </div>
   </div>
 </template>

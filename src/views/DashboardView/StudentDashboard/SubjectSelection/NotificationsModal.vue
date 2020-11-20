@@ -15,7 +15,10 @@
         <large-button button-type="button" @click.native="onClose()"
           >Nah, I'll check every minute.</large-button
         >
-        <large-button button-type="button" primary @click.native="handlePushNotification()"
+        <large-button
+          button-type="button"
+          primary
+          @click.native="handlePushNotification()"
           >Yes, please notify me!</large-button
         >
       </div>
