@@ -26,6 +26,7 @@
           </p>
           <large-button
             v-if="mobileMode"
+            button-type="button"
             primary
             @click.native="handleMobileStart(subtopic)"
             >{{ modalData.acceptText }}</large-button

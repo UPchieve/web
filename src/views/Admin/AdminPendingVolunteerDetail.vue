@@ -90,7 +90,7 @@
         <background-info v-if="hasCompletedBackgroundInfo" :user="volunteer" />
       </div>
       <p v-if="error" class="error">{{ error }}</p>
-      <large-button @click.native="handleSubmit" type="button" class="save-btn"
+      <large-button @click.native="handleSubmit" button-type="button" class="save-btn"
         >Save</large-button
       >
     </div>

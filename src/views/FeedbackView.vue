@@ -317,6 +317,7 @@
         ></textarea>
       </div>
       <large-button
+        button-type="button"
         class="feedback__submit-button"
         primary
         @click.native="submitFeedback"

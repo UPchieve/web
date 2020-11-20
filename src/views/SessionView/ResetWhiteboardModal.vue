@@ -16,8 +16,9 @@
       <separator />
       <footer class="reset-wb-modal__footer">
         <div class="reset-wb-modal__buttons">
-          <large-button @click.native="closeModal">Cancel</large-button>
+          <large-button button-type="button" @click.native="closeModal">Cancel</large-button>
           <large-button
+            button-type="button"
             class="reset-wb-modal__reset-btn"
             @click.native="resetWhiteboard"
             >Reset</large-button

@@ -20,8 +20,9 @@
       <separator />
       <footer class="deactivate-account-modal__footer">
         <div class="deactivate-account-modal__buttons">
-          <large-button @click.native="closeModal">Cancel</large-button>
+          <large-button button-type="button" @click.native="closeModal">Cancel</large-button>
           <large-button
+            button-type="button"
             class="deactivate-account-modal__reset-btn"
             @click.native="deactivate"
             >Deactivate</large-button

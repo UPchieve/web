@@ -28,8 +28,8 @@
     </div>
     <div class="report-modal__footer">
       <div class="report-modal__buttons">
-        <large-button @click.native="cancel">Cancel</large-button>
-        <large-button primary @click.native="submit" :disabled="!isFormComplete"
+        <large-button button-type="button" @click.native="cancel">Cancel</large-button>
+        <large-button button-type="button" primary @click.native="submit" :disabled="!isFormComplete"
           >Report</large-button
         >
       </div>

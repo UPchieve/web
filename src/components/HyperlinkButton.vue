@@ -1,5 +1,10 @@
 <template>
-  <button-template :primary="primary" :routeTo="routeTo" :class="buttonClasses">
+  <button-template
+    :buttonType="buttonType"
+    :primary="primary"
+    :routeTo="routeTo"
+    :class="buttonClasses"
+  >
     <slot />
   </button-template>
 </template>
@@ -13,7 +18,13 @@ export default {
     primary: Boolean,
     dark: Boolean,
     reverse: Boolean,
-    routeTo: String
+    routeTo: String,
+    buttonType: {
+      type: String,
+      default: function() {
+        return "button";
+      }
+    }
   },
   computed: {
     buttonClasses() {

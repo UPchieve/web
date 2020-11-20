@@ -38,8 +38,8 @@
 
     <div v-if="!mobileMode" class="presession-survey__separator" />
     <div class="presession-survey__buttons">
-      <large-button @click.native="cancel()">Cancel</large-button>
-      <large-button primary @click.native="submitSurvey" :disabled="!isComplete"
+      <large-button button-type="button" @click.native="cancel()">Cancel</large-button>
+      <large-button button-type="button" primary @click.native="submitSurvey" :disabled="!isComplete"
         >Start a chat</large-button
       >
     </div>

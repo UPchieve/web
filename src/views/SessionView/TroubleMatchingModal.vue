@@ -14,11 +14,12 @@
       <div class="trouble-matching-modal__footer">
         <div class="trouble-matching-modal__buttons">
           <large-button
+            button-type="button"
             @click.native="closeModal"
             class="trouble-matching-modal__buttons--cancel"
             >Keep Waiting</large-button
           >
-          <large-button primary @click.native="end">End Session</large-button>
+          <large-button button-type="button" primary @click.native="end">End Session</large-button>
         </div>
       </div>
     </div>

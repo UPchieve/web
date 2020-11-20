@@ -24,9 +24,9 @@
     <div v-if="!mobileMode" class="seperator" />
 
     <div class="UpgradeAppModal-buttons">
-      <large-button @click.native="onClose()">No thanks.</large-button>
+      <large-button button-type="button" @click.native="onClose()">No thanks.</large-button>
       <a :href="appStoreLink" target="_blank" class="UpgradeAppModal-link">
-        <large-button primary>Take me to the app store!</large-button>
+        <large-button button-type="button" primary>Take me to the app store!</large-button>
       </a>
     </div>
   </div>

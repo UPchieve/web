@@ -107,6 +107,7 @@
             </p>
 
             <large-button
+              button-type="button"
               class="btn save-btn"
               @click.native="addReference"
               :disabled="
@@ -133,7 +134,7 @@
       <separator v-if="!mobileMode" />
 
       <div class="buttons-container">
-        <large-button class="btn done-btn" @click.native="closeModal"
+        <large-button button-type="button" class="btn done-btn" @click.native="closeModal"
           >Done</large-button
         >
       </div>
