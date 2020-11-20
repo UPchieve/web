@@ -38,6 +38,7 @@
     "cypress": "^3.8.3",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
+    "html-validate": "^4.0.2",
     "jquery": "^3.5.0",
     "lodash": "^4.17.19",
     "moment": "^2.24.0",
@@ -72,6 +73,7 @@
   },
   "devDependencies": {
     "cypress-file-upload": "^4.0.7",
+    "html-validate-vue": "^3.2.0",
     "vue-jest": "^3.0.5",
     "webpack-bundle-analyzer": "^3.7.0"
   }
