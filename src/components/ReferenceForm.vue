@@ -15,9 +15,9 @@
         </legend>
         <legend v-else>Evaluation Responses</legend>
         <p v-if="!isAdminReview">
-          Please answer the following questions honestly based on your
-          knowledge of/experience with the applicant. It should take less than
-          10 minutes to complete and all answers will remain confidential.
+          Please answer the following questions honestly based on your knowledge
+          of/experience with the applicant. It should take less than 10 minutes
+          to complete and all answers will remain confidential.
         </p>
         <div class="question-col">
           <label for="affiliation" class="uc-form-label"
