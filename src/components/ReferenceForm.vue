@@ -13,10 +13,10 @@
         <legend v-if="!isAdminReview">
           <h1 class="title">UPchieve Applicant Reference Evaluation</h1>
           <p>
-            Please answer the following questions honestly based on your knowledge
-            of/experience with the applicant. It should take less than 10 minutes
-            to complete and all answers will remain confidential.
-           </p>
+            Please answer the following questions honestly based on your
+            knowledge of/experience with the applicant. It should take less than
+            10 minutes to complete and all answers will remain confidential.
+          </p>
         </legend>
         <div class="question-col">
           <label for="affiliation" class="uc-form-label"
@@ -576,9 +576,5 @@ textarea.uc-form-input {
 
 .radio-answer-row {
   @include flex-container(row, flex-start, center);
-}
-
-.sr-only {
-  display: none
 }
 </style>
