@@ -25,13 +25,17 @@
         </tr>
       </tbody>
     </table>
+    <audio
+      class="audio__new-waiting-student"
+      src="@/assets/audio/new-waiting-student.mp3"
+      muted
+    />
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
 import { allSubtopics } from "@/utils/topics";
-import newWaitingStudentAudio from "@/assets/audio/new-waiting-student.mp3";
 import sendWebNotification from "@/utils/send-web-notification";
 import requestNotificationPermission from "@/utils/request-notification-permission";
 
@@ -116,7 +120,7 @@ export default {
     }
   },
   sockets: {
-    sessions(sessions) {
+    async sessions(sessions) {
       if (this.user.isBanned) {
         this.openSessions = [];
         return;
@@ -164,8 +168,17 @@ export default {
       }
 
       if (!this.isInitialMount && newSession) {
-        const audio = new Audio(newWaitingStudentAudio);
-        audio.play();
+        try {
+          const newWaitingStudentAudio = document.querySelector(
+            ".audio__new-waiting-student"
+          );
+          // Unmuting the audio allows us to bypass the need for user interaction with the DOM before playing a sound
+          newWaitingStudentAudio.muted = false;
+          await newWaitingStudentAudio.play();
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.log("Unable to play audio");
+        }
 
         if (this.isWebPageHidden)
           sendWebNotification(
@@ -173,7 +186,7 @@ export default {
               newSession.subTopic
             )} session`,
             {
-              body: "Go to the dashboard"
+              body: "Visit your dashboard"
             }
           );
       }
@@ -194,5 +207,8 @@ export default {
 
 .session-row td {
   text-align: left;
+}
+
+.audio__new-waiting-student {
 }
 </style>

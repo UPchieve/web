@@ -58,6 +58,12 @@
       </div>
     </div>
 
+    <audio
+      class="audio__receive-message"
+      src="@/assets/audio/receive-message.mp3"
+      muted
+    />
+
     <div class="chat-footer">
       <transition name="fade">
         <div class="typing-indicator" v-show="typingIndicatorShown">
@@ -86,7 +92,6 @@ import LoadingMessage from "@/components/LoadingMessage";
 import ModerationService from "@/services/ModerationService";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
 import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
-import recieveMessageAudio from "@/assets/audio/recieve-message.mp3";
 import sendWebNotification from "@/utils/send-web-notification";
 import requestNotificationPermission from "@/utils/request-notification-permission";
 
@@ -207,13 +212,17 @@ export default {
     },
     async triggerAlert(data) {
       try {
-        // An error is thrown when the user has not interacted with the DOM first
-        const audio = new Audio(recieveMessageAudio);
-        await audio.play();
-        // eslint-disable-next-line no-empty
+        const receiveMessageAudio = document.querySelector(
+          ".audio__receive-message"
+        );
+        // Unmuting the audio allows us to bypass the need for user interaction with the DOM before playing a sound
+        receiveMessageAudio.muted = false;
+        await receiveMessageAudio.play();
       } catch (error) {
-        console.log("error: ", error);
+        // eslint-disable-next-line no-console
+        console.log("Unable to play audio");
       }
+
       sendWebNotification(
         `${this.sessionPartner.firstname} has sent a message`,
         { body: data.contents }
@@ -463,5 +472,9 @@ span {
     padding: 10px 16px;
     line-height: 18px;
   }
+}
+
+.audio__receive-message {
+  display: none;
 }
 </style>
