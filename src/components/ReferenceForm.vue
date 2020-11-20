@@ -58,7 +58,7 @@
                 <table>
                   <tr class="radio-question-row">
                     <td class="mobile-remove"></td>
-                  <td
+                    <td
                       class="radio-question-selection-title"
                       v-for="(label, labelIndex) in question.tableTitle"
                       v-bind:key="labelIndex"
@@ -95,6 +95,7 @@
                     </td>
                   </tr>
                 </table>
+
                 <table
                   class="mobile-pinned-questions-container"
                   v-if="mobileMode"
