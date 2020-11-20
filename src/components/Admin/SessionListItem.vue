@@ -1,7 +1,7 @@
 <template>
   <router-link :to="`/admin/sessions/${session._id}`" class="session-list-link">
     <div class="session-list-item">
-      <div class="session-list-item__column session-list-item__column">
+      <div class="session-list-item__column">
         <span class="bold">{{ subTopicDisplayName }}</span>
         <span>{{ createdAt }}</span>
       </div>
