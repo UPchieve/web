@@ -93,7 +93,6 @@ import ModerationService from "@/services/ModerationService";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
 import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 import sendWebNotification from "@/utils/send-web-notification";
-import requestNotificationPermission from "@/utils/request-notification-permission";
 
 /**
  * @todo {1} Use more descriptive names that comply with the coding standards.
@@ -170,9 +169,6 @@ export default {
     handleMessage(event) {
       // If key pressed is Enter, send the message
       if (event.key == "Enter") {
-        // Best practice to ask for permission after a user gesture
-        requestNotificationPermission();
-
         const message = this.newMessage.trim();
         this.clearMessageInput();
 

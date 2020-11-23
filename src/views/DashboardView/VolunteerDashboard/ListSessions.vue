@@ -37,7 +37,6 @@
 import { mapState } from "vuex";
 import { allSubtopics } from "@/utils/topics";
 import sendWebNotification from "@/utils/send-web-notification";
-import requestNotificationPermission from "@/utils/request-notification-permission";
 
 export default {
   data() {
@@ -77,9 +76,6 @@ export default {
     gotoSession(session) {
       const { type, subTopic, _id } = session;
       const path = `/session/${type}/${subTopic}/${_id}`;
-
-      // Best practice to ask for permission after a user gesture
-      requestNotificationPermission();
 
       if (type && subTopic && _id) {
         this.$router.push(path);
@@ -182,11 +178,11 @@ export default {
 
         if (this.isWebPageHidden)
           sendWebNotification(
-            `A student started a new ${this.subtopicDisplayName(
-              newSession.subTopic
-            )} session`,
+            `${
+              newSession.student.firstname
+            } needs help in ${this.subtopicDisplayName(newSession.subTopic)}`,
             {
-              body: "Visit your dashboard"
+              body: "Can you help them?"
             }
           );
       }

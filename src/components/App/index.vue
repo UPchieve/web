@@ -28,7 +28,6 @@ import AppBanner from "./AppBanner";
 import PortalService from "@/services/PortalService";
 import getOperatingSystem from "@/utils/get-operating-system";
 import isOutdatedMobileAppVersion from "@/utils/is-outdated-mobile-app-version";
-import requestNotificationPermission from "@/utils/request-notification-permission";
 
 export default {
   name: "App",
@@ -51,7 +50,6 @@ export default {
     await this.$store.dispatch("app/checkEnvironment", this);
     PortalService.call("app.isLoaded");
 
-    requestNotificationPermission();
     this.setVisibilityListener();
 
     if (this.isMobileApp) {
