@@ -8,6 +8,8 @@
       >
     </div>
 
+    <web-notifications-button />
+
     <div class="volunteer-dashboard__body">
       <template v-if="user.isApproved && user.isOnboarded">
         <div class="dashboard-card">
@@ -138,6 +140,7 @@ import VerificationIcon from "@/assets/verification.svg";
 import OnboardingIcon from "@/assets/onboarding.svg";
 import TrainingIcon from "@/assets/training_icon.svg";
 import { allSubtopicNames } from "@/utils/topics";
+import WebNotificationsButton from "@/components/WebNotificationsButton.vue";
 
 const headerData = {
   component: "RejoinSessionHeader",
@@ -156,7 +159,8 @@ export default {
     ReferencesModal,
     VerificationIcon,
     OnboardingIcon,
-    VolunteerWelcomeModal
+    VolunteerWelcomeModal,
+    WebNotificationsButton
   },
   watch: {
     isSessionAlive(isAlive) {
