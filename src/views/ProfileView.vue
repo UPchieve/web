@@ -91,10 +91,7 @@
             </div>
           </div>
 
-          <div
-            v-if="Notification.permission === 'granted'"
-            class="container-section"
-          >
+          <div v-if="isNotificationPermissionGranted" class="container-section">
             <div class="prompt">Notifications</div>
             <div class="answer">
               <toggle-button
@@ -238,6 +235,9 @@ export default {
       }, {});
 
       return subjects;
+    },
+    isNotificationPermissionGranted() {
+      return Notification.permission === "granted";
     }
   },
   methods: {
