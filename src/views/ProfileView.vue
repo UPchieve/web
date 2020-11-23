@@ -91,6 +91,31 @@
             </div>
           </div>
 
+          <div
+            v-if="Notification.permission === 'granted'"
+            class="container-section"
+          >
+            <div class="prompt">Notifications</div>
+            <div class="answer">
+              <toggle-button
+                :disabled="!activeEdit"
+                :value="isAllowingNotifications"
+                :labels="{ checked: 'Active', unchecked: 'Deactivated' }"
+                :width="95"
+                :color="{
+                  checked: '#16D2AA',
+                  unchecked: '#F44747',
+                  disabled: '#AAAAAA'
+                }"
+                @change="toggleWebNotifications"
+                :sync="true"
+              />
+            </div>
+            <div class="description">
+              Turn off to stop recieving notifications.
+            </div>
+          </div>
+
           <div class="container-section resetBtn">
             <router-link to="/resetpassword" class="prompt"
               >Reset password</router-link
@@ -125,6 +150,8 @@ import { mapGetters, mapState } from "vuex";
 import UserService from "@/services/UserService";
 import { topics, allSubtopics } from "@/utils/topics";
 import DeactivateAccountModal from "./DeactivateAccountModal";
+import setNotificationPermission from "@/utils/set-notification-permission";
+import getNotificationPermission from "@/utils/get-notification-permission";
 
 export default {
   name: "profile-view",
@@ -141,10 +168,12 @@ export default {
       phoneNational: "",
       phoneInputInfo: {},
       isAccountActive: true,
+      isAllowingNotifications: true,
       showDeactivateAccountModal: false
     };
   },
   created() {
+    this.isAllowingNotifications = getNotificationPermission() === "granted";
     this.isAccountActive = !this.user.isDeactivated;
     if (this.user.isVolunteer && this.user.phone) {
       const num =
@@ -226,6 +255,12 @@ export default {
 
     toggleDeactivatedAccountModal() {
       this.showDeactivateAccountModal = !this.showDeactivateAccountModal;
+    },
+
+    toggleWebNotifications({ value }) {
+      const permission = value ? "granted" : "denied";
+      this.isAllowingNotifications = value;
+      setNotificationPermission(permission);
     },
 
     setIsAccountActive(value) {
