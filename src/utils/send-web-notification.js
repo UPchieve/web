@@ -1,18 +1,12 @@
 import LogoIcon from "@/assets/logo-02.png";
+import getNotificationPermission from "@/utils/get-notification-permission.js";
 
 const sendWebNotification = (title, data) => {
   // Check browser support
   if (!("Notification" in window)) return;
 
-  if (Notification.permission === "granted")
+  if (getNotificationPermission() === "granted")
     new Notification(title, { icon: LogoIcon, ...data });
-  else if (Notification.permission !== "denied") {
-    Notification.requestPermission().then(permission => {
-      // If the user accepts, create a notification
-      if (permission === "granted")
-        new Notification(title, { icon: LogoIcon, ...data });
-    });
-  }
 };
 
 export default sendWebNotification;
