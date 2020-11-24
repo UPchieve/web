@@ -65,6 +65,10 @@
     >
       <photo-upload-icon class="photo-upload--icon" />
     </div>
+    <web-notifications-modal
+      v-if="showNotificationModal"
+      :closeModal="() => setShowNotificationModal(false)"
+    />
   </div>
 </template>
 
@@ -81,6 +85,8 @@ import SessionFulfilledModal from "./SessionFulfilledModal";
 import ConnectionTroubleModal from "./ConnectionTroubleModal";
 import PhotoUploadIcon from "@/assets/whiteboard_icons/photo-upload.svg";
 import isOutdatedMobileAppVersion from "@/utils/is-outdated-mobile-app-version";
+import WebNotificationsModal from "@/components/WebNotificationsModal";
+import getNotificationPermission from "@/utils/get-notification-permission";
 
 const headerData = {
   component: "SessionHeader"
@@ -93,7 +99,8 @@ export default {
     SessionChat,
     Whiteboard,
     PhotoUploadIcon,
-    DocumentEditor
+    DocumentEditor,
+    WebNotificationsModal
   },
   created() {
     if (this.mobileMode) {
@@ -117,7 +124,8 @@ export default {
     return {
       auxiliaryOpen: false,
       sessionId: null,
-      hasSeenNewMessage: true
+      hasSeenNewMessage: true,
+      showNotificationModal: false
     };
   },
   computed: {
@@ -222,6 +230,16 @@ export default {
         if (!this.$socket.connected) await this.$socket.connect();
         this.joinSession(sessionId);
         this.$store.dispatch("user/sessionConnected");
+
+        if (
+          (this.user.isVolunteer &&
+            (!this.user.isOnboarded || !this.user.isApproved)) ||
+          this.isMobileApp
+        )
+          this.showNotificationModal = false;
+
+        if (getNotificationPermission() === "default")
+          this.showNotificationModal = true;
       })
       .catch(err => {
         if (err.status !== 0 && err.code !== "EUSERABORTED") {
@@ -320,6 +338,9 @@ export default {
     },
     setHasSeenNewMessage(value) {
       this.hasSeenNewMessage = value;
+    },
+    setShowNotificationModal(value) {
+      this.showNotificationModal = value;
     }
   },
   watch: {
