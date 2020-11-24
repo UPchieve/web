@@ -176,15 +176,14 @@ export default {
           console.log("Unable to play audio");
         }
 
-        if (this.isWebPageHidden)
-          sendWebNotification(
-            `${
-              newSession.student.firstname
-            } needs help in ${this.subtopicDisplayName(newSession.subTopic)}`,
-            {
-              body: "Can you help them?"
-            }
-          );
+        sendWebNotification(
+          `${
+            newSession.student.firstname
+          } needs help in ${this.subtopicDisplayName(newSession.subTopic)}`,
+          {
+            body: "Can you help them?"
+          }
+        );
       }
       this.isInitialMount = false;
     }
