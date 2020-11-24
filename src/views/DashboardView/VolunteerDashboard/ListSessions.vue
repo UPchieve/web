@@ -205,5 +205,6 @@ export default {
 }
 
 .audio__new-waiting-student {
+  display: none;
 }
 </style>

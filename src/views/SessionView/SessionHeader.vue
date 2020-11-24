@@ -454,4 +454,8 @@ h1 {
   display: flex;
   align-items: center;
 }
+
+.audio__volunteer-joined {
+  display: none;
+}
 </style>

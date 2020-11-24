@@ -8,12 +8,11 @@
       >
     </div>
 
-    <web-notifications-button />
-
     <div class="volunteer-dashboard__body">
       <template v-if="user.isApproved && user.isOnboarded">
         <div class="dashboard-card">
           <div class="students-waiting">
+            <web-notifications-button class="notifications-button" />
             <div class="dashboard-card__title">Waiting Students</div>
             <div v-if="isSessionAlive">
               <button
@@ -703,5 +702,10 @@ export default {
       text-decoration: none;
     }
   }
+}
+
+.notifications-button {
+  @include flex-container(row, flex-end);
+  margin-bottom: 1.4em;
 }
 </style>
