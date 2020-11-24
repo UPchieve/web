@@ -95,7 +95,6 @@
             <div class="prompt">Notifications</div>
             <div class="answer">
               <toggle-button
-                :disabled="!activeEdit"
                 :value="isAllowingNotifications"
                 :labels="{ checked: 'Active', unchecked: 'Deactivated' }"
                 :width="95"
