@@ -87,6 +87,7 @@ import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 import LoadingMessage from "@/components/LoadingMessage";
 import TroubleMatchingModal from "@/views/SessionView/TroubleMatchingModal";
 import UnmatchedModal from "@/views/SessionView/UnmatchedModal";
+import sendWebNotification from "@/utils/send-web-notification";
 
 /**
  * @todo {1} Refactoring candidate: use a modal instead.
@@ -304,6 +305,12 @@ export default {
         this.showTroubleMatchingModal = false;
         this.showUnmatchedModal = false;
         clearInterval(this.isWaitingIntervalId);
+        sendWebNotification(
+          `${this.sessionPartner.firstname} has joined your session`,
+          {
+            body: "-"
+          }
+        );
       }
     }
   }
