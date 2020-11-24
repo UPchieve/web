@@ -62,6 +62,12 @@
       :endSession="endSession"
       :sessionId="session._id"
     />
+    <!-- @todo: change name if decide to go with same audio -->
+    <audio
+      class="audio__volunteer-joined"
+      src="@/assets/audio/new-waiting-student.mp3"
+      muted
+    />
     <!-- <div
       :class="[connectionMsgType]"
       class="connection-message"
@@ -300,11 +306,22 @@ export default {
   watch: {
     // Close possibly open modals that are triggered by a long waiting period
     // and clear the isWaiting interval when a volunteer joins the session
-    isSessionWaitingForVolunteer(value, prevValue) {
+    async isSessionWaitingForVolunteer(value, prevValue) {
       if (!value && prevValue) {
         this.showTroubleMatchingModal = false;
         this.showUnmatchedModal = false;
         clearInterval(this.isWaitingIntervalId);
+        try {
+          const volunteerJoinedAudio = document.querySelector(
+            ".audio__volunteer-joined"
+          );
+          // Unmuting the audio allows us to bypass the need for user interaction with the DOM before playing a sound
+          volunteerJoinedAudio.muted = false;
+          await volunteerJoinedAudio.play();
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.log("Unable to play audio");
+        }
         sendWebNotification(
           `${this.sessionPartner.firstname} has joined your session`,
           {
