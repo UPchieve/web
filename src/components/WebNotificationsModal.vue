@@ -30,13 +30,14 @@ import { mapState } from "vuex";
 import Modal from "@/components/Modal";
 import Separator from "@/components/Separator";
 import LargeButton from "@/components/LargeButton";
+import setNotificationPermission from "@/utils/set-notification-permission";
 
 export default {
   name: "WebNotificationsModal",
   components: { LargeButton, Modal, Separator },
   props: {
     closeModal: { type: Function, required: true },
-    requestNotificationPermission: { type: Function, required: true }
+    handleNotificationButton: { type: Function }
   },
   computed: {
     ...mapState({
@@ -46,6 +47,21 @@ export default {
       if (this.user.isVolunteer)
         return "Receive notifications for when a student needs your help and when you receive a chat message!";
       return "Receive notifications for when a volunteer joins your session and sends you messages!";
+    }
+  },
+  methods: {
+    async requestNotificationPermission() {
+      document.querySelector(".upc-modal-form").remove();
+      this.isSelectionNotificationPermission = true;
+
+      if (!("Notification" in window)) return;
+      if (Notification.permission == "default") {
+        const result = await Notification.requestPermission();
+        setNotificationPermission(result);
+        this.isSelectionNotificationPermission = false;
+      }
+      if (this.handleNotificationButton) this.handleNotificationButton();
+      this.closeModal();
     }
   }
 };

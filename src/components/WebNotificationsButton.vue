@@ -1,15 +1,17 @@
 <template>
-  <div v-if="showNotificationButton">
-    <large-button @click.native="toggleNotificationModal" class="btn">
+  <div v-if="isShowingNotificationButton">
+    <large-button
+      @click.native="() => setShowNotificationModal(true)"
+      class="btn"
+    >
       Allow notifications
     </large-button>
 
     <web-notifications-modal
       v-if="showNotificationModal"
-      :closeModal="toggleNotificationModal"
-      :requestNotificationPermission="requestNotificationPermission"
+      :closeModal="() => setShowNotificationModal(false)"
+      :handleNotificationButton="handleNotificationButton"
     />
-    <div v-if="isSelectionNotificationPermission" class="upc-modal" />
   </div>
 </template>
 
@@ -17,7 +19,6 @@
 import { mapState } from "vuex";
 import WebNotificationsModal from "@/components/WebNotificationsModal";
 import getNotificationPermission from "@/utils/get-notification-permission";
-import setNotificationPermission from "@/utils/set-notification-permission";
 import LargeButton from "@/components/LargeButton.vue";
 
 export default {
@@ -26,12 +27,11 @@ export default {
   data() {
     return {
       showNotificationModal: false,
-      isSelectionNotificationPermission: false,
-      showNotificationButton: false
+      isShowingNotificationButton: false
     };
   },
   mounted() {
-    this.displayButton();
+    this.handleNotificationButton();
   },
   computed: {
     ...mapState({
@@ -40,22 +40,10 @@ export default {
     })
   },
   methods: {
-    toggleNotificationModal() {
-      this.showNotificationModal = !this.showNotificationModal;
+    setShowNotificationModal(value) {
+      this.showNotificationModal = value;
     },
-    async requestNotificationPermission() {
-      this.toggleNotificationModal();
-      this.isSelectionNotificationPermission = true;
-
-      if (!("Notification" in window)) return;
-      if (Notification.permission == "default") {
-        const result = await Notification.requestPermission();
-        setNotificationPermission(result);
-        this.isSelectionNotificationPermission = false;
-        this.displayButton();
-      }
-    },
-    displayButton() {
+    handleNotificationButton() {
       // User is a volunteer who is not onboarded or approved
       // or user is using the mobile app
       if (
@@ -65,7 +53,8 @@ export default {
       )
         return;
 
-      this.showNotificationButton = getNotificationPermission() === "default";
+      this.isShowingNotificationButton =
+        getNotificationPermission() === "default";
     }
   }
 };
@@ -75,6 +64,7 @@ export default {
 .btn {
   background-color: $c-success-green;
   color: #fff;
-  margin-top: 2em;
+  @include font-category("helper-text");
+  font-weight: 500;
 }
 </style>
