@@ -618,11 +618,15 @@ export default {
            */
           setTimeout(() => {
             // Set the Zwibbler view to a rectangle that fits all whiteboard nodes
-            this.zwibblerCtx.setViewRectangle(
-              this.zwibblerCtx.getBoundingRectangle(
-                this.zwibblerCtx.getAllNodes()
-              )
-            );
+            try {
+              this.zwibblerCtx.setViewRectangle(
+                this.zwibblerCtx.getBoundingRectangle(
+                  this.zwibblerCtx.getAllNodes()
+                )
+              );
+            } catch (error) {
+              this.resizeViewRectangle();
+            }
           }, 500);
         }
       });
