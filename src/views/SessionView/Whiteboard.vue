@@ -233,6 +233,10 @@ export default {
     isSessionOver: {
       type: Boolean,
       required: true
+    },
+    openFileDialog: {
+      type: Function,
+      required: true
     }
   },
   data() {
@@ -397,9 +401,6 @@ export default {
 
       // Reset the file input
       event.target.value = "";
-    },
-    openFileDialog() {
-      document.querySelector(".upload-photo").click();
     },
     insertPhoto(imageUrl) {
       const nodeId = this.zwibblerCtx.createNode("ImageNode", {
