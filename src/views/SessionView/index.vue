@@ -238,7 +238,8 @@ export default {
     reconnect_attempt() {
       this.$store.dispatch("user/sessionDisconnected");
       if (!this.session || !this.session._id) {
-        this.showTroubleStartingModal();
+        const abort = () => this.$router.push("/");
+        this.showTroubleStartingModal(abort);
       }
     },
     connect() {
