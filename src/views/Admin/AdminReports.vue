@@ -236,7 +236,7 @@ export default {
     fileTitle() {
       let title = "";
       if (this.highSchool.name) title = this.highSchool.name;
-      if (this.studentPartnerOrg.displayName)
+      if (this.studentPartnerOrg && this.studentPartnerOrg.displayName)
         title = this.studentPartnerOrg.displayName;
       if (this.isValidPartnerSite) title = this.studentPartnerSite;
 
