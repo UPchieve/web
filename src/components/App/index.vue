@@ -145,15 +145,14 @@ export default {
   watch: {
     user(currentUserValue, previousUserValue) {
       const nowLoggedIn = currentUserValue._id && !previousUserValue._id;
-      if (
-        nowLoggedIn &&
-        this.mobileMode &&
-        !this.isMobileApp &&
-        !this.isVolunteer
-      ) {
-        this.$store.dispatch("app/banner/show", {
-          component: "MobileAppNoticeBanner"
-        });
+      if (nowLoggedIn) {
+        Sentry.setUser({ id: currentUserValue._id });
+
+        if (this.mobileMode && !this.isMobileApp && !this.isVolunteer) {
+          this.$store.dispatch("app/banner/show", {
+            component: "MobileAppNoticeBanner"
+          });
+        }
       }
     },
     /**
