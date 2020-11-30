@@ -264,12 +264,20 @@ export default {
 
         this.zwibblerCtx.on("connected", () => {
           this.zwibblerCtx.usePanTool();
-
-          this.zwibblerCtx.setViewRectangle(
-            this.zwibblerCtx.getBoundingRectangle(
-              this.zwibblerCtx.getAllNodes()
-            )
-          );
+          try {
+            this.zwibblerCtx.setViewRectangle(
+              this.zwibblerCtx.getBoundingRectangle(
+                this.zwibblerCtx.getAllNodes()
+              )
+            );
+          } catch (error) {
+            this.zwibblerCtx.setViewRectangle({
+              x: 0,
+              y: 0,
+              width: 1,
+              height: 1
+            });
+          }
         });
       }
     });
