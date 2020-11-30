@@ -26,7 +26,7 @@
           :isWhiteboardOpen="auxiliaryOpen"
           :toggleWhiteboard="toggleAuxiliary"
           :isSessionOver="isSessionOver"
-          ref="whiteboard"
+          :openFileDialog="openFileDialog"
         />
         <document-editor v-else />
       </div>
@@ -305,7 +305,7 @@ export default {
       this.sessionReconnecting = true;
     },
     openFileDialog() {
-      this.$refs.whiteboard.openFileDialog();
+      document.querySelector(".upload-photo").click();
     }
   },
   watch: {
