@@ -10,7 +10,7 @@
       <div class="uc-column">
         <sidebar-info
           v-if="!mobileMode"
-          style="margin-bottom: 64px;"
+          class="AppSidebar-info"
           :authenticated="isAuthenticated"
           :isVolunteer="isVolunteer"
           :name="user.firstname"
@@ -104,6 +104,10 @@ $transition: transform 700ms;
     padding-left: 2em;
     height: initial;
   }
+}
+
+.AppSidebar-info {
+  margin-bottom: 64px;
 }
 
 .AppSidebar-final-link {
