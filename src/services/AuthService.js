@@ -128,12 +128,12 @@ export default {
     if (context) {
       NetworkService.logout(context)
         .then(() => {
-          context.$store.dispatch("user/clear");
           context.$router.push("/logout");
+          context.$store.dispatch("user/clear");
         })
         .catch(() => {
-          context.$store.dispatch("user/clear");
           context.$router.push("/logout");
+          context.$store.dispatch("user/clear");
         })
         .finally(() => {
           // disconnect socket
