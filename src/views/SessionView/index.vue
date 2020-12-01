@@ -26,7 +26,7 @@
           :isWhiteboardOpen="auxiliaryOpen"
           :toggleWhiteboard="toggleAuxiliary"
           :isSessionOver="isSessionOver"
-          ref="whiteboard"
+          :openFileDialog="openFileDialog"
         />
         <document-editor v-else />
       </div>
@@ -238,7 +238,8 @@ export default {
     reconnect_attempt() {
       this.$store.dispatch("user/sessionDisconnected");
       if (!this.session || !this.session._id) {
-        this.showTroubleStartingModal();
+        const abort = () => this.$router.push("/");
+        this.showTroubleStartingModal(abort);
       }
     },
     connect() {
@@ -304,7 +305,7 @@ export default {
       this.sessionReconnecting = true;
     },
     openFileDialog() {
-      this.$refs.whiteboard.openFileDialog();
+      document.querySelector(".upload-photo").click();
     }
   },
   watch: {
