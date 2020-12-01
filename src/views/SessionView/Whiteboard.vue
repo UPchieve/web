@@ -233,6 +233,10 @@ export default {
     isSessionOver: {
       type: Boolean,
       required: true
+    },
+    openFileDialog: {
+      type: Function,
+      required: true
     }
   },
   data() {
@@ -397,9 +401,6 @@ export default {
 
       // Reset the file input
       event.target.value = "";
-    },
-    openFileDialog() {
-      document.querySelector(".upload-photo").click();
     },
     insertPhoto(imageUrl) {
       const nodeId = this.zwibblerCtx.createNode("ImageNode", {
@@ -618,11 +619,15 @@ export default {
            */
           setTimeout(() => {
             // Set the Zwibbler view to a rectangle that fits all whiteboard nodes
-            this.zwibblerCtx.setViewRectangle(
-              this.zwibblerCtx.getBoundingRectangle(
-                this.zwibblerCtx.getAllNodes()
-              )
-            );
+            try {
+              this.zwibblerCtx.setViewRectangle(
+                this.zwibblerCtx.getBoundingRectangle(
+                  this.zwibblerCtx.getAllNodes()
+                )
+              );
+            } catch (error) {
+              this.resizeViewRectangle();
+            }
           }, 500);
         }
       });
