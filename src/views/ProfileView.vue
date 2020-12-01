@@ -102,17 +102,36 @@
       <div v-if="user.isVolunteer" class="cert-info contain">
         <div class="subheader">Unlocked Subjects</div>
         <div class="container-content cert">
-          <div
-            v-for="(value, key) in subjects"
-            :key="`certification-${key}-${value}`"
-          >
-            <div v-if="value" class="certBox">
-              <div :class="certKey[key]" class="certKey">
-                {{ certKey[key] }}
+          <ul>
+            <li
+              v-for="subject in unlockedSubjects"
+              :key="subject"
+              class="certBox"
+            >
+              <div>
+                <span
+                  :class="getSubjectType(subject).toUpperCase()"
+                  class="certKey"
+                  >{{ getSubjectType(subject).toUpperCase() }}</span
+                >
+                <span class="certValue">{{ displaySubjectName(subject) }}</span>
               </div>
-              <div class="certValue">{{ key }}</div>
-            </div>
-          </div>
+              <toggle-button
+                v-if="isSubjectAllowedToEdit(subject)"
+                :disabled="!activeEdit"
+                :value="modifiedSubjects.includes(subject)"
+                :labels="{ checked: 'Active', unchecked: 'Deactivated' }"
+                :width="95"
+                :color="{
+                  checked: '#16D2AA',
+                  unchecked: '#F44747',
+                  disabled: '#AAAAAA'
+                }"
+                @change="event => toggleActiveSubject(event, subject)"
+                :sync="true"
+              />
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -125,6 +144,9 @@ import { mapGetters, mapState } from "vuex";
 import UserService from "@/services/UserService";
 import { topics, allSubtopics } from "@/utils/topics";
 import DeactivateAccountModal from "./DeactivateAccountModal";
+import getUnlockedSubjects from "@/utils/get-unlocked-subjects";
+import getSubjectType from "@/utils/get-subject-type";
+import { MATH_SUBJECTS } from "@/consts";
 
 export default {
   name: "profile-view",
@@ -141,7 +163,8 @@ export default {
       phoneNational: "",
       phoneInputInfo: {},
       isAccountActive: true,
-      showDeactivateAccountModal: false
+      showDeactivateAccountModal: false,
+      modifiedSubjects: []
     };
   },
   created() {
@@ -158,6 +181,8 @@ export default {
         e164: pn.getNumber("e164")
       };
     }
+
+    this.modifiedSubjects = this.user.subjects;
   },
   computed: {
     ...mapState({
@@ -197,10 +222,9 @@ export default {
     },
     subjects() {
       const user = this.$store.state.user.user;
+      const subtopics = allSubtopics();
 
       const subjects = user.subjects.reduce((displayObj, key) => {
-        const subtopics = allSubtopics();
-
         if (subtopics[key]) {
           displayObj[subtopics[key].displayName || subtopics[key]] = true;
         }
@@ -209,6 +233,20 @@ export default {
       }, {});
 
       return subjects;
+    },
+    unlockedSubjects() {
+      const unlockedSubjects = getUnlockedSubjects(this.user.certifications);
+
+      /**
+       * @note: Some users have subjects that were grandfathered in and won't unlock
+       *        because they do not have the required certs to unlock them
+       *        Push the grandfathered in subjects to unlockedSubjects
+       **/
+      for (const subject of this.user.subjects) {
+        if (!unlockedSubjects.includes(subject)) unlockedSubjects.push(subject);
+      }
+
+      return unlockedSubjects;
     }
   },
   methods: {
@@ -269,10 +307,11 @@ export default {
         // form fields valid, so set profile
         this.user.phone = this.phoneInputInfo.e164;
         this.user.isDeactivated = !this.isAccountActive;
+        this.user.subjects = this.modifiedSubjects;
 
         // send only the necessary data
         const payloadUser = {};
-        const keys = ["phone", "isDeactivated"];
+        const keys = ["phone", "isDeactivated", "subjects"];
 
         keys.forEach(key => (payloadUser[key] = this.user[key]));
 
@@ -288,6 +327,36 @@ export default {
           }
         );
       }
+    },
+
+    getSubjectType(subject) {
+      return getSubjectType(subject);
+    },
+
+    displaySubjectName(subject) {
+      const subtopics = allSubtopics();
+      if (subtopics[subject])
+        return subtopics[subject].displayName || subtopics[subject];
+
+      return subject;
+    },
+
+    isSubjectAllowedToEdit(subject) {
+      const subjectsNotAllowedToEdit = [
+        MATH_SUBJECTS.INTEGRATED_MATH_ONE,
+        MATH_SUBJECTS.INTEGRATED_MATH_TWO,
+        MATH_SUBJECTS.INTEGRATED_MATH_THREE,
+        MATH_SUBJECTS.INTEGRATED_MATH_FOUR
+      ];
+      return !subjectsNotAllowedToEdit.includes(subject);
+    },
+
+    toggleActiveSubject({ value }, subject) {
+      if (value) this.modifiedSubjects.push(subject);
+      else
+        this.modifiedSubjects = this.modifiedSubjects.filter(
+          item => item !== subject
+        );
     }
   }
 };
@@ -485,10 +554,9 @@ button:hover {
 }
 
 .certBox {
-  display: flex;
+  @include flex-container(row, space-between, center);
   height: 60px;
-  align-items: center;
-  padding-left: 20px;
+  padding: 0 20px;
   border-top: 1px solid #cccccf;
   font-weight: 600;
 }
