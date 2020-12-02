@@ -27,7 +27,7 @@
         <span class="zip-code__title">Median Income:</span> {{ medianIncome }}
       </p>
       <p>
-        <span class="zip-code__title">Is Eligible:</span>
+        <span class="zip-code__title">Eligible:</span>
         {{ zipCode.isEligible }}
       </p>
     </div>
