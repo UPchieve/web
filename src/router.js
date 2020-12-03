@@ -36,6 +36,7 @@ import AdminSchools from "./views/Admin/AdminSchools";
 import AdminAddSchool from "./views/Admin/AdminAddSchool";
 import AdminEditSchool from "./views/Admin/AdminEditSchool";
 import AdminReports from "./views/Admin/AdminReports";
+import AdminZipCodes from "./views/Admin/AdminZipCodes";
 import ReviewMaterialsView from "./views/ReviewMaterialsView";
 import ReferenceView from "./views/ReferenceView";
 import BackgroundInfoView from "./views/BackgroundInfoView";
@@ -320,6 +321,12 @@ const routes = [
     path: "/admin/reports",
     name: "AdminReports",
     component: AdminReports,
+    meta: { protected: true, requiresAdmin: true }
+  },
+  {
+    path: "/admin/zip-codes",
+    name: "AdminZipCodes",
+    component: AdminZipCodes,
     meta: { protected: true, requiresAdmin: true }
   },
   {
