@@ -6,13 +6,13 @@ const path = require("path");
 
 const app = express();
 
-indexHtml = renderIndexHtml()
+indexHtml = renderIndexHtml();
 
 app.use(express.static(path.join(__dirname, 'dist')));
 
 app.use((_, res) => {
   res.send(indexHtml).status(200)
-})
+});
 
 app.listen(8080, () => {
   logger.info("listening on 8080");
@@ -38,5 +38,5 @@ function renderIndexHtml() {
     mainWebsiteUrl: process.env.VUE_APP_MAIN_WEBSITE_URL
   };
 
-  return Mustache.render(template, config)
+  return Mustache.render(template, config);
 }
