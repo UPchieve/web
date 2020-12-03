@@ -10,28 +10,28 @@ if (configElement !== null) {
   // if there's no interpolation the object will include straight string values
   // of the mustache templates, so we can look for that
   passedConfig.mainWebsiteUrl.includes("{{")
-  ? (config.mainWebsiteUrl = process.env.VUE_APP_MAIN_WEBSITE_URL)
-  : (config.mainWebsiteUrl = passedConfig.mainWebsiteUrl);
+    ? (config.mainWebsiteUrl = process.env.VUE_APP_MAIN_WEBSITE_URL)
+    : (config.mainWebsiteUrl = passedConfig.mainWebsiteUrl);
   passedConfig.serverRoot.includes("{{")
-  ? (config.serverRoot = process.env.VUE_APP_SERVER_ROOT)
-  : (config.serverRoot = passedConfig.serverRoot);
+    ? (config.serverRoot = process.env.VUE_APP_SERVER_ROOT)
+    : (config.serverRoot = passedConfig.serverRoot);
   passedConfig.socketAddress.includes("{{")
-  ? (config.websocketAddress = process.env.VUE_APP_SOCKET_ADDRESS)
-  : (config.socketAddress = passedConfig.socketAddress);
+    ? (config.websocketAddress = process.env.VUE_APP_SOCKET_ADDRESS)
+    : (config.socketAddress = passedConfig.socketAddress);
   passedConfig.websocketRoot.includes("{{")
-  ? (config.websocketRoot = process.env.VUE_APP_WEBSOCKET_ROOT)
-  : (config.websocketRoot = passedConfig.websocketRoot);
+    ? (config.websocketRoot = process.env.VUE_APP_WEBSOCKET_ROOT)
+    : (config.websocketRoot = passedConfig.websocketRoot);
   passedConfig.zwibblerUrl.includes("{{")
-  ? (config.zwibblerUrl = process.env.VUE_APP_ZWIBBLER_URL)
-  : (config.zwibblerUrl = passedConfig.zwibblerUrl);
+    ? (config.zwibblerUrl = process.env.VUE_APP_ZWIBBLER_URL)
+    : (config.zwibblerUrl = passedConfig.zwibblerUrl);
 } else {
   // tests don't include the index.html file
   // so we have to populate these without it
-  config.mainWebsiteUrl = process.env.VUE_APP_MAIN_WEBSITE_URL
-  config.serverRoot = process.env.VUE_APP_SERVER_ROOT
-  config.websocketAddress = process.env.VUE_APP_WEBSOCKET_ADDRESS
-  config.websocketRoot = process.env.VUE_APP_MAIN_WEBSOCKET_ROOT
-  config.zwibblerUrl = process.env.VUE_APP_ZWIBBLER_URL
+  config.mainWebsiteUrl = process.env.VUE_APP_MAIN_WEBSITE_URL;
+  config.serverRoot = process.env.VUE_APP_SERVER_ROOT;
+  config.websocketAddress = process.env.VUE_APP_WEBSOCKET_ADDRESS;
+  config.websocketRoot = process.env.VUE_APP_MAIN_WEBSOCKET_ROOT;
+  config.zwibblerUrl = process.env.VUE_APP_ZWIBBLER_URL;
 }
 
 export default config;
