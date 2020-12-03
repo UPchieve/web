@@ -6,12 +6,12 @@ const path = require("path");
 
 const app = express();
 
-indexHtml = renderIndexHtml();
+const indexHtml = renderIndexHtml();
 
 app.use(express.static(path.join(__dirname, 'dist')));
 
 app.use((_, res) => {
-  res.send(indexHtml).status(200)
+  res.send(indexHtml).status(200);
 });
 
 app.listen(8080, () => {
