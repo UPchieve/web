@@ -79,6 +79,7 @@ import { mapState } from "vuex";
 import CheckMark from "@/components/CheckMark";
 import LargeButton from "@/components/LargeButton";
 import ArrowIcon from "@/assets/arrow.svg";
+import getUnlockedSubjects from "@/utils/get-unlocked-subjects";
 
 export default {
   name: "SubjectCertsDropDown",
@@ -110,6 +111,20 @@ export default {
       const largeScreenBreakpoint = 992;
 
       return this.windowWidth <= largeScreenBreakpoint;
+    },
+    unlockedSubjects() {
+      const unlockedSubjects = getUnlockedSubjects(this.user.certifications);
+
+      /**
+       * @note: Some users have subjects that were grandfathered in and won't unlock
+       *        because they do not have the required certs to unlock them
+       *        Push the grandfathered in subjects to unlockedSubjects
+       **/
+      for (const subject of this.user.subjects) {
+        if (!unlockedSubjects.includes(subject)) unlockedSubjects.push(subject);
+      }
+
+      return unlockedSubjects;
     }
   },
 
@@ -118,9 +133,11 @@ export default {
       return this.user.certifications[cert].passed;
     },
     hasUnlockedSubject(cert) {
-      if (cert === "algebra") return this.user.subjects.includes("algebraOne");
-      return this.user.subjects.includes(cert);
+      if (cert === "algebra")
+        return this.unlockedSubjects.includes("algebraOne");
+      return this.unlockedSubjects.includes(cert);
     },
+
     progressStatus(cert) {
       if (this.isComplete(cert)) return "Completed";
       if (this.hasUnlockedSubject(cert)) return "Unlocked";
