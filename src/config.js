@@ -34,6 +34,4 @@ if (configElement !== null) {
   config.zwibblerUrl = process.env.VUE_APP_ZWIBBLER_URL
 }
 
-
-
 export default config;
