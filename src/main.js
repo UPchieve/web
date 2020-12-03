@@ -14,12 +14,13 @@ import App from "./components/App";
 import PortalService from "./services/PortalService";
 import router from "./router";
 import store from "./store";
+import config from "./config";
 
 // Prevent production tip on startup
 Vue.config.productionTip = false;
 
 // Set up SocketIO
-const socket = Socket.connect(process.env.VUE_APP_SOCKET_ADDRESS, {
+const socket = Socket.connect(config.socketAddress, {
   autoConnect: false
 });
 Vue.use(VueSocketIO, socket);

@@ -18,6 +18,7 @@
 import { mapState } from "vuex";
 import FormPageTemplate from "@/components/FormPageTemplate";
 import FormFooter from "@/components/FormFooter";
+import config from "../config"
 
 export default {
   components: {
@@ -34,7 +35,7 @@ export default {
   },
   data() {
     return {
-      mainWebsiteUrl: process.env.VUE_APP_MAIN_WEBSITE_URL
+      mainWebsiteUrl: config.mainWebsiteUrl
     };
   }
 };

@@ -164,6 +164,7 @@ import FeedbackPreview from "@/components/Admin/FeedbackPreview";
 import Quill from "quill";
 import SessionFlags from "@/components/Admin/SessionFlags";
 import Separator from "@/components/Separator";
+import config from "../../config"
 
 export default {
   name: "AdminSessionDetail",
@@ -251,7 +252,7 @@ export default {
           showToolbar: false,
           showColourPanel: false,
           collaborationServer: `${
-            process.env.VUE_APP_WEBSOCKET_ROOT
+            config.websocketRoot
           }/whiteboard/admin/{name}`,
           readOnly: true
         });

@@ -197,6 +197,7 @@ import ResetIcon from "@/assets/whiteboard_icons/reset.svg";
 import Loader from "@/components/Loader";
 import ResetWhiteboardModal from "./ResetWhiteboardModal";
 import * as Sentry from "@sentry/browser";
+import config from "../../config"
 
 export default {
   components: {
@@ -520,7 +521,7 @@ export default {
         defaultFontSize: 32,
         background: "grid",
         collaborationServer: `${
-          process.env.VUE_APP_WEBSOCKET_ROOT
+          config.websocketRoot
         }/whiteboard/room/{name}`
       });
 

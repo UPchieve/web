@@ -25,6 +25,7 @@
 
 <script>
 import { mapState, mapGetters } from "vuex";
+import config from "../../../config"
 
 export default {
   props: {
@@ -46,7 +47,7 @@ export default {
       if (process.env.NODE_ENV === "development") {
         return `http://localhost:8080/referral/${referralCode}`;
       } else {
-        return `${process.env.VUE_APP_SERVER_ROOT}/referral/${referralCode}`;
+        return `${config.serverRoot}/referral/${referralCode}`;
       }
     }
   },
