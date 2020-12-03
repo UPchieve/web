@@ -197,7 +197,7 @@ import ResetIcon from "@/assets/whiteboard_icons/reset.svg";
 import Loader from "@/components/Loader";
 import ResetWhiteboardModal from "./ResetWhiteboardModal";
 import * as Sentry from "@sentry/browser";
-import config from "../../config"
+import config from "../../config";
 
 export default {
   components: {
@@ -520,9 +520,7 @@ export default {
         scrollbars: true,
         defaultFontSize: 32,
         background: "grid",
-        collaborationServer: `${
-          config.websocketRoot
-        }/whiteboard/room/{name}`
+        collaborationServer: `${config.websocketRoot}/whiteboard/room/{name}`
       });
 
       this.zwibblerCtx = zwibblerCtx;

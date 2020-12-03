@@ -29,6 +29,6 @@ app.get("/", function(_, res) {
   res.send(output).status(200)
 })
 
-app.listen(3000, () => {
-  console.log("listening on 3000")
+app.listen(8080, () => {
+  console.log("listening on 8080")
 })

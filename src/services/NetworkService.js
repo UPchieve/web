@@ -1,19 +1,13 @@
 import Vue from "vue";
 import promiseRetry from "promise-retry";
 import errcode from "err-code";
-import config from "../config"
+import config from "../config";
 
 const AUTH_ROOT = `${config.serverRoot}/auth`;
 const API_ROOT = `${config.serverRoot}/api`;
-const ELIGIBILITY_API_ROOT = `${
-  config.serverRoot
-}/api-public/eligibility`;
-const CONTACT_API_ROOT = `${
-  config.serverRoot
-}/api-public/contact`;
-const REFERENCE_API_ROOT = `${
-  config.serverRoot
-}/api-public/reference`;
+const ELIGIBILITY_API_ROOT = `${config.serverRoot}/api-public/eligibility`;
+const CONTACT_API_ROOT = `${config.serverRoot}/api-public/contact`;
+const REFERENCE_API_ROOT = `${config.serverRoot}/api-public/reference`;
 const WHITEBOARD_ROOT = `${config.serverRoot}/whiteboard`;
 
 const FAULT_TOLERANT_HTTP_TIMEOUT = 10000;

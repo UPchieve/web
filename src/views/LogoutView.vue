@@ -18,7 +18,7 @@
 import { mapState } from "vuex";
 import FormPageTemplate from "@/components/FormPageTemplate";
 import FormFooter from "@/components/FormFooter";
-import config from "../config"
+import config from "../config";
 
 export default {
   components: {

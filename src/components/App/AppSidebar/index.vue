@@ -36,7 +36,7 @@ import { mapState, mapGetters } from "vuex";
 import AuthService from "@/services/AuthService";
 import SidebarInfo from "./SidebarInfo";
 import SidebarLinks from "./SidebarLinks";
-import config from "../../../config"
+import config from "../../../config";
 
 export default {
   components: { SidebarInfo, SidebarLinks },

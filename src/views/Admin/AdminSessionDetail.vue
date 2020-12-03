@@ -164,7 +164,7 @@ import FeedbackPreview from "@/components/Admin/FeedbackPreview";
 import Quill from "quill";
 import SessionFlags from "@/components/Admin/SessionFlags";
 import Separator from "@/components/Separator";
-import config from "../../config"
+import config from "../../config";
 
 export default {
   name: "AdminSessionDetail",
