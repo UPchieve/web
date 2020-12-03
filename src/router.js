@@ -2,13 +2,15 @@ import Vue from "vue";
 import VueResource from "vue-resource";
 import VueRouter from "vue-router";
 
-const ContactView = () => import('./views/ContactView');
+const ContactView = () => import("./views/ContactView");
 const LegalView = () => import("./views/LegalView");
 const LogoutView = () => import("./views/LogoutView");
 const LoginView = () => import("./views/LoginView");
 const SignupView = () => import("./views/SignupView");
-const VolunteerPartnerSignupView = () => import("./views/VolunteerPartnerSignupView");
-const StudentPartnerSignupView = () => import("./views/StudentPartnerSignupView");
+const VolunteerPartnerSignupView = () =>
+  import("./views/VolunteerPartnerSignupView");
+const StudentPartnerSignupView = () =>
+  import("./views/StudentPartnerSignupView");
 const ResetPasswordView = () => import("./views/ResetPasswordView");
 const SetPasswordView = () => import("./views/SetPasswordView");
 const OnboardingView = () => import("./views/OnboardingView");
@@ -23,18 +25,30 @@ const ProfileView = () => import("./views/ProfileView");
 const CalendarView = () => import("./views/CalendarView");
 const AdminView = () => import("./views/Admin");
 const VolunteerCoverage = () => import("./views/Admin/VolunteerCoverage");
-const AdminSessions = () => import(/* webpackChunkName: "admin-sessions" */ "./views/Admin/AdminSessions");
-const AdminSessionNotifications = () => import(/* webpackChunkName: "admin-sessions" */ "./views/Admin/AdminSessionNotifications");
-const AdminSessionDetail = () => import(/* webpackChunkName: "admin-sessions" */ "./views/Admin/AdminSessionDetail");
-const AdminSessionReview = () => import(/* webpackChunkName: "admin-sessions" */ "./views/Admin/AdminSessionReview");
-const AdminUsers = () => import(/* webpackChunkName: "admin-users" */ "./views/Admin/AdminUsers");
-const AdminUserDetail = () => import(/* webpackChunkName: "admin-users" */ "./views/Admin/AdminUserDetail");
-const AdminPendingVolunteers = () => import("./views/Admin/AdminPendingVolunteers");
-const AdminIneligibleStudents = () => import("./views/Admin/AdminIneligibleStudents");
-const AdminSchoolDetail = () => import(/* webpackChunkName: "admin-school" */ "./views/Admin/AdminSchoolDetail");
-const AdminSchools = () => import(/* webpackChunkName: "admin-school" */ "./views/Admin/AdminSchools");
-const AdminAddSchool = () => import(/* webpackChunkName: "admin-school" */ "./views/Admin/AdminAddSchool");
-const AdminEditSchool = () => import(/* webpackChunkName: "admin-school" */ "./views/Admin/AdminEditSchool");
+const AdminSessions = () =>
+  import(/* webpackChunkName: "admin-sessions" */ "./views/Admin/AdminSessions");
+const AdminSessionNotifications = () =>
+  import(/* webpackChunkName: "admin-sessions" */ "./views/Admin/AdminSessionNotifications");
+const AdminSessionDetail = () =>
+  import(/* webpackChunkName: "admin-sessions" */ "./views/Admin/AdminSessionDetail");
+const AdminSessionReview = () =>
+  import(/* webpackChunkName: "admin-sessions" */ "./views/Admin/AdminSessionReview");
+const AdminUsers = () =>
+  import(/* webpackChunkName: "admin-users" */ "./views/Admin/AdminUsers");
+const AdminUserDetail = () =>
+  import(/* webpackChunkName: "admin-users" */ "./views/Admin/AdminUserDetail");
+const AdminPendingVolunteers = () =>
+  import("./views/Admin/AdminPendingVolunteers");
+const AdminIneligibleStudents = () =>
+  import("./views/Admin/AdminIneligibleStudents");
+const AdminSchoolDetail = () =>
+  import(/* webpackChunkName: "admin-school" */ "./views/Admin/AdminSchoolDetail");
+const AdminSchools = () =>
+  import(/* webpackChunkName: "admin-school" */ "./views/Admin/AdminSchools");
+const AdminAddSchool = () =>
+  import(/* webpackChunkName: "admin-school" */ "./views/Admin/AdminAddSchool");
+const AdminEditSchool = () =>
+  import(/* webpackChunkName: "admin-school" */ "./views/Admin/AdminEditSchool");
 const AdminReports = () => import("./views/Admin/AdminReports");
 const AdminZipCodes = () => import("./views/Admin/AdminZipCodes");
 const ReviewMaterialsView = () => import("./views/ReviewMaterialsView");
