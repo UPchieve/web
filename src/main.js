@@ -20,7 +20,7 @@ import config from "./config";
 Vue.config.productionTip = false;
 
 // Set up SocketIO
-const socket = Socket.connect(config.websocketAddress, {
+const socket = Socket.connect(config.socketAddress, {
   autoConnect: false
 });
 Vue.use(VueSocketIO, socket);

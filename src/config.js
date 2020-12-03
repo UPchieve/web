@@ -16,7 +16,7 @@ if (configElement !== null) {
     ? (config.serverRoot = process.env.VUE_APP_SERVER_ROOT)
     : (config.serverRoot = passedConfig.serverRoot);
   passedConfig.socketAddress.includes("{{")
-    ? (config.websocketAddress = process.env.VUE_APP_SOCKET_ADDRESS)
+    ? (config.socketAddress = process.env.VUE_APP_SOCKET_ADDRESS)
     : (config.socketAddress = passedConfig.socketAddress);
   passedConfig.websocketRoot.includes("{{")
     ? (config.websocketRoot = process.env.VUE_APP_WEBSOCKET_ROOT)
@@ -29,7 +29,7 @@ if (configElement !== null) {
   // so we have to populate these without it
   config.mainWebsiteUrl = process.env.VUE_APP_MAIN_WEBSITE_URL;
   config.serverRoot = process.env.VUE_APP_SERVER_ROOT;
-  config.websocketAddress = process.env.VUE_APP_WEBSOCKET_ADDRESS;
+  config.socketAddress = process.env.VUE_APP_WEBSOCKET_ADDRESS;
   config.websocketRoot = process.env.VUE_APP_MAIN_WEBSOCKET_ROOT;
   config.zwibblerUrl = process.env.VUE_APP_ZWIBBLER_URL;
 }
