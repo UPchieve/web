@@ -8,7 +8,7 @@ const app = express();
 
 const indexHtml = renderIndexHtml();
 
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, "dist")));
 
 app.use((_, res) => {
   res.send(indexHtml).status(200);
