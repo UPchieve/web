@@ -10,28 +10,28 @@ if (configElement !== null) {
   // if there's no interpolation the object will include straight string values
   // of the mustache templates, so we can look for that
   passedConfig.mainWebsiteUrl.includes("{{")
-  ? (config.mainWebsiteUrl = "http://www.upchieve.org")
+  ? (config.mainWebsiteUrl = process.env.VUE_APP_MAIN_WEBSITE_URL)
   : (config.mainWebsiteUrl = passedConfig.mainWebsiteUrl);
   passedConfig.serverRoot.includes("{{")
-  ? (config.serverRoot = "http://localhost:3000")
+  ? (config.serverRoot = process.env.VUE_APP_SERVER_ROOT)
   : (config.serverRoot = passedConfig.serverRoot);
   passedConfig.socketAddress.includes("{{")
-  ? (config.websocketAddress = "http://localhost:3001")
+  ? (config.websocketAddress = process.env.VUE_APP_SOCKET_ADDRESS)
   : (config.socketAddress = passedConfig.socketAddress);
   passedConfig.websocketRoot.includes("{{")
-  ? (config.websocketRoot = "ws://localhost:3000")
+  ? (config.websocketRoot = process.env.VUE_APP_WEBSOCKET_ROOT)
   : (config.websocketRoot = passedConfig.websocketRoot);
   passedConfig.zwibblerUrl.includes("{{")
-  ? (config.zwibblerUrl = "/static/js/zwibbler-demo.js")
+  ? (config.zwibblerUrl = process.env.VUE_APP_ZWIBBLER_URL)
   : (config.zwibblerUrl = passedConfig.zwibblerUrl);
 } else {
   // tests don't include the index.html file
   // so we have to populate these without it
-  config.mainWebsiteUrl = "http://www.upchieve.org"
-  config.serverRoot = "http://localhost:3000"
-  config.websocketAddress = "http://localhost:3001"
-  config.websocketRoot = "ws://localhost:3000"
-  config.zwibblerUrl = "/static/js/zwibbler-demo.js"
+  config.mainWebsiteUrl = process.env.VUE_APP_MAIN_WEBSITE_URL
+  config.serverRoot = process.env.VUE_APP_SERVER_ROOT
+  config.websocketAddress = process.env.VUE_APP_WEBSOCKET_ADDRESS
+  config.websocketRoot = process.env.VUE_APP_MAIN_WEBSOCKET_ROOT
+  config.zwibblerUrl = process.env.VUE_APP_ZWIBBLER_URL
 }
 
 
