@@ -188,8 +188,12 @@
 import validator from "validator";
 import * as Sentry from "@sentry/browser";
 import AuthService from "@/services/AuthService";
+import VuePhoneNumberInput from "vue-phone-number-input";
 
 export default {
+  components: {
+    VuePhoneNumberInput
+  },
   data() {
     return {
       msg: "",

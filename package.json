@@ -18,8 +18,8 @@
     "test:watch": "vue-cli-service test:unit --watch"
   },
   "dependencies": {
-    "@sentry/browser": "^5.9.0",
-    "@sentry/integrations": "^5.8.0",
+    "@sentry/browser": "^5.27.6",
+    "@sentry/integrations": "^5.27.6",
     "@trevoreyre/autocomplete-vue": "^2.0.2",
     "awesome-phonenumber": "^2.20.0",
     "axios": "^0.19.2",
