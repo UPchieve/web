@@ -144,7 +144,7 @@
 import PhoneNumber from "awesome-phonenumber";
 import { mapGetters, mapState } from "vuex";
 import UserService from "@/services/UserService";
-import { topics, allSubtopics } from "@/utils/topics";
+import { topics } from "@/utils/topics";
 import DeactivateAccountModal from "./DeactivateAccountModal";
 
 export default {
@@ -220,22 +220,6 @@ export default {
         }
       }
       return subtopicObj;
-    },
-    subjects() {
-      const user = this.$store.state.user.user;
-      const subtopics = allSubtopics();
-
-      const subjects = user.subjects.reduce((displayObj, key) => {
-        const { subject } = key;
-        if (subtopics[subject])
-          displayObj[
-            subtopics[subject].displayName || subtopics[subject]
-          ] = true;
-
-        return displayObj;
-      }, {});
-
-      return subjects;
     }
   },
   methods: {
