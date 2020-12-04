@@ -132,7 +132,9 @@ export default {
 
         if (
           Object.keys(allSubtopics()).some(
-            s => s === subTopic && this.user.subjects.includes(s)
+            s =>
+              s === subTopic &&
+              this.user.subjects.some(({ subject }) => subject === s)
           )
         ) {
           results.push(session);
