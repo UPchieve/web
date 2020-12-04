@@ -5,7 +5,7 @@ import VueRouter from "vue-router";
 const ContactView = () => import("./views/ContactView");
 const LegalView = () => import("./views/LegalView");
 const LogoutView = () => import("./views/LogoutView");
-const LoginView = () => import("./views/LoginView");
+import LoginView from "./views/LoginView";
 const SignupView = () => import("./views/SignupView");
 const VolunteerPartnerSignupView = () =>
   import("./views/VolunteerPartnerSignupView");
