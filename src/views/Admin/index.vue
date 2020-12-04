@@ -26,6 +26,9 @@
       <router-link to="/admin/volunteer-coverage" class="admin-link btn"
         >Volunteer Coverage</router-link
       >
+      <router-link to="/admin/zip-codes" class="admin-link btn"
+        >Zip Code Lookup</router-link
+      >
       <router-link to="/edu" class="admin-link btn">Edu Admin</router-link>
     </div>
   </div>

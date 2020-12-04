@@ -9,15 +9,16 @@
       class="questions-container"
       :class="isAdminReview && 'admin-review'"
     >
-      <template v-if="!isAdminReview">
-        <h1 class="title">UPchieve Applicant Reference Evaluation</h1>
-        <p>
+      <fieldset :disabled="isAdminReview">
+        <legend class="heading-legend" v-if="!isAdminReview">
+          <h1 class="title">UPchieve Applicant Reference Evaluation</h1>
+        </legend>
+        <legend v-else>Evaluation Responses</legend>
+        <p v-if="!isAdminReview">
           Please answer the following questions honestly based on your knowledge
           of/experience with the applicant. It should take less than 10 minutes
           to complete and all answers will remain confidential.
         </p>
-      </template>
-      <fieldset :disabled="isAdminReview">
         <div class="question-col">
           <label for="affiliation" class="uc-form-label"
             >In what capacity do you know the applicant?</label
@@ -45,8 +46,8 @@
             placeholder="Your answer"
           />
         </div>
-        <table v-if="!isAdminReview">
-          <tr
+        <template v-if="!isAdminReview">
+          <div
             class="question-row"
             v-for="(question, question_index) in multipleRadioQuestions"
             v-bind:key="question_index"
@@ -54,46 +55,48 @@
             <div class="uc-form-label">{{ question.title }}</div>
             <div class="position-wrapper">
               <div class="question-scroll-container">
-                <tr class="radio-question-row">
-                  <td class="mobile-remove"></td>
-                  <td
-                    class="radio-question-selection-title"
-                    v-for="(label, labelIndex) in question.tableTitle"
-                    v-bind:key="labelIndex"
+                <table>
+                  <tr class="radio-question-row">
+                    <td class="mobile-remove"></td>
+                    <td
+                      class="radio-question-selection-title"
+                      v-for="(label, labelIndex) in question.tableTitle"
+                      v-bind:key="labelIndex"
+                    >
+                      {{ label }}
+                    </td>
+                  </tr>
+                  <tr
+                    class="radio-question-row"
+                    v-for="(subquestion, subquestionIndex) in question.options"
+                    v-bind:key="subquestion"
                   >
-                    {{ label }}
-                  </td>
-                </tr>
-                <tr
-                  class="radio-question-row"
-                  v-for="(subquestion, subquestionIndex) in question.options"
-                  v-bind:key="subquestion"
-                >
-                  <td class="radio-question-cell">{{ subquestion }}</td>
-                  <td
-                    class="radio-question-selection-cell"
-                    v-for="index in question.tableTitle.length"
-                    v-bind:key="index"
-                  >
-                    <input
-                      class="uc-form-input"
-                      v-model="
-                        multipleRadioResponse[
-                          question.optionsAlias[subquestionIndex]
-                        ]
-                      "
-                      type="radio"
-                      :name="
-                        `multiple-radio-${
-                          question.qid
-                        }_${subquestionIndex.toString()}`
-                      "
-                      :value="index"
-                    />
-                  </td>
-                </tr>
+                    <td class="radio-question-cell">{{ subquestion }}</td>
+                    <td
+                      class="radio-question-selection-cell"
+                      v-for="index in question.tableTitle.length"
+                      v-bind:key="index"
+                    >
+                      <input
+                        class="uc-form-input"
+                        v-model="
+                          multipleRadioResponse[
+                            question.optionsAlias[subquestionIndex]
+                          ]
+                        "
+                        type="radio"
+                        :name="
+                          `multiple-radio-${
+                            question.qid
+                          }_${subquestionIndex.toString()}`
+                        "
+                        :value="index"
+                      />
+                    </td>
+                  </tr>
+                </table>
 
-                <div
+                <table
                   class="mobile-pinned-questions-container"
                   v-if="mobileMode"
                 >
@@ -123,11 +126,11 @@
                       <input class="uc-form-input" type="radio" />
                     </td>
                   </tr>
-                </div>
+                </table>
               </div>
             </div>
-          </tr>
-        </table>
+          </div>
+        </template>
 
         <div v-else>
           <div
@@ -576,5 +579,10 @@ textarea.uc-form-input {
 
 .radio-answer-row {
   @include flex-container(row, flex-start, center);
+}
+
+.heading-legend {
+  border-bottom: 0;
+  margin-bottom: 0;
 }
 </style>
