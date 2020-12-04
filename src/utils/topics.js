@@ -52,7 +52,7 @@ export function allSubtopics() {
   let subtopicObj = {};
 
   for (let topic in topics) {
-    if (topics.hasOwnProperty(topic)) {
+    if (Object.prototype.hasOwnProperty.call(topics, topic)) {
       subtopicObj = Object.assign(subtopicObj, topics[topic].subtopics);
     }
   }

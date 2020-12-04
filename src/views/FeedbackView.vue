@@ -614,7 +614,10 @@ export default {
 
       const responseData = this.userResponse;
       for (const key in responseData) {
-        if (responseData.hasOwnProperty(key) && responseData[key] === "")
+        if (
+          Object.prototype.hasOwnProperty.call(responseData, key) &&
+          responseData[key] === ""
+        )
           delete responseData[key];
       }
 

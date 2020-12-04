@@ -187,7 +187,9 @@ export default {
 
       for (let [topicName, topicData] of Object.entries(topics)) {
         for (let topic in topicData.subtopics) {
-          if (topicData.subtopics.hasOwnProperty(topic)) {
+          if (
+            Object.prototype.hasOwnProperty.call(topicData.subtopics, topic)
+          ) {
             const { displayName } = topicData.subtopics[topic];
             subtopicObj[displayName] = topicName.toUpperCase();
           }

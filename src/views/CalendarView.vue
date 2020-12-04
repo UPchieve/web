@@ -156,11 +156,11 @@ export default {
     sortTimes() {
       const keysMap = {};
       for (const day in this.availability) {
-        if (this.availability.hasOwnProperty(day)) {
+        if (Object.prototype.hasOwnProperty.call(this.availability, day)) {
           const times = this.availability[day];
           const keys = [];
           for (const time in times) {
-            if (times.hasOwnProperty(time)) {
+            if (Object.prototype.hasOwnProperty.call(times, time)) {
               keys.push(time);
             }
           }

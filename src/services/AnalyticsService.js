@@ -21,7 +21,10 @@ export default {
     for (var property in userData.certifications) {
       if (
         userData.certifications[property] &&
-        userData.certifications[property].hasOwnProperty("passed")
+        Object.prototype.hasOwnProperty.call(
+          userData.certifications[property],
+          "passed"
+        )
       ) {
         if (userData.certifications[property].passed) {
           listPassed.push(property);
