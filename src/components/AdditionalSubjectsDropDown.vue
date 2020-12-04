@@ -84,8 +84,9 @@ export default {
 
   methods: {
     isComplete(includedSubjects) {
+      // Check if the user has all required certifications for the subject
       return includedSubjects.every(subject =>
-        this.user.subjects.includes(subject.key)
+        this.user.subjects.some(s => s.subject === subject.key)
       );
     },
     progressStatus(includedSubjects) {

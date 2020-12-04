@@ -118,8 +118,9 @@ export default {
       return this.user.certifications[cert].passed;
     },
     hasUnlockedSubject(cert) {
-      if (cert === "algebra") return this.user.subjects.includes("algebraOne");
-      return this.user.subjects.includes(cert);
+      if (cert === "algebra")
+        return this.user.subjects.some(s => s.subject === "algebraOne");
+      return this.user.subjects.some(s => s.subject === cert);
     },
     progressStatus(cert) {
       if (this.isComplete(cert)) return "Completed";

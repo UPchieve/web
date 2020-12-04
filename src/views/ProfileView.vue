@@ -103,14 +103,35 @@
         <div class="subheader">Unlocked Subjects</div>
         <div class="container-content cert">
           <div
-            v-for="(value, key) in subjects"
-            :key="`certification-${key}-${value}`"
+            v-for="{ subject } in user.subjects"
+            :key="`certification-${subject}`"
           >
-            <div v-if="value" class="certBox">
-              <div :class="certKey[key]" class="certKey">
-                {{ certKey[key] }}
+            <div v-if="subject" class="certBox">
+              <div>
+                <span :class="certKey[subject].subjectType" class="certKey">
+                  {{ certKey[subject].subjectType }}
+                </span>
+                <span class="certValue">{{
+                  certKey[subject].displayName
+                }}</span>
               </div>
-              <div class="certValue">{{ key }}</div>
+              <toggle-button
+                :value="
+                  modifiedSubjects.some(
+                    s => s.subject === subject && s.isActivated
+                  )
+                "
+                :disabled="!activeEdit"
+                :labels="{ checked: 'Active', unchecked: 'Deactivated' }"
+                :width="95"
+                :color="{
+                  checked: '#16D2AA',
+                  unchecked: '#F44747',
+                  disabled: '#AAAAAA'
+                }"
+                @change="event => toggleSubjectActivated(event, subject)"
+                :sync="true"
+              />
             </div>
           </div>
         </div>
@@ -123,7 +144,7 @@
 import PhoneNumber from "awesome-phonenumber";
 import { mapGetters, mapState } from "vuex";
 import UserService from "@/services/UserService";
-import { topics, allSubtopics } from "@/utils/topics";
+import { topics } from "@/utils/topics";
 import DeactivateAccountModal from "./DeactivateAccountModal";
 
 export default {
@@ -141,10 +162,12 @@ export default {
       phoneNational: "",
       phoneInputInfo: {},
       isAccountActive: true,
-      showDeactivateAccountModal: false
+      showDeactivateAccountModal: false,
+      modifiedSubjects: []
     };
   },
   created() {
+    this.modifiedSubjects = this.user.subjects;
     this.isAccountActive = !this.user.isDeactivated;
     if (this.user.isVolunteer && this.user.phone) {
       const num =
@@ -189,26 +212,14 @@ export default {
         for (let topic in topicData.subtopics) {
           if (topicData.subtopics.hasOwnProperty(topic)) {
             const { displayName } = topicData.subtopics[topic];
-            subtopicObj[displayName] = topicName.toUpperCase();
+            subtopicObj[topic] = {
+              subjectType: topicName.toUpperCase(),
+              displayName
+            };
           }
         }
       }
       return subtopicObj;
-    },
-    subjects() {
-      const user = this.$store.state.user.user;
-
-      const subjects = user.subjects.reduce((displayObj, key) => {
-        const subtopics = allSubtopics();
-
-        if (subtopics[key]) {
-          displayObj[subtopics[key].displayName || subtopics[key]] = true;
-        }
-
-        return displayObj;
-      }, {});
-
-      return subjects;
     }
   },
   methods: {
@@ -268,11 +279,10 @@ export default {
       if (!this.errors.length) {
         // form fields valid, so set profile
         this.user.phone = this.phoneInputInfo.e164;
-        this.user.isDeactivated = !this.isAccountActive;
-
+        this.user.subjects = this.modifiedSubjects;
         // send only the necessary data
         const payloadUser = {};
-        const keys = ["phone", "isDeactivated"];
+        const keys = ["phone", "isDeactivated", "subjects"];
 
         keys.forEach(key => (payloadUser[key] = this.user[key]));
 
@@ -287,6 +297,11 @@ export default {
             this.saveFailed = true;
           }
         );
+      }
+    },
+    toggleSubjectActivated({ value }, subject) {
+      for (const s of this.modifiedSubjects) {
+        if (s.subject === subject) s.isActivated = value;
       }
     }
   }
@@ -485,10 +500,9 @@ button:hover {
 }
 
 .certBox {
-  display: flex;
+  @include flex-container(row, space-between, center);
   height: 60px;
-  align-items: center;
-  padding-left: 20px;
+  padding: 0 20px;
   border-top: 1px solid #cccccf;
   font-weight: 600;
 }
