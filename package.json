@@ -20,7 +20,6 @@
   "dependencies": {
     "@sentry/browser": "^5.27.6",
     "@sentry/integrations": "^5.27.6",
-    "@trevoreyre/autocomplete-vue": "^2.0.2",
     "awesome-phonenumber": "^2.20.0",
     "axios": "^0.19.2",
     "bootstrap": "^3.3.7",
@@ -55,6 +54,7 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
+    "@trevoreyre/autocomplete-vue": "^2.0.2",
     "@vue/cli-plugin-babel": "^4.5.9",
     "@vue/cli-plugin-e2e-cypress": "^4.5.9",
     "@vue/cli-plugin-eslint": "^4.5.9",
