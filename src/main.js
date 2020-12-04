@@ -5,7 +5,6 @@ import VueHeadful from "vue-headful";
 import * as Sentry from "@sentry/browser";
 import * as Integrations from "@sentry/integrations";
 import vSelect from "vue-select";
-import VuePhoneNumberInput from "vue-phone-number-input";
 import VueStarRating from "vue-star-rating";
 import ToggleButton from "vue-js-toggle-button";
 import Socket from "queued-socket.io";
@@ -62,9 +61,6 @@ Vue.component("vue-headful", VueHeadful);
 
 // Set up vue-select
 Vue.component("v-select", vSelect);
-
-// Set up vue-phone-number-input
-Vue.component("vue-phone-number-input", VuePhoneNumberInput);
 
 // Set up vue-star-rating
 Vue.component("vue-star-rating", VueStarRating);

@@ -125,11 +125,13 @@ import { mapGetters, mapState } from "vuex";
 import UserService from "@/services/UserService";
 import { topics, allSubtopics } from "@/utils/topics";
 import DeactivateAccountModal from "./DeactivateAccountModal";
+import VuePhoneNumberInput from "vue-phone-number-input";
 
 export default {
   name: "profile-view",
   components: {
-    DeactivateAccountModal
+    DeactivateAccountModal,
+    VuePhoneNumberInput
   },
   data() {
     return {
