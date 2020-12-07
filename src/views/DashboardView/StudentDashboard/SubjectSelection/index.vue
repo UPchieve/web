@@ -141,7 +141,7 @@ export default {
     },
     checkOrEnforceWaitingPeriod() {
       const timeSinceLastSession = this.calculateTimeSinceLastSession();
-      const fiveMinutes = 1000;
+      const fiveMinutes = 1000 * 60 * 5;
       const timeLeftUntilFiveMinutes = fiveMinutes - timeSinceLastSession;
 
       // Only show a waiting period message if there's no active session
