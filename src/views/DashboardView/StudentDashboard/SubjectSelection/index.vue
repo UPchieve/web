@@ -76,11 +76,7 @@ export default {
 
     // Temporarily hide Physics subjects and Environmental Science from students
     cards[1].subtopics = cards[1].subtopics.filter(subject => {
-      const temporarilyHiddenSubjects = [
-        "physicsOne",
-        "physicsTwo",
-        "environmentalScience"
-      ];
+      const temporarilyHiddenSubjects = ["physicsTwo", "environmentalScience"];
       return !temporarilyHiddenSubjects.includes(subject);
     });
 
@@ -145,7 +141,7 @@ export default {
     },
     checkOrEnforceWaitingPeriod() {
       const timeSinceLastSession = this.calculateTimeSinceLastSession();
-      const fiveMinutes = 1000 * 60 * 5;
+      const fiveMinutes = 1000;
       const timeLeftUntilFiveMinutes = fiveMinutes - timeSinceLastSession;
 
       // Only show a waiting period message if there's no active session
