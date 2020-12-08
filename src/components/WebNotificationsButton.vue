@@ -4,7 +4,7 @@
       @click.native="() => setShowNotificationModal(true)"
       class="btn"
     >
-      Allow notifications
+      Allow browser notifications
     </large-button>
 
     <web-notifications-modal
@@ -66,5 +66,10 @@ export default {
   color: #fff;
   @include font-category("helper-text");
   font-weight: 500;
+  border: none;
+
+  &:hover {
+    background-color: darken($c-success-green, 5%);
+  }
 }
 </style>
