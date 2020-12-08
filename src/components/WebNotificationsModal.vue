@@ -11,7 +11,7 @@
       </header>
 
       <h2 class="web-notifications-modal__subtitle">
-        {{ userNotificationMessage }}
+        {{ description }}
       </h2>
 
       <separator />
@@ -46,7 +46,7 @@ export default {
     ...mapState({
       user: state => state.user.user
     }),
-    userNotificationMessage() {
+    description() {
       if (this.isVolunteerDashboardView)
         return "Turning on browser notifications will help ensure you never miss a student request while the dashboard is open. We’ll also notify you during the session if the student sends a message while you’re not looking. You can change this setting any time via your profile.";
       if (this.user.isVolunteer)
