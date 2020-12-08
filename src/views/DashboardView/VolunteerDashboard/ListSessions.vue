@@ -151,39 +151,41 @@ export default {
       const prevOpenSessions = this.openSessions;
       this.openSessions = results;
 
-      // Look for the new session added
-      let newSession;
-      for (const session of this.openSessions) {
-        const { _id: sessionId } = session;
-        let isOldSession = false;
-        for (const oldSession of prevOpenSessions) {
-          if (oldSession._id === sessionId) isOldSession = true;
-        }
-
-        if (!isOldSession) newSession = session;
-      }
-
-      if (!this.isInitialMount && newSession) {
-        try {
-          const newWaitingStudentAudio = document.querySelector(
-            ".audio__new-waiting-student"
-          );
-          // Unmuting the audio allows us to bypass the need for user interaction with the DOM before playing a sound
-          newWaitingStudentAudio.muted = false;
-          await newWaitingStudentAudio.play();
-        } catch (error) {
-          // eslint-disable-next-line no-console
-          console.log("Unable to play audio");
-        }
-
-        sendWebNotification(
-          `${
-            newSession.student.firstname
-          } needs help in ${this.subtopicDisplayName(newSession.subTopic)}`,
-          {
-            body: "Can you help them?"
+      if (!this.isInitialMount) {
+        // Look for the new session added
+        let newSession;
+        for (const session of this.openSessions) {
+          const { _id: sessionId } = session;
+          let isOldSession = false;
+          for (const oldSession of prevOpenSessions) {
+            if (oldSession._id === sessionId) isOldSession = true;
           }
-        );
+
+          if (!isOldSession) newSession = session;
+        }
+
+        if (newSession) {
+          try {
+            const newWaitingStudentAudio = document.querySelector(
+              ".audio__new-waiting-student"
+            );
+            // Unmuting the audio allows us to bypass the need for user interaction with the DOM before playing a sound
+            newWaitingStudentAudio.muted = false;
+            await newWaitingStudentAudio.play();
+          } catch (error) {
+            // eslint-disable-next-line no-console
+            console.log("Unable to play audio");
+          }
+
+          sendWebNotification(
+            `${
+              newSession.student.firstname
+            } needs help in ${this.subtopicDisplayName(newSession.subTopic)}`,
+            {
+              body: "Can you help them?"
+            }
+          );
+        }
       }
       this.isInitialMount = false;
     }
