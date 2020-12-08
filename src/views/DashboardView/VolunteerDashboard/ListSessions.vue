@@ -27,7 +27,7 @@
     </table>
     <audio
       class="audio__new-waiting-student"
-      src="@/assets/audio/new-waiting-student.mp3"
+      src="@/assets/audio/alert.mp3"
       muted
     />
   </div>

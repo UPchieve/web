@@ -62,10 +62,9 @@
       :endSession="endSession"
       :sessionId="session._id"
     />
-    <!-- @todo: change name if decide to go with same audio -->
     <audio
       class="audio__volunteer-joined"
-      src="@/assets/audio/new-waiting-student.mp3"
+      src="@/assets/audio/alert.mp3"
       muted
     />
     <!-- <div
