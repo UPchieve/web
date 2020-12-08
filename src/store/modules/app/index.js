@@ -15,14 +15,16 @@ export default {
   state: {
     windowWidth: 0,
     windowHeight: 0,
-    isMobileApp: false
+    isMobileApp: false,
+    isWebPageHidden: false
   },
   mutations: {
     setWindowWidth: (state, width = 0) =>
       (state.windowWidth = Math.max(0, width)),
     setWindowHeight: (state, height = 0) =>
       (state.windowHeight = Math.max(0, height)),
-    setIsMobileApp: (state, isMobileApp) => (state.isMobileApp = isMobileApp)
+    setIsMobileApp: (state, isMobileApp) => (state.isMobileApp = isMobileApp),
+    isWebPageHidden: (state, isVisible) => (state.isWebPageHidden = isVisible)
   },
   actions: {
     showNavigation: ({ dispatch }) => {
@@ -47,6 +49,13 @@ export default {
           : false;
 
       commit("setIsMobileApp", isMobileApp);
+    },
+
+    updateWebPageVisibility: ({ commit }, hiddenProperty) => {
+      let isHidden = false;
+      if (document[hiddenProperty]) isHidden = true;
+
+      commit("isWebPageHidden", isHidden);
     }
   },
   getters: {

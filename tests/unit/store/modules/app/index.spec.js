@@ -17,7 +17,8 @@ describe("`app` store module", () => {
     expect(state).toEqual({
       windowWidth: 0,
       windowHeight: 0,
-      isMobileApp: false
+      isMobileApp: false,
+      isWebPageHidden: false
     });
   });
 

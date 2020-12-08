@@ -131,7 +131,7 @@ export default {
       }
     },
     getReviewMaterials() {
-      // Recieves no content - used for tracking user actions
+      // Receives no content - used for tracking user actions
       NetworkService.getReviewMaterials(this, this.category);
     },
     importConceptReview(ext) {

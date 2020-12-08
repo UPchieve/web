@@ -25,28 +25,37 @@
         </tr>
       </tbody>
     </table>
+    <audio
+      class="audio__new-waiting-student"
+      src="@/assets/audio/alert.mp3"
+      muted
+    />
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
 import { allSubtopics } from "@/utils/topics";
+import sendWebNotification from "@/utils/send-web-notification";
 
 export default {
   data() {
     return {
       openSessions: [],
       allSubtopics: {},
-      emitListIntervalId: null
+      emitListIntervalId: null,
+      isInitialMount: false
     };
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: state => state.user.user,
+      isWebPageHidden: state => state.app.isWebPageHidden
     })
   },
   mounted() {
     this.allSubtopics = allSubtopics();
+    this.isInitialMount = true;
 
     // reconnect socket if it isn't already
     if (!this.$socket.connected) {
@@ -107,7 +116,7 @@ export default {
     }
   },
   sockets: {
-    sessions(sessions) {
+    async sessions(sessions) {
       if (this.user.isBanned) {
         this.openSessions = [];
         return;
@@ -139,7 +148,46 @@ export default {
         }
       }
 
+      const prevOpenSessions = this.openSessions;
       this.openSessions = results;
+
+      if (!this.isInitialMount) {
+        // Look for the new session added
+        let newSession;
+        for (const session of this.openSessions) {
+          const { _id: sessionId } = session;
+          let isOldSession = false;
+          for (const oldSession of prevOpenSessions) {
+            if (oldSession._id === sessionId) isOldSession = true;
+          }
+
+          if (!isOldSession) newSession = session;
+        }
+
+        if (newSession) {
+          try {
+            const newWaitingStudentAudio = document.querySelector(
+              ".audio__new-waiting-student"
+            );
+            // Unmuting the audio allows us to bypass the need for user interaction with the DOM before playing a sound
+            newWaitingStudentAudio.muted = false;
+            await newWaitingStudentAudio.play();
+          } catch (error) {
+            // eslint-disable-next-line no-console
+            console.log("Unable to play audio");
+          }
+
+          sendWebNotification(
+            `${
+              newSession.student.firstname
+            } needs help in ${this.subtopicDisplayName(newSession.subTopic)}`,
+            {
+              body: "Can you help them?"
+            }
+          );
+        }
+      }
+      this.isInitialMount = false;
     }
   }
 };
@@ -156,5 +204,9 @@ export default {
 
 .session-row td {
   text-align: left;
+}
+
+.audio__new-waiting-student {
+  display: none;
 }
 </style>
