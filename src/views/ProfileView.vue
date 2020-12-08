@@ -92,11 +92,11 @@
           </div>
 
           <div v-if="isNotificationPermissionGranted" class="container-section">
-            <div class="prompt">Notifications</div>
+            <div class="prompt">Browser Notifications</div>
             <div class="answer">
               <toggle-button
                 :value="isAllowingNotifications"
-                :labels="{ checked: 'Active', unchecked: 'Deactivated' }"
+                :labels="{ checked: 'On', unchecked: 'Off' }"
                 :width="95"
                 :color="{
                   checked: '#16D2AA',
@@ -107,8 +107,13 @@
                 :sync="true"
               />
             </div>
-            <div class="description">
-              Turn off to stop recieving notifications.
+            <div v-if="user.isVolunteer" class="description">
+              Browser alerts when a student appears on the dashboard waitlist
+              and when a student sends a message while you’re not looking.
+            </div>
+            <div v-else class="description">
+              Browser alerts when a coach joins your session and when a coach
+              sends a message while you’re not looking.
             </div>
           </div>
 
