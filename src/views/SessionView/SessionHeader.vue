@@ -322,12 +322,9 @@ export default {
           // eslint-disable-next-line no-console
           console.log("Unable to play audio");
         }
-        sendWebNotification(
-          `${this.sessionPartner.firstname} has joined your session`,
-          {
-            body: "-"
-          }
-        );
+        sendWebNotification("We found a coach!", {
+          body: `Start chatting with ${this.sessionPartner.firstname} now.`
+        });
       }
     }
   }
