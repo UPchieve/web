@@ -148,11 +148,13 @@ import { topics, allSubtopics } from "@/utils/topics";
 import DeactivateAccountModal from "./DeactivateAccountModal";
 import setNotificationPermission from "@/utils/set-notification-permission";
 import getNotificationPermission from "@/utils/get-notification-permission";
+import VuePhoneNumberInput from "vue-phone-number-input";
 
 export default {
   name: "profile-view",
   components: {
-    DeactivateAccountModal
+    DeactivateAccountModal,
+    VuePhoneNumberInput
   },
   data() {
     return {

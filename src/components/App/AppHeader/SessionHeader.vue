@@ -7,7 +7,7 @@
     </div>
     <div class="session-header__center">
       <router-link to="/">
-        <img class="session-header__logo" :src="logoUrl" />
+        <img class="session-header__logo" :src="logoUrl" alt="UPchieve" />
       </router-link>
     </div>
     <div class="session-header__right"></div>

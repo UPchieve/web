@@ -423,6 +423,13 @@ export default {
       .get(`${AUTH_ROOT}/partner/volunteer-partners`)
       .then(this._successHandler, this._errorHandler);
   },
+
+  adminGetZipCodes(zipCode) {
+    return Vue.http
+      .get(`${ELIGIBILITY_API_ROOT}/zip-codes/${zipCode}`)
+      .then(this._successHandler, this._errorHandler);
+  },
+
   getQuestions(context, data) {
     return context.$http
       .post(`${API_ROOT}/training/questions`, data)
