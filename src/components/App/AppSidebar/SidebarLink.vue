@@ -5,6 +5,8 @@
     :to="to"
     tag="div"
     @click.native="$store.dispatch('app/sidebar/collapse')"
+    @keydown.enter.native="navigate()"
+    tabindex="0"
   >
     <slot></slot>
     <p>{{ text }}</p>
@@ -36,6 +38,12 @@ export default {
         SidebarLink: true,
         "SidebarLink--desktop": !this.mobileMode
       };
+    }
+  },
+  methods: {
+    navigate() {
+      this.$store.dispatch("app/sidebar/collapse");
+      this.$router.push(this.to);
     }
   }
 };

@@ -24,7 +24,13 @@
         />
       </div>
 
-      <div v-if="isAuthenticated" :class="finalLinkClass" v-on:click="logout">
+      <div
+        v-if="isAuthenticated"
+        :class="finalLinkClass"
+        v-on:click="logout"
+        v-on:keydown.enter="logout"
+        tabindex="0"
+      >
         Log out
       </div>
     </div>
