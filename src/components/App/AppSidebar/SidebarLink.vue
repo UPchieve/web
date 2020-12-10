@@ -6,7 +6,7 @@
     tag="div"
     @click.native="$store.dispatch('app/sidebar/collapse')"
     @keydown.enter.native="navigate()"
-    tabindex="0"
+    :tabindex="isCollapsed && mobileMode ? -1 : 0"
   >
     <slot></slot>
     <p>{{ text }}</p>
@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 export default {
   props: {
@@ -29,6 +29,7 @@ export default {
     }
   },
   computed: {
+    ...mapState({ isCollapsed: state => state.app.sidebar.isCollapsed }),
     ...mapGetters({ mobileMode: "app/mobileMode" }),
     size() {
       return this.mobileMode ? "1em" : "1.5em";

@@ -29,7 +29,7 @@
         :class="finalLinkClass"
         v-on:click="logout"
         v-on:keydown.enter="logout"
-        tabindex="0"
+        :tabindex="isSidebarCollapsed && mobileMode ? -1 : 0"
       >
         Log out
       </div>
