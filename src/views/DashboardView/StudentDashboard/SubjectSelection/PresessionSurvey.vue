@@ -22,7 +22,11 @@
               :id="`${question.key}_${option.value}`"
               :value="option.value"
             />
-            <label :for="`${question.key}_${option.value}`">
+            <label
+              :for="`${question.key}_${option.value}`"
+              tabindex="0"
+              @keydown.space="responses[question.key].answer = option.value"
+            >
               <span>{{ option.displayName }}</span>
               <input
                 v-if="option.value === 'other'"
