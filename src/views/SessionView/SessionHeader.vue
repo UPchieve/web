@@ -62,6 +62,11 @@
       :endSession="endSession"
       :sessionId="session._id"
     />
+    <audio
+      class="audio__volunteer-joined"
+      src="@/assets/audio/alert.mp3"
+      muted
+    />
     <!-- <div
       :class="[connectionMsgType]"
       class="connection-message"
@@ -87,6 +92,7 @@ import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 import LoadingMessage from "@/components/LoadingMessage";
 import TroubleMatchingModal from "@/views/SessionView/TroubleMatchingModal";
 import UnmatchedModal from "@/views/SessionView/UnmatchedModal";
+import sendWebNotification from "@/utils/send-web-notification";
 
 /**
  * @todo {1} Refactoring candidate: use a modal instead.
@@ -299,11 +305,25 @@ export default {
   watch: {
     // Close possibly open modals that are triggered by a long waiting period
     // and clear the isWaiting interval when a volunteer joins the session
-    isSessionWaitingForVolunteer(value, prevValue) {
+    async isSessionWaitingForVolunteer(value, prevValue) {
       if (!value && prevValue) {
         this.showTroubleMatchingModal = false;
         this.showUnmatchedModal = false;
         clearInterval(this.isWaitingIntervalId);
+        try {
+          const volunteerJoinedAudio = document.querySelector(
+            ".audio__volunteer-joined"
+          );
+          // Unmuting the audio allows us to bypass the need for user interaction with the DOM before playing a sound
+          volunteerJoinedAudio.muted = false;
+          await volunteerJoinedAudio.play();
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.log("Unable to play audio");
+        }
+        sendWebNotification("We found a coach!", {
+          body: `Start chatting with ${this.sessionPartner.firstname} now.`
+        });
       }
     }
   }
@@ -429,5 +449,9 @@ h1 {
 .avatar-info-container {
   display: flex;
   align-items: center;
+}
+
+.audio__volunteer-joined {
+  display: none;
 }
 </style>

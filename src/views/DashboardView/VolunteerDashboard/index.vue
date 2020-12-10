@@ -12,6 +12,7 @@
       <template v-if="user.isApproved && user.isOnboarded">
         <div class="dashboard-card">
           <div class="students-waiting">
+            <web-notifications-button class="notifications-button" />
             <div class="dashboard-card__title">Waiting Students</div>
             <div v-if="isSessionAlive">
               <button
@@ -138,6 +139,7 @@ import VerificationIcon from "@/assets/verification.svg";
 import OnboardingIcon from "@/assets/onboarding.svg";
 import TrainingIcon from "@/assets/training_icon.svg";
 import { allSubtopicNames } from "@/utils/topics";
+import WebNotificationsButton from "@/components/WebNotificationsButton.vue";
 
 const headerData = {
   component: "RejoinSessionHeader",
@@ -156,7 +158,8 @@ export default {
     ReferencesModal,
     VerificationIcon,
     OnboardingIcon,
-    VolunteerWelcomeModal
+    VolunteerWelcomeModal,
+    WebNotificationsButton
   },
   watch: {
     isSessionAlive(isAlive) {
@@ -699,5 +702,10 @@ export default {
       text-decoration: none;
     }
   }
+}
+
+.notifications-button {
+  @include flex-container(row, flex-end);
+  margin-bottom: 1.4em;
 }
 </style>

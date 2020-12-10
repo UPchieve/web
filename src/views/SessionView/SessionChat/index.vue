@@ -58,6 +58,12 @@
       </div>
     </div>
 
+    <audio
+      class="audio__receive-message"
+      src="@/assets/audio/receive-message.mp3"
+      muted
+    />
+
     <div class="chat-footer">
       <transition name="fade">
         <div class="typing-indicator" v-show="typingIndicatorShown">
@@ -86,6 +92,7 @@ import LoadingMessage from "@/components/LoadingMessage";
 import ModerationService from "@/services/ModerationService";
 import StudentAvatarUrl from "@/assets/defaultavatar3.png";
 import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
+import sendWebNotification from "@/utils/send-web-notification";
 
 /**
  * @todo {1} Use more descriptive names that comply with the coding standards.
@@ -95,6 +102,10 @@ import VolunteerAvatarUrl from "@/assets/defaultavatar4.png";
 export default {
   name: "session-chat",
   components: { ChatBot, LoadingMessage },
+  props: {
+    setHasSeenNewMessage: { type: Function, required: true },
+    shouldHideChatSection: { type: Boolean, required: true }
+  },
   data() {
     return {
       newMessage: "",
@@ -108,6 +119,7 @@ export default {
     ...mapState({
       user: state => state.user.user,
       currentSession: state => state.user.session,
+      isWebPageHidden: state => state.app.isWebPageHidden,
       messages: state =>
         (state.user.session.messages || []).map(message => {
           const {
@@ -193,6 +205,25 @@ export default {
       this.typingTimeout = setTimeout(() => {
         this.notTyping();
       }, 2000);
+    },
+    async triggerAlert(data) {
+      try {
+        const receiveMessageAudio = document.querySelector(
+          ".audio__receive-message"
+        );
+        // Unmuting the audio allows us to bypass the need for user interaction with the DOM before playing a sound
+        receiveMessageAudio.muted = false;
+        await receiveMessageAudio.play();
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.log("Unable to play audio");
+      }
+
+      sendWebNotification(
+        `${this.sessionPartner.firstname} has sent a message`,
+        { body: data.contents }
+      );
+      return;
     }
   },
 
@@ -203,7 +234,18 @@ export default {
     "not-typing"() {
       this.typingIndicatorShown = false;
     },
-    messageSend(data) {
+    async messageSend(data) {
+      const { userId } = data;
+      // If the chat is hidden show visual indicator that a new message has arrived
+      if (this.shouldHideChatSection) {
+        this.setHasSeenNewMessage(false);
+        this.triggerAlert(data);
+      }
+
+      // Only allow audio when a user does not have the web page in view
+      if (userId !== this.user._id && this.isWebPageHidden)
+        this.triggerAlert(data);
+
       this.$store.dispatch("user/addMessage", data);
     },
     messageError() {
@@ -426,5 +468,9 @@ span {
     padding: 10px 16px;
     line-height: 18px;
   }
+}
+
+.audio__receive-message {
+  display: none;
 }
 </style>
