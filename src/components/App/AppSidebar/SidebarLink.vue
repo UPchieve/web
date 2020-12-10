@@ -44,6 +44,9 @@ export default {
   methods: {
     navigate() {
       this.$store.dispatch("app/sidebar/collapse");
+
+      // necessary because router-link doesn't provide a way to set modifiers, like
+      // keydown.enter.native, in the event prop
       this.$router.push(this.to);
     }
   }
