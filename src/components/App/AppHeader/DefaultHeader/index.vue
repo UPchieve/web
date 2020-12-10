@@ -6,7 +6,7 @@
         <span class="DefaultHeader-user-info-name">{{ name }}</span>
       </div>
 
-      <hamburger-button />
+      <hamburger-button :tabindex="mobileMode ? 0 : -1" />
     </template>
 
     <template v-else>
