@@ -243,7 +243,7 @@ export default {
       return subjects;
     },
     isNotificationPermissionGranted() {
-      return Notification.permission === "granted";
+      return "Notification" in window && Notification.permission === "granted";
     }
   },
   methods: {
