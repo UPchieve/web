@@ -30,20 +30,30 @@
         </div>
       </div>
       <div class="button-container">
-        <div v-if="user.isVolunteer" class="report-btn" @click="reportSession">
+        <div
+          v-if="user.isVolunteer"
+          class="report-btn"
+          tabindex="0"
+          @click="reportSession"
+          @keydown.enter="reportSession"
+        >
           Report
         </div>
 
         <span
           v-if="isSessionWaitingForVolunteer"
+          tabindex="0"
           @click="end"
+          @keydown.enter="end"
           class="end-session-btn"
         >
           Cancel
         </span>
         <span
           v-else-if="isSessionOver"
+          tabindex="0"
           @click="goToFeedbackPage"
+          @keydown.enter="goToFeedbackPage"
           class="end-session-btn"
         >
           Finish
