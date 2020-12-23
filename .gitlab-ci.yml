@@ -3,10 +3,10 @@ include:
 
 test:
   stage: test
-  image: gliderlabs/herokuish:latest
+  image: heroku/buildpacks:20
   script:
-    - cp -R . /tmp/app
-    - /bin/herokuish buildpack test
+    - npm install
+    - npm run test
   rules:
     - if: '$TEST_DISABLED'
       when: never
@@ -14,14 +14,22 @@ test:
 
 lint:
   stage: test
-  image: gliderlabs/herokuish:latest
+  image: heroku/buildpacks:20
   script:
-    - cp -$ . /tmp/app
+    - npm install
     - npm run lint:prod
+  rules:
+    - if: '$TEST_DISABLED'
+      when: never
+    - if: '$CI_COMMIT_TAG || $CI_COMMIT_BRANCH'
 
 e2e:
   stage: test
-  image: gliderlabs/herokuish:latest
+  image: heroku/buildpacks:20
   script:
-    - cp -$ . /tmp/app
+    - npm install
     - npm run e2e:headless
+  rules:
+    - if: '$TEST_DISABLED'
+      when: never
+    - if: '$CI_COMMIT_TAG || $CI_COMMIT_BRANCH'
