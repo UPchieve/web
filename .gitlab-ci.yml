@@ -1,9 +1,21 @@
 include:
   - template: Auto-DevOps.gitlab-ci.yml
 
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .npm/
+
+variables:
+  AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED: "true"
+  AUTO_DEVOPS_BUILD_IMAGE_CNB_BUILDER: "heroku/buildpacks:20"
+  BUILDPACK_URL: "heroku/nodejs"
+
 test:
   stage: test
   image: node:12.20.0-stretch
+  before_script:
+    - npm ci --cache .npm --prefer-offline
   script:
     - npm install
     - npm run test
@@ -15,6 +27,8 @@ test:
 lint:
   stage: test
   image: node:12.20.0-stretch
+  before_script:
+    - npm ci --cache .npm --prefer-offline
   script:
     - npm install
     - npm run lint:prod
@@ -26,7 +40,10 @@ lint:
 e2e:
   stage: test
   image: node:12.20.0-stretch
+  before_script:
+    - npm ci --cache .npm --prefer-offline
   script:
+    - apt-get install libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
     - npm install
     - npm run e2e:headless
   rules:
