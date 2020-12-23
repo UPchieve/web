@@ -4,6 +4,7 @@ include:
 build:
   stage: build
   image: "registry.gitlab.com/gitlab-org/cluster-integration/auto-build-image:v0.4.0"
+  cache: {}
   variables:
     DOCKER_TLS_CERTDIR: ""
   services:
