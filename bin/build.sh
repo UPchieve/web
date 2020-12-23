@@ -42,6 +42,7 @@ pack build "$image_tagged" \
   --env ftp_proxy \
   --env NO_PROXY \
   --env no_proxy
+  --env "NODE_ENV=production"
 
 docker tag "$image_tagged" "$image_latest"
 
