@@ -3,7 +3,7 @@ include:
 
 test:
   stage: test
-  image: heroku/buildpacks:20
+  image: node:12.20.0-stretch
   script:
     - npm install
     - npm run test
@@ -14,7 +14,7 @@ test:
 
 lint:
   stage: test
-  image: heroku/buildpacks:20
+  image: node:12.20.0-stretch
   script:
     - npm install
     - npm run lint:prod
@@ -25,7 +25,7 @@ lint:
 
 e2e:
   stage: test
-  image: heroku/buildpacks:20
+  image: node:12.20.0-stretch
   script:
     - npm install
     - npm run e2e:headless
