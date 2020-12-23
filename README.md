@@ -4,6 +4,10 @@
 
 [![CircleCI](https://circleci.com/gh/UPchieve/web.svg?style=svg)](https://circleci.com/gh/UPchieve/web) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](code_of_conduct.md)
 
+## GITLAB
+
+NOTE: Active development on this project has moved to https://gitlab.com/upchieve/high-line, no more pushes should go straight to the Github repo.
+
 ## Build Setup
 
 1. Install NodeJS either via [binary](https://nodejs.org/en/) or [Homebrew](http://brew.sh) (`brew install node`)
