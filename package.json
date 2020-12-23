@@ -67,7 +67,7 @@
     "vuex": "^3.0.1"
   },
   "engines": {
-    "node": ">= 11.7.0",
+    "node": ">= 12.20.0",
     "npm": ">= 6.0.0"
   },
   "devDependencies": {
