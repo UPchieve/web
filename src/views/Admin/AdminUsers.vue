@@ -31,7 +31,12 @@
       </div>
 
       <div>
-        <button class="uc-form-button" type="button" @click="getUsers">
+        <button
+          class="uc-form-button"
+          type="button"
+          @click="getUsers"
+          ref="search"
+        >
           Search
         </button>
       </div>
@@ -134,7 +139,18 @@ export default {
         .addEventListener("keydown", this.keyboardListener);
     });
   },
-
+  mounted() {
+    const anyFieldHasData =
+      this.firstName ||
+      this.lastName ||
+      this.email ||
+      (this.partnerOrg.length && this.partnerOrg.length > 0) ||
+      this.highSchool;
+    if (anyFieldHasData) {
+      const searchButton = this.$refs.search;
+      searchButton.click();
+    }
+  },
   computed: {
     isFirstPage() {
       return this.page === 1;
