@@ -5,6 +5,8 @@
     :to="to"
     tag="div"
     @click.native="$store.dispatch('app/sidebar/collapse')"
+    @keydown.enter.native="navigate()"
+    :tabindex="isCollapsed && mobileMode ? -1 : 0"
   >
     <slot></slot>
     <p>{{ text }}</p>
@@ -12,7 +14,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 export default {
   props: {
@@ -27,6 +29,7 @@ export default {
     }
   },
   computed: {
+    ...mapState({ isCollapsed: state => state.app.sidebar.isCollapsed }),
     ...mapGetters({ mobileMode: "app/mobileMode" }),
     size() {
       return this.mobileMode ? "1em" : "1.5em";
@@ -36,6 +39,15 @@ export default {
         SidebarLink: true,
         "SidebarLink--desktop": !this.mobileMode
       };
+    }
+  },
+  methods: {
+    navigate() {
+      this.$store.dispatch("app/sidebar/collapse");
+
+      // necessary because router-link doesn't provide a way to set modifiers, like
+      // keydown.enter.native, in the event prop
+      this.$router.push(this.to);
     }
   }
 };
