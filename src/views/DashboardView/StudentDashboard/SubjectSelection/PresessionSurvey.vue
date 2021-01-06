@@ -19,6 +19,7 @@
             <input
               v-model="responses[question.key].answer"
               type="radio"
+              tabindex="-1"
               :id="`${question.key}_${option.value}`"
               :value="option.value"
             />
@@ -31,6 +32,7 @@
               <input
                 v-if="option.value === 'other'"
                 type="text"
+                tabindex="-1"
                 v-model="responses[question.key].other"
                 :disabled="responses[question.key].answer !== 'other'"
               />
