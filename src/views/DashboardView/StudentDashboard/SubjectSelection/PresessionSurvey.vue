@@ -19,14 +19,20 @@
             <input
               v-model="responses[question.key].answer"
               type="radio"
+              tabindex="-1"
               :id="`${question.key}_${option.value}`"
               :value="option.value"
             />
-            <label :for="`${question.key}_${option.value}`">
+            <label
+              :for="`${question.key}_${option.value}`"
+              tabindex="0"
+              @keydown.space="responses[question.key].answer = option.value"
+            >
               <span>{{ option.displayName }}</span>
               <input
                 v-if="option.value === 'other'"
                 type="text"
+                tabindex="-1"
                 v-model="responses[question.key].other"
                 :disabled="responses[question.key].answer !== 'other'"
               />

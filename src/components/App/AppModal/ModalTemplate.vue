@@ -1,8 +1,10 @@
 <template>
   <div
     class="ModalTemplate"
+    ref="modalTemplateContainer"
     :class="{ 'ModalTemplate--important': important }"
     @click="closeModal"
+    @keydown="checkKeyEvent"
   >
     <div v-if="mobileMode" class="ModalTemplate-header">
       <div
@@ -44,6 +46,9 @@ import { mapGetters } from "vuex";
 import LargeButton from "@/components/LargeButton";
 import ArrowIcon from "@/assets/arrow.svg";
 
+const FOCUSABLE_ELEMENT_SELECTOR =
+  'button:not([disabled]), [href], input:not([tabindex="-1"]), select, textarea, [tabindex]:not([tabindex="-1"])';
+
 export default {
   components: { LargeButton, ArrowIcon },
   props: {
@@ -59,6 +64,11 @@ export default {
   mounted() {
     const body = document.querySelector("body");
     body.classList.add("disable-scroll");
+
+    // focus on first focusable child element, to put the focus in the trap
+    this.$refs.modalTemplateContainer
+      .querySelectorAll(FOCUSABLE_ELEMENT_SELECTOR)[0]
+      .focus();
   },
   beforeDestroy() {
     const body = document.querySelector("body");
@@ -78,8 +88,48 @@ export default {
     closeModal(event) {
       // users must interact with the modal button to close session related modals
       if (this.isSessionFulfilledModal) return;
-      const { target } = event;
-      if (target.classList.contains("ModalTemplate")) this.handleCancel();
+      const { key, target } = event;
+      if (key === "Escape" || target.classList.contains("ModalTemplate")) {
+        this.handleCancel();
+      }
+    },
+    checkKeyEvent(event) {
+      // based on tab key trap at:
+      // https://gist.github.com/JimSchofield/ec06d1f209799f5cd279f5683b178da4
+      const { key } = event;
+
+      if (key === "Escape") {
+        // treat as a close event and exit early
+        this.closeModal(event);
+        return;
+      }
+
+      const focusableList = this.$refs.modalTemplateContainer.querySelectorAll(
+        FOCUSABLE_ELEMENT_SELECTOR
+      );
+
+      // escape early if only 1 or no elements to focus
+      if (focusableList.length < 2 && event.key === "Tab") {
+        event.preventDefault();
+        return;
+      }
+
+      const last = focusableList.length - 1;
+      if (
+        event.key === "Tab" &&
+        event.shiftKey === false &&
+        event.target === focusableList[last]
+      ) {
+        event.preventDefault();
+        focusableList[0].focus();
+      } else if (
+        event.key === "Tab" &&
+        event.shiftKey === true &&
+        event.target === focusableList[0]
+      ) {
+        event.preventDefault();
+        focusableList[last].focus();
+      }
     }
   }
 };
