@@ -46,6 +46,9 @@ import { mapGetters } from "vuex";
 import LargeButton from "@/components/LargeButton";
 import ArrowIcon from "@/assets/arrow.svg";
 
+const FOCUSABLE_ELEMENT_SELECTOR =
+  'button:not([disabled]), [href], input:not([tabindex="-1"]), select, textarea, [tabindex]:not([tabindex="-1"])';
+
 export default {
   components: { LargeButton, ArrowIcon },
   props: {
@@ -61,6 +64,11 @@ export default {
   mounted() {
     const body = document.querySelector("body");
     body.classList.add("disable-scroll");
+
+    // focus on first focusable child element, to put the focus in the trap
+    this.$refs.modalTemplateContainer
+      .querySelectorAll(FOCUSABLE_ELEMENT_SELECTOR)[0]
+      .focus();
   },
   beforeDestroy() {
     const body = document.querySelector("body");
@@ -97,7 +105,7 @@ export default {
       }
 
       const focusableList = this.$refs.modalTemplateContainer.querySelectorAll(
-        'button:not([disabled]), [href], input:not([tabindex="-1"]), select, textarea, [tabindex]:not([tabindex="-1"])'
+        FOCUSABLE_ELEMENT_SELECTOR
       );
 
       // escape early if only 1 or no elements to focus
