@@ -1,0 +1,75 @@
+include:
+  - template: Auto-DevOps.gitlab-ci.yml
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .npm
+    - node_modules
+
+variables:
+  AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED: "true"
+  AUTO_DEVOPS_BUILD_IMAGE_CNB_BUILDER: "heroku/buildpacks:20"
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
+
+build:
+  stage: build
+  image: "docker:19.03.12"
+  cache: {}
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+  services:
+    - docker:19.03.12-dind
+  script:
+    - |
+      if [[ -z "$CI_COMMIT_TAG" ]]; then
+        export CI_APPLICATION_REPOSITORY=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG}
+        export CI_APPLICATION_TAG=${CI_APPLICATION_TAG:-$CI_COMMIT_SHA}
+      else
+        export CI_APPLICATION_REPOSITORY=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE}
+        export CI_APPLICATION_TAG=${CI_APPLICATION_TAG:-$CI_COMMIT_TAG}
+      fi
+    - export image_tagged="$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG"
+    - export image_latest="$CI_APPLICATION_REPOSITORY:latest"
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - apk add --update curl tar
+    - (curl -sSL "https://github.com/buildpacks/pack/releases/download/v0.15.1/pack-v0.15.1-linux.tgz" | tar -C /usr/local/bin/ --no-same-owner -xzv pack)
+    - |
+      pack build "$image_tagged" \
+        --clear-cache \
+        --builder heroku/buildpacks:20 \
+        --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
+        --buildpack heroku/nodejs \
+        --buildpack heroku/procfile \
+        --env "NODE_ENV=production"
+    - docker tag "$image_tagged" "$image_latest"
+    - docker push "$image_tagged"
+    - docker push "$image_latest"
+  rules:
+    - if: '$CI_COMMIT_TAG || $CI_COMMIT_BRANCH'
+
+test:
+  stage: test
+  image: node:12.20.0-stretch
+  before_script:
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - npm install
+    - npm run test
+  rules:
+    - if: '$TEST_DISABLED'
+      when: never
+    - if: '$CI_COMMIT_TAG || $CI_COMMIT_BRANCH'
+
+lint:
+  stage: test
+  image: node:12.20.0-stretch
+  before_script:
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - npm install
+    - npm run lint:prod
+  rules:
+    - if: '$TEST_DISABLED'
+      when: never
+    - if: '$CI_COMMIT_TAG || $CI_COMMIT_BRANCH'
