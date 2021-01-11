@@ -10,7 +10,16 @@ const indexHtml = renderIndexHtml();
 
 app.use(express.static(path.join(__dirname, "dist")));
 
-app.use((_, res) => {
+app.get('/healthz', function (req, res, next) {
+  res.sendStatus(200)
+  next()
+})
+
+app.use((req, res, next) => {
+  if (req.path.includes("healthz")) {
+    next()
+    return
+  }
   res.send(indexHtml).status(200);
 });
 
