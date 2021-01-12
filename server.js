@@ -3,17 +3,18 @@ const fs = require("fs");
 const Mustache = require("mustache");
 const logger = require("pino")();
 const path = require("path");
+const { exec } = require("child_process");
 
 const app = express();
 
 const indexHtml = renderIndexHtml();
 
-app.use(express.static(path.join(__dirname, "dist")));
+app.get("/healthz", function(req, res, next) {
+  res.sendStatus(200);
+  next();
+});
 
-app.get('/healthz', function (req, res, next) {
-  res.sendStatus(200)
-  next()
-})
+app.use(express.static(path.join(__dirname, "dist")));
 
 app.use((req, res, next) => {
   if (req.path.includes("healthz")) {
@@ -21,6 +22,7 @@ app.use((req, res, next) => {
     return
   }
   res.send(indexHtml).status(200);
+  next()
 });
 
 app.listen(8080, () => {
@@ -46,6 +48,8 @@ function renderIndexHtml() {
     socketAddress: process.env.VUE_APP_SOCKET_ADDRESS,
     mainWebsiteUrl: process.env.VUE_APP_MAIN_WEBSITE_URL
   };
+
+  exec(`mv ${indexPath} ${__dirname}`);
 
   return Mustache.render(template, config);
 }
