@@ -1,7 +1,7 @@
 import Validator from "validator";
 
 import NetworkService from "./NetworkService";
-import AnalyticsService from "./AnalyticsService";
+// import AnalyticsService from "./AnalyticsService";
 
 import errorFromHttpResponse from "../utils/error-from-http-response";
 
@@ -17,18 +17,19 @@ export default {
       return Promise.reject("Invalid login form submission");
     }
 
-    return NetworkService.login(context, creds).then(res => {
-      const data = { ...res.data };
-      if (!data) {
-        throw new Error("No user returned from auth service");
-      }
+    return NetworkService.login(context, creds)
+    // .then(res => {
+    //   const data = { ...res.data };
+    //   if (!data) {
+    //     throw new Error("No user returned from auth service");
+    //   }
 
-      // analytics: tracking when a user has logged in
-      AnalyticsService.identify(data.user, data.user.isFakeUser);
-      AnalyticsService.trackNoProperties("logged in", data.user.isFakeUser);
+    //   // analytics: tracking when a user has logged in
+    //   AnalyticsService.identify(data.user, data.user.isFakeUser);
+    //   AnalyticsService.trackNoProperties("logged in", data.user.isFakeUser);
 
-      return data;
-    });
+    //   return data;
+    // });
   },
 
   registerOpenVolunteer(context, signupData) {
