@@ -31,7 +31,7 @@ app.listen(8080, () => {
 
 function renderIndexHtml() {
   let template = "";
-  const indexPath = path.join(__dirname, "dist/index.html");
+  const indexPath = path.join(__dirname, "index.html");
   try {
     template = fs.readFileSync(indexPath, "utf8");
   } catch (err) {
@@ -48,8 +48,6 @@ function renderIndexHtml() {
     socketAddress: process.env.VUE_APP_SOCKET_ADDRESS,
     mainWebsiteUrl: process.env.VUE_APP_MAIN_WEBSITE_URL
   };
-
-  exec(`mv ${indexPath} ${__dirname}`);
 
   return Mustache.render(template, config);
 }
