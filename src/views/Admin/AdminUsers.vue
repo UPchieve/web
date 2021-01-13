@@ -147,8 +147,7 @@ export default {
       (this.partnerOrg.length && this.partnerOrg.length > 0) ||
       this.highSchool;
     if (anyFieldHasData) {
-      const searchButton = this.$refs.search;
-      searchButton.click();
+      this.getUsers();
     }
   },
   computed: {
