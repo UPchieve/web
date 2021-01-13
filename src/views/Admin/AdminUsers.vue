@@ -31,12 +31,7 @@
       </div>
 
       <div>
-        <button
-          class="uc-form-button"
-          type="button"
-          @click="getUsers"
-          ref="search"
-        >
+        <button class="uc-form-button" type="button" @click="getUsers">
           Search
         </button>
       </div>
