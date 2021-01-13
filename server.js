@@ -3,11 +3,15 @@ const fs = require("fs");
 const Mustache = require("mustache");
 const logger = require("pino")();
 const path = require("path");
-const { exec } = require("child_process");
+const cacheControl = require("express-cache-controller")
 
 const app = express();
 
 const indexHtml = renderIndexHtml();
+
+app.use(cacheControl({
+  noCache: true
+}));
 
 app.get("/healthz", function(req, res, next) {
   res.sendStatus(200);
