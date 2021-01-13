@@ -1,19 +1,14 @@
 import Vue from "vue";
 import promiseRetry from "promise-retry";
 import errcode from "err-code";
+import config from "../config";
 
-const AUTH_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/auth`;
-const API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/api`;
-const ELIGIBILITY_API_ROOT = `${
-  process.env.VUE_APP_SERVER_ROOT
-}/api-public/eligibility`;
-const CONTACT_API_ROOT = `${
-  process.env.VUE_APP_SERVER_ROOT
-}/api-public/contact`;
-const REFERENCE_API_ROOT = `${
-  process.env.VUE_APP_SERVER_ROOT
-}/api-public/reference`;
-const WHITEBOARD_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/whiteboard`;
+const AUTH_ROOT = `${config.serverRoot}/auth`;
+const API_ROOT = `${config.serverRoot}/api`;
+const ELIGIBILITY_API_ROOT = `${config.serverRoot}/api-public/eligibility`;
+const CONTACT_API_ROOT = `${config.serverRoot}/api-public/contact`;
+const REFERENCE_API_ROOT = `${config.serverRoot}/api-public/reference`;
+const WHITEBOARD_ROOT = `${config.serverRoot}/whiteboard`;
 
 const FAULT_TOLERANT_HTTP_TIMEOUT = 10000;
 const FAULT_TOLERANT_HTTP_MAX_RETRY_TIMEOUT = 100000;

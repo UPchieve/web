@@ -331,7 +331,7 @@
 import { mapState } from "vuex";
 
 import NetworkService from "@/services/NetworkService";
-import AnalyticsService from "@/services/AnalyticsService";
+// import AnalyticsService from "@/services/AnalyticsService";
 import LargeButton from "@/components/LargeButton";
 import { topics } from "@/utils/topics";
 import moment from "moment";
@@ -610,7 +610,7 @@ export default {
     submitFeedback() {
       if (this.isSubmittingFeedback) return;
       // analytics: tracking feedback response data
-      AnalyticsService.trackFeedback(this, this.user.isFakeUser);
+      // AnalyticsService.trackFeedback(this, this.user.isFakeUser);
 
       const responseData = this.userResponse;
       for (const key in responseData) {

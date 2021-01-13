@@ -42,6 +42,7 @@ import { mapState, mapGetters } from "vuex";
 import AuthService from "@/services/AuthService";
 import SidebarInfo from "./SidebarInfo";
 import SidebarLinks from "./SidebarLinks";
+import config from "../../../config";
 
 export default {
   components: { SidebarInfo, SidebarLinks },
@@ -68,7 +69,7 @@ export default {
       AuthService.logout(this);
     },
     backToWebsite() {
-      window.location = process.env.VUE_APP_MAIN_WEBSITE_URL;
+      window.location = config.mainWebsiteUrl;
     }
   }
 };

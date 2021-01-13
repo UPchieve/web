@@ -1,5 +1,5 @@
 import NetworkService from "./NetworkService";
-import AnalyticsService from "./AnalyticsService";
+// import AnalyticsService from "./AnalyticsService";
 
 import errorFromHttpResponse from "../utils/error-from-http-response.js";
 
@@ -7,16 +7,17 @@ export default {
   loading: false,
 
   endSession(context, sessionId) {
-    return NetworkService.endSession(context, { sessionId }).then(() => {
-      const currentSessionData = context.$store.state.user.session;
+    return NetworkService.endSession(context, { sessionId });
+    // .then(() => {
+    // const currentSessionData = context.$store.state.user.session;
 
-      // analytics: track when a help session has ended
-      AnalyticsService.trackSessionEnded(
-        context,
-        currentSessionData,
-        context.$store.state.user.isFakeUser
-      );
-    });
+    // analytics: track when a help session has ended
+    // AnalyticsService.trackSessionEnded(
+    //   context,
+    //   currentSessionData,
+    //   context.$store.state.user.isFakeUser
+    // );
+    // });
   },
 
   newSession(context, sessionType, sessionSubTopic, options) {
@@ -33,10 +34,10 @@ export default {
       const data = res.data || {};
       const { sessionId } = data;
 
-      const currentSession = {
-        sessionId,
-        data: context.$store.state.user.session
-      };
+      // const currentSession = {
+      //   sessionId,
+      //   data: context.$store.state.user.session
+      // };
 
       if (sessionId) {
         const sessionData = {
@@ -50,13 +51,13 @@ export default {
         context.$router.replace("/");
       }
       // analytics: track when a session has started
-      AnalyticsService.trackSessionStarted(
-        context,
-        currentSession,
-        sessionType,
-        sessionSubTopic,
-        context.$store.state.user.isFakeUser
-      );
+      // AnalyticsService.trackSessionStarted(
+      //   context,
+      //   currentSession,
+      //   sessionType,
+      //   sessionSubTopic,
+      //   context.$store.state.user.isFakeUser
+      // );
 
       return sessionId;
     });
