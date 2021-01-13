@@ -40,6 +40,20 @@
         :resourceId="material.resourceId"
       />
 
+      <p v-if="material.type === 'document'" class="material__document-link">
+        Are you having trouble viewing the document?
+        <a
+          :href="
+            `https://upc-training-materials.s3.us-east-2.amazonaws.com/${
+              material.resourceId
+            }.pdf`
+          "
+          target="_blank"
+          rel="noopener noreferrer"
+          >View here</a
+        >
+      </p>
+
       <button
         v-if="this.material.isRequired"
         :disabled="this.material.isCompleted"
@@ -220,6 +234,10 @@ export default {
           brightness(103%) contrast(96%);
       }
     }
+  }
+
+  &__document-link {
+    margin-top: 1em;
   }
 }
 </style>
