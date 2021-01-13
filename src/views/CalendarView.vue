@@ -63,7 +63,7 @@ import _ from "lodash";
 import moment from "moment-timezone";
 
 import CalendarService from "@/services/CalendarService";
-import AnalyticsService from "@/services/AnalyticsService";
+// import AnalyticsService from "@/services/AnalyticsService";
 
 const saveStates = {
   SAVED: "saved",
@@ -281,10 +281,10 @@ export default {
       });
 
       // analytics: tracking whether a user has updated their availability
-      AnalyticsService.trackNoProperties(
-        "updated availability",
-        this.user.isFakeUser
-      );
+      // AnalyticsService.trackNoProperties(
+      //   "updated availability",
+      //   this.user.isFakeUser
+      // );
     }
   }
 };
