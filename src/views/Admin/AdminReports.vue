@@ -144,21 +144,25 @@ export default {
           : ""
       };
 
-      const response = await NetworkService.adminGetSessionReport(data);
-      const {
-        body: { sessions }
-      } = response;
+      try {
+        const response = await NetworkService.adminGetSessionReport(data);
+        const {
+          body: { sessions }
+        } = response;
 
-      if (sessions.length === 0) {
-        this.error = "No sessions meet the criteria";
-      } else {
-        this.exportToCsv(
-          `${this.fileTitle} ${this.todaysDate} Session Report`,
-          sessions
-        );
+        if (sessions.length === 0) {
+          this.error = "No sessions meet the criteria";
+        } else {
+          this.exportToCsv(
+            `${this.fileTitle} ${this.todaysDate} Session Report`,
+            sessions
+          );
+        }
+
+        this.isGeneratingReport = false;
+      } catch (error) {
+        this.isGeneratingReport = false;
       }
-
-      this.isGeneratingReport = false;
     },
 
     async generateUsageReport() {
@@ -181,20 +185,24 @@ export default {
           : ""
       };
 
-      const response = await NetworkService.adminGetUsageReport(data);
-      const {
-        body: { students }
-      } = response;
+      try {
+        const response = await NetworkService.adminGetUsageReport(data);
+        const {
+          body: { students }
+        } = response;
 
-      if (students.length === 0) {
-        this.error = "No students meet the criteria";
-      } else {
-        this.exportToCsv(
-          `${this.fileTitle} ${this.todaysDate} Usage Report`,
-          students
-        );
+        if (students.length === 0) {
+          this.error = "No students meet the criteria";
+        } else {
+          this.exportToCsv(
+            `${this.fileTitle} ${this.todaysDate} Usage Report`,
+            students
+          );
+        }
+        this.isGeneratingReport = false;
+      } catch (error) {
+        this.isGeneratingReport = false;
       }
-      this.isGeneratingReport = false;
     },
 
     // https://gist.github.com/changhuixu/de092ee55a9e115abba988910bd68d41#file-csv-data-service-ts
