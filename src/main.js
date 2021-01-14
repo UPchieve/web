@@ -14,6 +14,8 @@ import PortalService from "./services/PortalService";
 import router from "./router";
 import store from "./store";
 import config from "./config";
+import posthog from 'posthog-js';
+window.location.href.indexOf('127.0.0.1') === -1 && posthog.init(`${config.posthogToken}`, {api_host: 'https://app.posthog.com'})
 
 // Prevent production tip on startup
 Vue.config.productionTip = false;

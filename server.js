@@ -52,7 +52,8 @@ function renderIndexHtml() {
     websocketRoot: process.env.VUE_APP_WEBSOCKET_ROOT,
     serverRoot: process.env.VUE_APP_SERVER_ROOT,
     socketAddress: process.env.VUE_APP_SOCKET_ADDRESS,
-    mainWebsiteUrl: process.env.VUE_APP_MAIN_WEBSITE_URL
+    mainWebsiteUrl: process.env.VUE_APP_MAIN_WEBSITE_URL,
+    posthogToken: process.env.VUE_APP_POSTHOG_TOKEN
   };
 
   return Mustache.render(template, config);
