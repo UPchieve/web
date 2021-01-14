@@ -71,11 +71,22 @@
     </div>
 
     <p class="error">{{ error }}</p>
+    <Loader v-if="isGeneratingReport" />
 
-    <button type="button" class="report-btn" @click="generateSessionReport">
+    <button
+      type="button"
+      class="report-btn"
+      @click="generateSessionReport"
+      :disabled="isGeneratingReport"
+    >
       Generate Session Report
     </button>
-    <button type="button" class="report-btn" @click="generateUsageReport">
+    <button
+      type="button"
+      class="report-btn"
+      @click="generateUsageReport"
+      :disabled="isGeneratingReport"
+    >
       Generate Usage Report
     </button>
   </div>
@@ -84,11 +95,12 @@
 <script>
 import NetworkService from "@/services/NetworkService";
 import SchoolList from "@/components/SchoolList";
+import Loader from "@/components/Loader";
 import moment from "moment";
 
 export default {
   name: "AdminReports",
-  components: { SchoolList },
+  components: { SchoolList, Loader },
 
   data() {
     return {
@@ -100,7 +112,8 @@ export default {
       studentPartnerOrg: {},
       studentPartnerSite: "",
       listedPartnerOrgs: [],
-      error: ""
+      error: "",
+      isGeneratingReport: false
     };
   },
   async mounted() {
@@ -112,6 +125,8 @@ export default {
   },
   methods: {
     async generateSessionReport() {
+      if (this.isGeneratingReport) return;
+      this.isGeneratingReport = true;
       this.error = "";
 
       const data = {
@@ -142,9 +157,13 @@ export default {
           sessions
         );
       }
+
+      this.isGeneratingReport = false;
     },
 
     async generateUsageReport() {
+      if (this.isGeneratingReport) return;
+      this.isGeneratingReport = true;
       this.error = "";
 
       const data = {
@@ -175,6 +194,7 @@ export default {
           students
         );
       }
+      this.isGeneratingReport = false;
     },
 
     // https://gist.github.com/changhuixu/de092ee55a9e115abba988910bd68d41#file-csv-data-service-ts
@@ -315,6 +335,11 @@ export default {
   &:hover {
     background-color: $c-success-green;
     color: white;
+  }
+
+  &:disabled {
+    color: #f1f3f6;
+    background-color: $c-secondary-grey;
   }
 }
 
