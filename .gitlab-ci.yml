@@ -40,8 +40,7 @@ build:
         --builder heroku/buildpacks:20 \
         --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
         --buildpack heroku/nodejs \
-        --buildpack heroku/procfile \
-        --env "NODE_ENV=production"
+        --buildpack heroku/procfile
     - docker tag "$image_tagged" "$image_latest"
     - docker push "$image_tagged"
     - docker push "$image_latest"
