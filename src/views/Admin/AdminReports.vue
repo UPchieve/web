@@ -338,7 +338,7 @@ export default {
   }
 
   &:disabled {
-    color: #f1f3f6;
+    color: $c-background-grey;
     background-color: $c-secondary-grey;
   }
 }
