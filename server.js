@@ -1,3 +1,4 @@
+require("newrelic");
 const express = require("express");
 const fs = require("fs");
 const Mustache = require("mustache");
