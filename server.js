@@ -3,15 +3,17 @@ const fs = require("fs");
 const Mustache = require("mustache");
 const logger = require("pino")();
 const path = require("path");
-const cacheControl = require("express-cache-controller")
+const cacheControl = require("express-cache-controller");
 
 const app = express();
 
 const indexHtml = renderIndexHtml();
 
-app.use(cacheControl({
-  noCache: true
-}));
+app.use(
+  cacheControl({
+    noCache: true
+  })
+);
 
 app.get("/healthz", function(req, res, next) {
   res.sendStatus(200);
@@ -22,11 +24,11 @@ app.use(express.static(path.join(__dirname, "dist")));
 
 app.use((req, res, next) => {
   if (req.path.includes("healthz")) {
-    next()
-    return
+    next();
+    return;
   }
   res.send(indexHtml).status(200);
-  next()
+  next();
 });
 
 app.listen(8080, () => {

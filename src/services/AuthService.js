@@ -17,7 +17,7 @@ export default {
       return Promise.reject("Invalid login form submission");
     }
 
-    return NetworkService.login(context, creds)
+    return NetworkService.login(context, creds);
     // .then(res => {
     //   const data = { ...res.data };
     //   if (!data) {
