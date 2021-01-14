@@ -71,11 +71,22 @@
     </div>
 
     <p class="error">{{ error }}</p>
+    <Loader v-if="isGeneratingReport" />
 
-    <button type="button" class="report-btn" @click="generateSessionReport">
+    <button
+      type="button"
+      class="report-btn"
+      @click="generateSessionReport"
+      :disabled="isGeneratingReport"
+    >
       Generate Session Report
     </button>
-    <button type="button" class="report-btn" @click="generateUsageReport">
+    <button
+      type="button"
+      class="report-btn"
+      @click="generateUsageReport"
+      :disabled="isGeneratingReport"
+    >
       Generate Usage Report
     </button>
   </div>
@@ -84,11 +95,12 @@
 <script>
 import NetworkService from "@/services/NetworkService";
 import SchoolList from "@/components/SchoolList";
+import Loader from "@/components/Loader";
 import moment from "moment";
 
 export default {
   name: "AdminReports",
-  components: { SchoolList },
+  components: { SchoolList, Loader },
 
   data() {
     return {
@@ -100,7 +112,8 @@ export default {
       studentPartnerOrg: {},
       studentPartnerSite: "",
       listedPartnerOrgs: [],
-      error: ""
+      error: "",
+      isGeneratingReport: false
     };
   },
   async mounted() {
@@ -112,6 +125,8 @@ export default {
   },
   methods: {
     async generateSessionReport() {
+      if (this.isGeneratingReport) return;
+      this.isGeneratingReport = true;
       this.error = "";
 
       const data = {
@@ -129,22 +144,30 @@ export default {
           : ""
       };
 
-      const response = await NetworkService.adminGetSessionReport(data);
-      const {
-        body: { sessions }
-      } = response;
+      try {
+        const response = await NetworkService.adminGetSessionReport(data);
+        const {
+          body: { sessions }
+        } = response;
 
-      if (sessions.length === 0) {
-        this.error = "No sessions meet the criteria";
-      } else {
-        this.exportToCsv(
-          `${this.fileTitle} ${this.todaysDate} Session Report`,
-          sessions
-        );
+        if (sessions.length === 0) {
+          this.error = "No sessions meet the criteria";
+        } else {
+          this.exportToCsv(
+            `${this.fileTitle} ${this.todaysDate} Session Report`,
+            sessions
+          );
+        }
+
+        this.isGeneratingReport = false;
+      } catch (error) {
+        this.isGeneratingReport = false;
       }
     },
 
     async generateUsageReport() {
+      if (this.isGeneratingReport) return;
+      this.isGeneratingReport = true;
       this.error = "";
 
       const data = {
@@ -162,18 +185,23 @@ export default {
           : ""
       };
 
-      const response = await NetworkService.adminGetUsageReport(data);
-      const {
-        body: { students }
-      } = response;
+      try {
+        const response = await NetworkService.adminGetUsageReport(data);
+        const {
+          body: { students }
+        } = response;
 
-      if (students.length === 0) {
-        this.error = "No students meet the criteria";
-      } else {
-        this.exportToCsv(
-          `${this.fileTitle} ${this.todaysDate} Usage Report`,
-          students
-        );
+        if (students.length === 0) {
+          this.error = "No students meet the criteria";
+        } else {
+          this.exportToCsv(
+            `${this.fileTitle} ${this.todaysDate} Usage Report`,
+            students
+          );
+        }
+        this.isGeneratingReport = false;
+      } catch (error) {
+        this.isGeneratingReport = false;
       }
     },
 
@@ -315,6 +343,11 @@ export default {
   &:hover {
     background-color: $c-success-green;
     color: white;
+  }
+
+  &:disabled {
+    color: $c-background-grey;
+    background-color: $c-secondary-grey;
   }
 }
 
