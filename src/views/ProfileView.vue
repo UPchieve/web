@@ -91,6 +91,32 @@
             </div>
           </div>
 
+          <div v-if="isNotificationPermissionGranted" class="container-section">
+            <div class="prompt">Browser Notifications</div>
+            <div class="answer">
+              <toggle-button
+                :value="isAllowingNotifications"
+                :labels="{ checked: 'On', unchecked: 'Off' }"
+                :width="95"
+                :color="{
+                  checked: '#16D2AA',
+                  unchecked: '#F44747',
+                  disabled: '#AAAAAA'
+                }"
+                @change="toggleWebNotifications"
+                :sync="true"
+              />
+            </div>
+            <div v-if="user.isVolunteer" class="description">
+              Browser alerts when a student appears on the dashboard waitlist
+              and when a student sends a message while you’re not looking.
+            </div>
+            <div v-else class="description">
+              Browser alerts when a coach joins your session and when a coach
+              sends a message while you’re not looking.
+            </div>
+          </div>
+
           <div class="container-section resetBtn">
             <router-link to="/resetpassword" class="prompt"
               >Reset password</router-link
@@ -125,11 +151,15 @@ import { mapGetters, mapState } from "vuex";
 import UserService from "@/services/UserService";
 import { topics, allSubtopics } from "@/utils/topics";
 import DeactivateAccountModal from "./DeactivateAccountModal";
+import setNotificationPermission from "@/utils/set-notification-permission";
+import getNotificationPermission from "@/utils/get-notification-permission";
+import VuePhoneNumberInput from "vue-phone-number-input";
 
 export default {
   name: "profile-view",
   components: {
-    DeactivateAccountModal
+    DeactivateAccountModal,
+    VuePhoneNumberInput
   },
   data() {
     return {
@@ -141,10 +171,12 @@ export default {
       phoneNational: "",
       phoneInputInfo: {},
       isAccountActive: true,
+      isAllowingNotifications: true,
       showDeactivateAccountModal: false
     };
   },
   created() {
+    this.isAllowingNotifications = getNotificationPermission() === "granted";
     this.isAccountActive = !this.user.isDeactivated;
     if (this.user.isVolunteer && this.user.phone) {
       const num =
@@ -209,6 +241,9 @@ export default {
       }, {});
 
       return subjects;
+    },
+    isNotificationPermissionGranted() {
+      return "Notification" in window && Notification.permission === "granted";
     }
   },
   methods: {
@@ -226,6 +261,12 @@ export default {
 
     toggleDeactivatedAccountModal() {
       this.showDeactivateAccountModal = !this.showDeactivateAccountModal;
+    },
+
+    toggleWebNotifications({ value }) {
+      const permission = value ? "granted" : "denied";
+      this.isAllowingNotifications = value;
+      setNotificationPermission(permission);
     },
 
     setIsAccountActive(value) {

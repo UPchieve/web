@@ -37,7 +37,10 @@
           'chat-container--hidden': shouldHideChatSection
         }"
       >
-        <session-chat />
+        <session-chat
+          :shouldHideChatSection="shouldHideChatSection"
+          :setHasSeenNewMessage="setHasSeenNewMessage"
+        />
       </div>
     </div>
     <div
@@ -46,7 +49,13 @@
       id="toggleButton"
       @click="toggleAuxiliary"
     >
-      <img id="toggleIcon" :src="toggleIconSrc" />
+      <div class="toggleButton__wrapper">
+        <span
+          class="toggleButton__message-indicator"
+          v-if="!hasSeenNewMessage"
+        ></span>
+        <img id="toggleIcon" :src="toggleIconSrc" />
+      </div>
     </div>
     <div
       v-if="showPhotoUpload"
@@ -56,6 +65,10 @@
     >
       <photo-upload-icon class="photo-upload--icon" />
     </div>
+    <web-notifications-modal
+      v-if="showNotificationModal"
+      :closeModal="() => setShowNotificationModal(false)"
+    />
   </div>
 </template>
 
@@ -72,6 +85,8 @@ import SessionFulfilledModal from "./SessionFulfilledModal";
 import ConnectionTroubleModal from "./ConnectionTroubleModal";
 import PhotoUploadIcon from "@/assets/whiteboard_icons/photo-upload.svg";
 import isOutdatedMobileAppVersion from "@/utils/is-outdated-mobile-app-version";
+import WebNotificationsModal from "@/components/WebNotificationsModal";
+import getNotificationPermission from "@/utils/get-notification-permission";
 
 const headerData = {
   component: "SessionHeader"
@@ -84,7 +99,8 @@ export default {
     SessionChat,
     Whiteboard,
     PhotoUploadIcon,
-    DocumentEditor
+    DocumentEditor,
+    WebNotificationsModal
   },
   created() {
     if (this.mobileMode) {
@@ -107,7 +123,9 @@ export default {
   data() {
     return {
       auxiliaryOpen: false,
-      sessionId: null
+      sessionId: null,
+      hasSeenNewMessage: true,
+      showNotificationModal: false
     };
   },
   computed: {
@@ -212,6 +230,16 @@ export default {
         if (!this.$socket.connected) await this.$socket.connect();
         this.joinSession(sessionId);
         this.$store.dispatch("user/sessionConnected");
+
+        if (
+          (this.user.isVolunteer &&
+            (!this.user.isOnboarded || !this.user.isApproved)) ||
+          this.isMobileApp
+        )
+          this.showNotificationModal = false;
+
+        if (getNotificationPermission() === "default")
+          this.showNotificationModal = true;
       })
       .catch(err => {
         if (err.status !== 0 && err.code !== "EUSERABORTED") {
@@ -263,6 +291,8 @@ export default {
         document.getElementById("toggleButton").classList.remove("back");
         this.auxiliaryOpen = false;
       }
+
+      if (this.shouldHideAuxiliarySection) this.hasSeenNewMessage = true;
     },
     joinSession(sessionId) {
       this.$queuedSocket.emit(
@@ -306,6 +336,12 @@ export default {
     },
     openFileDialog() {
       document.querySelector(".upload-photo").click();
+    },
+    setHasSeenNewMessage(value) {
+      this.hasSeenNewMessage = value;
+    },
+    setShowNotificationModal(value) {
+      this.showNotificationModal = value;
     }
   },
   watch: {
@@ -456,6 +492,21 @@ export default {
     width: 26px;
     height: 26px;
   }
+}
+
+.toggleButton__wrapper {
+  position: relative;
+}
+
+.toggleButton__message-indicator {
+  position: absolute;
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: $c-error-red;
+  top: 0;
+  right: 0;
+  border-radius: 50%;
 }
 
 .photo-upload--hidden {

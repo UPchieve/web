@@ -216,11 +216,13 @@ import * as Sentry from "@sentry/browser";
 import FormPageTemplate from "@/components/FormPageTemplate";
 import AuthService from "@/services/AuthService";
 import NetworkService from "@/services/NetworkService";
+import VuePhoneNumberInput from "vue-phone-number-input";
 
 export default {
   name: "volunteer-partner-signup-view",
   components: {
-    FormPageTemplate
+    FormPageTemplate,
+    VuePhoneNumberInput
   },
   beforeRouteEnter(to, from, next) {
     const partnerId = to.params.partnerId;

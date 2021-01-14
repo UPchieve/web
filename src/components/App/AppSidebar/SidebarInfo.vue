@@ -1,7 +1,7 @@
 <template>
   <div class="SidebarInfo">
     <template v-if="authenticated">
-      <img class="SidebarInfo-avatar" :src="avatarUrl" />
+      <img class="SidebarInfo-avatar" :src="avatarUrl" alt="" />
       <div class="SidebarInfo-name">{{ name }}</div>
       <div class="SidebarInfo-type">{{ type }}</div>
       <div class="SidebarInfo-status">

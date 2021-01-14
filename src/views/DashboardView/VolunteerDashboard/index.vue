@@ -12,6 +12,7 @@
       <template v-if="user.isApproved && user.isOnboarded">
         <div class="dashboard-card">
           <div class="students-waiting">
+            <web-notifications-button class="notifications-button" />
             <div class="dashboard-card__title">Waiting Students</div>
             <div v-if="isSessionAlive">
               <button
@@ -46,6 +47,14 @@
               </div>
             </div>
           </div>
+
+          <a
+            class="track-hours-link"
+            href="https://upc-training-materials.s3.us-east-2.amazonaws.com/volunteer-hour-tracking-guide.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            >How to track your volunteer hours <arrow-icon class="arrow-icon" />
+          </a>
         </div>
       </template>
       <template v-else>
@@ -138,6 +147,8 @@ import VerificationIcon from "@/assets/verification.svg";
 import OnboardingIcon from "@/assets/onboarding.svg";
 import TrainingIcon from "@/assets/training_icon.svg";
 import { allSubtopicNames } from "@/utils/topics";
+import WebNotificationsButton from "@/components/WebNotificationsButton.vue";
+import ArrowIcon from "@/assets/arrow.svg";
 
 const headerData = {
   component: "RejoinSessionHeader",
@@ -156,7 +167,9 @@ export default {
     ReferencesModal,
     VerificationIcon,
     OnboardingIcon,
-    VolunteerWelcomeModal
+    VolunteerWelcomeModal,
+    WebNotificationsButton,
+    ArrowIcon
   },
   watch: {
     isSessionAlive(isAlive) {
@@ -699,5 +712,32 @@ export default {
       text-decoration: none;
     }
   }
+}
+
+.notifications-button {
+  @include flex-container(row, flex-end);
+  margin-bottom: 1.4em;
+}
+
+.track-hours-link {
+  @include font-category("button");
+  display: inline-flex;
+  align-items: center;
+  margin: 0 auto;
+  padding: 0;
+  color: $c-success-green;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.arrow-icon {
+  fill: $c-success-green;
+  height: 16px;
+  width: 16px;
+  margin-top: 2px;
+  margin-left: 8px;
 }
 </style>

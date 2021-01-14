@@ -2,7 +2,13 @@
 
 > Online tutoring platform built with Vue.js and Webpack
 
-[![CircleCI](https://circleci.com/gh/UPchieve/web.svg?style=svg)](https://circleci.com/gh/UPchieve/web) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](code_of_conduct.md)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
+
+[Contributing Guide](CONTRIBUTING.md)
+
+## GITLAB
+
+NOTE: Active development on this project has moved to https://gitlab.com/upchieve/high-line, no more pushes should go straight to the Github repo.
 
 ## Build Setup
 

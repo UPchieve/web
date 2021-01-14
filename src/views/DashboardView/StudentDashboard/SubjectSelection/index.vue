@@ -70,17 +70,13 @@ export default {
 
     // Temporarily hide Statistics and Calculus BC from students
     cards[0].subtopics = cards[0].subtopics.filter(subject => {
-      const temporarilyHiddenSubjects = ["statistics", "calculusBC"];
+      const temporarilyHiddenSubjects = ["calculusBC"];
       return !temporarilyHiddenSubjects.includes(subject);
     });
 
     // Temporarily hide Physics subjects and Environmental Science from students
     cards[1].subtopics = cards[1].subtopics.filter(subject => {
-      const temporarilyHiddenSubjects = [
-        "physicsOne",
-        "physicsTwo",
-        "environmentalScience"
-      ];
+      const temporarilyHiddenSubjects = ["physicsTwo", "environmentalScience"];
       return !temporarilyHiddenSubjects.includes(subject);
     });
 
