@@ -24,6 +24,9 @@ if (configElement !== null) {
   passedConfig.zwibblerUrl.includes("{{")
     ? (config.zwibblerUrl = process.env.VUE_APP_ZWIBBLER_URL)
     : (config.zwibblerUrl = passedConfig.zwibblerUrl);
+  passedConfig.posthogToken.includes("{{")
+    ? (config.posthogToken = process.env.VUE_APP_POSTHOG_TOKEN)
+    : (config.posthogToken = passedConfig.posthogToken);
 } else {
   // tests don't include the index.html file
   // so we have to populate these without it
@@ -32,6 +35,7 @@ if (configElement !== null) {
   config.socketAddress = process.env.VUE_APP_WEBSOCKET_ADDRESS;
   config.websocketRoot = process.env.VUE_APP_MAIN_WEBSOCKET_ROOT;
   config.zwibblerUrl = process.env.VUE_APP_ZWIBBLER_URL;
+  config.posthogToken = process.env.VUE_APP_POSTHOG_TOKEN;
 }
 
 export default config;
