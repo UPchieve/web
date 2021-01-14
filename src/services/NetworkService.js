@@ -1,6 +1,6 @@
-import Vue from "vue";
-import promiseRetry from "promise-retry";
 import errcode from "err-code";
+import promiseRetry from "promise-retry";
+import Vue from "vue";
 
 const AUTH_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/auth`;
 const API_ROOT = `${process.env.VUE_APP_SERVER_ROOT}/api`;
@@ -388,7 +388,9 @@ export default {
       studentPartnerSite
     }).toString();
     return Vue.http
-      .get(`${API_ROOT}/reports/session-report?${queryParams}`)
+      .get(`${API_ROOT}/reports/session-report?${queryParams}`, {
+        timeout: 300000
+      })
       .then(this._successHandler, this._errorHandler);
   },
   adminGetUsageReport({
@@ -410,7 +412,9 @@ export default {
       studentPartnerSite
     }).toString();
     return Vue.http
-      .get(`${API_ROOT}/reports/usage-report?${queryParams}`)
+      .get(`${API_ROOT}/reports/usage-report?${queryParams}`, {
+        timeout: 300000
+      })
       .then(this._successHandler, this._errorHandler);
   },
   adminGetStudentPartners() {
