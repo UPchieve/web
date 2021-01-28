@@ -118,10 +118,20 @@ export default {
             }
           ];
           break;
+        case "satReading":
+          this.reviewMaterials = [
+            {
+              title: "SAT Reading Review Guide",
+              pdf: require(`../assets/review_materials/satReading/sat-reading-review-guide.pdf`),
+              image: require(`../assets/review_materials/satReading/sat-reading-review-guide.png`)
+            }
+          ];
+          break;
         case "chemistry":
         case "environmentalScience":
         case "calculusBC":
         case "calculusAB":
+        case "satMath":
           this.reviewMaterials = [];
           break;
         // case for a user entering a subject that we do not support

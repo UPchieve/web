@@ -144,7 +144,12 @@ export default {
     }),
 
     auxiliaryType() {
-      const documentEditorSubTopics = ["planning", "essays", "applications"];
+      const documentEditorSubTopics = [
+        "planning",
+        "essays",
+        "applications",
+        "satReading"
+      ];
       if (documentEditorSubTopics.includes(this.session.subTopic))
         return "DOCUMENT";
       else return "WHITEBOARD";

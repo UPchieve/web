@@ -81,8 +81,8 @@ export default {
       subjectTypes: [
         { displayName: "Math", key: "math" },
         { displayName: "Science", key: "science" },
-        { displayName: "College Counseling", key: "college" }
-        // { displayName: "Standardized Testing", key: "sat" }
+        { displayName: "College Counseling", key: "college" },
+        { displayName: "Standardized Testing", key: "sat" }
       ],
       currentSubjectType: "math",
       math: {
@@ -285,8 +285,9 @@ export default {
       },
       sat: {
         training: [
-          { displayName: "UPchieve 101", key: "upchieve101" },
-          { displayName: "SAT Strategies ", key: "satStrategies" }
+          { displayName: "UPchieve 101", key: "upchieve101" }
+          // Hide until SAT Strategies is completed
+          // { displayName: "SAT Strategies ", key: "satStrategies" }
         ],
         certifications: [
           {
