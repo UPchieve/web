@@ -33,7 +33,7 @@
     "express": "^4.17.1",
     "express-cache-controller": "^1.1.0",
     "jquery": "^3.5.0",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.26",
     "mustache": "^4.0.1",
