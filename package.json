@@ -22,7 +22,7 @@
     "@sentry/browser": "^5.9.0",
     "@sentry/integrations": "^5.8.0",
     "awesome-phonenumber": "^2.20.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.2",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^23.6.0",
