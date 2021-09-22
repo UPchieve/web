@@ -8,7 +8,7 @@
 
 ## GITLAB
 
-NOTE: Active development on this project has moved to https://gitlab.com/upchieve/high-line, no more pushes should go straight to the Github repo.
+NOTE: Active development on this project has moved to https://gitlab.com/upchieve/subway, no more pushes should go straight to the Github repo.
 
 ## Build Setup
 
