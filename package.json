@@ -38,7 +38,7 @@
     "moment-timezone": "^0.5.26",
     "mustache": "^4.0.1",
     "newrelic": "^7.1.0",
-    "node-sass": "^4.14.1",
+    "node-sass": "^7.0.0",
     "pino": "^6.7.0",
     "portal-gun": "git://github.com/claydotio/portal-gun.git",
     "promise-retry": "^1.1.1",
