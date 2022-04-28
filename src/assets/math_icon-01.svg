@@ -1,0 +1,11 @@
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 24 24" xml:space="preserve">
+  <style>
+    .st0{fill:#fff}
+  </style>
+  <path class="st0" d="M22 1c.6 0 1 .5 1 1v20c0 .6-.5 1-1 1H2c-.6 0-1-.5-1-1V2c0-.6.5-1 1-1h20m0-1H2C.9 0 0 .9 0 2v20c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2z"/>
+  <path class="st0" d="M6.5 4.2h1v6h-1z"/>
+  <path class="st0" d="M4 6.7h6v1H4zM14 6.7h6v1h-6zM14.5 15.4l4.2 4.2.7-.7-4.2-4.2-.7.7z"/>
+  <path class="st0" d="M14.5 18.9l.7.7 4.2-4.2-.7-.7-4.2 4.2zM4 16.7h6v1H4z"/>
+  <circle class="st0" cx="7" cy="15.2" r=".7"/>
+  <circle class="st0" cx="7" cy="19.1" r=".7"/>
+</svg>

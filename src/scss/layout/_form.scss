@@ -1,0 +1,253 @@
+.uc-form {
+  @include flex-container(column);
+  $size: 500px;
+
+  background: white;
+  font-size: 16px;
+
+  width: 100%;
+  max-width: $size;
+  min-height: $size;
+
+  // NOTE: this is to override bootstrap
+  a {
+    color: #73737a;
+  }
+}
+
+.uc-form-header {
+  @include flex-container(row, space-between);
+  padding: 25px;
+  padding-bottom: 0;
+}
+
+.uc-form-header-link {
+  $className: &;
+
+  color: #73737a;
+  font-weight: 600;
+
+  &--active {
+    @extend #{$className};
+    color: $c-accent;
+  }
+}
+
+.uc-form-body {
+  @include flex-container(column);
+  @include child-spacing(top, 25px);
+
+  margin: auto 0;
+  padding: 50px;
+
+  @include breakpoint-below("medium") {
+    padding: 50px 20px;
+  }
+
+  &--center {
+    @include flex-container(column, center, center);
+  }
+
+  h3 {
+    line-height: 1.3em;
+  }
+}
+
+.uc-form-text {
+  @include breakpoint-above("small") {
+    padding: 0 25px;
+  }
+}
+
+.uc-form-label {
+  color: #343440;
+  font-weight: 400;
+  text-align: left;
+  margin: 0;
+}
+
+.uc-form-input {
+  border: none;
+  border-bottom: 3px solid $c-accent;
+  border-radius: 0;
+  box-shadow: none;
+
+  box-sizing: content-box;
+  padding: 6px 12px;
+
+  height: 30px;
+
+  &:focus {
+    outline: none;
+    border-bottom: 3px solid darken($c-accent, 15%);
+  }
+
+  &--invalid {
+    border-bottom: 3px solid #BF0000;
+  }
+}
+
+.uc-form-select {
+  width: 100%;
+  margin: 5px 0 0;
+
+  &--invalid {
+    .vs__dropdown-toggle {
+      border-color: $c-error-red;
+    }
+  }
+}
+
+.uc-form-subtext {
+  color: #73737a;
+  font-size: 12px;
+  margin: 6px 0 0 0;
+  text-align: left;
+}
+
+.uc-form-button {
+  background-color: #f6f6f6;
+  border: none;
+  border-radius: 20px;
+  color: $c-accent;
+
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+
+  min-height: 40px;
+
+  &:hover,
+  &:active {
+    color: white;
+    background-color: $c-accent;
+  }
+
+  &:disabled {
+    background-color: #f6f6f6;
+    color: $c-secondary-grey;
+  }
+}
+
+.uc-form-button-big {
+  font-size: 14px;
+  background-color: $c-background-grey;
+  border: none;
+  border-radius: 50px;
+  color: $c-soft-black;
+  padding: 13px 32px;
+  font-weight: 500;
+  min-width: 250px;
+
+  &:hover,
+  &:active {
+    color: white;
+    background-color: $c-accent;
+  }
+
+  &:disabled {
+    background-color: #f6f6f6;
+    color: $c-secondary-grey;
+  }
+}
+
+/// Helper class for creating a basic form checkbox.
+///
+/// @example
+///   <div class="uc-form-checkbox">
+///     <input id="my-checkbox" type="checkbox" />
+///     <label for="my-checkbox">My Checkbox</label>
+///   </div>
+.uc-form-checkbox {
+  @include flex-container(row, flex-start, center);
+
+  input[type="checkbox"] {
+    @include flex-container(row, center, center);
+    $size: 20px;
+
+    -webkit-appearance: none;
+    background-color: #f6f6f6;
+    border-radius: 3px;
+    border: 1px solid #99a1a7;
+    box-shadow: none;
+
+    min-width: $size;
+    width: $size;
+    min-height: $size;
+    height: $size;
+
+    margin: 0;
+
+    &:checked {
+      background-color: white;
+      color: $c-accent;
+      font-size: 14px;
+
+      &:after {
+        content: '✔';
+      }
+    }
+  }
+
+  label {
+    font-size: 12px;
+    color: #343440;
+    margin: 0 0 0 15px;
+    text-align: left;
+
+    a {
+      color: $c-accent;
+    }
+  }
+}
+
+.uc-autocomplete {
+  width: 100%;
+
+  &-input {
+    border: none;
+    border-bottom: 3px solid $c-accent;
+    border-radius: 0;
+    box-shadow: none;
+
+    box-sizing: border-box;
+    padding: 6px 12px;
+
+    width: 100%;
+    height: 45px;
+
+    &:focus {
+      outline: none;
+      border-bottom: 3px solid darken($c-accent, 15%);
+    }
+  }
+
+  &-result-list {
+    width: 100%;
+    font-size: 14px;
+    background: #fff;
+    list-style: none;
+    padding: 0;
+    max-height: 180px;
+    overflow: auto;
+    border: solid 1px #ccc;
+    border-top: none;
+    border-radius: 5px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    margin-top: 0px;
+  }
+
+  &-result {
+    width: 100%;
+    text-align: left;
+    white-space: nowrap;
+    padding: 10px 12px;
+    cursor: pointer;
+
+    &:hover,
+    &[aria-selected=true] {
+      background: #eee;
+    }
+  }
+}

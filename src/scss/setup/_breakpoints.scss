@@ -1,0 +1,43 @@
+/// Breakpoint key-value pairs
+$breakpoint-map: (
+  'tiny': 414px,
+  'small': 576px,
+  'medium': 768px,
+  'large': 992px,
+  'huge': 1200px,
+  'massive': 1800px
+);
+
+/// Returns a breakpoint by key.
+/// @requires {function} $validate-map-key
+/// @param {string} $key - Key in $breakpoint-map
+/// @return {number} width
+@function get-breakpoint($key) {
+  @return validate-map-key($breakpoint-map, $key);
+}
+
+/// Media query helper. Activates above a minimum width.
+/// @param {string} $key - Key in $breakpoint-map
+@mixin breakpoint-above($key) {
+  @media screen and (min-width: get-breakpoint($key)) {
+    @content;
+  }
+}
+
+/// Media query helper. Activates below a maximum width.
+/// @param {string} $key - Key in $breakpoint-map
+@mixin breakpoint-below($key) {
+  @media screen and (max-width: get-breakpoint($key) - 0.02px) {
+    @content;
+  }
+}
+
+/// Media query helper for iPhone 11, iPhone 11 Pro, iPhone Xs screens.
+/// @param {string} $key - Key in $breakpoint-map
+@mixin breakpoint-latest-iphones() {
+  @media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2),
+    only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3),
+    only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+    @content;
+  }
+}

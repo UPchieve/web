@@ -1,0 +1,208 @@
+.training {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-row-gap: 2ch;
+
+  @include breakpoint-above("large") {
+    grid-template-columns: 0.6fr 1fr 0.8fr;
+    overflow-y: scroll;
+  }
+
+  @include breakpoint-above("huge") {
+    grid-template-columns: 1fr 1fr 1fr;
+    overflow-y: auto;
+  }
+
+  &__header {
+    @include font-category("subheading");
+    text-transform: uppercase;
+    background-color: $c-backdrop;
+    padding: 0.4em;
+
+    &:first-child {
+      text-align: left;
+      border-top-left-radius: 5px;
+      border-bottom-left-radius: 5px;
+      padding-left: 3em;
+    }
+
+    &:last-child {
+      padding-right: 2em;
+      border-top-right-radius: 5px;
+      border-bottom-right-radius: 5px;
+    }
+  }
+
+  &__progress-bar {
+    width: 100%;
+    border: none;
+    border-radius: 10rem;
+    height: 20px;
+    grid-column-start: span 3;
+    position: relative;
+    background-color: $c-background-grey;
+
+    &--bg {
+      width: 100%;
+      background-color: $c-success-green;
+      height: 100%;
+      border-radius: 10rem;
+    }
+
+    &--number {
+      color: white;
+    }
+
+    &--number-center {
+      position: absolute;
+      left: 0;
+      right: 0;
+      color: $c-soft-black;
+    }
+
+    @include breakpoint-above("small") {
+      width: 50%;
+    }
+
+    @include breakpoint-above("large") {
+      width: 90%;
+      align-self: center;
+      justify-self: center;
+      grid-column-start: auto;
+    }
+
+    @include breakpoint-above("huge") {
+      width: 70%;
+    }
+  }
+
+  &__cert {
+    @include flex-container(row, flex-start, center);
+    align-self: center;
+    text-align: left;
+    grid-column-start: span 3;
+
+    @include breakpoint-above("large") {
+      grid-column-start: auto;
+    }
+    @include breakpoint-above("large") {
+      padding-left: 3em;
+    }
+
+    &-title {
+      @include flex-container(column, flex-start, flex-start);
+      margin-left: 2em;
+
+      @include breakpoint-above("large") {
+        width: 100px;
+      }
+      @include breakpoint-above("huge") {
+        min-width: 125px;
+      }
+    }
+  }
+
+  &__row-border {
+    grid-column-start: span 3;
+    background-color: $c-background-grey;
+    height: 2px;
+
+    &:last-child {
+      display: none;
+    }
+  }
+
+  &__subjects-unlocked {
+    @include flex-container(row, flex-start, center);
+    grid-column-start: span 3;
+    flex-flow: row wrap;
+
+    @include breakpoint-above("large") {
+      @include flex-container(column, center, center);
+      height: auto;
+      flex-flow: column wrap;
+      margin: 0 auto;
+      width: 80%;
+      grid-column-start: auto;
+    }
+
+    @include breakpoint-above("huge") {
+      @include flex-container(column, center, center);
+      height: 70px;
+    }
+
+    &--subject {
+      font-size: 12px;
+      color: $c-soft-black;
+      display: inline-block;
+      margin-right: 1em;
+    }
+
+    &--mobile {
+      display: inline-block;
+      margin-right: 1em;
+      font-size: 12px;
+    }
+  }
+
+  &__status {
+    color: $c-secondary-grey;
+
+    &--progress {
+      color: $c-warning-orange;
+    }
+
+    &--completed,
+    &--unlocked {
+      color: $c-success-green;
+    }
+
+    &--error {
+      color: $c-error-red;
+    }
+  }
+}
+
+.action-btns {
+  @include flex-container(row, flex-start, center);
+  grid-column-start: span 3;
+
+  @include breakpoint-above("large") {
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    justify-self: center;
+    grid-column-start: auto;
+  }
+
+  @media only screen and (min-width: 992px) and (max-width: 1280px) {
+    display: initial;
+  }
+
+  &__quiz-btn {
+    width: 180px;
+  }
+
+  &__review-link {
+    @include flex-container(row, flex-start, center);
+    color: $c-success-green;
+    margin-right: 1.5em;
+    align-self: start;
+
+    &--text {
+      margin-right: 0.4em;
+    }
+
+    &--arrow-icon {
+      width: 20px;
+      fill: $c-success-green;
+    }
+    &:hover {
+      color: $c-secondary-grey;
+    }
+
+    &:hover &--arrow-icon {
+      fill: $c-secondary-grey;
+    }
+  }
+}

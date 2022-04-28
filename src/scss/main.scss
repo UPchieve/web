@@ -1,0 +1,37 @@
+// This file is imported in App.vue.
+
+@import '~bootstrap/scss/bootstrap';
+@import '~bootstrap-vue/src/index.scss';
+@import '~typeface-work-sans/index.css';
+@import '~vue-select/src/scss/vue-select.scss';
+@import '~vue-phone-number-input/dist/vue-phone-number-input.css';
+@import "~quill/dist/quill.core.css";
+@import "~quill/dist/quill.snow.css";
+@import "~gleap/build/index.min.css";
+@import '~@/assets/fonts/upchieve_icon_font.css';
+
+@import 'layout/utils';
+@import 'layout/form';
+@import 'layout/modal';
+@import 'layout/training';
+
+html {
+  height: 100%;
+}
+
+body {
+  background: $c-background-grey;
+  color: $c-soft-black;
+
+  font-family: $font-family-default;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  text-align: center;
+
+  height: 100%;
+}
+
+.disable-scroll {
+  overflow: hidden;
+}

@@ -1,0 +1,27 @@
+// vue-select overrides
+$vs-border-color: $c-border-grey;
+
+.v-select {
+  .vs__dropdown-toggle {
+    padding: 5px 9px 9px 6px;
+  }
+}
+
+// vue-phone-number-input overrides
+.vue-phone-number-input {
+  @include breakpoint-below("medium") {
+    .input-phone-number {
+      .field-input {
+        padding-top: 0 !important;
+      }
+
+      .field-label {
+        display: none !important;
+      }
+    }
+  }
+}
+
+.profile #VuePhoneNumberInput_phone_number {
+  margin-left: -1px !important;
+}
