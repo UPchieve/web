@@ -12,17 +12,17 @@ import MobileAppNoticeBanner from './MobileAppNoticeBanner'
 export default {
   components: {
     BannerTemplate,
-    MobileAppNoticeBanner
+    MobileAppNoticeBanner,
   },
   computed: {
     ...mapState({
-      bannerComponent: state => state.app.banner.component
-    })
+      bannerComponent: (state) => state.app.banner.component,
+    }),
   },
   methods: {
     onCancel() {
       this.$store.dispatch('app/banner/hide')
-    }
-  }
+    },
+  },
 }
 </script>

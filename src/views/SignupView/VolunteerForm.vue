@@ -26,7 +26,7 @@
         type="email"
         class="uc-form-input"
         v-bind:class="{
-          'uc-form-input--invalid': invalidInputs.indexOf('inputEmail') > -1
+          'uc-form-input--invalid': invalidInputs.indexOf('inputEmail') > -1,
         }"
         v-model="credentials.email"
         required
@@ -48,7 +48,7 @@
         type="password"
         class="uc-form-input"
         v-bind:class="{
-          'uc-form-input--invalid': invalidInputs.indexOf('inputPassword') > -1
+          'uc-form-input--invalid': invalidInputs.indexOf('inputPassword') > -1,
         }"
         v-model="credentials.password"
         required
@@ -60,9 +60,7 @@
       </p>
     </div>
 
-    <button class="uc-form-button" type="submit">
-      Continue
-    </button>
+    <button class="uc-form-button" type="submit">Continue</button>
 
     <div v-if="msg !== ''" role="alert">{{ msg }}</div>
   </form>
@@ -115,7 +113,7 @@
         type="text"
         class="uc-form-input"
         v-bind:class="{
-          'uc-form-input--invalid': invalidInputs.indexOf('firstName') > -1
+          'uc-form-input--invalid': invalidInputs.indexOf('firstName') > -1,
         }"
         v-model="profile.firstName"
         required
@@ -131,7 +129,7 @@
         type="text"
         class="uc-form-input"
         v-bind:class="{
-          'uc-form-input--invalid': invalidInputs.indexOf('lastName') > -1
+          'uc-form-input--invalid': invalidInputs.indexOf('lastName') > -1,
         }"
         v-model="profile.lastName"
         required
@@ -191,7 +189,7 @@ import Loader from '@/components/Loader'
 export default {
   components: {
     VuePhoneNumberInput,
-    Loader
+    Loader,
   },
   data() {
     return {
@@ -201,16 +199,16 @@ export default {
       credentials: {
         email: '',
         password: '',
-        terms: false
+        terms: false,
       },
       profile: {
         firstName: '',
         lastName: '',
-        phone: ''
+        phone: '',
       },
       step: 'step-1',
       phoneInputInfo: {},
-      isRegistering: false
+      isRegistering: false,
     }
   },
   mounted() {
@@ -244,13 +242,13 @@ export default {
       // check credentials
       AuthService.checkRegister(this, {
         email: this.credentials.email,
-        password: this.credentials.password
+        password: this.credentials.password,
       })
         .then(() => {
           this.step = 'step-2'
           this.$router.push('/sign-up/volunteer/about')
         })
-        .catch(err => {
+        .catch((err) => {
           this.msg = err.message
           if (err.status !== 409 && err.status !== 422) {
             Sentry.captureException(err)
@@ -295,13 +293,13 @@ export default {
         terms: this.credentials.terms,
         firstName: this.profile.firstName,
         lastName: this.profile.lastName,
-        phone: this.phoneInputInfo.e164
+        phone: this.phoneInputInfo.e164,
       })
         .then(() => {
           this.isRegistering = false
           this.$router.push('/verify')
         })
-        .catch(err => {
+        .catch((err) => {
           this.isRegistering = false
           this.msg = err.message
           if (err.status !== 409 && err.status !== 422) {
@@ -311,8 +309,8 @@ export default {
     },
     onPhoneInputUpdate(phoneInputInfo) {
       this.phoneInputInfo = phoneInputInfo
-    }
-  }
+    },
+  },
 }
 </script>
 

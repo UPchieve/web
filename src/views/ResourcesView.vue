@@ -1,8 +1,6 @@
 <template>
   <div class="resources-page">
-    <div class="header">
-      Resources for Students
-    </div>
+    <div class="header">Resources for Students</div>
     <div class="description">
       Below are some sites that we think every student should be familiar with.
     </div>
@@ -86,63 +84,63 @@ import { mapState } from 'vuex'
 
 export default {
   computed: {
-    ...mapState({ user: state => state.user.user })
-  }
+    ...mapState({ user: (state) => state.user.user }),
+  },
 }
 </script>
 
 <style lang="scss" scoped>
 .resources-page {
-  border-radius: 8px;
-  padding: 40px 20px;
-  margin: 40px 20px;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  border-radius: 8px
+  padding: 40px 20px
+  margin: 40px 20px
+  background: #fff
+  display: flex
+  flex-direction: column
+  align-items: flex-start
 
   @include breakpoint-above('large') {
-    margin: 40px;
-    padding: 40px;
+    margin: 40px
+    padding: 40px
   }
 }
 
 .header {
-  color: $c-soft-black;
-  font-size: 24px;
-  font-weight: 500;
+  color: $c-soft-black
+  font-size: 24px
+  font-weight: 500
 }
 
 .description {
-  text-align: left;
-  margin: 10px 0 35px;
-  color: #77778b;
-  font-size: 14px;
+  text-align: left
+  margin: 10px 0 35px
+  color: #77778b
+  font-size: 14px
 }
 
 .body {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  font-size: 16px;
+  display: flex
+  flex-direction: column
+  align-items: flex-start
+  font-size: 16px
 }
 
 .category {
-  padding-bottom: 10px;
+  padding-bottom: 10px
 }
 
 .cat-header {
-  text-align: left;
-  font-size: 18px;
-  font-weight: 500;
-  padding-bottom: 10px;
+  text-align: left
+  font-size: 18px
+  font-weight: 500
+  padding-bottom: 10px
 }
 
 ul {
-  text-align: left;
+  text-align: left
 }
 
 li {
-  padding-bottom: 10px;
+  padding-bottom: 10px
 }
 </style>

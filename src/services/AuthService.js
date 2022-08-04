@@ -15,7 +15,7 @@ export default {
       return Promise.reject('Invalid login form submission')
     }
 
-    return NetworkService.login(context, creds).then(res => {
+    return NetworkService.login(context, creds).then((res) => {
       const data = { ...res.data }
       if (!data) {
         throw new Error('No user returned from auth service')
@@ -27,67 +27,67 @@ export default {
 
   registerOpenVolunteer(context, signupData) {
     return NetworkService.registerOpenVolunteer(context, signupData)
-      .then(res => {
+      .then((res) => {
         const data = { ...res.data }
         if (!data) {
           throw new Error('No user returned from auth service')
         }
         AnalyticsService.registerVolunteer(data.user)
       })
-      .catch(res => {
+      .catch((res) => {
         throw errorFromHttpResponse(res)
       })
   },
 
   registerPartnerVolunteer(context, signupData) {
     return NetworkService.registerPartnerVolunteer(context, signupData)
-      .then(res => {
+      .then((res) => {
         const data = { ...res.data }
         if (!data) {
           throw new Error('No user returned from auth service')
         }
         AnalyticsService.registerVolunteer(data.user)
       })
-      .catch(res => {
+      .catch((res) => {
         throw errorFromHttpResponse(res)
       })
   },
 
   registerOpenStudent(context, signupData) {
     return NetworkService.registerOpenStudent(context, signupData)
-      .then(res => {
+      .then((res) => {
         const data = { ...res.data }
         if (!data) {
           throw new Error('No user returned from auth service')
         }
       })
-      .catch(res => {
+      .catch((res) => {
         throw errorFromHttpResponse(res)
       })
   },
 
   registerPartnerStudent(context, signupData) {
     return NetworkService.registerPartnerStudent(context, signupData)
-      .then(res => {
+      .then((res) => {
         const data = { ...res.data }
         if (!data) {
           throw new Error('No user returned from auth service')
         }
       })
-      .catch(res => {
+      .catch((res) => {
         throw errorFromHttpResponse(res)
       })
   },
 
   checkRegister(context, creds) {
-    return NetworkService.checkRegister(context, creds).catch(res => {
+    return NetworkService.checkRegister(context, creds).catch((res) => {
       throw errorFromHttpResponse(res)
     })
   },
 
   sendReset(context, email, redirect) {
     return NetworkService.sendReset(context, { email })
-      .then(res => {
+      .then((res) => {
         const data = { ...res.data }
         if (res.status !== 200) {
           throw new Error(data.err)
@@ -101,14 +101,14 @@ export default {
           }, 2000)
         }
       })
-      .catch(res => {
+      .catch((res) => {
         throw errorFromHttpResponse(res)
       })
   },
 
   confirmReset(context, credentials, redirect) {
     return NetworkService.confirmReset(context, credentials)
-      .then(res => {
+      .then((res) => {
         const data = { ...res.data }
         if (!data) {
           throw new Error('No user returned from auth service')
@@ -122,25 +122,25 @@ export default {
           }, 2000)
         }
       })
-      .catch(res => {
+      .catch((res) => {
         throw errorFromHttpResponse(res)
       })
   },
 
   verifyReset(context, token) {
-    return NetworkService.verifyReset(context, token).catch(err => {
+    return NetworkService.verifyReset(context, token).catch((err) => {
       throw errorFromHttpResponse(err)
     })
   },
 
   initiateVerification(data) {
-    return NetworkService.sendVerification(data).catch(err => {
+    return NetworkService.sendVerification(data).catch((err) => {
       throw errorFromHttpResponse(err)
     })
   },
 
   confirmVerification(data) {
-    return NetworkService.confirmVerification(data).catch(err => {
+    return NetworkService.confirmVerification(data).catch((err) => {
       throw errorFromHttpResponse(err)
     })
   },
@@ -173,7 +173,7 @@ export default {
         ? NetworkService.userGlobal()
         : NetworkService.user(context)
     return authPromise
-      .then(res => {
+      .then((res) => {
         const data = { ...res.data }
         if (!data) {
           throw new Error('No user returned from auth service')
@@ -182,23 +182,23 @@ export default {
         if (data.user) {
           const auth = {
             authenticated: true,
-            user: data.user
+            user: data.user,
           }
           auth.user.date = new Date(res.headers.get('Date'))
           return auth
         } else {
           return {
             authenticated: false,
-            user: null
+            user: null,
           }
         }
       })
-      .catch(err => {
+      .catch((err) => {
         return {
           authenticated: false,
           user: null,
-          err: err
+          err: err,
         }
       })
-  }
+  },
 }

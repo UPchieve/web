@@ -147,9 +147,7 @@
       </div>
     </div>
     <div class="sessions-filter-button">
-      <button class="btn" type="button" @click="submitFilters">
-        Update
-      </button>
+      <button class="btn" type="button" @click="submitFilters">Update</button>
     </div>
     <page-control
       :page="page"
@@ -168,9 +166,9 @@ import SessionsList from '@/components/Admin/SessionsList'
 import PageControl from '@/components/Admin/PageControl'
 import moment from 'moment'
 
-const getSessions = async filters => {
+const getSessions = async (filters) => {
   const {
-    body: { sessions, isLastPage }
+    body: { sessions, isLastPage },
   } = await NetworkService.adminGetSessions(filters)
 
   return { sessions, isLastPage }
@@ -189,9 +187,7 @@ export default {
       filters: {
         showBannedUsers: '',
         showTestUsers: '',
-        sessionActivityFrom: moment()
-          .subtract(7, 'days')
-          .format('YYYY-MM-DD'),
+        sessionActivityFrom: moment().subtract(7, 'days').format('YYYY-MM-DD'),
         sessionActivityTo: moment().format('YYYY-MM-DD'),
         minMessagesSent: 0,
         minSessionLength: 1, // in minutes,
@@ -199,8 +195,8 @@ export default {
         volunteerRating: '',
         firstTimeStudent: '',
         firstTimeVolunteer: '',
-        isReported: ''
-      }
+        isReported: '',
+      },
     }
   },
 
@@ -218,8 +214,8 @@ export default {
         volunteerRating,
         firstTimeStudent,
         firstTimeVolunteer,
-        isReported
-      }
+        isReported,
+      },
     } = this.$route
     const page = parseInt(pageQuery) || this.page
     this.filters.showBannedUsers =
@@ -247,7 +243,7 @@ export default {
   computed: {
     isFirstPage() {
       return this.page === 1
-    }
+    },
   },
 
   methods: {
@@ -275,18 +271,18 @@ export default {
         path: '/admin/sessions',
         query: {
           page: this.page,
-          ...this.filters
-        }
+          ...this.filters,
+        },
       })
 
       const { sessions, isLastPage } = await getSessions({
         page: this.page,
-        ...this.filters
+        ...this.filters,
       })
       this.sessions = sessions
       this.isLastPage = isLastPage
-    }
-  }
+    },
+  },
 }
 </script>
 

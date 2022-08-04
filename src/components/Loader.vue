@@ -12,8 +12,8 @@
 <script>
 export default {
   props: {
-    overlay: Boolean
-  }
+    overlay: Boolean,
+  },
 }
 </script>
 

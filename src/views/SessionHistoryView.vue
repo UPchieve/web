@@ -1,146 +1,165 @@
 <template>
-<div class="session-history">
-  <section class="header">
-    <h1 class="title">
-      Session History
-    </h1>
-    <p v-if="!mobileMode" class="subtitle">
-      On this page you can review your past sessions on UPchieve and favorite your preferred Academic Coaches. We’ll do our best to pair you with your favorited coaches when they’re available.      
-    </p>
-  </section>
-  <div v-if="!mobileMode" class="container">
-    <section>
-      <div class="spacing--grid session-list__headers">
-        <span>SUBJECT</span>
-        <span>DATE</span>
-        <span>COACH</span>
-      </div>
-      <div v-if="hasNoPastSessions()">
-          <h1 class="title title-no-sessions"> Looks like you haven't had any sessions in the past 12 months. </h1>
-      </div>
-      <ul class="session-list">
-        <li v-for="(session, index) in sessions" :key="session._id">
-          <div class="session-list__session">
-            <div class="session-list__subject-container">
-            <component v-bind:is="session.svg" class="subject-icon" />
-              <div class="subject-name-container">
-              <div
-                class="subject"
-                >{{ session.subject }}</div
+  <div class="session-history">
+    <section class="header">
+      <h1 class="title">Session History</h1>
+      <p v-if="!mobileMode" class="subtitle">
+        On this page you can review your past sessions on UPchieve and favorite
+        your preferred Academic Coaches. We’ll do our best to pair you with your
+        favorited coaches when they’re available.
+      </p>
+    </section>
+    <div v-if="!mobileMode" class="container">
+      <section>
+        <div class="spacing--grid session-list__headers">
+          <span>SUBJECT</span>
+          <span>DATE</span>
+          <span>COACH</span>
+          <span>SESSION RECAP</span>
+        </div>
+        <div v-if="hasNoPastSessions()">
+          <h1 class="title title-no-sessions">
+            Looks like you haven't had any sessions in the past 12 months.
+          </h1>
+        </div>
+        <ul class="session-list">
+          <li v-for="(session, index) in sessions" :key="session._id">
+            <div class="session-list__session">
+              <div class="session-list__subject-container">
+                <component v-bind:is="session.svg" class="subject-icon" />
+                <div class="subject-name-container">
+                  <div class="subject">{{ session.subject }}</div>
+                  <span class="subject-time-tutored">
+                    {{ getSessionDuration(session.timeTutored) }} minutes</span
+                  >
+                </div>
+              </div>
+              <span class="session-list__created-at">
+                {{ getSessionTime(session.createdAt) }}</span
               >
-              <span class="subject-time-tutored"> {{ getSessionDuration(session.timeTutored) }} minutes</span>
+              <div class="session-list__coach-name-container">
+                <favoriting-toggle
+                  :initialIsFavorite="session.isFavorited"
+                  :volunteerName="session.volunteerFirstName"
+                  :volunteerId="session.volunteerId"
+                  v-on:change-favorited="updateFavoritedVolunteers"
+                />
+                <span class="session-list__coach-name">
+                  {{ session.volunteerFirstName }}
+                </span>
+              </div>
+              <div class="session-list__session-recap">
+                <a :href="sessionRecapURL(session.id)">
+                  <large-button
+                    primary="true"
+                    class="session-list__session-recap__button"
+                    >Session Recap</large-button
+                  >
+                </a>
               </div>
             </div>
-            <span class="session-list__created-at"
-              > {{ getSessionTime(session.createdAt) }}</span
-            >
-            <div class="session-list__coach-name-container">
-            <favoriting-toggle
-              :initialIsFavorite="session.isFavorited"
-              :volunteerName="session.volunteerFirstName"
-              :volunteerId="session.volunteerId"
-              v-on:change-favorited="updateFavoritedVolunteers"
-            />
-            <span class="session-list__coach-name"> {{ session.volunteerFirstName }} </span>
-            </div>
-          </div>
-          <div class="border--thin" v-if="index !== 5"></div>
-        </li>
-      </ul>
+            <div class="border--thin" v-if="index !== 5"></div>
+          </li>
+        </ul>
         <footer class="page-actions-container">
-        <div class="page-actions">
-          <div
-            @click="() => getSessionHistory(page - 1)"
-            :class="isFirstPage && 'page-actions__stepper--disabled'"
-            class="page-actions__stepper"
-          >
-            <caret-icon class="caret caret--previous" /><span
-              >Previous</span
+          <div class="page-actions">
+            <div
+              @click="() => getSessionHistory(page - 1)"
+              :class="isFirstPage && 'page-actions__stepper--disabled'"
+              class="page-actions__stepper"
             >
-          </div>
-          <div class="page-numbers">
-            <span
-              class="page-num page-num--active"
+              <caret-icon class="caret caret--previous" /><span>Previous</span>
+            </div>
+            <div class="page-numbers">
+              <span class="page-num page-num--active">
+                {{ page }}
+              </span>
+            </div>
+            <div
+              @click="() => getSessionHistory(page + 1)"
+              :class="isLastPage && 'page-actions__stepper--disabled'"
+              class="page-actions__stepper"
             >
-              {{ page }} 
-            </span>
+              <span>Next</span><caret-icon class="caret caret--next" />
+            </div>
           </div>
-          <div
-            @click="() => getSessionHistory(page + 1)"
-            :class="isLastPage && 'page-actions__stepper--disabled'"
-            class="page-actions__stepper"
-          >
-            <span>Next</span
-            ><caret-icon class="caret caret--next" />
+        </footer>
+      </section>
+    </div>
+    <div v-if="mobileMode">
+      <div class="mobile-container">
+        <section>
+          <div v-if="hasNoPastSessions()">
+            <h1 class="title title-no-sessions">
+              Looks like you haven't had any sessions in the past 12 months.
+            </h1>
           </div>
-        </div>
-      </footer>
-    </section>
-  </div>
-  <div v-if="mobileMode">
-    <div class="mobile-container">
-    <section>
-      <div v-if="hasNoPastSessions()">
-          <h1 class="title title-no-sessions"> Looks like you haven't had any sessions in the past 12 months. </h1>
-      </div>
-      <ul class="mobile-session-list">
-        <li v-for="(session, index) in sessions" :key="session._id">
-          <div class="mobile-session-list__session">
-            <div class="mobile-session-list__subject-container">
-            <component v-bind:is="session.svg" class="mobile-subject-icon" />
-              <div class="mobile-subject-name-container">
+          <ul class="mobile-session-list">
+            <li v-for="(session, index) in sessions" :key="session._id">
+              <div class="mobile-session-list__session">
+                <div class="mobile-session-list__subject-container">
+                  <component
+                    v-bind:is="session.svg"
+                    class="mobile-subject-icon"
+                  />
+                  <div class="mobile-subject-name-container">
+                    <div class="mobile-subject">{{ session.subject }}</div>
+                    <span class="mobile-subject-time-tutored">
+                      {{ getSessionDuration(session.timeTutored) }}
+                      minutes</span
+                    >
+                  </div>
+                </div>
+                <div class="mobile-session-list__createdAt-container">
+                  <div class="mobile-session-list__coach-name-container">
+                    <favoriting-toggle
+                      class="heart"
+                      :initialIsFavorite="session.isFavorited"
+                      :volunteerName="session.volunteerFirstName"
+                      :volunteerId="session.volunteerId"
+                      v-on:change-favorited="updateFavoritedVolunteers"
+                    />
+                    <span class="mobile-session-list__coach-name">
+                      {{ session.volunteerFirstName }}
+                    </span>
+                  </div>
+                  <span class="mobile-session-list__created-at">
+                    {{ getSessionTimeForMobile(session.createdAt) }}</span
+                  >
+                </div>
+                <a :href="sessionRecapURL(session.id)">
+                  <caret-icon class="caret--next" />
+                </a>
+              </div>
+              <div class="border--thin" v-if="index !== 5"></div>
+            </li>
+          </ul>
+          <footer class="page-actions-container">
+            <div class="page-actions">
               <div
-                class="mobile-subject"
-                >{{ session.subject }}</div
+                @click="() => getSessionHistory(page - 1)"
+                :class="isFirstPage && 'page-actions__stepper--disabled'"
+                class="page-actions__stepper"
               >
-              <span class="mobile-subject-time-tutored"> {{ getSessionDuration(session.timeTutored) }} minutes</span>
+                <caret-icon class="caret caret--previous" />
+              </div>
+              <div class="page-numbers">
+                <span class="page-num page-num--active">
+                  {{ page }}
+                </span>
+              </div>
+              <div
+                @click="() => getSessionHistory(page + 1)"
+                :class="isLastPage && 'page-actions__stepper--disabled'"
+                class="page-actions__stepper"
+              >
+                <caret-icon class="caret caret--next" />
               </div>
             </div>
-            <div class="mobile-session-list__createdAt-container">
-            <div class="mobile-session-list__coach-name-container">
-              <favoriting-toggle class="heart"
-              :initialIsFavorite="session.isFavorited"
-              :volunteerName="session.volunteerFirstName"
-              :volunteerId="session.volunteerId"
-              v-on:change-favorited="updateFavoritedVolunteers"
-              />
-              <span class="mobile-session-list__coach-name"> {{ session.volunteerFirstName }} </span>
-            </div>
-            <span class="mobile-session-list__created-at"> {{ getSessionTimeForMobile(session.createdAt) }}</span>
-            </div>
-          </div>
-          <div class="border--thin" v-if="index !== 5"></div>
-        </li>
-      </ul>
-      <footer class="page-actions-container">
-        <div class="page-actions">
-          <div
-            @click="() => getSessionHistory(page - 1)"
-            :class="isFirstPage && 'page-actions__stepper--disabled'"
-            class="page-actions__stepper"
-          >
-            <caret-icon class="caret caret--previous" />
-          </div>
-          <div class="page-numbers">
-            <span
-              class="page-num page-num--active"
-            >
-              {{ page }}
-            </span>
-          </div>
-          <div
-            @click="() => getSessionHistory(page + 1)"
-            :class="isLastPage && 'page-actions__stepper--disabled'"
-            class="page-actions__stepper"
-          >
-            <caret-icon class="caret caret--next" />
-          </div>
-        </div>
-      </footer>
-    </section>
+          </footer>
+        </section>
+      </div>
     </div>
   </div>
-</div>
 </template>
 
 <script>
@@ -152,18 +171,19 @@ import ReadingWritingSVG from '@/assets/subject_icons/more-resources.svg'
 import NetworkService from '../services/NetworkService'
 import CaretIcon from '@/assets/caret.svg'
 import FavoritingToggle from '../components/FavoritingToggle.vue'
+import LargeButton from '../components/LargeButton'
 import { mapState, mapGetters } from 'vuex'
 import moment from 'moment'
 
 export default {
   name: 'session-history-view',
-  components: { CaretIcon, FavoritingToggle},
+  components: { CaretIcon, FavoritingToggle, LargeButton },
   data() {
     return {
       sessions: [],
       page: 1,
       hasNext: false,
-      total: 0
+      total: 0,
     }
   },
   computed: {
@@ -181,7 +201,7 @@ export default {
       const totalPages = Math.ceil(this.total / sessionLimitPerPage)
       return totalPages === 0 ? 1 : totalPages
     },
-    isLastPage(){
+    isLastPage() {
       return this.page === this.totalPages
     },
     svgs() {
@@ -190,16 +210,16 @@ export default {
         college: CollegeSVG,
         science: ScienceSVG,
         readingWriting: ReadingWritingSVG,
-        sat: SATSVG
+        sat: SATSVG,
       }
-    }
+    },
   },
   methods: {
     async getSessionHistory(page) {
       if (page < 1 || page > this.totalPages) return
       const response = await NetworkService.getSessionHistory(page)
       this.sessions = response.body.pastSessions
-      if(this.sessions.length){
+      if (this.sessions.length) {
         this.getSessionTopicIcons()
       }
       this.isLastPage = response.body.isLastPage
@@ -216,8 +236,8 @@ export default {
     },
     getSessionTopicIcons() {
       this.sessions = this.sessions.map((session) => {
-          session.svg = this.svgs[session.topic]
-          return session
+        session.svg = this.svgs[session.topic]
+        return session
       })
     },
     getSessionTime(sessionCreatedAt) {
@@ -227,129 +247,147 @@ export default {
       return moment(sessionCreatedAt).format('l h:mm A')
     },
     getSessionDuration(timeTutored) {
-      const duration = Math.ceil(timeTutored/(1000 * 60))
+      const duration = Math.ceil(timeTutored / (1000 * 60))
       return duration
     },
     hasNoPastSessions() {
       return this.total === 0
     },
     updateFavoritedVolunteers(volunteerId, isFavorited) {
-      this.sessions = this.sessions.map(session => ({
-        ...session, 
-        isFavorited: session.volunteerId === volunteerId ? isFavorited : session.isFavorited
+      this.sessions = this.sessions.map((session) => ({
+        ...session,
+        isFavorited:
+          session.volunteerId === volunteerId
+            ? isFavorited
+            : session.isFavorited,
       }))
-    }
-   },
+    },
+    sessionRecapURL(sessionId) {
+      return `${sessionId}/recap`
+    },
+  },
   async created() {
-    await Promise.all([this.getSessionHistory(this.page),
-    this.getTotalSessions(),
+    await Promise.all([
+      this.getSessionHistory(this.page),
+      this.getTotalSessions(),
     ])
-  }
+  },
 }
-
 </script>
 
-<style lang="scss" scoped> 
+<style lang="scss" scoped>
+a {
+  text-decoration: none
+}
+
 ul {
-  padding: 0px;
-  height: 100%;
-  margin: auto;
-  list-style-type: none;
+  padding: 0px
+  height: 100%
+  margin: auto
+  list-style-type: none
 }
 
 .header {
-  text-align: left;
-  margin-bottom: 2em;
+  text-align: left
+  margin-bottom: 2em
 
   @include breakpoint-below('small') {
-    margin-bottom: 0;
+    margin-bottom: 0
   }
 }
 
 .title {
-  font-weight: 500;
-  font-size: 22px;
-  margin-bottom: 1em; 
+  font-weight: 500
+  font-size: 22px
+  margin-bottom: 1em
 
   @include breakpoint-below('small') {
-    margin: 1em;
-    font-size: 18px;
+    margin: 1em
+    font-size: 18px
   }
 
   &-no-sessions {
-    margin-top: 3em;
+    margin-top: 3em
   }
 }
 
 .subtitle {
-  @include font-category('heading');
-  color: $c-secondary-grey;
+  @include font-category('heading')
+  color: $c-secondary-grey
 
   &-no-sessions {
-    font-size: 16px;
+    font-size: 16px
   }
 }
 
 .session-history {
-  padding: 53px;
+  padding: 53px
 
   @include breakpoint-below('large') {
-    padding: 1em;
+    padding: 1em
   }
 
   @include breakpoint-below('small') {
-    padding: 0;
+    padding: 0
   }
 }
 
 .container {
-  padding: 0;
-  margin: 0;
-  background-color: white;
-  border: 1px solid $c-border-grey;
-  border-radius: 8px 8px 16px 16px;
-  min-width: 100%;
+  padding: 0
+  margin: 0
+  background-color: white
+  border: 1px solid $c-border-grey
+  border-radius: 8px 8px 16px 16px
+  min-width: 100%
 }
 
 .spacing--grid {
-  display: grid;
+  display: grid
   @include breakpoint-above('small') {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr
   }
 }
 
 .session-list {
-  padding: 0 2em;
-  min-height: 600px;
+  padding: 0 2em
+  min-height: 600px
+
+  @include breakpoint-below('large') {
+    padding-right: 1.5em
+  }
 
   &__headers {
-    @include font-category('subheading');
-    background-color: $c-background-blue;
-    width: 100%;
-    padding: 1em 2em;
+    @include font-category('subheading')
+    background-color: $c-background-blue
+    width: 100%
+    padding: 1em 2em
   }
 
   &__coach-name {
-      @include font-category('subheading');
-      margin: 0.8em;
-      @include breakpoint-below('large') {
-        font-size: 14px;
-      }
+    @include font-category('subheading')
+    margin: 0.8em;
+    @include breakpoint-below('large') {
+      font-size: 14px;
+    }
 
-      &-container {
-        @include flex-container(row, center, center);
+    &-container {
+      @include flex-container(row, center, center);
+
+      @include breakpoint-below('medium') {
+        width: 100px;
       }
     }
-  
+  }
+
   &__session {
     @include flex-container(row, space-around, center);
     display: grid;
     @include breakpoint-above('tiny') {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
     padding: 1em 0;
   }
-  
+
   &__subject-container {
     @include flex-container(row, center, center);
   }
@@ -359,8 +397,36 @@ ul {
     color: $c-secondary-grey;
     @include breakpoint-below('large') {
       font-size: 14px;
+      margin: 0.7em;
     }
-  }    
+  }
+
+  &__session-recap {
+    @include flex-container(row, center, center);
+
+    &__button {
+      border-color: $c-information-blue;
+      background: #fff;
+      color: $c-information-blue;
+      fill: $c-information-blue;
+
+      &:hover {
+        background-color: rgba(24, 85, 209, 0.1);
+        color: $c-information-blue;
+        fill: $c-information-blue;
+      }
+
+      &:active {
+        background-color: $c-information-blue;
+        color: #fff;
+        fill: #fff;
+      }
+
+      @include breakpoint-below('large') {
+        transform: scale(0.8, 0.8);
+      }
+    }
+  }
 }
 
 .subject {
@@ -507,25 +573,24 @@ ul {
 .mobile-spacing--grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-
 }
 
 .mobile-session-list {
   padding: 0;
   min-height: 500px;
   &__coach-name {
-      font-weight: 500;
-      font-size: 14px;
-      margin: 0.4em;
-      &-container {
-        @include flex-container(row, center, center);
-      }        
+    font-weight: 500;
+    font-size: 14px;
+    margin: 0.4em;
+    &-container {
+      @include flex-container(row, center, center);
     }
-  
+  }
+
   &__session {
     @include flex-container(row, space-between, center);
   }
-  
+
   &__subject-container {
     @include flex-container(row, initial, center);
   }
@@ -534,11 +599,12 @@ ul {
     color: $c-secondary-grey;
     font-size: 12px;
     font-weight: 400;
-  }    
+  }
 
   &__createdAt-container {
-    @include flex-container(column, center, flex-end)
-  } 
+    @include flex-container(column, center, flex-end);
+    margin-left: auto;
+  }
 }
 
 .mobile-subject {
@@ -547,8 +613,8 @@ ul {
   font-size: 16px;
 
   &-icon {
-  height: 30px;
-  width: 30px;
+    height: 30px;
+    width: 30px;
   }
 
   &-name-container {

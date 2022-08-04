@@ -6,15 +6,13 @@
         <cross-icon class="upc-modal-close-icon" @click="closeModal" />
       </header>
       <div v-if="user.photoIdStatus === 'SUBMITTED'">
-        <p class="subtitle">
-          Your photo ID is under review.
-        </p>
+        <p class="subtitle">Your photo ID is under review.</p>
       </div>
       <div v-else>
         <p class="subtitle">
-          In order to keep our students safe, we confirm your identity
-          by requesting a picture of your photo ID (such as your driver's
-          license, passport, or student ID). Acceptable formats: jpeg, png
+          In order to keep our students safe, we confirm your identity by
+          requesting a picture of your photo ID (such as your driver's license,
+          passport, or student ID). Acceptable formats: jpeg, png
         </p>
 
         <div v-if="photo" class="photo-id-container">
@@ -64,20 +62,20 @@ export default {
   name: 'volunteer-dashboard',
   components: { Modal, Separator, LargeButton, TrashIcon, CrossIcon },
   props: {
-    closeModal: { type: Function, required: true }
+    closeModal: { type: Function, required: true },
   },
   data() {
     return {
       photo: '',
       file: undefined,
-      error: ''
+      error: '',
     }
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: (state) => state.user.user,
     }),
-    ...mapGetters({ mobileMode: 'app/mobileMode' })
+    ...mapGetters({ mobileMode: 'app/mobileMode' }),
   },
   methods: {
     async addPhoto(event) {
@@ -104,27 +102,27 @@ export default {
         return
       }
       this.error = ''
-      NetworkService.getPhotoUploadUrl().then(res => {
+      NetworkService.getPhotoUploadUrl().then((res) => {
         const { uploadUrl } = res.body
         if (uploadUrl) {
           axios.put(uploadUrl, this.file, {
             headers: {
-              'Content-Type': this.file.type
-            }
+              'Content-Type': this.file.type,
+            },
           })
           this.$store.dispatch('user/addToUser', {
-            photoIdStatus: 'SUBMITTED'
+            photoIdStatus: 'SUBMITTED',
           })
           AnalyticsService.captureEvent(EVENTS.PHOTO_ID_ADDED, {
-            event: EVENTS.PHOTO_ID_ADDED
+            event: EVENTS.PHOTO_ID_ADDED,
           })
           this.closeModal()
         } else {
           this.error = 'Sorry, we had trouble uploading your photo.'
         }
       })
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -15,9 +15,9 @@ export default {
   data() {
     return {
       policyURL: `${DOCS_URL}/Student-Community-Guidelines.pdf`,
-      message: 'Your account is under review'
+      message: 'Your account is under review',
     }
-  }
+  },
 }
 </script>
 

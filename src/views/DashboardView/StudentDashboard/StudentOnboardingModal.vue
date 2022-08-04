@@ -31,7 +31,7 @@ import ArrowIcon from '@/assets/arrow.svg'
 export default {
   components: { LargeButton, ArrowIcon },
   props: {
-    modalData: { type: Object, required: true }
+    modalData: { type: Object, required: true },
   },
   data() {
     return {
@@ -41,41 +41,40 @@ export default {
           title: 'Welcome to UPchieve! 🎉',
           subtitle:
             'You’re almost ready to get started! We just need to lay down some ground rules.',
-          button: "I'm listening"
+          button: "I'm listening",
         },
         {
           title: 'Rule #1: Be patient when making a request.',
           subtitle:
             'Pairing you with a coach can take up to 10 minutes. We know waiting’s hard, but we promise a coach is on their way 🏃🏿‍♂️ Don’t leave ‘em hanging!',
-          tip:
-            'Our coaches are patient, too. Ask as many questions as you want in the same session! There’s no time limit.',
-          button: 'Patience, check'
+          tip: 'Our coaches are patient, too. Ask as many questions as you want in the same session! There’s no time limit.',
+          button: 'Patience, check',
         },
         {
           title: 'Rule #2: Play nice with your coach.',
           subtitle:
             'Our coaches are real people with real feelings — No 🤖 here. They’re eager to help you, so please be kind and respectful.',
-          button: 'I promise to bring my best self'
+          button: 'I promise to bring my best self',
         },
         {
           title: 'Rule #3: Stay safe out there.',
           subtitle:
             'You came to UPchieve for homework help, not the ☕. Keep conversations on-topic, and don’t share personal info like your phone number, IG handle, or email.',
-          button: 'Got it, I’m here to learn'
+          button: 'Got it, I’m here to learn',
         },
         {
           title: 'You’re ready for your first session! 💯',
           subtitle:
             'Thank you for listening. We can tell this is going to be the beginning of a beautiful friendship.',
-          button: 'Take me to my dashboard'
-        }
-      ]
+          button: 'Take me to my dashboard',
+        },
+      ],
     }
   },
   computed: {
     ...mapGetters({
-      mobileMode: 'app/mobileMode'
-    })
+      mobileMode: 'app/mobileMode',
+    }),
   },
   methods: {
     nextStep() {
@@ -85,8 +84,8 @@ export default {
       } else {
         this.step += 1
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

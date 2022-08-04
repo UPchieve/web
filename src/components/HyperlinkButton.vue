@@ -23,18 +23,18 @@ export default {
     showArrow: { type: Boolean, default: true },
     buttonType: {
       type: String,
-      default: 'button'
-    }
+      default: 'button',
+    },
   },
   computed: {
     buttonClasses() {
       return {
         HyperlinkButton: true,
         'HyperlinkButton--dark': this.dark,
-        'HyperlinkButton--reverse': this.reverse
+        'HyperlinkButton--reverse': this.reverse,
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

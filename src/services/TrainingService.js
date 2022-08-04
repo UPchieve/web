@@ -15,7 +15,7 @@ export default {
     this.idAnswerMap = {}
     this.idCorrectAnswerMap = {}
     this.category = category
-    return NetworkService.getQuestions(context, { category }).then(res => {
+    return NetworkService.getQuestions(context, { category }).then((res) => {
       this.questions = res.data.questions || []
       return this.questions.length
     })
@@ -43,7 +43,7 @@ export default {
       const picked = this.idAnswerMap[question._id]
       return {
         question,
-        picked
+        picked,
       }
     }
     return null
@@ -55,7 +55,7 @@ export default {
       const picked = this.idAnswerMap[question._id]
       return {
         question,
-        picked
+        picked,
       }
     }
     return null
@@ -72,14 +72,14 @@ export default {
   submitQuiz(context) {
     return NetworkService.getQuizScore(context, {
       idAnswerMap: this.idAnswerMap,
-      category: this.category
-    }).then(res => {
+      category: this.category,
+    }).then((res) => {
       this.idCorrectAnswerMap = res.data.idCorrectAnswerMap
       return {
         tries: res.data.tries,
         passed: res.data.passed,
         score: res.data.score,
-        idUserAnswerMap: this.idAnswerMap
+        idUserAnswerMap: this.idAnswerMap,
       }
     })
   },
@@ -87,10 +87,10 @@ export default {
     const questionsReview = this.questions.slice(0)
     const idCorrectAnswerMap = { ...this.idCorrectAnswerMap }
     const idAnswerMap = { ...this.idAnswerMap }
-    questionsReview.forEach(question => {
+    questionsReview.forEach((question) => {
       question.userAnswer = idAnswerMap[question._id]
       question.correctAnswer = idCorrectAnswerMap[question._id]
     })
     return questionsReview
-  }
+  },
 }

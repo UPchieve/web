@@ -24,7 +24,7 @@
       :class="{
         'App-router-view-wrapper': true,
         'App-router-view-wrapper--header': showHeader,
-        'App-router-view-wrapper--sidebar': showSidebar
+        'App-router-view-wrapper--sidebar': showSidebar,
       }"
     >
       <router-view />
@@ -58,14 +58,14 @@ export default {
     AppModal,
     AppBanner,
     BAlert,
-    LargeButton
+    LargeButton,
   },
   mixins: [crono],
   data() {
     return {
       isIOS: false,
       docHiddenProperty: '',
-      showRefreshAlert: false
+      showRefreshAlert: false,
     }
   },
   async created() {
@@ -92,8 +92,8 @@ export default {
           this.$store.dispatch('app/modal/show', {
             component: 'UpgradeAppModal',
             data: {
-              showTemplateButtons: false
-            }
+              showTemplateButtons: false,
+            },
           })
         }, 1000)
       }
@@ -147,7 +147,7 @@ export default {
     handleResize() {
       this.$store.dispatch('app/windowResize', {
         width: window.innerWidth,
-        height: window.innerHeight
+        height: window.innerHeight,
       })
     },
     handleExternalURLs(event) {
@@ -164,7 +164,7 @@ export default {
         const { href } = event.target
         PortalService.call('browser.openWindow', {
           url: href,
-          target: '_system'
+          target: '_system',
         })
       }
     },
@@ -202,37 +202,42 @@ export default {
   },
   computed: {
     ...mapState({
-      showHeader: state => state.app.header.isShown,
-      showSidebar: state => state.app.sidebar.isShown,
-      showModal: state => state.app.modal.isShown,
-      showBanner: state => state.app.banner.isShown,
-      bannerComponent: state => state.app.banner.component,
-      isMobileApp: state => state.app.isMobileApp,
-      isWebPageHidden: state => state.app.isWebPageHidden,
-      user: state => state.user.user
+      showHeader: (state) => state.app.header.isShown,
+      showSidebar: (state) => state.app.sidebar.isShown,
+      showModal: (state) => state.app.modal.isShown,
+      showBanner: (state) => state.app.banner.isShown,
+      bannerComponent: (state) => state.app.banner.component,
+      isMobileApp: (state) => state.app.isMobileApp,
+      isWebPageHidden: (state) => state.app.isWebPageHidden,
+      user: (state) => state.user.user,
     }),
     ...mapGetters({
       userAuthenticated: 'user/isAuthenticated',
       isVolunteer: 'user/isVolunteer',
-      mobileMode: 'app/mobileMode'
+      mobileMode: 'app/mobileMode',
     }),
   },
   // https://github.com/BrianRosamilia/vue-crono
   cron: {
     /// every 10 minutes, check the current server version
     time: 600000,
-    method: 'getCurrentServerVersion'
+    method: 'getCurrentServerVersion',
   },
   watch: {
     user(currentUserValue, previousUserValue) {
       const nowLoggedIn = currentUserValue._id && !previousUserValue._id
       if (nowLoggedIn) {
         Sentry.setUser({ id: currentUserValue._id })
-      AnalyticsService.identify(currentUserValue._id, currentUserValue.firstname, currentUserValue.email, currentUserValue.type)
+        AnalyticsService.identify(
+          currentUserValue._id,
+          currentUserValue.firstname,
+          currentUserValue.email,
+          currentUserValue.type
+        )
 
         if (this.mobileMode && !this.isMobileApp && !this.isVolunteer) {
           this.$store.dispatch('app/banner/show', {
-            component: 'MobileAppNoticeBanner'
+            component: 'MobileAppNoticeBanner',
           })
         }
 
@@ -260,7 +265,7 @@ export default {
           this.$store.dispatch('user/fetchLatestSession', this)
         }
       }
-    }
+    },
   },
   sockets: {
     error(error) {
@@ -281,8 +286,8 @@ export default {
     },
     redirect() {
       this.$router.push('/')
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -3,14 +3,14 @@
     :class="{
       AppSidebar: true,
       'AppSidebar--header': showHeader,
-      'AppSidebar--collapsed': mobileMode && isSidebarCollapsed
+      'AppSidebar--collapsed': mobileMode && isSidebarCollapsed,
     }"
   >
     <div class="AppSidebar-content">
       <div class="uc-column">
         <sidebar-info
           v-if="!mobileMode"
-          style="margin-bottom: 64px;"
+          style="margin-bottom: 64px"
           :authenticated="isAuthenticated"
           :isVolunteer="isVolunteer"
           :name="user.firstname"
@@ -48,21 +48,21 @@ export default {
   components: { SidebarInfo, SidebarLinks },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      showHeader: state => state.app.header.isShown,
-      isSidebarCollapsed: state => state.app.sidebar.isCollapsed
+      user: (state) => state.user.user,
+      showHeader: (state) => state.app.header.isShown,
+      isSidebarCollapsed: (state) => state.app.sidebar.isCollapsed,
     }),
     ...mapGetters({
       isAuthenticated: 'user/isAuthenticated',
       isVolunteer: 'user/isVolunteer',
-      mobileMode: 'app/mobileMode'
+      mobileMode: 'app/mobileMode',
     }),
     finalLinkClass() {
       return {
         'AppSidebar-final-link': true,
-        'AppSidebar-final-link--desktop': !this.mobileMode
+        'AppSidebar-final-link--desktop': !this.mobileMode,
       }
-    }
+    },
   },
   methods: {
     logout() {
@@ -70,8 +70,8 @@ export default {
     },
     backToWebsite() {
       window.location = config.mainWebsiteUrl
-    }
-  }
+    },
+  },
 }
 </script>
 

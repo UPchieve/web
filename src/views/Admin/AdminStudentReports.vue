@@ -130,20 +130,20 @@ export default {
       isGeneratingReport: false,
       studentPartnerOrgs: [],
       sponsorOrgs: [],
-      sponsorOrg: ''
+      sponsorOrg: '',
     }
   },
   async mounted() {
     const [partnerOrgResponse, sponsorOrgResponse] = await Promise.all([
       await NetworkService.adminGetStudentPartners(),
-      await NetworkService.adminGetSponsorOrgs()
+      await NetworkService.adminGetSponsorOrgs(),
     ])
 
     const {
-     body: { partnerOrgs: studentPartnerOrgs }
+      body: { partnerOrgs: studentPartnerOrgs },
     } = partnerOrgResponse
     const {
-      body: { sponsorOrgs }
+      body: { sponsorOrgs },
     } = sponsorOrgResponse
 
     this.studentPartnerOrgs = studentPartnerOrgs
@@ -165,7 +165,7 @@ export default {
 
       try {
         const {
-          body: { sessions }
+          body: { sessions },
         } = await NetworkService.adminGetSessionReport(query)
         if (sessions.length === 0) this.error = 'No sessions meet the criteria'
         else
@@ -196,7 +196,7 @@ export default {
 
       try {
         const {
-          body: { students }
+          body: { students },
         } = await NetworkService.adminGetUsageReport(query)
         if (students.length === 0) this.error = 'No students meet the criteria'
         else
@@ -215,10 +215,7 @@ export default {
       this.highSchool = highSchool
     },
     formatDate(date) {
-      return moment(date)
-        .utc()
-        .startOf('day')
-        .format('MM-DD-YYYY')
+      return moment(date).utc().startOf('day').format('MM-DD-YYYY')
     },
     isValidDateFormat(date) {
       return moment(date, 'MM-DD-YYYY', true).isValid()
@@ -237,7 +234,7 @@ export default {
         studentPartnerSite: this.isValidPartnerSite
           ? this.studentPartnerSite
           : '',
-        sponsorOrg: this.isValidSponsorOrg ? this.sponsorOrg.key : ''
+        sponsorOrg: this.isValidSponsorOrg ? this.sponsorOrg.key : '',
       }
     },
     validSessionDateRanges(query) {
@@ -268,7 +265,7 @@ export default {
       this.error = errorMessage
         ? errorMessage
         : 'There was a problem with retrieving the report'
-    }
+    },
   },
   computed: {
     todaysDate() {
@@ -279,8 +276,7 @@ export default {
       if (this.highSchool.name) title = this.highSchool.name
       if (this.studentPartnerOrg && this.studentPartnerOrg.name)
         title = this.studentPartnerOrg.name
-      if (this.sponsorOrg && this.sponsorOrg.name)
-        title = this.sponsorOrg.name
+      if (this.sponsorOrg && this.sponsorOrg.name) title = this.sponsorOrg.name
       if (this.isValidPartnerSite) title = this.studentPartnerSite
 
       return title
@@ -302,8 +298,8 @@ export default {
     },
     isValidSponsorOrg() {
       return this.sponsorOrg && this.sponsorOrg.key
-    }
-  }
+    },
+  },
 }
 </script>
 

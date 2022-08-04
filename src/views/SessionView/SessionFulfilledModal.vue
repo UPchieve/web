@@ -16,19 +16,19 @@ export default {
   name: 'SessionFulfilledModal',
   components: { LargeButton },
   props: {
-    modalData: { type: Object, required: true }
+    modalData: { type: Object, required: true },
   },
   computed: {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
-      isVolunteer: 'user/isVolunteer'
+      isVolunteer: 'user/isVolunteer',
     }),
     message() {
       const {
         isSessionEnded,
         volunteerJoined,
         isSessionVolunteer,
-        isSessionStudent
+        isSessionStudent,
       } = this.modalData
       const thankYouMessage = 'Thanks for trying, we really appreciate it!'
       let text = ''
@@ -56,13 +56,13 @@ export default {
       } else {
         return 'Session Fulfilled'
       }
-    }
+    },
   },
   methods: {
     onAccept() {
       this.$router.push('/')
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -9,12 +9,12 @@ import ArrowIcon from '@/assets/arrow.svg'
 
 export default {
   components: {
-    ArrowIcon
+    ArrowIcon,
   },
   props: {
     linkUrl: String,
-    label: String
-  }
+    label: String,
+  },
 }
 </script>
 

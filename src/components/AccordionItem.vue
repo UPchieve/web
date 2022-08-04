@@ -12,7 +12,7 @@
             'accordion-item__bullet--open': isOpen,
             'accordion-item__bullet--large': buttonSize === 'large',
             'accordion-item__bullet--large-open':
-              buttonSize === 'large' && isOpen
+              buttonSize === 'large' && isOpen,
           }"
         ></span>
         <div class="accordion-item__labels">
@@ -58,40 +58,40 @@
 import AlertIcon from '@/assets/alert.svg'
 export default {
   components: {
-    AlertIcon
+    AlertIcon,
   },
   props: {
     label: {
       type: String,
-      default: ''
+      default: '',
     },
     sublabel: {
-      type: String
+      type: String,
     },
     buttonSize: {
-      type: String
+      type: String,
     },
     alertMessage: {
       type: String,
-      default: ''
-    }
+      default: '',
+    },
   },
   computed: {
     isIntegratedMathDropDown() {
       return this.isOpen && this.label === 'Integrated Math'
-    }
+    },
   },
 
   data() {
     return {
-      isOpen: false
+      isOpen: false,
     }
   },
   methods: {
     toggle() {
       this.isOpen = !this.isOpen
-    }
-  }
+    },
+  },
 }
 </script>
 

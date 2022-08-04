@@ -65,9 +65,7 @@
       <div>{{ endedAt }}</div>
     </div>
     <div class="session-detail__section">
-      <div class="session-detail__section-title">
-        Notifications
-      </div>
+      <div class="session-detail__section-title">Notifications</div>
       <router-link :to="`/admin/sessions/${session._id}/notifications`"
         >{{
           session.notifications ? session.notifications.length : 0
@@ -100,19 +98,15 @@
       v-if="studentFeedback"
       class="session-detail__section session-detail__section--feedback"
     >
-      <div class="session-detail__section-title">
-        Student feedback
-      </div>
+      <div class="session-detail__section-title">Student feedback</div>
       <feedback-preview :feedback="studentFeedback" :userType="'student'" />
     </div>
     <div
       v-if="volunteerFeedback"
       class="session-detail__section session-detail__section--feedback"
     >
-      <div class="session-detail__section-title">
-        Volunteer feedback
-      </div>
-      <feedback-preview :feedback="volunteerFeedback" :userType="'volunteer'"/>
+      <div class="session-detail__section-title">Volunteer feedback</div>
+      <feedback-preview :feedback="volunteerFeedback" :userType="'volunteer'" />
     </div>
     <div v-if="session.photos.length > 0" class="session-detail__section">
       <div class="session-detail__section-title">Photos</div>
@@ -162,7 +156,7 @@ export default {
     ChatLog,
     FeedbackPreview,
     SessionFlags,
-    Separator
+    Separator,
   },
 
   data() {
@@ -171,7 +165,7 @@ export default {
       quillEditor: null,
       zwibblerCtx: null,
       reviewError: false,
-      loadingWhiteboardError: ''
+      loadingWhiteboardError: '',
     }
   },
 
@@ -195,10 +189,16 @@ export default {
       return endedBy ? endedBy.firstname : '?'
     },
     studentFeedback() {
-      return this.session.feedbacks && (this.session.feedbacks.studentTutoringFeedback || this.session.feedbacks.studentCounselingFeedback) ? this.session.feedbacks : null
+      return this.session.feedbacks &&
+        (this.session.feedbacks.studentTutoringFeedback ||
+          this.session.feedbacks.studentCounselingFeedback)
+        ? this.session.feedbacks
+        : null
     },
     volunteerFeedback() {
-      return this.session.feedbacks && this.session.feedbacks.volunteerFeedback ? this.session.feedbacks : null
+      return this.session.feedbacks && this.session.feedbacks.volunteerFeedback
+        ? this.session.feedbacks
+        : null
     },
     devicePlatform() {
       if (
@@ -217,12 +217,12 @@ export default {
     },
     isWhiteboardSession() {
       return this.session.type !== 'college'
-    }
+    },
   },
 
   async created() {
     const {
-      body: { session }
+      body: { session },
     } = await NetworkService.adminGetSession(this.$route.params.sessionId)
     this.session = session
 
@@ -240,7 +240,7 @@ export default {
           showToolbar: false,
           showColourPanel: false,
           collaborationServer: `${config.websocketRoot}/whiteboard/admin/{name}`,
-          readOnly: true
+          readOnly: true,
         })
 
         try {
@@ -262,7 +262,7 @@ export default {
               x: 0,
               y: 0,
               width: 1,
-              height: 1
+              height: 1,
             })
           }
         })
@@ -273,7 +273,7 @@ export default {
   methods: {
     async toggleReviewedSession(event) {
       const {
-        target: { checked }
+        target: { checked },
       } = event
       this.reviewError = false
       const sessionId = this.session._id
@@ -288,8 +288,8 @@ export default {
 
     goBack() {
       this.$router.go(-1)
-    }
-  }
+    },
+  },
 }
 </script>
 

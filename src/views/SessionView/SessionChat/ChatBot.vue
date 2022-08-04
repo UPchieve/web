@@ -29,33 +29,31 @@ export default {
     return {
       unsentBotMessages: [],
       sentBotMessages: [],
-      botInterval: null
+      botInterval: null,
     }
   },
 
   computed: {
     ...mapGetters({
-      firstName: 'user/firstName'
+      firstName: 'user/firstName',
     }),
 
     isStillMessaging() {
       return this.unsentBotMessages.length > 0
-    }
+    },
   },
 
   created() {
     const botMessages = [
       {
-        msg: `Hey ${this.firstName}! I'm the UPchieve Bot.`
+        msg: `Hey ${this.firstName}! I'm the UPchieve Bot.`,
       },
       {
-        msg:
-          "Right now we're searching for a live coach to pair you with. This process should only take 5-10 minutes, so please hang tight!"
+        msg: "Right now we're searching for a live coach to pair you with. This process should only take 5-10 minutes, so please hang tight!",
       },
       {
-        msg:
-          "While you're waiting, you can save time by telling us what you need help with in the chat! You can also write out a problem you're working on on the whiteboard."
-      }
+        msg: "While you're waiting, you can save time by telling us what you need help with in the chat! You can also write out a problem you're working on on the whiteboard.",
+      },
     ]
 
     this.unsentBotMessages = botMessages
@@ -77,8 +75,8 @@ export default {
       this.sentBotMessages.push(newMessage)
 
       this.$emit('new-bot-message')
-    }
-  }
+    },
+  },
 }
 </script>
 

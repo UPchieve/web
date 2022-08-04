@@ -47,13 +47,14 @@ import TrainingView from './views/TrainingView'
 import VerificationView from './views/VerificationView'
 import VolunteerPartnerSignupView from './views/VolunteerPartnerSignupView'
 import SessionHistoryView from './views/SessionHistoryView'
+import SessionRecapView from './views/SessionRecapView'
 
 Vue.use(VueResource)
 Vue.http.options.credentials = true
 
 const getUser = () => {
   if (store.getters['user/isAuthenticated']) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       store.dispatch('user/fetchUser')
       resolve()
     })
@@ -75,80 +76,80 @@ const routes = [
           }
         })
         .catch(() => {})
-    }
+    },
   },
   {
     path: '/contact',
     name: 'ContactView',
     component: ContactView,
-    meta: { authOptional: true }
+    meta: { authOptional: true },
   },
   {
     path: '/legal',
     name: 'LegalView',
     component: LegalView,
-    meta: { authOptional: true }
+    meta: { authOptional: true },
   },
   {
     path: '/login',
     name: 'LoginView',
     component: LoginView,
-    meta: { loggedOutOnly: true }
+    meta: { loggedOutOnly: true },
   },
   {
     path: '/logout',
     name: 'LogoutView',
     component: LogoutView,
-    meta: { loggedOutOnly: true }
+    meta: { loggedOutOnly: true },
   },
   {
     path: '/reference-form/:referenceId',
     name: 'ReferenceView',
     component: ReferenceView,
-    meta: { authOptional: true }
+    meta: { authOptional: true },
   },
   {
     path: '/signup',
     beforeEnter: (to, from, next) => {
       next('/sign-up')
-    }
+    },
   },
   {
     path: '/sign-up/:userType?/:step?',
     name: 'SignupView',
     component: SignupView,
-    meta: { loggedOutOnly: true }
+    meta: { loggedOutOnly: true },
   },
   {
     path: '/signup/student/:partnerId',
     name: 'StudentPartnerSignupView',
     component: StudentPartnerSignupView,
-    meta: { loggedOutOnly: true }
+    meta: { loggedOutOnly: true },
   },
   {
     path: '/signup/volunteer/:partnerId',
     name: 'VolunteerPartnerSignupView',
     component: VolunteerPartnerSignupView,
-    meta: { loggedOutOnly: true }
+    meta: { loggedOutOnly: true },
   },
-  { 
+  {
     path: '/sessions/history',
     name: 'SessionHistoryView',
     component: SessionHistoryView,
-    meta: { protected: true }
+    meta: { protected: true },
   },
   {
     path: '/referral/:referredByCode',
     beforeEnter: (to, from, next) => {
       const referredByCode = to.params.referredByCode
       next(`/sign-up?referral=${referredByCode}`)
-    }
+    },
   },
   {
     path: '/integration',
     beforeEnter: (to, from, next) => {
       const {
-        query: { assignmentId, partner, problemId, studentId }
+        query: { assignmentId, partner, problemId, studentId },
       } = to
 
       localStorage.setItem('assignmentId', assignmentId)
@@ -162,24 +163,24 @@ const routes = [
           next(`/signup/student/${partner}`)
         }
       })
-    }
+    },
   },
   {
     path: '/resetpassword',
     name: 'ResetPasswordView',
-    component: ResetPasswordView
+    component: ResetPasswordView,
   },
   {
     path: '/setpassword',
     name: 'SetPasswordView',
     component: SetPasswordView,
-    props: route => ({ token: route.query.token })
+    props: (route) => ({ token: route.query.token }),
   },
   {
     path: '/dashboard',
     name: 'DashboardView',
     component: DashboardView,
-    meta: { protected: true }
+    meta: { protected: true },
   },
   {
     path: '/session/:topic/:subTopic/:sessionId?',
@@ -194,13 +195,13 @@ const routes = [
         Object.prototype.hasOwnProperty.call(topics[topic].subtopics, subtopic)
       if (isValidTopicAndSubtopic) next()
       else next('/dashboard')
-    }
+    },
   },
   {
     path: '/resources',
     name: 'ResourcesView',
     component: ResourcesView,
-    meta: { protected: true }
+    meta: { protected: true },
   },
   {
     path: '/refer-friends',
@@ -210,20 +211,19 @@ const routes = [
     beforeEnter: (to, from, next) => {
       if (store.getters['featureFlags/isReferFriendsActive']) next()
       else next('/dashboard')
-    }
+    },
   },
   {
     path: '/feedback/:sessionId',
     name: 'FeedbackView',
     component: FeedbackView,
-    meta: { protected: true }
+    meta: { protected: true },
   },
   {
-    path:
-      '/feedback/:sessionId/:topic/:subTopic/:userType/:studentId/:volunteerId',
+    path: '/feedback/:sessionId/:topic/:subTopic/:userType/:studentId/:volunteerId',
     name: 'StudentCounselingFeedbackView',
     component: StudentCounselingFeedbackView,
-    meta: { protected: true }
+    meta: { protected: true },
   },
   {
     path: '/verify',
@@ -240,164 +240,170 @@ const routes = [
           }
         })
         .catch(() => {})
-    }
+    },
   },
   {
     path: '/training',
     name: 'TrainingView',
     component: TrainingView,
-    meta: { protected: true }
+    meta: { protected: true },
   },
   {
     path: '/training/review/:category',
     name: 'ReviewMaterialsView',
     component: ReviewMaterialsView,
-    meta: { protected: true }
+    meta: { protected: true },
   },
   {
     path: '/training/:category/quiz',
     name: 'QuizView',
     component: QuizView,
-    meta: { protected: true }
+    meta: { protected: true },
   },
   {
     path: '/training/course/:courseKey',
     name: 'TrainingCourseView',
     component: TrainingCourseView,
-    meta: { protected: true }
+    meta: { protected: true },
   },
   {
     path: '/profile',
     name: 'ProfileView',
     component: ProfileView,
-    meta: { protected: true }
+    meta: { protected: true },
   },
   {
     path: '/favorite-coaches',
     name: 'FavoriteCoachesView',
     component: FavoriteCoachesView,
-    meta: { protected: true }
+    meta: { protected: true },
   },
   {
     path: '/calendar',
     name: 'CalendarView',
     component: CalendarView,
-    meta: { protected: true }
+    meta: { protected: true },
   },
   {
     path: '/admin',
     name: 'Admin',
     component: AdminView,
-    meta: { protected: true, requiresAdmin: true }
+    meta: { protected: true, requiresAdmin: true },
   },
   {
     path: '/admin/volunteer-coverage',
     name: 'VolunteerCoverage',
     component: VolunteerCoverage,
-    meta: { protected: true, requiresAdmin: true }
+    meta: { protected: true, requiresAdmin: true },
   },
   {
     path: '/admin/sessions',
     name: 'AdminSessions',
     component: AdminSessions,
-    meta: { protected: true, requiresAdmin: true }
+    meta: { protected: true, requiresAdmin: true },
   },
   {
     path: '/admin/sessions/review',
     name: 'AdminSessionDetail',
     component: AdminSessionReview,
-    meta: { protected: true, requiresAdmin: true }
+    meta: { protected: true, requiresAdmin: true },
   },
   {
     path: '/admin/sessions/:sessionId',
     name: 'AdminSessionDetail',
     component: AdminSessionDetail,
-    meta: { protected: true, requiresAdmin: true }
+    meta: { protected: true, requiresAdmin: true },
   },
   {
     path: '/admin/sessions/:sessionId/notifications',
     name: 'AdminSessionNotifications',
     component: AdminSessionNotifications,
-    meta: { protected: true, requiresAdmin: true }
+    meta: { protected: true, requiresAdmin: true },
   },
   {
     path: '/admin/users',
     name: 'AdminUsers',
     component: AdminUsers,
-    meta: { protected: true, requiresAdmin: true }
+    meta: { protected: true, requiresAdmin: true },
   },
   {
     path: '/admin/users/:userId',
     name: 'AdminUserDetail',
     component: AdminUserDetail,
-    meta: { protected: true, requiresAdmin: true }
+    meta: { protected: true, requiresAdmin: true },
   },
   {
     path: '/admin/volunteers/review',
     name: 'AdminPendingVolunteers',
     component: AdminPendingVolunteers,
-    meta: { protected: true, requiresAdmin: true }
+    meta: { protected: true, requiresAdmin: true },
   },
   {
     path: '/admin/ineligible-students',
     name: 'AdminIneligibleStudents',
     component: AdminIneligibleStudents,
-    meta: { protected: true, requiresAdmin: true }
+    meta: { protected: true, requiresAdmin: true },
   },
   {
     path: '/admin/school/new',
     name: 'AdminAddSchool',
     component: AdminAddSchool,
-    meta: { protected: true, requiresAdmin: true }
+    meta: { protected: true, requiresAdmin: true },
   },
   {
     path: '/admin/school/edit',
     name: 'AdminAddSchool',
     component: AdminEditSchool,
-    meta: { protected: true, requiresAdmin: true }
+    meta: { protected: true, requiresAdmin: true },
   },
   {
     path: '/admin/school/:schoolId',
     name: 'AdminSchoolDetail',
     component: AdminSchoolDetail,
-    meta: { protected: true, requiresAdmin: true }
+    meta: { protected: true, requiresAdmin: true },
   },
   {
     path: '/admin/schools',
     name: 'AdminSchools',
     component: AdminSchools,
-    meta: { protected: true, requiresAdmin: true }
+    meta: { protected: true, requiresAdmin: true },
   },
   {
     path: '/admin/reports/students',
     name: 'AdminStudentReports',
     component: AdminStudentReports,
-    meta: { protected: true, requiresAdmin: true }
+    meta: { protected: true, requiresAdmin: true },
   },
   {
     path: '/admin/reports/volunteers',
     name: 'AdminVolunteerReports',
     component: AdminVolunteerReports,
-    meta: { protected: true, requiresAdmin: true }
+    meta: { protected: true, requiresAdmin: true },
   },
   {
     path: '/admin/zip-codes',
     name: 'AdminZipCodes',
     component: AdminZipCodes,
-    meta: { protected: true, requiresAdmin: true }
+    meta: { protected: true, requiresAdmin: true },
   },
   {
     path: '/background-information',
     name: 'BackgroundInfoView',
     component: BackgroundInfoView,
-    meta: { protected: true }
+    meta: { protected: true },
+  },
+  {
+    path: '/sessions/:sessionId/recap',
+    name: 'SessionRecapView',
+    component: SessionRecapView,
+    meta: { protected: true },
   },
   {
     path: '/edu', // TODO: make this be "/admin/edu"
     component: () => {
       window.location.href = '/edu'
-    }
-  }
+    },
+  },
 ]
 
 /**
@@ -409,37 +415,37 @@ const router = new VueRouter({
   mode: 'history',
   scrollBehavior() {
     return { x: 0, y: 0 }
-  }
+  },
 })
 
 export default router
 
 // Router middleware to check authentication for protect routes
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(route => route.meta.requiresAdmin)) {
+  if (to.matched.some((route) => route.meta.requiresAdmin)) {
     getUser()
       .then(() => {
         if (!store.state.user.user.isAdmin) {
           next({
             path: '/login',
             query: {
-              redirect: to.fullPath
-            }
+              redirect: to.fullPath,
+            },
           })
         } else {
           next()
         }
       })
       .catch(() => {})
-  } else if (to.matched.some(route => route.meta.protected)) {
+  } else if (to.matched.some((route) => route.meta.protected)) {
     getUser()
       .then(() => {
         if (!store.getters['user/isAuthenticated']) {
           next({
             path: '/login',
             query: {
-              redirect: to.fullPath
-            }
+              redirect: to.fullPath,
+            },
           })
         } else if (!store.getters['user/isVerified']) {
           const route = '/verify'
@@ -447,14 +453,14 @@ router.beforeEach((to, from, next) => {
           else
             next({
               path: route,
-              redirect: to.fullPath
+              redirect: to.fullPath,
             })
         } else {
           next()
         }
       })
       .catch(() => {})
-  } else if (to.matched.some(route => route.meta.loggedOutOnly)) {
+  } else if (to.matched.some((route) => route.meta.loggedOutOnly)) {
     getUser()
       .then(() => {
         if (store.getters['user/isAuthenticated']) {
@@ -464,7 +470,7 @@ router.beforeEach((to, from, next) => {
         }
       })
       .catch(() => {})
-  } else if (to.matched.some(route => route.meta.authOptional)) {
+  } else if (to.matched.some((route) => route.meta.authOptional)) {
     getUser()
       .then(() => {
         next()
@@ -487,7 +493,10 @@ router.afterEach((to, from) => {
     // @todo: only track on prod
     window.gtag('config', 'UA-133171872-1', {
       page_path: router.currentRoute.path,
-      custom_map: { dimension1: 'is_volunteer', dimension2: 'is_authenticated' }
+      custom_map: {
+        dimension1: 'is_volunteer',
+        dimension2: 'is_authenticated',
+      },
     })
 
     const isAuthenticated = store.getters['user/isAuthenticated']
@@ -503,7 +512,7 @@ router.afterEach((to, from) => {
 // If endpoint returns 401, redirect to login (except for requests to get user or user's
 // session)
 Vue.http.interceptors.push((request, next) => {
-  next(response => {
+  next((response) => {
     const is401 = response.status === 401
     const isGetUserAttempt =
       request.url.indexOf('/api/user') !== -1 && request.method === 'GET'
@@ -520,6 +529,6 @@ Vue.http.interceptors.push((request, next) => {
 Vue.http.interceptors.push((request) => {
   const csrfToken = store.getters['app/csrfToken']
   if (csrfToken) {
-    request.headers.set('X-CSRF-TOKEN', csrfToken);
-  }   
-});
+    request.headers.set('X-CSRF-TOKEN', csrfToken)
+  }
+})

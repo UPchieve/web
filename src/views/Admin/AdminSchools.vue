@@ -24,7 +24,7 @@
           :options="states"
           label="label"
           :searchable="true"
-          :reduce="option => option.value"
+          :reduce="(option) => option.value"
         />
       </div>
 
@@ -62,9 +62,9 @@ import SchoolListItem from '@/components/Admin/SchoolListItem'
 import PlusIcon from '@/assets/plus_icon.svg'
 import { STATES_WITH_ABBREVIATIONS } from '@/consts'
 
-const getSchools = async data => {
+const getSchools = async (data) => {
   const {
-    body: { schools, isLastPage }
+    body: { schools, isLastPage },
   } = await NetworkService.adminGetSchools(data)
   return { schools, isLastPage }
 }
@@ -79,12 +79,12 @@ export default {
       schools: [],
       name: '',
       city: '',
-      state: ''
+      state: '',
     }
   },
   async created() {
     const {
-      query: { page: pageQuery, name, city, state }
+      query: { page: pageQuery, name, city, state },
     } = this.$route
     const page = parseInt(pageQuery) || this.page
     this.name = name || this.name
@@ -104,7 +104,7 @@ export default {
     },
     states() {
       return STATES_WITH_ABBREVIATIONS
-    }
+    },
   },
   methods: {
     setPage(page) {
@@ -126,18 +126,18 @@ export default {
       const data = {
         name: this.name,
         city: this.city,
-        state: this.state ? this.state : ''
+        state: this.state ? this.state : '',
       }
       this.$router.push({
         path: '/admin/schools',
         query: {
           ...data,
-          page: this.page
-        }
+          page: this.page,
+        },
       })
       const { schools, isLastPage } = await getSchools({
         ...data,
-        page: this.page
+        page: this.page,
       })
       this.schools = schools
       this.isLastPage = isLastPage
@@ -148,8 +148,8 @@ export default {
       if (key === 'Enter' && tagName === 'INPUT') {
         this.getSchools()
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

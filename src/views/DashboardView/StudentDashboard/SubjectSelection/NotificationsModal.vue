@@ -36,24 +36,24 @@ import * as Sentry from '@sentry/browser'
 export default {
   components: { LargeButton, LoadingMessage },
   props: {
-    modalData: { type: Object, required: true }
+    modalData: { type: Object, required: true },
   },
   data() {
     return {
       selectedSubtopic: '',
-      isLoadingSession: false
+      isLoadingSession: false,
     }
   },
   computed: {
     ...mapState({
-      isMobileApp: state => state.app.isMobileApp
+      isMobileApp: (state) => state.app.isMobileApp,
     }),
     ...mapGetters({ mobileMode: 'app/mobileMode' }),
     title() {
       return this.modalData.topic
         ? `Choose a ${this.modalData.topic} subject`
         : 'Choose a subject'
-    }
+    },
   },
   methods: {
     async handlePushNotification() {
@@ -82,8 +82,8 @@ export default {
 
       const { topic, selectedSubtopic } = this.modalData
       startSession(this.$router, topic, selectedSubtopic)
-    }
-  }
+    },
+  },
 }
 </script>
 

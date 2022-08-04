@@ -10,7 +10,7 @@ export const GOOGLE_PLAY_STORE_LINK =
   'https://play.google.com/store/apps/details?id=org.upchieve.mobile'
 
 export const PHYSICS_MAPPING = {
-  physicsone: 'physicsOne'
+  physicsone: 'physicsOne',
 }
 
 export const CDN_URL = 'https://upchievecdn.blob.core.windows.net'
@@ -68,7 +68,7 @@ export const STATES = [
   'Washington',
   'West Virginia',
   'Wisconsin',
-  'Wyoming'
+  'Wyoming',
 ]
 
 export const COUNTRIES = [
@@ -320,7 +320,7 @@ export const COUNTRIES = [
   'Yemen',
   'Zambia',
   'Zimbabwe',
-  'Aland Islands'
+  'Aland Islands',
 ]
 
 export const STATES_WITH_ABBREVIATIONS = [
@@ -382,7 +382,7 @@ export const STATES_WITH_ABBREVIATIONS = [
   { label: 'Washington', value: 'WA' },
   { label: 'West Virginia', value: 'WV' },
   { label: 'Wisconsin', value: 'WI' },
-  { label: 'Wyoming', value: 'WY' }
+  { label: 'Wyoming', value: 'WY' },
 ]
 
 // user events in a [noun][verb] format
@@ -417,12 +417,13 @@ export const EVENTS = {
   STUDENT_ENTERED_PASSWORD: 'STUDENT_ENTERED_PASSWORD',
   STUDENT_ENTERED_ZIP_CODE: 'STUDENT_ENTERED_ZIP_CODE',
   STUDENT_SEARCHED_SCHOOL: 'STUDENT_SEARCHED_SCHOOL',
-  STUDENT_SELECTED_SCHOOL: 'STUDENT_SELECTED_SCHOOL'
+  STUDENT_SELECTED_SCHOOL: 'STUDENT_SELECTED_SCHOOL',
+  VOLUNTEER_CLICKED_ABOUT_SESSION: 'VOLUNTEER_CLICKED_ABOUT_SESSION',
 }
 
 export const VERIFICATION_METHOD = {
   SMS: 'sms',
-  EMAIL: 'email'
+  EMAIL: 'email',
 }
 
 export const FEATURE_FLAGS = {
@@ -430,12 +431,19 @@ export const FEATURE_FLAGS = {
   STUDENT_BANNED_STATE: 'student-banned-state',
   DASHBOARD_REDESIGN: 'dashboard-redesign',
   GATES_STUDY: 'gates-study',
-  ALGEBRA_TWO_LAUNCH: 'algebra-two-launch',
   DOWNTIME_BANNER: 'downtime-banner',
   CHATBOT: 'chatbot',
   COACH_FAVORITING: 'coach-favoriting',
   SESSION_HISTORY: 'session-history',
-  READING_LAUNCH: 'reading-launch',
+  DASHBOARD_BANNER: 'dashboard-banner',
+  ZIP_CODE_CHECK: 'zip-code-check',
+  DISCOVERY_SOURCE: 'discovery-source',
+  UPCHIEVE_101_GRACE_PERIOD_BANNER: 'training-grace-period-banner',
+  SUMMER_PREP_BANNER: 'summer-prep-banner',
+  US_HISTORY_LAUNCH_VOLUNTEER: 'us-history-launch-volunteer',
+  US_HISTORY_LAUNCH_STUDENT: 'us-history-launch-student',
+  CONTEXT_SHARING_WITH_VOLUNTEER: 'context-sharing-with-volunteer',
+  ENVIRONMENTAL_SCIENCE_LAUNCH_STUDENT: 'environmental-science-launch-student',
 }
 
 export const ANALYTICS_REPORT_ROW = {
@@ -465,7 +473,7 @@ export const ANALYTICS_REPORT_ROW = {
   DATE_RANGE_TRAINING_HOURS: 'Training hours within date range',
   DATE_RANGE_ELAPSED_AVAILABILITY_HOURS:
     'Elapsed availability hours within date range',
-  DATE_RANGE_VOLUNTEER_HOURS: 'Total hours within date range'
+  DATE_RANGE_VOLUNTEER_HOURS: 'Total hours within date range',
 }
 
 export const ANALYTICS_REPORT_SUMMARY = {
@@ -480,5 +488,11 @@ export const ANALYTICS_REPORT_SUMMARY = {
   TOTAL_TEXTS_RECEIVED: 'Total tutoring opportunities provided',
   TOTAL_SESSIONS_COMPLETED: 'Total sessions completed',
   TOTAL_VOLUNTEER_HOURS: 'Total volunteer hours completed',
-  TOTAL_UNIQUE_STUDENTS_HELPED: 'Total unique students helped'
+  TOTAL_UNIQUE_STUDENTS_HELPED: 'Total unique students helped',
+}
+
+export const QUESTION_TYPES = {
+  multipleChoice: 'multiple choice',
+  checkBox: 'check box',
+  freeResponse: 'free response',
 }

@@ -14,11 +14,11 @@ import calculateWaitingPeriodCountdown from '@/utils/calculate-waiting-period-co
 export default {
   name: 'waiting-period-header',
   props: {
-    headerData: Object
+    headerData: Object,
   },
   computed: {
     ...mapGetters({
-      mobileMode: 'app/mobileMode'
+      mobileMode: 'app/mobileMode',
     }),
     message() {
       // TODO: implement a better timer and transition to the default header from this timer
@@ -28,8 +28,8 @@ export default {
       const minuteTextFormat = countdown === 1 ? 'minute' : 'minutes'
 
       return `You must wait at least ${countdown} ${minuteTextFormat} before requesting a new session.`
-    }
-  }
+    },
+  },
 }
 </script>
 

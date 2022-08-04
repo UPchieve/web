@@ -16,7 +16,7 @@ import moment from 'moment'
 export default {
   name: 'PendingVolunteerListItem',
   props: {
-    volunteer: { type: Object, required: true }
+    volunteer: { type: Object, required: true },
   },
   computed: {
     readyForReviewAt() {
@@ -25,8 +25,8 @@ export default {
 
     fullName() {
       return `${this.volunteer.firstname} ${this.volunteer.lastname}`
-    }
-  }
+    },
+  },
 }
 </script>
 

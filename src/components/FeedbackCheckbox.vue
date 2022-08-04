@@ -31,11 +31,11 @@ export default {
   props: {
     id: {
       type: String,
-      required: true
+      required: true,
     },
     options: Array,
     value: String,
-    selectedOptions: Array
+    selectedOptions: Array,
   },
   computed: {
     checked() {
@@ -47,9 +47,9 @@ export default {
       },
       set(val) {
         this.$emit('input', val)
-      }
-    }
-  }
+      },
+    },
+  },
 }
 </script>
 

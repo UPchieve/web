@@ -5,7 +5,7 @@
       'account-action--progress': status === 'PROGRESS',
       'account-action--pending': status === 'PENDING',
       'account-action--completed': status === 'COMPLETED',
-      'account-action--error': status === 'ERROR'
+      'account-action--error': status === 'ERROR',
     }"
   >
     <div class="account-action__icon-container">
@@ -28,14 +28,14 @@ export default {
   name: 'account-action',
   components: {
     RightCaret,
-    CheckIcon
+    CheckIcon,
   },
   props: {
     title: String,
     subtitle: String,
     status: String,
-    icon: Object
-  }
+    icon: Object,
+  },
 }
 </script>
 

@@ -90,14 +90,14 @@ export default {
     FormPageTemplate,
     StudentForm,
     VolunteerForm,
-    FormFooter
+    FormFooter,
   },
   data() {
     return {
       userSelection: null,
       isReferred: false,
       referredBy: {},
-      isLoginLinkVisible: true
+      isLoginLinkVisible: true,
     }
   },
 
@@ -109,7 +109,7 @@ export default {
       this.isReferred = true
 
       const {
-        data: { user }
+        data: { user },
       } = await NetworkService.getReferredBy(referralCode)
 
       if (!user) {
@@ -126,7 +126,7 @@ export default {
   },
   computed: {
     ...mapState({
-      isMobileApp: state => state.app.isMobileApp
+      isMobileApp: (state) => state.app.isMobileApp,
     }),
     welcomeMessage() {
       if (this.isReferred && this.referredBy)
@@ -138,7 +138,7 @@ export default {
       if (this.referredBy && this.referredBy.firstname)
         return capitalize(this.referredBy.firstname)
       else return ''
-    }
+    },
   },
 
   methods: {
@@ -152,8 +152,8 @@ export default {
     },
     hideLoginLink() {
       this.isLoginLinkVisible = false
-    }
-  }
+    },
+  },
 }
 </script>
 

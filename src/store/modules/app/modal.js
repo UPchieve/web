@@ -3,12 +3,12 @@ export default {
   state: {
     component: null,
     data: {},
-    isShown: false
+    isShown: false,
   },
   mutations: {
     setComponent: (state, component = null) => (state.component = component),
     setData: (state, data = {}) => (state.data = data),
-    setIsShown: (state, b) => (state.isShown = !!b)
+    setIsShown: (state, b) => (state.isShown = !!b),
   },
   actions: {
     show: ({ commit }, payload = {}) => {
@@ -20,6 +20,6 @@ export default {
       commit('setIsShown', false)
       commit('setComponent', null)
       commit('setData', {})
-    }
-  }
+    },
+  },
 }

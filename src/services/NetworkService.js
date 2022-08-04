@@ -25,13 +25,14 @@ export default {
   },
   _faultTolerantHttp(http, method, onRetry, url, data) {
     const promiseToRetry = () => {
-      return (['get', 'delete', 'head', 'jsonp'].indexOf(method) !== -1
-        ? http[method](url, {
-            timeout: FAULT_TOLERANT_HTTP_TIMEOUT
-          })
-        : http[method](url, data, {
-            timeout: FAULT_TOLERANT_HTTP_TIMEOUT
-          })
+      return (
+        ['get', 'delete', 'head', 'jsonp'].indexOf(method) !== -1
+          ? http[method](url, {
+              timeout: FAULT_TOLERANT_HTTP_TIMEOUT,
+            })
+          : http[method](url, data, {
+              timeout: FAULT_TOLERANT_HTTP_TIMEOUT,
+            })
       ).then(this._successHandler, this._errorHandler)
     }
 
@@ -39,13 +40,13 @@ export default {
     const requestState = { isAborted: false }
 
     return promiseRetry(
-      retry => {
+      (retry) => {
         if (requestState.isAborted) {
           // early exit
           throw errcode(new Error('Aborted by user'), 'EUSERABORTED')
         }
 
-        return promiseToRetry().catch(res => {
+        return promiseToRetry().catch((res) => {
           if (res.status === 0) {
             if (onRetry) {
               onRetry(res, () => {
@@ -60,7 +61,7 @@ export default {
       },
       {
         retries: FAULT_TOLERANT_HTTP_MAX_RETRIES,
-        maxTimeout: FAULT_TOLERANT_HTTP_MAX_RETRY_TIMEOUT
+        maxTimeout: FAULT_TOLERANT_HTTP_MAX_RETRY_TIMEOUT,
       }
     )
   },
@@ -250,7 +251,7 @@ export default {
     return Vue.http
       .post(`${API_ROOT}/session/${sessionId}/report`, {
         reportReason,
-        reportMessage
+        reportMessage,
       })
       .then(this._successHandler, this._errorHandler)
   },
@@ -281,7 +282,7 @@ export default {
     volunteerRating,
     firstTimeStudent,
     firstTimeVolunteer,
-    isReported
+    isReported,
   }) {
     const queryParams = new URLSearchParams({
       page,
@@ -295,7 +296,7 @@ export default {
       volunteerRating,
       firstTimeStudent,
       firstTimeVolunteer,
-      isReported
+      isReported,
     }).toString()
 
     return Vue.http
@@ -349,7 +350,7 @@ export default {
     lastName,
     email,
     partnerOrg,
-    highSchool
+    highSchool,
   }) {
     const queryParams = new URLSearchParams({
       page,
@@ -358,7 +359,7 @@ export default {
       lastName,
       email,
       partnerOrg,
-      highSchool
+      highSchool,
     }).toString()
 
     return Vue.http
@@ -380,7 +381,7 @@ export default {
       name,
       state,
       city,
-      page
+      page,
     }).toString()
     return Vue.http
       .get(`${ELIGIBILITY_API_ROOT}/schools?${queryParams}`)
@@ -414,7 +415,7 @@ export default {
     highSchoolId,
     studentPartnerOrg,
     studentPartnerSite,
-    sponsorOrg
+    sponsorOrg,
   }) {
     const queryParams = new URLSearchParams({
       joinedBefore,
@@ -424,11 +425,11 @@ export default {
       highSchoolId,
       studentPartnerOrg,
       studentPartnerSite,
-      sponsorOrg
+      sponsorOrg,
     }).toString()
     return Vue.http
       .get(`${API_ROOT}/reports/session-report?${queryParams}`, {
-        timeout: 300000
+        timeout: 300000,
       })
       .then(this._successHandler, this._errorHandler)
   },
@@ -440,7 +441,7 @@ export default {
     highSchoolId,
     studentPartnerOrg,
     studentPartnerSite,
-    sponsorOrg
+    sponsorOrg,
   }) {
     const queryParams = new URLSearchParams({
       joinedBefore,
@@ -450,11 +451,11 @@ export default {
       highSchoolId,
       studentPartnerOrg,
       studentPartnerSite,
-      sponsorOrg
+      sponsorOrg,
     }).toString()
     return Vue.http
       .get(`${API_ROOT}/reports/usage-report?${queryParams}`, {
-        timeout: 300000
+        timeout: 300000,
       })
       .then(this._successHandler, this._errorHandler)
   },
@@ -462,11 +463,11 @@ export default {
     const queryParams = new URLSearchParams({
       startDate,
       endDate,
-      partnerOrg
+      partnerOrg,
     }).toString()
     return Vue.http
       .get(`${API_ROOT}/reports/volunteer-telecom-report?${queryParams}`, {
-        timeout: 300000
+        timeout: 300000,
       })
       .then(this._successHandler, this._errorHandler)
   },
@@ -474,7 +475,7 @@ export default {
     const queryParams = new URLSearchParams({
       startDate,
       endDate,
-      partnerOrg
+      partnerOrg,
     }).toString()
     return Vue.http
       .get(`${API_ROOT}/reports/partner-analytics-report?${queryParams}`, {
@@ -482,9 +483,9 @@ export default {
         headers: {
           'Content-Disposition': 'attachment; filename=analytics-report.xlsx',
           'Content-Type':
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         },
-        responseType: 'arraybuffer'
+        responseType: 'arraybuffer',
       })
       .then(this._successHandler, this._errorHandler)
   },
@@ -532,7 +533,7 @@ export default {
   recordTrainingCourseProgress(courseKey, materialKey) {
     return Vue.http
       .post(`${API_ROOT}/training/course/${courseKey}/progress`, {
-        materialKey
+        materialKey,
       })
       .then(this._successHandler, this._errorHandler)
   },
@@ -553,6 +554,11 @@ export default {
       )
       .then(this._successHandler, this._errorHandler)
   },
+  checkZipCode(context, { zipCode }) {
+    return context.$http
+      .get(`${ELIGIBILITY_API_ROOT}/check-zip-code/${zipCode}`)
+      .then(this._successHandler, this._errorHandler)
+  },
   checkStudentEligibility(
     context,
     { schoolUpchieveId, zipCode, email, referredByCode, currentGrade }
@@ -563,7 +569,7 @@ export default {
         zipCode,
         email,
         referredByCode,
-        currentGrade
+        currentGrade,
       })
       .then(this._successHandler, this._errorHandler)
   },
@@ -585,7 +591,7 @@ export default {
   getFeedback({ sessionId, userType }) {
     const queryParams = new URLSearchParams({
       sessionId,
-      userType
+      userType,
     }).toString()
     return Vue.http
       .get(`${API_ROOT}/feedback?${queryParams}`)
@@ -601,14 +607,14 @@ export default {
       .post(`${API_ROOT}/user/volunteer-approval/reference`, {
         referenceFirstName,
         referenceLastName,
-        referenceEmail
+        referenceEmail,
       })
       .then(this._successHandler, this._errorHandler)
   },
   deleteReference({ referenceEmail }) {
     return Vue.http
       .post(`${API_ROOT}/user/volunteer-approval/reference/delete`, {
-        referenceEmail
+        referenceEmail,
       })
       .then(this._successHandler, this._errorHandler)
   },
@@ -637,9 +643,34 @@ export default {
       .post(`${API_ROOT}/survey/presession/${sessionId}`, { responseData })
       .then(this._successHandler, this._errorHandler)
   },
-  getPresessionSurvey(sessionId) {
+  submitSurvey(survey) {
+    return Vue.http
+      .post(`${API_ROOT}/survey/save`, survey)
+      .then(this._successHandler, this._errorHandler)
+  },
+  getPresessionSurveyForFeedback(sessionId) {
     return Vue.http
       .get(`${API_ROOT}/survey/presession/${sessionId}`)
+      .then(this._successHandler, this._errorHandler)
+  },
+  getStudentsPresessionGoal(sessionId) {
+    return Vue.http
+      .get(`${API_ROOT}/survey/presession/${sessionId}/goal`)
+      .then(this._successHandler, this._errorHandler)
+  },
+  getPresessionSurvey(subjectName) {
+    return Vue.http
+      .get(`${API_ROOT}/survey/presession?subject=${subjectName}`)
+      .then(this._successHandler, this._errorHandler)
+  },
+  getPresessionSurveyResponse(sessionId) {
+    return Vue.http
+      .get(`${API_ROOT}/survey/presession/response/${sessionId}`)
+      .then(this._successHandler, this._errorHandler)
+  },
+  getPostsessionSurvey(subjectName) {
+    return Vue.http
+      .get(`${API_ROOT}/survey/postsession?subject=${subjectName}`)
       .then(this._successHandler, this._errorHandler)
   },
   getUserProductFlags() {
@@ -649,8 +680,8 @@ export default {
   },
   updateFavoriteVolunteerStatus(volunteerId, data) {
     return Vue.http
-    .post(`${API_ROOT}/students/favorite-volunteers/${volunteerId}`, data)
-    .then(this._successHandler, this._errorHandler)
+      .post(`${API_ROOT}/students/favorite-volunteers/${volunteerId}`, data)
+      .then(this._successHandler, this._errorHandler)
   },
   getRemainingFavoriteVolunteers() {
     return Vue.http
@@ -675,6 +706,16 @@ export default {
   getFavoriteVolunteers(page) {
     return Vue.http
       .get(`${API_ROOT}/students/favorite-volunteers?page=${page}`)
+      .then(this._successHandler, this._errorHandler)
+  },
+  getSessionRecap(sessionId) {
+    return Vue.http
+      .get(`${API_ROOT}/sessions/${sessionId}/recap`)
+      .then(this._successHandler, this._errorHandler)
+  },
+  getStudentSignupSources() {
+    return Vue.http
+      .get(`${ELIGIBILITY_API_ROOT}/signup-sources/students`)
       .then(this._successHandler, this._errorHandler)
   },
 }

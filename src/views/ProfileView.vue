@@ -80,7 +80,7 @@
                 :color="{
                   checked: '#16D2AA',
                   unchecked: '#F44747',
-                  disabled: '#AAAAAA'
+                  disabled: '#AAAAAA',
                 }"
                 @change="toggleAccountActive"
                 :sync="true"
@@ -102,7 +102,7 @@
                 :color="{
                   checked: '#16D2AA',
                   unchecked: '#F44747',
-                  disabled: '#AAAAAA'
+                  disabled: '#AAAAAA',
                 }"
                 @change="toggleWebNotifications"
                 :sync="true"
@@ -162,7 +162,7 @@ export default {
   name: 'profile-view',
   components: {
     DeactivateAccountModal,
-    VuePhoneNumberInput
+    VuePhoneNumberInput,
   },
   data() {
     return {
@@ -175,7 +175,7 @@ export default {
       phoneInputInfo: {},
       isAccountActive: true,
       isAllowingNotifications: true,
-      showDeactivateAccountModal: false
+      showDeactivateAccountModal: false,
     }
   },
   created() {
@@ -190,16 +190,16 @@ export default {
       // Hack to initially mock the vue-phone-number-input data
       this.phoneInputInfo = {
         isValid: true,
-        e164: pn.getNumber('e164')
+        e164: pn.getNumber('e164'),
       }
     }
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: (state) => state.user.user,
     }),
     ...mapGetters({
-      avatarUrl: 'user/avatarUrl'
+      avatarUrl: 'user/avatarUrl',
     }),
     name() {
       const user = this.$store.state.user.user
@@ -214,7 +214,7 @@ export default {
 
       return {
         number: pn.getNumber('international'),
-        country: pn.getRegionCode()
+        country: pn.getRegionCode(),
       }
     },
     certKey() {
@@ -245,13 +245,16 @@ export default {
         }
 
         /**
-         * 
-         * show algebraTwo-temporary in profile view only if they have 
+         *
+         * show algebraTwo-temporary in profile view only if they have
          * it in their subjects and do not have algebraTwo
-         * 
+         *
          */
         // TODO: remove line below in algebra 2 launch cleanup
-        if (key === 'algebraTwo-temporary' && !user.subjects.includes('algebraTwo')) 
+        if (
+          key === 'algebraTwo-temporary' &&
+          !user.subjects.includes('algebraTwo')
+        )
           displayObj['Algebra 2 Temporary'] = true
 
         return displayObj
@@ -261,7 +264,7 @@ export default {
     },
     isNotificationPermissionGranted() {
       return 'Notification' in window && Notification.permission === 'granted'
-    }
+    },
   },
   methods: {
     onPhoneInputUpdate(phoneInputInfo) {
@@ -334,7 +337,7 @@ export default {
         const payloadUser = {}
         const keys = ['phone', 'isDeactivated']
 
-        keys.forEach(key => (payloadUser[key] = this.user[key]))
+        keys.forEach((key) => (payloadUser[key] = this.user[key]))
 
         // wait for save to succeed before coming out of edit mode
         UserService.setProfile(payloadUser).then(
@@ -343,7 +346,7 @@ export default {
             this.activeEdit = false
             this.saveFailed = false
             AnalyticsService.captureEvent(EVENTS.PROFILE_UPDATED, {
-              event: EVENTS.PROFILE_UPDATED
+              event: EVENTS.PROFILE_UPDATED,
             })
 
             if (
@@ -351,7 +354,7 @@ export default {
               payloadUser.isDeactivated !== isDeactivatedBeforeUpdate
             )
               AnalyticsService.captureEvent(EVENTS.ACCOUNT_DEACTIVATED, {
-                event: EVENTS.ACCOUNT_DEACTIVATED
+                event: EVENTS.ACCOUNT_DEACTIVATED,
               })
           },
           () => {
@@ -359,159 +362,159 @@ export default {
           }
         )
       }
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
 .profile {
-  font-size: 16px;
-  font-family: $font-family-default;
+  font-size: 16px
+  font-family: $font-family-default
 }
 
 .wrap-container {
-  padding: 15px 15px 55px 15px;
-  @include flex-container(column);
-  align-items: stretch;
+  padding: 15px 15px 55px 15px
+  @include flex-container(column)
+  align-items: stretch
 
-  @include child-spacing(top, 16px);
-  @include child-spacing(right, 0);
+  @include child-spacing(top, 16px)
+  @include child-spacing(right, 0)
 
   @include breakpoint-above('large') {
-    padding: 40px;
+    padding: 40px
 
-    @include child-spacing(top, 0);
-    @include child-spacing(right, 40px);
+    @include child-spacing(top, 0)
+    @include child-spacing(right, 40px)
 
-    @include flex-container(row);
+    @include flex-container(row)
 
     & > * {
-      flex-basis: 50%;
+      flex-basis: 50%
     }
   }
 }
 
 .header {
-  display: flex;
-  margin: 0;
-  font-size: 24px;
-  align-items: center;
-  justify-content: space-between;
-  font-weight: 500;
-  padding: 25px 15px 10px 35px;
+  display: flex
+  margin: 0
+  font-size: 24px
+  align-items: center
+  justify-content: space-between
+  font-weight: 500
+  padding: 25px 15px 10px 35px
 
   @include breakpoint-above('large') {
-    padding: 40px 40px 0 40px;
+    padding: 40px 40px 0 40px
   }
 }
 
 .contain {
-  display: flex;
-  flex-direction: column;
-  border-radius: 8px;
-  background: #fff;
+  display: flex
+  flex-direction: column
+  border-radius: 8px
+  background: #fff
 }
 
 .container-content {
-  padding: 20px;
-  text-align: left;
+  padding: 20px
+  text-align: left
 
   @include breakpoint-above('large') {
-    padding: 40px;
+    padding: 40px
   }
 }
 
 .subheader {
-  font-weight: 600;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 30px 15px 0;
-  font-size: 20px;
+  font-weight: 600
+  display: flex
+  justify-content: center
+  align-items: center
+  padding: 30px 15px 0
+  font-size: 20px
 }
 
 .container-section {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 20px;
+  display: flex
+  flex-direction: column
+  margin-bottom: 20px
 }
 
 ul {
-  padding: 0px;
-  height: 100%;
-  margin: auto;
+  padding: 0px
+  height: 100%
+  margin: auto
 }
 
 .basic-info {
-  display: flex;
-  flex-direction: column;
-  align-items: left;
-  margin-top: 30px;
+  display: flex
+  flex-direction: column
+  align-items: left
+  margin-top: 30px
 }
 
 .info-header {
-  display: flex;
-  align-items: center;
+  display: flex
+  align-items: center
 
-  margin-left: 30px;
-  font-size: 20px;
-  font-weight: 600;
+  margin-left: 30px
+  font-size: 20px
+  font-weight: 600
 }
 
 .info-header.basic {
-  height: 60px;
+  height: 60px
 }
 
 .info-header.cert {
-  margin-bottom: 15px;
+  margin-bottom: 15px
 }
 
 .answer {
-  font-weight: 600;
+  font-weight: 600
 }
 
 .answer .vue-js-switch {
-  margin: 5px 0;
+  margin: 5px 0
 }
 
 .answer ul {
-  margin-left: 20px;
+  margin-left: 20px
 }
 
 .phone-input {
-  margin: 5px 0 0;
+  margin: 5px 0 0
 }
 
 .description {
-  margin-top: 10px;
-  font-size: 12px;
+  margin-top: 10px
+  font-size: 12px
 }
 
 button {
-  height: 30px;
-  border-radius: 20px;
-  padding: 0px 10px;
-  color: #16d2aa;
-  background-color: #f6f6f6;
+  height: 30px
+  border-radius: 20px
+  padding: 0px 10px
+  color: #16d2aa
+  background-color: #f6f6f6
 }
 
 button:active,
 button:hover {
-  background-color: #16d2aa;
-  color: #fff;
+  background-color: #16d2aa
+  color: #fff
 }
 
 .editBtn {
-  background-color: #16d2aa;
-  border-radius: 30px;
-  width: 120px;
-  align-items: center;
-  height: 40px;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: 600;
-  color: white;
+  background-color: #16d2aa
+  border-radius: 30px
+  width: 120px
+  align-items: center
+  height: 40px
+  justify-content: center
+  font-size: 16px
+  font-weight: 600
+  color: white
 
   &:hover {
     color: #2c3e50;
@@ -583,6 +586,17 @@ button:hover {
 
 .SCIENCE {
   background-color: #9675ce;
+}
+
+.SOCIALSTUDIES {
+  background-color: #3eaaf7;
+}
+
+.SAT {
+  background-color: #f0912b;
+}
+
+.READINGWRITING {
 }
 
 .errors {

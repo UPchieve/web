@@ -15,8 +15,8 @@ export default {
   computed: {
     ...mapGetters({
       isAuthenticated: 'user/isAuthenticated',
-      isVolunteer: 'user/isVolunteer'
-    })
-  }
+      isVolunteer: 'user/isVolunteer',
+    }),
+  },
 }
 </script>

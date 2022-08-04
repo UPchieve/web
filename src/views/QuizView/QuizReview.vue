@@ -34,12 +34,12 @@ import TrainingService from '@/services/TrainingService'
 export default {
   data() {
     return {
-      questionsReview: []
+      questionsReview: [],
     }
   },
   mounted() {
     this.questionsReview = TrainingService.reviewQuiz(this)
-    this.questionsReview.forEach(question => {
+    this.questionsReview.forEach((question) => {
       if (question.imageSrc) {
         question.imageStyle = {
           backgroundImage: `url(${question.imageSrc})`,
@@ -47,7 +47,7 @@ export default {
           height: '300px',
           display: 'flex',
           backgroundSize: '100%',
-          backgroundRepeat: 'no-repeat'
+          backgroundRepeat: 'no-repeat',
         }
       } else {
         question.imageStyle = {}
@@ -69,13 +69,13 @@ export default {
       window.MathJax.Hub.Queue([
         'Typeset',
         window.MathJax.Hub,
-        Array.from(questions).flatMap(question => [
+        Array.from(questions).flatMap((question) => [
           question.querySelector('.question-text'),
-          ...Array.from(question.querySelectorAll('.possible-answers div'))
-        ])
+          ...Array.from(question.querySelectorAll('.possible-answers div')),
+        ]),
       ])
-    }
-  }
+    },
+  },
 }
 </script>
 

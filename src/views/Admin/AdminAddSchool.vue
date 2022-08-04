@@ -25,7 +25,7 @@
           :options="states"
           label="label"
           :searchable="true"
-          :reduce="option => option.value"
+          :reduce="(option) => option.value"
         />
       </div>
 
@@ -72,8 +72,8 @@ export default {
       error: '',
       options: [
         { text: 'False', value: false },
-        { text: 'True', value: true }
-      ]
+        { text: 'True', value: true },
+      ],
     }
   },
   computed: {
@@ -82,7 +82,7 @@ export default {
     },
     invalidForm() {
       return !(this.name && this.city && this.state && this.zipCode)
-    }
+    },
   },
   methods: {
     async createSchool(event) {
@@ -93,12 +93,12 @@ export default {
         city: this.city,
         state: this.state ? this.state : '',
         zipCode: this.zipCode,
-        isApproved: this.isApproved
+        isApproved: this.isApproved,
       }
 
       try {
         const {
-          body: { schoolId }
+          body: { schoolId },
         } = await NetworkService.adminCreateSchool(data)
         this.$router.push(`/admin/school/${schoolId}`)
       } catch (error) {
@@ -107,8 +107,8 @@ export default {
     },
     goBack() {
       this.$router.go(-1)
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -111,18 +111,18 @@ export default {
       showQuizReview: false,
       showQuizStart: false,
       quizResults: {},
-      loadingQuizResults: false
+      loadingQuizResults: false,
     }
   },
   components: {
     LoadingMessage,
     QuizQuestions,
     QuizResults,
-    QuizReview
+    QuizReview,
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: (state) => state.user.user,
     }),
     tries() {
       const { user } = this.$store.state.user
@@ -131,10 +131,10 @@ export default {
     },
     showNoQuiz() {
       return !this.quizLength
-    }
+    },
   },
   beforeMount() {
-    TrainingService.loadQuiz(this, this.category).then(quizLength => {
+    TrainingService.loadQuiz(this, this.category).then((quizLength) => {
       this.quizLoading = false
       this.quizLength = quizLength
       this.showQuizStart = !!quizLength
@@ -146,28 +146,28 @@ export default {
       this.showQuizStart = false
       AnalyticsService.captureEvent(EVENTS.QUIZ_STARTED, {
         event: EVENTS.QUIZ_STARTED,
-        subject: this.category
+        subject: this.category,
       })
     },
     submitQuiz() {
       this.showQuizQuestions = false
       this.loadingQuizResults = true
-      TrainingService.submitQuiz(this).then(data => {
+      TrainingService.submitQuiz(this).then((data) => {
         this.quizResults = data
         this.loadingQuizResults = false
         this.showQuizResults = true
         const quizEvent = data.passed ? EVENTS.QUIZ_PASSED : EVENTS.QUIZ_FAILED
         AnalyticsService.captureEvent(quizEvent, {
           action: quizEvent,
-          subject: this.category
+          subject: this.category,
         })
       })
     },
     showReview() {
       this.showQuizResults = false
       this.showQuizReview = true
-    }
-  }
+    },
+  },
 }
 </script>
 

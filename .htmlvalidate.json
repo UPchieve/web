@@ -1,0 +1,12 @@
+{
+  "plugins": ["html-validate-vue"],
+  "extends": ["html-validate:standard", "html-validate:a17y", "html-validate-vue:recommended"],
+  "elements": ["html5", "./elements.json"],
+  "rules": {
+    "element-case": ["error", { "style": ["lowercase", "pascalcase"] }],
+    "no-inline-style": "off"
+  },
+  "transform": {
+    "^.*\\.vue$": "html-validate-vue"
+  }
+}

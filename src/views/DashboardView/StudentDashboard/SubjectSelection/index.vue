@@ -3,11 +3,9 @@
     <p v-if="hasWaitingPeriod" class="waiting-period">
       {{ waitingPeriodMessage }}
     </p>
-    <h2 v-if="mobileMode">
-      Explore our subjects
-    </h2>
+    <h2 v-if="mobileMode">Explore our subjects</h2>
     <subject-card
-      v-for="(card, index) in cards"
+      v-for="(card, index) in filteredCards"
       v-bind:key="index"
       :title="card.title"
       :subtitle="card.subtitle"
@@ -33,11 +31,12 @@ import ReadingWritingSVG from '@/assets/subject_icons/more-resources.svg'
 import calculateWaitingPeriodCountdown from '@/utils/calculate-waiting-period-countdown'
 import ReferralSVG from '@/assets/dashboard_icons/student/referral.svg'
 import LightBulbSVG from '@/assets/dashboard_icons/student/light-bulb.svg'
+import SocialStudiesSVG from '@/assets/subject_icons/social-studies.svg'
 
 import { topics } from '@/utils/topics'
 
 const defaultHeaderData = {
-  component: 'DefaultHeader'
+  component: 'DefaultHeader',
 }
 
 export default {
@@ -52,15 +51,17 @@ export default {
       college: CollegeSVG,
       science: ScienceSVG,
       readingWriting: ReadingWritingSVG,
-      sat: SATSVG
+      sat: SATSVG,
+      socialStudies: SocialStudiesSVG,
     }
 
     const topicOrderMapping = {
       math: 0,
-      college: 2,
-      science: 3,
-      readingWriting: 4,
-      sat: 1
+      readingWriting: 1,
+      science: 2,
+      socialStudies: 3,
+      college: 4,
+      sat: 5,
     }
 
     const cards = Object.entries(topics)
@@ -74,45 +75,17 @@ export default {
           subtopicDisplayNames: Object.entries(topicObj.subtopics)
             .map(([subtopicKey, subtopicObj]) => [
               subtopicKey,
-              subtopicObj.displayName
+              subtopicObj.displayName,
             ])
             .reduce((result, [subtopicKey, displayName]) => {
               result[subtopicKey] = displayName
               return result
             }, {}),
           isTutoringCard: true,
-          order: topicOrderMapping[key]
+          order: topicOrderMapping[key],
         }
       })
       .sort((a, b) => a.order - b.order)
-
-    for (const card of cards) {
-      // Temporarily hide Statistics and Calculus BC from students
-      if (card.topic === 'math')
-        card.subtopics = card.subtopics.filter(subject => {
-          const temporarilyHiddenSubjects = ['calculusBC']
-          return !temporarilyHiddenSubjects.includes(subject)
-        })
-
-      // Temporarily hide Physics subjects and Environmental Science from students
-      if (card.topic === 'science')
-        card.subtopics = card.subtopics.filter(subject => {
-          const temporarilyHiddenSubjects = [
-            'physicsTwo',
-            'environmentalScience'
-          ]
-          return !temporarilyHiddenSubjects.includes(subject)
-        })
-
-      // Temporarily hide Reading subject from students
-      if (card.topic === 'readingWriting')
-        card.subtopics = card.subtopics.filter(subject => {
-          const temporarilyHiddenSubjects = [
-            'reading'
-          ]
-          return !temporarilyHiddenSubjects.includes(subject)
-        })
-    }
 
     cards.push({
       title: 'Give Feedback',
@@ -120,14 +93,14 @@ export default {
         'Help us improve by telling us what new subjects and features you want!',
       svg: LightBulbSVG,
       buttonText: 'Give feedback',
-      routeTo: '/contact'
+      routeTo: '/contact',
     })
 
     cards.push({
       title: 'Invite Your Friends',
       subtitle: 'Share UPchieve with a friend!',
       svg: ReferralSVG,
-      buttonText: 'Learn More'
+      buttonText: 'Learn More',
     })
 
     return {
@@ -135,16 +108,20 @@ export default {
       disableSubjectCard: false,
       waitingPeriodTimeoutId: null,
       hasWaitingPeriod: false,
-      waitingPeriodTimeLeft: 0
+      waitingPeriodTimeLeft: 0,
     }
   },
   computed: {
     ...mapState({
-      latestSession: state => state.user.latestSession
+      latestSession: (state) => state.user.latestSession,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
-      isSessionAlive: 'user/isSessionAlive'
+      isSessionAlive: 'user/isSessionAlive',
+      isUsHistroyLaunchStudentActive:
+        'featureFlags/isUsHistroyLaunchStudentActive',
+      isEnvironmentalScienceLaunchStudentActive:
+        'featureFlags/isEnvironmentalScienceLaunchStudentActive',
     }),
     waitingPeriodMessage() {
       const countdown = calculateWaitingPeriodCountdown(
@@ -153,7 +130,38 @@ export default {
       const minuteTextFormat = countdown === 1 ? 'minute' : 'minutes'
 
       return `You must wait at least ${countdown} ${minuteTextFormat} before requesting a new session.`
-    }
+    },
+
+    filteredCards() {
+      const cards = [...this.cards]
+      for (const card of cards) {
+        // Temporarily hide Statistics and Calculus BC from students
+        if (card.topic === 'math')
+          card.subtopics = card.subtopics.filter((subject) => {
+            const temporarilyHiddenSubjects = ['calculusBC']
+            return !temporarilyHiddenSubjects.includes(subject)
+          })
+
+        // Temporarily hide Physics 2 subject from students
+        if (card.topic === 'science')
+          card.subtopics = card.subtopics.filter((subject) => {
+            const temporarilyHiddenSubjects = ['physicsTwo']
+            return !temporarilyHiddenSubjects.includes(subject)
+          })
+
+        // Temporarily hide Environmental Science from students
+        if (
+          card.topic === 'science' &&
+          !this.isEnvironmentalScienceLaunchStudentActive
+        )
+          card.subtopics = card.subtopics.filter((subject) => {
+            const temporarilyHiddenSubjects = ['environmentalScience']
+            return !temporarilyHiddenSubjects.includes(subject)
+          })
+      }
+      if (!this.isUsHistroyLaunchStudentActive) cards.splice(3, 1)
+      return cards
+    },
   },
   watch: {
     // This component mounts before the lastestSession and isSessionAlive
@@ -163,7 +171,7 @@ export default {
     },
     isSessionAlive() {
       this.checkOrEnforceWaitingPeriod()
-    }
+    },
   },
   methods: {
     calculateTimeSinceLastSession() {
@@ -188,8 +196,8 @@ export default {
           const waitingHeaderData = {
             component: 'WaitingPeriodHeader',
             data: {
-              timeLeft: timeLeftUntilFiveMinutes
-            }
+              timeLeft: timeLeftUntilFiveMinutes,
+            },
           }
           this.$store.dispatch('app/header/show', waitingHeaderData)
 
@@ -216,8 +224,8 @@ export default {
       return (
         card.isTutoringCard && (this.disableSubjectCard || this.isSessionAlive)
       )
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -1,0 +1,74 @@
+{
+  "btn": {
+    "inherit": "button"
+  },
+  "button-template": {
+     "flow": true,
+     "permittedContent": [ "@phrasing" ],
+     "attributes": {
+       "button-type": [ "button", "reset", "submit" ]
+     }
+  },
+  "chip": {
+    "flow": true
+  },
+  "autocomplete": {
+    "flow": true,
+    "permittedContent": [ "@flow" ]
+  },
+  "modal": {
+    "flow": true,
+    "permittedContent": [ "@flow" ]
+  },
+  "separator": {
+    "flow": true
+  },
+  "hyperlink-button": {
+    "inherit": "button-template"
+  },
+  "large-button": {
+    "inherit": "button-template"
+  },
+  "loader": {
+    "flow": true
+  },
+  "module": {
+    "flow": true
+  },
+  "material": {
+    "flow": true
+  },
+  "whiteboard": {
+    "flow": true
+  },
+  "selectionicon": {
+    "flow": true
+  },
+  "penicon": {
+    "flow": true
+  },
+  "shapesicon": {
+    "flow": true
+  },
+  "texticon": {
+    "flow": true
+  },
+  "colorpickericon": {
+    "flow": true
+  },
+  "undoicon": {
+    "flow": true
+  },
+  "redoicon": {
+    "flow": true
+  },
+  "photouploadicon": {
+    "flow": true
+  },
+  "clearicon": {
+    "flow": true
+  },
+  "reseticon": {
+    "flow": true
+  }
+}

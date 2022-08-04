@@ -1,7 +1,10 @@
 <template>
   <div class="SubjectSelectionModal">
     <div v-if="showSurvey" class="presession-survey-container">
-      <presession-survey v-on:survey-completed="onSurveyCompleted" />
+      <presession-survey
+        v-on:survey-completed="onSurveyCompleted"
+        :subject="selectedSubtopic"
+      />
     </div>
     <div v-else>
       <component v-if="!mobileMode" :is="modalData.svg" class="icon" />
@@ -17,7 +20,7 @@
           class="SubjectSelectionModal-subtopic"
           :class="{
             'SubjectSelectionModal-subtopic--selected':
-              subtopic === selectedSubtopic
+              subtopic === selectedSubtopic,
           }"
           @click="setSelectedSubtopic(subtopic)"
         >
@@ -46,27 +49,31 @@ import getCookie from '@/utils/get-cookie'
 export default {
   components: { LargeButton, PresessionSurvey },
   props: {
-    modalData: { type: Object, required: true }
+    modalData: { type: Object, required: true },
   },
   data() {
     return {
       selectedSubtopic: this.modalData.preSelectedSubtopic || '',
-      showSurvey: this.modalData.preSelectedSubtopic ? true : false
+      showSurvey: this.modalData.preSelectedSubtopic ? true : false,
     }
   },
   computed: {
     ...mapState({
-      isMobileApp: state => state.app.isMobileApp,
-      user: state => state.user.user,
+      isMobileApp: (state) => state.app.isMobileApp,
+      user: (state) => state.user.user,
       isTopicSkippingSurvey() {
         return (
           this.modalData.topic === 'college' ||
           this.modalData.topic === 'readingWriting' ||
           this.modalData.topic === 'sat'
         )
-      }
+      },
     }),
-    ...mapGetters({ mobileMode: 'app/mobileMode' }),
+    ...mapGetters({
+      mobileMode: 'app/mobileMode',
+      isContextSharingWithVolunteerActive:
+        'featureFlags/isContextSharingWithVolunteerActive',
+    }),
     title() {
       if (this.modalData.topic === 'college')
         return `Choose a ${this.modalData.topic} counseling subject`
@@ -74,10 +81,12 @@ export default {
         return 'Choose a standardized testing subject'
       if (this.modalData.topic === 'readingWriting')
         return 'Choose a reading and writing subject'
+      if (this.modalData.topic === 'socialStudies')
+        return `Choose a social studies subject`
       return this.modalData.topic
         ? `Choose a ${this.modalData.topic} subject`
         : 'Choose a subject'
-    }
+    },
   },
   mounted() {
     // when mounted, skip the presession survey for certain topics
@@ -100,8 +109,8 @@ export default {
             backText: 'Dashboard',
             acceptText: 'Yes, please notify me!',
             selectedSubtopic: this.selectedSubtopic,
-            topic: this.modalData.topic
-          }
+            topic: this.modalData.topic,
+          },
         })
       } else {
         this.onAccept()
@@ -109,13 +118,17 @@ export default {
     },
     onAccept() {
       if (this.selectedSubtopic === '') return
-      if (this.isTopicSkippingSurvey) this.onSurveyCompleted()
+      if (
+        !this.isContextSharingWithVolunteerActive &&
+        this.isTopicSkippingSurvey
+      )
+        this.onSurveyCompleted()
       else this.showSurvey = true
     },
     onSurveyCompleted() {
       startSession(this.$router, this.modalData.topic, this.selectedSubtopic)
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -201,11 +214,8 @@ p {
 }
 
 .presession-survey-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
   width: 100%;
   background: #fff;
+  border-radius: 22px;
 }
 </style>

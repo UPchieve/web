@@ -40,10 +40,10 @@ export default {
   props: {
     sessionId: { type: String, required: true },
     endSession: { type: Function, required: true },
-    closeModal: { type: Function, required: true }
+    closeModal: { type: Function, required: true },
   },
   computed: {
-    ...mapGetters({ mobileMode: 'app/mobileMode' })
+    ...mapGetters({ mobileMode: 'app/mobileMode' }),
   },
   mounted() {
     // Session toggle buttons are rendered on a higher stacking context
@@ -64,15 +64,15 @@ export default {
     },
     async end() {
       const data = {
-        timeout: 15
+        timeout: 15,
       }
       await NetworkService.timedOutSession(this.sessionId, data)
       AnalyticsService.captureEvent(EVENTS.SESSION_TIMED_OUT_15_MINS, {
-        event: EVENTS.SESSION_TIMED_OUT_15_MINS
+        event: EVENTS.SESSION_TIMED_OUT_15_MINS,
       })
       this.endSession()
-    }
-  }
+    },
+  },
 }
 </script>
 

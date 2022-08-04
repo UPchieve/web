@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  name: 'header-template'
+  name: 'header-template',
 }
 </script>
 

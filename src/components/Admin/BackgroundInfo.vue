@@ -19,7 +19,7 @@ import { chain, map, isEmpty } from 'lodash'
 
 export default {
   props: {
-    user: Object
+    user: Object,
   },
   computed: {
     backgroundInfoItems() {
@@ -32,36 +32,36 @@ export default {
         'company',
         'college',
         'languages',
-        'linkedInUrl'
+        'linkedInUrl',
       ]
       return chain(backgroundKeys)
-        .map(bgKey => {
+        .map((bgKey) => {
           let bgValue = this.user[bgKey]
           if (isEmpty(bgValue)) return null
           if (Array.isArray(bgValue))
             return {
               name: bgKey,
-              value: bgValue.join(', ')
+              value: bgValue.join(', '),
             }
           if (typeof bgValue === 'object')
-            return map(Object.keys(bgValue), subKey => ({
+            return map(Object.keys(bgValue), (subKey) => ({
               name: `${subKey} ${bgKey}`,
-              value: bgValue[subKey]
+              value: bgValue[subKey],
             }))
           return {
             name: bgKey,
-            value: bgValue
+            value: bgValue,
           }
         })
-        .filter(item => !!item)
+        .filter((item) => !!item)
         .flatten()
-        .map(item => ({
+        .map((item) => ({
           ...item,
-          isLink: item.value.indexOf('http') !== -1
+          isLink: item.value.indexOf('http') !== -1,
         }))
         .value()
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -13,9 +13,9 @@ export const topics = {
       integratedMathOne: { displayName: 'Integrated Math 1' },
       integratedMathTwo: { displayName: 'Integrated Math 2' },
       integratedMathThree: { displayName: 'Integrated Math 3' },
-      integratedMathFour: { displayName: 'Integrated Math 4' }
+      integratedMathFour: { displayName: 'Integrated Math 4' },
     },
-    displayName: 'Math Tutoring'
+    displayName: 'Math Tutoring',
   },
   science: {
     subtopics: {
@@ -23,40 +23,46 @@ export const topics = {
       chemistry: { displayName: 'Chemistry' },
       physicsOne: { displayName: 'Physics 1' },
       physicsTwo: { displayName: 'Physics 2' },
-      environmentalScience: { displayName: 'Environmental Science' }
+      environmentalScience: { displayName: 'Environmental Science' },
     },
-    displayName: 'Science Tutoring'
+    displayName: 'Science Tutoring',
   },
   readingWriting: {
     subtopics: {
       humanitiesEssays: { displayName: 'Humanities Essays' },
-      reading: {displayName: 'Reading'}
+      reading: { displayName: 'Reading' },
     },
-    displayName: 'Reading and Writing Tutoring'
+    displayName: 'Reading and Writing Tutoring',
+  },
+  socialStudies: {
+    subtopics: {
+      usHistory: { displayName: 'U.S. History' },
+    },
+    displayName: 'Social Studies',
   },
   college: {
     subtopics: {
       planning: { displayName: 'Planning' },
       essays: { displayName: 'College Essays' },
-      applications: { displayName: 'Applications' }
+      applications: { displayName: 'Applications' },
     },
-    displayName: 'College Counseling'
+    displayName: 'College Counseling',
   },
   sat: {
     subtopics: {
       satMath: { displayName: 'SAT Math' },
-      satReading: { displayName: 'SAT Reading' }
+      satReading: { displayName: 'SAT Reading' },
     },
-    displayName: 'Standardized Testing Tutoring'
+    displayName: 'Standardized Testing Tutoring',
   },
   training: {
     subtopics: {
       upchieve101: { displayName: 'UPchieve 101' },
       tutoringSkills: { displayName: 'Tutoring Skills' },
-      collegeSkills: { displayName: 'College Counseling Skills' }
+      collegeSkills: { displayName: 'College Counseling Skills' },
     },
-    displayName: 'UPchieve Training'
-  }
+    displayName: 'UPchieve Training',
+  },
 }
 
 /**

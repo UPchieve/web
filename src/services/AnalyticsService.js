@@ -7,7 +7,7 @@ export default {
     posthog.identify(userId)
     Gleap.identify(userId, {
       name,
-      email
+      email,
     })
     Gleap.setCustomData('userType', type)
   },
@@ -29,13 +29,13 @@ export default {
 
   registerVolunteer(volunteer) {
     const userProperties = {
-      userType: 'volunteer'
+      userType: 'volunteer',
     }
     if (volunteer.volunteerPartnerOrg)
       userProperties.partner = volunteer.volunteerPartnerOrg
     this.updateUser(userProperties)
     this.captureEvent(EVENTS.ACCOUNT_CREATED, {
-      event: EVENTS.ACCOUNT_CREATED
+      event: EVENTS.ACCOUNT_CREATED,
     })
   },
 
@@ -60,7 +60,7 @@ export default {
     }
     // adds to volunteer score
     if (feedbackComponent.userType === 'student') {
-      volunteerScore = aggResponses.reduce(function(acc, val) {
+      volunteerScore = aggResponses.reduce(function (acc, val) {
         return acc + val
       }, 0)
     }
@@ -70,7 +70,7 @@ export default {
       user: feedbackComponent.userType,
       'student id': feedbackComponent.studentId,
       'volunteer id': feedbackComponent.volunteerId,
-      'volunteer score': volunteerScore
+      'volunteer score': volunteerScore,
       // can get answers to specific response using aggResponses
     })
   },
@@ -139,7 +139,7 @@ export default {
       'volunteer show time': volunteerShowed || null,
       'did volunteer show': !!volunteerShowed,
       'time ended': new Date(), // might be slightly off from the session's "endedAt"
-      'successful session': successfulSession
+      'successful session': successfulSession,
     })
   },
 
@@ -153,7 +153,7 @@ export default {
       user: user.isVolunteer ? 'volunteer' : 'student',
       'session topic': topic,
       'session subtopic': subTopic,
-      'session id': currentSession.sessionId
+      'session id': currentSession.sessionId,
     })
-  }
+  },
 }

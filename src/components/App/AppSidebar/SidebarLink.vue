@@ -20,16 +20,16 @@ export default {
   props: {
     to: {
       type: String,
-      required: true
+      required: true,
     },
     icon: Object,
     text: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
-    ...mapState({ isCollapsed: state => state.app.sidebar.isCollapsed }),
+    ...mapState({ isCollapsed: (state) => state.app.sidebar.isCollapsed }),
     ...mapGetters({ mobileMode: 'app/mobileMode' }),
     size() {
       return this.mobileMode ? '1em' : '1.5em'
@@ -37,9 +37,9 @@ export default {
     parentClass() {
       return {
         SidebarLink: true,
-        'SidebarLink--desktop': !this.mobileMode
+        'SidebarLink--desktop': !this.mobileMode,
       }
-    }
+    },
   },
   methods: {
     navigate() {
@@ -48,8 +48,8 @@ export default {
       // necessary because router-link doesn't provide a way to set modifiers, like
       // keydown.enter.native, in the event prop
       this.$router.push(this.to)
-    }
-  }
+    },
+  },
 }
 </script>
 

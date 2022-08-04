@@ -59,7 +59,7 @@ export default {
     important: Boolean,
     showTemplateButtons: { type: Boolean, default: true },
     showAccept: { type: Boolean, default: true },
-    modalComponentName: String
+    modalComponentName: String,
   },
   mounted() {
     const body = document.querySelector('body')
@@ -78,7 +78,7 @@ export default {
     ...mapGetters({ mobileMode: 'app/mobileMode' }),
     isSessionFulfilledModal() {
       return this.modalComponentName === 'SessionFulfilledModal'
-    }
+    },
   },
   methods: {
     handleCancel() {
@@ -130,8 +130,8 @@ export default {
         event.preventDefault()
         focusableList[last].focus()
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

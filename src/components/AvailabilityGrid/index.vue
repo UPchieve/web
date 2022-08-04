@@ -32,7 +32,7 @@ export default {
   components: { Cell },
   props: {
     availability: Object,
-    waitTimes: Object
+    waitTimes: Object,
   },
   data() {
     return {
@@ -61,8 +61,8 @@ export default {
         '8 pm': false,
         '9 pm': false,
         '10 pm': false,
-        '11 pm': false
-      }
+        '11 pm': false,
+      },
     }
   },
   methods: {
@@ -76,8 +76,8 @@ export default {
       } catch (err) {
         return 0
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

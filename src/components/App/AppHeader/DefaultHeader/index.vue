@@ -32,9 +32,9 @@ export default {
     ...mapGetters({
       avatarUrl: 'user/avatarUrl',
       mobileMode: 'app/mobileMode',
-      name: 'user/firstName'
-    })
-  }
+      name: 'user/firstName',
+    }),
+  },
 }
 </script>
 

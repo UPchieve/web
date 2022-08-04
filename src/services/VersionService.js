@@ -14,5 +14,5 @@ export default {
       Sentry.captureException(err)
     }
     return version
-  }
+  },
 }

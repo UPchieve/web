@@ -40,7 +40,7 @@ export default {
       avatarUrl: 'user/avatarUrl',
       name: 'user/firstName',
       sessionPath: 'user/sessionPath',
-      isDashboardRedesignActive: 'featureFlags/isDashboardRedesignActive'
+      isDashboardRedesignActive: 'featureFlags/isDashboardRedesignActive',
     }),
     message() {
       return `You have a chat in session${this.mobileMode ? '' : '.'}`
@@ -48,7 +48,7 @@ export default {
     isNewHeader() {
       const status = {
         class: 'RejoinSessionHeader',
-        buttonClass: ''
+        buttonClass: '',
       }
 
       if (this.isDashboardRedesignActive) {
@@ -57,13 +57,13 @@ export default {
       }
 
       return status
-    }
+    },
   },
   methods: {
     showModal() {
       this.$store.dispatch('app/modal/show', {
         component: 'RejoinSessionModal',
-        data: { backText: 'Dashboard', important: true }
+        data: { backText: 'Dashboard', important: true },
       })
     },
     rejoin() {
@@ -71,8 +71,8 @@ export default {
     },
     end() {
       sessionUtils.endSession(this)
-    }
-  }
+    },
+  },
 }
 </script>
 

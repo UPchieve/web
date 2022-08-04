@@ -31,32 +31,32 @@ export default {
   name: 'TrainingCourseView',
   components: {
     Module,
-    QuizLink
+    QuizLink,
   },
   data() {
     return {
-      course: null
+      course: null,
     }
   },
   async created() {
     const courseKey = this.$route.params.courseKey
     const {
-      body: { course }
+      body: { course },
     } = await NetworkService.getTrainingCourse(courseKey)
     this.course = course
   },
   computed: {
     ...mapState({
-      certifications: state => state.user.user.certifications
+      certifications: (state) => state.user.user.certifications,
     }),
     quizCertification() {
       return this.certifications[this.course.quizKey]
-    }
+    },
   },
   methods: {
     async trackMaterialProgress(materialKey) {
-      this.course.modules.forEach(mod => {
-        mod.materials.forEach(mat => {
+      this.course.modules.forEach((mod) => {
+        mod.materials.forEach((mat) => {
           if (mat.materialKey === materialKey) {
             mat.isCompleted = true
           }
@@ -64,7 +64,7 @@ export default {
       })
 
       const {
-        body: { progress, isComplete }
+        body: { progress, isComplete },
       } = await NetworkService.recordTrainingCourseProgress(
         this.course.courseKey,
         materialKey
@@ -72,8 +72,8 @@ export default {
 
       this.course.progress = progress
       this.course.isComplete = isComplete
-    }
-  }
+    },
+  },
 }
 </script>
 

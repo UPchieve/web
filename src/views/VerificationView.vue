@@ -17,9 +17,7 @@
         </div>
       </nav>
       <div class="uc-form-body" v-if="step === 1">
-        <h1 class="title">
-          You’re almost there!
-        </h1>
+        <h1 class="title">You’re almost there!</h1>
         <p>
           Confirm you're not a <span v-if="showEmoji">🤖</span
           ><span v-else>robot</span> by verifying your account. Please select
@@ -123,9 +121,7 @@
         <div>
           <verification-badge />
           <h3>You’re verified <span v-if="showEmoji">😎</span></h3>
-          <p>
-            Woohoo! Welcome to UPchieve.
-          </p>
+          <p>Woohoo! Welcome to UPchieve.</p>
         </div>
         <div>
           <large-button primary routeTo="/" class="uc-form-button-big">
@@ -160,7 +156,7 @@ export default {
     FormFooter,
     VuePhoneNumberInput,
     VerificationBadge,
-    LargeButton
+    LargeButton,
   },
   data() {
     return {
@@ -172,7 +168,7 @@ export default {
       sendTo: '',
       error: '',
       isSubmitting: false,
-      email: ''
+      email: '',
     }
   },
   mounted() {
@@ -183,12 +179,12 @@ export default {
     // Hack to initially mock the vue-phone-number-input data
     this.phoneInputInfo = {
       isValid: true,
-      e164: phoneNumber.getNumber('e164')
+      e164: phoneNumber.getNumber('e164'),
     }
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: (state) => state.user.user,
     }),
     isValidForm() {
       if (!this.verificationMethod) return false
@@ -224,12 +220,12 @@ export default {
       const phoneNumber = new PhoneNumber(this.user.phone || '')
       return {
         number: phoneNumber.getNumber('international'),
-        country: phoneNumber.getRegionCode()
+        country: phoneNumber.getRegionCode(),
       }
     },
     showEmoji() {
       return !this.user.isVolunteer
-    }
+    },
   },
   methods: {
     onPhoneInputUpdate(phoneInputInfo) {
@@ -255,7 +251,7 @@ export default {
       try {
         await AuthService.initiateVerification({
           sendTo: this.sendTo,
-          verificationMethod: this.verificationMethod
+          verificationMethod: this.verificationMethod,
         })
         this.step = 2
       } catch (error) {
@@ -276,19 +272,19 @@ export default {
 
       try {
         const {
-          data: { success }
+          data: { success },
         } = await AuthService.confirmVerification({
           verificationCode: this.verificationCode,
           sendTo: this.sendTo,
-          verificationMethod: this.verificationMethod
+          verificationMethod: this.verificationMethod,
         })
         if (success) {
           AnalyticsService.captureEvent(EVENTS.ACCOUNT_VERIFIED, {
-            event: EVENTS.ACCOUNT_VERIFIED
+            event: EVENTS.ACCOUNT_VERIFIED,
           })
           this.$store.dispatch('user/firstDashboardVisit', true)
           this.$store.dispatch('user/addToUser', {
-            verified: true
+            verified: true,
           })
           this.step = 3
         } else {
@@ -310,84 +306,84 @@ export default {
     },
     logout() {
       AuthService.logout(this)
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
 .title {
-  @include font-category('display-small');
+  @include font-category('display-small')
 }
 
 .subtitle {
-  @include font-category('heading');
+  @include font-category('heading')
 }
 
 .verification {
   &__container {
-    @include flex-container(row, flex-start, center);
+    @include flex-container(row, flex-start, center)
   }
 
   &__radio-label {
-    @include flex-container(column, flex-start, flex-start);
-    padding-left: 2em;
+    @include flex-container(column, flex-start, flex-start)
+    padding-left: 2em
   }
 
   &__phone-input {
-    width: 300px;
+    width: 300px
   }
 
   &__label {
-    font-weight: 500;
+    font-weight: 500
   }
 
   .verification-nav__button {
-    text-align: left;
-    margin-top: 1em;
-    margin-left: 1em;
+    text-align: left
+    margin-top: 1em
+    margin-left: 1em
   }
 
   &__back-button {
-    color: #417db1;
-    border-radius: 20px;
-    padding: 5px 15px;
-    cursor: pointer;
+    color: #417db1
+    border-radius: 20px
+    padding: 5px 15px
+    cursor: pointer
 
     &:hover {
-      background: #f7fcfe;
+      background: #f7fcfe
     }
   }
 
   &__send-to {
-    display: block;
-    font-weight: 500;
+    display: block
+    font-weight: 500
   }
 
   &__log-out-button {
-    margin-left: auto;
+    margin-left: auto
     &:hover {
-      text-decoration: underline;
+      text-decoration: underline
     }
   }
   &__field {
-    text-align: left;
-    width: 300px;
-    border-bottom: 3px solid $c-success-green;
-    padding: initial;
+    text-align: left
+    width: 300px
+    border-bottom: 3px solid $c-success-green
+    padding: initial
   }
 }
 
 .uc-form-input--wide {
-  width: 300px;
+  width: 300px
 }
 
 .uc-form-button {
-  text-transform: initial;
+  text-transform: initial
 }
 
 .error {
-  color: $c-error-red;
-  margin-bottom: 0;
+  color: $c-error-red
+  margin-bottom: 0
 }
 </style>

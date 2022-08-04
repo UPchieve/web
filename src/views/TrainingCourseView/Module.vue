@@ -36,25 +36,25 @@ export default {
   components: {
     Material,
     CheckMark,
-    RightCaret
+    RightCaret,
   },
   props: {
-    module: Object
+    module: Object,
   },
   data() {
     return {
       showMaterials: false,
-      openMaterial: ''
+      openMaterial: '',
     }
   },
   computed: {
     isCompleted() {
       return this.module.materials.every(
-        mat => mat.isCompleted || !mat.isRequired
+        (mat) => mat.isCompleted || !mat.isRequired
       )
     },
     isStarted() {
-      return this.module.materials.some(mat => mat.isCompleted)
+      return this.module.materials.some((mat) => mat.isCompleted)
     },
     statusClass() {
       if (this.isCompleted) return 'module--completed'
@@ -65,7 +65,7 @@ export default {
       if (this.isCompleted) return 'Completed'
       else if (this.isStarted) return 'In progress'
       return 'Not started'
-    }
+    },
   },
   methods: {
     toggleMaterials() {
@@ -74,8 +74,8 @@ export default {
     toggleMaterial(materialKey) {
       if (materialKey === this.openMaterial) this.openMaterial = ''
       else this.openMaterial = materialKey
-    }
-  }
+    },
+  },
 }
 </script>
 

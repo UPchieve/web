@@ -40,11 +40,11 @@ export default {
   components: { LargeButton, Modal, Separator },
   props: {
     closeModal: { type: Function, required: true },
-    handleNotificationButton: { type: Function }
+    handleNotificationButton: { type: Function },
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: (state) => state.user.user,
     }),
     description() {
       if (this.isVolunteerDashboardView)
@@ -55,7 +55,7 @@ export default {
     },
     isVolunteerDashboardView() {
       return this.$route.name === 'DashboardView' && this.user.isVolunteer
-    }
+    },
   },
   methods: {
     async requestNotificationPermission() {
@@ -70,8 +70,8 @@ export default {
       }
       if (this.handleNotificationButton) this.handleNotificationButton()
       this.closeModal()
-    }
-  }
+    },
+  },
 }
 </script>
 

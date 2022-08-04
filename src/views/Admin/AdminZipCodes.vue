@@ -44,7 +44,7 @@ export default {
     return {
       query: '',
       zipCode: {},
-      error: ''
+      error: '',
     }
   },
 
@@ -61,7 +61,7 @@ export default {
       if (this.zipCode.medianIncome)
         return this.zipCode.medianIncome.toLocaleString()
       return ''
-    }
+    },
   },
 
   methods: {
@@ -69,7 +69,7 @@ export default {
       this.error = ''
       try {
         const {
-          body: { zipCode }
+          body: { zipCode },
         } = await NetworkService.adminGetZipCodes(this.query)
 
         this.zipCode = zipCode
@@ -84,8 +84,8 @@ export default {
       if (key === 'Enter' && tagName === 'INPUT') {
         this.getZipCodes()
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -9,13 +9,13 @@
 
       <sidebar-link
         v-if="!isVolunteer && isSessionHistoryActive"
-        to='/sessions/history'
+        to="/sessions/history"
         text="Session History"
       >
         <calendar-icon class="icon" />
       </sidebar-link>
 
-       <sidebar-link
+      <sidebar-link
         v-if="isCoachFavoritingActive && !isVolunteer"
         to="/favorite-coaches"
         text="Favorite Coaches"

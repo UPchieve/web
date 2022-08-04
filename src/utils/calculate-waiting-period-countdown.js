@@ -1,6 +1,6 @@
 import convertMsToMinutes from './convert-ms-to-minutes'
 
-const calculateWaitingPeriodCountdown = time => {
+const calculateWaitingPeriodCountdown = (time) => {
   // Display countdown as counting down from 5 to 1
   let countdown = Math.floor(convertMsToMinutes(time) + 1)
 

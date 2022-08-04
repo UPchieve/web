@@ -25,17 +25,17 @@ import moment from 'moment'
 import { topics } from '@/utils/topics'
 import SessionFlags from './SessionFlags'
 
-const pluralize = num => {
+const pluralize = (num) => {
   return num === 1 ? '' : 's'
 }
 
 export default {
   name: 'SessionListItem',
   props: {
-    session: Object
+    session: Object,
   },
   components: {
-    SessionFlags
+    SessionFlags,
   },
 
   computed: {
@@ -67,8 +67,8 @@ export default {
 
     studentRating() {
       return this.session.studentRating ? this.session.studentRating : '-'
-    }
-  }
+    },
+  },
 }
 </script>
 

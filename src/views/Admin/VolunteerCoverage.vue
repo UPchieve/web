@@ -83,7 +83,7 @@
                   class="cell--data"
                   :style="{
                     '--rgb': getColor(cell),
-                    '--hour': getGradient(cell)
+                    '--hour': getGradient(cell),
                   }"
                 >
                   {{ cell }}
@@ -119,7 +119,7 @@ export default {
       selected: 'algebraOne', // default
       topics: allSubtopicNames(),
       // availability objects
-      availabilityTable: {}
+      availabilityTable: {},
     }
   },
 
@@ -128,9 +128,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters({
-      isAlgebraTwoLaunchActive: 'featureFlags/isAlgebraTwoLaunchActive'
-    }),
+    ...mapGetters({}),
   },
 
   methods: {
@@ -139,16 +137,14 @@ export default {
         in the "certifiedSubject". */
     getAvailability(certifiedSubject) {
       let cert = certifiedSubject
-      // TODO: remove condition below in algebra 2 launch cleanup
-      if (!this.isAlgebraTwoLaunchActive && certifiedSubject.match(/^algebra/i)) cert = 'algebra'
       UserService.getVolunteersAvailability(this, cert)
-        .then(availability => {
+        .then((availability) => {
           this.availabilityTable = availability
           //flattening table makes the implementation of css grid cleaner
           this.availabilityTable.table = availability.table.flat()
           return this.availabilityTable
         })
-        .catch(err => {
+        .catch((err) => {
           this.errorMsg = err.message
         })
     },
@@ -165,7 +161,7 @@ export default {
         this.availabilityTable.table.length != 0
       ) {
         if (compareNumber.length != 0) {
-          return this.availabilityTable.table.reduce(function(
+          return this.availabilityTable.table.reduce(function (
             totalHours,
             currentValue
           ) {
@@ -222,8 +218,8 @@ export default {
           20) +
         '%'
       )
-    }
-  }
+    },
+  },
 }
 </script>
 

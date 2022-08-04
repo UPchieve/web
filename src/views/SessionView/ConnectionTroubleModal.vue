@@ -17,20 +17,20 @@ import LargeButton from '@/components/LargeButton'
 export default {
   components: { LargeButton },
   props: {
-    modalData: { type: Object, required: true }
+    modalData: { type: Object, required: true },
   },
   computed: {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
-      isVolunteer: 'user/isVolunteer'
-    })
+      isVolunteer: 'user/isVolunteer',
+    }),
   },
   methods: {
     onAccept() {
       this.modalData.abortFunction()
       this.$router.push('/')
-    }
-  }
+    },
+  },
 }
 </script>
 

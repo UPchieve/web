@@ -159,8 +159,9 @@
                     </tr>
                     <tr
                       class="radio-question-row"
-                      v-for="(subquestion,
-                      subquestionIndex) in experienceRadioQuestion.options"
+                      v-for="(
+                        subquestion, subquestionIndex
+                      ) in experienceRadioQuestion.options"
                       :key="subquestion"
                     >
                       <td class="radio-question-cell">{{ subquestion }}</td>
@@ -257,7 +258,7 @@
             <input
               type="text"
               v-model="addedLanguages"
-              class=" uc-form-input"
+              class="uc-form-input"
               v-if="showAddLanguages"
               placeholder="Enter a language"
             />
@@ -295,7 +296,7 @@ export default {
           'Working part-time',
           'Unemployed',
           'Caregiver',
-          'Retired'
+          'Retired',
         ],
         languages: [
           'Spanish',
@@ -307,8 +308,8 @@ export default {
           'French',
           'Korean',
           'Russian',
-          'German'
-        ]
+          'German',
+        ],
       },
       showInputErrors: false,
       formError: '',
@@ -317,7 +318,7 @@ export default {
       experience: {
         tutoring: '',
         collegeCounseling: '',
-        mentoring: ''
+        mentoring: '',
       },
       languages: [],
       showAddLanguages: false,
@@ -334,16 +335,16 @@ export default {
           '0-1 years',
           '1-2 years',
           '2-5 years',
-          '5+ years'
+          '5+ years',
         ],
         options: ['Tutoring', 'College Counseling', 'Mentoring'],
-        optionsAlias: ['tutoring', 'collegeCounseling', 'mentoring']
-      }
+        optionsAlias: ['tutoring', 'collegeCounseling', 'mentoring'],
+      },
     }
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: (state) => state.user.user,
     }),
     hasCompletedBackgroundInfo() {
       return (
@@ -379,7 +380,7 @@ export default {
         this.occupation.includes('Working full-time') &&
         !this.user.volunteerPartnerOrg
       )
-    }
+    },
   },
   methods: {
     async submitForm(event) {
@@ -401,7 +402,7 @@ export default {
       const experience = {
         tutoring: columnTitle[tutoring - 1],
         collegeCounseling: columnTitle[collegeCounseling - 1],
-        mentoring: columnTitle[mentoring - 1]
+        mentoring: columnTitle[mentoring - 1],
       }
 
       const data = {
@@ -413,7 +414,7 @@ export default {
         state: this.isUnitedStatesSelected ? this.state : '',
         city: this.city,
         college: this.college,
-        company: this.company
+        company: this.company,
       }
 
       if (this.languages.length > 0) {
@@ -426,19 +427,19 @@ export default {
         await NetworkService.addBackgroundInfo(data)
         this.wasSubmitted = false
         AnalyticsService.captureEvent(EVENTS.BACKGROUND_INFORMATION_COMPLETED, {
-          event: EVENTS.BACKGROUND_INFORMATION_COMPLETED
+          event: EVENTS.BACKGROUND_INFORMATION_COMPLETED,
         })
 
         if (this.user.volunteerPartnerOrg)
           AnalyticsService.captureEvent(EVENTS.ACCOUNT_APPROVED, {
-            event: EVENTS.ACCOUNT_APPROVED
+            event: EVENTS.ACCOUNT_APPROVED,
           })
 
         // mandatory fields: occupation, experience, country / state / city,
         // update is a subset of mandatory fields
         const update = {
           occupation: data.occupation,
-          country: data.country
+          country: data.country,
         }
 
         this.$store.dispatch('user/addToUser', update)
@@ -465,96 +466,96 @@ export default {
         (this.isCollegeEducated && !this.college) ||
         (this.isWorkingFullTime && !this.company)
       )
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
 input:invalid {
-  border-bottom: $c-error-red solid 3px;
+  border-bottom: $c-error-red solid 3px
 }
 
 ol {
-  padding-inline-start: 30px;
+  padding-inline-start: 30px
   @include breakpoint-above('medium') {
-    padding-inline-start: 40px;
+    padding-inline-start: 40px
   }
 }
 
 .uc-form-checkbox {
-  margin-bottom: 0.6em;
+  margin-bottom: 0.6em
 
   & label {
-    @include font-category('body');
+    @include font-category('body')
   }
 }
 
 .uc-form-col {
-  margin: 4em 0;
+  margin: 4em 0
 }
 
 .uc-form-radio {
-  margin-bottom: 0.6em;
+  margin-bottom: 0.6em
 
   & label {
-    margin-left: 15px;
+    margin-left: 15px
   }
 }
 
 textarea {
-  width: 100%;
-  height: 80px;
+  width: 100%
+  height: 80px
 }
 
 .background-info {
-  @include font-category('body');
+  @include font-category('body')
 
   &__wrapper {
-    max-width: 100%;
-    background-color: #fff;
-    border-radius: 8px;
+    max-width: 100%
+    background-color: #fff
+    border-radius: 8px
 
     @include breakpoint-above('medium') {
-      padding: 40px;
-      max-width: 90%;
-      margin: 15px 15px 55px 40px;
+      padding: 40px
+      max-width: 90%
+      margin: 15px 15px 55px 40px
     }
 
     @include breakpoint-above('large') {
-      max-width: 800px;
+      max-width: 800px
     }
   }
 
   &__header {
-    margin: 0;
-    text-align: left;
-    font-weight: 500;
-    padding: 40px 20px 20px 20px;
-    @include font-category('display-small');
+    margin: 0
+    text-align: left
+    font-weight: 500
+    padding: 40px 20px 20px 20px
+    @include font-category('display-small')
 
     @include breakpoint-above('medium') {
-      padding: 20px;
+      padding: 20px
     }
   }
 
   &__completed-message {
-    padding: 1em;
+    padding: 1em
   }
 
   &__form {
-    border-radius: 8px;
-    padding: 20px;
-    text-align: left;
-    max-width: 95%;
+    border-radius: 8px
+    padding: 20px
+    text-align: left
+    max-width: 95%
 
     @include breakpoint-above('large') {
-      max-width: 80%;
+      max-width: 80%
     }
   }
 
   &__question-description {
-    @include font-category('helper-text');
+    @include font-category('helper-text')
     margin-top: 10px;
     color: $c-secondary-grey;
   }

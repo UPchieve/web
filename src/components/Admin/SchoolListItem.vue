@@ -13,13 +13,13 @@
 export default {
   name: 'SchoolListItem',
   props: {
-    school: Object
+    school: Object,
   },
   computed: {
     approvalStatus() {
       return this.school.isApproved ? 'Approved' : 'Not approved'
-    }
-  }
+    },
+  },
 }
 </script>
 

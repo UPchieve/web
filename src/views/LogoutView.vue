@@ -23,30 +23,30 @@ import config from '../config'
 export default {
   components: {
     FormPageTemplate,
-    FormFooter
+    FormFooter,
   },
   created() {
     this.$store.dispatch('app/hideNavigation')
   },
   computed: {
     ...mapState({
-      isMobileApp: state => state.app.isMobileApp
-    })
+      isMobileApp: (state) => state.app.isMobileApp,
+    }),
   },
   data() {
     return {
-      mainWebsiteUrl: config.mainWebsiteUrl
+      mainWebsiteUrl: config.mainWebsiteUrl,
     }
-  }
+  },
 }
 </script>
 
 <style lang="scss" scoped>
 .title {
-  color: black;
-  font-size: 24px;
-  font-weight: 600;
-  margin: 50px 0px;
-  text-align: center;
+  color: black
+  font-size: 24px
+  font-weight: 600
+  margin: 50px 0px
+  text-align: center
 }
 </style>

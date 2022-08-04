@@ -21,7 +21,7 @@ export default {
   name: 'session-header',
   data() {
     return { logoUrl: LogoImageUrl }
-  }
+  },
 }
 </script>
 

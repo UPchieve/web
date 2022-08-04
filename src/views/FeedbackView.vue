@@ -89,12 +89,13 @@ export default {
   name: 'FeedbackView',
   components: {
     LargeButton,
-    Loader
+    Loader,
   },
   data() {
     return {
       session: {},
       presessionSurvey: {},
+      studentPresessionGoal: '',
       isSubmittingFeedback: false,
       completedFeedback: false,
       isFavoriteCoach: false,
@@ -109,11 +110,11 @@ export default {
            *        because that HTML is not processed by Vue’s template compiler
            **/
           dynamicQuestion: () =>
-            `Your goal for this session was to <span class="feedback__session-goal">${this.sessionGoal}</span>. On a scale of 1 to 5, did UPchieve help you achieve your goal?`,
+            `Your goal for this session was to <span class="feedback__session-goal">${this.sessionGoal.toLowerCase()}</span>. On a scale of 1 to 5, did UPchieve help you achieve your goal?`,
           options: ['Not at all', '', 'Kind of', '', 'Yes, completely!'],
           component: FeedbackRadio,
           direction: 'row',
-          answer: null
+          answer: null,
         },
         {
           id: 'subject-understanding',
@@ -124,9 +125,9 @@ export default {
             "I don't know how to do this at all.",
             'I think I know how to do it, but I need help.',
             "I can do this on my own, but I don't fully understand it.",
-            'I am very comfortable with this topic.'
+            'I am very comfortable with this topic.',
           ],
-          answer: null
+          answer: null,
         },
         {
           id: 'coach-rating',
@@ -134,7 +135,7 @@ export default {
           component: FeedbackRadio,
           options: ['Terrible', '', 'Decent', '', 'Amazing'],
           direction: 'row',
-          answer: null
+          answer: null,
         },
         {
           id: 'coach-favoriting',
@@ -168,9 +169,9 @@ export default {
           component: FeedbackTextarea,
           answer: null,
           show: () => {
-            const question = this.questions.find(q => q.id === 'coach-rating')
+            const question = this.questions.find((q) => q.id === 'coach-rating')
             return question.answer && question.answer <= 3
-          }
+          },
         },
         {
           id: 'other-feedback',
@@ -179,8 +180,8 @@ export default {
           subtext:
             'This can be about the website, about your coach, about the services/features UPchieve provides, about any technical issues you encountered, etc. We read every single comment, every day!',
           component: FeedbackTextarea,
-          answer: null
-        }
+          answer: null,
+        },
       ],
       volunteerQuestions: [
         {
@@ -189,7 +190,7 @@ export default {
           component: FeedbackRadio,
           direction: 'row',
           options: ['Not at all', '', 'Somewhat', '', 'Yes, absolutely!'],
-          answer: ''
+          answer: '',
         },
         {
           id: 'session-improvements',
@@ -199,10 +200,10 @@ export default {
           answer: null,
           show: () => {
             const question = this.volunteerQuestions.find(
-              q => q.id === 'session-enjoyable'
+              (q) => q.id === 'session-enjoyable'
             )
             return question.answer && question.answer <= 3
-          }
+          },
         },
         {
           id: 'student-understanding',
@@ -214,9 +215,9 @@ export default {
             'They have a sense of how to do it, but they still need some help.',
             'They can do this on their own, but they don’t fully understand it.',
             'They are very comfortable with the topic.',
-            'N/A - I couldn’t tell.'
+            'N/A - I couldn’t tell.',
           ],
-          answer: null
+          answer: null,
         },
         {
           id: 'session-obstacles',
@@ -231,9 +232,9 @@ export default {
             'The student requested the wrong subject',
             'There was a gap in my own knowledge',
             'The student was rude or inappropriate',
-            'The student was only looking for answers'
+            'The student was only looking for answers',
           ],
-          answer: []
+          answer: [],
         },
         {
           id: 'other-feedback',
@@ -242,18 +243,20 @@ export default {
           subtext:
             'This can be about the website, about your coach, about the services/features UPchieve provides, about any technical issues you encountered, etc. We read every single comment, but if you need to connect with UPchieve staff about a question or concern please email us directly.',
           component: FeedbackTextarea,
-          answer: null
-        }
+          answer: null,
+        },
       ],
-      error: ''
+      error: '',
     }
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: (state) => state.user.user,
     }),
     ...mapGetters({
       isCoachFavoritingActive: 'featureFlags/isCoachFavoritingActive',
+      isContextSharingWithVolunteerActive:
+        'featureFlags/isContextSharingWithVolunteerActive',
     }),
     sessionPartnerFirstName() {
       return this.user.isVolunteer
@@ -265,31 +268,34 @@ export default {
       return topics[type].subtopics[subTopic].displayName
     },
     sessionTime() {
-      return moment(this.session.createdAt)
-        .local()
-        .format('LT')
+      return moment(this.session.createdAt).local().format('LT')
     },
     sessionDate() {
-      return moment(this.session.createdAt)
-        .local()
-        .format('MMMM Do, YYYY')
+      return moment(this.session.createdAt).local().format('MMMM Do, YYYY')
     },
     sessionGoal() {
-      if (this.presessionSurvey && this.presessionSurvey.createdAt) {
-        if (
-          this.presessionSurvey.responseData['primary-goal'].answer === 'other'
-        ) {
-          if (this.presessionSurvey.responseData['primary-goal'].other)
-            return this.presessionSurvey.responseData[
-              'primary-goal'
-            ].other.toLowerCase()
-          else return 'get help'
+      if (
+        this.isContextSharingWithVolunteerActive &&
+        this.studentPresessionGoal
+      ) {
+        return this.studentPresessionGoal
+      } else {
+        if (this.presessionSurvey && this.presessionSurvey.createdAt) {
+          if (
+            this.presessionSurvey.responseData['primary-goal'].answer ===
+            'other'
+          ) {
+            if (this.presessionSurvey.responseData['primary-goal'].other)
+              return this.presessionSurvey.responseData[
+                'primary-goal'
+              ].other.toLowerCase()
+            else return 'get help'
+          }
+          return formatSurveyAnswers(
+            this.presessionSurvey.responseData['primary-goal'].answer
+          ).toLowerCase()
         }
-        return formatSurveyAnswers(
-          this.presessionSurvey.responseData['primary-goal'].answer
-        ).toLowerCase()
       }
-
       return 'get help'
     },
     userType() {
@@ -301,7 +307,7 @@ export default {
         : this.studentQuestions
     },
     filteredQuestions() {
-      return this.questions.filter(item => !item.show || item.show())
+      return this.questions.filter((item) => !item.show || item.show())
     },
     isFavoritingCoach() {
       if (!this.isVolunteer) {
@@ -313,38 +319,45 @@ export default {
         return coachFavoritingQuestion && coachFavoritingQuestion.answer === 1
       }
       return false
-    }
+    },
   },
   async beforeMount() {
     this.$store.dispatch('app/sidebar/hide')
     this.$store.dispatch('app/header/show', {
-      component: 'SessionHeader'
+      component: 'SessionHeader',
     })
     const sessionId = this.$route.params.sessionId
     const [
       feedbackResponse,
       sessionResponse,
-      presessionResponse
+      presessionResponse,
+      presessionGoalResponse,
     ] = await Promise.all([
       NetworkService.getFeedback({
         sessionId,
-        userType: this.userType
+        userType: this.userType,
       }),
       NetworkService.getSession(sessionId),
-      NetworkService.getPresessionSurvey(sessionId)
+      NetworkService.getPresessionSurveyForFeedback(sessionId),
+      NetworkService.getStudentsPresessionGoal(sessionId),
     ])
 
     const {
-      body: { feedback }
+      body: { feedback },
     } = feedbackResponse
     const {
-      body: { session }
+      body: { session },
     } = sessionResponse
     const {
-      body: { survey }
+      body: { survey },
     } = presessionResponse
+    const {
+      body: { goal },
+    } = presessionGoalResponse
 
     this.session = session
+    this.studentPresessionGoal = goal
+    // TODO: remove in context sharing feature flag cleanup
     this.presessionSurvey = survey
     if (feedback) {
       this.completedFeedback = true
@@ -358,8 +371,7 @@ export default {
       this.isFavoriteCoach = response.body.isFavorite
 
       if (!this.isFavoriteCoach) {
-        const response =
-          await NetworkService.getRemainingFavoriteVolunteers()
+        const response = await NetworkService.getRemainingFavoriteVolunteers()
         this.isFavoriteCoachLimitReached = response.body.remaining === 0
       }
     }
@@ -375,7 +387,7 @@ export default {
         subTopic: this.session.subTopic,
         userType: this.userType,
         studentId: this.session.student._id,
-        volunteerId: this.session.volunteer._id
+        volunteerId: this.session.volunteer._id,
       }
 
       const feedbackPath = this.user.isVolunteer
@@ -418,7 +430,7 @@ export default {
         this.isSubmittingFeedback = false
       }
     },
-  }
+  },
 }
 </script>
 
@@ -430,78 +442,78 @@ export default {
 //        All styles here are namespaced under "feedback" to avoid
 //        collision/overrides with any global styling
 .feedback {
-  min-height: 100%;
-  width: 100%;
-  position: relative;
-  vertical-align: middle;
-  text-align: center;
-  padding: 4em 0;
-  background-color: $c-background-grey;
+  min-height: 100%
+  width: 100%
+  position: relative
+  vertical-align: middle
+  text-align: center
+  padding: 4em 0
+  background-color: $c-background-grey
 
   &__container {
-    width: 90%;
-    margin: auto;
-    background-color: white;
-    padding: 2.8em;
-    border-radius: 5px;
-    text-align: left;
+    width: 90%
+    margin: auto
+    background-color: white
+    padding: 2.8em
+    border-radius: 5px
+    text-align: left
 
     @include breakpoint-above('medium') {
-      max-width: 800px;
+      max-width: 800px
     }
   }
 
   &__header-container {
-    margin-bottom: 3em;
+    margin-bottom: 3em
   }
 
   &__header {
-    @include font-category('display-small');
+    @include font-category('display-small')
   }
   &__subheader {
-    font-size: 22px;
-    color: $c-secondary-grey;
-    margin: 0;
+    font-size: 22px
+    color: $c-secondary-grey
+    margin: 0
   }
 
   &__questions-list {
-    list-style-type: none;
-    padding-inline-start: 0;
+    list-style-type: none
+    padding-inline-start: 0
   }
 
   &__questions-item {
-    margin-bottom: 3em;
+    margin-bottom: 3em
   }
 
   &__question {
-    text-align: left;
-    @include font-category('heading');
+    text-align: left
+    @include font-category('heading')
 
     &-number {
-      margin-right: 5px;
+      margin-right: 5px
     }
   }
   &__subtext {
-    text-align: left;
-    @include font-category('helper-text');
-    color: $c-secondary-grey;
+    text-align: left
+    @include font-category('helper-text')
+    color: $c-secondary-grey
   }
 
   &__submit-button {
-    margin: 0 auto;
+    margin: 0 auto
   }
 
   &__dashboard-button {
-    margin: 1em 0;
+    margin: 1em 0
   }
 
   &__session-goal {
-    font-weight: 600;
-    color: $c-success-green;
+    font-weight: 600
+    color: $c-success-green
   }
 
   &__error {
-    color: $c-error-red;
+    color: $c-error-red
   }
 }
 </style>

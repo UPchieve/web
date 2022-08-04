@@ -20,7 +20,7 @@
               'training__status--progress':
                 progressStatus(cert.key) === 'In progress',
               'training__status--completed':
-                progressStatus(cert.key) === 'Completed'
+                progressStatus(cert.key) === 'Completed',
             }"
             >{{ progressStatus(cert.key) }}</span
           >
@@ -36,7 +36,7 @@
             class="training__progress-bar--number"
             :class="{
               'training__progress-bar--number-center':
-                progressBarNumber(cert.key) < 30
+                progressBarNumber(cert.key) < 30,
             }"
             >{{ progressBarNumber(cert.key) }}%</span
           >
@@ -85,32 +85,32 @@ export default {
   components: {
     CheckMark,
     LargeButton,
-    ArrowIcon
+    ArrowIcon,
   },
   props: {
     headers: {
       type: Array,
-      required: true
+      required: true,
     },
     certData: {
       type: Array,
-      required: true
+      required: true,
     },
     trainingCourse: {
-      type: Boolean
-    }
+      type: Boolean,
+    },
   },
 
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      windowWidth: state => state.app.windowWidth
+      user: (state) => state.user.user,
+      windowWidth: (state) => state.app.windowWidth,
     }),
     isLargeDevice() {
       const largeScreenBreakpoint = 992
 
       return this.windowWidth <= largeScreenBreakpoint
-    }
+    },
   },
 
   methods: {
@@ -134,8 +134,8 @@ export default {
       if (progress === 0) return 'Start course'
       if (this.isComplete(cert)) return 'Completed'
       return 'Resume course'
-    }
-  }
+    },
+  },
 }
 </script>
 

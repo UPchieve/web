@@ -19,22 +19,22 @@ import Btn from './Btn'
 
 export default {
   components: {
-    Btn
+    Btn,
   },
   props: {
     mainBtnLabel: {
       type: String,
-      default: ''
+      default: '',
     },
     secondBtnLabel: {
       type: String,
-      default: ''
+      default: '',
     },
     clickHandlers: {
       type: Object,
-      required: true
-    }
-  }
+      required: true,
+    },
+  },
 }
 </script>
 

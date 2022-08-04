@@ -74,7 +74,7 @@ export default {
     AccordionItem,
     TrainingDropDown,
     SubjectCertsDropDown,
-    AdditionalSubjectsDropDown
+    AdditionalSubjectsDropDown,
   },
   data() {
     return {
@@ -84,10 +84,11 @@ export default {
 
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: (state) => state.user.user,
     }),
     ...mapGetters({
-      isAlgebraTwoLaunchActive: 'featureFlags/isAlgebraTwoLaunchActive'
+      isUsHistroyLaunchVolunteerActive:
+        'featureFlags/isUsHistroyLaunchVolunteerActive',
     }),
     currentSubject() {
       return this[this.currentSubjectType]
@@ -112,160 +113,51 @@ export default {
       if (this.currentSubjectType === 'math')
         return {
           header: 'Integrated Math',
-          subheader: 'Click here to learn more about Integrated Math'
+          subheader: 'Click here to learn more about Integrated Math',
         }
       else
         return {
           header: 'Additional Subjects',
           subheader:
-            'Tutor for these subjects automatically by completing the required training courses'
+            'Tutor for these subjects automatically by completing the required training courses',
         }
     },
     subjectTypes() {
-      return [
-        { displayName: 'Math', key: 'math' },
-        { displayName: 'Science', key: 'science' },
-        { displayName: 'Reading and Writing', key: 'readingWriting' },
-        { displayName: 'College Counseling', key: 'college' },
-        { displayName: 'Standardized Testing', key: 'sat' }
-      ]
-    },
-    math() {
-      return this.isAlgebraTwoLaunchActive ? 
-        this.algebraTwoLaunchMath : 
-        this.legacyMath
-    },
-    legacyMath() {
-      return {
-        training: [
-          { displayName: 'UPchieve 101', key: 'upchieve101' }
-          // { displayName: "Tutoring Skills", key: "tutoringSkills" }
-        ],
-        certifications: [
-          {
-            displayName: 'Pre-algebra',
-            subjectsIncluded: [
-              { displayName: 'Pre-algebra', key: 'prealgebra' }
-            ],
-            key: 'prealgebra'
-          },
-          {
-            displayName: 'Algebra',
-            subjectsIncluded: [
-              { displayName: 'Pre-algebra', key: 'prealgebra' },
-              { displayName: 'Algebra 1', key: 'algebraOne' },
-              { displayName: 'Algebra 2', key: 'algebraTwo' }
-            ],
-            key: 'algebra'
-          },
-          {
-            displayName: 'Geometry',
-            subjectsIncluded: [{ displayName: 'Geometry', key: 'geometry' }],
-            key: 'geometry'
-          },
-          {
-            displayName: 'Trigonometry',
-            subjectsIncluded: [
-              { displayName: 'Trigonometry', key: 'trigonometry' }
-            ],
-            key: 'trigonometry'
-          },
-          {
-            displayName: 'Statistics',
-            subjectsIncluded: [
-              { displayName: 'Statistics', key: 'statistics' }
-            ],
-            key: 'statistics'
-          },
-          {
-            displayName: 'Precalculus',
-            subjectsIncluded: [
-              { displayName: 'Pre-algebra', key: 'prealgebra' },
-              { displayName: 'Algebra 1', key: 'algebraOne' },
-              { displayName: 'Algebra 2', key: 'algebraTwo' },
-              { displayName: 'Trigonometry', key: 'trigonometry' },
-              { displayName: 'Precalculus', key: 'precalculus' }
-            ],
-            key: 'precalculus'
-          },
-          {
-            displayName: 'Calculus AB',
-            subjectsIncluded: [
-              { displayName: 'Pre-algebra', key: 'prealgebra' },
-              { displayName: 'Algebra 1', key: 'algebraOne' },
-              { displayName: 'Algebra 2', key: 'algebraTwo' },
-              { displayName: 'Trigonometry', key: 'trigonometry' },
-              { displayName: 'Precalculus', key: 'precalculus' },
-              { displayName: 'Calculus AB', key: 'calculusAB' }
-            ],
-            key: 'calculusAB'
-          },
-          {
-            displayName: 'Calculus BC',
-            subjectsIncluded: [
-              { displayName: 'Pre-algebra', key: 'prealgebra' },
-              { displayName: 'Algebra 1', key: 'algebraOne' },
-              { displayName: 'Algebra 2', key: 'algebraTwo' },
-              { displayName: 'Trigonometry', key: 'trigonometry' },
-              { displayName: 'Precalculus', key: 'precalculus' },
-              { displayName: 'Calculus AB', key: 'calculusAB' },
-              { displayName: 'Calculus BC', key: 'calculusBC' }
-            ],
-            key: 'calculusBC'
-          }
-        ],
-        additionalSubjects: [
-          {
-            displayName: 'Integrated Math 1',
-            subjectsIncluded: [
-              { displayName: 'Algebra', key: 'algebraOne' },
-              { displayName: 'Geometry', key: 'geometry' },
-              { displayName: 'Statistics', key: 'statistics' }
-            ],
-            key: 'integratedMathOne'
-          },
-          {
-            displayName: 'Integrated Math 2',
-            subjectsIncluded: [
-              { displayName: 'Algebra', key: 'algebraOne' },
-              { displayName: 'Geometry', key: 'geometry' },
-              { displayName: 'Trigonometry', key: 'trigonometry' },
-              { displayName: 'Statistics', key: 'statistics' }
-            ],
-            key: 'integratedMathTwo'
-          },
-          {
-            displayName: 'Integrated Math 3',
-            subjectsIncluded: [
-              { displayName: 'Precalculus', key: 'precalculus' },
-              { displayName: 'Statistics', key: 'statistics' }
-            ],
-            key: 'integratedMathThree'
-          },
-          {
-            displayName: 'Integrated Math 4',
-            subjectsIncluded: [
-              { displayName: 'Precalculus', key: 'precalculus' }
-            ],
-
-            key: 'integratedMathFour'
-          }
+      if (this.isUsHistroyLaunchVolunteerActive) {
+        return [
+          { displayName: 'Math', key: 'math' },
+          { displayName: 'Science', key: 'science' },
+          { displayName: 'Reading and Writing', key: 'readingWriting' },
+          { displayName: 'Social Studies', key: 'socialStudies' },
+          { displayName: 'College Counseling', key: 'college' },
+          { displayName: 'Standardized Testing', key: 'sat' },
+        ]
+      } else {
+        return [
+          { displayName: 'Math', key: 'math' },
+          { displayName: 'Science', key: 'science' },
+          { displayName: 'Reading and Writing', key: 'readingWriting' },
+          { displayName: 'College Counseling', key: 'college' },
+          { displayName: 'Standardized Testing', key: 'sat' },
         ]
       }
     },
-    algebraTwoLaunchMath(){
+    math() {
+      return this.algebraTwoLaunchMath
+    },
+    algebraTwoLaunchMath() {
       return {
         training: [
-          { displayName: 'UPchieve 101', key: 'upchieve101' }
+          { displayName: 'UPchieve 101', key: 'upchieve101' },
           // { displayName: "Tutoring Skills", key: "tutoringSkills" }
         ],
         certifications: [
           {
             displayName: 'Pre-algebra',
             subjectsIncluded: [
-              { displayName: 'Pre-algebra', key: 'prealgebra' }
+              { displayName: 'Pre-algebra', key: 'prealgebra' },
             ],
-            key: 'prealgebra'
+            key: 'prealgebra',
           },
           {
             displayName: 'Algebra 1',
@@ -273,35 +165,35 @@ export default {
               { displayName: 'Pre-algebra', key: 'prealgebra' },
               { displayName: 'Algebra 1', key: 'algebraOne' },
             ],
-            key: 'algebraOne'
+            key: 'algebraOne',
           },
           {
             displayName: 'Algebra 2',
             subjectsIncluded: [
               { displayName: 'Pre-algebra', key: 'prealgebra' },
               { displayName: 'Algebra 1', key: 'algebraOne' },
-              { displayName: 'Algebra 2', key: 'algebraTwo' }
+              { displayName: 'Algebra 2', key: 'algebraTwo' },
             ],
-            key: 'algebraTwo'
+            key: 'algebraTwo',
           },
           {
             displayName: 'Geometry',
             subjectsIncluded: [{ displayName: 'Geometry', key: 'geometry' }],
-            key: 'geometry'
+            key: 'geometry',
           },
           {
             displayName: 'Trigonometry',
             subjectsIncluded: [
-              { displayName: 'Trigonometry', key: 'trigonometry' }
+              { displayName: 'Trigonometry', key: 'trigonometry' },
             ],
-            key: 'trigonometry'
+            key: 'trigonometry',
           },
           {
             displayName: 'Statistics',
             subjectsIncluded: [
-              { displayName: 'Statistics', key: 'statistics' }
+              { displayName: 'Statistics', key: 'statistics' },
             ],
-            key: 'statistics'
+            key: 'statistics',
           },
           {
             displayName: 'Precalculus',
@@ -310,9 +202,9 @@ export default {
               { displayName: 'Algebra 1', key: 'algebraOne' },
               { displayName: 'Algebra 2', key: 'algebraTwo' },
               { displayName: 'Trigonometry', key: 'trigonometry' },
-              { displayName: 'Precalculus', key: 'precalculus' }
+              { displayName: 'Precalculus', key: 'precalculus' },
             ],
-            key: 'precalculus'
+            key: 'precalculus',
           },
           {
             displayName: 'Calculus AB',
@@ -322,9 +214,9 @@ export default {
               { displayName: 'Algebra 2', key: 'algebraTwo' },
               { displayName: 'Trigonometry', key: 'trigonometry' },
               { displayName: 'Precalculus', key: 'precalculus' },
-              { displayName: 'Calculus AB', key: 'calculusAB' }
+              { displayName: 'Calculus AB', key: 'calculusAB' },
             ],
-            key: 'calculusAB'
+            key: 'calculusAB',
           },
           {
             displayName: 'Calculus BC',
@@ -335,10 +227,10 @@ export default {
               { displayName: 'Trigonometry', key: 'trigonometry' },
               { displayName: 'Precalculus', key: 'precalculus' },
               { displayName: 'Calculus AB', key: 'calculusAB' },
-              { displayName: 'Calculus BC', key: 'calculusBC' }
+              { displayName: 'Calculus BC', key: 'calculusBC' },
             ],
-            key: 'calculusBC'
-          }
+            key: 'calculusBC',
+          },
         ],
         additionalSubjects: [
           {
@@ -346,9 +238,9 @@ export default {
             subjectsIncluded: [
               { displayName: 'Algebra 1', key: 'algebraOne' },
               { displayName: 'Geometry', key: 'geometry' },
-              { displayName: 'Statistics', key: 'statistics' }
+              { displayName: 'Statistics', key: 'statistics' },
             ],
-            key: 'integratedMathOne'
+            key: 'integratedMathOne',
           },
           {
             displayName: 'Integrated Math 2',
@@ -356,74 +248,74 @@ export default {
               { displayName: 'Algebra 1', key: 'algebraOne' },
               { displayName: 'Geometry', key: 'geometry' },
               { displayName: 'Trigonometry', key: 'trigonometry' },
-              { displayName: 'Statistics', key: 'statistics' }
+              { displayName: 'Statistics', key: 'statistics' },
             ],
-            key: 'integratedMathTwo'
+            key: 'integratedMathTwo',
           },
           {
             displayName: 'Integrated Math 3',
             subjectsIncluded: [
               { displayName: 'Precalculus', key: 'precalculus' },
-              { displayName: 'Statistics', key: 'statistics' }
+              { displayName: 'Statistics', key: 'statistics' },
             ],
-            key: 'integratedMathThree'
+            key: 'integratedMathThree',
           },
           {
             displayName: 'Integrated Math 4',
             subjectsIncluded: [
-              { displayName: 'Precalculus', key: 'precalculus' }
+              { displayName: 'Precalculus', key: 'precalculus' },
             ],
 
-            key: 'integratedMathFour'
-          }
-        ]
+            key: 'integratedMathFour',
+          },
+        ],
       }
     },
     science() {
-       return { 
+      return {
         training: [
-          { displayName: 'UPchieve 101', key: 'upchieve101' }
+          { displayName: 'UPchieve 101', key: 'upchieve101' },
           // { displayName: "Tutoring Skills", key: "tutoringSkills" }
         ],
         certifications: [
           {
             displayName: 'Biology',
             subjectsIncluded: [{ displayName: 'Biology', key: 'biology' }],
-            key: 'biology'
+            key: 'biology',
           },
           {
             displayName: 'Chemistry',
             subjectsIncluded: [{ displayName: 'Chemistry', key: 'chemistry' }],
-            key: 'chemistry'
+            key: 'chemistry',
           },
           {
             displayName: 'Physics 1',
             subjectsIncluded: [{ displayName: 'Physics 1', key: 'physicsOne' }],
-            key: 'physicsOne'
+            key: 'physicsOne',
           },
           {
             displayName: 'Physics 2',
             subjectsIncluded: [{ displayName: 'Physics 2', key: 'physicsTwo' }],
-            key: 'physicsTwo'
+            key: 'physicsTwo',
           },
           {
             displayName: 'Environmental Science',
             subjectsIncluded: [
               {
                 displayName: 'Environmental Science',
-                key: 'environmentalScience'
-              }
+                key: 'environmentalScience',
+              },
             ],
-            key: 'environmentalScience'
-          }
+            key: 'environmentalScience',
+          },
         ],
-        additionalSubjects: []
-       }
+        additionalSubjects: [],
+      }
     },
     readingWriting() {
       return {
         training: [
-          { displayName: 'UPchieve 101', key: 'upchieve101' }
+          { displayName: 'UPchieve 101', key: 'upchieve101' },
           // { displayName: "Tutoring Skills", key: "tutoringSkills" }
         ],
         certifications: [
@@ -432,51 +324,69 @@ export default {
             subjectsIncluded: [
               {
                 displayName: 'Humanities Essays',
-                key: 'humanitiesEssays'
-              }
+                key: 'humanitiesEssays',
+              },
             ],
-            key: 'humanitiesEssays'
+            key: 'humanitiesEssays',
           },
           {
             displayName: 'Reading',
             subjectsIncluded: [
               {
                 displayName: 'Reading',
-                key: 'reading'
-              }
+                key: 'reading',
+              },
             ],
-            key: 'reading'
-          }
+            key: 'reading',
+          },
         ],
-        additionalSubjects: []
+        additionalSubjects: [],
+      }
+    },
+    socialStudies() {
+      return {
+        training: [{ displayName: 'UPchieve 101', key: 'upchieve101' }],
+        certifications: [
+          {
+            displayName: 'U.S. History',
+            subjectsIncluded: [
+              {
+                displayName: 'U.S. History',
+                key: 'usHistory',
+              },
+            ],
+            key: 'usHistory',
+          },
+        ],
+        additionalSubjects: [],
       }
     },
     college() {
-      return  { 
+      return {
         training: [
-          { displayName: 'UPchieve 101', key: 'upchieve101' }
+          { displayName: 'UPchieve 101', key: 'upchieve101' },
           // { displayName: "College Counseling", key: "collegeCounseling" }
         ],
         certifications: [
           {
             displayName: 'College Essays',
             subjectsIncluded: [
-              { displayName: 'College Essays', key: 'essays' }
+              { displayName: 'College Essays', key: 'essays' },
             ],
-            key: 'essays'
+            key: 'essays',
           },
           {
             displayName: 'Planning',
             subjectsIncluded: [{ displayName: 'Planning', key: 'planning' }],
-            key: 'planning'
+            key: 'planning',
           },
           {
             displayName: 'Applications',
             subjectsIncluded: [
-              { displayName: 'Applications', key: 'applications' }
+              { displayName: 'Applications', key: 'applications' },
             ],
-            key: 'applications'
-          }
+            key: 'applications',
+          },
         ],
         additionalSubjects: [
           // {
@@ -495,13 +405,13 @@ export default {
           //   ],
           //   key: "applications"
           // }
-        ]
+        ],
       }
     },
     sat() {
-      return { 
+      return {
         training: [
-          { displayName: 'UPchieve 101', key: 'upchieve101' }
+          { displayName: 'UPchieve 101', key: 'upchieve101' },
           // Hide until SAT Strategies is completed
           // { displayName: "SAT Strategies ", key: "satStrategies" }
         ],
@@ -509,85 +419,85 @@ export default {
           {
             displayName: 'SAT Math',
             subjectsIncluded: [{ displayName: 'SAT Math', key: 'satMath' }],
-            key: 'satMath'
+            key: 'satMath',
           },
           {
             displayName: 'SAT Reading',
             subjectsIncluded: [
-              { displayName: 'SAT Reading', key: 'satReading' }
+              { displayName: 'SAT Reading', key: 'satReading' },
             ],
-            key: 'satReading'
-          }
+            key: 'satReading',
+          },
         ],
-        additionalSubjects: []
+        additionalSubjects: [],
       }
-    }
+    },
   },
   methods: {
     showSubjectTraining(subject) {
       this.currentSubjectType = subject
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
 .body-container {
-  max-width: 1200px;
-  width: 100%;
-  border-radius: 8px;
-  background: #fff;
-  padding: 40px 15px 80px;
+  max-width: 1200px
+  width: 100%
+  border-radius: 8px
+  background: #fff
+  padding: 40px 15px 80px
 
   @include breakpoint-above('large') {
-    padding: 40px 40px 80px;
+    padding: 40px 40px 80px
   }
 
   .body-header {
-    font-size: 24px;
-    font-weight: 500;
-    text-align: left;
-    margin: 0 0 20px 0;
+    font-size: 24px
+    font-weight: 500
+    text-align: left
+    margin: 0 0 20px 0
   }
 }
 
 .training-view {
-  padding: 10px;
+  padding: 10px
 
   @include breakpoint-above('large') {
-    padding: 40px;
+    padding: 40px
   }
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
-  cursor: pointer;
+  color: inherit
+  text-decoration: none
+  cursor: pointer
 }
 
 .instructions {
-  text-align: left;
-  font-size: 16px;
-  color: $c-secondary-grey;
+  text-align: left
+  font-size: 16px
+  color: $c-secondary-grey
 }
 
 .subject-types {
-  @include flex-container(row, space-around, center);
-  margin-top: 2em;
+  @include flex-container(row, space-around, center)
+  margin-top: 2em
 
   &__header-type {
-    flex-basis: 100%;
-    padding-bottom: 0.8em;
-    font-size: 16px;
-    border-bottom: 4px solid transparent;
+    flex-basis: 100%
+    padding-bottom: 0.8em
+    font-size: 16px
+    border-bottom: 4px solid transparent
 
     &:hover {
-      cursor: pointer;
+      cursor: pointer
     }
   }
 }
 
 .is-selected {
-  border-bottom: 4px solid $c-success-green;
+  border-bottom: 4px solid $c-success-green
 }
 </style>

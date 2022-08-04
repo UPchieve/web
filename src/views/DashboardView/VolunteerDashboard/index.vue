@@ -11,12 +11,26 @@
       </router-link>
     </div>
 
+    <!-- TODO: Remove with feature flag training-grace-period-banner cleanup -->
+    <div
+      v-if="!downtimeMessage && showUpchieve101NoticeForGracePeriod"
+      class="dashboard-notice"
+    >
+      <router-link to="training/course/upchieve101" class="">
+        Our bad! Because of a bug, you skipped a critical step in your UPchieve
+        onboarding. Please take the UPchieve101 quiz before July 1st to keep
+        coaching. <arrow-icon class="arrow-icon--banner" />
+      </router-link>
+    </div>
+
     <div
       v-if="downtimeMessage"
       class="dashboard-notice"
       :class="'dashboard-notice--info'"
     >
-      <a href="https://upchieve.statuspage.io" target="_blank">{{ downtimeMessage }}</a>
+      <a href="https://upchieve.statuspage.io" target="_blank">{{
+        downtimeMessage
+      }}</a>
     </div>
 
     <div class="volunteer-dashboard__body">
@@ -80,7 +94,7 @@
           <div class="dashboard-card__icon">
             <verification-icon />
           </div>
-          <div class="dashboard-card__title">Approval process</div>
+          <div class="dashboard-card__title">Safety Screening</div>
           <div class="dashboard-card__subtitle">
             {{ approvalCardSubheader }}
           </div>
@@ -111,10 +125,11 @@
           <div class="dashboard-card__icon">
             <onboarding-icon />
           </div>
-          <div class="dashboard-card__title">Onboarding process</div>
+          <div class="dashboard-card__title">Onboarding Process</div>
           <div class="dashboard-card__subtitle">
-            Before you can begin helping students, you’ll need to complete our
-            volunteer onboarding process.
+            While waiting for your safety screening to process, complete our
+            quick onboarding so you're ready to start helping students as soon
+            as possible.
           </div>
 
           <account-action
@@ -171,15 +186,15 @@ import NetworkService from '../../../services/NetworkService'
 import config from '../../../config'
 
 const defaultHeaderData = {
-  component: 'DefaultHeader'
+  component: 'DefaultHeader',
 }
 
 const rejoinHeaderData = {
-  component: 'RejoinSessionHeader'
+  component: 'RejoinSessionHeader',
 }
 
-const readingLaunchHeaderData = {
-  component: 'ReadingLaunchHeader'
+const dashboardBannerData = {
+  component: 'DashboardBannerHeader',
 }
 
 const upchieveTopics = allSubtopicNames()
@@ -196,7 +211,7 @@ export default {
     OnboardingIcon,
     VolunteerWelcomeModal,
     WebNotificationsButton,
-    ArrowIcon
+    ArrowIcon,
   },
 
   watch: {
@@ -209,12 +224,12 @@ export default {
     },
   },
   async created() {
-    const hasUnlockedReading = this.user.certifications.reading.passed
+    const hasUnlockedUSHistory = this.user.certifications.usHistory.passed
 
     if (this.isSessionAlive) {
       this.$store.dispatch('app/header/show', rejoinHeaderData)
-    } else if (this.isReadingLaunchActive && !hasUnlockedReading){
-      this.$store.dispatch('app/header/show', readingLaunchHeaderData)
+    } else if (this.isDashboardBannerActive && !hasUnlockedUSHistory) {
+      this.$store.dispatch('app/header/show', dashboardBannerData)
     }
 
     if (this.isFirstDashboardVisit) {
@@ -232,13 +247,13 @@ export default {
       showReferencesModal: false,
       showWelcomeModal: false,
       lastUpdated: '',
-      impactStats: {}
+      impactStats: {},
     }
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      isFirstDashboardVisit: state => state.user.isFirstDashboardVisit
+      user: (state) => state.user.user,
+      isFirstDashboardVisit: (state) => state.user.isFirstDashboardVisit,
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
@@ -246,12 +261,14 @@ export default {
       hasCertification: 'user/hasCertification',
       hasSelectedAvailability: 'user/hasSelectedAvailability',
       isDowntimeBannerActive: 'featureFlags/isDowntimeBannerActive',
-      isReadingLaunchActive: 'featureFlags/isReadingLaunchActive'
+      isDashboardBannerActive: 'featureFlags/isDashboardBannerActive',
+      isUpchieve101GracePeriodBannerActive:
+        'featureFlags/isUpchieve101GracePeriodBannerActive',
     }),
 
     isCustomVolunteerPartner() {
       return config.customVolunteerPartnerOrgs.some(
-        org => org === this.user.volunteerPartnerOrg
+        (org) => org === this.user.volunteerPartnerOrg
       )
     },
 
@@ -259,15 +276,30 @@ export default {
       return !this.user.pastSessions || !this.user.pastSessions.length
     },
 
-    showUpchieve101Notice() {
+    showUpchieve101NoticeForLegacyVolunteers() {
       if (!this.user.isApproved || !this.user.isOnboarded) return false
       if (this.user.certifications.upchieve101.passed) return false
       return new Date(this.user.createdAt) < new Date('9/18/20')
     },
 
+    /**
+     * Volunteers in 2022 who got to skip completing the UPchieve 101 quiz but
+     * became onboarded will see a grace period banner that prompts
+     * them to take the UPchieve 101 quiz
+     */
+    // TODO: Remove with feature flag upchieve-101-grace-period-banner cleanup
+    showUpchieve101NoticeForGracePeriod() {
+      return (
+        this.user.isOnboarded &&
+        !this.user.certifications['upchieve101'].passed &&
+        new Date(this.user.createdAt) >= new Date('01/01/2022') &&
+        this.isUpchieve101GracePeriodBannerActive
+      )
+    },
+
     downtimeMessage() {
       if (this.isDowntimeBannerActive) {
-        return 'UPchieve is experiencing recurring interruptions. If your session is interrupted, please wait a few seconds and refresh.'
+        return 'UPchieve will be down for maintenance Tuesday, July 26th from 9-10 AM ET.'
       } else {
         return ''
       }
@@ -278,67 +310,67 @@ export default {
         case 'EMPTY':
           return {
             subtitle: 'Upload a photo ID',
-            status: 'DEFAULT'
+            status: 'DEFAULT',
           }
         case 'SUBMITTED':
           return {
             subtitle: 'Pending review',
-            status: 'PENDING'
+            status: 'PENDING',
           }
         case 'APPROVED':
           return {
             subtitle: 'Completed',
-            status: 'COMPLETED'
+            status: 'COMPLETED',
           }
         case 'REJECTED':
           return {
             subtitle: 'Please upload a different photo',
-            status: 'ERROR'
+            status: 'ERROR',
           }
         default:
           return {
             subtitle: 'Upload a photo ID',
-            status: 'DEFAULT'
+            status: 'DEFAULT',
           }
       }
     },
 
     referenceAction() {
-      const statuses = this.user.references.map(r => r.status)
+      const statuses = this.user.references.map((r) => r.status)
 
       if (statuses.length === 0)
         return {
           subtitle: 'Provide 2 references',
-          status: 'DEFAULT'
+          status: 'DEFAULT',
         }
 
-      if (statuses.some(s => s === 'REJECTED'))
+      if (statuses.some((s) => s === 'REJECTED'))
         return {
           subtitle: 'Provide new reference(s)',
-          status: 'ERROR'
+          status: 'ERROR',
         }
 
       if (statuses.length === 1)
         return {
           subtitle: 'In progress: provide 1 additional reference',
-          status: 'PROGRESS'
+          status: 'PROGRESS',
         }
 
       if (statuses[0] === 'APPROVED' && statuses[1] === 'APPROVED')
         return {
           subtitle: 'Completed',
-          status: 'COMPLETED'
+          status: 'COMPLETED',
         }
 
       if (statuses[0] === 'SUBMITTED' && statuses[1] === 'SUBMITTED')
         return {
           subtitle: 'Pending review',
-          status: 'PENDING'
+          status: 'PENDING',
         }
 
       return {
         subtitle: 'Waiting on references to submit',
-        status: 'PENDING'
+        status: 'PENDING',
       }
     },
 
@@ -346,12 +378,12 @@ export default {
       if (this.hasSelectedAvailability)
         return {
           subtitle: 'Completed',
-          status: 'COMPLETED'
+          status: 'COMPLETED',
         }
 
       return {
         subtitle: 'Select at least one hour',
-        status: 'DEFAULT'
+        status: 'DEFAULT',
       }
     },
 
@@ -362,12 +394,12 @@ export default {
         if (this.user.certifications[cert].passed)
           return {
             subtitle: 'Completed',
-            status: 'COMPLETED'
+            status: 'COMPLETED',
           }
       }
       return {
         subtitle: 'Pass at least one quiz',
-        status: 'DEFAULT'
+        status: 'DEFAULT',
       }
     },
 
@@ -376,19 +408,19 @@ export default {
       if (passedQuiz)
         return {
           subtitle: 'Completed',
-          status: 'COMPLETED'
+          status: 'COMPLETED',
         }
 
       const startedCourse = this.user.trainingCourses.upchieve101.progress > 0
       if (startedCourse)
         return {
           subtitle: 'In progress',
-          status: 'PENDING'
+          status: 'PENDING',
         }
 
       return {
         subtitle: 'Go through our training',
-        status: 'DEFAULT'
+        status: 'DEFAULT',
       }
     },
 
@@ -396,12 +428,12 @@ export default {
       if (this.hasCompletedBackgroundInfo)
         return {
           subtitle: 'Completed',
-          status: 'COMPLETED'
+          status: 'COMPLETED',
         }
 
       return {
         subtitle: 'Fill out form',
-        status: 'DEFAULT'
+        status: 'DEFAULT',
       }
     },
 
@@ -417,34 +449,34 @@ export default {
       if (this.user.volunteerPartnerOrg)
         return 'Just one step left to get approved to volunteer with UPchieve!'
 
-      return 'Complete our screening process to get approved to volunteer with UPchieve.'
+      return 'Student safety is our top priority! Please complete our screening process before you can start working with students.'
     },
     openVolunteerApprovalAccountActions() {
       const accountActions = [
         {
-          title: 'Background information',
+          title: 'Background information (3 mins)',
           subtitle: this.backgroundInfoAction.subtitle,
           status: this.backgroundInfoAction.status,
           clickFn: this.goToBackgroundInfo,
           icon: PersonIcon,
-          priority: this.addSortPriorityNum(this.backgroundInfoAction.status)
+          priority: this.addSortPriorityNum(this.backgroundInfoAction.status),
         },
         {
-          title: 'Proof of identity',
+          title: 'Proof of identity (2 mins)',
           subtitle: this.photoIdAction.subtitle,
           status: this.photoIdAction.status,
           clickFn: this.togglePhotoUploadModal,
           icon: PersonCardIcon,
-          priority: this.addSortPriorityNum(this.photoIdAction.status)
+          priority: this.addSortPriorityNum(this.photoIdAction.status),
         },
         {
-          title: 'Reference check',
+          title: 'Reference check (5 mins)',
           subtitle: this.referenceAction.subtitle,
           status: this.referenceAction.status,
           clickFn: this.toggleReferencesModal,
           icon: ReferencesIcon,
-          priority: this.addSortPriorityNum(this.referenceAction.status)
-        }
+          priority: this.addSortPriorityNum(this.referenceAction.status),
+        },
       ]
 
       return accountActions.sort((a, b) => a.priority - b.priority)
@@ -458,7 +490,7 @@ export default {
           status: this.backgroundInfoAction.status,
           clickFn: this.goToBackgroundInfo,
           icon: PersonIcon,
-          priority: this.addSortPriorityNum(this.backgroundInfoAction.status)
+          priority: this.addSortPriorityNum(this.backgroundInfoAction.status),
         },
         {
           title: 'Proof of identity',
@@ -467,8 +499,8 @@ export default {
           status: 'COMPLETED',
           clickFn: () => {},
           icon: PersonCardIcon,
-          priority: this.addSortPriorityNum('COMPLETED')
-        }
+          priority: this.addSortPriorityNum('COMPLETED'),
+        },
       ]
 
       return accountActions.sort((a, b) => a.priority - b.priority)
@@ -477,29 +509,29 @@ export default {
     onboaringAccountActions() {
       const onboaringActions = [
         {
-          title: 'Complete UPchieve 101',
+          title: 'Complete UPchieve 101 (45 mins)',
           subtitle: this.trainingAction.subtitle,
           status: this.trainingAction.status,
           clickFn: this.clickUpchieve101Action,
           icon: TrainingIcon,
-          priority: this.addSortPriorityNum(this.trainingAction.status)
+          priority: this.addSortPriorityNum(this.trainingAction.status),
         },
         {
-          title: 'Select availability',
+          title: 'Select availability (5 mins)',
           subtitle: this.availabilityAction.subtitle,
           status: this.availabilityAction.status,
           clickFn: this.clickAvailabilityAction,
           icon: CalendarIcon,
-          priority: this.addSortPriorityNum(this.availabilityAction.status)
+          priority: this.addSortPriorityNum(this.availabilityAction.status),
         },
         {
-          title: 'Unlock a subject',
+          title: 'Unlock a subject (15 mins)',
           subtitle: this.certificationAction.subtitle,
           status: this.certificationAction.status,
           clickFn: this.clickCertificationAction,
           icon: CertificationIcon,
-          priority: this.addSortPriorityNum(this.certificationAction.status)
-        }
+          priority: this.addSortPriorityNum(this.certificationAction.status),
+        },
       ]
       return onboaringActions.sort((a, b) => a.priority - b.priority)
     },
@@ -523,7 +555,7 @@ export default {
     showOnboardingModal() {
       this.$store.dispatch('app/modal/show', {
         component: 'VolunteerOnboardingModal',
-        data: { alertModal: true, acceptText: 'Get started' }
+        data: { alertModal: true, acceptText: 'Get started' },
       })
     },
     toggleWelcomeModal() {
@@ -593,7 +625,7 @@ export default {
       }
 
       // (2) Certs obtained
-      const certsObtained = _.filter(upchieveTopics, topic => {
+      const certsObtained = _.filter(upchieveTopics, (topic) => {
         return _.get(user, `certifications.${topic}.passed`, false)
       })
 
@@ -611,24 +643,24 @@ export default {
       return [
         {
           label: 'Hours of availability selected',
-          value: `${numHoursSelected} hours selected`
+          value: `${numHoursSelected} hours selected`,
         },
         {
           label: 'Number of certifications obtained',
-          value: `${numCertsObtained} certs obtained`
+          value: `${numCertsObtained} certs obtained`,
         },
         {
           label: 'Number of requests filled',
-          value: `${numRequestsFilled} requests filled`
+          value: `${numRequestsFilled} requests filled`,
         },
         {
           label: 'Hours of tutoring completed',
-          value: `${numHoursTutored} hours tutored`
+          value: `${numHoursTutored} hours tutored`,
         },
         {
           label: 'Hours of elapsed availability',
-          value: `${numElapsedAvailabilityHours} hours elapsed`
-        }
+          value: `${numElapsedAvailabilityHours} hours elapsed`,
+        },
       ]
     },
     getCustomImpactStats() {
@@ -662,7 +694,7 @@ export default {
       }
 
       // (2) Certs obtained
-      const certsObtained = _.filter(upchieveTopics, topic => {
+      const certsObtained = _.filter(upchieveTopics, (topic) => {
         return _.get(user, `certifications.${topic}.passed`, false)
       })
 
@@ -677,23 +709,23 @@ export default {
       return [
         {
           label: 'Hours of availability selected',
-          value: `${numHoursSelected} hours selected`
+          value: `${numHoursSelected} hours selected`,
         },
         {
           label: 'Number of certifications obtained',
-          value: `${numCertsObtained} certs obtained`
+          value: `${numCertsObtained} certs obtained`,
         },
         {
           label: 'Number of requests filled',
-          value: `${numRequestsFilled} requests filled`
+          value: `${numRequestsFilled} requests filled`,
         },
         {
           label: 'Total hours of volunteering completed',
-          value: `${numHoursVolunteered} hours volunteered`
-        }
+          value: `${numHoursVolunteered} hours volunteered`,
+        },
       ]
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -882,5 +914,12 @@ export default {
   width: 16px;
   margin-top: 2px;
   margin-left: 8px;
+
+  &--banner {
+    height: 16px;
+    width: 16px;
+    fill: $upchieve-white;
+    margin-left: 0.5em;
+  }
 }
 </style>

@@ -20,7 +20,7 @@
             class="training__status"
             :class="{
               'training__status--completed': isComplete(cert.key),
-              'training__status--unlocked': hasUnlockedSubject(cert.key)
+              'training__status--unlocked': hasUnlockedSubject(cert.key),
             }"
             >{{ progressStatus(cert.key) }}</span
           >
@@ -86,32 +86,32 @@ export default {
   components: {
     CheckMark,
     LargeButton,
-    ArrowIcon
+    ArrowIcon,
   },
   props: {
     headers: {
       type: Array,
-      required: true
+      required: true,
     },
     certData: {
       type: Array,
-      required: true
+      required: true,
     },
     trainingCourse: {
-      type: Boolean
-    }
+      type: Boolean,
+    },
   },
 
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      windowWidth: state => state.app.windowWidth
+      user: (state) => state.user.user,
+      windowWidth: (state) => state.app.windowWidth,
     }),
     isLargeDevice() {
       const largeScreenBreakpoint = 992
 
       return this.windowWidth <= largeScreenBreakpoint
-    }
+    },
   },
 
   methods: {
@@ -137,8 +137,8 @@ export default {
       if (this.isComplete(cert) || this.hasUnlockedSubject(cert))
         return 'Completed'
       else return 'Start quiz'
-    }
-  }
+    },
+  },
 }
 </script>
 

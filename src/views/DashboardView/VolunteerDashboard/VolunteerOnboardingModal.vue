@@ -45,19 +45,19 @@ import LargeButton from '@/components/LargeButton'
 export default {
   components: { LargeButton },
   props: {
-    modalData: { type: Object, required: true }
+    modalData: { type: Object, required: true },
   },
   computed: {
     ...mapGetters({
-      mobileMode: 'app/mobileMode'
-    })
+      mobileMode: 'app/mobileMode',
+    }),
   },
   methods: {
     onAccept() {
       this.$store.dispatch('user/firstDashboardVisit', false)
       this.$router.push('/calendar')
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -21,7 +21,7 @@ import { backOff } from 'exponential-backoff'
 
 if (config.posthogToken) {
   posthog.init(`${config.posthogToken}`, {
-    api_host: 'https://p.upchieve.org'
+    api_host: 'https://p.upchieve.org',
   })
 }
 
@@ -34,7 +34,7 @@ Vue.config.productionTip = false
 
 // Set up SocketIO
 const socket = Socket.connect(config.socketAddress, {
-  autoConnect: false
+  autoConnect: false,
 })
 Vue.use(VueSocketIO, socket)
 
@@ -46,7 +46,7 @@ Vue.use(VueRouter)
 // Set up PortalGun (connection to native app)
 PortalService.listen()
 
-const handlePortalData = data => {
+const handlePortalData = (data) => {
   // TODO: don't route immediately if push is received while app is open.
   // can detect with `if (data._isPush && data._original?.additionalData?.foreground)`
   // and show own UI for notification
@@ -67,10 +67,10 @@ if (config.sentryDsn) {
     // Our Sentry project is configured to only accept calls from app.upchieve.org
     dsn: config.sentryDsn,
     integrations: [
-      new Integrations.Vue({ Vue, attachProps: true, logErrors: true })
+      new Integrations.Vue({ Vue, attachProps: true, logErrors: true }),
     ],
     environment: config.sentryEnv,
-    release: `uc-web@${config.version}`
+    release: `uc-web@${config.version}`,
   })
 }
 
@@ -87,7 +87,7 @@ Vue.component('vue-star-rating', VueStarRating)
 Vue.use(ToggleButton)
 
 // Filter for formatting times
-Vue.filter('formatTime', value => {
+Vue.filter('formatTime', (value) => {
   if (value) {
     return moment(value).format('h:mm a')
   }
@@ -98,7 +98,7 @@ function initVue() {
   const app = new Vue({
     router,
     store,
-    render: h => h(App)
+    render: (h) => h(App),
   }).$mount('#app')
 
   // allow e2e tests to see Vuex store
@@ -107,12 +107,12 @@ function initVue() {
   }
 }
 
-async function main(){
+async function main() {
   try {
     // apply the csrf token to the store before initializing Vue
     const response = await backOff(() => NetworkService.getCsrfToken())
     store.commit('app/setCsrfToken', response.data.csrfToken)
-    initVue();
+    initVue()
   } catch (err) {
     Sentry.captureException(err)
   }

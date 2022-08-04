@@ -30,7 +30,7 @@ export default {
     page: Number,
     isFirstPage: Boolean,
     isLastPage: Boolean,
-    showPageNumber: { type: Boolean, default: true }
+    showPageNumber: { type: Boolean, default: true },
   },
 
   methods: {
@@ -39,8 +39,8 @@ export default {
     },
     previousPage() {
       this.$emit('previousPage')
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -9,14 +9,14 @@ import CheckIcon from '@/assets/check.svg'
 
 export default {
   components: {
-    CheckIcon
+    CheckIcon,
   },
   props: {
     checked: {
       type: Boolean,
-      default: false
-    }
-  }
+      default: false,
+    },
+  },
 }
 </script>
 

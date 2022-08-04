@@ -22,11 +22,11 @@ import VolunteerIcon from '@/assets/volunteer-icon.svg'
 
 export default {
   props: {
-    user: Object
+    user: Object,
   },
   computed: {
     userIcon() {
-      return this.user.isVolunteer ? VolunteerIcon : StudentIcon 
+      return this.user.isVolunteer ? VolunteerIcon : StudentIcon
     },
     userSince() {
       return moment(this.user.createdAt).fromNow()
@@ -34,8 +34,8 @@ export default {
     sessions() {
       const count = this.user.pastSessions ? this.user.pastSessions.length : 0
       return `${count} session${count === 1 ? '' : 's'}`
-    }
-  }
+    },
+  },
 }
 </script>
 

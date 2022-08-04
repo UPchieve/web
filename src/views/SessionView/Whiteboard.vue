@@ -18,8 +18,13 @@
       ref="zwibDiv"
     ></div>
     <transition name="reset-whiteboard-error">
-      <p class="reset-whiteboard-error " v-show="resetWhiteboardError">
+      <p class="error" v-show="resetWhiteboardError">
         Unable to reset the whiteboard.
+      </p>
+    </transition>
+    <transition name="uploading-picture-error">
+      <p class="error" v-show="uploadingPictureError">
+        Unable to upload the picture.
       </p>
     </transition>
     <div id="toolbar" class="toolbar">
@@ -198,7 +203,7 @@
         <FileDialog
           ref="fileDialog"
           class="upload-photo"
-          accept="image/*"
+          accept="image/*, image/heic"
           @file-selected="uploadPhoto"
         />
         <PhotoUploadIcon class="toolbar-item__svg--photo" />
@@ -255,6 +260,7 @@ import ResetWhiteboardModal from './ResetWhiteboardModal'
 import LoadingMessage from '@/components/LoadingMessage'
 import * as Sentry from '@sentry/browser'
 import config from '../../config'
+import heic2any from 'heic2any'
 
 export default {
   components: {
@@ -275,25 +281,25 @@ export default {
     ResetIcon,
     Loader,
     ResetWhiteboardModal,
-    LoadingMessage
+    LoadingMessage,
   },
   props: {
     sessionId: {
       type: String,
-      required: true
+      required: true,
     },
     isWhiteboardOpen: {
       type: Boolean,
-      required: true
+      required: true,
     },
     toggleWhiteboard: {
       type: Function,
-      required: true
+      required: true,
     },
     isSessionOver: {
       type: Boolean,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
@@ -312,16 +318,17 @@ export default {
       hadConnectionIssue: false,
       showResetWhiteboardModal: false,
       shouldResetWhiteboard: false,
-      resetWhiteboardError: false
+      resetWhiteboardError: false,
+      uploadingPictureError: false,
     }
   },
   computed: {
     ...mapState({
-      isMobileApp: state => state.app.isMobileApp,
+      isMobileApp: (state) => state.app.isMobileApp,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
-      isVolunteer: 'user/isVolunteer'
+      isVolunteer: 'user/isVolunteer',
     }),
     toolClass() {
       if (this.selectedTool === 'brush') return 'zwib-wrapper--brush'
@@ -349,7 +356,7 @@ export default {
         this.selectedTool === 'polygon' ||
         this.selectedTool === 'rectangle'
       )
-    }
+    },
   },
   updated() {
     if (this.error) {
@@ -362,12 +369,15 @@ export default {
     this.loadZwibbler()
   },
   methods: {
+    isMobile() {
+      return /iPhone|iPad|iPod/i.test(navigator.userAgent)
+    },
     resizeViewRectangle() {
       this.zwibblerCtx.setViewRectangle({
         x: 0,
         y: 0,
         width: this.canvasWidth,
-        height: 1
+        height: 1,
       })
     },
     handleOrientationChange() {
@@ -403,7 +413,7 @@ export default {
       this.zwibblerCtx.useLineTool(
         {},
         {
-          singleLine: true
+          singleLine: true,
         }
       )
       this.maybeFocusZwibbler(event)
@@ -449,7 +459,7 @@ export default {
     },
     async uploadPhoto(uploadEvents) {
       const { files } = uploadEvents.fileSelectionEvent.target
-      const file = files[0]
+      let file = files[0]
       const tenMegabytes = 10 * 1000000
 
       if (!this.isWhiteboardOpen && this.mobileMode) this.toggleWhiteboard()
@@ -462,22 +472,47 @@ export default {
 
       this.usePickTool(uploadEvents.dialogOpeningEvent)
 
-      const response = await NetworkService.getSessionPhotoUploadUrl(
-        this.sessionId
-      )
-      const {
-        body: { uploadUrl, imageUrl }
-      } = response
+      this.isLoading = true
 
-      if (uploadUrl) {
-        this.isLoading = true
-        await axios.put(uploadUrl, file, {
-          headers: {
-            'Content-Type': file.type
-          }
-        })
+      try {
+        // Convert HEIC images to jpeg on desktop devices
+        if (!this.isMobile() && file.type === 'image/heic') {
+          const convertedBlob = await heic2any({
+            blob: file,
+            toType: 'image/jpeg',
+          })
 
-        this.insertPhoto(imageUrl)
+          const fileType = convertedBlob.type.split('/')[1]
+          const previousFileName = file.name.split('.')[0]
+          const newFileName = `${previousFileName}.${fileType}`
+          file = new File([convertedBlob], newFileName, {
+            lastModified: new Date().getTime(),
+          })
+        }
+
+        const response = await NetworkService.getSessionPhotoUploadUrl(
+          this.sessionId
+        )
+        const {
+          body: { uploadUrl, imageUrl },
+        } = response
+
+        if (uploadUrl) {
+          await axios.put(uploadUrl, file, {
+            headers: {
+              'Content-Type': file.type,
+            },
+          })
+
+          this.insertPhoto(imageUrl)
+        }
+      } catch (error) {
+        this.isLoading = false
+        this.uploadingPictureError = true
+        setTimeout(() => {
+          this.uploadingPictureError = false
+        }, 2000)
+        return
       }
 
       // Reset the file input
@@ -486,7 +521,7 @@ export default {
     insertPhoto(imageUrl) {
       const nodeId = this.zwibblerCtx.createNode('ImageNode', {
         url: imageUrl,
-        opacity: 0
+        opacity: 0,
       })
 
       this.zwibblerCtx.on('resource-loaded', () => {
@@ -579,7 +614,7 @@ export default {
       this.zwibblerCtx.destroy()
       this.loadZwibbler()
       this.$socket.emit('resetWhiteboard', {
-        sessionId: this.sessionId
+        sessionId: this.sessionId,
       })
       this.setShouldResetWhiteboard(false)
     },
@@ -600,7 +635,7 @@ export default {
         scrollbars: true,
         defaultFontSize: 32,
         background: 'grid',
-        collaborationServer: `${config.websocketRoot}/whiteboard/room/{name}`
+        collaborationServer: `${config.websocketRoot}/whiteboard/room/{name}`,
       })
 
       this.zwibblerCtx = zwibblerCtx
@@ -635,7 +670,7 @@ export default {
         const zwibblerWsConnection = this.zwibblerCtx.Ec.rc.rc
         const zwibblerOnMessage = zwibblerWsConnection.onmessage
         // Intercept Zwibbler's websocket message handler
-        zwibblerWsConnection.onmessage = messageEvent => {
+        zwibblerWsConnection.onmessage = (messageEvent) => {
           // Forward message to Zwibbler unless it's our "pong" response
           if (messageEvent.data !== 'p0ng') zwibblerOnMessage(messageEvent)
         }
@@ -651,7 +686,7 @@ export default {
         this.resizeViewRectangle()
 
         // Don't start setting selected tool until connected
-        this.zwibblerCtx.on('tool-changed', toolname => {
+        this.zwibblerCtx.on('tool-changed', (toolname) => {
           this.selectedTool = toolname
           this.hideHoveredToolbars()
         })
@@ -669,7 +704,7 @@ export default {
         return false
       })
 
-      this.zwibblerCtx.on('nodes-added', nodes => {
+      this.zwibblerCtx.on('nodes-added', (nodes) => {
         if (this.isShapeSelected) this.shapeNodes.push(nodes[0])
         if (this.selectedTool === 'text') this.usePickTool()
       })
@@ -682,7 +717,7 @@ export default {
 
       window.addEventListener('resize', this.handleWindowResize, false)
 
-      this.zwibblerCtx.on('document-changed', info => {
+      this.zwibblerCtx.on('document-changed', (info) => {
         const isRemoteChange = info && info.remote
         const isWhiteboardHidden = this.mobileMode && !this.isWhiteboardOpen
         const shouldResizeView = isRemoteChange && isWhiteboardHidden
@@ -709,7 +744,7 @@ export default {
           }, 500)
         }
       })
-    }
+    },
   },
   beforeDestroy() {
     window.removeEventListener(
@@ -737,15 +772,15 @@ export default {
     },
     shouldResetWhiteboard(currentValue) {
       if (currentValue) this.resetWhiteboard()
-    }
+    },
   },
   sockets: {
     resetWhiteboard() {
       window.clearInterval(this.pingPongInterval)
       this.zwibblerCtx.destroy()
       this.loadZwibbler()
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -1005,7 +1040,7 @@ export default {
   justify-content: center;
 }
 
-.reset-whiteboard-error {
+.error {
   width: 100%;
   background-color: $c-error-red;
   color: #fff;
@@ -1043,7 +1078,8 @@ export default {
   }
 }
 
-#zwib-div:focus-visible, #zwib-div canvas:focus-visible {
-  border: 1px solid #000
+#zwib-div:focus-visible,
+#zwib-div canvas:focus-visible {
+  border: 1px solid #000;
 }
 </style>

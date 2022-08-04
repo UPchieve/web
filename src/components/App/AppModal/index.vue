@@ -45,18 +45,18 @@ export default {
     VolunteerOnboardingModal,
     UpgradeAppModal,
     StudentOnboardingModal,
-    ReportSessionModal
+    ReportSessionModal,
   },
   data() {
     return {
-      enableAccept: false
+      enableAccept: false,
     }
   },
   computed: {
     ...mapState({
-      modalComponent: state => state.app.modal.component,
-      modalData: state => state.app.modal.data
-    })
+      modalComponent: (state) => state.app.modal.component,
+      modalData: (state) => state.app.modal.data,
+    }),
   },
   mounted() {
     // enable the accept button by default if an alert modal
@@ -73,7 +73,7 @@ export default {
     },
     onEnableAccept(value) {
       this.enableAccept = value
-    }
-  }
+    },
+  },
 }
 </script>

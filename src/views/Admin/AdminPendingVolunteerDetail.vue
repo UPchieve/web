@@ -37,9 +37,9 @@
             v-model="photoIdStatus"
             class="user-detail__photo-id-select"
           >
-            <option selected disabled value="SUBMITTED"
-              >Review required...</option
-            >
+            <option selected disabled value="SUBMITTED">
+              Review required...
+            </option>
             <option value="REJECTED">Reject</option>
             <option value="APPROVED">Approve</option>
           </select>
@@ -109,7 +109,7 @@ export default {
   components: { AdminReferenceView, LargeButton, BackgroundInfo },
   props: {
     volunteer: { type: Object, required: true },
-    toggleEditMode: { type: Function, required: true }
+    toggleEditMode: { type: Function, required: true },
   },
   data() {
     return {
@@ -117,7 +117,7 @@ export default {
       photoIdStatus: '',
       showReferenceForm: false,
       chosenReference: undefined,
-      referencesStatusMap: {}
+      referencesStatusMap: {},
     }
   },
   async created() {
@@ -133,12 +133,12 @@ export default {
       const data = {
         photoIdStatus: this.photoIdStatus,
         referencesStatusMap: this.referencesStatusMap,
-        volunteerId: this.volunteer._id
+        volunteerId: this.volunteer._id,
       }
       try {
         await NetworkService.adminReviewPendingVolunteer({
           volunteerId: this.volunteer._id,
-          data
+          data,
         })
       } catch (error) {
         this.error = "There was an error updating the volunteer's status."
@@ -150,7 +150,7 @@ export default {
     },
     updateReferenceStatus(event) {
       const {
-        target: { value }
+        target: { value },
       } = event
       this.referencesStatusMap[this.chosenReference._id] = value
     },
@@ -163,7 +163,7 @@ export default {
         return 'user-detail__status--pending'
       if (status === 'APPROVED') return 'user-detail__status--approved'
       if (status === 'REJECTED') return 'user-detail__status--rejected'
-    }
+    },
   },
   computed: {
     createdAt() {
@@ -175,8 +175,8 @@ export default {
         this.volunteer.occupation.length > 0 &&
         this.volunteer.country
       )
-    }
-  }
+    },
+  },
 }
 </script>
 

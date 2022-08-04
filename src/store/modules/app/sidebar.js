@@ -2,11 +2,11 @@ export default {
   namespaced: true,
   state: {
     isShown: false,
-    isCollapsed: true
+    isCollapsed: true,
   },
   mutations: {
     setIsShown: (state, b) => (state.isShown = !!b),
-    setIsCollapsed: (state, b) => (state.isCollapsed = !!b)
+    setIsCollapsed: (state, b) => (state.isCollapsed = !!b),
   },
   actions: {
     show: ({ dispatch, commit }) => {
@@ -18,6 +18,6 @@ export default {
       commit('setIsShown', false)
     },
     collapse: ({ commit }) => commit('setIsCollapsed', true),
-    expand: ({ commit }) => commit('setIsCollapsed', false)
-  }
+    expand: ({ commit }) => commit('setIsCollapsed', false),
+  },
 }

@@ -22,7 +22,7 @@
           :options="states"
           label="label"
           :searchable="true"
-          :reduce="option => option.value"
+          :reduce="(option) => option.value"
         />
       </div>
       <div class="edit-school__input-row">
@@ -44,9 +44,7 @@
       </div>
 
       <p class="error" v-if="error">{{ error }}</p>
-      <button class="uc-form-button" type="submit">
-        Update
-      </button>
+      <button class="uc-form-button" type="submit">Update</button>
     </form>
   </div>
 </template>
@@ -61,7 +59,7 @@ export default {
   props: {
     school: { type: Object, required: true },
     toggleEditMode: { type: Function, required: true },
-    getSchool: { type: Function, required: true }
+    getSchool: { type: Function, required: true },
   },
 
   data() {
@@ -73,9 +71,9 @@ export default {
       isApproved: false,
       options: [
         { text: 'False', value: false },
-        { text: 'True', value: true }
+        { text: 'True', value: true },
       ],
-      error: ''
+      error: '',
     }
   },
   async created() {
@@ -95,7 +93,7 @@ export default {
         city: this.city,
         state: this.state,
         zipCode: this.zipCode,
-        isApproved: this.isApproved
+        isApproved: this.isApproved,
       }
 
       try {
@@ -109,13 +107,13 @@ export default {
     },
     goBack() {
       this.toggleEditMode()
-    }
+    },
   },
   computed: {
     states() {
       return STATES_WITH_ABBREVIATIONS
-    }
-  }
+    },
+  },
 }
 </script>
 

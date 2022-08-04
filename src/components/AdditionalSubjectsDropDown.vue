@@ -17,7 +17,7 @@
           <span
             class="training__status"
             :class="{
-              'training__status--completed': isComplete(cert.subjectsIncluded)
+              'training__status--completed': isComplete(cert.subjectsIncluded),
             }"
             >{{ progressStatus(cert.subjectsIncluded) }}</span
           >
@@ -54,45 +54,45 @@ import CheckMark from '@/components/CheckMark'
 export default {
   name: 'AdditionalSubjectsDropDown',
   components: {
-    CheckMark
+    CheckMark,
   },
   props: {
     headers: {
       type: Array,
-      required: true
+      required: true,
     },
     certData: {
       type: Array,
-      required: true
+      required: true,
     },
     trainingCourse: {
-      type: Boolean
-    }
+      type: Boolean,
+    },
   },
 
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      windowWidth: state => state.app.windowWidth
+      user: (state) => state.user.user,
+      windowWidth: (state) => state.app.windowWidth,
     }),
     isLargeDevice() {
       const largeScreenBreakpoint = 992
 
       return this.windowWidth <= largeScreenBreakpoint
-    }
+    },
   },
 
   methods: {
     isComplete(includedSubjects) {
-      return includedSubjects.every(subject =>
+      return includedSubjects.every((subject) =>
         this.user.subjects.includes(subject.key)
       )
     },
     progressStatus(includedSubjects) {
       if (this.isComplete(includedSubjects)) return 'Unlocked'
       else return 'Locked'
-    }
-  }
+    },
+  },
 }
 </script>
 

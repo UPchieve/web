@@ -21,13 +21,13 @@ import RightCaret from '@/assets/right-caret.svg'
 export default {
   components: {
     CheckMark,
-    RightCaret
+    RightCaret,
   },
   props: {
     quizKey: String,
     quizName: String,
     certification: Object,
-    isDisabled: Boolean
+    isDisabled: Boolean,
   },
   computed: {
     isCompleted() {
@@ -47,14 +47,14 @@ export default {
       else if (this.isCompleted) return 'Completed'
       else if (this.isStarted) return 'In progress'
       return 'Not started'
-    }
+    },
   },
   methods: {
     onClick() {
       if (this.isDisabled || this.isCompleted) return
       else this.$router.push(`/training/${Case.kebab(this.quizKey)}/quiz`)
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -34,7 +34,7 @@ const icons = {
   eraser: true,
   pen: true,
   trash: true,
-  undo: true
+  undo: true,
 }
 
 export default {
@@ -42,17 +42,17 @@ export default {
     icon: {
       type: String,
       required: true,
-      validator: key => key in icons
+      validator: (key) => key in icons,
     },
     color: {
       type: String,
-      default: null
+      default: null,
     },
     size: {
       type: String,
-      default: '1em'
-    }
-  }
+      default: '1em',
+    },
+  },
 }
 </script>
 

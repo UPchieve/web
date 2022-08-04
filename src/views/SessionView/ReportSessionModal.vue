@@ -51,28 +51,28 @@ import LargeButton from '@/components/LargeButton'
 
 const reportReasonOptions = [
   'This student was extremely rude or inappropriate',
-  'I am worried for the immediate safety of this student'
+  'I am worried for the immediate safety of this student',
 ]
 
 export default {
   components: { LargeButton },
   props: {
-    modalData: { type: Object, required: true }
+    modalData: { type: Object, required: true },
   },
   data() {
     return {
       reportReasonOptions,
       reportReason: null,
-      reportMessage: ''
+      reportMessage: '',
     }
   },
   computed: {
     ...mapState({
-      currentSession: state => state.user.session
+      currentSession: (state) => state.user.session,
     }),
     isFormComplete() {
       return !!this.reportReason
-    }
+    },
   },
   methods: {
     async submit() {
@@ -80,7 +80,7 @@ export default {
         await NetworkService.reportSession({
           sessionId: this.currentSession._id,
           reportReason: this.reportReason,
-          reportMessage: this.reportMessage
+          reportMessage: this.reportMessage,
         })
       } catch (error) {
         alert('Failed to submit')
@@ -90,8 +90,8 @@ export default {
     },
     cancel() {
       this.$store.dispatch('app/modal/hide')
-    }
-  }
+    },
+  },
 }
 </script>
 

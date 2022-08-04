@@ -16,9 +16,7 @@
         <input id="email" type="text" v-model="email" />
       </div>
       <div class="row">
-        <label for="partner-org" class="uc-form-label">
-          Partner org
-        </label>
+        <label for="partner-org" class="uc-form-label"> Partner org </label>
         <v-select
           id="partner-org"
           class="option-select"
@@ -101,9 +99,7 @@
         </select>
       </div>
       <p class="error" v-if="error">{{ error }}</p>
-      <button class="uc-form-button" type="submit">
-        Update
-      </button>
+      <button class="uc-form-button" type="submit">Update</button>
     </form>
   </div>
 </template>
@@ -118,7 +114,7 @@ export default {
   props: {
     user: { type: Object, required: true },
     toggleEditMode: { type: Function, required: true },
-    getUser: { type: Function, required: true }
+    getUser: { type: Function, required: true },
   },
 
   data() {
@@ -135,23 +131,23 @@ export default {
       inGatesStudy: false,
       options: [
         { text: 'False', value: false },
-        { text: 'True', value: true }
+        { text: 'True', value: true },
       ],
       error: '',
-      listedPartnerOrgs: []
+      listedPartnerOrgs: [],
     }
   },
   async created() {
     if (this.user.isVolunteer) {
       const response = await NetworkService.adminGetVolunteerPartners()
       const {
-        body: { partnerOrgs }
+        body: { partnerOrgs },
       } = response
       this.listedPartnerOrgs = partnerOrgs
     } else {
       const response = await NetworkService.adminGetStudentPartners()
       const {
-        body: { partnerOrgs }
+        body: { partnerOrgs },
       } = response
       this.listedPartnerOrgs = partnerOrgs
     }
@@ -191,7 +187,7 @@ export default {
         isBanned: this.isBanned,
         isDeactivated: this.isDeactivated,
         isApproved: this.isApproved,
-        inGatesStudy: this.inGatesStudy
+        inGatesStudy: this.inGatesStudy,
       }
 
       if (
@@ -213,8 +209,8 @@ export default {
     },
     goBack() {
       this.toggleEditMode()
-    }
-  }
+    },
+  },
 }
 </script>
 

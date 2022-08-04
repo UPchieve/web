@@ -23,14 +23,14 @@ export default {
   computed: {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
-      sessionPath: 'user/sessionPath'
-    })
+      sessionPath: 'user/sessionPath',
+    }),
   },
   watch: {
     // Hide modal if mobileMode becomes false
     mobileMode(value) {
       if (!value) this.$store.dispatch('app/modal/hide')
-    }
+    },
   },
   methods: {
     rejoin() {
@@ -38,8 +38,8 @@ export default {
     },
     end() {
       sessionUtils.endSession(this)
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -38,10 +38,10 @@ export default {
   name: 'UnmatchedModal',
   components: { LargeButton, Modal, Separator },
   props: {
-    sessionId: { type: String, required: true }
+    sessionId: { type: String, required: true },
   },
   computed: {
-    ...mapGetters({ mobileMode: 'app/mobileMode' })
+    ...mapGetters({ mobileMode: 'app/mobileMode' }),
   },
   mounted() {
     // Session toggle buttons are rendered on a higher stacking context
@@ -58,15 +58,15 @@ export default {
   methods: {
     async end() {
       const data = {
-        timeout: 45
+        timeout: 45,
       }
       await NetworkService.timedOutSession(this.sessionId, data)
       AnalyticsService.captureEvent(EVENTS.SESSION_TIMED_OUT_45_MINS, {
-        event: EVENTS.SESSION_TIMED_OUT_45_MINS
+        event: EVENTS.SESSION_TIMED_OUT_45_MINS,
       })
       this.$router.push('/dashboard')
-    }
-  }
+    },
+  },
 }
 </script>
 

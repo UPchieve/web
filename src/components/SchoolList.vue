@@ -21,14 +21,14 @@ export default {
   props: {
     setHighSchool: {
       type: Function,
-      required: true
+      required: true,
     },
     placeholder: {
-      type: String
-    }
+      type: String,
+    },
   },
   components: {
-    Autocomplete
+    Autocomplete,
   },
 
   methods: {
@@ -36,10 +36,10 @@ export default {
       if (input.length < 3) return []
 
       const response = await NetworkService.searchSchool(this, {
-        query: input
+        query: input,
       })
       const {
-        body: { results: schools }
+        body: { results: schools },
       } = response
       return schools
     },
@@ -48,8 +48,8 @@ export default {
     },
     handleSelectHighSchool(school) {
       this.setHighSchool(school)
-    }
-  }
+    },
+  },
 }
 </script>
 

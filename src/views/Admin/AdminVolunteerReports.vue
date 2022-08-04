@@ -73,12 +73,12 @@ export default {
       volunteerPartnerOrgs: [],
       volunteerPartnerOrg: {},
       startDate: '',
-      endDate: ''
+      endDate: '',
     }
   },
   async mounted() {
     const {
-      body: { partnerOrgs: volunteerPartnerOrgs }
+      body: { partnerOrgs: volunteerPartnerOrgs },
     } = await NetworkService.adminGetVolunteerPartners()
     this.volunteerPartnerOrgs = volunteerPartnerOrgs
   },
@@ -113,7 +113,7 @@ export default {
       const query = this.getQuery()
       try {
         const {
-          body: { data }
+          body: { data },
         } = await NetworkService.adminGetVolunteerTelecomReport(query)
 
         if (data.length === 0)
@@ -135,13 +135,10 @@ export default {
           .utc()
           .startOf('day')
           .format('MM-DD-YYYY'),
-        endDate: moment(this.endDate)
-          .utc()
-          .startOf('day')
-          .format('MM-DD-YYYY'),
+        endDate: moment(this.endDate).utc().startOf('day').format('MM-DD-YYYY'),
         partnerOrg: this.isValidVolunteerPartnerOrg
           ? this.volunteerPartnerOrg.key
-          : ''
+          : '',
       }
     },
     errorHandler(errorMessage = '') {
@@ -155,7 +152,7 @@ export default {
       return JSON.parse(decoder.decode(buffer))
     },
     mapAnalyticsReportHeaders(report) {
-      return report.map(row => {
+      return report.map((row) => {
         // Use a Map to preserve key insertion order
         return new Map([
           [ANALYTICS_REPORT_ROW.FIRST_NAME, row.firstName],
@@ -168,113 +165,113 @@ export default {
           [ANALYTICS_REPORT_ROW.DATE_FIRST_SESSION, row.dateFirstSession],
           [
             ANALYTICS_REPORT_ROW.CERTIFICATIONS_RECEIVED,
-            row.certificationsReceived
+            row.certificationsReceived,
           ],
           [ANALYTICS_REPORT_ROW.MATH_CERTS_RECEIVED, row.mathCertsReceived],
           [
             ANALYTICS_REPORT_ROW.SCIENCE_CERTS_RECEIVED,
-            row.scienceCertsReceived
+            row.scienceCertsReceived,
           ],
           [
             ANALYTICS_REPORT_ROW.COLLEGE_CERTS_RECEIVED,
-            row.collegeCertsReceived
+            row.collegeCertsReceived,
           ],
           [ANALYTICS_REPORT_ROW.TOTAL_TEXTS_RECEIVED, row.totalTextsReceived],
           [
             ANALYTICS_REPORT_ROW.TOTAL_SESSIONS_COMPLETED,
-            row.totalSessionsCompleted
+            row.totalSessionsCompleted,
           ],
           [
             ANALYTICS_REPORT_ROW.TOTAL_UNIQUE_STUDENTS_HELPED,
-            row.totalUniqueStudentsHelped
+            row.totalUniqueStudentsHelped,
           ],
           [ANALYTICS_REPORT_ROW.TOTAL_TUTORING_HOURS, row.totalTutoringHours],
           [ANALYTICS_REPORT_ROW.TOTAL_TRAINING_HOURS, row.totalTrainingHours],
           [
             ANALYTICS_REPORT_ROW.TOTAL_ELAPSED_AVAILABILITY_HOURS,
-            row.totalElapsedAvailabilityHours
+            row.totalElapsedAvailabilityHours,
           ],
           [ANALYTICS_REPORT_ROW.TOTAL_VOLUNTEER_HOURS, row.totalVolunteerHours],
           [
             ANALYTICS_REPORT_ROW.DATE_RANGE_TEXTS_RECEIVED,
-            row.dateRangeTextsReceived
+            row.dateRangeTextsReceived,
           ],
           [
             ANALYTICS_REPORT_ROW.DATE_RANGE_SESSIONS_COMPLETED,
-            row.dateRangeSessionsCompleted
+            row.dateRangeSessionsCompleted,
           ],
           [
             ANALYTICS_REPORT_ROW.DATE_RANGE_UNIQUE_STUDENTS_HELPED,
-            row.dateRangeUniqueStudentsHelped
+            row.dateRangeUniqueStudentsHelped,
           ],
           [
             ANALYTICS_REPORT_ROW.DATE_RANGE_TUTORING_HOURS,
-            row.dateRangeTutoringHours
+            row.dateRangeTutoringHours,
           ],
           [
             ANALYTICS_REPORT_ROW.DATE_RANGE_TRAINING_HOURS,
-            row.dateRangeTrainingHours
+            row.dateRangeTrainingHours,
           ],
           [
             ANALYTICS_REPORT_ROW.DATE_RANGE_ELAPSED_AVAILABILITY_HOURS,
-            row.dateRangeElapsedAvailabilityHours
+            row.dateRangeElapsedAvailabilityHours,
           ],
           [
             ANALYTICS_REPORT_ROW.DATE_RANGE_VOLUNTEER_HOURS,
-            row.dateRangeVolunteerHours
-          ]
+            row.dateRangeVolunteerHours,
+          ],
         ])
       })
     },
     mapAnalyticsSummaryHeaders(summary) {
       // Use a Map to preserve key insertion order
-      return summary.map(row => {
+      return summary.map((row) => {
         return new Map([
           [ANALYTICS_REPORT_SUMMARY.DATE_RANGE_SIGN_UPS, row.dateRangeSignUps],
           [
             ANALYTICS_REPORT_SUMMARY.DATE_RANGE_VOLUNTEERS_ONBOARDED,
-            row.dateRangeVolunteersOnboarded
+            row.dateRangeVolunteersOnboarded,
           ],
           [
             ANALYTICS_REPORT_SUMMARY.DATE_RANGE_TEXT_RECEIVED,
-            row.dateRangeTextsReceived
+            row.dateRangeTextsReceived,
           ],
           [
             ANALYTICS_REPORT_SUMMARY.DATE_RANGE_SESSIONS_COMPLETED,
-            row.dateRangeSessionsCompleted
+            row.dateRangeSessionsCompleted,
           ],
           [
             ANALYTICS_REPORT_SUMMARY.DATE_RANGE_VOLUNTEER_HOURS,
-            row.dateRangeVolunteerHours
+            row.dateRangeVolunteerHours,
           ],
           [
             ANALYTICS_REPORT_SUMMARY.DATE_RANGE_UNIQUE_STUDENTS_HELPED,
-            row.dateRangeUniqueStudentsHelped
+            row.dateRangeUniqueStudentsHelped,
           ],
           [ANALYTICS_REPORT_SUMMARY.TOTAL_SIGN_UPS, row.totalSignUps],
           [
             ANALYTICS_REPORT_SUMMARY.TOTAL_VOLUNTEERS_ONBORDED,
-            row.totalVolunteersOnboarded
+            row.totalVolunteersOnboarded,
           ],
           [
             ANALYTICS_REPORT_SUMMARY.TOTAL_TEXTS_RECEIVED,
-            row.totalTextsReceived
+            row.totalTextsReceived,
           ],
           [
             ANALYTICS_REPORT_SUMMARY.TOTAL_SESSIONS_COMPLETED,
-            row.totalSessionsCompleted
+            row.totalSessionsCompleted,
           ],
           [
             ANALYTICS_REPORT_SUMMARY.TOTAL_VOLUNTEER_HOURS,
-            row.totalVolunteerHours
+            row.totalVolunteerHours,
           ],
           [
             ANALYTICS_REPORT_SUMMARY.TOTAL_UNIQUE_STUDENTS_HELPED,
-            row.totalUniqueStudentsHelped
-          ]
+            row.totalUniqueStudentsHelped,
+          ],
         ])
       })
-    }
+    },
   },
   computed: {
     todaysDate() {
@@ -282,8 +279,8 @@ export default {
     },
     isValidVolunteerPartnerOrg() {
       return this.volunteerPartnerOrg && this.volunteerPartnerOrg.key
-    }
-  }
+    },
+  },
 }
 </script>
 

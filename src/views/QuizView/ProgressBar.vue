@@ -27,13 +27,13 @@ export default {
   props: {
     quizLength: { type: Number, required: true },
     barWidth: { type: Number, required: true },
-    questionNumber: { type: Number, required: true }
+    questionNumber: { type: Number, required: true },
   },
   computed: {
     hasManyQuestions() {
       return this.quizLength > 16
-    }
-  }
+    },
+  },
 }
 </script>
 

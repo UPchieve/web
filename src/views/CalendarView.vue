@@ -28,11 +28,7 @@
       <div v-if="hasUserSchedule">
         <div class="tz-selector-container">
           <span>Time Zone: </span>
-          <select
-            v-model="selectedTz"
-            class="tz-selector"
-            @change="tzChanged"
-          >
+          <select v-model="selectedTz" class="tz-selector" @change="tzChanged">
             <option v-for="tz in tzList" :key="tz">
               {{ tz }}
             </option>
@@ -65,7 +61,7 @@ const saveStates = {
   SAVED: 'saved',
   UNSAVED: 'unsaved',
   ERROR: 'error',
-  SAVING: 'saving'
+  SAVING: 'saving',
 }
 
 export default {
@@ -76,12 +72,12 @@ export default {
       availability: {},
       tzList: moment.tz.names(),
       selectedTz: '',
-      saveState: saveStates.UNSAVED
+      saveState: saveStates.UNSAVED,
     }
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: (state) => state.user.user,
     }),
     saveButtonClass() {
       return ['save-button', 'save-button--' + this.saveState]
@@ -89,7 +85,7 @@ export default {
     saveLabel() {
       switch (this.saveState) {
         case saveStates.SAVED:
-          return 'Saved &#x2714;'
+          return 'Saved &#x2714'
         case saveStates.SAVING:
           return 'Saving...'
         default:
@@ -104,7 +100,7 @@ export default {
     },
     hasWaitTimes() {
       return !_.isEmpty(this.waitTimes)
-    }
+    },
   },
   created() {
     this.initScheduleData()
@@ -215,7 +211,7 @@ export default {
         Wednesday: 'Thursday',
         Thursday: 'Friday',
         Friday: 'Saturday',
-        Saturday: 'Sunday'
+        Saturday: 'Sunday',
       }
       const predWeekday = {
         Sunday: 'Saturday',
@@ -224,7 +220,7 @@ export default {
         Wednesday: 'Tuesday',
         Thursday: 'Wednesday',
         Friday: 'Thursday',
-        Saturday: 'Friday'
+        Saturday: 'Friday',
       }
       const convertedAvailability = {}
       for (const day in availability) {
@@ -264,168 +260,168 @@ export default {
         this,
         this.convertAvailability(this.availability, offset),
         this.selectedTz
-      ).then(response => {
+      ).then((response) => {
         if (response.status == 200) {
           this.saveState = saveStates.SAVED
           AnalyticsService.captureEvent(EVENTS.AVAILABILITY_UPDATED, {
-            event: EVENTS.AVAILABILITY_UPDATED
+            event: EVENTS.AVAILABILITY_UPDATED,
           })
         } else {
           this.saveState = saveStates.ERROR
         }
       })
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
 .calendar-container {
-  padding: 10px;
+  padding: 10px
 
   @include breakpoint-above('medium') {
-    padding: 40px;
+    padding: 40px
   }
 }
 
 .calendar {
-  background: #fff;
-  border-radius: 8px;
-  font-size: 12px;
-  color: #343440;
-  padding: 20px 15px;
+  background: #fff
+  border-radius: 8px
+  font-size: 12px
+  color: #343440
+  padding: 20px 15px
 
   @include breakpoint-above('medium') {
-    padding: 40px;
+    padding: 40px
   }
 }
 
 .header {
-  display: flex;
-  flex-direction: column;
+  display: flex
+  flex-direction: column
 }
 
 .header-title {
-  font-size: 24px;
-  font-weight: 500;
+  font-size: 24px
+  font-weight: 500
 }
 
 .save-button {
-  font-size: 16px;
-  font-weight: 600;
-  padding: 10px 45px;
-  border-radius: 30px;
-  color: #fff;
-  border: none;
-  margin-left: auto;
+  font-size: 16px
+  font-weight: 600
+  padding: 10px 45px
+  border-radius: 30px
+  color: #fff
+  border: none
+  margin-left: auto
 
   &:hover {
-    color: #000;
+    color: #000
   }
 
   &--unsaved {
-    background: $c-success-green;
+    background: $c-success-green
   }
 
   &--saved {
-    background: $c-secondary-grey;
+    background: $c-secondary-grey
   }
 
   &--error {
-    background: $c-error-red !important;
+    background: $c-error-red !important
   }
 
   &--saving {
-    background: $c-disabled-grey;
+    background: $c-disabled-grey
   }
 }
 
 input[type='checkbox'] {
-  position: absolute;
-  display: block;
-  opacity: 0;
-  width: 100px;
-  height: 40px;
+  position: absolute
+  display: block
+  opacity: 0
+  width: 100px
+  height: 40px
 }
 
 label {
-  width: 100px;
-  height: 40px;
-  margin: 0;
+  width: 100px
+  height: 40px
+  margin: 0
 }
 
 input[type='checkbox']:checked + label {
-  background-color: rgba(22, 210, 170, 0.5);
+  background-color: rgba(22, 210, 170, 0.5)
 }
 
 .tz-selector-container {
-  padding-top: 30px;
+  padding-top: 30px
 }
 
 .tz-selector {
-  background-color: white;
+  background-color: white
 }
 
 .instructions-container {
-  text-align: left;
+  text-align: left
 }
 
 .instructions {
-  font-size: 16px;
-  color: $c-secondary-grey;
-  margin: 15px 0;
+  font-size: 16px
+  color: $c-secondary-grey
+  margin: 15px 0
 }
 
 .save-container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+  display: flex
+  flex-direction: row
+  align-items: center
 }
 
 .clock-explanation-container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+  display: flex
+  flex-direction: row
+  align-items: center
 }
 
 .clock-explanation {
-  text-align: left;
-  font-size: 14px;
-  margin: 15px 0;
+  text-align: left
+  font-size: 14px
+  margin: 15px 0
 }
 
 .clock-explanation-icon {
-  background: none;
-  min-width: 20px;
-  min-height: 20px;
-  margin-right: 10px;
+  background: none
+  min-width: 20px
+  min-height: 20px
+  margin-right: 10px
 }
 
 @media screen and (max-width: #{get-app-sidebar-width("medium") + 960px}) {
   .calendar-container {
-    width: 100%;
+    width: 100%
     @each $key, $value in $app-sidebar-width-map {
       @if map-get($breakpoint-map, $key) {
         @include breakpoint-above($key) {
-          width: calc(100% - #{$value});
+          width: calc(100% - #{$value})
         }
       }
     }
-    position: absolute;
-    overflow-x: hidden;
+    position: absolute
+    overflow-x: hidden
   }
 
   input[type='checkbox'] {
-    position: relative;
-    margin-top: 0;
-    margin-bottom: -40px;
+    position: relative
+    margin-top: 0
+    margin-bottom: -40px
   }
 }
 
 @media screen and (max-width: get-breakpoint('medium')) {
   .btn {
-    padding-top: 0em !important;
-    padding-bottom: 0em !important;
+    padding-top: 0em !important
+    padding-bottom: 0em !important
   }
 }
 </style>

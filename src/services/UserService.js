@@ -7,7 +7,7 @@ export default {
     return AuthService.getAuth(context)
   },
   getUser(context) {
-    return this.getAuth(context).then(auth => {
+    return this.getAuth(context).then((auth) => {
       if (auth.authenticated) {
         return auth.user
       }
@@ -32,7 +32,7 @@ export default {
   },
 
   getVolunteers(context) {
-    return NetworkService.getVolunteers(context).then(res => {
+    return NetworkService.getVolunteers(context).then((res) => {
       if (res.data.err) {
         return res.data.err
       } else if (res.data.volunteers) {
@@ -46,7 +46,7 @@ export default {
     return NetworkService.getVolunteersAvailability(
       context,
       certifiedSubject
-    ).then(res => {
+    ).then((res) => {
       if (res.data.err) {
         return res.data.err
       } else if (res.data.aggAvailabilities) {
@@ -55,5 +55,5 @@ export default {
         throw new Error()
       }
     })
-  }
+  },
 }

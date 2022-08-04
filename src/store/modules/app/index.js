@@ -11,7 +11,7 @@ export default {
     header,
     sidebar,
     modal,
-    banner
+    banner,
   },
   state: {
     windowWidth: 0,
@@ -20,7 +20,7 @@ export default {
     isWebPageHidden: false,
     version: '',
     currentServerVersion: '',
-    csrfToken: ''
+    csrfToken: '',
   },
   mutations: {
     setWindowWidth: (state, width = 0) =>
@@ -32,7 +32,7 @@ export default {
     setCurrentServerVersion: (state, version) =>
       (state.currentServerVersion = version),
     isWebPageHidden: (state, isVisible) => (state.isWebPageHidden = isVisible),
-    setCsrfToken: (state, csrfToken) => (state.csrfToken = csrfToken)
+    setCsrfToken: (state, csrfToken) => (state.csrfToken = csrfToken),
   },
   actions: {
     showNavigation: ({ dispatch }) => {
@@ -67,10 +67,10 @@ export default {
       if (document[hiddenProperty]) isHidden = true
 
       commit('isWebPageHidden', isHidden)
-    }
+    },
   },
   getters: {
-    mobileMode: state => state.windowWidth <= MAX_MOBILE_MODE_WIDTH,
-    csrfToken: state => state.csrfToken
-  }
+    mobileMode: (state) => state.windowWidth <= MAX_MOBILE_MODE_WIDTH,
+    csrfToken: (state) => state.csrfToken,
+  },
 }

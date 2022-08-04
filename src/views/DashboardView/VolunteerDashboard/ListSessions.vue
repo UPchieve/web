@@ -45,13 +45,13 @@ export default {
       openSessions: [],
       allSubtopics: {},
       emitListIntervalId: null,
-      isInitialMount: false
+      isInitialMount: false,
     }
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      isWebPageHidden: state => state.app.isWebPageHidden,
+      user: (state) => state.user.user,
+      isWebPageHidden: (state) => state.app.isWebPageHidden,
       sortedOpenSessions() {
         // sorts the sessions by createdAt, with oldest sessions coming first
         return this.openSessions.slice().sort((first, second) => {
@@ -63,8 +63,8 @@ export default {
             return 0
           }
         })
-      }
-    })
+      },
+    }),
   },
   mounted() {
     this.allSubtopics = allSubtopics()
@@ -126,7 +126,7 @@ export default {
           this.emitListIntervalId = null
         } else this.$forceUpdate()
       }, 1000 * 60)
-    }
+    },
   },
   sockets: {
     async sessions(sessions) {
@@ -140,7 +140,7 @@ export default {
         this.startWaitTimeRefresh()
 
       const results = []
-      const socketSessions = sessions.filter(session => !session.volunteer)
+      const socketSessions = sessions.filter((session) => !session.volunteer)
 
       for (let i = 0; i < socketSessions.length; i++) {
         const session = socketSessions[i]
@@ -154,10 +154,12 @@ export default {
 
         if (
           Object.keys(allSubtopics()).some(
-            s => s === subTopic && this.user.subjects.includes(s)
+            (s) => s === subTopic && this.user.subjects.includes(s)
             // Allow users with `algebraTwo-temporary` to pick up `algebraTwo` sessions
             // TODO: remove check for `algebraTwo` in algebra 2 launch cleanup
-          ) || (subTopic === 'algebraTwo' && this.user.subjects.includes('algebraTwo-temporary'))
+          ) ||
+          (subTopic === 'algebraTwo' &&
+            this.user.subjects.includes('algebraTwo-temporary'))
         ) {
           results.push(session)
         }
@@ -197,14 +199,14 @@ export default {
               newSession.student.firstname
             } needs help in ${this.subtopicDisplayName(newSession.subTopic)}`,
             {
-              body: 'Can you help them?'
+              body: 'Can you help them?',
             }
           )
         }
       }
       this.isInitialMount = false
-    }
-  }
+    },
+  },
 }
 </script>
 

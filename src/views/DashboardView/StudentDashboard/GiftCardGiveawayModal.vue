@@ -69,14 +69,14 @@ export default {
   name: 'volunteer-dashboard',
   components: { Modal, LargeButton, HeavyCrossIcon },
   props: {
-    closeModal: { type: Function, required: true }
+    closeModal: { type: Function, required: true },
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: (state) => state.user.user,
     }),
-    ...mapGetters({ mobileMode: 'app/mobileMode' })
-  }
+    ...mapGetters({ mobileMode: 'app/mobileMode' }),
+  },
 }
 </script>
 

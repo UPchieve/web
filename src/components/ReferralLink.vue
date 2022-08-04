@@ -20,12 +20,12 @@ export default {
   data() {
     return {
       selectedSubtopic: '',
-      copyMessage: 'Copy'
+      copyMessage: 'Copy',
     }
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: (state) => state.user.user,
     }),
     referralLink() {
       const { referralCode } = this.user
@@ -34,7 +34,7 @@ export default {
       } else {
         return `${config.serverRoot}/referral/${referralCode}`
       }
-    }
+    },
   },
 
   methods: {
@@ -51,8 +51,8 @@ export default {
       } catch (error) {
         this.copyMessage = 'Copy'
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -80,11 +80,11 @@
             OR REMOVED FROM THE WEBSITE BY UPCHIEVE OR (B) ANY PERSONS UNDER THE
             AGE OF 13. By using or registering an account for the Website, you
             represent (a) that you have read and agree to these Terms, the
-            Privacy Policy, and Disclaimers; (b) that you have not been
-            previously suspended or removed from the Website by UPchieve; (c)
-            that you are over 13 years of age; and (d) that your registration
-            and your use of the Website is in compliance with any and all
-            applicable laws and regulations.
+            Privacy Policy, and Disclaimers (b) that you have not been
+            previously suspended or removed from the Website by UPchieve (c)
+            that you are over 13 years of age and (d) that your registration and
+            your use of the Website is in compliance with any and all applicable
+            laws and regulations.
           </p>
         </accordion-item>
 
@@ -194,12 +194,12 @@
               Use the Website for any commercial use or purpose unless expressly
               permitted by UPchieve in writing, it being understood that the
               Website and related services are intended for personal,
-              non-commercial use only;
+              non-commercial use only
             </li>
 
             <li>
               Post, upload, or distribute any defamatory, libelous, or
-              inaccurate content;
+              inaccurate content
             </li>
 
             <li>
@@ -207,13 +207,13 @@
               that a reasonable person could deem to be objectionable,
               offensive, indecent, pornographic, harassing, threatening,
               embarrassing, distressing, vulgar, hateful, discriminatory, or
-              otherwise inappropriate;
+              otherwise inappropriate
             </li>
 
             <li>
               Impersonate any person or entity, falsely claim an affiliation
               with any person or entity, access the Website accounts of others
-              without permission, or perform any other fraudulent activity;
+              without permission, or perform any other fraudulent activity
             </li>
 
             <li>
@@ -222,19 +222,18 @@
               unsolicited advertising, promotional materials, or other
               solicitation material, bulk mailing of commercial advertising,
               chain mail, informational announcements, charity requests, and
-              petitions for signatures);
+              petitions for signatures)
             </li>
 
             <li>
               Use the Website for any illegal purpose, or in violation of any
               local, state, national, or international law, including, without
               limitation, laws governing intellectual property and other
-              proprietary rights, and data protection and privacy; or
+              proprietary rights, and data protection and privacy or
             </li>
 
             <li>
-              Defame, harass, abuse, threaten or defraud Users of the Website;
-              or
+              Defame, harass, abuse, threaten or defraud Users of the Website or
             </li>
 
             <li>
@@ -264,7 +263,7 @@
           </p>
 
           <p>
-            <strong>NO CLASS ACTIONS; NO JURY TRIAL.</strong> You agree that you
+            <strong>NO CLASS ACTIONS NO JURY TRIAL.</strong> You agree that you
             will only sue us as an individual in any dispute connected with the
             Services. You agree that you will not file a class action or
             participate in a class action. You agree that you will not join any
@@ -309,14 +308,14 @@
             <strong>WE'RE NOT RESPONSIBLE FOR ALL CIRCUMSTANCES.</strong> You
             also agree that we are not responsible for anything beyond our
             control. For example, we are not liable: for Service interruptions
-            caused by problems with the communications network; for problems
-            caused by any Internet service provider; for your computer or its
-            programs failing; for the acts of criminal attackers, whether in
-            real-time or automated (e.g., viruses); for other technologically
+            caused by problems with the communications network for problems
+            caused by any Internet service provider for your computer or its
+            programs failing for the acts of criminal attackers, whether in
+            real-time or automated (e.g., viruses) for other technologically
             harmful material that may infect your computer equipment, computer
             programs, data or proprietary material due to your use of the
             Websites or to your downloading of any content on it, or on any
-            website linked to it; or for errors in information provided to us
+            website linked to it or for errors in information provided to us
             upon which we reasonably rely. These are only examples. We assume no
             responsibility for the content of other websites linked on the
             Website. Such links should not be interpreted as an endorsement by
@@ -407,9 +406,7 @@
               Contact you about your account, including, but not limited to,
               changes to the Terms of Service or UPchieve's Services
             </li>
-            <li>
-              Ask you for your feedback to help make our Services better
-            </li>
+            <li>Ask you for your feedback to help make our Services better</li>
             <li>Respond to your requests for information or assistance</li>
             <li>
               Consolidate anonymized information about Users in order to apply
@@ -474,7 +471,10 @@
               <strong>Cookies, see below for detail</strong>
             </li>
             <li>
-              <strong>Account Data, including past chat logs, feedback, actions on site, etc</strong>
+              <strong
+                >Account Data, including past chat logs, feedback, actions on
+                site, etc</strong
+              >
             </li>
           </ul>
         </accordion-item>
@@ -501,11 +501,10 @@
               Services, and how long your interactions with other Users last.
             </li>
             <li>
-              <strong>
-                Information we collect automatically.
-              </strong>
-              When you use our Site, we also collect information and analytics about
-              how you interact with our Site through technologies like cookies.
+              <strong> Information we collect automatically. </strong>
+              When you use our Site, we also collect information and analytics
+              about how you interact with our Site through technologies like
+              cookies.
             </li>
           </ul>
 
@@ -521,22 +520,26 @@
         <accordion-item label="Opting Out of Communiations">
           <p>
             With your consent, from time to time we will communicate with you
-            concerning our Services, including requests for future support.
-            To opt-out of receiving these communications, you may click on the
+            concerning our Services, including requests for future support. To
+            opt-out of receiving these communications, you may click on the
             “unsubscribe” link in any email communications.
           </p>
         </accordion-item>
 
-        <accordion-item label="Update, Correct, or Delete Your Personal Information">
+        <accordion-item
+          label="Update, Correct, or Delete Your Personal Information"
+        >
           <p>
-            You can visit the Profile section of our Site at any time to see some
-            of the personal information we have collected about you. You can update
-            most of this information on the Site, but you may also email us at
-            <a href="mailto:support@upchieve.org">support@upchieve.org</a> at any time
-            to request that we update or remove your information.
+            You can visit the Profile section of our Site at any time to see
+            some of the personal information we have collected about you. You
+            can update most of this information on the Site, but you may also
+            email us at
+            <a href="mailto:support@upchieve.org">support@upchieve.org</a> at
+            any time to request that we update or remove your information.
             UPchieve will retain the information about you for as long as your
-            account remains active. iOS app users may request full deletion of their account,
-            which makes it inaccessible while we manually process removal of the data.
+            account remains active. iOS app users may request full deletion of
+            their account, which makes it inaccessible while we manually process
+            removal of the data.
           </p>
 
           <p>
@@ -582,9 +585,12 @@
               internet safety practices and use caution even when interacting
               with other Users. For more information on best internet safety
               practices specifically for teens, check out
-              <a href="https://teens.webmd.com/features/teen-internet-safety-tips"
-                 target="_blank"
-                 rel="noopener noreferrer">WebMD's article</a>.
+              <a
+                href="https://teens.webmd.com/features/teen-internet-safety-tips"
+                target="_blank"
+                rel="noopener noreferrer"
+                >WebMD's article</a
+              >.
             </li>
 
             <li>
@@ -634,76 +640,94 @@
         <accordion-item label="Cookies">
           <ul>
             <li>
-              <strong>
-                What a cookie is:
-              </strong>
+              <strong> What a cookie is: </strong>
               <p>
-                A Cookie is a small file that can be placed on your device
-                that allows us to recognize and remember you. It is sent
-                to your browser and stored on your computer’s hard drive.
-                When you visit our sites, we may collect information from
-                you automatically through cookies or similar technology,
-                such as a tag, pixel, or other web beacon.
+                A Cookie is a small file that can be placed on your device that
+                allows us to recognize and remember you. It is sent to your
+                browser and stored on your computer’s hard drive. When you visit
+                our sites, we may collect information from you automatically
+                through cookies or similar technology, such as a tag, pixel, or
+                other web beacon.
               </p>
             </li>
             <li>
               <strong>How we use cookies:</strong>
               <p>
-                We use Cookies in a range of ways to improve your experience on our site,
-                including by keeping you logged in, and providing us with an understanding
-                of how you use and interact with our Site. Ultimately, this allows us to provide
-                the Service that you receive on our Site and app.
+                We use Cookies in a range of ways to improve your experience on
+                our site, including by keeping you logged in, and providing us
+                with an understanding of how you use and interact with our Site.
+                Ultimately, this allows us to provide the Service that you
+                receive on our Site and app.
               </p>
               <p>
-                Other organizations also collect user information on our Site through Cookies,
-                tags and pixels. Tags and pixels, also known as web beacons, are similar to
-                Cookies but are collected through embedded images. Using Cookies and other
-                technologies allows other organizations to help us to analyze how our site is being used,
-                and measure the number of visitors to the site.
+                Other organizations also collect user information on our Site
+                through Cookies, tags and pixels. Tags and pixels, also known as
+                web beacons, are similar to Cookies but are collected through
+                embedded images. Using Cookies and other technologies allows
+                other organizations to help us to analyze how our site is being
+                used, and measure the number of visitors to the site.
               </p>
               <p>
-                We use third-party services, including Google Analytics and Posthog to gather general
-                information about how visitors use our Site for website optimization and analytics.
-                To find out more about Google Analytics' privacy policies, please visit the following link:
-                http://www.google.com/policies/privacy/partners/.
-                For further details about Posthog, please see https://www.posthog.com.
-                We use a service called Gleap to handle user error reports. We use a service called NewRelic
-                to track errors and performance of our applications. Both use cookies on our site.
-                For all of the above services, the only people with access to data are our staff members.
-                While the data is sent to a third party to process, they are not allowed to
-                view any of the data coming from our system.
+                We use third-party services, including Google Analytics and
+                Posthog to gather general information about how visitors use our
+                Site for website optimization and analytics. To find out more
+                about Google Analytics' privacy policies, please visit the
+                following link:
+                http://www.google.com/policies/privacy/partners/. For further
+                details about Posthog, please see https://www.posthog.com. We
+                use a service called Gleap to handle user error reports. We use
+                a service called NewRelic to track errors and performance of our
+                applications. Both use cookies on our site. For all of the above
+                services, the only people with access to data are our staff
+                members. While the data is sent to a third party to process,
+                they are not allowed to view any of the data coming from our
+                system.
               </p>
             </li>
             <li>
               <strong>To opt-out of cookies:</strong>
               <p>
-                You may choose opt-out from the use of Cookies on your computer by selecting the
-                appropriate settings in your browser. Be aware that opting-out may affect your
-                ability to use all the features of the Site. Because a Cookie is stored on your computer,
-                it is always possible for you to view, modify or delete it.
+                You may choose opt-out from the use of Cookies on your computer
+                by selecting the appropriate settings in your browser. Be aware
+                that opting-out may affect your ability to use all the features
+                of the Site. Because a Cookie is stored on your computer, it is
+                always possible for you to view, modify or delete it.
               </p>
               <p>
-                It is also possible to stop your browser from accepting Cookies altogether by
-                changing your browser’s Cookie settings. You can usually find these settings
-                in the “Options” or “Preferences” menu of your browser. The following links may be helpful,
-                or you can use the “Help” option in your browser.
+                It is also possible to stop your browser from accepting Cookies
+                altogether by changing your browser’s Cookie settings. You can
+                usually find these settings in the “Options” or “Preferences”
+                menu of your browser. The following links may be helpful, or you
+                can use the “Help” option in your browser.
               </p>
               <ul>
                 <li>
-                  <a href="https://support.microsoft.com/en-gb/microsoft-edge/delete-cookies-in-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09"
-                     target="_blank">Cookie Settings in Edge</a>
+                  <a
+                    href="https://support.microsoft.com/en-gb/microsoft-edge/delete-cookies-in-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09"
+                    target="_blank"
+                    >Cookie Settings in Edge</a
+                  >
                 </li>
                 <li>
-                  <a href="https://support.mozilla.org/en-US/kb/cookies-information-websites-store-on-your-computer?redirectslug=Cookies&redirectlocale=en-US"
-                     target="_blank">Cookie Settings in Firefox</a>
+                  <a
+                    href="https://support.mozilla.org/en-US/kb/cookies-information-websites-store-on-your-computer?redirectslug=Cookies&redirectlocale=en-US"
+                    target="_blank"
+                    >Cookie Settings in Firefox</a
+                  >
                 </li>
                 <li>
-                  <a href="https://support.google.com/chrome/answer/95647?hl=en&ref_topic=14666"
-                     target="_blank">Cookie Settings in Chrome</a>
+                  <a
+                    href="https://support.google.com/chrome/answer/95647?hl=en&ref_topic=14666"
+                    target="_blank"
+                    >Cookie Settings in Chrome</a
+                  >
                 </li>
                 <li>
-                  <a href="https://support.apple.com/guide/safari/manage-cookies-sfri11471/mac"
-                     target="_blank">Cookie Settings in Safari</a>
+                  <a
+                    href="https://support.apple.com/guide/safari/manage-cookies-sfri11471/mac"
+                    target="_blank"
+                    >Cookie Settings in Safari</a
+                  >
                 </li>
               </ul>
             </li>
@@ -712,9 +736,10 @@
 
         <accordion-item label="External Links">
           <p>
-            Our Site may include links to external websites. UPchieve is not responsible for the
-            privacy practices of these websites and we encourage you to review and understand
-            their privacy practices and policies prior to providing any personal information to them.
+            Our Site may include links to external websites. UPchieve is not
+            responsible for the privacy practices of these websites and we
+            encourage you to review and understand their privacy practices and
+            policies prior to providing any personal information to them.
           </p>
         </accordion-item>
 
@@ -731,9 +756,11 @@
 
         <accordion-item label="Contact Us">
           <p>
-            If you have any questions about this Privacy Policy, please contact us at
+            If you have any questions about this Privacy Policy, please contact
+            us at
             <a href="mailto:support@upchieve.org">support@upchieve.org</a>.
-            Alternatively, please submit your question or request via the “Contact” feature on our Site.
+            Alternatively, please submit your question or request via the
+            “Contact” feature on our Site.
           </p>
         </accordion-item>
       </div>
@@ -903,7 +930,7 @@ export default {
   name: 'LegalView',
   components: {
     FullTextTemplate,
-    AccordionItem
+    AccordionItem,
   },
   created() {
     if (!this.isAuthenticated) {
@@ -912,8 +939,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      isAuthenticated: 'user/isAuthenticated'
-    })
+      isAuthenticated: 'user/isAuthenticated',
+    }),
   },
   watch: {
     isAuthenticated(isAuthed) {
@@ -922,8 +949,8 @@ export default {
       } else {
         this.$store.dispatch('app/hideNavigation')
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

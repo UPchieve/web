@@ -14,7 +14,7 @@ export default {
   name: 'UserListItem',
 
   props: {
-    user: Object
+    user: Object,
   },
 
   computed: {
@@ -23,8 +23,8 @@ export default {
     },
     userType() {
       return this.user.isVolunteer ? 'Volunteer' : 'Student'
-    }
-  }
+    },
+  },
 }
 </script>
 

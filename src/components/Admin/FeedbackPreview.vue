@@ -36,7 +36,10 @@
     <div v-if="writtenFeedback" class="feedback-preview__written">
       {{ writtenFeedback }}
     </div>
-    <div v-if="isStudentFeedback && coachFeedback" class="feedback-preview__written">
+    <div
+      v-if="isStudentFeedback && coachFeedback"
+      class="feedback-preview__written"
+    >
       Feedback on coach: {{ coachFeedback }}
     </div>
   </div>
@@ -52,15 +55,15 @@ export default {
     feedback: Object,
     userType: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
 
   computed: {
     sessionRating() {
       const sessionRatingKeys = [
         'studentCounselingFeedback.rate-session.rating',
-        'responseData.rate-session.rating'
+        'responseData.rate-session.rating',
       ]
       for (const sessionRatingKey of sessionRatingKeys) {
         const sessionRating = get(this.feedback, sessionRatingKey, null)
@@ -70,7 +73,7 @@ export default {
       return ''
     },
 
-    isStudentFeedback(){
+    isStudentFeedback() {
       return this.userType === 'student'
     },
 
@@ -80,16 +83,19 @@ export default {
         'studentTutoringFeedback.other-feedback',
         'studentCounselingFeedback.other-feedback',
       ]
-      const volunteerFeedbackKeys = [
-        'volunteerFeedback.other-feedback',
-      ]
-      const legacyFeedbackKeys = [
-        'responseData.other-feedback'
-      ]
-      if(this.isStudentFeedback)
-        otherFeedback = this.getOtherFeedback([...studentFeedbackKeys, ...legacyFeedbackKeys])
-      else otherFeedback = this.getOtherFeedback([...volunteerFeedbackKeys, ...legacyFeedbackKeys])
-      
+      const volunteerFeedbackKeys = ['volunteerFeedback.other-feedback']
+      const legacyFeedbackKeys = ['responseData.other-feedback']
+      if (this.isStudentFeedback)
+        otherFeedback = this.getOtherFeedback([
+          ...studentFeedbackKeys,
+          ...legacyFeedbackKeys,
+        ])
+      else
+        otherFeedback = this.getOtherFeedback([
+          ...volunteerFeedbackKeys,
+          ...legacyFeedbackKeys,
+        ])
+
       return otherFeedback
     },
 
@@ -103,7 +109,7 @@ export default {
         'I think I know how to do it, but I need help.',
         'I can do this with help.',
         'I can do this on my own.',
-        'I’m very confident'
+        'I’m very confident',
       ]
       const path = get(
         this.feedback,
@@ -141,9 +147,9 @@ export default {
 
       if (isEmpty(ratings)) return []
 
-      return Object.keys(ratings).map(r => ({
+      return Object.keys(ratings).map((r) => ({
         name: r,
-        value: ratings[r]
+        value: ratings[r],
       }))
     },
 
@@ -158,7 +164,7 @@ export default {
           if (key === 'other-feedback') return {}
           return {
             key,
-            value
+            value,
           }
         })
 
@@ -176,7 +182,7 @@ export default {
         'The student requested the wrong subject',
         'There was a gap in my own knowledge',
         'The student was rude or inappropriate',
-        'The student was only looking for answers'
+        'The student was only looking for answers',
       ]
       return options
         .filter((_, index) =>
@@ -193,22 +199,22 @@ export default {
         'They have a sense of how to do it, but they still need some help.',
         'They can do this on their own, but they don’t fully understand it.',
         'They are very comfortable with the topic.',
-        'N/A - I couldn’t tell.'
+        'N/A - I couldn’t tell.',
       ]
       return options[
         this.feedback.volunteerFeedback['student-understanding'] - 1
       ]
-    }
+    },
   },
   methods: {
-    getOtherFeedback(otherFeedbackKeys){
+    getOtherFeedback(otherFeedbackKeys) {
       for (const feedbackKey of otherFeedbackKeys) {
         const otherFeedback = get(this.feedback, feedbackKey, null)
         if (otherFeedback) return otherFeedback
       }
       return ''
-    }
-  }
+    },
+  },
 }
 </script>
 

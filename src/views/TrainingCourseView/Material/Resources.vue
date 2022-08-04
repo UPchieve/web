@@ -14,11 +14,11 @@ import LinkMaterial from './Link'
 
 export default {
   components: {
-    LinkMaterial
+    LinkMaterial,
   },
   props: {
-    links: Array
-  }
+    links: Array,
+  },
 }
 </script>
 

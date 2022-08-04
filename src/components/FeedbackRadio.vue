@@ -50,19 +50,19 @@ export default {
   name: 'FeedbackRadio',
   model: {
     prop: 'value',
-    event: 'change'
+    event: 'change',
   },
   props: {
     id: {
       type: String,
-      required: true
+      required: true,
     },
     options: Array,
     direction: {
       type: String,
-      default: 'column'
-    }
-  }
+      default: 'column',
+    },
+  },
 }
 </script>
 

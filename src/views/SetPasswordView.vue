@@ -79,15 +79,15 @@ export default {
   components: {
     FormPageTemplate,
     LargeButton,
-    Loader
+    Loader,
   },
   props: {
-    token: String
+    token: String,
   },
   created() {
     this.$store.dispatch('app/hideNavigation')
     const { token } = this.$route.params
-    AuthService.verifyReset(this, { token }).catch(err => {
+    AuthService.verifyReset(this, { token }).catch((err) => {
       if (err.status !== 404 && err.status !== 422) {
         Sentry.captureException(err)
       }
@@ -102,20 +102,20 @@ export default {
         token: '',
         email: '',
         password: '',
-        newpassword: ''
+        newpassword: '',
       },
       isValidResetToken: true,
       isResettingPassword: false,
-      showSuccess: false
+      showSuccess: false,
     }
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: (state) => state.user.user,
     }),
     redirectText() {
       return this.user ? 'Home' : 'Log in'
-    }
+    },
   },
   methods: {
     submit() {
@@ -125,42 +125,42 @@ export default {
         token: this.token,
         email: this.credentials.email,
         password: this.credentials.password,
-        newpassword: this.credentials.newpassword
+        newpassword: this.credentials.newpassword,
       })
         .then(() => {
           this.isResettingPassword = false
           this.showSuccess = true
         })
-        .catch(err => {
+        .catch((err) => {
           this.isResettingPassword = false
           this.msg = err.message || err
           if (err.status !== 422) {
             Sentry.captureException(err)
           }
         })
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
 .uc-form {
-  position: relative;
+  position: relative
 }
 
 .uc-form-header {
-  font-size: 24px;
-  font-weight: bold;
-  justify-content: center;
+  font-size: 24px
+  font-weight: bold
+  justify-content: center
 
   &-link--success {
-    color: $c-success-green;
+    color: $c-success-green
   }
 }
 
 .success-message {
-  @include flex-container(column, center, center);
-  margin: auto 0;
-  padding: 50px;
+  @include flex-container(column, center, center)
+  margin: auto 0
+  padding: 50px
 }
 </style>

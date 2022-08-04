@@ -24,15 +24,15 @@ export default {
   inheritAttrs: false,
   model: {
     prop: 'checked',
-    event: 'change'
+    event: 'change',
   },
   props: {
     checked: Boolean,
     id: {
       type: String,
-      required: true
-    }
-  }
+      required: true,
+    },
+  },
 }
 </script>
 

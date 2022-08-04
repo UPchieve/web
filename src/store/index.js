@@ -18,8 +18,8 @@ export const storeOptions = {
     app: appModule,
     user: userModule,
     productFlags: productFlagsModule,
-    featureFlags: featureFlagsModule
-  }
+    featureFlags: featureFlagsModule,
+  },
 }
 
 export default new Vuex.Store(storeOptions)

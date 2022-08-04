@@ -94,11 +94,9 @@
                         )
                     "
                     type="radio"
-                    :name="
-                      `multiple-radio-${
-                        question.qid
-                      }_${subquestion_index.toString()}`
-                    "
+                    :name="`multiple-radio-${
+                      question.qid
+                    }_${subquestion_index.toString()}`"
                     :value="index"
                   />
                 </td>
@@ -113,9 +111,7 @@
                 v-bind:key="subquestion"
               >
                 <input
-                  :id="
-                    `radio-list-option_${question.options_alias[subquestion_index]}`
-                  "
+                  :id="`radio-list-option_${question.options_alias[subquestion_index]}`"
                   class="radio-list__option-input"
                   v-model="userResponse[question.alias]"
                   type="radio"
@@ -124,9 +120,7 @@
                 />
                 <label
                   class="radio-list__option-label"
-                  :for="
-                    `radio-list-option_${question.options_alias[subquestion_index]}`
-                  "
+                  :for="`radio-list-option_${question.options_alias[subquestion_index]}`"
                 >
                   {{ subquestion }}
                 </label>
@@ -219,7 +213,7 @@ export default {
           title: 'Rate your session',
           secondary_title: '',
           options: ['Rating'],
-          options_alias: ['rating']
+          options_alias: ['rating'],
         },
         {
           qid: '2',
@@ -233,7 +227,7 @@ export default {
             'Finish a homework assignment',
             'Get advice',
             'Prepare for a test',
-            'Other'
+            'Other',
           ],
           options_alias: [
             'improve-understanding',
@@ -241,8 +235,8 @@ export default {
             'finish-homework',
             'get-advice',
             'test-prep',
-            'other'
-          ]
+            'other',
+          ],
         },
         {
           qid: '3',
@@ -255,18 +249,18 @@ export default {
             'Somewhat Disagree',
             'Neither',
             'Somewhat Agree',
-            'Strongly Agree'
+            'Strongly Agree',
           ],
           options: [
             'My coach was knowedgable about the topic.',
             'My coach was friendly and approachable.',
-            'I would like to receive help from this coach again.'
+            'I would like to receive help from this coach again.',
           ],
           options_alias: [
             'coach-knowedgable',
             'coach-friendly',
-            'coach-help-again'
-          ]
+            'coach-help-again',
+          ],
         },
         {
           qid: '4',
@@ -287,8 +281,8 @@ export default {
           secondary_title:
             'This can be about the web app, the Academic Coach who helped you, the services UPchieve offers, etc.',
           table_title: [],
-          options: []
-        }
+          options: [],
+        },
       ],
       questions: [],
       userResponse: {},
@@ -304,7 +298,7 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: (state) => state.user.user,
     }),
     ...mapGetters({
       isCoachFavoritingActive: 'featureFlags/isCoachFavoritingActive',
@@ -349,7 +343,7 @@ export default {
     this.questions = this.student_questions
 
     if (this.questions.length > 0)
-      this.questions.map(question => {
+      this.questions.map((question) => {
         if (
           question.qtype === 'multiple-radio' ||
           question.qtype === 'star-rating'
@@ -364,8 +358,7 @@ export default {
       this.isFavoriteCoach = response.body.isFavorite
 
       if (!this.isFavoriteCoach) {
-        const response =
-          await NetworkService.getRemainingFavoriteVolunteers()
+        const response = await NetworkService.getRemainingFavoriteVolunteers()
         this.isFavoriteCoachLimitReached = response.body.remaining === 0
       }
     }

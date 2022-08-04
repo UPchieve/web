@@ -47,86 +47,118 @@
           />
         </div>
         <template v-if="!isAdminReview">
-          <div
-            class="question-row"
-            v-for="(question, question_index) in multipleRadioQuestions"
-            v-bind:key="question_index"
-          >
-            <div class="uc-form-label">{{ question.title }}</div>
-            <div class="position-wrapper">
-              <div class="question-scroll-container">
-                <table>
-                  <tr class="radio-question-row">
-                    <td class="mobile-remove"></td>
-                    <td
-                      class="radio-question-selection-title"
-                      v-for="(label, labelIndex) in question.tableTitle"
-                      v-bind:key="labelIndex"
+          <div v-if="!mobileMode">
+            <div
+              class="question-row"
+              v-for="(question, question_index) in multipleRadioQuestions"
+              v-bind:key="question_index"
+            >
+              <div class="uc-form-label">{{ question.title }}</div>
+              <div class="position-wrapper">
+                <div class="question-scroll-container">
+                  <table>
+                    <tr class="radio-question-row">
+                      <td class="mobile-remove"></td>
+                      <td
+                        class="radio-question-selection-title"
+                        v-for="(label, labelIndex) in question.tableTitle"
+                        v-bind:key="labelIndex"
+                      >
+                        {{ label }}
+                      </td>
+                    </tr>
+                    <tr
+                      class="radio-question-row"
+                      v-for="(
+                        subquestion, subquestionIndex
+                      ) in question.options"
+                      v-bind:key="subquestion"
                     >
-                      {{ label }}
-                    </td>
-                  </tr>
-                  <tr
-                    class="radio-question-row"
-                    v-for="(subquestion, subquestionIndex) in question.options"
-                    v-bind:key="subquestion"
-                  >
-                    <td class="radio-question-cell">{{ subquestion }}</td>
-                    <td
-                      class="radio-question-selection-cell"
-                      v-for="index in question.tableTitle.length"
-                      v-bind:key="index"
-                    >
-                      <input
-                        class="uc-form-input"
-                        v-model="
-                          multipleRadioResponse[
-                            question.optionsAlias[subquestionIndex]
-                          ]
-                        "
-                        type="radio"
-                        :name="
-                          `multiple-radio-${
+                      <td class="radio-question-cell">{{ subquestion }}</td>
+                      <td
+                        class="radio-question-selection-cell"
+                        v-for="index in question.tableTitle.length"
+                        v-bind:key="index"
+                      >
+                        <input
+                          class="uc-form-input"
+                          v-model="
+                            multipleRadioResponse[
+                              question.optionsAlias[subquestionIndex]
+                            ]
+                          "
+                          type="radio"
+                          :name="`multiple-radio-${
                             question.qid
-                          }_${subquestionIndex.toString()}`
-                        "
-                        :value="index"
-                      />
-                    </td>
-                  </tr>
-                </table>
+                          }_${subquestionIndex.toString()}`"
+                          :value="index"
+                        />
+                      </td>
+                    </tr>
+                  </table>
 
-                <table
-                  class="mobile-pinned-questions-container"
-                  v-if="mobileMode"
-                >
-                  <tr class="radio-question-row">
-                    <td class="mobile-remove mobile-remove--shadow"></td>
-                    <td
-                      class="radio-question-selection-title radio-question-selection-title--hidden"
-                      v-for="(label, labelIndex) in question.tableTitle"
-                      v-bind:key="labelIndex"
-                    >
-                      {{ label }}
-                    </td>
-                  </tr>
-                  <tr
-                    class="radio-question-row"
-                    v-for="subquestion in question.options"
-                    v-bind:key="subquestion"
+                  <table
+                    class="mobile-pinned-questions-container"
+                    v-if="mobileMode"
                   >
-                    <td class="radio-question-cell radio-question-cell--shadow">
-                      {{ subquestion }}
-                    </td>
-                    <td
-                      class="radio-question-selection-cell--hidden"
-                      v-for="index in question.tableTitle.length"
-                      v-bind:key="index"
+                    <tr class="radio-question-row">
+                      <td class="mobile-remove mobile-remove--shadow"></td>
+                      <td
+                        class="radio-question-selection-title radio-question-selection-title--hidden"
+                        v-for="(label, labelIndex) in question.tableTitle"
+                        v-bind:key="labelIndex"
+                      >
+                        {{ label }}
+                      </td>
+                    </tr>
+                    <tr
+                      class="radio-question-row"
+                      v-for="subquestion in question.options"
+                      v-bind:key="subquestion"
                     >
-                      <input class="uc-form-input" type="radio" />
-                    </td>
-                  </tr>
-                </table>
+                      <td
+                        class="radio-question-cell radio-question-cell--shadow"
+                      >
+                        {{ subquestion }}
+                      </td>
+                      <td
+                        class="radio-question-selection-cell--hidden"
+                        v-for="index in question.tableTitle.length"
+                        v-bind:key="index"
+                      >
+                        <input class="uc-form-input" type="radio" />
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-else>
+            <div
+              v-for="(question, questionIndex) in multipleRadioQuestions"
+              v-bind:key="questionIndex"
+            >
+              <div class="uc-form-label">{{ question.title }}</div>
+              <div
+                v-for="(subquestion, subquestionIndex) in question.options"
+                v-bind:key="subquestionIndex"
+              >
+                <div class="uc-form-label">{{ subquestion }}</div>
+                <v-select
+                  class="uc-reference-form__select"
+                  @input="
+                    (value) =>
+                      storeIndexForMultipleRadioResponse(
+                        value,
+                        question.optionsAlias[subquestionIndex],
+                        question.tableTitle
+                      )
+                  "
+                  placeholder="Select your answer"
+                  :options="question.tableTitle"
+                  :searchable="false"
+                ></v-select>
               </div>
             </div>
           </div>
@@ -209,7 +241,7 @@ export default {
   name: 'ReferenceForm',
   props: {
     isAdminReview: { type: Boolean, default: false },
-    reference: { type: Object }
+    reference: { type: Object },
   },
   data() {
     return {
@@ -232,20 +264,20 @@ export default {
             'Neither Agree or Disagree',
             'Somewhat Agree',
             'Strongly Agree',
-            "I cannot speak to this aspect of the applicant's character"
+            "I cannot speak to this aspect of the applicant's character",
           ],
           options: [
             'patient',
             'a positive role model',
             'agreeable and approachable',
-            'able to communicate effectively'
+            'able to communicate effectively',
           ],
           optionsAlias: [
             'patient',
             'positiveRoleModel',
             'agreeableAndApproachable',
-            'communicatesEffectively'
-          ]
+            'communicatesEffectively',
+          ],
         },
         {
           qid: '2',
@@ -257,30 +289,30 @@ export default {
             'Somewhat Disagree',
             'Neither',
             'Somewhat Agree',
-            'Strongly Agree'
+            'Strongly Agree',
           ],
           options: [
-            'I would trust the applicant to spend time with a child alone.'
+            'I would trust the applicant to spend time with a child alone.',
           ],
-          optionsAlias: ['trustworthyWithChildren']
-        }
+          optionsAlias: ['trustworthyWithChildren'],
+        },
       ],
       multipleRadioResponse: {
         patient: '',
         positiveRoleModel: '',
         agreeableAndApproachable: '',
         communicatesEffectively: '',
-        trustworthyWithChildren: ''
-      }
+        trustworthyWithChildren: '',
+      },
     }
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: (state) => state.user.user,
     }),
     ...mapGetters({
-      mobileMode: 'app/mobileMode'
-    })
+      mobileMode: 'app/mobileMode',
+    }),
   },
   async mounted() {
     if (this.isAdminReview) {
@@ -289,10 +321,14 @@ export default {
       this.rejectionReason = this.reference.rejectionReason
       this.additionalInfo = this.reference.additionalInfo
       this.multipleRadioResponse.patient = this.reference.patient
-      this.multipleRadioResponse.positiveRoleModel = this.reference.positiveRoleModel
-      this.multipleRadioResponse.agreeableAndApproachable = this.reference.agreeableAndApproachable
-      this.multipleRadioResponse.communicatesEffectively = this.reference.communicatesEffectively
-      this.multipleRadioResponse.trustworthyWithChildren = this.reference.trustworthyWithChildren
+      this.multipleRadioResponse.positiveRoleModel =
+        this.reference.positiveRoleModel
+      this.multipleRadioResponse.agreeableAndApproachable =
+        this.reference.agreeableAndApproachable
+      this.multipleRadioResponse.communicatesEffectively =
+        this.reference.communicatesEffectively
+      this.multipleRadioResponse.trustworthyWithChildren =
+        this.reference.trustworthyWithChildren
     } else {
       try {
         await NetworkService.checkReference(this.$route.params.referenceId)
@@ -314,7 +350,7 @@ export default {
         positiveRoleModel,
         agreeableAndApproachable,
         communicatesEffectively,
-        trustworthyWithChildren
+        trustworthyWithChildren,
       } = this.multipleRadioResponse
 
       const data = {
@@ -326,7 +362,7 @@ export default {
         positiveRoleModel,
         agreeableAndApproachable,
         communicatesEffectively,
-        trustworthyWithChildren
+        trustworthyWithChildren,
       }
       const referenceId = this.$route.params.referenceId
 
@@ -336,7 +372,7 @@ export default {
           AnalyticsService.captureEvent(EVENTS.REFERENCE_FORM_SUBMITTED, {
             event: EVENTS.REFERENCE_FORM_SUBMITTED,
             userId: this.user._id,
-            referenceId: referenceId
+            referenceId: referenceId,
           })
         })
         .catch(() => {
@@ -349,7 +385,7 @@ export default {
         positiveRoleModel,
         agreeableAndApproachable,
         communicatesEffectively,
-        trustworthyWithChildren
+        trustworthyWithChildren,
       } = this.multipleRadioResponse
 
       const requiredInputs = {
@@ -361,11 +397,11 @@ export default {
         positiveRoleModel,
         agreeableAndApproachable,
         communicatesEffectively,
-        trustworthyWithChildren
+        trustworthyWithChildren,
       }
 
       const requiredInputValues = Object.values(requiredInputs)
-      const isValidForm = requiredInputValues.every(input => !!input)
+      const isValidForm = requiredInputValues.every((input) => !!input)
 
       return isValidForm
     },
@@ -375,10 +411,37 @@ export default {
       // Ratings recorded from a reference are 1-based indexed, subtract 1 to make 0-based indexed
       const responseRating = question.tableTitle[referenceResponse - 1]
       return responseRating
-    }
-  }
+    },
+    // The database expects the index of the inputted value and not the value text itself
+    storeIndexForMultipleRadioResponse(value, path, possibleAnswers) {
+      // ratings recorded from a reference are 1-based index
+      this.multipleRadioResponse[path] = possibleAnswers.indexOf(value) + 1
+    },
+  },
 }
 </script>
+
+<style lang="scss">
+.uc-reference-form__select .vs__dropdown-menu {
+  font-size: 14px;
+}
+
+.uc-reference-form__select .vs__dropdown-menu li {
+  &:hover {
+    color: #000;
+    background-color: $c-background-blue;
+  }
+}
+
+.uc-reference-form__select .vs__dropdown-option {
+  white-space: normal;
+}
+
+.uc-reference-form__select .vs__dropdown-toggle {
+  max-height: 60px;
+  white-space: normal;
+}
+</style>
 
 <style lang="scss" scoped>
 .helper-message {
@@ -399,6 +462,7 @@ textarea.uc-form-input {
 .uc-form {
   &-label {
     font-weight: 500;
+    margin-top: 1.5em;
   }
 
   &-input {
@@ -406,6 +470,18 @@ textarea.uc-form-input {
     &:focus {
       outline: none;
       border-bottom: 3px solid darken($c-information-blue, 15%);
+    }
+  }
+}
+
+.uc-reference-form {
+  &__select {
+    width: 100%;
+    margin-top: 1.5em;
+    font-size: 14px;
+
+    ::placeholder {
+      color: $c-banned-grey;
     }
   }
 }

@@ -38,28 +38,28 @@ export default {
   name: 'volunteer-welcome-modal',
   components: { Modal, ArrowIcon },
   props: {
-    closeModal: { type: Function, required: true }
+    closeModal: { type: Function, required: true },
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: (state) => state.user.user,
     }),
     ...mapGetters({
-      mobileMode: 'app/mobileMode'
+      mobileMode: 'app/mobileMode',
     }),
     message() {
       if (this.user.isApproved)
-        return 'We’re so glad you’re here! Before you can start tutoring, you’ll need to set up your account.'
+        return "We're so glad you're joining our movement to democratize access to educational support. Before you can start making an impact in a student’s life, you'll need to complete a few quick steps."
       else
-        return 'We’re so glad you’re here! Before you can start tutoring, you’ll need to set up your account and get verified as a volunteer'
-    }
+        return "We're so glad you're joining our movement to democratize access to educational support. Before you can start making an impact in a student’s life, you'll need to complete a few quick steps."
+    },
   },
   methods: {
     handleCloseModal() {
       this.$store.dispatch('user/firstDashboardVisit', false)
       this.closeModal()
-    }
-  }
+    },
+  },
 }
 </script>
 

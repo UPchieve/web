@@ -21,17 +21,17 @@ import ReferralLink from '@/components/ReferralLink.vue'
 export default {
   components: { ReferralLink },
   props: {
-    modalData: { type: Object, required: true }
+    modalData: { type: Object, required: true },
   },
   data() {
     return {
       selectedSubtopic: '',
-      copyMessage: 'Copy'
+      copyMessage: 'Copy',
     }
   },
   computed: {
-    ...mapGetters({ mobileMode: 'app/mobileMode' })
-  }
+    ...mapGetters({ mobileMode: 'app/mobileMode' }),
+  },
 }
 </script>
 

@@ -25,7 +25,7 @@ const availabilityTime = {
   '8p': true,
   '9p': true,
   '10p': true,
-  '11p': true
+  '11p': true,
 }
 
 const availability = {
@@ -35,7 +35,7 @@ const availability = {
   Wednesday: Object.assign({}, availabilityTime),
   Thursday: Object.assign({}, availabilityTime),
   Friday: Object.assign({}, availabilityTime),
-  Saturday: Object.assign({}, availabilityTime)
+  Saturday: Object.assign({}, availabilityTime),
 }
 
 const waitTimes = {
@@ -62,7 +62,7 @@ const waitTimes = {
   '8p': 5 * 60 * 1000,
   '9p': 5 * 60 * 1000,
   '10p': 5 * 60 * 1000,
-  '11p': 5 * 60 * 1000
+  '11p': 5 * 60 * 1000,
 }
 
 const wait = {
@@ -72,29 +72,29 @@ const wait = {
   Wednesday: waitTimes,
   Thursday: waitTimes,
   Friday: waitTimes,
-  Saturday: waitTimes
+  Saturday: waitTimes,
 }
 
 export default {
   title: 'Availability/AvailabilityGrid',
-  component: AvailabilityGrid
+  component: AvailabilityGrid,
 }
 
 const Template = (args, { argTypes }) => ({
   props: Object.keys(argTypes),
   components: { AvailabilityGrid },
   methods: {
-    clickCell: arg => {
+    clickCell: (arg) => {
       availability[arg.day][arg.hour] = !availability[arg.day][arg.hour]
       action('clicked')(arg)
-    }
+    },
   },
   template:
-    '<AvailabilityGrid v-bind="$props" @select="clickCell">AvailabilityGrid</AvailabilityGrid>'
+    '<AvailabilityGrid v-bind="$props" @select="clickCell">AvailabilityGrid</AvailabilityGrid>',
 })
 
 export const Vanilla = Template.bind({})
 Vanilla.args = {
   availability: availability,
-  waitTimes: wait
+  waitTimes: wait,
 }

@@ -1,7 +1,10 @@
 <template>
   <div
     class="upc-modal"
-    :class="{ 'modal--important': important, 'upc-modal--disable-mobile': disableModalMobileMode }"
+    :class="{
+      'modal--important': important,
+      'upc-modal--disable-mobile': disableModalMobileMode,
+    }"
     @click="handleClose"
   >
     <div v-if="mobileMode && !disableModalMobileMode" class="upc-modal-header">
@@ -34,7 +37,7 @@ export default {
     important: Boolean,
     backText: { type: String, default: 'Back' },
     useDefaultPadding: { type: Boolean, default: true, required: false },
-    disableModalMobileMode: { type: Boolean, default: false, required: false }
+    disableModalMobileMode: { type: Boolean, default: false, required: false },
   },
   mounted() {
     const body = document.querySelector('body')
@@ -45,14 +48,14 @@ export default {
     body.classList.remove('disable-scroll')
   },
   computed: {
-    ...mapGetters({ mobileMode: 'app/mobileMode' })
+    ...mapGetters({ mobileMode: 'app/mobileMode' }),
   },
   methods: {
     handleClose(event) {
       const { target } = event
       if (target.classList.contains('upc-modal')) this.closeModal()
-    }
-  }
+    },
+  },
 }
 </script>
 

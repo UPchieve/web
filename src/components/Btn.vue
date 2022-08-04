@@ -9,34 +9,34 @@ export default {
   props: {
     label: {
       type: String,
-      default: ''
+      default: '',
     },
     btnOptionsSecond: {
       type: Boolean,
-      default: false
+      default: false,
     },
     big: {
       type: Boolean,
-      default: false
+      default: false,
     },
     clickHandler: {
       type: Function,
-      required: true
+      required: true,
     },
     type: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
       classes: {
         'v-btn': true,
         'v-btn--btn-options-second': this.btnOptionsSecond,
-        'v-btn--big': this.big
-      }
+        'v-btn--big': this.big,
+      },
     }
-  }
+  },
 }
 </script>
 

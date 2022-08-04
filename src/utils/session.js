@@ -23,7 +23,7 @@ export const rejoinSession = (router, sessionPath) => {
  * Ends the current session.
  * @param {object} context
  */
-export const endSession = context => {
+export const endSession = (context) => {
   const sessionId = context.$store.state.user.session._id
   SessionService.endSession(context, sessionId)
     .then(() => {

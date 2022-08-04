@@ -12,17 +12,17 @@ export default {
   props: {
     accept: {
       type: String,
-      required: true
+      required: true,
     },
     fileSelected: {
       type: Function,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
       dialogOpeningEvent: null,
-      fileSelectionEvent: null
+      fileSelectionEvent: null,
     }
   },
   methods: {
@@ -34,10 +34,10 @@ export default {
       this.fileSelectionEvent = event
       this.$emit('file-selected', {
         dialogOpeningEvent: this.dialogOpeningEvent,
-        fileSelectionEvent: this.fileSelectionEvent
+        fileSelectionEvent: this.fileSelectionEvent,
       })
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -113,7 +113,7 @@ import PageControl from '@/components/Admin/PageControl'
 
 const getUser = async (userId, page) => {
   const {
-    body: { user }
+    body: { user },
   } = await NetworkService.adminGetUser(userId, page)
 
   return user
@@ -127,14 +127,14 @@ export default {
     SessionsList,
     BackgroundInfo,
     AdminEditUser,
-    PageControl
+    PageControl,
   },
 
   data() {
     return {
       user: {},
       isEditMode: false,
-      page: 1
+      page: 1,
     }
   },
 
@@ -171,7 +171,7 @@ export default {
       }
 
       return descendingPastSessions
-    }
+    },
   },
   methods: {
     toggleEditMode() {
@@ -199,10 +199,10 @@ export default {
       if (this.user.numPastSessions > 0)
         this.$router.push({
           path: `/admin/users/${this.user._id}`,
-          query: { page: this.page }
+          query: { page: this.page },
         })
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -19,11 +19,11 @@ export default {
   name: 'BannerTemplate',
   components: { CrossIcon },
   computed: {
-    ...mapGetters({ mobileMode: 'app/mobileMode' })
+    ...mapGetters({ mobileMode: 'app/mobileMode' }),
   },
   props: {
-    onCancel: Function
-  }
+    onCancel: Function,
+  },
 }
 </script>
 

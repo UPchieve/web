@@ -27,7 +27,7 @@ export default {
   data() {
     return {
       showNotificationModal: false,
-      isShowingNotificationButton: false
+      isShowingNotificationButton: false,
     }
   },
   mounted() {
@@ -35,9 +35,9 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      isMobileApp: state => state.app.isMobileApp
-    })
+      user: (state) => state.user.user,
+      isMobileApp: (state) => state.app.isMobileApp,
+    }),
   },
   methods: {
     setShowNotificationModal(value) {
@@ -55,8 +55,8 @@ export default {
 
       this.isShowingNotificationButton =
         getNotificationPermission() === 'default'
-    }
-  }
+    },
+  },
 }
 </script>
 

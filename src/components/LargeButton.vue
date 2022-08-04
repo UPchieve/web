@@ -22,22 +22,22 @@ export default {
     routeTo: String,
     showArrow: {
       type: Boolean,
-      default: true
+      default: true,
     },
     buttonType: {
       type: String,
-      default: 'button'
-    }
+      default: 'button',
+    },
   },
   computed: {
     buttonClasses() {
       const base = `LargeButton-${this.primary ? 'primary' : 'secondary'}`
       return {
         [base]: true,
-        [`${base}--reverse`]: this.reverse
+        [`${base}--reverse`]: this.reverse,
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

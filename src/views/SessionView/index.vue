@@ -10,14 +10,14 @@
       v-if="sessionId"
       class="session-contents-container"
       v-bind:class="{
-        'session-contents-container--mobile': mobileMode
+        'session-contents-container--mobile': mobileMode,
       }"
     >
       <div
         class="auxiliary-container"
         id="auxiliary-container"
         v-bind:class="{
-          'auxiliary-container--hidden': shouldHideAuxiliarySection
+          'auxiliary-container--hidden': shouldHideAuxiliarySection,
         }"
       >
         <whiteboard
@@ -34,9 +34,36 @@
         class="chat-container"
         id="chat-container"
         v-bind:class="{
-          'chat-container--hidden': shouldHideChatSection
+          'chat-container--hidden': shouldHideChatSection,
         }"
       >
+        <div
+          v-if="user.isVolunteer && isLoadingPresessionResponse"
+          class="about-session-container"
+        >
+          <loading-message message="Loading" class="about-session-loader" />
+        </div>
+        <div
+          v-else-if="user.isVolunteer && studentPresessionResponses.length > 0"
+          class="about-session-container"
+        >
+          <div class="about-session-button" @click="handleAboutSessionClick">
+            About the session
+            <caret-icon class="caret" />
+          </div>
+        </div>
+        <div
+          v-else-if="
+            user.isVolunteer &&
+            (showNoPresessionSurveyResponse ||
+              studentPresessionResponses.length === 0)
+          "
+          class="about-session-container"
+        >
+          <div class="about-session-no-responses">
+            No goal found for this session
+          </div>
+        </div>
         <session-chat
           :shouldHideChatSection="shouldHideChatSection"
           :setHasSeenNewMessage="setHasSeenNewMessage"
@@ -69,6 +96,12 @@
       v-if="showNotificationModal"
       :closeModal="() => setShowNotificationModal(false)"
     />
+    <about-session-modal
+      v-if="showAboutSessionModal"
+      :closeModal="toggleAboutSessionModal"
+      :responses="studentPresessionResponses"
+      :totalStudentSessions="totalStudentSessions"
+    />
   </div>
 </template>
 
@@ -86,13 +119,17 @@ import SessionFulfilledModal from './SessionFulfilledModal'
 import ConnectionTroubleModal from './ConnectionTroubleModal'
 import PhotoUploadIcon from '@/assets/whiteboard_icons/photo-upload.svg'
 import isOutdatedMobileAppVersion from '@/utils/is-outdated-mobile-app-version'
+import CaretIcon from '@/assets/caret.svg'
 import WebNotificationsModal from '@/components/WebNotificationsModal'
+import AboutSessionModal from './AboutSessionModal'
 import getNotificationPermission from '@/utils/get-notification-permission'
 import { EVENTS } from '@/consts'
 import Gleap from 'gleap'
+import { backOff } from 'exponential-backoff'
+import LoadingMessage from '@/components/LoadingMessage'
 
 const activeHeaderData = {
-  component: 'SessionHeader'
+  component: 'SessionHeader',
 }
 
 export default {
@@ -103,7 +140,10 @@ export default {
     Whiteboard,
     PhotoUploadIcon,
     DocumentEditor,
-    WebNotificationsModal
+    WebNotificationsModal,
+    CaretIcon,
+    AboutSessionModal,
+    LoadingMessage,
   },
   created() {
     if (this.mobileMode) {
@@ -116,7 +156,7 @@ export default {
     window.addEventListener('resize', this.handleResize)
   },
   beforeDestroy() {
-    Gleap.removeCustomData("sessionId")
+    Gleap.removeCustomData('sessionId')
     window.removeEventListener('resize', this.handleResize)
   },
   /*
@@ -129,27 +169,34 @@ export default {
       auxiliaryOpen: false,
       sessionId: null,
       hasSeenNewMessage: true,
-      showNotificationModal: false
+      showNotificationModal: false,
+      showAboutSessionModal: false,
+      studentPresessionResponses: [],
+      totalStudentSessions: 0,
+      showNoPresessionSurveyResponse: false,
+      isLoadingPresessionResponse: false,
     }
   },
   beforeRouteEnter(to, from, next) {
-    next(vm => {
+    next((vm) => {
       vm.prevRoute = from
     })
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      session: state => state.user.session,
-      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
-      isMobileApp: state => state.app.isMobileApp,
-      presessionSurvey: state => state.user.presessionSurvey
+      user: (state) => state.user.user,
+      session: (state) => state.user.session,
+      isSessionConnectionAlive: (state) => state.user.isSessionConnectionAlive,
+      isMobileApp: (state) => state.app.isMobileApp,
+      presessionSurvey: (state) => state.user.presessionSurvey,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
       isAuthenticated: 'user/isAuthenticated',
       isVolunteer: 'user/isVolunteer',
-      isSessionOver: 'user/isSessionOver'
+      isSessionOver: 'user/isSessionOver',
+      isContextSharingWithVolunteerActive:
+        'featureFlags/isContextSharingWithVolunteerActive',
     }),
 
     auxiliaryType() {
@@ -159,7 +206,8 @@ export default {
         'applications',
         'satReading',
         'humanitiesEssays',
-        'reading'
+        'reading',
+        'usHistory',
       ]
       if (documentEditorSubTopics.includes(this.session.subTopic))
         return 'DOCUMENT'
@@ -198,7 +246,7 @@ export default {
       }
 
       return false
-    }
+    },
   },
   mounted() {
     const id = this.$route.params.sessionId
@@ -214,33 +262,45 @@ export default {
         {
           onRetry: (res, abort) => {
             this.showTroubleStartingModal(abort)
-          }
+          },
         }
       )
     } else {
       promise = SessionService.useExistingSession(this, id, {
         onRetry: (res, abort) => {
           this.showTroubleJoiningModal(abort)
-        }
+        },
       })
     }
 
     promise
-      .then(async sessionId => {
+      .then(async (sessionId) => {
         this.sessionId = sessionId
         if (!id && !this.isVolunteer)
           AnalyticsService.captureEvent(EVENTS.SESSION_REQUESTED, {
             event: EVENTS.SESSION_REQUESTED,
             sessionId,
-            subject: this.$route.params.subTopic
+            subject: this.$route.params.subTopic,
           })
 
         // If we have a pre-session survey, submit it now
         if (Object.keys(this.presessionSurvey).length) {
-          NetworkService.submitPresessionSurvey(
-            sessionId,
-            this.presessionSurvey
-          )
+          if (this.isContextSharingWithVolunteerActive) {
+            try {
+              await backOff(() =>
+                NetworkService.submitSurvey(
+                  Object.assign({}, this.presessionSurvey, { sessionId })
+                )
+              )
+            } catch (err) {
+              Sentry.captureException(err)
+            }
+          } else {
+            NetworkService.submitPresessionSurvey(
+              sessionId,
+              this.presessionSurvey
+            )
+          }
           this.$store.dispatch('user/clearPresessionSurvey')
         }
 
@@ -251,8 +311,12 @@ export default {
 
         if (!this.$socket.connected) await this.$socket.connect()
         this.joinSession(sessionId)
-        Gleap.setCustomData("sessionId", sessionId)
+        Gleap.setCustomData('sessionId', sessionId)
         this.$store.dispatch('user/sessionConnected')
+
+        if (this.user.isVolunteer && this.isContextSharingWithVolunteerActive) {
+          await this.getSessionContext(sessionId)
+        }
 
         if (
           (this.user.isVolunteer &&
@@ -264,7 +328,7 @@ export default {
         if (getNotificationPermission() === 'default')
           this.showNotificationModal = true
       })
-      .catch(err => {
+      .catch((err) => {
         if (err.status !== 0 && err.code !== 'EUSERABORTED') {
           window.alert('Could not start new help session')
           Sentry.captureException(err)
@@ -273,7 +337,7 @@ export default {
       })
   },
   sockets: {
-    bump: function(data) {
+    bump: function (data) {
       this.$store.dispatch('app/modal/show', {
         component: SessionFulfilledModal,
         data: {
@@ -282,8 +346,8 @@ export default {
           isSessionEnded: !!data.endedAt,
           volunteerJoined: !!data.volunteer,
           isSessionVolunteer: this.user._id === data.volunteer,
-          isSessionStudent: this.user._id === data.student
-        }
+          isSessionStudent: this.user._id === data.student,
+        },
       })
     },
     reconnect_attempt() {
@@ -295,7 +359,7 @@ export default {
     },
     connect() {
       this.$store.dispatch('user/sessionConnected')
-    }
+    },
   },
   methods: {
     handleResize() {
@@ -328,7 +392,7 @@ export default {
           // helps track where volunteers are joining a session from
           // if a volunteer joins using a URL from a text notification, resolve to an empty string
           joinedFrom:
-            this.prevRoute && this.prevRoute.name ? this.prevRoute.name : ''
+            this.prevRoute && this.prevRoute.name ? this.prevRoute.name : '',
         },
         1
       )
@@ -356,8 +420,8 @@ export default {
           message,
           acceptText: 'Abort Session',
           alertModal: true,
-          abortFunction: abort
-        }
+          abortFunction: abort,
+        },
       })
     },
     tryClicked() {
@@ -371,15 +435,37 @@ export default {
     },
     setShowNotificationModal(value) {
       this.showNotificationModal = value
-    }
+    },
+    handleAboutSessionClick() {
+      AnalyticsService.captureEvent(EVENTS.VOLUNTEER_CLICKED_ABOUT_SESSION)
+      this.toggleAboutSessionModal()
+    },
+    toggleAboutSessionModal() {
+      this.showAboutSessionModal = !this.showAboutSessionModal
+    },
+    async getSessionContext(sessionId) {
+      try {
+        this.isLoadingPresessionResponse = true
+        const presessionSurveyResponse =
+          await NetworkService.getPresessionSurveyResponse(sessionId)
+        this.totalStudentSessions =
+          presessionSurveyResponse.data.totalStudentSessions
+        this.studentPresessionResponses =
+          presessionSurveyResponse.data.responses
+      } catch (err) {
+        this.showNoPresessionSurveyResponse = true
+      } finally {
+        this.isLoadingPresessionResponse = false
+      }
+    },
   },
   watch: {
     isSessionConnectionAlive(newValue, oldValue) {
       if (newValue && !oldValue) {
         this.$store.dispatch('app/modal/hide')
       }
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -440,6 +526,39 @@ export default {
 
   @include breakpoint-below('medium') {
     padding-top: 80px;
+  }
+}
+
+.about-session {
+  &-container {
+    background-color: $light-blue-background;
+    z-index: 1;
+    padding: 0.75em 0.6em;
+    width: 100%;
+    @include flex-container(row);
+  }
+
+  &-button {
+    @include font-category('subheading');
+    background-color: $light-blue-background;
+
+    &:hover {
+      background-color: rgba(196, 196, 196, 0.2);
+      cursor: pointer;
+    }
+
+    border-radius: 4px;
+    padding: 0.4rem 0.5rem;
+  }
+
+  &-no-responses {
+    @include font-category('subheading');
+    padding: 0.4rem 0.5rem;
+  }
+
+  &-loader {
+    @include font-category('subheading');
+    padding: 0.4rem 0.5rem;
   }
 }
 
@@ -548,5 +667,9 @@ export default {
 
 .photo-upload--icon {
   margin-top: 5px !important;
+}
+
+.caret {
+  fill: #000;
 }
 </style>

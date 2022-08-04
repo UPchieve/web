@@ -70,9 +70,9 @@
 import NetworkService from '@/services/NetworkService'
 import AdminEditSchool from '@/views/Admin/AdminEditSchool'
 
-const getSchool = async schoolId => {
+const getSchool = async (schoolId) => {
   const {
-    body: { school }
+    body: { school },
   } = await NetworkService.adminGetSchool(schoolId)
 
   return school
@@ -88,7 +88,7 @@ export default {
       school: {},
       approvalError: '',
       partnerStatusError: '',
-      isEditMode: false
+      isEditMode: false,
     }
   },
 
@@ -104,7 +104,7 @@ export default {
       return this.school.isPartner
         ? 'Is a Partner School'
         : 'Not a Partner School'
-    }
+    },
   },
 
   methods: {
@@ -113,12 +113,12 @@ export default {
     },
     async toggleSchoolApproval(event) {
       const {
-        target: { checked }
+        target: { checked },
       } = event
 
       const data = {
         schoolId: this.school._id,
-        isApproved: checked
+        isApproved: checked,
       }
 
       try {
@@ -131,12 +131,12 @@ export default {
     },
     async toggleSchoolIsPartner(event) {
       const {
-        target: { checked }
+        target: { checked },
       } = event
 
       const data = {
         schoolId: this.school._id,
-        isPartner: checked
+        isPartner: checked,
       }
 
       try {
@@ -154,8 +154,8 @@ export default {
 
     async getSchool() {
       this.school = await getSchool(this.$route.params.schoolId)
-    }
-  }
+    },
+  },
 }
 </script>
 

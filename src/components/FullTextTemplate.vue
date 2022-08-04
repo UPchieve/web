@@ -15,17 +15,17 @@ export default {
   props: {
     headerTitle: {
       type: String,
-      default: ''
+      default: '',
     },
     ledeText: {
       type: String,
-      default: ''
-    }
+      default: '',
+    },
   },
   data() {
     return {}
   },
-  methods: {}
+  methods: {},
 }
 </script>
 

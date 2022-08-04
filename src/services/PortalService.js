@@ -18,5 +18,5 @@ export default {
         // eslint-disable-next-line no-console
         .catch(() => console.log('Portal Gun is unavailable.'))
     )
-  }
+  },
 }

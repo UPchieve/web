@@ -1,7 +1,7 @@
 <template>
   <div class="chat-message">
     <div :class="message.user === volunteerId && 'chat-message--volunteer'">
-      <component class="chat-message__avatar" :is="avatar"/>
+      <component class="chat-message__avatar" :is="avatar" />
       <div class="chat-message__content">{{ message.contents }}</div>
     </div>
     <div class="chat-message__timestamp">{{ timestamp }}</div>
@@ -20,18 +20,18 @@ export default {
     studentId: String,
     volunteerId: {
       type: String,
-      default: ''
-    }
+      default: '',
+    },
   },
 
   computed: {
     timestamp() {
       return moment(this.message.createdAt).format('h:mm a')
     },
-    avatar(){
+    avatar() {
       return getChatAvatar(this.message.user, this.studentId, this.volunteerId)
-    }
-  }
+    },
+  },
 }
 </script>
 

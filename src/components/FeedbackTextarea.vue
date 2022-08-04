@@ -11,13 +11,13 @@ export default {
   props: {
     id: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   model: {
     prop: 'value',
-    event: 'change'
-  }
+    event: 'change',
+  },
 }
 </script>
 

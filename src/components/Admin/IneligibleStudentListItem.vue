@@ -34,7 +34,7 @@ export default {
   name: 'IneligibleStudentListItem',
 
   props: {
-    student: Object
+    student: Object,
   },
 
   computed: {
@@ -46,8 +46,8 @@ export default {
     },
     schoolApprovalStatus() {
       return this.student.isApproved ? 'Approved' : 'Not approved'
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -94,39 +94,35 @@
       <label for="inputHighschool" class="uc-form-label"
         >What school do you go to?</label
       >
-
       <div class="school-search">
         <autocomplete
-          id="inputHighschool"
-          class="school-search__autocomplete"
-          :search="autocompleteSchool"
-          :get-result-value="getSchoolDisplayName"
           base-class="uc-autocomplete"
-          auto-select
+          :search="autocompleteSchool"
           placeholder="Search for your school"
           aria-label="Search for your school"
+          :get-result-value="getSchoolDisplayName"
           @submit="handleSelectHighSchool"
-        ></autocomplete>
-
-        <div
-          v-if="eligibility.noSchoolResults"
-          class="school-search__no-results"
         >
-          <a
-            href="https://upchieve.org/cant-find-school"
-            target="_blank"
-            @click="cantFindSchool"
-          >
-            Can't find your high school?
-          </a>
-        </div>
+          <template #result="{ result, props }">
+            <li v-bind="props">
+              <div>
+                <span v-if="result.name"> {{ result.name }}</span>
+                <a
+                  v-if="result.cantFindSchool"
+                  href="https://upchieve.org/cant-find-school"
+                  @click="cantFindSchool"
+                >
+                  Can't find your high school?
+                </a>
+              </div>
+            </li>
+          </template>
+        </autocomplete>
       </div>
     </div>
 
     <div class="uc-column">
-      <div class="uc-form-label">
-        What grade are you in (2021-22)?
-      </div>
+      <div class="uc-form-label">What grade are you in (2021-22)?</div>
       <v-select
         class="uc-form-body__select"
         v-model="profile.currentGrade"
@@ -146,7 +142,7 @@
         pattern="[0-9]{5}"
         class="uc-form-input"
         v-bind:class="{
-          'uc-form-input--invalid': invalidInputs.indexOf('inputZipCode') > -1
+          'uc-form-input--invalid': invalidInputs.indexOf('inputZipCode') > -1,
         }"
         v-model="eligibility.zipCode"
         required
@@ -165,7 +161,7 @@
         class="uc-form-input"
         v-bind:class="{
           'uc-form-input--invalid':
-            invalidInputs.indexOf('inputEligibilityEmail') > -1
+            invalidInputs.indexOf('inputEligibilityEmail') > -1,
         }"
         v-model="eligibility.email"
         required
@@ -192,9 +188,7 @@
     <div>
       <verification-badge />
       <h3>Woohoo, you're eligible!</h3>
-      <p>
-        Finish setting up your free account
-      </p>
+      <p>Finish setting up your free account</p>
     </div>
     <div>
       <button class="uc-form-button-big" type="button" @click="accountPage">
@@ -213,7 +207,12 @@
     <h3>{{ title }}</h3>
 
     <p v-if="isCollegeStudent" class="small-paragraph college-ineligibility">
-      We don't have the capacity to help college students right now, but did you know that many UPchieve students dream of going to college just like you? Give back by <a href="https://upchieve.org/volunteer" target="_blank">becoming an Academic Coach.</a>
+      We don't have the capacity to help college students right now, but did you
+      know that many UPchieve students dream of going to college just like you?
+      Give back by
+      <a href="https://upchieve.org/volunteer" target="_blank"
+        >becoming an Academic Coach.</a
+      >
     </p>
     <p v-else class="small-paragraph">
       We weren’t able to verify your eligibility based on the information you’ve
@@ -223,10 +222,19 @@
     </p>
 
     <p v-if="isCollegeStudent" class="small-paragraph college-ineligibility">
-      <i>Still need help? <a href="https://upchieve.org/resources-for-college-students" target="_blank"> Find college resources here. </a></i>
+      <i
+        >Still need help?
+        <a
+          href="https://upchieve.org/resources-for-college-students"
+          target="_blank"
+        >
+          Find college resources here.
+        </a></i
+      >
     </p>
 
     <button
+      v-if="!isCollegeStudent"
       class="uc-form-button-big"
       type="button"
       @click="ineligibleContinue"
@@ -267,35 +275,35 @@
       <label for="inputHighschool" class="uc-form-label"
         >What school do you go to?</label
       >
-
       <div class="school-search">
         <autocomplete
-          id="inputHighschool"
-          class="school-search__autocomplete"
-          :search="autocompleteSchool"
-          :get-result-value="getSchoolDisplayName"
           base-class="uc-autocomplete"
-          auto-select
+          :search="autocompleteSchool"
           placeholder="Search for your school"
           aria-label="Search for your school"
+          :get-result-value="getSchoolDisplayName"
           @submit="handleSelectHighSchool"
-        ></autocomplete>
-
-        <div
-          v-if="eligibility.noSchoolResults"
-          class="school-search__no-results"
         >
-          <a href="https://upchieve.org/cant-find-school" target="_blank">
-            Can't find your high school?
-          </a>
-        </div>
+          <template #result="{ result, props }">
+            <li v-bind="props">
+              <div>
+                <span v-if="result.name"> {{ result.name }}</span>
+                <a
+                  v-if="result.cantFindSchool"
+                  href="https://upchieve.org/cant-find-school"
+                  @click="cantFindSchool"
+                >
+                  Can't find your high school?
+                </a>
+              </div>
+            </li>
+          </template>
+        </autocomplete>
       </div>
     </div>
 
     <div class="uc-column">
-      <div class="uc-form-label">
-        What grade are you in (2021-22)?
-      </div>
+      <div class="uc-form-label">What grade are you in (2021-22)?</div>
       <v-select
         class="uc-form-body__select"
         v-model="profile.currentGrade"
@@ -315,7 +323,7 @@
         pattern="[0-9]{5}"
         class="uc-form-input"
         v-bind:class="{
-          'uc-form-input--invalid': invalidInputs.indexOf('inputZipCode') > -1
+          'uc-form-input--invalid': invalidInputs.indexOf('inputZipCode') > -1,
         }"
         v-model="eligibility.zipCode"
         required
@@ -334,7 +342,7 @@
         class="uc-form-input"
         v-bind:class="{
           'uc-form-input--invalid':
-            invalidInputs.indexOf('inputEligibilityEmail') > -1
+            invalidInputs.indexOf('inputEligibilityEmail') > -1,
         }"
         v-model="eligibility.email"
         required
@@ -343,9 +351,7 @@
       />
     </div>
 
-    <button class="uc-form-button-big" type="submit">
-      Continue
-    </button>
+    <button class="uc-form-button-big" type="submit">Continue</button>
 
     <div v-if="msg !== ''" role="alert">{{ msg }}</div>
   </form>
@@ -380,7 +386,7 @@
             type="text"
             class="uc-form-input"
             v-bind:class="{
-              'uc-form-input--invalid': invalidInputs.indexOf('firstName') > -1
+              'uc-form-input--invalid': invalidInputs.indexOf('firstName') > -1,
             }"
             v-model="profile.firstName"
             required
@@ -395,7 +401,7 @@
             type="text"
             class="uc-form-input"
             v-bind:class="{
-              'uc-form-input--invalid': invalidInputs.indexOf('lastName') > -1
+              'uc-form-input--invalid': invalidInputs.indexOf('lastName') > -1,
             }"
             v-model="profile.lastName"
             required
@@ -415,7 +421,7 @@
         type="password"
         class="uc-form-input"
         v-bind:class="{
-          'uc-form-input--invalid': invalidInputs.indexOf('inputPassword') > -1
+          'uc-form-input--invalid': invalidInputs.indexOf('inputPassword') > -1,
         }"
         v-model="credentials.password"
         required
@@ -425,6 +431,24 @@
         Must have at least one number, one uppercase letter, and one lowercase
         letter.
       </p>
+    </div>
+
+    <div class="uc-column">
+      <label for="signup-source" class="uc-form-label"
+        >How did you hear about us?</label
+      >
+      <v-select
+        id="signup-source"
+        class="uc-form-select"
+        v-model="signupSourceId"
+        :options="signupSourcesOptions"
+        label="name"
+        :reduce="(option) => option.id"
+        :searchable="false"
+        :clearable="false"
+        required
+        :loading="isLoadingSignupSources"
+      />
     </div>
 
     <div class="uc-form-checkbox">
@@ -440,9 +464,7 @@
       </label>
     </div>
 
-    <button class="uc-form-button-big" type="submit">
-      Create my account
-    </button>
+    <button class="uc-form-button-big" type="submit">Create my account</button>
 
     <div v-if="msg !== ''" role="alert">{{ msg }}</div>
   </form>
@@ -470,7 +492,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import validator from 'validator'
 import Autocomplete from '@trevoreyre/autocomplete-vue'
 import * as Sentry from '@sentry/browser'
@@ -480,12 +502,13 @@ import AnalyticsService from '@/services/AnalyticsService'
 import VerificationBadge from '@/assets/verification.svg'
 import ErrorBadge from '@/assets/error_badge.svg'
 import { EVENTS } from '@/consts'
+import { backOff } from 'exponential-backoff'
 
 export default {
   components: {
     Autocomplete,
     VerificationBadge,
-    ErrorBadge
+    ErrorBadge,
   },
   data() {
     const gradeLevels = [
@@ -495,7 +518,7 @@ export default {
       '11th grade',
       '12th grade',
       'College',
-      'Other'
+      'Other',
     ]
 
     return {
@@ -506,20 +529,19 @@ export default {
       errors: [],
       invalidInputs: [],
       eligibility: {
-        noSchoolResults: false,
         highSchool: {},
         zipCode: '',
-        email: ''
+        email: '',
       },
       credentials: {
         email: '',
         password: '',
-        terms: false
+        terms: false,
       },
       profile: {
         firstName: '',
         lastName: '',
-        currentGrade: ''
+        currentGrade: '',
       },
       step: '',
       hasStartedSearchingForSchool: false,
@@ -528,7 +550,10 @@ export default {
       hasEnteredFirstName: false,
       hasEnteredLastName: false,
       hasEnteredPassword: false,
-      isCollegeStudent: false
+      isCollegeStudent: false,
+      signupSourcesOptions: [],
+      signupSourceId: null,
+      isLoadingSignupSource: false,
     }
   },
   async mounted() {
@@ -542,7 +567,10 @@ export default {
   },
   computed: {
     ...mapState({
-      isMobileApp: state => state.app.isMobileApp
+      isMobileApp: (state) => state.app.isMobileApp,
+    }),
+    ...mapGetters({
+      isZipCodeCheckActive: 'featureFlags/isZipCodeCheckActive',
     }),
     trimCurrentGrade() {
       // extracting the first word out of the gradeLevels
@@ -550,21 +578,20 @@ export default {
       return this.profile.currentGrade.split(' ')[0]
     },
     title() {
-      if(this.isCollegeStudent)
+      if (this.isCollegeStudent)
         return "Oops, looks like you're not a high school student!"
-      else
-        return "Sorry, we can't verify your eligibility yet."
+      else return "Sorry, we can't verify your eligibility yet."
     },
   },
   watch: {
-    'eligibility.email': function(currentValue, oldValue) {
+    'eligibility.email': function (currentValue, oldValue) {
       if (currentValue && !oldValue) {
         if (!this.hasEnteredEmail)
           AnalyticsService.captureEvent(EVENTS.STUDENT_ENTERED_EMAIL)
         this.hasEnteredEmail = true
       }
     },
-    'eligibility.zipCode': function(currentValue, oldValue) {
+    'eligibility.zipCode': function (currentValue, oldValue) {
       if (currentValue && !oldValue) {
         if (!this.hasEnteredZipCode)
           AnalyticsService.captureEvent(EVENTS.STUDENT_ENTERED_ZIP_CODE)
@@ -591,7 +618,7 @@ export default {
           AnalyticsService.captureEvent(EVENTS.STUDENT_ENTERED_PASSWORD)
         this.hasEnteredPassword = true
       }
-    }
+    },
   },
   methods: {
     partnerCodePage() {
@@ -634,7 +661,7 @@ export default {
       this.invalidInputs = []
 
       NetworkService.checkStudentPartnerSignupCode(this.partnerSignupCode)
-        .then(res => {
+        .then((res) => {
           const studentPartnerKey = res.body.studentPartnerKey
           const studentPartnerRoute = `/signup/student/${studentPartnerKey}`
 
@@ -646,7 +673,7 @@ export default {
         })
     },
 
-    checkEligibilityErrors() {
+    async checkEligibilityErrors() {
       // validate input
       this.errors = []
       this.invalidInputs = []
@@ -659,8 +686,16 @@ export default {
       const zipCode = this.eligibility.zipCode
 
       if (!zipCode || !zipCodeRegex.test(zipCode)) {
-        this.errors.push('You must enter a valid zip code')
+        this.errors.push('You must enter a properly formatted zip code')
         this.invalidInputs.push('inputZipCode')
+      } else if (this.isZipCodeCheckActive) {
+        const {
+          body: { isValidZipCode },
+        } = await NetworkService.checkZipCode(this, { zipCode })
+        if (!isValidZipCode) {
+          this.errors.push('You must enter a valid United States zip code')
+          this.invalidInputs.push('inputZipCode')
+        }
       }
 
       if (!this.eligibility.email) {
@@ -678,7 +713,8 @@ export default {
       }
     },
 
-    continueToAccountPage() {
+    // transitions from the referred sign up view to account view
+    async continueToAccountPage() {
       this.checkEligibilityErrors()
       if (this.errors.length) return
 
@@ -686,6 +722,7 @@ export default {
       this.credentials.email = this.eligibility.email
       this.step = 'account'
       this.$router.push('/sign-up/student/account')
+      await this.getSignupSources()
     },
 
     async submitEligibility() {
@@ -702,7 +739,7 @@ export default {
       // reset error msg from server
       this.msg = ''
 
-      this.checkEligibilityErrors()
+      await this.checkEligibilityErrors()
       if (this.errors.length) return
 
       NetworkService.checkStudentEligibility(this, {
@@ -710,31 +747,30 @@ export default {
         zipCode: this.eligibility.zipCode,
         email: this.eligibility.email,
         referredByCode: window.localStorage.getItem('upcReferredByCode'),
-        currentGrade: this.trimCurrentGrade
+        currentGrade: this.trimCurrentGrade,
       })
-        .then(async response => {
+        .then(async (response) => {
           const isEligible = response.body.isEligible
           if (isEligible) {
             this.step = 'eligible'
             this.$router.push('/sign-up/student/eligible')
             AnalyticsService.captureEvent(EVENTS.ELIGIBILITY_ELIGIBLE, {
-              event: EVENTS.ELIGIBILITY_ELIGIBLE
+              event: EVENTS.ELIGIBILITY_ELIGIBLE,
             })
             // autofill the user's email
             this.credentials.email = this.eligibility.email
           } else {
             this.step = 'ineligible'
-           if(response.body.isCollegeStudent)
-              this.isCollegeStudent = true
+            if (response.body.isCollegeStudent) this.isCollegeStudent = true
             this.$router.push('/sign-up/student/ineligible')
             AnalyticsService.captureEvent(EVENTS.ELIGIBILITY_INELIGIBLE, {
-              event: EVENTS.ELIGIBILITY_INELIGIBLE
+              event: EVENTS.ELIGIBILITY_INELIGIBLE,
             })
           }
           const isDomesticIpAddress = await this.isDomesticIpAddress()
           if (!isDomesticIpAddress) return this.internationalPage()
         })
-        .catch(res => {
+        .catch((res) => {
           this.errors.push(res.body.message)
         })
     },
@@ -743,6 +779,7 @@ export default {
       this.$router.push('/sign-up/student/account')
       const isDomesticIpAddress = await this.isDomesticIpAddress()
       if (!isDomesticIpAddress) return this.internationalPage()
+      await this.getSignupSources()
     },
     ineligibleContinue() {
       AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_STUDENT_ACCESS_PAGE)
@@ -751,9 +788,8 @@ export default {
     autocompleteSchool(input) {
       this.eligibility.highSchool = {}
 
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         if (input.length < 3) {
-          this.eligibility.noSchoolResults = false
           return resolve([])
         }
 
@@ -761,15 +797,22 @@ export default {
           AnalyticsService.captureEvent(EVENTS.STUDENT_SEARCHED_SCHOOL)
         this.hasStartedSearchingForSchool = true
 
+        let cantFindSchoolItem = {
+          cantFindSchool: true,
+        }
+
         NetworkService.searchSchool(this, { query: input })
-          .then(response => response.body.results)
-          .then(schools => {
-            this.eligibility.noSchoolResults = schools.length === 0
+          .then((response) => response.body.results)
+          .then((schools) => {
+            schools.push(cantFindSchoolItem)
             resolve(schools)
           })
       })
     },
     getSchoolDisplayName(school) {
+      if (school.cantFindSchool) {
+        return `Can't Find School`
+      }
       return `${school.name} (${school.city}, ${school.state})`
     },
     handleSelectHighSchool(school) {
@@ -797,6 +840,9 @@ export default {
         this.errors.push('A password is required.')
         this.invalidInputs.push('inputPassword')
       }
+      if (!this.signupSourceId) {
+        this.errors.push('Please select an option for how you heard about us.')
+      }
       if (!this.errors.length) this.submit()
     },
     submit() {
@@ -809,13 +855,14 @@ export default {
         highSchoolId: this.eligibility.highSchool.upchieveId,
         zipCode: this.eligibility.zipCode,
         currentGrade: this.trimCurrentGrade,
-        referredByCode: window.localStorage.getItem('upcReferredByCode')
+        referredByCode: window.localStorage.getItem('upcReferredByCode'),
+        signupSourceId: this.signupSourceId,
       })
         .then(() => {
           window.localStorage.removeItem('upcReferredByCode')
           this.$router.push('/verify')
         })
-        .catch(err => {
+        .catch((err) => {
           this.errors.push(err.message)
           if (err.message.match(/^Password/))
             AnalyticsService.captureEvent(
@@ -828,8 +875,21 @@ export default {
     },
     cantFindSchool() {
       AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CANT_FIND_SCHOOL)
-    }
-  }
+    },
+    async getSignupSources() {
+      this.isLoadingSignupSource = true
+      try {
+        const data = await backOff(() =>
+          NetworkService.getStudentSignupSources()
+        )
+        this.signupSourcesOptions = data.body.signupSources
+      } catch (err) {
+        Sentry.captureException(err)
+      } finally {
+        this.isLoadingSignupSource = false
+      }
+    },
+  },
 }
 </script>
 
@@ -888,7 +948,6 @@ export default {
     text-decoration: underline;
   }
 }
-
 
 .name-fields {
   @include child-spacing(right, 15px);

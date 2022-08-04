@@ -21,9 +21,9 @@ export default {
   computed: {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
-      name: 'user/firstName'
-    })
-  }
+      name: 'user/firstName',
+    }),
+  },
 }
 </script>
 

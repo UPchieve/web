@@ -43,9 +43,7 @@
       <p v-if="material.type === 'document'" class="material__document-link">
         Are you having trouble viewing the document?
         <a
-          :href="
-            `https://upc-training-materials.s3.us-east-2.amazonaws.com/${material.resourceId}.pdf`
-          "
+          :href="`https://upc-training-materials.s3.us-east-2.amazonaws.com/${material.resourceId}.pdf`"
           target="_blank"
           rel="noopener noreferrer"
           >View here</a
@@ -84,11 +82,11 @@ export default {
     RightCaret,
     BookIcon,
     VideoIcon,
-    LinkIcon
+    LinkIcon,
   },
   props: {
     material: Object,
-    isOpen: Boolean
+    isOpen: Boolean,
   },
   computed: {
     statusClass() {
@@ -101,7 +99,7 @@ export default {
       if (!this.material.isRequired) return 'Optional'
       else if (this.material.isCompleted) return 'Completed'
       else return 'Not started'
-    }
+    },
   },
   methods: {
     toggleMaterial() {
@@ -109,8 +107,8 @@ export default {
     },
     materialClicked() {
       this.$emit('material-completed', this.material.materialKey)
-    }
-  }
+    },
+  },
 }
 </script>
 

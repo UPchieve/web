@@ -1,6 +1,9 @@
 <template>
   <div>
-    <heart-icon :class="favoritedStatus.class" v-on:click="toggleFavoritedStatus"/>
+    <heart-icon
+      :class="favoritedStatus.class"
+      v-on:click="toggleFavoritedStatus"
+    />
     <volunteer-unfavoriting-modal
       v-if="showVolunteerUnfavoritingModal"
       :closeModal="toggleVolunteerUnfavoritingModal"
@@ -26,11 +29,11 @@ export default {
   props: {
     initialIsFavorite: {
       type: Boolean,
-      default: false
+      default: false,
     },
     volunteerName: {
       type: String,
-      default: ''
+      default: '',
     },
     volunteerId: {
       type: String,
@@ -39,8 +42,8 @@ export default {
     },
     sessionId: {
       type: String,
-      default: ''
-    }
+      default: '',
+    },
   },
   created() {
     this.isFavorite = this.initialIsFavorite
@@ -48,13 +51,13 @@ export default {
   watch: {
     initialIsFavorite(newIsFavorite) {
       this.isFavorite = newIsFavorite
-    }
+    },
   },
   data() {
     return {
       showVolunteerUnfavoritingModal: false,
       showFavoritedListFullModal: false,
-      isFavorite: false
+      isFavorite: false,
     }
   },
   methods: {
@@ -63,29 +66,28 @@ export default {
       this.showVolunteerUnfavoritingModal = false
     },
     async setIsFavorite(value) {
-     try {
-        const response = await NetworkService.updateFavoriteVolunteerStatus(this.volunteerId, { isFavorite: value })
+      try {
+        const response = await NetworkService.updateFavoriteVolunteerStatus(
+          this.volunteerId,
+          { isFavorite: value }
+        )
         this.isFavorite = response.body.isFavorite
         this.$emit('change-favorited', this.volunteerId, this.isFavorite)
       } catch (error) {
-        if (error.body.success === false)
-          this.showFavoritedListFullModal = true
-        else  
-         this.$emit('error-favoriting', error.body.err)
-     } 
+        if (error.body.success === false) this.showFavoritedListFullModal = true
+        else this.$emit('error-favoriting', error.body.err)
+      }
     },
-    async toggleFavoritedStatus(){
-      if(this.isFavorite) {
+    async toggleFavoritedStatus() {
+      if (this.isFavorite) {
         this.toggleVolunteerUnfavoritingModal()
         return
       }
-      const { 
-        body: { remaining }
+      const {
+        body: { remaining },
       } = await NetworkService.getRemainingFavoriteVolunteers()
-      if (remaining > 0)
-        this.setIsFavorite(true)
-      else
-        this.toggleFavoritedListFullModal()
+      if (remaining > 0) this.setIsFavorite(true)
+      else this.toggleFavoritedListFullModal()
     },
     toggleVolunteerUnfavoritingModal() {
       this.showVolunteerUnfavoritingModal = !this.showVolunteerUnfavoritingModal
@@ -98,54 +100,53 @@ export default {
     favoritedStatus() {
       const status = {
         class: 'heart-icon',
-      }   
+      }
 
-    if(this.isFavorite){
-      status.class += '-favorited'
-    }
-    else {
-      status.class += '-unfavorited'
-    }
-    return status
-  },   
-}
+      if (this.isFavorite) {
+        status.class += '-favorited'
+      } else {
+        status.class += '-unfavorited'
+      }
+      return status
+    },
+  },
 }
 </script>
 
 <style lang="scss">
-.heart-icon {  
+.heart-icon {
   &-favorited {
     fill: $c-shadow-warn;
     transition: all 0.3s ease-in-out;
 
     & path {
-    stroke: $c-shadow-warn;
-    } 
+      stroke: $c-shadow-warn;
+    }
 
     &:active {
-    transform: scale(0.9);
-    }  
+      transform: scale(0.9);
+    }
 
     &:hover {
       cursor: pointer;
     }
-  
-    &:hover path{
+
+    &:hover path {
       stroke: $c-active-heart;
-      fill: $c-active-heart;        
+      fill: $c-active-heart;
     }
   }
 
   &-unfavorited {
     transition: all 0.3s ease-in-out;
 
-    &:hover path{
+    &:hover path {
       stroke: $c-active-heart;
     }
 
     &:active {
       transform: scale(0.9);
     }
-  } 
+  }
 }
 </style>

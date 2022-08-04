@@ -67,7 +67,7 @@ export default {
   components: { DropdownList, HyperlinkButton, LargeButton },
   data() {
     return {
-      selectedSubtopic: ''
+      selectedSubtopic: '',
     }
   },
   beforeDestroy() {
@@ -76,39 +76,39 @@ export default {
   props: {
     title: {
       type: String,
-      required: true
+      required: true,
     },
     subtitle: {
       type: String,
-      default: 'Join a chat room to start.'
+      default: 'Join a chat room to start.',
     },
     svg: {
       type: Object,
-      required: true
+      required: true,
     },
     topic: String,
     subtopics: Array,
     subtopicDisplayNames: Object,
     buttonText: {
       type: String,
-      default: 'Start a chat'
+      default: 'Start a chat',
     },
     routeTo: String,
-    disableSubjectCard: Boolean
+    disableSubjectCard: Boolean,
   },
   computed: {
     ...mapState({
-      latestSession: state => state.user.latestSession,
-      isMobileApp: state => state.app.isMobileApp,
-      user: state => state.user.user
+      latestSession: (state) => state.user.latestSession,
+      isMobileApp: (state) => state.app.isMobileApp,
+      user: (state) => state.user.user,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
-      isSessionAlive: 'user/isSessionAlive'
+      isSessionAlive: 'user/isSessionAlive',
     }),
     disabled() {
       return this.user.isBanned || this.disableSubjectCard
-    }
+    },
   },
   methods: {
     handleClick() {
@@ -127,16 +127,16 @@ export default {
             acceptText: 'Yes, please notify me!',
             selectedSubtopic: this.selectedSubtopic,
             topic: this.topic,
-            showTemplateButtons: false
-          }
+            showTemplateButtons: false,
+          },
         })
       } else if (this.title === 'Invite Your Friends') {
         this.$store.dispatch('app/modal/show', {
           component: 'ReferralModal',
           data: {
             svg: this.svg,
-            showAccept: false
-          }
+            showAccept: false,
+          },
         })
       } else {
         this.$store.dispatch('app/modal/show', {
@@ -148,12 +148,12 @@ export default {
             subtopics: this.subtopics,
             subtopicDisplayNames: this.subtopicDisplayNames,
             svg: this.svg,
-            preSelectedSubtopic: this.selectedSubtopic
-          }
+            preSelectedSubtopic: this.selectedSubtopic,
+          },
         })
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

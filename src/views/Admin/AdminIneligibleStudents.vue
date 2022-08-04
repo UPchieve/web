@@ -32,9 +32,9 @@ import NetworkService from '@/services/NetworkService'
 import IneligibleStudentListItem from '@/components/Admin/IneligibleStudentListItem'
 import PageControl from '@/components/Admin/PageControl'
 
-const getIneligibleStudents = async page => {
+const getIneligibleStudents = async (page) => {
   const {
-    body: { ineligibleStudents, isLastPage }
+    body: { ineligibleStudents, isLastPage },
   } = await NetworkService.adminGetIneligibleStudents(page)
   return { ineligibleStudents, isLastPage }
 }
@@ -47,7 +47,7 @@ export default {
     return {
       page: 1,
       ineligibleStudents: [],
-      isLastPage: false
+      isLastPage: false,
     }
   },
 
@@ -59,7 +59,7 @@ export default {
   computed: {
     isFirstPage() {
       return this.page === 1
-    }
+    },
   },
 
   methods: {
@@ -67,7 +67,7 @@ export default {
       this.page = page
       this.$router.push({
         path: '/admin/ineligible-students',
-        query: { page }
+        query: { page },
       })
       const { ineligibleStudents, isLastPage } = await getIneligibleStudents(
         page
@@ -82,8 +82,8 @@ export default {
 
     previousPage() {
       this.setPage(this.page - 1)
-    }
-  }
+    },
+  },
 }
 </script>
 

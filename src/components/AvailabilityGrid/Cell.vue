@@ -16,20 +16,20 @@ export default {
   props: {
     content: {
       type: String,
-      default: ''
+      default: '',
     },
     selectable: {
       type: Boolean,
-      default: true
+      default: true,
     },
     selected: {
       type: Boolean,
-      default: false
+      default: false,
     },
     flagged: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
 
   computed: {
@@ -37,10 +37,10 @@ export default {
       const base = `Cell-${this.selectable ? 'selectable' : 'unselectable'}`
       return {
         [base]: true,
-        [`${base}--selected`]: this.selected
+        [`${base}--selected`]: this.selected,
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -2,7 +2,11 @@
   <div class="session-header-wrapper">
     <div :class="{ inactive: !isSessionInProgress }" class="session-header">
       <div class="avatar-info-container">
-        <component :is="partnerAvatar" class="avatar" :class="!isSessionAlive && 'avatar--hidden'" />
+        <component
+          :is="partnerAvatar"
+          class="avatar"
+          :class="!isSessionAlive && 'avatar--hidden'"
+        />
         <div class="info">
           <template v-if="isSessionEnding">
             <loading-message message="Ending session" />
@@ -11,7 +15,11 @@
             <loading-message message="Contacting coaches" />
           </template>
           <template v-else-if="isSessionInProgress">
-            <span class="volunteer-name">{{ sessionPartner.firstname }}</span>
+            <div class="volunteer-info">
+              <span class="volunteer-name">{{ sessionPartner.firstname }}</span
+              ><br />
+              <span class="in-session-label">In Session</span>
+            </div>
           </template>
           <template v-else-if="isSessionOver">
             <template v-if="sessionPartner.firstname">
@@ -113,13 +121,13 @@ export default {
       showTroubleMatchingModal: false,
       showUnmatchedModal: false,
       hasSeenTroubleMatchingModal: false,
-      isWaitingIntervalId: null
+      isWaitingIntervalId: null,
     }
   },
   components: {
     LoadingMessage,
     TroubleMatchingModal,
-    UnmatchedModal
+    UnmatchedModal,
   },
   mounted() {
     // Show a modal if a student has been waiting too long to get matched with a volunteer
@@ -143,8 +151,8 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      session: state => state.user.session
+      user: (state) => state.user.user,
+      session: (state) => state.user.session,
     }),
     ...mapGetters({
       sessionPartner: 'user/sessionPartner',
@@ -152,17 +160,15 @@ export default {
       isSessionWaitingForVolunteer: 'user/isSessionWaitingForVolunteer',
       isSessionInProgress: 'user/isSessionInProgress',
       isSessionOver: 'user/isSessionOver',
-      isChatbotActive: 'featureFlags/isChatbotActive'
+      isChatbotActive: 'featureFlags/isChatbotActive',
     }),
 
     partnerAvatar() {
       if (this.isSessionWaitingForVolunteer) return ChatBotIcon
       // show the current user their partner's avatar
-      if (this.user.isVolunteer)
-        return StudentIcon
-      else
-        return VolunteerIcon
-    }
+      if (this.user.isVolunteer) return StudentIcon
+      else return VolunteerIcon
+    },
   },
   methods: {
     end() {
@@ -206,8 +212,8 @@ export default {
       this.$store.dispatch('app/modal/show', {
         component: 'ReportSessionModal',
         data: {
-          showTemplateButtons: false
-        }
+          showTemplateButtons: false,
+        },
       })
     },
     alertCouldNotEnd() {
@@ -243,7 +249,7 @@ export default {
     },
     getMessagesAfterVolunteerJoined() {
       return this.session.messages.filter(
-        message =>
+        (message) =>
           new Date(message.createdAt).getTime() >=
           new Date(this.session.volunteerJoinedAt).getTime()
       )
@@ -319,7 +325,7 @@ export default {
         this.toggleTroubleMatchingModal()
         this.hasSeenTroubleMatchingModal = true
       }
-    }
+    },
   },
   sockets: {
     connect_error() {
@@ -337,7 +343,7 @@ export default {
     },
     connect() {
       this.connectionSuccess()
-    }
+    },
   },
   watch: {
     // Close possibly open modals that are triggered by a long waiting period
@@ -359,11 +365,11 @@ export default {
           console.log('Unable to play audio')
         }
         sendWebNotification('We found a coach!', {
-          body: `Start chatting with ${this.sessionPartner.firstname} now.`
+          body: `Start chatting with ${this.sessionPartner.firstname} now.`,
         })
       }
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -375,7 +381,7 @@ export default {
 .session-header {
   position: relative;
   height: 100%;
-  background-color: $c-success-green;
+  background-color: $c-information-blue;
   padding: 0 20px;
   text-align: left;
   display: flex;
@@ -423,9 +429,19 @@ h1 {
   }
 }
 
+.volunteer-info {
+  display: inline-block;
+  line-height: 1.25;
+}
+
 .volunteer-name {
-  font-weight: 500;
+  font-weight: 600;
   font-size: 18px;
+}
+
+.in-session-label {
+  font-weight: 400;
+  font-size: 12px;
 }
 
 .button-container {
@@ -455,12 +471,19 @@ h1 {
   cursor: pointer;
   border: solid 1px #fff;
   color: #fff;
-  font-size: 14px;
-  padding: 5px 10px;
-  border-radius: 5px;
+  font-size: 16px;
+  line-height: 125%;
+  padding: 12px 24px;
+  border-radius: 9999px;
 
   &:hover {
     background: rgba(255, 255, 255, 0.2);
+  }
+
+  @include breakpoint-below('large') {
+    line-height: 1;
+    padding: 9px;
+    min-height: 46px;
   }
 }
 

@@ -41,11 +41,11 @@ import { GOOGLE_PLAY_STORE_LINK, APP_STORE_LINK } from '@/consts'
 export default {
   components: { LargeButton },
   props: {
-    modalData: { type: Object, required: true }
+    modalData: { type: Object, required: true },
   },
   data() {
     return {
-      appStoreLink: ''
+      appStoreLink: '',
     }
   },
   mounted() {
@@ -62,16 +62,16 @@ export default {
     newReleaseNotes() {
       return [
         'Take + send photos to your coaches',
-        'Share photos from your phone’s library'
+        'Share photos from your phone’s library',
       ]
-    }
+    },
   },
   methods: {
     onClose() {
       this.$emit('cancel')
       this.$store.dispatch('app/modal/hide')
-    }
-  }
+    },
+  },
 }
 </script>
 

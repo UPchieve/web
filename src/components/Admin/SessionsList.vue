@@ -17,10 +17,10 @@ export default {
   name: 'SessionsList',
 
   props: {
-    sessions: Array[Object]
+    sessions: Array[Object],
   },
 
-  components: { SessionListItem }
+  components: { SessionListItem },
 }
 </script>
 

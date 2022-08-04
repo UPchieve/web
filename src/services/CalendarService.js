@@ -9,9 +9,9 @@ export default {
 
   getWaitTimes(context) {
     return NetworkService.getWaitTimes(context)
-      .then(response => response.body.heatMap)
+      .then((response) => response.body.heatMap)
       .catch(() => ({
         /* return empty waittimes object */
       }))
-  }
+  },
 }

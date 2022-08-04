@@ -25,7 +25,7 @@ import { topics } from '@/utils/topics'
 export default {
   props: {
     quizResults: { type: Object, required: true },
-    quizLength: { type: Number, required: true }
+    quizLength: { type: Number, required: true },
   },
   data() {
     return {
@@ -36,7 +36,7 @@ export default {
       category: '',
       rightBtn: { text: '', route: '' },
       popUpBorderStyle: {},
-      scoreStyle: {}
+      scoreStyle: {},
     }
   },
   mounted() {
@@ -53,12 +53,12 @@ export default {
         : "Now that you have this certification, you'll be notified of student requests for help in this subject. If you want to help students with even more subjects, just pass more quizzes!"
       this.popUpBorderStyle = {
         borderBottom: '5px solid #16D2AA',
-        borderLeft: '5px solid #16D2AA'
+        borderLeft: '5px solid #16D2AA',
       }
       this.scoreStyle = { color: '#16D2AA' }
       this.rightBtn = {
         text: 'Take another quiz',
-        route: '/training'
+        route: '/training',
       }
     } else {
       this.headerMsg = "You failed this time, but don't give up!"
@@ -67,13 +67,13 @@ export default {
         : 'Please try taking this quiz again after reviewing your incorrect answers and checking out the subject-specific review materials we provide on the Training page.'
       this.popUpBorderStyle = {
         borderBottom: '5px solid #F44747',
-        borderLeft: '5px solid #F44747'
+        borderLeft: '5px solid #F44747',
       }
       this.scoreStyle = { color: '#F44747' }
       this.leftBtn = { text: 'Review answers', route: '' }
       this.rightBtn = {
         text: 'Keep studying',
-        route: `/training/review/${Case.kebab(this.category)}`
+        route: `/training/review/${Case.kebab(this.category)}`,
       }
     }
 
@@ -85,8 +85,8 @@ export default {
     },
     showReview() {
       this.$emit('showReview')
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -2,11 +2,11 @@ export default {
   namespaced: true,
   state: {
     component: null,
-    isShown: false
+    isShown: false,
   },
   mutations: {
     setComponent: (state, component = null) => (state.component = component),
-    setIsShown: (state, b) => (state.isShown = !!b)
+    setIsShown: (state, b) => (state.isShown = !!b),
   },
   actions: {
     show: ({ commit }, payload = {}) => {
@@ -16,6 +16,6 @@ export default {
     hide: ({ commit }) => {
       commit('setIsShown', false)
       commit('setComponent', null)
-    }
-  }
+    },
+  },
 }

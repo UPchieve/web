@@ -23,7 +23,7 @@ export default {
   name: 'NotificationPreview',
 
   props: {
-    notification: Object
+    notification: Object,
   },
 
   computed: {
@@ -48,8 +48,8 @@ export default {
       return this.notification.priorityGroup
         ? this.notification.priorityGroup
         : 'No priority group stored'
-    }
-  }
+    },
+  },
 }
 </script>
 

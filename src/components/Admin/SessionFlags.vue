@@ -1,18 +1,18 @@
 <template>
   <ul class="flags-list">
-    <li
-      v-for="flag in flags"
-      :key="flag"
-      class="flags-item"
-      :class="getFlagColor(flag)"
-    >
-      {{ flag }}
+    <li v-for="flag in flags" :key="flag">
+      <Chip
+        class="flags-item"
+        :class="getFlagColor(flag)"
+        :chipContent="flag"
+      />
     </li>
   </ul>
 </template>
 
 <script>
 import Case from 'case'
+import Chip from '../Chip.vue'
 
 const SESSION_FLAGS_CLASS = {
   absentStudent: 'flags-item--absent',
@@ -24,20 +24,20 @@ const SESSION_FLAGS_CLASS = {
   reported: 'flags-item--reported',
   lowCoachRatingFromStudent: 'flags-item--student-coach-rating',
   lowSessionRatingFromStudent: 'flags-item--student-session-rating',
-  lowSessionRatingFromCoach: 'flags-item--volunteer-session-rating'
+  lowSessionRatingFromCoach: 'flags-item--volunteer-session-rating',
 }
 
 export default {
   name: 'SessionFlags',
-
   props: {
-    flags: Array
+    flags: Array,
   },
   methods: {
     getFlagColor(flag) {
       return SESSION_FLAGS_CLASS[Case.camel(flag)] || ''
-    }
-  }
+    },
+  },
+  components: { Chip },
 }
 </script>
 
@@ -50,12 +50,10 @@ export default {
 }
 
 .flags-item {
+  margin-top: 1em;
   margin-right: 1em;
   color: #fff;
-  padding: 0.5em 1em;
-  border-radius: 100px;
-  margin-top: 1em;
-  font-size: 12px;
+  border: 0px;
 
   &--volunteer-session-rating {
     background-color: darken($c-backdrop, 20%);

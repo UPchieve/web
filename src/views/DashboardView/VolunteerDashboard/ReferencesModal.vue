@@ -9,10 +9,7 @@
         <p>
           Before providing the name and email for your references, please make
           sure they’re eligible by reviewing our
-          <a
-            href="https://upc-training-materials.s3.us-east-2.amazonaws.com/choosing-references.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
+          <a :href="referenceDocUrl" target="_blank" rel="noopener noreferrer"
             >References Guide</a
           >. We will contact them via email requesting them to fill out a
           reference form.
@@ -28,7 +25,10 @@
               <h4>Reference {{ index + 1 }}</h4>
               <trash-icon
                 class="trash-icon"
-                v-if="reference.status !== 'APPROVED'"
+                v-if="
+                  reference.status !== 'APPROVED' &&
+                  reference.status !== 'SUBMITTED'
+                "
                 @click="removeReference(index)"
               />
             </div>
@@ -43,7 +43,7 @@
                     reference.status === 'UNSENT' ||
                     reference.status === 'SENT' ||
                     reference.status === 'SUBMITTED',
-                  rejected: reference.status === 'REJECTED'
+                  rejected: reference.status === 'REJECTED',
                 }"
               ></span>
               <span>
@@ -152,13 +152,13 @@ import validator from 'validator'
 import TrashIcon from '@/assets/trash.svg'
 import CrossIcon from '@/assets/cross.svg'
 import AnalyticsService from '@/services/AnalyticsService'
-import { EVENTS } from '@/consts'
+import { EVENTS, DOCS_URL } from '@/consts'
 
 export default {
   name: 'reference-modal',
   components: { Modal, Separator, LargeButton, TrashIcon, CrossIcon },
   props: {
-    closeModal: { type: Function, required: true }
+    closeModal: { type: Function, required: true },
   },
   data() {
     return {
@@ -167,7 +167,8 @@ export default {
       newReferenceFirstName: '',
       newReferenceLastName: '',
       newReferenceEmail: '',
-      isAddReferenceMode: false
+      isAddReferenceMode: false,
+      referenceDocUrl: `${DOCS_URL}/choosing-references.pdf`,
     }
   },
   mounted() {
@@ -175,9 +176,9 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: (state) => state.user.user,
     }),
-    ...mapGetters({ mobileMode: 'app/mobileMode' })
+    ...mapGetters({ mobileMode: 'app/mobileMode' }),
   },
   methods: {
     toggleAddReferenceMode() {
@@ -214,35 +215,45 @@ export default {
 
       this.addReferenceError = ''
 
-      const newReference = {
-        firstName: this.newReferenceFirstName,
-        lastName: this.newReferenceLastName,
-        email: this.newReferenceEmail,
-        status: 'UNSENT'
-      }
-      this.references.push(newReference)
       NetworkService.addReference({
         referenceFirstName: this.newReferenceFirstName,
         referenceLastName: this.newReferenceLastName,
-        referenceEmail: this.newReferenceEmail
-      })
-      AnalyticsService.captureEvent(EVENTS.REFERENCE_ADDED, {
-        event: EVENTS.REFERENCE_ADDED,
-        referenceFirstName: newReference.firstName,
-        referenceEmail: newReference.email
-      })
-      this.toggleAddReferenceMode()
-      this.$store.dispatch('user/addToUser', {
-        references: this.references
+        referenceEmail: this.newReferenceEmail,
+      }).then((response) => {
+        if (response.body.success === false) {
+          this.addReferenceError = response.body.message
+          return
+        }
+
+        this.addReferenceError = ''
+
+        const newReference = {
+          firstName: this.newReferenceFirstName,
+          lastName: this.newReferenceLastName,
+          email: this.newReferenceEmail,
+          status: 'UNSENT',
+        }
+        this.references.push(newReference)
+
+        AnalyticsService.captureEvent(EVENTS.REFERENCE_ADDED, {
+          event: EVENTS.REFERENCE_ADDED,
+          referenceFirstName: newReference.firstName,
+          referenceEmail: newReference.email,
+        })
+
+        this.toggleAddReferenceMode()
+        this.$store.dispatch('user/addToUser', {
+          references: this.references,
+        })
       })
     },
     removeReference(position) {
       NetworkService.deleteReference({
-        referenceEmail: this.references[position].email
+        referenceEmail: this.references[position].email,
       })
       this.references = this.references.filter((_, index) => position !== index)
       this.$store.dispatch('user/addToUser', {
-        references: this.references
+        references: this.references,
       })
     },
     isUniqueEmail(email) {
@@ -254,8 +265,8 @@ export default {
         }
       }
       return isUnique
-    }
-  }
+    },
+  },
 }
 </script>
 

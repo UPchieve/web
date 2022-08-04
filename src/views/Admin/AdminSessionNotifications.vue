@@ -24,25 +24,25 @@ export default {
 
   data() {
     return {
-      notifications: []
+      notifications: [],
     }
   },
 
   methods: {
     goBack() {
       this.$router.go(-1)
-    }
+    },
   },
 
   async created() {
     const {
-      body: { notifications }
+      body: { notifications },
     } = await NetworkService.adminGetSessionNotifications(
       this.$route.params.sessionId
     )
 
     this.notifications = notifications
-  }
+  },
 }
 </script>
 

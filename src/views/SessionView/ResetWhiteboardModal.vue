@@ -37,7 +37,7 @@ export default {
   components: { LargeButton, Modal, Separator },
   props: {
     closeModal: { type: Function, required: true },
-    setShouldResetWhiteboard: { type: Function, required: true }
+    setShouldResetWhiteboard: { type: Function, required: true },
   },
   methods: {
     async resetWhiteboard() {
@@ -46,8 +46,8 @@ export default {
     },
     cancel() {
       this.closeModal()
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -61,8 +61,8 @@ export default {
 
   props: {
     user: {
-      type: Object
-    }
+      type: Object,
+    },
   },
 
   methods: {
@@ -74,7 +74,7 @@ export default {
     },
     onCreateAccount() {
       this.$emit('onCreateAccount')
-    }
-  }
+    },
+  },
 }
 </script>

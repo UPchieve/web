@@ -15,7 +15,34 @@
         class="dashboard-notice"
         :class="'dashboard-notice--downtime'"
       >
-        <a href="https://upchieve.statuspage.io" target="_blank">{{ downtimeMessage }}</a>
+        <a href="https://upchieve.statuspage.io" target="_blank">{{
+          downtimeMessage
+        }}</a>
+      </div>
+
+      <div
+        v-if="
+          this.isSummerPrepActive &&
+          user.pastSessions &&
+          user.pastSessions.length &&
+          !user.isBanned > 0
+        "
+        class="dashboard-notice"
+        :class="'dashboard-notice--summer-prep'"
+      >
+        <!-- Show Below Message Until July 5th: -->
+        <span v-if="new Date() < new Date('07/05/2022')"
+          >Need to write your college essay? Take our 2 week
+          <a href="https://bit.ly/upchievesummer" target="_blank"
+            >College Essay Challenge</a
+          >!</span
+        >
+        <!-- Show Below Message From July 5th-July 26th: -->
+        <span v-if="new Date() >= new Date('07/05/2022')"
+          >Want to get college ready?
+          <a href="https://bit.ly/upchievesummer" target="_blank">Sign up</a>
+          for our 2 week bootcamp!</span
+        >
       </div>
     </div>
 
@@ -35,15 +62,15 @@ import FirstSessionCongratsModal from './FirstSessionCongratsModal'
 import moment from 'moment-timezone'
 
 const defaultHeaderData = {
-  component: 'DefaultHeader'
+  component: 'DefaultHeader',
 }
 
 const activeHeaderData = {
-  component: 'RejoinSessionHeader'
+  component: 'RejoinSessionHeader',
 }
 
 const bannedHeaderData = {
-  component: 'BannedStudentHeader'
+  component: 'BannedStudentHeader',
 }
 
 export default {
@@ -66,36 +93,32 @@ export default {
       this.$store.dispatch('app/modal/show', {
         component: 'StudentOnboardingModal',
         data: {
-          showTemplateButtons: false
-        }
+          showTemplateButtons: false,
+        },
       })
     }
 
-    if (
-      this.isReferFriendsActive &&
-      this.hasSeenFirstSessionCongratsModal
-    )
+    if (this.isReferFriendsActive && this.hasSeenFirstSessionCongratsModal)
       this.toggleFirstSessionCongratsModal()
 
-    this.currentHour = moment()
-      .tz('America/New_York')
-      .hour()
+    this.currentHour = moment().tz('America/New_York').hour()
   },
   data() {
     return {
       currentHour: 0,
-      showFirstSessionCongratsModal: false
+      showFirstSessionCongratsModal: false,
     }
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      isFirstDashboardVisit: state => state.user.isFirstDashboardVisit
+      user: (state) => state.user.user,
+      isFirstDashboardVisit: (state) => state.user.isFirstDashboardVisit,
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
       isReferFriendsActive: 'featureFlags/isReferFriendsActive',
       isDowntimeBannerActive: 'featureFlags/isDowntimeBannerActive',
+      isSummerPrepActive: 'featureFlags/isSummerPrepActive',
     }),
     isLowCoachHour() {
       return this.currentHour < 12
@@ -115,7 +138,7 @@ export default {
     },
     downtimeMessage() {
       if (this.isDowntimeBannerActive) {
-        return 'UPchieve is experiencing recurring interruptions. If your session is interrupted, please wait a few seconds and refresh.'
+        return 'UPchieve will be down for maintenance Tuesday, July 26th from 9-10 AM ET.'
       } else {
         return ''
       }
@@ -126,12 +149,12 @@ export default {
         this.user.pastSessions.length === 1 &&
         !localStorage.getItem('viewedFirstSessionCongratsModal')
       )
-    }
+    },
   },
   methods: {
     toggleFirstSessionCongratsModal() {
       this.showFirstSessionCongratsModal = !this.showFirstSessionCongratsModal
-    }
+    },
   },
   watch: {
     isSessionAlive(isAlive, prevIsAlive) {
@@ -146,8 +169,8 @@ export default {
       } else {
         this.$store.dispatch('app/header/show', activeHeaderData)
       }
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -197,6 +220,15 @@ export default {
   &--downtime {
     color: #fff;
     background-color: $c-information-blue;
+  }
+
+  &--summer-prep {
+    color: #fff;
+    background-color: $c-information-blue;
+    a {
+      text-decoration: underline;
+      font-weight: bold;
+    }
   }
 }
 </style>

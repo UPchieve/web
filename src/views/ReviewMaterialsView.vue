@@ -3,9 +3,7 @@
     <div v-if="error">
       <p class="error-message">
         Please click
-        <router-link to="/training">
-          here
-        </router-link>
+        <router-link to="/training"> here </router-link>
         to see our available categories and their associated review materials.
       </p>
     </div>
@@ -54,7 +52,7 @@ export default {
       reviewMaterials: [],
       category: '',
       error: false,
-      hostPath: `https://cdn.upchieve.org/review-materials`
+      hostPath: `https://cdn.upchieve.org/review-materials`,
     }
   },
   mounted() {
@@ -63,7 +61,7 @@ export default {
     this.category = category
     AnalyticsService.captureEvent(EVENTS.REVIEW_MATERIALS_VIEWED, {
       event: EVENTS.REVIEW_MATERIALS_VIEWED,
-      subject: this.category
+      subject: this.category,
     })
 
     // format physics from lowercase 'physicsone' -> 'physicsOne'
@@ -92,17 +90,19 @@ export default {
         case 'calculusAB':
         case 'calculusBC':
         case 'chemistry':
+        case 'environmentalScience':
+        case 'usHistory':
           this.reviewMaterials = [
             {
               title: 'Topics & Resources',
               pdf: this.getTopicsAndResourcePath('pdf'),
-              image: this.getTopicsAndResourcePath('png')
+              image: this.getTopicsAndResourcePath('png'),
             },
             {
               title: 'Concept Review',
               pdf: this.getConceptReviewPath('pdf'),
-              image: this.getConceptReviewPath('png')
-            }
+              image: this.getConceptReviewPath('png'),
+            },
           ]
           break
         case 'planning':
@@ -110,8 +110,8 @@ export default {
             {
               title: 'College Planning Review',
               pdf: `${this.hostPath}/college-planning-review.pdf`,
-              image: `${this.hostPath}/college-planning-review.png`
-            }
+              image: `${this.hostPath}/college-planning-review.png`,
+            },
           ]
           break
         case 'essays':
@@ -119,8 +119,8 @@ export default {
             {
               title: 'College Essays Review',
               pdf: `${this.hostPath}/college-essays-review.pdf`,
-              image: `${this.hostPath}/college-essays-review.png`
-            }
+              image: `${this.hostPath}/college-essays-review.png`,
+            },
           ]
           break
         case 'applications':
@@ -128,8 +128,8 @@ export default {
             {
               title: 'College Applications Review',
               pdf: `${this.hostPath}/college-applications-review.pdf`,
-              image: `${this.hostPath}/college-applications-review.png`
-            }
+              image: `${this.hostPath}/college-applications-review.png`,
+            },
           ]
           break
         case 'satReading':
@@ -137,8 +137,8 @@ export default {
             {
               title: 'SAT Reading Review Guide',
               pdf: `${this.hostPath}/sat-reading-review-guide.pdf`,
-              image: `${this.hostPath}/sat-reading-review-guide.png`
-            }
+              image: `${this.hostPath}/sat-reading-review-guide.png`,
+            },
           ]
           break
         case 'satMath':
@@ -146,20 +146,17 @@ export default {
             {
               title: 'SAT Math Review Guide',
               pdf: `${this.hostPath}/sat-math-review-guide.pdf`,
-              image: `${this.hostPath}/sat-math-review-guide.png`
-            }
+              image: `${this.hostPath}/sat-math-review-guide.png`,
+            },
           ]
-          break
-        case 'environmentalScience':
-          this.reviewMaterials = []
           break
         case 'humanitiesEssays':
           this.reviewMaterials = [
             {
               title: 'Humanities Essays Review Guide',
               pdf: `${this.hostPath}/humanities-essays-review-guide.pdf`,
-              image: `${this.hostPath}/humanities-essays-review-guide.png`
-            }
+              image: `${this.hostPath}/humanities-essays-review-guide.png`,
+            },
           ]
           break
         case 'reading':
@@ -167,8 +164,8 @@ export default {
             {
               title: 'Reading Review Guide',
               pdf: `${this.hostPath}/reading-review.pdf`,
-              image: `${this.hostPath}/reading-review.png`
-            }
+              image: `${this.hostPath}/reading-review.png`,
+            },
           ]
           break
         // case for a user entering a subject that we do not support
@@ -190,106 +187,101 @@ export default {
       return `${
         this.hostPath
       }/${this.category.toLowerCase()}-topics-and-resources.${ext}`
-    }
+    },
   },
   computed: {
-    ...mapGetters({
-      isAlgebraTwoLaunchActive: 'featureFlags/isAlgebraTwoLaunchActive'
-    }),
+    ...mapGetters({}),
     categoryDisplayName() {
       const subtopics = allSubtopics()
-      // TODO: remove condition below in algebra 2 launch cleanup
-      if (!this.isAlgebraTwoLaunchActive && this.category === 'algebra') 
-        return 'Algebra'
       if (this.category) return subtopics[this.category].displayName
 
       return ''
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
 .wrapper {
-  padding: 40px 40px 80px;
-  margin: 40px 40px 80px;
-  background: #fff;
-  border-radius: 8px;
-  max-width: 800px;
+  padding: 40px 40px 80px
+  margin: 40px 40px 80px
+  background: #fff
+  border-radius: 8px
+  max-width: 800px
 }
 
 .header-title {
-  text-transform: capitalize;
-  text-align: left;
-  font-size: 24px;
-  font-weight: 500;
-  text-align: left;
-  margin: 0 0 35px 0;
+  text-transform: capitalize
+  text-align: left
+  font-size: 24px
+  font-weight: 500
+  text-align: left
+  margin: 0 0 35px 0
 }
 
 .review-materials {
-  display: flex;
-  flex-flow: row wrap;
-  padding-left: 0;
+  display: flex
+  flex-flow: row wrap
+  padding-left: 0
 
   &__link {
-    margin-right: 2em;
-    display: block;
-    margin-bottom: 1em;
-    width: 40%;
+    margin-right: 2em
+    display: block
+    margin-bottom: 1em
+    width: 40%
   }
 
   &__content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: white;
-    border-radius: 5px;
-    border: 1px solid gray;
-    position: relative;
+    display: flex
+    flex-direction: column
+    align-items: center
+    background-color: white
+    border-radius: 5px
+    border: 1px solid gray
+    position: relative
 
     &:hover .image-overlay {
-      opacity: 0.6;
+      opacity: 0.6
     }
   }
 
   &__title {
-    padding: 1em 0;
+    padding: 1em 0
   }
 
   &__image {
-    width: 100%;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    display: block;
+    width: 100%
+    border-top-left-radius: 5px
+    border-top-right-radius: 5px
+    display: block
   }
 }
 
 .image-overlay {
-  width: 100%;
-  position: absolute;
-  z-index: 5;
-  opacity: 0;
-  left: 0;
-  top: 0;
-  height: inherit;
+  width: 100%
+  position: absolute
+  z-index: 5
+  opacity: 0
+  left: 0
+  top: 0
+  height: inherit
   background-image: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 0.4) 0%,
     rgba(0, 0, 0, 0) 100%
-  );
-  height: 160px;
+  )
+  height: 160px
 }
 
 .error-message {
-  font-size: 16px;
+  font-size: 16px
 }
 
 @media screen and (max-width: 760px) {
   .review-materials {
     &__link {
-      width: 100%;
-      margin-right: 0;
+      width: 100%
+      margin-right: 0
     }
   }
 }

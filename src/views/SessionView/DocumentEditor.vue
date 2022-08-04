@@ -1,7 +1,6 @@
 <template>
   <div class="document-editor">
-    <div id="quill-container">
-    </div>
+    <div id="quill-container"></div>
     <transition name="document-loading">
       <loading-message
         message="Loading the document editor"
@@ -32,7 +31,7 @@ Quill.register('modules/cursors', QuillCursors)
 export default {
   components: {
     LoadingMessage,
-    RefreshDocumentEditorModal
+    RefreshDocumentEditorModal,
   },
   data() {
     return {
@@ -42,14 +41,14 @@ export default {
       incomingDeltas: [],
       retries: 0,
       showRefreshModal: false,
-      isConnecting: false
+      isConnecting: false,
     }
   },
   computed: {
     ...mapState({
-      currentSession: state => state.user.session,
-      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
-    })
+      currentSession: (state) => state.user.session,
+      isSessionConnectionAlive: (state) => state.user.isSessionConnectionAlive,
+    }),
   },
   mounted() {
     this.quillEditor = new Quill('#quill-container', {
@@ -63,20 +62,20 @@ export default {
         'strike',
         'color',
         'background',
-        'list'
+        'list',
       ],
       modules: {
         cursors: {
           selectionChangeSource: 'cursor-api',
-          transformOnTextChange: true
+          transformOnTextChange: true,
         },
         toolbar: [
           [{ header: [1, 2, false] }],
           ['bold', 'italic', 'underline', 'strike'],
           [{ color: [] }, { background: [] }],
-          [{ list: 'ordered' }, { list: 'bullet' }]
-        ]
-      }
+          [{ list: 'ordered' }, { list: 'bullet' }],
+        ],
+      },
     })
     // do not allow user to make edits until the quill doc contents are set
     this.quillEditor.disable()
@@ -85,7 +84,7 @@ export default {
     this.quillEditor.on('selection-change', this.quillSelectionChange)
 
     this.$socket.emit('requestQuillState', {
-      sessionId: this.currentSession._id
+      sessionId: this.currentSession._id,
     })
 
     this.quillEditor
@@ -97,7 +96,7 @@ export default {
       if (source === 'user') {
         this.$socket.emit('transmitQuillDelta', {
           sessionId: this.currentSession._id,
-          delta
+          delta,
         })
       }
     },
@@ -106,18 +105,18 @@ export default {
       if (source === 'user') {
         this.$socket.emit('transmitQuillSelection', {
           sessionId: this.currentSession._id,
-          range
+          range,
         })
       }
     },
-    updateContents(delta){
+    updateContents(delta) {
       this.quillEditor.updateContents(delta)
     },
-    emptyIncomingDeltas(){
-      for (const delta of this.incomingDeltas){
+    emptyIncomingDeltas() {
+      for (const delta of this.incomingDeltas) {
         this.updateContents(delta)
       }
-    }
+    },
   },
   sockets: {
     quillState({ delta }) {
@@ -137,20 +136,20 @@ export default {
     },
 
     /**
-     * 
-     * This event lets us know the last delta that was composed to the Quill 
+     *
+     * This event lets us know the last delta that was composed to the Quill
      * document in our server cache
-     * 
+     *
      * If the last delta stored is found in our `incomingDeltas` queue,
-     * that means the requested quill state from our server contains 
-     * the last delta stored and the ones before it. Remove those from 
+     * that means the requested quill state from our server contains
+     * the last delta stored and the ones before it. Remove those from
      * `incomingDeltas` to avoid appending duplicate deltas to the client Quill doc
-     * 
+     *
      */
     lastDeltaStored({ delta }) {
       if (delta) {
         const queueCutoff = this.incomingDeltas.findIndex(
-          pendingDelta => pendingDelta.id === delta.id
+          (pendingDelta) => pendingDelta.id === delta.id
         )
         this.incomingDeltas = this.incomingDeltas.slice(queueCutoff + 1)
       }
@@ -159,14 +158,14 @@ export default {
     retryLoadingDoc() {
       const maxRetries = 10
       if (this.retries > maxRetries) {
-          this.showRefreshModal = true
+        this.showRefreshModal = true
       } else {
         this.retries++
         this.$socket.emit('requestQuillState', {
-          sessionId: this.currentSession._id
+          sessionId: this.currentSession._id,
         })
       }
-    }
+    },
   },
   watch: {
     isSessionConnectionAlive(newValue, oldValue) {
@@ -179,7 +178,7 @@ export default {
         this.isConnecting = true
       }
     },
-  }
+  },
 }
 </script>
 

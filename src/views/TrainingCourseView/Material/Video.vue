@@ -13,8 +13,8 @@
 <script>
 export default {
   props: {
-    resourceId: String
-  }
+    resourceId: String,
+  },
 }
 </script>
 

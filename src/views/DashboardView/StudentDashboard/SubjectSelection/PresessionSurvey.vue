@@ -1,53 +1,158 @@
 <template>
-  <div class="presession-survey">
-    <div class="presession-survey__title">
-      Tell us a little about your request
-    </div>
-    <div class="presession-survey__subtitle">
-      This info will help us find the best coach to pair you with
-    </div>
-
-    <div class="questions-container">
-      <div v-for="question in questions" :key="question.title" class="question">
-        <div class="question__title">{{ question.title }}</div>
-        <div class="question__options">
+  <div class="survey-container">
+    <cross-icon @click="cancel()" class="cross-icon" />
+    <div class="presession-survey">
+      <template v-if="isContextSharingWithVolunteerActive">
+        <div class="presession-survey__title">Tell us about your request</div>
+        <div class="presession-survey__subtitle">
+          This will give your coach the info they need to help you.
+        </div>
+        <stepper
+          :totalSteps="survey.length"
+          :currentStep="currentStep"
+          class="stepper"
+        />
+        <div v-if="survey.length">
+          <div class="question__title">
+            {{ currentQuestion.questionText }}
+          </div>
           <div
-            v-for="option in question.options"
-            :key="option.displayName"
-            class="question__option"
+            class="question__responses"
+            :class="{
+              'question__responses-images': isRowOfImages,
+            }"
           >
-            <input
-              v-model="responses[question.key].answer"
-              type="radio"
-              tabindex="-1"
-              :id="`${question.key}_${option.value}`"
-              :value="option.value"
-            />
-            <label
-              :for="`${question.key}_${option.value}`"
-              tabindex="0"
-              @keydown.space="responses[question.key].answer = option.value"
-            >
-              <span>{{ option.displayName }}</span>
-              <input
-                v-if="option.value === 'other'"
-                type="text"
-                tabindex="-1"
-                v-model="responses[question.key].other"
-                :disabled="responses[question.key].answer !== 'other'"
+            <template v-for="response in currentQuestion.responses">
+              <survey-image
+                v-if="isRowOfImages"
+                class="question__response question__response-image"
+                :key="`${response.responseId}-image`"
+                :src="response.responseDisplayImage"
+                :label="response.responseText"
+                :responseId="response.responseId"
+                :isSelected="
+                  userResponse[currentQuestion.questionId].responseId ===
+                  response.responseId
+                "
+                @survey-image-click="updateUserResponse"
               />
-            </label>
+
+              <survey-radio
+                v-else-if="
+                  currentQuestion.questionType === questionTypes.multipleChoice
+                "
+                class="question__response"
+                :key="`${response.responseId}-radio`"
+                :id="`${currentQuestion.questionId}_${response.responseId}`"
+                :radioValue="response.responseId"
+                :name="currentQuestion.questionId"
+                :checked="
+                  userResponse[currentQuestion.questionId].responseId ===
+                  response.responseId
+                "
+                :responseId="response.responseId"
+                :label="response.responseText"
+                :isOpenResponseDisabled="
+                  userResponse[currentQuestion.questionId].responseId !==
+                  response.responseId
+                "
+                :openResponseValue="
+                  userResponse[currentQuestion.questionId].openResponse
+                "
+                @survey-radio-input="updateUserResponse"
+              />
+            </template>
           </div>
         </div>
-      </div>
-    </div>
 
-    <div v-if="!mobileMode" class="presession-survey__separator" />
-    <div class="presession-survey__buttons">
-      <large-button @click.native="cancel()">Cancel</large-button>
-      <large-button primary @click.native="submitSurvey" :disabled="!isComplete"
-        >Start a chat</large-button
-      >
+        <div v-if="!mobileMode" class="presession-survey__separator" />
+        <div class="presession-survey__buttons">
+          <large-button @click.native="prevStep" v-if="currentStep > 1"
+            >Back</large-button
+          >
+
+          <large-button
+            primary
+            @click.native="nextStep"
+            v-if="currentStep !== survey.length"
+            :disabled="isNextButtonDisabled"
+            >Next</large-button
+          >
+
+          <large-button
+            primary
+            v-if="currentStep === survey.length"
+            @click.native="submitSurvey"
+            :disabled="!isSurveyComplete"
+            >Start a chat</large-button
+          >
+        </div>
+      </template>
+      <!-- 
+        TODO: remove in context sharing feature flag cleanup.
+        old presession survey below. remove the template
+        below 
+      -->
+      <template v-else>
+        <div class="presession-survey__title presession-survey__title-legacy">
+          Tell us a little about your request
+        </div>
+        <div
+          class="presession-survey__subtitle presession-survey__subtitle-legacy"
+        >
+          This info will help us find the best coach to pair you with
+        </div>
+
+        <div class="questions-container">
+          <div
+            v-for="question in questions"
+            :key="question.title"
+            class="question-legacy"
+          >
+            <div class="question-legacy__title">{{ question.title }}</div>
+            <div class="question-legacy__options">
+              <div
+                v-for="option in question.options"
+                :key="option.displayName"
+                class="question-legacy__option"
+              >
+                <input
+                  v-model="responses[question.key].answer"
+                  type="radio"
+                  tabindex="-1"
+                  :id="`${question.key}_${option.value}`"
+                  :value="option.value"
+                />
+                <label
+                  :for="`${question.key}_${option.value}`"
+                  tabindex="0"
+                  @keydown.space="responses[question.key].answer = option.value"
+                >
+                  <span>{{ option.displayName }}</span>
+                  <input
+                    v-if="option.value === 'other'"
+                    type="text"
+                    tabindex="-1"
+                    v-model="responses[question.key].other"
+                    :disabled="responses[question.key].answer !== 'other'"
+                  />
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="!mobileMode" class="presession-survey__separator" />
+        <div class="presession-survey__buttons">
+          <large-button @click.native="cancel()">Cancel</large-button>
+          <large-button
+            primary
+            @click.native="submitSurvey"
+            :disabled="!isComplete"
+            >Start a chat</large-button
+          >
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -55,7 +160,14 @@
 <script>
 import { mapGetters } from 'vuex'
 import LargeButton from '@/components/LargeButton'
+import Stepper from '@/components/Stepper'
+import NetworkService from '@/services/NetworkService'
+import CrossIcon from '@/assets/cross.svg'
+import { QUESTION_TYPES } from '@/consts'
+import SurveyRadio from '@/components/Surveys/SurveyRadio'
+import SurveyImage from '@/components/Surveys/SurveyImage'
 
+// TODO: remove in context sharing feature flag cleanup
 const questions = [
   {
     title: "What is your primary goal for today's session?",
@@ -63,29 +175,29 @@ const questions = [
     options: [
       {
         displayName: 'Solve a specific question',
-        value: 'specific-question'
+        value: 'specific-question',
       },
       {
         displayName: 'Complete a homework assignment',
-        value: 'complete-homework'
+        value: 'complete-homework',
       },
       {
         displayName: 'Prepare for a quiz/test',
-        value: 'test-prep'
+        value: 'test-prep',
       },
       {
         displayName: 'Check my answers',
-        value: 'check-answers'
+        value: 'check-answers',
       },
       {
         displayName: 'Improve my understanding of a topic',
-        value: 'improve-understanding'
+        value: 'improve-understanding',
       },
       {
         displayName: 'Other',
-        value: 'other'
-      }
-    ]
+        value: 'other',
+      },
+    ],
   },
   {
     title:
@@ -94,110 +206,341 @@ const questions = [
     options: [
       {
         displayName: "I don't know how to do this at all.",
-        value: 1
+        value: 1,
       },
       {
         displayName: 'I think I know how to do it, but I need help.',
-        value: 2
+        value: 2,
       },
       {
         displayName:
           "I can do this on my own, but I don't fully understand it.",
-        value: 3
+        value: 3,
       },
       {
         displayName: 'I am very comfortable with this topic.',
-        value: 4
-      }
-    ]
-  }
+        value: 4,
+      },
+    ],
+  },
 ]
 
 export default {
-  components: { LargeButton },
+  components: {
+    LargeButton,
+    Stepper,
+    CrossIcon,
+    SurveyRadio,
+    SurveyImage,
+  },
+
+  props: {
+    subject: {
+      type: String,
+      required: true,
+    },
+  },
 
   data() {
     return {
+      // TODO: remove in context sharing feature flag cleanup
       questions,
+      // TODO: remove in context sharing feature flag cleanup
       responses: {
         'primary-goal': {
-          answer: ''
+          answer: '',
         },
         'topic-understanding': {
-          answer: ''
-        }
-      }
+          answer: '',
+        },
+      },
+      currentStep: 1,
+      userResponse: {},
+      survey: [],
+      surveyId: null,
+      surveyTypeId: null,
     }
   },
 
+  async mounted() {
+    if (this.isContextSharingWithVolunteerActive) {
+      const response = await NetworkService.getPresessionSurvey(this.subject)
+      this.survey = response.data.survey
+      this.surveyId = response.data.surveyId
+      this.surveyTypeId = response.data.surveyTypeId
+      this.buildUserResponse()
+    }
+    /**
+     *
+     *
+     * The Presession survey component is rendered within the SubjectSelectionModal,
+     * which is uses the ModalTemplate. Since the ModalTemplate has styles that are
+     * not desired for this design, and to avoid a refactor of multiple components,
+     * we are overriding styles of the ModalTemplate within this component and only
+     * for the lifecycle of this component.
+     *
+     *
+     */
+    this.overrideModalTemplateStyles()
+  },
+
   computed: {
-    ...mapGetters({ mobileMode: 'app/mobileMode' }),
+    ...mapGetters({
+      mobileMode: 'app/mobileMode',
+      isContextSharingWithVolunteerActive:
+        'featureFlags/isContextSharingWithVolunteerActive',
+    }),
+    // TODO: remove in context sharing feature flag cleanup
     isComplete() {
       return (
         !!this.responses['primary-goal'].answer &&
         !!this.responses['topic-understanding'].answer
       )
-    }
+    },
+    isSurveyComplete() {
+      for (const question of this.survey) {
+        const questionId = question.questionId
+        const userResponse = this.userResponse[questionId]
+        if (!userResponse.responseId) return false
+
+        // check if a response that should have an open response was entered
+        const response = question.responses.find(
+          (response) => response.responseText === 'Other'
+        )
+        if (
+          response &&
+          response.responseId === userResponse.responseId &&
+          !userResponse.openResponse
+        )
+          return false
+      }
+      return true
+    },
+    currentQuestion() {
+      // In order to access the 0-based array of `this.survey` we must take one from the currentStep
+      return this.survey[this.currentStep - 1]
+    },
+    // checks if the current question has a row of responses that require to show a display image
+    isRowOfImages() {
+      return this.currentQuestion.responses.some((a) => a.responseDisplayImage)
+    },
+    questionTypes() {
+      return QUESTION_TYPES
+    },
+    isNextButtonDisabled() {
+      return (
+        this.currentQuestion &&
+        this.userResponse[this.currentQuestion.questionId] &&
+        !this.userResponse[this.currentQuestion.questionId].responseId
+      )
+    },
   },
 
   methods: {
     submitSurvey() {
-      this.$store.dispatch('user/updatePresessionSurvey', this.responses)
+      let surveyResponses = this.responses
+
+      if (this.isContextSharingWithVolunteerActive) {
+        if (!this.isSurveyComplete) return
+
+        const submissions = []
+        for (const question of this.survey) {
+          const questionId = question.questionId
+          const response = this.userResponse[questionId]
+          submissions.push({
+            questionId: Number(questionId),
+            responseChoiceId: response.responseId,
+            openResponse: response.openResponse,
+          })
+        }
+
+        surveyResponses = {
+          surveyId: this.surveyId,
+          surveyTypeId: this.surveyTypeId,
+          submissions,
+        }
+      }
+      this.$store.dispatch('user/updatePresessionSurvey', surveyResponses)
       this.$emit('survey-completed')
     },
     cancel() {
       this.$store.dispatch('app/modal/hide')
-    }
-  }
+    },
+    nextStep() {
+      this.currentStep++
+    },
+    prevStep() {
+      this.currentStep--
+    },
+    // builds a default user response to be stored in state that maps a survey question ID to a response map
+    buildUserResponse() {
+      const userResponse = Object.assign({}, this.userResponse)
+
+      for (const question of this.survey) {
+        const questionResponse = {
+          responseId: null,
+          openResponse: '',
+        }
+        userResponse[question.questionId] = questionResponse
+      }
+
+      this.userResponse = userResponse
+    },
+    updateUserResponse(responseId, openResponseText = '') {
+      const questionId = this.currentQuestion.questionId
+      // Vue cannot detect property addition or deletion on objects. A new object
+      // must be created for Vue to recognize changes on said object
+      const responseAnswer = {
+        [questionId]: Object.assign({}, this.userResponse[questionId], {
+          responseId,
+          openResponse: openResponseText,
+        }),
+      }
+      this.userResponse = Object.assign({}, this.userResponse, responseAnswer)
+    },
+    overrideModalTemplateStyles() {
+      const formElem = document.querySelector('.ModalTemplate-form')
+      formElem.style.overflow = 'initial'
+      formElem.style.padding = 'initial'
+      formElem.style.borderRadius = '22px'
+
+      const selectionModal = document.querySelector('.SubjectSelectionModal')
+      selectionModal.style.minHeight = 'initial'
+
+      const modalTemplateSeparator = document.querySelector(
+        '.ModalTemplate-seperator'
+      )
+      modalTemplateSeparator.style.display = 'none'
+
+      const modalTemplateButtons = document.querySelector(
+        '.ModalTemplate-buttons'
+      )
+      modalTemplateButtons.style.display = 'none'
+
+      const modalTemplatePaddingElem = document.querySelector(
+        '.ModalTemplate-form--bottom-padding'
+      )
+      modalTemplatePaddingElem.style.paddingTop = 'initial'
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
+.survey-container {
+  @include flex-container(column);
+}
+
 .presession-survey {
-  height: 100%;
   width: 100%;
-  padding: 40px 20px 0;
+  padding: 1em;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  text-align: left;
 
   @include breakpoint-above('medium') {
-    padding: 40px 40px 0;
+    padding: 0 4em;
   }
 
   &__title {
     font-weight: 500;
-    font-size: 24px;
-    line-height: 1.25;
+    @include font-category('display-small');
+    margin: 0.5em 0;
+    color: $c-soft-black;
   }
 
   &__subtitle {
-    color: $c-secondary-grey;
-    font-size: 16px;
-    line-height: 1.5;
-    margin-bottom: 10px;
+    @include font-category('helper-text');
   }
 
   &__separator {
-    border: 1px solid #d6e0ef;
+    border: 1px solid $c-border-grey;
     width: 100%;
     height: 1px;
   }
 
   &__buttons {
     width: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-end;
+    @include flex-container(row, flex-end, center);
+    margin: 1.5em 0;
 
     button {
-      margin: 15px 0 25px;
+      margin-right: 1em;
 
-      &:first-child {
-        margin-right: 16px;
+      &:last-child {
+        margin-right: initial;
       }
     }
+  }
+}
+
+.question {
+  &__title {
+    margin-bottom: 5px;
+    text-align: left;
+    font-weight: 500;
+    color: $c-soft-black;
+    @include font-category('heading');
+  }
+
+  &__responses {
+    text-align: left;
+    margin: 1.5em 0;
+
+    &-images {
+      @include flex-container(row, center);
+      flex-wrap: wrap;
+      margin-top: 2em;
+    }
+  }
+
+  &__response {
+    margin: 0.75em 0;
+
+    &-image {
+      flex-basis: 30%;
+
+      @include breakpoint-above('medium') {
+        flex-basis: 20%;
+      }
+    }
+  }
+}
+
+.stepper {
+  width: 200px;
+  margin: 1em 0 1.5em 0;
+}
+
+.cross-icon {
+  cursor: pointer;
+  align-self: flex-end;
+  fill: $icon-grey;
+  width: 15px;
+  height: 15px;
+  margin: 1.5em;
+}
+
+// TODO: remove the styles below in context sharing feature flag cleanup
+.presession-survey {
+  width: 100%;
+  padding: 40px 20px 0;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+
+  @include breakpoint-above('medium') {
+    padding: 0 4em;
+  }
+
+  &__title-legacy {
+    text-align: center;
+    margin: initial;
+  }
+
+  &__subtitle-legacy {
+    text-align: center;
+    margin-bottom: 10px;
   }
 }
 
@@ -209,7 +552,7 @@ export default {
   }
 }
 
-.question {
+.question-legacy {
   align-self: stretch;
   margin: 15px 20px 35px;
 
@@ -217,16 +560,19 @@ export default {
     margin-bottom: 5px;
     text-align: left;
     font-weight: 500;
-    color: $c-secondary-grey;
-    font-size: 18px;
+    color: $c-soft-black;
+    @include font-category('heading');
   }
 
   &__options {
     text-align: left;
+    margin: 1em 0;
     padding-left: 15px;
   }
 
   &__option {
+    margin: 0.5em 0;
+
     label {
       font-weight: 400;
       display: flex;

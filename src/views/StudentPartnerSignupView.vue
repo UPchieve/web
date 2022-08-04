@@ -46,7 +46,8 @@
             id="inputSite"
             class="uc-form-select"
             v-bind:class="{
-              'uc-form-select--invalid': invalidInputs.indexOf('inputSite') > -1
+              'uc-form-select--invalid':
+                invalidInputs.indexOf('inputSite') > -1,
             }"
             v-model="formData.partnerSite"
             :options="studentPartner.sites"
@@ -65,7 +66,8 @@
             type="email"
             class="uc-form-input"
             v-bind:class="{
-              'uc-form-input--invalid': invalidInputs.indexOf('inputEmail') > -1
+              'uc-form-input--invalid':
+                invalidInputs.indexOf('inputEmail') > -1,
             }"
             v-model="formData.email"
             required
@@ -84,7 +86,7 @@
             class="uc-form-input"
             v-bind:class="{
               'uc-form-input--invalid':
-                invalidInputs.indexOf('inputPassword') > -1
+                invalidInputs.indexOf('inputPassword') > -1,
             }"
             v-model="formData.password"
             required
@@ -151,7 +153,7 @@
             type="text"
             class="uc-form-input"
             v-bind:class="{
-              'uc-form-input--invalid': invalidInputs.indexOf('firstName') > -1
+              'uc-form-input--invalid': invalidInputs.indexOf('firstName') > -1,
             }"
             v-model="formData.firstName"
             required
@@ -167,7 +169,7 @@
             type="text"
             class="uc-form-input"
             v-bind:class="{
-              'uc-form-input--invalid': invalidInputs.indexOf('lastName') > -1
+              'uc-form-input--invalid': invalidInputs.indexOf('lastName') > -1,
             }"
             v-model="formData.lastName"
             required
@@ -193,22 +195,27 @@
 
           <div class="school-search">
             <autocomplete
-              id="inputHighschool"
-              class="school-search__autocomplete"
-              :search="autocompleteSchool"
-              :get-result-value="getSchoolDisplayName"
               base-class="uc-autocomplete"
-              auto-select
-              placeholder="Search for your high school"
-              aria-label="Search for your high school"
+              :search="autocompleteSchool"
+              placeholder="Search for your school"
+              aria-label="Search for your school"
+              :get-result-value="getSchoolDisplayName"
               @submit="handleSelectHighSchool"
-            ></autocomplete>
-
-            <div v-if="noHighSchoolResults" class="school-search__no-results">
-              <a href="https://upchieve.org/cant-find-school" target="_blank">
-                Can't find your high school?
-              </a>
-            </div>
+            >
+              <template #result="{ result, props }">
+                <li v-bind="props">
+                  <div>
+                    <span v-if="result.name"> {{ result.name }}</span>
+                    <a
+                      v-if="result.cantFindSchool"
+                      href="https://upchieve.org/cant-find-school"
+                    >
+                      Can't find your high school?
+                    </a>
+                  </div>
+                </li>
+              </template>
+            </autocomplete>
           </div>
         </div>
 
@@ -233,6 +240,24 @@
           />
         </div>
 
+        <div class="uc-column" v-if="studentPartner.isManuallyApproved">
+          <label for="signup-source" class="uc-form-label"
+            >How did you hear about us?</label
+          >
+          <v-select
+            id="signup-source"
+            class="uc-form-select"
+            v-model="signupSourceId"
+            :options="signupSourcesOptions"
+            label="name"
+            :reduce="(option) => option.id"
+            :searchable="false"
+            :clearable="false"
+            required
+            :loading="isLoadingSignupSources"
+          />
+        </div>
+
         <div class="uc-form-checkbox">
           <input
             id="userAgreement"
@@ -246,9 +271,7 @@
           </label>
         </div>
 
-        <button class="uc-form-button" type="submit">
-          Sign Up
-        </button>
+        <button class="uc-form-button" type="submit">Sign Up</button>
 
         <div v-if="serverErrorMsg !== ''">{{ serverErrorMsg }}</div>
       </form>
@@ -264,23 +287,25 @@ import Autocomplete from '@trevoreyre/autocomplete-vue'
 import FormPageTemplate from '@/components/FormPageTemplate'
 import AuthService from '@/services/AuthService'
 import NetworkService from '@/services/NetworkService'
+import { backOff } from 'exponential-backoff'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'student-partner-signup-view',
   components: {
     FormPageTemplate,
-    Autocomplete
+    Autocomplete,
   },
   beforeRouteEnter(to, from, next) {
     const partnerId = to.params.partnerId
 
     NetworkService.getStudentPartner(partnerId)
-      .then(data => {
+      .then((data) => {
         const studentPartner = data.body.studentPartner
         if (!studentPartner) return next('/sign-up')
-        return next(_this => _this.setStudentPartner(studentPartner))
+        return next((_this) => _this.setStudentPartner(studentPartner))
       })
-      .catch(err => {
+      .catch((err) => {
         if (err.status !== 404) {
           // we shouldn't get 422 here, since semantics of GET request are expected
           // to be correct regardless of user input
@@ -299,12 +324,11 @@ export default {
         highSchoolSignup: false,
         collegeSignup: false,
         schoolSignupRequired: false,
-        sites: []
+        sites: [],
       },
       formStep: 'step-1',
       isHighSchoolStudent: false,
       isCollegeStudent: false,
-      noHighSchoolResults: false,
       formData: {
         partnerSite: undefined,
         email: '',
@@ -313,14 +337,18 @@ export default {
         lastName: '',
         highSchoolUpchieveId: '',
         college: '',
-        terms: false
+        terms: false,
       },
       errors: [],
       invalidInputs: [],
-      serverErrorMsg: ''
+      serverErrorMsg: '',
+      signupSourcesOptions: [],
+      signupSourceId: null,
+      isLoadingSignupSource: false,
     }
   },
   computed: {
+    ...mapGetters({}),
     showHighSchoolCheckbox() {
       // Don't show if high school input is disabled
       if (!this.studentPartner.highSchoolSignup) return false
@@ -383,7 +411,7 @@ export default {
         !this.studentPartner.highSchoolSignup &&
         this.studentPartner.schoolSignupRequired
       )
-    }
+    },
   },
   methods: {
     setStudentPartner(studentPartner) {
@@ -393,28 +421,33 @@ export default {
     autocompleteSchool(input) {
       this.formData.highSchoolUpchieveId = ''
 
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         if (input.length < 3) {
-          this.noHighSchoolResults = false
           return resolve([])
         }
 
+        let cantFindSchoolItem = {
+          cantFindSchool: true,
+        }
+
         NetworkService.searchSchool(this, { query: input })
-          .then(response => response.body.results)
-          .then(schools => {
-            this.noHighSchoolResults = schools.length === 0
+          .then((response) => response.body.results)
+          .then((schools) => {
+            schools.push(cantFindSchoolItem)
             resolve(schools)
           })
       })
     },
 
     getSchoolDisplayName(school) {
+      if (school.cantFindSchool) {
+        return `Can't Find School`
+      }
       return `${school.name} (${school.city}, ${school.state})`
     },
 
     handleSelectHighSchool(school) {
       this.formData.highSchoolUpchieveId = school.upchieveId
-      this.noHighSchoolResults = false
     },
 
     formStepTwo() {
@@ -450,13 +483,14 @@ export default {
       // Check credentials
       AuthService.checkRegister(this, {
         email: this.formData.email,
-        password: this.formData.password
+        password: this.formData.password,
       })
         .then(() => {
           this.formStep = 'step-2'
           this.serverErrorMsg = ''
+          this.getSignupSources()
         })
-        .catch(err => {
+        .catch((err) => {
           this.serverErrorMsg = err.message
           if (err.status !== 409 && err.status !== 422) {
             Sentry.captureException(err)
@@ -509,6 +543,10 @@ export default {
         this.invalidInputs.push('college')
       }
 
+      if (this.studentPartner.isManuallyApproved && !this.signupSourceId) {
+        this.errors.push('Please select an option for how you heard about us.')
+      }
+
       if (!this.formData.terms) {
         this.errors.push('You must read and accept the user agreement.')
       }
@@ -529,62 +567,77 @@ export default {
         lastName: this.formData.lastName,
         highSchoolId: this.formData.highSchoolUpchieveId,
         college: this.formData.college,
-        terms: this.formData.terms
+        terms: this.formData.terms,
+        signupSourceId: this.signupSourceId,
       })
         .then(() => {
           this.$router.push('/verify')
         })
-        .catch(err => {
+        .catch((err) => {
           this.serverErrorMsg = err.message
           if (err.status !== 422) {
             Sentry.captureException(err)
           }
         })
-    }
-  }
+    },
+
+    async getSignupSources() {
+      this.isLoadingSignupSource = true
+      try {
+        const data = await backOff(() =>
+          NetworkService.getStudentSignupSources()
+        )
+        this.signupSourcesOptions = data.body.signupSources
+      } catch (err) {
+        Sentry.captureException(err)
+      } finally {
+        this.isLoadingSignupSource = false
+      }
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
 .uc-form-body {
-  @include child-spacing(top, 25px);
+  @include child-spacing(top, 25px)
 }
 
 .step-header {
-  text-align: left;
+  text-align: left
 
   &__title {
-    font-size: 18px;
-    font-weight: bold;
+    font-size: 18px
+    font-weight: bold
   }
 
   &__subtitle {
-    font-size: 14px;
-    color: $c-secondary-grey;
+    font-size: 14px
+    color: $c-secondary-grey
   }
 
   a {
-    color: $c-information-blue;
+    color: $c-information-blue
   }
 }
 
 .step-errors {
-  color: #bf0000;
-  font-size: 14px;
-  text-align: left;
+  color: #bf0000
+  font-size: 14px
+  text-align: left
 }
 
 .school-search {
-  position: relative;
-  margin-bottom: 30px;
+  position: relative
+  margin-bottom: 30px
 
   &__no-results {
-    position: absolute;
-    left: 0;
-    top: 100%;
-    width: 100%;
-    padding: 10px 12px;
-    border: solid 1px #ccc;
+    position: absolute
+    left: 0
+    top: 100%
+    width: 100%
+    padding: 10px 12px
+    border: solid 1px #ccc
     border-top: none;
     border-radius: 5px;
     border-top-left-radius: 0;

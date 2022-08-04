@@ -12,19 +12,19 @@ import getOperatingSystem from '@/utils/get-operating-system'
 
 export default {
   props: {
-    message: { type: String, required: true }
+    message: { type: String, required: true },
   },
   data() {
     return {
       isMobileAppIOS: false,
       intervalTimeoutId: null,
-      animatedEllipsis: ''
+      animatedEllipsis: '',
     }
   },
   computed: {
     ...mapState({
-      isMobileApp: state => state.app.isMobileApp
-    })
+      isMobileApp: (state) => state.app.isMobileApp,
+    }),
   },
   created() {
     // @todo
@@ -44,7 +44,7 @@ export default {
   },
   beforeDestroy() {
     clearInterval(this.intervalTimeoutId)
-  }
+  },
 }
 </script>
 

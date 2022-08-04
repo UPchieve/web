@@ -61,9 +61,9 @@ import PageControl from '@/components/Admin/PageControl'
 import UserListItem from '@/components/Admin/UserListItem'
 import { isEmpty } from 'lodash'
 
-const getUsers = async data => {
+const getUsers = async (data) => {
   const {
-    body: { users, isLastPage }
+    body: { users, isLastPage },
   } = await NetworkService.adminGetUsers(data)
 
   return { users, isLastPage }
@@ -86,7 +86,7 @@ export default {
       listedPartnerOrgs: [],
       partnerOrg: {},
       partnerSite: '',
-      highSchool: ''
+      highSchool: '',
     }
   },
 
@@ -99,8 +99,8 @@ export default {
         lastName,
         email,
         partnerOrg,
-        highSchool
-      }
+        highSchool,
+      },
     } = this.$route
     const page = parseInt(pageQuery)
     this.page = page || this.page
@@ -110,19 +110,17 @@ export default {
     this.email = email || this.email
     this.highSchool = highSchool || this.highSchool
 
-    const [
-      studentPartnersResponse,
-      volunteerPartnersResponse
-    ] = await Promise.all([
-      NetworkService.adminGetVolunteerPartners(),
-      NetworkService.adminGetStudentPartners()
-    ])
+    const [studentPartnersResponse, volunteerPartnersResponse] =
+      await Promise.all([
+        NetworkService.adminGetVolunteerPartners(),
+        NetworkService.adminGetStudentPartners(),
+      ])
 
     const {
-      body: { partnerOrgs: studentPartnerOrgs }
+      body: { partnerOrgs: studentPartnerOrgs },
     } = studentPartnersResponse
     const {
-      body: { partnerOrgs: volunteerPartnerOrgs }
+      body: { partnerOrgs: volunteerPartnerOrgs },
     } = volunteerPartnersResponse
 
     this.listedPartnerOrgs = [...studentPartnerOrgs, ...volunteerPartnerOrgs]
@@ -154,7 +152,7 @@ export default {
   computed: {
     isFirstPage() {
       return this.page === 1
-    }
+    },
   },
 
   methods: {
@@ -179,18 +177,18 @@ export default {
         lastName: this.lastName,
         email: this.email,
         partnerOrg: isEmpty(this.partnerOrg) ? '' : this.partnerOrg.key,
-        highSchool: this.highSchool
+        highSchool: this.highSchool,
       }
       this.$router.push({
         path: '/admin/users',
         query: {
           ...data,
-          page: this.page
-        }
+          page: this.page,
+        },
       })
       const { users, isLastPage } = await getUsers({
         ...data,
-        page: this.page
+        page: this.page,
       })
       this.users = users
       this.isLastPage = isLastPage
@@ -201,8 +199,8 @@ export default {
       if (key === 'Enter' && tagName === 'INPUT') {
         this.getUsers()
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

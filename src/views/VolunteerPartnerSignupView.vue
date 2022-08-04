@@ -39,7 +39,8 @@
             type="email"
             class="uc-form-input"
             v-bind:class="{
-              'uc-form-input--invalid': invalidInputs.indexOf('inputEmail') > -1
+              'uc-form-input--invalid':
+                invalidInputs.indexOf('inputEmail') > -1,
             }"
             v-model="formData.email"
             required
@@ -58,7 +59,7 @@
             class="uc-form-input"
             v-bind:class="{
               'uc-form-input--invalid':
-                invalidInputs.indexOf('inputPassword') > -1
+                invalidInputs.indexOf('inputPassword') > -1,
             }"
             v-model="formData.password"
             required
@@ -131,7 +132,7 @@
                   class="uc-form-input"
                   v-bind:class="{
                     'uc-form-input--invalid':
-                      invalidInputs.indexOf('firstName') > -1
+                      invalidInputs.indexOf('firstName') > -1,
                   }"
                   v-model="formData.firstName"
                   required
@@ -147,7 +148,7 @@
                   class="uc-form-input"
                   v-bind:class="{
                     'uc-form-input--invalid':
-                      invalidInputs.indexOf('lastName') > -1
+                      invalidInputs.indexOf('lastName') > -1,
                   }"
                   v-model="formData.lastName"
                   required
@@ -225,18 +226,18 @@ export default {
   components: {
     FormPageTemplate,
     VuePhoneNumberInput,
-    Loader
+    Loader,
   },
   beforeRouteEnter(to, from, next) {
     const partnerId = to.params.partnerId
 
     NetworkService.getVolunteerPartner(partnerId)
-      .then(data => {
+      .then((data) => {
         const volunteerPartner = data.body.volunteerPartner
         if (!volunteerPartner) return next('/sign-up')
-        return next(_this => _this.setVolunteerPartner(volunteerPartner))
+        return next((_this) => _this.setVolunteerPartner(volunteerPartner))
       })
-      .catch(err => {
+      .catch((err) => {
         if (err.status !== 404) {
           // we shouldn't get 422 here, since semantics of GET request are expected
           // to be correct regardless of user input
@@ -252,7 +253,7 @@ export default {
     return {
       volunteerPartner: {
         name: '',
-        requiredEmailDomains: []
+        requiredEmailDomains: [],
       },
       formStep: 'step-1',
       formData: {
@@ -261,13 +262,13 @@ export default {
         firstName: '',
         lastName: '',
         phone: '',
-        terms: false
+        terms: false,
       },
       phoneInputInfo: {},
       errors: [],
       invalidInputs: [],
       serverErrorMsg: '',
-      isRegistering: false
+      isRegistering: false,
     }
   },
   computed: {
@@ -285,7 +286,7 @@ export default {
       return this.hasEmailValidation
         ? "What's your work email?"
         : "What's your email?"
-    }
+    },
   },
   methods: {
     setVolunteerPartner(volunteerPartner) {
@@ -345,13 +346,13 @@ export default {
       // Check credentials
       AuthService.checkRegister(this, {
         email: this.formData.email,
-        password: this.formData.password
+        password: this.formData.password,
       })
         .then(() => {
           this.formStep = 'step-2'
           this.serverErrorMsg = ''
         })
-        .catch(err => {
+        .catch((err) => {
           this.serverErrorMsg = err.message
           if (err.status !== 409 && err.status !== 422) {
             Sentry.captureException(err)
@@ -403,65 +404,65 @@ export default {
         firstName: this.formData.firstName,
         lastName: this.formData.lastName,
         phone: this.phoneInputInfo.e164,
-        terms: this.formData.terms
+        terms: this.formData.terms,
       })
         .then(() => {
           this.isRegistering = false
           this.$router.push('/verify')
         })
-        .catch(err => {
+        .catch((err) => {
           this.isRegistering = false
           this.serverErrorMsg = err.message
           if (err.status !== 409 && err.status !== 422) {
             Sentry.captureException(err)
           }
         })
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
 .uc-form-body {
-  @include child-spacing(top, 25px);
-  position: relative;
+  @include child-spacing(top, 25px)
+  position: relative
 }
 
 .step-header {
-  text-align: left;
+  text-align: left
 
   &__title {
-    font-size: 18px;
-    font-weight: bold;
+    font-size: 18px
+    font-weight: bold
   }
 
   &__subtitle {
-    font-size: 14px;
-    color: $c-secondary-grey;
+    font-size: 14px
+    color: $c-secondary-grey
   }
 
   a {
-    color: $c-information-blue;
+    color: $c-information-blue
   }
 }
 
 .name-fields {
-  @include child-spacing(right, 15px);
+  @include child-spacing(right, 15px)
 
   input {
-    box-sizing: border-box;
-    width: 100%;
-    height: 45px;
+    box-sizing: border-box
+    width: 100%
+    height: 45px
   }
 }
 
 .phone-input {
-  margin: 10px 0 2px;
+  margin: 10px 0 2px
 }
 
 .step-errors {
-  color: #bf0000;
-  font-size: 14px;
+  color: #bf0000
+  font-size: 14px
   text-align: left;
 }
 

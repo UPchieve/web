@@ -1,8 +1,12 @@
 <template>
   <div class="chat-log">
     <div class="chat-log__header">
-      <div v-if="student"><student-icon class="chat-log__icon"/> {{ student.firstname }}</div>
-      <div v-if="volunteer"><volunteer-icon class="chat-log__icon"/> {{ volunteer.firstname }}</div>
+      <div v-if="student">
+        <student-icon class="chat-log__icon" /> {{ student.firstname }}
+      </div>
+      <div v-if="volunteer">
+        <volunteer-icon class="chat-log__icon" /> {{ volunteer.firstname }}
+      </div>
     </div>
     <div class="chat-log__messages-container">
       <!-- TODO: use session chat component when it is created -->
@@ -13,7 +17,7 @@
         class="chat-log__message"
         :class="{
           'chat-log__message--right':
-            volunteer && message.user === volunteer._id
+            volunteer && message.user === volunteer._id,
         }"
         :studentId="student._id"
         :volunteerId="volunteer && volunteer._id"
@@ -35,8 +39,8 @@ export default {
   props: {
     messages: Array[Object],
     student: Object,
-    volunteer: Object
-  }
+    volunteer: Object,
+  },
 }
 </script>
 

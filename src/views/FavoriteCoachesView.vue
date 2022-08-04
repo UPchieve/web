@@ -27,13 +27,13 @@
                 <span class="coach-list__coach-name">{{
                   coach.firstName
                 }}</span>
-                <span
-                  >{{getSessionTotalTextDisplay(coach.numSessions)}}</span>
+                <span>{{ getSessionTotalTextDisplay(coach.numSessions) }}</span>
               </div>
             </div>
 
-            <span v-if="!mobileMode"
-              >{{getSessionTotalTextDisplay(coach.numSessions)}}</span>
+            <span v-if="!mobileMode">{{
+              getSessionTotalTextDisplay(coach.numSessions)
+            }}</span>
             <favoriting-toggle
               :initialIsFavorite="true"
               :volunteerName="coach.firstName"
@@ -136,9 +136,9 @@ export default {
       const totalPages = Math.ceil(this.total / coachLimitPerPage)
       return totalPages === 0 ? 1 : totalPages
     },
-    isLastPage(){
+    isLastPage() {
       return this.page === this.totalPages
-    }
+    },
   },
   methods: {
     async getFavoriteCoaches(page) {
@@ -155,137 +155,137 @@ export default {
       if (this.page === page) return
       await this.getFavoriteCoaches(page)
     },
-    getSessionTotalTextDisplay(numSessions){
+    getSessionTotalTextDisplay(numSessions) {
       return `${numSessions} Session${numSessions > 1 ? 's' : ''}`
-    }
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
 ul {
-  padding: 0px;
-  height: 100%;
-  margin: auto;
-  list-style-type: none;
+  padding: 0px
+  height: 100%
+  margin: auto
+  list-style-type: none
 }
 
 .header {
-  text-align: left;
-  margin-bottom: 2em;
+  text-align: left
+  margin-bottom: 2em
 }
 
 .secondary-header {
-  font-size: 1.4rem;
+  font-size: 1.4rem
 }
 
 .title {
-  font-weight: 500;
-  font-size: 22px;
-  margin-bottom: 1em;
+  font-weight: 500
+  font-size: 22px
+  margin-bottom: 1em
 }
 
 .subtitle {
-  @include font-category('heading');
-  color: $c-secondary-grey;
+  @include font-category('heading')
+  color: $c-secondary-grey
 }
 
 .container {
-  padding: 1.5em;
-  margin: 0;
+  padding: 1.5em
+  margin: 0
 
   @include breakpoint-above('large') {
-    padding: 2.5em;
+    padding: 2.5em
   }
 }
 
 .coach-list {
-  min-height: 600px;
-  padding: 0 2em;
+  min-height: 600px
+  padding: 0 2em
 
   &__headers {
-    background-color: $c-background-blue;
-    padding: 1em 2em;
-    border-radius: 8px 8px 0px 0px;
-    font-weight: 500;
+    background-color: $c-background-blue
+    padding: 1em 2em
+    border-radius: 8px 8px 0px 0px
+    font-weight: 500
   }
 
   &__coach {
-    padding: 2.4em 0;
+    padding: 2.4em 0
 
     &-name {
-      font-weight: 500;
-      text-align: left;
+      font-weight: 500
+      text-align: left
 
       @include breakpoint-above('medium') {
-        width: 100px;
+        width: 100px
       }
     }
 
     &-name-container {
-      @include flex-container(row, center, center);
+      @include flex-container(row, center, center)
 
       @include breakpoint-above('medium') {
-        flex-direction: row;
+        flex-direction: row
       }
     }
 
     &-name-session {
-      @include flex-container(column);
-      text-align: left;
-      margin-left: 1em;
+      @include flex-container(column)
+      text-align: left
+      margin-left: 1em
     }
   }
 }
 
 .favorite-coaches {
-  background-color: $upchieve-white;
-  border-radius: 8px;
-  border: 1px solid $c-background-blue;
+  background-color: $upchieve-white
+  border-radius: 8px
+  border: 1px solid $c-background-blue
 
   &__no-coaches {
-    @include flex-container(column, normal, center);
-    margin: 4em 2em 2em;
-    min-height: 60vh;
+    @include flex-container(column, normal, center)
+    margin: 4em 2em 2em
+    min-height: 60vh
 
     &-description {
-      max-width: 600px;
-      margin-top: 1em;
-      color: $c-secondary-grey;
+      max-width: 600px
+      margin-top: 1em
+      color: $c-secondary-grey
     }
   }
 }
 
 .spacing--grid {
-  @include flex-container(row, space-around, center);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  @include flex-container(row, space-around, center)
+  display: grid
+  grid-template-columns: 1fr 1fr
   @include breakpoint-above('medium') {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr
   }
 }
 
 .page-actions {
-  @include flex-container(row, space-around);
-  padding: 1em 0;
+  @include flex-container(row, space-around)
+  padding: 1em 0
 
   @include breakpoint-above('large') {
-    justify-content: flex-end;
+    justify-content: flex-end
   }
 }
 
 .border--thin {
-  width: 95%;
-  border-bottom: 2px solid $c-background-grey;
-  margin: 0 auto;
+  width: 95%
+  border-bottom: 2px solid $c-background-grey
+  margin: 0 auto
 }
 
 .page-actions-container {
-  padding: 0 2em;
+  padding: 0 2em
 }
 
 .page-numbers {
-  display: flex;
+  display: flex
   justify-content: flex-end;
   align-items: center;
 }

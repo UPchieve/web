@@ -1,9 +1,7 @@
 <template>
   <div class="document">
     <iframe
-      :src="
-        `https://docs.google.com/viewer?url=https://upc-training-materials.s3.us-east-2.amazonaws.com/${resourceId}.pdf&embedded=true`
-      "
+      :src="`https://docs.google.com/viewer?url=https://upc-training-materials.s3.us-east-2.amazonaws.com/${resourceId}.pdf&embedded=true`"
       frameborder="0"
       class="document__iframe"
       allowfullscreen
@@ -25,21 +23,21 @@ import Loader from '@/components/Loader'
 export default {
   name: 'Document',
   props: {
-    resourceId: String
+    resourceId: String,
   },
   components: { Loader },
   data() {
     return {
       isLoaded: false,
       isLoadedIntervalId: null,
-      reloadAttempts: 0
+      reloadAttempts: 0,
     }
   },
   computed: {
     isMaxAttempt() {
       const maxAttempts = 20
       return this.reloadAttempts > maxAttempts
-    }
+    },
   },
   mounted() {
     /**
@@ -62,8 +60,8 @@ export default {
     },
     forceRerender() {
       this.reloadAttempts += 1
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -23,13 +23,13 @@ export default {
     return {
       page: 1,
       sessions: [],
-      isLastPage: false
+      isLastPage: false,
     }
   },
 
   async created() {
     const {
-      query: { page: pageQuery }
+      query: { page: pageQuery },
     } = this.$route
     const page = parseInt(pageQuery) || this.page
     this.setPage(page)
@@ -38,7 +38,7 @@ export default {
   computed: {
     isFirstPage() {
       return this.page === 1
-    }
+    },
   },
 
   methods: {
@@ -63,20 +63,20 @@ export default {
 
     async getSessions() {
       const query = {
-        page: this.page
+        page: this.page,
       }
       this.$router.push({
         path: '/admin/sessions/review',
-        query
+        query,
       })
 
       const {
-        body: { sessions, isLastPage }
+        body: { sessions, isLastPage },
       } = await NetworkService.adminGetSessionsToReview(this.page)
       this.sessions = sessions
       this.isLastPage = isLastPage
-    }
-  }
+    },
+  },
 }
 </script>
 

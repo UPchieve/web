@@ -28,12 +28,12 @@ export default {
     reference: { type: Object, required: true },
     closeReferenceView: { type: Function, required: true },
     updateReferenceStatus: { type: Function, required: true },
-    referenceStatusText: { type: String, required: true }
+    referenceStatusText: { type: String, required: true },
   },
   components: { ReferenceForm },
   data() {
     return {
-      hideReferenceForm: false
+      hideReferenceForm: false,
     }
   },
   created() {
@@ -41,17 +41,17 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: (state) => state.user.user,
     }),
     ...mapGetters({
-      mobileMode: 'app/mobileMode'
-    })
+      mobileMode: 'app/mobileMode',
+    }),
   },
   methods: {
     testing() {
       this.hideReferenceForm = true
-    }
-  }
+    },
+  },
 }
 </script>
 

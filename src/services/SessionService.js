@@ -13,7 +13,7 @@ export default {
       AnalyticsService.captureEvent(EVENTS.SESSION_ENDED, {
         event: EVENTS.SESSION_ENDED,
         sessionId: sessionId,
-        subject: currentSessionData.subTopic
+        subject: currentSessionData.subTopic,
       })
     })
   },
@@ -22,7 +22,7 @@ export default {
     const onRetry = options && options.onRetry
     const data = {
       sessionType,
-      sessionSubTopic
+      sessionSubTopic,
     }
 
     if (localStorage.getItem('assignmentId')) {
@@ -31,7 +31,7 @@ export default {
       data.studentId = localStorage.getItem('studentId')
     }
 
-    return NetworkService.newSession(context, data, onRetry).then(res => {
+    return NetworkService.newSession(context, data, onRetry).then((res) => {
       const data = res.data || {}
       const { sessionId } = data
 
@@ -44,7 +44,7 @@ export default {
         const sessionData = {
           type: sessionType,
           subTopic: sessionSubTopic,
-          _id: sessionId
+          _id: sessionId,
         }
         localStorage.removeItem('assignmentId')
         localStorage.removeItem('problemId')
@@ -71,13 +71,13 @@ export default {
     const onRetry = options && options.onRetry
 
     return NetworkService.checkSession(context, { sessionId }, onRetry)
-      .then(res => {
+      .then((res) => {
         const data = res.data || {}
         const { sessionId } = data
 
         return sessionId
       })
-      .catch(res => {
+      .catch((res) => {
         if (res.status === 404) {
           context.$router.replace('/')
         } else {
@@ -89,9 +89,9 @@ export default {
   getCurrentSession(context, user) {
     return NetworkService.currentSession(context, {
       user_id: user._id,
-      is_volunteer: user.isVolunteer
+      is_volunteer: user.isVolunteer,
     })
-      .then(resp => {
+      .then((resp) => {
         const { sessionId, data } = resp.data || {}
         const { type, subTopic } = data
 
@@ -99,19 +99,19 @@ export default {
           return Promise.resolve({ sessionData: data })
         }
       })
-      .catch(resp => {
+      .catch((resp) => {
         throw errorFromHttpResponse(resp)
       })
   },
 
   getLatestSession(context, user) {
     return NetworkService.latestSession(context, { userId: user._id })
-      .then(resp => {
+      .then((resp) => {
         const { data } = resp.data || {}
         return Promise.resolve({ sessionData: data })
       })
-      .catch(resp => {
+      .catch((resp) => {
         throw errorFromHttpResponse(resp)
       })
-  }
+  },
 }

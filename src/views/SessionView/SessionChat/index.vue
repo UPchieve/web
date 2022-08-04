@@ -14,8 +14,10 @@
           class="chat-warning chat-warning--moderation"
           v-show="moderationWarningIsShown"
         >
-          <span>Messages cannot contain personal information, profanity, or links to
-          third party video services</span>
+          <span
+            >Messages cannot contain personal information, profanity, or links
+            to third party video services</span
+          >
           <span class="chat-warning__close" @click="hideModerationWarning"
             >×</span
           >
@@ -38,46 +40,49 @@
       </transition>
     </div>
 
-     <div class="messages-container">
-        <div
-          class="messages"
-          ref="messages"
-          @scroll="handleScroll"
-          tabindex="0"
-        >
-          <chat-bot
-            v-if="showLegacyChatBot && !user.isVolunteer && isSessionWaitingForVolunteer"
-            @new-bot-message="handleIncomingMessage"
-          />
-          <template v-for="(message, index) in currentSession.messages">
-            <div
-              :key="`message-${index}`"
-              :class="messageAlignment(message)"
-              class="message"
-            >
-              <component class="avatar" :is="avatar(message)" v-if="message.user !== user._id"/>
-
-              <div class="contents" :class="chatBotContents(message)">
-                <span>{{ message.contents }}</span>
-              </div>
-              <div class="time">
-                {{ message.createdAt | formatTime }}
-              </div>
-            </div>
-          </template>
-        </div>
-        <transition name="fade">
-          <button
-            type="button"
-            v-show="numberOfUnreadChatMessages > 0"
-            class="messages-overlay unread-message-indicator"
-            @click="scrollToUnread"
+    <div class="messages-container">
+      <div class="messages" ref="messages" @scroll="handleScroll" tabindex="0">
+        <chat-bot
+          v-if="
+            showLegacyChatBot &&
+            !user.isVolunteer &&
+            isSessionWaitingForVolunteer
+          "
+          @new-bot-message="handleIncomingMessage"
+        />
+        <template v-for="(message, index) in currentSession.messages">
+          <div
+            :key="`message-${index}`"
+            :class="messageAlignment(message)"
+            class="message"
           >
-            {{ unreadMessageNote }}
-            <img src="@/assets/down_arrow.png" />
-          </button>
-        </transition>
+            <component
+              class="avatar"
+              :is="avatar(message)"
+              v-if="message.user !== user._id"
+            />
+
+            <div class="contents" :class="chatBotContents(message)">
+              <span>{{ message.contents }}</span>
+            </div>
+            <div class="time">
+              {{ message.createdAt | formatTime }}
+            </div>
+          </div>
+        </template>
       </div>
+      <transition name="fade">
+        <button
+          type="button"
+          v-show="numberOfUnreadChatMessages > 0"
+          class="messages-overlay unread-message-indicator"
+          @click="scrollToUnread"
+        >
+          {{ unreadMessageNote }}
+          <img src="@/assets/down_arrow.png" />
+        </button>
+      </transition>
+    </div>
 
     <audio
       class="audio__receive-message"
@@ -118,7 +123,7 @@ import getChatAvatar from '@/utils/get-chat-avatar'
 
 const MESSAGE_ALIGNMENT = {
   LEFT: 'left',
-  RIGHT: 'right'
+  RIGHT: 'right',
 }
 
 /**
@@ -131,7 +136,7 @@ export default {
   components: { ChatBot, LoadingMessage, ChatBotIcon },
   props: {
     setHasSeenNewMessage: { type: Function, required: true },
-    shouldHideChatSection: { type: Boolean, required: true }
+    shouldHideChatSection: { type: Boolean, required: true },
   },
   data() {
     return {
@@ -140,44 +145,45 @@ export default {
       typingTimeout: null,
       typingIndicatorShown: false,
       isMessageError: false,
-      isAutoscrolling: false
+      isAutoscrolling: false,
     }
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      currentSession: state => state.user.session,
-      isWebPageHidden: state => state.app.isWebPageHidden,
-      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
-      unreadChatMessageIndices: state => state.user.unreadChatMessageIndices,
-      chatScrolledToMessageIndex: state => state.user.chatScrolledToMessageIndex
+      user: (state) => state.user.user,
+      currentSession: (state) => state.user.session,
+      isWebPageHidden: (state) => state.app.isWebPageHidden,
+      isSessionConnectionAlive: (state) => state.user.isSessionConnectionAlive,
+      unreadChatMessageIndices: (state) => state.user.unreadChatMessageIndices,
+      chatScrolledToMessageIndex: (state) =>
+        state.user.chatScrolledToMessageIndex,
     }),
     ...mapGetters({
       sessionPartner: 'user/sessionPartner',
       isSessionWaitingForVolunteer: 'user/isSessionWaitingForVolunteer',
       isSessionAlive: 'user/isSessionAlive',
       numberOfUnreadChatMessages: 'user/numberOfUnreadChatMessages',
-      isChatbotActive: 'featureFlags/isChatbotActive'
+      isChatbotActive: 'featureFlags/isChatbotActive',
     }),
-    isSessionConnectionFailure: function() {
+    isSessionConnectionFailure: function () {
       const isConnectionFailure =
         !this.isSessionConnectionAlive && this.isSessionAlive
       if (isConnectionFailure)
         Sentry.captureException(new Error('Attempting to connect the chat'), {
           tags: {
-            sessionId: this.currentSession._id
-          }
+            sessionId: this.currentSession._id,
+          },
         })
       return isConnectionFailure
     },
-    unreadMessageNote: function() {
+    unreadMessageNote: function () {
       return `${this.numberOfUnreadChatMessages} unread message${
         this.numberOfUnreadChatMessages === 1 ? '' : 's'
       }`
     },
-    showLegacyChatBot(){
+    showLegacyChatBot() {
       return !this.isChatbotActive
-    }
+    },
   },
   mounted() {
     if (this.chatScrolledToMessageIndex !== null) {
@@ -197,7 +203,7 @@ export default {
       this.$socket.emit('message', {
         sessionId: this.currentSession._id,
         user: this.user,
-        message
+        message,
       })
     },
     clearMessageInput() {
@@ -206,7 +212,7 @@ export default {
     notTyping() {
       // Tell the server that the user is no longer typing
       this.$socket.emit('notTyping', {
-        sessionId: this.currentSession._id
+        sessionId: this.currentSession._id,
       })
     },
     handleOutgoingMessage(event) {
@@ -222,13 +228,15 @@ export default {
         this.hideModerationWarning()
 
         // Check for personal info/profanity in message
-        ModerationService.checkIfMessageIsClean(this, message).then(isClean => {
-          if (isClean) {
-            this.showNewMessage(message)
-          } else {
-            this.showModerationWarning()
+        ModerationService.checkIfMessageIsClean(this, message).then(
+          (isClean) => {
+            if (isClean) {
+              this.showNewMessage(message)
+            } else {
+              this.showModerationWarning()
+            }
           }
-        })
+        )
 
         // Disregard typing handler for enter
         this.notTyping()
@@ -239,7 +247,7 @@ export default {
 
       // Typing handler for when non-Enter/Backspace keys are pressed
       this.$socket.emit('typing', {
-        sessionId: this.currentSession._id
+        sessionId: this.currentSession._id,
       })
 
       /** Every time a key is pressed, set an inactive timer
@@ -272,8 +280,8 @@ export default {
       const messageElements = this.getUserMessageElements()
 
       if (this.unreadChatMessageIndices.length > 0) {
-        const readMessageIndices = this.unreadChatMessageIndices.filter(index =>
-          this.isMessageElementInView(messageElements[index])
+        const readMessageIndices = this.unreadChatMessageIndices.filter(
+          (index) => this.isMessageElementInView(messageElements[index])
         )
         this.$store.dispatch('user/markChatMessagesAsRead', readMessageIndices)
       }
@@ -297,7 +305,8 @@ export default {
         this.scrollToBottom()
       } else if (
         this.currentSession.messages.length > 0 &&
-        this.currentSession.messages[this.currentSession.messages.length - 1].user !== this.user._id
+        this.currentSession.messages[this.currentSession.messages.length - 1]
+          .user !== this.user._id
       ) {
         const messageElements = this.getUserMessageElements()
 
@@ -318,7 +327,7 @@ export default {
     getUserMessageElements() {
       // the DOM elements corresponding to messages sent by users
       // (as opposed to the chatbot)
-      return Array.from(this.$refs.messages.children).filter(element =>
+      return Array.from(this.$refs.messages.children).filter((element) =>
         element.classList.contains('message')
       )
     },
@@ -356,23 +365,31 @@ export default {
         messagesBox.lastElementChild.offsetTop +
         messagesBox.lastElementChild.offsetHeight
     },
-    messageAlignment(message){
-      return message.user === this.user._id ? MESSAGE_ALIGNMENT.RIGHT : MESSAGE_ALIGNMENT.LEFT
+    messageAlignment(message) {
+      return message.user === this.user._id
+        ? MESSAGE_ALIGNMENT.RIGHT
+        : MESSAGE_ALIGNMENT.LEFT
     },
-    showAvatar(message){
-      return this.messageAlignment(message) ===  MESSAGE_ALIGNMENT.LEFT
+    showAvatar(message) {
+      return this.messageAlignment(message) === MESSAGE_ALIGNMENT.LEFT
     },
-    avatar(message){
-      const volunteerId = this.currentSession.volunteer && this.currentSession.volunteer._id
-      return getChatAvatar(message.user, this.currentSession.student._id, volunteerId)
+    avatar(message) {
+      const volunteerId =
+        this.currentSession.volunteer && this.currentSession.volunteer._id
+      return getChatAvatar(
+        message.user,
+        this.currentSession.student._id,
+        volunteerId
+      )
     },
-    chatBotContents(message){
+    chatBotContents(message) {
       const isStudentMessage = message.user === this.currentSession.student._id
-      const isVolunteerMessage = this.currentSession.volunteer ? message.user === this.currentSession.volunteer._id : false
-      if (!isStudentMessage && !isVolunteerMessage)
-        return 'contents--chat-bot'
+      const isVolunteerMessage = this.currentSession.volunteer
+        ? message.user === this.currentSession.volunteer._id
+        : false
+      if (!isStudentMessage && !isVolunteerMessage) return 'contents--chat-bot'
       return ''
-    }
+    },
   },
   sockets: {
     'is-typing'() {
@@ -403,8 +420,8 @@ export default {
       setTimeout(() => {
         this.isMessageError = false
       }, 1000)
-    }
-  }
+    },
+  },
 }
 </script>
 

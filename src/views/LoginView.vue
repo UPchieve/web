@@ -64,19 +64,19 @@ import FormFooter from '@/components/FormFooter'
 export default {
   components: {
     FormPageTemplate,
-    FormFooter
+    FormFooter,
   },
   created() {
     this.$store.dispatch('app/hideNavigation')
   },
   computed: {
     ...mapState({
-      isMobileApp: state => state.app.isMobileApp
+      isMobileApp: (state) => state.app.isMobileApp,
     }),
     isValidForm() {
       const { email, password } = this.credentials
       return email && password
-    }
+    },
   },
   data() {
     let error
@@ -86,9 +86,9 @@ export default {
     return {
       credentials: {
         email: '',
-        password: ''
+        password: '',
       },
-      error
+      error,
     }
   },
   methods: {
@@ -96,17 +96,17 @@ export default {
       if (!this.isValidForm) return
       AuthService.login(this, {
         email: this.credentials.email,
-        password: this.credentials.password
+        password: this.credentials.password,
       })
-        .then(data => {
+        .then((data) => {
           this.$store.commit('user/setUser', data.user)
           this.$router.push(this.$route.query.redirect || '/')
         })
         .catch(() => {
           this.error = 'Oops! The email or password you entered is incorrect.'
         })
-    }
-  }
+    },
+  },
 }
 </script>
 

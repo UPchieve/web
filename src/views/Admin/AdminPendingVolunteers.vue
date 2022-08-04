@@ -29,9 +29,9 @@ import NetworkService from '@/services/NetworkService'
 import PendingVolunteerListItem from '@/components/Admin/PendingVolunteerListItem'
 import PageControl from '@/components/Admin/PageControl'
 
-const getVolunteersToReview = async page => {
+const getVolunteersToReview = async (page) => {
   const {
-    body: { volunteers, isLastPage }
+    body: { volunteers, isLastPage },
   } = await NetworkService.adminGetVolunteersToReview(page)
 
   return { volunteers, isLastPage }
@@ -44,7 +44,7 @@ export default {
     return {
       page: 1,
       volunteers: [],
-      isLastPage: false
+      isLastPage: false,
     }
   },
   async created() {
@@ -54,7 +54,7 @@ export default {
   computed: {
     isFirstPage() {
       return this.page === 1
-    }
+    },
   },
   methods: {
     async setPage(page) {
@@ -72,8 +72,8 @@ export default {
 
     previousPage() {
       this.setPage(this.page - 1)
-    }
-  }
+    },
+  },
 }
 </script>
 

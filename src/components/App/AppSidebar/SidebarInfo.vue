@@ -21,18 +21,18 @@ export default {
   props: {
     authenticated: Boolean,
     isVolunteer: Boolean,
-    name: String
+    name: String,
   },
   components: {
     StudentIcon,
-    VolunteerIcon
+    VolunteerIcon,
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: (state) => state.user.user,
     }),
     ...mapGetters({
-      isSessionAlive: 'user/isSessionAlive'
+      isSessionAlive: 'user/isSessionAlive',
     }),
     type() {
       return this.isVolunteer ? 'Volunteer' : 'Student'
@@ -42,7 +42,7 @@ export default {
 
       const status = {
         text: 'Ready to chat',
-        class: 'SidebarInfo-status-circle'
+        class: 'SidebarInfo-status-circle',
       }
 
       if (this.isVolunteer) {
@@ -71,10 +71,10 @@ export default {
 
       return status
     },
-    avatar(){
+    avatar() {
       return this.isVolunteer ? VolunteerIcon : StudentIcon
-    }
-  }
+    },
+  },
 }
 </script>
 

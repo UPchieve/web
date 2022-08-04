@@ -24,43 +24,43 @@ export default {
   props: {
     title: {
       type: String,
-      required: true
+      required: true,
     },
-    svg: {
+    svg: () => ({
       type: Object,
       required: true,
-      default: MathSVG
-    },
+      default: MathSVG,
+    }),
     topic: String,
     buttonText: {
       type: String,
-      default: 'Subject'
+      default: 'Subject',
     },
     routeTo: String,
     disableSubjectCard: {
       type: Boolean,
-      default: false
+      default: false,
     },
     showArrow: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   computed: {
     ...mapState({
-      latestSession: state => state.user.latestSession,
-      isMobileApp: state => state.app.isMobileApp,
-      user: state => state.user.user
+      latestSession: (state) => state.user.latestSession,
+      isMobileApp: (state) => state.app.isMobileApp,
+      user: (state) => state.user.user,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
-      isSessionAlive: 'user/isSessionAlive'
+      isSessionAlive: 'user/isSessionAlive',
     }),
 
     disabled() {
       return this.disableSubjectCard
-    }
-  }
+    },
+  },
 }
 </script>
 
