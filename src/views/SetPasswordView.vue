@@ -145,22 +145,22 @@ export default {
 
 <style lang="scss" scoped>
 .uc-form {
-  position: relative
+  position: relative;
 }
 
 .uc-form-header {
-  font-size: 24px
-  font-weight: bold
-  justify-content: center
+  font-size: 24px;
+  font-weight: bold;
+  justify-content: center;
 
   &-link--success {
-    color: $c-success-green
+    color: $c-success-green;
   }
 }
 
 .success-message {
-  @include flex-container(column, center, center)
-  margin: auto 0
-  padding: 50px
+  @include flex-container(column, center, center);
+  margin: auto 0;
+  padding: 50px;
 }
 </style>

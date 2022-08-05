@@ -443,61 +443,61 @@ export default {
 
 <style lang="scss" scoped>
 .body-container {
-  max-width: 1200px
-  width: 100%
-  border-radius: 8px
-  background: #fff
-  padding: 40px 15px 80px
+  max-width: 1200px;
+  width: 100%;
+  border-radius: 8px;
+  background: #fff;
+  padding: 40px 15px 80px;
 
   @include breakpoint-above('large') {
-    padding: 40px 40px 80px
+    padding: 40px 40px 80px;
   }
 
   .body-header {
-    font-size: 24px
-    font-weight: 500
-    text-align: left
-    margin: 0 0 20px 0
+    font-size: 24px;
+    font-weight: 500;
+    text-align: left;
+    margin: 0 0 20px 0;
   }
 }
 
 .training-view {
-  padding: 10px
+  padding: 10px;
 
   @include breakpoint-above('large') {
-    padding: 40px
+    padding: 40px;
   }
 }
 
 a {
-  color: inherit
-  text-decoration: none
-  cursor: pointer
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .instructions {
-  text-align: left
-  font-size: 16px
-  color: $c-secondary-grey
+  text-align: left;
+  font-size: 16px;
+  color: $c-secondary-grey;
 }
 
 .subject-types {
-  @include flex-container(row, space-around, center)
-  margin-top: 2em
+  @include flex-container(row, space-around, center);
+  margin-top: 2em;
 
   &__header-type {
-    flex-basis: 100%
-    padding-bottom: 0.8em
-    font-size: 16px
-    border-bottom: 4px solid transparent
+    flex-basis: 100%;
+    padding-bottom: 0.8em;
+    font-size: 16px;
+    border-bottom: 4px solid transparent;
 
     &:hover {
-      cursor: pointer
+      cursor: pointer;
     }
   }
 }
 
 .is-selected {
-  border-bottom: 4px solid $c-success-green
+  border-bottom: 4px solid $c-success-green;
 }
 </style>

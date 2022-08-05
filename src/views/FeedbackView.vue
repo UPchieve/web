@@ -442,78 +442,78 @@ export default {
 //        All styles here are namespaced under "feedback" to avoid
 //        collision/overrides with any global styling
 .feedback {
-  min-height: 100%
-  width: 100%
-  position: relative
-  vertical-align: middle
-  text-align: center
-  padding: 4em 0
-  background-color: $c-background-grey
+  min-height: 100%;
+  width: 100%;
+  position: relative;
+  vertical-align: middle;
+  text-align: center;
+  padding: 4em 0;
+  background-color: $c-background-grey;
 
   &__container {
-    width: 90%
-    margin: auto
-    background-color: white
-    padding: 2.8em
-    border-radius: 5px
-    text-align: left
+    width: 90%;
+    margin: auto;
+    background-color: white;
+    padding: 2.8em;
+    border-radius: 5px;
+    text-align: left;
 
     @include breakpoint-above('medium') {
-      max-width: 800px
+      max-width: 800px;
     }
   }
 
   &__header-container {
-    margin-bottom: 3em
+    margin-bottom: 3em;
   }
 
   &__header {
-    @include font-category('display-small')
+    @include font-category('display-small');
   }
   &__subheader {
-    font-size: 22px
-    color: $c-secondary-grey
-    margin: 0
+    font-size: 22px;
+    color: $c-secondary-grey;
+    margin: 0;
   }
 
   &__questions-list {
-    list-style-type: none
-    padding-inline-start: 0
+    list-style-type: none;
+    padding-inline-start: 0;
   }
 
   &__questions-item {
-    margin-bottom: 3em
+    margin-bottom: 3em;
   }
 
   &__question {
-    text-align: left
-    @include font-category('heading')
+    text-align: left;
+    @include font-category('heading');
 
     &-number {
-      margin-right: 5px
+      margin-right: 5px;
     }
   }
   &__subtext {
-    text-align: left
-    @include font-category('helper-text')
-    color: $c-secondary-grey
+    text-align: left;
+    @include font-category('helper-text');
+    color: $c-secondary-grey;
   }
 
   &__submit-button {
-    margin: 0 auto
+    margin: 0 auto;
   }
 
   &__dashboard-button {
-    margin: 1em 0
+    margin: 1em 0;
   }
 
   &__session-goal {
-    font-weight: 600
-    color: $c-success-green
+    font-weight: 600;
+    color: $c-success-green;
   }
 
   &__error {
-    color: $c-error-red
+    color: $c-error-red;
   }
 }
 </style>

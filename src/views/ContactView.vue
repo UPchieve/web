@@ -192,97 +192,97 @@ export default {
 
 <style lang="scss" scoped>
 .contact-wrapper {
-  padding: 40px 20px
+  padding: 40px 20px;
 
   @include breakpoint-above('large') {
-    padding: 40px
+    padding: 40px;
   }
 
   &--noAuth {
-    @include flex-container(row, center, center)
+    @include flex-container(row, center, center);
     background: url('~@/assets/onboarding_background.png') no-repeat center
-      fixed
-    background-size: cover
-    min-height: 100vh
+      fixed;
+    background-size: cover;
+    min-height: 100vh;
   }
 }
 
 .contact {
-  @include flex-container(column, space-between, flex-start)
-  max-width: 800px
-  padding: 40px 20px
-  border-radius: 8px
-  background: #fff
+  @include flex-container(column, space-between, flex-start);
+  max-width: 800px;
+  padding: 40px 20px;
+  border-radius: 8px;
+  background: #fff;
 
   @include breakpoint-above('large') {
-    padding: 40px 40px 60px
+    padding: 40px 40px 60px;
   }
 
   &__header {
-    color: $c-soft-black
-    font-size: 24px
-    font-weight: 500
+    color: $c-soft-black;
+    font-size: 24px;
+    font-weight: 500;
   }
 
   &__description {
-    max-width: 500px
-    text-align: left
-    margin: 10px 0 35px
-    color: $c-secondary-grey
-    font-size: 14px
+    max-width: 500px;
+    text-align: left;
+    margin: 10px 0 35px;
+    color: $c-secondary-grey;
+    font-size: 14px;
   }
 
   &__form {
-    align-self: stretch
+    align-self: stretch;
   }
 
   &--noAuth {
-    border-radius: 0
-    margin-left: auto
-    margin-right: auto
-    flex-basis: 500px
+    border-radius: 0;
+    margin-left: auto;
+    margin-right: auto;
+    flex-basis: 500px;
   }
 }
 
 .contact-form {
-  @include child-spacing(top, 30px)
-  max-width: 500px
+  @include child-spacing(top, 30px);
+  max-width: 500px;
 
   &__section {
-    @include flex-container(column, space-between, stretch)
+    @include flex-container(column, space-between, stretch);
   }
 
   &__label {
-    font-size: 16px
-    font-weight: 600
-    align-self: flex-start
-    margin-bottom: 10px
+    font-size: 16px;
+    font-weight: 600;
+    align-self: flex-start;
+    margin-bottom: 10px;
   }
 
   &__text,
   &__textarea {
-    border: solid 1px $c-border-grey
-    border-radius: 4px
-    font-size: 16px
-    padding: 10px 15px
+    border: solid 1px $c-border-grey;
+    border-radius: 4px;
+    font-size: 16px;
+    padding: 10px 15px;
 
     &:focus {
-      outline: none
+      outline: none;
     }
   }
 
   &__textarea {
-    resize: none
+    resize: none;
   }
 
   &__select {
-    font-size: 16px
+    font-size: 16px;
   }
 }
 
 .errors {
-  color: #bf0000
-  font-size: 14px
-  text-align: center
+  color: #bf0000;
+  font-size: 14px;
+  text-align: center;
 }
 </style>

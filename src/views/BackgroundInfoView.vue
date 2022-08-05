@@ -477,14 +477,14 @@ input:invalid {
 }
 
 ol {
-  padding-inline-start: 30px
+  padding-inline-start: 30px;
   @include breakpoint-above('medium') {
     padding-inline-start: 40px
   }
 }
 
 .uc-form-checkbox {
-  margin-bottom: 0.6em
+  margin-bottom: 0.6em;
 
   & label {
     @include font-category('body')
@@ -496,7 +496,7 @@ ol {
 }
 
 .uc-form-radio {
-  margin-bottom: 0.6em
+  margin-bottom: 0.6em;
 
   & label {
     margin-left: 15px
@@ -504,21 +504,21 @@ ol {
 }
 
 textarea {
-  width: 100%
+  width: 100%;
   height: 80px
 }
 
 .background-info {
-  @include font-category('body')
+  @include font-category('body');
 
   &__wrapper {
-    max-width: 100%
-    background-color: #fff
-    border-radius: 8px
+    max-width: 100%;
+    background-color: #fff;
+    border-radius: 8px;
 
     @include breakpoint-above('medium') {
-      padding: 40px
-      max-width: 90%
+      padding: 40px;
+      max-width: 90%;
       margin: 15px 15px 55px 40px
     }
 
@@ -528,11 +528,11 @@ textarea {
   }
 
   &__header {
-    margin: 0
-    text-align: left
-    font-weight: 500
-    padding: 40px 20px 20px 20px
-    @include font-category('display-small')
+    margin: 0;
+    text-align: left;
+    font-weight: 500;
+    padding: 40px 20px 20px 20px;
+    @include font-category('display-small');
 
     @include breakpoint-above('medium') {
       padding: 20px
@@ -544,18 +544,18 @@ textarea {
   }
 
   &__form {
-    border-radius: 8px
-    padding: 20px
-    text-align: left
-    max-width: 95%
+    border-radius: 8px;
+    padding: 20px;
+    text-align: left;
+    max-width: 95%;
 
     @include breakpoint-above('large') {
-      max-width: 80%
+      max-width: 80%;
     }
   }
 
   &__question-description {
-    @include font-category('helper-text')
+    @include font-category('helper-text');
     margin-top: 10px;
     color: $c-secondary-grey;
   }

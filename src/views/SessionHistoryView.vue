@@ -277,94 +277,94 @@ export default {
 
 <style lang="scss" scoped>
 a {
-  text-decoration: none
+  text-decoration: none;
 }
 
 ul {
-  padding: 0px
-  height: 100%
-  margin: auto
-  list-style-type: none
+  padding: 0px;
+  height: 100%;
+  margin: auto;
+  list-style-type: none;
 }
 
 .header {
-  text-align: left
-  margin-bottom: 2em
+  text-align: left;
+  margin-bottom: 2em;
 
   @include breakpoint-below('small') {
-    margin-bottom: 0
+    margin-bottom: 0;
   }
 }
 
 .title {
-  font-weight: 500
-  font-size: 22px
-  margin-bottom: 1em
+  font-weight: 500;
+  font-size: 22px;
+  margin-bottom: 1em;
 
   @include breakpoint-below('small') {
-    margin: 1em
-    font-size: 18px
+    margin: 1em;
+    font-size: 18px;
   }
 
   &-no-sessions {
-    margin-top: 3em
+    margin-top: 3em;
   }
 }
 
 .subtitle {
-  @include font-category('heading')
-  color: $c-secondary-grey
+  @include font-category('heading');
+  color: $c-secondary-grey;
 
   &-no-sessions {
-    font-size: 16px
+    font-size: 16px;
   }
 }
 
 .session-history {
-  padding: 53px
+  padding: 53px;
 
   @include breakpoint-below('large') {
-    padding: 1em
+    padding: 1em;
   }
 
   @include breakpoint-below('small') {
-    padding: 0
+    padding: 0;
   }
 }
 
 .container {
-  padding: 0
-  margin: 0
-  background-color: white
-  border: 1px solid $c-border-grey
-  border-radius: 8px 8px 16px 16px
-  min-width: 100%
+  padding: 0;
+  margin: 0;
+  background-color: white;
+  border: 1px solid $c-border-grey;
+  border-radius: 8px 8px 16px 16px;
+  min-width: 100%;
 }
 
 .spacing--grid {
-  display: grid
+  display: grid;
   @include breakpoint-above('small') {
-    grid-template-columns: 1fr 1fr 1fr 1fr
+    grid-template-columns: 1fr 1fr 1fr 1fr;
   }
 }
 
 .session-list {
-  padding: 0 2em
-  min-height: 600px
+  padding: 0 2em;
+  min-height: 600px;
 
   @include breakpoint-below('large') {
-    padding-right: 1.5em
+    padding-right: 1.5em;
   }
 
   &__headers {
-    @include font-category('subheading')
-    background-color: $c-background-blue
-    width: 100%
-    padding: 1em 2em
+    @include font-category('subheading');
+    background-color: $c-background-blue;
+    width: 100%;
+    padding: 1em 2em;
   }
 
   &__coach-name {
-    @include font-category('subheading')
+    @include font-category('subheading');
     margin: 0.8em;
     @include breakpoint-below('large') {
       font-size: 14px;

@@ -164,14 +164,14 @@ export default {
 
 <style lang="scss" scoped>
 ul {
-  padding: 0px
-  height: 100%
-  margin: auto
+  padding: 0px;
+  height: 100%;
+  margin: auto;
   list-style-type: none
 }
 
 .header {
-  text-align: left
+  text-align: left;
   margin-bottom: 2em
 }
 
@@ -180,19 +180,19 @@ ul {
 }
 
 .title {
-  font-weight: 500
-  font-size: 22px
-  margin-bottom: 1em
+  font-weight: 500;
+  font-size: 22px;
+  margin-bottom: 1em;
 }
 
 .subtitle {
-  @include font-category('heading')
+  @include font-category('heading');
   color: $c-secondary-grey
 }
 
 .container {
-  padding: 1.5em
-  margin: 0
+  padding: 1.5em;
+  margin: 0;
 
   @include breakpoint-above('large') {
     padding: 2.5em
@@ -200,74 +200,74 @@ ul {
 }
 
 .coach-list {
-  min-height: 600px
-  padding: 0 2em
+  min-height: 600px;
+  padding: 0 2em;
 
   &__headers {
-    background-color: $c-background-blue
-    padding: 1em 2em
-    border-radius: 8px 8px 0px 0px
+    background-color: $c-background-blue;
+    padding: 1em 2em;
+    border-radius: 8px 8px 0px 0px;
     font-weight: 500
   }
 
   &__coach {
-    padding: 2.4em 0
+    padding: 2.4em 0;
 
     &-name {
-      font-weight: 500
-      text-align: left
+      font-weight: 500;
+      text-align: left;
 
       @include breakpoint-above('medium') {
-        width: 100px
+        width: 100px;
       }
     }
 
     &-name-container {
-      @include flex-container(row, center, center)
+      @include flex-container(row, center, center);
 
       @include breakpoint-above('medium') {
-        flex-direction: row
+        flex-direction: row;
       }
     }
 
     &-name-session {
-      @include flex-container(column)
-      text-align: left
+      @include flex-container(column);
+      text-align: left;
       margin-left: 1em
     }
   }
 }
 
 .favorite-coaches {
-  background-color: $upchieve-white
-  border-radius: 8px
+  background-color: $upchieve-white;
+  border-radius: 8px;
   border: 1px solid $c-background-blue
 
   &__no-coaches {
-    @include flex-container(column, normal, center)
-    margin: 4em 2em 2em
+    @include flex-container(column, normal, center);
+    margin: 4em 2em 2em;
     min-height: 60vh
 
     &-description {
-      max-width: 600px
-      margin-top: 1em
-      color: $c-secondary-grey
+      max-width: 600px;
+      margin-top: 1em;
+      color: $c-secondary-grey;
     }
   }
 }
 
 .spacing--grid {
-  @include flex-container(row, space-around, center)
-  display: grid
-  grid-template-columns: 1fr 1fr
+  @include flex-container(row, space-around, center);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   @include breakpoint-above('medium') {
     grid-template-columns: 1fr 1fr 1fr
   }
 }
 
 .page-actions {
-  @include flex-container(row, space-around)
-  padding: 1em 0
+  @include flex-container(row, space-around);
+  padding: 1em 0;
 
   @include breakpoint-above('large') {
     justify-content: flex-end
@@ -275,8 +275,8 @@ ul {
 }
 
 .border--thin {
-  width: 95%
-  border-bottom: 2px solid $c-background-grey
+  width: 95%;
+  border-bottom: 2px solid $c-background-grey;
   margin: 0 auto
 }
 
@@ -285,7 +285,7 @@ ul {
 }
 
 .page-numbers {
-  display: flex
+  display: flex;
   justify-content: flex-end;
   align-items: center;
 }

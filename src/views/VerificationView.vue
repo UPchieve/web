@@ -313,77 +313,77 @@ export default {
 
 <style lang="scss" scoped>
 .title {
-  @include font-category('display-small')
+  @include font-category('display-small');
 }
 
 .subtitle {
-  @include font-category('heading')
+  @include font-category('heading');
 }
 
 .verification {
   &__container {
-    @include flex-container(row, flex-start, center)
+    @include flex-container(row, flex-start, center);
   }
 
   &__radio-label {
-    @include flex-container(column, flex-start, flex-start)
-    padding-left: 2em
+    @include flex-container(column, flex-start, flex-start);
+    padding-left: 2em;
   }
 
   &__phone-input {
-    width: 300px
+    width: 300px;
   }
 
   &__label {
-    font-weight: 500
+    font-weight: 500;
   }
 
   .verification-nav__button {
-    text-align: left
-    margin-top: 1em
-    margin-left: 1em
+    text-align: left;
+    margin-top: 1em;
+    margin-left: 1em;
   }
 
   &__back-button {
-    color: #417db1
-    border-radius: 20px
-    padding: 5px 15px
-    cursor: pointer
+    color: #417db1;
+    border-radius: 20px;
+    padding: 5px 15px;
+    cursor: pointer;
 
     &:hover {
-      background: #f7fcfe
+      background: #f7fcfe;
     }
   }
 
   &__send-to {
-    display: block
-    font-weight: 500
+    display: block;
+    font-weight: 500;
   }
 
   &__log-out-button {
-    margin-left: auto
+    margin-left: auto;
     &:hover {
-      text-decoration: underline
+      text-decoration: underline;
     }
   }
   &__field {
-    text-align: left
-    width: 300px
-    border-bottom: 3px solid $c-success-green
-    padding: initial
+    text-align: left;
+    width: 300px;
+    border-bottom: 3px solid $c-success-green;
+    padding: initial;
   }
 }
 
 .uc-form-input--wide {
-  width: 300px
+  width: 300px;
 }
 
 .uc-form-button {
-  text-transform: initial
+  text-transform: initial;
 }
 
 .error {
-  color: $c-error-red
-  margin-bottom: 0
+  color: $c-error-red;
+  margin-bottom: 0;
 }
 </style>

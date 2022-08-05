@@ -600,44 +600,44 @@ export default {
 
 <style lang="scss" scoped>
 .uc-form-body {
-  @include child-spacing(top, 25px)
+  @include child-spacing(top, 25px);
 }
 
 .step-header {
-  text-align: left
+  text-align: left;
 
   &__title {
-    font-size: 18px
-    font-weight: bold
+    font-size: 18px;
+    font-weight: bold;
   }
 
   &__subtitle {
-    font-size: 14px
-    color: $c-secondary-grey
+    font-size: 14px;
+    color: $c-secondary-grey;
   }
 
   a {
-    color: $c-information-blue
+    color: $c-information-blue;
   }
 }
 
 .step-errors {
-  color: #bf0000
-  font-size: 14px
-  text-align: left
+  color: #bf0000;
+  font-size: 14px;
+  text-align: left;
 }
 
 .school-search {
-  position: relative
-  margin-bottom: 30px
+  position: relative;
+  margin-bottom: 30px;
 
   &__no-results {
-    position: absolute
-    left: 0
-    top: 100%
-    width: 100%
-    padding: 10px 12px
-    border: solid 1px #ccc
+    position: absolute;
+    left: 0;
+    top: 100%;
+    width: 100%;
+    padding: 10px 12px;
+    border: solid 1px #ccc;
     border-top: none;
     border-radius: 5px;
     border-top-left-radius: 0;

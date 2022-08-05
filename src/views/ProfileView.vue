@@ -369,152 +369,152 @@ export default {
 
 <style lang="scss" scoped>
 .profile {
-  font-size: 16px
-  font-family: $font-family-default
+  font-size: 16px;
+  font-family: $font-family-default;
 }
 
 .wrap-container {
-  padding: 15px 15px 55px 15px
-  @include flex-container(column)
-  align-items: stretch
+  padding: 15px 15px 55px 15px;
+  @include flex-container(column);
+  align-items: stretch;
 
-  @include child-spacing(top, 16px)
-  @include child-spacing(right, 0)
+  @include child-spacing(top, 16px);
+  @include child-spacing(right, 0);
 
   @include breakpoint-above('large') {
-    padding: 40px
+    padding: 40px;
 
-    @include child-spacing(top, 0)
-    @include child-spacing(right, 40px)
+    @include child-spacing(top, 0);
+    @include child-spacing(right, 40px);
 
-    @include flex-container(row)
+    @include flex-container(row);
 
     & > * {
-      flex-basis: 50%
+      flex-basis: 50%;
     }
   }
 }
 
 .header {
-  display: flex
-  margin: 0
-  font-size: 24px
-  align-items: center
-  justify-content: space-between
-  font-weight: 500
-  padding: 25px 15px 10px 35px
+  display: flex;
+  margin: 0;
+  font-size: 24px;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 500;
+  padding: 25px 15px 10px 35px;
 
   @include breakpoint-above('large') {
-    padding: 40px 40px 0 40px
+    padding: 40px 40px 0 40px;
   }
 }
 
 .contain {
-  display: flex
-  flex-direction: column
-  border-radius: 8px
-  background: #fff
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  background: #fff;
 }
 
 .container-content {
-  padding: 20px
-  text-align: left
+  padding: 20px;
+  text-align: left;
 
   @include breakpoint-above('large') {
-    padding: 40px
+    padding: 40px;
   }
 }
 
 .subheader {
-  font-weight: 600
-  display: flex
-  justify-content: center
-  align-items: center
-  padding: 30px 15px 0
-  font-size: 20px
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 15px 0;
+  font-size: 20px;
 }
 
 .container-section {
-  display: flex
-  flex-direction: column
-  margin-bottom: 20px
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
 }
 
 ul {
-  padding: 0px
-  height: 100%
-  margin: auto
+  padding: 0px;
+  height: 100%;
+  margin: auto;
 }
 
 .basic-info {
-  display: flex
-  flex-direction: column
-  align-items: left
-  margin-top: 30px
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  margin-top: 30px;
 }
 
 .info-header {
-  display: flex
-  align-items: center
+  display: flex;
+  align-items: center;
 
-  margin-left: 30px
-  font-size: 20px
-  font-weight: 600
+  margin-left: 30px;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .info-header.basic {
-  height: 60px
+  height: 60px;
 }
 
 .info-header.cert {
-  margin-bottom: 15px
+  margin-bottom: 15px;
 }
 
 .answer {
-  font-weight: 600
+  font-weight: 600;
 }
 
 .answer .vue-js-switch {
-  margin: 5px 0
+  margin: 5px 0;
 }
 
 .answer ul {
-  margin-left: 20px
+  margin-left: 20px;
 }
 
 .phone-input {
-  margin: 5px 0 0
+  margin: 5px 0 0;
 }
 
 .description {
-  margin-top: 10px
-  font-size: 12px
+  margin-top: 10px;
+  font-size: 12px;
 }
 
 button {
-  height: 30px
-  border-radius: 20px
-  padding: 0px 10px
-  color: #16d2aa
-  background-color: #f6f6f6
+  height: 30px;
+  border-radius: 20px;
+  padding: 0px 10px;
+  color: #16d2aa;
+  background-color: #f6f6f6;
 }
 
 button:active,
 button:hover {
-  background-color: #16d2aa
-  color: #fff
+  background-color: #16d2aa;
+  color: #fff;
 }
 
 .editBtn {
-  background-color: #16d2aa
-  border-radius: 30px
-  width: 120px
-  align-items: center
-  height: 40px
-  justify-content: center
-  font-size: 16px
-  font-weight: 600
-  color: white
+  background-color: #16d2aa;
+  border-radius: 30px;
+  width: 120px;
+  align-items: center;
+  height: 40px;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
 
   &:hover {
     color: #2c3e50;

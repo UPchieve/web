@@ -94,121 +94,121 @@ export default {
 h1,
 h2,
 p {
-  margin: 0
-  padding: 0
+  margin: 0;
+  padding: 0;
 }
 
 p {
-  @include font-category('body')
+  @include font-category('body');
 }
 
 .refer-friends {
-  border-radius: 8px
-  background-color: #fff
-  padding: 1.8em 3em 3em
-  margin: 1em
-  text-align: left
+  border-radius: 8px;
+  background-color: #fff;
+  padding: 1.8em 3em 3em;
+  margin: 1em;
+  text-align: left;
 
   @include breakpoint-above('medium') {
-    max-width: 1000px
-    margin: 3em 3em 0 3em
+    max-width: 1000px;
+    margin: 3em 3em 0 3em;
   }
 
   &__title {
-    @include font-category('display-small')
+    @include font-category('display-small');
     @include breakpoint-above('medium') {
-      margin-top: 24px
+      margin-top: 24px;
     }
     color: initial
   }
 
   &__instructions {
-    @include font-category('heading')
-    font-weight: 700
+    @include font-category('heading');
+    font-weight: 700;
   }
 
   &__subtitle {
-    @include font-category('body')
-    margin-bottom: 2em
-    margin-top: 1em
+    @include font-category('body');
+    margin-bottom: 2em;
+    margin-top: 1em;
   }
 
   &__text--strong {
-    font-weight: 600
+    font-weight: 600;
   }
 
   &__text--rewards {
-    font-weight: 700
+    font-weight: 700;
   }
 
   &__survey-link {
-    color: $c-success-green
-    text-decoration: underline
+    color: $c-success-green;
+    text-decoration: underline;
   }
 
   &__step {
-    margin-top: 2.2em
+    margin-top: 2.2em;
   }
 
   &__note {
-    font-style: italic
+    font-style: italic;
   }
 
   &__money-bag {
-    @include font-category('display-small')
+    @include font-category('display-small');
   }
 
   &__progress {
-    margin: 2em 0
-    @include flex-container(column)
+    margin: 2em 0;
+    @include flex-container(column);
 
     @include breakpoint-above('medium') {
-      @include flex-container(row, flex-start, center)
+      @include flex-container(row, flex-start, center);
     }
 
     &-title {
       @include breakpoint-above('medium') {
-        margin-left: 4em
+        margin-left: 4em;
       }
 
-      font-weight: 600
+      font-weight: 600;
     }
 
     &-bar {
-      width: 50%
-      border: none
-      border-radius: 10rem
-      height: 20px
-      grid-column-start: span 3
-      position: relative
-      background-color: $c-background-grey
-      margin: 1em 0
+      width: 50%;
+      border: none;
+      border-radius: 10rem;
+      height: 20px;
+      grid-column-start: span 3;
+      position: relative;
+      background-color: $c-background-grey;
+      margin: 1em 0;
 
       @include breakpoint-above('small') {
-        width: 30%
+        width: 30%;
       }
 
       @include breakpoint-above('medium') {
-        width: 20%
-        margin: 0 2em
+        width: 20%;
+        margin: 0 2em;
       }
 
       &--bg {
-        width: 40%
-        background-color: $c-success-green
-        height: 100%
-        border-radius: 10rem
+        width: 40%;
+        background-color: $c-success-green;
+        height: 100%;
+        border-radius: 10rem;
       }
 
       &--number {
-        color: white
+        color: white;
       }
 
       &--number-center {
-        position: absolute
-        left: 0
-        right: 0
-        color: $c-soft-black
+        position: absolute;
+        left: 0;
+        right: 0;
+        color: $c-soft-black;
       }
     }
   }

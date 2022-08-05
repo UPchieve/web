@@ -203,85 +203,85 @@ export default {
 
 <style lang="scss" scoped>
 .wrapper {
-  padding: 40px 40px 80px
-  margin: 40px 40px 80px
-  background: #fff
-  border-radius: 8px
-  max-width: 800px
+  padding: 40px 40px 80px;
+  margin: 40px 40px 80px;
+  background: #fff;
+  border-radius: 8px;
+  max-width: 800px;
 }
 
 .header-title {
-  text-transform: capitalize
-  text-align: left
-  font-size: 24px
-  font-weight: 500
-  text-align: left
-  margin: 0 0 35px 0
+  text-transform: capitalize;
+  text-align: left;
+  font-size: 24px;
+  font-weight: 500;
+  text-align: left;
+  margin: 0 0 35px 0;
 }
 
 .review-materials {
-  display: flex
-  flex-flow: row wrap
-  padding-left: 0
+  display: flex;
+  flex-flow: row wrap;
+  padding-left: 0;
 
   &__link {
-    margin-right: 2em
-    display: block
-    margin-bottom: 1em
-    width: 40%
+    margin-right: 2em;
+    display: block;
+    margin-bottom: 1em;
+    width: 40%;
   }
 
   &__content {
-    display: flex
-    flex-direction: column
-    align-items: center
-    background-color: white
-    border-radius: 5px
-    border: 1px solid gray
-    position: relative
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid gray;
+    position: relative;
 
     &:hover .image-overlay {
-      opacity: 0.6
+      opacity: 0.6;
     }
   }
 
   &__title {
-    padding: 1em 0
+    padding: 1em 0;
   }
 
   &__image {
-    width: 100%
-    border-top-left-radius: 5px
-    border-top-right-radius: 5px
-    display: block
+    width: 100%;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    display: block;
   }
 }
 
 .image-overlay {
-  width: 100%
-  position: absolute
-  z-index: 5
-  opacity: 0
-  left: 0
-  top: 0
-  height: inherit
+  width: 100%;
+  position: absolute;
+  z-index: 5;
+  opacity: 0;
+  left: 0;
+  top: 0;
+  height: inherit;
   background-image: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 0.4) 0%,
     rgba(0, 0, 0, 0) 100%
-  )
-  height: 160px
+  );
+  height: 160px;
 }
 
 .error-message {
-  font-size: 16px
+  font-size: 16px;
 }
 
 @media screen and (max-width: 760px) {
   .review-materials {
     &__link {
-      width: 100%
-      margin-right: 0
+      width: 100%;
+      margin-right: 0;
     }
   }
 }

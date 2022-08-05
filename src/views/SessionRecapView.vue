@@ -195,121 +195,121 @@ export default {
 
 <style lang="scss" scoped>
 .chat-card-editor-container {
-  @include flex-container(column)
-  flex-basis: 60%
+  @include flex-container(column);
+  flex-basis: 60%;
 }
 
 .card-title {
-  @include font-category('display-small')
-  text-align: left
-  border-bottom: 2px solid $c-background-grey
-  padding-bottom: 0.5em
+  @include font-category('display-small');
+  text-align: left;
+  border-bottom: 2px solid $c-background-grey;
+  padding-bottom: 0.5em;
 }
 
 .session-recap-page {
-  padding: 35px
-  height: 100%
-  max-width: 1200px
+  padding: 35px;
+  height: 100%;
+  max-width: 1200px;
 
   @include breakpoint-above('large') {
-    display: flex
-    flex-flow: row wrap
-    height: 1300px
+    display: flex;
+    flex-flow: row wrap;
+    height: 1300px;
   }
 }
 
 .recap-card {
-  background-color: $upchieve-white
-  border-radius: 8px 8px 16px 16px
-  padding: 22px
-  margin-right: 1.8em
-  margin-bottom: 1.8em
+  background-color: $upchieve-white;
+  border-radius: 8px 8px 16px 16px;
+  padding: 22px;
+  margin-right: 1.8em;
+  margin-bottom: 1.8em;
 
   @include breakpoint-below('large') {
-    margin-right: 0
+    margin-right: 0;
   }
 }
 
 .spacing--grid {
-  display: grid
-  grid-template-columns: 1fr 2fr
+  display: grid;
+  grid-template-columns: 1fr 2fr;
 }
 
 .card-detail {
-  @include font-category('heading')
-  text-align: left
-  margin: 1em 0.5em 0.5em 0.5em
+  @include font-category('heading');
+  text-align: left;
+  margin: 1em 0.5em 0.5em 0.5em;
 
   &__title {
-    font-size: 18px
-    font-weight: 500
-    text-align: left
-    margin: 1em 0.5em 0.5em 0.5em
+    font-size: 18px;
+    font-weight: 500;
+    text-align: left;
+    margin: 1em 0.5em 0.5em 0.5em;
   }
 
   &__sub-container {
-    @include flex-container(row, normal, center)
-    margin: 0
+    @include flex-container(row, normal, center);
+    margin: 0;
   }
 }
 
 .chat {
-  margin-bottom: 1.8em
-  flex-basis: 40%
+  margin-bottom: 1.8em;
+  flex-basis: 40%;
 }
 
 .document {
-  @include flex-container(column)
-  margin-right: 1.8em
-  margin-bottom: 1.8em
-  font-size: 20px
-  height: 500px
-  overflow-y: auto
-  background-color: $upchieve-white
-  padding: 22px
-  border-radius: 8px 8px 16px 16px
+  @include flex-container(column);
+  margin-right: 1.8em;
+  margin-bottom: 1.8em;
+  font-size: 20px;
+  height: 500px;
+  overflow-y: auto;
+  background-color: $upchieve-white;
+  padding: 22px;
+  border-radius: 8px 8px 16px 16px;
 
   &__title {
-    @include font-category('display-small')
-    border-bottom: 2px solid $c-background-grey
-    text-align: left
-    padding-bottom: 0.5em
+    @include font-category('display-small');
+    border-bottom: 2px solid $c-background-grey;
+    text-align: left;
+    padding-bottom: 0.5em;
   }
 
   @include breakpoint-below('large') {
-    margin-right: 0
+    margin-right: 0;
   }
 
   &__container {
-    overflow-y: auto
-    height: 100%
+    overflow-y: auto;
+    height: 100%;
   }
 }
 
 .error {
-  color: $c-error-red
-  margin: 1em 0
+  color: $c-error-red;
+  margin: 1em 0;
 }
 
 .subject-icon {
-  height: 24px
-  width: 24px
+  height: 24px;
+  width: 24px;
 }
 
 .heart {
-  width: 18.46px
-  height: 17.14px
-  padding-left: 4px
+  width: 18.46px;
+  height: 17.14px;
+  padding-left: 4px;
 }
 
 #zwibbler-container {
-  height: 100%
-  width: 100%
+  height: 100%;
+  width: 100%;
 }
 
 .whiteboard-wrapper {
-  height: 100%
-  width: 100%
-  position: relative
+  height: 100%;
+  width: 100%;
+  position: relative;
 }
 </style>

@@ -55,16 +55,16 @@ export default {
 
 <style lang="scss" scoped>
 .deactivate-account-modal {
-  @include flex-container(column)
+  @include flex-container(column);
 
   &__title {
     @include font-category('display-small')
   }
 
   &__message {
-    @include font-category('body')
-    margin: 0 0 35px
-    color: $c-secondary-grey
+    @include font-category('body');
+    margin: 0 0 35px;
+    color: $c-secondary-grey;
     font-size: 15px
   }
 
@@ -73,17 +73,17 @@ export default {
   }
 
   &__buttons {
-    margin-top: 16px
-    @include flex-container(row, flex-end)
-    @include child-spacing(left, 16px)
+    margin-top: 16px;
+    @include flex-container(row, flex-end);
+    @include child-spacing(left, 16px);
   }
 
   &__reset-btn {
-    background-color: $c-error-red
-    color: white
+    background-color: $c-error-red;
+    color: white;
 
     &:hover {
-      background: lighten($color: $c-error-red, $amount: 5%)
+      background: lighten($color: $c-error-red, $amount: 5%);
     }
   }
 }

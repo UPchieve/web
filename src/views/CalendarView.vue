@@ -277,7 +277,7 @@ export default {
 
 <style lang="scss" scoped>
 .calendar-container {
-  padding: 10px
+  padding: 10px;
 
   @include breakpoint-above('medium') {
     padding: 40px
@@ -285,11 +285,11 @@ export default {
 }
 
 .calendar {
-  background: #fff
-  border-radius: 8px
-  font-size: 12px
-  color: #343440
-  padding: 20px 15px
+  background: #fff;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #343440;
+  padding: 20px 15px;
 
   @include breakpoint-above('medium') {
     padding: 40px
@@ -297,23 +297,23 @@ export default {
 }
 
 .header {
-  display: flex
+  display: flex;
   flex-direction: column
 }
 
 .header-title {
-  font-size: 24px
+  font-size: 24px;
   font-weight: 500
 }
 
 .save-button {
-  font-size: 16px
-  font-weight: 600
-  padding: 10px 45px
-  border-radius: 30px
-  color: #fff
-  border: none
-  margin-left: auto
+  font-size: 16px;
+  font-weight: 600;
+  padding: 10px 45px;
+  border-radius: 30px;
+  color: #fff;
+  border: none;
+  margin-left: auto;
 
   &:hover {
     color: #000
@@ -337,16 +337,16 @@ export default {
 }
 
 input[type='checkbox'] {
-  position: absolute
-  display: block
-  opacity: 0
-  width: 100px
+  position: absolute;
+  display: block;
+  opacity: 0;
+  width: 100px;
   height: 40px
 }
 
 label {
-  width: 100px
-  height: 40px
+  width: 100px;
+  height: 40px;
   margin: 0
 }
 
@@ -367,39 +367,39 @@ input[type='checkbox']:checked + label {
 }
 
 .instructions {
-  font-size: 16px
-  color: $c-secondary-grey
+  font-size: 16px;
+  color: $c-secondary-grey;
   margin: 15px 0
 }
 
 .save-container {
-  display: flex
-  flex-direction: row
+  display: flex;
+  flex-direction: row;
   align-items: center
 }
 
 .clock-explanation-container {
-  display: flex
-  flex-direction: row
+  display: flex;
+  flex-direction: row;
   align-items: center
 }
 
 .clock-explanation {
-  text-align: left
-  font-size: 14px
+  text-align: left;
+  font-size: 14px;
   margin: 15px 0
 }
 
 .clock-explanation-icon {
-  background: none
-  min-width: 20px
-  min-height: 20px
+  background: none;
+  min-width: 20px;
+  min-height: 20px;
   margin-right: 10px
 }
 
 @media screen and (max-width: #{get-app-sidebar-width("medium") + 960px}) {
   .calendar-container {
-    width: 100%
+    width: 100%;
     @each $key, $value in $app-sidebar-width-map {
       @if map-get($breakpoint-map, $key) {
         @include breakpoint-above($key) {
@@ -407,21 +407,21 @@ input[type='checkbox']:checked + label {
         }
       }
     }
-    position: absolute
+    position: absolute;
     overflow-x: hidden
   }
 
   input[type='checkbox'] {
-    position: relative
-    margin-top: 0
+    position: relative;
+    margin-top: 0;
     margin-bottom: -40px
   }
 }
 
 @media screen and (max-width: get-breakpoint('medium')) {
   .btn {
-    padding-top: 0em !important
-    padding-bottom: 0em !important
+    padding-top: 0em !important;
+    padding-bottom: 0em !important;
   }
 }
 </style>

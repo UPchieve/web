@@ -424,45 +424,45 @@ export default {
 
 <style lang="scss" scoped>
 .uc-form-body {
-  @include child-spacing(top, 25px)
-  position: relative
+  @include child-spacing(top, 25px);
+  position: relative;
 }
 
 .step-header {
-  text-align: left
+  text-align: left;
 
   &__title {
-    font-size: 18px
-    font-weight: bold
+    font-size: 18px;
+    font-weight: bold;
   }
 
   &__subtitle {
-    font-size: 14px
-    color: $c-secondary-grey
+    font-size: 14px;
+    color: $c-secondary-grey;
   }
 
   a {
-    color: $c-information-blue
+    color: $c-information-blue;
   }
 }
 
 .name-fields {
-  @include child-spacing(right, 15px)
+  @include child-spacing(right, 15px);
 
   input {
-    box-sizing: border-box
-    width: 100%
-    height: 45px
+    box-sizing: border-box;
+    width: 100%;
+    height: 45px;
   }
 }
 
 .phone-input {
-  margin: 10px 0 2px
+  margin: 10px 0 2px;
 }
 
 .step-errors {
-  color: #bf0000
-  font-size: 14px
+  color: #bf0000;
+  font-size: 14px;
   text-align: left;
 }
 

@@ -106,7 +106,9 @@ export default {
 }
 
 .link-container {
-  @include flex-container(row, space-evenly) min-width: 150px &--end {
+  @include flex-container(row, space-evenly);
+  min-width: 150px;
+  &--end {
     justify-content: flex-end;
   }
 }

@@ -11,7 +11,11 @@
     "html-validate": "html-validate --ext html,vue src",
     "storybook": "start-storybook -p 6006",
     "storybook:snapshot": "npm run test -- -u",
-    "test": "vue-cli-service test:unit"
+    "test": "vue-cli-service test:unit",
+    "build:production": "",
+    "build:staging": "",
+    "build:demo": "",
+    "build:hackers": ""
   },
   "dependencies": {
     "@sentry/browser": "^5.30.0",
