@@ -10,7 +10,7 @@ variables:
   NEW_RELIC_ENABLED: "false"
   NEW_RELIC_NO_CONFIG_FILE: "true"
 
-build:
+build_production:
   stage: build
   image: "docker:20.10.6"
   cache: {}
@@ -20,6 +20,8 @@ build:
     DOCKER_TLS_CERTDIR: ""
   services:
     - docker:20.10.6-dind
+  only:
+    - main
   script:
     - |
       if [[ -z "$CI_COMMIT_TAG" ]]; then
@@ -34,12 +36,20 @@ build:
     - export image_latest="$CI_APPLICATION_REPOSITORY:latest"
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - apk add --update curl tar
+    # install buildpacks tool
     - (curl -sSL "https://github.com/buildpacks/pack/releases/download/v0.26.0/pack-v0.26.0-linux.tgz" | tar -C /usr/local/bin/ --no-same-owner -xzv pack)
+    # install and configure doppler cli
+    - wget -q -t3 'https://packages.doppler.com/public/cli/rsa.8004D9FF50437357.key' -O /etc/apk/keys/cli@doppler-8004D9FF50437357.rsa.pub
+    - echo 'https://packages.doppler.com/public/cli/alpine/any-version/main' | tee -a /etc/apk/repositories
+    - apk add doppler
+    - echo "$DOPPLER_TOKEN_PRODUCTION" | doppler configure set token --scope
+    # build
     - |
-      pack build "$image_tagged" \
+      doppler run --mount .env -- \
+      pack build "$image_tagged-production" \
+        --env-file ./.env \
         --creation-time now \
         --builder heroku/buildpacks:20 \
-        --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
         --buildpack heroku/nodejs \
         --buildpack heroku/procfile@0.6.2 \
         --publish
