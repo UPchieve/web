@@ -52,7 +52,7 @@ build_production:
         --buildpack heroku/procfile@0.6.2 \
         --publish
   rules:
-    - if: '$CI_COMMIT_BRANCH = "main"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
 
 test:
   stage: test
