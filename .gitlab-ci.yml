@@ -1,7 +1,7 @@
-#cache:
-#  key: ${CI_COMMIT_REF_SLUG}
-#  paths:
-#    - .npm
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .npm
 
 variables:
   AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED: "true"
