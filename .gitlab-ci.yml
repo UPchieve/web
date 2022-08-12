@@ -20,8 +20,6 @@ build_production:
     DOCKER_TLS_CERTDIR: ""
   services:
     - docker:20.10.6-dind
-  only:
-    - main
   script:
     - |
       if [[ -z "$CI_COMMIT_TAG" ]]; then
@@ -54,7 +52,7 @@ build_production:
         --buildpack heroku/procfile@0.6.2 \
         --publish
   rules:
-    - if: '$CI_COMMIT_TAG || $CI_COMMIT_BRANCH'
+    - if: '$CI_COMMIT_BRANCH = "main"'
 
 test:
   stage: test
