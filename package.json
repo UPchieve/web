@@ -5,17 +5,14 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "start": "node server.js",
     "lint": "vue-cli-service lint",
     "lint:dry": "vue-cli-service lint --no-fix",
     "build-storybook": "build-storybook",
     "html-validate": "html-validate --ext html,vue src",
     "storybook": "start-storybook -p 6006",
     "storybook:snapshot": "npm run test -- -u",
-    "test": "vue-cli-service test:unit",
-    "build:production": "",
-    "build:staging": "",
-    "build:demo": "",
-    "build:hackers": ""
+    "test": "vue-cli-service test:unit"
   },
   "dependencies": {
     "@sentry/browser": "^5.30.0",
