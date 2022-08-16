@@ -59,7 +59,7 @@ build_production:
 
 test:
   stage: test
-  image: node:16.17.0-bullseye
+  image: node:16.16.0-bullseye
   tags:
     - upchieve
   before_script:
@@ -74,7 +74,7 @@ test:
 
 lint:
   stage: test
-  image: node:16.17.0-bullseye
+  image: node:16.16.0-bullseye
   tags:
     - upchieve
   before_script:
@@ -89,7 +89,7 @@ lint:
 
 html_validate:
   stage: test
-  image: node:16.17.0-bullseye
+  image: node:16.16.0-bullseye
   tags:
     - upchieve
   before_script:
