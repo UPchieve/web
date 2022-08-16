@@ -45,20 +45,21 @@ build_production:
     - echo "$DOPPLER_TOKEN_PRODUCTION" | doppler configure set token
     # build
     - |
-      doppler run --mount .doppler_env -- \
-      pack build "$image_tagged-production" \
-        --env-file ./.doppler_env \
-        --creation-time now \
-        --builder heroku/buildpacks:20 \
-        --buildpack heroku/nodejs \
-        --buildpack heroku/procfile@0.6.2 \
-        --publish
+      doppler run --mount .doppler_env \
+        --mount-template .doppler_env.tmpl -- \
+        pack build "$image_tagged"-production \
+          --env-file .doppler_env \
+          --creation-time now \
+          --builder heroku/buildpacks:20 \
+          --buildpack heroku/nodejs \
+          --buildpack heroku/procfile@0.6.2 \
+          --publish
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
 
 test:
   stage: test
-  image: node:16.16.0-bullseye
+  image: node:16.17.0-bullseye
   tags:
     - upchieve
   before_script:
@@ -73,7 +74,7 @@ test:
 
 lint:
   stage: test
-  image: node:16.8.0-bullseye
+  image: node:16.17.0-bullseye
   tags:
     - upchieve
   before_script:
@@ -88,7 +89,7 @@ lint:
 
 html_validate:
   stage: test
-  image: node:16.8.0-bullseye
+  image: node:16.17.0-bullseye
   tags:
     - upchieve
   before_script:

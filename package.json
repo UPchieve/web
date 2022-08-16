@@ -111,5 +111,9 @@
     "> 1%",
     "last 2 versions",
     "not dead"
-  ]
+  ],
+  "engines": {
+    "node": "~16.16.0",
+    "npm": "~8.11.0"
+  }
 }
