@@ -45,9 +45,9 @@ build_production:
     - echo "$DOPPLER_TOKEN_PRODUCTION" | doppler configure set token
     # build
     - |
-      doppler run --mount .env -- \
+      doppler run --mount .doppler_env -- \
       pack build "$image_tagged-production" \
-        --env-file ./.env \
+        --env-file ./.doppler_env \
         --creation-time now \
         --builder heroku/buildpacks:20 \
         --buildpack heroku/nodejs \
