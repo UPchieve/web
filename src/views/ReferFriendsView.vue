@@ -119,7 +119,7 @@ p {
     @include breakpoint-above('medium') {
       margin-top: 24px;
     }
-    color: initial
+    color: initial;
   }
 
   &__instructions {

@@ -29,7 +29,9 @@ const app = express()
 app.set('trust proxy', true)
 
 let originRegex
-config.nodeEnv === 'dev' ? config.additionalAllowedOrigins = `http://localhost:${config.serverPort}` : config.additionalAllowedOrigins = ''
+config.nodeEnv === 'dev'
+  ? (config.additionalAllowedOrigins = `http://localhost:${config.serverPort}`)
+  : (config.additionalAllowedOrigins = '')
 if (config.additionalAllowedOrigins !== '') {
   originRegex = new RegExp(
     `^(${config.host}|${config.additionalAllowedOrigins})$`
@@ -46,7 +48,7 @@ app.use(
   })
 )
 
-app.get('/healthz', function(req, res) {
+app.get('/healthz', function (req, res) {
   res.status(200).json({ version: config.version })
 })
 

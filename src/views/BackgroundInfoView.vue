@@ -473,13 +473,13 @@ export default {
 
 <style lang="scss" scoped>
 input:invalid {
-  border-bottom: $c-error-red solid 3px
+  border-bottom: $c-error-red solid 3px;
 }
 
 ol {
   padding-inline-start: 30px;
   @include breakpoint-above('medium') {
-    padding-inline-start: 40px
+    padding-inline-start: 40px;
   }
 }
 
@@ -487,25 +487,25 @@ ol {
   margin-bottom: 0.6em;
 
   & label {
-    @include font-category('body')
+    @include font-category('body');
   }
 }
 
 .uc-form-col {
-  margin: 4em 0
+  margin: 4em 0;
 }
 
 .uc-form-radio {
   margin-bottom: 0.6em;
 
   & label {
-    margin-left: 15px
+    margin-left: 15px;
   }
 }
 
 textarea {
   width: 100%;
-  height: 80px
+  height: 80px;
 }
 
 .background-info {
@@ -519,11 +519,11 @@ textarea {
     @include breakpoint-above('medium') {
       padding: 40px;
       max-width: 90%;
-      margin: 15px 15px 55px 40px
+      margin: 15px 15px 55px 40px;
     }
 
     @include breakpoint-above('large') {
-      max-width: 800px
+      max-width: 800px;
     }
   }
 
@@ -535,12 +535,12 @@ textarea {
     @include font-category('display-small');
 
     @include breakpoint-above('medium') {
-      padding: 20px
+      padding: 20px;
     }
   }
 
   &__completed-message {
-    padding: 1em
+    padding: 1em;
   }
 
   &__form {

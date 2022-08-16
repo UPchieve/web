@@ -167,16 +167,16 @@ ul {
   padding: 0px;
   height: 100%;
   margin: auto;
-  list-style-type: none
+  list-style-type: none;
 }
 
 .header {
   text-align: left;
-  margin-bottom: 2em
+  margin-bottom: 2em;
 }
 
 .secondary-header {
-  font-size: 1.4rem
+  font-size: 1.4rem;
 }
 
 .title {
@@ -187,7 +187,7 @@ ul {
 
 .subtitle {
   @include font-category('heading');
-  color: $c-secondary-grey
+  color: $c-secondary-grey;
 }
 
 .container {
@@ -195,7 +195,7 @@ ul {
   margin: 0;
 
   @include breakpoint-above('large') {
-    padding: 2.5em
+    padding: 2.5em;
   }
 }
 
@@ -207,7 +207,7 @@ ul {
     background-color: $c-background-blue;
     padding: 1em 2em;
     border-radius: 8px 8px 0px 0px;
-    font-weight: 500
+    font-weight: 500;
   }
 
   &__coach {
@@ -233,7 +233,7 @@ ul {
     &-name-session {
       @include flex-container(column);
       text-align: left;
-      margin-left: 1em
+      margin-left: 1em;
     }
   }
 }
@@ -241,14 +241,10 @@ ul {
 .favorite-coaches {
   background-color: $upchieve-white;
   border-radius: 8px;
-  border: 1px solid $c-background-blue
-
-  &__no-coaches {
+  border: 1px solid $c-background-blue &__no-coaches {
     @include flex-container(column, normal, center);
     margin: 4em 2em 2em;
-    min-height: 60vh
-
-    &-description {
+    min-height: 60vh &-description {
       max-width: 600px;
       margin-top: 1em;
       color: $c-secondary-grey;
@@ -261,7 +257,7 @@ ul {
   display: grid;
   grid-template-columns: 1fr 1fr;
   @include breakpoint-above('medium') {
-    grid-template-columns: 1fr 1fr 1fr
+    grid-template-columns: 1fr 1fr 1fr;
   }
 }
 
@@ -270,18 +266,18 @@ ul {
   padding: 1em 0;
 
   @include breakpoint-above('large') {
-    justify-content: flex-end
+    justify-content: flex-end;
   }
 }
 
 .border--thin {
   width: 95%;
   border-bottom: 2px solid $c-background-grey;
-  margin: 0 auto
+  margin: 0 auto;
 }
 
 .page-actions-container {
-  padding: 0 2em
+  padding: 0 2em;
 }
 
 .page-numbers {

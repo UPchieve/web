@@ -280,7 +280,7 @@ export default {
   padding: 10px;
 
   @include breakpoint-above('medium') {
-    padding: 40px
+    padding: 40px;
   }
 }
 
@@ -292,18 +292,18 @@ export default {
   padding: 20px 15px;
 
   @include breakpoint-above('medium') {
-    padding: 40px
+    padding: 40px;
   }
 }
 
 .header {
   display: flex;
-  flex-direction: column
+  flex-direction: column;
 }
 
 .header-title {
   font-size: 24px;
-  font-weight: 500
+  font-weight: 500;
 }
 
 .save-button {
@@ -316,23 +316,23 @@ export default {
   margin-left: auto;
 
   &:hover {
-    color: #000
+    color: #000;
   }
 
   &--unsaved {
-    background: $c-success-green
+    background: $c-success-green;
   }
 
   &--saved {
-    background: $c-secondary-grey
+    background: $c-secondary-grey;
   }
 
   &--error {
-    background: $c-error-red !important
+    background: $c-error-red !important;
   }
 
   &--saving {
-    background: $c-disabled-grey
+    background: $c-disabled-grey;
   }
 }
 
@@ -341,60 +341,60 @@ input[type='checkbox'] {
   display: block;
   opacity: 0;
   width: 100px;
-  height: 40px
+  height: 40px;
 }
 
 label {
   width: 100px;
   height: 40px;
-  margin: 0
+  margin: 0;
 }
 
 input[type='checkbox']:checked + label {
-  background-color: rgba(22, 210, 170, 0.5)
+  background-color: rgba(22, 210, 170, 0.5);
 }
 
 .tz-selector-container {
-  padding-top: 30px
+  padding-top: 30px;
 }
 
 .tz-selector {
-  background-color: white
+  background-color: white;
 }
 
 .instructions-container {
-  text-align: left
+  text-align: left;
 }
 
 .instructions {
   font-size: 16px;
   color: $c-secondary-grey;
-  margin: 15px 0
+  margin: 15px 0;
 }
 
 .save-container {
   display: flex;
   flex-direction: row;
-  align-items: center
+  align-items: center;
 }
 
 .clock-explanation-container {
   display: flex;
   flex-direction: row;
-  align-items: center
+  align-items: center;
 }
 
 .clock-explanation {
   text-align: left;
   font-size: 14px;
-  margin: 15px 0
+  margin: 15px 0;
 }
 
 .clock-explanation-icon {
   background: none;
   min-width: 20px;
   min-height: 20px;
-  margin-right: 10px
+  margin-right: 10px;
 }
 
 @media screen and (max-width: #{get-app-sidebar-width("medium") + 960px}) {
@@ -403,18 +403,18 @@ input[type='checkbox']:checked + label {
     @each $key, $value in $app-sidebar-width-map {
       @if map-get($breakpoint-map, $key) {
         @include breakpoint-above($key) {
-          width: calc(100% - #{$value})
+          width: calc(100% - #{$value});
         }
       }
     }
     position: absolute;
-    overflow-x: hidden
+    overflow-x: hidden;
   }
 
   input[type='checkbox'] {
     position: relative;
     margin-top: 0;
-    margin-bottom: -40px
+    margin-bottom: -40px;
   }
 }
 

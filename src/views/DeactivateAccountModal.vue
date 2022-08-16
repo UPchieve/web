@@ -58,18 +58,18 @@ export default {
   @include flex-container(column);
 
   &__title {
-    @include font-category('display-small')
+    @include font-category('display-small');
   }
 
   &__message {
     @include font-category('body');
     margin: 0 0 35px;
     color: $c-secondary-grey;
-    font-size: 15px
+    font-size: 15px;
   }
 
   &__section {
-    @include flex-container(column, space-between)
+    @include flex-container(column, space-between);
   }
 
   &__buttons {
