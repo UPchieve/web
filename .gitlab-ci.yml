@@ -57,6 +57,142 @@ build_production:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
 
+build_demo:
+  stage: build
+  image: "docker:20.10.6"
+  cache: {}
+  tags:
+    - upchieve
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+  services:
+    - docker:20.10.6-dind
+  script:
+    - |
+      if [[ -z "$CI_COMMIT_TAG" ]]; then
+        export CI_APPLICATION_REPOSITORY=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG}
+        export CI_APPLICATION_TAG=${CI_APPLICATION_TAG:-$CI_COMMIT_SHA}
+      else
+        export CI_APPLICATION_REPOSITORY=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE}
+        export CI_APPLICATION_TAG=${CI_APPLICATION_TAG:-$CI_COMMIT_TAG}
+      fi
+    - export image_tagged="$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG"
+    - export image_cache="$CI_REGISTRY_IMAGE/cache-image:latest"
+    - export image_latest="$CI_APPLICATION_REPOSITORY:latest"
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - apk add --update curl tar
+    # install buildpacks tool
+    - (curl -sSL "https://github.com/buildpacks/pack/releases/download/v0.26.0/pack-v0.26.0-linux.tgz" | tar -C /usr/local/bin/ --no-same-owner -xzv pack)
+    # install and configure doppler cli
+    - wget -q -t3 'https://packages.doppler.com/public/cli/rsa.8004D9FF50437357.key' -O /etc/apk/keys/cli@doppler-8004D9FF50437357.rsa.pub
+    - echo 'https://packages.doppler.com/public/cli/alpine/any-version/main' | tee -a /etc/apk/repositories
+    - apk add doppler
+    - echo "$DOPPLER_TOKEN_DEMO" | doppler configure set token
+    # build
+    - |
+      doppler run --mount .doppler_env \
+        --mount-template .doppler_env.tmpl -- \
+        pack build "$image_tagged"-demo \
+          --env-file .doppler_env \
+          --creation-time now \
+          --builder heroku/buildpacks:20 \
+          --buildpack heroku/nodejs \
+          --buildpack heroku/procfile@0.6.2 \
+          --publish
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+build_staging:
+  stage: build
+  image: "docker:20.10.6"
+  cache: {}
+  tags:
+    - upchieve
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+  services:
+    - docker:20.10.6-dind
+  script:
+    - |
+      if [[ -z "$CI_COMMIT_TAG" ]]; then
+        export CI_APPLICATION_REPOSITORY=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG}
+        export CI_APPLICATION_TAG=${CI_APPLICATION_TAG:-$CI_COMMIT_SHA}
+      else
+        export CI_APPLICATION_REPOSITORY=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE}
+        export CI_APPLICATION_TAG=${CI_APPLICATION_TAG:-$CI_COMMIT_TAG}
+      fi
+    - export image_tagged="$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG"
+    - export image_cache="$CI_REGISTRY_IMAGE/cache-image:latest"
+    - export image_latest="$CI_APPLICATION_REPOSITORY:latest"
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - apk add --update curl tar
+    # install buildpacks tool
+    - (curl -sSL "https://github.com/buildpacks/pack/releases/download/v0.26.0/pack-v0.26.0-linux.tgz" | tar -C /usr/local/bin/ --no-same-owner -xzv pack)
+    # install and configure doppler cli
+    - wget -q -t3 'https://packages.doppler.com/public/cli/rsa.8004D9FF50437357.key' -O /etc/apk/keys/cli@doppler-8004D9FF50437357.rsa.pub
+    - echo 'https://packages.doppler.com/public/cli/alpine/any-version/main' | tee -a /etc/apk/repositories
+    - apk add doppler
+    - echo "$DOPPLER_TOKEN_STAGING" | doppler configure set token
+    # build
+    - |
+      doppler run --mount .doppler_env \
+        --mount-template .doppler_env.tmpl -- \
+        pack build "$image_tagged"-staging \
+          --env-file .doppler_env \
+          --creation-time now \
+          --builder heroku/buildpacks:20 \
+          --buildpack heroku/nodejs \
+          --buildpack heroku/procfile@0.6.2 \
+          --publish
+  rules:
+    - if: '$CI_COMMIT_BRANCH != "main"'
+
+build_hackers:
+  stage: build
+  image: "docker:20.10.6"
+  cache: {}
+  tags:
+    - upchieve
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+  services:
+    - docker:20.10.6-dind
+  script:
+    - |
+      if [[ -z "$CI_COMMIT_TAG" ]]; then
+        export CI_APPLICATION_REPOSITORY=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG}
+        export CI_APPLICATION_TAG=${CI_APPLICATION_TAG:-$CI_COMMIT_SHA}
+      else
+        export CI_APPLICATION_REPOSITORY=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE}
+        export CI_APPLICATION_TAG=${CI_APPLICATION_TAG:-$CI_COMMIT_TAG}
+      fi
+    - export image_tagged="$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG"
+    - export image_cache="$CI_REGISTRY_IMAGE/cache-image:latest"
+    - export image_latest="$CI_APPLICATION_REPOSITORY:latest"
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - apk add --update curl tar
+    # install buildpacks tool
+    - (curl -sSL "https://github.com/buildpacks/pack/releases/download/v0.26.0/pack-v0.26.0-linux.tgz" | tar -C /usr/local/bin/ --no-same-owner -xzv pack)
+    # install and configure doppler cli
+    - wget -q -t3 'https://packages.doppler.com/public/cli/rsa.8004D9FF50437357.key' -O /etc/apk/keys/cli@doppler-8004D9FF50437357.rsa.pub
+    - echo 'https://packages.doppler.com/public/cli/alpine/any-version/main' | tee -a /etc/apk/repositories
+    - apk add doppler
+    - echo "$DOPPLER_TOKEN_HACKERS" | doppler configure set token
+    # build
+    - |
+      doppler run --mount .doppler_env \
+        --mount-template .doppler_env.tmpl -- \
+        pack build "$image_tagged"-hackers \
+          --env-file .doppler_env \
+          --env "VUE_APP_VERSION=$CI_COMMIT_SHA" \
+          --creation-time now \
+          --builder heroku/buildpacks:20 \
+          --buildpack heroku/nodejs \
+          --buildpack heroku/procfile@0.6.2 \
+          --publish
+  rules:
+    - if: '$CI_COMMIT_BRANCH != "main"'
+
 test:
   stage: test
   image: node:16.16.0-bullseye
