@@ -1645,6 +1645,7 @@ exports[`Storyshots Example/Header Logged In 1`] = `
   >
     <div>
       <svg
+        focusable="false"
         height="32"
         viewBox="0 0 32 32"
         width="32"
@@ -1701,6 +1702,7 @@ exports[`Storyshots Example/Header Logged Out 1`] = `
   >
     <div>
       <svg
+        focusable="false"
         height="32"
         viewBox="0 0 32 32"
         width="32"
@@ -1919,6 +1921,7 @@ exports[`Storyshots Example/Page Logged In 1`] = `
     >
       <div>
         <svg
+          focusable="false"
           height="32"
           viewBox="0 0 32 32"
           width="32"
@@ -2052,6 +2055,7 @@ exports[`Storyshots Example/Page Logged In 1`] = `
       Adjust the width of the canvas with the
       
       <svg
+        focusable="false"
         height="10"
         viewBox="0 0 12 12"
         width="10"
@@ -2084,6 +2088,7 @@ exports[`Storyshots Example/Page Logged Out 1`] = `
     >
       <div>
         <svg
+          focusable="false"
           height="32"
           viewBox="0 0 32 32"
           width="32"
@@ -2224,6 +2229,7 @@ exports[`Storyshots Example/Page Logged Out 1`] = `
       Adjust the width of the canvas with the
       
       <svg
+        focusable="false"
         height="10"
         viewBox="0 0 12 12"
         width="10"
@@ -2251,6 +2257,7 @@ exports[`Storyshots Example/Page Logged Out 1`] = `
 exports[`Storyshots Example/RecentSubjectCard Active Card 1`] = `
 <button
   class="SubjectCard"
+  type="button"
 >
   <!---->
    
@@ -2267,6 +2274,7 @@ exports[`Storyshots Example/RecentSubjectCard Active Card 1`] = `
 exports[`Storyshots Example/RecentSubjectCard Default Card 1`] = `
 <button
   class="SubjectCard"
+  type="button"
 >
   <!---->
    
@@ -2284,6 +2292,7 @@ exports[`Storyshots Example/RecentSubjectCard Disabled Card 1`] = `
 <button
   class="SubjectCard"
   disabled="disabled"
+  type="button"
 >
   <!---->
    
@@ -2300,6 +2309,7 @@ exports[`Storyshots Example/RecentSubjectCard Disabled Card 1`] = `
 exports[`Storyshots Example/RecentSubjectCard Hovered Card 1`] = `
 <button
   class="SubjectCard"
+  type="button"
 >
   <!---->
    
