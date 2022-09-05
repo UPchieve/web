@@ -52,8 +52,8 @@ build_production:
           --creation-time now \
           --builder heroku/buildpacks:20 \
           --buildpack heroku/nodejs \
-          --buildpack heroku/procfile@0.6.2 \
-          --publish
+          --buildpack heroku/procfile@0.6.2
+    - docker push "$image_tagged"-production
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
 
@@ -97,8 +97,8 @@ build_demo:
           --creation-time now \
           --builder heroku/buildpacks:20 \
           --buildpack heroku/nodejs \
-          --buildpack heroku/procfile@0.6.2 \
-          --publish
+          --buildpack heroku/procfile@0.6.2
+    - docker push "$image_tagged"-demo
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
 
