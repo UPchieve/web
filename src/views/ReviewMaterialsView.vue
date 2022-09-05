@@ -29,7 +29,11 @@
         >
           <div class="review-materials__content">
             <div class="image-overlay"></div>
-            <img :src="review.image" class="review-materials__image" alt="header image for materials review" />
+            <img
+              :src="review.image"
+              class="review-materials__image"
+              alt="header image for materials review"
+            />
             <span class="review-materials__title">{{ review.title }}</span>
           </div>
         </a>

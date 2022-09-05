@@ -23,7 +23,11 @@
               <div class="session-info-title">{{ response.displayLabel }}</div>
               <div class="session-info-response">
                 <span v-if="response.displayImage">
-                  <img class="response-image" :src="response.displayImage" alt="image representing student's response" />
+                  <img
+                    class="response-image"
+                    :src="response.displayImage"
+                    alt="image representing student's response"
+                  />
                   {{ response.response.toLowerCase() }}
                 </span>
                 <span v-else>{{ response.response }}</span>

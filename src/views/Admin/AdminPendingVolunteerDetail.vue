@@ -45,7 +45,11 @@
           </select>
         </div>
         <div class="user-detail__photo-container">
-          <img class="user-detail__photo" :src="volunteer.photoUrl" alt="volunteer photo id" />
+          <img
+            class="user-detail__photo"
+            :src="volunteer.photoUrl"
+            alt="volunteer photo id"
+          />
         </div>
         <div>{{ volunteer.photoId }}</div>
       </div>

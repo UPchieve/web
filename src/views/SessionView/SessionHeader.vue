@@ -63,7 +63,9 @@
         >
           Finish
         </button>
-        <button v-else @click="end" class="end-session-btn" type="button">End session</button>
+        <button v-else @click="end" class="end-session-btn" type="button">
+          End session
+        </button>
       </div>
     </div>
     <trouble-matching-modal

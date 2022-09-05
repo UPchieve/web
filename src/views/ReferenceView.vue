@@ -1,7 +1,11 @@
 <template>
   <div class="reference-form-container">
     <div class="reference-form">
-      <img class="header-img" src="@/assets/reference-form-header.png" alt="Header image for reference form" />
+      <img
+        class="header-img"
+        src="@/assets/reference-form-header.png"
+        alt="Header image for reference form"
+      />
       <reference-form />
     </div>
   </div>
