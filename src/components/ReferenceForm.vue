@@ -57,79 +57,83 @@
               <div class="position-wrapper">
                 <div class="question-scroll-container">
                   <table>
-                    <tr class="radio-question-row">
-                      <td class="mobile-remove"></td>
-                      <td
-                        class="radio-question-selection-title"
-                        v-for="(label, labelIndex) in question.tableTitle"
-                        v-bind:key="labelIndex"
+                    <tbody>
+                      <tr class="radio-question-row">
+                        <td class="mobile-remove"></td>
+                        <td
+                          class="radio-question-selection-title"
+                          v-for="(label, labelIndex) in question.tableTitle"
+                          v-bind:key="labelIndex"
+                        >
+                          {{ label }}
+                        </td>
+                      </tr>
+                      <tr
+                        class="radio-question-row"
+                        v-for="(subquestion,
+                        subquestionIndex) in question.options"
+                        v-bind:key="subquestion"
                       >
-                        {{ label }}
-                      </td>
-                    </tr>
-                    <tr
-                      class="radio-question-row"
-                      v-for="(subquestion,
-                      subquestionIndex) in question.options"
-                      v-bind:key="subquestion"
-                    >
-                      <td class="radio-question-cell">{{ subquestion }}</td>
-                      <td
-                        class="radio-question-selection-cell"
-                        v-for="index in question.tableTitle.length"
-                        v-bind:key="index"
-                      >
-                        <input
-                          class="uc-form-input"
-                          v-model="
-                            multipleRadioResponse[
-                              question.optionsAlias[subquestionIndex]
-                            ]
-                          "
-                          type="radio"
-                          :name="
-                            `multiple-radio-${
-                              question.qid
-                            }_${subquestionIndex.toString()}`
-                          "
-                          :value="index"
-                        />
-                      </td>
-                    </tr>
+                        <td class="radio-question-cell">{{ subquestion }}</td>
+                        <td
+                          class="radio-question-selection-cell"
+                          v-for="index in question.tableTitle.length"
+                          v-bind:key="index"
+                        >
+                          <input
+                            class="uc-form-input"
+                            v-model="
+                              multipleRadioResponse[
+                                question.optionsAlias[subquestionIndex]
+                              ]
+                            "
+                            type="radio"
+                            :name="
+                              `multiple-radio-${
+                                question.qid
+                              }_${subquestionIndex.toString()}`
+                            "
+                            :value="index"
+                          />
+                        </td>
+                      </tr>
+                    </tbody>
                   </table>
 
                   <table
                     class="mobile-pinned-questions-container"
                     v-if="mobileMode"
                   >
-                    <tr class="radio-question-row">
-                      <td class="mobile-remove mobile-remove--shadow"></td>
-                      <td
-                        class="radio-question-selection-title radio-question-selection-title--hidden"
-                        v-for="(label, labelIndex) in question.tableTitle"
-                        v-bind:key="labelIndex"
+                    <tbody>
+                      <tr class="radio-question-row">
+                        <td class="mobile-remove mobile-remove--shadow"></td>
+                        <td
+                          class="radio-question-selection-title radio-question-selection-title--hidden"
+                          v-for="(label, labelIndex) in question.tableTitle"
+                          v-bind:key="labelIndex"
+                        >
+                          {{ label }}
+                        </td>
+                      </tr>
+                      <tr
+                        class="radio-question-row"
+                        v-for="subquestion in question.options"
+                        v-bind:key="subquestion"
                       >
-                        {{ label }}
-                      </td>
-                    </tr>
-                    <tr
-                      class="radio-question-row"
-                      v-for="subquestion in question.options"
-                      v-bind:key="subquestion"
-                    >
-                      <td
-                        class="radio-question-cell radio-question-cell--shadow"
-                      >
-                        {{ subquestion }}
-                      </td>
-                      <td
-                        class="radio-question-selection-cell--hidden"
-                        v-for="index in question.tableTitle.length"
-                        v-bind:key="index"
-                      >
-                        <input class="uc-form-input" type="radio" />
-                      </td>
-                    </tr>
+                        <td
+                          class="radio-question-cell radio-question-cell--shadow"
+                        >
+                          {{ subquestion }}
+                        </td>
+                        <td
+                          class="radio-question-selection-cell--hidden"
+                          v-for="index in question.tableTitle.length"
+                          v-bind:key="index"
+                        >
+                          <input class="uc-form-input" type="radio" />
+                        </td>
+                      </tr>
+                    </tbody>
                   </table>
                 </div>
               </div>

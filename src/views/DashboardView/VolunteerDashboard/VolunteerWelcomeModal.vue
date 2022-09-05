@@ -7,6 +7,7 @@
     <img
       class="volunteer-welcome-modal-header-img"
       src="@/assets/volunteer-welcome-modal-header.png"
+      alt="image welcoming new volunteers"
     />
     <div class="volunteer-welcome-modal">
       <div class="volunteer-welcome-modal-title-container">

@@ -121,6 +121,7 @@
         :key="index"
         :src="image"
         class="session-detail__section--image"
+        alt="a photo posted by student in the session"
       />
     </div>
     <div

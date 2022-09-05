@@ -9,14 +9,16 @@
     />
     <div class="list-wrapper">
       <table>
-        <tr>
-          <th>Created At</th>
-          <th>Email</th>
-          <th>Median income</th>
-          <th>Zip code</th>
-          <th>School</th>
-          <th>School approval status</th>
-        </tr>
+        <thead>
+          <tr>
+            <th scope="col">Created At</th>
+            <th scope="col">Email</th>
+            <th scope="col">Median income</th>
+            <th scope="col">Zip code</th>
+            <th scope="col">School</th>
+            <th scope="col">School approval status</th>
+          </tr>
+        </thead>
         <ineligible-student-list-item
           v-for="student in ineligibleStudents"
           :key="student._id"

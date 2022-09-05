@@ -70,5 +70,20 @@
   },
   "reseticon": {
     "flow": true
+  },
+  "clockicon": {
+    "flow": true
+  },
+  "cell": {
+    "flow": true
+  },
+  "availabilitygrid": {
+    "flow": true
+  },
+  "stepper": {
+    "flow": true
+  },
+  "filedialog": {
+    "flow": true
   }
 }

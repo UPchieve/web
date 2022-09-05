@@ -1,5 +1,5 @@
 <template>
-  <button class="SubjectCard" :disabled="disabled">
+  <button class="SubjectCard" :disabled="disabled" type="button">
     <component class="SubjectCard-icon" v-bind:is="svg" />
     <span class="SubectCard-title">{{ title }}</span>
     <arrow-icon class="arrow-icon" />

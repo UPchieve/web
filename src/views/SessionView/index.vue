@@ -81,7 +81,7 @@
           class="toggleButton__message-indicator"
           v-if="!hasSeenNewMessage"
         ></span>
-        <img id="toggleIcon" :src="toggleIconSrc" />
+        <img id="toggleIcon" :src="toggleIconSrc" alt="toggle icon" />
       </div>
     </div>
     <div

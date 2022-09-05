@@ -4,12 +4,12 @@
       :src="
         `https://docs.google.com/viewer?url=https://upc-training-materials.s3.us-east-2.amazonaws.com/${resourceId}.pdf&embedded=true`
       "
-      frameborder="0"
       class="document__iframe"
       allowfullscreen
       @load="loaded"
       :key="reloadAttempts"
       v-if="!isMaxAttempt"
+      title="external document for training"
     ></iframe>
     <p v-else>
       Sorry, we were unable to load the document. Please try refreshing the

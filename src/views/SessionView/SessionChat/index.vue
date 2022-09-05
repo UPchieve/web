@@ -79,7 +79,7 @@
           @click="scrollToUnread"
         >
           {{ unreadMessageNote }}
-          <img src="@/assets/down_arrow.png" />
+          <img src="@/assets/down_arrow.png" alt="down arrow" />
         </button>
       </transition>
     </div>

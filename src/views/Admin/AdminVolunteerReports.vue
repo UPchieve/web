@@ -3,12 +3,12 @@
     <div class="filter-panel">
       <div class="col">
         <div class="filter-panel__row">
-          <label for="volunteer-report-from" class="col">
+          <label class="col">
             From
             <input id="volunteer-report-from" type="date" v-model="startDate" />
           </label>
 
-          <label for="volunteer-report-to" class="col">
+          <label class="col">
             To
             <input id="volunteer-report-to" type="date" v-model="endDate" />
           </label>
@@ -17,7 +17,7 @@
 
       <div class="col">
         <div>
-          <label for="volunteer-partner-org" class="col">
+          <label class="col">
             Volunteer partner org
             <v-select
               id="volunteer-partner-org"

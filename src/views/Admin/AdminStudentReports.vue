@@ -3,12 +3,12 @@
     <div class="filter-panel">
       <div class="col">
         <div class="filter-panel__row">
-          <label for="joined-after" class="col">
+          <label class="col">
             Joined after
             <input id="joined-after" type="date" v-model="joinedAfter" />
           </label>
 
-          <label for="joined-before" class="col">
+          <label class="col">
             Joined before
             <input id="joined-before" type="date" v-model="joinedBefore" />
           </label>
@@ -17,7 +17,7 @@
 
       <div class="col">
         <div class="filter-panel__row">
-          <label for="session-range-from" class="col">
+          <label class="col">
             Session from
             <input
               id="session-range-from"
@@ -26,7 +26,7 @@
             />
           </label>
 
-          <label for="session-range-to" class="col">
+          <label class="col">
             Session to
             <input id="session-range-to" type="date" v-model="sessionRangeTo" />
           </label>
@@ -35,7 +35,7 @@
 
       <div class="col">
         <div>
-          <label for="student-partner-org" class="col">
+          <label class="col">
             Student partner org
             <v-select
               id="student-partner-org"
@@ -58,7 +58,7 @@
       </div>
       <div class="col">
         <div>
-          <label for="sponsor-org" class="col">
+          <label class="col">
             Sponsor org
             <v-select
               id="sponsor-org"

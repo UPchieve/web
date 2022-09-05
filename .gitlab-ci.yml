@@ -226,6 +226,7 @@ lint:
 html_validate:
   stage: test
   image: node:16.16.0-bullseye
+  allow_failure: true
   tags:
     - upchieve
   before_script:

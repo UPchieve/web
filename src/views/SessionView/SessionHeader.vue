@@ -42,6 +42,7 @@
           v-if="user.isVolunteer"
           class="report-btn"
           @click="reportSession"
+          type="button"
         >
           Report
         </button>
@@ -50,6 +51,7 @@
           v-if="isSessionWaitingForVolunteer"
           @click="end"
           class="end-session-btn"
+          type="button"
         >
           Cancel
         </button>
@@ -57,10 +59,11 @@
           v-else-if="isSessionOver"
           @click="goToFeedbackPage"
           class="end-session-btn"
+          type="button"
         >
           Finish
         </button>
-        <button v-else @click="end" class="end-session-btn">End session</button>
+        <button v-else @click="end" class="end-session-btn" type="button">End session</button>
       </div>
     </div>
     <trouble-matching-modal

@@ -33,7 +33,7 @@
             value="email"
             id="verification-email"
           />
-          <label for="verification-email" class="verification__radio-label">
+          <label class="verification__radio-label">
             <span class="verification__label">By email</span>
             <input
               class="uc-form-input verification__field"
@@ -91,7 +91,7 @@
           <span class="verification__send-to">{{ sendTo }}</span>
         </p>
         <div class="verification__container">
-          <label for="verification-code" class="verification__radio-label">
+          <label class="verification__radio-label">
             <span class="verification__label"
               >Enter your 6-digit verification code:</span
             >

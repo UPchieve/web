@@ -55,7 +55,7 @@
 
       <div class="col">
         <div class="session-activity-container">
-          <label for="session-activity-from" class="col"
+          <label class="col"
             >from
             <input
               id="session-activity-from"
@@ -64,7 +64,7 @@
             />
           </label>
 
-          <label for="session-activity-to" class="col"
+          <label class="col"
             >to
             <input
               id="session-activity-to"

@@ -11,7 +11,7 @@
           :id="`${id}-${index}`"
           :name="id"
           :value="index + 1"
-          class="feedback__checkbox-input feedback__checkbox-input uc-form-input"
+          class="feedback__checkbox-input uc-form-input"
           v-model="selected"
         />
         <label class="feedback__checkbox-label" :for="`${id}-${index}`">

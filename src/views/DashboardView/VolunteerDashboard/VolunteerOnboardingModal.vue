@@ -13,6 +13,7 @@
         <img
           src="@/assets/onboarding_icons/calendar-icon.png"
           class="OnboardingModal-icon"
+          alt="calendar icon"
         />
         <h4>Select availability</h4>
         <p>
@@ -24,6 +25,7 @@
         <img
           src="@/assets/onboarding_icons/quiz-icon.png"
           class="OnboardingModal-icon"
+          alt="quiz icon"
         />
         <h4>Get a certification</h4>
         <p>

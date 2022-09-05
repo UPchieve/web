@@ -4,6 +4,7 @@
       :src="src"
       @click="handleImageClick"
       class="survey-image__image"
+      alt="image showing answer option, see label that appears when selected"
       :class="{
         'survey-image__image--not-selected': !isSelected,
       }"

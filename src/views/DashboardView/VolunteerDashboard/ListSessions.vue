@@ -3,9 +3,9 @@
     <table class="table table-striped table-hover">
       <thead>
         <tr>
-          <th>Student</th>
-          <th>Help Topic</th>
-          <th>Wait Time</th>
+          <th scope="col">Student</th>
+          <th scope="col">Help Topic</th>
+          <th scope="col">Wait Time</th>
         </tr>
       </thead>
       <tbody>

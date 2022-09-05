@@ -32,7 +32,7 @@
           :id="`${id}-${index}`"
           :name="id"
           :value="index + 1"
-          class="feedback__radio-input feedback__radio-input uc-form-input"
+          class="feedback__radio-input uc-form-input"
           @change="$emit('change', Number($event.target.value))"
         />
         <label class="feedback__radio-label" :for="`${id}-${index}`">

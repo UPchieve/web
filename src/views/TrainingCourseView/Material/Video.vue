@@ -3,9 +3,9 @@
     <iframe
       class="video__iframe"
       :src="`https://player.vimeo.com/video/${resourceId}`"
-      frameborder="0"
       allow="autoplay; fullscreen"
       allowfullscreen
+      title="external video for training"
     ></iframe>
   </div>
 </template>

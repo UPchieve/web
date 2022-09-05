@@ -18,7 +18,7 @@
         </p>
 
         <div v-if="photo" class="photo-id-container">
-          <img :src="photo" class="photo-id-img" />
+          <img :src="photo" class="photo-id-img" alt="your uploaded photo id" />
           <div class="trash-icon-container" @click="removePhoto">
             <trash-icon class="trash-icon" />
           </div>

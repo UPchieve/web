@@ -9,11 +9,13 @@
     />
     <div class="list-wrapper">
       <table>
-        <tr>
-          <th>Waiting since</th>
-          <th>Name</th>
-          <th>Email</th>
-        </tr>
+        <thead>
+          <tr>
+            <th scope="col">Waiting since</th>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+          </tr>
+        </thead>
         <pending-volunteer-list-item
           v-for="volunteer in volunteers"
           :key="volunteer._id"
