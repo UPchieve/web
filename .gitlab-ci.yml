@@ -201,7 +201,7 @@ test:
   before_script:
     - npm ci --cache .npm --prefer-offline
   script:
-    - npm run test:frontend
+    - npm run test
   needs: []
   rules:
     - if: '$TEST_DISABLED'
