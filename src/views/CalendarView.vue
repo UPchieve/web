@@ -77,7 +77,7 @@ export default {
   },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
+      user: state => state.user.user,
     }),
     saveButtonClass() {
       return ['save-button', 'save-button--' + this.saveState]
@@ -85,7 +85,7 @@ export default {
     saveLabel() {
       switch (this.saveState) {
         case saveStates.SAVED:
-          return 'Saved &#x2714'
+          return 'Saved &#x2714;'
         case saveStates.SAVING:
           return 'Saving...'
         default:
@@ -260,7 +260,7 @@ export default {
         this,
         this.convertAvailability(this.availability, offset),
         this.selectedTz
-      ).then((response) => {
+      ).then(response => {
         if (response.status == 200) {
           this.saveState = saveStates.SAVED
           AnalyticsService.captureEvent(EVENTS.AVAILABILITY_UPDATED, {

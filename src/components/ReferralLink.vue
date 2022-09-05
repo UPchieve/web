@@ -25,7 +25,7 @@ export default {
   },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
+      user: state => state.user.user,
     }),
     referralLink() {
       const { referralCode } = this.user

@@ -151,8 +151,8 @@ export default {
   },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
-      session: (state) => state.user.session,
+      user: state => state.user.user,
+      session: state => state.user.session,
     }),
     ...mapGetters({
       sessionPartner: 'user/sessionPartner',
@@ -161,6 +161,7 @@ export default {
       isSessionInProgress: 'user/isSessionInProgress',
       isSessionOver: 'user/isSessionOver',
       isChatbotActive: 'featureFlags/isChatbotActive',
+      isPostsessionSurveyActive: 'featureFlags/isPostsessionSurveyActive',
     }),
 
     partnerAvatar() {
@@ -249,7 +250,7 @@ export default {
     },
     getMessagesAfterVolunteerJoined() {
       return this.session.messages.filter(
-        (message) =>
+        message =>
           new Date(message.createdAt).getTime() >=
           new Date(this.session.volunteerJoinedAt).getTime()
       )
@@ -259,7 +260,11 @@ export default {
       // or if the student was not paired with a tutor
       if (this.isAbsentUser()) return this.$router.push('/')
 
-      if (!this.user.isVolunteer && this.session.type === 'college') {
+      if (
+        !this.isPostsessionSurveyActive &&
+        !this.user.isVolunteer &&
+        this.session.type === 'college'
+      ) {
         this.goToStudentCounselingFeedbackPage()
         return
       }

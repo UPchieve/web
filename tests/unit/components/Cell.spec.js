@@ -28,5 +28,5 @@ it('renders the cell in the selectable + selected state', () => {
   expect(wrapper.classes()).toContain('Cell-selectable--selected')
 })
 
-// TODO: test flagged state via query selector for clock in wrapper.findComponent()
-// TODO: test full grid via wrapper.findAllComponents() to find child cells
+// TODO: test flagged state via query selector for clock in wrapper.find()
+// TODO: test full grid via wrapper.findAll() to find child cells

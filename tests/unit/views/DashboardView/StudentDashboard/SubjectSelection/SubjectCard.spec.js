@@ -5,6 +5,7 @@ import { storeOptions } from '@/store'
 import SubjectCard from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectCard'
 import HyperlinkButton from '@/components/HyperlinkButton'
 import LargeButton from '@/components/LargeButton'
+// import TestIcon from "@/assets/sidebar_icons/house.svg";
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
@@ -12,25 +13,7 @@ localVue.use(Vuex)
 const getWrapper = (mobileMode = false, propsData) => {
   const store = new Vuex.Store(
     merge({}, storeOptions, {
-      modules: {
-        app: {
-          getters: {
-            mobileMode: () => mobileMode,
-          },
-        },
-        user: {
-          getters: {
-            isSessionAlive: () => false,
-          },
-        },
-        featureFlags: {
-          getters: {
-            isSessionHistoryActive: () => true,
-            isCoachFavoritingActive: () => true,
-            isReferFriendsActive: () => false,
-          },
-        },
-      },
+      modules: { app: { getters: { mobileMode: () => mobileMode } } },
     })
   )
 
@@ -52,14 +35,14 @@ describe('SubjectCard', () => {
         const wrapper = getWrapper(true, propsData)
         expect(wrapper.classes('SubjectCard')).toBe(true)
 
-        // const icon = wrapper.findComponent('.SubjectCard-icon')
-        // expect(icon.contains(propsData.svg)).toBe(true)
+        // const icon = wrapper.find(".SubjectCard-icon");
+        // expect(icon.contains(propsData.svg)).toBe(true);
 
-        const title = wrapper.findComponent('.SubjectCard-title')
+        const title = wrapper.find('.SubjectCard-title')
         expect(title.exists()).toBe(true)
         expect(title.text()).toBe(propsData.title)
 
-        const subtitle = wrapper.findComponent('.SubjectCard-subtitle')
+        const subtitle = wrapper.find('.SubjectCard-subtitle')
         expect(subtitle.exists()).toBe(false)
       })
 
@@ -67,21 +50,28 @@ describe('SubjectCard', () => {
         const wrapper = getWrapper(true, propsData)
 
         // No `routeTo`
+        let handleClick = jest.fn()
+        wrapper.setMethods({ handleClick })
         wrapper.setProps({ routeTo: null })
 
-        const button = wrapper.findComponent(HyperlinkButton)
+        const button = wrapper.find(HyperlinkButton)
         expect(button.exists()).toBe(true)
         expect(button.text()).toBe(propsData.buttonText)
         expect(button.props().routeTo).toBeUndefined()
         button.trigger('click')
+        expect(handleClick).toHaveBeenCalled()
 
         // With `routeTo`
+        handleClick = jest.fn()
+        wrapper.setMethods({ handleClick })
         wrapper.setProps({ routeTo: '/test' })
 
-        const routeButton = wrapper.findComponent(HyperlinkButton)
+        const routeButton = wrapper.find(HyperlinkButton)
         expect(routeButton.exists()).toBe(true)
         expect(routeButton.text()).toBe(propsData.buttonText)
         expect(routeButton.props().routeTo).toBe('/test')
+        routeButton.trigger('click')
+        expect(handleClick).not.toHaveBeenCalled()
       })
     })
 
@@ -90,14 +80,14 @@ describe('SubjectCard', () => {
         const wrapper = getWrapper(false, propsData)
         expect(wrapper.classes('SubjectCard')).toBe(true)
 
-        // const icon = wrapper.findComponent('.SubjectCard-icon')
-        // expect(icon.contains(propsData.svg)).toBe(true)
+        // const icon = wrapper.find(".SubjectCard-icon");
+        // expect(icon.contains(propsData.svg)).toBe(true);
 
-        const title = wrapper.findComponent('.SubjectCard-title')
+        const title = wrapper.find('.SubjectCard-title')
         expect(title.exists()).toBe(true)
         expect(title.text()).toBe(propsData.title)
 
-        const subtitle = wrapper.findComponent('.SubjectCard-subtitle')
+        const subtitle = wrapper.find('.SubjectCard-subtitle')
         expect(subtitle.exists()).toBe(true)
         expect(subtitle.text()).toBe(propsData.subtitle)
       })
@@ -106,22 +96,28 @@ describe('SubjectCard', () => {
         const wrapper = getWrapper(false, propsData)
 
         // No `routeTo`
+        let handleClick = jest.fn()
+        wrapper.setMethods({ handleClick })
         wrapper.setProps({ routeTo: null })
 
-        const button = wrapper.findComponent(LargeButton)
+        const button = wrapper.find(LargeButton)
         expect(button.exists()).toBe(true)
         expect(button.text()).toBe(propsData.buttonText)
         expect(button.props().routeTo).toBeUndefined()
         button.trigger('click')
+        expect(handleClick).toHaveBeenCalled()
 
         // With `routeTo`
+        handleClick = jest.fn()
+        wrapper.setMethods({ handleClick })
         wrapper.setProps({ routeTo: '/test' })
 
-        const routeButton = wrapper.findComponent(HyperlinkButton)
+        const routeButton = wrapper.find(HyperlinkButton)
         expect(routeButton.exists()).toBe(true)
         expect(routeButton.text()).toBe(propsData.buttonText)
         expect(routeButton.props().routeTo).toBe('/test')
         routeButton.trigger('click')
+        expect(handleClick).not.toHaveBeenCalled()
       })
     })
   })

@@ -120,7 +120,7 @@ export default {
   },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
+      user: state => state.user.user,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -241,10 +241,14 @@ ul {
 .favorite-coaches {
   background-color: $upchieve-white;
   border-radius: 8px;
-  border: 1px solid $c-background-blue &__no-coaches {
+  border: 1px solid $c-background-blue;
+
+  &__no-coaches {
     @include flex-container(column, normal, center);
     margin: 4em 2em 2em;
-    min-height: 60vh &-description {
+    min-height: 60vh;
+
+    &-description {
       max-width: 600px;
       margin-top: 1em;
       color: $c-secondary-grey;

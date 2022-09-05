@@ -196,7 +196,7 @@ export default {
   },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
+      user: state => state.user.user,
     }),
     ...mapGetters({
       avatarUrl: 'user/avatarUrl',
@@ -337,7 +337,7 @@ export default {
         const payloadUser = {}
         const keys = ['phone', 'isDeactivated']
 
-        keys.forEach((key) => (payloadUser[key] = this.user[key]))
+        keys.forEach(key => (payloadUser[key] = this.user[key]))
 
         // wait for save to succeed before coming out of edit mode
         UserService.setProfile(payloadUser).then(

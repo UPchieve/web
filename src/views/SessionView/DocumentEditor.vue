@@ -46,8 +46,8 @@ export default {
   },
   computed: {
     ...mapState({
-      currentSession: (state) => state.user.session,
-      isSessionConnectionAlive: (state) => state.user.isSessionConnectionAlive,
+      currentSession: state => state.user.session,
+      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
     }),
   },
   mounted() {
@@ -149,7 +149,7 @@ export default {
     lastDeltaStored({ delta }) {
       if (delta) {
         const queueCutoff = this.incomingDeltas.findIndex(
-          (pendingDelta) => pendingDelta.id === delta.id
+          pendingDelta => pendingDelta.id === delta.id
         )
         this.incomingDeltas = this.incomingDeltas.slice(queueCutoff + 1)
       }

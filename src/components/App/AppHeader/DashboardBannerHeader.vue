@@ -1,13 +1,7 @@
 <template>
   <div class="header">
     <!-- Edit the text below to display on dashboard banner to volunteers -->
-    <!-- Show Below Message Until July 15th: -->
-    <div v-if="new Date() < new Date('7-15-2022')" class="header-message">
-      <span>Introducing our new subject: U.S. History!</span> Take the quiz by
-      July 15th to help us launch to students.
-    </div>
-    <!-- Show Below Message starting July 15th -->
-    <div v-if="new Date() >= new Date('7-15-2022')" class="header-message">
+    <div class="header-message">
       <span>Introducing our new subject: U.S. History!</span> Take the quiz
       today.
     </div>

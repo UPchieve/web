@@ -72,8 +72,8 @@ export default {
 
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
-      windowWidth: (state) => state.app.windowWidth,
+      user: state => state.user.user,
+      windowWidth: state => state.app.windowWidth,
     }),
     isLargeDevice() {
       const largeScreenBreakpoint = 992
@@ -84,7 +84,7 @@ export default {
 
   methods: {
     isComplete(includedSubjects) {
-      return includedSubjects.every((subject) =>
+      return includedSubjects.every(subject =>
         this.user.subjects.includes(subject.key)
       )
     },

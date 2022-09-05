@@ -17,7 +17,9 @@
         </div>
       </nav>
       <div class="uc-form-body" v-if="step === 1">
-        <h1 class="title">You’re almost there!</h1>
+        <h1 class="title">
+          You’re almost there!
+        </h1>
         <p>
           Confirm you're not a <span v-if="showEmoji">🤖</span
           ><span v-else>robot</span> by verifying your account. Please select
@@ -121,7 +123,9 @@
         <div>
           <verification-badge />
           <h3>You’re verified <span v-if="showEmoji">😎</span></h3>
-          <p>Woohoo! Welcome to UPchieve.</p>
+          <p>
+            Woohoo! Welcome to UPchieve.
+          </p>
         </div>
         <div>
           <large-button primary routeTo="/" class="uc-form-button-big">
@@ -184,7 +188,7 @@ export default {
   },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
+      user: state => state.user.user,
     }),
     isValidForm() {
       if (!this.verificationMethod) return false

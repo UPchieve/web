@@ -2,7 +2,7 @@
   <div class="survey-container">
     <cross-icon @click="cancel()" class="cross-icon" />
     <div class="presession-survey">
-      <template v-if="isContextSharingWithVolunteerActive">
+      <template>
         <div class="presession-survey__title">Tell us about your request</div>
         <div class="presession-survey__subtitle">
           This will give your coach the info they need to help you.
@@ -29,10 +29,11 @@
                 :key="`${response.responseId}-image`"
                 :src="response.responseDisplayImage"
                 :label="response.responseText"
+                :questionId="currentQuestion.questionId"
                 :responseId="response.responseId"
                 :isSelected="
                   userResponse[currentQuestion.questionId].responseId ===
-                  response.responseId
+                    response.responseId
                 "
                 @survey-image-click="updateUserResponse"
               />
@@ -48,13 +49,14 @@
                 :name="currentQuestion.questionId"
                 :checked="
                   userResponse[currentQuestion.questionId].responseId ===
-                  response.responseId
+                    response.responseId
                 "
+                :questionId="currentQuestion.questionId"
                 :responseId="response.responseId"
                 :label="response.responseText"
                 :isOpenResponseDisabled="
                   userResponse[currentQuestion.questionId].responseId !==
-                  response.responseId
+                    response.responseId
                 "
                 :openResponseValue="
                   userResponse[currentQuestion.questionId].openResponse
@@ -84,71 +86,6 @@
             v-if="currentStep === survey.length"
             @click.native="submitSurvey"
             :disabled="!isSurveyComplete"
-            >Start a chat</large-button
-          >
-        </div>
-      </template>
-      <!-- 
-        TODO: remove in context sharing feature flag cleanup.
-        old presession survey below. remove the template
-        below 
-      -->
-      <template v-else>
-        <div class="presession-survey__title presession-survey__title-legacy">
-          Tell us a little about your request
-        </div>
-        <div
-          class="presession-survey__subtitle presession-survey__subtitle-legacy"
-        >
-          This info will help us find the best coach to pair you with
-        </div>
-
-        <div class="questions-container">
-          <div
-            v-for="question in questions"
-            :key="question.title"
-            class="question-legacy"
-          >
-            <div class="question-legacy__title">{{ question.title }}</div>
-            <div class="question-legacy__options">
-              <div
-                v-for="option in question.options"
-                :key="option.displayName"
-                class="question-legacy__option"
-              >
-                <input
-                  v-model="responses[question.key].answer"
-                  type="radio"
-                  tabindex="-1"
-                  :id="`${question.key}_${option.value}`"
-                  :value="option.value"
-                />
-                <label
-                  :for="`${question.key}_${option.value}`"
-                  tabindex="0"
-                  @keydown.space="responses[question.key].answer = option.value"
-                >
-                  <span>{{ option.displayName }}</span>
-                  <input
-                    v-if="option.value === 'other'"
-                    type="text"
-                    tabindex="-1"
-                    v-model="responses[question.key].other"
-                    :disabled="responses[question.key].answer !== 'other'"
-                  />
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div v-if="!mobileMode" class="presession-survey__separator" />
-        <div class="presession-survey__buttons">
-          <large-button @click.native="cancel()">Cancel</large-button>
-          <large-button
-            primary
-            @click.native="submitSurvey"
-            :disabled="!isComplete"
             >Start a chat</large-button
           >
         </div>
@@ -263,13 +200,11 @@ export default {
   },
 
   async mounted() {
-    if (this.isContextSharingWithVolunteerActive) {
-      const response = await NetworkService.getPresessionSurvey(this.subject)
-      this.survey = response.data.survey
-      this.surveyId = response.data.surveyId
-      this.surveyTypeId = response.data.surveyTypeId
-      this.buildUserResponse()
-    }
+    const response = await NetworkService.getPresessionSurvey(this.subject)
+    this.survey = response.data.survey
+    this.surveyId = response.data.surveyId
+    this.surveyTypeId = response.data.surveyTypeId
+    this.buildUserResponse()
     /**
      *
      *
@@ -287,8 +222,6 @@ export default {
   computed: {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
-      isContextSharingWithVolunteerActive:
-        'featureFlags/isContextSharingWithVolunteerActive',
     }),
     // TODO: remove in context sharing feature flag cleanup
     isComplete() {
@@ -305,7 +238,7 @@ export default {
 
         // check if a response that should have an open response was entered
         const response = question.responses.find(
-          (response) => response.responseText === 'Other'
+          response => response.responseText === 'Other'
         )
         if (
           response &&
@@ -322,7 +255,7 @@ export default {
     },
     // checks if the current question has a row of responses that require to show a display image
     isRowOfImages() {
-      return this.currentQuestion.responses.some((a) => a.responseDisplayImage)
+      return this.currentQuestion.responses.every(a => a.responseDisplayImage)
     },
     questionTypes() {
       return QUESTION_TYPES
@@ -340,25 +273,23 @@ export default {
     submitSurvey() {
       let surveyResponses = this.responses
 
-      if (this.isContextSharingWithVolunteerActive) {
-        if (!this.isSurveyComplete) return
+      if (!this.isSurveyComplete) return
 
-        const submissions = []
-        for (const question of this.survey) {
-          const questionId = question.questionId
-          const response = this.userResponse[questionId]
-          submissions.push({
-            questionId: Number(questionId),
-            responseChoiceId: response.responseId,
-            openResponse: response.openResponse,
-          })
-        }
+      const submissions = []
+      for (const question of this.survey) {
+        const questionId = question.questionId
+        const response = this.userResponse[questionId]
+        submissions.push({
+          questionId: Number(questionId),
+          responseChoiceId: response.responseId,
+          openResponse: response.openResponse,
+        })
+      }
 
-        surveyResponses = {
-          surveyId: this.surveyId,
-          surveyTypeId: this.surveyTypeId,
-          submissions,
-        }
+      surveyResponses = {
+        surveyId: this.surveyId,
+        surveyTypeId: this.surveyTypeId,
+        submissions,
       }
       this.$store.dispatch('user/updatePresessionSurvey', surveyResponses)
       this.$emit('survey-completed')
@@ -386,8 +317,7 @@ export default {
 
       this.userResponse = userResponse
     },
-    updateUserResponse(responseId, openResponseText = '') {
-      const questionId = this.currentQuestion.questionId
+    updateUserResponse(questionId, responseId, openResponseText = '') {
       // Vue cannot detect property addition or deletion on objects. A new object
       // must be created for Vue to recognize changes on said object
       const responseAnswer = {

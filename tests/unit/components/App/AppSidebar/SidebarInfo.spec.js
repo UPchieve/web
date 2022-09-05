@@ -6,7 +6,7 @@ import SidebarInfo from '@/components/App/AppSidebar/SidebarInfo'
 const localVue = createLocalVue()
 localVue.use(Vuex)
 
-const getWrapper = (propsData) =>
+const getWrapper = propsData =>
   shallowMount(SidebarInfo, { localVue, store, propsData })
 
 describe('SidebarInfo', () => {

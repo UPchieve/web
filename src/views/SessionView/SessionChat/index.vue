@@ -45,8 +45,8 @@
         <chat-bot
           v-if="
             showLegacyChatBot &&
-            !user.isVolunteer &&
-            isSessionWaitingForVolunteer
+              !user.isVolunteer &&
+              isSessionWaitingForVolunteer
           "
           @new-bot-message="handleIncomingMessage"
         />
@@ -109,7 +109,7 @@
 </template>
 
 <script>
-import { setTimeout, clearTimeout } from 'timers-browserify'
+import { setTimeout, clearTimeout } from 'timers'
 import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
 import * as Sentry from '@sentry/browser'
@@ -150,12 +150,12 @@ export default {
   },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
-      currentSession: (state) => state.user.session,
-      isWebPageHidden: (state) => state.app.isWebPageHidden,
-      isSessionConnectionAlive: (state) => state.user.isSessionConnectionAlive,
-      unreadChatMessageIndices: (state) => state.user.unreadChatMessageIndices,
-      chatScrolledToMessageIndex: (state) =>
+      user: state => state.user.user,
+      currentSession: state => state.user.session,
+      isWebPageHidden: state => state.app.isWebPageHidden,
+      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
+      unreadChatMessageIndices: state => state.user.unreadChatMessageIndices,
+      chatScrolledToMessageIndex: state =>
         state.user.chatScrolledToMessageIndex,
     }),
     ...mapGetters({
@@ -165,7 +165,7 @@ export default {
       numberOfUnreadChatMessages: 'user/numberOfUnreadChatMessages',
       isChatbotActive: 'featureFlags/isChatbotActive',
     }),
-    isSessionConnectionFailure: function () {
+    isSessionConnectionFailure: function() {
       const isConnectionFailure =
         !this.isSessionConnectionAlive && this.isSessionAlive
       if (isConnectionFailure)
@@ -176,7 +176,7 @@ export default {
         })
       return isConnectionFailure
     },
-    unreadMessageNote: function () {
+    unreadMessageNote: function() {
       return `${this.numberOfUnreadChatMessages} unread message${
         this.numberOfUnreadChatMessages === 1 ? '' : 's'
       }`
@@ -228,15 +228,13 @@ export default {
         this.hideModerationWarning()
 
         // Check for personal info/profanity in message
-        ModerationService.checkIfMessageIsClean(this, message).then(
-          (isClean) => {
-            if (isClean) {
-              this.showNewMessage(message)
-            } else {
-              this.showModerationWarning()
-            }
+        ModerationService.checkIfMessageIsClean(this, message).then(isClean => {
+          if (isClean) {
+            this.showNewMessage(message)
+          } else {
+            this.showModerationWarning()
           }
-        )
+        })
 
         // Disregard typing handler for enter
         this.notTyping()
@@ -280,8 +278,8 @@ export default {
       const messageElements = this.getUserMessageElements()
 
       if (this.unreadChatMessageIndices.length > 0) {
-        const readMessageIndices = this.unreadChatMessageIndices.filter(
-          (index) => this.isMessageElementInView(messageElements[index])
+        const readMessageIndices = this.unreadChatMessageIndices.filter(index =>
+          this.isMessageElementInView(messageElements[index])
         )
         this.$store.dispatch('user/markChatMessagesAsRead', readMessageIndices)
       }
@@ -327,7 +325,7 @@ export default {
     getUserMessageElements() {
       // the DOM elements corresponding to messages sent by users
       // (as opposed to the chatbot)
-      return Array.from(this.$refs.messages.children).filter((element) =>
+      return Array.from(this.$refs.messages.children).filter(element =>
         element.classList.contains('message')
       )
     },

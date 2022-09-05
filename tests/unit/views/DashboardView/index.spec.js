@@ -18,11 +18,6 @@ const getWrapper = (isAuthenticated = true, isVolunteer = false) => {
           isVolunteer: () => isVolunteer,
         },
       },
-      featureFlags: {
-        getters: {
-          isDowntimeBannerActive: () => false,
-        },
-      },
     },
   })
 

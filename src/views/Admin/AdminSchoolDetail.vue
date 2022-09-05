@@ -70,7 +70,7 @@
 import NetworkService from '@/services/NetworkService'
 import AdminEditSchool from '@/views/Admin/AdminEditSchool'
 
-const getSchool = async (schoolId) => {
+const getSchool = async schoolId => {
   const {
     body: { school },
   } = await NetworkService.adminGetSchool(schoolId)

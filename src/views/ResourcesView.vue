@@ -1,6 +1,8 @@
 <template>
   <div class="resources-page">
-    <div class="header">Resources for Students</div>
+    <div class="header">
+      Resources for Students
+    </div>
     <div class="description">
       Below are some sites that we think every student should be familiar with.
     </div>
@@ -84,7 +86,7 @@ import { mapState } from 'vuex'
 
 export default {
   computed: {
-    ...mapState({ user: (state) => state.user.user }),
+    ...mapState({ user: state => state.user.user }),
   },
 }
 </script>

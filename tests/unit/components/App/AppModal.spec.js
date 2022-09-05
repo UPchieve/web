@@ -25,7 +25,7 @@ describe('AppModal', () => {
   it('renders ModalTemplate', () => {
     const state = { data: { backText: 'Back', acceptText: 'Okay' } }
     const wrapper = getWrapper(state)
-    const modal = wrapper.findComponent(ModalTemplate)
+    const modal = wrapper.find(ModalTemplate)
     expect(modal.exists()).toBe(true)
     expect(modal.props().backText).toEqual(state.data.backText)
     expect(modal.props().acceptText).toEqual(state.data.acceptText)
@@ -33,8 +33,8 @@ describe('AppModal', () => {
 
   it('renders SubjectSelectionModal', () => {
     const state = { component: 'SubjectSelectionModal', data: {} }
-    const wrapper = getWrapper(state).findComponent(ModalTemplate)
-    const modal = wrapper.findComponent(SubjectSelectionModal)
+    const wrapper = getWrapper(state).find(ModalTemplate)
+    const modal = wrapper.find(SubjectSelectionModal)
     expect(modal.exists()).toBe(true)
     expect(modal.props().modalData).toEqual(state.data)
   })

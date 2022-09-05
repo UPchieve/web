@@ -59,8 +59,8 @@ export default {
   },
   computed: {
     ...mapState({
-      isMobileApp: (state) => state.app.isMobileApp,
-      user: (state) => state.user.user,
+      isMobileApp: state => state.app.isMobileApp,
+      user: state => state.user.user,
       isTopicSkippingSurvey() {
         return (
           this.modalData.topic === 'college' ||
@@ -71,8 +71,6 @@ export default {
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
-      isContextSharingWithVolunteerActive:
-        'featureFlags/isContextSharingWithVolunteerActive',
     }),
     title() {
       if (this.modalData.topic === 'college')
@@ -118,11 +116,6 @@ export default {
     },
     onAccept() {
       if (this.selectedSubtopic === '') return
-      if (
-        !this.isContextSharingWithVolunteerActive &&
-        this.isTopicSkippingSurvey
-      )
-        this.onSurveyCompleted()
       else this.showSurvey = true
     },
     onSurveyCompleted() {

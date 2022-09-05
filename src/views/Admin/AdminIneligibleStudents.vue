@@ -32,7 +32,7 @@ import NetworkService from '@/services/NetworkService'
 import IneligibleStudentListItem from '@/components/Admin/IneligibleStudentListItem'
 import PageControl from '@/components/Admin/PageControl'
 
-const getIneligibleStudents = async (page) => {
+const getIneligibleStudents = async page => {
   const {
     body: { ineligibleStudents, isLastPage },
   } = await NetworkService.adminGetIneligibleStudents(page)

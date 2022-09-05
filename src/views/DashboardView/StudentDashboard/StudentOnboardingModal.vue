@@ -47,7 +47,8 @@ export default {
           title: 'Rule #1: Be patient when making a request.',
           subtitle:
             'Pairing you with a coach can take up to 10 minutes. We know waiting’s hard, but we promise a coach is on their way 🏃🏿‍♂️ Don’t leave ‘em hanging!',
-          tip: 'Our coaches are patient, too. Ask as many questions as you want in the same session! There’s no time limit.',
+          tip:
+            'Our coaches are patient, too. Ask as many questions as you want in the same session! There’s no time limit.',
           button: 'Patience, check',
         },
         {

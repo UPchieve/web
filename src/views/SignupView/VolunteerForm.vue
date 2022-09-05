@@ -60,7 +60,9 @@
       </p>
     </div>
 
-    <button class="uc-form-button" type="submit">Continue</button>
+    <button class="uc-form-button" type="submit">
+      Continue
+    </button>
 
     <div v-if="msg !== ''" role="alert">{{ msg }}</div>
   </form>
@@ -248,7 +250,7 @@ export default {
           this.step = 'step-2'
           this.$router.push('/sign-up/volunteer/about')
         })
-        .catch((err) => {
+        .catch(err => {
           this.msg = err.message
           if (err.status !== 409 && err.status !== 422) {
             Sentry.captureException(err)
@@ -299,7 +301,7 @@ export default {
           this.isRegistering = false
           this.$router.push('/verify')
         })
-        .catch((err) => {
+        .catch(err => {
           this.isRegistering = false
           this.msg = err.message
           if (err.status !== 409 && err.status !== 422) {

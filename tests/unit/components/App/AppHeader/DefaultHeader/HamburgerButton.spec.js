@@ -54,7 +54,7 @@ describe.skip('HamburgerButton', () => {
   it('calls handleClick when clicked', () => {
     // const handleClick = jest.fn();
     // const wrapper = getWrapper(true);
-    // const icon = wrapper.findComponent(HamburgerIcon);
+    // const icon = wrapper.find(HamburgerIcon);
     // icon.trigger("click");
     /**
      *
@@ -68,7 +68,7 @@ describe.skip('HamburgerButton', () => {
 
   it('expands sidebar if collapsed when clicked', () => {
     // const wrapper = getWrapper(true);
-    // // const icon = wrapper.findComponent(HamburgerIcon);
+    // // const icon = wrapper.find(HamburgerIcon);
     // icon.trigger("click");
     /**
      *
@@ -82,7 +82,7 @@ describe.skip('HamburgerButton', () => {
 
   it('collapses sidebar if expanded when clicked', () => {
     // const wrapper = getWrapper(false);
-    // const icon = wrapper.findComponent(CrossIcon);
+    // const icon = wrapper.find(CrossIcon);
     /**
      *
      * TODO: Fix test - remove explicit call to collapse function and

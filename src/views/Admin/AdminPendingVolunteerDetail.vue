@@ -37,9 +37,9 @@
             v-model="photoIdStatus"
             class="user-detail__photo-id-select"
           >
-            <option selected disabled value="SUBMITTED">
-              Review required...
-            </option>
+            <option selected disabled value="SUBMITTED"
+              >Review required...</option
+            >
             <option value="REJECTED">Reject</option>
             <option value="APPROVED">Approve</option>
           </select>

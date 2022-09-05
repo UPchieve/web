@@ -147,7 +147,9 @@
       </div>
     </div>
     <div class="sessions-filter-button">
-      <button class="btn" type="button" @click="submitFilters">Update</button>
+      <button class="btn" type="button" @click="submitFilters">
+        Update
+      </button>
     </div>
     <page-control
       :page="page"
@@ -166,7 +168,7 @@ import SessionsList from '@/components/Admin/SessionsList'
 import PageControl from '@/components/Admin/PageControl'
 import moment from 'moment'
 
-const getSessions = async (filters) => {
+const getSessions = async filters => {
   const {
     body: { sessions, isLastPage },
   } = await NetworkService.adminGetSessions(filters)
@@ -187,7 +189,9 @@ export default {
       filters: {
         showBannedUsers: '',
         showTestUsers: '',
-        sessionActivityFrom: moment().subtract(7, 'days').format('YYYY-MM-DD'),
+        sessionActivityFrom: moment()
+          .subtract(7, 'days')
+          .format('YYYY-MM-DD'),
         sessionActivityTo: moment().format('YYYY-MM-DD'),
         minMessagesSent: 0,
         minSessionLength: 1, // in minutes,

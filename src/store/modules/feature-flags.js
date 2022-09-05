@@ -50,27 +50,16 @@ export default {
   state: {
     flags: {
       [FEATURE_FLAGS.REFER_FRIENDS]: false,
-      [FEATURE_FLAGS.STUDENT_BANNED_STATE]: true,
       [FEATURE_FLAGS.DASHBOARD_REDESIGN]: false,
-      [FEATURE_FLAGS.GATES_STUDY]: true,
       [FEATURE_FLAGS.DOWNTIME_BANNER]: false,
       [FEATURE_FLAGS.CHATBOT]: false,
-      [FEATURE_FLAGS.COACH_FAVORITING]: true,
-      [FEATURE_FLAGS.SESSION_HISTORY]: true,
-      [FEATURE_FLAGS.DASHBOARD_BANNER]: true,
-      [FEATURE_FLAGS.ZIP_CODE_CHECK]: true,
-      [FEATURE_FLAGS.DISCOVERY_SOURCE]: false,
-      [FEATURE_FLAGS.UPCHIEVE_101_GRACE_PERIOD_BANNER]: true,
-      [FEATURE_FLAGS.SUMMER_PREP_BANNER]: true,
-      [FEATURE_FLAGS.US_HISTORY_LAUNCH_VOLUNTEER]: true,
-      [FEATURE_FLAGS.US_HISTORY_LAUNCH_STUDENT]: false,
-      [FEATURE_FLAGS.CONTEXT_SHARING_WITH_VOLUNTEER]: true,
-      [FEATURE_FLAGS.ENVIRONMENTAL_SCIENCE_LAUNCH_STUDENT]: false,
+      [FEATURE_FLAGS.POSTSESSION_SURVEY]: false,
+      [FEATURE_FLAGS.DASHBOARD_BANNER]: false,
     },
   },
   mutations: {
-    setFeatureFlags: (state) => {
-      Object.keys(FEATURE_FLAGS).forEach((key) => {
+    setFeatureFlags: state => {
+      Object.keys(FEATURE_FLAGS).forEach(key => {
         state.flags[FEATURE_FLAGS[key]] = unleash.isEnabled(FEATURE_FLAGS[key])
       })
     },
@@ -89,35 +78,14 @@ export default {
     },
   },
   getters: {
-    isReferFriendsActive: (state) => state.flags[FEATURE_FLAGS.REFER_FRIENDS],
-    isStudentBannedStateActive: (state) =>
-      state.flags[FEATURE_FLAGS.STUDENT_BANNED_STATE],
-    isDashboardRedesignActive: (state) =>
+    isReferFriendsActive: state => state.flags[FEATURE_FLAGS.REFER_FRIENDS],
+    isDashboardRedesignActive: state =>
       state.flags[FEATURE_FLAGS.DASHBOARD_REDESIGN],
-    isGatesStudyActive: (state) => state.flags[FEATURE_FLAGS.GATES_STUDY],
-    isDowntimeBannerActive: (state) =>
-      state.flags[FEATURE_FLAGS.DOWNTIME_BANNER],
-    isChatbotActive: (state) => state.flags[FEATURE_FLAGS.CHATBOT],
-    isCoachFavoritingActive: (state) =>
-      state.flags[FEATURE_FLAGS.COACH_FAVORITING],
-    isSessionHistoryActive: (state) =>
-      state.flags[FEATURE_FLAGS.SESSION_HISTORY],
-    isDashboardBannerActive: (state) =>
+    isDowntimeBannerActive: state => state.flags[FEATURE_FLAGS.DOWNTIME_BANNER],
+    isChatbotActive: state => state.flags[FEATURE_FLAGS.CHATBOT],
+    isDashboardBannerActive: state =>
       state.flags[FEATURE_FLAGS.DASHBOARD_BANNER],
-    isZipCodeCheckActive: (state) => state.flags[FEATURE_FLAGS.ZIP_CODE_CHECK],
-    isDiscoverySourceActive: (state) =>
-      state.flags[FEATURE_FLAGS.DISCOVERY_SOURCE],
-    isUpchieve101GracePeriodBannerActive: (state) =>
-      state.flags[FEATURE_FLAGS.UPCHIEVE_101_GRACE_PERIOD_BANNER],
-    isSummerPrepActive: (state) =>
-      state.flags[FEATURE_FLAGS.SUMMER_PREP_BANNER],
-    isUsHistroyLaunchVolunteerActive: (state) =>
-      state.flags[FEATURE_FLAGS.US_HISTORY_LAUNCH_VOLUNTEER],
-    isUsHistroyLaunchStudentActive: (state) =>
-      state.flags[FEATURE_FLAGS.US_HISTORY_LAUNCH_STUDENT],
-    isContextSharingWithVolunteerActive: (state) =>
-      state.flags[FEATURE_FLAGS.CONTEXT_SHARING_WITH_VOLUNTEER],
-    isEnvironmentalScienceLaunchStudentActive: (state) =>
-      state.flags[FEATURE_FLAGS.ENVIRONMENTAL_SCIENCE_LAUNCH_STUDENT],
+    isPostsessionSurveyActive: state =>
+      state.flags[FEATURE_FLAGS.POSTSESSION_SURVEY],
   },
 }

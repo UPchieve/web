@@ -16,17 +16,7 @@ const getWrapper = (mobileMode = false) => {
           mobileMode: () => mobileMode,
         },
       },
-      user: {
-        getters: {
-          isSessionAlive: () => false,
-        },
-        state: { latestSession: {} },
-      },
-      featureFlags: {
-        getters: {
-          isUsHistroyLaunchStudentActive: () => false,
-        },
-      },
+      user: { state: { latestSession: {} } },
     },
   })
 
@@ -38,7 +28,7 @@ describe('SubjectSelection', () => {
     { title: 'Math Tutoring', topic: 'math' },
     { title: 'Reading and Writing Tutoring', topic: 'readingWriting' },
     { title: 'Science Tutoring', topic: 'science' },
-    // { title: 'Social Studies', topic: 'socialStudies' },
+    { title: 'Social Studies', topic: 'socialStudies' },
     { title: 'College Counseling', topic: 'college' },
     { title: 'Standardized Testing Tutoring', topic: 'sat' },
     {
@@ -60,11 +50,11 @@ describe('SubjectSelection', () => {
       const wrapper = getWrapper(true)
       expect(wrapper.classes('SubjectSelection')).toBe(true)
 
-      const header = wrapper.findComponent('h2')
+      const header = wrapper.find('h2')
       expect(header.exists()).toBe(true)
       expect(header.text()).toBe('Explore our subjects')
 
-      const subjectCards = wrapper.findAllComponents(SubjectCard)
+      const subjectCards = wrapper.findAll(SubjectCard)
       expect(subjectCards.length).toBe(cards.length)
 
       cards.forEach((card, i) => {
@@ -77,10 +67,10 @@ describe('SubjectSelection', () => {
       const wrapper = getWrapper(false)
       expect(wrapper.classes('SubjectSelection')).toBe(true)
 
-      const p = wrapper.findComponent('p')
+      const p = wrapper.find('p')
       expect(p.exists()).toBe(false)
 
-      const subjectCards = wrapper.findAllComponents(SubjectCard)
+      const subjectCards = wrapper.findAll(SubjectCard)
       expect(subjectCards.length).toBe(cards.length)
 
       cards.forEach((card, i) => {

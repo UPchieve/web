@@ -27,8 +27,8 @@ export default {
   },
   computed: {
     ...mapState({
-      headerComponent: (state) => state.app.header.component || 'DefaultHeader',
-      headerData: (state) => state.app.header.data,
+      headerComponent: state => state.app.header.component || 'DefaultHeader',
+      headerData: state => state.app.header.data,
     }),
   },
 }

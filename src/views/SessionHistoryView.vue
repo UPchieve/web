@@ -1,7 +1,9 @@
 <template>
   <div class="session-history">
     <section class="header">
-      <h1 class="title">Session History</h1>
+      <h1 class="title">
+        Session History
+      </h1>
       <p v-if="!mobileMode" class="subtitle">
         On this page you can review your past sessions on UPchieve and favorite
         your preferred Academic Coaches. We’ll do our best to pair you with your
@@ -188,7 +190,7 @@ export default {
   },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
+      user: state => state.user.user,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -235,7 +237,7 @@ export default {
       await this.getSessionHistory(page)
     },
     getSessionTopicIcons() {
-      this.sessions = this.sessions.map((session) => {
+      this.sessions = this.sessions.map(session => {
         session.svg = this.svgs[session.topic]
         return session
       })
@@ -254,7 +256,7 @@ export default {
       return this.total === 0
     },
     updateFavoritedVolunteers(volunteerId, isFavorited) {
-      this.sessions = this.sessions.map((session) => ({
+      this.sessions = this.sessions.map(session => ({
         ...session,
         isFavorited:
           session.volunteerId === volunteerId

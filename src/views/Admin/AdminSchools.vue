@@ -24,7 +24,7 @@
           :options="states"
           label="label"
           :searchable="true"
-          :reduce="(option) => option.value"
+          :reduce="option => option.value"
         />
       </div>
 
@@ -62,7 +62,7 @@ import SchoolListItem from '@/components/Admin/SchoolListItem'
 import PlusIcon from '@/assets/plus_icon.svg'
 import { STATES_WITH_ABBREVIATIONS } from '@/consts'
 
-const getSchools = async (data) => {
+const getSchools = async data => {
   const {
     body: { schools, isLastPage },
   } = await NetworkService.adminGetSchools(data)

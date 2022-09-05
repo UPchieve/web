@@ -68,7 +68,7 @@ export default {
   },
   computed: {
     ...mapState({
-      currentSession: (state) => state.user.session,
+      currentSession: state => state.user.session,
     }),
     isFormComplete() {
       return !!this.reportReason

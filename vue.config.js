@@ -2,6 +2,22 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const path = require('path')
 
 module.exports = {
+  devServer: {
+    disableHostCheck: true,
+    proxy: {
+      '/setcookie': {
+        target: 'http://localhost', // not used, we just need the pathRewrite hook
+        changeOrigin: true,
+        pathRewrite: function(path, req) {
+          req.res.statusCode = 302
+          req.res.cookie('first_cookie', '1', { maxAge: 3600 * 24 * 365 * 10 })
+          req.res.setHeader('Location', 'http://localhost:12380?redirected')
+          req.res.end()
+          return ''
+        },
+      },
+    },
+  },
   configureWebpack: () => {
     if (process.env.BUNDLE_ANALYZER) {
       // merges into config https://cli.vuejs.org/guide/webpack.html#simple-configuration
@@ -10,10 +26,10 @@ module.exports = {
       }
     }
   },
-  chainWebpack: (config) => {
+  chainWebpack: config => {
     // Import setup scss into all processed scss
     const types = ['vue-modules', 'vue', 'normal-modules', 'normal']
-    types.forEach((type) =>
+    types.forEach(type =>
       config.module
         .rule('scss')
         .oneOf(type)
@@ -34,6 +50,30 @@ module.exports = {
         svgo: {
           plugins: [{ removeViewBox: false }],
         },
+      })
+
+    config.module
+      .rule('pdf')
+      .test(/\.pdf$/)
+      .use('file-loader')
+      .loader('file-loader')
+
+    config.module
+      .rule('eslint')
+      .use('eslint-loader')
+      .tap(options => {
+        return {
+          extensions: ['.js', '.jsx', '.vue'],
+          cache: true,
+          cacheIdentifier: 'c861364c',
+          configFile: '.eslintrc.js',
+          emitWarning: false,
+          emitError: false,
+          eslintPath: 'eslint',
+          formatter: function() {
+            /* omitted long function */
+          },
+        }
       })
   },
 }

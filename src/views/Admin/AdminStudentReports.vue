@@ -215,7 +215,10 @@ export default {
       this.highSchool = highSchool
     },
     formatDate(date) {
-      return moment(date).utc().startOf('day').format('MM-DD-YYYY')
+      return moment(date)
+        .utc()
+        .startOf('day')
+        .format('MM-DD-YYYY')
     },
     isValidDateFormat(date) {
       return moment(date, 'MM-DD-YYYY', true).isValid()
@@ -371,9 +374,7 @@ input {
 }
 
 .error {
-  color: $c-error-red;
-  text-align: left;
-  margin: 2em 0;
+  margin: 64px 0;
   font-size: 16px;
 }
 </style>

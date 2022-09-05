@@ -80,11 +80,11 @@
             OR REMOVED FROM THE WEBSITE BY UPCHIEVE OR (B) ANY PERSONS UNDER THE
             AGE OF 13. By using or registering an account for the Website, you
             represent (a) that you have read and agree to these Terms, the
-            Privacy Policy, and Disclaimers (b) that you have not been
-            previously suspended or removed from the Website by UPchieve (c)
-            that you are over 13 years of age and (d) that your registration and
-            your use of the Website is in compliance with any and all applicable
-            laws and regulations.
+            Privacy Policy, and Disclaimers; (b) that you have not been
+            previously suspended or removed from the Website by UPchieve; (c)
+            that you are over 13 years of age; and (d) that your registration
+            and your use of the Website is in compliance with any and all
+            applicable laws and regulations.
           </p>
         </accordion-item>
 
@@ -194,12 +194,12 @@
               Use the Website for any commercial use or purpose unless expressly
               permitted by UPchieve in writing, it being understood that the
               Website and related services are intended for personal,
-              non-commercial use only
+              non-commercial use only;
             </li>
 
             <li>
               Post, upload, or distribute any defamatory, libelous, or
-              inaccurate content
+              inaccurate content;
             </li>
 
             <li>
@@ -207,13 +207,13 @@
               that a reasonable person could deem to be objectionable,
               offensive, indecent, pornographic, harassing, threatening,
               embarrassing, distressing, vulgar, hateful, discriminatory, or
-              otherwise inappropriate
+              otherwise inappropriate;
             </li>
 
             <li>
               Impersonate any person or entity, falsely claim an affiliation
               with any person or entity, access the Website accounts of others
-              without permission, or perform any other fraudulent activity
+              without permission, or perform any other fraudulent activity;
             </li>
 
             <li>
@@ -222,18 +222,19 @@
               unsolicited advertising, promotional materials, or other
               solicitation material, bulk mailing of commercial advertising,
               chain mail, informational announcements, charity requests, and
-              petitions for signatures)
+              petitions for signatures);
             </li>
 
             <li>
               Use the Website for any illegal purpose, or in violation of any
               local, state, national, or international law, including, without
               limitation, laws governing intellectual property and other
-              proprietary rights, and data protection and privacy or
+              proprietary rights, and data protection and privacy; or
             </li>
 
             <li>
-              Defame, harass, abuse, threaten or defraud Users of the Website or
+              Defame, harass, abuse, threaten or defraud Users of the Website;
+              or
             </li>
 
             <li>
@@ -263,7 +264,7 @@
           </p>
 
           <p>
-            <strong>NO CLASS ACTIONS NO JURY TRIAL.</strong> You agree that you
+            <strong>NO CLASS ACTIONS; NO JURY TRIAL.</strong> You agree that you
             will only sue us as an individual in any dispute connected with the
             Services. You agree that you will not file a class action or
             participate in a class action. You agree that you will not join any
@@ -308,14 +309,14 @@
             <strong>WE'RE NOT RESPONSIBLE FOR ALL CIRCUMSTANCES.</strong> You
             also agree that we are not responsible for anything beyond our
             control. For example, we are not liable: for Service interruptions
-            caused by problems with the communications network for problems
-            caused by any Internet service provider for your computer or its
-            programs failing for the acts of criminal attackers, whether in
-            real-time or automated (e.g., viruses) for other technologically
+            caused by problems with the communications network; for problems
+            caused by any Internet service provider; for your computer or its
+            programs failing; for the acts of criminal attackers, whether in
+            real-time or automated (e.g., viruses); for other technologically
             harmful material that may infect your computer equipment, computer
             programs, data or proprietary material due to your use of the
             Websites or to your downloading of any content on it, or on any
-            website linked to it or for errors in information provided to us
+            website linked to it; or for errors in information provided to us
             upon which we reasonably rely. These are only examples. We assume no
             responsibility for the content of other websites linked on the
             Website. Such links should not be interpreted as an endorsement by
@@ -406,7 +407,9 @@
               Contact you about your account, including, but not limited to,
               changes to the Terms of Service or UPchieve's Services
             </li>
-            <li>Ask you for your feedback to help make our Services better</li>
+            <li>
+              Ask you for your feedback to help make our Services better
+            </li>
             <li>Respond to your requests for information or assistance</li>
             <li>
               Consolidate anonymized information about Users in order to apply
@@ -501,7 +504,9 @@
               Services, and how long your interactions with other Users last.
             </li>
             <li>
-              <strong> Information we collect automatically. </strong>
+              <strong>
+                Information we collect automatically.
+              </strong>
               When you use our Site, we also collect information and analytics
               about how you interact with our Site through technologies like
               cookies.
@@ -640,7 +645,9 @@
         <accordion-item label="Cookies">
           <ul>
             <li>
-              <strong> What a cookie is: </strong>
+              <strong>
+                What a cookie is:
+              </strong>
               <p>
                 A Cookie is a small file that can be placed on your device that
                 allows us to recognize and remember you. It is sent to your

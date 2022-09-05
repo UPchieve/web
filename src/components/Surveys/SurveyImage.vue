@@ -40,11 +40,15 @@ export default {
       type: [String, Number],
       required: true,
     },
+    questionId: {
+      type: [String, Number],
+      required: true,
+    },
   },
 
   methods: {
     handleImageClick() {
-      this.$emit('survey-image-click', this.responseId)
+      this.$emit('survey-image-click', this.questionId, this.responseId)
     },
   },
 }
@@ -62,7 +66,14 @@ export default {
     height: 38px;
     width: 38px;
 
-    @include breakpoint-above('small') {
+    @media only screen and (max-width: 660px) {
+      margin: 10px 15px;
+      height: 20px;
+      width: 20px;
+    }
+
+    @media only screen and (min-width: 661px) {
+      margin: 20px 20px;
       height: 50px;
       width: 50px;
     }

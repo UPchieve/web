@@ -2,8 +2,6 @@ import SidebarLink from '@/components/App/AppSidebar/SidebarLink'
 import SidebarLinks from '@/components/App/AppSidebar/SidebarLinks'
 import { createLocalVue, shallowMount } from '@vue/test-utils'
 import Vuex from 'vuex'
-import { merge } from 'lodash'
-import { storeOptions } from '@/store'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
@@ -17,6 +15,16 @@ const LEGAL_LINK = {
   text: 'Legal policy',
 }
 const PROFILE_LINK = { to: '/profile', text: 'Profile' }
+
+// Student links
+const SESSION_HISTORY_LINK = {
+  to: '/sessions/history',
+  text: 'Session History',
+}
+const FAVORITE_COACHES_LINK = {
+  to: '/favorite-coaches',
+  text: 'Favorite Coaches',
+}
 
 // Volunteer links
 const CALENDAR_LINK = { to: '/calendar', text: 'Schedule' }
@@ -33,7 +41,14 @@ const ADMIN_LINK = { to: '/admin', text: 'Admin' }
 const links = {
   default: {
     loggedOut: [],
-    student: [DASHBOARD_LINK, PROFILE_LINK, CONTACT_LINK, LEGAL_LINK],
+    student: [
+      DASHBOARD_LINK,
+      SESSION_HISTORY_LINK,
+      FAVORITE_COACHES_LINK,
+      PROFILE_LINK,
+      CONTACT_LINK,
+      LEGAL_LINK,
+    ],
     volunteer: [
       DASHBOARD_LINK,
       TRAINING_LINK,
@@ -42,7 +57,15 @@ const links = {
       CONTACT_LINK,
       LEGAL_LINK,
     ],
-    admin: [DASHBOARD_LINK, ADMIN_LINK, PROFILE_LINK, CONTACT_LINK, LEGAL_LINK],
+    admin: [
+      DASHBOARD_LINK,
+      TRAINING_LINK,
+      CALENDAR_LINK,
+      ADMIN_LINK,
+      PROFILE_LINK,
+      CONTACT_LINK,
+      LEGAL_LINK,
+    ],
   },
   onboarding: {
     student: [],
@@ -62,18 +85,8 @@ const getWrapper = (options = {}) => {
 
   const getters = {
     isReferFriendsActive: () => false,
-    isSessionHistoryActive: () => true,
-    isCoachFavoritingActive: () => true,
   }
-  const store = new Vuex.Store(
-    merge({}, storeOptions, {
-      modules: {
-        featureFlags: {
-          getters,
-        },
-      },
-    })
-  )
+  const store = new Vuex.Store({ getters })
 
   return shallowMount(SidebarLinks, {
     localVue,
@@ -92,19 +105,19 @@ describe('SidebarLinks', () => {
   it('layout', () => {
     const wrapper = getWrapper({ authenticated: true })
     expect(wrapper.classes('SidebarLinks')).toBe(true)
-    expect(wrapper.findAllComponents(SidebarLink).length).toBeGreaterThan(0)
+    expect(wrapper.findAll(SidebarLink).length).toBeGreaterThan(0)
 
-    const about = wrapper.findComponent('.SidebarLinks-about')
+    const about = wrapper.find('.SidebarLinks-about')
     expect(about.exists()).toBe(true)
     expect(about.text()).toBe('About UPchieve')
 
     wrapper.setProps({ mobileMode: true })
-    expect(wrapper.findComponent('.SidebarLinks-about').exists()).toBe(false)
+    expect(wrapper.find('.SidebarLinks-about').exists()).toBe(false)
   })
 
   describe('link tests', () => {
     const testLinks = (wrapper, expectedLinks) => {
-      const sidebarLinks = wrapper.findAllComponents(SidebarLink)
+      const sidebarLinks = wrapper.findAll(SidebarLink)
       expect(sidebarLinks.length).toBe(expectedLinks.length)
       expectedLinks.forEach((link, i) => {
         const sidebarLink = sidebarLinks.at(i)
@@ -153,6 +166,7 @@ describe('SidebarLinks', () => {
           mobileMode: true,
           isAdmin: true,
           authenticated: true,
+          isVolunteer: true,
         })
         testLinks(wrapper, links.default.admin)
       })
@@ -197,6 +211,7 @@ describe('SidebarLinks', () => {
           mobileMode: false,
           isAdmin: true,
           authenticated: true,
+          isVolunteer: true,
         })
         testLinks(wrapper, links.default.admin)
       })

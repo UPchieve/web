@@ -4,7 +4,7 @@
     :is="icon"
     v-on:click="handleAction"
     v-on:keydown.enter="handleAction"
-    :tabindex="Number(tabindex)"
+    :tabindex="tabindex"
   />
 </template>
 
@@ -13,7 +13,7 @@ import HambugerIcon from '@/assets/hamburger.svg'
 import CrossIcon from '@/assets/cross.svg'
 
 export default {
-  props: { tabindex: String },
+  props: { tabindex: Number },
   computed: {
     icon() {
       return this.$store.state.app.sidebar.isCollapsed

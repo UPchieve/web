@@ -428,22 +428,11 @@ export const VERIFICATION_METHOD = {
 
 export const FEATURE_FLAGS = {
   REFER_FRIENDS: 'refer-friends',
-  STUDENT_BANNED_STATE: 'student-banned-state',
   DASHBOARD_REDESIGN: 'dashboard-redesign',
-  GATES_STUDY: 'gates-study',
   DOWNTIME_BANNER: 'downtime-banner',
   CHATBOT: 'chatbot',
-  COACH_FAVORITING: 'coach-favoriting',
-  SESSION_HISTORY: 'session-history',
   DASHBOARD_BANNER: 'dashboard-banner',
-  ZIP_CODE_CHECK: 'zip-code-check',
-  DISCOVERY_SOURCE: 'discovery-source',
-  UPCHIEVE_101_GRACE_PERIOD_BANNER: 'training-grace-period-banner',
-  SUMMER_PREP_BANNER: 'summer-prep-banner',
-  US_HISTORY_LAUNCH_VOLUNTEER: 'us-history-launch-volunteer',
-  US_HISTORY_LAUNCH_STUDENT: 'us-history-launch-student',
-  CONTEXT_SHARING_WITH_VOLUNTEER: 'context-sharing-with-volunteer',
-  ENVIRONMENTAL_SCIENCE_LAUNCH_STUDENT: 'environmental-science-launch-student',
+  POSTSESSION_SURVEY: 'postsession-survey',
 }
 
 export const ANALYTICS_REPORT_ROW = {

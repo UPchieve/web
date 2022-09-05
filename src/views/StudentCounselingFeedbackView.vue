@@ -86,7 +86,7 @@
                 >
                   <input
                     @change="
-                      (event) =>
+                      event =>
                         handleCoachRatingChange(
                           event,
                           question.alias,
@@ -94,9 +94,11 @@
                         )
                     "
                     type="radio"
-                    :name="`multiple-radio-${
-                      question.qid
-                    }_${subquestion_index.toString()}`"
+                    :name="
+                      `multiple-radio-${
+                        question.qid
+                      }_${subquestion_index.toString()}`
+                    "
                     :value="index"
                   />
                 </td>
@@ -111,7 +113,9 @@
                 v-bind:key="subquestion"
               >
                 <input
-                  :id="`radio-list-option_${question.options_alias[subquestion_index]}`"
+                  :id="
+                    `radio-list-option_${question.options_alias[subquestion_index]}`
+                  "
                   class="radio-list__option-input"
                   v-model="userResponse[question.alias]"
                   type="radio"
@@ -120,7 +124,9 @@
                 />
                 <label
                   class="radio-list__option-label"
-                  :for="`radio-list-option_${question.options_alias[subquestion_index]}`"
+                  :for="
+                    `radio-list-option_${question.options_alias[subquestion_index]}`
+                  "
                 >
                   {{ subquestion }}
                 </label>
@@ -185,7 +191,8 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+// NOTE: can get rid of this entire component once we've fully transferred over to new postsession survey
+import { mapState } from 'vuex'
 import NetworkService from '@/services/NetworkService'
 import Case from 'case'
 import Loader from '@/components/Loader'
@@ -298,17 +305,13 @@ export default {
   },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
-    }),
-    ...mapGetters({
-      isCoachFavoritingActive: 'featureFlags/isCoachFavoritingActive',
+      user: state => state.user.user,
     }),
     showFavoriteQuestion() {
       return (
         this.userResponse['coach-ratings']['coach-help-again'] >= 4 &&
         !this.isFavoriteCoach &&
-        !this.isFavoriteCoachLimitReached &&
-        this.isCoachFavoritingActive
+        !this.isFavoriteCoachLimitReached
       )
     },
   },
@@ -343,7 +346,7 @@ export default {
     this.questions = this.student_questions
 
     if (this.questions.length > 0)
-      this.questions.map((question) => {
+      this.questions.map(question => {
         if (
           question.qtype === 'multiple-radio' ||
           question.qtype === 'star-rating'
@@ -351,7 +354,7 @@ export default {
           this.userResponse[question.alias] = {}
       })
 
-    if (!this.user.isVolunteer && this.isCoachFavoritingActive) {
+    if (!this.user.isVolunteer) {
       const response = await NetworkService.checkIsFavoriteVolunteer(
         this.session.volunteer._id
       )
@@ -392,7 +395,7 @@ export default {
             volunteerId: this.volunteerId,
           })
         )
-        if (this.isFavoritingCoach && this.isCoachFavoritingActive)
+        if (this.isFavoritingCoach)
           requests.push(
             NetworkService.updateFavoriteVolunteerStatus(
               this.session.volunteer._id,

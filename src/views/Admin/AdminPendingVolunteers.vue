@@ -29,7 +29,7 @@ import NetworkService from '@/services/NetworkService'
 import PendingVolunteerListItem from '@/components/Admin/PendingVolunteerListItem'
 import PageControl from '@/components/Admin/PageControl'
 
-const getVolunteersToReview = async (page) => {
+const getVolunteersToReview = async page => {
   const {
     body: { volunteers, isLastPage },
   } = await NetworkService.adminGetVolunteersToReview(page)

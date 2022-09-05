@@ -54,7 +54,7 @@ Vue.http.options.credentials = true
 
 const getUser = () => {
   if (store.getters['user/isAuthenticated']) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       store.dispatch('user/fetchUser')
       resolve()
     })
@@ -174,7 +174,7 @@ const routes = [
     path: '/setpassword',
     name: 'SetPasswordView',
     component: SetPasswordView,
-    props: (route) => ({ token: route.query.token }),
+    props: route => ({ token: route.query.token }),
   },
   {
     path: '/dashboard',
@@ -220,7 +220,8 @@ const routes = [
     meta: { protected: true },
   },
   {
-    path: '/feedback/:sessionId/:topic/:subTopic/:userType/:studentId/:volunteerId',
+    path:
+      '/feedback/:sessionId/:topic/:subTopic/:userType/:studentId/:volunteerId',
     name: 'StudentCounselingFeedbackView',
     component: StudentCounselingFeedbackView,
     meta: { protected: true },
@@ -422,7 +423,7 @@ export default router
 
 // Router middleware to check authentication for protect routes
 router.beforeEach((to, from, next) => {
-  if (to.matched.some((route) => route.meta.requiresAdmin)) {
+  if (to.matched.some(route => route.meta.requiresAdmin)) {
     getUser()
       .then(() => {
         if (!store.state.user.user.isAdmin) {
@@ -437,7 +438,7 @@ router.beforeEach((to, from, next) => {
         }
       })
       .catch(() => {})
-  } else if (to.matched.some((route) => route.meta.protected)) {
+  } else if (to.matched.some(route => route.meta.protected)) {
     getUser()
       .then(() => {
         if (!store.getters['user/isAuthenticated']) {
@@ -460,7 +461,7 @@ router.beforeEach((to, from, next) => {
         }
       })
       .catch(() => {})
-  } else if (to.matched.some((route) => route.meta.loggedOutOnly)) {
+  } else if (to.matched.some(route => route.meta.loggedOutOnly)) {
     getUser()
       .then(() => {
         if (store.getters['user/isAuthenticated']) {
@@ -470,7 +471,7 @@ router.beforeEach((to, from, next) => {
         }
       })
       .catch(() => {})
-  } else if (to.matched.some((route) => route.meta.authOptional)) {
+  } else if (to.matched.some(route => route.meta.authOptional)) {
     getUser()
       .then(() => {
         next()
@@ -512,7 +513,7 @@ router.afterEach((to, from) => {
 // If endpoint returns 401, redirect to login (except for requests to get user or user's
 // session)
 Vue.http.interceptors.push((request, next) => {
-  next((response) => {
+  next(response => {
     const is401 = response.status === 401
     const isGetUserAttempt =
       request.url.indexOf('/api/user') !== -1 && request.method === 'GET'
@@ -526,7 +527,7 @@ Vue.http.interceptors.push((request, next) => {
 })
 
 // using the double submit cookie pattern to send csrf token stored in cookie as a request parameter
-Vue.http.interceptors.push((request) => {
+Vue.http.interceptors.push(request => {
   const csrfToken = store.getters['app/csrfToken']
   if (csrfToken) {
     request.headers.set('X-CSRF-TOKEN', csrfToken)

@@ -48,6 +48,10 @@ export default {
       type: String,
       required: true,
     },
+    questionId: {
+      type: [String, Number],
+      required: true,
+    },
     responseId: {
       type: [String, Number],
       required: true,
@@ -65,10 +69,15 @@ export default {
 
   methods: {
     handleRadioSelection() {
-      this.$emit('survey-radio-input', this.responseId, '')
+      this.$emit('survey-radio-input', this.questionId, this.responseId, '')
     },
     handleOpenResponse(event) {
-      this.$emit('survey-radio-input', this.responseId, event.target.value)
+      this.$emit(
+        'survey-radio-input',
+        this.questionId,
+        this.responseId,
+        event.target.value
+      )
     },
   },
 

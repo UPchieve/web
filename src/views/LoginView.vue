@@ -71,7 +71,7 @@ export default {
   },
   computed: {
     ...mapState({
-      isMobileApp: (state) => state.app.isMobileApp,
+      isMobileApp: state => state.app.isMobileApp,
     }),
     isValidForm() {
       const { email, password } = this.credentials
@@ -98,7 +98,7 @@ export default {
         email: this.credentials.email,
         password: this.credentials.password,
       })
-        .then((data) => {
+        .then(data => {
           this.$store.commit('user/setUser', data.user)
           this.$router.push(this.$route.query.redirect || '/')
         })

@@ -24,38 +24,219 @@
 
       <template v-else>
         <ul class="feedback__questions-list">
-          <li
-            v-for="(question, index) in filteredQuestions"
-            :key="question.id"
-            class="feedback__questions-item"
-          >
-            <h2
-              class="feedback__question"
-              v-html="
-                question.question
-                  ? question.question
-                  : question.dynamicQuestion()
-              "
+          <div v-if="isPostsessionSurveyActive">
+            <li
+              v-for="questionInfo in filteredQuestions"
+              :key="questionInfo.question.id"
+              :class="{
+                'feedback__questions-item': !(
+                  questionInfo.questionType === 'radio'
+                ),
+              }"
             >
-              {{ index + 1 }}.
-              {{
-                question.question
-                  ? question.question
-                  : question.dynamicQuestion()
-              }}
-            </h2>
-            <p class="feedback__subtext">
-              {{ question.subtext }}
-            </p>
-            <component
-              :is="question.component"
-              :id="question.id"
-              :position="index"
-              :options="question.options"
-              :direction="question.direction"
-              v-model="question.answer"
-            />
-          </li>
+              <div v-if="questionInfo.headerText">
+                <hr />
+                <div class="question__section-header">
+                  {{ questionInfo.headerText }}
+                </div>
+              </div>
+              <div class="question__title">
+                {{ questionInfo.question.questionText }}
+              </div>
+              <div
+                :class="{
+                  'question__responses-images': isRowOfImages(
+                    questionInfo.question
+                  ),
+                  'question__responses-rating':
+                    questionInfo.questionType === 'number-rating',
+                  'question__responses-radio':
+                    questionInfo.questionType === 'radio',
+                  'question__responses-vertical':
+                    isHighRatingQuestion(questionInfo.question) ||
+                    isGuidelineIssueListQuestion(questionInfo.question),
+                  'question__responses-postsession': !(
+                    isHighRatingQuestion(questionInfo.question) ||
+                    isGuidelineIssueListQuestion(questionInfo.question)
+                  ),
+                }"
+              >
+                <template
+                  v-for="(response, index) in questionInfo.question.responses"
+                >
+                  <survey-image
+                    v-if="questionInfo.questionType === 'emoji'"
+                    class="question__response question__response-image"
+                    :key="`${response.responseId}-image`"
+                    :src="response.responseDisplayImage"
+                    :label="response.responseText"
+                    :questionId="questionInfo.questionId"
+                    :responseId="response.responseId"
+                    :isSelected="
+                      userResponse[questionInfo.questionId].responseId ===
+                        response.responseId
+                    "
+                    @survey-image-click="updateUserResponse"
+                  />
+                  <survey-chip-option
+                    v-else-if="questionInfo.questionType === 'chip'"
+                    :key="`${response.responseId}-chip`"
+                    :label="response.responseText"
+                    :questionId="questionInfo.questionId"
+                    :responseId="response.responseId"
+                    :isSelected="
+                      userResponse[questionInfo.questionId].responseId &&
+                        userResponse[questionInfo.questionId].responseId.find(
+                          r => r === response.responseId
+                        )
+                    "
+                    @chip-click="updateUserResponseMultiselect"
+                    class="issue-reason-chip"
+                  />
+                  <survey-image
+                    v-else-if="questionInfo.questionType === 'star'"
+                    class="question__response question__response-star"
+                    :key="`${response.responseId}-star`"
+                    :src="response.responseDisplayImage"
+                    :questionId="questionInfo.questionId"
+                    :responseId="response.responseId"
+                    :isSelected="
+                      shouldStarShowSelected(questionInfo.question, response)
+                    "
+                    @survey-image-click="updateUserResponse"
+                  />
+                  <survey-radio
+                    v-else-if="questionInfo.questionType === 'radio'"
+                    class="question__response question__response-boxed question__response-radio"
+                    :class="{
+                      'question__response-boxed-selected':
+                        userResponse[questionInfo.questionId].responseId ===
+                        response.responseId,
+                    }"
+                    :key="`${response.responseId}-radio`"
+                    :id="`${questionInfo.questionId}_${response.responseId}`"
+                    :radioValue="response.responseId"
+                    :name="questionInfo.questionId"
+                    :checked="
+                      userResponse[questionInfo.questionId].responseId ===
+                        response.responseId
+                    "
+                    :questionId="questionInfo.questionId"
+                    :responseId="response.responseId"
+                    :label="response.responseText"
+                    :isOpenResponseDisabled="true"
+                    @survey-radio-input="updateUserResponse"
+                  />
+                  <survey-checkbox
+                    v-else-if="questionInfo.questionType === 'checkbox'"
+                    class="question__response question__response-boxed"
+                    :class="{
+                      'question__response-boxed-selected':
+                        userResponse[questionInfo.questionId].responseId &&
+                        userResponse[questionInfo.questionId].responseId.find(
+                          r => r === response.responseId
+                        ),
+                    }"
+                    :key="`${response.responseId}-checkbox`"
+                    :id="`${questionInfo.questionId}_${response.responseId}`"
+                    :checkboxValue="response.responseId"
+                    :name="questionInfo.questionId"
+                    :checked="
+                      userResponse[questionInfo.questionId].responseId ===
+                        response.responseId
+                    "
+                    :questionId="questionInfo.questionId"
+                    :responseId="response.responseId"
+                    :label="response.responseText"
+                    @survey-checkbox-input="updateUserResponseMultiselect"
+                  />
+                  <survey-rate-number
+                    v-else-if="questionInfo.questionType === 'number-rating'"
+                    class="question__response question__response-numbers"
+                    :key="`${response.responseId}-rating`"
+                    :src="response.responseDisplayImage"
+                    :rating="index + 1"
+                    :label="index % 2 === 0 ? response.responseText : ''"
+                    :questionId="questionInfo.questionId"
+                    :responseId="response.responseId"
+                    :isSelected="
+                      userResponse[questionInfo.questionId].responseId ===
+                        response.responseId
+                    "
+                    @survey-rate-click="updateUserResponse"
+                  />
+                  <div
+                    v-else-if="questionInfo.questionType === 'free response'"
+                    :key="`${response.responseId}-free-response`"
+                  >
+                    <div class="question__subtext">
+                      We read every single comment, but if you need to connect
+                      with UPchieve staff about a question or concern please
+                      email us directly:
+                      <a href="mailto:support@upchieve.org"
+                        >support@upchieve.org</a
+                      >
+                    </div>
+                    <feedback-textarea
+                      :id="`${questionInfo.questionId}_${response.responseId}`"
+                      @change="
+                        responseText =>
+                          updateUserResponse(
+                            questionInfo.questionId,
+                            response.responseId,
+                            responseText
+                          )
+                      "
+                    >
+                    </feedback-textarea>
+                  </div>
+                </template>
+              </div>
+              <div
+                class="response-answer-text"
+                v-if="
+                  questionInfo.questionType === 'star' &&
+                    userResponse[questionInfo.questionId].responseId
+                "
+              >
+                {{ getAnswerToQuestion(questionInfo.question) }}
+              </div>
+            </li>
+          </div>
+          <div v-else>
+            <li
+              v-for="(question, index) in filteredQuestions"
+              :key="question.id"
+              :class="feedback__questions - item"
+            >
+              <h2
+                class="feedback__question"
+                v-html="
+                  question.question
+                    ? question.question
+                    : question.dynamicQuestion()
+                "
+              >
+                {{ index + 1 }}.
+                {{
+                  question.question
+                    ? question.question
+                    : question.dynamicQuestion()
+                }}
+              </h2>
+              <p class="feedback__subtext">
+                {{ question.subtext }}
+              </p>
+              <component
+                :is="question.component"
+                :id="question.id"
+                :position="index"
+                :options="question.options"
+                v-model="question.answer"
+                :direction="question.direction"
+              />
+            </li>
+          </div>
         </ul>
 
         <p v-if="error" class="feedback__error">{{ error }}</p>
@@ -84,12 +265,25 @@ import FeedbackRadio from '@/components/FeedbackRadio'
 import FeedbackTextarea from '@/components/FeedbackTextarea'
 import FeedbackCheckbox from '@/components/FeedbackCheckbox'
 import Loader from '@/components/Loader'
+import { QUESTION_TYPES } from '@/consts'
+import SurveyRadio from '@/components/Surveys/SurveyRadio'
+import SurveyImage from '@/components/Surveys/SurveyImage'
+import SurveyRateNumber from '../components/Surveys/SurveyRateNumber'
+import SurveyChipOption from '../components/Surveys/SurveyChipOption'
+import SurveyCheckbox from '../components/Surveys/SurveyCheckbox'
+import _ from 'lodash'
 
 export default {
   name: 'FeedbackView',
   components: {
     LargeButton,
     Loader,
+    SurveyImage,
+    SurveyRadio,
+    SurveyRateNumber,
+    SurveyChipOption,
+    SurveyCheckbox,
+    FeedbackTextarea,
   },
   data() {
     return {
@@ -100,6 +294,9 @@ export default {
       completedFeedback: false,
       isFavoriteCoach: false,
       isFavoriteCoachLimitReached: false,
+      allQuestions: [],
+
+      // TODO: remove in context sharing feature flag cleanup
       studentQuestions: [
         {
           id: 'session-goal',
@@ -151,14 +348,9 @@ export default {
           direction: 'column',
           answer: null,
           show: () => {
-            if (
-              this.isFavoriteCoach ||
-              this.isFavoriteCoachLimitReached ||
-              !this.isCoachFavoritingActive
-            )
+            if (this.isFavoriteCoach || this.isFavoriteCoachLimitReached)
               return false
-
-            const question = this.questions.find((q) => q.id === 'coach-rating')
+            const question = this.questions.find(q => q.id === 'coach-rating')
             return question.answer && question.answer >= 4
           },
         },
@@ -169,7 +361,7 @@ export default {
           component: FeedbackTextarea,
           answer: null,
           show: () => {
-            const question = this.questions.find((q) => q.id === 'coach-rating')
+            const question = this.questions.find(q => q.id === 'coach-rating')
             return question.answer && question.answer <= 3
           },
         },
@@ -183,6 +375,8 @@ export default {
           answer: null,
         },
       ],
+
+      // TODO: remove in context sharing feature flag cleanup
       volunteerQuestions: [
         {
           id: 'session-enjoyable',
@@ -200,7 +394,7 @@ export default {
           answer: null,
           show: () => {
             const question = this.volunteerQuestions.find(
-              (q) => q.id === 'session-enjoyable'
+              q => q.id === 'session-enjoyable'
             )
             return question.answer && question.answer <= 3
           },
@@ -247,16 +441,15 @@ export default {
         },
       ],
       error: '',
+      userResponse: {},
     }
   },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
+      user: state => state.user.user,
     }),
     ...mapGetters({
-      isCoachFavoritingActive: 'featureFlags/isCoachFavoritingActive',
-      isContextSharingWithVolunteerActive:
-        'featureFlags/isContextSharingWithVolunteerActive',
+      isPostsessionSurveyActive: 'featureFlags/isPostsessionSurveyActive',
     }),
     sessionPartnerFirstName() {
       return this.user.isVolunteer
@@ -268,16 +461,17 @@ export default {
       return topics[type].subtopics[subTopic].displayName
     },
     sessionTime() {
-      return moment(this.session.createdAt).local().format('LT')
+      return moment(this.session.createdAt)
+        .local()
+        .format('LT')
     },
     sessionDate() {
-      return moment(this.session.createdAt).local().format('MMMM Do, YYYY')
+      return moment(this.session.createdAt)
+        .local()
+        .format('MMMM Do, YYYY')
     },
     sessionGoal() {
-      if (
-        this.isContextSharingWithVolunteerActive &&
-        this.studentPresessionGoal
-      ) {
+      if (this.isPostsessionSurveyActive && this.studentPresessionGoal) {
         return this.studentPresessionGoal
       } else {
         if (this.presessionSurvey && this.presessionSurvey.createdAt) {
@@ -302,23 +496,21 @@ export default {
       return this.user.isVolunteer ? 'volunteer' : 'student'
     },
     questions() {
+      if (this.isPostsessionSurveyActive) {
+        return this.allQuestions.map(q => q.question)
+      }
       return this.user.isVolunteer
         ? this.volunteerQuestions
         : this.studentQuestions
     },
-    filteredQuestions() {
-      return this.questions.filter((item) => !item.show || item.show())
+    questionTypes() {
+      return QUESTION_TYPES
     },
-    isFavoritingCoach() {
-      if (!this.isVolunteer) {
-        const coachFavoritingQuestion = this.filteredQuestions.find(
-          (q) => q.id === 'coach-favoriting'
-        )
-        // `1` is the first answer option when asking the student if they would like
-        // to favorite the coach. That means the student wants to favorite them
-        return coachFavoritingQuestion && coachFavoritingQuestion.answer === 1
+    filteredQuestions() {
+      if (this.isPostsessionSurveyActive) {
+        return this.allQuestions.filter(q => q.isVisible)
       }
-      return false
+      return this.questions.filter(item => !item.show || item.show())
     },
   },
   async beforeMount() {
@@ -356,6 +548,33 @@ export default {
     } = presessionGoalResponse
 
     this.session = session
+    if (this.isPostsessionSurveyActive) {
+      const postsessionSurveyDefinitionResponse = await NetworkService.getPostsessionSurvey(
+        this.session.subTopic,
+        this.session.id,
+        this.userType
+      )
+      this.surveyDefinition = postsessionSurveyDefinitionResponse.body.survey
+      this.allQuestions = _.map(this.surveyDefinition.survey, q => {
+        const isHiddenOnStart =
+          this.isLowRatingQuestion(q) ||
+          this.isHighRatingQuestion(q) ||
+          this.isGuidelineIssueListQuestion(q)
+        q.responses = _.orderBy(q.responses, r => r.displayPriority)
+        return {
+          questionId: q.questionId,
+          question: q,
+          isVisible: !isHiddenOnStart,
+          questionType: this.getQuestionDisplayType(q),
+          headerText: this.getQuestionSectionHeader(q),
+        }
+      })
+      this.allQuestions = _.orderBy(
+        this.allQuestions,
+        q => q.question.displayPriority
+      )
+      this.buildUserResponse()
+    }
     this.studentPresessionGoal = goal
     // TODO: remove in context sharing feature flag cleanup
     this.presessionSurvey = survey
@@ -364,7 +583,7 @@ export default {
       return
     }
 
-    if (!this.user.isVolunteer && this.isCoachFavoritingActive) {
+    if (!this.user.isVolunteer) {
       const response = await NetworkService.checkIsFavoriteVolunteer(
         this.session.volunteer._id
       )
@@ -377,58 +596,354 @@ export default {
     }
   },
   methods: {
+    getQuestionDisplayType(question) {
+      if (question.questionType === 'multiple choice') {
+        if (question.questionText.startsWith('How do you think')) {
+          return 'emoji'
+        } else if (this.isLowRatingQuestion(question)) {
+          return 'chip'
+        } else if (this.isStarRankingQuestion(question)) {
+          return 'star'
+        } else if (
+          this.isHighRatingQuestion(question) ||
+          this.isIssuePresentQuestion(question)
+        ) {
+          return 'radio'
+        } else if (this.isGuidelineIssueListQuestion(question)) {
+          return 'checkbox'
+        } else if (this.isNumericalRatingQuestion(question)) {
+          return 'number-rating'
+        }
+      }
+      return question.questionType
+    },
+    getQuestionSectionHeader(question) {
+      if (question.questionType === 'multiple choice') {
+        if (question.questionText.startsWith('How do you think')) {
+          return "Student's Feelings"
+        } else if (this.isStarRankingQuestion(question)) {
+          return this.user.isVolunteer ? "Student's Progress" : 'Your Goal'
+        } else if (this.isIssuePresentQuestion(question)) {
+          return 'Your Concerns'
+        } else if (this.isHowSupportiveQuestion(question)) {
+          return 'Your Coach'
+        }
+      } else if (question.questionType === 'free response') {
+        return 'Your Thoughts'
+      }
+      return undefined
+    },
+
+    isRowOfImages(question) {
+      return (
+        question.questionType === 'emoji' || question.questionType === 'star'
+      )
+    },
+    isStarRankingQuestion(question) {
+      return (
+        question.questionText.startsWith('Your goal for this session') ||
+        question.questionText.endsWith('achieve their goal?')
+      )
+    },
+    isGuidelineIssueListQuestion(question) {
+      return question.questionText.startsWith('Please select all that apply')
+    },
+    isIssuePresentQuestion(question) {
+      return question.questionText.startsWith('Were there any student safety')
+    },
+    isHowSupportiveQuestion(question) {
+      return question.questionText.startsWith('Overall, how supportive')
+    },
+    isNumericalRatingQuestion(question) {
+      return (
+        this.isHowSupportiveQuestion(question) ||
+        question.questionText.startsWith('Overall, how much did your coach')
+      )
+    },
+
+    isHighRatingQuestion(question) {
+      return question.questionText.startsWith(
+        'Would you like to favorite your coach'
+      )
+    },
+    isHighRatingResponse(responseText) {
+      return (
+        responseText === "I'm def closer to my goal" ||
+        responseText === 'GOAL ACHIEVED' ||
+        responseText === 'Mostly' ||
+        responseText === 'A lot'
+      )
+    },
+    isLowRatingQuestion(question) {
+      return question.questionText.startsWith('Sorry to hear that')
+    },
+    isLowRatingResponse(responseText) {
+      return (
+        responseText === 'Not at all' || responseText === 'Sorta but not really'
+      )
+    },
+
+    shouldStarShowSelected(question, response) {
+      if (!this.userResponse[question.questionId]) {
+        return false
+      }
+      const currentDisplayPriority = response.responseDisplayPriority
+
+      const selectedResponseId = this.userResponse[question.questionId]
+        .responseId
+      const responseForSelectedResponseId = question.responses.find(
+        r => r.responseId === selectedResponseId
+      )
+      if (currentDisplayPriority && responseForSelectedResponseId) {
+        return (
+          responseForSelectedResponseId.responseDisplayPriority >=
+          currentDisplayPriority
+        )
+      }
+      return false
+    },
+
+    getAnswerToQuestion(question) {
+      const questionResponseId = this.userResponse[question.questionId]
+        .responseId
+      const selectedResponse = question.responses.find(
+        r => r.responseId === questionResponseId
+      )
+      return selectedResponse.responseText
+    },
+    isFavoritingCoach() {
+      if (!this.isVolunteer) {
+        if (this.isPostsessionSurveyActive) {
+          const coachFavoritingQuestion = this.filteredQuestions.find(q =>
+            this.isHighRatingQuestion(q)
+          )
+          const coachFavoritingAnswer = this.getAnswerToQuestion(
+            coachFavoritingQuestion
+          )
+          return coachFavoritingAnswer && coachFavoritingAnswer === 'Yes'
+        }
+        const coachFavoritingQuestion = this.filteredQuestions.find(
+          q => q.id === 'coach-favoriting'
+        )
+        // `1` is the first answer option when asking the student if they would like
+        // to favorite the coach. That means the student wants to favorite them
+        return coachFavoritingQuestion && coachFavoritingQuestion.answer === 1
+      }
+      return false
+    },
     async submitFeedback() {
       if (this.isSubmittingFeedback) return
       this.isSubmittingFeedback = true
       this.error = ''
-      const data = {
-        sessionId: this.session._id,
-        topic: this.session.type,
-        subTopic: this.session.subTopic,
-        userType: this.userType,
-        studentId: this.session.student._id,
-        volunteerId: this.session.volunteer._id,
-      }
-
-      const feedbackPath = this.user.isVolunteer
-        ? 'volunteerFeedback'
-        : 'studentTutoringFeedback'
-      data[feedbackPath] = {}
-
-      for (const option of this.filteredQuestions) {
-        const { id, answer } = option
-        // the answer to the coach-favoriting question is not included in the feedback submission
-        if (id === 'coach-favoriting') continue
-
-        if (answer && !Array.isArray(answer)) data[feedbackPath][id] = answer
-        // sort answers with multiple selections
-        if (answer && Array.isArray(answer) && answer.length > 0)
-          data[feedbackPath][id] = answer.sort((a, b) => a - b)
-      }
-
-      try {
-        const requests = []
-        requests.push(NetworkService.feedback(this, data))
-        if (
-          !this.isVolunteer &&
-          this.isFavoritingCoach &&
-          this.isCoachFavoritingActive
-        )
-          requests.push(
-            NetworkService.updateFavoriteVolunteerStatus(
-              this.session.volunteer._id,
-              { isFavorite: true, sessionId: this.session._id }
+      if (this.isPostsessionSurveyActive) {
+        const submissions = []
+        for (const questionInfo of this.filteredQuestions) {
+          const question = questionInfo.question
+          const response = this.userResponse[question.questionId]
+          if (this.isHighRatingQuestion(question)) {
+            // the answer to the coach-favoriting question is not included in the feedback submission
+            continue
+          } else if (
+            (this.isLowRatingQuestion(question) ||
+              this.isGuidelineIssueListQuestion(question)) &&
+            response.responseId
+          ) {
+            // the answers to the what-went-wrong questions are multiselect; convert to several single-response answers for saving
+            response.responseId.forEach(resp => {
+              submissions.push({
+                questionId: Number(question.questionId),
+                responseChoiceId: resp,
+                openResponse: response.openResponse,
+              })
+            })
+          } else {
+            if (response.responseId) {
+              submissions.push({
+                questionId: Number(question.questionId),
+                responseChoiceId: response.responseId,
+                openResponse: response.openResponse,
+              })
+            }
+          }
+        }
+        const surveyResponse = {
+          surveyId: this.surveyDefinition.surveyId,
+          surveyTypeId: this.surveyDefinition.surveyTypeId,
+          sessionId: this.session._id,
+          submissions,
+        }
+        try {
+          const requests = []
+          requests.push(NetworkService.submitSurvey(surveyResponse))
+          if (
+            !this.isVolunteer &&
+            this.isFavoritingCoach &&
+            this.isCoachFavoritingActive
+          ) {
+            requests.push(
+              NetworkService.updateFavoriteVolunteerStatus(
+                this.session.volunteer._id,
+                { isFavorite: true, sessionId: this.session._id }
+              )
             )
-          )
-        await Promise.all(requests)
-        this.$router.push('/')
-      } catch (error) {
-        if (error.body.success === false) this.error = error.body.message
-        else if (error.status === 422) this.error = error.body.err
-        else this.error = 'There was an error sending your feedback'
-      } finally {
-        this.isSubmittingFeedback = false
+          }
+          await Promise.all(requests)
+          this.$router.push('/dashboard')
+        } catch (error) {
+          if (error.body.success === false) this.error = error.body.message
+          else if (error.status === 422) this.error = error.body.err
+          else this.error = 'There was an error sending your feedback'
+        } finally {
+          this.isSubmittingFeedback = false
+        }
+      } else {
+        const data = {
+          sessionId: this.session._id,
+          topic: this.session.type,
+          subTopic: this.session.subTopic,
+          userType: this.userType,
+          studentId: this.session.student._id,
+          volunteerId: this.session.volunteer._id,
+        }
+        const feedbackPath = this.user.isVolunteer
+          ? 'volunteerFeedback'
+          : 'studentTutoringFeedback'
+        data[feedbackPath] = {}
+
+        for (const option of this.filteredQuestions) {
+          const { id, answer } = option
+          // the answer to the coach-favoriting question is not included in the feedback submission
+          if (id === 'coach-favoriting') continue
+
+          if (answer && !Array.isArray(answer)) data[feedbackPath][id] = answer
+          // sort answers with multiple selections
+          if (answer && Array.isArray(answer) && answer.length > 0)
+            data[feedbackPath][id] = answer.sort((a, b) => a - b)
+        }
+        try {
+          const requests = []
+          requests.push(NetworkService.feedback(this, data))
+          if (!this.isVolunteer && this.isFavoritingCoach)
+            requests.push(
+              NetworkService.updateFavoriteVolunteerStatus(
+                this.session.volunteer._id,
+                { isFavorite: true, sessionId: this.session._id }
+              )
+            )
+          await Promise.all(requests)
+          this.$router.push('/')
+        } catch (error) {
+          if (error.body.success === false) this.error = error.body.message
+          else if (error.status === 422) this.error = error.body.err
+          else this.error = 'There was an error sending your feedback'
+        } finally {
+          this.isSubmittingFeedback = false
+        }
       }
+    },
+    // builds a default user response to be stored in state that maps a survey question ID to a response map
+    buildUserResponse() {
+      const userResponse = Object.assign({}, this.userResponse)
+      for (const question of this.surveyDefinition.survey) {
+        const questionResponse = {
+          responseId: null,
+          openResponse: '',
+        }
+        userResponse[question.questionId] = questionResponse
+      }
+
+      this.userResponse = userResponse
+    },
+    updateUserResponseMultiselect(questionId, responseId) {
+      let currentSelected = this.userResponse[questionId].responseId
+      if (!currentSelected) {
+        // list is currently empty, create it
+        currentSelected = [responseId]
+      } else if (currentSelected.find(r => r === responseId)) {
+        // clicked item is already in list; deselect it
+        _.remove(currentSelected, r => r === responseId)
+      } else {
+        // clicked item is not in list yet; select it
+        currentSelected.push(responseId)
+      }
+
+      const responseAnswer = {
+        [questionId]: Object.assign({}, this.userResponse[questionId], {
+          responseId: currentSelected,
+        }),
+      }
+      this.userResponse = Object.assign({}, this.userResponse, responseAnswer)
+    },
+
+    // if question changed is ratings question, show/hide conditional questions that depend on it
+    ratingQuestionShowHide(questionId, responseId) {
+      const ratingQuestion = _.find(this.questions, q =>
+        this.isStarRankingQuestion(q)
+      )
+      if (ratingQuestion && questionId === ratingQuestion.questionId) {
+        const ratingResponse = _.find(
+          ratingQuestion.responses,
+          r => r.responseId === responseId
+        )
+        const showHighRatingQuestion = this.isHighRatingResponse(
+          ratingResponse.responseText
+        )
+        const showLowRatingQuestion = this.isLowRatingResponse(
+          ratingResponse.responseText
+        )
+
+        _.map(this.allQuestions, q => {
+          if (this.isHighRatingQuestion(q.question)) {
+            q.isVisible = showHighRatingQuestion
+            return q
+          } else if (this.isLowRatingQuestion(q.question)) {
+            q.isVisible = showLowRatingQuestion
+            return q
+          }
+        })
+      }
+    },
+    // if question changed is student safety & guideline violation question, show/hide conditional question that depends on it
+    guidelineQuestionShowHide(questionId, responseId) {
+      const guidelineQuestion = _.find(this.questions, q =>
+        q.questionText.startsWith('Were there any student safety')
+      )
+      if (guidelineQuestion && questionId === guidelineQuestion.questionId) {
+        const guidelineResponse = _.find(
+          guidelineQuestion.responses,
+          r => r.responseId === responseId
+        )
+        this.allQuestions = _.map(this.allQuestions, q => {
+          const shouldToggleQuestionVisibility = this.isGuidelineIssueListQuestion(
+            q.question
+          )
+          q.isVisible = shouldToggleQuestionVisibility
+            ? guidelineResponse.responseText === 'Yes'
+            : q.isVisible
+          return q
+        })
+      }
+    },
+
+    updateUserResponse(questionId, responseId, openResponseText = '') {
+      this.ratingQuestionShowHide(questionId, responseId)
+      this.guidelineQuestionShowHide(questionId, responseId)
+
+      // clear out responses for all hidden questions so we don't save junk data (change to actually-selected answer will handle re-render)
+      const questionIdsToClear = this.allQuestions
+        .filter(item => !item.isVisible)
+        .map(item => item.question.questionId)
+      _.forEach(questionIdsToClear, q => {
+        this.userResponse[q] = { responseId: null, openResponse: '' }
+      })
+
+      const responseAnswer = {
+        [questionId]: Object.assign({}, this.userResponse[questionId], {
+          responseId,
+          openResponse: openResponseText,
+        }),
+      }
+      this.userResponse = Object.assign({}, this.userResponse, responseAnswer)
     },
   },
 }
@@ -515,5 +1030,65 @@ export default {
   &__error {
     color: $c-error-red;
   }
+}
+
+.question {
+  &__section-header {
+    font-weight: 600;
+    font-size: 22pt;
+    margin-top: 30px;
+    margin-bottom: 10px;
+  }
+
+  &__responses-postsession {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  &__responses-vertical {
+    width: 100%;
+  }
+
+  &__responses-radio {
+    padding: 20px;
+  }
+
+  &__response-radio {
+    width: 45%;
+  }
+
+  &__response-boxed {
+    border: solid 1px $c-border-grey;
+    border-radius: 5px;
+    margin: 15px;
+    padding: 15px;
+    display: flex;
+  }
+
+  &__response-boxed-selected {
+    background-color: $selected-green;
+    border-color: $c-accent;
+  }
+
+  &__subtext {
+    font-weight: 400;
+    font-size: 12px;
+    color: $c-secondary-grey;
+    margin-top: 10px;
+    margin-bottom: 14px;
+  }
+}
+
+.response-answer-text {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  color: $c-secondary-grey;
+}
+
+.issue-reason-chip {
+  margin-top: 1em;
+  margin-right: 1em;
 }
 </style>

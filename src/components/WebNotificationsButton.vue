@@ -35,8 +35,8 @@ export default {
   },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
-      isMobileApp: (state) => state.app.isMobileApp,
+      user: state => state.user.user,
+      isMobileApp: state => state.app.isMobileApp,
     }),
   },
   methods: {

@@ -69,9 +69,8 @@
                     </tr>
                     <tr
                       class="radio-question-row"
-                      v-for="(
-                        subquestion, subquestionIndex
-                      ) in question.options"
+                      v-for="(subquestion,
+                      subquestionIndex) in question.options"
                       v-bind:key="subquestion"
                     >
                       <td class="radio-question-cell">{{ subquestion }}</td>
@@ -88,9 +87,11 @@
                             ]
                           "
                           type="radio"
-                          :name="`multiple-radio-${
-                            question.qid
-                          }_${subquestionIndex.toString()}`"
+                          :name="
+                            `multiple-radio-${
+                              question.qid
+                            }_${subquestionIndex.toString()}`
+                          "
                           :value="index"
                         />
                       </td>
@@ -148,7 +149,7 @@
                 <v-select
                   class="uc-reference-form__select"
                   @input="
-                    (value) =>
+                    value =>
                       storeIndexForMultipleRadioResponse(
                         value,
                         question.optionsAlias[subquestionIndex],
@@ -308,7 +309,7 @@ export default {
   },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
+      user: state => state.user.user,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -321,14 +322,10 @@ export default {
       this.rejectionReason = this.reference.rejectionReason
       this.additionalInfo = this.reference.additionalInfo
       this.multipleRadioResponse.patient = this.reference.patient
-      this.multipleRadioResponse.positiveRoleModel =
-        this.reference.positiveRoleModel
-      this.multipleRadioResponse.agreeableAndApproachable =
-        this.reference.agreeableAndApproachable
-      this.multipleRadioResponse.communicatesEffectively =
-        this.reference.communicatesEffectively
-      this.multipleRadioResponse.trustworthyWithChildren =
-        this.reference.trustworthyWithChildren
+      this.multipleRadioResponse.positiveRoleModel = this.reference.positiveRoleModel
+      this.multipleRadioResponse.agreeableAndApproachable = this.reference.agreeableAndApproachable
+      this.multipleRadioResponse.communicatesEffectively = this.reference.communicatesEffectively
+      this.multipleRadioResponse.trustworthyWithChildren = this.reference.trustworthyWithChildren
     } else {
       try {
         await NetworkService.checkReference(this.$route.params.referenceId)
@@ -401,7 +398,7 @@ export default {
       }
 
       const requiredInputValues = Object.values(requiredInputs)
-      const isValidForm = requiredInputValues.every((input) => !!input)
+      const isValidForm = requiredInputValues.every(input => !!input)
 
       return isValidForm
     },

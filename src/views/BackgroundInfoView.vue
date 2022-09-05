@@ -159,9 +159,8 @@
                     </tr>
                     <tr
                       class="radio-question-row"
-                      v-for="(
-                        subquestion, subquestionIndex
-                      ) in experienceRadioQuestion.options"
+                      v-for="(subquestion,
+                      subquestionIndex) in experienceRadioQuestion.options"
                       :key="subquestion"
                     >
                       <td class="radio-question-cell">{{ subquestion }}</td>
@@ -258,7 +257,7 @@
             <input
               type="text"
               v-model="addedLanguages"
-              class="uc-form-input"
+              class=" uc-form-input"
               v-if="showAddLanguages"
               placeholder="Enter a language"
             />
@@ -344,7 +343,7 @@ export default {
   },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
+      user: state => state.user.user,
     }),
     hasCompletedBackgroundInfo() {
       return (

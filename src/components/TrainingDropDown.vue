@@ -103,8 +103,8 @@ export default {
 
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
-      windowWidth: (state) => state.app.windowWidth,
+      user: state => state.user.user,
+      windowWidth: state => state.app.windowWidth,
     }),
     isLargeDevice() {
       const largeScreenBreakpoint = 992

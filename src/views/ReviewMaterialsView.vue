@@ -3,7 +3,9 @@
     <div v-if="error">
       <p class="error-message">
         Please click
-        <router-link to="/training"> here </router-link>
+        <router-link to="/training">
+          here
+        </router-link>
         to see our available categories and their associated review materials.
       </p>
     </div>

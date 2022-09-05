@@ -37,13 +37,13 @@ describe('SidebarLink', () => {
     expect(wrapper.props('to')).toBe('/')
     // expect(wrapper.contains(HouseIcon)).toBe(true);
 
-    const text = wrapper.findComponent('p')
+    const text = wrapper.find('p')
     expect(text.text()).toBe('Home')
   })
 
   it('conditionally renders icon', () => {
     // const wrapper = getWrapper({ to: "/", text: "Home" });
-    // const icon = wrapper.findComponent(UpchieveIcon);
+    // const icon = wrapper.find(UpchieveIcon);
     // expect(icon.exists()).toBe(false);
   })
 

@@ -8,7 +8,7 @@
       </sidebar-link>
 
       <sidebar-link
-        v-if="!isVolunteer && isSessionHistoryActive"
+        v-if="!isVolunteer"
         to="/sessions/history"
         text="Session History"
       >
@@ -16,7 +16,7 @@
       </sidebar-link>
 
       <sidebar-link
-        v-if="isCoachFavoritingActive && !isVolunteer"
+        v-if="!isVolunteer"
         to="/favorite-coaches"
         text="Favorite Coaches"
       >
@@ -93,8 +93,6 @@ export default {
   computed: {
     ...mapGetters({
       isReferFriendsActive: 'featureFlags/isReferFriendsActive',
-      isSessionHistoryActive: 'featureFlags/isSessionHistoryActive',
-      isCoachFavoritingActive: 'featureFlags/isCoachFavoritingActive',
     }),
   },
 }

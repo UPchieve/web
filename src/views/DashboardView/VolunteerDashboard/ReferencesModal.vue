@@ -27,7 +27,7 @@
                 class="trash-icon"
                 v-if="
                   reference.status !== 'APPROVED' &&
-                  reference.status !== 'SUBMITTED'
+                    reference.status !== 'SUBMITTED'
                 "
                 @click="removeReference(index)"
               />
@@ -176,7 +176,7 @@ export default {
   },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
+      user: state => state.user.user,
     }),
     ...mapGetters({ mobileMode: 'app/mobileMode' }),
   },
@@ -219,7 +219,7 @@ export default {
         referenceFirstName: this.newReferenceFirstName,
         referenceLastName: this.newReferenceLastName,
         referenceEmail: this.newReferenceEmail,
-      }).then((response) => {
+      }).then(response => {
         if (response.body.success === false) {
           this.addReferenceError = response.body.message
           return
@@ -259,7 +259,7 @@ export default {
     isUniqueEmail(email) {
       let isUnique = true
       for (const reference of this.references) {
-        if (reference.email === email) {
+        if (reference.email.toLowerCase() === email.toLowerCase()) {
           isUnique = false
           break
         }

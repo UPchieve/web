@@ -232,12 +232,12 @@ export default {
     const partnerId = to.params.partnerId
 
     NetworkService.getVolunteerPartner(partnerId)
-      .then((data) => {
+      .then(data => {
         const volunteerPartner = data.body.volunteerPartner
         if (!volunteerPartner) return next('/sign-up')
-        return next((_this) => _this.setVolunteerPartner(volunteerPartner))
+        return next(_this => _this.setVolunteerPartner(volunteerPartner))
       })
-      .catch((err) => {
+      .catch(err => {
         if (err.status !== 404) {
           // we shouldn't get 422 here, since semantics of GET request are expected
           // to be correct regardless of user input
@@ -352,7 +352,7 @@ export default {
           this.formStep = 'step-2'
           this.serverErrorMsg = ''
         })
-        .catch((err) => {
+        .catch(err => {
           this.serverErrorMsg = err.message
           if (err.status !== 409 && err.status !== 422) {
             Sentry.captureException(err)
@@ -410,7 +410,7 @@ export default {
           this.isRegistering = false
           this.$router.push('/verify')
         })
-        .catch((err) => {
+        .catch(err => {
           this.isRegistering = false
           this.serverErrorMsg = err.message
           if (err.status !== 409 && err.status !== 422) {

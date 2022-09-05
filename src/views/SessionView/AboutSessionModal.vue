@@ -61,7 +61,7 @@ export default {
   },
   computed: {
     ...mapState({
-      session: (state) => state.user.session,
+      session: state => state.user.session,
     }),
     isNewStudent() {
       return this.totalStudentSessions < 3

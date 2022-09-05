@@ -3,7 +3,9 @@
     <p v-if="hasWaitingPeriod" class="waiting-period">
       {{ waitingPeriodMessage }}
     </p>
-    <h2 v-if="mobileMode">Explore our subjects</h2>
+    <h2 v-if="mobileMode">
+      Explore our subjects
+    </h2>
     <subject-card
       v-for="(card, index) in filteredCards"
       v-bind:key="index"
@@ -113,15 +115,11 @@ export default {
   },
   computed: {
     ...mapState({
-      latestSession: (state) => state.user.latestSession,
+      latestSession: state => state.user.latestSession,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
       isSessionAlive: 'user/isSessionAlive',
-      isUsHistroyLaunchStudentActive:
-        'featureFlags/isUsHistroyLaunchStudentActive',
-      isEnvironmentalScienceLaunchStudentActive:
-        'featureFlags/isEnvironmentalScienceLaunchStudentActive',
     }),
     waitingPeriodMessage() {
       const countdown = calculateWaitingPeriodCountdown(
@@ -137,29 +135,18 @@ export default {
       for (const card of cards) {
         // Temporarily hide Statistics and Calculus BC from students
         if (card.topic === 'math')
-          card.subtopics = card.subtopics.filter((subject) => {
+          card.subtopics = card.subtopics.filter(subject => {
             const temporarilyHiddenSubjects = ['calculusBC']
             return !temporarilyHiddenSubjects.includes(subject)
           })
 
         // Temporarily hide Physics 2 subject from students
         if (card.topic === 'science')
-          card.subtopics = card.subtopics.filter((subject) => {
+          card.subtopics = card.subtopics.filter(subject => {
             const temporarilyHiddenSubjects = ['physicsTwo']
             return !temporarilyHiddenSubjects.includes(subject)
           })
-
-        // Temporarily hide Environmental Science from students
-        if (
-          card.topic === 'science' &&
-          !this.isEnvironmentalScienceLaunchStudentActive
-        )
-          card.subtopics = card.subtopics.filter((subject) => {
-            const temporarilyHiddenSubjects = ['environmentalScience']
-            return !temporarilyHiddenSubjects.includes(subject)
-          })
       }
-      if (!this.isUsHistroyLaunchStudentActive) cards.splice(3, 1)
       return cards
     },
   },

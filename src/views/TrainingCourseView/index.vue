@@ -47,7 +47,7 @@ export default {
   },
   computed: {
     ...mapState({
-      certifications: (state) => state.user.user.certifications,
+      certifications: state => state.user.user.certifications,
     }),
     quizCertification() {
       return this.certifications[this.course.quizKey]
@@ -55,8 +55,8 @@ export default {
   },
   methods: {
     async trackMaterialProgress(materialKey) {
-      this.course.modules.forEach((mod) => {
-        mod.materials.forEach((mat) => {
+      this.course.modules.forEach(mod => {
+        mod.materials.forEach(mat => {
           if (mat.materialKey === materialKey) {
             mat.isCompleted = true
           }

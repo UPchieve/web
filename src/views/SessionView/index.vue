@@ -55,8 +55,8 @@
         <div
           v-else-if="
             user.isVolunteer &&
-            (showNoPresessionSurveyResponse ||
-              studentPresessionResponses.length === 0)
+              (showNoPresessionSurveyResponse ||
+                studentPresessionResponses.length === 0)
           "
           class="about-session-container"
         >
@@ -178,25 +178,23 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
-    next((vm) => {
+    next(vm => {
       vm.prevRoute = from
     })
   },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
-      session: (state) => state.user.session,
-      isSessionConnectionAlive: (state) => state.user.isSessionConnectionAlive,
-      isMobileApp: (state) => state.app.isMobileApp,
-      presessionSurvey: (state) => state.user.presessionSurvey,
+      user: state => state.user.user,
+      session: state => state.user.session,
+      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
+      isMobileApp: state => state.app.isMobileApp,
+      presessionSurvey: state => state.user.presessionSurvey,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
       isAuthenticated: 'user/isAuthenticated',
       isVolunteer: 'user/isVolunteer',
       isSessionOver: 'user/isSessionOver',
-      isContextSharingWithVolunteerActive:
-        'featureFlags/isContextSharingWithVolunteerActive',
     }),
 
     auxiliaryType() {
@@ -274,7 +272,7 @@ export default {
     }
 
     promise
-      .then(async (sessionId) => {
+      .then(async sessionId => {
         this.sessionId = sessionId
         if (!id && !this.isVolunteer)
           AnalyticsService.captureEvent(EVENTS.SESSION_REQUESTED, {
@@ -285,21 +283,14 @@ export default {
 
         // If we have a pre-session survey, submit it now
         if (Object.keys(this.presessionSurvey).length) {
-          if (this.isContextSharingWithVolunteerActive) {
-            try {
-              await backOff(() =>
-                NetworkService.submitSurvey(
-                  Object.assign({}, this.presessionSurvey, { sessionId })
-                )
+          try {
+            await backOff(() =>
+              NetworkService.submitSurvey(
+                Object.assign({}, this.presessionSurvey, { sessionId })
               )
-            } catch (err) {
-              Sentry.captureException(err)
-            }
-          } else {
-            NetworkService.submitPresessionSurvey(
-              sessionId,
-              this.presessionSurvey
             )
+          } catch (err) {
+            Sentry.captureException(err)
           }
           this.$store.dispatch('user/clearPresessionSurvey')
         }
@@ -314,7 +305,7 @@ export default {
         Gleap.setCustomData('sessionId', sessionId)
         this.$store.dispatch('user/sessionConnected')
 
-        if (this.user.isVolunteer && this.isContextSharingWithVolunteerActive) {
+        if (this.user.isVolunteer) {
           await this.getSessionContext(sessionId)
         }
 
@@ -328,7 +319,7 @@ export default {
         if (getNotificationPermission() === 'default')
           this.showNotificationModal = true
       })
-      .catch((err) => {
+      .catch(err => {
         if (err.status !== 0 && err.code !== 'EUSERABORTED') {
           window.alert('Could not start new help session')
           Sentry.captureException(err)
@@ -337,7 +328,7 @@ export default {
       })
   },
   sockets: {
-    bump: function (data) {
+    bump: function(data) {
       this.$store.dispatch('app/modal/show', {
         component: SessionFulfilledModal,
         data: {
@@ -446,8 +437,9 @@ export default {
     async getSessionContext(sessionId) {
       try {
         this.isLoadingPresessionResponse = true
-        const presessionSurveyResponse =
-          await NetworkService.getPresessionSurveyResponse(sessionId)
+        const presessionSurveyResponse = await NetworkService.getPresessionSurveyResponse(
+          sessionId
+        )
         this.totalStudentSessions =
           presessionSurveyResponse.data.totalStudentSessions
         this.studentPresessionResponses =

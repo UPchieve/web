@@ -35,7 +35,7 @@ export default {
         'linkedInUrl',
       ]
       return chain(backgroundKeys)
-        .map((bgKey) => {
+        .map(bgKey => {
           let bgValue = this.user[bgKey]
           if (isEmpty(bgValue)) return null
           if (Array.isArray(bgValue))
@@ -44,7 +44,7 @@ export default {
               value: bgValue.join(', '),
             }
           if (typeof bgValue === 'object')
-            return map(Object.keys(bgValue), (subKey) => ({
+            return map(Object.keys(bgValue), subKey => ({
               name: `${subKey} ${bgKey}`,
               value: bgValue[subKey],
             }))
@@ -53,9 +53,9 @@ export default {
             value: bgValue,
           }
         })
-        .filter((item) => !!item)
+        .filter(item => !!item)
         .flatten()
-        .map((item) => ({
+        .map(item => ({
           ...item,
           isLink: item.value.indexOf('http') !== -1,
         }))

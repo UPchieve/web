@@ -11,19 +11,7 @@ const getWrapper = () => {
   const store = new Vuex.Store({
     modules: {
       user: {
-        user: {
-          state: { user: { pastSessions: [] } },
-        },
-        getters: {
-          isSessionAlive: () => true,
-        },
-      },
-      featureFlags: {
-        getters: {
-          isReferFriendsActive: () => false,
-          isDowntimeBannerActive: () => false,
-          isSummerPrepActive: () => false,
-        },
+        user: { state: { user: { pastSessions: [] } } },
       },
     },
   })
@@ -36,10 +24,10 @@ describe('StudentDashboard', () => {
     const wrapper = getWrapper()
     expect(wrapper.classes('student-dashboard')).toBe(true)
 
-    const banner = wrapper.findComponent(DashboardBanner)
+    const banner = wrapper.find(DashboardBanner)
     expect(banner.exists()).toBe(true)
 
-    const selection = wrapper.findComponent(SubjectSelection)
+    const selection = wrapper.find(SubjectSelection)
     expect(selection.exists()).toBe(true)
   })
 })

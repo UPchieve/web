@@ -29,7 +29,7 @@ export default {
     },
   },
   computed: {
-    ...mapState({ isCollapsed: (state) => state.app.sidebar.isCollapsed }),
+    ...mapState({ isCollapsed: state => state.app.sidebar.isCollapsed }),
     ...mapGetters({ mobileMode: 'app/mobileMode' }),
     size() {
       return this.mobileMode ? '1em' : '1.5em'

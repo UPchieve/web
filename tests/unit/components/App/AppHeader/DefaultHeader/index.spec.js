@@ -31,28 +31,28 @@ describe('DefaultHeader', () => {
     expect(wrapper.classes()).toEqual(['DefaultHeader'])
 
     // User info
-    const userInfo = wrapper.findComponent('.DefaultHeader-user-info')
+    const userInfo = wrapper.find('.DefaultHeader-user-info')
     expect(userInfo.exists()).toBe(true)
-    expect(userInfo.element.tagName).toEqual('DIV')
+    expect(userInfo.is('div')).toBe(true)
 
     const avatar = userInfo.find('.DefaultHeader-user-info-avatar')
     expect(avatar.exists()).toBe(true)
-    expect(avatar.element.tagName).toEqual('IMG')
+    expect(avatar.is('img')).toBe(true)
 
     const name = userInfo.find('.DefaultHeader-user-info-name')
     expect(name.exists()).toBe(true)
-    expect(name.element.tagName).toEqual('SPAN')
+    expect(name.is('span')).toBe(true)
     expect(name.text()).toBe('Tester')
 
     // Hamburger
-    expect(wrapper.findComponent(HamburgerButton).exists()).toBe(true)
+    expect(wrapper.find(HamburgerButton).exists()).toBe(true)
   })
 
   it('renders expected elements when not in mobile mode', () => {
     const wrapper = getWrapper()
-    const logo = wrapper.findComponent('.DefaultHeader-logo')
+    const logo = wrapper.find('.DefaultHeader-logo')
     expect(logo.exists()).toBe(true)
-    expect(logo.element.tagName).toEqual('IMG')
+    expect(logo.is('img')).toBe(true)
     expect(logo.attributes('src')).toBeDefined()
   })
 })

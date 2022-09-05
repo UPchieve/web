@@ -74,44 +74,40 @@ describe('AppSidebar', () => {
       const wrapper = getWrapper({ mobileMode: true })
       expect(wrapper.classes('AppSidebar')).toBe(true)
 
-      const content = wrapper.findComponent('.AppSidebar-content')
+      const content = wrapper.find('.AppSidebar-content')
       expect(content.exists()).toBe(true)
 
-      const info = content.findComponent(SidebarInfo)
+      const info = content.find(SidebarInfo)
       expect(info.exists()).toBe(false)
 
-      const links = content.findComponent(SidebarLinks)
+      const links = content.find(SidebarLinks)
       expect(links.exists()).toBe(true)
 
       // Final link
-      expect(content.findComponent('.AppSidebar-final-link').exists()).toBe(
-        true
+      expect(content.find('.AppSidebar-final-link').exists()).toBe(true)
+      expect(content.find('.AppSidebar-final-link--desktop').exists()).toBe(
+        false
       )
-      expect(
-        content.findComponent('.AppSidebar-final-link--desktop').exists()
-      ).toBe(false)
     })
 
     it('desktop', () => {
       const wrapper = getWrapper({ mobileMode: false })
       expect(wrapper.classes('AppSidebar')).toBe(true)
 
-      const content = wrapper.findComponent('.AppSidebar-content')
+      const content = wrapper.find('.AppSidebar-content')
       expect(content.exists()).toBe(true)
 
-      const info = content.findComponent(SidebarInfo)
+      const info = content.find(SidebarInfo)
       expect(info.exists()).toBe(true)
 
-      const links = content.findComponent(SidebarLinks)
+      const links = content.find(SidebarLinks)
       expect(links.exists()).toBe(true)
 
       // Final link
-      expect(content.findComponent('.AppSidebar-final-link').exists()).toBe(
+      expect(content.find('.AppSidebar-final-link').exists()).toBe(true)
+      expect(content.find('.AppSidebar-final-link--desktop').exists()).toBe(
         true
       )
-      expect(
-        content.findComponent('.AppSidebar-final-link--desktop').exists()
-      ).toBe(true)
     })
   })
 })

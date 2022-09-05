@@ -44,7 +44,7 @@ export default {
   components: { StudentIcon, VolunteerIcon },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
+      user: state => state.user.user,
     }),
   },
   data() {

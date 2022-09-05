@@ -106,7 +106,10 @@
           <template #result="{ result, props }">
             <li v-bind="props">
               <div>
-                <span v-if="result.name"> {{ result.name }}</span>
+                <span v-if="result.name">
+                  {{ result.name }} ({{ result.city }},
+                  {{ result.state }})</span
+                >
                 <a
                   v-if="result.cantFindSchool"
                   href="https://upchieve.org/cant-find-school"
@@ -122,7 +125,9 @@
     </div>
 
     <div class="uc-column">
-      <div class="uc-form-label">What grade are you in (2021-22)?</div>
+      <div class="uc-form-label">
+        What grade are you in (2021-22)?
+      </div>
       <v-select
         class="uc-form-body__select"
         v-model="profile.currentGrade"
@@ -188,7 +193,9 @@
     <div>
       <verification-badge />
       <h3>Woohoo, you're eligible!</h3>
-      <p>Finish setting up your free account</p>
+      <p>
+        Finish setting up your free account
+      </p>
     </div>
     <div>
       <button class="uc-form-button-big" type="button" @click="accountPage">
@@ -287,7 +294,10 @@
           <template #result="{ result, props }">
             <li v-bind="props">
               <div>
-                <span v-if="result.name"> {{ result.name }}</span>
+                <span v-if="result.name">
+                  {{ result.name }} ({{ result.city }},
+                  {{ result.state }})</span
+                >
                 <a
                   v-if="result.cantFindSchool"
                   href="https://upchieve.org/cant-find-school"
@@ -303,7 +313,9 @@
     </div>
 
     <div class="uc-column">
-      <div class="uc-form-label">What grade are you in (2021-22)?</div>
+      <div class="uc-form-label">
+        What grade are you in (2021-22)?
+      </div>
       <v-select
         class="uc-form-body__select"
         v-model="profile.currentGrade"
@@ -351,7 +363,9 @@
       />
     </div>
 
-    <button class="uc-form-button-big" type="submit">Continue</button>
+    <button class="uc-form-button-big" type="submit">
+      Continue
+    </button>
 
     <div v-if="msg !== ''" role="alert">{{ msg }}</div>
   </form>
@@ -443,7 +457,7 @@
         v-model="signupSourceId"
         :options="signupSourcesOptions"
         label="name"
-        :reduce="(option) => option.id"
+        :reduce="option => option.id"
         :searchable="false"
         :clearable="false"
         required
@@ -464,7 +478,9 @@
       </label>
     </div>
 
-    <button class="uc-form-button-big" type="submit">Create my account</button>
+    <button class="uc-form-button-big" type="submit">
+      Create my account
+    </button>
 
     <div v-if="msg !== ''" role="alert">{{ msg }}</div>
   </form>
@@ -492,7 +508,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import validator from 'validator'
 import Autocomplete from '@trevoreyre/autocomplete-vue'
 import * as Sentry from '@sentry/browser'
@@ -567,10 +583,7 @@ export default {
   },
   computed: {
     ...mapState({
-      isMobileApp: (state) => state.app.isMobileApp,
-    }),
-    ...mapGetters({
-      isZipCodeCheckActive: 'featureFlags/isZipCodeCheckActive',
+      isMobileApp: state => state.app.isMobileApp,
     }),
     trimCurrentGrade() {
       // extracting the first word out of the gradeLevels
@@ -584,14 +597,14 @@ export default {
     },
   },
   watch: {
-    'eligibility.email': function (currentValue, oldValue) {
+    'eligibility.email': function(currentValue, oldValue) {
       if (currentValue && !oldValue) {
         if (!this.hasEnteredEmail)
           AnalyticsService.captureEvent(EVENTS.STUDENT_ENTERED_EMAIL)
         this.hasEnteredEmail = true
       }
     },
-    'eligibility.zipCode': function (currentValue, oldValue) {
+    'eligibility.zipCode': function(currentValue, oldValue) {
       if (currentValue && !oldValue) {
         if (!this.hasEnteredZipCode)
           AnalyticsService.captureEvent(EVENTS.STUDENT_ENTERED_ZIP_CODE)
@@ -661,7 +674,7 @@ export default {
       this.invalidInputs = []
 
       NetworkService.checkStudentPartnerSignupCode(this.partnerSignupCode)
-        .then((res) => {
+        .then(res => {
           const studentPartnerKey = res.body.studentPartnerKey
           const studentPartnerRoute = `/signup/student/${studentPartnerKey}`
 
@@ -682,20 +695,14 @@ export default {
         this.errors.push('You must select your high school.')
       }
 
-      const zipCodeRegex = /^\d{5}$/
       const zipCode = this.eligibility.zipCode
 
-      if (!zipCode || !zipCodeRegex.test(zipCode)) {
-        this.errors.push('You must enter a properly formatted zip code')
+      const {
+        body: { isValidZipCode },
+      } = await NetworkService.checkZipCode(this, { zipCode })
+      if (!isValidZipCode) {
+        this.errors.push('You must enter a valid United States zip code')
         this.invalidInputs.push('inputZipCode')
-      } else if (this.isZipCodeCheckActive) {
-        const {
-          body: { isValidZipCode },
-        } = await NetworkService.checkZipCode(this, { zipCode })
-        if (!isValidZipCode) {
-          this.errors.push('You must enter a valid United States zip code')
-          this.invalidInputs.push('inputZipCode')
-        }
       }
 
       if (!this.eligibility.email) {
@@ -749,7 +756,7 @@ export default {
         referredByCode: window.localStorage.getItem('upcReferredByCode'),
         currentGrade: this.trimCurrentGrade,
       })
-        .then(async (response) => {
+        .then(async response => {
           const isEligible = response.body.isEligible
           if (isEligible) {
             this.step = 'eligible'
@@ -770,7 +777,7 @@ export default {
           const isDomesticIpAddress = await this.isDomesticIpAddress()
           if (!isDomesticIpAddress) return this.internationalPage()
         })
-        .catch((res) => {
+        .catch(res => {
           this.errors.push(res.body.message)
         })
     },
@@ -788,7 +795,7 @@ export default {
     autocompleteSchool(input) {
       this.eligibility.highSchool = {}
 
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         if (input.length < 3) {
           return resolve([])
         }
@@ -802,8 +809,8 @@ export default {
         }
 
         NetworkService.searchSchool(this, { query: input })
-          .then((response) => response.body.results)
-          .then((schools) => {
+          .then(response => response.body.results)
+          .then(schools => {
             schools.push(cantFindSchoolItem)
             resolve(schools)
           })
@@ -862,7 +869,7 @@ export default {
           window.localStorage.removeItem('upcReferredByCode')
           this.$router.push('/verify')
         })
-        .catch((err) => {
+        .catch(err => {
           this.errors.push(err.message)
           if (err.message.match(/^Password/))
             AnalyticsService.captureEvent(

@@ -3,27 +3,6 @@
     <dashboard-banner />
 
     <div
-      v-if="!downtimeMessage && showUpchieve101Notice"
-      class="dashboard-notice"
-    >
-      <router-link to="training/course/upchieve101">
-        Please complete UPchieve 101 to remain an active coach
-      </router-link>
-    </div>
-
-    <!-- TODO: Remove with feature flag training-grace-period-banner cleanup -->
-    <div
-      v-if="!downtimeMessage && showUpchieve101NoticeForGracePeriod"
-      class="dashboard-notice"
-    >
-      <router-link to="training/course/upchieve101" class="">
-        Our bad! Because of a bug, you skipped a critical step in your UPchieve
-        onboarding. Please take the UPchieve101 quiz before July 1st to keep
-        coaching. <arrow-icon class="arrow-icon--banner" />
-      </router-link>
-    </div>
-
-    <div
       v-if="downtimeMessage"
       class="dashboard-notice"
       :class="'dashboard-notice--info'"
@@ -252,8 +231,8 @@ export default {
   },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
-      isFirstDashboardVisit: (state) => state.user.isFirstDashboardVisit,
+      user: state => state.user.user,
+      isFirstDashboardVisit: state => state.user.isFirstDashboardVisit,
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
@@ -262,39 +241,16 @@ export default {
       hasSelectedAvailability: 'user/hasSelectedAvailability',
       isDowntimeBannerActive: 'featureFlags/isDowntimeBannerActive',
       isDashboardBannerActive: 'featureFlags/isDashboardBannerActive',
-      isUpchieve101GracePeriodBannerActive:
-        'featureFlags/isUpchieve101GracePeriodBannerActive',
     }),
 
     isCustomVolunteerPartner() {
       return config.customVolunteerPartnerOrgs.some(
-        (org) => org === this.user.volunteerPartnerOrg
+        org => org === this.user.volunteerPartnerOrg
       )
     },
 
     isNewVolunteer() {
       return !this.user.pastSessions || !this.user.pastSessions.length
-    },
-
-    showUpchieve101NoticeForLegacyVolunteers() {
-      if (!this.user.isApproved || !this.user.isOnboarded) return false
-      if (this.user.certifications.upchieve101.passed) return false
-      return new Date(this.user.createdAt) < new Date('9/18/20')
-    },
-
-    /**
-     * Volunteers in 2022 who got to skip completing the UPchieve 101 quiz but
-     * became onboarded will see a grace period banner that prompts
-     * them to take the UPchieve 101 quiz
-     */
-    // TODO: Remove with feature flag upchieve-101-grace-period-banner cleanup
-    showUpchieve101NoticeForGracePeriod() {
-      return (
-        this.user.isOnboarded &&
-        !this.user.certifications['upchieve101'].passed &&
-        new Date(this.user.createdAt) >= new Date('01/01/2022') &&
-        this.isUpchieve101GracePeriodBannerActive
-      )
     },
 
     downtimeMessage() {
@@ -336,7 +292,7 @@ export default {
     },
 
     referenceAction() {
-      const statuses = this.user.references.map((r) => r.status)
+      const statuses = this.user.references.map(r => r.status)
 
       if (statuses.length === 0)
         return {
@@ -344,7 +300,7 @@ export default {
           status: 'DEFAULT',
         }
 
-      if (statuses.some((s) => s === 'REJECTED'))
+      if (statuses.some(s => s === 'REJECTED'))
         return {
           subtitle: 'Provide new reference(s)',
           status: 'ERROR',
@@ -625,7 +581,7 @@ export default {
       }
 
       // (2) Certs obtained
-      const certsObtained = _.filter(upchieveTopics, (topic) => {
+      const certsObtained = _.filter(upchieveTopics, topic => {
         return _.get(user, `certifications.${topic}.passed`, false)
       })
 
@@ -694,7 +650,7 @@ export default {
       }
 
       // (2) Certs obtained
-      const certsObtained = _.filter(upchieveTopics, (topic) => {
+      const certsObtained = _.filter(upchieveTopics, topic => {
         return _.get(user, `certifications.${topic}.passed`, false)
       })
 

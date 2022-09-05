@@ -98,9 +98,9 @@ export default {
   },
   computed: {
     ...mapState({
-      latestSession: (state) => state.user.latestSession,
-      isMobileApp: (state) => state.app.isMobileApp,
-      user: (state) => state.user.user,
+      latestSession: state => state.user.latestSession,
+      isMobileApp: state => state.app.isMobileApp,
+      user: state => state.user.user,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',

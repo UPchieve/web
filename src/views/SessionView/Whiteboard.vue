@@ -324,7 +324,7 @@ export default {
   },
   computed: {
     ...mapState({
-      isMobileApp: (state) => state.app.isMobileApp,
+      isMobileApp: state => state.app.isMobileApp,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -512,11 +512,12 @@ export default {
         setTimeout(() => {
           this.uploadingPictureError = false
         }, 2000)
+        Sentry.captureException(error)
         return
+      } finally {
+        // Reset the file input
+        uploadEvents.fileSelectionEvent.target.value = ''
       }
-
-      // Reset the file input
-      event.target.value = ''
     },
     insertPhoto(imageUrl) {
       const nodeId = this.zwibblerCtx.createNode('ImageNode', {
@@ -670,7 +671,7 @@ export default {
         const zwibblerWsConnection = this.zwibblerCtx.Ec.rc.rc
         const zwibblerOnMessage = zwibblerWsConnection.onmessage
         // Intercept Zwibbler's websocket message handler
-        zwibblerWsConnection.onmessage = (messageEvent) => {
+        zwibblerWsConnection.onmessage = messageEvent => {
           // Forward message to Zwibbler unless it's our "pong" response
           if (messageEvent.data !== 'p0ng') zwibblerOnMessage(messageEvent)
         }
@@ -686,7 +687,7 @@ export default {
         this.resizeViewRectangle()
 
         // Don't start setting selected tool until connected
-        this.zwibblerCtx.on('tool-changed', (toolname) => {
+        this.zwibblerCtx.on('tool-changed', toolname => {
           this.selectedTool = toolname
           this.hideHoveredToolbars()
         })
@@ -704,7 +705,7 @@ export default {
         return false
       })
 
-      this.zwibblerCtx.on('nodes-added', (nodes) => {
+      this.zwibblerCtx.on('nodes-added', nodes => {
         if (this.isShapeSelected) this.shapeNodes.push(nodes[0])
         if (this.selectedTool === 'text') this.usePickTool()
       })
@@ -717,7 +718,7 @@ export default {
 
       window.addEventListener('resize', this.handleWindowResize, false)
 
-      this.zwibblerCtx.on('document-changed', (info) => {
+      this.zwibblerCtx.on('document-changed', info => {
         const isRemoteChange = info && info.remote
         const isWhiteboardHidden = this.mobileMode && !this.isWhiteboardOpen
         const shouldResizeView = isRemoteChange && isWhiteboardHidden

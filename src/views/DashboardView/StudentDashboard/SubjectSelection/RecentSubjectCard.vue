@@ -26,11 +26,11 @@ export default {
       type: String,
       required: true,
     },
-    svg: () => ({
+    svg: {
       type: Object,
       required: true,
       default: MathSVG,
-    }),
+    },
     topic: String,
     buttonText: {
       type: String,
@@ -48,9 +48,9 @@ export default {
   },
   computed: {
     ...mapState({
-      latestSession: (state) => state.user.latestSession,
-      isMobileApp: (state) => state.app.isMobileApp,
-      user: (state) => state.user.user,
+      latestSession: state => state.user.latestSession,
+      isMobileApp: state => state.app.isMobileApp,
+      user: state => state.user.user,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',

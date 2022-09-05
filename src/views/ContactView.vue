@@ -9,7 +9,9 @@
       class="contact"
       :class="{ 'contact--noAuth': !isAuthenticated || !isVerified }"
     >
-      <div class="contact__header">Contact Us</div>
+      <div class="contact__header">
+        Contact Us
+      </div>
 
       <div class="contact__description">
         Our

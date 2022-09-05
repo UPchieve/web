@@ -5,7 +5,9 @@
         <div class="uc-form-header-link--active">Reset Your Password</div>
 
         <div class="link-container link-container--end" v-if="user">
-          <router-link to="/" class="uc-form-header-link"> Home </router-link>
+          <router-link to="/" class="uc-form-header-link">
+            Home
+          </router-link>
         </div>
 
         <div class="link-container" v-else>
@@ -79,7 +81,7 @@ export default {
   },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
+      user: state => state.user.user,
     }),
   },
   methods: {
@@ -88,7 +90,7 @@ export default {
       this.error = ''
       AuthService.sendReset(this, this.email)
         .then(() => (this.isSendingEmail = false))
-        .catch((err) => {
+        .catch(err => {
           this.error = err.message
           this.isSendingEmail = false
           if (err.status !== 422) {
@@ -108,6 +110,7 @@ export default {
 .link-container {
   @include flex-container(row, space-evenly);
   min-width: 150px;
+
   &--end {
     justify-content: flex-end;
   }

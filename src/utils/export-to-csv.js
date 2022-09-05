@@ -11,9 +11,9 @@ export default function exportToCsv(filename, rows) {
     keys.join(separator) +
     '\n' +
     rows
-      .map((row) => {
+      .map(row => {
         return keys
-          .map((k) => {
+          .map(k => {
             let cell
             if (row instanceof Map)
               cell =
@@ -34,7 +34,7 @@ export default function exportToCsv(filename, rows) {
       })
       .join('\n')
 
-  const blob = new Blob([csvContent], { type: 'text/csvcharset=utf-8' })
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
   if (navigator.msSaveBlob) {
     // IE 10+
     navigator.msSaveBlob(blob, filename)

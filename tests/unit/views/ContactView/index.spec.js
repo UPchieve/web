@@ -12,8 +12,7 @@ localVue.component('v-select', vSelect)
 const getWrapper = (
   isAuthenticated = true,
   isVolunteer = false,
-  isVerified = true,
-  email
+  isVerified = true
 ) => {
   const store = new Vuex.Store({
     modules: {
@@ -40,23 +39,19 @@ describe('ContactView', () => {
   it('renders ContactView', () => {
     const wrapper = getWrapper(true, true, true)
     expect(wrapper.is(ContactView))
-    expect(wrapper.findComponent('.contact__header').text()).toEqual(
-      'Contact Us'
-    )
+    expect(wrapper.find('.contact__header').text()).toEqual('Contact Us')
   })
 
   it('renders ContactView for a logged in user', () => {
     const wrapper = getWrapper(true, true, true)
     expect(wrapper.vm.hasValidEmail).toBeTruthy()
-    expect(wrapper.findComponent('#contact-form-email').exists()).toBeFalsy()
+    expect(wrapper.find('#contact-form-email').exists()).toBeFalsy()
   })
 
   it('renders ContactView for an anonymous user', () => {
     const wrapper = getWrapper(false, false, false)
     expect(wrapper.vm.hasValidEmail).toBeFalsy()
-    expect(wrapper.findComponent('#contact-form-email').exists()).toBeTruthy()
-    expect(
-      wrapper.findComponent('#contact-form-email').isVisible()
-    ).toBeTruthy()
+    expect(wrapper.find('#contact-form-email').exists()).toBeTruthy()
+    expect(wrapper.find('#contact-form-email').isVisible()).toBeTruthy()
   })
 })

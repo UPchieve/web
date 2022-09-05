@@ -35,11 +35,11 @@ describe('DashboardView', () => {
       const wrapper = getWrapper(true)
       expect(wrapper.classes('DashboardBanner')).toBe(true)
 
-      const greeting = wrapper.findComponent('.DashboardBanner-greeting')
+      const greeting = wrapper.find('.DashboardBanner-greeting')
       expect(greeting.exists()).toBe(true)
       expect(greeting.text()).toBe('Hello, Tester!')
 
-      const banner = wrapper.findComponent('.DashboardBanner-banner')
+      const banner = wrapper.find('.DashboardBanner-banner')
       expect(banner.exists()).toBe(true)
     })
 
@@ -47,7 +47,7 @@ describe('DashboardView', () => {
       const wrapper = getWrapper(false)
       expect(wrapper.classes('DashboardBanner')).toBe(true)
 
-      const banner = wrapper.findComponent('.DashboardBanner-banner')
+      const banner = wrapper.find('.DashboardBanner-banner')
       expect(banner.exists()).toBe(true)
 
       const greeting = banner.find('.DashboardBanner-greeting')

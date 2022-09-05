@@ -25,14 +25,13 @@ export default {
   },
   _faultTolerantHttp(http, method, onRetry, url, data) {
     const promiseToRetry = () => {
-      return (
-        ['get', 'delete', 'head', 'jsonp'].indexOf(method) !== -1
-          ? http[method](url, {
-              timeout: FAULT_TOLERANT_HTTP_TIMEOUT,
-            })
-          : http[method](url, data, {
-              timeout: FAULT_TOLERANT_HTTP_TIMEOUT,
-            })
+      return (['get', 'delete', 'head', 'jsonp'].indexOf(method) !== -1
+        ? http[method](url, {
+            timeout: FAULT_TOLERANT_HTTP_TIMEOUT,
+          })
+        : http[method](url, data, {
+            timeout: FAULT_TOLERANT_HTTP_TIMEOUT,
+          })
       ).then(this._successHandler, this._errorHandler)
     }
 
@@ -40,13 +39,13 @@ export default {
     const requestState = { isAborted: false }
 
     return promiseRetry(
-      (retry) => {
+      retry => {
         if (requestState.isAborted) {
           // early exit
           throw errcode(new Error('Aborted by user'), 'EUSERABORTED')
         }
 
-        return promiseToRetry().catch((res) => {
+        return promiseToRetry().catch(res => {
           if (res.status === 0) {
             if (onRetry) {
               onRetry(res, () => {
@@ -638,11 +637,6 @@ export default {
       .post(`${API_ROOT}/user/volunteer-approval/background-information`, data)
       .then(this._successHandler, this._errorHandler)
   },
-  submitPresessionSurvey(sessionId, responseData) {
-    return Vue.http
-      .post(`${API_ROOT}/survey/presession/${sessionId}`, { responseData })
-      .then(this._successHandler, this._errorHandler)
-  },
   submitSurvey(survey) {
     return Vue.http
       .post(`${API_ROOT}/survey/save`, survey)
@@ -668,9 +662,11 @@ export default {
       .get(`${API_ROOT}/survey/presession/response/${sessionId}`)
       .then(this._successHandler, this._errorHandler)
   },
-  getPostsessionSurvey(subjectName) {
+  getPostsessionSurvey(subjectName, sessionId, role) {
     return Vue.http
-      .get(`${API_ROOT}/survey/postsession?subject=${subjectName}`)
+      .get(
+        `${API_ROOT}/survey/postsession?subject=${subjectName}&sessionId=${sessionId}&role=${role}`
+      )
       .then(this._successHandler, this._errorHandler)
   },
   getUserProductFlags() {

@@ -42,7 +42,7 @@ export default {
     icon: {
       type: String,
       required: true,
-      validator: (key) => key in icons,
+      validator: key => key in icons,
     },
     color: {
       type: String,

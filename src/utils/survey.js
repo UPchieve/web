@@ -1,4 +1,4 @@
-export const formatSurveyAnswers = (answer) => {
+export const formatSurveyAnswers = answer => {
   const format = {
     'specific-question': 'Solve a specific question',
     'complete-homework': 'Complete a homework assignment',

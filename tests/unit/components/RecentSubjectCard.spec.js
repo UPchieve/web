@@ -21,14 +21,14 @@ describe('RecentSubjectCard', () => {
     expect(wrapper.is(RecentSubjectCard))
     expect(wrapper.props('title')).toBe('Algebra 1')
     expect(wrapper.props('disableSubjectCard')).toBe(false)
-    expect(wrapper.findComponent('.SubjectCard').exists()).toBe(true)
+    expect(wrapper.find('.SubjectCard').exists()).toBe(true)
 
     /* SVGs not rendered in tests. Refer to README.md here for further explanation: https://gitlab.com/upchieve/subway
     expect(wrapper.contains('ArrowIcon')).toBe(true);
-    const arrow = wrapper.findComponent('ArrowIcon');
+    const arrow = wrapper.find('ArrowIcon');
     expect(arrow.exists()).toBe(true);
     expect(arrow.isVisible()).toBe(true);
-    expect(wrapper.findComponent('svg')).toBe('MathSVG');
+    expect(wrapper.find('svg')).toBe('MathSVG');
     */
   })
 

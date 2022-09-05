@@ -87,7 +87,7 @@ export default {
   created() {
     this.$store.dispatch('app/hideNavigation')
     const { token } = this.$route.params
-    AuthService.verifyReset(this, { token }).catch((err) => {
+    AuthService.verifyReset(this, { token }).catch(err => {
       if (err.status !== 404 && err.status !== 422) {
         Sentry.captureException(err)
       }
@@ -111,7 +111,7 @@ export default {
   },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
+      user: state => state.user.user,
     }),
     redirectText() {
       return this.user ? 'Home' : 'Log in'
@@ -131,7 +131,7 @@ export default {
           this.isResettingPassword = false
           this.showSuccess = true
         })
-        .catch((err) => {
+        .catch(err => {
           this.isResettingPassword = false
           this.msg = err.message || err
           if (err.status !== 422) {

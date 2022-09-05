@@ -205,7 +205,10 @@
               <template #result="{ result, props }">
                 <li v-bind="props">
                   <div>
-                    <span v-if="result.name"> {{ result.name }}</span>
+                    <span v-if="result.name">
+                      {{ result.name }}, ({{ result.city }},
+                      {{ result.state }})</span
+                    >
                     <a
                       v-if="result.cantFindSchool"
                       href="https://upchieve.org/cant-find-school"
@@ -250,7 +253,7 @@
             v-model="signupSourceId"
             :options="signupSourcesOptions"
             label="name"
-            :reduce="(option) => option.id"
+            :reduce="option => option.id"
             :searchable="false"
             :clearable="false"
             required
@@ -271,7 +274,9 @@
           </label>
         </div>
 
-        <button class="uc-form-button" type="submit">Sign Up</button>
+        <button class="uc-form-button" type="submit">
+          Sign Up
+        </button>
 
         <div v-if="serverErrorMsg !== ''">{{ serverErrorMsg }}</div>
       </form>
@@ -300,12 +305,12 @@ export default {
     const partnerId = to.params.partnerId
 
     NetworkService.getStudentPartner(partnerId)
-      .then((data) => {
+      .then(data => {
         const studentPartner = data.body.studentPartner
         if (!studentPartner) return next('/sign-up')
-        return next((_this) => _this.setStudentPartner(studentPartner))
+        return next(_this => _this.setStudentPartner(studentPartner))
       })
-      .catch((err) => {
+      .catch(err => {
         if (err.status !== 404) {
           // we shouldn't get 422 here, since semantics of GET request are expected
           // to be correct regardless of user input
@@ -421,7 +426,7 @@ export default {
     autocompleteSchool(input) {
       this.formData.highSchoolUpchieveId = ''
 
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         if (input.length < 3) {
           return resolve([])
         }
@@ -431,8 +436,8 @@ export default {
         }
 
         NetworkService.searchSchool(this, { query: input })
-          .then((response) => response.body.results)
-          .then((schools) => {
+          .then(response => response.body.results)
+          .then(schools => {
             schools.push(cantFindSchoolItem)
             resolve(schools)
           })
@@ -490,7 +495,7 @@ export default {
           this.serverErrorMsg = ''
           this.getSignupSources()
         })
-        .catch((err) => {
+        .catch(err => {
           this.serverErrorMsg = err.message
           if (err.status !== 409 && err.status !== 422) {
             Sentry.captureException(err)
@@ -573,7 +578,7 @@ export default {
         .then(() => {
           this.$router.push('/verify')
         })
-        .catch((err) => {
+        .catch(err => {
           this.serverErrorMsg = err.message
           if (err.status !== 422) {
             Sentry.captureException(err)

@@ -135,7 +135,10 @@ export default {
           .utc()
           .startOf('day')
           .format('MM-DD-YYYY'),
-        endDate: moment(this.endDate).utc().startOf('day').format('MM-DD-YYYY'),
+        endDate: moment(this.endDate)
+          .utc()
+          .startOf('day')
+          .format('MM-DD-YYYY'),
         partnerOrg: this.isValidVolunteerPartnerOrg
           ? this.volunteerPartnerOrg.key
           : '',
@@ -152,7 +155,7 @@ export default {
       return JSON.parse(decoder.decode(buffer))
     },
     mapAnalyticsReportHeaders(report) {
-      return report.map((row) => {
+      return report.map(row => {
         // Use a Map to preserve key insertion order
         return new Map([
           [ANALYTICS_REPORT_ROW.FIRST_NAME, row.firstName],
@@ -225,7 +228,7 @@ export default {
     },
     mapAnalyticsSummaryHeaders(summary) {
       // Use a Map to preserve key insertion order
-      return summary.map((row) => {
+      return summary.map(row => {
         return new Map([
           [ANALYTICS_REPORT_SUMMARY.DATE_RANGE_SIGN_UPS, row.dateRangeSignUps],
           [

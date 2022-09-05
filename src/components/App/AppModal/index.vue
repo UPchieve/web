@@ -54,8 +54,8 @@ export default {
   },
   computed: {
     ...mapState({
-      modalComponent: (state) => state.app.modal.component,
-      modalData: (state) => state.app.modal.data,
+      modalComponent: state => state.app.modal.component,
+      modalData: state => state.app.modal.data,
     }),
   },
   mounted() {

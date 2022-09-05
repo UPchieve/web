@@ -25,7 +25,7 @@
           :options="states"
           label="label"
           :searchable="true"
-          :reduce="(option) => option.value"
+          :reduce="option => option.value"
         />
       </div>
 

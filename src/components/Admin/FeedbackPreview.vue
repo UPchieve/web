@@ -147,7 +147,7 @@ export default {
 
       if (isEmpty(ratings)) return []
 
-      return Object.keys(ratings).map((r) => ({
+      return Object.keys(ratings).map(r => ({
         name: r,
         value: ratings[r],
       }))

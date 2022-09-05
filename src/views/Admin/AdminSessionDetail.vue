@@ -65,7 +65,9 @@
       <div>{{ endedAt }}</div>
     </div>
     <div class="session-detail__section">
-      <div class="session-detail__section-title">Notifications</div>
+      <div class="session-detail__section-title">
+        Notifications
+      </div>
       <router-link :to="`/admin/sessions/${session._id}/notifications`"
         >{{
           session.notifications ? session.notifications.length : 0
@@ -98,14 +100,18 @@
       v-if="studentFeedback"
       class="session-detail__section session-detail__section--feedback"
     >
-      <div class="session-detail__section-title">Student feedback</div>
+      <div class="session-detail__section-title">
+        Student feedback
+      </div>
       <feedback-preview :feedback="studentFeedback" :userType="'student'" />
     </div>
     <div
       v-if="volunteerFeedback"
       class="session-detail__section session-detail__section--feedback"
     >
-      <div class="session-detail__section-title">Volunteer feedback</div>
+      <div class="session-detail__section-title">
+        Volunteer feedback
+      </div>
       <feedback-preview :feedback="volunteerFeedback" :userType="'volunteer'" />
     </div>
     <div v-if="session.photos.length > 0" class="session-detail__section">

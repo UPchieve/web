@@ -10,7 +10,7 @@
       <div class="uc-column">
         <sidebar-info
           v-if="!mobileMode"
-          style="margin-bottom: 64px"
+          style="margin-bottom: 64px;"
           :authenticated="isAuthenticated"
           :isVolunteer="isVolunteer"
           :name="user.firstname"
@@ -48,9 +48,9 @@ export default {
   components: { SidebarInfo, SidebarLinks },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
-      showHeader: (state) => state.app.header.isShown,
-      isSidebarCollapsed: (state) => state.app.sidebar.isCollapsed,
+      user: state => state.user.user,
+      showHeader: state => state.app.header.isShown,
+      isSidebarCollapsed: state => state.app.sidebar.isCollapsed,
     }),
     ...mapGetters({
       isAuthenticated: 'user/isAuthenticated',
