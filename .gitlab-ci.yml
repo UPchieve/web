@@ -51,6 +51,7 @@ build_production:
           --env-file .doppler_env \
           --creation-time now \
           --builder heroku/buildpacks:20 \
+          --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
           --buildpack heroku/nodejs \
           --buildpack heroku/procfile@0.6.2
     - docker push "$image_tagged"-production
@@ -63,6 +64,8 @@ build_demo:
   cache: {}
   tags:
     - upchieve
+  when: manual
+  allow_failure: true
   variables:
     DOCKER_TLS_CERTDIR: ""
   services:
@@ -96,6 +99,7 @@ build_demo:
           --env-file .doppler_env \
           --creation-time now \
           --builder heroku/buildpacks:20 \
+          --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
           --buildpack heroku/nodejs \
           --buildpack heroku/procfile@0.6.2
     - docker push "$image_tagged"-demo
@@ -141,6 +145,7 @@ build_staging:
           --env-file .doppler_env \
           --creation-time now \
           --builder heroku/buildpacks:20 \
+          --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
           --buildpack heroku/nodejs \
           --buildpack heroku/procfile@0.6.2
     - docker push "$image_tagged"-staging
@@ -153,6 +158,8 @@ build_hackers:
   cache: {}
   tags:
     - upchieve
+  when: manual
+  allow_failure: true
   variables:
     DOCKER_TLS_CERTDIR: ""
   services:
@@ -187,6 +194,7 @@ build_hackers:
           --env "VUE_APP_VERSION=$CI_COMMIT_SHA" \
           --creation-time now \
           --builder heroku/buildpacks:20 \
+          --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
           --buildpack heroku/nodejs \
           --buildpack heroku/procfile@0.6.2
     - docker push "$image_tagged"-hackers
