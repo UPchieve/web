@@ -6,8 +6,8 @@ module.exports = {
   version: process.env.HIGH_LINE_VERSION || 'development',
   logLevel: process.env.HIGH_LINE_LOG_LEVEL || 'debug',
   awsS3: {
-    photoIdBucket: process.env.SUBWAY_PHOTO_ID_BUCKET || 'photo-id-bucket',
+    photoIdBucket: process.env.HIGH_LINE_PHOTO_ID_BUCKET || 'photo-id-bucket',
     sessionPhotoBucket:
-      process.env.SUBWAY_SESSION_PHOTO_BUCKET || 'session-photo-bucket',
+      process.env.HIGH_LINE_SESSION_PHOTO_BUCKET || 'session-photo-bucket',
   },
 }
