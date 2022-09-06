@@ -51,7 +51,6 @@ app.use(
         upgradeInsecureRequests,
       },
     },
-    frameguard: false,
   })
 )
 

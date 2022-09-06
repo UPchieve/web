@@ -29,7 +29,7 @@
     "express": "^4.18.1",
     "gleap": "6.4.3",
     "heic2any": "^0.0.3",
-    "helmet": "^6.0.0",
+    "helmet": "^4.6.0",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.33",
     "newrelic": "^9.0.0",
