@@ -18,7 +18,6 @@ const gleapScriptUrl = 'https://widget.gleap.io'
 
 // connect sources
 const posthogUrl = 'https://p.upchieve.org'
-const unleashUrl = 'https://gitlab.com'
 const sentryUrl = 'https://*.ingest.sentry.io'
 const mathJaxFetchUrl = 'https://api.cdnjs.com'
 const gleapConnectUrls = [
@@ -46,7 +45,7 @@ const googleDocsUrl = 'https://docs.google.com'
 const trainingMaterialsS3 =
   'https://upc-training-materials.s3.us-east-2.amazonaws.com'
 
-export const scriptSrc = [
+const scriptSrc = [
   "'self'",
   `https://${config.host}`,
   ...googleUrls,
@@ -60,7 +59,7 @@ export const scriptSrc = [
   'blob:',
 ]
 
-export const imgSrc = [
+const imgSrc = [
   "'self'",
   ...googleUrls,
   ...s3PhotoImageUrls,
@@ -70,29 +69,28 @@ export const imgSrc = [
   `https://${config.host}`,
 ]
 
-export const connectSrc = [
+const connectSrc = [
   "'self'",
   posthogUrl,
-  unleashUrl,
   sentryUrl,
   mathJaxFetchUrl,
   ...s3PhotoConnectUrls,
   ...newrelicUrls,
   ...googleUrls,
   ...gleapConnectUrls,
-  config.vueAppUnleashUrl,
   `wss://${config.host}`,
   `https://${config.host}`,
 ]
 
-if (config.NODE_ENV !== 'production') {
+if (config.nodeEnv !== 'production') {
   connectSrc.push('http://localhost:3000')
   connectSrc.push('http://localhost:3001')
   connectSrc.push('ws://localhost:3001')
+  connectSrc.push('ws://localhost:3000')
   connectSrc.push('http://localhost:3002')
 }
 
-export const defaultSrc = [
+const defaultSrc = [
   "'self'",
   `https://${config.host}`,
   "'unsafe-inline'",
@@ -102,16 +100,29 @@ export const defaultSrc = [
 ]
 
 // the rest are defaults
-export const baseUri = ["'self'"]
-export const blockAllMixedContent = []
-export const fontSrc = ["'self'", 'https:', 'data:']
-export const frameAncestors = ["'self'", 'http://localhost']
-export const objectSrc = ["'none'"]
-export const scriptSrcAttr = ["'none'"]
-export const styleSrc = ["'self'", 'https:', "'unsafe-inline'"]
-export let upgradeInsecureRequests
-if (config.NODE_ENV === 'production') {
+const baseUri = ["'self'"]
+const blockAllMixedContent = []
+const fontSrc = ["'self'", 'https:', 'data:']
+const objectSrc = ["'none'"]
+const scriptSrcAttr = ["'none'"]
+const styleSrc = ["'self'", 'https:', "'unsafe-inline'"]
+let upgradeInsecureRequests
+if (config.nodeEnv === 'production') {
   upgradeInsecureRequests = []
 } else {
   upgradeInsecureRequests = null
+}
+
+module.exports = {
+  baseUri,
+  blockAllMixedContent,
+  connectSrc,
+  defaultSrc,
+  fontSrc,
+  imgSrc,
+  objectSrc,
+  scriptSrc,
+  scriptSrcAttr,
+  styleSrc,
+  upgradeInsecureRequests,
 }

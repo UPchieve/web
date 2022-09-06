@@ -1,3 +1,4 @@
+require('newrelic')
 const express = require('express')
 const path = require('path')
 const pino = require('pino')
@@ -11,7 +12,6 @@ const {
   connectSrc,
   defaultSrc,
   fontSrc,
-  // frameAncestors,
   imgSrc,
   objectSrc,
   scriptSrc,
@@ -41,7 +41,6 @@ app.use(
         connectSrc,
         defaultSrc,
         fontSrc,
-        // frameAncestors,
         imgSrc,
         objectSrc,
         scriptSrc,
@@ -63,7 +62,7 @@ if (config.additionalAllowedOrigins !== '') {
     `^(${config.host}|${config.additionalAllowedOrigins})$`
   )
 } else {
-  originRegex = new RegExp(`^(${config.host}|'http://localhost:8080')$`)
+  originRegex = new RegExp(`^(http://${config.host}|'http://localhost:8080')$`)
 }
 
 app.use(
@@ -79,6 +78,8 @@ app.get('/healthz', function(req, res) {
 })
 
 app.use(express.static(path.join(__dirname, distDir)))
+
+app.use('*', express.static(path.join(__dirname, distDir)))
 
 app.listen(config.serverPort, () => {
   logger.info(`api server listening on port ${config.serverPort}`)
