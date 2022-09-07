@@ -62,8 +62,11 @@ export default {
   computed: {
     sessionRating() {
       const sessionRatingKeys = [
+        // todo: clear out these extra properties when postsession survey flag is flipped
         'studentCounselingFeedback.rate-session.rating',
         'responseData.rate-session.rating',
+        'studentTutoringFeedback.session-goal',
+        'volunteerFeedback.session-enjoyable',
       ]
       for (const sessionRatingKey of sessionRatingKeys) {
         const sessionRating = get(this.feedback, sessionRatingKey, null)

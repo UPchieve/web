@@ -24,6 +24,8 @@ const logger = pino({
   level: config.logLevel,
 })
 
+logger.info('starting high-line server')
+
 const distDir = './dist'
 
 const app = express()
@@ -49,7 +51,6 @@ app.use(
         upgradeInsecureRequests,
       },
     },
-    frameguard: false,
   })
 )
 

@@ -42,15 +42,16 @@ build_production:
     - wget -q -t3 'https://packages.doppler.com/public/cli/rsa.8004D9FF50437357.key' -O /etc/apk/keys/cli@doppler-8004D9FF50437357.rsa.pub
     - echo 'https://packages.doppler.com/public/cli/alpine/any-version/main' | tee -a /etc/apk/repositories
     - apk add doppler
-    - echo "$DOPPLER_TOKEN_PRODUCTION" | doppler configure set token
     # build
     - |
-      doppler run --mount .doppler_env \
+      doppler run --token "$DOPPLER_TOKEN_PRODUCTION" \
+        --mount .doppler_env \
         --mount-template .doppler_env.tmpl -- \
         pack build "$image_tagged"-production \
           --env-file .doppler_env \
           --creation-time now \
           --builder heroku/buildpacks:20 \
+          --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
           --buildpack heroku/nodejs \
           --buildpack heroku/procfile@0.6.2
     - docker push "$image_tagged"-production
@@ -63,6 +64,8 @@ build_demo:
   cache: {}
   tags:
     - upchieve
+  when: manual
+  allow_failure: true
   variables:
     DOCKER_TLS_CERTDIR: ""
   services:
@@ -87,15 +90,16 @@ build_demo:
     - wget -q -t3 'https://packages.doppler.com/public/cli/rsa.8004D9FF50437357.key' -O /etc/apk/keys/cli@doppler-8004D9FF50437357.rsa.pub
     - echo 'https://packages.doppler.com/public/cli/alpine/any-version/main' | tee -a /etc/apk/repositories
     - apk add doppler
-    - echo "$DOPPLER_TOKEN_DEMO" | doppler configure set token
     # build
     - |
-      doppler run --mount .doppler_env \
-        --mount-template .doppler_env.tmpl -- \
+      doppler run --token "$DOPPLER_TOKEN_DEMO" \
+      --mount .doppler_env \
+      --mount-template .doppler_env.tmpl -- \
         pack build "$image_tagged"-demo \
           --env-file .doppler_env \
           --creation-time now \
           --builder heroku/buildpacks:20 \
+          --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
           --buildpack heroku/nodejs \
           --buildpack heroku/procfile@0.6.2
     - docker push "$image_tagged"-demo
@@ -132,18 +136,19 @@ build_staging:
     - wget -q -t3 'https://packages.doppler.com/public/cli/rsa.8004D9FF50437357.key' -O /etc/apk/keys/cli@doppler-8004D9FF50437357.rsa.pub
     - echo 'https://packages.doppler.com/public/cli/alpine/any-version/main' | tee -a /etc/apk/repositories
     - apk add doppler
-    - echo "$DOPPLER_TOKEN_STAGING" | doppler configure set token
     # build
     - |
-      doppler run --mount .doppler_env \
-        --mount-template .doppler_env.tmpl -- \
+      doppler run --token "$DOPPLER_TOKEN_STAGING" \
+      --mount .doppler_env \
+      --mount-template .doppler_env.tmpl -- \
         pack build "$image_tagged"-staging \
           --env-file .doppler_env \
           --creation-time now \
           --builder heroku/buildpacks:20 \
+          --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
           --buildpack heroku/nodejs \
-          --buildpack heroku/procfile@0.6.2 \
-          --publish
+          --buildpack heroku/procfile@0.6.2
+    - docker push "$image_tagged"-staging
   rules:
     - if: '$CI_COMMIT_BRANCH != "main"'
 
@@ -153,6 +158,8 @@ build_hackers:
   cache: {}
   tags:
     - upchieve
+  when: manual
+  allow_failure: true
   variables:
     DOCKER_TLS_CERTDIR: ""
   services:
@@ -177,19 +184,20 @@ build_hackers:
     - wget -q -t3 'https://packages.doppler.com/public/cli/rsa.8004D9FF50437357.key' -O /etc/apk/keys/cli@doppler-8004D9FF50437357.rsa.pub
     - echo 'https://packages.doppler.com/public/cli/alpine/any-version/main' | tee -a /etc/apk/repositories
     - apk add doppler
-    - echo "$DOPPLER_TOKEN_HACKERS" | doppler configure set token
     # build
     - |
-      doppler run --mount .doppler_env \
-        --mount-template .doppler_env.tmpl -- \
+      doppler run --token "$DOPPLER_TOKEN_HACKERS" \
+      --mount .doppler_env \
+      --mount-template .doppler_env.tmpl -- \
         pack build "$image_tagged"-hackers \
           --env-file .doppler_env \
           --env "VUE_APP_VERSION=$CI_COMMIT_SHA" \
           --creation-time now \
           --builder heroku/buildpacks:20 \
+          --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
           --buildpack heroku/nodejs \
-          --buildpack heroku/procfile@0.6.2 \
-          --publish
+          --buildpack heroku/procfile@0.6.2
+    - docker push "$image_tagged"-hackers
   rules:
     - if: '$CI_COMMIT_BRANCH != "main"'
 
