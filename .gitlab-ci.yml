@@ -49,6 +49,7 @@ build_production:
         --mount-template .doppler_env.tmpl -- \
         pack build "$image_tagged"-production \
           --env-file .doppler_env \
+          --env "VUE_APP_VERSION=$CI_COMMIT_SHA-production" \
           --creation-time now \
           --builder heroku/buildpacks:20 \
           --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
@@ -97,6 +98,7 @@ build_demo:
       --mount-template .doppler_env.tmpl -- \
         pack build "$image_tagged"-demo \
           --env-file .doppler_env \
+          --env "VUE_APP_VERSION=$CI_COMMIT_SHA-demo" \
           --creation-time now \
           --builder heroku/buildpacks:20 \
           --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
@@ -143,6 +145,7 @@ build_staging:
       --mount-template .doppler_env.tmpl -- \
         pack build "$image_tagged"-staging \
           --env-file .doppler_env \
+          --env "VUE_APP_VERSION=$CI_COMMIT_SHA-staging" \
           --creation-time now \
           --builder heroku/buildpacks:20 \
           --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
@@ -191,7 +194,7 @@ build_hackers:
       --mount-template .doppler_env.tmpl -- \
         pack build "$image_tagged"-hackers \
           --env-file .doppler_env \
-          --env "VUE_APP_VERSION=$CI_COMMIT_SHA" \
+          --env "VUE_APP_VERSION=$CI_COMMIT_SHA-hackers" \
           --creation-time now \
           --builder heroku/buildpacks:20 \
           --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
