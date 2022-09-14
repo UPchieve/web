@@ -10,6 +10,7 @@ config.zwibblerUrl = process.env.VUE_APP_ZWIBBLER_URL
 config.posthogToken = process.env.VUE_APP_POSTHOG_TOKEN
 config.unleashName = process.env.VUE_APP_UNLEASH_NAME
 config.unleashId = process.env.VUE_APP_UNLEASH_ID
+config.gleapSdkKey = process.env.VUE_APP_GLEAP_SDK_KEY
 config.devtools = process.env.VUE_APP_DEVTOOLS
 config.nodeEnv = process.env.NODE_ENV
 config.version = process.env.VUE_APP_VERSION || 'development'
