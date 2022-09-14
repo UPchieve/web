@@ -127,12 +127,6 @@ export default {
       })
   },
 
-  verifyReset(context, token) {
-    return NetworkService.verifyReset(context, token).catch(err => {
-      throw errorFromHttpResponse(err)
-    })
-  },
-
   initiateVerification(data) {
     return NetworkService.sendVerification(data).catch(err => {
       throw errorFromHttpResponse(err)
