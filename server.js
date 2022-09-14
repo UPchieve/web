@@ -1,5 +1,6 @@
 require('newrelic')
 const express = require('express')
+const fs = require('fs')
 const path = require('path')
 const pino = require('pino')
 const pinoHttp = require('pino-http')
@@ -27,6 +28,16 @@ const logger = pino({
 logger.info('starting high-line server')
 
 const distDir = './dist'
+const indexPath = path.join(__dirname, `${distDir}/index.html`)
+let indexHtml
+try {
+  indexHtml = fs.readFileSync(indexPath, 'utf8')
+} catch (err) {
+  logger.error(`error reading index.html file: ${err}`)
+  if (config.nodeEnv !== 'dev') {
+    process.exit(1)
+  }
+}
 
 const app = express()
 app.set('trust proxy', true)
@@ -78,9 +89,12 @@ app.get('/healthz', function(req, res) {
   res.status(200).json({ version: config.version })
 })
 
-app.use(express.static(path.join(__dirname, distDir)))
+app.use(express.static(path.join(__dirname, distDir), { index: indexHtml }))
 
-app.use('*', express.static(path.join(__dirname, distDir)))
+app.use((req, res, next) => {
+  res.send(indexHtml).status(200)
+  next()
+})
 
 app.listen(config.serverPort, () => {
   logger.info(`api server listening on port ${config.serverPort}`)
