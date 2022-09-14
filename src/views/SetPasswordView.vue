@@ -86,14 +86,6 @@ export default {
   },
   created() {
     this.$store.dispatch('app/hideNavigation')
-    const { token } = this.$route.params
-    AuthService.verifyReset(this, { token }).catch(err => {
-      if (err.status !== 404 && err.status !== 422) {
-        Sentry.captureException(err)
-      }
-      this.msg = err.message
-      this.isValidResetToken = false
-    })
   },
   data() {
     return {
