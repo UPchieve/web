@@ -316,6 +316,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.uc-form-body {
+  text-align: center;
+}
+
 .title {
   @include font-category('display-small');
 }

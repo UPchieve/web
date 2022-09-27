@@ -211,6 +211,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+thead {
+  text-align: center;
+}
+
 .session-list {
   padding: 10px 20px;
 }

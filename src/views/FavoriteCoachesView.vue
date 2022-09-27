@@ -260,6 +260,8 @@ ul {
   @include flex-container(row, space-around, center);
   display: grid;
   grid-template-columns: 1fr 1fr;
+  text-align: center;
+
   @include breakpoint-above('medium') {
     grid-template-columns: 1fr 1fr 1fr;
   }

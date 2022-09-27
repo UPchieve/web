@@ -18,6 +18,7 @@
     text-transform: uppercase;
     background-color: $c-backdrop;
     padding: 0.4em;
+    text-align: center;
 
     &:first-child {
       text-align: left;
@@ -41,6 +42,7 @@
     grid-column-start: span 3;
     position: relative;
     background-color: $c-background-grey;
+    text-align: center;
 
     &--bg {
       width: 100%;

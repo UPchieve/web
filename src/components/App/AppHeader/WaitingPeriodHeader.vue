@@ -36,6 +36,7 @@ export default {
 <style lang="scss" scoped>
 .WaitingPeriod {
   margin: 0 auto;
+  text-align: center;
 
   @include header-child;
   background-color: $c-warning-orange;

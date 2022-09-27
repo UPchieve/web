@@ -309,6 +309,7 @@ ul {
   }
 
   &-no-sessions {
+    text-align: center;
     margin-top: 3em;
   }
 }
@@ -345,6 +346,8 @@ ul {
 
 .spacing--grid {
   display: grid;
+  text-align: center;
+
   @include breakpoint-above('small') {
     grid-template-columns: 1fr 1fr 1fr 1fr;
   }
