@@ -50,6 +50,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 15px 5px;
+  text-align: center;
 
   @include breakpoint-above('medium') {
     padding: 15px 25px;

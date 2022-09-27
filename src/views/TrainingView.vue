@@ -470,6 +470,7 @@ a {
 .subject-types {
   @include flex-container(row, space-around, center);
   margin-top: 2em;
+  text-align: center;
 
   &__header-type {
     flex-basis: 100%;

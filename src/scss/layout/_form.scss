@@ -46,6 +46,7 @@
 
   &--center {
     @include flex-container(column, center, center);
+    text-align: center;
   }
 
   h3 {

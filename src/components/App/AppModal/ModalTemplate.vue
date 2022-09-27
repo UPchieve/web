@@ -150,6 +150,8 @@ $header-height: 80px;
   left: 0;
   z-index: get-z('modal');
 
+  text-align: center;
+
   &--important {
     background: $c-warning-orange;
   }

@@ -58,14 +58,16 @@
               </div>
             </div>
           </div>
-
-          <a
-            class="track-hours-link"
-            :href="hourTrackingGuide"
-            target="_blank"
-            rel="noopener noreferrer"
-            >How to track your volunteer hours <arrow-icon class="arrow-icon" />
-          </a>
+          <div class="dashboard-card__link">
+            <a
+              class="track-hours-link"
+              :href="hourTrackingGuide"
+              target="_blank"
+              rel="noopener noreferrer"
+              >How to track your volunteer hours
+              <arrow-icon class="arrow-icon" />
+            </a>
+          </div>
         </div>
       </template>
       <template v-else>
@@ -756,6 +758,7 @@ export default {
     font-size: 24px;
     font-weight: 500;
     line-height: 1.25;
+    text-align: center;
   }
 
   &__subtitle {
@@ -763,6 +766,7 @@ export default {
     color: $c-secondary-grey;
     margin-bottom: 24px;
     padding: 0 15px;
+    text-align: center;
 
     @include breakpoint-above('medium') {
       padding: 0 42px;
@@ -775,6 +779,10 @@ export default {
     @include breakpoint-above('medium') {
       margin: 0 20px;
     }
+  }
+
+  &__link {
+    text-align: center;
   }
 }
 

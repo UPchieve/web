@@ -356,6 +356,7 @@ input[type='checkbox']:checked + label {
 
 .tz-selector-container {
   padding-top: 30px;
+  text-align: center;
 }
 
 .tz-selector {
