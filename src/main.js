@@ -27,6 +27,7 @@ if (config.posthogToken) {
 
 if (config.gleapSdkKey) {
   Gleap.initialize(config.gleapSdkKey)
+  Gleap.getInstance().softReInitialize()
 }
 
 // Prevent production tip on startup
