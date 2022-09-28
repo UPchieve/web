@@ -26,6 +26,14 @@ const gleapConnectUrls = [
   gleapScriptUrl,
 ]
 
+// frame sources
+const googleDocFrameSrcUrl = 'https://docs.google.com/'
+const vimeoFrameSrcUrl = 'https://player.vimeo.com/'
+const gleapMessengerFrameSrcUrl = 'https://messenger.gleap.io/'
+
+// media sources
+const gleapMediaSrcUrl = 'https://js.gleap.io/'
+
 // img srcs
 const s3PhotoConnectUrls = [
   `${config.awsS3.photoIdBucket}.s3.us-east-2.amazonaws.com`,
@@ -82,6 +90,15 @@ const connectSrc = [
   `https://${config.host}`,
 ]
 
+const frameSrc = [
+  "'self'",
+  googleDocFrameSrcUrl,
+  vimeoFrameSrcUrl,
+  gleapMessengerFrameSrcUrl,
+]
+
+const mediaSrc = ["'self'", gleapMediaSrcUrl]
+
 if (config.nodeEnv !== 'production') {
   connectSrc.push('http://localhost:3000')
   connectSrc.push('http://localhost:3001')
@@ -124,5 +141,7 @@ module.exports = {
   scriptSrc,
   scriptSrcAttr,
   styleSrc,
+  frameSrc,
+  mediaSrc,
   upgradeInsecureRequests,
 }

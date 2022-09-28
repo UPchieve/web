@@ -18,6 +18,8 @@ const {
   scriptSrc,
   scriptSrcAttr,
   styleSrc,
+  frameSrc,
+  mediaSrc,
   upgradeInsecureRequests,
 } = require('./securitySettings')
 
@@ -59,6 +61,8 @@ app.use(
         scriptSrc,
         scriptSrcAttr,
         styleSrc,
+        frameSrc,
+        mediaSrc,
         upgradeInsecureRequests,
       },
     },
@@ -66,16 +70,14 @@ app.use(
 )
 
 let originRegex
-config.nodeEnv === 'dev'
-  ? (config.additionalAllowedOrigins = `http://localhost:${config.serverPort}`)
-  : (config.additionalAllowedOrigins = '')
-if (config.additionalAllowedOrigins !== '') {
+if (config.additionalAllowedOrigins !== '')
   originRegex = new RegExp(
-    `^(${config.host}|${config.additionalAllowedOrigins})$`
+    `^(${config.host}|http://localhost:${config.serverPort}|${config.additionalAllowedOrigins})$`
   )
-} else {
-  originRegex = new RegExp(`^(http://${config.host}|'http://localhost:8080')$`)
-}
+else
+  originRegex = new RegExp(
+    `^(${config.host}|http://localhost:${config.serverPort})$`
+  )
 
 app.use(
   cors({
