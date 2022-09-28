@@ -18,8 +18,10 @@ build_production:
   cache: {}
   tags:
     - upchieve
+    - containerbuild
   variables:
     DOCKER_TLS_CERTDIR: ""
+    MOUNT_POINT: /builds/$CI_PROJECT_PATH/mnt
   services:
     - docker:20.10.6-dind
   script:
@@ -42,19 +44,20 @@ build_production:
     - wget -q -t3 'https://packages.doppler.com/public/cli/rsa.8004D9FF50437357.key' -O /etc/apk/keys/cli@doppler-8004D9FF50437357.rsa.pub
     - echo 'https://packages.doppler.com/public/cli/alpine/any-version/main' | tee -a /etc/apk/repositories
     - apk add doppler
+    - mkdir -p "$MOUNT_POINT"
     # build
     - |
       doppler run --token "$DOPPLER_TOKEN_PRODUCTION" \
-        --mount .doppler_env \
-        --mount-template .doppler_env.tmpl -- \
-        pack build "$image_tagged"-production \
-          --env-file .doppler_env \
-          --env "VUE_APP_VERSION=$CI_COMMIT_SHA-production" \
-          --creation-time now \
-          --builder heroku/buildpacks:20 \
-          --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
-          --buildpack heroku/nodejs \
-          --buildpack heroku/procfile@0.6.2
+      --mount "$MOUNT_POINT/.doppler_env" \
+      --mount-template .doppler_env.tmpl -- \
+          pack build "$image_tagged"-production \
+            --env-file "$MOUNT_POINT/.doppler_env" \
+            --env "VUE_APP_VERSION=$CI_COMMIT_SHA-production" \
+            --creation-time now \
+            --builder heroku/buildpacks:20 \
+            --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
+            --buildpack heroku/nodejs \
+            --buildpack heroku/procfile@0.6.2
     - docker push "$image_tagged"-production
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
@@ -65,10 +68,12 @@ build_demo:
   cache: {}
   tags:
     - upchieve
+    - containerbuild
   when: manual
   allow_failure: true
   variables:
     DOCKER_TLS_CERTDIR: ""
+    MOUNT_POINT: /builds/$CI_PROJECT_PATH/mnt
   services:
     - docker:20.10.6-dind
   script:
@@ -91,19 +96,20 @@ build_demo:
     - wget -q -t3 'https://packages.doppler.com/public/cli/rsa.8004D9FF50437357.key' -O /etc/apk/keys/cli@doppler-8004D9FF50437357.rsa.pub
     - echo 'https://packages.doppler.com/public/cli/alpine/any-version/main' | tee -a /etc/apk/repositories
     - apk add doppler
+    - mkdir -p "$MOUNT_POINT"
     # build
     - |
       doppler run --token "$DOPPLER_TOKEN_DEMO" \
-      --mount .doppler_env \
+      --mount "$MOUNT_POINT/.doppler_env" \
       --mount-template .doppler_env.tmpl -- \
-        pack build "$image_tagged"-demo \
-          --env-file .doppler_env \
-          --env "VUE_APP_VERSION=$CI_COMMIT_SHA-demo" \
-          --creation-time now \
-          --builder heroku/buildpacks:20 \
-          --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
-          --buildpack heroku/nodejs \
-          --buildpack heroku/procfile@0.6.2
+          pack build "$image_tagged"-demo \
+            --env-file "$MOUNT_POINT/.doppler_env" \
+            --env "VUE_APP_VERSION=$CI_COMMIT_SHA-demo" \
+            --creation-time now \
+            --builder heroku/buildpacks:20 \
+            --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
+            --buildpack heroku/nodejs \
+            --buildpack heroku/procfile@0.6.2
     - docker push "$image_tagged"-demo
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
@@ -114,8 +120,10 @@ build_staging:
   cache: {}
   tags:
     - upchieve
+    - containerbuild
   variables:
     DOCKER_TLS_CERTDIR: ""
+    MOUNT_POINT: /builds/$CI_PROJECT_PATH/mnt
   services:
     - docker:20.10.6-dind
   script:
@@ -138,19 +146,20 @@ build_staging:
     - wget -q -t3 'https://packages.doppler.com/public/cli/rsa.8004D9FF50437357.key' -O /etc/apk/keys/cli@doppler-8004D9FF50437357.rsa.pub
     - echo 'https://packages.doppler.com/public/cli/alpine/any-version/main' | tee -a /etc/apk/repositories
     - apk add doppler
-    # build
+    - mkdir -p "$MOUNT_POINT"
+      # build
     - |
       doppler run --token "$DOPPLER_TOKEN_STAGING" \
-      --mount .doppler_env \
+      --mount "$MOUNT_POINT/.doppler_env" \
       --mount-template .doppler_env.tmpl -- \
-        pack build "$image_tagged"-staging \
-          --env-file .doppler_env \
-          --env "VUE_APP_VERSION=$CI_COMMIT_SHA-staging" \
-          --creation-time now \
-          --builder heroku/buildpacks:20 \
-          --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
-          --buildpack heroku/nodejs \
-          --buildpack heroku/procfile@0.6.2
+          pack build "$image_tagged"-staging \
+            --env-file "$MOUNT_POINT/.doppler_env" \
+            --env "VUE_APP_VERSION=$CI_COMMIT_SHA-staging" \
+            --creation-time now \
+            --builder heroku/buildpacks:20 \
+            --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
+            --buildpack heroku/nodejs \
+            --buildpack heroku/procfile@0.6.2
     - docker push "$image_tagged"-staging
   rules:
     - if: '$CI_COMMIT_BRANCH != "main"'
@@ -161,10 +170,12 @@ build_hackers:
   cache: {}
   tags:
     - upchieve
+    - containerbuild
   when: manual
   allow_failure: true
   variables:
     DOCKER_TLS_CERTDIR: ""
+    MOUNT_POINT: /builds/$CI_PROJECT_PATH/mnt
   services:
     - docker:20.10.6-dind
   script:
@@ -187,19 +198,20 @@ build_hackers:
     - wget -q -t3 'https://packages.doppler.com/public/cli/rsa.8004D9FF50437357.key' -O /etc/apk/keys/cli@doppler-8004D9FF50437357.rsa.pub
     - echo 'https://packages.doppler.com/public/cli/alpine/any-version/main' | tee -a /etc/apk/repositories
     - apk add doppler
+    - mkdir -p "$MOUNT_POINT"
     # build
     - |
       doppler run --token "$DOPPLER_TOKEN_HACKERS" \
-      --mount .doppler_env \
+      --mount "$MOUNT_POINT/.doppler_env" \
       --mount-template .doppler_env.tmpl -- \
-        pack build "$image_tagged"-hackers \
-          --env-file .doppler_env \
-          --env "VUE_APP_VERSION=$CI_COMMIT_SHA-hackers" \
-          --creation-time now \
-          --builder heroku/buildpacks:20 \
-          --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
-          --buildpack heroku/nodejs \
-          --buildpack heroku/procfile@0.6.2
+          pack build "$image_tagged"-hackers \
+            --env-file "$MOUNT_POINT/.doppler_env" \
+            --env "VUE_APP_VERSION=$CI_COMMIT_SHA-hackers" \
+            --creation-time now \
+            --builder heroku/buildpacks:20 \
+            --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
+            --buildpack heroku/nodejs \
+            --buildpack heroku/procfile@0.6.2
     - docker push "$image_tagged"-hackers
   rules:
     - if: '$CI_COMMIT_BRANCH != "main"'
