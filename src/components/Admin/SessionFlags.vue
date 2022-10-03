@@ -19,12 +19,16 @@ const SESSION_FLAGS_CLASS = {
   absentVolunteer: 'flags-item--absent',
   commentFromStudent: 'flags-item--comment',
   commentFromVolunteer: 'flags-item--comment',
-  onlyLookingForAnswers: 'flags-item--only-looking-for-answers',
-  rudeOrInappropriate: 'flags-item--rude-or-inappropriate',
+  pressuringCoach: 'flags-item--pressuringCoach',
+  meanOrInappropriate: 'flags-item--mean-or-inappropriate',
   reported: 'flags-item--reported',
   lowCoachRatingFromStudent: 'flags-item--student-coach-rating',
   lowSessionRatingFromStudent: 'flags-item--student-session-rating',
   lowSessionRatingFromCoach: 'flags-item--volunteer-session-rating',
+  pii: 'flags-item--personal-identifying-info',
+  gradedAssignment: 'flags-item--graded-assignment',
+  coachUncomfortable: 'flags-item--coach-uncomfortable',
+  studentInDistress: 'flags-item--student-in-distress',
 }
 
 export default {
@@ -54,6 +58,7 @@ export default {
   margin-right: 1em;
   color: #fff;
   border: 0px;
+  font-weight: bold;
 
   &--volunteer-session-rating {
     background-color: darken($c-backdrop, 20%);
@@ -70,14 +75,26 @@ export default {
   &--absent {
     background-color: #fdab3d;
   }
-  &--only-looking-for-answers {
+  &--pressuringCoach {
     background-color: rgba($color: $c-sat, $alpha: 0.9);
   }
-  &--rude-or-inappropriate {
+  &--mean-or-inappropriate {
     background-color: $c-math;
   }
   &--student-coach-rating {
     background-color: #c3ce87;
+  }
+  &--personal-identifying-info {
+    background-color: $c-college;
+  }
+  &--graded-assignment {
+    background-color: #feb4f1;
+  }
+  &--coach-uncomfortable {
+    background-color: #2d3a55;
+  }
+  &--student-in-distress {
+    background-color: #e75f5f;
   }
 }
 </style>
