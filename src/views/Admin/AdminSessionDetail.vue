@@ -97,22 +97,55 @@
       />
     </div>
     <div
-      v-if="studentFeedback"
+      v-if="legacyStudentFeedback"
       class="session-detail__section session-detail__section--feedback"
     >
       <div class="session-detail__section-title">
         Student feedback
       </div>
-      <feedback-preview :feedback="studentFeedback" :userType="'student'" />
+      <feedback-preview
+        :feedback="legacyStudentFeedback"
+        :userType="'student'"
+      />
     </div>
     <div
-      v-if="volunteerFeedback"
+      v-if="legacyVolunteerFeedback"
       class="session-detail__section session-detail__section--feedback"
     >
       <div class="session-detail__section-title">
         Volunteer feedback
       </div>
-      <feedback-preview :feedback="volunteerFeedback" :userType="'volunteer'" />
+      <feedback-preview
+        :feedback="legacyVolunteerFeedback"
+        :userType="'volunteer'"
+      />
+    </div>
+    <div
+      v-if="presessionSurvey"
+      class="session-detail__section session-detail__section--feedback"
+    >
+      <div class="session-detail__section-title">
+        Student Presession Survey
+      </div>
+      <survey-response-preview :response="presessionSurvey" />
+    </div>
+    <div
+      v-if="studentPostsessionSurvey"
+      class="session-detail__section session-detail__section--feedback"
+    >
+      <div class="session-detail__section-title">
+        Student Postsession Survey
+      </div>
+      <survey-response-preview :response="studentPostsessionSurvey" />
+    </div>
+    <div
+      v-if="volunteerPostsessionSurvey"
+      class="session-detail__section session-detail__section--feedback"
+    >
+      <div class="session-detail__section-title">
+        Volunteer Postsession Survey
+      </div>
+      <survey-response-preview :response="volunteerPostsessionSurvey" />
     </div>
     <div v-if="session.photos.length > 0" class="session-detail__section">
       <div class="session-detail__section-title">Photos</div>
@@ -150,6 +183,7 @@ import NetworkService from '@/services/NetworkService'
 import UserPreview from '@/components/Admin/UserPreview'
 import ChatLog from '@/components/Admin/ChatLog'
 import FeedbackPreview from '@/components/Admin/FeedbackPreview'
+import SurveyResponsePreview from '@/components/Admin/SurveyResponsePreview'
 import Quill from 'quill'
 import SessionFlags from '@/components/Admin/SessionFlags'
 import Separator from '@/components/Separator'
@@ -162,6 +196,7 @@ export default {
     UserPreview,
     ChatLog,
     FeedbackPreview,
+    SurveyResponsePreview,
     SessionFlags,
     Separator,
   },
@@ -195,16 +230,36 @@ export default {
           : this.session.volunteer
       return endedBy ? endedBy.firstname : '?'
     },
-    studentFeedback() {
+    // pre-context sharing feedback
+    legacyStudentFeedback() {
       return this.session.feedbacks &&
         (this.session.feedbacks.studentTutoringFeedback ||
           this.session.feedbacks.studentCounselingFeedback)
         ? this.session.feedbacks
         : null
     },
-    volunteerFeedback() {
+    // pre-context sharing feedback
+    legacyVolunteerFeedback() {
       return this.session.feedbacks && this.session.feedbacks.volunteerFeedback
         ? this.session.feedbacks
+        : null
+    },
+    presessionSurvey() {
+      return this.session.surveyResponses &&
+        this.session.surveyResponses.presessionSurvey
+        ? this.session.surveyResponses.presessionSurvey
+        : null
+    },
+    studentPostsessionSurvey() {
+      return this.session.surveyResponses &&
+        this.session.surveyResponses.studentPostsessionSurvey
+        ? this.session.surveyResponses.studentPostsessionSurvey
+        : null
+    },
+    volunteerPostsessionSurvey() {
+      return this.session.surveyResponses &&
+        this.session.surveyResponses.volunteerPostsessionSurvey
+        ? this.session.surveyResponses.volunteerPostsessionSurvey
         : null
     },
     devicePlatform() {
