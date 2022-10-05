@@ -86,7 +86,7 @@
                     :responseId="response.responseId"
                     :isSelected="
                       userResponse[questionInfo.questionId].responseId &&
-                        userResponse[questionInfo.questionId].responseId.find(
+                        !!userResponse[questionInfo.questionId].responseId.find(
                           r => r === response.responseId
                         )
                     "
@@ -243,6 +243,7 @@
 
         <large-button
           class="feedback__submit-button"
+          :disabled="!hasAnsweredAtLeastOneQuestion()"
           primary
           @click.native="submitFeedback"
         >
@@ -525,6 +526,7 @@ export default {
       sessionResponse,
       presessionResponse,
       presessionGoalResponse,
+      postsessionAlreadySavedResponse
     ] = await Promise.all([
       NetworkService.getFeedback({
         sessionId,
@@ -533,6 +535,7 @@ export default {
       NetworkService.getSession(sessionId),
       NetworkService.getPresessionSurveyForFeedback(sessionId),
       NetworkService.getStudentsPresessionGoal(sessionId),
+      NetworkService.getPostsessionSurveyResponse(sessionId, this.userType)
     ])
 
     const {
@@ -547,7 +550,6 @@ export default {
     const {
       body: { goal },
     } = presessionGoalResponse
-
     this.session = session
     if (this.isPostsessionSurveyActive) {
       const postsessionSurveyDefinitionResponse = await NetworkService.getPostsessionSurvey(
@@ -579,7 +581,8 @@ export default {
     this.studentPresessionGoal = goal
     // TODO: remove in context sharing feature flag cleanup
     this.presessionSurvey = survey
-    if (feedback) {
+    if (feedback || postsessionAlreadySavedResponse.body.length > 0) {
+      this.loading = false
       this.completedFeedback = true
       return
     }
@@ -704,7 +707,16 @@ export default {
       }
       return false
     },
-
+    hasAnsweredAtLeastOneQuestion() {
+      for (const questionInfo of this.filteredQuestions) {
+        const question = questionInfo.question
+        const response = this.userResponse[question.questionId]
+        if (response.openResponse || response.responseId) {
+          return true
+        }
+      }
+      return false
+    },
     getAnswerToQuestion(question) {
       const questionResponseId = this.userResponse[question.questionId]
         .responseId

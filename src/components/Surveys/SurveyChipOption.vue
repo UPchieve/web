@@ -19,7 +19,8 @@ export default {
     },
     isSelected: {
       type: Boolean,
-      required: true,
+      default: false,
+      required: false,
     },
     responseId: {
       type: [String, Number],
