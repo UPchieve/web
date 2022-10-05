@@ -248,7 +248,7 @@
         >
           Submit
         </large-button>
-        <loader v-if="isSubmittingFeedback" :overlay="true" />
+        <loader v-if="isSubmittingFeedback || isLoading" :overlay="true" />
       </template>
     </div>
   </div>
@@ -290,6 +290,7 @@ export default {
       session: {},
       presessionSurvey: {},
       studentPresessionGoal: '',
+      isLoading: true,
       isSubmittingFeedback: false,
       completedFeedback: false,
       isFavoriteCoach: false,
@@ -594,6 +595,7 @@ export default {
         this.isFavoriteCoachLimitReached = response.body.remaining === 0
       }
     }
+    this.isLoading = false
   },
   methods: {
     getQuestionDisplayType(question) {
