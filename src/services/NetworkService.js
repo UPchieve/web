@@ -664,6 +664,13 @@ export default {
       )
       .then(this._successHandler, this._errorHandler)
   },
+  getPostsessionSurveyResponse(sessionId, role) {
+    return Vue.http
+      .get(
+        `${API_ROOT}/survey/postsession/response?sessionId=${sessionId}&role=${role}`
+      )
+      .then(this._successHandler, this._errorHandler)
+  },
   getUserProductFlags() {
     return Vue.http
       .get(`${API_ROOT}/product-flags`)
