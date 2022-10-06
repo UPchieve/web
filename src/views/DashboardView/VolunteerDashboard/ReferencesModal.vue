@@ -207,7 +207,9 @@ export default {
         return
       }
 
-      if (this.user.email === this.newReferenceEmail) {
+      if (
+        this.user.email.toLowerCase() === this.newReferenceEmail.toLowerCase()
+      ) {
         this.addReferenceError =
           'Your reference cannot have the same email address as you.'
         return
@@ -218,7 +220,7 @@ export default {
       NetworkService.addReference({
         referenceFirstName: this.newReferenceFirstName,
         referenceLastName: this.newReferenceLastName,
-        referenceEmail: this.newReferenceEmail,
+        referenceEmail: this.newReferenceEmail.toLowerCase(),
       }).then(response => {
         if (response.body.success === false) {
           this.addReferenceError = response.body.message
@@ -230,7 +232,7 @@ export default {
         const newReference = {
           firstName: this.newReferenceFirstName,
           lastName: this.newReferenceLastName,
-          email: this.newReferenceEmail,
+          email: this.newReferenceEmail.toLowerCase(),
           status: 'UNSENT',
         }
         this.references.push(newReference)
@@ -238,7 +240,7 @@ export default {
         AnalyticsService.captureEvent(EVENTS.REFERENCE_ADDED, {
           event: EVENTS.REFERENCE_ADDED,
           referenceFirstName: newReference.firstName,
-          referenceEmail: newReference.email,
+          referenceEmail: newReference.email.toLowerCase(),
         })
 
         this.toggleAddReferenceMode()
