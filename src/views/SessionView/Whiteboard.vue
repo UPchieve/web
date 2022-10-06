@@ -18,12 +18,12 @@
       ref="zwibDiv"
     ></div>
     <transition name="reset-whiteboard-error">
-      <p class="error" v-show="resetWhiteboardError">
+      <p class="whiteboard-transition-error" v-show="resetWhiteboardError">
         Unable to reset the whiteboard.
       </p>
     </transition>
     <transition name="uploading-picture-error">
-      <p class="error" v-show="uploadingPictureError">
+      <p class="whiteboard-transition-error" v-show="uploadingPictureError">
         Unable to upload the picture.
       </p>
     </transition>
@@ -1041,7 +1041,7 @@ export default {
   justify-content: center;
 }
 
-.error {
+.whiteboard-transition-error {
   width: 100%;
   background-color: $c-error-red;
   color: #fff;
