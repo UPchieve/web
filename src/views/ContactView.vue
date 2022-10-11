@@ -22,9 +22,14 @@
           >FAQ page</a
         >
         is the fastest way to find answers. Or you can fill out this form and
-        we'll get back to you as soon as possible! Alternatively, you can always
-        email us directly at
-        <a href="mailto:support@upchieve.org">support@upchieve.org</a>.
+        we'll get back to you as soon as possible! You can visit our
+        <a
+          href="https://upchieve.org/verify-volunteer-hours"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Verify Your Volunteer Hours page</a
+        >
+        to learn more about submitting volunteer hours.
       </div>
 
       <div class="contact__description" v-if="sendState === sendStates.SENT">
