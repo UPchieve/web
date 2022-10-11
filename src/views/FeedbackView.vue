@@ -526,7 +526,7 @@ export default {
       sessionResponse,
       presessionResponse,
       presessionGoalResponse,
-      postsessionAlreadySavedResponse
+      postsessionAlreadySavedResponse,
     ] = await Promise.all([
       NetworkService.getFeedback({
         sessionId,
@@ -535,7 +535,7 @@ export default {
       NetworkService.getSession(sessionId),
       NetworkService.getPresessionSurveyForFeedback(sessionId),
       NetworkService.getStudentsPresessionGoal(sessionId),
-      NetworkService.getPostsessionSurveyResponse(sessionId, this.userType)
+      NetworkService.getPostsessionSurveyResponse(sessionId, this.userType),
     ])
 
     const {
