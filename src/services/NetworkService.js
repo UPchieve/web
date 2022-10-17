@@ -716,4 +716,9 @@ export default {
       .get(`${ELIGIBILITY_API_ROOT}/signup-sources/students`)
       .then(this._successHandler, this._errorHandler)
   },
+  adminGetActivePartnersForStudent(studentId) {
+    return Vue.http
+      .get(`${API_ROOT}/students/partners/active?student=${studentId}`)
+      .then(this._successHandler, this._errorHandler)
+  },
 }

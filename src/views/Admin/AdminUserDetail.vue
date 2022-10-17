@@ -155,7 +155,7 @@ export default {
     },
 
     schoolName() {
-      const school = this.user.approvedHighschool
+      const school = this.user.approvedHighSchool
       if (!school) return null
 
       return school.nameStored ? school.nameStored : school.SCH_NAME
