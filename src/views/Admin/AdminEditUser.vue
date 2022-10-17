@@ -40,6 +40,19 @@
         />
       </div>
 
+      <div class="row" v-if="!user.isVolunteer">
+        <label for="partner-school" class="uc-form-label">
+          Partner school
+        </label>
+        <v-select
+          id="partner-school"
+          class="option-select"
+          :options="listedPartnerSchools"
+          label="displayName"
+          v-model="partnerSchool"
+        />
+      </div>
+
       <div class="row">
         <label for="verified" class="uc-form-label">Verified</label>
         <select name="verified" id="verified" v-model="isVerified">
@@ -127,6 +140,7 @@ export default {
       lastName: '',
       email: '',
       partnerOrg: {},
+      partnerSchool: {},
       partnerSite: '',
       isVerified: false,
       isBanned: false,
@@ -139,9 +153,12 @@ export default {
       ],
       error: '',
       listedPartnerOrgs: [],
+      listedPartnerSchools: [],
     }
   },
   async created() {
+    let activeSchoolPartnerName = ''
+
     if (this.user.isVolunteer) {
       const response = await NetworkService.adminGetVolunteerPartners()
       const {
@@ -153,7 +170,27 @@ export default {
       const {
         body: { partnerOrgs },
       } = response
-      this.listedPartnerOrgs = partnerOrgs
+      const activeSchoolPartnerResponse = await NetworkService.adminGetActivePartnersForStudent(
+        this.user.id
+      )
+      const {
+        body: { activePartners },
+      } = activeSchoolPartnerResponse
+
+      const listedPartnerOrgs = []
+      const listedPartnerSchools = []
+
+      for (let org of partnerOrgs) {
+        if (org.isSchool) listedPartnerSchools.push(org)
+        else listedPartnerOrgs.push(org)
+      }
+
+      this.listedPartnerOrgs = listedPartnerOrgs
+      this.listedPartnerSchools = listedPartnerSchools
+
+      for (let partner of activePartners) {
+        if (partner.schoolId) activeSchoolPartnerName = partner.name
+      }
     }
 
     this.firstName = this.user.firstname
@@ -169,10 +206,17 @@ export default {
 
     for (let org of this.listedPartnerOrgs) {
       if (
-        org.key === this.user.studentPartnerOrg ||
-        org.key === this.user.volunteerPartnerOrg
+        org.name === this.user.studentPartnerOrg ||
+        org.name === this.user.volunteerPartnerOrg
       ) {
         this.partnerOrg = org
+        break
+      }
+    }
+
+    for (let org of this.listedPartnerSchools) {
+      if (activeSchoolPartnerName === org.name) {
+        this.partnerSchool = org
         break
       }
     }
@@ -192,6 +236,9 @@ export default {
         isDeactivated: this.isDeactivated,
         isApproved: this.isApproved,
         inGatesStudy: this.inGatesStudy,
+        partnerSchool: isEmpty(this.partnerSchool)
+          ? ''
+          : this.partnerSchool.key,
       }
 
       if (
