@@ -18,7 +18,7 @@
           <div class="students-waiting">
             <web-notifications-button class="notifications-button" />
             <div class="dashboard-card__title">Waiting Students</div>
-            <div v-if="isSessionAlive">
+            <div v-if="isSessionAlive" class="rejoin-session-container">
               <button
                 class="btn rejoinSessionBtn"
                 type="button"
@@ -885,5 +885,9 @@ export default {
     fill: $upchieve-white;
     margin-left: 0.5em;
   }
+}
+
+.rejoin-session-container {
+  text-align: center;
 }
 </style>
