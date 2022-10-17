@@ -218,8 +218,10 @@ import * as Sentry from '@sentry/browser'
 import FormPageTemplate from '@/components/FormPageTemplate'
 import AuthService from '@/services/AuthService'
 import NetworkService from '@/services/NetworkService'
+import AnalyticsService from '@/services/AnalyticsService'
 import VuePhoneNumberInput from 'vue-phone-number-input'
 import Loader from '@/components/Loader'
+import { EVENTS } from '@/consts'
 
 export default {
   name: 'volunteer-partner-signup-view',
@@ -235,6 +237,13 @@ export default {
       .then(data => {
         const volunteerPartner = data.body.volunteerPartner
         if (!volunteerPartner) return next('/sign-up')
+        if (volunteerPartner.deactivated) {
+          AnalyticsService.captureEvent(
+            EVENTS.VOLUNTEER_VISITED_DEACTIVATED_PARTNER,
+            { partner: partnerId }
+          )
+          return next('/sign-up')
+        }
         return next(_this => _this.setVolunteerPartner(volunteerPartner))
       })
       .catch(err => {
