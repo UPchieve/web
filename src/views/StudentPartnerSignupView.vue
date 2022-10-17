@@ -292,8 +292,10 @@ import Autocomplete from '@trevoreyre/autocomplete-vue'
 import FormPageTemplate from '@/components/FormPageTemplate'
 import AuthService from '@/services/AuthService'
 import NetworkService from '@/services/NetworkService'
+import AnalyticsService from '@/services/AnalyticsService'
 import { backOff } from 'exponential-backoff'
 import { mapGetters } from 'vuex'
+import { EVENTS } from '@/consts'
 
 export default {
   name: 'student-partner-signup-view',
@@ -308,6 +310,13 @@ export default {
       .then(data => {
         const studentPartner = data.body.studentPartner
         if (!studentPartner) return next('/sign-up')
+        if (studentPartner.deactivated) {
+          AnalyticsService.captureEvent(
+            EVENTS.STUDENT_VISITED_DEACTIVATED_PARTNER,
+            { partner: partnerId }
+          )
+          return next('/sign-up')
+        }
         return next(_this => _this.setStudentPartner(studentPartner))
       })
       .catch(err => {
