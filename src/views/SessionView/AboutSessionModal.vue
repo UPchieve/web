@@ -22,7 +22,12 @@
             <div v-for="response in responses" :key="response.displayLabel">
               <div class="session-info-title">{{ response.displayLabel }}</div>
               <div class="session-info-response">
-                <span v-if="response.displayImage">
+                <span
+                  v-if="
+                    response.displayImage &&
+                      showImageWithResponse(response.displayLabel)
+                  "
+                >
                   <img
                     class="response-image"
                     :src="response.displayImage"
@@ -88,10 +93,19 @@ export default {
     },
     studentsConfidence() {
       for (const response of this.responses) {
-        if (response.displayImage && response.score <= 2)
+        if (
+          response.displayLabel.startsWith('How they feel about') &&
+          response.displayImage &&
+          response.score <= 2
+        )
           return response.response.toLowerCase()
       }
       return ''
+    },
+  },
+  methods: {
+    showImageWithResponse(label) {
+      return !label.startsWith('How well they understand the topic')
     },
   },
 }

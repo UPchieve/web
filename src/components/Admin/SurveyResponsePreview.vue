@@ -9,7 +9,7 @@
           Your Thoughts
         </div>
         <div v-else>
-          {{key}}
+          {{ key }}
         </div>
       </strong>
       <div v-for="(response, indexInner) in question" v-bind:key="indexInner">
@@ -26,7 +26,7 @@
             :show-rating="false"
           />
         </div>
-        {{response.response}}
+        {{ response.response }}
       </div>
     </div>
   </div>
@@ -49,11 +49,14 @@ export default {
   },
   methods: {
     isSessionRating(questionText) {
-      return questionText.endsWith('achieve your goal?') || questionText.endsWith('achieve their goal?')
+      return (
+        questionText.endsWith('achieve your goal?') ||
+        questionText.endsWith('achieve their goal?')
+      )
     },
     isFreeResponse(questionText) {
       return questionText.startsWith('This can be about the web app,')
-    }
+    },
   },
 }
 </script>

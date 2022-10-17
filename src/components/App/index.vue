@@ -326,6 +326,7 @@ export default {
   z-index: 999;
   position: fixed;
   width: 100%;
+  text-align: center;
 
   &__refresh-button {
     display: initial;
