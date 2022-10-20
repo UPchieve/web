@@ -155,7 +155,7 @@
                     class="question__response question__response-numbers"
                     :key="`${response.responseId}-rating`"
                     :src="response.responseDisplayImage"
-                    :rating="index + 1"
+                    :rating="(index + 1).toString()"
                     :label="index % 2 === 0 ? response.responseText : ''"
                     :questionId="questionInfo.questionId"
                     :responseId="response.responseId"
@@ -592,7 +592,6 @@ export default {
         this.session.volunteer._id
       )
       this.isFavoriteCoach = response.body.isFavorite
-
       if (!this.isFavoriteCoach) {
         const response = await NetworkService.getRemainingFavoriteVolunteers()
         this.isFavoriteCoachLimitReached = response.body.remaining === 0
@@ -897,7 +896,7 @@ export default {
         )
         const showHighRatingQuestion = this.isHighRatingResponse(
           ratingResponse.responseText
-        )
+        ) && !this.isFavoriteCoachLimitReached
         const showLowRatingQuestion = this.isLowRatingResponse(
           ratingResponse.responseText
         )
