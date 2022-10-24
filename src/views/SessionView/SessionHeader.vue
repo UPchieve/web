@@ -111,7 +111,6 @@ import LoadingMessage from '@/components/LoadingMessage'
 import TroubleMatchingModal from '@/views/SessionView/TroubleMatchingModal'
 import UnmatchedModal from '@/views/SessionView/UnmatchedModal'
 import sendWebNotification from '@/utils/send-web-notification'
-import Case from 'case'
 
 /**
  * @todo {1} Refactoring candidate: use a modal instead.
@@ -265,43 +264,7 @@ export default {
       // or if the student was not paired with a tutor
       if (this.isAbsentUser()) return this.$router.push('/')
 
-      if (
-        !this.isPostsessionSurveyActive &&
-        !this.user.isVolunteer &&
-        this.session.type === 'college'
-      ) {
-        this.goToStudentCounselingFeedbackPage()
-        return
-      }
       router.push(`/feedback/${this.session._id}`)
-    },
-    goToStudentCounselingFeedbackPage() {
-      const sessionId = this.session._id
-      let studentId = ''
-      let volunteerId = null
-      let subTopic = null
-      let topic = null
-
-      if (this.session.student) studentId = this.session.student._id
-      if (this.session.volunteer) volunteerId = this.session.volunteer._id
-      if (this.session.type) topic = this.session.type
-      if (this.session.subTopic) subTopic = this.session.subTopic
-
-      const url = volunteerId
-        ? '/feedback/' +
-          sessionId +
-          '/' +
-          Case.kebab(topic) +
-          '/' +
-          Case.kebab(subTopic) +
-          '/' +
-          (this.user.isVolunteer ? 'volunteer' : 'student') +
-          '/' +
-          studentId +
-          '/' +
-          volunteerId
-        : '/'
-      router.push(url)
     },
     toggleTroubleMatchingModal() {
       if (this.isChatbotActive) this.showTroubleMatchingModal = false

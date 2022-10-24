@@ -24,7 +24,7 @@
 
       <template v-else>
         <ul class="feedback__questions-list">
-          <div v-if="isPostsessionSurveyActive">
+          <div>
             <li
               v-for="questionInfo in filteredQuestions"
               :key="questionInfo.question.id"
@@ -203,40 +203,6 @@
               </div>
             </li>
           </div>
-          <div v-else>
-            <li
-              v-for="(question, index) in filteredQuestions"
-              :key="question.id"
-              :class="feedback__questions - item"
-            >
-              <h2
-                class="feedback__question"
-                v-html="
-                  question.question
-                    ? question.question
-                    : question.dynamicQuestion()
-                "
-              >
-                {{ index + 1 }}.
-                {{
-                  question.question
-                    ? question.question
-                    : question.dynamicQuestion()
-                }}
-              </h2>
-              <p class="feedback__subtext">
-                {{ question.subtext }}
-              </p>
-              <component
-                :is="question.component"
-                :id="question.id"
-                :position="index"
-                :options="question.options"
-                v-model="question.answer"
-                :direction="question.direction"
-              />
-            </li>
-          </div>
         </ul>
 
         <p v-if="error" class="feedback__error">{{ error }}</p>
@@ -256,17 +222,13 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import NetworkService from '@/services/NetworkService'
 import LargeButton from '@/components/LargeButton'
 import { topics } from '@/utils/topics'
 import moment from 'moment'
-import { formatSurveyAnswers } from '@/utils/survey'
-import FeedbackRadio from '@/components/FeedbackRadio'
 import FeedbackTextarea from '@/components/FeedbackTextarea'
-import FeedbackCheckbox from '@/components/FeedbackCheckbox'
 import Loader from '@/components/Loader'
-import { QUESTION_TYPES } from '@/consts'
 import SurveyRadio from '@/components/Surveys/SurveyRadio'
 import SurveyImage from '@/components/Surveys/SurveyImage'
 import SurveyRateNumber from '../components/Surveys/SurveyRateNumber'
@@ -289,159 +251,12 @@ export default {
   data() {
     return {
       session: {},
-      presessionSurvey: {},
-      studentPresessionGoal: '',
       isLoading: true,
       isSubmittingFeedback: false,
       completedFeedback: false,
       isFavoriteCoach: false,
       isFavoriteCoachLimitReached: false,
       allQuestions: [],
-
-      // TODO: remove in context sharing feature flag cleanup
-      studentQuestions: [
-        {
-          id: 'session-goal',
-          /**
-           *
-           * @note: This dynamic question output html content. Scoped
-           *        styles are not applied to content inside v-html,
-           *        because that HTML is not processed by Vue’s template compiler
-           **/
-          dynamicQuestion: () =>
-            `Your goal for this session was to <span class="feedback__session-goal">${this.sessionGoal.toLowerCase()}</span>. On a scale of 1 to 5, did UPchieve help you achieve your goal?`,
-          options: ['Not at all', '', 'Kind of', '', 'Yes, completely!'],
-          component: FeedbackRadio,
-          direction: 'row',
-          answer: null,
-        },
-        {
-          id: 'subject-understanding',
-          question:
-            'What is your level of understanding now that you’ve completed your session?',
-          component: FeedbackRadio,
-          options: [
-            "I don't know how to do this at all.",
-            'I think I know how to do it, but I need help.',
-            "I can do this on my own, but I don't fully understand it.",
-            'I am very comfortable with this topic.',
-          ],
-          answer: null,
-        },
-        {
-          id: 'coach-rating',
-          question: 'Please rate the Academic Coach who helped you.',
-          component: FeedbackRadio,
-          options: ['Terrible', '', 'Decent', '', 'Amazing'],
-          direction: 'row',
-          answer: null,
-        },
-        {
-          id: 'coach-favoriting',
-          dynamicQuestion: () =>
-            `Would you like to favorite your Coach, ${this.sessionPartnerFirstName}?`,
-          subtext:
-            'Favoriting a coach will increase your chances of being paired with them in the future. You can also favorite or unfavorite coaches from the Session History page.',
-          component: FeedbackRadio,
-          options: [
-            'Yes, I’d love to work with them again!',
-            'No thanks, not right now.',
-          ],
-          direction: 'column',
-          answer: null,
-          show: () => {
-            if (this.isFavoriteCoach || this.isFavoriteCoachLimitReached)
-              return false
-            const question = this.questions.find(q => q.id === 'coach-rating')
-            return question.answer && question.answer >= 4
-          },
-        },
-        {
-          id: 'coach-feedback',
-          question: 'What could your coach have done better?',
-          subtext: 'This feedback will be anonymous! You can be honest. :)',
-          component: FeedbackTextarea,
-          answer: null,
-          show: () => {
-            const question = this.questions.find(q => q.id === 'coach-rating')
-            return question.answer && question.answer <= 3
-          },
-        },
-        {
-          id: 'other-feedback',
-          question:
-            '(Optional) Do you have any other feedback you’d like to share with UPchieve?',
-          subtext:
-            'This can be about the website, about your coach, about the services/features UPchieve provides, about any technical issues you encountered, etc. We read every single comment, every day!',
-          component: FeedbackTextarea,
-          answer: null,
-        },
-      ],
-
-      // TODO: remove in context sharing feature flag cleanup
-      volunteerQuestions: [
-        {
-          id: 'session-enjoyable',
-          question: 'Was this session enjoyable and/or rewarding?',
-          component: FeedbackRadio,
-          direction: 'row',
-          options: ['Not at all', '', 'Somewhat', '', 'Yes, absolutely!'],
-          answer: '',
-        },
-        {
-          id: 'session-improvements',
-          question:
-            "We're sorry to hear that! What could have made this session more enjoyable and/or rewarding?",
-          component: FeedbackTextarea,
-          answer: null,
-          show: () => {
-            const question = this.volunteerQuestions.find(
-              q => q.id === 'session-enjoyable'
-            )
-            return question.answer && question.answer <= 3
-          },
-        },
-        {
-          id: 'student-understanding',
-          question:
-            "How would you rate the student's understanding of the topic they asked help with by the end of the session?",
-          component: FeedbackRadio,
-          options: [
-            "They don't know how to do this at all",
-            'They have a sense of how to do it, but they still need some help.',
-            'They can do this on their own, but they don’t fully understand it.',
-            'They are very comfortable with the topic.',
-            'N/A - I couldn’t tell.',
-          ],
-          answer: null,
-        },
-        {
-          id: 'session-obstacles',
-          question:
-            'Did any of the following get in the way of your ability to help the student? Please select all that apply!',
-          component: FeedbackCheckbox,
-          options: [
-            'Website/app didn’t fully work',
-            'We ran out of time',
-            'The student was too far behind',
-            'The student didn’t want to participate',
-            'The student requested the wrong subject',
-            'There was a gap in my own knowledge',
-            'The student was rude or inappropriate',
-            'The student was only looking for answers',
-          ],
-          answer: [],
-        },
-        {
-          id: 'other-feedback',
-          question:
-            '(Optional) Do you have any other feedback you’d like to share with UPchieve?',
-          subtext:
-            'This can be about the website, about your coach, about the services/features UPchieve provides, about any technical issues you encountered, etc. We read every single comment, but if you need to connect with UPchieve staff about a question or concern please email us directly.',
-          component: FeedbackTextarea,
-          answer: null,
-        },
-      ],
       error: '',
       userResponse: {},
     }
@@ -449,9 +264,6 @@ export default {
   computed: {
     ...mapState({
       user: state => state.user.user,
-    }),
-    ...mapGetters({
-      isPostsessionSurveyActive: 'featureFlags/isPostsessionSurveyActive',
     }),
     sessionPartnerFirstName() {
       return this.user.isVolunteer
@@ -472,47 +284,14 @@ export default {
         .local()
         .format('MMMM Do, YYYY')
     },
-    sessionGoal() {
-      if (this.isPostsessionSurveyActive && this.studentPresessionGoal) {
-        return this.studentPresessionGoal
-      } else {
-        if (this.presessionSurvey && this.presessionSurvey.createdAt) {
-          if (
-            this.presessionSurvey.responseData['primary-goal'].answer ===
-            'other'
-          ) {
-            if (this.presessionSurvey.responseData['primary-goal'].other)
-              return this.presessionSurvey.responseData[
-                'primary-goal'
-              ].other.toLowerCase()
-            else return 'get help'
-          }
-          return formatSurveyAnswers(
-            this.presessionSurvey.responseData['primary-goal'].answer
-          ).toLowerCase()
-        }
-      }
-      return 'get help'
-    },
     userType() {
       return this.user.isVolunteer ? 'volunteer' : 'student'
     },
     questions() {
-      if (this.isPostsessionSurveyActive) {
-        return this.allQuestions.map(q => q.question)
-      }
-      return this.user.isVolunteer
-        ? this.volunteerQuestions
-        : this.studentQuestions
-    },
-    questionTypes() {
-      return QUESTION_TYPES
+      return this.allQuestions.map(q => q.question)
     },
     filteredQuestions() {
-      if (this.isPostsessionSurveyActive) {
-        return this.allQuestions.filter(q => q.isVisible)
-      }
-      return this.questions.filter(item => !item.show || item.show())
+      return this.allQuestions.filter(q => q.isVisible)
     },
   },
   async beforeMount() {
@@ -524,8 +303,6 @@ export default {
     const [
       feedbackResponse,
       sessionResponse,
-      presessionResponse,
-      presessionGoalResponse,
       postsessionAlreadySavedResponse,
     ] = await Promise.all([
       NetworkService.getFeedback({
@@ -533,8 +310,6 @@ export default {
         userType: this.userType,
       }),
       NetworkService.getSession(sessionId),
-      NetworkService.getPresessionSurveyForFeedback(sessionId),
-      NetworkService.getStudentsPresessionGoal(sessionId),
       NetworkService.getPostsessionSurveyResponse(sessionId, this.userType),
     ])
 
@@ -544,43 +319,34 @@ export default {
     const {
       body: { session },
     } = sessionResponse
-    const {
-      body: { survey },
-    } = presessionResponse
-    const {
-      body: { goal },
-    } = presessionGoalResponse
+
     this.session = session
-    if (this.isPostsessionSurveyActive) {
-      const postsessionSurveyDefinitionResponse = await NetworkService.getPostsessionSurvey(
-        this.session.subTopic,
-        this.session.id,
-        this.userType
-      )
-      this.surveyDefinition = postsessionSurveyDefinitionResponse.body.survey
-      this.allQuestions = _.map(this.surveyDefinition.survey, q => {
-        const isHiddenOnStart =
-          this.isLowRatingQuestion(q) ||
-          this.isHighRatingQuestion(q) ||
-          this.isGuidelineIssueListQuestion(q)
-        q.responses = _.orderBy(q.responses, r => r.displayPriority)
-        return {
-          questionId: q.questionId,
-          question: q,
-          isVisible: !isHiddenOnStart,
-          questionType: this.getQuestionDisplayType(q),
-          headerText: this.getQuestionSectionHeader(q),
-        }
-      })
-      this.allQuestions = _.orderBy(
-        this.allQuestions,
-        q => q.question.displayPriority
-      )
-      this.buildUserResponse()
-    }
-    this.studentPresessionGoal = goal
-    // TODO: remove in context sharing feature flag cleanup
-    this.presessionSurvey = survey
+    const postsessionSurveyDefinitionResponse = await NetworkService.getPostsessionSurvey(
+      this.session.subTopic,
+      this.session.id,
+      this.userType
+    )
+    this.surveyDefinition = postsessionSurveyDefinitionResponse.body.survey
+    this.allQuestions = _.map(this.surveyDefinition.survey, q => {
+      const isHiddenOnStart =
+        this.isLowRatingQuestion(q) ||
+        this.isHighRatingQuestion(q) ||
+        this.isGuidelineIssueListQuestion(q)
+      q.responses = _.orderBy(q.responses, r => r.displayPriority)
+      return {
+        questionId: q.questionId,
+        question: q,
+        isVisible: !isHiddenOnStart,
+        questionType: this.getQuestionDisplayType(q),
+        headerText: this.getQuestionSectionHeader(q),
+      }
+    })
+    this.allQuestions = _.orderBy(
+      this.allQuestions,
+      q => q.question.displayPriority
+    )
+    this.buildUserResponse()
+
     if (feedback || postsessionAlreadySavedResponse.body.length > 0) {
       this.loading = false
       this.completedFeedback = true
@@ -726,21 +492,13 @@ export default {
     },
     isFavoritingCoach() {
       if (!this.user.isVolunteer) {
-        if (this.isPostsessionSurveyActive) {
-          const coachFavoritingQuestion = this.filteredQuestions.find(q =>
-            this.isHighRatingQuestion(q)
-          )
-          const coachFavoritingAnswer = this.getAnswerToQuestion(
-            coachFavoritingQuestion
-          )
-          return coachFavoritingAnswer && coachFavoritingAnswer === 'Yes'
-        }
-        const coachFavoritingQuestion = this.filteredQuestions.find(
-          q => q.id === 'coach-favoriting'
+        const coachFavoritingQuestion = this.filteredQuestions.find(q =>
+          this.isHighRatingQuestion(q)
         )
-        // `1` is the first answer option when asking the student if they would like
-        // to favorite the coach. That means the student wants to favorite them
-        return coachFavoritingQuestion && coachFavoritingQuestion.answer === 1
+        const coachFavoritingAnswer = this.getAnswerToQuestion(
+          coachFavoritingQuestion
+        )
+        return coachFavoritingAnswer && coachFavoritingAnswer === 'Yes'
       }
       return false
     },
@@ -748,106 +506,61 @@ export default {
       if (this.isSubmittingFeedback) return
       this.isSubmittingFeedback = true
       this.error = ''
-      if (this.isPostsessionSurveyActive) {
-        const submissions = []
-        for (const questionInfo of this.filteredQuestions) {
-          const question = questionInfo.question
-          const response = this.userResponse[question.questionId]
-          if (this.isHighRatingQuestion(question)) {
-            // the answer to the coach-favoriting question is not included in the feedback submission
-            continue
-          } else if (
-            (this.isLowRatingQuestion(question) ||
-              this.isGuidelineIssueListQuestion(question)) &&
-            response.responseId
-          ) {
-            // the answers to the what-went-wrong questions are multiselect; convert to several single-response answers for saving
-            response.responseId.forEach(resp => {
-              submissions.push({
-                questionId: Number(question.questionId),
-                responseChoiceId: resp,
-                openResponse: response.openResponse,
-              })
-            })
-          } else {
-            if (response.responseId) {
-              submissions.push({
-                questionId: Number(question.questionId),
-                responseChoiceId: response.responseId,
-                openResponse: response.openResponse,
-              })
-            }
-          }
-        }
-        const surveyResponse = {
-          surveyId: this.surveyDefinition.surveyId,
-          surveyTypeId: this.surveyDefinition.surveyTypeId,
-          sessionId: this.session._id,
-          submissions,
-        }
-        try {
-          const requests = []
-          requests.push(NetworkService.submitSurvey(surveyResponse))
-          if (!this.user.isVolunteer && this.isFavoritingCoach) {
-            requests.push(
-              NetworkService.updateFavoriteVolunteerStatus(
-                this.session.volunteer._id,
-                { isFavorite: true, sessionId: this.session._id }
-              )
-            )
-          }
-          await Promise.all(requests)
-          this.$router.push('/dashboard')
-        } catch (error) {
-          if (error.body.success === false) this.error = error.body.message
-          else if (error.status === 422) this.error = error.body.err
-          else this.error = 'There was an error sending your feedback'
-        } finally {
-          this.isSubmittingFeedback = false
-        }
-      } else {
-        const data = {
-          sessionId: this.session._id,
-          topic: this.session.type,
-          subTopic: this.session.subTopic,
-          userType: this.userType,
-          studentId: this.session.student._id,
-          volunteerId: this.session.volunteer._id,
-        }
-        const feedbackPath = this.user.isVolunteer
-          ? 'volunteerFeedback'
-          : 'studentTutoringFeedback'
-        data[feedbackPath] = {}
-
-        for (const option of this.filteredQuestions) {
-          const { id, answer } = option
+      const submissions = []
+      for (const questionInfo of this.filteredQuestions) {
+        const question = questionInfo.question
+        const response = this.userResponse[question.questionId]
+        if (this.isHighRatingQuestion(question)) {
           // the answer to the coach-favoriting question is not included in the feedback submission
-          if (id === 'coach-favoriting') continue
-
-          if (answer && !Array.isArray(answer)) data[feedbackPath][id] = answer
-          // sort answers with multiple selections
-          if (answer && Array.isArray(answer) && answer.length > 0)
-            data[feedbackPath][id] = answer.sort((a, b) => a - b)
+          continue
+        } else if (
+          (this.isLowRatingQuestion(question) ||
+            this.isGuidelineIssueListQuestion(question)) &&
+          response.responseId
+        ) {
+          // the answers to the what-went-wrong questions are multiselect; convert to several single-response answers for saving
+          response.responseId.forEach(resp => {
+            submissions.push({
+              questionId: Number(question.questionId),
+              responseChoiceId: resp,
+              openResponse: response.openResponse,
+            })
+          })
+        } else {
+          if (response.responseId) {
+            submissions.push({
+              questionId: Number(question.questionId),
+              responseChoiceId: response.responseId,
+              openResponse: response.openResponse,
+            })
+          }
         }
-        try {
-          const requests = []
-          requests.push(NetworkService.feedback(this, data))
-          if (!this.user.isVolunteer && this.isFavoritingCoach)
-            requests.push(
-              NetworkService.updateFavoriteVolunteerStatus(
-                this.session.volunteer._id,
-                { isFavorite: true, sessionId: this.session._id }
-              )
+      }
+      const surveyResponse = {
+        surveyId: this.surveyDefinition.surveyId,
+        surveyTypeId: this.surveyDefinition.surveyTypeId,
+        sessionId: this.session._id,
+        submissions,
+      }
+      try {
+        const requests = []
+        requests.push(NetworkService.submitSurvey(surveyResponse))
+        if (!this.user.isVolunteer && this.isFavoritingCoach) {
+          requests.push(
+            NetworkService.updateFavoriteVolunteerStatus(
+              this.session.volunteer._id,
+              { isFavorite: true, sessionId: this.session._id }
             )
-          await Promise.all(requests)
-          this.$router.push('/')
-        } catch (error) {
-          if (error.body.success === false) this.error = error.body.message
-          else if (error.status === 422) this.error = error.body.err
-          else this.error = 'There was an error sending your feedback'
-        } finally {
-          this.isSubmittingFeedback = false
+          )
         }
+        await Promise.all(requests)
+        this.$router.push('/dashboard')
+      } catch (error) {
+        if (error.body.success === false) this.error = error.body.message
+        else if (error.status === 422) this.error = error.body.err
+        else this.error = 'There was an error sending your feedback'
+      } finally {
+        this.isSubmittingFeedback = false
       }
     },
     // builds a default user response to be stored in state that maps a survey question ID to a response map
