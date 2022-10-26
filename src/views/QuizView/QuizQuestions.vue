@@ -318,6 +318,10 @@ label {
   }
 }
 
+.questionText {
+  white-space: pre-wrap;
+}
+
 @media screen and (max-width: 700px) {
   .question-number,
   .quiz-body {

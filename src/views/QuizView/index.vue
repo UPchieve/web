@@ -222,6 +222,7 @@ export default {
   border-left: 5px solid #1855d1;
   padding-top: 1em;
   margin-top: 1.6em;
+  text-align: center;
 
   & p:nth-child(3) {
     margin-top: -0.3em;
