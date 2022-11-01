@@ -128,9 +128,15 @@
 
       <div v-if="user.isVolunteer" class="cert-info contain">
         <div class="subheader">Unlocked Subjects</div>
-        <div class="container-content cert">
+        <loader
+          v-if="isFetchingSubjects"
+          class="loader--center"
+          :height="40"
+          :width="40"
+        />
+        <div v-else class="container-content cert">
           <div
-            v-for="(value, key) in subjects"
+            v-for="(value, key) in userSubjects"
             :key="`certification-${key}-${value}`"
           >
             <div v-if="value" class="certBox">
@@ -151,18 +157,19 @@ import PhoneNumber from 'awesome-phonenumber'
 import { mapGetters, mapState } from 'vuex'
 import UserService from '@/services/UserService'
 import AnalyticsService from '@/services/AnalyticsService'
-import { topics, allSubtopics } from '@/utils/topics'
 import DeactivateAccountModal from './DeactivateAccountModal'
 import setNotificationPermission from '@/utils/set-notification-permission'
 import getNotificationPermission from '@/utils/get-notification-permission'
 import VuePhoneNumberInput from 'vue-phone-number-input'
 import { EVENTS } from '@/consts'
+import Loader from '@/components/Loader.vue'
 
 export default {
   name: 'profile-view',
   components: {
     DeactivateAccountModal,
     VuePhoneNumberInput,
+    Loader,
   },
   data() {
     return {
@@ -197,9 +204,12 @@ export default {
   computed: {
     ...mapState({
       user: state => state.user.user,
+      subjects: state => state.subjects.subjects,
+      isFetchingSubjects: state => state.subjects.isFetchingSubjects,
     }),
     ...mapGetters({
       avatarUrl: 'user/avatarUrl',
+      allSubtopics: 'subjects/allSubtopics',
     }),
     name() {
       const user = this.$store.state.user.user
@@ -220,7 +230,7 @@ export default {
     certKey() {
       let subtopicObj = {}
 
-      for (let [topicName, topicData] of Object.entries(topics)) {
+      for (let [topicName, topicData] of Object.entries(this.subjects)) {
         for (let topic in topicData.subtopics) {
           if (
             Object.prototype.hasOwnProperty.call(topicData.subtopics, topic)
@@ -230,32 +240,16 @@ export default {
           }
         }
       }
-      // TODO: remove line below in algebra 2 launch cleanup
-      subtopicObj['Algebra 2 Temporary'] = 'MATH'
       return subtopicObj
     },
-    subjects() {
+    userSubjects() {
       const user = this.$store.state.user.user
 
       const subjects = user.subjects.reduce((displayObj, key) => {
-        const subtopics = allSubtopics()
-
+        const subtopics = this.allSubtopics
         if (subtopics[key]) {
           displayObj[subtopics[key].displayName || subtopics[key]] = true
         }
-
-        /**
-         *
-         * show algebraTwo-temporary in profile view only if they have
-         * it in their subjects and do not have algebraTwo
-         *
-         */
-        // TODO: remove line below in algebra 2 launch cleanup
-        if (
-          key === 'algebraTwo-temporary' &&
-          !user.subjects.includes('algebraTwo')
-        )
-          displayObj['Algebra 2 Temporary'] = true
 
         return displayObj
       }, {})
@@ -611,5 +605,11 @@ button:hover {
 .errors-list {
   color: #bf0000;
   margin-left: 40px;
+}
+
+.loader--center {
+  margin-top: 2em;
+  margin-right: auto;
+  margin-left: auto;
 }
 </style>

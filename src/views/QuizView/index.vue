@@ -67,7 +67,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import Case from 'case'
 
 import LoadingMessage from '@/components/LoadingMessage'
@@ -79,29 +79,17 @@ import QuizReview from './QuizReview'
 
 import isPhysics from '@/utils/is-physics'
 import { PHYSICS_MAPPING, EVENTS } from '@/consts'
-import { allSubtopics } from '@/utils/topics'
 import AnalyticsService from '@/services/AnalyticsService'
 
 export default {
   data() {
-    const subtopics = allSubtopics()
     let category = Case.camel(this.$route.params.category)
-    let quizName
 
     // format physics from lowercase 'physicsone' -> 'physicsOne'
     if (isPhysics(category)) category = PHYSICS_MAPPING[category]
 
-    if (category === 'esl') {
-      quizName = category.toUpperCase()
-    } else if (subtopics[category]) {
-      quizName = subtopics[category].displayName
-    } else {
-      quizName = category.charAt(0).toUpperCase() + category.slice(1)
-    }
-
     return {
       category,
-      quizName,
       quizLoading: true,
       quizLength: 0,
       questionsReview: [],
@@ -124,6 +112,9 @@ export default {
     ...mapState({
       user: state => state.user.user,
     }),
+    ...mapGetters({
+      allSubtopics: 'subjects/allSubtopics',
+    }),
     tries() {
       const { user } = this.$store.state.user
       const { tries } = user.certifications[this.category]
@@ -131,6 +122,18 @@ export default {
     },
     showNoQuiz() {
       return !this.quizLength
+    },
+    quizName() {
+      let quizName
+      if (this.category === 'esl') {
+        quizName = this.category.toUpperCase()
+      } else if (this.allSubtopics[this.category]) {
+        quizName = this.allSubtopics[this.category].displayName
+      } else {
+        quizName =
+          this.category.charAt(0).toUpperCase() + this.category.slice(1)
+      }
+      return quizName
     },
   },
   beforeMount() {
@@ -213,6 +216,7 @@ export default {
   display: flex;
   flex-direction: column;
   min-height: 200px;
+  text-align: center;
 }
 
 .quiz-start {

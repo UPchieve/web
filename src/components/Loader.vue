@@ -1,10 +1,10 @@
 <template>
   <div :class="overlay && 'overlay'">
     <div class="loader">
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
+      <div :style="loaderStyle"></div>
+      <div :style="loaderStyle"></div>
+      <div :style="loaderStyle"></div>
+      <div :style="loaderStyle"></div>
     </div>
   </div>
 </template>
@@ -13,6 +13,16 @@
 export default {
   props: {
     overlay: Boolean,
+    height: { type: Number, default: 64 },
+    width: { type: Number, default: 64 },
+  },
+  computed: {
+    loaderStyle() {
+      return {
+        height: `${this.height}px`,
+        width: `${this.width}px`,
+      }
+    },
   },
 }
 </script>
@@ -29,13 +39,11 @@ export default {
     box-sizing: border-box;
     display: block;
     position: absolute;
-    width: 64px;
-    height: 64px;
     margin: 8px;
-    border: 8px solid $c-information-blue;
+    border: 8px solid $upchieve-green;
     border-radius: 50%;
     animation: ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-    border-color: $c-information-blue transparent transparent transparent;
+    border-color: $upchieve-green transparent transparent transparent;
   }
 
   & div:nth-child(1) {

@@ -123,7 +123,7 @@ import CaretIcon from '@/assets/caret.svg'
 import WebNotificationsModal from '@/components/WebNotificationsModal'
 import AboutSessionModal from './AboutSessionModal'
 import getNotificationPermission from '@/utils/get-notification-permission'
-import { EVENTS } from '@/consts'
+import { EVENTS, SESSION_TOOL_TYPES } from '@/consts'
 import Gleap from 'gleap'
 import { backOff } from 'exponential-backoff'
 import LoadingMessage from '@/components/LoadingMessage'
@@ -198,16 +198,7 @@ export default {
     }),
 
     auxiliaryType() {
-      const documentEditorSubTopics = [
-        'planning',
-        'essays',
-        'applications',
-        'satReading',
-        'humanitiesEssays',
-        'reading',
-        'usHistory',
-      ]
-      if (documentEditorSubTopics.includes(this.session.subTopic))
+      if (this.session.toolType === SESSION_TOOL_TYPES.DOCUMENT_EDITOR)
         return 'DOCUMENT'
       else return 'WHITEBOARD'
     },
@@ -246,7 +237,15 @@ export default {
       return false
     },
   },
-  mounted() {
+  async mounted() {
+    const {
+      body: { isValid },
+    } = await NetworkService.getIsSubjectValid(
+      this.$route.params.subTopic,
+      this.$route.params.topic
+    )
+    if (!isValid) return this.$router.push('/dashboard')
+
     const id = this.$route.params.sessionId
 
     let promise

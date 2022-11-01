@@ -160,7 +160,6 @@ import CertificationIcon from '@/assets/certification.svg'
 import VerificationIcon from '@/assets/verification.svg'
 import OnboardingIcon from '@/assets/onboarding.svg'
 import TrainingIcon from '@/assets/training_icon.svg'
-import { allSubtopicNames } from '@/utils/topics'
 import WebNotificationsButton from '@/components/WebNotificationsButton.vue'
 import ArrowIcon from '@/assets/arrow.svg'
 import NetworkService from '../../../services/NetworkService'
@@ -177,8 +176,6 @@ const rejoinHeaderData = {
 const dashboardBannerData = {
   component: 'DashboardBannerHeader',
 }
-
-const upchieveTopics = allSubtopicNames()
 
 export default {
   name: 'volunteer-dashboard',
@@ -243,6 +240,7 @@ export default {
       hasSelectedAvailability: 'user/hasSelectedAvailability',
       isDowntimeBannerActive: 'featureFlags/isDowntimeBannerActive',
       isDashboardBannerActive: 'featureFlags/isDashboardBannerActive',
+      allSubjectNames: 'subjects/allSubtopicNames',
     }),
 
     isCustomVolunteerPartner() {
@@ -583,7 +581,7 @@ export default {
       }
 
       // (2) Certs obtained
-      const certsObtained = _.filter(upchieveTopics, topic => {
+      const certsObtained = _.filter(this.allSubjectNames, topic => {
         return _.get(user, `certifications.${topic}.passed`, false)
       })
 
@@ -652,7 +650,7 @@ export default {
       }
 
       // (2) Certs obtained
-      const certsObtained = _.filter(upchieveTopics, topic => {
+      const certsObtained = _.filter(this.allSubjectNames, topic => {
         return _.get(user, `certifications.${topic}.passed`, false)
       })
 

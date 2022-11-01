@@ -17,7 +17,7 @@
         >
           <td>{{ session.student.firstname }}</td>
           <td>
-            {{ subtopicDisplayName(session.subTopic) }}
+            {{ session.subjectDisplayName }}
           </td>
           <td>
             {{ waitTime(session.createdAt) }}
@@ -35,7 +35,6 @@
 
 <script>
 import { mapState } from 'vuex'
-import { allSubtopics } from '@/utils/topics'
 import sendWebNotification from '@/utils/send-web-notification'
 import Case from 'case'
 
@@ -43,7 +42,6 @@ export default {
   data() {
     return {
       openSessions: [],
-      allSubtopics: {},
       emitListIntervalId: null,
       isInitialMount: false,
     }
@@ -67,7 +65,6 @@ export default {
     }),
   },
   mounted() {
-    this.allSubtopics = allSubtopics()
     this.isInitialMount = true
 
     // reconnect socket if it isn't already
@@ -95,9 +92,6 @@ export default {
       } else {
         this.$store.dispatch('user/clearSession')
       }
-    },
-    subtopicDisplayName(subtopic) {
-      return this.allSubtopics[subtopic].displayName
     },
     waitTime(time) {
       const newTime = new Date().getTime() - new Date(time).getTime()
@@ -152,17 +146,7 @@ export default {
           continue
         }
 
-        if (
-          Object.keys(allSubtopics()).some(
-            s => s === subTopic && this.user.subjects.includes(s)
-            // Allow users with `algebraTwo-temporary` to pick up `algebraTwo` sessions
-            // TODO: remove check for `algebraTwo` in algebra 2 launch cleanup
-          ) ||
-          (subTopic === 'algebraTwo' &&
-            this.user.subjects.includes('algebraTwo-temporary'))
-        ) {
-          results.push(session)
-        }
+        if (this.user.subjects.includes(subTopic)) results.push(session)
       }
 
       const prevOpenSessions = this.openSessions
@@ -195,9 +179,7 @@ export default {
           }
 
           sendWebNotification(
-            `${
-              newSession.student.firstname
-            } needs help in ${this.subtopicDisplayName(newSession.subTopic)}`,
+            `${newSession.student.firstname} needs help in ${newSession.subjectDisplayName}`,
             {
               body: 'Can you help them?',
             }

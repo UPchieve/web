@@ -22,8 +22,8 @@
 
 <script>
 import moment from 'moment'
-import { topics } from '@/utils/topics'
 import SessionFlags from './SessionFlags'
+import { mapState } from 'vuex'
 
 const pluralize = num => {
   return num === 1 ? '' : 's'
@@ -39,6 +39,10 @@ export default {
   },
 
   computed: {
+    ...mapState({
+      subjects: state => state.subjects.subjects,
+    }),
+
     createdAt() {
       return moment(this.session.createdAt).format('l, h:mm a')
     },
@@ -62,7 +66,7 @@ export default {
 
     subTopicDisplayName() {
       const { type, subTopic } = this.session
-      return topics[type].subtopics[subTopic].displayName
+      return this.subjects[type].subtopics[subTopic].displayName
     },
 
     studentRating() {

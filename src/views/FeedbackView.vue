@@ -225,7 +225,6 @@
 import { mapState } from 'vuex'
 import NetworkService from '@/services/NetworkService'
 import LargeButton from '@/components/LargeButton'
-import { topics } from '@/utils/topics'
 import moment from 'moment'
 import FeedbackTextarea from '@/components/FeedbackTextarea'
 import Loader from '@/components/Loader'
@@ -264,6 +263,7 @@ export default {
   computed: {
     ...mapState({
       user: state => state.user.user,
+      subjects: state => state.subjects.subjects,
     }),
     sessionPartnerFirstName() {
       return this.user.isVolunteer
@@ -272,7 +272,7 @@ export default {
     },
     sessionSubject() {
       const { type, subTopic } = this.session
-      return topics[type].subtopics[subTopic].displayName
+      return this.subjects[type].subtopics[subTopic].displayName
     },
     sessionTime() {
       return moment(this.session.createdAt)

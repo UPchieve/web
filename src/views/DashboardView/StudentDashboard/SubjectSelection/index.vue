@@ -6,7 +6,13 @@
     <h2 v-if="mobileMode">
       Explore our subjects
     </h2>
+    <loader v-if="isFetchingSubjects" class="loader--center" />
+    <p v-else-if="fetchingSubjectsError" class="error">
+      We had trouble loading the list of subjects. Please try refreshing the
+      page.
+    </p>
     <subject-card
+      v-else
       v-for="(card, index) in filteredCards"
       v-bind:key="index"
       :title="card.title"
@@ -34,8 +40,7 @@ import calculateWaitingPeriodCountdown from '@/utils/calculate-waiting-period-co
 import ReferralSVG from '@/assets/dashboard_icons/student/referral.svg'
 import LightBulbSVG from '@/assets/dashboard_icons/student/light-bulb.svg'
 import SocialStudiesSVG from '@/assets/subject_icons/social-studies.svg'
-
-import { topics } from '@/utils/topics'
+import Loader from '@/components/Loader.vue'
 
 const defaultHeaderData = {
   component: 'DefaultHeader',
@@ -43,70 +48,12 @@ const defaultHeaderData = {
 
 export default {
   name: 'subject-selection',
-  components: { SubjectCard },
+  components: { SubjectCard, Loader },
   beforeDestroy() {
     clearTimeout(this.waitingPeriodTimeoutId)
   },
   data() {
-    const svgs = {
-      math: MathSVG,
-      college: CollegeSVG,
-      science: ScienceSVG,
-      readingWriting: ReadingWritingSVG,
-      sat: SATSVG,
-      socialStudies: SocialStudiesSVG,
-    }
-
-    const topicOrderMapping = {
-      math: 0,
-      readingWriting: 1,
-      science: 2,
-      socialStudies: 3,
-      college: 4,
-      sat: 5,
-    }
-
-    const cards = Object.entries(topics)
-      .filter(([key]) => key !== 'training')
-      .map(([key, topicObj]) => {
-        return {
-          title: topicObj.displayName,
-          svg: svgs[key],
-          topic: key,
-          subtopics: Object.keys(topicObj.subtopics),
-          subtopicDisplayNames: Object.entries(topicObj.subtopics)
-            .map(([subtopicKey, subtopicObj]) => [
-              subtopicKey,
-              subtopicObj.displayName,
-            ])
-            .reduce((result, [subtopicKey, displayName]) => {
-              result[subtopicKey] = displayName
-              return result
-            }, {}),
-          isTutoringCard: true,
-          order: topicOrderMapping[key],
-        }
-      })
-      .sort((a, b) => a.order - b.order)
-
-    cards.push({
-      title: 'Give Feedback',
-      subtitle:
-        'Help us improve by telling us what new subjects and features you want!',
-      svg: LightBulbSVG,
-      buttonText: 'Give feedback',
-      routeTo: '/contact',
-    })
-
-    cards.push({
-      title: 'Invite Your Friends',
-      subtitle: 'Share UPchieve with a friend!',
-      svg: ReferralSVG,
-      buttonText: 'Learn More',
-    })
-
     return {
-      cards,
       disableSubjectCard: false,
       waitingPeriodTimeoutId: null,
       hasWaitingPeriod: false,
@@ -116,6 +63,9 @@ export default {
   computed: {
     ...mapState({
       latestSession: state => state.user.latestSession,
+      subjects: state => state.subjects.subjects,
+      isFetchingSubjects: state => state.subjects.isFetchingSubjects,
+      fetchingSubjectsError: state => state.subjects.fetchingSubjectsError,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -128,6 +78,65 @@ export default {
       const minuteTextFormat = countdown === 1 ? 'minute' : 'minutes'
 
       return `You must wait at least ${countdown} ${minuteTextFormat} before requesting a new session.`
+    },
+    cards() {
+      const svgs = {
+        math: MathSVG,
+        college: CollegeSVG,
+        science: ScienceSVG,
+        readingWriting: ReadingWritingSVG,
+        sat: SATSVG,
+        socialStudies: SocialStudiesSVG,
+      }
+
+      const topicOrderMapping = {
+        math: 0,
+        readingWriting: 1,
+        science: 2,
+        socialStudies: 3,
+        college: 4,
+        sat: 5,
+      }
+
+      const cards = Object.entries(this.subjects)
+        .filter(([key]) => key !== 'training')
+        .map(([key, topicObj]) => {
+          return {
+            title: topicObj.displayName,
+            svg: svgs[key],
+            topic: key,
+            subtopics: Object.keys(topicObj.subtopics),
+            subtopicDisplayNames: Object.entries(topicObj.subtopics)
+              .map(([subtopicKey, subtopicObj]) => [
+                subtopicKey,
+                subtopicObj.displayName,
+              ])
+              .reduce((result, [subtopicKey, displayName]) => {
+                result[subtopicKey] = displayName
+                return result
+              }, {}),
+            isTutoringCard: true,
+            order: topicOrderMapping[key],
+          }
+        })
+        .sort((a, b) => a.order - b.order)
+
+      cards.push({
+        title: 'Give Feedback',
+        subtitle:
+          'Help us improve by telling us what new subjects and features you want!',
+        svg: LightBulbSVG,
+        buttonText: 'Give feedback',
+        routeTo: '/contact',
+      })
+
+      cards.push({
+        title: 'Invite Your Friends',
+        subtitle: 'Share UPchieve with a friend!',
+        svg: ReferralSVG,
+        buttonText: 'Learn More',
+      })
+      return cards
     },
 
     filteredCards() {
@@ -257,5 +266,14 @@ export default {
     @include font-category('heading');
     margin-top: initial;
   }
+}
+
+.loader--center {
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.error {
+  color: $c-error-red;
 }
 </style>
