@@ -429,13 +429,17 @@ export const VERIFICATION_METHOD = {
   EMAIL: 'email',
 }
 
-export const FEATURE_FLAGS = {
+export const UNLEASH_FEATURE_FLAGS = {
   REFER_FRIENDS: 'refer-friends',
   DASHBOARD_REDESIGN: 'dashboard-redesign',
   DOWNTIME_BANNER: 'downtime-banner',
   CHATBOT: 'chatbot',
   DASHBOARD_BANNER: 'dashboard-banner',
   POSTSESSION_SURVEY: 'postsession-survey',
+}
+
+export const POSTHOG_FEATURE_FLAGS = {
+  SUBJECT_HYDRATION: 'subject-hydration',
 }
 
 export const ANALYTICS_REPORT_ROW = {
@@ -487,4 +491,9 @@ export const QUESTION_TYPES = {
   multipleChoice: 'multiple choice',
   checkBox: 'check box',
   freeResponse: 'free response',
+}
+
+export const SESSION_TOOL_TYPES = {
+  DOCUMENT_EDITOR: 'documenteditor',
+  WHITEBOARD: 'whiteboard',
 }

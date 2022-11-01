@@ -10,63 +10,78 @@
         certification per subject, then you'll be able to start tutoring for
         that subject.
       </p>
-      <div class="subject-types">
-        <p
-          v-for="subjectType in subjectTypes"
-          :key="subjectType.key"
-          @click="showSubjectTraining(subjectType.key)"
-          class="subject-types__header-type"
-          :class="subjectType.key === currentSubjectType ? 'is-selected' : null"
+      <loader
+        v-if="isFetchingTraining"
+        class="loader--center"
+        :height="40"
+        :width="40"
+      />
+      <p v-else-if="fetchingTrainingError" class="error">
+        We had trouble loading the training material. Please try refreshing the
+        page.
+      </p>
+      <template v-else>
+        <div class="subject-types">
+          <p
+            v-for="subjectType in subjectTypes"
+            :key="subjectType.key"
+            @click="showSubjectTraining(subjectType.key)"
+            class="subject-types__header-type"
+            :class="
+              subjectType.key === currentSubjectType ? 'is-selected' : null
+            "
+          >
+            {{ subjectType.displayName }}
+          </p>
+        </div>
+
+        <accordion-item
+          label="Training Courses"
+          sublabel="Complete the training in order to begin tutoring students"
+          buttonSize="large"
+          :alertMessage="requiredTrainingMessage"
         >
-          {{ subjectType.displayName }}
-        </p>
-      </div>
+          <training-drop-down
+            :headers="['Training', 'Progress', 'Actions']"
+            :certData="currentSubject.training"
+            trainingCourse
+          />
+        </accordion-item>
 
-      <accordion-item
-        label="Training Courses"
-        sublabel="Complete the training in order to begin tutoring students"
-        buttonSize="large"
-        :alertMessage="requiredTrainingMessage"
-      >
-        <training-drop-down
-          :headers="['Training', 'Progress', 'Actions']"
-          :certData="currentSubject.training"
-          trainingCourse
-        />
-      </accordion-item>
+        <accordion-item
+          label="Subject Certifications"
+          sublabel="Complete at least 1 certification quiz in order to begin tutoring students"
+          buttonSize="large"
+        >
+          <subject-certs-drop-down
+            :headers="['Certification', 'Subjects Unlocked', 'Actions']"
+            :certData="currentSubject.certifications"
+          />
+        </accordion-item>
 
-      <accordion-item
-        label="Subject Certifications"
-        sublabel="Complete at least 1 certification quiz in order to begin tutoring students"
-        buttonSize="large"
-      >
-        <subject-certs-drop-down
-          :headers="['Certification', 'Subjects Unlocked', 'Actions']"
-          :certData="currentSubject.certifications"
-        />
-      </accordion-item>
-
-      <accordion-item
-        :label="additionalSubjectsAccordionHeader.header"
-        :sublabel="additionalSubjectsAccordionHeader.subheader"
-        buttonSize="large"
-        v-if="currentSubject.additionalSubjects.length > 0"
-      >
-        <additional-subjects-drop-down
-          :headers="additionalSubjectsColHeaders"
-          :certData="currentSubject.additionalSubjects"
-        />
-      </accordion-item>
+        <accordion-item
+          :label="additionalSubjectsAccordionHeader.header"
+          :sublabel="additionalSubjectsAccordionHeader.subheader"
+          buttonSize="large"
+          v-if="currentSubject.additionalSubjects.length > 0"
+        >
+          <additional-subjects-drop-down
+            :headers="additionalSubjectsColHeaders"
+            :certData="currentSubject.additionalSubjects"
+          />
+        </accordion-item>
+      </template>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import AccordionItem from '@/components/AccordionItem'
 import TrainingDropDown from '@/components/TrainingDropDown'
 import SubjectCertsDropDown from '@/components/SubjectCertsDropDown'
 import AdditionalSubjectsDropDown from '@/components/AdditionalSubjectsDropDown'
+import Loader from '@/components/Loader.vue'
 
 export default {
   name: 'Training',
@@ -75,6 +90,7 @@ export default {
     TrainingDropDown,
     SubjectCertsDropDown,
     AdditionalSubjectsDropDown,
+    Loader,
   },
   data() {
     return {
@@ -82,12 +98,30 @@ export default {
     }
   },
 
+  async created() {
+    if (
+      Object.entries(this.training).length === 0 &&
+      this.isSubjectHydrationActive
+    )
+      await this.$store.dispatch('subjects/getTrainingSubjects')
+  },
   computed: {
     ...mapState({
       user: state => state.user.user,
+      training: state => state.subjects.training,
+      isFetchingTraining: state => state.subjects.isFetchingTraining,
+      fetchingTrainingError: state => state.subjects.fetchingTrainingError,
+    }),
+    ...mapGetters({
+      isSubjectHydrationActive: 'featureFlags/isSubjectHydrationActive',
     }),
     currentSubject() {
-      return this[this.currentSubjectType]
+      if (
+        this.isSubjectHydrationActive &&
+        Object.entries(this.training).length > 0
+      )
+        return this.training[this.currentSubjectType]
+      else return this[this.currentSubjectType]
     },
     // get the amount of required training material a user must complete
     requiredTrainingMessage() {
@@ -119,14 +153,25 @@ export default {
         }
     },
     subjectTypes() {
-      return [
-        { displayName: 'Math', key: 'math' },
-        { displayName: 'Science', key: 'science' },
-        { displayName: 'Reading and Writing', key: 'readingWriting' },
-        { displayName: 'Social Studies', key: 'socialStudies' },
-        { displayName: 'College Counseling', key: 'college' },
-        { displayName: 'Standardized Testing', key: 'sat' },
-      ]
+      // There are race condition issues with the feature flag isSubjectHydrationActive and
+      // if the store has dispatched to retrieve the training materials. We only show the hydrated
+      // training if there is something in the store, otherwise use the hardcoded. This is NOT
+      // going to be an issue once the feature flag is removed because every time we create this component
+      // we will fetch the training materials
+      if (
+        this.isSubjectHydrationActive &&
+        Object.entries(this.training).length > 0
+      )
+        return this.training.subjectTypes
+      else
+        return [
+          { displayName: 'Math', key: 'math' },
+          { displayName: 'Science', key: 'science' },
+          { displayName: 'Reading and Writing', key: 'readingWriting' },
+          { displayName: 'Social Studies', key: 'socialStudies' },
+          { displayName: 'College Counseling', key: 'college' },
+          { displayName: 'Standardized Testing', key: 'sat' },
+        ]
     },
     math() {
       return this.algebraTwoLaunchMath
@@ -486,5 +531,14 @@ a {
 
 .is-selected {
   border-bottom: 4px solid $c-success-green;
+}
+
+.loader--center {
+  margin-top: 2em;
+  text-align: center;
+}
+
+.error {
+  color: $c-error-red;
 }
 </style>

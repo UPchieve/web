@@ -1,7 +1,8 @@
-import { FEATURE_FLAGS } from '@/consts'
+import { UNLEASH_FEATURE_FLAGS, POSTHOG_FEATURE_FLAGS } from '@/consts'
 import config from '@/config'
 import { UnleashClient } from 'unleash-proxy-client'
 import * as Sentry from '@sentry/browser'
+import posthog from 'posthog-js'
 
 /**
  * featureFlagRoot is just localhost:3002 locally, but
@@ -49,19 +50,25 @@ export default {
   namespaced: true,
   state: {
     flags: {
-      [FEATURE_FLAGS.REFER_FRIENDS]: false,
-      [FEATURE_FLAGS.DASHBOARD_REDESIGN]: false,
-      [FEATURE_FLAGS.DOWNTIME_BANNER]: false,
-      [FEATURE_FLAGS.CHATBOT]: false,
-      [FEATURE_FLAGS.POSTSESSION_SURVEY]: false,
-      [FEATURE_FLAGS.DASHBOARD_BANNER]: false,
+      [UNLEASH_FEATURE_FLAGS.REFER_FRIENDS]: false,
+      [UNLEASH_FEATURE_FLAGS.DASHBOARD_REDESIGN]: false,
+      [UNLEASH_FEATURE_FLAGS.DOWNTIME_BANNER]: false,
+      [UNLEASH_FEATURE_FLAGS.CHATBOT]: false,
+      [UNLEASH_FEATURE_FLAGS.POSTSESSION_SURVEY]: false,
+      [UNLEASH_FEATURE_FLAGS.DASHBOARD_BANNER]: false,
+      [POSTHOG_FEATURE_FLAGS.SUBJECT_HYDRATION]: false,
     },
   },
   mutations: {
     setFeatureFlags: state => {
-      Object.keys(FEATURE_FLAGS).forEach(key => {
-        state.flags[FEATURE_FLAGS[key]] = unleash.isEnabled(FEATURE_FLAGS[key])
+      Object.keys(UNLEASH_FEATURE_FLAGS).forEach(key => {
+        state.flags[UNLEASH_FEATURE_FLAGS[key]] = unleash.isEnabled(
+          UNLEASH_FEATURE_FLAGS[key]
+        )
       })
+    },
+    setPostHogFlags: (state, flags) => {
+      state.flags = Object.assign(state.flags, flags)
     },
   },
   actions: {
@@ -76,16 +83,30 @@ export default {
         Sentry.captureException(err)
       }
     },
+    async initPostHogFlags({ commit }) {
+      try {
+        posthog.onFeatureFlags(() => {
+          const flags = posthog.featureFlags.getFlagVariants()
+          commit('setPostHogFlags', flags)
+        })
+      } catch (err) {
+        Sentry.captureException(err)
+      }
+    },
   },
   getters: {
-    isReferFriendsActive: state => state.flags[FEATURE_FLAGS.REFER_FRIENDS],
+    isReferFriendsActive: state =>
+      state.flags[UNLEASH_FEATURE_FLAGS.REFER_FRIENDS],
     isDashboardRedesignActive: state =>
-      state.flags[FEATURE_FLAGS.DASHBOARD_REDESIGN],
-    isDowntimeBannerActive: state => state.flags[FEATURE_FLAGS.DOWNTIME_BANNER],
-    isChatbotActive: state => state.flags[FEATURE_FLAGS.CHATBOT],
+      state.flags[UNLEASH_FEATURE_FLAGS.DASHBOARD_REDESIGN],
+    isDowntimeBannerActive: state =>
+      state.flags[UNLEASH_FEATURE_FLAGS.DOWNTIME_BANNER],
+    isChatbotActive: state => state.flags[UNLEASH_FEATURE_FLAGS.CHATBOT],
     isDashboardBannerActive: state =>
-      state.flags[FEATURE_FLAGS.DASHBOARD_BANNER],
+      state.flags[UNLEASH_FEATURE_FLAGS.DASHBOARD_BANNER],
     isPostsessionSurveyActive: state =>
-      state.flags[FEATURE_FLAGS.POSTSESSION_SURVEY],
+      state.flags[UNLEASH_FEATURE_FLAGS.POSTSESSION_SURVEY],
+    isSubjectHydrationActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.SUBJECT_HYDRATION],
   },
 }

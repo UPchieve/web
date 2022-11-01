@@ -49,7 +49,6 @@ import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import isPhysics from '@/utils/is-physics'
 import { PHYSICS_MAPPING, EVENTS } from '@/consts'
-import { allSubtopics } from '@/utils/topics'
 
 export default {
   components: {},
@@ -196,9 +195,11 @@ export default {
     },
   },
   computed: {
-    ...mapGetters({}),
+    ...mapGetters({
+      allSubtopics: 'subjects/allSubtopics',
+    }),
     categoryDisplayName() {
-      const subtopics = allSubtopics()
+      const subtopics = this.allSubtopics
       if (this.category) return subtopics[this.category].displayName
 
       return ''

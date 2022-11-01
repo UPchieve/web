@@ -721,4 +721,19 @@ export default {
       .get(`${API_ROOT}/students/partners/active?student=${studentId}`)
       .then(this._successHandler, this._errorHandler)
   },
+  getSubjects() {
+    return Vue.http
+      .get(`${API_ROOT}/subjects`)
+      .then(this._successHandler, this._errorHandler)
+  },
+  getIsSubjectValid(subject, topic) {
+    return Vue.http
+      .get(`${API_ROOT}/subjects/is-valid?subject=${subject}&topic=${topic}`)
+      .then(this._successHandler, this._errorHandler)
+  },
+  getTrainingSubjects() {
+    return Vue.http
+      .get(`${API_ROOT}/subjects/training`)
+      .then(this._successHandler, this._errorHandler)
+  },
 }

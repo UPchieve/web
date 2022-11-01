@@ -19,8 +19,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import Case from 'case'
-import { topics } from '@/utils/topics'
 
 export default {
   props: {
@@ -42,9 +42,9 @@ export default {
   mounted() {
     const { category } = this.$route.params
     this.category = category
-    const isTrainingCategory = Object.keys(topics.training.subtopics).includes(
-      category
-    )
+    const isTrainingCategory = Object.keys(
+      this.subjects.training.subtopics
+    ).includes(category)
 
     if (this.quizResults.passed) {
       this.headerMsg = 'What a rockstar! You passed!'
@@ -86,6 +86,11 @@ export default {
     showReview() {
       this.$emit('showReview')
     },
+  },
+  computed: {
+    ...mapState({
+      subjects: state => state.subjects.subjects,
+    }),
   },
 }
 </script>

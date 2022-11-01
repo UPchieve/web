@@ -50,7 +50,7 @@
           <div class="subject-selecter">
             <v-select
               v-model="selected"
-              :options="topics"
+              :options="allSubjectNames"
               @input="getAvailability"
             >
             </v-select>
@@ -100,7 +100,6 @@
 <script>
 import UserService from '@/services/UserService'
 
-import { allSubtopicNames } from '@/utils/topics'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -117,7 +116,6 @@ export default {
       greaterThan: '',
       // dropdown menu options
       selected: 'algebraOne', // default
-      topics: allSubtopicNames(),
       // availability objects
       availabilityTable: {},
     }
@@ -128,7 +126,9 @@ export default {
   },
 
   computed: {
-    ...mapGetters({}),
+    ...mapGetters({
+      allSubjectNames: 'subjects/allSubtopicNames',
+    }),
   },
 
   methods: {
