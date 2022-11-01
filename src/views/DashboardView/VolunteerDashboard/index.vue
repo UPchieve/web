@@ -240,6 +240,7 @@ export default {
       hasSelectedAvailability: 'user/hasSelectedAvailability',
       isDowntimeBannerActive: 'featureFlags/isDowntimeBannerActive',
       isDashboardBannerActive: 'featureFlags/isDashboardBannerActive',
+      isFilterActiveSubjectsActive: 'featureFlags/isFilterActiveSubjectsActive',
       allSubjectNames: 'subjects/allSubtopicNames',
     }),
 
@@ -585,7 +586,9 @@ export default {
         return _.get(user, `certifications.${topic}.passed`, false)
       })
 
-      const numCertsObtained = certsObtained.length
+      let numCertsObtained = certsObtained.length
+      if (this.isFilterActiveSubjectsActive)
+        numCertsObtained = user.totalActiveCertifications
 
       // (3) Requests filled
       const numRequestsFilled = _.get(user, 'pastSessions.length', '--')

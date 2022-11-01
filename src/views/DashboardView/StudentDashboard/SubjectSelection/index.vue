@@ -70,6 +70,7 @@ export default {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
       isSessionAlive: 'user/isSessionAlive',
+      isStudentCollegeRevampActive: 'featureFlags/isStudentCollegeRevampActive',
     }),
     waitingPeriodMessage() {
       const countdown = calculateWaitingPeriodCountdown(
@@ -153,6 +154,28 @@ export default {
         if (card.topic === 'science')
           card.subtopics = card.subtopics.filter(subject => {
             const temporarilyHiddenSubjects = ['physicsTwo']
+            return !temporarilyHiddenSubjects.includes(subject)
+          })
+
+        if (card.topic === 'college' && !this.isStudentCollegeRevampActive)
+          card.subtopics = card.subtopics.filter(subject => {
+            const temporarilyHiddenSubjects = [
+              'collegePrep',
+              'collegeList',
+              'collegeApps',
+              'applicationEssays',
+              'financialAid',
+            ]
+            return !temporarilyHiddenSubjects.includes(subject)
+          })
+        // TODO: Remove in the student-college-revamp feature flag cleanup
+        else if (card.topic === 'college' && this.isStudentCollegeRevampActive)
+          card.subtopics = card.subtopics.filter(subject => {
+            const temporarilyHiddenSubjects = [
+              'essays',
+              'planning',
+              'applications',
+            ]
             return !temporarilyHiddenSubjects.includes(subject)
           })
       }

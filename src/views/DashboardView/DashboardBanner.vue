@@ -62,7 +62,7 @@ export default {
   @include breakpoint-above('medium') {
     @include flex-container(column, center, center);
     @include child-spacing(top, 16px);
-    height: 400px;
+    height: 200px;
   }
 }
 </style>

@@ -210,6 +210,7 @@ export default {
     ...mapGetters({
       avatarUrl: 'user/avatarUrl',
       allSubtopics: 'subjects/allSubtopics',
+      isFilterActiveSubjectsActive: 'featureFlags/isFilterActiveSubjectsActive',
     }),
     name() {
       const user = this.$store.state.user.user
@@ -244,8 +245,11 @@ export default {
     },
     userSubjects() {
       const user = this.$store.state.user.user
+      const userSubjects = this.isFilterActiveSubjectsActive
+        ? user.activeSubjects
+        : user.subjects
 
-      const subjects = user.subjects.reduce((displayObj, key) => {
+      const subjects = userSubjects.reduce((displayObj, key) => {
         const subtopics = this.allSubtopics
         if (subtopics[key]) {
           displayObj[subtopics[key].displayName || subtopics[key]] = true

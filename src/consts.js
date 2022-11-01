@@ -440,6 +440,9 @@ export const UNLEASH_FEATURE_FLAGS = {
 
 export const POSTHOG_FEATURE_FLAGS = {
   SUBJECT_HYDRATION: 'subject-hydration',
+  STUDENT_COLLEGE_REVAMP: 'student-college-revamp',
+  VOLUNTEER_COLLEGE_REVAMP: 'volunteer-college-revamp',
+  FILTER_ACTIVE_SUBJECTS: 'filter-active-subjects',
 }
 
 export const ANALYTICS_REPORT_ROW = {
