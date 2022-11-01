@@ -137,6 +137,51 @@ export default {
             },
           ]
           break
+        case 'collegePrep':
+          this.reviewMaterials = [
+            {
+              title: 'College Prep Review',
+              pdf: `${this.hostPath}/college-prep-review.pdf`,
+              image: `${this.hostPath}/college-prep-review.png`,
+            },
+          ]
+          break
+        case 'collegeList':
+          this.reviewMaterials = [
+            {
+              title: 'College List Review',
+              pdf: `${this.hostPath}/college-list-review.pdf`,
+              image: `${this.hostPath}/college-list-review.png`,
+            },
+          ]
+          break
+        case 'collegeApps':
+          this.reviewMaterials = [
+            {
+              title: 'College Applications Review',
+              pdf: `${this.hostPath}/college-apps-review.pdf`,
+              image: `${this.hostPath}/college-apps-review.png`,
+            },
+          ]
+          break
+        case 'applicationEssays':
+          this.reviewMaterials = [
+            {
+              title: 'Application Essays Review',
+              pdf: `${this.hostPath}/application-essays-review.pdf`,
+              image: `${this.hostPath}/application-essays-review.png`,
+            },
+          ]
+          break
+        case 'financialAid':
+          this.reviewMaterials = [
+            {
+              title: 'Financial Aid Review',
+              pdf: `${this.hostPath}/financial-aid-review.pdf`,
+              image: `${this.hostPath}/financial-aid-review.png`,
+            },
+          ]
+          break
         case 'satReading':
           this.reviewMaterials = [
             {

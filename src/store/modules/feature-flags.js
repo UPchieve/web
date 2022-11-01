@@ -57,6 +57,9 @@ export default {
       [UNLEASH_FEATURE_FLAGS.POSTSESSION_SURVEY]: false,
       [UNLEASH_FEATURE_FLAGS.DASHBOARD_BANNER]: false,
       [POSTHOG_FEATURE_FLAGS.SUBJECT_HYDRATION]: false,
+      [POSTHOG_FEATURE_FLAGS.STUDENT_COLLEGE_REVAMP]: false,
+      [POSTHOG_FEATURE_FLAGS.VOLUNTEER_COLLEGE_REVAMP]: false,
+      [POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS]: false,
     },
   },
   mutations: {
@@ -108,5 +111,11 @@ export default {
       state.flags[UNLEASH_FEATURE_FLAGS.POSTSESSION_SURVEY],
     isSubjectHydrationActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.SUBJECT_HYDRATION],
+    isStudentCollegeRevampActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.STUDENT_COLLEGE_REVAMP],
+    isVolunteerCollegeRevampActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.VOLUNTEER_COLLEGE_REVAMP],
+    isFilterActiveSubjectsActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS],
   },
 }

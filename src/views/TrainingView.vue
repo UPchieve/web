@@ -114,14 +114,44 @@ export default {
     }),
     ...mapGetters({
       isSubjectHydrationActive: 'featureFlags/isSubjectHydrationActive',
+      isVolunteerCollegeRevampActive:
+        'featureFlags/isVolunteerCollegeRevampActive',
     }),
     currentSubject() {
+      let currentTrainingSubject = this[this.currentSubjectType]
+
       if (
         this.isSubjectHydrationActive &&
         Object.entries(this.training).length > 0
       )
-        return this.training[this.currentSubjectType]
-      else return this[this.currentSubjectType]
+        currentTrainingSubject = this.training[this.currentSubjectType]
+
+      // TODO: remove in volunteer-college-revamp feature flag cleanup
+      if (
+        this.isVolunteerCollegeRevampActive &&
+        this.currentSubjectType === 'college'
+      ) {
+        const subjectsToShow = [
+          'collegePrep',
+          'collegeList',
+          'collegeApps',
+          'applicationEssays',
+          'financialAid',
+        ]
+        currentTrainingSubject.certifications = currentTrainingSubject.certifications.filter(
+          training => subjectsToShow.includes(training.key)
+        )
+      } else if (
+        !this.isVolunteerCollegeRevampActive &&
+        this.currentSubjectType === 'college'
+      ) {
+        const subjectsToShow = ['applications', 'planning', 'essays']
+        currentTrainingSubject.certifications = currentTrainingSubject.certifications.filter(
+          training => subjectsToShow.includes(training.key)
+        )
+      }
+
+      return currentTrainingSubject
     },
     // get the amount of required training material a user must complete
     requiredTrainingMessage() {
@@ -169,7 +199,7 @@ export default {
           { displayName: 'Science', key: 'science' },
           { displayName: 'Reading and Writing', key: 'readingWriting' },
           { displayName: 'Social Studies', key: 'socialStudies' },
-          { displayName: 'College Counseling', key: 'college' },
+          { displayName: 'College Advising', key: 'college' },
           { displayName: 'Standardized Testing', key: 'sat' },
         ]
     },
@@ -393,51 +423,75 @@ export default {
       }
     },
     college() {
-      return {
-        training: [
-          { displayName: 'UPchieve 101', key: 'upchieve101' },
-          // { displayName: "College Counseling", key: "collegeCounseling" }
-        ],
-        certifications: [
-          {
-            displayName: 'College Essays',
-            subjectsIncluded: [
-              { displayName: 'College Essays', key: 'essays' },
-            ],
-            key: 'essays',
-          },
-          {
-            displayName: 'Planning',
-            subjectsIncluded: [{ displayName: 'Planning', key: 'planning' }],
-            key: 'planning',
-          },
-          {
-            displayName: 'Applications',
-            subjectsIncluded: [
-              { displayName: 'Applications', key: 'applications' },
-            ],
-            key: 'applications',
-          },
-        ],
-        additionalSubjects: [
-          // {
-          //   displayName: "College Planning",
-          //   subjectsIncluded: [
-          //     { displayName: "UPchieve 101", key: "upchieve101" },
-          //     { displayName: "College Counseling", key: "collegeCounseling" }
-          //   ],
-          //   key: "planning"
-          // },
-          // {
-          //   displayName: "College Applications",
-          //   subjectsIncluded: [
-          //     { displayName: "UPchieve 101", key: "upchieve101" },
-          //     { displayName: "College Counseling", key: "collegeCounseling" }
-          //   ],
-          //   key: "applications"
-          // }
-        ],
-      }
+      if (this.isVolunteerCollegeRevampActive)
+        return {
+          training: [{ displayName: 'UPchieve 101', key: 'upchieve101' }],
+          certifications: [
+            {
+              displayName: 'College Prep',
+              subjectsIncluded: [
+                { displayName: 'College Prep', key: 'collegePrep' },
+              ],
+              key: 'collegePrep',
+            },
+            {
+              displayName: 'College List',
+              subjectsIncluded: [
+                { displayName: 'College List', key: 'collegeList' },
+              ],
+              key: 'collegeList',
+            },
+            {
+              displayName: 'Applications',
+              subjectsIncluded: [
+                { displayName: 'Applications', key: 'collegeApps' },
+              ],
+              key: 'collegeApps',
+            },
+            {
+              displayName: 'Application Essays',
+              subjectsIncluded: [
+                { displayName: 'Application Essays', key: 'applicationEssays' },
+              ],
+              key: 'applicationEssays',
+            },
+            {
+              displayName: 'Financial Aid',
+              subjectsIncluded: [
+                { displayName: 'Financial Aid', key: 'financialAid' },
+              ],
+              key: 'financialAid',
+            },
+          ],
+          additionalSubjects: [],
+        }
+      // TODO: remove in volunteer-college-revamp feature flag cleanup
+      else
+        return {
+          training: [{ displayName: 'UPchieve 101', key: 'upchieve101' }],
+          certifications: [
+            {
+              displayName: 'College Essays',
+              subjectsIncluded: [
+                { displayName: 'College Essays', key: 'essays' },
+              ],
+              key: 'essays',
+            },
+            {
+              displayName: 'Planning',
+              subjectsIncluded: [{ displayName: 'Planning', key: 'planning' }],
+              key: 'planning',
+            },
+            {
+              displayName: 'Applications',
+              subjectsIncluded: [
+                { displayName: 'Applications', key: 'applications' },
+              ],
+              key: 'applications',
+            },
+          ],
+          additionalSubjects: [],
+        }
     },
     sat() {
       return {
@@ -467,6 +521,15 @@ export default {
   methods: {
     showSubjectTraining(subject) {
       this.currentSubjectType = subject
+    },
+  },
+  watch: {
+    // This watcher is here because `isSubjectHydrationActive` may not be true when
+    // this component loads
+    // TODO: remove watcher when removing subject-hydration feature flag
+    async isSubjectHydrationActive(currentValue, prevValue) {
+      if (!prevValue && currentValue)
+        await this.$store.dispatch('subjects/getTrainingSubjects')
     },
   },
 }
