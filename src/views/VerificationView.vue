@@ -44,28 +44,6 @@
             />
           </label>
         </div>
-
-        <div class="verification__container">
-          <input
-            class="uc-form-input"
-            v-model="verificationMethod"
-            type="radio"
-            value="sms"
-            id="verification-sms"
-          />
-          <label for="verification-sms" class="verification__radio-label">
-            <span class="verification__label">By text message</span>
-            <vue-phone-number-input
-              class="verification__phone-input"
-              v-model="phoneNational"
-              color="#555"
-              valid-color="#16ba97"
-              @update="onPhoneInputUpdate"
-              @click="clickedPhone"
-              :default-country-code="internationalPhoneInfo.country"
-            />
-          </label>
-        </div>
         <p v-if="error" class="error" role="alert">
           {{ error }}
         </p>
@@ -143,7 +121,6 @@
 import { mapState } from 'vuex'
 import FormPageTemplate from '@/components/FormPageTemplate'
 import FormFooter from '@/components/FormFooter'
-import VuePhoneNumberInput from 'vue-phone-number-input'
 import AuthService from '@/services/AuthService'
 import VerificationBadge from '@/assets/verification.svg'
 import { VERIFICATION_METHOD } from '@/consts'
@@ -158,7 +135,6 @@ export default {
   components: {
     FormPageTemplate,
     FormFooter,
-    VuePhoneNumberInput,
     VerificationBadge,
     LargeButton,
   },
@@ -244,7 +220,7 @@ export default {
       this.isSubmitting = true
 
       if (!this.isValidForm) {
-        this.error = 'Please select your email or phone number'
+        this.error = 'Please select your email'
         return
       }
       if (this.isTextMessageSelected) this.sendTo = this.phoneInputInfo.e164
@@ -388,6 +364,8 @@ export default {
 
 .uc-form-button {
   text-transform: initial;
+  background: darken($c-success-green, 5%);
+  color: $c-background-grey;
 }
 
 .error {
