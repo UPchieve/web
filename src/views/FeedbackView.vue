@@ -607,9 +607,9 @@ export default {
           ratingQuestion.responses,
           r => r.responseId === responseId
         )
-        const showHighRatingQuestion = this.isHighRatingResponse(
-          ratingResponse.responseText
-        ) && !this.isFavoriteCoachLimitReached
+        const showHighRatingQuestion =
+          this.isHighRatingResponse(ratingResponse.responseText) &&
+          !this.isFavoriteCoachLimitReached
         const showLowRatingQuestion = this.isLowRatingResponse(
           ratingResponse.responseText
         )

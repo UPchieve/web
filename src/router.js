@@ -500,8 +500,12 @@ Vue.http.interceptors.push((request, next) => {
       request.url.indexOf('/api/user') !== -1 && request.method === 'GET'
     const isGetSessionAttempt =
       request.url.indexOf('/api/session/current') !== -1
+    const isGetSubjectsAttempt = request.url.indexOf('/api/subjects') !== -1
 
-    if (is401 && !(isGetUserAttempt || isGetSessionAttempt)) {
+    if (
+      is401 &&
+      !(isGetUserAttempt || isGetSessionAttempt || isGetSubjectsAttempt)
+    ) {
       router.push('/login?401=true').catch(() => {})
     }
   })

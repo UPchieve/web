@@ -569,7 +569,7 @@ export default {
       isCollegeStudent: false,
       signupSourcesOptions: [],
       signupSourceId: null,
-      isLoadingSignupSource: false,
+      isLoadingSignupSources: false,
     }
   },
   async mounted() {
@@ -884,7 +884,7 @@ export default {
       AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CANT_FIND_SCHOOL)
     },
     async getSignupSources() {
-      this.isLoadingSignupSource = true
+      this.isLoadingSignupSources = true
       try {
         const data = await backOff(() =>
           NetworkService.getStudentSignupSources()
@@ -893,7 +893,7 @@ export default {
       } catch (err) {
         Sentry.captureException(err)
       } finally {
-        this.isLoadingSignupSource = false
+        this.isLoadingSignupSources = false
       }
     },
   },
