@@ -52,19 +52,14 @@
           class="uc-form-button"
           type="submit"
           @click.prevent="sendCode"
-          :disabled="!isValidForm"
+          :disabled="!isValidForm || isSubmitting"
         >
           {{ sendCodeButtonText }}
         </button>
       </div>
 
       <div class="uc-form-body" v-if="step === 2">
-        <p v-if="isTextMessageSelected">
-          We just texted your verification code to
-          <span class="verification__send-to">{{ phoneNational }}</span>
-        </p>
-
-        <p v-else>
+        <p>
           We just emailed your verification code to
           <span class="verification__send-to">{{ sendTo }}</span>
         </p>
@@ -123,12 +118,10 @@ import FormPageTemplate from '@/components/FormPageTemplate'
 import FormFooter from '@/components/FormFooter'
 import AuthService from '@/services/AuthService'
 import VerificationBadge from '@/assets/verification.svg'
-import { VERIFICATION_METHOD } from '@/consts'
 import LargeButton from '@/components/LargeButton'
 import * as Sentry from '@sentry/browser'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
-import PhoneNumber from 'awesome-phonenumber'
 
 export default {
   name: 'VerificationView',
@@ -141,8 +134,6 @@ export default {
   data() {
     return {
       verificationMethod: 'email',
-      phoneInputInfo: {},
-      phoneNational: '',
       step: 1,
       verificationCode: '',
       sendTo: '',
@@ -154,13 +145,6 @@ export default {
   mounted() {
     this.$store.dispatch('app/hideNavigation')
     this.email = this.user.email || ''
-    const phoneNumber = new PhoneNumber(this.user.phone || '')
-    this.phoneNational = phoneNumber.getNumber('national')
-    // Hack to initially mock the vue-phone-number-input data
-    this.phoneInputInfo = {
-      isValid: true,
-      e164: phoneNumber.getNumber('e164'),
-    }
   },
   computed: {
     ...mapState({
@@ -168,11 +152,7 @@ export default {
     }),
     isValidForm() {
       if (!this.verificationMethod) return false
-      if (this.isTextMessageSelected && !this.phoneInputInfo.e164) return false
-      if (this.isTextMessageSelected && !this.phoneInputInfo.isValid)
-        return false
-      if (!this.isTextMessageSelected && !this.isValidEmail) return false
-      return true
+      return this.isValidEmail
     },
     isValidVerificationCode() {
       return !(
@@ -183,37 +163,20 @@ export default {
     isValidEmail() {
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)
     },
-    isTextMessageSelected() {
-      return this.verificationMethod === VERIFICATION_METHOD.SMS
-    },
     sendCodeButtonText() {
-      if (this.isTextMessageSelected && !this.phoneInputInfo.e164)
-        return 'Please enter a phone number'
-      if (this.isTextMessageSelected && !this.phoneInputInfo.isValid)
-        return 'Please enter a valid phone number'
-      if (!this.isTextMessageSelected && !this.isValidEmail)
+      if (this.isSubmitting) {
+        return 'Sending...'
+      }
+      if (!this.isValidEmail)
         return 'Please enter a valid email address'
 
       return 'Send my code'
-    },
-    internationalPhoneInfo() {
-      const phoneNumber = new PhoneNumber(this.user.phone || '')
-      return {
-        number: phoneNumber.getNumber('international'),
-        country: phoneNumber.getRegionCode(),
-      }
     },
     showEmoji() {
       return !this.user.isVolunteer
     },
   },
   methods: {
-    onPhoneInputUpdate(phoneInputInfo) {
-      this.phoneInputInfo = phoneInputInfo
-    },
-    clickedPhone() {
-      this.verificationMethod = VERIFICATION_METHOD.SMS
-    },
     async sendCode() {
       this.error = ''
       if (this.isSubmitting) return
@@ -223,10 +186,7 @@ export default {
         this.error = 'Please select your email'
         return
       }
-      if (this.isTextMessageSelected) this.sendTo = this.phoneInputInfo.e164
-      else {
-        if (this.isValidEmail) this.sendTo = this.email
-      }
+      if (this.isValidEmail) this.sendTo = this.email
 
       try {
         await AuthService.initiateVerification({
@@ -314,10 +274,6 @@ export default {
     padding-left: 2em;
   }
 
-  &__phone-input {
-    width: 300px;
-  }
-
   &__label {
     font-weight: 500;
   }
@@ -366,6 +322,10 @@ export default {
   text-transform: initial;
   background: darken($c-success-green, 5%);
   color: $c-background-grey;
+  &:disabled{
+    background: $c-background-grey;
+    color: darken($c-success-green, 5%);
+  }
 }
 
 .error {
