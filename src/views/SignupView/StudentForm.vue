@@ -464,7 +464,18 @@
         :loading="isLoadingSignupSources"
       />
     </div>
-
+    <div class="uc-column" v-if="shouldShowOtherSignupInput()">
+      <input
+        id="otherSignupSource"
+        type="text"
+        class="uc-form-input"
+        v-model="otherSignupSource"
+        autofocus
+      />
+      <p class="uc-form-subtext">
+        Tell us where you heard about us!
+      </p>
+    </div>
     <div class="uc-form-checkbox">
       <input
         id="userAgreement"
@@ -569,6 +580,7 @@ export default {
       isCollegeStudent: false,
       signupSourcesOptions: [],
       signupSourceId: null,
+      otherSignupSource: '',
       isLoadingSignupSources: false,
     }
   },
@@ -864,6 +876,7 @@ export default {
         currentGrade: this.trimCurrentGrade,
         referredByCode: window.localStorage.getItem('upcReferredByCode'),
         signupSourceId: this.signupSourceId,
+        otherSignupSource: this.otherSignupSource,
       })
         .then(() => {
           window.localStorage.removeItem('upcReferredByCode')
@@ -882,6 +895,15 @@ export default {
     },
     cantFindSchool() {
       AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CANT_FIND_SCHOOL)
+    },
+    shouldShowOtherSignupInput() {
+      if (this.isLoadingSignupSources || !this.signupSourcesOptions) {
+        return false
+      }
+      const otherOption = this.signupSourcesOptions.find(
+        s => s.name === 'Other'
+      )
+      return otherOption && otherOption.id === this.signupSourceId
     },
     async getSignupSources() {
       this.isLoadingSignupSources = true
