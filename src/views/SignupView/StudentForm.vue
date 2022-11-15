@@ -470,6 +470,10 @@
         type="text"
         class="uc-form-input"
         v-model="otherSignupSource"
+        v-bind:class="{
+          'uc-form-input--invalid':
+            invalidInputs.indexOf('otherSignupSource') > -1,
+        }"
         autofocus
       />
       <p class="uc-form-subtext">
@@ -841,7 +845,6 @@ export default {
     submitAccountForm() {
       this.errors = []
       this.invalidInputs = []
-
       if (!this.profile.firstName || !this.profile.lastName) {
         this.errors.push('You must enter your first and last name.')
       }
@@ -862,6 +865,13 @@ export default {
       if (!this.signupSourceId) {
         this.errors.push('Please select an option for how you heard about us.')
       }
+      if (this.shouldShowOtherSignupInput() && !this.otherSignupSource) {
+        this.errors.push(
+          'Please enter signup source in the text box if "Other" is selected'
+        )
+        this.invalidInputs.push('otherSignupSource')
+      }
+
       if (!this.errors.length) this.submit()
     },
     submit() {
