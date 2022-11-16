@@ -257,10 +257,25 @@
             :searchable="false"
             :clearable="false"
             required
-            :loading="isLoadingSignupSources"
+            :loading="isLoadingSignupSource"
           />
         </div>
-
+        <div class="uc-column" v-if="shouldShowOtherSignupInput()">
+          <input
+            id="otherSignupSource"
+            type="text"
+            class="uc-form-input"
+            v-model="otherSignupSource"
+            v-bind:class="{
+              'uc-form-input--invalid':
+                invalidInputs.indexOf('otherSignupSource') > -1,
+            }"
+            autofocus
+          />
+          <p class="uc-form-subtext">
+            Tell us where you heard about us!
+          </p>
+        </div>
         <div class="uc-form-checkbox">
           <input
             id="userAgreement"
@@ -358,6 +373,7 @@ export default {
       serverErrorMsg: '',
       signupSourcesOptions: [],
       signupSourceId: null,
+      otherSignupSource: '',
       isLoadingSignupSource: false,
     }
   },
@@ -463,7 +479,15 @@ export default {
     handleSelectHighSchool(school) {
       this.formData.highSchoolUpchieveId = school.upchieveId
     },
-
+    shouldShowOtherSignupInput() {
+      if (this.isLoadingSignupSource || !this.signupSourcesOptions) {
+        return false
+      }
+      const otherOption = this.signupSourcesOptions.find(
+        s => s.name === 'Other'
+      )
+      return otherOption && otherOption.id === this.signupSourceId
+    },
     formStepTwo() {
       // validate input
       this.errors = []
@@ -488,6 +512,13 @@ export default {
       if (!this.formData.password) {
         this.errors.push('A password is required.')
         this.invalidInputs.push('inputPassword')
+      }
+
+      if (this.shouldShowOtherSignupInput() && !this.otherSignupSource) {
+        this.errors.push(
+          'Please enter signup source in the text box if "Other" is selected'
+        )
+        this.invalidInputs.push('otherSignupSource')
       }
 
       if (this.errors.length) {
@@ -557,7 +588,7 @@ export default {
         this.invalidInputs.push('college')
       }
 
-      if (this.studentPartner.isManuallyApproved && !this.signupSourceId) {
+      if (this.studentPartner.isManuallyApproved && !this.otherSignupSource) {
         this.errors.push('Please select an option for how you heard about us.')
       }
 
@@ -583,6 +614,7 @@ export default {
         college: this.formData.college,
         terms: this.formData.terms,
         signupSourceId: this.signupSourceId,
+        otherSignupSource: this.otherSignupSource,
       })
         .then(() => {
           this.$router.push('/verify')

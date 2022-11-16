@@ -464,7 +464,22 @@
         :loading="isLoadingSignupSources"
       />
     </div>
-
+    <div class="uc-column" v-if="shouldShowOtherSignupInput()">
+      <input
+        id="otherSignupSource"
+        type="text"
+        class="uc-form-input"
+        v-model="otherSignupSource"
+        v-bind:class="{
+          'uc-form-input--invalid':
+            invalidInputs.indexOf('otherSignupSource') > -1,
+        }"
+        autofocus
+      />
+      <p class="uc-form-subtext">
+        Tell us where you heard about us!
+      </p>
+    </div>
     <div class="uc-form-checkbox">
       <input
         id="userAgreement"
@@ -569,6 +584,7 @@ export default {
       isCollegeStudent: false,
       signupSourcesOptions: [],
       signupSourceId: null,
+      otherSignupSource: '',
       isLoadingSignupSources: false,
     }
   },
@@ -829,7 +845,6 @@ export default {
     submitAccountForm() {
       this.errors = []
       this.invalidInputs = []
-
       if (!this.profile.firstName || !this.profile.lastName) {
         this.errors.push('You must enter your first and last name.')
       }
@@ -850,6 +865,13 @@ export default {
       if (!this.signupSourceId) {
         this.errors.push('Please select an option for how you heard about us.')
       }
+      if (this.shouldShowOtherSignupInput() && !this.otherSignupSource) {
+        this.errors.push(
+          'Please enter signup source in the text box if "Other" is selected'
+        )
+        this.invalidInputs.push('otherSignupSource')
+      }
+
       if (!this.errors.length) this.submit()
     },
     submit() {
@@ -864,6 +886,7 @@ export default {
         currentGrade: this.trimCurrentGrade,
         referredByCode: window.localStorage.getItem('upcReferredByCode'),
         signupSourceId: this.signupSourceId,
+        otherSignupSource: this.otherSignupSource,
       })
         .then(() => {
           window.localStorage.removeItem('upcReferredByCode')
@@ -882,6 +905,15 @@ export default {
     },
     cantFindSchool() {
       AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CANT_FIND_SCHOOL)
+    },
+    shouldShowOtherSignupInput() {
+      if (this.isLoadingSignupSources || !this.signupSourcesOptions) {
+        return false
+      }
+      const otherOption = this.signupSourcesOptions.find(
+        s => s.name === 'Other'
+      )
+      return otherOption && otherOption.id === this.signupSourceId
     },
     async getSignupSources() {
       this.isLoadingSignupSources = true
