@@ -257,7 +257,7 @@
             :searchable="false"
             :clearable="false"
             required
-            :loading="isLoadingSignupSources"
+            :loading="isLoadingSignupSource"
           />
         </div>
         <div class="uc-column" v-if="shouldShowOtherSignupInput()">
@@ -480,7 +480,7 @@ export default {
       this.formData.highSchoolUpchieveId = school.upchieveId
     },
     shouldShowOtherSignupInput() {
-      if (this.isLoadingSignupSources || !this.signupSourcesOptions) {
+      if (this.isLoadingSignupSource || !this.signupSourcesOptions) {
         return false
       }
       const otherOption = this.signupSourcesOptions.find(
@@ -588,7 +588,7 @@ export default {
         this.invalidInputs.push('college')
       }
 
-      if (this.studentPartner.isManuallyApproved && !this.signupSourceId) {
+      if (this.studentPartner.isManuallyApproved && !this.otherSignupSource) {
         this.errors.push('Please select an option for how you heard about us.')
       }
 
