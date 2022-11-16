@@ -218,6 +218,24 @@ export default {
             },
           ]
           break
+        case 'essayPlanning':
+          this.reviewMaterials = [
+            {
+              title: 'Essay Planning Review Guide',
+              pdf: `${this.hostPath}/essay-planning-review.pdf`,
+              image: `${this.hostPath}/essay-planning-review.png`,
+            },
+          ]
+          break
+        case 'essayFeedback':
+          this.reviewMaterials = [
+            {
+              title: 'Essay Feedback Review Guide',
+              pdf: `${this.hostPath}/essay-feedback-review.pdf`,
+              image: `${this.hostPath}/essay-feedback-review.png`,
+            },
+          ]
+          break
         // case for a user entering a subject that we do not support
         default:
           this.error = true

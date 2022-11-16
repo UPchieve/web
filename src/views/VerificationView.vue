@@ -167,8 +167,7 @@ export default {
       if (this.isSubmitting) {
         return 'Sending...'
       }
-      if (!this.isValidEmail)
-        return 'Please enter a valid email address'
+      if (!this.isValidEmail) return 'Please enter a valid email address'
 
       return 'Send my code'
     },
@@ -322,7 +321,7 @@ export default {
   text-transform: initial;
   background: darken($c-success-green, 5%);
   color: $c-background-grey;
-  &:disabled{
+  &:disabled {
     background: $c-background-grey;
     color: darken($c-success-green, 5%);
   }

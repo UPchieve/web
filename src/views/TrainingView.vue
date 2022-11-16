@@ -99,10 +99,7 @@ export default {
   },
 
   async created() {
-    if (
-      Object.entries(this.training).length === 0 &&
-      this.isSubjectHydrationActive
-    )
+    if (Object.entries(this.training).length === 0)
       await this.$store.dispatch('subjects/getTrainingSubjects')
   },
   computed: {
@@ -113,18 +110,13 @@ export default {
       fetchingTrainingError: state => state.subjects.fetchingTrainingError,
     }),
     ...mapGetters({
-      isSubjectHydrationActive: 'featureFlags/isSubjectHydrationActive',
       isVolunteerCollegeRevampActive:
         'featureFlags/isVolunteerCollegeRevampActive',
+      isVolunteerEnglishRevampActive:
+        'featureFlags/isVolunteerEnglishRevampActive',
     }),
     currentSubject() {
-      let currentTrainingSubject = this[this.currentSubjectType]
-
-      if (
-        this.isSubjectHydrationActive &&
-        Object.entries(this.training).length > 0
-      )
-        currentTrainingSubject = this.training[this.currentSubjectType]
+      const currentTrainingSubject = this.training[this.currentSubjectType]
 
       // TODO: remove in volunteer-college-revamp feature flag cleanup
       if (
@@ -146,6 +138,25 @@ export default {
         this.currentSubjectType === 'college'
       ) {
         const subjectsToShow = ['applications', 'planning', 'essays']
+        currentTrainingSubject.certifications = currentTrainingSubject.certifications.filter(
+          training => subjectsToShow.includes(training.key)
+        )
+      }
+
+      // TODO: remove in volunteer-english-revamp feature flag cleanup
+      if (
+        this.isVolunteerEnglishRevampActive &&
+        this.currentSubjectType === 'readingWriting'
+      ) {
+        const subjectsToShow = ['reading', 'essayPlanning', 'essayFeedback']
+        currentTrainingSubject.certifications = currentTrainingSubject.certifications.filter(
+          training => subjectsToShow.includes(training.key)
+        )
+      } else if (
+        !this.isVolunteerEnglishRevampActive &&
+        this.currentSubjectType === 'readingWriting'
+      ) {
+        const subjectsToShow = ['reading', 'humanitiesEssays']
         currentTrainingSubject.certifications = currentTrainingSubject.certifications.filter(
           training => subjectsToShow.includes(training.key)
         )
@@ -183,353 +194,12 @@ export default {
         }
     },
     subjectTypes() {
-      // There are race condition issues with the feature flag isSubjectHydrationActive and
-      // if the store has dispatched to retrieve the training materials. We only show the hydrated
-      // training if there is something in the store, otherwise use the hardcoded. This is NOT
-      // going to be an issue once the feature flag is removed because every time we create this component
-      // we will fetch the training materials
-      if (
-        this.isSubjectHydrationActive &&
-        Object.entries(this.training).length > 0
-      )
-        return this.training.subjectTypes
-      else
-        return [
-          { displayName: 'Math', key: 'math' },
-          { displayName: 'Science', key: 'science' },
-          { displayName: 'Reading and Writing', key: 'readingWriting' },
-          { displayName: 'Social Studies', key: 'socialStudies' },
-          { displayName: 'College Advising', key: 'college' },
-          { displayName: 'Standardized Testing', key: 'sat' },
-        ]
-    },
-    math() {
-      return this.algebraTwoLaunchMath
-    },
-    algebraTwoLaunchMath() {
-      return {
-        training: [
-          { displayName: 'UPchieve 101', key: 'upchieve101' },
-          // { displayName: "Tutoring Skills", key: "tutoringSkills" }
-        ],
-        certifications: [
-          {
-            displayName: 'Pre-algebra',
-            subjectsIncluded: [
-              { displayName: 'Pre-algebra', key: 'prealgebra' },
-            ],
-            key: 'prealgebra',
-          },
-          {
-            displayName: 'Algebra 1',
-            subjectsIncluded: [
-              { displayName: 'Pre-algebra', key: 'prealgebra' },
-              { displayName: 'Algebra 1', key: 'algebraOne' },
-            ],
-            key: 'algebraOne',
-          },
-          {
-            displayName: 'Algebra 2',
-            subjectsIncluded: [
-              { displayName: 'Pre-algebra', key: 'prealgebra' },
-              { displayName: 'Algebra 1', key: 'algebraOne' },
-              { displayName: 'Algebra 2', key: 'algebraTwo' },
-            ],
-            key: 'algebraTwo',
-          },
-          {
-            displayName: 'Geometry',
-            subjectsIncluded: [{ displayName: 'Geometry', key: 'geometry' }],
-            key: 'geometry',
-          },
-          {
-            displayName: 'Trigonometry',
-            subjectsIncluded: [
-              { displayName: 'Trigonometry', key: 'trigonometry' },
-            ],
-            key: 'trigonometry',
-          },
-          {
-            displayName: 'Statistics',
-            subjectsIncluded: [
-              { displayName: 'Statistics', key: 'statistics' },
-            ],
-            key: 'statistics',
-          },
-          {
-            displayName: 'Precalculus',
-            subjectsIncluded: [
-              { displayName: 'Pre-algebra', key: 'prealgebra' },
-              { displayName: 'Algebra 1', key: 'algebraOne' },
-              { displayName: 'Algebra 2', key: 'algebraTwo' },
-              { displayName: 'Trigonometry', key: 'trigonometry' },
-              { displayName: 'Precalculus', key: 'precalculus' },
-            ],
-            key: 'precalculus',
-          },
-          {
-            displayName: 'Calculus AB',
-            subjectsIncluded: [
-              { displayName: 'Pre-algebra', key: 'prealgebra' },
-              { displayName: 'Algebra 1', key: 'algebraOne' },
-              { displayName: 'Algebra 2', key: 'algebraTwo' },
-              { displayName: 'Trigonometry', key: 'trigonometry' },
-              { displayName: 'Precalculus', key: 'precalculus' },
-              { displayName: 'Calculus AB', key: 'calculusAB' },
-            ],
-            key: 'calculusAB',
-          },
-          {
-            displayName: 'Calculus BC',
-            subjectsIncluded: [
-              { displayName: 'Pre-algebra', key: 'prealgebra' },
-              { displayName: 'Algebra 1', key: 'algebraOne' },
-              { displayName: 'Algebra 2', key: 'algebraTwo' },
-              { displayName: 'Trigonometry', key: 'trigonometry' },
-              { displayName: 'Precalculus', key: 'precalculus' },
-              { displayName: 'Calculus AB', key: 'calculusAB' },
-              { displayName: 'Calculus BC', key: 'calculusBC' },
-            ],
-            key: 'calculusBC',
-          },
-        ],
-        additionalSubjects: [
-          {
-            displayName: 'Integrated Math 1',
-            subjectsIncluded: [
-              { displayName: 'Algebra 1', key: 'algebraOne' },
-              { displayName: 'Geometry', key: 'geometry' },
-              { displayName: 'Statistics', key: 'statistics' },
-            ],
-            key: 'integratedMathOne',
-          },
-          {
-            displayName: 'Integrated Math 2',
-            subjectsIncluded: [
-              { displayName: 'Algebra 1', key: 'algebraOne' },
-              { displayName: 'Geometry', key: 'geometry' },
-              { displayName: 'Trigonometry', key: 'trigonometry' },
-              { displayName: 'Statistics', key: 'statistics' },
-            ],
-            key: 'integratedMathTwo',
-          },
-          {
-            displayName: 'Integrated Math 3',
-            subjectsIncluded: [
-              { displayName: 'Precalculus', key: 'precalculus' },
-              { displayName: 'Statistics', key: 'statistics' },
-            ],
-            key: 'integratedMathThree',
-          },
-          {
-            displayName: 'Integrated Math 4',
-            subjectsIncluded: [
-              { displayName: 'Precalculus', key: 'precalculus' },
-            ],
-
-            key: 'integratedMathFour',
-          },
-        ],
-      }
-    },
-    science() {
-      return {
-        training: [
-          { displayName: 'UPchieve 101', key: 'upchieve101' },
-          // { displayName: "Tutoring Skills", key: "tutoringSkills" }
-        ],
-        certifications: [
-          {
-            displayName: 'Biology',
-            subjectsIncluded: [{ displayName: 'Biology', key: 'biology' }],
-            key: 'biology',
-          },
-          {
-            displayName: 'Chemistry',
-            subjectsIncluded: [{ displayName: 'Chemistry', key: 'chemistry' }],
-            key: 'chemistry',
-          },
-          {
-            displayName: 'Physics 1',
-            subjectsIncluded: [{ displayName: 'Physics 1', key: 'physicsOne' }],
-            key: 'physicsOne',
-          },
-          {
-            displayName: 'Physics 2',
-            subjectsIncluded: [{ displayName: 'Physics 2', key: 'physicsTwo' }],
-            key: 'physicsTwo',
-          },
-          {
-            displayName: 'Environmental Science',
-            subjectsIncluded: [
-              {
-                displayName: 'Environmental Science',
-                key: 'environmentalScience',
-              },
-            ],
-            key: 'environmentalScience',
-          },
-        ],
-        additionalSubjects: [],
-      }
-    },
-    readingWriting() {
-      return {
-        training: [
-          { displayName: 'UPchieve 101', key: 'upchieve101' },
-          // { displayName: "Tutoring Skills", key: "tutoringSkills" }
-        ],
-        certifications: [
-          {
-            displayName: 'Humanities Essays',
-            subjectsIncluded: [
-              {
-                displayName: 'Humanities Essays',
-                key: 'humanitiesEssays',
-              },
-            ],
-            key: 'humanitiesEssays',
-          },
-          {
-            displayName: 'Reading',
-            subjectsIncluded: [
-              {
-                displayName: 'Reading',
-                key: 'reading',
-              },
-            ],
-            key: 'reading',
-          },
-        ],
-        additionalSubjects: [],
-      }
-    },
-    socialStudies() {
-      return {
-        training: [{ displayName: 'UPchieve 101', key: 'upchieve101' }],
-        certifications: [
-          {
-            displayName: 'U.S. History',
-            subjectsIncluded: [
-              {
-                displayName: 'U.S. History',
-                key: 'usHistory',
-              },
-            ],
-            key: 'usHistory',
-          },
-        ],
-        additionalSubjects: [],
-      }
-    },
-    college() {
-      if (this.isVolunteerCollegeRevampActive)
-        return {
-          training: [{ displayName: 'UPchieve 101', key: 'upchieve101' }],
-          certifications: [
-            {
-              displayName: 'College Prep',
-              subjectsIncluded: [
-                { displayName: 'College Prep', key: 'collegePrep' },
-              ],
-              key: 'collegePrep',
-            },
-            {
-              displayName: 'College List',
-              subjectsIncluded: [
-                { displayName: 'College List', key: 'collegeList' },
-              ],
-              key: 'collegeList',
-            },
-            {
-              displayName: 'Applications',
-              subjectsIncluded: [
-                { displayName: 'Applications', key: 'collegeApps' },
-              ],
-              key: 'collegeApps',
-            },
-            {
-              displayName: 'Application Essays',
-              subjectsIncluded: [
-                { displayName: 'Application Essays', key: 'applicationEssays' },
-              ],
-              key: 'applicationEssays',
-            },
-            {
-              displayName: 'Financial Aid',
-              subjectsIncluded: [
-                { displayName: 'Financial Aid', key: 'financialAid' },
-              ],
-              key: 'financialAid',
-            },
-          ],
-          additionalSubjects: [],
-        }
-      // TODO: remove in volunteer-college-revamp feature flag cleanup
-      else
-        return {
-          training: [{ displayName: 'UPchieve 101', key: 'upchieve101' }],
-          certifications: [
-            {
-              displayName: 'College Essays',
-              subjectsIncluded: [
-                { displayName: 'College Essays', key: 'essays' },
-              ],
-              key: 'essays',
-            },
-            {
-              displayName: 'Planning',
-              subjectsIncluded: [{ displayName: 'Planning', key: 'planning' }],
-              key: 'planning',
-            },
-            {
-              displayName: 'Applications',
-              subjectsIncluded: [
-                { displayName: 'Applications', key: 'applications' },
-              ],
-              key: 'applications',
-            },
-          ],
-          additionalSubjects: [],
-        }
-    },
-    sat() {
-      return {
-        training: [
-          { displayName: 'UPchieve 101', key: 'upchieve101' },
-          // Hide until SAT Strategies is completed
-          // { displayName: "SAT Strategies ", key: "satStrategies" }
-        ],
-        certifications: [
-          {
-            displayName: 'SAT Math',
-            subjectsIncluded: [{ displayName: 'SAT Math', key: 'satMath' }],
-            key: 'satMath',
-          },
-          {
-            displayName: 'SAT Reading',
-            subjectsIncluded: [
-              { displayName: 'SAT Reading', key: 'satReading' },
-            ],
-            key: 'satReading',
-          },
-        ],
-        additionalSubjects: [],
-      }
+      return this.training.subjectTypes
     },
   },
   methods: {
     showSubjectTraining(subject) {
       this.currentSubjectType = subject
-    },
-  },
-  watch: {
-    // This watcher is here because `isSubjectHydrationActive` may not be true when
-    // this component loads
-    // TODO: remove watcher when removing subject-hydration feature flag
-    async isSubjectHydrationActive(currentValue, prevValue) {
-      if (!prevValue && currentValue)
-        await this.$store.dispatch('subjects/getTrainingSubjects')
     },
   },
 }
