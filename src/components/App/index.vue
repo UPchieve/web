@@ -49,7 +49,6 @@ import AnalyticsService from '@/services/AnalyticsService'
 import config from '@/config'
 import LargeButton from '@/components/LargeButton'
 import Gleap from 'gleap'
-import { topics } from '@/utils/topics'
 
 export default {
   name: 'App',
@@ -220,7 +219,6 @@ export default {
       userAuthenticated: 'user/isAuthenticated',
       isVolunteer: 'user/isVolunteer',
       mobileMode: 'app/mobileMode',
-      isSubjectHydrationActive: 'featureFlags/isSubjectHydrationActive',
     }),
   },
   // https://github.com/BrianRosamilia/vue-crono
@@ -248,13 +246,8 @@ export default {
         }
 
         this.$store.dispatch('productFlags/getUserProductFlags')
-        if (
-          this.isSubjectHydrationActive &&
-          Object.entries(this.subjects).length === 0
-        )
+        if (Object.entries(this.subjects).length === 0)
           this.$store.dispatch('subjects/getSubjects')
-        // TODO: remove feature flag in subject hydration flag cleanup
-        else this.$store.commit('subjects/setSubjects', topics)
       }
     },
     /**
@@ -278,17 +271,6 @@ export default {
           this.$store.dispatch('user/fetchLatestSession', this)
         }
       }
-    },
-    // This watcher is here because `isSubjectHydrationActive` may not be true when
-    // this component loads
-    // TODO: remove when removing subject-hydration feature flag
-    isSubjectHydrationActive(currentValue, prevValue) {
-      if (
-        !prevValue &&
-        currentValue &&
-        Object.entries(this.subjects).length === 0
-      )
-        this.$store.dispatch('subjects/getSubjects')
     },
   },
   sockets: {

@@ -71,6 +71,7 @@ export default {
       mobileMode: 'app/mobileMode',
       isSessionAlive: 'user/isSessionAlive',
       isStudentCollegeRevampActive: 'featureFlags/isStudentCollegeRevampActive',
+      isStudentEnglishRevampActive: 'featureFlags/isStudentEnglishRevampActive',
     }),
     waitingPeriodMessage() {
       const countdown = calculateWaitingPeriodCountdown(
@@ -176,6 +177,24 @@ export default {
               'planning',
               'applications',
             ]
+            return !temporarilyHiddenSubjects.includes(subject)
+          })
+
+        if (
+          card.topic === 'readingWriting' &&
+          !this.isStudentEnglishRevampActive
+        )
+          card.subtopics = card.subtopics.filter(subject => {
+            const temporarilyHiddenSubjects = ['essayPlanning', 'essayFeedback']
+            return !temporarilyHiddenSubjects.includes(subject)
+          })
+        // TODO: Remove in the student-english-revamp feature flag cleanup
+        else if (
+          card.topic === 'readingWriting' &&
+          this.isStudentEnglishRevampActive
+        )
+          card.subtopics = card.subtopics.filter(subject => {
+            const temporarilyHiddenSubjects = ['humanitiesEssays']
             return !temporarilyHiddenSubjects.includes(subject)
           })
       }

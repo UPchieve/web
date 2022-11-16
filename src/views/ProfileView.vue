@@ -237,7 +237,10 @@ export default {
             Object.prototype.hasOwnProperty.call(topicData.subtopics, topic)
           ) {
             const { displayName } = topicData.subtopics[topic]
-            subtopicObj[displayName] = topicName.toUpperCase()
+            let topicDisplay = topicName
+            // TODO: remove when `readingWriting` is updated to have `english` as a key
+            if (topicDisplay === 'readingWriting') topicDisplay = 'english'
+            subtopicObj[displayName] = topicDisplay.toUpperCase()
           }
         }
       }
