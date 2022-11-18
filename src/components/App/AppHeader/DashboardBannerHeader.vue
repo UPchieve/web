@@ -2,18 +2,19 @@
   <div class="header">
     <!-- Edit the text below to display on dashboard banner to volunteers -->
     <div class="header-message">
-      <span>Introducing our new subject: U.S. History!</span> Take the quiz
-      today.
+      <span>We've revamped our English and College Advising training!</span>
     </div>
     <router-link to="/training" tag="button" class="header-button"
-      >Get Certified</router-link
-    >
+      >Get Certified by Dec 31st<arrow-icon class="arrow-icon"
+    /></router-link>
   </div>
 </template>
 
 <script>
+import ArrowIcon from '@/assets/arrow.svg'
 export default {
   name: 'dashboard-banner-header',
+  components: { ArrowIcon },
 }
 </script>
 
@@ -41,10 +42,18 @@ export default {
     border-radius: 20px;
     padding: 0.4em 1.2em;
     font-weight: 600;
+    @include flex-container(row, flex-start, center);
 
     &:hover {
       background-color: darken($upchieve-white, 5%);
     }
   }
+}
+
+.arrow-icon {
+  fill: currentColor;
+  height: 16px;
+  width: 16px;
+  margin-left: 0.6em;
 }
 </style>
