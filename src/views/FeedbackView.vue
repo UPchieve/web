@@ -485,6 +485,9 @@ export default {
     getAnswerToQuestion(question) {
       const questionResponseId = this.userResponse[question.questionId]
         .responseId
+      if (!questionResponseId) {
+        return null
+      }
       const selectedResponse = question.responses.find(
         r => r.responseId === questionResponseId
       )
@@ -493,10 +496,13 @@ export default {
     isFavoritingCoach() {
       if (!this.user.isVolunteer) {
         const coachFavoritingQuestion = this.filteredQuestions.find(q =>
-          this.isHighRatingQuestion(q)
+          this.isHighRatingQuestion(q.question)
         )
+        if (!coachFavoritingQuestion) {
+          return false
+        }
         const coachFavoritingAnswer = this.getAnswerToQuestion(
-          coachFavoritingQuestion
+          coachFavoritingQuestion.question
         )
         return coachFavoritingAnswer && coachFavoritingAnswer === 'Yes'
       }
@@ -542,26 +548,33 @@ export default {
         sessionId: this.session._id,
         submissions,
       }
-      try {
-        const requests = []
-        requests.push(NetworkService.submitSurvey(surveyResponse))
-        if (!this.user.isVolunteer && this.isFavoritingCoach) {
-          requests.push(
-            NetworkService.updateFavoriteVolunteerStatus(
-              this.session.volunteer._id,
-              { isFavorite: true, sessionId: this.session._id }
-            )
+      const requests = []
+      requests.push(NetworkService.submitSurvey(surveyResponse))
+      if (this.isFavoritingCoach()) {
+        requests.push(
+          NetworkService.updateFavoriteVolunteerStatus(
+            this.session.volunteer._id,
+            { isFavorite: true, sessionId: this.session._id }
           )
-        }
-        await Promise.all(requests)
-        this.$router.push('/dashboard')
-      } catch (error) {
-        if (error.body.success === false) this.error = error.body.message
-        else if (error.status === 422) this.error = error.body.err
-        else this.error = 'There was an error sending your feedback'
-      } finally {
-        this.isSubmittingFeedback = false
+        )
       }
+
+      const responses = await Promise.allSettled(requests)
+      // if there is an error in saving, display it; don't block progression if the error is in favoriting
+      const rejectedSave = responses
+        .filter(result => result.status === 'rejected')
+        .map(result => result.reason)
+        .find(res => res.url.endsWith('api/survey/save'))
+
+      if (rejectedSave) {
+        this.error = 'There was an error sending your feedback'
+        if (rejectedSave.status === 422) {
+          this.error = rejectedSave.body.statusText
+        }
+      } else {
+        this.$router.push('/dashboard')
+      }
+      this.isSubmittingFeedback = false
     },
     // builds a default user response to be stored in state that maps a survey question ID to a response map
     buildUserResponse() {
