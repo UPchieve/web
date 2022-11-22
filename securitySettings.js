@@ -17,7 +17,11 @@ const newrelicUrls = [
 const gleapScriptUrl = 'https://widget.gleap.io'
 
 // connect sources
-const posthogUrl = 'https://p.upchieve.org'
+const posthogUrls = [
+  'https://p.upchieve.org',
+  'https://app-static-prod.posthog.com',
+  'https://app.posthog.com'
+]
 const sentryUrl = 'https://*.ingest.sentry.io'
 const mathJaxFetchUrl = 'https://api.cdnjs.com'
 const gleapConnectUrls = [
@@ -59,7 +63,7 @@ const scriptSrc = [
   ...googleUrls,
   cdnUrl,
   mathJaxScriptUrl,
-  posthogUrl,
+  ...posthogUrls,
   ...newrelicUrls,
   gleapScriptUrl,
   "'unsafe-eval'",
@@ -79,7 +83,7 @@ const imgSrc = [
 
 const connectSrc = [
   "'self'",
-  posthogUrl,
+  ...posthogUrls,
   sentryUrl,
   mathJaxFetchUrl,
   ...s3PhotoConnectUrls,
