@@ -200,6 +200,10 @@ export default {
         this.$store.dispatch('app/header/show', rejoinHeaderData)
       }
     },
+    allSubjectNames(currValue, prevValue) {
+      const isNowLoaded = currValue.length && !prevValue.length
+      if (isNowLoaded) this.initImpactSummary()
+    },
   },
   async created() {
     const englishAndCollegeAdvisingLaunchDate = '2022-11-17T00:00:00.000Z'
@@ -231,10 +235,7 @@ export default {
       this.toggleWelcomeModal()
     }
 
-    if (this.isCustomVolunteerPartner) {
-      this.impactStats = await this.getCustomImpactStats()
-      this.lastUpdated = await this.getLastUpdated()
-    } else this.impactStats = await this.getImpactStats()
+    this.initImpactSummary()
   },
   data() {
     return {
@@ -700,6 +701,12 @@ export default {
           value: `${numHoursVolunteered} hours volunteered`,
         },
       ]
+    },
+    async initImpactSummary() {
+      if (this.isCustomVolunteerPartner) {
+        this.impactStats = await this.getCustomImpactStats()
+        this.lastUpdated = await this.getLastUpdated()
+      } else this.impactStats = await this.getImpactStats()
     },
   },
 }
