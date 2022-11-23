@@ -104,64 +104,6 @@ import { QUESTION_TYPES } from '@/consts'
 import SurveyRadio from '@/components/Surveys/SurveyRadio'
 import SurveyImage from '@/components/Surveys/SurveyImage'
 
-// TODO: remove in context sharing feature flag cleanup
-const questions = [
-  {
-    title: "What is your primary goal for today's session?",
-    key: 'primary-goal',
-    options: [
-      {
-        displayName: 'Solve a specific question',
-        value: 'specific-question',
-      },
-      {
-        displayName: 'Complete a homework assignment',
-        value: 'complete-homework',
-      },
-      {
-        displayName: 'Prepare for a quiz/test',
-        value: 'test-prep',
-      },
-      {
-        displayName: 'Check my answers',
-        value: 'check-answers',
-      },
-      {
-        displayName: 'Improve my understanding of a topic',
-        value: 'improve-understanding',
-      },
-      {
-        displayName: 'Other',
-        value: 'other',
-      },
-    ],
-  },
-  {
-    title:
-      'What is your level of understanding of the topic you need support with?',
-    key: 'topic-understanding',
-    options: [
-      {
-        displayName: "I don't know how to do this at all.",
-        value: 1,
-      },
-      {
-        displayName: 'I think I know how to do it, but I need help.',
-        value: 2,
-      },
-      {
-        displayName:
-          "I can do this on my own, but I don't fully understand it.",
-        value: 3,
-      },
-      {
-        displayName: 'I am very comfortable with this topic.',
-        value: 4,
-      },
-    ],
-  },
-]
-
 export default {
   components: {
     LargeButton,
@@ -180,17 +122,6 @@ export default {
 
   data() {
     return {
-      // TODO: remove in context sharing feature flag cleanup
-      questions,
-      // TODO: remove in context sharing feature flag cleanup
-      responses: {
-        'primary-goal': {
-          answer: '',
-        },
-        'topic-understanding': {
-          answer: '',
-        },
-      },
       currentStep: 1,
       userResponse: {},
       survey: [],
@@ -223,13 +154,6 @@ export default {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
     }),
-    // TODO: remove in context sharing feature flag cleanup
-    isComplete() {
-      return (
-        !!this.responses['primary-goal'].answer &&
-        !!this.responses['topic-understanding'].answer
-      )
-    },
     isSurveyComplete() {
       for (const question of this.survey) {
         const questionId = question.questionId
@@ -330,9 +254,11 @@ export default {
     },
     overrideModalTemplateStyles() {
       const formElem = document.querySelector('.ModalTemplate-form')
-      formElem.style.overflow = 'initial'
+      if (!this.mobileMode) {
+        formElem.style.overflow = 'initial'
+        formElem.style.borderRadius = '22px'
+      }
       formElem.style.padding = 'initial'
-      formElem.style.borderRadius = '22px'
 
       const selectionModal = document.querySelector('.SubjectSelectionModal')
       selectionModal.style.minHeight = 'initial'
@@ -449,96 +375,5 @@ export default {
   width: 15px;
   height: 15px;
   margin: 1.5em;
-}
-
-// TODO: remove the styles below in context sharing feature flag cleanup
-.presession-survey {
-  width: 100%;
-  padding: 40px 20px 0;
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-
-  @include breakpoint-above('medium') {
-    padding: 0 4em;
-  }
-
-  &__title-legacy {
-    text-align: center;
-    margin: initial;
-  }
-
-  &__subtitle-legacy {
-    text-align: center;
-    margin-bottom: 10px;
-  }
-}
-
-.questions-container {
-  overflow-y: scroll;
-
-  @include breakpoint-above('medium') {
-    height: 321px;
-  }
-}
-
-.question-legacy {
-  align-self: stretch;
-  margin: 15px 20px 35px;
-
-  &__title {
-    margin-bottom: 5px;
-    text-align: left;
-    font-weight: 500;
-    color: $c-soft-black;
-    @include font-category('heading');
-  }
-
-  &__options {
-    text-align: left;
-    margin: 1em 0;
-    padding-left: 15px;
-  }
-
-  &__option {
-    margin: 0.5em 0;
-
-    label {
-      font-weight: 400;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: flex-start;
-      font-size: 16px;
-
-      &:before {
-        content: '';
-        display: inline-block;
-        width: 24px;
-        height: 24px;
-        min-width: 24px;
-        min-height: 24px;
-        padding: 3px;
-        background-clip: content-box;
-        border: 1px solid #77778b;
-        border-radius: 50%;
-        margin-right: 8px;
-      }
-    }
-
-    input[type='radio'] {
-      display: none;
-
-      &:checked + label:before {
-        background-color: #16d2aa;
-        border: 1px solid #16d2aa;
-      }
-    }
-
-    input[type='text'] {
-      margin: 0 0 0 10px;
-      width: 250px;
-    }
-  }
 }
 </style>
