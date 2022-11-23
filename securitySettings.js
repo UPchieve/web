@@ -20,7 +20,7 @@ const gleapScriptUrl = 'https://widget.gleap.io'
 const posthogUrls = [
   'https://p.upchieve.org',
   'https://app-static-prod.posthog.com',
-  'https://app.posthog.com'
+  'https://app.posthog.com',
 ]
 const sentryUrl = 'https://*.ingest.sentry.io'
 const mathJaxFetchUrl = 'https://api.cdnjs.com'

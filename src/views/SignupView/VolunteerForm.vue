@@ -157,6 +157,40 @@
       </p>
     </div>
 
+    <div class="uc-column">
+      <label for="signup-source" class="uc-form-label"
+        >How did you hear about us?</label
+      >
+      <v-select
+        id="signup-source"
+        class="uc-form-select"
+        v-model="signupSourceId"
+        :options="signupSourcesOptions"
+        label="name"
+        :reduce="option => option.id"
+        :searchable="false"
+        :clearable="false"
+        required
+        :loading="isLoadingSignupSources"
+      />
+    </div>
+    <div class="uc-column" v-if="shouldShowOtherSignupInput()">
+      <input
+        id="otherSignupSource"
+        type="text"
+        class="uc-form-input"
+        v-model="otherSignupSource"
+        v-bind:class="{
+          'uc-form-input--invalid':
+            invalidInputs.indexOf('otherSignupSource') > -1,
+        }"
+        autofocus
+      />
+      <p class="uc-form-subtext">
+        Tell us where you heard about us!
+      </p>
+    </div>
+
     <div class="uc-form-checkbox">
       <input
         id="userAgreement"
@@ -187,6 +221,8 @@ import * as Sentry from '@sentry/browser'
 import AuthService from '@/services/AuthService'
 import VuePhoneNumberInput from 'vue-phone-number-input'
 import Loader from '@/components/Loader'
+import NetworkService from '@/services/NetworkService'
+import { backOff } from 'exponential-backoff'
 
 export default {
   components: {
@@ -211,6 +247,10 @@ export default {
       step: 'step-1',
       phoneInputInfo: {},
       isRegistering: false,
+      signupSourcesOptions: [],
+      signupSourceId: null,
+      otherSignupSource: '',
+      isLoadingSignupSources: false,
     }
   },
   mounted() {
@@ -249,6 +289,7 @@ export default {
         .then(() => {
           this.step = 'step-2'
           this.$router.push('/sign-up/volunteer/about')
+          this.getSignupSources()
         })
         .catch(err => {
           this.msg = err.message
@@ -281,6 +322,12 @@ export default {
       if (!this.credentials.terms) {
         this.errors.push('You must read and accept the user agreement.')
       }
+      if (this.shouldShowOtherSignupInput() && !this.otherSignupSource) {
+        this.errors.push(
+          'Please enter signup source in the text box if "Other" is selected'
+        )
+        this.invalidInputs.push('otherSignupSource')
+      }
       if (!this.errors.length) {
         this.submit()
       }
@@ -296,6 +343,8 @@ export default {
         firstName: this.profile.firstName,
         lastName: this.profile.lastName,
         phone: this.phoneInputInfo.e164,
+        signupSourceId: this.signupSourceId,
+        otherSignupSource: this.otherSignupSource,
       })
         .then(() => {
           this.isRegistering = false
@@ -311,6 +360,36 @@ export default {
     },
     onPhoneInputUpdate(phoneInputInfo) {
       this.phoneInputInfo = phoneInputInfo
+    },
+    shouldShowOtherSignupInput() {
+      if (this.isLoadingSignupSources || !this.signupSourcesOptions) {
+        return false
+      }
+      const otherOption = this.signupSourcesOptions.find(
+        s => s.name === 'Other'
+      )
+      return otherOption && otherOption.id === this.signupSourceId
+    },
+    async getSignupSources() {
+      this.isLoadingSignupSources = true
+      try {
+        const data = await backOff(() =>
+          NetworkService.getStudentSignupSources()
+        )
+        let allSources = data.body.signupSources
+
+        // volunteer sources drop School/Teacher and replace Friend/Classmate with Friend
+        allSources = allSources.filter(
+          source => source.name !== 'School / Teacher'
+        )
+        allSources.find(source => source.name === 'Friend / Classmate').name =
+          'Friend'
+        this.signupSourcesOptions = allSources
+      } catch (err) {
+        Sentry.captureException(err)
+      } finally {
+        this.isLoadingSignupSources = false
+      }
     },
   },
 }
