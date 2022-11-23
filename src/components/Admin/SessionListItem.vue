@@ -49,10 +49,12 @@ export default {
 
     status() {
       if (!this.session.endedAt) {
-        if (!this.session.volunteerEmail) return '⌛ Student waiting'
+        if (!(this.session.volunteerEmail || this.session.volunteer))
+          return '⌛ Student waiting'
         else return '✅ Paired, in progress'
       } else {
-        if (!this.session.volunteerEmail) return '❌ Not paired'
+        if (!(this.session.volunteerEmail || this.session.volunteer))
+          return '❌ Not paired'
         else return '✅ Paired, ended'
       }
     },
