@@ -623,8 +623,8 @@ export default {
           value: `${numHoursSelected} hours selected`,
         },
         {
-          label: 'Number of certifications obtained',
-          value: `${numCertsObtained} certs obtained`,
+          label: 'Number of quizzes passed',
+          value: `${numCertsObtained} quizzes passed`,
         },
         {
           label: 'Number of requests filled',
@@ -689,8 +689,8 @@ export default {
           value: `${numHoursSelected} hours selected`,
         },
         {
-          label: 'Number of certifications obtained',
-          value: `${numCertsObtained} certs obtained`,
+          label: 'Number of quizzes passed',
+          value: `${numCertsObtained} quizzes passed`,
         },
         {
           label: 'Number of requests filled',
