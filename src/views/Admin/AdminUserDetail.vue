@@ -82,8 +82,54 @@
         </div>
         <div v-if="user.isVolunteer" class="user-detail__section">
           <div class="user-detail__section-title">Background Information</div>
-          <div v-if="!user.background">--</div>
-          <background-info v-else :user="user" />
+          <div v-if="user.background.occupation">
+            <div class="user-detail__subtitle">
+              Occupation: {{ user.background.occupation.toString() }}
+            </div>
+          </div>
+          <div v-if="user.background.college">
+            <div class="user-detail__subtitle">
+              College/University: {{ user.background.college }}
+            </div>
+          </div>
+          <div v-if="user.background.company">
+            <div class="user-detail__subtitle">
+              Company: {{ user.background.company }}
+            </div>
+          </div>
+          <div v-if="user.background.linkedInUrl">
+            <div class="user-detail__subtitle">
+              LinkedIn Url: {{ user.background.linkedInUrl }}
+            </div>
+          </div>
+          <div v-if="user.background.country">
+            <div class="user-detail__subtitle">
+              Country: {{ user.background.country }}
+            </div>
+          </div>
+          <div v-if="user.background.state">
+            <div class="user-detail__subtitle">
+              State: {{ user.background.state }}
+            </div>
+          </div>
+          <div v-if="user.background.city">
+            <div class="user-detail__subtitle">
+              City: {{ user.background.city }}
+            </div>
+          </div>
+          <div v-if="user.background.experience">
+            <div class="user-detail__subtitle">
+              Experience: Tutoring: {{ user.background.experience.tutoring }},
+              College Counseling:
+              {{ user.background.experience.collegeCounseling }}, Mentoring:
+              {{ user.background.experience.mentoring }}
+            </div>
+          </div>
+          <div v-if="user.background.languages">
+            <div class="user-detail__subtitle">
+              Languages: {{ user.background.languages.toString() }}
+            </div>
+          </div>
         </div>
       </div>
       <page-control
@@ -106,7 +152,6 @@
 import moment from 'moment'
 import NetworkService from '@/services/NetworkService'
 import SessionsList from '@/components/Admin/SessionsList'
-import BackgroundInfo from '@/components/Admin/BackgroundInfo'
 import AdminPendingVolunteerDetail from '@/views/Admin/AdminPendingVolunteerDetail'
 import AdminEditUser from '@/views/Admin/AdminEditUser'
 import PageControl from '@/components/Admin/PageControl'
@@ -115,7 +160,6 @@ const getUser = async (userId, page) => {
   const {
     body: { user },
   } = await NetworkService.adminGetUser(userId, page)
-
   return user
 }
 
@@ -125,7 +169,6 @@ export default {
   components: {
     AdminPendingVolunteerDetail,
     SessionsList,
-    BackgroundInfo,
     AdminEditUser,
     PageControl,
   },
