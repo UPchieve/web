@@ -219,6 +219,8 @@ export default {
       userAuthenticated: 'user/isAuthenticated',
       isVolunteer: 'user/isVolunteer',
       mobileMode: 'app/mobileMode',
+      isSubjectsDatabaseHydrationActive:
+        'featureFlags/isSubjectsDatabaseHydrationActive',
     }),
   },
   // https://github.com/BrianRosamilia/vue-crono
@@ -271,6 +273,20 @@ export default {
           this.$store.dispatch('user/fetchLatestSession', this)
         }
       }
+    },
+
+    /***
+     *
+     * The shape of `subjects` has changed with the
+     * `isSubjectsDatabaseHydrationActive` feature flag. We want
+     * to make sure we get the correct shape for the subjects
+     * depending on if the feature flag is on or not.
+     *
+     *
+     * TODO: remove watcher below in subjects-database-hydration flag cleanup
+     */
+    isSubjectsDatabaseHydrationActive() {
+      this.$store.dispatch('subjects/getSubjects')
     },
   },
   sockets: {

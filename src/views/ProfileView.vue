@@ -110,11 +110,11 @@
             </div>
             <div v-if="user.isVolunteer" class="description">
               Browser alerts when a student appears on the dashboard waitlist
-              and when a student sends a message while you’re not looking.
+              and when a student sends a message while you're not looking.
             </div>
             <div v-else class="description">
               Browser alerts when a coach joins your session and when a coach
-              sends a message while you’re not looking.
+              sends a message while you're not looking.
             </div>
           </div>
 
@@ -140,10 +140,24 @@
             :key="`certification-${key}-${value}`"
           >
             <div v-if="value" class="certBox">
-              <div :class="certKey[key]" class="certKey">
-                {{ certKey[key] }}
-              </div>
-              <div class="certValue">{{ key }}</div>
+              <template v-if="isSubjectsDatabaseHydrationActive">
+                <div
+                  :style="{ backgroundColor: subjects[key].topicColor }"
+                  class="certKey"
+                >
+                  {{ subjects[key].topicDisplayName.toUpperCase() }}
+                </div>
+                <div class="certValue">
+                  {{ subjects[key].displayName }}
+                </div>
+              </template>
+              <!-- TODO: remove below in subjects-database-hydration flag cleanup -->
+              <template v-else>
+                <div :class="certKey[key]" class="certKey">
+                  {{ certKey[key] }}
+                </div>
+                <div class="certValue">{{ key }}</div>
+              </template>
             </div>
           </div>
         </div>
@@ -211,6 +225,8 @@ export default {
       avatarUrl: 'user/avatarUrl',
       allSubtopics: 'subjects/allSubtopics',
       isFilterActiveSubjectsActive: 'featureFlags/isFilterActiveSubjectsActive',
+      isSubjectsDatabaseHydrationActive:
+        'featureFlags/isSubjectsDatabaseHydrationActive',
     }),
     name() {
       const user = this.$store.state.user.user
@@ -252,16 +268,25 @@ export default {
         ? user.activeSubjects
         : user.subjects
 
-      const subjects = userSubjects.reduce((displayObj, key) => {
-        const subtopics = this.allSubtopics
-        if (subtopics[key]) {
-          displayObj[subtopics[key].displayName || subtopics[key]] = true
+      if (this.isSubjectsDatabaseHydrationActive) {
+        const subjects = {}
+        for (const subject of userSubjects) {
+          subjects[subject] = true
         }
+        return subjects
+      } else {
+        // TODO: remove below in subjects-database-hydration flag cleanup
+        const subjects = userSubjects.reduce((displayObj, key) => {
+          const subtopics = this.allSubtopics
+          if (subtopics[key]) {
+            displayObj[subtopics[key].displayName || subtopics[key]] = true
+          }
 
-        return displayObj
-      }, {})
+          return displayObj
+        }, {})
 
-      return subjects
+        return subjects
+      }
     },
     isNotificationPermissionGranted() {
       return 'Notification' in window && Notification.permission === 'granted'
