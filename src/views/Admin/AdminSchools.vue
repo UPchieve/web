@@ -1,9 +1,5 @@
 <template>
   <div class="schools">
-    <router-link to="/admin/school/new" class="schools__add-school--link">
-      <plus-icon class="plus-icon" />
-      <span>Add a school</span>
-    </router-link>
     <div class="schools__search-panel">
       <div class="schools__input-row">
         <label for="name" class="uc-form-label">School name</label>
@@ -59,7 +55,6 @@
 import NetworkService from '@/services/NetworkService'
 import PageControl from '@/components/Admin/PageControl'
 import SchoolListItem from '@/components/Admin/SchoolListItem'
-import PlusIcon from '@/assets/plus_icon.svg'
 import { STATES_WITH_ABBREVIATIONS } from '@/consts'
 
 const getSchools = async data => {
@@ -71,7 +66,7 @@ const getSchools = async data => {
 
 export default {
   name: 'AdminSchools',
-  components: { SchoolListItem, PageControl, PlusIcon },
+  components: { SchoolListItem, PageControl },
   data() {
     return {
       page: 1,
@@ -174,23 +169,6 @@ select {
     padding: 40px;
   }
 
-  &__add-school--link {
-    @include flex-container(row, flex-start, center);
-
-    margin-bottom: 2em;
-    border: 1px solid darken(#f7fcfe, 5%);
-    width: 180px;
-    padding: 1em 2em;
-    background: #f7fcfe;
-    border-radius: 20px;
-    cursor: pointer;
-
-    &:hover {
-      background: darken(#f7fcfe, 3%);
-      text-decoration: none;
-    }
-  }
-
   &__input-row {
     margin-bottom: 1em;
     margin-left: 0;
@@ -199,15 +177,6 @@ select {
   &__v-select--state {
     display: inline-block;
     width: 300px;
-  }
-}
-
-.plus-icon {
-  width: 12px;
-  height: 12px;
-  margin-right: 0.8em;
-  & path {
-    fill: $c-success-green;
   }
 }
 

@@ -381,11 +381,6 @@ export default {
       .get(`${ELIGIBILITY_API_ROOT}/schools?${queryParams}`)
       .then(this._successHandler, this._errorHandler)
   },
-  adminCreateSchool(data) {
-    return Vue.http
-      .post(`${ELIGIBILITY_API_ROOT}/school/new`, data)
-      .then(this._successHandler, this._errorHandler)
-  },
   adminUpdateSchool(schoolId, data) {
     return Vue.http
       .put(`${ELIGIBILITY_API_ROOT}/school/${schoolId}`, data)
