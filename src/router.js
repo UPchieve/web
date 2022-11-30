@@ -3,7 +3,6 @@ import VueResource from 'vue-resource'
 import VueRouter from 'vue-router'
 import store from './store'
 import AdminView from './views/Admin'
-import AdminAddSchool from './views/Admin/AdminAddSchool'
 import AdminEditSchool from './views/Admin/AdminEditSchool'
 import AdminIneligibleStudents from './views/Admin/AdminIneligibleStudents'
 import AdminPendingVolunteers from './views/Admin/AdminPendingVolunteers'
@@ -327,14 +326,8 @@ const routes = [
     meta: { protected: true, requiresAdmin: true },
   },
   {
-    path: '/admin/school/new',
-    name: 'AdminAddSchool',
-    component: AdminAddSchool,
-    meta: { protected: true, requiresAdmin: true },
-  },
-  {
     path: '/admin/school/edit',
-    name: 'AdminAddSchool',
+    name: 'AdminEditSchool',
     component: AdminEditSchool,
     meta: { protected: true, requiresAdmin: true },
   },
