@@ -436,6 +436,7 @@ export const UNLEASH_FEATURE_FLAGS = {
   CHATBOT: 'chatbot',
   DASHBOARD_BANNER: 'dashboard-banner',
   POSTSESSION_SURVEY: 'postsession-survey',
+  SUBJECTS_DATABASE_HYDRATION: 'subjects-database-hydration',
 }
 
 export const POSTHOG_FEATURE_FLAGS = {

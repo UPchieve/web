@@ -23,7 +23,7 @@
 <script>
 import moment from 'moment'
 import SessionFlags from './SessionFlags'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 
 const pluralize = num => {
   return num === 1 ? '' : 's'
@@ -41,6 +41,10 @@ export default {
   computed: {
     ...mapState({
       subjects: state => state.subjects.subjects,
+    }),
+    ...mapGetters({
+      isSubjectsDatabaseHydrationActive:
+        'featureFlags/isSubjectsDatabaseHydrationActive',
     }),
 
     createdAt() {
@@ -67,8 +71,14 @@ export default {
     },
 
     subTopicDisplayName() {
-      const { type, subTopic } = this.session
-      return this.subjects[type].subtopics[subTopic].displayName
+      if (this.isSubjectsDatabaseHydrationActive) {
+        const { subTopic } = this.session
+        return this.subjects[subTopic].displayName
+      } else {
+        // TODO: remove below in subjects-database-hydration flag cleanup
+        const { type, subTopic } = this.session
+        return this.subjects[type].subtopics[subTopic].displayName
+      }
     },
 
     studentRating() {

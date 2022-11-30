@@ -7,7 +7,18 @@
       />
     </div>
     <div v-else>
-      <component v-if="!mobileMode" :is="modalData.svg" class="icon" />
+      <component
+        v-if="!mobileMode && typeof modalData.svg === 'object'"
+        :is="modalData.svg"
+        class="icon"
+      />
+      <img
+        v-else-if="!mobileMode && typeof modalData.svg === 'string'"
+        :src="modalData.svg"
+        :alt="`${this.modalData.topic} icon`"
+        class="icon"
+      />
+
       <h1 class="SubjectSelectionModal-title">{{ title }}</h1>
       <h2 v-if="!mobileMode" class="SubjectSelectionModal-subtitle">
         Choose a subject so we can connect you with the right tutor.

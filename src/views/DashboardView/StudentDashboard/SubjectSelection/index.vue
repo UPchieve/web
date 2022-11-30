@@ -72,6 +72,8 @@ export default {
       isSessionAlive: 'user/isSessionAlive',
       isStudentCollegeRevampActive: 'featureFlags/isStudentCollegeRevampActive',
       isStudentEnglishRevampActive: 'featureFlags/isStudentEnglishRevampActive',
+      isSubjectsDatabaseHydrationActive:
+        'featureFlags/isSubjectsDatabaseHydrationActive',
     }),
     waitingPeriodMessage() {
       const countdown = calculateWaitingPeriodCountdown(
@@ -100,28 +102,68 @@ export default {
         sat: 5,
       }
 
-      const cards = Object.entries(this.subjects)
-        .filter(([key]) => key !== 'training')
-        .map(([key, topicObj]) => {
-          return {
-            title: topicObj.displayName,
-            svg: svgs[key],
-            topic: key,
-            subtopics: Object.keys(topicObj.subtopics),
-            subtopicDisplayNames: Object.entries(topicObj.subtopics)
-              .map(([subtopicKey, subtopicObj]) => [
-                subtopicKey,
-                subtopicObj.displayName,
-              ])
-              .reduce((result, [subtopicKey, displayName]) => {
-                result[subtopicKey] = displayName
-                return result
-              }, {}),
-            isTutoringCard: true,
-            order: topicOrderMapping[key],
+      let cards = []
+      if (this.isSubjectsDatabaseHydrationActive) {
+        const topicCards = {}
+        for (const subject of Object.values(this.subjects)) {
+          const { topicName } = subject
+          if (!topicCards[topicName])
+            topicCards[topicName] = {
+              topic: subject.topicName,
+              title: subject.topicDisplayName,
+              subjects: [],
+              subtopics: [],
+              subtopicDisplayNames: {},
+              svg: subject.topicIconLink,
+              order: subject.topicDashboardOrder,
+              isTutoringCard: true,
+            }
+          // Create a list of subjects that a topic has
+          if (subject.active)
+            topicCards[topicName].subjects.push({
+              name: subject.name,
+              id: subject.id,
+              displayName: subject.displayName,
+              displayOrder: subject.displayOrder,
+            })
+        }
+
+        // Sort the subjects for each topic and pull out their key
+        // along with their display name
+        for (const topicData of Object.values(topicCards)) {
+          topicData.subjects.sort((a, b) => a.displayOrder - b.displayOrder)
+          for (const subject of topicData.subjects) {
+            topicData.subtopics.push(subject.name)
+            topicData.subtopicDisplayNames[subject.name] = subject.displayName
           }
-        })
-        .sort((a, b) => a.order - b.order)
+          cards.push(topicData)
+        }
+        cards.sort((a, b) => a.order - b.order)
+      } else {
+        // TODO: remove below in subjects-database-hydration flag cleanup
+        cards = Object.entries(this.subjects)
+          .filter(([key]) => key !== 'training')
+          .map(([key, topicObj]) => {
+            return {
+              title: topicObj.displayName,
+              svg: svgs[key],
+              topic: key,
+              subtopics: Object.keys(topicObj.subtopics),
+              subtopicDisplayNames: Object.entries(topicObj.subtopics)
+                .map(([subtopicKey, subtopicObj]) => [
+                  subtopicKey,
+                  subtopicObj.displayName,
+                ])
+                .reduce((result, [subtopicKey, displayName]) => {
+                  result[subtopicKey] = displayName
+                  return result
+                }, {}),
+              isTutoringCard: true,
+              order: topicOrderMapping[key],
+            }
+          })
+          .sort((a, b) => a.order - b.order)
+      }
 
       cards.push({
         title: 'Give Feedback',

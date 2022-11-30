@@ -1,7 +1,12 @@
 <template>
   <div class="SubjectCard">
     <template v-if="mobileMode">
-      <component class="SubjectCard-icon" v-bind:is="svg" />
+      <component
+        class="SubjectCard-icon"
+        v-if="isComponentSvg"
+        v-bind:is="svg"
+      />
+      <img v-else :src="svg" :alt="altImageText" class="SubjectCard-icon" />
 
       <div class="SubjectCard-mobile-column">
         <h2 class="SubjectCard-title">{{ title }}</h2>
@@ -24,7 +29,12 @@
 
     <template v-else>
       <div class="SubjectCard-desktop-column">
-        <component class="SubjectCard-icon" v-bind:is="svg" />
+        <component
+          class="SubjectCard-icon"
+          v-if="isComponentSvg"
+          v-bind:is="svg"
+        />
+        <img v-else :src="svg" :alt="altImageText" class="SubjectCard-icon" />
         <h2 class="SubjectCard-title">{{ title }}</h2>
         <p class="SubjectCard-subtitle">{{ subtitle }}</p>
         <dropdown-list
@@ -83,7 +93,7 @@ export default {
       default: 'Join a chat room to start.',
     },
     svg: {
-      type: Object,
+      type: [Object, String],
       required: true,
     },
     topic: String,
@@ -108,6 +118,12 @@ export default {
     }),
     disabled() {
       return this.user.isBanned || this.disableSubjectCard
+    },
+    isComponentSvg() {
+      return typeof this.svg === 'object'
+    },
+    altImageText() {
+      return `${this.topic.toLowerCase()} icon`
     },
   },
   methods: {
