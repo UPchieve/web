@@ -2,7 +2,7 @@
   <div class="header">
     <!-- Edit the text below to display on dashboard banner to volunteers -->
     <div class="header-message">
-      <span>We've revamped our English and College Advising training!</span>
+      <span>We've revamped our English and College Counseling training!</span>
     </div>
     <router-link to="/training" tag="button" class="header-button"
       >Get Certified by Dec 31st<arrow-icon class="arrow-icon"
