@@ -178,7 +178,7 @@ export default {
         if (this.contactFormData.topic === this.contactTopics[2]) {
           if (!this.isAuthenticated)
             Gleap.setCustomData('email', this.contactFormData.userEmail)
-          Gleap.sendSilentBugReport(this.contactFormData.message, 'LOW')
+          Gleap.sendSilentCrashReport(this.contactFormData.message, 'LOW')
           if (!this.isAuthenticated) Gleap.clearCustomData()
         }
 
