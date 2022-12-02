@@ -111,9 +111,12 @@ export default {
   computed: {
     ...mapState({
       user: state => state.user.user,
+      subjects: state => state.subjects.subjects,
     }),
     ...mapGetters({
       allSubtopics: 'subjects/allSubtopics',
+      isSubjectsDatabaseHydrationActive:
+        'featureFlags/isSubjectsDatabaseHydrationActive',
     }),
     tries() {
       const { user } = this.$store.state.user
@@ -125,10 +128,13 @@ export default {
     },
     quizName() {
       let quizName
+      const subjects = this.isSubjectsDatabaseHydrationActive
+        ? this.subjects
+        : this.allSubtopics
       if (this.category === 'esl') {
         quizName = this.category.toUpperCase()
-      } else if (this.allSubtopics[this.category]) {
-        quizName = this.allSubtopics[this.category].displayName
+      } else if (subjects[this.category]) {
+        quizName = subjects[this.category].displayName
       } else {
         quizName =
           this.category.charAt(0).toUpperCase() + this.category.slice(1)

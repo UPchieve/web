@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import Case from 'case'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -73,178 +73,184 @@ export default {
     if (isPhysics(category)) this.category = PHYSICS_MAPPING[category]
 
     this.getCategoryMaterials()
-    if (!this.error) {
+    //TODO: remove below in subjects-database-hydration flag cleanup
+    if (!this.error && !this.isSubjectsDatabaseHydrationActive) {
       this.getReviewMaterials()
     }
   },
   methods: {
-    getCategoryMaterials() {
-      // TODO: remove `algebra` case below in algebra 2 launch cleanup
-      switch (this.category) {
-        case 'prealgebra':
-        case 'algebra':
-        case 'algebraOne':
-        case 'algebraTwo':
-        case 'geometry':
-        case 'trigonometry':
-        case 'statistics':
-        case 'precalculus':
-        case 'biology':
-        case 'physicsOne':
-        case 'physicsTwo':
-        case 'calculusAB':
-        case 'calculusBC':
-        case 'chemistry':
-        case 'environmentalScience':
-        case 'usHistory':
-          this.reviewMaterials = [
-            {
-              title: 'Topics & Resources',
-              pdf: this.getTopicsAndResourcePath('pdf'),
-              image: this.getTopicsAndResourcePath('png'),
-            },
-            {
-              title: 'Concept Review',
-              pdf: this.getConceptReviewPath('pdf'),
-              image: this.getConceptReviewPath('png'),
-            },
-          ]
-          break
-        case 'planning':
-          this.reviewMaterials = [
-            {
-              title: 'College Planning Review',
-              pdf: `${this.hostPath}/college-planning-review.pdf`,
-              image: `${this.hostPath}/college-planning-review.png`,
-            },
-          ]
-          break
-        case 'essays':
-          this.reviewMaterials = [
-            {
-              title: 'College Essays Review',
-              pdf: `${this.hostPath}/college-essays-review.pdf`,
-              image: `${this.hostPath}/college-essays-review.png`,
-            },
-          ]
-          break
-        case 'applications':
-          this.reviewMaterials = [
-            {
-              title: 'College Applications Review',
-              pdf: `${this.hostPath}/college-applications-review.pdf`,
-              image: `${this.hostPath}/college-applications-review.png`,
-            },
-          ]
-          break
-        case 'collegePrep':
-          this.reviewMaterials = [
-            {
-              title: 'College Prep Review',
-              pdf: `${this.hostPath}/college-prep-review.pdf`,
-              image: `${this.hostPath}/college-prep-review.png`,
-            },
-          ]
-          break
-        case 'collegeList':
-          this.reviewMaterials = [
-            {
-              title: 'College List Review',
-              pdf: `${this.hostPath}/college-list-review.pdf`,
-              image: `${this.hostPath}/college-list-review.png`,
-            },
-          ]
-          break
-        case 'collegeApps':
-          this.reviewMaterials = [
-            {
-              title: 'College Applications Review',
-              pdf: `${this.hostPath}/college-apps-review.pdf`,
-              image: `${this.hostPath}/college-apps-review.png`,
-            },
-          ]
-          break
-        case 'applicationEssays':
-          this.reviewMaterials = [
-            {
-              title: 'Application Essays Review',
-              pdf: `${this.hostPath}/application-essays-review.pdf`,
-              image: `${this.hostPath}/application-essays-review.png`,
-            },
-          ]
-          break
-        case 'financialAid':
-          this.reviewMaterials = [
-            {
-              title: 'Financial Aid Review',
-              pdf: `${this.hostPath}/financial-aid-review.pdf`,
-              image: `${this.hostPath}/financial-aid-review.png`,
-            },
-          ]
-          break
-        case 'satReading':
-          this.reviewMaterials = [
-            {
-              title: 'SAT Reading Review Guide',
-              pdf: `${this.hostPath}/sat-reading-review-guide.pdf`,
-              image: `${this.hostPath}/sat-reading-review-guide.png`,
-            },
-          ]
-          break
-        case 'satMath':
-          this.reviewMaterials = [
-            {
-              title: 'SAT Math Review Guide',
-              pdf: `${this.hostPath}/sat-math-review-guide.pdf`,
-              image: `${this.hostPath}/sat-math-review-guide.png`,
-            },
-          ]
-          break
-        case 'humanitiesEssays':
-          this.reviewMaterials = [
-            {
-              title: 'Humanities Essays Review Guide',
-              pdf: `${this.hostPath}/humanities-essays-review-guide.pdf`,
-              image: `${this.hostPath}/humanities-essays-review-guide.png`,
-            },
-          ]
-          break
-        case 'reading':
-          this.reviewMaterials = [
-            {
-              title: 'Reading Review Guide',
-              pdf: `${this.hostPath}/reading-review.pdf`,
-              image: `${this.hostPath}/reading-review.png`,
-            },
-          ]
-          break
-        case 'essayPlanning':
-          this.reviewMaterials = [
-            {
-              title: 'Essay Planning Review Guide',
-              pdf: `${this.hostPath}/essay-planning-review.pdf`,
-              image: `${this.hostPath}/essay-planning-review.png`,
-            },
-          ]
-          break
-        case 'essayFeedback':
-          this.reviewMaterials = [
-            {
-              title: 'Essay Feedback Review Guide',
-              pdf: `${this.hostPath}/essay-feedback-review.pdf`,
-              image: `${this.hostPath}/essay-feedback-review.png`,
-            },
-          ]
-          break
-        // case for a user entering a subject that we do not support
-        default:
-          this.error = true
-          break
+    async getCategoryMaterials() {
+      if (this.isSubjectsDatabaseHydrationActive) {
+        const materials = await NetworkService.getReviewMaterials(this.category)
+        this.reviewMaterials = materials.body
+      } else {
+        // TODO: remove below in subjects-database-hydration flag cleanup
+        switch (this.category) {
+          case 'prealgebra':
+          case 'algebra':
+          case 'algebraOne':
+          case 'algebraTwo':
+          case 'geometry':
+          case 'trigonometry':
+          case 'statistics':
+          case 'precalculus':
+          case 'biology':
+          case 'physicsOne':
+          case 'physicsTwo':
+          case 'calculusAB':
+          case 'calculusBC':
+          case 'chemistry':
+          case 'environmentalScience':
+          case 'usHistory':
+            this.reviewMaterials = [
+              {
+                title: 'Topics & Resources',
+                pdf: this.getTopicsAndResourcePath('pdf'),
+                image: this.getTopicsAndResourcePath('png'),
+              },
+              {
+                title: 'Concept Review',
+                pdf: this.getConceptReviewPath('pdf'),
+                image: this.getConceptReviewPath('png'),
+              },
+            ]
+            break
+          case 'planning':
+            this.reviewMaterials = [
+              {
+                title: 'College Planning Review',
+                pdf: `${this.hostPath}/college-planning-review.pdf`,
+                image: `${this.hostPath}/college-planning-review.png`,
+              },
+            ]
+            break
+          case 'essays':
+            this.reviewMaterials = [
+              {
+                title: 'College Essays Review',
+                pdf: `${this.hostPath}/college-essays-review.pdf`,
+                image: `${this.hostPath}/college-essays-review.png`,
+              },
+            ]
+            break
+          case 'applications':
+            this.reviewMaterials = [
+              {
+                title: 'College Applications Review',
+                pdf: `${this.hostPath}/college-applications-review.pdf`,
+                image: `${this.hostPath}/college-applications-review.png`,
+              },
+            ]
+            break
+          case 'collegePrep':
+            this.reviewMaterials = [
+              {
+                title: 'College Prep Review',
+                pdf: `${this.hostPath}/college-prep-review.pdf`,
+                image: `${this.hostPath}/college-prep-review.png`,
+              },
+            ]
+            break
+          case 'collegeList':
+            this.reviewMaterials = [
+              {
+                title: 'College List Review',
+                pdf: `${this.hostPath}/college-list-review.pdf`,
+                image: `${this.hostPath}/college-list-review.png`,
+              },
+            ]
+            break
+          case 'collegeApps':
+            this.reviewMaterials = [
+              {
+                title: 'College Applications Review',
+                pdf: `${this.hostPath}/college-apps-review.pdf`,
+                image: `${this.hostPath}/college-apps-review.png`,
+              },
+            ]
+            break
+          case 'applicationEssays':
+            this.reviewMaterials = [
+              {
+                title: 'Application Essays Review',
+                pdf: `${this.hostPath}/application-essays-review.pdf`,
+                image: `${this.hostPath}/application-essays-review.png`,
+              },
+            ]
+            break
+          case 'financialAid':
+            this.reviewMaterials = [
+              {
+                title: 'Financial Aid Review',
+                pdf: `${this.hostPath}/financial-aid-review.pdf`,
+                image: `${this.hostPath}/financial-aid-review.png`,
+              },
+            ]
+            break
+          case 'satReading':
+            this.reviewMaterials = [
+              {
+                title: 'SAT Reading Review Guide',
+                pdf: `${this.hostPath}/sat-reading-review-guide.pdf`,
+                image: `${this.hostPath}/sat-reading-review-guide.png`,
+              },
+            ]
+            break
+          case 'satMath':
+            this.reviewMaterials = [
+              {
+                title: 'SAT Math Review Guide',
+                pdf: `${this.hostPath}/sat-math-review-guide.pdf`,
+                image: `${this.hostPath}/sat-math-review-guide.png`,
+              },
+            ]
+            break
+          case 'humanitiesEssays':
+            this.reviewMaterials = [
+              {
+                title: 'Humanities Essays Review Guide',
+                pdf: `${this.hostPath}/humanities-essays-review-guide.pdf`,
+                image: `${this.hostPath}/humanities-essays-review-guide.png`,
+              },
+            ]
+            break
+          case 'reading':
+            this.reviewMaterials = [
+              {
+                title: 'Reading Review Guide',
+                pdf: `${this.hostPath}/reading-review.pdf`,
+                image: `${this.hostPath}/reading-review.png`,
+              },
+            ]
+            break
+          case 'essayPlanning':
+            this.reviewMaterials = [
+              {
+                title: 'Essay Planning Review Guide',
+                pdf: `${this.hostPath}/essay-planning-review.pdf`,
+                image: `${this.hostPath}/essay-planning-review.png`,
+              },
+            ]
+            break
+          case 'essayFeedback':
+            this.reviewMaterials = [
+              {
+                title: 'Essay Feedback Review Guide',
+                pdf: `${this.hostPath}/essay-feedback-review.pdf`,
+                image: `${this.hostPath}/essay-feedback-review.png`,
+              },
+            ]
+            break
+          // case for a user entering a subject that we do not support
+          default:
+            this.error = true
+            break
+        }
       }
     },
     getReviewMaterials() {
       // Receives no content - used for tracking user actions
-      NetworkService.getReviewMaterials(this, this.category)
+      NetworkService.getReviewMaterials(this.category)
     },
     getConceptReviewPath(ext) {
       return `${
@@ -258,12 +264,20 @@ export default {
     },
   },
   computed: {
+    ...mapState({
+      subjects: state => state.subjects.subjects,
+    }),
     ...mapGetters({
       allSubtopics: 'subjects/allSubtopics',
+      isSubjectsDatabaseHydrationActive:
+        'featureFlags/isSubjectsDatabaseHydrationActive',
     }),
     categoryDisplayName() {
-      const subtopics = this.allSubtopics
-      if (this.category) return subtopics[this.category].displayName
+      const subtopics = this.isSubjectsDatabaseHydrationActive
+        ? this.subjects
+        : this.allSubtopics
+      if (this.category && subtopics[this.category])
+        return subtopics[this.category].displayName
 
       return ''
     },

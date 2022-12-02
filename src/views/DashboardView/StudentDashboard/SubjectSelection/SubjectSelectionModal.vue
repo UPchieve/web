@@ -15,7 +15,7 @@
       <img
         v-else-if="!mobileMode && typeof modalData.svg === 'string'"
         :src="modalData.svg"
-        :alt="`${this.modalData.topic} icon`"
+        :alt="`${this.modalData.title} icon`"
         class="icon"
       />
 
@@ -72,29 +72,30 @@ export default {
     ...mapState({
       isMobileApp: state => state.app.isMobileApp,
       user: state => state.user.user,
-      isTopicSkippingSurvey() {
-        return (
-          this.modalData.topic === 'college' ||
-          this.modalData.topic === 'readingWriting' ||
-          this.modalData.topic === 'sat'
-        )
-      },
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
+      isSubjectsDatabaseHydrationActive:
+        'featureFlags/isSubjectsDatabaseHydrationActive',
     }),
     title() {
-      if (this.modalData.topic === 'college')
-        return `Choose a ${this.modalData.topic} counseling subject`
-      if (this.modalData.topic === 'sat')
-        return 'Choose a standardized testing subject'
-      if (this.modalData.topic === 'readingWriting')
-        return 'Choose a reading and writing subject'
-      if (this.modalData.topic === 'socialStudies')
-        return `Choose a social studies subject`
-      return this.modalData.topic
-        ? `Choose a ${this.modalData.topic} subject`
-        : 'Choose a subject'
+      if (this.modalData.title && this.isSubjectsDatabaseHydrationActive) {
+        return `Choose a${
+          this.startsWithVowel(this.modalData.title) ? 'n' : ''
+        } ${this.modalData.title} subject`
+      } else {
+        if (this.modalData.topic === 'college')
+          return `Choose a ${this.modalData.topic} counseling subject`
+        if (this.modalData.topic === 'sat')
+          return 'Choose a standardized testing subject'
+        if (this.modalData.topic === 'readingWriting')
+          return 'Choose a reading and writing subject'
+        if (this.modalData.topic === 'socialStudies')
+          return `Choose a social studies subject`
+        return this.modalData.topic
+          ? `Choose a ${this.modalData.topic} subject`
+          : 'Choose a subject'
+      }
     },
   },
   mounted() {
@@ -131,6 +132,9 @@ export default {
     },
     onSurveyCompleted() {
       startSession(this.$router, this.modalData.topic, this.selectedSubtopic)
+    },
+    startsWithVowel(word) {
+      return /[AEIOUaeiou]/i.test(word[0])
     },
   },
 }
