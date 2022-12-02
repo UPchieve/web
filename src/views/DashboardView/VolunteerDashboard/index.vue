@@ -204,35 +204,45 @@ export default {
       const isNowLoaded = currValue.length && !prevValue.length
       if (isNowLoaded) this.initImpactSummary()
     },
+    isDashboardBannerActive: {
+      handler() {
+        const englishAndCollegeAdvisingLaunchDate = '2022-11-17T00:00:00.000Z'
+        const newEnglishAndCollegeSubjects = [
+          'essayPlanning',
+          'essayFeedback',
+          'collegePrep',
+          'collegeList',
+          'collegeApps',
+          'applicationEssays',
+          'financialAid',
+        ]
+        const hasUnlockedAllNewEnglishAndCollegeSubjects = newEnglishAndCollegeSubjects.every(
+          subject => this.user.certifications[subject].passed
+        )
+
+        if (this.isSessionAlive) {
+          this.$store.dispatch('app/header/show', rejoinHeaderData)
+        } else if (
+          this.isDashboardBannerActive &&
+          new Date(this.user.createdAt).getTime() <=
+            new Date(englishAndCollegeAdvisingLaunchDate).getTime() &&
+          new Date().getTime() <
+            new Date('2023-01-01T00:00:00.000Z').getTime() &&
+          !hasUnlockedAllNewEnglishAndCollegeSubjects
+        ) {
+          this.$store.dispatch('app/header/show', dashboardBannerData)
+        }
+      },
+      immediate: true,
+    },
   },
   async created() {
-    const englishAndCollegeAdvisingLaunchDate = '2022-11-17T00:00:00.000Z'
-    const newEnglishAndCollegeSubjects = [
-      'essayPlanning',
-      'essayFeedback',
-      'collegePrep',
-      'collegeList',
-      'collegeApps',
-      'applicationEssays',
-      'financialAid',
-    ]
-    const hasUnlockedAllNewEnglishAndCollegeSubjects = newEnglishAndCollegeSubjects.every(
-      subject => this.user.certifications[subject].passed
-    )
-    if (this.isSessionAlive) {
-      this.$store.dispatch('app/header/show', rejoinHeaderData)
-    } else if (
-      this.isDashboardBannerActive &&
-      new Date(this.user.createdAt).getTime() <=
-        new Date(englishAndCollegeAdvisingLaunchDate).getTime() &&
-      new Date().getTime() < new Date('2023-01-01T00:00:00.000Z').getTime() &&
-      !hasUnlockedAllNewEnglishAndCollegeSubjects
-    ) {
-      this.$store.dispatch('app/header/show', dashboardBannerData)
-    }
-
     if (this.isFirstDashboardVisit) {
       this.toggleWelcomeModal()
+    }
+
+    if (this.isSessionAlive) {
+      this.$store.dispatch('app/header/show', rejoinHeaderData)
     }
 
     this.initImpactSummary()
