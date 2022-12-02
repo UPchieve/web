@@ -170,7 +170,7 @@ export default {
           width: '300px',
           height: '300px',
           display: 'flex',
-          backgroundSize: '100%',
+          backgroundSize: 'contain',
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center',
         }
