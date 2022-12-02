@@ -52,9 +52,8 @@ export default {
       }
     },
   },
-  // TODO: these getters are likely to change once we are
-  // hydrating from the database
   getters: {
+    // TODO: remove in subjects-database-hydration flag cleanup
     allSubtopics: state => {
       let subtopicObj = {}
 
@@ -69,8 +68,12 @@ export default {
 
       return subtopicObj
     },
-    allSubtopicNames: (state, getters) => {
-      return Object.keys(getters.allSubtopics)
+    allSubtopicNames: (state, getters, rootState, rootGetters) => {
+      if (rootGetters['featureFlags/isSubjectsDatabaseHydrationActive']) {
+        return Object.keys(state.subjects)
+      }
+      // TODO: remove in subjects-database-hydration flag cleanup
+      else return Object.keys(getters.allSubtopics)
     },
   },
 }

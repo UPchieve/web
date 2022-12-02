@@ -161,6 +161,7 @@ export default {
             backText: 'Dashboard',
             acceptText: this.topic === 'college' ? 'Start a chat' : 'Continue',
             topic: this.topic,
+            title: this.title,
             subtopics: this.subtopics,
             subtopicDisplayNames: this.subtopicDisplayNames,
             svg: this.svg,
