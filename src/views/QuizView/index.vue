@@ -77,16 +77,12 @@ import QuizQuestions from './QuizQuestions'
 import QuizResults from './QuizResults'
 import QuizReview from './QuizReview'
 
-import isPhysics from '@/utils/is-physics'
-import { PHYSICS_MAPPING, EVENTS } from '@/consts'
+import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 
 export default {
   data() {
     let category = Case.camel(this.$route.params.category)
-
-    // format physics from lowercase 'physicsone' -> 'physicsOne'
-    if (isPhysics(category)) category = PHYSICS_MAPPING[category]
 
     return {
       category,

@@ -9,10 +9,6 @@ export const APP_STORE_LINK =
 export const GOOGLE_PLAY_STORE_LINK =
   'https://play.google.com/store/apps/details?id=org.upchieve.mobile'
 
-export const PHYSICS_MAPPING = {
-  physicsone: 'physicsOne',
-}
-
 export const CDN_URL = 'https://upchievecdn.blob.core.windows.net'
 
 export const DOCS_URL = `${CDN_URL}/docs`
