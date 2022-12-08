@@ -1,24 +1,24 @@
 <template>
   <div class="wrapper">
-    <div v-if="error">
-      <p class="error-message">
-        Please click
-        <router-link to="/training">
-          here
-        </router-link>
-        to see our available categories and their associated review materials.
-      </p>
-    </div>
-    <div v-else-if="reviewMaterials.length === 0">
+    <div class="review-materials__container">
       <h1 class="header-title">{{ categoryDisplayName }} Review Materials</h1>
-      <p class="error-message">
-        Sorry, review materials for {{ categoryDisplayName }} are currently
-        under development. Check back soon!
-      </p>
-    </div>
-    <div v-else>
-      <h1 class="header-title">{{ categoryDisplayName }} Review Materials</h1>
-      <div class="review-materials">
+      <loader v-if="isLoadingMaterials" class="loader--center" />
+      <div v-else-if="error">
+        <p class="error-message">
+          Please try refreshing the page or click
+          <router-link to="/training">
+            here
+          </router-link>
+          to see our available categories and their associated review materials.
+        </p>
+      </div>
+      <div v-else-if="reviewMaterials.length === 0">
+        <p class="error-message">
+          Sorry, review materials for {{ categoryDisplayName }} are currently
+          under development. Check back soon!
+        </p>
+      </div>
+      <div class="review-materials" v-else>
         <a
           target="_blank"
           rel="noopener noreferrer"
@@ -47,17 +47,19 @@ import { mapState, mapGetters } from 'vuex'
 import Case from 'case'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
-import isPhysics from '@/utils/is-physics'
-import { PHYSICS_MAPPING, EVENTS } from '@/consts'
+import { EVENTS } from '@/consts'
+import { backOff } from 'exponential-backoff'
+import Loader from '@/components/Loader'
 
 export default {
-  components: {},
+  components: { Loader },
   data() {
     return {
       reviewMaterials: [],
       category: '',
       error: false,
       hostPath: `https://cdn.upchieve.org/review-materials`,
+      isLoadingMaterials: false,
     }
   },
   mounted() {
@@ -69,9 +71,6 @@ export default {
       subject: this.category,
     })
 
-    // format physics from lowercase 'physicsone' -> 'physicsOne'
-    if (isPhysics(category)) this.category = PHYSICS_MAPPING[category]
-
     this.getCategoryMaterials()
     //TODO: remove below in subjects-database-hydration flag cleanup
     if (!this.error && !this.isSubjectsDatabaseHydrationActive) {
@@ -81,8 +80,17 @@ export default {
   methods: {
     async getCategoryMaterials() {
       if (this.isSubjectsDatabaseHydrationActive) {
-        const materials = await NetworkService.getReviewMaterials(this.category)
-        this.reviewMaterials = materials.body
+        try {
+          this.isLoadingMaterials = true
+          const materials = await backOff(() =>
+            NetworkService.getReviewMaterials(this.category)
+          )
+          this.reviewMaterials = materials.body
+        } catch (error) {
+          this.error = true
+        } finally {
+          this.isLoadingMaterials = false
+        }
       } else {
         // TODO: remove below in subjects-database-hydration flag cleanup
         switch (this.category) {
@@ -308,6 +316,11 @@ export default {
   flex-flow: row wrap;
   padding-left: 0;
 
+  &__container {
+    display: flex;
+    flex-direction: column;
+  }
+
   &__link {
     margin-right: 2em;
     display: block;
@@ -359,6 +372,10 @@ export default {
 
 .error-message {
   font-size: 16px;
+}
+
+.loader--center {
+  align-self: center;
 }
 
 @media screen and (max-width: 760px) {

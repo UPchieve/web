@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import Case from 'case'
 
 export default {
@@ -42,13 +42,22 @@ export default {
   mounted() {
     const { category } = this.$route.params
     this.category = category
-    const isTrainingCategory = Object.keys(
-      this.subjects.training.subtopics
-    ).includes(category)
+
+    let isTrainingSubject
+    if (this.isSubjectsDatabaseHydrationActive) {
+      const subject = Case.camel(this.$route.params.category)
+      this.category = subject
+      isTrainingSubject = this.quizResults.isTrainingSubject
+    }
+    // TODO: remove below in subject-database-hydration flag cleanup
+    else
+      isTrainingSubject = Object.keys(
+        this.subjects.training.subtopics
+      ).includes(category)
 
     if (this.quizResults.passed) {
       this.headerMsg = 'What a rockstar! You passed!'
-      this.instructionMsg = isTrainingCategory
+      this.instructionMsg = isTrainingSubject
         ? "Now that you have this certification, you're one step closer to being able to help students!"
         : "Now that you have this certification, you'll be notified of student requests for help in this subject. If you want to help students with even more subjects, just pass more quizzes!"
       this.popUpBorderStyle = {
@@ -62,7 +71,7 @@ export default {
       }
     } else {
       this.headerMsg = "You failed this time, but don't give up!"
-      this.instructionMsg = isTrainingCategory
+      this.instructionMsg = isTrainingSubject
         ? 'Please try taking this quiz again after reviewing your incorrect answers and checking out the training course materials again.'
         : 'Please try taking this quiz again after reviewing your incorrect answers and checking out the subject-specific review materials we provide on the Training page.'
       this.popUpBorderStyle = {
@@ -90,6 +99,11 @@ export default {
   computed: {
     ...mapState({
       subjects: state => state.subjects.subjects,
+      training: state => state.subjects.training,
+    }),
+    ...mapGetters({
+      isSubjectsDatabaseHydrationActive:
+        'featureFlags/isSubjectsDatabaseHydrationActive',
     }),
   },
 }
