@@ -498,7 +498,11 @@ export default {
       .get(`${ELIGIBILITY_API_ROOT}/zip-codes/${zipCode}`)
       .then(this._successHandler, this._errorHandler)
   },
-
+  adminGetUserIdFromEmail(email) {
+    return Vue.http
+      .get(`${API_ROOT}/user/email/${email}`)
+      .then(this._successHandler, this._errorHandler)
+  },
   getQuestions(context, data) {
     return context.$http
       .post(`${API_ROOT}/training/questions`, data)

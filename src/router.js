@@ -44,6 +44,7 @@ import VerificationView from './views/VerificationView'
 import VolunteerPartnerSignupView from './views/VolunteerPartnerSignupView'
 import SessionHistoryView from './views/SessionHistoryView'
 import SessionRecapView from './views/SessionRecapView'
+import AdminTestAudience from './views/Admin/AdminTestAudience'
 
 Vue.use(VueResource)
 Vue.http.options.credentials = true
@@ -378,6 +379,12 @@ const routes = [
     component: () => {
       window.location.href = '/edu'
     },
+  },
+  {
+    path: '/admin/test-audience',
+    name: 'AdminTestAudience',
+    component: AdminTestAudience,
+    meta: { protected: true, requiresAdmin: true },
   },
 ]
 
