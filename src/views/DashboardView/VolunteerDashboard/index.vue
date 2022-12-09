@@ -40,7 +40,9 @@
 
           <div class="volunteer-impact">
             <div class="volunteer-impact__stats">
+              <loader v-if="isLoadingImpactSummary" class="loader--center" />
               <div
+                v-else
                 v-for="(stat, statIndex) in impactStats"
                 :key="statIndex"
                 class="volunteer-impact__stat"
@@ -164,6 +166,7 @@ import WebNotificationsButton from '@/components/WebNotificationsButton.vue'
 import ArrowIcon from '@/assets/arrow.svg'
 import NetworkService from '../../../services/NetworkService'
 import config from '../../../config'
+import Loader from '@/components/Loader'
 
 const defaultHeaderData = {
   component: 'DefaultHeader',
@@ -190,6 +193,7 @@ export default {
     VolunteerWelcomeModal,
     WebNotificationsButton,
     ArrowIcon,
+    Loader,
   },
 
   watch: {
@@ -200,9 +204,12 @@ export default {
         this.$store.dispatch('app/header/show', rejoinHeaderData)
       }
     },
-    allSubjectNames(currValue, prevValue) {
-      const isNowLoaded = currValue.length && !prevValue.length
-      if (isNowLoaded) this.initImpactSummary()
+    allSubjectNames: {
+      handler(currValue, prevValue) {
+        const isNowLoaded = currValue.length && !prevValue?.length
+        if (isNowLoaded) this.initImpactSummary()
+      },
+      immediate: true,
     },
     isDashboardBannerActive: {
       handler() {
@@ -244,8 +251,6 @@ export default {
     if (this.isSessionAlive) {
       this.$store.dispatch('app/header/show', rejoinHeaderData)
     }
-
-    this.initImpactSummary()
   },
   data() {
     return {
@@ -254,6 +259,7 @@ export default {
       showWelcomeModal: false,
       lastUpdated: '',
       impactStats: {},
+      isLoadingImpactSummary: true,
     }
   },
   computed: {
@@ -713,10 +719,14 @@ export default {
       ]
     },
     async initImpactSummary() {
-      if (this.isCustomVolunteerPartner) {
-        this.impactStats = await this.getCustomImpactStats()
-        this.lastUpdated = await this.getLastUpdated()
-      } else this.impactStats = await this.getImpactStats()
+      try {
+        if (this.isCustomVolunteerPartner) {
+          this.impactStats = await this.getCustomImpactStats()
+          this.lastUpdated = await this.getLastUpdated()
+        } else this.impactStats = await this.getImpactStats()
+      } finally {
+        this.isLoadingImpactSummary = false
+      }
     },
   },
 }
@@ -923,6 +933,10 @@ export default {
 }
 
 .rejoin-session-container {
+  text-align: center;
+}
+
+.loader--center {
   text-align: center;
 }
 </style>
