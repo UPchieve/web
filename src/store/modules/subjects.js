@@ -68,12 +68,8 @@ export default {
 
       return subtopicObj
     },
-    allSubtopicNames: (state, getters, rootState, rootGetters) => {
-      if (rootGetters['featureFlags/isSubjectsDatabaseHydrationActive']) {
-        return Object.keys(state.subjects)
-      }
-      // TODO: remove in subjects-database-hydration flag cleanup
-      else return Object.keys(getters.allSubtopics)
+    allSubtopicNames: state => {
+      return Object.keys(state.subjects)
     },
   },
 }

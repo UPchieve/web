@@ -140,24 +140,15 @@
             :key="`certification-${key}-${value}`"
           >
             <div v-if="value" class="certBox">
-              <template v-if="isSubjectsDatabaseHydrationActive">
-                <div
-                  :style="{ backgroundColor: subjects[key].topicColor }"
-                  class="certKey"
-                >
-                  {{ subjects[key].topicDisplayName.toUpperCase() }}
-                </div>
-                <div class="certValue">
-                  {{ subjects[key].displayName }}
-                </div>
-              </template>
-              <!-- TODO: remove below in subjects-database-hydration flag cleanup -->
-              <template v-else>
-                <div :class="certKey[key]" class="certKey">
-                  {{ certKey[key] }}
-                </div>
-                <div class="certValue">{{ key }}</div>
-              </template>
+              <div
+                :style="{ backgroundColor: subjects[key].topicColor }"
+                class="certKey"
+              >
+                {{ subjects[key].topicDisplayName.toUpperCase() }}
+              </div>
+              <div class="certValue">
+                {{ subjects[key].displayName }}
+              </div>
             </div>
           </div>
         </div>
@@ -225,8 +216,6 @@ export default {
       avatarUrl: 'user/avatarUrl',
       allSubtopics: 'subjects/allSubtopics',
       isFilterActiveSubjectsActive: 'featureFlags/isFilterActiveSubjectsActive',
-      isSubjectsDatabaseHydrationActive:
-        'featureFlags/isSubjectsDatabaseHydrationActive',
     }),
     name() {
       const user = this.$store.state.user.user
@@ -268,25 +257,11 @@ export default {
         ? user.activeSubjects
         : user.subjects
 
-      if (this.isSubjectsDatabaseHydrationActive) {
-        const subjects = {}
-        for (const subject of userSubjects) {
-          subjects[subject] = true
-        }
-        return subjects
-      } else {
-        // TODO: remove below in subjects-database-hydration flag cleanup
-        const subjects = userSubjects.reduce((displayObj, key) => {
-          const subtopics = this.allSubtopics
-          if (subtopics[key]) {
-            displayObj[subtopics[key].displayName || subtopics[key]] = true
-          }
-
-          return displayObj
-        }, {})
-
-        return subjects
+      const subjects = {}
+      for (const subject of userSubjects) {
+        subjects[subject] = true
       }
+      return subjects
     },
     isNotificationPermissionGranted() {
       return 'Notification' in window && Notification.permission === 'granted'

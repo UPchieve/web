@@ -75,27 +75,13 @@ export default {
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
-      isSubjectsDatabaseHydrationActive:
-        'featureFlags/isSubjectsDatabaseHydrationActive',
     }),
     title() {
-      if (this.modalData.title && this.isSubjectsDatabaseHydrationActive) {
+      if (this.modalData.title)
         return `Choose a${
           this.startsWithVowel(this.modalData.title) ? 'n' : ''
         } ${this.modalData.title} subject`
-      } else {
-        if (this.modalData.topic === 'college')
-          return `Choose a ${this.modalData.topic} counseling subject`
-        if (this.modalData.topic === 'sat')
-          return 'Choose a standardized testing subject'
-        if (this.modalData.topic === 'readingWriting')
-          return 'Choose a reading and writing subject'
-        if (this.modalData.topic === 'socialStudies')
-          return `Choose a social studies subject`
-        return this.modalData.topic
-          ? `Choose a ${this.modalData.topic} subject`
-          : 'Choose a subject'
-      }
+      return ''
     },
   },
   mounted() {

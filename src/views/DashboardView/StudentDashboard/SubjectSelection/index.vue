@@ -13,7 +13,7 @@
     </p>
     <subject-card
       v-else
-      v-for="(card, index) in filteredCards"
+      v-for="(card, index) in cards"
       v-bind:key="index"
       :title="card.title"
       :subtitle="card.subtitle"
@@ -31,15 +31,9 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import SubjectCard from './SubjectCard'
-import MathSVG from '@/assets/subject_icons/math.svg'
-import CollegeSVG from '@/assets/subject_icons/college-counseling.svg'
-import ScienceSVG from '@/assets/subject_icons/science.svg'
-import SATSVG from '@/assets/subject_icons/sat.svg'
-import ReadingWritingSVG from '@/assets/subject_icons/more-resources.svg'
 import calculateWaitingPeriodCountdown from '@/utils/calculate-waiting-period-countdown'
 import ReferralSVG from '@/assets/dashboard_icons/student/referral.svg'
 import LightBulbSVG from '@/assets/dashboard_icons/student/light-bulb.svg'
-import SocialStudiesSVG from '@/assets/subject_icons/social-studies.svg'
 import Loader from '@/components/Loader.vue'
 
 const defaultHeaderData = {
@@ -70,10 +64,6 @@ export default {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
       isSessionAlive: 'user/isSessionAlive',
-      isStudentCollegeRevampActive: 'featureFlags/isStudentCollegeRevampActive',
-      isStudentEnglishRevampActive: 'featureFlags/isStudentEnglishRevampActive',
-      isSubjectsDatabaseHydrationActive:
-        'featureFlags/isSubjectsDatabaseHydrationActive',
     }),
     waitingPeriodMessage() {
       const countdown = calculateWaitingPeriodCountdown(
@@ -84,86 +74,42 @@ export default {
       return `You must wait at least ${countdown} ${minuteTextFormat} before requesting a new session.`
     },
     cards() {
-      const svgs = {
-        math: MathSVG,
-        college: CollegeSVG,
-        science: ScienceSVG,
-        readingWriting: ReadingWritingSVG,
-        sat: SATSVG,
-        socialStudies: SocialStudiesSVG,
-      }
-
-      const topicOrderMapping = {
-        math: 0,
-        readingWriting: 1,
-        science: 2,
-        socialStudies: 3,
-        college: 4,
-        sat: 5,
-      }
-
-      let cards = []
-      if (this.isSubjectsDatabaseHydrationActive) {
-        const topicCards = {}
-        for (const subject of Object.values(this.subjects)) {
-          const { topicName } = subject
-          if (!topicCards[topicName])
-            topicCards[topicName] = {
-              topic: subject.topicName,
-              title: subject.topicDisplayName,
-              subjects: [],
-              subtopics: [],
-              subtopicDisplayNames: {},
-              svg: subject.topicIconLink,
-              order: subject.topicDashboardOrder,
-              isTutoringCard: true,
-            }
-          // Create a list of subjects that a topic has
-          if (subject.active)
-            topicCards[topicName].subjects.push({
-              name: subject.name,
-              id: subject.id,
-              displayName: subject.displayName,
-              displayOrder: subject.displayOrder,
-            })
-        }
-
-        // Sort the subjects for each topic and pull out their key
-        // along with their display name
-        for (const topicData of Object.values(topicCards)) {
-          topicData.subjects.sort((a, b) => a.displayOrder - b.displayOrder)
-          for (const subject of topicData.subjects) {
-            topicData.subtopics.push(subject.name)
-            topicData.subtopicDisplayNames[subject.name] = subject.displayName
+      const cards = []
+      const topicCards = {}
+      for (const subject of Object.values(this.subjects)) {
+        const { topicName } = subject
+        if (!subject.active) continue
+        if (!topicCards[topicName])
+          topicCards[topicName] = {
+            topic: subject.topicName,
+            title: subject.topicDisplayName,
+            subjects: [],
+            subtopics: [],
+            subtopicDisplayNames: {},
+            svg: subject.topicIconLink,
+            order: subject.topicDashboardOrder,
+            isTutoringCard: true,
           }
-          cards.push(topicData)
-        }
-        cards.sort((a, b) => a.order - b.order)
-      } else {
-        // TODO: remove below in subjects-database-hydration flag cleanup
-        cards = Object.entries(this.subjects)
-          .filter(([key]) => key !== 'training')
-          .map(([key, topicObj]) => {
-            return {
-              title: topicObj.displayName,
-              svg: svgs[key],
-              topic: key,
-              subtopics: Object.keys(topicObj.subtopics),
-              subtopicDisplayNames: Object.entries(topicObj.subtopics)
-                .map(([subtopicKey, subtopicObj]) => [
-                  subtopicKey,
-                  subtopicObj.displayName,
-                ])
-                .reduce((result, [subtopicKey, displayName]) => {
-                  result[subtopicKey] = displayName
-                  return result
-                }, {}),
-              isTutoringCard: true,
-              order: topicOrderMapping[key],
-            }
-          })
-          .sort((a, b) => a.order - b.order)
+        // Create a list of subjects that a topic has
+        topicCards[topicName].subjects.push({
+          name: subject.name,
+          id: subject.id,
+          displayName: subject.displayName,
+          displayOrder: subject.displayOrder,
+        })
       }
+
+      // Sort the subjects for each topic and pull out their key
+      // along with their display name
+      for (const topicData of Object.values(topicCards)) {
+        topicData.subjects.sort((a, b) => a.displayOrder - b.displayOrder)
+        for (const subject of topicData.subjects) {
+          topicData.subtopics.push(subject.name)
+          topicData.subtopicDisplayNames[subject.name] = subject.displayName
+        }
+        cards.push(topicData)
+      }
+      cards.sort((a, b) => a.order - b.order)
 
       cards.push({
         title: 'Give Feedback',
@@ -180,66 +126,6 @@ export default {
         svg: ReferralSVG,
         buttonText: 'Learn More',
       })
-      return cards
-    },
-
-    filteredCards() {
-      const cards = [...this.cards]
-      for (const card of cards) {
-        // Temporarily hide Statistics and Calculus BC from students
-        if (card.topic === 'math')
-          card.subtopics = card.subtopics.filter(subject => {
-            const temporarilyHiddenSubjects = ['calculusBC']
-            return !temporarilyHiddenSubjects.includes(subject)
-          })
-
-        // Temporarily hide Physics 2 subject from students
-        if (card.topic === 'science')
-          card.subtopics = card.subtopics.filter(subject => {
-            const temporarilyHiddenSubjects = ['physicsTwo']
-            return !temporarilyHiddenSubjects.includes(subject)
-          })
-
-        if (card.topic === 'college' && !this.isStudentCollegeRevampActive)
-          card.subtopics = card.subtopics.filter(subject => {
-            const temporarilyHiddenSubjects = [
-              'collegePrep',
-              'collegeList',
-              'collegeApps',
-              'applicationEssays',
-              'financialAid',
-            ]
-            return !temporarilyHiddenSubjects.includes(subject)
-          })
-        // TODO: Remove in the student-college-revamp feature flag cleanup
-        else if (card.topic === 'college' && this.isStudentCollegeRevampActive)
-          card.subtopics = card.subtopics.filter(subject => {
-            const temporarilyHiddenSubjects = [
-              'essays',
-              'planning',
-              'applications',
-            ]
-            return !temporarilyHiddenSubjects.includes(subject)
-          })
-
-        if (
-          card.topic === 'readingWriting' &&
-          !this.isStudentEnglishRevampActive
-        )
-          card.subtopics = card.subtopics.filter(subject => {
-            const temporarilyHiddenSubjects = ['essayPlanning', 'essayFeedback']
-            return !temporarilyHiddenSubjects.includes(subject)
-          })
-        // TODO: Remove in the student-english-revamp feature flag cleanup
-        else if (
-          card.topic === 'readingWriting' &&
-          this.isStudentEnglishRevampActive
-        )
-          card.subtopics = card.subtopics.filter(subject => {
-            const temporarilyHiddenSubjects = ['humanitiesEssays']
-            return !temporarilyHiddenSubjects.includes(subject)
-          })
-      }
       return cards
     },
   },

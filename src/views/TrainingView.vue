@@ -76,7 +76,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import AccordionItem from '@/components/AccordionItem'
 import TrainingDropDown from '@/components/TrainingDropDown'
 import SubjectCertsDropDown from '@/components/SubjectCertsDropDown'
@@ -109,60 +109,8 @@ export default {
       isFetchingTraining: state => state.subjects.isFetchingTraining,
       fetchingTrainingError: state => state.subjects.fetchingTrainingError,
     }),
-    ...mapGetters({
-      isVolunteerCollegeRevampActive:
-        'featureFlags/isVolunteerCollegeRevampActive',
-      isVolunteerEnglishRevampActive:
-        'featureFlags/isVolunteerEnglishRevampActive',
-    }),
     currentSubject() {
-      const currentTrainingSubject = this.training[this.currentSubjectType]
-
-      // TODO: remove in volunteer-college-revamp feature flag cleanup
-      if (
-        this.isVolunteerCollegeRevampActive &&
-        this.currentSubjectType === 'college'
-      ) {
-        const subjectsToShow = [
-          'collegePrep',
-          'collegeList',
-          'collegeApps',
-          'applicationEssays',
-          'financialAid',
-        ]
-        currentTrainingSubject.certifications = currentTrainingSubject.certifications.filter(
-          training => subjectsToShow.includes(training.key)
-        )
-      } else if (
-        !this.isVolunteerCollegeRevampActive &&
-        this.currentSubjectType === 'college'
-      ) {
-        const subjectsToShow = ['applications', 'planning', 'essays']
-        currentTrainingSubject.certifications = currentTrainingSubject.certifications.filter(
-          training => subjectsToShow.includes(training.key)
-        )
-      }
-
-      // TODO: remove in volunteer-english-revamp feature flag cleanup
-      if (
-        this.isVolunteerEnglishRevampActive &&
-        this.currentSubjectType === 'readingWriting'
-      ) {
-        const subjectsToShow = ['reading', 'essayPlanning', 'essayFeedback']
-        currentTrainingSubject.certifications = currentTrainingSubject.certifications.filter(
-          training => subjectsToShow.includes(training.key)
-        )
-      } else if (
-        !this.isVolunteerEnglishRevampActive &&
-        this.currentSubjectType === 'readingWriting'
-      ) {
-        const subjectsToShow = ['reading', 'humanitiesEssays']
-        currentTrainingSubject.certifications = currentTrainingSubject.certifications.filter(
-          training => subjectsToShow.includes(training.key)
-        )
-      }
-
-      return currentTrainingSubject
+      return this.training[this.currentSubjectType]
     },
     // get the amount of required training material a user must complete
     requiredTrainingMessage() {

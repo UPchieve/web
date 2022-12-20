@@ -165,7 +165,6 @@ export default {
       isSessionInProgress: 'user/isSessionInProgress',
       isSessionOver: 'user/isSessionOver',
       isChatbotActive: 'featureFlags/isChatbotActive',
-      isPostsessionSurveyActive: 'featureFlags/isPostsessionSurveyActive',
     }),
 
     partnerAvatar() {
