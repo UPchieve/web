@@ -6,6 +6,7 @@
       <div :style="loaderStyle"></div>
       <div :style="loaderStyle"></div>
     </div>
+    <div v-if="message" class="message" :style="{ 'margin-top': `${(height + 45)}px`, 'position': 'absolute' }">{{ message }}</div>
   </div>
 </template>
 
@@ -15,6 +16,7 @@ export default {
     overlay: Boolean,
     height: { type: Number, default: 64 },
     width: { type: Number, default: 64 },
+    message: String
   },
   computed: {
     loaderStyle() {
