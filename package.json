@@ -70,14 +70,14 @@
   "devDependencies": {
     "cypress-file-upload": "^4.0.7",
     "cypress": "^3.8.3",
-    "vue-jest": "^3.0.5",
+    "vue-jest": "^4.0.1",
     "webpack-bundle-analyzer": "^3.7.0",
     "@trevoreyre/autocomplete-vue": "^2.0.2",
-    "@vue/cli-plugin-babel": "^3.9.0",
+    "@vue/cli-plugin-babel": "^5.0.8",
     "@vue/cli-plugin-e2e-cypress": "^3.9.0",
     "@vue/cli-plugin-eslint": "^3.9.0",
-    "@vue/cli-plugin-unit-jest": "^3.9.0",
-    "@vue/cli-service": "^4.3.1",
+    "@vue/cli-plugin-unit-jest": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
     "@vue/eslint-config-prettier": "^4.0.1",
     "@vue/test-utils": "1.0.0-beta.29"
   }
