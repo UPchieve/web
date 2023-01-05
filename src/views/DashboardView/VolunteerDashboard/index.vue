@@ -305,7 +305,7 @@ export default {
           }
         case 'SUBMITTED':
           return {
-            subtitle: 'Pending review',
+            subtitle: 'Reviewed after references submit',
             status: 'PENDING',
           }
         case 'APPROVED':
