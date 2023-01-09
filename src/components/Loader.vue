@@ -6,7 +6,7 @@
       <div :style="loaderStyle"></div>
       <div :style="loaderStyle"></div>
     </div>
-    <div v-if="message" class="message" :style="{ 'margin-top': `${(height + 45)}px`, 'position': 'absolute' }">{{ message }}</div>
+    <div v-if="message" class="message">{{ message }}</div>
   </div>
 </template>
 
@@ -71,7 +71,7 @@ export default {
 }
 
 .overlay {
-  @include flex-container(row, center, center);
+  @include flex-container(column, center, center);
   position: absolute;
   background-color: rgba($c-background-grey, 0.4);
   top: 0;

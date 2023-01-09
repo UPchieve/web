@@ -80,7 +80,7 @@
         </div>
       </div>
 
-      <form-footer v-if="!isMobileApp" />
+      <form-footer />
     </form>
     <loader v-if="isSubmitting" :message="loadingMessage" overlay />
   </form-page-template>
@@ -234,7 +234,7 @@ export default {
 
   &__sub-text {
     text-align: center;
-    padding-top: 20px;
+    padding-top: 1em;
   }
 
   &__sub-link {
