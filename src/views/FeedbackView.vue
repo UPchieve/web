@@ -222,7 +222,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import NetworkService from '@/services/NetworkService'
 import LargeButton from '@/components/LargeButton'
 import moment from 'moment'
@@ -265,24 +265,14 @@ export default {
       user: state => state.user.user,
       subjects: state => state.subjects.subjects,
     }),
-    ...mapGetters({
-      isSubjectsDatabaseHydrationActive:
-        'featureFlags/isSubjectsDatabaseHydrationActive',
-    }),
     sessionPartnerFirstName() {
       return this.user.isVolunteer
         ? this.session.student.firstName
         : this.session.volunteer.firstName
     },
     sessionSubject() {
-      if (this.isSubjectsDatabaseHydrationActive) {
-        const subject = this.session.subTopic
-        return this.subjects[subject].displayName
-      } else {
-        // TODO: remove below in subjects-database-hydration flag cleanup
-        const { type, subTopic } = this.session
-        return this.subjects[type].subtopics[subTopic].displayName
-      }
+      const subject = this.session.subTopic
+      return this.subjects[subject].displayName
     },
     sessionTime() {
       return moment(this.session.createdAt)

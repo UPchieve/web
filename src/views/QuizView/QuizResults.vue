@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import Case from 'case'
 
 export default {
@@ -40,20 +40,9 @@ export default {
     }
   },
   mounted() {
-    const { category } = this.$route.params
-    this.category = category
-
-    let isTrainingSubject
-    if (this.isSubjectsDatabaseHydrationActive) {
-      const subject = Case.camel(this.$route.params.category)
-      this.category = subject
-      isTrainingSubject = this.quizResults.isTrainingSubject
-    }
-    // TODO: remove below in subject-database-hydration flag cleanup
-    else
-      isTrainingSubject = Object.keys(
-        this.subjects.training.subtopics
-      ).includes(category)
+    const subject = Case.camel(this.$route.params.category)
+    this.category = subject
+    const isTrainingSubject = this.quizResults.isTrainingSubject
 
     if (this.quizResults.passed) {
       this.headerMsg = 'What a rockstar! You passed!'
@@ -100,10 +89,6 @@ export default {
     ...mapState({
       subjects: state => state.subjects.subjects,
       training: state => state.subjects.training,
-    }),
-    ...mapGetters({
-      isSubjectsDatabaseHydrationActive:
-        'featureFlags/isSubjectsDatabaseHydrationActive',
     }),
   },
 }

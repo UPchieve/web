@@ -431,16 +431,10 @@ export const UNLEASH_FEATURE_FLAGS = {
   DOWNTIME_BANNER: 'downtime-banner',
   CHATBOT: 'chatbot',
   DASHBOARD_BANNER: 'dashboard-banner',
-  POSTSESSION_SURVEY: 'postsession-survey',
-  SUBJECTS_DATABASE_HYDRATION: 'subjects-database-hydration',
 }
 
 export const POSTHOG_FEATURE_FLAGS = {
-  STUDENT_COLLEGE_REVAMP: 'student-college-revamp',
-  VOLUNTEER_COLLEGE_REVAMP: 'volunteer-college-revamp',
   FILTER_ACTIVE_SUBJECTS: 'filter-active-subjects',
-  STUDENT_ENGLISH_REVAMP: 'student-english-revamp',
-  VOLUNTEER_ENGLISH_REVAMP: 'volunteer-english-revamp',
 }
 
 export const ANALYTICS_REPORT_ROW = {

@@ -54,14 +54,8 @@ export default {
       [UNLEASH_FEATURE_FLAGS.DASHBOARD_REDESIGN]: false,
       [UNLEASH_FEATURE_FLAGS.DOWNTIME_BANNER]: false,
       [UNLEASH_FEATURE_FLAGS.CHATBOT]: false,
-      [UNLEASH_FEATURE_FLAGS.POSTSESSION_SURVEY]: false,
-      [UNLEASH_FEATURE_FLAGS.SUBJECTS_DATABASE_HYDRATION]: false,
       [UNLEASH_FEATURE_FLAGS.DASHBOARD_BANNER]: false,
-      [POSTHOG_FEATURE_FLAGS.STUDENT_COLLEGE_REVAMP]: false,
-      [POSTHOG_FEATURE_FLAGS.VOLUNTEER_COLLEGE_REVAMP]: false,
       [POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS]: false,
-      [POSTHOG_FEATURE_FLAGS.STUDENT_ENGLISH_REVAMP]: false,
-      [POSTHOG_FEATURE_FLAGS.VOLUNTEER_ENGLISH_REVAMP]: false,
     },
   },
   mutations: {
@@ -109,19 +103,7 @@ export default {
     isChatbotActive: state => state.flags[UNLEASH_FEATURE_FLAGS.CHATBOT],
     isDashboardBannerActive: state =>
       state.flags[UNLEASH_FEATURE_FLAGS.DASHBOARD_BANNER],
-    isPostsessionSurveyActive: state =>
-      state.flags[UNLEASH_FEATURE_FLAGS.POSTSESSION_SURVEY],
-    isStudentCollegeRevampActive: state =>
-      state.flags[POSTHOG_FEATURE_FLAGS.STUDENT_COLLEGE_REVAMP],
-    isVolunteerCollegeRevampActive: state =>
-      state.flags[POSTHOG_FEATURE_FLAGS.VOLUNTEER_COLLEGE_REVAMP],
     isFilterActiveSubjectsActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS],
-    isStudentEnglishRevampActive: state =>
-      state.flags[POSTHOG_FEATURE_FLAGS.STUDENT_ENGLISH_REVAMP],
-    isVolunteerEnglishRevampActive: state =>
-      state.flags[POSTHOG_FEATURE_FLAGS.VOLUNTEER_ENGLISH_REVAMP],
-    isSubjectsDatabaseHydrationActive: state =>
-      state.flags[UNLEASH_FEATURE_FLAGS.SUBJECTS_DATABASE_HYDRATION],
   },
 }

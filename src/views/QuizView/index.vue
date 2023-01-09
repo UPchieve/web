@@ -111,8 +111,6 @@ export default {
     }),
     ...mapGetters({
       allSubtopics: 'subjects/allSubtopics',
-      isSubjectsDatabaseHydrationActive:
-        'featureFlags/isSubjectsDatabaseHydrationActive',
     }),
     tries() {
       const { user } = this.$store.state.user
@@ -124,9 +122,7 @@ export default {
     },
     quizName() {
       let quizName
-      const subjects = this.isSubjectsDatabaseHydrationActive
-        ? this.subjects
-        : this.allSubtopics
+      const subjects = this.subjects
       if (this.category === 'esl') {
         quizName = this.category.toUpperCase()
       } else if (subjects[this.category]) {
