@@ -6,6 +6,7 @@
       <div :style="loaderStyle"></div>
       <div :style="loaderStyle"></div>
     </div>
+    <div v-if="message" class="message">{{ message }}</div>
   </div>
 </template>
 
@@ -15,6 +16,7 @@ export default {
     overlay: Boolean,
     height: { type: Number, default: 64 },
     width: { type: Number, default: 64 },
+    message: String
   },
   computed: {
     loaderStyle() {
@@ -69,7 +71,7 @@ export default {
 }
 
 .overlay {
-  @include flex-container(row, center, center);
+  @include flex-container(column, center, center);
   position: absolute;
   background-color: rgba($c-background-grey, 0.4);
   top: 0;

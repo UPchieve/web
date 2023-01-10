@@ -2,12 +2,6 @@
   <form-page-template>
     <form class="uc-form" aria-labelledby="verificationForm">
       <nav class="uc-form-header" aria-label="Options">
-        <span
-          class="verification__back-button"
-          @click="goBack"
-          v-if="step === 2"
-          >← Back</span
-        >
         <div
           class="uc-form-header-link verification__log-out-button"
           v-on:click="logout"
@@ -17,51 +11,26 @@
         </div>
       </nav>
       <div class="uc-form-body" v-if="step === 1">
-        <h1 class="title">
-          You’re almost there!
-        </h1>
-        <p>
-          Confirm you're not a <span v-if="showEmoji">🤖</span
-          ><span v-else>robot</span> by verifying your account. Please select
-          how you would like to receive your verification code.
-        </p>
-        <div class="verification__container">
-          <input
-            class="uc-form-input"
-            v-model="verificationMethod"
-            type="radio"
-            value="email"
-            id="verification-email"
-          />
-          <label class="verification__radio-label">
-            <span class="verification__label">By email</span>
-            <input
-              class="uc-form-input verification__field"
-              type="email"
-              v-model="email"
-              id="verification-email"
-              aria-label="Email"
-            />
-          </label>
-        </div>
-        <p v-if="error" class="error" role="alert">
-          {{ error }}
-        </p>
+        <div v-if="error">
+          <p class="error" role="alert">
+            {{ error }}
+          </p>
 
-        <button
-          class="uc-form-button"
-          type="submit"
-          @click.prevent="sendCode"
-          :disabled="!isValidForm || isSubmitting"
-        >
-          {{ sendCodeButtonText }}
-        </button>
+          <button
+            class="uc-form-button"
+            type="submit"
+            @click.prevent="sendCode"
+            :disabled="!isValidForm || isSubmitting"
+          >
+            {{ sendCodeButtonText }}
+          </button>
+        </div>
       </div>
 
       <div class="uc-form-body" v-if="step === 2">
         <p>
           We just emailed your verification code to
-          <span class="verification__send-to">{{ sendTo }}</span>
+          <span class="verification__send-to">{{ email }}</span>
         </p>
         <div class="verification__container">
           <label class="verification__radio-label">
@@ -90,6 +59,10 @@
         >
           Verify my account
         </button>
+
+        <div class="uc-form-subtext verification__sub-text">
+          Did not receive an email? <span :disabled="isSubmitting" @click.prevent="sendCode" class="verification__sub-link">Resend code</span>
+        </div>
       </div>
 
       <div v-if="step === 3" class="uc-form-body uc-form-body--center">
@@ -107,8 +80,9 @@
         </div>
       </div>
 
-      <form-footer v-if="!isMobileApp" />
+      <form-footer />
     </form>
+    <loader v-if="isSubmitting" :message="loadingMessage" overlay />
   </form-page-template>
 </template>
 
@@ -116,12 +90,13 @@
 import { mapState } from 'vuex'
 import FormPageTemplate from '@/components/FormPageTemplate'
 import FormFooter from '@/components/FormFooter'
+import Loader from '@/components/Loader'
 import AuthService from '@/services/AuthService'
 import VerificationBadge from '@/assets/verification.svg'
 import LargeButton from '@/components/LargeButton'
 import * as Sentry from '@sentry/browser'
 import AnalyticsService from '@/services/AnalyticsService'
-import { EVENTS } from '@/consts'
+import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 
 export default {
   name: 'VerificationView',
@@ -130,74 +105,63 @@ export default {
     FormFooter,
     VerificationBadge,
     LargeButton,
+    Loader,
   },
   data() {
     return {
-      verificationMethod: 'email',
       step: 1,
       verificationCode: '',
-      sendTo: '',
+      loadingMessage: '',
       error: '',
-      isSubmitting: false,
+      isSubmitting: true,
       email: '',
     }
   },
   mounted() {
     this.$store.dispatch('app/hideNavigation')
-    this.email = this.user.email || ''
+    this.email = this.user.email
+    this.sendCode(true)
   },
   computed: {
     ...mapState({
       user: state => state.user.user,
     }),
-    isValidForm() {
-      if (!this.verificationMethod) return false
-      return this.isValidEmail
-    },
     isValidVerificationCode() {
       return !(
         this.verificationCode.length !== 6 ||
         isNaN(Number(this.verificationCode))
       )
     },
-    isValidEmail() {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)
-    },
     sendCodeButtonText() {
       if (this.isSubmitting) {
         return 'Sending...'
       }
-      if (!this.isValidEmail) return 'Please enter a valid email address'
 
-      return 'Send my code'
+      return 'Resend verification code'
     },
     showEmoji() {
       return !this.user.isVolunteer
     },
   },
   methods: {
-    async sendCode() {
+    async sendCode(force) {
       this.error = ''
-      if (this.isSubmitting) return
+      if (!force && this.isSubmitting) return
       this.isSubmitting = true
-
-      if (!this.isValidForm) {
-        this.error = 'Please select your email'
-        return
-      }
-      if (this.isValidEmail) this.sendTo = this.email
-
+      this.loadingMessage = 'Sending a verification email. Please wait...'
       try {
         await AuthService.initiateVerification({
-          sendTo: this.sendTo,
-          verificationMethod: this.verificationMethod,
+          sendTo: this.email,
+          verificationMethod: VERIFICATION_METHOD.EMAIL,
         })
         this.step = 2
+        this.error = ''
       } catch (error) {
         this.handleRequestError(error)
       }
 
       this.isSubmitting = false
+      this.loadingMessage = ''
     },
     async confirmVerificationCode() {
       this.error = ''
@@ -214,8 +178,8 @@ export default {
           data: { success },
         } = await AuthService.confirmVerification({
           verificationCode: this.verificationCode,
-          sendTo: this.sendTo,
-          verificationMethod: this.verificationMethod,
+          sendTo: this.email,
+          verificationMethod: VERIFICATION_METHOD.EMAIL,
         })
         if (success) {
           AnalyticsService.captureEvent(EVENTS.ACCOUNT_VERIFIED, {
@@ -227,21 +191,16 @@ export default {
           })
           this.step = 3
         } else {
-          this.error =
-            'Please enter the most recent verification code that was sent to you'
-          this.isSubmitting = false
+          this.error = 'Please enter the most recent verification code that was sent to you'
         }
       } catch (error) {
         this.handleRequestError(error)
       }
+      this.isSubmitting = false
     },
     handleRequestError(error) {
       if (error.status !== 422) Sentry.captureException(error)
-      this.error = error.message
-    },
-    goBack() {
-      this.error = ''
-      this.step -= 1
+      this.error = error.message || 'Sorry, looks like something went wrong. Please try again in a few minutes.'
     },
     logout() {
       AuthService.logout(this)
@@ -253,10 +212,6 @@ export default {
 <style lang="scss" scoped>
 .uc-form-body {
   text-align: center;
-}
-
-.title {
-  @include font-category('display-small');
 }
 
 .subtitle {
@@ -275,6 +230,18 @@ export default {
 
   &__label {
     font-weight: 500;
+  }
+
+  &__sub-text {
+    text-align: center;
+    padding-top: 1em;
+  }
+
+  &__sub-link {
+    cursor: pointer;
+    &:hover {
+      font-weight: 500;
+    }
   }
 
   .verification-nav__button {
