@@ -20,13 +20,14 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import Quill from 'quill'
 import QuillCursors from 'quill-cursors'
 import LoadingMessage from '@/components/LoadingMessage'
 import RefreshDocumentEditorModal from '@/views/SessionView/RefreshDocumentEditorModal'
 
 Quill.register('modules/cursors', QuillCursors)
+const Delta = Quill.import('delta')
 
 export default {
   components: {
@@ -49,8 +50,21 @@ export default {
       currentSession: state => state.user.session,
       isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
     }),
+    ...mapGetters({
+      isVolunteer: 'user/isVolunteer',
+    }),
   },
   mounted() {
+    const toolbar = [
+      [{ header: [1, 2, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ color: [] }, { background: [] }],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+    ]
+
+    if (!this.isVolunteer) {
+      toolbar.push(['image'])
+    }
     this.quillEditor = new Quill('#quill-container', {
       placeholder: 'Type or paste something...',
       theme: 'snow',
@@ -63,20 +77,26 @@ export default {
         'color',
         'background',
         'list',
+        'image',
       ],
       modules: {
         cursors: {
           selectionChangeSource: 'cursor-api',
           transformOnTextChange: true,
         },
-        toolbar: [
-          [{ header: [1, 2, false] }],
-          ['bold', 'italic', 'underline', 'strike'],
-          [{ color: [] }, { background: [] }],
-          [{ list: 'ordered' }, { list: 'bullet' }],
-        ],
+        toolbar
       },
     })
+
+    if (this.isVolunteer) {
+      const useHandler = () => {
+        const delta = new Delta()
+        return delta.insert('')
+      }
+      this.quillEditor.clipboard.addMatcher('IMG', useHandler)
+      this.quillEditor.clipboard.addMatcher('PICTURE', useHandler)
+    }
+
     // do not allow user to make edits until the quill doc contents are set
     this.quillEditor.disable()
 
