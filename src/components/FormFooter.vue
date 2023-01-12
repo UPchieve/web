@@ -1,7 +1,7 @@
 <template>
   <nav class="FormFooter" aria-label="More information">
     <div>
-      <router-link to="/contact" target="_blank">Contact Us</router-link>
+      <router-link to="/contact">Contact Us</router-link>
     </div>
     <div>
       <router-link to="/legal" target="_blank">Legal Policy</router-link>

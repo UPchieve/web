@@ -95,7 +95,6 @@ import { mapGetters } from 'vuex'
 import NetworkService from '../services/NetworkService'
 import LargeButton from '@/components/LargeButton'
 import isEmail from 'validator/lib/isEmail'
-import Gleap from 'gleap'
 
 const sendStates = {
   UNSENT: 'Unsent',
@@ -172,14 +171,6 @@ export default {
         }
         if (this.isAuthenticated) {
           this.contactFormData.userId = this.$store.state.user.user._id
-        }
-
-        // send the same message to our bug ticket tracker
-        if (this.contactFormData.topic === this.contactTopics[2]) {
-          if (!this.isAuthenticated)
-            Gleap.setCustomData('email', this.contactFormData.userEmail)
-          Gleap.sendSilentCrashReport(this.contactFormData.message, 'LOW')
-          if (!this.isAuthenticated) Gleap.clearCustomData()
         }
 
         // there's not much a user can do at this point

@@ -45,6 +45,7 @@ import VolunteerPartnerSignupView from './views/VolunteerPartnerSignupView'
 import SessionHistoryView from './views/SessionHistoryView'
 import SessionRecapView from './views/SessionRecapView'
 import AdminTestAudience from './views/Admin/AdminTestAudience'
+import Gleap from 'gleap'
 
 Vue.use(VueResource)
 Vue.http.options.credentials = true
@@ -80,6 +81,19 @@ const routes = [
     name: 'ContactView',
     component: ContactView,
     meta: { authOptional: true },
+    beforeEnter: (to, from, next) => {
+      const instance = Gleap.getInstance()
+      if (instance.initialized) {
+        try {
+          Gleap.open()
+          if (!Gleap.isOpened) throw new Error('Unable to open Gleap.')
+        } catch (error) {
+          next()
+        }
+      } else {
+        next()
+      }
+    },
   },
   {
     path: '/legal',
