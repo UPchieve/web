@@ -52,6 +52,7 @@ export default {
     }),
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',
+      isReferFriendsActive: 'featureFlags/isImagesInDocumentsActive',
     }),
   },
   mounted() {
@@ -62,7 +63,7 @@ export default {
       [{ list: 'ordered' }, { list: 'bullet' }],
     ]
 
-    if (!this.isVolunteer) {
+    if (!this.isVolunteer && this.isImagesInDocumentsActive) {
       toolbar.push(['image'])
     }
     this.quillEditor = new Quill('#quill-container', {
@@ -88,7 +89,7 @@ export default {
       },
     })
 
-    if (this.isVolunteer) {
+    if (this.isVolunteer && this.isImagesInDocumentsActive) {
       const useHandler = () => {
         const delta = new Delta()
         return delta.insert('')

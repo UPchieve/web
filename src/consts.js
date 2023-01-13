@@ -426,6 +426,7 @@ export const VERIFICATION_METHOD = {
 }
 
 export const UNLEASH_FEATURE_FLAGS = {
+  IMAGES_IN_DOCUMENTS: 'images-in-documents',
   REFER_FRIENDS: 'refer-friends',
   DASHBOARD_REDESIGN: 'dashboard-redesign',
   DOWNTIME_BANNER: 'downtime-banner',

@@ -94,6 +94,8 @@ export default {
     },
   },
   getters: {
+    isImagesInDocumentsActive: state =>
+      state.flags[UNLEASH_FEATURE_FLAGS.IMAGES_IN_DOCUMENTS],
     isReferFriendsActive: state =>
       state.flags[UNLEASH_FEATURE_FLAGS.REFER_FRIENDS],
     isDashboardRedesignActive: state =>
