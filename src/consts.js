@@ -426,7 +426,6 @@ export const VERIFICATION_METHOD = {
 }
 
 export const UNLEASH_FEATURE_FLAGS = {
-  IMAGES_IN_DOCUMENTS: 'images-in-documents',
   REFER_FRIENDS: 'refer-friends',
   DASHBOARD_REDESIGN: 'dashboard-redesign',
   DOWNTIME_BANNER: 'downtime-banner',
@@ -436,6 +435,7 @@ export const UNLEASH_FEATURE_FLAGS = {
 
 export const POSTHOG_FEATURE_FLAGS = {
   FILTER_ACTIVE_SUBJECTS: 'filter-active-subjects',
+  IMAGES_IN_DOCUMENTS: 'images-in-documents',
 }
 
 export const ANALYTICS_REPORT_ROW = {

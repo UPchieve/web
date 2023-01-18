@@ -52,7 +52,7 @@ export default {
     }),
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',
-      isReferFriendsActive: 'featureFlags/isImagesInDocumentsActive',
+      isImagesInDocumentsActive: 'featureFlags/isImagesInDocumentsActive',
     }),
   },
   mounted() {

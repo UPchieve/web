@@ -56,6 +56,7 @@ export default {
       [UNLEASH_FEATURE_FLAGS.CHATBOT]: false,
       [UNLEASH_FEATURE_FLAGS.DASHBOARD_BANNER]: false,
       [POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS]: false,
+      [POSTHOG_FEATURE_FLAGS.IMAGES_IN_DOCUMENTS]: false,
     },
   },
   mutations: {
@@ -94,8 +95,6 @@ export default {
     },
   },
   getters: {
-    isImagesInDocumentsActive: state =>
-      state.flags[UNLEASH_FEATURE_FLAGS.IMAGES_IN_DOCUMENTS],
     isReferFriendsActive: state =>
       state.flags[UNLEASH_FEATURE_FLAGS.REFER_FRIENDS],
     isDashboardRedesignActive: state =>
@@ -107,5 +106,7 @@ export default {
       state.flags[UNLEASH_FEATURE_FLAGS.DASHBOARD_BANNER],
     isFilterActiveSubjectsActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS],
+    isImagesInDocumentsActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.IMAGES_IN_DOCUMENTS],
   },
 }
