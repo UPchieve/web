@@ -158,7 +158,7 @@
       />
     </div>
     <div
-      v-if="session.quillDoc"
+      v-if="isDocEditorSession"
       class="session-detail__section session-detail__section--document"
     >
       <h2 class="session-detail__section-title">Document</h2>
@@ -188,6 +188,7 @@ import Quill from 'quill'
 import SessionFlags from '@/components/Admin/SessionFlags'
 import Separator from '@/components/Separator'
 import config from '../../config'
+import { SESSION_TOOL_TYPES } from '@/consts'
 
 export default {
   name: 'AdminSessionDetail',
@@ -278,7 +279,10 @@ export default {
       return 'Desktop'
     },
     isWhiteboardSession() {
-      return this.session.type !== 'college'
+      return this.session.toolType === SESSION_TOOL_TYPES.WHITEBOARD
+    },
+    isDocEditorSession() {
+      return this.session.toolType === SESSION_TOOL_TYPES.DOCUMENT_EDITOR
     },
   },
 
@@ -290,7 +294,7 @@ export default {
 
     // Set quill document after the DOM has been updated to show session div
     this.$nextTick(async () => {
-      if (this.session.quillDoc) {
+      if (this.isDocEditorSession) {
         const container = document.querySelector('.quill-container')
         this.quillEditor = new Quill(container)
         this.quillEditor.enable(false)
