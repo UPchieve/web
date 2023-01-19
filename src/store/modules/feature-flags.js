@@ -84,14 +84,18 @@ export default {
       }
     },
     async initPostHogFlags({ commit }) {
-      try {
-        posthog.onFeatureFlags(() => {
-          const flags = posthog.featureFlags.getFlagVariants()
-          commit('setPostHogFlags', flags)
-        })
-      } catch (err) {
-        Sentry.captureException(err)
-      }
+      return await new Promise((resolve, reject) => {
+        try {
+          posthog.onFeatureFlags(() => {
+            const flags = posthog.featureFlags.getFlagVariants()
+            commit('setPostHogFlags', flags)
+            resolve()
+          })
+        } catch (err) {
+          Sentry.captureException(err)
+          reject(err)
+        }
+      })
     },
   },
   getters: {
