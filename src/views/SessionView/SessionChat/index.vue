@@ -2,7 +2,7 @@
   <div class="chat">
     <vue-headful
       :title="
-        typingIndicatorShown
+        typingIndicatorShown && isSessionConnectionAlive && isSessionAlive
           ? `${sessionPartner.firstname || 'Chatbot'} is typing...`
           : 'UPchieve'
       "
@@ -50,8 +50,9 @@
           "
           @new-bot-message="handleIncomingMessage"
         />
-        <template v-for="(message, index) in currentSession.messages">
+        <template>
           <div
+            v-for="(message, index) in currentSession.messages"
             :key="`message-${index}`"
             :class="messageAlignment(message)"
             class="message"
@@ -92,7 +93,7 @@
 
     <div class="chat-footer">
       <transition name="fade">
-        <div class="typing-indicator" v-show="typingIndicatorShown">
+        <div class="typing-indicator" v-show="typingIndicatorShown && isSessionConnectionAlive && isSessionAlive">
           {{ this.sessionPartner.firstname || 'Chatbot' }} is typing...
         </div>
       </transition>
@@ -391,7 +392,7 @@ export default {
   },
   sockets: {
     'is-typing'() {
-      this.typingIndicatorShown = true
+      this.typingIndicatorShown = this.isSessionConnectionAlive && this.isSessionAlive
     },
     'not-typing'() {
       this.typingIndicatorShown = false
