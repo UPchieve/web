@@ -1,6 +1,6 @@
 <template>
   <div class="training">
-    <template v-if="!isLargeDevice">
+    <template v-if="!isSmallDevice">
       <h3 class="training__header" v-for="header in headers" :key="header">
         {{ header }}
       </h3>
@@ -11,15 +11,15 @@
         class="training__cert"
         :key="`cert-title-${cert.displayName}-${index}`"
       >
-        <check-mark :checked="isComplete(cert.subjectsIncluded)" />
+        <check-mark :checked="isComplete(cert)" />
         <div class="training__cert-title">
           <span>{{ cert.displayName }}</span>
           <span
             class="training__status"
             :class="{
-              'training__status--completed': isComplete(cert.subjectsIncluded),
+              'training__status--completed': isComplete(cert),
             }"
-            >{{ progressStatus(cert.subjectsIncluded) }}</span
+            >{{ progressStatus(cert) }}</span
           >
         </div>
       </div>
@@ -28,8 +28,10 @@
         :key="`subjects-${cert.displayName}-${index}`"
         class="training__subjects-unlocked"
       >
-        <span v-if="isLargeDevice" class="training__subjects-unlocked--mobile"
-          >Required Certifications:</span
+        <span
+          v-if="isSmallDevice"
+          class="training__subjects-unlocked--mobile"
+          >{{ certColumnTitle }}</span
         >
         <span
           v-for="subject in cert.subjectsIncluded"
@@ -68,6 +70,10 @@ export default {
     trainingCourse: {
       type: Boolean,
     },
+    dropDownType: {
+      type: String,
+      default: 'unlocking',
+    },
   },
 
   computed: {
@@ -75,21 +81,27 @@ export default {
       user: state => state.user.user,
       windowWidth: state => state.app.windowWidth,
     }),
-    isLargeDevice() {
+    isSmallDevice() {
       const largeScreenBreakpoint = 992
 
       return this.windowWidth <= largeScreenBreakpoint
     },
+    certColumnTitle() {
+      if (this.dropDownType === 'computed') return 'Required Certifications:'
+      else return 'Alternative Certifications:'
+    },
   },
 
   methods: {
-    isComplete(includedSubjects) {
-      return includedSubjects.every(subject =>
-        this.user.subjects.includes(subject.key)
-      )
+    isComplete(cert) {
+      if (this.dropDownType === 'computed')
+        return cert.subjectsIncluded.every(subject =>
+          this.user.subjects.includes(subject.key)
+        )
+      else return this.user.subjects.includes(cert.key)
     },
-    progressStatus(includedSubjects) {
-      if (this.isComplete(includedSubjects)) return 'Unlocked'
+    progressStatus(cert) {
+      if (this.isComplete(cert)) return 'Unlocked'
       else return 'Locked'
     },
   },

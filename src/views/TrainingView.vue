@@ -70,6 +70,19 @@
             :certData="currentSubject.additionalSubjects"
           />
         </accordion-item>
+
+        <accordion-item
+          :label="computedSubjectsHeader.header"
+          :sublabel="computedSubjectsHeader.subheader"
+          buttonSize="large"
+          v-if="currentSubject.computedSubjects.length > 0"
+        >
+          <additional-subjects-drop-down
+            :headers="additionalSubjectsColHeaders"
+            :certData="currentSubject.computedSubjects"
+            :dropDownType="'computed'"
+          />
+        </accordion-item>
       </template>
     </div>
   </div>
@@ -124,9 +137,7 @@ export default {
       return `${amount} courses required`
     },
     additionalSubjectsColHeaders() {
-      if (this.currentSubjectType === 'college')
-        return ['Subject', 'Required Training', '']
-      else return ['Subject', 'Required Certifications', '']
+      return ['Subject', 'Alternative Certifications', '']
     },
     additionalSubjectsAccordionHeader() {
       if (this.currentSubjectType === 'math')
@@ -137,8 +148,20 @@ export default {
       else
         return {
           header: 'Additional Subjects',
+          subheader: `We're always improving our training, here's a list of older certifications that will unlock subjects. We'd still recommend getting your new certifications as our training has improved!`,
+        }
+    },
+    computedSubjectsHeader() {
+      if (this.currentSubjectType === 'math')
+        return {
+          header: 'Integrated Math',
+          subheader: 'Click here to learn more about Integrated Math',
+        }
+      else
+        return {
+          header: 'Computed Subjects',
           subheader:
-            'Tutor for these subjects automatically by completing the required training courses',
+            'These are subjects that require multiple certifications to be completed',
         }
     },
     subjectTypes() {

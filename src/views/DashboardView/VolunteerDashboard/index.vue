@@ -615,15 +615,6 @@ export default {
         )
       }
 
-      // (2) Certs obtained
-      const certsObtained = _.filter(this.allSubjectNames, topic => {
-        return _.get(user, `certifications.${topic}.passed`, false)
-      })
-
-      let numCertsObtained = certsObtained.length
-      if (this.isFilterActiveSubjectsActive)
-        numCertsObtained = user.totalActiveCertifications
-
       // (3) Requests filled
       const numRequestsFilled = _.get(user, 'pastSessions.length', '--')
 
@@ -640,7 +631,7 @@ export default {
         },
         {
           label: 'Number of quizzes passed',
-          value: `${numCertsObtained} quizzes passed`,
+          value: `${this.user.totalQuizzesPassed} quizzes passed`,
         },
         {
           label: 'Number of requests filled',
@@ -686,13 +677,6 @@ export default {
         )
       }
 
-      // (2) Certs obtained
-      const certsObtained = _.filter(this.allSubjectNames, topic => {
-        return _.get(user, `certifications.${topic}.passed`, false)
-      })
-
-      const numCertsObtained = certsObtained.length
-
       // (3) Requests filled
       const numRequestsFilled = _.get(user, 'pastSessions.length', '--')
 
@@ -706,7 +690,7 @@ export default {
         },
         {
           label: 'Number of quizzes passed',
-          value: `${numCertsObtained} quizzes passed`,
+          value: `${this.user.totalQuizzesPassed} quizzes passed`,
         },
         {
           label: 'Number of requests filled',
