@@ -60,7 +60,7 @@
               : null
           "
           class="action-btns__quiz-btn"
-          :disabled="isComplete(cert.key) || hasUnlockedSubject(cert.key)"
+          :disabled="isComplete(cert.key)"
         >
           <span>{{ actionButtonText(cert.key) }}</span>
         </large-button>
@@ -119,7 +119,6 @@ export default {
       return this.user.certifications[cert].passed
     },
     hasUnlockedSubject(cert) {
-      if (cert === 'algebra') return this.user.subjects.includes('algebraOne')
       return this.user.subjects.includes(cert)
     },
     certReviewLink(cert) {
@@ -134,8 +133,7 @@ export default {
       else return 'Not started'
     },
     actionButtonText(cert) {
-      if (this.isComplete(cert) || this.hasUnlockedSubject(cert))
-        return 'Completed'
+      if (this.isComplete(cert)) return 'Completed'
       else return 'Start quiz'
     },
   },

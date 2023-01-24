@@ -16,7 +16,7 @@ export default {
     overlay: Boolean,
     height: { type: Number, default: 64 },
     width: { type: Number, default: 64 },
-    message: String
+    message: String,
   },
   computed: {
     loaderStyle() {

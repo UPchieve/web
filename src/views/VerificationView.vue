@@ -61,7 +61,13 @@
         </button>
 
         <div class="uc-form-subtext verification__sub-text">
-          Did not receive an email? <span :disabled="isSubmitting" @click.prevent="sendCode" class="verification__sub-link">Resend code</span>
+          Did not receive an email?
+          <span
+            :disabled="isSubmitting"
+            @click.prevent="sendCode"
+            class="verification__sub-link"
+            >Resend code</span
+          >
         </div>
       </div>
 
@@ -191,7 +197,8 @@ export default {
           })
           this.step = 3
         } else {
-          this.error = 'Please enter the most recent verification code that was sent to you'
+          this.error =
+            'Please enter the most recent verification code that was sent to you'
         }
       } catch (error) {
         this.handleRequestError(error)
@@ -200,7 +207,9 @@ export default {
     },
     handleRequestError(error) {
       if (error.status !== 422) Sentry.captureException(error)
-      this.error = error.message || 'Sorry, looks like something went wrong. Please try again in a few minutes.'
+      this.error =
+        error.message ||
+        'Sorry, looks like something went wrong. Please try again in a few minutes.'
     },
     logout() {
       AuthService.logout(this)
