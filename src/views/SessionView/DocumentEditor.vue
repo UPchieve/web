@@ -21,6 +21,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
+import { ImageCompressor } from '@/utils/quill-image-optimizer'
 import Quill from 'quill'
 import QuillCursors from 'quill-cursors'
 import LoadingMessage from '@/components/LoadingMessage'
@@ -81,6 +82,12 @@ export default {
         'image',
       ],
       modules: {
+        ImageCompressor: {
+          quality: 0.9,
+          maxWidth: 1000,
+          maxHeight: 1000,
+          imageType: 'image/png',
+        },
         cursors: {
           selectionChangeSource: 'cursor-api',
           transformOnTextChange: true,
