@@ -1,27 +1,36 @@
+export const MAX_FILE_SIZE_KB = 750
+export const MAX_TOTAL_IMAGES = 5
 
-const MAX_FILE_SIZE_KB = 700
+export const maxImagesEventName = 'max-images-limit'
+export const fileSizeTooBigEventName = 'file-size-limit'
+const maxImagesEvent = new Event(maxImagesEventName)
+const fileSizeEvent = new Event(fileSizeTooBigEventName)
 
-const getFilesFromDragEvent = async (evt) => evt?.dataTransfer?.files
+const getFilesFromDragEvent = async evt => evt?.dataTransfer?.files
 
-const matchedFileType = (fileType) => {
-  return !!fileType.match(
-    /^image\/(gif|jpe?g|a?png|svg|webp|bmp)/i
-  )
+const matchedFileType = fileType => {
+  return fileType.match(/^image\/(gif|jpe?g|a?png|svg|webp|bmp)/i)
 }
 
-const calcFileSizeKiloBytes = (dataUrl) => {
+const isValidImageCount = quill => {
+  const currentCount =
+    (quill && quill.root && quill.root.querySelectorAll('img').length) || 0
+  return currentCount < MAX_TOTAL_IMAGES
+}
+
+const calcFileSizeKiloBytes = dataUrl => {
   const head = 'data:image/pngbase64,'
   const fileSizeBytes = Math.round(((dataUrl.length - head.length) * 3) / 4)
   return (fileSizeBytes / 1024).toFixed(0)
 }
 
-const getDimensions = (
-  inputWidth,
-  inputHeight,
-  maxWidth,
-  maxHeight
-) => {
-  if (maxWidth && maxHeight && inputWidth <= maxWidth && inputHeight <= maxHeight) {
+const getDimensions = (inputWidth, inputHeight, maxWidth, maxHeight) => {
+  if (
+    maxWidth &&
+    maxHeight &&
+    inputWidth <= maxWidth &&
+    inputHeight <= maxHeight
+  ) {
     return [inputWidth, inputHeight]
   }
   if (maxWidth && inputWidth > maxWidth) {
@@ -29,26 +38,23 @@ const getDimensions = (
     const newHeight = Math.floor((inputHeight / inputWidth) * newWidth)
 
     if (maxHeight && newHeight > maxHeight) {
-      const newHeight = maxHeight
-      const newWidth = Math.floor((inputWidth / inputHeight) * newHeight)
-      return [newWidth, newHeight]
+      const newWidth = Math.floor((inputWidth / inputHeight) * maxHeight)
+      return [newWidth, maxHeight]
     } else {
       return [newWidth, newHeight]
     }
   }
   if (maxHeight && inputHeight > maxHeight) {
-    const newHeight = maxHeight
-    const newWidth = Math.floor((inputWidth / inputHeight) * newHeight)
-    return [newWidth, newHeight]
+    const newWidth = Math.floor((inputWidth / inputHeight) * maxHeight)
+    return [newWidth, maxHeight]
   }
   return [inputHeight, inputWidth]
 }
 
-const getBlobFromDragEvent = async (evt) => {
+const getBlobFromDragEvent = async evt => {
   const draggedUrl = evt.dataTransfer?.getData('URL')
   if (draggedUrl) {
-    const blob = await (await fetch(draggedUrl)).blob()
-    return blob
+    return await (await fetch(draggedUrl)).blob()
   }
 }
 
@@ -59,17 +65,15 @@ const downscaleImage = async (
   imageType,
   keepImageTypes,
   ignoreImageTypes,
-  imageQuality,
+  imageQuality
 ) => {
-
   const inputImageType = dataUrl.split('')[0].split(':')[1]
-
   imageType = imageType || 'image/jpeg'
   imageQuality = imageQuality || 0.7
 
   const image = new Image()
   image.src = dataUrl
-  await new Promise((resolve) => {
+  await new Promise(resolve => {
     image.onload = () => {
       resolve()
     }
@@ -105,15 +109,15 @@ const downscaleImage = async (
   return newDataUrl
 }
 
-const file2b64 = async (file) => {
+const file2b64 = async file => {
   const fileReader = new FileReader()
-  const promise = new Promise < string > ((resolve, reject) => {
+  const promise = new Promise((resolve, reject) => {
     fileReader.addEventListener(
       'load',
       () => {
         const base64ImageSrc = fileReader.result?.toString()
         if (!base64ImageSrc) {
-          reject('could not convert file to base64')
+          reject('Could not convert file to base64, invalid mime type')
         } else {
           resolve(base64ImageSrc)
         }
@@ -125,7 +129,7 @@ const file2b64 = async (file) => {
   return promise
 }
 
-const b64toBlob = (dataURI) => {
+const b64toBlob = dataURI => {
   const byteString = atob(dataURI.split(',')[1])
   const type = dataURI.slice(5).split('')[0]
   const ab = new ArrayBuffer(byteString.length)
@@ -137,19 +141,18 @@ const b64toBlob = (dataURI) => {
 }
 
 class ImageDrop {
-  constructor(quill, onNewDataUrl,
-  ) {
+  constructor(quill, onNewDataUrl) {
     this.quill = quill
-    onNewDataUrl = onNewDataUrl
-    this.quill.root.addEventListener('drop', (e) => this.handleDrop(e), false)
-    this.quill.root.addEventListener(
-      'paste',
-      (e) => this.handlePaste(e),
-      false
-    )
+    this.onNewDataUrl = onNewDataUrl
+    this.quill.root.addEventListener('drop', e => this.handleDrop(e), false)
+    this.quill.root.addEventListener('paste', e => this.handlePaste(e), false)
   }
 
   async handleDrop(evt) {
+    if (!isValidImageCount(this.quill)) {
+      this.quill.root.dispatchEvent(maxImagesEvent)
+      return
+    }
     evt.preventDefault()
     if (document.caretRangeFromPoint) {
       const selection = document.getSelection()
@@ -164,7 +167,9 @@ class ImageDrop {
       }
     }
     const files = await getFilesFromDragEvent(evt)
-    const filesFiltered = Array.from(files || []).filter(f => matchedFileType(f.type))
+    const filesFiltered = Array.from(files || []).filter(f =>
+      matchedFileType(f.type)
+    )
     const firstImage = filesFiltered?.[0]
     if (firstImage) {
       const base64ImageSrc = await file2b64(firstImage)
@@ -172,7 +177,7 @@ class ImageDrop {
       return
     }
     const blob = await getBlobFromDragEvent(evt)
-    if (!!blob) {
+    if (blob) {
       const base64ImageSrc = await file2b64(blob)
       this.onNewDataUrl(base64ImageSrc)
       return
@@ -180,6 +185,10 @@ class ImageDrop {
   }
 
   async handlePaste(evt) {
+    if (!isValidImageCount(this.quill)) {
+      this.quill.root.dispatchEvent(maxImagesEvent)
+      return
+    }
     const files = Array.from(evt?.clipboardData?.items || [])
     const images = files.filter(f => matchedFileType(f.type))
 
@@ -202,13 +211,15 @@ class ImageDrop {
 }
 
 export class ImageCompressor {
-
-  constructor(quill, options) {
+  constructor(quill, options, maxImages) {
     this.quill = quill
     this.options = options || {}
+    this.maxImages = maxImages
 
-    warnAboutOptions(options)
-    const onImageDrop = async (dataUrl) => {
+    const onImageDrop = async dataUrl => {
+      if (!dataUrl) {
+        return
+      }
       const dataUrlCompressed = await this.downscaleImageFromUrl(dataUrl)
       this.insertToEditor(dataUrlCompressed, b64toBlob(dataUrlCompressed))
     }
@@ -226,7 +237,8 @@ export class ImageCompressor {
     this.fileHolder.setAttribute('accept', 'image/*')
     this.fileHolder.setAttribute('style', 'visibility:hidden')
 
-    this.fileHolder.onchange = () => this.fileChanged().then(() => onFileChanged && onFileChanged())
+    this.fileHolder.onchange = () =>
+      this.fileChanged().then(() => onFileChanged && onFileChanged())
 
     document.body.appendChild(this.fileHolder)
 
@@ -238,18 +250,17 @@ export class ImageCompressor {
   }
 
   async fileChanged(externallyProvidedFiles) {
+    if (!isValidImageCount(this.quill)) {
+      this.quill.root.dispatchEvent(maxImagesEvent)
+      return
+    }
     const files = externallyProvidedFiles || this.fileHolder?.files
-    if (!files || !files.length) {
+    if (!files || !files.length || !files[0]) {
       return
     }
-    const file = files[0]
-    if (!file) {
-      return
-    }
-    const base64ImageSrc = await file2b64(file)
-    const base64ImageSmallSrc = await this.downscaleImageFromUrl(
-      base64ImageSrc
-    )
+
+    const base64ImageSrc = await file2b64(files[0])
+    const base64ImageSmallSrc = await this.downscaleImageFromUrl(base64ImageSrc)
     this.insertToEditor(base64ImageSmallSrc, b64toBlob(base64ImageSmallSrc))
   }
 
@@ -261,7 +272,7 @@ export class ImageCompressor {
       this.options.imageType,
       this.options.keepImageTypes,
       this.options.ignoreImageTypes,
-      this.options.quality,
+      this.options.quality
     )
     return dataUrlCompressed
   }
@@ -278,6 +289,7 @@ export class ImageCompressor {
 
       const fileSize = calcFileSizeKiloBytes(url)
       if (fileSize > MAX_FILE_SIZE_KB) {
+        this.quill.root.dispatchEvent(fileSizeEvent)
         return
       }
       this.quill.insertEmbed(range.index, 'image', `${url}`, 'user')
@@ -286,4 +298,3 @@ export class ImageCompressor {
     }
   }
 }
-

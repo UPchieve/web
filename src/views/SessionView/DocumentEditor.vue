@@ -21,13 +21,19 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import { ImageCompressor } from '@/utils/quill-image-optimizer'
+import {
+  ImageCompressor,
+  maxImagesEventName,
+  fileSizeTooBigEventName,
+  MAX_TOTAL_IMAGES,
+} from '@/utils/quill-image-optimizer'
 import Quill from 'quill'
 import QuillCursors from 'quill-cursors'
 import LoadingMessage from '@/components/LoadingMessage'
 import RefreshDocumentEditorModal from '@/views/SessionView/RefreshDocumentEditorModal'
 
 Quill.register('modules/cursors', QuillCursors)
+Quill.register('modules/image', ImageCompressor)
 const Delta = Quill.import('delta')
 
 export default {
@@ -82,19 +88,36 @@ export default {
         'image',
       ],
       modules: {
-        ImageCompressor: {
-          quality: 0.9,
+        image: {
+          quality: 0.8,
           maxWidth: 1000,
           maxHeight: 1000,
-          imageType: 'image/png',
+          imageType: 'image/webp',
         },
         cursors: {
           selectionChangeSource: 'cursor-api',
           transformOnTextChange: true,
         },
-        toolbar
+        toolbar,
       },
     })
+
+    this.quillEditor.root.addEventListener(
+      maxImagesEventName,
+      () =>
+        alert(
+          `Too many images uploaded. \n\n You can not have more than ${MAX_TOTAL_IMAGES} images in the document editor.`
+        ),
+      false
+    )
+    this.quillEditor.root.addEventListener(
+      fileSizeTooBigEventName,
+      () =>
+        alert(
+          `Image file size is too big. \n\n Please compress/resize the image before uploading.`
+        ),
+      false
+    )
 
     if (this.isVolunteer && this.isImagesInDocumentsActive) {
       const useHandler = () => {
