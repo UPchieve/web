@@ -3,6 +3,14 @@ export const MAX_TOTAL_IMAGES = 5
 
 export const maxImagesEventName = 'max-images-limit'
 export const fileSizeTooBigEventName = 'file-size-limit'
+
+const isSafari =
+  /constructor/i.test(window.HTMLElement) ||
+  (p => p.toString() === '[object SafariRemoteNotification]')(
+    !window['safari'] ||
+      (typeof safari !== 'undefined' && window['safari'].pushNotification)
+  )
+
 const maxImagesEvent = new Event(maxImagesEventName)
 const fileSizeEvent = new Event(fileSizeTooBigEventName)
 
@@ -19,9 +27,8 @@ const isValidImageCount = quill => {
 }
 
 const calcFileSizeKiloBytes = dataUrl => {
-  const head = 'data:image/pngbase64,'
-  const fileSizeBytes = Math.round(((dataUrl.length - head.length) * 3) / 4)
-  return (fileSizeBytes / 1024).toFixed(0)
+  const fileSizeBytes = Math.round((dataUrl.length * 3) / 4)
+  return Math.ceil(fileSizeBytes / 1024)
 }
 
 const getDimensions = (inputWidth, inputHeight, maxWidth, maxHeight) => {
@@ -34,14 +41,13 @@ const getDimensions = (inputWidth, inputHeight, maxWidth, maxHeight) => {
     return [inputWidth, inputHeight]
   }
   if (maxWidth && inputWidth > maxWidth) {
-    const newWidth = maxWidth
-    const newHeight = Math.floor((inputHeight / inputWidth) * newWidth)
+    const newHeight = Math.floor((inputHeight / inputWidth) * maxWidth)
 
     if (maxHeight && newHeight > maxHeight) {
       const newWidth = Math.floor((inputWidth / inputHeight) * maxHeight)
       return [newWidth, maxHeight]
     } else {
-      return [newWidth, newHeight]
+      return [maxWidth, newHeight]
     }
   }
   if (maxHeight && inputHeight > maxHeight) {
@@ -129,17 +135,6 @@ const file2b64 = async file => {
   return promise
 }
 
-const b64toBlob = dataURI => {
-  const byteString = atob(dataURI.split(',')[1])
-  const type = dataURI.slice(5).split('')[0]
-  const ab = new ArrayBuffer(byteString.length)
-  let ia = new Uint8Array(ab)
-  for (let i = 0; i < byteString.length; ++i) {
-    ia[i] = byteString.charCodeAt(i)
-  }
-  return new Blob([ab], { type: type })
-}
-
 class ImageDrop {
   constructor(quill, onNewDataUrl) {
     this.quill = quill
@@ -214,6 +209,9 @@ export class ImageCompressor {
   constructor(quill, options, maxImages) {
     this.quill = quill
     this.options = options || {}
+    if (isSafari && this.options.imageType === 'image/webp') {
+      this.options.imageType = 'image/jpeg'
+    }
     this.maxImages = maxImages
 
     const onImageDrop = async dataUrl => {
@@ -221,7 +219,7 @@ export class ImageCompressor {
         return
       }
       const dataUrlCompressed = await this.downscaleImageFromUrl(dataUrl)
-      this.insertToEditor(dataUrlCompressed, b64toBlob(dataUrlCompressed))
+      this.insertToEditor(dataUrlCompressed)
     }
     this.imageDrop = new ImageDrop(quill, onImageDrop)
     const toolbar = this.quill.getModule('toolbar')
@@ -261,7 +259,7 @@ export class ImageCompressor {
 
     const base64ImageSrc = await file2b64(files[0])
     const base64ImageSmallSrc = await this.downscaleImageFromUrl(base64ImageSrc)
-    this.insertToEditor(base64ImageSmallSrc, b64toBlob(base64ImageSmallSrc))
+    this.insertToEditor(base64ImageSmallSrc)
   }
 
   async downscaleImageFromUrl(dataUrl) {
@@ -277,24 +275,20 @@ export class ImageCompressor {
     return dataUrlCompressed
   }
 
-  insertToEditor(url, blob) {
-    if (this.options.insertIntoEditor) {
-      this.options.insertIntoEditor(url, blob)
-    } else {
-      this.range = this.quill.getSelection()
-      const range = this.range
-      if (!range) {
-        return
-      }
-
-      const fileSize = calcFileSizeKiloBytes(url)
-      if (fileSize > MAX_FILE_SIZE_KB) {
-        this.quill.root.dispatchEvent(fileSizeEvent)
-        return
-      }
-      this.quill.insertEmbed(range.index, 'image', `${url}`, 'user')
-      range.index++
-      this.quill.setSelection(range, 'api')
+  insertToEditor(url) {
+    this.range = this.quill.getSelection()
+    const range = this.range
+    if (!range) {
+      return
     }
+
+    const fileSize = calcFileSizeKiloBytes(url)
+    if (fileSize > MAX_FILE_SIZE_KB) {
+      this.quill.root.dispatchEvent(fileSizeEvent)
+      return
+    }
+    this.quill.insertEmbed(range.index, 'image', `${url}`, 'user')
+    range.index++
+    this.quill.setSelection(range, 'api')
   }
 }
