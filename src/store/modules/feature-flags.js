@@ -56,6 +56,7 @@ export default {
       [UNLEASH_FEATURE_FLAGS.CHATBOT]: false,
       [UNLEASH_FEATURE_FLAGS.DASHBOARD_BANNER]: false,
       [POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS]: false,
+      [POSTHOG_FEATURE_FLAGS.IMAGES_IN_DOCUMENTS]: false,
     },
   },
   mutations: {
@@ -83,14 +84,18 @@ export default {
       }
     },
     async initPostHogFlags({ commit }) {
-      try {
-        posthog.onFeatureFlags(() => {
-          const flags = posthog.featureFlags.getFlagVariants()
-          commit('setPostHogFlags', flags)
-        })
-      } catch (err) {
-        Sentry.captureException(err)
-      }
+      return await new Promise((resolve, reject) => {
+        try {
+          posthog.onFeatureFlags(() => {
+            const flags = posthog.featureFlags.getFlagVariants()
+            commit('setPostHogFlags', flags)
+            resolve()
+          })
+        } catch (err) {
+          Sentry.captureException(err)
+          reject(err)
+        }
+      })
     },
   },
   getters: {
@@ -105,5 +110,7 @@ export default {
       state.flags[UNLEASH_FEATURE_FLAGS.DASHBOARD_BANNER],
     isFilterActiveSubjectsActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS],
+    isImagesInDocumentsActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.IMAGES_IN_DOCUMENTS],
   },
 }

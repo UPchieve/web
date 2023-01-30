@@ -20,13 +20,21 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
+import {
+  ImageCompressor,
+  maxImagesEventName,
+  fileSizeTooBigEventName,
+  MAX_TOTAL_IMAGES,
+} from '@/utils/quill-image-optimizer'
 import Quill from 'quill'
 import QuillCursors from 'quill-cursors'
 import LoadingMessage from '@/components/LoadingMessage'
 import RefreshDocumentEditorModal from '@/views/SessionView/RefreshDocumentEditorModal'
 
 Quill.register('modules/cursors', QuillCursors)
+Quill.register('modules/image', ImageCompressor)
+const Delta = Quill.import('delta')
 
 export default {
   components: {
@@ -49,8 +57,22 @@ export default {
       currentSession: state => state.user.session,
       isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
     }),
+    ...mapGetters({
+      isVolunteer: 'user/isVolunteer',
+      isImagesInDocumentsActive: 'featureFlags/isImagesInDocumentsActive',
+    }),
   },
   mounted() {
+    const toolbar = [
+      [{ header: [1, 2, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ color: [] }, { background: [] }],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+    ]
+
+    if (!this.isVolunteer && this.isImagesInDocumentsActive) {
+      toolbar.push(['image'])
+    }
     this.quillEditor = new Quill('#quill-container', {
       placeholder: 'Type or paste something...',
       theme: 'snow',
@@ -63,20 +85,49 @@ export default {
         'color',
         'background',
         'list',
+        'image',
       ],
       modules: {
+        image: {
+          quality: 0.8,
+          maxWidth: 1000,
+          maxHeight: 1000,
+          imageType: 'image/webp',
+        },
         cursors: {
           selectionChangeSource: 'cursor-api',
           transformOnTextChange: true,
         },
-        toolbar: [
-          [{ header: [1, 2, false] }],
-          ['bold', 'italic', 'underline', 'strike'],
-          [{ color: [] }, { background: [] }],
-          [{ list: 'ordered' }, { list: 'bullet' }],
-        ],
+        toolbar,
       },
     })
+
+    this.quillEditor.root.addEventListener(
+      maxImagesEventName,
+      () =>
+        alert(
+          `Too many images uploaded. \n\n You can not have more than ${MAX_TOTAL_IMAGES} images in the document editor.`
+        ),
+      false
+    )
+    this.quillEditor.root.addEventListener(
+      fileSizeTooBigEventName,
+      () =>
+        alert(
+          `Image file size is too big. \n\n Please compress/resize the image before uploading.`
+        ),
+      false
+    )
+
+    if (this.isVolunteer && this.isImagesInDocumentsActive) {
+      const useHandler = () => {
+        const delta = new Delta()
+        return delta.insert('')
+      }
+      this.quillEditor.clipboard.addMatcher('IMG', useHandler)
+      this.quillEditor.clipboard.addMatcher('PICTURE', useHandler)
+    }
+
     // do not allow user to make edits until the quill doc contents are set
     this.quillEditor.disable()
 
