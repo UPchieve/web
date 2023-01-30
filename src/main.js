@@ -72,6 +72,13 @@ if (config.sentryDsn) {
     ],
     environment: config.sentryEnv,
     release: `uc-web@${config.version}`,
+    // This error gets sent to Sentry when a session with a document editor
+    // that has text in it has ended. This error is usually sent continuously
+    // to Sentry until the browser is refreshed. This quickly eats up all of
+    // our monthly ingest quota.
+    // TODO: Figure out why this error is thrown when redirected to the dashboard
+    //       or feedback page for sessions with a filled document editor
+    ignoreErrors: ['ResizeObserver'],
   })
 }
 
