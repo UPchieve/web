@@ -93,7 +93,12 @@
 
     <div class="chat-footer">
       <transition name="fade">
-        <div class="typing-indicator" v-show="typingIndicatorShown && isSessionConnectionAlive && isSessionAlive">
+        <div
+          class="typing-indicator"
+          v-show="
+            typingIndicatorShown && isSessionConnectionAlive && isSessionAlive
+          "
+        >
           {{ this.sessionPartner.firstname || 'Chatbot' }} is typing...
         </div>
       </transition>
@@ -392,7 +397,8 @@ export default {
   },
   sockets: {
     'is-typing'() {
-      this.typingIndicatorShown = this.isSessionConnectionAlive && this.isSessionAlive
+      this.typingIndicatorShown =
+        this.isSessionConnectionAlive && this.isSessionAlive
     },
     'not-typing'() {
       this.typingIndicatorShown = false

@@ -238,6 +238,12 @@ export default {
           currentUserValue.email,
           currentUserValue.type
         )
+        AnalyticsService.updateUser({
+          userType: currentUserValue.type,
+          partner: currentUserValue.isVolunteer
+            ? currentUserValue.volunteerPartnerOrg
+            : currentUserValue.studentPartnerOrg,
+        })
 
         if (this.mobileMode && !this.isMobileApp && !this.isVolunteer) {
           this.$store.dispatch('app/banner/show', {
