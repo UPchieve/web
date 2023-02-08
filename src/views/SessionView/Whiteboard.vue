@@ -261,6 +261,7 @@ import LoadingMessage from '@/components/LoadingMessage'
 import * as Sentry from '@sentry/browser'
 import config from '../../config'
 import heic2any from 'heic2any'
+import LoggerService from '@/services/LoggerService'
 
 export default {
   components: {
@@ -670,10 +671,21 @@ export default {
         // @todo access the connection in a less sketchy way
         const zwibblerWsConnection = this.zwibblerCtx.Ec.rc.rc
         const zwibblerOnMessage = zwibblerWsConnection.onmessage
+        const zwibblerOnClose = zwibblerWsConnection.onclose
         // Intercept Zwibbler's websocket message handler
         zwibblerWsConnection.onmessage = messageEvent => {
           // Forward message to Zwibbler unless it's our "pong" response
           if (messageEvent.data !== 'p0ng') zwibblerOnMessage(messageEvent)
+        }
+
+        // Intercept Zwibbler's websocket close handler to throw custom error
+        zwibblerWsConnection.onclose = closeEvent => {
+          const userType = this.isVolunteer ? 'volunteer' : 'student'
+          const err = new Error(
+            `WebSocket for the ${userType} in session ${this.sessionId} closed with code ${closeEvent.code} for reason: ${closeEvent.reason}`
+          )
+          LoggerService.noticeError(err)
+          zwibblerOnClose(closeEvent)
         }
 
         // Ping server every 45 seconds to keep the connection open
