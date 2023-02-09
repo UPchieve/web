@@ -127,6 +127,7 @@ import { EVENTS, SESSION_TOOL_TYPES } from '@/consts'
 import Gleap from 'gleap'
 import { backOff } from 'exponential-backoff'
 import LoadingMessage from '@/components/LoadingMessage'
+import LoggerService from '@/services/LoggerService'
 
 const activeHeaderData = {
   component: 'SessionHeader',
@@ -347,6 +348,21 @@ export default {
         this.showTroubleStartingModal(abort)
       }
     },
+    // https://socket.io/docs/v2/client-api/#event-disconnect
+    async disconnect(reason) {
+      const userType = this.isVolunteer ? 'volunteer' : 'student'
+      const err = new Error(
+        `Chat socket for the ${userType} in session ${this.sessionId} for reason: ${reason}`
+      )
+      LoggerService.noticeError(err)
+
+      if (reason === 'io server disconnect') {
+        // the disconnection was initiated by the server, you need to reconnect manually
+        if (!this.$socket.connected) await this.$socket.connect()
+        this.joinSession(this.sessionId)
+        this.$store.dispatch('user/sessionConnected')
+      }
+    },
     connect() {
       this.$store.dispatch('user/sessionConnected')
     },
@@ -374,7 +390,7 @@ export default {
     async joinSession(sessionId) {
       // await nextTick to get access to this.prevRoute and avoid a race condition
       await this.$nextTick()
-      this.$queuedSocket.emit(
+      this.$socket.emit(
         'join',
         {
           sessionId,
