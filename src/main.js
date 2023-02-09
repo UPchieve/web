@@ -7,7 +7,6 @@ import * as Integrations from '@sentry/integrations'
 import vSelect from 'vue-select'
 import VueStarRating from 'vue-star-rating'
 import ToggleButton from 'vue-js-toggle-button'
-import Socket from 'queued-socket.io'
 import moment from 'moment'
 import App from './components/App'
 import PortalService from './services/PortalService'
@@ -18,6 +17,7 @@ import posthog from 'posthog-js'
 import Gleap from 'gleap'
 import NetworkService from './services/NetworkService'
 import { backOff } from 'exponential-backoff'
+import io from 'socket.io-client'
 
 if (config.posthogToken) {
   posthog.init(`${config.posthogToken}`, {
@@ -34,12 +34,11 @@ if (config.gleapSdkKey) {
 Vue.config.productionTip = false
 
 // Set up SocketIO
-const socket = Socket.connect(config.socketAddress, {
-  autoConnect: false,
-})
-Vue.use(VueSocketIO, socket)
-
-Vue.prototype.$queuedSocket = Socket
+Vue.use(
+  new VueSocketIO({
+    connection: io(config.socketAddress),
+  })
+)
 
 // Set up Vue Router
 Vue.use(VueRouter)
