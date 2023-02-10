@@ -57,6 +57,7 @@ export default {
       [UNLEASH_FEATURE_FLAGS.DASHBOARD_BANNER]: false,
       [POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS]: false,
       [POSTHOG_FEATURE_FLAGS.IMAGES_IN_DOCUMENTS]: false,
+      [POSTHOG_FEATURE_FLAGS.OPTIONAL_MIDDLE_SCHOOL]: false,
     },
   },
   mutations: {
@@ -112,5 +113,7 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS],
     isImagesInDocumentsActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.IMAGES_IN_DOCUMENTS],
+    isOptionalMiddleSchoolActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.OPTIONAL_MIDDLE_SCHOOL],
   },
 }
