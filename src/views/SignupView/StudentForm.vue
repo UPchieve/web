@@ -69,6 +69,20 @@
     </div>
 
     <div class="uc-column">
+      <div class="uc-form-label">
+        What grade are you in?
+      </div>
+      <v-select
+        class="uc-form-body__select"
+        v-model="profile.currentGrade"
+        placeholder="Select your grade"
+        @input="onGradeChange"
+        :options="gradeLevels"
+        :searchable="false"
+      ></v-select>
+    </div>
+
+    <div class="uc-column">
       <label for="inputHighschool" class="uc-form-label"
         >What school do you go to?</label
       >
@@ -101,20 +115,6 @@
           </template>
         </autocomplete>
       </div>
-    </div>
-
-    <div class="uc-column">
-      <div class="uc-form-label">
-        What grade are you in?
-      </div>
-      <v-select
-        class="uc-form-body__select"
-        v-model="profile.currentGrade"
-        placeholder="Select your grade"
-        @input="onGradeChange"
-        :options="gradeLevels"
-        :searchable="false"
-      ></v-select>
     </div>
 
     <div class="uc-column">
