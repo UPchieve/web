@@ -15,6 +15,10 @@ const newrelicUrls = [
   'https://bam.nr-data.net',
 ]
 const gleapScriptUrl = 'https://widget.gleap.io'
+const gleapAvatarIconUrls = [
+  'https://www.gravatar.com',
+  'https://i1.wp.com/api.gleap.io',
+]
 
 // connect sources
 const posthogUrls = [
@@ -75,6 +79,7 @@ const imgSrc = [
   "'self'",
   ...googleUrls,
   ...s3PhotoImageUrls,
+  ...gleapAvatarIconUrls,
   cdnUrl,
   'data:',
   'blob:',
