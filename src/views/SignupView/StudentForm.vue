@@ -623,9 +623,9 @@ export default {
       if (this.errors.length) return
 
       NetworkService.checkStudentEligibility(this, {
-        schoolUpchieveId:
-          this.eligibility.highSchool.upchieveId ||
-          '00000e00-00b0-00ca-0000-0b00c0b0000f',
+        schoolUpchieveId: !this.isMiddleSchoolGrade
+          ? this.eligibility.highSchool.upchieveId
+          : '00000e00-00b0-00ca-0000-0b00c0b0000f',
         zipCode: this.eligibility.zipCode,
         email: this.eligibility.email,
         referredByCode: window.localStorage.getItem('upcReferredByCode'),
