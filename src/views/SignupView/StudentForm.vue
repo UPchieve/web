@@ -55,7 +55,7 @@
   <form
     v-else-if="step === 'eligibility' || step === 'referred'"
     class="uc-form-body uc-form-body--center"
-    :aria-label="isReferred ? 'Student eligibility' : 'Student Referral Signup'"
+    :aria-label="isReferred ? 'Student Referral Signup' : 'Student eligibility'"
     @submit.prevent="isReferred ? continueToAccountPage() : submitEligibility()"
   >
     <FormErrors :errors="errors" />
@@ -68,7 +68,7 @@
       </p>
     </div>
 
-    <div class="uc-column">
+    <div class="uc-column grade-select">
       <div class="uc-form-label">
         What grade are you in?
       </div>
@@ -439,6 +439,7 @@ export default {
       otherSignupSource: '',
       isLoadingSignupSources: false,
       isReferred: false,
+      isMiddleSchoolGrade: false,
     }
   },
   async mounted() {
@@ -602,7 +603,7 @@ export default {
 
     // transitions from the referred sign up view to account view
     async continueToAccountPage() {
-      this.checkEligibilityErrors()
+      await this.checkEligibilityErrors()
       if (this.errors.length) return
 
       // autofill the user's email
@@ -622,7 +623,9 @@ export default {
       if (this.errors.length) return
 
       NetworkService.checkStudentEligibility(this, {
-        schoolUpchieveId: this.eligibility.highSchool.upchieveId,
+        schoolUpchieveId:
+          this.eligibility.highSchool.upchieveId ||
+          '00000e00-00b0-00ca-0000-0b00c0b0000f',
         zipCode: this.eligibility.zipCode,
         email: this.eligibility.email,
         referredByCode: window.localStorage.getItem('upcReferredByCode'),
@@ -650,7 +653,8 @@ export default {
           if (!isDomesticIpAddress) return this.internationalPage()
         })
         .catch(res => {
-          this.errors.push(res.body.message)
+          const error = (res.body && res.body.err) || 'Unknown server error'
+          this.errors.push(error)
         })
     },
     async accountPage() {
@@ -788,7 +792,17 @@ export default {
 }
 </script>
 
+<style lang="scss">
+.school-search ul {
+  z-index: 11 !important;
+}
+</style>
+
 <style lang="scss" scoped>
+.uc-form-body .grade-select {
+  z-index: 10;
+}
+
 .uc-form-body {
   @include child-spacing(top, 25px);
 
