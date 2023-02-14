@@ -634,6 +634,7 @@ export default {
   width: 40px;
   height: 40px;
   transition: 0.4s;
+  text-align: center;
 
   @include breakpoint-below('medium') {
     bottom: 40px;
