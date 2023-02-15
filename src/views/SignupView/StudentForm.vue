@@ -509,8 +509,7 @@ export default {
   methods: {
     onGradeChange(value) {
       this.isMiddleSchoolOptional = Boolean(
-        //value === '8th grade' && this.isOptionalMiddleSchoolActive
-        value === '8th grade'
+        value === '8th grade' && this.isOptionalMiddleSchoolActive
       )
     },
 
