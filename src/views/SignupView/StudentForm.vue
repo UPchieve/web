@@ -84,7 +84,8 @@
 
     <div class="uc-column">
       <label for="inputHighschool" class="uc-form-label"
-        >What school do you go to?</label
+        >What school do you go to?
+        <span v-if="isMiddleSchoolOptional">(Optional)</span></label
       >
       <div class="school-search">
         <autocomplete
@@ -439,7 +440,7 @@ export default {
       otherSignupSource: '',
       isLoadingSignupSources: false,
       isReferred: false,
-      isMiddleSchoolGrade: false,
+      isMiddleSchoolOptional: false,
     }
   },
   async mounted() {
@@ -507,8 +508,9 @@ export default {
   },
   methods: {
     onGradeChange(value) {
-      this.isMiddleSchoolGrade = Boolean(
-        value === '8th grade' && this.isOptionalMiddleSchoolActive
+      this.isMiddleSchoolOptional = Boolean(
+        //value === '8th grade' && this.isOptionalMiddleSchoolActive
+        value === '8th grade'
       )
     },
 
@@ -571,9 +573,9 @@ export default {
 
       if (
         !this.eligibility.highSchool.upchieveId &&
-        !this.isMiddleSchoolGrade
+        !this.isMiddleSchoolOptional
       ) {
-        this.errors.push('You must select your high school.')
+        this.errors.push('You must select a school.')
       }
 
       const zipCode = this.eligibility.zipCode
@@ -622,10 +624,14 @@ export default {
       await this.checkEligibilityErrors()
       if (this.errors.length) return
 
+      let schoolUpchieveId = this.eligibility.highSchool.upchieveId
+      if (this.isMiddleSchoolOptional) {
+        schoolUpchieveId =
+          schoolUpchieveId || '00000e00-00b0-00ca-0000-0b00c0b0000f'
+      }
+
       NetworkService.checkStudentEligibility(this, {
-        schoolUpchieveId: !this.isMiddleSchoolGrade
-          ? this.eligibility.highSchool.upchieveId
-          : '00000e00-00b0-00ca-0000-0b00c0b0000f',
+        schoolUpchieveId,
         zipCode: this.eligibility.zipCode,
         email: this.eligibility.email,
         referredByCode: window.localStorage.getItem('upcReferredByCode'),
