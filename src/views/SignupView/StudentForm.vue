@@ -5,17 +5,7 @@
     aria-label="Student signup"
     @submit.prevent="submitPartnerSignupCode()"
   >
-    <div
-      v-if="errors.length"
-      class="step-errors"
-      role="alert"
-      aria-labelledby="errorHeading"
-    >
-      <h5 id="errorHeading">Please correct the following problems:</h5>
-      <ul>
-        <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
-      </ul>
-    </div>
+    <FormErrors :errors="errors" />
 
     <template v-if="showSignupCodeDecision">
       <div class="step-title step-title--center">
@@ -63,24 +53,12 @@
   </form>
 
   <form
-    v-else-if="step === 'eligibility'"
+    v-else-if="step === 'eligibility' || step === 'referred'"
     class="uc-form-body uc-form-body--center"
-    aria-label="Student eligibility"
-    @submit.prevent="submitEligibility()"
+    :aria-label="isReferred ? 'Student Referral Signup' : 'Student eligibility'"
+    @submit.prevent="isReferred ? continueToAccountPage() : submitEligibility()"
   >
-    <div
-      v-if="errors.length"
-      class="step-errors"
-      role="alert"
-      aria-labelledby="eligibilityErrorHeading"
-    >
-      <h5 id="eligibilityErrorHeading">
-        Please correct the following problems:
-      </h5>
-      <ul>
-        <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
-      </ul>
-    </div>
+    <FormErrors :errors="errors" />
 
     <div class="uc-column title-wrapper">
       <h3>Great! Let's get started</h3>
@@ -90,9 +68,24 @@
       </p>
     </div>
 
+    <div class="uc-column grade-select">
+      <div class="uc-form-label">
+        What grade are you in?
+      </div>
+      <v-select
+        class="uc-form-body__select"
+        v-model="profile.currentGrade"
+        placeholder="Select your grade"
+        @input="onGradeChange"
+        :options="gradeLevels"
+        :searchable="false"
+      ></v-select>
+    </div>
+
     <div class="uc-column">
       <label for="inputHighschool" class="uc-form-label"
-        >What school do you go to?</label
+        >What school do you go to?
+        <span v-if="isMiddleSchoolOptional">(Optional)</span></label
       >
       <div class="school-search">
         <autocomplete
@@ -112,29 +105,17 @@
                 >
                 <a
                   v-if="result.cantFindSchool"
+                  target="_blank"
                   href="https://upchieve.org/cant-find-school"
                   @click="cantFindSchool"
                 >
-                  Can't find your high school?
+                  Can't find your school?
                 </a>
               </div>
             </li>
           </template>
         </autocomplete>
       </div>
-    </div>
-
-    <div class="uc-column">
-      <div class="uc-form-label">
-        What grade are you in (2022-23)?
-      </div>
-      <v-select
-        class="uc-form-body__select"
-        v-model="profile.currentGrade"
-        placeholder="Select your grade"
-        :options="gradeLevels"
-        :searchable="false"
-      ></v-select>
     </div>
 
     <div class="uc-column">
@@ -173,14 +154,14 @@
         placeholder="Email"
         aria-label="Email"
       />
-      <p class="uc-form-subtext">
+      <p class="uc-form-subtext" v-if="!isReferred">
         We will only use this email to notify you if your eligibility status
         changes in the future.
       </p>
     </div>
 
     <button class="uc-form-button-big" type="submit">
-      Check my eligibility
+      {{ !isReferred ? 'Check my eligibility' : 'Continue' }}
     </button>
 
     <div v-if="msg !== ''" role="alert">{{ msg }}</div>
@@ -251,142 +232,12 @@
   </div>
 
   <form
-    v-else-if="step === 'referred'"
-    class="uc-form-body uc-form-body--center"
-    aria-label="Student Referral Signup"
-    @submit.prevent="continueToAccountPage()"
-  >
-    <div
-      v-if="errors.length"
-      class="step-errors"
-      role="alert"
-      aria-labelledby="eligibilityErrorHeading"
-    >
-      <h5 id="eligibilityErrorHeading">
-        Please correct the following problems:
-      </h5>
-      <ul>
-        <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
-      </ul>
-    </div>
-
-    <div class="uc-column title-wrapper">
-      <h3>Great! Let's get started</h3>
-      <p v-if="!isReferred">
-        First, we need to ask you a few quick questions to make sure you're
-        eligible for our services.
-      </p>
-    </div>
-
-    <div class="uc-column">
-      <label for="inputHighschool" class="uc-form-label"
-        >What school do you go to?</label
-      >
-      <div class="school-search">
-        <autocomplete
-          base-class="uc-autocomplete"
-          :search="autocompleteSchool"
-          placeholder="Search for your school"
-          aria-label="Search for your school"
-          :get-result-value="getSchoolDisplayName"
-          @submit="handleSelectHighSchool"
-        >
-          <template #result="{ result, props }">
-            <li v-bind="props">
-              <div>
-                <span v-if="result.name">
-                  {{ result.name }} ({{ result.city }},
-                  {{ result.state }})</span
-                >
-                <a
-                  v-if="result.cantFindSchool"
-                  href="https://upchieve.org/cant-find-school"
-                  @click="cantFindSchool"
-                >
-                  Can't find your high school?
-                </a>
-              </div>
-            </li>
-          </template>
-        </autocomplete>
-      </div>
-    </div>
-
-    <div class="uc-column">
-      <div class="uc-form-label">
-        What grade are you in (2022-23)?
-      </div>
-      <v-select
-        class="uc-form-body__select"
-        v-model="profile.currentGrade"
-        placeholder="Select your grade"
-        :options="gradeLevels"
-        :searchable="false"
-      ></v-select>
-    </div>
-
-    <div class="uc-column">
-      <label for="inputZipCode" class="uc-form-label"
-        >What zip code do you live in?</label
-      >
-      <input
-        id="inputZipCode"
-        type="text"
-        pattern="[0-9]{5}"
-        class="uc-form-input"
-        v-bind:class="{
-          'uc-form-input--invalid': invalidInputs.indexOf('inputZipCode') > -1,
-        }"
-        v-model="eligibility.zipCode"
-        required
-        placeholder="5 digit zip code"
-        aria-label="5 digit zip code"
-      />
-    </div>
-
-    <div class="uc-column">
-      <label for="inputEligibilityEmail" class="uc-form-label"
-        >What's your email?</label
-      >
-      <input
-        id="inputEligibilityEmail"
-        type="email"
-        class="uc-form-input"
-        v-bind:class="{
-          'uc-form-input--invalid':
-            invalidInputs.indexOf('inputEligibilityEmail') > -1,
-        }"
-        v-model="eligibility.email"
-        required
-        placeholder="Email"
-        aria-label="Email"
-      />
-    </div>
-
-    <button class="uc-form-button-big" type="submit">
-      Continue
-    </button>
-
-    <div v-if="msg !== ''" role="alert">{{ msg }}</div>
-  </form>
-
-  <form
     v-else-if="step === 'account'"
     class="uc-form-body uc-form-body--center"
     aria-label="Student account"
     @submit.prevent="submitAccountForm()"
   >
-    <div
-      v-if="errors.length"
-      class="step-errors"
-      role="alert"
-      aria-labelledby="accountErrorsHeading"
-    >
-      <h5 id="accountErrorsHeading">Please correct the following problems:</h5>
-      <ul>
-        <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
-      </ul>
-    </div>
+    <FormErrors :errors="errors" />
 
     <h3 v-if="isReferred">Finish creating your account</h3>
     <div class="step-title" v-else>Finish creating your account</div>
@@ -523,7 +374,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import validator from 'validator'
 import Autocomplete from '@trevoreyre/autocomplete-vue'
 import * as Sentry from '@sentry/browser'
@@ -534,12 +385,14 @@ import VerificationBadge from '@/assets/verification.svg'
 import ErrorBadge from '@/assets/error_badge.svg'
 import { EVENTS } from '@/consts'
 import { backOff } from 'exponential-backoff'
+import FormErrors from '@/components/FormErrors.vue'
 
 export default {
   components: {
     Autocomplete,
     VerificationBadge,
     ErrorBadge,
+    FormErrors,
   },
   data() {
     const gradeLevels = [
@@ -586,10 +439,11 @@ export default {
       signupSourceId: null,
       otherSignupSource: '',
       isLoadingSignupSources: false,
+      isReferred: false,
+      isMiddleSchoolOptional: false,
     }
   },
   async mounted() {
-    this.isReferred = !!window.localStorage.getItem('upcReferredByCode')
     if (this.isReferred) this.step = 'referred'
     else if (this.isMobileApp) this.partnerCodePage()
     else this.eligibilityPage()
@@ -600,6 +454,9 @@ export default {
   computed: {
     ...mapState({
       isMobileApp: state => state.app.isMobileApp,
+    }),
+    ...mapGetters({
+      isOptionalMiddleSchoolActive: 'featureFlags/isOptionalMiddleSchoolActive',
     }),
     trimCurrentGrade() {
       // extracting the first word out of the gradeLevels
@@ -650,6 +507,12 @@ export default {
     },
   },
   methods: {
+    onGradeChange(value) {
+      this.isMiddleSchoolOptional = Boolean(
+        value === '8th grade' && this.isOptionalMiddleSchoolActive
+      )
+    },
+
     partnerCodePage() {
       this.step = 'partner-signup-code'
       this.$router.push('/sign-up/student/partner-code')
@@ -707,8 +570,11 @@ export default {
       this.errors = []
       this.invalidInputs = []
 
-      if (!this.eligibility.highSchool.upchieveId) {
-        this.errors.push('You must select your high school.')
+      if (
+        !this.eligibility.highSchool.upchieveId &&
+        !this.isMiddleSchoolOptional
+      ) {
+        this.errors.push('You must select a school.')
       }
 
       const zipCode = this.eligibility.zipCode
@@ -738,7 +604,7 @@ export default {
 
     // transitions from the referred sign up view to account view
     async continueToAccountPage() {
-      this.checkEligibilityErrors()
+      await this.checkEligibilityErrors()
       if (this.errors.length) return
 
       // autofill the user's email
@@ -750,14 +616,6 @@ export default {
 
     async submitEligibility() {
       AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CHECK_MY_ELIGIBILITY)
-      if (this.isReferred) {
-        this.step = 'eligible'
-        this.$router.push('/sign-up/student/eligible')
-
-        const isDomesticIpAddress = await this.isDomesticIpAddress()
-        if (!isDomesticIpAddress) return this.internationalPage()
-        return
-      }
 
       // reset error msg from server
       this.msg = ''
@@ -765,8 +623,14 @@ export default {
       await this.checkEligibilityErrors()
       if (this.errors.length) return
 
+      let schoolUpchieveId = this.eligibility.highSchool.upchieveId
+      if (this.isMiddleSchoolOptional) {
+        schoolUpchieveId =
+          schoolUpchieveId || '00000e00-00b0-00ca-0000-0b00c0b0000f'
+      }
+
       NetworkService.checkStudentEligibility(this, {
-        schoolUpchieveId: this.eligibility.highSchool.upchieveId,
+        schoolUpchieveId,
         zipCode: this.eligibility.zipCode,
         email: this.eligibility.email,
         referredByCode: window.localStorage.getItem('upcReferredByCode'),
@@ -794,7 +658,8 @@ export default {
           if (!isDomesticIpAddress) return this.internationalPage()
         })
         .catch(res => {
-          this.errors.push(res.body.message)
+          const error = (res.body && res.body.err) || 'Unknown server error'
+          this.errors.push(error)
         })
     },
     async accountPage() {
@@ -932,7 +797,17 @@ export default {
 }
 </script>
 
+<style lang="scss">
+.school-search ul {
+  z-index: 11 !important;
+}
+</style>
+
 <style lang="scss" scoped>
+.uc-form-body .grade-select {
+  z-index: 10;
+}
+
 .uc-form-body {
   @include child-spacing(top, 25px);
 
@@ -1005,12 +880,6 @@ p.small-paragraph {
 
 .enter-signup-code-button {
   margin-bottom: 25px;
-}
-
-.step-errors {
-  color: #bf0000;
-  font-size: 14px;
-  text-align: left;
 }
 
 .school-search {

@@ -436,6 +436,7 @@ export const UNLEASH_FEATURE_FLAGS = {
 export const POSTHOG_FEATURE_FLAGS = {
   FILTER_ACTIVE_SUBJECTS: 'filter-active-subjects',
   IMAGES_IN_DOCUMENTS: 'images-in-documents',
+  OPTIONAL_MIDDLE_SCHOOL: 'optional-middle-school',
 }
 
 export const ANALYTICS_REPORT_ROW = {
