@@ -1,67 +1,72 @@
 <template>
   <div class="session-recap-page">
-    <div class="chat-card-editor-container">
-      <div class="recap-card">
-        <h2 class="card-title">Session Recap</h2>
-        <div class="spacing--grid">
-          <span class="card-detail__title">Subject:</span>
-          <div class="card-detail__sub-container">
-            <div class="card-detail">{{ session.subject }}</div>
-            <component
-              v-bind:is="session.svg"
-              class="subject-icon card-detail"
-            />
+    <loader v-if="isLoadingRecap" class="recap-loader" />
+    <template v-else>
+      <div class="chat-card-editor-container">
+        <div class="recap-card">
+          <h2 class="card-title">Session Recap</h2>
+          <div class="spacing--grid">
+            <span class="card-detail__title">Subject:</span>
+            <div class="card-detail__sub-container">
+              <div class="card-detail">{{ session.subject }}</div>
+              <component
+                v-bind:is="session.svg"
+                class="subject-icon card-detail"
+              />
+            </div>
+            <span class="card-detail__title">Time:</span>
+            <div class="card-detail">
+              {{ getSessionTime(session.createdAt) }}
+            </div>
+            <span class="card-detail__title">Coach:</span>
+            <div class="card-detail card-detail__sub-container">
+              <div class="card-detail">{{ session.volunteerFirstName }}</div>
+              <favoriting-toggle
+                :initialIsFavorite="session.isFavorited"
+                :volunteerName="session.volunteerFirstName"
+                :volunteerId="session.volunteerId"
+                class="heart"
+              />
+            </div>
           </div>
-          <span class="card-detail__title">Time:</span>
-          <div class="card-detail">{{ getSessionTime(session.createdAt) }}</div>
-          <span class="card-detail__title">Coach:</span>
-          <div class="card-detail card-detail__sub-container">
-            <div class="card-detail">{{ session.volunteerFirstName }}</div>
-            <favoriting-toggle
-              :initialIsFavorite="session.isFavorited"
-              :volunteerName="session.volunteerFirstName"
-              :volunteerId="session.volunteerId"
-              class="heart"
-            />
+        </div>
+        <chat-log
+          v-if="mobileMode"
+          class="chat"
+          :messages="session.messages"
+          :studentId="session.studentId"
+          :volunteerId="session.volunteerId"
+        />
+        <div v-if="session.quillDoc" class="document">
+          <h2 class="document__title">Doc Editor</h2>
+          <div class="document__container">
+            <div class="quill-container"></div>
+          </div>
+        </div>
+        <div v-if="session.hasWhiteboardDoc" class="document">
+          <h2 class="document__title">Whiteboard</h2>
+          <p v-if="loadingWhiteboardError" class="error">
+            {{ loadingWhiteboardError }}
+          </p>
+          <div class="whiteboard-wrapper">
+            <transition name="whiteboard-warning">
+              <loading-message
+                message="Loading the whiteboard"
+                class="whiteboard-warning whiteboard-warning--connection"
+                v-show="!isConnectedToWhiteboard && !loadingWhiteboardError"
+              />
+            </transition>
+            <div id="zwibbler-container"></div>
           </div>
         </div>
       </div>
       <chat-log
-        v-if="mobileMode"
-        class="chat"
+        v-if="!mobileMode"
         :messages="session.messages"
         :studentId="session.studentId"
         :volunteerId="session.volunteerId"
       />
-      <div v-if="session.quillDoc" class="document">
-        <h2 class="document__title">Doc Editor</h2>
-        <div class="document__container">
-          <div class="quill-container"></div>
-        </div>
-      </div>
-      <div v-if="session.hasWhiteboardDoc" class="document">
-        <h2 class="document__title">Whiteboard</h2>
-        <p v-if="loadingWhiteboardError" class="error">
-          {{ loadingWhiteboardError }}
-        </p>
-        <div class="whiteboard-wrapper">
-          <transition name="whiteboard-warning">
-            <loading-message
-              message="Loading the whiteboard"
-              class="whiteboard-warning whiteboard-warning--connection"
-              v-show="!isConnectedToWhiteboard && !loadingWhiteboardError"
-            />
-          </transition>
-          <div id="zwibbler-container"></div>
-        </div>
-      </div>
-    </div>
-    <chat-log
-      v-if="!mobileMode"
-      :messages="session.messages"
-      :studentId="session.studentId"
-      :volunteerId="session.volunteerId"
-    />
+    </template>
   </div>
 </template>
 
@@ -79,12 +84,14 @@ import ScienceSVG from '@/assets/subject_icons/science.svg'
 import SATSVG from '@/assets/subject_icons/sat.svg'
 import ReadingWritingSVG from '@/assets/subject_icons/more-resources.svg'
 import LoadingMessage from '@/components/LoadingMessage'
+import Loader from '@/components/Loader'
 
 export default {
   components: {
     ChatLog,
     FavoritingToggle,
     LoadingMessage,
+    Loader,
   },
   computed: {
     ...mapState({
@@ -116,14 +123,22 @@ export default {
       loadingWhiteboardError: '',
       zwibblerCtx: null,
       isConnectedToWhiteboard: false,
+      isLoadingRecap: true,
     }
   },
   async created() {
-    const response = await NetworkService.getSessionRecap(
-      this.$route.params.sessionId
-    )
-    this.session = response.body.session
-    this.session.svg = this.svgs[this.session.topic]
+    try {
+      this.isLoadingRecap = true
+      const response = await NetworkService.getSessionRecap(
+        this.$route.params.sessionId
+      )
+      this.session = response.body.session
+      this.session.svg = this.svgs[this.session.topic]
+    } catch (error) {
+      if (error.status === 403) this.$router.push('/dashboard')
+    } finally {
+      this.isLoadingRecap = false
+    }
 
     // The divs that contain the editors are not loaded onto the DOM immediately because they
     // have conditions that must consult the `this.session`. $nextTick allows us to execute
@@ -311,5 +326,9 @@ export default {
   height: 100%;
   width: 100%;
   position: relative;
+}
+
+.recap-loader {
+  margin: 0 auto;
 }
 </style>
