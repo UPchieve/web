@@ -1,7 +1,7 @@
 import { UNLEASH_FEATURE_FLAGS, POSTHOG_FEATURE_FLAGS } from '@/consts'
 import config from '@/config'
 import { UnleashClient } from 'unleash-proxy-client'
-import * as Sentry from '@sentry/browser'
+import LoggerService from '@/services/LoggerService'
 import posthog from 'posthog-js'
 
 /**
@@ -81,7 +81,7 @@ export default {
         })
         await unleash.start()
       } catch (err) {
-        Sentry.captureException(err)
+        LoggerService.noticeError(err)
       }
     },
     async initPostHogFlags({ commit }) {
@@ -93,7 +93,7 @@ export default {
             resolve()
           })
         } catch (err) {
-          Sentry.captureException(err)
+          LoggerService.noticeError(err)
           reject(err)
         }
       })

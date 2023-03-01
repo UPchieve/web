@@ -2,7 +2,7 @@ import StudentAvatarUrl from '@/assets/defaultavatar3.png'
 import VolunteerAvatarUrl from '@/assets/defaultavatar4.png'
 import SessionService from '@/services/SessionService'
 import UserService from '@/services/UserService'
-import * as Sentry from '@sentry/browser'
+import LoggerService from '@/services/LoggerService'
 import Case from 'case'
 import _ from 'lodash'
 
@@ -136,7 +136,7 @@ export default {
         .catch(err => {
           commit('setSession', {})
           if (err.status !== 404) {
-            Sentry.captureException(err)
+            LoggerService.noticeError(err)
           }
         })
     },
@@ -149,7 +149,7 @@ export default {
         .catch(err => {
           commit('setLatestSession', {})
           if (err.status !== 404) {
-            Sentry.captureException(err)
+            LoggerService.noticeError(err)
           }
         })
     },

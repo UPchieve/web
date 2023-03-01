@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer'
 import exifremove from 'exifremove'
-import * as Sentry from '@sentry/browser'
+import LoggerService from '@/services/LoggerService'
 
 function checkIfPhotoIsAllowedType(file) {
   const allowedFormats = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif']
@@ -36,7 +36,7 @@ export async function validatePhoto(file) {
   try {
     return await stripExifData(file)
   } catch (err) {
-    Sentry.captureException(
+    LoggerService.noticeError(
       new Error(
         `Unable to remove identifying information from the image: ${err}`
       )

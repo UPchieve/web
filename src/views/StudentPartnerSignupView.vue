@@ -301,7 +301,7 @@
 
 <script>
 import validator from 'validator'
-import * as Sentry from '@sentry/browser'
+import LoggerService from '@/services/LoggerService'
 import Autocomplete from '@trevoreyre/autocomplete-vue'
 
 import FormPageTemplate from '@/components/FormPageTemplate'
@@ -338,7 +338,7 @@ export default {
         if (err.status !== 404) {
           // we shouldn't get 422 here, since semantics of GET request are expected
           // to be correct regardless of user input
-          Sentry.captureException(err)
+          LoggerService.noticeError(err)
         }
         return next('/sign-up')
       })
@@ -538,7 +538,7 @@ export default {
         .catch(err => {
           this.serverErrorMsg = err.message
           if (err.status !== 409 && err.status !== 422) {
-            Sentry.captureException(err)
+            LoggerService.noticeError(err)
           }
         })
     },
@@ -622,7 +622,7 @@ export default {
         .catch(err => {
           this.serverErrorMsg = err.message
           if (err.status !== 422) {
-            Sentry.captureException(err)
+            LoggerService.noticeError(err)
           }
         })
     },
@@ -635,7 +635,7 @@ export default {
         )
         this.signupSourcesOptions = data.body.signupSources
       } catch (err) {
-        Sentry.captureException(err)
+        LoggerService.noticeError(err)
       } finally {
         this.isLoadingSignupSource = false
       }

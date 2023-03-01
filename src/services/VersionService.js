@@ -1,5 +1,5 @@
 import NetworkService from './NetworkService'
-import * as Sentry from '@sentry/browser'
+import LoggerService from './LoggerService'
 
 export default {
   async getCurrentServerVersion() {
@@ -11,7 +11,7 @@ export default {
       version = checkHealthResponse.body.version
     } catch (err) {
       version = 'unknown'
-      Sentry.captureException(err)
+      LoggerService.noticeError(err)
     }
     return version
   },

@@ -18,6 +18,7 @@ import Gleap from 'gleap'
 import NetworkService from './services/NetworkService'
 import { backOff } from 'exponential-backoff'
 import io from 'socket.io-client'
+import LoggerService from './services/LoggerService'
 
 if (config.posthogToken) {
   posthog.init(`${config.posthogToken}`, {
@@ -121,7 +122,7 @@ async function main() {
     store.commit('app/setCsrfToken', response.data.csrfToken)
     initVue()
   } catch (err) {
-    Sentry.captureException(err)
+    LoggerService.noticeError(err)
   }
 }
 

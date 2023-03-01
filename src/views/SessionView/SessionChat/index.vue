@@ -118,7 +118,6 @@
 import { setTimeout, clearTimeout } from 'timers'
 import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
-import * as Sentry from '@sentry/browser'
 
 import ChatBot from './ChatBot'
 import LoadingMessage from '@/components/LoadingMessage'
@@ -126,6 +125,7 @@ import ModerationService from '@/services/ModerationService'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import sendWebNotification from '@/utils/send-web-notification'
 import getChatAvatar from '@/utils/get-chat-avatar'
+import LoggerService from '@/services/LoggerService'
 
 const MESSAGE_ALIGNMENT = {
   LEFT: 'left',
@@ -175,7 +175,7 @@ export default {
       const isConnectionFailure =
         !this.isSessionConnectionAlive && this.isSessionAlive
       if (isConnectionFailure)
-        Sentry.captureException(new Error('Attempting to connect the chat'), {
+        LoggerService.noticeError(new Error('Attempting to connect the chat'), {
           tags: {
             sessionId: this.currentSession._id,
           },
