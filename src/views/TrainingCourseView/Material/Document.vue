@@ -1,9 +1,7 @@
 <template>
   <div class="document">
     <iframe
-      :src="
-        `https://docs.google.com/viewer?url=https://upc-training-materials.s3.us-east-2.amazonaws.com/${resourceId}.pdf&embedded=true`
-      "
+      :src="linkUrl"
       class="document__iframe"
       allowfullscreen
       @load="loaded"
@@ -25,7 +23,7 @@ import Loader from '@/components/Loader'
 export default {
   name: 'Document',
   props: {
-    resourceId: String,
+    linkUrl: String,
   },
   components: { Loader },
   data() {

@@ -7,13 +7,20 @@
       allowfullscreen
       title="external video for training"
     ></iframe>
+    <link-material v-if="pdf" :linkUrl="pdf" :label="'PDF Version'" />
   </div>
 </template>
 
 <script>
+import LinkMaterial from './Link'
+
 export default {
+  components: {
+    LinkMaterial,
+  },
   props: {
     resourceId: String,
+    pdf: String,
   },
 }
 </script>
