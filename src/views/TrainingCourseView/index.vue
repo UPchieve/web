@@ -6,7 +6,7 @@
       <div class="course__modules">
         <module
           v-for="module in course.modules"
-          :key="module.moduleKey"
+          :key="module.name"
           :module="module"
           v-on:material-completed="trackMaterialProgress"
         />

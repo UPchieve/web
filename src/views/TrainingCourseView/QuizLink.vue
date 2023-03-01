@@ -37,14 +37,14 @@ export default {
       return this.certification.tries > 0
     },
     statusClass() {
-      if (this.isDisabled) return 'quiz-link--disabled'
-      else if (this.isCompleted) return 'quiz-link--completed'
+      if (this.isCompleted) return 'quiz-link--completed'
+      else if (this.isDisabled) return 'quiz-link--disabled'
       else if (this.isStarted) return 'quiz-link--started'
       return 'quiz-link--not-started'
     },
     statusText() {
-      if (this.isDisabled) return 'Locked'
-      else if (this.isCompleted) return 'Completed'
+      if (this.isCompleted) return 'Completed'
+      else if (this.isDisabled) return 'Locked'
       else if (this.isStarted) return 'In progress'
       return 'Not started'
     },

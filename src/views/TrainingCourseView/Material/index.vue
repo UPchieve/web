@@ -25,7 +25,7 @@
       <link-material
         v-if="material.type === 'link'"
         :linkUrl="material.linkUrl"
-        :label="'Go to link'"
+        :label="material.linkLabel ? material.linkLabel : 'Go to link'"
       />
       <resources-material
         v-else-if="material.type === 'resources'"
@@ -33,21 +33,17 @@
       />
       <document-material
         v-else-if="material.type === 'document'"
-        :resourceId="material.resourceId"
+        :linkUrl="material.linkUrl"
       />
       <video-material
         v-else-if="material.type === 'video'"
         :resourceId="material.resourceId"
+        :pdf="material.videoPDF"
       />
 
       <p v-if="material.type === 'document'" class="material__document-link">
         Are you having trouble viewing the document?
-        <a
-          :href="
-            `https://upc-training-materials.s3.us-east-2.amazonaws.com/${material.resourceId}.pdf`
-          "
-          target="_blank"
-          rel="noopener noreferrer"
+        <a :href="material.linkUrl" target="_blank" rel="noopener noreferrer"
           >View here</a
         >
       </p>
@@ -199,6 +195,7 @@ export default {
   &__description {
     font-size: 16px;
     padding: 10px 0 30px;
+    white-space: pre-line;
   }
 
   &__complete-btn {

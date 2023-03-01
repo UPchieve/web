@@ -104,6 +104,7 @@ const frameSrc = [
   googleDocFrameSrcUrl,
   vimeoFrameSrcUrl,
   gleapMessengerFrameSrcUrl,
+  cdnUrl,
 ]
 
 const mediaSrc = ["'self'", gleapMediaSrcUrl]
