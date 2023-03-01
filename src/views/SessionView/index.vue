@@ -107,7 +107,6 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import * as Sentry from '@sentry/browser'
 import NetworkService from '@/services/NetworkService'
 import SessionService from '@/services/SessionService'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -290,7 +289,7 @@ export default {
               )
             )
           } catch (err) {
-            Sentry.captureException(err)
+            LoggerService.noticeError(err)
           }
           this.$store.dispatch('user/clearPresessionSurvey')
         }
@@ -322,7 +321,7 @@ export default {
       .catch(err => {
         if (err.status !== 0 && err.code !== 'EUSERABORTED') {
           window.alert('Could not start new help session')
-          Sentry.captureException(err)
+          LoggerService.noticeError(err)
         }
         this.$router.replace('/')
       })

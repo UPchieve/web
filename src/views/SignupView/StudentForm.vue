@@ -377,7 +377,7 @@
 import { mapState, mapGetters } from 'vuex'
 import validator from 'validator'
 import Autocomplete from '@trevoreyre/autocomplete-vue'
-import * as Sentry from '@sentry/browser'
+import LoggerService from '@/services/LoggerService'
 import AuthService from '@/services/AuthService'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -764,7 +764,7 @@ export default {
               EVENTS.STUDENT_ENTERED_INVALID_PASSWORD
             )
           if (err.status !== 422) {
-            Sentry.captureException(err)
+            LoggerService.noticeError(err)
           }
         })
     },
@@ -788,7 +788,7 @@ export default {
         )
         this.signupSourcesOptions = data.body.signupSources
       } catch (err) {
-        Sentry.captureException(err)
+        LoggerService.noticeError(err)
       } finally {
         this.isLoadingSignupSources = false
       }

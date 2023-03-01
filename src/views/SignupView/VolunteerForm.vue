@@ -217,7 +217,7 @@
 
 <script>
 import validator from 'validator'
-import * as Sentry from '@sentry/browser'
+import LoggerService from '@/services/LoggerService'
 import AuthService from '@/services/AuthService'
 import VuePhoneNumberInput from 'vue-phone-number-input'
 import Loader from '@/components/Loader'
@@ -294,7 +294,7 @@ export default {
         .catch(err => {
           this.msg = err.message
           if (err.status !== 409 && err.status !== 422) {
-            Sentry.captureException(err)
+            LoggerService.noticeError(err)
           }
         })
     },
@@ -354,7 +354,7 @@ export default {
           this.isRegistering = false
           this.msg = err.message
           if (err.status !== 409 && err.status !== 422) {
-            Sentry.captureException(err)
+            LoggerService.noticeError(err)
           }
         })
     },
@@ -386,7 +386,7 @@ export default {
           'Friend'
         this.signupSourcesOptions = allSources
       } catch (err) {
-        Sentry.captureException(err)
+        LoggerService.noticeError(err)
       } finally {
         this.isLoadingSignupSources = false
       }

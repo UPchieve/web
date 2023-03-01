@@ -100,7 +100,7 @@ import Loader from '@/components/Loader'
 import AuthService from '@/services/AuthService'
 import VerificationBadge from '@/assets/verification.svg'
 import LargeButton from '@/components/LargeButton'
-import * as Sentry from '@sentry/browser'
+import LoggerService from '@/services/LoggerService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 
@@ -206,7 +206,7 @@ export default {
       this.isSubmitting = false
     },
     handleRequestError(error) {
-      if (error.status !== 422) Sentry.captureException(error)
+      if (error.status !== 422) LoggerService.noticeError(error)
       this.error =
         error.message ||
         'Sorry, looks like something went wrong. Please try again in a few minutes.'

@@ -49,6 +49,7 @@ import AnalyticsService from '@/services/AnalyticsService'
 import config from '@/config'
 import LargeButton from '@/components/LargeButton'
 import Gleap from 'gleap'
+import LoggerService from '@/services/LoggerService'
 
 export default {
   name: 'App',
@@ -282,16 +283,16 @@ export default {
   sockets: {
     error(error) {
       if (this.isExemptSocketError(error)) return
-      Sentry.captureException(error)
+      LoggerService.noticeError(error)
     },
     connect_error(error) {
       // these are handled internally and shouldn't be forwarded to Sentry
       if (this.isExemptSocketError(error)) return
-      Sentry.captureException(error)
+      LoggerService.noticeError(error)
     },
     reconnect_error(error) {
       if (this.isExemptSocketError(error)) return
-      Sentry.captureException(error)
+      LoggerService.noticeError(error)
     },
     'session-change'(sessionData) {
       this.$store.dispatch('user/updateSession', sessionData)

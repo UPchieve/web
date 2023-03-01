@@ -31,7 +31,7 @@ import PortalService from '@/services/PortalService'
 import NetworkService from '@/services/NetworkService'
 import LoadingMessage from '@/components/LoadingMessage'
 import setCookie from '@/utils/set-cookie'
-import * as Sentry from '@sentry/browser'
+import LoggerService from '@/services/LoggerService'
 
 export default {
   components: { LargeButton, LoadingMessage },
@@ -69,7 +69,7 @@ export default {
         startSession(this.$router, topic, selectedSubtopic)
       } catch (error) {
         if (error.status !== 422) {
-          Sentry.captureException(error)
+          LoggerService.noticeError(error)
         }
 
         startSession(this.$router, topic, selectedSubtopic)

@@ -1,5 +1,5 @@
 import NetworkService from '@/services/NetworkService'
-import * as Sentry from '@sentry/browser'
+import LoggerService from '@/services/LoggerService'
 import { backOff } from 'exponential-backoff'
 
 export default {
@@ -31,7 +31,7 @@ export default {
         const response = await backOff(() => NetworkService.getSubjects())
         commit('setSubjects', response.body.subjects)
       } catch (err) {
-        Sentry.captureException(err)
+        LoggerService.noticeError(err)
         commit('setFetchingSubjectsError', true)
       } finally {
         commit('setIsFetchingSubjects', false)
@@ -45,7 +45,7 @@ export default {
         )
         commit('setTraining', response.body.training)
       } catch (err) {
-        Sentry.captureException(err)
+        LoggerService.noticeError(err)
         commit('setFetchingTrainingError', true)
       } finally {
         commit('setIsFetchingTraining', false)

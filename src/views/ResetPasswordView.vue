@@ -56,12 +56,12 @@
 </template>
 
 <script>
-import * as Sentry from '@sentry/browser'
 import { mapState } from 'vuex'
 
 import AuthService from '@/services/AuthService'
 import FormPageTemplate from '@/components/FormPageTemplate'
 import Loader from '@/components/Loader'
+import LoggerService from '@/services/LoggerService'
 
 export default {
   components: {
@@ -94,7 +94,7 @@ export default {
           this.error = err.message
           this.isSendingEmail = false
           if (err.status !== 422) {
-            Sentry.captureException(err)
+            LoggerService.noticeError(err)
           }
         })
     },

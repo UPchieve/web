@@ -67,13 +67,13 @@
 </template>
 
 <script>
-import * as Sentry from '@sentry/browser'
 import { mapState } from 'vuex'
 
 import AuthService from '@/services/AuthService'
 import FormPageTemplate from '@/components/FormPageTemplate'
 import LargeButton from '@/components/LargeButton'
 import Loader from '@/components/Loader'
+import LoggerService from '@/services/LoggerService'
 
 export default {
   components: {
@@ -127,7 +127,7 @@ export default {
           this.isResettingPassword = false
           this.msg = err.message || err
           if (err.status !== 422) {
-            Sentry.captureException(err)
+            LoggerService.noticeError(err)
           }
         })
     },

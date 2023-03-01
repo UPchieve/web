@@ -258,7 +258,6 @@ import ResetIcon from '@/assets/whiteboard_icons/reset.svg'
 import Loader from '@/components/Loader'
 import ResetWhiteboardModal from './ResetWhiteboardModal'
 import LoadingMessage from '@/components/LoadingMessage'
-import * as Sentry from '@sentry/browser'
 import config from '../../config'
 import heic2any from 'heic2any'
 import LoggerService from '@/services/LoggerService'
@@ -513,7 +512,7 @@ export default {
         setTimeout(() => {
           this.uploadingPictureError = false
         }, 2000)
-        Sentry.captureException(error)
+        LoggerService.noticeError(error)
         return
       } finally {
         // Reset the file input
@@ -652,7 +651,7 @@ export default {
       try {
         await this.zwibblerCtx.joinSharedSession(this.sessionId, true)
       } catch (error) {
-        Sentry.captureException(error)
+        LoggerService.noticeError(error)
       }
 
       // Set up custom selection handles
