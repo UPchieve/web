@@ -25,11 +25,9 @@
           <p
             v-for="subjectType in subjectTypes"
             :key="subjectType.key"
-            @click="showSubjectTraining(subjectType.key)"
+            @click="showTopicTraining(subjectType.key)"
             class="subject-types__header-type"
-            :class="
-              subjectType.key === currentSubjectType ? 'is-selected' : null
-            "
+            :class="subjectType.key === currentTopic ? 'is-selected' : null"
           >
             {{ subjectType.displayName }}
           </p>
@@ -107,13 +105,14 @@ export default {
   },
   data() {
     return {
-      currentSubjectType: 'math',
+      currentTopic: '',
     }
   },
 
   async created() {
     if (Object.entries(this.training).length === 0)
       await this.$store.dispatch('subjects/getTrainingSubjects')
+    else this.setInitialTopic()
   },
   computed: {
     ...mapState({
@@ -123,7 +122,7 @@ export default {
       fetchingTrainingError: state => state.subjects.fetchingTrainingError,
     }),
     currentSubject() {
-      return this.training[this.currentSubjectType]
+      return this.training[this.currentTopic]
     },
     // get the amount of required training material a user must complete
     requiredTrainingMessage() {
@@ -140,19 +139,13 @@ export default {
       return ['Subject', 'Alternative Certifications', '']
     },
     additionalSubjectsAccordionHeader() {
-      if (this.currentSubjectType === 'math')
-        return {
-          header: 'Integrated Math',
-          subheader: 'Click here to learn more about Integrated Math',
-        }
-      else
-        return {
-          header: 'Additional Subjects',
-          subheader: `We're always improving our training, here's a list of older certifications that will unlock subjects. We'd still recommend getting your new certifications as our training has improved!`,
-        }
+      return {
+        header: 'Additional Subjects',
+        subheader: `We're always improving our training, here's a list of older certifications that will unlock subjects. We'd still recommend getting your new certifications as our training has improved!`,
+      }
     },
     computedSubjectsHeader() {
-      if (this.currentSubjectType === 'math')
+      if (this.currentTopic === 'math')
         return {
           header: 'Integrated Math',
           subheader: 'Click here to learn more about Integrated Math',
@@ -169,8 +162,17 @@ export default {
     },
   },
   methods: {
-    showSubjectTraining(subject) {
-      this.currentSubjectType = subject
+    showTopicTraining(topic) {
+      this.currentTopic = topic
+    },
+    setInitialTopic() {
+      this.currentTopic = this.subjectTypes[0].key
+    },
+  },
+  watch: {
+    'training.subjectTypes'(newValue, oldValue) {
+      const nowLoaded = newValue && !oldValue
+      if (nowLoaded) this.setInitialTopic()
     },
   },
 }
