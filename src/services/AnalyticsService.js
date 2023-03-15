@@ -3,13 +3,11 @@ import { EVENTS } from '../consts'
 import Gleap from 'gleap'
 
 export default {
-  identify(userId, name, email, type) {
+  identify(userId, properties) {
     posthog.identify(userId)
-    Gleap.identify(userId, {
-      name,
-      email,
-    })
-    Gleap.setCustomData('userType', type)
+    Gleap.identify(userId, properties)
+    // Attaches custom data to the feedback submission
+    Gleap.setCustomData('userType', properties.customData.userType)
   },
 
   updateUser(update) {
