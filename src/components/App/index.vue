@@ -233,17 +233,23 @@ export default {
       const nowLoggedIn = currentUserValue._id && !previousUserValue._id
       if (nowLoggedIn) {
         Sentry.setUser({ id: currentUserValue._id })
-        AnalyticsService.identify(
-          currentUserValue._id,
-          currentUserValue.firstname,
-          currentUserValue.email,
-          currentUserValue.type
-        )
+        const partner = currentUserValue.isVolunteer
+          ? currentUserValue.volunteerPartnerOrg
+          : currentUserValue.studentPartnerOrg
+        AnalyticsService.identify(currentUserValue._id, {
+          name: currentUserValue.firstName,
+          email: currentUserValue.email,
+          value: currentUserValue.roleId,
+          // Attaches custom data to the user in Gleap
+          customData: {
+            userType: currentUserValue.type,
+            partner: currentUserValue.partner,
+            totalSessions: currentUserValue.pastSessions.length,
+          },
+        })
         AnalyticsService.updateUser({
           userType: currentUserValue.type,
-          partner: currentUserValue.isVolunteer
-            ? currentUserValue.volunteerPartnerOrg
-            : currentUserValue.studentPartnerOrg,
+          partner,
         })
 
         if (this.mobileMode && !this.isMobileApp && !this.isVolunteer) {
