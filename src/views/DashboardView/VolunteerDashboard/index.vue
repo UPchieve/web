@@ -133,11 +133,6 @@
       :closeModal="togglePhotoUploadModal"
     />
 
-    <references-modal
-      v-if="showReferencesModal"
-      :closeModal="toggleReferencesModal"
-    />
-
     <volunteer-welcome-modal
       v-if="showWelcomeModal"
       :closeModal="toggleWelcomeModal"
@@ -152,11 +147,9 @@ import ListSessions from './ListSessions'
 import DashboardBanner from '../DashboardBanner'
 import AccountAction from './AccountAction'
 import PhotoUploadModal from './PhotoUploadModal'
-import ReferencesModal from './ReferencesModal'
 import VolunteerWelcomeModal from '@/views/DashboardView/VolunteerDashboard/VolunteerWelcomeModal.vue'
 import PersonCardIcon from '@/assets/person-card.svg'
 import PersonIcon from '@/assets/person.svg'
-import ReferencesIcon from '@/assets/references-icon.svg'
 import CalendarIcon from '@/assets/calendar.svg'
 import CertificationIcon from '@/assets/certification.svg'
 import VerificationIcon from '@/assets/verification.svg'
@@ -187,7 +180,6 @@ export default {
     DashboardBanner,
     AccountAction,
     PhotoUploadModal,
-    ReferencesModal,
     VerificationIcon,
     OnboardingIcon,
     VolunteerWelcomeModal,
@@ -255,7 +247,6 @@ export default {
   data() {
     return {
       showPhotoUploadModal: false,
-      showReferencesModal: false,
       showWelcomeModal: false,
       lastUpdated: '',
       impactStats: {},
@@ -305,7 +296,7 @@ export default {
           }
         case 'SUBMITTED':
           return {
-            subtitle: 'Reviewed after references submit',
+            subtitle: 'Reviewed after background information is completed',
             status: 'PENDING',
           }
         case 'APPROVED':
@@ -323,45 +314,6 @@ export default {
             subtitle: 'Upload a photo ID',
             status: 'DEFAULT',
           }
-      }
-    },
-
-    referenceAction() {
-      const statuses = this.user.references.map(r => r.status)
-
-      if (statuses.length === 0)
-        return {
-          subtitle: 'Provide 2 references',
-          status: 'DEFAULT',
-        }
-
-      if (statuses.some(s => s === 'REJECTED'))
-        return {
-          subtitle: 'Provide new reference(s)',
-          status: 'ERROR',
-        }
-
-      if (statuses.length === 1)
-        return {
-          subtitle: 'In progress: provide 1 additional reference',
-          status: 'PROGRESS',
-        }
-
-      if (statuses[0] === 'APPROVED' && statuses[1] === 'APPROVED')
-        return {
-          subtitle: 'Completed',
-          status: 'COMPLETED',
-        }
-
-      if (statuses[0] === 'SUBMITTED' && statuses[1] === 'SUBMITTED')
-        return {
-          subtitle: 'Pending review',
-          status: 'PENDING',
-        }
-
-      return {
-        subtitle: 'Waiting on references to submit',
-        status: 'PENDING',
       }
     },
 
@@ -460,14 +412,6 @@ export default {
           icon: PersonCardIcon,
           priority: this.addSortPriorityNum(this.photoIdAction.status),
         },
-        {
-          title: 'Reference check (5 mins)',
-          subtitle: this.referenceAction.subtitle,
-          status: this.referenceAction.status,
-          clickFn: this.toggleReferencesModal,
-          icon: ReferencesIcon,
-          priority: this.addSortPriorityNum(this.referenceAction.status),
-        },
       ]
 
       return accountActions.sort((a, b) => a.priority - b.priority)
@@ -554,9 +498,6 @@ export default {
     },
     togglePhotoUploadModal() {
       this.showPhotoUploadModal = !this.showPhotoUploadModal
-    },
-    toggleReferencesModal() {
-      this.showReferencesModal = !this.showReferencesModal
     },
     clickAvailabilityAction() {
       this.$router.push('/calendar')

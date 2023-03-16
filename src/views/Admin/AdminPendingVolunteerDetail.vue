@@ -1,13 +1,5 @@
 <template>
-  <div v-if="showReferenceForm">
-    <admin-reference-view
-      :reference="chosenReference"
-      :closeReferenceView="toggleReferenceView"
-      :updateReferenceStatus="updateReferenceStatus"
-      :referenceStatusText="chosenReference.status"
-    />
-  </div>
-  <div v-else-if="volunteer._id" class="user-detail">
+  <div v-if="volunteer._id" class="user-detail">
     <div class="user-detail__body">
       <button class="edit-btn btn" type="button" @click="toggleEditMode()">
         Edit
@@ -54,31 +46,6 @@
         <div>{{ volunteer.photoId }}</div>
       </div>
       <div class="user-detail__section">
-        <div class="user-detail__section-title">References</div>
-        <div
-          v-for="reference in volunteer.references"
-          :key="reference._id"
-          class="reference"
-        >
-          <p>
-            <span
-              @click="toggleReferenceView(reference)"
-              class="reference__form-link"
-              >{{ reference.firstName }} {{ reference.lastName }}</span
-            >
-            {{ ' ' }}
-            <span
-              class="user-detail__account-notice user-detail__status"
-              :class="statusColor(referencesStatusMap[reference.id])"
-              >{{ statusText(referencesStatusMap[reference.id]) }}</span
-            >
-          </p>
-          <p class="reference__email">
-            {{ reference.email }}
-          </p>
-        </div>
-      </div>
-      <div class="user-detail__section">
         <div class="user-detail__section-title">
           Background Information
           <span
@@ -104,13 +71,12 @@
 <script>
 import moment from 'moment'
 import NetworkService from '@/services/NetworkService'
-import AdminReferenceView from '@/views/Admin/AdminReferenceView'
 import LargeButton from '@/components/LargeButton'
 import BackgroundInfo from '@/components/Admin/BackgroundInfo'
 
 export default {
   name: 'AdminPendingVolunteerDetail',
-  components: { AdminReferenceView, LargeButton, BackgroundInfo },
+  components: { LargeButton, BackgroundInfo },
   props: {
     volunteer: { type: Object, required: true },
     toggleEditMode: { type: Function, required: true },
@@ -119,16 +85,10 @@ export default {
     return {
       error: '',
       photoIdStatus: '',
-      showReferenceForm: false,
-      chosenReference: undefined,
-      referencesStatusMap: {},
     }
   },
   async created() {
     this.photoIdStatus = this.volunteer.photoIdStatus
-    for (const reference of this.volunteer.references) {
-      this.referencesStatusMap[reference._id] = reference.status
-    }
   },
   methods: {
     async handleSubmit() {
@@ -136,7 +96,6 @@ export default {
 
       const data = {
         photoIdStatus: this.photoIdStatus,
-        referencesStatusMap: this.referencesStatusMap,
         volunteerId: this.volunteer._id,
       }
       try {
@@ -147,16 +106,6 @@ export default {
       } catch (error) {
         this.error = "There was an error updating the volunteer's status."
       }
-    },
-    toggleReferenceView(reference) {
-      this.chosenReference = reference
-      this.showReferenceForm = !this.showReferenceForm
-    },
-    updateReferenceStatus(event) {
-      const {
-        target: { value },
-      } = event
-      this.referencesStatusMap[this.chosenReference._id] = value
     },
     statusText(status) {
       if (status === 'SUBMITTED') return 'WAITING FOR REVIEW'
@@ -271,17 +220,6 @@ export default {
 
   &__photo-id-select {
     margin-bottom: 0.8em;
-  }
-}
-
-.reference {
-  margin-bottom: 1em;
-  text-align: left;
-
-  &__form-link {
-    color: $c-information-blue;
-    text-decoration: underline;
-    cursor: pointer;
   }
 }
 
