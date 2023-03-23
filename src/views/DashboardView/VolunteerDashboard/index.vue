@@ -296,7 +296,7 @@ export default {
           }
         case 'SUBMITTED':
           return {
-            subtitle: 'Reviewed after background information is completed',
+            subtitle: 'Waiting for review (1-2 business days)',
             status: 'PENDING',
           }
         case 'APPROVED':
