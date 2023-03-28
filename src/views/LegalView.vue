@@ -76,13 +76,11 @@
       <div>
         <accordion-item label="Eligibility for Services">
           <p>
-            THE WEBSITE IS NOT AVAILABLE TO (A) ANY USERS PREVIOUSLY SUSPENDED
-            OR REMOVED FROM THE WEBSITE BY UPCHIEVE OR (B) ANY PERSONS UNDER THE
-            AGE OF 13. By using or registering an account for the Website, you
+            THE WEBSITE IS NOT AVAILABLE TO ANY USERS PREVIOUSLY SUSPENDED
+            OR REMOVED FROM THE WEBSITE BY UPCHIEVE. By using or registering an account for the Website, you
             represent (a) that you have read and agree to these Terms, the
             Privacy Policy, and Disclaimers; (b) that you have not been
-            previously suspended or removed from the Website by UPchieve; (c)
-            that you are over 13 years of age; and (d) that your registration
+            previously suspended or removed from the Website by UPchieve; and (d) that your registration
             and your use of the Website is in compliance with any and all
             applicable laws and regulations.
           </p>
@@ -547,13 +545,6 @@
             removal of the data.
           </p>
 
-          <p>
-            If you are under age 13, a law called the Children's Online Privacy
-            Protection Act (COPPA) says that we must have a parent's permission
-            before we may collect and use your personal information. At this
-            point, we do not allow students under the age of 13 to make accounts
-            and use our Services.
-          </p>
         </accordion-item>
 
         <accordion-item label="Who Has Access to Your Personal Information">

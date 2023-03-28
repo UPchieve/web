@@ -339,7 +339,7 @@
         required
       />
       <label for="userAgreement">
-        I am at least 13 years of age and have read and accept the
+        I have read and accept the
         <a href="/legal" target="_blank">User Agreement</a>.
       </label>
     </div>
