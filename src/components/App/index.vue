@@ -50,6 +50,7 @@ import config from '@/config'
 import LargeButton from '@/components/LargeButton'
 import Gleap from 'gleap'
 import LoggerService from '@/services/LoggerService'
+import posthog from 'posthog-js'
 
 export default {
   name: 'App',
@@ -276,7 +277,9 @@ export default {
      * On route transition, fetch current session (for students, also most recent session)
      * @todo: Fetch these much less frequently (only once?)
      */
-    $route() {
+    $route(to, from) {
+      // Capture PostHog pageviews on route transitions
+      if (to.path !== from.path) posthog.capture('$pageview')
       if (this.userAuthenticated) {
         this.$store.dispatch('user/fetchSession', this)
 
