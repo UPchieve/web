@@ -76,13 +76,14 @@
       <div>
         <accordion-item label="Eligibility for Services">
           <p>
-            THE WEBSITE IS NOT AVAILABLE TO ANY USERS PREVIOUSLY SUSPENDED
-            OR REMOVED FROM THE WEBSITE BY UPCHIEVE. By using or registering an account for the Website, you
-            represent (a) that you have read and agree to these Terms, the
-            Privacy Policy, and Disclaimers; (b) that you have not been
-            previously suspended or removed from the Website by UPchieve; and (d) that your registration
-            and your use of the Website is in compliance with any and all
-            applicable laws and regulations.
+            THE WEBSITE IS NOT AVAILABLE TO ANY USERS PREVIOUSLY SUSPENDED OR
+            REMOVED FROM THE WEBSITE BY UPCHIEVE. By using or registering an
+            account for the Website, you represent (a) that you have read and
+            agree to these Terms, the Privacy Policy, and Disclaimers; (b) that
+            you have not been previously suspended or removed from the Website
+            by UPchieve; and (d) that your registration and your use of the
+            Website is in compliance with any and all applicable laws and
+            regulations.
           </p>
         </accordion-item>
 
@@ -544,7 +545,6 @@
             their account, which makes it inaccessible while we manually process
             removal of the data.
           </p>
-
         </accordion-item>
 
         <accordion-item label="Who Has Access to Your Personal Information">
