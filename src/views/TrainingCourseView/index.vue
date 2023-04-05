@@ -26,6 +26,9 @@ import { mapState } from 'vuex'
 import NetworkService from '@/services/NetworkService'
 import Module from './Module'
 import QuizLink from './QuizLink'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
+import LoggerService from '@/services/LoggerService'
 
 export default {
   name: 'TrainingCourseView',
@@ -55,23 +58,33 @@ export default {
   },
   methods: {
     async trackMaterialProgress(materialKey) {
+      let materialName = ''
       this.course.modules.forEach(mod => {
         mod.materials.forEach(mat => {
           if (mat.materialKey === materialKey) {
             mat.isCompleted = true
+            materialName = mat.name
           }
         })
       })
 
-      const {
-        body: { progress, isComplete },
-      } = await NetworkService.recordTrainingCourseProgress(
-        this.course.courseKey,
-        materialKey
-      )
+      try {
+        const {
+          body: { progress, isComplete },
+        } = await NetworkService.recordTrainingCourseProgress(
+          this.course.courseKey,
+          materialKey
+        )
 
-      this.course.progress = progress
-      this.course.isComplete = isComplete
+        this.course.progress = progress
+        this.course.isComplete = isComplete
+        AnalyticsService.captureEvent(EVENTS.MATERIAL_COMPLETED, {
+          event: EVENTS.MATERIAL_COMPLETED,
+          title: materialName,
+        })
+      } catch (error) {
+        LoggerService.noticeError(error)
+      }
     },
   },
 }
