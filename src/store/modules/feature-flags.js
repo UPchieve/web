@@ -59,6 +59,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.IMAGES_IN_DOCUMENTS]: false,
       [POSTHOG_FEATURE_FLAGS.OPTIONAL_MIDDLE_SCHOOL]: false,
       [POSTHOG_FEATURE_FLAGS.VALUE_PROP_SURVEY]: false,
+      [POSTHOG_FEATURE_FLAGS.FAST_TRACKED_USER]: false,
     },
   },
   mutations: {
@@ -118,5 +119,7 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.OPTIONAL_MIDDLE_SCHOOL],
     isValuePropSurveyActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.VALUE_PROP_SURVEY],
+    isFastTrackedUserActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.FAST_TRACKED_USER],
   },
 }

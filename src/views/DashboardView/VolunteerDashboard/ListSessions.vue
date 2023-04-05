@@ -9,7 +9,16 @@
         </tr>
       </thead>
       <tbody>
+        <tr v-if="isLoadingSessions">
+          <td colspan="3">
+            <loader
+              message="Please wait as we match you to a student..."
+              class="session-loader"
+            />
+          </td>
+        </tr>
         <tr
+          v-else
           v-for="(session, index) in sortedOpenSessions"
           :key="`session-${index}`"
           class="session-row"
@@ -34,9 +43,10 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import sendWebNotification from '@/utils/send-web-notification'
 import Case from 'case'
+import Loader from '@/components/Loader'
 
 export default {
   data() {
@@ -45,6 +55,10 @@ export default {
       emitListIntervalId: null,
       isInitialMount: false,
     }
+  },
+  components: { Loader },
+  props: {
+    isLoadingSessions: { type: Boolean, required: true },
   },
   computed: {
     ...mapState({
@@ -62,6 +76,9 @@ export default {
           }
         })
       },
+    }),
+    ...mapGetters({
+      isFastTrackedUserActive: 'featureFlags/isFastTrackedUserActive',
     }),
   },
   mounted() {
@@ -141,12 +158,19 @@ export default {
         const { subTopic } = session
 
         const isAdminOrTestUser = this.user.isAdmin || this.user.isTestUser
+        const fastTrackedUser =
+          this.isFastTrackedUserActive &&
+          isAdminOrTestUser &&
+          !this.user.pastSessions?.length &&
+          (!this.user.isOnboarded || !this.user.isApproved)
         // Show test accounts to admin and test volunteer accounts
         if (session.student.isTestUser && !isAdminOrTestUser) {
           continue
         }
-
-        if (this.user.subjects.includes(subTopic)) results.push(session)
+        // fast tracked users should only see test users
+        if (!session.student.isTestUser && fastTrackedUser) continue
+        if (session.student.isTestUser && fastTrackedUser) results.push(session)
+        else if (this.user.subjects.includes(subTopic)) results.push(session)
       }
 
       const prevOpenSessions = this.openSessions
@@ -211,5 +235,9 @@ thead {
 
 .audio__new-waiting-student {
   display: none;
+}
+
+.session-loader {
+  text-align: center;
 }
 </style>
