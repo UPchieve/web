@@ -13,7 +13,12 @@
     </div>
 
     <div class="volunteer-dashboard__body">
-      <template v-if="user.isApproved && user.isOnboarded">
+      <template
+        v-if="
+          (user.isApproved && user.isOnboarded) ||
+            (isFastTrackedUserActive && user.isTestUser && isNewVolunteer)
+        "
+      >
         <div class="dashboard-card">
           <div class="students-waiting">
             <web-notifications-button class="notifications-button" />
@@ -31,7 +36,7 @@
               <div class="dashboard-card__subtitle">
                 Students waiting for help will show up below.
               </div>
-              <list-sessions />
+              <list-sessions :isLoadingSessions="isLoadingSessions" />
             </div>
           </div>
         </div>
@@ -136,6 +141,7 @@
     <volunteer-welcome-modal
       v-if="showWelcomeModal"
       :closeModal="toggleWelcomeModal"
+      :loadSessionsList="loadSessionsList"
     />
   </div>
 </template>
@@ -251,6 +257,7 @@ export default {
       lastUpdated: '',
       impactStats: {},
       isLoadingImpactSummary: true,
+      isLoadingSessions: false,
     }
   },
   computed: {
@@ -267,6 +274,7 @@ export default {
       isDashboardBannerActive: 'featureFlags/isDashboardBannerActive',
       isFilterActiveSubjectsActive: 'featureFlags/isFilterActiveSubjectsActive',
       allSubjectNames: 'subjects/allSubtopicNames',
+      isFastTrackedUserActive: 'featureFlags/isFastTrackedUserActive',
     }),
 
     isCustomVolunteerPartner() {
@@ -652,6 +660,14 @@ export default {
       } finally {
         this.isLoadingImpactSummary = false
       }
+    },
+    // Load the session list for 10 seconds after a fast tracked user picks a subject
+    // they're interested in tutoring
+    loadSessionsList() {
+      this.isLoadingSessions = true
+      setTimeout(() => {
+        this.isLoadingSessions = false
+      }, 1000 * 10)
     },
   },
 }

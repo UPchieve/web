@@ -33,6 +33,7 @@ export default {
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
+      isFastTrackedUserActive: 'featureFlags/isFastTrackedUserActive',
     }),
     type() {
       return this.isVolunteer ? 'Volunteer' : 'Student'
@@ -67,6 +68,16 @@ export default {
       if (this.isVolunteer && this.user.isOnboarded && !this.user.isApproved) {
         status.class += '--onboarding'
         status.text = 'Pending approval'
+      }
+
+      if (
+        this.isFastTrackedUserActive &&
+        this.isVolunteer &&
+        !this.user.pastSessions?.length &&
+        (!this.user.isOnboarded || !this.user.isApproved)
+      ) {
+        status.text = 'Ready to help'
+        status.class = 'SidebarInfo-status-circle'
       }
 
       return status

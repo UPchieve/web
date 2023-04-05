@@ -191,39 +191,6 @@
       </p>
     </div>
 
-    <div class="uc-column" v-if="isValuePropSurveyActive">
-      <label for="value-prop-survey" class="uc-form-label"
-        >We'd love to learn more about why you decided to create an UPchieve
-        account</label
-      >
-      <v-select
-        id="value-prop-survey"
-        class="uc-form-select"
-        v-model="valuePropSurvey"
-        :options="shuffledSurvey"
-        label="name"
-        :searchable="false"
-        :clearable="false"
-        required
-      />
-    </div>
-    <div class="uc-column" v-if="valuePropSurvey === 'Other'">
-      <input
-        id="valuePropSurveyOther"
-        type="text"
-        class="uc-form-input"
-        v-model="valuePropSurveyOther"
-        v-bind:class="{
-          'uc-form-input--invalid':
-            invalidInputs.indexOf('valuePropSurveyOther') > -1,
-        }"
-        autofocus
-      />
-      <p class="uc-form-subtext">
-        Could you tell us a bit more about why you're signing up?
-      </p>
-    </div>
-
     <div class="uc-form-checkbox">
       <input
         id="userAgreement"
@@ -256,10 +223,6 @@ import VuePhoneNumberInput from 'vue-phone-number-input'
 import Loader from '@/components/Loader'
 import NetworkService from '@/services/NetworkService'
 import { backOff } from 'exponential-backoff'
-import AnalyticsService from '@/services/AnalyticsService'
-import { mapGetters } from 'vuex'
-import { EVENTS } from '@/consts'
-import { shuffle } from 'lodash'
 
 export default {
   components: {
@@ -288,26 +251,10 @@ export default {
       signupSourceId: null,
       otherSignupSource: '',
       isLoadingSignupSources: false,
-      valuePropSurvey: '',
-      valuePropSurveyOther: '',
     }
   },
   mounted() {
     this.$router.push('/sign-up/volunteer/account')
-  },
-  computed: {
-    ...mapGetters({
-      isValuePropSurveyActive: 'featureFlags/isValuePropSurveyActive',
-    }),
-    shuffledSurvey() {
-      return shuffle([
-        'Flexible volunteering',
-        'Get volunteer hours',
-        'Impact students',
-        'Curious about UPchieve',
-        'Other',
-      ])
-    },
   },
   methods: {
     nextPage() {
@@ -381,20 +328,6 @@ export default {
         )
         this.invalidInputs.push('otherSignupSource')
       }
-      if (this.isValuePropSurveyActive) {
-        if (!this.valuePropSurvey) {
-          this.errors.push(
-            `We'd love to learn why you decided to create an account!`
-          )
-          this.invalidInputs.push()
-        }
-        if (this.valuePropSurvey === 'Other' && !this.valuePropSurveyOther) {
-          this.errors.push(
-            'Please tell us more about why you decided to create an account with UPchieve in the text box if "Other" is selected'
-          )
-          this.invalidInputs.push('valuePropSurveyOther')
-        }
-      }
       if (!this.errors.length) {
         this.submit()
       }
@@ -415,12 +348,6 @@ export default {
       })
         .then(() => {
           this.isRegistering = false
-          if (this.isValuePropSurveyActive && this.valuePropSurvey)
-            AnalyticsService.captureEvent(EVENTS.SURVEY_VALUE_PROPOSITION, {
-              event: EVENTS.SURVEY_VALUE_PROPOSITION,
-              response: this.valuePropSurvey,
-              openResponse: this.valuePropSurveyOther,
-            })
           this.$router.push('/verify')
         })
         .catch(err => {
