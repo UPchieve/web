@@ -70,6 +70,8 @@ import RightCaret from '@/assets/right-caret.svg'
 import BookIcon from '@/assets/sidebar_icons/book.svg'
 import VideoIcon from '@/assets/video.svg'
 import LinkIcon from '@/assets/link.svg'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 export default {
   components: {
@@ -101,6 +103,13 @@ export default {
   },
   methods: {
     toggleMaterial() {
+      // Since isOpen is read from our props, it will be closed
+      // when it is toggled to be open
+      if (!this.isOpen)
+        AnalyticsService.captureEvent(EVENTS.MATERIAL_VIEWED, {
+          event: EVENTS.MATERIAL_VIEWED,
+          title: this.material.name,
+        })
       this.$emit('material-toggled', this.material.materialKey)
     },
     materialClicked() {
