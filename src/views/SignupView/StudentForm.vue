@@ -658,7 +658,9 @@ export default {
           if (!isDomesticIpAddress) return this.internationalPage()
         })
         .catch(res => {
-          const error = (res.body && res.body.err) || 'Unknown server error'
+          const error =
+            (res.body && (res.body.err || res.body.message)) ||
+            'Unknown server error'
           this.errors.push(error)
         })
     },
