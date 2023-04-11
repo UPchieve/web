@@ -221,7 +221,6 @@ export default {
       userAuthenticated: 'user/isAuthenticated',
       isVolunteer: 'user/isVolunteer',
       mobileMode: 'app/mobileMode',
-      isFastTrackedUserActive: 'featureFlags/isFastTrackedUserActive',
     }),
   },
   // https://github.com/BrianRosamilia/vue-crono
@@ -233,19 +232,6 @@ export default {
   watch: {
     user(currentUserValue, previousUserValue) {
       const nowLoggedIn = currentUserValue._id && !previousUserValue._id
-      // update a fast tracked user's `isTestUser` to `true` to mock a fake test user
-      if (
-        this.isFastTrackedUserActive &&
-        currentUserValue._id &&
-        !currentUserValue.isTestUser &&
-        currentUserValue.isVolunteer &&
-        !currentUserValue.pastSessions?.length &&
-        (!currentUserValue.isOnboarded || !currentUserValue.isApproved)
-      ) {
-        // Trigger the welcome modal to allow for fast tracked users to select a subject
-        if (nowLoggedIn) this.$store.dispatch('user/firstDashboardVisit', true)
-        this.$store.dispatch('user/addToUser', { isTestUser: true })
-      }
       if (nowLoggedIn) {
         Sentry.setUser({ id: currentUserValue._id })
         const partner = currentUserValue.isVolunteer
@@ -301,17 +287,6 @@ export default {
           this.$store.dispatch('user/fetchLatestSession', this)
         }
       }
-    },
-    isFastTrackedUserActive(currentValue, prevValue) {
-      // update a fast tracked user's `isTestUser` to `true` to mock a fake test user
-      if (
-        currentValue &&
-        !prevValue &&
-        this.user.isVolunteer &&
-        !this.user.pastSessions?.length &&
-        (!this.user.isOnboarded || !this.user.isApproved)
-      )
-        this.$store.dispatch('user/addToUser', { isTestUser: true })
     },
   },
   sockets: {

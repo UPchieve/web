@@ -440,8 +440,6 @@ export const POSTHOG_FEATURE_FLAGS = {
   FILTER_ACTIVE_SUBJECTS: 'filter-active-subjects',
   IMAGES_IN_DOCUMENTS: 'images-in-documents',
   OPTIONAL_MIDDLE_SCHOOL: 'optional-middle-school',
-  VALUE_PROP_SURVEY: 'value-prop-survey',
-  FAST_TRACKED_USER: 'fast-tracked-user',
 }
 
 export const ANALYTICS_REPORT_ROW = {
