@@ -45,6 +45,7 @@ import VolunteerPartnerSignupView from './views/VolunteerPartnerSignupView'
 import SessionHistoryView from './views/SessionHistoryView'
 import SessionRecapView from './views/SessionRecapView'
 import AdminTestAudience from './views/Admin/AdminTestAudience'
+import WelcomePage from './views/WelcomePage'
 import Gleap from 'gleap'
 
 Vue.use(VueResource)
@@ -68,7 +69,13 @@ const routes = [
       getUser()
         .then(() => {
           if (store.getters['user/isAuthenticated']) {
-            next('/dashboard')
+            if (
+              store.getters['featureFlags/isForcedTrainingActive'] &&
+              store.getters['user/isVolunteer'] &&
+              !store.getters['user/hasCertification']
+            )
+              next('/training')
+            else next('/dashboard')
           } else {
             next('/login')
           }
@@ -192,6 +199,15 @@ const routes = [
     name: 'DashboardView',
     component: DashboardView,
     meta: { protected: true },
+    beforeEnter: async (to, from, next) => {
+      if (
+        store.getters['featureFlags/isForcedTrainingActive'] &&
+        store.getters['user/isVolunteer'] &&
+        !store.getters['user/hasCertification']
+      )
+        next('/training')
+      else next()
+    },
   },
   {
     path: '/session/:topic/:subTopic/:sessionId?',
@@ -267,6 +283,15 @@ const routes = [
     name: 'ProfileView',
     component: ProfileView,
     meta: { protected: true },
+    beforeEnter: (to, from, next) => {
+      if (
+        store.getters['featureFlags/isForcedTrainingActive'] &&
+        store.getters['user/isVolunteer'] &&
+        !store.getters['user/hasCertification']
+      )
+        next('/training')
+      else next()
+    },
   },
   {
     path: '/favorite-coaches',
@@ -279,6 +304,15 @@ const routes = [
     name: 'CalendarView',
     component: CalendarView,
     meta: { protected: true },
+    beforeEnter: (to, from, next) => {
+      if (
+        store.getters['featureFlags/isForcedTrainingActive'] &&
+        store.getters['user/isVolunteer'] &&
+        !store.getters['user/hasCertification']
+      )
+        next('/training')
+      else next()
+    },
   },
   {
     path: '/admin',
@@ -399,6 +433,12 @@ const routes = [
     name: 'AdminTestAudience',
     component: AdminTestAudience,
     meta: { protected: true, requiresAdmin: true },
+  },
+  {
+    path: '/welcome',
+    name: 'WelcomePage',
+    component: WelcomePage,
+    meta: { protected: true },
   },
 ]
 

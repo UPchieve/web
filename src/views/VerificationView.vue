@@ -80,7 +80,13 @@
           </p>
         </div>
         <div>
-          <large-button primary routeTo="/" class="uc-form-button-big">
+          <large-button
+            primary
+            :routeTo="
+              isForcedTrainingActive && user.isVolunteer ? '/welcome' : '/'
+            "
+            class="uc-form-button-big"
+          >
             Take me to the dashboard
           </large-button>
         </div>
@@ -93,7 +99,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import FormPageTemplate from '@/components/FormPageTemplate'
 import FormFooter from '@/components/FormFooter'
 import Loader from '@/components/Loader'
@@ -131,6 +137,9 @@ export default {
   computed: {
     ...mapState({
       user: state => state.user.user,
+    }),
+    ...mapGetters({
+      isForcedTrainingActive: 'featureFlags/isForcedTrainingActive',
     }),
     isValidVerificationCode() {
       return !(
