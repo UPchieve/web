@@ -1,5 +1,13 @@
 <template>
-  <div class="SidebarLinks">
+  <div
+    class="SidebarLinks"
+    :class="{
+      'forced-training':
+        this.isForcedTrainingActive &&
+        !this.hasCertification &&
+        this.isVolunteer,
+    }"
+  >
     <template v-if="$route.path.indexOf('/onboarding') !== -1"></template>
 
     <template v-else-if="authenticated">
@@ -93,6 +101,8 @@ export default {
   computed: {
     ...mapGetters({
       isReferFriendsActive: 'featureFlags/isReferFriendsActive',
+      isForcedTrainingActive: 'featureFlags/isForcedTrainingActive',
+      hasCertification: 'user/hasCertification',
     }),
   },
 }
@@ -114,5 +124,9 @@ export default {
 .icon {
   margin-right: 0.8em;
   width: 24px;
+}
+
+.forced-training {
+  visibility: hidden;
 }
 </style>

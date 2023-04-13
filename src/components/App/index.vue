@@ -51,6 +51,7 @@ import LargeButton from '@/components/LargeButton'
 import Gleap from 'gleap'
 import LoggerService from '@/services/LoggerService'
 import posthog from 'posthog-js'
+import { EVENTS } from '@/consts'
 
 export default {
   name: 'App',
@@ -221,7 +222,16 @@ export default {
       userAuthenticated: 'user/isAuthenticated',
       isVolunteer: 'user/isVolunteer',
       mobileMode: 'app/mobileMode',
+      isForcedTrainingActive: 'featureFlags/isForcedTrainingActive',
+      hasCertification: 'user/hasCertification',
     }),
+    isForcedTrainingUser() {
+      return (
+        this.isForcedTrainingActive &&
+        this.isVolunteer &&
+        !this.hasCertification
+      )
+    },
   },
   // https://github.com/BrianRosamilia/vue-crono
   cron: {
@@ -252,6 +262,11 @@ export default {
           userType: currentUserValue.type,
           partner,
         })
+        if (this.isForcedTrainingUser) {
+          AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_FORCED_TRAINING, {
+            event: EVENTS.FLAGGED_AS_FORCED_TRAINING,
+          })
+        }
 
         if (this.mobileMode && !this.isMobileApp && !this.isVolunteer) {
           this.$store.dispatch('app/banner/show', {
@@ -287,6 +302,17 @@ export default {
           this.$store.dispatch('user/fetchLatestSession', this)
         }
       }
+    },
+    isForcedTrainingActive(currentValue, prevValue) {
+      if (
+        currentValue &&
+        !prevValue &&
+        this.isVolunteer &&
+        !this.hasCertification
+      )
+        AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_FORCED_TRAINING, {
+          event: EVENTS.FLAGGED_AS_FORCED_TRAINING,
+        })
     },
   },
   sockets: {
