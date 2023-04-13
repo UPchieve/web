@@ -18,25 +18,40 @@
           under development. Check back soon!
         </p>
       </div>
-      <div class="review-materials" v-else>
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          class="review-materials__link"
-          v-for="review in reviewMaterials"
-          :href="review.pdf"
-          :key="review.title"
+      <div v-else>
+        <div class="review-materials">
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            class="review-materials__link"
+            v-for="review in reviewMaterials"
+            :href="review.pdf"
+            :key="review.title"
+          >
+            <div class="review-materials__content">
+              <div class="image-overlay"></div>
+              <img
+                :src="review.image"
+                class="review-materials__image"
+                alt="header image for materials review"
+              />
+              <span class="review-materials__title">{{ review.title }}</span>
+            </div>
+          </a>
+        </div>
+
+        <large-button
+          v-if="
+            user.certifications[category] &&
+              !user.certifications[category].passed
+          "
+          primary
+          :showArrow="false"
+          :routeTo="quizLink"
+          class="review-materials__start-quiz"
         >
-          <div class="review-materials__content">
-            <div class="image-overlay"></div>
-            <img
-              :src="review.image"
-              class="review-materials__image"
-              alt="header image for materials review"
-            />
-            <span class="review-materials__title">{{ review.title }}</span>
-          </div>
-        </a>
+          <span>Start quiz</span>
+        </large-button>
       </div>
     </div>
   </div>
@@ -50,9 +65,10 @@ import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import { backOff } from 'exponential-backoff'
 import Loader from '@/components/Loader'
+import LargeButton from '@/components/LargeButton'
 
 export default {
-  components: { Loader },
+  components: { Loader, LargeButton },
   data() {
     return {
       reviewMaterials: [],
@@ -101,6 +117,7 @@ export default {
   computed: {
     ...mapState({
       subjects: state => state.subjects.subjects,
+      user: state => state.user.user,
     }),
     ...mapGetters({
       allSubtopics: 'subjects/allSubtopics',
@@ -111,6 +128,9 @@ export default {
         return subtopics[this.category].displayName
 
       return ''
+    },
+    quizLink() {
+      return `/training/${Case.kebab(this.category)}/quiz`
     },
   },
 }
@@ -174,6 +194,10 @@ export default {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     display: block;
+  }
+
+  &__start-quiz {
+    margin-top: 2em;
   }
 }
 
