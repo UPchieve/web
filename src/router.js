@@ -74,7 +74,7 @@ const routes = [
               store.getters['user/isVolunteer'] &&
               !store.getters['user/hasCertification']
             )
-              next('/training')
+              next('/welcome')
             else next('/dashboard')
           } else {
             next('/login')
@@ -205,7 +205,7 @@ const routes = [
         store.getters['user/isVolunteer'] &&
         !store.getters['user/hasCertification']
       )
-        next('/training')
+        next('/welcome')
       else next()
     },
   },
@@ -289,7 +289,7 @@ const routes = [
         store.getters['user/isVolunteer'] &&
         !store.getters['user/hasCertification']
       )
-        next('/training')
+        next('/welcome')
       else next()
     },
   },
@@ -310,7 +310,7 @@ const routes = [
         store.getters['user/isVolunteer'] &&
         !store.getters['user/hasCertification']
       )
-        next('/training')
+        next('/welcome')
       else next()
     },
   },

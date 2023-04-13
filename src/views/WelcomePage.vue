@@ -3,14 +3,25 @@
     <div class="welcome-page-card">
       <div class="welcome-page-card-content">
         <div class="welcome-page-title-container">
-          <h1 class="welcome-page-title">Welcome {{ user.firstname }} 👋</h1>
-          <p class="welcome-page-subtitle">
-            We're so glad you're here!
-          </p>
-          <p class="welcome-page-subtitle">
-            First, select the subject you're most looking forward to helping
-            students with!
-          </p>
+          <template v-if="userCreatedBeforeLaunch">
+            <h1 class="welcome-page-title">Hi {{ user.firstname }} 👋</h1>
+            <p class="welcome-page-subtitle">
+              At UPchieve we're always striving to improve!
+            </p>
+            <p class="welcome-page-subtitle">
+              We're trying out a new dashboard experience, let's jump in 🙂
+            </p>
+          </template>
+          <template v-else>
+            <h1 class="welcome-page-title">Welcome {{ user.firstname }} 👋</h1>
+            <p class="welcome-page-subtitle">
+              We're so glad you're here!
+            </p>
+            <p class="welcome-page-subtitle">
+              First, select the subject you're most looking forward to helping
+              students with!
+            </p>
+          </template>
         </div>
 
         <div class="pick-subjects">
@@ -68,14 +79,12 @@ export default {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
     }),
-    message() {
-      const who = true
-      if (this.user.isApproved)
-        return "We're so glad you're joining our movement to democratize access to educational support. Before you can start making an impact in a student’s life, you'll need to complete a few quick steps."
-      else if (who)
-        return `Pick the subject you are ready to teach. As soon as you push Get Started, we'll find you a student to connect with.`
-      else
-        return "We're so glad you're joining our movement to democratize access to educational support. Before you can start making an impact in a student’s life, you'll need to complete a few quick steps."
+    userCreatedBeforeLaunch() {
+      const forcedTrainingLaunchDate = '2023-04-13T15:40:00.000Z'
+      return (
+        new Date(this.user.createdAt).getTime() <=
+        new Date(forcedTrainingLaunchDate).getTime()
+      )
     },
     subjectsAndTopics() {
       return [
