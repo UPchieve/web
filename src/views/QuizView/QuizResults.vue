@@ -14,6 +14,14 @@
       <router-link :to="rightBtn.route" tag="button" class="btn">{{
         rightBtn.text
       }}</router-link>
+      <button
+        class="btn"
+        type="button"
+        @click="reload"
+        v-if="!quizResults.passed"
+      >
+        Retake quiz
+      </button>
     </div>
   </div>
 </template>
