@@ -3,50 +3,34 @@
     <div class="welcome-page-card">
       <div class="welcome-page-card-content">
         <div class="welcome-page-title-container">
-          <template v-if="userCreatedBeforeLaunch">
-            <h1 class="welcome-page-title">Hi {{ user.firstname }} 👋</h1>
-            <p class="welcome-page-subtitle">
-              At UPchieve we're always striving to improve!
-            </p>
-            <p class="welcome-page-subtitle">
-              We're trying out a new dashboard experience, let's jump in 🙂
-            </p>
-          </template>
-          <template v-else>
-            <h1 class="welcome-page-title">Welcome {{ user.firstname }} 👋</h1>
-            <p class="welcome-page-subtitle">
-              We're so glad you're here!
-            </p>
-            <p class="welcome-page-subtitle">
-              First, select the subject you're most looking forward to helping
-              students with!
-            </p>
-          </template>
+          <h1 class="welcome-page-title">
+            {{ userCreatedBeforeLaunch ? 'Hi' : 'Welcome' }}
+            {{ user.firstname }} 👋
+          </h1>
+          <p class="welcome-page-subtitle">
+            {{
+              userCreatedBeforeLaunch
+                ? "We're so glad you're here!"
+                : "We're trying something new 🙂"
+            }}
+          </p>
         </div>
-
-        <div class="pick-subjects">
-          <v-select
-            id="fast-track-question"
-            class="uc-form-select welcome-page-subject-select"
-            v-model="subjectSelection"
-            label="subjectDisplayName"
-            :options="subjectsAndTopics"
-            :searchable="true"
-            :clearable="false"
-            required
-            :reduce="option => option.subject"
-            placeholder="Select a subject"
-          />
+        <div class="certification-instructions-container">
+          <p class="">
+            Let's get certified to tutor! Pass a short quiz in your favorite subject.
+          </p>
+          <p class="">
+            (Unlimited attempts! 😊)
+          </p>
+          <div class="pick-subjects">
+            <v-select id="fast-track-question" class="uc-form-select welcome-page-subject-select"
+              v-model="subjectSelection" label="subjectDisplayName" :options="subjectsAndTopics" :searchable="true"
+              :clearable="false" required :reduce="option => option.subject" placeholder="Select a subject" />
+          </div>
+          <button @click="handleTrainingRedirect" class="welcome-page-btn" type="button" :disabled="!subjectSelection">
+            Take the quiz
+          </button>
         </div>
-
-        <button
-          @click="handleTrainingRedirect"
-          class="welcome-page-btn"
-          type="button"
-          :disabled="!subjectSelection"
-        >
-          Continue
-        </button>
       </div>
     </div>
     <cert-dog class="cert-dog" v-if="!mobileMode" />
@@ -247,10 +231,16 @@ export default {
     @include breakpoint-above('small') {
       width: 60%;
     }
+
+
+  }
+
+  &-title-container,
+  .certification-instructions-container {
+    text-align: center;
   }
 
   &-title-container {
-    text-align: center;
     margin-bottom: 2em;
   }
 
@@ -259,7 +249,6 @@ export default {
     // @include breakpoint-above('medium') {
     //   margin-top: 4em;
     // }
-    margin-bottom: 1em;
   }
 
   &-subtitle {
@@ -306,6 +295,7 @@ export default {
   right: 0;
   bottom: 0;
   height: 200px;
+
   @include breakpoint-above('medium') {
     height: 350px;
   }
