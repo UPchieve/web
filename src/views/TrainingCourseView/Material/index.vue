@@ -39,6 +39,7 @@
         v-else-if="material.type === 'video'"
         :resourceId="material.resourceId"
         :pdf="material.videoPDF"
+        :links="material.links"
       />
 
       <p v-if="material.type === 'document'" class="material__document-link">
