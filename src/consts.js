@@ -442,6 +442,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   IMAGES_IN_DOCUMENTS: 'images-in-documents',
   OPTIONAL_MIDDLE_SCHOOL: 'optional-middle-school',
   FORCED_TRAINING: 'forced-training',
+  TINY_UPCHIEVE101: 'tiny-upchieve101',
 }
 
 export const ANALYTICS_REPORT_ROW = {

@@ -266,6 +266,7 @@ export default {
       isDowntimeBannerActive: 'featureFlags/isDowntimeBannerActive',
       isDashboardBannerActive: 'featureFlags/isDashboardBannerActive',
       isFilterActiveSubjectsActive: 'featureFlags/isFilterActiveSubjectsActive',
+      isTinyUpchieve101Active: 'featureFlags/isTinyUpchieve101Active',
       allSubjectNames: 'subjects/allSubtopicNames',
     }),
 
@@ -444,7 +445,9 @@ export default {
     onboaringAccountActions() {
       const onboaringActions = [
         {
-          title: 'Complete UPchieve 101 (45 mins)',
+          title: `Complete UPchieve 101 ${
+            this.isTinyUpchieve101Active ? '(20mins)' : '(45 mins)'
+          }`,
           subtitle: this.trainingAction.subtitle,
           status: this.trainingAction.status,
           clickFn: this.clickUpchieve101Action,
