@@ -5,11 +5,14 @@
         <div class="instructions-container">
           <div class="header-title">Tell us when to text you!</div>
           <p class="instructions">
-            Choose your availability below and we’ll text you when a student
-            needs your help. You’re not obligated to tutor every time we text
-            you, but try and select times you’re likely to want to help a
-            student. Don’t want to wait for a text? You can check your dashboard
-            for students who need help at any time.
+            The best way to help students is to wait on your dashboard for students
+            who need help at any time you have 30 minutes free! However, to ensure
+            we can match students' requests quickly even when there are no coaches
+            waiting on the dashboard, we also send out text messages for requests
+            that have not been picked up. You can help us ensure every student
+            request gets matched by providing your availability below. You’re not
+            obligated to tutor every time we text you, but try and select times you’re
+            likely to want to help a student.
           </p>
         </div>
         <div class="save-container">
