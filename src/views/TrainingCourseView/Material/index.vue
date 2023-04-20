@@ -73,6 +73,7 @@ import VideoIcon from '@/assets/video.svg'
 import LinkIcon from '@/assets/link.svg'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
+import { mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -90,6 +91,9 @@ export default {
     isOpen: Boolean,
   },
   computed: {
+    ...mapGetters({
+      isTinyUpchieve101Active: 'featureFlags/isTinyUpchieve101Active',
+    }),
     statusClass() {
       if (!this.material.isRequired) return 'material--optional'
       else if (this.material.isCompleted) return 'material--completed'
@@ -110,6 +114,7 @@ export default {
         AnalyticsService.captureEvent(EVENTS.MATERIAL_VIEWED, {
           event: EVENTS.MATERIAL_VIEWED,
           title: this.material.name,
+          isTiny101: this.isTinyUpchieve101Active,
         })
       this.$emit('material-toggled', this.material.materialKey)
     },

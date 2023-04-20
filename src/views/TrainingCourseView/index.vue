@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import NetworkService from '@/services/NetworkService'
 import Module from './Module'
 import QuizLink from './QuizLink'
@@ -51,6 +51,9 @@ export default {
   computed: {
     ...mapState({
       certifications: state => state.user.user.certifications,
+    }),
+    ...mapGetters({
+      isTinyUpchieve101Active: 'featureFlags/isTinyUpchieve101Active',
     }),
     quizCertification() {
       return this.certifications[this.course.quizKey]
@@ -81,6 +84,7 @@ export default {
         AnalyticsService.captureEvent(EVENTS.MATERIAL_COMPLETED, {
           event: EVENTS.MATERIAL_COMPLETED,
           title: materialName,
+          isTiny101: this.isTinyUpchieve101Active,
         })
       } catch (error) {
         LoggerService.noticeError(error)
