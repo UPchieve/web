@@ -60,6 +60,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.OPTIONAL_MIDDLE_SCHOOL]: false,
       [POSTHOG_FEATURE_FLAGS.FORCED_TRAINING]: false,
       [POSTHOG_FEATURE_FLAGS.TINY_UPCHIEVE101]: false,
+      [POSTHOG_FEATURE_FLAGS.TINY_CERTS]: false,
     },
   },
   mutations: {
@@ -121,5 +122,6 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.FORCED_TRAINING],
     isTinyUpchieve101Active: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.TINY_UPCHIEVE101],
+    isTinyCertsActive: state => state.flags[POSTHOG_FEATURE_FLAGS.TINY_CERTS],
   },
 }

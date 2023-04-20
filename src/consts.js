@@ -443,6 +443,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   OPTIONAL_MIDDLE_SCHOOL: 'optional-middle-school',
   FORCED_TRAINING: 'forced-training',
   TINY_UPCHIEVE101: 'tiny-upchieve101',
+  TINY_CERTS: 'tiny-certs',
 }
 
 export const ANALYTICS_REPORT_ROW = {

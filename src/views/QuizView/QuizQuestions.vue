@@ -184,6 +184,11 @@ export default {
       this.styleImage(question.imageSrc)
       this.items = question.possibleAnswers
       this.showNext = true
+      if (!TrainingService.hasNext()) {
+        this.showNext = false
+        this.showSubmit = true
+      }
+
       this.questionNumber = TrainingService.getIndex(this) + 1
     },
     previous() {
