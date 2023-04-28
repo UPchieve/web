@@ -244,24 +244,26 @@ export default {
       const nowLoggedIn = currentUserValue._id && !previousUserValue._id
       if (nowLoggedIn) {
         Sentry.setUser({ id: currentUserValue._id })
-        const partner = currentUserValue.isVolunteer
-          ? currentUserValue.volunteerPartnerOrg
-          : currentUserValue.studentPartnerOrg
+        const userProps = {
+          userType: currentUserValue.type,
+          createdAt: currentUserValue.createdAt,
+          totalSessions: currentUserValue.pastSessions.length,
+        }
+        if (currentUserValue.isVolunteer) {
+          userProps.onboarded = currentUserValue.isOnboarded
+          userProps.approved = currentUserValue.isApproved
+          userProps.partner = currentUserValue.volunteerPartnerOrg
+        } else {
+          userProps.partner = currentUserValue.studentPartnerOrg
+        }
         AnalyticsService.identify(currentUserValue._id, {
           name: currentUserValue.firstName,
           email: currentUserValue.email,
           value: currentUserValue.roleId,
           // Attaches custom data to the user in Gleap
-          customData: {
-            userType: currentUserValue.type,
-            partner: currentUserValue.partner,
-            totalSessions: currentUserValue.pastSessions.length,
-          },
+          customData: userProps,
         })
-        AnalyticsService.updateUser({
-          userType: currentUserValue.type,
-          partner,
-        })
+        AnalyticsService.updateUser(userProps)
         if (this.isForcedTrainingUser) {
           AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_FORCED_TRAINING, {
             event: EVENTS.FLAGGED_AS_FORCED_TRAINING,
