@@ -79,10 +79,10 @@ export default {
     PortalService.call('app.isLoaded')
 
     // start up the posthog feature flag service
-    await this.$store.dispatch('featureFlags/initPostHogFlags')
+    this.$store.dispatch('featureFlags/initPostHogFlags')
 
     // start up the unleash feature flag service
-    await this.$store.dispatch('featureFlags/initUnleash')
+    this.$store.dispatch('featureFlags/initUnleash')
 
     // set version on initial load
     this.$store.commit('app/setVersion', config.version)
