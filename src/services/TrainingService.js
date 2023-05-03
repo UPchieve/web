@@ -80,6 +80,7 @@ export default {
         passed: res.data.passed,
         score: res.data.score,
         idUserAnswerMap: this.idAnswerMap,
+        isTrainingSubject: res.data.isTrainingSubject,
       }
     })
   },

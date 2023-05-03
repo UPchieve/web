@@ -15,20 +15,63 @@
             }}
           </p>
         </div>
-        <div class="certification-instructions-container">
+        <div
+          class="certification-instructions-container"
+          v-if="!hasCertification"
+        >
           <p class="">
-            Let's get certified to tutor! Pass a short quiz in your favorite subject.
+            Let's get certified to tutor! Pass a short quiz in your favorite
+            subject.
           </p>
           <p class="">
             (Unlimited attempts! 😊)
           </p>
           <div class="pick-subjects">
-            <v-select id="fast-track-question" class="uc-form-select welcome-page-subject-select"
-              v-model="subjectSelection" label="subjectDisplayName" :options="subjectsAndTopics" :searchable="true"
-              :clearable="false" required :reduce="option => option.subject" placeholder="Select a subject" />
+            <v-select
+              id="fast-track-question"
+              class="uc-form-select welcome-page-subject-select"
+              v-model="subjectSelection"
+              label="subjectDisplayName"
+              :options="subjectsAndTopics"
+              :searchable="true"
+              :clearable="false"
+              required
+              :reduce="option => option.subject"
+              placeholder="Select a subject"
+            />
           </div>
-          <button @click="handleTrainingRedirect" class="welcome-page-btn" type="button" :disabled="!subjectSelection">
+          <button
+            @click="handleTrainingRedirect"
+            class="welcome-page-btn"
+            type="button"
+            :disabled="!subjectSelection"
+          >
             Take the quiz
+          </button>
+        </div>
+        <div
+          class="certification-instructions-container"
+          v-else-if="!passedUpchieve101"
+        >
+          <p class="">
+            {{
+              completed101Training
+                ? 'Put your knowledge to the test and pass our training quiz!'
+                : 'Next up: take our training to learn how to provide impactful coaching for every student on UPchieve!'
+            }}
+          </p>
+          <button
+            @click="handle101Redirect"
+            class="welcome-page-btn"
+            type="button"
+          >
+            {{
+              completed101Training
+                ? 'Start UPchieve 101 quiz'
+                : inProgress
+                ? 'Resume course'
+                : 'Start course'
+            }}
           </button>
         </div>
       </div>
@@ -62,9 +105,11 @@ export default {
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
+      hasCertification: 'user/hasCertification',
+      passedUpchieve101: 'user/passedUpchieve101',
     }),
     userCreatedBeforeLaunch() {
-      const forcedTrainingLaunchDate = '2023-04-13T15:40:00.000Z'
+      const forcedTrainingLaunchDate = '2023-04-27T16:00:00.000Z'
       return (
         new Date(this.user.createdAt).getTime() <=
         new Date(forcedTrainingLaunchDate).getTime()
@@ -182,6 +227,15 @@ export default {
         },
       ]
     },
+    inProgress() {
+      return (
+        this.user.trainingCourses.upchieve101.progress > 0 &&
+        !this.completed101Training
+      )
+    },
+    completed101Training() {
+      return this.user.trainingCourses.upchieve101.progress === 100
+    },
   },
 
   methods: {
@@ -194,6 +248,11 @@ export default {
         const path = `/training/${Case.kebab(data.subject)}/quiz`
         this.$router.push(path)
       }
+    },
+    handle101Redirect() {
+      this.completed101Training
+        ? this.$router.push('/training/upchieve101/quiz')
+        : this.$router.push('/training/course/upchieve101')
     },
   },
 }
@@ -231,8 +290,6 @@ export default {
     @include breakpoint-above('small') {
       width: 60%;
     }
-
-
   }
 
   &-title-container,

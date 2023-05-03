@@ -82,9 +82,7 @@
         <div>
           <large-button
             primary
-            :routeTo="
-              isForcedTrainingActive && user.isVolunteer ? '/welcome' : '/'
-            "
+            :routeTo="isAutoFlowActive && user.isVolunteer ? '/welcome' : '/'"
             class="uc-form-button-big"
           >
             Take me to the dashboard
@@ -139,7 +137,7 @@ export default {
       user: state => state.user.user,
     }),
     ...mapGetters({
-      isForcedTrainingActive: 'featureFlags/isForcedTrainingActive',
+      isAutoFlowActive: 'featureFlags/isAutoFlowActive',
     }),
     isValidVerificationCode() {
       return !(

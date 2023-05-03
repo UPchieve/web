@@ -70,9 +70,10 @@ const routes = [
         .then(() => {
           if (store.getters['user/isAuthenticated']) {
             if (
-              store.getters['featureFlags/isForcedTrainingActive'] &&
+              store.getters['featureFlags/isAutoFlowActive'] &&
               store.getters['user/isVolunteer'] &&
-              !store.getters['user/hasCertification']
+              (!store.getters['user/hasCertification'] ||
+                !store.getters['user/passedUpchieve101'])
             )
               next('/welcome')
             else next('/dashboard')
@@ -201,9 +202,10 @@ const routes = [
     meta: { protected: true },
     beforeEnter: async (to, from, next) => {
       if (
-        store.getters['featureFlags/isForcedTrainingActive'] &&
+        store.getters['featureFlags/isAutoFlowActive'] &&
         store.getters['user/isVolunteer'] &&
-        !store.getters['user/hasCertification']
+        (!store.getters['user/hasCertification'] ||
+          !store.getters['user/passedUpchieve101'])
       )
         next('/welcome')
       else next()
@@ -285,9 +287,10 @@ const routes = [
     meta: { protected: true },
     beforeEnter: (to, from, next) => {
       if (
-        store.getters['featureFlags/isForcedTrainingActive'] &&
+        store.getters['featureFlags/isAutoFlowActive'] &&
         store.getters['user/isVolunteer'] &&
-        !store.getters['user/hasCertification']
+        (!store.getters['user/hasCertification'] ||
+          !store.getters['user/passedUpchieve101'])
       )
         next('/welcome')
       else next()
@@ -306,9 +309,10 @@ const routes = [
     meta: { protected: true },
     beforeEnter: (to, from, next) => {
       if (
-        store.getters['featureFlags/isForcedTrainingActive'] &&
+        store.getters['featureFlags/isAutoFlowActive'] &&
         store.getters['user/isVolunteer'] &&
-        !store.getters['user/hasCertification']
+        (!store.getters['user/hasCertification'] ||
+          !store.getters['user/passedUpchieve101'])
       )
         next('/welcome')
       else next()

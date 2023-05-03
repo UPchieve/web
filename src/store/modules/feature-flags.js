@@ -58,7 +58,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS]: false,
       [POSTHOG_FEATURE_FLAGS.IMAGES_IN_DOCUMENTS]: false,
       [POSTHOG_FEATURE_FLAGS.OPTIONAL_MIDDLE_SCHOOL]: false,
-      [POSTHOG_FEATURE_FLAGS.FORCED_TRAINING]: false,
+      [POSTHOG_FEATURE_FLAGS.AUTO_FLOW]: false,
       [POSTHOG_FEATURE_FLAGS.TINY_UPCHIEVE101]: false,
       [POSTHOG_FEATURE_FLAGS.TINY_CERTS]: false,
     },
@@ -118,8 +118,7 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.IMAGES_IN_DOCUMENTS],
     isOptionalMiddleSchoolActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.OPTIONAL_MIDDLE_SCHOOL],
-    isForcedTrainingActive: state =>
-      state.flags[POSTHOG_FEATURE_FLAGS.FORCED_TRAINING],
+    isAutoFlowActive: state => state.flags[POSTHOG_FEATURE_FLAGS.AUTO_FLOW],
     isTinyUpchieve101Active: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.TINY_UPCHIEVE101],
     isTinyCertsActive: state => state.flags[POSTHOG_FEATURE_FLAGS.TINY_CERTS],

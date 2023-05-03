@@ -222,14 +222,15 @@ export default {
       userAuthenticated: 'user/isAuthenticated',
       isVolunteer: 'user/isVolunteer',
       mobileMode: 'app/mobileMode',
-      isForcedTrainingActive: 'featureFlags/isForcedTrainingActive',
+      isAutoFlowActive: 'featureFlags/isAutoFlowActive',
       hasCertification: 'user/hasCertification',
+      passedUpchieve101: 'user/passedUpchieve101',
     }),
-    isForcedTrainingUser() {
+    isAutoFlowUser() {
       return (
-        this.isForcedTrainingActive &&
+        this.isAutoFlowActive &&
         this.isVolunteer &&
-        !this.hasCertification
+        (!this.hasCertification || !this.passedUpchieve101)
       )
     },
   },
@@ -264,9 +265,9 @@ export default {
           customData: userProps,
         })
         AnalyticsService.updateUser(userProps)
-        if (this.isForcedTrainingUser) {
-          AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_FORCED_TRAINING, {
-            event: EVENTS.FLAGGED_AS_FORCED_TRAINING,
+        if (this.isAutoFlowUser) {
+          AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_AUTO_FLOW, {
+            event: EVENTS.FLAGGED_AS_AUTO_FLOW,
           })
         }
 
@@ -305,15 +306,15 @@ export default {
         }
       }
     },
-    isForcedTrainingActive(currentValue, prevValue) {
+    isAutoFlowActive(currentValue, prevValue) {
       if (
         currentValue &&
         !prevValue &&
         this.isVolunteer &&
-        !this.hasCertification
+        (!this.hasCertification || !this.passedUpchieve101)
       )
-        AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_FORCED_TRAINING, {
-          event: EVENTS.FLAGGED_AS_FORCED_TRAINING,
+        AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_AUTO_FLOW, {
+          event: EVENTS.FLAGGED_AS_AUTO_FLOW,
         })
     },
   },
