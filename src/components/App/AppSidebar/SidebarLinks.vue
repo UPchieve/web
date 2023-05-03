@@ -3,8 +3,8 @@
     class="SidebarLinks"
     :class="{
       'forced-training':
-        this.isForcedTrainingActive &&
-        !this.hasCertification &&
+        this.isAutoFlowActive &&
+        (!this.hasCertification || !this.passedUpchieve101) &&
         this.isVolunteer,
     }"
   >
@@ -101,8 +101,9 @@ export default {
   computed: {
     ...mapGetters({
       isReferFriendsActive: 'featureFlags/isReferFriendsActive',
-      isForcedTrainingActive: 'featureFlags/isForcedTrainingActive',
+      isAutoFlowActive: 'featureFlags/isAutoFlowActive',
       hasCertification: 'user/hasCertification',
+      passedUpchieve101: 'user/passedUpchieve101',
     }),
   },
 }

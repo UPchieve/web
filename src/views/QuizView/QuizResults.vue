@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import Case from 'case'
 
 export default {
@@ -66,6 +66,15 @@ export default {
         text: 'Take another quiz',
         route: '/training',
       }
+      if (
+        this.isAutoFlowActive &&
+        !this.user.isOnboarded &&
+        !this.hasCertification
+      )
+        this.rightBtn = {
+          text: 'Done',
+          route: '/welcome',
+        }
     } else {
       this.headerMsg = "You failed this time, but don't give up!"
       this.instructionMsg = isTrainingSubject
@@ -79,7 +88,9 @@ export default {
       this.leftBtn = { text: 'Review answers', route: '' }
       this.rightBtn = {
         text: 'Keep studying',
-        route: `/training/review/${Case.kebab(this.category)}`,
+        route: isTrainingSubject
+          ? `/training/course/${Case.kebab(this.category)}`
+          : `/training/review/${Case.kebab(this.category)}`,
       }
     }
 
@@ -97,6 +108,12 @@ export default {
     ...mapState({
       subjects: state => state.subjects.subjects,
       training: state => state.subjects.training,
+      user: state => state.user.user,
+    }),
+    ...mapGetters({
+      isAutoFlowActive: 'featureFlags/isAutoFlowActive',
+      hasCertification: 'user/hasCertification',
+      passedUpchieve101: 'user/passedUpchieve101',
     }),
   },
 }

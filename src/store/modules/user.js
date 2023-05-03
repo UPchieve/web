@@ -242,7 +242,15 @@ export default {
     isVerified: state => state.user.verified,
 
     hasCertification: state => {
-      return _.some(state.user.certifications, { passed: true })
+      // UPchieve 101 is a training course and not technically considered
+      // a certification. It's nested in user.certifications for legacy purposes
+      const certs = Object.assign({}, state.user.certifications)
+      delete certs.upchieve101
+      return _.some(certs, { passed: true })
+    },
+
+    passedUpchieve101: state => {
+      return state.user.certifications.upchieve101.passed
     },
 
     hasSelectedAvailability: state => !!state.user.availabilityLastModifiedAt,
