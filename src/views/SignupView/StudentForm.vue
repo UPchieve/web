@@ -52,11 +52,154 @@
     <div v-if="msg !== ''" role="alert">{{ msg }}</div>
   </form>
 
+  <div
+    class="form-card"
+    v-else-if="step === 'eligibilityNew'"
+    @submit.prevent="submitEligibilityForm()"
+  >
+    <FormErrors :errors="errors" />
+
+    <h1 class="header">Check if you are eligible for UPchieve</h1>
+    <p class="body">
+      Already have an account?
+      <router-link class="link" to="/login">Log In</router-link>
+    </p>
+
+    <form id="form-eligibility" class="flex column">
+      <div class="form-element">
+        <v-select
+          class="select-input"
+          v-model="eligibility.currentGrade"
+          placeholder="Select your grade*"
+          @input="onGradeChange"
+          :options="gradeLevels"
+          :searchable="false"
+          :clearable="false"
+          v-bind:class="{
+            'select-input-invalid': v$.eligibility.currentGrade.$errors.length,
+          }"
+          @close="onGradeClose"
+          required
+        ></v-select>
+
+        <div class="input-metadata error">
+          <div v-if="v$.eligibility.currentGrade.$errors.length">
+            {{
+              v$.eligibility.currentGrade.$silentErrors
+                .map(e => e.$message)
+                .join(', ')
+            }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-element">
+        <autocomplete
+          base-class="autocomplete-school-search"
+          :search="autocompleteSchool"
+          :get-result-value="getSchoolDisplayName"
+          placeholder="Search for your school*"
+          aria-label="Search for your school*"
+          @submit="handleSelectHighSchool"
+          @blur="v$.eligibility.highSchool.$touch"
+          v-bind:class="{
+            'autocomplete-school-search-invalid':
+              v$.eligibility.highSchool.$errors.length,
+          }"
+          required
+        >
+          <template #result="{ result, props }">
+            <li v-bind="props">
+              <div v-if="result.name" class="result">
+                {{ result.name }} ({{ result.city }}, {{ result.state }})
+              </div>
+              <a
+                v-if="result.cantFindSchool"
+                target="_blank"
+                href="https://upchieve.org/cant-find-school"
+              >
+                <div class="result">
+                  {{ CANNOT_FIND_SCHOOL_TEXT }}
+                </div>
+              </a>
+            </li>
+          </template>
+        </autocomplete>
+        <div class="input-metadata error">
+          <div v-if="v$.eligibility.highSchool.$errors.length">
+            {{
+              v$.eligibility.highSchool.$errors.map(e => e.$message).join(', ')
+            }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-element">
+        <input
+          id="inputZipCode"
+          class="form-text-input"
+          type="text"
+          placeholder="Enter your zip code*"
+          v-model="eligibility.zipCode"
+          v-bind:class="{
+            'form-text-input-invalid': v$.eligibility.zipCode.$errors.length,
+          }"
+          @blur="v$.eligibility.zipCode.$touch"
+        />
+        <div class="input-metadata error">
+          <div v-if="v$.eligibility.zipCode.$errors.length">
+            {{ v$.eligibility.zipCode.$errors.map(e => e.$message).join(', ') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-element">
+        <input
+          id="inputEligibilityEmail"
+          class="form-text-input"
+          type="email"
+          v-model="eligibility.email"
+          v-bind:class="{
+            'form-text-input-invalid': v$.eligibility.email.$errors.length,
+          }"
+          @blur="v$.eligibility.email.$touch"
+          placeholder="Email*"
+          required
+        />
+        <div class="input-metadata flex row no-wrap">
+          <div>
+            We will only use this email to notify you if your eligibility status
+            changes in the future.
+          </div>
+          <div class="error">
+            <div v-if="v$.eligibility.email.$errors.length">
+              {{ v$.eligibility.email.$errors.map(e => e.$message).join(', ') }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button
+        id="btn-eligibility-submit"
+        class="button-filled-lg mt-30"
+        :disabled="
+          !!v$.eligibility.$silentErrors.length ||
+            !!v$.eligibility.$errors.length
+        "
+        type="submit"
+      >
+        Check my eligibility
+      </button>
+    </form>
+  </div>
+
   <form
     v-else-if="step === 'eligibility' || step === 'referred'"
     class="uc-form-body uc-form-body--center"
     :aria-label="isReferred ? 'Student Referral Signup' : 'Student eligibility'"
-    @submit.prevent="isReferred ? continueToAccountPage() : submitEligibility()"
+    @submit.prevent="
+      isReferred ? submitReferralEligibilityForm() : submitEligibilityForm()
+    "
   >
     <FormErrors :errors="errors" />
 
@@ -74,7 +217,7 @@
       </div>
       <v-select
         class="uc-form-body__select"
-        v-model="profile.currentGrade"
+        v-model="eligibility.currentGrade"
         placeholder="Select your grade"
         @input="onGradeChange"
         :options="gradeLevels"
@@ -179,7 +322,7 @@
       </p>
     </div>
     <div>
-      <button class="uc-form-button-big" type="button" @click="accountPage">
+      <button class="button-filled-lg" @click="accountPage">
         Continue
       </button>
     </div>
@@ -223,7 +366,7 @@
 
     <button
       v-if="!isCollegeStudent"
-      class="uc-form-button-big"
+      class="button-filled-lg"
       type="button"
       @click="ineligibleContinue"
     >
@@ -233,105 +376,109 @@
 
   <form
     v-else-if="step === 'account'"
-    class="uc-form-body uc-form-body--center"
+    class="flex column form-card"
     aria-label="Student account"
     @submit.prevent="submitAccountForm()"
   >
     <FormErrors :errors="errors" />
 
-    <h3 v-if="isReferred">Finish creating your account</h3>
-    <div class="step-title" v-else>Finish creating your account</div>
+    <h1 class="header" ng-if="!isReferred && streamlineSignUpFlow">
+      Woohoo, you're eligible for UPchieve!
+    </h1>
+    <h1 class="header">Finish creating your free account</h1>
+    <p class="body">
+      Already have an account?
+      <router-link class="link" to="/login">Log In</router-link>
+    </p>
 
-    <div class="uc-column">
-      <label for="firstName" class="uc-form-label">What's your name?</label>
-      <div class="uc-row name-fields">
-        <div class="uc-column">
-          <input
-            id="firstName"
-            type="text"
-            class="uc-form-input"
-            v-bind:class="{
-              'uc-form-input--invalid': invalidInputs.indexOf('firstName') > -1,
-            }"
-            v-model="profile.firstName"
-            required
-            autofocus
-            autocomplete="given-name"
-          />
-          <p class="uc-form-subtext">First Name</p>
-        </div>
-        <div class="uc-column">
-          <input
-            id="lastName"
-            type="text"
-            class="uc-form-input"
-            v-bind:class="{
-              'uc-form-input--invalid': invalidInputs.indexOf('lastName') > -1,
-            }"
-            v-model="profile.lastName"
-            required
-            autocomplete="family-name"
-          />
-          <p class="uc-form-subtext">Last Name</p>
+    <div class="form-element">
+      <input
+        class="form-text-input"
+        type="text"
+        v-model="profile.firstName"
+        v-bind:class="{
+          'form-text-input-invalid': v$.profile.firstName.$errors.length,
+        }"
+        @blur="v$.profile.firstName.$touch"
+        placeholder="First name*"
+        required
+      />
+      <div class="input-metadata error">
+        <div v-if="v$.profile.firstName.$errors.length">
+          {{ v$.profile.firstName.$errors.map(e => e.$message).join(', ') }}
         </div>
       </div>
     </div>
 
-    <div class="uc-column">
-      <label for="inputPassword" class="uc-form-label">
-        Create a password.
-      </label>
+    <div class="form-element">
       <input
-        id="inputPassword"
-        type="password"
-        class="uc-form-input"
+        class="form-text-input"
+        type="text"
+        v-model="profile.lastName"
         v-bind:class="{
-          'uc-form-input--invalid': invalidInputs.indexOf('inputPassword') > -1,
+          'form-text-input-invalid': v$.profile.lastName.$errors.length,
         }"
-        v-model="credentials.password"
+        @blur="v$.profile.lastName.$touch"
+        placeholder="Last name*"
         required
-        autocomplete="new-password"
       />
-      <p class="uc-form-subtext">
-        Must have at least one number, one uppercase letter, and one lowercase
-        letter.
+      <div class="input-metadata error">
+        <div v-if="v$.profile.lastName.$errors.length">
+          {{ v$.profile.lastName.$errors.map(e => e.$message).join(', ') }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-element">
+      <input
+        class="form-text-input"
+        type="password"
+        v-model="credentials.password"
+        v-bind:class="{
+          'form-text-input-invalid': v$.credentials.password.$errors.length,
+        }"
+        @blur="v$.credentials.password.$touch"
+        placeholder="Password*"
+        aria-label="Create a password"
+      />
+      <p
+        class="input-metadata"
+        v-bind:class="{
+          'input-metadata error-red': v$.credentials.password.$errors.length,
+        }"
+      >
+        Must have at least one number, one uppercase letter, one lowercase
+        letter, and be at least 8 characters long.
       </p>
     </div>
 
-    <div class="uc-column">
-      <label for="signup-source" class="uc-form-label"
-        >How did you hear about us?</label
-      >
+    <div class="form-element">
       <v-select
         id="signup-source"
-        class="uc-form-select"
+        class="select-input mt-10"
+        placeholder="How did you hear about us?"
         v-model="signupSourceId"
         :options="signupSourcesOptions"
-        label="name"
         :reduce="option => option.id"
         :searchable="false"
         :clearable="false"
-        required
         :loading="isLoadingSignupSources"
-      />
+        label="name"
+      ></v-select>
     </div>
-    <div class="uc-column" v-if="shouldShowOtherSignupInput()">
+
+    <div class="form-element" v-if="shouldShowOtherSignupInput()">
       <input
         id="otherSignupSource"
         type="text"
-        class="uc-form-input"
+        class="form-text-input"
+        placeholder="Tell us where you heard about us!"
         v-model="otherSignupSource"
-        v-bind:class="{
-          'uc-form-input--invalid':
-            invalidInputs.indexOf('otherSignupSource') > -1,
-        }"
         autofocus
       />
-      <p class="uc-form-subtext">
-        Tell us where you heard about us!
-      </p>
     </div>
-    <div class="uc-form-checkbox">
+
+    <div class="uc-form-checkbox ml-10 mt-30">
       <input
         id="userAgreement"
         type="checkbox"
@@ -344,11 +491,23 @@
       </label>
     </div>
 
-    <button class="uc-form-button-big" type="submit">
+    <button
+      class="button-filled-lg mt-30"
+      :disabled="
+        !!v$.profile.$silentErrors.length ||
+          !!v$.profile.$errors.length ||
+          !!v$.credentials.$silentErrors.length ||
+          !!v$.credentials.$errors.length ||
+          !credentials.terms ||
+          (!streamlineSignUpFlow && !signupSourceId) ||
+          (!streamlineSignUpFlow &&
+            shouldShowOtherSignupInput() &&
+            !this.otherSignupSource)
+      "
+      type="submit"
+    >
       Create my account
     </button>
-
-    <div v-if="msg !== ''" role="alert">{{ msg }}</div>
   </form>
 
   <div
@@ -375,7 +534,15 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import validator from 'validator'
+import { useVuelidate } from '@vuelidate/core'
+import {
+  helpers,
+  required,
+  requiredIf,
+  email,
+  minLength,
+  maxLength,
+} from '@vuelidate/validators'
 import Autocomplete from '@trevoreyre/autocomplete-vue'
 import LoggerService from '@/services/LoggerService'
 import AuthService from '@/services/AuthService'
@@ -383,7 +550,7 @@ import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import VerificationBadge from '@/assets/verification.svg'
 import ErrorBadge from '@/assets/error_badge.svg'
-import { EVENTS } from '@/consts'
+import { EVENTS, GRADES } from '@/consts'
 import { backOff } from 'exponential-backoff'
 import FormErrors from '@/components/FormErrors.vue'
 
@@ -394,25 +561,45 @@ export default {
     ErrorBadge,
     FormErrors,
   },
-  data() {
-    const gradeLevels = [
-      '8th grade',
-      '9th grade',
-      '10th grade',
-      '11th grade',
-      '12th grade',
-      'College',
-      'Other',
-    ]
-
+  setup() {
+    return { v$: useVuelidate() }
+  },
+  validations() {
     return {
-      gradeLevels,
+      eligibility: {
+        currentGrade: { required },
+        highSchool: { required },
+        zipCode: { required, minLength: minLength(5), maxLength: maxLength(5) },
+        email: { required, email },
+      },
+      profile: {
+        firstName: { required },
+        lastName: { required },
+      },
+      credentials: {
+        email: { required, email },
+        password: {
+          required,
+          isPasswordValid: helpers.regex(this.PASSWORD_PATTERN),
+        },
+        terms: { required },
+      },
+      signupSourceId: requiredIf(!this.streamlineSignUpFlow),
+      otherSignupSource: requiredIf(
+        !this.streamlineSignUpFlow && this.shouldShowOtherSignupInput()
+      ),
+    }
+  },
+  data() {
+    return {
+      gradeLevels: GRADES,
       partnerSignupCode: '',
       showSignupCodeDecision: true,
       msg: '',
       errors: [],
       invalidInputs: [],
       eligibility: {
+        currentGrade: '',
         highSchool: {},
         zipCode: '',
         email: '',
@@ -425,7 +612,6 @@ export default {
       profile: {
         firstName: '',
         lastName: '',
-        currentGrade: '',
       },
       step: '',
       hasStartedSearchingForSchool: false,
@@ -457,16 +643,26 @@ export default {
     }),
     ...mapGetters({
       isOptionalMiddleSchoolActive: 'featureFlags/isOptionalMiddleSchoolActive',
+      streamlineSignUpFlow: 'featureFlags/streamlineSignUpFlow',
     }),
     trimCurrentGrade() {
       // extracting the first word out of the gradeLevels
       // example: "8th grade" --> "8th"
-      return this.profile.currentGrade.split(' ')[0]
+      return this.eligibility.currentGrade.split(' ')[0]
     },
     title() {
       if (this.isCollegeStudent)
         return "Oops, looks like you're not a high school student!"
       else return "Sorry, we can't verify your eligibility yet."
+    },
+    CANNOT_FIND_SCHOOL_TEXT() {
+      return `Can't find your school?`
+    },
+    GRADE_LEVELS() {
+      return GRADES
+    },
+    PASSWORD_PATTERN() {
+      return /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/
     },
   },
   watch: {
@@ -512,6 +708,13 @@ export default {
         value === '8th grade' && this.isOptionalMiddleSchoolActive
       )
     },
+    // Necessary to explicitly call on close of the currentGrade select menu
+    // because v-select component is preventing blur event.
+    onGradeClose() {
+      if (!this.eligibility.currentGrade) {
+        this.v$.eligibility.currentGrade.$touch()
+      }
+    },
 
     partnerCodePage() {
       this.step = 'partner-signup-code'
@@ -519,7 +722,8 @@ export default {
     },
 
     eligibilityPage() {
-      this.step = 'eligibility'
+      this.$emit('hideLoginLink')
+      this.step = 'eligibilityNew'
       this.$router.push('/sign-up/student/eligibility')
     },
 
@@ -565,7 +769,7 @@ export default {
         })
     },
 
-    async checkEligibilityErrors() {
+    async hasEligibilityFormErrors() {
       // validate input
       this.errors = []
       this.invalidInputs = []
@@ -590,38 +794,28 @@ export default {
       if (!this.eligibility.email) {
         this.errors.push('An email address is required.')
         this.invalidInputs.push('inputEligibilityEmail')
-      } else if (!validator.isEmail(this.eligibility.email)) {
-        this.errors.push(
-          this.eligibility.email + ' is not a valid email address.'
-        )
-        this.invalidInputs.push('inputEligibilityEmail')
       }
 
-      if (!this.profile.currentGrade) {
+      if (!this.eligibility.currentGrade) {
         this.errors.push('You must select your grade level.')
       }
+
+      return !!this.errors.length
     },
 
     // transitions from the referred sign up view to account view
-    async continueToAccountPage() {
-      await this.checkEligibilityErrors()
-      if (this.errors.length) return
-
-      // autofill the user's email
-      this.credentials.email = this.eligibility.email
-      this.step = 'account'
-      this.$router.push('/sign-up/student/account')
-      await this.getSignupSources()
+    async submitReferralEligibilityForm() {
+      if (await this.hasEligibilityFormErrors()) return
+      this.accountPage()
     },
 
-    async submitEligibility() {
+    async submitEligibilityForm() {
       AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CHECK_MY_ELIGIBILITY)
 
       // reset error msg from server
       this.msg = ''
 
-      await this.checkEligibilityErrors()
-      if (this.errors.length) return
+      if (await this.hasEligibilityFormErrors()) return
 
       let schoolUpchieveId = this.eligibility.highSchool.upchieveId
       if (this.isMiddleSchoolOptional) {
@@ -639,13 +833,18 @@ export default {
         .then(async response => {
           const isEligible = response.body.isEligible
           if (isEligible) {
-            this.step = 'eligible'
-            this.$router.push('/sign-up/student/eligible')
             AnalyticsService.captureEvent(EVENTS.ELIGIBILITY_ELIGIBLE, {
               event: EVENTS.ELIGIBILITY_ELIGIBLE,
             })
             // autofill the user's email
             this.credentials.email = this.eligibility.email
+            if (this.streamlineSignUpFlow) {
+              this.accountPage()
+            } else {
+              this.$emit('hideLoginLink')
+              this.step = 'eligible'
+              this.$router.push('/sign-up/student/eligible')
+            }
           } else {
             this.step = 'ineligible'
             if (response.body.isCollegeStudent) this.isCollegeStudent = true
@@ -664,17 +863,21 @@ export default {
           this.errors.push(error)
         })
     },
+
     async accountPage() {
+      this.$emit('hideLoginLink')
       this.step = 'account'
       this.$router.push('/sign-up/student/account')
       const isDomesticIpAddress = await this.isDomesticIpAddress()
       if (!isDomesticIpAddress) return this.internationalPage()
       await this.getSignupSources()
     },
+
     ineligibleContinue() {
       AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_STUDENT_ACCESS_PAGE)
       window.location = 'https://upchieve.org/request-access'
     },
+
     autocompleteSchool(input) {
       this.eligibility.highSchool = {}
 
@@ -699,17 +902,23 @@ export default {
           })
       })
     },
+
     getSchoolDisplayName(school) {
       if (school.cantFindSchool) {
-        return `Can't Find School`
+        return
       }
       return `${school.name} (${school.city}, ${school.state})`
     },
     handleSelectHighSchool(school) {
-      AnalyticsService.captureEvent(EVENTS.STUDENT_SELECTED_SCHOOL)
-      this.eligibility.highSchool = school || {}
+      if (school.value === this.CANNOT_FIND_SCHOOL_TEXT) {
+        AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CANT_FIND_SCHOOL)
+      } else {
+        AnalyticsService.captureEvent(EVENTS.STUDENT_SELECTED_SCHOOL)
+        this.eligibility.highSchool = school || {}
+      }
     },
-    submitAccountForm() {
+
+    hasAccountFormErrors() {
       this.errors = []
       this.invalidInputs = []
       if (!this.profile.firstName || !this.profile.lastName) {
@@ -729,19 +938,26 @@ export default {
         this.errors.push('A password is required.')
         this.invalidInputs.push('inputPassword')
       }
-      if (!this.signupSourceId) {
-        this.errors.push('Please select an option for how you heard about us.')
-      }
-      if (this.shouldShowOtherSignupInput() && !this.otherSignupSource) {
-        this.errors.push(
-          'Please enter signup source in the text box if "Other" is selected'
-        )
-        this.invalidInputs.push('otherSignupSource')
+      if (!this.streamlineSignUpFlow) {
+        if (!this.signupSourceId) {
+          this.errors.push(
+            'Please select an option for how you heard about us.'
+          )
+        }
+        if (this.shouldShowOtherSignupInput() && !this.otherSignupSource) {
+          this.errors.push(
+            'Please enter signup source in the text box if "Other" is selected'
+          )
+          this.invalidInputs.push('otherSignupSource')
+        }
       }
 
-      if (!this.errors.length) this.submit()
+      return !!this.errors.length
     },
-    submit() {
+
+    async submitAccountForm() {
+      if (this.hasAccountFormErrors()) return
+
       AuthService.registerOpenStudent(this, {
         email: this.credentials.email,
         password: this.credentials.password,
@@ -761,7 +977,7 @@ export default {
         })
         .catch(err => {
           this.errors.push(err.message)
-          if (err.message.match(/^Password/))
+          if (err.message && err.message.match(/^Password/))
             AnalyticsService.captureEvent(
               EVENTS.STUDENT_ENTERED_INVALID_PASSWORD
             )
@@ -770,9 +986,7 @@ export default {
           }
         })
     },
-    cantFindSchool() {
-      AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CANT_FIND_SCHOOL)
-    },
+
     shouldShowOtherSignupInput() {
       if (this.isLoadingSignupSources || !this.signupSourcesOptions) {
         return false
@@ -800,16 +1014,145 @@ export default {
 </script>
 
 <style lang="scss">
-.school-search ul {
-  z-index: 11 !important;
+.select-input {
+  box-sizing: border-box;
+  width: 100%;
+
+  .vs__search {
+    margin: 0;
+    padding: 0;
+
+    &::placeholder {
+      color: $c-banned-grey;
+    }
+  }
+
+  &:hover {
+    .vs__dropdown-option {
+      background-color: #fff;
+    }
+  }
+
+  .vs__selected-options {
+    padding: 0;
+  }
+
+  .vs__selected {
+    margin: 0;
+    padding: 0;
+  }
+
+  &-invalid {
+    .vs__dropdown-toggle {
+      outline: 1px solid $c-error-red;
+    }
+  }
+
+  .vs__dropdown-toggle {
+    border: 1px solid $border-grey;
+    border-radius: 4px;
+    box-shadow: none;
+    padding: 15px 13px;
+    width: 100%;
+  }
+
+  .vs__dropdown-toggle[aria-expanded='true'] {
+    outline: 1px solid $c-information-blue;
+  }
+
+  .vs__dropdown-menu {
+    background: #fff;
+    border: solid 1px #ccc;
+    border-top: none;
+    border-radius: 5px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    font-size: 14px;
+    list-style: none;
+    padding: 0;
+    margin-top: 2px;
+    max-height: 180px;
+    overflow: auto;
+    width: 100%;
+  }
+
+  .vs__dropdown-option {
+    color: #000;
+    cursor: pointer;
+    padding: 10px 12px;
+    width: 100%;
+
+    &:hover,
+    &:focus {
+      background: #eee;
+      color: #000;
+    }
+  }
+}
+
+.autocomplete-school-search {
+  width: 100%;
+
+  &-input {
+    border: 1px solid $border-grey;
+    border-radius: 4px;
+    box-shadow: none;
+    padding: 15px 13px;
+    width: 100%;
+
+    &::placeholder {
+      color: $c-banned-grey;
+    }
+
+    &:focus-within {
+      outline: 1px solid $c-information-blue;
+    }
+  }
+
+  &-invalid .autocomplete-school-search-input {
+    outline: 1px solid $c-error-red;
+  }
+
+  &-result-list {
+    background: #fff;
+    border: solid 1px #ccc;
+    border-top: none;
+    border-radius: 5px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    font-size: 14px;
+    list-style: none;
+    padding: 0;
+    margin-top: 1px;
+    max-height: 180px;
+    overflow: auto;
+    width: 100%;
+  }
+
+  [data-position='above'] .autocomplete-result-list {
+    border: solid 1px #ccc;
+    border-bottom: none;
+    border-radius: 5px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-bottom: 1px;
+    margin-top: 0;
+  }
+
+  .result {
+    cursor: pointer;
+    padding: 10px 12px;
+    width: 100%;
+
+    &:hover,
+    &:focus {
+      background: #eee;
+    }
+  }
 }
 </style>
 
 <style lang="scss" scoped>
-.uc-form-body .grade-select {
-  z-index: 10;
-}
-
 .uc-form-body {
   @include child-spacing(top, 25px);
 
@@ -817,7 +1160,6 @@ export default {
     height: 48px;
     width: 100%;
     margin-top: 20px;
-    z-index: 0;
   }
 
   ::placeholder {
@@ -925,5 +1267,117 @@ p.small-paragraph {
 
 .contact {
   color: $c-success-green;
+}
+
+.header {
+  font-weight: 500;
+  font-size: 24px;
+}
+
+.body {
+  font-size: 16px;
+  margin-bottom: 30px;
+
+  .link {
+    color: $c-information-blue;
+  }
+}
+
+.form-card {
+  padding: 20px 40px;
+}
+
+.form-element {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 6px;
+}
+
+.form-text-input {
+  border: 1px solid $border-grey;
+  border-radius: 4px;
+  box-shadow: none;
+  box-sizing: border-box;
+  padding: 15px 13px;
+
+  &:focus {
+    outline: 1px solid $c-information-blue;
+  }
+
+  &-invalid {
+    outline: 1px solid $c-error-red;
+  }
+
+  &::placeholder {
+    color: $c-banned-grey;
+  }
+}
+
+.button-filled-lg {
+  background-color: $c-information-blue;
+  border: none;
+  border-radius: 200px;
+  color: #fff;
+  height: 48px;
+  padding: 12px 24px;
+
+  &:hover {
+    background-color: #103a90;
+  }
+
+  &:disabled {
+    background-color: #f1f3f6;
+    color: #8b939f;
+  }
+}
+
+.input-metadata {
+  color: $c-banned-grey;
+  font-size: 12px;
+  margin: 1px 10px 0 10px;
+
+  &.error,
+  .error {
+    color: $c-error-red;
+    font-size: 10px;
+    min-height: 15px;
+    text-align: right;
+  }
+
+  &.error-red {
+    color: $c-error-red;
+  }
+}
+
+.w-full {
+  width: 100%;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.flex {
+  display: flex;
+
+  &.column {
+    flex-direction: column;
+  }
+
+  &.row {
+    flex-direction: row;
+  }
+
+  &.no-wrap {
+    flex-wrap: nowrap;
+  }
+}
+
+.mt-30 {
+  margin-top: 30px;
+}
+
+.ml-10 {
+  margin-left: 10px;
 }
 </style>

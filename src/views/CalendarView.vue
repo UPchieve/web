@@ -11,8 +11,8 @@
             there are no coaches waiting on the dashboard, we also send out text
             messages for requests that have not been picked up. You can help us
             ensure every student request gets matched by providing your
-            availability below. You're not obligated to tutor every time we text
-            you, but try and select times you're likely to want to help a
+            availability below. You’re not obligated to tutor every time we text
+            you, but try and select times you’re likely to want to help a
             student.
           </p>
         </div>
