@@ -312,10 +312,12 @@ export default {
         !prevValue &&
         this.isVolunteer &&
         (!this.hasCertification || !this.passedUpchieve101)
-      )
+      ) {
         AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_AUTO_FLOW, {
           event: EVENTS.FLAGGED_AS_AUTO_FLOW,
         })
+        this.$router.push('/welcome')
+      }
     },
   },
   sockets: {
