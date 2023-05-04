@@ -13,6 +13,16 @@ export const CDN_URL = 'https://upchievecdn.blob.core.windows.net'
 
 export const DOCS_URL = `${CDN_URL}/docs`
 
+export const GRADES = [
+  '8th grade',
+  '9th grade',
+  '10th grade',
+  '11th grade',
+  '12th grade',
+  'College',
+  'Other',
+]
+
 export const STATES = [
   'Alabama',
   'Alaska',
@@ -444,6 +454,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   AUTO_FLOW: 'auto-flow',
   TINY_UPCHIEVE101: 'tiny-upchieve101',
   TINY_CERTS: 'tiny-certs',
+  STREAMLINE_SIGN_IN: 'streamline-sign-in',
 }
 
 export const ANALYTICS_REPORT_ROW = {

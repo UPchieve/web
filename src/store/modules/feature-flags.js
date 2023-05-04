@@ -61,6 +61,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.AUTO_FLOW]: false,
       [POSTHOG_FEATURE_FLAGS.TINY_UPCHIEVE101]: false,
       [POSTHOG_FEATURE_FLAGS.TINY_CERTS]: false,
+      [POSTHOG_FEATURE_FLAGS.STREAMLINE_SIGN_IN]: false,
     },
   },
   mutations: {
@@ -122,5 +123,7 @@ export default {
     isTinyUpchieve101Active: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.TINY_UPCHIEVE101],
     isTinyCertsActive: state => state.flags[POSTHOG_FEATURE_FLAGS.TINY_CERTS],
+    streamlineSignUpFlow: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.STREAMLINE_SIGN_IN],
   },
 }
