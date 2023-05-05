@@ -62,7 +62,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.TINY_UPCHIEVE101]: false,
       [POSTHOG_FEATURE_FLAGS.TINY_CERTS]: false,
       [POSTHOG_FEATURE_FLAGS.SIMULATED_SESSION]: false,
-      [POSTHOG_FEATURE_FLAGS.STREAMLINE_SIGN_IN]: false,
+      [POSTHOG_FEATURE_FLAGS.STREAMLINE_SIGN_UP_FLOW]: false,
     },
   },
   mutations: {
@@ -128,6 +128,6 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.SIMULATED_SESSION] &&
       !getters.isAutoFlowActive,
     streamlineSignUpFlow: state =>
-      state.flags[POSTHOG_FEATURE_FLAGS.STREAMLINE_SIGN_IN],
+      state.flags[POSTHOG_FEATURE_FLAGS.STREAMLINE_SIGN_UP_FLOW],
   },
 }
