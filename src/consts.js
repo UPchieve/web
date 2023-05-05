@@ -454,8 +454,6 @@ export const POSTHOG_FEATURE_FLAGS = {
   IMAGES_IN_DOCUMENTS: 'images-in-documents',
   OPTIONAL_MIDDLE_SCHOOL: 'optional-middle-school',
   AUTO_FLOW: 'auto-flow',
-  TINY_UPCHIEVE101: 'tiny-upchieve101',
-  TINY_CERTS: 'tiny-certs',
   SIMULATED_SESSION: 'simulated-session',
   STREAMLINE_SIGN_UP_FLOW: 'streamline-sign-in',
 }
