@@ -839,6 +839,12 @@ export default {
             // autofill the user's email
             this.credentials.email = this.eligibility.email
             if (this.streamlineSignUpFlow) {
+              AnalyticsService.captureEvent(
+                EVENTS.FLAGGED_AS_STREAMLINE_SIGN_UP_FLOW,
+                {
+                  event: EVENTS.FLAGGED_AS_STREAMLINE_SIGN_UP_FLOW,
+                }
+              )
               this.accountPage()
             } else {
               this.$emit('hideLoginLink')
