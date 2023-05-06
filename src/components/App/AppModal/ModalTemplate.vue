@@ -10,7 +10,7 @@
       <div
         class="ModalTemplate-header-close-button"
         @click="handleCancel"
-        v-if="!isSessionFulfilledModal"
+        v-if="!hasNoEscape"
       >
         <arrow-icon class="icon" />
         <p>{{ backText }}</p>
@@ -76,8 +76,10 @@ export default {
   },
   computed: {
     ...mapGetters({ mobileMode: 'app/mobileMode' }),
-    isSessionFulfilledModal() {
-      return this.modalComponentName === 'SessionFulfilledModal'
+    hasNoEscape() {
+      return ['SessionFulfilledModal', 'SubjectCatalogSignUpModal'].includes(
+        this.modalComponentName
+      )
     },
   },
   methods: {
@@ -87,7 +89,7 @@ export default {
     },
     closeModal(event) {
       // users must interact with the modal button to close session related modals
-      if (this.isSessionFulfilledModal) return
+      if (this.hasNoEscape) return
       const { key, target } = event
       if (key === 'Escape' || target.classList.contains('ModalTemplate')) {
         this.handleCancel()

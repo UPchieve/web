@@ -59,7 +59,11 @@
   >
     <FormErrors :errors="errors" />
 
-    <h1 class="header">Check if you are eligible for UPchieve</h1>
+    <h1 v-if="isDashboardFirst" class="header">
+      Before we connect you with your tutor, we need to ask you a few quick
+      questions to make sure you're eligible for our services
+    </h1>
+    <h1 v-else class="header">Check if you are eligible for UPchieve</h1>
     <p class="body">
       Already have an account?
       <router-link class="link" to="/login">Log In</router-link>
@@ -382,7 +386,10 @@
   >
     <FormErrors :errors="errors" />
 
-    <h1 class="header" ng-if="!isReferred && streamlineSignUpFlow">
+    <h1
+      class="header"
+      v-if="(!isReferred && streamlineSignUpFlow) || isDashboardFirst"
+    >
       Woohoo, you're eligible for UPchieve!
     </h1>
     <h1 class="header">Finish creating your free account</h1>
@@ -494,7 +501,8 @@
     <button
       class="button-filled-lg mt-30"
       :disabled="
-        !!v$.profile.$silentErrors.length ||
+        isSubmittingAccountForm ||
+          !!v$.profile.$silentErrors.length ||
           !!v$.profile.$errors.length ||
           !!v$.credentials.$silentErrors.length ||
           !!v$.credentials.$errors.length ||
@@ -560,6 +568,9 @@ export default {
     VerificationBadge,
     ErrorBadge,
     FormErrors,
+  },
+  props: {
+    isDashboardFirst: Boolean,
   },
   setup() {
     return { v$: useVuelidate() }
@@ -627,6 +638,7 @@ export default {
       isLoadingSignupSources: false,
       isReferred: false,
       isMiddleSchoolOptional: false,
+      isSubmittingAccountForm: false,
     }
   },
   async mounted() {
@@ -724,7 +736,9 @@ export default {
     eligibilityPage() {
       this.$emit('hideLoginLink')
       this.step = 'eligibilityNew'
-      this.$router.push('/sign-up/student/eligibility')
+      if (!this.isDashboardFirst) {
+        this.$router.push('/sign-up/student/eligibility')
+      }
     },
 
     async isDomesticIpAddress() {
@@ -838,7 +852,7 @@ export default {
             })
             // autofill the user's email
             this.credentials.email = this.eligibility.email
-            if (this.streamlineSignUpFlow) {
+            if (this.streamlineSignUpFlow || this.isDashboardFirst) {
               AnalyticsService.captureEvent(
                 EVENTS.FLAGGED_AS_STREAMLINE_SIGN_UP_FLOW,
                 {
@@ -849,12 +863,16 @@ export default {
             } else {
               this.$emit('hideLoginLink')
               this.step = 'eligible'
-              this.$router.push('/sign-up/student/eligible')
+              if (!this.isDashboardFirst) {
+                this.$router.push('/sign-up/student/eligible')
+              }
             }
           } else {
             this.step = 'ineligible'
             if (response.body.isCollegeStudent) this.isCollegeStudent = true
-            this.$router.push('/sign-up/student/ineligible')
+            if (!this.isDashboardFirst) {
+              this.$router.push('/sign-up/student/ineligible')
+            }
             AnalyticsService.captureEvent(EVENTS.ELIGIBILITY_INELIGIBLE, {
               event: EVENTS.ELIGIBILITY_INELIGIBLE,
             })
@@ -873,7 +891,9 @@ export default {
     async accountPage() {
       this.$emit('hideLoginLink')
       this.step = 'account'
-      this.$router.push('/sign-up/student/account')
+      if (!this.isDashboardFirst) {
+        this.$router.push('/sign-up/student/account')
+      }
       const isDomesticIpAddress = await this.isDomesticIpAddress()
       if (!isDomesticIpAddress) return this.internationalPage()
       await this.getSignupSources()
@@ -962,7 +982,11 @@ export default {
     },
 
     async submitAccountForm() {
-      if (this.hasAccountFormErrors()) return
+      this.isSubmittingAccountForm = true
+      if (this.hasAccountFormErrors()) {
+        this.isSubmittingAccountForm = false
+        return
+      }
 
       AuthService.registerOpenStudent(this, {
         email: this.credentials.email,
@@ -979,9 +1003,11 @@ export default {
       })
         .then(() => {
           window.localStorage.removeItem('upcReferredByCode')
+          this.isSubmittingAccountForm = false
           this.$router.push('/verify')
         })
         .catch(err => {
+          this.isSubmittingAccountForm = false
           this.errors.push(err.message)
           if (err.message && err.message.match(/^Password/))
             AnalyticsService.captureEvent(
@@ -1058,6 +1084,7 @@ export default {
     border: 1px solid $border-grey;
     border-radius: 4px;
     box-shadow: none;
+    height: 56px;
     padding: 15px 13px;
     width: 100%;
   }
