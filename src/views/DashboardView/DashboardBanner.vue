@@ -1,12 +1,14 @@
 <template>
   <div class="DashboardBanner">
     <h1 v-if="mobileMode" class="DashboardBanner-greeting">
-      Hello, {{ name }}!
+      <span v-if="alternateHeaderText">{{ alternateHeaderText }}</span>
+      <span v-else>Hello, {{ name }}!</span>
     </h1>
 
     <div class="DashboardBanner-banner">
       <h1 v-if="!mobileMode" class="DashboardBanner-greeting">
-        Hello, {{ name }}!
+        <span v-if="alternateHeaderText">{{ alternateHeaderText }}</span>
+        <span v-else>Hello, {{ name }}!</span>
       </h1>
 
       <slot></slot>
@@ -18,6 +20,9 @@
 import { mapGetters } from 'vuex'
 
 export default {
+  props: {
+    alternateHeaderText: String,
+  },
   computed: {
     ...mapGetters({
       mobileMode: 'app/mobileMode',

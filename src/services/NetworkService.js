@@ -5,6 +5,7 @@ import config from '../config'
 
 const AUTH_ROOT = `${config.serverRoot}/auth`
 const API_ROOT = `${config.serverRoot}/api`
+const PUBLIC_API_ROOT = `${config.serverRoot}/api-public`
 const ELIGIBILITY_API_ROOT = `${config.serverRoot}/api-public/eligibility`
 const CONTACT_API_ROOT = `${config.serverRoot}/api-public/contact`
 const REFERENCE_API_ROOT = `${config.serverRoot}/api-public/reference`
@@ -538,6 +539,11 @@ export default {
   getWaitTimes(context) {
     return context.$http
       .get(`${API_ROOT}/stats/volunteer/heatmap`)
+      .then(this._successHandler, this._errorHandler)
+  },
+  getPublicSubjects() {
+    return Vue.http
+      .get(`${PUBLIC_API_ROOT}/subjects`)
       .then(this._successHandler, this._errorHandler)
   },
   searchSchool(context, { query }) {
