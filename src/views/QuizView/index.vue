@@ -39,7 +39,7 @@
               </p>
               <p>
                 There's no time limit, but we recommend setting aside at least
-                {{ isTinyCertsActive ? 'a few minutes.' : '15 minutes.' }}
+                15 minutes.
               </p>
               <p>Once you feel ready, press "Start Quiz" below!</p>
             </div>
@@ -111,7 +111,6 @@ export default {
     }),
     ...mapGetters({
       allSubtopics: 'subjects/allSubtopics',
-      isTinyCertsActive: 'featureFlags/isTinyCertsActive',
     }),
     tries() {
       const { user } = this.$store.state.user
