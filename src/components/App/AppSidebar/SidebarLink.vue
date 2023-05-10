@@ -1,16 +1,21 @@
 <template>
-  <router-link
-    :class="parentClass"
-    active-class="SidebarLink--active"
-    :to="to"
-    tag="div"
-    @click.native="$store.dispatch('app/sidebar/collapse')"
-    @keydown.enter.native="navigate()"
-    :tabindex="isCollapsed && mobileMode ? -1 : 0"
-  >
-    <slot></slot>
-    <p>{{ text }}</p>
-  </router-link>
+  <div>
+    <a v-if="openNewTab" :href="to" target="_blank"><slot></slot>{{ text }}</a>
+    <template v-else>
+      <router-link
+        :class="parentClass"
+        active-class="SidebarLink--active"
+        :to="to"
+        tag="div"
+        @click.native="$store.dispatch('app/sidebar/collapse')"
+        @keydown.enter.native="navigate()"
+        :tabindex="isCollapsed && mobileMode ? -1 : 0"
+      >
+        <slot></slot>
+        <p>{{ text }}</p>
+      </router-link>
+    </template>
+  </div>
 </template>
 
 <script>
@@ -26,6 +31,10 @@ export default {
     text: {
       type: String,
       required: true,
+    },
+    openNewTab: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {
@@ -76,9 +85,13 @@ export default {
   }
 }
 
-.icon {
-  padding-right: 16px;
-  width: 16px;
-  height: 16px;
+a {
+  @include font-category('subheading');
+  color: $c-soft-black;
+  display: block;
+
+  &:hover {
+    text-decoration: none;
+  }
 }
 </style>
