@@ -397,7 +397,7 @@ export default {
     openVolunteerApprovalAccountActions() {
       const accountActions = [
         {
-          title: 'Background information (3 mins)',
+          title: 'Background information',
           subtitle: this.backgroundInfoAction.subtitle,
           status: this.backgroundInfoAction.status,
           clickFn: this.goToBackgroundInfo,
@@ -405,7 +405,7 @@ export default {
           priority: this.addSortPriorityNum(this.backgroundInfoAction.status),
         },
         {
-          title: 'Proof of identity (2 mins)',
+          title: 'Proof of identity',
           subtitle: this.photoIdAction.subtitle,
           status: this.photoIdAction.status,
           clickFn: this.togglePhotoUploadModal,
@@ -444,7 +444,7 @@ export default {
     onboaringAccountActions() {
       const onboaringActions = [
         {
-          title: 'Complete UPchieve 101 (20 mins)',
+          title: 'Complete UPchieve 101',
           subtitle: this.trainingAction.subtitle,
           status: this.trainingAction.status,
           clickFn: this.clickUpchieve101Action,
@@ -452,7 +452,7 @@ export default {
           priority: this.addSortPriorityNum(this.trainingAction.status),
         },
         {
-          title: 'Select availability (5 mins)',
+          title: 'Select availability',
           subtitle: this.availabilityAction.subtitle,
           status: this.availabilityAction.status,
           clickFn: this.clickAvailabilityAction,
@@ -460,7 +460,7 @@ export default {
           priority: this.addSortPriorityNum(this.availabilityAction.status),
         },
         {
-          title: 'Unlock a subject (15 mins)',
+          title: 'Unlock a subject',
           subtitle: this.certificationAction.subtitle,
           status: this.certificationAction.status,
           clickFn: this.clickCertificationAction,
