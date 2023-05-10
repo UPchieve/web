@@ -59,8 +59,16 @@
       <sidebar-link to="/contact" text="Contact us">
         <envelope-icon class="icon" />
       </sidebar-link>
-      <sidebar-link to="/legal" text="Legal policy">
+      <sidebar-link to="/legal" text="Legal policy" v-if="!isVolunteer">
         <exclamation-icon class="icon" />
+      </sidebar-link>
+      <sidebar-link
+        v-if="isVolunteer"
+        to="https://join.slack.com/t/upchieveaccommunity/shared_invite/zt-1gihzt03n-Sj58fEdBiZjVwc4DPDdg0g"
+        text="Community"
+        :openNewTab="true"
+      >
+        <word-bubbles-icon class="icon" />
       </sidebar-link>
     </template>
   </div>
