@@ -2,11 +2,15 @@
 <html lang="en">
   <head>
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-133171872-1"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2RLYC0VEES"></script>
     <script>
       window.dataLayer = window.dataLayer || []
       function gtag(){dataLayer.push(arguments)}
       gtag('js', new Date())
+      gtag('config', 'G-2RLYC0VEES', {
+        // We send the page view manually in router.
+        send_page_view: false
+       })
     </script>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -24,16 +28,6 @@
     <meta name="viewport" content="width=device-width, user-scalable=no">
     <link rel="shortcut icon" type="image/png" href="<%= VUE_APP_ROOT %>/favicon.png">
     <title>UPchieve</title>
-
-    <!-- Google Tag Manager -->
-    <script>
-      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-      })(window,document,'script','dataLayer','GTM-NMVFPLP');
-    </script>
-    <!-- End Google Tag Manager -->
   </head>
   <body>
     <noscript>

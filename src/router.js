@@ -532,26 +532,22 @@ router.afterEach((to, from) => {
   if (to.name !== from.name) store.dispatch('app/showNavigation')
   store.dispatch('app/modal/hide')
 
-  // Google Analytics
+  // Google Analytics.
   if (window.gtag) {
-    // Send page view
-    // @todo: put GA ID in config
-    // @todo: only track on prod
-    window.gtag('config', 'UA-133171872-1', {
-      page_path: router.currentRoute.path,
-      custom_map: {
-        dimension1: 'is_volunteer',
-        dimension2: 'is_authenticated',
-      },
-    })
-
     const isAuthenticated = store.getters['user/isAuthenticated']
-    const isVolunteer = store.getters['user/isVolunteer']
-    const gtagDimensions = { is_authenticated: isAuthenticated ? '1' : '0' }
-    if (isAuthenticated) gtagDimensions.is_volunteer = isVolunteer ? '1' : '0'
+    const gtagDimensions = {
+      page_title: router.currentRoute.name,
+      page_location: window.location.href,
+      page_path: router.currentRoute.path,
+      is_authenticated: isAuthenticated ? '1' : '0',
+    }
+    if (isAuthenticated) {
+      const isVolunteer = store.getters['user/isVolunteer']
+      gtagDimensions.is_volunteer = isVolunteer ? '1' : '0'
+    }
 
-    // Send custom dimensions data
-    window.gtag('event', 'upc_page_transition', gtagDimensions)
+    // Send page view.
+    window.gtag('event', 'page_view', gtagDimensions)
   }
 })
 
