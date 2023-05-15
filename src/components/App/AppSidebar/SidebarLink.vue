@@ -1,6 +1,8 @@
 <template>
   <div>
-    <a v-if="openNewTab" :href="to" target="_blank"><slot></slot>{{ text }}</a>
+    <a v-if="openNewTab" :href="to" target="_blank" :class="parentClass"
+      ><slot></slot>{{ text }}</a
+    >
     <template v-else>
       <router-link
         :class="parentClass"
