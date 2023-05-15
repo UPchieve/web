@@ -49,12 +49,11 @@ describe('SidebarLink', () => {
 
   it('collapses sidebar when clicked', () => {
     const collapse = jest.fn()
-    // const wrapper = getWrapper(
-    //   { to: "/", icon: HouseIcon, text: "Home" },
-    //   collapse
-    // );
-    const wrapper = getWrapper({ to: '/', text: 'Home' }, collapse)
-    wrapper.trigger('click')
+    const wrapper = getWrapper(
+      { to: '/', text: 'Home', openNewTab: false },
+      collapse
+    )
+    wrapper.find('.SidebarLink').trigger('click')
     expect(collapse).toHaveBeenCalled()
   })
 })

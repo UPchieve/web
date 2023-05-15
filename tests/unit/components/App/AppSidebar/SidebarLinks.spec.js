@@ -9,11 +9,6 @@ localVue.use(Vuex)
 // General links
 const CONTACT_LINK = { to: '/contact', text: 'Contact us' }
 const DASHBOARD_LINK = { to: '/dashboard', text: 'Dashboard' }
-const LEGAL_LINK = {
-  to: '/legal',
-
-  text: 'Legal policy',
-}
 const PROFILE_LINK = { to: '/profile', text: 'Profile' }
 
 // Student links
@@ -25,14 +20,21 @@ const FAVORITE_COACHES_LINK = {
   to: '/favorite-coaches',
   text: 'Favorite Coaches',
 }
+const LEGAL_LINK = {
+  to: '/legal',
+  text: 'Legal policy',
+}
 
 // Volunteer links
 const CALENDAR_LINK = { to: '/calendar', text: 'Schedule' }
-
 const TRAINING_LINK = {
   to: '/training',
-
   text: 'Training',
+}
+const COMMUNITY_LINK = {
+  to:
+    'https://join.slack.com/t/upchieveaccommunity/shared_invite/zt-1gihzt03n-Sj58fEdBiZjVwc4DPDdg0g',
+  text: 'Community',
 }
 // Admin links
 const ADMIN_LINK = { to: '/admin', text: 'Admin' }
@@ -55,7 +57,7 @@ const links = {
       CALENDAR_LINK,
       PROFILE_LINK,
       CONTACT_LINK,
-      LEGAL_LINK,
+      COMMUNITY_LINK,
     ],
     admin: [
       DASHBOARD_LINK,
@@ -64,7 +66,7 @@ const links = {
       ADMIN_LINK,
       PROFILE_LINK,
       CONTACT_LINK,
-      LEGAL_LINK,
+      COMMUNITY_LINK,
     ],
   },
   onboarding: {
