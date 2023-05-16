@@ -60,7 +60,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.OPTIONAL_MIDDLE_SCHOOL]: false,
       [POSTHOG_FEATURE_FLAGS.AUTO_FLOW]: false,
       [POSTHOG_FEATURE_FLAGS.SIMULATED_SESSION]: false,
-      [POSTHOG_FEATURE_FLAGS.STREAMLINE_SIGN_UP_FLOW]: false,
     },
   },
   mutations: {
@@ -122,7 +121,5 @@ export default {
     isSimulatedSessionActive: (state, getters) =>
       state.flags[POSTHOG_FEATURE_FLAGS.SIMULATED_SESSION] &&
       !getters.isAutoFlowActive,
-    streamlineSignUpFlow: state =>
-      state.flags[POSTHOG_FEATURE_FLAGS.STREAMLINE_SIGN_UP_FLOW],
   },
 }

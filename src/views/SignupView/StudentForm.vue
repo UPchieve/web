@@ -386,12 +386,6 @@
   >
     <FormErrors :errors="errors" />
 
-    <h1
-      class="header"
-      v-if="(!isReferred && streamlineSignUpFlow) || isDashboardFirst"
-    >
-      Woohoo, you're eligible for UPchieve!
-    </h1>
     <h1 class="header">Finish creating your free account</h1>
     <p class="body">
       Already have an account?
@@ -507,10 +501,8 @@
           !!v$.credentials.$silentErrors.length ||
           !!v$.credentials.$errors.length ||
           !credentials.terms ||
-          (!streamlineSignUpFlow && !signupSourceId) ||
-          (!streamlineSignUpFlow &&
-            shouldShowOtherSignupInput() &&
-            !this.otherSignupSource)
+          !signupSourceId ||
+          (shouldShowOtherSignupInput() && !this.otherSignupSource)
       "
       type="submit"
     >
@@ -546,7 +538,6 @@ import { useVuelidate } from '@vuelidate/core'
 import {
   helpers,
   required,
-  requiredIf,
   email,
   minLength,
   maxLength,
@@ -595,10 +586,8 @@ export default {
         },
         terms: { required },
       },
-      signupSourceId: requiredIf(!this.streamlineSignUpFlow),
-      otherSignupSource: requiredIf(
-        !this.streamlineSignUpFlow && this.shouldShowOtherSignupInput()
-      ),
+      signupSourceId: required,
+      otherSignupSource: required,
     }
   },
   data() {
@@ -655,7 +644,6 @@ export default {
     }),
     ...mapGetters({
       isOptionalMiddleSchoolActive: 'featureFlags/isOptionalMiddleSchoolActive',
-      streamlineSignUpFlow: 'featureFlags/streamlineSignUpFlow',
     }),
     trimCurrentGrade() {
       // extracting the first word out of the gradeLevels
@@ -852,30 +840,20 @@ export default {
             })
             // autofill the user's email
             this.credentials.email = this.eligibility.email
-            if (this.streamlineSignUpFlow || this.isDashboardFirst) {
-              AnalyticsService.captureEvent(
-                EVENTS.FLAGGED_AS_STREAMLINE_SIGN_UP_FLOW,
-                {
-                  event: EVENTS.FLAGGED_AS_STREAMLINE_SIGN_UP_FLOW,
-                }
-              )
-              this.accountPage()
-            } else {
-              this.$emit('hideLoginLink')
-              this.step = 'eligible'
-              if (!this.isDashboardFirst) {
-                this.$router.push('/sign-up/student/eligible')
-              }
+            this.$emit('hideLoginLink')
+            this.step = 'eligible'
+            if (!this.isDashboardFirst) {
+              this.$router.push('/sign-up/student/eligible')
             }
           } else {
+            AnalyticsService.captureEvent(EVENTS.ELIGIBILITY_INELIGIBLE, {
+              event: EVENTS.ELIGIBILITY_INELIGIBLE,
+            })
             this.step = 'ineligible'
             if (response.body.isCollegeStudent) this.isCollegeStudent = true
             if (!this.isDashboardFirst) {
               this.$router.push('/sign-up/student/ineligible')
             }
-            AnalyticsService.captureEvent(EVENTS.ELIGIBILITY_INELIGIBLE, {
-              event: EVENTS.ELIGIBILITY_INELIGIBLE,
-            })
           }
           const isDomesticIpAddress = await this.isDomesticIpAddress()
           if (!isDomesticIpAddress) return this.internationalPage()
@@ -964,18 +942,14 @@ export default {
         this.errors.push('A password is required.')
         this.invalidInputs.push('inputPassword')
       }
-      if (!this.streamlineSignUpFlow) {
-        if (!this.signupSourceId) {
-          this.errors.push(
-            'Please select an option for how you heard about us.'
-          )
-        }
-        if (this.shouldShowOtherSignupInput() && !this.otherSignupSource) {
-          this.errors.push(
-            'Please enter signup source in the text box if "Other" is selected'
-          )
-          this.invalidInputs.push('otherSignupSource')
-        }
+      if (!this.signupSourceId) {
+        this.errors.push('Please select an option for how you heard about us.')
+      }
+      if (this.shouldShowOtherSignupInput() && !this.otherSignupSource) {
+        this.errors.push(
+          'Please enter signup source in the text box if "Other" is selected'
+        )
+        this.invalidInputs.push('otherSignupSource')
       }
 
       return !!this.errors.length
