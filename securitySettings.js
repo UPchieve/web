@@ -14,11 +14,7 @@ const newrelicUrls = [
   'https://js-agent.newrelic.com',
   'https://bam.nr-data.net',
 ]
-const gleapScriptUrl = 'https://widget.gleap.io'
-const gleapAvatarIconUrls = [
-  'https://www.gravatar.com',
-  'https://i1.wp.com/api.gleap.io',
-]
+const gleapUrl = 'https://*.gleap.io'
 
 // connect sources
 const posthogUrls = [
@@ -28,19 +24,10 @@ const posthogUrls = [
 ]
 const sentryUrl = 'https://*.ingest.sentry.io'
 const mathJaxFetchUrl = 'https://api.cdnjs.com'
-const gleapConnectUrls = [
-  'https://uptime.gleap.io',
-  'https://api.gleap.io',
-  gleapScriptUrl,
-]
 
 // frame sources
 const googleDocFrameSrcUrl = 'https://docs.google.com/'
 const vimeoFrameSrcUrl = 'https://player.vimeo.com/'
-const gleapMessengerFrameSrcUrl = 'https://messenger.gleap.io/'
-
-// media sources
-const gleapMediaSrcUrl = 'https://js.gleap.io/'
 
 // img srcs
 const s3PhotoConnectUrls = [
@@ -69,7 +56,7 @@ const scriptSrc = [
   mathJaxScriptUrl,
   ...posthogUrls,
   ...newrelicUrls,
-  gleapScriptUrl,
+  gleapUrl,
   "'unsafe-eval'",
   "'unsafe-inline'",
   'blob:',
@@ -79,7 +66,7 @@ const imgSrc = [
   "'self'",
   ...googleUrls,
   ...s3PhotoImageUrls,
-  ...gleapAvatarIconUrls,
+  gleapUrl,
   cdnUrl,
   'data:',
   'blob:',
@@ -94,7 +81,7 @@ const connectSrc = [
   ...s3PhotoConnectUrls,
   ...newrelicUrls,
   ...googleUrls,
-  ...gleapConnectUrls,
+  gleapUrl,
   `wss://${config.host}`,
   `https://${config.host}`,
 ]
@@ -103,11 +90,11 @@ const frameSrc = [
   "'self'",
   googleDocFrameSrcUrl,
   vimeoFrameSrcUrl,
-  gleapMessengerFrameSrcUrl,
+  gleapUrl,
   cdnUrl,
 ]
 
-const mediaSrc = ["'self'", gleapMediaSrcUrl]
+const mediaSrc = ["'self'", gleapUrl]
 
 if (config.nodeEnv !== 'production') {
   connectSrc.push('http://localhost:3000')
