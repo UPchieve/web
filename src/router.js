@@ -70,13 +70,7 @@ const routes = [
       getUser()
         .then(() => {
           if (store.getters['user/isAuthenticated']) {
-            if (
-              store.getters['featureFlags/isAutoFlowActive'] &&
-              store.getters['user/isVolunteer'] &&
-              (!store.getters['user/hasCertification'] ||
-                !store.getters['user/passedUpchieve101'])
-            )
-              next('/welcome')
+            if (store.getters['user/isAutoFlowUser']) next('/welcome')
             else next('/dashboard')
           } else {
             next('/login')
@@ -207,13 +201,7 @@ const routes = [
     component: DashboardView,
     meta: { protected: true },
     beforeEnter: async (to, from, next) => {
-      if (
-        store.getters['featureFlags/isAutoFlowActive'] &&
-        store.getters['user/isVolunteer'] &&
-        (!store.getters['user/hasCertification'] ||
-          !store.getters['user/passedUpchieve101'])
-      )
-        next('/welcome')
+      if (store.getters['user/isAutoFlowUser']) next('/welcome')
       else next()
     },
   },
@@ -292,13 +280,7 @@ const routes = [
     component: ProfileView,
     meta: { protected: true },
     beforeEnter: (to, from, next) => {
-      if (
-        store.getters['featureFlags/isAutoFlowActive'] &&
-        store.getters['user/isVolunteer'] &&
-        (!store.getters['user/hasCertification'] ||
-          !store.getters['user/passedUpchieve101'])
-      )
-        next('/welcome')
+      if (store.getters['user/isAutoFlowUser']) next('/welcome')
       else next()
     },
   },
@@ -314,13 +296,7 @@ const routes = [
     component: CalendarView,
     meta: { protected: true },
     beforeEnter: (to, from, next) => {
-      if (
-        store.getters['featureFlags/isAutoFlowActive'] &&
-        store.getters['user/isVolunteer'] &&
-        (!store.getters['user/hasCertification'] ||
-          !store.getters['user/passedUpchieve101'])
-      )
-        next('/welcome')
+      if (store.getters['user/isAutoFlowUser']) next('/welcome')
       else next()
     },
   },

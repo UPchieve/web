@@ -2,10 +2,7 @@
   <div
     class="SidebarLinks"
     :class="{
-      'forced-training':
-        this.isAutoFlowActive &&
-        (!this.hasCertification || !this.passedUpchieve101) &&
-        this.isVolunteer,
+      'SidebarLinks--auto-flow': this.isAutoFlowUser,
     }"
   >
     <template v-if="$route.path.indexOf('/onboarding') !== -1"></template>
@@ -109,9 +106,7 @@ export default {
   computed: {
     ...mapGetters({
       isReferFriendsActive: 'featureFlags/isReferFriendsActive',
-      isAutoFlowActive: 'featureFlags/isAutoFlowActive',
-      hasCertification: 'user/hasCertification',
-      passedUpchieve101: 'user/passedUpchieve101',
+      isAutoFlowUser: 'user/isAutoFlowUser',
     }),
   },
 }
@@ -128,14 +123,14 @@ export default {
     margin-top: 40px;
     text-align: left;
   }
+
+  &--auto-flow {
+    visibility: hidden;
+  }
 }
 
 .icon {
   margin-right: 0.8em;
   width: 24px;
-}
-
-.forced-training {
-  visibility: hidden;
 }
 </style>

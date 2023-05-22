@@ -17,7 +17,7 @@
       <button
         class="btn"
         type="button"
-        @click="reload"
+        @click="reloadQuiz"
         v-if="!quizResults.passed"
       >
         Retake quiz
@@ -27,13 +27,14 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import Case from 'case'
 
 export default {
   props: {
     quizResults: { type: Object, required: true },
     quizLength: { type: Number, required: true },
+    reloadQuiz: { type: Function, required: true },
   },
   data() {
     return {
@@ -66,15 +67,6 @@ export default {
         text: 'Take another quiz',
         route: '/training',
       }
-      if (
-        this.isAutoFlowActive &&
-        !this.user.isOnboarded &&
-        !this.hasCertification
-      )
-        this.rightBtn = {
-          text: 'Done',
-          route: '/welcome',
-        }
     } else {
       this.headerMsg = "You failed this time, but don't give up!"
       this.instructionMsg = isTrainingSubject
@@ -87,7 +79,7 @@ export default {
       this.scoreStyle = { color: '#F44747' }
       this.leftBtn = { text: 'Review answers', route: '' }
       this.rightBtn = {
-        text: 'Keep studying',
+        text: 'Review concepts',
         route: isTrainingSubject
           ? `/training/course/${Case.kebab(this.category)}`
           : `/training/review/${Case.kebab(this.category)}`,
@@ -97,9 +89,6 @@ export default {
     this.scoreMsg = `Score: ${this.quizResults.score} out of ${this.quizLength} correct.`
   },
   methods: {
-    reload() {
-      this.$router.go(this.$router.currentRoute)
-    },
     showReview() {
       this.$emit('showReview')
     },
@@ -109,11 +98,6 @@ export default {
       subjects: state => state.subjects.subjects,
       training: state => state.subjects.training,
       user: state => state.user.user,
-    }),
-    ...mapGetters({
-      isAutoFlowActive: 'featureFlags/isAutoFlowActive',
-      hasCertification: 'user/hasCertification',
-      passedUpchieve101: 'user/passedUpchieve101',
     }),
   },
 }
@@ -134,6 +118,12 @@ h2 {
   line-height: 26px;
   color: #16d2aa;
   font-weight: 600;
+  margin-bottom: 1.4em;
+
+  @include breakpoint-above('large') {
+    width: 27%;
+    margin-bottom: 0;
+  }
 }
 
 .btn:hover {
@@ -146,17 +136,12 @@ h2 {
 }
 
 .btn-container {
-  display: flex;
-  justify-content: space-between;
-  width: 80%;
+  @include flex-container(column, space-around, center);
+  width: 100%;
   margin: 4em auto;
 
-  & .btn:first-of-type {
-    margin-left: 15px;
-  }
-
-  & .btn:last-of-type {
-    margin-right: 15px;
+  @include breakpoint-above('large') {
+    @include flex-container(row, space-around, center);
   }
 }
 
@@ -181,34 +166,9 @@ h2 {
 }
 
 @media screen and (max-width: 890px) {
-  .btn-container {
-    width: 100%;
-  }
-
   .score-container {
     width: 100%;
     left: 0;
-  }
-
-  .review-btn {
-    margin: 0% auto;
-  }
-
-  .btn {
-    width: 120px;
-  }
-}
-
-@media screen and (max-width: 400px) {
-  .btn-container {
-    flex-direction: column;
-    align-items: center;
-    margin: 2em 0;
-  }
-
-  .btn {
-    width: 80%;
-    margin-bottom: 1.6em;
   }
 }
 </style>

@@ -2,13 +2,28 @@
   <div v-if="user.isVolunteer" :style="coverStyle" class="training-quiz">
     <div id="quiz-name" :class="showQuizReview ? 'done-header' : 'header'">
       <h1 class="title">{{ quizName }} Certification Quiz</h1>
-      <router-link
+      <div
         v-if="showQuizReview"
-        to="/dashboard"
-        tag="div"
-        class="done btn"
-        >DONE</router-link
+        class="review-buttons"
+        :class="{
+          'review-buttons--align-end': quizResults.passed,
+        }"
       >
+        <large-button
+          v-if="!quizResults.passed"
+          primary
+          :showArrow="false"
+          @click.native="reloadQuiz"
+          class="review-buttons--button"
+          ><span>Retake quiz</span>
+        </large-button>
+        <large-button
+          class="review-buttons--button review-buttons--button-end"
+          :showArrow="false"
+          routeTo="/dashboard"
+          ><span>Done</span>
+        </large-button>
+      </div>
     </div>
     <div class="quiz-inner">
       <div v-if="quizLoading" class="loading-body">
@@ -43,9 +58,13 @@
               </p>
               <p>Once you feel ready, press "Start Quiz" below!</p>
             </div>
-            <button class="btn" type="button" @click.prevent="startQuiz()">
-              Start Quiz
-            </button>
+            <large-button
+              primary
+              :showArrow="false"
+              @click.native="startQuiz()"
+              class="start-quiz-btn"
+              ><span>Start Quiz</span>
+            </large-button>
           </div>
         </div>
 
@@ -59,6 +78,7 @@
           v-if="showQuizResults"
           :quizResults="quizResults"
           :quizLength="quizLength"
+          :reloadQuiz="reloadQuiz"
           @showReview="showReview"
         />
       </div>
@@ -67,8 +87,8 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
 import Case from 'case'
+import { mapGetters, mapState } from 'vuex'
 
 import LoadingMessage from '@/components/LoadingMessage'
 import TrainingService from '@/services/TrainingService'
@@ -79,8 +99,11 @@ import QuizReview from './QuizReview'
 
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
+import LargeButton from '@/components/LargeButton'
 
+// TODO: Refactor this file - CSS, make use of async, and better error handling
 export default {
+  name: 'QuizView',
   data() {
     let category = Case.camel(this.$route.params.category)
 
@@ -103,6 +126,7 @@ export default {
     QuizQuestions,
     QuizResults,
     QuizReview,
+    LargeButton,
   },
   computed: {
     ...mapState({
@@ -135,11 +159,7 @@ export default {
     },
   },
   beforeMount() {
-    TrainingService.loadQuiz(this, this.category).then(quizLength => {
-      this.quizLoading = false
-      this.quizLength = quizLength
-      this.showQuizStart = !!quizLength
-    })
+    this.loadQuiz()
   },
   methods: {
     startQuiz() {
@@ -162,11 +182,31 @@ export default {
           action: quizEvent,
           subject: this.category,
         })
+        if (data.passed) {
+          const updatedCerts = Object.assign(this.user.certifications, {
+            [this.category]: { passed: true, tries: data.tries },
+          })
+          this.$store.dispatch('user/addToUser', {
+            certifications: updatedCerts,
+          })
+        }
       })
     },
     showReview() {
       this.showQuizResults = false
       this.showQuizReview = true
+    },
+    reloadQuiz() {
+      this.loadQuiz()
+    },
+    loadQuiz() {
+      TrainingService.loadQuiz(this, this.category).then(quizLength => {
+        this.quizLoading = false
+        this.showQuizResults = false
+        this.showQuizReview = false
+        this.quizLength = quizLength
+        this.showQuizStart = !!quizLength
+      })
     },
   },
 }
@@ -192,11 +232,15 @@ export default {
   }
 }
 
-.header,
-.done-header {
+.header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.done-header {
+  @include breakpoint-above('large') {
+    @include flex-container(row, space-between, center);
+  }
 }
 
 .title {
@@ -299,5 +343,35 @@ export default {
   .instructions {
     padding: 0 1em;
   }
+}
+
+.review-buttons {
+  @include flex-container(row, space-between);
+  width: 100%;
+  margin-top: 1em;
+
+  @include breakpoint-above('large') {
+    width: 40%;
+    margin-top: 0;
+  }
+
+  &--align-end {
+    justify-content: initial;
+    @include breakpoint-above('large') {
+      justify-content: flex-end;
+    }
+  }
+
+  &--button {
+    width: 45%;
+
+    @include breakpoint-above('large') {
+      margin-top: 0;
+    }
+  }
+}
+
+.start-quiz-btn {
+  margin: 0 auto;
 }
 </style>
