@@ -166,6 +166,8 @@ export default {
             subtopicDisplayNames: this.subtopicDisplayNames,
             svg: this.svg,
             preSelectedSubtopic: this.selectedSubtopic,
+            subtitle:
+              'Choose a subject so we can connect you with the right tutor.',
           },
         })
       }

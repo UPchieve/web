@@ -59,7 +59,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.IMAGES_IN_DOCUMENTS]: false,
       [POSTHOG_FEATURE_FLAGS.OPTIONAL_MIDDLE_SCHOOL]: false,
       [POSTHOG_FEATURE_FLAGS.AUTO_FLOW]: false,
-      [POSTHOG_FEATURE_FLAGS.SIMULATED_SESSION]: false,
     },
   },
   mutations: {
@@ -118,8 +117,5 @@ export default {
     isOptionalMiddleSchoolActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.OPTIONAL_MIDDLE_SCHOOL],
     isAutoFlowActive: state => state.flags[POSTHOG_FEATURE_FLAGS.AUTO_FLOW],
-    isSimulatedSessionActive: (state, getters) =>
-      state.flags[POSTHOG_FEATURE_FLAGS.SIMULATED_SESSION] &&
-      !getters.isAutoFlowActive,
   },
 }

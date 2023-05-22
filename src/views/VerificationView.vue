@@ -82,7 +82,7 @@
         <div>
           <large-button
             primary
-            :routeTo="isAutoFlowActive && user.isVolunteer ? '/welcome' : '/'"
+            :routeTo="isAutoFlowUser ? '/welcome' : '/'"
             class="uc-form-button-big"
           >
             Take me to the dashboard
@@ -137,7 +137,7 @@ export default {
       user: state => state.user.user,
     }),
     ...mapGetters({
-      isAutoFlowActive: 'featureFlags/isAutoFlowActive',
+      isAutoFlowUser: 'user/isAutoFlowUser',
     }),
     isValidVerificationCode() {
       return !(

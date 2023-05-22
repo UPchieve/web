@@ -21,7 +21,7 @@
 
       <h1 class="SubjectSelectionModal-title">{{ title }}</h1>
       <h2 v-if="!mobileMode" class="SubjectSelectionModal-subtitle">
-        Choose a subject so we can connect you with the right tutor.
+        {{ modalData.subtitle }}
       </h2>
 
       <div class="SubjectSelectionModal-subtopics">
@@ -56,7 +56,16 @@ import { startSession } from '@/utils/session'
 import LargeButton from '@/components/LargeButton'
 import PresessionSurvey from './PresessionSurvey'
 import getCookie from '@/utils/get-cookie'
+import Case from 'case'
 
+/**
+ *
+ * TODO:  Refactor this modal to better handle different use cases.
+ *        It currently serves subject selection on the student dashboard,
+ *        which prompts the pre-session survey.
+ *        It also serves as a modal for volunteers to start a quiz
+ *
+ */
 export default {
   components: { LargeButton, PresessionSurvey },
   props: {
@@ -98,7 +107,11 @@ export default {
       this.setSelectedSubtopic(subject)
       const hasSentPushTokenRegister = getCookie('hasSentPushTokenRegister')
 
-      if (this.isMobileApp && !hasSentPushTokenRegister) {
+      if (
+        !this.modalData.trainingSelect &&
+        this.isMobileApp &&
+        !hasSentPushTokenRegister
+      ) {
         this.$store.dispatch('app/modal/show', {
           component: 'NotificationsModal',
           data: {
@@ -114,6 +127,7 @@ export default {
     },
     onAccept() {
       if (this.selectedSubtopic === '') return
+      else if (this.modalData.trainingSelect) this.handleTrainingRedirect()
       else this.showSurvey = true
     },
     onSurveyCompleted() {
@@ -121,6 +135,10 @@ export default {
     },
     startsWithVowel(word) {
       return /[AEIOUaeiou]/i.test(word[0])
+    },
+    handleTrainingRedirect() {
+      const path = `/training/${Case.kebab(this.selectedSubtopic)}/quiz`
+      this.$router.push(path)
     },
   },
 }

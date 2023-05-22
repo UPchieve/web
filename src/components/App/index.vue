@@ -52,8 +52,6 @@ import Gleap from 'gleap'
 import LoggerService from '@/services/LoggerService'
 import posthog from 'posthog-js'
 import { EVENTS } from '@/consts'
-import getCookie from '@/utils/get-cookie'
-import setCookie from '@/utils/set-cookie'
 
 export default {
   name: 'App',
@@ -224,24 +222,8 @@ export default {
       userAuthenticated: 'user/isAuthenticated',
       isVolunteer: 'user/isVolunteer',
       mobileMode: 'app/mobileMode',
-      isAutoFlowActive: 'featureFlags/isAutoFlowActive',
-      isSimulatedSessionActive: 'featureFlags/isSimulatedSessionActive',
-      hasCertification: 'user/hasCertification',
-      passedUpchieve101: 'user/passedUpchieve101',
+      isAutoFlowUser: 'user/isAutoFlowUser',
     }),
-    isAutoFlowUser() {
-      return (
-        this.isAutoFlowActive &&
-        this.isVolunteer &&
-        (!this.hasCertification || !this.passedUpchieve101)
-      )
-    },
-    autoflow101CookieName() {
-      return 'autoflow-101'
-    },
-    simulatedSessionCookieName() {
-      return 'simulatedSession'
-    },
   },
   // https://github.com/BrianRosamilia/vue-crono
   cron: {
@@ -253,31 +235,6 @@ export default {
     user(currentUserValue, previousUserValue) {
       const nowLoggedIn = currentUserValue._id && !previousUserValue._id
       if (nowLoggedIn) {
-        if (this.isAutoFlowUser) {
-          AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_AUTO_FLOW, {
-            event: EVENTS.FLAGGED_AS_AUTO_FLOW,
-          })
-          // Capture auto-flow users just in case % for rollouts are manipulated
-          setCookie(this.autoflow101CookieName, true, 3)
-        }
-        const hasSeenSurvey = getCookie(this.simulatedSessionCookieName)
-        const hasSeenAutoFlow = getCookie(this.autoflow101CookieName)
-        // Remove in isSimulatedSessionActive feature flag clean up
-        // Ensure the user only sees the simulated survey once
-        if (
-          this.isVolunteer &&
-          !this.user.onboarded &&
-          !this.passedUpchieve101 &&
-          this.isSimulatedSessionActive &&
-          !hasSeenSurvey &&
-          !hasSeenAutoFlow
-        ) {
-          Gleap.showSurvey('uh88p2', 'survey')
-          setCookie(this.simulatedSessionCookieName, true, 7)
-          AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_SIMULATED_SESSION, {
-            event: EVENTS.FLAGGED_AS_SIMULATED_SESSION,
-          })
-        }
         Sentry.setUser({ id: currentUserValue._id })
         const userProps = {
           userType: currentUserValue.type,
@@ -335,32 +292,13 @@ export default {
         }
       }
     },
-    isAutoFlowActive(currentValue, prevValue) {
-      if (
-        currentValue &&
-        !prevValue &&
-        this.isVolunteer &&
-        (!this.hasCertification || !this.passedUpchieve101)
-      ) {
-        AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_AUTO_FLOW, {
-          event: EVENTS.FLAGGED_AS_AUTO_FLOW,
+    isAutoFlowUser(currentValue, prevValue) {
+      if (currentValue && !prevValue) {
+        AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_AUTO_FLOW_STEP_ONE, {
+          event: EVENTS.FLAGGED_AS_AUTO_FLOW_STEP_ONE,
         })
-        setCookie(this.autoflow101CookieName, true, 3)
+
         this.$router.push('/welcome')
-      }
-    },
-    isSimulatedSessionActive(currentValue, prevValue) {
-      if (
-        currentValue &&
-        !prevValue &&
-        this.isVolunteer &&
-        !this.user.onboarded &&
-        !this.passedUpchieve101
-      ) {
-        AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_SIMULATED_SESSION, {
-          event: EVENTS.FLAGGED_AS_SIMULATED_SESSION,
-        })
-        setCookie(this.simulatedSessionCookieName, true, 7)
       }
     },
   },

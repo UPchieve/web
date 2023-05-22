@@ -320,5 +320,15 @@ export default {
     numberOfUnreadChatMessages: state => {
       return state.unreadChatMessageIndices.length
     },
+
+    isAutoFlowUser: (state, getters, rootState, rootGetters) => {
+      return (
+        !state.user.isOnboarded &&
+        getters.isVolunteer &&
+        !getters.hasCertification &&
+        // TODO: Remove in AutoFlow feature flag removal
+        rootGetters['featureFlags/isAutoFlowActive']
+      )
+    },
   },
 }

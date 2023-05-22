@@ -64,6 +64,7 @@ export default {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
       isSessionAlive: 'user/isSessionAlive',
+      topicCards: 'subjects/topicCards',
     }),
     waitingPeriodMessage() {
       const countdown = calculateWaitingPeriodCountdown(
@@ -74,43 +75,7 @@ export default {
       return `You must wait at least ${countdown} ${minuteTextFormat} before requesting a new session.`
     },
     cards() {
-      const cards = []
-      const topicCards = {}
-      for (const subject of Object.values(this.subjects)) {
-        const { topicName } = subject
-        if (!subject.active) continue
-        if (!topicCards[topicName])
-          topicCards[topicName] = {
-            topic: subject.topicName,
-            title: subject.topicDisplayName,
-            subjects: [],
-            subtopics: [],
-            subtopicDisplayNames: {},
-            svg: subject.topicIconLink,
-            order: subject.topicDashboardOrder,
-            isTutoringCard: true,
-          }
-        // Create a list of subjects that a topic has
-        topicCards[topicName].subjects.push({
-          name: subject.name,
-          id: subject.id,
-          displayName: subject.displayName,
-          displayOrder: subject.displayOrder,
-        })
-      }
-
-      // Sort the subjects for each topic and pull out their key
-      // along with their display name
-      for (const topicData of Object.values(topicCards)) {
-        topicData.subjects.sort((a, b) => a.displayOrder - b.displayOrder)
-        for (const subject of topicData.subjects) {
-          topicData.subtopics.push(subject.name)
-          topicData.subtopicDisplayNames[subject.name] = subject.displayName
-        }
-        cards.push(topicData)
-      }
-      cards.sort((a, b) => a.order - b.order)
-
+      const cards = [...this.topicCards]
       cards.push({
         title: 'Give Feedback',
         subtitle:
