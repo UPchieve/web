@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import Case from 'case'
 
 export default {
@@ -67,6 +67,11 @@ export default {
         text: 'Take another quiz',
         route: '/training',
       }
+      if (this.isAutoFlowStepTwoUser)
+        this.rightBtn = {
+          text: 'Done',
+          route: '/welcome',
+        }
     } else {
       this.headerMsg = "You failed this time, but don't give up!"
       this.instructionMsg = isTrainingSubject
@@ -98,6 +103,9 @@ export default {
       subjects: state => state.subjects.subjects,
       training: state => state.subjects.training,
       user: state => state.user.user,
+    }),
+    ...mapGetters({
+      isAutoFlowStepTwoUser: 'user/isAutoFlowStepTwoUser',
     }),
   },
 }

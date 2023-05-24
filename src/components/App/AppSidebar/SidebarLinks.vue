@@ -2,7 +2,8 @@
   <div
     class="SidebarLinks"
     :class="{
-      'SidebarLinks--auto-flow': this.isAutoFlowUser,
+      'SidebarLinks--auto-flow':
+        this.isAutoFlowUser || this.isAutoFlowStepTwoUser,
     }"
   >
     <template v-if="$route.path.indexOf('/onboarding') !== -1"></template>
@@ -107,6 +108,7 @@ export default {
     ...mapGetters({
       isReferFriendsActive: 'featureFlags/isReferFriendsActive',
       isAutoFlowUser: 'user/isAutoFlowUser',
+      isAutoFlowStepTwoUser: 'user/isAutoFlowStepTwoUser',
     }),
   },
 }
