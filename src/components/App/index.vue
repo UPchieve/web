@@ -223,6 +223,8 @@ export default {
       isVolunteer: 'user/isVolunteer',
       mobileMode: 'app/mobileMode',
       isAutoFlowUser: 'user/isAutoFlowUser',
+      isAutoFlowStepTwoUser: 'user/isAutoFlowStepTwoUser',
+      isAutoFlowProgressBarUser: 'user/isAutoFlowProgressBarUser',
     }),
   },
   // https://github.com/BrianRosamilia/vue-crono
@@ -299,6 +301,25 @@ export default {
         })
 
         this.$router.push('/welcome')
+      }
+    },
+    isAutoFlowStepTwoUser(currentValue, prevValue) {
+      if (currentValue && !prevValue) {
+        AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_AUTO_FLOW_STEP_TWO, {
+          event: EVENTS.FLAGGED_AS_AUTO_FLOW_STEP_TWO,
+        })
+
+        this.$router.push('/welcome')
+      }
+    },
+    isAutoFlowProgressBarUser(currentValue, prevValue) {
+      if (currentValue && !prevValue) {
+        AnalyticsService.captureEvent(
+          EVENTS.FLAGGED_AS_AUTO_FLOW_STEP_TWO_PROGRESS_BAR,
+          {
+            event: EVENTS.FLAGGED_AS_AUTO_FLOW_STEP_TWO_PROGRESS_BAR,
+          }
+        )
       }
     },
   },

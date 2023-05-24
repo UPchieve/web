@@ -330,5 +330,23 @@ export default {
         rootGetters['featureFlags/isAutoFlowActive']
       )
     },
+
+    isAutoFlowStepTwoUser: (state, getters, rootState, rootGetters) => {
+      return (
+        !state.user.isOnboarded &&
+        getters.isVolunteer &&
+        (!getters.hasCertification || !getters.passedUpchieve101) &&
+        // TODO: Remove in AutoFlowStepTwo feature flag removal
+        rootGetters['featureFlags/isAutoFlowStepTwoActive']
+      )
+    },
+
+    isAutoFlowProgressBarUser: (state, getters, rootState, rootGetters) => {
+      return (
+        getters.isAutoFlowStepTwoUser &&
+        // TODO: Remove in AutoFlowProgressBar feature flag removal
+        rootGetters['featureFlags/isAutoFlowProgressBarActive']
+      )
+    },
   },
 }

@@ -1,8 +1,12 @@
 <template>
-  <div class="welcome-page">
+  <div class="welcome-page" v-if="!hasCertification">
     <div class="welcome-page-card">
       <div class="welcome-page-card-content">
         <div class="welcome-page-title-container">
+          <p class="welcome-page-progress" v-if="isAutoFlowProgressBarUser">
+            <span class="welcome-page-progress--step">Step 1 of 2:</span>
+            Subject certification
+          </p>
           <h1 class="welcome-page-title">Hi, {{ user.firstname }} 👋</h1>
         </div>
         <div>
@@ -31,16 +35,57 @@
       </div>
     </div>
   </div>
+  <div class="welcome-page-step-two" v-else-if="!passedUpchieve101">
+    <div class="welcome-page-step-two-card">
+      <div class="welcome-page-step-two-card-content">
+        <div class="welcome-page-step-two-title-container">
+          <h1 class="welcome-page-step-two-title">
+            Hi, {{ user.firstname }} 👋
+          </h1>
+          <p class="welcome-page-step-two-subtitle">
+            We're so glad you're here!
+          </p>
+        </div>
+        <div class="certification-instructions-container-step-two">
+          <p class="">
+            {{
+              completed101Training
+                ? 'Put your knowledge to the test and pass our training quiz!'
+                : 'Next up: take our training to learn how to provide impactful coaching for every student on UPchieve!'
+            }}
+          </p>
+          <large-button
+            @click.native="handle101Redirect"
+            class="welcome-page-step-two-btn"
+            type="button"
+          >
+            {{
+              completed101Training
+                ? 'Start UPchieve 101 quiz'
+                : inProgress
+                ? 'Resume course'
+                : 'Start course'
+            }}
+          </large-button>
+        </div>
+      </div>
+    </div>
+    <cert-dog class="cert-dog-step-two" v-if="!mobileMode" />
+  </div>
 </template>
 
 <script>
 import { mapState, mapGetters } from 'vuex'
 import TopicChip from '@/components/TopicChip'
+import CertDog from '@/assets/certdog.svg'
+import LargeButton from '@/components/LargeButton'
 
 export default {
   name: 'welcome-page',
   components: {
     TopicChip,
+    CertDog,
+    LargeButton,
   },
   beforeMount() {
     this.$store.dispatch('app/sidebar/hide')
@@ -59,7 +104,19 @@ export default {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
       topicCards: 'subjects/topicCards',
+      isAutoFlowProgressBarUser: 'user/isAutoFlowProgressBarUser',
+      hasCertification: 'user/hasCertification',
+      passedUpchieve101: 'user/passedUpchieve101',
     }),
+    inProgress() {
+      return (
+        this.user.trainingCourses.upchieve101.progress > 0 &&
+        !this.completed101Training
+      )
+    },
+    completed101Training() {
+      return this.user.trainingCourses.upchieve101.progress === 100
+    },
   },
 
   methods: {
@@ -80,6 +137,11 @@ export default {
           subtitle: 'Choose a subject to take a short quiz in.',
         },
       })
+    },
+    handle101Redirect() {
+      this.completed101Training
+        ? this.$router.push('/training/upchieve101/quiz')
+        : this.$router.push('/training/course/upchieve101')
     },
   },
 }
@@ -165,6 +227,114 @@ export default {
 
   &-description {
     margin-bottom: 0;
+  }
+
+  &-progress {
+    color: $c-information-blue;
+    &--step {
+      font-weight: 600;
+    }
+  }
+}
+
+// Styles are taken from the prevous v1 version of the WelcomePage
+.welcome-page-step-two {
+  background-color: #ecf1fa;
+  @include flex-container(column, initial, center);
+  height: 100%;
+
+  &-card {
+    background-color: $upchieve-white;
+    @include flex-container(column, initial, center);
+    height: 100vh;
+
+    @include breakpoint-above('small') {
+      @include flex-container(column, center, center);
+      margin-top: 6em;
+      width: 80%;
+      border-radius: 2em;
+      height: initial;
+    }
+
+    @include breakpoint-above('medium') {
+      width: 50%;
+    }
+
+    @include breakpoint-above('huge') {
+      width: 40%;
+    }
+  }
+
+  &-card-content {
+    @include flex-container(column, center, center);
+    margin: 5em 0;
+    width: 80%;
+    border-radius: 2em;
+
+    @include breakpoint-above('small') {
+      width: 60%;
+    }
+  }
+
+  &-title-container,
+  .certification-instructions-container {
+    text-align: center;
+  }
+
+  &-title-container {
+    margin-bottom: 2em;
+  }
+
+  &-title {
+    @include font-category('display-small');
+  }
+
+  &-subtitle {
+    font-size: 16px;
+    color: $c-secondary-grey;
+    margin-bottom: 0em;
+  }
+
+  &-btn {
+    @include flex-container(row, center, center);
+    width: 100%;
+    background-color: $c-success-green;
+    border-color: transparent;
+    color: white;
+    margin-top: 1.6em;
+    border: 1px solid rgba(0, 0, 0, 0);
+    border-radius: 20px;
+    padding: 9px 23px;
+    @include font-category('body');
+    border: none;
+
+    &:hover {
+      background: darken($c-success-green, 5%);
+      color: $c-background-grey;
+    }
+  }
+
+  &-subject-select::placeholder {
+    color: $c-banned-grey;
+  }
+}
+
+.welcome-page-step-two-btn:disabled {
+  background-color: $c-disabled-grey;
+}
+
+.cert-dog-step-two {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  height: 200px;
+
+  @include breakpoint-above('medium') {
+    height: 350px;
+  }
+
+  @include breakpoint-above('huge') {
+    right: 20%;
   }
 }
 </style>
