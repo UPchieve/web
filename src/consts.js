@@ -14,6 +14,8 @@ export const CDN_URL = 'https://upchievecdn.blob.core.windows.net'
 export const DOCS_URL = `${CDN_URL}/docs`
 
 export const GRADES = [
+  '6th grade',
+  '7th grade',
   '8th grade',
   '9th grade',
   '10th grade',
@@ -452,7 +454,6 @@ export const UNLEASH_FEATURE_FLAGS = {
 export const POSTHOG_FEATURE_FLAGS = {
   FILTER_ACTIVE_SUBJECTS: 'filter-active-subjects',
   IMAGES_IN_DOCUMENTS: 'images-in-documents',
-  OPTIONAL_MIDDLE_SCHOOL: 'optional-middle-school',
   AUTO_FLOW: 'auto-flow',
   SIMULATED_SESSION: 'simulated-session',
 }
