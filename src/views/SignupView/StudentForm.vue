@@ -59,11 +59,7 @@
   >
     <FormErrors :errors="errors" />
 
-    <h1 v-if="isDashboardFirst" class="header">
-      Before we connect you with your tutor, we need to ask you a few quick
-      questions to make sure you're eligible for our services
-    </h1>
-    <h1 v-else class="header">Check if you are eligible for UPchieve</h1>
+    <h1 class="header">Check if you are eligible for UPchieve</h1>
     <p class="body">
       Already have an account?
       <router-link class="link" to="/login">Log In</router-link>
@@ -560,9 +556,6 @@ export default {
     ErrorBadge,
     FormErrors,
   },
-  props: {
-    isDashboardFirst: Boolean,
-  },
   setup() {
     return { v$: useVuelidate() }
   },
@@ -724,9 +717,7 @@ export default {
     eligibilityPage() {
       this.$emit('hideLoginLink')
       this.step = 'eligibilityNew'
-      if (!this.isDashboardFirst) {
-        this.$router.push('/sign-up/student/eligibility')
-      }
+      this.$router.push('/sign-up/student/eligibility')
     },
 
     async isDomesticIpAddress() {
@@ -842,18 +833,14 @@ export default {
             this.credentials.email = this.eligibility.email
             this.$emit('hideLoginLink')
             this.step = 'eligible'
-            if (!this.isDashboardFirst) {
-              this.$router.push('/sign-up/student/eligible')
-            }
+            this.$router.push('/sign-up/student/eligible')
           } else {
             AnalyticsService.captureEvent(EVENTS.ELIGIBILITY_INELIGIBLE, {
               event: EVENTS.ELIGIBILITY_INELIGIBLE,
             })
             this.step = 'ineligible'
             if (response.body.isCollegeStudent) this.isCollegeStudent = true
-            if (!this.isDashboardFirst) {
-              this.$router.push('/sign-up/student/ineligible')
-            }
+            this.$router.push('/sign-up/student/ineligible')
           }
           const isDomesticIpAddress = await this.isDomesticIpAddress()
           if (!isDomesticIpAddress) return this.internationalPage()
@@ -869,9 +856,7 @@ export default {
     async accountPage() {
       this.$emit('hideLoginLink')
       this.step = 'account'
-      if (!this.isDashboardFirst) {
-        this.$router.push('/sign-up/student/account')
-      }
+      this.$router.push('/sign-up/student/account')
       const isDomesticIpAddress = await this.isDomesticIpAddress()
       if (!isDomesticIpAddress) return this.internationalPage()
       await this.getSignupSources()

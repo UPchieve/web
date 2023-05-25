@@ -77,9 +77,7 @@ export default {
   computed: {
     ...mapGetters({ mobileMode: 'app/mobileMode' }),
     hasNoEscape() {
-      return ['SessionFulfilledModal', 'SubjectCatalogSignUpModal'].includes(
-        this.modalComponentName
-      )
+      return ['SessionFulfilledModal'].includes(this.modalComponentName)
     },
   },
   methods: {

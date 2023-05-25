@@ -38,7 +38,6 @@ import SessionView from './views/SessionView'
 import SetPasswordView from './views/SetPasswordView'
 import SignupView from './views/SignupView'
 import StudentPartnerSignupView from './views/StudentPartnerSignupView'
-import SubjectCatalogView from './views/SubjectCatalogView'
 import TrainingCourseView from './views/TrainingCourseView'
 import TrainingView from './views/TrainingView'
 import VerificationView from './views/VerificationView'
@@ -193,11 +192,6 @@ const routes = [
     name: 'SetPasswordView',
     component: SetPasswordView,
     props: route => ({ token: route.query.token }),
-  },
-  {
-    path: '/subject-catalog',
-    name: 'SubjectCatalogView',
-    component: SubjectCatalogView,
   },
   {
     path: '/dashboard',
