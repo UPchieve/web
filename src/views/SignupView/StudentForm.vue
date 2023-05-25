@@ -545,6 +545,7 @@ import ErrorBadge from '@/assets/error_badge.svg'
 import { EVENTS, GRADES } from '@/consts'
 import { backOff } from 'exponential-backoff'
 import FormErrors from '@/components/FormErrors.vue'
+import { mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -630,6 +631,9 @@ export default {
   computed: {
     ...mapState({
       isMobileApp: state => state.app.isMobileApp,
+    }),
+    ...mapGetters({
+      useNewZipsEligibility: 'featureFlags/useNewZipsEligibility',
     }),
     trimCurrentGrade() {
       // extracting the first word out of the gradeLevels
@@ -804,12 +808,16 @@ export default {
           schoolUpchieveId || '00000e00-00b0-00ca-0000-0b00c0b0000f'
       }
 
+      if (this.useNewZipsEligibility) {
+        AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_NEW_ZIPS_ELIGIBILITY)
+      }
       NetworkService.checkStudentEligibility(this, {
         schoolUpchieveId,
         zipCode: this.eligibility.zipCode,
         email: this.eligibility.email,
         referredByCode: window.localStorage.getItem('upcReferredByCode'),
         currentGrade: this.trimCurrentGrade,
+        useNewZipsEligibility: this.useNewZipsEligibility ?? false,
       })
         .then(async response => {
           const isEligible = response.body.isEligible
