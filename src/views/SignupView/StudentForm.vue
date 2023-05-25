@@ -75,7 +75,6 @@
           class="select-input"
           v-model="eligibility.currentGrade"
           placeholder="Select your grade*"
-          @input="onGradeChange"
           :options="gradeLevels"
           :searchable="false"
           :clearable="false"
@@ -223,7 +222,6 @@
         class="uc-form-body__select"
         v-model="eligibility.currentGrade"
         placeholder="Select your grade"
-        @input="onGradeChange"
         :options="gradeLevels"
         :searchable="false"
       ></v-select>
@@ -231,8 +229,7 @@
 
     <div class="uc-column">
       <label for="inputHighschool" class="uc-form-label"
-        >What school do you go to?
-        <span v-if="isMiddleSchoolOptional">(Optional)</span></label
+        >What school do you go to?</label
       >
       <div class="school-search">
         <autocomplete
@@ -533,7 +530,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import { useVuelidate } from '@vuelidate/core'
 import {
   helpers,
@@ -626,7 +623,6 @@ export default {
       otherSignupSource: '',
       isLoadingSignupSources: false,
       isReferred: false,
-      isMiddleSchoolOptional: false,
       isSubmittingAccountForm: false,
     }
   },
@@ -641,9 +637,6 @@ export default {
   computed: {
     ...mapState({
       isMobileApp: state => state.app.isMobileApp,
-    }),
-    ...mapGetters({
-      isOptionalMiddleSchoolActive: 'featureFlags/isOptionalMiddleSchoolActive',
     }),
     trimCurrentGrade() {
       // extracting the first word out of the gradeLevels
@@ -703,11 +696,6 @@ export default {
     },
   },
   methods: {
-    onGradeChange(value) {
-      this.isMiddleSchoolOptional = Boolean(
-        value === '8th grade' && this.isOptionalMiddleSchoolActive
-      )
-    },
     // Necessary to explicitly call on close of the currentGrade select menu
     // because v-select component is preventing blur event.
     onGradeClose() {
