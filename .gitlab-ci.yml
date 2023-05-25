@@ -163,6 +163,9 @@ build_staging:
     - docker push "$image_tagged"-staging
   rules:
     - if: '$CI_COMMIT_BRANCH != "main"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: manual
 
 build_hackers:
   stage: build
