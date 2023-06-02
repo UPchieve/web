@@ -51,7 +51,7 @@
             {{
               completed101Training
                 ? 'Put your knowledge to the test and pass our training quiz!'
-                : 'Next up: take our training to learn how to provide impactful coaching for every student on UPchieve!'
+                : 'Next up: Take our training to learn how to provide impactful coaching for every student on UPchieve!'
             }}
           </p>
           <large-button
