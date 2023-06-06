@@ -61,18 +61,20 @@ export default {
       [POSTHOG_FEATURE_FLAGS.AUTO_FLOW_STEP_TWO]: false,
       [POSTHOG_FEATURE_FLAGS.AUTO_FLOW_PROGRESS_BAR]: false,
       [POSTHOG_FEATURE_FLAGS.NEW_ZIPS_ELIGIBILITY]: false,
+      [POSTHOG_FEATURE_FLAGS.FLAG_PERSON_PROPERTIES]: false,
+      [POSTHOG_FEATURE_FLAGS.POLL_FLAGS]: false,
     },
   },
   mutations: {
-    setFeatureFlags: state => {
-      Object.keys(UNLEASH_FEATURE_FLAGS).forEach(key => {
-        state.flags[UNLEASH_FEATURE_FLAGS[key]] = unleash.isEnabled(
-          UNLEASH_FEATURE_FLAGS[key]
-        )
+    setFeatureFlags: (state, isPostHog) => {
+      // Use of an arrow function to implicitly bind the 3rd party module to the var
+      const isFlagEnabled = isPostHog
+        ? flag => posthog.isFeatureEnabled(flag)
+        : flag => unleash.isEnabled(flag)
+      const flags = isPostHog ? POSTHOG_FEATURE_FLAGS : UNLEASH_FEATURE_FLAGS
+      Object.keys(flags).forEach(key => {
+        state.flags[flags[key]] = isFlagEnabled(flags[key])
       })
-    },
-    setPostHogFlags: (state, flags) => {
-      state.flags = Object.assign(state.flags, flags)
     },
   },
   actions: {
@@ -80,19 +82,23 @@ export default {
       try {
         unleash = await createClient()
         unleash.on('update', () => {
-          commit('setFeatureFlags')
+          commit('setFeatureFlags', false)
         })
         await unleash.start()
       } catch (err) {
         LoggerService.noticeError(err)
       }
     },
-    async initPostHogFlags({ commit }) {
+    async initPostHogFlags({ commit, getters }) {
       return await new Promise((resolve, reject) => {
         try {
+          // Retrieve feature flags from PostHog every 5 minutes
+          const featureFlagInterval = 1000 * 60 * 5
+          setInterval(() => {
+            if (getters.isPollingFlagsActive) posthog.reloadFeatureFlags()
+          }, featureFlagInterval)
           posthog.onFeatureFlags(() => {
-            const flags = posthog.featureFlags.getFlagVariants()
-            commit('setPostHogFlags', flags)
+            commit('setFeatureFlags', true)
             resolve()
           })
         } catch (err) {
@@ -100,6 +106,10 @@ export default {
           reject(err)
         }
       })
+    },
+    async setPersonPropertiesForFlags({ getters }, props) {
+      if (getters.isFlagPersonPropertiesActive)
+        posthog.setPersonPropertiesForFlags(props)
     },
   },
   getters: {
@@ -125,5 +135,9 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.AUTO_FLOW_PROGRESS_BAR],
     useNewZipsEligibility: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.NEW_ZIPS_ELIGIBILITY],
+    isFlagPersonPropertiesActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.FLAG_PERSON_PROPERTIES],
+    isPollingFlagsActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.POLL_FLAGS],
   },
 }
