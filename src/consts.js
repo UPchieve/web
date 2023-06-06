@@ -461,6 +461,8 @@ export const POSTHOG_FEATURE_FLAGS = {
   AUTO_FLOW_STEP_TWO: 'auto-flow-step-two',
   AUTO_FLOW_PROGRESS_BAR: 'auto-flow-progress-bar',
   NEW_ZIPS_ELIGIBILITY: 'new-zips-eligibility',
+  FLAG_PERSON_PROPERTIES: 'flag-person-properties',
+  POLL_FLAGS: 'polling-flags',
 }
 
 export const ANALYTICS_REPORT_ROW = {

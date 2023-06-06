@@ -225,6 +225,7 @@ export default {
       isAutoFlowUser: 'user/isAutoFlowUser',
       isAutoFlowStepTwoUser: 'user/isAutoFlowStepTwoUser',
       isAutoFlowProgressBarUser: 'user/isAutoFlowProgressBarUser',
+      getUserPropsForAnalytics: 'user/getUserPropsForAnalytics',
     }),
   },
   // https://github.com/BrianRosamilia/vue-crono
@@ -238,18 +239,12 @@ export default {
       const nowLoggedIn = currentUserValue._id && !previousUserValue._id
       if (nowLoggedIn) {
         Sentry.setUser({ id: currentUserValue._id })
-        const userProps = {
-          userType: currentUserValue.type,
-          createdAt: currentUserValue.createdAt,
-          totalSessions: currentUserValue.pastSessions.length,
-        }
-        if (currentUserValue.isVolunteer) {
-          userProps.onboarded = currentUserValue.isOnboarded
-          userProps.approved = currentUserValue.isApproved
-          userProps.partner = currentUserValue.volunteerPartnerOrg
-        } else {
-          userProps.partner = currentUserValue.studentPartnerOrg
-        }
+        const userProps = this.getUserPropsForAnalytics
+        this.$store.dispatch(
+          'featureFlags/setPersonPropertiesForFlags',
+          userProps
+        )
+
         AnalyticsService.identify(currentUserValue._id, {
           name: currentUserValue.firstName,
           email: currentUserValue.email,

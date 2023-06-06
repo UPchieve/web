@@ -188,10 +188,16 @@ export default {
       commit('setIsFirstDashboardVisit', isFirstDashboardVisit)
     },
 
-    addToUser: ({ commit, state }, data) => {
+    addToUser: ({ commit, state, dispatch, getters }, data) => {
       const { user } = state
       const updatedUser = { ...user, ...data }
       commit('updateUser', updatedUser)
+      // Ensure that properties are up to date with for feature flag evaluation
+      dispatch(
+        'featureFlags/setPersonPropertiesForFlags',
+        getters.getUserPropsForAnalytics,
+        { root: true }
+      )
     },
 
     updatePresessionSurvey: ({ commit }, surveyData) => {
@@ -347,6 +353,23 @@ export default {
         // TODO: Remove in AutoFlowProgressBar feature flag removal
         rootGetters['featureFlags/isAutoFlowProgressBarActive']
       )
+    },
+
+    getUserPropsForAnalytics: (state, getters) => {
+      const userProps = {
+        userType: state.user.type,
+        createdAt: state.user.createdAt,
+        totalSessions: state.user.pastSessions.length,
+      }
+      if (getters.isVolunteer) {
+        userProps.onboarded = state.user.isOnboarded
+        userProps.approved = state.user.isApproved
+        userProps.partner = state.user.volunteerPartnerOrg
+      } else {
+        userProps.partner = state.user.studentPartnerOrg
+      }
+
+      return userProps
     },
   },
 }
