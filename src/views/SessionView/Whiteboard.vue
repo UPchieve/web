@@ -680,8 +680,10 @@ export default {
         // Intercept Zwibbler's websocket close handler to throw custom error
         zwibblerWsConnection.onclose = closeEvent => {
           const userType = this.isVolunteer ? 'volunteer' : 'student'
+          // Access Zwibbler's internal WebSocket stream name
+          // Note: the properties to access will change with every new Zwibbler update
           const err = new Error(
-            `WebSocket for the ${userType} in session ${this.sessionId} closed with code ${closeEvent.code} for reason: ${closeEvent.reason}`
+            `WebSocket for the ${userType} in session ${this.sessionId} closed with code ${closeEvent.code} for reason: "${closeEvent.reason}" in room: ${this.zwibblerCtx.Ec.cC}`
           )
           LoggerService.noticeError(err)
           zwibblerOnClose(closeEvent)
