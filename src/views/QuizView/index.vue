@@ -188,6 +188,7 @@ export default {
           })
           this.$store.dispatch('user/addToUser', {
             certifications: updatedCerts,
+            totalQuizzesPassed: this.user.totalQuizzesPassed + 1,
           })
         }
       })
