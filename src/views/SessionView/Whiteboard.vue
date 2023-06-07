@@ -308,8 +308,6 @@ export default {
       showColorPicker: false,
       error: '',
       showShapes: false,
-      // used to determine the beginning and end node of a shape
-      shapeNodes: [],
       isLoading: false,
       canvasHeight: 2800,
       canvasWidth: 1000,
@@ -718,11 +716,6 @@ export default {
         return false
       })
 
-      this.zwibblerCtx.on('nodes-added', nodes => {
-        if (this.isShapeSelected) this.shapeNodes.push(nodes[0])
-        if (this.selectedTool === 'text') this.usePickTool()
-      })
-
       window.addEventListener(
         'orientationchange',
         this.handleOrientationChange,
@@ -773,13 +766,6 @@ export default {
     this.zwibblerCtx.destroy()
   },
   watch: {
-    shapeNodes() {
-      // Use the pick tool after the end node for a shape was added
-      if (this.shapeNodes.length === 2 && this.isShapeSelected) {
-        this.usePickTool()
-        this.shapeNodes = []
-      }
-    },
     isSessionOver(isSessionOver, oldIsSessionOver) {
       if (isSessionOver && !oldIsSessionOver)
         this.zwibblerCtx.setConfig('readOnly', true)
