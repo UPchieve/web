@@ -561,6 +561,7 @@ export default {
       referredByCode,
       currentGrade,
       useNewZipsEligibility,
+      useNewSchoolsEligibility,
     }
   ) {
     return context.$http
@@ -571,6 +572,7 @@ export default {
         referredByCode,
         currentGrade,
         useNewZipsEligibility,
+        useNewSchoolsEligibility,
       })
       .then(this._successHandler, this._errorHandler)
   },

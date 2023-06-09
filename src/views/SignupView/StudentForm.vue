@@ -634,6 +634,7 @@ export default {
     }),
     ...mapGetters({
       useNewZipsEligibility: 'featureFlags/useNewZipsEligibility',
+      useNewSchoolsEligibility: 'featureFlags/useNewSchoolsEligibility',
     }),
     trimCurrentGrade() {
       // extracting the first word out of the gradeLevels
@@ -811,6 +812,9 @@ export default {
       if (this.useNewZipsEligibility) {
         AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_NEW_ZIPS_ELIGIBILITY)
       }
+      if (this.useNewSchoolsEligibility) {
+        AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_NEW_SCHOOLS_ELIGIBILITY)
+      }
       NetworkService.checkStudentEligibility(this, {
         schoolUpchieveId,
         zipCode: this.eligibility.zipCode,
@@ -818,6 +822,7 @@ export default {
         referredByCode: window.localStorage.getItem('upcReferredByCode'),
         currentGrade: this.trimCurrentGrade,
         useNewZipsEligibility: this.useNewZipsEligibility ?? false,
+        useNewSchoolsEligibility: this.useNewSchoolsEligibility ?? false,
       })
         .then(async response => {
           const isEligible = response.body.isEligible
