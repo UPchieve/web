@@ -4,10 +4,7 @@ const config = require('./serverConfig')
 // helmet docs: https://helmetjs.github.io/
 
 // script sources
-const googleUrls = [
-  'https://www.googletagmanager.com',
-  'https://www.google-analytics.com',
-]
+const googleScriptUrls = ['https://*.googletagmanager.com']
 const cdnUrl = 'https://cdn.upchieve.org'
 const mathJaxScriptUrl = 'https://cdnjs.cloudflare.com'
 const newrelicUrls = [
@@ -17,6 +14,11 @@ const newrelicUrls = [
 const gleapUrl = 'https://*.gleap.io'
 
 // connect sources
+const googleConnectUrls = [
+  'https://*.google-analytics.com',
+  'https://*.analytics.google.com',
+  'https://*.googletagmanager.com ',
+]
 const posthogUrls = [
   'https://p.upchieve.org',
   'https://app-static-prod.posthog.com',
@@ -24,15 +26,19 @@ const posthogUrls = [
 ]
 const sentryUrl = 'https://*.ingest.sentry.io'
 const mathJaxFetchUrl = 'https://api.cdnjs.com'
+const s3PhotoConnectUrls = [
+  `${config.awsS3.photoIdBucket}.s3.us-east-2.amazonaws.com`,
+  `${config.awsS3.sessionPhotoBucket}.s3.us-east-2.amazonaws.com`,
+]
 
 // frame sources
 const googleDocFrameSrcUrl = 'https://docs.google.com/'
 const vimeoFrameSrcUrl = 'https://player.vimeo.com/'
 
 // img srcs
-const s3PhotoConnectUrls = [
-  `${config.awsS3.photoIdBucket}.s3.us-east-2.amazonaws.com`,
-  `${config.awsS3.sessionPhotoBucket}.s3.us-east-2.amazonaws.com`,
+const googleImageUrls = [
+  'https://*.google-analytics.com',
+  'https://*.googletagmanager.com',
 ]
 
 const s3PhotoImageUrls = [
@@ -51,7 +57,7 @@ const trainingMaterialsS3 =
 const scriptSrc = [
   "'self'",
   `https://${config.host}`,
-  ...googleUrls,
+  ...googleScriptUrls,
   cdnUrl,
   mathJaxScriptUrl,
   ...posthogUrls,
@@ -64,7 +70,7 @@ const scriptSrc = [
 
 const imgSrc = [
   "'self'",
-  ...googleUrls,
+  ...googleImageUrls,
   ...s3PhotoImageUrls,
   gleapUrl,
   cdnUrl,
@@ -80,7 +86,7 @@ const connectSrc = [
   mathJaxFetchUrl,
   ...s3PhotoConnectUrls,
   ...newrelicUrls,
-  ...googleUrls,
+  ...googleConnectUrls,
   gleapUrl,
   `wss://${config.host}`,
   `https://${config.host}`,
