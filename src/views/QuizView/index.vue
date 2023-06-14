@@ -79,6 +79,7 @@
           :quizResults="quizResults"
           :quizLength="quizLength"
           :reloadQuiz="reloadQuiz"
+          :isFirstQuiz="isFirstQuiz"
           @showReview="showReview"
         />
       </div>
@@ -119,6 +120,7 @@ export default {
       showQuizStart: false,
       quizResults: {},
       loadingQuizResults: false,
+      isFirstQuiz: false,
     }
   },
   components: {
@@ -135,6 +137,7 @@ export default {
     }),
     ...mapGetters({
       allSubtopics: 'subjects/allSubtopics',
+      hasCertification: 'user/hasCertification',
     }),
     tries() {
       const { user } = this.$store.state.user
@@ -160,6 +163,7 @@ export default {
   },
   beforeMount() {
     this.loadQuiz()
+    this.isFirstQuiz = !this.hasCertification
   },
   methods: {
     startQuiz() {

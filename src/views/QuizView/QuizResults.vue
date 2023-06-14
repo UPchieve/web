@@ -35,6 +35,7 @@ export default {
     quizResults: { type: Object, required: true },
     quizLength: { type: Number, required: true },
     reloadQuiz: { type: Function, required: true },
+    isFirstQuiz: { type: Boolean, required: true },
   },
   data() {
     return {
@@ -55,9 +56,10 @@ export default {
 
     if (this.quizResults.passed) {
       this.headerMsg = 'What a rockstar! You passed!'
-      this.instructionMsg = isTrainingSubject
-        ? "Now that you have this certification, you're one step closer to being able to help students!"
-        : "Now that you have this certification, you'll be notified of student requests for help in this subject. If you want to help students with even more subjects, just pass more quizzes!"
+      this.instructionMsg =
+        isTrainingSubject || this.isFirstQuiz
+          ? "Now that you have this certification, you're one step closer to being able to help students!"
+          : "Now that you have this certification, you'll be notified of student requests for help in this subject. If you want to help students with even more subjects, just pass more quizzes!"
       this.popUpBorderStyle = {
         borderBottom: '5px solid #16D2AA',
         borderLeft: '5px solid #16D2AA',
