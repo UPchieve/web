@@ -327,31 +327,38 @@ export default {
       return state.unreadChatMessageIndices.length
     },
 
-    isAutoFlowUser: (state, getters, rootState, rootGetters) => {
+    isAutoFlowUser: (state, getters) => {
       return (
-        !state.user.isOnboarded &&
-        getters.isVolunteer &&
-        !getters.hasCertification &&
-        // TODO: Remove in AutoFlow feature flag removal
-        rootGetters['featureFlags/isAutoFlowActive']
-      )
-    },
-
-    isAutoFlowStepTwoUser: (state, getters, rootState, rootGetters) => {
-      return (
-        !state.user.isOnboarded &&
-        getters.isVolunteer &&
-        (!getters.hasCertification || !getters.passedUpchieve101) &&
-        // TODO: Remove in AutoFlowStepTwo feature flag removal
-        rootGetters['featureFlags/isAutoFlowStepTwoActive']
+        (!state.user.isOnboarded &&
+          getters.isVolunteer &&
+          !getters.hasCertification) ||
+        getters.isAutoFlowProgressBarUser ||
+        getters.isAutoFlowAvailabilityStepUser
       )
     },
 
     isAutoFlowProgressBarUser: (state, getters, rootState, rootGetters) => {
       return (
-        getters.isAutoFlowStepTwoUser &&
+        !state.user.isOnboarded &&
+        getters.isVolunteer &&
+        (!getters.hasCertification || !getters.passedUpchieve101) &&
         // TODO: Remove in AutoFlowProgressBar feature flag removal
         rootGetters['featureFlags/isAutoFlowProgressBarActive']
+      )
+    },
+
+    isAutoFlowAvailabilityStepUser: (
+      state,
+      getters,
+      rootState,
+      rootGetters
+    ) => {
+      return (
+        !state.user.isOnboarded &&
+        getters.isVolunteer &&
+        (!getters.hasCertification || !state.user.availabilityLastModifiedAt) &&
+        // TODO: Remove in AutoFlowTwoStepAvailability feature flag removal
+        rootGetters['featureFlags/isAutoFlowAvailabilityStepActive']
       )
     },
 

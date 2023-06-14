@@ -1,6 +1,10 @@
 <template>
   <div class="calendar-container">
     <div class="calendar">
+      <p class="calendar__progress" v-if="isAutoFlowAvailabilityStepUser">
+        <span class="calendar__progress--step">Step 2 of 2:</span>
+        Schedule a time slot!
+      </p>
       <div class="header">
         <div class="instructions-container">
           <div class="header-title">Tell us when to text you!</div>
@@ -11,8 +15,8 @@
             there are no coaches waiting on the dashboard, we also send out text
             messages for requests that have not been picked up. You can help us
             ensure every student request gets matched by providing your
-            availability below. You’re not obligated to tutor every time we text
-            you, but try and select times you’re likely to want to help a
+            availability below. You're not obligated to tutor every time we text
+            you, but try and select times you're likely to want to help a
             student.
           </p>
         </div>
@@ -49,7 +53,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 
 import _ from 'lodash'
 import moment from 'moment-timezone'
@@ -82,6 +86,9 @@ export default {
   computed: {
     ...mapState({
       user: state => state.user.user,
+    }),
+    ...mapGetters({
+      isAutoFlowAvailabilityStepUser: 'user/isAutoFlowAvailabilityStepUser',
     }),
     saveButtonClass() {
       return ['save-button', 'save-button--' + this.saveState]
@@ -270,6 +277,10 @@ export default {
           AnalyticsService.captureEvent(EVENTS.AVAILABILITY_UPDATED, {
             event: EVENTS.AVAILABILITY_UPDATED,
           })
+
+          this.$store.dispatch('user/addToUser', {
+            availabilityLastModifiedAt: new Date().toISOString(),
+          })
         } else {
           this.saveState = saveStates.ERROR
         }
@@ -291,12 +302,18 @@ export default {
 .calendar {
   background: #fff;
   border-radius: 8px;
-  font-size: 12px;
   color: #343440;
   padding: 20px 15px;
 
   @include breakpoint-above('medium') {
     padding: 40px;
+  }
+
+  &__progress {
+    color: $c-information-blue;
+    &--step {
+      font-weight: 600;
+    }
   }
 }
 
@@ -361,6 +378,7 @@ input[type='checkbox']:checked + label {
 .tz-selector-container {
   padding-top: 30px;
   text-align: center;
+  font-size: 12px;
 }
 
 .tz-selector {

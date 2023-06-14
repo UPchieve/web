@@ -3,7 +3,10 @@
     <div class="welcome-page-card">
       <div class="welcome-page-card-content">
         <div class="welcome-page-title-container">
-          <p class="welcome-page-progress" v-if="isAutoFlowProgressBarUser">
+          <p
+            class="welcome-page-progress"
+            v-if="isAutoFlowProgressBarUser || isAutoFlowAvailabilityStepUser"
+          >
             <span class="welcome-page-progress--step">Step 1 of 2:</span>
             Subject certification
           </p>
@@ -35,7 +38,10 @@
       </div>
     </div>
   </div>
-  <div class="welcome-page-step-two" v-else-if="!passedUpchieve101">
+  <div
+    class="welcome-page-step-two"
+    v-else-if="isAutoFlowProgressBarUser || isAutoFlowAvailabilityStepUser"
+  >
     <div class="welcome-page-step-two-card">
       <div class="welcome-page-step-two-card-content">
         <div class="welcome-page-step-two-title-container">
@@ -46,7 +52,10 @@
             We're so glad you're here!
           </p>
         </div>
-        <div class="certification-instructions-container-step-two">
+        <div
+          class="certification-instructions-container-step-two"
+          v-if="isAutoFlowProgressBarUser"
+        >
           <p class="">
             {{
               completed101Training
@@ -66,6 +75,22 @@
                 ? 'Resume course'
                 : 'Start course'
             }}
+          </large-button>
+        </div>
+        <div
+          class="certification-instructions-container-step-two"
+          v-else-if="isAutoFlowAvailabilityStepUser"
+        >
+          <p>
+            Next up: Select when you'd like to receive text messages about
+            students' requesting help.
+          </p>
+          <large-button
+            @click.native="handleAvailabilityPageRedirect"
+            class="welcome-page-step-two-btn"
+            type="button"
+          >
+            Select availability
           </large-button>
         </div>
       </div>
@@ -105,6 +130,7 @@ export default {
       mobileMode: 'app/mobileMode',
       topicCards: 'subjects/topicCards',
       isAutoFlowProgressBarUser: 'user/isAutoFlowProgressBarUser',
+      isAutoFlowAvailabilityStepUser: 'user/isAutoFlowAvailabilityStepUser',
       hasCertification: 'user/hasCertification',
       passedUpchieve101: 'user/passedUpchieve101',
     }),
@@ -142,6 +168,9 @@ export default {
       this.completed101Training
         ? this.$router.push('/training/upchieve101/quiz')
         : this.$router.push('/training/course/upchieve101')
+    },
+    handleAvailabilityPageRedirect() {
+      this.$router.push('/calendar')
     },
   },
 }
@@ -247,6 +276,8 @@ export default {
     background-color: $upchieve-white;
     @include flex-container(column, initial, center);
     height: 100vh;
+    position: relative;
+    z-index: 1;
 
     @include breakpoint-above('small') {
       @include flex-container(column, center, center);
@@ -328,6 +359,7 @@ export default {
   right: 0;
   bottom: 0;
   height: 200px;
+  z-index: 0;
 
   @include breakpoint-above('medium') {
     height: 350px;
