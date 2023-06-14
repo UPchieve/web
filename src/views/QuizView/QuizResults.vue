@@ -67,7 +67,7 @@ export default {
         text: 'Take another quiz',
         route: '/training',
       }
-      if (this.isAutoFlowStepTwoUser)
+      if (this.isAutoFlowAvailabilityStepUser)
         this.rightBtn = {
           text: 'Done',
           route: '/welcome',
@@ -105,7 +105,7 @@ export default {
       user: state => state.user.user,
     }),
     ...mapGetters({
-      isAutoFlowStepTwoUser: 'user/isAutoFlowStepTwoUser',
+      isAutoFlowAvailabilityStepUser: 'user/isAutoFlowAvailabilityStepUser',
     }),
   },
 }

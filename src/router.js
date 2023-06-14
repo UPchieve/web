@@ -69,11 +69,7 @@ const routes = [
       getUser()
         .then(() => {
           if (store.getters['user/isAuthenticated']) {
-            if (
-              store.getters['user/isAutoFlowUser'] ||
-              store.getters['user/isAutoFlowStepTwoUser']
-            )
-              next('/welcome')
+            if (store.getters['user/isAutoFlowUser']) next('/welcome')
             else next('/dashboard')
           } else {
             next('/login')
@@ -199,11 +195,7 @@ const routes = [
     component: DashboardView,
     meta: { protected: true },
     beforeEnter: async (to, from, next) => {
-      if (
-        store.getters['user/isAutoFlowUser'] ||
-        store.getters['user/isAutoFlowStepTwoUser']
-      )
-        next('/welcome')
+      if (store.getters['user/isAutoFlowUser']) next('/welcome')
       else next()
     },
   },
@@ -282,11 +274,7 @@ const routes = [
     component: ProfileView,
     meta: { protected: true },
     beforeEnter: (to, from, next) => {
-      if (
-        store.getters['user/isAutoFlowUser'] ||
-        store.getters['user/isAutoFlowStepTwoUser']
-      )
-        next('/welcome')
+      if (store.getters['user/isAutoFlowUser']) next('/welcome')
       else next()
     },
   },
@@ -302,11 +290,8 @@ const routes = [
     component: CalendarView,
     meta: { protected: true },
     beforeEnter: (to, from, next) => {
-      if (
-        store.getters['user/isAutoFlowUser'] ||
-        store.getters['user/isAutoFlowStepTwoUser']
-      )
-        next('/welcome')
+      if (store.getters['user/isAutoFlowAvailabilityStepUser']) next()
+      else if (store.getters['user/isAutoFlowUser']) next('/welcome')
       else next()
     },
   },

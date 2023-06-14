@@ -57,8 +57,6 @@ export default {
       [UNLEASH_FEATURE_FLAGS.DASHBOARD_BANNER]: false,
       [POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS]: false,
       [POSTHOG_FEATURE_FLAGS.IMAGES_IN_DOCUMENTS]: false,
-      [POSTHOG_FEATURE_FLAGS.AUTO_FLOW]: false,
-      [POSTHOG_FEATURE_FLAGS.AUTO_FLOW_STEP_TWO]: false,
       [POSTHOG_FEATURE_FLAGS.AUTO_FLOW_PROGRESS_BAR]: false,
       [POSTHOG_FEATURE_FLAGS.NEW_ZIPS_ELIGIBILITY]: false,
       [POSTHOG_FEATURE_FLAGS.NEW_SCHOOLS_ELIGIBILITY]: false,
@@ -129,9 +127,6 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.IMAGES_IN_DOCUMENTS],
     isOptionalMiddleSchoolActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.OPTIONAL_MIDDLE_SCHOOL],
-    isAutoFlowActive: state => state.flags[POSTHOG_FEATURE_FLAGS.AUTO_FLOW],
-    isAutoFlowStepTwoActive: state =>
-      state.flags[POSTHOG_FEATURE_FLAGS.AUTO_FLOW_STEP_TWO],
     isAutoFlowProgressBarActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.AUTO_FLOW_PROGRESS_BAR],
     useNewZipsEligibility: state =>
@@ -142,5 +137,7 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.FLAG_PERSON_PROPERTIES],
     isPollingFlagsActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.POLL_FLAGS],
+    isAutoFlowAvailabilityStepActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.AUTO_FLOW_TWO_STEP_AVAILABILITY],
   },
 }

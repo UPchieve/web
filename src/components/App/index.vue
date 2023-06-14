@@ -223,7 +223,7 @@ export default {
       isVolunteer: 'user/isVolunteer',
       mobileMode: 'app/mobileMode',
       isAutoFlowUser: 'user/isAutoFlowUser',
-      isAutoFlowStepTwoUser: 'user/isAutoFlowStepTwoUser',
+      isAutoFlowAvailabilityStepUser: 'user/isAutoFlowAvailabilityStepUser',
       isAutoFlowProgressBarUser: 'user/isAutoFlowProgressBarUser',
       getUserPropsForAnalytics: 'user/getUserPropsForAnalytics',
     }),
@@ -290,22 +290,7 @@ export default {
       }
     },
     isAutoFlowUser(currentValue, prevValue) {
-      if (currentValue && !prevValue) {
-        AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_AUTO_FLOW_STEP_ONE, {
-          event: EVENTS.FLAGGED_AS_AUTO_FLOW_STEP_ONE,
-        })
-
-        this.$router.push('/welcome')
-      }
-    },
-    isAutoFlowStepTwoUser(currentValue, prevValue) {
-      if (currentValue && !prevValue) {
-        AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_AUTO_FLOW_STEP_TWO, {
-          event: EVENTS.FLAGGED_AS_AUTO_FLOW_STEP_TWO,
-        })
-
-        this.$router.push('/welcome')
-      }
+      if (currentValue && !prevValue) this.$router.push('/welcome')
     },
     isAutoFlowProgressBarUser(currentValue, prevValue) {
       if (currentValue && !prevValue) {
@@ -316,6 +301,12 @@ export default {
           }
         )
       }
+    },
+    isAutoFlowAvailabilityStepUser(currentValue, prevValue) {
+      if (currentValue && !prevValue)
+        AnalyticsService.captureEvent(
+          EVENTS.FLAGGED_AS_AUTO_FLOW_STEP_TWO_AVAILBILITY_STEP
+        )
     },
   },
   sockets: {

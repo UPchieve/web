@@ -82,9 +82,7 @@
         <div>
           <large-button
             primary
-            :routeTo="
-              isAutoFlowUser || isAutoFlowStepTwoUser ? '/welcome' : '/'
-            "
+            :routeTo="isAutoFlowUser ? '/welcome' : '/'"
             class="uc-form-button-big"
           >
             Take me to the dashboard
@@ -140,7 +138,6 @@ export default {
     }),
     ...mapGetters({
       isAutoFlowUser: 'user/isAutoFlowUser',
-      isAutoFlowStepTwoUser: 'user/isAutoFlowStepTwoUser',
     }),
     isValidVerificationCode() {
       return !(
