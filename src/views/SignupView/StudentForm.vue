@@ -633,7 +633,6 @@ export default {
       isMobileApp: state => state.app.isMobileApp,
     }),
     ...mapGetters({
-      useNewZipsEligibility: 'featureFlags/useNewZipsEligibility',
       useNewSchoolsEligibility: 'featureFlags/useNewSchoolsEligibility',
     }),
     trimCurrentGrade() {
@@ -809,9 +808,6 @@ export default {
           schoolUpchieveId || '00000e00-00b0-00ca-0000-0b00c0b0000f'
       }
 
-      if (this.useNewZipsEligibility) {
-        AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_NEW_ZIPS_ELIGIBILITY)
-      }
       if (this.useNewSchoolsEligibility) {
         AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_NEW_SCHOOLS_ELIGIBILITY)
       }
@@ -821,7 +817,6 @@ export default {
         email: this.eligibility.email,
         referredByCode: window.localStorage.getItem('upcReferredByCode'),
         currentGrade: this.trimCurrentGrade,
-        useNewZipsEligibility: this.useNewZipsEligibility ?? false,
         useNewSchoolsEligibility: this.useNewSchoolsEligibility ?? false,
       })
         .then(async response => {

@@ -560,7 +560,6 @@ export default {
       email,
       referredByCode,
       currentGrade,
-      useNewZipsEligibility,
       useNewSchoolsEligibility,
     }
   ) {
@@ -571,7 +570,6 @@ export default {
         email,
         referredByCode,
         currentGrade,
-        useNewZipsEligibility,
         useNewSchoolsEligibility,
       })
       .then(this._successHandler, this._errorHandler)
