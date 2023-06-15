@@ -82,8 +82,8 @@
           v-else-if="isAutoFlowAvailabilityStepUser"
         >
           <p>
-            Next up: Select when you'd like to receive text messages about
-            students' requesting help.
+            Next up: Select at least 1 hour a week when you'd like to receive
+            text messages about students requesting help.
           </p>
           <large-button
             @click.native="handleAvailabilityPageRedirect"

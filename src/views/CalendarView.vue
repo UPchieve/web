@@ -18,6 +18,12 @@
             availability below. You're not obligated to tutor every time we text
             you, but try and select times you're likely to want to help a
             student.
+            <span
+              v-if="isAutoFlowAvailabilityStepUser"
+              class="instructions-set-up"
+              >To set up your account, please select at least 1 hour a week to
+              receive text messages.</span
+            >
           </p>
         </div>
         <div class="save-container">
@@ -28,9 +34,13 @@
               tutor—try and include some of these if you can!
             </p>
           </div>
-          <button v-bind:class="saveButtonClass" type="button" @click="save()">
+          <large-button
+            v-bind:class="saveButtonClass"
+            type="button"
+            @click.native="save()"
+          >
             <span v-html="saveLabel"></span>
-          </button>
+          </large-button>
         </div>
       </div>
       <div v-if="hasUserSchedule">
@@ -59,6 +69,7 @@ import _ from 'lodash'
 import moment from 'moment-timezone'
 
 import AvailabilityGrid from '@/components/AvailabilityGrid'
+import LargeButton from '@/components/LargeButton'
 import ClockIcon from '@/assets/clock.svg'
 
 import CalendarService from '@/services/CalendarService'
@@ -73,7 +84,7 @@ const saveStates = {
 }
 
 export default {
-  components: { AvailabilityGrid, ClockIcon },
+  components: { AvailabilityGrid, ClockIcon, LargeButton },
   data() {
     return {
       waitTimes: {},
@@ -111,6 +122,17 @@ export default {
     },
     hasWaitTimes() {
       return !_.isEmpty(this.waitTimes)
+    },
+    hasChangedSchedule() {
+      const estUtcOffset = moment.tz.zone('America/New_York').parse(Date.now())
+      const userUtcOffset = moment.tz.zone(this.selectedTz).parse(Date.now())
+      const offset = (estUtcOffset - userUtcOffset) / 60
+      return (
+        !_.isEqual(
+          this.availability,
+          this.convertAvailability(this.user.availability, offset)
+        ) || this.selectedTz !== this.user.timezone
+      )
     },
   },
   created() {
@@ -263,6 +285,11 @@ export default {
     },
     save() {
       this.saveState = saveStates.SAVING
+      // Do not send a request to the server if there are no actual changes
+      if (!this.hasChangedSchedule) {
+        this.saveState = saveStates.SAVED
+        return
+      }
       const estUtcOffset = moment.tz.zone('America/New_York').parse(Date.now())
       const userUtcOffset = moment.tz.zone(this.selectedTz).parse(Date.now())
       // offsets returned by zone.utcOffset() are returned in minutes and inverted for POSIX compatibility
@@ -393,6 +420,10 @@ input[type='checkbox']:checked + label {
   font-size: 16px;
   color: $c-secondary-grey;
   margin: 15px 0;
+
+  &-set-up {
+    font-weight: 600;
+  }
 }
 
 .save-container {
