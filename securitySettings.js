@@ -16,6 +16,7 @@ const gleapUrl = 'https://*.gleap.io'
 // connect sources
 const googleConnectUrls = [
   'https://*.google-analytics.com',
+  'https://analytics.google.com',
   'https://*.analytics.google.com',
   'https://*.googletagmanager.com ',
 ]
