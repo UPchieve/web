@@ -34,32 +34,58 @@
         </div>
         <div class="school-detail__section">
           <div class="school-detail__section-title">Zip code</div>
-          <div>{{ school.zipCode }}</div>
+          <div>{{ school.zip }}</div>
         </div>
         <div class="school-detail__section">
           <div class="school-detail__section-title">Status</div>
-          <div>{{ schoolApprovalStatus }}</div>
-          <input
-            type="checkbox"
-            id="toggleSchoolApproval"
-            class="checkbox"
-            :checked="school.isApproved"
-            @change="toggleSchoolApproval"
-          />
-          <label for="toggleSchoolApproval" class="switch"></label>
-          <p v-if="approvalError" class="error">{{ approvalError }}</p>
-          <div>{{ schoolPartnerStatus }}</div>
-          <input
-            type="checkbox"
-            id="toggleSchoolPartner"
-            class="checkbox"
-            :checked="school.isPartner"
-            @change="toggleSchoolIsPartner"
-          />
-          <label for="toggleSchoolPartner" class="switch"></label>
-          <p v-if="partnerStatusError" class="error">
-            {{ partnerStatusError }}
-          </p>
+          <div class="uc-row">
+            <label for="toggleSchoolApproved"
+              >Admin Approved:
+              <input
+                type="checkbox"
+                id="toggleSchoolApproved"
+                class="checkbox"
+                :checked="school.isAdminApproved"
+                @change="toggleSchoolApproved"
+              />
+              <span class="switch"></span>
+            </label>
+          </div>
+          <div class="uc-row">
+            <label for="togglePartnerSchool"
+              >Partner School:
+              <input
+                type="checkbox"
+                id="togglePartnerSchool"
+                class="checkbox"
+                :checked="school.isPartner"
+                @change="toggleSchoolPartner"
+              />
+              <span class="switch"></span>
+            </label>
+          </div>
+          <div v-if="toggleSchoolPartnerError" class="error">
+            {{ toggleSchoolPartnerError }}
+          </div>
+        </div>
+        <div class="school-detail__section">
+          <div class="school-detail__section-title">School Properties</div>
+          <div>
+            Title1 or Title1 Eligible:
+            {{ school.isSchoolWideTitle1 || school.isTitle1Eligible }}
+          </div>
+          <div>
+            National School Lunch Program:
+            {{ school.nationalSchoolLunchProgram }}
+          </div>
+          <div>Total Students: {{ school.totalStudents }}</div>
+          <div>
+            Free/Reduced Lunch Eligible Students: {{ school.frlEligible }}
+          </div>
+          <div>
+            NSLP Direct Certification Students:
+            {{ school.nslpDirectCertification }}
+          </div>
         </div>
       </div>
     </template>
@@ -70,14 +96,6 @@
 import NetworkService from '@/services/NetworkService'
 import AdminEditSchool from '@/views/Admin/AdminEditSchool'
 
-const getSchool = async schoolId => {
-  const {
-    body: { school },
-  } = await NetworkService.adminGetSchool(schoolId)
-
-  return school
-}
-
 export default {
   name: 'AdminSchoolDetail',
 
@@ -86,8 +104,8 @@ export default {
   data() {
     return {
       school: {},
-      approvalError: '',
-      partnerStatusError: '',
+      toggleSchoolApprovedError: '',
+      toggleSchoolPartnerError: '',
       isEditMode: false,
     }
   },
@@ -96,22 +114,13 @@ export default {
     this.getSchool()
   },
 
-  computed: {
-    schoolApprovalStatus() {
-      return this.school.isApproved ? 'Approved' : 'Not approved'
-    },
-    schoolPartnerStatus() {
-      return this.school.isPartner
-        ? 'Is a Partner School'
-        : 'Not a Partner School'
-    },
-  },
-
   methods: {
     goBack() {
       this.$router.go(-1)
     },
-    async toggleSchoolApproval(event) {
+    async toggleSchoolApproved(event) {
+      this.toggleSchoolApprovedError = ''
+
       const {
         target: { checked },
       } = event
@@ -123,13 +132,15 @@ export default {
 
       try {
         await NetworkService.adminUpdateSchoolApproval(data)
-        this.school.isApproved = checked
+        this.school.isAdminApproved = checked
       } catch (error) {
-        this.approvalError =
+        this.toggleSchoolApprovedError =
           "There was an error updating the school's approval status"
       }
     },
-    async toggleSchoolIsPartner(event) {
+    async toggleSchoolPartner(event) {
+      this.toggleSchoolPartnerError = ''
+
       const {
         target: { checked },
       } = event
@@ -143,7 +154,7 @@ export default {
         await NetworkService.adminUpdateSchoolPartnerStatus(data)
         this.school.isPartner = checked
       } catch (error) {
-        this.partnerStatusError =
+        this.toggleSchoolPartnerError =
           "There was an error updating the school's partner status"
       }
     },
@@ -153,7 +164,13 @@ export default {
     },
 
     async getSchool() {
-      this.school = await getSchool(this.$route.params.schoolId)
+      const schoolId = this.$route.params.schoolId
+
+      const {
+        body: { school },
+      } = await NetworkService.adminGetSchool(schoolId)
+
+      this.school = school
     },
   },
 }
@@ -162,7 +179,7 @@ export default {
 <style lang="scss" scoped>
 .school-detail {
   background: #fff;
-  margin: 10px;
+  margin-top: 10px;
   border-radius: 8px;
   padding: 10px;
   max-width: 800px;
@@ -187,7 +204,6 @@ export default {
   &__subtitle {
     color: $c-secondary-grey;
     font-size: 18px;
-    margin-bottom: 20px;
   }
 
   &__section {
@@ -196,7 +212,7 @@ export default {
     flex-direction: column;
     align-items: flex-start;
     margin: 10px 0;
-    font-size: 20px;
+    font-size: 18px;
   }
 
   &__section-title {
@@ -241,6 +257,7 @@ export default {
   display: inline-block;
   width: 40px;
   height: 20px;
+  margin-left: 5px;
   background-color: rgba(0, 0, 0, 0.25);
   border-radius: 20px;
   transition: all 0.3s;
@@ -272,5 +289,9 @@ export default {
   @include font-category('helper-text');
   color: $c-error-red;
   text-align: left;
+}
+
+label {
+  margin-bottom: 0;
 }
 </style>

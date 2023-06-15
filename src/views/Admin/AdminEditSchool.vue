@@ -26,20 +26,15 @@
         />
       </div>
       <div class="edit-school__input-row">
-        <label for="zipCode" class="uc-form-label">School ZIP code</label>
-        <input id="zipCode" type="text" v-model="zipCode" />
+        <label for="zip" class="uc-form-label">School ZIP code</label>
+        <input id="zip" type="text" v-model="zip" />
       </div>
 
       <div class="edit-school__input-row">
-        <label for="is-approved" class="uc-form-label">Approval</label>
-        <select name="is-approved" id="is-approved" v-model="isApproved">
-          <option
-            v-for="option in options"
-            :value="option.value"
-            :key="option.text"
-          >
-            {{ option.text }}
-          </option>
+        <label for="is-approved" class="uc-form-label">Admin Approved</label>
+        <select name="is-approved" id="is-approved" v-model="isAdminApproved">
+          <option value="true">True</option>
+          <option value="false">False</option>
         </select>
       </div>
 
@@ -66,24 +61,13 @@ export default {
 
   data() {
     return {
-      name: '',
-      city: '',
-      state: '',
-      zipCode: '',
-      isApproved: false,
-      options: [
-        { text: 'False', value: false },
-        { text: 'True', value: true },
-      ],
+      name: this.school.name,
+      city: this.school.city,
+      zip: this.school.zip,
+      state: this.school.state,
+      isAdminApproved: this.school.isAdminApproved,
       error: '',
     }
-  },
-  async created() {
-    this.name = this.school.name
-    this.city = this.school.city
-    this.zipCode = this.school.zipCode
-    this.state = this.school.state
-    this.isApproved = this.school.isApproved
   },
 
   methods: {
@@ -94,8 +78,8 @@ export default {
         name: this.name,
         city: this.city,
         state: this.state,
-        zipCode: this.zipCode,
-        isApproved: this.isApproved,
+        zip: this.zip,
+        isApproved: this.isAdminApproved,
       }
 
       try {
