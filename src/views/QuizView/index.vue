@@ -57,14 +57,27 @@
                 15 minutes.
               </p>
               <p>Once you feel ready, press "Start Quiz" below!</p>
+              <p v-if="isQuizStudyMaterialUser">
+                You can also press the "Study" button to study the material
+                we've created before taking the quiz
+              </p>
             </div>
-            <large-button
-              primary
-              :showArrow="false"
-              @click.native="startQuiz()"
-              class="start-quiz-btn"
-              ><span>Start Quiz</span>
-            </large-button>
+            <div class="quiz-buttons">
+              <large-button
+                v-if="isQuizStudyMaterialUser"
+                :showArrow="false"
+                @click.native="goToStudyMaterials()"
+                class="start-quiz-btn"
+                ><span>Study</span>
+              </large-button>
+              <large-button
+                primary
+                :showArrow="false"
+                @click.native="startQuiz()"
+                class="start-quiz-btn"
+                ><span>Start Quiz</span>
+              </large-button>
+            </div>
           </div>
         </div>
 
@@ -137,6 +150,7 @@ export default {
     }),
     ...mapGetters({
       allSubtopics: 'subjects/allSubtopics',
+      isQuizStudyMaterialUser: 'user/isQuizStudyMaterialUser',
       hasCertification: 'user/hasCertification',
     }),
     tries() {
@@ -213,6 +227,12 @@ export default {
         this.showQuizStart = !!quizLength
       })
     },
+    goToStudyMaterials() {
+      AnalyticsService.captureEvent(
+        EVENTS.VOLUNTEER_CLICKED_QUIZ_STUDY_MATERIALS
+      )
+      this.$router.push(`/training/review/${Case.kebab(this.category)}`)
+    },
   },
 }
 </script>
@@ -278,6 +298,10 @@ export default {
   & p:nth-child(3) {
     margin-top: -0.3em;
   }
+}
+
+.quiz-buttons {
+  @include flex-container(row, center);
 }
 
 .btn {
@@ -377,6 +401,7 @@ export default {
 }
 
 .start-quiz-btn {
-  margin: 0 auto;
+  width: 150px;
+  margin: 0 1em;
 }
 </style>

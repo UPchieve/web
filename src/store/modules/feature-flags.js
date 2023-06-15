@@ -62,6 +62,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.NEW_SCHOOLS_ELIGIBILITY]: false,
       [POSTHOG_FEATURE_FLAGS.FLAG_PERSON_PROPERTIES]: false,
       [POSTHOG_FEATURE_FLAGS.POLL_FLAGS]: false,
+      [POSTHOG_FEATURE_FLAGS.QUIZ_STUDY_MATERIALS]: false,
     },
   },
   mutations: {
@@ -139,5 +140,7 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.POLL_FLAGS],
     isAutoFlowAvailabilityStepActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.AUTO_FLOW_TWO_STEP_AVAILABILITY],
+    isQuizStudyMaterialsActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.QUIZ_STUDY_MATERIALS],
   },
 }

@@ -362,6 +362,17 @@ export default {
       )
     },
 
+    isQuizStudyMaterialUser: (state, getters, rootState, rootGetters) => {
+      return (
+        !state.user.isOnboarded &&
+        getters.isVolunteer &&
+        !getters.hasCertification &&
+        // Target those not in the 2-step auto flow
+        !rootGetters['featureFlags/isAutoFlowAvailabilityStepActive'] &&
+        rootGetters['featureFlags/isQuizStudyMaterialsActive']
+      )
+    },
+
     getUserPropsForAnalytics: (state, getters) => {
       const userProps = {
         userType: state.user.type,
