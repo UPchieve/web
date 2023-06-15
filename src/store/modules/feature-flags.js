@@ -58,7 +58,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS]: false,
       [POSTHOG_FEATURE_FLAGS.IMAGES_IN_DOCUMENTS]: false,
       [POSTHOG_FEATURE_FLAGS.AUTO_FLOW_PROGRESS_BAR]: false,
-      [POSTHOG_FEATURE_FLAGS.NEW_ZIPS_ELIGIBILITY]: false,
       [POSTHOG_FEATURE_FLAGS.NEW_SCHOOLS_ELIGIBILITY]: false,
       [POSTHOG_FEATURE_FLAGS.FLAG_PERSON_PROPERTIES]: false,
       [POSTHOG_FEATURE_FLAGS.POLL_FLAGS]: false,
@@ -130,8 +129,6 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.OPTIONAL_MIDDLE_SCHOOL],
     isAutoFlowProgressBarActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.AUTO_FLOW_PROGRESS_BAR],
-    useNewZipsEligibility: state =>
-      state.flags[POSTHOG_FEATURE_FLAGS.NEW_ZIPS_ELIGIBILITY],
     useNewSchoolsEligibility: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.NEW_SCHOOLS_ELIGIBILITY],
     isFlagPersonPropertiesActive: state =>
