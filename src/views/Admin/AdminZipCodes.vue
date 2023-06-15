@@ -24,7 +24,16 @@
         <span class="zip-code__title">Zip Code:</span> {{ zipCode.zipCode }}
       </p>
       <p>
-        <span class="zip-code__title">Median Income:</span> {{ medianIncome }}
+        <span class="zip-code__title">Median Income:</span>
+        {{ zipCode.medianIncome }}
+      </p>
+      <p>
+        <span class="zip-code__title">Median CBSA Income:</span>
+        {{ zipCode.cbsaIncome }}
+      </p>
+      <p>
+        <span class="zip-code__title">Median State Income:</span>
+        {{ zipCode.stateIncome }}
       </p>
       <p>
         <span class="zip-code__title">Eligible:</span>
@@ -54,14 +63,6 @@ export default {
         .querySelector('.search-panel')
         .addEventListener('keydown', this.keyboardListener)
     })
-  },
-
-  computed: {
-    medianIncome() {
-      if (this.zipCode.medianIncome)
-        return this.zipCode.medianIncome.toLocaleString()
-      return ''
-    },
   },
 
   methods: {

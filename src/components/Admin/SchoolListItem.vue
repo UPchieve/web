@@ -1,11 +1,13 @@
 <template>
-  <router-link :to="`/admin/school/${school._id}`" class="list-item">
-    <p class="list-item__column">{{ school.name }}</p>
-    <div class="list-item__column">
-      <p>{{ school.city }}, {{ school.state }}</p>
-      <p>{{ school.zipCode }}</p>
-    </div>
-    <p class="list-item__column">{{ approvalStatus }}</p>
+  <router-link :to="`/admin/school/${school._id}`" class="list-item" tag="tr">
+    <td>{{ school.name }}</td>
+    <td>
+      <div>{{ school.city }}, {{ school.state }}</div>
+      <div>{{ school.zip }}</div>
+    </td>
+    <td>{{ adminApprovalStatus }}</td>
+    <td>{{ approvalStatus }}</td>
+    <td>{{ partnerStatus }}</td>
   </router-link>
 </template>
 
@@ -16,8 +18,14 @@ export default {
     school: Object,
   },
   computed: {
+    adminApprovalStatus() {
+      return this.school.isAdminApproved ? 'Yes' : 'No'
+    },
     approvalStatus() {
-      return this.school.isApproved ? 'Approved' : 'Not approved'
+      return this.school.isApproved ? 'Yes' : 'No'
+    },
+    partnerStatus() {
+      return this.school.isPartner ? 'Yes' : 'No'
     },
   },
 }
@@ -25,20 +33,15 @@ export default {
 
 <style lang="scss" scoped>
 .list-item {
-  @include flex-container(row, space-between, flex-start);
-  padding: 20px 40px;
-  text-decoration: none;
   color: $c-soft-black;
+  height: 60px;
+  text-decoration: none;
+  width: 100%;
 
   &:hover {
     cursor: pointer;
     background: #fbfbfb;
     text-decoration: none;
-  }
-
-  &__column {
-    text-align: left;
-    flex-basis: 200px;
   }
 }
 </style>

@@ -40,11 +40,20 @@
             @nextPage="nextPage"
             @previousPage="previousPage"
           />
-          <school-list-item
-            v-for="school in schools"
-            :key="school._id"
-            :school="school"
-          />
+          <table>
+            <tr>
+              <th class="col-lg">School Name</th>
+              <th class="col-md">Location</th>
+              <th class="col-sm">Admin Approved</th>
+              <th class="col-sm">Approved</th>
+              <th class="col-sm">Partner</th>
+            </tr>
+            <school-list-item
+              v-for="school in schools"
+              :key="school._id"
+              :school="school"
+            />
+          </table>
         </div>
       </div>
     </template>
@@ -185,7 +194,7 @@ select {
 }
 
 .list {
-  width: 800px;
+  width: 100%;
 }
 
 .uc-form-label {
@@ -197,5 +206,22 @@ select {
   margin: 2em 0 4em 0;
   padding: 1em 1.6em;
   border: 1px solid $c-border-grey;
+}
+
+table {
+  table-layout: fixed;
+  width: 100%;
+
+  .col-lg {
+    width: 45%;
+  }
+
+  .col-md {
+    width: 30%;
+  }
+
+  .col-sm {
+    width: 15%;
+  }
 }
 </style>
