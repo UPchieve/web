@@ -92,7 +92,7 @@
         </div>
       </div>
 
-      <div class="form-element">
+      <div v-if="!isZipFirst" class="form-element">
         <autocomplete
           base-class="autocomplete-school-search"
           :search="autocompleteSchool"
@@ -188,6 +188,78 @@
         type="submit"
       >
         Check my eligibility
+      </button>
+    </form>
+  </div>
+
+  <div
+    class="form-card"
+    v-else-if="step === 'eligibilitySchool'"
+    @submit.prevent="submitEligibilityForm()"
+  >
+    <FormErrors :errors="errors" />
+
+    <h1 class="header">
+      UPchieve isn't available in your zip code, but we still might be available
+      in your school!
+    </h1>
+    <p class="body">
+      Check now:
+    </p>
+
+    <form id="form-school-eligibility" class="flex column">
+      <div class="form-element">
+        <autocomplete
+          base-class="autocomplete-school-search"
+          :search="autocompleteSchool"
+          :get-result-value="getSchoolDisplayName"
+          placeholder="Search for your school*"
+          aria-label="Search for your school*"
+          @submit="handleSelectHighSchool"
+          @blur="v$.eligibilitySchool.highSchool.$touch"
+          v-bind:class="{
+            'autocomplete-school-search-invalid':
+              v$.eligibilitySchool.highSchool.$errors.length,
+          }"
+          required
+        >
+          <template #result="{ result, props }">
+            <li v-bind="props">
+              <div v-if="result.name" class="result">
+                {{ result.name }} ({{ result.city }}, {{ result.state }})
+              </div>
+              <a
+                v-if="result.cantFindSchool"
+                target="_blank"
+                href="https://upchieve.org/cant-find-school"
+              >
+                <div class="result">
+                  {{ CANNOT_FIND_SCHOOL_TEXT }}
+                </div>
+              </a>
+            </li>
+          </template>
+        </autocomplete>
+        <div class="input-metadata error">
+          <div v-if="v$.eligibilitySchool.highSchool.$errors.length">
+            {{
+              v$.eligibilitySchool.highSchool.$errors
+                .map(e => e.$message)
+                .join(', ')
+            }}
+          </div>
+        </div>
+      </div>
+      <button
+        id="btn-eligibility-submit"
+        class="button-filled-lg mt-30"
+        :disabled="
+          !!v$.eligibilitySchool.$silentErrors.length ||
+            !!v$.eligibilitySchool.$errors.length
+        "
+        type="submit"
+      >
+        Check my school
       </button>
     </form>
   </div>
@@ -531,6 +603,7 @@ import { useVuelidate } from '@vuelidate/core'
 import {
   helpers,
   required,
+  requiredUnless,
   email,
   minLength,
   maxLength,
@@ -558,12 +631,16 @@ export default {
     return { v$: useVuelidate() }
   },
   validations() {
+    const isZipFirst = this.isZipFirst
     return {
       eligibility: {
         currentGrade: { required },
-        highSchool: { required },
+        highSchool: { requiredIf: requiredUnless(isZipFirst) },
         zipCode: { required, minLength: minLength(5), maxLength: maxLength(5) },
         email: { required, email },
+      },
+      eligibilitySchool: {
+        highSchool: { required },
       },
       profile: {
         firstName: { required },
@@ -594,6 +671,9 @@ export default {
         highSchool: {},
         zipCode: '',
         email: '',
+      },
+      eligibilitySchool: {
+        highSchool: {},
       },
       credentials: {
         email: '',
@@ -634,6 +714,7 @@ export default {
     }),
     ...mapGetters({
       useNewSchoolsEligibility: 'featureFlags/useNewSchoolsEligibility',
+      isZipFirst: 'featureFlags/isZipFirst',
     }),
     trimCurrentGrade() {
       // extracting the first word out of the gradeLevels
@@ -760,6 +841,7 @@ export default {
       this.invalidInputs = []
 
       if (
+        !this.isZipFirst &&
         !this.eligibility.highSchool.upchieveId &&
         !this.isMiddleSchoolOptional
       ) {
@@ -796,23 +878,20 @@ export default {
 
     async submitEligibilityForm() {
       AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CHECK_MY_ELIGIBILITY)
+      if (this.isZipFirst && this.step === 'eligibilityNew') {
+        AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_ZIP_FIRST)
+      }
 
       // reset error msg from server
       this.msg = ''
 
       if (await this.hasEligibilityFormErrors()) return
 
-      let schoolUpchieveId = this.eligibility.highSchool.upchieveId
-      if (this.isMiddleSchoolOptional) {
-        schoolUpchieveId =
-          schoolUpchieveId || '00000e00-00b0-00ca-0000-0b00c0b0000f'
-      }
-
       if (this.useNewSchoolsEligibility) {
         AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_NEW_SCHOOLS_ELIGIBILITY)
       }
       NetworkService.checkStudentEligibility(this, {
-        schoolUpchieveId,
+        schoolUpchieveId: this.eligibility.highSchool.upchieveId,
         zipCode: this.eligibility.zipCode,
         email: this.eligibility.email,
         referredByCode: window.localStorage.getItem('upcReferredByCode'),
@@ -834,9 +913,22 @@ export default {
             AnalyticsService.captureEvent(EVENTS.ELIGIBILITY_INELIGIBLE, {
               event: EVENTS.ELIGIBILITY_INELIGIBLE,
             })
-            this.step = 'ineligible'
             if (response.body.isCollegeStudent) this.isCollegeStudent = true
-            this.$router.push('/sign-up/student/ineligible')
+
+            if (
+              this.step === 'eligibilityNew' &&
+              this.isZipFirst &&
+              !this.isCollegeStudent
+            ) {
+              AnalyticsService.captureEvent(
+                EVENTS.FLAGGED_AS_ZIP_FIRST_GOING_TO_SCHOOL
+              )
+              this.step = 'eligibilitySchool'
+              this.$router.push('/sign-up/student/school-eligibility')
+            } else {
+              this.step = 'ineligible'
+              this.$router.push('/sign-up/student/ineligible')
+            }
           }
           const isDomesticIpAddress = await this.isDomesticIpAddress()
           if (!isDomesticIpAddress) return this.internationalPage()
@@ -900,6 +992,7 @@ export default {
       } else {
         AnalyticsService.captureEvent(EVENTS.STUDENT_SELECTED_SCHOOL)
         this.eligibility.highSchool = school || {}
+        this.eligibilitySchool.highSchool = school || {}
       }
     },
 
