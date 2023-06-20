@@ -123,14 +123,14 @@ export default {
       verificationCode: '',
       loadingMessage: '',
       error: '',
-      isSubmitting: true,
+      isSubmitting: false,
       email: '',
     }
   },
   mounted() {
     this.$store.dispatch('app/hideNavigation')
     this.email = this.user.email
-    this.sendCode(true)
+    this.sendCode()
   },
   computed: {
     ...mapState({
@@ -157,9 +157,9 @@ export default {
     },
   },
   methods: {
-    async sendCode(force) {
+    async sendCode() {
       this.error = ''
-      if (!force && this.isSubmitting) return
+      if (this.isSubmitting) return
       this.isSubmitting = true
       this.loadingMessage = 'Sending a verification email. Please wait...'
       try {
