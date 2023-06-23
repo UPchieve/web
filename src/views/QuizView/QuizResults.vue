@@ -1,34 +1,63 @@
 <template>
   <div :style="popUpBorderStyle" class="score-container">
     <div>
-      <h2>{{ headerMsg }}</h2>
-      <p :style="scoreStyle" class="score">{{ scoreMsg }}</p>
+      <p class="score-container--header">{{ headerMsg }}</p>
+      <p
+        :class="{
+          'score--passed': quizResults.passed,
+          'score--failed': !quizResults.passed,
+        }"
+        class="score"
+      >
+        {{ scoreMsg }}
+      </p>
       <p class="instructions">
         {{ instructionMsg }}
       </p>
     </div>
     <div class="btn-container">
-      <button class="review-btn btn" type="button" @click="showReview">
-        Review answers
-      </button>
-      <router-link :to="rightBtn.route" tag="button" class="btn">{{
-        rightBtn.text
-      }}</router-link>
-      <button
+      <large-button
+        v-if="leftBtn.route"
+        :showArrow="false"
+        :routeTo="leftBtn.route"
         class="btn"
-        type="button"
-        @click="reloadQuiz"
-        v-if="!quizResults.passed"
       >
-        Retake quiz
-      </button>
+        {{ leftBtn.text }}
+      </large-button>
+      <large-button
+        v-else-if="leftBtn.handleClick"
+        :showArrow="false"
+        @click.native="leftBtn.handleClick"
+        class="btn"
+      >
+        {{ leftBtn.text }}
+      </large-button>
+      <large-button
+        v-if="rightBtn.route"
+        primary
+        :showArrow="false"
+        :routeTo="rightBtn.route"
+        class="btn"
+      >
+        {{ rightBtn.text }}
+      </large-button>
+      <large-button
+        v-else-if="rightBtn.handleClick"
+        primary
+        :showArrow="false"
+        @click.native="rightBtn.handleClick"
+        class="btn"
+      >
+        {{ rightBtn.text }}
+      </large-button>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import Case from 'case'
+import LargeButton from '@/components/LargeButton'
 
 export default {
   props: {
@@ -37,6 +66,9 @@ export default {
     reloadQuiz: { type: Function, required: true },
     isFirstQuiz: { type: Boolean, required: true },
   },
+  components: {
+    LargeButton,
+  },
   data() {
     return {
       scoreMsg: '',
@@ -44,7 +76,8 @@ export default {
       headerMsg: '',
       instructionMsg: '',
       category: '',
-      rightBtn: { text: '', route: '' },
+      leftBtn: { text: '', route: '', handleClick: undefined },
+      rightBtn: { text: '', route: '', handleClick: undefined },
       popUpBorderStyle: {},
       scoreStyle: {},
     }
@@ -56,41 +89,34 @@ export default {
 
     if (this.quizResults.passed) {
       this.headerMsg = 'What a rockstar! You passed!'
-      this.instructionMsg =
-        isTrainingSubject || this.isFirstQuiz
-          ? "Now that you have this certification, you're one step closer to being able to help students!"
-          : "Now that you have this certification, you'll be notified of student requests for help in this subject. If you want to help students with even more subjects, just pass more quizzes!"
-      this.popUpBorderStyle = {
-        borderBottom: '5px solid #16D2AA',
-        borderLeft: '5px solid #16D2AA',
-      }
-      this.scoreStyle = { color: '#16D2AA' }
+
+      this.instructionMsg = this.isFirstQuiz
+        ? `Once you finish setting up your account on your dashboard, you'll be notified of student requests for help in this subject. If you want to help students with even more subjects, just pass more quizzes located in the "Training" tab.`
+        : isTrainingSubject
+        ? "Now that you have this certification, you're one step closer to being able to help students!"
+        : "Now that you have this certification, you'll be notified of student requests for help in this subject. If you want to help students with even more subjects, just pass more quizzes!"
+      this.leftBtn = { text: 'Review answers', handleClick: this.showReview }
       this.rightBtn = {
         text: 'Take another quiz',
         route: '/training',
       }
-      if (this.isAutoFlowAvailabilityStepUser)
+      if (this.isFirstQuiz)
         this.rightBtn = {
-          text: 'Done',
-          route: '/welcome',
+          text: 'Go to Dashboard',
+          route: '/dashboard',
         }
     } else {
       this.headerMsg = "You failed this time, but don't give up!"
       this.instructionMsg = isTrainingSubject
         ? 'Please try taking this quiz again after reviewing your incorrect answers and checking out the training course materials again.'
         : 'Please try taking this quiz again after reviewing your incorrect answers and checking out the subject-specific review materials we provide on the Training page.'
-      this.popUpBorderStyle = {
-        borderBottom: '5px solid #F44747',
-        borderLeft: '5px solid #F44747',
-      }
-      this.scoreStyle = { color: '#F44747' }
-      this.leftBtn = { text: 'Review answers', route: '' }
-      this.rightBtn = {
+      this.leftBtn = {
         text: 'Review concepts',
         route: isTrainingSubject
           ? `/training/course/${Case.kebab(this.category)}`
           : `/training/review/${Case.kebab(this.category)}`,
       }
+      this.rightBtn = { text: 'Review answers', handleClick: this.showReview }
     }
 
     this.scoreMsg = `Score: ${this.quizResults.score} out of ${this.quizLength} correct.`
@@ -106,73 +132,58 @@ export default {
       training: state => state.subjects.training,
       user: state => state.user.user,
     }),
-    ...mapGetters({
-      isAutoFlowAvailabilityStepUser: 'user/isAutoFlowAvailabilityStepUser',
-    }),
   },
 }
 </script>
 
 <style lang="scss" scoped>
-h2 {
-  font-size: 20px;
-}
-
-// todo: make global button to import
 .btn {
-  background: #f6f6f6;
-  border-radius: 20px;
-  min-width: 140px;
-  box-sizing: content-box;
-  height: 26px;
-  line-height: 26px;
-  color: #16d2aa;
-  font-weight: 600;
-  margin-bottom: 1.4em;
+  margin-top: 1em;
+  width: 100px;
 
-  @include breakpoint-above('large') {
-    width: 27%;
-    margin-bottom: 0;
+  @include breakpoint-above('tiny') {
+    width: 150px;
   }
-}
 
-.btn:hover {
-  background-color: #16d2aa;
-  color: #fff;
-}
+  @include breakpoint-above('small') {
+    width: initial;
+  }
 
-.instructions {
-  margin: 50px 0;
+  @include breakpoint-above('medium') {
+    margin-bottom: 0;
+    margin-left: 2em;
+  }
 }
 
 .btn-container {
-  @include flex-container(column, space-around, center);
+  @include flex-container(row, space-around, center);
   width: 100%;
-  margin: 4em auto;
+  margin-top: 4em;
 
-  @include breakpoint-above('large') {
-    @include flex-container(row, space-around, center);
+  @include breakpoint-above('medium') {
+    @include flex-container(row, flex-end, center);
   }
 }
 
-// override global style from router-link
-.btn.active {
-  box-shadow: initial;
-}
-
 .score {
-  margin-top: 20px;
+  margin-top: 1.25em;
   font-weight: 600;
-}
 
-.instructions {
-  width: 80%;
-  margin: 1.4em auto 0;
+  &--passed {
+    color: $c-success-green;
+  }
+
+  &--failed {
+    color: $c-error-red;
+  }
 }
 
 .score-container {
   margin-top: 1em;
-  padding-top: 1em;
+
+  &--header {
+    font-weight: 500;
+  }
 }
 
 @media screen and (max-width: 890px) {

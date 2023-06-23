@@ -1,6 +1,10 @@
 <template>
-  <div v-if="user.isVolunteer" :style="coverStyle" class="training-quiz">
-    <div id="quiz-name" :class="showQuizReview ? 'done-header' : 'header'">
+  <div
+    v-if="user.isVolunteer"
+    class="training-quiz"
+    :class="trainingQuizClasses"
+  >
+    <div :class="showQuizReview ? 'done-header' : 'header'">
       <h1 class="title">{{ quizName }} Certification Quiz</h1>
       <div
         v-if="showQuizReview"
@@ -9,20 +13,36 @@
           'review-buttons--align-end': quizResults.passed,
         }"
       >
-        <large-button
-          v-if="!quizResults.passed"
-          primary
-          :showArrow="false"
-          @click.native="reloadQuiz"
-          class="review-buttons--button"
-          ><span>Retake quiz</span>
-        </large-button>
-        <large-button
-          class="review-buttons--button review-buttons--button-end"
-          :showArrow="false"
-          routeTo="/dashboard"
-          ><span>Done</span>
-        </large-button>
+        <template v-if="!quizResults.passed">
+          <large-button
+            primary
+            :showArrow="false"
+            @click.native="goToStudyMaterials"
+            class="review-buttons--button"
+            ><span>Review concepts</span>
+          </large-button>
+          <large-button
+            class="review-buttons--button review-buttons--button-end"
+            :showArrow="false"
+            @click.native="reloadQuiz"
+            ><span>Retake quiz</span>
+          </large-button>
+        </template>
+        <template v-else>
+          <large-button
+            primary
+            :showArrow="false"
+            routeTo="/training"
+            class="review-buttons--button"
+            ><span>Take another quiz</span>
+          </large-button>
+          <large-button
+            class="review-buttons--button review-buttons--button-end"
+            :showArrow="false"
+            routeTo="/dashboard"
+            ><span>Go to Dashboard</span>
+          </large-button>
+        </template>
       </div>
     </div>
     <div class="quiz-inner">
@@ -49,32 +69,33 @@
           <div>
             <div class="instructions">
               <h2 class="instructions-header">Get ready, set...</h2>
-              <p>
-                You're about to start a quiz with {{ quizLength }} questions.
-              </p>
-              <p>
-                There's no time limit, but we recommend setting aside at least
-                15 minutes.
-              </p>
-              <p>Once you feel ready, press "Start Quiz" below!</p>
-              <p v-if="isQuizStudyMaterialUser">
-                You can also press the "Study" button to study the material
-                we've created before taking the quiz
-              </p>
+              <div class="instructions-content">
+                <p>
+                  You're about to start a quiz with {{ quizLength }} questions.
+                  There's no time limit, but we recommend setting aside at least
+                  15 minutes. Once you feel ready, press
+                  <span class="instructions-start-quiz">"Start Quiz"</span>
+                  below!
+                </p>
+                <p v-if="isQuizStudyMaterialUser">
+                  You can also press the "Study" button to study the material
+                  we've created before taking the quiz
+                </p>
+              </div>
             </div>
             <div class="quiz-buttons">
               <large-button
                 v-if="isQuizStudyMaterialUser"
                 :showArrow="false"
                 @click.native="goToStudyMaterials()"
-                class="start-quiz-btn"
+                class="quiz-buttons--button"
                 ><span>Study</span>
               </large-button>
               <large-button
                 primary
                 :showArrow="false"
                 @click.native="startQuiz()"
-                class="start-quiz-btn"
+                class="quiz-buttons--button quiz-buttons--primary-button"
                 ><span>Start Quiz</span>
               </large-button>
             </div>
@@ -174,6 +195,14 @@ export default {
       }
       return quizName
     },
+    trainingQuizClasses() {
+      const resultsHasEntries = Object.keys(this.quizResults).length
+      return {
+        'training-quiz--passed': resultsHasEntries && this.quizResults.passed,
+        'training-quiz--failed': resultsHasEntries && !this.quizResults.passed,
+        'training-quiz--review-answers': this.showQuizReview,
+      }
+    },
   },
   beforeMount() {
     this.loadQuiz()
@@ -223,6 +252,7 @@ export default {
         this.quizLoading = false
         this.showQuizResults = false
         this.showQuizReview = false
+        this.quizResults = {}
         this.quizLength = quizLength
         this.showQuizStart = !!quizLength
       })
@@ -246,14 +276,33 @@ export default {
   background: #fff;
   border-radius: 8px;
   margin: 10px;
-  padding: 20px 15px;
+  padding: 1.25em 0.9em;
   max-width: 1000px;
   padding-bottom: 8em;
+  border-left: 5px solid $c-information-blue;
 
   @include breakpoint-above('medium') {
-    margin: 40px;
-    padding: 40px;
-    padding-bottom: 8em;
+    margin: 2.5em;
+    padding: 2.5em;
+    width: 80%;
+  }
+
+  @include breakpoint-above('huge') {
+    width: 50%;
+  }
+
+  &--review-answers {
+    @include breakpoint-above('huge') {
+      width: 80%;
+    }
+  }
+
+  &--passed {
+    border-left: 5px solid $c-success-green;
+  }
+
+  &--failed {
+    border-left: 5px solid $c-error-red;
   }
 }
 
@@ -283,25 +332,6 @@ export default {
   display: flex;
   flex-direction: column;
   min-height: 200px;
-  text-align: center;
-}
-
-.quiz-start {
-  padding-bottom: 3em;
-  width: 100%;
-  border-bottom: 5px solid #1855d1;
-  border-left: 5px solid #1855d1;
-  padding-top: 1em;
-  margin-top: 1.6em;
-  text-align: center;
-
-  & p:nth-child(3) {
-    margin-top: -0.3em;
-  }
-}
-
-.quiz-buttons {
-  @include flex-container(row, center);
 }
 
 .btn {
@@ -321,25 +351,25 @@ export default {
 }
 
 .instructions {
-  width: 80%;
-  margin: 4em auto;
+  &-content {
+    margin: 1em 0;
+    margin-bottom: 4em;
+  }
 
   &-header {
-    font-size: 20px;
+    font-size: 18px;
+    margin-top: 0.5em;
     margin-bottom: 1em;
   }
-}
-.exceeded-tries {
-  margin: 4em 0;
+
+  &-start-quiz {
+    font-weight: 500;
+  }
 }
 
 @media screen and (max-width: 700px) {
   .header {
     padding: 1em 1em 1em 3em;
-  }
-
-  .col-xs-12.view-container {
-    padding: 0em;
   }
 
   .quiz-inner {
@@ -384,13 +414,6 @@ export default {
     margin-top: 0;
   }
 
-  &--align-end {
-    justify-content: initial;
-    @include breakpoint-above('large') {
-      justify-content: flex-end;
-    }
-  }
-
   &--button {
     width: 45%;
 
@@ -400,8 +423,29 @@ export default {
   }
 }
 
-.start-quiz-btn {
-  width: 150px;
-  margin: 0 1em;
+.quiz-buttons {
+  @include flex-container(row, space-between);
+
+  @include breakpoint-above('large') {
+    @include flex-container(row, flex-end);
+  }
+
+  &--button {
+    width: 120px;
+
+    @include breakpoint-above('tiny') {
+      width: 150px;
+    }
+
+    @include breakpoint-above('large') {
+      margin-left: 2em;
+    }
+  }
+}
+
+@media screen and (min-width: 990px) and (max-width: 1100px) {
+  .training-quiz--review-answers {
+    width: 90%;
+  }
 }
 </style>
