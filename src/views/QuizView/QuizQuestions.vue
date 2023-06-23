@@ -29,32 +29,32 @@
         </div>
         <p class="quiz-error">{{ errorMsg }}</p>
       </form>
-      <div class="btn-container">
-        <button
-          v-if="showPrevious"
-          class="prev btn"
-          type="button"
-          @click.prevent="previous()"
-        >
-          PREVIOUS
-        </button>
-        <button
-          v-if="showNext"
-          class="next btn"
-          type="button"
-          @click.prevent="next()"
-        >
-          NEXT
-        </button>
-        <button
-          v-if="showSubmit"
-          class="submit btn"
-          type="submit"
-          @click.prevent="submit()"
-        >
-          SUBMIT QUIZ
-        </button>
-      </div>
+    </div>
+    <div class="btn-container">
+      <button
+        v-if="showPrevious"
+        class="prev btn"
+        type="button"
+        @click.prevent="previous()"
+      >
+        PREVIOUS
+      </button>
+      <button
+        v-if="showNext"
+        class="next btn"
+        type="button"
+        @click.prevent="next()"
+      >
+        NEXT
+      </button>
+      <button
+        v-if="showSubmit"
+        class="submit btn"
+        type="submit"
+        @click.prevent="submit()"
+      >
+        SUBMIT QUIZ
+      </button>
     </div>
   </div>
 </template>
@@ -255,6 +255,7 @@ export default {
   width: 400px;
   text-align: left;
   margin: 0 auto;
+  margin-bottom: 2em;
 }
 
 input[type='radio']:checked {
@@ -286,10 +287,14 @@ label {
 .btn {
   background: #f6f6f6;
   border-radius: 20px;
-  width: 160px;
+  width: 120px;
   padding: 0.6em 0;
   color: #16d2aa;
   font-weight: 600;
+
+  @include breakpoint-above('large') {
+    width: 160px;
+  }
 }
 
 .btn:hover {
@@ -303,9 +308,7 @@ label {
 }
 
 .btn-container {
-  display: flex;
-  justify-content: space-between;
-  position: absolute;
+  @include flex-container(row, space-between);
   left: 0;
   width: 100%;
 
@@ -313,14 +316,6 @@ label {
   left: 0;
   right: 0;
   margin: 2em auto 0;
-
-  & .btn:first-of-type {
-    margin-left: 15px;
-  }
-
-  & .btn:last-of-type {
-    margin-right: 15px;
-  }
 }
 
 .questionText {
@@ -344,7 +339,7 @@ label {
 
 @media screen and (max-width: 400px) {
   .btn {
-    width: 120px;
+    width: 100px;
   }
 
   // override inline styling
