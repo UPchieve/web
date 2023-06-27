@@ -13,6 +13,7 @@ import RejoinSessionHeader from './RejoinSessionHeader'
 import WaitingPeriodHeader from './WaitingPeriodHeader'
 import BannedStudentHeader from './BannedStudentHeader'
 import DashboardBannerHeader from './DashboardBannerHeader'
+import EarnCertificationsHeader from './EarnCertificationsHeader'
 
 export default {
   name: 'app-header',
@@ -24,6 +25,7 @@ export default {
     WaitingPeriodHeader,
     BannedStudentHeader,
     DashboardBannerHeader,
+    EarnCertificationsHeader,
   },
   computed: {
     ...mapState({

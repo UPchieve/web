@@ -48,6 +48,10 @@ const bannedHeaderData = {
   component: 'BannedStudentHeader',
 }
 
+const earnCertificationsHeaderData = {
+  component: 'EarnCertificationsHeader',
+}
+
 export default {
   name: 'student-dashboard',
   components: {
@@ -56,6 +60,9 @@ export default {
     FirstSessionCongratsModal,
   },
   created() {
+    if (this.isEarnCertificationsActive)
+      this.$store.dispatch('app/header/show', earnCertificationsHeaderData)
+
     if (this.user && this.user.isBanned) {
       this.$store.dispatch('app/header/show', bannedHeaderData)
     }
@@ -95,6 +102,7 @@ export default {
       isSessionAlive: 'user/isSessionAlive',
       isReferFriendsActive: 'featureFlags/isReferFriendsActive',
       isDowntimeBannerActive: 'featureFlags/isDowntimeBannerActive',
+      isEarnCertificationsActive: 'featureFlags/isEarnCertificationsActive',
     }),
     isLowCoachHour() {
       return this.currentHour < 12
