@@ -64,6 +64,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.QUIZ_STUDY_MATERIALS]: false,
       [POSTHOG_FEATURE_FLAGS.ZIP_FIRST]: false,
       [POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS]: false,
+      [POSTHOG_FEATURE_FLAGS.UPDATED_AUTO_FLOW_QUIZ_UX]: false,
     },
   },
   mutations: {
@@ -144,5 +145,7 @@ export default {
     isZipFirst: state => state.flags[POSTHOG_FEATURE_FLAGS.ZIP_FIRST],
     isEarnCertificationsActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS],
+    isUpdatedAutoFlowQuizUxActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.UPDATED_AUTO_FLOW_QUIZ_UX],
   },
 }
