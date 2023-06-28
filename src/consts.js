@@ -473,6 +473,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   QUIZ_STUDY_MATERIALS: 'quiz-study-materials',
   ZIP_FIRST: 'zip-first',
   EARN_CERTIFICATIONS: 'earn-certifications',
+  UPDATED_AUTO_FLOW_QUIZ_UX: 'updated-auto-flow-quiz-ux',
 }
 
 export const ANALYTICS_REPORT_ROW = {
