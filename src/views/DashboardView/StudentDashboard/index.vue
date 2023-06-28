@@ -35,6 +35,8 @@ import DashboardBanner from '../DashboardBanner'
 import SubjectSelection from './SubjectSelection'
 import FirstSessionCongratsModal from './FirstSessionCongratsModal'
 import moment from 'moment-timezone'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const defaultHeaderData = {
   component: 'DefaultHeader',
@@ -152,6 +154,19 @@ export default {
           this.toggleFirstSessionCongratsModal()
       } else {
         this.$store.dispatch('app/header/show', activeHeaderData)
+      }
+    },
+    isEarnCertificationsActive(currentValue, prevValue) {
+      if (
+        currentValue &&
+        !prevValue &&
+        // ensure no other dashboard headers are shown
+        ((this.user && !this.user.isBanned) || !this.sessionAlive)
+      ) {
+        this.$store.dispatch('app/header/show', earnCertificationsHeaderData)
+        AnalyticsService.captureEvent(
+          EVENTS.FLAGGED_AS_EARN_CERTIFICATIONS_STUDENT
+        )
       }
     },
   },
