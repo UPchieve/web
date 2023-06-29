@@ -21,6 +21,7 @@
       </div>
     </div>
 
+    <level-system v-if="isLevelSystemActive" class="level-system" />
     <subject-selection />
     <first-session-congrats-modal
       v-if="showFirstSessionCongratsModal"
@@ -35,6 +36,7 @@ import DashboardBanner from '../DashboardBanner'
 import SubjectSelection from './SubjectSelection'
 import FirstSessionCongratsModal from './FirstSessionCongratsModal'
 import moment from 'moment-timezone'
+import LevelSystem from '@/components/LevelSystem'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 
@@ -60,6 +62,7 @@ export default {
     DashboardBanner,
     SubjectSelection,
     FirstSessionCongratsModal,
+    LevelSystem,
   },
   created() {
     if (this.isEarnCertificationsActive)
@@ -105,6 +108,7 @@ export default {
       isReferFriendsActive: 'featureFlags/isReferFriendsActive',
       isDowntimeBannerActive: 'featureFlags/isDowntimeBannerActive',
       isEarnCertificationsActive: 'featureFlags/isEarnCertificationsActive',
+      isLevelSystemActive: 'featureFlags/isLevelSystemActive',
     }),
     isLowCoachHour() {
       return this.currentHour < 12
@@ -169,6 +173,11 @@ export default {
         )
       }
     },
+    isLevelSystemActive(currentValue, prevValue) {
+      if (currentValue && !prevValue) {
+        AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_LEVEL_SYSTEM_STUDENT)
+      }
+    },
   },
 }
 </script>
@@ -229,6 +238,30 @@ export default {
       text-decoration: underline;
       font-weight: bold;
     }
+  }
+}
+
+.level-system {
+  // Add 20px because of the margin-bottom from the dashboard banner
+  margin-top: calc(1em + 20px);
+  // margin-bottom here for the same reason it's on the dashboard banner
+  margin-bottom: -20px;
+  width: 100%;
+
+  @include breakpoint-between(1050px, 1430px) {
+    width: 48%;
+  }
+
+  @include breakpoint-between(1430px, 1809px) {
+    width: 31.5%;
+  }
+
+  @include breakpoint-between(1430px, 1809px) {
+    width: 31.5%;
+  }
+
+  @include breakpoint-above('massive') {
+    width: 400px;
   }
 }
 </style>

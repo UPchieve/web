@@ -63,15 +63,16 @@ export default {
       [POSTHOG_FEATURE_FLAGS.POLL_FLAGS]: false,
       [POSTHOG_FEATURE_FLAGS.QUIZ_STUDY_MATERIALS]: false,
       [POSTHOG_FEATURE_FLAGS.ZIP_FIRST]: false,
-      [POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS]: false,
       [POSTHOG_FEATURE_FLAGS.UPDATED_AUTO_FLOW_QUIZ_UX]: false,
+      // This is an experiment, using multivariant feature flag values
+      [POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS_AND_LEVEL_SYSTEM]: '',
     },
   },
   mutations: {
     setFeatureFlags: (state, isPostHog) => {
       // Use of an arrow function to implicitly bind the 3rd party module to the var
       const isFlagEnabled = isPostHog
-        ? flag => posthog.isFeatureEnabled(flag)
+        ? flag => posthog.getFeatureFlag(flag)
         : flag => unleash.isEnabled(flag)
       const flags = isPostHog ? POSTHOG_FEATURE_FLAGS : UNLEASH_FEATURE_FLAGS
       Object.keys(flags).forEach(key => {
@@ -143,9 +144,15 @@ export default {
     isQuizStudyMaterialsActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.QUIZ_STUDY_MATERIALS],
     isZipFirst: state => state.flags[POSTHOG_FEATURE_FLAGS.ZIP_FIRST],
-    isEarnCertificationsActive: state =>
-      state.flags[POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS],
     isUpdatedAutoFlowQuizUxActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.UPDATED_AUTO_FLOW_QUIZ_UX],
+    isEarnCertificationsActive: state =>
+      state.flags[
+        POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS_AND_LEVEL_SYSTEM
+      ] === POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS,
+    isLevelSystemActive: state =>
+      state.flags[
+        POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS_AND_LEVEL_SYSTEM
+      ] === POSTHOG_FEATURE_FLAGS.LEVEL_SYSTEM,
   },
 }
