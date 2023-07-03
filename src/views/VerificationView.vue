@@ -1,55 +1,39 @@
 <template>
   <form-page-template>
-    <form class="uc-form" aria-labelledby="verificationForm">
-      <nav class="uc-form-header" aria-label="Options">
-        <div
-          class="uc-form-header-link verification__log-out-button"
-          v-on:click="logout"
-          v-on:keydown.enter="logout"
-        >
-          Log out
-        </div>
-      </nav>
-      <div class="uc-form-body" v-if="step === 1">
-        <div v-if="error">
-          <p class="error" role="alert">
-            {{ error }}
-          </p>
-
-          <button
-            class="uc-form-button"
-            type="submit"
-            @click.prevent="sendCode"
-            :disabled="!isValidForm || isSubmitting"
-          >
-            {{ sendCodeButtonText }}
-          </button>
-        </div>
+    <div class="uc-form">
+      <div v-if="error" class="alert alert-danger" role="alert">
+        {{ error }}
       </div>
 
-      <div class="uc-form-body" v-if="step === 2">
-        <p>
+      <div v-if="step === 1">
+        <button
+          v-if="error"
+          class="uc-form-button"
+          @click.prevent="sendCode"
+          :disabled="isSubmitting"
+        >
+          {{ sendCodeButtonText }}
+        </button>
+      </div>
+
+      <div v-if="step === 2">
+        <p class="uc-form-text center">
           We just emailed your verification code to
           <span class="verification__send-to">{{ email }}</span>
         </p>
-        <div class="verification__container">
-          <label class="verification__radio-label">
-            <span class="verification__label"
-              >Enter your 6-digit verification code:</span
-            >
-            <input
-              class="uc-form-input uc-form-input--wide"
-              v-model="verificationCode"
-              type="input"
-              id="verification-code"
-              placeholder="XXXXXX"
-            />
+        <div class="uc-form-element">
+          <label for="verification-code">
+            Enter your 6-digit verification code
           </label>
+          <input
+            id="verification-code"
+            class="uc-form-text-input"
+            v-model="verificationCode"
+            type="text"
+            placeholder="XXXXXX"
+            required
+          />
         </div>
-
-        <p v-if="error" class="error" role="alert">
-          {{ error }}
-        </p>
 
         <button
           class="uc-form-button"
@@ -65,33 +49,32 @@
           <span
             :disabled="isSubmitting"
             @click.prevent="sendCode"
-            class="verification__sub-link"
+            class="uc-link"
             >Resend code</span
           >
         </div>
       </div>
 
-      <div v-if="step === 3" class="uc-form-body uc-form-body--center">
-        <div>
-          <verification-badge />
-          <h3>You’re verified <span v-if="showEmoji">😎</span></h3>
-          <p>
-            Woohoo! Welcome to UPchieve.
-          </p>
-        </div>
-        <div>
-          <large-button
-            primary
-            :routeTo="isAutoFlowUser ? '/welcome' : '/'"
-            class="uc-form-button-big"
-          >
-            Take me to the dashboard
-          </large-button>
-        </div>
+      <div v-if="step === 3">
+        <verification-badge />
+        <h1 class="uc-form-header center">
+          You’re verified <span v-if="showEmoji">😎</span>
+        </h1>
+        <p class="uc-form-text center">
+          Woohoo! Welcome to UPchieve.
+        </p>
+        <large-button
+          primary
+          :routeTo="isAutoFlowUser ? '/welcome' : '/'"
+          class="uc-form-button"
+        >
+          Take me to the dashboard
+        </large-button>
       </div>
 
-      <form-footer />
-    </form>
+      <button class="uc-form-button-secondary" @click="logout">Logout</button>
+    </div>
+
     <loader v-if="isSubmitting" :message="loadingMessage" overlay />
   </form-page-template>
 </template>
@@ -99,7 +82,6 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import FormPageTemplate from '@/components/FormPageTemplate'
-import FormFooter from '@/components/FormFooter'
 import Loader from '@/components/Loader'
 import AuthService from '@/services/AuthService'
 import VerificationBadge from '@/assets/verification.svg'
@@ -112,7 +94,6 @@ export default {
   name: 'VerificationView',
   components: {
     FormPageTemplate,
-    FormFooter,
     VerificationBadge,
     LargeButton,
     Loader,
@@ -183,6 +164,7 @@ export default {
 
       if (!this.isValidVerificationCode) {
         this.error = 'Please enter a 6-digit verification code'
+        this.isSubmitting = false
         return
       }
 
@@ -226,14 +208,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.uc-form-body {
-  text-align: center;
-}
-
-.subtitle {
-  @include font-category('heading');
-}
-
 .verification {
   &__container {
     @include flex-container(row, flex-start, center);
@@ -253,65 +227,19 @@ export default {
     padding-top: 1em;
   }
 
-  &__sub-link {
-    cursor: pointer;
-    &:hover {
-      font-weight: 500;
-    }
-  }
-
   .verification-nav__button {
     text-align: left;
     margin-top: 1em;
     margin-left: 1em;
   }
 
-  &__back-button {
-    color: #417db1;
-    border-radius: 20px;
-    padding: 5px 15px;
-    cursor: pointer;
-
-    &:hover {
-      background: #f7fcfe;
-    }
-  }
-
   &__send-to {
     display: block;
     font-weight: 500;
   }
-
-  &__log-out-button {
-    margin-left: auto;
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-  &__field {
-    text-align: left;
-    width: 300px;
-    border-bottom: 3px solid $c-success-green;
-    padding: initial;
-  }
 }
 
-.uc-form-input--wide {
-  width: 300px;
-}
-
-.uc-form-button {
-  text-transform: initial;
-  background: darken($c-success-green, 5%);
-  color: $c-background-grey;
-  &:disabled {
-    background: $c-background-grey;
-    color: darken($c-success-green, 5%);
-  }
-}
-
-.error {
-  color: $c-error-red;
-  margin-bottom: 0;
+.uc-form-button-secondary {
+  margin-top: auto;
 }
 </style>

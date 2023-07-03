@@ -1,78 +1,88 @@
 <template>
   <form-page-template>
-    <form class="uc-form" aria-labelledby="loginFormHeader">
-      <nav class="uc-form-header" aria-label="Options">
-        <div class="uc-form-header-link--active" id="loginFormHeader">
-          Log In
-        </div>
-        <router-link to="/sign-up" class="uc-form-header-link"
-          >Sign Up</router-link
-        >
-      </nav>
+    <div class="uc-form">
+      <h1 class="uc-form-header">Hey, welcome back!</h1>
 
-      <div class="uc-form-body">
-        <div
-          v-if="error || $route.query['401'] === 'true'"
-          class="alert alert-danger"
-          role="alert"
-        >
-          {{ error }}
-        </div>
+      <div
+        v-if="error || $route.query['401'] === 'true'"
+        class="alert alert-danger"
+        role="alert"
+      >
+        {{ error }}
+      </div>
 
-        <div class="uc-column">
+      <form>
+        <div class="uc-form-element">
           <label for="inputEmail" class="uc-form-label">Email</label>
           <input
             id="inputEmail"
-            v-model="credentials.email"
+            class="uc-form-text-input"
             type="email"
-            class="uc-form-input"
+            placeholder="Enter your email address"
+            v-model="credentials.email"
             required
             autofocus
           />
         </div>
 
-        <div class="uc-column">
+        <div class="uc-form-element">
           <label for="inputPassword" class="uc-form-label">Password</label>
           <input
             id="inputPassword"
-            v-model="credentials.password"
+            class="uc-form-text-input"
             type="password"
-            class="uc-form-input"
+            placeholder="Enter your password"
+            v-model="credentials.password"
             required
           />
-          <router-link to="/resetpassword" class="uc-form-subtext">
-            Forgot password?
+          <router-link to="/resetpassword" class="uc-link subtext">
+            Forgot your password?
           </router-link>
         </div>
 
-        <button class="uc-form-button" type="submit" @click.prevent="submit">
-          Login
+        <button
+          class="uc-form-button"
+          type="submit"
+          @click.prevent="signIn"
+          :disabled="!isValidForm || isLoggingIn"
+        >
+          Sign In
         </button>
-      </div>
+      </form>
 
-      <form-footer v-if="!isMobileApp" />
-    </form>
+      <button
+        class="uc-form-button google"
+        @click.prevent="signInWithGoogle"
+        :disabled="isLoggingIn"
+      >
+        <google-logo></google-logo>
+        Sign In with Google
+      </button>
+      <p class="uc-form-text">
+        Need an account?
+        <router-link to="/sign-up" class="uc-link">Sign Up</router-link>
+      </p>
+    </div>
   </form-page-template>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import AnalyticsService from '@/services/AnalyticsService'
 import AuthService from '@/services/AuthService'
 import FormPageTemplate from '@/components/FormPageTemplate'
-import FormFooter from '@/components/FormFooter'
+import GoogleLogo from '@/assets/google_logo.svg'
+import { EVENTS } from '@/consts'
+import config from '../config'
 
 export default {
   components: {
     FormPageTemplate,
-    FormFooter,
+    GoogleLogo,
   },
   created() {
     this.$store.dispatch('app/hideNavigation')
   },
   computed: {
-    ...mapState({
-      isMobileApp: state => state.app.isMobileApp,
-    }),
     isValidForm() {
       const { email, password } = this.credentials
       return email && password
@@ -81,19 +91,29 @@ export default {
   data() {
     let error
     if (this.$route.query['401'] === 'true') {
-      error = 'Your session has expired. Please log in again'
+      error = 'Your session has expired. Please log in again.'
     }
+    if (this.$route.query['400'] === 'true') {
+      AnalyticsService.captureEvent(
+        EVENTS.USER_DOES_NOT_HAVE_LINKED_GOOGLE_ACCOUNT
+      )
+      error =
+        'Your Google account is not associated with this account. Please use your password instead.'
+    }
+    this.isLoggingIn = false
     return {
       credentials: {
         email: '',
         password: '',
       },
       error,
+      isLoggingIn: false,
     }
   },
   methods: {
-    submit() {
+    signIn() {
       if (!this.isValidForm) return
+      this.isLoggingIn = true
       AuthService.login(this, {
         email: this.credentials.email,
         password: this.credentials.password,
@@ -105,6 +125,16 @@ export default {
         .catch(() => {
           this.error = 'Oops! The email or password you entered is incorrect.'
         })
+        .finally(() => {
+          this.isLoggingIn = false
+        })
+    },
+    signInWithGoogle() {
+      this.isLoggingIn = true
+      AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_IN_WITH_GOOGLE)
+      const url = `${config.serverRoot}/auth/login/google`
+      window.location.replace(url)
+      this.isLoggingIn = false
     },
   },
 }
@@ -112,6 +142,14 @@ export default {
 
 <style lang="scss" scoped>
 .alert {
-  margin-bottom: 0;
+  margin: 25px 0;
+}
+
+.uc-form-text {
+  text-align: center;
+}
+
+.uc-link.subtext {
+  margin: 2px 0 0 10px;
 }
 </style>

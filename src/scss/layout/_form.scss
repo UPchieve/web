@@ -3,152 +3,245 @@
   $size: 500px;
 
   background: white;
-  font-size: 16px;
+  border-radius: 22px;
 
   width: 100%;
   max-width: $size;
   min-height: $size;
 
-  // NOTE: this is to override bootstrap
-  a {
-    color: #73737a;
+  padding: 45px 25px;
+
+  @include breakpoint-below('small') {
+    padding: 20px;
+  }
+
+  .alert {
+    margin: 25px 0;
   }
 }
 
 .uc-form-header {
-  @include flex-container(row, space-between);
-  padding: 25px;
-  padding-bottom: 0;
-}
+  font-size: 30px;
+  font-weight: 500;
+  margin: 0;
 
-.uc-form-header-link {
-  $className: &;
-
-  color: #73737a;
-  font-weight: 600;
-
-  &--active {
-    @extend #{$className};
-    color: $c-accent;
-  }
-}
-
-.uc-form-body {
-  @include flex-container(column);
-  @include child-spacing(top, 25px);
-
-  margin: auto 0;
-  padding: 50px;
-
-  @include breakpoint-below("medium") {
-    padding: 50px 20px;
-  }
-
-  &--center {
-    @include flex-container(column, center, center);
+  &.center {
     text-align: center;
   }
+}
 
-  h3 {
-    line-height: 1.3em;
+.uc-form-element {
+  @include flex-container(column);
+  margin-top: 16px;
+
+  &:first-child {
+    margin-top: 24px;
   }
+
+  label {
+    @include font-category(caption);
+    color: $c-secondary-grey;
+    font-weight: 400;
+    margin: 0 0 2px 4px;
+
+    &.error {
+      color: $c-error-red;
+    }
+  }
+
+  .error-caption {
+    @include font-category(caption);
+    color: $c-error-red;
+    font-weight: 400;
+    margin: 0 4px 2px 0;
+  }
+
+  .metadata {
+    color: $c-banned-grey;
+    font-size: 12px;
+    margin: 2px 0 0 4px;
+
+    &.error {
+      color: $c-error-red;
+    }
+  }
+
 }
 
 .uc-form-text {
-  @include breakpoint-above("small") {
-    padding: 0 25px;
+  font-size: 16px;
+  margin: 25px 0 0 0;
+
+  &.center {
+    text-align: center;
   }
 }
 
-.uc-form-label {
-  color: #343440;
-  font-weight: 400;
-  text-align: left;
-  margin: 0;
+.uc-link {
+  color: $c-information-blue;
+
+  &:hover {
+    color: $c-information-blue;
+    text-decoration: underline;
+  }
 }
 
-.uc-form-input {
+.uc-form-button {
+  background-color: $button-primary-bg;
   border: none;
-  border-bottom: 3px solid $c-accent;
-  border-radius: 0;
-  box-shadow: none;
-
-  box-sizing: content-box;
-  padding: 6px 12px;
-
-  height: 30px;
-
-  &:focus {
-    outline: none;
-    border-bottom: 3px solid darken($c-accent, 15%);
-  }
-
-  &--invalid {
-    border-bottom: 3px solid #BF0000;
-  }
-}
-
-.uc-form-select {
+  border-radius: 200px;
+  color: $button-primary-text;
+  font-size: 16px;
+  height: 48px;
+  margin-top: 40px;
   width: 100%;
-  margin: 5px 0 0;
 
-  &--invalid {
-    .vs__dropdown-toggle {
-      border-color: $c-error-red;
+  &:hover,
+  &:active {
+    background-color: $button-primary-bg-hover;
+  }
+
+  &:disabled {
+    background-color: $button-primary-bg-disabled;
+    color: $button-primary-text-disabled;
+  }
+
+  &-secondary {
+    background-color: $button-secondary-bg;
+    border: 1px solid $button-secondary-border;
+    border-radius: 200px;
+    color: $button-secondary-text;
+    font-size: 16px;
+    height: 48px;
+
+    &:hover,
+    &:active {
+      background-color: $button-secondary-bg-hover;
+      border-color: $button-secondary-border-hover;
+    }
+  }
+
+  &.google {
+    background-color: #fff;
+    border: 1px solid $c-border-grey;
+    border-radius: 200px;
+    color: $c-secondary-grey;
+    height: 48px;
+    margin-top: 16px;
+
+    &:hover,
+    &:active {
+      border-color: $c-information-blue;
+    }
+
+    &:disabled {
+      background-color: $button-primary-bg-disabled;
+      color: $button-primary-text-disabled;
+      border-color: $button-primary-bg-disabled;
+
+      svg {
+        opacity: 0.07;
+      }
     }
   }
 }
 
-.uc-form-subtext {
-  color: #73737a;
-  font-size: 12px;
-  margin: 6px 0 0 0;
-  text-align: left;
-}
+// Styles for text inputs.
+.uc-form-text-input {
+  border: 1px solid $border-grey;
+  border-radius: 4px;
+  box-shadow: none;
+  box-sizing: border-box;
+  padding: 15px 13px;
 
-.uc-form-button {
-  background-color: #f6f6f6;
-  border: none;
-  border-radius: 20px;
-  color: $c-accent;
-
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-
-  min-height: 40px;
-
-  &:hover,
-  &:active {
-    color: white;
-    background-color: $c-accent;
+  &:focus {
+    outline: 1px solid $c-information-blue;
   }
 
-  &:disabled {
-    background-color: #f6f6f6;
-    color: $c-secondary-grey;
+  &-invalid {
+    outline: 1px solid $c-error-red;
+  }
+
+  &::placeholder {
+    color: $c-banned-grey;
   }
 }
 
-.uc-form-button-big {
-  font-size: 14px;
-  background-color: $c-background-grey;
-  border: none;
-  border-radius: 50px;
-  color: $c-soft-black;
-  padding: 13px 32px;
-  font-weight: 500;
-  min-width: 250px;
+// Override v-select component styles.
+.v-select.uc-form-select-input {
+  box-sizing: border-box;
+  width: 100%;
 
-  &:hover,
-  &:active {
-    color: white;
-    background-color: $c-accent;
+  .vs__search {
+    margin: 0;
+    padding: 0;
+
+    &::placeholder {
+      color: $c-banned-grey;
+    }
   }
 
-  &:disabled {
-    background-color: #f6f6f6;
-    color: $c-secondary-grey;
+  &:hover {
+    .vs__dropdown-option {
+      background-color: #fff;
+    }
+  }
+
+  .vs__selected-options {
+    padding: 0;
+  }
+
+  .vs__selected {
+    margin: 0;
+    padding: 0;
+  }
+
+  &-invalid {
+    .vs__dropdown-toggle {
+      outline: 1px solid $c-error-red;
+    }
+  }
+
+  .vs__dropdown-toggle {
+    border: 1px solid $border-grey;
+    border-radius: 4px;
+    box-shadow: none;
+    height: 56px;
+    padding: 15px 13px;
+    width: 100%;
+  }
+
+  .vs__dropdown-toggle[aria-expanded='true'] {
+    outline: 1px solid $c-information-blue;
+  }
+
+  .vs__dropdown-menu {
+    background: #fff;
+    border: solid 1px #ccc;
+    border-top: none;
+    border-radius: 5px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    font-size: 14px;
+    list-style: none;
+    padding: 0;
+    margin-top: 2px;
+    max-height: 180px;
+    overflow: auto;
+    width: 100%;
+  }
+
+  .vs__dropdown-option {
+    color: #000;
+    cursor: pointer;
+    padding: 10px 12px;
+    width: 100%;
+
+    &:hover,
+    &:focus {
+      background: #eee;
+      color: #000;
+    }
   }
 }
 
@@ -197,9 +290,123 @@
     text-align: left;
 
     a {
-      color: $c-accent;
+      color: $c-information-blue;
     }
   }
+}
+
+// Override autocomplete component styles.
+.uc-form-autocomplete-input {
+  width: 100%;
+
+  &-input {
+    border: 1px solid $border-grey;
+    border-radius: 4px;
+    box-shadow: none;
+    padding: 15px 13px;
+    width: 100%;
+
+    &::placeholder {
+      color: $c-banned-grey;
+    }
+
+    &:focus-within {
+      outline: 1px solid $c-information-blue;
+    }
+  }
+
+  &-invalid .uc-form-autocomplete-input-input {
+    outline: 1px solid $c-error-red;
+  }
+
+  &-result-list {
+    background: #fff;
+    border: solid 1px #ccc;
+    border-top: none;
+    border-radius: 5px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    font-size: 14px;
+    list-style: none;
+    padding: 0;
+    margin-top: 1px;
+    max-height: 180px;
+    overflow: auto;
+    width: 100%;
+  }
+
+  [data-position='above'] .autocomplete-result-list {
+    border: solid 1px #ccc;
+    border-bottom: none;
+    border-radius: 5px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-bottom: 1px;
+    margin-top: 0;
+  }
+
+  .result {
+    cursor: pointer;
+    padding: 10px 12px;
+    width: 100%;
+
+    &:hover,
+    &:focus {
+      background: #eee;
+    }
+  }
+}
+
+
+// OLD STYLES
+.uc-form-input {
+  border: none;
+  border-bottom: 3px solid $c-accent;
+  border-radius: 0;
+  box-shadow: none;
+
+  box-sizing: content-box;
+  padding: 6px 12px;
+
+  height: 30px;
+
+  &:focus {
+    outline: none;
+    border-bottom: 3px solid darken($c-accent, 15%);
+  }
+
+  &--invalid {
+    border-bottom: 3px solid #BF0000;
+  }
+}
+
+.uc-form-button-big {
+  font-size: 14px;
+  background-color: $c-background-grey;
+  border: none;
+  border-radius: 50px;
+  color: $c-soft-black;
+  padding: 13px 32px;
+  font-weight: 500;
+  min-width: 250px;
+
+  &:hover,
+  &:active {
+    color: white;
+    background-color: $c-accent;
+  }
+
+  &:disabled {
+    background-color: #f6f6f6;
+    color: $c-secondary-grey;
+  }
+}
+
+.uc-form-subtext {
+  color: #73737a;
+  font-size: 12px;
+  margin: 6px 0 0 0;
+  text-align: left;
 }
 
 .uc-autocomplete {
@@ -250,5 +457,17 @@
     &[aria-selected=true] {
       background: #eee;
     }
+  }
+}
+
+.uc-form-header-link {
+  $className: &;
+
+  color: #73737a;
+  font-weight: 600;
+
+  &--active {
+    @extend #{$className};
+    color: $c-accent;
   }
 }

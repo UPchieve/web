@@ -1,8 +1,36 @@
 .uc-column {
   @include flex-container(column);
   align-self: stretch;
+
+  &.justify-between {
+    justify-content: space-between;
+  }
+
+  &.justify-center {
+    justify-content: center;
+  }
+
+  &.items-center {
+    align-items: center;
+  }
 }
 
 .uc-row {
   @include flex-container(row);
+
+  &.justify-between {
+    justify-content: space-between;
+  }
+
+  &.items-center {
+    align-items: center;
+  }
+}
+
+.w-full {
+  width: 100%;
+}
+
+.h-full {
+  height: 100%;
 }

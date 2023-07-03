@@ -8,16 +8,15 @@ $font-weight-medium: 500;
 /// @requires {function} $validate-map-key
 /// @param {string} $category - Scale category
 @mixin font-category($category) {
-  $categories: (
-    // category-name: (font-size, font-weight, line-height)
+  $categories: ( // category-name: (font-size, font-weight, line-height)
     'display-large': (40px, $font-weight-medium, 1.25),
     'display-small': (24px, $font-weight-medium, 1.25),
     'heading': (18px, $font-weight-regular, 1.25),
     'subheading': (16px, $font-weight-medium, 1.25),
     'body': (16px, $font-weight-regular, 1.5),
     'helper-text': (14px, $font-weight-regular, 1.5),
-    'button': (16px, $font-weight-medium, 1.25)
-  );
+    'button': (16px, $font-weight-medium, 1.25),
+    'caption': (12px, $font-weight-medium, 1.25));
 
   // Validate category and get list
   $list: validate-map-key($categories, $category);

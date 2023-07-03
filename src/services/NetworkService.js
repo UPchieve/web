@@ -554,14 +554,7 @@ export default {
   },
   checkStudentEligibility(
     context,
-    {
-      schoolUpchieveId,
-      zipCode,
-      email,
-      referredByCode,
-      currentGrade,
-      useNewSchoolsEligibility,
-    }
+    { schoolUpchieveId, zipCode, email, referredByCode, currentGrade }
   ) {
     return context.$http
       .post(`${ELIGIBILITY_API_ROOT}/check`, {
@@ -570,7 +563,6 @@ export default {
         email,
         referredByCode,
         currentGrade,
-        useNewSchoolsEligibility,
       })
       .then(this._successHandler, this._errorHandler)
   },

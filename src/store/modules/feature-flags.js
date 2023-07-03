@@ -66,6 +66,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.UPDATED_AUTO_FLOW_QUIZ_UX]: false,
       // This is an experiment, using multivariant feature flag values
       [POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS_AND_LEVEL_SYSTEM]: '',
+      [POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO]: false,
     },
   },
   mutations: {
@@ -154,5 +155,7 @@ export default {
       state.flags[
         POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS_AND_LEVEL_SYSTEM
       ] === POSTHOG_FEATURE_FLAGS.LEVEL_SYSTEM,
+    offerGoogleSSO: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO],
   },
 }
