@@ -1,15 +1,11 @@
 <template>
   <form-page-template>
     <div class="uc-form">
-      <div class="uc-form-body">
-        <div class="title">You're logged out!</div>
+      <h1 class="title">You're logged out!</h1>
 
-        <router-link to="/login" class="uc-form-button" tag="button">
-          Login
-        </router-link>
-      </div>
-
-      <form-footer v-if="!isMobileApp" />
+      <router-link to="/login" class="uc-form-button" tag="button">
+        Login
+      </router-link>
     </div>
   </form-page-template>
 </template>
@@ -17,13 +13,11 @@
 <script>
 import { mapState } from 'vuex'
 import FormPageTemplate from '@/components/FormPageTemplate'
-import FormFooter from '@/components/FormFooter'
 import config from '../config'
 
 export default {
   components: {
     FormPageTemplate,
-    FormFooter,
   },
   created() {
     this.$store.dispatch('app/hideNavigation')
@@ -42,6 +36,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.uc-form {
+  @include flex-container(column, center, center);
+}
+
 .title {
   color: black;
   font-size: 24px;

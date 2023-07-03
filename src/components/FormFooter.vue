@@ -28,6 +28,7 @@ export default {}
 
   min-height: 100px;
   margin-top: auto;
+  width: 100%;
 
   a {
     color: #73737a;

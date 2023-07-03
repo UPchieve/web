@@ -1,38 +1,27 @@
 <template>
   <form-page-template>
-    <form class="uc-form">
-      <div class="uc-form-header">
-        <div class="uc-form-header-link--active">Reset Your Password</div>
+    <div class="uc-form">
+      <h1 class="uc-form-header">Reset Your Password</h1>
+      <p v-if="!error && !msg" class="uc-form-text">
+        Enter the email associated with your account and we'll email
+        instructions to reset your password.
+      </p>
 
-        <div class="link-container link-container--end" v-if="user">
-          <router-link to="/" class="uc-form-header-link">
-            Home
-          </router-link>
-        </div>
-
-        <div class="link-container" v-else>
-          <router-link to="/login" class="uc-form-header-link">
-            Log In
-          </router-link>
-          <span>/</span>
-          <router-link to="/sign-up" class="uc-form-header-link">
-            Sign Up
-          </router-link>
-        </div>
+      <div v-if="error" class="alert alert-danger" role="alert">
+        {{ error }}
       </div>
 
-      <div v-if="msg" class="message">{{ msg }}</div>
+      <div v-if="msg" class="uc-form-text message">{{ msg }}</div>
 
-      <div v-else class="uc-form-body">
-        <div class="uc-column">
-          <label for="inputEmail" class="uc-form-label"
-            >Please enter your email address</label
-          >
+      <form v-else>
+        <div class="uc-form-element">
+          <label for="inputEmail" class="uc-form-label">Email</label>
           <input
             id="inputEmail"
-            v-model="email"
+            class="uc-form-text-input"
             type="email"
-            class="uc-form-input"
+            placeholder="Enter your email address"
+            v-model="email"
             required
             autofocus
           />
@@ -44,20 +33,20 @@
           @click.prevent="submit()"
           :disabled="isSendingEmail"
         >
-          Enter
+          Send
         </button>
+      </form>
 
-        <loader v-if="isSendingEmail" overlay />
-
-        <p v-if="error" class="error">{{ error }}</p>
-      </div>
-    </form>
+      <loader v-if="isSendingEmail" overlay />
+      <p v-if="!error && !msg" class="uc-form-text">
+        Remember your password?
+        <router-link to="/login" class="uc-link">Log In</router-link>
+      </p>
+    </div>
   </form-page-template>
 </template>
 
 <script>
-import { mapState } from 'vuex'
-
 import AuthService from '@/services/AuthService'
 import FormPageTemplate from '@/components/FormPageTemplate'
 import Loader from '@/components/Loader'
@@ -79,11 +68,6 @@ export default {
       isSendingEmail: false,
     }
   },
-  computed: {
-    ...mapState({
-      user: state => state.user.user,
-    }),
-  },
   methods: {
     submit() {
       this.isSendingEmail = true
@@ -103,30 +87,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.uc-form {
-  position: relative;
-}
+.uc-form-text {
+  text-align: center;
 
-.link-container {
-  @include flex-container(row, space-evenly);
-  min-width: 150px;
-
-  &--end {
-    justify-content: flex-end;
+  &.message {
+    margin-top: 40%;
   }
-}
-
-@include breakpoint-below('tiny') {
-  .uc-form-header {
-    @include flex-container(column, center, center);
-  }
-}
-
-.message {
-  margin-top: 40%;
-}
-
-.error {
-  color: $c-error-red;
 }
 </style>

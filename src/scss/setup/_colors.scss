@@ -48,14 +48,12 @@ $c-active-heart: #F41717;
 
 // Override default bootstrap variables
 $success: $c-success-green;
-$theme-colors: () !default;
-$theme-colors: map-merge(
-  (
-    'primary': #16D2AA,
-    'warning': #FF8C5F,
-    'danger': #F44747
-  ),
-  $theme-colors
+$theme-colors: (
+  ) !default;
+$theme-colors: map-merge(('primary': #16D2AA,
+      'warning': #FF8C5F,
+      'danger': #F44747),
+    $theme-colors
 );
 
 // New design colors
@@ -67,3 +65,15 @@ $border-grey: #D8DEE5;
 $light-blue-background: #F1F8FE;
 $step-blue: #1855D166;
 $icon-grey: #676879;
+
+$button-primary-bg: $c-information-blue;
+$button-primary-bg-hover: #103A90;
+$button-primary-bg-disabled: $c-background-grey;
+$button-primary-text: #FFF;
+$button-primary-text-disabled: #8B939F;
+
+$button-secondary-bg: white;
+$button-secondary-bg-hover: #1855D11A;
+$button-secondary-text: #343440;
+$button-secondary-border: #D8DEE5;
+$button-secondary-border-hover: $c-information-blue;

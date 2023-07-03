@@ -1,87 +1,71 @@
 <template>
   <form-page-template>
     <div class="uc-form">
-      <nav class="uc-form-header" aria-label="Other options">
-        <router-link
-          to="/login"
-          class="uc-form-header-link"
-          v-if="!isReferred && isLoginLinkVisible"
-          >Log In</router-link
-        >
-      </nav>
-
       <volunteer-form v-if="this.userSelection === 'volunteer'" />
-      <student-form
-        v-else-if="this.userSelection === 'student'"
-        @hideLoginLink="hideLoginLink"
-      />
-      <div v-else class="uc-form-body uc-form-body--center">
-        <div>
-          <h3>
-            {{ welcomeMessage }}
-          </h3>
-          <p v-if="isReferred" class="uc-form-text uc-form-text--referred">
-            UPchieve is a nonprofit that provides <b>100% free</b> online
-            tutoring and college counseling, available 24/7! Since
-            {{ firstName }} invited you, you can skip our wait list!
-          </p>
-          <p v-else class="uc-form-text">
-            We are a nonprofit that provides free, online tutoring and college
-            counseling to eligible high school students.
-          </p>
+      <student-form v-else-if="this.userSelection === 'student'" />
+
+      <div v-else>
+        <h1 class="uc-form-header">{{ welcomeMessage }}</h1>
+        <p v-if="isReferred" class="uc-form-text">
+          UPchieve is a nonprofit that provides <b>100% free</b> online tutoring
+          and college counseling, available 24/7! Since {{ firstName }} invited
+          you, you can skip our wait list!
+        </p>
+        <p v-else class="uc-form-text">
+          We are a nonprofit that provides free, online tutoring and college
+          counseling to eligible middle and high school students.
+        </p>
+
+        <div v-if="isReferred">
+          <button
+            class="uc-form-button"
+            type="submit"
+            @click.prevent="selectStudent()"
+          >
+            Awesome! I'm ready to sign up
+          </button>
+
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            class="uc-form-button-big uc-form-button--link uc-form-button--referral"
+            href="https://upchieve.org/students"
+            >Tell me more about UPchieve first
+          </a>
         </div>
-        <nav class="btn-container" aria-labelledby="signupMenuSubheader">
-          <h4 class="uc-subheader" id="signupMenuSubheader" v-if="!isReferred">
-            How can we help you?
-          </h4>
-          <div v-if="isReferred">
-            <button
-              class="uc-form-button-big uc-form-button--referral"
-              type="submit"
-              @click.prevent="selectStudent()"
-            >
-              Awesome! I'm ready to sign up
+        <div v-else>
+          <p class="uc-form-text bold">I want to sign up as...</p>
+          <div class="btn-card-container">
+            <button class="btn-card student" @click.prevent="selectStudent">
+              <div class="img-container">
+                <student-avatar class="img"></student-avatar>
+              </div>
+              <p class="text">A Student</p>
             </button>
-
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              class="uc-form-button-big uc-form-button--link uc-form-button--referral"
-              href="https://upchieve.org/students"
-              >Tell me more about UPchieve first
-            </a>
-          </div>
-          <div v-else>
-            <button
-              class="uc-form-button-big"
-              type="submit"
-              @click.prevent="selectStudent()"
-            >
-              I need an Academic Coach
-            </button>
-
-            <button
-              class="uc-form-button-big"
-              type="submit"
-              @click.prevent="selectVolunteer()"
-            >
-              I’d like to become an Academic Coach
+            <button class="btn-card volunteer" @click.prevent="selectVolunteer">
+              <div class="img-container">
+                <volunteer-avatar class="img"></volunteer-avatar>
+              </div>
+              <p class="text">An Academic Coach</p>
             </button>
           </div>
-        </nav>
+        </div>
+        <p class="uc-form-text">
+          Already have an account?
+          <router-link class="uc-link" to="/login">Log In</router-link>
+        </p>
       </div>
-      <form-footer v-if="!isMobileApp" />
     </div>
   </form-page-template>
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import FormPageTemplate from '@/components/FormPageTemplate'
 import StudentForm from './StudentForm'
 import VolunteerForm from './VolunteerForm'
-import FormFooter from '@/components/FormFooter'
 import NetworkService from '@/services/NetworkService'
+import StudentAvatar from '@/assets/student-avatar.svg'
+import VolunteerAvatar from '@/assets/volunteer-avatar.svg'
 import { capitalize } from 'lodash'
 
 export default {
@@ -90,19 +74,20 @@ export default {
     FormPageTemplate,
     StudentForm,
     VolunteerForm,
-    FormFooter,
+    StudentAvatar,
+    VolunteerAvatar,
   },
   data() {
     return {
       userSelection: null,
       isReferred: false,
       referredBy: {},
-      isLoginLinkVisible: true,
     }
   },
 
   async created() {
     this.$store.dispatch('app/hideNavigation')
+
     const referralCode = this.$route.query.referral
     if (referralCode) {
       window.localStorage.setItem('upcReferredByCode', referralCode)
@@ -119,15 +104,12 @@ export default {
     }
 
     if (this.$route.params)
-      if (this.isMobileApp || this.$route.params.userType === 'student')
+      if (this.$route.params.userType === 'student')
         this.userSelection = 'student'
       else if (this.$route.params.userType === 'volunteer')
         this.userSelection = 'volunteer'
   },
   computed: {
-    ...mapState({
-      isMobileApp: state => state.app.isMobileApp,
-    }),
     welcomeMessage() {
       if (this.isReferred && this.referredBy)
         return `${this.firstName} invited you to UPchieve!`
@@ -150,51 +132,93 @@ export default {
       this.$router.push('/sign-up/student')
       this.userSelection = 'student'
     },
-    hideLoginLink() {
-      this.isLoginLinkVisible = false
-    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
 .uc-form-header {
-  flex-direction: row-reverse;
+  display: block;
+  font-size: 36px;
+  text-align: center;
 }
 
-.uc-subheader {
-  color: $c-secondary-grey;
-  font-weight: 600;
-}
+.uc-form-text {
+  margin-top: 25px;
+  text-align: center;
 
-.uc-form-body {
-  .uc-column {
-    margin-top: 25px;
+  &.bold {
+    font-weight: 500;
   }
 }
 
-.btn-container {
-  margin-bottom: 25px;
-  button:first-of-type {
-    margin: 15px 0 15px;
+.btn-card-container {
+  @include flex-container(row, space-evenly);
+  margin: 40px 0;
+
+  @include breakpoint-below('small') {
+    @include flex-container(column, center, center);
+    @include child-spacing(top, 15px);
+    margin: 20px 0;
   }
 }
 
-.uc-form-text--referred {
-  margin-top: 2em;
-}
-
-.uc-form-button--referral {
-  width: 300px;
-}
-
-.uc-form-button--link {
-  display: inline-block;
-  color: $c-soft-black;
+.btn-card {
+  @include flex-container(column, space-between);
+  background: white;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.2);
+  height: 160px;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
+  top: 0;
+  transition: top 0.2s ease-in-out;
+  width: 170px;
 
   &:hover {
-    color: #fff;
-    text-decoration: none;
+    top: -5px;
+  }
+
+  &.volunteer {
+    .img-container {
+      background: #a5e9ff;
+
+      .img {
+        height: 85%;
+        top: 8px;
+      }
+    }
+  }
+
+  &.student {
+    .img-container {
+      background: #f9bef9;
+    }
+  }
+
+  .img-container {
+    flex-grow: 1;
+    position: relative;
+    width: 100%;
+
+    .img {
+      height: 100%;
+      left: 0;
+      position: absolute;
+      top: 0;
+      width: 100%;
+    }
+  }
+
+  .text {
+    background: white;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px;
+    margin: 0;
+    width: 100%;
   }
 }
 </style>
