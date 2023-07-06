@@ -422,6 +422,12 @@
           </ul>
 
           <p>
+            We also collect your name and email address when you log in to our
+            site using Google SSO, which helps us to create and manage your
+            account, offering a more seamless user experience.
+          </p>
+
+          <p>
             Because we care about your privacy, there are several things we
             promise we will never do:
           </p>
@@ -450,6 +456,12 @@
             </li>
             <li>
               <strong>Full name</strong>
+            </li>
+            <li>
+              <strong
+                >Name and email address (when using Google SSO for
+                sign-in)</strong
+              >
             </li>
             <li>
               <strong>Birthdate</strong>
@@ -519,12 +531,22 @@
             data protection and privacy laws may be less stringent than the laws
             of the originating country.
           </p>
+
+          <p>
+            We also collect your personal information when you choose to log in
+            to our site using Google SSO, a third-party service. When using
+            Google SSO, you share with us certain information provided by
+            Google, which currently includes your name and email address. Please
+            note that the privacy policies of Google also apply.
+          </p>
         </accordion-item>
 
-        <accordion-item label="Opting Out of Communiations">
+        <accordion-item label="Opting Out of Communications">
           <p>
             With your consent, from time to time we will communicate with you
-            concerning our Services, including requests for future support. To
+            concerning our Services, including requests for future support. By
+            using Google SSO to log into our site, you give us consent to use
+            your name and email for communications related to our Services. To
             opt-out of receiving these communications, you may click on the
             “unsubscribe” link in any email communications.
           </p>
@@ -566,7 +588,10 @@
               to respond to your message. Members of UPchieve’s Operations team
               may access specific information connected with your account for
               purposes such as screening chat logs or consolidating information
-              to provide to the partner organization that referred you (if any)
+              to provide to the partner organization that referred you (if any).
+              Information collected through Google SSO, such as your name and
+              email, may also be accessed by certain UPchieve staff members for
+              account management and user support purposes.
             </li>
 
             <li>
@@ -629,7 +654,11 @@
             If we have reason to believe that disclosing your personal
             information is required by law, is reasonable to protect someone
             from possible injury, or is required as part of an internal or
-            external legal investigation, we may do so.
+            external legal investigation, we may do so. This includes
+            information collected through Google SSO. We will not share your
+            name or email address obtained via Google SSO with any third
+            parties, except as required by law or to protect our rights,
+            property, or safety, as well as those of our users or the public.
           </p>
         </accordion-item>
 
@@ -675,11 +704,16 @@
                 details about Posthog, please see https://www.posthog.com. We
                 use a service called Gleap to handle user error reports. We use
                 a service called NewRelic to track errors and performance of our
-                applications. Both use cookies on our site. For all of the above
-                services, the only people with access to data are our staff
-                members. While the data is sent to a third party to process,
-                they are not allowed to view any of the data coming from our
-                system.
+                applications. Both use cookies on our site. We also use Google
+                SSO as a part of our services, which utilizes cookies for its
+                operation. For details about how Google uses cookies, please see
+                their
+                <a href="https://policies.google.com/technologies/cookies">
+                  Cookie Policy</a
+                >. For all of the above services, the only people with access to
+                data are our staff members. While the data is sent to a third
+                party to process, they are not allowed to view any of the data
+                coming from our system.
               </p>
             </li>
             <li>
