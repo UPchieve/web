@@ -254,6 +254,26 @@
       <router-link class="uc-link" to="/login">Log In</router-link>
     </p>
 
+    <div v-if="offerGoogleSSO">
+      <button
+        class="uc-form-button google"
+        @click.prevent="signUpWithGoogle"
+        :disabled="isSubmittingAccountForm"
+      >
+        <google-logo />
+        Sign Up with Google
+      </button>
+      <p class="terms-text">
+        By clicking the button above, you agree to our
+        <a href="/legal" target="_blank" class="uc-link">User Agreement</a>.
+      </p>
+      <div class="uc-row items-center w-full break-line-container">
+        <span class="break-line w-full"></span>
+        <p class="or-text">or</p>
+        <span class="break-line w-full"></span>
+      </div>
+    </div>
+
     <form
       aria-label="Create student account"
       @submit.prevent="submitAccountForm()"
@@ -379,27 +399,6 @@
         <a href="/legal" target="_blank" class="uc-link">User Agreement</a>.
       </p>
     </form>
-
-    <div v-if="offerGoogleSSO">
-      <div class="uc-row items-center w-full break-line-container">
-        <span class="break-line w-full"></span>
-        <p class="or-text">or</p>
-        <span class="break-line w-full"></span>
-      </div>
-      <button
-        class="uc-form-button google"
-        @click.prevent="signUpWithGoogle"
-        :disabled="isSubmittingAccountForm"
-      >
-        <google-logo />
-        Sign Up with Google
-      </button>
-      <p class="terms-text">
-        By clicking the button above, you agree to be 13 years of age or older
-        and agree to our
-        <a href="/legal" target="_blank" class="uc-link">User Agreement</a>.
-      </p>
-    </div>
   </div>
 
   <div
