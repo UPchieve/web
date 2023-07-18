@@ -1,50 +1,59 @@
 <template>
   <form-page-template>
-    <form class="uc-form">
-      <div class="uc-form-header">Reset Your Password</div>
-      <div v-if="isValidResetToken && !showSuccess" class="uc-form-body">
-        <div class="uc-column">
-          <label for="inputEmail" class="uc-form-label">
-            Please enter your email address
-          </label>
+    <div class="uc-form">
+      <h1 class="uc-form-header">Reset Your Password</h1>
+      <div
+        v-if="msg"
+        class="alert alert-danger"
+        role="alert"
+      >
+        {{ msg }}
+      </div>
+
+      <form v-if="!showSuccess">
+        <div class="uc-form-element">
+          <label for="email">Email</label>
           <input
-            id="inputEmail"
+            id="email"
+            class="uc-form-text-input"
             type="email"
-            class="uc-form-input"
+            placeholder="Enter your email address"
             v-model="credentials.email"
             required
             autofocus
           />
         </div>
 
-        <div class="uc-column">
-          <label for="inputPassword" class="uc-form-label">
-            Create a new password
+        <div class="uc-form-element">
+          <label for="password">
+            Password
           </label>
           <input
-            id="inputPassword"
+            id="password"
+            class="uc-form-text-input"
             type="password"
-            class="uc-form-input"
+            placeholder="Create a new password"
             v-model="credentials.password"
             required
           />
+          <div class="metadata">
+            Must have at least one number, one uppercase letter, one lowercase
+            letter, and be at least 8 characters long.
+          </div>
         </div>
 
-        <div class="uc-column">
-          <label for="inputPassword" class="uc-form-label">
-            Re-enter your new password
+        <div class="uc-form-element">
+          <label for="re-enter-password">
+            Re-enter Password
           </label>
           <input
-            id="inputPassword"
+            id="re-enter-password"
+            class="uc-form-text-input"
             type="password"
-            class="uc-form-input"
+            placeholder="Re-enter your new password"
             v-model="credentials.newpassword"
             required
           />
-          <p class="uc-form-subtext">
-            It must contain lowercase and uppercase letters, numbers, and at
-            least 8 characters.
-          </p>
         </div>
 
         <button class="uc-form-button" type="submit" @click.prevent="submit()">
@@ -52,17 +61,13 @@
         </button>
 
         <loader v-if="isResettingPassword" overlay />
+      </form>
 
-        <div v-if="msg">{{ msg }}</div>
-      </div>
       <div v-else-if="showSuccess" class="success-message">
         <p>Your password has been successfully reset!</p>
         <large-button primary routeTo="/">{{ redirectText }}</large-button>
       </div>
-      <div v-else class="uc-form-body">
-        <p>{{ msg }}</p>
-      </div>
-    </form>
+    </div>
   </form-page-template>
 </template>
 
@@ -96,7 +101,6 @@ export default {
         password: '',
         newpassword: '',
       },
-      isValidResetToken: true,
       isResettingPassword: false,
       showSuccess: false,
     }
@@ -136,20 +140,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.uc-form {
-  position: relative;
-}
-
-.uc-form-header {
-  font-size: 24px;
-  font-weight: bold;
-  justify-content: center;
-
-  &-link--success {
-    color: $c-success-green;
-  }
-}
-
 .success-message {
   @include flex-container(column, center, center);
   margin: auto 0;

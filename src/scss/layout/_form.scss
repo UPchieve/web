@@ -15,9 +15,14 @@
     padding: 20px;
   }
 
+  @include breakpoint-below('tiny') {
+    border-radius: 0px;
+  }
+
   .alert {
     margin: 25px 0;
   }
+
 }
 
 .uc-form-header {
@@ -36,6 +41,10 @@
 
   &:first-child {
     margin-top: 24px;
+
+    @include breakpoint-below('tiny') {
+      margin-top: 12px;
+    }
   }
 
   label {
@@ -95,6 +104,10 @@
   height: 48px;
   margin-top: 40px;
   width: 100%;
+
+  @include breakpoint-below('tiny') {
+    margin-top: 20px;
+  }
 
   &:hover,
   &:active {
