@@ -21,7 +21,10 @@
       </div>
     </div>
 
-    <level-system v-if="isLevelSystemActive" class="level-system" />
+    <level-system-removal-modal
+      v-if="isLevelSystemRemovalModalActive"
+      class="level-system"
+    />
     <subject-selection />
     <first-session-congrats-modal
       v-if="showFirstSessionCongratsModal"
@@ -36,9 +39,10 @@ import DashboardBanner from '../DashboardBanner'
 import SubjectSelection from './SubjectSelection'
 import FirstSessionCongratsModal from './FirstSessionCongratsModal'
 import moment from 'moment-timezone'
-import LevelSystem from '@/components/LevelSystem'
+import LevelSystemRemovalModal from './LevelSystemRemovalModal'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
+import getCookie from '@/utils/get-cookie'
 
 const defaultHeaderData = {
   component: 'DefaultHeader',
@@ -62,7 +66,7 @@ export default {
     DashboardBanner,
     SubjectSelection,
     FirstSessionCongratsModal,
-    LevelSystem,
+    LevelSystemRemovalModal,
   },
   created() {
     if (this.isEarnCertificationsActive)
@@ -139,6 +143,12 @@ export default {
         this.user.pastSessions.length === 1 &&
         !localStorage.getItem('viewedFirstSessionCongratsModal')
       )
+    },
+    isLevelSystemRemovalModalActive() {
+      const seenLevelSystemRemovalModal = getCookie(
+        'hasSeenLevelSystemRemovalModal'
+      )
+      return this.isLevelSystemActive && !seenLevelSystemRemovalModal
     },
   },
   methods: {
