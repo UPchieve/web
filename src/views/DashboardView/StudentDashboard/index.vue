@@ -85,6 +85,18 @@ export default {
       })
     }
 
+    if (localStorage.getItem('isSSOSignUpRedirect')) {
+      AnalyticsService.captureEvent(EVENTS.ACCOUNT_CREATED)
+      AnalyticsService.captureEvent(EVENTS.ACCOUNT_VERIFIED)
+      localStorage.removeItem('isSSOSignUpRedirect')
+      this.$store.dispatch('app/modal/show', {
+        component: 'StudentOnboardingModal',
+        data: {
+          showTemplateButtons: false,
+        },
+      })
+    }
+
     if (this.isReferFriendsActive && this.hasSeenFirstSessionCongratsModal)
       this.toggleFirstSessionCongratsModal()
 
@@ -102,6 +114,7 @@ export default {
     ...mapState({
       user: state => state.user.user,
       isFirstDashboardVisit: state => state.user.isFirstDashboardVisit,
+      isSSOSignUpRedirect: state => state.user.isSSOSignUpRedirect,
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',

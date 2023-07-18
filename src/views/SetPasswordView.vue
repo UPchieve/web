@@ -2,11 +2,7 @@
   <form-page-template>
     <div class="uc-form">
       <h1 class="uc-form-header">Reset Your Password</h1>
-      <div
-        v-if="msg"
-        class="alert alert-danger"
-        role="alert"
-      >
+      <div v-if="msg" class="alert alert-danger" role="alert">
         {{ msg }}
       </div>
 

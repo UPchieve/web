@@ -538,6 +538,7 @@ export default {
           'Failed to sign up with Google. Please use password instead.'
       )
       this.step = 'account'
+      localStorage.setItem('isSSOSignUpRedirect', false)
     } else if (this.isReferred) this.step = 'referred'
     else this.eligibilityPage()
 
@@ -820,6 +821,7 @@ export default {
     },
     signUpWithGoogle() {
       AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_UP_WITH_GOOGLE)
+      localStorage.setItem('isSSOSignUpRedirect', true)
       const data = {
         email: this.eligibility.email,
         highSchoolId: this.eligibility.highSchool.upchieveId,
