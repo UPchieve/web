@@ -1,6 +1,7 @@
 import Validator from 'validator'
 import errorFromHttpResponse from '../utils/error-from-http-response'
 import AnalyticsService from './AnalyticsService'
+import ProductDiscoveryService from './ProductDiscoveryService'
 import NetworkService from './NetworkService'
 
 export default {
@@ -152,6 +153,7 @@ export default {
         })
         .finally(() => {
           AnalyticsService.reset()
+          ProductDiscoveryService.reset()
 
           // disconnect socket
           context.$socket.disconnect()

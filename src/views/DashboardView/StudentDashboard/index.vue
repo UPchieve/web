@@ -41,6 +41,7 @@ import FirstSessionCongratsModal from './FirstSessionCongratsModal'
 import moment from 'moment-timezone'
 import LevelSystemRemovalModal from './LevelSystemRemovalModal'
 import AnalyticsService from '@/services/AnalyticsService'
+import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 import { EVENTS } from '@/consts'
 import getCookie from '@/utils/get-cookie'
 
@@ -92,6 +93,9 @@ export default {
     if (this.isReferFriendsActive && this.hasSeenFirstSessionCongratsModal)
       this.toggleFirstSessionCongratsModal()
 
+    if (this.isOrbitalSegmentActive)
+      ProductDiscoveryService.trigger('RMKBxdsZBgWb')
+
     this.currentHour = moment()
       .tz('America/New_York')
       .hour()
@@ -113,6 +117,7 @@ export default {
       isDowntimeBannerActive: 'featureFlags/isDowntimeBannerActive',
       isEarnCertificationsActive: 'featureFlags/isEarnCertificationsActive',
       isLevelSystemActive: 'featureFlags/isLevelSystemActive',
+      isOrbitalActive: 'featureFlags/isOrbitalActive',
     }),
     isLowCoachHour() {
       return this.currentHour < 12
@@ -149,6 +154,18 @@ export default {
         'hasSeenLevelSystemRemovalModal'
       )
       return this.isLevelSystemActive && !seenLevelSystemRemovalModal
+    },
+    isOrbitalSegment() {
+      const totalSessions = this.user.pastSessions.length
+      return (
+        totalSessions >= 2 &&
+        totalSessions <= 9 &&
+        !this.user.isBanned &&
+        !this.user.isTestUser
+      )
+    },
+    isOrbitalSegmentActive() {
+      return this.isOrbitalActive && this.isOrbitalSegment
     },
   },
   methods: {
@@ -187,6 +204,10 @@ export default {
       if (currentValue && !prevValue) {
         AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_LEVEL_SYSTEM_STUDENT)
       }
+    },
+    isOrbitalActive(currentValue, prevValue) {
+      if (currentValue && !prevValue && this.isOrbitalSegment)
+        ProductDiscoveryService.trigger('RMKBxdsZBgWb')
     },
   },
 }

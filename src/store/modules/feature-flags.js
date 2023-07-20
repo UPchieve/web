@@ -64,6 +64,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.QUIZ_STUDY_MATERIALS]: false,
       [POSTHOG_FEATURE_FLAGS.ZIP_FIRST]: false,
       [POSTHOG_FEATURE_FLAGS.UPDATED_AUTO_FLOW_QUIZ_UX]: false,
+      [POSTHOG_FEATURE_FLAGS.ORBITAL]: false,
       // This is an experiment, using multivariant feature flag values
       [POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS_AND_LEVEL_SYSTEM]: '',
       [POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO]: false,
@@ -157,5 +158,6 @@ export default {
       ] === POSTHOG_FEATURE_FLAGS.LEVEL_SYSTEM,
     offerGoogleSSO: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO],
+    isOrbitalActive: state => state.flags[POSTHOG_FEATURE_FLAGS.ORBITAL],
   },
 }
