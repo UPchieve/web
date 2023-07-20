@@ -485,6 +485,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   LEVEL_SYSTEM: 'level-system',
   UPDATED_AUTO_FLOW_QUIZ_UX: 'updated-auto-flow-quiz-ux',
   OFFER_GOOGLE_SSO: 'offer-google-sso',
+  ELIGIBILITY_FORM_HEADLINE: 'eligibility-form-headline',
   ORBITAL: 'orbital',
 }
 

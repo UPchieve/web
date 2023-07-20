@@ -3,11 +3,7 @@
     <FormErrors :errors="errors" />
 
     <h1 class="uc-form-header">
-      {{
-        isReferred
-          ? "Let's get started!"
-          : 'Check if you are eligible for UPchieve'
-      }}
+      {{ isReferred ? "Let's get started!" : eligibilityFormHeadline }}
     </h1>
     <p class="uc-form-text">
       Already have an account?
@@ -181,7 +177,7 @@
         :disabled="cannotSubmitForm(v$.eligibility)"
         type="submit"
       >
-        {{ isReferred ? 'Continue' : 'Check my eligibility' }}
+        Continue
       </button>
     </form>
   </div>
@@ -548,6 +544,7 @@ export default {
   computed: {
     ...mapGetters({
       offerGoogleSSO: 'featureFlags/offerGoogleSSO',
+      eligibilityFormHeadline: 'featureFlags/eligibilityFormHeadline',
     }),
     trimCurrentGrade() {
       // extracting the first word out of the gradeLevels

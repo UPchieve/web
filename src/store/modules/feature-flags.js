@@ -68,6 +68,11 @@ export default {
       // This is an experiment, using multivariant feature flag values
       [POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS_AND_LEVEL_SYSTEM]: '',
       [POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO]: false,
+      [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_FORM_HEADLINE]: 'control',
+    },
+    flagPayloads: {
+      [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_FORM_HEADLINE]:
+        'Check if you are eligible for UPchieve',
     },
   },
   mutations: {
@@ -80,6 +85,13 @@ export default {
       Object.keys(flags).forEach(key => {
         state.flags[flags[key]] = isFlagEnabled(flags[key])
       })
+
+      if (isPostHog) {
+        const getFlagPayload = flag => posthog.getFeatureFlagPayload(flag)
+        Object.keys(state.flagPayloads).forEach(key => {
+          state.flagPayloads[key] = getFlagPayload(key)
+        })
+      }
     },
   },
   actions: {
@@ -158,6 +170,8 @@ export default {
       ] === POSTHOG_FEATURE_FLAGS.LEVEL_SYSTEM,
     offerGoogleSSO: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO],
+    eligibilityFormHeadline: state =>
+      state.flagPayloads[POSTHOG_FEATURE_FLAGS.ELIGIBILITY_FORM_HEADLINE],
     isOrbitalActive: state => state.flags[POSTHOG_FEATURE_FLAGS.ORBITAL],
   },
 }
