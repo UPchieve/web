@@ -12,6 +12,7 @@ const newrelicUrls = [
   'https://bam.nr-data.net',
 ]
 const gleapUrl = 'https://*.gleap.io'
+const orbitalUrl = 'https://*.useorbital.com'
 
 // connect sources
 const googleConnectUrls = [
@@ -64,6 +65,7 @@ const scriptSrc = [
   ...posthogUrls,
   ...newrelicUrls,
   gleapUrl,
+  orbitalUrl,
   "'unsafe-eval'",
   "'unsafe-inline'",
   'blob:',
@@ -89,6 +91,7 @@ const connectSrc = [
   ...newrelicUrls,
   ...googleConnectUrls,
   gleapUrl,
+  orbitalUrl,
   `wss://${config.host}`,
   `https://${config.host}`,
 ]
@@ -98,6 +101,7 @@ const frameSrc = [
   googleDocFrameSrcUrl,
   vimeoFrameSrcUrl,
   gleapUrl,
+  orbitalUrl,
   cdnUrl,
 ]
 
