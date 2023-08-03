@@ -1,7 +1,7 @@
 <template>
   <form-page-template>
     <div class="uc-form">
-      <div class="uc-form-header">
+      <div class="uc-row justify-between mb-16">
         <router-link to="/login" class="uc-form-header-link"
           >Log In</router-link
         >
@@ -701,5 +701,9 @@ export default {
 
 .d-none {
   display: none !important;
+}
+
+.mb-16 {
+  margin-bottom: 40px;
 }
 </style>
