@@ -105,8 +105,11 @@ export default {
     if (this.isReferFriendsActive && this.hasSeenFirstSessionCongratsModal)
       this.toggleFirstSessionCongratsModal()
 
-    if (this.isOrbitalSegmentActive)
-      ProductDiscoveryService.trigger('RMKBxdsZBgWb')
+    if (this.isOrbitalSegmentsActive)
+      ProductDiscoveryService.triggerDynamicSegment(
+        this.user,
+        this.orbitalSegments
+      )
 
     this.currentHour = moment()
       .tz('America/New_York')
@@ -131,6 +134,8 @@ export default {
       isEarnCertificationsActive: 'featureFlags/isEarnCertificationsActive',
       isLevelSystemActive: 'featureFlags/isLevelSystemActive',
       isOrbitalActive: 'featureFlags/isOrbitalActive',
+      orbitalSegments: 'featureFlags/orbitalSegments',
+      isOrbitalSegmentsActive: 'featureFlags/isOrbitalSegmentsActive',
     }),
     isLowCoachHour() {
       return this.currentHour < 12
@@ -168,17 +173,8 @@ export default {
       )
       return this.isLevelSystemActive && !seenLevelSystemRemovalModal
     },
-    isOrbitalSegment() {
-      const totalSessions = this.user.pastSessions.length
-      return (
-        totalSessions >= 2 &&
-        totalSessions <= 9 &&
-        !this.user.isBanned &&
-        !this.user.isTestUser
-      )
-    },
-    isOrbitalSegmentActive() {
-      return this.isOrbitalActive && this.isOrbitalSegment
+    userAndOrbitalSegment() {
+      return [this.user, this.orbitalSegments, this.isOrbitalSegmentsActive]
     },
   },
   methods: {
@@ -218,9 +214,23 @@ export default {
         AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_LEVEL_SYSTEM_STUDENT)
       }
     },
-    isOrbitalActive(currentValue, prevValue) {
-      if (currentValue && !prevValue && this.isOrbitalSegment)
-        ProductDiscoveryService.trigger('RMKBxdsZBgWb')
+    userAndOrbitalSegment: {
+      handler: function(currentValue, prevValue) {
+        if (
+          this.isOrbitalSegmentsActive &&
+          Object.keys(currentValue[0]).length &&
+          Object.keys(currentValue[1]).length &&
+          currentValue[2] &&
+          (!Object.keys(prevValue[0]).length ||
+            !Object.keys(prevValue[1]).length ||
+            !prevValue[2])
+        )
+          ProductDiscoveryService.triggerDynamicSegment(
+            this.user,
+            this.orbitalSegments
+          )
+      },
+      deep: true,
     },
   },
 }

@@ -65,6 +65,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.ZIP_FIRST]: false,
       [POSTHOG_FEATURE_FLAGS.UPDATED_AUTO_FLOW_QUIZ_UX]: false,
       [POSTHOG_FEATURE_FLAGS.ORBITAL]: false,
+      [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: false,
       // This is an experiment, using multivariant feature flag values
       [POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS_AND_LEVEL_SYSTEM]: '',
       [POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO]: false,
@@ -73,6 +74,7 @@ export default {
     flagPayloads: {
       [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_FORM_HEADLINE]:
         'Check if you are eligible for UPchieve',
+      [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: {},
     },
   },
   mutations: {
@@ -172,6 +174,9 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO],
     eligibilityFormHeadline: state =>
       state.flagPayloads[POSTHOG_FEATURE_FLAGS.ELIGIBILITY_FORM_HEADLINE],
-    isOrbitalActive: state => state.flags[POSTHOG_FEATURE_FLAGS.ORBITAL],
+    orbitalSegments: state =>
+      state.flagPayloads[POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS],
+    isOrbitalSegmentsActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS],
   },
 }
