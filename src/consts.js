@@ -486,7 +486,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   UPDATED_AUTO_FLOW_QUIZ_UX: 'updated-auto-flow-quiz-ux',
   OFFER_GOOGLE_SSO: 'offer-google-sso',
   ELIGIBILITY_FORM_HEADLINE: 'eligibility-form-headline',
-  ORBITAL: 'orbital',
+  ORBITAL_SEGMENTS: 'orbital-segments',
 }
 
 export const ANALYTICS_REPORT_ROW = {
