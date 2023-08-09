@@ -71,7 +71,9 @@ import { mapGetters, mapState } from 'vuex'
 import DropdownList from '@/components/DropdownList'
 import HyperlinkButton from '@/components/HyperlinkButton'
 import LargeButton from '@/components/LargeButton'
+import AnalyticsService from '@/services/AnalyticsService'
 import getCookie from '@/utils/get-cookie'
+import { EVENTS } from '@/consts'
 
 export default {
   components: { DropdownList, HyperlinkButton, LargeButton },
@@ -147,6 +149,9 @@ export default {
           },
         })
       } else if (this.title === 'Invite Your Friends') {
+        AnalyticsService.captureEvent(
+          EVENTS.STUDENT_CLICKED_TO_GET_REFERRAL_LINK_CARD
+        )
         this.$store.dispatch('app/modal/show', {
           component: 'ReferralModal',
           data: {
