@@ -16,7 +16,7 @@
           counseling to eligible middle and high school students.
         </p>
 
-        <div v-if="isReferred">
+        <div v-if="isReferred" class="uc-column items-center">
           <button
             class="uc-form-button"
             type="submit"
@@ -28,7 +28,7 @@
           <a
             target="_blank"
             rel="noopener noreferrer"
-            class="uc-form-button-big uc-form-button--link uc-form-button--referral"
+            class="link"
             href="https://upchieve.org/students"
             >Tell me more about UPchieve first
           </a>
@@ -64,8 +64,10 @@ import FormPageTemplate from '@/components/FormPageTemplate'
 import StudentForm from './StudentForm'
 import VolunteerForm from './VolunteerForm'
 import NetworkService from '@/services/NetworkService'
+import AnalyticsService from '@/services/AnalyticsService'
 import StudentAvatar from '@/assets/student-avatar.svg'
 import VolunteerAvatar from '@/assets/volunteer-avatar.svg'
+import { EVENTS } from '@/consts'
 import { capitalize } from 'lodash'
 
 export default {
@@ -91,6 +93,9 @@ export default {
     const referralCode = this.$route.query.referral
     if (referralCode) {
       window.localStorage.setItem('upcReferredByCode', referralCode)
+      AnalyticsService.captureEvent(EVENTS.USER_VISITED_REFERRAL_LINK, {
+        referralCode,
+      })
       this.isReferred = true
 
       const {
@@ -219,6 +224,19 @@ export default {
     padding: 10px;
     margin: 0;
     width: 100%;
+  }
+}
+
+a.link {
+  color: $c-information-blue;
+  font-size: 18px;
+  font-weight: 500;
+  margin: 20px 0 50px 0;
+  text-align: center;
+
+  &:hover {
+    color: #103a90;
+    text-decoration: none;
   }
 }
 </style>

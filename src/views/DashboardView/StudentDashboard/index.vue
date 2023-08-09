@@ -2,6 +2,17 @@
   <div class="student-dashboard">
     <dashboard-banner />
     <div class="dashboard-notices">
+      <div class="share-upchieve-notice">
+        <div>
+          🌟 <span class="bold">Become a Brand Ambassador!</span>
+          Spread the UPchieve love by sharing your specialized link with pals
+          who want to UP their learning game too!
+        </div>
+        <a class="link" @click="openReferralModal">
+          Get your link now! 🚀
+        </a>
+      </div>
+
       <div
         v-if="!downtimeMessage && noticeMessage"
         class="dashboard-notice"
@@ -35,6 +46,7 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
+import ReferralSVG from '@/assets/dashboard_icons/student/referral.svg'
 import DashboardBanner from '../DashboardBanner'
 import SubjectSelection from './SubjectSelection'
 import FirstSessionCongratsModal from './FirstSessionCongratsModal'
@@ -181,6 +193,19 @@ export default {
     toggleFirstSessionCongratsModal() {
       this.showFirstSessionCongratsModal = !this.showFirstSessionCongratsModal
     },
+    openReferralModal() {
+      AnalyticsService.captureEvent(
+        EVENTS.STUDENT_CLICKED_TO_GET_REFERRAL_LINK_BANNER
+      )
+      this.$store.dispatch('app/modal/show', {
+        component: 'ReferralModal',
+        data: {
+          title: 'Become a Brand Ambassador',
+          svg: ReferralSVG,
+          showAccept: false,
+        },
+      })
+    },
   },
   watch: {
     isSessionAlive(isAlive, prevIsAlive) {
@@ -316,6 +341,33 @@ export default {
 
   @include breakpoint-above('massive') {
     width: 400px;
+  }
+}
+
+.share-upchieve-notice {
+  @include flex-container(column);
+  background-color: #fff;
+  border-radius: 8px;
+  color: #000;
+  font-size: 18px;
+  padding: 15px;
+  margin-top: 20px;
+  text-align: center;
+
+  .bold {
+    font-weight: 500;
+  }
+
+  a {
+    color: $c-information-blue;
+    font-weight: 500;
+    margin-top: 10px;
+
+    &:hover {
+      cursor: pointer;
+      color: #103a90;
+      text-decoration: none;
+    }
   }
 }
 </style>

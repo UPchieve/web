@@ -14,6 +14,8 @@
 
 <script>
 import { mapState } from 'vuex'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 import config from '@/config'
 
 export default {
@@ -44,6 +46,7 @@ export default {
       }
       try {
         await navigator.clipboard.writeText(this.referralLink)
+        AnalyticsService.captureEvent(EVENTS.STUDENT_COPIED_REFERRAL_LINK)
         this.copyMessage = 'Copied'
         setTimeout(() => {
           this.copyMessage = 'Copy'

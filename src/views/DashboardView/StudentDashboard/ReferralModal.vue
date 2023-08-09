@@ -1,7 +1,9 @@
 <template>
   <div class="ReferralModal">
     <component v-if="!mobileMode" :is="modalData.svg" class="icon" />
-    <h1 class="ReferralModal-title">Invite Your Friends</h1>
+    <h1 class="ReferralModal-title">
+      {{ modalData.title || 'Invite Your Friends' }}
+    </h1>
     <h2 class="ReferralModal-subtitle">
       Sharing is caring! Your friends can create their very own UPchieve account
       using the link below.
