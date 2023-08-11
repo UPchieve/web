@@ -75,6 +75,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_FORM_HEADLINE]:
         'Check if you are eligible for UPchieve',
       [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: {},
+      [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: null,
     },
   },
   mutations: {
@@ -178,5 +179,7 @@ export default {
       state.flagPayloads[POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS],
     isOrbitalSegmentsActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS],
+    topicCardDashboardReorder: state =>
+      state.flagPayloads[POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER],
   },
 }

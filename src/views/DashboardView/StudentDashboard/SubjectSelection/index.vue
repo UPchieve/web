@@ -65,6 +65,7 @@ export default {
       mobileMode: 'app/mobileMode',
       isSessionAlive: 'user/isSessionAlive',
       topicCards: 'subjects/topicCards',
+      topicCardDashboardReorder: 'featureFlags/topicCardDashboardReorder',
     }),
     waitingPeriodMessage() {
       const countdown = calculateWaitingPeriodCountdown(
@@ -75,7 +76,16 @@ export default {
       return `You must wait at least ${countdown} ${minuteTextFormat} before requesting a new session.`
     },
     cards() {
-      const cards = [...this.topicCards]
+      let cards = [...this.topicCards]
+      if (this.topicCardDashboardReorder)
+        cards = cards
+          .map(card => {
+            return {
+              ...card,
+              order: this.topicCardDashboardReorder[card.topic],
+            }
+          })
+          .sort((a, b) => a.order - b.order)
       cards.push({
         title: 'Give Feedback',
         subtitle:
