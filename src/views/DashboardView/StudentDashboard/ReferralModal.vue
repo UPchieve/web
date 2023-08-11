@@ -2,15 +2,17 @@
   <div class="ReferralModal">
     <component v-if="!mobileMode" :is="modalData.svg" class="icon" />
     <h1 class="ReferralModal-title">
-      {{ modalData.title || 'Invite Your Friends' }}
+      Invite Your Friends
     </h1>
     <h2 class="ReferralModal-subtitle">
-      Sharing is caring! Your friends can create their very own UPchieve account
-      using the link below.
+      {{
+        modalData.subcopy ||
+          'Sharing is caring! Your friends can create their very own UPchieve account using the link below.'
+      }}
     </h2>
 
     <div>
-      <h4>Share link</h4>
+      <h4 class="share-link">Share link</h4>
       <referral-link />
     </div>
   </div>
@@ -67,5 +69,11 @@ p {
 .ReferralModal-subtitle {
   @include font-category('body');
   color: $c-secondary-grey;
+}
+
+.share-link {
+  font-size: 20px;
+  margin-top: 30px;
+  margin-bottom: -30px;
 }
 </style>

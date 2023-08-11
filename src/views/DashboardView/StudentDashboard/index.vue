@@ -3,13 +3,10 @@
     <dashboard-banner />
     <div class="dashboard-notices">
       <div class="share-upchieve-notice">
-        <div>
-          🌟 <span class="bold">Become a Brand Ambassador!</span>
-          Spread the UPchieve love by sharing your specialized link with pals
-          who want to UP their learning game too!
-        </div>
+        🌟 Know a friend or classmate who would benefit from free, 24/7
+        tutoring?
         <a class="link" @click="openReferralModal">
-          Get your link now! 🚀
+          Invite them to UPchieve! 🚀
         </a>
       </div>
 
@@ -200,9 +197,10 @@ export default {
       this.$store.dispatch('app/modal/show', {
         component: 'ReferralModal',
         data: {
-          title: 'Become a Brand Ambassador',
           svg: ReferralSVG,
           showAccept: false,
+          subcopy:
+            "Refer friends or classmates to UPchieve by sharing your unique sign-up link below. If you sign up 10 people, we'll send you an UPchieve swag bag!",
         },
       })
     },
@@ -350,13 +348,9 @@ export default {
   border-radius: 8px;
   color: #000;
   font-size: 18px;
-  padding: 15px;
-  margin-top: 20px;
+  padding: 20px;
+  margin-top: 15px;
   text-align: center;
-
-  .bold {
-    font-weight: 500;
-  }
 
   a {
     color: $c-information-blue;
