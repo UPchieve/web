@@ -493,6 +493,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   OFFER_GOOGLE_SSO: 'offer-google-sso',
   ELIGIBILITY_FORM_HEADLINE: 'eligibility-form-headline',
   ORBITAL_SEGMENTS: 'orbital-segments',
+  TOPIC_CARD_DASHBOARD_REORDER: 'topic-card-dashboard-reorder',
 }
 
 export const ANALYTICS_REPORT_ROW = {
