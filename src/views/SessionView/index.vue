@@ -37,32 +37,40 @@
           'chat-container--hidden': shouldHideChatSection,
         }"
       >
-        <div
-          v-if="user.isVolunteer && isLoadingPresessionResponse"
-          class="about-session-container"
-        >
-          <loading-message message="Loading" class="about-session-loader" />
-        </div>
-        <div
-          v-else-if="user.isVolunteer && studentPresessionResponses.length > 0"
-          class="about-session-container"
-        >
-          <div class="about-session-button" @click="handleAboutSessionClick">
+        <div class="about-session-container" v-if="user.isVolunteer">
+          <loading-message
+            v-if="isLoadingPresessionResponse"
+            message="Loading"
+            class="about-session-loader"
+          />
+          <div
+            v-else-if="studentPresessionResponses.length > 0"
+            class="about-session-button"
+            @click="handleAboutSessionClick"
+          >
             About the session
             <caret-icon class="caret" />
           </div>
-        </div>
-        <div
-          v-else-if="
-            user.isVolunteer &&
-              (showNoPresessionSurveyResponse ||
-                studentPresessionResponses.length === 0)
-          "
-          class="about-session-container"
-        >
-          <div class="about-session-no-responses">
+          <div
+            v-else-if="
+              showNoPresessionSurveyResponse ||
+                studentPresessionResponses.length === 0
+            "
+            class="about-session-no-responses"
+          >
             No goal found for this session
           </div>
+          <question-mark-icon
+            v-if="mobileMode"
+            @click="openHelp"
+            class="help-icon"
+          />
+        </div>
+        <div
+          class="about-session-container"
+          v-else-if="mobileMode && !user.isVolunteer"
+        >
+          <question-mark-icon @click="openHelp" class="help-icon" />
         </div>
         <session-chat
           :shouldHideChatSection="shouldHideChatSection"
@@ -119,6 +127,7 @@ import ConnectionTroubleModal from './ConnectionTroubleModal'
 import PhotoUploadIcon from '@/assets/whiteboard_icons/photo-upload.svg'
 import isOutdatedMobileAppVersion from '@/utils/is-outdated-mobile-app-version'
 import CaretIcon from '@/assets/caret.svg'
+import QuestionMarkIcon from '@/assets/question-mark-icon.svg'
 import WebNotificationsModal from '@/components/WebNotificationsModal'
 import AboutSessionModal from './AboutSessionModal'
 import getNotificationPermission from '@/utils/get-notification-permission'
@@ -144,6 +153,7 @@ export default {
     CaretIcon,
     AboutSessionModal,
     LoadingMessage,
+    QuestionMarkIcon,
   },
   created() {
     if (this.mobileMode) {
@@ -154,10 +164,15 @@ export default {
     }
 
     window.addEventListener('resize', this.handleResize)
+
+    // Hide Gleap using CSS. The SDK's`hide` function is a no-op at the moment
+    if (this.mobileMode)
+      document.querySelector(this.gleapClass).style.visibility = 'hidden'
   },
   beforeDestroy() {
     Gleap.removeCustomData('sessionId')
     window.removeEventListener('resize', this.handleResize)
+    document.querySelector(this.gleapClass).style.visibility = 'visible'
   },
   /*
    * @notes
@@ -235,6 +250,9 @@ export default {
       }
 
       return false
+    },
+    gleapClass() {
+      return '.bb-feedback-button'
     },
   },
   async mounted() {
@@ -464,12 +482,22 @@ export default {
         this.isLoadingPresessionResponse = false
       }
     },
+    openHelp() {
+      Gleap.open()
+      AnalyticsService.captureEvent(EVENTS.USER_CLICKED_IN_SESSION_HELP)
+    },
   },
   watch: {
     isSessionConnectionAlive(newValue, oldValue) {
       if (newValue && !oldValue) {
         this.$store.dispatch('app/modal/hide')
       }
+    },
+    mobileMode(newValue, oldValue) {
+      if (newValue && !oldValue)
+        document.querySelector(this.gleapClass).style.visibility = 'hidden'
+      if (!newValue && oldValue)
+        document.querySelector(this.gleapClass).style.visibility = 'visible'
     },
   },
 }
@@ -541,7 +569,7 @@ export default {
     z-index: 1;
     padding: 0.75em 0.6em;
     width: 100%;
-    @include flex-container(row);
+    @include flex-container(row, space-between, center);
   }
 
   &-button {
@@ -678,5 +706,18 @@ export default {
 
 .caret {
   fill: #000;
+}
+
+.help-icon {
+  width: 30px;
+  height: 30px;
+  margin-left: auto;
+  fill: $c-information-blue;
+  transition: scale 0.2s ease-in-out;
+
+  &:hover {
+    cursor: pointer;
+    transform: scale(1.1);
+  }
 }
 </style>
