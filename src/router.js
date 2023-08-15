@@ -17,6 +17,7 @@ import AdminUserDetail from './views/Admin/AdminUserDetail'
 import AdminUsers from './views/Admin/AdminUsers'
 import AdminVolunteerReports from './views/Admin/AdminVolunteerReports'
 import AdminZipCodes from './views/Admin/AdminZipCodes'
+import AdminRosterStudents from './views/Admin/AdminRosterStudents'
 import VolunteerCoverage from './views/Admin/VolunteerCoverage'
 import BackgroundInfoView from './views/BackgroundInfoView'
 import CalendarView from './views/CalendarView'
@@ -389,6 +390,12 @@ const routes = [
     path: '/admin/zip-codes',
     name: 'AdminZipCodes',
     component: AdminZipCodes,
+    meta: { protected: true, requiresAdmin: true },
+  },
+  {
+    path: '/admin/roster-students',
+    name: 'AdminRosterStudents',
+    component: AdminRosterStudents,
     meta: { protected: true, requiresAdmin: true },
   },
   {
