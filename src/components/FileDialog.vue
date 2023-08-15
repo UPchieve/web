@@ -14,10 +14,6 @@ export default {
       type: String,
       required: true,
     },
-    fileSelected: {
-      type: Function,
-      required: true,
-    },
   },
   data() {
     return {
