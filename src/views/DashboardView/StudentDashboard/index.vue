@@ -11,7 +11,7 @@
       </div>
 
       <div
-        v-if="!downtimeMessage && noticeMessage"
+        v-if="!downtimeBannerMessage && noticeMessage"
         class="dashboard-notice"
         :class="isLowCoachHour && 'dashboard-notice--warn'"
       >
@@ -19,12 +19,12 @@
       </div>
 
       <div
-        v-if="downtimeMessage"
+        v-if="downtimeBannerMessage"
         class="dashboard-notice"
         :class="'dashboard-notice--downtime'"
       >
         <a href="https://upchieve.statuspage.io" target="_blank">{{
-          downtimeMessage
+          downtimeBannerMessage
         }}</a>
       </div>
     </div>
@@ -139,7 +139,7 @@ export default {
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
       isReferFriendsActive: 'featureFlags/isReferFriendsActive',
-      isDowntimeBannerActive: 'featureFlags/isDowntimeBannerActive',
+      downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
       isEarnCertificationsActive: 'featureFlags/isEarnCertificationsActive',
       isLevelSystemActive: 'featureFlags/isLevelSystemActive',
       isOrbitalActive: 'featureFlags/isOrbitalActive',
@@ -161,13 +161,6 @@ export default {
         return 'Heads up: we have fewer coaches available than normal right now. Try making requests between 12pm-12am ET when possible!'
 
       return ''
-    },
-    downtimeMessage() {
-      if (this.isDowntimeBannerActive) {
-        return 'UPchieve will be down for maintenance Tuesday, July 26th from 9-10 AM ET.'
-      } else {
-        return ''
-      }
     },
     hasSeenFirstSessionCongratsModal() {
       return (

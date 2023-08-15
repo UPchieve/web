@@ -52,7 +52,6 @@ export default {
     flags: {
       [UNLEASH_FEATURE_FLAGS.REFER_FRIENDS]: false,
       [UNLEASH_FEATURE_FLAGS.DASHBOARD_REDESIGN]: false,
-      [UNLEASH_FEATURE_FLAGS.DOWNTIME_BANNER]: false,
       [UNLEASH_FEATURE_FLAGS.CHATBOT]: false,
       [UNLEASH_FEATURE_FLAGS.DASHBOARD_BANNER]: false,
       [POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS]: false,
@@ -75,6 +74,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_FORM_HEADLINE]:
         'Check if you are eligible for UPchieve',
       [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: {},
+      [POSTHOG_FEATURE_FLAGS.DOWNTIME_BANNER]: '',
       [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: null,
     },
   },
@@ -137,8 +137,6 @@ export default {
       state.flags[UNLEASH_FEATURE_FLAGS.REFER_FRIENDS],
     isDashboardRedesignActive: state =>
       state.flags[UNLEASH_FEATURE_FLAGS.DASHBOARD_REDESIGN],
-    isDowntimeBannerActive: state =>
-      state.flags[UNLEASH_FEATURE_FLAGS.DOWNTIME_BANNER],
     isChatbotActive: state => state.flags[UNLEASH_FEATURE_FLAGS.CHATBOT],
     isDashboardBannerActive: state =>
       state.flags[UNLEASH_FEATURE_FLAGS.DASHBOARD_BANNER],
@@ -179,6 +177,8 @@ export default {
       state.flagPayloads[POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS],
     isOrbitalSegmentsActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS],
+    downtimeBannerMessage: state =>
+      state.flagPayloads[POSTHOG_FEATURE_FLAGS.DOWNTIME_BANNER],
     topicCardDashboardReorder: state =>
       state.flagPayloads[POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER],
   },

@@ -471,7 +471,6 @@ export const VERIFICATION_METHOD = {
 export const UNLEASH_FEATURE_FLAGS = {
   REFER_FRIENDS: 'refer-friends',
   DASHBOARD_REDESIGN: 'dashboard-redesign',
-  DOWNTIME_BANNER: 'downtime-banner',
   CHATBOT: 'chatbot',
   DASHBOARD_BANNER: 'dashboard-banner',
 }
@@ -494,6 +493,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   OFFER_GOOGLE_SSO: 'offer-google-sso',
   ELIGIBILITY_FORM_HEADLINE: 'eligibility-form-headline',
   ORBITAL_SEGMENTS: 'orbital-segments',
+  DOWNTIME_BANNER: 'downtime-banner',
   TOPIC_CARD_DASHBOARD_REORDER: 'topic-card-dashboard-reorder',
 }
 
