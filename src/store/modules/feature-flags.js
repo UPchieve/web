@@ -73,7 +73,7 @@ export default {
     flagPayloads: {
       [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_FORM_HEADLINE]:
         'Check if you are eligible for UPchieve',
-      [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: {},
+      [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: [],
       [POSTHOG_FEATURE_FLAGS.DOWNTIME_BANNER]: '',
       [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: null,
     },
