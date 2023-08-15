@@ -3,12 +3,12 @@
     <dashboard-banner />
 
     <div
-      v-if="downtimeMessage"
+      v-if="downtimeBannerMessage"
       class="dashboard-notice"
       :class="'dashboard-notice--info'"
     >
       <a href="https://upchieve.statuspage.io" target="_blank">{{
-        downtimeMessage
+        downtimeBannerMessage
       }}</a>
     </div>
 
@@ -263,7 +263,7 @@ export default {
       sessionPath: 'user/sessionPath',
       hasCertification: 'user/hasCertification',
       hasSelectedAvailability: 'user/hasSelectedAvailability',
-      isDowntimeBannerActive: 'featureFlags/isDowntimeBannerActive',
+      downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
       isDashboardBannerActive: 'featureFlags/isDashboardBannerActive',
       isFilterActiveSubjectsActive: 'featureFlags/isFilterActiveSubjectsActive',
       allSubjectNames: 'subjects/allSubtopicNames',
@@ -277,14 +277,6 @@ export default {
 
     isNewVolunteer() {
       return !this.user.pastSessions || !this.user.pastSessions.length
-    },
-
-    downtimeMessage() {
-      if (this.isDowntimeBannerActive) {
-        return 'UPchieve will be down for maintenance Tuesday, July 26th from 9-10 AM ET.'
-      } else {
-        return ''
-      }
     },
 
     photoIdAction() {
