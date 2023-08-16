@@ -66,6 +66,8 @@ export default {
       isSessionAlive: 'user/isSessionAlive',
       topicCards: 'subjects/topicCards',
       topicCardDashboardReorder: 'featureFlags/topicCardDashboardReorder',
+      isTopicDashboardReorderActive:
+        'featureFlags/isTopicDashboardReorderActive',
     }),
     waitingPeriodMessage() {
       const countdown = calculateWaitingPeriodCountdown(
@@ -77,7 +79,7 @@ export default {
     },
     cards() {
       let cards = [...this.topicCards]
-      if (this.topicCardDashboardReorder)
+      if (this.isTopicDashboardReorderActive && this.topicCardDashboardReorder)
         cards = cards
           .map(card => {
             return {

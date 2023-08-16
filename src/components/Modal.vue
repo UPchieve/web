@@ -33,7 +33,7 @@ import ArrowIcon from '@/assets/arrow.svg'
 export default {
   components: { ArrowIcon },
   props: {
-    closeModal: { type: Function, required: true },
+    closeModal: { type: Function },
     important: Boolean,
     backText: { type: String, default: 'Back' },
     useDefaultPadding: { type: Boolean, default: true, required: false },
@@ -53,7 +53,8 @@ export default {
   methods: {
     handleClose(event) {
       const { target } = event
-      if (target.classList.contains('upc-modal')) this.closeModal()
+      if (this.closeModal && target.classList.contains('upc-modal'))
+        this.closeModal()
     },
   },
 }
