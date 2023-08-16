@@ -24,6 +24,7 @@ import LoggerService from './services/LoggerService'
 if (config.posthogToken) {
   posthog.init(`${config.posthogToken}`, {
     api_host: 'https://p.upchieve.org',
+    persistence: 'localStorage+cookie'
   })
 }
 
