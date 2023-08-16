@@ -33,6 +33,10 @@
       v-if="isLevelSystemRemovalModalActive"
       class="level-system"
     />
+    <tell-them-college-prep-modal
+      v-if="isJustTellThemActive && showTellThemCollegePrepModal"
+      :closeModal="toggleTellThemCollegePrepModal"
+    />
     <subject-selection />
     <first-session-congrats-modal
       v-if="showFirstSessionCongratsModal"
@@ -47,6 +51,7 @@ import ReferralSVG from '@/assets/dashboard_icons/student/referral.svg'
 import DashboardBanner from '../DashboardBanner'
 import SubjectSelection from './SubjectSelection'
 import FirstSessionCongratsModal from './FirstSessionCongratsModal'
+import TellThemCollegePrepModal from './TellThemCollegePrepModal'
 import moment from 'moment-timezone'
 import LevelSystemRemovalModal from './LevelSystemRemovalModal'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -77,6 +82,7 @@ export default {
     SubjectSelection,
     FirstSessionCongratsModal,
     LevelSystemRemovalModal,
+    TellThemCollegePrepModal,
   },
   created() {
     if (this.isEarnCertificationsActive)
@@ -120,6 +126,13 @@ export default {
         this.orbitalSegments
       )
 
+    if (
+      this.isJustTellThemActive &&
+      !getCookie('hasSeenTellThemCollegePrepModal') &&
+      this.user.pastSessions.length >= 1
+    )
+      this.showTellThemCollegePrepModal = true
+
     this.currentHour = moment()
       .tz('America/New_York')
       .hour()
@@ -128,6 +141,7 @@ export default {
     return {
       currentHour: 0,
       showFirstSessionCongratsModal: false,
+      showTellThemCollegePrepModal: false,
     }
   },
   computed: {
@@ -145,6 +159,7 @@ export default {
       isOrbitalActive: 'featureFlags/isOrbitalActive',
       orbitalSegments: 'featureFlags/orbitalSegments',
       isOrbitalSegmentsActive: 'featureFlags/isOrbitalSegmentsActive',
+      isJustTellThemActive: 'featureFlags/isJustTellThemActive',
     }),
     isLowCoachHour() {
       return this.currentHour < 12
@@ -182,6 +197,9 @@ export default {
   methods: {
     toggleFirstSessionCongratsModal() {
       this.showFirstSessionCongratsModal = !this.showFirstSessionCongratsModal
+    },
+    toggleTellThemCollegePrepModal() {
+      this.showTellThemCollegePrepModal = !this.showTellThemCollegePrepModal
     },
     openReferralModal() {
       AnalyticsService.captureEvent(
@@ -228,6 +246,16 @@ export default {
     isLevelSystemActive(currentValue, prevValue) {
       if (currentValue && !prevValue) {
         AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_LEVEL_SYSTEM_STUDENT)
+      }
+    },
+    isJustTellThemActive(currentValue, prevValue) {
+      if (
+        currentValue &&
+        !prevValue &&
+        !getCookie('hasSeenTellThemCollegePrepModal') &&
+        this.user.pastSessions.length >= 1
+      ) {
+        this.showTellThemCollegePrepModal = true
       }
     },
     userAndOrbitalSegment: {

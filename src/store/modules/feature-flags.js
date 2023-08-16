@@ -69,6 +69,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS_AND_LEVEL_SYSTEM]: '',
       [POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO]: false,
       [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_FORM_HEADLINE]: 'control',
+      [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: 'control',
     },
     flagPayloads: {
       [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_FORM_HEADLINE]:
@@ -181,5 +182,11 @@ export default {
       state.flagPayloads[POSTHOG_FEATURE_FLAGS.DOWNTIME_BANNER],
     topicCardDashboardReorder: state =>
       state.flagPayloads[POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER],
+    isJustTellThemActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER] ===
+      'tell-them',
+    isTopicDashboardReorderActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER] ===
+      'dashboard-reorder',
   },
 }
