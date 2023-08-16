@@ -385,6 +385,7 @@ export default {
         userProps.partner = state.user.volunteerPartnerOrg
       } else {
         userProps.partner = state.user.studentPartnerOrg
+        userProps.gradeLevel = state.user.gradeLevel
       }
 
       return userProps
