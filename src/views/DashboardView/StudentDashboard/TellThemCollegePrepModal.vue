@@ -202,6 +202,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import Modal from '@/components/Modal'
 import LargeButton from '@/components/LargeButton'
 import setCookie from '@/utils/set-cookie'
@@ -239,6 +240,9 @@ export default {
     setCookie('hasSeenTellThemCollegePrepModal', true)
   },
   computed: {
+    ...mapState({
+      user: state => state.user.user,
+    }),
     formattedReminderDate() {
       return moment(this.dateTime, 'YYYY-MM-DD HH:mm').format(
         'MM/DD/YYYY h:mm a'
@@ -307,6 +311,8 @@ export default {
         etDate: this.handleDate('America/New_York'),
         gmtDate: this.handleDate('GMT'),
         phone: this.phoneInput.e164,
+        firstName: this.user.firstName,
+        userLink: `https://app.upchieve.org/admin/users/${this.user.id}`,
       })
       this.nextStep()
     },
