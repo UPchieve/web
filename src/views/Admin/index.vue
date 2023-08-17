@@ -36,6 +36,9 @@
       <router-link to="admin/test-audience" class="admin-link btn"
         >Test Audience</router-link
       >
+      <router-link to="admin/roster-students" class="admin-link btn"
+        >Roster Students</router-link
+      >
     </div>
   </div>
 </template>

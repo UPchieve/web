@@ -5,6 +5,7 @@ import config from '../config'
 
 const AUTH_ROOT = `${config.serverRoot}/auth`
 const API_ROOT = `${config.serverRoot}/api`
+const ADMIN_ROOT = `${config.serverRoot}/admin`
 const ELIGIBILITY_API_ROOT = `${config.serverRoot}/api-public/eligibility`
 const CONTACT_API_ROOT = `${config.serverRoot}/api-public/contact`
 const REFERENCE_API_ROOT = `${config.serverRoot}/api-public/reference`
@@ -394,6 +395,16 @@ export default {
   adminUpdateSchoolPartnerStatus(data) {
     return Vue.http
       .post(`${ELIGIBILITY_API_ROOT}/school/partner`, data)
+      .then(this._successHandler, this._errorHandler)
+  },
+  adminGetPartnerSchools() {
+    return Vue.http
+      .get(`${ADMIN_ROOT}/schools/partner-schools`)
+      .then(this._successHandler, this._errorHandler)
+  },
+  adminUploadRosterStudents(data) {
+    return Vue.http
+      .post(`${ADMIN_ROOT}/roster-students`, data)
       .then(this._successHandler, this._errorHandler)
   },
   adminGetSessionReport({
