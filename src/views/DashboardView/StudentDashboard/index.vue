@@ -58,6 +58,7 @@ import AnalyticsService from '@/services/AnalyticsService'
 import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 import { EVENTS } from '@/consts'
 import getCookie from '@/utils/get-cookie'
+import Gleap from 'gleap'
 
 const defaultHeaderData = {
   component: 'DefaultHeader',
@@ -136,6 +137,8 @@ export default {
     this.currentHour = moment()
       .tz('America/New_York')
       .hour()
+
+    if (this.isGleapBotExperimentActive) this.showGleapBot()
   },
   data() {
     return {
@@ -160,6 +163,7 @@ export default {
       orbitalSegments: 'featureFlags/orbitalSegments',
       isOrbitalSegmentsActive: 'featureFlags/isOrbitalSegmentsActive',
       isJustTellThemActive: 'featureFlags/isJustTellThemActive',
+      isGleapBotExperimentActive: 'featureFlags/isGleapBotExperimentActive',
     }),
     isLowCoachHour() {
       return this.currentHour < 12
@@ -215,6 +219,11 @@ export default {
         },
       })
     },
+    showGleapBot() {
+      AnalyticsService.captureEvent(EVENTS.GLEAP_BOT_SHOWN)
+      Gleap.startBot('64b555f1e8dd226df869b2e7')
+      AnalyticsService.updateUser({ hasMessages: false })
+    },
   },
   watch: {
     isSessionAlive(isAlive, prevIsAlive) {
@@ -257,6 +266,9 @@ export default {
       ) {
         this.showTellThemCollegePrepModal = true
       }
+    },
+    isGleapBotExperimentActive(currentValue, prevValue) {
+      if (currentValue && !prevValue) this.showGleapBot()
     },
     userAndOrbitalSegment: {
       handler: function(currentValue, prevValue) {
