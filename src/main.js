@@ -20,17 +20,22 @@ import NetworkService from './services/NetworkService'
 import { backOff } from 'exponential-backoff'
 import io from 'socket.io-client'
 import LoggerService from './services/LoggerService'
+import AnalyticsService from './services/AnalyticsService'
+import { EVENTS } from './consts'
 
 if (config.posthogToken) {
   posthog.init(`${config.posthogToken}`, {
     api_host: 'https://p.upchieve.org',
-    persistence: 'localStorage+cookie'
+    persistence: 'localStorage+cookie',
   })
 }
 
 if (config.gleapSdkKey) {
   Gleap.initialize(config.gleapSdkKey)
   Gleap.getInstance().softReInitialize()
+  Gleap.on('close', () => {
+    AnalyticsService.captureEvent(EVENTS.GLEAP_CLOSED)
+  })
 }
 
 // Prevent production tip on startup
