@@ -5,7 +5,7 @@ import config from '../config'
 
 const AUTH_ROOT = `${config.serverRoot}/auth`
 const API_ROOT = `${config.serverRoot}/api`
-const ADMIN_ROOT = `${config.serverRoot}/admin`
+const ADMIN_ROOT = `${API_ROOT}/admin`
 const ELIGIBILITY_API_ROOT = `${config.serverRoot}/api-public/eligibility`
 const CONTACT_API_ROOT = `${config.serverRoot}/api-public/contact`
 const REFERENCE_API_ROOT = `${config.serverRoot}/api-public/reference`
