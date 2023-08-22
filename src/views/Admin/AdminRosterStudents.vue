@@ -6,6 +6,7 @@
       class="alert alert-success"
       :class="{
         'alert-danger': isError,
+        'alert-warning': isWarning,
       }"
       role="alert"
     >
@@ -106,7 +107,8 @@ export default {
     return {
       isSubmitting: false,
       msg: '',
-      isError: true,
+      isError: false,
+      isWarning: false,
       partnerSchools: [],
       partnerSchool: null,
       partnerSite: null,
@@ -141,6 +143,7 @@ export default {
       this.isSubmitting = true
       this.msg = ''
       this.isError = false
+      this.isWarning = false
 
       const formData = new FormData()
       formData.append('studentsFile', this.studentDataFile)
@@ -149,8 +152,16 @@ export default {
       formData.append('partnerSite', this.partnerSite)
 
       try {
-        await NetworkService.adminUploadRosterStudents(formData)
-        this.msg = 'Success!'
+        const { body } = await NetworkService.adminUploadRosterStudents(
+          formData
+        )
+        if (body.failedUsers.length) {
+          const failedEmails = body.failedUsers.map(u => u.email).join(', ')
+          this.msg = `The following users failed to be created: ${failedEmails}`
+          this.isWarning = true
+        } else {
+          this.msg = 'Success!'
+        }
         this.clearData()
       } catch (error) {
         this.msg = error.body.err
