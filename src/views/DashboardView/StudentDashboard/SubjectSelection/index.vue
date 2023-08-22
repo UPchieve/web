@@ -64,7 +64,7 @@ export default {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
       isSessionAlive: 'user/isSessionAlive',
-      topicCards: 'subjects/topicCards',
+      topicCards: 'subjects/sessionRequestTopicCards',
       topicCardDashboardReorder: 'featureFlags/topicCardDashboardReorder',
       isTopicDashboardReorderActive:
         'featureFlags/isTopicDashboardReorderActive',
