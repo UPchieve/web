@@ -511,6 +511,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   ORBITAL_SEGMENTS: 'orbital-segments',
   DOWNTIME_BANNER: 'downtime-banner',
   TOPIC_CARD_DASHBOARD_REORDER: 'topic-card-dashboard-reorder',
+  SUBJECT_REQUEST_ROLLOUT: 'subject-request-rollout',
   GLEAP_BOT_EXPERIMENT: 'gleap-bot-experiment',
 }
 

@@ -112,9 +112,11 @@ export default {
     CertDog,
     LargeButton,
   },
-  beforeMount() {
+  async beforeMount() {
     this.$store.dispatch('app/sidebar/hide')
     this.$store.dispatch('app/header/hide')
+    if (Object.entries(this.training).length === 0)
+      await this.$store.dispatch('subjects/getTrainingSubjects')
   },
   data() {
     return {
@@ -125,10 +127,11 @@ export default {
     ...mapState({
       user: state => state.user.user,
       subjects: state => state.subjects.subjects,
+      training: state => state.subjects.training,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
-      topicCards: 'subjects/topicCards',
+      topicCards: 'subjects/quizTopicCards',
       isAutoFlowProgressBarUser: 'user/isAutoFlowProgressBarUser',
       isAutoFlowAvailabilityStepUser: 'user/isAutoFlowAvailabilityStepUser',
       hasCertification: 'user/hasCertification',
