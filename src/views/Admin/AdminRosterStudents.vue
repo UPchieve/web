@@ -14,6 +14,11 @@
     </div>
     <p>Create student profiles for a partner school.</p>
     <p>
+      Note: This upload is only for new students. If a student with the email
+      already has an account with us, you'll receive a warning at the end of the
+      upload that the student failed to be created.
+    </p>
+    <p>
       Before submitting, please make sure the CSV file with the list of students
       has the proper fields, and the columns are labeled correctly.
     </p>
@@ -21,12 +26,13 @@
       <li><code>firstName</code> - required</li>
       <li><code>lastName</code> - required</li>
       <li>
-        <code>gradeLevel</code> - required. Format as e.g. <code>6th</code>
+        <code>gradeLevel</code> - required. Format as just the grade number, for
+        e.g. <code>6</code> for 6th grade.
       </li>
       <li><code>email</code> - required</li>
       <li>
-        <code>proxyEmail</code> - required if students are NOT able to receive
-        emails from us.
+        <code>proxyEmail</code> - optional, but required if students are NOT
+        able to receive emails from us.
         <ul>
           <li>
             The owner of the proxy email address will only receive
@@ -36,9 +42,9 @@
         </ul>
       </li>
       <li>
-        <code>password</code> - required if students can't receive our emails
-        and the <code>proxyEmail</code> is not willing to forward "Set Password"
-        emails to students.
+        <code>password</code> - optional, but required if students can't receive
+        our emails and the <code>proxyEmail</code> is not willing to forward
+        "Set Password" emails to students.
       </li>
     </ul>
 
@@ -117,7 +123,7 @@ export default {
   },
   async mounted() {
     const { body } = await NetworkService.adminGetPartnerSchools()
-    this.partnerSchools = body
+    this.partnerSchools = body.sort((a, b) => a.schoolName > b.schoolName)
   },
   methods: {
     clearData() {
