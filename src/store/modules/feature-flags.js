@@ -66,6 +66,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.ORBITAL]: false,
       [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: false,
       [POSTHOG_FEATURE_FLAGS.GLEAP_BOT_EXPERIMENT]: false,
+      [POSTHOG_FEATURE_FLAGS.STUDENT_COACH_REACH_OUT]: false,
       // This is an experiment, using multivariant feature flag values
       [POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS_AND_LEVEL_SYSTEM]: '',
       [POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO]: false,
@@ -194,5 +195,7 @@ export default {
       state.flagPayloads[POSTHOG_FEATURE_FLAGS.SUBJECT_REQUEST_ROLLOUT],
     isGleapBotExperimentActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.GLEAP_BOT_EXPERIMENT],
+    isStudentCoachReachOutActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.STUDENT_COACH_REACH_OUT],
   },
 }
