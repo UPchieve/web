@@ -23,6 +23,39 @@
       </template>
 
       <template v-else>
+        <div
+          v-if="isStudentCoachReachOutActive && !user.isVolunteer"
+          class="student-reach-out-container"
+        >
+          <div v-if="hasSentStudentMessage">
+            Sent!
+          </div>
+          <div v-else>
+            <h2 class="question__section-header">
+              Send a message to your coach!
+            </h2>
+            <p class="italic">
+              The UPchieve team monitors messages to ensure they are in line
+              with our community guidelines. Let's keep it safe and respectful!
+              Remember not to share your email, social media handles, or other
+              personal information.
+            </p>
+            <textarea
+              class="student-coach-message"
+              @input="responseText => updateStudentMessageToCoach(responseText)"
+              v-model="studentMessage"
+            >
+            </textarea>
+            <large-button
+              @click.native="sendStudentMessageToCoach"
+              primary
+              :disabled="!studentMessage"
+              class="primary-button"
+              >Send</large-button
+            >
+          </div>
+        </div>
+
         <ul class="feedback__questions-list">
           <div>
             <li
@@ -222,7 +255,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import NetworkService from '@/services/NetworkService'
 import LargeButton from '@/components/LargeButton'
 import moment from 'moment'
@@ -234,6 +267,8 @@ import SurveyRateNumber from '../components/Surveys/SurveyRateNumber'
 import SurveyChipOption from '../components/Surveys/SurveyChipOption'
 import SurveyCheckbox from '../components/Surveys/SurveyCheckbox'
 import _ from 'lodash'
+import { EVENTS } from '@/consts'
+import AnalyticsService from '@/services/AnalyticsService'
 
 export default {
   name: 'FeedbackView',
@@ -258,12 +293,18 @@ export default {
       allQuestions: [],
       error: '',
       userResponse: {},
+      hasSentStudentMessage: false,
+      hasTypedMessage: false,
+      studentMessage: '',
     }
   },
   computed: {
     ...mapState({
       user: state => state.user.user,
       subjects: state => state.subjects.subjects,
+    }),
+    ...mapGetters({
+      isStudentCoachReachOutActive: 'featureFlags/isStudentCoachReachOutActive',
     }),
     sessionPartnerFirstName() {
       return this.user.isVolunteer
@@ -680,6 +721,23 @@ export default {
       }
       this.userResponse = Object.assign({}, this.userResponse, responseAnswer)
     },
+    updateStudentMessageToCoach() {
+      if (!this.hasTypedMessage) {
+        this.hasTypedMessage = true
+        AnalyticsService.captureEvent(
+          EVENTS.STUDENT_TYPED_IN_COACH_REACH_OUT_TEXT_BOX
+        )
+      }
+    },
+    sendStudentMessageToCoach() {
+      AnalyticsService.captureEvent(
+        EVENTS.STUDENT_SENT_COACH_REACH_OUT_MESSAGE,
+        {
+          message: this.studentMessage,
+        }
+      )
+      this.hasSentStudentMessage = true
+    },
   },
 }
 </script>
@@ -825,5 +883,39 @@ export default {
 .issue-reason-chip {
   margin-top: 1em;
   margin-right: 1em;
+}
+
+// remove below in student-reach-out feature flag cleanup
+.italic {
+  font-style: italic;
+}
+
+.primary-button {
+  &:disabled {
+    border: 1px solid $c-border-grey !important;
+  }
+}
+
+.student-reach-out-container {
+  background-color: $c-background-grey;
+  border-radius: 5px;
+  padding: 1em 0.5em;
+}
+
+.student-coach-message {
+  margin: 1em 0;
+}
+
+.student-coach-message {
+  width: 100%;
+  height: 120px;
+  border: 1px solid $c-border-grey;
+  border-radius: 5px;
+  padding: 1em;
+  resize: none;
+  &:focus {
+    outline: none;
+    border-color: $c-success-green;
+  }
 }
 </style>
