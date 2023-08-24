@@ -87,7 +87,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import AccordionItem from '@/components/AccordionItem'
 import TrainingDropDown from '@/components/TrainingDropDown'
 import SubjectCertsDropDown from '@/components/SubjectCertsDropDown'
@@ -117,9 +117,11 @@ export default {
   computed: {
     ...mapState({
       user: state => state.user.user,
-      training: state => state.subjects.training,
       isFetchingTraining: state => state.subjects.isFetchingTraining,
       fetchingTrainingError: state => state.subjects.fetchingTrainingError,
+    }),
+    ...mapGetters({
+      training: 'subjects/activeTraining',
     }),
     currentSubject() {
       return this.training[this.currentTopic]
@@ -158,7 +160,12 @@ export default {
         }
     },
     subjectTypes() {
-      return this.training.subjectTypes
+      return (
+        this.training.subjectTypes?.filter(
+          subjectType =>
+            this.training[subjectType.key].certifications.length > 0
+        ) || []
+      )
     },
   },
   methods: {
