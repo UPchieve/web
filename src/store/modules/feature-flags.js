@@ -79,6 +79,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.DOWNTIME_BANNER]: '',
       [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: null,
       [POSTHOG_FEATURE_FLAGS.SUBJECT_REQUEST_ROLLOUT]: [],
+      [POSTHOG_FEATURE_FLAGS.QUIZ_ROLLOUT]: [],
     },
   },
   mutations: {
@@ -191,7 +192,9 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER] ===
       'dashboard-reorder',
     subjectRequestRollout: state =>
-      state.flagPayloads[POSTHOG_FEATURE_FLAGS.SUBJECT_REQUEST_ROLLOUT],
+      state.flagPayloads[POSTHOG_FEATURE_FLAGS.SUBJECT_REQUEST_ROLLOUT] ?? [],
+    quizRollout: state =>
+      state.flagPayloads[POSTHOG_FEATURE_FLAGS.QUIZ_ROLLOUT] ?? [],
     isGleapBotExperimentActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.GLEAP_BOT_EXPERIMENT],
   },

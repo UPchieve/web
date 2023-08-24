@@ -116,16 +116,17 @@ export default {
     },
     sessionRequestTopicCards: (state, getters, rootState, rootGetters) => {
       const rolledOutSubjects =
-        rootGetters['featureFlags/subjectRequestRollout'] ?? []
+        rootGetters['featureFlags/subjectRequestRollout']
       return generateTopicCards(
         state.subjects,
         subject => !subject.active && !rolledOutSubjects.includes(subject.name)
       )
     },
-    quizTopicCards: (state, getters) => {
+    quizTopicCards: (state, getters, rootState, rootGetters) => {
+      const rolledOutQuizzes = rootGetters['featureFlags/quizRollout']
       return generateTopicCards(
         getters.reformatTrainingToSubjectsMap,
-        subject => !subject.active
+        quiz => !quiz.active && !rolledOutQuizzes.includes(quiz.name)
       )
     },
     // This reformats the training data to have the shape of `state.subjects`.
@@ -137,21 +138,34 @@ export default {
         // `state.training` has other properties not directly related to certifications
         if (Array.isArray(t) || !t.certifications) continue
         const certData = t
-        const certifications = certData.certifications
-        for (const cert of certifications) {
-          const topic = state.subjects[cert.key]?.topicName
-          formatted[cert.key] = {
-            ...state.subjects[cert.key],
+        const quizzes = certData.certifications
+        for (const quiz of quizzes) {
+          const topic = state.subjects[quiz.key]?.topicName
+          formatted[quiz.key] = {
+            ...state.subjects[quiz.key],
             topicDashboardOrder: state.training.subjectTypes.find(
               item => item.key === topic.key
             )?.trainingOrder,
-            // `state.training` is populated with only active quizzes. We are ensuring
-            // the spread from `state.subjects` doesn't overwrite the quiz's `active` status
-            active: true,
+            active: quiz.active,
           }
         }
       }
       return formatted
+    },
+    activeTraining: (state, getters, rootState, rootGetters) => {
+      const rolledOutQuizzes = rootGetters['featureFlags/quizRollout']
+      const activeTraining = {}
+      for (const [key, quizData] of Object.entries(state.training)) {
+        if (quizData.certifications?.length) {
+          const activeQuizzes = quizData.certifications.filter(
+            quiz =>
+              quiz.active ||
+              (!quiz.active && rolledOutQuizzes.includes(quiz.key))
+          )
+          activeTraining[key] = { ...quizData, certifications: activeQuizzes }
+        } else if (Array.isArray(quizData)) activeTraining[key] = [...quizData]
+      }
+      return activeTraining
     },
   },
 }

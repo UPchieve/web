@@ -513,6 +513,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   DOWNTIME_BANNER: 'downtime-banner',
   TOPIC_CARD_DASHBOARD_REORDER: 'topic-card-dashboard-reorder',
   SUBJECT_REQUEST_ROLLOUT: 'subject-request-rollout',
+  QUIZ_ROLLOUT: 'quiz-rollout',
   GLEAP_BOT_EXPERIMENT: 'gleap-bot-experiment',
 }
 
