@@ -27,7 +27,7 @@
                 primary
                 :showArrow="false"
                 @click.native="startSession"
-                >Start a session</large-button
+                >Get college help</large-button
               >
             </div>
             <div class="tell-them-cp-modal__text--center">
