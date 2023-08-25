@@ -12,7 +12,7 @@
               Want to go to college?
             </p>
             <p class="tell-them-cp-modal__message">
-              1:1 College prep help is available now!
+              1:1 college prep tutors are available now!
             </p>
           </section>
           <footer class="tell-them-cp-modal__footer">
@@ -27,7 +27,7 @@
                 primary
                 :showArrow="false"
                 @click.native="startSession"
-                >Get college help</large-button
+                >Start a college chat</large-button
               >
             </div>
             <div class="tell-them-cp-modal__text--center">
