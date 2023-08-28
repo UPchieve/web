@@ -81,6 +81,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: null,
       [POSTHOG_FEATURE_FLAGS.SUBJECT_REQUEST_ROLLOUT]: [],
       [POSTHOG_FEATURE_FLAGS.QUIZ_ROLLOUT]: [],
+      [POSTHOG_FEATURE_FLAGS.TEST_SUBJECT_CARD_COPY]: 'Standardized Testing',
     },
   },
   mutations: {
@@ -200,5 +201,7 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.GLEAP_BOT_EXPERIMENT],
     isStudentCoachReachOutActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.STUDENT_COACH_REACH_OUT],
+    testSubjectCardCopy: state =>
+      state.flagPayloads[POSTHOG_FEATURE_FLAGS.TEST_SUBJECT_CARD_COPY],
   },
 }
