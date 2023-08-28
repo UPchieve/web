@@ -92,7 +92,7 @@ export default {
 
       const SAT_TOPIC = 'sat'
       cards.map(card => {
-        if (card.topic === SAT_TOPIC) {
+        if (card.topic === SAT_TOPIC && this.testSubjectCardCopy) {
           card.title = this.testSubjectCardCopy
         }
       })

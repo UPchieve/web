@@ -519,6 +519,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   QUIZ_ROLLOUT: 'quiz-rollout',
   GLEAP_BOT_EXPERIMENT: 'gleap-bot-experiment',
   STUDENT_COACH_REACH_OUT: 'student-coach-reach-out',
+  TEST_SUBJECT_CARD_COPY: 'test-subject-card-copy',
 }
 
 export const ANALYTICS_REPORT_ROW = {
