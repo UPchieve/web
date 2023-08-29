@@ -123,7 +123,8 @@ export default {
           this.$router.push(this.$route.query.redirect || '/')
         })
         .catch(() => {
-          this.error = 'Oops! The email or password you entered is incorrect.'
+          this.error =
+            "Oops! That email and password combination doesn't work. Check your password or if you signed up with Google SSO."
         })
         .finally(() => {
           this.isLoggingIn = false
