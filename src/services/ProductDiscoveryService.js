@@ -9,9 +9,7 @@ function isValidUserForSegment(user, properties) {
   return (
     user.pastSessions.length >= minSessions &&
     user.pastSessions.length <= maxSessions &&
-    userType === user.type &&
-    !user.isBanned &&
-    !user.isTestUser
+    userType === user.type
   )
 }
 
