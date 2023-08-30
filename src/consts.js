@@ -518,6 +518,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   SUBJECT_REQUEST_ROLLOUT: 'subject-request-rollout',
   QUIZ_ROLLOUT: 'quiz-rollout',
   GLEAP_BOT_EXPERIMENT: 'gleap-bot-experiment',
+  GLEAP_BOT_SEGMENT_EXPERIMENTS: 'gleap-bot-segment-experiments',
   STUDENT_COACH_REACH_OUT: 'student-coach-reach-out',
   TEST_SUBJECT_CARD_COPY: 'test-subject-card-copy',
 }
