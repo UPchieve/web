@@ -77,6 +77,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_FORM_HEADLINE]:
         'Check if you are eligible for UPchieve',
       [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: [],
+      [POSTHOG_FEATURE_FLAGS.GLEAP_BOT_SEGMENT_EXPERIMENTS]: [],
       [POSTHOG_FEATURE_FLAGS.DOWNTIME_BANNER]: '',
       [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: null,
       [POSTHOG_FEATURE_FLAGS.SUBJECT_REQUEST_ROLLOUT]: [],
@@ -199,6 +200,11 @@ export default {
       state.flagPayloads[POSTHOG_FEATURE_FLAGS.QUIZ_ROLLOUT] ?? [],
     isGleapBotExperimentActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.GLEAP_BOT_EXPERIMENT],
+    gleapBotSegmentExperiments: state =>
+      state.flagPayloads[POSTHOG_FEATURE_FLAGS.GLEAP_BOT_SEGMENT_EXPERIMENTS] ??
+      [],
+    isGleapBotSegmentExperimentsActive: (state, getters) =>
+      getters.gleapBotSegmentExperiments.length > 0,
     isStudentCoachReachOutActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.STUDENT_COACH_REACH_OUT],
     testSubjectCardCopy: state =>
