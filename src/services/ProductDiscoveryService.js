@@ -42,8 +42,16 @@ export default {
       for (const properties of segmentProperties) {
         if (isValidUserForSegment(user, properties)) {
           const { botId } = properties
-          Gleap.startBot(botId)
-          AnalyticsService.captureEvent(EVENTS.GLEAP_BOT_SHOWN, { botId })
+          const key = 'gleapBotsShown'
+          const gleapBotsShown = JSON.parse(localStorage.getItem(key)) ?? []
+          if (!gleapBotsShown.includes(botId)) {
+            Gleap.startBot(botId)
+            AnalyticsService.captureEvent(EVENTS.GLEAP_BOT_SHOWN, { botId })
+            localStorage.setItem(
+              key,
+              JSON.stringify([...gleapBotsShown, botId])
+            )
+          }
         }
       }
     } catch (error) {
