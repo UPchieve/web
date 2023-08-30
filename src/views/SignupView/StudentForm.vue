@@ -2,9 +2,17 @@
   <div v-if="step === 'eligibility' || step === 'referred'">
     <FormErrors :errors="errors" />
 
-    <h1 class="uc-form-header">
+    <h1 v-if="!isCollegeConfidential" class="uc-form-header">
       {{ isReferred ? "Let's get started!" : eligibilityFormHeadline }}
     </h1>
+    <div v-if="isCollegeConfidential">
+      <h1 class="uc-form-header">Welcome College Confidential Student!</h1>
+      <p class="uc-form-text">
+        UPchieve is partnering with College Confidential to offer 100% free,
+        online college counseling and tutoring available 24/7! Share some quick
+        info below to see if you're eligible.
+      </p>
+    </div>
     <p class="uc-form-text">
       Already have an account?
       <router-link class="uc-link" to="/login">Log In</router-link>
@@ -515,11 +523,12 @@ export default {
       isCollegeStudent: false,
       isReferred: false,
       isSubmittingAccountForm: false,
+      isCollegeConfidential: false,
     }
   },
   async mounted() {
+    const params = this.$route.query
     if (this.isFailureRedirect()) {
-      const params = this.$route.query
       this.eligibility = {
         currentGrade: params['currentGrade'],
         highSchool: {
@@ -537,6 +546,10 @@ export default {
       localStorage.setItem('isSSOSignUpRedirect', false)
     } else if (this.isReferred) this.step = 'referred'
     else this.eligibilityPage()
+
+    if (params['utm_source'] === 'collegeconfidential') {
+      this.isCollegeConfidential = true
+    }
 
     const isDomesticIpAddress = await this.isDomesticIpAddress()
     if (!isDomesticIpAddress) return this.internationalPage()
