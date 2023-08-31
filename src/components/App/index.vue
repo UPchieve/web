@@ -216,6 +216,7 @@ export default {
       isMobileApp: state => state.app.isMobileApp,
       isWebPageHidden: state => state.app.isWebPageHidden,
       user: state => state.user.user,
+      session: state => state.user.session,
       subjects: state => state.subjects.subjects,
     }),
     ...mapGetters({
@@ -307,6 +308,10 @@ export default {
         AnalyticsService.captureEvent(
           EVENTS.FLAGGED_AS_AUTO_FLOW_STEP_TWO_AVAILBILITY_STEP
         )
+    },
+    session(currentValue, prevValue) {
+      const hadASession = !currentValue.id && prevValue.id
+      if (hadASession) this.$store.dispatch('user/updateHadASession', true)
     },
   },
   sockets: {

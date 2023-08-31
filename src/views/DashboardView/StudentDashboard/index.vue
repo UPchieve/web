@@ -128,7 +128,8 @@ export default {
       )
 
     if (
-      this.isJustTellThemActive &&
+      this.isCollegePrepAdActive[0] &&
+      this.isCollegePrepAdActive[1] &&
       !getCookie('hasSeenTellThemCollegePrepModal') &&
       this.user.pastSessions.length >= 1
     )
@@ -150,6 +151,7 @@ export default {
   computed: {
     ...mapState({
       user: state => state.user.user,
+      hadASession: state => state.user.hadASession,
       isFirstDashboardVisit: state => state.user.isFirstDashboardVisit,
       isSSOSignUpRedirect: state => state.user.isSSOSignUpRedirect,
     }),
@@ -196,6 +198,9 @@ export default {
     },
     userAndOrbitalSegment() {
       return [this.user, this.orbitalSegments, this.isOrbitalSegmentsActive]
+    },
+    isCollegePrepAdActive() {
+      return [this.isJustTellThemActive, this.hadASession]
     },
   },
   methods: {
@@ -257,10 +262,11 @@ export default {
         AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_LEVEL_SYSTEM_STUDENT)
       }
     },
-    isJustTellThemActive(currentValue, prevValue) {
+    isCollegePrepAdActive(currentValue, prevValue) {
       if (
-        currentValue &&
-        !prevValue &&
+        currentValue[0] &&
+        currentValue[1] &&
+        (!prevValue[0] || !prevValue[1]) &&
         !getCookie('hasSeenTellThemCollegePrepModal') &&
         this.user.pastSessions.length >= 1
       ) {
