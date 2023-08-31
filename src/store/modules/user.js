@@ -17,6 +17,7 @@ export default {
     presessionSurvey: {},
     unreadChatMessageIndices: [],
     chatScrolledToMessageIndex: null,
+    hadASession: false,
   },
   mutations: {
     setUser: (state, user = {}) => (state.user = user),
@@ -98,6 +99,10 @@ export default {
 
     clearChatScrolledToMessageIndex: state => {
       state.chatScrolledToMessageIndex = null
+    },
+
+    setHadASession: (state, flag) => {
+      state.hadASession = flag
     },
   },
   actions: {
@@ -226,6 +231,10 @@ export default {
 
     clearChatScrolledToMessageIndex: ({ commit }) => {
       commit('clearChatScrolledToMessageIndex')
+    },
+
+    updateHadASession: ({ commit }, flag) => {
+      commit('setHadASession', flag)
     },
   },
   getters: {
