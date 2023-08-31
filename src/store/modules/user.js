@@ -378,6 +378,8 @@ export default {
         userType: state.user.type,
         createdAt: state.user.createdAt,
         totalSessions: state.user.pastSessions.length,
+        isBanned: state.user.isBanned,
+        isTestUser: state.user.isTestUser,
       }
       if (getters.isVolunteer) {
         userProps.onboarded = state.user.isOnboarded
