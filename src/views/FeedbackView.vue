@@ -32,13 +32,12 @@
           </div>
           <div v-else>
             <h2 class="question__section-header">
-              Send a message to your coach!
+              Need to reach out to your coach?
             </h2>
             <p class="italic">
-              The UPchieve team monitors messages to ensure they are in line
-              with our community guidelines. Let's keep it safe and respectful!
-              Remember not to share your email, social media handles, or other
-              personal information.
+              Send your coach a message and they'll get back to you. The
+              UPchieve team monitors messages, let's keep them safe and
+              respectful!
             </p>
             <textarea
               class="student-coach-message"
