@@ -553,10 +553,12 @@ export default {
       this.isSubmittingFeedback = true
       this.error = ''
       const submissions = []
+      let hasGivenHighRating = false
       for (const questionInfo of this.filteredQuestions) {
         const question = questionInfo.question
         const response = this.userResponse[question.questionId]
         if (this.isHighRatingQuestion(question)) {
+          hasGivenHighRating = true
           // the answer to the coach-favoriting question is not included in the feedback submission
           continue
         } else if (
@@ -612,6 +614,7 @@ export default {
           this.error = rejectedSave.body.statusText
         }
       } else {
+        localStorage.setItem('high-session-rating', hasGivenHighRating)
         this.$router.push('/dashboard')
       }
       this.isSubmittingFeedback = false

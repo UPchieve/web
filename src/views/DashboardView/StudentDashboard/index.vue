@@ -55,6 +55,7 @@ import TellThemCollegePrepModal from './TellThemCollegePrepModal'
 import moment from 'moment-timezone'
 import LevelSystemRemovalModal from './LevelSystemRemovalModal'
 import AnalyticsService from '@/services/AnalyticsService'
+import NetworkService from '@/services/NetworkService'
 import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 import { EVENTS } from '@/consts'
 import getCookie from '@/utils/get-cookie'
@@ -85,7 +86,7 @@ export default {
     LevelSystemRemovalModal,
     TellThemCollegePrepModal,
   },
-  created() {
+  async created() {
     if (this.isEarnCertificationsActive)
       this.$store.dispatch('app/header/show', earnCertificationsHeaderData)
 
@@ -140,6 +141,38 @@ export default {
       .hour()
 
     if (this.isGleapBotExperimentActive) this.showGleapBot()
+
+    if (
+      !localStorage.getItem('has-shown-referral') &&
+      localStorage.getItem('high-session-rating') === 'true'
+    ) {
+      if (this.referralTiming === 'email') {
+        const {
+          body: { success },
+        } = await NetworkService.sendReferralProgramEmail()
+        if (success) {
+          AnalyticsService.captureEvent(EVENTS.STUDENT_SENT_EMAIL_REFERRAL)
+          localStorage.setItem('has-shown-referral', true)
+        }
+      }
+      if (this.referralTiming === 'after-session') {
+        this.$store.dispatch('app/modal/show', {
+          component: 'ReferralModal',
+          data: {
+            svg: ReferralSVG,
+            showAccept: false,
+            header:
+              '🌟 Know a friend or classmate who would benefit from free, 24/7 tutoring?',
+            subcopy:
+              "Refer friends or classmates to UPchieve by sharing your unique sign-up link below. If you sign up 10 people, we'll send you an UPchieve swag bag!",
+          },
+        })
+        AnalyticsService.captureEvent(
+          EVENTS.STUDENT_SHOWN_AFTER_SESSION_REFERRAL
+        )
+        localStorage.setItem('has-shown-referral', true)
+      }
+    }
   },
   data() {
     return {
@@ -166,6 +199,7 @@ export default {
       isOrbitalSegmentsActive: 'featureFlags/isOrbitalSegmentsActive',
       isJustTellThemActive: 'featureFlags/isJustTellThemActive',
       isGleapBotExperimentActive: 'featureFlags/isGleapBotExperimentActive',
+      referralTiming: 'featureFlags/referralTiming',
     }),
     isLowCoachHour() {
       return this.currentHour < 12
