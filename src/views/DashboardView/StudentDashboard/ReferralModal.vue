@@ -2,7 +2,7 @@
   <div class="ReferralModal">
     <component v-if="!mobileMode" :is="modalData.svg" class="icon" />
     <h1 class="ReferralModal-title">
-      Invite Your Friends
+      {{ modalData.header || 'Invite Your Friends' }}
     </h1>
     <h2 class="ReferralModal-subtitle">
       {{

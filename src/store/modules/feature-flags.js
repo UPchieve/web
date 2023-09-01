@@ -72,6 +72,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO]: false,
       [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_FORM_HEADLINE]: 'control',
       [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: 'control',
+      [POSTHOG_FEATURE_FLAGS.REFERRAL_TIMING]: '', // one-of waiting-session, after-session, or email
     },
     flagPayloads: {
       [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_FORM_HEADLINE]:
@@ -209,5 +210,6 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.STUDENT_COACH_REACH_OUT],
     testSubjectCardCopy: state =>
       state.flagPayloads[POSTHOG_FEATURE_FLAGS.TEST_SUBJECT_CARD_COPY],
+    referralTiming: state => state.flags[POSTHOG_FEATURE_FLAGS.REFERRAL_TIMING],
   },
 }
