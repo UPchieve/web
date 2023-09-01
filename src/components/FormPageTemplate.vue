@@ -1,5 +1,6 @@
 <template>
   <div class="uc-column h-full">
+    <div class="background-img"></div>
     <div class="FormPageTemplate">
       <img class="logo-white" src="@/assets/p_logo_white.png" alt="UPchieve" />
       <img class="logo-teal" src="@/assets/header_logo.png" alt="UPchieve" />
@@ -7,7 +8,7 @@
         <slot></slot>
       </main>
     </div>
-    <nav class="FormFooter" aria-label="More information">
+    <nav class="footer" aria-label="More information">
       <div>
         <router-link to="/contact">Contact Us</router-link>
       </div>
@@ -22,9 +23,25 @@
 </template>
 
 <style lang="scss" scoped>
+.background-img {
+  background-color: white;
+
+  @include breakpoint-above('tiny') {
+    background: url('~@/assets/onboarding_background.png') no-repeat center
+      center;
+    background-attachment: fixed;
+    background-size: cover;
+    height: 100%;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: -1;
+  }
+}
+
 .FormPageTemplate {
   @include flex-container(column, flex-start, center);
-  background-color: white;
   padding-top: 20px;
   height: 100%;
 
@@ -35,11 +52,7 @@
   }
 
   @include breakpoint-above('tiny') {
-    background: url('~@/assets/onboarding_background.png') no-repeat center;
-    background-color: blue;
-    background-size: cover;
-    justify-content: center;
-    padding-top: 0;
+    padding-top: 50px;
 
     main {
       padding-bottom: 50px;
@@ -67,7 +80,7 @@
   }
 }
 
-.FormFooter {
+.footer {
   @include flex-container(column, space-around, center);
 
   background-color: #f6f6f6;
