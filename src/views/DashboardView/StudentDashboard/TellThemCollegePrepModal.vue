@@ -18,11 +18,6 @@
           <footer class="tell-them-cp-modal__footer">
             <div class="tell-them-cp-modal__buttons">
               <large-button
-                class="tell-them-cp-modal__buttons-button"
-                @click.native="handleRemindMeClick"
-                >Remind me</large-button
-              >
-              <large-button
                 class="tell-them-cp-modal__buttons-button tell-them-cp-modal__buttons-button--primary"
                 primary
                 :showArrow="false"
@@ -361,7 +356,7 @@ export default {
       margin: 0 auto;
 
       @include breakpoint-above('small') {
-        width: 200px;
+        width: 250px;
       }
 
       &--primary {
