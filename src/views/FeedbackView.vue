@@ -614,6 +614,7 @@ export default {
           this.error = rejectedSave.body.statusText
         }
       } else {
+        AnalyticsService.captureEvent(EVENTS.POST_SESSION_SURVEY_SUBMITTED)
         localStorage.setItem('high-session-rating', hasGivenHighRating)
         this.$router.push('/dashboard')
       }
