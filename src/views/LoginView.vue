@@ -81,6 +81,7 @@ export default {
   },
   created() {
     this.$store.dispatch('app/hideNavigation')
+    localStorage.removeItem('isSSOSignUpRedirect')
   },
   computed: {
     isValidForm() {

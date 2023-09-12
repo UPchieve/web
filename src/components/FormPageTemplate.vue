@@ -42,6 +42,7 @@
 
 .FormPageTemplate {
   @include flex-container(column, flex-start, center);
+  background-color: white;
   padding-top: 20px;
   height: 100%;
 
@@ -52,6 +53,7 @@
   }
 
   @include breakpoint-above('tiny') {
+    background-color: transparent;
     padding-top: 50px;
 
     main {
