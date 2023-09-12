@@ -69,7 +69,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.STUDENT_COACH_REACH_OUT]: false,
       // This is an experiment, using multivariant feature flag values
       [POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS_AND_LEVEL_SYSTEM]: '',
-      [POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO]: false,
+      [POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO]: true,
       [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_FORM_HEADLINE]: 'control',
       [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: 'control',
       [POSTHOG_FEATURE_FLAGS.REFERRAL_TIMING]: '', // one-of waiting-session, after-session, or email
