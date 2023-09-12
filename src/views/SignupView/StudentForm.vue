@@ -527,6 +527,7 @@ export default {
     }
   },
   async mounted() {
+    localStorage.removeItem('isSSOSignUpRedirect')
     const params = this.$route.query
     if (this.isFailureRedirect()) {
       this.eligibility = {
@@ -543,7 +544,6 @@ export default {
           'Failed to sign up with Google. Please use password instead.'
       )
       this.step = 'account'
-      localStorage.setItem('isSSOSignUpRedirect', false)
     } else if (this.isReferred) this.step = 'referred'
     else this.eligibilityPage()
 
