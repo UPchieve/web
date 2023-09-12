@@ -27,6 +27,15 @@ if (config.posthogToken) {
   posthog.init(`${config.posthogToken}`, {
     api_host: 'https://p.upchieve.org',
     persistence: 'localStorage+cookie',
+    on_xhr_error: req => {
+      if (req?.status === 0)
+        LoggerService.noticeError(
+          new Error('Failed to fetch feature flags from PostHog.')
+        )
+      LoggerService.noticeError(
+        new Error(`PostHog - Bad HTTP status: ${req?.status} ${req?.statusText}`)
+      )
+    },
   })
 }
 
