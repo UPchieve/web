@@ -2,10 +2,13 @@ import posthog from 'posthog-js'
 import { EVENTS } from '../consts'
 import Gleap from 'gleap'
 
+const newrelic = window.newrelic
+
 export default {
   identify(userId, properties) {
     posthog.identify(userId)
     Gleap.identify(userId, properties)
+    if (newrelic) newrelic.setUserId(userId)
     // Attaches custom data to the feedback submission
     Gleap.setCustomData('userType', properties.customData.userType)
   },
@@ -23,6 +26,7 @@ export default {
     posthog.reset()
     // TODO: does this clear identity stuff too?
     Gleap.clearCustomData()
+    if (newrelic) newrelic.setUserId(null)
   },
 
   registerVolunteer(volunteer) {
