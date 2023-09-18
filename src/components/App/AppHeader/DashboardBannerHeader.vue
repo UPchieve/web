@@ -1,12 +1,20 @@
 <template>
   <div class="header">
-    <!-- Edit the text below to display on dashboard banner to volunteers -->
     <div class="header-message">
-      <span>We've revamped our English and College Counseling training!</span>
+      <span
+        >UPchieve's Fall Challenge! You can earn $5 per week for having a
+        session</span
+      >
     </div>
-    <router-link to="/training" tag="button" class="header-button"
-      >Get Certified by Dec 31st<arrow-icon class="arrow-icon"
-    /></router-link>
+    <a
+      href="http://upchieve.org/upchieve-fall-challenge-2023"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="header-button"
+    >
+      Learn more 🎉
+      <arrow-icon class="arrow-icon" />
+    </a>
   </div>
 </template>
 

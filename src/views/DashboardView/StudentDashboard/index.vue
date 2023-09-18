@@ -77,6 +77,10 @@ const earnCertificationsHeaderData = {
   component: 'EarnCertificationsHeader',
 }
 
+const dashboardBannerData = {
+  component: 'DashboardBannerHeader',
+}
+
 export default {
   name: 'student-dashboard',
   components: {
@@ -96,7 +100,7 @@ export default {
 
     if (this.isSessionAlive) {
       this.$store.dispatch('app/header/show', activeHeaderData)
-    }
+    } else if (this.isDashboardBannerActive) this.triggerIncentiveProgram()
 
     if (this.isFirstDashboardVisit) {
       this.$store.dispatch('app/modal/show', {
@@ -187,6 +191,7 @@ export default {
       hadASession: state => state.user.hadASession,
       isFirstDashboardVisit: state => state.user.isFirstDashboardVisit,
       isSSOSignUpRedirect: state => state.user.isSSOSignUpRedirect,
+      productFlags: state => state.productFlags.flags,
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
@@ -200,6 +205,7 @@ export default {
       isJustTellThemActive: 'featureFlags/isJustTellThemActive',
       isGleapBotExperimentActive: 'featureFlags/isGleapBotExperimentActive',
       referralTiming: 'featureFlags/referralTiming',
+      isDashboardBannerActive: 'featureFlags/isDashboardBannerActive',
     }),
     isLowCoachHour() {
       return this.currentHour < 12
@@ -236,6 +242,9 @@ export default {
     isCollegePrepAdActive() {
       return [this.isJustTellThemActive, this.hadASession]
     },
+    isFallIncentiveProgramActive() {
+      return [this.user, this.productFlags, this.isDashboardBannerActive]
+    },
   },
   methods: {
     toggleFirstSessionCongratsModal() {
@@ -262,6 +271,12 @@ export default {
       AnalyticsService.captureEvent(EVENTS.GLEAP_BOT_SHOWN)
       Gleap.startBot('64b555f1e8dd226df869b2e7')
       AnalyticsService.updateUser({ hasMessages: false })
+    },
+    triggerIncentiveProgram() {
+      if (!this.productFlags.fallIncentiveProgram) return
+
+      this.$store.dispatch('app/header/show', dashboardBannerData)
+      Gleap.trackEvent('fall-incentive-program')
     },
   },
   watch: {
@@ -325,6 +340,18 @@ export default {
             this.user,
             this.orbitalSegments
           )
+      },
+      deep: true,
+    },
+    isFallIncentiveProgramActive: {
+      handler: function(currentValue, prevValue) {
+        if (
+          currentValue[0] &&
+          currentValue[1] &&
+          currentValue[2] &&
+          (!prevValue[0] || !prevValue[1] || !prevValue[2])
+        )
+          this.triggerIncentiveProgram()
       },
       deep: true,
     },
