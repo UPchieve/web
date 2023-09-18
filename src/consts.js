@@ -499,10 +499,10 @@ export const UNLEASH_FEATURE_FLAGS = {
   REFER_FRIENDS: 'refer-friends',
   DASHBOARD_REDESIGN: 'dashboard-redesign',
   CHATBOT: 'chatbot',
-  DASHBOARD_BANNER: 'dashboard-banner',
 }
 
 export const POSTHOG_FEATURE_FLAGS = {
+  DASHBOARD_BANNER: 'dashboard-banner',
   FILTER_ACTIVE_SUBJECTS: 'filter-active-subjects',
   IMAGES_IN_DOCUMENTS: 'images-in-documents',
   STREAMLINE_SIGN_UP_FLOW: 'streamline-sign-in',
