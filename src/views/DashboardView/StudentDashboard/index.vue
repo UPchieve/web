@@ -346,10 +346,12 @@ export default {
     isFallIncentiveProgramActive: {
       handler: function(currentValue, prevValue) {
         if (
-          currentValue[0] &&
-          currentValue[1] &&
+          Object.keys(currentValue[0]).length &&
+          Object.keys(currentValue[1]).length &&
           currentValue[2] &&
-          (!prevValue[0] || !prevValue[1] || !prevValue[2])
+          (!Object.keys(prevValue[0]).length ||
+            !Object.keys(prevValue[1]).length ||
+            !prevValue[2])
         )
           this.triggerIncentiveProgram()
       },
