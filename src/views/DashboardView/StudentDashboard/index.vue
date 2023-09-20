@@ -2,14 +2,6 @@
   <div class="student-dashboard">
     <dashboard-banner />
     <div class="dashboard-notices">
-      <div class="share-upchieve-notice">
-        🌟 Know a friend or classmate who would benefit from free, 24/7
-        tutoring?
-        <a class="link" @click="openReferralModal">
-          Invite them to UPchieve! 🚀
-        </a>
-      </div>
-
       <div
         v-if="!downtimeBannerMessage && noticeMessage"
         class="dashboard-notice"
@@ -47,7 +39,6 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import ReferralSVG from '@/assets/dashboard_icons/student/referral.svg'
 import DashboardBanner from '../DashboardBanner'
 import SubjectSelection from './SubjectSelection'
 import FirstSessionCongratsModal from './FirstSessionCongratsModal'
@@ -55,7 +46,6 @@ import TellThemCollegePrepModal from './TellThemCollegePrepModal'
 import moment from 'moment-timezone'
 import LevelSystemRemovalModal from './LevelSystemRemovalModal'
 import AnalyticsService from '@/services/AnalyticsService'
-import NetworkService from '@/services/NetworkService'
 import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 import { EVENTS } from '@/consts'
 import getCookie from '@/utils/get-cookie'
@@ -145,38 +135,6 @@ export default {
       .hour()
 
     if (this.isGleapBotExperimentActive) this.showGleapBot()
-
-    if (
-      !localStorage.getItem('has-shown-referral') &&
-      localStorage.getItem('high-session-rating') === 'true'
-    ) {
-      if (this.referralTiming === 'email') {
-        const {
-          body: { success },
-        } = await NetworkService.sendReferralProgramEmail()
-        if (success) {
-          AnalyticsService.captureEvent(EVENTS.STUDENT_SENT_EMAIL_REFERRAL)
-          localStorage.setItem('has-shown-referral', true)
-        }
-      }
-      if (this.referralTiming === 'after-session') {
-        this.$store.dispatch('app/modal/show', {
-          component: 'ReferralModal',
-          data: {
-            svg: ReferralSVG,
-            showAccept: false,
-            header:
-              '🌟 Know a friend or classmate who would benefit from free, 24/7 tutoring?',
-            subcopy:
-              "Refer friends or classmates to UPchieve by sharing your unique sign-up link below. If you sign up 10 people, we'll send you an UPchieve swag bag!",
-          },
-        })
-        AnalyticsService.captureEvent(
-          EVENTS.STUDENT_SHOWN_AFTER_SESSION_REFERRAL
-        )
-        localStorage.setItem('has-shown-referral', true)
-      }
-    }
   },
   data() {
     return {
@@ -190,7 +148,6 @@ export default {
       user: state => state.user.user,
       hadASession: state => state.user.hadASession,
       isFirstDashboardVisit: state => state.user.isFirstDashboardVisit,
-      isSSOSignUpRedirect: state => state.user.isSSOSignUpRedirect,
       productFlags: state => state.productFlags.flags,
     }),
     ...mapGetters({
@@ -204,7 +161,6 @@ export default {
       isOrbitalSegmentsActive: 'featureFlags/isOrbitalSegmentsActive',
       isJustTellThemActive: 'featureFlags/isJustTellThemActive',
       isGleapBotExperimentActive: 'featureFlags/isGleapBotExperimentActive',
-      referralTiming: 'featureFlags/referralTiming',
       isDashboardBannerActive: 'featureFlags/isDashboardBannerActive',
     }),
     isLowCoachHour() {
@@ -252,20 +208,6 @@ export default {
     },
     toggleTellThemCollegePrepModal() {
       this.showTellThemCollegePrepModal = !this.showTellThemCollegePrepModal
-    },
-    openReferralModal() {
-      AnalyticsService.captureEvent(
-        EVENTS.STUDENT_CLICKED_TO_GET_REFERRAL_LINK_BANNER
-      )
-      this.$store.dispatch('app/modal/show', {
-        component: 'ReferralModal',
-        data: {
-          svg: ReferralSVG,
-          showAccept: false,
-          subcopy:
-            "Refer friends or classmates to UPchieve by sharing your unique sign-up link below. If you sign up 10 people, we'll send you an UPchieve swag bag!",
-        },
-      })
     },
     showGleapBot() {
       AnalyticsService.captureEvent(EVENTS.GLEAP_BOT_SHOWN)

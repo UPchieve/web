@@ -3,7 +3,7 @@
     <FormErrors :errors="errors" />
 
     <h1 v-if="!isCollegeConfidential" class="uc-form-header">
-      {{ isReferred ? "Let's get started!" : eligibilityFormHeadline }}
+      Awesome! Let's check if we're a match
     </h1>
     <div v-if="isCollegeConfidential">
       <h1 class="uc-form-header">Welcome College Confidential Student!</h1>
@@ -557,7 +557,6 @@ export default {
   computed: {
     ...mapGetters({
       offerGoogleSSO: 'featureFlags/offerGoogleSSO',
-      eligibilityFormHeadline: 'featureFlags/eligibilityFormHeadline',
     }),
     trimCurrentGrade() {
       // extracting the first word out of the gradeLevels
@@ -566,7 +565,7 @@ export default {
     },
     title() {
       if (this.isCollegeStudent)
-        return "Oops, looks like you're not a high school student!"
+        return "Oops, looks like you're not a middle or high school student!"
       else return "Sorry, we can't verify your eligibility yet."
     },
     CANNOT_FIND_SCHOOL_TEXT() {

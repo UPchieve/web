@@ -33,7 +33,9 @@ if (config.posthogToken) {
           new Error('Failed to fetch feature flags from PostHog.')
         )
       LoggerService.noticeError(
-        new Error(`PostHog - Bad HTTP status: ${req?.status} ${req?.statusText}`)
+        new Error(
+          `PostHog - Bad HTTP status: ${req?.status} ${req?.statusText}`
+        )
       )
     },
   })

@@ -57,11 +57,9 @@ export default {
       [POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS]: false,
       [POSTHOG_FEATURE_FLAGS.IMAGES_IN_DOCUMENTS]: false,
       [POSTHOG_FEATURE_FLAGS.AUTO_FLOW_PROGRESS_BAR]: false,
-      [POSTHOG_FEATURE_FLAGS.NEW_SCHOOLS_ELIGIBILITY]: false,
       [POSTHOG_FEATURE_FLAGS.FLAG_PERSON_PROPERTIES]: false,
       [POSTHOG_FEATURE_FLAGS.POLL_FLAGS]: false,
       [POSTHOG_FEATURE_FLAGS.QUIZ_STUDY_MATERIALS]: false,
-      [POSTHOG_FEATURE_FLAGS.ZIP_FIRST]: false,
       [POSTHOG_FEATURE_FLAGS.UPDATED_AUTO_FLOW_QUIZ_UX]: false,
       [POSTHOG_FEATURE_FLAGS.ORBITAL]: false,
       [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: false,
@@ -70,20 +68,15 @@ export default {
       // This is an experiment, using multivariant feature flag values
       [POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS_AND_LEVEL_SYSTEM]: '',
       [POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO]: true,
-      [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_FORM_HEADLINE]: 'control',
       [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: 'control',
-      [POSTHOG_FEATURE_FLAGS.REFERRAL_TIMING]: '', // one-of waiting-session, after-session, or email
     },
     flagPayloads: {
-      [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_FORM_HEADLINE]:
-        'Check if you are eligible for UPchieve',
       [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: [],
       [POSTHOG_FEATURE_FLAGS.GLEAP_BOT_SEGMENT_EXPERIMENTS]: [],
       [POSTHOG_FEATURE_FLAGS.DOWNTIME_BANNER]: '',
       [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: null,
       [POSTHOG_FEATURE_FLAGS.SUBJECT_REQUEST_ROLLOUT]: [],
       [POSTHOG_FEATURE_FLAGS.QUIZ_ROLLOUT]: [],
-      [POSTHOG_FEATURE_FLAGS.TEST_SUBJECT_CARD_COPY]: 'Standardized Testing',
     },
   },
   mutations: {
@@ -156,8 +149,6 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.OPTIONAL_MIDDLE_SCHOOL],
     isAutoFlowProgressBarActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.AUTO_FLOW_PROGRESS_BAR],
-    useNewSchoolsEligibility: state =>
-      state.flags[POSTHOG_FEATURE_FLAGS.NEW_SCHOOLS_ELIGIBILITY],
     isFlagPersonPropertiesActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.FLAG_PERSON_PROPERTIES],
     isPollingFlagsActive: state =>
@@ -166,7 +157,6 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.AUTO_FLOW_TWO_STEP_AVAILABILITY],
     isQuizStudyMaterialsActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.QUIZ_STUDY_MATERIALS],
-    isZipFirst: state => state.flags[POSTHOG_FEATURE_FLAGS.ZIP_FIRST],
     isUpdatedAutoFlowQuizUxActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.UPDATED_AUTO_FLOW_QUIZ_UX],
     isEarnCertificationsActive: state =>
@@ -179,8 +169,6 @@ export default {
       ] === POSTHOG_FEATURE_FLAGS.LEVEL_SYSTEM,
     offerGoogleSSO: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO],
-    eligibilityFormHeadline: state =>
-      state.flagPayloads[POSTHOG_FEATURE_FLAGS.ELIGIBILITY_FORM_HEADLINE],
     orbitalSegments: state =>
       state.flagPayloads[POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS],
     isOrbitalSegmentsActive: state =>
@@ -208,8 +196,5 @@ export default {
       getters.gleapBotSegmentExperiments.length > 0,
     isStudentCoachReachOutActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.STUDENT_COACH_REACH_OUT],
-    testSubjectCardCopy: state =>
-      state.flagPayloads[POSTHOG_FEATURE_FLAGS.TEST_SUBJECT_CARD_COPY],
-    referralTiming: state => state.flags[POSTHOG_FEATURE_FLAGS.REFERRAL_TIMING],
   },
 }
