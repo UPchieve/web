@@ -102,17 +102,14 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import SessionService from '@/services/SessionService'
-import AnalyticsService from '@/services/AnalyticsService'
 import router from '@/router'
 import StudentIcon from '@/assets/student-icon.svg'
 import VolunteerIcon from '@/assets/volunteer-icon.svg'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
-import ReferralSVG from '@/assets/dashboard_icons/student/referral.svg'
 import LoadingMessage from '@/components/LoadingMessage'
 import TroubleMatchingModal from '@/views/SessionView/TroubleMatchingModal'
 import UnmatchedModal from '@/views/SessionView/UnmatchedModal'
 import sendWebNotification from '@/utils/send-web-notification'
-import { EVENTS } from '@/consts'
 
 /**
  * @todo {1} Refactoring candidate: use a modal instead.
@@ -152,32 +149,6 @@ export default {
       }, 1000 * 60)
     }
   },
-  created() {
-    if (
-      !localStorage.getItem('has-shown-referral') &&
-      localStorage.getItem('high-session-rating') === 'true' &&
-      this.referralTiming === 'waiting-session'
-    ) {
-      // Same re-render issue as mentioned above.
-      setTimeout(() => {
-        this.$store.dispatch('app/modal/show', {
-          component: 'ReferralModal',
-          data: {
-            svg: ReferralSVG,
-            showAccept: false,
-            header:
-              '🌟 Know a friend or classmate who would benefit from free, 24/7 tutoring?',
-            subcopy:
-              "Refer friends or classmates to UPchieve by sharing your unique sign-up link below. If you sign up 10 people, we'll send you an UPchieve swag bag!",
-          },
-        })
-      }, 2000)
-      AnalyticsService.captureEvent(
-        EVENTS.STUDENT_SHOWN_WAITING_SESSION_REFERRAL
-      )
-      localStorage.setItem('has-shown-referral', true)
-    }
-  },
   beforeDestroy() {
     this.$socket.disconnect()
   },
@@ -193,7 +164,6 @@ export default {
       isSessionInProgress: 'user/isSessionInProgress',
       isSessionOver: 'user/isSessionOver',
       isChatbotActive: 'featureFlags/isChatbotActive',
-      referralTiming: 'featureFlags/referralTiming',
     }),
 
     partnerAvatar() {

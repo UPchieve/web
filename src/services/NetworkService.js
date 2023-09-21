@@ -746,9 +746,4 @@ export default {
       .get(`${API_ROOT}/subjects/training`)
       .then(this._successHandler, this._errorHandler)
   },
-  sendReferralProgramEmail() {
-    return Vue.http
-      .post(`${API_ROOT}/send-referral-email`)
-      .then(this._successHandler, this._errorHandler)
-  },
 }
