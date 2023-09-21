@@ -6,12 +6,46 @@
       Awesome! Let's check if we're a match
     </h1>
     <div v-if="isCollegeConfidential">
-      <h1 class="uc-form-header">Welcome College Confidential Student!</h1>
-      <p class="uc-form-text">
-        UPchieve is partnering with College Confidential to offer 100% free,
-        online college counseling and tutoring available 24/7! Share some quick
-        info below to see if you're eligible.
-      </p>
+      <div v-if="ccIntroCopy === 'college-essay-specific'">
+        <h1 class="uc-form-header">Need help revising your college essay?</h1>
+        <p class="uc-form-text">
+          The nonprofit
+          <a
+            class="uc-link"
+            href="https://upchieve.org/students"
+            target="_blank"
+            @click="logStudentClickedUpchieveLink()"
+            >UPchieve</a
+          >
+          is partnering with College Confidential to make it easy for you to
+          chat with an expert 24/7, completely free, for help on any part of
+          your application or for tutoring. Sign up now!
+        </p>
+      </div>
+      <div v-else-if="ccIntroCopy === 'focus-on-results'">
+        <h1 class="uc-form-header">Improve your college chances</h1>
+        <p class="uc-form-text">
+          Students who use
+          <a
+            class="uc-link"
+            href="https://upchieve.org/students"
+            target="_blank"
+            @click="logStudentClickedUpchieveLink()"
+            >UPchieve</a
+          >
+          10+ times are 3x more likely than their peers to be accepted into a
+          4-year college! Sign up for free access to the 24/7 academic support
+          that can help you achieve your dream.
+        </p>
+      </div>
+      <div v-else>
+        <h1 class="uc-form-header">Welcome College Confidential Student!</h1>
+        <p class="uc-form-text">
+          UPchieve is partnering with College Confidential to offer 100% free,
+          online college counseling and tutoring available 24/7! Share some
+          quick info below to see if you're eligible.
+        </p>
+      </div>
     </div>
     <p class="uc-form-text">
       Already have an account?
@@ -545,7 +579,7 @@ export default {
       )
       this.step = 'account'
     } else if (this.isReferred) this.step = 'referred'
-    else this.eligibilityPage()
+    else this.eligibilityPage(params)
 
     if (params['utm_source'] === 'collegeconfidential') {
       this.isCollegeConfidential = true
@@ -557,6 +591,7 @@ export default {
   computed: {
     ...mapGetters({
       offerGoogleSSO: 'featureFlags/offerGoogleSSO',
+      ccIntroCopy: 'featureFlags/ccIntroCopy',
     }),
     trimCurrentGrade() {
       // extracting the first word out of the gradeLevels
@@ -616,6 +651,9 @@ export default {
     },
   },
   methods: {
+    logStudentClickedUpchieveLink() {
+      AnalyticsService.captureEvent(EVENTS.CC_STUDENT_CLICKED_UPCHIEVE_LINK)
+    },
     isFailureRedirect() {
       return (
         !!this.$route.query['email'] &&
@@ -633,9 +671,9 @@ export default {
       }
     },
 
-    eligibilityPage() {
+    eligibilityPage(params) {
       this.step = 'eligibility'
-      this.$router.push('/sign-up/student/eligibility')
+      this.$router.push({ path: `/sign-up/student/eligibility`, query: params })
     },
 
     async isDomesticIpAddress() {
