@@ -746,4 +746,9 @@ export default {
       .get(`${API_ROOT}/subjects/training`)
       .then(this._successHandler, this._errorHandler)
   },
+  queueStudentsTextReminder(data) {
+    return Vue.http
+      .post(`${API_ROOT}/students/reminders/text`, data)
+      .then(this._successHandler, this._errorHandler)
+  },
 }

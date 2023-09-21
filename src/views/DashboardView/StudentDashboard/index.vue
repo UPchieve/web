@@ -29,6 +29,10 @@
       v-if="isJustTellThemActive && showTellThemCollegePrepModal"
       :closeModal="toggleTellThemCollegePrepModal"
     />
+    <procrastination-prevention-modal
+      v-if="showThemProcrastinationPreventionModal"
+      :closeModal="toggleProcrastinationPreventionModal"
+    />
     <subject-selection />
     <first-session-congrats-modal
       v-if="showFirstSessionCongratsModal"
@@ -43,6 +47,7 @@ import DashboardBanner from '../DashboardBanner'
 import SubjectSelection from './SubjectSelection'
 import FirstSessionCongratsModal from './FirstSessionCongratsModal'
 import TellThemCollegePrepModal from './TellThemCollegePrepModal'
+import ProcrastinationPreventionModal from './ProcrastinationPreventionModal'
 import moment from 'moment-timezone'
 import LevelSystemRemovalModal from './LevelSystemRemovalModal'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -79,6 +84,7 @@ export default {
     FirstSessionCongratsModal,
     LevelSystemRemovalModal,
     TellThemCollegePrepModal,
+    ProcrastinationPreventionModal,
   },
   async created() {
     if (this.isEarnCertificationsActive)
@@ -130,6 +136,13 @@ export default {
     )
       this.showTellThemCollegePrepModal = true
 
+    if (
+      this.isProcrastinationPreventionReminderActive[0] &&
+      this.isProcrastinationPreventionReminderActive[1] &&
+      !localStorage.getItem('hasSeenProcrastinationPreventionModal')
+    )
+      this.showThemProcrastinationPreventionModal = true
+
     this.currentHour = moment()
       .tz('America/New_York')
       .hour()
@@ -141,6 +154,7 @@ export default {
       currentHour: 0,
       showFirstSessionCongratsModal: false,
       showTellThemCollegePrepModal: false,
+      showThemProcrastinationPreventionModal: false,
     }
   },
   computed: {
@@ -160,6 +174,8 @@ export default {
       orbitalSegments: 'featureFlags/orbitalSegments',
       isOrbitalSegmentsActive: 'featureFlags/isOrbitalSegmentsActive',
       isJustTellThemActive: 'featureFlags/isJustTellThemActive',
+      isProcrastinationPreventionActive:
+        'featureFlags/isProcrastinationPreventionActive',
       isGleapBotExperimentActive: 'featureFlags/isGleapBotExperimentActive',
       isDashboardBannerActive: 'featureFlags/isDashboardBannerActive',
     }),
@@ -201,6 +217,9 @@ export default {
     isFallIncentiveProgramActive() {
       return [this.user, this.productFlags, this.isDashboardBannerActive]
     },
+    isProcrastinationPreventionReminderActive() {
+      return [this.isProcrastinationPreventionActive, this.hadASession]
+    },
   },
   methods: {
     toggleFirstSessionCongratsModal() {
@@ -208,6 +227,10 @@ export default {
     },
     toggleTellThemCollegePrepModal() {
       this.showTellThemCollegePrepModal = !this.showTellThemCollegePrepModal
+    },
+    toggleProcrastinationPreventionModal() {
+      this.showThemProcrastinationPreventionModal = !this
+        .showThemProcrastinationPreventionModal
     },
     showGleapBot() {
       AnalyticsService.captureEvent(EVENTS.GLEAP_BOT_SHOWN)
@@ -262,6 +285,17 @@ export default {
         this.user.pastSessions.length >= 1
       ) {
         this.showTellThemCollegePrepModal = true
+      }
+    },
+    isProcrastinationPreventionReminderActive(currentValue, prevValue) {
+      if (
+        currentValue[0] &&
+        currentValue[1] &&
+        (!prevValue[0] || !prevValue[1]) &&
+        !localStorage.getItem('hasSeenProcrastinationPreventionModal') &&
+        this.user.pastSessions.length >= 1
+      ) {
+        this.showThemProcrastinationPreventionModal = true
       }
     },
     isGleapBotExperimentActive(currentValue, prevValue) {

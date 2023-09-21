@@ -48,6 +48,8 @@ import SessionRecapView from './views/SessionRecapView'
 import AdminTestAudience from './views/Admin/AdminTestAudience'
 import WelcomePage from './views/WelcomePage'
 import Gleap from 'gleap'
+import AnalyticsService from './services/AnalyticsService'
+import { EVENTS } from './consts'
 
 Vue.use(VueResource)
 Vue.http.options.credentials = true
@@ -69,6 +71,11 @@ const routes = [
     beforeEnter: (to, from, next) => {
       getUser()
         .then(() => {
+          if (to.query.s && to.query.s === 'tr')
+            AnalyticsService.captureEvent(
+              EVENTS.STUDENT_PROCRASTINATION_PREVENTION_RETURNED_FROM_REMINDER
+            )
+
           if (store.getters['user/isAuthenticated']) {
             if (store.getters['user/isAutoFlowUser']) next('/welcome')
             else next('/dashboard')
