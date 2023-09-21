@@ -65,6 +65,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: false,
       [POSTHOG_FEATURE_FLAGS.GLEAP_BOT_EXPERIMENT]: false,
       [POSTHOG_FEATURE_FLAGS.STUDENT_COACH_REACH_OUT]: false,
+      [POSTHOG_FEATURE_FLAGS.PROCRASTINATION_PREVENTION]: false,
       // This is an experiment, using multivariant feature flag values
       [POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS_AND_LEVEL_SYSTEM]: '',
       [POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO]: true,
@@ -196,5 +197,7 @@ export default {
       getters.gleapBotSegmentExperiments.length > 0,
     isStudentCoachReachOutActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.STUDENT_COACH_REACH_OUT],
+    isProcrastinationPreventionActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.PROCRASTINATION_PREVENTION],
   },
 }
