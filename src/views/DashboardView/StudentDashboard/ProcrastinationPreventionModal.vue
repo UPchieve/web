@@ -18,13 +18,13 @@
           <footer class="procrastination-modal__footer">
             <div class="procrastination-modal__buttons">
               <large-button
-                class="procrastination-modal__buttons-button procrastination-modal__buttons-button--small"
+                class="procrastination-modal__buttons-button"
                 :showArrow="false"
                 @click.native="handleNotStruggling"
                 >No</large-button
               >
               <large-button
-                class="procrastination-modal__buttons-button procrastination-modal__buttons-button--small"
+                class="procrastination-modal__buttons-button"
                 :showArrow="false"
                 @click.native="handleIsStruggling"
                 >Yes</large-button
@@ -92,7 +92,7 @@
 
           <footer class="procrastination-modal__footer">
             <div
-              class="procrastination-modal__buttons procrastination-modal__buttons--secondary"
+              class="procrastination-modal__buttons procrastination-modal__buttons--col"
             >
               <large-button
                 @click.native="handleSelectNewTime"
@@ -147,7 +147,7 @@
               class="procrastination-modal__buttons procrastination-modal__buttons--secondary"
             >
               <span
-                @click="showCancelConfirmation"
+                @click="handleCancelCustomDate"
                 class="procrastination-modal__buttons--cancel"
                 >Cancel</span
               >
@@ -172,15 +172,17 @@
           </header>
 
           <footer class="procrastination-modal__footer">
-            <div class="procrastination-modal__buttons">
+            <div
+              class="procrastination-modal__buttons procrastination-modal__buttons--col"
+            >
               <large-button
-                class="procrastination-modal__buttons-button procrastination-modal__buttons-button--small"
+                class="procrastination-modal__buttons-button"
                 @click.native="handleDontRemindMe"
                 >Don't remind me</large-button
               >
               <large-button
                 class="procrastination-modal__buttons-button
-                procrastination-modal__buttons-button--small procrastination-modal__buttons-button--primary"
+               procrastination-modal__buttons-button--primary"
                 primary
                 :showArrow="false"
                 @click.native="handleRemindMeClick"
@@ -293,6 +295,12 @@ export default {
         EVENTS.STUDENT_PROCRASTINATION_PREVENTION_SHOWN_CANCEL_CONFIRMATION
       )
     },
+    handleCancelCustomDate() {
+      this.step = 3
+      AnalyticsService.captureEvent(
+        EVENTS.STUDENT_PROCRASTINATION_PREVENTION_CANCEL_CUSTOM_DATE
+      )
+    },
     handleCancelConfirm() {
       AnalyticsService.captureEvent(
         EVENTS.STUDENT_PROCRASTINATION_PREVENTION_CANCEL_CONFIRMED
@@ -319,7 +327,12 @@ export default {
     },
     handleReminderTimeUpdate() {
       AnalyticsService.captureEvent(
-        EVENTS.STUDENT_PROCRASTINATION_PREVENTION_CHANGED_REMINDER_DATE
+        EVENTS.STUDENT_PROCRASTINATION_PREVENTION_CHANGED_REMINDER_DATE,
+        {
+          gmtDate: moment(this.reminderFormatted, 'MM-DD-YYYY HH:mm a')
+            .tz('GMT')
+            .format('MM-DD-YYYY HH:mm'),
+        }
       )
       this.step = 3
     },
@@ -385,12 +398,6 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.procrastination .upc-modal-form {
-  max-width: 550px;
-}
-</style>
-
 <style lang="scss" scoped>
 .procrastination-modal {
   text-align: initial;
@@ -420,15 +427,20 @@ export default {
 
   &__buttons {
     @include flex-container(row, space-between, center);
+    margin: 1.6em 0 0.4em 0;
+    & span:first-child,
+    & button:first-child {
+      margin-right: 1em;
+    }
+
     &-button {
       margin: 0 auto;
+      width: 100%;
+      margin-bottom: 1.3em;
 
       @include breakpoint-above('small') {
         width: 250px;
-      }
-
-      &--small {
-        width: 200px;
+        margin-bottom: initial;
       }
 
       &--primary {
@@ -445,15 +457,19 @@ export default {
 
     &--secondary {
       @include flex-container(row, flex-end, center);
-      margin: 1.6em 0 0.4em 0;
+      & button {
+        margin: initial;
+      }
+    }
 
-      & span:first-child,
-      & button:first-child {
-        margin-right: 1em;
+    &--col {
+      @include flex-container(column, initial, center);
+      @include breakpoint-above('small') {
+        @include flex-container(row, space-between, center);
       }
 
       & button {
-        margin: initial;
+        margin-right: initial;
       }
     }
 
@@ -494,7 +510,6 @@ export default {
 
   &__phone-input {
     margin-top: 0.4em;
-    margin-bottom: 1em;
     width: 100%;
     font-weight: 500;
   }
@@ -516,11 +531,20 @@ export default {
 }
 
 .cross-icon {
-  width: 15px;
-  margin-left: auto;
+  width: 18px;
+  float: right;
+  margin-right: 1em;
+  margin-bottom: 1em;
 
   &:hover {
     cursor: pointer;
+  }
+
+  @include breakpoint-above('medium') {
+    margin-bottom: initial;
+    margin-right: initial;
+    float: initial;
+    margin-left: auto;
   }
 }
 </style>
