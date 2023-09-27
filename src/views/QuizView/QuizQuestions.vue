@@ -192,7 +192,7 @@ export default {
       this.questionNumber = TrainingService.getIndex(this) + 1
     },
     previous() {
-      TrainingService.saveAnswer(this, this.picked)
+      TrainingService.saveAnswer(this.picked)
       this.picked = ''
       const data = TrainingService.getPreviousQuestion(this)
       const { question } = data
@@ -211,7 +211,7 @@ export default {
       this.showNext = true
     },
     next() {
-      TrainingService.saveAnswer(this, this.picked)
+      TrainingService.saveAnswer(this.picked)
       this.picked = ''
       const data = TrainingService.getNextQuestion(this)
       const { question } = data
@@ -227,7 +227,7 @@ export default {
       this.showPrevious = true
     },
     submit() {
-      TrainingService.saveAnswer(this, this.picked)
+      TrainingService.saveAnswer(this.picked)
       if (!TrainingService.hasCompleted()) {
         this.errorMsg =
           'You must answer all questions before submitting the quiz!'

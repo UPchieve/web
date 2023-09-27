@@ -71,11 +71,12 @@ export default {
           this.volunteerId,
           { isFavorite: value }
         )
-        this.isFavorite = response.body.isFavorite
+        this.isFavorite = response.data.isFavorite
         this.$emit('change-favorited', this.volunteerId, this.isFavorite)
       } catch (error) {
-        if (error.body.success === false) this.showFavoritedListFullModal = true
-        else this.$emit('error-favoriting', error.body.err)
+        if (error.response.data.success === false)
+          this.showFavoritedListFullModal = true
+        else this.$emit('error-favoriting', error.response.data.err)
       }
     },
     async toggleFavoritedStatus() {
@@ -84,7 +85,7 @@ export default {
         return
       }
       const {
-        body: { remaining },
+        data: { remaining },
       } = await NetworkService.getRemainingFavoriteVolunteers()
       if (remaining > 0) this.setIsFavorite(true)
       else this.toggleFavoritedListFullModal()

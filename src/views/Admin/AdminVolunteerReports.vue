@@ -78,7 +78,7 @@ export default {
   },
   async mounted() {
     const {
-      body: { partnerOrgs: volunteerPartnerOrgs },
+      data: { partnerOrgs: volunteerPartnerOrgs },
     } = await NetworkService.adminGetVolunteerPartners()
     this.volunteerPartnerOrgs = volunteerPartnerOrgs
   },
@@ -100,7 +100,7 @@ export default {
         )
         this.isGeneratingReport = false
       } catch (error) {
-        const data = this.convertBufferToObject(error.body)
+        const data = this.convertBufferToObject(error.response.data)
         if (error.status === 422) this.errorHandler(data.err)
         else this.errorHandler()
       }
@@ -113,7 +113,7 @@ export default {
       const query = this.getQuery()
       try {
         const {
-          body: { data },
+          data: { data },
         } = await NetworkService.adminGetVolunteerTelecomReport(query)
 
         if (data.length === 0)

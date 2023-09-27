@@ -234,7 +234,7 @@ export default {
         this.hideModerationWarning()
 
         // Check for personal info/profanity in message
-        ModerationService.checkIfMessageIsClean(this, message).then(isClean => {
+        ModerationService.checkIfMessageIsClean(message).then(isClean => {
           if (isClean) {
             this.showNewMessage(message)
           } else {

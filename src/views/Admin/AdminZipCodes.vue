@@ -70,7 +70,7 @@ export default {
       this.error = ''
       try {
         const {
-          body: { zipCode },
+          data: { zipCode },
         } = await NetworkService.adminGetZipCodes(this.query)
 
         this.zipCode = zipCode

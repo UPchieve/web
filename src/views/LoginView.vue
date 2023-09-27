@@ -115,7 +115,7 @@ export default {
     signIn() {
       if (!this.isValidForm) return
       this.isLoggingIn = true
-      AuthService.login(this, {
+      AuthService.login({
         email: this.credentials.email,
         password: this.credentials.password,
       })

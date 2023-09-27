@@ -16,7 +16,7 @@ import store from './store'
 import config from './config'
 import posthog from 'posthog-js'
 import Gleap from 'gleap'
-import NetworkService from './services/NetworkService'
+import NetworkService, { axiosInstance } from './services/NetworkService'
 import { backOff } from 'exponential-backoff'
 import io from 'socket.io-client'
 import LoggerService from './services/LoggerService'
@@ -141,6 +141,8 @@ async function main() {
     // apply the csrf token to the store before initializing Vue
     const response = await backOff(() => NetworkService.getCsrfToken())
     store.commit('app/setCsrfToken', response.data.csrfToken)
+    axiosInstance.defaults.headers.common['X-CSRF-TOKEN'] =
+      response.data.csrfToken
     initVue()
   } catch (err) {
     LoggerService.noticeError(err)

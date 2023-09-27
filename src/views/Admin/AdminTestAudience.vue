@@ -53,7 +53,7 @@ export default {
       this.error = ''
       try {
         const user = await NetworkService.adminGetUserIdFromEmail(this.query)
-        Gleap.identify(user.body.userId, {
+        Gleap.identify(user.data.userId, {
           value: 1,
         })
       } catch (error) {
@@ -64,7 +64,7 @@ export default {
       this.error = ''
       try {
         const user = await NetworkService.adminGetUserIdFromEmail(this.query)
-        Gleap.identify(user.body.userId, {
+        Gleap.identify(user.data.userId, {
           value: 0,
         })
       } catch (error) {

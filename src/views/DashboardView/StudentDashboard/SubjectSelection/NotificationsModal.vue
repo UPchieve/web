@@ -64,7 +64,7 @@ export default {
         this.isLoadingSession = true
 
         const { token } = await PortalService.call('push.register')
-        await NetworkService.savePushToken(this, { token })
+        await NetworkService.savePushToken({ token })
 
         startSession(this.$router, topic, selectedSubtopic)
       } catch (error) {

@@ -150,7 +150,7 @@ export default {
       this.someThingChanged()
     },
     async updateLocalWaitTimes() {
-      const originalWaitTimes = await CalendarService.getWaitTimes(this)
+      const originalWaitTimes = await CalendarService.getWaitTimes()
       const userUtcOffset = moment.tz.zone(this.selectedTz).parse(Date.now())
       const offset = (-1 * userUtcOffset) / 60
       this.waitTimes = this.convertAvailability(originalWaitTimes, offset)

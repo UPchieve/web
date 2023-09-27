@@ -162,19 +162,19 @@ export default {
     if (this.user.isVolunteer) {
       const response = await NetworkService.adminGetVolunteerPartners()
       const {
-        body: { partnerOrgs },
+        data: { partnerOrgs },
       } = response
       this.listedPartnerOrgs = partnerOrgs
     } else {
       const response = await NetworkService.adminGetStudentPartners()
       const {
-        body: { partnerOrgs },
+        data: { partnerOrgs },
       } = response
       const activeSchoolPartnerResponse = await NetworkService.adminGetActivePartnersForStudent(
         this.user.id
       )
       const {
-        body: { activePartners },
+        data: { activePartners },
       } = activeSchoolPartnerResponse
 
       const listedPartnerOrgs = []

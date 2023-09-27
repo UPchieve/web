@@ -68,7 +68,7 @@ import { STATES_WITH_ABBREVIATIONS } from '@/consts'
 
 const getSchools = async data => {
   const {
-    body: { schools, isLastPage },
+    data: { schools, isLastPage },
   } = await NetworkService.adminGetSchools(data)
   return { schools, isLastPage }
 }

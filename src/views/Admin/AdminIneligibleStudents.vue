@@ -36,7 +36,7 @@ import PageControl from '@/components/Admin/PageControl'
 
 const getIneligibleStudents = async page => {
   const {
-    body: { ineligibleStudents, isLastPage },
+    data: { ineligibleStudents, isLastPage },
   } = await NetworkService.adminGetIneligibleStudents(page)
   return { ineligibleStudents, isLastPage }
 }

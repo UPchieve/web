@@ -72,7 +72,7 @@ export default {
       try {
         commit('setIsFetchingSubjects', true)
         const response = await backOff(() => NetworkService.getSubjects())
-        commit('setSubjects', response.body.subjects)
+        commit('setSubjects', response.data.subjects)
       } catch (err) {
         LoggerService.noticeError(err)
         commit('setFetchingSubjectsError', true)
@@ -86,7 +86,7 @@ export default {
         const response = await backOff(() =>
           NetworkService.getTrainingSubjects()
         )
-        commit('setTraining', response.body.training)
+        commit('setTraining', response.data.training)
       } catch (err) {
         LoggerService.noticeError(err)
         commit('setFetchingTrainingError', true)

@@ -96,7 +96,7 @@ export default {
         const materials = await backOff(() =>
           NetworkService.getReviewMaterials(this.category)
         )
-        this.reviewMaterials = materials.body
+        this.reviewMaterials = materials.data
       } catch (error) {
         this.error = true
       } finally {

@@ -48,7 +48,7 @@ export default {
   async created() {
     const courseKey = this.$route.params.courseKey
     const {
-      body: { course },
+      data: { course },
     } = await NetworkService.getTrainingCourse(courseKey)
     this.course = course
   },
@@ -77,7 +77,7 @@ export default {
 
       try {
         const {
-          body: { progress, isComplete },
+          data: { progress, isComplete },
         } = await NetworkService.recordTrainingCourseProgress(
           this.course.courseKey,
           materialKey

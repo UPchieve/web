@@ -61,10 +61,10 @@ import PageControl from '@/components/Admin/PageControl'
 import UserListItem from '@/components/Admin/UserListItem'
 import { isEmpty } from 'lodash'
 
-const getUsers = async data => {
+const getUsers = async userData => {
   const {
-    body: { users, isLastPage },
-  } = await NetworkService.adminGetUsers(data)
+    data: { users, isLastPage },
+  } = await NetworkService.adminGetUsers(userData)
 
   return { users, isLastPage }
 }
@@ -119,10 +119,10 @@ export default {
     ])
 
     const {
-      body: { partnerOrgs: studentPartnerOrgs },
+      data: { partnerOrgs: studentPartnerOrgs },
     } = studentPartnersResponse
     const {
-      body: { partnerOrgs: volunteerPartnerOrgs },
+      data: { partnerOrgs: volunteerPartnerOrgs },
     } = volunteerPartnersResponse
 
     this.listedPartnerOrgs = [...studentPartnerOrgs, ...volunteerPartnerOrgs]

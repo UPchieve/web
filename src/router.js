@@ -1,5 +1,3 @@
-import Vue from 'vue'
-import VueResource from 'vue-resource'
 import VueRouter from 'vue-router'
 import store from './store'
 import AdminView from './views/Admin'
@@ -50,9 +48,7 @@ import WelcomePage from './views/WelcomePage'
 import Gleap from 'gleap'
 import AnalyticsService from './services/AnalyticsService'
 import { EVENTS } from './consts'
-
-Vue.use(VueResource)
-Vue.http.options.credentials = true
+import { axiosInstance } from './services/NetworkService'
 
 const getUser = () => {
   if (store.getters['user/isAuthenticated']) {
@@ -538,28 +534,23 @@ router.afterEach((to, from) => {
 
 // If endpoint returns 401, redirect to login (except for requests to get user or user's
 // session)
-Vue.http.interceptors.push((request, next) => {
-  next(response => {
-    const is401 = response.status === 401
+axiosInstance.interceptors.response.use(
+  response => response,
+  error => {
+    const is401 = error.request.status === 401
     const isGetUserAttempt =
-      request.url.indexOf('/api/user') !== -1 && request.method === 'GET'
+      error.request.responseURL.indexOf('/api/user') !== -1 &&
+      error.response.config.method === 'get'
     const isGetSessionAttempt =
-      request.url.indexOf('/api/session/current') !== -1
-    const isGetSubjectsAttempt = request.url.indexOf('/api/subjects') !== -1
+      error.request.responseURL.indexOf('/api/session/current') !== -1
+    const isGetSubjectsAttempt =
+      error.request.responseURL.indexOf('/api/subjects') !== -1
 
     if (
       is401 &&
       !(isGetUserAttempt || isGetSessionAttempt || isGetSubjectsAttempt)
-    ) {
+    )
       router.push('/login?401=true').catch(() => {})
-    }
-  })
-})
-
-// using the double submit cookie pattern to send csrf token stored in cookie as a request parameter
-Vue.http.interceptors.push(request => {
-  const csrfToken = store.getters['app/csrfToken']
-  if (csrfToken) {
-    request.headers.set('X-CSRF-TOKEN', csrfToken)
+    return Promise.reject(error)
   }
-})
+)

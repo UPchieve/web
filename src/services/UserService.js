@@ -3,11 +3,8 @@ import AuthService from './AuthService'
 import NetworkService from './NetworkService'
 
 export default {
-  getAuth(context) {
-    return AuthService.getAuth(context)
-  },
-  getUser(context) {
-    return this.getAuth(context).then(auth => {
+  getUser() {
+    return AuthService.getAuth().then(auth => {
       if (auth.authenticated) {
         return auth.user
       }
@@ -31,8 +28,8 @@ export default {
     return NetworkService.setProfile(data)
   },
 
-  getVolunteers(context) {
-    return NetworkService.getVolunteers(context).then(res => {
+  getVolunteers() {
+    return NetworkService.getVolunteers().then(res => {
       if (res.data.err) {
         return res.data.err
       } else if (res.data.volunteers) {
@@ -42,18 +39,17 @@ export default {
       }
     })
   },
-  getVolunteersAvailability(context, certifiedSubject) {
-    return NetworkService.getVolunteersAvailability(
-      context,
-      certifiedSubject
-    ).then(res => {
-      if (res.data.err) {
-        return res.data.err
-      } else if (res.data.aggAvailabilities) {
-        return res.data.aggAvailabilities
-      } else {
-        throw new Error()
+  getVolunteersAvailability(certifiedSubject) {
+    return NetworkService.getVolunteersAvailability(certifiedSubject).then(
+      res => {
+        if (res.data.err) {
+          return res.data.err
+        } else if (res.data.aggAvailabilities) {
+          return res.data.aggAvailabilities
+        } else {
+          throw new Error()
+        }
       }
-    })
+    )
   },
 }

@@ -170,7 +170,7 @@ import moment from 'moment'
 
 const getSessions = async filters => {
   const {
-    body: { sessions, isLastPage },
+    data: { sessions, isLastPage },
   } = await NetworkService.adminGetSessions(filters)
 
   return { sessions, isLastPage }

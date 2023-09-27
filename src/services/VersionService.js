@@ -8,7 +8,7 @@ export default {
     let version
     try {
       const checkHealthResponse = await NetworkService.checkHealth()
-      version = checkHealthResponse.body.version
+      version = checkHealthResponse.data.version
     } catch (err) {
       version = 'unknown'
       LoggerService.noticeError(err)

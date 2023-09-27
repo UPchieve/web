@@ -71,7 +71,7 @@ export default {
       })
 
       const {
-        body: { sessions, isLastPage },
+        data: { sessions, isLastPage },
       } = await NetworkService.adminGetSessionsToReview(this.page)
       this.sessions = sessions
       this.isLastPage = isLastPage

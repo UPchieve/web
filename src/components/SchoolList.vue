@@ -35,11 +35,11 @@ export default {
     async autocompleteSchool(input) {
       if (input.length < 3) return []
 
-      const response = await NetworkService.searchSchool(this, {
+      const response = await NetworkService.searchSchool({
         query: input,
       })
       const {
-        body: { results: schools },
+        data: { results: schools },
       } = response
       return schools
     },
