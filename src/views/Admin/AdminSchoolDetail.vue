@@ -167,7 +167,7 @@ export default {
       const schoolId = this.$route.params.schoolId
 
       const {
-        body: { school },
+        data: { school },
       } = await NetworkService.adminGetSchool(schoolId)
 
       this.school = school

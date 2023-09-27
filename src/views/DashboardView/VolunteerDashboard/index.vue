@@ -475,7 +475,7 @@ export default {
       if (status === 'DEFAULT') return 4
     },
     async getLastUpdated() {
-      const res = await NetworkService.getVolunteerLastUpdated(this)
+      const res = await NetworkService.getVolunteerLastUpdated()
       if (res.data.err) {
         return 'Error retriving last update time'
       }

@@ -700,8 +700,8 @@ export default {
       const zipCode = this.eligibility.zipCode
 
       const {
-        body: { isValidZipCode },
-      } = await NetworkService.checkZipCode(this, { zipCode })
+        data: { isValidZipCode },
+      } = await NetworkService.checkZipCode({ zipCode })
       if (!isValidZipCode) {
         this.errors.push('You must enter a valid United States zip code.')
       }
@@ -731,7 +731,7 @@ export default {
 
       if (await this.hasEligibilityFormErrors()) return
 
-      NetworkService.checkStudentEligibility(this, {
+      NetworkService.checkStudentEligibility({
         schoolUpchieveId: this.eligibility.highSchool.upchieveId,
         zipCode: this.eligibility.zipCode,
         email: this.eligibility.email,
@@ -739,7 +739,7 @@ export default {
         currentGrade: this.trimCurrentGrade,
       })
         .then(async response => {
-          const isEligible = response.body.isEligible
+          const isEligible = response.data.isEligible
           if (isEligible) {
             AnalyticsService.captureEvent(EVENTS.ELIGIBILITY_ELIGIBLE, {
               event: EVENTS.ELIGIBILITY_ELIGIBLE,
@@ -752,7 +752,7 @@ export default {
             AnalyticsService.captureEvent(EVENTS.ELIGIBILITY_INELIGIBLE, {
               event: EVENTS.ELIGIBILITY_INELIGIBLE,
             })
-            if (response.body.isCollegeStudent) this.isCollegeStudent = true
+            if (response.data.isCollegeStudent) this.isCollegeStudent = true
             this.step = 'ineligible'
             this.$router.push('/sign-up/student/ineligible')
           }
@@ -795,8 +795,8 @@ export default {
           cantFindSchool: true,
         }
 
-        NetworkService.searchSchool(this, { query: input })
-          .then(response => response.body.results)
+        NetworkService.searchSchool({ query: input })
+          .then(response => response.data.results)
           .then(schools => {
             schools.push(cantFindSchoolItem)
             resolve(schools)
@@ -838,7 +838,7 @@ export default {
         return
       }
 
-      AuthService.registerOpenStudent(this, {
+      AuthService.registerOpenStudent({
         email: this.credentials.email,
         password: this.credentials.password,
         terms: true,

@@ -5,7 +5,7 @@ import ProductDiscoveryService from './ProductDiscoveryService'
 import NetworkService from './NetworkService'
 
 export default {
-  login(context, creds) {
+  login(creds) {
     const { email, password } = creds
     if (
       !email ||
@@ -16,7 +16,7 @@ export default {
       return Promise.reject('Invalid login form submission')
     }
 
-    return NetworkService.login(context, creds).then(res => {
+    return NetworkService.login(creds).then(res => {
       const data = { ...res.data }
       if (!data) {
         throw new Error('No user returned from auth service')
@@ -26,8 +26,8 @@ export default {
     })
   },
 
-  registerOpenVolunteer(context, signupData) {
-    return NetworkService.registerOpenVolunteer(context, signupData)
+  registerOpenVolunteer(signupData) {
+    return NetworkService.registerOpenVolunteer(signupData)
       .then(res => {
         const data = { ...res.data }
         if (!data) {
@@ -40,8 +40,8 @@ export default {
       })
   },
 
-  registerPartnerVolunteer(context, signupData) {
-    return NetworkService.registerPartnerVolunteer(context, signupData)
+  registerPartnerVolunteer(signupData) {
+    return NetworkService.registerPartnerVolunteer(signupData)
       .then(res => {
         const data = { ...res.data }
         if (!data) {
@@ -54,8 +54,8 @@ export default {
       })
   },
 
-  registerOpenStudent(context, signupData) {
-    return NetworkService.registerOpenStudent(context, signupData)
+  registerOpenStudent(signupData) {
+    return NetworkService.registerOpenStudent(signupData)
       .then(res => {
         const data = { ...res.data }
         if (!data) {
@@ -67,8 +67,8 @@ export default {
       })
   },
 
-  registerPartnerStudent(context, signupData) {
-    return NetworkService.registerPartnerStudent(context, signupData)
+  registerPartnerStudent(signupData) {
+    return NetworkService.registerPartnerStudent(signupData)
       .then(res => {
         const data = { ...res.data }
         if (!data) {
@@ -80,14 +80,14 @@ export default {
       })
   },
 
-  checkRegister(context, creds) {
-    return NetworkService.checkRegister(context, creds).catch(res => {
+  checkRegister(creds) {
+    return NetworkService.checkRegister(creds).catch(res => {
       throw errorFromHttpResponse(res)
     })
   },
 
   sendReset(context, email, redirect) {
-    return NetworkService.sendReset(context, { email })
+    return NetworkService.sendReset({ email })
       .then(res => {
         const data = { ...res.data }
         if (res.status !== 200) {
@@ -108,7 +108,7 @@ export default {
   },
 
   confirmReset(context, credentials, redirect) {
-    return NetworkService.confirmReset(context, credentials)
+    return NetworkService.confirmReset(credentials)
       .then(res => {
         const data = { ...res.data }
         if (!data) {
@@ -142,7 +142,7 @@ export default {
 
   logout(context) {
     if (context) {
-      NetworkService.logout(context)
+      NetworkService.logout()
         .then(() => {
           context.$router.push('/logout')
           context.$store.dispatch('user/clear')
@@ -161,14 +161,8 @@ export default {
     }
   },
 
-  getAuth(context, options) {
-    const isGlobal = options && options.isGlobal
-
-    const authPromise =
-      !context || isGlobal
-        ? NetworkService.userGlobal()
-        : NetworkService.user(context)
-    return authPromise
+  getAuth() {
+    return NetworkService.user()
       .then(res => {
         const data = { ...res.data }
         if (!data) {

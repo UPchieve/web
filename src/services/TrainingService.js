@@ -9,13 +9,13 @@ export default {
   idCorrectAnswerMap: {},
   category: null,
 
-  loadQuiz(context, category) {
+  loadQuiz(category) {
     this.index = 0
     this.numAnswers = 0
     this.idAnswerMap = {}
     this.idCorrectAnswerMap = {}
     this.category = category
-    return NetworkService.getQuestions(context, { category }).then(res => {
+    return NetworkService.getQuestions({ category }).then(res => {
       this.questions = res.data.questions || []
       return this.questions.length
     })
@@ -60,7 +60,7 @@ export default {
     }
     return null
   },
-  saveAnswer(context, picked) {
+  saveAnswer(picked) {
     const question = this.questions[this.index]
     const isNewAnswer =
       _.isEmpty(this.idAnswerMap[question._id]) && !_.isEmpty(picked)
@@ -69,8 +69,8 @@ export default {
     }
     this.idAnswerMap[question._id] = picked
   },
-  submitQuiz(context) {
-    return NetworkService.getQuizScore(context, {
+  submitQuiz() {
+    return NetworkService.getQuizScore({
       idAnswerMap: this.idAnswerMap,
       category: this.category,
     }).then(res => {

@@ -122,8 +122,8 @@ export default {
     }
   },
   async mounted() {
-    const { body } = await NetworkService.adminGetPartnerSchools()
-    this.partnerSchools = body.sort((a, b) => a.schoolName > b.schoolName)
+    const { data } = await NetworkService.adminGetPartnerSchools()
+    this.partnerSchools = data.sort((a, b) => a.schoolName > b.schoolName)
   },
   methods: {
     clearData() {
@@ -158,11 +158,11 @@ export default {
       formData.append('partnerSite', this.partnerSite)
 
       try {
-        const { body } = await NetworkService.adminUploadRosterStudents(
+        const { data } = await NetworkService.adminUploadRosterStudents(
           formData
         )
-        if (body.failedUsers.length) {
-          const failedEmails = body.failedUsers.map(u => u.email).join(', ')
+        if (data.failedUsers.length) {
+          const failedEmails = data.failedUsers.map(u => u.email).join(', ')
           this.msg = `The following users failed to be created: ${failedEmails}`
           this.isWarning = true
         } else {
@@ -170,7 +170,8 @@ export default {
         }
         this.clearData()
       } catch (error) {
-        this.msg = error.body.err
+        // TODO check if body is in the error
+        this.msg = error.response.data.err
         this.isError = true
       } finally {
         this.isSubmitting = false

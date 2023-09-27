@@ -33,7 +33,7 @@ import PageControl from '@/components/Admin/PageControl'
 
 const getVolunteersToReview = async page => {
   const {
-    body: { volunteers, isLastPage },
+    data: { volunteers, isLastPage },
   } = await NetworkService.adminGetVolunteersToReview(page)
 
   return { volunteers, isLastPage }

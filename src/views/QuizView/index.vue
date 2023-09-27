@@ -220,7 +220,7 @@ export default {
     submitQuiz() {
       this.showQuizQuestions = false
       this.loadingQuizResults = true
-      TrainingService.submitQuiz(this).then(data => {
+      TrainingService.submitQuiz().then(data => {
         this.quizResults = data
         this.loadingQuizResults = false
         this.showQuizResults = true
@@ -248,7 +248,7 @@ export default {
       this.loadQuiz()
     },
     loadQuiz() {
-      TrainingService.loadQuiz(this, this.category).then(quizLength => {
+      TrainingService.loadQuiz(this.category).then(quizLength => {
         this.quizLoading = false
         this.showQuizResults = false
         this.showQuizReview = false

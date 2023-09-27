@@ -105,7 +105,7 @@ export default {
       }
       this.error = ''
       NetworkService.getPhotoUploadUrl().then(res => {
-        const { uploadUrl } = res.body
+        const { uploadUrl } = res.data
         if (uploadUrl) {
           axios.put(uploadUrl, this.file, {
             headers: {

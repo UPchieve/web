@@ -132,7 +132,7 @@ export default {
       const response = await NetworkService.getSessionRecap(
         this.$route.params.sessionId
       )
-      this.session = response.body.session
+      this.session = response.data.session
       this.session.svg = this.svgs[this.session.topic]
     } catch (error) {
       if (error.status === 403) this.$router.push('/dashboard')

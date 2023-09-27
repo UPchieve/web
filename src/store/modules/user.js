@@ -133,8 +133,8 @@ export default {
       commit('setUser', {})
     },
 
-    fetchSession: ({ commit, state }, context) => {
-      SessionService.getCurrentSession(context, state.user)
+    fetchSession: ({ commit, state }) => {
+      SessionService.getCurrentSession(state.user)
         .then(({ sessionData }) => {
           commit('setSession', sessionData)
         })
@@ -146,8 +146,8 @@ export default {
         })
     },
 
-    fetchLatestSession: ({ commit, state }, context) => {
-      SessionService.getLatestSession(context, state.user)
+    fetchLatestSession: ({ commit, state }) => {
+      SessionService.getLatestSession(state.user)
         .then(({ sessionData }) => {
           commit('setLatestSession', sessionData)
         })

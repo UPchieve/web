@@ -257,7 +257,7 @@ export default {
   },
   async mounted() {
     const {
-      body: { isValid },
+      data: { isValid },
     } = await NetworkService.getIsSubjectValid(
       this.$route.params.subTopic,
       this.$route.params.topic

@@ -412,8 +412,8 @@ export default {
     const partnerId = to.params.partnerId
 
     NetworkService.getStudentPartner(partnerId)
-      .then(data => {
-        const studentPartner = data.body.studentPartner
+      .then(res => {
+        const studentPartner = res.data.studentPartner
         if (!studentPartner) return next('/sign-up')
         if (studentPartner.deactivated) {
           AnalyticsService.captureEvent(
@@ -580,8 +580,8 @@ export default {
           cantFindSchool: true,
         }
 
-        NetworkService.searchSchool(this, { query: input })
-          .then(response => response.body.results)
+        NetworkService.searchSchool({ query: input })
+          .then(response => response.data.results)
           .then(schools => {
             schools.push(cantFindSchoolItem)
             resolve(schools)
@@ -645,10 +645,10 @@ export default {
     async getSignupSources() {
       this.isLoadingSignupSource = true
       try {
-        const data = await backOff(() =>
+        const res = await backOff(() =>
           NetworkService.getStudentSignupSources()
         )
-        this.signupSourcesOptions = data.body.signupSources
+        this.signupSourcesOptions = res.data.signupSources
       } catch (err) {
         LoggerService.noticeError(err)
       } finally {
@@ -663,7 +663,7 @@ export default {
         return
       }
 
-      AuthService.registerPartnerStudent(this, {
+      AuthService.registerPartnerStudent({
         studentPartnerOrg: this.$route.params.partnerId,
         partnerUserId: this.$route.query.uid,
         partnerSite: this.formData.partnerSite,

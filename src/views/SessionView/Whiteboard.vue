@@ -492,7 +492,7 @@ export default {
           this.sessionId
         )
         const {
-          body: { uploadUrl, imageUrl },
+          data: { uploadUrl, imageUrl },
         } = response
 
         if (uploadUrl) {

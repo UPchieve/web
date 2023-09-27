@@ -288,7 +288,7 @@ export default {
 
   async created() {
     const {
-      body: { session },
+      data: { session },
     } = await NetworkService.adminGetSession(this.$route.params.sessionId)
     this.session = session
 

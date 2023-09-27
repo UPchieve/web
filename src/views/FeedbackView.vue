@@ -354,10 +354,10 @@ export default {
     ])
 
     const {
-      body: { feedback },
+      data: { feedback },
     } = feedbackResponse
     const {
-      body: { session },
+      data: { session },
     } = sessionResponse
 
     this.session = session
@@ -366,7 +366,7 @@ export default {
       this.session.id,
       this.userType
     )
-    this.surveyDefinition = postsessionSurveyDefinitionResponse.body.survey
+    this.surveyDefinition = postsessionSurveyDefinitionResponse.data.survey
     this.allQuestions = _.map(this.surveyDefinition.survey, q => {
       const isHiddenOnStart =
         this.isLowRatingQuestion(q) ||
@@ -387,7 +387,7 @@ export default {
     )
     this.buildUserResponse()
 
-    if (feedback || postsessionAlreadySavedResponse.body.length > 0) {
+    if (feedback || postsessionAlreadySavedResponse.data.length > 0) {
       this.loading = false
       this.completedFeedback = true
       return
@@ -397,10 +397,10 @@ export default {
       const response = await NetworkService.checkIsFavoriteVolunteer(
         this.session.volunteer._id
       )
-      this.isFavoriteCoach = response.body.isFavorite
+      this.isFavoriteCoach = response.data.isFavorite
       if (!this.isFavoriteCoach) {
         const response = await NetworkService.getRemainingFavoriteVolunteers()
-        this.isFavoriteCoachLimitReached = response.body.remaining === 0
+        this.isFavoriteCoachLimitReached = response.data.remaining === 0
       }
     }
     this.isLoading = false

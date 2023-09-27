@@ -282,7 +282,7 @@ export default {
       }
 
       // check credentials
-      AuthService.checkRegister(this, {
+      AuthService.checkRegister({
         email: this.credentials.email,
         password: this.credentials.password,
       })
@@ -336,7 +336,7 @@ export default {
       this.msg = ''
       if (this.isRegistering) return
       this.isRegistering = true
-      AuthService.registerOpenVolunteer(this, {
+      AuthService.registerOpenVolunteer({
         email: this.credentials.email,
         password: this.credentials.password,
         terms: this.credentials.terms,
@@ -373,10 +373,10 @@ export default {
     async getSignupSources() {
       this.isLoadingSignupSources = true
       try {
-        const data = await backOff(() =>
+        const response = await backOff(() =>
           NetworkService.getStudentSignupSources()
         )
-        let allSources = data.body.signupSources
+        let allSources = response.data.signupSources
 
         // volunteer sources drop School/Teacher and replace Friend/Classmate with Friend
         allSources = allSources.filter(

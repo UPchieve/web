@@ -36,7 +36,7 @@ export default {
 
   async created() {
     const {
-      body: { notifications },
+      data: { notifications },
     } = await NetworkService.adminGetSessionNotifications(
       this.$route.params.sessionId
     )

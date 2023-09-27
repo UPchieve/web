@@ -158,7 +158,7 @@ import PageControl from '@/components/Admin/PageControl'
 
 const getUser = async (userId, page) => {
   const {
-    body: { user },
+    data: { user },
   } = await NetworkService.adminGetUser(userId, page)
   return user
 }

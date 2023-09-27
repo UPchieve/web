@@ -220,16 +220,16 @@ export default {
     async getSessionHistory(page) {
       if (page < 1 || page > this.totalPages) return
       const response = await NetworkService.getSessionHistory(page)
-      this.sessions = response.body.pastSessions
+      this.sessions = response.data.pastSessions
       if (this.sessions.length) {
         this.getSessionTopicIcons()
       }
-      this.isLastPage = response.body.isLastPage
+      this.isLastPage = response.data.isLastPage
       this.page = page
     },
     async getTotalSessions() {
       const response = await NetworkService.getTotalSessionHistory()
-      this.total = response.body.total
+      this.total = response.data.total
     },
     // @todo: to be revisited to implement new design for page actions
     async handlePageClick(page) {

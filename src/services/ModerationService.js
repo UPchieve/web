@@ -7,15 +7,15 @@ function _errHandler(/* err */) {
 }
 
 export default {
-  checkIfMessageIsClean(context, data) {
-    return NetworkService.checkIfMessageIsClean(context, {
+  checkIfMessageIsClean(data) {
+    return NetworkService.checkIfMessageIsClean({
       content: data,
     }).then(
       res => {
-        if ('err' in res.body) {
-          return _errHandler(res.body)
+        if ('err' in res.data) {
+          return _errHandler(res.data)
         } else {
-          return res.body.isClean
+          return res.data.isClean
         }
       },
       err => {

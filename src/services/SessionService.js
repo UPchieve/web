@@ -7,7 +7,7 @@ export default {
   loading: false,
 
   endSession(context, sessionId) {
-    return NetworkService.endSession(context, { sessionId }).then(() => {
+    return NetworkService.endSession({ sessionId }).then(() => {
       const currentSessionData = context.$store.state.user.session
 
       AnalyticsService.captureEvent(EVENTS.SESSION_ENDED, {
@@ -31,7 +31,7 @@ export default {
       data.studentId = localStorage.getItem('studentId')
     }
 
-    return NetworkService.newSession(context, data, onRetry).then(res => {
+    return NetworkService.newSession(data, onRetry).then(res => {
       const data = res.data || {}
       const { sessionId } = data
 
@@ -70,7 +70,7 @@ export default {
   useExistingSession(context, sessionId, options) {
     const onRetry = options && options.onRetry
 
-    return NetworkService.checkSession(context, { sessionId }, onRetry)
+    return NetworkService.checkSession({ sessionId }, onRetry)
       .then(res => {
         const data = res.data || {}
         const { sessionId } = data
@@ -86,8 +86,8 @@ export default {
       })
   },
 
-  getCurrentSession(context, user) {
-    return NetworkService.currentSession(context, {
+  getCurrentSession(user) {
+    return NetworkService.currentSession({
       user_id: user._id,
       is_volunteer: user.isVolunteer,
     })
@@ -104,8 +104,8 @@ export default {
       })
   },
 
-  getLatestSession(context, user) {
-    return NetworkService.latestSession(context, { userId: user._id })
+  getLatestSession(user) {
+    return NetworkService.latestSession({ userId: user._id })
       .then(resp => {
         const { data } = resp.data || {}
         return Promise.resolve({ sessionData: data })

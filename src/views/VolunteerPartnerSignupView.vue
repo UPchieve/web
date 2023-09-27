@@ -234,8 +234,8 @@ export default {
     const partnerId = to.params.partnerId
 
     NetworkService.getVolunteerPartner(partnerId)
-      .then(data => {
-        const volunteerPartner = data.body.volunteerPartner
+      .then(res => {
+        const volunteerPartner = res.data.volunteerPartner
         if (!volunteerPartner) return next('/sign-up')
         if (volunteerPartner.deactivated) {
           AnalyticsService.captureEvent(
@@ -353,7 +353,7 @@ export default {
       }
 
       // Check credentials
-      AuthService.checkRegister(this, {
+      AuthService.checkRegister({
         email: this.formData.email,
         password: this.formData.password,
       })
@@ -405,7 +405,7 @@ export default {
       this.serverErrorMsg = ''
       if (this.isRegistering) return
       this.isRegistering = true
-      AuthService.registerPartnerVolunteer(this, {
+      AuthService.registerPartnerVolunteer({
         volunteerPartnerOrg: this.$route.params.partnerId,
         partnerUserId: this.$route.query.uid,
         email: this.formData.email,

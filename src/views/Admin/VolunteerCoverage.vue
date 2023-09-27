@@ -137,7 +137,7 @@ export default {
         in the "certifiedSubject". */
     getAvailability(certifiedSubject) {
       let cert = certifiedSubject
-      UserService.getVolunteersAvailability(this, cert)
+      UserService.getVolunteersAvailability(cert)
         .then(availability => {
           this.availabilityTable = availability
           //flattening table makes the implementation of css grid cleaner

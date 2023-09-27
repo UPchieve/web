@@ -140,10 +140,10 @@ export default {
     ])
 
     const {
-      body: { partnerOrgs: studentPartnerOrgs },
+      data: { partnerOrgs: studentPartnerOrgs },
     } = partnerOrgResponse
     const {
-      body: { sponsorOrgs },
+      data: { sponsorOrgs },
     } = sponsorOrgResponse
 
     this.studentPartnerOrgs = studentPartnerOrgs
@@ -165,7 +165,7 @@ export default {
 
       try {
         const {
-          body: { sessions },
+          data: { sessions },
         } = await NetworkService.adminGetSessionReport(query)
         if (sessions.length === 0) this.error = 'No sessions meet the criteria'
         else
@@ -176,7 +176,7 @@ export default {
 
         this.isGeneratingReport = false
       } catch (error) {
-        if (error.status === 422) this.errorHandler(error.body.err)
+        if (error.status === 422) this.errorHandler(error.response.data.err)
         else this.errorHandler()
       }
     },
@@ -196,7 +196,7 @@ export default {
 
       try {
         const {
-          body: { students },
+          data: { students },
         } = await NetworkService.adminGetUsageReport(query)
         if (students.length === 0) this.error = 'No students meet the criteria'
         else
@@ -207,7 +207,7 @@ export default {
 
         this.isGeneratingReport = false
       } catch (error) {
-        if (error.status === 422) this.errorHandler(error.body.err)
+        if (error.status === 422) this.errorHandler(error.response.data.err)
         else this.errorHandler()
       }
     },
