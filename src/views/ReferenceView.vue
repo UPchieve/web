@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import ReferenceForm from '@/components/ReferenceForm'
+import ReferenceForm from '@/components/ReferenceForm.vue'
 
 export default {
   name: 'ReferenceView',

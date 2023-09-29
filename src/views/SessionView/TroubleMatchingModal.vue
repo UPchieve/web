@@ -28,9 +28,9 @@
 <script>
 import { mapGetters } from 'vuex'
 import NetworkService from '@/services/NetworkService'
-import Modal from '@/components/Modal'
-import Separator from '@/components/Separator'
-import LargeButton from '@/components/LargeButton'
+import Modal from '@/components/Modal.vue'
+import Separator from '@/components/Separator.vue'
+import LargeButton from '@/components/LargeButton.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 

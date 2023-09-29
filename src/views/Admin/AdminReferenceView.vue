@@ -20,7 +20,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import ReferenceForm from '@/components/ReferenceForm'
+import ReferenceForm from '@/components/ReferenceForm.vue'
 
 export default {
   name: 'AdminReferenceView',

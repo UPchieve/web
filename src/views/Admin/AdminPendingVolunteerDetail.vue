@@ -71,8 +71,8 @@
 <script>
 import moment from 'moment'
 import NetworkService from '@/services/NetworkService'
-import LargeButton from '@/components/LargeButton'
-import BackgroundInfo from '@/components/Admin/BackgroundInfo'
+import LargeButton from '@/components/LargeButton.vue'
+import BackgroundInfo from '@/components/Admin/BackgroundInfo.vue'
 
 export default {
   name: 'AdminPendingVolunteerDetail',

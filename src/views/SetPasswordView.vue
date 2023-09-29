@@ -71,9 +71,9 @@
 import { mapState } from 'vuex'
 
 import AuthService from '@/services/AuthService'
-import FormPageTemplate from '@/components/FormPageTemplate'
-import LargeButton from '@/components/LargeButton'
-import Loader from '@/components/Loader'
+import FormPageTemplate from '@/components/FormPageTemplate.vue'
+import LargeButton from '@/components/LargeButton.vue'
+import Loader from '@/components/Loader.vue'
 import LoggerService from '@/services/LoggerService'
 
 export default {

@@ -2,9 +2,9 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 import { merge } from 'lodash'
 import Vuex from 'vuex'
 import { storeOptions } from '@/store'
-import AppSidebar from '@/components/App/AppSidebar'
-import SidebarInfo from '@/components/App/AppSidebar/SidebarInfo'
-import SidebarLinks from '@/components/App/AppSidebar/SidebarLinks'
+import AppSidebar from '@/components/App/AppSidebar/index.vue'
+import SidebarInfo from '@/components/App/AppSidebar/SidebarInfo.vue'
+import SidebarLinks from '@/components/App/AppSidebar/SidebarLinks.vue'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)

@@ -29,7 +29,7 @@
 
 <script>
 import Material from './Material'
-import CheckMark from '@/components/CheckMark'
+import CheckMark from '@/components/CheckMark.vue'
 import RightCaret from '@/assets/right-caret.svg'
 
 export default {

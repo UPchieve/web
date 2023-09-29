@@ -215,12 +215,12 @@
 import validator from 'validator'
 import LoggerService from '@/services/LoggerService'
 
-import FormPageTemplate from '@/components/FormPageTemplate'
+import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import AuthService from '@/services/AuthService'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import VuePhoneNumberInput from 'vue-phone-number-input'
-import Loader from '@/components/Loader'
+import Loader from '@/components/Loader.vue'
 import { EVENTS } from '@/consts'
 
 export default {

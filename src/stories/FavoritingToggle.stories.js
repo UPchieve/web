@@ -1,4 +1,4 @@
-import FavoritingToggle from '../components/FavoritingToggle'
+import FavoritingToggle from '../components/FavoritingToggle.vue'
 
 export default {
   title: 'Example/FavoritingToggle',

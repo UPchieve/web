@@ -39,9 +39,9 @@
 </template>
 
 <script>
-import Modal from '@/components/Modal'
-import LargeButton from '@/components/LargeButton'
-import Separator from '@/components/Separator'
+import Modal from '@/components/Modal.vue'
+import LargeButton from '@/components/LargeButton.vue'
+import Separator from '@/components/Separator.vue'
 import UpdogCrying from '@/assets/updog-crying.svg'
 import setCookie from '@/utils/set-cookie'
 import AnalyticsService from '@/services/AnalyticsService'

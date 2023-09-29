@@ -56,7 +56,7 @@
 
 <script>
 import NetworkService from '@/services/NetworkService'
-import Loader from '@/components/Loader'
+import Loader from '@/components/Loader.vue'
 import moment from 'moment'
 import exportToCsv from '@/utils/export-to-csv'
 import { ANALYTICS_REPORT_ROW, ANALYTICS_REPORT_SUMMARY } from '@/consts'

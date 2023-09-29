@@ -2,7 +2,7 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
 import userModule from '@/store/modules/user'
 import appModule from '@/store/modules/app'
-import ContactView from '@/views/ContactView'
+import ContactView from '@/views/ContactView.vue'
 import vSelect from 'vue-select'
 
 const localVue = createLocalVue()

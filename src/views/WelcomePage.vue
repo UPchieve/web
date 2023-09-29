@@ -101,9 +101,9 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import TopicChip from '@/components/TopicChip'
+import TopicChip from '@/components/TopicChip.vue'
 import CertDog from '@/assets/certdog.svg'
-import LargeButton from '@/components/LargeButton'
+import LargeButton from '@/components/LargeButton.vue'
 
 export default {
   name: 'welcome-page',

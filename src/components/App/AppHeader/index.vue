@@ -6,14 +6,14 @@
 
 <script>
 import { mapState } from 'vuex'
-import HeaderTemplate from './HeaderTemplate'
-import DefaultHeader from './DefaultHeader'
-import SessionHeader from './SessionHeader'
-import RejoinSessionHeader from './RejoinSessionHeader'
-import WaitingPeriodHeader from './WaitingPeriodHeader'
-import BannedStudentHeader from './BannedStudentHeader'
-import DashboardBannerHeader from './DashboardBannerHeader'
-import EarnCertificationsHeader from './EarnCertificationsHeader'
+import HeaderTemplate from './HeaderTemplate.vue'
+import DefaultHeader from './DefaultHeader/index.vue'
+import SessionHeader from './SessionHeader.vue'
+import RejoinSessionHeader from './RejoinSessionHeader.vue'
+import WaitingPeriodHeader from './WaitingPeriodHeader.vue'
+import BannedStudentHeader from './BannedStudentHeader.vue'
+import DashboardBannerHeader from './DashboardBannerHeader.vue'
+import EarnCertificationsHeader from './EarnCertificationsHeader.vue'
 
 export default {
   name: 'app-header',

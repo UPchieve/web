@@ -72,7 +72,7 @@
 </template>
 
 <script>
-import SidebarLink from './SidebarLink'
+import SidebarLink from './SidebarLink.vue'
 import HouseIcon from '@/assets/sidebar_icons/house.svg'
 import GraduationCapIcon from '@/assets/sidebar_icons/graduation-cap.svg'
 import CalendarIcon from '@/assets/sidebar_icons/calendar.svg'

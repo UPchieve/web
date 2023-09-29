@@ -54,8 +54,8 @@
 </template>
 
 <script>
-import Modal from '@/components/Modal'
-import Stepper from '@/components/Stepper'
+import Modal from '@/components/Modal.vue'
+import Stepper from '@/components/Stepper.vue'
 import AlertIcon from '@/assets/blue-alert.svg'
 import CrossIcon from '@/assets/cross.svg'
 import { mapState } from 'vuex'

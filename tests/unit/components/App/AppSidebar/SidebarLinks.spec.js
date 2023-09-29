@@ -1,5 +1,5 @@
-import SidebarLink from '@/components/App/AppSidebar/SidebarLink'
-import SidebarLinks from '@/components/App/AppSidebar/SidebarLinks'
+import SidebarLink from '@/components/App/AppSidebar/SidebarLink.vue'
+import SidebarLinks from '@/components/App/AppSidebar/SidebarLinks.vue'
 import { createLocalVue, shallowMount } from '@vue/test-utils'
 import Vuex from 'vuex'
 

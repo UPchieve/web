@@ -65,7 +65,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import Case from 'case'
-import LargeButton from '@/components/LargeButton'
+import LargeButton from '@/components/LargeButton.vue'
 
 export default {
   props: {

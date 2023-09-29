@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import FormPageTemplate from '@/components/FormPageTemplate'
+import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import StudentForm from './StudentForm'
 import VolunteerForm from './VolunteerForm'
 import NetworkService from '@/services/NetworkService'

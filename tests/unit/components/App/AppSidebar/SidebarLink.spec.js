@@ -3,9 +3,7 @@ import { merge } from 'lodash'
 import VueRouter from 'vue-router'
 import Vuex from 'vuex'
 import { storeOptions } from '@/store'
-import SidebarLink from '@/components/App/AppSidebar/SidebarLink'
-// import UpchieveIcon from "@/components/UpchieveIcon";
-// import HouseIcon from "@/assets/sidebar_icons/house.svg";
+import SidebarLink from '@/components/App/AppSidebar/SidebarLink.vue'
 
 const localVue = createLocalVue()
 localVue.use(VueRouter)

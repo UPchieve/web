@@ -955,8 +955,8 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import FullTextTemplate from '@/components/FullTextTemplate'
-import AccordionItem from '@/components/AccordionItem'
+import FullTextTemplate from '@/components/FullTextTemplate.vue'
+import AccordionItem from '@/components/AccordionItem.vue'
 
 export default {
   name: 'LegalView',

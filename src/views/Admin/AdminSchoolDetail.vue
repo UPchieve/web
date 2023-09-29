@@ -94,7 +94,7 @@
 
 <script>
 import NetworkService from '@/services/NetworkService'
-import AdminEditSchool from '@/views/Admin/AdminEditSchool'
+import AdminEditSchool from '@/views/Admin/AdminEditSchool.vue'
 
 export default {
   name: 'AdminSchoolDetail',

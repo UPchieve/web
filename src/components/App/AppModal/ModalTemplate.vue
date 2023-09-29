@@ -43,7 +43,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import LargeButton from '@/components/LargeButton'
+import LargeButton from '@/components/LargeButton.vue'
 import ArrowIcon from '@/assets/arrow.svg'
 
 const FOCUSABLE_ELEMENT_SELECTOR =

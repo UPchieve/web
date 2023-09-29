@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import ButtonTemplate from './ButtonTemplate'
+import ButtonTemplate from './ButtonTemplate.vue'
 
 export default {
   components: { ButtonTemplate },

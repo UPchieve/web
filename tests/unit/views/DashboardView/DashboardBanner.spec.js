@@ -2,8 +2,7 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
 import appModule from '@/store/modules/app'
 import userModule from '@/store/modules/user'
-import DashboardBanner from '@/views/DashboardView/DashboardBanner'
-// import LargeButton from "@/components/LargeButton";
+import DashboardBanner from '@/views/DashboardView/DashboardBanner.vue'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)

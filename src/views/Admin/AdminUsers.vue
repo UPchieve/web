@@ -57,8 +57,8 @@
 
 <script>
 import NetworkService from '@/services/NetworkService'
-import PageControl from '@/components/Admin/PageControl'
-import UserListItem from '@/components/Admin/UserListItem'
+import PageControl from '@/components/Admin/PageControl.vue'
+import UserListItem from '@/components/Admin/UserListItem.vue'
 import { isEmpty } from 'lodash'
 
 const getUsers = async userData => {

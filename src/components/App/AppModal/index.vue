@@ -23,16 +23,16 @@
 
 <script>
 import { mapState } from 'vuex'
-import ModalTemplate from './ModalTemplate'
-import RejoinSessionModal from './RejoinSessionModal'
+import ModalTemplate from './ModalTemplate.vue'
+import RejoinSessionModal from './RejoinSessionModal.vue'
 import UpgradeAppModal from './UpgradeAppModal'
-import SubjectSelectionModal from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectSelectionModal'
-import NotificationsModal from '@/views/DashboardView/StudentDashboard/SubjectSelection/NotificationsModal'
-import ReferralModal from '@/views/DashboardView/StudentDashboard/ReferralModal'
-import SessionFulfilledModal from '@/views/SessionView/SessionFulfilledModal'
+import SubjectSelectionModal from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectSelectionModal.vue'
+import NotificationsModal from '@/views/DashboardView/StudentDashboard/SubjectSelection/NotificationsModal.vue'
+import ReferralModal from '@/views/DashboardView/StudentDashboard/ReferralModal.vue'
+import SessionFulfilledModal from '@/views/SessionView/SessionFulfilledModal.vue'
 import VolunteerOnboardingModal from '@/views/DashboardView/VolunteerDashboard/VolunteerOnboardingModal.vue'
-import StudentOnboardingModal from '@/views/DashboardView/StudentDashboard/StudentOnboardingModal'
-import ReportSessionModal from '@/views/SessionView/ReportSessionModal'
+import StudentOnboardingModal from '@/views/DashboardView/StudentDashboard/StudentOnboardingModal.vue'
+import ReportSessionModal from '@/views/SessionView/ReportSessionModal.vue'
 
 export default {
   components: {

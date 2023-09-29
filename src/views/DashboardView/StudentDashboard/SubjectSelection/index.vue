@@ -30,7 +30,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import SubjectCard from './SubjectCard'
+import SubjectCard from './SubjectCard.vue'
 import calculateWaitingPeriodCountdown from '@/utils/calculate-waiting-period-countdown'
 import ReferralSVG from '@/assets/dashboard_icons/student/referral.svg'
 import LightBulbSVG from '@/assets/dashboard_icons/student/light-bulb.svg'

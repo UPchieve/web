@@ -106,9 +106,9 @@ import router from '@/router'
 import StudentIcon from '@/assets/student-icon.svg'
 import VolunteerIcon from '@/assets/volunteer-icon.svg'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
-import LoadingMessage from '@/components/LoadingMessage'
-import TroubleMatchingModal from '@/views/SessionView/TroubleMatchingModal'
-import UnmatchedModal from '@/views/SessionView/UnmatchedModal'
+import LoadingMessage from '@/components/LoadingMessage.vue'
+import TroubleMatchingModal from '@/views/SessionView/TroubleMatchingModal.vue'
+import UnmatchedModal from '@/views/SessionView/UnmatchedModal.vue'
 import sendWebNotification from '@/utils/send-web-notification'
 
 /**

@@ -2,12 +2,12 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 import { merge } from 'lodash'
 import Vuex from 'vuex'
 import { storeOptions } from '@/store'
-import AppHeader from '@/components/App/AppHeader'
-import HeaderTemplate from '@/components/App/AppHeader/HeaderTemplate'
-import DefaultHeader from '@/components/App/AppHeader/DefaultHeader'
-import RejoinSessionHeader from '@/components/App/AppHeader/RejoinSessionHeader'
-import BannedStudentHeader from '@/components/App/AppHeader/BannedStudentHeader'
-import WaitingPeriodHeader from '@/components/App/AppHeader/WaitingPeriodHeader'
+import AppHeader from '@/components/App/AppHeader/index.vue'
+import HeaderTemplate from '@/components/App/AppHeader/HeaderTemplate.vue'
+import DefaultHeader from '@/components/App/AppHeader/DefaultHeader/index.vue'
+import RejoinSessionHeader from '@/components/App/AppHeader/RejoinSessionHeader.vue'
+import BannedStudentHeader from '@/components/App/AppHeader/BannedStudentHeader.vue'
+import WaitingPeriodHeader from '@/components/App/AppHeader/WaitingPeriodHeader.vue'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)

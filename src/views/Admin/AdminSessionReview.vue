@@ -13,8 +13,8 @@
 
 <script>
 import NetworkService from '@/services/NetworkService'
-import SessionsList from '@/components/Admin/SessionsList'
-import PageControl from '@/components/Admin/PageControl'
+import SessionsList from '@/components/Admin/SessionsList.vue'
+import PageControl from '@/components/Admin/PageControl.vue'
 
 export default {
   name: 'AdminSessionReview',

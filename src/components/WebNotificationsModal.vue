@@ -30,9 +30,9 @@
 
 <script>
 import { mapState } from 'vuex'
-import Modal from '@/components/Modal'
-import Separator from '@/components/Separator'
-import LargeButton from '@/components/LargeButton'
+import Modal from '@/components/Modal.vue'
+import Separator from '@/components/Separator.vue'
+import LargeButton from '@/components/LargeButton.vue'
 import setNotificationPermission from '@/utils/set-notification-permission'
 
 export default {

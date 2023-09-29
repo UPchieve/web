@@ -1,6 +1,6 @@
 import appModule from '@/store/modules/app'
-import SubjectSelection from '@/views/DashboardView/StudentDashboard/SubjectSelection'
-import SubjectCard from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectCard'
+import SubjectSelection from '@/views/DashboardView/StudentDashboard/SubjectSelection/index.vue'
+import SubjectCard from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectCard.vue'
 import { createLocalVue, shallowMount } from '@vue/test-utils'
 import Vuex from 'vuex'
 

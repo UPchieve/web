@@ -6,8 +6,8 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 
-import VolunteerDashboard from './VolunteerDashboard'
-import StudentDashboard from './StudentDashboard'
+import VolunteerDashboard from './VolunteerDashboard/index.vue'
+import StudentDashboard from './StudentDashboard/index.vue'
 import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 
 export default {

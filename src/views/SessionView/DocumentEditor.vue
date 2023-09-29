@@ -29,8 +29,8 @@ import {
 } from '@/utils/quill-image-optimizer'
 import Quill from 'quill'
 import QuillCursors from 'quill-cursors'
-import LoadingMessage from '@/components/LoadingMessage'
-import RefreshDocumentEditorModal from '@/views/SessionView/RefreshDocumentEditorModal'
+import LoadingMessage from '@/components/LoadingMessage.vue'
+import RefreshDocumentEditorModal from '@/views/SessionView/RefreshDocumentEditorModal.vue'
 
 Quill.register('modules/cursors', QuillCursors)
 Quill.register('modules/image', ImageCompressor)

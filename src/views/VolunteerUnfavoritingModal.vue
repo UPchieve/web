@@ -33,8 +33,8 @@
 </template>
 
 <script>
-import Modal from '@/components/Modal'
-import LargeButton from '@/components/LargeButton'
+import Modal from '@/components/Modal.vue'
+import LargeButton from '@/components/LargeButton.vue'
 
 export default {
   name: 'volunteer-unfavoriting-modal',

@@ -6,8 +6,8 @@
 
 <script>
 import { mapState } from 'vuex'
-import BannerTemplate from './BannerTemplate'
-import MobileAppNoticeBanner from './MobileAppNoticeBanner'
+import BannerTemplate from './BannerTemplate.vue'
+import MobileAppNoticeBanner from './MobileAppNoticeBanner.vue'
 
 export default {
   components: {

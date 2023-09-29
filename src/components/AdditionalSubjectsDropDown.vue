@@ -51,7 +51,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import CheckMark from '@/components/CheckMark'
+import CheckMark from '@/components/CheckMark.vue'
 
 export default {
   name: 'AdditionalSubjectsDropDown',

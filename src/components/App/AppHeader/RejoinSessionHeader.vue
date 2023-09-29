@@ -28,8 +28,8 @@
 <script>
 import { mapGetters } from 'vuex'
 import * as sessionUtils from '@/utils/session'
-import HyperlinkButton from '@/components/HyperlinkButton'
-import LargeButton from '@/components/LargeButton'
+import HyperlinkButton from '@/components/HyperlinkButton.vue'
+import LargeButton from '@/components/LargeButton.vue'
 
 export default {
   name: 'rejoin-session-header',

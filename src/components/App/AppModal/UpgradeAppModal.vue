@@ -34,7 +34,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import LargeButton from '@/components/LargeButton'
+import LargeButton from '@/components/LargeButton.vue'
 import getOperatingSystem from '@/utils/get-operating-system'
 import { GOOGLE_PLAY_STORE_LINK, APP_STORE_LINK } from '@/consts'
 

@@ -28,8 +28,8 @@
 
 <script>
 import NetworkService from '@/services/NetworkService'
-import PendingVolunteerListItem from '@/components/Admin/PendingVolunteerListItem'
-import PageControl from '@/components/Admin/PageControl'
+import PendingVolunteerListItem from '@/components/Admin/PendingVolunteerListItem.vue'
+import PageControl from '@/components/Admin/PageControl.vue'
 
 const getVolunteersToReview = async page => {
   const {

@@ -88,10 +88,10 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import AccordionItem from '@/components/AccordionItem'
-import TrainingDropDown from '@/components/TrainingDropDown'
-import SubjectCertsDropDown from '@/components/SubjectCertsDropDown'
-import AdditionalSubjectsDropDown from '@/components/AdditionalSubjectsDropDown'
+import AccordionItem from '@/components/AccordionItem.vue'
+import TrainingDropDown from '@/components/TrainingDropDown.vue'
+import SubjectCertsDropDown from '@/components/SubjectCertsDropDown.vue'
+import AdditionalSubjectsDropDown from '@/components/AdditionalSubjectsDropDown.vue'
 import Loader from '@/components/Loader.vue'
 
 export default {

@@ -96,13 +96,13 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import LargeButton from '@/components/LargeButton'
-import Stepper from '@/components/Stepper'
+import LargeButton from '@/components/LargeButton.vue'
+import Stepper from '@/components/Stepper.vue'
 import NetworkService from '@/services/NetworkService'
 import CrossIcon from '@/assets/cross.svg'
 import { QUESTION_TYPES } from '@/consts'
-import SurveyRadio from '@/components/Surveys/SurveyRadio'
-import SurveyImage from '@/components/Surveys/SurveyImage'
+import SurveyRadio from '@/components/Surveys/SurveyRadio.vue'
+import SurveyImage from '@/components/Surveys/SurveyImage.vue'
 
 export default {
   components: {

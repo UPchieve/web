@@ -120,7 +120,7 @@ import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
 
 import ChatBot from './ChatBot'
-import LoadingMessage from '@/components/LoadingMessage'
+import LoadingMessage from '@/components/LoadingMessage.vue'
 import ModerationService from '@/services/ModerationService'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import sendWebNotification from '@/utils/send-web-notification'

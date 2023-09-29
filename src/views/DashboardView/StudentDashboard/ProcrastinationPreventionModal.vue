@@ -198,8 +198,8 @@
 
 <script>
 import { mapState } from 'vuex'
-import Modal from '@/components/Modal'
-import LargeButton from '@/components/LargeButton'
+import Modal from '@/components/Modal.vue'
+import LargeButton from '@/components/LargeButton.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import NetworkService from '@/services/NetworkService'
 import { EVENTS } from '@/consts'

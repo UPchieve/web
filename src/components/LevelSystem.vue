@@ -75,9 +75,9 @@
 
 <script>
 import { mapState } from 'vuex'
-import Modal from '@/components/Modal'
-import LargeButton from './LargeButton'
-import Separator from './Separator'
+import Modal from '@/components/Modal.vue'
+import LargeButton from './LargeButton.vue'
+import Separator from './Separator.vue'
 import ArrowIcon from '@/assets/arrow.svg'
 import UpdogStar from '@/assets/updog-star.svg'
 import UpdogHooray from '@/assets/updog-hooray.svg'

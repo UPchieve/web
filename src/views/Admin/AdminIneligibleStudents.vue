@@ -31,8 +31,8 @@
 
 <script>
 import NetworkService from '@/services/NetworkService'
-import IneligibleStudentListItem from '@/components/Admin/IneligibleStudentListItem'
-import PageControl from '@/components/Admin/PageControl'
+import IneligibleStudentListItem from '@/components/Admin/IneligibleStudentListItem.vue'
+import PageControl from '@/components/Admin/PageControl.vue'
 
 const getIneligibleStudents = async page => {
   const {

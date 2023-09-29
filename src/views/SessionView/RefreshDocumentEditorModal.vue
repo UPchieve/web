@@ -25,9 +25,9 @@
 </template>
 
 <script>
-import LargeButton from '@/components/LargeButton'
-import Modal from '@/components/Modal'
-import Separator from '@/components/Separator'
+import LargeButton from '@/components/LargeButton.vue'
+import Modal from '@/components/Modal.vue'
+import Separator from '@/components/Separator.vue'
 
 export default {
   components: { LargeButton, Modal, Separator },

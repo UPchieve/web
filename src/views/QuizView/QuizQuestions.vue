@@ -62,7 +62,7 @@
 <script>
 import TrainingService from '@/services/TrainingService'
 
-import ProgressBar from './ProgressBar'
+import ProgressBar from './ProgressBar.vue'
 
 export default {
   props: ['quizLength'],

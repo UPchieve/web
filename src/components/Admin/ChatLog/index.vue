@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import ChatMessage from './ChatMessage'
+import ChatMessage from './ChatMessage.vue'
 import StudentIcon from '@/assets/student-icon.svg'
 import VolunteerIcon from '@/assets/volunteer-icon.svg'
 

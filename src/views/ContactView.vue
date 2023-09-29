@@ -93,7 +93,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import NetworkService from '../services/NetworkService'
-import LargeButton from '@/components/LargeButton'
+import LargeButton from '@/components/LargeButton.vue'
 import isEmail from 'validator/lib/isEmail'
 
 const sendStates = {

@@ -108,8 +108,8 @@
 
 <script>
 import NetworkService from '@/services/NetworkService'
-import SchoolList from '@/components/SchoolList'
-import Loader from '@/components/Loader'
+import SchoolList from '@/components/SchoolList.vue'
+import Loader from '@/components/Loader.vue'
 import moment from 'moment'
 import exportToCsv from '@/utils/export-to-csv'
 

@@ -77,8 +77,8 @@
 <script>
 import { mapState } from 'vuex'
 import Case from 'case'
-import CheckMark from '@/components/CheckMark'
-import LargeButton from '@/components/LargeButton'
+import CheckMark from '@/components/CheckMark.vue'
+import LargeButton from '@/components/LargeButton.vue'
 import ArrowIcon from '@/assets/arrow.svg'
 
 export default {

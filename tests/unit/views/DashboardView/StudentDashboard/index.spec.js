@@ -1,6 +1,6 @@
-import DashboardBanner from '@/views/DashboardView/DashboardBanner'
-import StudentDashboard from '@/views/DashboardView/StudentDashboard'
-import SubjectSelection from '@/views/DashboardView/StudentDashboard/SubjectSelection'
+import DashboardBanner from '@/views/DashboardView/DashboardBanner.vue'
+import StudentDashboard from '@/views/DashboardView/StudentDashboard/index.vue'
+import SubjectSelection from '@/views/DashboardView/StudentDashboard/SubjectSelection/index.vue'
 import { createLocalVue, shallowMount } from '@vue/test-utils'
 import Vuex from 'vuex'
 
