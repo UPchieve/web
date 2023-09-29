@@ -33,6 +33,10 @@
       v-if="showThemProcrastinationPreventionModal"
       :closeModal="toggleProcrastinationPreventionModal"
     />
+    <phone-number-submission-modal
+      v-if="showPhoneNumberSubmissionModal"
+      :closeModal="togglePhoneNumberSubmissionModal"
+    />
     <subject-selection />
     <first-session-congrats-modal
       v-if="showFirstSessionCongratsModal"
@@ -48,6 +52,7 @@ import SubjectSelection from './SubjectSelection/index.vue'
 import FirstSessionCongratsModal from './FirstSessionCongratsModal.vue'
 import TellThemCollegePrepModal from './TellThemCollegePrepModal.vue'
 import ProcrastinationPreventionModal from './ProcrastinationPreventionModal.vue'
+import PhoneNumberSubmissionModal from './PhoneNumberSubmissionModal.vue'
 import moment from 'moment-timezone'
 import LevelSystemRemovalModal from './LevelSystemRemovalModal.vue'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -85,6 +90,7 @@ export default {
     LevelSystemRemovalModal,
     TellThemCollegePrepModal,
     ProcrastinationPreventionModal,
+    PhoneNumberSubmissionModal,
   },
   async created() {
     if (this.isEarnCertificationsActive)
@@ -143,6 +149,9 @@ export default {
     )
       this.showThemProcrastinationPreventionModal = true
 
+    if (this.isPhoneNumberSubmissionModalActive)
+      this.showPhoneNumberSubmissionModal = true
+
     this.currentHour = moment()
       .tz('America/New_York')
       .hour()
@@ -155,6 +164,7 @@ export default {
       showFirstSessionCongratsModal: false,
       showTellThemCollegePrepModal: false,
       showThemProcrastinationPreventionModal: false,
+      showPhoneNumberSubmissionModal: false,
     }
   },
   computed: {
@@ -220,6 +230,15 @@ export default {
     isProcrastinationPreventionReminderActive() {
       return [this.isProcrastinationPreventionActive, this.hadASession]
     },
+    isPhoneNumberSubmissionModalActive() {
+      return (
+        this.isFallIncentiveProgramActive[0] &&
+        this.isFallIncentiveProgramActive[1].fallIncentiveProgram &&
+        this.isFallIncentiveProgramActive[2] &&
+        !localStorage.getItem('hasSeenPhoneNumberSubmissionModal') &&
+        !this.user.phone
+      )
+    },
   },
   methods: {
     toggleFirstSessionCongratsModal() {
@@ -231,6 +250,9 @@ export default {
     toggleProcrastinationPreventionModal() {
       this.showThemProcrastinationPreventionModal = !this
         .showThemProcrastinationPreventionModal
+    },
+    togglePhoneNumberSubmissionModal() {
+      this.showPhoneNumberSubmissionModal = !this.showPhoneNumberSubmissionModal
     },
     showGleapBot() {
       AnalyticsService.captureEvent(EVENTS.GLEAP_BOT_SHOWN)
@@ -331,6 +353,8 @@ export default {
             !prevValue[2])
         )
           this.triggerIncentiveProgram()
+        if (this.isPhoneNumberSubmissionModalActive)
+          this.showPhoneNumberSubmissionModal = true
       },
       deep: true,
     },
