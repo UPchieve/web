@@ -273,7 +273,7 @@ export default {
       return this.earliestReminderTimeByLatestSession
     },
     internationalPhoneInfo() {
-      if (!this.user.phone) return null
+      if (!this.user.phone) return { number: '', country: '' }
 
       const pn = new PhoneNumber(this.user.phone)
 
