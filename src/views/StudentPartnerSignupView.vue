@@ -347,7 +347,7 @@ import { email, helpers, required, requiredIf } from '@vuelidate/validators'
 import LoggerService from '@/services/LoggerService'
 import Autocomplete from '@trevoreyre/autocomplete-vue'
 
-import FormPageTemplate from '@/components/FormPageTemplate'
+import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import FormErrors from '@/components/FormErrors.vue'
 import AuthService from '@/services/AuthService'
 import NetworkService from '@/services/NetworkService'

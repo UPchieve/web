@@ -47,7 +47,7 @@
 <script>
 import { mapState } from 'vuex'
 import NetworkService from '@/services/NetworkService'
-import LargeButton from '@/components/LargeButton'
+import LargeButton from '@/components/LargeButton.vue'
 
 const reportReasonOptions = [
   'This student was extremely rude or inappropriate',

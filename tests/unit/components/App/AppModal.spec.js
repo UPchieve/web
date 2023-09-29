@@ -2,9 +2,9 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 import { merge } from 'lodash'
 import Vuex from 'vuex'
 import { storeOptions } from '@/store'
-import AppModal from '@/components/App/AppModal'
-import ModalTemplate from '@/components/App/AppModal/ModalTemplate'
-import SubjectSelectionModal from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectSelectionModal'
+import AppModal from '@/components/App/AppModal/index.vue'
+import ModalTemplate from '@/components/App/AppModal/ModalTemplate.vue'
+import SubjectSelectionModal from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectSelectionModal.vue'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)

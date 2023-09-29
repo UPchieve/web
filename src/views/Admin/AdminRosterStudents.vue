@@ -102,7 +102,7 @@
 
 <script>
 import NetworkService from '@/services/NetworkService'
-import Loader from '@/components/Loader'
+import Loader from '@/components/Loader.vue'
 
 export default {
   name: 'AdminRosterStudents',

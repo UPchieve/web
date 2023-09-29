@@ -20,7 +20,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import LogoImageUrl from '@/assets/header_logo.png'
-import HamburgerButton from './HamburgerButton'
+import HamburgerButton from './HamburgerButton.vue'
 
 export default {
   name: 'default-header',

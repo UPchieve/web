@@ -26,10 +26,10 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import { startSession } from '@/utils/session'
-import LargeButton from '@/components/LargeButton'
+import LargeButton from '@/components/LargeButton.vue'
 import PortalService from '@/services/PortalService'
 import NetworkService from '@/services/NetworkService'
-import LoadingMessage from '@/components/LoadingMessage'
+import LoadingMessage from '@/components/LoadingMessage.vue'
 import setCookie from '@/utils/set-cookie'
 import LoggerService from '@/services/LoggerService'
 

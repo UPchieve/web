@@ -143,10 +143,10 @@
 <script>
 import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
-import ListSessions from './ListSessions'
+import ListSessions from './ListSessions.vue'
 import DashboardBanner from '../DashboardBanner'
-import AccountAction from './AccountAction'
-import PhotoUploadModal from './PhotoUploadModal'
+import AccountAction from './AccountAction.vue'
+import PhotoUploadModal from './PhotoUploadModal.vue'
 import VolunteerWelcomeModal from '@/views/DashboardView/VolunteerDashboard/VolunteerWelcomeModal.vue'
 import PersonCardIcon from '@/assets/person-card.svg'
 import PersonIcon from '@/assets/person.svg'
@@ -159,7 +159,7 @@ import WebNotificationsButton from '@/components/WebNotificationsButton.vue'
 import ArrowIcon from '@/assets/arrow.svg'
 import NetworkService from '../../../services/NetworkService'
 import config from '../../../config'
-import Loader from '@/components/Loader'
+import Loader from '@/components/Loader.vue'
 
 const defaultHeaderData = {
   component: 'DefaultHeader',

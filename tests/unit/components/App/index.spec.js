@@ -4,10 +4,10 @@ import Vuex from 'vuex'
 import VueRouter from 'vue-router'
 import router from '@/router'
 import { storeOptions } from '@/store'
-import App from '@/components/App'
-import AppHeader from '@/components/App/AppHeader'
-import AppSidebar from '@/components/App/AppSidebar'
-import AppModal from '@/components/App/AppModal'
+import App from '@/components/App/index.vue'
+import AppHeader from '@/components/App/AppHeader/index.vue'
+import AppSidebar from '@/components/App/AppSidebar/index.vue'
+import AppModal from '@/components/App/AppModal/index.vue'
 
 const localVue = createLocalVue()
 localVue.use(VueRouter)

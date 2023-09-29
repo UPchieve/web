@@ -1,7 +1,7 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
 import store from '@/store'
-import SidebarInfo from '@/components/App/AppSidebar/SidebarInfo'
+import SidebarInfo from '@/components/App/AppSidebar/SidebarInfo.vue'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)

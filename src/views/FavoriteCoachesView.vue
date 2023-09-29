@@ -91,7 +91,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import FavoritingToggle from '@/components/FavoritingToggle'
+import FavoritingToggle from '@/components/FavoritingToggle.vue'
 import NetworkService from '@/services/NetworkService'
 import CaretIcon from '@/assets/caret.svg'
 import CoachIcon from '@/assets/volunteer-icon.svg'

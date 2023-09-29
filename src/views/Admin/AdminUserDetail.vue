@@ -151,10 +151,10 @@
 <script>
 import moment from 'moment'
 import NetworkService from '@/services/NetworkService'
-import SessionsList from '@/components/Admin/SessionsList'
-import AdminPendingVolunteerDetail from '@/views/Admin/AdminPendingVolunteerDetail'
-import AdminEditUser from '@/views/Admin/AdminEditUser'
-import PageControl from '@/components/Admin/PageControl'
+import SessionsList from '@/components/Admin/SessionsList.vue'
+import AdminPendingVolunteerDetail from '@/views/Admin/AdminPendingVolunteerDetail.vue'
+import AdminEditUser from '@/views/Admin/AdminEditUser.vue'
+import PageControl from '@/components/Admin/PageControl.vue'
 
 const getUser = async (userId, page) => {
   const {

@@ -68,8 +68,8 @@ import { mapState, mapGetters } from 'vuex'
 import _ from 'lodash'
 import moment from 'moment-timezone'
 
-import AvailabilityGrid from '@/components/AvailabilityGrid'
-import LargeButton from '@/components/LargeButton'
+import AvailabilityGrid from '@/components/AvailabilityGrid/index.vue'
+import LargeButton from '@/components/LargeButton.vue'
 import ClockIcon from '@/assets/clock.svg'
 
 import CalendarService from '@/services/CalendarService'

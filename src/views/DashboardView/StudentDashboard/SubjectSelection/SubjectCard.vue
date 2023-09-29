@@ -68,9 +68,9 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import DropdownList from '@/components/DropdownList'
-import HyperlinkButton from '@/components/HyperlinkButton'
-import LargeButton from '@/components/LargeButton'
+import DropdownList from '@/components/DropdownList.vue'
+import HyperlinkButton from '@/components/HyperlinkButton.vue'
+import LargeButton from '@/components/LargeButton.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import getCookie from '@/utils/get-cookie'
 import { EVENTS } from '@/consts'

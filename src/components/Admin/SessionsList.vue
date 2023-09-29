@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import SessionListItem from './SessionListItem'
+import SessionListItem from './SessionListItem.vue'
 
 export default {
   name: 'SessionsList',

@@ -10,7 +10,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import LargeButton from '@/components/LargeButton'
+import LargeButton from '@/components/LargeButton.vue'
 
 export default {
   name: 'SessionFulfilledModal',

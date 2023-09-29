@@ -12,7 +12,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import FormPageTemplate from '@/components/FormPageTemplate'
+import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import config from '../config'
 
 export default {

@@ -19,8 +19,8 @@
 
 <script>
 import HeartIcon from '@/assets/heart.svg'
-import VolunteerUnfavoritingModal from '@/views/VolunteerUnfavoritingModal'
-import FavoritedListFullModal from '@/views/FavoritedListFullModal'
+import VolunteerUnfavoritingModal from '@/views/VolunteerUnfavoritingModal.vue'
+import FavoritedListFullModal from '@/views/FavoritedListFullModal.vue'
 import NetworkService from '@/services/NetworkService'
 
 export default {

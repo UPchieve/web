@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import Btn from './Btn'
+import Btn from './Btn.vue'
 
 export default {
   components: {

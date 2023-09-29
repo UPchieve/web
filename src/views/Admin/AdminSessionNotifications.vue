@@ -15,7 +15,7 @@
 
 <script>
 import NetworkService from '@/services/NetworkService'
-import NotificationPreview from '@/components/Admin/NotificationPreview'
+import NotificationPreview from '@/components/Admin/NotificationPreview.vue'
 
 export default {
   name: 'AdminSessionNotifications',

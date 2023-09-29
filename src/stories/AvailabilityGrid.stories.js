@@ -1,4 +1,4 @@
-import AvailabilityGrid from '../components/AvailabilityGrid'
+import AvailabilityGrid from '../components/AvailabilityGrid/index.vue'
 import { action } from '@storybook/addon-actions'
 
 const availabilityTime = {

@@ -125,16 +125,16 @@
 import Case from 'case'
 import { mapGetters, mapState } from 'vuex'
 
-import LoadingMessage from '@/components/LoadingMessage'
+import LoadingMessage from '@/components/LoadingMessage.vue'
 import TrainingService from '@/services/TrainingService'
 
-import QuizQuestions from './QuizQuestions'
-import QuizResults from './QuizResults'
-import QuizReview from './QuizReview'
+import QuizQuestions from './QuizQuestions.vue'
+import QuizResults from './QuizResults.vue'
+import QuizReview from './QuizReview.vue'
 
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
-import LargeButton from '@/components/LargeButton'
+import LargeButton from '@/components/LargeButton.vue'
 
 // TODO: Refactor this file - CSS, make use of async, and better error handling
 export default {

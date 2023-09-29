@@ -2,9 +2,9 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 import { merge } from 'lodash'
 import Vuex from 'vuex'
 import { storeOptions } from '@/store'
-import SubjectCard from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectCard'
-import HyperlinkButton from '@/components/HyperlinkButton'
-import LargeButton from '@/components/LargeButton'
+import SubjectCard from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectCard.vue'
+import HyperlinkButton from '@/components/HyperlinkButton.vue'
+import LargeButton from '@/components/LargeButton.vue'
 // import TestIcon from "@/assets/sidebar_icons/house.svg";
 
 const localVue = createLocalVue()

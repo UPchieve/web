@@ -24,8 +24,8 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import Modal from '@/components/Modal'
-import LargeButton from '@/components/LargeButton'
+import Modal from '@/components/Modal.vue'
+import LargeButton from '@/components/LargeButton.vue'
 import HeavyCrossIcon from '@/assets/heavy-cross.svg'
 
 export default {

@@ -48,8 +48,8 @@
 
 <script>
 import AuthService from '@/services/AuthService'
-import FormPageTemplate from '@/components/FormPageTemplate'
-import Loader from '@/components/Loader'
+import FormPageTemplate from '@/components/FormPageTemplate.vue'
+import Loader from '@/components/Loader.vue'
 import LoggerService from '@/services/LoggerService'
 
 export default {

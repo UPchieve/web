@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import ChatLog from '@/components/ChatLog'
+import ChatLog from '@/components/ChatLog.vue'
 import NetworkService from '@/services/NetworkService'
 import FavoritingToggle from '@/components/FavoritingToggle.vue'
 import { mapState, mapGetters } from 'vuex'
@@ -83,8 +83,8 @@ import CollegeSVG from '@/assets/subject_icons/college-counseling.svg'
 import ScienceSVG from '@/assets/subject_icons/science.svg'
 import SATSVG from '@/assets/subject_icons/sat.svg'
 import ReadingWritingSVG from '@/assets/subject_icons/more-resources.svg'
-import LoadingMessage from '@/components/LoadingMessage'
-import Loader from '@/components/Loader'
+import LoadingMessage from '@/components/LoadingMessage.vue'
+import Loader from '@/components/Loader.vue'
 
 export default {
   components: {

@@ -1,4 +1,4 @@
-import Stepper from '../components/Stepper'
+import Stepper from '../components/Stepper.vue'
 
 export default {
   title: 'Components/Stepper',

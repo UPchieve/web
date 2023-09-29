@@ -69,7 +69,7 @@
 <script>
 import AnalyticsService from '@/services/AnalyticsService'
 import AuthService from '@/services/AuthService'
-import FormPageTemplate from '@/components/FormPageTemplate'
+import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import GoogleLogo from '@/assets/google_logo.svg'
 import { EVENTS } from '@/consts'
 import config from '../config'

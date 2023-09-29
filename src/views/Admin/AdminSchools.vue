@@ -62,8 +62,8 @@
 
 <script>
 import NetworkService from '@/services/NetworkService'
-import PageControl from '@/components/Admin/PageControl'
-import SchoolListItem from '@/components/Admin/SchoolListItem'
+import PageControl from '@/components/Admin/PageControl.vue'
+import SchoolListItem from '@/components/Admin/SchoolListItem.vue'
 import { STATES_WITH_ABBREVIATIONS } from '@/consts'
 
 const getSchools = async data => {

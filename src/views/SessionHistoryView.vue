@@ -173,7 +173,7 @@ import ReadingWritingSVG from '@/assets/subject_icons/more-resources.svg'
 import NetworkService from '../services/NetworkService'
 import CaretIcon from '@/assets/caret.svg'
 import FavoritingToggle from '../components/FavoritingToggle.vue'
-import LargeButton from '../components/LargeButton'
+import LargeButton from '../components/LargeButton.vue'
 import { mapState, mapGetters } from 'vuex'
 import moment from 'moment'
 

@@ -16,7 +16,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import * as sessionUtils from '@/utils/session'
-import LargeButton from '@/components/LargeButton'
+import LargeButton from '@/components/LargeButton.vue'
 
 export default {
   components: { LargeButton },

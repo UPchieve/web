@@ -40,8 +40,8 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import AuthService from '@/services/AuthService'
-import SidebarInfo from './SidebarInfo'
-import SidebarLinks from './SidebarLinks'
+import SidebarInfo from './SidebarInfo.vue'
+import SidebarLinks from './SidebarLinks.vue'
 import config from '../../../config'
 
 export default {

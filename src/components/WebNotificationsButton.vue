@@ -17,7 +17,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import WebNotificationsModal from '@/components/WebNotificationsModal'
+import WebNotificationsModal from '@/components/WebNotificationsModal.vue'
 import getNotificationPermission from '@/utils/get-notification-permission'
 import LargeButton from '@/components/LargeButton.vue'
 

@@ -33,7 +33,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import ArrowIcon from '@/assets/arrow.svg'
-import Modal from '@/components/Modal'
+import Modal from '@/components/Modal.vue'
 
 export default {
   name: 'volunteer-welcome-modal',

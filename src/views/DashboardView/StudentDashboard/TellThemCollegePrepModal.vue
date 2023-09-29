@@ -198,8 +198,8 @@
 
 <script>
 import { mapState } from 'vuex'
-import Modal from '@/components/Modal'
-import LargeButton from '@/components/LargeButton'
+import Modal from '@/components/Modal.vue'
+import LargeButton from '@/components/LargeButton.vue'
 import setCookie from '@/utils/set-cookie'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'

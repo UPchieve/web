@@ -1,9 +1,9 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
 import userModule from '@/store/modules/user'
-import DashboardView from '@/views/DashboardView'
-import VolunteerDashboard from '@/views/DashboardView/VolunteerDashboard'
-import StudentDashboard from '@/views/DashboardView/StudentDashboard'
+import DashboardView from '@/views/DashboardView/index.vue'
+import VolunteerDashboard from '@/views/DashboardView/VolunteerDashboard/index.vue'
+import StudentDashboard from '@/views/DashboardView/StudentDashboard/index.vue'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)

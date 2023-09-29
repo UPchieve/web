@@ -64,8 +64,8 @@ import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import { backOff } from 'exponential-backoff'
-import Loader from '@/components/Loader'
-import LargeButton from '@/components/LargeButton'
+import Loader from '@/components/Loader.vue'
+import LargeButton from '@/components/LargeButton.vue'
 
 export default {
   components: { Loader, LargeButton },

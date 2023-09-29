@@ -220,7 +220,7 @@ import validator from 'validator'
 import LoggerService from '@/services/LoggerService'
 import AuthService from '@/services/AuthService'
 import VuePhoneNumberInput from 'vue-phone-number-input'
-import Loader from '@/components/Loader'
+import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'
 import { backOff } from 'exponential-backoff'
 
