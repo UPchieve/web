@@ -7,7 +7,7 @@
       >
     </div>
     <a
-      href="http://upchieve.org/upchieve-fall-challenge-2023"
+      href="https://upchieve.org/upchieve-fall-challenge-2023"
       target="_blank"
       rel="noopener noreferrer"
       class="header-button"

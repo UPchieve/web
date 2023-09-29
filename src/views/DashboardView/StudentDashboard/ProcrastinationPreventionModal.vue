@@ -48,6 +48,7 @@
                 class="procrastination-modal__phone-input"
                 v-model="phone"
                 :error="phone !== '' && !isValidPhone"
+                :default-country-code="internationalPhoneInfo.country"
                 :required="true"
                 color="#555"
                 valid-color="#16ba97"
@@ -70,7 +71,7 @@
               <large-button
                 class="procrastination-modal__buttons-button procrastination-modal__buttons-button--primary"
                 @click.native="handlePhoneSubmission"
-                :disabled="phone === '' || !this.isValidPhone"
+                :disabled="phone === '' || !isValidPhone"
                 primary
                 :showArrow="false"
                 >Done</large-button
@@ -207,6 +208,7 @@ import moment from 'moment'
 import UpdogProcrastination from '@/assets/updog-procrastination.svg'
 import VuePhoneNumberInput from 'vue-phone-number-input'
 import CrossIcon from '@/assets/cross.svg'
+import PhoneNumber from 'awesome-phonenumber'
 
 export default {
   name: 'ProcrastinationPreventionModal',
@@ -233,6 +235,13 @@ export default {
       EVENTS.STUDENT_PROCRASTINATION_PREVENTION_MODAL_SHOWN
     )
     localStorage.setItem('hasSeenProcrastinationPreventionModal', true)
+    const pn = new PhoneNumber(this.user.phone)
+    this.phone = pn.getNumber('national')
+    // Hack to initially mock the vue-phone-number-input data
+    this.phoneInput = {
+      isValid: true,
+      e164: pn.getNumber('e164'),
+    }
   },
   computed: {
     ...mapState({
@@ -262,6 +271,16 @@ export default {
       if (this.reminderDate && this.reminderTime)
         return this.formattedReminderDate
       return this.earliestReminderTimeByLatestSession
+    },
+    internationalPhoneInfo() {
+      if (!this.user.phone) return null
+
+      const pn = new PhoneNumber(this.user.phone)
+
+      return {
+        number: pn.getNumber('international'),
+        country: pn.getRegionCode(),
+      }
     },
   },
   props: {
@@ -355,7 +374,7 @@ export default {
       this.step++
     },
     async handleRemindMeSubmit() {
-      if (this.isInvalidPhone) this.phoneError = true
+      if (!this.isValidPhone) this.phoneError = true
 
       AnalyticsService.captureEvent(
         EVENTS.STUDENT_PROCRASTINATION_PREVENTION_REMINDER_SUBMITTED
