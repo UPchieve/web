@@ -86,7 +86,7 @@ export default {
     }
   },
   mounted() {
-    localStorage.setItem('hasPhoneNumberSubmissionModal', true)
+    localStorage.setItem('hasSeenPhoneNumberSubmissionModal', true)
     AnalyticsService.captureEvent(
       EVENTS.STUDENT_FALL_INCENTIVE_PROGRAM_PHONE_NUMBER_MODAL_SHOWN
     )
@@ -110,7 +110,7 @@ export default {
       return this.phoneInput.isValid
     },
     internationalPhoneInfo() {
-      if (!this.user.phone) return null
+      if (!this.user.phone) return { number: '', country: '' }
 
       const pn = new PhoneNumber(this.user.phone)
 
