@@ -169,14 +169,13 @@ export default {
       }
 
       try {
-        // const {
-        //   data: { success },
-        // } = await AuthService.confirmVerification({
-        //   verificationCode: this.verificationCode,
-        //   sendTo: this.email,
-        //   verificationMethod: VERIFICATION_METHOD.EMAIL,
-        // })
-        const success = true
+        const {
+          data: { success },
+        } = await AuthService.confirmVerification({
+          verificationCode: this.verificationCode,
+          sendTo: this.email,
+          verificationMethod: VERIFICATION_METHOD.EMAIL,
+        })
         if (success) {
           AnalyticsService.captureEvent(EVENTS.ACCOUNT_VERIFIED, {
             event: EVENTS.ACCOUNT_VERIFIED,
