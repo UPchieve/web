@@ -1,5 +1,15 @@
 <template>
   <div class="admin-sessions">
+    <div>
+      <label for="studentFirstName">Student First Name</label>
+      <input
+        id="studentFirstName"
+        type="text"
+        class="ml-1"
+        v-model="studentFirstName"
+      />
+      <button class="uc-form-button" @click="submitFilters">Filter</button>
+    </div>
     <page-control
       :page="page"
       :isFirstPage="isFirstPage"
@@ -7,7 +17,8 @@
       @nextPage="nextPage"
       @previousPage="previousPage"
     />
-    <sessions-list :sessions="sessions" />
+    <loader v-if="isLoading" class="uc-column items-center"></loader>
+    <sessions-list v-else :sessions="sessions" />
   </div>
 </template>
 
@@ -15,23 +26,27 @@
 import NetworkService from '@/services/NetworkService'
 import SessionsList from '@/components/Admin/SessionsList.vue'
 import PageControl from '@/components/Admin/PageControl.vue'
+import Loader from '@/components/Loader.vue'
 
 export default {
   name: 'AdminSessionReview',
-  components: { SessionsList, PageControl },
+  components: { SessionsList, PageControl, Loader },
   data() {
     return {
       page: 1,
       sessions: [],
       isLastPage: false,
+      studentFirstName: '',
+      isLoading: true,
     }
   },
 
   async created() {
     const {
-      query: { page: pageQuery },
+      query: { page: pageQuery, studentFirstName },
     } = this.$route
     const page = parseInt(pageQuery) || this.page
+    this.studentFirstName = studentFirstName || this.studentFirstName
     this.setPage(page)
   },
 
@@ -44,7 +59,6 @@ export default {
   methods: {
     setPage(page) {
       this.page = page
-      this.sessions = []
       this.getSessions()
     },
 
@@ -62,19 +76,24 @@ export default {
     },
 
     async getSessions() {
+      this.isLoading = true
       const query = {
         page: this.page,
+        studentFirstName: this.studentFirstName,
       }
       this.$router.push({
         path: '/admin/sessions/review',
         query,
       })
-
       const {
         data: { sessions, isLastPage },
-      } = await NetworkService.adminGetSessionsToReview(this.page)
+      } = await NetworkService.adminGetSessionsToReview(
+        this.page,
+        this.studentFirstName
+      )
       this.sessions = sessions
       this.isLastPage = isLastPage
+      this.isLoading = false
     },
   },
 }
@@ -92,5 +111,9 @@ export default {
     margin: 40px;
     padding: 40px;
   }
+}
+
+.ml-1 {
+  margin-left: 0.25rem;
 }
 </style>

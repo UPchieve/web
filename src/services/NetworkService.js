@@ -357,11 +357,10 @@ export default {
       this._errorHandler
     )
   },
-  adminGetSessionsToReview(page) {
-    return httpGet(`${API_ROOT}/session/review?page=${page}`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+  adminGetSessionsToReview(page, studentFirstName) {
+    return httpGet(
+      `${API_ROOT}/session/review?page=${page}&studentFirstName=${studentFirstName}`
+    ).then(this._successHandler, this._errorHandler)
   },
   adminUpdateSession(sessionId, data) {
     return httpPut(`${API_ROOT}/session/${sessionId}`, data).then(
