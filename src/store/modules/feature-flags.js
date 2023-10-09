@@ -71,6 +71,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO]: true,
       [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: 'control',
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
+      [POSTHOG_FEATURE_FLAGS.REFERRAL_COPY]: '',
     },
     flagPayloads: {
       [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: [],
@@ -201,5 +202,6 @@ export default {
     ccIntroCopy: state => state.flags[POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY],
     isProcrastinationPreventionActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.PROCRASTINATION_PREVENTION],
+    referralCopy: state => state.flags[POSTHOG_FEATURE_FLAGS.REFERRAL_COPY],
   },
 }

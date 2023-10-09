@@ -68,7 +68,6 @@ export default {
       topicCardDashboardReorder: 'featureFlags/topicCardDashboardReorder',
       isTopicDashboardReorderActive:
         'featureFlags/isTopicDashboardReorderActive',
-      testSubjectCardCopy: 'featureFlags/testSubjectCardCopy',
     }),
     waitingPeriodMessage() {
       const countdown = calculateWaitingPeriodCountdown(

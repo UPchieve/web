@@ -67,12 +67,12 @@ p {
 }
 
 .ReferralModal-subtitle {
-  @include font-category('body');
+  @include font-category('heading');
   color: $c-secondary-grey;
 }
 
 .share-link {
-  font-size: 20px;
+  font-size: 14px;
   margin-top: 30px;
   margin-bottom: -30px;
 }
