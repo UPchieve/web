@@ -37,6 +37,10 @@
       v-if="showPhoneNumberSubmissionModal"
       :closeModal="togglePhoneNumberSubmissionModal"
     />
+    <fall-incentive-enrollment-modal
+      v-if="showFallIncentiveEnrollmentModal"
+      :closeModal="toggleFallIncentiveEnrollmentModal"
+    />
     <subject-selection />
     <first-session-congrats-modal
       v-if="showFirstSessionCongratsModal"
@@ -53,6 +57,7 @@ import FirstSessionCongratsModal from './FirstSessionCongratsModal.vue'
 import TellThemCollegePrepModal from './TellThemCollegePrepModal.vue'
 import ProcrastinationPreventionModal from './ProcrastinationPreventionModal.vue'
 import PhoneNumberSubmissionModal from './PhoneNumberSubmissionModal.vue'
+import FallIncentiveEnrollmentModal from './FallIncentiveEnrollmentModal.vue'
 import moment from 'moment-timezone'
 import LevelSystemRemovalModal from './LevelSystemRemovalModal.vue'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -91,6 +96,7 @@ export default {
     TellThemCollegePrepModal,
     ProcrastinationPreventionModal,
     PhoneNumberSubmissionModal,
+    FallIncentiveEnrollmentModal,
   },
   async created() {
     if (this.isEarnCertificationsActive)
@@ -152,6 +158,9 @@ export default {
     if (this.isPhoneNumberSubmissionModalActive)
       this.showPhoneNumberSubmissionModal = true
 
+    if (this.isEnrollmentForFallIncentiveModalActive)
+      this.showFallIncentiveEnrollmentModal = true
+
     this.currentHour = moment()
       .tz('America/New_York')
       .hour()
@@ -165,6 +174,7 @@ export default {
       showTellThemCollegePrepModal: false,
       showThemProcrastinationPreventionModal: false,
       showPhoneNumberSubmissionModal: false,
+      showFallIncentiveEnrollmentModal: false,
     }
   },
   computed: {
@@ -188,6 +198,8 @@ export default {
         'featureFlags/isProcrastinationPreventionActive',
       isGleapBotExperimentActive: 'featureFlags/isGleapBotExperimentActive',
       isDashboardBannerActive: 'featureFlags/isDashboardBannerActive',
+      isFallIncentiveEnrollmentActive:
+        'featureFlags/isFallIncentiveEnrollmentActive',
     }),
     isLowCoachHour() {
       return this.currentHour < 12
@@ -230,6 +242,18 @@ export default {
     isProcrastinationPreventionReminderActive() {
       return [this.isProcrastinationPreventionActive, this.hadASession]
     },
+    isEnrollmentForFallIncentiveActive() {
+      return [this.isFallIncentiveEnrollmentActive, this.hadASession]
+    },
+    isEnrollmentForFallIncentiveModalActive() {
+      return (
+        this.isEnrollmentForFallIncentiveActive[0] &&
+        this.isEnrollmentForFallIncentiveActive[1] &&
+        !localStorage.getItem('hasSeenFallIncentiveEnrollmentModal') &&
+        this.user.pastSessions.length === 1 &&
+        !this.user.phone
+      )
+    },
     isPhoneNumberSubmissionModalActive() {
       return (
         this.isFallIncentiveProgramActive[0] &&
@@ -253,6 +277,10 @@ export default {
     },
     togglePhoneNumberSubmissionModal() {
       this.showPhoneNumberSubmissionModal = !this.showPhoneNumberSubmissionModal
+    },
+    toggleFallIncentiveEnrollmentModal() {
+      this.showFallIncentiveEnrollmentModal = !this
+        .showFallIncentiveEnrollmentModal
     },
     showGleapBot() {
       AnalyticsService.captureEvent(EVENTS.GLEAP_BOT_SHOWN)
@@ -355,6 +383,17 @@ export default {
           this.triggerIncentiveProgram()
         if (this.isPhoneNumberSubmissionModalActive)
           this.showPhoneNumberSubmissionModal = true
+      },
+      deep: true,
+    },
+    isEnrollmentForFallIncentiveActive: {
+      handler: function(currentValue, prevValue) {
+        if (
+          (currentValue[0] && currentValue[1] && !prevValue[0]) ||
+          !prevValue[1]
+        )
+          if (this.isEnrollmentForFallIncentiveModalActive)
+            this.showFallIncentiveEnrollmentModal = true
       },
       deep: true,
     },

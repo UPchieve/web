@@ -824,4 +824,16 @@ export default {
       this._errorHandler
     )
   },
+  initiateFallIncentiveProgramEnrollment(data) {
+    return httpPost(
+      `${API_ROOT}/product-flags/fall-incentive-enrollment/initiate`,
+      data
+    ).then(this._successHandler, this._errorHandler)
+  },
+  fallIncentiveProgramEnrollmentEnroll(data) {
+    return httpPost(
+      `${API_ROOT}/product-flags/fall-incentive-enrollment/enroll`,
+      data
+    ).then(this._successHandler, this._errorHandler)
+  },
 }
