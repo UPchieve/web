@@ -237,7 +237,11 @@ export default {
       return [this.isJustTellThemActive, this.hadASession]
     },
     isFallIncentiveProgramActive() {
-      return [this.user, this.productFlags, this.isDashboardBannerActive]
+      return [
+        this.user,
+        this.productFlags?.fallIncentiveProgram,
+        this.isDashboardBannerActive,
+      ]
     },
     isProcrastinationPreventionReminderActive() {
       return [this.isProcrastinationPreventionActive, this.hadASession]
@@ -257,7 +261,7 @@ export default {
     isPhoneNumberSubmissionModalActive() {
       return (
         this.isFallIncentiveProgramActive[0] &&
-        this.isFallIncentiveProgramActive[1].fallIncentiveProgram &&
+        this.isFallIncentiveProgramActive[1] &&
         this.isFallIncentiveProgramActive[2] &&
         !localStorage.getItem('hasSeenPhoneNumberSubmissionModal') &&
         !this.user.phone
@@ -373,12 +377,10 @@ export default {
       handler: function(currentValue, prevValue) {
         if (
           Object.keys(currentValue[0]).length &&
-          Object.keys(currentValue[1]).length &&
+          currentValue[1] &&
           currentValue[2] &&
           !this.isSessionAlive &&
-          (!Object.keys(prevValue[0]).length ||
-            !Object.keys(prevValue[1]).length ||
-            !prevValue[2])
+          (!Object.keys(prevValue[0]).length || !prevValue[1] || !prevValue[2])
         )
           this.triggerIncentiveProgram()
         if (this.isPhoneNumberSubmissionModalActive)
