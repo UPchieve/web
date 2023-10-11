@@ -64,6 +64,7 @@ import AnalyticsService from '@/services/AnalyticsService'
 import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 import { EVENTS } from '@/consts'
 import getCookie from '@/utils/get-cookie'
+import ReferralSVG from '@/assets/dashboard_icons/student/referral.svg'
 import Gleap from 'gleap'
 
 const defaultHeaderData = {
@@ -166,6 +167,48 @@ export default {
       .hour()
 
     if (this.isGleapBotExperimentActive) this.showGleapBot()
+
+    if (
+      !this.showTellThemCollegePrepModal &&
+      !this.showThemProcrastinationPreventionModal &&
+      !this.showFallIncentiveEnrollmentModali &&
+      !!this.referralCopy &&
+      (!localStorage.getItem('last-seen-referral-modal') ||
+        moment(localStorage.getItem('last-seen-referral-modal')).isSameOrBefore(
+          moment().subtract(1, 'week')
+        )) &&
+      localStorage.getItem('high-session-rating') === 'true'
+    ) {
+      let header
+      let subcopy
+      if (this.referralCopy === 'baseline') {
+        header =
+          'Know a friend or classmate who would benefit from free 24/7 tutoring?'
+        subcopy = 'Invite them to UPchieve!'
+      } else if (this.referralCopy === 'small-gift-card') {
+        header =
+          'UPchieve can help your friends succeed! Refer 5 friends to UPchieve and get a $25 gift card when they sign up.'
+        subcopy = 'Refer your friends now'
+      } else if (this.referralCopy === 'emotional-appeal-struggling') {
+        header =
+          'Do you have friends, siblings, or classmates struggling in a class? When you share UPchieve, you can help a struggling friend succeed!'
+        subcopy = 'Invite them to UPchieve!'
+      }
+
+      AnalyticsService.captureEvent(EVENTS.STUDENT_SHOWN_REFERRAL_MODAL)
+
+      this.$store.dispatch('app/modal/show', {
+        component: 'ReferralModal',
+        data: {
+          svg: ReferralSVG,
+          showAccept: false,
+          header,
+          subcopy,
+        },
+      })
+
+      localStorage.setItem('last-seen-referral-modal', new Date())
+    }
   },
   data() {
     return {
@@ -200,6 +243,7 @@ export default {
       isDashboardBannerActive: 'featureFlags/isDashboardBannerActive',
       isFallIncentiveEnrollmentActive:
         'featureFlags/isFallIncentiveEnrollmentActive',
+      referralCopy: 'featureFlags/referralCopy',
     }),
     isLowCoachHour() {
       return this.currentHour < 12

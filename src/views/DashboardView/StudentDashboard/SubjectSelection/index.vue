@@ -68,7 +68,6 @@ export default {
       topicCardDashboardReorder: 'featureFlags/topicCardDashboardReorder',
       isTopicDashboardReorderActive:
         'featureFlags/isTopicDashboardReorderActive',
-      testSubjectCardCopy: 'featureFlags/testSubjectCardCopy',
     }),
     waitingPeriodMessage() {
       const countdown = calculateWaitingPeriodCountdown(
@@ -89,13 +88,6 @@ export default {
             }
           })
           .sort((a, b) => a.order - b.order)
-
-      const SAT_TOPIC = 'sat'
-      cards.map(card => {
-        if (card.topic === SAT_TOPIC && this.testSubjectCardCopy) {
-          card.title = this.testSubjectCardCopy
-        }
-      })
 
       cards.push({
         title: 'Give Feedback',
