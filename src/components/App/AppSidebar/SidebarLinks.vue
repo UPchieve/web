@@ -65,7 +65,7 @@
         text="Community"
         :openNewTab="true"
       >
-        <word-bubbles-icon class="icon" />
+        <slack-logo-icon class="icon" />
       </sidebar-link>
     </template>
   </div>
@@ -82,6 +82,7 @@ import EnvelopeIcon from '@/assets/sidebar_icons/envelope.svg'
 import ExclamationIcon from '@/assets/sidebar_icons/exclamation.svg'
 import PortraitIcon from '@/assets/sidebar_icons/portrait.svg'
 import HeartIcon from '@/assets/heart.svg'
+import SlackLogoIcon from '@/assets/slack-logo-icon.svg'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -96,6 +97,7 @@ export default {
     ExclamationIcon,
     PortraitIcon,
     HeartIcon,
+    SlackLogoIcon,
   },
   props: {
     authenticated: Boolean,
