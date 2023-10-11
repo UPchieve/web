@@ -66,6 +66,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.GLEAP_BOT_EXPERIMENT]: false,
       [POSTHOG_FEATURE_FLAGS.STUDENT_COACH_REACH_OUT]: false,
       [POSTHOG_FEATURE_FLAGS.PROCRASTINATION_PREVENTION]: false,
+      [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_ENROLLMENT]: false,
       // This is an experiment, using multivariant feature flag values
       [POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS_AND_LEVEL_SYSTEM]: '',
       [POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO]: true,
@@ -202,6 +203,8 @@ export default {
     ccIntroCopy: state => state.flags[POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY],
     isProcrastinationPreventionActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.PROCRASTINATION_PREVENTION],
+    isFallIncentiveEnrollmentActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_ENROLLMENT],
     referralCopy: state => state.flags[POSTHOG_FEATURE_FLAGS.REFERRAL_COPY],
   },
 }
