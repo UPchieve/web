@@ -184,7 +184,7 @@ export default {
   mounted() {
     localStorage.setItem('hasSeenFallIncentiveEnrollmentModal', true)
     AnalyticsService.captureEvent(
-      EVENTS.STUDENT_FALL_INCENTIVE_ENROLLMENT_PHONE_NUMBER_MODAL_SHOWN
+      EVENTS.STUDENT_FALL_INCENTIVE_ENROLLMENT_MODAL_SHOWN
     )
     if (this.user.phone) {
       const pn = new PhoneNumber(this.user.phone)
@@ -236,7 +236,7 @@ export default {
       await this.sendCode()
       if (!this.error) this.hasResentCode = true
       AnalyticsService.captureEvent(
-        EVENTS.STUDENT_FALL_INCENTIVE_VERIFICATION_CODE_RESENT
+        EVENTS.STUDENT_FALL_INCENTIVE_ENROLLMENT_VERIFICATION_CODE_RESENT
       )
     },
     async sendCode() {
