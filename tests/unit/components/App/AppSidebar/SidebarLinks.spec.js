@@ -33,7 +33,7 @@ const TRAINING_LINK = {
 }
 const COMMUNITY_LINK = {
   to:
-    'https://join.slack.com/t/upchieveaccommunity/shared_invite/zt-1gihzt03n-Sj58fEdBiZjVwc4DPDdg0g',
+    'https://join.slack.com/t/upchieveaccommunity/shared_invite/zt-24t73z5ac-yYtM9OuQTv7z0hKu5J5HMg',
   text: 'Community',
 }
 // Admin links
