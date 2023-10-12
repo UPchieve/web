@@ -75,9 +75,9 @@ export default {
       AuthService.sendReset(this, this.email)
         .then(() => (this.isSendingEmail = false))
         .catch(err => {
-          this.error = err.message
+          this.error = err?.response?.data?.err ?? 'Failed: Please try again.'
           this.isSendingEmail = false
-          if (err.status !== 422) {
+          if (err?.response?.status !== 422) {
             LoggerService.noticeError(err)
           }
         })

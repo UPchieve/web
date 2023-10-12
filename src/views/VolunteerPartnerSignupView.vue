@@ -247,7 +247,7 @@ export default {
         return next(_this => _this.setVolunteerPartner(volunteerPartner))
       })
       .catch(err => {
-        if (err.status !== 404) {
+        if (err?.response?.status !== 404) {
           // we shouldn't get 422 here, since semantics of GET request are expected
           // to be correct regardless of user input
           LoggerService.noticeError(err)
@@ -362,8 +362,9 @@ export default {
           this.serverErrorMsg = ''
         })
         .catch(err => {
-          this.serverErrorMsg = err.message
-          if (err.status !== 409 && err.status !== 422) {
+          this.serverErrorMsg =
+            err?.response?.data?.err ?? 'Failed: Please try again.'
+          if (err?.response?.status !== 409 && err?.response?.status !== 422) {
             LoggerService.noticeError(err)
           }
         })
@@ -421,8 +422,9 @@ export default {
         })
         .catch(err => {
           this.isRegistering = false
-          this.serverErrorMsg = err.message
-          if (err.status !== 409 && err.status !== 422) {
+          this.serverErrorMsg =
+            err?.response?.data?.err ?? 'Failed: Please try again.'
+          if (err?.response?.status !== 409 && err?.response?.status !== 422) {
             LoggerService.noticeError(err)
           }
         })

@@ -125,8 +125,8 @@ export default {
         })
         .catch(err => {
           this.isResettingPassword = false
-          this.msg = err.message || err
-          if (err.status !== 422) {
+          this.msg = err?.response?.data?.err ?? 'Failed: Please try again.'
+          if (err?.response?.status !== 422) {
             LoggerService.noticeError(err)
           }
         })

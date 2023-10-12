@@ -856,12 +856,14 @@ export default {
         })
         .catch(err => {
           this.isSubmittingAccountForm = false
-          this.errors.push(err.message)
-          if (err.message && err.message.match(/^Password/))
+          const errorMsg =
+            err?.response?.data?.err ?? 'Failed: Please try again.'
+          this.errors.push(errorMsg)
+          if (errorMsg && errorMsg.match(/^Password/))
             AnalyticsService.captureEvent(
               EVENTS.STUDENT_ENTERED_INVALID_PASSWORD
             )
-          if (err.status !== 422) {
+          if (err?.response?.status !== 422) {
             LoggerService.noticeError(err)
           }
         })

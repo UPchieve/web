@@ -425,7 +425,7 @@ export default {
         return next(_this => (_this.studentPartner = studentPartner))
       })
       .catch(err => {
-        if (err.status !== 404) {
+        if (err?.response?.status !== 404) {
           // we shouldn't get 422 here, since semantics of GET request are expected
           // to be correct regardless of user input
           LoggerService.noticeError(err)
@@ -682,8 +682,10 @@ export default {
         })
         .catch(err => {
           this.isSubmittingForm = false
-          this.errors.push(err.message)
-          if (err.status !== 422) {
+          this.errors.push(
+            err?.response?.data?.err ?? 'Failed: Please try again.'
+          )
+          if (err?.response?.status !== 422) {
             LoggerService.noticeError(err)
           }
         })

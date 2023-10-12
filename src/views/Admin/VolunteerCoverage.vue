@@ -145,7 +145,8 @@ export default {
           return this.availabilityTable
         })
         .catch(err => {
-          this.errorMsg = err.message
+          this.errorMsg =
+            err?.response?.data?.err ?? 'Failed: Please try again.'
         })
     },
 

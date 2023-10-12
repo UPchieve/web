@@ -337,7 +337,7 @@ export default {
           this.showNotificationModal = true
       })
       .catch(err => {
-        if (err.status !== 0 && err.code !== 'EUSERABORTED') {
+        if (err?.response?.status !== 0 && err.code !== 'EUSERABORTED') {
           window.alert('Could not start new help session')
           LoggerService.noticeError(err)
         }
