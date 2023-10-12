@@ -377,7 +377,7 @@ export default {
           })
         })
         .catch(err => {
-          if (err.status === 404)
+          if (err?.response?.status === 404)
             this.error =
               'Please verify with the applicant that you are still listed as a reference.'
           else this.error = 'Error submitting form, please try again.'

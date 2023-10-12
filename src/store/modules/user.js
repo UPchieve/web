@@ -123,7 +123,7 @@ export default {
         })
         .catch(err => {
           // erase the user only if not authenticated
-          if (err.status === 401) {
+          if (err?.response?.status === 401) {
             commit('setUser', {})
           }
         })
@@ -140,7 +140,7 @@ export default {
         })
         .catch(err => {
           commit('setSession', {})
-          if (err.status !== 404) {
+          if (err?.response?.status !== 404) {
             LoggerService.noticeError(err)
           }
         })
@@ -153,7 +153,7 @@ export default {
         })
         .catch(err => {
           commit('setLatestSession', {})
-          if (err.status !== 404) {
+          if (err?.response?.status !== 404) {
             LoggerService.noticeError(err)
           }
         })

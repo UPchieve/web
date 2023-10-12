@@ -292,8 +292,8 @@ export default {
           this.getSignupSources()
         })
         .catch(err => {
-          this.msg = err.message
-          if (err.status !== 409 && err.status !== 422) {
+          this.msg = err?.response?.data?.err ?? 'Failed: Please try again.'
+          if (err?.response?.status !== 409 && err?.response?.status !== 422) {
             LoggerService.noticeError(err)
           }
         })
@@ -352,8 +352,8 @@ export default {
         })
         .catch(err => {
           this.isRegistering = false
-          this.msg = err.message
-          if (err.status !== 409 && err.status !== 422) {
+          this.msg = err?.response?.data?.err ?? 'Failed: Please try again.'
+          if (err?.response.status !== 409 && err?.response.status !== 422) {
             LoggerService.noticeError(err)
           }
         })
