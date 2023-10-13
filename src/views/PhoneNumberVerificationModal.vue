@@ -1,0 +1,202 @@
+<template>
+  <Modal :closeModal="closeModal">
+    <Loader v-if="isSubmitting" :message="loadingMessage" overlay />
+    <!-- Step 1 content: Need to complete verification -->
+    <div v-if="!verificationComplete">
+      <div v-show="error" class="alert alert-danger" role="alert">
+        {{ error }}
+      </div>
+      <p class="uc-form-text" id="phone-number-changed-message" v-if="phoneNumberChanged">
+        Before we can save your new phone number, we need to verify it.
+      </p>
+      <p class="uc-form-text">
+        We just texted a verification code to
+        <span class="verification-phone-number">{{ phoneNumberToVerify }}</span
+        >.
+      </p>
+      <div class="uc-form-element">
+        <label for="verification-code-field">
+          Enter your 6-digit verification code
+        </label>
+        <input
+          class="uc-form-text-input"
+          id="verification-code-field"
+          v-model="verificationCode"
+          type="text"
+          placeholder="XXXXXX"
+          maxlength="6"
+        />
+      </div>
+      <p class="uc-form-subtext">
+        Did not receive a code?
+        <span
+          class="uc-link secondary-btn"
+          :disabled="isSubmitting"
+          @click.prevent="resendCode"
+          id="resend-btn"
+        >
+          Resend code
+        </span>
+      </p>
+
+      <div class="buttons-container">
+        <button
+          type="submit"
+          :disabled="!isValidVerificationCode"
+          class="uc-form-button"
+          id="verify-phone-btn"
+          @click.prevent="confirmVerification"
+        >
+          Verify my phone number
+        </button>
+        <button class="uc-form-button-secondary" id="cancel-btn" @click="closeModal">
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2 content: Completed state -->
+    <div v-if="verificationComplete">
+      <p class="uc-form-text">
+        Youre phone number has been verified!
+      </p>
+      <button class="uc-form-button" @click="closeModal">Close</button>
+    </div>
+  </Modal>
+</template>
+<script>
+import Loader from '@/components/Loader.vue'
+import Modal from '@/components/Modal.vue'
+import { VERIFICATION_METHOD } from '@/consts'
+import AuthService from '@/services/AuthService'
+import { mapState } from 'vuex'
+
+export default {
+  name: 'phone-number-verification-modal',
+  components: {
+    Modal,
+    Loader,
+  },
+  props: {
+    phoneNumberToVerify: {
+      type: String,
+      required: true,
+    },
+    closeModal: {
+      type: Function,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      verificationCode: '',
+      isSubmitting: false,
+      error: '',
+      loadingMessage: '',
+      loadingMessageCodeSent: 'Sending a verification code. Please wait...',
+      loadingMessageCodeVerifying: 'Verifying your code. Please wait...',
+      phoneNumber: '',
+      verificationComplete: false,
+      defaultErrorMessage: 'Something went wrong',
+    }
+  },
+  mounted() {
+    this.initiateVerification()
+  },
+  created() {
+    this.$store.dispatch('user/fetchUser').then(() => {
+      this.phoneNumber = this.user.phone
+    })
+  },
+  computed: {
+    ...mapState({
+      user: state => state.user.user,
+    }),
+    isValidVerificationCode() {
+      return !(
+        this.verificationCode.length !== 6 ||
+        isNaN(Number(this.verificationCode))
+      )
+    },
+    phoneNumberChanged() {
+      return this.phoneNumber !== this.phoneNumberToVerify
+    },
+  },
+  methods: {
+    async initiateVerification() {
+      this.loadingMessage = this.loadingMessageCodeSent
+      this.isSubmitting = true
+      this.error = ''
+
+      try {
+        await AuthService.initiateVerification({
+          sendTo: this.phoneNumberToVerify,
+          verificationMethod: VERIFICATION_METHOD.SMS,
+          firstName: this.user.firstName,
+          userId: this.user.id,
+        })
+      } catch (error) {
+        this.displayError(error)
+      }
+
+      this.isSubmitting = false
+    },
+    async confirmVerification() {
+      this.loadingMessage = this.loadingMessageCodeVerifying
+      this.isSubmitting = true
+      this.error = ''
+      try {
+        const success = await AuthService.confirmVerification({
+          verificationCode: this.verificationCode,
+          sendTo: this.phoneNumberToVerify,
+          verificationMethod: VERIFICATION_METHOD.SMS,
+          forSignup: false,
+          userId: this.user.id,
+        })
+        if (success) {
+          this.verificationComplete = true
+        } else {
+          this.error =
+            'Please enter the most recent verification code that was sent to you'
+        }
+      } catch (error) {
+        this.displayError(error)
+      }
+
+      this.isSubmitting = false
+    },
+    async resendCode() {
+      this.initiateVerification()
+    },
+    displayError(error) {
+      this.error = error.message ?? this.defaultErrorMessage
+    },
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+.verification-phone-number {
+  font-weight: bold;
+}
+
+.secondary-btn {
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.uc-form-element {
+  text-align: initial;
+}
+
+.uc-form-button-secondary {
+  width: 100%;
+}
+
+.buttons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+</style>
