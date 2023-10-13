@@ -12,7 +12,9 @@
     "html-validate": "html-validate --ext html,vue src",
     "storybook": "start-storybook -p 6006",
     "storybook:snapshot": "npm run test -- -u",
-    "test": "vue-cli-service test:unit --transformIgnorePatterns \"node_modules/(?!axios)/\""
+    "test": "vue-cli-service test:unit --transformIgnorePatterns \"node_modules/(?!axios)/\"",
+    "scan:diff": "git diff --staged --name-only -z | xargs -0 detect-secrets-hook --baseline .secrets.baseline --exclude-files package-lock.json",
+    "scan:audit": "detect-secrets audit .secrets.baseline"
   },
   "dependencies": {
     "@sentry/browser": "^5.30.0",
@@ -102,6 +104,7 @@
     "webpack-bundle-analyzer": "^3.7.0"
   },
   "pre-commit": [
+    "scan:diff",
     "lint:dry"
   ],
   "eslintConfig": {
