@@ -1,7 +1,10 @@
 <template>
   <div class="chat">
     <div class="chat-header">
-      <component class="chat-header__avatar" :is="studentAvatar" />
+      <component
+        class="chat-header__avatar"
+        :is="user.isVolunteer ? studentAvatar : volunteerAvatar"
+      />
       <div class="chat-header__title">Session Chat</div>
     </div>
     <div class="chat-contents">

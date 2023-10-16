@@ -5,29 +5,59 @@
         Session History
       </h1>
       <p v-if="!mobileMode" class="subtitle">
-        On this page you can review your past sessions on UPchieve and favorite
-        your preferred Academic Coaches. We’ll do our best to pair you with your
-        favorited coaches when they’re available.
+        {{
+          user.isVolunteer
+            ? 'On this page you can review your past sessions on UPchieve'
+            : `On this page you can review your past sessions on UPchieve and favorite
+        your preferred Academic Coaches. We'll do our best to pair you with your
+        favorited coaches when they're available.`
+        }}
       </p>
     </section>
     <div v-if="!mobileMode" class="container">
       <section>
-        <div class="spacing--grid session-list__headers">
+        <div
+          class="spacing--grid session-list__headers"
+          :class="{
+            'spacing--grid-3': user.isVolunteer,
+            'spacing--grid-4': !user.isVolunteer,
+          }"
+        >
           <span>SUBJECT</span>
           <span>DATE</span>
-          <span>COACH</span>
+          <span v-if="!user.isVolunteer">COACH</span>
           <span>SESSION RECAP</span>
         </div>
-        <div v-if="hasNoPastSessions()">
-          <h1 class="title title-no-sessions">
+        <div v-if="error">
+          <h1 class="title title--body">
+            {{ error }}
+          </h1>
+        </div>
+        <loader
+          v-else-if="isFetchingSessions"
+          message="Retrieving your session history"
+          class="session-history-loader"
+        />
+        <div v-else-if="hasNoPastSessions()">
+          <h1 class="title title--body">
             Looks like you haven't had any sessions in the past 12 months.
           </h1>
         </div>
-        <ul class="session-list">
+        <ul class="session-list" v-else>
           <li v-for="(session, index) in sessions" :key="session._id">
-            <div class="session-list__session">
+            <div
+              class="session-list__session"
+              :class="{
+                'session-list__session--grid-3': user.isVolunteer,
+                'session-list__session--grid-4': !user.isVolunteer,
+              }"
+            >
               <div class="session-list__subject-container">
-                <component v-bind:is="session.svg" class="subject-icon" />
+                <img
+                  :src="session.topicIconLink"
+                  :alt="`${session.topic} icon`"
+                  class="subject-icon"
+                />
                 <div class="subject-name-container">
                   <div class="subject">{{ session.subject }}</div>
                   <span class="subject-time-tutored">
@@ -35,10 +65,13 @@
                   >
                 </div>
               </div>
-              <span class="session-list__created-at">
-                {{ getSessionTime(session.createdAt) }}</span
+              <p class="session-list__created-at">
+                {{ getSessionTime(session.createdAt) }}
+              </p>
+              <div
+                v-if="!user.isVolunteer"
+                class="session-list__coach-name-container"
               >
-              <div class="session-list__coach-name-container">
                 <favoriting-toggle
                   :initialIsFavorite="session.isFavorited"
                   :volunteerName="session.volunteerFirstName"
@@ -52,7 +85,7 @@
               <div class="session-list__session-recap">
                 <a :href="sessionRecapURL(session.id)">
                   <large-button
-                    primary="true"
+                    primary
                     class="session-list__session-recap__button"
                     >Session Recap</large-button
                   >
@@ -65,6 +98,7 @@
         <footer class="page-actions-container">
           <div class="page-actions">
             <div
+              v-if="page > 1"
               @click="() => getSessionHistory(page - 1)"
               :class="isFirstPage && 'page-actions__stepper--disabled'"
               class="page-actions__stepper"
@@ -90,17 +124,28 @@
     <div v-if="mobileMode">
       <div class="mobile-container">
         <section>
-          <div v-if="hasNoPastSessions()">
-            <h1 class="title title-no-sessions">
+          <div v-if="error">
+            <h1 class="title title--body">
+              {{ error }}
+            </h1>
+          </div>
+          <loader
+            v-else-if="isFetchingSessions"
+            message="Retrieving your session history"
+            class="session-history-loader"
+          />
+          <div v-else-if="hasNoPastSessions()">
+            <h1 class="title title--body">
               Looks like you haven't had any sessions in the past 12 months.
             </h1>
           </div>
-          <ul class="mobile-session-list">
+          <ul v-else class="mobile-session-list">
             <li v-for="(session, index) in sessions" :key="session._id">
               <div class="mobile-session-list__session">
                 <div class="mobile-session-list__subject-container">
-                  <component
-                    v-bind:is="session.svg"
+                  <img
+                    :src="session.topicIconLink"
+                    :alt="`${session.topic} icon`"
                     class="mobile-subject-icon"
                   />
                   <div class="mobile-subject-name-container">
@@ -111,7 +156,10 @@
                     >
                   </div>
                 </div>
-                <div class="mobile-session-list__createdAt-container">
+                <div
+                  v-if="!user.isVolunteer"
+                  class="mobile-session-list__createdAt-container"
+                >
                   <div class="mobile-session-list__coach-name-container">
                     <favoriting-toggle
                       class="heart"
@@ -165,27 +213,30 @@
 </template>
 
 <script>
-import MathSVG from '@/assets/subject_icons/math.svg'
-import CollegeSVG from '@/assets/subject_icons/college-counseling.svg'
-import ScienceSVG from '@/assets/subject_icons/science.svg'
-import SATSVG from '@/assets/subject_icons/sat.svg'
-import ReadingWritingSVG from '@/assets/subject_icons/more-resources.svg'
 import NetworkService from '../services/NetworkService'
 import CaretIcon from '@/assets/caret.svg'
 import FavoritingToggle from '../components/FavoritingToggle.vue'
 import LargeButton from '../components/LargeButton.vue'
 import { mapState, mapGetters } from 'vuex'
 import moment from 'moment'
+import Loader from '@/components/Loader.vue'
+import { backOff } from 'exponential-backoff'
+import LoggerService from '@/services/LoggerService'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 export default {
   name: 'session-history-view',
-  components: { CaretIcon, FavoritingToggle, LargeButton },
+  components: { CaretIcon, FavoritingToggle, LargeButton, Loader },
   data() {
     return {
       sessions: [],
       page: 1,
       hasNext: false,
       total: 0,
+      isFetchingSessions: false,
+      isLastPage: false,
+      error: '',
     }
   },
   computed: {
@@ -203,44 +254,52 @@ export default {
       const totalPages = Math.ceil(this.total / sessionLimitPerPage)
       return totalPages === 0 ? 1 : totalPages
     },
-    isLastPage() {
-      return this.page === this.totalPages
-    },
-    svgs() {
-      return {
-        math: MathSVG,
-        college: CollegeSVG,
-        science: ScienceSVG,
-        readingWriting: ReadingWritingSVG,
-        sat: SATSVG,
-      }
-    },
   },
   methods: {
     async getSessionHistory(page) {
       if (page < 1 || page > this.totalPages) return
-      const response = await NetworkService.getSessionHistory(page)
-      this.sessions = response.data.pastSessions
-      if (this.sessions.length) {
-        this.getSessionTopicIcons()
+      this.isFetchingSessions = true
+      if (page > this.page)
+        AnalyticsService.captureEvent(
+          EVENTS.VOLUNTEER_CLICKED_NEXT_SESSION_HISTORY_PAGE,
+          {
+            page,
+          }
+        )
+      if (page < this.page)
+        AnalyticsService.captureEvent(
+          EVENTS.VOLUNTEER_CLICKED_PREVIOUS_SESSION_HISTORY_PAGE,
+          {
+            page,
+          }
+        )
+      try {
+        const response = await backOff(() =>
+          NetworkService.getSessionHistory(page)
+        )
+        this.sessions = response.data.pastSessions
+        this.isLastPage = response.data.isLastPage
+        this.page = page
+      } catch (error) {
+        this.handleError(error)
+      } finally {
+        this.isFetchingSessions = false
       }
-      this.isLastPage = response.data.isLastPage
-      this.page = page
     },
     async getTotalSessions() {
-      const response = await NetworkService.getTotalSessionHistory()
-      this.total = response.data.total
+      try {
+        const response = await backOff(() =>
+          NetworkService.getTotalSessionHistory()
+        )
+        this.total = response.data.total
+      } catch (error) {
+        this.handleError(error)
+      }
     },
-    // @todo: to be revisited to implement new design for page actions
-    async handlePageClick(page) {
-      if (this.page === page) return
-      await this.getSessionHistory(page)
-    },
-    getSessionTopicIcons() {
-      this.sessions = this.sessions.map(session => {
-        session.svg = this.svgs[session.topic]
-        return session
-      })
+    handleError(error) {
+      LoggerService.noticeError(error.response.data.err)
+      this.error =
+        'We were unable to load your history. Please try again later.'
     },
     getSessionTime(sessionCreatedAt) {
       return moment(sessionCreatedAt).format('l @ h:mm A')
@@ -273,6 +332,8 @@ export default {
       this.getSessionHistory(this.page),
       this.getTotalSessions(),
     ])
+
+    AnalyticsService.captureEvent(EVENTS.VOLUNTEER_OPENED_SESSION_HISTORY)
   },
 }
 </script>
@@ -308,19 +369,15 @@ ul {
     font-size: 18px;
   }
 
-  &-no-sessions {
+  &--body {
     text-align: center;
-    margin-top: 3em;
+    margin: 3em 1em 0 1em;
   }
 }
 
 .subtitle {
   @include font-category('heading');
   color: $c-secondary-grey;
-
-  &-no-sessions {
-    font-size: 16px;
-  }
 }
 
 .session-history {
@@ -332,6 +389,11 @@ ul {
 
   @include breakpoint-below('small') {
     padding: 0;
+  }
+
+  &-loader {
+    margin: 1em 0;
+    @include flex-container(column, center, center);
   }
 }
 
@@ -348,8 +410,16 @@ ul {
   display: grid;
   text-align: center;
 
-  @include breakpoint-above('small') {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+  &-3 {
+    @include breakpoint-above('small') {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+
+  &-4 {
+    @include breakpoint-above('small') {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
   }
 }
 
@@ -387,8 +457,16 @@ ul {
   &__session {
     @include flex-container(row, space-around, center);
     display: grid;
-    @include breakpoint-above('tiny') {
-      grid-template-columns: 1fr 1fr 1fr 1fr;
+
+    &--grid-3 {
+      @include breakpoint-above('tiny') {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+    }
+    &--grid-4 {
+      @include breakpoint-above('tiny') {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+      }
     }
     padding: 1em 0;
   }
@@ -398,6 +476,7 @@ ul {
   }
 
   &__created-at {
+    text-align: center;
     @include font-category('subheading');
     color: $c-secondary-grey;
     @include breakpoint-below('large') {
@@ -573,11 +652,6 @@ ul {
   border: 1px solid $c-border-grey;
   border-radius: 8px 8px 16px 16px;
   min-width: 100%;
-}
-
-.mobile-spacing--grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
 }
 
 .mobile-session-list {
