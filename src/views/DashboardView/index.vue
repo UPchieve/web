@@ -16,36 +16,42 @@ export default {
   computed: {
     ...mapState({
       user: state => state.user.user,
+      featureFlags: state => state.featureFlags.flags,
     }),
     ...mapGetters({
       isAuthenticated: 'user/isAuthenticated',
       isVolunteer: 'user/isVolunteer',
-      gleapBotSegmentExperiments: 'featureFlags/gleapBotSegmentExperiments',
-      isGleapBotSegmentExperimentsActive:
-        'featureFlags/isGleapBotSegmentExperimentsActive',
+      gleapSegmentExperiments: 'featureFlags/gleapSegmentExperiments',
+      isGleapSegmentExperimentsActive:
+        'featureFlags/isGleapSegmentExperimentsActive',
     }),
-    userGleapBotSegment() {
-      return [this.user, this.gleapBotSegmentExperiments]
+    userGleapSegments() {
+      return [this.user, this.gleapSegmentExperiments, this.featureFlags]
     },
   },
   mounted() {
-    if (this.isGleapBotSegmentExperimentsActive)
-      ProductDiscoveryService.triggerDynamicGleapBot(
+    if (this.isGleapSegmentExperimentsActive)
+      ProductDiscoveryService.triggerDynamicGleapWidget(
         this.user,
-        this.gleapBotSegmentExperiments
+        this.gleapSegmentExperiments,
+        this.featureFlags
       )
   },
   watch: {
-    userGleapBotSegment: {
+    userGleapSegments: {
       handler: function(currentValue, prevValue) {
         if (
           Object.keys(currentValue[0]).length &&
           currentValue[1].length &&
-          (!Object.keys(prevValue[0]).length || !prevValue[1].length)
+          Object.keys(currentValue[2]).length &&
+          (!Object.keys(prevValue[0]).length ||
+            !prevValue[1].length ||
+            !Object.keys(currentValue[2]).length)
         )
-          ProductDiscoveryService.triggerDynamicGleapBot(
+          ProductDiscoveryService.triggerDynamicGleapWidget(
             this.user,
-            this.gleapBotSegmentExperiments
+            this.gleapSegmentExperiments,
+            this.featureFlags
           )
       },
       deep: true,

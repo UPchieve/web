@@ -67,6 +67,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.STUDENT_COACH_REACH_OUT]: false,
       [POSTHOG_FEATURE_FLAGS.PROCRASTINATION_PREVENTION]: false,
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_ENROLLMENT]: false,
+      [POSTHOG_FEATURE_FLAGS.TUTOR_SESSION_HISTORY]: false,
       // This is an experiment, using multivariant feature flag values
       [POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS_AND_LEVEL_SYSTEM]: '',
       [POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO]: true,
@@ -77,7 +78,7 @@ export default {
     },
     flagPayloads: {
       [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: [],
-      [POSTHOG_FEATURE_FLAGS.GLEAP_BOT_SEGMENT_EXPERIMENTS]: [],
+      [POSTHOG_FEATURE_FLAGS.GLEAP_SEGMENT_EXPERIMENTS]: [],
       [POSTHOG_FEATURE_FLAGS.DOWNTIME_BANNER]: '',
       [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: null,
       [POSTHOG_FEATURE_FLAGS.SUBJECT_REQUEST_ROLLOUT]: [],
@@ -194,11 +195,10 @@ export default {
       state.flagPayloads[POSTHOG_FEATURE_FLAGS.QUIZ_ROLLOUT] ?? [],
     isGleapBotExperimentActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.GLEAP_BOT_EXPERIMENT],
-    gleapBotSegmentExperiments: state =>
-      state.flagPayloads[POSTHOG_FEATURE_FLAGS.GLEAP_BOT_SEGMENT_EXPERIMENTS] ??
-      [],
-    isGleapBotSegmentExperimentsActive: (state, getters) =>
-      getters.gleapBotSegmentExperiments.length > 0,
+    gleapSegmentExperiments: state =>
+      state.flagPayloads[POSTHOG_FEATURE_FLAGS.GLEAP_SEGMENT_EXPERIMENTS] ?? [],
+    isGleapSegmentExperimentsActive: (state, getters) =>
+      getters.gleapSegmentExperiments.length > 0,
     isStudentCoachReachOutActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.STUDENT_COACH_REACH_OUT],
     ccIntroCopy: state => state.flags[POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY],
@@ -207,5 +207,7 @@ export default {
     isFallIncentiveEnrollmentActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_ENROLLMENT],
     referralCopy: state => state.flags[POSTHOG_FEATURE_FLAGS.REFERRAL_COPY],
+    isTutorSessionHistoryActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.TUTOR_SESSION_HISTORY],
   },
 }

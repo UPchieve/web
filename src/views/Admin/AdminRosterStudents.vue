@@ -170,7 +170,6 @@ export default {
         }
         this.clearData()
       } catch (error) {
-        // TODO check if body is in the error
         this.msg = error.response.data.err
         this.isError = true
       } finally {

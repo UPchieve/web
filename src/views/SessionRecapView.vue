@@ -9,8 +9,9 @@
             <span class="card-detail__title">Subject:</span>
             <div class="card-detail__sub-container">
               <div class="card-detail">{{ session.subject }}</div>
-              <component
-                v-bind:is="session.svg"
+              <img
+                :src="session.topicIconLink"
+                :alt="`${session.topic} icon`"
                 class="subject-icon card-detail"
               />
             </div>
@@ -18,10 +19,19 @@
             <div class="card-detail">
               {{ getSessionTime(session.createdAt) }}
             </div>
-            <span class="card-detail__title">Coach:</span>
+            <span class="card-detail__title">{{
+              user.isVolunteer ? 'Student:' : 'Coach:'
+            }}</span>
             <div class="card-detail card-detail__sub-container">
-              <div class="card-detail">{{ session.volunteerFirstName }}</div>
+              <div class="card-detail">
+                {{
+                  user.isVolunteer
+                    ? session.studentFirstName
+                    : session.volunteerFirstName
+                }}
+              </div>
               <favoriting-toggle
+                v-if="!user.isVolunteer"
                 :initialIsFavorite="session.isFavorited"
                 :volunteerName="session.volunteerFirstName"
                 :volunteerId="session.volunteerId"
@@ -73,18 +83,15 @@
 <script>
 import ChatLog from '@/components/ChatLog.vue'
 import NetworkService from '@/services/NetworkService'
+import AnalyticsService from '@/services/AnalyticsService'
 import FavoritingToggle from '@/components/FavoritingToggle.vue'
 import { mapState, mapGetters } from 'vuex'
 import moment from 'moment'
 import Quill from 'quill'
 import config from '../config'
-import MathSVG from '@/assets/subject_icons/math.svg'
-import CollegeSVG from '@/assets/subject_icons/college-counseling.svg'
-import ScienceSVG from '@/assets/subject_icons/science.svg'
-import SATSVG from '@/assets/subject_icons/sat.svg'
-import ReadingWritingSVG from '@/assets/subject_icons/more-resources.svg'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import Loader from '@/components/Loader.vue'
+import { EVENTS } from '@/consts'
 
 export default {
   components: {
@@ -100,15 +107,6 @@ export default {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
     }),
-    svgs() {
-      return {
-        math: MathSVG,
-        college: CollegeSVG,
-        science: ScienceSVG,
-        readingWriting: ReadingWritingSVG,
-        sat: SATSVG,
-      }
-    },
     whiteboardDimensions() {
       return {
         width: 1000,
@@ -133,7 +131,7 @@ export default {
         this.$route.params.sessionId
       )
       this.session = response.data.session
-      this.session.svg = this.svgs[this.session.topic]
+      AnalyticsService.captureEvent(EVENTS.VOLUNTEER_OPENED_SESSION_RECAP)
     } catch (error) {
       if (error.status === 403) this.$router.push('/dashboard')
     } finally {
