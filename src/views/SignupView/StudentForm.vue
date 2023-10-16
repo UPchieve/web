@@ -6,36 +6,32 @@
       Awesome! Let's check if we're a match
     </h1>
     <div v-if="isCollegeConfidential">
-      <div v-if="ccIntroCopy === 'college-essay-specific'">
-        <h1 class="uc-form-header">Need help revising your college essay?</h1>
+      <div v-if="ccIntroCopy === 'get-that-a'">
+        <h1 class="uc-form-header">Get that A you deserve!</h1>
         <p class="uc-form-text">
-          The nonprofit
-          <a
-            class="uc-link"
-            href="https://upchieve.org/students"
-            target="_blank"
-            @click="logStudentClickedUpchieveLink()"
-            >UPchieve</a
-          >
-          is partnering with College Confidential to make it easy for you to
-          chat with an expert 24/7, completely free, for help on any part of
-          your application or for tutoring. Sign up now!
+          Students who use UPchieve get better grades in their classes and are
+          more competitive during college admission season! Sign up for free
+          access to the 24/7 academic support that can help you achieve your
+          dream.
         </p>
       </div>
-      <div v-else-if="ccIntroCopy === 'focus-on-results'">
-        <h1 class="uc-form-header">Improve your college chances</h1>
+      <div v-else-if="ccIntroCopy === 'stuck-on-problem'">
+        <h1 class="uc-form-header">Stuck on a problem? Our tutors can help!</h1>
         <p class="uc-form-text">
-          Students who use
-          <a
-            class="uc-link"
-            href="https://upchieve.org/students"
-            target="_blank"
-            @click="logStudentClickedUpchieveLink()"
-            >UPchieve</a
-          >
-          10+ times are 3x more likely than their peers to be accepted into a
-          4-year college! Sign up for free access to the 24/7 academic support
-          that can help you achieve your dream.
+          UPchieve connects students with tutors that will help them during any
+          part of a homework problem. Why struggle alone? Sign up for free
+          access to our thousands of 1:1 24/7 tutors that can help you whenever
+          you need it.
+        </p>
+      </div>
+      <div v-else-if="ccIntroCopy === 'grade-focused'">
+        <h1 class="uc-form-header">
+          6th to 12th grade, UPchieve has you covered!
+        </h1>
+        <p class="uc-form-text">
+          UPchieve provides students with trained 1:1 coaches who can follow you
+          in your academic journey and prepare you for future success. Why go
+          through school alone? Sign up for free 24/7 tutoring and college prep!
         </p>
       </div>
       <div v-else>
