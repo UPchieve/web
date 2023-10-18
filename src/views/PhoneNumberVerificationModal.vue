@@ -6,7 +6,11 @@
       <div v-show="error" class="alert alert-danger" role="alert">
         {{ error }}
       </div>
-      <p class="uc-form-text" id="phone-number-changed-message" v-if="phoneNumberChanged">
+      <p
+        class="uc-form-text"
+        id="phone-number-changed-message"
+        v-if="phoneNumberChanged"
+      >
         Before we can save your new phone number, we need to verify it.
       </p>
       <p class="uc-form-text">
@@ -49,7 +53,11 @@
         >
           Verify my phone number
         </button>
-        <button class="uc-form-button-secondary" id="cancel-btn" @click="closeModal">
+        <button
+          class="uc-form-button-secondary"
+          id="cancel-btn"
+          @click="closeModal"
+        >
           Cancel
         </button>
       </div>
@@ -60,7 +68,7 @@
       <p class="uc-form-text">
         Youre phone number has been verified!
       </p>
-      <button class="uc-form-button" @click="closeModal">Close</button>
+      <button class="uc-form-button" @click="completeModal">Close</button>
     </div>
   </Modal>
 </template>
@@ -85,6 +93,10 @@ export default {
     closeModal: {
       type: Function,
       required: true,
+    },
+    onCloseSuccess: {
+      type: Function,
+      required: false,
     },
   },
   data() {
@@ -168,8 +180,12 @@ export default {
     async resendCode() {
       this.initiateVerification()
     },
+    async completeModal() {
+      this.closeModal()
+      this.onCloseSuccess()
+    },
     displayError(error) {
-      this.error = error.message ?? this.defaultErrorMessage
+      this.error = error?.response?.data?.err ?? this.defaultErrorMessage
     },
   },
 }
