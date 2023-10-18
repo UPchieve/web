@@ -1,5 +1,12 @@
 <template>
   <div class="profile">
+    <PhoneNumberVerificationModal
+      v-if="showSmsVerificationModal"
+      data-testid="sms-verification-modal"
+      :phoneNumberToVerify="phoneInputInfo.e164"
+      :closeModal="toggleShowSmsVerificationModal"
+      :onCloseSuccess="updateVerifiedPhoneInfo"
+    />
     <deactivate-account-modal
       v-if="showDeactivateAccountModal"
       :closeModal="toggleDeactivatedAccountModal"
@@ -9,8 +16,9 @@
       Your profile
       <button
         type="button"
-        v-if="user.isVolunteer"
+        v-if="mayEditProfile"
         class="editBtn btn"
+        data-testid="edit-profile-btn"
         @click="editProfile()"
       >
         {{ editBtnMsg }}
@@ -37,14 +45,34 @@
             <div class="prompt">Your Email</div>
             <div class="answer">{{ user.email }}</div>
           </div>
-          <div v-if="user.isVolunteer">
+          <div>
             <div id="phone" class="container-section">
               <div class="prompt">Your Phone Number</div>
-              <div v-show="!activeEdit && user.phone" class="answer">
+              <div
+                v-show="!activeEdit && user.phone"
+                class="answer phone-answer"
+              >
                 {{ internationalPhoneInfo.number }}
+
+                <!-- Unverified phone number: Show alert with CTA to verify phone number -->
+                <div
+                  v-if="
+                    !this.user.phoneVerified &&
+                      this.isEditProfilePhoneNumberActive
+                  "
+                  class="alert alert-warning unverified"
+                >
+                  Your phone number has not been verified.
+                  <span
+                    class="uc-link secondary-btn"
+                    @click.prevent="toggleShowSmsVerificationModal"
+                    >Verify now
+                  </span>
+                </div>
               </div>
+
               <div v-show="!activeEdit && !user.phone" class="answer">
-                (None given)
+                No phone number provided
               </div>
 
               <vue-phone-number-input
@@ -61,7 +89,18 @@
                 @update="onPhoneInputUpdate"
               />
 
-              <div class="description">
+              <div v-if="shouldSeeSmsConsentCheckbox" data-testid="sms-consent-checkbox">
+                <input
+                  type="checkbox"
+                  :disabled="!activeEdit"
+                  v-model="smsConsent"
+                  label="By checking this box, I consent to receiving SMS messages from UPchieve at the phone number provided above."
+                />
+                By checking this box, I consent to receiving SMS messages from
+                UPchieve at the phone number provided above.
+              </div>
+
+              <div class="description" v-if="user.isVolunteer">
                 We will use this number to send you notifications when a student
                 needs help. You will only receive notifications during the
                 periods that you select in your schedule.
@@ -84,6 +123,7 @@
                 }"
                 @change="toggleAccountActive"
                 :sync="true"
+                data-testid="deactivate-account-toggle"
               />
             </div>
             <div class="description">
@@ -168,6 +208,7 @@ import getNotificationPermission from '@/utils/get-notification-permission'
 import VuePhoneNumberInput from 'vue-phone-number-input'
 import { EVENTS } from '@/consts'
 import Loader from '@/components/Loader.vue'
+import PhoneNumberVerificationModal from './PhoneNumberVerificationModal.vue'
 
 export default {
   name: 'profile-view',
@@ -175,6 +216,7 @@ export default {
     DeactivateAccountModal,
     VuePhoneNumberInput,
     Loader,
+    PhoneNumberVerificationModal,
   },
   data() {
     return {
@@ -188,12 +230,16 @@ export default {
       isAccountActive: true,
       isAllowingNotifications: true,
       showDeactivateAccountModal: false,
+      mayEditProfile: false,
+      shouldSeeSmsConsentCheckbox: false,
+      showSmsVerificationModal: false,
+      smsConsent: false,
     }
   },
   created() {
     this.isAllowingNotifications = getNotificationPermission() === 'granted'
     this.isAccountActive = !this.user.isDeactivated
-    if (this.user.isVolunteer && this.user.phone) {
+    if (this.user.phone) {
       const num =
         this.user.phone[0] === '+' ? this.user.phone : `+1${this.user.phone}`
       const pn = new PhoneNumber(num)
@@ -204,7 +250,10 @@ export default {
         isValid: true,
         e164: pn.getNumber('e164'),
       }
+
+      this.smsConsent = this.user.smsConsent
     }
+    this.setFlagsForEditingPhoneNumber()
   },
   computed: {
     ...mapState({
@@ -216,13 +265,15 @@ export default {
       avatarUrl: 'user/avatarUrl',
       allSubtopics: 'subjects/allSubtopics',
       isFilterActiveSubjectsActive: 'featureFlags/isFilterActiveSubjectsActive',
+      isEditProfilePhoneNumberActive:
+        'featureFlags/isEditProfilePhoneNumberActive',
     }),
     name() {
       const user = this.$store.state.user.user
       return user.firstname || (user.isVolunteer ? 'volunteer' : 'student')
     },
     internationalPhoneInfo() {
-      if (!this.user.isVolunteer || !this.user.phone) return false
+      if (!this.user.phone) return false
 
       const num =
         this.user.phone[0] === '+' ? this.user.phone : `+1 ${this.user.phone}`
@@ -266,6 +317,12 @@ export default {
     isNotificationPermissionGranted() {
       return 'Notification' in window && Notification.permission === 'granted'
     },
+    userNeedsToVerifyPhone() {
+      return (
+        this.user.phone !== this.phoneInputInfo.e164 ||
+        (this.user.phone && !this.user.phoneVerified)
+      )
+    },
   },
   methods: {
     onPhoneInputUpdate(phoneInputInfo) {
@@ -290,8 +347,20 @@ export default {
       setNotificationPermission(permission)
     },
 
+    toggleShowSmsVerificationModal() {
+      this.showSmsVerificationModal = !this.showSmsVerificationModal
+    },
+
     setIsAccountActive(value) {
       this.isAccountActive = value
+    },
+
+    async updateVerifiedPhoneInfo() {
+      const updates = {
+        phone: this.phoneInputInfo.e164,
+        phoneVerified: true,
+      }
+      this.$store.dispatch('user/addToUser', updates)
     },
 
     /**
@@ -328,20 +397,11 @@ export default {
       }
 
       if (!this.errors.length) {
-        // @todo: refactor to use vuex mutation instead of setting global `user` directly
-        // form fields valid, so set profile
         const isDeactivatedBeforeUpdate = this.user.isDeactivated
-        this.user.phone = this.phoneInputInfo.e164
-        this.user.isDeactivated = !this.isAccountActive
-
-        // send only the necessary data
-        const payloadUser = {}
-        const keys = ['phone', 'isDeactivated']
-
-        keys.forEach(key => (payloadUser[key] = this.user[key]))
+        const reqBody = this.createUpdateProfileRequestBody()
 
         // wait for save to succeed before coming out of edit mode
-        UserService.setProfile(payloadUser).then(
+        UserService.setProfile(reqBody).then(
           () => {
             this.editBtnMsg = 'Edit'
             this.activeEdit = false
@@ -351,11 +411,29 @@ export default {
             })
 
             if (
-              payloadUser.isDeactivated &&
-              payloadUser.isDeactivated !== isDeactivatedBeforeUpdate
+              reqBody.isDeactivated &&
+              reqBody.isDeactivated !== isDeactivatedBeforeUpdate
             )
               AnalyticsService.captureEvent(EVENTS.ACCOUNT_DEACTIVATED, {
                 event: EVENTS.ACCOUNT_DEACTIVATED,
+              })
+
+            // Update user state after successful API call
+            this.$store
+              .dispatch('user/addToUser', {
+                phone: reqBody.phone ?? this.user.phone,
+                isDeactivated:
+                  reqBody.isDeactivated ?? !this.isAccountActive,
+                smsConsent: reqBody.smsConsent ?? this.user.smsConsent,
+              })
+              .then(() => {
+                // Phone number verification flow
+                if (
+                  this.userNeedsToVerifyPhone &&
+                  this.isEditProfilePhoneNumberActive
+                ) {
+                  this.showSmsVerificationModal = true
+                }
               })
           },
           () => {
@@ -363,6 +441,37 @@ export default {
           }
         )
       }
+    },
+
+    createUpdateProfileRequestBody() {
+      const reqBody = {}
+      reqBody.isDeactivated = !this.isAccountActive
+
+      // Edit Profile Phone Number flag:
+      // When OFF, volunteers edit their phone number through this UpdateProfile API
+      // When ON, students can send smsConsent field on this API
+      if (this.isEditProfilePhoneNumberActive) {
+        if (!this.user.isVolunteer && this.smsConsent !== this.user.smsConsent) {
+          reqBody.smsConsent = this.smsConsent
+        }
+      } else {
+        if (
+          this.user.isVolunteer &&
+          this.user.phone !== this.phoneInputInfo.e164
+        ) {
+          reqBody.phone = this.phoneInputInfo.e164
+        }
+      }
+      return reqBody
+    },
+
+    setFlagsForEditingPhoneNumber() {
+      this.mayEditProfile =
+        this.user.isVolunteer || this.isEditProfilePhoneNumberActive
+      this.shouldSeeSmsConsentCheckbox =
+        this.isEditProfilePhoneNumberActive &&
+        !this.user.isVolunteer &&
+        this.user.phone
     },
   },
 }
@@ -473,6 +582,13 @@ ul {
 
 .answer {
   font-weight: 600;
+}
+
+.phone-answer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: baseline;
 }
 
 .answer .vue-js-switch {
@@ -618,5 +734,25 @@ button:hover {
   margin-top: 2em;
   margin-right: auto;
   margin-left: auto;
+}
+
+.unverified {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  font-weight: normal;
+  g {
+    fill: $c-warning-orange;
+  }
+}
+
+.secondary-btn {
+  &:hover {
+    cursor: pointer;
+  }
+
+  p {
+    font-style: none;
+  }
 }
 </style>

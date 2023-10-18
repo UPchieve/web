@@ -9,7 +9,7 @@ localVue.use(Vuex)
 
 describe('PhoneNumberVerificationModal', () => {
   let DEFAULT_PROPS
-  
+
   beforeEach(() => {
     jest.resetAllMocks()
     DEFAULT_PROPS = {
@@ -90,10 +90,13 @@ describe('PhoneNumberVerificationModal', () => {
   describe('Cancel', () => {
     it('Should close the modal when the Cancel button is clicked', async () => {
       const closeModalFn = jest.fn()
-      const wrapper = getWrapper({}, {
-        ...DEFAULT_PROPS,
+      const wrapper = getWrapper(
+        {},
+        {
+          ...DEFAULT_PROPS,
           closeModal: closeModalFn,
-      })
+        }
+      )
       const cancelBtn = wrapper.find('#cancel-btn')
 
       expect(cancelBtn.isVisible()).toBeTruthy()
@@ -106,9 +109,9 @@ describe('PhoneNumberVerificationModal', () => {
   })
 
   /* When the user is verifying an unsaved phone number,
-     * the modal should render extra text. This text should not appear if
-     * the user is verifying an existing number.
-     */
+   * the modal should render extra text. This text should not appear if
+   * the user is verifying an existing number.
+   */
   describe('New phone number', () => {
     it('Should render extra text when the phone number to verify is a new phone number', async () => {
       const wrapper = getWrapper(
@@ -118,7 +121,8 @@ describe('PhoneNumberVerificationModal', () => {
         {
           ...DEFAULT_PROPS,
           phoneNumberToVerify: '+18180000001',
-      })
+        }
+      )
       const numberToVerifyWrapper = wrapper.find('.verification-phone-number')
       expect(numberToVerifyWrapper.exists()).toBeTruthy()
       expect(numberToVerifyWrapper.text()).toContain('+18180000001')

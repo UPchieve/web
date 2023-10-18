@@ -209,5 +209,7 @@ export default {
     referralCopy: state => state.flags[POSTHOG_FEATURE_FLAGS.REFERRAL_COPY],
     isTutorSessionHistoryActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.TUTOR_SESSION_HISTORY],
+    isEditProfilePhoneNumberActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.EDIT_PROFILE_PHONE_NUMBER],
   },
 }
