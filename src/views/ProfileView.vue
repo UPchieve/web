@@ -406,6 +406,7 @@ export default {
             this.editBtnMsg = 'Edit'
             this.activeEdit = false
             this.saveFailed = false
+
             AnalyticsService.captureEvent(EVENTS.PROFILE_UPDATED, {
               event: EVENTS.PROFILE_UPDATED,
             })
@@ -417,6 +418,13 @@ export default {
               AnalyticsService.captureEvent(EVENTS.ACCOUNT_DEACTIVATED, {
                 event: EVENTS.ACCOUNT_DEACTIVATED,
               })
+
+            if ('smsConsent' in reqBody) {
+              const evt = reqBody.smsConsent
+                ? EVENTS.SMS_OPTED_IN
+                : EVENTS.SMS_OPTED_OUT
+              AnalyticsService.captureEvent(evt)
+            }
 
             // Update user state after successful API call
             this.$store
