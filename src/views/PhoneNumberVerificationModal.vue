@@ -78,6 +78,8 @@ import Modal from '@/components/Modal.vue'
 import { VERIFICATION_METHOD } from '@/consts'
 import AuthService from '@/services/AuthService'
 import { mapState } from 'vuex'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 export default {
   name: 'phone-number-verification-modal',
@@ -153,6 +155,11 @@ export default {
 
       this.isSubmitting = false
     },
+
+    /**
+     * Calls /verify/confirm and emits events if successful.
+     * @returns {Promise<void>}
+     */
     async confirmVerification() {
       this.loadingMessage = this.loadingMessageCodeVerifying
       this.isSubmitting = true
@@ -167,6 +174,10 @@ export default {
         })
         if (success) {
           this.verificationComplete = true
+          AnalyticsService.captureEvent(EVENTS.PHONE_NUMBER_VERIFIED)
+          if (this.user.phone !== this.phoneNumberToVerify) {
+            AnalyticsService.captureEvent(EVENTS.PHONE_NUMBER_UPDATED)
+          }
         } else {
           this.error =
             'Please enter the most recent verification code that was sent to you'
