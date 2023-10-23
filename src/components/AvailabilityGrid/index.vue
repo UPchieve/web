@@ -1,7 +1,7 @@
 <template>
   <div class="AvailabilityGrid">
     <div class="Column">
-      <Cell class="Top Left" :selectable="false" />
+      <Cell class="Top Left TopLeft" :selectable="false" content="(Start Times)" />
       <Cell
         v-for="(value, hour) in timeRange"
         class="Left"
@@ -102,8 +102,16 @@ export default {
 }
 .Top {
   border-top: none !important;
+  align-items: center;
 }
 .Left {
   border-left: none !important;
+  align-items: center;
 }
+.TopLeft {
+  font-size: 11px;
+  font-style: italic;
+  align-items: end;
+}
+
 </style>
