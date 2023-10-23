@@ -6,67 +6,79 @@
       <div v-show="error" class="alert alert-danger" role="alert">
         {{ error }}
       </div>
-      <p
-        class="uc-form-text"
-        id="phone-number-changed-message"
-        v-if="phoneNumberChanged"
-      >
-        Before we can save your new phone number, we need to verify it.
-      </p>
-      <p class="uc-form-text">
-        We just texted a verification code to
-        <span class="verification-phone-number">{{ phoneNumberToVerify }}</span
-        >.
-      </p>
-      <div class="uc-form-element">
-        <label for="verification-code-field">
-          Enter your 6-digit verification code
-        </label>
-        <input
-          class="uc-form-text-input"
-          id="verification-code-field"
-          v-model="verificationCode"
-          type="text"
-          placeholder="XXXXXX"
-          maxlength="6"
-        />
-      </div>
-      <p class="uc-form-subtext">
-        Did not receive a code?
-        <span
-          class="uc-link secondary-btn"
-          :disabled="isSubmitting"
-          @click.prevent="resendCode"
-          id="resend-btn"
+      <div v-if="!flowIncompletable" data-testid="verification-body">
+        <p
+          class="uc-form-text"
+          id="phone-number-changed-message"
+          v-if="phoneNumberChanged"
         >
-          Resend code
-        </span>
-      </p>
+          Before we can save your new phone number, we need to verify it.
+        </p>
+        <p class="uc-form-text">
+          We just texted a verification code to
+          <span class="verification-phone-number">{{
+            phoneNumberToVerify
+          }}</span
+          >.
+        </p>
+        <div class="uc-form-element">
+          <label for="verification-code-field">
+            Enter your 6-digit verification code
+          </label>
+          <input
+            class="uc-form-text-input"
+            id="verification-code-field"
+            v-model="verificationCode"
+            type="text"
+            placeholder="XXXXXX"
+            maxlength="6"
+          />
+        </div>
+        <p class="uc-form-subtext">
+          Did not receive a code?
+          <span
+            class="uc-link secondary-btn"
+            :disabled="isSubmitting"
+            @click.prevent="resendCode"
+            id="resend-btn"
+          >
+            Resend code
+          </span>
+        </p>
 
-      <div class="buttons-container">
-        <button
-          type="submit"
-          :disabled="!isValidVerificationCode"
-          class="uc-form-button"
-          id="verify-phone-btn"
-          @click.prevent="confirmVerification"
-        >
-          Verify my phone number
-        </button>
-        <button
-          class="uc-form-button-secondary"
-          id="cancel-btn"
-          @click="closeModal"
-        >
-          Cancel
-        </button>
+        <div class="buttons-container">
+          <button
+            type="submit"
+            :disabled="!isValidVerificationCode"
+            class="uc-form-button"
+            id="verify-phone-btn"
+            @click.prevent="confirmVerification"
+          >
+            Verify my phone number
+          </button>
+          <button
+            class="uc-form-button-secondary"
+            id="cancel-btn"
+            @click="closeModal"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
+      <button
+        v-if="flowIncompletable"
+        class="uc-form-button-secondary"
+        id="cancel-btn"
+        @click="closeModal"
+      >
+        Go Back
+      </button>
     </div>
 
     <!-- Step 2 content: Completed state -->
     <div v-if="verificationComplete">
       <p class="uc-form-text">
-        Youre phone number has been verified!
+        Your phone number has been verified!
       </p>
       <button class="uc-form-button" @click="completeModal">Close</button>
     </div>
@@ -112,6 +124,7 @@ export default {
       phoneNumber: '',
       verificationComplete: false,
       defaultErrorMessage: 'Something went wrong',
+      flowIncompletable: false,
     }
   },
   mounted() {
@@ -150,6 +163,11 @@ export default {
           userId: this.user.id,
         })
       } catch (error) {
+        // 4xx errors: User has done something wrong, which is either to do with the phone number
+        // or making too many requests.
+        // 5xx: Something is malfunctioning.
+        // In either case, there is nothing to do but close the modal.
+        this.flowIncompletable = true
         this.displayError(error)
       }
 
