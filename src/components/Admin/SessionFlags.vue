@@ -38,7 +38,9 @@ export default {
   },
   methods: {
     getFlagColor(flag) {
-      return SESSION_FLAGS_CLASS[Case.camel(flag)] || ''
+      return (
+        SESSION_FLAGS_CLASS[Case.camel(flag)] || SESSION_FLAGS_CLASS.reported
+      )
     },
   },
   components: { Chip },

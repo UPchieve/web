@@ -88,8 +88,25 @@ export default {
 
   getCurrentSession(user) {
     return NetworkService.currentSession({
-      user_id: user._id,
+      user_id: user.id,
       is_volunteer: user.isVolunteer,
+    })
+      .then(resp => {
+        const { sessionId, data } = resp.data || {}
+        const { type, subTopic } = data
+
+        if (type && subTopic && sessionId) {
+          return Promise.resolve({ sessionData: data })
+        }
+      })
+      .catch(resp => {
+        throw errorFromHttpResponse(resp)
+      })
+  },
+
+  getRecapSessionForDms(sessionId) {
+    return NetworkService.getRecapSessionForDms({
+      sessionId,
     })
       .then(resp => {
         const { sessionId, data } = resp.data || {}

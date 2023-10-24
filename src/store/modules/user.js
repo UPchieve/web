@@ -12,6 +12,7 @@ export default {
     user: {},
     session: {},
     latestSession: {},
+    recapSession: {},
     isFirstDashboardVisit: false,
     isSessionConnectionAlive: false,
     presessionSurvey: {},
@@ -34,10 +35,16 @@ export default {
 
     setSession: (state, session = {}) => (state.session = session),
 
+    setRecapSession: (state, session = {}) => (state.recapSession = session),
+
     setLatestSession: (state, session = {}) => (state.latestSession = session),
 
     addMessage: (state, message) => {
       if (message) state.session.messages.push(message)
+    },
+
+    addRecapMessage: (state, message) => {
+      if (message) state.recapSession.messages.push(message)
     },
 
     setAvailability: (state, availability, date) => {
@@ -159,6 +166,19 @@ export default {
         })
     },
 
+    fetchRecapSessionForDms: async ({ commit }, sessionId) => {
+      SessionService.getRecapSessionForDms(sessionId)
+        .then(({ sessionData }) => {
+          commit('setRecapSession', sessionData)
+        })
+        .catch(err => {
+          commit('setRecapSession', {})
+          if (err.status !== 404) {
+            LoggerService.noticeError(err)
+          }
+        })
+    },
+
     clearSession: ({ commit }) => {
       commit('setSession', {})
     },
@@ -187,6 +207,10 @@ export default {
 
     addMessage: ({ commit }, message) => {
       commit('addMessage', message)
+    },
+
+    addRecapMessage: ({ commit }, message) => {
+      commit('addRecapMessage', message)
     },
 
     firstDashboardVisit: ({ commit }, isFirstDashboardVisit) => {

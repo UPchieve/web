@@ -40,13 +40,38 @@
             </div>
           </div>
         </div>
-        <chat-log
-          v-if="mobileMode"
-          class="chat"
-          :messages="session.messages"
-          :studentId="session.studentId"
-          :volunteerId="session.volunteerId"
-        />
+        <template v-if="mobileMode">
+          <chat-log
+            v-if="!isRecapDmsAvailable"
+            class="chat"
+            :messages="session.messages"
+            :studentId="session.studentId"
+            :volunteerId="session.volunteerId"
+          />
+          <div class="chat chat__dms" v-if="isRecapDmsAvailable">
+            <div class="chat-header chat__dms-header">
+              <div class="chat__dms-avatar-container">
+                <component
+                  class="chat-header__avatar"
+                  :is="user.isVolunteer ? studentAvatar : volunteerAvatar"
+                />
+                <div class="chat-header__title">Session Chat</div>
+              </div>
+              <button class="report-btn" @click="reportSession" type="button">
+                Report
+              </button>
+            </div>
+            <session-chat
+              class="chat__dms-session-chat"
+              :currentSession="recapSession"
+              :shouldHideChatSection="false"
+              :setHasSeenNewMessage="setHasSeenNewMessage"
+              :isInRecap="true"
+              :isSessionConnectionAlive="isSessionConnectionAlive"
+              :isSessionAlive="isSessionAlive"
+            />
+          </div>
+        </template>
         <div v-if="session.quillDoc" class="document">
           <h2 class="document__title">Doc Editor</h2>
           <div class="document__container">
@@ -70,28 +95,64 @@
           </div>
         </div>
       </div>
-      <chat-log
-        v-if="!mobileMode"
-        :messages="session.messages"
-        :studentId="session.studentId"
-        :volunteerId="session.volunteerId"
-      />
+      <template v-if="!mobileMode">
+        <chat-log
+          v-if="!isRecapDmsAvailable"
+          :messages="session.messages"
+          :studentId="session.studentId"
+          :volunteerId="session.volunteerId"
+        />
+        <div class="chat chat__dms" v-if="isRecapDmsAvailable">
+          <div class="chat-header chat__dms-header">
+            <div class="chat__dms-avatar-container">
+              <component
+                class="chat-header__avatar"
+                :is="user.isVolunteer ? studentAvatar : volunteerAvatar"
+              />
+              <div class="chat-header__title">Session Chat</div>
+            </div>
+            <button
+              v-if="!reportSubmitted"
+              class="report-btn"
+              @click="reportSession"
+              type="button"
+            >
+              Report
+            </button>
+            <span v-else class="report-btn report-btn--submitted">
+              Reported
+            </span>
+          </div>
+          <session-chat
+            class="chat__dms-session-chat"
+            :currentSession="recapSession"
+            :shouldHideChatSection="false"
+            :setHasSeenNewMessage="setHasSeenNewMessage"
+            :isInRecap="true"
+            :isSessionConnectionAlive="isSessionConnectionAlive"
+            :isSessionAlive="isSessionAlive"
+          />
+        </div>
+      </template>
     </template>
   </div>
 </template>
 
 <script>
 import ChatLog from '@/components/ChatLog.vue'
-import NetworkService from '@/services/NetworkService'
-import AnalyticsService from '@/services/AnalyticsService'
 import FavoritingToggle from '@/components/FavoritingToggle.vue'
-import { mapState, mapGetters } from 'vuex'
+import Loader from '@/components/Loader.vue'
+import LoadingMessage from '@/components/LoadingMessage.vue'
+import { EVENTS } from '@/consts'
+import AnalyticsService from '@/services/AnalyticsService'
+import NetworkService from '@/services/NetworkService'
+import SessionChat from '@/views/SessionView/SessionChat/index.vue'
+import StudentIcon from '@/assets/student-icon.svg'
+import VolunteerIcon from '@/assets/volunteer-icon.svg'
 import moment from 'moment'
 import Quill from 'quill'
+import { mapGetters, mapState } from 'vuex'
 import config from '../config'
-import LoadingMessage from '@/components/LoadingMessage.vue'
-import Loader from '@/components/Loader.vue'
-import { EVENTS } from '@/consts'
 
 export default {
   components: {
@@ -99,10 +160,12 @@ export default {
     FavoritingToggle,
     LoadingMessage,
     Loader,
+    SessionChat,
   },
   computed: {
     ...mapState({
       user: state => state.user.user,
+      recapSession: state => state.user.recapSession,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -113,6 +176,12 @@ export default {
         height: 2800,
       }
     },
+    studentAvatar() {
+      return StudentIcon
+    },
+    volunteerAvatar() {
+      return VolunteerIcon
+    },
   },
   data() {
     return {
@@ -122,6 +191,12 @@ export default {
       zwibblerCtx: null,
       isConnectedToWhiteboard: false,
       isLoadingRecap: true,
+      // TODO: handle session connction issus in recap. We will ignore for now
+      isSessionConnectionAlive: true,
+      // Session is considered alive when in recap mode
+      isSessionAlive: true,
+      isRecapDmsAvailable: false,
+      reportSubmitted: false,
     }
   },
   async created() {
@@ -131,6 +206,8 @@ export default {
         this.$route.params.sessionId
       )
       this.session = response.data.session
+      this.isRecapDmsAvailable = response.data.isRecapDmsAvailable
+      this.$store.dispatch('user/fetchRecapSessionForDms', this.session.id)
       AnalyticsService.captureEvent(EVENTS.VOLUNTEER_OPENED_SESSION_RECAP)
     } catch (error) {
       if (error.status === 403) this.$router.push('/dashboard')
@@ -202,6 +279,23 @@ export default {
       this.loadingWhiteboardError =
         'Failed to load the whiteboard. Please try refreshing the page.'
     },
+    setHasSeenNewMessage(value) {
+      this.hasSeenNewMessage = value
+    },
+    toggleReportSubmitted() {
+      this.reportSubmitted = true
+    },
+    reportSession() {
+      this.$store.dispatch('app/modal/show', {
+        component: 'ReportSessionModal',
+        data: {
+          showTemplateButtons: false,
+          currentSession: this.recapSession,
+          isInRecap: true,
+          toggleReportSubmitted: this.toggleReportSubmitted,
+        },
+      })
+    },
   },
 }
 </script>
@@ -269,6 +363,46 @@ export default {
 .chat {
   margin-bottom: 1.8em;
   flex-basis: 40%;
+
+  &-header {
+    background-color: $c-information-blue;
+    padding: 21px;
+    text-align: left;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    border-radius: 8px 8px 0px 0px;
+
+    &__avatar {
+      width: 40px;
+      height: 40px;
+    }
+
+    &__title {
+      font-weight: 600;
+      font-size: 18px;
+      color: #fff;
+      margin-left: 1em;
+    }
+  }
+
+  &__dms {
+    @include flex-container(column);
+
+    &-header {
+      @include flex-container(row, space-between, center);
+    }
+
+    &-avatar-container {
+      @include flex-container(row, space-between, center);
+    }
+
+    &-session-chat {
+      height: 700px;
+      max-height: 700px;
+    }
+  }
 }
 
 .document {
@@ -328,5 +462,28 @@ export default {
 
 .recap-loader {
   margin: 0 auto;
+}
+
+.report-btn {
+  display: block;
+  border: none;
+  background-color: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  color: #fff;
+  padding: 0 5px;
+  margin-right: 10px;
+
+  &:hover {
+    color: #e8e8e8;
+  }
+
+  &--submitted {
+    color: $c-disabled-grey;
+
+    &:hover {
+      color: $c-disabled-grey;
+    }
+  }
 }
 </style>

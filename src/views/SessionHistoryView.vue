@@ -16,16 +16,10 @@
     </section>
     <div v-if="!mobileMode" class="container">
       <section>
-        <div
-          class="spacing--grid session-list__headers"
-          :class="{
-            'spacing--grid-3': user.isVolunteer,
-            'spacing--grid-4': !user.isVolunteer,
-          }"
-        >
+        <div class="spacing--grid spacing--grid-4 session-list__headers">
           <span>SUBJECT</span>
           <span>DATE</span>
-          <span v-if="!user.isVolunteer">COACH</span>
+          <span>{{ user.isVolunteer ? 'STUDENT' : 'COACH' }}</span>
           <span>SESSION RECAP</span>
         </div>
         <div v-if="error">
@@ -38,20 +32,14 @@
           message="Retrieving your session history"
           class="session-history-loader"
         />
-        <div v-else-if="hasNoPastSessions()">
+        <div v-else-if="hasNoPastSessions()" class="session-list">
           <h1 class="title title--body">
             Looks like you haven't had any sessions in the past 12 months.
           </h1>
         </div>
         <ul class="session-list" v-else>
           <li v-for="(session, index) in sessions" :key="session._id">
-            <div
-              class="session-list__session"
-              :class="{
-                'session-list__session--grid-3': user.isVolunteer,
-                'session-list__session--grid-4': !user.isVolunteer,
-              }"
-            >
+            <div class="session-list__session session-list__session--grid-4">
               <div class="session-list__subject-container">
                 <img
                   :src="session.topicIconLink"
@@ -68,18 +56,20 @@
               <p class="session-list__created-at">
                 {{ getSessionTime(session.createdAt) }}
               </p>
-              <div
-                v-if="!user.isVolunteer"
-                class="session-list__coach-name-container"
-              >
+              <div class="session-list__partner-name-container">
                 <favoriting-toggle
+                  v-if="!user.isVolunteer"
                   :initialIsFavorite="session.isFavorited"
                   :volunteerName="session.volunteerFirstName"
                   :volunteerId="session.volunteerId"
                   v-on:change-favorited="updateFavoritedVolunteers"
                 />
-                <span class="session-list__coach-name">
-                  {{ session.volunteerFirstName }}
+                <span class="session-list__partner-name">
+                  {{
+                    user.isVolunteer
+                      ? session.studentFirstName
+                      : session.volunteerFirstName
+                  }}
                 </span>
               </div>
               <div class="session-list__session-recap">
@@ -98,7 +88,6 @@
         <footer class="page-actions-container">
           <div class="page-actions">
             <div
-              v-if="page > 1"
               @click="() => getSessionHistory(page - 1)"
               :class="isFirstPage && 'page-actions__stepper--disabled'"
               class="page-actions__stepper"
@@ -135,7 +124,7 @@
             class="session-history-loader"
           />
           <div v-else-if="hasNoPastSessions()">
-            <h1 class="title title--body">
+            <h1 class="title title--body mobile-session-list">
               Looks like you haven't had any sessions in the past 12 months.
             </h1>
           </div>
@@ -156,20 +145,22 @@
                     >
                   </div>
                 </div>
-                <div
-                  v-if="!user.isVolunteer"
-                  class="mobile-session-list__createdAt-container"
-                >
-                  <div class="mobile-session-list__coach-name-container">
+                <div class="mobile-session-list__createdAt-container">
+                  <div class="mobile-session-list__partner-name-container">
                     <favoriting-toggle
+                      v-if="!user.isVolunteer"
                       class="heart"
                       :initialIsFavorite="session.isFavorited"
                       :volunteerName="session.volunteerFirstName"
                       :volunteerId="session.volunteerId"
                       v-on:change-favorited="updateFavoritedVolunteers"
                     />
-                    <span class="mobile-session-list__coach-name">
-                      {{ session.volunteerFirstName }}
+                    <span class="mobile-session-list__partner-name">
+                      {{
+                        user.isVolunteer
+                          ? session.studentFirstName
+                          : session.volunteerFirstName
+                      }}
                     </span>
                   </div>
                   <span class="mobile-session-list__created-at">
@@ -438,7 +429,7 @@ ul {
     padding: 1em 2em;
   }
 
-  &__coach-name {
+  &__partner-name {
     @include font-category('subheading');
     margin: 0.8em;
     @include breakpoint-below('large') {
@@ -657,7 +648,7 @@ ul {
 .mobile-session-list {
   padding: 0;
   min-height: 500px;
-  &__coach-name {
+  &__partner-name {
     font-weight: 500;
     font-size: 14px;
     margin: 0.4em;

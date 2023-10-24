@@ -73,8 +73,12 @@
           <question-mark-icon @click="openHelp" class="help-icon" />
         </div>
         <session-chat
+          :currentSession="session"
           :shouldHideChatSection="shouldHideChatSection"
           :setHasSeenNewMessage="setHasSeenNewMessage"
+          :isSessionConnectionAlive="isSessionConnectionAlive"
+          :isSessionAlive="isSessionAlive"
+          :sessionHasEnded="sessionHasEnded"
         />
       </div>
     </div>
@@ -190,6 +194,8 @@ export default {
       totalStudentSessions: 0,
       showNoPresessionSurveyResponse: false,
       isLoadingPresessionResponse: false,
+      isFetchingIsSessionRecapEligible: false,
+      sessionHasEnded: false,
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -210,6 +216,8 @@ export default {
       isAuthenticated: 'user/isAuthenticated',
       isVolunteer: 'user/isVolunteer',
       isSessionOver: 'user/isSessionOver',
+      isSessionAlive: 'user/isSessionAlive',
+      isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
     }),
 
     auxiliaryType() {
@@ -498,6 +506,10 @@ export default {
         document.querySelector(this.gleapClass).style.visibility = 'hidden'
       if (!newValue && oldValue)
         document.querySelector(this.gleapClass).style.visibility = 'visible'
+    },
+    // Once session has ended, show chatbot to tutor
+    async 'session.endedAt'(newValue, oldValue) {
+      if (newValue && !oldValue) this.sessionHasEnded = true
     },
   },
 }

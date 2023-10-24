@@ -2,10 +2,9 @@
   <div class="report-modal">
     <h1 class="report-modal__title">Report this session</h1>
     <h2 class="report-modal__subtitle">
-      Reporting students will result in immediate action from UPchieve. If you
-      have a concern that requires less immediate attention, please let us know
-      in the feedback form after your session is complete. Not sure what to do?
+      {{ reportModalSubtitle }}
       <a
+        v-if="!isInRecap"
         href="https://upc-training-materials.s3.us-east-2.amazonaws.com/reporting-guidelines.pdf"
         target="_blank"
         rel="noopener noreferrer"
@@ -19,7 +18,7 @@
       <v-select
         class="report-modal__select report-modal__select--required"
         v-model="reportReason"
-        :options="reportReasonOptions"
+        :options="reportReasonOptionsToDisplay"
         :searchable="false"
         :clearable="false"
       ></v-select>
@@ -45,13 +44,23 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import NetworkService from '@/services/NetworkService'
+import AnalyticsService from '@/services/AnalyticsService'
 import LargeButton from '@/components/LargeButton.vue'
+import { mapState } from 'vuex'
+import { EVENTS } from '@/consts'
 
+// TODO: Options should be hydrated via the database
 const reportReasonOptions = [
   'This student was extremely rude or inappropriate',
   'I am worried for the immediate safety of this student',
+]
+
+const studentRecapReportReasonOptions = [
+  'Coach asked me to connect off of UPchieve',
+  'Coach made me feel uncomfortable or unsafe',
+  'Coach used inappropriate language',
+  'Coach talked about inappropriate and offensive topics',
 ]
 
 export default {
@@ -66,25 +75,69 @@ export default {
       reportMessage: '',
     }
   },
+  mounted() {
+    if (this.isInRecap)
+      AnalyticsService.captureEvent(
+        EVENTS.SESSION_RECAP_DM_REPORT_MODAL_SHOWN,
+        {
+          sessionId: this.currentSession.id,
+        }
+      )
+  },
   computed: {
     ...mapState({
-      currentSession: state => state.user.session,
+      user: state => state.user.user,
     }),
     isFormComplete() {
       return !!this.reportReason
+    },
+    currentSession() {
+      return this.modalData.currentSession
+    },
+    isInRecap() {
+      return this.modalData.isInRecap ?? false
+    },
+    reportReasonOptionsToDisplay() {
+      if (!this.isInRecap) return reportReasonOptions
+      else {
+        if (this.user.isVolunteer) return reportReasonOptions
+        else return studentRecapReportReasonOptions
+      }
+    },
+    reportModalSubtitle() {
+      if (this.isInRecap && !this.user.isVolunteer)
+        return `Reporting coaches will result in immediate action from UPchieve. The coach won't be able to help any students while UPchieve staff investigates the issue. Please only report a coach for the reasons listed below, otherwise reach out with your concerns by clicking the contact us link instead!`
+      else
+        return `Reporting ${
+          this.user.isVolunteer ? 'students' : 'tutors'
+        } will result
+      in immediate action from UPchieve. If you have a concern that requires
+      less immediate attention, please let us know in the feedback form after
+      your session is complete. Not sure what to do?`
     },
   },
   methods: {
     async submit() {
       try {
         await NetworkService.reportSession({
-          sessionId: this.currentSession._id,
+          sessionId: this.currentSession.id,
           reportReason: this.reportReason,
           reportMessage: this.reportMessage,
+          source: this.isInRecap ? 'recap' : '',
         })
+        if (this.modalData.toggleReportSubmitted)
+          this.modalData.toggleReportSubmitted()
       } catch (error) {
         alert('Failed to submit')
       }
+
+      if (this.isInRecap)
+        AnalyticsService.captureEvent(
+          EVENTS.SESSION_RECAP_DM_REPORT_MODAL_SUBMITTED,
+          {
+            sessionId: this.currentSession.id,
+          }
+        )
 
       this.$store.dispatch('app/modal/hide')
     },

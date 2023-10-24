@@ -263,6 +263,12 @@ export default {
       this._errorHandler
     )
   },
+  getRecapSessionForDms(data) {
+    return httpPost(`${API_ROOT}/session/recap-dms`, data).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
   latestSession(data) {
     return httpPost(`${API_ROOT}/session/latest`, data).then(
       this._successHandler,
@@ -275,10 +281,11 @@ export default {
       this._errorHandler
     )
   },
-  reportSession({ sessionId, reportReason, reportMessage }) {
+  reportSession({ sessionId, reportReason, reportMessage, source }) {
     return httpPost(`${API_ROOT}/session/${sessionId}/report`, {
       reportReason,
       reportMessage,
+      source,
     }).then(this._successHandler, this._errorHandler)
   },
   getSessionPhotoUploadUrl(sessionId) {
@@ -833,6 +840,12 @@ export default {
   fallIncentiveProgramEnrollmentEnroll(data) {
     return httpPost(
       `${API_ROOT}/product-flags/fall-incentive-enrollment/enroll`,
+      data
+    ).then(this._successHandler, this._errorHandler)
+  },
+  isSessionRecapEligible(sessionId, data) {
+    return httpPost(
+      `${API_ROOT}/sessions/history/${sessionId}/eligible`,
       data
     ).then(this._successHandler, this._errorHandler)
   },
