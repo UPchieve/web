@@ -76,7 +76,7 @@ const activeHeaderData = {
 }
 
 const bannedHeaderData = {
-  component: 'BannedStudentHeader',
+  component: 'BannedHeader',
 }
 
 const earnCertificationsHeaderData = {
@@ -102,10 +102,6 @@ export default {
   async created() {
     if (this.isEarnCertificationsActive)
       this.$store.dispatch('app/header/show', earnCertificationsHeaderData)
-
-    if (this.user && this.user.isBanned) {
-      this.$store.dispatch('app/header/show', bannedHeaderData)
-    }
 
     if (this.isSessionAlive) {
       this.$store.dispatch('app/header/show', activeHeaderData)
@@ -208,6 +204,11 @@ export default {
       })
 
       localStorage.setItem('last-seen-referral-modal', new Date())
+    }
+
+    // TODO: move globally to show banner in all pages
+    if (this.user && this.user.isBanned) {
+      this.$store.dispatch('app/header/show', bannedHeaderData)
     }
   },
   data() {

@@ -13,7 +13,7 @@
       </sidebar-link>
 
       <sidebar-link
-        v-if="!isVolunteer || isTutorSessionHistoryActive"
+        v-if="!isVolunteer"
         to="/sessions/history"
         text="Session History"
       >
@@ -34,6 +34,14 @@
 
       <sidebar-link v-if="isVolunteer" to="/calendar" text="Schedule">
         <calendar-icon class="icon" />
+      </sidebar-link>
+
+      <sidebar-link
+        v-if="isVolunteer && isTutorSessionHistoryActive"
+        to="/sessions/history"
+        text="Session History"
+      >
+        <archive-icon class="icon" />
       </sidebar-link>
 
       <sidebar-link v-if="isAdmin" to="/admin" text="Admin">

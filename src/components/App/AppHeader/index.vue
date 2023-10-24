@@ -11,7 +11,7 @@ import DefaultHeader from './DefaultHeader/index.vue'
 import SessionHeader from './SessionHeader.vue'
 import RejoinSessionHeader from './RejoinSessionHeader.vue'
 import WaitingPeriodHeader from './WaitingPeriodHeader.vue'
-import BannedStudentHeader from './BannedStudentHeader.vue'
+import BannedHeader from './BannedHeader.vue'
 import DashboardBannerHeader from './DashboardBannerHeader.vue'
 import EarnCertificationsHeader from './EarnCertificationsHeader.vue'
 
@@ -23,7 +23,7 @@ export default {
     SessionHeader,
     RejoinSessionHeader,
     WaitingPeriodHeader,
-    BannedStudentHeader,
+    BannedHeader,
     DashboardBannerHeader,
     EarnCertificationsHeader,
   },

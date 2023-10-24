@@ -208,6 +208,13 @@ export default {
     if (this.isSessionAlive) {
       this.$store.dispatch('app/header/show', rejoinHeaderData)
     }
+
+    // TODO: move globally to show banner in all pages
+    if (this.user && this.user.isBanned) {
+      this.$store.dispatch('app/header/show', {
+        component: 'BannedHeader',
+      })
+    }
   },
   data() {
     return {

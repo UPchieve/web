@@ -3,7 +3,7 @@
     <vue-headful
       :title="
         typingIndicatorShown && isSessionConnectionAlive && isSessionAlive
-          ? `${sessionPartner.firstname || 'Chatbot'} is typing...`
+          ? `${sessionPartnerName || 'Chatbot'} is typing...`
           : 'UPchieve'
       "
     />
@@ -43,11 +43,7 @@
     <div class="messages-container">
       <div class="messages" ref="messages" @scroll="handleScroll" tabindex="0">
         <chat-bot
-          v-if="
-            showLegacyChatBot &&
-              !user.isVolunteer &&
-              isSessionWaitingForVolunteer
-          "
+          v-if="!user.isVolunteer && isSessionWaitingForVolunteer"
           @new-bot-message="handleIncomingMessage"
         />
         <template>
@@ -60,17 +56,36 @@
             <component
               class="avatar"
               :is="avatar(message)"
-              v-if="message.user !== user._id"
+              v-if="message.user !== user.id"
             />
 
             <div class="contents" :class="chatBotContents(message)">
-              <span>{{ message.contents }}</span>
+              <span v-if="message.hasHtml" v-html="message.contents"></span>
+              <span v-else>{{ message.contents }}</span>
             </div>
             <div class="time">
               {{ message.createdAt | formatTime }}
             </div>
           </div>
         </template>
+        <chat-bot
+          v-if="sessionHasEnded && isSessionRecapDmsActive"
+          :isSessionRecapBot="true"
+          :currentSession="currentSession"
+          @recap-eligible="toggleEligibleForSessionRecapChat"
+          @loading-chatbot-message="scrollToBottom"
+        />
+        <chat-bot
+          v-if="
+            user.isVolunteer &&
+              isInRecap &&
+              currentSession.messages &&
+              !tutorSentMessageAfterSessionEnded
+          "
+          :isInRecap="isInRecap"
+          :currentSession="currentSession"
+          @loading-chatbot-message="scrollToBottom"
+        />
       </div>
       <transition name="fade">
         <button
@@ -91,7 +106,7 @@
       muted
     />
 
-    <div class="chat-footer">
+    <div class="chat-footer" :class="isInRecap && 'chat-footer--recap'">
       <transition name="fade">
         <div
           class="typing-indicator"
@@ -99,7 +114,7 @@
             typingIndicatorShown && isSessionConnectionAlive && isSessionAlive
           "
         >
-          {{ this.sessionPartner.firstname || 'Chatbot' }} is typing...
+          {{ sessionPartnerName || 'Chatbot' }} is typing...
         </div>
       </transition>
 
@@ -122,7 +137,6 @@ import { mapState, mapGetters } from 'vuex'
 import ChatBot from './ChatBot'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import ModerationService from '@/services/ModerationService'
-import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import sendWebNotification from '@/utils/send-web-notification'
 import getChatAvatar from '@/utils/get-chat-avatar'
 import LoggerService from '@/services/LoggerService'
@@ -139,10 +153,17 @@ const MESSAGE_ALIGNMENT = {
  */
 export default {
   name: 'session-chat',
-  components: { ChatBot, LoadingMessage, ChatBotIcon },
+  components: { ChatBot, LoadingMessage },
   props: {
     setHasSeenNewMessage: { type: Function, required: true },
     shouldHideChatSection: { type: Boolean, required: true },
+    currentSession: { type: Object, required: true },
+    isInRecap: { type: Boolean, default: false },
+    isSessionConnectionAlive: { type: Boolean, required: true },
+    isSessionAlive: { type: Boolean, required: true },
+    isFetchingIsSessionRecapEligible: { type: Boolean, default: false },
+    isSessionRecapEligible: { type: Boolean, default: false },
+    sessionHasEnded: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -152,32 +173,36 @@ export default {
       typingIndicatorShown: false,
       isMessageError: false,
       isAutoscrolling: false,
+      showChatBot: false,
+      eligibleForSessionRecapChat: false,
     }
   },
   computed: {
     ...mapState({
       user: state => state.user.user,
-      currentSession: state => state.user.session,
       isWebPageHidden: state => state.app.isWebPageHidden,
-      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
       unreadChatMessageIndices: state => state.user.unreadChatMessageIndices,
       chatScrolledToMessageIndex: state =>
         state.user.chatScrolledToMessageIndex,
     }),
     ...mapGetters({
-      sessionPartner: 'user/sessionPartner',
       isSessionWaitingForVolunteer: 'user/isSessionWaitingForVolunteer',
-      isSessionAlive: 'user/isSessionAlive',
       numberOfUnreadChatMessages: 'user/numberOfUnreadChatMessages',
-      isChatbotActive: 'featureFlags/isChatbotActive',
+      isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
     }),
+    sessionPartnerName() {
+      if (!this.currentSession) return ''
+      return this.user.isVolunteer
+        ? this.currentSession.student?.firstName
+        : this.currentSession.volunteer?.firstName
+    },
     isSessionConnectionFailure: function() {
       const isConnectionFailure =
         !this.isSessionConnectionAlive && this.isSessionAlive
       if (isConnectionFailure)
         LoggerService.noticeError(new Error('Attempting to connect the chat'), {
           tags: {
-            sessionId: this.currentSession._id,
+            sessionId: this.currentSession.id,
           },
         })
       return isConnectionFailure
@@ -187,8 +212,12 @@ export default {
         this.numberOfUnreadChatMessages === 1 ? '' : 's'
       }`
     },
-    showLegacyChatBot() {
-      return !this.isChatbotActive
+    tutorSentMessageAfterSessionEnded() {
+      if (!this.currentSession || !this.currentSession.messages) return false
+      for (const message of this.currentSession.messages) {
+        if (message.createdAt > this.currentSession.endedAt) return true
+      }
+      return false
     },
   },
   mounted() {
@@ -205,12 +234,20 @@ export default {
     hideModerationWarning() {
       this.moderationWarningIsShown = false
     },
+    toggleEligibleForSessionRecapChat() {
+      this.eligibleForSessionRecapChat = true
+    },
     showNewMessage(message) {
       this.$socket.emit('message', {
-        sessionId: this.currentSession._id,
+        sessionId: this.currentSession.id,
         user: this.user,
         message,
+        source:
+          this.isInRecap || this.eligibleForSessionRecapChat ? 'recap' : '',
       })
+    },
+    isEventFromSameSession(sessionId) {
+      return this.currentSession.id === sessionId
     },
     clearMessageInput() {
       this.newMessage = ''
@@ -218,7 +255,7 @@ export default {
     notTyping() {
       // Tell the server that the user is no longer typing
       this.$socket.emit('notTyping', {
-        sessionId: this.currentSession._id,
+        sessionId: this.currentSession.id,
       })
     },
     handleOutgoingMessage(event) {
@@ -251,7 +288,7 @@ export default {
 
       // Typing handler for when non-Enter/Backspace keys are pressed
       this.$socket.emit('typing', {
-        sessionId: this.currentSession._id,
+        sessionId: this.currentSession.id,
       })
 
       /** Every time a key is pressed, set an inactive timer
@@ -274,10 +311,9 @@ export default {
         console.log('Unable to play audio')
       }
 
-      sendWebNotification(
-        `${this.sessionPartner.firstname} has sent a message`,
-        { body: data.contents }
-      )
+      sendWebNotification(`${this.sessionPartnerName} has sent a message`, {
+        body: data.contents,
+      })
       return
     },
     handleScroll() {
@@ -310,7 +346,7 @@ export default {
       } else if (
         this.currentSession.messages.length > 0 &&
         this.currentSession.messages[this.currentSession.messages.length - 1]
-          .user !== this.user._id
+          .user !== this.user.id
       ) {
         const messageElements = this.getUserMessageElements()
 
@@ -370,7 +406,7 @@ export default {
         messagesBox.lastElementChild.offsetHeight
     },
     messageAlignment(message) {
-      return message.user === this.user._id
+      return message.user === this.user.id
         ? MESSAGE_ALIGNMENT.RIGHT
         : MESSAGE_ALIGNMENT.LEFT
     },
@@ -379,32 +415,35 @@ export default {
     },
     avatar(message) {
       const volunteerId =
-        this.currentSession.volunteer && this.currentSession.volunteer._id
+        this.currentSession.volunteer && this.currentSession.volunteer.id
       return getChatAvatar(
         message.user,
-        this.currentSession.student._id,
+        this.currentSession.student.id,
         volunteerId
       )
     },
     chatBotContents(message) {
-      const isStudentMessage = message.user === this.currentSession.student._id
+      const isStudentMessage = message.user === this.currentSession.student.id
       const isVolunteerMessage = this.currentSession.volunteer
-        ? message.user === this.currentSession.volunteer._id
+        ? message.user === this.currentSession.volunteer.id
         : false
       if (!isStudentMessage && !isVolunteerMessage) return 'contents--chat-bot'
       return ''
     },
   },
   sockets: {
-    'is-typing'() {
-      this.typingIndicatorShown =
-        this.isSessionConnectionAlive && this.isSessionAlive
+    'is-typing'(data) {
+      if (this.isEventFromSameSession(data.sessionId))
+        this.typingIndicatorShown =
+          this.isSessionConnectionAlive && this.isSessionAlive
     },
-    'not-typing'() {
-      this.typingIndicatorShown = false
+    'not-typing'(data) {
+      if (this.isEventFromSameSession(data.sessionId))
+        this.typingIndicatorShown = false
     },
     async messageSend(data) {
-      const { userId } = data
+      const { userId, sessionId } = data
+      if (!this.isEventFromSameSession(sessionId)) return
       // If the chat is hidden show visual indicator that a new message has arrived
       if (this.shouldHideChatSection) {
         this.setHasSeenNewMessage(false)
@@ -412,19 +451,30 @@ export default {
       }
 
       // Only allow audio when a user does not have the web page in view
-      if (userId !== this.user._id && this.isWebPageHidden)
+      if (userId !== this.user.id && this.isWebPageHidden)
         this.triggerAlert(data)
 
-      this.$store.dispatch('user/addMessage', data)
+      if (this.isInRecap) this.$store.dispatch('user/addRecapMessage', data)
+      else this.$store.dispatch('user/addMessage', data)
 
       this.handleIncomingMessage()
     },
-    messageError() {
-      if (this.isMessageError) return
+    messageError(data) {
+      if (this.isMessageError || !this.isEventFromSameSession(data.sessionId))
+        return
       this.isMessageError = true
       setTimeout(() => {
         this.isMessageError = false
       }, 1000)
+    },
+  },
+  watch: {
+    'currentSession.messages'(currentVal, prevVal) {
+      if ((this.isInRecap && currentVal, !prevVal))
+        // Wait for the DOM to update
+        this.$nextTick(() => {
+          this.scrollToBottom()
+        })
     },
   },
 }
@@ -581,6 +631,12 @@ export default {
     display: flex;
     align-items: center;
   }
+
+  &--recap {
+    @include breakpoint-below('medium') {
+      padding: 1em 0.5em;
+    }
+  }
 }
 
 .typing-indicator {
@@ -613,6 +669,12 @@ export default {
     border-radius: 20px;
     padding: 0.6em 1em;
     line-height: 18px;
+  }
+
+  &--recap {
+    @include breakpoint-below('medium') {
+      width: 100%;
+    }
   }
 }
 

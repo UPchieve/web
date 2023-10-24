@@ -6,7 +6,7 @@ import AppHeader from '@/components/App/AppHeader/index.vue'
 import HeaderTemplate from '@/components/App/AppHeader/HeaderTemplate.vue'
 import DefaultHeader from '@/components/App/AppHeader/DefaultHeader/index.vue'
 import RejoinSessionHeader from '@/components/App/AppHeader/RejoinSessionHeader.vue'
-import BannedStudentHeader from '@/components/App/AppHeader/BannedStudentHeader.vue'
+import BannedHeader from '@/components/App/AppHeader/BannedHeader.vue'
 import WaitingPeriodHeader from '@/components/App/AppHeader/WaitingPeriodHeader.vue'
 
 const localVue = createLocalVue()
@@ -46,10 +46,10 @@ describe('AppHeader', () => {
     expect(modal.attributes('header-data')).toBeDefined()
   })
 
-  it('renders BannedStudentHeader', () => {
-    const state = { component: 'BannedStudentHeader', data: {} }
+  it('renders BannedHeader', () => {
+    const state = { component: 'BannedHeader', data: {} }
     const wrapper = getWrapper(state).find(HeaderTemplate)
-    const modal = wrapper.find(BannedStudentHeader)
+    const modal = wrapper.find(BannedHeader)
     expect(modal.exists()).toBe(true)
     expect(modal.attributes('header-data')).toBeDefined()
   })

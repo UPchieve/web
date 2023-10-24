@@ -100,6 +100,7 @@
 </template>
 
 <script>
+// TODO: This file needs to be refactored to remove session logic from this component
 import { mapState, mapGetters } from 'vuex'
 import SessionService from '@/services/SessionService'
 import router from '@/router'
@@ -164,6 +165,7 @@ export default {
       isSessionInProgress: 'user/isSessionInProgress',
       isSessionOver: 'user/isSessionOver',
       isChatbotActive: 'featureFlags/isChatbotActive',
+      isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
     }),
 
     partnerAvatar() {
@@ -207,7 +209,9 @@ export default {
       SessionService.endSession(this, sessionId)
         .then(() => {
           this.$store.dispatch('user/sessionDisconnected')
-          this.goToFeedbackPage()
+          if (!this.isSessionRecapDmsActive) this.goToFeedbackPage()
+          // Do not send the user directly to the feedback page if they can leave DMs
+          this.isSessionEnding = false
         })
         .catch(this.alertCouldNotEnd)
     },
