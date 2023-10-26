@@ -5,7 +5,7 @@
         <div class="phone-number-modal">
           <header>
             <h1 class="phone-number-modal__title">
-              Did you know you can earn $5 a week for having a session?! 💸🎓
+              Did you know you can earn $10 a week for having a session?! 💸🎓
             </h1>
             <p class="phone-number-modal__body">
               Sign up for text reminders and never miss out on the opportunity
