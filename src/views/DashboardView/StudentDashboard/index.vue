@@ -83,6 +83,7 @@ const earnCertificationsHeaderData = {
   component: 'EarnCertificationsHeader',
 }
 
+// TODO: abstract this banner out more to allow for dynamic targeting
 const dashboardBannerData = {
   component: 'DashboardBannerHeader',
 }
@@ -282,11 +283,7 @@ export default {
       return [this.isJustTellThemActive, this.hadASession]
     },
     isFallIncentiveProgramActive() {
-      return [
-        this.user,
-        this.productFlags?.fallIncentiveProgram,
-        this.isDashboardBannerActive,
-      ]
+      return [this.user, this.productFlags, this.isDashboardBannerActive]
     },
     isProcrastinationPreventionReminderActive() {
       return [this.isProcrastinationPreventionActive, this.hadASession]
@@ -336,8 +333,13 @@ export default {
       Gleap.startBot('64b555f1e8dd226df869b2e7')
       AnalyticsService.updateUser({ hasMessages: false })
     },
+    // Only show the banner to those who have >= 1 sessions and < 10 session or in the incentive program
     triggerIncentiveProgram() {
-      if (!this.productFlags.fallIncentiveProgram) return
+      if (
+        !this.productFlags.fallIncentiveProgram &&
+        (this.user.pastSessions.length < 1 || this.user.pastSessions.length > 9)
+      )
+        return
 
       this.$store.dispatch('app/header/show', dashboardBannerData)
       Gleap.trackEvent('fall-incentive-program')
@@ -422,10 +424,12 @@ export default {
       handler: function(currentValue, prevValue) {
         if (
           Object.keys(currentValue[0]).length &&
-          currentValue[1] &&
+          Object.keys(currentValue[1]).length &&
           currentValue[2] &&
           !this.isSessionAlive &&
-          (!Object.keys(prevValue[0]).length || !prevValue[1] || !prevValue[2])
+          (!Object.keys(prevValue[0]).length ||
+            !Object.keys(prevValue[1]).length ||
+            !prevValue[2])
         )
           this.triggerIncentiveProgram()
         if (this.isPhoneNumberSubmissionModalActive)

@@ -15,7 +15,7 @@
         <div v-else-if="step === 1" class="incentive-enrollment-modal">
           <header>
             <h1 class="incentive-enrollment-modal__title">
-              Want to earn $5 a week this fall, just for having a session? 💸🎓
+              Want to earn $10 a week this fall, just for having a session? 💸🎓
             </h1>
             <p class="incentive-enrollment-modal__body">
               Provide your phone number to enroll in our Fall UPchieve
