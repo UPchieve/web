@@ -56,7 +56,7 @@ build_production:
             --creation-time now \
             --builder heroku/buildpacks:20 \
             --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
-            --buildpack heroku/nodejs \
+            --buildpack heroku/nodejs@1.1.7 \
             --buildpack heroku/procfile@0.6.2
     - docker push "$image_tagged"-production
   rules:
@@ -108,7 +108,7 @@ build_demo:
             --creation-time now \
             --builder heroku/buildpacks:20 \
             --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
-            --buildpack heroku/nodejs \
+            --buildpack heroku/nodejs@1.1.7 \
             --buildpack heroku/procfile@0.6.2
     - docker push "$image_tagged"-demo
   rules:
@@ -158,7 +158,7 @@ build_staging:
             --creation-time now \
             --builder heroku/buildpacks:20 \
             --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
-            --buildpack heroku/nodejs \
+            --buildpack heroku/nodejs@1.1.7 \
             --buildpack heroku/procfile@0.6.2
     - docker push "$image_tagged"-staging
   rules:
@@ -213,7 +213,7 @@ build_hackers:
             --creation-time now \
             --builder heroku/buildpacks:20 \
             --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
-            --buildpack heroku/nodejs \
+            --buildpack heroku/nodejs@1.1.7 \
             --buildpack heroku/procfile@0.6.2
     - docker push "$image_tagged"-hackers
   rules:
