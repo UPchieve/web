@@ -2,8 +2,8 @@
   <div class="header">
     <div class="header-message">
       <span
-        >UPchieve's Fall Challenge! You can earn $10 per week for having a
-        session</span
+        >Join UPchieve's Fall Challenge: You can earn $10 per week for having a
+        session!</span
       >
     </div>
     <a

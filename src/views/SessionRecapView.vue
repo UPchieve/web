@@ -208,7 +208,8 @@ export default {
       this.session = response.data.session
       this.isRecapDmsAvailable = response.data.isRecapDmsAvailable
       this.$store.dispatch('user/fetchRecapSessionForDms', this.session.id)
-      AnalyticsService.captureEvent(EVENTS.VOLUNTEER_OPENED_SESSION_RECAP)
+      if (this.user.isVolunteer)
+        AnalyticsService.captureEvent(EVENTS.VOLUNTEER_OPENED_SESSION_RECAP)
     } catch (error) {
       if (error.status === 403) this.$router.push('/dashboard')
     } finally {
