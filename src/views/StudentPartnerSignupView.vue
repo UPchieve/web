@@ -471,7 +471,7 @@ export default {
         lastName: '',
         schoolId: '',
         college: '',
-        signupSourceId: '',
+        signupSourceId: undefined,
         otherSignupSource: '',
       },
       errors: [],
