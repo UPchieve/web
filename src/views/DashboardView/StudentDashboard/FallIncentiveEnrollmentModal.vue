@@ -247,8 +247,9 @@ export default {
       this.loadingMessage = 'Sending a verification code. Please wait...'
 
       try {
-        await NetworkService.initiateFallIncentiveProgramEnrollment({
-          phone: this.phoneInput.e164,
+        await NetworkService.sendVerification({
+          sendTo: this.phoneInput.e164,
+          verificationMethod: VERIFICATION_METHOD.SMS,
         })
         this.step = 2
         this.error = ''
