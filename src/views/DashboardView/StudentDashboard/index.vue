@@ -168,7 +168,7 @@ export default {
     if (
       !this.showTellThemCollegePrepModal &&
       !this.showThemProcrastinationPreventionModal &&
-      !this.showFallIncentiveEnrollmentModali &&
+      !this.showFallIncentiveEnrollmentModal &&
       !!this.referralCopy &&
       (!localStorage.getItem('last-seen-referral-modal') ||
         moment(localStorage.getItem('last-seen-referral-modal')).isSameOrBefore(

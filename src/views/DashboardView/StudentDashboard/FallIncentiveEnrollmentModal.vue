@@ -160,7 +160,7 @@ import Loader from '@/components/Loader.vue'
 import UpdogHooray from '@/assets/updog-hooray.svg'
 
 export default {
-  name: 'incentive-enrollmentPreventionModal',
+  name: 'IncentiveEnrollmentPreventionModal',
   components: {
     Modal,
     LargeButton,
@@ -314,6 +314,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.incentive-enrollment {
+  // Ensure this is shown other overlapping modals
+  z-index: 1000;
+}
+
 .incentive-enrollment-modal {
   text-align: initial;
 
