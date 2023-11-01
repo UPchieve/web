@@ -1,35 +1,61 @@
-import posthog from 'posthog-js'
-import { EVENTS } from '../consts'
 import Gleap from 'gleap'
+import posthog from 'posthog-js'
+import config from '../config'
+import { EVENTS } from '../consts'
+import LoggerService from './LoggerService'
 
-const newrelic = window.newrelic
+class AnalyticsService {
+  static init() {
+    if (config.posthogToken) {
+      posthog.init(`${config.posthogToken}`, {
+        api_host: 'https://p.upchieve.org',
+        persistence: 'localStorage+cookie',
+        on_xhr_error: req => {
+          if (req?.status === 0)
+            LoggerService.noticeError(
+              new Error('Failed to fetch feature flags from PostHog.')
+            )
+          LoggerService.noticeError(
+            new Error(
+              `PostHog - Bad HTTP status: ${req?.status} ${req?.statusText}`
+            )
+          )
+        },
+      })
+    }
 
-export default {
-  identify(userId, properties) {
+    if (config.gleapSdkKey) {
+      Gleap.initialize(config.gleapSdkKey)
+      Gleap.getInstance().softReInitialize()
+      Gleap.on('close', () => {
+        this.captureEvent(EVENTS.GLEAP_CLOSED)
+      })
+    }
+  }
+
+  static identify(userId, properties) {
     posthog.identify(userId)
     Gleap.identify(userId, properties)
-    if (newrelic) newrelic.setUserId(userId)
     // Attaches custom data to the feedback submission
     Gleap.setCustomData('userType', properties.customData.userType)
-  },
+  }
 
-  updateUser(update) {
-    posthog.people.set(update)
-  },
+  static updateUser(update) {
+    posthog.setPersonProperties(update)
+  }
 
-  captureEvent(name, properties) {
+  static captureEvent(name, properties) {
     posthog.capture(name, properties)
-  },
+  }
 
   // unset any of the user's distinctive ids
-  reset() {
+  static reset() {
     posthog.reset()
     // TODO: does this clear identity stuff too?
     Gleap.clearCustomData()
-    if (newrelic) newrelic.setUserId(null)
-  },
+  }
 
-  registerVolunteer(volunteer) {
+  static registerVolunteer(volunteer) {
     const userProperties = {
       userType: 'volunteer',
     }
@@ -39,10 +65,10 @@ export default {
     this.captureEvent(EVENTS.ACCOUNT_CREATED, {
       event: EVENTS.ACCOUNT_CREATED,
     })
-  },
+  }
 
   // tracking the information from the feedback form
-  trackFeedback(feedbackComponent, isFakeUser) {
+  static trackFeedback(feedbackComponent, isFakeUser) {
     if (isFakeUser) return
 
     let aggResponses = []
@@ -75,10 +101,10 @@ export default {
       'volunteer score': volunteerScore,
       // can get answers to specific response using aggResponses
     })
-  },
+  }
 
   // tracks when a help session has ended
-  trackSessionEnded(context, currentSession, isFakeUser) {
+  static trackSessionEnded(context, currentSession, isFakeUser) {
     if (isFakeUser) return
 
     // calculating time-related session info (session length, wait time, etc.)
@@ -143,10 +169,16 @@ export default {
       'time ended': new Date(), // might be slightly off from the session's "endedAt"
       'successful session': successfulSession,
     })
-  },
+  }
 
   // tracks when a help session has started
-  trackSessionStarted(context, currentSession, topic, subTopic, isFakeUser) {
+  static trackSessionStarted(
+    context,
+    currentSession,
+    topic,
+    subTopic,
+    isFakeUser
+  ) {
     if (isFakeUser) return
 
     const user = context.$store.state.user.user
@@ -157,5 +189,64 @@ export default {
       'session subtopic': subTopic,
       'session id': currentSession.sessionId,
     })
-  },
+  }
 }
+
+class DevAnalyticsService {
+  static init() {
+    // eslint-disable-next-line no-console
+    console.info('AnalyticsService.init')
+  }
+
+  static identify(userId, properties) {
+    // eslint-disable-next-line no-console
+    console.info('AnalyticsService.identify', userId, properties)
+  }
+
+  static updateUser(update) {
+    // eslint-disable-next-line no-console
+    console.info('AnalyticsService.updateUser', update)
+  }
+
+  static captureEvent(name, properties) {
+    // eslint-disable-next-line no-console
+    console.info('AnalyticsService.captureEvent', name, properties)
+  }
+
+  static reset() {
+    // eslint-disable-next-line no-console
+    console.info('AnalyticsService.reset')
+  }
+
+  static registerVolunteer() {
+    // eslint-disable-next-line no-console
+    console.info('AnalyticsService.registerVolunteer')
+  }
+
+  static trackFeedback() {
+    // eslint-disable-next-line no-console
+    console.info('AnalyticsService.trackFeedback')
+  }
+
+  static trackSessionEnded() {
+    // eslint-disable-next-line no-console
+    console.info('AnalyticsService.trackSessionEnded')
+  }
+
+  static trackSessionStarted() {
+    // eslint-disable-next-line no-console
+    console.info('AnalyticsService.trackSessionStarted')
+  }
+}
+
+function getAnalyticsService() {
+  switch (config.nodeEnv) {
+    case 'development':
+      return DevAnalyticsService
+    default:
+      return AnalyticsService
+  }
+}
+
+const service = getAnalyticsService()
+export default service
