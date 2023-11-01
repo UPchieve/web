@@ -1,10 +1,6 @@
 <template>
   <div class="course">
     <div v-if="course" class="course__container">
-      <p class="course__progress" v-if="isAutoFlowProgressBarUser">
-        <span class="course__progress--step">Step 2 of 2:</span>
-        UPchieve 101 Training
-      </p>
       <div class="course__title">{{ course.name }}</div>
       <div class="course__description">{{ course.description }}</div>
       <div class="course__modules">
@@ -26,7 +22,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import NetworkService from '@/services/NetworkService'
 import Module from './Module'
 import QuizLink from './QuizLink'
@@ -55,9 +51,6 @@ export default {
   computed: {
     ...mapState({
       certifications: state => state.user.user.certifications,
-    }),
-    ...mapGetters({
-      isAutoFlowProgressBarUser: 'user/isAutoFlowProgressBarUser',
     }),
     quizCertification() {
       return this.certifications[this.course.quizKey]

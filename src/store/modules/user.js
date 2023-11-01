@@ -362,36 +362,9 @@ export default {
 
     isAutoFlowUser: (state, getters) => {
       return (
-        (!state.user.isOnboarded &&
-          getters.isVolunteer &&
-          !getters.hasCertification) ||
-        getters.isAutoFlowProgressBarUser ||
-        getters.isAutoFlowAvailabilityStepUser
-      )
-    },
-
-    isAutoFlowProgressBarUser: (state, getters, rootState, rootGetters) => {
-      return (
         !state.user.isOnboarded &&
         getters.isVolunteer &&
-        (!getters.hasCertification || !getters.passedUpchieve101) &&
-        // TODO: Remove in AutoFlowProgressBar feature flag removal
-        rootGetters['featureFlags/isAutoFlowProgressBarActive']
-      )
-    },
-
-    isAutoFlowAvailabilityStepUser: (
-      state,
-      getters,
-      rootState,
-      rootGetters
-    ) => {
-      return (
-        !state.user.isOnboarded &&
-        getters.isVolunteer &&
-        (!getters.hasCertification || !state.user.availabilityLastModifiedAt) &&
-        // TODO: Remove in AutoFlowTwoStepAvailability feature flag removal
-        rootGetters['featureFlags/isAutoFlowAvailabilityStepActive']
+        !getters.hasCertification
       )
     },
 
@@ -400,8 +373,6 @@ export default {
         !state.user.isOnboarded &&
         getters.isVolunteer &&
         !getters.hasCertification &&
-        // Target those not in the 2-step auto flow
-        !rootGetters['featureFlags/isAutoFlowAvailabilityStepActive'] &&
         rootGetters['featureFlags/isQuizStudyMaterialsActive']
       )
     },

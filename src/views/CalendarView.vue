@@ -1,10 +1,6 @@
 <template>
   <div class="calendar-container">
     <div class="calendar">
-      <p class="calendar__progress" v-if="isAutoFlowAvailabilityStepUser">
-        <span class="calendar__progress--step">Step 2 of 2:</span>
-        Schedule a time slot!
-      </p>
       <div class="header">
         <div class="instructions-container">
           <div class="header-title">Tell us when to text you!</div>
@@ -18,12 +14,6 @@
             availability below. You're not obligated to tutor every time we text
             you, but try and select times you're likely to want to help a
             student.
-            <span
-              v-if="isAutoFlowAvailabilityStepUser"
-              class="instructions-set-up"
-              >To set up your account, please select at least 1 hour a week to
-              receive text messages.</span
-            >
           </p>
         </div>
         <div class="save-container">
@@ -63,7 +53,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 
 import _ from 'lodash'
 import moment from 'moment-timezone'
@@ -97,9 +87,6 @@ export default {
   computed: {
     ...mapState({
       user: state => state.user.user,
-    }),
-    ...mapGetters({
-      isAutoFlowAvailabilityStepUser: 'user/isAutoFlowAvailabilityStepUser',
     }),
     saveButtonClass() {
       return ['save-button', 'save-button--' + this.saveState]

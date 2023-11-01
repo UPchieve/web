@@ -294,8 +294,7 @@ const routes = [
     component: CalendarView,
     meta: { protected: true },
     beforeEnter: (to, from, next) => {
-      if (store.getters['user/isAutoFlowAvailabilityStepUser']) next()
-      else if (store.getters['user/isAutoFlowUser']) next('/welcome')
+      if (store.getters['user/isAutoFlowUser']) next('/welcome')
       else next()
     },
   },
