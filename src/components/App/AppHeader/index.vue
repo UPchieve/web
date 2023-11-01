@@ -13,7 +13,6 @@ import RejoinSessionHeader from './RejoinSessionHeader.vue'
 import WaitingPeriodHeader from './WaitingPeriodHeader.vue'
 import BannedHeader from './BannedHeader.vue'
 import DashboardBannerHeader from './DashboardBannerHeader.vue'
-import EarnCertificationsHeader from './EarnCertificationsHeader.vue'
 
 export default {
   name: 'app-header',
@@ -25,7 +24,6 @@ export default {
     WaitingPeriodHeader,
     BannedHeader,
     DashboardBannerHeader,
-    EarnCertificationsHeader,
   },
   computed: {
     ...mapState({

@@ -21,10 +21,6 @@
       </div>
     </div>
 
-    <level-system-removal-modal
-      v-if="isLevelSystemRemovalModalActive"
-      class="level-system"
-    />
     <tell-them-college-prep-modal
       v-if="isJustTellThemActive && showTellThemCollegePrepModal"
       :closeModal="toggleTellThemCollegePrepModal"
@@ -59,7 +55,6 @@ import ProcrastinationPreventionModal from './ProcrastinationPreventionModal.vue
 import PhoneNumberSubmissionModal from './PhoneNumberSubmissionModal.vue'
 import FallIncentiveEnrollmentModal from './FallIncentiveEnrollmentModal.vue'
 import moment from 'moment-timezone'
-import LevelSystemRemovalModal from './LevelSystemRemovalModal.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 import { EVENTS } from '@/consts'
@@ -79,10 +74,6 @@ const bannedHeaderData = {
   component: 'BannedHeader',
 }
 
-const earnCertificationsHeaderData = {
-  component: 'EarnCertificationsHeader',
-}
-
 // TODO: abstract this banner out more to allow for dynamic targeting
 const dashboardBannerData = {
   component: 'DashboardBannerHeader',
@@ -94,16 +85,12 @@ export default {
     DashboardBanner,
     SubjectSelection,
     FirstSessionCongratsModal,
-    LevelSystemRemovalModal,
     TellThemCollegePrepModal,
     ProcrastinationPreventionModal,
     PhoneNumberSubmissionModal,
     FallIncentiveEnrollmentModal,
   },
   async created() {
-    if (this.isEarnCertificationsActive)
-      this.$store.dispatch('app/header/show', earnCertificationsHeaderData)
-
     if (this.isSessionAlive) {
       this.$store.dispatch('app/header/show', activeHeaderData)
     } else if (this.isDashboardBannerActive) this.triggerIncentiveProgram()
@@ -162,8 +149,6 @@ export default {
     this.currentHour = moment()
       .tz('America/New_York')
       .hour()
-
-    if (this.isGleapBotExperimentActive) this.showGleapBot()
 
     if (
       !this.showTellThemCollegePrepModal &&
@@ -233,15 +218,11 @@ export default {
       isSessionAlive: 'user/isSessionAlive',
       isReferFriendsActive: 'featureFlags/isReferFriendsActive',
       downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
-      isEarnCertificationsActive: 'featureFlags/isEarnCertificationsActive',
-      isLevelSystemActive: 'featureFlags/isLevelSystemActive',
-      isOrbitalActive: 'featureFlags/isOrbitalActive',
       orbitalSegments: 'featureFlags/orbitalSegments',
       isOrbitalSegmentsActive: 'featureFlags/isOrbitalSegmentsActive',
       isJustTellThemActive: 'featureFlags/isJustTellThemActive',
       isProcrastinationPreventionActive:
         'featureFlags/isProcrastinationPreventionActive',
-      isGleapBotExperimentActive: 'featureFlags/isGleapBotExperimentActive',
       isDashboardBannerActive: 'featureFlags/isDashboardBannerActive',
       isFallIncentiveEnrollmentActive:
         'featureFlags/isFallIncentiveEnrollmentActive',
@@ -269,12 +250,6 @@ export default {
         this.user.pastSessions.length === 1 &&
         !localStorage.getItem('viewedFirstSessionCongratsModal')
       )
-    },
-    isLevelSystemRemovalModalActive() {
-      const seenLevelSystemRemovalModal = getCookie(
-        'hasSeenLevelSystemRemovalModal'
-      )
-      return this.isLevelSystemActive && !seenLevelSystemRemovalModal
     },
     userAndOrbitalSegment() {
       return [this.user, this.orbitalSegments, this.isOrbitalSegmentsActive]
@@ -359,24 +334,6 @@ export default {
         this.$store.dispatch('app/header/show', activeHeaderData)
       }
     },
-    isEarnCertificationsActive(currentValue, prevValue) {
-      if (
-        currentValue &&
-        !prevValue &&
-        // ensure no other dashboard headers are shown
-        ((this.user && !this.user.isBanned) || !this.sessionAlive)
-      ) {
-        this.$store.dispatch('app/header/show', earnCertificationsHeaderData)
-        AnalyticsService.captureEvent(
-          EVENTS.FLAGGED_AS_EARN_CERTIFICATIONS_STUDENT
-        )
-      }
-    },
-    isLevelSystemActive(currentValue, prevValue) {
-      if (currentValue && !prevValue) {
-        AnalyticsService.captureEvent(EVENTS.FLAGGED_AS_LEVEL_SYSTEM_STUDENT)
-      }
-    },
     isCollegePrepAdActive(currentValue, prevValue) {
       if (
         currentValue[0] &&
@@ -398,9 +355,6 @@ export default {
       ) {
         this.showThemProcrastinationPreventionModal = true
       }
-    },
-    isGleapBotExperimentActive(currentValue, prevValue) {
-      if (currentValue && !prevValue) this.showGleapBot()
     },
     userAndOrbitalSegment: {
       handler: function(currentValue, prevValue) {
@@ -510,31 +464,6 @@ export default {
     }
   }
 }
-
-.level-system {
-  // Add 20px because of the margin-bottom from the dashboard banner
-  margin-top: calc(1em + 20px);
-  // margin-bottom here for the same reason it's on the dashboard banner
-  margin-bottom: -20px;
-  width: 100%;
-
-  @include breakpoint-between(1050px, 1430px) {
-    width: 48%;
-  }
-
-  @include breakpoint-between(1430px, 1809px) {
-    width: 31.5%;
-  }
-
-  @include breakpoint-between(1430px, 1809px) {
-    width: 31.5%;
-  }
-
-  @include breakpoint-above('massive') {
-    width: 400px;
-  }
-}
-
 .share-upchieve-notice {
   @include flex-container(column);
   background-color: #fff;

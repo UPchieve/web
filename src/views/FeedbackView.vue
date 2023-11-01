@@ -23,38 +23,6 @@
       </template>
 
       <template v-else>
-        <div
-          v-if="isStudentCoachReachOutActive && !user.isVolunteer"
-          class="student-reach-out-container"
-        >
-          <div v-if="hasSentStudentMessage">
-            Sent!
-          </div>
-          <div v-else>
-            <h2 class="question__section-header">
-              Need to reach out to your coach?
-            </h2>
-            <p class="italic">
-              Send your coach a message and they'll get back to you. The
-              UPchieve team monitors messages, let's keep them safe and
-              respectful!
-            </p>
-            <textarea
-              class="student-coach-message"
-              @input="responseText => updateStudentMessageToCoach(responseText)"
-              v-model="studentMessage"
-            >
-            </textarea>
-            <large-button
-              @click.native="sendStudentMessageToCoach"
-              primary
-              :disabled="!studentMessage"
-              class="primary-button"
-              >Send</large-button
-            >
-          </div>
-        </div>
-
         <ul class="feedback__questions-list">
           <div>
             <li
@@ -254,7 +222,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import NetworkService from '@/services/NetworkService'
 import LargeButton from '@/components/LargeButton.vue'
 import moment from 'moment'
@@ -292,18 +260,12 @@ export default {
       allQuestions: [],
       error: '',
       userResponse: {},
-      hasSentStudentMessage: false,
-      hasTypedMessage: false,
-      studentMessage: '',
     }
   },
   computed: {
     ...mapState({
       user: state => state.user.user,
       subjects: state => state.subjects.subjects,
-    }),
-    ...mapGetters({
-      isStudentCoachReachOutActive: 'featureFlags/isStudentCoachReachOutActive',
     }),
     sessionPartnerFirstName() {
       return this.user.isVolunteer
@@ -723,23 +685,6 @@ export default {
         }),
       }
       this.userResponse = Object.assign({}, this.userResponse, responseAnswer)
-    },
-    updateStudentMessageToCoach() {
-      if (!this.hasTypedMessage) {
-        this.hasTypedMessage = true
-        AnalyticsService.captureEvent(
-          EVENTS.STUDENT_TYPED_IN_COACH_REACH_OUT_TEXT_BOX
-        )
-      }
-    },
-    sendStudentMessageToCoach() {
-      AnalyticsService.captureEvent(
-        EVENTS.STUDENT_SENT_COACH_REACH_OUT_MESSAGE,
-        {
-          message: this.studentMessage,
-        }
-      )
-      this.hasSentStudentMessage = true
     },
   },
 }

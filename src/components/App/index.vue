@@ -51,7 +51,6 @@ import LargeButton from '@/components/LargeButton.vue'
 import Gleap from 'gleap'
 import LoggerService from '@/services/LoggerService'
 import posthog from 'posthog-js'
-import { EVENTS } from '@/consts'
 
 export default {
   name: 'App',
@@ -224,8 +223,6 @@ export default {
       isVolunteer: 'user/isVolunteer',
       mobileMode: 'app/mobileMode',
       isAutoFlowUser: 'user/isAutoFlowUser',
-      isAutoFlowAvailabilityStepUser: 'user/isAutoFlowAvailabilityStepUser',
-      isAutoFlowProgressBarUser: 'user/isAutoFlowProgressBarUser',
       getUserPropsForAnalytics: 'user/getUserPropsForAnalytics',
     }),
   },
@@ -292,22 +289,6 @@ export default {
     },
     isAutoFlowUser(currentValue, prevValue) {
       if (currentValue && !prevValue) this.$router.push('/welcome')
-    },
-    isAutoFlowProgressBarUser(currentValue, prevValue) {
-      if (currentValue && !prevValue) {
-        AnalyticsService.captureEvent(
-          EVENTS.FLAGGED_AS_AUTO_FLOW_STEP_TWO_PROGRESS_BAR,
-          {
-            event: EVENTS.FLAGGED_AS_AUTO_FLOW_STEP_TWO_PROGRESS_BAR,
-          }
-        )
-      }
-    },
-    isAutoFlowAvailabilityStepUser(currentValue, prevValue) {
-      if (currentValue && !prevValue)
-        AnalyticsService.captureEvent(
-          EVENTS.FLAGGED_AS_AUTO_FLOW_STEP_TWO_AVAILBILITY_STEP
-        )
     },
     session(currentValue, prevValue) {
       const hadASession = !currentValue.id && prevValue.id

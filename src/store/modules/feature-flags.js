@@ -55,22 +55,15 @@ export default {
       [UNLEASH_FEATURE_FLAGS.CHATBOT]: false,
       [POSTHOG_FEATURE_FLAGS.DASHBOARD_BANNER]: false,
       [POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS]: false,
-      [POSTHOG_FEATURE_FLAGS.IMAGES_IN_DOCUMENTS]: false,
-      [POSTHOG_FEATURE_FLAGS.AUTO_FLOW_PROGRESS_BAR]: false,
-      [POSTHOG_FEATURE_FLAGS.FLAG_PERSON_PROPERTIES]: false,
       [POSTHOG_FEATURE_FLAGS.POLL_FLAGS]: false,
       [POSTHOG_FEATURE_FLAGS.QUIZ_STUDY_MATERIALS]: false,
-      [POSTHOG_FEATURE_FLAGS.UPDATED_AUTO_FLOW_QUIZ_UX]: false,
-      [POSTHOG_FEATURE_FLAGS.ORBITAL]: false,
       [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: false,
-      [POSTHOG_FEATURE_FLAGS.GLEAP_BOT_EXPERIMENT]: false,
       [POSTHOG_FEATURE_FLAGS.STUDENT_COACH_REACH_OUT]: false,
       [POSTHOG_FEATURE_FLAGS.PROCRASTINATION_PREVENTION]: false,
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_ENROLLMENT]: false,
       [POSTHOG_FEATURE_FLAGS.TUTOR_SESSION_HISTORY]: false,
       [POSTHOG_FEATURE_FLAGS.SESSION_RECAP_DMS]: false,
       // This is an experiment, using multivariant feature flag values
-      [POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS_AND_LEVEL_SYSTEM]: '',
       [POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO]: true,
       [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: 'control',
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -135,9 +128,8 @@ export default {
         }
       })
     },
-    async setPersonPropertiesForFlags({ getters }, props) {
-      if (getters.isFlagPersonPropertiesActive)
-        posthog.setPersonPropertiesForFlags(props)
+    async setPersonPropertiesForFlags(actionData, props) {
+      posthog.setPersonPropertiesForFlags(props)
     },
   },
   getters: {
@@ -150,30 +142,12 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.DASHBOARD_BANNER],
     isFilterActiveSubjectsActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS],
-    isImagesInDocumentsActive: state =>
-      state.flags[POSTHOG_FEATURE_FLAGS.IMAGES_IN_DOCUMENTS],
     isOptionalMiddleSchoolActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.OPTIONAL_MIDDLE_SCHOOL],
-    isAutoFlowProgressBarActive: state =>
-      state.flags[POSTHOG_FEATURE_FLAGS.AUTO_FLOW_PROGRESS_BAR],
-    isFlagPersonPropertiesActive: state =>
-      state.flags[POSTHOG_FEATURE_FLAGS.FLAG_PERSON_PROPERTIES],
     isPollingFlagsActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.POLL_FLAGS],
-    isAutoFlowAvailabilityStepActive: state =>
-      state.flags[POSTHOG_FEATURE_FLAGS.AUTO_FLOW_TWO_STEP_AVAILABILITY],
     isQuizStudyMaterialsActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.QUIZ_STUDY_MATERIALS],
-    isUpdatedAutoFlowQuizUxActive: state =>
-      state.flags[POSTHOG_FEATURE_FLAGS.UPDATED_AUTO_FLOW_QUIZ_UX],
-    isEarnCertificationsActive: state =>
-      state.flags[
-        POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS_AND_LEVEL_SYSTEM
-      ] === POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS,
-    isLevelSystemActive: state =>
-      state.flags[
-        POSTHOG_FEATURE_FLAGS.EARN_CERTIFICATIONS_AND_LEVEL_SYSTEM
-      ] === POSTHOG_FEATURE_FLAGS.LEVEL_SYSTEM,
     offerGoogleSSO: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO],
     orbitalSegments: state =>
@@ -194,14 +168,10 @@ export default {
       state.flagPayloads[POSTHOG_FEATURE_FLAGS.SUBJECT_REQUEST_ROLLOUT] ?? [],
     quizRollout: state =>
       state.flagPayloads[POSTHOG_FEATURE_FLAGS.QUIZ_ROLLOUT] ?? [],
-    isGleapBotExperimentActive: state =>
-      state.flags[POSTHOG_FEATURE_FLAGS.GLEAP_BOT_EXPERIMENT],
     gleapSegmentExperiments: state =>
       state.flagPayloads[POSTHOG_FEATURE_FLAGS.GLEAP_SEGMENT_EXPERIMENTS] ?? [],
     isGleapSegmentExperimentsActive: (state, getters) =>
       getters.gleapSegmentExperiments.length > 0,
-    isStudentCoachReachOutActive: state =>
-      state.flags[POSTHOG_FEATURE_FLAGS.STUDENT_COACH_REACH_OUT],
     ccIntroCopy: state => state.flags[POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY],
     isProcrastinationPreventionActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.PROCRASTINATION_PREVENTION],

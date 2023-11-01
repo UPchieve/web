@@ -33,7 +33,7 @@
         {{ leftBtn.text }}
       </large-button>
       <large-button
-        v-if="!isUpdatedAutoFlowQuizUxActive && !quizResults.passed"
+        v-if="!isFirstQuiz && !quizResults.passed"
         :showArrow="false"
         @click.native="middleBtn.handleClick"
         class="btn"
@@ -63,7 +63,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import Case from 'case'
 import LargeButton from '@/components/LargeButton.vue'
 
@@ -98,18 +98,17 @@ export default {
     if (this.quizResults.passed) {
       this.headerMsg = 'What a rockstar! You passed!'
 
-      this.instructionMsg =
-        this.isFirstQuiz && this.isUpdatedAutoFlowQuizUxActive
-          ? `Once you finish setting up your account on your dashboard, you'll be notified of student requests for help in this subject. If you want to help students with even more subjects, just pass more quizzes located in the "Training" tab.`
-          : isTrainingSubject
-          ? "Now that you have this certification, you're one step closer to being able to help students!"
-          : "Now that you have this certification, you'll be notified of student requests for help in this subject. If you want to help students with even more subjects, just pass more quizzes!"
+      this.instructionMsg = this.isFirstQuiz
+        ? `Once you finish setting up your account on your dashboard, you'll be notified of student requests for help in this subject. If you want to help students with even more subjects, just pass more quizzes located in the "Training" tab.`
+        : isTrainingSubject
+        ? "Now that you have this certification, you're one step closer to being able to help students!"
+        : "Now that you have this certification, you'll be notified of student requests for help in this subject. If you want to help students with even more subjects, just pass more quizzes!"
       this.leftBtn = { text: 'Review answers', handleClick: this.showReview }
       this.rightBtn = {
         text: 'Take another quiz',
         route: '/training',
       }
-      if (this.isFirstQuiz && this.isUpdatedAutoFlowQuizUxActive)
+      if (this.isFirstQuiz)
         this.rightBtn = {
           text: 'Go to Dashboard',
           route: '/dashboard',
@@ -126,7 +125,7 @@ export default {
           : `/training/review/${Case.kebab(this.category)}`,
       }
       this.middleBtn = { text: 'Review answers', handleClick: this.showReview }
-      if (this.isUpdatedAutoFlowQuizUxActive)
+      if (this.isFirstQuiz)
         this.rightBtn = { text: 'Review answers', handleClick: this.showReview }
       else this.rightBtn = { text: 'Retake quiz', handleClick: this.reloadQuiz }
     }
@@ -143,10 +142,6 @@ export default {
       subjects: state => state.subjects.subjects,
       training: state => state.subjects.training,
       user: state => state.user.user,
-    }),
-    ...mapGetters({
-      isUpdatedAutoFlowQuizUxActive:
-        'featureFlags/isUpdatedAutoFlowQuizUxActive',
     }),
   },
 }

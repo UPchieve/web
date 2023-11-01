@@ -59,7 +59,6 @@ export default {
     }),
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',
-      isImagesInDocumentsActive: 'featureFlags/isImagesInDocumentsActive',
     }),
   },
   mounted() {
@@ -70,9 +69,8 @@ export default {
       [{ list: 'ordered' }, { list: 'bullet' }],
     ]
 
-    if (!this.isVolunteer && this.isImagesInDocumentsActive) {
-      toolbar.push(['image'])
-    }
+    if (!this.isVolunteer) toolbar.push(['image'])
+
     this.quillEditor = new Quill('#quill-container', {
       placeholder: 'Type or paste something...',
       theme: 'snow',
@@ -119,7 +117,7 @@ export default {
       false
     )
 
-    if (this.isVolunteer && this.isImagesInDocumentsActive) {
+    if (this.isVolunteer) {
       const useHandler = () => {
         const delta = new Delta()
         return delta.insert('')
