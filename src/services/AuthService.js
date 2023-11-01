@@ -1,8 +1,9 @@
 import Validator from 'validator'
 import errorFromHttpResponse from '../utils/error-from-http-response'
 import AnalyticsService from './AnalyticsService'
-import ProductDiscoveryService from './ProductDiscoveryService'
+import LoggerService from './LoggerService'
 import NetworkService from './NetworkService'
+import ProductDiscoveryService from './ProductDiscoveryService'
 
 export default {
   login(creds) {
@@ -153,6 +154,7 @@ export default {
         })
         .finally(() => {
           AnalyticsService.reset()
+          LoggerService.reset()
           ProductDiscoveryService.reset()
 
           // disconnect socket

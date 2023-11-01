@@ -33,7 +33,6 @@
 </template>
 
 <script>
-import * as Sentry from '@sentry/browser'
 import { mapState, mapGetters } from 'vuex'
 import { crono } from 'vue-crono'
 import '@/scss/main.scss'
@@ -46,10 +45,10 @@ import PortalService from '@/services/PortalService'
 import getOperatingSystem from '@/utils/get-operating-system'
 import isOutdatedMobileAppVersion from '@/utils/is-outdated-mobile-app-version'
 import AnalyticsService from '@/services/AnalyticsService'
+import LoggerService from '@/services/LoggerService'
 import config from '@/config'
 import LargeButton from '@/components/LargeButton.vue'
 import Gleap from 'gleap'
-import LoggerService from '@/services/LoggerService'
 import posthog from 'posthog-js'
 
 export default {
@@ -236,7 +235,6 @@ export default {
     user(currentUserValue, previousUserValue) {
       const nowLoggedIn = currentUserValue._id && !previousUserValue._id
       if (nowLoggedIn) {
-        Sentry.setUser({ id: currentUserValue._id })
         const userProps = this.getUserPropsForAnalytics
         this.$store.dispatch(
           'featureFlags/setPersonPropertiesForFlags',
@@ -251,6 +249,7 @@ export default {
           customData: userProps,
         })
         AnalyticsService.updateUser(userProps)
+        LoggerService.identify(currentUserValue._id)
 
         if (this.mobileMode && !this.isMobileApp && !this.isVolunteer) {
           this.$store.dispatch('app/banner/show', {

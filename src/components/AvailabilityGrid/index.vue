@@ -1,7 +1,11 @@
 <template>
   <div class="AvailabilityGrid">
     <div class="Column">
-      <Cell class="Top Left TopLeft" :selectable="false" content="(Start Times)" />
+      <Cell
+        class="Top Left TopLeft"
+        :selectable="false"
+        content="(Start Times)"
+      />
       <Cell
         v-for="(value, hour) in timeRange"
         class="Left"
@@ -113,5 +117,4 @@ export default {
   font-style: italic;
   align-items: end;
 }
-
 </style>

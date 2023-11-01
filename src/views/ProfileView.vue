@@ -89,7 +89,10 @@
                 @update="onPhoneInputUpdate"
               />
 
-              <div v-if="shouldSeeSmsConsentCheckbox" data-testid="sms-consent-checkbox">
+              <div
+                v-if="shouldSeeSmsConsentCheckbox"
+                data-testid="sms-consent-checkbox"
+              >
                 <input
                   type="checkbox"
                   :disabled="!activeEdit"
@@ -430,8 +433,7 @@ export default {
             this.$store
               .dispatch('user/addToUser', {
                 phone: reqBody.phone ?? this.user.phone,
-                isDeactivated:
-                  reqBody.isDeactivated ?? !this.isAccountActive,
+                isDeactivated: reqBody.isDeactivated ?? !this.isAccountActive,
                 smsConsent: reqBody.smsConsent ?? this.user.smsConsent,
               })
               .then(() => {
@@ -459,7 +461,10 @@ export default {
       // When OFF, volunteers edit their phone number through this UpdateProfile API
       // When ON, students can send smsConsent field on this API
       if (this.isEditProfilePhoneNumberActive) {
-        if (!this.user.isVolunteer && this.smsConsent !== this.user.smsConsent) {
+        if (
+          !this.user.isVolunteer &&
+          this.smsConsent !== this.user.smsConsent
+        ) {
           reqBody.smsConsent = this.smsConsent
         }
       } else {

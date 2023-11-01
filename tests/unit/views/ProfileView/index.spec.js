@@ -112,9 +112,9 @@ describe('ProfileView', () => {
             isVolunteer,
           },
         })
-        expect(wrapper.find('[data-testid="deactivate-account-toggle"]').exists()).toEqual(
-          isVolunteer
-        )
+        expect(
+          wrapper.find('[data-testid="deactivate-account-toggle"]').exists()
+        ).toEqual(isVolunteer)
       }
     )
   })
@@ -151,7 +151,9 @@ describe('ProfileView', () => {
             },
           },
         })
-        expect(!!wrapper.find('[data-testid="sms-consent-checkbox"]').exists()).toEqual(expected)
+        expect(
+          !!wrapper.find('[data-testid="sms-consent-checkbox"]').exists()
+        ).toEqual(expected)
       }
     )
 
@@ -166,7 +168,9 @@ describe('ProfileView', () => {
       await clickEditSaveButton(wrapper)
 
       // Expect modal to pop open
-      expect(wrapper.find('[data-testid="sms-verification-modal"]').exists()).toBeFalsy()
+      expect(
+        wrapper.find('[data-testid="sms-verification-modal"]').exists()
+      ).toBeFalsy()
     })
   })
 })
