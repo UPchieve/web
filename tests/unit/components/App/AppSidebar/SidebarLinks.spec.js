@@ -20,6 +20,10 @@ const FAVORITE_COACHES_LINK = {
   to: '/favorite-coaches',
   text: 'Favorite Coaches',
 }
+const REFERRAL_MODAL = {
+  onClick: () => {},
+  text: 'Refer a Friend',
+}
 const LEGAL_LINK = {
   to: '/legal',
   text: 'Legal policy',
@@ -48,6 +52,7 @@ const links = {
       SESSION_HISTORY_LINK,
       FAVORITE_COACHES_LINK,
       PROFILE_LINK,
+      REFERRAL_MODAL,
       CONTACT_LINK,
       LEGAL_LINK,
     ],

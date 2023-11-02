@@ -3,28 +3,28 @@
     <p v-if="hasWaitingPeriod" class="waiting-period">
       {{ waitingPeriodMessage }}
     </p>
-    <h2 v-if="mobileMode">
-      Explore our subjects
+    <h2>
+      Choose from all of our available subjects!
     </h2>
     <loader v-if="isFetchingSubjects" class="loader--center" />
     <p v-else-if="fetchingSubjectsError" class="error">
       We had trouble loading the list of subjects. Please try refreshing the
       page.
     </p>
-    <subject-card
-      v-else
-      v-for="(card, index) in cards"
-      v-bind:key="index"
-      :title="card.title"
-      :subtitle="card.subtitle"
-      :svg="card.svg"
-      :topic="card.topic"
-      :subtopics="card.subtopics"
-      :subtopicDisplayNames="card.subtopicDisplayNames"
-      :button-text="card.buttonText"
-      :routeTo="card.routeTo"
-      :disableSubjectCard="isCardDisabled(card)"
-    />
+    <div v-else class="cards">
+      <subject-card
+        v-for="(card, index) in cards"
+        v-bind:key="index"
+        :title="card.title"
+        :subtitle="card.subtitle"
+        :svg="card.svg"
+        :topic="card.topic"
+        :subtopics="card.subtopics"
+        :subtopicDisplayNames="card.subtopicDisplayNames"
+        :routeTo="card.routeTo"
+        :isDisabled="isCardDisabled()"
+      />
+    </div>
   </div>
 </template>
 
@@ -32,8 +32,6 @@
 import { mapState, mapGetters } from 'vuex'
 import SubjectCard from './SubjectCard.vue'
 import calculateWaitingPeriodCountdown from '@/utils/calculate-waiting-period-countdown'
-import ReferralSVG from '@/assets/dashboard_icons/student/referral.svg'
-import LightBulbSVG from '@/assets/dashboard_icons/student/light-bulb.svg'
 import Loader from '@/components/Loader.vue'
 
 const defaultHeaderData = {
@@ -60,6 +58,7 @@ export default {
       subjects: state => state.subjects.subjects,
       isFetchingSubjects: state => state.subjects.isFetchingSubjects,
       fetchingSubjectsError: state => state.subjects.fetchingSubjectsError,
+      user: state => state.user.user,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -88,22 +87,6 @@ export default {
             }
           })
           .sort((a, b) => a.order - b.order)
-
-      cards.push({
-        title: 'Give Feedback',
-        subtitle:
-          'Help us improve by telling us what new subjects and features you want!',
-        svg: LightBulbSVG,
-        buttonText: 'Give feedback',
-        routeTo: '/contact',
-      })
-
-      cards.push({
-        title: 'Invite Your Friends',
-        subtitle: 'Share UPchieve with a friend!',
-        svg: ReferralSVG,
-        buttonText: 'Learn More',
-      })
       return cards
     },
   },
@@ -164,9 +147,9 @@ export default {
         this.hasWaitingPeriod = false
       }
     },
-    isCardDisabled(card) {
+    isCardDisabled() {
       return (
-        card.isTutoringCard && (this.disableSubjectCard || this.isSessionAlive)
+        this.disableSubjectCard || this.isSessionAlive || this.user.isBanned
       )
     },
   },
@@ -185,12 +168,20 @@ export default {
     padding: 0;
     text-align: left;
   }
+}
 
-  @include breakpoint-above('medium') {
-    @include child-spacing(top, 0);
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-    gap: 40px;
+.cards {
+  column-gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  row-gap: 16px;
+
+  @include breakpoint-below('huge') {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include breakpoint-below('small') {
+    grid-template-columns: repeat(1, 1fr);
   }
 }
 
