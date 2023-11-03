@@ -73,13 +73,12 @@
                 </span>
               </div>
               <div class="session-list__session-recap">
-                <a :href="sessionRecapURL(session.id)">
-                  <large-button
-                    primary
-                    class="session-list__session-recap__button"
-                    >Session Recap</large-button
-                  >
-                </a>
+                <large-button
+                  primary
+                  class="session-list__session-recap__button"
+                  @click.native="routeToSessionRecap(session.id)"
+                  >Session Recap</large-button
+                >
               </div>
             </div>
             <div class="border--thin" v-if="index !== 5"></div>
@@ -167,9 +166,10 @@
                     {{ getSessionTimeForMobile(session.createdAt) }}</span
                   >
                 </div>
-                <a :href="sessionRecapURL(session.id)">
-                  <caret-icon class="caret--next" />
-                </a>
+                <caret-icon
+                  class="caret--next"
+                  @click="routeToSessionRecap(session.id)"
+                />
               </div>
               <div class="border--thin" v-if="index !== 5"></div>
             </li>
@@ -314,8 +314,8 @@ export default {
             : session.isFavorited,
       }))
     },
-    sessionRecapURL(sessionId) {
-      return `${sessionId}/recap`
+    routeToSessionRecap(sessionId) {
+      this.$router.push(`/sessions/${sessionId}/recap`)
     },
   },
   async created() {

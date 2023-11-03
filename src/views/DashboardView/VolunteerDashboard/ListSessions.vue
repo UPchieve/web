@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import sendWebNotification from '@/utils/send-web-notification'
 import Case from 'case'
 
@@ -63,16 +63,17 @@ export default {
         })
       },
     }),
+    ...mapGetters({
+      isRecapSocketUpdatesActive: 'featureFlags/isRecapSocketUpdatesActive',
+    }),
   },
   mounted() {
     this.isInitialMount = true
-
-    // reconnect socket if it isn't already
-    if (!this.$socket.connected) {
+    if (this.isRecapSocketUpdatesActive || this.$socket.connected)
+      this.emitList()
+    else if (!this.$socket.connected) {
       this.$socket.connect()
       this.$socket.on('connect', this.emitList)
-    } else {
-      this.emitList()
     }
   },
   beforeDestroy() {

@@ -63,6 +63,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_ENROLLMENT]: false,
       [POSTHOG_FEATURE_FLAGS.TUTOR_SESSION_HISTORY]: false,
       [POSTHOG_FEATURE_FLAGS.SESSION_RECAP_DMS]: false,
+      [POSTHOG_FEATURE_FLAGS.RECAP_SOCKET_UPDATES]: false,
       // This is an experiment, using multivariant feature flag values
       [POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO]: true,
       [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: 'control',
@@ -184,5 +185,7 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.EDIT_PROFILE_PHONE_NUMBER],
     isSessionRecapDmsActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.SESSION_RECAP_DMS],
+    isRecapSocketUpdatesActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.RECAP_SOCKET_UPDATES],
   },
 }

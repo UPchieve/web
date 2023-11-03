@@ -24,6 +24,7 @@ export default {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
       sessionPath: 'user/sessionPath',
+      isRecapSocketUpdatesActive: 'featureFlags/isRecapSocketUpdatesActive',
     }),
   },
   watch: {
@@ -37,7 +38,7 @@ export default {
       sessionUtils.rejoinSession(this.$router, this.sessionPath)
     },
     end() {
-      sessionUtils.endSession(this)
+      sessionUtils.endSession(this, this.isRecapSocketUpdatesActive)
     },
   },
 }

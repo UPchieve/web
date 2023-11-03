@@ -572,6 +572,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   EDIT_PROFILE_PHONE_NUMBER: 'edit-profile-phone-number',
   TUTOR_SESSION_HISTORY: 'tutor-session-history',
   SESSION_RECAP_DMS: 'session-recap-dms',
+  RECAP_SOCKET_UPDATES: 'recap-socket-updates',
 }
 
 export const ANALYTICS_REPORT_ROW = {

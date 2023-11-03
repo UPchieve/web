@@ -151,7 +151,7 @@ export default {
     }
   },
   beforeDestroy() {
-    this.$socket.disconnect()
+    if (!this.isRecapSocketUpdatesActive) this.$socket.disconnect()
   },
   computed: {
     ...mapState({
@@ -166,6 +166,7 @@ export default {
       isSessionOver: 'user/isSessionOver',
       isChatbotActive: 'featureFlags/isChatbotActive',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
+      isRecapSocketUpdatesActive: 'featureFlags/isRecapSocketUpdatesActive',
     }),
 
     partnerAvatar() {

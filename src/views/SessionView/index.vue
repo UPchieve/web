@@ -218,6 +218,7 @@ export default {
       isSessionOver: 'user/isSessionOver',
       isSessionAlive: 'user/isSessionAlive',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
+      isRecapSocketUpdatesActive: 'featureFlags/isRecapSocketUpdatesActive',
     }),
 
     auxiliaryType() {
@@ -325,7 +326,8 @@ export default {
           this.$store.dispatch('user/fetchUser')
         }
 
-        if (!this.$socket.connected) await this.$socket.connect()
+        if (!this.$socket.connected && !this.isRecapSocketUpdatesActive)
+          await this.$socket.connect()
         this.joinSession(sessionId)
         Gleap.setCustomData('sessionId', sessionId)
         this.$store.dispatch('user/sessionConnected')
@@ -381,7 +383,10 @@ export default {
       )
       LoggerService.noticeError(err)
 
-      if (reason === 'io server disconnect') {
+      if (
+        reason === 'io server disconnect' &&
+        !this.isRecapSocketUpdatesActive
+      ) {
         // the disconnection was initiated by the server, you need to reconnect manually
         if (!this.$socket.connected) await this.$socket.connect()
         this.joinSession(this.sessionId)
@@ -389,6 +394,7 @@ export default {
       }
     },
     connect() {
+      if (this.isRecapSocketUpdatesActive) this.joinSession(this.sessionId)
       this.$store.dispatch('user/sessionConnected')
     },
   },
