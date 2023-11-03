@@ -1,7 +1,15 @@
 <template>
   <div class="student-dashboard">
-    <dashboard-banner subheader="What can we help you with today?" />
+    <dashboard-banner />
     <div class="dashboard-notices">
+      <div
+        v-if="!downtimeBannerMessage && noticeMessage"
+        class="dashboard-notice"
+        :class="isLowCoachHour && 'dashboard-notice--warn'"
+      >
+        {{ noticeMessage }}
+      </div>
+
       <div
         v-if="downtimeBannerMessage"
         class="dashboard-notice"
@@ -222,6 +230,19 @@ export default {
     }),
     isLowCoachHour() {
       return this.currentHour < 12
+    },
+    noticeMessage() {
+      if (this.currentHour >= 12 && this.currentHour <= 23)
+        return 'Heads up: this is a great time to make a request! We have plenty of coaches available between 12pm - 12 am ET.'
+      if (this.currentHour >= 3 && this.currentHour <= 9)
+        return 'Heads up: we have very few coaches available right now. Try making requests between 12pm-12am ET when possible'
+      if (
+        (this.currentHour >= 0 && this.currentHour < 3) ||
+        (this.currentHour >= 9 && this.currentHour < 12)
+      )
+        return 'Heads up: we have fewer coaches available than normal right now. Try making requests between 12pm-12am ET when possible!'
+
+      return ''
     },
     hasSeenFirstSessionCongratsModal() {
       return (
