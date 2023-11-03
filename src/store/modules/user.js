@@ -389,6 +389,17 @@ export default {
         userProps.onboarded = state.user.isOnboarded
         userProps.approved = state.user.isApproved
         userProps.partner = state.user.volunteerPartnerOrg
+
+        const certificationInfo = Object.entries(
+          state.user.certifications
+        ).reduce((acc, [subject, quizInfo]) => {
+          acc[subject] = quizInfo.passed
+          return acc
+        }, {})
+        return {
+          ...userProps,
+          ...certificationInfo,
+        }
       } else {
         userProps.partner = state.user.studentPartnerOrg
         userProps.gradeLevel = state.user.gradeLevel
