@@ -22,8 +22,8 @@ export const axiosInstance = axios.create({
   baseURL: config.serverRoot,
 })
 
-export function httpGet(path) {
-  return axiosInstance.get(path)
+export function httpGet(path, config) {
+  return axiosInstance.get(path, config)
 }
 
 export function httpPost(path, data) {
