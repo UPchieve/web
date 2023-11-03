@@ -313,7 +313,7 @@ export default {
     },
     startSession() {
       AnalyticsService.captureEvent(EVENTS.STUDENT_TELL_THEM_CP_STARTED_SESSION)
-      this.$router.push('/session/college/planning/')
+      this.$router.push('/session/college/college-prep/')
     },
     handleDate(timezone) {
       return moment(this.dateTime, 'YYYY-MM-DD HH:mm')
