@@ -146,6 +146,7 @@ import LoadingMessage from '@/components/LoadingMessage.vue'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import NetworkService from '@/services/NetworkService'
+import LoggerService from '@/services/LoggerService'
 import SessionChat from '@/views/SessionView/SessionChat/index.vue'
 import StudentIcon from '@/assets/student-icon.svg'
 import VolunteerIcon from '@/assets/volunteer-icon.svg'
@@ -169,6 +170,7 @@ export default {
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
+      isRecapSocketUpdatesActive: 'featureFlags/isRecapSocketUpdatesActive',
     }),
     whiteboardDimensions() {
       return {
@@ -182,6 +184,9 @@ export default {
     volunteerAvatar() {
       return VolunteerIcon
     },
+    isSessionConnectionAlive() {
+      return this.$socket.connected && this.socketJoinedRoom
+    },
   },
   data() {
     return {
@@ -191,12 +196,11 @@ export default {
       zwibblerCtx: null,
       isConnectedToWhiteboard: false,
       isLoadingRecap: true,
-      // TODO: handle session connction issus in recap. We will ignore for now
-      isSessionConnectionAlive: true,
       // Session is considered alive when in recap mode
       isSessionAlive: true,
       isRecapDmsAvailable: false,
       reportSubmitted: false,
+      socketJoinedRoom: false,
     }
   },
   async created() {
@@ -210,6 +214,11 @@ export default {
       this.$store.dispatch('user/fetchRecapSessionForDms', this.session.id)
       if (this.user.isVolunteer)
         AnalyticsService.captureEvent(EVENTS.VOLUNTEER_OPENED_SESSION_RECAP)
+      if (this.isRecapDmsAvailable && this.isRecapSocketUpdatesActive)
+        this.joinSocketToRoom()
+      // This is to mock the previous behavior before the updates, where
+      // we kept`isSessionConnectionAlive` as `true`
+      if (!this.isRecapSocketUpdatesActive) this.socketJoinedRoom = true
     } catch (error) {
       if (error.status === 403) this.$router.push('/dashboard')
     } finally {
@@ -296,6 +305,30 @@ export default {
           toggleReportSubmitted: this.toggleReportSubmitted,
         },
       })
+    },
+    joinSocketToRoom() {
+      this.$socket.emit('sessions/recap:join', { sessionId: this.session.id })
+    },
+  },
+  sockets: {
+    redirect: function(error) {
+      LoggerService.noticeError(
+        error ??
+          `Redirected from recap of session ${this.session.id} to the dashboard`
+      )
+      this.$router.push('/')
+    },
+    'sessions/recap:joined': function() {
+      this.socketJoinedRoom = true
+    },
+    'sessions/recap:join-failed': function(error) {
+      this.socketJoinedRoom = false
+      LoggerService.noticeError(error)
+      // Retry joining the room after 3 seconds
+      setTimeout(() => this.joinSocketToRoom(), 3000)
+    },
+    connect() {
+      if (this.isRecapSocketUpdatesActive) this.joinSocketToRoom()
     },
   },
 }

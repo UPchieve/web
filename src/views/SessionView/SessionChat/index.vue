@@ -196,9 +196,12 @@ export default {
         ? this.currentSession.student?.firstName
         : this.currentSession.volunteer?.firstName
     },
+    // The chat is already loaded with a connection failure in SessionRecapView
+    // since it's checking if the socket joined the room. Exclude SessionRecapView
+    // when logging out expected errors
     isSessionConnectionFailure: function() {
       const isConnectionFailure =
-        !this.isSessionConnectionAlive && this.isSessionAlive
+        !this.isSessionConnectionAlive && this.isSessionAlive && !this.isInRecap
       if (isConnectionFailure)
         LoggerService.noticeError(new Error('Attempting to connect the chat'), {
           tags: {

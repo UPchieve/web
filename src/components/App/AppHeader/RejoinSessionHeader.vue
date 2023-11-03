@@ -41,6 +41,7 @@ export default {
       name: 'user/firstName',
       sessionPath: 'user/sessionPath',
       isDashboardRedesignActive: 'featureFlags/isDashboardRedesignActive',
+      isRecapSocketUpdatesActive: 'featureFlags/isRecapSocketUpdatesActive',
     }),
     message() {
       return `You have a chat in session${this.mobileMode ? '' : '.'}`
@@ -70,7 +71,7 @@ export default {
       sessionUtils.rejoinSession(this.$router, this.sessionPath)
     },
     end() {
-      sessionUtils.endSession(this)
+      sessionUtils.endSession(this, this.isRecapSocketUpdatesActive)
     },
   },
 }

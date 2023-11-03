@@ -299,6 +299,18 @@ export default {
       if (this.isExemptSocketError(error)) return
       LoggerService.noticeError(error)
     },
+    // https://socket.io/docs/v2/client-api/#event-disconnect
+    async disconnect(reason) {
+      const err = new Error(
+        `Socket.io connection for user ${this.user.id} disconnected for reason: ${reason}`
+      )
+      LoggerService.noticeError(err)
+
+      if (reason === 'io server disconnect') {
+        // the disconnection was initiated by the server, you need to reconnect manually
+        if (!this.$socket.connected) await this.$socket.connect()
+      }
+    },
     connect_error(error) {
       // these are handled internally and shouldn't be forwarded to Sentry
       if (this.isExemptSocketError(error)) return
