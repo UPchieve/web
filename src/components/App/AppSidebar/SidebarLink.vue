@@ -3,10 +3,6 @@
     <a v-if="openNewTab" :href="to" target="_blank" :class="parentClass"
       ><slot></slot>{{ text }}</a
     >
-    <div v-else-if="onClick" :class="parentClass" @click="onClick()">
-      <slot></slot>
-      <p>{{ text }}</p>
-    </div>
     <template v-else>
       <router-link
         :class="parentClass"
@@ -31,7 +27,7 @@ export default {
   props: {
     to: {
       type: String,
-      required: false,
+      required: true,
     },
     icon: Object,
     text: {
@@ -41,10 +37,6 @@ export default {
     openNewTab: {
       type: Boolean,
       default: false,
-    },
-    onClick: {
-      type: Function,
-      required: false,
     },
   },
   computed: {

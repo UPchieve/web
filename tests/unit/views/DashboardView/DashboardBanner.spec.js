@@ -1,14 +1,21 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
+import appModule from '@/store/modules/app'
 import userModule from '@/store/modules/user'
 import DashboardBanner from '@/views/DashboardView/DashboardBanner.vue'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
 
-function getWrapper(subheader, firstName = 'Tester') {
+const getWrapper = (mobileMode = false, firstName = 'Tester') => {
   const store = new Vuex.Store({
     modules: {
+      app: {
+        ...appModule,
+        getters: {
+          mobileMode: () => mobileMode,
+        },
+      },
       user: {
         ...userModule,
         getters: {
@@ -18,39 +25,33 @@ function getWrapper(subheader, firstName = 'Tester') {
     },
   })
 
-  return shallowMount(DashboardBanner, {
-    localVue,
-    store,
-    propsData: {
-      subheader,
-    },
-  })
+  return shallowMount(DashboardBanner, { localVue, store })
 }
 
-describe('DashboardBanner', () => {
-  test('layout without subheader', () => {
-    const wrapper = getWrapper()
-    expect(wrapper.classes('DashboardBanner')).toBe(true)
+describe('DashboardView', () => {
+  describe('layout', () => {
+    test('mobile', () => {
+      const wrapper = getWrapper(true)
+      expect(wrapper.classes('DashboardBanner')).toBe(true)
 
-    const h1 = wrapper.find('h1')
-    expect(h1.exists()).toBe(true)
-    expect(h1.text()).toBe('Hello, Tester!')
+      const greeting = wrapper.find('.DashboardBanner-greeting')
+      expect(greeting.exists()).toBe(true)
+      expect(greeting.text()).toBe('Hello, Tester!')
 
-    const h2 = wrapper.find('h2')
-    expect(h2.exists()).toBe(false)
-  })
+      const banner = wrapper.find('.DashboardBanner-banner')
+      expect(banner.exists()).toBe(true)
+    })
 
-  test('layout subheader', () => {
-    const subheader = 'This is the subheader'
-    const wrapper = getWrapper(subheader)
-    expect(wrapper.classes('DashboardBanner')).toBe(true)
+    test('desktop', () => {
+      const wrapper = getWrapper(false)
+      expect(wrapper.classes('DashboardBanner')).toBe(true)
 
-    const h1 = wrapper.find('h1')
-    expect(h1.exists()).toBe(true)
-    expect(h1.text()).toBe('Hello, Tester!')
+      const banner = wrapper.find('.DashboardBanner-banner')
+      expect(banner.exists()).toBe(true)
 
-    const h2 = wrapper.find('h2')
-    expect(h2.exists()).toBe(true)
-    expect(h2.text()).toBe(subheader)
+      const greeting = banner.find('.DashboardBanner-greeting')
+      expect(greeting.exists()).toBe(true)
+      expect(greeting.text()).toBe('Hello, Tester!')
+    })
   })
 })

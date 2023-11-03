@@ -53,11 +53,11 @@
       </sidebar-link>
 
       <sidebar-link
-        v-if="!isVolunteer"
-        text="Refer a Friend"
-        :onClick="openReferFriendModal"
+        v-if="!isVolunteer && isReferFriendsActive"
+        to="/refer-friends"
+        text="Refer friends"
       >
-        <refer-friend-icon class="icon" />
+        <word-bubbles-icon class="icon" />
       </sidebar-link>
 
       <div v-if="!mobileMode" class="SidebarLinks-about">About UPchieve</div>
@@ -80,37 +80,34 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import SidebarLink from './SidebarLink.vue'
-import ArchiveIcon from '@/assets/archive.svg'
+import HouseIcon from '@/assets/sidebar_icons/house.svg'
+import GraduationCapIcon from '@/assets/sidebar_icons/graduation-cap.svg'
 import CalendarIcon from '@/assets/sidebar_icons/calendar.svg'
+import FolderIcon from '@/assets/sidebar_icons/folder.svg'
+import WordBubblesIcon from '@/assets/sidebar_icons/word-bubbles.svg'
 import EnvelopeIcon from '@/assets/sidebar_icons/envelope.svg'
 import ExclamationIcon from '@/assets/sidebar_icons/exclamation.svg'
-import FolderIcon from '@/assets/sidebar_icons/folder.svg'
-import GraduationCapIcon from '@/assets/sidebar_icons/graduation-cap.svg'
-import HeartIcon from '@/assets/heart.svg'
-import HouseIcon from '@/assets/sidebar_icons/house.svg'
 import PortraitIcon from '@/assets/sidebar_icons/portrait.svg'
-import ReferFriendIcon from '@/assets/refer-friend-icon.svg'
-import ReferralSVG from '@/assets/dashboard_icons/student/referral.svg'
+import HeartIcon from '@/assets/heart.svg'
+import ArchiveIcon from '@/assets/archive.svg'
 import SlackLogoIcon from '@/assets/slack-logo-icon.svg'
-import AnalyticsService from '@/services/AnalyticsService'
-import { EVENTS } from '@/consts'
+import { mapGetters } from 'vuex'
 
 export default {
   components: {
     SidebarLink,
-    ArchiveIcon,
+    HouseIcon,
+    GraduationCapIcon,
     CalendarIcon,
+    FolderIcon,
+    WordBubblesIcon,
     EnvelopeIcon,
     ExclamationIcon,
-    FolderIcon,
-    GraduationCapIcon,
-    HeartIcon,
-    HouseIcon,
     PortraitIcon,
-    ReferFriendIcon,
+    HeartIcon,
     SlackLogoIcon,
+    ArchiveIcon,
   },
   props: {
     authenticated: Boolean,
@@ -120,39 +117,10 @@ export default {
   },
   computed: {
     ...mapGetters({
+      isReferFriendsActive: 'featureFlags/isReferFriendsActive',
       isTutorSessionHistoryActive: 'featureFlags/isTutorSessionHistoryActive',
       isAutoFlowUser: 'user/isAutoFlowUser',
-      referralCopy: 'featureFlags/referralCopy',
     }),
-  },
-  methods: {
-    openReferFriendModal() {
-      AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_REFER_A_FRIEND)
-      let header
-      let subcopy
-      if (this.referralCopy === 'baseline') {
-        header =
-          'Know a friend or classmate who would benefit from free 24/7 tutoring?'
-        subcopy = 'Invite them to UPchieve!'
-      } else if (this.referralCopy === 'small-gift-card') {
-        header =
-          'UPchieve can help your friends succeed! Refer 5 friends to UPchieve and get a $25 gift card when they sign up.'
-        subcopy = 'Refer your friends now'
-      } else if (this.referralCopy === 'emotional-appeal-struggling') {
-        header =
-          'Do you have friends, siblings, or classmates struggling in a class? When you share UPchieve, you can help a struggling friend succeed!'
-        subcopy = 'Invite them to UPchieve!'
-      }
-      this.$store.dispatch('app/modal/show', {
-        component: 'ReferralModal',
-        data: {
-          svg: ReferralSVG,
-          showAccept: false,
-          header,
-          subcopy,
-        },
-      })
-    },
   },
 }
 </script>
