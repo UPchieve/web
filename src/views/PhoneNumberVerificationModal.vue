@@ -183,19 +183,20 @@ export default {
       this.isSubmitting = true
       this.error = ''
       try {
-        const success = await AuthService.confirmVerification({
+        const result = await AuthService.confirmVerification({
           verificationCode: this.verificationCode,
           sendTo: this.phoneNumberToVerify,
           verificationMethod: VERIFICATION_METHOD.SMS,
           forSignup: false,
           userId: this.user.id,
         })
-        if (success) {
+        if (result.data.success) {
           this.verificationComplete = true
           AnalyticsService.captureEvent(EVENTS.PHONE_NUMBER_VERIFIED)
           if (this.user.phone !== this.phoneNumberToVerify) {
             AnalyticsService.captureEvent(EVENTS.PHONE_NUMBER_UPDATED)
           }
+          this.error = ''
         } else {
           this.error =
             'Please enter the most recent verification code that was sent to you'
