@@ -98,6 +98,7 @@
                   :disabled="!activeEdit"
                   v-model="smsConsent"
                   label="By checking this box, I consent to receiving SMS messages from UPchieve at the phone number provided above."
+                  @change="emitSmsConsentCheckboxChangedEvent"
                 />
                 By checking this box, I consent to receiving SMS messages from
                 UPchieve at the phone number provided above.
@@ -332,6 +333,13 @@ export default {
       this.phoneInputInfo = phoneInputInfo
     },
 
+    async emitSmsConsentCheckboxChangedEvent() {
+      AnalyticsService.captureEvent(EVENTS.SMS_CONSENT_CHECKBOX_CHANGED, {
+        event: EVENTS.SMS_CONSENT_CHECKBOX_CHANGED,
+        value: this.smsConsent ? 'checked' : 'unchecked',
+      })
+    },
+
     toggleAccountActive({ value }) {
       if (!value) {
         this.toggleDeactivatedAccountModal()
@@ -363,6 +371,7 @@ export default {
         phone: this.phoneInputInfo.e164,
         phoneVerified: true,
       }
+      this.shouldSeeSmsConsentCheckbox = true
       this.$store.dispatch('user/addToUser', updates)
     },
 
