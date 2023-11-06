@@ -145,6 +145,12 @@ export default {
       this._errorHandler
     )
   },
+  registerStudent(data) {
+    return httpPost(`${AUTH_ROOT}/register/student`, data).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
   registerOpenStudent(data) {
     return httpPost(`${AUTH_ROOT}/register/student/open`, data).then(
       this._successHandler,
