@@ -55,6 +55,14 @@ export default {
       })
   },
 
+  async registerStudent(signupData) {
+    try {
+      await NetworkService.registerStudent(signupData)
+    } catch (e) {
+      throw errorFromHttpResponse(e)
+    }
+  },
+
   registerOpenStudent(signupData) {
     return NetworkService.registerOpenStudent(signupData)
       .then(res => {

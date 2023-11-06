@@ -3,7 +3,7 @@
     <FormErrors :errors="errors" />
 
     <h1 v-if="!isCollegeConfidential" class="uc-form-header">
-      Awesome! Let's check if we're a match
+      {{ customEligibilityHeader || `Awesome! Let's check if we're a match` }}
     </h1>
     <div v-if="isCollegeConfidential">
       <div v-if="ccIntroCopy === 'get-that-a'">
@@ -554,11 +554,27 @@ export default {
       isReferred: false,
       isSubmittingAccountForm: false,
       isCollegeConfidential: false,
+      partnerKey: undefined,
+      studentPartner: undefined,
     }
   },
   async mounted() {
-    localStorage.removeItem('isSSOSignUpRedirect')
     const params = this.$route.query
+    if (params.partner) {
+      try {
+        const res = await NetworkService.getStudentPartner(params.partner)
+        const studentPartner = res.data.studentPartner
+        if (!studentPartner || studentPartner.deactivated) {
+          delete params.partner
+        } else {
+          this.studentPartner = studentPartner
+        }
+      } catch {
+        delete params.partner
+      }
+    }
+
+    localStorage.removeItem('isSSOSignUpRedirect')
     if (this.isFailureRedirect()) {
       this.eligibility = {
         currentGrade: params['currentGrade'],
@@ -568,6 +584,7 @@ export default {
         zipCode: params['zipCode'],
         email: params['email'],
       }
+      this.partnerKey = params['partner']
       this.credentials.email = params['email']
       this.errors.push(
         this.$route.query['error'] ??
@@ -579,6 +596,10 @@ export default {
 
     if (params['utm_source'] === 'collegeconfidential') {
       this.isCollegeConfidential = true
+    }
+
+    if (params['partner']) {
+      this.partnerKey = params['partner']
     }
 
     const isDomesticIpAddress = await this.isDomesticIpAddress()
@@ -607,6 +628,12 @@ export default {
     },
     PASSWORD_PATTERN() {
       return /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/
+    },
+    customEligibilityHeader() {
+      if (this.studentPartner) {
+        return `Welcome ${this.studentPartner.name} Student!`
+      }
+      return ''
     },
   },
   watch: {
@@ -834,50 +861,47 @@ export default {
         return
       }
 
-      AuthService.registerOpenStudent({
-        email: this.credentials.email,
-        password: this.credentials.password,
-        terms: true,
-        firstName: this.profile.firstName,
-        lastName: this.profile.lastName,
-        highSchoolId: this.eligibility.highSchool.upchieveId,
-        zipCode: this.eligibility.zipCode,
-        currentGrade: this.trimCurrentGrade,
-        referredByCode: window.localStorage.getItem('upcReferredByCode'),
-      })
-        .then(() => {
-          window.localStorage.removeItem('upcReferredByCode')
-          this.isSubmittingAccountForm = false
-          this.$router.push('/verify')
+      try {
+        await AuthService.registerStudent({
+          email: this.credentials.email,
+          firstName: this.profile.firstName,
+          gradeLevel: this.trimCurrentGrade,
+          lastName: this.profile.lastName,
+          password: this.credentials.password,
+          referredByCode: window.localStorage.getItem('upcReferredByCode'),
+          schoolId: this.eligibility.highSchool.upchieveId,
+          studentPartnerOrg: this.partnerKey,
+          zipCode: this.eligibility.zipCode,
         })
-        .catch(err => {
-          this.isSubmittingAccountForm = false
-          const errorMsg =
-            err?.response?.data?.err ?? 'Failed: Please try again.'
-          this.errors.push(errorMsg)
-          if (errorMsg && errorMsg.match(/^Password/))
-            AnalyticsService.captureEvent(
-              EVENTS.STUDENT_ENTERED_INVALID_PASSWORD
-            )
-          if (err?.response?.status !== 422) {
-            LoggerService.noticeError(err)
-          }
-        })
+        window.localStorage.removeItem('upcReferredByCode')
+        this.$router.push('/verify')
+      } catch (e) {
+        const errorMsg = e?.response?.data?.err ?? 'Failed: Please try again.'
+        this.errors.push(errorMsg)
+        if (errorMsg && errorMsg.match(/^Password/))
+          AnalyticsService.captureEvent(EVENTS.STUDENT_ENTERED_INVALID_PASSWORD)
+        if (e?.response?.status !== 422) {
+          LoggerService.noticeError(e)
+        }
+      } finally {
+        this.isSubmittingAccountForm = false
+      }
     },
     signUpWithGoogle() {
       AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_UP_WITH_GOOGLE)
       localStorage.setItem('isSSOSignUpRedirect', true)
       const data = {
         email: this.eligibility.email,
-        highSchoolId: this.eligibility.highSchool.upchieveId,
-        zipCode: this.eligibility.zipCode,
         currentGrade: this.trimCurrentGrade,
+        gradeLevel: this.trimCurrentGrade,
+        highSchoolId: this.eligibility.highSchool.upchieveId,
+        schoolId: this.eligibility.highSchool.upchieveId,
         referredByCode: window.localStorage.getItem('upcReferredByCode'),
+        studentPartnerOrg: this.partnerKey,
+        zipCode: this.eligibility.zipCode,
       }
-      const dataAsQueryParams = Object.entries(data)
-        .map(q => `${q[0]}=${q[1]}`)
-        .join('&')
-      const url = `${config.serverRoot}/auth/register/google/student?${dataAsQueryParams}`
+      const params = new URLSearchParams(data).toString()
+      const url = `${config.serverRoot}/auth/register/google/student?${params}`
       window.location.replace(url)
     },
 
