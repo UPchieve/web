@@ -221,6 +221,7 @@ export default {
         component: 'ReportSessionModal',
         data: {
           showTemplateButtons: false,
+          currentSession: this.session,
         },
       })
     },
