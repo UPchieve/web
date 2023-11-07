@@ -435,7 +435,9 @@ export default {
               const evt = reqBody.smsConsent
                 ? EVENTS.SMS_OPTED_IN
                 : EVENTS.SMS_OPTED_OUT
-              AnalyticsService.captureEvent(evt)
+              AnalyticsService.captureEvent(evt, {
+                event: evt,
+              })
             }
 
             // Update user state after successful API call

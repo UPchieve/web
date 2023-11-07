@@ -129,6 +129,12 @@ export default {
   },
   mounted() {
     this.initiateVerification()
+    AnalyticsService.captureEvent(
+      EVENTS.PHONE_NUMBER_VERIFICATION_MODAL_OPENED,
+      {
+        event: EVENTS.PHONE_NUMBER_VERIFICATION_MODAL_OPENED,
+      }
+    )
   },
   created() {
     this.$store.dispatch('user/fetchUser').then(() => {
@@ -192,9 +198,13 @@ export default {
         })
         if (result.data.success) {
           this.verificationComplete = true
-          AnalyticsService.captureEvent(EVENTS.PHONE_NUMBER_VERIFIED)
+          AnalyticsService.captureEvent(EVENTS.PHONE_NUMBER_VERIFIED, {
+            event: EVENTS.PHONE_NUMBER_VERIFIED,
+          })
           if (this.user.phone !== this.phoneNumberToVerify) {
-            AnalyticsService.captureEvent(EVENTS.PHONE_NUMBER_UPDATED)
+            AnalyticsService.captureEvent(EVENTS.PHONE_NUMBER_UPDATED, {
+              event: EVENTS.PHONE_NUMBER_UPDATED,
+            })
           }
           this.error = ''
         } else {
