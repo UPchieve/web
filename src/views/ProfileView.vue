@@ -371,7 +371,7 @@ export default {
         phone: this.phoneInputInfo.e164,
         phoneVerified: true,
       }
-      this.shouldSeeSmsConsentCheckbox = true
+      this.shouldSeeSmsConsentCheckbox = !this.user.isVolunteer
       this.$store.dispatch('user/addToUser', updates)
     },
 
