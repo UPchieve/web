@@ -86,13 +86,14 @@ export default {
       })
   },
 
-  getCurrentSession(user) {
-    return NetworkService.currentSession({
-      user_id: user.id,
-      is_volunteer: user.isVolunteer,
-    })
-      .then(resp => {
-        const { sessionId, data } = resp.data || {}
+  getCurrentSession() {
+    return NetworkService.currentSession()
+      .then(res => {
+        if (!res.data || !res.data.sessionId) {
+          return Promise.resolve({ sessionData: {} })
+        }
+
+        const { sessionId, data } = res.data
         const { type, subTopic } = data
 
         if (type && subTopic && sessionId) {
@@ -121,10 +122,10 @@ export default {
       })
   },
 
-  getLatestSession(user) {
-    return NetworkService.latestSession({ userId: user._id })
-      .then(resp => {
-        const { data } = resp.data || {}
+  getLatestSession() {
+    return NetworkService.latestSession()
+      .then(res => {
+        const { data } = res.data || {}
         return Promise.resolve({ sessionData: data })
       })
       .catch(resp => {

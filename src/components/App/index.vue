@@ -273,7 +273,8 @@ export default {
 
     /**
      * On route transition, fetch current session (for students, also most recent session)
-     * @todo: Fetch these much less frequently (only once?)
+     * @todo: Fetch these much less frequently (only once).
+     * @todo: Consolidate with the logic in router.
      */
     $route(to, from) {
       // Capture PostHog pageviews on route transitions
