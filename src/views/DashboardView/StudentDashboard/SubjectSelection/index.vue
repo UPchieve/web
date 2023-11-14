@@ -3,28 +3,29 @@
     <p v-if="hasWaitingPeriod" class="waiting-period">
       {{ waitingPeriodMessage }}
     </p>
-    <h2 v-if="mobileMode">
-      Explore our subjects
+    <h2 v-if="showDashboardRedesign">
+      Choose from all of our available subjects!
     </h2>
-    <loader v-if="isFetchingSubjects" class="loader--center" />
+    <loader v-if="isFetchingSubjects" class="uc-column items-center" />
     <p v-else-if="fetchingSubjectsError" class="error">
       We had trouble loading the list of subjects. Please try refreshing the
       page.
     </p>
-    <subject-card
-      v-else
-      v-for="(card, index) in cards"
-      v-bind:key="index"
-      :title="card.title"
-      :subtitle="card.subtitle"
-      :svg="card.svg"
-      :topic="card.topic"
-      :subtopics="card.subtopics"
-      :subtopicDisplayNames="card.subtopicDisplayNames"
-      :button-text="card.buttonText"
-      :routeTo="card.routeTo"
-      :disableSubjectCard="isCardDisabled(card)"
-    />
+    <div v-else :class="showDashboardRedesign ? 'cards' : 'cards-old'">
+      <subject-card
+        v-for="(card, index) in cards"
+        v-bind:key="index"
+        :title="card.title"
+        :subtitle="card.subtitle"
+        :svg="card.svg"
+        :topic="card.topic"
+        :subtopics="card.subtopics"
+        :subtopicDisplayNames="card.subtopicDisplayNames"
+        :button-text="card.buttonText"
+        :routeTo="card.routeTo"
+        :isDisabled="isCardDisabled()"
+      />
+    </div>
   </div>
 </template>
 
@@ -60,6 +61,7 @@ export default {
       subjects: state => state.subjects.subjects,
       isFetchingSubjects: state => state.subjects.isFetchingSubjects,
       fetchingSubjectsError: state => state.subjects.fetchingSubjectsError,
+      user: state => state.user.user,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -68,6 +70,7 @@ export default {
       topicCardDashboardReorder: 'featureFlags/topicCardDashboardReorder',
       isTopicDashboardReorderActive:
         'featureFlags/isTopicDashboardReorderActive',
+      showDashboardRedesign: 'user/showDashboardRedesign',
     }),
     waitingPeriodMessage() {
       const countdown = calculateWaitingPeriodCountdown(
@@ -89,21 +92,23 @@ export default {
           })
           .sort((a, b) => a.order - b.order)
 
-      cards.push({
-        title: 'Give Feedback',
-        subtitle:
-          'Help us improve by telling us what new subjects and features you want!',
-        svg: LightBulbSVG,
-        buttonText: 'Give feedback',
-        routeTo: '/contact',
-      })
+      if (!this.showDashboardRedesign) {
+        cards.push({
+          title: 'Give Feedback',
+          subtitle:
+            'Help us improve by telling us what new subjects and features you want!',
+          svg: LightBulbSVG,
+          buttonText: 'Give feedback',
+          routeTo: '/contact',
+        })
 
-      cards.push({
-        title: 'Invite Your Friends',
-        subtitle: 'Share UPchieve with a friend!',
-        svg: ReferralSVG,
-        buttonText: 'Learn More',
-      })
+        cards.push({
+          title: 'Invite Your Friends',
+          subtitle: 'Share UPchieve with a friend!',
+          svg: ReferralSVG,
+          buttonText: 'Learn More',
+        })
+      }
       return cards
     },
   },
@@ -164,9 +169,9 @@ export default {
         this.hasWaitingPeriod = false
       }
     },
-    isCardDisabled(card) {
+    isCardDisabled() {
       return (
-        card.isTutoringCard && (this.disableSubjectCard || this.isSessionAlive)
+        this.disableSubjectCard || this.isSessionAlive || this.user.isBanned
       )
     },
   },
@@ -175,22 +180,42 @@ export default {
 
 <style lang="scss" scoped>
 .SubjectSelection {
+  margin-top: 30px;
+}
+
+h2 {
+  @include font-category('heading');
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.cards-old {
   @include flex-container(column);
   @include child-spacing(top, 16px);
-  margin-top: 40px;
-
-  h2 {
-    @include font-category('heading');
-    margin: 0;
-    padding: 0;
-    text-align: left;
-  }
+  margin-top: 10px;
 
   @include breakpoint-above('medium') {
     @include child-spacing(top, 0);
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
     gap: 40px;
+  }
+}
+
+.cards {
+  column-gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 20px;
+  row-gap: 16px;
+
+  @include breakpoint-below('huge') {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include breakpoint-below('small') {
+    grid-template-columns: repeat(1, 1fr);
   }
 }
 
@@ -219,6 +244,7 @@ export default {
 .loader--center {
   margin-right: auto;
   margin-left: auto;
+  width: 100%;
 }
 
 .error {

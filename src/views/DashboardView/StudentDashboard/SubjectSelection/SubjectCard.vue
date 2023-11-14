@@ -1,5 +1,17 @@
 <template>
-  <div class="SubjectCard">
+  <button
+    v-if="showDashboardRedesign"
+    class="subject-card uc-row justify-center"
+    @click="handleClick"
+    :disabled="isDisabled"
+  >
+    <img :src="svg" class="icon" aria-hidden="true" />
+    <div class="uc-column justify-center items-start">
+      <h2 class="title">{{ title }}</h2>
+      <p class="metadata">{{ metadata }}</p>
+    </div>
+  </button>
+  <div v-else class="SubjectCard">
     <template v-if="mobileMode">
       <component
         class="SubjectCard-icon"
@@ -14,14 +26,14 @@
           v-if="routeTo"
           primary
           :routeTo="routeTo"
-          :disabled="disabled"
+          :disabled="isDisabled"
           >{{ buttonText }}</hyperlink-button
         >
         <hyperlink-button
           v-else
           primary
           @click.native="handleClick"
-          :disabled="disabled"
+          :disabled="isDisabled"
           >{{ buttonText }}</hyperlink-button
         >
       </div>
@@ -44,7 +56,7 @@
           disabledOption="Choose a subject"
           :options="subtopics"
           :optionDisplay="subtopicDisplayNames"
-          :disabled="disabled"
+          :disabled="isDisabled"
         />
       </div>
 
@@ -52,14 +64,14 @@
         v-if="routeTo"
         primary
         :routeTo="routeTo"
-        :disabled="disabled"
+        :disabled="isDisabled"
         >{{ buttonText }}</hyperlink-button
       >
       <large-button
         v-else
         primary
         @click.native="handleClick"
-        :disabled="disabled"
+        :disabled="isDisabled"
         >{{ buttonText }}</large-button
       >
     </template>
@@ -67,12 +79,11 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 import DropdownList from '@/components/DropdownList.vue'
 import HyperlinkButton from '@/components/HyperlinkButton.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import AnalyticsService from '@/services/AnalyticsService'
-import getCookie from '@/utils/get-cookie'
 import { EVENTS } from '@/consts'
 
 export default {
@@ -106,20 +117,17 @@ export default {
       default: 'Start a chat',
     },
     routeTo: String,
-    disableSubjectCard: Boolean,
+    isDisabled: Boolean,
   },
   computed: {
-    ...mapState({
-      latestSession: state => state.user.latestSession,
-      isMobileApp: state => state.app.isMobileApp,
-      user: state => state.user.user,
-    }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
-      isSessionAlive: 'user/isSessionAlive',
+      showDashboardRedesign: 'user/showDashboardRedesign',
     }),
-    disabled() {
-      return this.user.isBanned || this.disableSubjectCard
+    metadata() {
+      const numSubtopics = this.subtopics.length
+      const pluralization = numSubtopics === 1 ? '' : 's'
+      return numSubtopics + ' Subject' + pluralization
     },
     isComponentSvg() {
       return typeof this.svg === 'object'
@@ -130,25 +138,7 @@ export default {
   },
   methods: {
     handleClick() {
-      const hasSentPushTokenRegister = getCookie('hasSentPushTokenRegister')
-
-      // show the notifications modal for tablet users on the mobile app
-      if (
-        this.isMobileApp &&
-        this.selectedSubtopic !== '' &&
-        !hasSentPushTokenRegister
-      ) {
-        this.$store.dispatch('app/modal/show', {
-          component: 'NotificationsModal',
-          data: {
-            backText: 'Dashboard',
-            acceptText: 'Yes, please notify me!',
-            selectedSubtopic: this.selectedSubtopic,
-            topic: this.topic,
-            showTemplateButtons: false,
-          },
-        })
-      } else if (this.title === 'Invite Your Friends') {
+      if (this.title === 'Invite Your Friends') {
         AnalyticsService.captureEvent(
           EVENTS.STUDENT_CLICKED_TO_GET_REFERRAL_LINK_CARD
         )
@@ -164,7 +154,7 @@ export default {
           component: 'SubjectSelectionModal',
           data: {
             backText: 'Dashboard',
-            acceptText: this.topic === 'college' ? 'Start a chat' : 'Continue',
+            acceptText: 'Continue',
             topic: this.topic,
             title: this.title,
             subtopics: this.subtopics,
@@ -182,6 +172,44 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.subject-card {
+  background: white;
+  border: 1px solid #d8dee5;
+  border-radius: 8px;
+  padding: 16px;
+
+  &:hover,
+  &:focus {
+    background: #f2fbf9;
+    border-color: #16d2aa;
+  }
+
+  &[disabled] {
+    background: #f1f3f6;
+    border-color: #d8dee5;
+  }
+  .icon {
+    height: 80px;
+    margin-right: 16px;
+    width: 80px;
+  }
+
+  .title {
+    @include font-category('heading');
+    font-weight: 600;
+    margin: 0;
+    padding: 0;
+    text-align: start;
+  }
+
+  .metadata {
+    @include font-category('helper-text');
+    color: #565961;
+    text-align: start;
+    margin: 0;
+  }
+}
+
 .SubjectCard {
   @include flex-container(row, flex-start);
   @include child-spacing(left, 24px);

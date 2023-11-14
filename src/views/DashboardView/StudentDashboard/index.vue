@@ -1,9 +1,13 @@
 <template>
   <div class="student-dashboard">
-    <dashboard-banner />
+    <dashboard-banner
+      :subheader="
+        showDashboardRedesign ? `What can we help you with today?` : ``
+      "
+    />
     <div class="dashboard-notices">
       <div
-        v-if="!downtimeBannerMessage && noticeMessage"
+        v-if="!downtimeBannerMessage && noticeMessage && !showDashboardRedesign"
         class="dashboard-notice"
         :class="isLowCoachHour && 'dashboard-notice--warn'"
       >
@@ -227,6 +231,7 @@ export default {
       isFallIncentiveEnrollmentActive:
         'featureFlags/isFallIncentiveEnrollmentActive',
       referralCopy: 'featureFlags/referralCopy',
+      showDashboardRedesign: 'user/showDashboardRedesign',
     }),
     isLowCoachHour() {
       return this.currentHour < 12

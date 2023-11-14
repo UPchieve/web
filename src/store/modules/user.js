@@ -377,6 +377,15 @@ export default {
       )
     },
 
+    showDashboardRedesign: (state, _getters, _rootState, rootGetters) => {
+      return (
+        !state.user.isVolunteer &&
+        (rootGetters['featureFlags/showDashboardRedesign'] ||
+          state.user.studentPartnerOrg ===
+            rootGetters['featureFlags/forceShowDashboardRedesignOrg'])
+      )
+    },
+
     getUserPropsForAnalytics: (state, getters) => {
       const userProps = {
         userType: state.user.type,
