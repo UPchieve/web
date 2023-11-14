@@ -40,11 +40,17 @@
             </div>
           </div>
         </div>
-        <div v-if="!isNewStudent && hasLowConfidence" class="tip">
-          <div class="tip-title">UPchieve's tip</div>
+        <div
+          v-if="!isNewStudent && getLowConfidenceResponseIfExists"
+          class="tip"
+        >
+          <div class="tip-title" data-testid="upchieves-tip">
+            UPchieve's tip
+          </div>
           <div class="tip-text">
-            {{ studentsFirstName }} is feeling {{ studentsConfidence }}. Praise
-            their effort and start with easy questions so that they can
+            {{ studentsFirstName }} is feeling
+            {{ getLowConfidenceResponseIfExists.response.toLowerCase() }}.
+            Praise their effort and start with easy questions so that they can
             experience small wins!
           </div>
         </div>
@@ -60,13 +66,15 @@ import AlertIcon from '@/assets/blue-alert.svg'
 import CrossIcon from '@/assets/cross.svg'
 import { mapState } from 'vuex'
 
+const LOW_CONFIDENCE_THRESHOLD = 2
+
 export default {
   name: 'about-session-modal',
   components: { Modal, Stepper, AlertIcon, CrossIcon },
   props: {
     closeModal: { type: Function, required: true },
-    responses: { type: Array, requied: true },
-    totalStudentSessions: { type: Number, requied: true },
+    responses: { type: Array, required: true },
+    totalStudentSessions: { type: Number, required: true },
   },
   computed: {
     ...mapState({
@@ -82,25 +90,20 @@ export default {
 
       return `This is ${this.studentsFirstName}'s ${display} session!`
     },
-    hasLowConfidence() {
-      for (const response of this.responses) {
-        if (response.displayImage && response.score <= 2) return true
-      }
-      return false
-    },
     studentsFirstName() {
       return this.session.student.firstname
     },
-    studentsConfidence() {
-      for (const response of this.responses) {
-        if (
+    /**
+     * Return the first presession survey response where the student indicated low confidence
+     * (score <= 2) to a question of the format "How do you feel about x",
+     * or undefined if no such response exists.
+     */
+    getLowConfidenceResponseIfExists() {
+      return this.responses.find(
+        response =>
           response.displayLabel.startsWith('How they feel about') &&
-          response.displayImage &&
-          response.score <= 2
-        )
-          return response.response.toLowerCase()
-      }
-      return ''
+          response.score <= LOW_CONFIDENCE_THRESHOLD
+      )
     },
   },
   methods: {
