@@ -1,16 +1,7 @@
 <template>
   <div class="DashboardBanner">
-    <h1 v-if="mobileMode" class="DashboardBanner-greeting">
-      <span>Hello, {{ name }}!</span>
-    </h1>
-
-    <div class="DashboardBanner-banner">
-      <h1 v-if="!mobileMode" class="DashboardBanner-greeting">
-        <span>Hello, {{ name }}!</span>
-      </h1>
-
-      <slot></slot>
-    </div>
+    <h1>Hello, {{ name }}!</h1>
+    <h2 v-if="subheader">{{ subheader }}</h2>
   </div>
 </template>
 
@@ -18,9 +9,11 @@
 import { mapGetters } from 'vuex'
 
 export default {
+  props: {
+    subheader: String,
+  },
   computed: {
     ...mapGetters({
-      mobileMode: 'app/mobileMode',
       name: 'user/firstName',
     }),
   },
@@ -29,32 +22,17 @@ export default {
 
 <style lang="scss" scoped>
 .DashboardBanner {
-  @include flex-container(column, initial, flex-start);
+  @include flex-container(column, center, flex-start);
   @include child-spacing(top, 24px);
-  width: 100%;
 
-  h1 {
-    margin: 0;
-    padding: 0;
-  }
-}
-
-.DashboardBanner-greeting {
-  @include font-category('display-small');
-  @include breakpoint-above('medium') {
-    @include font-category('display-large');
-    color: white;
-  }
-}
-
-.DashboardBanner-banner {
-  @include flex-container(column, flex-end, flex-start);
   background: url('~@/assets/dashboardHeader@2x.png');
   background-position: 25%;
   background-repeat: no-repeat;
   background-size: cover;
   border-radius: 8px;
 
+  color: white;
+  width: 100%;
   padding: 24px 16px;
   width: 100%;
   height: 225px;
@@ -63,6 +41,26 @@ export default {
     @include flex-container(column, center, center);
     @include child-spacing(top, 16px);
     height: 200px;
+  }
+}
+
+h1 {
+  margin: 0;
+  padding: 0;
+
+  @include font-category('display-small');
+  @include breakpoint-above('medium') {
+    @include font-category('display-large');
+  }
+}
+
+h2 {
+  margin: 0;
+  padding: 0;
+
+  @include font-category('heading');
+  @include breakpoint-above('medium') {
+    @include font-category('display-small');
   }
 }
 </style>
