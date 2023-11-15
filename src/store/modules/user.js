@@ -147,9 +147,7 @@ export default {
         })
         .catch(err => {
           commit('setSession', {})
-          if (err?.response?.status !== 404) {
-            LoggerService.noticeError(err)
-          }
+          LoggerService.noticeError(err)
         })
     },
 
@@ -160,9 +158,7 @@ export default {
         })
         .catch(err => {
           commit('setLatestSession', {})
-          if (err?.response?.status !== 404) {
-            LoggerService.noticeError(err)
-          }
+          LoggerService.noticeError(err)
         })
     },
 
