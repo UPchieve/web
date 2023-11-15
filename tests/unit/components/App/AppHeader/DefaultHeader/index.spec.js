@@ -3,7 +3,7 @@ import { merge } from 'lodash'
 import Vuex from 'vuex'
 import { storeOptions } from '@/store'
 import DefaultHeader from '@/components/App/AppHeader/DefaultHeader/index.vue'
-import HamburgerButton from '@/components/App/AppHeader/DefaultHeader/HamburgerButton.vue'
+import HamburgerButton from '@/components/App/AppHeader/HamburgerButton.vue'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)

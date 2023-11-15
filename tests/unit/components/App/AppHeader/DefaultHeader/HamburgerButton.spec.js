@@ -2,9 +2,7 @@ import { shallowMount, createLocalVue } from '@vue/test-utils'
 import { merge } from 'lodash'
 import Vuex from 'vuex'
 import { storeOptions } from '@/store'
-import HamburgerButton from '@/components/App/AppHeader/DefaultHeader/HamburgerButton.vue'
-// import HamburgerIcon from "@/assets/hamburger.svg";
-// import CrossIcon from "@/assets/cross.svg";
+import HamburgerButton from '@/components/App/AppHeader/HamburgerButton.vue'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)

@@ -1,5 +1,6 @@
 <template>
   <div class="banned_header">
+    <hamburger-button v-if="mobileMode" class="left white" :tabindex="0" />
     <div class="banned_header-text">{{ message }}</div>
     <div class="banned_header-document">
       <a :href="linkOut" target="_blank"> Why am I seeing this?</a>
@@ -8,14 +9,19 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { DOCS_URL } from '@/consts'
+import HamburgerButton from './HamburgerButton.vue'
 
 export default {
   name: 'banned-header',
+  components: { HamburgerButton },
   computed: {
     ...mapState({
       user: state => state.user.user,
+    }),
+    ...mapGetters({
+      mobileMode: 'app/mobileMode',
     }),
     linkOut() {
       return this.user.isVolunteer
@@ -55,5 +61,15 @@ export default {
   grid-column: 3;
   justify-self: right;
   align-self: center;
+}
+
+.left {
+  left: 15px;
+  position: absolute;
+  top: 15px;
+}
+
+.white {
+  fill: white;
 }
 </style>

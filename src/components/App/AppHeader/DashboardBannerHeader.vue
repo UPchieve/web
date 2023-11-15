@@ -1,6 +1,7 @@
 <template>
   <div class="header">
-    <div class="header-message">
+    <hamburger-button v-if="mobileMode" class="left white" :tabindex="0" />
+    <div class="header-message" :class="{ 'header-message-small': mobileMode }">
       <span
         >Join UPchieve's Fall Challenge: You can earn $10 per week for having a
         session!</span
@@ -31,19 +32,23 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import ArrowIcon from '@/assets/arrow.svg'
 import FallIncentiveEnrollmentModal from '@/views/DashboardView/StudentDashboard/FallIncentiveEnrollmentModal.vue'
+import HamburgerButton from './HamburgerButton.vue'
 
 export default {
   name: 'dashboard-banner-header',
-  components: { ArrowIcon, FallIncentiveEnrollmentModal },
+  components: { ArrowIcon, FallIncentiveEnrollmentModal, HamburgerButton },
   data() {
     return { showFallIncentiveEnrollmentModal: false }
   },
   computed: {
     ...mapState({
       productFlags: state => state.productFlags.flags,
+    }),
+    ...mapGetters({
+      mobileMode: 'app/mobileMode',
     }),
   },
   methods: {
@@ -69,6 +74,11 @@ export default {
     & span {
       font-weight: 500;
     }
+
+    &-small {
+      font-size: 14px;
+      margin-left: 48px;
+    }
   }
 
   &-button {
@@ -92,5 +102,15 @@ export default {
   height: 16px;
   width: 16px;
   margin-left: 0.6em;
+}
+
+.left {
+  left: 15px;
+  position: absolute;
+  top: 15px;
+}
+
+.white {
+  fill: white;
 }
 </style>

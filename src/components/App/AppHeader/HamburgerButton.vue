@@ -13,6 +13,7 @@ import HambugerIcon from '@/assets/hamburger.svg'
 import CrossIcon from '@/assets/cross.svg'
 
 export default {
+  name: 'HamburgerButton',
   props: { tabindex: Number },
   computed: {
     icon() {
