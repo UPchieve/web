@@ -21,6 +21,7 @@
 
 <script>
 export default {
+  name: 'checkbox',
   inheritAttrs: false,
   model: {
     prop: 'checked',

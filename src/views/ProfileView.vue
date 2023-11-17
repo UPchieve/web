@@ -89,21 +89,18 @@
                 @update="onPhoneInputUpdate"
               />
 
-              <div
-                v-if="shouldSeeSmsConsentCheckbox"
-                data-testid="sms-consent-checkbox"
-              >
-                <input
-                  type="checkbox"
+              <div class="sms-consent" v-if="shouldSeeSmsConsentCheckbox">
+                <checkbox
+                  id="sms-consent-checkbox"
                   :disabled="!activeEdit"
                   v-model="smsConsent"
-                  label="By checking this box, I consent to receiving SMS messages from UPchieve at the phone number provided above."
                   @change="emitSmsConsentCheckboxChangedEvent"
                 />
-                By checking this box, I consent to receiving SMS messages from
-                UPchieve at the phone number provided above.
+                <label for="sms-consent-input"
+                  >By checking this box, I consent to receiving SMS messages
+                  from UPchieve at the phone number provided above.</label
+                >
               </div>
-
               <div class="description" v-if="user.isVolunteer">
                 We will use this number to send you notifications when a student
                 needs help. You will only receive notifications during the
@@ -213,10 +210,12 @@ import VuePhoneNumberInput from 'vue-phone-number-input'
 import { EVENTS } from '@/consts'
 import Loader from '@/components/Loader.vue'
 import PhoneNumberVerificationModal from './PhoneNumberVerificationModal.vue'
+import Checkbox from '@/components/CheckBox.vue'
 
 export default {
   name: 'profile-view',
   components: {
+    Checkbox,
     DeactivateAccountModal,
     VuePhoneNumberInput,
     Loader,
@@ -778,5 +777,10 @@ button:hover {
   p {
     font-style: none;
   }
+}
+
+.sms-consent {
+  display: flex;
+  align-items: baseline;
 }
 </style>

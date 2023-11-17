@@ -151,9 +151,9 @@ describe('ProfileView', () => {
             },
           },
         })
-        expect(
-          !!wrapper.find('[data-testid="sms-consent-checkbox"]').exists()
-        ).toEqual(expected)
+        expect(!!wrapper.find('#sms-consent-checkbox').exists()).toEqual(
+          expected
+        )
       }
     )
 
