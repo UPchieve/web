@@ -69,7 +69,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: 'control',
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
       [POSTHOG_FEATURE_FLAGS.REFERRAL_COPY]: '',
-      [POSTHOG_FEATURE_FLAGS.EDIT_PROFILE_PHONE_NUMBER]: false,
       [POSTHOG_FEATURE_FLAGS.DASHBOARD_REDESIGN]: false,
     },
     flagPayloads: {
@@ -183,8 +182,6 @@ export default {
     referralCopy: state => state.flags[POSTHOG_FEATURE_FLAGS.REFERRAL_COPY],
     isTutorSessionHistoryActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.TUTOR_SESSION_HISTORY],
-    isEditProfilePhoneNumberActive: state =>
-      state.flags[POSTHOG_FEATURE_FLAGS.EDIT_PROFILE_PHONE_NUMBER],
     isSessionRecapDmsActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.SESSION_RECAP_DMS],
     showDashboardRedesign: state =>
