@@ -16,7 +16,6 @@
       Your profile
       <button
         type="button"
-        v-if="mayEditProfile"
         class="editBtn btn"
         data-testid="edit-profile-btn"
         @click="editProfile()"
@@ -56,10 +55,7 @@
 
                 <!-- Unverified phone number: Show alert with CTA to verify phone number -->
                 <div
-                  v-if="
-                    !this.user.phoneVerified &&
-                      this.isEditProfilePhoneNumberActive
-                  "
+                  v-if="!this.user.phoneVerified"
                   class="alert alert-warning unverified"
                 >
                   Your phone number has not been verified.
@@ -233,7 +229,6 @@ export default {
       isAccountActive: true,
       isAllowingNotifications: true,
       showDeactivateAccountModal: false,
-      mayEditProfile: false,
       shouldSeeSmsConsentCheckbox: false,
       showSmsVerificationModal: false,
       smsConsent: false,
@@ -268,8 +263,6 @@ export default {
       avatarUrl: 'user/avatarUrl',
       allSubtopics: 'subjects/allSubtopics',
       isFilterActiveSubjectsActive: 'featureFlags/isFilterActiveSubjectsActive',
-      isEditProfilePhoneNumberActive:
-        'featureFlags/isEditProfilePhoneNumberActive',
     }),
     name() {
       const user = this.$store.state.user.user
@@ -448,10 +441,7 @@ export default {
               })
               .then(() => {
                 // Phone number verification flow
-                if (
-                  this.userNeedsToVerifyPhone &&
-                  this.isEditProfilePhoneNumberActive
-                ) {
+                if (this.userNeedsToVerifyPhone) {
                   this.showSmsVerificationModal = true
                 }
               })
@@ -467,34 +457,17 @@ export default {
       const reqBody = {}
       reqBody.isDeactivated = !this.isAccountActive
 
-      // Edit Profile Phone Number flag:
-      // When OFF, volunteers edit their phone number through this UpdateProfile API
-      // When ON, students can send smsConsent field on this API
-      if (this.isEditProfilePhoneNumberActive) {
-        if (
-          !this.user.isVolunteer &&
-          this.smsConsent !== this.user.smsConsent
-        ) {
-          reqBody.smsConsent = this.smsConsent
-        }
-      } else {
-        if (
-          this.user.isVolunteer &&
-          this.user.phone !== this.phoneInputInfo.e164
-        ) {
-          reqBody.phone = this.phoneInputInfo.e164
-        }
+      // Students get a checkbox to opt in/out of SMS
+      if (!this.user.isVolunteer && this.smsConsent !== this.user.smsConsent) {
+        reqBody.smsConsent = this.smsConsent
       }
+
       return reqBody
     },
 
     setFlagsForEditingPhoneNumber() {
-      this.mayEditProfile =
-        this.user.isVolunteer || this.isEditProfilePhoneNumberActive
       this.shouldSeeSmsConsentCheckbox =
-        this.isEditProfilePhoneNumberActive &&
-        !this.user.isVolunteer &&
-        this.user.phone
+        !this.user.isVolunteer && this.user.phone
     },
   },
 }

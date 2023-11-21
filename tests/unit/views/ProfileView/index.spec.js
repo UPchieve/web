@@ -24,11 +24,9 @@ describe('ProfileView', () => {
     jest.resetAllMocks()
 
     DEFAULT_FLAGS = {
-      [POSTHOG_FEATURE_FLAGS.EDIT_PROFILE_PHONE_NUMBER]: true,
       [POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS]: true,
     }
     DEFAULT_FLAGS_GETTERS = {
-      isEditProfilePhoneNumberActive: () => true,
       isFilterActiveSubjectsActive: () => true,
     }
     DEFAULT_USER = {
@@ -119,7 +117,7 @@ describe('ProfileView', () => {
     )
   })
 
-  describe('Feature flag isEditProfilePhoneNumberActive', () => {
+  describe('Editing and verifying phone numbers', () => {
     /**
      * Helper function to click the button for editing/saving the profile
      */
@@ -129,33 +127,31 @@ describe('ProfileView', () => {
     }
 
     it.each([
-      // flag, phone, expected
-      [true, '+18607708892', true],
-      [false, '+18607708892', false],
-      [false, null, false],
-      [true, null, false],
+      // isVolunteer, expected
+      [true, false],
+      [false, true],
     ])(
-      'Should only show sms consent checkbox for students with phone numbers when the flag is on',
-      (flag, phone, expected) => {
+      'Should only show sms consent checkbox for students',
+      (isVolunteer, expected) => {
         const wrapper = getWrapper({
           user: {
-            isVolunteer: false,
-            phone,
-          },
-          featureFlags: {
-            flags: {
-              [POSTHOG_FEATURE_FLAGS.EDIT_PROFILE_PHONE_NUMBER]: flag,
-            },
-            getters: {
-              isEditProfilePhoneNumberActive: () => flag,
-            },
+            isVolunteer,
+            phone: '+18188888857',
           },
         })
-        expect(!!wrapper.find('#sms-consent-checkbox').exists()).toEqual(
-          expected
-        )
+        expect(wrapper.find('#sms-consent-checkbox').exists()).toEqual(expected)
       }
     )
+
+    it('Should not show SMS checkbox for students who have no phone number', () => {
+      const wrapper = getWrapper({
+        user: {
+          isVolunteer: false,
+          phone: null,
+        },
+      })
+      expect(wrapper.find('#sms-consent-checkbox').exists()).toBeFalsy()
+    })
 
     it('Should NOT open the SMS verification modal if the profile was saved with no changes to phone number', async () => {
       const wrapper = getWrapper({

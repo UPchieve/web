@@ -571,7 +571,6 @@ export const POSTHOG_FEATURE_FLAGS = {
   PROCRASTINATION_PREVENTION: 'procrastination-prevention',
   FALL_INCENTIVE_ENROLLMENT: 'fall-incentive-enrollment',
   REFERRAL_COPY: 'referral-copy',
-  EDIT_PROFILE_PHONE_NUMBER: 'edit-profile-phone-number',
   TUTOR_SESSION_HISTORY: 'tutor-session-history',
   SESSION_RECAP_DMS: 'session-recap-dms',
   DASHBOARD_REDESIGN: 'dashboard-redesign',
