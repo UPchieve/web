@@ -12,7 +12,7 @@
             <h1
               class="procrastination-modal__title procrastination-modal__title--center"
             >
-              Do you need help to stay on track to reach your academic goals?
+              Are you struggling with procrastination?
             </h1>
           </section>
           <footer class="procrastination-modal__footer">
