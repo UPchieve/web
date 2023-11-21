@@ -12,6 +12,7 @@ const newrelicUrls = [
   'https://bam.nr-data.net',
 ]
 const gleapUrl = 'https://*.gleap.io'
+const gleapWss = 'wss://ws.gleap.io'
 const orbitalUrl = 'https://*.useorbital.com'
 
 // connect sources
@@ -91,6 +92,7 @@ const connectSrc = [
   ...newrelicUrls,
   ...googleConnectUrls,
   gleapUrl,
+  gleapWss,
   orbitalUrl,
   `wss://${config.host}`,
   `https://${config.host}`,
