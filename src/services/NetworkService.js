@@ -206,8 +206,9 @@ export default {
       this._errorHandler
     )
   },
-  sendVerification(data) {
-    return httpPost(`${API_ROOT}/verify/send`, data).then(
+  async sendVerification(data) {
+    const config = await getAdditionalConfig('sendVerification')
+    return httpPost(`${API_ROOT}/verify/send`, data, config).then(
       this._successHandler,
       this._errorHandler
     )

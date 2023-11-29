@@ -54,7 +54,7 @@
           >
         </div>
       </div>
-
+      <RecaptchaCaption />
       <button class="uc-form-button-secondary" @click="logout">Logout</button>
     </div>
 
@@ -70,10 +70,12 @@ import AuthService from '@/services/AuthService'
 import LoggerService from '@/services/LoggerService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
+import RecaptchaCaption from '@/components/recaptcha/RecaptchaCaption.vue'
 
 export default {
   name: 'VerificationView',
   components: {
+    RecaptchaCaption,
     FormPageTemplate,
     Loader,
   },
