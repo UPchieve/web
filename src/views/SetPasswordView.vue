@@ -55,12 +55,7 @@
         <button class="uc-form-button" type="submit" @click.prevent="submit()">
           Reset Password
         </button>
-        <p class="caption">
-          This site is protected by reCAPTCHA and the Google
-          <a href="https://policies.google.com/privacy">Privacy Policy</a> and
-          <a href="https://policies.google.com/terms">Terms of Service</a>
-          apply.
-        </p>
+        <RecaptchaCaption />
 
         <loader v-if="isResettingPassword" overlay />
       </form>
@@ -81,9 +76,11 @@ import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import Loader from '@/components/Loader.vue'
 import LoggerService from '@/services/LoggerService'
+import RecaptchaCaption from '@/components/recaptcha/RecaptchaCaption.vue'
 
 export default {
   components: {
+    RecaptchaCaption,
     FormPageTemplate,
     LargeButton,
     Loader,
@@ -146,10 +143,5 @@ export default {
   @include flex-container(column, center, center);
   margin: auto 0;
   padding: 50px;
-}
-
-.caption {
-  font-size: 12px;
-  padding: 12px 12px 0 12px;
 }
 </style>

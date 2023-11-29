@@ -64,6 +64,7 @@
             Cancel
           </button>
         </div>
+        <RecaptchaCaption />
       </div>
       <button
         v-if="flowIncompletable"
@@ -92,10 +93,12 @@ import AuthService from '@/services/AuthService'
 import { mapState } from 'vuex'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
+import RecaptchaCaption from '@/components/recaptcha/RecaptchaCaption.vue'
 
 export default {
   name: 'phone-number-verification-modal',
   components: {
+    RecaptchaCaption,
     Modal,
     Loader,
   },

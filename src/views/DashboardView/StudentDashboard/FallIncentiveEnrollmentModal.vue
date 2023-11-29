@@ -66,6 +66,7 @@
                 >Send code</large-button
               >
             </div>
+            <RecaptchaCaption />
           </footer>
         </div>
         <div v-else-if="step === 2" class="incentive-enrollment-modal">
@@ -158,10 +159,12 @@ import VuePhoneNumberInput from 'vue-phone-number-input'
 import { mapState } from 'vuex'
 import Loader from '@/components/Loader.vue'
 import UpdogHooray from '@/assets/updog-hooray.svg'
+import RecaptchaCaption from '@/components/recaptcha/RecaptchaCaption.vue'
 
 export default {
   name: 'IncentiveEnrollmentPreventionModal',
   components: {
+    RecaptchaCaption,
     Modal,
     LargeButton,
     VuePhoneNumberInput,
