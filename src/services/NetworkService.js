@@ -17,21 +17,39 @@ const FAULT_TOLERANT_HTTP_TIMEOUT = 10000
 const FAULT_TOLERANT_HTTP_MAX_RETRY_TIMEOUT = 100000
 const FAULT_TOLERANT_HTTP_MAX_RETRIES = 10
 
+const grecaptcha = window.grecaptcha
+
 export const axiosInstance = axios.create({
   withCredentials: true,
   baseURL: config.serverRoot,
 })
 
-export function httpGet(path, config) {
+async function getRecaptchaToken(action) {
+  return new Promise((resolve, reject) => {
+    grecaptcha.ready(() => {
+      grecaptcha.execute(config.googleRecaptchaKey, { action }).then(
+        token => resolve(token),
+        () => reject()
+      )
+    })
+  })
+}
+
+async function getAdditionalConfig(action) {
+  const token = await getRecaptchaToken(action)
+  return { headers: { 'g-recaptcha-response': token } }
+}
+
+export async function httpGet(path, config) {
   return axiosInstance.get(path, config)
 }
 
-export function httpPost(path, data) {
-  return axiosInstance.post(path, data)
+export async function httpPost(path, data, config) {
+  return axiosInstance.post(path, data, config)
 }
 
-export function httpPut(path, data) {
-  return axiosInstance.put(path, data)
+export async function httpPut(path, data, config) {
+  return axiosInstance.put(path, data, config)
 }
 
 export default {
@@ -169,8 +187,9 @@ export default {
       this._errorHandler
     )
   },
-  confirmReset(data) {
-    return httpPost(`${AUTH_ROOT}/reset/confirm`, data).then(
+  async confirmReset(data) {
+    const config = await getAdditionalConfig('resetPassword')
+    return httpPost(`${AUTH_ROOT}/reset/confirm`, data, config).then(
       this._successHandler,
       this._errorHandler
     )

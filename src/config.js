@@ -20,4 +20,6 @@ config.customVolunteerPartnerOrgs =
   process.env.SUBWAY_CUSTOM_VOLUNTEER_PARTNER_ORGS || 'bogus'
 const customVolunteerPartnerOrgs = config.customVolunteerPartnerOrgs.split(',')
 config.customVolunteerPartnerOrgs = customVolunteerPartnerOrgs
+config.googleRecaptchaKey = process.env.VUE_APP_GOOGLE_RECAPTCHA_KEY
+
 export default config
