@@ -1,10 +1,11 @@
 <template>
   <form-page-template>
-    <div class="uc-form">
+    <div v-if="!showParentGuardianConfirmationPage" class="uc-form">
       <FormErrors :errors="errors" />
 
       <h1 v-if="studentPartner.name" class="uc-form-header">
-        Welcome {{ studentPartner.name }} Student!
+        Welcome {{ studentPartner.name }}
+        {{ useParentGuardianSignUpFlow ? `Parent/Guardian!` : `Student!` }}
       </h1>
       <h1 v-else class="uc-form-header">
         Welcome to UPchieve!
@@ -17,7 +18,7 @@
         We're a free online tutoring platform for high school students.
       </p>
 
-      <div v-if="useSSO">
+      <div v-if="useSSO && !useParentGuardianSignUpFlow">
         <div class="uc-form-element">
           <div class="uc-row justify-between">
             <label for="grade">What is your current grade?</label>
@@ -56,13 +57,13 @@
               error: hasFormValidationError(v$.formData.partnerSite),
             }"
           >
-            Which site do you belong to?
+            What is {{ formTextIdentifier }} site?
           </label>
           <v-select
             id="site"
             class="uc-form-select-input"
             v-model="formData.partnerSite"
-            placeholder="Select your site"
+            :placeholder="`Select ${formTextIdentifier} site`"
             v-bind:class="{
               'uc-form-select-input-invalid': hasFormValidationError(
                 v$.formData.partnerSite
@@ -82,13 +83,13 @@
             v-bind:class="{
               error: hasFormValidationError(v$.formData.firstName),
             }"
-            >What is your first name?
+            >What is {{ formTextIdentifier }} first name?
           </label>
           <input
             id="firstName"
             class="uc-form-text-input"
             type="text"
-            placeholder="Enter your first name"
+            :placeholder="`Enter ${formTextIdentifier} first name`"
             v-bind:class="{
               'uc-form-text-input-invalid': hasFormValidationError(
                 v$.formData.firstName
@@ -107,13 +108,13 @@
             v-bind:class="{
               error: hasFormValidationError(v$.formData.lastName),
             }"
-            >What is your last name?
+            >What is {{ formTextIdentifier }} last name?
           </label>
           <input
             id="lastName"
             class="uc-form-text-input"
             type="text"
-            placeholder="Enter your last name"
+            :placeholder="`Enter ${formTextIdentifier} last name`"
             v-bind:class="{
               'uc-form-text-input-invalid': hasFormValidationError(
                 v$.formData.lastName
@@ -133,7 +134,8 @@
             type="checkbox"
           />
           <label for="highSchoolCheckbox">
-            Are you currently a high school student?
+            {{ formQuestionIdentifier }} currently a middle or high school
+            student?
           </label>
         </div>
 
@@ -143,14 +145,14 @@
             v-bind:class="{
               error: hasFormValidationError(v$.formData.schoolId),
             }"
-            >What is your school?</label
+            >What is {{ formTextIdentifier }} school?</label
           >
           <autocomplete
             id="school"
             base-class="uc-form-autocomplete-input"
             :search="autocompleteSchool"
-            placeholder="Search for your school"
-            aria-label="Search for your school"
+            :placeholder="`Search for ${formTextIdentifier} school`"
+            :aria-label="`Search for ${formTextIdentifier} school`"
             :get-result-value="getSchoolDisplayName"
             @submit="handleSelectHighSchool"
             @blur="v$.formData.schoolId.$touch()"
@@ -186,7 +188,7 @@
             type="checkbox"
           />
           <label for="collegeCheckbox">
-            Are you currently a college student?
+            {{ formQuestionIdentifier }} currently a college student?
           </label>
         </div>
 
@@ -196,12 +198,12 @@
             v-bind:class="{
               error: hasFormValidationError(v$.formData.college),
             }"
-            >What is your college?</label
+            >What is {{ formTextIdentifier }} college?</label
           >
           <input
             id="college"
             class="uc-form-text-input"
-            placeholder="Enter your college"
+            :placeholder="`Enter ${formTextIdentifier} college`"
             type="text"
             v-model="formData.college"
             v-bind:class="{
@@ -220,7 +222,7 @@
               v-bind:class="{
                 error: hasFormValidationError(v$.formData.email),
               }"
-              >What is your email?</label
+              >What is {{ formTextIdentifier }} email?</label
             >
             <div
               v-if="hasFormValidationError(v$.formData.email)"
@@ -233,7 +235,7 @@
             id="email"
             class="uc-form-text-input"
             type="email"
-            placeholder="Enter your email address"
+            :placeholder="`Enter ${formTextIdentifier} email address`"
             v-model="formData.email"
             v-bind:class="{
               'uc-form-text-input-invalid': hasFormValidationError(
@@ -245,7 +247,39 @@
           />
         </div>
 
-        <div class="uc-form-element">
+        <div v-if="useParentGuardianSignUpFlow" class="uc-form-element">
+          <div class="uc-row justify-between">
+            <label
+              for="parent-email"
+              v-bind:class="{
+                error: hasFormValidationError(v$.formData.parentGuardianEmail),
+              }"
+              >What is your email?</label
+            >
+            <div
+              v-if="hasFormValidationError(v$.formData.parentGuardianEmail)"
+              class="error-caption"
+            >
+              {{ getFormValidationError(v$.formData.parentGuardianEmail) }}
+            </div>
+          </div>
+          <input
+            id="parent-email"
+            class="uc-form-text-input"
+            type="email"
+            placeholder="Enter your email address"
+            v-model="formData.parentGuardianEmail"
+            v-bind:class="{
+              'uc-form-text-input-invalid': hasFormValidationError(
+                v$.formData.parentGuardianEmail
+              ),
+            }"
+            @blur="v$.formData.parentGuardianEmail.$touch"
+            required
+          />
+        </div>
+
+        <div v-if="!useParentGuardianSignUpFlow" class="uc-form-element">
           <div class="uc-row justify-between">
             <label
               for="password"
@@ -338,6 +372,16 @@
         </p>
       </form>
     </div>
+    <div v-if="showParentGuardianConfirmationPage" class="uc-form">
+      <div class="uc-column justify-center items-center h-full center">
+        <verification-badge />
+        <h1>You're all set!</h1>
+        <p>An account for {{ this.formData.firstName }} has been created.</p>
+        <p>
+          We have sent an email to {{ this.formData.email }} to set a password.
+        </p>
+      </div>
+    </div>
   </form-page-template>
 </template>
 
@@ -356,6 +400,7 @@ import { backOff } from 'exponential-backoff'
 import { EVENTS, GRADES } from '@/consts'
 import GoogleLogo from '@/assets/google_logo.svg'
 import config from '../config'
+import VerificationBadge from '@/assets/verification.svg'
 
 export default {
   name: 'student-partner-signup-view',
@@ -364,6 +409,7 @@ export default {
     FormErrors,
     Autocomplete,
     GoogleLogo,
+    VerificationBadge,
   },
   setup() {
     return { v$: useVuelidate() }
@@ -397,7 +443,17 @@ export default {
         },
         password: {
           isPasswordValid: helpers.regex(this.PASSWORD_PATTERN),
-          required: helpers.withMessage('Required', required),
+          required: helpers.withMessage(
+            'Required',
+            requiredIf(() => !this.useParentGuardianSignUpFlow)
+          ),
+        },
+        parentGuardianEmail: {
+          isValidEmail: helpers.withMessage('Not a valid email address', email),
+          required: helpers.withMessage(
+            'Required',
+            requiredIf(() => this.useParentGuardianSignUpFlow)
+          ),
         },
         signupSourceId: {
           required: helpers.withMessage(
@@ -439,6 +495,9 @@ export default {
     if (this.shouldUseSSO(params)) {
       this.useSSO = true
     }
+    if (this.shouldUseParentGuardianSignUpFlow(params)) {
+      this.useParentGuardianSignUpFlow = true
+    }
     if (this.isFailureRedirect(params)) {
       this.errors.push(params['error'] || 'Failed to sign up with Google.')
     }
@@ -450,6 +509,8 @@ export default {
   data() {
     return {
       useSSO: false,
+      useParentGuardianSignUpFlow: false,
+      showParentGuardianConfirmationPage: false,
       gradeLevels: GRADES,
       sso: {
         currentGrade: '',
@@ -464,15 +525,16 @@ export default {
       isHighSchoolStudent: false,
       isCollegeStudent: false,
       formData: {
-        partnerSite: undefined,
+        college: '',
         email: '',
-        password: '',
         firstName: '',
         lastName: '',
-        schoolId: '',
-        college: '',
-        signupSourceId: undefined,
         otherSignupSource: '',
+        partnerSite: undefined,
+        password: '',
+        parentGuardianEmail: '',
+        schoolId: '',
+        signupSourceId: undefined,
       },
       errors: [],
       serverErrorMsg: '',
@@ -482,6 +544,14 @@ export default {
     }
   },
   computed: {
+    formTextIdentifier() {
+      if (this.useParentGuardianSignUpFlow) return 'the student'
+      return 'your'
+    },
+    formQuestionIdentifier() {
+      if (this.useParentGuardianSignUpFlow) return 'Is the student'
+      return 'Are you'
+    },
     PASSWORD_PATTERN() {
       return /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/
     },
@@ -567,6 +637,9 @@ export default {
     },
     shouldUseSSO(params) {
       return params['sso'] === 'google'
+    },
+    shouldUseParentGuardianSignUpFlow(params) {
+      return 'parent' in params
     },
     autocompleteSchool(input) {
       this.formData.schoolId = ''
@@ -663,22 +736,25 @@ export default {
         return
       }
 
-      AuthService.registerPartnerStudent({
-        studentPartnerOrg: this.$route.params.partnerId,
-        partnerUserId: this.$route.query.uid,
-        partnerSite: this.formData.partnerSite,
+      AuthService.registerStudent({
+        college: this.formData.college,
         email: this.formData.email,
-        password: this.formData.password,
         firstName: this.formData.firstName,
         lastName: this.formData.lastName,
-        highSchoolId: this.formData.schoolId,
-        college: this.formData.college,
-        terms: true,
+        parentGuardianEmail: this.formData.parentGuardianEmail,
+        partnerSite: this.formData.partnerSite,
+        password: this.formData.password,
+        schoolId: this.formData.schoolId,
         signupSourceId: this.formData.signupSourceId,
+        studentPartnerOrg: this.$route.params.partnerId,
         otherSignupSource: this.formData.otherSignupSource,
       })
         .then(() => {
-          this.$router.push('/verify')
+          if (this.useParentGuardianSignUpFlow) {
+            this.showParentGuardianConfirmationPage = true
+          } else {
+            this.$router.push('/verify')
+          }
         })
         .catch(err => {
           this.isSubmittingForm = false
