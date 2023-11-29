@@ -32,3 +32,10 @@ body {
 .disable-scroll {
   overflow: hidden;
 }
+
+// Hides the Google reCAPTCHA badge.
+// However, any flow that uses reCAPTCHA must have branding visible in the user flow.
+// See https://developers.google.com/recaptcha/docs/faq#id-like-to-hide-the-recaptcha-badge.-what-is-allowed
+.grecaptcha-badge {
+  visibility: hidden;
+}
