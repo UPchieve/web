@@ -5,6 +5,20 @@
     <h1 v-if="!isCollegeConfidential" class="uc-form-header">
       {{ customEligibilityHeader || `Awesome! Let's check if we're a match` }}
     </h1>
+    <div v-if="showBigFutureIntroCopy">
+      <p class="uc-form-text">
+        UPchieve and BigFuture are working together to connect you to 100% free,
+        online college counseling and tutoring available 24/7! Share some quick
+        info below to see if you're eligible or
+        <a
+          class="uc-link"
+          href="https://upchieve.org/bigfuture"
+          target="_blank"
+          @click="logStudentClickedLearnMoreLink"
+          >learn more.</a
+        >
+      </p>
+    </div>
     <div v-if="isCollegeConfidential">
       <div v-if="ccIntroCopy === 'get-that-a'">
         <h1 class="uc-form-header">Get that A you deserve!</h1>
@@ -553,9 +567,11 @@ export default {
       isCollegeStudent: false,
       isReferred: false,
       isSubmittingAccountForm: false,
-      isCollegeConfidential: false,
       partnerKey: undefined,
       studentPartner: undefined,
+      // Reach Studies:
+      isCollegeConfidential: false,
+      showBigFutureIntroCopy: false,
     }
   },
   async mounted() {
@@ -600,6 +616,10 @@ export default {
 
     if (params['partner']) {
       this.partnerKey = params['partner']
+
+      if (this.partnerKey === 'bigfuture' && this.bfIntroCopy) {
+        this.showBigFutureIntroCopy = true
+      }
     }
 
     const isDomesticIpAddress = await this.isDomesticIpAddress()
@@ -609,6 +629,7 @@ export default {
     ...mapGetters({
       offerGoogleSSO: 'featureFlags/offerGoogleSSO',
       ccIntroCopy: 'featureFlags/ccIntroCopy',
+      bfIntroCopy: 'featureFlags/bfIntroCopy',
     }),
     trimCurrentGrade() {
       // extracting the first word out of the gradeLevels
@@ -674,8 +695,8 @@ export default {
     },
   },
   methods: {
-    logStudentClickedUpchieveLink() {
-      AnalyticsService.captureEvent(EVENTS.CC_STUDENT_CLICKED_UPCHIEVE_LINK)
+    logStudentClickedLearnMoreLink() {
+      AnalyticsService.captureEvent(EVENTS.BF_STUDENT_CLICKED_LEARN_MORE)
     },
     isFailureRedirect() {
       return (

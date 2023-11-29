@@ -541,6 +541,7 @@ export const EVENTS = {
   SESSION_RECAP_DM_REPORT_MODAL_SHOWN: 'SESSION_RECAP_REPORT_MODAL_SHOWN',
   SESSION_RECAP_DM_REPORT_MODAL_SUBMITTED:
     'SESSION_RECAP_DM_REPORT_MODAL_SUBMITTED',
+  BF_STUDENT_CLICKED_LEARN_MORE: 'BF_STUDENT_CLICKED_LEARN_MORE',
 }
 
 export const VERIFICATION_METHOD = {
@@ -568,6 +569,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   GLEAP_SEGMENT_EXPERIMENTS: 'gleap-segment-experiments',
   STUDENT_COACH_REACH_OUT: 'student-coach-reach-out',
   CC_INTRO_COPY: 'cc-intro-copy',
+  BF_INTRO_COPY: 'bf-intro-copy',
   PROCRASTINATION_PREVENTION: 'procrastination-prevention',
   FALL_INCENTIVE_ENROLLMENT: 'fall-incentive-enrollment',
   REFERRAL_COPY: 'referral-copy',
