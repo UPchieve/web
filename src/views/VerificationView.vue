@@ -55,23 +55,6 @@
         </div>
       </div>
 
-      <div v-if="step === 3">
-        <verification-badge />
-        <h1 class="uc-form-header center">
-          You’re verified <span v-if="showEmoji">😎</span>
-        </h1>
-        <p class="uc-form-text center">
-          Woohoo! Welcome to UPchieve.
-        </p>
-        <large-button
-          primary
-          :routeTo="isAutoFlowUser ? '/welcome' : '/'"
-          class="uc-form-button"
-        >
-          Take me to the dashboard
-        </large-button>
-      </div>
-
       <button class="uc-form-button-secondary" @click="logout">Logout</button>
     </div>
 
@@ -84,8 +67,6 @@ import { mapState, mapGetters } from 'vuex'
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import Loader from '@/components/Loader.vue'
 import AuthService from '@/services/AuthService'
-import VerificationBadge from '@/assets/verification.svg'
-import LargeButton from '@/components/LargeButton.vue'
 import LoggerService from '@/services/LoggerService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
@@ -94,8 +75,6 @@ export default {
   name: 'VerificationView',
   components: {
     FormPageTemplate,
-    VerificationBadge,
-    LargeButton,
     Loader,
   },
   data() {
@@ -177,14 +156,17 @@ export default {
           verificationMethod: VERIFICATION_METHOD.EMAIL,
         })
         if (success) {
-          AnalyticsService.captureEvent(EVENTS.ACCOUNT_VERIFIED, {
-            event: EVENTS.ACCOUNT_VERIFIED,
-          })
+          AnalyticsService.captureEvent(EVENTS.ACCOUNT_VERIFIED)
           this.$store.dispatch('user/firstDashboardVisit', true)
           this.$store.dispatch('user/addToUser', {
             verified: true,
           })
-          this.step = 3
+
+          if (this.isAutoFlowUser) {
+            this.$router.push('/welcome')
+          } else {
+            this.$router.push('/')
+          }
         } else {
           this.error =
             'Please enter the most recent verification code that was sent to you'
