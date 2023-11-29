@@ -64,6 +64,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.TUTOR_SESSION_HISTORY]: false,
       [POSTHOG_FEATURE_FLAGS.SESSION_RECAP_DMS]: false,
       [POSTHOG_FEATURE_FLAGS.RECAP_SOCKET_UPDATES]: false,
+      [POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY]: false,
       // This is an experiment, using multivariant feature flag values
       [POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO]: true,
       [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: 'control',
@@ -175,6 +176,7 @@ export default {
     isGleapSegmentExperimentsActive: (state, getters) =>
       getters.gleapSegmentExperiments.length > 0,
     ccIntroCopy: state => state.flags[POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY],
+    bfIntroCopy: state => state.flags[POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY],
     isProcrastinationPreventionActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.PROCRASTINATION_PREVENTION],
     isFallIncentiveEnrollmentActive: state =>
