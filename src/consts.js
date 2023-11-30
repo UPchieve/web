@@ -578,6 +578,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   DASHBOARD_REDESIGN: 'dashboard-redesign',
   FORCE_DASHBOARD_REDESIGN_ORG: 'force-dashboard-redesign-org',
   RECAP_SOCKET_UPDATES: 'recap-socket-updates',
+  SCORECASTER_WOZ: 'scorecaster-woz',
 }
 
 export const ANALYTICS_REPORT_ROW = {
