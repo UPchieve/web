@@ -33,10 +33,6 @@
       v-if="showThemProcrastinationPreventionModal"
       :closeModal="toggleProcrastinationPreventionModal"
     />
-    <phone-number-submission-modal
-      v-if="showPhoneNumberSubmissionModal"
-      :closeModal="togglePhoneNumberSubmissionModal"
-    />
     <fall-incentive-enrollment-modal
       v-if="showFallIncentiveEnrollmentModal"
       :closeModal="toggleFallIncentiveEnrollmentModal"
@@ -56,7 +52,6 @@ import SubjectSelection from './SubjectSelection/index.vue'
 import FirstSessionCongratsModal from './FirstSessionCongratsModal.vue'
 import TellThemCollegePrepModal from './TellThemCollegePrepModal.vue'
 import ProcrastinationPreventionModal from './ProcrastinationPreventionModal.vue'
-import PhoneNumberSubmissionModal from './PhoneNumberSubmissionModal.vue'
 import FallIncentiveEnrollmentModal from './FallIncentiveEnrollmentModal.vue'
 import moment from 'moment-timezone'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -91,7 +86,6 @@ export default {
     FirstSessionCongratsModal,
     TellThemCollegePrepModal,
     ProcrastinationPreventionModal,
-    PhoneNumberSubmissionModal,
     FallIncentiveEnrollmentModal,
   },
   async created() {
@@ -143,9 +137,6 @@ export default {
       !localStorage.getItem('hasSeenProcrastinationPreventionModal')
     )
       this.showThemProcrastinationPreventionModal = true
-
-    if (this.isPhoneNumberSubmissionModalActive)
-      this.showPhoneNumberSubmissionModal = true
 
     if (this.isEnrollmentForFallIncentiveModalActive)
       this.showFallIncentiveEnrollmentModal = true
@@ -207,7 +198,6 @@ export default {
       showFirstSessionCongratsModal: false,
       showTellThemCollegePrepModal: false,
       showThemProcrastinationPreventionModal: false,
-      showPhoneNumberSubmissionModal: false,
       showFallIncentiveEnrollmentModal: false,
     }
   },
@@ -280,15 +270,6 @@ export default {
         !this.user.phone
       )
     },
-    isPhoneNumberSubmissionModalActive() {
-      return (
-        this.isFallIncentiveProgramActive[0] &&
-        this.isFallIncentiveProgramActive[1] &&
-        this.isFallIncentiveProgramActive[2] &&
-        !localStorage.getItem('hasSeenPhoneNumberSubmissionModal') &&
-        !this.user.phone
-      )
-    },
   },
   methods: {
     toggleFirstSessionCongratsModal() {
@@ -300,9 +281,6 @@ export default {
     toggleProcrastinationPreventionModal() {
       this.showThemProcrastinationPreventionModal = !this
         .showThemProcrastinationPreventionModal
-    },
-    togglePhoneNumberSubmissionModal() {
-      this.showPhoneNumberSubmissionModal = !this.showPhoneNumberSubmissionModal
     },
     toggleFallIncentiveEnrollmentModal() {
       this.showFallIncentiveEnrollmentModal = !this
@@ -391,8 +369,6 @@ export default {
             !prevValue[2])
         )
           this.triggerIncentiveProgram()
-        if (this.isPhoneNumberSubmissionModalActive)
-          this.showPhoneNumberSubmissionModal = true
       },
       deep: true,
     },
