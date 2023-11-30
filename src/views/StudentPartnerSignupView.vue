@@ -533,7 +533,7 @@ export default {
         partnerSite: undefined,
         password: '',
         parentGuardianEmail: '',
-        schoolId: '',
+        schoolId: undefined,
         signupSourceId: undefined,
       },
       errors: [],
@@ -642,7 +642,7 @@ export default {
       return 'parent' in params
     },
     autocompleteSchool(input) {
-      this.formData.schoolId = ''
+      this.formData.schoolId = undefined
 
       return new Promise(resolve => {
         if (input.length < 3) {
