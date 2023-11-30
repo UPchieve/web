@@ -4,7 +4,11 @@ const config = require('./serverConfig')
 // helmet docs: https://helmetjs.github.io/
 
 // script sources
-const googleScriptUrls = ['https://*.googletagmanager.com']
+const googleScriptUrls = [
+  'https://*.googletagmanager.com',
+  'https://www.google.com/recaptcha/',
+  'https://www.gstatic.com/recaptcha/',
+]
 const cdnUrl = 'https://cdn.upchieve.org'
 const mathJaxScriptUrl = 'https://cdnjs.cloudflare.com'
 const newrelicUrls = [
@@ -35,7 +39,11 @@ const s3PhotoConnectUrls = [
 ]
 
 // frame sources
-const googleDocFrameSrcUrl = 'https://docs.google.com/'
+const googleFrameSrcUrls = [
+  'https://docs.google.com/',
+  'https://www.google.com/recaptcha/',
+  'https://recaptcha.google.com/recaptcha/',
+]
 const vimeoFrameSrcUrl = 'https://player.vimeo.com/'
 
 // img srcs
@@ -100,7 +108,7 @@ const connectSrc = [
 
 const frameSrc = [
   "'self'",
-  googleDocFrameSrcUrl,
+  ...googleFrameSrcUrls,
   vimeoFrameSrcUrl,
   gleapUrl,
   orbitalUrl,
