@@ -50,8 +50,6 @@ export default {
   namespaced: true,
   state: {
     flags: {
-      [UNLEASH_FEATURE_FLAGS.REFER_FRIENDS]: false,
-      [UNLEASH_FEATURE_FLAGS.DASHBOARD_REDESIGN]: false,
       [UNLEASH_FEATURE_FLAGS.CHATBOT]: false,
       [POSTHOG_FEATURE_FLAGS.DASHBOARD_BANNER]: false,
       [POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS]: false,
@@ -70,8 +68,8 @@ export default {
       [POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO]: true,
       [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: 'control',
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
-      [POSTHOG_FEATURE_FLAGS.REFERRAL_COPY]: '',
       [POSTHOG_FEATURE_FLAGS.DASHBOARD_REDESIGN]: false,
+      [POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION]: false,
     },
     flagPayloads: {
       [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: [],
@@ -81,6 +79,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SUBJECT_REQUEST_ROLLOUT]: [],
       [POSTHOG_FEATURE_FLAGS.QUIZ_ROLLOUT]: [],
       [POSTHOG_FEATURE_FLAGS.FORCE_DASHBOARD_REDESIGN_ORG]: 'none',
+      [POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION]: '',
     },
   },
   mutations: {
@@ -137,8 +136,6 @@ export default {
     },
   },
   getters: {
-    isReferFriendsActive: state =>
-      state.flags[UNLEASH_FEATURE_FLAGS.REFER_FRIENDS],
     isDashboardRedesignActive: state =>
       state.flags[UNLEASH_FEATURE_FLAGS.DASHBOARD_REDESIGN],
     isChatbotActive: state => state.flags[UNLEASH_FEATURE_FLAGS.CHATBOT],
@@ -182,7 +179,6 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.PROCRASTINATION_PREVENTION],
     isFallIncentiveEnrollmentActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_ENROLLMENT],
-    referralCopy: state => state.flags[POSTHOG_FEATURE_FLAGS.REFERRAL_COPY],
     isTutorSessionHistoryActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.TUTOR_SESSION_HISTORY],
     isSessionRecapDmsActive: state =>
@@ -193,5 +189,9 @@ export default {
       state.flagPayloads[POSTHOG_FEATURE_FLAGS.FORCE_DASHBOARD_REDESIGN_ORG],
     isRecapSocketUpdatesActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.RECAP_SOCKET_UPDATES],
+    isAutoStartCollegeSessionActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION],
+    autoStartCollegeSession: state =>
+      state.flagPayloads[POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION],
   },
 }

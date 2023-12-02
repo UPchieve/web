@@ -38,10 +38,6 @@
       :closeModal="toggleFallIncentiveEnrollmentModal"
     />
     <subject-selection />
-    <first-session-congrats-modal
-      v-if="showFirstSessionCongratsModal"
-      :closeModal="toggleFirstSessionCongratsModal"
-    />
   </div>
 </template>
 
@@ -49,16 +45,15 @@
 import { mapGetters, mapState } from 'vuex'
 import DashboardBanner from '../DashboardBanner'
 import SubjectSelection from './SubjectSelection/index.vue'
-import FirstSessionCongratsModal from './FirstSessionCongratsModal.vue'
 import TellThemCollegePrepModal from './TellThemCollegePrepModal.vue'
 import ProcrastinationPreventionModal from './ProcrastinationPreventionModal.vue'
 import FallIncentiveEnrollmentModal from './FallIncentiveEnrollmentModal.vue'
+import StudentOnboardingModal from './StudentOnboardingModal.vue'
 import moment from 'moment-timezone'
 import AnalyticsService from '@/services/AnalyticsService'
 import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 import { EVENTS } from '@/consts'
 import getCookie from '@/utils/get-cookie'
-import ReferralSVG from '@/assets/dashboard_icons/student/referral.svg'
 import Gleap from 'gleap'
 
 const defaultHeaderData = {
@@ -83,7 +78,6 @@ export default {
   components: {
     DashboardBanner,
     SubjectSelection,
-    FirstSessionCongratsModal,
     TellThemCollegePrepModal,
     ProcrastinationPreventionModal,
     FallIncentiveEnrollmentModal,
@@ -91,11 +85,13 @@ export default {
   async created() {
     if (this.isSessionAlive) {
       this.$store.dispatch('app/header/show', activeHeaderData)
-    } else if (this.isDashboardBannerActive) this.triggerIncentiveProgram()
+    } else if (this.isDashboardBannerActive) {
+      this.triggerIncentiveProgram()
+    }
 
     if (this.isFirstDashboardVisit) {
       this.$store.dispatch('app/modal/show', {
-        component: 'StudentOnboardingModal',
+        component: StudentOnboardingModal,
         data: {
           showTemplateButtons: false,
         },
@@ -106,16 +102,14 @@ export default {
       AnalyticsService.captureEvent(EVENTS.ACCOUNT_CREATED)
       AnalyticsService.captureEvent(EVENTS.ACCOUNT_VERIFIED)
       localStorage.removeItem('isSSOSignUpRedirect')
+      this.$store.dispatch('user/firstDashboardVisit', true)
       this.$store.dispatch('app/modal/show', {
-        component: 'StudentOnboardingModal',
+        component: StudentOnboardingModal,
         data: {
           showTemplateButtons: false,
         },
       })
     }
-
-    if (this.isReferFriendsActive && this.hasSeenFirstSessionCongratsModal)
-      this.toggleFirstSessionCongratsModal()
 
     if (this.isOrbitalSegmentsActive)
       ProductDiscoveryService.triggerDynamicSegment(
@@ -145,48 +139,6 @@ export default {
       .tz('America/New_York')
       .hour()
 
-    if (
-      !this.showTellThemCollegePrepModal &&
-      !this.showThemProcrastinationPreventionModal &&
-      !this.showFallIncentiveEnrollmentModal &&
-      !!this.referralCopy &&
-      (!localStorage.getItem('last-seen-referral-modal') ||
-        moment(localStorage.getItem('last-seen-referral-modal')).isSameOrBefore(
-          moment().subtract(1, 'week')
-        )) &&
-      localStorage.getItem('high-session-rating') === 'true'
-    ) {
-      let header
-      let subcopy
-      if (this.referralCopy === 'baseline') {
-        header =
-          'Know a friend or classmate who would benefit from free 24/7 tutoring?'
-        subcopy = 'Invite them to UPchieve!'
-      } else if (this.referralCopy === 'small-gift-card') {
-        header =
-          'UPchieve can help your friends succeed! Refer 5 friends to UPchieve and get a $25 gift card when they sign up.'
-        subcopy = 'Refer your friends now'
-      } else if (this.referralCopy === 'emotional-appeal-struggling') {
-        header =
-          'Do you have friends, siblings, or classmates struggling in a class? When you share UPchieve, you can help a struggling friend succeed!'
-        subcopy = 'Invite them to UPchieve!'
-      }
-
-      AnalyticsService.captureEvent(EVENTS.STUDENT_SHOWN_REFERRAL_MODAL)
-
-      this.$store.dispatch('app/modal/show', {
-        component: 'ReferralModal',
-        data: {
-          svg: ReferralSVG,
-          showAccept: false,
-          header,
-          subcopy,
-        },
-      })
-
-      localStorage.setItem('last-seen-referral-modal', new Date())
-    }
-
     // TODO: move globally to show banner in all pages
     if (this.user && this.user.isBanned) {
       this.$store.dispatch('app/header/show', bannedHeaderData)
@@ -195,7 +147,6 @@ export default {
   data() {
     return {
       currentHour: 0,
-      showFirstSessionCongratsModal: false,
       showTellThemCollegePrepModal: false,
       showThemProcrastinationPreventionModal: false,
       showFallIncentiveEnrollmentModal: false,
@@ -210,7 +161,6 @@ export default {
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
-      isReferFriendsActive: 'featureFlags/isReferFriendsActive',
       downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
       orbitalSegments: 'featureFlags/orbitalSegments',
       isOrbitalSegmentsActive: 'featureFlags/isOrbitalSegmentsActive',
@@ -220,8 +170,10 @@ export default {
       isDashboardBannerActive: 'featureFlags/isDashboardBannerActive',
       isFallIncentiveEnrollmentActive:
         'featureFlags/isFallIncentiveEnrollmentActive',
-      referralCopy: 'featureFlags/referralCopy',
       showDashboardRedesign: 'user/showDashboardRedesign',
+      isAutoStartCollegeSessionActive:
+        'featureFlags/isAutoStartCollegeSessionActive',
+      autoStartCollegeSession: 'featureFlags/autoStartCollegeSession',
     }),
     isLowCoachHour() {
       return this.currentHour < 12
@@ -238,13 +190,6 @@ export default {
         return 'Heads up: we have fewer coaches available than normal right now. Try making requests between 12pm-12am ET when possible!'
 
       return ''
-    },
-    hasSeenFirstSessionCongratsModal() {
-      return (
-        this.user &&
-        this.user.pastSessions.length === 1 &&
-        !localStorage.getItem('viewedFirstSessionCongratsModal')
-      )
     },
     userAndOrbitalSegment() {
       return [this.user, this.orbitalSegments, this.isOrbitalSegmentsActive]
@@ -272,9 +217,6 @@ export default {
     },
   },
   methods: {
-    toggleFirstSessionCongratsModal() {
-      this.showFirstSessionCongratsModal = !this.showFirstSessionCongratsModal
-    },
     toggleTellThemCollegePrepModal() {
       this.showTellThemCollegePrepModal = !this.showTellThemCollegePrepModal
     },
@@ -304,15 +246,26 @@ export default {
     },
   },
   watch: {
-    isSessionAlive(isAlive, prevIsAlive) {
+    isFirstDashboardVisit(currValue, prevValue) {
+      const hasJustDismissedWelcomeModal = !currValue && prevValue
+      if (
+        hasJustDismissedWelcomeModal &&
+        !this.hadASession &&
+        this.isAutoStartCollegeSessionActive &&
+        this.autoStartCollegeSession
+      ) {
+        this.$store.dispatch('app/modal/show', {
+          component: 'StartCollegeSessionModal',
+          data: {
+            showTemplateButtons: false,
+            sessionTopic: this.autoStartCollegeSession,
+          },
+        })
+      }
+    },
+    isSessionAlive(isAlive) {
       if (!isAlive) {
         this.$store.dispatch('app/header/show', defaultHeaderData)
-        if (
-          this.isReferFriendsActive &&
-          prevIsAlive &&
-          this.hasSeenFirstSessionCongratsModal
-        )
-          this.toggleFirstSessionCongratsModal()
       } else {
         this.$store.dispatch('app/header/show', activeHeaderData)
       }
