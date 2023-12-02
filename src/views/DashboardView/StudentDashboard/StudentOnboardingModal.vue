@@ -29,6 +29,7 @@ import LargeButton from '@/components/LargeButton.vue'
 import ArrowIcon from '@/assets/arrow.svg'
 
 export default {
+  name: 'StudentOnboardingModal',
   components: { LargeButton, ArrowIcon },
   props: {
     modalData: { type: Object, required: true },

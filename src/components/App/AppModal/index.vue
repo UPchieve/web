@@ -33,6 +33,7 @@ import SessionFulfilledModal from '@/views/SessionView/SessionFulfilledModal.vue
 import VolunteerOnboardingModal from '@/views/DashboardView/VolunteerDashboard/VolunteerOnboardingModal.vue'
 import StudentOnboardingModal from '@/views/DashboardView/StudentDashboard/StudentOnboardingModal.vue'
 import ReportSessionModal from '@/views/SessionView/ReportSessionModal.vue'
+import StartCollegeSessionModal from '@/views/DashboardView/StudentDashboard/StartCollegeSessionModal.vue'
 
 export default {
   components: {
@@ -46,6 +47,7 @@ export default {
     UpgradeAppModal,
     StudentOnboardingModal,
     ReportSessionModal,
+    StartCollegeSessionModal,
   },
   data() {
     return {
