@@ -292,7 +292,13 @@ export default {
     },
     session(currentValue, prevValue) {
       const hadASession = !currentValue.id && prevValue.id
-      if (hadASession) this.$store.dispatch('user/updateHadASession', true)
+      if (hadASession) {
+        this.$store.dispatch('user/updateHadASession', true)
+        this.$store.dispatch(
+          'user/updatePrevSessionSubject',
+          prevValue.subTopic
+        )
+      }
     },
   },
   sockets: {

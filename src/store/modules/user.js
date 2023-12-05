@@ -19,6 +19,7 @@ export default {
     unreadChatMessageIndices: [],
     chatScrolledToMessageIndex: null,
     hadASession: false,
+    prevSessionSubject: '',
   },
   mutations: {
     setUser: (state, user = {}) => (state.user = user),
@@ -110,6 +111,10 @@ export default {
 
     setHadASession: (state, flag) => {
       state.hadASession = flag
+    },
+
+    setPrevSessionSubject: (state, subject) => {
+      state.prevSessionSubject = subject
     },
   },
   actions: {
@@ -255,6 +260,10 @@ export default {
 
     updateHadASession: ({ commit }, flag) => {
       commit('setHadASession', flag)
+    },
+
+    updatePrevSessionSubject: ({ commit }, subject) => {
+      commit('setPrevSessionSubject', subject)
     },
   },
   getters: {
