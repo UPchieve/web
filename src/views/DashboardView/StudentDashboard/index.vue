@@ -37,6 +37,10 @@
       v-if="showFallIncentiveEnrollmentModal"
       :closeModal="toggleFallIncentiveEnrollmentModal"
     />
+    <scorecaster-modal
+      v-if="showScorecasterModal"
+      :closeModal="toggleShowScorecasterModal"
+    />
     <subject-selection />
   </div>
 </template>
@@ -49,6 +53,7 @@ import TellThemCollegePrepModal from './TellThemCollegePrepModal.vue'
 import ProcrastinationPreventionModal from './ProcrastinationPreventionModal.vue'
 import FallIncentiveEnrollmentModal from './FallIncentiveEnrollmentModal.vue'
 import StudentOnboardingModal from './StudentOnboardingModal.vue'
+import ScorecasterModal from './ScorecasterModal.vue'
 import moment from 'moment-timezone'
 import AnalyticsService from '@/services/AnalyticsService'
 import ProductDiscoveryService from '@/services/ProductDiscoveryService'
@@ -81,6 +86,7 @@ export default {
     TellThemCollegePrepModal,
     ProcrastinationPreventionModal,
     FallIncentiveEnrollmentModal,
+    ScorecasterModal,
   },
   async created() {
     if (this.isSessionAlive) {
@@ -135,6 +141,8 @@ export default {
     if (this.isEnrollmentForFallIncentiveModalActive)
       this.showFallIncentiveEnrollmentModal = true
 
+    if (this.isScorecasterUserSegment) this.showScorecasterModal = true
+
     this.currentHour = moment()
       .tz('America/New_York')
       .hour()
@@ -150,12 +158,14 @@ export default {
       showTellThemCollegePrepModal: false,
       showThemProcrastinationPreventionModal: false,
       showFallIncentiveEnrollmentModal: false,
+      showScorecasterModal: false,
     }
   },
   computed: {
     ...mapState({
       user: state => state.user.user,
       hadASession: state => state.user.hadASession,
+      prevSessionSubject: state => state.user.prevSessionSubject,
       isFirstDashboardVisit: state => state.user.isFirstDashboardVisit,
       productFlags: state => state.productFlags.flags,
     }),
@@ -171,6 +181,7 @@ export default {
       isFallIncentiveEnrollmentActive:
         'featureFlags/isFallIncentiveEnrollmentActive',
       showDashboardRedesign: 'user/showDashboardRedesign',
+      isScorecasterModalActive: 'featureFlags/isScorecasterModalActive',
       isAutoStartCollegeSessionActive:
         'featureFlags/isAutoStartCollegeSessionActive',
       autoStartCollegeSession: 'featureFlags/autoStartCollegeSession',
@@ -215,6 +226,19 @@ export default {
         !this.user.phone
       )
     },
+    isScorecasterUserSegment() {
+      const hadAReadingSession = this.prevSessionSubject === 'reading'
+      return (
+        this.isScorecasterModalActive &&
+        hadAReadingSession &&
+        !localStorage.getItem('hasSeenScorecasterModal') &&
+        // We can ensure that sessionStats are updated because
+        // we currently retrieve the user on every route transition.
+        // That means after a session ends, we have updated stats
+        // by the time we are on the dashboard again
+        this.user.sessionStats?.reading.totalHelped >= 1
+      )
+    },
   },
   methods: {
     toggleTellThemCollegePrepModal() {
@@ -227,6 +251,9 @@ export default {
     toggleFallIncentiveEnrollmentModal() {
       this.showFallIncentiveEnrollmentModal = !this
         .showFallIncentiveEnrollmentModal
+    },
+    toggleShowScorecasterModal() {
+      this.showScorecasterModal = !this.showScorecasterModal
     },
     showGleapBot() {
       AnalyticsService.captureEvent(EVENTS.GLEAP_BOT_SHOWN)
@@ -335,6 +362,9 @@ export default {
             this.showFallIncentiveEnrollmentModal = true
       },
       deep: true,
+    },
+    isScorecasterUserSegment(currentValue, prevValue) {
+      if (currentValue && !prevValue) this.showScorecasterModal = true
     },
   },
 }
