@@ -164,7 +164,21 @@
       </div>
 
       <div v-if="user.isVolunteer" class="cert-info contain">
-        <div class="subheader">Unlocked Subjects</div>
+        <div class="subheader-subjects">
+          <div
+            v-if="isMutedSubjectAlertsActive"
+            class="subheader-subjects--left"
+          >
+            Unlocked Subjects
+          </div>
+          <div v-else class="subheader-subjects--center">Unlocked Subjects</div>
+          <div
+            v-if="isMutedSubjectAlertsActive"
+            class="subheader-subjects--right"
+          >
+            Tutoring Alerts
+          </div>
+        </div>
         <loader
           v-if="isFetchingSubjects"
           class="loader--center"
@@ -177,14 +191,33 @@
             :key="`certification-${key}-${value}`"
           >
             <div v-if="value" class="certBox">
-              <div
-                :style="{ backgroundColor: subjects[key].topicColor }"
-                class="certKey"
-              >
-                {{ subjects[key].topicDisplayName.toUpperCase() }}
+              <div class="subjects-left">
+                <div
+                  :style="{ backgroundColor: subjects[key].topicColor }"
+                  class="certKey"
+                >
+                  {{ subjects[key].topicDisplayName.toUpperCase() }}
+                </div>
+                <div class="certValue">
+                  {{ subjects[key].displayName }}
+                </div>
               </div>
-              <div class="certValue">
-                {{ subjects[key].displayName }}
+              <div v-if="isMutedSubjectAlertsActive" class="subjects-right">
+                <toggle-button
+                  :disabled="!activeEdit"
+                  :value="subjectIsNotMuted(key)"
+                  :width="75"
+                  :labels="{ checked: 'On', unchecked: 'Off' }"
+                  :color="{
+                    checked: '#16D2AA',
+                    unchecked: '#F44747',
+                    disabled: '#AAAAAA',
+                  }"
+                  @change="
+                    togglemutedSubjectAlerts(key, subjectIsNotMuted(key))
+                  "
+                  :sync="true"
+                />
               </div>
             </div>
           </div>
@@ -232,6 +265,7 @@ export default {
       shouldSeeSmsConsentCheckbox: false,
       showSmsVerificationModal: false,
       smsConsent: false,
+      newMutedSubjectAlerts: [],
     }
   },
   created() {
@@ -251,6 +285,9 @@ export default {
 
       this.smsConsent = this.user.smsConsent
     }
+    if (this.isMutedSubjectAlertsActive && this.user.isVolunteer) {
+      this.newMutedSubjectAlerts = [...this.user.mutedSubjectAlerts]
+    }
     this.setFlagsForEditingPhoneNumber()
   },
   computed: {
@@ -263,6 +300,7 @@ export default {
       avatarUrl: 'user/avatarUrl',
       allSubtopics: 'subjects/allSubtopics',
       isFilterActiveSubjectsActive: 'featureFlags/isFilterActiveSubjectsActive',
+      isMutedSubjectAlertsActive: 'featureFlags/isMutedSubjectAlertsActive',
     }),
     name() {
       const user = this.$store.state.user.user
@@ -350,6 +388,20 @@ export default {
       setNotificationPermission(permission)
     },
 
+    togglemutedSubjectAlerts(subject, isNotMuted) {
+      if (isNotMuted) {
+        this.newMutedSubjectAlerts.push(subject)
+      } else {
+        this.newMutedSubjectAlerts = this.newMutedSubjectAlerts.filter(
+          s => s != subject
+        )
+      }
+    },
+
+    subjectIsNotMuted(subject) {
+      return !this.newMutedSubjectAlerts.includes(subject)
+    },
+
     toggleShowSmsVerificationModal() {
       this.showSmsVerificationModal = !this.showSmsVerificationModal
     },
@@ -433,12 +485,17 @@ export default {
             }
 
             // Update user state after successful API call
+            let addToUserData = {
+              phone: reqBody.phone ?? this.user.phone,
+              isDeactivated: reqBody.isDeactivated ?? !this.isAccountActive,
+              smsConsent: reqBody.smsConsent ?? this.user.smsConsent,
+            }
+            if (this.isMutedSubjectAlertsActive && this.user.isVolunteer) {
+              addToUserData.mutedSubjectAlerts =
+                reqBody.mutedSubjectAlerts ?? this.user.mutedSubjectAlerts
+            }
             this.$store
-              .dispatch('user/addToUser', {
-                phone: reqBody.phone ?? this.user.phone,
-                isDeactivated: reqBody.isDeactivated ?? !this.isAccountActive,
-                smsConsent: reqBody.smsConsent ?? this.user.smsConsent,
-              })
+              .dispatch('user/addToUser', addToUserData)
               .then(() => {
                 // Phone number verification flow
                 if (this.userNeedsToVerifyPhone) {
@@ -462,6 +519,9 @@ export default {
         reqBody.smsConsent = this.smsConsent
       }
 
+      if (this.isMutedSubjectAlertsActive && this.user.isVolunteer) {
+        reqBody.mutedSubjectAlerts = this.newMutedSubjectAlerts
+      }
       return reqBody
     },
 
@@ -538,6 +598,41 @@ export default {
   align-items: center;
   padding: 30px 15px 0;
   font-size: 20px;
+}
+
+.subheader-subjects {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 1;
+  font-size: 20px;
+  font-weight: 600;
+  padding: 30px 15px 0;
+}
+
+.subheader-subjects--center {
+  grid-column: 1 / 3;
+  text-align: center;
+}
+
+.subheader-subjects--left {
+  grid-column: 1;
+  text-align: left;
+}
+
+.subheader-subjects--right {
+  grid-column: 2;
+  text-align: right;
+}
+
+.subjects-left {
+  grid-column: 1;
+  text-align: left;
+}
+
+.subjects-right {
+  grid-column: 2;
+  text-align: right;
+  padding-top: 8px;
 }
 
 .container-section {
@@ -672,15 +767,19 @@ button:hover {
 }
 
 .certBox {
-  display: flex;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 1;
   height: 60px;
   align-items: center;
   padding-left: 20px;
+  padding-right: 20px;
   border-top: 1px solid #cccccf;
   font-weight: 600;
 }
 
 .certKey {
+  display: inline-block;
   border-radius: 12px;
   padding: 0 10px;
   margin: 0 10px 0 0;
@@ -689,27 +788,8 @@ button:hover {
   background-color: #1855d1;
 }
 
-.COLLEGE {
-  background-color: #f1c026;
-}
-
-.MATH {
-  background-color: #16d2aa;
-}
-
-.SCIENCE {
-  background-color: #9675ce;
-}
-
-.SOCIALSTUDIES {
-  background-color: #3eaaf7;
-}
-
-.SAT {
-  background-color: #f0912b;
-}
-
-.READINGWRITING {
+.certValue {
+  display: inline-block;
 }
 
 .errors {

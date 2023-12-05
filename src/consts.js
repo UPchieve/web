@@ -584,6 +584,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   CC_INTRO_COPY: 'cc-intro-copy',
   BF_INTRO_COPY: 'bf-intro-copy',
   PROCRASTINATION_PREVENTION: 'procrastination-prevention',
+  MUTED_SUBJECT_ALERTS: 'muted-subject-alerts',
   FALL_INCENTIVE_ENROLLMENT: 'fall-incentive-enrollment',
   REFERRAL_COPY: 'referral-copy',
   TUTOR_SESSION_HISTORY: 'tutor-session-history',

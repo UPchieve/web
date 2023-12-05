@@ -58,6 +58,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: false,
       [POSTHOG_FEATURE_FLAGS.STUDENT_COACH_REACH_OUT]: false,
       [POSTHOG_FEATURE_FLAGS.PROCRASTINATION_PREVENTION]: false,
+      [POSTHOG_FEATURE_FLAGS.MUTED_SUBJECT_ALERTS]: false,
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_ENROLLMENT]: false,
       [POSTHOG_FEATURE_FLAGS.TUTOR_SESSION_HISTORY]: false,
       [POSTHOG_FEATURE_FLAGS.SESSION_RECAP_DMS]: false,
@@ -178,6 +179,8 @@ export default {
     bfIntroCopy: state => state.flags[POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY],
     isProcrastinationPreventionActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.PROCRASTINATION_PREVENTION],
+    isMutedSubjectAlertsActive: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.MUTED_SUBJECT_ALERTS],
     isFallIncentiveEnrollmentActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_ENROLLMENT],
     isTutorSessionHistoryActive: state =>
