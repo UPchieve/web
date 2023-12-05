@@ -64,6 +64,7 @@ export default {
       },
     }),
     ...mapGetters({
+      isMutedSubjectAlertsActive: 'featureFlags/isMutedSubjectAlertsActive',
       isRecapSocketUpdatesActive: 'featureFlags/isRecapSocketUpdatesActive',
     }),
   },
@@ -146,8 +147,15 @@ export default {
         if (session.student.isTestUser && !isAdminOrTestUser) {
           continue
         }
-
-        if (this.user.subjects.includes(subTopic)) results.push(session)
+        if (
+          this.user.subjects.includes(subTopic) &&
+          !(
+            this.isMutedSubjectAlertsActive &&
+            this.user.mutedSubjectAlerts.includes(subTopic)
+          )
+        ) {
+          results.push(session)
+        }
       }
 
       const prevOpenSessions = this.openSessions

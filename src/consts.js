@@ -569,6 +569,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   STUDENT_COACH_REACH_OUT: 'student-coach-reach-out',
   CC_INTRO_COPY: 'cc-intro-copy',
   PROCRASTINATION_PREVENTION: 'procrastination-prevention',
+  MUTED_SUBJECT_ALERTS: 'muted-subject-alerts',
   FALL_INCENTIVE_ENROLLMENT: 'fall-incentive-enrollment',
   REFERRAL_COPY: 'referral-copy',
   TUTOR_SESSION_HISTORY: 'tutor-session-history',
