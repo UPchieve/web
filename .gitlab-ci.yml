@@ -16,9 +16,6 @@ build_production:
   stage: build
   image: "docker:20.10.6"
   cache: {}
-  tags:
-    - upchieve
-    - containerbuild
   variables:
     DOCKER_TLS_CERTDIR: ""
     MOUNT_POINT: /builds/$CI_PROJECT_PATH/mnt
@@ -66,9 +63,6 @@ build_demo:
   stage: build
   image: "docker:20.10.6"
   cache: {}
-  tags:
-    - upchieve
-    - containerbuild
   when: manual
   allow_failure: true
   variables:
@@ -118,9 +112,6 @@ build_staging:
   stage: build
   image: "docker:20.10.6"
   cache: {}
-  tags:
-    - upchieve
-    - containerbuild
   variables:
     DOCKER_TLS_CERTDIR: ""
     MOUNT_POINT: /builds/$CI_PROJECT_PATH/mnt
@@ -171,9 +162,6 @@ build_hackers:
   stage: build
   image: "docker:20.10.6"
   cache: {}
-  tags:
-    - upchieve
-    - containerbuild
   when: manual
   allow_failure: true
   variables:
@@ -222,8 +210,6 @@ build_hackers:
 test:
   stage: test
   image: node:16.16.0-bullseye
-  tags:
-    - upchieve
   before_script:
     - npm ci --cache .npm --prefer-offline
   script:
@@ -237,8 +223,6 @@ test:
 lint:
   stage: test
   image: node:16.16.0-bullseye
-  tags:
-    - upchieve
   before_script:
     - npm ci --cache .npm --prefer-offline
   script:
@@ -253,8 +237,6 @@ html_validate:
   stage: test
   image: node:16.16.0-bullseye
   allow_failure: true
-  tags:
-    - upchieve
   before_script:
     - npm ci --cache .npm --prefer-offline
   script:
