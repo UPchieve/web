@@ -138,7 +138,7 @@
         >
           <template #result="{ result, props }">
             <li v-bind="props">
-              <div v-if="result.name" class="result">
+              <div v-if="result.name" id="ph-no-capture" class="result">
                 {{ result.name }} ({{ result.city }}, {{ result.state }})
               </div>
               <a

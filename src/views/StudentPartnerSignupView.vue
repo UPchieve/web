@@ -378,7 +378,9 @@
         <h1>You're all set!</h1>
         <p>An account for {{ this.formData.firstName }} has been created.</p>
         <p>
-          We have sent an email to {{ this.formData.email }} to set a password.
+          We have sent an email to
+          <span id="ph-no-capture">{{ this.formData.email }}</span> to set a
+          password.
         </p>
       </div>
     </div>

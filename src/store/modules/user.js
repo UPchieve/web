@@ -393,6 +393,7 @@ export default {
 
     getUserPropsForAnalytics: (state, getters) => {
       const userProps = {
+        ucId: state.user.id,
         userType: state.user.type,
         createdAt: state.user.createdAt,
         totalSessions: state.user.pastSessions.length,
@@ -417,6 +418,9 @@ export default {
       } else {
         userProps.partner = state.user.studentPartnerOrg
         userProps.gradeLevel = state.user.gradeLevel
+        if (state.user.isSchoolPartner) {
+          userProps.schoolPartner = state.user.school
+        }
       }
 
       return userProps
