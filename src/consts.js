@@ -595,6 +595,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   SCORECASTER_WOZ: 'scorecaster-woz',
   AUTO_START_COLLEGE_SESSION: 'auto-start-college-session',
   SCORECASTER_MODAL: 'scorecaster-modal',
+  SMS_VERIFICATION: 'sms-verification',
 }
 
 export const ANALYTICS_REPORT_ROW = {
