@@ -19,7 +19,9 @@
       <div v-if="step === 2">
         <p class="uc-form-text center">
           We just emailed your verification code to
-          <span class="verification__send-to">{{ email }}</span>
+          <span id="ph-no-capture" class="verification__send-to">{{
+            email
+          }}</span>
         </p>
         <div class="uc-form-element">
           <label for="verification-code">

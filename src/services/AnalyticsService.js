@@ -21,6 +21,9 @@ class AnalyticsService {
             )
           )
         },
+        session_recording: {
+          maskTextSelector: '#ph-no-capture',
+        },
       })
     }
 
@@ -34,10 +37,10 @@ class AnalyticsService {
   }
 
   static identify(userId, properties) {
-    posthog.identify(userId)
+    posthog.identify(userId, properties)
     Gleap.identify(userId, properties)
     // Attaches custom data to the feedback submission
-    Gleap.setCustomData('userType', properties.customData.userType)
+    Gleap.setCustomData('userType', properties.userType)
   }
 
   static updateUser(update) {

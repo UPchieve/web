@@ -42,12 +42,13 @@
         <div class="container-content">
           <div id="email" class="container-section">
             <div class="prompt">Your Email</div>
-            <div class="answer">{{ user.email }}</div>
+            <div id="ph-no-capture" class="answer">{{ user.email }}</div>
           </div>
           <div>
             <div id="phone" class="container-section">
               <div class="prompt">Your Phone Number</div>
               <div
+                id="ph-no-capture"
                 v-show="!activeEdit && user.phone"
                 class="answer phone-answer"
               >

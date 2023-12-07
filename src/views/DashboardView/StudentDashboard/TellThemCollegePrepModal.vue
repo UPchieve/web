@@ -305,8 +305,6 @@ export default {
       AnalyticsService.captureEvent(EVENTS.STUDENT_TELL_THEM_CP_REMINDER, {
         etDate: this.handleDate('America/New_York'),
         gmtDate: this.handleDate('GMT'),
-        phone: this.phoneInput.e164,
-        firstName: this.user.firstName,
         userLink: `https://app.upchieve.org/admin/users/${this.user.id}`,
       })
       this.nextStep()

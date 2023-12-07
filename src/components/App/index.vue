@@ -233,7 +233,7 @@ export default {
   },
   watch: {
     user(currentUserValue, previousUserValue) {
-      const nowLoggedIn = currentUserValue._id && !previousUserValue._id
+      const nowLoggedIn = currentUserValue.id && !previousUserValue.id
       if (nowLoggedIn) {
         const userProps = this.getUserPropsForAnalytics
         this.$store.dispatch(
@@ -241,14 +241,7 @@ export default {
           userProps
         )
 
-        AnalyticsService.identify(currentUserValue._id, {
-          name: currentUserValue.firstName,
-          email: currentUserValue.email,
-          value: currentUserValue.roleId,
-          // Attaches custom data to the user in Gleap
-          customData: userProps,
-        })
-        AnalyticsService.updateUser(userProps)
+        AnalyticsService.identify(currentUserValue.id, userProps)
         LoggerService.identify(currentUserValue._id)
 
         if (this.mobileMode && !this.isMobileApp && !this.isVolunteer) {
@@ -260,6 +253,9 @@ export default {
         this.$store.dispatch('productFlags/getUserProductFlags')
         if (Object.entries(this.subjects).length === 0)
           this.$store.dispatch('subjects/getSubjects')
+      } else if (currentUserValue.id) {
+        const userProps = this.getUserPropsForAnalytics
+        AnalyticsService.updateUser(userProps)
       }
     },
     /**
