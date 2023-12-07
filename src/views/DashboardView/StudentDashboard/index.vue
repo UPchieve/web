@@ -7,14 +7,6 @@
     />
     <div class="dashboard-notices">
       <div
-        v-if="!downtimeBannerMessage && noticeMessage && !showDashboardRedesign"
-        class="dashboard-notice"
-        :class="isLowCoachHour && 'dashboard-notice--warn'"
-      >
-        {{ noticeMessage }}
-      </div>
-
-      <div
         v-if="downtimeBannerMessage"
         class="dashboard-notice"
         :class="'dashboard-notice--downtime'"
@@ -54,7 +46,6 @@ import ProcrastinationPreventionModal from './ProcrastinationPreventionModal.vue
 import FallIncentiveEnrollmentModal from './FallIncentiveEnrollmentModal.vue'
 import StudentOnboardingModal from './StudentOnboardingModal.vue'
 import ScorecasterModal from './ScorecasterModal.vue'
-import moment from 'moment-timezone'
 import AnalyticsService from '@/services/AnalyticsService'
 import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 import { EVENTS } from '@/consts'
@@ -143,10 +134,6 @@ export default {
 
     if (this.isScorecasterUserSegment) this.showScorecasterModal = true
 
-    this.currentHour = moment()
-      .tz('America/New_York')
-      .hour()
-
     // TODO: move globally to show banner in all pages
     if (this.user && this.user.isBanned) {
       this.$store.dispatch('app/header/show', bannedHeaderData)
@@ -154,7 +141,6 @@ export default {
   },
   data() {
     return {
-      currentHour: 0,
       showTellThemCollegePrepModal: false,
       showThemProcrastinationPreventionModal: false,
       showFallIncentiveEnrollmentModal: false,
@@ -186,22 +172,6 @@ export default {
         'featureFlags/isAutoStartCollegeSessionActive',
       autoStartCollegeSession: 'featureFlags/autoStartCollegeSession',
     }),
-    isLowCoachHour() {
-      return this.currentHour < 12
-    },
-    noticeMessage() {
-      if (this.currentHour >= 12 && this.currentHour <= 23)
-        return 'Heads up: this is a great time to make a request! We have plenty of coaches available between 12pm - 12 am ET.'
-      if (this.currentHour >= 3 && this.currentHour <= 9)
-        return 'Heads up: we have very few coaches available right now. Try making requests between 12pm-12am ET when possible'
-      if (
-        (this.currentHour >= 0 && this.currentHour < 3) ||
-        (this.currentHour >= 9 && this.currentHour < 12)
-      )
-        return 'Heads up: we have fewer coaches available than normal right now. Try making requests between 12pm-12am ET when possible!'
-
-      return ''
-    },
     userAndOrbitalSegment() {
       return [this.user, this.orbitalSegments, this.isOrbitalSegmentsActive]
     },
@@ -425,28 +395,6 @@ export default {
     a {
       text-decoration: underline;
       font-weight: bold;
-    }
-  }
-}
-.share-upchieve-notice {
-  @include flex-container(column);
-  background-color: #fff;
-  border-radius: 8px;
-  color: #000;
-  font-size: 18px;
-  padding: 20px;
-  margin-top: 15px;
-  text-align: center;
-
-  a {
-    color: $c-information-blue;
-    font-weight: 500;
-    margin-top: 10px;
-
-    &:hover {
-      cursor: pointer;
-      color: #103a90;
-      text-decoration: none;
     }
   }
 }
