@@ -54,8 +54,7 @@ class AnalyticsService {
   // unset any of the user's distinctive ids
   static reset() {
     posthog.reset()
-    // TODO: does this clear identity stuff too?
-    Gleap.clearCustomData()
+    Gleap.clearIdentity()
   }
 
   static registerVolunteer(volunteer) {
