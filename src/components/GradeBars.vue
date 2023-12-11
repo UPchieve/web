@@ -13,18 +13,18 @@
 export default {
   name: 'GradeBars',
   props: {
-    grade: Number,
+    grade: { type: Number, required: true },
+    minimumGrade: { type: Number, required: true },
   },
   methods: {
     isFilled(index) {
       return index <= this.numFilledSquares
     },
   },
-
   computed: {
     numFilledSquares() {
-      if (this.grade < 50) return 1
-      return Math.floor((this.grade - 50) / 10) + 1
+      if (this.grade < this.minimumGrade) return 1
+      return Math.floor((this.grade - this.minimumGrade) / 10) + 1
     },
   },
 }

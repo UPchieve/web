@@ -51,7 +51,7 @@
               :showArrow="false"
               primary
             >
-              Practice with a tutor
+              Start a new Reading session
             </large-button>
           </div>
         </footer>
@@ -90,55 +90,88 @@
           </div>
         </footer>
       </div>
-      <div v-else-if="step === 2" class="scorecaster">
+      <div v-else-if="step === 2" class="scorecaster scorecaster--flex">
+        <cross-icon class="cross-icon" @click="handleCloseModal" />
         <header>
-          <h1 class="scorecaster__title">
-            <img
-              src="https://cdn.upchieve.org/site-images/topic-icons/english.svg"
-              alt="Reading icon"
-            />
-            Your Reading Score: {{ this.summary.grade }}%
+          <h1 class="scorecaster__title scorecaster__title-header">
+            <span>Test Score Forecast</span>
+            <span>{{ overview.grade }}%</span>
           </h1>
         </header>
 
         <section class="scorecaster__section">
-          <div class="scorecaster__body scorecaster__body--bold">
-            Here's a summary of our analysis:
-          </div>
-          <div class="scorecaster__body">
-            {{ this.summary.summary }}
+          <p class="scorecaster__body">
+            Based on your Reading tutoring sessions, our UPbot created a special
+            report for you.
+          </p>
+          <div class="scorecaster__overview-container">
+            <div class="scorecaster__overview">
+              <header class="scorecaster__overview-header">
+                <h2
+                  class="scorecaster__overview-title scorecaster__overview--bold"
+                >
+                  Strengths
+                </h2>
+              </header>
+              <p
+                v-for="strength of displayTopicsByType('strength')"
+                :key="strength.topic"
+                class="scorecaster__overview-topic"
+              >
+                {{ strength.topic }}
+              </p>
+            </div>
+            <div class="scorecaster__overview">
+              <header class="scorecaster__overview-header">
+                <h2
+                  class="scorecaster__overview-title scorecaster__overview--bold"
+                >
+                  Practice Areas
+                </h2>
+              </header>
+              <p
+                v-for="practiceArea of displayTopicsByType('practiceArea')"
+                :key="practiceArea.topic"
+                class="scorecaster__overview-topic"
+              >
+                {{ practiceArea.topic }}
+              </p>
+              <span
+                class="scorecaster__overview-link"
+                @click="showDetailedReport"
+              >
+                See more practice areas
+              </span>
+            </div>
+            <p class="scorecaster__overview--subtext">
+              The more sessions you have the more accurate your report will be.
+              Make sure to ask your coach to help you with your practice areas.
+            </p>
           </div>
         </section>
         <footer class="scorecaster__footer">
           <div class="scorecaster__buttons">
             <large-button
-              class="scorecaster__buttons-button"
-              @click.native="handleCloseModal"
-              :showArrow="false"
-            >
-              Close
-            </large-button>
-            <large-button
-              class="scorecaster__buttons-button  scorecaster__buttons-button--primary"
-              @click.native="showDetailedReport"
+              class="scorecaster__buttons-button  scorecaster__buttons-button--primary scorecaster__buttons-button--single scorecaster__buttons-button--wide"
+              @click.native="handleSessionRequest"
               :showArrow="false"
               primary
             >
-              Find out more
+              Start a new Reading session
             </large-button>
           </div>
         </footer>
       </div>
       <div v-else-if="step === 3" class="scorecaster">
-        <header>
+        <header class="scorecaster__practice-area-header">
           <h1 class="scorecaster__title scorecaster__title--center">
-            Report Breakdown
+            Practice Areas
           </h1>
         </header>
 
         <section class="scorecaster__section--center">
           <div
-            v-for="topic of topics"
+            v-for="topic of displayTopicsByType('practiceArea')"
             :key="topic.topic"
             class="scorecaster__topic"
           >
@@ -148,7 +181,6 @@
                 <span class="scorecaster__topic-scores--score"
                   >Score: {{ topic.grade }}</span
                 >
-                <grade-bars :grade="topic.grade" />
               </div>
             </div>
             <div class="scorecaster__topic-recommendations">
@@ -180,7 +212,7 @@
               :showArrow="false"
               primary
             >
-              Practice with a tutor
+              Start a Reading session
             </large-button>
           </div>
         </footer>
@@ -197,10 +229,10 @@ import UpdogConstruction from '@/assets/updog-construction.svg'
 import LargeButton from '@/components/LargeButton.vue'
 import Modal from '@/components/Modal.vue'
 import UpdogLoader from '@/components/UpdogLoader.vue'
-import GradeBars from '@/components/GradeBars.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
+import CrossIcon from '@/assets/cross.svg'
 
 export default {
   name: 'ScorecasterModal',
@@ -209,8 +241,8 @@ export default {
     LargeButton,
     ScorecasterBanner,
     UpdogLoader,
-    GradeBars,
     UpdogConstruction,
+    CrossIcon,
   },
   data() {
     return {
@@ -218,7 +250,7 @@ export default {
       isSubmitting: false,
       hasError: false,
       showHaveMoreSessions: false,
-      summary: {},
+      overview: {},
       topics: [],
     }
   },
@@ -260,13 +292,13 @@ export default {
         AnalyticsService.captureEvent(EVENTS.SCORECASTER_ANALYSIS_STARTED)
         const { data } = await NetworkService.getScorecasterAnalysis()
         AnalyticsService.captureEvent(EVENTS.SCORECASTER_ANALYSIS_RECEIVED)
-        this.summary = data.summary
+        this.overview = data.overview
         this.topics = data.topics
 
         // We're going to expect that the AI couldn't come up with a solution
         // based on the student's sessions. The student may need to do more sessions
         // for an analysis
-        if (!Object.keys(this.summary).length || !this.topics.length) {
+        if (!Object.keys(this.overview).length || !this.topics.length) {
           this.showHaveMoreSessions = true
           localStorage.removeItem('hasSeenScoreCasterModal')
           AnalyticsService.captureEvent(EVENTS.SCORECASTER_NO_ANALYSIS)
@@ -282,6 +314,18 @@ export default {
         this.isSubmitting = false
       }
     },
+    getGrade(grade) {
+      if (grade < 65) return 1
+      return Math.floor((grade - 65) / 10) + 1
+    },
+    displayGrade(gradeNumber) {
+      const grade = this.getGrade(gradeNumber)
+      return `${grade}/5`
+    },
+    displayTopicsByType(type) {
+      const topics = this.topics.filter(topic => topic.type === type)
+      return topics.sort((a, b) => a.grade - b.grade)
+    },
   },
 }
 </script>
@@ -295,6 +339,10 @@ export default {
     font-weight: 500;
     margin-top: 1em;
     margin-bottom: 1em;
+
+    &-header {
+      @include flex-container(row, space-between, center);
+    }
 
     &--center {
       text-align: center;
@@ -347,6 +395,10 @@ export default {
         margin-bottom: initial;
       }
 
+      &--wide {
+        width: 300px;
+      }
+
       &--primary,
       &--single {
         background-color: $c-information-blue;
@@ -373,6 +425,64 @@ export default {
 
     &--center {
       @include flex-container(row, center);
+    }
+  }
+
+  &__overview-container {
+    width: 90%;
+    margin: 0 auto;
+
+    @include breakpoint-above('small') {
+      width: 90%;
+      margin-top: 1em;
+    }
+  }
+
+  &__overview {
+    padding: 1em;
+    border: 1px solid $c-border-grey;
+    border-collapse: collapse;
+
+    &-header {
+      @include flex-container(row, space-between, center);
+    }
+
+    &-title {
+      @include font-category('subheading');
+    }
+
+    &--bold {
+      font-weight: 600;
+    }
+
+    &-topic {
+      @include font-category('body');
+      margin: 0;
+    }
+
+    &-link {
+      @include font-category('body');
+      color: $c-information-blue;
+      margin: 0;
+      font-weight: 600;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+    &--subtext {
+      @include font-category('helper-text');
+      margin-top: 1em;
+    }
+  }
+
+  &__practice-area {
+    &-header {
+      @include flex-container(row, space-between, center);
+    }
+
+    &-grade {
+      font-size: 22px;
     }
   }
 
@@ -409,6 +519,10 @@ export default {
       }
     }
   }
+
+  &--flex {
+    @include flex-container(column);
+  }
 }
 
 .scorecaster-banner {
@@ -427,5 +541,21 @@ export default {
 
 .loading-message {
   margin-top: 1em;
+}
+
+.cross-icon {
+  width: 18px;
+  margin-right: 1em;
+  margin-left: auto;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  @include breakpoint-above('medium') {
+    margin-bottom: initial;
+    margin-right: initial;
+    margin-left: auto;
+  }
 }
 </style>
