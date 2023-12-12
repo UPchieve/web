@@ -73,6 +73,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.DASHBOARD_REDESIGN]: false,
       [POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION]: false,
       [POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION]: false,
+      [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_EMAIL]: false,
     },
     flagPayloads: {
       [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: [],
@@ -202,5 +203,7 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.SCORECASTER_MODAL],
     isSmsVerificationEnabled: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION],
+    eligibilityEmail: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.ELIGIBILITY_EMAIL],
   },
 }

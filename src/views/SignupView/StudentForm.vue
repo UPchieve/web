@@ -187,7 +187,7 @@
         />
       </div>
 
-      <div class="uc-form-element">
+      <div v-if="!skipEligibilityEmail" class="uc-form-element">
         <div class="uc-row justify-between">
           <label
             for="email"
@@ -390,6 +390,38 @@
         />
       </div>
 
+      <div v-if="!eligibility.email" class="uc-form-element">
+        <div class="uc-row justify-between">
+          <label
+            for="email"
+            v-bind:class="{
+              error: hasFormValidationError(v$.credentials.email),
+            }"
+            >Email</label
+          >
+          <div
+            v-if="hasFormValidationError(v$.credentials.email)"
+            class="error-caption"
+          >
+            {{ getFormValidationError(v$.credentials.email) }}
+          </div>
+        </div>
+        <input
+          id="email"
+          class="uc-form-text-input"
+          type="email"
+          placeholder="Enter your email address"
+          v-model="credentials.email"
+          v-bind:class="{
+            'uc-form-text-input-invalid': hasFormValidationError(
+              v$.credentials.email
+            ),
+          }"
+          @blur="v$.credentials.email.$touch"
+          required
+        />
+      </div>
+
       <div class="uc-form-element">
         <div class="uc-row justify-between">
           <label
@@ -477,11 +509,12 @@
 import { mapGetters } from 'vuex'
 import { useVuelidate } from '@vuelidate/core'
 import {
-  helpers,
-  required,
   email,
-  minLength,
+  helpers,
   maxLength,
+  minLength,
+  required,
+  requiredIf,
 } from '@vuelidate/validators'
 import Autocomplete from '@trevoreyre/autocomplete-vue'
 import LoggerService from '@/services/LoggerService'
@@ -517,7 +550,10 @@ export default {
           maxLength: maxLength(5),
         },
         email: {
-          required: helpers.withMessage('Required', required),
+          required: helpers.withMessage(
+            'Required',
+            requiredIf(!this.skipEligibilityEmail)
+          ),
           email: helpers.withMessage('Not a valid email address', email),
         },
       },
@@ -572,6 +608,7 @@ export default {
       // Reach Studies:
       isCollegeConfidential: false,
       showBigFutureIntroCopy: false,
+      skipEligibilityEmail: false,
     }
   },
   async mounted() {
@@ -622,6 +659,12 @@ export default {
       }
     }
 
+    this.skipEligibilityEmail =
+      this.eligibilityEmail && this.partnerKey === 'bigfuture'
+    if (this.skipEligibilityEmail) {
+      AnalyticsService.captureEvent(EVENTS.SKIPPING_ELIGIBILITY_EMAIL)
+    }
+
     const isDomesticIpAddress = await this.isDomesticIpAddress()
     if (!isDomesticIpAddress) return this.internationalPage()
   },
@@ -630,6 +673,7 @@ export default {
       offerGoogleSSO: 'featureFlags/offerGoogleSSO',
       ccIntroCopy: 'featureFlags/ccIntroCopy',
       bfIntroCopy: 'featureFlags/bfIntroCopy',
+      eligibilityEmail: 'featureFlags/eligibilityEmail',
     }),
     trimCurrentGrade() {
       // extracting the first word out of the gradeLevels
@@ -750,7 +794,7 @@ export default {
         this.errors.push('You must enter a valid United States zip code.')
       }
 
-      if (!this.eligibility.email) {
+      if (!this.eligibility.email && !this.skipEligibilityEmail) {
         this.errors.push('An email address is required.')
       }
 
