@@ -494,14 +494,12 @@ export default {
               addToUserData.mutedSubjectAlerts =
                 reqBody.mutedSubjectAlerts ?? this.user.mutedSubjectAlerts
             }
-            this.$store
-              .dispatch('user/addToUser', addToUserData)
-              .then(() => {
-                // Phone number verification flow
-                if (this.userNeedsToVerifyPhone) {
-                  this.showSmsVerificationModal = true
-                }
-              })
+            this.$store.dispatch('user/addToUser', addToUserData).then(() => {
+              // Phone number verification flow
+              if (this.userNeedsToVerifyPhone) {
+                this.showSmsVerificationModal = true
+              }
+            })
           },
           () => {
             this.saveFailed = true

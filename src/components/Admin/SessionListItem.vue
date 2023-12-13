@@ -10,9 +10,7 @@
         <span>{{ messages }}</span>
       </div>
       <div class="session-list-item__column">
-        <span
-          >{{ session.studentFirstName }} {{ session.studentLastName }}</span
-        >
+        <span>{{ session.studentFirstName }}</span>
       </div>
       <div class="session-list-item__column">
         <span>{{ studentRating }}</span>
