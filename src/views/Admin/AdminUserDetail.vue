@@ -49,7 +49,7 @@
           >
         </div>
         <div class="user-detail__title">
-          {{ user.firstname }} {{ user.lastname }}
+          {{ user.firstName }} {{ user.lastName }}
         </div>
         <div class="user-detail__subtitle">ID: {{ user._id }}</div>
         <div class="user-detail__section">
