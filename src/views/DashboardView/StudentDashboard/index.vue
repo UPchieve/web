@@ -201,12 +201,7 @@ export default {
       return (
         this.isScorecasterModalActive &&
         hadAReadingSession &&
-        !localStorage.getItem('hasSeenScorecasterModal') &&
-        // We can ensure that sessionStats are updated because
-        // we currently retrieve the user on every route transition.
-        // That means after a session ends, we have updated stats
-        // by the time we are on the dashboard again
-        this.user.sessionStats?.reading.totalHelped >= 1
+        !localStorage.getItem('hasSeenScorecasterModal')
       )
     },
   },
