@@ -193,8 +193,8 @@ export default {
       }
     }
 
-    this.firstName = this.user.firstname
-    this.lastName = this.user.lastname
+    this.firstName = this.user.firstName
+    this.lastName = this.user.lastName
     this.email = this.user.email
     this.partnerSite = this.user.partnerSite || ''
     this.isVerified = this.user.verified
