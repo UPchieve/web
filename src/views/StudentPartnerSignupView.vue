@@ -57,13 +57,13 @@
               error: hasFormValidationError(v$.formData.partnerSite),
             }"
           >
-            What is {{ formTextIdentifier }} site?
+            What is {{ formLabelIdentifier }} site?
           </label>
           <v-select
             id="site"
             class="uc-form-select-input"
             v-model="formData.partnerSite"
-            :placeholder="`Select ${formTextIdentifier} site`"
+            :placeholder="`Select ${formLabelIdentifier} site`"
             v-bind:class="{
               'uc-form-select-input-invalid': hasFormValidationError(
                 v$.formData.partnerSite
@@ -83,13 +83,13 @@
             v-bind:class="{
               error: hasFormValidationError(v$.formData.firstName),
             }"
-            >What is {{ formTextIdentifier }} first name?
+            >What is {{ formLabelIdentifier }} first name?
           </label>
           <input
             id="firstName"
             class="uc-form-text-input"
             type="text"
-            :placeholder="`Enter ${formTextIdentifier} first name`"
+            :placeholder="`Enter ${formLabelIdentifier} first name`"
             v-bind:class="{
               'uc-form-text-input-invalid': hasFormValidationError(
                 v$.formData.firstName
@@ -108,13 +108,13 @@
             v-bind:class="{
               error: hasFormValidationError(v$.formData.lastName),
             }"
-            >What is {{ formTextIdentifier }} last name?
+            >What is {{ formLabelIdentifier }} last name?
           </label>
           <input
             id="lastName"
             class="uc-form-text-input"
             type="text"
-            :placeholder="`Enter ${formTextIdentifier} last name`"
+            :placeholder="`Enter ${formLabelIdentifier} last name`"
             v-bind:class="{
               'uc-form-text-input-invalid': hasFormValidationError(
                 v$.formData.lastName
@@ -145,14 +145,14 @@
             v-bind:class="{
               error: hasFormValidationError(v$.formData.schoolId),
             }"
-            >What is {{ formTextIdentifier }} school?</label
+            >What is {{ formLabelIdentifier }} school?</label
           >
           <autocomplete
             id="school"
             base-class="uc-form-autocomplete-input"
             :search="autocompleteSchool"
-            :placeholder="`Search for ${formTextIdentifier} school`"
-            :aria-label="`Search for ${formTextIdentifier} school`"
+            :placeholder="`Search for ${formLabelIdentifier} school`"
+            :aria-label="`Search for ${formLabelIdentifier} school`"
             :get-result-value="getSchoolDisplayName"
             @submit="handleSelectHighSchool"
             @blur="v$.formData.schoolId.$touch()"
@@ -198,12 +198,12 @@
             v-bind:class="{
               error: hasFormValidationError(v$.formData.college),
             }"
-            >What is {{ formTextIdentifier }} college?</label
+            >What is {{ formLabelIdentifier }} college?</label
           >
           <input
             id="college"
             class="uc-form-text-input"
-            :placeholder="`Enter ${formTextIdentifier} college`"
+            :placeholder="`Enter ${formLabelIdentifier} college`"
             type="text"
             v-model="formData.college"
             v-bind:class="{
@@ -222,7 +222,7 @@
               v-bind:class="{
                 error: hasFormValidationError(v$.formData.email),
               }"
-              >What is {{ formTextIdentifier }} email?</label
+              >What is {{ formLabelIdentifier }} email?</label
             >
             <div
               v-if="hasFormValidationError(v$.formData.email)"
@@ -235,7 +235,7 @@
             id="email"
             class="uc-form-text-input"
             type="email"
-            :placeholder="`Enter ${formTextIdentifier} email address`"
+            :placeholder="`Enter ${formLabelIdentifier} email address`"
             v-model="formData.email"
             v-bind:class="{
               'uc-form-text-input-invalid': hasFormValidationError(
@@ -546,8 +546,8 @@ export default {
     }
   },
   computed: {
-    formTextIdentifier() {
-      if (this.useParentGuardianSignUpFlow) return 'the student'
+    formLabelIdentifier() {
+      if (this.useParentGuardianSignUpFlow) return "the student's"
       return 'your'
     },
     formQuestionIdentifier() {
