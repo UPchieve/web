@@ -57,11 +57,6 @@
         </p>
       </div>
     </div>
-    <p class="uc-form-text">
-      Already have an account?
-      <router-link class="uc-link" to="/login">Log In</router-link>
-    </p>
-
     <form
       id="form-eligibility"
       class="uc-column"
@@ -232,6 +227,10 @@
         Continue
       </button>
     </form>
+    <p class="uc-form-text below text-center">
+      Already have an account?
+      <router-link class="uc-link" to="/login">Log In</router-link>
+    </p>
   </div>
 
   <div
@@ -546,8 +545,14 @@ export default {
         highSchool: { required: helpers.withMessage('Required', required) },
         zipCode: {
           required: helpers.withMessage('Required', required),
-          minLength: minLength(5),
-          maxLength: maxLength(5),
+          minLength: helpers.withMessage(
+            'Must be 5 characters long',
+            minLength(5)
+          ),
+          maxLength: helpers.withMessage(
+            'Must be 5 characters long',
+            maxLength(5)
+          ),
         },
         email: {
           required: helpers.withMessage(
@@ -761,7 +766,10 @@ export default {
 
     eligibilityPage(params) {
       this.step = 'eligibility'
-      this.$router.push({ path: `/sign-up/student/eligibility`, query: params })
+      this.$router.replace({
+        path: `/sign-up/student/eligibility`,
+        query: params,
+      })
     },
 
     async isDomesticIpAddress() {
@@ -775,7 +783,7 @@ export default {
 
     internationalPage() {
       this.step = 'international'
-      this.$router.push('/sign-up/student/international')
+      this.$router.replace('/sign-up/student/international')
     },
 
     async hasEligibilityFormErrors() {
@@ -835,14 +843,14 @@ export default {
             // autofill the user's email
             this.credentials.email = this.eligibility.email
             this.step = 'eligible'
-            this.$router.push('/sign-up/student/eligible')
+            this.$router.replace('/sign-up/student/eligible')
           } else {
             AnalyticsService.captureEvent(EVENTS.ELIGIBILITY_INELIGIBLE, {
               event: EVENTS.ELIGIBILITY_INELIGIBLE,
             })
             if (response.data.isCollegeStudent) this.isCollegeStudent = true
             this.step = 'ineligible'
-            this.$router.push('/sign-up/student/ineligible')
+            this.$router.replace('/sign-up/student/ineligible')
           }
           const isDomesticIpAddress = await this.isDomesticIpAddress()
           if (!isDomesticIpAddress) return this.internationalPage()
@@ -857,7 +865,7 @@ export default {
 
     async accountPage() {
       this.step = 'account'
-      this.$router.push('/sign-up/student/account')
+      this.$router.replace('/sign-up/student/account')
       const isDomesticIpAddress = await this.isDomesticIpAddress()
       if (!isDomesticIpAddress) return this.internationalPage()
     },
@@ -939,7 +947,7 @@ export default {
           zipCode: this.eligibility.zipCode,
         })
         window.localStorage.removeItem('upcReferredByCode')
-        this.$router.push('/verify')
+        this.$router.replace('/verify')
       } catch (e) {
         const errorMsg = e?.response?.data?.err ?? 'Failed: Please try again.'
         this.errors.push(errorMsg)
@@ -1003,6 +1011,10 @@ p.small-paragraph {
 
 .uc-form-text {
   margin-top: 10px;
+
+  &.below {
+    margin-top: 20px;
+  }
 }
 
 .break-line-container {

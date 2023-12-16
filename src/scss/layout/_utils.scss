@@ -10,6 +10,10 @@
     justify-content: center;
   }
 
+  &.justify-end {
+    justify-content: end;
+  }
+
   &.items-center {
     align-items: center;
   }
@@ -31,10 +35,18 @@
   width: 100%;
 }
 
+.w-80 {
+  width: 80%;
+}
+
 .h-full {
   height: 100%;
 }
 
 .center {
   text-align: center;
+}
+
+.overflow-hidden {
+  overflow: hidden;
 }

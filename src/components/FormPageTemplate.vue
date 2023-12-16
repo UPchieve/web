@@ -1,12 +1,45 @@
 <template>
-  <div class="uc-column h-full">
-    <div class="background-img"></div>
-    <div class="FormPageTemplate">
-      <img class="logo-white" src="@/assets/p_logo_white.png" alt="UPchieve" />
-      <img class="logo-teal" src="@/assets/header_logo.png" alt="UPchieve" />
-      <main>
-        <slot></slot>
-      </main>
+  <div
+    class="h-full"
+    :class="{ 'uc-row': showNewDesign, 'uc-column': !showNewDesign }"
+  >
+    <div v-if="!showNewDesign" class="background-img"></div>
+    <div v-else class="bg-fixed-container">
+      <div class="bg-fixed  uc-column items-center justify-end">
+        <h1 class="header">
+          Chat with an online college coach for free!
+        </h1>
+        <div class="image-container">
+          <chat-mobile class="w-full h-full" />
+        </div>
+      </div>
+    </div>
+    <div
+      :class="{
+        'bg-content uc-column items-center justify-center': showNewDesign,
+        FormPageTemplate: !showNewDesign,
+      }"
+    >
+      <img
+        v-if="!showNewDesign"
+        class="logo-white"
+        src="@/assets/p_logo_white.png"
+        alt="UPchieve"
+      />
+      <img
+        :class="{
+          'logo-teal-new-design': showNewDesign,
+          'logo-teal': !showNewDesign,
+        }"
+        src="@/assets/header_logo.png"
+        alt="UPchieve"
+      />
+      <slot></slot>
+      <img
+        v-if="showNewDesign"
+        class="img-updog-subjects"
+        src="@/assets/updog-subjects.png"
+      />
     </div>
     <nav class="footer" aria-label="More information">
       <div>
@@ -22,7 +55,94 @@
   </div>
 </template>
 
+<script>
+import { mapGetters } from 'vuex'
+import ChatMobile from '@/assets/chat-mobile.svg'
+
+export default {
+  components: {
+    ChatMobile,
+  },
+  computed: {
+    ...mapGetters({
+      isNewEligibilityFormDesignEnabled:
+        'featureFlags/isNewEligibilityFormDesignEnabled',
+    }),
+    showNewDesign() {
+      return (
+        this.isNewEligibilityFormDesignEnabled &&
+        this.$route.path.includes('eligibility') &&
+        this.$route.query['partner'] === 'bigfuture'
+      )
+    },
+  },
+}
+</script>
+
 <style lang="scss" scoped>
+.bg-fixed-container {
+  flex: 1 1 0;
+  height: 100%;
+
+  @include breakpoint-below('tiny') {
+    display: none;
+  }
+}
+
+.bg-fixed {
+  background-color: #f0f9ff;
+  height: 100%;
+  position: fixed;
+  width: 50%;
+}
+
+.header {
+  font-size: 32px;
+  font-weight: 600;
+  max-width: 65%;
+  min-width: 300px;
+  padding: 16px 24px;
+  text-align: center;
+}
+
+.image-container {
+  height: 100%;
+  max-height: 70vh;
+  width: 100%;
+}
+
+.bg-content {
+  background-color: white;
+  flex: 1 1 0;
+  margin: auto;
+  min-height: 100vh;
+  padding-bottom: 50px;
+
+  .uc-form::v-deep {
+    padding-top: 0px;
+
+    @include breakpoint-below('tiny') {
+      padding-bottom: 0px;
+    }
+  }
+
+  @include breakpoint-below('tiny') {
+    padding-bottom: 100px;
+  }
+}
+
+.logo-teal-new-design {
+  margin: 16px;
+}
+
+.img-updog-subjects {
+  margin-top: 10px;
+  @include breakpoint-above('tiny') {
+    display: none;
+  }
+}
+
+/* old */
 .background-img {
   background-color: white;
 
@@ -42,23 +162,12 @@
 
 .FormPageTemplate {
   @include flex-container(column, flex-start, center);
-  background-color: white;
   padding-top: 20px;
-  height: 100%;
 
-  main {
-    @include flex-container(column, center, center);
-    padding-bottom: 100px;
-    width: 100%;
-  }
+  padding-bottom: 50px;
 
-  @include breakpoint-above('tiny') {
-    background-color: transparent;
-    padding-top: 50px;
-
-    main {
-      padding-bottom: 50px;
-    }
+  @include breakpoint-below('tiny') {
+    background-color: white;
   }
 }
 
@@ -76,6 +185,7 @@
 .logo-teal {
   display: block;
   max-width: 95px;
+  padding-top: 12px;
 
   @include breakpoint-above('tiny') {
     display: none;
