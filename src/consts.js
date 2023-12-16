@@ -599,6 +599,8 @@ export const POSTHOG_FEATURE_FLAGS = {
   SMS_VERIFICATION: 'sms-verification',
   ELIGIBILITY_EMAIL: 'eligibility-email',
   NEW_ELIGIBILITY_FORM_DESIGN: 'new-eligibility-form-design',
+  SMS_VERIFICATION_ENABLED_ON_SIGNUP_FLOW:
+    'sms-verification-enabled-on-signup-flow',
 }
 
 export const ANALYTICS_REPORT_ROW = {
