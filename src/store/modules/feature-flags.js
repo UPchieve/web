@@ -75,6 +75,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION]: false,
       [POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION]: false,
       [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_EMAIL]: false,
+      [POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION_ENABLED_ON_SIGNUP_FLOW]: false,
     },
     flagPayloads: {
       [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: [],
@@ -208,5 +209,9 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.ELIGIBILITY_EMAIL],
     isNewEligibilityFormDesignEnabled: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.NEW_ELIGIBILITY_FORM_DESIGN],
+    isSmsVerificationEnabledOnSignupFlow: state =>
+      state.flags[
+        POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION_ENABLED_ON_SIGNUP_FLOW
+      ],
   },
 }

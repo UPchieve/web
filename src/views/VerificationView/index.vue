@@ -5,22 +5,24 @@
         {{ error }}
       </div>
 
-      <div v-if="step === 1">
-        <button
-          v-if="error"
-          class="uc-form-button"
-          @click.prevent="sendCode"
-          :disabled="isSubmitting"
-        >
-          {{ sendCodeButtonText }}
-        </button>
-      </div>
+      <!--        If sms-verification is enabled, give the user the option to choose verification method in step 1-->
+      <verification-method-selector
+        v-if="
+          step === 1 &&
+            isSmsVerificationEnabled &&
+            isSmsVerificationEnabledOnSignupFlow
+        "
+        data-testid="verification-method-selector"
+        :email="user.email"
+        v-model="verificationInputs"
+      />
 
-      <div v-if="step === 2">
+      <!-- Verify code-->
+      <div v-if="step === 2" data-testid="step-2">
         <p class="uc-form-text center">
-          We just emailed your verification code to
+          We just sent your verification code to
           <span id="ph-no-capture" class="verification__send-to">{{
-            email
+            sendTo
           }}</span>
         </p>
         <div class="uc-form-element">
@@ -37,17 +39,13 @@
           />
         </div>
 
-        <button
-          class="uc-form-button"
-          type="submit"
-          @click.prevent="confirmVerificationCode"
-          :disabled="!isValidVerificationCode"
-        >
-          Verify my account
-        </button>
-
         <div class="uc-form-subtext verification__sub-text">
-          Did not receive an email?
+          Did not receive
+          {{
+            verificationInputs.method === VERIFICATION_METHOD.SMS
+              ? 'a text'
+              : 'an email'
+          }}?
           <span
             :disabled="isSubmitting"
             @click.prevent="sendCode"
@@ -56,8 +54,32 @@
           >
         </div>
       </div>
+
+      <div class="buttons-container">
+        <button
+          class="uc-form-button"
+          @click.prevent="sendCode"
+          v-if="step === 1"
+          :disabled="
+            verificationInputs.method === VERIFICATION_METHOD.SMS &&
+              !verificationInputs.phoneInputInfo.isValid
+          "
+        >
+          {{ sendCodeButtonText }}
+        </button>
+        <button
+          class="uc-form-button"
+          type="submit"
+          @click.prevent="confirmVerificationCode"
+          :disabled="!isValidVerificationCode"
+          v-if="step === 2"
+        >
+          Verify my account
+        </button>
+        <button class="uc-form-button-secondary" @click="logout">Logout</button>
+      </div>
+
       <RecaptchaCaption />
-      <button class="uc-form-button-secondary" @click="logout">Logout</button>
     </div>
 
     <loader v-if="isSubmitting" :message="loadingMessage" overlay />
@@ -73,6 +95,7 @@ import LoggerService from '@/services/LoggerService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 import RecaptchaCaption from '@/components/recaptcha/RecaptchaCaption.vue'
+import VerificationMethodSelector from '@/views/VerificationView/VerificationMethodSelector.vue'
 
 export default {
   name: 'VerificationView',
@@ -80,29 +103,56 @@ export default {
     RecaptchaCaption,
     FormPageTemplate,
     Loader,
+    VerificationMethodSelector,
   },
   data() {
     return {
       step: 1,
       verificationCode: '',
+      verificationInputs: {
+        method: VERIFICATION_METHOD.EMAIL,
+        phoneInputInfo: {},
+      },
       loadingMessage: '',
       error: '',
       isSubmitting: false,
-      email: '',
+    }
+  },
+  beforeMount() {
+    if (
+      this.isSmsVerificationEnabled &&
+      this.isSmsVerificationEnabledOnSignupFlow
+    ) {
+      this.step = 1
+    } else {
+      this.step = 2
+      this.verificationInputs.method = VERIFICATION_METHOD.EMAIL
+      this.sendCode()
     }
   },
   mounted() {
     this.$store.dispatch('app/hideNavigation')
-    this.email = this.user.email
-    this.sendCode()
   },
   computed: {
+    VERIFICATION_METHOD() {
+      return VERIFICATION_METHOD
+    },
     ...mapState({
       user: state => state.user.user,
     }),
     ...mapGetters({
       isAutoFlowUser: 'user/isAutoFlowUser',
+      isSmsVerificationEnabled: 'featureFlags/isSmsVerificationEnabled', // Whether SMS verification is enabled across the app
+      isSmsVerificationEnabledOnSignupFlow:
+        'featureFlags/isSmsVerificationEnabledOnSignupFlow', // Whether it's a verification option during signup
     }),
+    sendTo() {
+      if (this.verificationInputs.method === VERIFICATION_METHOD.SMS) {
+        return this.verificationInputs.phoneInputInfo.e164
+      } else {
+        return this.user.email
+      }
+    },
     isValidVerificationCode() {
       return !(
         this.verificationCode.length !== 6 ||
@@ -112,12 +162,11 @@ export default {
     sendCodeButtonText() {
       if (this.isSubmitting) {
         return 'Sending...'
+      } else if (this.error) {
+        return 'Resend verification code'
+      } else {
+        return 'Send code'
       }
-
-      return 'Resend verification code'
-    },
-    showEmoji() {
-      return !this.user.isVolunteer
     },
   },
   methods: {
@@ -125,11 +174,13 @@ export default {
       this.error = ''
       if (this.isSubmitting) return
       this.isSubmitting = true
-      this.loadingMessage = 'Sending a verification email. Please wait...'
+      this.loadingMessage = 'Sending a verification code. Please wait...'
       try {
         await AuthService.initiateVerification({
-          sendTo: this.email,
-          verificationMethod: VERIFICATION_METHOD.EMAIL,
+          sendTo: this.sendTo,
+          verificationMethod: this.verificationInputs.method,
+          userId: this.user.id,
+          firstName: this.user.firstName,
         })
         this.step = 2
         this.error = ''
@@ -156,11 +207,13 @@ export default {
           data: { success },
         } = await AuthService.confirmVerification({
           verificationCode: this.verificationCode,
-          sendTo: this.email,
-          verificationMethod: VERIFICATION_METHOD.EMAIL,
+          sendTo: this.sendTo,
+          verificationMethod: this.verificationInputs.method,
         })
         if (success) {
-          AnalyticsService.captureEvent(EVENTS.ACCOUNT_VERIFIED)
+          AnalyticsService.captureEvent(EVENTS.ACCOUNT_VERIFIED, {
+            verificationMethod: this.verificationInputs.method,
+          })
           this.$store.dispatch('user/firstDashboardVisit', true)
           this.$store.dispatch('user/addToUser', {
             verified: true,
@@ -181,10 +234,10 @@ export default {
       this.isSubmitting = false
     },
     handleRequestError(error) {
-      if (error.status !== 422) LoggerService.noticeError(error)
       this.error =
-        error.message ||
+        error.response?.data?.err ??
         'Sorry, looks like something went wrong. Please try again in a few minutes.'
+      if (error.status !== 422) LoggerService.noticeError(error.response?.data)
     },
     logout() {
       AuthService.logout(this)
@@ -227,5 +280,21 @@ export default {
 
 .uc-form-button-secondary {
   margin-top: auto;
+  width: 100%;
+}
+
+.buttons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.alert {
+  margin-top: 0px;
+  text-align: center;
+}
+
+.uc-form {
+  justify-content: space-between;
 }
 </style>
