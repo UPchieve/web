@@ -9,15 +9,16 @@
       <div v-if="!flowIncompletable" data-testid="verification-body">
         <p
           class="uc-form-text"
-          id="phone-number-changed-message"
-          v-if="phoneNumberChanged"
+          data-testid="phone-or-email-changed-message"
+          v-if="phoneOrEmailToVerify !== phoneOrEmail"
         >
-          Before we can save your new phone number, we need to verify it.
+          Before we can save your new {{ verificationMethodText }}, we need to
+          verify it.
         </p>
         <p class="uc-form-text">
-          We just texted a verification code to
-          <span class="verification-phone-number">{{
-            phoneNumberToVerify
+          We just sent a verification code to
+          <span class="verification-destination">{{
+            phoneOrEmailToVerify
           }}</span
           >.
         </p>
@@ -51,10 +52,10 @@
             type="submit"
             :disabled="!isValidVerificationCode"
             class="uc-form-button"
-            id="verify-phone-btn"
+            data-testid="verify-code-btn"
             @click.prevent="confirmVerification"
           >
-            Verify my phone number
+            Verify my {{ verificationMethodText }}
           </button>
           <button
             class="uc-form-button-secondary"
@@ -79,7 +80,7 @@
     <!-- Step 2 content: Completed state -->
     <div v-if="verificationComplete">
       <p class="uc-form-text">
-        Your phone number has been verified!
+        Your {{ verificationMethodText }} has been verified!
       </p>
       <button class="uc-form-button" @click="completeModal">Close</button>
     </div>
@@ -96,14 +97,18 @@ import { EVENTS } from '@/consts'
 import RecaptchaCaption from '@/components/recaptcha/RecaptchaCaption.vue'
 
 export default {
-  name: 'phone-number-verification-modal',
+  name: 'verification-modal',
   components: {
     RecaptchaCaption,
     Modal,
     Loader,
   },
   props: {
-    phoneNumberToVerify: {
+    phoneOrEmailToVerify: {
+      type: String,
+      required: true,
+    },
+    verificationMethod: {
       type: String,
       required: true,
     },
@@ -124,27 +129,33 @@ export default {
       loadingMessage: '',
       loadingMessageCodeSent: 'Sending a verification code. Please wait...',
       loadingMessageCodeVerifying: 'Verifying your code. Please wait...',
-      phoneNumber: '',
+      phoneOrEmail: '',
       verificationComplete: false,
       defaultErrorMessage: 'Something went wrong',
       flowIncompletable: false,
+      verificationMethodText:
+        this.verificationMethod === VERIFICATION_METHOD.SMS
+          ? 'phone number'
+          : 'email',
     }
   },
   mounted() {
     this.initiateVerification()
-    AnalyticsService.captureEvent(
-      EVENTS.PHONE_NUMBER_VERIFICATION_MODAL_OPENED,
-      {
-        event: EVENTS.PHONE_NUMBER_VERIFICATION_MODAL_OPENED,
-      }
-    )
-  },
-  created() {
-    this.$store.dispatch('user/fetchUser').then(() => {
-      this.phoneNumber = this.user.phone
+    AnalyticsService.captureEvent(EVENTS.VERIFICATION_MODAL_OPENED, {
+      verificationMethod: this.verificationMethod,
+      userId: this.user.id,
     })
   },
+  created() {
+    this.phoneOrEmail =
+      this.verificationMethod === VERIFICATION_METHOD.SMS
+        ? this.user.phone
+        : this.user.email
+  },
   computed: {
+    VERIFICATION_METHOD() {
+      return VERIFICATION_METHOD
+    },
     ...mapState({
       user: state => state.user.user,
     }),
@@ -153,9 +164,6 @@ export default {
         this.verificationCode.length !== 6 ||
         isNaN(Number(this.verificationCode))
       )
-    },
-    phoneNumberChanged() {
-      return this.phoneNumber !== this.phoneNumberToVerify
     },
   },
   methods: {
@@ -166,13 +174,13 @@ export default {
 
       try {
         await AuthService.initiateVerification({
-          sendTo: this.phoneNumberToVerify,
-          verificationMethod: VERIFICATION_METHOD.SMS,
+          sendTo: this.phoneOrEmailToVerify,
+          verificationMethod: this.verificationMethod,
           firstName: this.user.firstName,
           userId: this.user.id,
         })
       } catch (error) {
-        // 4xx errors: User has done something wrong, which is either to do with the phone number
+        // 4xx errors: User has done something wrong, which is either to do with the phone number/email
         // or making too many requests.
         // 5xx: Something is malfunctioning.
         // In either case, there is nothing to do but close the modal.
@@ -194,20 +202,24 @@ export default {
       try {
         const result = await AuthService.confirmVerification({
           verificationCode: this.verificationCode,
-          sendTo: this.phoneNumberToVerify,
-          verificationMethod: VERIFICATION_METHOD.SMS,
+          sendTo: this.phoneOrEmailToVerify,
+          verificationMethod: this.verificationMethod,
           forSignup: false,
           userId: this.user.id,
         })
         if (result.data.success) {
           this.verificationComplete = true
-          AnalyticsService.captureEvent(EVENTS.PHONE_NUMBER_VERIFIED, {
-            event: EVENTS.PHONE_NUMBER_VERIFIED,
-          })
-          if (this.user.phone !== this.phoneNumberToVerify) {
-            AnalyticsService.captureEvent(EVENTS.PHONE_NUMBER_UPDATED, {
-              event: EVENTS.PHONE_NUMBER_UPDATED,
-            })
+          if (this.verificationMethod === VERIFICATION_METHOD.SMS) {
+            AnalyticsService.captureEvent(EVENTS.PHONE_NUMBER_VERIFIED)
+
+            if (this.user.phone !== this.phoneOrEmailToVerify) {
+              AnalyticsService.captureEvent(EVENTS.PHONE_NUMBER_UPDATED)
+            }
+          } else {
+            AnalyticsService.captureEvent(EVENTS.EMAIL_VERIFIED)
+            if (this.user.email !== this.phoneOrEmailToVerify) {
+              AnalyticsService.captureEvent(EVENTS.EMAIL_UPDATED)
+            }
           }
           this.error = ''
         } else {
@@ -226,6 +238,15 @@ export default {
     async completeModal() {
       this.closeModal()
       this.onCloseSuccess()
+      const updates = {}
+      if (this.verificationMethod === VERIFICATION_METHOD.EMAIL) {
+        updates.emailVerified = true
+        updates.email = this.phoneOrEmailToVerify
+      } else if (this.verificationMethod === VERIFICATION_METHOD.SMS) {
+        updates.phoneVerified = true
+        updates.phone = this.phoneOrEmailToVerify
+      }
+      await this.$store.dispatch('user/addToUser', updates)
     },
     displayError(error) {
       this.error = error?.response?.data?.err ?? this.defaultErrorMessage
@@ -235,7 +256,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.verification-phone-number {
+.verification-destination {
   font-weight: bold;
 }
 
