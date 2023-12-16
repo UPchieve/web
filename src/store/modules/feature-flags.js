@@ -66,6 +66,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY]: false,
       [POSTHOG_FEATURE_FLAGS.SCORECASTER_WOZ]: false,
       [POSTHOG_FEATURE_FLAGS.SCORECASTER_MODAL]: false,
+      [POSTHOG_FEATURE_FLAGS.NEW_ELIGIBILITY_FORM_DESIGN]: false,
       // This is an experiment, using multivariant feature flag values
       [POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO]: true,
       [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: 'control',
@@ -205,5 +206,7 @@ export default {
       state.flags[POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION],
     eligibilityEmail: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.ELIGIBILITY_EMAIL],
+    isNewEligibilityFormDesignEnabled: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.NEW_ELIGIBILITY_FORM_DESIGN],
   },
 }

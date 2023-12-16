@@ -17,6 +17,7 @@
 
   @include breakpoint-below('tiny') {
     border-radius: 0px;
+    padding-bottom: 100px;
   }
 
   .alert {
@@ -26,7 +27,7 @@
 }
 
 .uc-form-header {
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 500;
   margin: 0;
 
@@ -37,15 +38,7 @@
 
 .uc-form-element {
   @include flex-container(column);
-  margin-top: 16px;
-
-  &:first-child {
-    margin-top: 24px;
-
-    @include breakpoint-below('tiny') {
-      margin-top: 12px;
-    }
-  }
+  margin-top: 10px;
 
   label {
     @include font-category(caption);
@@ -63,6 +56,7 @@
     color: $c-error-red;
     font-weight: 400;
     margin: 0 4px 2px 0;
+    text-align: end;
   }
 
   .metadata {
@@ -102,7 +96,7 @@
   color: $button-primary-text;
   font-size: 16px;
   height: 48px;
-  margin-top: 40px;
+  margin-top: 24px;
   width: 100%;
 
   @include breakpoint-below('tiny') {
@@ -165,7 +159,7 @@
   border-radius: 4px;
   box-shadow: none;
   box-sizing: border-box;
-  padding: 15px 13px;
+  padding: 11px 13px;
 
   &:focus {
     outline: 1px solid $c-information-blue;
@@ -219,8 +213,8 @@
     border: 1px solid $border-grey;
     border-radius: 4px;
     box-shadow: none;
-    height: 56px;
-    padding: 15px 13px;
+    height: 48px;
+    padding: 11px 13px;
     width: 100%;
   }
 
@@ -316,7 +310,7 @@
     border: 1px solid $border-grey;
     border-radius: 4px;
     box-shadow: none;
-    padding: 15px 13px;
+    padding: 11px 13px;
     width: 100%;
 
     &::placeholder {

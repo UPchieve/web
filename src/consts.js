@@ -598,6 +598,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   SCORECASTER_MODAL: 'scorecaster-modal',
   SMS_VERIFICATION: 'sms-verification',
   ELIGIBILITY_EMAIL: 'eligibility-email',
+  NEW_ELIGIBILITY_FORM_DESIGN: 'new-eligibility-form-design',
 }
 
 export const ANALYTICS_REPORT_ROW = {
