@@ -1,9 +1,10 @@
 <template>
   <div class="profile">
-    <PhoneNumberVerificationModal
+    <VerificationModal
       v-if="showSmsVerificationModal"
       data-testid="sms-verification-modal"
-      :phoneNumberToVerify="phoneInputInfo.e164"
+      :phoneOrEmailToVerify="phoneInputInfo.e164"
+      :verificationMethod="VERIFICATION_METHOD.SMS"
       :closeModal="toggleShowSmsVerificationModal"
       :onCloseSuccess="updateVerifiedPhoneInfo"
     />
@@ -237,9 +238,9 @@ import DeactivateAccountModal from './DeactivateAccountModal'
 import setNotificationPermission from '@/utils/set-notification-permission'
 import getNotificationPermission from '@/utils/get-notification-permission'
 import VuePhoneNumberInput from 'vue-phone-number-input'
-import { EVENTS } from '@/consts'
+import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 import Loader from '@/components/Loader.vue'
-import PhoneNumberVerificationModal from './PhoneNumberVerificationModal.vue'
+import VerificationModal from './VerificationModal.vue'
 import Checkbox from '@/components/CheckBox.vue'
 
 export default {
@@ -249,7 +250,7 @@ export default {
     DeactivateAccountModal,
     VuePhoneNumberInput,
     Loader,
-    PhoneNumberVerificationModal,
+    VerificationModal,
   },
   data() {
     return {
@@ -306,6 +307,9 @@ export default {
     name() {
       const user = this.$store.state.user.user
       return user.firstname || (user.isVolunteer ? 'volunteer' : 'student')
+    },
+    VERIFICATION_METHOD() {
+      return VERIFICATION_METHOD
     },
     internationalPhoneInfo() {
       if (!this.user.phone) return false
@@ -412,12 +416,7 @@ export default {
     },
 
     async updateVerifiedPhoneInfo() {
-      const updates = {
-        phone: this.phoneInputInfo.e164,
-        phoneVerified: true,
-      }
       this.shouldSeeSmsConsentCheckbox = !this.user.isVolunteer
-      this.$store.dispatch('user/addToUser', updates)
     },
 
     /**

@@ -48,7 +48,7 @@ import StudentOnboardingModal from './StudentOnboardingModal.vue'
 import ScorecasterModal from './ScorecasterModal.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import ProductDiscoveryService from '@/services/ProductDiscoveryService'
-import { EVENTS } from '@/consts'
+import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 import getCookie from '@/utils/get-cookie'
 import Gleap from 'gleap'
 
@@ -82,6 +82,17 @@ export default {
   async created() {
     if (this.isSessionAlive) {
       this.$store.dispatch('app/header/show', activeHeaderData)
+    } else if (
+      !this.user.emailVerified &&
+      this.isShowEmailVerificationHeaderActive
+    ) {
+      this.$store.dispatch('app/header/show', {
+        component: 'VerificationHeader',
+        data: {
+          verificationMethod: VERIFICATION_METHOD.EMAIL,
+          phoneOrEmailToVerify: this.user.email,
+        },
+      })
     } else if (this.isDashboardBannerActive) {
       this.triggerIncentiveProgram()
     }
@@ -171,6 +182,8 @@ export default {
       isAutoStartCollegeSessionActive:
         'featureFlags/isAutoStartCollegeSessionActive',
       autoStartCollegeSession: 'featureFlags/autoStartCollegeSession',
+      isShowEmailVerificationHeaderActive:
+        'featureFlags/isShowEmailVerificationHeaderActive',
     }),
     userAndOrbitalSegment() {
       return [this.user, this.orbitalSegments, this.isOrbitalSegmentsActive]

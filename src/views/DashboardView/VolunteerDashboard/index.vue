@@ -160,6 +160,7 @@ import ArrowIcon from '@/assets/arrow.svg'
 import NetworkService from '../../../services/NetworkService'
 import config from '../../../config'
 import Loader from '@/components/Loader.vue'
+import { VERIFICATION_METHOD } from '@/consts'
 
 const defaultHeaderData = {
   component: 'DefaultHeader',
@@ -207,6 +208,17 @@ export default {
 
     if (this.isSessionAlive) {
       this.$store.dispatch('app/header/show', rejoinHeaderData)
+    } else if (
+      !this.user.emailVerified &&
+      this.isShowEmailVerificationHeaderActive
+    ) {
+      this.$store.dispatch('app/header/show', {
+        component: 'VerificationHeader',
+        data: {
+          verificationMethod: VERIFICATION_METHOD.EMAIL,
+          phoneOrEmailToVerify: this.user.email,
+        },
+      })
     }
 
     // TODO: move globally to show banner in all pages
@@ -238,6 +250,8 @@ export default {
       downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
       isFilterActiveSubjectsActive: 'featureFlags/isFilterActiveSubjectsActive',
       allSubjectNames: 'subjects/allSubtopicNames',
+      isShowEmailVerificationHeaderActive:
+        'featureFlags/isShowEmailVerificationHeaderActive',
     }),
 
     isCustomVolunteerPartner() {

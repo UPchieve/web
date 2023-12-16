@@ -1,19 +1,21 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils'
 import Vuex from 'vuex'
 import userModule from '@/store/modules/user'
-import PhoneNumberVerificationModal from '@/views/PhoneNumberVerificationModal.vue'
+import VerificationModal from '@/views/VerificationModal.vue'
 import AuthService from '@/services/AuthService'
+import { VERIFICATION_METHOD } from '@/consts'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
 
-describe('PhoneNumberVerificationModal', () => {
+describe('VerificationModal', () => {
   let DEFAULT_PROPS
 
   beforeEach(() => {
     jest.resetAllMocks()
     DEFAULT_PROPS = {
-      phoneNumberToVerify: '+18180000001',
+      phoneOrEmailToVerify: '+18180000001',
+      verificationMethod: VERIFICATION_METHOD.SMS,
       closeModal: () => {},
     }
   })
@@ -29,7 +31,7 @@ describe('PhoneNumberVerificationModal', () => {
         },
       },
     })
-    return shallowMount(PhoneNumberVerificationModal, {
+    return shallowMount(VerificationModal, {
       localVue,
       store,
       propsData: props,
@@ -39,7 +41,7 @@ describe('PhoneNumberVerificationModal', () => {
   describe('Verify Phone Number', () => {
     it('Should disable this button while the textbox has an invalid code input', async () => {
       const wrapper = getWrapper()
-      const verifyButton = wrapper.find('#verify-phone-btn')
+      const verifyButton = wrapper.find('[data-testid="verify-code-btn"]')
       const codeInput = wrapper.find('#verification-code-field')
 
       // Disabled while no input
@@ -47,18 +49,18 @@ describe('PhoneNumberVerificationModal', () => {
 
       // Disabled while < 6 digits
       codeInput.setValue('12345')
-      await wrapper.vm.$nextTick
+      await wrapper.vm.$nextTick()
       expect(verifyButton.attributes('disabled')).toBeDefined()
 
       // Enabled when 6 digits
       codeInput.setValue('123456')
-      await wrapper.vm.$nextTick
+      await wrapper.vm.$nextTick()
       expect(verifyButton.attributes('disabled')).toBeUndefined()
     })
 
     it('Should call the AuthService when the verify phone number button is clicked', async () => {
       const wrapper = getWrapper()
-      const verifyButton = wrapper.find('#verify-phone-btn')
+      const verifyButton = wrapper.find('[data-testid="verify-code-btn"]')
       expect(verifyButton.isVisible()).toBeTruthy()
 
       AuthService.confirmVerification = jest.fn().mockResolvedValue(true)
@@ -66,11 +68,12 @@ describe('PhoneNumberVerificationModal', () => {
       // Input code to enable button
       const codeInput = wrapper.find('#verification-code-field')
       codeInput.setValue('123456')
-      await wrapper.vm.$nextTick
+      await wrapper.vm.$nextTick()
       // Click the button
       verifyButton.trigger('click')
       await wrapper.vm.$nextTick()
       expect(AuthService.confirmVerification).toHaveBeenCalled()
+      await wrapper.vm.$nextTick()
     })
   })
 
@@ -82,7 +85,7 @@ describe('PhoneNumberVerificationModal', () => {
 
       // Click it
       resendBtn.trigger('click')
-      await wrapper.vm.$nextTick
+      await wrapper.vm.$nextTick()
       expect(AuthService.initiateVerification).toHaveBeenCalled()
     })
   })
@@ -102,7 +105,7 @@ describe('PhoneNumberVerificationModal', () => {
       expect(cancelBtn.isVisible()).toBeTruthy()
 
       cancelBtn.trigger('click')
-      await wrapper.vm.$nextTick
+      await wrapper.vm.$nextTick()
 
       expect(closeModalFn).toHaveBeenCalled()
     })
@@ -120,15 +123,17 @@ describe('PhoneNumberVerificationModal', () => {
         },
         {
           ...DEFAULT_PROPS,
-          phoneNumberToVerify: '+18180000001',
+          phoneOrEmailToVerify: '+18180000001',
         }
       )
-      const numberToVerifyWrapper = wrapper.find('.verification-phone-number')
+      const numberToVerifyWrapper = wrapper.find('.verification-destination')
       expect(numberToVerifyWrapper.exists()).toBeTruthy()
       expect(numberToVerifyWrapper.text()).toContain('+18180000001')
 
       expect(
-        wrapper.find('#phone-number-changed-message').isVisible()
+        wrapper
+          .find('[data-testid="phone-or-email-changed-message"]')
+          .isVisible()
       ).toBeTruthy()
     })
 
@@ -140,13 +145,62 @@ describe('PhoneNumberVerificationModal', () => {
         },
         {
           ...DEFAULT_PROPS,
-          phoneNumberToVerify: phone,
+          phoneOrEmailToVerify: phone,
         }
       )
       wrapper.setData({
-        phoneNumber: phone,
+        phoneOrEmail: phone,
       })
-      expect(wrapper.find('#phone-number-changed-message').exists()).toBeFalsy()
+      await wrapper.vm.$nextTick()
+      expect(
+        wrapper.find('[data-testid="phone-or-email-changed-message"]').exists()
+      ).toBeFalsy()
     })
+
+    it.each([
+      [
+        {
+          phoneOrEmailToVerify: 'myTestEmail@gmail.com',
+          verificationMethod: VERIFICATION_METHOD.EMAIL,
+        },
+        {
+          sendTo: 'myTestEmail@gmail.com',
+          verificationMethod: VERIFICATION_METHOD.EMAIL,
+        },
+        'email',
+      ],
+      [
+        {
+          phoneOrEmailToVerify: '+18607776654',
+          verificationMethod: VERIFICATION_METHOD.SMS,
+        },
+        { sendTo: '+18607776654', verificationMethod: VERIFICATION_METHOD.SMS },
+        'phone number',
+      ],
+    ])(
+      'Should render the correct text based on the verification method and supply the correct API request payload',
+      async (props, expectedPartialReq, renderedText) => {
+        AuthService.initiateVerification = jest.fn()
+        const wrapper = getWrapper(
+          {
+            email: 'myTestEmail@gmail.com',
+            phone: '+18607776654',
+          },
+          { ...DEFAULT_PROPS, ...props }
+        )
+        // Renders:
+        expect(
+          wrapper.find('[data-testid="verify-code-btn"]').text()
+        ).toContain(renderedText)
+        expect(wrapper.find('.verification-destination').text()).toContain(
+          props.phoneOrEmailToVerify
+        )
+
+        // Sends:
+        expect(AuthService.initiateVerification).toHaveBeenCalledWith(
+          expect.objectContaining(expectedPartialReq)
+        )
+      }
+    )
   })
 })

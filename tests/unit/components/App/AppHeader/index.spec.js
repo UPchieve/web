@@ -8,6 +8,8 @@ import DefaultHeader from '@/components/App/AppHeader/DefaultHeader/index.vue'
 import RejoinSessionHeader from '@/components/App/AppHeader/RejoinSessionHeader.vue'
 import BannedHeader from '@/components/App/AppHeader/BannedHeader.vue'
 import WaitingPeriodHeader from '@/components/App/AppHeader/WaitingPeriodHeader.vue'
+import VerificationHeader from '@/components/App/AppHeader/VerificationHeader.vue'
+import { VERIFICATION_METHOD } from '@/consts'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
@@ -63,5 +65,17 @@ describe('AppHeader', () => {
     const modal = wrapper.find(WaitingPeriodHeader)
     expect(modal.exists()).toBe(true)
     expect(modal.props().headerData).toEqual(state.data)
+  })
+
+  it('renders VerificationHeader', () => {
+    const state = {
+      component: 'VerificationHeader',
+      data: {
+        verificationMethod: VERIFICATION_METHOD.EMAIL,
+        phoneOrEmailToVerify: 'myTestEmail@gmail.com',
+      },
+    }
+    const wrapper = getWrapper(state)
+    expect(wrapper.find(VerificationHeader).isVisible()).toBeTruthy()
   })
 })
