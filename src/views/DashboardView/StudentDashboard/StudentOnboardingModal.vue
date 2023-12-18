@@ -25,8 +25,10 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import LargeButton from '@/components/LargeButton.vue'
+import { EVENTS } from '@/consts'
+import AnalyticsService from '@/services/AnalyticsService'
 import ArrowIcon from '@/assets/arrow.svg'
+import LargeButton from '@/components/LargeButton.vue'
 
 export default {
   name: 'StudentOnboardingModal',
@@ -78,11 +80,15 @@ export default {
       mobileMode: 'app/mobileMode',
     }),
   },
+  created() {
+    AnalyticsService.captureEvent(EVENTS.STUDENT_SHOWN_ONBOARDING_MODAL)
+  },
   methods: {
     nextStep() {
       if (this.step === this.views.length - 1) {
         this.$store.dispatch('app/modal/hide')
         this.$store.dispatch('user/firstDashboardVisit', false)
+        AnalyticsService.captureEvent(EVENTS.STUDENT_FINISHED_ONBOARDING_MODAL)
       } else {
         this.step += 1
       }

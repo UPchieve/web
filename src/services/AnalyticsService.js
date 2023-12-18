@@ -4,6 +4,11 @@ import config from '../config'
 import { EVENTS } from '../consts'
 import LoggerService from './LoggerService'
 
+const GLEAP_TRACK_EVENTS = new Set([
+  EVENTS.STUDENT_SHOWN_ONBOARDING_MODAL,
+  EVENTS.STUDENT_FINISHED_ONBOARDING_MODAL,
+])
+
 class AnalyticsService {
   static init() {
     if (config.posthogToken) {
@@ -49,6 +54,9 @@ class AnalyticsService {
 
   static captureEvent(name, properties) {
     posthog.capture(name, properties)
+    if (GLEAP_TRACK_EVENTS.has(name)) {
+      Gleap.captureEvent(name, properties)
+    }
   }
 
   // unset any of the user's distinctive ids
@@ -212,7 +220,12 @@ class DevAnalyticsService {
 
   static captureEvent(name, properties) {
     // eslint-disable-next-line no-console
-    console.info('AnalyticsService.captureEvent', name, properties)
+    console.info(
+      'AnalyticsService.captureEvent',
+      name,
+      properties,
+      GLEAP_TRACK_EVENTS.has(name)
+    )
   }
 
   static reset() {
