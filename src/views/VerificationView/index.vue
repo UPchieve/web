@@ -219,6 +219,10 @@ export default {
             verified: true,
           })
 
+          if (this.verificationInputs.method === VERIFICATION_METHOD.SMS) {
+            AnalyticsService.captureEvent(EVENTS.ACCOUNT_VERIFIED_WITH_SMS)
+          }
+
           if (this.isAutoFlowUser) {
             this.$router.push('/welcome')
           } else {
