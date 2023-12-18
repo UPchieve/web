@@ -7,16 +7,7 @@
     </h1>
     <div v-if="showBigFutureIntroCopy">
       <p class="uc-form-text">
-        UPchieve and BigFuture are working together to connect you to 100% free,
-        online college counseling and tutoring available 24/7! Share some quick
-        info below to see if you're eligible or
-        <a
-          class="uc-link"
-          href="https://upchieve.org/bigfuture"
-          target="_blank"
-          @click="logStudentClickedLearnMoreLink"
-          >learn more.</a
-        >
+        {{ bfIntroCopy }}
       </p>
     </div>
     <div v-if="isCollegeConfidential">
@@ -659,7 +650,11 @@ export default {
     if (params['partner']) {
       this.partnerKey = params['partner']
 
-      if (this.partnerKey === 'bigfuture' && this.bfIntroCopy) {
+      if (
+        this.partnerKey === 'bigfuture' &&
+        this.isBfIntroCopyEnabled &&
+        this.bfIntroCopy
+      ) {
         this.showBigFutureIntroCopy = true
       }
     }
@@ -677,6 +672,7 @@ export default {
     ...mapGetters({
       offerGoogleSSO: 'featureFlags/offerGoogleSSO',
       ccIntroCopy: 'featureFlags/ccIntroCopy',
+      isBfIntroCopyEnabled: 'featureFlags/isBfIntroCopyEnabled',
       bfIntroCopy: 'featureFlags/bfIntroCopy',
       eligibilityEmail: 'featureFlags/eligibilityEmail',
     }),
