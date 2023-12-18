@@ -24,7 +24,7 @@ export default {
     },
 
     fullName() {
-      return `${this.volunteer.firstname} ${this.volunteer.lastname}`
+      return `${this.volunteer.firstName} ${this.volunteer.lastName}`
     },
   },
 }

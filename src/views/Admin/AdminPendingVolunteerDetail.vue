@@ -5,7 +5,7 @@
         Edit
       </button>
       <div class="user-detail__title">
-        {{ volunteer.firstname }} {{ volunteer.lastname }}
+        {{ volunteer.firstName }} {{ volunteer.lastName }}
       </div>
       <div class="user-detail__subtitle">ID: {{ volunteer._id }}</div>
       <div class="user-detail__section">
