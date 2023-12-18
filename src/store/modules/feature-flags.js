@@ -76,7 +76,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION]: false,
       [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_EMAIL]: false,
       [POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION_ENABLED_ON_SIGNUP_FLOW]: false,
-      [POSTHOG_FEATURE_FLAGS.SHOW_EMAIL_VERIFICATION_HEADER]: false,
     },
     flagPayloads: {
       [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: [],
@@ -218,7 +217,5 @@ export default {
       state.flags[
         POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION_ENABLED_ON_SIGNUP_FLOW
       ],
-    isShowEmailVerificationHeaderActive: state =>
-      state.flags[POSTHOG_FEATURE_FLAGS.SHOW_EMAIL_VERIFICATION_HEADER],
   },
 }

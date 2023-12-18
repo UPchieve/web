@@ -562,7 +562,6 @@ export const EVENTS = {
   VERIFICATION_MODAL_OPENED: 'VERIFICATION_MODAL_OPENED',
   EMAIL_VERIFIED: 'EMAIL_VERIFIED',
   EMAIL_UPDATED: 'EMAIL_UPDATED',
-  ACCOUNT_VERIFIED_WITH_SMS: 'ACCOUNT_VERIFIED_WITH_SMS',
 }
 
 export const VERIFICATION_METHOD = {
@@ -608,7 +607,6 @@ export const POSTHOG_FEATURE_FLAGS = {
   NEW_ELIGIBILITY_FORM_DESIGN: 'new-eligibility-form-design',
   SMS_VERIFICATION_ENABLED_ON_SIGNUP_FLOW:
     'sms-verification-enabled-on-signup-flow',
-  SHOW_EMAIL_VERIFICATION_HEADER: 'show-email-verification-header',
 }
 
 export const ANALYTICS_REPORT_ROW = {
