@@ -210,7 +210,7 @@ export default {
       this.$store.dispatch('app/header/show', rejoinHeaderData)
     } else if (
       !this.user.emailVerified &&
-      this.isShowEmailVerificationHeaderActive
+      this.isSmsVerificationEnabledOnSignupFlow
     ) {
       this.$store.dispatch('app/header/show', {
         component: 'VerificationHeader',
@@ -250,8 +250,8 @@ export default {
       downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
       isFilterActiveSubjectsActive: 'featureFlags/isFilterActiveSubjectsActive',
       allSubjectNames: 'subjects/allSubtopicNames',
-      isShowEmailVerificationHeaderActive:
-        'featureFlags/isShowEmailVerificationHeaderActive',
+      isSmsVerificationEnabledOnSignupFlow:
+        'featureFlags/isSmsVerificationEnabledOnSignupFlow',
     }),
 
     isCustomVolunteerPartner() {

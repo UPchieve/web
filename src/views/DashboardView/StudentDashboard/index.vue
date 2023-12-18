@@ -84,7 +84,7 @@ export default {
       this.$store.dispatch('app/header/show', activeHeaderData)
     } else if (
       !this.user.emailVerified &&
-      this.isShowEmailVerificationHeaderActive
+      this.isSmsVerificationEnabledOnSignupFlow
     ) {
       this.$store.dispatch('app/header/show', {
         component: 'VerificationHeader',
@@ -182,8 +182,8 @@ export default {
       isAutoStartCollegeSessionActive:
         'featureFlags/isAutoStartCollegeSessionActive',
       autoStartCollegeSession: 'featureFlags/autoStartCollegeSession',
-      isShowEmailVerificationHeaderActive:
-        'featureFlags/isShowEmailVerificationHeaderActive',
+      isSmsVerificationEnabledOnSignupFlow:
+        'featureFlags/isSmsVerificationEnabledOnSignupFlow',
     }),
     userAndOrbitalSegment() {
       return [this.user, this.orbitalSegments, this.isOrbitalSegmentsActive]
