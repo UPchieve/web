@@ -87,6 +87,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.QUIZ_ROLLOUT]: [],
       [POSTHOG_FEATURE_FLAGS.FORCE_DASHBOARD_REDESIGN_ORG]: 'none',
       [POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION]: '',
+      [POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY]: '',
     },
   },
   mutations: {
@@ -181,7 +182,10 @@ export default {
     isGleapSegmentExperimentsActive: (state, getters) =>
       getters.gleapSegmentExperiments.length > 0,
     ccIntroCopy: state => state.flags[POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY],
-    bfIntroCopy: state => state.flags[POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY],
+    isBfIntroCopyEnabled: state =>
+      state.flags[POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY],
+    bfIntroCopy: state =>
+      state.flagPayloads[POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY],
     isProcrastinationPreventionActive: state =>
       state.flags[POSTHOG_FEATURE_FLAGS.PROCRASTINATION_PREVENTION],
     isMutedSubjectAlertsActive: state =>
