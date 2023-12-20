@@ -3,17 +3,6 @@
     class="h-full"
     :class="{ 'uc-row': showNewDesign, 'uc-column': !showNewDesign }"
   >
-    <div v-if="!showNewDesign" class="background-img"></div>
-    <div v-else class="bg-fixed-container">
-      <div class="bg-fixed  uc-column items-center justify-end">
-        <h1 class="header">
-          Chat with an online college coach for free!
-        </h1>
-        <div class="image-container">
-          <chat-mobile class="w-full h-full" />
-        </div>
-      </div>
-    </div>
     <div
       :class="{
         'bg-content uc-column items-center justify-center': showNewDesign,
@@ -40,6 +29,17 @@
         class="img-updog-subjects"
         src="@/assets/updog-subjects.png"
       />
+    </div>
+    <div v-if="!showNewDesign" class="background-img"></div>
+    <div v-else class="bg-fixed-container">
+      <div class="bg-fixed  uc-column items-center justify-end">
+        <h1 class="header">
+          Chat with an online college coach for free!
+        </h1>
+        <div class="image-container">
+          <chat-mobile class="w-full h-full" />
+        </div>
+      </div>
     </div>
     <nav class="footer" aria-label="More information">
       <div>
@@ -97,7 +97,7 @@ export default {
 }
 
 .header {
-  font-size: 32px;
+  font-size: 30px;
   font-weight: 600;
   max-width: 65%;
   min-width: 300px;
@@ -162,9 +162,7 @@ export default {
 
 .FormPageTemplate {
   @include flex-container(column, flex-start, center);
-  padding-top: 20px;
-
-  padding-bottom: 50px;
+  padding-bottom: 60px;
 
   @include breakpoint-below('tiny') {
     background-color: white;
@@ -173,8 +171,8 @@ export default {
 
 .logo-white {
   max-width: 155px;
-  margin-bottom: 20px;
-  margin-top: 20px;
+  margin-bottom: 10px;
+  margin-top: 10px;
   display: none;
 
   @include breakpoint-above('tiny') {
