@@ -55,7 +55,7 @@ class AnalyticsService {
   static captureEvent(name, properties) {
     posthog.capture(name, properties)
     if (GLEAP_TRACK_EVENTS.has(name)) {
-      Gleap.captureEvent(name, properties)
+      Gleap.trackEvent(name, properties)
     }
   }
 
