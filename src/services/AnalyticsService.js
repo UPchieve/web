@@ -27,7 +27,7 @@ class AnalyticsService {
           )
         },
         session_recording: {
-          maskTextSelector: '#ph-no-capture',
+          maskTextSelector: '#ph-no-capture, .ph-mask',
         },
       })
     }
