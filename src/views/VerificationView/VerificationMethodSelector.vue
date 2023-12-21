@@ -19,7 +19,7 @@
             "
           />
           <label for="email-option"
-            >By email (<span class="ph-no-capture"
+            >By email (<span class="ph-mask"
               ><strong>{{ email }}</strong></span
             >)</label
           >
@@ -51,7 +51,7 @@
       <label for="phone-number-input">Enter your phone number</label>
       <vue-phone-number-input
         id="phone-number-input"
-        class="ph-no-capture"
+        class="ph-mask"
         v-model="phone"
         required
         @update="

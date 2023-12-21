@@ -17,7 +17,7 @@
         </p>
         <p class="uc-form-text">
           We just sent a verification code to
-          <span class="verification-destination">{{
+          <span class="verification-destination ph-mask">{{
             phoneOrEmailToVerify
           }}</span
           >.

@@ -214,10 +214,14 @@ export default {
           AnalyticsService.captureEvent(EVENTS.ACCOUNT_VERIFIED, {
             verificationMethod: this.verificationInputs.method,
           })
+          const userUpdates = { verified: true }
+          if (this.verificationInputs.method === VERIFICATION_METHOD.SMS) {
+            userUpdates.phoneVerified = true
+          } else {
+            userUpdates.emailVerified = true
+          }
           this.$store.dispatch('user/firstDashboardVisit', true)
-          this.$store.dispatch('user/addToUser', {
-            verified: true,
-          })
+          this.$store.dispatch('user/addToUser', userUpdates)
 
           if (this.isAutoFlowUser) {
             this.$router.push('/welcome')
