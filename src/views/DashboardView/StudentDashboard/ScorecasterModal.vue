@@ -95,7 +95,7 @@
         <header>
           <h1 class="scorecaster__title scorecaster__title-header">
             <span>Test Score Forecast</span>
-            <span>{{ overview.grade }}%</span>
+            <span>{{ summary.overallGrade }}%</span>
           </h1>
         </header>
 
@@ -113,13 +113,13 @@
                   Strengths
                 </h2>
               </header>
-              <p
-                v-for="strength of displayTopicsByType('strength')"
-                :key="strength.topic"
-                class="scorecaster__overview-topic"
+              <div
+                v-for="concept of filteredConceptsToFocusArea('strength')"
+                :key="concept.name"
+                class="scorecaster__concept"
               >
-                {{ strength.topic }}
-              </p>
+                <p class="scorecaster__overview-concept">{{ concept.name }}</p>
+              </div>
             </div>
             <div class="scorecaster__overview">
               <header class="scorecaster__overview-header">
@@ -129,13 +129,13 @@
                   Practice Areas
                 </h2>
               </header>
-              <p
-                v-for="practiceArea of displayTopicsByType('practiceArea')"
-                :key="practiceArea.topic"
-                class="scorecaster__overview-topic"
+              <div
+                v-for="concept of filteredConceptsToFocusArea('practiceArea')"
+                :key="concept.name"
+                class="scorecaster__concept"
               >
-                {{ practiceArea.topic }}
-              </p>
+                <p class="scorecaster__overview-concept">{{ concept.name }}</p>
+              </div>
               <span
                 class="scorecaster__overview-link"
                 @click="showDetailedReport"
@@ -171,29 +171,35 @@
 
         <section class="scorecaster__section--center">
           <div
-            v-for="topic of displayTopicsByType('practiceArea')"
-            :key="topic.topic"
-            class="scorecaster__topic"
+            v-for="concept of filteredConceptsToFocusArea('practiceArea')"
+            :key="concept.name"
           >
-            <div class="scorecaster__topic-header">
-              <span class="scorecaster__topic-name">{{ topic.topic }} </span>
-              <div class="scorecaster__topic-scores">
-                <span class="scorecaster__topic-scores--score"
-                  >Score: {{ topic.grade }}</span
-                >
+            <div class="scorecaster__concept">
+              <div class="scorecaster__concept-header">
+                <span class="scorecaster__concept-name"
+                  >{{ concept.name }}
+                </span>
+                <div class="scorecaster__concept-scores">
+                  <span class="scorecaster__concept-scores--score"
+                    >Score: {{ concept.grade }}</span
+                  >
+                </div>
               </div>
-            </div>
-            <div class="scorecaster__topic-recommendations">
-              Recommendations for improvement:
-              <ul>
-                <li
-                  v-for="recommendation of topic.recommendations"
-                  :key="recommendation"
-                  class="scorecaster__topic-recommendations--recommendation"
-                >
-                  {{ recommendation }}
-                </li>
-              </ul>
+              <div class="scorecaster__concept-recommendations">
+                Recommendations for improvement:
+                <ul>
+                  <li
+                    v-for="detail of filteredFocusAreasToInfoType(
+                      concept,
+                      'recommendation'
+                    )"
+                    :key="detail.content"
+                    class="scorecaster__concept-recommendations--recommendation"
+                  >
+                    {{ detail.content }}
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </section>
@@ -250,8 +256,8 @@ export default {
       isSubmitting: false,
       hasError: false,
       showHaveMoreSessions: false,
-      overview: {},
-      topics: [],
+      summary: {},
+      concepts: [],
     }
   },
   mounted() {
@@ -290,15 +296,19 @@ export default {
 
       try {
         AnalyticsService.captureEvent(EVENTS.SCORECASTER_ANALYSIS_STARTED)
-        const { data } = await NetworkService.getScorecasterAnalysis()
+        const {
+          data,
+          // Only generates report for Reading sessions atm, will be expanded to more subjects
+        } = await NetworkService.generateProgressReportForAllSessions()
+
         AnalyticsService.captureEvent(EVENTS.SCORECASTER_ANALYSIS_RECEIVED)
-        this.overview = data.overview
-        this.topics = data.topics
+        this.summary = data.summary
+        this.concepts = data.concepts
 
         // We're going to expect that the AI couldn't come up with a solution
         // based on the student's sessions. The student may need to do more sessions
         // for an analysis
-        if (!Object.keys(this.overview).length || !this.topics.length) {
+        if (!Object.keys(this.summary).length || !this.concepts.length) {
           this.showHaveMoreSessions = true
           localStorage.removeItem('hasSeenScoreCasterModal')
           AnalyticsService.captureEvent(EVENTS.SCORECASTER_NO_ANALYSIS)
@@ -322,9 +332,21 @@ export default {
       const grade = this.getGrade(gradeNumber)
       return `${grade}/5`
     },
-    displayTopicsByType(type) {
-      const topics = this.topics.filter(topic => topic.type === type)
-      return topics.sort((a, b) => a.grade - b.grade)
+    filteredConceptsToFocusArea(focusArea) {
+      const includedConceptNames = new Set()
+      return this.concepts.filter(concept => {
+        if (
+          !includedConceptNames.has(concept.name) &&
+          concept.details.some(detail => detail.focusArea === focusArea)
+        ) {
+          includedConceptNames.add(concept.name)
+          return true
+        }
+        return false
+      })
+    },
+    filteredFocusAreasToInfoType(concept, infoType) {
+      return concept.details.filter(detail => detail.infoType === infoType)
     },
   },
 }
@@ -455,7 +477,7 @@ export default {
       font-weight: 600;
     }
 
-    &-topic {
+    &-concept {
       @include font-category('body');
       margin: 0;
     }
@@ -486,7 +508,7 @@ export default {
     }
   }
 
-  &__topic {
+  &__concept {
     margin: 0.5em 0;
 
     &-header {

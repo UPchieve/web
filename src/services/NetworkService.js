@@ -869,9 +869,9 @@ export default {
       data
     ).then(this._successHandler, this._errorHandler)
   },
-  getScorecasterAnalysis() {
-    return httpGet(`${API_ROOT}/scorecaster`, {
-      // Allow Scorecaster 2 minutes to analyze the sessions
+  generateProgressReportForAllSessions() {
+    return httpGet(`${API_ROOT}/progress-reports/generate`, {
+      // Allow the progress report generation 2 minutes to analyze the sessions
       timeout: 120000,
     }).then(this._successHandler, this._errorHandler)
   },
