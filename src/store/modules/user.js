@@ -3,6 +3,7 @@ import VolunteerAvatarUrl from '@/assets/defaultavatar4.png'
 import SessionService from '@/services/SessionService'
 import UserService from '@/services/UserService'
 import LoggerService from '@/services/LoggerService'
+import NetworkService from '@/services/NetworkService'
 import Case from 'case'
 import _ from 'lodash'
 
@@ -20,6 +21,9 @@ export default {
     chatScrolledToMessageIndex: null,
     hadASession: false,
     prevSessionSubject: '',
+    requestedProgressReportOverview: false,
+    unreadProgressReportOverviewSubjects: [],
+    hasSeenProgressReportModal: false,
   },
   mutations: {
     setUser: (state, user = {}) => (state.user = user),
@@ -115,6 +119,18 @@ export default {
 
     setPrevSessionSubject: (state, subject) => {
       state.prevSessionSubject = subject
+    },
+
+    setRequestedProgressReportOverview: (state, flag) => {
+      state.requestedProgressReportOverview = flag
+    },
+
+    setUnreadProgressReportOverviewSubjects: (state, subjects) => {
+      state.unreadProgressReportOverviewSubjects = subjects
+    },
+
+    updateHasSeenProgressReportModal: (state, flag) => {
+      state.hasSeenProgressReportModal = flag
     },
   },
   actions: {
@@ -264,6 +280,38 @@ export default {
 
     updatePrevSessionSubject: ({ commit }, subject) => {
       commit('setPrevSessionSubject', subject)
+    },
+    updateRequestedProgressReportOverview: ({ commit }, flag) => {
+      commit('setRequestedProgressReportOverview', flag)
+    },
+
+    getUnreadProgressReportOverviewSubjects: async ({ commit, state }) => {
+      if (state.user.isVolunteer) return
+
+      try {
+        const response = await NetworkService.getUnreadProgressReportOverviewSubjects()
+        commit(
+          'setUnreadProgressReportOverviewSubjects',
+          response.data.subjects
+        )
+      } catch (error) {
+        LoggerService.error(error.response.data.err)
+      }
+    },
+
+    updateProgressReportsReadStatus: async ({ dispatch }, reportIds) => {
+      if (!Array.isArray(reportIds) || !reportIds.length) return
+
+      try {
+        await NetworkService.updateProgressReportsReadStatus(reportIds)
+        dispatch('getUnreadProgressReportOverviewSubjects')
+      } catch (error) {
+        LoggerService.error(error.response.data.err)
+      }
+    },
+
+    updateHasSeenProgressReportModal: ({ commit }, flag) => {
+      commit('updateHasSeenProgressReportModal', flag)
     },
   },
   getters: {
@@ -424,6 +472,10 @@ export default {
       }
 
       return userProps
+    },
+
+    hasUnreadProgressOverviewReports: state => {
+      return !!state.unreadProgressReportOverviewSubjects.length
     },
   },
 }

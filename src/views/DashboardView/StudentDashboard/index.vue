@@ -29,9 +29,9 @@
       v-if="showFallIncentiveEnrollmentModal"
       :closeModal="toggleFallIncentiveEnrollmentModal"
     />
-    <scorecaster-modal
-      v-if="showScorecasterModal"
-      :closeModal="toggleShowScorecasterModal"
+    <progress-report-modal
+      v-if="showProgressReportModal"
+      :closeModal="toggleShowProgressReportModal"
     />
     <subject-selection />
   </div>
@@ -45,7 +45,7 @@ import TellThemCollegePrepModal from './TellThemCollegePrepModal.vue'
 import ProcrastinationPreventionModal from './ProcrastinationPreventionModal.vue'
 import FallIncentiveEnrollmentModal from './FallIncentiveEnrollmentModal.vue'
 import StudentOnboardingModal from './StudentOnboardingModal.vue'
-import ScorecasterModal from './ScorecasterModal.vue'
+import ProgressReportModal from './ProgressReportModal.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
@@ -77,7 +77,7 @@ export default {
     TellThemCollegePrepModal,
     ProcrastinationPreventionModal,
     FallIncentiveEnrollmentModal,
-    ScorecasterModal,
+    ProgressReportModal,
   },
   async created() {
     if (this.isSessionAlive) {
@@ -143,7 +143,7 @@ export default {
     if (this.isEnrollmentForFallIncentiveModalActive)
       this.showFallIncentiveEnrollmentModal = true
 
-    if (this.isScorecasterUserSegment) this.showScorecasterModal = true
+    if (this.isProgressReportUserSegment) this.showProgressReportModal = true
 
     // TODO: move globally to show banner in all pages
     if (this.user && this.user.isBanned) {
@@ -155,7 +155,7 @@ export default {
       showTellThemCollegePrepModal: false,
       showThemProcrastinationPreventionModal: false,
       showFallIncentiveEnrollmentModal: false,
-      showScorecasterModal: false,
+      showProgressReportModal: false,
     }
   },
   computed: {
@@ -165,6 +165,9 @@ export default {
       prevSessionSubject: state => state.user.prevSessionSubject,
       isFirstDashboardVisit: state => state.user.isFirstDashboardVisit,
       productFlags: state => state.productFlags.flags,
+      latestSession: state => state.user.latestSession,
+      hasSeenProgressReportModal: state =>
+        state.user.hasSeenProgressReportModal,
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
@@ -178,7 +181,8 @@ export default {
       isFallIncentiveEnrollmentActive:
         'featureFlags/isFallIncentiveEnrollmentActive',
       showDashboardRedesign: 'user/showDashboardRedesign',
-      isScorecasterModalActive: 'featureFlags/isScorecasterModalActive',
+      isProgressReportsActive: 'featureFlags/isProgressReportsActive',
+      isProgressReportsModalActive: 'featureFlags/isProgressReportsModalActive',
       isAutoStartCollegeSessionActive:
         'featureFlags/isAutoStartCollegeSessionActive',
       autoStartCollegeSession: 'featureFlags/autoStartCollegeSession',
@@ -209,12 +213,16 @@ export default {
         !this.user.phone
       )
     },
-    isScorecasterUserSegment() {
-      const hadAReadingSession = this.prevSessionSubject === 'reading'
+    isProgressReportUserSegment() {
       return (
-        this.isScorecasterModalActive &&
-        hadAReadingSession &&
-        !localStorage.getItem('hasSeenScorecasterModal')
+        this.isProgressReportsActive &&
+        this.isProgressReportsModalActive &&
+        this.latestSession.subject === 'reading' &&
+        this.latestSession.timeTutored >= 1000 * 60 &&
+        this.hadASession &&
+        // We keep track of this state to allow users to see the modal every time after
+        // having multiple sessions
+        !this.hasSeenProgressReportModal
       )
     },
   },
@@ -230,8 +238,8 @@ export default {
       this.showFallIncentiveEnrollmentModal = !this
         .showFallIncentiveEnrollmentModal
     },
-    toggleShowScorecasterModal() {
-      this.showScorecasterModal = !this.showScorecasterModal
+    toggleShowProgressReportModal() {
+      this.showProgressReportModal = !this.showProgressReportModal
     },
     showGleapBot() {
       AnalyticsService.captureEvent(EVENTS.GLEAP_BOT_SHOWN)
@@ -341,8 +349,8 @@ export default {
       },
       deep: true,
     },
-    isScorecasterUserSegment(currentValue, prevValue) {
-      if (currentValue && !prevValue) this.showScorecasterModal = true
+    isProgressReportUserSegment(currentValue, prevValue) {
+      if (currentValue && !prevValue) this.showProgressReportModal = true
     },
   },
 }
