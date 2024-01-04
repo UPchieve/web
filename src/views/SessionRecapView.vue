@@ -4,7 +4,18 @@
     <template v-else>
       <div class="chat-card-editor-container">
         <div class="recap-card">
-          <h2 class="card-title">Session Recap</h2>
+          <header class="recap-card__header recap-card__header-start-session">
+            <h2 class="card-title">Session Recap</h2>
+            <large-button
+              v-if="progressReport.id"
+              class="recap-card__button"
+              @click.native="handleSessionRequest"
+              :showArrow="false"
+            >
+              Start a {{ session.subject }} session
+            </large-button>
+          </header>
+
           <div class="spacing--grid">
             <span class="card-detail__title">Subject:</span>
             <div class="card-detail__sub-container">
@@ -72,6 +83,33 @@
             />
           </div>
         </template>
+        <dropdown
+          v-if="progressReport && progressReport.status === 'complete'"
+          :toggleStyles="{
+            padding: '1.4em 2em',
+          }"
+          class="progress-report__dropdown"
+          @toggled="handleProgressReportToggle"
+        >
+          <template v-slot:header>
+            <p class="progress-report__dropdown-header">
+              <span class="progress-report__dropdown-header--insight"
+                >Session Insight:</span
+              >
+              Passing Grade: {{ progressReport.summary.overallGrade }}%
+            </p>
+          </template>
+          <template v-slot:content>
+            <div class="progress-report__dropdown-content">
+              <separator class="separator" />
+              <progress-report-session
+                class="progress-report-session"
+                v-if="progressReport.id"
+                :progressReport="progressReport"
+              />
+            </div>
+          </template>
+        </dropdown>
         <div v-if="session.quillDoc" class="document">
           <h2 class="document__title">Doc Editor</h2>
           <div class="document__container">
@@ -143,6 +181,10 @@ import ChatLog from '@/components/ChatLog.vue'
 import FavoritingToggle from '@/components/FavoritingToggle.vue'
 import Loader from '@/components/Loader.vue'
 import LoadingMessage from '@/components/LoadingMessage.vue'
+import ProgressReportSession from '@/components/ProgressReportSession.vue'
+import Dropdown from '@/components/Dropdown.vue'
+import Separator from '@/components/Separator.vue'
+import LargeButton from '@/components/LargeButton.vue'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import NetworkService from '@/services/NetworkService'
@@ -162,6 +204,10 @@ export default {
     LoadingMessage,
     Loader,
     SessionChat,
+    ProgressReportSession,
+    Dropdown,
+    Separator,
+    LargeButton,
   },
   computed: {
     ...mapState({
@@ -201,6 +247,7 @@ export default {
       isRecapDmsAvailable: false,
       reportSubmitted: false,
       socketJoinedRoom: false,
+      progressReport: {},
     }
   },
   async created() {
@@ -219,6 +266,8 @@ export default {
       // This is to mock the previous behavior before the updates, where
       // we kept`isSessionConnectionAlive` as `true`
       if (!this.isRecapSocketUpdatesActive) this.socketJoinedRoom = true
+
+      if (!this.user.isVolunteer) await this.getProgressReportForSession()
     } catch (error) {
       if (error.status === 403) this.$router.push('/dashboard')
     } finally {
@@ -309,6 +358,31 @@ export default {
     joinSocketToRoom() {
       this.$socket.emit('sessions/recap:join', { sessionId: this.session.id })
     },
+    async getProgressReportForSession() {
+      try {
+        const response = await NetworkService.getProgressReportForSession(
+          this.session.id
+        )
+        if (response.data.id) this.progressReport = response.data
+      } catch (error) {
+        LoggerService.noticeError(error)
+      }
+    },
+    handleSessionRequest() {
+      AnalyticsService.captureEvent(
+        EVENTS.PROGRESS_REPORT_SESSION_RECAP_STUDENT_REQUESTED_HELP
+      )
+      this.$router.push('/session/readingWriting/reading/')
+    },
+    handleProgressReportToggle(isOpen) {
+      if (isOpen)
+        AnalyticsService.captureEvent(
+          EVENTS.PROGRESS_REPORT_SESSION_RECAP_STUDENT_CLICKED_REPORT,
+          {
+            sessionId: this.session.id,
+          }
+        )
+    },
   },
   sockets: {
     redirect: function(error) {
@@ -342,9 +416,6 @@ export default {
 
 .card-title {
   @include font-category('display-small');
-  text-align: left;
-  border-bottom: 2px solid $c-background-grey;
-  padding-bottom: 0.5em;
 }
 
 .session-recap-page {
@@ -368,6 +439,31 @@ export default {
 
   @include breakpoint-below('large') {
     margin-right: 0;
+  }
+
+  &__header {
+    @include flex-container(row, space-between, center);
+
+    &-start-session {
+      @include breakpoint-between('300px', '560px') {
+        @include flex-container(column, space-between, flex-start);
+      }
+      @include breakpoint-between('992px', '1200px') {
+        @include flex-container(column, space-between, flex-start);
+      }
+      @include breakpoint-between('772px', '830px') {
+        @include flex-container(column, space-between, flex-start);
+      }
+    }
+  }
+
+  &__button {
+    background-color: $c-information-blue;
+    color: $upchieve-white;
+
+    &:hover {
+      background: darken($c-information-blue, 5%);
+    }
   }
 }
 
@@ -465,6 +561,37 @@ export default {
     overflow-y: auto;
     height: 100%;
   }
+}
+
+.progress-report__dropdown {
+  background-color: $upchieve-white;
+  border-radius: 8px;
+  margin-bottom: 1.8em;
+
+  &-content {
+    padding: 0 2em;
+  }
+
+  &-header {
+    @include font-category('heading');
+    margin-bottom: 0;
+
+    &--insight {
+      font-weight: 500;
+    }
+  }
+
+  @include breakpoint-above('large') {
+    margin-right: 1.8em;
+  }
+}
+
+.progress-report-session {
+  padding: 1em 0;
+}
+
+.separator {
+  border: 1px solid $c-background-grey;
 }
 
 .error {

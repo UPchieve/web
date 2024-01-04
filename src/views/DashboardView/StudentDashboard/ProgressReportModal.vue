@@ -1,52 +1,56 @@
 <template>
   <div>
     <modal :backText="''">
-      <div v-if="isSubmitting" class="scorecaster">
-        <section class="scorecaster__section scorecaster__section--center">
-          <updog-loader class="updog" />
-          <p class="loading-message">This might take a minute or so...</p>
+      <div v-if="isSubmitting" class="prm">
+        <section class="prm__section prm__section--center">
+          <upbot class="updog" />
+          <p class="loading-message">
+            UPbot is analyzing your reading score, it might take a minute or
+            so....
+          </p>
+          <large-button @click.native="handleCloseModal">Dismiss</large-button>
         </section>
       </div>
-      <div v-else-if="hasError" class="scorecaster">
-        <section class="scorecaster__section scorecaster__section--center">
+      <div v-else-if="hasError" class="prm">
+        <section class="prm__section prm__section--center">
           <updog-construction class="updog" />
-          <p class="scorecaster__body">
+          <p class="prm__body">
             Hey there! 👋 This feature is experimental, and it looks like we
             don't have everything working as we expected quite yet. We're on it
             and making it awesome as we speak!
           </p>
         </section>
-        <footer class="scorecaster__footer">
-          <div class="scorecaster__buttons scorecaster__buttons--center">
+        <footer class="prm__footer">
+          <div class="prm__buttons prm__buttons--center">
             <large-button @click.native="handleCloseModal">Close</large-button>
           </div>
         </footer>
       </div>
-      <div v-else-if="showHaveMoreSessions" class="scorecaster">
+      <div v-else-if="showHaveMoreSessions" class="prm">
         <header>
-          <scorecaster-banner class="scorecaster-banner" />
-          <h1 class="scorecaster__title">
+          <banner-image class="prm-banner" />
+          <h1 class="prm__title">
             We're almost there for your report
           </h1>
         </header>
-        <section class="scorecaster__section scorecaster__section--center">
-          <p class="scorecaster__body">
+        <section class="prm__section prm__section--center">
+          <p class="prm__body">
             Looks like we need a bit more data from your Reading tutoring
             sessions to whip up a solid report. The more sessions you dive into,
             the better we can predict your future success!
           </p>
         </section>
-        <footer class="scorecaster__footer">
-          <div class="scorecaster__buttons scorecaster__buttons--center">
+        <footer class="prm__footer">
+          <div class="prm__buttons prm__buttons--center">
             <large-button
-              class="scorecaster__buttons-button"
+              class="prm__buttons-button"
               @click.native="handleCloseModal"
               :showArrow="false"
             >
               Close
             </large-button>
             <large-button
-              class="scorecaster__buttons-button  scorecaster__buttons-button--single"
+              class="prm__buttons-button  prm__buttons-button--single"
               @click.native="handleSessionRequest"
               :showArrow="false"
               primary
@@ -56,32 +60,66 @@
           </div>
         </footer>
       </div>
-      <div v-else-if="step === 1" class="scorecaster">
+      <div v-else-if="showStillGeneratingReport" class="prm">
         <header>
-          <scorecaster-banner class="scorecaster-banner" />
-          <h1 class="scorecaster__title">
+          <banner-image class="prm-banner" />
+          <h1 class="prm__title">
+            It's taking longer than usual
+          </h1>
+        </header>
+        <section class="prm__section prm__section--center">
+          <p class="prm__body">
+            Hey there! 👋 We're going to continue to try to generate a report
+            for you. If we're able to generate a new report, you'll be able to
+            find it in the "Your Progress" tab in the sidebar.
+          </p>
+        </section>
+        <footer class="prm__footer">
+          <div class="prm__buttons prm__buttons--center">
+            <large-button
+              class="prm__buttons-button"
+              @click.native="handleCloseModal"
+              :showArrow="false"
+            >
+              Close
+            </large-button>
+            <large-button
+              class="prm__buttons-button  prm__buttons-button--single"
+              @click.native="handleSessionRequest"
+              :showArrow="false"
+              primary
+            >
+              Start a new Reading session
+            </large-button>
+          </div>
+        </footer>
+      </div>
+      <div v-else-if="step === 1" class="prm">
+        <header>
+          <banner-image class="prm-banner" />
+          <h1 class="prm__title">
             Want a forecast of your reading scores?
           </h1>
-          <p class="scorecaster__body">
+          <p class="prm__body">
             Based on your reading tutoring sessions, we'll make a report for
             you. It guesses how well you'll do on future English quizzes or
             tests, and shows what you're doing well and what to improve.
           </p>
-          <p class="scorecaster__body--helper">
+          <p class="prm__body--helper">
             This is a new experimental feature. We might not get it right the
             first time!
           </p>
         </header>
 
-        <footer class="scorecaster__footer">
-          <div class="scorecaster__buttons">
+        <footer class="prm__footer">
+          <div class="prm__buttons">
             <large-button
-              class="scorecaster__buttons-button"
+              class="prm__buttons-button"
               @click.native="handleCloseModal"
               >No, thanks</large-button
             >
             <large-button
-              class="scorecaster__buttons-button scorecaster__buttons-button--primary"
+              class="prm__buttons-button prm__buttons-button--primary"
               @click.native="analyzeSessions"
               primary
               :showArrow="false"
@@ -90,70 +128,69 @@
           </div>
         </footer>
       </div>
-      <div v-else-if="step === 2" class="scorecaster scorecaster--flex">
+      <div v-else-if="step === 2" class="prm prm--flex">
         <cross-icon class="cross-icon" @click="handleCloseModal" />
         <header>
-          <h1 class="scorecaster__title scorecaster__title-header">
+          <h1 class="prm__title prm__title-header">
             <span>Test Score Forecast</span>
             <span>{{ summary.overallGrade }}%</span>
           </h1>
         </header>
 
-        <section class="scorecaster__section">
-          <p class="scorecaster__body">
+        <section class="prm__section">
+          <p class="prm__body">
             Based on your Reading tutoring sessions, our UPbot created a special
             report for you.
           </p>
-          <div class="scorecaster__overview-container">
-            <div class="scorecaster__overview">
-              <header class="scorecaster__overview-header">
-                <h2
-                  class="scorecaster__overview-title scorecaster__overview--bold"
-                >
+          <div class="prm__overview-container">
+            <div
+              v-if="filteredConceptsToFocusArea('strength').length"
+              class="prm__overview"
+            >
+              <header class="prm__overview-header">
+                <h2 class="prm__overview-title prm__overview--bold">
                   Strengths
                 </h2>
               </header>
               <div
                 v-for="concept of filteredConceptsToFocusArea('strength')"
                 :key="concept.name"
-                class="scorecaster__concept"
+                class="prm__concept"
               >
-                <p class="scorecaster__overview-concept">{{ concept.name }}</p>
+                <p class="prm__overview-concept">{{ concept.name }}</p>
               </div>
             </div>
-            <div class="scorecaster__overview">
-              <header class="scorecaster__overview-header">
-                <h2
-                  class="scorecaster__overview-title scorecaster__overview--bold"
-                >
+            <div
+              v-if="filteredConceptsToFocusArea('practiceArea').length"
+              class="prm__overview"
+            >
+              <header class="prm__overview-header">
+                <h2 class="prm__overview-title prm__overview--bold">
                   Practice Areas
                 </h2>
               </header>
               <div
                 v-for="concept of filteredConceptsToFocusArea('practiceArea')"
                 :key="concept.name"
-                class="scorecaster__concept"
+                class="prm__concept"
               >
-                <p class="scorecaster__overview-concept">{{ concept.name }}</p>
+                <p class="prm__overview-concept">{{ concept.name }}</p>
               </div>
-              <span
-                class="scorecaster__overview-link"
-                @click="showDetailedReport"
-              >
+              <span class="prm__overview-link" @click="showDetailedReport">
                 See more practice areas
               </span>
             </div>
-            <p class="scorecaster__overview--subtext">
+            <p class="prm__overview--subtext">
               The more sessions you have the more accurate your report will be.
               Make sure to ask your coach to help you with your practice areas.
             </p>
           </div>
         </section>
-        <footer class="scorecaster__footer">
-          <div class="scorecaster__buttons">
+        <footer class="prm__footer">
+          <div class="prm__buttons">
             <large-button
-              class="scorecaster__buttons-button  scorecaster__buttons-button--primary scorecaster__buttons-button--single scorecaster__buttons-button--wide"
-              @click.native="handleSessionRequest"
+              class="prm__buttons-button  prm__buttons-button--primary prm__buttons-button--single prm__buttons-button--wide"
+              @click.native="handleSessionRequest()"
               :showArrow="false"
               primary
             >
@@ -162,30 +199,28 @@
           </div>
         </footer>
       </div>
-      <div v-else-if="step === 3" class="scorecaster">
-        <header class="scorecaster__practice-area-header">
-          <h1 class="scorecaster__title scorecaster__title--center">
+      <div v-else-if="step === 3" class="prm">
+        <header class="prm__practice-area-header">
+          <h1 class="prm__title prm__title--center">
             Practice Areas
           </h1>
         </header>
 
-        <section class="scorecaster__section--center">
+        <section class="prm__section--center">
           <div
             v-for="concept of filteredConceptsToFocusArea('practiceArea')"
             :key="concept.name"
           >
-            <div class="scorecaster__concept">
-              <div class="scorecaster__concept-header">
-                <span class="scorecaster__concept-name"
-                  >{{ concept.name }}
-                </span>
-                <div class="scorecaster__concept-scores">
-                  <span class="scorecaster__concept-scores--score"
+            <div class="prm__concept">
+              <div class="prm__concept-header">
+                <span class="prm__concept-name">{{ concept.name }} </span>
+                <div class="prm__concept-scores">
+                  <span class="prm__concept-scores--score"
                     >Score: {{ concept.grade }}</span
                   >
                 </div>
               </div>
-              <div class="scorecaster__concept-recommendations">
+              <div class="prm__concept-recommendations">
                 Recommendations for improvement:
                 <ul>
                   <li
@@ -194,7 +229,7 @@
                       'recommendation'
                     )"
                     :key="detail.content"
-                    class="scorecaster__concept-recommendations--recommendation"
+                    class="prm__concept-recommendations--recommendation"
                   >
                     {{ detail.content }}
                   </li>
@@ -203,17 +238,17 @@
             </div>
           </div>
         </section>
-        <footer class="scorecaster__footer">
-          <div class="scorecaster__buttons">
+        <footer class="prm__footer">
+          <div class="prm__buttons">
             <large-button
-              class="scorecaster__buttons-button"
+              class="prm__buttons-button"
               @click.native="handleCloseModal"
               :showArrow="false"
             >
               Close
             </large-button>
             <large-button
-              class="scorecaster__buttons-button  scorecaster__buttons-button--single"
+              class="prm__buttons-button  prm__buttons-button--single"
               @click.native="handleSessionRequest"
               :showArrow="false"
               primary
@@ -230,23 +265,21 @@
 <script>
 import { mapState } from 'vuex'
 import { EVENTS } from '@/consts'
-import ScorecasterBanner from '@/assets/scorecaster-banner.svg'
+import BannerImage from '@/assets/scorecaster-banner.svg'
+import Upbot from '@/assets/upbot.svg'
 import UpdogConstruction from '@/assets/updog-construction.svg'
 import LargeButton from '@/components/LargeButton.vue'
 import Modal from '@/components/Modal.vue'
-import UpdogLoader from '@/components/UpdogLoader.vue'
 import AnalyticsService from '@/services/AnalyticsService'
-import NetworkService from '@/services/NetworkService'
-import LoggerService from '@/services/LoggerService'
 import CrossIcon from '@/assets/cross.svg'
 
 export default {
-  name: 'ScorecasterModal',
+  name: 'ProgressReportModal',
   components: {
     Modal,
     LargeButton,
-    ScorecasterBanner,
-    UpdogLoader,
+    BannerImage,
+    Upbot,
     UpdogConstruction,
     CrossIcon,
   },
@@ -256,73 +289,100 @@ export default {
       isSubmitting: false,
       hasError: false,
       showHaveMoreSessions: false,
-      summary: {},
-      concepts: [],
+      showStillGeneratingReport: false,
+      report: null,
+      timeOutInterval: null,
     }
   },
   mounted() {
-    localStorage.setItem('hasSeenScorecasterModal', true)
-    AnalyticsService.captureEvent(EVENTS.SCORECASTER_MODAL_SHOWN)
+    AnalyticsService.captureEvent(EVENTS.PROGRESS_REPORT_MODAL_SHOWN)
+    this.$store.dispatch('user/updateHasSeenProgressReportModal', true)
+  },
+  beforeDestroy() {
+    clearInterval(this.timeOutInterval)
   },
   computed: {
     ...mapState({
       user: state => state.user.user,
+      requestedProgressReportOverview: state =>
+        state.user.requestedProgressReportOverview,
     }),
+    concepts() {
+      return this.report.concepts
+    },
+    summary() {
+      return this.report.summary
+    },
   },
   props: {
     closeModal: { required: true, type: Function },
   },
   methods: {
     handleCloseModal() {
-      AnalyticsService.captureEvent(EVENTS.SCORECASTER_MODAL_CLOSED)
+      AnalyticsService.captureEvent(EVENTS.PROGRESS_REPORT_MODAL_CLOSED)
       this.closeModal()
     },
     handleSessionRequest() {
-      AnalyticsService.captureEvent(EVENTS.SCORECASTER_STUDENT_REQUESTED_HELP)
-      // There's a SCORECASTER_MODAL_CLOSED event here so that we can
-      // have a clear start and end point for our user journey in PostHog
-      AnalyticsService.captureEvent(EVENTS.SCORECASTER_MODAL_CLOSED)
+      AnalyticsService.captureEvent(
+        EVENTS.PROGRESS_REPORT_STUDENT_REQUESTED_HELP
+      )
+      // Close the modal so that we can have a clear start
+      // and end point for our user journey in PostHog from the
+      // PROGRESS_REPORT_MODAL_CLOSED event
+      this.handleCloseModal()
       this.$router.push('/session/readingWriting/reading/')
     },
     showDetailedReport() {
       AnalyticsService.captureEvent(
-        EVENTS.SCORECASTER_STUDENT_CLICKED_DETAILED_REPORT
+        EVENTS.PROGRESS_REPORT_STUDENT_CLICKED_DETAILED_REPORT
       )
       this.step++
     },
     async analyzeSessions() {
-      if (this.isSubmitting) return
       this.isSubmitting = true
+      AnalyticsService.captureEvent(
+        EVENTS.PROGRESS_REPORT_STUDENT_CLICKED_START_ANALYSIS
+      )
+      this.$store.dispatch('user/updateRequestedProgressReportOverview', true)
 
-      try {
-        AnalyticsService.captureEvent(EVENTS.SCORECASTER_ANALYSIS_STARTED)
-        const {
-          data,
-          // Only generates report for Reading sessions atm, will be expanded to more subjects
-        } = await NetworkService.generateProgressReportForAllSessions()
+      // This handles the case where a user verifies they want to see the analysis
+      // after the socket event is received
+      if (this.report) this.handleReport()
 
-        AnalyticsService.captureEvent(EVENTS.SCORECASTER_ANALYSIS_RECEIVED)
-        this.summary = data.summary
-        this.concepts = data.concepts
-
-        // We're going to expect that the AI couldn't come up with a solution
-        // based on the student's sessions. The student may need to do more sessions
-        // for an analysis
-        if (!Object.keys(this.summary).length || !this.concepts.length) {
-          this.showHaveMoreSessions = true
-          localStorage.removeItem('hasSeenScoreCasterModal')
-          AnalyticsService.captureEvent(EVENTS.SCORECASTER_NO_ANALYSIS)
-        } else this.step++
-      } catch (error) {
+      this.timeOutInterval = setTimeout(() => {
+        if (!this.report) {
+          this.showStillGeneratingReport = true
+          this.isSubmitting = false
+          AnalyticsService.captureEvent(
+            EVENTS.PROGRESS_REPORT_STUDENT_MODAL_TIMED_OUT
+          )
+        }
+      }, 1000 * 60)
+    },
+    async handleReport() {
+      if (this.report.status === 'error') {
         this.hasError = true
-        const err = error.response.data.err
-        LoggerService.noticeError(err)
-        AnalyticsService.captureEvent(EVENTS.SCORECASTER_ANALYSIS_ERROR, {
-          error: err,
-        })
-      } finally {
-        this.isSubmitting = false
+        AnalyticsService.captureEvent(EVENTS.PROGRESS_REPORT_ANALYSIS_ERROR)
+        this.$store.dispatch(
+          'user/updateRequestedProgressReportOverview',
+          false
+        )
+      } else if (!Object.keys(this.summary).length || !this.concepts.length) {
+        this.showHaveMoreSessions = true
+        AnalyticsService.captureEvent(EVENTS.PROGRESS_REPORT_NO_ANALYSIS)
+        this.$store.dispatch(
+          'user/updateRequestedProgressReportOverview',
+          false
+        )
+      } else {
+        AnalyticsService.captureEvent(EVENTS.PROGRESS_REPORT_ANALYSIS_SHOWN)
+        this.step = 2
+        this.$store.dispatch('user/updateProgressReportsReadStatus', [
+          this.report.id,
+        ])
       }
+
+      this.isSubmitting = false
     },
     getGrade(grade) {
       if (grade < 65) return 1
@@ -349,11 +409,17 @@ export default {
       return concept.details.filter(detail => detail.infoType === infoType)
     },
   },
+  sockets: {
+    'progress-report:processed:overview'(data) {
+      this.report = data.report
+      if (this.requestedProgressReportOverview) this.handleReport()
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
-.scorecaster {
+.prm {
   text-align: initial;
 
   &__title {
@@ -547,7 +613,7 @@ export default {
   }
 }
 
-.scorecaster-banner {
+.prm-banner {
   width: 100%;
   height: 300px;
 }
@@ -562,6 +628,9 @@ export default {
 }
 
 .loading-message {
+  font-size: 22px;
+  text-align: center;
+  font-weight: 600;
   margin-top: 1em;
 }
 

@@ -869,10 +869,38 @@ export default {
       data
     ).then(this._successHandler, this._errorHandler)
   },
-  generateProgressReportForAllSessions() {
-    return httpGet(`${API_ROOT}/progress-reports/generate`, {
-      // Allow the progress report generation 2 minutes to analyze the sessions
-      timeout: 120000,
-    }).then(this._successHandler, this._errorHandler)
+  getProgressReportForSession(sessionId) {
+    return httpGet(`${API_ROOT}/progress-reports/sessions/${sessionId}`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
+  getProgressReportsForSubject(subject, page) {
+    return httpGet(
+      `${API_ROOT}/progress-reports/subjects/${subject}?page=${page}`
+    ).then(this._successHandler, this._errorHandler)
+  },
+  getProgressReportSummariesForSubject(subject) {
+    return httpGet(`${API_ROOT}/progress-reports/summaries/${subject}`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
+  getLatestProgressReportOverviewForSubject(subject) {
+    return httpGet(
+      `${API_ROOT}/progress-reports/summaries/${subject}/latest`
+    ).then(this._successHandler, this._errorHandler)
+  },
+  updateProgressReportsReadStatus(reportIds) {
+    return httpPost(`${API_ROOT}/progress-reports/read`, { reportIds }).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
+  getUnreadProgressReportOverviewSubjects() {
+    return httpGet(`${API_ROOT}/progress-reports/unread`).then(
+      this._successHandler,
+      this._errorHandler
+    )
   },
 }

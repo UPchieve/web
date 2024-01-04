@@ -75,5 +75,17 @@ module.exports = {
           },
         }
       })
+
+    config.module
+      .rule('transpile-node-modules')
+      .test(/\.js$/)
+      .include
+      .add(path.resolve(__dirname, 'node_modules/chart.js'))
+      .end()
+      .use('babel-loader')
+      .loader('babel-loader')
+      .options({
+        presets: [['@babel/preset-env', { targets: "defaults" }]]
+      });
   },
 }

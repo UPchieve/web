@@ -210,6 +210,9 @@ export default {
       SessionService.endSession(this, sessionId)
         .then(() => {
           this.$store.dispatch('user/sessionDisconnected')
+          // Potentially show the ProgressReportModal again to a student
+          // to let them decide if they would like to see an analysis for their Reading sessions
+          this.$store.dispatch('user/updateHasSeenProgressReportModal', false)
           if (!this.isSessionRecapDmsActive) this.goToFeedbackPage()
           // Do not send the user directly to the feedback page if they can leave DMs
           this.isSessionEnding = false

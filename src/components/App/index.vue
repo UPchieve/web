@@ -216,6 +216,8 @@ export default {
       user: state => state.user.user,
       session: state => state.user.session,
       subjects: state => state.subjects.subjects,
+      requestedProgressReportOverview: state =>
+        state.user.requestedProgressReportOverview,
     }),
     ...mapGetters({
       userAuthenticated: 'user/isAuthenticated',
@@ -253,6 +255,8 @@ export default {
         this.$store.dispatch('productFlags/getUserProductFlags')
         if (Object.entries(this.subjects).length === 0)
           this.$store.dispatch('subjects/getSubjects')
+
+        this.$store.dispatch('user/getUnreadProgressReportOverviewSubjects')
       } else if (currentUserValue.id) {
         const userProps = this.getUserPropsForAnalytics
         AnalyticsService.updateUser(userProps)
@@ -328,6 +332,31 @@ export default {
     },
     redirect() {
       this.$router.push('/')
+    },
+    /**
+     *
+     * When a student dismisses the ProgressReportModal because the
+     * analysis of their sessions is taking too long, this event
+     * handler acts as a way to notify the student with a notification
+     * indicator in the side bar next to "Your Progress".
+     * We check the server for any unread progress report overviews for the student
+     *
+     * Show the indicator if:
+     * - ProgressReport modal is not currently open,
+     * - Student wanted to see the analysis
+     * - Report was processed successfully
+     *
+     */
+    'progress-report:processed:overview'(data) {
+      // Grab the ProgressReportModal
+      const isOnScreen = document.querySelector('.prm')
+      if (
+        !isOnScreen &&
+        this.requestedProgressReportOverview &&
+        data.report &&
+        data.report.status === 'complete'
+      )
+        this.$store.dispatch('user/getUnreadProgressReportOverviewSubjects')
     },
   },
 }

@@ -52,6 +52,20 @@
         <portrait-icon class="icon" />
       </sidebar-link>
 
+      <!-- Defaults to 'reading' until progress reports are launched to more subjects -->
+      <sidebar-link
+        v-if="!isVolunteer && isProgressReportsActive"
+        to="/sessions/progress/reading"
+        text="Your Progress"
+        class="SidebarLinks__container"
+      >
+        <your-progress-icon class="icon" />
+        <activity-dot
+          v-if="hasUnreadProgressOverviewReports"
+          class="SidebarLinks__notification"
+        />
+      </sidebar-link>
+
       <sidebar-link
         v-if="showDashboardRedesign"
         text="Refer a Friend"
@@ -94,7 +108,9 @@ import PortraitIcon from '@/assets/sidebar_icons/portrait.svg'
 import ReferFriendIcon from '@/assets/sidebar_icons/refer-friend-icon.svg'
 import ReferralSVG from '@/assets/dashboard_icons/student/referral.svg'
 import SlackLogoIcon from '@/assets/slack-logo-icon.svg'
+import YourProgressIcon from '@/assets/your-progress.svg'
 import AnalyticsService from '@/services/AnalyticsService'
+import ActivityDot from '@/components/ActivityDot.vue'
 import { EVENTS } from '@/consts'
 
 export default {
@@ -111,6 +127,8 @@ export default {
     PortraitIcon,
     ReferFriendIcon,
     SlackLogoIcon,
+    YourProgressIcon,
+    ActivityDot,
   },
   props: {
     authenticated: Boolean,
@@ -121,8 +139,10 @@ export default {
   computed: {
     ...mapGetters({
       isTutorSessionHistoryActive: 'featureFlags/isTutorSessionHistoryActive',
+      isProgressReportsActive: 'featureFlags/isProgressReportsActive',
       isAutoFlowUser: 'user/isAutoFlowUser',
       showDashboardRedesign: 'user/showDashboardRedesign',
+      hasUnreadProgressOverviewReports: 'user/hasUnreadProgressOverviewReports',
     }),
   },
   methods: {
@@ -171,6 +191,16 @@ export default {
 
   &--auto-flow {
     visibility: hidden;
+  }
+
+  &__container {
+    position: relative;
+  }
+
+  &__notification {
+    position: absolute;
+    right: 40px;
+    top: -3px;
   }
 }
 

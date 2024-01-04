@@ -45,6 +45,7 @@ import SessionHistoryView from './views/SessionHistoryView.vue'
 import SessionRecapView from './views/SessionRecapView.vue'
 import AdminTestAudience from './views/Admin/AdminTestAudience.vue'
 import WelcomePage from './views/WelcomePage.vue'
+import ProgressReportsOverviewView from './views/ProgressReportsOverviewView.vue'
 import Gleap from 'gleap'
 import AnalyticsService from './services/AnalyticsService'
 import { EVENTS } from './consts'
@@ -428,6 +429,12 @@ const routes = [
     path: '/welcome',
     name: 'WelcomePage',
     component: WelcomePage,
+    meta: { protected: true },
+  },
+  {
+    path: '/sessions/progress/:subject',
+    name: 'ProgressReportsOverviewView',
+    component: ProgressReportsOverviewView,
     meta: { protected: true },
   },
 ]
