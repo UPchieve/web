@@ -206,6 +206,9 @@ build_hackers:
     - docker push "$image_tagged"-hackers
   rules:
     - if: '$CI_COMMIT_BRANCH != "main"'
+      when: manual
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: manual
 
 test:
   stage: test
