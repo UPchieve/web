@@ -23,10 +23,10 @@ This repository is the frontend SPA only. It relies on the API server and worker
 Local Development
 -----------------
 ### Local Dependencies
-The recommended tool for runtime version management is [`nvm`][nvm]. To use `nvm` on Windows, first install the appropriate Linux shell distribution using [`WSL`][wsl] (Windows Subsystem for Linux). We currently run on Node v16.16.0, you can switch to this using
+The recommended tool for runtime version management is [`nvm`][nvm]. To use `nvm` on Windows, first install the appropriate Linux shell distribution using [`WSL`][wsl] (Windows Subsystem for Linux). We currently run on Node v20.10.0, you can switch to this using
 
 ```shell
-$ nvm install v16.16.0 && nvm use v16.16.0
+$ nvm install v20.10.0 && nvm use v20.10.0
 ```
 
 After switching npm versions using nvm, you will need to run `$ npm install`.

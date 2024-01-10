@@ -43,6 +43,10 @@ build_production:
     - apk add doppler
     - mkdir -p "$MOUNT_POINT"
     # build
+    # Node.js 17+ uses OpenSSL 3 which enforces stricter crypto policies, 
+    # leading to errors in some crypto operations.
+    # The 'openssl-legacy-provider' option allows older crypto methods for compatibility.
+    # TODO: Remove the NODE_OPTIONS env when webpack is updated to v5 and there are no build issues.
     - |
       doppler run --token "$DOPPLER_TOKEN_PRODUCTION" \
       --mount "$MOUNT_POINT/.doppler_env" \
@@ -50,10 +54,11 @@ build_production:
           pack build "$image_tagged"-production \
             --env-file "$MOUNT_POINT/.doppler_env" \
             --env "VUE_APP_VERSION=$CI_COMMIT_SHA-production" \
+            --env "NODE_OPTIONS=--openssl-legacy-provider" \
             --creation-time now \
             --builder heroku/buildpacks:20 \
             --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
-            --buildpack heroku/nodejs@1.1.7 \
+            --buildpack heroku/nodejs@2.6.2 \
             --buildpack heroku/procfile@0.6.2
     - docker push "$image_tagged"-production
   rules:
@@ -92,6 +97,10 @@ build_demo:
     - apk add doppler
     - mkdir -p "$MOUNT_POINT"
     # build
+    # Node.js 17+ uses OpenSSL 3 which enforces stricter crypto policies, 
+    # leading to errors in some crypto operations.
+    # The 'openssl-legacy-provider' option allows older crypto methods for compatibility.
+    # TODO: Remove the NODE_OPTIONS env when webpack is updated to v5 and there are no build issues.
     - |
       doppler run --token "$DOPPLER_TOKEN_DEMO" \
       --mount "$MOUNT_POINT/.doppler_env" \
@@ -99,10 +108,11 @@ build_demo:
           pack build "$image_tagged"-demo \
             --env-file "$MOUNT_POINT/.doppler_env" \
             --env "VUE_APP_VERSION=$CI_COMMIT_SHA-demo" \
+            --env "NODE_OPTIONS=--openssl-legacy-provider" \
             --creation-time now \
             --builder heroku/buildpacks:20 \
             --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
-            --buildpack heroku/nodejs@1.1.7 \
+            --buildpack heroku/nodejs@2.6.2 \
             --buildpack heroku/procfile@0.6.2
     - docker push "$image_tagged"-demo
   rules:
@@ -138,7 +148,11 @@ build_staging:
     - echo 'https://packages.doppler.com/public/cli/alpine/any-version/main' | tee -a /etc/apk/repositories
     - apk add doppler
     - mkdir -p "$MOUNT_POINT"
-      # build
+    # build
+    # Node.js 17+ uses OpenSSL 3 which enforces stricter crypto policies, 
+    # leading to errors in some crypto operations.
+    # The 'openssl-legacy-provider' option allows older crypto methods for compatibility.
+    # TODO: Remove the NODE_OPTIONS env when webpack is updated to v5 and there are no build issues.
     - |
       doppler run --token "$DOPPLER_TOKEN_STAGING" \
       --mount "$MOUNT_POINT/.doppler_env" \
@@ -146,10 +160,11 @@ build_staging:
           pack build "$image_tagged"-staging \
             --env-file "$MOUNT_POINT/.doppler_env" \
             --env "VUE_APP_VERSION=$CI_COMMIT_SHA-staging" \
+            --env "NODE_OPTIONS=--openssl-legacy-provider" \
             --creation-time now \
             --builder heroku/buildpacks:20 \
             --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
-            --buildpack heroku/nodejs@1.1.7 \
+            --buildpack heroku/nodejs@2.6.2 \
             --buildpack heroku/procfile@0.6.2
     - docker push "$image_tagged"-staging
   rules:
@@ -191,6 +206,10 @@ build_hackers:
     - apk add doppler
     - mkdir -p "$MOUNT_POINT"
     # build
+    # Node.js 17+ uses OpenSSL 3 which enforces stricter crypto policies, 
+    # leading to errors in some crypto operations.
+    # The 'openssl-legacy-provider' option allows older crypto methods for compatibility.
+    # TODO: Remove the NODE_OPTIONS env when webpack is updated to v5 and there are no build issues.
     - |
       doppler run --token "$DOPPLER_TOKEN_HACKERS" \
       --mount "$MOUNT_POINT/.doppler_env" \
@@ -198,10 +217,11 @@ build_hackers:
           pack build "$image_tagged"-hackers \
             --env-file "$MOUNT_POINT/.doppler_env" \
             --env "VUE_APP_VERSION=$CI_COMMIT_SHA-hackers" \
+            --env "NODE_OPTIONS=--openssl-legacy-provider" \
             --creation-time now \
             --builder heroku/buildpacks:20 \
             --buildpack registry.gitlab.com/upchieve/doppler-buildpack \
-            --buildpack heroku/nodejs@1.1.7 \
+            --buildpack heroku/nodejs@2.6.2 \
             --buildpack heroku/procfile@0.6.2
     - docker push "$image_tagged"-hackers
   rules:
@@ -212,7 +232,7 @@ build_hackers:
 
 test:
   stage: test
-  image: node:16.16.0-bullseye
+  image: node:20.10.0-bullseye
   before_script:
     - npm ci --cache .npm --prefer-offline
   script:
@@ -225,7 +245,7 @@ test:
 
 lint:
   stage: test
-  image: node:16.16.0-bullseye
+  image: node:20.10.0-bullseye
   before_script:
     - npm ci --cache .npm --prefer-offline
   script:
@@ -238,7 +258,7 @@ lint:
 
 html_validate:
   stage: test
-  image: node:16.16.0-bullseye
+  image: node:20.10.0-bullseye
   allow_failure: true
   before_script:
     - npm ci --cache .npm --prefer-offline
