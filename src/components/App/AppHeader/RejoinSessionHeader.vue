@@ -42,7 +42,6 @@ export default {
       avatarUrl: 'user/avatarUrl',
       name: 'user/firstName',
       sessionPath: 'user/sessionPath',
-      isDashboardRedesignActive: 'featureFlags/isDashboardRedesignActive',
       isRecapSocketUpdatesActive: 'featureFlags/isRecapSocketUpdatesActive',
     }),
     message() {
@@ -52,11 +51,6 @@ export default {
       const status = {
         class: 'RejoinSessionHeader',
         buttonClass: '',
-      }
-
-      if (this.isDashboardRedesignActive) {
-        status.class += '--redesign'
-        status.buttonClass += 'RejoinSessionHeader-buttons--redesign'
       }
 
       return status

@@ -3,7 +3,6 @@ import featureFlagsModule from '@/store/modules/feature-flags'
 import { createLocalVue, mount } from '@vue/test-utils'
 import Vuex from 'vuex'
 import VerificationView from '@/views/VerificationView/index.vue'
-import { POSTHOG_FEATURE_FLAGS } from '@/consts'
 
 describe('VerificationView', () => {
   const localVue = createLocalVue()
@@ -33,11 +32,10 @@ describe('VerificationView', () => {
         },
         featureFlags: {
           ...featureFlagsModule,
-          state: {
-            flags: {
-              [POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION]: smsVerificationEnabled,
-              [POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION_ENABLED_ON_SIGNUP_FLOW]: smsVerificationEnabledOnSignupFlow,
-            },
+          getters: {
+            isSmsVerificationEnabled: () => smsVerificationEnabled,
+            isSmsVerificationEnabledOnSignupFlow: () =>
+              smsVerificationEnabledOnSignupFlow,
           },
         },
       },

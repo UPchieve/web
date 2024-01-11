@@ -55,7 +55,6 @@
     "style-resources-loader": "^1.5.0",
     "timers-browserify": "^2.0.12",
     "typeface-work-sans": "^0.0.72",
-    "unleash-proxy-client": "^1.9.0",
     "validator": "^13.6.0",
     "vue": "~2.6.10",
     "vue-crono": "^2.0.9",

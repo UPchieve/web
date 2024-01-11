@@ -590,12 +590,6 @@ export const VERIFICATION_METHOD = {
   EMAIL: 'email',
 }
 
-export const UNLEASH_FEATURE_FLAGS = {
-  REFER_FRIENDS: 'refer-friends',
-  DASHBOARD_REDESIGN: 'dashboard-redesign',
-  CHATBOT: 'chatbot',
-}
-
 export const POSTHOG_FEATURE_FLAGS = {
   DASHBOARD_BANNER: 'dashboard-banner',
   FILTER_ACTIVE_SUBJECTS: 'filter-active-subjects',
