@@ -2,7 +2,6 @@ import Gleap from 'gleap'
 import posthog from 'posthog-js'
 import config from '../config'
 import { EVENTS } from '../consts'
-import LoggerService from './LoggerService'
 
 const GLEAP_TRACK_EVENTS = new Set([
   EVENTS.STUDENT_SHOWN_ONBOARDING_MODAL,
@@ -11,27 +10,6 @@ const GLEAP_TRACK_EVENTS = new Set([
 
 class AnalyticsService {
   static init() {
-    if (config.posthogToken) {
-      posthog.init(`${config.posthogToken}`, {
-        api_host: 'https://p.upchieve.org',
-        persistence: 'localStorage+cookie',
-        on_xhr_error: req => {
-          if (req?.status === 0)
-            LoggerService.noticeError(
-              new Error('Failed to fetch feature flags from PostHog.')
-            )
-          LoggerService.noticeError(
-            new Error(
-              `PostHog - Bad HTTP status: ${req?.status} ${req?.statusText}`
-            )
-          )
-        },
-        session_recording: {
-          maskTextSelector: '#ph-no-capture, .ph-mask',
-        },
-      })
-    }
-
     if (config.gleapSdkKey) {
       Gleap.initialize(config.gleapSdkKey)
       Gleap.getInstance().softReInitialize()

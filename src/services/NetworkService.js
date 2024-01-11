@@ -108,6 +108,12 @@ export default {
       this._errorHandler
     )
   },
+  async getBootstrappedFeatureFlags() {
+    return httpGet(`${config.serverRoot}/feature-flags`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
   login(data) {
     return httpPost(`${AUTH_ROOT}/login`, data).then(
       this._successHandler,

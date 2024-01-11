@@ -164,7 +164,6 @@ export default {
       isSessionWaitingForVolunteer: 'user/isSessionWaitingForVolunteer',
       isSessionInProgress: 'user/isSessionInProgress',
       isSessionOver: 'user/isSessionOver',
-      isChatbotActive: 'featureFlags/isChatbotActive',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
       isRecapSocketUpdatesActive: 'featureFlags/isRecapSocketUpdatesActive',
     }),
@@ -274,8 +273,7 @@ export default {
       router.push(`/feedback/${this.session._id}`)
     },
     toggleTroubleMatchingModal() {
-      if (this.isChatbotActive) this.showTroubleMatchingModal = false
-      else this.showTroubleMatchingModal = !this.showTroubleMatchingModal
+      this.showTroubleMatchingModal = !this.showTroubleMatchingModal
     },
     toggleUnmatchedModal() {
       this.showUnmatchedModal = !this.showUnmatchedModal

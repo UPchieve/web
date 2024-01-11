@@ -15,10 +15,10 @@ import config from './config'
 import NetworkService, { axiosInstance } from './services/NetworkService'
 import { backOff } from 'exponential-backoff'
 import io from 'socket.io-client'
-import LoggerService from './services/LoggerService'
 import AnalyticsService from './services/AnalyticsService'
+import FeatureFlagService from './services/FeatureFlagService'
+import LoggerService from './services/LoggerService'
 
-AnalyticsService.init()
 LoggerService.init()
 
 // Prevent production tip on startup
@@ -90,11 +90,22 @@ function initVue() {
 
 async function main() {
   try {
-    // apply the csrf token to the store before initializing Vue
-    const response = await backOff(() => NetworkService.getCsrfToken())
-    store.commit('app/setCsrfToken', response.data.csrfToken)
-    axiosInstance.defaults.headers.common['X-CSRF-TOKEN'] =
-      response.data.csrfToken
+    const [csrfResponse, flagsResponse] = await Promise.allSettled([
+      backOff(() => NetworkService.getCsrfToken()),
+      NetworkService.getBootstrappedFeatureFlags(),
+    ])
+
+    const csrfToken = csrfResponse.value.data.csrfToken
+    store.commit('app/setCsrfToken', csrfToken)
+    axiosInstance.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken
+
+    await FeatureFlagService.init(
+      flagsResponse.value?.data?.id,
+      flagsResponse.value?.data?.featureFlags,
+      flagsResponse.value?.data?.featureFlagPayloads
+    )
+    AnalyticsService.init()
+
     initVue()
   } catch (err) {
     LoggerService.noticeError(err)

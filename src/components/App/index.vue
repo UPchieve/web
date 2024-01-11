@@ -76,12 +76,6 @@ export default {
     await this.$store.dispatch('app/checkEnvironment', this)
     PortalService.call('app.isLoaded')
 
-    // start up the posthog feature flag service
-    this.$store.dispatch('featureFlags/initPostHogFlags')
-
-    // start up the unleash feature flag service
-    this.$store.dispatch('featureFlags/initUnleash')
-
     // set version on initial load
     this.$store.commit('app/setVersion', config.version)
 

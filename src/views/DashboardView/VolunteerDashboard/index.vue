@@ -248,7 +248,6 @@ export default {
       hasCertification: 'user/hasCertification',
       hasSelectedAvailability: 'user/hasSelectedAvailability',
       downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
-      isFilterActiveSubjectsActive: 'featureFlags/isFilterActiveSubjectsActive',
       allSubjectNames: 'subjects/allSubtopicNames',
       isSmsVerificationEnabledOnSignupFlow:
         'featureFlags/isSmsVerificationEnabledOnSignupFlow',

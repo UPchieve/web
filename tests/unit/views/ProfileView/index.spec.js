@@ -4,7 +4,6 @@ import subjectsModule from '@/store/modules/subjects'
 import ProfileView from '@/views/ProfileView.vue'
 import { createLocalVue, mount } from '@vue/test-utils'
 import Vuex from 'vuex'
-import { POSTHOG_FEATURE_FLAGS } from '@/consts'
 import UserService from '@/services/UserService'
 import AuthService from '@/services/AuthService'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -13,7 +12,7 @@ describe('ProfileView', () => {
   const localVue = createLocalVue()
   localVue.use(Vuex)
 
-  let DEFAULT_FLAGS, DEFAULT_FLAGS_GETTERS, DEFAULT_USER
+  let DEFAULT_FLAGS_GETTERS, DEFAULT_USER
 
   UserService.setProfile = jest.fn().mockResolvedValue()
   AuthService.initiateVerification = jest.fn().mockResolvedValue()
@@ -23,9 +22,6 @@ describe('ProfileView', () => {
   beforeEach(() => {
     jest.resetAllMocks()
 
-    DEFAULT_FLAGS = {
-      [POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS]: true,
-    }
     DEFAULT_FLAGS_GETTERS = {
       isFilterActiveSubjectsActive: () => true,
     }
@@ -55,18 +51,10 @@ describe('ProfileView', () => {
         },
         featureFlags: {
           ...featureFlagsModule,
-          // flags: {
-          state: {
-            flags: {
-              ...DEFAULT_FLAGS,
-              ...(overrides.featureFlags?.flags ?? {}),
-            },
-          },
           getters: {
             ...DEFAULT_FLAGS_GETTERS,
             ...(overrides.featureFlags?.getters ?? {}),
           },
-          // },
         },
         subjects: {
           ...subjectsModule,
