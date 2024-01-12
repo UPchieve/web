@@ -356,17 +356,20 @@ export default {
   },
   sockets: {
     bump: function(data) {
-      this.$store.dispatch('app/modal/show', {
-        component: SessionFulfilledModal,
-        data: {
-          acceptText: 'Return to Dashboard',
-          alertModal: true,
-          isSessionEnded: !!data.endedAt,
-          volunteerJoined: !!data.volunteer,
-          isSessionVolunteer: this.user._id === data.volunteer,
-          isSessionStudent: this.user._id === data.student,
-        },
-      })
+      // Do not show the session fulfilled modal if a user is already
+      // present on the page after a session has ended
+      if (!this.sessionHasEnded)
+        this.$store.dispatch('app/modal/show', {
+          component: SessionFulfilledModal,
+          data: {
+            acceptText: 'Return to Dashboard',
+            alertModal: true,
+            isSessionEnded: !!data.endedAt,
+            volunteerJoined: !!data.volunteer,
+            isSessionVolunteer: this.user._id === data.volunteer,
+            isSessionStudent: this.user._id === data.student,
+          },
+        })
     },
     reconnect_attempt() {
       this.$store.dispatch('user/sessionDisconnected')
