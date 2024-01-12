@@ -533,8 +533,10 @@ export default {
               borderColor: 'rgba(0, 123, 255, 1)',
               borderWidth: 2,
               tension: 0.4,
-              // To hide data points
-              pointRadius: 0,
+              // Set pointRadius to 5 if there's only one datum in the dataset to ensure visibility.
+              // Hide point radii (set to 0) for multiple data points
+              pointRadius: dataset.length === 1 ? 5 : 0,
+              pointBackgroundColor: '#ffffff',
             },
           ],
         },
