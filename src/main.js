@@ -2,7 +2,6 @@ import Vue from 'vue'
 import VueCompositionAPI from '@vue/composition-api'
 import VueSocketIO from 'vue-socket.io'
 import VueRouter from 'vue-router'
-import VueHeadful from 'vue-headful'
 import vSelect from 'vue-select'
 import VueStarRating from 'vue-star-rating'
 import ToggleButton from 'vue-js-toggle-button'
@@ -54,9 +53,6 @@ PortalService.call('top.getData').then(handlePortalData)
 
 // Called any time app is running (warm start) & push notification is received
 PortalService.call('top.onData', handlePortalData)
-
-// Set up vue-headful
-Vue.component('vue-headful', VueHeadful)
 
 // Set up vue-select
 Vue.component('v-select', vSelect)
