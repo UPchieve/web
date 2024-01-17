@@ -1,13 +1,6 @@
 <template>
   <div class="chat">
-    <vue-headful
-      :title="
-        typingIndicatorShown && isSessionConnectionAlive && isSessionAlive
-          ? `${sessionPartnerName || 'Chatbot'} is typing...`
-          : 'UPchieve'
-      "
-    />
-
+    <document-title :title="documentTitle"></document-title>
     <div>
       <transition name="chat-warning">
         <div
@@ -135,6 +128,7 @@ import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
 
 import ChatBot from './ChatBot'
+import DocumentTitle from '@/components/DocumentTitle.vue'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import ModerationService from '@/services/ModerationService'
 import sendWebNotification from '@/utils/send-web-notification'
@@ -153,7 +147,7 @@ const MESSAGE_ALIGNMENT = {
  */
 export default {
   name: 'session-chat',
-  components: { ChatBot, LoadingMessage },
+  components: { ChatBot, LoadingMessage, DocumentTitle },
   props: {
     setHasSeenNewMessage: { type: Function, required: true },
     shouldHideChatSection: { type: Boolean, required: true },
@@ -221,6 +215,13 @@ export default {
         if (message.createdAt > this.currentSession.endedAt) return true
       }
       return false
+    },
+    documentTitle() {
+      return this.typingIndicatorShown &&
+        this.isSessionConnectionAlive &&
+        this.isSessionAlive
+        ? `${this.sessionPartnerName || 'Chatbot'} is typing...`
+        : 'UPchieve'
     },
   },
   mounted() {
