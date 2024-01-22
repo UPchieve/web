@@ -154,7 +154,7 @@ export default {
       }, 1000 * 60)
     },
     async handleIncomingSessions(sessions) {
-      if (this.user.isBanned) {
+      if (!sessions || !Array.isArray(sessions) || this.user.isBanned) {
         this.openSessions = []
         return
       }
