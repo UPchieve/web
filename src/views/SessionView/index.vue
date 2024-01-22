@@ -326,8 +326,7 @@ export default {
           this.$store.dispatch('user/fetchUser')
         }
 
-        if (!this.$socket.connected && !this.isRecapSocketUpdatesActive)
-          await this.$socket.connect()
+        if (!this.$socket.connected) await this.$socket.connect()
         this.joinSession(sessionId)
         Gleap.setCustomData('sessionId', sessionId)
         this.$store.dispatch('user/sessionConnected')
@@ -394,7 +393,7 @@ export default {
       }
     },
     connect() {
-      if (this.isRecapSocketUpdatesActive) this.joinSession(this.sessionId)
+      this.joinSession(this.sessionId)
       this.$store.dispatch('user/sessionConnected')
     },
   },
