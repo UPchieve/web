@@ -29,7 +29,9 @@ Vue.use(VueCompositionAPI)
 // Set up SocketIO
 Vue.use(
   new VueSocketIO({
-    connection: io(config.socketAddress),
+    connection: io(config.socketAddress, {
+      autoConnect: false,
+    }),
   })
 )
 

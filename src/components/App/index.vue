@@ -231,6 +231,7 @@ export default {
     user(currentUserValue, previousUserValue) {
       const nowLoggedIn = currentUserValue.id && !previousUserValue.id
       if (nowLoggedIn) {
+        if (!this.$socket.connected) this.$socket.connect()
         const userProps = this.getUserPropsForAnalytics
         this.$store.dispatch(
           'featureFlags/setPersonPropertiesForFlags',

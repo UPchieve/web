@@ -1,6 +1,9 @@
 <template>
   <div class="session-list">
-    <table class="table table-striped table-hover">
+    <div v-if="hasError" class="session-list__error">
+      <p>Failed to load a list of students. Please try refreshing</p>
+    </div>
+    <table v-else class="table table-striped table-hover">
       <thead>
         <tr>
           <th scope="col">Student</th>
@@ -36,14 +39,17 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import sendWebNotification from '@/utils/send-web-notification'
+import LoggerService from '@/services/LoggerService'
 import Case from 'case'
 
 export default {
+  name: 'ListSessions',
   data() {
     return {
       openSessions: [],
       emitListIntervalId: null,
       isInitialMount: false,
+      hasError: false,
     }
   },
   computed: {
@@ -81,9 +87,33 @@ export default {
     clearInterval(this.emitListIntervalId)
   },
   methods: {
-    emitList() {
-      this.$socket.emit('list')
-      this.startWaitTimeRefresh()
+    emitList(retryCount = 0, maxRetries = 5) {
+      let isAcknowledged = false
+      let timeoutId
+
+      this.$socket.emit('list', null, response => {
+        if (response.status === 200) {
+          isAcknowledged = true
+          clearTimeout(timeoutId)
+          this.handleIncomingSessions(response.sessions)
+          this.startWaitTimeRefresh()
+        }
+      })
+
+      if (retryCount < maxRetries) {
+        // simple exponential backoff
+        const delay = Math.pow(2, retryCount) * 500
+        timeoutId = setTimeout(() => {
+          if (!isAcknowledged) {
+            this.emitList(retryCount + 1, maxRetries)
+          }
+        }, delay)
+      } else {
+        LoggerService.noticeError(
+          `Max retry attempts reached, unable to fetch list of sessions for user: ${this.user.id}`
+        )
+        this.hasError = true
+      }
     },
     gotoSession(session) {
       const { type, subTopic, _id } = session
@@ -123,9 +153,7 @@ export default {
         } else this.$forceUpdate()
       }, 1000 * 60)
     },
-  },
-  sockets: {
-    async sessions(sessions) {
+    async handleIncomingSessions(sessions) {
       if (this.user.isBanned) {
         this.openSessions = []
         return
@@ -198,6 +226,11 @@ export default {
       this.isInitialMount = false
     },
   },
+  sockets: {
+    async sessions(sessions) {
+      this.handleIncomingSessions(sessions)
+    },
+  },
 }
 </script>
 
@@ -208,6 +241,11 @@ thead {
 
 .session-list {
   padding: 10px 20px;
+
+  &__error {
+    color: $c-error-red;
+    text-align: center;
+  }
 }
 
 .session-row {
