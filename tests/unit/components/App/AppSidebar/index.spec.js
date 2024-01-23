@@ -77,10 +77,10 @@ describe('AppSidebar', () => {
       const content = wrapper.find('.AppSidebar-content')
       expect(content.exists()).toBe(true)
 
-      const info = content.find(SidebarInfo)
+      const info = content.findComponent(SidebarInfo)
       expect(info.exists()).toBe(false)
 
-      const links = content.find(SidebarLinks)
+      const links = content.findComponent(SidebarLinks)
       expect(links.exists()).toBe(true)
 
       // Final link
@@ -97,10 +97,10 @@ describe('AppSidebar', () => {
       const content = wrapper.find('.AppSidebar-content')
       expect(content.exists()).toBe(true)
 
-      const info = content.find(SidebarInfo)
+      const info = content.findComponent(SidebarInfo)
       expect(info.exists()).toBe(true)
 
-      const links = content.find(SidebarLinks)
+      const links = content.findComponent(SidebarLinks)
       expect(links.exists()).toBe(true)
 
       // Final link

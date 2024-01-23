@@ -28,30 +28,30 @@ describe('AppHeader', () => {
   it('renders HeaderTemplate', () => {
     const state = { data: {} }
     const wrapper = getWrapper(state)
-    const modal = wrapper.find(HeaderTemplate)
+    const modal = wrapper.findComponent(HeaderTemplate)
     expect(modal.exists()).toBe(true)
   })
 
   it('renders DefaultHeader', () => {
     const state = { component: 'DefaultHeader', data: {} }
-    const wrapper = getWrapper(state).find(HeaderTemplate)
-    const modal = wrapper.find(DefaultHeader)
+    const wrapper = getWrapper(state).findComponent(HeaderTemplate)
+    const modal = wrapper.findComponent(DefaultHeader)
     expect(modal.exists()).toBe(true)
     expect(modal.attributes('header-data')).toBeDefined()
   })
 
   it('renders RejoinSessionHeader', () => {
     const state = { component: 'RejoinSessionHeader', data: {} }
-    const wrapper = getWrapper(state).find(HeaderTemplate)
-    const modal = wrapper.find(RejoinSessionHeader)
+    const wrapper = getWrapper(state).findComponent(HeaderTemplate)
+    const modal = wrapper.findComponent(RejoinSessionHeader)
     expect(modal.exists()).toBe(true)
     expect(modal.attributes('header-data')).toBeDefined()
   })
 
   it('renders BannedHeader', () => {
     const state = { component: 'BannedHeader', data: {} }
-    const wrapper = getWrapper(state).find(HeaderTemplate)
-    const modal = wrapper.find(BannedHeader)
+    const wrapper = getWrapper(state).findComponent(HeaderTemplate)
+    const modal = wrapper.findComponent(BannedHeader)
     expect(modal.exists()).toBe(true)
     expect(modal.attributes('header-data')).toBeDefined()
   })
@@ -61,8 +61,8 @@ describe('AppHeader', () => {
       component: 'WaitingPeriodHeader',
       data: { timeLeft: 1000 * 60 * 4 },
     }
-    const wrapper = getWrapper(state).find(HeaderTemplate)
-    const modal = wrapper.find(WaitingPeriodHeader)
+    const wrapper = getWrapper(state).findComponent(HeaderTemplate)
+    const modal = wrapper.findComponent(WaitingPeriodHeader)
     expect(modal.exists()).toBe(true)
     expect(modal.props().headerData).toEqual(state.data)
   })
@@ -76,6 +76,6 @@ describe('AppHeader', () => {
       },
     }
     const wrapper = getWrapper(state)
-    expect(wrapper.find(VerificationHeader).isVisible()).toBeTruthy()
+    expect(wrapper.findComponent(VerificationHeader).isVisible()).toBeTruthy()
   })
 })

@@ -55,7 +55,7 @@ describe.skip('SubjectSelection', () => {
       expect(header.exists()).toBe(true)
       expect(header.text()).toBe('Explore our subjects')
 
-      const subjectCards = wrapper.findAll(SubjectCard)
+      const subjectCards = wrapper.findAllComponents(SubjectCard)
       expect(subjectCards.length).toBe(cards.length)
 
       cards.forEach((card, i) => {
@@ -71,7 +71,7 @@ describe.skip('SubjectSelection', () => {
       const p = wrapper.find('p')
       expect(p.exists()).toBe(false)
 
-      const subjectCards = wrapper.findAll(SubjectCard)
+      const subjectCards = wrapper.findAllComponents(SubjectCard)
       expect(subjectCards.length).toBe(cards.length)
 
       cards.forEach((card, i) => {

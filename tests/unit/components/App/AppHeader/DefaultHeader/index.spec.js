@@ -33,26 +33,26 @@ describe('DefaultHeader', () => {
     // User info
     const userInfo = wrapper.find('.DefaultHeader-user-info')
     expect(userInfo.exists()).toBe(true)
-    expect(userInfo.is('div')).toBe(true)
+    expect(userInfo.element.tagName).toBe('DIV')
 
     const avatar = userInfo.find('.DefaultHeader-user-info-avatar')
     expect(avatar.exists()).toBe(true)
-    expect(avatar.is('img')).toBe(true)
+    expect(avatar.element.tagName).toBe('IMG')
 
     const name = userInfo.find('.DefaultHeader-user-info-name')
     expect(name.exists()).toBe(true)
-    expect(name.is('span')).toBe(true)
+    expect(name.element.tagName).toBe('SPAN')
     expect(name.text()).toBe('Tester')
 
     // Hamburger
-    expect(wrapper.find(HamburgerButton).exists()).toBe(true)
+    expect(wrapper.findComponent(HamburgerButton).exists()).toBe(true)
   })
 
   it('renders expected elements when not in mobile mode', () => {
     const wrapper = getWrapper()
     const logo = wrapper.find('.DefaultHeader-logo')
     expect(logo.exists()).toBe(true)
-    expect(logo.is('img')).toBe(true)
+    expect(logo.element.tagName).toBe('IMG')
     expect(logo.attributes('src')).toBeDefined()
   })
 })

@@ -30,10 +30,10 @@ describe('StudentDashboard', () => {
     const wrapper = getWrapper()
     expect(wrapper.classes('student-dashboard')).toBe(true)
 
-    const banner = wrapper.find(DashboardBanner)
+    const banner = wrapper.findComponent(DashboardBanner)
     expect(banner.exists()).toBe(true)
 
-    const selection = wrapper.find(SubjectSelection)
+    const selection = wrapper.findComponent(SubjectSelection)
     expect(selection.exists()).toBe(true)
   })
 })
