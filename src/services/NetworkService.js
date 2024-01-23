@@ -5,6 +5,7 @@ import axios from 'axios'
 
 const AUTH_ROOT = `${config.serverRoot}/auth`
 const API_ROOT = `${config.serverRoot}/api`
+const API_PUBLIC_ROOT = `${config.serverRoot}/api-public`
 const ADMIN_ROOT = `${API_ROOT}/admin`
 const ELIGIBILITY_API_ROOT = `${config.serverRoot}/api-public/eligibility`
 const CONTACT_API_ROOT = `${config.serverRoot}/api-public/contact`
@@ -109,7 +110,7 @@ export default {
     )
   },
   async getBootstrappedFeatureFlags() {
-    return httpGet(`${config.serverRoot}/feature-flags`).then(
+    return httpGet(`${API_PUBLIC_ROOT}/feature-flags`).then(
       this._successHandler,
       this._errorHandler
     )
