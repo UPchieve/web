@@ -42,25 +42,25 @@ describe('App', () => {
   it('renders expected elements', () => {
     const wrapper = getWrapper()
     expect(wrapper.classes('App')).toBe(true)
-    expect(wrapper.find(AppHeader).exists()).toBe(true)
-    expect(wrapper.find(AppSidebar).exists()).toBe(true)
-    expect(wrapper.find(AppModal).exists()).toBe(false)
+    expect(wrapper.findComponent(AppHeader).exists()).toBe(true)
+    expect(wrapper.findComponent(AppSidebar).exists()).toBe(true)
+    expect(wrapper.findComponent(AppModal).exists()).toBe(false)
     expect(wrapper.find('router-view-stub').exists()).toBe(true)
 
     const routerViewWrapper = wrapper.find('.App-router-view-wrapper')
     expect(routerViewWrapper.exists()).toBe(true)
-    expect(routerViewWrapper.is('div')).toBe(true)
+    expect(routerViewWrapper.element.tagName).toBe('DIV')
     expect(routerViewWrapper.classes()).toEqual([
       'App-router-view-wrapper',
       'App-router-view-wrapper--header',
       'App-router-view-wrapper--sidebar',
     ])
-    expect(routerViewWrapper.contains('router-view-stub')).toBe(true)
+    expect(routerViewWrapper.find('router-view-stub').exists()).toBe(true)
   })
 
   it('conditionally renders `AppHeader`', () => {
     const wrapper = getWrapper({ showHeader: false })
-    expect(wrapper.find(AppHeader).exists()).toBe(false)
+    expect(wrapper.findComponent(AppHeader).exists()).toBe(false)
 
     const routerViewWrapper = wrapper.find('.App-router-view-wrapper')
     expect(routerViewWrapper.classes('App-router-view-wrapper--header')).toBe(
@@ -70,7 +70,7 @@ describe('App', () => {
 
   it('conditionally renders `AppSidebar`', () => {
     const wrapper = getWrapper({ showSidebar: false })
-    expect(wrapper.find(AppSidebar).exists()).toBe(false)
+    expect(wrapper.findComponent(AppSidebar).exists()).toBe(false)
 
     const routerViewWrapper = wrapper.find('.App-router-view-wrapper')
     expect(routerViewWrapper.classes('App-router-view-wrapper--sidebar')).toBe(
@@ -80,6 +80,6 @@ describe('App', () => {
 
   it('conditionally renders `AppModal`', () => {
     const wrapper = getWrapper({ showModal: true })
-    expect(wrapper.find(AppModal).exists()).toBe(true)
+    expect(wrapper.findComponent(AppModal).exists()).toBe(true)
   })
 })

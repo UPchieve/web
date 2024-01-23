@@ -29,7 +29,7 @@ export default {
     svg: {
       type: Object,
       required: true,
-      default: MathSVG,
+      default: () => MathSVG,
     },
     topic: String,
     buttonText: {

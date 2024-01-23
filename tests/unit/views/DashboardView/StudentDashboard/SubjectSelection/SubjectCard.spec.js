@@ -46,7 +46,7 @@ describe('SubjectCard', () => {
         expect(subtitle.exists()).toBe(false)
       })
 
-      test('link button', () => {
+      test('link button', async () => {
         const wrapper = getWrapper(true, propsData)
 
         // No `routeTo`
@@ -54,7 +54,7 @@ describe('SubjectCard', () => {
         wrapper.setMethods({ handleClick })
         wrapper.setProps({ routeTo: null })
 
-        const button = wrapper.find(HyperlinkButton)
+        const button = wrapper.findComponent(HyperlinkButton)
         expect(button.exists()).toBe(true)
         expect(button.text()).toBe(propsData.buttonText)
         expect(button.props().routeTo).toBeUndefined()
@@ -64,9 +64,9 @@ describe('SubjectCard', () => {
         // With `routeTo`
         handleClick = jest.fn()
         wrapper.setMethods({ handleClick })
-        wrapper.setProps({ routeTo: '/test' })
+        await wrapper.setProps({ routeTo: '/test' })
 
-        const routeButton = wrapper.find(HyperlinkButton)
+        const routeButton = wrapper.findComponent(HyperlinkButton)
         expect(routeButton.exists()).toBe(true)
         expect(routeButton.text()).toBe(propsData.buttonText)
         expect(routeButton.props().routeTo).toBe('/test')
@@ -92,7 +92,7 @@ describe('SubjectCard', () => {
         expect(subtitle.text()).toBe(propsData.subtitle)
       })
 
-      test('link button', () => {
+      test('link button', async () => {
         const wrapper = getWrapper(false, propsData)
 
         // No `routeTo`
@@ -100,7 +100,7 @@ describe('SubjectCard', () => {
         wrapper.setMethods({ handleClick })
         wrapper.setProps({ routeTo: null })
 
-        const button = wrapper.find(LargeButton)
+        const button = wrapper.findComponent(LargeButton)
         expect(button.exists()).toBe(true)
         expect(button.text()).toBe(propsData.buttonText)
         expect(button.props().routeTo).toBeUndefined()
@@ -110,9 +110,9 @@ describe('SubjectCard', () => {
         // With `routeTo`
         handleClick = jest.fn()
         wrapper.setMethods({ handleClick })
-        wrapper.setProps({ routeTo: '/test' })
+        await wrapper.setProps({ routeTo: '/test' })
 
-        const routeButton = wrapper.find(HyperlinkButton)
+        const routeButton = wrapper.findComponent(HyperlinkButton)
         expect(routeButton.exists()).toBe(true)
         expect(routeButton.text()).toBe(propsData.buttonText)
         expect(routeButton.props().routeTo).toBe('/test')

@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import VueCompositionAPI from '@vue/composition-api'
 import VueSocketIO from 'vue-socket.io'
 import VueRouter from 'vue-router'
 import vSelect from 'vue-select'
@@ -22,9 +21,6 @@ LoggerService.init()
 
 // Prevent production tip on startup
 Vue.config.productionTip = false
-
-// Use composition for Vuelidate (form validation)
-Vue.use(VueCompositionAPI)
 
 // Set up SocketIO
 Vue.use(

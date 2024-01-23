@@ -104,22 +104,22 @@ const getWrapper = (options = {}) => {
 }
 
 describe('SidebarLinks', () => {
-  it('layout', () => {
+  it('layout', async () => {
     const wrapper = getWrapper({ authenticated: true })
     expect(wrapper.classes('SidebarLinks')).toBe(true)
-    expect(wrapper.findAll(SidebarLink).length).toBeGreaterThan(0)
+    expect(wrapper.findAllComponents(SidebarLink).length).toBeGreaterThan(0)
 
     const about = wrapper.find('.SidebarLinks-about')
     expect(about.exists()).toBe(true)
     expect(about.text()).toBe('About UPchieve')
 
-    wrapper.setProps({ mobileMode: true })
+    await wrapper.setProps({ mobileMode: true })
     expect(wrapper.find('.SidebarLinks-about').exists()).toBe(false)
   })
 
   describe('link tests', () => {
     const testLinks = (wrapper, expectedLinks) => {
-      const sidebarLinks = wrapper.findAll(SidebarLink)
+      const sidebarLinks = wrapper.findAllComponents(SidebarLink)
       expect(sidebarLinks.length).toBe(expectedLinks.length)
       expectedLinks.forEach((link, i) => {
         const sidebarLink = sidebarLinks.at(i)
