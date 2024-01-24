@@ -62,7 +62,7 @@
           </div>
         </template>
         <chat-bot
-          v-if="sessionHasEnded && isSessionRecapDmsActive"
+          v-if="sessionHasEnded && isSessionRecapDmsActive && user.isVolunteer"
           :isSessionRecapBot="true"
           :currentSession="currentSession"
           @recap-eligible="toggleEligibleForSessionRecapChat"
