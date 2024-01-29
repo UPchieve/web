@@ -465,7 +465,7 @@ export default {
         userProps.partner = state.user.studentPartnerOrg
         userProps.gradeLevel = state.user.gradeLevel
         if (state.user.isSchoolPartner) {
-          userProps.schoolPartner = state.user.school
+          userProps.schoolPartner = state.user.schoolName
         }
       }
 
