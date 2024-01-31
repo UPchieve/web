@@ -1,4 +1,4 @@
-import MyHeader from './Header.vue';
+import MyHeader from './Header.vue'
 
 export default {
   title: 'Example/Header',
@@ -17,7 +17,7 @@ export default {
     // More on how to position stories at: https://storybook.js.org/docs/configure/story-layout
     layout: 'fullscreen',
   },
-};
+}
 
 export const LoggedIn = {
   args: {
@@ -25,6 +25,6 @@ export const LoggedIn = {
       name: 'Jane Doe',
     },
   },
-};
+}
 
-export const LoggedOut = {};
+export const LoggedOut = {}
