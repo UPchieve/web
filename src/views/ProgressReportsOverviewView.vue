@@ -554,9 +554,9 @@ export default {
       const gradeRanges = {
         60: 'Almost there',
         70: 'Passing Grade',
-        80: 'Exceptional',
-        90: 'Excellent',
-        100: 'Outstanding',
+        80: 'Satisfactory',
+        90: 'Awesome',
+        100: 'Superb',
       }
 
       this.chart = new Chart(chartRef, {
