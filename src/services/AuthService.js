@@ -2,8 +2,10 @@ import Validator from 'validator'
 import errorFromHttpResponse from '../utils/error-from-http-response'
 import AnalyticsService from './AnalyticsService'
 import LoggerService from './LoggerService'
-import NetworkService from './NetworkService'
+import NetworkService, { axiosInstance } from './NetworkService'
 import ProductDiscoveryService from './ProductDiscoveryService'
+
+export const INVALID_CSRF_ERROR = 'invalid csrf token'
 
 export default {
   login(creds) {
@@ -200,5 +202,15 @@ export default {
           err: err,
         }
       })
+  },
+  async fetchAndSetCsrfHeader() {
+    const res = await NetworkService.getCsrfToken()
+    if (!res?.data?.csrfToken) {
+      LoggerService.noticeError('Failed to fetch CSRF token')
+      throw new Error(
+        'Something went wrong. Please refresh the page and try again.'
+      )
+    }
+    axiosInstance.defaults.headers.common['X-CSRF-TOKEN'] = res.data.csrfToken
   },
 }

@@ -49,7 +49,9 @@ import ProgressReportsOverviewView from './views/ProgressReportsOverviewView.vue
 import Gleap from 'gleap'
 import AnalyticsService from './services/AnalyticsService'
 import { EVENTS } from './consts'
-import { axiosInstance } from './services/NetworkService'
+import NetworkService, { axiosInstance } from './services/NetworkService'
+import AuthService, { INVALID_CSRF_ERROR } from '@/services/AuthService'
+import LoggerService from '@/services/LoggerService'
 
 const getUser = () => {
   if (store.getters['user/isAuthenticated']) {
@@ -112,7 +114,7 @@ const routes = [
     path: '/login',
     name: 'LoginView',
     component: LoginView,
-    meta: { loggedOutOnly: true },
+    meta: { loggedOutOnly: true, mayForceLogout: true, fetchCsrfToken: true },
   },
   {
     path: '/logout',
@@ -131,24 +133,25 @@ const routes = [
     beforeEnter: (to, from, next) => {
       next('/sign-up')
     },
+    meta: { fetchCsrfToken: true },
   },
   {
     path: '/sign-up/:userType?/:step?',
     name: 'SignupView',
     component: SignupView,
-    meta: { loggedOutOnly: true },
+    meta: { loggedOutOnly: true, fetchCsrfToken: true },
   },
   {
     path: '/signup/student/:partnerId',
     name: 'StudentPartnerSignupView',
     component: StudentPartnerSignupView,
-    meta: { loggedOutOnly: true },
+    meta: { loggedOutOnly: true, fetchCsrfToken: true },
   },
   {
     path: '/signup/volunteer/:partnerId',
     name: 'VolunteerPartnerSignupView',
     component: VolunteerPartnerSignupView,
-    meta: { loggedOutOnly: true },
+    meta: { loggedOutOnly: true, fetchCsrfToken: true },
   },
   {
     path: '/sessions/history',
@@ -162,6 +165,7 @@ const routes = [
       const referredByCode = to.params.referredByCode
       next(`/sign-up?referral=${referredByCode}`)
     },
+    meta: { fetchCsrfToken: true },
   },
   {
     path: '/integration',
@@ -455,7 +459,18 @@ export default router
 
 // Router middleware to check authentication for protect routes
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(route => route.meta.requiresAdmin)) {
+  if (to.matched.some(route => route.meta.fetchCsrfToken)) {
+    AuthService.fetchAndSetCsrfHeader()
+      .then(() => {
+        next()
+      })
+      .catch(err => {
+        LoggerService.noticeError(
+          'Failed to fetch CSRF token on navigation guard',
+          err
+        )
+      })
+  } else if (to.matched.some(route => route.meta.requiresAdmin)) {
     getUser()
       .then(() => {
         if (!store.state.user.user.isAdmin) {
@@ -493,6 +508,17 @@ router.beforeEach((to, from, next) => {
         }
       })
       .catch(() => {})
+  } else if (
+    to.matched.some(route => route.meta.mayForceLogout) &&
+    to.query['logout']
+  ) {
+    NetworkService.logout()
+      .then(() => {
+        store.dispatch('user/clear')
+      })
+      .then(() => {
+        next()
+      })
   } else if (to.matched.some(route => route.meta.loggedOutOnly)) {
     getUser()
       .then(() => {
@@ -538,12 +564,13 @@ router.afterEach((to, from) => {
   }
 })
 
-// If endpoint returns 401, redirect to login (except for requests to get user or user's
+// If endpoint returns 401 or invalid CSRF token, prompt user to reauthenticate at login (except for requests to get user or user's
 // session)
 axiosInstance.interceptors.response.use(
   response => response,
   error => {
     const is401 = error.request.status === 401
+    const isInvalidCsrfToken = error?.response?.data?.err === INVALID_CSRF_ERROR
     const isGetUserAttempt =
       error.request.responseURL.indexOf('/api/user') !== -1 &&
       error.response.config.method === 'get'
@@ -553,10 +580,12 @@ axiosInstance.interceptors.response.use(
       error.request.responseURL.indexOf('/api/subjects') !== -1
 
     if (
-      is401 &&
-      !(isGetUserAttempt || isGetSessionAttempt || isGetSubjectsAttempt)
-    )
-      router.push('/login?401=true').catch(() => {})
-    return Promise.reject(error)
+      (is401 &&
+        !(isGetUserAttempt || isGetSessionAttempt || isGetSubjectsAttempt)) ||
+      isInvalidCsrfToken
+    ) {
+      router.push('/login?401=true&logout=true').catch(() => {})
+      return Promise.reject(error)
+    }
   }
 )
