@@ -20,9 +20,11 @@ export default {
 
   newSession(context, sessionType, sessionSubTopic, options) {
     const onRetry = options && options.onRetry
+    const docEditorVersion = options?.docEditorVersion
     const data = {
       sessionType,
       sessionSubTopic,
+      docEditorVersion,
     }
 
     if (localStorage.getItem('assignmentId')) {

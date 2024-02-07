@@ -137,5 +137,7 @@ export default {
       FeatureFlagService.isFeatureEnabled(
         POSTHOG_FEATURE_FLAGS.PROGRESS_REPORTS_MODAL
       ),
+    shouldUseQuillV2: () =>
+      FeatureFlagService.isFeatureEnabled(POSTHOG_FEATURE_FLAGS.QUILL_V2),
   },
 }

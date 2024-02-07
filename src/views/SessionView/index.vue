@@ -22,13 +22,21 @@
       >
         <whiteboard
           ref="whiteboard"
-          v-if="auxiliaryType === 'WHITEBOARD'"
+          v-if="auxiliaryType === sessionToolTypes.WHITEBOARD"
           :sessionId="sessionId"
           :isWhiteboardOpen="auxiliaryOpen"
           :toggleWhiteboard="toggleAuxiliary"
           :isSessionOver="isSessionOver"
         />
-        <document-editor v-else />
+        <document-editor-v2
+          v-else-if="
+            auxiliaryType === sessionToolTypes.DOCUMENT_EDITOR &&
+              docEditorVersion === 2
+          "
+        />
+        <document-editor
+          v-else-if="auxiliaryType === sessionToolTypes.DOCUMENT_EDITOR"
+        />
       </div>
       <div
         class="chat-container"
@@ -126,6 +134,7 @@ import SessionHeader from './SessionHeader'
 import SessionChat from './SessionChat'
 import Whiteboard from './Whiteboard'
 import DocumentEditor from './DocumentEditor'
+import DocumentEditorV2 from './DocumentEditorV2.vue'
 import SessionFulfilledModal from './SessionFulfilledModal'
 import ConnectionTroubleModal from './ConnectionTroubleModal'
 import PhotoUploadIcon from '@/assets/whiteboard_icons/photo-upload.svg'
@@ -153,6 +162,7 @@ export default {
     Whiteboard,
     PhotoUploadIcon,
     DocumentEditor,
+    DocumentEditorV2,
     WebNotificationsModal,
     CaretIcon,
     AboutSessionModal,
@@ -210,6 +220,8 @@ export default {
       isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
       isMobileApp: state => state.app.isMobileApp,
       presessionSurvey: state => state.user.presessionSurvey,
+      docEditorVersion: state => state.user.session.docEditorVersion,
+      auxiliaryType: state => state.user.session.toolType,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -219,12 +231,10 @@ export default {
       isSessionAlive: 'user/isSessionAlive',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
       isRecapSocketUpdatesActive: 'featureFlags/isRecapSocketUpdatesActive',
+      shouldUseQuillV2: 'featureFlags/shouldUseQuillV2',
     }),
-
-    auxiliaryType() {
-      if (this.session.toolType === SESSION_TOOL_TYPES.DOCUMENT_EDITOR)
-        return 'DOCUMENT'
-      else return 'WHITEBOARD'
+    sessionToolTypes() {
+      return SESSION_TOOL_TYPES
     },
 
     toggleIconSrc() {
@@ -279,15 +289,21 @@ export default {
 
     if (!id) {
       let type = this.$route.params.topic
+      const options = {
+        onRetry: (res, abort) => {
+          this.showTroubleStartingModal(abort)
+        },
+      }
+
+      if (this.shouldUseQuillV2) {
+        options.docEditorVersion = 2
+      }
+
       promise = SessionService.newSession(
         this,
         type,
         this.$route.params.subTopic,
-        {
-          onRetry: (res, abort) => {
-            this.showTroubleStartingModal(abort)
-          },
-        }
+        options
       )
     } else {
       promise = SessionService.useExistingSession(this, id, {

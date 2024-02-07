@@ -623,6 +623,7 @@ export const POSTHOG_FEATURE_FLAGS = {
     'sms-verification-enabled-on-signup-flow',
   PROGRESS_REPORTS: 'progress-reports',
   PROGRESS_REPORTS_MODAL: 'progress-reports-modal',
+  QUILL_V2: 'quill-v2',
 }
 
 export const ANALYTICS_REPORT_ROW = {
