@@ -6,7 +6,18 @@
         <span class="DefaultHeader-user-info-name">{{ name }}</span>
       </div>
 
-      <hamburger-button :tabindex="0" />
+      <div class="DefaultHeader-menu-container">
+        <hamburger-button :tabindex="0" />
+        <activity-dot
+          v-if="
+            unreadProgressReportOverviewSubjects.length > 0 &&
+              isProgressReportsActive &&
+              !user.isVolunteer
+          "
+          :total="unreadProgressReportOverviewSubjects.length"
+          class="DefaultHeader-menu-notification"
+        />
+      </div>
     </template>
 
     <template v-else>
@@ -18,21 +29,28 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import LogoImageUrl from '@/assets/header_logo.png'
 import HamburgerButton from '../HamburgerButton.vue'
+import ActivityDot from '@/components/ActivityDot.vue'
 
 export default {
   name: 'default-header',
-  components: { HamburgerButton },
+  components: { HamburgerButton, ActivityDot },
   data() {
     return { logoUrl: LogoImageUrl }
   },
   computed: {
+    ...mapState({
+      user: state => state.user.user,
+      unreadProgressReportOverviewSubjects: state =>
+        state.user.unreadProgressReportOverviewSubjects,
+    }),
     ...mapGetters({
       avatarUrl: 'user/avatarUrl',
       mobileMode: 'app/mobileMode',
       name: 'user/firstName',
+      isProgressReportsActive: 'featureFlags/isProgressReportsActive',
     }),
   },
 }
@@ -67,6 +85,20 @@ export default {
 
   &-name {
     @include font-category('heading');
+  }
+}
+
+.DefaultHeader {
+  &-menu {
+    &-container {
+      position: relative;
+    }
+
+    &-notification {
+      position: absolute;
+      top: 0;
+      right: -5px;
+    }
   }
 }
 </style>

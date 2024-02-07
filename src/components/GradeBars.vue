@@ -1,7 +1,7 @@
 <template>
   <div class="bars">
     <div
-      v-for="num in 5"
+      v-for="num in 10"
       class="bar"
       :class="isFilled(num) && 'bar--filled'"
       :key="num"
@@ -14,7 +14,7 @@ export default {
   name: 'GradeBars',
   props: {
     grade: { type: Number, required: true },
-    minimumGrade: { type: Number, required: true },
+    minimumGrade: { type: Number, required: false, default: 0 },
   },
   methods: {
     isFilled(index) {
@@ -36,8 +36,8 @@ export default {
 }
 
 .bar {
-  width: 20px;
-  height: 20px;
+  width: 20%;
+  height: 8px;
   margin: 0 0.1em;
   background-color: $c-background-grey;
 

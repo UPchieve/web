@@ -59,21 +59,48 @@
     </template>
     <template v-else>
       <section class="progress-reports__overview">
-        <h1 class="progress-reports__overview-title">Overall practice</h1>
+        <h1
+          class="progress-reports__overview-title progress-reports__overview-title--header"
+        >
+          Overview of your {{ subjectDisplayName }} Progress
+        </h1>
         <separator class="separator" />
+
+        <section>
+          <div>
+            <p class="progress-reports__overview-score spacing--padding">
+              Overall {{ subjectDisplayName }} Score
+            </p>
+            <div class="spacing--padding">
+              <h2
+                class="progress-reports__overview-content--big progress-reports__overview-grade-label"
+              >
+                {{ gradeLevelLabel }}
+              </h2>
+
+              <p>
+                {{
+                  gradeDescription(latestProgressReport.summary.overallGrade)
+                }}
+              </p>
+
+              <grade-bars
+                :grade="latestProgressReport.summary.overallGrade"
+                class="grade-bars"
+              />
+
+              <p class="progress-reports__overview-summary">
+                {{ latestProgressReport.summary.summary }}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <separator class="separator" />
+
         <section class="progress-reports__overview-graphics">
           <div
-            class="progress-reports__overview-level progress-reports__overview-graphics-stat"
-          >
-            <p class="progress-reports__overview-subtitle">
-              {{ subjectDisplayName }} Level
-            </p>
-            <p class="progress-reports__overview-content--big">
-              {{ gradeLevelLabel }}
-            </p>
-          </div>
-
-          <div
+            v-if="topConcept"
             class="progress-reports__overview-top-concept progress-reports__overview-graphics-stat"
           >
             <p class="progress-reports__overview-subtitle">
@@ -91,10 +118,15 @@
               Concepts to Practice
             </p>
             <ol class="progress-reports__overview-practice-list">
-              <li v-for="practice in practiceAreas" :key="practice.name">
-                <span class="progress-reports__concepts-practice-name">{{
-                  practice.name
-                }}</span>
+              <li
+                v-for="(practice, index) in practiceAreas"
+                :key="practice.name"
+              >
+                <span
+                  v-if="index < 5"
+                  class="progress-reports__concepts-practice-name"
+                  >{{ practice.name }}</span
+                >
               </li>
             </ol>
           </div>
@@ -102,9 +134,6 @@
           <div class="progress-reports__overview-graphics-chart">
             <canvas ref="chart"></canvas>
           </div>
-        </section>
-        <section>
-          <p>{{ latestProgressReport.summary.summary }}</p>
         </section>
 
         <section class="progress-reports__concepts-practice">
@@ -173,7 +202,7 @@
                     primary
                     class="session-list__session-recap session-list__session-recap__button"
                     @click.native="routeToSessionRecap(session.id)"
-                    >See analysis</large-button
+                    >See review</large-button
                   >
                 </div>
               </div>
@@ -284,6 +313,7 @@ import moment from 'moment'
 import LargeButton from '@/components/LargeButton.vue'
 import Separator from '@/components/Separator.vue'
 import Loader from '@/components/Loader.vue'
+import GradeBars from '@/components/GradeBars.vue'
 import { backOff } from 'exponential-backoff'
 import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
@@ -293,6 +323,7 @@ import CaretIcon from '@/assets/caret.svg'
 import InformationIcon from '@/assets/information.svg'
 import UpdogConstruction from '@/assets/updog-construction.svg'
 import UpbotIcon from '@/assets/upbot.svg'
+import { gradeLabel, gradeDescription } from '@/utils/grades'
 
 export default {
   name: 'progress-reports-view',
@@ -304,6 +335,7 @@ export default {
     InformationIcon,
     UpbotIcon,
     UpdogConstruction,
+    GradeBars,
   },
   data() {
     return {
@@ -359,7 +391,7 @@ export default {
       return endResult
     },
     gradeLevelLabel() {
-      return this.gradeToLabel(this.latestProgressReport.summary.overallGrade)
+      return this.gradeLabel(this.latestProgressReport.summary.overallGrade)
     },
     subjectDisplayName() {
       if (!this.subjects[this.subject]) return this.subject
@@ -388,6 +420,9 @@ export default {
       await this.$nextTick()
       this.createChart()
       this.sendReadReceiptsToUnreadReports()
+      window.addEventListener('resize', () => {
+        this.reloadChart()
+      })
     } catch (error) {
       LoggerService.noticeError(error)
       this.hasPageError = true
@@ -396,7 +431,8 @@ export default {
     }
   },
   beforeDestroy() {
-    if (this.chart) this.chart.destroy()
+    this.destroyChart()
+    window.removeEventListener('resize', this.reloadChart)
   },
   methods: {
     async getProgressReportsForSubject(page) {
@@ -482,12 +518,11 @@ export default {
 
       this.$store.dispatch('user/updateProgressReportsReadStatus', reportIds)
     },
-    gradeToLabel(grade) {
-      if (grade >= 95) return 'Superb!'
-      if (grade >= 85) return 'Awesome'
-      if (grade >= 75) return 'Satisfactory'
-      if (grade >= 65) return 'Getting there'
-      return 'Needs improvement'
+    gradeLabel(grade) {
+      return gradeLabel(grade)
+    },
+    gradeDescription(grade) {
+      return gradeDescription(grade)
     },
     createChart() {
       const chartRef = this.$refs.chart
@@ -510,16 +545,18 @@ export default {
       }
 
       const labels = months
+      const mobileMode = this.mobileMode
       const dataset = sortedData.map(entry => ({
         x: moment(entry.createdAt).local(),
         y: entry.overallGrade,
-        label: this.gradeToLabel(entry.overallGrade),
+        label: this.gradeLabel(entry.overallGrade),
       }))
       const gradeRanges = {
-        65: 'Getting there',
-        75: 'Satisfactory',
-        85: 'Awesome',
-        95: 'Superb!',
+        60: 'Almost there',
+        70: 'Passing Grade',
+        80: 'Exceptional',
+        90: 'Excellent',
+        100: 'Outstanding',
       }
 
       this.chart = new Chart(chartRef, {
@@ -541,7 +578,7 @@ export default {
           ],
         },
         options: {
-          maintainAspectRatio: true,
+          maintainAspectRatio: !mobileMode,
           responsive: true,
           scales: {
             y: {
@@ -554,8 +591,8 @@ export default {
                   return gradeRanges[value] || ''
                 },
               },
-              suggestedMin: 60,
-              max: 100,
+              suggestedMin: 50,
+              max: 110,
 
               border: {
                 display: false,
@@ -572,6 +609,9 @@ export default {
               grid: {
                 // Removes the x-axis grid lines
                 display: false,
+              },
+              ticks: {
+                minRotation: mobileMode ? 50 : 0,
               },
             },
           },
@@ -591,6 +631,13 @@ export default {
           },
         },
       })
+    },
+    destroyChart() {
+      if (this.chart) this.chart.destroy()
+    },
+    reloadChart() {
+      this.destroyChart()
+      this.createChart()
     },
   },
 }
@@ -729,6 +776,28 @@ p {
     &-title {
       font-size: 20px;
       font-weight: 600;
+
+      &--header {
+        margin-bottom: 0.6em;
+      }
+    }
+
+    &-score {
+      font-size: 14px;
+      margin: 0.4em 0;
+      padding-top: 0.5em;
+      padding-bottom: 0.5em;
+      background-color: lighten($upchieve-green, $amount: 24%);
+    }
+
+    &-grade-label {
+      font-size: 28px;
+      font-weight: 500;
+      margin: 0.2em 0;
+    }
+
+    &-summary {
+      margin-bottom: 1em;
     }
 
     &-graphics {
@@ -737,18 +806,19 @@ p {
 
       @include breakpoint-above('large') {
         display: grid;
-        grid-template-rows: auto auto;
-        grid-template-columns: minmax(auto, 250px) auto;
+        grid-template-rows: auto;
+        grid-template-columns: minmax(auto, 250px) auto auto;
         gap: 0 20px;
       }
 
       @include breakpoint-between('992px', '1200px') {
-        grid-template-columns: 1fr 1fr 1fr;
-        grid-template-rows: auto auto;
+        grid-template-columns: 50% 50%;
+        grid-template-rows: auto;
       }
 
       @include breakpoint-above('huge') {
         grid-template-columns: 20% 20% 1fr;
+        grid-template-rows: 1fr;
       }
 
       &-stat {
@@ -782,14 +852,17 @@ p {
         margin-bottom: 1em;
         height: 300px;
 
+        @include breakpoint-above('large') {
+          height: initial;
+        }
+
         @include breakpoint-between('992px', '1200px') {
-          grid-column: 1 / span 3;
+          grid-column: 1 / span 2;
           grid-row: 2;
         }
 
         @include breakpoint-above('huge') {
           grid-column: 3;
-          grid-row: 1 / span 2;
           width: 100%;
         }
       }
@@ -1174,5 +1247,14 @@ p {
 
 .updog {
   height: 200px;
+}
+
+.spacing--padding {
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+.grade-bars {
+  margin: 1em 0;
 }
 </style>
