@@ -342,7 +342,7 @@ export default {
      * - Report was processed successfully
      *
      */
-    'progress-report:processed:overview'(data) {
+    'progress-report:processed:session'(data) {
       // Grab the ProgressReportModal
       const isOnScreen = document.querySelector('.prm')
       if (

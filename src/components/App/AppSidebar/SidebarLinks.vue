@@ -12,6 +12,21 @@
         <house-icon class="icon" />
       </sidebar-link>
 
+      <!-- Defaults to 'reading' until progress reports are launched to more subjects -->
+      <sidebar-link
+        v-if="!isVolunteer && isProgressReportsActive"
+        to="/sessions/progress/reading"
+        text="Your Progress"
+        class="SidebarLinks__container"
+      >
+        <your-progress-icon class="icon" />
+        <activity-dot
+          v-if="unreadProgressReportOverviewSubjects.length > 0"
+          :total="unreadProgressReportOverviewSubjects.length"
+          class="SidebarLinks__notification"
+        />
+      </sidebar-link>
+
       <sidebar-link
         v-if="!isVolunteer"
         to="/sessions/history"
@@ -52,20 +67,6 @@
         <portrait-icon class="icon" />
       </sidebar-link>
 
-      <!-- Defaults to 'reading' until progress reports are launched to more subjects -->
-      <sidebar-link
-        v-if="!isVolunteer && isProgressReportsActive"
-        to="/sessions/progress/reading"
-        text="Your Progress"
-        class="SidebarLinks__container"
-      >
-        <your-progress-icon class="icon" />
-        <activity-dot
-          v-if="hasUnreadProgressOverviewReports"
-          class="SidebarLinks__notification"
-        />
-      </sidebar-link>
-
       <sidebar-link
         v-if="showDashboardRedesign"
         text="Refer a Friend"
@@ -94,7 +95,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import SidebarLink from './SidebarLink.vue'
 import ArchiveIcon from '@/assets/archive.svg'
 import CalendarIcon from '@/assets/sidebar_icons/calendar.svg'
@@ -137,12 +138,15 @@ export default {
     mobileMode: Boolean,
   },
   computed: {
+    ...mapState({
+      unreadProgressReportOverviewSubjects: state =>
+        state.user.unreadProgressReportOverviewSubjects,
+    }),
     ...mapGetters({
       isTutorSessionHistoryActive: 'featureFlags/isTutorSessionHistoryActive',
       isProgressReportsActive: 'featureFlags/isProgressReportsActive',
       isAutoFlowUser: 'user/isAutoFlowUser',
       showDashboardRedesign: 'user/showDashboardRedesign',
-      hasUnreadProgressOverviewReports: 'user/hasUnreadProgressOverviewReports',
     }),
   },
   methods: {
@@ -198,9 +202,8 @@ export default {
   }
 
   &__notification {
-    position: absolute;
-    right: 40px;
-    top: -3px;
+    order: 3;
+    margin-left: 0.4em;
   }
 }
 

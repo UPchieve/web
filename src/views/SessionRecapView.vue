@@ -87,6 +87,7 @@
           v-if="progressReport && progressReport.status === 'complete'"
           :toggleStyles="{
             padding: '1.4em 2em',
+            backgroundColor: '#FEDF85',
           }"
           class="progress-report__dropdown"
           @toggled="handleProgressReportToggle"
@@ -94,9 +95,9 @@
           <template v-slot:header>
             <p class="progress-report__dropdown-header">
               <span class="progress-report__dropdown-header--insight"
-                >Session Insight:</span
+                >Session Review:</span
               >
-              Passing Grade: {{ progressReport.summary.overallGrade }}%
+              {{ progressReport.summary.overallGrade }}%
             </p>
           </template>
           <template v-slot:content>
@@ -106,6 +107,7 @@
                 class="progress-report-session"
                 v-if="progressReport.id"
                 :progressReport="progressReport"
+                :subjectDisplayName="session.subject"
               />
             </div>
           </template>

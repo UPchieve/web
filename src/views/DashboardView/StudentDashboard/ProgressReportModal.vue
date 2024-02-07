@@ -5,10 +5,17 @@
         <section class="prm__section prm__section--center">
           <upbot class="updog" />
           <p class="loading-message">
-            UPbot is analyzing your reading score, it might take a minute or
-            so....
+            UPbot is analyzing your reading score, it might take a minute or so.
           </p>
-          <large-button @click.native="handleCloseModal">Dismiss</large-button>
+          <p class="prm__body--spacing prm__body--center">
+            You can always go to the "Your progress tab" to access your session
+            overview
+          </p>
+          <large-button
+            class="prm__buttons-button"
+            @click.native="handleCloseModal"
+            >Dismiss</large-button
+          >
         </section>
       </div>
       <div v-else-if="hasError" class="prm">
@@ -27,30 +34,23 @@
         </footer>
       </div>
       <div v-else-if="showHaveMoreSessions" class="prm">
-        <header>
-          <banner-image class="prm-banner" />
-          <h1 class="prm__title">
-            We're almost there for your report
+        <header class="prm__section--center">
+          <cross-icon class="cross-icon" @click="handleCloseModal" />
+          <upbot-sad />
+          <h1 class="prm__title prm__body--center">
+            Sorry, we didn't have enough information to analyze this session.
           </h1>
         </header>
-        <section class="prm__section prm__section--center">
-          <p class="prm__body">
-            Looks like we need a bit more data from your Reading tutoring
-            sessions to whip up a solid report. The more sessions you dive into,
-            the better we can predict your future success!
+        <section class="prm__section">
+          <p class="prm__body--center">
+            Try providing more details or extending the session for a more
+            thorough review.
           </p>
         </section>
         <footer class="prm__footer">
-          <div class="prm__buttons prm__buttons--center">
+          <div class="prm__buttons">
             <large-button
-              class="prm__buttons-button"
-              @click.native="handleCloseModal"
-              :showArrow="false"
-            >
-              Close
-            </large-button>
-            <large-button
-              class="prm__buttons-button  prm__buttons-button--single"
+              class="prm__buttons-button  prm__buttons-button--primary"
               @click.native="handleSessionRequest"
               :showArrow="false"
               primary
@@ -62,7 +62,8 @@
       </div>
       <div v-else-if="showStillGeneratingReport" class="prm">
         <header>
-          <banner-image class="prm-banner" />
+          <mobile-banner-image v-if="mobileMode" class="prm-banner" />
+          <desktop-banner-image v-else class="prm-banner" />
           <h1 class="prm__title">
             It's taking longer than usual
           </h1>
@@ -75,186 +76,137 @@
           </p>
         </section>
         <footer class="prm__footer">
-          <div class="prm__buttons prm__buttons--center">
+          <div class="prm__buttons">
+            <large-button
+              class="prm__buttons-button prm__buttons-button--primary"
+              @click.native="handleSessionRequest"
+              :showArrow="false"
+              primary
+            >
+              Start a new Reading session
+            </large-button>
             <large-button
               class="prm__buttons-button"
               @click.native="handleCloseModal"
               :showArrow="false"
             >
               Close
-            </large-button>
-            <large-button
-              class="prm__buttons-button  prm__buttons-button--single"
-              @click.native="handleSessionRequest"
-              :showArrow="false"
-              primary
-            >
-              Start a new Reading session
             </large-button>
           </div>
         </footer>
       </div>
       <div v-else-if="step === 1" class="prm">
         <header>
-          <banner-image class="prm-banner" />
+          <mobile-banner-image v-if="mobileMode" class="prm-banner" />
+          <desktop-banner-image v-else class="prm-banner" />
           <h1 class="prm__title">
-            Want a forecast of your reading scores?
+            Want to see how you are doing in Reading?
           </h1>
           <p class="prm__body">
-            Based on your reading tutoring sessions, we'll make a report for
-            you. It guesses how well you'll do on future English quizzes or
-            tests, and shows what you're doing well and what to improve.
-          </p>
-          <p class="prm__body--helper">
-            This is a new experimental feature. We might not get it right the
-            first time!
+            UPbot can now analyze what you've learned with your coach and will
+            generate a report on what you're doing well and what you can improve
+            on. You will be able to see how you are progressing after each
+            session!
           </p>
         </header>
 
         <footer class="prm__footer">
           <div class="prm__buttons">
-            <large-button
-              class="prm__buttons-button"
-              @click.native="handleCloseModal"
-              >No, thanks</large-button
-            >
             <large-button
               class="prm__buttons-button prm__buttons-button--primary"
               @click.native="analyzeSessions"
               primary
               :showArrow="false"
-              >Analyze my sessions</large-button
+              >Analyze my session</large-button
+            >
+            <span class="prm__buttons-span" @click="handleCloseModal"
+              >Maybe later</span
             >
           </div>
         </footer>
       </div>
       <div v-else-if="step === 2" class="prm prm--flex">
-        <cross-icon class="cross-icon" @click="handleCloseModal" />
-        <header>
-          <h1 class="prm__title prm__title-header">
-            <span>Test Score Forecast</span>
-            <span>{{ summary.overallGrade }}%</span>
-          </h1>
-        </header>
+        <div>
+          <div class="prm__title--row">
+            <p>Session Overview:</p>
+            <cross-icon class="cross-icon" @click="handleCloseModal" />
+          </div>
+          <p class="prm__title prm__title--grade">
+            {{ gradeLabel(summary.overallGrade) }}
+          </p>
+        </div>
+        <grade-bars :minimumGrade="0" :grade="summary.overallGrade" />
+
+        <separator v-if="!mobileMode" class="separator" />
 
         <section class="prm__section">
-          <p class="prm__body">
-            Based on your Reading tutoring sessions, our UPbot created a special
-            report for you.
-          </p>
-          <div class="prm__overview-container">
-            <div
-              v-if="filteredConceptsToFocusArea('strength').length"
-              class="prm__overview"
-            >
-              <header class="prm__overview-header">
-                <h2 class="prm__overview-title prm__overview--bold">
-                  Strengths
-                </h2>
-              </header>
-              <div
-                v-for="concept of filteredConceptsToFocusArea('strength')"
-                :key="concept.name"
-                class="prm__concept"
-              >
-                <p class="prm__overview-concept">{{ concept.name }}</p>
-              </div>
+          <div class="prm__section-bot">
+            <upbot v-if="!mobileMode" class="upbot--medium" />
+            <div class="prm__overview--strength">
+              <p>
+                Great job on finishing your reading session!
+              </p>
+              <p v-if="filteredConceptsToFocusArea('strength').length">
+                You did a phenomenal job on tackling
+                {{ filteredConceptsToFocusArea('strength')[0].name }}!
+              </p>
             </div>
+          </div>
+          <div>
             <div
               v-if="filteredConceptsToFocusArea('practiceArea').length"
               class="prm__overview"
             >
               <header class="prm__overview-header">
-                <h2 class="prm__overview-title prm__overview--bold">
-                  Practice Areas
+                <h2
+                  class="prm__overview-title prm__overview-title--practice prm__overview--bold"
+                >
+                  Concepts to Practice
                 </h2>
               </header>
-              <div
+              <ul
                 v-for="concept of filteredConceptsToFocusArea('practiceArea')"
                 :key="concept.name"
                 class="prm__concept"
               >
-                <p class="prm__overview-concept">{{ concept.name }}</p>
-              </div>
-              <span class="prm__overview-link" @click="showDetailedReport">
-                See more practice areas
+                <li class="prm__overview-concept">{{ concept.name }}</li>
+              </ul>
+              <span
+                v-if="!mobileMode"
+                class="prm__overview-link"
+                @click="showDetailedReport"
+              >
+                Review my practice areas
               </span>
             </div>
-            <p class="prm__overview--subtext">
-              The more sessions you have the more accurate your report will be.
-              Make sure to ask your coach to help you with your practice areas.
-            </p>
           </div>
+
+          <separator class="separator" />
+
+          <p
+            class="prm__overview--subtext prm__overview--subtext-more-sessions"
+          >
+            The more sessions you have the more accurate your report will be.
+            Make sure to ask your coach to help you with your practice areas.
+          </p>
         </section>
         <footer class="prm__footer">
           <div class="prm__buttons">
             <large-button
-              class="prm__buttons-button  prm__buttons-button--primary prm__buttons-button--single prm__buttons-button--wide"
+              class="prm__buttons-button prm__buttons-button--primary"
               @click.native="handleSessionRequest()"
               :showArrow="false"
               primary
             >
               Start a new Reading session
             </large-button>
-          </div>
-        </footer>
-      </div>
-      <div v-else-if="step === 3" class="prm">
-        <header class="prm__practice-area-header">
-          <h1 class="prm__title prm__title--center">
-            Practice Areas
-          </h1>
-        </header>
-
-        <section class="prm__section--center">
-          <div
-            v-for="concept of filteredConceptsToFocusArea('practiceArea')"
-            :key="concept.name"
-          >
-            <div class="prm__concept">
-              <div class="prm__concept-header">
-                <span class="prm__concept-name">{{ concept.name }} </span>
-                <div class="prm__concept-scores">
-                  <span class="prm__concept-scores--score"
-                    >Score: {{ concept.grade }}</span
-                  >
-                </div>
-              </div>
-              <div class="prm__concept-recommendations">
-                Recommendations for improvement:
-                <ul>
-                  <li
-                    v-for="detail of filteredFocusAreasToInfoType(
-                      concept,
-                      'recommendation'
-                    )"
-                    :key="detail.content"
-                    class="prm__concept-recommendations--recommendation"
-                  >
-                    {{ detail.content }}
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-        <footer class="prm__footer">
-          <div class="prm__buttons">
-            <large-button
-              class="prm__buttons-button"
-              @click.native="handleCloseModal"
-              :showArrow="false"
+            <span
+              v-if="mobileMode"
+              class="prm__overview-link"
+              @click="showDetailedReport"
             >
-              Close
-            </large-button>
-            <large-button
-              class="prm__buttons-button  prm__buttons-button--single"
-              @click.native="handleSessionRequest"
-              :showArrow="false"
-              primary
-            >
-              Start a Reading session
-            </large-button>
+              Review my practice areas
+            </span>
           </div>
         </footer>
       </div>
@@ -263,25 +215,34 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import { EVENTS } from '@/consts'
-import BannerImage from '@/assets/scorecaster-banner.svg'
+import DesktopBannerImage from '@/assets/progress-report-banner-desktop.svg'
+import MobileBannerImage from '@/assets/progress-report-banner-mobile.svg'
 import Upbot from '@/assets/upbot.svg'
+import UpbotSad from '@/assets/upbot-sad.svg'
 import UpdogConstruction from '@/assets/updog-construction.svg'
 import LargeButton from '@/components/LargeButton.vue'
 import Modal from '@/components/Modal.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import CrossIcon from '@/assets/cross.svg'
+import GradeBars from '@/components/GradeBars.vue'
+import Separator from '@/components/Separator.vue'
+import { gradeLabel } from '@/utils/grades'
 
 export default {
   name: 'ProgressReportModal',
   components: {
     Modal,
     LargeButton,
-    BannerImage,
+    DesktopBannerImage,
+    MobileBannerImage,
     Upbot,
+    UpbotSad,
     UpdogConstruction,
     CrossIcon,
+    GradeBars,
+    Separator,
   },
   data() {
     return {
@@ -306,6 +267,10 @@ export default {
       user: state => state.user.user,
       requestedProgressReportOverview: state =>
         state.user.requestedProgressReportOverview,
+      latestSession: state => state.user.latestSession,
+    }),
+    ...mapGetters({
+      mobileMode: 'app/mobileMode',
     }),
     concepts() {
       return this.report.concepts
@@ -336,7 +301,7 @@ export default {
       AnalyticsService.captureEvent(
         EVENTS.PROGRESS_REPORT_STUDENT_CLICKED_DETAILED_REPORT
       )
-      this.step++
+      this.$router.push(`/sessions/${this.latestSession.id}/recap`)
     },
     async analyzeSessions() {
       this.isSubmitting = true
@@ -408,9 +373,12 @@ export default {
     filteredFocusAreasToInfoType(concept, infoType) {
       return concept.details.filter(detail => detail.infoType === infoType)
     },
+    gradeLabel(grade) {
+      return gradeLabel(grade)
+    },
   },
   sockets: {
-    'progress-report:processed:overview'(data) {
+    'progress-report:processed:session'(data) {
       this.report = data.report
       if (this.requestedProgressReportOverview) this.handleReport()
     },
@@ -418,15 +386,28 @@ export default {
 }
 </script>
 
+<style lang="scss">
+.upc-modal-form {
+  border-radius: 1.5em;
+}
+</style>
+
 <style lang="scss" scoped>
+p {
+  margin-bottom: 0;
+}
+
+.separator {
+  margin-top: 1em;
+}
 .prm {
   text-align: initial;
 
   &__title {
-    @include font-category('display-small');
-    font-weight: 500;
+    font-size: 22px;
+    font-weight: 600;
     margin-top: 1em;
-    margin-bottom: 1em;
+    margin-bottom: 0.8em;
 
     &-header {
       @include flex-container(row, space-between, center);
@@ -434,6 +415,15 @@ export default {
 
     &--center {
       text-align: center;
+    }
+
+    &--row {
+      @include flex-container(row, space-between, center);
+    }
+
+    &--grade {
+      margin-top: initial;
+      margin-bottom: 0.25em;
     }
   }
 
@@ -447,6 +437,12 @@ export default {
     @include flex-container(column, center, center);
   }
 
+  &__section {
+    &-bot {
+      @include flex-container(row, space-between, center);
+    }
+  }
+
   &__body {
     @include font-category('heading');
     margin-bottom: 0.5em;
@@ -456,31 +452,34 @@ export default {
       font-weight: 600;
     }
 
-    &--helper {
-      color: $c-secondary-grey;
+    &--center {
+      text-align: center;
+    }
+
+    &--spacing {
+      margin-bottom: 1em;
     }
   }
 
   &__buttons {
-    @include flex-container(column, space-between, center);
+    @include flex-container(column, center, center);
     margin: 1.6em 0 0.4em 0;
-    & span:first-child,
-    & button:first-child {
-      margin-right: 1em;
-    }
 
-    @include breakpoint-above('small') {
-      @include flex-container(row, space-between, center);
+    &-span {
+      text-align: center;
+      font-weight: 500;
+      &:hover {
+        cursor: pointer;
+      }
     }
 
     &-button {
-      margin: 0 auto;
       width: 100%;
-      margin-bottom: 1.3em;
+      margin-bottom: 0.8em;
 
       @include breakpoint-above('small') {
-        width: 250px;
-        margin-bottom: initial;
+        min-width: 50%;
+        max-width: 60%;
       }
 
       &--wide {
@@ -527,16 +526,24 @@ export default {
   }
 
   &__overview {
-    padding: 1em;
-    border: 1px solid $c-border-grey;
-    border-collapse: collapse;
-
     &-header {
       @include flex-container(row, space-between, center);
+      margin-top: 1em;
+
+      @include breakpoint-above('tiny') {
+        margin-top: initial;
+      }
     }
 
     &-title {
       @include font-category('subheading');
+    }
+
+    &-title--practice {
+      @include font-category('subheading');
+      background-color: lighten($upchieve-green, $amount: 17%);
+      width: 100%;
+      padding: 0.4em;
     }
 
     &--bold {
@@ -546,21 +553,42 @@ export default {
     &-concept {
       @include font-category('body');
       margin: 0;
+      font-weight: 500;
     }
 
     &-link {
       @include font-category('body');
-      color: $c-information-blue;
       margin: 0;
-      font-weight: 600;
+      font-weight: 500;
       &:hover {
         cursor: pointer;
+      }
+
+      @include breakpoint-above('medium') {
+        margin-left: 2.5em;
+        color: $c-information-blue;
+        border-bottom: 1px solid $c-information-blue;
       }
     }
 
     &--subtext {
       @include font-category('helper-text');
       margin-top: 1em;
+
+      &-more-sessions {
+        padding: 0em 2em;
+      }
+    }
+
+    &--strength {
+      margin-left: 1em;
+      margin-top: 1em;
+      margin-bottom: 1em;
+
+      @include breakpoint-above('medium') {
+        margin-top: initial;
+        margin-bottom: initial;
+      }
     }
   }
 
@@ -615,7 +643,7 @@ export default {
 
 .prm-banner {
   width: 100%;
-  height: 300px;
+  height: 100%;
 }
 .error {
   color: $c-error-red;
@@ -632,6 +660,7 @@ export default {
   text-align: center;
   font-weight: 600;
   margin-top: 1em;
+  margin-bottom: 0.4em;
 }
 
 .cross-icon {
@@ -648,5 +677,9 @@ export default {
     margin-right: initial;
     margin-left: auto;
   }
+}
+
+.upbot--medium {
+  width: 75px;
 }
 </style>
