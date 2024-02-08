@@ -25,7 +25,7 @@ export default {
   @include flex-container(column, center, flex-start);
   @include child-spacing(top, 24px);
 
-  background: url('~@/assets/dashboardHeader@2x.png');
+  background: url('@/assets/dashboardHeader@2x.png');
   background-position: 25%;
   background-repeat: no-repeat;
   background-size: cover;

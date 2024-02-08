@@ -1,10 +1,11 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils'
-import { merge } from 'lodash'
+import { merge } from 'lodash-es'
 import Vuex from 'vuex'
 import { storeOptions } from '@/store'
 import SubjectCard from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectCard.vue'
 import HyperlinkButton from '@/components/HyperlinkButton.vue'
 import LargeButton from '@/components/LargeButton.vue'
+import { vi } from 'vitest';
 // import TestIcon from "@/assets/sidebar_icons/house.svg";
 
 const localVue = createLocalVue()
@@ -50,7 +51,7 @@ describe('SubjectCard', () => {
         const wrapper = getWrapper(true, propsData)
 
         // No `routeTo`
-        let handleClick = jest.fn()
+        let handleClick = vi.fn()
         wrapper.setMethods({ handleClick })
         wrapper.setProps({ routeTo: null })
 
@@ -62,7 +63,7 @@ describe('SubjectCard', () => {
         expect(handleClick).toHaveBeenCalled()
 
         // With `routeTo`
-        handleClick = jest.fn()
+        handleClick = vi.fn()
         wrapper.setMethods({ handleClick })
         await wrapper.setProps({ routeTo: '/test' })
 
@@ -96,7 +97,7 @@ describe('SubjectCard', () => {
         const wrapper = getWrapper(false, propsData)
 
         // No `routeTo`
-        let handleClick = jest.fn()
+        let handleClick = vi.fn()
         wrapper.setMethods({ handleClick })
         wrapper.setProps({ routeTo: null })
 
@@ -108,7 +109,7 @@ describe('SubjectCard', () => {
         expect(handleClick).toHaveBeenCalled()
 
         // With `routeTo`
-        handleClick = jest.fn()
+        handleClick = vi.fn()
         wrapper.setMethods({ handleClick })
         await wrapper.setProps({ routeTo: '/test' })
 

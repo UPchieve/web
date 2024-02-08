@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import {isEmpty} from 'lodash-es'
 import NetworkService from './NetworkService'
 
 export default {
@@ -63,7 +63,7 @@ export default {
   saveAnswer(picked) {
     const question = this.questions[this.index]
     const isNewAnswer =
-      _.isEmpty(this.idAnswerMap[question._id]) && !_.isEmpty(picked)
+      isEmpty(this.idAnswerMap[question._id]) && !isEmpty(picked)
     if (isNewAnswer) {
       this.numAnswers += 1
     }

@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import LinkMaterial from './Link'
+import LinkMaterial from './Link.vue'
 
 export default {
   components: {

@@ -55,7 +55,7 @@
 <script>
 import { mapState } from 'vuex'
 
-import _ from 'lodash'
+import {isEmpty, isEqual} from 'lodash-es'
 import moment from 'moment-timezone'
 
 import AvailabilityGrid from '@/components/AvailabilityGrid/index.vue'
@@ -105,17 +105,17 @@ export default {
       return this.sortTimes()
     },
     hasUserSchedule() {
-      return !_.isEmpty(this.availability)
+      return !isEmpty(this.availability)
     },
     hasWaitTimes() {
-      return !_.isEmpty(this.waitTimes)
+      return !isEmpty(this.waitTimes)
     },
     hasChangedSchedule() {
       const estUtcOffset = moment.tz.zone('America/New_York').parse(Date.now())
       const userUtcOffset = moment.tz.zone(this.selectedTz).parse(Date.now())
       const offset = (estUtcOffset - userUtcOffset) / 60
       return (
-        !_.isEqual(
+        !isEqual(
           this.availability,
           this.convertAvailability(this.user.availability, offset)
         ) || this.selectedTz !== this.user.timezone

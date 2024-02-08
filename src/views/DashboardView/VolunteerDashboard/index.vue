@@ -141,10 +141,10 @@
 </template>
 
 <script>
-import _ from 'lodash'
+import { flow, reduce, get, isBoolean } from 'lodash-es'
 import { mapState, mapGetters } from 'vuex'
 import ListSessions from './ListSessions.vue'
-import DashboardBanner from '../DashboardBanner'
+import DashboardBanner from '../DashboardBanner.vue'
 import AccountAction from './AccountAction.vue'
 import PhotoUploadModal from './PhotoUploadModal.vue'
 import VolunteerWelcomeModal from '@/views/DashboardView/VolunteerDashboard/VolunteerWelcomeModal.vue'
@@ -169,6 +169,9 @@ const defaultHeaderData = {
 const rejoinHeaderData = {
   component: 'RejoinSessionHeader',
 }
+
+// (1) Hours selected
+const userHasSchedule = flow([get, isBoolean])
 
 export default {
   name: 'volunteer-dashboard',
@@ -504,20 +507,15 @@ export default {
     },
     getImpactStats() {
       const user = this.$store.state.user.user
-      // (1) Hours selected
-      const userHasSchedule = _.chain(user)
-        .get('availability.Thursday.5p')
-        .isBoolean()
-        .value()
 
       let numHoursSelected = 0
 
-      if (userHasSchedule) {
-        numHoursSelected = _.reduce(
+      if (userHasSchedule(user, 'availability.Thursday.5p')) {
+        numHoursSelected = reduce(
           user.availability,
           (weeklyHourCount, dayHours) => {
             // Tally up num hours for each day
-            const hoursSelectedForDay = _.reduce(
+            const hoursSelectedForDay = reduce(
               dayHours,
               (dailyHourCount, hourVal) => {
                 // Add 1 if hour val is true
@@ -533,7 +531,7 @@ export default {
       }
 
       // (3) Requests filled
-      const numRequestsFilled = _.get(user, 'pastSessions.length', '--')
+      const numRequestsFilled = get(user, 'pastSessions.length', '--')
 
       // (4) Hours tutored
       const numHoursTutored = Number(this.user.hoursTutored) || '0'
@@ -566,20 +564,14 @@ export default {
     },
     getCustomImpactStats() {
       const user = this.$store.state.user.user
-      // (1) Hours selected
-      const userHasSchedule = _.chain(user)
-        .get('availability.Thursday.5p')
-        .isBoolean()
-        .value()
-
       let numHoursSelected = 0
 
-      if (userHasSchedule) {
-        numHoursSelected = _.reduce(
+      if (userHasSchedule(user, 'availability.Thursday.5p')) {
+        numHoursSelected = reduce(
           user.availability,
           (weeklyHourCount, dayHours) => {
             // Tally up num hours for each day
-            const hoursSelectedForDay = _.reduce(
+            const hoursSelectedForDay = reduce(
               dayHours,
               (dailyHourCount, hourVal) => {
                 // Add 1 if hour val is true
@@ -595,7 +587,7 @@ export default {
       }
 
       // (3) Requests filled
-      const numRequestsFilled = _.get(user, 'pastSessions.length', '--')
+      const numRequestsFilled = get(user, 'pastSessions.length', '--')
 
       // (4) Hours volunteered
       const numHoursVolunteered = Number(user.totalVolunteerHours) || '--'

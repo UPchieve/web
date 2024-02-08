@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import * as Sentry from '@sentry/browser'
-import * as Integrations from '@sentry/integrations'
+import { Vue as IVue } from '@sentry/integrations'
 import config from '../config'
 
 const newrelic = window.newrelic
@@ -13,7 +13,7 @@ class LoggerService {
         // Our Sentry project is configured to only accept calls from app.upchieve.org
         dsn: config.sentryDsn,
         integrations: [
-          new Integrations.Vue({ Vue, attachProps: true, logErrors: true }),
+          new IVue({ Vue, attachProps: true, logErrors: true }),
         ],
         environment: config.sentryEnv,
         release: `uc-web@${config.version}`,

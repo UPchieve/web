@@ -4,6 +4,7 @@ import userModule from '@/store/modules/user'
 import VerificationModal from '@/views/VerificationModal.vue'
 import AuthService from '@/services/AuthService'
 import { VERIFICATION_METHOD } from '@/consts'
+import { vi } from 'vitest';
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
@@ -12,7 +13,7 @@ describe('VerificationModal', () => {
   let DEFAULT_PROPS
 
   beforeEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
     DEFAULT_PROPS = {
       phoneOrEmailToVerify: '+18180000001',
       verificationMethod: VERIFICATION_METHOD.SMS,
@@ -63,7 +64,7 @@ describe('VerificationModal', () => {
       const verifyButton = wrapper.find('[data-testid="verify-code-btn"]')
       expect(verifyButton.isVisible()).toBeTruthy()
 
-      AuthService.confirmVerification = jest.fn().mockResolvedValue(true)
+      AuthService.confirmVerification = vi.fn().mockResolvedValue(true)
 
       // Input code to enable button
       const codeInput = wrapper.find('#verification-code-field')
@@ -79,7 +80,7 @@ describe('VerificationModal', () => {
 
   describe('Resend Code', () => {
     it('Should call the AuthService when the Resend Code button is clicked', async () => {
-      AuthService.initiateVerification = jest.fn()
+      AuthService.initiateVerification = vi.fn()
       const wrapper = getWrapper()
       const resendBtn = wrapper.find('#resend-btn')
 
@@ -92,7 +93,7 @@ describe('VerificationModal', () => {
 
   describe('Cancel', () => {
     it('Should close the modal when the Cancel button is clicked', async () => {
-      const closeModalFn = jest.fn()
+      const closeModalFn = vi.fn()
       const wrapper = getWrapper(
         {},
         {
@@ -180,7 +181,7 @@ describe('VerificationModal', () => {
     ])(
       'Should render the correct text based on the verification method and supply the correct API request payload',
       async (props, expectedPartialReq, renderedText) => {
-        AuthService.initiateVerification = jest.fn()
+        AuthService.initiateVerification = vi.fn()
         const wrapper = getWrapper(
           {
             email: 'myTestEmail@gmail.com',

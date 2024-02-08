@@ -123,11 +123,10 @@
 </template>
 
 <script>
-import { setTimeout, clearTimeout } from 'timers'
-import _ from 'lodash'
+import {isEmpty} from 'lodash-es'
 import { mapState, mapGetters } from 'vuex'
 
-import ChatBot from './ChatBot'
+import ChatBot from './ChatBot.vue'
 import DocumentTitle from '@/components/DocumentTitle.vue'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import ModerationService from '@/services/ModerationService'
@@ -269,7 +268,7 @@ export default {
         this.clearMessageInput()
 
         // Early exit if message is blank
-        if (_.isEmpty(message)) return
+        if (isEmpty(message)) return
 
         // Reset the chat warning
         this.hideModerationWarning()

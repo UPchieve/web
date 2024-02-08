@@ -1,4 +1,5 @@
 import modalModule from '@/store/modules/app/modal'
+import { vi } from 'vitest';
 
 const { state, mutations, actions } = modalModule
 
@@ -39,7 +40,7 @@ describe('`app/modal` store module', () => {
   describe('actions', () => {
     it('show', () => {
       expect(typeof actions.show).toBe('function')
-      const commit = jest.fn()
+      const commit = vi.fn()
       const payload = { component: 'component', data: {} }
       actions.show({ commit }, payload)
       expect(commit).toHaveBeenNthCalledWith(1, 'setIsShown', true)
@@ -53,7 +54,7 @@ describe('`app/modal` store module', () => {
 
     it('hide', () => {
       expect(typeof actions.hide).toBe('function')
-      const commit = jest.fn()
+      const commit = vi.fn()
       actions.hide({ commit })
       expect(commit).toHaveBeenNthCalledWith(1, 'setIsShown', false)
       expect(commit).toHaveBeenNthCalledWith(2, 'setComponent', null)

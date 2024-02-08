@@ -22,7 +22,7 @@
 
 <script>
 import moment from 'moment'
-import SessionFlags from './SessionFlags'
+import SessionFlags from './SessionFlags.vue'
 import { mapState } from 'vuex'
 
 const pluralize = num => {

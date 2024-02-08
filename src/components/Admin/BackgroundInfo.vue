@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { chain, map, isEmpty } from 'lodash'
+import { flow, map, filter, isEmpty, flatten, partialRight } from 'lodash-es'
 
 export default {
   props: {
@@ -34,32 +34,37 @@ export default {
         'languages',
         'linkedInUrl',
       ]
-      return chain(backgroundKeys)
-        .map(bgKey => {
-          let bgValue = this.user[bgKey]
-          if (isEmpty(bgValue)) return null
-          if (Array.isArray(bgValue))
-            return {
-              name: bgKey,
-              value: bgValue.join(', '),
-            }
-          if (typeof bgValue === 'object')
-            return map(Object.keys(bgValue), subKey => ({
-              name: `${subKey} ${bgKey}`,
-              value: bgValue[subKey],
-            }))
+
+      const mapBackgroundItemKeys = partialRight(map, (bgKey) => {
+        let bgValue = this.user[bgKey]
+        if (isEmpty(bgValue)) return null
+        if (Array.isArray(bgValue))
           return {
             name: bgKey,
-            value: bgValue,
+            value: bgValue.join(', '),
           }
-        })
-        .filter(item => !!item)
-        .flatten()
-        .map(item => ({
-          ...item,
-          isLink: item.value.indexOf('http') !== -1,
-        }))
-        .value()
+        if (typeof bgValue === 'object')
+          return map(Object.keys(bgValue), (subKey) => ({
+            name: `${subKey} ${bgKey}`,
+            value: bgValue[subKey],
+          }))
+        return {
+          name: bgKey,
+          value: bgValue,
+        }
+      })
+      const mapIsLink = partialRight(map, (item) => ({
+        ...item,
+        isLink: item.value.indexOf('http') !== -1,
+      }))
+      const getBackgroundInfoItems = flow([
+        mapBackgroundItemKeys,
+        partialRight(filter, (item) => !!item),
+        flatten,
+        mapIsLink,
+      ])
+
+      return getBackgroundInfoItems(backgroundKeys)
     },
   },
 }

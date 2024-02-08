@@ -54,7 +54,7 @@
 import { mapState, mapGetters } from 'vuex'
 import { startSession } from '@/utils/session'
 import LargeButton from '@/components/LargeButton.vue'
-import PresessionSurvey from './PresessionSurvey'
+import PresessionSurvey from './PresessionSurvey.vue'
 import getCookie from '@/utils/get-cookie'
 import Case from 'case'
 

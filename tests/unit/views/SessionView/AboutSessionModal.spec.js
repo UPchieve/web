@@ -2,13 +2,15 @@ import { createLocalVue, shallowMount } from '@vue/test-utils'
 import Vuex from 'vuex'
 import userModule from '@/store/modules/user'
 import AboutSessionModal from '@/views/SessionView/AboutSessionModal.vue'
+import { vi } from 'vitest';
+
 describe('AboutSessionModal', () => {
   const localVue = createLocalVue()
   localVue.use(Vuex)
   let DEFAULT_SESSION, DEFAULT_PROPS
 
   beforeEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
 
     DEFAULT_SESSION = {
       student: {
@@ -17,7 +19,7 @@ describe('AboutSessionModal', () => {
     }
 
     DEFAULT_PROPS = {
-      closeModal: jest.fn(),
+      closeModal: vi.fn(),
       responses: [],
       totalStudentSessions: 5,
     }

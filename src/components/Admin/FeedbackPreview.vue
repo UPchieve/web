@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { get, isEmpty } from 'lodash'
+import { get, isEmpty } from 'lodash-es'
 
 export default {
   name: 'FeedbackPreview',
