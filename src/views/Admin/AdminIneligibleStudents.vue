@@ -34,7 +34,7 @@ import NetworkService from '@/services/NetworkService'
 import IneligibleStudentListItem from '@/components/Admin/IneligibleStudentListItem.vue'
 import PageControl from '@/components/Admin/PageControl.vue'
 
-const getIneligibleStudents = async page => {
+const getIneligibleStudents = async (page) => {
   const {
     data: { ineligibleStudents, isLastPage },
   } = await NetworkService.adminGetIneligibleStudents(page)
@@ -71,9 +71,8 @@ export default {
         path: '/admin/ineligible-students',
         query: { page },
       })
-      const { ineligibleStudents, isLastPage } = await getIneligibleStudents(
-        page
-      )
+      const { ineligibleStudents, isLastPage } =
+        await getIneligibleStudents(page)
       this.ineligibleStudents = ineligibleStudents
       this.isLastPage = isLastPage
     },

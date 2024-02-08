@@ -2,14 +2,10 @@
   <modal>
     <div class="refresh_doc">
       <header>
-        <h1 class="refresh_doc__title">
-          We were unable to load the document
-        </h1>
+        <h1 class="refresh_doc__title">We were unable to load the document</h1>
       </header>
 
-      <p class="refresh_doc__message">
-        Please refresh the page.
-      </p>
+      <p class="refresh_doc__message">Please refresh the page.</p>
       <separator />
       <footer class="refresh_doc__footer">
         <div class="refresh_doc__buttons">

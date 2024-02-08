@@ -6,9 +6,7 @@
   >
     <div class="list-full-modal">
       <header>
-        <h1 class="list-full-modal-title">
-          Your Favorite Coach list is full
-        </h1>
+        <h1 class="list-full-modal-title">Your Favorite Coach list is full</h1>
       </header>
 
       <h2 class="list-full-modal-subtitle">

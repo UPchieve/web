@@ -25,7 +25,7 @@ import moment from 'moment'
 import SessionFlags from './SessionFlags.vue'
 import { mapState } from 'vuex'
 
-const pluralize = num => {
+const pluralize = (num) => {
   return num === 1 ? '' : 's'
 }
 
@@ -40,7 +40,7 @@ export default {
 
   computed: {
     ...mapState({
-      subjects: state => state.subjects.subjects,
+      subjects: (state) => state.subjects.subjects,
     }),
 
     createdAt() {

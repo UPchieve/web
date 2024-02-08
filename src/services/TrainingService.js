@@ -1,4 +1,4 @@
-import {isEmpty} from 'lodash-es'
+import { isEmpty } from 'lodash-es'
 import NetworkService from './NetworkService'
 
 export default {
@@ -15,7 +15,7 @@ export default {
     this.idAnswerMap = {}
     this.idCorrectAnswerMap = {}
     this.category = category
-    return NetworkService.getQuestions({ category }).then(res => {
+    return NetworkService.getQuestions({ category }).then((res) => {
       this.questions = res.data.questions || []
       return this.questions.length
     })
@@ -73,7 +73,7 @@ export default {
     return NetworkService.getQuizScore({
       idAnswerMap: this.idAnswerMap,
       category: this.category,
-    }).then(res => {
+    }).then((res) => {
       this.idCorrectAnswerMap = res.data.idCorrectAnswerMap
       return {
         tries: res.data.tries,
@@ -88,7 +88,7 @@ export default {
     const questionsReview = this.questions.slice(0)
     const idCorrectAnswerMap = { ...this.idCorrectAnswerMap }
     const idAnswerMap = { ...this.idAnswerMap }
-    questionsReview.forEach(question => {
+    questionsReview.forEach((question) => {
       question.userAnswer = idAnswerMap[question._id]
       question.correctAnswer = idCorrectAnswerMap[question._id]
     })

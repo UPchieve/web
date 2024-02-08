@@ -116,9 +116,9 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      isFetchingTraining: state => state.subjects.isFetchingTraining,
-      fetchingTrainingError: state => state.subjects.fetchingTrainingError,
+      user: (state) => state.user.user,
+      isFetchingTraining: (state) => state.subjects.isFetchingTraining,
+      fetchingTrainingError: (state) => state.subjects.fetchingTrainingError,
     }),
     ...mapGetters({
       training: 'subjects/activeTraining',
@@ -162,7 +162,7 @@ export default {
     subjectTypes() {
       return (
         this.training.subjectTypes?.filter(
-          subjectType =>
+          (subjectType) =>
             this.training[subjectType.key].certifications.length > 0
         ) || []
       )

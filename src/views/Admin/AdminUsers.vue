@@ -61,7 +61,7 @@ import PageControl from '@/components/Admin/PageControl.vue'
 import UserListItem from '@/components/Admin/UserListItem.vue'
 import { isEmpty } from 'lodash-es'
 
-const getUsers = async userData => {
+const getUsers = async (userData) => {
   const {
     data: { users, isLastPage },
   } = await NetworkService.adminGetUsers(userData)
@@ -110,13 +110,11 @@ export default {
     this.email = email || this.email
     this.highSchool = highSchool || this.highSchool
 
-    const [
-      studentPartnersResponse,
-      volunteerPartnersResponse,
-    ] = await Promise.all([
-      NetworkService.adminGetVolunteerPartners(),
-      NetworkService.adminGetStudentPartners(),
-    ])
+    const [studentPartnersResponse, volunteerPartnersResponse] =
+      await Promise.all([
+        NetworkService.adminGetVolunteerPartners(),
+        NetworkService.adminGetStudentPartners(),
+      ])
 
     const {
       data: { partnerOrgs: studentPartnerOrgs },

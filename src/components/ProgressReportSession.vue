@@ -23,9 +23,7 @@
         v-if="topConcept"
         class="progress-report__overview-top-concept progress-report__overview-graphics-stat"
       >
-        <p class="progress-report__overview-subtitle">
-          Strongest Concept
-        </p>
+        <p class="progress-report__overview-subtitle">Strongest Concept</p>
         <p class="progress-report__concepts-concept">
           {{ topConcept.name }}
         </p>
@@ -34,9 +32,7 @@
       <div
         class="progress-report__overview-practice progress-report__overview-graphics-stat"
       >
-        <p class="progress-report__overview-subtitle">
-          Concepts to Practice
-        </p>
+        <p class="progress-report__overview-subtitle">Concepts to Practice</p>
         <ol class="progress-report__overview-list">
           <li v-for="(practice, index) in practiceAreas" :key="practice.name">
             <span class="progress-report__concepts-concept" v-if="index < 5">{{
@@ -122,24 +118,26 @@ export default {
     getSummaryForFocusAreaAndInfoType(data, focusArea, infoType) {
       const summary = data.details
         .filter(
-          detail =>
+          (detail) =>
             detail.focusArea === focusArea && detail.infoType === infoType
         )
-        .map(detail => detail.content)
+        .map((detail) => detail.content)
       return summary.join('. ')
     },
     filteredConceptsWithFocusArea(focusArea) {
       const includedConceptNames = new Set()
-      const filteredConcepts = this.progressReport.concepts.filter(concept => {
-        if (
-          !includedConceptNames.has(concept.name) &&
-          concept.details.some(detail => detail.focusArea === focusArea)
-        ) {
-          includedConceptNames.add(concept.name)
-          return true
+      const filteredConcepts = this.progressReport.concepts.filter(
+        (concept) => {
+          if (
+            !includedConceptNames.has(concept.name) &&
+            concept.details.some((detail) => detail.focusArea === focusArea)
+          ) {
+            includedConceptNames.add(concept.name)
+            return true
+          }
+          return false
         }
-        return false
-      })
+      )
       filteredConcepts.sort((a, b) => b.grade - a.grade)
       return filteredConcepts
     },

@@ -38,8 +38,8 @@ Quill.register('modules/cursors', QuillCursors)
 Quill.register('modules/image', ImageCompressor)
 const Delta = Quill.import('delta')
 
-const encode = array => array.toString()
-const decode = str => Uint8Array.from(str.split(',').map(Number))
+const encode = (array) => array.toString()
+const decode = (str) => Uint8Array.from(str.split(',').map(Number))
 
 export default {
   components: {
@@ -59,8 +59,8 @@ export default {
   },
   computed: {
     ...mapState({
-      currentSession: state => state.user.session,
-      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
+      currentSession: (state) => state.user.session,
+      isSessionConnectionAlive: (state) => state.user.isSessionConnectionAlive,
     }),
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',

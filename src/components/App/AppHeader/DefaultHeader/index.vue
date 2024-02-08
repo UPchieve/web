@@ -11,8 +11,8 @@
         <activity-dot
           v-if="
             unreadProgressReportOverviewSubjects.length > 0 &&
-              isProgressReportsActive &&
-              !user.isVolunteer
+            isProgressReportsActive &&
+            !user.isVolunteer
           "
           :total="unreadProgressReportOverviewSubjects.length"
           class="DefaultHeader-menu-notification"
@@ -42,8 +42,8 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      unreadProgressReportOverviewSubjects: state =>
+      user: (state) => state.user.user,
+      unreadProgressReportOverviewSubjects: (state) =>
         state.user.unreadProgressReportOverviewSubjects,
     }),
     ...mapGetters({

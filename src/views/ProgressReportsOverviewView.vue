@@ -3,9 +3,7 @@
     <section>
       <div class="progress-reports__header">
         <div class="progress-reports__header-container">
-          <h1 class="progress-reports__header-title">
-            Your Progress
-          </h1>
+          <h1 class="progress-reports__header-title">Your Progress</h1>
           <div class="progress-reports__header-information">
             <information-icon
               v-if="!summaries.length || !hasPageError"
@@ -103,9 +101,7 @@
             v-if="topConcept"
             class="progress-reports__overview-top-concept progress-reports__overview-graphics-stat"
           >
-            <p class="progress-reports__overview-subtitle">
-              Strongest Concept
-            </p>
+            <p class="progress-reports__overview-subtitle">Strongest Concept</p>
             <p class="progress-reports__overview-content--big">
               {{ topConcept.name }}
             </p>
@@ -355,8 +351,8 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      subjects: state => state.subjects.subjects,
+      user: (state) => state.user.user,
+      subjects: (state) => state.subjects.subjects,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -468,10 +464,10 @@ export default {
     filteredConceptsToFocusArea(focusArea) {
       const includedConceptNames = new Set()
       const filteredConcepts = this.latestProgressReport.concepts.filter(
-        concept => {
+        (concept) => {
           if (
             !includedConceptNames.has(concept.name) &&
-            concept.details.some(detail => detail.focusArea === focusArea)
+            concept.details.some((detail) => detail.focusArea === focusArea)
           ) {
             includedConceptNames.add(concept.name)
             return true
@@ -513,8 +509,8 @@ export default {
     },
     async sendReadReceiptsToUnreadReports() {
       const reportIds = this.summaries
-        .filter(summary => !summary.reportReadAt)
-        .map(summary => summary.reportId)
+        .filter((summary) => !summary.reportReadAt)
+        .map((summary) => summary.reportId)
 
       this.$store.dispatch('user/updateProgressReportsReadStatus', reportIds)
     },
@@ -537,16 +533,13 @@ export default {
       const months = []
       for (let i = 2; i >= -1; i--) {
         months.push(
-          currentDate
-            .clone()
-            .subtract(i, 'months')
-            .format('MMMM YYYY')
+          currentDate.clone().subtract(i, 'months').format('MMMM YYYY')
         )
       }
 
       const labels = months
       const mobileMode = this.mobileMode
-      const dataset = sortedData.map(entry => ({
+      const dataset = sortedData.map((entry) => ({
         x: moment(entry.createdAt).local(),
         y: entry.overallGrade,
         label: this.gradeLabel(entry.overallGrade),
@@ -586,7 +579,7 @@ export default {
               ticks: {
                 padding: 20,
                 // Show all labels on the Y-axis
-                callback: function(value) {
+                callback: function (value) {
                   // Display the label for the range starting at this value
                   return gradeRanges[value] || ''
                 },

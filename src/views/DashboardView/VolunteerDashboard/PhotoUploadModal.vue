@@ -6,9 +6,7 @@
         <cross-icon class="upc-modal-close-icon" @click="closeModal" />
       </header>
       <div v-if="user.photoIdStatus === 'SUBMITTED'">
-        <p class="subtitle">
-          Your photo ID is under review.
-        </p>
+        <p class="subtitle">Your photo ID is under review.</p>
       </div>
       <div v-else>
         <p class="subtitle">
@@ -75,7 +73,7 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
+      user: (state) => state.user.user,
     }),
     ...mapGetters({ mobileMode: 'app/mobileMode' }),
   },
@@ -104,7 +102,7 @@ export default {
         return
       }
       this.error = ''
-      NetworkService.getPhotoUploadUrl().then(res => {
+      NetworkService.getPhotoUploadUrl().then((res) => {
         const { uploadUrl } = res.data
         if (uploadUrl) {
           axios.put(uploadUrl, this.file, {

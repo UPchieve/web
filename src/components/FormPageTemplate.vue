@@ -32,10 +32,8 @@
     </div>
     <div v-if="!showNewDesign" class="background-img"></div>
     <div v-else class="bg-fixed-container">
-      <div class="bg-fixed  uc-column items-center justify-end">
-        <h1 class="header">
-          Chat with an online college coach for free!
-        </h1>
+      <div class="bg-fixed uc-column items-center justify-end">
+        <h1 class="header">Chat with an online college coach for free!</h1>
         <div class="image-container">
           <chat-mobile class="w-full h-full" />
         </div>

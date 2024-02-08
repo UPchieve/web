@@ -78,8 +78,8 @@ export default {
 
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      windowWidth: state => state.app.windowWidth,
+      user: (state) => state.user.user,
+      windowWidth: (state) => state.app.windowWidth,
     }),
     isSmallDevice() {
       const largeScreenBreakpoint = 992
@@ -95,7 +95,7 @@ export default {
   methods: {
     isComplete(cert) {
       if (this.dropDownType === 'computed')
-        return cert.subjectsIncluded.every(subject =>
+        return cert.subjectsIncluded.every((subject) =>
           this.user.subjects.includes(subject.key)
         )
       else return this.user.subjects.includes(cert.key)

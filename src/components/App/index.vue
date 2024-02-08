@@ -200,17 +200,17 @@ export default {
   },
   computed: {
     ...mapState({
-      showHeader: state => state.app.header.isShown,
-      showSidebar: state => state.app.sidebar.isShown,
-      showModal: state => state.app.modal.isShown,
-      showBanner: state => state.app.banner.isShown,
-      bannerComponent: state => state.app.banner.component,
-      isMobileApp: state => state.app.isMobileApp,
-      isWebPageHidden: state => state.app.isWebPageHidden,
-      user: state => state.user.user,
-      session: state => state.user.session,
-      subjects: state => state.subjects.subjects,
-      requestedProgressReportOverview: state =>
+      showHeader: (state) => state.app.header.isShown,
+      showSidebar: (state) => state.app.sidebar.isShown,
+      showModal: (state) => state.app.modal.isShown,
+      showBanner: (state) => state.app.banner.isShown,
+      bannerComponent: (state) => state.app.banner.component,
+      isMobileApp: (state) => state.app.isMobileApp,
+      isWebPageHidden: (state) => state.app.isWebPageHidden,
+      user: (state) => state.user.user,
+      session: (state) => state.user.session,
+      subjects: (state) => state.subjects.subjects,
+      requestedProgressReportOverview: (state) =>
         state.user.requestedProgressReportOverview,
     }),
     ...mapGetters({

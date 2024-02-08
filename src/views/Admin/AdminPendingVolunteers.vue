@@ -31,7 +31,7 @@ import NetworkService from '@/services/NetworkService'
 import PendingVolunteerListItem from '@/components/Admin/PendingVolunteerListItem.vue'
 import PageControl from '@/components/Admin/PageControl.vue'
 
-const getVolunteersToReview = async page => {
+const getVolunteersToReview = async (page) => {
   const {
     data: { volunteers, isLastPage },
   } = await NetworkService.adminGetVolunteersToReview(page)

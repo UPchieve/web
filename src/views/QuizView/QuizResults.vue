@@ -101,8 +101,8 @@ export default {
       this.instructionMsg = this.isFirstQuiz
         ? `Once you finish setting up your account on your dashboard, you'll be notified of student requests for help in this subject. If you want to help students with even more subjects, just pass more quizzes located in the "Training" tab.`
         : isTrainingSubject
-        ? "Now that you have this certification, you're one step closer to being able to help students!"
-        : "Now that you have this certification, you'll be notified of student requests for help in this subject. If you want to help students with even more subjects, just pass more quizzes!"
+          ? "Now that you have this certification, you're one step closer to being able to help students!"
+          : "Now that you have this certification, you'll be notified of student requests for help in this subject. If you want to help students with even more subjects, just pass more quizzes!"
       this.leftBtn = { text: 'Review answers', handleClick: this.showReview }
       this.rightBtn = {
         text: 'Take another quiz',
@@ -139,9 +139,9 @@ export default {
   },
   computed: {
     ...mapState({
-      subjects: state => state.subjects.subjects,
-      training: state => state.subjects.training,
-      user: state => state.user.user,
+      subjects: (state) => state.subjects.subjects,
+      training: (state) => state.subjects.training,
+      user: (state) => state.user.user,
     }),
   },
 }

@@ -7,7 +7,7 @@
     <h2 class="ReferralModal-subtitle">
       {{
         modalData.subcopy ||
-          'Sharing is caring! Your friends can create their very own UPchieve account using the link below.'
+        'Sharing is caring! Your friends can create their very own UPchieve account using the link below.'
       }}
     </h2>
 

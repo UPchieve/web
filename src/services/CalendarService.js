@@ -9,7 +9,7 @@ export default {
 
   getWaitTimes() {
     return NetworkService.getWaitTimes()
-      .then(response => response.data.heatMap)
+      .then((response) => response.data.heatMap)
       .catch(() => ({
         /* return empty waittimes object */
       }))

@@ -25,7 +25,7 @@
                 <span
                   v-if="
                     response.displayImage &&
-                      showImageWithResponse(response.displayLabel)
+                    showImageWithResponse(response.displayLabel)
                   "
                 >
                   <img
@@ -78,7 +78,7 @@ export default {
   },
   computed: {
     ...mapState({
-      session: state => state.user.session,
+      session: (state) => state.user.session,
     }),
     isNewStudent() {
       return this.totalStudentSessions < 3
@@ -100,7 +100,7 @@ export default {
      */
     getLowConfidenceResponseIfExists() {
       return this.responses.find(
-        response =>
+        (response) =>
           response.displayLabel.startsWith('How they feel about') &&
           response.score <= LOW_CONFIDENCE_THRESHOLD
       )

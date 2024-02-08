@@ -76,7 +76,7 @@ class AnalyticsService {
     }
     // adds to volunteer score
     if (feedbackComponent.userType === 'student') {
-      volunteerScore = aggResponses.reduce(function(acc, val) {
+      volunteerScore = aggResponses.reduce(function (acc, val) {
         return acc + val
       }, 0)
     }

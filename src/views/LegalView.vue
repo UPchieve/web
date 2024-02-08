@@ -406,9 +406,7 @@
               Contact you about your account, including, but not limited to,
               changes to the Terms of Service or UPchieve's Services
             </li>
-            <li>
-              Ask you for your feedback to help make our Services better
-            </li>
+            <li>Ask you for your feedback to help make our Services better</li>
             <li>Respond to your requests for information or assistance</li>
             <li>
               Consolidate anonymized information about Users in order to apply
@@ -515,9 +513,7 @@
               Services, and how long your interactions with other Users last.
             </li>
             <li>
-              <strong>
-                Information we collect automatically.
-              </strong>
+              <strong> Information we collect automatically. </strong>
               When you use our Site, we also collect information and analytics
               about how you interact with our Site through technologies like
               cookies.
@@ -665,9 +661,7 @@
         <accordion-item label="Cookies">
           <ul>
             <li>
-              <strong>
-                What a cookie is:
-              </strong>
+              <strong> What a cookie is: </strong>
               <p>
                 A Cookie is a small file that can be placed on your device that
                 allows us to recognize and remember you. It is sent to your

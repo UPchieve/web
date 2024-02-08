@@ -11,14 +11,14 @@ export default {
     return NetworkService.checkIfMessageIsClean({
       content: data,
     }).then(
-      res => {
+      (res) => {
         if ('err' in res.data) {
           return _errHandler(res.data)
         } else {
           return res.data.isClean
         }
       },
-      err => {
+      (err) => {
         return _errHandler(err)
       }
     )

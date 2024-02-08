@@ -12,9 +12,7 @@ class LoggerService {
       Sentry.init({
         // Our Sentry project is configured to only accept calls from app.upchieve.org
         dsn: config.sentryDsn,
-        integrations: [
-          new IVue({ Vue, attachProps: true, logErrors: true }),
-        ],
+        integrations: [new IVue({ Vue, attachProps: true, logErrors: true })],
         environment: config.sentryEnv,
         release: `uc-web@${config.version}`,
         // This error gets sent to Sentry when a session with a document editor

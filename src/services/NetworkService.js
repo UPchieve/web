@@ -29,7 +29,7 @@ async function getRecaptchaToken(action) {
   return new Promise((resolve, reject) => {
     grecaptcha.ready(() => {
       grecaptcha.execute(config.googleRecaptchaKey, { action }).then(
-        token => resolve(token),
+        (token) => resolve(token),
         () => reject()
       )
     })
@@ -62,13 +62,14 @@ export default {
   },
   _faultTolerantHttp(method, onRetry, url, data) {
     const promiseToRetry = () => {
-      return (['get', 'delete', 'head', 'jsonp'].indexOf(method) !== -1
-        ? axiosInstance[method](url, {
-            timeout: FAULT_TOLERANT_HTTP_TIMEOUT,
-          })
-        : axiosInstance[method](url, data, {
-            timeout: FAULT_TOLERANT_HTTP_TIMEOUT,
-          })
+      return (
+        ['get', 'delete', 'head', 'jsonp'].indexOf(method) !== -1
+          ? axiosInstance[method](url, {
+              timeout: FAULT_TOLERANT_HTTP_TIMEOUT,
+            })
+          : axiosInstance[method](url, data, {
+              timeout: FAULT_TOLERANT_HTTP_TIMEOUT,
+            })
       ).then(this._successHandler, this._errorHandler)
     }
 
@@ -76,13 +77,13 @@ export default {
     const requestState = { isAborted: false }
 
     return promiseRetry(
-      retry => {
+      (retry) => {
         if (requestState.isAborted) {
           // early exit
           throw errcode(new Error('Aborted by user'), 'EUSERABORTED')
         }
 
-        return promiseToRetry().catch(res => {
+        return promiseToRetry().catch((res) => {
           if (res.status === 0) {
             if (onRetry) {
               onRetry(res, () => {

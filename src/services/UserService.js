@@ -4,7 +4,7 @@ import NetworkService from './NetworkService'
 
 export default {
   getUser() {
-    return AuthService.getAuth().then(auth => {
+    return AuthService.getAuth().then((auth) => {
       if (auth.authenticated) {
         return auth.user
       }
@@ -29,7 +29,7 @@ export default {
   },
 
   getVolunteers() {
-    return NetworkService.getVolunteers().then(res => {
+    return NetworkService.getVolunteers().then((res) => {
       if (res.data.err) {
         return res.data.err
       } else if (res.data.volunteers) {
@@ -41,7 +41,7 @@ export default {
   },
   getVolunteersAvailability(certifiedSubject) {
     return NetworkService.getVolunteersAvailability(certifiedSubject).then(
-      res => {
+      (res) => {
         if (res.data.err) {
           return res.data.err
         } else if (res.data.aggAvailabilities) {

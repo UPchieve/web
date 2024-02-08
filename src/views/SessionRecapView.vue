@@ -213,8 +213,8 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      recapSession: state => state.user.recapSession,
+      user: (state) => state.user.user,
+      recapSession: (state) => state.user.recapSession,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -387,17 +387,17 @@ export default {
     },
   },
   sockets: {
-    redirect: function(error) {
+    redirect: function (error) {
       LoggerService.noticeError(
         error ??
           `Redirected from recap of session ${this.session.id} to the dashboard`
       )
       this.$router.push('/')
     },
-    'sessions/recap:joined': function() {
+    'sessions/recap:joined': function () {
       this.socketJoinedRoom = true
     },
-    'sessions/recap:join-failed': function(error) {
+    'sessions/recap:join-failed': function (error) {
       this.socketJoinedRoom = false
       LoggerService.noticeError(error)
       // Retry joining the room after 3 seconds

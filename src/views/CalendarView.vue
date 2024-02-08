@@ -55,7 +55,7 @@
 <script>
 import { mapState } from 'vuex'
 
-import {isEmpty, isEqual} from 'lodash-es'
+import { isEmpty, isEqual } from 'lodash-es'
 import moment from 'moment-timezone'
 
 import AvailabilityGrid from '@/components/AvailabilityGrid/index.vue'
@@ -86,7 +86,7 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
+      user: (state) => state.user.user,
     }),
     saveButtonClass() {
       return ['save-button', 'save-button--' + this.saveState]
@@ -285,7 +285,7 @@ export default {
         this,
         this.convertAvailability(this.availability, offset),
         this.selectedTz
-      ).then(response => {
+      ).then((response) => {
         if (response.status == 200) {
           this.saveState = saveStates.SAVED
           AnalyticsService.captureEvent(EVENTS.AVAILABILITY_UPDATED, {

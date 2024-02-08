@@ -11,9 +11,9 @@ export default function exportToCsv(filename, rows) {
     keys.join(separator) +
     '\n' +
     rows
-      .map(row => {
+      .map((row) => {
         return keys
-          .map(k => {
+          .map((k) => {
             let cell
             if (row instanceof Map)
               cell =

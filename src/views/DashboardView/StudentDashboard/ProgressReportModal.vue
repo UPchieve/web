@@ -50,7 +50,7 @@
         <footer class="prm__footer">
           <div class="prm__buttons">
             <large-button
-              class="prm__buttons-button  prm__buttons-button--primary"
+              class="prm__buttons-button prm__buttons-button--primary"
               @click.native="handleSessionRequest"
               :showArrow="false"
               primary
@@ -64,9 +64,7 @@
         <header>
           <mobile-banner-image v-if="mobileMode" class="prm-banner" />
           <desktop-banner-image v-else class="prm-banner" />
-          <h1 class="prm__title">
-            It's taking longer than usual
-          </h1>
+          <h1 class="prm__title">It's taking longer than usual</h1>
         </header>
         <section class="prm__section prm__section--center">
           <p class="prm__body">
@@ -99,9 +97,7 @@
         <header>
           <mobile-banner-image v-if="mobileMode" class="prm-banner" />
           <desktop-banner-image v-else class="prm-banner" />
-          <h1 class="prm__title">
-            Want to see how you are doing in Reading?
-          </h1>
+          <h1 class="prm__title">Want to see how you are doing in Reading?</h1>
           <p class="prm__body">
             UPbot can now analyze what you've learned with your coach and will
             generate a report on what you're doing well and what you can improve
@@ -143,9 +139,7 @@
           <div class="prm__section-bot">
             <upbot v-if="!mobileMode" class="upbot--medium" />
             <div class="prm__overview--strength">
-              <p>
-                Great job on finishing your reading session!
-              </p>
+              <p>Great job on finishing your reading session!</p>
               <p v-if="filteredConceptsToFocusArea('strength').length">
                 You did a phenomenal job on tackling
                 {{ filteredConceptsToFocusArea('strength')[0].name }}!
@@ -264,10 +258,10 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      requestedProgressReportOverview: state =>
+      user: (state) => state.user.user,
+      requestedProgressReportOverview: (state) =>
         state.user.requestedProgressReportOverview,
-      latestSession: state => state.user.latestSession,
+      latestSession: (state) => state.user.latestSession,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -359,10 +353,10 @@ export default {
     },
     filteredConceptsToFocusArea(focusArea) {
       const includedConceptNames = new Set()
-      return this.concepts.filter(concept => {
+      return this.concepts.filter((concept) => {
         if (
           !includedConceptNames.has(concept.name) &&
-          concept.details.some(detail => detail.focusArea === focusArea)
+          concept.details.some((detail) => detail.focusArea === focusArea)
         ) {
           includedConceptNames.add(concept.name)
           return true
@@ -371,7 +365,7 @@ export default {
       })
     },
     filteredFocusAreasToInfoType(concept, infoType) {
-      return concept.details.filter(detail => detail.infoType === infoType)
+      return concept.details.filter((detail) => detail.infoType === infoType)
     },
     gradeLabel(grade) {
       return gradeLabel(grade)

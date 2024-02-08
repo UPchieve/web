@@ -10,9 +10,7 @@
       us achieve our mission by referring your friends to UPchieve! Here’s how:
     </p>
 
-    <h2 class="refer-friends__instructions">
-      Instructions:
-    </h2>
+    <h2 class="refer-friends__instructions">Instructions:</h2>
 
     <p class="refer-friends__text--strong">
       Step 1: Copy your unique sign-up link

@@ -8,9 +8,7 @@
         <div class="logo-background">
           <app-store-logo class="mobile-app-store-logo" />
         </div>
-        <span class="mobile-app-store-title">
-          UPchieve App
-        </span>
+        <span class="mobile-app-store-title"> UPchieve App </span>
       </div>
       <a :href="mobileAppStoreLink" class="mobile-app-store-link">Visit</a>
     </div>

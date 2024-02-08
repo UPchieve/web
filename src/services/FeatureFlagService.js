@@ -51,7 +51,7 @@ class FeatureFlagService {
     featureFlags = FLAG_DEFAULTS,
     featureFlagPayloads = FLAG_PAYLOAD_DEFAULTS
   ) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       posthog.init(config.posthogToken, {
         api_host: 'https://p.upchieve.org',
         persistence: 'localStorage+cookie',
@@ -64,7 +64,7 @@ class FeatureFlagService {
           featureFlags,
           featureFlagPayloads,
         },
-        on_xhr_error: req => {
+        on_xhr_error: (req) => {
           LoggerService.noticeError(
             new Error(
               `PostHog - Bad HTTP status: ${req?.status} ${req?.statusText}`

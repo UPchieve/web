@@ -155,8 +155,8 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      session: state => state.user.session,
+      user: (state) => state.user.user,
+      session: (state) => state.user.session,
     }),
     ...mapGetters({
       sessionPartner: 'user/sessionPartner',
@@ -260,7 +260,7 @@ export default {
     },
     getMessagesAfterVolunteerJoined() {
       return this.session.messages.filter(
-        message =>
+        (message) =>
           new Date(message.createdAt).getTime() >=
           new Date(this.session.volunteerJoinedAt).getTime()
       )

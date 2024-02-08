@@ -54,8 +54,8 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      isWebPageHidden: state => state.app.isWebPageHidden,
+      user: (state) => state.user.user,
+      isWebPageHidden: (state) => state.app.isWebPageHidden,
       sortedOpenSessions() {
         // sorts the sessions by createdAt, with oldest sessions coming first
         return this.openSessions.slice().sort((first, second) => {
@@ -91,7 +91,7 @@ export default {
       let isAcknowledged = false
       let timeoutId
 
-      this.$socket.emit('list', null, response => {
+      this.$socket.emit('list', null, (response) => {
         if (response.status === 200) {
           isAcknowledged = true
           clearTimeout(timeoutId)
@@ -164,7 +164,7 @@ export default {
         this.startWaitTimeRefresh()
 
       const results = []
-      const socketSessions = sessions.filter(session => !session.volunteer)
+      const socketSessions = sessions.filter((session) => !session.volunteer)
 
       for (let i = 0; i < socketSessions.length; i++) {
         const session = socketSessions[i]

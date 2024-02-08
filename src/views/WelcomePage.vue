@@ -6,16 +6,12 @@
           <h1 class="welcome-page-title">Hi, {{ user.firstname }} 👋</h1>
         </div>
         <div>
-          <p class="welcome-page-description">
-            We're so glad you're here!
-          </p>
+          <p class="welcome-page-description">We're so glad you're here!</p>
           <p class="welcome-page-description">
             Let's get certified to tutor! Pass a short quiz in your favorite
             subject.
           </p>
-          <p class="welcome-page-description">
-            (Unlimited attempts! 😊)
-          </p>
+          <p class="welcome-page-description">(Unlimited attempts! 😊)</p>
           <div class="welcome-page-topic-grid">
             <topic-chip
               v-for="(card, index) in topicCards"
@@ -55,9 +51,9 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      subjects: state => state.subjects.subjects,
-      training: state => state.subjects.training,
+      user: (state) => state.user.user,
+      subjects: (state) => state.subjects.subjects,
+      training: (state) => state.subjects.training,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -78,7 +74,7 @@ export default {
 
   methods: {
     handleTopicClick(topicName) {
-      const topicCard = this.topicCards.find(card => card.topic === topicName)
+      const topicCard = this.topicCards.find((card) => card.topic === topicName)
       this.$store.dispatch('app/modal/show', {
         component: 'SubjectSelectionModal',
         data: {

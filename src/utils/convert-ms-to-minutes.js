@@ -1,4 +1,4 @@
-const convertMsToMinutes = time => {
+const convertMsToMinutes = (time) => {
   return time / 60000
 }
 

@@ -242,8 +242,8 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      isFirstDashboardVisit: state => state.user.isFirstDashboardVisit,
+      user: (state) => state.user.user,
+      isFirstDashboardVisit: (state) => state.user.isFirstDashboardVisit,
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
@@ -258,7 +258,7 @@ export default {
 
     isCustomVolunteerPartner() {
       return config.customVolunteerPartnerOrgs.some(
-        org => org === this.user.volunteerPartnerOrg
+        (org) => org === this.user.volunteerPartnerOrg
       )
     },
 

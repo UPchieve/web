@@ -230,12 +230,8 @@
   >
     <verification-badge />
     <h1 class="uc-form-header center">Woohoo, you're eligible!</h1>
-    <p class="uc-form-text center">
-      Finish setting up your free account
-    </p>
-    <button class="uc-form-button" @click="accountPage">
-      Continue
-    </button>
+    <p class="uc-form-text center">Finish setting up your free account</p>
+    <button class="uc-form-button" @click="accountPage">Continue</button>
   </div>
 
   <div
@@ -457,8 +453,8 @@
         class="uc-form-button"
         :disabled="
           isSubmittingAccountForm ||
-            cannotSubmitForm(v$.profile) ||
-            cannotSubmitForm(v$.credentials)
+          cannotSubmitForm(v$.profile) ||
+          cannotSubmitForm(v$.credentials)
         "
         type="submit"
       >
@@ -703,14 +699,14 @@ export default {
     },
   },
   watch: {
-    'eligibility.email': function(currentValue, oldValue) {
+    'eligibility.email': function (currentValue, oldValue) {
       if (currentValue && !oldValue) {
         if (!this.hasEnteredEmail)
           AnalyticsService.captureEvent(EVENTS.STUDENT_ENTERED_EMAIL)
         this.hasEnteredEmail = true
       }
     },
-    'eligibility.zipCode': function(currentValue, oldValue) {
+    'eligibility.zipCode': function (currentValue, oldValue) {
       if (currentValue && !oldValue) {
         if (!this.hasEnteredZipCode)
           AnalyticsService.captureEvent(EVENTS.STUDENT_ENTERED_ZIP_CODE)
@@ -830,7 +826,7 @@ export default {
         referredByCode: window.localStorage.getItem('upcReferredByCode'),
         currentGrade: this.trimCurrentGrade,
       })
-        .then(async response => {
+        .then(async (response) => {
           const isEligible = response.data.isEligible
           if (isEligible) {
             AnalyticsService.captureEvent(EVENTS.ELIGIBILITY_ELIGIBLE, {
@@ -851,7 +847,7 @@ export default {
           const isDomesticIpAddress = await this.isDomesticIpAddress()
           if (!isDomesticIpAddress) return this.internationalPage()
         })
-        .catch(res => {
+        .catch((res) => {
           const error =
             (res.body && (res.body.err || res.body.message)) ||
             'Unknown server error'
@@ -874,7 +870,7 @@ export default {
     autocompleteSchool(input) {
       this.eligibility.highSchool = {}
 
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         if (input.length < 3) {
           return resolve([])
         }
@@ -888,8 +884,8 @@ export default {
         }
 
         NetworkService.searchSchool({ query: input })
-          .then(response => response.data.results)
-          .then(schools => {
+          .then((response) => response.data.results)
+          .then((schools) => {
             schools.push(cantFindSchoolItem)
             resolve(schools)
           })
@@ -981,7 +977,7 @@ export default {
       return !!el.$errors.length || !!el.$silentErrors.length
     },
     getFormValidationError(el) {
-      return el.$errors.map(e => e.$message).join(', ')
+      return el.$errors.map((e) => e.$message).join(', ')
     },
   },
 }

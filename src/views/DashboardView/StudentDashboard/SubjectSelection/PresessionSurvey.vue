@@ -33,7 +33,7 @@
                 :responseId="response.responseId"
                 :isSelected="
                   userResponse[currentQuestion.questionId].responseId ===
-                    response.responseId
+                  response.responseId
                 "
                 @survey-image-click="updateUserResponse"
               />
@@ -49,14 +49,14 @@
                 :name="currentQuestion.questionId"
                 :checked="
                   userResponse[currentQuestion.questionId].responseId ===
-                    response.responseId
+                  response.responseId
                 "
                 :questionId="currentQuestion.questionId"
                 :responseId="response.responseId"
                 :label="response.responseText"
                 :isOpenResponseDisabled="
                   userResponse[currentQuestion.questionId].responseId !==
-                    response.responseId
+                  response.responseId
                 "
                 :openResponseValue="
                   userResponse[currentQuestion.questionId].openResponse
@@ -162,7 +162,7 @@ export default {
 
         // check if a response that should have an open response was entered
         const response = question.responses.find(
-          response => response.responseText === 'Other'
+          (response) => response.responseText === 'Other'
         )
         if (
           response &&
@@ -179,7 +179,7 @@ export default {
     },
     // checks if the current question has a row of responses that require to show a display image
     isRowOfImages() {
-      return this.currentQuestion.responses.every(a => a.responseDisplayImage)
+      return this.currentQuestion.responses.every((a) => a.responseDisplayImage)
     },
     questionTypes() {
       return QUESTION_TYPES

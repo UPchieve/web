@@ -17,7 +17,7 @@ export default {
       return Promise.reject('Invalid login form submission')
     }
 
-    return NetworkService.login(creds).then(res => {
+    return NetworkService.login(creds).then((res) => {
       const data = { ...res.data }
       if (!data) {
         throw new Error('No user returned from auth service')
@@ -29,28 +29,28 @@ export default {
 
   registerOpenVolunteer(signupData) {
     return NetworkService.registerOpenVolunteer(signupData)
-      .then(res => {
+      .then((res) => {
         const data = { ...res.data }
         if (!data) {
           throw new Error('No user returned from auth service')
         }
         AnalyticsService.registerVolunteer(data.user)
       })
-      .catch(res => {
+      .catch((res) => {
         throw errorFromHttpResponse(res)
       })
   },
 
   registerPartnerVolunteer(signupData) {
     return NetworkService.registerPartnerVolunteer(signupData)
-      .then(res => {
+      .then((res) => {
         const data = { ...res.data }
         if (!data) {
           throw new Error('No user returned from auth service')
         }
         AnalyticsService.registerVolunteer(data.user)
       })
-      .catch(res => {
+      .catch((res) => {
         throw errorFromHttpResponse(res)
       })
   },
@@ -65,39 +65,39 @@ export default {
 
   registerOpenStudent(signupData) {
     return NetworkService.registerOpenStudent(signupData)
-      .then(res => {
+      .then((res) => {
         const data = { ...res.data }
         if (!data) {
           throw new Error('No user returned from auth service')
         }
       })
-      .catch(res => {
+      .catch((res) => {
         throw errorFromHttpResponse(res)
       })
   },
 
   registerPartnerStudent(signupData) {
     return NetworkService.registerPartnerStudent(signupData)
-      .then(res => {
+      .then((res) => {
         const data = { ...res.data }
         if (!data) {
           throw new Error('No user returned from auth service')
         }
       })
-      .catch(res => {
+      .catch((res) => {
         throw errorFromHttpResponse(res)
       })
   },
 
   checkRegister(creds) {
-    return NetworkService.checkRegister(creds).catch(res => {
+    return NetworkService.checkRegister(creds).catch((res) => {
       throw errorFromHttpResponse(res)
     })
   },
 
   sendReset(context, email, redirect) {
     return NetworkService.sendReset({ email })
-      .then(res => {
+      .then((res) => {
         const data = { ...res.data }
         if (res.status !== 200) {
           throw new Error(data.err)
@@ -111,14 +111,14 @@ export default {
           }, 2000)
         }
       })
-      .catch(res => {
+      .catch((res) => {
         throw errorFromHttpResponse(res)
       })
   },
 
   confirmReset(context, credentials, redirect) {
     return NetworkService.confirmReset(credentials)
-      .then(res => {
+      .then((res) => {
         const data = { ...res.data }
         if (!data) {
           throw new Error('No user returned from auth service')
@@ -132,19 +132,19 @@ export default {
           }, 2000)
         }
       })
-      .catch(res => {
+      .catch((res) => {
         throw errorFromHttpResponse(res)
       })
   },
 
   initiateVerification(data) {
-    return NetworkService.sendVerification(data).catch(err => {
+    return NetworkService.sendVerification(data).catch((err) => {
       throw errorFromHttpResponse(err)
     })
   },
 
   confirmVerification(data) {
-    return NetworkService.confirmVerification(data).catch(err => {
+    return NetworkService.confirmVerification(data).catch((err) => {
       throw errorFromHttpResponse(err)
     })
   },
@@ -173,7 +173,7 @@ export default {
 
   getAuth() {
     return NetworkService.user()
-      .then(res => {
+      .then((res) => {
         const data = { ...res.data }
         if (!data) {
           throw new Error('No user returned from auth service')
@@ -193,7 +193,7 @@ export default {
           }
         }
       })
-      .catch(err => {
+      .catch((err) => {
         return {
           authenticated: false,
           user: null,

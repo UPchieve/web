@@ -294,9 +294,9 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      subjects: state => state.subjects.subjects,
-      isFetchingSubjects: state => state.subjects.isFetchingSubjects,
+      user: (state) => state.user.user,
+      subjects: (state) => state.subjects.subjects,
+      isFetchingSubjects: (state) => state.subjects.isFetchingSubjects,
     }),
     ...mapGetters({
       avatarUrl: 'user/avatarUrl',
@@ -398,7 +398,7 @@ export default {
         this.newMutedSubjectAlerts.push(subject)
       } else {
         this.newMutedSubjectAlerts = this.newMutedSubjectAlerts.filter(
-          s => s != subject
+          (s) => s != subject
         )
       }
     },
