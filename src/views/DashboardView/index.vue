@@ -16,7 +16,6 @@ export default {
   computed: {
     ...mapState({
       user: (state) => state.user.user,
-      featureFlags: (state) => state.featureFlags.flags,
     }),
     ...mapGetters({
       isAuthenticated: 'user/isAuthenticated',
@@ -26,15 +25,14 @@ export default {
         'featureFlags/isGleapSegmentExperimentsActive',
     }),
     userGleapSegments() {
-      return [this.user, this.gleapSegmentExperiments, this.featureFlags]
+      return [this.user, this.gleapSegmentExperiments]
     },
   },
   mounted() {
     if (this.isGleapSegmentExperimentsActive)
       ProductDiscoveryService.triggerDynamicGleapWidget(
         this.user,
-        this.gleapSegmentExperiments,
-        this.featureFlags
+        this.gleapSegmentExperiments
       )
   },
   watch: {
@@ -50,8 +48,7 @@ export default {
         )
           ProductDiscoveryService.triggerDynamicGleapWidget(
             this.user,
-            this.gleapSegmentExperiments,
-            this.featureFlags
+            this.gleapSegmentExperiments
           )
       },
       deep: true,

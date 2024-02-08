@@ -135,7 +135,7 @@ class DevFeatureFlagService {
   }
 
   static getFeatureFlagPayload(featureFlagKey) {
-    return FLAG_DEFAULTS[featureFlagKey]
+    return FLAG_PAYLOAD_DEFAULTS[featureFlagKey]
   }
 }
 

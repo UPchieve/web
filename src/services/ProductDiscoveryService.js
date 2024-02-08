@@ -1,5 +1,6 @@
-import LoggerService from './LoggerService'
 import AnalyticsService from './AnalyticsService'
+import LoggerService from './LoggerService'
+import FeatureFlagService from './FeatureFlagService'
 import Gleap from 'gleap'
 import { EVENTS } from '@/consts'
 const orbital = window.orbital
@@ -27,16 +28,17 @@ const GLEAP_WIDGET_CONFIGS = {
   },
 }
 
-function isValidUserForSegment(user, properties, featureFlags) {
+function isValidUserForSegment(user, properties) {
   const { minSessions, maxSessions, userType, flagFilters } = properties
-  const validFlags =
-    !flagFilters || flagFilters.some((flag) => featureFlags[flag])
+  const hasAValidFlag = flagFilters.some((flag) =>
+    FeatureFlagService.isFeatureEnabled(flag)
+  )
 
   return (
     user.pastSessions.length >= minSessions &&
     user.pastSessions.length <= maxSessions &&
     userType === user.type &&
-    validFlags
+    hasAValidFlag
   )
 }
 
@@ -59,12 +61,12 @@ export default {
     orbital('trigger', discoveryId)
   },
 
-  triggerDynamicSegment(user, segmentProperties = [], featureFlags) {
+  triggerDynamicSegment(user, segmentProperties = []) {
     if (!segmentProperties.length) return
 
     try {
       for (const properties of segmentProperties) {
-        if (isValidUserForSegment(user, properties, featureFlags)) {
+        if (isValidUserForSegment(user, properties)) {
           const { discoveryId } = properties
           orbital('trigger', discoveryId)
         }
@@ -74,12 +76,12 @@ export default {
     }
   },
 
-  triggerDynamicGleapWidget(user, segmentProperties = [], featureFlags) {
+  triggerDynamicGleapWidget(user, segmentProperties = []) {
     if (!segmentProperties.length) return
 
     try {
       for (const properties of segmentProperties) {
-        if (isValidUserForSegment(user, properties, featureFlags)) {
+        if (isValidUserForSegment(user, properties)) {
           const { botId, surveyId, articleId } = properties
           if (botId) handleGleapWidget(botId, GLEAP_WIDGET_CONFIGS.bot)
           if (surveyId) handleGleapWidget(surveyId, GLEAP_WIDGET_CONFIGS.survey)

@@ -67,8 +67,10 @@ export default {
       FeatureFlagService.getFeatureFlagPayload(
         POSTHOG_FEATURE_FLAGS.GLEAP_SEGMENT_EXPERIMENTS
       ) ?? [],
-    isGleapSegmentExperimentsActive: (_state, getters) =>
-      getters.gleapSegmentExperiments.length > 0,
+    isGleapSegmentExperimentsActive: () =>
+      FeatureFlagService.isFeatureEnabled(
+        POSTHOG_FEATURE_FLAGS.GLEAP_SEGMENT_EXPERIMENTS
+      ),
     ccIntroCopy: () =>
       FeatureFlagService.getFeatureFlag(POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY),
     isBfIntroCopyEnabled: () =>
