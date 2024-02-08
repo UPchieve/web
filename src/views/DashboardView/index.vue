@@ -15,8 +15,8 @@ export default {
   components: { VolunteerDashboard, StudentDashboard },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      featureFlags: state => state.featureFlags.flags,
+      user: (state) => state.user.user,
+      featureFlags: (state) => state.featureFlags.flags,
     }),
     ...mapGetters({
       isAuthenticated: 'user/isAuthenticated',
@@ -39,7 +39,7 @@ export default {
   },
   watch: {
     userGleapSegments: {
-      handler: function(currentValue, prevValue) {
+      handler: function (currentValue, prevValue) {
         if (
           Object.keys(currentValue[0]).length &&
           currentValue[1].length &&

@@ -50,11 +50,11 @@ export default {
   computed: {
     isCompleted() {
       return this.module.materials.every(
-        mat => mat.isCompleted || !mat.isRequired
+        (mat) => mat.isCompleted || !mat.isRequired
       )
     },
     isStarted() {
-      return this.module.materials.some(mat => mat.isCompleted)
+      return this.module.materials.some((mat) => mat.isCompleted)
     },
     statusClass() {
       if (this.isCompleted) return 'module--completed'

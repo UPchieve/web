@@ -29,7 +29,7 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
+      user: (state) => state.user.user,
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',

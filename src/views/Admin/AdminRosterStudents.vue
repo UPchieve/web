@@ -158,11 +158,10 @@ export default {
       formData.append('partnerSite', this.partnerSite)
 
       try {
-        const { data } = await NetworkService.adminUploadRosterStudents(
-          formData
-        )
+        const { data } =
+          await NetworkService.adminUploadRosterStudents(formData)
         if (data.failedUsers.length) {
-          const failedEmails = data.failedUsers.map(u => u.email).join(', ')
+          const failedEmails = data.failedUsers.map((u) => u.email).join(', ')
           this.msg = `The following users failed to be created: ${failedEmails}`
           this.isWarning = true
         } else {

@@ -157,7 +157,7 @@ export default {
       return VERIFICATION_METHOD
     },
     ...mapState({
-      user: state => state.user.user,
+      user: (state) => state.user.user,
     }),
     isValidVerificationCode() {
       return !(

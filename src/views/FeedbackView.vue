@@ -74,7 +74,7 @@
                     :responseId="response.responseId"
                     :isSelected="
                       userResponse[questionInfo.questionId].responseId ===
-                        response.responseId
+                      response.responseId
                     "
                     @survey-image-click="updateUserResponse"
                   />
@@ -86,9 +86,9 @@
                     :responseId="response.responseId"
                     :isSelected="
                       userResponse[questionInfo.questionId].responseId &&
-                        !!userResponse[questionInfo.questionId].responseId.find(
-                          r => r === response.responseId
-                        )
+                      !!userResponse[questionInfo.questionId].responseId.find(
+                        (r) => r === response.responseId
+                      )
                     "
                     @chip-click="updateUserResponseMultiselect"
                     class="issue-reason-chip"
@@ -119,7 +119,7 @@
                     :name="questionInfo.questionId"
                     :checked="
                       userResponse[questionInfo.questionId].responseId ===
-                        response.responseId
+                      response.responseId
                     "
                     :questionId="questionInfo.questionId"
                     :responseId="response.responseId"
@@ -134,7 +134,7 @@
                       'question__response-boxed-selected':
                         userResponse[questionInfo.questionId].responseId &&
                         userResponse[questionInfo.questionId].responseId.find(
-                          r => r === response.responseId
+                          (r) => r === response.responseId
                         ),
                     }"
                     :key="`${response.responseId}-checkbox`"
@@ -143,7 +143,7 @@
                     :name="questionInfo.questionId"
                     :checked="
                       userResponse[questionInfo.questionId].responseId ===
-                        response.responseId
+                      response.responseId
                     "
                     :questionId="questionInfo.questionId"
                     :responseId="response.responseId"
@@ -161,7 +161,7 @@
                     :responseId="response.responseId"
                     :isSelected="
                       userResponse[questionInfo.questionId].responseId ===
-                        response.responseId
+                      response.responseId
                     "
                     @survey-rate-click="updateUserResponse"
                   />
@@ -180,7 +180,7 @@
                     <feedback-textarea
                       :id="`${questionInfo.questionId}_${response.responseId}`"
                       @change="
-                        responseText =>
+                        (responseText) =>
                           updateUserResponse(
                             questionInfo.questionId,
                             response.responseId,
@@ -196,7 +196,7 @@
                 class="response-answer-text"
                 v-if="
                   questionInfo.questionType === 'star' &&
-                    userResponse[questionInfo.questionId].responseId
+                  userResponse[questionInfo.questionId].responseId
                 "
               >
                 {{ getAnswerToQuestion(questionInfo.question) }}
@@ -233,7 +233,7 @@ import SurveyImage from '@/components/Surveys/SurveyImage.vue'
 import SurveyRateNumber from '../components/Surveys/SurveyRateNumber.vue'
 import SurveyChipOption from '../components/Surveys/SurveyChipOption.vue'
 import SurveyCheckbox from '../components/Surveys/SurveyCheckbox.vue'
-import {map, remove, orderBy, find, forEach} from 'lodash-es'
+import { map, remove, orderBy, find, forEach } from 'lodash-es'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 
@@ -264,8 +264,8 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      subjects: state => state.subjects.subjects,
+      user: (state) => state.user.user,
+      subjects: (state) => state.subjects.subjects,
     }),
     sessionPartnerFirstName() {
       return this.user.isVolunteer
@@ -277,23 +277,19 @@ export default {
       return this.subjects[subject].displayName
     },
     sessionTime() {
-      return moment(this.session.createdAt)
-        .local()
-        .format('LT')
+      return moment(this.session.createdAt).local().format('LT')
     },
     sessionDate() {
-      return moment(this.session.createdAt)
-        .local()
-        .format('MMMM Do, YYYY')
+      return moment(this.session.createdAt).local().format('MMMM Do, YYYY')
     },
     userType() {
       return this.user.isVolunteer ? 'volunteer' : 'student'
     },
     questions() {
-      return this.allQuestions.map(q => q.question)
+      return this.allQuestions.map((q) => q.question)
     },
     filteredQuestions() {
-      return this.allQuestions.filter(q => q.isVisible)
+      return this.allQuestions.filter((q) => q.isVisible)
     },
   },
   async beforeMount() {
@@ -302,18 +298,15 @@ export default {
       component: 'SessionHeader',
     })
     const sessionId = this.$route.params.sessionId
-    const [
-      feedbackResponse,
-      sessionResponse,
-      postsessionAlreadySavedResponse,
-    ] = await Promise.all([
-      NetworkService.getFeedback({
-        sessionId,
-        userType: this.userType,
-      }),
-      NetworkService.getSession(sessionId),
-      NetworkService.getPostsessionSurveyResponse(sessionId, this.userType),
-    ])
+    const [feedbackResponse, sessionResponse, postsessionAlreadySavedResponse] =
+      await Promise.all([
+        NetworkService.getFeedback({
+          sessionId,
+          userType: this.userType,
+        }),
+        NetworkService.getSession(sessionId),
+        NetworkService.getPostsessionSurveyResponse(sessionId, this.userType),
+      ])
 
     const {
       data: { feedback },
@@ -323,18 +316,19 @@ export default {
     } = sessionResponse
 
     this.session = session
-    const postsessionSurveyDefinitionResponse = await NetworkService.getPostsessionSurvey(
-      this.session.subTopic,
-      this.session.id,
-      this.userType
-    )
+    const postsessionSurveyDefinitionResponse =
+      await NetworkService.getPostsessionSurvey(
+        this.session.subTopic,
+        this.session.id,
+        this.userType
+      )
     this.surveyDefinition = postsessionSurveyDefinitionResponse.data.survey
-    this.allQuestions = map(this.surveyDefinition.survey, q => {
+    this.allQuestions = map(this.surveyDefinition.survey, (q) => {
       const isHiddenOnStart =
         this.isLowRatingQuestion(q) ||
         this.isHighRatingQuestion(q) ||
         this.isGuidelineIssueListQuestion(q)
-      q.responses =orderBy(q.responses, r => r.displayPriority)
+      q.responses = orderBy(q.responses, (r) => r.displayPriority)
       return {
         questionId: q.questionId,
         question: q,
@@ -345,7 +339,7 @@ export default {
     })
     this.allQuestions = orderBy(
       this.allQuestions,
-      q => q.question.displayPriority
+      (q) => q.question.displayPriority
     )
     this.buildUserResponse()
 
@@ -461,10 +455,10 @@ export default {
       }
       const currentDisplayPriority = response.responseDisplayPriority
 
-      const selectedResponseId = this.userResponse[question.questionId]
-        .responseId
+      const selectedResponseId =
+        this.userResponse[question.questionId].responseId
       const responseForSelectedResponseId = question.responses.find(
-        r => r.responseId === selectedResponseId
+        (r) => r.responseId === selectedResponseId
       )
       if (currentDisplayPriority && responseForSelectedResponseId) {
         return (
@@ -485,19 +479,19 @@ export default {
       return false
     },
     getAnswerToQuestion(question) {
-      const questionResponseId = this.userResponse[question.questionId]
-        .responseId
+      const questionResponseId =
+        this.userResponse[question.questionId].responseId
       if (!questionResponseId) {
         return null
       }
       const selectedResponse = question.responses.find(
-        r => r.responseId === questionResponseId
+        (r) => r.responseId === questionResponseId
       )
       return selectedResponse.responseText
     },
     isFavoritingCoach() {
       if (!this.user.isVolunteer) {
-        const coachFavoritingQuestion = this.filteredQuestions.find(q =>
+        const coachFavoritingQuestion = this.filteredQuestions.find((q) =>
           this.isHighRatingQuestion(q.question)
         )
         if (!coachFavoritingQuestion) {
@@ -529,7 +523,7 @@ export default {
           response.responseId
         ) {
           // the answers to the what-went-wrong questions are multiselect; convert to several single-response answers for saving
-          response.responseId.forEach(resp => {
+          response.responseId.forEach((resp) => {
             submissions.push({
               questionId: Number(question.questionId),
               responseChoiceId: resp,
@@ -566,9 +560,9 @@ export default {
       const responses = await Promise.allSettled(requests)
       // if there is an error in saving, display it; don't block progression if the error is in favoriting
       const rejectedSave = responses
-        .filter(result => result.status === 'rejected')
-        .map(result => result.reason)
-        .find(res => res.url.endsWith('api/survey/save'))
+        .filter((result) => result.status === 'rejected')
+        .map((result) => result.reason)
+        .find((res) => res.url.endsWith('api/survey/save'))
 
       if (rejectedSave) {
         this.error = 'There was an error sending your feedback'
@@ -600,9 +594,9 @@ export default {
       if (!currentSelected) {
         // list is currently empty, create it
         currentSelected = [responseId]
-      } else if (currentSelected.find(r => r === responseId)) {
+      } else if (currentSelected.find((r) => r === responseId)) {
         // clicked item is already in list; deselect it
-        remove(currentSelected, r => r === responseId)
+        remove(currentSelected, (r) => r === responseId)
       } else {
         // clicked item is not in list yet; select it
         currentSelected.push(responseId)
@@ -618,13 +612,13 @@ export default {
 
     // if question changed is ratings question, show/hide conditional questions that depend on it
     ratingQuestionShowHide(questionId, responseId) {
-      const ratingQuestion = find(this.questions, q =>
+      const ratingQuestion = find(this.questions, (q) =>
         this.isStarRankingQuestion(q)
       )
       if (ratingQuestion && questionId === ratingQuestion.questionId) {
         const ratingResponse = find(
           ratingQuestion.responses,
-          r => r.responseId === responseId
+          (r) => r.responseId === responseId
         )
         const showHighRatingQuestion =
           this.isHighRatingResponse(ratingResponse.responseText) &&
@@ -633,7 +627,7 @@ export default {
           ratingResponse.responseText
         )
 
-        map(this.allQuestions, q => {
+        map(this.allQuestions, (q) => {
           if (this.isHighRatingQuestion(q.question)) {
             q.isVisible = showHighRatingQuestion
             return q
@@ -646,18 +640,17 @@ export default {
     },
     // if question changed is student safety & guideline violation question, show/hide conditional question that depends on it
     guidelineQuestionShowHide(questionId, responseId) {
-      const guidelineQuestion = find(this.questions, q =>
+      const guidelineQuestion = find(this.questions, (q) =>
         q.questionText.startsWith('Were there any student safety')
       )
       if (guidelineQuestion && questionId === guidelineQuestion.questionId) {
         const guidelineResponse = find(
           guidelineQuestion.responses,
-          r => r.responseId === responseId
+          (r) => r.responseId === responseId
         )
-        this.allQuestions = map(this.allQuestions, q => {
-          const shouldToggleQuestionVisibility = this.isGuidelineIssueListQuestion(
-            q.question
-          )
+        this.allQuestions = map(this.allQuestions, (q) => {
+          const shouldToggleQuestionVisibility =
+            this.isGuidelineIssueListQuestion(q.question)
           q.isVisible = shouldToggleQuestionVisibility
             ? guidelineResponse.responseText === 'Yes'
             : q.isVisible
@@ -672,9 +665,9 @@ export default {
 
       // clear out responses for all hidden questions so we don't save junk data (change to actually-selected answer will handle re-render)
       const questionIdsToClear = this.allQuestions
-        .filter(item => !item.isVisible)
-        .map(item => item.question.questionId)
-      forEach(questionIdsToClear, q => {
+        .filter((item) => !item.isVisible)
+        .map((item) => item.question.questionId)
+      forEach(questionIdsToClear, (q) => {
         this.userResponse[q] = { responseId: null, openResponse: '' }
       })
 

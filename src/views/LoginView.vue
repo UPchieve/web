@@ -119,7 +119,7 @@ export default {
         email: this.credentials.email,
         password: this.credentials.password,
       })
-        .then(data => {
+        .then((data) => {
           this.$store.commit('user/setUser', data.user)
           this.$router.push(this.$route.query.redirect || '/')
         })

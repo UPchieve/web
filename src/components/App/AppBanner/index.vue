@@ -16,7 +16,7 @@ export default {
   },
   computed: {
     ...mapState({
-      bannerComponent: state => state.app.banner.component,
+      bannerComponent: (state) => state.app.banner.component,
     }),
   },
   methods: {

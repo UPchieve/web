@@ -7,9 +7,7 @@
         Welcome {{ studentPartner.name }}
         {{ useParentGuardianSignUpFlow ? `Parent/Guardian!` : `Student!` }}
       </h1>
-      <h1 v-else class="uc-form-header">
-        Welcome to UPchieve!
-      </h1>
+      <h1 v-else class="uc-form-header">Welcome to UPchieve!</h1>
       <p v-if="studentPartner.name" class="uc-form-text">
         Not with {{ studentPartner.name }}?
         <router-link class="uc-link" to="/sign-up">Click here</router-link>
@@ -340,7 +338,7 @@
             placeholder="Select how you heard about us"
             :options="signupSourcesOptions"
             label="name"
-            :reduce="option => option.id"
+            :reduce="(option) => option.id"
             :searchable="false"
             :clearable="false"
             required
@@ -470,7 +468,7 @@ export default {
     const partnerId = to.params.partnerId
 
     NetworkService.getStudentPartner(partnerId)
-      .then(res => {
+      .then((res) => {
         const studentPartner = res.data.studentPartner
         if (!studentPartner) return next('/sign-up')
         if (studentPartner.deactivated) {
@@ -480,9 +478,9 @@ export default {
           )
           return next('/sign-up')
         }
-        return next(_this => (_this.studentPartner = studentPartner))
+        return next((_this) => (_this.studentPartner = studentPartner))
       })
-      .catch(err => {
+      .catch((err) => {
         if (err?.response?.status !== 404) {
           // we shouldn't get 422 here, since semantics of GET request are expected
           // to be correct regardless of user input
@@ -646,7 +644,7 @@ export default {
     autocompleteSchool(input) {
       this.formData.schoolId = undefined
 
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         if (input.length < 3) {
           return resolve([])
         }
@@ -656,8 +654,8 @@ export default {
         }
 
         NetworkService.searchSchool({ query: input })
-          .then(response => response.data.results)
-          .then(schools => {
+          .then((response) => response.data.results)
+          .then((schools) => {
             schools.push(cantFindSchoolItem)
             resolve(schools)
           })
@@ -679,7 +677,7 @@ export default {
         return false
       }
       const otherOption = this.signupSourcesOptions.find(
-        s => s.name === 'Other'
+        (s) => s.name === 'Other'
       )
       return otherOption && otherOption.id === this.formData.signupSourceId
     },
@@ -758,7 +756,7 @@ export default {
             this.$router.push('/verify')
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.isSubmittingForm = false
           this.errors.push(
             err?.response?.data?.err ?? 'Failed: Please try again.'
@@ -779,7 +777,7 @@ export default {
         currentGrade: this.trimGradeLevel,
       }
       const dataAsQueryParams = Object.entries(data)
-        .map(q => `${q[0]}=${q[1]}`)
+        .map((q) => `${q[0]}=${q[1]}`)
         .join('&')
       const url = `${config.serverRoot}/auth/register/google/partner-student?${dataAsQueryParams}`
       window.location.replace(url)
@@ -789,7 +787,7 @@ export default {
       return !!el.$errors.length
     },
     getFormValidationError(el) {
-      return el.$errors.map(e => e.$message).join(', ')
+      return el.$errors.map((e) => e.$message).join(', ')
     },
 
     isSignUpButtonDisabled() {

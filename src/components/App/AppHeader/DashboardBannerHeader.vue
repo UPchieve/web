@@ -45,7 +45,7 @@ export default {
   },
   computed: {
     ...mapState({
-      productFlags: state => state.productFlags.flags,
+      productFlags: (state) => state.productFlags.flags,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -53,8 +53,8 @@ export default {
   },
   methods: {
     toggleFallIncentiveEnrollmentModal() {
-      this.showFallIncentiveEnrollmentModal = !this
-        .showFallIncentiveEnrollmentModal
+      this.showFallIncentiveEnrollmentModal =
+        !this.showFallIncentiveEnrollmentModal
     },
   },
 }

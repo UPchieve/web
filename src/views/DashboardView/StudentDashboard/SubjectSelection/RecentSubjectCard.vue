@@ -48,9 +48,9 @@ export default {
   },
   computed: {
     ...mapState({
-      latestSession: state => state.user.latestSession,
-      isMobileApp: state => state.app.isMobileApp,
-      user: state => state.user.user,
+      latestSession: (state) => state.user.latestSession,
+      isMobileApp: (state) => state.app.isMobileApp,
+      user: (state) => state.user.user,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -130,7 +130,11 @@ export default {
 .SubjectCard-title {
   @include font-category('heading');
   text-align: center;
-  font-family: Work Sans, Helvetica, Arial, sans-serif;
+  font-family:
+    Work Sans,
+    Helvetica,
+    Arial,
+    sans-serif;
   font-style: normal;
   font-size: 16px;
   line-height: 125%;

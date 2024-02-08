@@ -37,7 +37,7 @@ export default {
   },
   mounted() {
     this.questionsReview = TrainingService.reviewQuiz(this)
-    this.questionsReview.forEach(question => {
+    this.questionsReview.forEach((question) => {
       if (question.imageSrc) {
         question.imageStyle = {
           backgroundImage: `url(${question.imageSrc})`,
@@ -67,7 +67,7 @@ export default {
       window.MathJax.Hub.Queue([
         'Typeset',
         window.MathJax.Hub,
-        Array.from(questions).flatMap(question => [
+        Array.from(questions).flatMap((question) => [
           question.querySelector('.question-text'),
           ...Array.from(question.querySelectorAll('.possible-answers div')),
         ]),

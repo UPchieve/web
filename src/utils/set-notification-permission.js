@@ -1,4 +1,4 @@
-const setNotificationPermission = permissionStatus => {
+const setNotificationPermission = (permissionStatus) => {
   if (Notification.permission === 'granted')
     localStorage.setItem('notification-permission', permissionStatus)
   else if (Notification.permission === 'denied')

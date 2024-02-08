@@ -138,13 +138,13 @@ export default {
     getAvailability(certifiedSubject) {
       let cert = certifiedSubject
       UserService.getVolunteersAvailability(cert)
-        .then(availability => {
+        .then((availability) => {
           this.availabilityTable = availability
           //flattening table makes the implementation of css grid cleaner
           this.availabilityTable.table = availability.table.flat()
           return this.availabilityTable
         })
-        .catch(err => {
+        .catch((err) => {
           this.errorMsg =
             err?.response?.data?.err ?? 'Failed: Please try again.'
         })
@@ -162,7 +162,7 @@ export default {
         this.availabilityTable.table.length != 0
       ) {
         if (compareNumber.length != 0) {
-          return this.availabilityTable.table.reduce(function(
+          return this.availabilityTable.table.reduce(function (
             totalHours,
             currentValue
           ) {
@@ -173,8 +173,7 @@ export default {
               totalHours++
             }
             return totalHours
-          },
-          totalHours)
+          }, totalHours)
         }
       }
       return totalHours

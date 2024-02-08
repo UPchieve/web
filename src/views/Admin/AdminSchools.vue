@@ -20,7 +20,7 @@
           :options="states"
           label="label"
           :searchable="true"
-          :reduce="option => option.value"
+          :reduce="(option) => option.value"
         />
       </div>
 
@@ -66,7 +66,7 @@ import PageControl from '@/components/Admin/PageControl.vue'
 import SchoolListItem from '@/components/Admin/SchoolListItem.vue'
 import { STATES_WITH_ABBREVIATIONS } from '@/consts'
 
-const getSchools = async data => {
+const getSchools = async (data) => {
   const {
     data: { schools, isLastPage },
   } = await NetworkService.adminGetSchools(data)

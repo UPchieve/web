@@ -1,5 +1,5 @@
 // https://stackoverflow.com/a/24103596
-const getCookie = name => {
+const getCookie = (name) => {
   const nameEquality = `${name}=`
   let ca = document.cookie.split(';')
   for (let i = 0; i < ca.length; i++) {

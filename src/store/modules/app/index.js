@@ -70,7 +70,7 @@ export default {
     },
   },
   getters: {
-    mobileMode: state => state.windowWidth <= MAX_MOBILE_MODE_WIDTH,
-    csrfToken: state => state.csrfToken,
+    mobileMode: (state) => state.windowWidth <= MAX_MOBILE_MODE_WIDTH,
+    csrfToken: (state) => state.csrfToken,
   },
 }

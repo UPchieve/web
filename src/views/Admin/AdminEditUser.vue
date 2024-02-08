@@ -16,9 +16,7 @@
         <input id="email" type="text" v-model="email" />
       </div>
       <div class="row">
-        <label for="partner-org" class="uc-form-label">
-          Partner org
-        </label>
+        <label for="partner-org" class="uc-form-label"> Partner org </label>
         <v-select
           id="partner-org"
           class="option-select"
@@ -114,9 +112,7 @@
         </select>
       </div>
       <p class="error" v-if="error">{{ error }}</p>
-      <button class="uc-form-button" type="submit">
-        Update
-      </button>
+      <button class="uc-form-button" type="submit">Update</button>
     </form>
   </div>
 </template>
@@ -170,9 +166,8 @@ export default {
       const {
         data: { partnerOrgs },
       } = response
-      const activeSchoolPartnerResponse = await NetworkService.adminGetActivePartnersForStudent(
-        this.user.id
-      )
+      const activeSchoolPartnerResponse =
+        await NetworkService.adminGetActivePartnersForStudent(this.user.id)
       const {
         data: { activePartners },
       } = activeSchoolPartnerResponse

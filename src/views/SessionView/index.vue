@@ -31,7 +31,7 @@
         <document-editor-v2
           v-else-if="
             auxiliaryType === sessionToolTypes.DOCUMENT_EDITOR &&
-              docEditorVersion === 2
+            docEditorVersion === 2
           "
         />
         <document-editor
@@ -62,7 +62,7 @@
           <div
             v-else-if="
               showNoPresessionSurveyResponse ||
-                studentPresessionResponses.length === 0
+              studentPresessionResponses.length === 0
             "
             class="about-session-no-responses"
           >
@@ -209,19 +209,19 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
-    next(vm => {
+    next((vm) => {
       vm.prevRoute = from
     })
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      session: state => state.user.session,
-      isSessionConnectionAlive: state => state.user.isSessionConnectionAlive,
-      isMobileApp: state => state.app.isMobileApp,
-      presessionSurvey: state => state.user.presessionSurvey,
-      docEditorVersion: state => state.user.session.docEditorVersion,
-      auxiliaryType: state => state.user.session.toolType,
+      user: (state) => state.user.user,
+      session: (state) => state.user.session,
+      isSessionConnectionAlive: (state) => state.user.isSessionConnectionAlive,
+      isMobileApp: (state) => state.app.isMobileApp,
+      presessionSurvey: (state) => state.user.presessionSurvey,
+      docEditorVersion: (state) => state.user.session.docEditorVersion,
+      auxiliaryType: (state) => state.user.session.toolType,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -314,7 +314,7 @@ export default {
     }
 
     promise
-      .then(async sessionId => {
+      .then(async (sessionId) => {
         this.sessionId = sessionId
         if (!id && !this.isVolunteer)
           AnalyticsService.captureEvent(EVENTS.SESSION_REQUESTED, {
@@ -361,7 +361,7 @@ export default {
         if (getNotificationPermission() === 'default')
           this.showNotificationModal = true
       })
-      .catch(err => {
+      .catch((err) => {
         if (err?.response?.status !== 0 && err.code !== 'EUSERABORTED') {
           window.alert('Could not start new help session')
           LoggerService.noticeError(err)
@@ -370,7 +370,7 @@ export default {
       })
   },
   sockets: {
-    bump: function(data) {
+    bump: function (data) {
       // Do not show the session fulfilled modal if a user is already
       // present on the page after a session has ended
       if (!this.sessionHasEnded)
@@ -501,9 +501,8 @@ export default {
     async getSessionContext(sessionId) {
       try {
         this.isLoadingPresessionResponse = true
-        const presessionSurveyResponse = await NetworkService.getPresessionSurveyResponse(
-          sessionId
-        )
+        const presessionSurveyResponse =
+          await NetworkService.getPresessionSurveyResponse(sessionId)
         this.totalStudentSessions =
           presessionSurveyResponse.data.totalStudentSessions
         this.studentPresessionResponses =

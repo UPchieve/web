@@ -97,7 +97,7 @@ export default {
   },
   getters: {
     // TODO: remove in subjects-database-hydration flag cleanup
-    allSubtopics: state => {
+    allSubtopics: (state) => {
       let subtopicObj = {}
 
       for (let topic in state.subjects) {
@@ -111,7 +111,7 @@ export default {
 
       return subtopicObj
     },
-    allSubtopicNames: state => {
+    allSubtopicNames: (state) => {
       return Object.keys(state.subjects)
     },
     sessionRequestTopicCards: (state, getters, rootState, rootGetters) => {
@@ -119,19 +119,20 @@ export default {
         rootGetters['featureFlags/subjectRequestRollout']
       return generateTopicCards(
         state.subjects,
-        subject => !subject.active && !rolledOutSubjects.includes(subject.name)
+        (subject) =>
+          !subject.active && !rolledOutSubjects.includes(subject.name)
       )
     },
     quizTopicCards: (state, getters, rootState, rootGetters) => {
       const rolledOutQuizzes = rootGetters['featureFlags/quizRollout']
       return generateTopicCards(
         getters.reformatTrainingToSubjectsMap,
-        quiz => !quiz.active && !rolledOutQuizzes.includes(quiz.name)
+        (quiz) => !quiz.active && !rolledOutQuizzes.includes(quiz.name)
       )
     },
     // This reformats the training data to have the shape of `state.subjects`.
     // This is primarily for creating generating topic cards
-    reformatTrainingToSubjectsMap: state => {
+    reformatTrainingToSubjectsMap: (state) => {
       const training = Object.values(state.training)
       const formatted = {}
       for (const t of training) {
@@ -144,7 +145,7 @@ export default {
           formatted[quiz.key] = {
             ...state.subjects[quiz.key],
             topicDashboardOrder: state.training.subjectTypes.find(
-              item => item.key === topic.key
+              (item) => item.key === topic.key
             )?.trainingOrder,
             active: quiz.active,
           }
@@ -158,7 +159,7 @@ export default {
       for (const [key, quizData] of Object.entries(state.training)) {
         if (quizData.certifications?.length) {
           const activeQuizzes = quizData.certifications.filter(
-            quiz =>
+            (quiz) =>
               quiz.active ||
               (!quiz.active && rolledOutQuizzes.includes(quiz.key))
           )

@@ -21,9 +21,7 @@
         </div>
 
         <div class="uc-form-element">
-          <label for="password">
-            Password
-          </label>
+          <label for="password"> Password </label>
           <input
             id="password"
             class="uc-form-text-input"
@@ -39,9 +37,7 @@
         </div>
 
         <div class="uc-form-element">
-          <label for="re-enter-password">
-            Re-enter Password
-          </label>
+          <label for="re-enter-password"> Re-enter Password </label>
           <input
             id="re-enter-password"
             class="uc-form-text-input"
@@ -106,7 +102,7 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
+      user: (state) => state.user.user,
     }),
     redirectText() {
       return this.user ? 'Home' : 'Log in'
@@ -126,7 +122,7 @@ export default {
           this.isResettingPassword = false
           this.showSuccess = true
         })
-        .catch(err => {
+        .catch((err) => {
           this.isResettingPassword = false
           this.msg = err?.response?.data?.err ?? 'Failed: Please try again.'
           if (err?.response?.status !== 422) {

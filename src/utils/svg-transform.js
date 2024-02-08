@@ -4,7 +4,7 @@ const vueJest = require('vue-jest/lib/template-compiler')
 // Fix for the approach above: https://github.com/visualfanatic/vue-svg-loader/issues/102#issuecomment-585635384
 module.exports = {
   process(content) {
-    const render = function() {
+    const render = function () {
       vueJest({
         content,
         attrs: {

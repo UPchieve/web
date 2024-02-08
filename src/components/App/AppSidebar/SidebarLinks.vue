@@ -139,7 +139,7 @@ export default {
   },
   computed: {
     ...mapState({
-      unreadProgressReportOverviewSubjects: state =>
+      unreadProgressReportOverviewSubjects: (state) =>
         state.user.unreadProgressReportOverviewSubjects,
     }),
     ...mapGetters({

@@ -5,9 +5,7 @@
       v-bind:key="index"
     >
       <strong>
-        <div v-if="isFreeResponse(key)">
-          Your Thoughts
-        </div>
+        <div v-if="isFreeResponse(key)">Your Thoughts</div>
         <div v-else>
           {{ key }}
         </div>

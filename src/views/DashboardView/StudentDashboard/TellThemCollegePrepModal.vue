@@ -8,9 +8,7 @@
           </header>
 
           <section class="tell-them-cp-modal__section">
-            <p class="tell-them-cp-modal__subtitle">
-              Want to go to college?
-            </p>
+            <p class="tell-them-cp-modal__subtitle">Want to go to college?</p>
             <p class="tell-them-cp-modal__message">
               1:1 college prep tutors are available now!
             </p>
@@ -42,9 +40,7 @@
               class="arrow-icon"
               @click="() => handleBackButton('Create reminder')"
             />
-            <h1 class="tell-them-cp-modal__title">
-              Create Reminder
-            </h1>
+            <h1 class="tell-them-cp-modal__title">Create Reminder</h1>
           </header>
 
           <section class="tell-them-cp-modal__section">
@@ -116,7 +112,7 @@
                 :required="true"
                 color="#555"
                 valid-color="#16ba97"
-                @update="data => (phoneInput = data)"
+                @update="(data) => (phoneInput = data)"
               />
               <span v-if="!isValidPhone && isPhoneError" class="error"
                 >Please enter a valid phone number.</span
@@ -148,9 +144,7 @@
         <div class="tell-them-cp-modal">
           <header class="tell-them-cp-modal__header--middle">
             <updog-with-flag class="updog-flag" />
-            <h1 class="tell-them-cp-modal__title">
-              You're all set!
-            </h1>
+            <h1 class="tell-them-cp-modal__title">You're all set!</h1>
           </header>
 
           <footer class="tell-them-cp-modal__footer">
@@ -236,7 +230,7 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
+      user: (state) => state.user.user,
     }),
     formattedReminderDate() {
       return moment(this.dateTime, 'YYYY-MM-DD HH:mm').format(

@@ -160,13 +160,13 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      hadASession: state => state.user.hadASession,
-      prevSessionSubject: state => state.user.prevSessionSubject,
-      isFirstDashboardVisit: state => state.user.isFirstDashboardVisit,
-      productFlags: state => state.productFlags.flags,
-      latestSession: state => state.user.latestSession,
-      hasSeenProgressReportModal: state =>
+      user: (state) => state.user.user,
+      hadASession: (state) => state.user.hadASession,
+      prevSessionSubject: (state) => state.user.prevSessionSubject,
+      isFirstDashboardVisit: (state) => state.user.isFirstDashboardVisit,
+      productFlags: (state) => state.productFlags.flags,
+      latestSession: (state) => state.user.latestSession,
+      hasSeenProgressReportModal: (state) =>
         state.user.hasSeenProgressReportModal,
     }),
     ...mapGetters({
@@ -231,12 +231,12 @@ export default {
       this.showTellThemCollegePrepModal = !this.showTellThemCollegePrepModal
     },
     toggleProcrastinationPreventionModal() {
-      this.showThemProcrastinationPreventionModal = !this
-        .showThemProcrastinationPreventionModal
+      this.showThemProcrastinationPreventionModal =
+        !this.showThemProcrastinationPreventionModal
     },
     toggleFallIncentiveEnrollmentModal() {
-      this.showFallIncentiveEnrollmentModal = !this
-        .showFallIncentiveEnrollmentModal
+      this.showFallIncentiveEnrollmentModal =
+        !this.showFallIncentiveEnrollmentModal
     },
     toggleShowProgressReportModal() {
       this.showProgressReportModal = !this.showProgressReportModal
@@ -306,7 +306,7 @@ export default {
       }
     },
     userAndOrbitalSegment: {
-      handler: function(currentValue, prevValue) {
+      handler: function (currentValue, prevValue) {
         if (
           this.isOrbitalSegmentsActive &&
           Object.keys(currentValue[0]).length &&
@@ -324,7 +324,7 @@ export default {
       deep: true,
     },
     isFallIncentiveProgramActive: {
-      handler: function(currentValue, prevValue) {
+      handler: function (currentValue, prevValue) {
         if (
           Object.keys(currentValue[0]).length &&
           Object.keys(currentValue[1]).length &&
@@ -339,7 +339,7 @@ export default {
       deep: true,
     },
     isEnrollmentForFallIncentiveActive: {
-      handler: function(currentValue, prevValue) {
+      handler: function (currentValue, prevValue) {
         if (
           (currentValue[0] && currentValue[1] && !prevValue[0]) ||
           !prevValue[1]

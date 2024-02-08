@@ -6,7 +6,7 @@ export const fileSizeTooBigEventName = 'file-size-limit'
 
 const isSafari =
   /constructor/i.test(window.HTMLElement) ||
-  (p => p.toString() === '[object SafariRemoteNotification]')(
+  ((p) => p.toString() === '[object SafariRemoteNotification]')(
     !window['safari'] ||
       (typeof safari !== 'undefined' && window['safari'].pushNotification)
   )
@@ -14,19 +14,19 @@ const isSafari =
 const maxImagesEvent = new Event(maxImagesEventName)
 const fileSizeEvent = new Event(fileSizeTooBigEventName)
 
-const getFilesFromDragEvent = async evt => evt?.dataTransfer?.files
+const getFilesFromDragEvent = async (evt) => evt?.dataTransfer?.files
 
-const matchedFileType = fileType => {
+const matchedFileType = (fileType) => {
   return fileType.match(/^image\/(gif|jpe?g|a?png|svg|webp|bmp)/i)
 }
 
-const isValidImageCount = quill => {
+const isValidImageCount = (quill) => {
   const currentCount =
     (quill && quill.root && quill.root.querySelectorAll('img').length) || 0
   return currentCount < MAX_TOTAL_IMAGES
 }
 
-const calcFileSizeKiloBytes = dataUrl => {
+const calcFileSizeKiloBytes = (dataUrl) => {
   const fileSizeBytes = Math.round((dataUrl.length * 3) / 4)
   return Math.ceil(fileSizeBytes / 1024)
 }
@@ -57,7 +57,7 @@ const getDimensions = (inputWidth, inputHeight, maxWidth, maxHeight) => {
   return [inputHeight, inputWidth]
 }
 
-const getBlobFromDragEvent = async evt => {
+const getBlobFromDragEvent = async (evt) => {
   const draggedUrl = evt.dataTransfer?.getData('URL')
   if (draggedUrl) {
     return await (await fetch(draggedUrl)).blob()
@@ -79,7 +79,7 @@ const downscaleImage = async (
 
   const image = new Image()
   image.src = dataUrl
-  await new Promise(resolve => {
+  await new Promise((resolve) => {
     image.onload = () => {
       resolve()
     }
@@ -115,7 +115,7 @@ const downscaleImage = async (
   return newDataUrl
 }
 
-const file2b64 = async file => {
+const file2b64 = async (file) => {
   const fileReader = new FileReader()
   const promise = new Promise((resolve, reject) => {
     fileReader.addEventListener(
@@ -139,8 +139,8 @@ class ImageDrop {
   constructor(quill, onNewDataUrl) {
     this.quill = quill
     this.onNewDataUrl = onNewDataUrl
-    this.quill.root.addEventListener('drop', e => this.handleDrop(e), false)
-    this.quill.root.addEventListener('paste', e => this.handlePaste(e), false)
+    this.quill.root.addEventListener('drop', (e) => this.handleDrop(e), false)
+    this.quill.root.addEventListener('paste', (e) => this.handlePaste(e), false)
   }
 
   async handleDrop(evt) {
@@ -162,7 +162,7 @@ class ImageDrop {
       }
     }
     const files = await getFilesFromDragEvent(evt)
-    const filesFiltered = Array.from(files || []).filter(f =>
+    const filesFiltered = Array.from(files || []).filter((f) =>
       matchedFileType(f.type)
     )
     const firstImage = filesFiltered?.[0]
@@ -185,13 +185,13 @@ class ImageDrop {
       return
     }
     const files = Array.from(evt?.clipboardData?.items || [])
-    const images = files.filter(f => matchedFileType(f.type))
+    const images = files.filter((f) => matchedFileType(f.type))
 
     if (!images.length) {
       return
     }
 
-    const imagesNoHtml = images.filter(f => f.type !== 'text/html')
+    const imagesNoHtml = images.filter((f) => f.type !== 'text/html')
     if (!imagesNoHtml.length) {
       return
     }
@@ -214,7 +214,7 @@ export class ImageCompressor {
     }
     this.maxImages = maxImages
 
-    const onImageDrop = async dataUrl => {
+    const onImageDrop = async (dataUrl) => {
       if (!dataUrl) {
         return
       }

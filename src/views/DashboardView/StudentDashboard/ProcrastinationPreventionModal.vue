@@ -52,7 +52,7 @@
                 :required="true"
                 color="#555"
                 valid-color="#16ba97"
-                @update="data => (phoneInput = data)"
+                @update="(data) => (phoneInput = data)"
               />
               <span v-if="!isValidPhone && isPhoneError" class="error"
                 >Please enter a valid phone number.</span
@@ -115,9 +115,7 @@
       <template v-if="step === 4">
         <div class="procrastination-modal">
           <header>
-            <h1 class="procrastination-modal__title">
-              Create Reminder
-            </h1>
+            <h1 class="procrastination-modal__title">Create Reminder</h1>
           </header>
 
           <section class="procrastination-modal__section">
@@ -182,8 +180,7 @@
                 >Don't remind me</large-button
               >
               <large-button
-                class="procrastination-modal__buttons-button
-               procrastination-modal__buttons-button--primary"
+                class="procrastination-modal__buttons-button procrastination-modal__buttons-button--primary"
                 primary
                 :showArrow="false"
                 @click.native="handleRemindMeClick"
@@ -245,8 +242,8 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      latestSession: state => state.user.latestSession,
+      user: (state) => state.user.user,
+      latestSession: (state) => state.user.latestSession,
     }),
     formattedReminderDate() {
       return moment(this.dateTime, 'YYYY-MM-DD HH:mm').format(
@@ -392,10 +389,7 @@ export default {
         )
 
       // Default to sending tomorrow at start of an hour
-      return moment()
-        .add(1, 'day')
-        .startOf('hour')
-        .format('MM/DD/YYYY h:mm a')
+      return moment().add(1, 'day').startOf('hour').format('MM/DD/YYYY h:mm a')
     },
     closestHalfHour(inputDate) {
       const date = moment(inputDate)

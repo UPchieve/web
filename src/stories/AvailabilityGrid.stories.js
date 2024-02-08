@@ -84,7 +84,7 @@ const Template = (args, { argTypes }) => ({
   props: Object.keys(argTypes),
   components: { AvailabilityGrid },
   methods: {
-    clickCell: arg => {
+    clickCell: (arg) => {
       availability[arg.day][arg.hour] = !availability[arg.day][arg.hour]
       action('clicked')(arg)
     },

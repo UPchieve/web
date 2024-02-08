@@ -71,9 +71,9 @@
         <chat-bot
           v-if="
             user.isVolunteer &&
-              isInRecap &&
-              currentSession.messages &&
-              !tutorSentMessageAfterSessionEnded
+            isInRecap &&
+            currentSession.messages &&
+            !tutorSentMessageAfterSessionEnded
           "
           :isInRecap="isInRecap"
           :currentSession="currentSession"
@@ -123,7 +123,7 @@
 </template>
 
 <script>
-import {isEmpty} from 'lodash-es'
+import { isEmpty } from 'lodash-es'
 import { mapState, mapGetters } from 'vuex'
 
 import ChatBot from './ChatBot.vue'
@@ -172,10 +172,10 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      isWebPageHidden: state => state.app.isWebPageHidden,
-      unreadChatMessageIndices: state => state.user.unreadChatMessageIndices,
-      chatScrolledToMessageIndex: state =>
+      user: (state) => state.user.user,
+      isWebPageHidden: (state) => state.app.isWebPageHidden,
+      unreadChatMessageIndices: (state) => state.user.unreadChatMessageIndices,
+      chatScrolledToMessageIndex: (state) =>
         state.user.chatScrolledToMessageIndex,
     }),
     ...mapGetters({
@@ -192,7 +192,7 @@ export default {
     // The chat is already loaded with a connection failure in SessionRecapView
     // since it's checking if the socket joined the room. Exclude SessionRecapView
     // when logging out expected errors
-    isSessionConnectionFailure: function() {
+    isSessionConnectionFailure: function () {
       const isConnectionFailure =
         !this.isSessionConnectionAlive && this.isSessionAlive && !this.isInRecap
       if (isConnectionFailure)
@@ -203,7 +203,7 @@ export default {
         })
       return isConnectionFailure
     },
-    unreadMessageNote: function() {
+    unreadMessageNote: function () {
       return `${this.numberOfUnreadChatMessages} unread message${
         this.numberOfUnreadChatMessages === 1 ? '' : 's'
       }`
@@ -274,7 +274,7 @@ export default {
         this.hideModerationWarning()
 
         // Check for personal info/profanity in message
-        ModerationService.checkIfMessageIsClean(message).then(isClean => {
+        ModerationService.checkIfMessageIsClean(message).then((isClean) => {
           if (isClean) {
             this.showNewMessage(message)
           } else {
@@ -323,8 +323,8 @@ export default {
       const messageElements = this.getUserMessageElements()
 
       if (this.unreadChatMessageIndices.length > 0) {
-        const readMessageIndices = this.unreadChatMessageIndices.filter(index =>
-          this.isMessageElementInView(messageElements[index])
+        const readMessageIndices = this.unreadChatMessageIndices.filter(
+          (index) => this.isMessageElementInView(messageElements[index])
         )
         this.$store.dispatch('user/markChatMessagesAsRead', readMessageIndices)
       }
@@ -370,7 +370,7 @@ export default {
     getUserMessageElements() {
       // the DOM elements corresponding to messages sent by users
       // (as opposed to the chatbot)
-      return Array.from(this.$refs.messages.children).filter(element =>
+      return Array.from(this.$refs.messages.children).filter((element) =>
         element.classList.contains('message')
       )
     },

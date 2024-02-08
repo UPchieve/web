@@ -9,9 +9,7 @@
       class="contact"
       :class="{ 'contact--noAuth': !isAuthenticated || !isVerified }"
     >
-      <div class="contact__header">
-        Contact Us
-      </div>
+      <div class="contact__header">Contact Us</div>
 
       <div class="contact__description">
         Our
@@ -198,8 +196,7 @@ export default {
 
   &--noAuth {
     @include flex-container(row, center, center);
-    background: url('@/assets/onboarding_background.png') no-repeat center
-      fixed;
+    background: url('@/assets/onboarding_background.png') no-repeat center fixed;
     background-size: cover;
     min-height: 100vh;
   }

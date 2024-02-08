@@ -57,11 +57,11 @@ export default {
   },
   computed: {
     ...mapState({
-      latestSession: state => state.user.latestSession,
-      subjects: state => state.subjects.subjects,
-      isFetchingSubjects: state => state.subjects.isFetchingSubjects,
-      fetchingSubjectsError: state => state.subjects.fetchingSubjectsError,
-      user: state => state.user.user,
+      latestSession: (state) => state.user.latestSession,
+      subjects: (state) => state.subjects.subjects,
+      isFetchingSubjects: (state) => state.subjects.isFetchingSubjects,
+      fetchingSubjectsError: (state) => state.subjects.fetchingSubjectsError,
+      user: (state) => state.user.user,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -84,7 +84,7 @@ export default {
       let cards = [...this.topicCards]
       if (this.isTopicDashboardReorderActive && this.topicCardDashboardReorder)
         cards = cards
-          .map(card => {
+          .map((card) => {
             return {
               ...card,
               order: this.topicCardDashboardReorder[card.topic],

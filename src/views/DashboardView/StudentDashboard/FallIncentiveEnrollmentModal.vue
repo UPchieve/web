@@ -35,7 +35,7 @@
                 :required="true"
                 color="#555"
                 valid-color="#16ba97"
-                @update="data => (phoneInput = data)"
+                @update="(data) => (phoneInput = data)"
               />
 
               <span v-if="!isValidPhone && isPhoneError" class="error"
@@ -106,7 +106,7 @@
               class="incentive-enrollment-modal__buttons incentive-enrollment-modal__buttons--secondary"
             >
               <large-button
-                class="incentive-enrollment-modal__buttons-button  incentive-enrollment-modal__buttons-button--primary"
+                class="incentive-enrollment-modal__buttons-button incentive-enrollment-modal__buttons-button--primary"
                 @click.native="handlePhoneConfirmation"
                 :disabled="!isValidVerificationCode"
                 :showArrow="false"
@@ -132,7 +132,7 @@
           <footer class="incentive-enrollment-modal__footer">
             <div class="incentive-enrollment-modal__buttons">
               <large-button
-                class="incentive-enrollment-modal__buttons-button  incentive-enrollment-modal__buttons-button--single"
+                class="incentive-enrollment-modal__buttons-button incentive-enrollment-modal__buttons-button--single"
                 @click.native="handleCloseModal"
                 :showArrow="false"
                 primary
@@ -203,7 +203,7 @@ export default {
 
   computed: {
     ...mapState({
-      user: state => state.user.user,
+      user: (state) => state.user.user,
     }),
     isValidPhone() {
       return this.phoneInput.isValid

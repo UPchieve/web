@@ -22,7 +22,7 @@
           :options="states"
           label="label"
           :searchable="true"
-          :reduce="option => option.value"
+          :reduce="(option) => option.value"
         />
       </div>
       <div class="edit-school__input-row">
@@ -39,9 +39,7 @@
       </div>
 
       <p class="error" v-if="error">{{ error }}</p>
-      <button class="uc-form-button" type="submit">
-        Update
-      </button>
+      <button class="uc-form-button" type="submit">Update</button>
     </form>
   </div>
 </template>

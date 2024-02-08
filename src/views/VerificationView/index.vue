@@ -9,8 +9,8 @@
       <verification-method-selector
         v-if="
           step === 1 &&
-            isSmsVerificationEnabled &&
-            isSmsVerificationEnabledOnSignupFlow
+          isSmsVerificationEnabled &&
+          isSmsVerificationEnabledOnSignupFlow
         "
         data-testid="verification-method-selector"
         :email="user.email"
@@ -62,7 +62,7 @@
           v-if="step === 1"
           :disabled="
             verificationInputs.method === VERIFICATION_METHOD.SMS &&
-              !verificationInputs.phoneInputInfo.isValid
+            !verificationInputs.phoneInputInfo.isValid
           "
         >
           {{ sendCodeButtonText }}
@@ -138,7 +138,7 @@ export default {
       return VERIFICATION_METHOD
     },
     ...mapState({
-      user: state => state.user.user,
+      user: (state) => state.user.user,
     }),
     ...mapGetters({
       isAutoFlowUser: 'user/isAutoFlowUser',

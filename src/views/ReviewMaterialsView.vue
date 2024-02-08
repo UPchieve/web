@@ -6,9 +6,7 @@
       <div v-else-if="error">
         <p class="error-message">
           Please try refreshing the page or click
-          <router-link to="/training">
-            here
-          </router-link>
+          <router-link to="/training"> here </router-link>
           to see our available categories and their associated review materials.
         </p>
       </div>
@@ -43,7 +41,7 @@
         <large-button
           v-if="
             user.certifications[category] &&
-              !user.certifications[category].passed
+            !user.certifications[category].passed
           "
           primary
           :showArrow="false"
@@ -116,8 +114,8 @@ export default {
   },
   computed: {
     ...mapState({
-      subjects: state => state.subjects.subjects,
-      user: state => state.user.user,
+      subjects: (state) => state.subjects.subjects,
+      user: (state) => state.user.user,
     }),
     ...mapGetters({
       allSubtopics: 'subjects/allSubtopics',

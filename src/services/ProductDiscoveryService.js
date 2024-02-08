@@ -30,7 +30,7 @@ const GLEAP_WIDGET_CONFIGS = {
 function isValidUserForSegment(user, properties, featureFlags) {
   const { minSessions, maxSessions, userType, flagFilters } = properties
   const validFlags =
-    !flagFilters || flagFilters.some(flag => featureFlags[flag])
+    !flagFilters || flagFilters.some((flag) => featureFlags[flag])
 
   return (
     user.pastSessions.length >= minSessions &&

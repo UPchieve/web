@@ -74,7 +74,7 @@ export default {
       this.error = ''
       AuthService.sendReset(this, this.email)
         .then(() => (this.isSendingEmail = false))
-        .catch(err => {
+        .catch((err) => {
           this.error = err?.response?.data?.err ?? 'Failed: Please try again.'
           this.isSendingEmail = false
           if (err?.response?.status !== 422) {

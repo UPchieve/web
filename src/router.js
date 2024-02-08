@@ -53,7 +53,7 @@ import { axiosInstance } from './services/NetworkService'
 
 const getUser = () => {
   if (store.getters['user/isAuthenticated']) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       store.dispatch('user/fetchUser')
       resolve()
     })
@@ -192,7 +192,7 @@ const routes = [
     path: '/setpassword',
     name: 'SetPasswordView',
     component: SetPasswordView,
-    props: route => ({ token: route.query.token }),
+    props: (route) => ({ token: route.query.token }),
   },
   {
     path: '/dashboard',
@@ -449,7 +449,7 @@ export default router
 
 // Router middleware to check authentication for protect routes
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(route => route.meta.requiresAdmin)) {
+  if (to.matched.some((route) => route.meta.requiresAdmin)) {
     getUser()
       .then(() => {
         if (!store.state.user.user.isAdmin) {
@@ -464,7 +464,7 @@ router.beforeEach((to, from, next) => {
         }
       })
       .catch(() => {})
-  } else if (to.matched.some(route => route.meta.protected)) {
+  } else if (to.matched.some((route) => route.meta.protected)) {
     getUser()
       .then(() => {
         if (!store.getters['user/isAuthenticated']) {
@@ -487,7 +487,7 @@ router.beforeEach((to, from, next) => {
         }
       })
       .catch(() => {})
-  } else if (to.matched.some(route => route.meta.loggedOutOnly)) {
+  } else if (to.matched.some((route) => route.meta.loggedOutOnly)) {
     getUser()
       .then(() => {
         if (store.getters['user/isAuthenticated']) {
@@ -497,7 +497,7 @@ router.beforeEach((to, from, next) => {
         }
       })
       .catch(() => {})
-  } else if (to.matched.some(route => route.meta.authOptional)) {
+  } else if (to.matched.some((route) => route.meta.authOptional)) {
     getUser()
       .then(() => {
         next()
@@ -535,8 +535,8 @@ router.afterEach((to, from) => {
 // If endpoint returns 401, redirect to login (except for requests to get user or user's
 // session)
 axiosInstance.interceptors.response.use(
-  response => response,
-  error => {
+  (response) => response,
+  (error) => {
     const is401 = error.request.status === 401
     const isGetUserAttempt =
       error.request.responseURL.indexOf('/api/user') !== -1 &&

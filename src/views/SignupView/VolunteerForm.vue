@@ -60,9 +60,7 @@
       </p>
     </div>
 
-    <button class="uc-form-button" type="submit">
-      Continue
-    </button>
+    <button class="uc-form-button" type="submit">Continue</button>
 
     <div v-if="msg !== ''" role="alert">{{ msg }}</div>
   </form>
@@ -167,7 +165,7 @@
         v-model="signupSourceId"
         :options="signupSourcesOptions"
         label="name"
-        :reduce="option => option.id"
+        :reduce="(option) => option.id"
         :searchable="false"
         :clearable="false"
         required
@@ -186,9 +184,7 @@
         }"
         autofocus
       />
-      <p class="uc-form-subtext">
-        Tell us where you heard about us!
-      </p>
+      <p class="uc-form-subtext">Tell us where you heard about us!</p>
     </div>
 
     <div class="uc-form-checkbox">
@@ -291,7 +287,7 @@ export default {
           this.$router.push('/sign-up/volunteer/about')
           this.getSignupSources()
         })
-        .catch(err => {
+        .catch((err) => {
           this.msg = err?.response?.data?.err ?? 'Failed: Please try again.'
           if (err?.response?.status !== 409 && err?.response?.status !== 422) {
             LoggerService.noticeError(err)
@@ -350,7 +346,7 @@ export default {
           this.isRegistering = false
           this.$router.push('/verify')
         })
-        .catch(err => {
+        .catch((err) => {
           this.isRegistering = false
           this.msg = err?.response?.data?.err ?? 'Failed: Please try again.'
           if (err?.response.status !== 409 && err?.response.status !== 422) {
@@ -366,7 +362,7 @@ export default {
         return false
       }
       const otherOption = this.signupSourcesOptions.find(
-        s => s.name === 'Other'
+        (s) => s.name === 'Other'
       )
       return otherOption && otherOption.id === this.signupSourceId
     },
@@ -380,9 +376,9 @@ export default {
 
         // volunteer sources drop School/Teacher and replace Friend/Classmate with Friend
         allSources = allSources.filter(
-          source => source.name !== 'School / Teacher'
+          (source) => source.name !== 'School / Teacher'
         )
-        allSources.find(source => source.name === 'Friend / Classmate').name =
+        allSources.find((source) => source.name === 'Friend / Classmate').name =
           'Friend'
         this.signupSourcesOptions = allSources
       } catch (err) {

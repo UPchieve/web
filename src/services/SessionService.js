@@ -33,7 +33,7 @@ export default {
       data.studentId = localStorage.getItem('studentId')
     }
 
-    return NetworkService.newSession(data, onRetry).then(res => {
+    return NetworkService.newSession(data, onRetry).then((res) => {
       const data = res.data || {}
       const { sessionId } = data
 
@@ -73,13 +73,13 @@ export default {
     const onRetry = options && options.onRetry
 
     return NetworkService.checkSession({ sessionId }, onRetry)
-      .then(res => {
+      .then((res) => {
         const data = res.data || {}
         const { sessionId } = data
 
         return sessionId
       })
-      .catch(res => {
+      .catch((res) => {
         if (res.status === 404) {
           context.$router.replace('/')
         } else {
@@ -90,7 +90,7 @@ export default {
 
   getCurrentSession() {
     return NetworkService.currentSession()
-      .then(res => {
+      .then((res) => {
         if (!res.data || !res.data.sessionId) {
           return Promise.resolve({ sessionData: {} })
         }
@@ -102,7 +102,7 @@ export default {
           return Promise.resolve({ sessionData: data })
         }
       })
-      .catch(resp => {
+      .catch((resp) => {
         throw errorFromHttpResponse(resp)
       })
   },
@@ -111,7 +111,7 @@ export default {
     return NetworkService.getRecapSessionForDms({
       sessionId,
     })
-      .then(resp => {
+      .then((resp) => {
         const { sessionId, data } = resp.data || {}
         const { type, subTopic } = data
 
@@ -119,18 +119,18 @@ export default {
           return Promise.resolve({ sessionData: data })
         }
       })
-      .catch(resp => {
+      .catch((resp) => {
         throw errorFromHttpResponse(resp)
       })
   },
 
   getLatestSession() {
     return NetworkService.latestSession()
-      .then(res => {
+      .then((res) => {
         const { data } = res.data || {}
         return Promise.resolve({ sessionData: data })
       })
-      .catch(resp => {
+      .catch((resp) => {
         throw errorFromHttpResponse(resp)
       })
   },

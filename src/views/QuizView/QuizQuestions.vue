@@ -106,14 +106,14 @@ export default {
 
       const mathJaxParentElements = Array.from(
         quizBody.querySelectorAll('.MathJax_Preview')
-      ).map(e => e.parentElement)
+      ).map((e) => e.parentElement)
 
-      mathJaxElements.forEach(e => e.remove())
+      mathJaxElements.forEach((e) => e.remove())
 
       // MathJax slices up the DOM nodes it renders as math formulas. We need to
       // rejoin these under the first child's data attribute to avoid artifacts
       // being left behind
-      mathJaxParentElements.forEach(parentEl => {
+      mathJaxParentElements.forEach((parentEl) => {
         if (!(parentEl && parentEl.firstChild)) return
 
         parentEl.firstChild.data = parentEl.innerText
@@ -121,7 +121,7 @@ export default {
         // Remove all child nodes but the first
         Array.from(parentEl.childNodes)
           .slice(1)
-          .forEach(e => e.remove())
+          .forEach((e) => e.remove())
       })
     },
 
@@ -138,7 +138,7 @@ export default {
         window.MathJax.Hub,
         [
           questionText,
-          ...Array.from(answerChoices).map(answerChoice =>
+          ...Array.from(answerChoices).map((answerChoice) =>
             answerChoice.querySelector('.options label')
           ),
         ],

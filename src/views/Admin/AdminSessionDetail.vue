@@ -65,9 +65,7 @@
       <div>{{ endedAt }}</div>
     </div>
     <div class="session-detail__section">
-      <div class="session-detail__section-title">
-        Notifications
-      </div>
+      <div class="session-detail__section-title">Notifications</div>
       <router-link :to="`/admin/sessions/${session._id}/notifications`"
         >{{
           session.notifications ? session.notifications.length : 0
@@ -100,9 +98,7 @@
       v-if="legacyStudentFeedback"
       class="session-detail__section session-detail__section--feedback"
     >
-      <div class="session-detail__section-title">
-        Student feedback
-      </div>
+      <div class="session-detail__section-title">Student feedback</div>
       <feedback-preview
         :feedback="legacyStudentFeedback"
         :userType="'student'"
@@ -112,9 +108,7 @@
       v-if="legacyVolunteerFeedback"
       class="session-detail__section session-detail__section--feedback"
     >
-      <div class="session-detail__section-title">
-        Volunteer feedback
-      </div>
+      <div class="session-detail__section-title">Volunteer feedback</div>
       <feedback-preview
         :feedback="legacyVolunteerFeedback"
         :userType="'volunteer'"
@@ -124,9 +118,7 @@
       v-if="presessionSurvey"
       class="session-detail__section session-detail__section--feedback"
     >
-      <div class="session-detail__section-title">
-        Student Presession Survey
-      </div>
+      <div class="session-detail__section-title">Student Presession Survey</div>
       <survey-response-preview :response="presessionSurvey" />
     </div>
     <div

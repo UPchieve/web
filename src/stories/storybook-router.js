@@ -6,11 +6,11 @@ import { action } from '@storybook/addon-actions'
 Vue.use(VueRouter)
 
 const storyRouterDecorator = (links = {}, routerProps = {}) => {
-  return story => {
+  return (story) => {
     const router = new VueRouter(routerProps)
     router.replace(routerProps.initialEntry ? routerProps.initialEntry : '/')
 
-    const getLocation = location => {
+    const getLocation = (location) => {
       // The location can be a simple string if you are using directly one of the
       // Router methods (https://router.vuejs.org/en/api/router-instance.html#methods)
       // or it can be an object, having the name or the path depending if you
@@ -56,7 +56,7 @@ const storyRouterDecorator = (links = {}, routerProps = {}) => {
       router.beforeEach(routerProps.globalBeforeEach)
     }
 
-    router.afterEach(to => {
+    router.afterEach((to) => {
       for (const link in links) {
         if (to.fullPath === link) {
           links[link](to.fullPath)
@@ -71,7 +71,7 @@ const storyRouterDecorator = (links = {}, routerProps = {}) => {
       router,
       components: { WrappedComponent },
       template: '<wrapped-component/>',
-      beforeDestroy: function() {
+      beforeDestroy: function () {
         // Remove the afterEach callback from the router list to not
         // accumulate callbacks called for every route action (in practice
         // this means that without this the action is executed as many

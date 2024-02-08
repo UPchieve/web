@@ -322,7 +322,7 @@ export default {
   },
   computed: {
     ...mapState({
-      isMobileApp: state => state.app.isMobileApp,
+      isMobileApp: (state) => state.app.isMobileApp,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -670,13 +670,13 @@ export default {
         const zwibblerOnMessage = zwibblerWsConnection.onmessage
         const zwibblerOnClose = zwibblerWsConnection.onclose
         // Intercept Zwibbler's websocket message handler
-        zwibblerWsConnection.onmessage = messageEvent => {
+        zwibblerWsConnection.onmessage = (messageEvent) => {
           // Forward message to Zwibbler unless it's our "pong" response
           if (messageEvent.data !== 'p0ng') zwibblerOnMessage(messageEvent)
         }
 
         // Intercept Zwibbler's websocket close handler to throw custom error
-        zwibblerWsConnection.onclose = closeEvent => {
+        zwibblerWsConnection.onclose = (closeEvent) => {
           const userType = this.isVolunteer ? 'volunteer' : 'student'
           // Access Zwibbler's internal WebSocket stream name
           // Note: the properties to access will change with every new Zwibbler update
@@ -698,7 +698,7 @@ export default {
         this.resizeViewRectangle()
 
         // Don't start setting selected tool until connected
-        this.zwibblerCtx.on('tool-changed', toolname => {
+        this.zwibblerCtx.on('tool-changed', (toolname) => {
           this.selectedTool = toolname
           this.hideHoveredToolbars()
         })
@@ -724,7 +724,7 @@ export default {
 
       window.addEventListener('resize', this.handleWindowResize, false)
 
-      this.zwibblerCtx.on('document-changed', info => {
+      this.zwibblerCtx.on('document-changed', (info) => {
         const isRemoteChange = info && info.remote
         const isWhiteboardHidden = this.mobileMode && !this.isWhiteboardOpen
         const shouldResizeView = isRemoteChange && isWhiteboardHidden
