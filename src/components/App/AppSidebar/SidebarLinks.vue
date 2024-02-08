@@ -84,7 +84,7 @@
       </sidebar-link>
       <sidebar-link
         v-if="isVolunteer"
-        to="https://join.slack.com/t/upchieveaccommunity/shared_invite/zt-24t73z5ac-yYtM9OuQTv7z0hKu5J5HMg"
+        to="https://join.slack.com/t/upchieveaccommunity/shared_invite/zt-2bnpp4ihv-Yw7J9dIdUFKHzhxx8m5ORA"
         text="Community"
         :openNewTab="true"
       >
