@@ -61,14 +61,14 @@
 
 <script>
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
-import StudentForm from './StudentForm'
-import VolunteerForm from './VolunteerForm'
+import StudentForm from './StudentForm.vue'
+import VolunteerForm from './VolunteerForm.vue'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import StudentAvatar from '@/assets/student-avatar.svg'
 import VolunteerAvatar from '@/assets/volunteer-avatar.svg'
 import { EVENTS } from '@/consts'
-import { capitalize } from 'lodash'
+import { capitalize } from 'lodash-es'
 
 export default {
   name: 'signup-view',

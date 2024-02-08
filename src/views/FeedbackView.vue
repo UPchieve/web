@@ -233,7 +233,7 @@ import SurveyImage from '@/components/Surveys/SurveyImage.vue'
 import SurveyRateNumber from '../components/Surveys/SurveyRateNumber.vue'
 import SurveyChipOption from '../components/Surveys/SurveyChipOption.vue'
 import SurveyCheckbox from '../components/Surveys/SurveyCheckbox.vue'
-import _ from 'lodash'
+import {map, remove, orderBy, find, forEach} from 'lodash-es'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 
@@ -329,12 +329,12 @@ export default {
       this.userType
     )
     this.surveyDefinition = postsessionSurveyDefinitionResponse.data.survey
-    this.allQuestions = _.map(this.surveyDefinition.survey, q => {
+    this.allQuestions = map(this.surveyDefinition.survey, q => {
       const isHiddenOnStart =
         this.isLowRatingQuestion(q) ||
         this.isHighRatingQuestion(q) ||
         this.isGuidelineIssueListQuestion(q)
-      q.responses = _.orderBy(q.responses, r => r.displayPriority)
+      q.responses =orderBy(q.responses, r => r.displayPriority)
       return {
         questionId: q.questionId,
         question: q,
@@ -343,7 +343,7 @@ export default {
         headerText: this.getQuestionSectionHeader(q),
       }
     })
-    this.allQuestions = _.orderBy(
+    this.allQuestions = orderBy(
       this.allQuestions,
       q => q.question.displayPriority
     )
@@ -602,7 +602,7 @@ export default {
         currentSelected = [responseId]
       } else if (currentSelected.find(r => r === responseId)) {
         // clicked item is already in list; deselect it
-        _.remove(currentSelected, r => r === responseId)
+        remove(currentSelected, r => r === responseId)
       } else {
         // clicked item is not in list yet; select it
         currentSelected.push(responseId)
@@ -618,11 +618,11 @@ export default {
 
     // if question changed is ratings question, show/hide conditional questions that depend on it
     ratingQuestionShowHide(questionId, responseId) {
-      const ratingQuestion = _.find(this.questions, q =>
+      const ratingQuestion = find(this.questions, q =>
         this.isStarRankingQuestion(q)
       )
       if (ratingQuestion && questionId === ratingQuestion.questionId) {
-        const ratingResponse = _.find(
+        const ratingResponse = find(
           ratingQuestion.responses,
           r => r.responseId === responseId
         )
@@ -633,7 +633,7 @@ export default {
           ratingResponse.responseText
         )
 
-        _.map(this.allQuestions, q => {
+        map(this.allQuestions, q => {
           if (this.isHighRatingQuestion(q.question)) {
             q.isVisible = showHighRatingQuestion
             return q
@@ -646,15 +646,15 @@ export default {
     },
     // if question changed is student safety & guideline violation question, show/hide conditional question that depends on it
     guidelineQuestionShowHide(questionId, responseId) {
-      const guidelineQuestion = _.find(this.questions, q =>
+      const guidelineQuestion = find(this.questions, q =>
         q.questionText.startsWith('Were there any student safety')
       )
       if (guidelineQuestion && questionId === guidelineQuestion.questionId) {
-        const guidelineResponse = _.find(
+        const guidelineResponse = find(
           guidelineQuestion.responses,
           r => r.responseId === responseId
         )
-        this.allQuestions = _.map(this.allQuestions, q => {
+        this.allQuestions = map(this.allQuestions, q => {
           const shouldToggleQuestionVisibility = this.isGuidelineIssueListQuestion(
             q.question
           )
@@ -674,7 +674,7 @@ export default {
       const questionIdsToClear = this.allQuestions
         .filter(item => !item.isVisible)
         .map(item => item.question.questionId)
-      _.forEach(questionIdsToClear, q => {
+      forEach(questionIdsToClear, q => {
         this.userResponse[q] = { responseId: null, openResponse: '' }
       })
 

@@ -25,7 +25,7 @@
 import { mapState } from 'vuex'
 import ModalTemplate from './ModalTemplate.vue'
 import RejoinSessionModal from './RejoinSessionModal.vue'
-import UpgradeAppModal from './UpgradeAppModal'
+import UpgradeAppModal from './UpgradeAppModal.vue'
 import SubjectSelectionModal from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectSelectionModal.vue'
 import NotificationsModal from '@/views/DashboardView/StudentDashboard/SubjectSelection/NotificationsModal.vue'
 import ReferralModal from '@/views/DashboardView/StudentDashboard/ReferralModal.vue'

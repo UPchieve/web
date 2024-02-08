@@ -3,6 +3,7 @@ import appModule from '@/store/modules/app'
 import headerModule from '@/store/modules/app/header'
 import sidebarModule from '@/store/modules/app/sidebar'
 import modalModule from '@/store/modules/app/modal'
+import { vi } from 'vitest';
 
 const { modules, state, mutations, actions, getters } = appModule
 
@@ -52,7 +53,7 @@ describe('`app` store module', () => {
   describe('actions', () => {
     it('showNavigation', () => {
       expect(typeof actions.showNavigation).toBe('function')
-      const dispatch = jest.fn()
+      const dispatch = vi.fn()
       actions.showNavigation({ dispatch })
       expect(dispatch).toHaveBeenNthCalledWith(1, 'header/show')
       expect(dispatch).toHaveBeenNthCalledWith(2, 'sidebar/show')
@@ -60,7 +61,7 @@ describe('`app` store module', () => {
 
     it('hideNavigation', () => {
       expect(typeof actions.hideNavigation).toBe('function')
-      const dispatch = jest.fn()
+      const dispatch = vi.fn()
       actions.hideNavigation({ dispatch })
       expect(dispatch).toHaveBeenNthCalledWith(1, 'header/hide')
       expect(dispatch).toHaveBeenNthCalledWith(2, 'sidebar/hide')
@@ -68,7 +69,7 @@ describe('`app` store module', () => {
 
     it('windowResize', () => {
       expect(typeof actions.windowResize).toBe('function')
-      const commit = jest.fn()
+      const commit = vi.fn()
       const width = 800
       const height = 600
       actions.windowResize({ commit }, { width, height })

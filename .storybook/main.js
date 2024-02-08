@@ -8,7 +8,6 @@ const config = {
     'storybook-addon-pseudo-states',
     '@storybook/addon-a11y',
     '@storybook/addon-actions',
-    '@storybook/addon-storyshots',
   ],
 
   core: {},

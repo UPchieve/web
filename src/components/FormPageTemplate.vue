@@ -147,7 +147,7 @@ export default {
   background-color: white;
 
   @include breakpoint-above('tiny') {
-    background: url('~@/assets/onboarding_background.png') no-repeat center
+    background: url('@/assets/onboarding_background.png') no-repeat center
       center;
     background-attachment: fixed;
     background-size: cover;

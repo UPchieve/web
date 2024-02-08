@@ -24,8 +24,8 @@
 <script>
 import { mapState } from 'vuex'
 import NetworkService from '@/services/NetworkService'
-import Module from './Module'
-import QuizLink from './QuizLink'
+import Module from './Module.vue'
+import QuizLink from './QuizLink.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import LoggerService from '@/services/LoggerService'

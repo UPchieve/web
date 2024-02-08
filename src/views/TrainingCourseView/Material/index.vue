@@ -63,10 +63,10 @@
 </template>
 
 <script>
-import LinkMaterial from './Link'
-import ResourcesMaterial from './Resources'
-import DocumentMaterial from './Document'
-import VideoMaterial from './Video'
+import LinkMaterial from './Link.vue'
+import ResourcesMaterial from './Resources.vue'
+import DocumentMaterial from './Document.vue'
+import VideoMaterial from './Video.vue'
 import RightCaret from '@/assets/right-caret.svg'
 import BookIcon from '@/assets/sidebar_icons/book.svg'
 import VideoIcon from '@/assets/video.svg'

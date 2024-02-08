@@ -39,7 +39,7 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import DashboardBanner from '../DashboardBanner'
+import DashboardBanner from '../DashboardBanner.vue'
 import SubjectSelection from './SubjectSelection/index.vue'
 import TellThemCollegePrepModal from './TellThemCollegePrepModal.vue'
 import ProcrastinationPreventionModal from './ProcrastinationPreventionModal.vue'

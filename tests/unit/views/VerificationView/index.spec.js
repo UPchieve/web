@@ -9,7 +9,7 @@ describe('VerificationView', () => {
   localVue.use(Vuex)
 
   beforeEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   const getWrapper = (

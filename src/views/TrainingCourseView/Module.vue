@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import Material from './Material'
+import Material from './Material/index.vue'
 import CheckMark from '@/components/CheckMark.vue'
 import RightCaret from '@/assets/right-caret.svg'
 

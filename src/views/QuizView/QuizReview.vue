@@ -27,8 +27,6 @@
 </template>
 
 <script>
-import 'core-js/features/array/flat-map'
-
 import TrainingService from '@/services/TrainingService'
 
 export default {

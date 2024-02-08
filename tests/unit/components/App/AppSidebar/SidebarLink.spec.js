@@ -1,9 +1,10 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils'
-import { merge } from 'lodash'
+import { merge } from 'lodash-es'
 import VueRouter from 'vue-router'
 import Vuex from 'vuex'
 import { storeOptions } from '@/store'
 import SidebarLink from '@/components/App/AppSidebar/SidebarLink.vue'
+import { vi } from 'vitest';
 
 const localVue = createLocalVue()
 localVue.use(VueRouter)
@@ -46,7 +47,7 @@ describe('SidebarLink', () => {
   })
 
   it('collapses sidebar when clicked', () => {
-    const collapse = jest.fn()
+    const collapse = vi.fn()
     const wrapper = getWrapper(
       { to: '/', text: 'Home', openNewTab: false },
       collapse

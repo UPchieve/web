@@ -31,7 +31,7 @@ import Quill from 'quill'
 import QuillCursors from 'quill-cursors'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import RefreshDocumentEditorModal from '@/views/SessionView/RefreshDocumentEditorModal.vue'
-import * as Y from 'yjs'
+import { Doc, applyUpdate } from 'yjs'
 import { QuillBinding } from 'y-quill'
 
 Quill.register('modules/cursors', QuillCursors)
@@ -106,7 +106,7 @@ export default {
     })
 
     // Delegate tracking the contents of the doc to Yjs instead of Quill.
-    this.doc = new Y.Doc()
+    this.doc = new Doc()
     new QuillBinding(this.doc.getText('quill'), this.quillEditor)
 
     this.quillEditor.root.addEventListener(
@@ -179,14 +179,14 @@ export default {
   sockets: {
     quillStateV2({ updates }) {
       for (const update of updates) {
-        Y.applyUpdate(this.doc, decode(update))
+        applyUpdate(this.doc, decode(update))
       }
       this.isLoading = false
       this.quillEditor.enable()
     },
 
     partnerQuillDeltaV2({ update }) {
-      Y.applyUpdate(this.doc, decode(update))
+      applyUpdate(this.doc, decode(update))
     },
 
     quillPartnerSelection({ range }) {

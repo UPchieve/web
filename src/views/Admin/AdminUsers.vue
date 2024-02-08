@@ -59,7 +59,7 @@
 import NetworkService from '@/services/NetworkService'
 import PageControl from '@/components/Admin/PageControl.vue'
 import UserListItem from '@/components/Admin/UserListItem.vue'
-import { isEmpty } from 'lodash'
+import { isEmpty } from 'lodash-es'
 
 const getUsers = async userData => {
   const {

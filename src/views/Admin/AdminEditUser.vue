@@ -123,7 +123,7 @@
 
 <script>
 import NetworkService from '@/services/NetworkService'
-import { isEmpty } from 'lodash'
+import { isEmpty } from 'lodash-es'
 
 export default {
   name: 'AdminEditUser',

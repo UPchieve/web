@@ -7,6 +7,7 @@ import Vuex from 'vuex'
 import UserService from '@/services/UserService'
 import AuthService from '@/services/AuthService'
 import AnalyticsService from '@/services/AnalyticsService'
+import { vi } from 'vitest';
 
 describe('ProfileView', () => {
   const localVue = createLocalVue()
@@ -14,13 +15,13 @@ describe('ProfileView', () => {
 
   let DEFAULT_FLAGS_GETTERS, DEFAULT_USER
 
-  UserService.setProfile = jest.fn().mockResolvedValue()
-  AuthService.initiateVerification = jest.fn().mockResolvedValue()
-  userModule.actions.addToUser = jest.fn().mockResolvedValue()
-  AnalyticsService.captureEvent = jest.fn().mockReturnValue()
+  UserService.setProfile = vi.fn().mockResolvedValue()
+  AuthService.initiateVerification = vi.fn().mockResolvedValue()
+  userModule.actions.addToUser = vi.fn().mockResolvedValue()
+  AnalyticsService.captureEvent = vi.fn().mockReturnValue()
 
   beforeEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
 
     DEFAULT_FLAGS_GETTERS = {
       isFilterActiveSubjectsActive: () => true,

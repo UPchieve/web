@@ -13,8 +13,8 @@
 </template>
 
 <script>
-import LinkMaterial from './Link'
-import ResourcesMaterial from './Resources'
+import LinkMaterial from './Link.vue'
+import ResourcesMaterial from './Resources.vue'
 
 export default {
   components: {

@@ -3,7 +3,7 @@ import VerificationMethodSelector from '@/views/VerificationView/VerificationMet
 
 describe('VerificationMethodSelector', () => {
   beforeEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   const getWrapper = (email = 'testEmail@gmail.com') => {

@@ -83,7 +83,7 @@ export default {
 <style lang="scss" scoped>
 header {
   background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)),
-    url('~@/assets/confetti.png');
+    url('@/assets/confetti.png');
   height: 220px;
   padding-top: 1em;
   position: relative;

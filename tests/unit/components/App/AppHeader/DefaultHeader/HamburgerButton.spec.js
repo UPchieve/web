@@ -1,14 +1,15 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils'
-import { merge } from 'lodash'
+import { merge } from 'lodash-es'
 import Vuex from 'vuex'
 import { storeOptions } from '@/store'
 import HamburgerButton from '@/components/App/AppHeader/HamburgerButton.vue'
+import { vi } from 'vitest';
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
 
-const expand = jest.fn()
-const collapse = jest.fn()
+const expand = vi.fn()
+const collapse = vi.fn()
 
 const getWrapper = (isCollapsed = true) => {
   const store = new Vuex.Store(
@@ -50,7 +51,7 @@ describe.skip('HamburgerButton', () => {
 
   // The tests below are failing to trigger the handleClick function
   it('calls handleClick when clicked', () => {
-    // const handleClick = jest.fn();
+    // const handleClick = vi.fn();
     // const wrapper = getWrapper(true);
     // const icon = wrapper.find(HamburgerIcon);
     // icon.trigger("click");

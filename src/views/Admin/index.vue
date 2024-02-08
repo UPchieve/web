@@ -32,7 +32,6 @@
       <router-link to="/admin/zip-codes" class="admin-link btn"
         >Zip Code Lookup</router-link
       >
-      <router-link to="/edu" class="admin-link btn">Edu Admin</router-link>
       <router-link to="admin/test-audience" class="admin-link btn"
         >Test Audience</router-link
       >

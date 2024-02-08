@@ -5,7 +5,7 @@ import UserService from '@/services/UserService'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import Case from 'case'
-import _ from 'lodash'
+import { some } from 'lodash-es'
 
 export default {
   namespaced: true,
@@ -338,7 +338,7 @@ export default {
       // a certification. It's nested in user.certifications for legacy purposes
       const certs = Object.assign({}, state.user.certifications)
       delete certs.upchieve101
-      return _.some(certs, { passed: true })
+      return some(certs, { passed: true })
     },
 
     passedUpchieve101: state => {

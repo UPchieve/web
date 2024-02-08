@@ -1,5 +1,5 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils'
-import { merge } from 'lodash'
+import { merge } from 'lodash-es'
 import Vuex from 'vuex'
 import { storeOptions } from '@/store'
 import AppSidebar from '@/components/App/AppSidebar/index.vue'

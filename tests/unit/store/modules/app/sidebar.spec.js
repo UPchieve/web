@@ -1,4 +1,5 @@
 import sidebarModule from '@/store/modules/app/sidebar'
+import { vi } from 'vitest';
 
 const { state, mutations, actions } = sidebarModule
 
@@ -29,8 +30,8 @@ describe('`app/sidebar` store module', () => {
   describe('actions', () => {
     it('show', () => {
       expect(typeof actions.show).toBe('function')
-      const dispatch = jest.fn()
-      const commit = jest.fn()
+      const dispatch = vi.fn()
+      const commit = vi.fn()
       actions.show({ dispatch, commit })
       expect(dispatch).toHaveBeenCalledWith('collapse')
       expect(commit).toHaveBeenCalledWith('setIsShown', true)
@@ -38,8 +39,8 @@ describe('`app/sidebar` store module', () => {
 
     it('hide', () => {
       expect(typeof actions.hide).toBe('function')
-      const dispatch = jest.fn()
-      const commit = jest.fn()
+      const dispatch = vi.fn()
+      const commit = vi.fn()
       actions.hide({ dispatch, commit })
       expect(dispatch).toHaveBeenCalledWith('collapse')
       expect(commit).toHaveBeenCalledWith('setIsShown', false)
@@ -47,14 +48,14 @@ describe('`app/sidebar` store module', () => {
 
     it('collapse', () => {
       expect(typeof actions.collapse).toBe('function')
-      const commit = jest.fn()
+      const commit = vi.fn()
       actions.collapse({ commit })
       expect(commit).toHaveBeenCalledWith('setIsCollapsed', true)
     })
 
     it('expand', () => {
       expect(typeof actions.expand).toBe('function')
-      const commit = jest.fn()
+      const commit = vi.fn()
       actions.expand({ commit })
       expect(commit).toHaveBeenCalledWith('setIsCollapsed', false)
     })

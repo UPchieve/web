@@ -31,7 +31,7 @@ export default {
     }),
     referralLink() {
       const { referralCode } = this.user
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.NODE_ENV === 'development') {
         return `http://localhost:8080/referral/${referralCode}`
       } else {
         return `${config.serverRoot}/referral/${referralCode}`

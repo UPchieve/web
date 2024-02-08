@@ -37,7 +37,7 @@ Vue.use(VueRouter)
 // Set up PortalGun (connection to native app)
 PortalService.listen()
 
-const handlePortalData = data => {
+const handlePortalData = (data) => {
   // TODO: don't route immediately if push is received while app is open.
   // can detect with `if (data._isPush && data._original?.additionalData?.foreground)`
   // and show own UI for notification
@@ -62,7 +62,7 @@ Vue.component('vue-star-rating', VueStarRating)
 Vue.use(ToggleButton)
 
 // Filter for formatting times
-Vue.filter('formatTime', value => {
+Vue.filter('formatTime', (value) => {
   if (value) {
     return moment(value).format('h:mm a')
   }
@@ -73,7 +73,7 @@ function initVue() {
   const app = new Vue({
     router,
     store,
-    render: h => h(App),
+    render: (h) => h(App),
   }).$mount('#app')
 
   // allow e2e tests to see Vuex store
