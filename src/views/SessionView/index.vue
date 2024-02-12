@@ -101,7 +101,24 @@
           class="toggleButton__message-indicator"
           v-if="!hasSeenNewMessage"
         ></span>
-        <img id="toggleIcon" :src="toggleIconSrc" alt="toggle icon" />
+        <img
+          v-if="auxiliaryOpen"
+          id="toggleIcon"
+          src="@/assets/Chat.png"
+          alt="toggle icon"
+        />
+        <img
+          v-else-if="auxiliaryType === sessionToolTypes.WHITEBOARD"
+          id="toggleIcon"
+          src="@/assets/Pencil.png"
+          alt="toggle icon"
+        />
+        <img
+          v-else
+          id="toggleIcon"
+          src="@/assets/doc_editor_icon.png"
+          alt="toggle icon"
+        />
       </div>
     </div>
     <div
@@ -236,14 +253,6 @@ export default {
     sessionToolTypes() {
       return SESSION_TOOL_TYPES
     },
-
-    toggleIconSrc() {
-      if (this.auxiliaryOpen) return require(`@/assets/Chat.png`)
-      else if (this.auxiliaryType === 'WHITEBOARD')
-        return require(`@/assets/Pencil.png`)
-      else return require(`@/assets/doc_editor_icon.png`)
-    },
-
     shouldHideAuxiliarySection() {
       // Never hide auxiliary section (whiteboard/document) on desktop
       if (!this.mobileMode) {
