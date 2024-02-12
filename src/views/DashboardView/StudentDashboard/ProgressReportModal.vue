@@ -62,8 +62,7 @@
       </div>
       <div v-else-if="showStillGeneratingReport" class="prm">
         <header>
-          <mobile-banner-image v-if="mobileMode" class="prm-banner" />
-          <desktop-banner-image v-else class="prm-banner" />
+          <updog-construction class="updog--large" />
           <h1 class="prm__title">It's taking longer than usual</h1>
         </header>
         <section class="prm__section prm__section--center">
@@ -219,6 +218,7 @@ import UpdogConstruction from '@/assets/updog-construction.svg'
 import LargeButton from '@/components/LargeButton.vue'
 import Modal from '@/components/Modal.vue'
 import AnalyticsService from '@/services/AnalyticsService'
+import NetworkService from '@/services/NetworkService'
 import CrossIcon from '@/assets/cross.svg'
 import GradeBars from '@/components/GradeBars.vue'
 import Separator from '@/components/Separator.vue'
@@ -308,13 +308,15 @@ export default {
       // after the socket event is received
       if (this.report) this.handleReport()
 
-      this.timeOutInterval = setTimeout(() => {
-        if (!this.report) {
-          this.showStillGeneratingReport = true
-          this.isSubmitting = false
-          AnalyticsService.captureEvent(
-            EVENTS.PROGRESS_REPORT_STUDENT_MODAL_TIMED_OUT
-          )
+      this.timeOutInterval = setTimeout(async () => {
+        const response = await NetworkService.getProgressReportForSession(
+          this.latestSession.id
+        )
+        if (response.data.id) {
+          this.report = response.data
+          this.handleReport()
+        } else if (!this.report) {
+          this.handleModalTimeout()
         }
       }, 1000 * 60)
     },
@@ -326,6 +328,11 @@ export default {
           'user/updateRequestedProgressReportOverview',
           false
         )
+      } else if (
+        this.report.status === 'pending' ||
+        this.report.status === 'processing'
+      ) {
+        this.handleModalTimeout()
       } else if (!Object.keys(this.summary).length || !this.concepts.length) {
         this.showHaveMoreSessions = true
         AnalyticsService.captureEvent(EVENTS.PROGRESS_REPORT_NO_ANALYSIS)
@@ -369,6 +376,13 @@ export default {
     },
     gradeLabel(grade) {
       return gradeLabel(grade)
+    },
+    handleModalTimeout() {
+      this.showStillGeneratingReport = true
+      this.isSubmitting = false
+      AnalyticsService.captureEvent(
+        EVENTS.PROGRESS_REPORT_STUDENT_MODAL_TIMED_OUT
+      )
     },
   },
   sockets: {
@@ -647,6 +661,13 @@ p {
 .updog {
   width: 120px;
   height: 120px;
+
+  &--large {
+    display: block;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+  }
 }
 
 .loading-message {

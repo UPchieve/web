@@ -524,7 +524,7 @@ export default {
       const chartRef = this.$refs.chart
       const sortedData = [
         ...this.summaries.sort(
-          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+          (a, b) => new Date(a.sessionCreatedAt) - new Date(b.sessionCreatedAt)
         ),
       ]
       const currentDate = moment()
@@ -540,7 +540,7 @@ export default {
       const labels = months
       const mobileMode = this.mobileMode
       const dataset = sortedData.map((entry) => ({
-        x: moment(entry.createdAt).local(),
+        x: moment(entry.sessionCreatedAt).local(),
         y: entry.overallGrade,
         label: this.gradeLabel(entry.overallGrade),
       }))

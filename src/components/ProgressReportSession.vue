@@ -107,12 +107,6 @@ export default {
 
       return endResult
     },
-    gradeLabel(grade) {
-      return gradeLabel(grade)
-    },
-    gradeDescription(grade) {
-      return gradeDescription(grade)
-    },
   },
   methods: {
     getSummaryForFocusAreaAndInfoType(data, focusArea, infoType) {
@@ -140,6 +134,12 @@ export default {
       )
       filteredConcepts.sort((a, b) => b.grade - a.grade)
       return filteredConcepts
+    },
+    gradeLabel(grade) {
+      return gradeLabel(grade)
+    },
+    gradeDescription(grade) {
+      return gradeDescription(grade)
     },
   },
 }
