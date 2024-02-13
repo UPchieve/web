@@ -5,6 +5,8 @@ import LoggerService from './LoggerService'
 import NetworkService from './NetworkService'
 import ProductDiscoveryService from './ProductDiscoveryService'
 
+export const INVALID_CSRF_ERROR = 'invalid csrf token'
+
 export default {
   login(creds) {
     const { email, password } = creds
