@@ -21,6 +21,7 @@ export default {
     version: '',
     currentServerVersion: '',
     csrfToken: '',
+    showCsrfRefreshAlert: false,
   },
   mutations: {
     setWindowWidth: (state, width = 0) =>
@@ -33,6 +34,7 @@ export default {
       (state.currentServerVersion = version),
     isWebPageHidden: (state, isVisible) => (state.isWebPageHidden = isVisible),
     setCsrfToken: (state, csrfToken) => (state.csrfToken = csrfToken),
+    setShowCsrfRefreshAlert: (state, val) => (state.showCsrfRefreshAlert = val),
   },
   actions: {
     showNavigation: ({ dispatch }) => {

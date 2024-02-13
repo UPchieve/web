@@ -1,16 +1,12 @@
 <template>
   <div id="app" class="App" :class="isIOS && 'is-ios'">
-    <app-header v-if="showHeader" />
-    <app-sidebar v-if="showSidebar" />
-    <app-modal v-if="showModal" />
-    <app-banner v-if="showBanner" />
     <b-alert
       class="refresh-alert"
       dismissible
       variant="warning"
-      v-model="showRefreshAlert"
+      v-model="shouldShowRefreshAlert"
     >
-      There is a new version of the app available, please
+      {{ refreshMessage }}, please
       <large-button
         class="refresh-alert__refresh-button"
         @click.native="refreshPage"
@@ -19,7 +15,10 @@
         >refresh</large-button
       >
     </b-alert>
-
+    <app-header v-if="showHeader" />
+    <app-sidebar v-if="showSidebar" />
+    <app-modal v-if="showModal" />
+    <app-banner v-if="showBanner" />
     <div
       :class="{
         'App-router-view-wrapper': true,
@@ -66,7 +65,7 @@ export default {
     return {
       isIOS: false,
       docHiddenProperty: '',
-      showRefreshAlert: false,
+      newServerVersionAvailable: false,
     }
   },
   async created() {
@@ -125,7 +124,7 @@ export default {
           this.$store.state.app.version !==
           this.$store.state.app.currentServerVersion
         ) {
-          this.showRefreshAlert = true
+          this.newServerVersionAvailable = true
         }
       })
     },
@@ -212,6 +211,7 @@ export default {
       subjects: (state) => state.subjects.subjects,
       requestedProgressReportOverview: (state) =>
         state.user.requestedProgressReportOverview,
+      showCsrfRefreshAlert: (state) => state.app.showCsrfRefreshAlert,
     }),
     ...mapGetters({
       userAuthenticated: 'user/isAuthenticated',
@@ -220,6 +220,18 @@ export default {
       isAutoFlowUser: 'user/isAutoFlowUser',
       getUserPropsForAnalytics: 'user/getUserPropsForAnalytics',
     }),
+    shouldShowRefreshAlert() {
+      return this.newServerVersionAvailable || this.showCsrfRefreshAlert
+    },
+    refreshMessage() {
+      const defaultMsg = 'Oops! Something went wrong'
+      if (this.newServerVersionAvailable && !this.showCsrfRefreshAlert) {
+        // Prefer the "Oops!" message over new app version when both apply
+        return 'There is a new version of the app available'
+      } else {
+        return defaultMsg
+      }
+    },
   },
   // https://github.com/BrianRosamilia/vue-crono
   cron: {

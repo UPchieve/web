@@ -50,6 +50,7 @@ import Gleap from 'gleap'
 import AnalyticsService from './services/AnalyticsService'
 import { EVENTS } from './consts'
 import { axiosInstance } from './services/NetworkService'
+import { INVALID_CSRF_ERROR } from '@/services/AuthService'
 
 const getUser = () => {
   if (store.getters['user/isAuthenticated']) {
@@ -551,6 +552,16 @@ axiosInstance.interceptors.response.use(
       !(isGetUserAttempt || isGetSessionAttempt || isGetSubjectsAttempt)
     )
       router.push('/login?401=true').catch(() => {})
+    return Promise.reject(error)
+  }
+)
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.data?.err === INVALID_CSRF_ERROR) {
+      store.commit('app/setShowCsrfRefreshAlert', true)
+    }
     return Promise.reject(error)
   }
 )
