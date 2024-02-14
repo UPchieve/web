@@ -211,10 +211,7 @@ export default {
 
     if (this.isSessionAlive) {
       this.$store.dispatch('app/header/show', rejoinHeaderData)
-    } else if (
-      !this.user.emailVerified &&
-      this.isSmsVerificationEnabledOnSignupFlow
-    ) {
+    } else if (!this.user.emailVerified) {
       this.$store.dispatch('app/header/show', {
         component: 'VerificationHeader',
         data: {
@@ -252,8 +249,6 @@ export default {
       hasSelectedAvailability: 'user/hasSelectedAvailability',
       downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
       allSubjectNames: 'subjects/allSubtopicNames',
-      isSmsVerificationEnabledOnSignupFlow:
-        'featureFlags/isSmsVerificationEnabledOnSignupFlow',
     }),
 
     isCustomVolunteerPartner() {
