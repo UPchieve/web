@@ -119,10 +119,6 @@ export default {
       FeatureFlagService.isFeatureEnabled(
         POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION
       ),
-    isSmsVerificationEnabledOnSignupFlow: () =>
-      FeatureFlagService.isFeatureEnabled(
-        POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION_ENABLED_ON_SIGNUP_FLOW
-      ),
     eligibilityEmail: () =>
       FeatureFlagService.isFeatureEnabled(
         POSTHOG_FEATURE_FLAGS.ELIGIBILITY_EMAIL

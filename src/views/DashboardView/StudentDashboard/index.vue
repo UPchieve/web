@@ -82,10 +82,7 @@ export default {
   async created() {
     if (this.isSessionAlive) {
       this.$store.dispatch('app/header/show', activeHeaderData)
-    } else if (
-      !this.user.emailVerified &&
-      this.isSmsVerificationEnabledOnSignupFlow
-    ) {
+    } else if (!this.user.emailVerified) {
       this.$store.dispatch('app/header/show', {
         component: 'VerificationHeader',
         data: {
@@ -186,8 +183,6 @@ export default {
       isAutoStartCollegeSessionActive:
         'featureFlags/isAutoStartCollegeSessionActive',
       autoStartCollegeSession: 'featureFlags/autoStartCollegeSession',
-      isSmsVerificationEnabledOnSignupFlow:
-        'featureFlags/isSmsVerificationEnabledOnSignupFlow',
     }),
     userAndOrbitalSegment() {
       return [this.user, this.orbitalSegments, this.isOrbitalSegmentsActive]

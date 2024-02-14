@@ -14,7 +14,6 @@ describe('VerificationView', () => {
 
   const getWrapper = (
     smsVerificationEnabled = true,
-    smsVerificationEnabledOnSignupFlow = true
   ) => {
     const store = new Vuex.Store({
       modules: {
@@ -34,8 +33,6 @@ describe('VerificationView', () => {
           ...featureFlagsModule,
           getters: {
             isSmsVerificationEnabled: () => smsVerificationEnabled,
-            isSmsVerificationEnabledOnSignupFlow: () =>
-              smsVerificationEnabledOnSignupFlow,
           },
         },
       },
@@ -48,7 +45,7 @@ describe('VerificationView', () => {
 
   describe('sms-verification feature flag', () => {
     it('Should render VerificationMethodSelector when the flags are on', () => {
-      const wrapper = getWrapper(true, true)
+      const wrapper = getWrapper(true)
       expect(
         wrapper.find('[data-testid="verification-method-selector"]').exists()
       ).toBeTruthy()
@@ -56,22 +53,17 @@ describe('VerificationView', () => {
     })
 
     it.each([
-      [false, false],
-      [false, true],
-      [true, false],
+      [true, 'verification-method-selector'], [false, 'step-2'],
     ])(
-      'Should render in step 2 if either flag is disabled (%s, %s)',
-      (smsVerificationFlag, smsVerificationOnSignupFlag) => {
-        // Scenario: SMS verification disabled, therefore the user has no choice of verification method,
+      'When SMS enabled=%s, should render %s',
+      (smsVerificationFlag, step) => {
+        // Scenario: SMS verification disabled, the user has no choice of verification method,
         // so it goes straight to step 2.
-        const wrapper = getWrapper(
-          smsVerificationFlag,
-          smsVerificationOnSignupFlag
-        )
+        const wrapper = getWrapper(smsVerificationFlag)
         expect(
           wrapper.find('[data-testid="verification-method-selector"]').exists()
-        ).toBeFalsy()
-        expect(wrapper.find('[data-testid="step-2"]').isVisible()).toBeTruthy()
+        ).toEqual(smsVerificationFlag)
+        expect(wrapper.find(`[data-testid="${step}"]`).exists()).toBeTruthy()
       }
     )
   })

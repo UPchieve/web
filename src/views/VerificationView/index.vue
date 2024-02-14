@@ -7,11 +7,7 @@
 
       <!--        If sms-verification is enabled, give the user the option to choose verification method in step 1-->
       <verification-method-selector
-        v-if="
-          step === 1 &&
-          isSmsVerificationEnabled &&
-          isSmsVerificationEnabledOnSignupFlow
-        "
+        v-if="step === 1 && isSmsVerificationEnabled"
         data-testid="verification-method-selector"
         :email="user.email"
         v-model="verificationInputs"
@@ -119,10 +115,7 @@ export default {
     }
   },
   beforeMount() {
-    if (
-      this.isSmsVerificationEnabled &&
-      this.isSmsVerificationEnabledOnSignupFlow
-    ) {
+    if (this.isSmsVerificationEnabled) {
       this.step = 1
     } else {
       this.step = 2
@@ -143,8 +136,6 @@ export default {
     ...mapGetters({
       isAutoFlowUser: 'user/isAutoFlowUser',
       isSmsVerificationEnabled: 'featureFlags/isSmsVerificationEnabled', // Whether SMS verification is enabled across the app
-      isSmsVerificationEnabledOnSignupFlow:
-        'featureFlags/isSmsVerificationEnabledOnSignupFlow', // Whether it's a verification option during signup
     }),
     sendTo() {
       if (this.verificationInputs.method === VERIFICATION_METHOD.SMS) {
