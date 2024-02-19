@@ -30,7 +30,7 @@ const GLEAP_WIDGET_CONFIGS = {
 
 function isValidUserForSegment(user, properties) {
   const { minSessions, maxSessions, userType, flagFilters } = properties
-  const hasAValidFlag = flagFilters.some((flag) =>
+  const hasAValidFlag = flagFilters?.some((flag) =>
     FeatureFlagService.isFeatureEnabled(flag)
   )
 

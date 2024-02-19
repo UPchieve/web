@@ -3,6 +3,7 @@ import VolunteerAvatarUrl from '@/assets/defaultavatar4.png'
 import SessionService from '@/services/SessionService'
 import UserService from '@/services/UserService'
 import LoggerService from '@/services/LoggerService'
+import FeatureFlagService from '@/services/FeatureFlagService'
 import NetworkService from '@/services/NetworkService'
 import Case from 'case'
 import { some } from 'lodash-es'
@@ -234,15 +235,13 @@ export default {
       commit('setIsFirstDashboardVisit', isFirstDashboardVisit)
     },
 
-    addToUser: ({ commit, state, dispatch, getters }, data) => {
+    addToUser: ({ commit, state, getters }, data) => {
       const { user } = state
       const updatedUser = { ...user, ...data }
       commit('updateUser', updatedUser)
       // Ensure that properties are up to date with for feature flag evaluation
-      dispatch(
-        'featureFlags/setPersonPropertiesForFlags',
-        getters.getUserPropsForAnalytics,
-        { root: true }
+      FeatureFlagService.setPersonPropertiesForFlags(
+        getters.getUserPropsForAnalytics
       )
     },
 
