@@ -44,6 +44,7 @@ import PortalService from '@/services/PortalService'
 import getOperatingSystem from '@/utils/get-operating-system'
 import isOutdatedMobileAppVersion from '@/utils/is-outdated-mobile-app-version'
 import AnalyticsService from '@/services/AnalyticsService'
+import FeatureFlagService from '@/services/FeatureFlagService'
 import LoggerService from '@/services/LoggerService'
 import config from '@/config'
 import LargeButton from '@/components/LargeButton.vue'
@@ -244,11 +245,9 @@ export default {
       const nowLoggedIn = currentUserValue.id && !previousUserValue.id
       if (nowLoggedIn) {
         if (!this.$socket.connected) this.$socket.connect()
+
         const userProps = this.getUserPropsForAnalytics
-        this.$store.dispatch(
-          'featureFlags/setPersonPropertiesForFlags',
-          userProps
-        )
+        FeatureFlagService.setPersonPropertiesForFlags(userProps)
 
         AnalyticsService.identify(currentUserValue.id, userProps)
         LoggerService.identify(currentUserValue._id)

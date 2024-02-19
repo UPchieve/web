@@ -235,6 +235,7 @@ class DevAnalyticsService {
 function getAnalyticsService() {
   switch (config.nodeEnv) {
     case 'development':
+    case 'test':
       return DevAnalyticsService
     default:
       return AnalyticsService

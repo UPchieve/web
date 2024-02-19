@@ -10,4 +10,7 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
     'vue/multi-word-component-names': 'off',
   },
+  parserOptions: {
+    ecmaVersion: 2022,
+  }
 }
