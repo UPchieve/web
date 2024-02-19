@@ -2,7 +2,11 @@
   <div v-if="step === 'eligibility' || step === 'referred'">
     <FormErrors :errors="errors" />
 
-    <h1 v-if="!isCollegeConfidential" class="uc-form-header">
+    <h1
+      v-if="!isCollegeConfidential"
+      class="uc-form-header"
+      data-testid="eligibility-title"
+    >
       {{ customEligibilityHeader || `Awesome! Let's check if we're a match` }}
     </h1>
     <div v-if="showBigFutureIntroCopy">
@@ -47,6 +51,10 @@
           quick info below to see if you're eligible.
         </p>
       </div>
+    </div>
+    <div v-if="isCodeDotOrgStudent" data-testid="code-dot-org-custom-copy">
+      Create an account now to access FREE, 24/7 tutoring in all your classes,
+      including AP Computer Science. Complete the form below to proceed.
     </div>
     <form
       id="form-eligibility"
@@ -211,6 +219,7 @@
 
       <button
         id="btn-eligibility-submit"
+        data-testid="eligibility-form-submit-btn"
         class="uc-form-button"
         :disabled="cannotSubmitForm(v$.eligibility)"
         type="submit"
@@ -600,6 +609,7 @@ export default {
       // Reach Studies:
       isCollegeConfidential: false,
       showBigFutureIntroCopy: false,
+      showCodeDotOrgIntroCopy: false,
       skipEligibilityEmail: false,
     }
   },
@@ -693,9 +703,16 @@ export default {
     },
     customEligibilityHeader() {
       if (this.studentPartner) {
+        if (this.isCodeDotOrgStudent) {
+          return 'Welcome to UPchieve!'
+        }
         return `Welcome ${this.studentPartner.name} Student!`
       }
       return ''
+    },
+
+    isCodeDotOrgStudent() {
+      return this.studentPartner?.key === 'code-org'
     },
   },
   watch: {
@@ -758,10 +775,17 @@ export default {
 
     eligibilityPage(params) {
       this.step = 'eligibility'
-      this.$router.replace({
+      const destination = {
         path: `/sign-up/student/eligibility`,
         query: params,
-      })
+      }
+      if (
+        this.$route.path !== destination.path &&
+        this.$route.query !== destination.query
+      )
+        this.$router.replace(destination).catch((err) => {
+          LoggerService.noticeError(err)
+        })
     },
 
     async isDomesticIpAddress() {
@@ -812,7 +836,12 @@ export default {
     },
 
     async submitEligibilityForm() {
-      AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CHECK_MY_ELIGIBILITY)
+      AnalyticsService.captureEvent(
+        EVENTS.STUDENT_CLICKED_CHECK_MY_ELIGIBILITY,
+        {
+          partnerKey: this.partnerKey,
+        }
+      )
 
       // reset error msg from server
       this.msg = ''
@@ -828,18 +857,20 @@ export default {
       })
         .then(async (response) => {
           const isEligible = response.data.isEligible
+          AnalyticsService.captureEvent(
+            isEligible
+              ? EVENTS.ELIGIBILITY_ELIGIBLE
+              : EVENTS.ELIGIBILITY_INELIGIBLE,
+            {
+              partnerKey: this.partnerKey,
+            }
+          )
           if (isEligible) {
-            AnalyticsService.captureEvent(EVENTS.ELIGIBILITY_ELIGIBLE, {
-              event: EVENTS.ELIGIBILITY_ELIGIBLE,
-            })
             // autofill the user's email
             this.credentials.email = this.eligibility.email
             this.step = 'eligible'
             this.$router.replace('/sign-up/student/eligible')
           } else {
-            AnalyticsService.captureEvent(EVENTS.ELIGIBILITY_INELIGIBLE, {
-              event: EVENTS.ELIGIBILITY_INELIGIBLE,
-            })
             if (response.data.isCollegeStudent) this.isCollegeStudent = true
             this.step = 'ineligible'
             this.$router.replace('/sign-up/student/ineligible')
