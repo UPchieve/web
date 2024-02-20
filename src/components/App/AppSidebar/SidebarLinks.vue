@@ -1,10 +1,5 @@
 <template>
-  <div
-    class="SidebarLinks"
-    :class="{
-      'SidebarLinks--auto-flow': this.isAutoFlowUser,
-    }"
-  >
+  <div v-if="!isAutoFlowUser" class="SidebarLinks">
     <template v-if="$route.path.indexOf('/onboarding') !== -1"></template>
 
     <template v-else-if="authenticated">
@@ -191,10 +186,6 @@ export default {
     color: $c-secondary-grey;
     margin-top: 40px;
     text-align: left;
-  }
-
-  &--auto-flow {
-    visibility: hidden;
   }
 
   &__container {

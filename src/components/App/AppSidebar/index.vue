@@ -106,6 +106,8 @@ $transition: transform 700ms;
   height: 100%;
   padding: 40px 20px 40px 30px;
   position: relative;
+  display: flex;
+  flex-direction: column;
 
   @media screen and (min-width: get-breakpoint('medium')) and (max-width: get-breakpoint('huge')) and (orientation: landscape) {
     padding-left: 2em;
@@ -121,6 +123,7 @@ $transition: transform 700ms;
 
   &--desktop {
     @include font-category('button');
+    justify-content: space-between;
 
     @media screen and (min-width: get-breakpoint('medium')) and (max-width: get-breakpoint('huge')) and (orientation: landscape) {
       position: initial;
