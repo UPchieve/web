@@ -13,7 +13,7 @@
     "html-validate": "html-validate --ext html,vue src",
     "storybook": "storybook dev -p 6006",
     "test:watch": "vitest --watch",
-    "test": "vitest --run",
+    "test": "vitest --run --pool=forks",
     "scan:diff": "git diff --staged --name-only -z | xargs -0 detect-secrets-hook --baseline .secrets.baseline --exclude-files package-lock.json",
     "scan:audit": "detect-secrets audit .secrets.baseline"
   },
