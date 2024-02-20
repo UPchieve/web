@@ -54,7 +54,7 @@
     </div>
     <div v-if="isCodeDotOrgStudent" data-testid="code-dot-org-custom-copy">
       Create an account now to access FREE, 24/7 tutoring in all your classes,
-      including AP Computer Science. Complete the form below to proceed.
+      including AP Computer Science.
     </div>
     <form
       id="form-eligibility"
