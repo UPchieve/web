@@ -4,17 +4,21 @@
       <div v-if="isSubmitting" class="prm">
         <section class="prm__section prm__section--center">
           <upbot class="updog" />
-          <p class="loading-message">
-            UPbot is analyzing your reading score, it might take a minute or so.
+          <loading-message
+            class="loading-message"
+            :message="'UPbot is analyzing your Reading session'"
+          />
+          <p class="loading-message-subtitle">
+            Please wait, it might take a minute or so.
           </p>
           <p class="prm__body--spacing prm__body--center">
-            You can always go to the "Your progress tab" to access your session
-            overview
+            If you are tired of waiting, you can always access them later in
+            "Your Progress" tab when it's ready.
           </p>
           <large-button
             class="prm__buttons-button"
             @click.native="handleCloseModal"
-            >Dismiss</large-button
+            >View later</large-button
           >
         </section>
       </div>
@@ -98,10 +102,10 @@
           <desktop-banner-image v-else class="prm-banner" />
           <h1 class="prm__title">Want to see how you are doing in Reading?</h1>
           <p class="prm__body">
-            UPbot can now analyze what you've learned with your coach and will
-            generate a report on what you're doing well and what you can improve
-            on. You will be able to see how you are progressing after each
-            session!
+            Our <span class="bolded-text">Reading UPbot (AI Bot)</span> can
+            analyze what you're doing well and what you can improve on in your
+            reading sessions! You will also be able to see how you are
+            progressing after each session!
           </p>
         </header>
 
@@ -138,10 +142,13 @@
           <div class="prm__section-bot">
             <upbot v-if="!mobileMode" class="upbot--medium" />
             <div class="prm__overview--strength">
-              <p>Great job on finishing your reading session!</p>
+              <p>Great job on finishing your Reading session!</p>
               <p v-if="filteredConceptsToFocusArea('strength').length">
                 You did a phenomenal job on tackling
-                {{ filteredConceptsToFocusArea('strength')[0].name }}!
+                <span class="bolded-text--light">{{
+                  filteredConceptsToFocusArea('strength')[0].name
+                }}</span
+                >!
               </p>
             </div>
           </div>
@@ -179,8 +186,12 @@
           <p
             class="prm__overview--subtext prm__overview--subtext-more-sessions"
           >
-            The more sessions you have the more accurate your report will be.
-            Make sure to ask your coach to help you with your practice areas.
+            <span class="bolded-text">*Tip: </span>The more sessions you have
+            the more accurate your report will be.
+            <span class="bolded-text--light"
+              >Make sure to ask your coach to help you with your practice
+              areas.</span
+            >
           </p>
         </section>
         <footer class="prm__footer">
@@ -223,6 +234,7 @@ import CrossIcon from '@/assets/cross.svg'
 import GradeBars from '@/components/GradeBars.vue'
 import Separator from '@/components/Separator.vue'
 import { gradeLabel } from '@/utils/grades'
+import LoadingMessage from '@/components/LoadingMessage.vue'
 
 export default {
   name: 'ProgressReportModal',
@@ -237,6 +249,7 @@ export default {
     CrossIcon,
     GradeBars,
     Separator,
+    LoadingMessage,
   },
   data() {
     return {
@@ -675,7 +688,11 @@ p {
   text-align: center;
   font-weight: 600;
   margin-top: 1em;
-  margin-bottom: 0.4em;
+  margin-bottom: 0;
+
+  &-subtitle {
+    margin-bottom: 0.8em;
+  }
 }
 
 .cross-icon {
@@ -696,5 +713,13 @@ p {
 
 .upbot--medium {
   width: 75px;
+}
+
+.bolded-text {
+  font-weight: 600;
+
+  &--light {
+    font-weight: 500;
+  }
 }
 </style>

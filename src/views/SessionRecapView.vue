@@ -95,9 +95,8 @@
           <template v-slot:header>
             <p class="progress-report__dropdown-header">
               <span class="progress-report__dropdown-header--insight"
-                >Session Review:</span
+                >Session Review</span
               >
-              {{ progressReport.summary.overallGrade }}%
             </p>
           </template>
           <template v-slot:content>

@@ -16,11 +16,15 @@
               v-if="showMoreInfo"
               class="progress-reports__header-information--text"
             >
-              We used AI to analyze the content of your
-              {{ subjectDisplayName }} tutoring sessions. Your data was kept
-              entirely private; no other company saw the content of your
-              sessions, and the only people who viewed them were our existing
-              moderators.
+              We use our
+              <span class="progress-reports__header-information--text-bold"
+                >{{ subjectDisplayName }} UPbot (AI Bot)</span
+              >
+              to analyze your {{ subjectDisplayName }} sessions, enabling us to
+              generate a comprehensive report. This report highlights your
+              strengths and areas for improvement, empowering you to enhance
+              your {{ subjectDisplayName }} sessions effectively. Plus, you can
+              see how you're getting better after each session!
             </div>
           </div>
         </div>
@@ -60,7 +64,7 @@
         <h1
           class="progress-reports__overview-title progress-reports__overview-title--header"
         >
-          Overview of your {{ subjectDisplayName }} Progress
+          Overview of all your {{ subjectDisplayName }} sessions
         </h1>
         <separator class="separator" />
 
@@ -115,6 +119,7 @@
             </p>
             <ol class="progress-reports__overview-practice-list">
               <li
+                class="progress-reports__overview-practice-list--item"
                 v-for="(practice, index) in practiceAreas"
                 :key="practice.name"
               >
@@ -137,16 +142,34 @@
             Recommendations for Improvement:
           </h2>
           <div class="progress-reports__concepts-practice-items">
-            <p v-for="practice in practiceAreas" :key="practice.name">
-              <span class="progress-reports__concepts-practice-name"
-                >{{ practice.name }}:</span
-              >
-              <span class="progress-reports__concepts-practice-content">{{
-                practice.content
-              }}</span>
+            <p class="progress-reports__concepts-practice-subtext">
+              What you should work on with your coach next:
             </p>
+            <ol>
+              <li
+                v-for="practice in practiceAreas"
+                :key="practice.name"
+                class="progress-reports__concepts-practice-concept"
+              >
+                <span class="progress-reports__concepts-practice-name"
+                  >{{ practice.name }}:
+                </span>
+                <span class="progress-reports__concepts-practice-content">{{
+                  practice.content
+                }}</span>
+              </li>
+            </ol>
           </div>
         </section>
+
+        <large-button
+          class="progress-reports__start-session-btn progress-reports__btn--center"
+          @click.native="routeToSessionRequest"
+          :showArrow="false"
+          v-if="!isLoadingPage"
+        >
+          Start a {{ subjectDisplayName }} session
+        </large-button>
       </section>
 
       <div v-if="!mobileMode" class="container">
@@ -198,7 +221,7 @@
                     primary
                     class="session-list__session-recap session-list__session-recap__button"
                     @click.native="routeToSessionRecap(session.id)"
-                    >See review</large-button
+                    >Session recap</large-button
                   >
                 </div>
               </div>
@@ -746,6 +769,10 @@ p {
         @include breakpoint-above('small') {
           width: 400px;
         }
+
+        &-bold {
+          font-weight: 600;
+        }
       }
 
       &--icon {
@@ -863,6 +890,7 @@ p {
 
     &-subtitle {
       font-size: 14px;
+      margin-bottom: 0.4em;
     }
 
     &-content--big {
@@ -882,6 +910,15 @@ p {
       background-color: #feedbd;
       &-list {
         padding-left: 1.4em;
+
+        &--item {
+          margin-bottom: 0.6em;
+          line-height: 1.2;
+
+          @include breakpoint-above('large') {
+            margin-bottom: 0.6em;
+          }
+        }
       }
     }
   }
@@ -901,12 +938,21 @@ p {
       font-weight: 600;
     }
 
+    &-concept {
+      margin-bottom: 0.6em;
+    }
+
     &-content {
-      padding-left: 0.6em;
+      margin-bottom: 0.6em;
     }
 
     &-items {
       padding: 0.4em 1em;
+    }
+
+    &-subtext {
+      font-weight: 600;
+      margin-bottom: 0.4em;
     }
   }
 
@@ -919,6 +965,12 @@ p {
 
     &-content {
       margin-top: 1em;
+    }
+  }
+
+  &__btn {
+    &--center {
+      margin: 0 auto;
     }
   }
 }
@@ -1249,5 +1301,9 @@ p {
 
 .grade-bars {
   margin: 1em 0;
+}
+
+.bolded-text {
+  font-weight: 600;
 }
 </style>
