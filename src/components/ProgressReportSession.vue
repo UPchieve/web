@@ -2,7 +2,7 @@
   <div class="progress-report">
     <section>
       <h1 class="progress-report__title--subject-score">
-        {{ subjectDisplayName }} Score
+        This session's {{ subjectDisplayName }} score
       </h1>
       <h2 class="progress-report__title--grade-status">
         {{ gradeLabel(progressReport.summary.overallGrade) }}
@@ -50,10 +50,12 @@
         Recommendations for Improvement:
       </h1>
       <ol class="progress-report__overview-list">
-        <li v-for="practice in practiceAreas" :key="practice.name">
-          <span class="progress-report__concepts-concept">{{
-            practice.name
-          }}</span>
+        <li
+          v-for="practice in practiceAreas"
+          :key="practice.name"
+          class="progress-report__concepts-concept"
+        >
+          <span>{{ practice.name }}</span>
           - <span>{{ practice.content }}</span>
         </li>
       </ol>
@@ -62,7 +64,7 @@
 </template>
 
 <script>
-import GradeBars from './GradeBars.vue'
+import GradeBars from '@/components/GradeBars.vue'
 import { gradeLabel, gradeDescription } from '@/utils/grades'
 
 export default {
@@ -160,6 +162,7 @@ p {
 
     &-concept {
       font-weight: 500;
+      line-height: 1.2;
 
       &--score {
         margin-top: 0;
@@ -238,6 +241,10 @@ p {
       &-list {
         padding-left: 1.4em;
       }
+    }
+
+    &-list {
+      padding-left: 1.4em;
     }
   }
 

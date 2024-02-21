@@ -3,7 +3,7 @@
     <div
       v-for="num in 10"
       class="bar"
-      :class="isFilled(num) && 'bar--filled'"
+      :class="computeBarFilledClass(num)"
       :key="num"
     ></div>
   </div>
@@ -20,11 +20,18 @@ export default {
     isFilled(index) {
       return index <= this.numFilledSquares
     },
+    computeBarFilledClass(num) {
+      if (this.isFilled(num)) {
+        if (this.grade >= 70) return 'bar-filled--primary'
+        else return 'bar-filled--secondary'
+      }
+      return ''
+    },
   },
   computed: {
     numFilledSquares() {
-      if (this.grade < this.minimumGrade) return 1
-      return Math.floor((this.grade - this.minimumGrade) / 10) + 1
+      if (this.grade < this.minimumGrade) return 0
+      return Math.floor((this.grade - this.minimumGrade) / 10)
     },
   },
 }
@@ -41,8 +48,12 @@ export default {
   margin: 0 0.1em;
   background-color: $c-background-grey;
 
-  &--filled {
+  &-filled--primary {
     background-color: $c-success-green;
+  }
+
+  &-filled--secondary {
+    background-color: #edca13;
   }
 }
 </style>
