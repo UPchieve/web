@@ -639,7 +639,12 @@ export default {
       return params['sso'] === 'google'
     },
     shouldUseParentGuardianSignUpFlow(params) {
-      return 'parent' in params
+      for (const key in params) {
+        if (key.trim() === 'parent') {
+          return true
+        }
+      }
+      return false
     },
     autocompleteSchool(input) {
       this.formData.schoolId = undefined
