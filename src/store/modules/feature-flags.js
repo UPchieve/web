@@ -27,6 +27,8 @@ export default {
       [POSTHOG_FEATURE_FLAGS.PROGRESS_REPORTS]: false,
       [POSTHOG_FEATURE_FLAGS.PROGRESS_REPORTS_MODAL]: false,
       [POSTHOG_FEATURE_FLAGS.QUILL_V2]: false,
+      [POSTHOG_FEATURE_FLAGS.PAID_TUTOR]: false,
+      [POSTHOG_FEATURE_FLAGS.PAID_TUTORS_PILOT]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: 'control',
@@ -136,5 +138,8 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.PROGRESS_REPORTS_MODAL],
     shouldUseQuillV2: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.QUILL_V2],
+    isPaidTutor: (state) => state.toggleFlags[POSTHOG_FEATURE_FLAGS.PAID_TUTOR],
+    isPaidTutorsPilotRunning: (state) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.PAID_TUTORS_PILOT],
   },
 }

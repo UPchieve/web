@@ -622,6 +622,8 @@ export const POSTHOG_FEATURE_FLAGS = {
   PROGRESS_REPORTS: 'progress-reports',
   PROGRESS_REPORTS_MODAL: 'progress-reports-modal',
   QUILL_V2: 'quill-v2',
+  PAID_TUTOR: 'paid-tutor',
+  PAID_TUTORS_PILOT: 'paid-tutors-pilot',
 }
 
 export const ANALYTICS_REPORT_ROW = {

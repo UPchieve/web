@@ -13,17 +13,44 @@
       </thead>
       <tbody>
         <tr
-          v-for="(session, index) in sortedOpenSessions"
-          :key="`session-${index}`"
+          v-for="session in sortedOpenSessions"
+          :key="`session-${session.id}`"
+          :id="session.id"
           class="session-row"
+          :class="
+            isPaidTutorsPilotRunning && session.paidTutorsPilotGroup === 'test'
+              ? 'paid-tutors-pilot-test-group'
+              : ''
+          "
           @click="gotoSession(session)"
         >
-          <td>{{ session.student.firstname }}</td>
+          <b-tooltip
+            v-if="
+              isPaidTutorsPilotRunning &&
+              session.paidTutorsPilotGroup === 'test'
+            "
+            :target="session.id"
+            placement="top"
+            variant="dark"
+            custom-class="tooltip"
+            delay="300"
+            >Please prioritize this request. We are prioritizing this session to
+            improve student wait times as part of our experiment.
+          </b-tooltip>
+          <td>
+            {{ session.student.firstname }}
+          </td>
           <td>
             {{ session.subjectDisplayName }}
           </td>
           <td>
-            {{ waitTime(session.createdAt) }}
+            {{
+              waitTime(
+                session.createdAt,
+                isPaidTutorsPilotRunning &&
+                  session.paidTutorsPilotGroup === 'test'
+              )
+            }}
           </td>
         </tr>
       </tbody>
@@ -41,6 +68,7 @@ import { mapGetters, mapState } from 'vuex'
 import sendWebNotification from '@/utils/send-web-notification'
 import LoggerService from '@/services/LoggerService'
 import Case from 'case'
+import { BTooltip } from 'bootstrap-vue'
 
 export default {
   name: 'ListSessions',
@@ -52,26 +80,40 @@ export default {
       hasError: false,
     }
   },
+  components: { BTooltip },
   computed: {
     ...mapState({
       user: (state) => state.user.user,
       isWebPageHidden: (state) => state.app.isWebPageHidden,
       sortedOpenSessions() {
-        // sorts the sessions by createdAt, with oldest sessions coming first
+        // sorts the sessions by whether or not the student is in the `test`
+        // group of the paid tutors pilot (if that pilot is running)
+        // then by createdAt, with oldest sessions coming first
         return this.openSessions.slice().sort((first, second) => {
-          if (first.createdAt < second.createdAt) {
-            return -1
-          } else if (first.createdAt > second.createdAt) {
-            return 1
-          } else {
-            return 0
+          if (this.isPaidTutorsPilotRunning) {
+            if (
+              first.paidTutorsPilotGroup === 'test' &&
+              second.paidTutorsPilotGroup !== 'test'
+            )
+              return -1
+            if (
+              first.paidTutorsPilotGroup !== 'test' &&
+              second.paidTutorsPilotGroup == 'test'
+            )
+              return 1
           }
+
+          if (first.createdAt < second.createdAt) return -1
+          if (first.createdAt > second.createdAt) return 1
+          return 0
         })
       },
     }),
     ...mapGetters({
       isMutedSubjectAlertsActive: 'featureFlags/isMutedSubjectAlertsActive',
       isRecapSocketUpdatesActive: 'featureFlags/isRecapSocketUpdatesActive',
+      isPaidTutor: 'featureFlags/isPaidTutor',
+      isPaidTutorsPilotRunning: 'featureFlags/isPaidTutorsPilotRunning',
     }),
   },
   mounted() {
@@ -125,13 +167,15 @@ export default {
         this.$store.dispatch('user/clearSession')
       }
     },
-    waitTime(time) {
+    waitTime(time, showSeconds) {
       const newTime = new Date().getTime() - new Date(time).getTime()
       const seconds = Number((newTime / 1000).toFixed(0))
       const minutes = Number((newTime / (1000 * 60)).toFixed(0))
       const hours = Number((newTime / (1000 * 60 * 60)).toFixed(0))
 
-      if (seconds < 60) {
+      if (seconds < 120 && showSeconds) {
+        return `${seconds} second${seconds === 1 ? '' : 's'}`
+      } else if (seconds < 60) {
         return '< 1 min'
       }
       if (minutes < 60) {
@@ -145,13 +189,15 @@ export default {
     },
     // Refresh the wait time on open sessions for waiting students
     // Force a re-render on this instance to show updated wait times if there are open sessions
-    startWaitTimeRefresh() {
+    startWaitTimeRefresh(wait = 1000 * 60) {
       this.emitListIntervalId = setInterval(() => {
         if (this.openSessions.length === 0) {
           clearInterval(this.emitListIntervalId)
           this.emitListIntervalId = null
-        } else this.$forceUpdate()
-      }, 1000 * 60)
+        } else {
+          this.$forceUpdate()
+        }
+      }, wait)
     },
     async handleIncomingSessions(sessions) {
       if (!sessions || !Array.isArray(sessions) || this.user.isBanned) {
@@ -161,20 +207,35 @@ export default {
 
       // Start refreshing for open sessions if no timer is currently running
       if (sessions.length > 0 && !this.emitListIntervalId)
-        this.startWaitTimeRefresh()
+        this.startWaitTimeRefresh(
+          this.isPaidTutorsPilotRunning ? 1000 : 1000 * 60
+        )
 
       const results = []
       const socketSessions = sessions.filter((session) => !session.volunteer)
 
       for (let i = 0; i < socketSessions.length; i++) {
         const session = socketSessions[i]
-        const { subTopic } = session
+        const { subTopic, type, paidTutorsPilotGroup } = session
 
         const isAdminOrTestUser = this.user.isAdmin || this.user.isTestUser
         // Show test accounts to admin and test volunteer accounts
         if (session.student.isTestUser && !isAdminOrTestUser) {
           continue
         }
+
+        if (this.isPaidTutor && this.isPaidTutorsPilotRunning) {
+          if (
+            ['math', 'college'].includes(type) &&
+            paidTutorsPilotGroup === 'test'
+          ) {
+            results.push(session)
+          }
+          // Paid tutor should only pick up students in the 'test' group
+          // Do not show any other sessions
+          continue
+        }
+
         if (
           this.user.subjects.includes(subTopic) &&
           !(
@@ -258,5 +319,12 @@ thead {
 
 .audio__new-waiting-student {
   display: none;
+}
+.table-striped .paid-tutors-pilot-test-group {
+  background-color: $c-background-blue;
+}
+
+.tooltip {
+  opacity: 1;
 }
 </style>
