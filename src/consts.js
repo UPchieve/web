@@ -618,7 +618,6 @@ export const POSTHOG_FEATURE_FLAGS = {
   AUTO_START_COLLEGE_SESSION: 'auto-start-college-session',
   SMS_VERIFICATION: 'sms-verification',
   ELIGIBILITY_EMAIL: 'eligibility-email',
-  NEW_ELIGIBILITY_FORM_DESIGN: 'new-eligibility-form-design',
   PROGRESS_REPORTS: 'progress-reports',
   PROGRESS_REPORTS_MODAL: 'progress-reports-modal',
   QUILL_V2: 'quill-v2',

@@ -1,44 +1,23 @@
 <template>
-  <div
-    class="h-full"
-    :class="{ 'uc-row': showNewDesign, 'uc-column': !showNewDesign }"
-  >
+  <div class="base">
     <div
       :class="{
-        'bg-content uc-column items-center justify-center': showNewDesign,
-        FormPageTemplate: !showNewDesign,
+        'form-card': layout === 'card',
+        'form-panel left w-50p': layout === 'panel-left-50p',
+        'form-panel left w-75p': layout === 'panel-left-75p',
+        'form-panel right w-50p': layout === 'panel-right-50p',
+        'form-panel right w-75p': layout === 'panel-right-75p',
+        full: layout === 'full',
       }"
     >
-      <img
-        v-if="!showNewDesign"
-        class="logo-white"
-        src="@/assets/p_logo_white.png"
-        alt="UPchieve"
-      />
-      <img
-        :class="{
-          'logo-teal-new-design': showNewDesign,
-          'logo-teal': !showNewDesign,
-        }"
-        src="@/assets/header_logo.png"
-        alt="UPchieve"
-      />
-      <slot></slot>
-      <img
-        v-if="showNewDesign"
-        class="img-updog-subjects"
-        src="@/assets/updog-subjects.png"
-      />
-    </div>
-    <div v-if="!showNewDesign" class="background-img"></div>
-    <div v-else class="bg-fixed-container">
-      <div class="bg-fixed uc-column items-center justify-end">
-        <h1 class="header">Chat with an online college coach for free!</h1>
-        <div class="image-container">
-          <chat-mobile class="w-full h-full" />
-        </div>
+      <img class="logo white" src="@/assets/p_logo_white.png" aria-hidden />
+      <div class="img-content"></div>
+      <div class="form-content">
+        <img class="logo teal" src="@/assets/header_logo.png" aria-hidden />
+        <slot></slot>
       </div>
     </div>
+
     <nav class="footer" aria-label="More information">
       <div>
         <router-link to="/contact">Contact Us</router-link>
@@ -54,142 +33,148 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import ChatMobile from '@/assets/chat-mobile.svg'
-
 export default {
-  components: {
-    ChatMobile,
-  },
-  computed: {
-    ...mapGetters({
-      isNewEligibilityFormDesignEnabled:
-        'featureFlags/isNewEligibilityFormDesignEnabled',
-    }),
-    showNewDesign() {
-      return (
-        this.isNewEligibilityFormDesignEnabled &&
-        this.$route.path.includes('eligibility') &&
-        this.$route.query['partner'] === 'bigfuture'
-      )
-    },
+  data() {
+    return {
+      layout: 'card',
+    }
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.bg-fixed-container {
-  flex: 1 1 0;
-  height: 100%;
+$footer-height: 50px;
+$footer-height-tiny: 100px;
+
+.base {
+  @include flex-container(column, center, center);
+  background-attachment: fixed;
+  background-color: white;
+  background-image: url('@/assets/onboarding_background.png');
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  min-height: 100%;
+  padding-bottom: $footer-height;
 
   @include breakpoint-below('tiny') {
-    display: none;
-  }
-}
+    background-image: none;
+    padding-bottom: $footer-height-tiny;
 
-.bg-fixed {
-  background-color: #f0f9ff;
-  height: 100%;
-  position: fixed;
-  width: 50%;
-}
-
-.header {
-  font-size: 30px;
-  font-weight: 600;
-  max-width: 65%;
-  min-width: 300px;
-  padding: 16px 24px;
-  text-align: center;
-}
-
-.image-container {
-  height: 100%;
-  max-height: 70vh;
-  width: 100%;
-}
-
-.bg-content {
-  background-color: white;
-  flex: 1 1 0;
-  margin: auto;
-  min-height: 100vh;
-  padding-bottom: 50px;
-
-  .uc-form::v-deep {
-    padding-top: 0px;
-
-    @include breakpoint-below('tiny') {
-      padding-bottom: 0px;
+    &:has(.form-card) {
+      justify-content: start;
     }
   }
 
-  @include breakpoint-below('tiny') {
-    padding-bottom: 100px;
+  &:has(.full, .w-50p) {
+    background-image: none;
   }
-}
 
-.logo-teal-new-design {
-  margin: 16px;
-}
-
-.img-updog-subjects {
-  margin-top: 10px;
-  @include breakpoint-above('tiny') {
-    display: none;
+  .form-card {
+    background: white;
+    border-radius: 22px;
+    max-width: 500px;
+    padding: 25px;
+    position: relative;
+    width: 95%;
   }
-}
 
-/* old */
-.background-img {
-  background-color: white;
-
-  @include breakpoint-above('tiny') {
-    background: url('@/assets/onboarding_background.png') no-repeat center
-      center;
-    background-attachment: fixed;
-    background-size: cover;
-    height: 100%;
-    left: 0;
-    position: fixed;
-    top: 0;
+  .form-panel {
+    @include flex-container(row, space-between, stretch);
     width: 100%;
-    z-index: -1;
+
+    .form-content {
+      @include flex-container(column);
+    }
+    .form-content,
+    .img-content {
+      min-height: calc(100vh - $footer-height);
+
+      @include breakpoint-below('tiny') {
+        min-height: calc(100vh - $footer-height-tiny);
+      }
+    }
+
+    &.left {
+      flex-direction: row-reverse;
+    }
+
+    &.right {
+      flex-direction: row;
+    }
+
+    &.w-50p {
+      .form-content {
+        background: white;
+        flex: 1;
+      }
+      .img-content {
+        background-color: #f0f9ff;
+        flex: 1;
+      }
+    }
+
+    &.w-75p {
+      .form-content {
+        background: white;
+        flex: 4;
+      }
+      .img-content {
+        flex: 1;
+
+        @include breakpoint-below('tiny') {
+          flex: 0;
+        }
+      }
+    }
   }
 }
 
-.FormPageTemplate {
-  @include flex-container(column, flex-start, center);
-  padding-bottom: 60px;
-
-  @include breakpoint-below('tiny') {
-    background-color: white;
-  }
-}
-
-.logo-white {
-  max-width: 155px;
-  margin-bottom: 10px;
-  margin-top: 10px;
-  display: none;
-
-  @include breakpoint-above('tiny') {
+.form-card .logo {
+  &.white {
     display: block;
+    @include breakpoint-below('tiny') {
+      display: none;
+    }
+  }
+  &.teal {
+    display: none;
+    @include breakpoint-below('tiny') {
+      display: block;
+    }
+  }
+}
+.form-panel .logo {
+  &.white {
+    display: none;
+  }
+}
+.full .logo {
+  &.white {
+    display: none;
+  }
+  &.teal {
+    display: none;
   }
 }
 
-.logo-teal {
-  display: block;
-  max-width: 95px;
-  padding-top: 12px;
+.logo {
+  &.white {
+    $width: 155px;
+    left: calc(50% - $width / 2);
+    top: -85px;
+    position: absolute;
+    width: $width;
+  }
 
-  @include breakpoint-above('tiny') {
-    display: none;
+  &.teal {
+    margin-bottom: 16px;
+    max-width: 95px;
   }
 }
 
 .footer {
-  @include flex-container(column, space-around, center);
+  @include flex-container(row, space-around, center);
 
   background-color: #f6f6f6;
   border-top: 1px solid #cccccf;
@@ -197,7 +182,7 @@ export default {
   font-size: 12px;
   font-weight: 600;
 
-  min-height: 100px;
+  min-height: $footer-height;
   margin-top: auto;
   width: 100%;
 
@@ -211,9 +196,9 @@ export default {
     text-transform: uppercase;
   }
 
-  @include breakpoint-above('tiny') {
-    flex-direction: row;
-    min-height: 50px;
+  @include breakpoint-below('tiny') {
+    flex-direction: column;
+    min-height: $footer-height-tiny;
   }
 }
 </style>
