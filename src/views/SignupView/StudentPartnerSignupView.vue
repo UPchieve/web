@@ -55,13 +55,15 @@
               error: hasFormValidationError(v$.formData.partnerSite),
             }"
           >
-            What is {{ formLabelIdentifier }} site?
+            What is
+            {{ getFormLabelIdentifierPossessive }}
+            site?
           </label>
           <v-select
             id="site"
             class="uc-form-select-input"
             v-model="formData.partnerSite"
-            :placeholder="`Select ${formLabelIdentifier} site`"
+            :placeholder="`Select ${getFormLabelIdentifierPossessive} site`"
             v-bind:class="{
               'uc-form-select-input-invalid': hasFormValidationError(
                 v$.formData.partnerSite
@@ -81,13 +83,15 @@
             v-bind:class="{
               error: hasFormValidationError(v$.formData.firstName),
             }"
-            >What is {{ formLabelIdentifier }} first name?
+            >What is
+            {{ getFormLabelIdentifierPossessive }}
+            first name?
           </label>
           <input
             id="firstName"
             class="uc-form-text-input"
             type="text"
-            :placeholder="`Enter ${formLabelIdentifier} first name`"
+            :placeholder="`Enter ${getFormLabelIdentifierPossessive} first name`"
             v-bind:class="{
               'uc-form-text-input-invalid': hasFormValidationError(
                 v$.formData.firstName
@@ -106,13 +110,15 @@
             v-bind:class="{
               error: hasFormValidationError(v$.formData.lastName),
             }"
-            >What is {{ formLabelIdentifier }} last name?
+            >What is
+            {{ getFormLabelIdentifierPossessive }}
+            last name?
           </label>
           <input
             id="lastName"
             class="uc-form-text-input"
             type="text"
-            :placeholder="`Enter ${formLabelIdentifier} last name`"
+            :placeholder="`Enter ${getFormLabelIdentifierPossessive} last name`"
             v-bind:class="{
               'uc-form-text-input-invalid': hasFormValidationError(
                 v$.formData.lastName
@@ -132,8 +138,8 @@
             type="checkbox"
           />
           <label for="highSchoolCheckbox">
-            {{ formQuestionIdentifier }} currently a middle or high school
-            student?
+            {{ getFormQuestionIdentifier }}
+            currently a middle or high school student?
           </label>
         </div>
 
@@ -143,14 +149,16 @@
             v-bind:class="{
               error: hasFormValidationError(v$.formData.schoolId),
             }"
-            >What is {{ formLabelIdentifier }} school?</label
+            >What is
+            {{ getFormLabelIdentifierPossessive }}
+            school?</label
           >
           <autocomplete
             id="school"
             base-class="uc-form-autocomplete-input"
             :search="autocompleteSchool"
-            :placeholder="`Search for ${formLabelIdentifier} school`"
-            :aria-label="`Search for ${formLabelIdentifier} school`"
+            :placeholder="`Search for ${getFormLabelIdentifierPossessive} school`"
+            :aria-label="`Search for ${getFormLabelIdentifierPossessive} school`"
             :get-result-value="getSchoolDisplayName"
             @submit="handleSelectHighSchool"
             @blur="v$.formData.schoolId.$touch()"
@@ -186,7 +194,8 @@
             type="checkbox"
           />
           <label for="collegeCheckbox">
-            {{ formQuestionIdentifier }} currently a college student?
+            {{ getFormQuestionIdentifier }}
+            currently a college student?
           </label>
         </div>
 
@@ -196,12 +205,14 @@
             v-bind:class="{
               error: hasFormValidationError(v$.formData.college),
             }"
-            >What is {{ formLabelIdentifier }} college?</label
+            >What is
+            {{ getFormLabelIdentifierPossessive }}
+            college?</label
           >
           <input
             id="college"
             class="uc-form-text-input"
-            :placeholder="`Enter ${formLabelIdentifier} college`"
+            :placeholder="`Enter ${getFormLabelIdentifierPossessive} college`"
             type="text"
             v-model="formData.college"
             v-bind:class="{
@@ -220,7 +231,9 @@
               v-bind:class="{
                 error: hasFormValidationError(v$.formData.email),
               }"
-              >What is {{ formLabelIdentifier }} email?</label
+              >What is
+              {{ getFormLabelIdentifierPossessive }}
+              email?</label
             >
             <div
               v-if="hasFormValidationError(v$.formData.email)"
@@ -233,7 +246,7 @@
             id="email"
             class="uc-form-text-input"
             type="email"
-            :placeholder="`Enter ${formLabelIdentifier} email address`"
+            :placeholder="`Enter ${getFormLabelIdentifierPossessive} email address`"
             v-model="formData.email"
             v-bind:class="{
               'uc-form-text-input-invalid': hasFormValidationError(
@@ -399,9 +412,9 @@ import AnalyticsService from '@/services/AnalyticsService'
 import { backOff } from 'exponential-backoff'
 import { EVENTS, GRADES } from '@/consts'
 import GoogleLogo from '@/assets/google_logo.svg'
-import config from '../config'
+import config from '../../config'
 import VerificationBadge from '@/assets/verification.svg'
-
+import * as signupUtils from '@/utils/signup-utils'
 export default {
   name: 'student-partner-signup-view',
   components: {
@@ -544,14 +557,6 @@ export default {
     }
   },
   computed: {
-    formLabelIdentifier() {
-      if (this.useParentGuardianSignUpFlow) return "the student's"
-      return 'your'
-    },
-    formQuestionIdentifier() {
-      if (this.useParentGuardianSignUpFlow) return 'Is the student'
-      return 'Are you'
-    },
     PASSWORD_PATTERN() {
       return /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/
     },
@@ -628,6 +633,17 @@ export default {
         this.studentPartner.collegeSignup &&
         !this.studentPartner.highSchoolSignup &&
         this.studentPartner.schoolSignupRequired
+      )
+    },
+
+    getFormQuestionIdentifier() {
+      return signupUtils.getFormQuestionIdentifier(
+        this.useParentGuardianSignUpFlow
+      )
+    },
+    getFormLabelIdentifierPossessive() {
+      return signupUtils.getFormLabelIdentifierPossessive(
+        this.useParentGuardianSignUpFlow
       )
     },
   },
