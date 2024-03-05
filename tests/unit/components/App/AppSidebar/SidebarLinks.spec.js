@@ -32,7 +32,8 @@ const TRAINING_LINK = {
   text: 'Training',
 }
 const COMMUNITY_LINK = {
-  to: 'https://join.slack.com/t/upchieveaccommunity/shared_invite/zt-2bnpp4ihv-Yw7J9dIdUFKHzhxx8m5ORA',
+  // This link changes. Just match the consistent portion.
+  to: 'https://join.slack.com/t/upchieveaccommunity/shared_invite/',
   text: 'Community',
 }
 // Admin links
@@ -122,7 +123,7 @@ describe('SidebarLinks', () => {
       expect(sidebarLinks.length).toBe(expectedLinks.length)
       expectedLinks.forEach((link, i) => {
         const sidebarLink = sidebarLinks.at(i)
-        expect(sidebarLink.props('to')).toBe(link.to)
+        expect(sidebarLink.props('to')).toContain(link.to)
         // expect(sidebarLink.contains(link.icon)).toBe(true);
         expect(sidebarLink.props('text')).toBe(link.text)
       })
