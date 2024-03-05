@@ -64,6 +64,62 @@
       "
     >
       <div class="uc-form-element">
+        <label
+          for="studentFirstName"
+          data-testid="student-first-name-label"
+          v-bind:class="{
+            error: hasFormValidationError(v$.eligibility.studentFirstName),
+          }"
+          >What is
+          {{ getFormLabelIdentifierPossessive }}
+          first name?
+        </label>
+        <input
+          id="studentFirstName"
+          class="uc-form-text-input"
+          type="text"
+          :placeholder="`Enter ${getFormLabelIdentifierPossessive} first name`"
+          v-bind:class="{
+            'uc-form-text-input-invalid': hasFormValidationError(
+              v$.eligibility.studentFirstName
+            ),
+          }"
+          v-model="eligibility.studentFirstName"
+          @blur="v$.eligibility.studentFirstName.$touch"
+          autocomplete="given-name"
+          required
+        />
+      </div>
+
+      <div class="uc-form-element">
+        <label
+          for="studentLastName"
+          data-testid="student-last-name-label"
+          v-bind:class="{
+            error: hasFormValidationError(v$.eligibility.studentLastName),
+          }"
+          >What is
+          {{ getFormLabelIdentifierPossessive }}
+          last name?
+        </label>
+        <input
+          id="studentLastName"
+          class="uc-form-text-input"
+          type="text"
+          :placeholder="`Enter ${getFormLabelIdentifierPossessive} last name`"
+          v-bind:class="{
+            'uc-form-text-input-invalid': hasFormValidationError(
+              v$.eligibility.studentLastName
+            ),
+          }"
+          v-model="eligibility.studentLastName"
+          @blur="v$.eligibility.studentLastName.$touch"
+          autocomplete="family-name"
+          required
+        />
+      </div>
+
+      <div class="uc-form-element">
         <div class="uc-row justify-between">
           <label
             for="grade"
@@ -81,10 +137,11 @@
         </div>
         <v-select
           id="grade"
+          data-testid="student-grade-select"
           class="uc-form-select-input"
           v-model="eligibility.currentGrade"
-          placeholder="Select your grade"
-          aria-label="Select your grade"
+          :placeholder="`Select ${getFormLabelIdentifierPossessive} grade`"
+          :aria-label="`Select ${getFormLabelIdentifierPossessive} grade`"
           :options="gradeLevels"
           :searchable="false"
           :clearable="false"
@@ -116,9 +173,10 @@
         </div>
         <autocomplete
           id="school"
+          data-testid="student-school-autocomplete"
           base-class="uc-form-autocomplete-input"
-          placeholder="Search for your school"
-          aria-label="Search for your school"
+          :placeholder="`Search for ${getFormLabelIdentifierPossessive} school`"
+          :aria-label="`Search for ${getFormLabelIdentifierPossessive} school`"
           :search="autocompleteSchool"
           :get-result-value="getSchoolDisplayName"
           @submit="handleSelectHighSchool"
@@ -167,9 +225,11 @@
         </div>
         <input
           id="zipCode"
+          data-testid="student-zipcode-input"
           class="uc-form-text-input"
           type="text"
-          placeholder="Enter your zip code"
+          :placeholder="`Enter ${getFormLabelIdentifierPossessive} zip code`"
+          :aria-label="`Enter ${getFormLabelIdentifierPossessive} zip code`"
           v-model="eligibility.zipCode"
           v-bind:class="{
             'uc-form-text-input-invalid': hasFormValidationError(
@@ -184,36 +244,76 @@
       <div v-if="!skipEligibilityEmail" class="uc-form-element">
         <div class="uc-row justify-between">
           <label
-            for="email"
+            for="student-email"
             v-bind:class="{
-              error: hasFormValidationError(v$.eligibility.email),
+              error: hasFormValidationError(v$.eligibility.studentEmail),
             }"
-            >Email</label
+            >Student Email</label
           >
           <div
-            v-if="hasFormValidationError(v$.eligibility.email)"
+            v-if="hasFormValidationError(v$.eligibility.studentEmail)"
             class="error-caption"
           >
-            {{ getFormValidationError(v$.eligibility.email) }}
+            {{ getFormValidationError(v$.eligibility.studentEmail) }}
           </div>
         </div>
         <input
-          id="email"
+          id="student-email"
+          data-testid="student-email-input"
           class="uc-form-text-input"
           type="email"
-          placeholder="Enter your email address"
-          v-model="eligibility.email"
+          :placeholder="`Enter ${getFormLabelIdentifierPossessive} email address`"
+          :aria-label="`Enter ${getFormLabelIdentifierPossessive} email address`"
+          v-model="eligibility.studentEmail"
           v-bind:class="{
             'uc-form-text-input-invalid': hasFormValidationError(
-              v$.eligibility.email
+              v$.eligibility.studentEmail
             ),
           }"
-          @blur="v$.eligibility.email.$touch"
+          @blur="v$.eligibility.studentEmail.$touch"
           required
         />
         <div class="metadata">
-          We will only use this email to notify you if your eligibility status
-          changes in the future.
+          We will only use this email to notify
+          {{ getFormLabelIdentifier }} if
+          {{ getFormLabelIdentifierPossessive }}
+          eligibility status changes in the future.
+        </div>
+
+        <div v-if="useParentGuardianSignUpFlow" class="uc-form-element">
+          <div class="uc-row justify-between">
+            <label
+              for="parent-guardian-email"
+              v-bind:class="{
+                error: hasFormValidationError(
+                  v$.eligibility.parentGuardianEmail
+                ),
+              }"
+              >Your Email</label
+            >
+            <div
+              v-if="hasFormValidationError(v$.eligibility.parentGuardianEmail)"
+              class="error-caption"
+            >
+              {{ getFormValidationError(v$.eligibility.parentGuardianEmail) }}
+            </div>
+          </div>
+          <input
+            id="parent-guardian-email"
+            data-testid="parent-guardian-email-input"
+            class="uc-form-text-input"
+            type="email"
+            placeholder="Enter your email address"
+            aria-label="Enter your email address"
+            v-model="eligibility.parentGuardianEmail"
+            v-bind:class="{
+              'uc-form-text-input-invalid': hasFormValidationError(
+                v$.eligibility.parentGuardianEmail
+              ),
+            }"
+            @blur="v$.eligibility.parentGuardianEmail.$touch"
+            required
+          />
         </div>
       </div>
 
@@ -258,11 +358,15 @@
         >becoming an Academic Coach.</a
       >
     </p>
-    <p v-else class="small-paragraph">
-      We weren’t able to verify your eligibility based on the information you’ve
-      entered so far.
-      <strong>Don’t worry: you may still be eligible!</strong> We just need your
-      parent/guardian to answer some more questions first!
+    <p v-else class="small-paragraph" data-testid="eligibility-appeal-message">
+      We weren’t able to verify
+      {{ getFormLabelIdentifierPossessive }}
+      eligibility based on the information you’ve entered so far.
+      <strong
+        >Don’t worry: {{ getFormLabelIdentifier }} may still be
+        eligible!</strong
+      >
+      {{ getIneligibleCanAppealText }}
     </p>
 
     <p v-if="isCollegeStudent" class="small-paragraph">
@@ -286,6 +390,25 @@
     >
       Continue
     </button>
+  </div>
+
+  <div
+    v-else-if="step === 'parentGuardianConfirmation'"
+    class="uc-form"
+    data-testid="pg-confirmation-message"
+  >
+    <div class="uc-column justify-center items-center h-full center">
+      <verification-badge />
+      <h1>You're all set!</h1>
+      <p>
+        An account for {{ this.eligibility.studentFirstName }} has been created.
+      </p>
+      <p>
+        We have sent an email to
+        <span id="ph-no-capture">{{ this.eligibility.studentEmail }}</span> to
+        set a password.
+      </p>
+    </div>
   </div>
 
   <div v-else-if="step === 'account'">
@@ -339,9 +462,11 @@
         </div>
         <input
           id="firstName"
+          data-testid="student-first-name-input"
           class="uc-form-text-input"
           type="text"
-          placeholder="Enter your first name"
+          :placeholder="`Enter ${getFormLabelIdentifierPossessive} first name`"
+          :aria-label="`Enter ${getFormLabelIdentifierPossessive} first name`"
           v-model="profile.firstName"
           v-bind:class="{
             'uc-form-text-input-invalid': hasFormValidationError(
@@ -373,7 +498,8 @@
           id="lastName"
           class="uc-form-text-input"
           type="text"
-          placeholder="Enter your last name"
+          :placeholder="`Enter ${getFormLabelIdentifierPossessive} last name`"
+          :aria-label="`Enter ${getFormLabelIdentifierPossessive} last name`"
           v-model="profile.lastName"
           v-bind:class="{
             'uc-form-text-input-invalid': hasFormValidationError(
@@ -385,7 +511,7 @@
         />
       </div>
 
-      <div v-if="!eligibility.email" class="uc-form-element">
+      <div v-if="!eligibility.studentEmail" class="uc-form-element">
         <div class="uc-row justify-between">
           <label
             for="email"
@@ -405,7 +531,8 @@
           id="email"
           class="uc-form-text-input"
           type="email"
-          placeholder="Enter your email address"
+          :placeholder="`Enter ${getFormLabelIdentifierPossessive} email address`"
+          :aria-label="`Enter ${getFormLabelIdentifierPossessive} email address`"
           v-model="credentials.email"
           v-bind:class="{
             'uc-form-text-input-invalid': hasFormValidationError(
@@ -438,6 +565,7 @@
           class="uc-form-text-input"
           type="password"
           placeholder="Create a password"
+          aria-label="Create a password"
           v-model="credentials.password"
           v-bind:class="{
             'uc-form-text-input-invalid': hasFormValidationError(
@@ -522,6 +650,7 @@ import GoogleLogo from '@/assets/google_logo.svg'
 import { EVENTS, GRADES } from '@/consts'
 import FormErrors from '@/components/FormErrors.vue'
 import config from '../../config'
+import * as signupUtils from '@/utils/signup-utils'
 
 export default {
   components: {
@@ -538,7 +667,7 @@ export default {
     return {
       eligibility: {
         currentGrade: { required: helpers.withMessage('Required', required) },
-        highSchool: { required: helpers.withMessage('Required', required) },
+        highSchool: { required: helpers.withMessage('Required', required) }, // @TODO rename highSchool -> school
         zipCode: {
           required: helpers.withMessage('Required', required),
           minLength: helpers.withMessage(
@@ -550,12 +679,31 @@ export default {
             maxLength(5)
           ),
         },
-        email: {
+        studentEmail: {
           required: helpers.withMessage(
             'Required',
             requiredIf(!this.skipEligibilityEmail)
           ),
           email: helpers.withMessage('Not a valid email address', email),
+        },
+        parentGuardianEmail: {
+          required: helpers.withMessage(
+            'Required',
+            requiredIf(this.useParentGuardianSignUpFlow)
+          ),
+          email: helpers.withMessage('Not a valid email address', email),
+        },
+        studentFirstName: {
+          required: helpers.withMessage(
+            'Required',
+            requiredIf(this.useParentGuardianSignUpFlow)
+          ),
+        },
+        studentLastName: {
+          required: helpers.withMessage(
+            'Required',
+            requiredIf(this.useParentGuardianSignUpFlow)
+          ),
         },
       },
       profile: {
@@ -584,7 +732,10 @@ export default {
         currentGrade: '',
         highSchool: {},
         zipCode: '',
-        email: '',
+        studentFirstName: '',
+        studentLastName: '',
+        studentEmail: '',
+        parentGuardianEmail: '',
       },
       credentials: {
         email: '',
@@ -611,6 +762,7 @@ export default {
       showBigFutureIntroCopy: false,
       showCodeDotOrgIntroCopy: false,
       skipEligibilityEmail: false,
+      useParentGuardianSignUpFlow: false,
     }
   },
   async mounted() {
@@ -627,6 +779,10 @@ export default {
       } catch {
         delete params.partner
       }
+    }
+
+    if (this.shouldUseParentGuardianSignUpFlow(params)) {
+      this.useParentGuardianSignUpFlow = true
     }
 
     localStorage.removeItem('isSSOSignUpRedirect')
@@ -695,9 +851,6 @@ export default {
     CANNOT_FIND_SCHOOL_TEXT() {
       return `Can't find your school?`
     },
-    GRADE_LEVELS() {
-      return GRADES
-    },
     PASSWORD_PATTERN() {
       return /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/
     },
@@ -706,13 +859,30 @@ export default {
         if (this.isCodeDotOrgStudent) {
           return 'Welcome to UPchieve!'
         }
-        return `Welcome ${this.studentPartner.name} Student!`
+        return `Welcome ${this.studentPartner.name} ${this.getFormAddressee}!`
       }
       return ''
     },
-
     isCodeDotOrgStudent() {
       return this.studentPartner?.key === 'code-org'
+    },
+    getIneligibleCanAppealText() {
+      return signupUtils.getIneligibleCanAppealText(
+        this.useParentGuardianSignUpFlow
+      )
+    },
+    getFormLabelIdentifierPossessive() {
+      return signupUtils.getFormLabelIdentifierPossessive(
+        this.useParentGuardianSignUpFlow
+      )
+    },
+    getFormLabelIdentifier() {
+      return signupUtils.getFormLabelIdentifier(
+        this.useParentGuardianSignUpFlow
+      )
+    },
+    getFormAddressee() {
+      return signupUtils.getFormAddressee(this.useParentGuardianSignUpFlow)
     },
   },
   watch: {
@@ -753,9 +923,6 @@ export default {
     },
   },
   methods: {
-    logStudentClickedLearnMoreLink() {
-      AnalyticsService.captureEvent(EVENTS.BF_STUDENT_CLICKED_LEARN_MORE)
-    },
     isFailureRedirect() {
       return (
         !!this.$route.query['email'] &&
@@ -788,6 +955,10 @@ export default {
         })
     },
 
+    shouldUseParentGuardianSignUpFlow(params) {
+      return Object.keys(params).some((key) => key.trim() === 'parent')
+    },
+
     async isDomesticIpAddress() {
       try {
         await NetworkService.checkIpAddress()
@@ -818,7 +989,7 @@ export default {
         this.errors.push('You must enter a valid United States zip code.')
       }
 
-      if (!this.eligibility.email && !this.skipEligibilityEmail) {
+      if (!this.eligibility.studentEmail && !this.skipEligibilityEmail) {
         this.errors.push('An email address is required.')
       }
 
@@ -851,7 +1022,7 @@ export default {
       NetworkService.checkStudentEligibility({
         schoolUpchieveId: this.eligibility.highSchool.upchieveId,
         zipCode: this.eligibility.zipCode,
-        email: this.eligibility.email,
+        email: this.eligibility.studentEmail,
         referredByCode: window.localStorage.getItem('upcReferredByCode'),
         currentGrade: this.trimCurrentGrade,
       })
@@ -867,9 +1038,35 @@ export default {
           )
           if (isEligible) {
             // autofill the user's email
-            this.credentials.email = this.eligibility.email
-            this.step = 'eligible'
-            this.$router.replace('/sign-up/student/eligible')
+            this.credentials.email = this.eligibility.studentEmail
+
+            // On the parent/guardian flow, eligible users can skip the eligibility screen
+            if (this.useParentGuardianSignUpFlow) {
+              await AuthService.registerStudent({
+                email: this.eligibility.studentEmail,
+                firstName: this.eligibility.studentFirstName,
+                gradeLevel: this.trimCurrentGrade,
+                lastName: this.eligibility.studentLastName,
+                parentGuardianEmail: this.eligibility.parentGuardianEmail,
+                schoolId: this.eligibility.highSchool.upchieveId,
+                studentPartnerOrg: this.partnerKey,
+                zipCode: this.eligibility.zipCode,
+              })
+                .then(() => {
+                  this.step = 'parentGuardianConfirmation'
+                })
+                .catch((err) => {
+                  this.errors.push(
+                    err?.response?.data?.err ?? 'Failed: Please try again.'
+                  )
+                  if (err?.response?.status !== 422) {
+                    LoggerService.noticeError(err)
+                  }
+                })
+            } else {
+              this.step = 'eligible'
+              this.$router.replace('/sign-up/student/eligible')
+            }
           } else {
             if (response.data.isCollegeStudent) this.isCollegeStudent = true
             this.step = 'ineligible'
@@ -987,7 +1184,7 @@ export default {
       AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_UP_WITH_GOOGLE)
       localStorage.setItem('isSSOSignUpRedirect', true)
       const data = {
-        email: this.eligibility.email,
+        email: this.eligibility.studentEmail,
         currentGrade: this.trimCurrentGrade,
         gradeLevel: this.trimCurrentGrade,
         highSchoolId: this.eligibility.highSchool.upchieveId,
