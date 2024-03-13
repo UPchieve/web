@@ -32,7 +32,7 @@ function isValidUserForSegment(user, properties) {
   const { minSessions, maxSessions, userType, flagFilters } = properties
   const hasAValidFlag = flagFilters?.some((flag) =>
     FeatureFlagService.isFeatureEnabled(flag)
-  )
+  ) ?? true // if there are no filters, it's valid
 
   return (
     user.pastSessions.length >= minSessions &&
