@@ -162,6 +162,21 @@
               >Reset password</router-link
             >
           </div>
+
+          <div v-if="user.phone && !user.isVolunteer" class="delete-phone">
+            <input
+              type="button"
+              value="Remove phone from account"
+              @click="toggleDeletePhoneConfirmationModal"
+              data-testid="delete-phone-button"
+              class="remove-phone-btn"
+            />
+            <RemovePhoneConfirmationModal
+              v-if="showDeletePhoneConfirmationModal"
+              :onCancel="toggleDeletePhoneConfirmationModal"
+              :onAccept="handleDeleteNumber"
+            />
+          </div>
         </div>
       </div>
 
@@ -234,18 +249,20 @@ import PhoneNumber from 'awesome-phonenumber'
 import { mapGetters, mapState } from 'vuex'
 import UserService from '@/services/UserService'
 import AnalyticsService from '@/services/AnalyticsService'
-import DeactivateAccountModal from './DeactivateAccountModal.vue'
+import DeactivateAccountModal from '../DeactivateAccountModal.vue'
 import setNotificationPermission from '@/utils/set-notification-permission'
 import getNotificationPermission from '@/utils/get-notification-permission'
 import VuePhoneNumberInput from 'vue-phone-number-input'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 import Loader from '@/components/Loader.vue'
-import VerificationModal from './VerificationModal.vue'
+import VerificationModal from '../VerificationModal.vue'
 import Checkbox from '@/components/CheckBox.vue'
+import RemovePhoneConfirmationModal from '@/views/ProfileView/RemovePhoneConfirmationModal.vue'
 
 export default {
   name: 'profile-view',
   components: {
+    RemovePhoneConfirmationModal,
     Checkbox,
     DeactivateAccountModal,
     VuePhoneNumberInput,
@@ -265,6 +282,7 @@ export default {
       isAllowingNotifications: true,
       showDeactivateAccountModal: false,
       shouldSeeSmsConsentCheckbox: false,
+      showDeletePhoneConfirmationModal: false,
       showSmsVerificationModal: false,
       smsConsent: false,
       newMutedSubjectAlerts: [],
@@ -366,6 +384,15 @@ export default {
   methods: {
     onPhoneInputUpdate(phoneInputInfo) {
       this.phoneInputInfo = phoneInputInfo
+    },
+    toggleDeletePhoneConfirmationModal() {
+      this.showDeletePhoneConfirmationModal =
+        !this.showDeletePhoneConfirmationModal
+    },
+    handleDeleteNumber() {
+      this.showDeletePhoneConfirmationModal = false
+      this.shouldSeeSmsConsentCheckbox = false
+      this.smsConsent = false
     },
 
     async emitSmsConsentCheckboxChangedEvent() {
@@ -757,6 +784,18 @@ button:hover {
       text-decoration: none;
       color: darken($c-error-red, 40%);
     }
+  }
+}
+
+.remove-phone-btn {
+  border: none;
+  background: none;
+  padding-left: 0px;
+  color: darken($c-error-red, 25%);
+
+  &:hover {
+    text-decoration: none;
+    color: darken($c-error-red, 40%);
   }
 }
 
