@@ -1,13 +1,13 @@
 import userModule from '@/store/modules/user'
 import featureFlagsModule from '@/store/modules/feature-flags'
 import subjectsModule from '@/store/modules/subjects'
-import ProfileView from '@/views/ProfileView.vue'
+import ProfileView from '@/views/ProfileView/index.vue'
 import { createLocalVue, mount } from '@vue/test-utils'
 import Vuex from 'vuex'
 import UserService from '@/services/UserService'
 import AuthService from '@/services/AuthService'
 import AnalyticsService from '@/services/AnalyticsService'
-import { vi } from 'vitest';
+import { vi } from 'vitest'
 
 describe('ProfileView', () => {
   const localVue = createLocalVue()
@@ -81,7 +81,7 @@ describe('ProfileView', () => {
   describe('Render differences between students and volunteers', () => {
     it.each([true, false])(
       "Should/shouldn't show the description text for what we use the phone number for when isVolunteer=%s",
-      isVolunteer => {
+      (isVolunteer) => {
         const wrapper = getWrapper({
           user: {
             isVolunteer,
@@ -93,7 +93,7 @@ describe('ProfileView', () => {
 
     it.each([true, false])(
       "Should/shouldn't show the deactivate account option when isVolunteer=%s",
-      isVolunteer => {
+      (isVolunteer) => {
         const wrapper = getWrapper({
           user: {
             isVolunteer,
@@ -104,13 +104,28 @@ describe('ProfileView', () => {
         ).toEqual(isVolunteer)
       }
     )
+
+    it.each([true, false])(
+      "Should show 'Remove phone number' option for students only",
+      async (isVolunteer) => {
+        const wrapper = getWrapper({
+          user: {
+            isVolunteer,
+            phone: '+18187776543',
+          },
+        })
+        expect(
+          wrapper.find('[data-testid="delete-phone-button"]').exists()
+        ).toEqual(!isVolunteer)
+      }
+    )
   })
 
-  describe('Editing and verifying phone numbers', () => {
+  describe('Phone numbers', () => {
     /**
      * Helper function to click the button for editing/saving the profile
      */
-    const clickEditSaveButton = async wrapper => {
+    const clickEditSaveButton = async (wrapper) => {
       wrapper.find('[data-testid="edit-profile-btn"]').trigger('click')
       await wrapper.vm.$nextTick()
     }
@@ -155,6 +170,28 @@ describe('ProfileView', () => {
       // Expect modal to pop open
       expect(
         wrapper.find('[data-testid="sms-verification-modal"]').exists()
+      ).toBeFalsy()
+    })
+
+    it('Should open the corresponding modal if a student clicks the Remove Phone button', async () => {
+      const wrapper = getWrapper({
+        user: {
+          phone: '+18609998765',
+          isVolunteer: false,
+        },
+      })
+      await wrapper.find('[data-testid="delete-phone-button"]').trigger('click')
+      expect(
+        wrapper.find('[data-testid="remove-phone-confirmation-modal"]').exists()
+      ).toBeTruthy()
+    })
+
+    it('Should not render the Remove Phone button if the user has no phone', async () => {
+      const wrapper = getWrapper({
+        user: { phone: undefined, isVolunteer: false },
+      })
+      expect(
+        wrapper.find('[data-testid="delete-phone-button"]').exists()
       ).toBeFalsy()
     })
   })

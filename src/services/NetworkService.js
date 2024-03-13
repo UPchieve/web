@@ -53,6 +53,10 @@ export async function httpPut(path, data, config) {
   return axiosInstance.put(path, data, config)
 }
 
+export async function httpDelete(path, config) {
+  return axiosInstance.delete(path, config)
+}
+
 export default {
   _successHandler(res) {
     return Promise.resolve(res)
@@ -238,6 +242,9 @@ export default {
       this._successHandler,
       this._errorHandler
     )
+  },
+  deletePhone() {
+    return httpDelete(`${API_ROOT}/user/phone`)
   },
   getVolunteersAvailability(data) {
     return httpGet(`${API_ROOT}/volunteers/availability/${data}`).then(
