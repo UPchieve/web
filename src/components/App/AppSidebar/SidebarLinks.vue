@@ -11,7 +11,7 @@
       <sidebar-link
         v-if="!isVolunteer && isProgressReportsActive"
         to="/sessions/progress/reading"
-        text="Your Progress"
+        text="My Progress"
         class="SidebarLinks__container"
       >
         <your-progress-icon class="icon" />
