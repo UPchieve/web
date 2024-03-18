@@ -1,29 +1,7 @@
 .uc-form {
-  @include flex-container(column);
-  $size: 500px;
-
-  background: white;
-  border-radius: 22px;
-
-  width: 100%;
-  max-width: $size;
-  min-height: $size;
-
-  padding: 25px;
-
-  @include breakpoint-below('small') {
-    padding: 20px;
-  }
-
-  @include breakpoint-below('tiny') {
-    border-radius: 0px;
-    padding-bottom: 100px;
-  }
-
   .alert {
     margin: 25px 0;
   }
-
 }
 
 .uc-form-header {

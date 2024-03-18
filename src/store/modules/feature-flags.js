@@ -129,8 +129,6 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION],
     eligibilityEmail: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.ELIGIBILITY_EMAIL],
-    isNewEligibilityFormDesignEnabled: (state) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.NEW_ELIGIBILITY_FORM_DESIGN],
     isProgressReportsActive: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.PROGRESS_REPORTS],
     isProgressReportsModalActive: (state) =>
