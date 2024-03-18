@@ -63,7 +63,7 @@
         isReferred ? submitReferralEligibilityForm() : submitEligibilityForm()
       "
     >
-      <div class="uc-form-element">
+      <div class="uc-form-element" v-if="useParentGuardianSignUpFlow">
         <label
           for="studentFirstName"
           data-testid="student-first-name-label"
@@ -91,7 +91,7 @@
         />
       </div>
 
-      <div class="uc-form-element">
+      <div class="uc-form-element" v-if="useParentGuardianSignUpFlow">
         <label
           for="studentLastName"
           data-testid="student-last-name-label"
