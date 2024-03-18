@@ -253,6 +253,13 @@ describe('StudentForm', () => {
           .attributes('placeholder')
       ).toEqual('Enter your email address')
     })
+
+    it("Should only render the student's first and last name fields on the eligibility form for parent/guardian signup", async () => {
+      const wrapper = await getWrapper()
+      expect(wrapper.find('[data-testid="student-first-name-label"]').exists()).toBeFalsy()
+      expect(wrapper.find('[data-testid="student-last-name-label"]').exists()).toBeFalsy()
+
+    })
   })
 
   describe('Code.org students', () => {
