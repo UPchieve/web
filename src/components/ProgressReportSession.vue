@@ -1,17 +1,27 @@
 <template>
   <div class="progress-report">
     <section>
-      <h1 class="progress-report__title--subject-score">
-        This session's {{ subjectDisplayName }} score
-      </h1>
-      <h2 class="progress-report__title--grade-status">
-        {{ gradeLabel(progressReport.summary.overallGrade) }}
-      </h2>
-      <p>{{ gradeDescription(progressReport.summary.overallGrade) }}</p>
-      <grade-bars
-        class="progress-report__grade-bars"
-        :grade="progressReport.summary.overallGrade"
-      />
+      <div class="progress-report__section-header">
+        <div>
+          <h1 class="progress-report__title--subject-score">
+            This session's {{ subjectDisplayName }} score
+          </h1>
+
+          <h2 class="progress-report__title--grade-status">
+            {{ gradeLabel(progressReport.summary.overallGrade) }}
+          </h2>
+          <p>{{ gradeDescription(progressReport.summary.overallGrade) }}</p>
+        </div>
+        <progress-report-survey
+          v-if="isProgressReportsSurveyActive"
+          :progressReportId="progressReport.id"
+          class="progress-report__survey"
+        />
+        <grade-bars
+          class="progress-report__grade-bars"
+          :grade="progressReport.summary.overallGrade"
+        />
+      </div>
     </section>
 
     <section>
@@ -64,13 +74,16 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import GradeBars from '@/components/GradeBars.vue'
 import { gradeLabel, gradeDescription } from '@/utils/grades'
+import ProgressReportSurvey from '@/components/ProgressReportSurvey.vue'
 
 export default {
   name: 'ProgressReportSession',
   components: {
     GradeBars,
+    ProgressReportSurvey,
   },
   props: {
     progressReport: {
@@ -83,6 +96,10 @@ export default {
     },
   },
   computed: {
+    ...mapGetters({
+      isProgressReportsSurveyActive:
+        'featureFlags/isProgressReportsSurveyActive',
+    }),
     summaryForRecommendations() {
       return this.getSummaryForFocusAreaAndInfoType(
         this.progressReport.summary,
@@ -261,6 +278,34 @@ p {
 
   &__grade-bars {
     margin: 1em 0;
+    flex-basis: 100%;
+
+    @include breakpoint-above('large') {
+      order: 3;
+    }
+
+    @include breakpoint-between('992px', '1200px') {
+      order: 2;
+    }
+  }
+
+  &__section-header {
+    @include flex-container(row, space-between, flex-start);
+    flex-wrap: wrap;
+
+    @include breakpoint-between('992px', '1200px') {
+      @include flex-container(column);
+    }
+  }
+
+  &__survey {
+    order: 3;
+    margin: 0.8em 0;
+
+    @include breakpoint-above('huge') {
+      order: 2;
+      margin: 0;
+    }
   }
 }
 </style>

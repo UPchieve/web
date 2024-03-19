@@ -81,7 +81,7 @@ export default {
 
     &:hover {
       filter: grayscale(0);
-      transform: scale(1.2);
+      transform: scale(1.1);
 
       // show the label for the image when hovering over the image
       & + .survey-image__label {

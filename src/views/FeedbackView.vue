@@ -179,7 +179,7 @@
                     </div>
                     <feedback-textarea
                       :id="`${questionInfo.questionId}_${response.responseId}`"
-                      @change="
+                      @input="
                         (responseText) =>
                           updateUserResponse(
                             questionInfo.questionId,
