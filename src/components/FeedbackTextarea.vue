@@ -1,7 +1,7 @@
 <template>
   <textarea
     class="feedback__textarea"
-    @change="$emit('change', $event.target.value)"
+    @input="$emit('input', $event.target.value)"
   ></textarea>
 </template>
 
@@ -16,7 +16,7 @@ export default {
   },
   model: {
     prop: 'value',
-    event: 'change',
+    event: 'input',
   },
 }
 </script>

@@ -918,4 +918,15 @@ export default {
       this._errorHandler
     )
   },
+  getProgressReportSurvey() {
+    return httpGet(`${API_ROOT}/survey/progress-report`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
+  getProgressReportSurveyResponses(progressReportId) {
+    return httpGet(
+      `${API_ROOT}/survey/progress-report/${progressReportId}/response`
+    ).then(this._successHandler, this._errorHandler)
+  },
 }
