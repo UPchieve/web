@@ -155,23 +155,34 @@ export default {
       formData.append('studentsFile', this.studentDataFile)
       formData.append('schoolId', this.partnerSchool.schoolId)
       formData.append('partnerKey', this.partnerSchool.partnerKey)
-      formData.append('partnerSite', this.partnerSite)
+      if (this.partnerSite) {
+        formData.append('partnerSite', this.partnerSite)
+      }
 
       try {
         const { data } =
           await NetworkService.adminUploadRosterStudents(formData)
-        if (data.failedUsers.length) {
-          const failedEmails = data.failedUsers.map((u) => u.email).join(', ')
-          this.msg = `The following users failed to be created: ${failedEmails}`
-          this.isWarning = true
-        } else {
+
+        if (!data.failed.length && !data.updated.length) {
           this.msg = 'Success!'
+          return
         }
-        this.clearData()
+        this.isWarning = true
+
+        if (data.failed.length) {
+          const failedEmails = data.failed.map((u) => u.email).join(', ')
+          this.msg = `Failed: ${failedEmails}\n`
+        }
+
+        if (data.updated.length) {
+          const updatedEmails = data.updated.map((u) => u.email).join(', ')
+          this.msg += `Updated: ${updatedEmails}`
+        }
       } catch (error) {
         this.msg = error.response.data.err
         this.isError = true
       } finally {
+        this.clearData()
         this.isSubmitting = false
       }
     },
@@ -194,5 +205,6 @@ export default {
 
 .alert {
   margin: 25px 0;
+  white-space: pre-line;
 }
 </style>
