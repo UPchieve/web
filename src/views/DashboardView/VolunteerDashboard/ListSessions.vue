@@ -227,7 +227,8 @@ export default {
         if (this.isPaidTutor && this.isPaidTutorsPilotRunning) {
           if (
             ['math', 'college'].includes(type) &&
-            paidTutorsPilotGroup === 'test'
+            paidTutorsPilotGroup === 'test' &&
+            this.user.subjects.includes(subTopic)
           ) {
             results.push(session)
           }
