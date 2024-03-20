@@ -100,8 +100,8 @@ export default {
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.QUIZ_ROLLOUT] ?? [],
     gleapSegmentExperiments: (state) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.GLEAP_SEGMENT_EXPERIMENTS] ?? [],
-    isGleapSegmentExperimentsActive: (state) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.GLEAP_SEGMENT_EXPERIMENTS],
+    isGleapSegmentExperimentsActive: (_state, getters) =>
+      getters.gleapSegmentExperiments.length > 0,
     ccIntroCopy: (state) =>
       state.multivariantFlags[POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY],
     isBfIntroCopyEnabled: (state) =>
