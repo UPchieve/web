@@ -41,10 +41,7 @@ export default {
         if (
           Object.keys(currentValue[0]).length &&
           currentValue[1].length &&
-          Object.keys(currentValue[2]).length &&
-          (!Object.keys(prevValue[0]).length ||
-            !prevValue[1].length ||
-            !Object.keys(currentValue[2]).length)
+          (!Object.keys(prevValue[0]).length || !prevValue[1].length)
         )
           ProductDiscoveryService.triggerDynamicGleapWidget(
             this.user,
