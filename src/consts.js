@@ -625,6 +625,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   PAID_TUTOR: 'paid-tutor',
   PAID_TUTORS_PILOT: 'paid-tutors-pilot',
   PROGRESS_REPORT_SURVEY: 'progress-report-survey',
+  USE_NEW_SIGN_UP_FLOW: 'use-new-sign-up-flow',
 }
 
 export const ANALYTICS_REPORT_ROW = {

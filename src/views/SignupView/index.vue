@@ -1,6 +1,7 @@
 <template>
   <form-page-template>
-    <div class="uc-form">
+    <div v-if="useNewSignUpFlow"></div>
+    <div v-else class="uc-form">
       <volunteer-form v-if="this.userSelection === 'volunteer'" />
       <student-form v-else-if="this.userSelection === 'student'" />
 
@@ -60,6 +61,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import StudentForm from './StudentForm.vue'
 import VolunteerForm from './VolunteerForm.vue'
@@ -115,6 +117,9 @@ export default {
         this.userSelection = 'volunteer'
   },
   computed: {
+    ...mapGetters({
+      useNewSignUpFlow: 'featureFlags/useNewSignUpFlow',
+    }),
     welcomeMessage() {
       if (this.isReferred && this.referredBy)
         return `${this.firstName} invited you to UPchieve!`
