@@ -124,6 +124,10 @@ export default {
       this.$socket.connect()
       this.$socket.on('connect', this.emitList)
     }
+
+    this.newWaitingStudentAudio = document.querySelector(
+      '.audio__new-waiting-student'
+    )
   },
   beforeDestroy() {
     clearInterval(this.emitListIntervalId)
@@ -138,7 +142,6 @@ export default {
           isAcknowledged = true
           clearTimeout(timeoutId)
           this.handleIncomingSessions(response.sessions)
-          this.startWaitTimeRefresh()
         }
       })
 
@@ -172,6 +175,21 @@ export default {
       const seconds = Number((newTime / 1000).toFixed(0))
       const minutes = Number((newTime / (1000 * 60)).toFixed(0))
       const hours = Number((newTime / (1000 * 60 * 60)).toFixed(0))
+
+      /*
+       * We want extra alerting for our paid tutors.
+       * When we get close to the 40 second mark, we
+       * want to alert the paid tutors that they should
+       * pick it up soon
+       */
+      if (seconds === 34 && this.isPaidTutor) {
+        const id = setInterval(async () => {
+          // Unmuting the audio allows us to bypass the need for user interaction with the DOM before playing a sound
+          this.newWaitingStudentAudio.muted = false
+          await this.newWaitingStudentAudio.play()
+        }, 2500)
+        setTimeout(() => clearInterval(id), 2500 * 3)
+      }
 
       if (seconds < 120 && showSeconds) {
         return `${seconds} second${seconds === 1 ? '' : 's'}`
@@ -266,15 +284,12 @@ export default {
 
         if (newSession) {
           try {
-            const newWaitingStudentAudio = document.querySelector(
-              '.audio__new-waiting-student'
-            )
             // Unmuting the audio allows us to bypass the need for user interaction with the DOM before playing a sound
-            newWaitingStudentAudio.muted = false
-            await newWaitingStudentAudio.play()
+            this.newWaitingStudentAudio.muted = false
+            await this.newWaitingStudentAudio.play()
           } catch (error) {
             // eslint-disable-next-line no-console
-            console.log('Unable to play audio')
+            console.log('Unable to play audio', error)
           }
 
           sendWebNotification(
