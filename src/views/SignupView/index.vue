@@ -1,7 +1,12 @@
 <template>
-  <form-page-template>
-    <div v-if="useNewSignUpFlow"></div>
-    <div v-else class="uc-form">
+  <div
+    v-if="useNewSignUpFlow && this.userSelection === 'student'"
+    class="h-full"
+  >
+    <sign-up-forms />
+  </div>
+  <form-page-template v-else>
+    <div class="uc-form">
       <volunteer-form v-if="this.userSelection === 'volunteer'" />
       <student-form v-else-if="this.userSelection === 'student'" />
 
@@ -62,7 +67,9 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { capitalize } from 'lodash-es'
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
+import SignUpForms from './SignUpForms.vue'
 import StudentForm from './StudentForm.vue'
 import VolunteerForm from './VolunteerForm.vue'
 import NetworkService from '@/services/NetworkService'
@@ -70,12 +77,12 @@ import AnalyticsService from '@/services/AnalyticsService'
 import StudentAvatar from '@/assets/student-avatar.svg'
 import VolunteerAvatar from '@/assets/volunteer-avatar.svg'
 import { EVENTS } from '@/consts'
-import { capitalize } from 'lodash-es'
 
 export default {
   name: 'signup-view',
   components: {
     FormPageTemplate,
+    SignUpForms,
     StudentForm,
     VolunteerForm,
     StudentAvatar,

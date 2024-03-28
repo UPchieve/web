@@ -34,10 +34,11 @@
 
 <script>
 export default {
-  data() {
-    return {
-      layout: 'card',
-    }
+  props: {
+    layout: {
+      type: String,
+      default: 'card',
+    },
   },
 }
 </script>
@@ -107,6 +108,7 @@ $footer-height-tiny: 100px;
       .form-content {
         background: white;
         flex: 1;
+        padding: 16px;
       }
       .img-content {
         background-color: #f0f9ff;
@@ -118,6 +120,7 @@ $footer-height-tiny: 100px;
       .form-content {
         background: white;
         flex: 4;
+        padding: 16px;
       }
       .img-content {
         flex: 1;
