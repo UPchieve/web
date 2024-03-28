@@ -17,11 +17,12 @@
           :key="`session-${session.id}`"
           :id="session.id"
           class="session-row"
-          :class="
-            isPaidTutorsPilotRunning && session.paidTutorsPilotGroup === 'test'
-              ? 'paid-tutors-pilot-test-group'
-              : ''
-          "
+          :class="{
+            'paid-tutors-pilot-test-group':
+              isPaidTutorsPilotRunning &&
+              session.paidTutorsPilotGroup === 'test',
+            flash: flashStudents.has(session.id),
+          }"
           @click="gotoSession(session)"
         >
           <b-tooltip
@@ -44,13 +45,7 @@
             {{ session.subjectDisplayName }}
           </td>
           <td>
-            {{
-              waitTime(
-                session.createdAt,
-                isPaidTutorsPilotRunning &&
-                  session.paidTutorsPilotGroup === 'test'
-              )
-            }}
+            {{ waitTime(session) }}
           </td>
         </tr>
       </tbody>
@@ -78,6 +73,7 @@ export default {
       emitListIntervalId: null,
       isInitialMount: false,
       hasError: false,
+      flashStudents: new Set(),
     }
   },
   components: { BTooltip },
@@ -170,25 +166,31 @@ export default {
         this.$store.dispatch('user/clearSession')
       }
     },
-    waitTime(time, showSeconds) {
-      const newTime = new Date().getTime() - new Date(time).getTime()
+    waitTime({ createdAt, id, paidTutorsPilotGroup }) {
+      const newTime = new Date().getTime() - new Date(createdAt).getTime()
       const seconds = Number((newTime / 1000).toFixed(0))
       const minutes = Number((newTime / (1000 * 60)).toFixed(0))
       const hours = Number((newTime / (1000 * 60 * 60)).toFixed(0))
-
+      const showSeconds =
+        this.isPaidTutorsPilotRunning && paidTutorsPilotGroup === 'test'
       /*
        * We want extra alerting for our paid tutors.
        * When we get close to the 40 second mark, we
        * want to alert the paid tutors that they should
-       * pick it up soon
+       * pick it up soon by playing audio queues and
+       * flashing the student that is closing in on the
+       * 60 second mark. once we're at the 60 second mark,
+       * it's too late for the study, we want to prioritize
+       * other students under 60 seconds
        */
-      if (seconds === 34 && this.isPaidTutor) {
-        const id = setInterval(async () => {
-          // Unmuting the audio allows us to bypass the need for user interaction with the DOM before playing a sound
-          this.newWaitingStudentAudio.muted = false
-          await this.newWaitingStudentAudio.play()
-        }, 2500)
-        setTimeout(() => clearInterval(id), 2500 * 3)
+      if (seconds > 35 && seconds <= 60 && this.isPaidTutor && showSeconds) {
+        this.flashStudents.add(id)
+      } else {
+        this.flashStudents.delete(id)
+      }
+
+      if (this.flashStudents.has(id)) {
+        this.newWaitingStudentAudio.play()
       }
 
       if (seconds < 120 && showSeconds) {
@@ -342,5 +344,15 @@ thead {
 
 .tooltip {
   opacity: 1;
+}
+
+.flash {
+  animation: flash 1s ease-in-out infinite;
+}
+
+@keyframes flash {
+  50% {
+    background-color: $c-success-green;
+  }
 }
 </style>
