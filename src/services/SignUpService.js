@@ -348,7 +348,7 @@ function getAccountPageDetails(to) {
       getRow(null, getTextElement('h2', 'Create an Account')),
       // TODO: getRow(null, getGoogleSSOButton())),
       // TODO: getRow(null, getCleverSSOButton(())),
-      // TODO: getRow(null, getBreakElement()),
+      getRow(null, { element: 'LineDivider', props: { text: 'or' } }),
       getRow(
         null,
         getInputElement(
