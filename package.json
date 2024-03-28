@@ -6,6 +6,7 @@
     "serve": "VITE_CJS_TRACE=true vite",
     "build": "vite build",
     "preview": "vite preview",
+    "deploy": "doppler run --token $(op read op://private/doppler-high-line/password) -- npm run build && npx swa deploy --env production ./dist",
     "start": "node server.js",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
     "lint:dry": "eslint --ext .js,.vue --ignore-path .gitignore --no-fix src",
@@ -68,6 +69,7 @@
     "yjs": "^13.6.11"
   },
   "devDependencies": {
+    "@azure/static-web-apps-cli": "^1.1.7",
     "@storybook/addon-a11y": "^7.6.9",
     "@storybook/addon-actions": "^7.6.9",
     "@storybook/addon-essentials": "^7.6.8",
