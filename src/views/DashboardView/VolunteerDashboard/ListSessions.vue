@@ -18,18 +18,15 @@
           :id="session.id"
           class="session-row"
           :class="{
-            'paid-tutors-pilot-test-group':
-              isPaidTutorsPilotRunning &&
-              session.paidTutorsPilotGroup === 'test',
+            'paid-tutors-pilot-test-group': shouldHighlightSession(
+              session.paidTutorsPilotGroup
+            ),
             flash: flashStudents.has(session.id),
           }"
           @click="gotoSession(session)"
         >
           <b-tooltip
-            v-if="
-              isPaidTutorsPilotRunning &&
-              session.paidTutorsPilotGroup === 'test'
-            "
+            v-if="shouldHighlightSession(session.paidTutorsPilotGroup)"
             :target="session.id"
             placement="top"
             variant="dark"
@@ -166,13 +163,15 @@ export default {
         this.$store.dispatch('user/clearSession')
       }
     },
+    shouldHighlightSession(paidTutorsPilotGroup) {
+      return this.isPaidTutorsPilotRunning && paidTutorsPilotGroup === 'test'
+    },
     waitTime({ createdAt, id, paidTutorsPilotGroup }) {
       const newTime = new Date().getTime() - new Date(createdAt).getTime()
       const seconds = Number((newTime / 1000).toFixed(0))
       const minutes = Number((newTime / (1000 * 60)).toFixed(0))
       const hours = Number((newTime / (1000 * 60 * 60)).toFixed(0))
-      const showSeconds =
-        this.isPaidTutorsPilotRunning && paidTutorsPilotGroup === 'test'
+      const showSeconds = this.shouldHighlightSession(paidTutorsPilotGroup)
       /*
        * We want extra alerting for our paid tutors.
        * When we get close to the 40 second mark, we
