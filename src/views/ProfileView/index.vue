@@ -47,7 +47,26 @@
           </div>
           <div>
             <div id="phone" class="container-section">
-              <div class="prompt">Your Phone Number</div>
+              <div id="phone-heading">
+                <div class="prompt">Your Phone Number</div>
+                <button
+                  v-if="user.phone && !user.isVolunteer"
+                  class="remove-phone-btn"
+                  value="Remove"
+                  @click="toggleDeletePhoneConfirmationModal"
+                  data-testid="delete-phone-button"
+                  id="delete-phone-button"
+                  label="Remove"
+                >
+                  <TrashIcon id="delete-phone-icon" />
+                  Remove
+                </button>
+              </div>
+              <RemovePhoneConfirmationModal
+                v-if="showDeletePhoneConfirmationModal"
+                :onCancel="toggleDeletePhoneConfirmationModal"
+                :onAccept="handleDeleteNumber"
+              />
               <div
                 id="ph-no-capture"
                 v-show="!activeEdit && user.phone"
@@ -162,21 +181,6 @@
               >Reset password</router-link
             >
           </div>
-
-          <div v-if="user.phone && !user.isVolunteer" class="delete-phone">
-            <input
-              type="button"
-              value="Remove phone from account"
-              @click="toggleDeletePhoneConfirmationModal"
-              data-testid="delete-phone-button"
-              class="remove-phone-btn"
-            />
-            <RemovePhoneConfirmationModal
-              v-if="showDeletePhoneConfirmationModal"
-              :onCancel="toggleDeletePhoneConfirmationModal"
-              :onAccept="handleDeleteNumber"
-            />
-          </div>
         </div>
       </div>
 
@@ -258,6 +262,7 @@ import Loader from '@/components/Loader.vue'
 import VerificationModal from '../VerificationModal.vue'
 import Checkbox from '@/components/CheckBox.vue'
 import RemovePhoneConfirmationModal from '@/views/ProfileView/RemovePhoneConfirmationModal.vue'
+import TrashIcon from '@/assets/trash.svg'
 
 export default {
   name: 'profile-view',
@@ -268,6 +273,7 @@ export default {
     VuePhoneNumberInput,
     Loader,
     VerificationModal,
+    TrashIcon,
   },
   data() {
     return {
@@ -700,6 +706,12 @@ ul {
   font-weight: 600;
 }
 
+#phone-heading {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 .phone-answer {
   display: flex;
   flex-direction: column;
@@ -788,14 +800,29 @@ button:hover {
 }
 
 .remove-phone-btn {
+  color: $c-soft-black;
+  border-radius: 0px;
   border: none;
-  background: none;
-  padding-left: 0px;
-  color: darken($c-error-red, 25%);
+  background-color: transparent;
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 4px;
 
   &:hover {
-    text-decoration: none;
-    color: darken($c-error-red, 40%);
+    background-color: transparent;
+    color: $c-soft-black;
+  }
+
+  button {
+    border: none;
+    background: none;
+    padding-left: 0px;
+  }
+
+  #delete-phone-icon {
+    height: 14px;
+    width: 14px;
   }
 }
 

@@ -9,23 +9,28 @@
       >
         {{ error }}
       </div>
-      <p class="uc-form-header">
-        Are you sure you want to remove your phone number from your account?
+      <p class="uc-form-header">Are you sure?</p>
+      <p data-testid="confirmation-message">
+        {{
+          user.isVolunteer
+            ? 'Without a phone number you will no longer receive text notifications during your availability time.'
+            : 'Your phone number will be removed from your account.'
+        }}
       </p>
       <div class="remove-phone-modal-buttons-container">
-        <button
-          class="uc-form-button"
-          data-testid="remove-phone-accept-btn"
-          @click="deletePhoneInfo"
-        >
-          Yes, remove it
-        </button>
         <button
           class="uc-form-button-secondary"
           data-testid="remove-phone-cancel-btn"
           @click="onCancel"
         >
           Cancel
+        </button>
+        <button
+          class="uc-form-button"
+          data-testid="remove-phone-accept-btn"
+          @click="deletePhoneInfo"
+        >
+          Delete
         </button>
       </div>
     </Modal>
@@ -86,11 +91,12 @@ export default {
 .remove-phone-modal-buttons-container {
   padding-top: 16px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 16px;
 
   .uc-form-button {
     margin-top: 0;
+    background-color: $c-error-red;
   }
 
   .uc-form-button-secondary {
