@@ -15,7 +15,7 @@ describe('RemovePhoneConfirmationModal', () => {
   const mockCancel = vi.fn()
   const mockAccept = vi.fn()
 
-  const getWrapper = (mobileMode = false) => {
+  const getWrapper = (mobileMode = false, isVolunteer = false) => {
     const store = new Vuex.Store({
       modules: {
         user: {
@@ -23,6 +23,7 @@ describe('RemovePhoneConfirmationModal', () => {
           state: {
             user: {
               ...defaultUserState,
+              isVolunteer,
             },
           },
         },
@@ -100,4 +101,20 @@ describe('RemovePhoneConfirmationModal', () => {
       'Test error message'
     )
   })
+
+  it.each([
+    [
+      true,
+      'Without a phone number you will no longer receive text notifications during your availability time.',
+    ],
+    [false, 'Your phone number will be removed from your account.'],
+  ])(
+    'Should render the correct text depending on if the user is a student or volunteer (isVolunteer=%s)',
+    async (isVolunteer, expectedCopy) => {
+      const wrapper = getWrapper(false, isVolunteer)
+      expect(
+        wrapper.find('[data-testid="confirmation-message"]').text()
+      ).toEqual(expectedCopy)
+    }
+  )
 })
