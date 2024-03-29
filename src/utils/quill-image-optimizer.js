@@ -3,6 +3,7 @@ export const MAX_TOTAL_IMAGES = 5
 
 export const maxImagesEventName = 'max-images-limit'
 export const fileSizeTooBigEventName = 'file-size-limit'
+export const volunteerAttemptedToAddImage = 'volunteer-attempted-to-add-image'
 
 const isSafari =
   /constructor/i.test(window.HTMLElement) ||
@@ -13,6 +14,9 @@ const isSafari =
 
 const maxImagesEvent = new Event(maxImagesEventName)
 const fileSizeEvent = new Event(fileSizeTooBigEventName)
+const volunteerAttemptedToAddImageEvent = new Event(
+  volunteerAttemptedToAddImage
+)
 
 const getFilesFromDragEvent = async (evt) => evt?.dataTransfer?.files
 
@@ -136,11 +140,30 @@ const file2b64 = async (file) => {
 }
 
 class ImageDrop {
-  constructor(quill, onNewDataUrl) {
+  constructor(quill, onNewDataUrl, isVolunteer) {
     this.quill = quill
     this.onNewDataUrl = onNewDataUrl
-    this.quill.root.addEventListener('drop', (e) => this.handleDrop(e), false)
-    this.quill.root.addEventListener('paste', (e) => this.handlePaste(e), false)
+    this.isVolunteer = isVolunteer
+    this.quill.root.addEventListener(
+      'drop',
+      (e) => this.handleImageUpload(e, isVolunteer, () => this.handleDrop(e)),
+      false
+    )
+    this.quill.root.addEventListener(
+      'paste',
+      (e) => this.handleImageUpload(e, isVolunteer, () => this.handlePaste(e)),
+      false
+    )
+  }
+
+  async handleImageUpload(evt, isVolunteer, callback) {
+    if (isVolunteer) {
+      // Prevent volunteers from uploading images
+      this.quill.root.dispatchEvent(volunteerAttemptedToAddImageEvent)
+      evt.preventDefault()
+    } else {
+      await callback()
+    }
   }
 
   async handleDrop(evt) {
@@ -184,6 +207,7 @@ class ImageDrop {
       this.quill.root.dispatchEvent(maxImagesEvent)
       return
     }
+
     const files = Array.from(evt?.clipboardData?.items || [])
     const images = files.filter((f) => matchedFileType(f.type))
 
@@ -206,13 +230,13 @@ class ImageDrop {
 }
 
 export class ImageCompressor {
-  constructor(quill, options, maxImages) {
+  constructor(quill, options) {
     this.quill = quill
     this.options = options || {}
     if (isSafari && this.options.imageType === 'image/webp') {
       this.options.imageType = 'image/jpeg'
     }
-    this.maxImages = maxImages
+    this.maxImages = options.maxImages ?? MAX_TOTAL_IMAGES
 
     const onImageDrop = async (dataUrl) => {
       if (!dataUrl) {
@@ -221,7 +245,7 @@ export class ImageCompressor {
       const dataUrlCompressed = await this.downscaleImageFromUrl(dataUrl)
       this.insertToEditor(dataUrlCompressed)
     }
-    this.imageDrop = new ImageDrop(quill, onImageDrop)
+    this.imageDrop = new ImageDrop(quill, onImageDrop, this.options.isVolunteer)
     const toolbar = this.quill.getModule('toolbar')
     if (toolbar) {
       toolbar.addHandler('image', () => this.selectLocalImage())

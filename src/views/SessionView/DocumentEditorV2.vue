@@ -26,6 +26,7 @@ import {
   maxImagesEventName,
   fileSizeTooBigEventName,
   MAX_TOTAL_IMAGES,
+  volunteerAttemptedToAddImage,
 } from '@/utils/quill-image-optimizer'
 import Quill from 'quill'
 import QuillCursors from 'quill-cursors'
@@ -36,7 +37,6 @@ import { QuillBinding } from 'y-quill'
 
 Quill.register('modules/cursors', QuillCursors)
 Quill.register('modules/image', ImageCompressor)
-const Delta = Quill.import('delta')
 
 const encode = (array) => array.toString()
 const decode = (str) => Uint8Array.from(str.split(',').map(Number))
@@ -96,6 +96,7 @@ export default {
           maxWidth: 1000,
           maxHeight: 1000,
           imageType: 'image/webp',
+          isVolunteer: this.isVolunteer,
         },
         cursors: {
           selectionChangeSource: 'cursor-api',
@@ -125,15 +126,14 @@ export default {
         ),
       false
     )
-
-    if (this.isVolunteer) {
-      const useHandler = () => {
-        const delta = new Delta()
-        return delta.insert('')
-      }
-      this.quillEditor.clipboard.addMatcher('IMG', useHandler)
-      this.quillEditor.clipboard.addMatcher('PICTURE', useHandler)
-    }
+    this.quillEditor.root.addEventListener(
+      volunteerAttemptedToAddImage,
+      () =>
+        alert(
+          'At this time, coaches cannot upload images for student safety reasons. Please direct them to an online resource instead.'
+        ),
+      false
+    )
 
     // do not allow user to make edits until the quill doc contents are set
     this.quillEditor.disable()
