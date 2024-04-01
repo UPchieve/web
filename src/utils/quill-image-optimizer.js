@@ -18,7 +18,17 @@ const volunteerAttemptedToAddImageEvent = new Event(
   volunteerAttemptedToAddImage
 )
 
-const getFilesFromDragEvent = async (evt) => evt?.dataTransfer?.files
+const getImagesFromDragEvent = (evt) => {
+  return Array.from(evt?.dataTransfer?.files ?? []).filter((f) =>
+    matchedFileType(f.type)
+  )
+}
+
+const getImagesFromPasteEvent = (evt) => {
+  return Array.from(evt?.clipboardData?.items ?? []).filter((f) =>
+    matchedFileType(f.type)
+  )
+}
 
 const matchedFileType = (fileType) => {
   return fileType.match(/^image\/(gif|jpe?g|a?png|svg|webp|bmp)/i)
@@ -157,8 +167,11 @@ class ImageDrop {
   }
 
   async handleImageUpload(evt, isVolunteer, callback) {
-    if (isVolunteer) {
-      // Prevent volunteers from uploading images
+    // Prevent volunteers from uploading images
+    const isImageUpload =
+      (evt.type === 'drop' && getImagesFromDragEvent(evt).length) ||
+      (evt.type === 'paste' && getImagesFromPasteEvent(evt).length)
+    if (isVolunteer && isImageUpload) {
       this.quill.root.dispatchEvent(volunteerAttemptedToAddImageEvent)
       evt.preventDefault()
     } else {
@@ -184,11 +197,7 @@ class ImageDrop {
         )
       }
     }
-    const files = await getFilesFromDragEvent(evt)
-    const filesFiltered = Array.from(files || []).filter((f) =>
-      matchedFileType(f.type)
-    )
-    const firstImage = filesFiltered?.[0]
+    const firstImage = getImagesFromDragEvent(evt)[0]
     if (firstImage) {
       const base64ImageSrc = await file2b64(firstImage)
       this.onNewDataUrl(base64ImageSrc)
@@ -208,12 +217,7 @@ class ImageDrop {
       return
     }
 
-    const files = Array.from(evt?.clipboardData?.items || [])
-    const images = files.filter((f) => matchedFileType(f.type))
-
-    if (!images.length) {
-      return
-    }
+    const images = getImagesFromPasteEvent(evt)
 
     const imagesNoHtml = images.filter((f) => f.type !== 'text/html')
     if (!imagesNoHtml.length) {
