@@ -41,6 +41,7 @@ import FormEmail from '@/components/FormEmail.vue'
 import FormInput from '@/components/FormInput.vue'
 import FormErrors from '@/components/FormErrors.vue'
 import FormPassword from '@/components/FormPassword.vue'
+import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
 import FormSelect from '@/components/FormSelect.vue'
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import * as SignUpService from '@/services/SignUpService'
@@ -53,6 +54,7 @@ export default {
     FormInput,
     FormErrors,
     FormPassword,
+    FormSchoolSearch,
     FormSelect,
     FormPageTemplate,
   },
