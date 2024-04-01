@@ -38,6 +38,7 @@
 import { useVuelidate } from '@vuelidate/core'
 import UpdogCrying from '@/assets/updog-crying.svg'
 import FormEmail from '@/components/FormEmail.vue'
+import FormInput from '@/components/FormInput.vue'
 import FormErrors from '@/components/FormErrors.vue'
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import * as SignUpService from '@/services/SignUpService'
@@ -47,6 +48,7 @@ export default {
   components: {
     UpdogCrying,
     FormEmail,
+    FormInput,
     FormErrors,
     FormPageTemplate,
   },

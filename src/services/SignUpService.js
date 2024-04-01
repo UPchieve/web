@@ -48,10 +48,7 @@ export function getPageDetails(to, from) {
           },
         }
       ),
-      getRow(null, {
-        element: 'FormEmail',
-        props: { name: 'studentEmail ' },
-      }),
+      getRow(null, getZipCodeElement()),
       getRow(null, { element: 'br' }),
       getRow(null, getButtonElement(checkEligibility, 'Submit')),
     ],
@@ -88,6 +85,19 @@ function getButtonElement(submitAction, content, classes) {
     classes: 'uc-form-button ' + classes,
     content,
     submitAction,
+  }
+}
+
+function getZipCodeElement() {
+  return {
+    element: 'FormInput',
+    props: {
+      name: 'zipCode',
+      label: 'Zip Code',
+      minLength: 5,
+      maxLength: 5,
+      blurEvent: EVENTS.STUDENT_ENTERED_ZIP_CODE,
+    },
   }
 }
 
