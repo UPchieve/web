@@ -1,5 +1,7 @@
 import AnalyticsService from '@/services/AnalyticsService'
-import { EVENTS } from '@/consts'
+import LoggerService from '@/services/LoggerService'
+import NetworkService from '@/services/NetworkService'
+import { EVENTS, GRADES } from '@/consts'
 
 const RoutePath = {
   account: '/sign-up/student/account',
@@ -48,9 +50,10 @@ export function getPageDetails(to, from) {
           },
         }
       ),
-      getRow(null, getZipCodeElement()),
+      getRow('el-gap', getGradeSelectionElement(), getZipCodeElement()),
+      getRow(null, getSignUpSourceElement()),
       getRow(null, { element: 'br' }),
-      getRow(null, getButtonElement(checkEligibility, 'Submit')),
+      getRow(null, getButtonElement(checkEligibility, 'Check eligibility')),
     ],
   }
 }
@@ -94,9 +97,49 @@ function getZipCodeElement() {
     props: {
       name: 'zipCode',
       label: 'Zip Code',
+      placeholder: 'Zip Code',
       minLength: 5,
       maxLength: 5,
       blurEvent: EVENTS.STUDENT_ENTERED_ZIP_CODE,
+    },
+  }
+}
+
+function getGradeSelectionElement() {
+  return {
+    element: 'FormSelect',
+    props: {
+      blurEvent: EVENTS.STUDENT_SELECTED_GRADE,
+      getSelectOptions: () => GRADES,
+      name: 'currentGrade',
+      label: 'Grade in 2023-2024',
+      placeholder: 'Grade in 2023-2024',
+      reduce: (option) => option.split(' ')[0],
+    },
+  }
+}
+
+function getSignUpSourceElement() {
+  return {
+    element: 'FormSelect',
+    props: {
+      blurEvent: EVENTS.STUDENT_SELECTED_HOW_DID_YOU_HEAR_ABOUT_US,
+      getSelectOptions: async function() {
+        try {
+          const {
+            data: { signupSources },
+          } = await NetworkService.getStudentSignupSources()
+          return signupSources
+        } catch (err) {
+          LoggerService.noticeError(err)
+          return []
+        }
+      },
+      name: 'signUpSource',
+      label: 'How did you hear about us?',
+      optionTextField: 'name',
+      placeholder: 'How did you hear about us?',
+      reduce: (option) => option.id,
     },
   }
 }
