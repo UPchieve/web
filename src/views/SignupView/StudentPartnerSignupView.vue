@@ -61,16 +61,17 @@
           </label>
           <v-select
             id="site"
+            data-testid="site-select"
             class="uc-form-select-input"
             v-model="formData.partnerSite"
-            :placeholder="`Select ${getFormLabelIdentifierPossessive} site`"
+            :placeholder="`Search for ${getFormLabelIdentifierPossessive} site`"
             v-bind:class="{
               'uc-form-select-input-invalid': hasFormValidationError(
                 v$.formData.partnerSite
               ),
             }"
-            :options="studentPartner.sites"
-            :searchable="false"
+            :options="getSortedPartnerSites"
+            searchable="true"
             :clearable="false"
             @close="() => v$.formData.partnerSite.$touch()"
             required
@@ -645,6 +646,10 @@ export default {
       return signupUtils.getFormLabelIdentifierPossessive(
         this.useParentGuardianSignUpFlow
       )
+    },
+
+    getSortedPartnerSites() {
+      return Array.from(this.studentPartner.sites).sort()
     },
   },
   methods: {
