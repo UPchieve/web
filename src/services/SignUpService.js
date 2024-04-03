@@ -50,7 +50,8 @@ export function getPageDetails(to, from) {
           },
         }
       ),
-      getRow('el-gap', getGradeSelectionElement(), getZipCodeElement()),
+      getRow(null, getGradeSelectionElement(), getZipCodeElement()),
+      getRow(null, { element: 'FormSchoolSearch' }),
       getRow(null, getSignUpSourceElement()),
       getRow(null, { element: 'br' }),
       getRow(null, getButtonElement(checkEligibility, 'Check eligibility')),
