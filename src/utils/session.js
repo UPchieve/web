@@ -23,11 +23,10 @@ export const rejoinSession = (router, sessionPath) => {
  * Ends the current session.
  * @param {object} context
  */
-export const endSession = (context, skipSocketDisconnect) => {
+export const endSession = (context) => {
   const sessionId = context.$store.state.user.session._id
   SessionService.endSession(context, sessionId)
     .then(() => {
-      if (!skipSocketDisconnect) context.$socket.disconnect()
       context.$router.replace('/')
       context.$store.dispatch('user/fetch', context)
       context.$store.dispatch('app/modal/hide')

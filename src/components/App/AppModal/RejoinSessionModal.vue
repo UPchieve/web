@@ -38,7 +38,7 @@ export default {
       sessionUtils.rejoinSession(this.$router, this.sessionPath)
     },
     end() {
-      sessionUtils.endSession(this, this.isRecapSocketUpdatesActive)
+      sessionUtils.endSession(this)
     },
   },
 }

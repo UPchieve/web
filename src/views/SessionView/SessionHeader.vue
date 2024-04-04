@@ -150,9 +150,6 @@ export default {
       }, 1000 * 60)
     }
   },
-  beforeDestroy() {
-    if (!this.isRecapSocketUpdatesActive) this.$socket.disconnect()
-  },
   computed: {
     ...mapState({
       user: (state) => state.user.user,
