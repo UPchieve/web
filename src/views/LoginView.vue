@@ -1,12 +1,15 @@
 <template>
   <form-page-template>
     <div class="uc-form">
-      <h1 class="uc-form-header">Hey, welcome back!</h1>
+      <h1 class="uc-form-header" data-testid="login-heading">
+        Hey, welcome back!
+      </h1>
 
       <div
         v-if="error || $route.query['401'] === 'true'"
         class="alert alert-danger"
         role="alert"
+        data-testid="error"
       >
         {{ error }}
       </div>
@@ -16,6 +19,7 @@
           <label for="inputEmail" class="uc-form-label">Email</label>
           <input
             id="inputEmail"
+            data-testid="inputEmail"
             class="uc-form-text-input"
             type="email"
             placeholder="Enter your email address"
@@ -29,6 +33,7 @@
           <label for="inputPassword" class="uc-form-label">Password</label>
           <input
             id="inputPassword"
+            data-testid="inputPassword"
             class="uc-form-text-input"
             type="password"
             placeholder="Enter your password"
@@ -42,6 +47,7 @@
 
         <button
           class="uc-form-button"
+          data-testid="loginButton"
           type="submit"
           @click.prevent="signIn"
           :disabled="!isValidForm || isLoggingIn"
@@ -52,6 +58,7 @@
 
       <button
         class="uc-form-button google"
+        data-testid="googleSsoButton"
         @click.prevent="signInWithGoogle"
         :disabled="isLoggingIn"
       >

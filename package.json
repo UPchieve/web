@@ -15,6 +15,8 @@
     "storybook": "storybook dev -p 6006",
     "test:watch": "vitest --watch",
     "test": "vitest --run --pool=forks",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "scan:diff": "git diff --staged --name-only -z | xargs -0 detect-secrets-hook --baseline .secrets.baseline --exclude-files package-lock.json",
     "scan:audit": "detect-secrets audit .secrets.baseline"
   },
@@ -70,6 +72,7 @@
   },
   "devDependencies": {
     "@azure/static-web-apps-cli": "^1.1.7",
+    "@playwright/test": "^1.42.1",
     "@storybook/addon-a11y": "^7.6.9",
     "@storybook/addon-actions": "^7.6.9",
     "@storybook/addon-essentials": "^7.6.8",
@@ -78,6 +81,7 @@
     "@storybook/blocks": "^7.6.8",
     "@storybook/vue": "^7.6.8",
     "@storybook/vue-vite": "^7.6.8",
+    "@types/node": "^20.11.30",
     "@vitejs/plugin-vue2": "^2.3.1",
     "@vue/eslint-config-prettier": "^9.0.0",
     "@vue/test-utils": "^1.0.0",

@@ -1,5 +1,5 @@
 <template>
-  <div class="DashboardBanner">
+  <div data-testid="dashboard-banner" class="DashboardBanner">
     <h1>Hello, {{ name }}!</h1>
     <h2 v-if="subheader">{{ subheader }}</h2>
   </div>
