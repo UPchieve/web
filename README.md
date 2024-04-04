@@ -80,7 +80,6 @@ where the frontend can recognize that a new version is available and prompt the 
 
 `$ npm run start` is the command the container uses to start the server in our cloud deployment environments.
 
-
 ## Component Library
 
 We are transitioning to [Storybook](https://storybook.js.org/) to manage our frontend component library, with the goal
@@ -111,3 +110,7 @@ rendering.
 Our unit tests do not incorporate visual testing for SVG components (refer to this [component](src/views/DashboardView/StudentDashboard/SubjectSelection/RecentSubjectCard.vue) and its [unit test](tests/unit/components/RecentSubjectCard.spec.js)). The SVG components get successfully rendered on the application itself but not within unit or snapshot test markups.
 
 So, after extensive research and exhausting nearly all possible options of rendering and testing SVGs, as of August 4 2021, we realized that this has been a prolonged JSDOM/JavaScript [issue](https://github.com/vuejs/vue-test-utils/issues/369) and not something that is occuring due to vue-test-utils or jest capabilities. Hence, consider it acceptable to not visually test SVGs for the time being.
+
+
+## E2E Testing
+To run the playwright E2E tests locally, you can use the `npm run test:e2e` or `npm run test:e2e:ui` commands. Make sure you have the front and backend applications running locally before you start the tests.
