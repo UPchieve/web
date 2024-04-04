@@ -2,13 +2,13 @@ import Validator from 'validator'
 import errorFromHttpResponse from '../utils/error-from-http-response'
 import AnalyticsService from './AnalyticsService'
 import LoggerService from './LoggerService'
-import NetworkService from './NetworkService'
+import NetworkService, { axiosInstance } from './NetworkService'
 import ProductDiscoveryService from './ProductDiscoveryService'
 
 export const INVALID_CSRF_ERROR = 'invalid csrf token'
 
 export default {
-  login(creds) {
+  async login(creds) {
     const { email, password } = creds
     if (
       !email ||
@@ -19,14 +19,26 @@ export default {
       return Promise.reject('Invalid login form submission')
     }
 
-    return NetworkService.login(creds).then((res) => {
-      const data = { ...res.data }
-      if (!data) {
-        throw new Error('No user returned from auth service')
-      }
+    const loginResponse = await NetworkService.login(creds)
+    if (!('data' in loginResponse)) {
+      throw new Error('No user returned from auth service')
+    }
+    await this.fetchAndSetCsrfHeader(loginResponse.data.user.id)
+    return loginResponse.data
+  },
 
-      return data
-    })
+  async fetchAndSetCsrfHeader(userId = undefined) {
+    const csrfResponse = await NetworkService.getCsrfToken()
+    if (!csrfResponse?.data?.csrfToken) {
+      LoggerService.noticeError(
+        `Failed to fetch CSRF token for userId=${userId}`
+      )
+      throw new Error(
+        'Something went wrong. Please refresh the page and try again.'
+      )
+    }
+    axiosInstance.defaults.headers.common['X-CSRF-TOKEN'] =
+      csrfResponse.data.csrfToken
   },
 
   registerOpenVolunteer(signupData) {
