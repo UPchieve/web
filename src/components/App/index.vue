@@ -26,6 +26,12 @@
         'App-router-view-wrapper--sidebar': showSidebar,
       }"
     >
+      <audio
+        ref="newWaitingStudentAudio"
+        class="audio__new-waiting-student"
+        src="@/assets/audio/alert.mp3"
+        muted
+      />
       <router-view />
     </div>
   </div>
@@ -106,6 +112,8 @@ export default {
     if (this.mobileMode) {
       Gleap.hide()
     }
+    this.$store.state.volunteer.newWaitingStudentAudio =
+      this.$refs.newWaitingStudentAudio
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize)
@@ -339,6 +347,15 @@ export default {
     redirect() {
       this.$router.push('/')
     },
+    connect() {
+      if (this.isVolunteer) {
+        this.$store.dispatch('volunteer/emitList', {
+          socket: this.$socket,
+          retryCount: 0,
+          maxRetries: 5,
+        })
+      }
+    },
     /**
      *
      * When a student dismisses the ProgressReportModal because the
@@ -363,6 +380,11 @@ export default {
         data.report.status === 'complete'
       )
         this.$store.dispatch('user/getUnreadProgressReportOverviewSubjects')
+    },
+    async sessions(sessions) {
+      if (this.isVolunteer) {
+        this.$store.dispatch('volunteer/handleIncomingSessions', sessions)
+      }
     },
   },
 }
@@ -414,5 +436,9 @@ export default {
   color: initial;
   background-color: #fff;
   border-color: transparent;
+}
+
+.audio__new-waiting-student {
+  display: none;
 }
 </style>

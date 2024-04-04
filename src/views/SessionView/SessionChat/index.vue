@@ -405,8 +405,8 @@ export default {
     scrollToBottom() {
       const messagesBox = this.$refs.messages
       messagesBox.scrollTop =
-        messagesBox.lastElementChild.offsetTop +
-        messagesBox.lastElementChild.offsetHeight
+        (messagesBox.lastElementChild?.offsetTop ?? 0) +
+        (messagesBox.lastElementChild?.offsetHeight ?? 0)
     },
     messageAlignment(message) {
       return message.user === this.user.id

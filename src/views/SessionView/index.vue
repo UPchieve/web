@@ -197,13 +197,18 @@ export default {
     window.addEventListener('resize', this.handleResize)
 
     // Hide Gleap using CSS. The SDK's`hide` function is a no-op at the moment
-    if (this.mobileMode)
-      document.querySelector(this.gleapClass).style.visibility = 'hidden'
+    const gleapEl = document.querySelector(this.gleapClass)
+    if (this.mobileMode && gleapEl) {
+      gleapEl.style.visibility = 'hidden'
+    }
   },
   beforeDestroy() {
     Gleap.removeCustomData('sessionId')
     window.removeEventListener('resize', this.handleResize)
-    document.querySelector(this.gleapClass).style.visibility = 'visible'
+    const gleapEl = document.querySelector(this.gleapClass)
+    if (gleapEl) {
+      gleapEl.style.visibility = 'visible'
+    }
   },
   /*
    * @notes
