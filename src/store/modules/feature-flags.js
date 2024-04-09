@@ -30,6 +30,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.PAID_TUTORS_PILOT]: false,
       [POSTHOG_FEATURE_FLAGS.PROGRESS_REPORT_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.USE_NEW_SIGN_UP_FLOW]: false,
+      [POSTHOG_FEATURE_FLAGS.SHOW_IN_APP_SESSION_NOTIFICATIONS]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: 'control',
@@ -144,5 +145,9 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.PROGRESS_REPORT_SURVEY],
     useNewSignUpFlow: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.USE_NEW_SIGN_UP_FLOW],
+    showInAppSessionNotifications: (state) =>
+      state.toggleFlags[
+        POSTHOG_FEATURE_FLAGS.SHOW_IN_APP_SESSION_NOTIFICATIONS
+      ],
   },
 }

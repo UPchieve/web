@@ -337,7 +337,7 @@ export default {
           await volunteerJoinedAudio.play()
         } catch (error) {
           // eslint-disable-next-line no-console
-          console.log('Unable to play audio')
+          console.log('Unable to play audio', error)
         }
         sendWebNotification('We found a coach!', {
           body: `Start chatting with ${this.sessionPartner.firstname} now.`,

@@ -7,6 +7,7 @@ import productFlagsModule from './modules/product-flags'
 import userModule from './modules/user'
 import subjectsModule from './modules/subjects'
 import volunteerModule from './modules/volunteer'
+import notificationsModule from './modules/notifications'
 
 Vue.use(Vuex)
 
@@ -23,6 +24,7 @@ export const storeOptions = {
     featureFlags: featureFlagsModule,
     subjects: subjectsModule,
     volunteer: volunteerModule,
+    notifications: notificationsModule,
   },
 }
 

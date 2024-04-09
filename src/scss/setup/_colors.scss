@@ -2,78 +2,80 @@
 $c-soft-black: #343440;
 
 /// Used for secondary text and icons.
-$c-secondary-grey: #77778B;
+$c-secondary-grey: #77778b;
 
 /// Used for disabled text.
-$c-disabled-grey: #ABB2BD;
+$c-disabled-grey: #abb2bd;
 
 /// Used for borders and hint text.
-$c-border-grey: #D6E0EF;
+$c-border-grey: #d6e0ef;
 
 /// Used for backgrounds.
-$c-background-blue: #E3F2FD;
+$c-background-blue: #e3f2fd;
 
 /// Used for backgrounds.
-$c-background-grey: #F1F3F6;
+$c-background-grey: #f1f3f6;
 
 /// Used for primary actions and to indicate success.
-$c-success-green: #16D2AA;
+$c-success-green: #16d2aa;
 
 /// Used to indicate an error or destructive action.
-$c-error-red: #F44747;
+$c-error-red: #f44747;
 
 /// Used to warn the user.
-$c-warning-orange: #FF8C5F;
+$c-warning-orange: #ff8c5f;
 
 /// Used to draw the user's attention to important info.
-$c-information-blue: #1855D1;
+$c-information-blue: #1855d1;
 
 //Used for banned student state
 $c-banned-grey: #8b939f;
 
-
 // Old design colors
-$c-accent: #16D2AA;
-$c-backdrop-clear: #F0F7FD;
-$c-backdrop-warn: #FEEAB2;
-$c-backdrop: #E3F2FD;
-$c-bg: #F6F6F6;
-$c-college: #FED766;
-$c-math: #F7AEF8;
-$c-sat: #54DEFD;
-$c-shadow-header: #E1E1E1;
-$c-shadow-warn: #F44747;
-$c-shadow: #1855D1;
-$c-active-heart: #F41717;
+$c-accent: #16d2aa;
+$c-backdrop-clear: #f0f7fd;
+$c-backdrop-warn: #feeab2;
+$c-backdrop: #e3f2fd;
+$c-backdrop-translucent: rgb(227, 242, 253, 0.85);
+$c-bg: #f6f6f6;
+$c-college: #fed766;
+$c-math: #f7aef8;
+$c-sat: #54defd;
+$c-shadow-header: #e1e1e1;
+$c-shadow-warn: #f44747;
+$c-shadow: #1855d1;
+$c-active-heart: #f41717;
 
 // Override default bootstrap variables
 $success: $c-success-green;
-$theme-colors: (
-  ) !default;
-$theme-colors: map-merge(('primary': #16D2AA,
-      'warning': #FF8C5F,
-      'danger': #F44747),
-    $theme-colors
+$theme-colors: () !default;
+$theme-colors: map-merge(
+  (
+    'primary': #16d2aa,
+    'warning': #ff8c5f,
+    'danger': #f44747,
+  ),
+  $theme-colors
 );
 
 // New design colors
 $upchieve-green: #8ae8d4;
 $upchieve-white: #fff;
-$upchieve-chat-bot-green: #E9F9F5;
-$selected-green: #F2FBF9;
-$border-grey: #D8DEE5;
-$light-blue-background: #F1F8FE;
-$step-blue: #1855D166;
+$upchieve-chat-bot-green: #e9f9f5;
+$selected-green: #f2fbf9;
+$border-grey: #d8dee5;
+$light-blue-background: #f1f8fe;
+$step-blue: #1855d166;
 $icon-grey: #676879;
 
 $button-primary-bg: $c-information-blue;
-$button-primary-bg-hover: #103A90;
+$button-primary-bg-hover: #103a90;
 $button-primary-bg-disabled: $c-background-grey;
-$button-primary-text: #FFF;
-$button-primary-text-disabled: #8B939F;
+$button-primary-text: #fff;
+$button-primary-text-disabled: #8b939f;
 
 $button-secondary-bg: white;
-$button-secondary-bg-hover: #1855D11A;
+$button-secondary-bg-hover: #1855d11a;
 $button-secondary-text: #343440;
-$button-secondary-border: #D8DEE5;
+$button-secondary-border: #d8dee5;
 $button-secondary-border-hover: $c-information-blue;
