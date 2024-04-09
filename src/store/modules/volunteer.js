@@ -1,107 +1,122 @@
 import sendWebNotification from '@/utils/send-web-notification'
-import LoggerService from '@/services/LoggerService'
+
+function getWaitTimeInSeconds({ createdAt }) {
+  const newTime = new Date().getTime() - new Date(createdAt).getTime()
+  return Number((newTime / 1000).toFixed(0))
+}
 
 export default {
   namespaced: true,
   state: {
-    newWaitingStudentAudio: null,
+    newWaitingStudentAudioElement: null,
     openSessions: [],
-    emitListIntervalId: null,
-    hasError: false,
-    priorityStudents: new Set(),
+    tickIntervalId: null,
+    prioritySessions: new Set(),
   },
   mutations: {
+    setNewWaitingStudentAudioElement: (state, element) =>
+      (state.newWaitingStudentAudioElement = element),
     setOpenSessions: (state, openSessions) =>
       (state.openSessions = openSessions),
-    setEmitListIntervalId: (state, emitListIntervalId) =>
-      (state.emitListIntervalId = emitListIntervalId),
-    setHasError: (state, hasError) => (state.hasError = hasError),
-    addPriorityStudent: (state, student) => {
-      state.priorityStudents.add(student)
+    setTickIntervalId: (state, tickIntervalId) =>
+      (state.tickIntervalId = tickIntervalId),
+    addPrioritySession: (state, student) => {
+      state.prioritySessions.add(student)
     },
-    removePriorityStudent: (state, student) => {
-      state.priorityStudents.delete(student)
+    removePrioritySession: (state, student) => {
+      state.prioritySessions.delete(student)
     },
   },
 
   actions: {
-    addPriorityStudent({ commit }, student) {
-      commit('addPriorityStudent', student)
+    alertVolunteer({ state }, session) {
+      try {
+        state.newWaitingStudentAudioElement.play()
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.log('Unable to play audio', error)
+      }
+
+      sendWebNotification(`${session.student.firstname} needs help`, {
+        body: `Can you help them with ${session.subjectDisplayName}?`,
+      })
     },
-    removePriorityStudent({ commit }, student) {
-      commit('removePriorityStudent', student)
-    },
-    emitList({ commit, getters }, { socket, retryCount = 0, maxRetries = 5 }) {
-      let isAcknowledged = false
-      let timeoutId
-      socket.emit('list', null, (response) => {
-        if (response.status === 200) {
-          isAcknowledged = true
-          clearTimeout(timeoutId)
-          this.dispatch('volunteer/handleIncomingSessions', response.sessions)
+
+    /*
+     * this action needs to be defined so consumers can subscribe
+     * to when this is dispatched and act accordingly
+     * example: ListSessions.vue component subscribes and rerenders the wait time
+     *          for open sessions
+     */
+    tick({ state, commit }) {
+      state.openSessions.forEach((session) => {
+        const seconds = getWaitTimeInSeconds({ createdAt: session.createdAt })
+        /*
+         * We want extra alerting for our paid tutors.
+         * When we get close to the 40 second mark, we
+         * want to alert the paid tutors that they should
+         * pick it up soon by playing audio queues and
+         * flashing the student that is closing in on the
+         * 60 second mark. once we're at the 60 second mark,
+         * it's too late for the study, we want to prioritize
+         * other students under 60 seconds
+         */
+        const isPaidTutor = this.getters['featureFlags/isPaidTutor']
+        if (seconds >= 35 && seconds <= 60 && isPaidTutor) {
+          commit('addPrioritySession', session.id)
+        } else {
+          commit('removePrioritySession', session.id)
         }
       })
 
-      if (retryCount < maxRetries) {
-        // simple exponential backoff
-        const delay = Math.pow(2, retryCount) * 500
-        timeoutId = setTimeout(() => {
-          if (!isAcknowledged) {
-            this.dispatch('volunteer/emitList', {
-              socket,
-              retryCount: retryCount + 1,
-              maxRetries,
-            })
-          }
-        }, delay)
-      } else {
-        LoggerService.noticeError(
-          `Max retry attempts reached, unable to fetch list of sessions for user: ${getters.user.id}`
-        )
-        commit('setHasError', true)
+      if (state.prioritySessions.size > 0) {
+        state.newWaitingStudentAudioElement.play()
       }
     },
 
-    waitTick() {
-      // no-op - this needs to be defined so we can trigger ui updates based on startWaitTimeRefresh
-    },
-
-    // Refresh the wait time on open sessions for waiting students
-    // Force a re-render on this instance to show updated wait times if there are open sessions
-    startWaitTimeRefresh({ commit, state }, wait = 1000 * 60) {
+    /*
+     * Broadcast a `tick` action at a specified interval.
+     * This can be used for things like:
+     *  - rendering a dynamic wait time for specific students
+     *  - dispatching an audio or visual alert at specified times
+     */
+    tickInterval({ commit, state, dispatch }, wait = 1000) {
       commit(
-        'setEmitListIntervalId',
+        'setTickIntervalId',
         setInterval(() => {
           if (state.openSessions.length === 0) {
-            clearInterval(state.emitListIntervalId)
-            state.emitListIntervalId = null
+            clearInterval(state.tickIntervalId)
+            commit('setTickIntervalId', null)
           } else {
-            this.dispatch('volunteer/waitTick')
+            dispatch('tick')
           }
         }, wait)
       )
     },
+
     async handleIncomingSessions({ commit, dispatch, state }, sessions) {
       const user = this.state.user.user
       const isPaidTutor = this.getters['featureFlags/isPaidTutor']
       const isPaidTutorsPilotRunning =
         this.getters['featureFlags/isPaidTutorsPilotRunning']
-      if (!sessions || !Array.isArray(sessions) || user.isBanned) {
+      const isMutedSubjectAlertsActive =
+        this.getters['featureFlags/isMutedSubjectAlertsActive']
+
+      const volunteerCanAcceptSessions =
+        !sessions || !Array.isArray(sessions) || user.isBanned
+      if (volunteerCanAcceptSessions) {
         commit('setOpenSessions', [])
         return
       }
-      // Start refreshing for open sessions if no timer is currently running
-      if (sessions.length > 0 && !state.emitListIntervalId)
-        dispatch(
-          'startWaitTimeRefresh',
-          isPaidTutorsPilotRunning ? 1000 : 1000 * 60
-        )
+
+      // Trigger tick dispatch at interval if there is no timer running
+      if (sessions.length > 0 && !state.tickIntervalId) {
+        dispatch('tickInterval', 1000)
+      }
 
       const results = []
       const socketSessions = sessions.filter((session) => !session.volunteer)
-
-      for (let i = 0; i < socketSessions.length; i++) {
-        const session = socketSessions[i]
+      for (const session of socketSessions) {
         const { subTopic, type, paidTutorsPilotGroup } = session
 
         const isAdminOrTestUser = user.isAdmin || user.isTestUser
@@ -126,7 +141,7 @@ export default {
         if (
           user.subjects.includes(subTopic) &&
           !(
-            this.getters['featureFlags/isMutedSubjectAlertsActive'] &&
+            isMutedSubjectAlertsActive &&
             user.mutedSubjectAlerts.includes(subTopic)
           )
         ) {
@@ -139,7 +154,7 @@ export default {
 
       // Look for the new session added
       let newSession
-      for (const session of state.openSessions) {
+      for (const session of results) {
         const { _id: sessionId } = session
         let isOldSession = false
         for (const oldSession of prevOpenSessions) {
@@ -148,21 +163,10 @@ export default {
 
         if (!isOldSession) newSession = session
       }
-      const isNotInSession = !this.state.user.session?.id
-      if (isNotInSession && newSession) {
-        try {
-          await state.newWaitingStudentAudio.play()
-        } catch (error) {
-          // eslint-disable-next-line no-console
-          console.log('Unable to play audio', error)
-        }
 
-        sendWebNotification(
-          `${newSession.student.firstname} needs help in ${newSession.subjectDisplayName}`,
-          {
-            body: 'Can you help them?',
-          }
-        )
+      const volunteerIsNotInSession = !user.session?.id
+      if (volunteerIsNotInSession && newSession) {
+        dispatch('alertVolunteer', newSession)
       }
     },
   },
