@@ -1,4 +1,7 @@
 import sendWebNotification from '@/utils/send-web-notification'
+import StudentIcon from '@/assets/student-icon.svg'
+import Case from 'case'
+import router from '../../router'
 
 function getWaitTimeInSeconds({ createdAt }) {
   const newTime = new Date().getTime() - new Date(createdAt).getTime()
@@ -28,8 +31,24 @@ export default {
     },
   },
 
+  getters: {
+    getRoute({ rootState }) {
+      return rootState.route
+    },
+  },
+
   actions: {
-    alertVolunteer({ state }, session) {
+    gotoSession({ dispatch }, session) {
+      const { type, subTopic, id } = session
+      const path = `/session/${Case.kebab(type)}/${Case.kebab(subTopic)}/${id}`
+      if (type && subTopic && id) {
+        router.push(path)
+      } else {
+        dispatch('user/clearSession')
+      }
+    },
+
+    alertVolunteer({ state, dispatch }, session) {
       try {
         state.newWaitingStudentAudioElement.play()
       } catch (error) {
@@ -39,6 +58,18 @@ export default {
 
       sendWebNotification(`${session.student.firstname} needs help`, {
         body: `Can you help them with ${session.subjectDisplayName}?`,
+      })
+
+      this.dispatch('notifications/add', {
+        id: session.id,
+        icon: StudentIcon,
+        title: `${session.student.firstname} needs help with ${session.subjectDisplayName}`,
+        cta: {
+          text: 'Join session',
+          action: () => dispatch('gotoSession', session),
+        },
+        type: 'secondary',
+        duration: 1000 * 60 * 2,
       })
     },
 
@@ -70,7 +101,12 @@ export default {
       })
 
       if (state.prioritySessions.size > 0) {
-        state.newWaitingStudentAudioElement.play()
+        try {
+          state.newWaitingStudentAudioElement.play()
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.log('Unable to play audio', error)
+        }
       }
     },
 
@@ -155,10 +191,10 @@ export default {
       // Look for the new session added
       let newSession
       for (const session of results) {
-        const { _id: sessionId } = session
+        const { id: sessionId } = session
         let isOldSession = false
         for (const oldSession of prevOpenSessions) {
-          if (oldSession._id === sessionId) isOldSession = true
+          if (oldSession.id === sessionId) isOldSession = true
         }
 
         if (!isOldSession) newSession = session
@@ -167,6 +203,16 @@ export default {
       const volunteerIsNotInSession = !user.session?.id
       if (volunteerIsNotInSession && newSession) {
         dispatch('alertVolunteer', newSession)
+      }
+
+      // Remove any existing notifications of sessions that were picked up or canceled
+      const currentSessionIds = new Set(results.map(({ id }) => id))
+      const previousSessionIds = new Set(prevOpenSessions.map(({ id }) => id))
+      const removedSessionIds = previousSessionIds.difference(currentSessionIds)
+      if (removedSessionIds.size > 0) {
+        for (const removedSession of removedSessionIds) {
+          this.dispatch('notifications/remove', removedSession.id)
+        }
       }
     },
   },

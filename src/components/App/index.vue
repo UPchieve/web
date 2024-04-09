@@ -32,6 +32,7 @@
         src="@/assets/audio/alert.mp3"
         muted
       />
+      <attention-boxes v-if="showInAppSessionNotifications" />
       <router-view />
     </div>
   </div>
@@ -56,6 +57,7 @@ import config from '@/config'
 import LargeButton from '@/components/LargeButton.vue'
 import Gleap from 'gleap'
 import posthog from 'posthog-js'
+import AttentionBoxes from '../AttentionBoxes.vue'
 
 export default {
   name: 'App',
@@ -66,6 +68,7 @@ export default {
     AppBanner,
     BAlert,
     LargeButton,
+    AttentionBoxes,
   },
   mixins: [crono],
   data() {
@@ -262,6 +265,8 @@ export default {
       mobileMode: 'app/mobileMode',
       isAutoFlowUser: 'user/isAutoFlowUser',
       getUserPropsForAnalytics: 'user/getUserPropsForAnalytics',
+      showInAppSessionNotifications:
+        'featureFlags/showInAppSessionNotifications',
     }),
     shouldShowRefreshAlert() {
       return this.newServerVersionAvailable || this.showCsrfRefreshAlert
