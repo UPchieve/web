@@ -21,7 +21,7 @@
             'paid-tutors-pilot-test-group': shouldHighlightSession(
               session.paidTutorsPilotGroup
             ),
-            flash: priorityStudents.has(session.id),
+            flash: prioritySessions.has(session.id),
           }"
           @click="gotoSession(session)"
         >
@@ -92,9 +92,10 @@ export default {
           return 0
         })
       },
-      newWaitingStudentAudio: (state) => state.volunteer.newWaitingStudentAudio,
+      newWaitingStudentAudioElement: (state) =>
+        state.volunteer.newWaitingStudentAudioElement,
       ticks: (state) => state.volunteer.ticks,
-      priorityStudents: (state) => state.volunteer.priorityStudents,
+      prioritySessions: (state) => state.volunteer.prioritySessions,
     }),
     ...mapGetters({
       openSessions: 'volunteer/openSessions',
@@ -105,7 +106,7 @@ export default {
   },
   mounted() {
     this.unsubscribeFromTick = this.$store.subscribeAction((action) => {
-      if (action.type === 'volunteer/waitTick') {
+      if (action.type === 'volunteer/tick') {
         this.$forceUpdate()
       }
     })
@@ -127,31 +128,12 @@ export default {
     shouldHighlightSession(paidTutorsPilotGroup) {
       return this.isPaidTutorsPilotRunning && paidTutorsPilotGroup === 'test'
     },
-    waitTime({ createdAt, id, paidTutorsPilotGroup }) {
+    waitTime({ createdAt, paidTutorsPilotGroup }) {
       const newTime = new Date().getTime() - new Date(createdAt).getTime()
       const seconds = Number((newTime / 1000).toFixed(0))
       const minutes = Number((newTime / (1000 * 60)).toFixed(0))
       const hours = Number((newTime / (1000 * 60 * 60)).toFixed(0))
       const showSeconds = this.shouldHighlightSession(paidTutorsPilotGroup)
-      /*
-       * We want extra alerting for our paid tutors.
-       * When we get close to the 40 second mark, we
-       * want to alert the paid tutors that they should
-       * pick it up soon by playing audio queues and
-       * flashing the student that is closing in on the
-       * 60 second mark. once we're at the 60 second mark,
-       * it's too late for the study, we want to prioritize
-       * other students under 60 seconds
-       */
-      if (seconds > 35 && seconds <= 60 && this.isPaidTutor && showSeconds) {
-        this.$store.dispatch('volunteer/addPriorityStudent', id)
-      } else {
-        this.$store.dispatch('volunteer/removePriorityStudent', id)
-      }
-
-      if (this.priorityStudents.has(id)) {
-        this.newWaitingStudentAudio.play()
-      }
 
       if (seconds < 120 && showSeconds) {
         return `${seconds} second${seconds === 1 ? '' : 's'}`

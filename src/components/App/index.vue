@@ -27,7 +27,7 @@
       }"
     >
       <audio
-        ref="newWaitingStudentAudio"
+        ref="newWaitingStudentAudioElement"
         class="audio__new-waiting-student"
         src="@/assets/audio/alert.mp3"
         muted
@@ -112,9 +112,12 @@ export default {
     if (this.mobileMode) {
       Gleap.hide()
     }
-    this.$store.state.volunteer.newWaitingStudentAudio =
-      this.$refs.newWaitingStudentAudio
+    this.$store.commit(
+      'volunteer/setNewWaitingStudentAudioElement',
+      this.$refs.newWaitingStudentAudioElement
+    )
   },
+
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize)
 
@@ -204,6 +207,37 @@ export default {
         'app/updateWebPageVisibility',
         this.docHiddenProperty
       )
+    },
+    emitList({ retryCount = 0, maxRetries = 5 }) {
+      let isAcknowledged = false
+      let timeoutId
+      this.$socket.emit('list', null, (response) => {
+        if (response.status === 200) {
+          isAcknowledged = true
+          clearTimeout(timeoutId)
+          this.$store.dispatch(
+            'volunteer/handleIncomingSessions',
+            response.sessions
+          )
+        }
+      })
+
+      if (retryCount < maxRetries) {
+        // simple exponential backoff
+        const delay = Math.pow(2, retryCount) * 500
+        timeoutId = setTimeout(() => {
+          if (!isAcknowledged) {
+            this.emitList({
+              retryCount: retryCount + 1,
+              maxRetries,
+            })
+          }
+        }, delay)
+      } else {
+        LoggerService.noticeError(
+          `Max retry attempts reached, unable to fetch list of sessions for user: ${this.state.user.user.id}`
+        )
+      }
     },
   },
   computed: {
@@ -349,11 +383,7 @@ export default {
     },
     connect() {
       if (this.isVolunteer) {
-        this.$store.dispatch('volunteer/emitList', {
-          socket: this.$socket,
-          retryCount: 0,
-          maxRetries: 5,
-        })
+        this.emitList({ retryCount: 0, maxRetries: 5 })
       }
     },
     /**
