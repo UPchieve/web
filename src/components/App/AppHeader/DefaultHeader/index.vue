@@ -10,11 +10,10 @@
         <hamburger-button :tabindex="0" />
         <activity-dot
           v-if="
-            unreadProgressReportOverviewSubjects.length > 0 &&
+            hasUnreadProgressOverviewReports &&
             isProgressReportsActive &&
             !user.isVolunteer
           "
-          :total="unreadProgressReportOverviewSubjects.length"
           class="DefaultHeader-menu-notification"
         />
       </div>
@@ -43,14 +42,13 @@ export default {
   computed: {
     ...mapState({
       user: (state) => state.user.user,
-      unreadProgressReportOverviewSubjects: (state) =>
-        state.user.unreadProgressReportOverviewSubjects,
     }),
     ...mapGetters({
       avatarUrl: 'user/avatarUrl',
       mobileMode: 'app/mobileMode',
       name: 'user/firstName',
       isProgressReportsActive: 'featureFlags/isProgressReportsActive',
+      hasUnreadProgressOverviewReports: 'user/hasUnreadProgressOverviewReports',
     }),
   },
 }

@@ -46,11 +46,13 @@ import SessionRecapView from './views/SessionRecapView.vue'
 import AdminTestAudience from './views/Admin/AdminTestAudience.vue'
 import WelcomePage from './views/WelcomePage.vue'
 import ProgressReportsOverviewView from './views/ProgressReportsOverviewView.vue'
+import ProgressReportsOverviewSubjectView from './views/ProgressReportsOverviewSubjectView.vue'
 import Gleap from 'gleap'
 import AnalyticsService from './services/AnalyticsService'
 import { EVENTS } from './consts'
-import { axiosInstance } from './services/NetworkService'
+import NetworkService, { axiosInstance } from './services/NetworkService'
 import { INVALID_CSRF_ERROR } from '@/services/AuthService'
+import Case from 'case'
 
 const getUser = () => {
   if (store.getters['user/isAuthenticated']) {
@@ -427,9 +429,22 @@ const routes = [
     meta: { protected: true },
   },
   {
-    path: '/sessions/progress/:subject',
-    name: 'ProgressReportsOverviewView',
+    path: '/sessions/progress',
+    name: 'ProgressReportsOverview',
     component: ProgressReportsOverviewView,
+    meta: { protected: true },
+    beforeEnter: async (_to, _from, next) => {
+      const response =
+        await NetworkService.getLatestProgressReportOverviewSubject()
+      const subject = response.data
+      if (subject) next(`/sessions/progress/${Case.kebab(subject)}`)
+      else next()
+    },
+  },
+  {
+    path: '/sessions/progress/:subject',
+    name: 'ProgressReportsOverviewSubjectView',
+    component: ProgressReportsOverviewSubjectView,
     meta: { protected: true },
   },
 ]

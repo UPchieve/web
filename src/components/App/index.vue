@@ -309,7 +309,7 @@ export default {
         if (Object.entries(this.subjects).length === 0)
           this.$store.dispatch('subjects/getSubjects')
 
-        this.$store.dispatch('user/getUnreadProgressReportOverviewSubjects')
+        this.$store.dispatch('user/getProgressReportOverviewSubjectStats')
       } else if (currentUserValue.id) {
         const userProps = this.getUserPropsForAnalytics
         AnalyticsService.updateUser(userProps)
@@ -414,7 +414,7 @@ export default {
         data.report &&
         data.report.status === 'complete'
       )
-        this.$store.dispatch('user/getUnreadProgressReportOverviewSubjects')
+        this.$store.dispatch('user/getProgressReportOverviewSubjectStats')
     },
     async sessions(sessions) {
       if (this.isVolunteer) {

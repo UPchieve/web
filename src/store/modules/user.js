@@ -23,8 +23,9 @@ export default {
     hadASession: false,
     prevSessionSubject: '',
     requestedProgressReportOverview: false,
-    unreadProgressReportOverviewSubjects: [],
+    progressReportOverviewSubjectStats: [],
     hasSeenProgressReportModal: false,
+    latestProgressReportOverview: {},
   },
   mutations: {
     setUser: (state, user = {}) => (state.user = user),
@@ -126,8 +127,8 @@ export default {
       state.requestedProgressReportOverview = flag
     },
 
-    setUnreadProgressReportOverviewSubjects: (state, subjects) => {
-      state.unreadProgressReportOverviewSubjects = subjects
+    setProgressReportOverviewSubjectStats: (state, stats) => {
+      state.progressReportOverviewSubjectStats = stats
     },
 
     updateHasSeenProgressReportModal: (state, flag) => {
@@ -284,16 +285,13 @@ export default {
       commit('setRequestedProgressReportOverview', flag)
     },
 
-    getUnreadProgressReportOverviewSubjects: async ({ commit, state }) => {
+    getProgressReportOverviewSubjectStats: async ({ commit, state }) => {
       if (state.user.isVolunteer) return
 
       try {
         const response =
-          await NetworkService.getUnreadProgressReportOverviewSubjects()
-        commit(
-          'setUnreadProgressReportOverviewSubjects',
-          response.data.subjects
-        )
+          await NetworkService.getProgressReportOverviewSubjectStats()
+        commit('setProgressReportOverviewSubjectStats', response.data ?? [])
       } catch (error) {
         LoggerService.error(error.response.data.err)
       }
@@ -304,7 +302,7 @@ export default {
 
       try {
         await NetworkService.updateProgressReportsReadStatus(reportIds)
-        dispatch('getUnreadProgressReportOverviewSubjects')
+        dispatch('getProgressReportOverviewSubjectStats')
       } catch (error) {
         LoggerService.error(error.response.data.err)
       }
@@ -312,6 +310,15 @@ export default {
 
     updateHasSeenProgressReportModal: ({ commit }, flag) => {
       commit('updateHasSeenProgressReportModal', flag)
+    },
+
+    getLatestProgressReportOverview: async ({ commit }) => {
+      try {
+        const response = await NetworkService.getLatestProgressReportOverview()
+        commit('setLatestProgressReportOverview', response.data ?? {})
+      } catch (error) {
+        LoggerService.error(error.response.data.err)
+      }
     },
   },
   getters: {
@@ -473,7 +480,9 @@ export default {
     },
 
     hasUnreadProgressOverviewReports: (state) => {
-      return !!state.unreadProgressReportOverviewSubjects.length
+      return state.progressReportOverviewSubjectStats.some(
+        (subject) => subject.totalUnreadReports > 0
+      )
     },
   },
 }

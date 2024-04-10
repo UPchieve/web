@@ -912,8 +912,14 @@ export default {
       this._errorHandler
     )
   },
-  getUnreadProgressReportOverviewSubjects() {
-    return httpGet(`${API_ROOT}/progress-reports/unread`).then(
+  getProgressReportOverviewSubjectStats() {
+    return httpGet(`${API_ROOT}/progress-reports/overview/stats`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
+  getLatestProgressReportOverviewSubject() {
+    return httpGet(`${API_ROOT}/progress-reports/overview/latest/subject`).then(
       this._successHandler,
       this._errorHandler
     )

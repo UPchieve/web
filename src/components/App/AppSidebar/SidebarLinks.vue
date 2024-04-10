@@ -7,17 +7,15 @@
         <house-icon class="icon" />
       </sidebar-link>
 
-      <!-- Defaults to 'reading' until progress reports are launched to more subjects -->
       <sidebar-link
         v-if="!isVolunteer && isProgressReportsActive"
-        to="/sessions/progress/reading"
         text="My Progress"
         class="SidebarLinks__container"
+        to="/sessions/progress"
       >
         <your-progress-icon class="icon" />
         <activity-dot
-          v-if="unreadProgressReportOverviewSubjects.length > 0"
-          :total="unreadProgressReportOverviewSubjects.length"
+          v-if="hasUnreadProgressOverviewReports"
           class="SidebarLinks__notification"
         />
       </sidebar-link>
@@ -90,7 +88,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 import SidebarLink from './SidebarLink.vue'
 import ArchiveIcon from '@/assets/archive.svg'
 import CalendarIcon from '@/assets/sidebar_icons/calendar.svg'
@@ -133,15 +131,12 @@ export default {
     mobileMode: Boolean,
   },
   computed: {
-    ...mapState({
-      unreadProgressReportOverviewSubjects: (state) =>
-        state.user.unreadProgressReportOverviewSubjects,
-    }),
     ...mapGetters({
       isTutorSessionHistoryActive: 'featureFlags/isTutorSessionHistoryActive',
       isProgressReportsActive: 'featureFlags/isProgressReportsActive',
       isAutoFlowUser: 'user/isAutoFlowUser',
       showDashboardRedesign: 'user/showDashboardRedesign',
+      hasUnreadProgressOverviewReports: 'user/hasUnreadProgressOverviewReports',
     }),
   },
   methods: {
