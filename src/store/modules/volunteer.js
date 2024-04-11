@@ -31,12 +31,6 @@ export default {
     },
   },
 
-  getters: {
-    getRoute({ rootState }) {
-      return rootState.route
-    },
-  },
-
   actions: {
     gotoSession({ dispatch }, session) {
       const { type, subTopic, id } = session
@@ -48,7 +42,7 @@ export default {
       }
     },
 
-    alertVolunteer({ state, dispatch }, session) {
+    alertVolunteer({ state, dispatch, rootGetters }, session) {
       try {
         state.newWaitingStudentAudioElement.play()
       } catch (error) {
@@ -59,18 +53,51 @@ export default {
       sendWebNotification(`${session.student.firstname} needs help`, {
         body: `Can you help them with ${session.subjectDisplayName}?`,
       })
-
-      this.dispatch('notifications/add', {
-        id: session.id,
-        icon: StudentIcon,
-        title: `${session.student.firstname} needs help with ${session.subjectDisplayName}`,
-        cta: {
-          text: 'Join session',
-          action: () => dispatch('gotoSession', session),
-        },
-        type: 'secondary',
-        duration: 1000 * 60 * 2,
-      })
+      const isMobile = rootGetters['app/mobileMode']
+      const isDashboard = router.history.current.path === '/dashboard'
+      if (isDashboard && isMobile) {
+        return
+      }
+      const notifications = this.state.notifications.notifications
+      const rollupShowing =
+        notifications.findIndex(({ id }) => id === 'rollup-alert') > -1
+      if (
+        (!isMobile && state.openSessions.length > 4) ||
+        (isMobile && state.openSessions.length > 3)
+      ) {
+        if (rollupShowing) {
+          this.dispatch('notifications/updateTitle', {
+            notificationId: 'rollup-alert',
+            title: `There are ${state.openSessions.length} students that need help`,
+          })
+        } else {
+          this.dispatch('notifications/clear')
+          this.dispatch('notifications/add', {
+            id: 'rollup-alert',
+            icon: StudentIcon,
+            title: `There are ${state.openSessions.length} students that need help`,
+            cta: {
+              text: 'Go to dashboard',
+              action: () => router.push('/'),
+            },
+            type: 'secondary',
+            duration: 1000 * 60 * 2,
+          })
+        }
+      } else {
+        this.dispatch('notifications/add', {
+          id: session.id,
+          icon: StudentIcon,
+          title: `${session.student.firstname} needs help with ${session.subjectDisplayName}`,
+          cta: {
+            text: 'Join session',
+            action: () => dispatch('gotoSession', session),
+          },
+          type: 'secondary',
+          duration: 1000 * 60 * 2,
+        })
+        this.dispatch('notifications/remove', 'rollup-alert')
+      }
     },
 
     /*
@@ -206,13 +233,11 @@ export default {
       }
 
       // Remove any existing notifications of sessions that were picked up or canceled
-      const currentSessionIds = new Set(results.map(({ id }) => id))
-      const previousSessionIds = new Set(prevOpenSessions.map(({ id }) => id))
-      const removedSessionIds = previousSessionIds.difference(currentSessionIds)
-      if (removedSessionIds.size > 0) {
-        for (const removedSession of removedSessionIds) {
-          this.dispatch('notifications/remove', removedSession.id)
-        }
+      const currentIds = results.map(({ id }) => id)
+      const prevIds = prevOpenSessions.map(({ id }) => id)
+      const removedSessionIds = prevIds.filter((id) => !currentIds.includes(id))
+      for (const removedSessionId of removedSessionIds) {
+        this.dispatch('notifications/remove', removedSessionId)
       }
     },
   },

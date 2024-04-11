@@ -11,7 +11,18 @@ export default {
       const idx = state.notifications.findIndex(
         ({ id }) => id === notificationId
       )
-      state.notifications.splice(idx, 1)
+      if (idx > -1) {
+        state.notifications.splice(idx, 1)
+      }
+    },
+    clear: (state) => {
+      state.notifications = []
+    },
+    updateTitle: (state, { notificationId, title }) => {
+      const idx = state.notifications.findIndex(
+        ({ id }) => id === notificationId
+      )
+      state.notifications[idx].title = title
     },
   },
   actions: {
@@ -20,6 +31,12 @@ export default {
     },
     remove({ commit }, notificationId) {
       commit('remove', notificationId)
+    },
+    clear({ commit }) {
+      commit('clear')
+    },
+    updateTitle({ commit }, { notificationId, title }) {
+      commit('updateTitle', { notificationId, title })
     },
   },
 }
