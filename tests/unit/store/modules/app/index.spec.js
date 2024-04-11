@@ -3,7 +3,7 @@ import appModule from '@/store/modules/app'
 import headerModule from '@/store/modules/app/header'
 import sidebarModule from '@/store/modules/app/sidebar'
 import modalModule from '@/store/modules/app/modal'
-import { vi } from 'vitest';
+import { vi } from 'vitest'
 
 const { modules, state, mutations, actions, getters } = appModule
 
