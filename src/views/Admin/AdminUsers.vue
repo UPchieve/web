@@ -59,7 +59,7 @@
 import NetworkService from '@/services/NetworkService'
 import PageControl from '@/components/Admin/PageControl.vue'
 import UserListItem from '@/components/Admin/UserListItem.vue'
-import { isEmpty } from 'lodash-es'
+import { isEmpty, isEqual } from 'lodash-es'
 
 const getUsers = async (userData) => {
   const {
@@ -178,18 +178,15 @@ export default {
         email: this.email,
         partnerOrg: isEmpty(this.partnerOrg) ? '' : this.partnerOrg.key,
         highSchool: this.highSchool,
+        page: this.page.toString(),
       }
-      this.$router.push({
-        path: '/admin/users',
-        query: {
-          ...data,
-          page: this.page,
-        },
-      })
-      const { users, isLastPage } = await getUsers({
-        ...data,
-        page: this.page,
-      })
+      if (!isEqual(data, this.$route.query)) {
+        this.$router.push({
+          path: '/admin/users',
+          query: data,
+        })
+      }
+      const { users, isLastPage } = await getUsers(data)
       this.users = users
       this.isLastPage = isLastPage
     },
