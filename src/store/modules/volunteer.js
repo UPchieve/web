@@ -227,7 +227,7 @@ export default {
         if (!isOldSession) newSession = session
       }
 
-      const volunteerIsNotInSession = !user.session?.id
+      const volunteerIsNotInSession = !this.getters['user/isSessionAlive']
       if (volunteerIsNotInSession && newSession) {
         dispatch('alertVolunteer', newSession)
       }
