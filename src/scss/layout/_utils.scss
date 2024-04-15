@@ -33,6 +33,10 @@
   &.justify-center {
     justify-content: center;
   }
+
+  &.items-baseline {
+    align-items: baseline;
+  }
 }
 
 .w-full {

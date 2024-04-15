@@ -146,7 +146,7 @@ export default {
       this.userSelection = 'volunteer'
     },
     selectStudent() {
-      this.$router.push('/sign-up/student')
+      this.$router.push('/sign-up/student/eligibility')
       this.userSelection = 'student'
     },
   },

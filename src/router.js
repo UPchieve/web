@@ -49,8 +49,9 @@ import ProgressReportsOverviewView from './views/ProgressReportsOverviewView.vue
 import ProgressReportsOverviewSubjectView from './views/ProgressReportsOverviewSubjectView.vue'
 import Gleap from 'gleap'
 import AnalyticsService from './services/AnalyticsService'
-import { EVENTS } from './consts'
+import LoggerService from './services/LoggerService'
 import NetworkService, { axiosInstance } from './services/NetworkService'
+import { EVENTS } from './consts'
 import { INVALID_CSRF_ERROR } from '@/services/AuthService'
 import Case from 'case'
 
@@ -140,6 +141,46 @@ const routes = [
     name: 'SignupView',
     component: SignupView,
     meta: { loggedOutOnly: true },
+    props: true,
+    beforeEnter: async (to, from, next) => {
+      if (
+        to.params.step !== 'eligibility' &&
+        to.params.userType === 'student' &&
+        !from.name
+      ) {
+        return next({
+          name: 'SignupView',
+          params: { step: 'eligibility', userType: 'student' },
+          query: to.query,
+        })
+      }
+
+      const partnerKey = to.query?.partner
+      if (partnerKey && to.params.userType === 'student') {
+        try {
+          const {
+            data: { studentPartner },
+          } = await NetworkService.getStudentPartner(partnerKey)
+          if (!studentPartner || studentPartner.deactivated) {
+            AnalyticsService.captureEvent(
+              EVENTS.STUDENT_VISITED_DEACTIVATED_PARTNER,
+              { partner: to.query.partner }
+            )
+            delete to.query.partner
+          } else {
+            to.params.partner = studentPartner
+          }
+        } catch (err) {
+          // TODO: Don't throw an error if a partner with the key does not exist.
+          if (err.response.status !== 422) {
+            LoggerService.noticeError(err)
+          }
+          delete to.query.partner
+        }
+      }
+
+      return next()
+    },
   },
   {
     path: '/signup/student/:partnerId',
