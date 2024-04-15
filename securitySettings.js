@@ -31,7 +31,6 @@ const posthogUrls = [
   'https://app-static-prod.posthog.com',
   'https://app.posthog.com',
 ]
-const sentryUrl = 'https://*.ingest.sentry.io'
 const mathJaxFetchUrl = 'https://api.cdnjs.com'
 const s3PhotoConnectUrls = [
   `${config.awsS3.photoIdBucket}.s3.us-east-2.amazonaws.com`,
@@ -94,7 +93,6 @@ const imgSrc = [
 const connectSrc = [
   "'self'",
   ...posthogUrls,
-  sentryUrl,
   mathJaxFetchUrl,
   ...s3PhotoConnectUrls,
   ...newrelicUrls,

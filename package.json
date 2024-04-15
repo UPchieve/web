@@ -21,8 +21,6 @@
     "scan:audit": "detect-secrets audit .secrets.baseline"
   },
   "dependencies": {
-    "@sentry/browser": "^5.30.0",
-    "@sentry/integrations": "^5.30.0",
     "@trevoreyre/autocomplete-vue": "^2.0.2",
     "@vuelidate/core": "^2.0.2",
     "@vuelidate/validators": "^2.0.2",

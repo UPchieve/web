@@ -372,7 +372,7 @@ export default {
       }
     },
     connect_error(error) {
-      // these are handled internally and shouldn't be forwarded to Sentry
+      // these are handled internally and shouldn't be forwarded to New Relic
       if (this.isExemptSocketError(error)) return
       LoggerService.noticeError(error)
     },

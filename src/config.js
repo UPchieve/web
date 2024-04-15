@@ -9,8 +9,6 @@ config.gleapSdkKey = import.meta.env.VUE_APP_GLEAP_SDK_KEY
 config.devtools = import.meta.env.VUE_APP_DEVTOOLS
 config.nodeEnv = import.meta.env.NODE_ENV
 config.version = import.meta.env.VUE_APP_VERSION || 'development'
-config.sentryEnv = import.meta.env.VUE_APP_SENTRY_ENV
-config.sentryDsn = import.meta.env.VUE_APP_SENTRY_DSN
 config.customVolunteerPartnerOrgs =
   import.meta.env.SUBWAY_CUSTOM_VOLUNTEER_PARTNER_ORGS || 'bogus'
 const customVolunteerPartnerOrgs = config.customVolunteerPartnerOrgs.split(',')
