@@ -250,14 +250,14 @@ export default {
       this.isFetchingSessions = true
       if (page > this.page)
         AnalyticsService.captureEvent(
-          EVENTS.VOLUNTEER_CLICKED_NEXT_SESSION_HISTORY_PAGE,
+          EVENTS.USER_CLICKED_NEXT_SESSION_HISTORY_PAGE,
           {
             page,
           }
         )
       if (page < this.page)
         AnalyticsService.captureEvent(
-          EVENTS.VOLUNTEER_CLICKED_PREVIOUS_SESSION_HISTORY_PAGE,
+          EVENTS.USER_CLICKED_PREVIOUS_SESSION_HISTORY_PAGE,
           {
             page,
           }
