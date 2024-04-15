@@ -1,5 +1,6 @@
 <template>
   <div class="base">
+    <img class="logo white" src="@/assets/p_logo_white.png" aria-hidden />
     <div
       :class="{
         'form-card': layout === 'card',
@@ -10,7 +11,6 @@
         full: layout === 'full',
       }"
     >
-      <img class="logo white" src="@/assets/p_logo_white.png" aria-hidden />
       <div class="img-content"></div>
       <div class="form-content">
         <img class="logo teal" src="@/assets/header_logo.png" aria-hidden />
@@ -163,11 +163,9 @@ $footer-height-tiny: 100px;
 
 .logo {
   &.white {
-    $width: 155px;
-    left: calc(50% - $width / 2);
-    top: -85px;
-    position: absolute;
-    width: $width;
+    width: 155px;
+    padding-top: 18px;
+    padding-bottom: 18px;
   }
 
   &.teal {
