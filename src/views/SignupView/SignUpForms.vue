@@ -19,9 +19,7 @@
           :key="`${i}-${j}_${$route.path}`"
           :is="el.element"
           :class="el.classes"
-          :disabled="
-            el.submitAction ? v$.$error || !!v$.$silentErrors.length : false
-          "
+          :disabled="isDisabled(el)"
           v-bind="el.props"
           @click="
             el.submitAction ? submitWithValidation(el.submitAction) : null
@@ -66,6 +64,7 @@ export default {
   data() {
     return {
       error: null,
+      isSubmitting: false,
       pageDetails: {},
     }
   },
@@ -85,19 +84,42 @@ export default {
       if (!(await this.v$.$validate())) {
         return
       }
-      const [nextRoute, error] = await submit(this.getFormData())
-      if (error) {
-        this.error = error
-        return
+
+      this.isSubmitting = true
+      this.error = null
+
+      try {
+        const [next, error] = await submit(this.getSubmitData())
+        if (error) {
+          this.error = error
+          return
+        }
+
+        this.$router.replace(next)
+      } catch (err) {
+        this.error = 'Unknown server error'
+      } finally {
+        this.isSubmitting = false
       }
-      this.$router.push({ path: nextRoute })
     },
-    getFormData() {
+    getSubmitData() {
       const form = document.getElementById('form')
-      return new FormData(form)
+      const data = {}
+      for (const [key, value] of new FormData(form)) {
+        data[key] = value
+      }
+      const merged = { ...data, ...this.$route.params }
+      return merged
     },
     getPageDetails(to, from) {
       this.pageDetails = SignUpService.getPageDetails(to, from)
+    },
+    isDisabled(el) {
+      if (el.submitAction) {
+        return this.v$.$error || !!this.v$.$silentErrors?.length
+      }
+
+      return false
     },
   },
 }
@@ -110,6 +132,11 @@ export default {
 
 h1 {
   font-size: 24px;
+  font-weight: 500;
+}
+
+h2 {
+  font-size: 22px;
   font-weight: 500;
 }
 
