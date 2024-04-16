@@ -1,6 +1,5 @@
 <template>
   <div class="base">
-    <img class="logo white" src="@/assets/p_logo_white.png" aria-hidden />
     <div
       :class="{
         'form-card': layout === 'card',
@@ -17,6 +16,7 @@
         <slot></slot>
       </div>
     </div>
+    <img class="logo white" src="@/assets/p_logo_white.png" aria-hidden />
 
     <nav class="footer" aria-label="More information">
       <div>
@@ -147,12 +147,12 @@ $footer-height-tiny: 100px;
     }
   }
 }
-.form-panel .logo {
+.form-panel + .logo {
   &.white {
     display: none;
   }
 }
-.full .logo {
+.full + .logo {
   &.white {
     display: none;
   }
@@ -164,7 +164,7 @@ $footer-height-tiny: 100px;
 .logo {
   &.white {
     width: 155px;
-    padding-top: 18px;
+    order: -1;
     padding-bottom: 18px;
   }
 
