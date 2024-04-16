@@ -10,6 +10,7 @@ class FeatureFlagService {
     return new Promise((resolve) => {
       posthog.init(config.posthogToken, {
         api_host: 'https://p.upchieve.org',
+        ui_host: 'app.posthog.com',
         persistence: 'localStorage+cookie',
         loaded() {
           FeatureFlagService.listenForFlagReload()
