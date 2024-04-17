@@ -147,18 +147,18 @@ describe('StudentForm', () => {
       )
       expect(NetworkService.checkStudentEligibility).toHaveBeenCalledWith(
         expect.objectContaining({
-          schoolUpchieveId: eligibility.highSchool.upchieveId,
-          zipCode: eligibility.zipCode,
           email: eligibility.studentEmail,
+          schoolId: eligibility.highSchool.upchieveId,
+          zipCode: eligibility.zipCode,
         })
       )
       expect(AuthService.registerStudent).toHaveBeenCalledWith(
         expect.objectContaining({
-          parentGuardianEmail: eligibility.parentGuardianEmail,
           email: eligibility.studentEmail,
           firstName: eligibility.studentFirstName,
           lastName: eligibility.studentLastName,
-          studentPartnerOrg: testStudentPartnerOrg.key,
+          parentGuardianEmail: eligibility.parentGuardianEmail,
+          studentPartnerOrgKey: testStudentPartnerOrg.key,
         })
       )
       expect(wrapper.vm.$data.step).toEqual('parentGuardianConfirmation')

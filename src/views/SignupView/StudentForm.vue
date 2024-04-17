@@ -771,51 +771,42 @@ export default {
     }
   },
   async mounted() {
-    const params = this.$route.query
-    if (params.partner) {
-      try {
-        const res = await NetworkService.getStudentPartner(params.partner)
-        const studentPartner = res.data.studentPartner
-        if (!studentPartner || studentPartner.deactivated) {
-          delete params.partner
-        } else {
-          this.studentPartner = studentPartner
-        }
-      } catch {
-        delete params.partner
-      }
+    if (this.$route.params.partner) {
+      this.studentPartner = this.$route.params.partner
+      this.partnerKey = this.studentPartner.key
     }
 
-    if (this.shouldUseParentGuardianSignUpFlow(params)) {
+    const queryParams = this.$route.query
+    if (this.shouldUseParentGuardianSignUpFlow(queryParams)) {
       this.useParentGuardianSignUpFlow = true
     }
 
     localStorage.removeItem('isSSOSignUpRedirect')
     if (this.isFailureRedirect()) {
       this.eligibility = {
-        currentGrade: params['currentGrade'],
+        currentGrade: queryParams['gradeLevel'],
         highSchool: {
-          upchieveId: params['highSchoolId'],
+          upchieveId: queryParams['schoolId'],
         },
-        zipCode: params['zipCode'],
-        email: params['email'],
+        zipCode: queryParams['zipCode'],
+        email: queryParams['email'],
       }
-      this.partnerKey = params['partner']
-      this.credentials.email = params['email']
+      this.partnerKey = queryParams['studentPartnerOrgKey']
+      this.credentials.email = queryParams['email']
       this.errors.push(
         this.$route.query['error'] ??
           'Failed to sign up with Google. Please use password instead.'
       )
       this.step = 'account'
     } else if (this.isReferred) this.step = 'referred'
-    else this.eligibilityPage(params)
+    else this.eligibilityPage(queryParams)
 
-    if (params['utm_source'] === 'collegeconfidential') {
+    if (queryParams['utm_source'] === 'collegeconfidential') {
       this.isCollegeConfidential = true
     }
 
-    if (params['partner']) {
-      this.partnerKey = params['partner']
+    if (queryParams['partner']) {
+      this.partnerKey = queryParams['partner']
 
       if (
         this.partnerKey === 'bigfuture' &&
@@ -929,12 +920,7 @@ export default {
   },
   methods: {
     isFailureRedirect() {
-      return (
-        !!this.$route.query['email'] &&
-        !!this.$route.query['highSchoolId'] &&
-        !!this.$route.query['zipCode'] &&
-        !!this.$route.query['currentGrade']
-      )
+      return !!this.$route.query['provider']
     },
 
     // Necessary to explicitly call on close of the currentGrade select menu
@@ -1025,11 +1011,11 @@ export default {
       if (await this.hasEligibilityFormErrors()) return
 
       NetworkService.checkStudentEligibility({
-        schoolUpchieveId: this.eligibility.highSchool.upchieveId,
-        zipCode: this.eligibility.zipCode,
         email: this.eligibility.studentEmail,
+        gradeLevel: this.trimCurrentGrade,
         referredByCode: window.localStorage.getItem('upcReferredByCode'),
-        currentGrade: this.trimCurrentGrade,
+        schoolId: this.eligibility.highSchool.upchieveId,
+        zipCode: this.eligibility.zipCode,
       })
         .then(async (response) => {
           const isEligible = response.data.isEligible
@@ -1054,7 +1040,7 @@ export default {
                 lastName: this.eligibility.studentLastName,
                 parentGuardianEmail: this.eligibility.parentGuardianEmail,
                 schoolId: this.eligibility.highSchool.upchieveId,
-                studentPartnerOrg: this.partnerKey,
+                studentPartnerOrgKey: this.partnerKey,
                 zipCode: this.eligibility.zipCode,
               })
                 .then(() => {
@@ -1168,7 +1154,7 @@ export default {
           password: this.credentials.password,
           referredByCode: window.localStorage.getItem('upcReferredByCode'),
           schoolId: this.eligibility.highSchool.upchieveId,
-          studentPartnerOrg: this.partnerKey,
+          studentPartnerOrgKey: this.partnerKey,
           zipCode: this.eligibility.zipCode,
         })
         window.localStorage.removeItem('upcReferredByCode')
@@ -1190,16 +1176,16 @@ export default {
       localStorage.setItem('isSSOSignUpRedirect', true)
       const data = {
         email: this.eligibility.studentEmail,
-        currentGrade: this.trimCurrentGrade,
         gradeLevel: this.trimCurrentGrade,
-        highSchoolId: this.eligibility.highSchool.upchieveId,
-        schoolId: this.eligibility.highSchool.upchieveId,
+        isLogin: false,
+        provider: 'google',
         referredByCode: window.localStorage.getItem('upcReferredByCode'),
-        studentPartnerOrg: this.partnerKey,
+        schoolId: this.eligibility.highSchool.upchieveId,
+        studentPartnerOrgKey: this.partnerKey,
         zipCode: this.eligibility.zipCode,
       }
       const params = new URLSearchParams(data).toString()
-      const url = `${config.serverRoot}/auth/register/google/student?${params}`
+      const url = `${config.serverRoot}/auth/sso?${params}`
       window.location.replace(url)
     },
 

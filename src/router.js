@@ -51,6 +51,7 @@ import Gleap from 'gleap'
 import AnalyticsService from './services/AnalyticsService'
 import LoggerService from './services/LoggerService'
 import NetworkService, { axiosInstance } from './services/NetworkService'
+import { InputName } from '@/services/SignUpService'
 import { EVENTS } from './consts'
 import { INVALID_CSRF_ERROR } from '@/services/AuthService'
 import Case from 'case'
@@ -169,6 +170,7 @@ const routes = [
             delete to.query.partner
           } else {
             to.params.partner = studentPartner
+            to.params[InputName.STUDENT_PARTNER_ORG_KEY] = studentPartner.key
           }
         } catch (err) {
           // TODO: Don't throw an error if a partner with the key does not exist.

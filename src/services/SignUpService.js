@@ -1,3 +1,4 @@
+import config from '@/config'
 import { EVENTS, GRADES } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import AuthService from '@/services/AuthService'
@@ -32,15 +33,32 @@ type PageDetail = {
       content: string,
       submitAction: (fd: FormData) => SubmitActionResponse,
       props: {
-        name: FormInputName
+        name: InputName
         ...etc
       }
     }[],
 }
 type FormElement = 'h1' | 'p' | 'FormSelect' | 'FormInput' | 'FormEmail' etc.
 type SubmitActionResponse = [valid router object, error]
-type FormInputName = 'currentGrade' | 'zipCode' | 'studentEmail' etc.
 */
+
+// The following values are used as the `name` attribute on form elements,
+// and should match the keys in server requests.
+export const InputName = {
+  EMAIL: 'email',
+  FIRST_NAME: 'firstName',
+  GRADE_LEVEL: 'gradeLevel',
+  LAST_NAME: 'lastName',
+  PARENT_GUARDIAN_EMAIL: 'parentGuardianEmail',
+  PASSWORD: 'password',
+  REFERRED_BY_CODE: 'upcReferredByCode',
+  SCHOOL_ID: 'schoolId',
+  SIGNUP_SOURCE_ID: 'signupSourceId',
+  STUDENT_PARTNER_ORG_KEY: 'studentPartnerOrgKey',
+  STUDENT_PARTNER_ORG_SITE_NAME: 'studentPartnerOrgSiteName',
+  ZIP_CODE: 'zipCode',
+}
+
 export function getPageDetails(to, from) {
   const pd = get(to, from)
   pd.rows = pd.rows.filter((row) => !!row)
@@ -64,11 +82,13 @@ async function checkEligibility(data) {
     const {
       data: { isEligible },
     } = await NetworkService.checkStudentEligibility({
-      currentGrade: data.currentGrade,
-      email: '',
-      referredByCode: window.localStorage.getItem('upcReferredByCode'),
-      schoolUpchieveId: data.school,
-      zipCode: data.zipCode,
+      [InputName.EMAIL]: '',
+      [InputName.GRADE_LEVEL]: data[InputName.GRADE_LEVEL],
+      [InputName.REFERRED_BY_CODE]: window.localStorage.getItem(
+        InputName.REFERRED_BY_CODE
+      ),
+      [InputName.SCHOOL_ID]: data[InputName.SCHOOL_ID],
+      [InputName.ZIP_CODE]: data[InputName.ZIP_CODE],
     })
     AnalyticsService.captureEvent(
       isEligible ? EVENTS.ELIGIBILITY_ELIGIBLE : EVENTS.ELIGIBILITY_INELIGIBLE,
@@ -88,16 +108,20 @@ async function checkEligibility(data) {
 async function createAccount(data) {
   try {
     await AuthService.registerStudent({
-      email: data.studentEmail,
-      firstName: data.firstName,
-      gradeLevel: data.currentGrade,
-      lastName: data.lastName,
-      password: data.password,
-      referredByCode: window.localStorage.getItem('upcReferredByCode'),
-      schoolId: data.school,
-      signupSourceId: data.signUpSource,
-      studentPartnerOrg: data.partner?.key,
-      zipCode: data.zipCode,
+      [InputName.EMAIL]: data[InputName.EMAIL],
+      [InputName.FIRST_NAME]: data[InputName.FIRST_NAME],
+      [InputName.GRADE_LEVEL]: data[InputName.GRADE_LEVEL],
+      [InputName.LAST_NAME]: data[InputName.LAST_NAME],
+      [InputName.PASSWORD]: data[InputName.PASSWORD],
+      [InputName.REFERRED_BY_CODE]:
+        window.localStorage.getItem('upcReferredByCode'),
+      [InputName.SCHOOL_ID]: data[InputName.SCHOOL_ID],
+      [InputName.SIGNUP_SOURCE_ID]: data[InputName.SIGNUP_SOURCE_ID],
+      [InputName.STUDENT_PARTNER_ORG_KEY]:
+        data[InputName.STUDENT_PARTNER_ORG_KEY],
+      [InputName.STUDENT_PARTNER_ORG_SITE_NAME]:
+        data[InputName.STUDENT_PARTNER_ORG_SITE_NAME],
+      [InputName.ZIP_CODE]: data[InputName.ZIP_CODE],
     })
     window.localStorage.removeItem('upcReferredByCode')
 
@@ -108,9 +132,30 @@ async function createAccount(data) {
   }
 }
 
-function createAccountWithGoogle() {
+function createAccountWithGoogle(data) {
   AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_UP_WITH_GOOGLE)
-  // TODO: Redirect to Google sign-up.
+  return createAccountWithSso('google', data)
+}
+
+function createAccountWithClever(data) {
+  AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_UP_WITH_CLEVER)
+  return createAccountWithSso('clever', data)
+}
+
+function createAccountWithSso(provider, data) {
+  try {
+    const params = new URLSearchParams({
+      provider,
+    })
+    for (const key of Object.keys(data)) {
+      if (data[key]) params.append(key, data[key])
+    }
+    const url = `${config.serverRoot}/auth/sso?${params.toString()}`
+    window.location.replace(url)
+  } catch (err) {
+    LoggerService.noticeError(err)
+    return getSubmitResponse(null, null, err)
+  }
 }
 
 function ineligibleContinue() {
@@ -120,7 +165,11 @@ function ineligibleContinue() {
 
 function getSubmitResponse(nextPage, data, err) {
   if (err) {
-    return [null, err.response?.data?.err ?? 'Failed: Please try again.']
+    const error =
+      typeof err === 'string'
+        ? error
+        : err.response?.data?.err ?? 'Failed: Please try again.'
+    return [null, error]
   }
 
   switch (nextPage) {
@@ -215,7 +264,7 @@ function getZipCodeElement() {
   return {
     element: 'FormInput',
     props: {
-      name: 'zipCode',
+      name: InputName.ZIP_CODE,
       label: 'Zip Code',
       placeholder: 'Zip Code',
       minLength: 5,
@@ -231,7 +280,7 @@ function getGradeSelectionElement() {
     props: {
       blurEvent: EVENTS.STUDENT_SELECTED_GRADE,
       getSelectOptions: () => GRADES,
-      name: 'currentGrade',
+      name: InputName.GRADE_LEVEL,
       label: 'Grade in 2023-2024',
       placeholder: 'Grade in 2023-2024',
       reduce: (option) => option.split(' ')[0],
@@ -256,7 +305,7 @@ function getSignUpSourceElement() {
         }
       },
       label: 'How did you hear about us?',
-      name: 'signUpSource',
+      name: InputName.SIGNUP_SOURCE_ID,
       optionTextField: 'name',
       placeholder: 'How did you hear about us?',
       reduce: (option) => option.id,
@@ -268,7 +317,7 @@ function getStudentEmailElement(to) {
   return {
     element: 'FormEmail',
     props: {
-      name: 'studentEmail',
+      name: InputName.EMAIL,
       label: isParentGuardianSignUp(to) ? "Student's Email" : 'Email',
       placeholder: isParentGuardianSignUp(to) ? "Student's Email" : 'Email',
     },
@@ -319,7 +368,10 @@ function getEligibilityPageDetails(to) {
         : null,
       getRow('justify-start', ...getAlreadyHaveAccountElements()),
       getRow(null, getGradeSelectionElement(), getZipCodeElement()),
-      getRow(null, { element: 'FormSchoolSearch' }),
+      getRow(null, {
+        element: 'FormSchoolSearch',
+        props: { name: InputName.SCHOOL_ID },
+      }),
       getRow(null, getSignUpSourceElement()),
       getRow(null, { element: 'br' }),
       getRow(null, getButtonElement(checkEligibility, 'Check eligibility')),
@@ -365,19 +417,22 @@ function getAccountPageDetails(to) {
       getRow(null, getTextElement('h2', 'Create an Account')),
       getRow(
         null,
-        getSsoButton(createAccountWithGoogle, 'Sign Up with Google')
+        getSsoButton(createAccountWithGoogle, 'Continue with Google')
       ),
-      // TODO: getRow(null, getCleverSSOButton(())),
+      getRow(
+        null,
+        getSsoButton(createAccountWithClever, 'Continue with Clever', 'clever')
+      ),
       getRow(null, { element: 'LineDivider', props: { text: 'or' } }),
       getRow(
         null,
         getInputElement(
-          'firstName',
+          InputName.FIRST_NAME,
           'First Name',
           EVENTS.STUDENT_ENTERED_FIRST_NAME
         ),
         getInputElement(
-          'lastName',
+          InputName.LAST_NAME,
           'Last Name',
           EVENTS.STUDENT_ENTERED_LAST_NAME
         )

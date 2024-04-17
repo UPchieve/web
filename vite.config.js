@@ -20,6 +20,7 @@ export default {
             params: {
               overrides: {
                 removeViewBox: false,
+                cleanupIds: false,
               },
             },
           },

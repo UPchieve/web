@@ -767,13 +767,13 @@ export default {
         email: this.formData.email,
         firstName: this.formData.firstName,
         lastName: this.formData.lastName,
+        otherSignupSource: this.formData.otherSignupSource,
         parentGuardianEmail: this.formData.parentGuardianEmail,
-        partnerSite: this.formData.partnerSite,
         password: this.formData.password,
         schoolId: this.formData.schoolId,
         signupSourceId: this.formData.signupSourceId,
-        studentPartnerOrg: this.$route.params.partnerId,
-        otherSignupSource: this.formData.otherSignupSource,
+        studentPartnerOrgKey: this.$route.params.partnerId,
+        studentPartnerOrgSiteName: this.formData.partnerSite,
       })
         .then(() => {
           if (this.useParentGuardianSignUpFlow) {
@@ -799,13 +799,13 @@ export default {
       )
       localStorage.setItem('isSSOSignUpRedirect', true)
       const data = {
-        studentPartnerOrg: this.studentPartner.key,
-        currentGrade: this.trimGradeLevel,
+        gradeLevel: this.trimGradeLevel,
+        isLogin: false,
+        provider: 'google',
+        studentPartnerOrgKey: this.studentPartner.key,
       }
-      const dataAsQueryParams = Object.entries(data)
-        .map((q) => `${q[0]}=${q[1]}`)
-        .join('&')
-      const url = `${config.serverRoot}/auth/register/google/partner-student?${dataAsQueryParams}`
+      const params = new URLSearchParams(data).toString()
+      const url = `${config.serverRoot}/auth/sso?${params}`
       window.location.replace(url)
     },
 
