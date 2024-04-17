@@ -108,6 +108,11 @@ async function createAccount(data) {
   }
 }
 
+function createAccountWithGoogle() {
+  AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_UP_WITH_GOOGLE)
+  // TODO: Redirect to Google sign-up.
+}
+
 function ineligibleContinue() {
   AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_STUDENT_ACCESS_PAGE)
   window.location = 'https://upchieve.org/request-access'
@@ -164,7 +169,19 @@ function getButtonElement(submitAction, content, classes = '') {
     element: 'button',
     classes: 'uc-form-button ' + classes,
     content,
+    isDisabledOnInvalid: true,
     submitAction,
+  }
+}
+
+function getSsoButton(submitAction, content, ssoMethod = 'google') {
+  return {
+    element: 'SsoButton',
+    submitAction,
+    props: {
+      buttonText: content,
+      ssoMethod,
+    },
   }
 }
 
@@ -346,7 +363,10 @@ function getAccountPageDetails(to) {
     rows: [
       getRow(null, getTextElement('h1', "You're eligible for UPchieve! 🎉")),
       getRow(null, getTextElement('h2', 'Create an Account')),
-      // TODO: getRow(null, getGoogleSSOButton())),
+      getRow(
+        null,
+        getSsoButton(createAccountWithGoogle, 'Sign Up with Google')
+      ),
       // TODO: getRow(null, getCleverSSOButton(())),
       getRow(null, { element: 'LineDivider', props: { text: 'or' } }),
       getRow(
