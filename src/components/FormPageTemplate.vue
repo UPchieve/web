@@ -87,6 +87,7 @@ $footer-height-tiny: 100px;
     .form-content {
       @include flex-container(column);
     }
+
     .form-content,
     .img-content {
       min-height: calc(100vh - $footer-height);
@@ -110,6 +111,7 @@ $footer-height-tiny: 100px;
         flex: 1;
         padding: 16px;
       }
+
       .img-content {
         background-color: #f0f9ff;
         flex: 1;
@@ -122,6 +124,7 @@ $footer-height-tiny: 100px;
         flex: 4;
         padding: 16px;
       }
+
       .img-content {
         flex: 1;
 
@@ -133,32 +136,32 @@ $footer-height-tiny: 100px;
   }
 }
 
-.form-card .logo {
-  &.white {
+.form-card + .logo.white {
+  display: block;
+
+  @include breakpoint-below('tiny') {
+    display: none;
+  }
+}
+
+.form-card .logo.teal {
+  display: none;
+
+  @include breakpoint-below('tiny') {
     display: block;
-    @include breakpoint-below('tiny') {
-      display: none;
-    }
-  }
-  &.teal {
-    display: none;
-    @include breakpoint-below('tiny') {
-      display: block;
-    }
   }
 }
-.form-panel + .logo {
-  &.white {
-    display: none;
-  }
+
+.form-panel + .logo.white {
+  display: none;
 }
-.full + .logo {
-  &.white {
-    display: none;
-  }
-  &.teal {
-    display: none;
-  }
+
+.full + .logo.white {
+  display: none;
+}
+
+.full .logo.teal {
+  display: none;
 }
 
 .logo {
