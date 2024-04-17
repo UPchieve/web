@@ -6,7 +6,9 @@ export default {
   envPrefix: 'VUE_',
   define: {
     'import.meta.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-    'import.meta.env.SUBWAY_CUSTOM_VOLUNTEER_PARTNER_ORGS': JSON.stringify(process.env.SUBWAY_CUSTOM_VOLUNTEER_PARTNER_ORGS)
+    'import.meta.env.SUBWAY_CUSTOM_VOLUNTEER_PARTNER_ORGS': JSON.stringify(
+      process.env.SUBWAY_CUSTOM_VOLUNTEER_PARTNER_ORGS
+    ),
   },
   plugins: [
     vue(),
@@ -48,9 +50,6 @@ export default {
     environment: 'jsdom',
     globals: true,
     setupFiles: ['/tests/setup.js'],
-    exclude: [
-      '**/tests/e2e/**',
-      '**/node_modules/**',
-    ]
+    exclude: ['**/tests/e2e/**', '**/node_modules/**'],
   },
 }
