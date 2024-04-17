@@ -211,6 +211,8 @@ export default {
           this.$store.dispatch('user/updateHasSeenProgressReportModal', false)
           if (!this.isSessionRecapDmsActive) this.goToFeedbackPage()
           // Do not send the user directly to the feedback page if they can leave DMs
+          if (!this.user.isVolunteer) this.goToFeedbackPage()
+          //Send students directly to feedback page whether or not volunteers can send DMs.
           this.isSessionEnding = false
         })
         .catch(this.alertCouldNotEnd)

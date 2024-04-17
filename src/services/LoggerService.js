@@ -8,7 +8,9 @@ class LoggerService {
   }
 
   static noticeError(err, customData) {
-    if (window && window.newrelic) window.newrelic.noticeError(err, customData)
+    if (window && window.newrelic) {
+      window.newrelic.noticeError(err, customData)
+    }
   }
 
   static reset() {

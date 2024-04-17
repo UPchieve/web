@@ -59,6 +59,7 @@ export default {
     }),
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',
+      isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
     }),
   },
   mounted() {
@@ -218,8 +219,12 @@ export default {
   },
   watch: {
     isSessionConnectionAlive(newValue, oldValue) {
-      if (newValue && !oldValue) {
+      if (
+        (newValue && !oldValue) ||
+        (this.isSessionRecapDmsActive && this.isVolunteer)
+      ) {
         // socket.io just reconnected, allow edits to the document editor
+        // or the volunteer is able to send DMs after the session ends
         this.quillEditor.enable()
         this.isConnecting = false
       } else {
