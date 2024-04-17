@@ -22,13 +22,18 @@
           :disabled="isDisabled(el)"
           v-bind="el.props"
           @click="
-            el.submitAction ? submitWithValidation(el.submitAction) : null
+            el.submitAction && el.isDisabledOnInvalid
+              ? submitWithValidation(el.submitAction)
+              : el.submitAction
+                ? submit(el.submitAction)
+                : null
           "
         >
           {{ el.content }}
         </component>
       </div>
     </form>
+    <loader v-if="isSubmitting" overlay />
   </form-page-template>
 </template>
 
@@ -43,6 +48,8 @@ import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
 import FormSelect from '@/components/FormSelect.vue'
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import LineDivider from '@/components/LineDivider.vue'
+import Loader from '@/components/Loader.vue'
+import SsoButton from '@/components/SsoButton.vue'
 import * as SignUpService from '@/services/SignUpService'
 
 export default {
@@ -56,7 +63,9 @@ export default {
     FormSchoolSearch,
     FormSelect,
     FormPageTemplate,
+    Loader,
     LineDivider,
+    SsoButton,
   },
 
   setup() {
@@ -87,6 +96,9 @@ export default {
         return
       }
 
+      await this.submit(submit)
+    },
+    async submit(submit) {
       this.isSubmitting = true
       this.error = null
 
@@ -117,7 +129,7 @@ export default {
       this.pageDetails = SignUpService.getPageDetails(to, from)
     },
     isDisabled(el) {
-      if (el.submitAction) {
+      if (el.isDisabledOnInvalid) {
         return this.v$.$error || !!this.v$.$silentErrors?.length
       }
 
