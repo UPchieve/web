@@ -15,8 +15,9 @@
     "storybook": "storybook dev -p 6006",
     "test:watch": "vitest --watch",
     "test": "vitest --run --pool=forks",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
+    "test:e2e": "npx playwright test",
+    "test:e2e:ui": "npx playwright test --ui",
+    "test:e2e:update-snapshots": "npx playwright test --update-snapshots",
     "scan:diff": "git diff --staged --name-only -z | xargs -0 detect-secrets-hook --baseline .secrets.baseline --exclude-files package-lock.json",
     "scan:audit": "detect-secrets audit .secrets.baseline"
   },

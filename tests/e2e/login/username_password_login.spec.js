@@ -29,6 +29,7 @@ test.describe('Username/password login', () => {
   test('Page has the correct title', async ({ page }) => {
     await expect(page).toHaveTitle('UPchieve')
     await expect(page.getByTestId('login-heading')).toBeVisible()
+    await expect(page).toHaveScreenshot('page-load.png')
   })
 
   test('Logging in successfully', async ({ page }) => {
@@ -51,13 +52,14 @@ test.describe('Username/password login', () => {
     await emailInput.fill(STUDENT_EMAIL)
     await passwordInput.fill(STUDENT_PW)
     await expect(loginButton).toBeEnabled()
+    await expect(page).toHaveScreenshot('sign-in-btn-enabled.png')
 
     // Un-fill part of the form => login button disabled
     await passwordInput.fill('')
     await expect(loginButton).not.toBeEnabled()
 
     // Sign in successfully => Navigate to dashboard
-    await passwordInput.fill('Password123')
+    await passwordInput.fill(STUDENT_PW)
     await expect(loginButton).toBeEnabled()
     await loginButton.click()
     await page.waitForURL('**/dashboard')
@@ -85,5 +87,6 @@ test.describe('Username/password login', () => {
     const error = page.getByTestId('error')
     await expect(error).toBeVisible()
     await expect(error).toHaveText(BAD_CREDENTIALS_ERROR)
+    await expect(page).toHaveScreenshot('error-message.png')
   })
 })
