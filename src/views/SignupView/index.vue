@@ -42,13 +42,21 @@
         <div v-else>
           <p class="uc-form-text bold">I want to sign up as...</p>
           <div class="btn-card-container">
-            <button class="btn-card student" @click.prevent="selectStudent">
+            <button
+              data-testid="studentCard"
+              class="btn-card student"
+              @click.prevent="selectStudent"
+            >
               <div class="img-container">
                 <student-avatar class="img"></student-avatar>
               </div>
               <p class="text">A Student</p>
             </button>
-            <button class="btn-card volunteer" @click.prevent="selectVolunteer">
+            <button
+              data-testid="volunteerCard"
+              class="btn-card volunteer"
+              @click.prevent="selectVolunteer"
+            >
               <div class="img-container">
                 <volunteer-avatar class="img"></volunteer-avatar>
               </div>
