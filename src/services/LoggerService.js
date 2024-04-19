@@ -1,8 +1,22 @@
 import config from '../config'
+import VueRouter from 'vue-router'
+const { isNavigationFailure, NavigationFailureType } = VueRouter
 
 const newrelic = window.newrelic
 
 class LoggerService {
+  static init(){
+    newrelic.setErrorHandler(function (err) {
+      if (isNavigationFailure(err, NavigationFailureType.redirected)) {
+        return { group: 'NavigationGuardError: Redirected via a navigation guard.' }
+      } else if (isNavigationFailure(err, NavigationFailureType.cancelled)) {
+        return { group: 'NavigationFailure: Navigation cancelled with a new navigation.' }
+      } else {
+        return false
+      }
+    })
+  }
+
   static identify(userId) {
     if (newrelic) newrelic.setUserId(userId)
   }
@@ -19,6 +33,10 @@ class LoggerService {
 }
 
 class DevLoggerService {
+  static init(){
+    // eslint-disable-next-line no-console
+    console.info('LoggerService.init')
+  }
   static identify(userId) {
     // eslint-disable-next-line no-console
     console.info('LoggerService.identify', userId)
