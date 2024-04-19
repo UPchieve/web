@@ -356,13 +356,13 @@ export default {
   },
   sockets: {
     error(error) {
-      this.$socket.emit('client_error')
+      this.$socket.emit('client_error', error)
       if (this.isExemptSocketError(error)) return
       LoggerService.noticeError(error)
     },
     // https://socket.io/docs/v2/client-api/#event-disconnect
     async disconnect(reason) {
-      this.$socket.emit('client_disconnect')
+      this.$socket.emit('client_disconnect', reason)
       const err = new Error(
         `Socket.io connection for user ${this.user.id} disconnected for reason: ${reason}`
       )
@@ -374,13 +374,13 @@ export default {
       }
     },
     connect_error(error) {
-      this.$socket.emit('client_connect_error')
+      this.$socket.emit('client_connect_error', error)
       // these are handled internally and shouldn't be forwarded to New Relic
       if (this.isExemptSocketError(error)) return
       LoggerService.noticeError(error)
     },
     reconnect_error(error) {
-      this.$socket.emit('client_reconnect_error')
+      this.$socket.emit('client_reconnect_error', error)
       if (this.isExemptSocketError(error)) return
       LoggerService.noticeError(error)
     },
