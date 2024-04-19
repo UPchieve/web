@@ -122,6 +122,7 @@ function getFeatureFlagService() {
     case 'development':
     case 'test':
       return DevFeatureFlagService
+    case 'test_e2e':
     default:
       return FeatureFlagService
   }
