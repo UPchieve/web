@@ -68,16 +68,11 @@ Vue.filter('formatTime', (value) => {
 
 function initVue() {
   // Create Vue instance
-  const app = new Vue({
+  new Vue({
     router,
     store,
     render: (h) => h(App),
   }).$mount('#app')
-
-  // allow e2e tests to see Vuex store
-  if (window.Cypress) {
-    window.app = app
-  }
 }
 
 async function main() {
