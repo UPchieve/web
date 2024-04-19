@@ -17,6 +17,8 @@ import AnalyticsService from './services/AnalyticsService'
 import FeatureFlagService from './services/FeatureFlagService'
 import LoggerService from './services/LoggerService'
 
+LoggerService.init()
+
 // Prevent production tip on startup
 Vue.config.productionTip = false
 
