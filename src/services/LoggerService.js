@@ -5,12 +5,18 @@ const { isNavigationFailure, NavigationFailureType } = VueRouter
 const newrelic = window.newrelic
 
 class LoggerService {
-  static init(){
+  static init() {
+    if (!newrelic) return
     newrelic.setErrorHandler(function (err) {
       if (isNavigationFailure(err, NavigationFailureType.redirected)) {
-        return { group: 'NavigationGuardError: Redirected via a navigation guard.' }
+        return {
+          group: 'NavigationGuardError: Redirected via a navigation guard.',
+        }
       } else if (isNavigationFailure(err, NavigationFailureType.cancelled)) {
-        return { group: 'NavigationFailure: Navigation cancelled with a new navigation.' }
+        return {
+          group:
+            'NavigationFailure: Navigation cancelled with a new navigation.',
+        }
       } else {
         return false
       }
@@ -33,7 +39,7 @@ class LoggerService {
 }
 
 class DevLoggerService {
-  static init(){
+  static init() {
     // eslint-disable-next-line no-console
     console.info('LoggerService.init')
   }
@@ -55,6 +61,7 @@ class DevLoggerService {
 
 function getLoggerService() {
   switch (config.nodeEnv) {
+    case 'test_e2e':
     case 'development':
       return DevLoggerService
     default:
