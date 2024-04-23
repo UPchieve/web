@@ -71,6 +71,7 @@
   },
   "devDependencies": {
     "@azure/static-web-apps-cli": "^1.1.7",
+    "@faker-js/faker": "^8.4.1",
     "@playwright/test": "^1.42.1",
     "@storybook/addon-a11y": "^7.6.9",
     "@storybook/addon-actions": "^7.6.9",

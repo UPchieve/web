@@ -77,6 +77,7 @@
         <input
           id="studentFirstName"
           class="uc-form-text-input"
+          data-testid="pg-student-first-name-input"
           type="text"
           :placeholder="`Enter ${getFormLabelIdentifierPossessive} first name`"
           v-bind:class="{
@@ -105,6 +106,7 @@
         <input
           id="studentLastName"
           class="uc-form-text-input"
+          data-testid="pg-student-last-name-input"
           type="text"
           :placeholder="`Enter ${getFormLabelIdentifierPossessive} last name`"
           v-bind:class="{
@@ -393,6 +395,7 @@
   </div>
 
   <div
+    id="pg-confirmation-message"
     v-else-if="step === 'parentGuardianConfirmation'"
     class="uc-form"
     data-testid="pg-confirmation-message"
@@ -496,6 +499,7 @@
         </div>
         <input
           id="lastName"
+          data-testid="student-last-name-input"
           class="uc-form-text-input"
           type="text"
           :placeholder="`Enter ${getFormLabelIdentifierPossessive} last name`"
@@ -562,6 +566,7 @@
         </div>
         <input
           id="password"
+          data-testid="student-password-input"
           class="uc-form-text-input"
           type="password"
           placeholder="Create a password"
