@@ -405,29 +405,8 @@ export default {
     reconnect_failed() {
       this.$socket.emit('client_reconnect_failed')
     },
-    /**
-     *
-     * When a student dismisses the ProgressReportModal because the
-     * analysis of their sessions is taking too long, this event
-     * handler acts as a way to notify the student with a notification
-     * indicator in the side bar next to "Your Progress".
-     * We check the server for any unread progress report overviews for the student
-     *
-     * Show the indicator if:
-     * - ProgressReport modal is not currently open,
-     * - Student wanted to see the analysis
-     * - Report was processed successfully
-     *
-     */
-    'progress-report:processed:session'(data) {
-      // Grab the ProgressReportModal
-      const isOnScreen = document.querySelector('.prm')
-      if (
-        !isOnScreen &&
-        this.requestedProgressReportOverview &&
-        data.report &&
-        data.report.status === 'complete'
-      )
+    'progress-report:processed:overview'(data) {
+      if (data.report && data.report.status === 'complete')
         this.$store.dispatch('user/getProgressReportOverviewSubjectStats')
     },
     async sessions(sessions) {
