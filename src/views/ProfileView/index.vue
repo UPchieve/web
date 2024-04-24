@@ -208,25 +208,25 @@
         />
         <div v-else class="container-content cert">
           <div
-            v-for="(value, key) in userSubjects"
-            :key="`certification-${key}-${value}`"
+            v-for="(subject) in userSubjects"
+            :key="`certification-${subject.name}-${subject.value}`"
           >
-            <div v-if="value" class="certBox">
+            <div v-if="subject.value" class="certBox">
               <div class="subjects-left">
                 <div
-                  :style="{ backgroundColor: subjects[key].topicColor }"
+                  :style="{ backgroundColor: subjects[subject.name].topicColor }"
                   class="certKey"
                 >
-                  {{ subjects[key].topicDisplayName.toUpperCase() }}
+                  {{ subjects[subject.name].topicDisplayName.toUpperCase() }}
                 </div>
                 <div class="certValue">
-                  {{ subjects[key].displayName }}
+                  {{ subjects[subject.name].displayName }}
                 </div>
               </div>
               <div v-if="isMutedSubjectAlertsActive" class="subjects-right">
                 <toggle-button
                   :disabled="!activeEdit"
-                  :value="subjectIsNotMuted(key)"
+                  :value="subjectIsNotMuted(subject.name)"
                   :width="75"
                   :labels="{ checked: 'On', unchecked: 'Off' }"
                   :color="{
@@ -235,7 +235,7 @@
                     disabled: '#AAAAAA',
                   }"
                   @change="
-                    togglemutedSubjectAlerts(key, subjectIsNotMuted(key))
+                    togglemutedSubjectAlerts(subject.name, subjectIsNotMuted(subject.name))
                   "
                   :sync="true"
                 />
@@ -349,7 +349,7 @@ export default {
     },
     certKey() {
       let subtopicObj = {}
-
+      
       for (let [topicName, topicData] of Object.entries(this.subjects)) {
         for (let topic in topicData.subtopics) {
           if (
@@ -371,10 +371,11 @@ export default {
         ? user.activeSubjects
         : user.subjects
 
-      const subjects = {}
-      for (const subject of userSubjects) {
-        subjects[subject] = true
-      }
+      const subjects = userSubjects.map(subject => ({ 
+        'name': subject,
+        'value': true
+      })).sort((a, b) => a.name.localeCompare(b.name));
+
       return subjects
     },
     isNotificationPermissionGranted() {
