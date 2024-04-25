@@ -13,9 +13,8 @@
       <div v-else>
         <h1 class="uc-form-header">{{ welcomeMessage }}</h1>
         <p v-if="isReferred" class="uc-form-text">
-          UPchieve is a nonprofit that provides <b>100% free</b> online tutoring
-          and college counseling, available 24/7! Since {{ firstName }} invited
-          you, you can skip our wait list!
+          UPchieve is a nonprofit that provides 100% free online tutoring and
+          college counseling, available 24/7! Check if you are eligible!
         </p>
         <p v-else class="uc-form-text">
           We are a nonprofit that provides free, online tutoring and college
@@ -28,7 +27,7 @@
             type="submit"
             @click.prevent="selectStudent()"
           >
-            Awesome! I'm ready to sign up
+            Check my eligibility
           </button>
 
           <a
