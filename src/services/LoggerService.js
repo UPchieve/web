@@ -1,8 +1,9 @@
 import config from '../config'
 import VueRouter from 'vue-router'
-const { isNavigationFailure, NavigationFailureType } = VueRouter
+import { isSocketDisconnectError } from '../utils/custom-error-handlers'
 
 const newrelic = window.newrelic
+const { isNavigationFailure, NavigationFailureType } = VueRouter
 
 class LoggerService {
   static init() {
@@ -13,10 +14,9 @@ class LoggerService {
           group: 'NavigationGuardError: Redirected via a navigation guard.',
         }
       } else if (isNavigationFailure(err, NavigationFailureType.cancelled)) {
-        return {
-          group:
-            'NavigationFailure: Navigation cancelled with a new navigation.',
-        }
+        return { group: 'NavigationFailure: Navigation cancelled with a new navigation.' }
+      } else if (isSocketDisconnectError(err)) {
+        return { group: 'SocketError: Socket.io connection for user disconnected.' }
       } else {
         return false
       }
