@@ -14,7 +14,15 @@ class LoggerService {
           group: 'NavigationGuardError: Redirected via a navigation guard.',
         }
       } else if (isNavigationFailure(err, NavigationFailureType.cancelled)) {
-        return { group: 'NavigationFailure: Navigation cancelled with a new navigation.' }
+        return {
+          group:
+            'NavigationFailure: Navigation cancelled with a new navigation.',
+        }
+      } else if (isNavigationFailure(err, NavigationFailureType.duplicated)) {
+        return {
+          group:
+            'NavigationDuplicated: Avoided redundant navigation to current location.',
+        }
       } else if (isSocketDisconnectError(err)) {
         return { group: 'SocketError: Socket.io connection for user disconnected.' }
       } else {
