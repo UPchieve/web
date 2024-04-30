@@ -1,7 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { BASE_URL } from '../consts'
 
-const LOGIN_URL = BASE_URL
 const STUDENT_EMAIL = 'student1@upchieve.org'
 const STUDENT_PW = 'Password123'
 const BAD_CREDENTIALS_ERROR =
@@ -23,7 +21,7 @@ test.describe('Username/password login', () => {
   }
 
   test.beforeEach(async ({ page }) => {
-    await page.goto(LOGIN_URL)
+    await page.goto('/')
   })
 
   test('Page has the correct title', async ({ page }) => {
