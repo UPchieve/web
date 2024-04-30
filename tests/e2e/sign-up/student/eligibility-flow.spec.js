@@ -1,9 +1,8 @@
 import { faker } from '@faker-js/faker';
 import { test, expect } from '@playwright/test'
-import { BASE_URL } from '../../consts'
 import { POSTHOG_FEATURE_FLAGS } from '../../../../src/consts'
 
-const BASE_SIGN_UP_URL = BASE_URL + '/sign-up'
+const BASE_SIGN_UP_URL = '/sign-up'
 
 test.describe('Open sign-up index page', () => {
   test('Shows option to sign up as student or volunteer if is not referral', async ({ page }) => {

@@ -112,7 +112,20 @@ Our unit tests do not incorporate visual testing for SVG components (refer to th
 So, after extensive research and exhausting nearly all possible options of rendering and testing SVGs, as of August 4 2021, we realized that this has been a prolonged JSDOM/JavaScript [issue](https://github.com/vuejs/vue-test-utils/issues/369) and not something that is occuring due to vue-test-utils or jest capabilities. Hence, consider it acceptable to not visually test SVGs for the time being.
 
 
-## E2E Testing
-To run the playwright E2E tests locally, you can use the `npm run test:e2e` or `npm run test:e2e:ui` commands. Make sure you have the backend application running locally before you start the tests.
+## E2E Testing (Under construction)
 
-Playwright starts up the local frontend server as part of test configuration with the NODE_ENV environment variable set to `test_e2e`. Playwright will fail to startup if you have already have high-line running.
+### How it works
+When you run `npm run test:e2e`, the subway and high-line servers are started for you, and subway will use fresh, dockerized postgres and redis instances that are hosted on ports 5500 and 5501 by default. The db is seeded with the scripts in the `/db_init` folder of the subway repo on your machine, as well as the test data in `src/tests/e2e/testdata.sql` in this repository.
+
+If there was an existing E2E postgres or redis docker container, they will be destroyed before new ones are created.
+
+Note: You don't need to start the backend or frontend servers yourself. Playwright starts up the servers as part of test configuration with the NODE_ENV environment variable set to `test_e2e`. Playwright will fail to startup if you already have either running.
+
+### Setup
+1. **Set your environment variable `SUBWAY_REPO_PATH` to wherever your subway project is stored on your machine.** This enables the startup script to create the dockerized e2e environment and start the subway server.
+2. By default, the subway server logs are not output into the terminal, but to change this, set `log = true` in `/tests/e2e/setup.js`. (@TODO - Parameterize this in the npm command)
+3. Now run `npm run test:e2e` or `npm run test:e2e:ui`
+
+### Adding test data to testdata.sql
+For now, all test suites work off of the same postgres instance in parallel, and there is no cleanup step in between tests. This means collisions in test data are possible. **To mitigate that risk, please create new users/profiles for each test file that you create.** (@TODO - Cleanup db state between tests)
+
