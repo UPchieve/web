@@ -208,13 +208,15 @@
         />
         <div v-else class="container-content cert">
           <div
-            v-for="(subject) in userSubjects"
+            v-for="subject in userSubjects"
             :key="`certification-${subject.name}-${subject.value}`"
           >
             <div v-if="subject.value" class="certBox">
               <div class="subjects-left">
                 <div
-                  :style="{ backgroundColor: subjects[subject.name].topicColor }"
+                  :style="{
+                    backgroundColor: subjects[subject.name].topicColor,
+                  }"
                   class="certKey"
                 >
                   {{ subjects[subject.name].topicDisplayName.toUpperCase() }}
@@ -235,7 +237,10 @@
                     disabled: '#AAAAAA',
                   }"
                   @change="
-                    togglemutedSubjectAlerts(subject.name, subjectIsNotMuted(subject.name))
+                    togglemutedSubjectAlerts(
+                      subject.name,
+                      subjectIsNotMuted(subject.name)
+                    )
                   "
                   :sync="true"
                 />
@@ -349,7 +354,7 @@ export default {
     },
     certKey() {
       let subtopicObj = {}
-      
+
       for (let [topicName, topicData] of Object.entries(this.subjects)) {
         for (let topic in topicData.subtopics) {
           if (
@@ -371,10 +376,12 @@ export default {
         ? user.activeSubjects
         : user.subjects
 
-      const subjects = userSubjects.map(subject => ({ 
-        'name': subject,
-        'value': true
-      })).sort((a, b) => a.name.localeCompare(b.name));
+      const subjects = userSubjects
+        .map((subject) => ({
+          name: subject,
+          value: true,
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name))
 
       return subjects
     },
