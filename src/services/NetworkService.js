@@ -181,18 +181,6 @@ export default {
       this._errorHandler
     )
   },
-  registerOpenStudent(data) {
-    return httpPost(`${AUTH_ROOT}/register/student/open`, data).then(
-      this._successHandler,
-      this._errorHandler
-    )
-  },
-  registerPartnerStudent(data) {
-    return httpPost(`${AUTH_ROOT}/register/student/partner`, data).then(
-      this._successHandler,
-      this._errorHandler
-    )
-  },
   sendReset(data) {
     return httpPost(`${AUTH_ROOT}/reset/send`, data).then(
       this._successHandler,
@@ -668,18 +656,18 @@ export default {
     )
   },
   checkStudentEligibility({
-    schoolUpchieveId,
-    zipCode,
     email,
+    gradeLevel,
     referredByCode,
-    currentGrade,
+    schoolId,
+    zipCode,
   }) {
     return httpPost(`${ELIGIBILITY_API_ROOT}/check`, {
-      schoolUpchieveId,
-      zipCode,
       email,
+      gradeLevel,
       referredByCode,
-      currentGrade,
+      schoolId,
+      zipCode,
     }).then(this._successHandler, this._errorHandler)
   },
   checkIpAddress() {

@@ -59,7 +59,7 @@
       <button
         class="uc-form-button google"
         data-testid="googleSsoButton"
-        @click.prevent="signInWithGoogle"
+        @click.prevent="() => signInWithSso('google')"
         :disabled="isLoggingIn"
       >
         <google-logo></google-logo>
@@ -138,12 +138,25 @@ export default {
           this.isLoggingIn = false
         })
     },
-    signInWithGoogle() {
+    signInWithSso(provider) {
       this.isLoggingIn = true
-      AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_IN_WITH_GOOGLE)
-      const url = `${config.serverRoot}/auth/login/google`
+      this.captureSsoClickEvent(provider)
+      const params = new URLSearchParams({
+        provider,
+        isLogin: true,
+      })
+      const url = `${config.serverRoot}/auth/sso?${params.toString()}`
       window.location.replace(url)
       this.isLoggingIn = false
+    },
+    captureSsoClickEvent(provider) {
+      if (provider === 'google') {
+        AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_IN_WITH_GOOGLE)
+      }
+
+      if (provider === 'clever') {
+        AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_IN_WITH_CLEVER)
+      }
     },
   },
 }

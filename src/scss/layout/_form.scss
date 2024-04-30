@@ -106,7 +106,8 @@
     }
   }
 
-  &.google {
+  &.google,
+  &.sso {
     background-color: #fff;
     border: 1px solid $c-border-grey;
     border-radius: 200px;

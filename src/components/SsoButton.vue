@@ -1,21 +1,18 @@
 <template>
-  <button
-    class="uc-form-button"
-    :class="{
-      google: useGoogle,
-    }"
-    @click="$emit('click')"
-  >
+  <button class="uc-form-button sso" @click="$emit('click')">
     <google-logo v-if="useGoogle" />
+    <clever-logo v-if="useClever" />
     {{ buttonText }}
   </button>
 </template>
 
 <script>
+import CleverLogo from '@/assets/clever_logo.svg'
 import GoogleLogo from '@/assets/google_logo.svg'
 
 export default {
   components: {
+    CleverLogo,
     GoogleLogo,
   },
   props: {
@@ -24,13 +21,15 @@ export default {
     },
     ssoMethod: {
       type: String,
-      default: 'google',
     },
   },
 
   computed: {
     useGoogle() {
       return this.ssoMethod === 'google'
+    },
+    useClever() {
+      return this.ssoMethod === 'clever'
     },
   },
 }

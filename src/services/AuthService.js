@@ -77,32 +77,6 @@ export default {
     }
   },
 
-  registerOpenStudent(signupData) {
-    return NetworkService.registerOpenStudent(signupData)
-      .then((res) => {
-        const data = { ...res.data }
-        if (!data) {
-          throw new Error('No user returned from auth service')
-        }
-      })
-      .catch((res) => {
-        throw errorFromHttpResponse(res)
-      })
-  },
-
-  registerPartnerStudent(signupData) {
-    return NetworkService.registerPartnerStudent(signupData)
-      .then((res) => {
-        const data = { ...res.data }
-        if (!data) {
-          throw new Error('No user returned from auth service')
-        }
-      })
-      .catch((res) => {
-        throw errorFromHttpResponse(res)
-      })
-  },
-
   checkRegister(creds) {
     return NetworkService.checkRegister(creds).catch((res) => {
       throw errorFromHttpResponse(res)
