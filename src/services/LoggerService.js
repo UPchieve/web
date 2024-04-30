@@ -24,7 +24,9 @@ class LoggerService {
             'NavigationDuplicated: Avoided redundant navigation to current location.',
         }
       } else if (isSocketDisconnectError(err)) {
-        return { group: 'SocketError: Socket.io connection for user disconnected.' }
+        return {
+          group: 'SocketError: Socket.io connection for user disconnected.',
+        }
       } else {
         return false
       }
