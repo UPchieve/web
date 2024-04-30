@@ -407,6 +407,9 @@ export default {
         this.showTroubleStartingModal(abort)
       }
     },
+    reconnect() {
+      this.$store.dispatch('user/sessionConnected')
+    },
     // https://socket.io/docs/v2/client-api/#event-disconnect
     async disconnect(reason) {
       const userType = this.isVolunteer ? 'volunteer' : 'student'
