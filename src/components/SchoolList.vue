@@ -7,6 +7,7 @@
       auto-select
       :placeholder="placeholder"
       :aria-label="placeholder"
+      :debounce-time="500"
       @submit="handleSelectHighSchool"
       @input="setHighSchool"
     ></autocomplete>

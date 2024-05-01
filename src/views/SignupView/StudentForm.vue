@@ -181,6 +181,7 @@
           :aria-label="`Search for ${getFormLabelIdentifierPossessive} school`"
           :search="autocompleteSchool"
           :get-result-value="getSchoolDisplayName"
+          :debounce-time="500"
           @submit="handleSelectHighSchool"
           @blur="v$.eligibility.highSchool.$touch"
           v-bind:class="{
