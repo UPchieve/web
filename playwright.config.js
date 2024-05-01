@@ -32,6 +32,13 @@ module.exports = defineConfig({
         /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
         trace: 'on-first-retry',
     },
+
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.01,
+      mask: ['data-e2e-ignore']
+    }
+  },
   webServer: {
     command: 'npm run serve',
     url: 'http://localhost:8080',

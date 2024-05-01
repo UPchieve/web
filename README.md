@@ -131,3 +131,20 @@ You can use the DB client exposed in the `/tests/e2e` folder to add test data to
 
 For now, all test suites work off of the same postgres instance in parallel, and there is no cleanup step in between tests. This means collisions in test data are possible. **To mitigate that risk, please create new users/profiles for each test file that you create.** (@TODO - Cleanup db state between tests)
 
+### Updating snapshots
+The E2E tests include several [snapshot tests](https://playwright.dev/docs/test-snapshots), which make pixel-by-pixel comparisons between a pre-saved snapshot file and the state of the screen during test.
+
+Remember to update snapshots as needed with `npm run test:e2e:update-snapshots` when applicable.
+
+Sometimes, snapshot tests fail because dynamically generated inputs, such as anything faker-generated, get rendered on screen and are bound to be different from run to run. To exclude those elements from snapshot comparisons, you can use a [toHaveScreenshot mask](https://playwright.dev/docs/api/class-pageassertions#page-assertions-to-have-screenshot-1-option-mask).
+
+Example:
+
+```
+Component:
+
+<template>
+<p data-e2e-ignore>
+  Welcome, {{ firstName }}!
+</p>
+```

@@ -388,7 +388,11 @@
       <div class="uc-column justify-center items-center h-full center">
         <verification-badge />
         <h1>You're all set!</h1>
-        <p>An account for {{ this.formData.firstName }} has been created.</p>
+        <p>
+          An account for
+          <span data-e2e-ignore>{{ this.formData.firstName }}</span> has
+          been created.
+        </p>
         <p>
           We have sent an email to
           <span id="ph-no-capture">{{ this.formData.email }}</span> to set a

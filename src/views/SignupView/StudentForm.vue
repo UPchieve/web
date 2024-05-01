@@ -408,8 +408,10 @@
       </p>
       <p>
         We have sent an email to
-        <span id="ph-no-capture">{{ this.eligibility.studentEmail }}</span> to
-        set a password.
+        <span id="ph-no-capture" data-e2e-ignore>{{
+          this.eligibility.studentEmail
+        }}</span>
+        to set a password.
       </p>
     </div>
   </div>
