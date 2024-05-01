@@ -115,7 +115,7 @@ So, after extensive research and exhausting nearly all possible options of rende
 ## E2E Testing (Under construction)
 
 ### How it works
-When you run `npm run test:e2e`, the subway and high-line servers are started for you, and subway will use fresh, dockerized postgres and redis instances that are hosted on ports 5500 and 5501 by default. The db is seeded with the scripts in the `/db_init` folder of the subway repo on your machine, as well as the test data in `src/tests/e2e/testdata.sql` in this repository.
+When you run `npm run test:e2e`, the subway and high-line servers are started for you, and subway will use fresh, dockerized postgres and redis instances that are hosted on ports 5500 and 5501 by default. The db is seeded with the scripts in the `/db_init` folder of the subway repo on your machine.
 
 If there was an existing E2E postgres or redis docker container, they will be destroyed before new ones are created.
 
@@ -126,6 +126,8 @@ Note: You don't need to start the backend or frontend servers yourself. Playwrig
 2. By default, the subway server logs are not output into the terminal, but to change this, set `log = true` in `/tests/e2e/setup.js`. (@TODO - Parameterize this in the npm command)
 3. Now run `npm run test:e2e` or `npm run test:e2e:ui`
 
-### Adding test data to testdata.sql
+### Adding test data
+You can use the DB client exposed in the `/tests/e2e` folder to add test data to the E2E database.
+
 For now, all test suites work off of the same postgres instance in parallel, and there is no cleanup step in between tests. This means collisions in test data are possible. **To mitigate that risk, please create new users/profiles for each test file that you create.** (@TODO - Cleanup db state between tests)
 

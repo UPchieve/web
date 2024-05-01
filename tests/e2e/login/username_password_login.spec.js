@@ -1,11 +1,21 @@
 import { test, expect } from '@playwright/test'
-
-const STUDENT_EMAIL = 'student1@upchieve.org'
-const STUDENT_PW = 'Password123'
+import { getClient } from '../db'
+import { createUserRow } from '../utils'
 const BAD_CREDENTIALS_ERROR =
   "Oops! That email and password combination doesn't work. Check your password or if you signed up with Google SSO."
+let dbClient
+test.describe('Username/password login', async () => {
+  let testUser
 
-test.describe('Username/password login', () => {
+  test.beforeAll(async () => {
+    dbClient = await getClient().connect()
+    testUser = await createUserRow(dbClient)
+  })
+
+  test.afterAll(async () => {
+    await dbClient.release()
+  })
+
   const getFormFields = (page) => {
     const emailInput = page.getByTestId('inputEmail')
     const passwordInput = page.getByTestId('inputPassword')
@@ -47,8 +57,8 @@ test.describe('Username/password login', () => {
     await expect(googleSsoButton).toBeEnabled()
 
     // Fill out the login form => login button to be enabled
-    await emailInput.fill(STUDENT_EMAIL)
-    await passwordInput.fill(STUDENT_PW)
+    await emailInput.fill(testUser.email)
+    await passwordInput.fill(testUser.password)
     await expect(loginButton).toBeEnabled()
     await expect(page).toHaveScreenshot('sign-in-btn-enabled.png')
 
@@ -57,7 +67,7 @@ test.describe('Username/password login', () => {
     await expect(loginButton).not.toBeEnabled()
 
     // Sign in successfully => Navigate to dashboard
-    await passwordInput.fill(STUDENT_PW)
+    await passwordInput.fill(testUser.password)
     await expect(loginButton).toBeEnabled()
     await loginButton.click()
     await page.waitForURL('**/dashboard')
@@ -76,7 +86,7 @@ test.describe('Username/password login', () => {
     await expect(googleSsoButton).toBeVisible()
 
     // Fill in values and submit
-    await emailInput.fill(STUDENT_EMAIL)
+    await emailInput.fill(testUser.email)
     await passwordInput.fill('incorrectPassword456')
     await expect(loginButton).toBeEnabled()
     await loginButton.click()
