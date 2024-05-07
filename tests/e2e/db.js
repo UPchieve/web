@@ -24,5 +24,8 @@ export function getClient() {
 }
 
 export function getDbUlid() {
-  return Ulid.generate().toRaw()
+  return Ulid.generate()
+    .toRaw()
+    .toLowerCase()
+    .replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, '$1-$2-$3-$4-$5')
 }

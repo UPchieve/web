@@ -52,6 +52,7 @@
           @click="end"
           class="end-session-btn"
           type="button"
+          data-testid="cancel-session-button"
         >
           Cancel
         </button>

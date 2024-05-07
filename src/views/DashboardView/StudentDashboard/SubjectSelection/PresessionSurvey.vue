@@ -1,5 +1,5 @@
 <template>
-  <div class="survey-container">
+  <div class="survey-container" data-testid="survey-container">
     <cross-icon @click="cancel()" class="cross-icon" />
     <div class="presession-survey">
       <template>
@@ -25,6 +25,7 @@
             <template v-for="response in currentQuestion.responses">
               <survey-image
                 v-if="isRowOfImages"
+                :data-testid="`survey-question-${response.responseText}`"
                 class="question__response question__response-image"
                 :key="`${response.responseId}-image`"
                 :src="response.responseDisplayImage"
@@ -47,6 +48,7 @@
                 :id="`${currentQuestion.questionId}_${response.responseId}`"
                 :radioValue="response.responseId"
                 :name="currentQuestion.questionId"
+                :data-testid="`survey-question-${response.responseText}`"
                 :checked="
                   userResponse[currentQuestion.questionId].responseId ===
                   response.responseId
@@ -77,6 +79,7 @@
             primary
             @click.native="nextStep"
             v-if="currentStep !== survey.length"
+            data-testid="presession-next-button"
             :disabled="isNextButtonDisabled"
             >Next</large-button
           >
@@ -84,6 +87,7 @@
           <large-button
             primary
             v-if="currentStep === survey.length"
+            data-testid="presession-submit"
             @click.native="submitSurvey"
             :disabled="!isSurveyComplete"
             >Start a chat</large-button

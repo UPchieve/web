@@ -1,8 +1,7 @@
 <template>
-  <div class="survey-image__container">
+  <div class="survey-image__container" @click="handleImageClick">
     <img
       :src="src"
-      @click="handleImageClick"
       class="survey-image__image"
       alt="image showing answer option, see label that appears when selected"
       :class="{

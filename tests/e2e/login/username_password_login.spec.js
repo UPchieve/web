@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { getClient } from '../db'
 import { createUserRow } from '../utils'
+import { Login } from '../page-object-models/login'
 const BAD_CREDENTIALS_ERROR =
   "Oops! That email and password combination doesn't work. Check your password or if you signed up with Google SSO."
 let dbClient
@@ -16,20 +17,6 @@ test.describe('Username/password login', async () => {
     await dbClient.release()
   })
 
-  const getFormFields = (page) => {
-    const emailInput = page.getByTestId('inputEmail')
-    const passwordInput = page.getByTestId('inputPassword')
-    const loginButton = page.getByTestId('loginButton')
-    const googleSsoButton = page.getByTestId('googleSsoButton')
-
-    return {
-      emailInput,
-      passwordInput,
-      loginButton,
-      googleSsoButton,
-    }
-  }
-
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
   })
@@ -40,36 +27,23 @@ test.describe('Username/password login', async () => {
     await expect(page).toHaveScreenshot('page-load.png')
   })
 
-  test('Logging in successfully', async ({ page }) => {
-    // Check initial form fields and buttons are present
-    const { emailInput, passwordInput, loginButton, googleSsoButton } =
-      getFormFields(page)
-    await expect(emailInput).toBeVisible()
-    await expect(passwordInput).toBeVisible()
-    await expect(loginButton).toBeVisible()
-    await expect(googleSsoButton).toBeVisible()
-
-    // Initial focus should be on the email field
-    await expect(emailInput).toBeFocused()
-
-    // Check the login buttons are enabled/disabled initially
-    await expect(loginButton).not.toBeEnabled()
-    await expect(googleSsoButton).toBeEnabled()
-
-    // Fill out the login form => login button to be enabled
-    await emailInput.fill(testUser.email)
-    await passwordInput.fill(testUser.password)
-    await expect(loginButton).toBeEnabled()
+  test('Enable/disable logic works correctly', async ({ page }) => {
+    const { email, password } = testUser
+    const loginPage = new Login(page)
+    await loginPage.isReady()
+    await loginPage.fillFormWith({ email, password })
+    await expect(loginPage.loginButton).toBeEnabled()
+    await loginPage.fillFormWith({ email, password: '' })
+    await expect(loginPage.loginButton).not.toBeEnabled()
+    await loginPage.fillFormWith({ email, password })
+    await expect(loginPage.loginButton).toBeEnabled()
     await expect(page).toHaveScreenshot('sign-in-btn-enabled.png')
+  })
 
-    // Un-fill part of the form => login button disabled
-    await passwordInput.fill('')
-    await expect(loginButton).not.toBeEnabled()
-
-    // Sign in successfully => Navigate to dashboard
-    await passwordInput.fill(testUser.password)
-    await expect(loginButton).toBeEnabled()
-    await loginButton.click()
+  test('Logging in successfully', async ({ page }) => {
+    const { email, password } = testUser
+    const loginPage = new Login(page)
+    await loginPage.loginWith({ email, password })
     await page.waitForURL('**/dashboard')
     await expect(page.getByTestId('dashboard-banner')).toBeVisible()
   })
@@ -77,24 +51,9 @@ test.describe('Username/password login', async () => {
   test('Error message appears when incorrect credentials are provided', async ({
     page,
   }) => {
-    // Check initial form fields and buttons are present
-    const { emailInput, passwordInput, loginButton, googleSsoButton } =
-      getFormFields(page)
-    await expect(emailInput).toBeVisible()
-    await expect(passwordInput).toBeVisible()
-    await expect(loginButton).toBeVisible()
-    await expect(googleSsoButton).toBeVisible()
-
-    // Fill in values and submit
-    await emailInput.fill(testUser.email)
-    await passwordInput.fill('incorrectPassword456')
-    await expect(loginButton).toBeEnabled()
-    await loginButton.click()
-
-    // Ensure we are still on the same page, and the correct error message is shown
-    const error = page.getByTestId('error')
-    await expect(error).toBeVisible()
-    await expect(error).toHaveText(BAD_CREDENTIALS_ERROR)
-    await expect(page).toHaveScreenshot('error-message.png')
+    const { email } = testUser
+    const loginPage = new Login(page)
+    await loginPage.loginWith({ email, password: 'incorrectPassword456' })
+    await loginPage.hasError(BAD_CREDENTIALS_ERROR)
   })
 })

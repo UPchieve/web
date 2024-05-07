@@ -1,6 +1,7 @@
 <template>
   <button
     v-if="showDashboardRedesign"
+    :data-testid="`${topic}-subject-card`"
     class="subject-card uc-row justify-center"
     @click="handleClick"
     :disabled="isDisabled"
@@ -11,7 +12,7 @@
       <p class="metadata">{{ metadata }}</p>
     </div>
   </button>
-  <div v-else class="SubjectCard">
+  <div v-else class="SubjectCard" :data-testid="`${topic}-subject-card`">
     <template v-if="mobileMode">
       <component
         class="SubjectCard-icon"
@@ -25,6 +26,7 @@
         <hyperlink-button
           v-if="routeTo"
           primary
+          data-testid="start-chat"
           :routeTo="routeTo"
           :disabled="isDisabled"
           >{{ buttonText }}</hyperlink-button
@@ -32,6 +34,7 @@
         <hyperlink-button
           v-else
           primary
+          data-testid="start-chat"
           @click.native="handleClick"
           :disabled="isDisabled"
           >{{ buttonText }}</hyperlink-button
@@ -51,6 +54,7 @@
         <p class="SubjectCard-subtitle">{{ subtitle }}</p>
         <dropdown-list
           v-if="subtopics"
+          :data-testid="`${title}-dropdown`"
           v-model="selectedSubtopic"
           class="SubjectCard-dropdown"
           disabledOption="Choose a subject"
@@ -63,6 +67,7 @@
       <hyperlink-button
         v-if="routeTo"
         primary
+        data-testid="start-chat"
         :routeTo="routeTo"
         :disabled="isDisabled"
         >{{ buttonText }}</hyperlink-button
@@ -70,6 +75,7 @@
       <large-button
         v-else
         primary
+        data-testid="start-chat"
         @click.native="handleClick"
         :disabled="isDisabled"
         >{{ buttonText }}</large-button

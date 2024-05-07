@@ -44,6 +44,84 @@ export const createPassword = () => {
   })
 }
 
+export const createStudent = async (dbClient, args = {}) => {
+  const params = {
+    email: args?.email ?? faker.internet.email(),
+    firstName: args?.firstName ?? faker.person.firstName(),
+    lastName: args?.lastName ?? faker.person.lastName(),
+    password: args?.password ?? createPassword(),
+    verified: args?.verified ?? true,
+    ...args,
+  }
+
+  const response = await fetch(`http://localhost:3000/auth/register/student`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(params),
+  })
+  const { user } = await response.json()
+  await dbClient.query(
+    `UPDATE users SET verified = true WHERE id = '${user.id}'`
+  )
+  return { ...params, id: user.id }
+}
+
+export const createVolunteer = async (dbClient, args = {}) => {
+  const params = {
+    email: args?.email ?? faker.internet.email(),
+    firstName: args?.firstName ?? faker.person.firstName(),
+    lastName: args?.lastName ?? faker.person.lastName(),
+    password: args?.password ?? createPassword(),
+    phone: faker.phone.number('+###########'),
+    terms: true,
+    ...args,
+  }
+
+  const response = await fetch(
+    `http://localhost:3000/auth/register/volunteer/open`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(params),
+    }
+  )
+  const { user } = await response.json()
+  await dbClient.query(
+    `UPDATE users SET verified = true WHERE id = '${user.id}'`
+  )
+  await dbClient.query(
+    `UPDATE volunteer_profiles SET approved = true, onboarded = true WHERE user_id = '${user.id}'`
+  )
+
+  return { ...params, id: user.id }
+}
+
+export const withCertifications = async (
+  dbClient,
+  { userId, certificationNames }
+) => {
+  const { rows: certificationIds } = await dbClient.query(
+    `SELECT id FROM certifications WHERE name = ANY ($1)`,
+    [certificationNames]
+  )
+  for (const id of certificationIds.map(({ id }) => id)) {
+    await dbClient.query(
+      `INSERT INTO users_certifications (user_id, certification_id) VALUES ($1, $2)`,
+      [userId, id]
+    )
+  }
+}
+
+export const endSessionsFor = async (dbClient, userId) => {
+  await dbClient.query(
+    `UPDATE sessions SET ended_at = now() WHERE student_id = '${userId}'`
+  )
+}
+
 export const hashPassword = async (password) => {
   const salt = await bcrypt.genSalt(10)
   return await bcrypt.hash(password, salt)
