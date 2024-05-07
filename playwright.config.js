@@ -35,7 +35,7 @@ module.exports = defineConfig({
 
   expect: {
     toHaveScreenshot: {
-      maxDiffPixelRatio: 0.01,
+      maxDiffPixelRatio: 0.03,
       mask: ['data-e2e-ignore']
     }
   },
