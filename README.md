@@ -122,9 +122,10 @@ If there was an existing E2E postgres or redis docker container, they will be de
 Note: You don't need to start the backend or frontend servers yourself. Playwright starts up the servers as part of test configuration with the NODE_ENV environment variable set to `test_e2e`. Playwright will fail to startup if you already have either running.
 
 ### Setup
-1. **Set your environment variable `SUBWAY_REPO_PATH` to wherever your subway project is stored on your machine.** This enables the startup script to create the dockerized e2e environment and start the subway server.
-2. By default, the subway server logs are not output into the terminal, but to change this, set `log = true` in `/tests/e2e/setup.js`. (@TODO - Parameterize this in the npm command)
-3. Now run `npm run test:e2e` or `npm run test:e2e:ui`
+1. Install chrome for playwright: `npx playwright install chrome`
+2. **Set your environment variable `SUBWAY_REPO_PATH` to wherever your subway project is stored on your machine.** This enables the startup script to create the dockerized e2e environment and start the subway server.
+3. By default, the subway server logs are not output into the terminal, but to change this, set `log = true` in `/tests/e2e/setup.js`. (@TODO - Parameterize this in the npm command)
+4. Now run `npm run test:e2e` or `npm run test:e2e:ui`
 
 ### Adding test data
 You can use the DB client exposed in the `/tests/e2e` folder to add test data to the E2E database.
