@@ -17,6 +17,7 @@
       :placeholder="placeholder"
       :search="autocompleteSchool"
       :get-result-value="getSchoolDisplayName"
+      :debounce-time="500"
       @submit="handleSelectSchool"
       @blur="onBlur"
       base-class="uc-form-autocomplete-input"

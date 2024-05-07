@@ -161,6 +161,7 @@
             :placeholder="`Search for ${getFormLabelIdentifierPossessive} school`"
             :aria-label="`Search for ${getFormLabelIdentifierPossessive} school`"
             :get-result-value="getSchoolDisplayName"
+            :debounce-time="500"
             @submit="handleSelectHighSchool"
             @blur="v$.formData.schoolId.$touch()"
             v-bind:class="{
