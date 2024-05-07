@@ -9,6 +9,7 @@
 
     <select
       :id="id"
+      data-testid="dropdown-select"
       class="DropdownList-select"
       :disabled="disabled"
       :value="value"

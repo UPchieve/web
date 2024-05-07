@@ -54,7 +54,11 @@
 
             <div class="contents" :class="chatBotContents(message)">
               <span v-if="message.hasHtml" v-html="message.contents"></span>
-              <span v-else>{{ message.contents }}</span>
+              <span
+                v-else
+                :data-testid="`message-from-user-id-${message.user}`"
+                >{{ message.contents }}</span
+              >
             </div>
             <div class="time">
               {{ message.createdAt | formatTime }}
@@ -113,6 +117,7 @@
 
       <textarea
         class="message-textarea"
+        data-testid="chat-textarea"
         @keydown.enter.prevent
         @keyup="handleOutgoingMessage"
         v-model="newMessage"

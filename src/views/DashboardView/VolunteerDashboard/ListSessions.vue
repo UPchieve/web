@@ -16,6 +16,7 @@
           v-for="session in sortedOpenSessions"
           :key="`session-${session.id}`"
           :id="session.id"
+          :data-testid="`session-row-${session.student.firstname}`"
           class="session-row"
           :class="{
             'paid-tutors-pilot-test-group': shouldHighlightSession(

@@ -40,6 +40,7 @@
           </p>
           <large-button
             v-if="mobileMode"
+            :data-testid="`start-session-${subtopic}`"
             primary
             @click.native="handleMobileStart(subtopic)"
             >{{ modalData.acceptText }}</large-button

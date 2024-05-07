@@ -3,7 +3,11 @@
     <div class="banner-template">
       <template v-if="mobileMode">
         <header class="banner-template-header">
-          <cross-icon @click="onCancel" class="banner-template-close-button" />
+          <cross-icon
+            @click="onCancel"
+            data-testid="download-app-close-button"
+            class="banner-template-close-button"
+          />
         </header>
         <slot />
       </template>
