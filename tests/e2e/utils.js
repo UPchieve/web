@@ -53,51 +53,62 @@ export const createStudent = async (dbClient, args = {}) => {
     verified: args?.verified ?? true,
     ...args,
   }
-
-  const response = await fetch(`http://localhost:3000/auth/register/student`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(params),
-  })
-  const { user } = await response.json()
-  await dbClient.query(
-    `UPDATE users SET verified = true WHERE id = '${user.id}'`
-  )
-  return { ...params, id: user.id }
+  try {
+    const response = await fetch(
+      `http://localhost:3000/auth/register/student/`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(params),
+      }
+    )
+    const { user } = await response.json()
+    await dbClient.query(
+      `UPDATE users SET verified = true WHERE id = '${user.id}'`
+    )
+    return { ...params, id: user.id }
+  } catch (e) {
+    console.dir(e, { depth: null })
+  }
 }
 
 export const createVolunteer = async (dbClient, args = {}) => {
-  const params = {
-    email: args?.email ?? faker.internet.email(),
-    firstName: args?.firstName ?? faker.person.firstName(),
-    lastName: args?.lastName ?? faker.person.lastName(),
-    password: args?.password ?? createPassword(),
-    phone: faker.phone.number('+###########'),
-    terms: true,
-    ...args,
-  }
-
-  const response = await fetch(
-    `http://localhost:3000/auth/register/volunteer/open`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(params),
+  try {
+    const params = {
+      email: args?.email ?? faker.internet.email(),
+      firstName: args?.firstName ?? faker.person.firstName(),
+      lastName: args?.lastName ?? faker.person.lastName(),
+      password: args?.password ?? createPassword(),
+      phone: faker.phone.number('+###########'),
+      terms: true,
+      ...args,
     }
-  )
-  const { user } = await response.json()
-  await dbClient.query(
-    `UPDATE users SET verified = true WHERE id = '${user.id}'`
-  )
-  await dbClient.query(
-    `UPDATE volunteer_profiles SET approved = true, onboarded = true WHERE user_id = '${user.id}'`
-  )
 
-  return { ...params, id: user.id }
+    const response = await fetch(
+      `http://localhost:3000/auth/register/volunteer/open`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(params),
+      }
+    )
+
+    const { user } = await response.json()
+    await dbClient.query(
+      `UPDATE users SET verified = true WHERE id = '${user.id}'`
+    )
+    await dbClient.query(
+      `UPDATE volunteer_profiles SET approved = true, onboarded = true WHERE user_id = '${user.id}'`
+    )
+
+    return { ...params, id: user.id }
+  } catch (e) {
+    console.dir(e, { depth: null })
+  }
 }
 
 export const withCertifications = async (

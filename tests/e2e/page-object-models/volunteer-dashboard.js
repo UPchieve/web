@@ -13,5 +13,6 @@ export class VolunteerDashboard {
       'the new student session should show up for the volunteer'
     ).toBeVisible()
     await this.page.getByTestId(`session-row-${firstName}`).click()
+    await this.page.waitForURL('**/session/**')
   }
 }
