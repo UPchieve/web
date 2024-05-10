@@ -1,7 +1,6 @@
 import sendWebNotification from '@/utils/send-web-notification'
 import StudentIcon from '@/assets/student-icon.svg'
 import Case from 'case'
-import router from '../../router'
 
 function getWaitTimeInSeconds({ createdAt }) {
   const newTime = new Date().getTime() - new Date(createdAt).getTime()
@@ -32,17 +31,17 @@ export default {
   },
 
   actions: {
-    gotoSession({ dispatch }, session) {
+    gotoSession({ dispatch }, { context, session }) {
       const { type, subTopic, id } = session
       const path = `/session/${Case.kebab(type)}/${Case.kebab(subTopic)}/${id}`
       if (type && subTopic && id) {
-        router.push(path)
+        context.$router.push(path)
       } else {
         dispatch('user/clearSession')
       }
     },
 
-    alertVolunteer({ state, dispatch, rootGetters }, session) {
+    alertVolunteer({ state, dispatch, rootGetters }, { context, session }) {
       try {
         state.newWaitingStudentAudioElement.play()
       } catch (error) {
@@ -54,7 +53,7 @@ export default {
         body: `Can you help them with ${session.subjectDisplayName}?`,
       })
       const isMobile = rootGetters['app/mobileMode']
-      const isDashboard = router.history.current.path === '/dashboard'
+      const isDashboard = context.$router.history.current.path === '/dashboard'
       if (isDashboard && isMobile) {
         return
       }
@@ -78,7 +77,7 @@ export default {
             title: `There are ${state.openSessions.length} students that need help`,
             cta: {
               text: 'Go to dashboard',
-              action: () => router.push('/'),
+              action: () => context.$router.push('/'),
             },
             type: 'secondary',
             duration: 1000 * 60 * 2,
@@ -91,7 +90,7 @@ export default {
           title: `${session.student.firstname} needs help with ${session.subjectDisplayName}`,
           cta: {
             text: 'Join session',
-            action: () => dispatch('gotoSession', session),
+            action: () => dispatch('gotoSession', { context, session }),
           },
           type: 'secondary',
           duration: 1000 * 60 * 2,
@@ -157,7 +156,10 @@ export default {
       )
     },
 
-    async handleIncomingSessions({ commit, dispatch, state }, sessions) {
+    async handleIncomingSessions(
+      { commit, dispatch, state },
+      { context, sessions }
+    ) {
       const user = this.state.user.user
       const isPaidTutor = this.getters['featureFlags/isPaidTutor']
       const isPaidTutorsPilotRunning =
@@ -165,9 +167,11 @@ export default {
       const isMutedSubjectAlertsActive =
         this.getters['featureFlags/isMutedSubjectAlertsActive']
 
-      const volunteerCanAcceptSessions =
-        !sessions || !Array.isArray(sessions) || user.isBanned
-      if (volunteerCanAcceptSessions) {
+      const cantJoinSessions =
+        !sessions ||
+        !Array.isArray(sessions) ||
+        !this.getters['volunteer/isReadyToTutor']
+      if (cantJoinSessions) {
         commit('setOpenSessions', [])
         return
       }
@@ -229,7 +233,7 @@ export default {
 
       const volunteerIsNotInSession = !this.getters['user/isSessionAlive']
       if (volunteerIsNotInSession && newSession) {
-        dispatch('alertVolunteer', newSession)
+        dispatch('alertVolunteer', { context, session: newSession })
       }
 
       // Remove any existing notifications of sessions that were picked up or canceled
@@ -239,6 +243,18 @@ export default {
       for (const removedSessionId of removedSessionIds) {
         this.dispatch('notifications/remove', removedSessionId)
       }
+    },
+  },
+
+  getters: {
+    isReadyToTutor: (state, getters, rootState, rootGetters) => {
+      return (
+        rootState.user.user.isVolunteer &&
+        rootState.user.user.isOnboarded &&
+        rootState.user.user.isApproved &&
+        !rootState.user.user.isBanned &&
+        rootGetters['user/passedUpchieve101']
+      )
     },
   },
 }

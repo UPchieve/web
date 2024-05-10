@@ -11,7 +11,8 @@ export class StudentDashboard {
     return this.page.viewportSize().width < 767
   }
 
-  async createSessionFor({ subject, topic }) {
+  async createSessionFor(sessionArgs) {
+    const { subject, topic } = sessionArgs
     const card = await this.page.getByTestId(`${subject}-subject-card`)
     if (!this.isMobile) {
       await card.getByTestId('dropdown-select').selectOption(topic)
@@ -37,5 +38,10 @@ export class StudentDashboard {
       this.page.getByTestId('cancel-session-button'),
       'should be in session without a partner'
     ).toBeVisible()
+
+    const regex = new RegExp(`.*/session/${subject}/${topic}/(.*)`)
+    return {
+      sessionId: this.page.url().match(regex)[1],
+    }
   }
 }
