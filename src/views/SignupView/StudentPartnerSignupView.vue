@@ -391,8 +391,8 @@
         <h1>You're all set!</h1>
         <p>
           An account for
-          <span data-e2e-ignore>{{ this.formData.firstName }}</span> has
-          been created.
+          <span data-e2e-ignore>{{ this.formData.firstName }}</span> has been
+          created.
         </p>
         <p>
           We have sent an email to

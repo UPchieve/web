@@ -218,10 +218,10 @@ export default {
         if (response.status === 200) {
           isAcknowledged = true
           clearTimeout(timeoutId)
-          this.$store.dispatch(
-            'volunteer/handleIncomingSessions',
-            response.sessions
-          )
+          this.$store.dispatch('volunteer/handleIncomingSessions', {
+            context: this,
+            sessions: response.sessions,
+          })
         }
       })
 
@@ -411,7 +411,10 @@ export default {
     },
     async sessions(sessions) {
       if (this.isVolunteer) {
-        this.$store.dispatch('volunteer/handleIncomingSessions', sessions)
+        this.$store.dispatch('volunteer/handleIncomingSessions', {
+          context: this,
+          sessions,
+        })
       }
     },
   },

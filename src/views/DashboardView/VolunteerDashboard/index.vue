@@ -245,7 +245,6 @@ export default {
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
       sessionPath: 'user/sessionPath',
-      hasCertification: 'user/hasCertification',
       hasSelectedAvailability: 'user/hasSelectedAvailability',
       downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
       allSubjectNames: 'subjects/allSubtopicNames',

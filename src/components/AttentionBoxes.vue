@@ -5,6 +5,7 @@
         v-for="notification in notifications"
         v-bind:key="notification.id"
         :notification="notification"
+        :data-testid="`notification-${notification.id}`"
       />
     </transition-group>
   </div>

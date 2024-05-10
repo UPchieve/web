@@ -2,6 +2,8 @@ import bcrypt from 'bcrypt'
 import { getDbUlid } from './db'
 import { faker } from '@faker-js/faker'
 import { snake } from 'case'
+import { StudentDashboard } from './page-object-models/student-dashboard'
+import { Login } from './page-object-models/login'
 
 /**
  * Inserts a row into the users table.
@@ -70,6 +72,7 @@ export const createStudent = async (dbClient, args = {}) => {
     )
     return { ...params, id: user.id }
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.dir(e, { depth: null })
   }
 }
@@ -104,9 +107,11 @@ export const createVolunteer = async (dbClient, args = {}) => {
     await dbClient.query(
       `UPDATE volunteer_profiles SET approved = true, onboarded = true WHERE user_id = '${user.id}'`
     )
+    await passUpchieve101(dbClient, user.id)
 
     return { ...params, id: user.id }
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.dir(e, { depth: null })
   }
 }
@@ -127,6 +132,26 @@ export const withCertifications = async (
   }
 }
 
+export const passUpchieve101 = async (dbClient, userId) => {
+  const trainingCourseId = 1
+  const trainingMaterialsCompleted = [
+    '7b6a76',
+    'jsn832',
+    'ps87f9',
+    'jgu55k',
+    'fj8tzq',
+  ]
+  const quizId = 22
+  await dbClient.query(
+    `INSERT INTO users_training_courses (user_id, training_course_id, complete, completed_materials, progress) VALUES ($1, $2, $3, $4, $5)`,
+    [userId, trainingCourseId, true, trainingMaterialsCompleted, 100]
+  )
+  await dbClient.query(
+    `INSERT INTO users_quizzes (user_id, quiz_id, attempts, passed) VALUES ($1, $2, $3, $4)`,
+    [userId, quizId, 1, true]
+  )
+}
+
 export const endSessionsFor = async (dbClient, userId) => {
   await dbClient.query(
     `UPDATE sessions SET ended_at = now() WHERE student_id = '${userId}'`
@@ -136,4 +161,54 @@ export const endSessionsFor = async (dbClient, userId) => {
 export const hashPassword = async (password) => {
   const salt = await bcrypt.genSalt(10)
   return await bcrypt.hash(password, salt)
+}
+
+export const loginStudent = async (browser, studentUser) => {
+  const studentContext = await browser.newContext()
+  const studentPage = await studentContext.newPage()
+  const studentDashboard = new StudentDashboard(studentPage)
+  const studentLogin = new Login(studentPage)
+  await studentLogin.goto()
+  await studentLogin.loginWith(studentUser)
+  await studentPage.waitForURL('**/dashboard')
+  if (studentDashboard.isMobile) {
+    await studentPage.getByTestId('download-app-close-button').click()
+  }
+
+  return {
+    studentContext,
+    studentPage,
+    studentDashboard,
+  }
+}
+
+export const requestSession = async (studentDashboard, sessionArgs) => {
+  const { sessionId } = await studentDashboard.createSessionFor(sessionArgs)
+
+  return {
+    sessionId,
+  }
+}
+
+export const loginVolunteer = async (browser, volunteerUser) => {
+  const volunteerContext = await browser.newContext()
+  const volunteerPage = await volunteerContext.newPage()
+  const volunteerLogin = new Login(volunteerPage)
+  await volunteerLogin.goto()
+  await volunteerLogin.loginWith(volunteerUser)
+  await volunteerPage.waitForURL('**/dashboard')
+
+  return {
+    volunteerContext,
+    volunteerPage,
+  }
+}
+
+export const setFeatureFlags = async (page, featureFlags) => {
+  await page.route('*/**/feature-flags', async (route) => {
+    const json = {
+      featureFlags,
+    }
+    await route.fulfill({ json })
+  })
 }
