@@ -28,7 +28,7 @@ test.describe('Session', async () => {
   })
 
   test.afterAll(async () => {
-    endSessionsFor(dbClient, studentUser.id)
+    await endSessionsFor(dbClient, studentUser.id)
     await dbClient.release()
   })
 
