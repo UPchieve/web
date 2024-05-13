@@ -21,6 +21,7 @@
               v-model="picked"
               type="radio"
               :id="item.val"
+              :data-testid="item.val"
             />
             <label :for="item.val" :id="'answer-' + item.val">
               {{ item.val }}. {{ item.txt }}
@@ -40,6 +41,7 @@
         PREVIOUS
       </button>
       <button
+        data-testid="btn-question-next"
         v-if="showNext"
         class="next btn"
         type="button"
@@ -48,6 +50,7 @@
         NEXT
       </button>
       <button
+        data-testid="btn-submit-quiz"
         v-if="showSubmit"
         class="submit btn"
         type="submit"

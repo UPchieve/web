@@ -1,10 +1,13 @@
 <template>
-  <div class="quiz-link" :class="statusClass">
+  <!-- TODO: Make this a button so can use `disabled` for a11y. -->
+  <div data-testid="quiz-link" class="quiz-link" :class="statusClass">
     <div class="quiz-link__cell" @click="onClick">
       <check-mark class="quiz-link__icon" :checked="isCompleted" />
       <div class="quiz-link__left">
         <div class="quiz-link__name">{{ quizName }}</div>
-        <div class="quiz-link__status">{{ statusText }}</div>
+        <div data-testid="quiz-link-status" class="quiz-link__status">
+          {{ statusText }}
+        </div>
       </div>
       <div class="quiz-link__right">
         <right-caret class="quiz-link__caret" />

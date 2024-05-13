@@ -1,5 +1,5 @@
 <template>
-  <div class="material" :class="statusClass">
+  <div data-testid="training-material" class="material" :class="statusClass">
     <div class="material__cell" @click="toggleMaterial">
       <div class="material__icon-wrapper">
         <video-icon v-if="material.type === 'video'" />
@@ -50,6 +50,7 @@
       </p>
 
       <button
+        data-testid="btn-mark-training-completed"
         v-if="this.material.isRequired"
         :disabled="this.material.isCompleted"
         class="material__complete-btn"

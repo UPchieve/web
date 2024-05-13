@@ -1,5 +1,5 @@
 <template>
-  <div class="module" :class="statusClass">
+  <div data-testid="training-module" class="module" :class="statusClass">
     <div class="module__cell" @click="toggleMaterials">
       <check-mark class="module__icon" :checked="isCompleted" />
       <div class="module__left">

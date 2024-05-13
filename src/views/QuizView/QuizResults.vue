@@ -1,7 +1,9 @@
 <template>
   <div :style="popUpBorderStyle" class="score-container">
     <div>
-      <p class="score-container--header">{{ headerMsg }}</p>
+      <p id="title-quiz-result" class="score-container--header">
+        {{ headerMsg }}
+      </p>
       <p
         :class="{
           'score--passed': quizResults.passed,
