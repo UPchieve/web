@@ -376,14 +376,18 @@ export default {
         ? user.activeSubjects
         : user.subjects
 
-      const subjects = userSubjects
-        .map((subject) => ({
+      const subjects = this.$store.state.subjects.subjects
+
+      const sortedSubjects = userSubjects.map((subject) => {
+        const displayName = subjects[subject].displayName;
+        return {
           name: subject,
           value: true,
-        }))
-        .sort((a, b) => a.name.localeCompare(b.name))
+          displayName: displayName
+        }
+      }).sort((a, b) => a.displayName.localeCompare(b.displayName))
 
-      return subjects
+      return sortedSubjects
     },
     isNotificationPermissionGranted() {
       return 'Notification' in window && Notification.permission === 'granted'
