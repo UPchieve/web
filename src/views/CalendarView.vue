@@ -27,6 +27,7 @@
           <large-button
             v-bind:class="saveButtonClass"
             type="button"
+            data-testid="save-availability-button"
             @click.native="save()"
           >
             <span v-html="saveLabel"></span>
@@ -36,8 +37,13 @@
       <div v-if="hasUserSchedule">
         <div class="tz-selector-container">
           <span>Time Zone: </span>
-          <select v-model="selectedTz" class="tz-selector" @change="tzChanged">
-            <option v-for="tz in tzList" :key="tz">
+          <select
+            v-model="selectedTz"
+            class="tz-selector"
+            @change="tzChanged"
+            data-testid="tz-selector"
+          >
+            <option v-for="tz in tzList" :key="tz" :value="tz">
               {{ tz }}
             </option>
           </select>

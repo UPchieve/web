@@ -23,6 +23,7 @@
         :selected="value"
         :flagged="readWaitTime(day, hour) > threshold"
         @click.native="updateData(day, hour)"
+        :data-testid="`${day.toLowerCase()}-${hour}`"
       />
     </div>
   </div>
