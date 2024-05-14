@@ -33,6 +33,8 @@ module.exports = defineConfig({
     trace: 'on-first-retry',
   },
 
+  ignoreSnapshots: !process.env.INCLUDE_SNAPSHOT_TESTS,
+
   expect: {
     toHaveScreenshot: {
       maxDiffPixelRatio: 0.05,
