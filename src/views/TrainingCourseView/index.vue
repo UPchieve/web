@@ -1,8 +1,12 @@
 <template>
   <div class="course">
     <div v-if="course" class="course__container">
-      <div class="course__title">{{ course.name }}</div>
-      <div class="course__description">{{ course.description }}</div>
+      <div data-testid="course-name" class="course__title">
+        {{ course.name }}
+      </div>
+      <div data-testid="course-description" class="course__description">
+        {{ course.description }}
+      </div>
       <div class="course__modules">
         <module
           v-for="module in course.modules"

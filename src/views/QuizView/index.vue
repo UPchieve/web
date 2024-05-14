@@ -92,6 +92,7 @@
                 ><span>Study</span>
               </large-button>
               <large-button
+                data-testid="btn-start-quiz"
                 primary
                 :showArrow="false"
                 @click.native="startQuiz()"

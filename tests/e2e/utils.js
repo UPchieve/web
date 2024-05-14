@@ -80,10 +80,10 @@ export const createStudent = async (dbClient, args = {}) => {
 export const createVolunteer = async (dbClient, args = {}) => {
   try {
     const params = {
-      email: args?.email ?? faker.internet.email(),
-      firstName: args?.firstName ?? faker.person.firstName(),
-      lastName: args?.lastName ?? faker.person.lastName(),
-      password: args?.password ?? createPassword(),
+      email: faker.internet.email(),
+      firstName: faker.person.firstName(),
+      lastName: faker.person.lastName(),
+      password: createPassword(),
       phone: faker.phone.number('+###########'),
       terms: true,
       ...args,
@@ -104,10 +104,13 @@ export const createVolunteer = async (dbClient, args = {}) => {
     await dbClient.query(
       `UPDATE users SET verified = true WHERE id = '${user.id}'`
     )
+    const hasOnboarded = args.hasOnboarded ?? true
     await dbClient.query(
-      `UPDATE volunteer_profiles SET approved = true, onboarded = true WHERE user_id = '${user.id}'`
+      `UPDATE volunteer_profiles SET approved = true, onboarded = ${hasOnboarded} WHERE user_id = '${user.id}'`
     )
-    await passUpchieve101(dbClient, user.id)
+    if (hasOnboarded) {
+      await passUpchieve101(dbClient, user.id)
+    }
 
     return { ...params, id: user.id }
   } catch (e) {
