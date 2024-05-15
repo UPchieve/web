@@ -196,6 +196,7 @@
           <div
             v-if="isMutedSubjectAlertsActive"
             class="subheader-subjects--right"
+            data-testid="tutoring-alerts"
           >
             Tutoring Alerts
           </div>
@@ -225,8 +226,13 @@
                   {{ subjects[subject.name].displayName }}
                 </div>
               </div>
-              <div v-if="isMutedSubjectAlertsActive" class="subjects-right">
+              <div
+                v-if="isMutedSubjectAlertsActive"
+                class="subjects-right"
+                data-testid="toggle-buttons"
+              >
                 <toggle-button
+                  :data-testid="`toggle-button-${subject.name}`"
                   :disabled="!activeEdit"
                   :value="subjectIsNotMuted(subject.name)"
                   :width="75"

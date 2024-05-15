@@ -59,15 +59,15 @@ describe('ProfileView', () => {
         },
         subjects: {
           ...subjectsModule,
-          subjects: {
-            state: {
-              subjects: {},
+          state: {
+              subjects: {
+                ...(overrides.subjects ?? {})
+              },
               training: {},
               isFetchingSubjects: false,
               isFetchingTraining: false,
             },
           },
-        },
       },
     })
     // Many tests rely on accessing the wrapper for the nested VuePhoneNumberInput component.
@@ -79,7 +79,7 @@ describe('ProfileView', () => {
   }
 
   describe('Render differences between students and volunteers', () => {
-    it.each([true, false])(
+    test.each([true, false])(
       "Should/shouldn't show the description text for what we use the phone number for when isVolunteer=%s",
       (isVolunteer) => {
         const wrapper = getWrapper({
@@ -91,7 +91,7 @@ describe('ProfileView', () => {
       }
     )
 
-    it.each([true, false])(
+    test.each([true, false])(
       "Should/shouldn't show the deactivate account option when isVolunteer=%s",
       (isVolunteer) => {
         const wrapper = getWrapper({
@@ -105,7 +105,7 @@ describe('ProfileView', () => {
       }
     )
 
-    it.each([true, false])(
+    test.each([true, false])(
       "Should show 'Remove phone number' option for students only",
       async (isVolunteer) => {
         const wrapper = getWrapper({
@@ -130,7 +130,7 @@ describe('ProfileView', () => {
       await wrapper.vm.$nextTick()
     }
 
-    it.each([
+    test.each([
       // isVolunteer, expected
       [true, false],
       [false, true],
@@ -194,5 +194,117 @@ describe('ProfileView', () => {
         wrapper.find('[data-testid="delete-phone-button"]').exists()
       ).toBeFalsy()
     })
+  })
+
+  describe('Muted Subject Alert Tests', async () => {
+    const user = {
+      isVolunteer: true,
+      subjects: ['algebraOne', 'algebraTwo', 'biology'],
+      activeSubjects: ['algebraOne', 'algebraTwo', 'biology'],
+      mutedSubjectAlerts: [],
+    }
+
+    const subjects = {
+      algebraOne: {
+        active: true,
+        displayName: 'Algebra 1',
+        name: 'algebraOne',
+        topicColor: '#E398E4',
+        topicDisplayName: 'Math',
+        topicName: 'math',
+      },
+      algebraTwo: {
+        active: true,
+        displayName: 'Algebra 2',
+        name: 'algebraTwo',
+        topicColor: '#E398E4',
+        topicDisplayName: 'Math',
+        topicName: 'math',
+      },
+      biology: {
+        active: true,
+        displayName: 'Biology',
+        name: 'biology',
+        topicColor: '#9675CE',
+        topicDisplayName: 'Science',
+        topicName: 'science',
+      },
+    }
+
+    test.each([
+      [true, true], 
+      [false, false]
+    ])
+    ('Should only show tutoring alerts column and toggle button when mute subject alert FF is on', 
+      (mutedSubjectsAlert, expected) => {
+        const wrapper = getWrapper({
+          user,
+          subjects,
+          featureFlags: {
+            getters: {
+              isMutedSubjectAlertsActive: () => mutedSubjectsAlert,
+            },
+          },
+        })
+
+        expect(
+          wrapper.find('[data-testid="tutoring-alerts"]').exists()
+        ).toEqual(expected)
+
+        expect(wrapper.find('[data-testid="toggle-buttons"]').exists()).toEqual(
+          expected
+        )
+      })
+
+      test.each([
+        [[], 'true', undefined],
+        [['algebraTwo'], undefined, 'true']
+      ])(
+        'Should set toggle button value to false when subject is toggled off and true when it is toggled on', 
+        async (mutedSubjects, valueBeforeToggle, valueAfterToggle) => {
+          const wrapper = getWrapper({
+            user: {
+              ...user,
+              mutedSubjectAlerts: mutedSubjects,
+            },
+            subjects,
+            featureFlags: {
+              getters: {
+                isMutedSubjectAlertsActive: () => true,
+              },
+            },
+          })
+
+          const clickEditSaveButton = async (wrapper) => {
+            wrapper.find('[data-testid="edit-profile-btn"]').trigger('click')
+            await wrapper.vm.$nextTick()
+          }
+
+          const toggleMutedSubject = async (wrapper) => {
+            wrapper
+              .find('[data-testid="toggle-button-algebraTwo"]')
+              .trigger('change')
+            await wrapper.vm.$nextTick()
+          }
+
+          //Before toggle
+          expect(
+            wrapper
+              .find('[data-testid="toggle-button-algebraTwo"]')
+              .attributes().value
+          ).toEqual(valueBeforeToggle)
+
+          await clickEditSaveButton(wrapper)
+          await toggleMutedSubject(wrapper)
+          await clickEditSaveButton(wrapper)
+
+          //After toggle & save
+          expect(
+            wrapper
+              .find('[data-testid="toggle-button-algebraTwo"]')
+              .attributes().value
+          ).toEqual(valueAfterToggle)
+        }
+      )
   })
 })
