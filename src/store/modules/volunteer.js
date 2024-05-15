@@ -29,7 +29,6 @@ export default {
       state.prioritySessions.delete(student)
     },
   },
-
   actions: {
     gotoSession({ dispatch }, { context, session }) {
       const { type, subTopic, id } = session
