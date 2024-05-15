@@ -12,6 +12,58 @@ variables:
   NEW_RELIC_ENABLED: "false"
   NEW_RELIC_NO_CONFIG_FILE: "true"
 
+.build:
+  stage: build
+  image: "node:20.10.0-bullseye"
+  cache: []
+  environment:
+    action: prepare
+  artifacts:
+    when: on_success
+    paths:
+      - dist/
+  allow_failure: false
+  before_script:
+    - npm ci
+  script:
+    - apt update && apt install -y curl gnupg
+    - curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh | sh
+    - doppler run --token $DOPPLER_TOKEN -- npm run build
+
+build_ax:
+  extends: .build
+  environment:
+    name: ax
+  variables:
+    DOPPLER_TOKEN: $DOPPLER_TOKEN_AX
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - when: manual
+
+.deploy:
+  stage: deploy
+  image: registry.gitlab.com/static-web-apps/azure-static-web-apps-deploy
+  variables:
+    APP_PATH: '$CI_PROJECT_DIR/dist'
+    SKIP_APP_BUILD: true
+    SKIP_API_BUILD: true
+  script:
+    - echo "Deploying SWA."
+
+deploy_ax:
+  extends: .deploy
+  environment: ax
+  resource_group: ax
+  variables:
+    API_TOKEN: $AZURE_SWA_API_TOKEN_AX
+  needs:
+    - job: build_ax
+      artifacts: true
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: on_success
+
 build_production:
   stage: build
   image: "docker:20.10.6"
