@@ -1,8 +1,8 @@
 <template>
   <div class="uc-row items-center w-full break-line-container">
-    <span class="break-line w-full"></span>
+    <span class="break-line"></span>
     <p v-if="text" class="text">{{ text }}</p>
-    <span class="break-line w-full"></span>
+    <span class="break-line"></span>
   </div>
 </template>
 
@@ -23,6 +23,7 @@ export default {
 
 .break-line {
   background-color: $c-secondary-grey;
+  flex-grow: 1;
   height: 1px;
 }
 
@@ -31,5 +32,6 @@ export default {
   font-style: italic;
   padding: 0 10px;
   margin: 0;
+  width: fit-content;
 }
 </style>

@@ -1,10 +1,9 @@
 <template>
-  <form-page-template>
+  <form-page-template :layout="formPageTemplateLayout" @submit.prevent="signIn">
     <div class="uc-form">
       <h1 class="uc-form-header" data-testid="login-heading">
         Hey, welcome back!
       </h1>
-
       <div
         v-if="error || $route.query['401'] === 'true'"
         class="alert alert-danger"
@@ -13,38 +12,24 @@
       >
         {{ error }}
       </div>
-
       <form>
-        <div class="uc-form-element">
-          <label for="inputEmail" class="uc-form-label">Email</label>
-          <input
-            id="inputEmail"
-            data-testid="inputEmail"
-            class="uc-form-text-input"
-            type="email"
-            placeholder="Enter your email address"
-            v-model="credentials.email"
-            required
-            autofocus
-          />
-        </div>
-
-        <div class="uc-form-element">
-          <label for="inputPassword" class="uc-form-label">Password</label>
-          <input
-            id="inputPassword"
-            data-testid="inputPassword"
-            class="uc-form-text-input"
-            type="password"
-            placeholder="Enter your password"
-            v-model="credentials.password"
-            required
-          />
-          <router-link to="/resetpassword" class="uc-link subtext">
-            Forgot your password?
-          </router-link>
-        </div>
-
+        <!-- TODO: Do we want autofocus? -->
+        <FormEmail
+          v-model="credentials.email"
+          testid="inputEmail"
+          :placeholder="useNewSignUpFlow ? 'Email' : 'Enter your email address'"
+          :is-required="false"
+          is-autofocused
+        />
+        <FormPassword
+          v-model="credentials.password"
+          testid="inputPassword"
+          :placeholder="useNewSignUpFlow ? 'Password' : 'Enter your password'"
+          :is-required="false"
+        />
+        <router-link to="/resetpassword" class="uc-link subtext">
+          Forgot your password?
+        </router-link>
         <button
           class="uc-form-button"
           data-testid="loginButton"
@@ -52,19 +37,23 @@
           @click.prevent="signIn"
           :disabled="!isValidForm || isLoggingIn"
         >
-          Sign In
+          {{ useNewSignUpFlow ? 'Log in' : 'Sign In' }}
         </button>
+        <LineDivider v-if="useNewSignUpFlow" text="Or continue with:" />
+        <SsoButton
+          data-testid="googleSsoButton"
+          @click="signInWithSso('google')"
+          :buttonText="useNewSignUpFlow ? 'Google' : 'Sign In with Google'"
+          ssoMethod="google"
+        />
+        <SsoButton
+          data-testid="cleverSsoButton"
+          v-if="useNewSignUpFlow"
+          @click="signInWithSso('clever')"
+          buttonText="Clever"
+          ssoMethod="clever"
+        />
       </form>
-
-      <button
-        class="uc-form-button google"
-        data-testid="googleSsoButton"
-        @click.prevent="() => signInWithSso('google')"
-        :disabled="isLoggingIn"
-      >
-        <google-logo></google-logo>
-        Sign In with Google
-      </button>
       <p class="uc-form-text">
         Need an account?
         <router-link to="/sign-up" class="uc-link">Sign Up</router-link>
@@ -74,23 +63,36 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import AnalyticsService from '@/services/AnalyticsService'
 import AuthService from '@/services/AuthService'
+import FormEmail from '@/components/FormEmail.vue'
+import FormPassword from '@/components/FormPassword.vue'
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
-import GoogleLogo from '@/assets/google_logo.svg'
+import LineDivider from '@/components/LineDivider.vue'
+import SsoButton from '@/components/SsoButton.vue'
 import { EVENTS } from '@/consts'
 import config from '../config'
 
 export default {
   components: {
+    FormEmail,
+    FormPassword,
     FormPageTemplate,
-    GoogleLogo,
+    LineDivider,
+    SsoButton,
   },
   created() {
     this.$store.dispatch('app/hideNavigation')
     localStorage.removeItem('isSSOSignUpRedirect')
+    this.formPageTemplateLayout = this.useNewSignUpFlow
+      ? 'panel-left-50p'
+      : 'card'
   },
   computed: {
+    ...mapGetters({
+      useNewSignUpFlow: 'featureFlags/useNewSignUpFlow',
+    }),
     isValidForm() {
       const { email, password } = this.credentials
       return email && password
@@ -108,7 +110,6 @@ export default {
       error =
         'Your Google account is not associated with this account. Please use your password instead.'
     }
-    this.isLoggingIn = false
     return {
       credentials: {
         email: '',
@@ -153,7 +154,6 @@ export default {
       if (provider === 'google') {
         AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_IN_WITH_GOOGLE)
       }
-
       if (provider === 'clever') {
         AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_IN_WITH_CLEVER)
       }

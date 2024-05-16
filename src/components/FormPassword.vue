@@ -14,11 +14,12 @@
     </div>
     <input
       :id="name"
+      :data-testid="testid"
       :name="name"
       :placeholder="placeholder"
       type="password"
       v-model="password"
-      @input="$emit('password', $event.target.value)"
+      @input="$emit('input', $event.target.value)"
       class="uc-form-text-input"
       :class="{
         'uc-form-text-input-invalid': hasValidationError(),
@@ -27,13 +28,13 @@
       :required="isRequired"
     />
     <div
+      v-if="metadata"
       class="metadata"
       :class="{
         'metadata error': hasValidationError(),
       }"
     >
-      Must have at least one number, one uppercase letter, one lowercase letter,
-      and be at least 8 characters long.
+      {{ metadata }}
     </div>
   </div>
 </template>
@@ -61,6 +62,14 @@ export default {
     placeholder: {
       type: String,
       default: 'Password',
+    },
+    metadata: {
+      type: String,
+      default: '',
+    },
+    testid: {
+      type: String,
+      default: '',
     },
   },
 
