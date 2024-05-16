@@ -28,6 +28,7 @@ variables:
   script:
     - apt update && apt install -y curl gnupg
     - curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh | sh
+    - 'echo "{\"version\": \"$CI_COMMIT_SHA-$CI_ENVIRONMENT_NAME\"}" > public/version.json'
     - doppler run --token $DOPPLER_TOKEN -- npm run build
 
 build_ax:
@@ -63,6 +64,7 @@ deploy_ax:
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: on_success
+    - when: manual
 
 build_production:
   stage: build
@@ -94,6 +96,7 @@ build_production:
     - echo 'https://packages.doppler.com/public/cli/alpine/any-version/main' | tee -a /etc/apk/repositories
     - apk add doppler
     - mkdir -p "$MOUNT_POINT"
+    - 'echo "{\"version\": \"$CI_COMMIT_SHA-production\"}" > public/version.json'
     # build
     # Node.js 17+ uses OpenSSL 3 which enforces stricter crypto policies, 
     # leading to errors in some crypto operations.
@@ -148,6 +151,7 @@ build_demo:
     - echo 'https://packages.doppler.com/public/cli/alpine/any-version/main' | tee -a /etc/apk/repositories
     - apk add doppler
     - mkdir -p "$MOUNT_POINT"
+    - 'echo "{\"version\": \"$CI_COMMIT_SHA-demo\"}" > public/version.json'
     # build
     # Node.js 17+ uses OpenSSL 3 which enforces stricter crypto policies, 
     # leading to errors in some crypto operations.
@@ -200,6 +204,7 @@ build_staging:
     - echo 'https://packages.doppler.com/public/cli/alpine/any-version/main' | tee -a /etc/apk/repositories
     - apk add doppler
     - mkdir -p "$MOUNT_POINT"
+    - 'echo "{\"version\": \"$CI_COMMIT_SHA-staging\"}" > public/version.json'
     # build
     # Node.js 17+ uses OpenSSL 3 which enforces stricter crypto policies, 
     # leading to errors in some crypto operations.
@@ -257,6 +262,7 @@ build_hackers:
     - echo 'https://packages.doppler.com/public/cli/alpine/any-version/main' | tee -a /etc/apk/repositories
     - apk add doppler
     - mkdir -p "$MOUNT_POINT"
+    - 'echo "{\"version\": \"$CI_COMMIT_SHA-hackers\"}" > public/version.json'
     # build
     # Node.js 17+ uses OpenSSL 3 which enforces stricter crypto policies, 
     # leading to errors in some crypto operations.

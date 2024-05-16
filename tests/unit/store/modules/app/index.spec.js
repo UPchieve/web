@@ -21,7 +21,6 @@ describe('`app` store module', () => {
       isMobileApp: false,
       isWebPageHidden: false,
       version: '',
-      currentServerVersion: '',
       csrfToken: '',
       showCsrfRefreshAlert: false,
     })
