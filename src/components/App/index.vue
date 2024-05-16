@@ -53,7 +53,7 @@ import isOutdatedMobileAppVersion from '@/utils/is-outdated-mobile-app-version'
 import AnalyticsService from '@/services/AnalyticsService'
 import FeatureFlagService from '@/services/FeatureFlagService'
 import LoggerService from '@/services/LoggerService'
-import config from '@/config'
+import VersionService from '@/services/VersionService'
 import LargeButton from '@/components/LargeButton.vue'
 import Gleap from 'gleap'
 import posthog from 'posthog-js'
@@ -85,8 +85,8 @@ export default {
     await this.$store.dispatch('app/checkEnvironment', this)
     PortalService.call('app.isLoaded')
 
-    // set version on initial load
-    this.$store.commit('app/setVersion', config.version)
+    // Get and set version on initial load.
+    await this.getCurrentServerVersion()
 
     this.setVisibilityListener()
 
@@ -134,14 +134,15 @@ export default {
   },
   methods: {
     async getCurrentServerVersion() {
-      this.$store.dispatch('app/getCurrentServerVersion', this).then(() => {
-        if (
-          this.$store.state.app.version !==
-          this.$store.state.app.currentServerVersion
-        ) {
-          this.newServerVersionAvailable = true
-        }
-      })
+      const version = await VersionService.getCurrentServerVersion()
+      if (!this.version) {
+        this.$store.commit('app/setVersion', version)
+        return
+      }
+
+      if (version !== this.version) {
+        this.newServerVersionAvailable = true
+      }
     },
     iOSFocusElements(e) {
       if (!e) {
@@ -258,6 +259,7 @@ export default {
       requestedProgressReportOverview: (state) =>
         state.user.requestedProgressReportOverview,
       showCsrfRefreshAlert: (state) => state.app.showCsrfRefreshAlert,
+      version: (state) => state.app.version,
     }),
     ...mapGetters({
       userAuthenticated: 'user/isAuthenticated',

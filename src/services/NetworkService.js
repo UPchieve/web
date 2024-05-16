@@ -12,7 +12,7 @@ const CONTACT_API_ROOT = `${config.serverRoot}/api-public/contact`
 const REFERENCE_API_ROOT = `${config.serverRoot}/api-public/reference`
 const REFERRAL_API_ROOT = `${config.serverRoot}/api-public/referral`
 const WHITEBOARD_ROOT = `${config.serverRoot}/whiteboard`
-const HEALTH_ROOT = `${config.serverRoot}/healthz`
+const VERSION_ROOT = config.appRoot
 
 const FAULT_TOLERANT_HTTP_TIMEOUT = 10000
 const FAULT_TOLERANT_HTTP_MAX_RETRY_TIMEOUT = 100000
@@ -158,7 +158,7 @@ export default {
     ).then(this._successHandler, this._errorHandler)
   },
   checkHealth() {
-    return httpGet(`${HEALTH_ROOT}`).then(
+    return httpGet(`${VERSION_ROOT}/version.json`).then(
       this._successHandler,
       this._errorHandler
     )

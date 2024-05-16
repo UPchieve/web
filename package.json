@@ -6,7 +6,7 @@
     "serve": "VITE_CJS_TRACE=true vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "doppler run --token $(op read op://private/doppler-high-line/password) -- npm run build && npx swa deploy --env production ./dist",
+    "deploy:local": "echo '{\"version\": \"$(date +%s)\"}' > public/version.json && doppler run --token $(op read op://private/doppler-high-line/password) -- npm run build && npx swa deploy --env production ./dist",
     "start": "node server.js",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
     "lint:dry": "eslint --ext .js,.vue --ignore-path .gitignore --no-fix src",
