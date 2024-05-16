@@ -44,11 +44,11 @@ export class Login {
     await this.loginButton.click()
   }
 
-  async hasError(expectedError) {
+  async hasError(expectedError, nameSuffix) {
     // Ensure we are still on the same page, and the correct error message is shown
     const error = this.page.getByTestId('error')
     await expect(error).toBeVisible()
     await expect(error).toHaveText(expectedError)
-    await expect(this.page).toHaveScreenshot('error-message.png')
+    await expect(this.page).toHaveScreenshot('error-message' + nameSuffix + '.png')
   }
 }

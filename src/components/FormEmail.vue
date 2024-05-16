@@ -14,6 +14,7 @@
     </div>
     <input
       :id="name"
+      :data-testid="testid"
       :name="name"
       class="uc-form-text-input"
       :class="{
@@ -22,9 +23,10 @@
       type="email"
       :placeholder="placeholder"
       v-model="email"
-      @input="$emit('email', $event.target.value)"
+      @input="$emit('input', $event.target.value)"
       @blur="onBlur"
       :required="isRequired"
+      :autofocus="isAutofocused"
     />
   </div>
 </template>
@@ -41,6 +43,10 @@ export default {
       type: Boolean,
       default: true,
     },
+    isAutofocused: {
+      type: Boolean,
+      default: false,
+    },
     label: {
       type: String,
       default: 'Email',
@@ -52,6 +58,10 @@ export default {
     placeholder: {
       type: String,
       default: 'What is your email?',
+    },
+    testid: {
+      type: String,
+      default: '',
     },
   },
 

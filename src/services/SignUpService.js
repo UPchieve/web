@@ -438,7 +438,14 @@ function getAccountPageDetails(to) {
         )
       ),
       getRow(null, getStudentEmailElement(to)),
-      getRow(null, { element: 'FormPassword' }),
+      getRow(null, {
+        element: 'FormPassword',
+        props: {
+          name: InputName.PASSWORD,
+          metadata:
+            'Must have at least one number, one uppercase letter, one lowercase letter, and be at least 8 characters long.',
+        },
+      }),
       // TODO: getRow(null, getTermsCheckbox()),
       getRow(
         'items-baseline',
