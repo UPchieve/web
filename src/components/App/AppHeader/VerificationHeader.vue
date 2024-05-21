@@ -1,6 +1,11 @@
 <template>
   <div id="verification-header">
-    <hamburger-button v-if="mobileMode" class="left white" :tabindex="0" />
+    <hamburger-button
+      v-if="mobileMode"
+      class="left white"
+      :tabindex="0"
+      data-testid="mobile-header-hamburger"
+    />
     <span id="header-message"
       >Your account {{ verificationMethodText }} is unverified.
     </span>

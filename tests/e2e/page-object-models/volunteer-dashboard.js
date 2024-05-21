@@ -5,6 +5,12 @@ export class VolunteerDashboard {
 
   constructor(page) {
     this.page = page
+    this.trainingLink = page.getByText('Training')
+    this.mobileMenu = page.getByTestId('mobile-header-hamburger')
+  }
+
+  get isMobile() {
+    return this.page.viewportSize().width < 767
   }
 
   async joinSessionFor(firstName) {
@@ -14,5 +20,13 @@ export class VolunteerDashboard {
     ).toBeVisible()
     await this.page.getByTestId(`session-row-${firstName}`).click()
     await this.page.waitForURL('**/session/**')
+  }
+
+  async goToTraining() {
+    if (this.isMobile) {
+      await this.mobileMenu.click()
+    }
+
+    await this.trainingLink.click()
   }
 }

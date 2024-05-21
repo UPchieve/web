@@ -36,7 +36,12 @@
         <heart-icon class="icon" />
       </sidebar-link>
 
-      <sidebar-link v-if="isVolunteer" to="/training" text="Training">
+      <sidebar-link
+        v-if="isVolunteer"
+        to="/training"
+        text="Training"
+        data-testid="training-link"
+      >
         <graduation-cap-icon class="icon" />
       </sidebar-link>
 

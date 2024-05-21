@@ -13,7 +13,7 @@
       </div>
       <div class="questionText">{{ questionText }}</div>
       <div :style="imageStyle" class="question-image" />
-      <form class="possible-answers">
+      <form class="possible-answers" data-testid="quiz-questions">
         <div v-for="(item, index) in items" :key="`item-${index}`">
           <div class="options">
             <input
@@ -46,6 +46,7 @@
         class="next btn"
         type="button"
         @click.prevent="next()"
+        data-testid="next-question"
       >
         NEXT
       </button>
@@ -55,6 +56,7 @@
         class="submit btn"
         type="submit"
         @click.prevent="submit()"
+        data-testid="submit-quiz"
       >
         SUBMIT QUIZ
       </button>

@@ -50,6 +50,7 @@
           label="Subject Certifications"
           sublabel="Complete at least 1 certification quiz in order to begin tutoring students"
           buttonSize="large"
+          data-testid="subject-certifications"
         >
           <subject-certs-drop-down
             :headers="['Certification', 'Subjects Unlocked', 'Actions']"
