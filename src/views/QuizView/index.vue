@@ -25,6 +25,7 @@
             class="review-buttons--button review-buttons--button-end"
             :showArrow="false"
             @click.native="reloadQuiz"
+            data-testid="retake-quiz"
             ><span>Retake quiz</span>
           </large-button>
         </template>

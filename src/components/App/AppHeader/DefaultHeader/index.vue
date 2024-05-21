@@ -7,7 +7,7 @@
       </div>
 
       <div class="DefaultHeader-menu-container">
-        <hamburger-button :tabindex="0" />
+        <hamburger-button :tabindex="0" data-testid="mobile-header-hamburger" />
         <activity-dot
           v-if="
             hasUnreadProgressOverviewReports &&

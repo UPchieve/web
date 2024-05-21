@@ -1,7 +1,9 @@
 <template>
   <div class="wrapper">
     <div class="review-materials__container">
-      <h1 class="header-title">{{ categoryDisplayName }} Review Materials</h1>
+      <h1 class="header-title" data-testid="review-materials-header">
+        {{ categoryDisplayName }} Review Materials
+      </h1>
       <loader v-if="isLoadingMaterials" class="loader--center" />
       <div v-else-if="error">
         <p class="error-message">
@@ -25,6 +27,7 @@
             v-for="review in reviewMaterials"
             :href="review.pdf"
             :key="review.title"
+            :data-testid="`${review.pdf}`"
           >
             <div class="review-materials__content">
               <div class="image-overlay"></div>

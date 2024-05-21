@@ -17,6 +17,7 @@
         <div class="training__cert-title">
           <span>{{ cert.displayName }}</span>
           <span
+            :data-testid="`cert-${cert.key}`"
             class="training__status"
             :class="{
               'training__status--completed': isComplete(cert.key),
@@ -61,6 +62,7 @@
           "
           class="action-btns__quiz-btn"
           :disabled="isComplete(cert.key)"
+          :data-testid="`start-quiz-btn-${cert.key}`"
         >
           <span>{{ actionButtonText(cert.key) }}</span>
         </large-button>
