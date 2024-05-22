@@ -1,21 +1,24 @@
 import config from '@/config'
 import { EVENTS, GRADES } from '@/consts'
+import store from '@/store'
 import AnalyticsService from '@/services/AnalyticsService'
 import AuthService from '@/services/AuthService'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
-import { getFormAddressee } from '@/utils/signup-utils'
+import { getFormAddressee, getLabelPrefix } from '@/utils/signup-utils'
 
 const RoutePath = {
   account: '/sign-up/student/account',
   eligibility: '/sign-up/student/eligibility',
   ineligible: '/sign-up/student/ineligible',
+  parentGuardianConfirmation: '/sign-up/student/confirmation',
   verify: '/verify',
 }
 const SignUpPage = {
   account: 'account',
   eligibility: 'eligibility',
   ineligible: 'ineligible',
+  parentGuardianConfirmation: 'confirmation',
   verify: 'verify',
 }
 /*
@@ -73,6 +76,10 @@ export function getPageDetails(to, from) {
       return getAccountPageDetails(to)
     }
 
+    if (isParentGuardianConfirmationRoute(to, from)) {
+      return getParentGuardianConfirmationDetails(to)
+    }
+
     return getEligibilityPageDetails(to)
   }
 }
@@ -112,6 +119,7 @@ async function createAccount(data) {
       [InputName.FIRST_NAME]: data[InputName.FIRST_NAME],
       [InputName.GRADE_LEVEL]: data[InputName.GRADE_LEVEL],
       [InputName.LAST_NAME]: data[InputName.LAST_NAME],
+      [InputName.PARENT_GUARDIAN_EMAIL]: data[InputName.PARENT_GUARDIAN_EMAIL],
       [InputName.PASSWORD]: data[InputName.PASSWORD],
       [InputName.REFERRED_BY_CODE]:
         window.localStorage.getItem('upcReferredByCode'),
@@ -125,7 +133,10 @@ async function createAccount(data) {
     })
     window.localStorage.removeItem('upcReferredByCode')
 
-    return getSubmitResponse(SignUpPage.verify)
+    return getSubmitResponse(
+      data.parent ? SignUpPage.parentGuardianConfirmation : SignUpPage.verify,
+      data
+    )
   } catch (err) {
     LoggerService.noticeError(err)
     return getSubmitResponse(null, null, err)
@@ -173,6 +184,20 @@ function getSubmitResponse(nextPage, data, err) {
   }
 
   switch (nextPage) {
+    case SignUpPage.eligibility:
+      return [
+        {
+          params: {
+            userType: 'student',
+            step: SignUpPage.eligibility,
+          },
+          query: {
+            parent: data.parent,
+            partner: data.partner?.key,
+          },
+        },
+        null,
+      ]
     case SignUpPage.account:
       return [
         {
@@ -196,6 +221,16 @@ function getSubmitResponse(nextPage, data, err) {
       ]
     case SignUpPage.verify:
       return [{ path: RoutePath.verify }, null]
+    case SignUpPage.parentGuardianConfirmation:
+      return [
+        {
+          params: {
+            ...data,
+            step: SignUpPage.parentGuardianConfirmation,
+          },
+        },
+        null,
+      ]
   }
 }
 
@@ -223,6 +258,17 @@ function getButtonElement(submitAction, content, classes = '') {
   }
 }
 
+function getRouterLinkElement(content, pathTo) {
+  return {
+    element: 'router-link',
+    classes: 'uc-link ml-1',
+    content: content,
+    props: {
+      to: pathTo,
+    },
+  }
+}
+
 function getSsoButton(submitAction, content, ssoMethod = 'google') {
   return {
     element: 'SsoButton',
@@ -237,14 +283,7 @@ function getSsoButton(submitAction, content, ssoMethod = 'google') {
 function getAlreadyHaveAccountElements() {
   return [
     getTextElement('p', 'Already have an account?'),
-    {
-      element: 'router-link',
-      classes: 'uc-link ml-1',
-      content: 'Log In',
-      props: {
-        to: '/login',
-      },
-    },
+    getRouterLinkElement('Log in', '/login'),
   ]
 }
 
@@ -274,15 +313,15 @@ function getZipCodeElement() {
   }
 }
 
-function getGradeSelectionElement() {
+function getGradeSelectionElement(isParentGuardian) {
   return {
     element: 'FormSelect',
     props: {
       blurEvent: EVENTS.STUDENT_SELECTED_GRADE,
       getSelectOptions: () => GRADES,
       name: InputName.GRADE_LEVEL,
-      label: 'Grade in 2023-2024',
-      placeholder: 'Grade in 2023-2024',
+      label: getLabelPrefix(isParentGuardian) + 'Grade in 2023-2024',
+      placeholder: getLabelPrefix(isParentGuardian) + 'Grade in 2023-2024',
       reduce: (option) => option.split(' ')[0],
     },
   }
@@ -313,15 +352,34 @@ function getSignUpSourceElement() {
   }
 }
 
-function getStudentEmailElement(to) {
+function getStudentEmailElement(isParentGuardian) {
   return {
     element: 'FormEmail',
     props: {
       name: InputName.EMAIL,
-      label: isParentGuardianSignUp(to) ? "Student's Email" : 'Email',
-      placeholder: isParentGuardianSignUp(to) ? "Student's Email" : 'Email',
+      label: getLabelPrefix(isParentGuardian) + 'Email',
+      placeholder: getLabelPrefix(isParentGuardian) + 'Email',
     },
   }
+}
+
+function getParentGuardianEmailElement() {
+  return {
+    element: 'FormEmail',
+    props: {
+      name: InputName.PARENT_GUARDIAN_EMAIL,
+      label: 'Your Email',
+      placeholder: 'Your Email',
+    },
+  }
+}
+
+function getSsoSectionElements() {
+  return [
+    getRow(null, getSsoButton(createAccountWithGoogle, 'Google')),
+    getRow(null, getSsoButton(createAccountWithClever, 'Clever')),
+    getRow(null, { element: 'LineDivider', props: { text: 'or' } }),
+  ]
 }
 
 function isIneligibleRoute(to) {
@@ -332,47 +390,84 @@ function isAccountRoute(to, from) {
   return to.path === RoutePath.account && from?.path === RoutePath.eligibility
 }
 
+function isParentGuardianConfirmationRoute(to, from) {
+  return (
+    to.path === RoutePath.parentGuardianConfirmation &&
+    from?.path === RoutePath.account
+  )
+}
+
 function isParentGuardianSignUp(to) {
-  return Object.keys(to.query ?? {}).some((key) => key.trim() === 'parent')
+  return to.params.parent
 }
 
 function getEligibilityPageDetails(to) {
+  function isOrganicStudentSignUp() {
+    return !to.params.partner
+  }
+  function isCodeDotOrgStudent() {
+    return to.params.partner?.key === 'code-org'
+  }
+  function isBigFutureStudent() {
+    return to.params.partner?.key === 'bigfuture'
+  }
+  function isCollegeConfidentialStudent() {
+    return to.params['utm_source'] === 'collegeconfidential'
+  }
+
   function getHeaderText() {
-    if (to.params.partner?.name) {
-      if (isCodeDotOrgStudent()) {
-        return 'Welcome to UPchieve!'
-      }
-      return `Welcome ${to.params.partner.name} ${getFormAddressee(isParentGuardianSignUp(to))}`
+    if (isParentGuardianSignUp(to)) {
+      return 'Check if your child is eligible for free tutoring with UPchieve'
+    }
+    if (isCodeDotOrgStudent()) {
+      return 'Welcome to UPchieve!'
+    }
+    if (isCollegeConfidentialStudent()) {
+      return `Get that A you deserve!`
+    }
+    const partnerName = to.params.partner?.name
+    if (partnerName) {
+      return `Welcome ${partnerName} ${getFormAddressee(isParentGuardianSignUp(to))}`
     }
 
     return 'Check if you are eligible for UPchieve'
   }
 
-  function isCodeDotOrgStudent() {
-    return to.params.partner?.key === 'code-org'
+  function getSubheaderText() {
+    const bfIntroCopy = store.getters['featureFlags/bfIntroCopy']
+    if (isBigFutureStudent() && bfIntroCopy) {
+      return bfIntroCopy
+    }
+    if (isCollegeConfidentialStudent()) {
+      return 'Students who use UPchieve get better grades in their classes and are more competitive during college admission season! Sign up for free access to the 24/7 academic support that can help you achieve your dream.'
+    }
+    if (isCodeDotOrgStudent()) {
+      return 'Create an account now to access FREE, 24/7 tutoring in all your classes, including AP Computer Science.'
+    }
   }
 
+  const isParentGuardian = isParentGuardianSignUp(to)
+  const subheaderText = getSubheaderText()
   return {
     backgroundLayout: 'panel-right-50p',
     submitAction: checkEligibility,
     rows: [
       getRow(null, getTextElement('h1', getHeaderText())),
-      isCodeDotOrgStudent()
-        ? getRow(
-            null,
-            getTextElement(
-              'p',
-              'Create an account now to access FREE, 24/7 tutoring in all your classes, including AP Computer Science.'
-            )
-          )
-        : null,
+      subheaderText ? getRow(null, getTextElement('p', subheaderText)) : null,
       getRow('justify-start', ...getAlreadyHaveAccountElements()),
-      getRow(null, getGradeSelectionElement(), getZipCodeElement()),
+      getRow(
+        null,
+        getGradeSelectionElement(isParentGuardian),
+        getZipCodeElement()
+      ),
       getRow(null, {
         element: 'FormSchoolSearch',
-        props: { name: InputName.SCHOOL_ID },
+        props: {
+          label: getLabelPrefix(isParentGuardian) + 'School Name',
+          placeholder: getLabelPrefix(isParentGuardian) + 'School Name',
+        },
       }),
-      getRow(null, getSignUpSourceElement()),
+      isOrganicStudentSignUp() ? getRow(null, getSignUpSourceElement()) : null,
       getRow(null, { element: 'br' }),
       getRow(null, getButtonElement(checkEligibility, 'Check eligibility')),
     ],
@@ -387,7 +482,7 @@ function getIneligiblePageDetails() {
     rows: [
       getRow('uc-row justify-center', {
         element: 'updog-crying',
-        classes: 'updog-crying',
+        classes: 'updog',
       }),
       getRow(
         'justify-center',
@@ -409,48 +504,95 @@ function getIneligiblePageDetails() {
 }
 
 function getAccountPageDetails(to) {
+  const isParentGuardian = isParentGuardianSignUp(to)
   return {
     backgroundLayout: 'panel-right-75p',
     submitAction: createAccount,
     rows: [
-      getRow(null, getTextElement('h1', "You're eligible for UPchieve! 🎉")),
+      getRow(
+        getTextElement(
+          'h1',
+          (isParentGuardian ? 'Your child is ' : "You're ") +
+            'eligible for UPchieve! 🎉'
+        )
+      ),
       getRow(null, getTextElement('h2', 'Create an Account')),
-      getRow(
-        null,
-        getSsoButton(createAccountWithGoogle, 'Continue with Google')
-      ),
-      getRow(
-        null,
-        getSsoButton(createAccountWithClever, 'Continue with Clever', 'clever')
-      ),
-      getRow(null, { element: 'LineDivider', props: { text: 'or' } }),
+      ...(!isParentGuardian ? getSsoSectionElements() : []),
+      isParentGuardian ? getRow(null, getParentGuardianEmailElement(to)) : null,
       getRow(
         null,
         getInputElement(
           InputName.FIRST_NAME,
           'First Name',
+          getLabelPrefix(isParentGuardian) + 'First Name',
           EVENTS.STUDENT_ENTERED_FIRST_NAME
         ),
         getInputElement(
           InputName.LAST_NAME,
           'Last Name',
+          getLabelPrefix(isParentGuardian) + 'Last Name',
           EVENTS.STUDENT_ENTERED_LAST_NAME
         )
       ),
       getRow(null, getStudentEmailElement(to)),
-      getRow(null, {
+      !isParentGuardian ? getRow(null, {
         element: 'FormPassword',
         props: {
           name: InputName.PASSWORD,
           metadata:
             'Must have at least one number, one uppercase letter, one lowercase letter, and be at least 8 characters long.',
         },
-      }),
+      }) : null,
       // TODO: getRow(null, getTermsCheckbox()),
       getRow(
         'items-baseline',
         ...getAlreadyHaveAccountElements(),
         getButtonElement(createAccount, 'Confirm', 'button-narrow ml-auto')
+      ),
+    ],
+  }
+}
+
+function getParentGuardianConfirmationDetails(to) {
+  function resetSignUp(data) {
+    return getSubmitResponse(SignUpPage.eligibility, data)
+  }
+
+  const studentEmail = to.params.studentEmail
+  return {
+    backgroundLayout: 'full',
+    classes: 'text-center screen-narrow',
+    submitAction: resetSignUp,
+    rows: [
+      getRow(
+        'justify-center',
+        getTextElement(
+          'h1',
+          'Your child should have received an email from us!'
+        )
+      ),
+      getRow('justify-center', {
+        element: 'updog-smiling',
+        classes: 'updog',
+      }),
+      getRow('justify-center', {
+        element: 'check-circled',
+      }),
+      getRow(
+        'justify-center',
+        getTextElement(
+          'p',
+          `Please confirm with your child that they in fact did receive an email from us. Email was sent to ${studentEmail}.`
+        )
+      ),
+      getRow(
+        'justify-center bold',
+        getTextElement('p', "My child didn't receive a sign up email."),
+        getRouterLinkElement('Resend email', '') // TODO: Need a new endpoint.
+      ),
+      getRow(
+        'justify-center',
+        getButtonElement(resetSignUp, 'Sign up another child', 'button-narrow')
       ),
     ],
   }

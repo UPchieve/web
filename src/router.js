@@ -156,6 +156,11 @@ const routes = [
         })
       }
 
+      const isParent = Object.keys(to.query ?? {}).some(
+        (key) => key.trim() === 'parent'
+      )
+      to.params.parent = isParent
+
       const partnerKey = to.query?.partner
       if (partnerKey && to.params.userType === 'student') {
         try {

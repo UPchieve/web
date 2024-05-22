@@ -39,7 +39,9 @@
 
 <script>
 import { useVuelidate } from '@vuelidate/core'
+import CheckCircled from '@/assets/check-circled.svg'
 import UpdogCrying from '@/assets/updog-crying.svg'
+import UpdogSmiling from '@/assets/updog-smiling.svg'
 import FormEmail from '@/components/FormEmail.vue'
 import FormInput from '@/components/FormInput.vue'
 import FormErrors from '@/components/FormErrors.vue'
@@ -55,7 +57,9 @@ import * as SignUpService from '@/services/SignUpService'
 export default {
   name: 'sign-up-forms',
   components: {
+    CheckCircled,
     UpdogCrying,
+    UpdogSmiling,
     FormEmail,
     FormInput,
     FormErrors,
@@ -158,19 +162,24 @@ p {
   margin-bottom: 12px;
 }
 
+.bold {
+  font-weight: 500;
+}
+
 .el-gap {
   gap: 10px;
 }
 
 .button-narrow {
-  max-width: 185px;
+  padding: 0 25px;
+  width: fit-content;
 }
 
 .screen-narrow {
   max-width: 512px;
 }
 
-.updog-crying {
+.updog {
   height: 185px;
 }
 </style>
