@@ -279,7 +279,10 @@ export default {
         this.hideModerationWarning()
 
         // Check for personal info/profanity in message
-        ModerationService.checkIfMessageIsClean(message).then((isClean) => {
+        ModerationService.checkIfMessageIsClean({
+          message,
+          sessionId: this.currentSession.id,
+        }).then((isClean) => {
           if (isClean) {
             this.showNewMessage(message)
           } else {
