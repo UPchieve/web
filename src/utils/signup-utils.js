@@ -1,13 +1,36 @@
+import store from '@/store'
+
+export function getLabelPrefix(isParentGuardian) {
+  return isParentGuardian ? "Child's " : ''
+}
 export function getFormLabelIdentifierPossessive(isParentGuardian) {
-  return isParentGuardian ? "the student's" : 'your'
+  if (isParentGuardian && useNewSignUpFlow()) {
+    return "your child's"
+  }
+  if (isParentGuardian) {
+    return "the student's"
+  }
+  return 'your'
 }
 
 export function getFormLabelIdentifier(isParentGuardian) {
-  return isParentGuardian ? 'the student' : 'you'
+  if (isParentGuardian && useNewSignUpFlow()) {
+    return 'your child'
+  }
+  if (isParentGuardian) {
+    return 'the student'
+  }
+  return 'you'
 }
 
 export function getFormQuestionIdentifier(isParentGuardian) {
-  return isParentGuardian ? 'Is the student' : 'Are you'
+  if (isParentGuardian && useNewSignUpFlow()) {
+    return 'Is your child'
+  }
+  if (isParentGuardian) {
+    return 'Is the student'
+  }
+  return 'Are you'
 }
 
 export function getFormAddressee(isParentGuardian) {
@@ -16,4 +39,8 @@ export function getFormAddressee(isParentGuardian) {
 
 export function getIneligibleCanAppealText(isParentGuardian) {
   return `We just need ${isParentGuardian ? 'you' : 'your parent/guardian'} to answer some more questions first!`
+}
+
+function useNewSignUpFlow() {
+  return store.getters['featureFlags/useNewSignUpFlow']
 }
