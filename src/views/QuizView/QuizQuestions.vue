@@ -46,7 +46,6 @@
         class="next btn"
         type="button"
         @click.prevent="next()"
-        data-testid="next-question"
       >
         NEXT
       </button>
@@ -56,7 +55,6 @@
         class="submit btn"
         type="submit"
         @click.prevent="submit()"
-        data-testid="submit-quiz"
       >
         SUBMIT QUIZ
       </button>

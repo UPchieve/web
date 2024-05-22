@@ -384,14 +384,16 @@ export default {
 
       const subjects = this.$store.state.subjects.subjects
 
-      const sortedSubjects = userSubjects.map((subject) => {
-        const displayName = subjects[subject].displayName;
-        return {
-          name: subject,
-          value: true,
-          displayName: displayName
-        }
-      }).sort((a, b) => a.displayName.localeCompare(b.displayName))
+      const sortedSubjects = userSubjects
+        .map((subject) => {
+          const displayName = subjects[subject].displayName
+          return {
+            name: subject,
+            value: true,
+            displayName: displayName,
+          }
+        })
+        .sort((a, b) => a.displayName.localeCompare(b.displayName))
 
       return sortedSubjects
     },

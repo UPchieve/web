@@ -7,9 +7,9 @@ export class VolunteerTraining {
     this.page = page
     this.subjectCertifications = this.page.getByTestId('subject-certifications')
     this.startQuizBtn = this.page.getByRole('button', { name: 'Start Quiz' })
-    this.submitQuiz = this.page.getByTestId('submit-quiz')
+    this.submitQuiz = this.page.getByTestId('btn-submit-quiz')
     this.quizQuestions = this.page.getByTestId('quiz-questions')
-    this.nextQuestion = this.page.getByTestId('next-question')
+    this.nextQuestion = this.page.getByTestId('btn-question-next')
     this.quizResultsHeader = this.page.getByTestId('quiz-results-header')
     this.reviewAnswersBtn = this.page.getByRole('button', {
       name: 'Review Answers',
@@ -24,14 +24,11 @@ export class VolunteerTraining {
   }
 
   async hasText(message) {
-    await expect(
-      this.page.getByText(message),
-      'has correct text'
-    ).toBeVisible()
+    await expect(this.page.getByText(message), 'has correct text').toBeVisible()
   }
-  
+
   async checkSubjectCerts() {
-    await expect(this.subjectCertifications).toBeVisible() 
+    await expect(this.subjectCertifications).toBeVisible()
   }
 
   async chooseSubject(subject) {
@@ -57,28 +54,28 @@ export class VolunteerTraining {
     await this.submitQuiz.click()
   }
 
-  async checkResults(results){
+  async checkResults(results) {
     await expect(this.quizResultsHeader).toContainText(results)
   }
 
-  async reviewAnswers(){
+  async reviewAnswers() {
     await expect(this.reviewAnswersBtn).toBeVisible()
     await expect(this.reviewConceptsBtn).toBeVisible()
     await this.reviewAnswersBtn.click()
   }
 
-  async reviewConcepts(){
+  async reviewConcepts() {
     await expect(this.reviewConceptsBtn).toBeVisible()
     await this.reviewConceptsBtn.click()
     await expect(this.reviewMaterialsHeader).toBeVisible()
   }
 
-  async startQuizFromReview(){
+  async startQuizFromReview() {
     await expect(this.startQuizBtn).toBeVisible()
     await this.startQuizBtn.click()
   }
 
-  async retakeQuiz(){
+  async retakeQuiz() {
     await expect(this.retakeQuizBtn).toBeVisible()
     await this.retakeQuizBtn.click()
   }
