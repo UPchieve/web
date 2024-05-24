@@ -97,6 +97,9 @@ function getSubmitResponse(nextPage, data, err) {
 }
 
 async function checkEligibility(data) {
+  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CHECK_MY_ELIGIBILITY, {
+    partnerKey: data.partner?.key,
+  })
   try {
     const {
       data: { isEligible },
