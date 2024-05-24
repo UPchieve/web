@@ -1,5 +1,5 @@
 <template>
-  <button class="uc-form-button sso" @click="$emit('click')">
+  <button class="uc-form-button sso" @click.prevent="$emit('click')">
     <google-logo v-if="useGoogle" />
     <clever-logo v-if="useClever" />
     {{ buttonText }}

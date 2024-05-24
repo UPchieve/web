@@ -145,9 +145,12 @@ const routes = [
     props: true,
     beforeEnter: async (to, from, next) => {
       if (
-        to.params.step !== 'eligibility' &&
+        // Students must start from one of the form first pages,
+        // unless it is an error redirect.
+        !['eligibility', 'info'].includes(to.params.step) &&
         to.params.userType === 'student' &&
-        !from.name
+        !from.name &&
+        !to.query.error
       ) {
         return next({
           name: 'SignupView',
@@ -173,6 +176,7 @@ const routes = [
               { partner: to.query.partner }
             )
             delete to.query.partner
+            return next({ path: to.path, query: to.query, params: to.params })
           } else {
             to.params.partner = studentPartner
             to.params[InputName.STUDENT_PARTNER_ORG_KEY] = studentPartner.key
@@ -183,6 +187,7 @@ const routes = [
             LoggerService.noticeError(err)
           }
           delete to.query.partner
+          return next({ path: to.path, query: to.query, params: to.params })
         }
       }
 
@@ -194,6 +199,22 @@ const routes = [
     name: 'StudentPartnerSignupView',
     component: StudentPartnerSignupView,
     meta: { loggedOutOnly: true },
+    beforeEnter: async (to, _from, next) => {
+      if (store.getters['featureFlags/useNewSignUpFlow']) {
+        return next({
+          name: 'SignupView',
+          params: {
+            step: 'info',
+            userType: 'student',
+          },
+          query: {
+            partner: to.params.partnerId,
+            ...to.query,
+          },
+        })
+      }
+      return next()
+    },
   },
   {
     path: '/signup/volunteer/:partnerId',
