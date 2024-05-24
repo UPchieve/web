@@ -270,7 +270,6 @@ export default {
       // If key pressed is Enter, send the message
       if (event.key == 'Enter') {
         const message = this.newMessage.trim()
-        this.clearMessageInput()
 
         // Early exit if message is blank
         if (isEmpty(message)) return
@@ -285,6 +284,7 @@ export default {
         }).then((isClean) => {
           if (isClean) {
             this.showNewMessage(message)
+            this.clearMessageInput()
           } else {
             this.showModerationWarning()
           }
