@@ -1,52 +1,34 @@
-import config from '@/config'
-import { EVENTS, GRADES } from '@/consts'
 import store from '@/store'
+import { GRADES, EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import AuthService from '@/services/AuthService'
-import LoggerService from '@/services/LoggerService'
+import {
+  UserType,
+  SignUpPage,
+  getFilteredPageDetails,
+  getSubmitResponseDefault,
+  continueToAccountPage,
+  createAccountWithSso,
+  getRow,
+  getTextElement,
+  getButtonElement,
+  getRouterLinkElement,
+  getSsoButton,
+  getAlreadyHaveAccountElements,
+  getInputElement,
+} from '@/services/SignUpService'
 import NetworkService from '@/services/NetworkService'
+import LoggerService from '@/services/LoggerService'
 import { getFormAddressee, getLabelPrefix } from '@/utils/signup-utils'
 
 const RoutePath = {
-  account: '/sign-up/student/account',
-  eligibility: '/sign-up/student/eligibility',
-  ineligible: '/sign-up/student/ineligible',
-  parentGuardianConfirmation: '/sign-up/student/confirmation',
-  partnerInfo: 'sign-up/student/info',
-  verify: '/verify',
+  account: `/sign-up/student/${SignUpPage.account}`,
+  eligibility: `/sign-up/student/${SignUpPage.eligibility}`,
+  ineligible: `/sign-up/student/${SignUpPage.ineligible}`,
+  parentGuardianConfirmation: `/sign-up/student/${SignUpPage.confirmation}`,
+  partnerInfo: `sign-up/student/${SignUpPage.info}`,
+  verify: `/${SignUpPage.verify}`,
 }
-const SignUpPage = {
-  account: 'account',
-  eligibility: 'eligibility',
-  ineligible: 'ineligible',
-  parentGuardianConfirmation: 'confirmation',
-  partnerInfo: 'info',
-  verify: 'verify',
-}
-/*
-TypeScript will be nice :)
-In the meantime, here are the pseudo types:
-type PageDetail = {
-  backgroundLayout: 'card' | 'panel-right-50p' etc.,
-  submitAction: (fd: FormData) => string[],
-  classes: string,
-  rows: [
-    classes: string,
-    elements: {
-      element: FormElement,
-      classes: string,
-      content: string,
-      submitAction: (fd: FormData) => SubmitActionResponse,
-      props: {
-        name: InputName
-        ...etc
-      }
-    }[],
-}
-type FormElement = 'h1' | 'p' | 'FormSelect' | 'FormInput' | 'FormEmail' etc.
-type SubmitActionResponse = [valid router object, error]
-*/
-
 // The following values are used as the `name` attribute on form elements,
 // and should match the keys in server requests.
 export const InputName = {
@@ -65,11 +47,7 @@ export const InputName = {
 }
 
 export function getPageDetails(to, from) {
-  const pd = get(to, from)
-  pd.rows = pd.rows.filter((row) => !!row)
-  return pd
-
-  function get() {
+  return getFilteredPageDetails(() => {
     if (isIneligibleRoute(to, from)) {
       return getIneligiblePageDetails()
     }
@@ -83,6 +61,37 @@ export function getPageDetails(to, from) {
     }
 
     return getFirstPageDetails(to)
+  })
+}
+
+function getSubmitResponse(nextPage, data, err) {
+  switch (nextPage) {
+    case SignUpPage.eligibility:
+      return [
+        {
+          params: {
+            userType: UserType.student,
+            step: SignUpPage.eligibility,
+          },
+          query: {
+            parent: data.parent,
+            partner: data.partner?.key,
+          },
+        },
+        null,
+      ]
+    case SignUpPage.parentGuardianConfirmation:
+      return [
+        {
+          params: {
+            ...data,
+            step: SignUpPage.parentGuardianConfirmation,
+          },
+        },
+        null,
+      ]
+    default:
+      return getSubmitResponseDefault(nextPage, data, err)
   }
 }
 
@@ -113,8 +122,9 @@ async function checkEligibility(data) {
   }
 }
 
-async function continueToAccountPage(data) {
-  return getSubmitResponse(SignUpPage.account, data)
+function ineligibleContinue() {
+  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_STUDENT_ACCESS_PAGE)
+  window.location = 'https://upchieve.org/request-access'
 }
 
 async function createAccount(data) {
@@ -158,153 +168,48 @@ function createAccountWithClever(data) {
   return createAccountWithSso('clever', data)
 }
 
-function createAccountWithSso(provider, data) {
-  try {
-    const params = new URLSearchParams({
-      provider,
-    })
-    for (const key of Object.keys(data)) {
-      if (data[key]) params.append(key, data[key])
-    }
-    const url = `${config.serverRoot}/auth/sso?${params.toString()}`
-    window.location.replace(url)
-  } catch (err) {
-    LoggerService.noticeError(err)
-    return getSubmitResponse(null, null, err)
-  }
+function isParentGuardianSignUp(to) {
+  return to.params.parent === true || to.params.parent === 'true'
 }
 
-function ineligibleContinue() {
-  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_STUDENT_ACCESS_PAGE)
-  window.location = 'https://upchieve.org/request-access'
+function isIneligibleRoute(to) {
+  return to.path === RoutePath.ineligible
 }
 
-function getSubmitResponse(nextPage, data, err) {
-  if (err) {
-    const error =
-      typeof err === 'string'
-        ? error
-        : err.response?.data?.err ?? 'Failed: Please try again.'
-    return [null, error]
-  }
-
-  switch (nextPage) {
-    case SignUpPage.eligibility:
-      return [
-        {
-          params: {
-            userType: 'student',
-            step: SignUpPage.eligibility,
-          },
-          query: {
-            parent: data.parent,
-            partner: data.partner?.key,
-          },
-        },
-        null,
-      ]
-    case SignUpPage.account:
-      return [
-        {
-          params: {
-            ...data,
-            userType: 'student',
-            step: SignUpPage.account,
-          },
-        },
-        null,
-      ]
-    case SignUpPage.ineligible:
-      return [
-        {
-          params: {
-            userType: 'student',
-            step: SignUpPage.ineligible,
-          },
-        },
-        null,
-      ]
-    case SignUpPage.verify:
-      return [{ path: RoutePath.verify }, null]
-    case SignUpPage.parentGuardianConfirmation:
-      return [
-        {
-          params: {
-            ...data,
-            step: SignUpPage.parentGuardianConfirmation,
-          },
-        },
-        null,
-      ]
-  }
+function isAccountRoute(to, from) {
+  return to.path === RoutePath.account && from?.path === RoutePath.eligibility
 }
 
-function getRow(classes = '', ...elements) {
+function isParentGuardianConfirmationRoute(to, from) {
+  return (
+    to.path === SignUpPage.parentGuardianConfirmation &&
+    from?.path === SignUpPage.account
+  )
+}
+
+function getStudentEmailElement(isParentGuardian) {
   return {
-    classes,
-    elements: elements.filter((e) => !!e),
-  }
-}
-
-function getTextElement(element, content) {
-  return {
-    element,
-    content,
-  }
-}
-
-function getButtonElement(submitAction, content, classes = '') {
-  return {
-    element: 'button',
-    classes: 'uc-form-button ' + classes,
-    content,
-    isDisabledOnInvalid: true,
-    submitAction,
-  }
-}
-
-function getRouterLinkElement(content, pathTo) {
-  return {
-    element: 'router-link',
-    classes: 'uc-link ml-1',
-    content: content,
+    element: 'FormEmail',
     props: {
-      to: pathTo,
+      name: InputName.EMAIL,
+      label: getLabelPrefix(isParentGuardian) + 'Email',
+      placeholder: getLabelPrefix(isParentGuardian) + 'Email',
     },
   }
 }
 
-function getSsoButton(submitAction, content, ssoMethod = 'google') {
+function getParentGuardianEmailElement() {
   return {
-    element: 'SsoButton',
-    submitAction,
+    element: 'FormEmail',
     props: {
-      buttonText: content,
-      ssoMethod,
+      name: InputName.PARENT_GUARDIAN_EMAIL,
+      label: 'Your Email',
+      placeholder: 'Your Email',
     },
   }
 }
 
-function getAlreadyHaveAccountElements() {
-  return [
-    getTextElement('p', 'Already have an account?'),
-    getRouterLinkElement('Log in', '/login'),
-  ]
-}
-
-function getInputElement(name, prettyName, blurEvent) {
-  return {
-    element: 'FormInput',
-    props: {
-      blurEvent,
-      name,
-      label: prettyName,
-      placeholder: prettyName,
-    },
-  }
-}
-
-function getZipCodeElement() {
+export function getZipCodeElement() {
   return {
     element: 'FormInput',
     props: {
@@ -318,7 +223,7 @@ function getZipCodeElement() {
   }
 }
 
-function getGradeSelectionElement(isParentGuardian) {
+export function getGradeSelectionElement(isParentGuardian) {
   return {
     element: 'FormSelect',
     props: {
@@ -332,7 +237,22 @@ function getGradeSelectionElement(isParentGuardian) {
   }
 }
 
-function getPartnerSitesElement(to) {
+function getSsoSectionElements() {
+  return [
+    getRow(null, getSsoButton(createAccountWithGoogle, 'Google')),
+    getRow(null, getSsoButton(createAccountWithClever, 'Clever', 'clever')),
+    getRow(
+      'justify-center italic',
+      getTextElement(
+        'p',
+        'By clicking the button above, you agree to our User Agreement'
+      )
+    ),
+    getRow(null, { element: 'LineDivider', props: { text: 'or' } }),
+  ]
+}
+
+export function getPartnerSitesElement(to) {
   const sites = to.params.partner?.sites
   if (!sites) {
     return
@@ -343,7 +263,7 @@ function getPartnerSitesElement(to) {
     props: {
       blurEvent: EVENTS.STUDENT_SELECTED_PARTNER_SITE,
       getSelectOptions: () => sites,
-      name: 'partnerOrgSiteName',
+      name: InputName.STUDENT_PARTNER_ORG_SITE_NAME,
       label: 'Site',
       placeholder: 'Site',
     },
@@ -373,62 +293,6 @@ function getSignUpSourceElement() {
       reduce: (option) => option.id,
     },
   }
-}
-
-function getStudentEmailElement(isParentGuardian) {
-  return {
-    element: 'FormEmail',
-    props: {
-      name: InputName.EMAIL,
-      label: getLabelPrefix(isParentGuardian) + 'Email',
-      placeholder: getLabelPrefix(isParentGuardian) + 'Email',
-    },
-  }
-}
-
-function getParentGuardianEmailElement() {
-  return {
-    element: 'FormEmail',
-    props: {
-      name: InputName.PARENT_GUARDIAN_EMAIL,
-      label: 'Your Email',
-      placeholder: 'Your Email',
-    },
-  }
-}
-
-function getSsoSectionElements() {
-  return [
-    getRow(null, getSsoButton(createAccountWithGoogle, 'Google')),
-    getRow(null, getSsoButton(createAccountWithClever, 'Clever', 'clever')),
-    getRow(
-      'justify-center italic',
-      getTextElement(
-        'p',
-        'By clicking the button above, you agree to our User Agreement'
-      )
-    ),
-    getRow(null, { element: 'LineDivider', props: { text: 'or' } }),
-  ]
-}
-
-function isIneligibleRoute(to) {
-  return to.path === RoutePath.ineligible
-}
-
-function isAccountRoute(to) {
-  return to.path === RoutePath.account
-}
-
-function isParentGuardianConfirmationRoute(to, from) {
-  return (
-    to.path === RoutePath.parentGuardianConfirmation &&
-    from?.path === RoutePath.account
-  )
-}
-
-function isParentGuardianSignUp(to) {
-  return to.params.parent === true || to.params.parent === 'true'
 }
 
 function getFirstPageDetails(to) {

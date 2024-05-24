@@ -51,7 +51,8 @@ import Gleap from 'gleap'
 import AnalyticsService from './services/AnalyticsService'
 import LoggerService from './services/LoggerService'
 import NetworkService, { axiosInstance } from './services/NetworkService'
-import { InputName } from '@/services/SignUpService'
+import { UserType } from '@/services/SignUpService'
+import { InputName as StudentInputName } from '@/services/SignUpService/StudentSignUpService'
 import { EVENTS } from './consts'
 import { INVALID_CSRF_ERROR } from '@/services/AuthService'
 import Case from 'case'
@@ -150,13 +151,13 @@ const routes = [
         // Students must start from one of the form first pages,
         // unless it is an error redirect.
         !['eligibility', 'info'].includes(to.params.step) &&
-        to.params.userType === 'student' &&
+        to.params.userType === UserType.student &&
         !from.name &&
         !to.query.error
       ) {
         return next({
           name: 'SignupView',
-          params: { step: 'eligibility', userType: 'student' },
+          params: { step: 'eligibility', userType: UserType.student },
           query: to.query,
         })
       }
@@ -181,7 +182,8 @@ const routes = [
             return next({ path: to.path, query: to.query, params: to.params })
           } else {
             to.params.partner = studentPartner
-            to.params[InputName.STUDENT_PARTNER_ORG_KEY] = studentPartner.key
+            to.params[StudentInputName.STUDENT_PARTNER_ORG_KEY] =
+              studentPartner.key
           }
         } catch (err) {
           // TODO: Don't throw an error if a partner with the key does not exist.
