@@ -85,6 +85,12 @@ export default {
   },
 
   async created() {
+    const error = this.$route.query.error
+    if (error) {
+      this.error = error
+      delete this.$route.query.error
+    }
+
     this.getPageDetails(this.$route)
   },
 
@@ -126,7 +132,7 @@ export default {
       for (const [key, value] of new FormData(form)) {
         data[key] = value
       }
-      const merged = { ...data, ...this.$route.params }
+      const merged = { ...data, ...this.$route.params, ...this.$route.query }
       return merged
     },
     getPageDetails(to, from) {

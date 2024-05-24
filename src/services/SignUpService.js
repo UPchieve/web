@@ -12,6 +12,7 @@ const RoutePath = {
   eligibility: '/sign-up/student/eligibility',
   ineligible: '/sign-up/student/ineligible',
   parentGuardianConfirmation: '/sign-up/student/confirmation',
+  partnerInfo: 'sign-up/student/info',
   verify: '/verify',
 }
 const SignUpPage = {
@@ -19,6 +20,7 @@ const SignUpPage = {
   eligibility: 'eligibility',
   ineligible: 'ineligible',
   parentGuardianConfirmation: 'confirmation',
+  partnerInfo: 'info',
   verify: 'verify',
 }
 /*
@@ -80,7 +82,7 @@ export function getPageDetails(to, from) {
       return getParentGuardianConfirmationDetails(to)
     }
 
-    return getEligibilityPageDetails(to)
+    return getFirstPageDetails(to)
   }
 }
 
@@ -91,9 +93,8 @@ async function checkEligibility(data) {
     } = await NetworkService.checkStudentEligibility({
       [InputName.EMAIL]: '',
       [InputName.GRADE_LEVEL]: data[InputName.GRADE_LEVEL],
-      [InputName.REFERRED_BY_CODE]: window.localStorage.getItem(
-        InputName.REFERRED_BY_CODE
-      ),
+      [InputName.REFERRED_BY_CODE]:
+        window.localStorage.getItem('upcReferredByCode'),
       [InputName.SCHOOL_ID]: data[InputName.SCHOOL_ID],
       [InputName.ZIP_CODE]: data[InputName.ZIP_CODE],
     })
@@ -110,6 +111,10 @@ async function checkEligibility(data) {
     LoggerService.noticeError(err)
     return getSubmitResponse(null, null, err)
   }
+}
+
+async function continueToAccountPage(data) {
+  return getSubmitResponse(SignUpPage.account, data)
 }
 
 async function createAccount(data) {
@@ -237,7 +242,7 @@ function getSubmitResponse(nextPage, data, err) {
 function getRow(classes = '', ...elements) {
   return {
     classes,
-    elements,
+    elements: elements.filter((e) => !!e),
   }
 }
 
@@ -327,6 +332,24 @@ function getGradeSelectionElement(isParentGuardian) {
   }
 }
 
+function getPartnerSitesElement(to) {
+  const sites = to.params.partner?.sites
+  if (!sites) {
+    return
+  }
+
+  return {
+    element: 'FormSelect',
+    props: {
+      blurEvent: EVENTS.STUDENT_SELECTED_PARTNER_SITE,
+      getSelectOptions: () => sites,
+      name: 'partnerOrgSiteName',
+      label: 'Site',
+      placeholder: 'Site',
+    },
+  }
+}
+
 function getSignUpSourceElement() {
   return {
     element: 'FormSelect',
@@ -377,7 +400,7 @@ function getParentGuardianEmailElement() {
 function getSsoSectionElements() {
   return [
     getRow(null, getSsoButton(createAccountWithGoogle, 'Google')),
-    getRow(null, getSsoButton(createAccountWithClever, 'Clever')),
+    getRow(null, getSsoButton(createAccountWithClever, 'Clever', 'clever')),
     getRow(null, { element: 'LineDivider', props: { text: 'or' } }),
   ]
 }
@@ -386,8 +409,8 @@ function isIneligibleRoute(to) {
   return to.path === RoutePath.ineligible
 }
 
-function isAccountRoute(to, from) {
-  return to.path === RoutePath.account && from?.path === RoutePath.eligibility
+function isAccountRoute(to) {
+  return to.path === RoutePath.account
 }
 
 function isParentGuardianConfirmationRoute(to, from) {
@@ -401,9 +424,18 @@ function isParentGuardianSignUp(to) {
   return to.params.parent
 }
 
-function getEligibilityPageDetails(to) {
+function getFirstPageDetails(to) {
+  function isEligibilitySignUp() {
+    return to.params.step === 'eligibility'
+  }
+  function isEligibilityAppealSignUp() {
+    return to.params.partner?.isManuallyApproved
+  }
   function isOrganicStudentSignUp() {
     return !to.params.partner
+  }
+  function isPartnerStudentSignUp() {
+    return to.params.partner
   }
   function isCodeDotOrgStudent() {
     return to.params.partner?.key === 'code-org'
@@ -427,7 +459,7 @@ function getEligibilityPageDetails(to) {
     }
     const partnerName = to.params.partner?.name
     if (partnerName) {
-      return `Welcome ${partnerName} ${getFormAddressee(isParentGuardianSignUp(to))}`
+      return `Welcome ${partnerName} ${getFormAddressee(isParentGuardianSignUp(to))}!`
     }
 
     return 'Check if you are eligible for UPchieve'
@@ -446,6 +478,20 @@ function getEligibilityPageDetails(to) {
     }
   }
 
+  function includeSchoolElement() {
+    if (isPartnerStudentSignUp()) {
+      return !to.params.partner.isSchool
+    }
+    return true
+  }
+
+  function isSchoolRequired() {
+    if (isPartnerStudentSignUp()) {
+      return to.params.partner.schoolSignupRequired
+    }
+    return true
+  }
+
   const isParentGuardian = isParentGuardianSignUp(to)
   const subheaderText = getSubheaderText()
   return {
@@ -454,22 +500,43 @@ function getEligibilityPageDetails(to) {
     rows: [
       getRow(null, getTextElement('h1', getHeaderText())),
       subheaderText ? getRow(null, getTextElement('p', subheaderText)) : null,
-      getRow('justify-start', ...getAlreadyHaveAccountElements()),
+      isPartnerStudentSignUp()
+        ? getRow(
+            'justify-start',
+            getRouterLinkElement(
+              `Not with ${to.params.partner?.name}?`,
+              '/sign-up/student/eligibility'
+            )
+          )
+        : getRow('justify-start', ...getAlreadyHaveAccountElements()),
+      isPartnerStudentSignUp()
+        ? getRow(null, getPartnerSitesElement(to))
+        : null,
       getRow(
         null,
         getGradeSelectionElement(isParentGuardian),
-        getZipCodeElement()
+        isEligibilitySignUp() ? getZipCodeElement() : null
       ),
-      getRow(null, {
-        element: 'FormSchoolSearch',
-        props: {
-          label: getLabelPrefix(isParentGuardian) + 'School Name',
-          placeholder: getLabelPrefix(isParentGuardian) + 'School Name',
-        },
-      }),
-      isOrganicStudentSignUp() ? getRow(null, getSignUpSourceElement()) : null,
+      includeSchoolElement()
+        ? getRow(null, {
+            element: 'FormSchoolSearch',
+            props: {
+              label: getLabelPrefix(isParentGuardian) + 'School Name',
+              placeholder: getLabelPrefix(isParentGuardian) + 'School Name',
+              isRequired: isSchoolRequired(),
+            },
+          })
+        : null,
+      isOrganicStudentSignUp() || isEligibilityAppealSignUp()
+        ? getRow(null, getSignUpSourceElement())
+        : null,
       getRow(null, { element: 'br' }),
-      getRow(null, getButtonElement(checkEligibility, 'Check eligibility')),
+      getRow(
+        null,
+        isEligibilitySignUp()
+          ? getButtonElement(checkEligibility, 'Check eligibility')
+          : getButtonElement(continueToAccountPage, 'Continue')
+      ),
     ],
   }
 }
