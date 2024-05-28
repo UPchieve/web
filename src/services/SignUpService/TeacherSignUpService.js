@@ -1,12 +1,14 @@
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
+import LoggerService from '@/services/LoggerService'
+import NetworkService from '@/services/NetworkService'
 import {
   SignUpPage,
   getRow,
   getTextElement,
   getInputElement,
   getButtonElement,
-  continueToAccountPage,
+  getSubmitResponseDefault as getSubmitResponse,
 } from '@/services/SignUpService'
 
 const RoutePath = {
@@ -81,10 +83,29 @@ function getEligibilityPageDetails() {
   }
 }
 
-function checkEligibility(data) {
-  // TODO: Actually check eligibility.
+async function checkEligibility(data) {
   AnalyticsService.captureEvent(EVENTS.TEACHER_CLICKED_CHECK_ELIGIBILITY)
-  return continueToAccountPage(data)
+  try {
+    const {
+      data: { isEligible },
+    } = await NetworkService.checkTeacherEligibility({
+      [InputName.SCHOOL_ID]: data[InputName.SCHOOL_ID],
+    })
+    AnalyticsService.captureEvent(
+      isEligible
+        ? EVENTS.TEACHER_ELIGIBILITY_ELIGIBLE
+        : EVENTS.TEACHER_ELIGIBILITY_INELIGIBLE,
+      { schoolId: data[InputName.SCHOOL_ID] }
+    )
+
+    return getSubmitResponse(
+      isEligible ? SignUpPage.account : SignUpPage.ineligible,
+      data
+    )
+  } catch (err) {
+    LoggerService.noticeError(err)
+    return getSubmitResponse(null, null, err)
+  }
 }
 
 function getIneligiblePageDetails() {
@@ -143,4 +164,21 @@ function getAccountPageDetails() {
 function createAccount(data) {
   // eslint-disable-next-line no-console
   console.info('Create Account!', data)
+}
+
+export async function beforeEnter(to, from, next) {
+  if (
+    // Teachers must start from the eligibility page,
+    // unless it is an error redirect.
+    to.params.step !== 'eligibility' &&
+    !from.name &&
+    !to.query.error
+  ) {
+    return next({
+      name: 'SignupView',
+      params: { step: 'eligibility', userType: to.params.userType },
+      query: to.query,
+    })
+  }
+  return next()
 }

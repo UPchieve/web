@@ -670,6 +670,13 @@ export default {
       zipCode,
     }).then(this._successHandler, this._errorHandler)
   },
+  checkTeacherEligibility({ schoolId }) {
+    const queryParams = new URLSearchParams({ schoolId }).toString()
+    return httpGet(`${ELIGIBILITY_API_ROOT}/check/teacher?${queryParams}`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
   checkIpAddress() {
     return httpGet(`${ELIGIBILITY_API_ROOT}/ip-check`).then(
       this._successHandler,

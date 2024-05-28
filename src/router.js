@@ -49,10 +49,10 @@ import ProgressReportsOverviewView from './views/ProgressReportsOverviewView.vue
 import ProgressReportsOverviewSubjectView from './views/ProgressReportsOverviewSubjectView.vue'
 import Gleap from 'gleap'
 import AnalyticsService from './services/AnalyticsService'
-import LoggerService from './services/LoggerService'
 import NetworkService, { axiosInstance } from './services/NetworkService'
 import { UserType } from '@/services/SignUpService'
-import { InputName as StudentInputName } from '@/services/SignUpService/StudentSignUpService'
+import { beforeEnter as studentBeforeEnter } from '@/services/SignUpService/StudentSignUpService'
+import { beforeEnter as teacherBeforeEnter } from '@/services/SignUpService/TeacherSignUpService'
 import { EVENTS } from './consts'
 import { INVALID_CSRF_ERROR } from '@/services/AuthService'
 import Case from 'case'
@@ -147,55 +147,17 @@ const routes = [
     meta: { loggedOutOnly: true },
     props: true,
     beforeEnter: async (to, from, next) => {
-      if (
-        // Students must start from one of the form first pages,
-        // unless it is an error redirect.
-        !['eligibility', 'info'].includes(to.params.step) &&
-        to.params.userType === UserType.student &&
-        !from.name &&
-        !to.query.error
-      ) {
-        return next({
-          name: 'SignupView',
-          params: { step: 'eligibility', userType: UserType.student },
-          query: to.query,
-        })
+      switch (to.params.userType) {
+        case UserType.student:
+          return studentBeforeEnter(to, from, next)
+        case UserType.teacher:
+          return teacherBeforeEnter(to, from, next)
+        case UserType.volunteer:
+          return next()
+        default:
+          // Unknown userType.
+          return next('/sign-up')
       }
-
-      const isParent = Object.keys(to.query ?? {}).some(
-        (key) => key.trim() === 'parent'
-      )
-      to.params.parent = isParent
-
-      const partnerKey = to.query?.partner
-      if (partnerKey && to.params.userType === 'student') {
-        try {
-          const {
-            data: { studentPartner },
-          } = await NetworkService.getStudentPartner(partnerKey)
-          if (!studentPartner || studentPartner.deactivated) {
-            AnalyticsService.captureEvent(
-              EVENTS.STUDENT_VISITED_DEACTIVATED_PARTNER,
-              { partner: to.query.partner }
-            )
-            delete to.query.partner
-            return next({ path: to.path, query: to.query, params: to.params })
-          } else {
-            to.params.partner = studentPartner
-            to.params[StudentInputName.STUDENT_PARTNER_ORG_KEY] =
-              studentPartner.key
-          }
-        } catch (err) {
-          // TODO: Don't throw an error if a partner with the key does not exist.
-          if (err.response.status !== 422) {
-            LoggerService.noticeError(err)
-          }
-          delete to.query.partner
-          return next({ path: to.path, query: to.query, params: to.params })
-        }
-      }
-
-      return next()
     },
   },
   {
