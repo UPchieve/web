@@ -67,6 +67,10 @@ export default {
       type: String,
       default: '',
     },
+    blurEvent: {
+      type: String,
+      default: EVENTS.STUDENT_ENTERED_PASSWORD,
+    },
     testid: {
       type: String,
       default: '',
@@ -108,7 +112,7 @@ export default {
     onBlur() {
       this.v$.password.$touch()
       if (this.password && !this.hasEnteredPassword) {
-        AnalyticsService.captureEvent(EVENTS.STUDENT_ENTERED_PASSWORD)
+        AnalyticsService.captureEvent(this.blurEvent)
         this.hasEnteredPassword = true
       }
     },

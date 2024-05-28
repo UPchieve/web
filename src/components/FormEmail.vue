@@ -59,6 +59,10 @@ export default {
       type: String,
       default: 'What is your email?',
     },
+    blurEvent: {
+      type: String,
+      default: EVENTS.STUDENT_ENTERED_EMAIL,
+    },
     testid: {
       type: String,
       default: '',
@@ -93,7 +97,7 @@ export default {
     onBlur() {
       this.v$.email.$touch()
       if (this.email && !this.hasEnteredEmail) {
-        AnalyticsService.captureEvent(EVENTS.STUDENT_ENTERED_EMAIL)
+        AnalyticsService.captureEvent(this.blurEvent)
         this.hasEnteredEmail = true
       }
     },
