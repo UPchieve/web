@@ -181,6 +181,12 @@ export default {
       this._errorHandler
     )
   },
+  registerTeacher(data) {
+    return httpPost(`${AUTH_ROOT}/register/teacher`, data).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
   sendReset(data) {
     return httpPost(`${AUTH_ROOT}/reset/send`, data).then(
       this._successHandler,
