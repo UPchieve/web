@@ -18,8 +18,8 @@
 
       <footer class="web-notifications-modal__footer">
         <div class="web-notifications-modal__buttons">
-          <large-button @click.native="closeModal">No thanks.</large-button>
-          <large-button primary @click.native="requestNotificationPermission"
+          <large-button @click="closeModal">No thanks.</large-button>
+          <large-button primary @click="requestNotificationPermission"
             >Yes, notify me!</large-button
           >
         </div>

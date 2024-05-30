@@ -1,11 +1,11 @@
 <template>
-  <component
-    class="icon"
-    :is="icon"
-    v-on:click="handleAction"
-    v-on:keydown.enter="handleAction"
+  <span
+    @click="handleAction"
+    @keydown.enter="handleAction"
     :tabindex="tabindex"
-  />
+  >
+    <component class="icon" :is="icon" />
+  </span>
 </template>
 
 <script>

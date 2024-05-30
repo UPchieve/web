@@ -11,18 +11,12 @@
             name="verification-method"
             :value="VERIFICATION_METHOD.EMAIL"
             v-model="verificationInputs.method"
-            @change="
-              $emit('change', {
-                ...verificationInputs,
-                method: $event.target.value,
-              })
-            "
           />
-          <label for="email-option"
-            >By email (<span class="ph-mask"
+          <label for="email-option">
+            By email (<span class="ph-mask"
               ><strong>{{ email }}</strong></span
-            >)</label
-          >
+            >)
+          </label>
         </div>
         <div id="sms-radio" class="radio-option">
           <input
@@ -32,12 +26,6 @@
             name="verification-method"
             :value="VERIFICATION_METHOD.SMS"
             v-model="verificationInputs.method"
-            @change="
-              $emit('change', {
-                ...verificationInputs,
-                method: $event.target.value,
-              })
-            "
           />
           <label for="sms-option">By text message</label>
         </div>
@@ -49,16 +37,13 @@
       v-if="verificationInputs.method === VERIFICATION_METHOD.SMS"
     >
       <label for="phone-number-input">Enter your phone number</label>
-      <vue-phone-number-input
+      <maz-phone-number-input
         id="phone-number-input"
         class="ph-mask"
+        required="true"
         v-model="phone"
-        required
-        @update="
-          $emit('change', { ...verificationInputs, phoneInputInfo: $event })
-        "
-        color="#555"
-        valid-color="#16ba97"
+        show-code-on-list
+        @update="handlePhoneUpdate"
       />
     </div>
   </div>
@@ -66,28 +51,46 @@
 
 <script>
 import { VERIFICATION_METHOD } from '@/consts'
-import VuePhoneNumberInput from 'vue-phone-number-input'
+import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 
 export default {
   components: {
-    VuePhoneNumberInput,
+    MazPhoneNumberInput,
   },
   props: {
     email: {
+      type: String,
+      required: true,
+    },
+    modelValue: {
+      type: Object,
       required: true,
     },
   },
-  model: {
-    event: 'change',
-  },
+  emits: ['update:modelValue'],
   data() {
     return {
       verificationInputs: {
-        method: VERIFICATION_METHOD.EMAIL,
-        phoneInputInfo: {},
+        ...this.modelValue,
       },
       phone: '',
     }
+  },
+  methods: {
+    handlePhoneUpdate($event) {
+      this.verificationInputs = {
+        ...this.verificationInputs,
+        phoneInputInfo: $event,
+      }
+    },
+  },
+  watch: {
+    verificationInputs: {
+      handler(newVal) {
+        this.$emit('update:modelValue', newVal)
+      },
+      deep: true,
+    },
   },
   computed: {
     VERIFICATION_METHOD() {

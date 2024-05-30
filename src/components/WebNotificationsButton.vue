@@ -1,9 +1,6 @@
 <template>
   <div v-if="isShowingNotificationButton">
-    <large-button
-      @click.native="() => setShowNotificationModal(true)"
-      class="btn"
-    >
+    <large-button @click="() => setShowNotificationModal(true)" class="btn">
       Allow browser notifications
     </large-button>
 

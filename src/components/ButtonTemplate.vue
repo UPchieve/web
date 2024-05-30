@@ -9,7 +9,12 @@
     />
   </router-link>
 
-  <button v-else :type="buttonType" class="ButtonTemplate">
+  <button
+    v-else
+    @click="$emit('click')"
+    :type="buttonType"
+    class="ButtonTemplate"
+  >
     <span>
       <slot />
     </span>
@@ -26,6 +31,7 @@ import ArrowIcon from '@/assets/arrow.svg'
 export default {
   name: 'ButtonTemplate',
   components: { ArrowIcon },
+  emits: ['click'],
   props: {
     primary: Boolean,
     routeTo: String,

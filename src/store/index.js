@@ -1,6 +1,4 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import config from '../config'
+import { createStore } from 'vuex'
 import appModule from './modules/app'
 import featureFlagsModule from './modules/feature-flags'
 import productFlagsModule from './modules/product-flags'
@@ -8,13 +6,7 @@ import userModule from './modules/user'
 import subjectsModule from './modules/subjects'
 import volunteerModule from './modules/volunteer'
 import notificationsModule from './modules/notifications'
-
-Vue.use(Vuex)
-
-// Vue devtools need to be set before initializing store and router
-if (config.devtools) {
-  Vue.config.devtools = true
-}
+import socketModule from './modules/socket'
 
 export const storeOptions = {
   modules: {
@@ -25,7 +17,8 @@ export const storeOptions = {
     subjects: subjectsModule,
     volunteer: volunteerModule,
     notifications: notificationsModule,
+    socket: socketModule,
   },
 }
 
-export default new Vuex.Store(storeOptions)
+export default createStore(storeOptions)

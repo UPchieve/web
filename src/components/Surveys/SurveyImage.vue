@@ -45,7 +45,7 @@ export default {
       required: true,
     },
   },
-
+  emits: ['survey-image-click'],
   methods: {
     handleImageClick() {
       this.$emit('survey-image-click', this.questionId, this.responseId)

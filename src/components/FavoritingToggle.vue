@@ -45,6 +45,7 @@ export default {
       default: '',
     },
   },
+  emits: ['change-favorited', 'change-favoriting'],
   created() {
     this.isFavorite = this.initialIsFavorite
   },

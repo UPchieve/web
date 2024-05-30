@@ -32,6 +32,8 @@ import Quill from 'quill'
 import QuillCursors from 'quill-cursors'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import RefreshDocumentEditorModal from '@/views/SessionView/RefreshDocumentEditorModal.vue'
+import { socket } from '@/socket'
+import { markRaw } from 'vue'
 
 Quill.register('modules/cursors', QuillCursors)
 Quill.register('modules/image', ImageCompressor)
@@ -56,11 +58,15 @@ export default {
     ...mapState({
       currentSession: (state) => state.user.session,
       isSessionConnectionAlive: (state) => state.user.isSessionConnectionAlive,
+      isConnected: (state) => state.socket.isConnected,
     }),
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
     }),
+    isSocketReadyToRequestForDoc() {
+      return [this.isConnected, this.currentSession?.id]
+    },
   },
   mounted() {
     const toolbar = [
@@ -72,35 +78,37 @@ export default {
 
     if (!this.isVolunteer) toolbar.push(['image'])
 
-    this.quillEditor = new Quill('#quill-container', {
-      placeholder: 'Type or paste something...',
-      theme: 'snow',
-      formats: [
-        'header',
-        'bold',
-        'italic',
-        'underline',
-        'strike',
-        'color',
-        'background',
-        'list',
-        'image',
-      ],
-      modules: {
-        image: {
-          quality: 0.8,
-          maxWidth: 1000,
-          maxHeight: 1000,
-          imageType: 'image/webp',
-          isVolunteer: this.isVolunteer,
+    this.quillEditor = markRaw(
+      new Quill('#quill-container', {
+        placeholder: 'Type or paste something...',
+        theme: 'snow',
+        formats: [
+          'header',
+          'bold',
+          'italic',
+          'underline',
+          'strike',
+          'color',
+          'background',
+          'list',
+          'image',
+        ],
+        modules: {
+          image: {
+            quality: 0.8,
+            maxWidth: 1000,
+            maxHeight: 1000,
+            imageType: 'image/webp',
+            isVolunteer: this.isVolunteer,
+          },
+          cursors: {
+            selectionChangeSource: 'cursor-api',
+            transformOnTextChange: true,
+          },
+          toolbar,
         },
-        cursors: {
-          selectionChangeSource: 'cursor-api',
-          transformOnTextChange: true,
-        },
-        toolbar,
-      },
-    })
+      })
+    )
 
     this.quillEditor.root.addEventListener(
       maxImagesEventName,
@@ -133,18 +141,68 @@ export default {
     this.quillEditor.on('text-change', this.quillTextChange)
     this.quillEditor.on('selection-change', this.quillSelectionChange)
 
-    this.$socket.emit('requestQuillState', {
-      sessionId: this.currentSession._id,
+    /*
+     * This seems like an anti-pattern.
+     * Any events sent before `created()` is called will be missed.
+     * Socket listeners should ideally be defined in the socket store.
+     */
+    socket.on('quillState', ({ delta }) => {
+      this.quillEditor.setContents(delta)
+      this.emptyIncomingDeltas()
+      this.isLoading = false
+      this.quillEditor.enable()
+
+      this.quillEditor
+        .getModule('cursors')
+        .createCursor('partnerCursor', 'Partner', '#16D2AA')
     })
 
-    this.quillEditor
-      .getModule('cursors')
-      .createCursor('partnerCursor', 'Partner', '#16D2AA')
+    socket.on('partnerQuillDelta', ({ delta }) => {
+      if (this.isLoading) this.incomingDeltas.push(delta)
+      else this.updateContents(delta)
+    })
+
+    socket.on('quillPartnerSelection', ({ range }) => {
+      this.quillEditor.getModule('cursors').moveCursor('partnerCursor', range)
+    })
+    /**
+     *
+     * This event lets us know the last delta that was composed to the Quill
+     * document in our server cache
+     *
+     * If the last delta stored is found in our `incomingDeltas` queue,
+     * that means the requested quill state from our server contains
+     * the last delta stored and the ones before it. Remove those from
+     * `incomingDeltas` to avoid appending duplicate deltas to the client Quill doc
+     *
+     */
+    socket.on('lastDeltaStored', ({ delta }) => {
+      if (delta) {
+        const queueCutoff = this.incomingDeltas.findIndex(
+          (pendingDelta) => pendingDelta.id === delta.id
+        )
+        this.incomingDeltas = this.incomingDeltas.slice(queueCutoff + 1)
+      }
+    })
+
+    socket.on('retryLoadingDoc', () => {
+      const maxRetries = 10
+      if (this.retries > maxRetries) {
+        this.showRefreshModal = true
+      } else {
+        this.retries++
+        socket.emit('requestQuillState', {
+          sessionId: this.currentSession._id,
+        })
+      }
+    })
+
+    if (this.isConnected && this.currentSession?.id) this.requestQuillDoc()
   },
   methods: {
     quillTextChange(delta, oldDelta, source) {
       if (source === 'user') {
-        this.$socket.emit('transmitQuillDelta', {
+        socket.emit('transmitQuillDelta', {
           sessionId: this.currentSession._id,
           delta,
         })
@@ -153,7 +211,7 @@ export default {
 
     quillSelectionChange(range, oldRange, source) {
       if (source === 'user') {
-        this.$socket.emit('transmitQuillSelection', {
+        socket.emit('transmitQuillSelection', {
           sessionId: this.currentSession._id,
           range,
         })
@@ -167,54 +225,10 @@ export default {
         this.updateContents(delta)
       }
     },
-  },
-  sockets: {
-    quillState({ delta }) {
-      this.quillEditor.setContents(delta)
-      this.emptyIncomingDeltas()
-      this.isLoading = false
-      this.quillEditor.enable()
-    },
-
-    partnerQuillDelta({ delta }) {
-      if (this.isLoading) this.incomingDeltas.push(delta)
-      else this.updateContents(delta)
-    },
-
-    quillPartnerSelection({ range }) {
-      this.quillEditor.getModule('cursors').moveCursor('partnerCursor', range)
-    },
-
-    /**
-     *
-     * This event lets us know the last delta that was composed to the Quill
-     * document in our server cache
-     *
-     * If the last delta stored is found in our `incomingDeltas` queue,
-     * that means the requested quill state from our server contains
-     * the last delta stored and the ones before it. Remove those from
-     * `incomingDeltas` to avoid appending duplicate deltas to the client Quill doc
-     *
-     */
-    lastDeltaStored({ delta }) {
-      if (delta) {
-        const queueCutoff = this.incomingDeltas.findIndex(
-          (pendingDelta) => pendingDelta.id === delta.id
-        )
-        this.incomingDeltas = this.incomingDeltas.slice(queueCutoff + 1)
-      }
-    },
-
-    retryLoadingDoc() {
-      const maxRetries = 10
-      if (this.retries > maxRetries) {
-        this.showRefreshModal = true
-      } else {
-        this.retries++
-        this.$socket.emit('requestQuillState', {
-          sessionId: this.currentSession._id,
-        })
-      }
+    requestQuillDoc() {
+      socket.emit('requestQuillState', {
+        sessionId: this.currentSession.id,
+      })
     },
   },
   watch: {
@@ -231,6 +245,10 @@ export default {
         this.quillEditor.disable()
         this.isConnecting = true
       }
+    },
+    isSocketReadyToRequestForDoc(currentVal) {
+      const [isConnected, sessionId] = currentVal
+      if (isConnected && sessionId) this.requestQuillDoc()
     },
   },
 }

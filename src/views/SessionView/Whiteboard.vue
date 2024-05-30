@@ -12,11 +12,7 @@
         v-show="!isConnected"
       />
     </transition>
-    <div
-      id="zwib-div"
-      :class="{ 'whiteboard-open': isWhiteboardOpen }"
-      ref="zwibDiv"
-    ></div>
+    <div id="zwib-div" :class="{ 'whiteboard-open': isWhiteboardOpen }"></div>
     <transition name="reset-whiteboard-error">
       <p class="whiteboard-transition-error" v-show="resetWhiteboardError">
         Unable to reset the whiteboard.
@@ -261,6 +257,8 @@ import LoadingMessage from '@/components/LoadingMessage.vue'
 import config from '../../config'
 import heic2any from 'heic2any'
 import LoggerService from '@/services/LoggerService'
+import { socket } from '@/socket'
+import { markRaw } from 'vue'
 
 export default {
   components: {
@@ -363,7 +361,20 @@ export default {
       }, 2000)
     }
   },
-  mounted() {
+  async mounted() {
+    /*
+     * This seems like an anti-pattern.
+     * Any events sent before `created()` is called will be missed.
+     * Socket listeners should ideally be defined in the socket store.
+     */
+    socket.on('resetwhiteboard', async () => {
+      window.clearInterval(this.pingPongInterval)
+      await this.zwibblerCtx.destroy()
+      this.zwibblerCtx = markRaw(null)
+
+      this.loadZwibbler()
+    })
+
     this.loadZwibbler()
   },
   methods: {
@@ -599,23 +610,14 @@ export default {
       this.showResetWhiteboardModal = !this.showResetWhiteboardModal
     },
     async resetWhiteboard() {
-      try {
-        await NetworkService.resetWhiteboard({ sessionId: this.sessionId })
-      } catch (error) {
-        this.resetWhiteboardError = true
-        setTimeout(() => {
-          this.resetWhiteboardError = false
-        }, 2000)
-        return
-      }
-
+      await NetworkService.resetWhiteboard({ sessionId: this.sessionId })
       window.clearInterval(this.pingPongInterval)
-      this.zwibblerCtx.destroy()
+      await this.zwibblerCtx.destroy()
+      this.setShouldResetWhiteboard(false)
       this.loadZwibbler()
-      this.$socket.emit('resetWhiteboard', {
+      socket.emit('resetWhiteboard', {
         sessionId: this.sessionId,
       })
-      this.setShouldResetWhiteboard(false)
     },
     async loadZwibbler() {
       const zwibblerCtx = window.Zwibbler.create('zwib-div', {
@@ -637,7 +639,7 @@ export default {
         collaborationServer: `${config.websocketRoot}/whiteboard/room/{name}`,
       })
 
-      this.zwibblerCtx = zwibblerCtx
+      this.zwibblerCtx = markRaw(zwibblerCtx)
 
       // Set paper size
       this.zwibblerCtx.setPaperSize(this.canvasWidth, this.canvasHeight)
@@ -645,12 +647,7 @@ export default {
       // Zoom to full width
       this.resizeViewRectangle()
 
-      // Join or create shared zwibbler session
-      try {
-        await this.zwibblerCtx.joinSharedSession(this.sessionId, true)
-      } catch (error) {
-        LoggerService.noticeError(error)
-      }
+      this.zwibblerCtx.joinSharedSession(this.sessionId, true)
 
       // Set up custom selection handles
       this.setSelectionHandles()
@@ -659,14 +656,16 @@ export default {
       this.zwibblerCtx.setConfig('showHints', false)
 
       // read-only until connected
-      this.zwibblerCtx.setConfig('readOnly', true)
-
+      this.zwibblerCtx.setConfig('readOnly', false)
       this.zwibblerCtx.on('connected', () => {
         this.isConnected = true
         this.zwibblerCtx.setConfig('readOnly', false)
-
         // @todo access the connection in a less sketchy way
-        const zwibblerWsConnection = this.zwibblerCtx.Ec.rc.rc
+        // 'development' assumes using zwibbler-demo, other envs use zwibbler2 from the cdn
+        const zwibblerWsConnection =
+          import.meta.env.NODE_ENV === 'development'
+            ? this.zwibblerCtx.zc.Pb.Pb
+            : this.zwibblerCtx.Ec.rc.rc
         const zwibblerOnMessage = zwibblerWsConnection.onmessage
         const zwibblerOnClose = zwibblerWsConnection.onclose
         // Intercept Zwibbler's websocket message handler
@@ -681,7 +680,11 @@ export default {
           // Access Zwibbler's internal WebSocket stream name
           // Note: the properties to access will change with every new Zwibbler update
           const err = new Error(
-            `WebSocket for the ${userType} in session ${this.sessionId} closed with code ${closeEvent.code} for reason: "${closeEvent.reason}" in room: ${this.zwibblerCtx.Ec.cC}`
+            `WebSocket for the ${userType} in session ${this.sessionId} closed with code ${closeEvent.code} for reason: "${closeEvent.reason}" in room: ${
+              import.meta.env.NODE_ENV === 'development'
+                ? this.zwibblerCtx.zc.Hx
+                : this.zwibblerCtx.Ec.cC
+            }`
           )
           LoggerService.noticeError(err)
           zwibblerOnClose(closeEvent)
@@ -753,7 +756,7 @@ export default {
       })
     },
   },
-  beforeDestroy() {
+  beforeUnmount() {
     window.removeEventListener(
       'orientationchange',
       this.handleOrientationChange,
@@ -762,7 +765,10 @@ export default {
     window.removeEventListener('resize', this.handleWindowResize, false)
     window.clearInterval(this.pingPongInterval)
     // zwibbler cleanup
-    this.zwibblerCtx.leaveSharedSession()
+    // This method doesn't exist in zwibbler-demo.js
+    if (this.zwibblerCtx?.leaveSharedSession) {
+      this.zwibblerCtx.leaveSharedSession()
+    }
     this.zwibblerCtx.destroy()
   },
   watch: {
@@ -772,13 +778,6 @@ export default {
     },
     shouldResetWhiteboard(currentValue) {
       if (currentValue) this.resetWhiteboard()
-    },
-  },
-  sockets: {
-    resetWhiteboard() {
-      window.clearInterval(this.pingPongInterval)
-      this.zwibblerCtx.destroy()
-      this.loadZwibbler()
     },
   },
 }

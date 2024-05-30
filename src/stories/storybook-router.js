@@ -71,7 +71,7 @@ const storyRouterDecorator = (links = {}, routerProps = {}) => {
       router,
       components: { WrappedComponent },
       template: '<wrapped-component/>',
-      beforeDestroy: function () {
+      beforeUnmount: function () {
         // Remove the afterEach callback from the router list to not
         // accumulate callbacks called for every route action (in practice
         // this means that without this the action is executed as many

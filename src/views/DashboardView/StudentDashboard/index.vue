@@ -278,27 +278,33 @@ export default {
         this.$store.dispatch('app/header/show', activeHeaderData)
       }
     },
-    isCollegePrepAdActive(currentValue, prevValue) {
-      if (
-        currentValue[0] &&
-        currentValue[1] &&
-        (!prevValue[0] || !prevValue[1]) &&
-        !getCookie('hasSeenTellThemCollegePrepModal') &&
-        this.user.pastSessions.length >= 1
-      ) {
-        this.showTellThemCollegePrepModal = true
-      }
+    isCollegePrepAdActive: {
+      handler(currentValue, prevValue) {
+        if (
+          currentValue[0] &&
+          currentValue[1] &&
+          (!prevValue[0] || !prevValue[1]) &&
+          !getCookie('hasSeenTellThemCollegePrepModal') &&
+          this.user.pastSessions.length >= 1
+        ) {
+          this.showTellThemCollegePrepModal = true
+        }
+      },
+      deep: true,
     },
-    isProcrastinationPreventionReminderActive(currentValue, prevValue) {
-      if (
-        currentValue[0] &&
-        currentValue[1] &&
-        (!prevValue[0] || !prevValue[1]) &&
-        !localStorage.getItem('hasSeenProcrastinationPreventionModal') &&
-        this.user.pastSessions.length >= 1
-      ) {
-        this.showThemProcrastinationPreventionModal = true
-      }
+    isProcrastinationPreventionReminderActive: {
+      handler(currentValue, prevValue) {
+        if (
+          currentValue[0] &&
+          currentValue[1] &&
+          (!prevValue[0] || !prevValue[1]) &&
+          !localStorage.getItem('hasSeenProcrastinationPreventionModal') &&
+          this.user.pastSessions.length >= 1
+        ) {
+          this.showThemProcrastinationPreventionModal = true
+        }
+      },
+      deep: true,
     },
     userAndOrbitalSegment: {
       handler: function (currentValue, prevValue) {

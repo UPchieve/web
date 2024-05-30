@@ -1,38 +1,23 @@
-import Vue from 'vue'
-import VueSocketIO from 'vue-socket.io'
-import VueRouter from 'vue-router'
+import { createApp } from 'vue'
 import vSelect from 'vue-select'
 import VueStarRating from 'vue-star-rating'
-import ToggleButton from 'vue-js-toggle-button'
-import moment from 'moment'
 import App from './components/App/index.vue'
 import PortalService from './services/PortalService'
 import router from './router'
 import store from './store'
-import config from './config'
 import NetworkService, { axiosInstance } from './services/NetworkService'
 import { backOff } from 'exponential-backoff'
-import io from 'socket.io-client'
 import AnalyticsService from './services/AnalyticsService'
 import FeatureFlagService from './services/FeatureFlagService'
 import LoggerService from './services/LoggerService'
+import { socket } from './socket'
+import { IonicVue } from '@ionic/vue'
 
 LoggerService.init()
 
-// Prevent production tip on startup
-Vue.config.productionTip = false
-
-// Set up SocketIO
-Vue.use(
-  new VueSocketIO({
-    connection: io(config.socketAddress, {
-      autoConnect: false,
-    }),
-  })
-)
-
-// Set up Vue Router
-Vue.use(VueRouter)
+// remove any existing listeners after HMR
+socket.off()
+store.dispatch('socket/bindEvents')
 
 // Set up PortalGun (connection to native app)
 PortalService.listen()
@@ -52,31 +37,6 @@ PortalService.call('top.getData').then(handlePortalData)
 // Called any time app is running (warm start) & push notification is received
 PortalService.call('top.onData', handlePortalData)
 
-// Set up vue-select
-Vue.component('v-select', vSelect)
-
-// Set up vue-star-rating
-Vue.component('vue-star-rating', VueStarRating)
-
-// Set up vue-js-toggle-button
-Vue.use(ToggleButton)
-
-// Filter for formatting times
-Vue.filter('formatTime', (value) => {
-  if (value) {
-    return moment(value).format('h:mm a')
-  }
-})
-
-function initVue() {
-  // Create Vue instance
-  new Vue({
-    router,
-    store,
-    render: (h) => h(App),
-  }).$mount('#app')
-}
-
 async function main() {
   try {
     const [csrfResponse, flagsResponse] = await Promise.allSettled([
@@ -95,7 +55,16 @@ async function main() {
     )
     AnalyticsService.init()
 
-    initVue()
+    // Create Vue instance
+    const app = createApp(App)
+    app.use(store)
+    app.use(IonicVue)
+    app.use(router)
+    // Set up vue-select
+    app.component('v-select', vSelect)
+    // Set up vue-star-rating
+    app.component('vue-star-rating', VueStarRating)
+    app.mount('#mount')
   } catch (err) {
     LoggerService.noticeError(err)
   }

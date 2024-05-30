@@ -14,11 +14,11 @@
       <div class="trouble-matching-modal__footer">
         <div class="trouble-matching-modal__buttons">
           <large-button
-            @click.native="closeModal"
+            @click="closeModal"
             class="trouble-matching-modal__buttons--cancel"
             >Keep Waiting</large-button
           >
-          <large-button primary @click.native="end">End Session</large-button>
+          <large-button primary @click="end">End Session</large-button>
         </div>
       </div>
     </div>
@@ -50,7 +50,7 @@ export default {
     // than this modal in mobile. Hide the buttons when mounted
     if (this.mobileMode) this.displaySessionToggleButtons(false)
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.mobileMode) this.displaySessionToggleButtons(true)
   },
   methods: {

@@ -1,13 +1,15 @@
 // This file is imported in App.vue.
-
 @import '~/bootstrap/scss/bootstrap';
-@import '~/bootstrap-vue/src/index.scss';
+// @import '~/bootstrap-vue/src/index.scss';
 @import '~/typeface-work-sans/index.css';
-@import '~/vue-select/src/scss/vue-select.scss';
-@import '~/vue-phone-number-input/dist/vue-phone-number-input.css';
+@import '~/vue-select/dist/vue-select.css';
+@import 'maz-ui/styles'; // or import 'maz-ui/css/main.css'
 @import '~/quill/dist/quill.core.css';
 @import '~/quill/dist/quill.snow.css';
 @import '@/assets/fonts/upchieve_icon_font.css';
+
+/* Core CSS required for Ionic components to work properly */
+@import '~/@ionic/vue/css/core.css';
 
 @import 'layout/utils';
 @import 'layout/form';
@@ -26,6 +28,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
+  height: 100%;
+}
+
+#mount {
   height: 100%;
 }
 

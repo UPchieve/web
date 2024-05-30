@@ -20,13 +20,13 @@
               <large-button
                 class="procrastination-modal__buttons-button"
                 :showArrow="false"
-                @click.native="handleNotStruggling"
+                @click="handleNotStruggling"
                 >No</large-button
               >
               <large-button
                 class="procrastination-modal__buttons-button"
                 :showArrow="false"
-                @click.native="handleIsStruggling"
+                @click="handleIsStruggling"
                 >Yes</large-button
               >
             </div>
@@ -44,16 +44,15 @@
           <section class="procrastination-modal__section">
             <label class="procrastination-modal__phone-input">
               Phone Number
-              <vue-phone-number-input
+              <maz-phone-number-input
                 class="procrastination-modal__phone-input"
+                required="true"
                 v-model="phone"
-                :error="phone !== '' && !isValidPhone"
-                :default-country-code="internationalPhoneInfo.country"
-                :required="true"
-                color="#555"
-                valid-color="#16ba97"
+                :country-code="internationalPhoneInfo.country"
+                show-code-on-list
                 @update="(data) => (phoneInput = data)"
               />
+
               <span v-if="!isValidPhone && isPhoneError" class="error"
                 >Please enter a valid phone number.</span
               >
@@ -65,13 +64,13 @@
             >
               <large-button
                 class="procrastination-modal__buttons-button"
-                @click.native="showCancelConfirmation"
+                @click="showCancelConfirmation"
                 >No, thanks</large-button
               >
               <large-button
                 class="procrastination-modal__buttons-button procrastination-modal__buttons-button--primary"
-                @click.native="handlePhoneSubmission"
-                :disabled="phone === '' || !isValidPhone"
+                @click="handlePhoneSubmission"
+                :disabled="phone === '' || !isValidPhone ? true : null"
                 primary
                 :showArrow="false"
                 >Done</large-button
@@ -96,7 +95,7 @@
               class="procrastination-modal__buttons procrastination-modal__buttons--col"
             >
               <large-button
-                @click.native="handleSelectNewTime"
+                @click="handleSelectNewTime"
                 class="procrastination-modal__buttons-button"
                 >Change reminder</large-button
               >
@@ -104,8 +103,8 @@
                 class="procrastination-modal__buttons-button procrastination-modal__buttons-button--primary"
                 primary
                 :showArrow="false"
-                @click.native="handleRemindMeSubmit"
-                :disabled="phone === '' || !this.isValidPhone"
+                @click="handleRemindMeSubmit"
+                :disabled="phone === '' || !this.isValidPhone ? true : null"
                 >Done</large-button
               >
             </div>
@@ -154,8 +153,8 @@
                 class="procrastination-modal__buttons-button procrastination-modal__buttons-button--primary"
                 primary
                 :showArrow="false"
-                @click.native="handleReminderTimeUpdate"
-                :disabled="!(reminderDate && reminderTime)"
+                @click="handleReminderTimeUpdate"
+                :disabled="!(reminderDate && reminderTime) ? true : null"
                 >Continue</large-button
               >
             </div>
@@ -176,14 +175,14 @@
             >
               <large-button
                 class="procrastination-modal__buttons-button"
-                @click.native="handleDontRemindMe"
+                @click="handleDontRemindMe"
                 >Don't remind me</large-button
               >
               <large-button
                 class="procrastination-modal__buttons-button procrastination-modal__buttons-button--primary"
                 primary
                 :showArrow="false"
-                @click.native="handleRemindMeClick"
+                @click="handleRemindMeClick"
                 >Remind me</large-button
               >
             </div>
@@ -203,7 +202,7 @@ import NetworkService from '@/services/NetworkService'
 import { EVENTS } from '@/consts'
 import moment from 'moment'
 import UpdogProcrastination from '@/assets/updog-procrastination.svg'
-import VuePhoneNumberInput from 'vue-phone-number-input'
+import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import CrossIcon from '@/assets/cross.svg'
 import PhoneNumber from 'awesome-phonenumber'
 
@@ -213,7 +212,7 @@ export default {
     Modal,
     LargeButton,
     UpdogProcrastination,
-    VuePhoneNumberInput,
+    MazPhoneNumberInput,
     CrossIcon,
   },
   data() {
@@ -234,7 +233,6 @@ export default {
     localStorage.setItem('hasSeenProcrastinationPreventionModal', true)
     const pn = new PhoneNumber(this.user.phone)
     this.phone = pn.getNumber('national')
-    // Hack to initially mock the vue-phone-number-input data
     this.phoneInput = {
       isValid: true,
       e164: pn.getNumber('e164'),

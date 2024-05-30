@@ -14,6 +14,7 @@ export default {
       required: true,
     },
   },
+  emits: ['input'],
   model: {
     prop: 'value',
     event: 'input',

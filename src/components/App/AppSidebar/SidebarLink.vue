@@ -13,8 +13,8 @@
         active-class="SidebarLink--active"
         :to="to"
         tag="div"
-        @click.native="$store.dispatch('app/sidebar/collapse')"
-        @keydown.enter.native="navigate()"
+        @click="$store.dispatch('app/sidebar/collapse')"
+        @keydown.enter="navigate()"
         :tabindex="isCollapsed && mobileMode ? -1 : 0"
       >
         <slot></slot>
@@ -65,7 +65,7 @@ export default {
       this.$store.dispatch('app/sidebar/collapse')
 
       // necessary because router-link doesn't provide a way to set modifiers, like
-      // keydown.enter.native, in the event prop
+      // keydown.enter, in the event prop
       this.$router.push(this.to)
     },
   },

@@ -115,5 +115,8 @@ export default {
 
 .ml-1 {
   margin-left: 0.25rem;
+  border: 1px solid $c-secondary-grey;
+  padding: 0.4em;
+  border-radius: 2px;
 }
 </style>

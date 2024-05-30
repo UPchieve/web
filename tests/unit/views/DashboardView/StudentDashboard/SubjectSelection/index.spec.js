@@ -1,14 +1,11 @@
 import appModule from '@/store/modules/app'
 import SubjectSelection from '@/views/DashboardView/StudentDashboard/SubjectSelection/index.vue'
 import SubjectCard from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectCard.vue'
-import { createLocalVue, shallowMount } from '@vue/test-utils'
-import Vuex from 'vuex'
-
-const localVue = createLocalVue()
-localVue.use(Vuex)
+import { shallowMount } from '@vue/test-utils'
+import { createStore } from 'vuex'
 
 const getWrapper = (mobileMode = false) => {
-  const store = new Vuex.Store({
+  const store = createStore({
     modules: {
       app: {
         ...appModule,
@@ -20,7 +17,7 @@ const getWrapper = (mobileMode = false) => {
     },
   })
 
-  return shallowMount(SubjectSelection, { localVue, store })
+  return shallowMount(SubjectSelection, { global: { plugins: [store] } })
 }
 
 // TODO: create a mock file for subjects we move from using topics.js

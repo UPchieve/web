@@ -1,5 +1,5 @@
 <template>
-  <banner-template :onCancel="onCancel">
+  <banner-template @close="onCancel">
     <component v-if="bannerComponent" v-bind:is="bannerComponent" />
   </banner-template>
 </template>

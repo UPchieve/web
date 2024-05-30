@@ -6,11 +6,8 @@
       </h3>
     </template>
 
-    <template v-for="(cert, index) in certData">
-      <div
-        class="training__cert"
-        :key="`cert-title-${cert.displayName}-${index}`"
-      >
+    <template v-for="cert in certData" :key="`training-${cert.displayName}`">
+      <div class="training__cert">
         <check-mark :checked="isComplete(cert.key)" />
         <div class="training__cert-title">
           <span>{{ cert.displayName }}</span>
@@ -27,7 +24,7 @@
         </div>
       </div>
 
-      <div class="training__progress-bar" :key="`bar-${index}`">
+      <div class="training__progress-bar">
         <div
           class="training__progress-bar--bg"
           :style="{ width: progressBarNumber(cert.key) + '%' }"
@@ -43,7 +40,7 @@
         </div>
       </div>
 
-      <div class="action-btns" :key="`action-btns-${index}`">
+      <div class="action-btns">
         <router-link
           :to="`/training/course/${cert.key}`"
           class="action-btns__review-link"
@@ -66,10 +63,7 @@
         </large-button>
       </div>
 
-      <div
-        :key="`border-${cert.displayName}-${index}`"
-        class="training__row-border"
-      />
+      <div class="training__row-border" />
     </template>
   </div>
 </template>

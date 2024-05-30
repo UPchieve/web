@@ -209,9 +209,9 @@
 
         <large-button
           class="feedback__submit-button"
-          :disabled="!hasAnsweredAtLeastOneQuestion()"
+          :disabled="!hasAnsweredAtLeastOneQuestion() ? true : null"
           primary
-          @click.native="submitFeedback"
+          @click="submitFeedback"
         >
           Submit
         </large-button>

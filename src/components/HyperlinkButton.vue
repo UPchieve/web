@@ -5,6 +5,7 @@
     :class="buttonClasses"
     :showArrow="showArrow"
     :buttonType="buttonType"
+    @click="$emit('click')"
   >
     <slot />
   </button-template>
@@ -35,6 +36,7 @@ export default {
       }
     },
   },
+  emits: ['click'],
 }
 </script>
 

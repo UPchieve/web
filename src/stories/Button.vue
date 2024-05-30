@@ -47,6 +47,7 @@ export default {
     },
   },
 
+  emits: ['onClick'],
   methods: {
     onClick() {
       this.$emit('onClick')

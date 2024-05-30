@@ -9,10 +9,7 @@
     <span id="header-message"
       >Your account {{ verificationMethodText }} is unverified.
     </span>
-    <LargeButton
-      id="verify-button"
-      primary
-      @click.native="openVerificationModal"
+    <LargeButton id="verify-button" primary @click="openVerificationModal"
       >Verify now!</LargeButton
     >
     <VerificationModal

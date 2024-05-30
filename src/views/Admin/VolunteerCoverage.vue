@@ -51,7 +51,7 @@
             <v-select
               v-model="selected"
               :options="allSubjectNames"
-              @input="getAvailability"
+              @update:modelValue="getAvailability"
             >
             </v-select>
           </div>
@@ -150,9 +150,9 @@ export default {
         })
     },
 
-    /* Helper function that finds the total number of hours where the number of 
-        volunteers is less/greater than the inputted value. The boolean 
-        lessThan represents if we are calculating for less than (true) or greater 
+    /* Helper function that finds the total number of hours where the number of
+        volunteers is less/greater than the inputted value. The boolean
+        lessThan represents if we are calculating for less than (true) or greater
         than (false)*/
     getNumHours(lessThan) {
       const totalHours = 0

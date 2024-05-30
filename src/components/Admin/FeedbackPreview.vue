@@ -2,7 +2,7 @@
   <div class="feedback-preview">
     <div v-if="sessionRating" class="feedback-preview__star-rating">
       <vue-star-rating
-        v-model="sessionRating"
+        :rating="sessionRating"
         inactive-color="#ffffff"
         active-color="#36d2aa"
         border-color="#36d2aa"

@@ -44,7 +44,7 @@ const defaultHeaderData = {
 export default {
   name: 'subject-selection',
   components: { SubjectCard, Loader },
-  beforeDestroy() {
+  beforeUnmount() {
     clearTimeout(this.waitingPeriodTimeoutId)
   },
   data() {

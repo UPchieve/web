@@ -1,20 +1,15 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils'
-import Vuex from 'vuex'
+import { shallowMount } from '@vue/test-utils'
+import { createStore } from 'vuex'
 import userModule from '@/store/modules/user'
 import appModule from '@/store/modules/app'
 import ContactView from '@/views/ContactView.vue'
-import vSelect from 'vue-select'
-
-const localVue = createLocalVue()
-localVue.use(Vuex)
-localVue.component('v-select', vSelect)
 
 const getWrapper = (
   isAuthenticated = true,
   isVolunteer = false,
   isVerified = true
 ) => {
-  const store = new Vuex.Store({
+  const store = createStore({
     modules: {
       app: {
         ...appModule,
@@ -32,13 +27,13 @@ const getWrapper = (
 
   store.dispatch('user/addToUser', { email: 'avalid@email.com' })
 
-  return shallowMount(ContactView, { localVue, store })
+  return shallowMount(ContactView, { global: { plugins: [store] } })
 }
 
 describe('ContactView', () => {
   it('renders ContactView', () => {
     const wrapper = getWrapper(true, true, true)
-    expect(wrapper.is(ContactView))
+    expect(wrapper.findComponent(ContactView))
     expect(wrapper.find('.contact__header').text()).toEqual('Contact Us')
   })
 

@@ -11,15 +11,15 @@
       :id="id"
       data-testid="dropdown-select"
       class="DropdownList-select"
-      :disabled="disabled"
-      :value="value"
-      @input="$emit('input', $event.target.value)"
+      :disabled="disabled ? true : null"
+      :value="modelValue"
+      @input="$emit('update:modelValue', $event.target.value)"
     >
       <option v-if="disabledOption" selected disabled value>
         {{ disabledOption }}
       </option>
       <option v-for="(option, index) in options" :key="index" :value="option">
-        {{ optionDisplay[option] || option }}
+        {{ optionDisplay?.[option] || option }}
       </option>
     </select>
   </div>
@@ -27,15 +27,17 @@
 
 <script>
 export default {
+  compatConfig: { COMPONENT_V_MODEL: false },
   props: {
     id: String,
     label: String,
-    value: String,
+    modelValue: String,
     disabled: Boolean,
     disabledOption: String,
     options: Array,
     optionDisplay: Object,
   },
+  emits: ['update:modelValue'],
 }
 </script>
 

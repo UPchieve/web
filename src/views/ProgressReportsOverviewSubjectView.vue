@@ -507,7 +507,7 @@ export default {
     await this.getProgressReportOverviewSubjectStats()
     await this.generatePage()
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.destroyChart()
     window.removeEventListener('resize', this.reloadChart)
   },

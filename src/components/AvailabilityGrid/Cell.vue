@@ -1,8 +1,8 @@
 <template>
-  <div v-if="selectable" :class="cellClasses">
+  <div v-if="selectable" :class="cellClasses" @click="$emit('click')">
     <ClockIcon v-if="flagged" class="Cell-icon clock-icon" />
   </div>
-  <div v-else :class="cellClasses">
+  <div v-else :class="cellClasses" @click="$emit('click')">
     {{ content }}
   </div>
 </template>
@@ -13,6 +13,7 @@ import ClockIcon from '@/assets/clock.svg'
 export default {
   name: 'Cell',
   components: { ClockIcon },
+  emits: ['click'],
   props: {
     content: {
       type: String,

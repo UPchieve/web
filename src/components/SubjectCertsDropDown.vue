@@ -6,11 +6,11 @@
       </h3>
     </template>
 
-    <template v-for="(cert, index) in certData">
-      <div
-        class="training__cert"
-        :key="`cert-title-${cert.displayName}-${index}`"
-      >
+    <template
+      v-for="cert in certData"
+      :key="`subject-certs-${cert.displayName}`"
+    >
+      <div class="training__cert">
         <check-mark
           :checked="isComplete(cert.key) || hasUnlockedSubject(cert.key)"
         />
@@ -28,10 +28,7 @@
         </div>
       </div>
 
-      <div
-        :key="`subjects-${cert.displayName}-${index}`"
-        class="training__subjects-unlocked"
-      >
+      <div class="training__subjects-unlocked">
         <span v-if="isLargeDevice" class="training__subjects-unlocked--mobile"
           >Subjects Unlocked:</span
         >
@@ -43,7 +40,7 @@
         >
       </div>
 
-      <div class="action-btns" :key="`action-btns-${index}`">
+      <div class="action-btns">
         <router-link
           :to="certReviewLink(cert.key)"
           class="action-btns__review-link"
@@ -68,10 +65,7 @@
         </large-button>
       </div>
 
-      <div
-        :key="`border-${cert.displayName}-${index}`"
-        class="training__row-border"
-      />
+      <div class="training__row-border" />
     </template>
   </div>
 </template>
@@ -121,6 +115,7 @@ export default {
       return this.user.certifications[cert].passed
     },
     hasUnlockedSubject(cert) {
+      if (this.isComplete(cert)) return false
       return this.user.subjects.includes(cert)
     },
     certReviewLink(cert) {

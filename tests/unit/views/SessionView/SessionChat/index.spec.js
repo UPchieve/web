@@ -1,23 +1,12 @@
 import { test, vi } from 'vitest'
-import { createLocalVue, shallowMount } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils'
 import SessionChat from '@/views/SessionView/SessionChat/index.vue'
 import Vuex from 'vuex'
 import ModerationService from '@/services/ModerationService'
-import VueSocketIO from 'vue-socket.io'
 import flushPromises from 'flush-promises'
 
 vi.mock('../../../../../services/ModerationService')
 describe('SessionChat', () => {
-  const mockSocket = new VueSocketIO({
-    connection: 'socketserver.test',
-    emit: vi.fn(),
-    disconnect: vi.fn(),
-    connected: vi.fn(),
-  })
-  const localVue = createLocalVue()
-  localVue.use(Vuex)
-  localVue.use(mockSocket)
-
   const getWrapper = () => {
     const store = new Vuex.Store({
       modules: {
@@ -42,11 +31,17 @@ describe('SessionChat', () => {
             isSessionRecapDmsActive: () => true,
           },
         },
+        socket: {
+          messageData: {},
+        }
       },
     })
     return shallowMount(SessionChat, {
-      localVue,
-      store,
+      // localVue,
+      global: {
+        plugins: [store],
+      },
+      // store,
       propsData: {
         currentSession,
       },

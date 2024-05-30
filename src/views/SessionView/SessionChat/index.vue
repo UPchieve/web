@@ -39,32 +39,30 @@
           v-if="!user.isVolunteer && isSessionWaitingForVolunteer"
           @new-bot-message="handleIncomingMessage"
         />
-        <template>
-          <div
-            v-for="(message, index) in currentSession.messages"
-            :key="`message-${index}`"
-            :class="messageAlignment(message)"
-            class="message"
-          >
-            <component
-              class="avatar"
-              :is="avatar(message)"
-              v-if="message.user !== user.id"
-            />
+        <div
+          v-for="(message, index) in currentSession.messages"
+          :key="`message-${index}`"
+          :class="messageAlignment(message)"
+          class="message"
+        >
+          <component
+            class="avatar"
+            :is="avatar(message)"
+            v-if="message.user !== user.id"
+          />
 
-            <div class="contents" :class="chatBotContents(message)">
-              <span v-if="message.hasHtml" v-html="message.contents"></span>
-              <span
-                v-else
-                :data-testid="`message-from-user-id-${message.user}`"
-                >{{ message.contents }}</span
-              >
-            </div>
-            <div class="time">
-              {{ message.createdAt | formatTime }}
-            </div>
+          <div class="contents" :class="chatBotContents(message)">
+            <span v-if="message.hasHtml" v-html="message.contents"></span>
+            <span
+              v-else
+              :data-testid="`message-from-user-id-${message.user}`"
+              >{{ message.contents }}</span
+            >
           </div>
-        </template>
+          <div class="time">
+            {{ formatTime(message.createdAt) }}
+          </div>
+        </div>
         <chat-bot
           v-if="sessionHasEnded && isSessionRecapDmsActive && user.isVolunteer"
           :isSessionRecapBot="true"
@@ -97,20 +95,9 @@
       </transition>
     </div>
 
-    <audio
-      class="audio__receive-message"
-      src="@/assets/audio/receive-message.mp3"
-      muted
-    />
-
     <div class="chat-footer" :class="isInRecap && 'chat-footer--recap'">
       <transition name="fade">
-        <div
-          class="typing-indicator"
-          v-show="
-            typingIndicatorShown && isSessionConnectionAlive && isSessionAlive
-          "
-        >
+        <div class="typing-indicator" v-show="typingIndicatorShown">
           {{ sessionPartnerName || 'Chatbot' }} is typing...
         </div>
       </transition>
@@ -138,6 +125,9 @@ import ModerationService from '@/services/ModerationService'
 import sendWebNotification from '@/utils/send-web-notification'
 import getChatAvatar from '@/utils/get-chat-avatar'
 import LoggerService from '@/services/LoggerService'
+import moment from 'moment'
+import { socket } from '@/socket'
+import sound from '@/assets/audio/receive-message.mp3'
 
 const MESSAGE_ALIGNMENT = {
   LEFT: 'left',
@@ -173,6 +163,7 @@ export default {
       isAutoscrolling: false,
       showChatBot: false,
       eligibleForSessionRecapChat: false,
+      receiveMessageAudio: new Audio(sound),
     }
   },
   computed: {
@@ -182,6 +173,8 @@ export default {
       unreadChatMessageIndices: (state) => state.user.unreadChatMessageIndices,
       chatScrolledToMessageIndex: (state) =>
         state.user.chatScrolledToMessageIndex,
+      isTyping: (state) => state.socket.isTyping,
+      messageData: (state) => state.socket.messageData,
     }),
     ...mapGetters({
       isSessionWaitingForVolunteer: 'user/isSessionWaitingForVolunteer',
@@ -236,6 +229,9 @@ export default {
     }
   },
   methods: {
+    formatTime(createdAt) {
+      return moment(createdAt).format('h:mm a')
+    },
     showModerationWarning() {
       this.moderationWarningIsShown = true
     },
@@ -246,7 +242,7 @@ export default {
       this.eligibleForSessionRecapChat = true
     },
     showNewMessage(message) {
-      this.$socket.emit('message', {
+      socket.emit('message', {
         sessionId: this.currentSession.id,
         user: this.user,
         message,
@@ -262,7 +258,7 @@ export default {
     },
     notTyping() {
       // Tell the server that the user is no longer typing
-      this.$socket.emit('notTyping', {
+      socket.emit('notTyping', {
         sessionId: this.currentSession.id,
       })
     },
@@ -298,7 +294,7 @@ export default {
       } else if (event.key == 'Backspace') return
 
       // Typing handler for when non-Enter/Backspace keys are pressed
-      this.$socket.emit('typing', {
+      socket.emit('typing', {
         sessionId: this.currentSession.id,
       })
 
@@ -311,12 +307,7 @@ export default {
     },
     async triggerAlert(data) {
       try {
-        const receiveMessageAudio = document.querySelector(
-          '.audio__receive-message'
-        )
-        // Unmuting the audio allows us to bypass the need for user interaction with the DOM before playing a sound
-        receiveMessageAudio.muted = false
-        await receiveMessageAudio.play()
+        await this.receiveMessageAudio.play()
       } catch (error) {
         // eslint-disable-next-line no-console
         console.log('Unable to play audio', error)
@@ -442,50 +433,47 @@ export default {
       return ''
     },
   },
-  sockets: {
-    'is-typing'(data) {
-      if (this.isEventFromSameSession(data.sessionId))
-        this.typingIndicatorShown =
-          this.isSessionConnectionAlive && this.isSessionAlive
-    },
-    'not-typing'(data) {
-      if (this.isEventFromSameSession(data.sessionId))
-        this.typingIndicatorShown = false
-    },
-    async messageSend(data) {
-      const { userId, sessionId } = data
-      if (!this.isEventFromSameSession(sessionId)) return
-      // If the chat is hidden show visual indicator that a new message has arrived
-      if (this.shouldHideChatSection) {
-        this.setHasSeenNewMessage(false)
-        this.triggerAlert(data)
-      }
-
-      // Only allow audio when a user does not have the web page in view
-      if (userId !== this.user.id && this.isWebPageHidden)
-        this.triggerAlert(data)
-
-      if (this.isInRecap) this.$store.dispatch('user/addRecapMessage', data)
-      else this.$store.dispatch('user/addMessage', data)
-
-      this.handleIncomingMessage()
-    },
-    messageError(data) {
-      if (this.isMessageError || !this.isEventFromSameSession(data.sessionId))
-        return
+  watch: {
+    messageError() {
+      if (this.isMessageError) return
       this.isMessageError = true
       setTimeout(() => {
         this.isMessageError = false
       }, 1000)
     },
-  },
-  watch: {
-    'currentSession.messages'(currentVal, prevVal) {
-      if ((this.isInRecap && currentVal, !prevVal))
-        // Wait for the DOM to update
-        this.$nextTick(() => {
-          this.scrollToBottom()
-        })
+    messageData: {
+      handler(data) {
+        const { userId } = data
+        // If the chat is hidden show visual indicator that a new message has arrived
+        if (this.shouldHideChatSection) {
+          this.setHasSeenNewMessage(false)
+          this.triggerAlert(data)
+        }
+
+        // Only allow audio when a user does not have the web page in view
+        if (userId !== this.user.id && this.isWebPageHidden)
+          this.triggerAlert(data)
+
+        if (this.isInRecap) this.$store.dispatch('user/addRecapMessage', data)
+        else this.$store.dispatch('user/addMessage', data)
+
+        this.handleIncomingMessage()
+      },
+      deep: true,
+    },
+
+    isTyping(currentVal) {
+      this.typingIndicatorShown = currentVal
+    },
+    'currentSession.messages': {
+      handler(currentVal, prevVal) {
+        if ((this.isInRecap && currentVal, !prevVal))
+          // Wait for the DOM to update
+          this.$nextTick(() => {
+            this.scrollToBottom()
+          })
+      },
+      deep: true,
     },
   },
 }
@@ -687,9 +675,5 @@ export default {
       width: 100%;
     }
   }
-}
-
-.audio__receive-message {
-  display: none;
 }
 </style>

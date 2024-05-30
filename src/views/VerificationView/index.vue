@@ -5,7 +5,7 @@
         {{ error }}
       </div>
 
-      <!--        If sms-verification is enabled, give the user the option to choose verification method in step 1-->
+      <!-- If sms-verification is enabled, give the user the option to choose verification method in step 1-->
       <verification-method-selector
         v-if="step === 1 && isSmsVerificationEnabled"
         data-testid="verification-method-selector"
@@ -13,7 +13,7 @@
         v-model="verificationInputs"
       />
 
-      <!-- Verify code-->
+      <!-- Verify code -->
       <div v-if="step === 2" data-testid="step-2">
         <p class="uc-form-text center">
           We just sent your verification code to
@@ -43,7 +43,7 @@
               : 'an email'
           }}?
           <span
-            :disabled="isSubmitting"
+            :disabled="isSubmitting ? true : null"
             @click.prevent="sendCode"
             class="uc-link"
             >Resend code</span
@@ -59,6 +59,8 @@
           :disabled="
             verificationInputs.method === VERIFICATION_METHOD.SMS &&
             !verificationInputs.phoneInputInfo.isValid
+              ? true
+              : null
           "
         >
           {{ sendCodeButtonText }}
@@ -67,7 +69,7 @@
           class="uc-form-button"
           type="submit"
           @click.prevent="confirmVerificationCode"
-          :disabled="!isValidVerificationCode"
+          :disabled="!isValidVerificationCode ? true : null"
           v-if="step === 2"
         >
           Verify my account

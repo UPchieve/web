@@ -4,7 +4,7 @@
     :data-testid="`${topic}-subject-card`"
     class="subject-card uc-row justify-center"
     @click="handleClick"
-    :disabled="isDisabled"
+    :disabled="isDisabled ? true : null"
   >
     <img :src="svg" class="icon" aria-hidden="true" />
     <div class="uc-column justify-center items-start">
@@ -28,15 +28,15 @@
           primary
           data-testid="start-chat"
           :routeTo="routeTo"
-          :disabled="isDisabled"
+          :disabled="isDisabled ? true : null"
           >{{ buttonText }}</hyperlink-button
         >
         <hyperlink-button
           v-else
           primary
           data-testid="start-chat"
-          @click.native="handleClick"
-          :disabled="isDisabled"
+          @click="handleClick"
+          :disabled="isDisabled ? true : null"
           >{{ buttonText }}</hyperlink-button
         >
       </div>
@@ -60,7 +60,7 @@
           disabledOption="Choose a subject"
           :options="subtopics"
           :optionDisplay="subtopicDisplayNames"
-          :disabled="isDisabled"
+          :disabled="isDisabled ? true : null"
         />
       </div>
 
@@ -69,15 +69,15 @@
         primary
         data-testid="start-chat"
         :routeTo="routeTo"
-        :disabled="isDisabled"
+        :disabled="isDisabled ? true : null"
         >{{ buttonText }}</hyperlink-button
       >
       <large-button
         v-else
         primary
         data-testid="start-chat"
-        @click.native="handleClick"
-        :disabled="isDisabled"
+        @click="handleClick"
+        :disabled="isDisabled ? true : null"
         >{{ buttonText }}</large-button
       >
     </template>
@@ -93,13 +93,14 @@ import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 
 export default {
+  compatConfig: { COMPONENT_V_MODEL: false },
   components: { DropdownList, HyperlinkButton, LargeButton },
   data() {
     return {
       selectedSubtopic: '',
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     clearTimeout(this.timeoutId)
   },
   props: {

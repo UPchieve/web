@@ -80,23 +80,6 @@
       :endSession="endSession"
       :sessionId="session._id"
     />
-    <audio
-      class="audio__volunteer-joined"
-      src="@/assets/audio/alert.mp3"
-      muted
-    />
-    <!-- <div
-      :class="[connectionMsgType]"
-      class="connection-message"
-      v-if="connectionMsg || reconnectAttemptMsg"
-    >
-      {{ connectionMsg }} {{ reconnectAttemptMsg }}
-      <template v-if="reconnectAttemptMsg">
-        <button class="connection-try-again" @click.prevent="tryReconnect">
-          Try Now
-        </button>
-      </template>
-    </div> -->
   </div>
 </template>
 
@@ -112,6 +95,8 @@ import LoadingMessage from '@/components/LoadingMessage.vue'
 import TroubleMatchingModal from '@/views/SessionView/TroubleMatchingModal.vue'
 import UnmatchedModal from '@/views/SessionView/UnmatchedModal.vue'
 import sendWebNotification from '@/utils/send-web-notification'
+import { socket } from '@/socket'
+import sound from '@/assets/audio/alert.mp3'
 
 /**
  * @todo {1} Refactoring candidate: use a modal instead.
@@ -127,6 +112,7 @@ export default {
       showUnmatchedModal: false,
       hasSeenTroubleMatchingModal: false,
       isWaitingIntervalId: null,
+      volunteerJoinedAudio: new Audio(sound),
     }
   },
   components: {
@@ -134,6 +120,28 @@ export default {
     TroubleMatchingModal,
     UnmatchedModal,
   },
+  created() {
+    /*
+     * This seems like an anti-pattern.
+     * Any events sent before `created()` is called will be missed.
+     * Socket listeners should ideally be defined in the socket store.
+     */
+    // TODO: move this to its own store and have the socket store dispatch an event
+    socket.on('connect_error', () => {
+      this.connectionMsg =
+        'The system seems to be having a problem reaching the server.'
+      this.connectionMsgType = 'warning'
+    })
+    socket.on('connect_timeout', () => {
+      this.connectionMsg =
+        'The system seems to be having a problem reaching the server.'
+      this.connectionMsgType = 'socket/warning'
+    })
+    socket.on('reconnect_attempt', () => {
+      this.reconnectAttemptMsg = 'Trying periodically to reconnect.'
+    })
+  },
+
   mounted() {
     // Show a modal if a student has been waiting too long to get matched with a volunteer
     if (!this.user.isVolunteer) {
@@ -155,6 +163,7 @@ export default {
     ...mapState({
       user: (state) => state.user.user,
       session: (state) => state.user.session,
+      isConnected: (state) => state.socket.isConnected,
     }),
     ...mapGetters({
       sessionPartner: 'user/sessionPartner',
@@ -173,6 +182,7 @@ export default {
       else return VolunteerIcon
     },
   },
+  emits: ['try-clicked'],
   methods: {
     end() {
       if (this.isSessionWaitingForVolunteer) {
@@ -234,8 +244,8 @@ export default {
     tryReconnect() {
       // socket must be closed before reopening for automatic reconnections
       // to resume
-      this.$socket.close()
-      this.$socket.open()
+      socket.close()
+      socket.open()
       this.reconnectAttemptMsg = 'Waiting for server response.'
       this.$emit('try-clicked')
     },
@@ -305,25 +315,12 @@ export default {
       }
     },
   },
-  sockets: {
-    connect_error() {
-      this.connectionMsg =
-        'The system seems to be having a problem reaching the server.'
-      this.connectionMsgType = 'warning'
-    },
-    connect_timeout() {
-      this.connectionMsg =
-        'The system seems to be having a problem reaching the server.'
-      this.connectionMsgType = 'warning'
-    },
-    reconnect_attempt() {
-      this.reconnectAttemptMsg = 'Trying periodically to reconnect.'
-    },
-    connect() {
-      this.connectionSuccess()
-    },
-  },
   watch: {
+    isConnected(val) {
+      if (val) {
+        this.connectionSuccess()
+      }
+    },
     // Close possibly open modals that are triggered by a long waiting period
     // and clear the isWaiting interval when a volunteer joins the session
     async isSessionWaitingForVolunteer(value, prevValue) {
@@ -332,12 +329,7 @@ export default {
         this.showUnmatchedModal = false
         clearInterval(this.isWaitingIntervalId)
         try {
-          const volunteerJoinedAudio = document.querySelector(
-            '.audio__volunteer-joined'
-          )
-          // Unmuting the audio allows us to bypass the need for user interaction with the DOM before playing a sound
-          volunteerJoinedAudio.muted = false
-          await volunteerJoinedAudio.play()
+          await this.volunteerJoinedAudio.play()
         } catch (error) {
           // eslint-disable-next-line no-console
           console.log('Unable to play audio', error)
@@ -502,9 +494,5 @@ h1 {
 .avatar-info-container {
   display: flex;
   align-items: center;
-}
-
-.audio__volunteer-joined {
-  display: none;
 }
 </style>

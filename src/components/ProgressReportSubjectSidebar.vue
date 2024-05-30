@@ -1,15 +1,14 @@
 <template>
   <div class="pr-sidebar">
     <h1 class="pr-sidebar__header">Subjects</h1>
-
     <v-select
       v-if="isDropdownMode"
       :options="subjectsMapped"
-      class="pr-sidebar__dropdown"
-      :value="getSelectedSubjectValue"
+      :modelValue="getSelectedSubjectValue"
       :clearable="false"
       :searchable="false"
-      @input="handleSubjectChange"
+      @update:modelValue="handleSubjectChange"
+      class="pr-sidebar__dropdown"
     >
       <template #option="subject">
         <div :key="subject.displayName" class="pr-sidebar__dropdown-container">

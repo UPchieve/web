@@ -1,19 +1,17 @@
 import { test, expect } from '@playwright/test'
 import { getClient } from '../db.js'
-import {
-  createVolunteer,
-  withCertifications,
-} from '../utils.js'
+import { createVolunteer, withCertifications } from '../utils.js'
 import { Login } from '../page-object-models/login.js'
 import { TrainingCourse } from '../page-object-models/training-course.js'
 import { TrainingQuiz } from '../page-object-models/training-quiz.js'
-
 
 test.describe('UPchieve 101', async () => {
   test.beforeEach(async ({ page }) => {
     const dbClient = await getClient().connect()
     // Create and sign-in the volunteer.
-    const volunteerUser = await createVolunteer(dbClient, { hasOnboarded: false })
+    const volunteerUser = await createVolunteer(dbClient, {
+      hasOnboarded: false,
+    })
     // Add a single certification so we don't hit `isAutoFlowUser`.
     await withCertifications(dbClient, {
       userId: volunteerUser.id,
@@ -25,7 +23,9 @@ test.describe('UPchieve 101', async () => {
     await page.waitForURL('**/dashboard')
   })
 
-  test('the quiz is available once the volunteer completes the material', async ({ page }) => {
+  test('the quiz is available once the volunteer completes the material', async ({
+    page,
+  }) => {
     // Go to UPchieve 101 training page.
     const coursePage = new TrainingCourse(page)
     await coursePage.goTo('upchieve101')
@@ -48,10 +48,10 @@ test.describe('UPchieve 101', async () => {
     await quizPage.startQuiz()
 
     await quizPage.completeQuiz(true)
-    quizPage.expectCongratMessage()
+    await quizPage.expectCongratMessage()
   })
 
-  test('volunteer can retake the quiz if they fail', async({page}) => {
+  test('volunteer can retake the quiz if they fail', async ({ page }) => {
     // Got to UPchieve 101 quiz page.
     const quizPage = new TrainingQuiz(page)
     await quizPage.goTo('upchieve101')
@@ -63,8 +63,8 @@ test.describe('UPchieve 101', async () => {
     await quizPage.reviewAnswers()
     await quizPage.retakeQuiz()
     await quizPage.startQuiz()
-    
+
     await quizPage.completeQuiz(true)
-    quizPage.expectCongratMessage()
+    await quizPage.expectCongratMessage()
   })
 })

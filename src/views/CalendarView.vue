@@ -28,7 +28,7 @@
             v-bind:class="saveButtonClass"
             type="button"
             data-testid="save-availability-button"
-            @click.native="save()"
+            @click="save()"
           >
             <span v-html="saveLabel"></span>
           </large-button>
@@ -403,6 +403,7 @@ input[type='checkbox']:checked + label {
 
 .tz-selector {
   background-color: white;
+  border: 1px solid $c-secondary-grey;
 }
 
 .instructions-container {

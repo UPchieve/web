@@ -43,7 +43,7 @@ export default {
     const body = document.querySelector('body')
     body.classList.add('disable-scroll')
   },
-  beforeDestroy() {
+  beforeUnmount() {
     const body = document.querySelector('body')
     body.classList.remove('disable-scroll')
   },

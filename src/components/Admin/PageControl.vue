@@ -32,7 +32,7 @@ export default {
     isLastPage: Boolean,
     showPageNumber: { type: Boolean, default: true },
   },
-
+  emits: ['nextPage', 'previousPage'],
   methods: {
     nextPage() {
       this.$emit('nextPage')

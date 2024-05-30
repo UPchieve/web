@@ -1,21 +1,17 @@
 import userModule from '@/store/modules/user'
 import featureFlagsModule from '@/store/modules/feature-flags'
-import { createLocalVue, mount } from '@vue/test-utils'
-import Vuex from 'vuex'
+import { mount } from '@vue/test-utils'
+import { createStore } from 'vuex'
 import VerificationView from '@/views/VerificationView/index.vue'
+import { vi } from 'vitest'
 
 describe('VerificationView', () => {
-  const localVue = createLocalVue()
-  localVue.use(Vuex)
-
   beforeEach(() => {
     vi.resetAllMocks()
   })
 
-  const getWrapper = (
-    smsVerificationEnabled = true,
-  ) => {
-    const store = new Vuex.Store({
+  const getWrapper = (smsVerificationEnabled = true) => {
+    const store = createStore({
       modules: {
         user: {
           ...userModule,
@@ -38,8 +34,7 @@ describe('VerificationView', () => {
       },
     })
     return mount(VerificationView, {
-      localVue,
-      store,
+      global: { plugins: [store] },
     })
   }
 
@@ -53,18 +48,16 @@ describe('VerificationView', () => {
     })
 
     it.each([
-      [true, 'verification-method-selector'], [false, 'step-2'],
-    ])(
-      'When SMS enabled=%s, should render %s',
-      (smsVerificationFlag, step) => {
-        // Scenario: SMS verification disabled, the user has no choice of verification method,
-        // so it goes straight to step 2.
-        const wrapper = getWrapper(smsVerificationFlag)
-        expect(
-          wrapper.find('[data-testid="verification-method-selector"]').exists()
-        ).toEqual(smsVerificationFlag)
-        expect(wrapper.find(`[data-testid="${step}"]`).exists()).toBeTruthy()
-      }
-    )
+      [true, 'verification-method-selector'],
+      [false, 'step-2'],
+    ])('When SMS enabled=%s, should render %s', (smsVerificationFlag, step) => {
+      // Scenario: SMS verification disabled, the user has no choice of verification method,
+      // so it goes straight to step 2.
+      const wrapper = getWrapper(smsVerificationFlag)
+      expect(
+        wrapper.find('[data-testid="verification-method-selector"]').exists()
+      ).toEqual(smsVerificationFlag)
+      expect(wrapper.find(`[data-testid="${step}"]`).exists()).toBeTruthy()
+    })
   })
 })

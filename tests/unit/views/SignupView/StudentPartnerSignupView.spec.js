@@ -1,14 +1,16 @@
-import { createLocalVue, mount } from '@vue/test-utils'
-import Vuex from 'vuex'
+import { mount } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
+import router from '@/router'
+import store from '@/store'
 import StudentPartnerSignupView from '@/views/SignupView/StudentPartnerSignupView.vue'
+
 describe('StudentPartnerSignupView', () => {
-  const localVue = createLocalVue()
-  localVue.use(Vuex)
   var DEFAULT_STUDENT_PARTNER = {}
 
   const getWrapper = () => {
-    return mount(StudentPartnerSignupView, { localVue })
+    return mount(StudentPartnerSignupView, {
+      global: { plugins: [router, store] },
+    })
   }
   beforeEach(() => {
     DEFAULT_STUDENT_PARTNER = {

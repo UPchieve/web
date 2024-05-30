@@ -76,11 +76,11 @@ export default {
     if (this.isInRecap) {
       this.$store.dispatch('user/addRecapMessage', {
         contents: `Your session has ended but you can still <b>share extra resources and tips with this student!</b>
-        
+
         You can continue conversations asynchronously by messaging in this chat!
-        
+
         Your student will receive an email notification about your message and may respond later.
-        
+
         (Only you are able to initiate a conversation after the session ends, a student cannot reach out to you first.)`,
         createdAt: new Date().toISOString(),
         isVolunteer: false,
@@ -109,7 +109,7 @@ export default {
       }, 3000)
     } else this.launchSessionEndedChatBot()
   },
-
+  emits: ['new-bot-message', 'recap-eligible', 'loading-chatbot-message'],
   methods: {
     showBotMessage() {
       const newMessage = this.unsentBotMessages.shift()
@@ -150,11 +150,11 @@ export default {
             this.$emit('recap-eligible')
             this.$store.dispatch('user/addMessage', {
               contents: `Your session has ended but you can still <b>share extra resources and tips with this student!</b>
-              
+
               You can continue conversations asynchronously by messaging in this chat or later by going to the "Session History" tab and finding this session chat!
-              
+
               Your student will receive an email notification about your message and may respond later.
-              
+
               (Only you are able to initiate a conversation after the session ends, a student cannot reach out to you first.)`,
               createdAt: new Date().toISOString(),
               isVolunteer: false,

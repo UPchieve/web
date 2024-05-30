@@ -1,13 +1,9 @@
 import volunteerModule from '@/store/modules/volunteer'
 import userModule from '@/store/modules/user'
 import { it, vi } from 'vitest'
-import Vuex from 'vuex'
-import { createLocalVue } from '@vue/test-utils'
+import { createStore } from 'vuex'
 
 describe('Volunteer store module', () => {
-  const localVue = createLocalVue()
-  localVue.use(Vuex)
-
   const mockUserModule = {
     namespaced: true,
     getters: {},
@@ -17,7 +13,7 @@ describe('Volunteer store module', () => {
   }
 
   const getStore = (args = {}) => {
-    return new Vuex.Store({
+    return createStore({
       modules: {
         volunteer: {
           ...volunteerModule,

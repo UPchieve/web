@@ -4,6 +4,7 @@ import AnalyticsService from './AnalyticsService'
 import LoggerService from './LoggerService'
 import NetworkService, { axiosInstance } from './NetworkService'
 import ProductDiscoveryService from './ProductDiscoveryService'
+import { socket } from '@/socket'
 
 export const INVALID_CSRF_ERROR = 'invalid csrf token'
 
@@ -154,7 +155,7 @@ export default {
           ProductDiscoveryService.reset()
 
           // disconnect socket
-          context.$socket.disconnect()
+          socket.disconnect()
         })
     }
   },

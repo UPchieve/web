@@ -20,7 +20,7 @@
               :svg="card.svg"
               :totalSubjects="card.subtopics.length"
               class="welcome-page-topic-chip"
-              @click.native="() => handleTopicClick(card.topic)"
+              @click="() => handleTopicClick(card.topic)"
             />
           </div>
         </div>

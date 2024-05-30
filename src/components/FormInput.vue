@@ -22,7 +22,7 @@
       type="text"
       :placeholder="placeholder"
       v-model="text"
-      @input="$emit('text', $event.target.value)"
+      @input="$emit('update:modelValue', $event.target.value)"
       @blur="onBlur"
       :required="isRequired"
     />
@@ -37,7 +37,7 @@ import {
   requiredIf,
 } from '@vuelidate/validators'
 import AnalyticsService from '@/services/AnalyticsService'
-import InputValidation from '@/mixins/InputValidation'
+import { useInputValidation } from '@/composables/InputValidation'
 
 export default {
   props: {
@@ -63,9 +63,17 @@ export default {
     placeholder: {
       type: String,
     },
+    modelValue: {
+      type: String,
+      default: '',
+    },
   },
+  emits: ['update:modelValue'],
 
-  mixins: [InputValidation],
+  setup() {
+    const { v$, hasValidationError, getValidationErrors } = useInputValidation()
+    return { v$, hasValidationError, getValidationErrors }
+  },
 
   data() {
     return {

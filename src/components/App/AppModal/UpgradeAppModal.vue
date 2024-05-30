@@ -24,7 +24,7 @@
     <div v-if="!mobileMode" class="seperator" />
 
     <div class="UpgradeAppModal-buttons">
-      <large-button @click.native="onClose()">No thanks.</large-button>
+      <large-button @click="onClose()">No thanks.</large-button>
       <a :href="appStoreLink" target="_blank" class="UpgradeAppModal-link">
         <large-button primary>Take me to the app store!</large-button>
       </a>
@@ -57,6 +57,7 @@ export default {
       this.appStoreLink = APP_STORE_LINK
     }
   },
+  emits: ['cancel'],
   computed: {
     ...mapGetters({ mobileMode: 'app/mobileMode' }),
     newReleaseNotes() {

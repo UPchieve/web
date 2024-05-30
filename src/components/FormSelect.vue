@@ -37,7 +37,7 @@
 <script>
 import { helpers, requiredIf } from '@vuelidate/validators'
 import AnalyticsService from '@/services/AnalyticsService'
-import InputValidation from '@/mixins/InputValidation'
+import { useInputValidation } from '@/composables/InputValidation'
 
 export default {
   props: {
@@ -69,12 +69,15 @@ export default {
     },
   },
 
-  mixins: [InputValidation],
-
   async created() {
     this.isLoading = true
     this.selectOptions = await this.getSelectOptions()
     this.isLoading = false
+  },
+
+  setup() {
+    const { v$, hasValidationError, getValidationErrors } = useInputValidation()
+    return { v$, hasValidationError, getValidationErrors }
   },
 
   data() {

@@ -80,11 +80,11 @@ export const createStudent = async (dbClient, args = {}) => {
 export const createVolunteer = async (dbClient, args = {}) => {
   try {
     const params = {
-      email: faker.internet.email(),
-      firstName: faker.person.firstName(),
-      lastName: faker.person.lastName(),
-      password: createPassword(),
-      phone: faker.phone.number('+###########'),
+      email: args?.email ?? faker.internet.email(),
+      firstName: args?.firstName ?? faker.person.firstName(),
+      lastName: args?.lastName ?? faker.person.lastName(),
+      password: args?.password ?? createPassword(),
+      phone: `+${faker.string.numeric('###########')}`,
       terms: true,
       ...args,
     }

@@ -3,11 +3,9 @@
     <div class="banner-template">
       <template v-if="mobileMode">
         <header class="banner-template-header">
-          <cross-icon
-            @click="onCancel"
-            data-testid="download-app-close-button"
-            class="banner-template-close-button"
-          />
+          <span @click="$emit('close')" data-testid="download-app-close-button">
+            <cross-icon class="banner-template-close-button" />
+          </span>
         </header>
         <slot />
       </template>
@@ -25,9 +23,7 @@ export default {
   computed: {
     ...mapGetters({ mobileMode: 'app/mobileMode' }),
   },
-  props: {
-    onCancel: Function,
-  },
+  emits: ['close'],
 }
 </script>
 

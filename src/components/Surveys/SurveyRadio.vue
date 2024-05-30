@@ -18,7 +18,7 @@
         type="text"
         tabindex="-1"
         @input="handleOpenResponse"
-        :disabled="isOpenResponseDisabled"
+        :disabled="isOpenResponseDisabled ? true : null"
         :value="openResponseValue"
       />
     </label>
@@ -66,7 +66,7 @@ export default {
       default: '',
     },
   },
-
+  emits: ['survey-radio-input'],
   methods: {
     handleRadioSelection() {
       this.$emit('survey-radio-input', this.questionId, this.responseId, '')

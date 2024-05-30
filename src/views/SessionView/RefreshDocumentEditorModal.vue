@@ -9,9 +9,7 @@
       <separator />
       <footer class="refresh_doc__footer">
         <div class="refresh_doc__buttons">
-          <large-button
-            class="refresh_doc__refresh-btn"
-            @click.native="refreshDoc"
+          <large-button class="refresh_doc__refresh-btn" @click="refreshDoc"
             >Refresh</large-button
           >
         </div>

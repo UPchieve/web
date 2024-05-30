@@ -19,7 +19,7 @@
       :placeholder="placeholder"
       type="password"
       v-model="password"
-      @input="$emit('input', $event.target.value)"
+      @input="$emit('update:modelValue', $event.target.value)"
       class="uc-form-text-input"
       :class="{
         'uc-form-text-input-invalid': hasValidationError(),
@@ -43,7 +43,7 @@
 import { helpers, requiredIf } from '@vuelidate/validators'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
-import InputValidation from '@/mixins/InputValidation'
+import { useInputValidation } from '@/composables/InputValidation'
 
 export default {
   props: {
@@ -71,9 +71,18 @@ export default {
       type: String,
       default: '',
     },
+    modelValue: {
+      type: String,
+      default: '',
+    },
   },
 
-  mixins: [InputValidation],
+  emits: ['update:modelValue'],
+
+  setup() {
+    const { v$, hasValidationError, getValidationErrors } = useInputValidation()
+    return { v$, hasValidationError, getValidationErrors }
+  },
 
   data() {
     return {

@@ -1,10 +1,10 @@
-import { createLocalVue, mount } from '@vue/test-utils'
-import Vuex from 'vuex'
+import { mount } from '@vue/test-utils'
+import { createStore } from 'vuex'
 import StudentForm from '@/views/SignupView/StudentForm.vue'
 import featureFlagsModule from '@/store/modules/feature-flags'
 import NetworkService from '@/services/NetworkService'
 import { vi } from 'vitest'
-import VueRouter from 'vue-router'
+import { createMemoryHistory, createRouter } from 'vue-router'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import AuthService from '@/services/AuthService'
@@ -24,13 +24,9 @@ describe('StudentForm', () => {
       isCollegeStudent: false,
     },
   }
-  var localVue
 
   beforeEach(() => {
     vi.resetAllMocks()
-    localVue = createLocalVue()
-    localVue.use(Vuex)
-    localVue.use(VueRouter)
 
     NetworkService.checkStudentEligibility = vi
       .fn()
@@ -48,7 +44,7 @@ describe('StudentForm', () => {
     query = {},
     studentPartner = {}
   ) => {
-    const store = new Vuex.Store({
+    const store = createStore({
       modules: {
         featureFlags: {
           ...featureFlagsModule,
@@ -63,14 +59,12 @@ describe('StudentForm', () => {
         },
       },
     })
-    const router = new VueRouter({
+    const router = createRouter({
       routes: [{ path }],
-      mode: 'abstract',
+      history: createMemoryHistory(),
     })
     const wrapper = mount(StudentForm, {
-      localVue,
-      store,
-      router,
+      global: { plugins: [store, router] },
     })
     router.push({ path, query }).catch(() => {}) // Catch to suppress redundant navigation error in tests.
 
@@ -256,9 +250,12 @@ describe('StudentForm', () => {
 
     it("Should only render the student's first and last name fields on the eligibility form for parent/guardian signup", async () => {
       const wrapper = await getWrapper()
-      expect(wrapper.find('[data-testid="student-first-name-label"]').exists()).toBeFalsy()
-      expect(wrapper.find('[data-testid="student-last-name-label"]').exists()).toBeFalsy()
-
+      expect(
+        wrapper.find('[data-testid="student-first-name-label"]').exists()
+      ).toBeFalsy()
+      expect(
+        wrapper.find('[data-testid="student-last-name-label"]').exists()
+      ).toBeFalsy()
     })
   })
 

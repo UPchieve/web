@@ -1,6 +1,6 @@
 <template>
   <chip
-    @click.native="handleChipClick"
+    @click="handleChipClick"
     class="issue-reason"
     :class="{ 'selected-chip': isSelected }"
     :chipContent="label"
@@ -32,6 +32,7 @@ export default {
     },
   },
   components: { Chip },
+  emits: ['chip-click'],
   methods: {
     handleChipClick() {
       this.$emit('chip-click', this.questionId, this.responseId)

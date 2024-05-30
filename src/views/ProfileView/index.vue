@@ -91,27 +91,23 @@
               <div v-show="!activeEdit && !user.phone" class="answer">
                 No phone number provided
               </div>
-
-              <vue-phone-number-input
+              <maz-phone-number-input
                 class="phone-input"
+                required="true"
                 v-show="activeEdit"
                 v-model="phoneNational"
-                :default-country-code="internationalPhoneInfo.country"
-                :error="
-                  invalidInputs.indexOf('phone') > -1 && !phoneInputInfo.isValid
-                "
-                :required="true"
-                color="#555"
-                valid-color="#16ba97"
+                :country-code="internationalPhoneInfo.country"
+                show-code-on-list
                 @update="onPhoneInputUpdate"
               />
 
               <div class="sms-consent" v-if="shouldSeeSmsConsentCheckbox">
                 <checkbox
                   id="sms-consent-checkbox"
-                  :disabled="!activeEdit"
+                  :disabled="!activeEdit ? true : null"
                   v-model="smsConsent"
                   @change="emitSmsConsentCheckboxChangedEvent"
+                  :checked="smsConsent"
                 />
                 <label for="sms-consent-input"
                   >By checking this box, I consent to receiving SMS messages
@@ -130,7 +126,7 @@
             <div class="prompt">Account status</div>
             <div class="answer">
               <toggle-button
-                :disabled="!activeEdit"
+                :disabled="!activeEdit ? true : null"
                 :value="isAccountActive"
                 :labels="{ checked: 'Active', unchecked: 'Deactivated' }"
                 :width="95"
@@ -233,7 +229,7 @@
               >
                 <toggle-button
                   :data-testid="`toggle-button-${subject.name}`"
-                  :disabled="!activeEdit"
+                  :disabled="!activeEdit ? true : null"
                   :value="subjectIsNotMuted(subject.name)"
                   :width="75"
                   :labels="{ checked: 'On', unchecked: 'Off' }"
@@ -267,13 +263,14 @@ import AnalyticsService from '@/services/AnalyticsService'
 import DeactivateAccountModal from '../DeactivateAccountModal.vue'
 import setNotificationPermission from '@/utils/set-notification-permission'
 import getNotificationPermission from '@/utils/get-notification-permission'
-import VuePhoneNumberInput from 'vue-phone-number-input'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 import Loader from '@/components/Loader.vue'
 import VerificationModal from '../VerificationModal.vue'
 import Checkbox from '@/components/CheckBox.vue'
 import RemovePhoneConfirmationModal from '@/views/ProfileView/RemovePhoneConfirmationModal.vue'
 import TrashIcon from '@/assets/trash.svg'
+import ToggleButton from '@/components/ToggleButton.vue'
+import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 
 export default {
   name: 'profile-view',
@@ -281,10 +278,11 @@ export default {
     RemovePhoneConfirmationModal,
     Checkbox,
     DeactivateAccountModal,
-    VuePhoneNumberInput,
+    MazPhoneNumberInput,
     Loader,
     VerificationModal,
     TrashIcon,
+    ToggleButton,
   },
   data() {
     return {
@@ -314,7 +312,6 @@ export default {
       const pn = new PhoneNumber(num)
       this.phoneNational = pn.getNumber('national')
 
-      // Hack to initially mock the vue-phone-number-input data
       this.phoneInputInfo = {
         isValid: true,
         e164: pn.getNumber('e164'),

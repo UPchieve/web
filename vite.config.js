@@ -1,5 +1,5 @@
-import vue from '@vitejs/plugin-vue2'
-import { createSvgPlugin } from 'vite-plugin-vue2-svg'
+import vue from '@vitejs/plugin-vue'
+import svgLoader from 'vite-svg-loader'
 import path from 'path'
 
 export default {
@@ -10,9 +10,15 @@ export default {
       process.env.SUBWAY_CUSTOM_VOLUNTEER_PARTNER_ORGS
     ),
   },
+  resolve: {
+    alias: {
+      '~': path.resolve(__dirname, './node_modules'),
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   plugins: [
     vue(),
-    createSvgPlugin({
+    svgLoader({
       svgoConfig: {
         plugins: [
           {
@@ -28,12 +34,6 @@ export default {
       },
     }),
   ],
-  resolve: {
-    alias: {
-      '~': path.resolve(__dirname, './node_modules'),
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
   preview: {
     port: 8080,
   },
@@ -52,5 +52,10 @@ export default {
     globals: true,
     setupFiles: ['/tests/setup.js'],
     exclude: ['**/tests/e2e/**', '**/node_modules/**'],
+    server: {
+      deps: {
+        inline: [/maz-ui.*/],
+      },
+    },
   },
 }

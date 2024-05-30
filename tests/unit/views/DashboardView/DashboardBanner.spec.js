@@ -1,13 +1,10 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils'
-import Vuex from 'vuex'
+import { shallowMount } from '@vue/test-utils'
+import { createStore } from 'vuex'
 import userModule from '@/store/modules/user'
 import DashboardBanner from '@/views/DashboardView/DashboardBanner.vue'
 
-const localVue = createLocalVue()
-localVue.use(Vuex)
-
 const getWrapper = (firstName = 'Tester', subheader) => {
-  const store = new Vuex.Store({
+  const store = createStore({
     modules: {
       user: {
         ...userModule,
@@ -19,9 +16,8 @@ const getWrapper = (firstName = 'Tester', subheader) => {
   })
 
   return shallowMount(DashboardBanner, {
-    localVue,
-    store,
-    propsData: { subheader },
+    global: { plugins: [store] },
+    props: { subheader },
   })
 }
 

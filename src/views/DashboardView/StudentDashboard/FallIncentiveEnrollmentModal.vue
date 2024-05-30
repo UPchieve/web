@@ -1,148 +1,148 @@
 <template>
   <div class="incentive-enrollment">
     <modal :backText="''">
-      <template>
-        <div v-if="isSubmitting" class="incentive-enrollment-modal">
-          <section
-            class="incentive-enrollment-modal__section incentive-enrollment-modal__section--center"
-          >
-            <loader
-              :message="loadingMessage"
-              class="incentive-enrollment-modal__loader"
+      <div v-if="isSubmitting" class="incentive-enrollment-modal">
+        <section
+          class="incentive-enrollment-modal__section incentive-enrollment-modal__section--center"
+        >
+          <loader
+            :message="loadingMessage"
+            class="incentive-enrollment-modal__loader"
+          />
+        </section>
+      </div>
+      <div v-else-if="step === 1" class="incentive-enrollment-modal">
+        <header>
+          <h1 class="incentive-enrollment-modal__title">
+            Want to earn $10 a week this fall, just for having a session? 💸🎓
+          </h1>
+          <p class="incentive-enrollment-modal__body">
+            Provide your phone number to enroll in our Fall UPchieve challenge.
+            Get text reminders & never miss out on the opportunity to earn and
+            learn.
+          </p>
+        </header>
+
+        <section class="incentive-enrollment-modal__section">
+          <label class="incentive-enrollment-modal__phone-input">
+            Phone Number
+            <maz-phone-number-input
+              class="incentive-enrollment-modal__phone-input"
+              id="phoneNumber"
+              required="true"
+              v-model="phone"
+              :country-code="internationalPhoneInfo.country"
+              show-code-on-list
+              @update="(data) => (phoneInput = data)"
             />
-          </section>
-        </div>
-        <div v-else-if="step === 1" class="incentive-enrollment-modal">
-          <header>
-            <h1 class="incentive-enrollment-modal__title">
-              Want to earn $10 a week this fall, just for having a session? 💸🎓
-            </h1>
-            <p class="incentive-enrollment-modal__body">
-              Provide your phone number to enroll in our Fall UPchieve
-              challenge. Get text reminders & never miss out on the opportunity
-              to earn and learn.
-            </p>
-          </header>
 
-          <section class="incentive-enrollment-modal__section">
-            <label class="incentive-enrollment-modal__phone-input">
-              Phone Number
-              <vue-phone-number-input
-                class="incentive-enrollment-modal__phone-input"
-                v-model="phone"
-                :error="phone !== '' && !isValidPhone"
-                :default-country-code="internationalPhoneInfo.country"
-                :required="true"
-                color="#555"
-                valid-color="#16ba97"
-                @update="(data) => (phoneInput = data)"
-              />
+            <span v-if="!isValidPhone && isPhoneError" class="error"
+              >Please enter a valid phone number.</span
+            >
+          </label>
+          <p v-if="error" class="error">
+            {{
+              error || 'We were unable to save your number. Please try again.'
+            }}
+          </p>
+        </section>
+        <footer class="incentive-enrollment-modal__footer">
+          <div
+            class="incentive-enrollment-modal__buttons incentive-enrollment-modal__buttons--secondary"
+          >
+            <large-button
+              class="incentive-enrollment-modal__buttons-button"
+              @click="handleCloseModal"
+              >No, thanks</large-button
+            >
+            <large-button
+              class="incentive-enrollment-modal__buttons-button incentive-enrollment-modal__buttons-button--primary"
+              @click="sendCode"
+              :disabled="phone === '' || !isValidPhone ? true : null"
+              primary
+              :showArrow="false"
+              >Send code</large-button
+            >
+          </div>
+          <RecaptchaCaption />
+        </footer>
+      </div>
+      <div v-else-if="step === 2" class="incentive-enrollment-modal">
+        <header>
+          <h1 class="incentive-enrollment-modal__title">
+            We just texted you your verification code to
+            <span class="verification__send-to">{{ phone }}</span>
+          </h1>
+        </header>
 
-              <span v-if="!isValidPhone && isPhoneError" class="error"
-                >Please enter a valid phone number.</span
-              >
+        <section class="incentive-enrollment-modal__section">
+          <div class="uc-form-element">
+            <label for="verification-code">
+              Enter your 6-digit verification code
             </label>
-            <p v-if="error" class="error">
-              {{
-                error || 'We were unable to save your number. Please try again.'
-              }}
-            </p>
-          </section>
-          <footer class="incentive-enrollment-modal__footer">
-            <div
-              class="incentive-enrollment-modal__buttons incentive-enrollment-modal__buttons--secondary"
+            <input
+              id="verification-code"
+              class="uc-form-text-input"
+              v-model="verificationCode"
+              type="text"
+              placeholder="XXXXXX"
+              required
+            />
+          </div>
+          <div
+            class="uc-form-subtext verification__sub-text"
+            v-if="!hasResentCode"
+          >
+            Did not receive a text?
+            <span
+              :disabled="isSubmitting ? true : null"
+              @click="resendCode"
+              class="uc-link"
+              >Resend code</span
             >
-              <large-button
-                class="incentive-enrollment-modal__buttons-button"
-                @click.native="handleCloseModal"
-                >No, thanks</large-button
-              >
-              <large-button
-                class="incentive-enrollment-modal__buttons-button incentive-enrollment-modal__buttons-button--primary"
-                @click.native="sendCode"
-                :disabled="phone === '' || !isValidPhone"
-                primary
-                :showArrow="false"
-                >Send code</large-button
-              >
-            </div>
-            <RecaptchaCaption />
-          </footer>
-        </div>
-        <div v-else-if="step === 2" class="incentive-enrollment-modal">
-          <header>
-            <h1 class="incentive-enrollment-modal__title">
-              We just texted you your verification code to
-              <span class="verification__send-to">{{ phone }}</span>
-            </h1>
-          </header>
+          </div>
+        </section>
+        <footer class="incentive-enrollment-modal__footer">
+          <div
+            class="incentive-enrollment-modal__buttons incentive-enrollment-modal__buttons--secondary"
+          >
+            <large-button
+              class="incentive-enrollment-modal__buttons-button incentive-enrollment-modal__buttons-button--primary"
+              @click="handlePhoneConfirmation"
+              :disabled="!isValidVerificationCode ? true : null"
+              :showArrow="false"
+              primary
+            >
+              Verify my phone number
+            </large-button>
+          </div>
+        </footer>
+      </div>
+      <div v-else-if="step === 3" class="incentive-enrollment-modal">
+        <header>
+          <h1
+            class="incentive-enrollment-modal__title incentive-enrollment-modal__title--center"
+          >
+            Your phone is verified!
+          </h1>
+        </header>
 
-          <section class="incentive-enrollment-modal__section">
-            <div class="uc-form-element">
-              <label for="verification-code">
-                Enter your 6-digit verification code
-              </label>
-              <input
-                id="verification-code"
-                class="uc-form-text-input"
-                v-model="verificationCode"
-                type="text"
-                placeholder="XXXXXX"
-                required
-              />
-            </div>
-            <div
-              class="uc-form-subtext verification__sub-text"
-              v-if="!hasResentCode"
+        <section class="incentive-enrollment-modal__section--center">
+          <updog-hooray class="updog" />
+        </section>
+        <footer class="incentive-enrollment-modal__footer">
+          <div class="incentive-enrollment-modal__buttons">
+            <large-button
+              class="incentive-enrollment-modal__buttons-button incentive-enrollment-modal__buttons-button--single"
+              @click="handleCloseModal"
+              :showArrow="false"
+              primary
             >
-              Did not receive a text?
-              <span :disabled="isSubmitting" @click="resendCode" class="uc-link"
-                >Resend code</span
-              >
-            </div>
-          </section>
-          <footer class="incentive-enrollment-modal__footer">
-            <div
-              class="incentive-enrollment-modal__buttons incentive-enrollment-modal__buttons--secondary"
-            >
-              <large-button
-                class="incentive-enrollment-modal__buttons-button incentive-enrollment-modal__buttons-button--primary"
-                @click.native="handlePhoneConfirmation"
-                :disabled="!isValidVerificationCode"
-                :showArrow="false"
-                primary
-              >
-                Verify my phone number
-              </large-button>
-            </div>
-          </footer>
-        </div>
-        <div v-else-if="step === 3" class="incentive-enrollment-modal">
-          <header>
-            <h1
-              class="incentive-enrollment-modal__title incentive-enrollment-modal__title--center"
-            >
-              Your phone is verified!
-            </h1>
-          </header>
-
-          <section class="incentive-enrollment-modal__section--center">
-            <updog-hooray class="updog" />
-          </section>
-          <footer class="incentive-enrollment-modal__footer">
-            <div class="incentive-enrollment-modal__buttons">
-              <large-button
-                class="incentive-enrollment-modal__buttons-button incentive-enrollment-modal__buttons-button--single"
-                @click.native="handleCloseModal"
-                :showArrow="false"
-                primary
-              >
-                Done
-              </large-button>
-            </div>
-          </footer>
-        </div>
-      </template>
+              Done
+            </large-button>
+          </div>
+        </footer>
+      </div>
     </modal>
   </div>
 </template>
@@ -155,7 +155,7 @@ import AnalyticsService from '@/services/AnalyticsService'
 import NetworkService from '@/services/NetworkService'
 import AuthService from '@/services/AuthService'
 import PhoneNumber from 'awesome-phonenumber'
-import VuePhoneNumberInput from 'vue-phone-number-input'
+import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import { mapState } from 'vuex'
 import Loader from '@/components/Loader.vue'
 import UpdogHooray from '@/assets/updog-hooray.svg'
@@ -167,7 +167,7 @@ export default {
     RecaptchaCaption,
     Modal,
     LargeButton,
-    VuePhoneNumberInput,
+    MazPhoneNumberInput,
     Loader,
     UpdogHooray,
   },

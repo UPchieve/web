@@ -1,5 +1,5 @@
 import modalModule from '@/store/modules/app/modal'
-import { vi } from 'vitest';
+import { vi } from 'vitest'
 
 const { state, mutations, actions } = modalModule
 

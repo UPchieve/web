@@ -33,7 +33,7 @@
       <large-button
         v-else-if="leftBtn.handleClick"
         :showArrow="false"
-        @click.native="leftBtn.handleClick"
+        @click="leftBtn.handleClick"
         class="btn"
       >
         {{ leftBtn.text }}
@@ -41,7 +41,7 @@
       <large-button
         v-if="!isFirstQuiz && !quizResults.passed"
         :showArrow="false"
-        @click.native="middleBtn.handleClick"
+        @click="middleBtn.handleClick"
         class="btn"
       >
         {{ middleBtn.text }}
@@ -59,7 +59,7 @@
         v-else-if="rightBtn.handleClick"
         primary
         :showArrow="false"
-        @click.native="rightBtn.handleClick"
+        @click="rightBtn.handleClick"
         class="btn"
       >
         {{ rightBtn.text }}
@@ -91,6 +91,7 @@ export default {
       instructionMsg: '',
       category: '',
       leftBtn: { text: '', route: '', handleClick: undefined },
+      middleBtn: { text: '', route: '', handleClick: undefined },
       rightBtn: { text: '', route: '', handleClick: undefined },
       popUpBorderStyle: {},
       scoreStyle: {},
@@ -138,6 +139,7 @@ export default {
 
     this.scoreMsg = `Score: ${this.quizResults.score} out of ${this.quizLength} correct.`
   },
+  emits: ['showReview'],
   methods: {
     showReview() {
       this.$emit('showReview')

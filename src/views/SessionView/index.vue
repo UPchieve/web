@@ -152,7 +152,6 @@ import SessionChat from './SessionChat/index.vue'
 import Whiteboard from './Whiteboard.vue'
 import DocumentEditor from './DocumentEditor.vue'
 import DocumentEditorV2 from './DocumentEditorV2.vue'
-import SessionFulfilledModal from './SessionFulfilledModal.vue'
 import ConnectionTroubleModal from './ConnectionTroubleModal.vue'
 import PhotoUploadIcon from '@/assets/whiteboard_icons/photo-upload.svg'
 import isOutdatedMobileAppVersion from '@/utils/is-outdated-mobile-app-version'
@@ -166,6 +165,7 @@ import Gleap from 'gleap'
 import { backOff } from 'exponential-backoff'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import LoggerService from '@/services/LoggerService'
+import { socket } from '@/socket'
 
 const activeHeaderData = {
   component: 'SessionHeader',
@@ -202,7 +202,7 @@ export default {
       gleapEl.style.visibility = 'hidden'
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Gleap.removeCustomData('sessionId')
     window.removeEventListener('resize', this.handleResize)
     const gleapEl = document.querySelector(this.gleapClass)
@@ -228,6 +228,7 @@ export default {
       isLoadingPresessionResponse: false,
       isFetchingIsSessionRecapEligible: false,
       sessionHasEnded: false,
+      unsubscribeFromActionSubscription: () => undefined,
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -244,6 +245,7 @@ export default {
       presessionSurvey: (state) => state.user.presessionSurvey,
       docEditorVersion: (state) => state.user.session.docEditorVersion,
       auxiliaryType: (state) => state.user.session.toolType,
+      isConnected: (state) => state.socket.isConnected,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -286,6 +288,9 @@ export default {
     },
     gleapClass() {
       return '.bb-feedback-button'
+    },
+    isConnectionReady() {
+      return [this.isConnected, this.sessionId]
     },
   },
   async mounted() {
@@ -356,10 +361,8 @@ export default {
           this.$store.dispatch('user/fetchUser')
         }
 
-        if (!this.$socket.connected) await this.$socket.connect()
-        this.joinSession(sessionId)
+        if (!socket.connected) await socket.connect()
         Gleap.setCustomData('sessionId', sessionId)
-        this.$store.dispatch('user/sessionConnected')
 
         if (this.user.isVolunteer) {
           await this.getSessionContext(sessionId)
@@ -383,54 +386,37 @@ export default {
         this.$router.replace('/')
       })
   },
-  sockets: {
-    bump: function (data) {
-      // Do not show the session fulfilled modal if a user is already
-      // present on the page after a session has ended
-      if (!this.sessionHasEnded)
-        this.$store.dispatch('app/modal/show', {
-          component: SessionFulfilledModal,
-          data: {
-            acceptText: 'Return to Dashboard',
-            alertModal: true,
-            isSessionEnded: !!data.endedAt,
-            volunteerJoined: !!data.volunteer,
-            isSessionVolunteer: this.user._id === data.volunteer,
-            isSessionStudent: this.user._id === data.student,
-          },
-        })
-    },
-    reconnect_attempt() {
-      this.$store.dispatch('user/sessionDisconnected')
-      if (!this.session || !this.session._id) {
-        const abort = () => this.$router.push('/')
-        this.showTroubleStartingModal(abort)
+  watch: {
+    reconnectAttempts(prev, current) {
+      if (current > prev) {
+        this.$store.dispatch('user/sessionDisconnected')
+        if (!this.session || !this.session._id) {
+          const abort = () => this.$router.push('/')
+          this.showTroubleStartingModal(abort)
+        }
       }
     },
-    reconnect() {
-      this.$store.dispatch('user/sessionConnected')
-    },
-    // https://socket.io/docs/v2/client-api/#event-disconnect
-    async disconnect(reason) {
-      const userType = this.isVolunteer ? 'volunteer' : 'student'
-      const err = new Error(
-        `Chat socket for the ${userType} in session ${this.sessionId} for reason: ${reason}`
-      )
-      LoggerService.noticeError(err)
-
-      if (
-        reason === 'io server disconnect' &&
-        !this.isRecapSocketUpdatesActive
-      ) {
-        // the disconnection was initiated by the server, you need to reconnect manually
-        if (!this.$socket.connected) await this.$socket.connect()
+    isConnectionReady(currentValue) {
+      const [isConnected, sessionId] = currentValue
+      if (isConnected && sessionId) {
         this.joinSession(this.sessionId)
         this.$store.dispatch('user/sessionConnected')
       }
     },
-    connect() {
-      this.joinSession(this.sessionId)
-      this.$store.dispatch('user/sessionConnected')
+    isSessionConnectionAlive(newValue, oldValue) {
+      if (newValue && !oldValue) {
+        this.$store.dispatch('app/modal/hide')
+      }
+    },
+    mobileMode(newValue, oldValue) {
+      if (newValue && !oldValue)
+        document.querySelector(this.gleapClass).style.visibility = 'hidden'
+      if (!newValue && oldValue)
+        document.querySelector(this.gleapClass).style.visibility = 'visible'
+    },
+    // Once session has ended, show chatbot to tutor
+    async 'session.endedAt'(newValue, oldValue) {
+      if (newValue && !oldValue) this.sessionHasEnded = true
     },
   },
   methods: {
@@ -456,7 +442,7 @@ export default {
     async joinSession(sessionId) {
       // await nextTick to get access to this.prevRoute and avoid a race condition
       await this.$nextTick()
-      this.$socket.emit(
+      socket.emit(
         'join',
         {
           sessionId,
@@ -533,23 +519,6 @@ export default {
     openHelp() {
       Gleap.open()
       AnalyticsService.captureEvent(EVENTS.USER_CLICKED_IN_SESSION_HELP)
-    },
-  },
-  watch: {
-    isSessionConnectionAlive(newValue, oldValue) {
-      if (newValue && !oldValue) {
-        this.$store.dispatch('app/modal/hide')
-      }
-    },
-    mobileMode(newValue, oldValue) {
-      if (newValue && !oldValue)
-        document.querySelector(this.gleapClass).style.visibility = 'hidden'
-      if (!newValue && oldValue)
-        document.querySelector(this.gleapClass).style.visibility = 'visible'
-    },
-    // Once session has ended, show chatbot to tutor
-    async 'session.endedAt'(newValue, oldValue) {
-      if (newValue && !oldValue) this.sessionHasEnded = true
     },
   },
 }

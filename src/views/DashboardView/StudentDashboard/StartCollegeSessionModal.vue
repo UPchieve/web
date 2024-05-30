@@ -5,7 +5,7 @@
     <large-button
       primary
       class="button"
-      @click.native="startSession"
+      @click="startSession"
       :showArrow="false"
       >Chat with a coach!
     </large-button>

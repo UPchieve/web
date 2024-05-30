@@ -9,7 +9,7 @@
       class="questions-container"
       :class="isAdminReview && 'admin-review'"
     >
-      <fieldset :disabled="isAdminReview">
+      <fieldset :disabled="isAdminReview ? true : null">
         <legend class="heading-legend" v-if="!isAdminReview">
           <h1 class="title">UPchieve Applicant Reference Evaluation</h1>
         </legend>
@@ -151,7 +151,7 @@
                 <div class="uc-form-label">{{ subquestion }}</div>
                 <v-select
                   class="uc-reference-form__select"
-                  @input="
+                  @update:modelValue="
                     (value) =>
                       storeIndexForMultipleRadioResponse(
                         value,
@@ -226,7 +226,7 @@
           class="submit-button"
           type="button"
           v-on:click="submitForm"
-          :disabled="!isValidForm()"
+          :disabled="!isValidForm() ? true : null"
         >
           SUBMIT
         </button>

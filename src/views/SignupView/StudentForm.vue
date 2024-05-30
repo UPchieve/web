@@ -324,7 +324,7 @@
         id="btn-eligibility-submit"
         data-testid="eligibility-form-submit-btn"
         class="uc-form-button"
-        :disabled="cannotSubmitForm(v$.eligibility)"
+        :disabled="cannotSubmitForm(v$.eligibility) ? true : null"
         type="submit"
       >
         Continue
@@ -430,7 +430,7 @@
       <button
         class="uc-form-button google"
         @click.prevent="signUpWithGoogle"
-        :disabled="isSubmittingAccountForm"
+        :disabled="isSubmittingAccountForm ? true : null"
       >
         <google-logo />
         Sign Up with Google
@@ -600,6 +600,8 @@
           isSubmittingAccountForm ||
           cannotSubmitForm(v$.profile) ||
           cannotSubmitForm(v$.credentials)
+            ? true
+            : null
         "
         type="submit"
       >

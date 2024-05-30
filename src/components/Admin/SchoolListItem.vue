@@ -1,5 +1,8 @@
 <template>
-  <router-link :to="`/admin/school/${school._id}`" class="list-item" tag="tr">
+  <tr
+    @click="() => this.$router.push(`/admin/school/${school._id}`)"
+    class="list-item"
+  >
     <td>{{ school.name }}</td>
     <td>
       <div>{{ school.city }}, {{ school.state }}</div>
@@ -8,7 +11,7 @@
     <td>{{ adminApprovalStatus }}</td>
     <td>{{ approvalStatus }}</td>
     <td>{{ partnerStatus }}</td>
-  </router-link>
+  </tr>
 </template>
 
 <script>

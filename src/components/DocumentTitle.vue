@@ -1,3 +1,4 @@
+<template><span></span></template>
 <script>
 export default {
   name: 'document-title',
@@ -10,8 +11,12 @@ export default {
       },
     },
   },
-  render() {
-    return null
-  },
 }
 </script>
+<style lang="scss" scoped>
+span {
+  width: 0;
+  height: 0;
+  display: none;
+}
+</style>

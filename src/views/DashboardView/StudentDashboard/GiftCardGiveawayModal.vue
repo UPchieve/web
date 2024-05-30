@@ -50,7 +50,7 @@
           class="gift-card-giveaway-btn"
           primary
           :showArrow="false"
-          @click.native="closeModal"
+          @click="closeModal"
         >
           Good luck!
         </large-button>

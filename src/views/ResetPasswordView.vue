@@ -31,7 +31,7 @@
           class="uc-form-button"
           type="submit"
           @click.prevent="submit()"
-          :disabled="isSendingEmail"
+          :disabled="isSendingEmail ? true : null"
         >
           Send
         </button>

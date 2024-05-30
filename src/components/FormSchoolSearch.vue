@@ -53,7 +53,7 @@ import { helpers, requiredIf } from '@vuelidate/validators'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import NetworkService from '@/services/NetworkService'
-import InputValidation from '@/mixins/InputValidation'
+import { useInputValidation } from '@/composables/InputValidation'
 
 export default {
   components: {
@@ -79,10 +79,13 @@ export default {
     },
   },
 
-  mixins: [InputValidation],
-
   created() {
     this.CANNOT_FIND_SCHOOL_TEXT = `Can't find your school?`
+  },
+
+  setup() {
+    const { v$, hasValidationError, getValidationErrors } = useInputValidation()
+    return { v$, hasValidationError, getValidationErrors }
   },
 
   data() {

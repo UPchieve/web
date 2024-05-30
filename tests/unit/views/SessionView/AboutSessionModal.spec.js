@@ -1,12 +1,10 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils'
-import Vuex from 'vuex'
+import { mount } from '@vue/test-utils'
+import { createStore } from 'vuex'
 import userModule from '@/store/modules/user'
 import AboutSessionModal from '@/views/SessionView/AboutSessionModal.vue'
-import { vi } from 'vitest';
+import { vi } from 'vitest'
 
 describe('AboutSessionModal', () => {
-  const localVue = createLocalVue()
-  localVue.use(Vuex)
   let DEFAULT_SESSION, DEFAULT_PROPS
 
   beforeEach(() => {
@@ -30,7 +28,7 @@ describe('AboutSessionModal', () => {
    * @param overrides - May have property 'props'
    */
   const getWrapper = (overrides = {}) => {
-    const store = new Vuex.Store({
+    const store = createStore({
       modules: {
         user: {
           ...userModule,
@@ -43,10 +41,9 @@ describe('AboutSessionModal', () => {
       },
     })
 
-    return shallowMount(AboutSessionModal, {
-      localVue,
-      store,
-      propsData: {
+    return mount(AboutSessionModal, {
+      global: { plugins: [store] },
+      props: {
         ...DEFAULT_PROPS,
         ...(overrides.props ?? {}),
       },
@@ -93,7 +90,7 @@ describe('AboutSessionModal', () => {
 
     it.each([1, 2])(
       'Should render if the student scored %s in any of the "How do they feel" questions',
-      score => {
+      (score) => {
         const responses = [
           {
             displayLabel: 'How they feel about <subject>',

@@ -78,7 +78,7 @@
           <large-button
             class="contact-form__submit"
             primary
-            @click.native="submitContactUs"
+            @click="submitContactUs"
           >
             Send
           </large-button>
