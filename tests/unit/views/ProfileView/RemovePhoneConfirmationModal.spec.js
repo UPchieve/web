@@ -1,5 +1,5 @@
-import { mount, createLocalVue } from '@vue/test-utils'
-import Vuex from 'vuex'
+import { mount } from '@vue/test-utils'
+import { createStore } from 'vuex'
 import { vi } from 'vitest'
 import RemovePhoneConfirmationModal from '@/views/ProfileView/RemovePhoneConfirmationModal.vue'
 import NetworkService from '@/services/NetworkService'
@@ -7,8 +7,6 @@ import * as userModule from '@/store/modules/user'
 import * as appModule from '@/store/modules/app/index'
 import flushPromises from 'flush-promises'
 
-const localVue = createLocalVue()
-localVue.use(Vuex)
 vi.mock('../../../../src/services/NetworkService')
 describe('RemovePhoneConfirmationModal', () => {
   let defaultUserState
@@ -16,7 +14,7 @@ describe('RemovePhoneConfirmationModal', () => {
   const mockAccept = vi.fn()
 
   const getWrapper = (mobileMode = false, isVolunteer = false) => {
-    const store = new Vuex.Store({
+    const store = createStore({
       modules: {
         user: {
           ...userModule,
@@ -36,9 +34,8 @@ describe('RemovePhoneConfirmationModal', () => {
       },
     })
     return mount(RemovePhoneConfirmationModal, {
-      localVue,
-      store,
-      propsData: {
+      global: { plugins: [store] },
+      props: {
         onCancel: mockCancel,
         onAccept: mockAccept,
       },

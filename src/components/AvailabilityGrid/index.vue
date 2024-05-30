@@ -22,7 +22,7 @@
         :selectable="true"
         :selected="value"
         :flagged="readWaitTime(day, hour) > threshold"
-        @click.native="updateData(day, hour)"
+        @click="updateData(day, hour)"
         :data-testid="`${day.toLowerCase()}-${hour}`"
       />
     </div>
@@ -39,6 +39,7 @@ export default {
     availability: Object,
     waitTimes: Object,
   },
+  emits: ['select'],
   data() {
     return {
       threshold: 15 * 60 * 1000,

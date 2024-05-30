@@ -8,25 +8,24 @@
       <div class="chat-header__title">Session Chat</div>
     </div>
     <div class="chat-contents">
-      <template v-for="(message, index) in messages">
-        <div
-          :key="`message-${index}`"
-          :class="messageAlignment(message)"
-          class="message"
-        >
-          <component
-            class="avatar"
-            :is="avatar(message)"
-            v-if="message.user !== user._id"
-          />
-          <div class="contents" :class="messageStyling(message)">
-            <span>{{ message.contents }}</span>
-          </div>
-          <div class="time">
-            {{ message.createdAt | formatTime }}
-          </div>
+      <div
+        v-for="(message, index) in messages"
+        :class="messageAlignment(message)"
+        class="message"
+        :key="`message-${index}`"
+      >
+        <component
+          class="avatar"
+          :is="avatar(message)"
+          v-if="message.user !== user._id"
+        />
+        <div class="contents" :class="messageStyling(message)">
+          <span>{{ message.contents }}</span>
         </div>
-      </template>
+        <div class="time">
+          {{ formatTime(message.createdAt) }}
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -36,6 +35,7 @@ import getChatAvatar from '@/utils/get-chat-avatar'
 import StudentIcon from '@/assets/student-icon.svg'
 import VolunteerIcon from '@/assets/volunteer-icon.svg'
 import { mapState } from 'vuex'
+import moment from 'moment'
 
 const MESSAGE_ALIGNMENT = {
   LEFT: 'left',
@@ -62,6 +62,9 @@ export default {
     volunteerId: String,
   },
   methods: {
+    formatTime(createdAt) {
+      return moment(createdAt).format('h:mm a')
+    },
     messageAlignment(message) {
       return message.user === this.user._id
         ? MESSAGE_ALIGNMENT.RIGHT

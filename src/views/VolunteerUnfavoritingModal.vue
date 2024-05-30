@@ -14,7 +14,7 @@
       <footer>
         <div class="unfavoriting-modal-buttons">
           <large-button
-            @click.native="closeModal"
+            @click="closeModal"
             :showArrow="false"
             class="unfavoriting-modal-cancel-button"
             >Cancel</large-button
@@ -23,7 +23,7 @@
             :showArrow="false"
             primary
             class="unfavoriting-modal-unfavorite-button"
-            @click.native="unfavorite"
+            @click="unfavorite"
             >Unfavorite</large-button
           >
         </div>
@@ -43,6 +43,7 @@ export default {
     closeModal: { type: Function, required: true },
     volunteerName: { type: String, required: true, default: '' },
   },
+  emits: ['unfavorite'],
   methods: {
     unfavorite() {
       this.$emit('unfavorite', false)

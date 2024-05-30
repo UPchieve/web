@@ -21,6 +21,7 @@ export default {
       fileSelectionEvent: null,
     }
   },
+  emits: ['file-selected'],
   methods: {
     openFileDialog(event) {
       this.dialogOpeningEvent = event

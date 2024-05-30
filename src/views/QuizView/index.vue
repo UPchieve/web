@@ -17,15 +17,15 @@
           <large-button
             primary
             :showArrow="false"
-            @click.native="goToStudyMaterials"
+            @click="goToStudyMaterials"
             class="review-buttons--button"
             ><span>Review concepts</span>
           </large-button>
           <large-button
             class="review-buttons--button review-buttons--button-end"
             :showArrow="false"
-            @click.native="reloadQuiz"
             data-testid="retake-quiz"
+            @click="reloadQuiz"
             ><span>Retake quiz</span>
           </large-button>
         </template>
@@ -88,7 +88,7 @@
               <large-button
                 v-if="isQuizStudyMaterialUser"
                 :showArrow="false"
-                @click.native="goToStudyMaterials()"
+                @click="goToStudyMaterials()"
                 class="quiz-buttons--button"
                 ><span>Study</span>
               </large-button>
@@ -96,7 +96,7 @@
                 data-testid="btn-start-quiz"
                 primary
                 :showArrow="false"
-                @click.native="startQuiz()"
+                @click="startQuiz()"
                 class="quiz-buttons--button quiz-buttons--primary-button"
                 ><span>Start Quiz</span>
               </large-button>

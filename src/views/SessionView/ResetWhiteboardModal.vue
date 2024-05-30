@@ -16,10 +16,10 @@
       <separator />
       <footer class="reset-wb-modal__footer">
         <div class="reset-wb-modal__buttons">
-          <large-button @click.native="closeModal">Cancel</large-button>
+          <large-button @click="closeModal">Cancel</large-button>
           <large-button
             class="reset-wb-modal__reset-btn"
-            @click.native="resetWhiteboard"
+            @click="resetWhiteboard"
             >Reset</large-button
           >
         </div>

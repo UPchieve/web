@@ -97,6 +97,7 @@ export default {
   updated() {
     this.rerenderMathJaxElements()
   },
+  emits: ['submitQuiz'],
   methods: {
     clearMathJaxElements() {
       const quizBody = document.querySelector('.quiz-body')

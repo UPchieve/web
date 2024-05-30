@@ -6,11 +6,11 @@
       </h3>
     </template>
 
-    <template v-for="(cert, index) in certData">
-      <div
-        class="training__cert"
-        :key="`cert-title-${cert.displayName}-${index}`"
-      >
+    <template
+      v-for="cert in certData"
+      :key="`additional-subjects-${cert.displayName}`"
+    >
+      <div class="training__cert">
         <check-mark :checked="isComplete(cert)" />
         <div class="training__cert-title">
           <span>{{ cert.displayName }}</span>
@@ -24,10 +24,7 @@
         </div>
       </div>
 
-      <div
-        :key="`subjects-${cert.displayName}-${index}`"
-        class="training__subjects-unlocked"
-      >
+      <div class="training__subjects-unlocked">
         <span
           v-if="isSmallDevice"
           class="training__subjects-unlocked--mobile"
@@ -40,11 +37,8 @@
           >{{ subject.displayName }}</span
         >
       </div>
-      <div :key="`empty-${index}`" />
-      <div
-        :key="`border-${cert.displayName}-${index}`"
-        class="training__row-border"
-      />
+      <div />
+      <div class="training__row-border" />
     </template>
   </div>
 </template>

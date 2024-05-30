@@ -8,7 +8,7 @@ describe('VerificationMethodSelector', () => {
 
   const getWrapper = (email = 'testEmail@gmail.com') => {
     return mount(VerificationMethodSelector, {
-      propsData: {
+      props: {
         email,
       },
     })

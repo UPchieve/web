@@ -34,6 +34,8 @@ import LoadingMessage from '@/components/LoadingMessage.vue'
 import RefreshDocumentEditorModal from '@/views/SessionView/RefreshDocumentEditorModal.vue'
 import { Doc, applyUpdate } from 'yjs'
 import { QuillBinding } from 'y-quill'
+import { socket } from '@/socket'
+import { markRaw } from 'vue'
 
 Quill.register('modules/cursors', QuillCursors)
 Quill.register('modules/image', ImageCompressor)
@@ -61,11 +63,15 @@ export default {
     ...mapState({
       currentSession: (state) => state.user.session,
       isSessionConnectionAlive: (state) => state.user.isSessionConnectionAlive,
+      isConnected: (state) => state.socket.isConnected,
     }),
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
     }),
+    isSocketReadyToRequestForDoc() {
+      return [this.isConnected, this.currentSession?.id]
+    },
   },
   mounted() {
     const toolbar = [
@@ -77,35 +83,37 @@ export default {
 
     if (!this.isVolunteer) toolbar.push(['image'])
 
-    this.quillEditor = new Quill('#quill-container', {
-      placeholder: 'Type or paste something...',
-      theme: 'snow',
-      formats: [
-        'header',
-        'bold',
-        'italic',
-        'underline',
-        'strike',
-        'color',
-        'background',
-        'list',
-        'image',
-      ],
-      modules: {
-        image: {
-          quality: 0.8,
-          maxWidth: 1000,
-          maxHeight: 1000,
-          imageType: 'image/webp',
-          isVolunteer: this.isVolunteer,
+    this.quillEditor = markRaw(
+      new Quill('#quill-container', {
+        placeholder: 'Type or paste something...',
+        theme: 'snow',
+        formats: [
+          'header',
+          'bold',
+          'italic',
+          'underline',
+          'strike',
+          'color',
+          'background',
+          'list',
+          'image',
+        ],
+        modules: {
+          image: {
+            quality: 0.8,
+            maxWidth: 1000,
+            maxHeight: 1000,
+            imageType: 'image/webp',
+            isVolunteer: this.isVolunteer,
+          },
+          cursors: {
+            selectionChangeSource: 'cursor-api',
+            transformOnTextChange: true,
+          },
+          toolbar,
         },
-        cursors: {
-          selectionChangeSource: 'cursor-api',
-          transformOnTextChange: true,
-        },
-        toolbar,
-      },
-    })
+      })
+    )
 
     // Delegate tracking the contents of the doc to Yjs instead of Quill.
     this.doc = new Doc()
@@ -149,19 +157,33 @@ export default {
 
     this.quillEditor.on('selection-change', this.quillSelectionChange)
 
-    this.$socket.emit('requestQuillStateV2', {
-      sessionId: this.currentSession._id,
+    socket.on('quillStateV2', ({ updates }) => {
+      for (const update of updates) {
+        applyUpdate(this.doc, decode(update))
+      }
+      this.isLoading = false
+      this.quillEditor.enable()
+
+      this.quillEditor
+        .getModule('cursors')
+        .createCursor('partnerCursor', 'Partner', '#16D2AA')
     })
 
-    this.quillEditor
-      .getModule('cursors')
-      .createCursor('partnerCursor', 'Partner', '#16D2AA')
+    socket.on('partnerQuillDeltaV2', ({ update }) => {
+      applyUpdate(this.doc, decode(update))
+    })
+
+    socket.on('quillPartnerSelection', ({ range }) => {
+      this.quillEditor.getModule('cursors').moveCursor('partnerCursor', range)
+    })
+
+    if (this.isConnected && this.currentSession?.id) this.requestQuillDoc()
   },
   methods: {
     quillTextChange(update, origin, doc) {
       // Only emit changes that are made in this component
       if (origin?.doc === doc) {
-        this.$socket.emit('transmitQuillDeltaV2', {
+        socket.emit('transmitQuillDeltaV2', {
           sessionId: this.currentSession._id,
           update: encode(update),
         })
@@ -169,29 +191,16 @@ export default {
     },
     quillSelectionChange(range, oldRange, source) {
       if (source === 'user') {
-        this.$socket.emit('transmitQuillSelection', {
+        socket.emit('transmitQuillSelection', {
           sessionId: this.currentSession._id,
           range,
         })
       }
     },
-  },
-
-  sockets: {
-    quillStateV2({ updates }) {
-      for (const update of updates) {
-        applyUpdate(this.doc, decode(update))
-      }
-      this.isLoading = false
-      this.quillEditor.enable()
-    },
-
-    partnerQuillDeltaV2({ update }) {
-      applyUpdate(this.doc, decode(update))
-    },
-
-    quillPartnerSelection({ range }) {
-      this.quillEditor.getModule('cursors').moveCursor('partnerCursor', range)
+    requestQuillDoc() {
+      socket.emit('requestQuillStateV2', {
+        sessionId: this.currentSession.id,
+      })
     },
   },
   watch: {
@@ -208,6 +217,10 @@ export default {
         this.quillEditor.disable()
         this.isConnecting = true
       }
+    },
+    isSocketReadyToRequestForDoc(currentVal) {
+      const [isConnected, sessionId] = currentVal
+      if (isConnected && sessionId) this.requestQuillDoc()
     },
   },
 }

@@ -1,13 +1,9 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils'
-import Vuex from 'vuex'
+import { shallowMount } from '@vue/test-utils'
 import store from '@/store'
 import SidebarInfo from '@/components/App/AppSidebar/SidebarInfo.vue'
 
-const localVue = createLocalVue()
-localVue.use(Vuex)
-
-const getWrapper = propsData =>
-  shallowMount(SidebarInfo, { localVue, store, propsData })
+const getWrapper = (props) =>
+  shallowMount(SidebarInfo, { global: { plugins: [store] }, props })
 
 describe('SidebarInfo', () => {
   test('layout', () => {

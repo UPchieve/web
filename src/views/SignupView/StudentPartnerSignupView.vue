@@ -36,7 +36,7 @@
         <button
           class="uc-form-button google"
           @click.prevent="signUpWithGoogle"
-          :disabled="isSubmittingForm || !sso.currentGrade"
+          :disabled="isSubmittingForm || !sso.currentGrade ? true : null"
         >
           <google-logo />
           Sign Up with Google
@@ -375,7 +375,7 @@
         <button
           class="uc-form-button"
           type="submit"
-          :disabled="isSignUpButtonDisabled()"
+          :disabled="isSignUpButtonDisabled() ? true : null"
         >
           Sign Up
         </button>

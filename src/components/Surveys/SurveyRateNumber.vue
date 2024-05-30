@@ -41,6 +41,7 @@ export default {
       required: false,
     },
   },
+  emits: ['survey-rate-click'],
   methods: {
     handleRateClick() {
       this.$emit('survey-rate-click', this.questionId, this.responseId)

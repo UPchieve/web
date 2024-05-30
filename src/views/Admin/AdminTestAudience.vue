@@ -15,7 +15,7 @@
           class="uc-form-button"
           type="button"
           @click="addToAudience"
-          :disabled="!query"
+          :disabled="!query ? true : null"
         >
           Add To Audience
         </button>
@@ -23,7 +23,7 @@
           class="uc-form-button"
           type="button"
           @click="removeFromAudience"
-          :disabled="!query"
+          :disabled="!query ? true : null"
         >
           Remove From Audience
         </button>

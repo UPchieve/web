@@ -2,7 +2,7 @@
   <div :class="isNewHeader.class">
     <template v-if="mobileMode">
       <hamburger-button class="left white" :tabindex="0" />
-      <hyperlink-button primary reverse @click.native="showModal">{{
+      <hyperlink-button primary reverse @click="showModal">{{
         message
       }}</hyperlink-button>
     </template>
@@ -11,13 +11,11 @@
       <div class="RejoinSessionHeader-left" />
       <div class="RejoinSessionHeader-message">{{ message }}</div>
       <div class="RejoinSessionHeader-buttons">
-        <hyperlink-button reverse @click.native="end"
-          >End chat</hyperlink-button
-        >
+        <hyperlink-button reverse @click="end">End chat</hyperlink-button>
         <large-button
           primary
           reverse
-          @click.native="rejoin"
+          @click="rejoin"
           :class="isNewHeader.buttonClass"
           >Return to chat</large-button
         >

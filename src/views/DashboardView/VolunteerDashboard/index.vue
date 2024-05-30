@@ -89,7 +89,7 @@
               :subtitle="accountAction.subtitle"
               :status="accountAction.status"
               :icon="accountAction.icon"
-              @click.native="accountAction.clickFn"
+              @click="accountAction.clickFn"
             />
           </template>
           <template v-else>
@@ -100,7 +100,7 @@
               :subtitle="accountAction.subtitle"
               :status="accountAction.status"
               :icon="accountAction.icon"
-              @click.native="accountAction.clickFn"
+              @click="accountAction.clickFn"
             />
           </template>
         </div>
@@ -122,7 +122,7 @@
             :subtitle="accountAction.subtitle"
             :status="accountAction.status"
             :icon="accountAction.icon"
-            @click.native="accountAction.clickFn"
+            @click="accountAction.clickFn"
           />
         </div>
       </template>
@@ -202,6 +202,7 @@ export default {
         if (isNowLoaded) this.initImpactSummary()
       },
       immediate: true,
+      deep: true,
     },
   },
   async created() {

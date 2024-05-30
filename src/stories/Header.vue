@@ -68,7 +68,7 @@ export default {
       type: Object,
     },
   },
-
+  emits: ['onLogin', 'onLogout', 'onCreateAccount'],
   methods: {
     onLogin() {
       this.$emit('onLogin')

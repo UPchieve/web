@@ -1,17 +1,12 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils'
 import { merge } from 'lodash-es'
-import Vuex from 'vuex'
-import VueRouter from 'vue-router'
+import { createStore } from 'vuex'
 import router from '@/router'
 import { storeOptions } from '@/store'
 import App from '@/components/App/index.vue'
 import AppHeader from '@/components/App/AppHeader/index.vue'
 import AppSidebar from '@/components/App/AppSidebar/index.vue'
 import AppModal from '@/components/App/AppModal/index.vue'
-
-const localVue = createLocalVue()
-localVue.use(VueRouter)
-localVue.use(Vuex)
 
 const getWrapper = (options = {}) => {
   options = {
@@ -21,7 +16,7 @@ const getWrapper = (options = {}) => {
     ...options,
   }
 
-  const store = new Vuex.Store(
+  const store = createStore(
     merge({}, storeOptions, {
       modules: {
         app: {
@@ -35,7 +30,7 @@ const getWrapper = (options = {}) => {
     })
   )
 
-  return shallowMount(App, { localVue, router, store })
+  return shallowMount(App, { global: { plugins: [router, store] } })
 }
 
 describe('App', () => {

@@ -24,6 +24,7 @@ export default {
   components: {
     RightCaret,
   },
+  emits: ['toggled'],
   props: {
     header: { type: String, required: false, default: '' },
     toggleStyles: {

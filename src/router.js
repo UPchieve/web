@@ -1,4 +1,4 @@
-import VueRouter from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import store from './store'
 import AdminView from './views/Admin/index.vue'
 import AdminEditSchool from './views/Admin/AdminEditSchool.vue'
@@ -70,6 +70,7 @@ const getUser = () => {
 const routes = [
   {
     path: '/',
+    name: 'Home',
     beforeEnter: (to, from, next) => {
       getUser()
         .then(() => {
@@ -133,6 +134,7 @@ const routes = [
   },
   {
     path: '/signup',
+    name: 'Signup',
     beforeEnter: (to, from, next) => {
       next('/sign-up')
     },
@@ -230,6 +232,7 @@ const routes = [
   },
   {
     path: '/referral/:referredByCode',
+    name: 'Referred By',
     beforeEnter: (to, from, next) => {
       const referredByCode = to.params.referredByCode
       next(`/sign-up?referral=${referredByCode}`)
@@ -237,6 +240,7 @@ const routes = [
   },
   {
     path: '/integration',
+    name: 'Integration',
     beforeEnter: (to, from, next) => {
       const {
         query: { assignmentId, partner, problemId, studentId },
@@ -391,7 +395,7 @@ const routes = [
   },
   {
     path: '/admin/sessions/review',
-    name: 'AdminSessionDetail',
+    name: 'AdminSessionReview',
     component: AdminSessionReview,
     meta: { protected: true, requiresAdmin: true },
   },
@@ -521,12 +525,12 @@ const routes = [
 /**
  * @todo Consider refactoring this file
  */
-const router = new VueRouter({
+const router = createRouter({
+  history: createWebHistory(),
   routes,
   linkActiveClass: 'active',
-  mode: 'history',
   scrollBehavior() {
-    return { x: 0, y: 0 }
+    return { left: 0, top: 0 }
   },
 })
 

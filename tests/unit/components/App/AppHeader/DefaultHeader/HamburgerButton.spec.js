@@ -1,18 +1,15 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils'
 import { merge } from 'lodash-es'
-import Vuex from 'vuex'
+import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
 import HamburgerButton from '@/components/App/AppHeader/HamburgerButton.vue'
-import { vi } from 'vitest';
-
-const localVue = createLocalVue()
-localVue.use(Vuex)
+import { vi } from 'vitest'
 
 const expand = vi.fn()
 const collapse = vi.fn()
 
 const getWrapper = (isCollapsed = true) => {
-  const store = new Vuex.Store(
+  const store = createStore(
     merge({}, storeOptions, {
       modules: {
         app: {
@@ -28,8 +25,7 @@ const getWrapper = (isCollapsed = true) => {
   )
 
   return shallowMount(HamburgerButton, {
-    localVue,
-    store,
+    global: { plugins: [store] },
   })
 }
 

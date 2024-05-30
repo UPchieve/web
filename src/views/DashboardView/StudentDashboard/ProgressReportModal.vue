@@ -15,9 +15,7 @@
             If you are tired of waiting, you can always access them later in
             "Your Progress" tab when it's ready.
           </p>
-          <large-button
-            class="prm__buttons-button"
-            @click.native="handleCloseModal"
+          <large-button class="prm__buttons-button" @click="handleCloseModal"
             >View later</large-button
           >
         </section>
@@ -33,7 +31,7 @@
         </section>
         <footer class="prm__footer">
           <div class="prm__buttons prm__buttons--center">
-            <large-button @click.native="handleCloseModal">Close</large-button>
+            <large-button @click="handleCloseModal">Close</large-button>
           </div>
         </footer>
       </div>
@@ -54,8 +52,15 @@
         <footer class="prm__footer">
           <div class="prm__buttons">
             <large-button
-              class="prm__buttons-button prm__buttons-button--primary"
-              @click.native="handleSessionRequest"
+              class="prm__buttons-button"
+              @click="handleCloseModal"
+              :showArrow="false"
+            >
+              Close
+            </large-button>
+            <large-button
+              class="prm__buttons-button prm__buttons-button--single"
+              @click="handleSessionRequest"
               :showArrow="false"
               primary
             >
@@ -80,7 +85,7 @@
           <div class="prm__buttons">
             <large-button
               class="prm__buttons-button prm__buttons-button--primary"
-              @click.native="handleSessionRequest"
+              @click="handleSessionRequest"
               :showArrow="false"
               primary
             >
@@ -88,7 +93,7 @@
             </large-button>
             <large-button
               class="prm__buttons-button"
-              @click.native="handleCloseModal"
+              @click="handleCloseModal"
               :showArrow="false"
             >
               Close
@@ -113,7 +118,7 @@
           <div class="prm__buttons">
             <large-button
               class="prm__buttons-button prm__buttons-button--primary"
-              @click.native="analyzeSessions"
+              @click="analyzeSessions"
               primary
               :showArrow="false"
               >Analyze my session</large-button
@@ -198,7 +203,7 @@
           <div class="prm__buttons">
             <large-button
               class="prm__buttons-button prm__buttons-button--primary"
-              @click.native="handleSessionRequest()"
+              @click="handleSessionRequest()"
               :showArrow="false"
               primary
             >
@@ -235,6 +240,7 @@ import GradeBars from '@/components/GradeBars.vue'
 import Separator from '@/components/Separator.vue'
 import { gradeLabel } from '@/utils/grades'
 import LoadingMessage from '@/components/LoadingMessage.vue'
+import { socket } from '@/socket'
 
 export default {
   name: 'ProgressReportModal',
@@ -266,7 +272,7 @@ export default {
     AnalyticsService.captureEvent(EVENTS.PROGRESS_REPORT_MODAL_SHOWN)
     this.$store.dispatch('user/updateHasSeenProgressReportModal', true)
   },
-  beforeDestroy() {
+  beforeUnmount() {
     clearInterval(this.timeOutInterval)
   },
   computed: {
@@ -398,11 +404,16 @@ export default {
       )
     },
   },
-  sockets: {
-    'progress-report:processed:session'(data) {
+  created() {
+    /*
+     * This seems like an anti-pattern.
+     * Any events sent before `created()` is called will be missed.
+     * Socket listeners should ideally be defined in the socket store.
+     */
+    socket.on('progress-report:processed:session', (data) => {
       this.report = data.report
       if (this.requestedProgressReportOverview) this.handleReport()
-    },
+    })
   },
 }
 </script>

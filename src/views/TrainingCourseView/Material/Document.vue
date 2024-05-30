@@ -51,7 +51,7 @@ export default {
       else this.forceRerender()
     }, 1000 * 2)
   },
-  beforeDestroy() {
+  beforeUnmount() {
     clearInterval(this.isLoadedIntervalId)
   },
   methods: {

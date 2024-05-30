@@ -41,6 +41,7 @@ export default {
   props: {
     module: Object,
   },
+  emits: ['material-completed'],
   data() {
     return {
       showMaterials: false,

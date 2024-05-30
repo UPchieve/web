@@ -23,13 +23,13 @@
       <template v-if="!mobileMode && showTemplateButtons">
         <div class="ModalTemplate-seperator" />
         <div class="ModalTemplate-buttons">
-          <large-button v-if="!alertModal" @click.native="handleCancel"
+          <large-button v-if="!alertModal" @click="handleCancel"
             >Cancel</large-button
           >
           <large-button
             primary
-            @click.native="$emit('accept')"
-            :disabled="!enableAccept"
+            @click="$emit('accept')"
+            :disabled="!enableAccept ? true : null"
             v-if="showAccept"
             >{{ acceptText }}</large-button
           >
@@ -61,16 +61,18 @@ export default {
     showAccept: { type: Boolean, default: true },
     modalComponentName: String,
   },
+  emits: ['accept', 'cancel'],
   mounted() {
     const body = document.querySelector('body')
     body.classList.add('disable-scroll')
 
     // focus on first focusable child element, to put the focus in the trap
-    this.$refs.modalTemplateContainer
-      .querySelectorAll(FOCUSABLE_ELEMENT_SELECTOR)[0]
-      .focus()
+    const elemToFocusOn = this.$refs.modalTemplateContainer.querySelectorAll(
+      FOCUSABLE_ELEMENT_SELECTOR
+    )[0]
+    if (elemToFocusOn) elemToFocusOn.focus()
   },
-  beforeDestroy() {
+  beforeUnmount() {
     const body = document.querySelector('body')
     body.classList.remove('disable-scroll')
   },

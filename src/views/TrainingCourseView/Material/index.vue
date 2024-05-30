@@ -52,7 +52,7 @@
       <button
         data-testid="btn-mark-training-completed"
         v-if="this.material.isRequired"
-        :disabled="this.material.isCompleted"
+        :disabled="this.material.isCompleted ? true : null"
         class="material__complete-btn"
         type="button"
         @click="materialClicked"
@@ -103,6 +103,7 @@ export default {
       else return 'Not started'
     },
   },
+  emits: ['material-toggled', 'material-completed'],
   methods: {
     toggleMaterial() {
       // Since isOpen is read from our props, it will be closed

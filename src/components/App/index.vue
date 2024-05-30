@@ -1,20 +1,13 @@
 <template>
   <div id="app" class="App" :class="isIOS && 'is-ios'">
-    <b-alert
+    <ion-alert
+      :is-open="shouldShowRefreshAlert"
+      header="New version of UPchieve!"
+      :message="`${refreshMessage}, please`"
+      :buttons="alertButtons"
       class="refresh-alert"
-      dismissible
-      variant="warning"
-      v-model="shouldShowRefreshAlert"
     >
-      {{ refreshMessage }}, please
-      <large-button
-        class="refresh-alert__refresh-button"
-        @click.native="refreshPage"
-        primary
-        :showArrow="false"
-        >refresh</large-button
-      >
-    </b-alert>
+    </ion-alert>
     <app-header v-if="showHeader" />
     <app-sidebar v-if="showSidebar" />
     <app-modal v-if="showModal" />
@@ -26,12 +19,6 @@
         'App-router-view-wrapper--sidebar': showSidebar,
       }"
     >
-      <audio
-        ref="newWaitingStudentAudioElement"
-        class="audio__new-waiting-student"
-        src="@/assets/audio/alert.mp3"
-        muted
-      />
       <attention-boxes v-if="showInAppSessionNotifications" />
       <router-view />
     </div>
@@ -40,13 +27,11 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import { crono } from 'vue-crono'
 import '@/scss/main.scss'
 import AppHeader from './AppHeader/index.vue'
 import AppSidebar from './AppSidebar/index.vue'
 import AppModal from './AppModal/index.vue'
 import AppBanner from './AppBanner/index.vue'
-import { BAlert } from 'bootstrap-vue'
 import PortalService from '@/services/PortalService'
 import getOperatingSystem from '@/utils/get-operating-system'
 import isOutdatedMobileAppVersion from '@/utils/is-outdated-mobile-app-version'
@@ -54,10 +39,12 @@ import AnalyticsService from '@/services/AnalyticsService'
 import FeatureFlagService from '@/services/FeatureFlagService'
 import LoggerService from '@/services/LoggerService'
 import VersionService from '@/services/VersionService'
-import LargeButton from '@/components/LargeButton.vue'
 import Gleap from 'gleap'
 import posthog from 'posthog-js'
 import AttentionBoxes from '../AttentionBoxes.vue'
+import { socket } from '@/socket'
+import { IonAlert } from '@ionic/vue'
+import sound from '@/assets/audio/alert.mp3'
 
 export default {
   name: 'App',
@@ -66,16 +53,31 @@ export default {
     AppSidebar,
     AppModal,
     AppBanner,
-    BAlert,
-    LargeButton,
+    IonAlert,
     AttentionBoxes,
   },
-  mixins: [crono],
   data() {
     return {
+      audioAlert: new Audio(sound),
       isIOS: false,
       docHiddenProperty: '',
       newServerVersionAvailable: false,
+      checkForUpdateIntervalId: null,
+      alertButtons: [
+        {
+          text: 'Not now',
+          rol: 'cancel',
+          cssClass: 'alert-button-cancel',
+        },
+        {
+          text: 'Upgrade',
+          rol: 'confirm',
+          cssClass: 'alert-button-confirm',
+          handler: () => {
+            this.refreshPage()
+          },
+        },
+      ],
     }
   },
   async created() {
@@ -112,17 +114,24 @@ export default {
     }
   },
   mounted() {
+    // every 10 minutes, check the current server version
+    this.checkForUpdateIntervalId = setInterval(
+      () => {
+        this.getCurrentServerVersion()
+      },
+      1000 * 60 * 10
+    )
     if (this.mobileMode) {
       Gleap.hide()
     }
     this.$store.commit(
       'volunteer/setNewWaitingStudentAudioElement',
-      this.$refs.newWaitingStudentAudioElement
+      this.audioAlert
     )
   },
-
-  beforeDestroy() {
+  beforeUnmount() {
     window.removeEventListener('resize', this.handleResize)
+    clearInterval(this.checkForUpdateIntervalId)
 
     if (this.isMobileApp) {
       document.removeEventListener('click', this.handleExternalURLs)
@@ -181,12 +190,6 @@ export default {
         })
       }
     },
-    isExemptSocketError(error) {
-      return (
-        error.message === 'xhr poll error' ||
-        error.message === 'websocket error'
-      )
-    },
     refreshPage() {
       window.location.reload()
     },
@@ -215,7 +218,7 @@ export default {
     emitList({ retryCount = 0, maxRetries = 5 }) {
       let isAcknowledged = false
       let timeoutId
-      this.$socket.emit('list', null, (response) => {
+      socket.emit('list', null, (response) => {
         if (response.status === 200) {
           isAcknowledged = true
           clearTimeout(timeoutId)
@@ -256,10 +259,9 @@ export default {
       user: (state) => state.user.user,
       session: (state) => state.user.session,
       subjects: (state) => state.subjects.subjects,
-      requestedProgressReportOverview: (state) =>
-        state.user.requestedProgressReportOverview,
       showCsrfRefreshAlert: (state) => state.app.showCsrfRefreshAlert,
       version: (state) => state.app.version,
+      isConnected: (state) => state.socket.isConnected,
     }),
     ...mapGetters({
       userAuthenticated: 'user/isAuthenticated',
@@ -282,18 +284,17 @@ export default {
         return defaultMsg
       }
     },
-  },
-  // https://github.com/BrianRosamilia/vue-crono
-  cron: {
-    /// every 10 minutes, check the current server version
-    time: 600000,
-    method: 'getCurrentServerVersion',
+    isSocketReadyToGetWaitingStudents() {
+      return [this.isConnected, this.isVolunteer]
+    },
   },
   watch: {
     user(currentUserValue, previousUserValue) {
       const nowLoggedIn = currentUserValue.id && !previousUserValue.id
       if (nowLoggedIn) {
-        if (!this.$socket.connected) this.$socket.connect()
+        if (!this.$store.state.socket.isConnected) {
+          this.$store.dispatch('socket/connect')
+        }
 
         const userProps = this.getUserPropsForAnalytics
         FeatureFlagService.setPersonPropertiesForFlags(userProps)
@@ -355,73 +356,71 @@ export default {
         )
       }
     },
-  },
-  sockets: {
-    error(error) {
-      this.$socket.emit('client_error', error)
-      if (this.isExemptSocketError(error)) return
-      LoggerService.noticeError(error)
-    },
-    // https://socket.io/docs/v2/client-api/#event-disconnect
-    async disconnect(reason) {
-      this.$socket.emit('client_disconnect', reason)
-      const err = new Error(
-        `Socket.io connection for user ${this.user.id} disconnected for reason: ${reason}`
-      )
-      LoggerService.noticeError(err)
-
-      if (reason === 'io server disconnect') {
-        // the disconnection was initiated by the server, you need to reconnect manually
-        if (!this.$socket.connected) await this.$socket.connect()
-      }
-    },
-    connect_error(error) {
-      this.$socket.emit('client_connect_error', error)
-      // these are handled internally and shouldn't be forwarded to New Relic
-      if (this.isExemptSocketError(error)) return
-      LoggerService.noticeError(error)
-    },
-    reconnect_error(error) {
-      this.$socket.emit('client_reconnect_error', error)
-      if (this.isExemptSocketError(error)) return
-      LoggerService.noticeError(error)
-    },
-    'session-change'(sessionData) {
-      this.$store.dispatch('user/updateSession', sessionData)
-    },
-    redirect() {
-      this.$router.push('/')
-    },
-    connect() {
-      this.$socket.emit('client_connect')
-      if (this.isVolunteer) {
+    isSocketReadyToGetWaitingStudents(currentVal) {
+      const [isConnected, isVolunteer] = currentVal
+      if (isConnected && isVolunteer) {
         this.emitList({ retryCount: 0, maxRetries: 5 })
-      }
-    },
-    reconnect() {
-      this.$socket.emit('client_reconnect')
-    },
-    reconnect_attempt() {
-      this.$socket.emit('client_reconnect_attempt')
-    },
-    reconnect_failed() {
-      this.$socket.emit('client_reconnect_failed')
-    },
-    'progress-report:processed:overview'(data) {
-      if (data.report && data.report.status === 'complete')
-        this.$store.dispatch('user/getProgressReportOverviewSubjectStats')
-    },
-    async sessions(sessions) {
-      if (this.isVolunteer) {
-        this.$store.dispatch('volunteer/handleIncomingSessions', {
-          context: this,
-          sessions,
-        })
       }
     },
   },
 }
 </script>
+
+<style lang="scss">
+%LargeButton {
+  border: 1px solid rgba(0, 0, 0, 0); // for consistent button size
+  border-radius: 20px;
+  padding: 9px 23px; // subtracted 1px for border
+  display: inline-flex;
+}
+.refresh-alert {
+  .alert-button-group {
+    padding-bottom: 20px;
+  }
+  .alert-button-confirm {
+    @extend %LargeButton;
+
+    background: $c-success-green;
+    color: white;
+
+    &:hover {
+      background: darken($c-success-green, 5%);
+      color: $c-background-grey;
+    }
+
+    &:disabled {
+      background: $c-background-grey;
+      color: $c-disabled-grey;
+    }
+
+    &--reverse {
+      background: white;
+      color: $c-success-green;
+    }
+  }
+  .alert-button-cancel {
+    @extend %LargeButton;
+
+    background: white;
+    border-color: $c-border-grey;
+    color: $c-soft-black;
+
+    &:hover {
+      border-color: $c-soft-black;
+    }
+
+    &:disabled {
+      background: $c-background-grey;
+      border-color: $c-background-grey;
+      color: $c-disabled-grey;
+    }
+
+    &--reverse {
+      border-color: white;
+    }
+  }
+}
+</style>
 
 <style lang="scss" scoped>
 .App {
@@ -452,26 +451,5 @@ export default {
     @include bind-app-sidebar-width(padding-left);
     padding-left: 0;
   }
-}
-
-.refresh-alert {
-  z-index: 999;
-  position: fixed;
-  width: 100%;
-  text-align: center;
-
-  &__refresh-button {
-    display: initial;
-  }
-}
-
-.alert-warning {
-  color: initial;
-  background-color: #fff;
-  border-color: transparent;
-}
-
-.audio__new-waiting-student {
-  display: none;
 }
 </style>

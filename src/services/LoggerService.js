@@ -1,9 +1,8 @@
 import config from '../config'
-import VueRouter from 'vue-router'
 import { isSocketDisconnectError } from '../utils/custom-error-handlers'
+import { isNavigationFailure, NavigationFailureType } from 'vue-router'
 
 const newrelic = window.newrelic
-const { isNavigationFailure, NavigationFailureType } = VueRouter
 
 class LoggerService {
   static init() {

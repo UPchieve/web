@@ -1,22 +1,12 @@
-import Vuex from 'vuex'
+import { createStore } from 'vuex'
+import { storeOptions } from '@/store'
 import userModule from '@/store/modules/user'
 import { vi } from 'vitest'
-import { createLocalVue, mount } from '@vue/test-utils'
-import SessionView from '@/views/SessionView/index.vue'
 import { SESSION_TOOL_TYPES } from '@/consts'
-import VueSocketIO from 'vue-socket.io'
+import { merge } from 'lodash-es'
+import { socket } from '@/socket'
 
 describe('SessionView', () => {
-  const mockSocket = new VueSocketIO({
-    connection: 'socketserver.test',
-    emit: vi.fn(),
-    disconnect: vi.fn(),
-    connected: vi.fn(),
-  })
-  const localVue = createLocalVue()
-  localVue.use(Vuex)
-  localVue.use(mockSocket)
-
   const DEFAULT_USER = {
     user: {
       id: 'test-user-id',
@@ -33,54 +23,38 @@ describe('SessionView', () => {
     id: 'session-1',
   }
 
-  const getWrapper = (opts = {}, mocks = {}) => {
-    const store = new Vuex.Store({
+  const store = createStore(
+    merge({}, storeOptions, {
       modules: {
         user: {
           ...userModule,
           state: {
             user: {
               ...DEFAULT_USER,
-              ...opts?.user ?? {}
             },
             session: {
-              ...DEFAULT_SESSION
-            }
+              ...DEFAULT_SESSION,
+            },
           },
-          actions: {
-            ...userModule.actions,
-            sessionDisconnected: mocks.sessionDisconnected ?? vi.fn(),
-            sessionConnected: mocks.sessionConnected ?? vi.fn(),
-          }
         },
       },
     })
-
-    return mount(SessionView, {
-      localVue,
-      store,
-    })
-  }
+  )
 
   beforeEach(() => {
     vi.resetAllMocks()
+    // TODO when testing dom changes, make sure to mock this
+    // vi.spyOn(NetworkService, 'getIsSubjectValid').mockResolvedValue({
+    //   data: { isValid: true },
+    // })
+    store.dispatch('socket/bindEvents')
   })
 
-  it('Will call user/sessionConnected on socket reconnect', async () => {
-    const mockSessionConnected = vi.fn()
-    const wrapper = getWrapper({}, {
-      sessionConnected: mockSessionConnected
-    })
-    wrapper.vm.$socket.emit('reconnect')
-    expect(mockSessionConnected).toHaveBeenCalled()
-  })
-
-  it('Will call user/sessionDisconnected on socket reconnect_attempt', async () => {
-    const mockSessionDisconnected = vi.fn()
-    const wrapper = getWrapper({}, {
-      sessionDisconnected: mockSessionDisconnected
-    })
-    wrapper.vm.$socket.emit('reconnect_attempt')
-    expect(mockSessionDisconnected).toHaveBeenCalled()
+  it('Will call user/sessionConnected on socket reconnect and user/sessionDisconnected on reconnect_attempt', async () => {
+    expect(store.state.user.isSessionConnectionAlive).toBe(false)
+    socket.io.emit('reconnect')
+    expect(store.state.user.isSessionConnectionAlive).toBe(true)
+    socket.io.emit('reconnect_attempt')
+    expect(store.state.user.isSessionConnectionAlive).toBe(false)
   })
 })

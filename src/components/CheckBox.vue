@@ -6,7 +6,7 @@
       type="checkbox"
       :id="id"
       :checked="checked"
-      @change="$emit('change', $event.target.checked)"
+      @change="$emit('update:modelValue', $event.target.checked)"
     />
 
     <label
@@ -23,14 +23,15 @@
 export default {
   name: 'checkbox',
   inheritAttrs: false,
-  model: {
-    prop: 'checked',
-    event: 'change',
-  },
+  emits: ['modelValue'],
   props: {
     checked: Boolean,
     id: {
       type: String,
+      required: true,
+    },
+    modelValue: {
+      type: Boolean,
       required: true,
     },
   },

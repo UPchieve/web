@@ -46,7 +46,6 @@
       color: $c-error-red;
     }
   }
-
 }
 
 .uc-form-text {
@@ -76,6 +75,9 @@
   height: 48px;
   margin-top: 24px;
   width: 100%;
+  display: flex;
+  place-content: center;
+  place-items: center;
 
   @include breakpoint-below('tiny') {
     margin-top: 20px;
@@ -84,6 +86,8 @@
   &:hover,
   &:active {
     background-color: $button-primary-bg-hover;
+    color: $button-primary-text;
+    text-decoration: none;
   }
 
   &:disabled {
@@ -241,7 +245,7 @@
 .uc-form-checkbox {
   @include flex-container(row, flex-start, center);
 
-  input[type="checkbox"] {
+  input[type='checkbox'] {
     @include flex-container(row, center, center);
     $size: 20px;
 
@@ -343,7 +347,6 @@
   }
 }
 
-
 // OLD STYLES
 .uc-form-input {
   border: none;
@@ -362,7 +365,7 @@
   }
 
   &--invalid {
-    border-bottom: 3px solid #BF0000;
+    border-bottom: 3px solid #bf0000;
   }
 }
 
@@ -440,7 +443,7 @@
     cursor: pointer;
 
     &:hover,
-    &[aria-selected=true] {
+    &[aria-selected='true'] {
       background: #eee;
     }
   }

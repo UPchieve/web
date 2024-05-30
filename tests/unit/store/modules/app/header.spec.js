@@ -1,5 +1,5 @@
 import headerModule from '@/store/modules/app/header'
-import { vi } from 'vitest';
+import { vi } from 'vitest'
 
 const { state, mutations, actions } = headerModule
 

@@ -52,6 +52,7 @@ export default {
     prop: 'value',
     event: 'change',
   },
+  emits: ['change'],
   props: {
     id: {
       type: String,

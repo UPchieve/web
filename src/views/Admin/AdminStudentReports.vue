@@ -91,7 +91,7 @@
       type="button"
       class="report-btn"
       @click="generateSessionReport"
-      :disabled="isGeneratingReport"
+      :disabled="isGeneratingReport ? true : null"
     >
       Generate Session Report
     </button>
@@ -99,7 +99,7 @@
       type="button"
       class="report-btn"
       @click="generateUsageReport"
-      :disabled="isGeneratingReport"
+      :disabled="isGeneratingReport ? true : null"
     >
       Generate Usage Report
     </button>

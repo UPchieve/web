@@ -12,10 +12,10 @@
 
       <div v-if="!mobileMode" class="seperator" />
       <div class="NotificationsModal-buttons">
-        <large-button @click.native="onClose()"
+        <large-button @click="onClose()"
           >Nah, I'll check every minute.</large-button
         >
-        <large-button primary @click.native="handlePushNotification()"
+        <large-button primary @click="handlePushNotification()"
           >Yes, please notify me!</large-button
         >
       </div>
@@ -55,6 +55,7 @@ export default {
         : 'Choose a subject'
     },
   },
+  emits: ['cancel'],
   methods: {
     async handlePushNotification() {
       const { topic, selectedSubtopic } = this.modalData

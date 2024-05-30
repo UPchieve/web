@@ -15,10 +15,10 @@ import {
 describe('RecentSubjectCard', () => {
   it('renders recent subject card in default state', () => {
     const wrapper = shallowMount(RecentSubjectCard, {
-      propsData: DefaultCard.args,
+      props: DefaultCard.args,
     })
 
-    expect(wrapper.is(RecentSubjectCard))
+    expect(wrapper.findComponent(RecentSubjectCard))
     expect(wrapper.props('title')).toBe('Algebra 1')
     expect(wrapper.props('disableSubjectCard')).toBe(false)
     expect(wrapper.find('.SubjectCard').exists()).toBe(true)
@@ -35,7 +35,7 @@ describe('RecentSubjectCard', () => {
   //
   it('renders the recent subject card in the hovered state', () => {
     const wrapper = shallowMount(RecentSubjectCard, {
-      propsData: HoveredCard.args,
+      props: HoveredCard.args,
     })
 
     expect(wrapper.props('title')).toBe('Algebra 2')
@@ -45,7 +45,7 @@ describe('RecentSubjectCard', () => {
   //unable to test SVGs and classes on SVG elements
   it('renders the recent subject card in the active state', () => {
     const wrapper = shallowMount(RecentSubjectCard, {
-      propsData: ActiveCard.args,
+      props: ActiveCard.args,
     })
 
     expect(wrapper.props('title')).toBe('Calc 1')
@@ -55,7 +55,7 @@ describe('RecentSubjectCard', () => {
   //test for disabled recent subject card
   it('renders the recent subject card in the disabled state', () => {
     const wrapper = shallowMount(RecentSubjectCard, {
-      propsData: DisabledCard.args,
+      props: DisabledCard.args,
     })
 
     expect(wrapper.props('title')).toBe('Calc 2')

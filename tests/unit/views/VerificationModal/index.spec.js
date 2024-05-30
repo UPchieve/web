@@ -1,13 +1,10 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils'
-import Vuex from 'vuex'
+import { mount } from '@vue/test-utils'
+import { createStore } from 'vuex'
 import userModule from '@/store/modules/user'
 import VerificationModal from '@/views/VerificationModal.vue'
 import AuthService from '@/services/AuthService'
 import { VERIFICATION_METHOD } from '@/consts'
-import { vi } from 'vitest';
-
-const localVue = createLocalVue()
-localVue.use(Vuex)
+import { vi } from 'vitest'
 
 describe('VerificationModal', () => {
   let DEFAULT_PROPS
@@ -22,7 +19,7 @@ describe('VerificationModal', () => {
   })
 
   const getWrapper = (user = {}, props = DEFAULT_PROPS) => {
-    const store = new Vuex.Store({
+    const store = createStore({
       modules: {
         user: {
           ...userModule,
@@ -32,10 +29,9 @@ describe('VerificationModal', () => {
         },
       },
     })
-    return shallowMount(VerificationModal, {
-      localVue,
-      store,
-      propsData: props,
+    return mount(VerificationModal, {
+      global: { plugins: [store] },
+      props: props,
     })
   }
 

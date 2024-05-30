@@ -38,7 +38,7 @@
       type="button"
       class="report-btn"
       @click="generatePartnerAnalyticsReport"
-      :disabled="isGeneratingReport"
+      :disabled="isGeneratingReport ? true : null"
     >
       Generate Corporate Partner Analytics Report
     </button>
@@ -47,7 +47,7 @@
       type="button"
       class="report-btn"
       @click="generateTelecomReport"
-      :disabled="isGeneratingReport"
+      :disabled="isGeneratingReport ? true : null"
     >
       Generate Telecom Report
     </button>

@@ -1,28 +1,29 @@
 import DashboardBanner from '@/views/DashboardView/DashboardBanner.vue'
 import StudentDashboard from '@/views/DashboardView/StudentDashboard/index.vue'
 import SubjectSelection from '@/views/DashboardView/StudentDashboard/SubjectSelection/index.vue'
-import { createLocalVue, shallowMount } from '@vue/test-utils'
-import Vuex from 'vuex'
-
-const localVue = createLocalVue()
-localVue.use(Vuex)
+import { shallowMount } from '@vue/test-utils'
+import { storeOptions } from '@/store'
+import { merge } from 'lodash-es'
+import { createStore } from 'vuex'
 
 const getWrapper = () => {
-  const store = new Vuex.Store({
-    modules: {
-      user: {
-        user: { state: { user: { pastSessions: [] } } },
+  const store = createStore(
+    merge({}, storeOptions, {
+      modules: {
+        user: {
+          user: { state: { user: { pastSessions: [] } } },
+        },
+        productFlags: {
+          flags: { state: { flags: { fallIncentiveProgram: false } } },
+        },
+        featureFlags: {
+          flags: { state: { flags: {} } },
+        },
       },
-      productFlags: {
-        flags: { state: { flags: { fallIncentiveProgram: false } } },
-      },
-      featureFlags: {
-        flags: { state: { flags: {} } },
-      },
-    },
-  })
+    })
+  )
 
-  return shallowMount(StudentDashboard, { localVue, store })
+  return shallowMount(StudentDashboard, { global: { plugins: [store] } })
 }
 
 describe('StudentDashboard', () => {

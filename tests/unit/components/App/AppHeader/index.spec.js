@@ -1,6 +1,6 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import { merge } from 'lodash-es'
-import Vuex from 'vuex'
+import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
 import AppHeader from '@/components/App/AppHeader/index.vue'
 import HeaderTemplate from '@/components/App/AppHeader/HeaderTemplate.vue'
@@ -11,17 +11,14 @@ import WaitingPeriodHeader from '@/components/App/AppHeader/WaitingPeriodHeader.
 import VerificationHeader from '@/components/App/AppHeader/VerificationHeader.vue'
 import { VERIFICATION_METHOD } from '@/consts'
 
-const localVue = createLocalVue()
-localVue.use(Vuex)
-
 const getWrapper = (state = {}) => {
-  const store = new Vuex.Store(
+  const store = createStore(
     merge({}, storeOptions, {
       modules: { app: { modules: { header: { state } } } },
     })
   )
 
-  return shallowMount(AppHeader, { localVue, store })
+  return mount(AppHeader, { global: { plugins: [store] } })
 }
 
 describe('AppHeader', () => {

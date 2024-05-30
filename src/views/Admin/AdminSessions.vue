@@ -303,6 +303,11 @@ export default {
 input[type='number'],
 .small-input {
   width: 60px;
+  border: 1px solid $c-border-grey;
+}
+
+input[type='date'] {
+  border: 1px solid $c-border-grey;
 }
 
 .filter-panel {

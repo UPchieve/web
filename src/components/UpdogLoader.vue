@@ -27,7 +27,7 @@ export default {
       this.flipImage()
     }, 500)
   },
-  beforeDestroy() {
+  beforeUnmount() {
     clearInterval(this.intervalId)
   },
   methods: {

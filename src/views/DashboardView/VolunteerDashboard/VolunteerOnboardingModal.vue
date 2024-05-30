@@ -34,7 +34,7 @@
         </p>
       </div>
     </div>
-    <large-button v-if="mobileMode" primary @click.native="onAccept">
+    <large-button v-if="mobileMode" primary @click="onAccept">
       {{ modalData.acceptText }}
     </large-button>
   </div>

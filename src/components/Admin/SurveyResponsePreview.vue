@@ -13,7 +13,7 @@
       <div v-for="(response, indexInner) in question" v-bind:key="indexInner">
         <div v-if="isSessionRating(key)" class="feedback-preview__star-rating">
           <vue-star-rating
-            v-model="response.score"
+            :rating="response.score"
             inactive-color="#ffffff"
             active-color="#36d2aa"
             border-color="#36d2aa"

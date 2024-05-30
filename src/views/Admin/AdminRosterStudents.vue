@@ -91,7 +91,11 @@
         />
       </div>
 
-      <button class="uc-form-button" type="submit" :disabled="disableSubmit()">
+      <button
+        class="uc-form-button"
+        type="submit"
+        :disabled="disableSubmit() ? true : null"
+      >
         Submit
       </button>
     </form>

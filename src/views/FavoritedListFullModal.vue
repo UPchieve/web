@@ -17,7 +17,7 @@
       <footer>
         <div class="list-full-modal-buttons">
           <large-button
-            @click.native="closeModal"
+            @click="closeModal"
             class="list-full-modal-okay-button"
             :showArrow="false"
             >Okay</large-button

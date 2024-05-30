@@ -42,7 +42,7 @@
             v-if="mobileMode"
             :data-testid="`start-session-${subtopic}`"
             primary
-            @click.native="handleMobileStart(subtopic)"
+            @click="handleMobileStart(subtopic)"
             >{{ modalData.acceptText }}</large-button
           >
         </div>
@@ -94,6 +94,7 @@ export default {
       return ''
     },
   },
+  emits: ['enable-accept'],
   mounted() {
     // when mounted, skip the presession survey for certain topics
     // or show the presession survey for the rest of them

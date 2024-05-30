@@ -19,7 +19,7 @@
                 class="tell-them-cp-modal__buttons-button tell-them-cp-modal__buttons-button--primary"
                 primary
                 :showArrow="false"
-                @click.native="startSession"
+                @click="startSession"
                 >Start a college chat</large-button
               >
             </div>
@@ -80,8 +80,8 @@
                 class="tell-them-cp-modal__buttons-button tell-them-cp-modal__buttons-button--primary"
                 primary
                 :showArrow="false"
-                @click.native="handleReminderDate"
-                :disabled="!(reminderDate && reminderTime)"
+                @click="handleReminderDate"
+                :disabled="!(reminderDate && reminderTime) ? true : null"
                 >Continue</large-button
               >
             </div>
@@ -105,15 +105,14 @@
           <section class="tell-them-cp-modal__section">
             <label class="tell-them-cp-modal__phone-input">
               Phone Number
-              <vue-phone-number-input
+              <maz-phone-number-input
                 class="tell-them-cp-modal__phone-input"
+                required="true"
                 v-model="phone"
-                :error="phone !== '' && !isValidPhone"
-                :required="true"
-                color="#555"
-                valid-color="#16ba97"
+                show-code-on-list
                 @update="(data) => (phoneInput = data)"
               />
+
               <span v-if="!isValidPhone && isPhoneError" class="error"
                 >Please enter a valid phone number.</span
               >
@@ -125,13 +124,13 @@
             >
               <large-button
                 class="tell-them-cp-modal__buttons-button"
-                @click.native="askConfirmation"
+                @click="askConfirmation"
                 >Cancel</large-button
               >
               <large-button
                 class="tell-them-cp-modal__buttons-button tell-them-cp-modal__buttons-button--primary"
-                @click.native="handleRemindMeSubmit"
-                :disabled="phone === '' || !this.isValidPhone"
+                @click="handleRemindMeSubmit"
+                :disabled="phone === '' || !this.isValidPhone ? true : null"
                 primary
                 :showArrow="false"
                 >Done</large-button
@@ -153,7 +152,7 @@
                 class="tell-them-cp-modal__buttons-button tell-them-cp-modal__buttons-button--primary"
                 primary
                 :showArrow="false"
-                @click.native="closeModal"
+                @click="closeModal"
                 >Okay</large-button
               >
             </div>
@@ -172,14 +171,14 @@
             <div class="tell-them-cp-modal__buttons">
               <large-button
                 class="tell-them-cp-modal__buttons-button"
-                @click.native="handleDontRemindMe"
+                @click="handleDontRemindMe"
                 >Don't remind me</large-button
               >
               <large-button
                 class="tell-them-cp-modal__buttons-button tell-them-cp-modal__buttons-button--primary"
                 primary
                 :showArrow="false"
-                @click.native="handleRemindMeClick"
+                @click="handleRemindMeClick"
                 >Remind me</large-button
               >
             </div>
@@ -200,7 +199,7 @@ import { EVENTS } from '@/consts'
 import moment from 'moment'
 import UpdogCollege from '@/assets/updog-college.svg'
 import UpdogWithFlag from '@/assets/updog-with-flag.svg'
-import VuePhoneNumberInput from 'vue-phone-number-input'
+import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import ArrowIcon from '@/assets/arrow.svg'
 
 export default {
@@ -210,7 +209,7 @@ export default {
     LargeButton,
     UpdogCollege,
     UpdogWithFlag,
-    VuePhoneNumberInput,
+    MazPhoneNumberInput,
     ArrowIcon,
   },
   data() {

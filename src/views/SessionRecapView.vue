@@ -9,7 +9,7 @@
             <large-button
               v-if="progressReport.id"
               class="recap-card__button"
-              @click.native="handleSessionRequest"
+              @click="handleSessionRequest"
               :showArrow="false"
             >
               Start a {{ session.subject }} session
@@ -197,6 +197,8 @@ import moment from 'moment'
 import Quill from 'quill'
 import { mapGetters, mapState } from 'vuex'
 import config from '../config'
+import { socket } from '@/socket'
+import { markRaw } from 'vue'
 
 export default {
   components: {
@@ -214,6 +216,8 @@ export default {
     ...mapState({
       user: (state) => state.user.user,
       recapSession: (state) => state.user.recapSession,
+      socketJoinedRoom: (state) => state.socket.socketJoinedRoom,
+      isConnected: (state) => state.socket.isConnected,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -232,7 +236,10 @@ export default {
       return VolunteerIcon
     },
     isSessionConnectionAlive() {
-      return this.$socket.connected && this.socketJoinedRoom
+      return socket.connected && this.socketJoinedRoom
+    },
+    isJoinedSessionSocketReadyToEmit() {
+      return [this.isConnected, this.session?.id]
     },
   },
   data() {
@@ -247,7 +254,6 @@ export default {
       isSessionAlive: true,
       isRecapDmsAvailable: false,
       reportSubmitted: false,
-      socketJoinedRoom: false,
       progressReport: {},
     }
   },
@@ -262,8 +268,6 @@ export default {
       this.$store.dispatch('user/fetchRecapSessionForDms', this.session.id)
       if (this.user.isVolunteer)
         AnalyticsService.captureEvent(EVENTS.VOLUNTEER_OPENED_SESSION_RECAP)
-      if (this.isRecapDmsAvailable && this.isRecapSocketUpdatesActive)
-        this.joinSocketToRoom()
       // This is to mock the previous behavior before the updates, where
       // we kept`isSessionConnectionAlive` as `true`
       if (!this.isRecapSocketUpdatesActive) this.socketJoinedRoom = true
@@ -275,9 +279,18 @@ export default {
       this.isLoadingRecap = false
     }
 
+    if (
+      this.isJoinedSessionSocketReadyToEmit[0] &&
+      this.isJoinedSessionSocketReadyToEmit[1] &&
+      this.isRecapDmsAvailable &&
+      this.isRecapSocketUpdatesActive
+    )
+      this.joinSocketToRoom()
+
     // The divs that contain the editors are not loaded onto the DOM immediately because they
     // have conditions that must consult the `this.session`. $nextTick allows us to execute
     // code on the related DOM elements on the next DOM update cycle
+    // TODO: Clean this up so that the whiteboard doesn't rely on nextTick
     this.$nextTick(async () => {
       if (this.session.quillDoc) {
         const container = document.querySelector('.quill-container')
@@ -287,20 +300,25 @@ export default {
       }
 
       if (this.session.hasWhiteboardDoc) {
-        this.zwibblerCtx = window.Zwibbler.create('zwibbler-container', {
-          showToolbar: false,
-          showColourPanel: false,
-          collaborationServer: `${config.websocketRoot}/whiteboard/recap/${this.session.id}`,
-          readOnly: true,
-          allowZoom: false,
-        })
+        this.zwibblerCtx = markRaw(
+          window.Zwibbler.create('zwibbler-container', {
+            showToolbar: false,
+            showColourPanel: false,
+            collaborationServer: `${config.websocketRoot}/whiteboard/recap/${this.session.id}`,
+            readOnly: true,
+            allowZoom: false,
+          })
+        )
 
         // Allow 20 seconds for Zwibbler to retry to get the document from the server otherwise,
         // leave the shared session to have Zwibbler stop connection retries
         setTimeout(() => {
           if (!this.isConnectedToWhiteboard) {
             this.failedLoadingWhiteboard()
-            this.zwibblerCtx.leaveSharedSession()
+            // This method doesn't exist in zwibbler-demo.js
+            if (this.zwibblerCtx?.leaveSharedSession) {
+              this.zwibblerCtx.leaveSharedSession()
+            }
           }
         }, 1000 * 20)
 
@@ -357,7 +375,7 @@ export default {
       })
     },
     joinSocketToRoom() {
-      this.$socket.emit('sessions/recap:join', { sessionId: this.session.id })
+      socket.emit('sessions/recap:join', { sessionId: this.session.id })
     },
     async getProgressReportForSession() {
       try {
@@ -385,25 +403,26 @@ export default {
         )
     },
   },
-  sockets: {
-    redirect: function (error) {
-      LoggerService.noticeError(
-        error ??
-          `Redirected from recap of session ${this.session.id} to the dashboard`
+  watch: {
+    socketJoinedRoom(val) {
+      if (val === false) {
+        setTimeout(() => this.joinSocketToRoom(), 3000)
+      }
+    },
+    isJoinedSessionSocketReadyToEmit(currentValue, prevValue) {
+      const [isConnected, sessionId] = currentValue
+      const [prevIsConnected, prevSessionId] = prevValue
+      if (
+        isConnected &&
+        sessionId &&
+        this.isRecapDmsAvailable &&
+        this.isRecapSocketUpdatesActive &&
+        (!prevIsConnected ||
+          !prevSessionId ||
+          !this.isRecapDmsAvailable ||
+          !this.isRecapSocketUpdatesActive)
       )
-      this.$router.push('/')
-    },
-    'sessions/recap:joined': function () {
-      this.socketJoinedRoom = true
-    },
-    'sessions/recap:join-failed': function (error) {
-      this.socketJoinedRoom = false
-      LoggerService.noticeError(error)
-      // Retry joining the room after 3 seconds
-      setTimeout(() => this.joinSocketToRoom(), 3000)
-    },
-    connect() {
-      if (this.isRecapSocketUpdatesActive) this.joinSocketToRoom()
+        this.joinSocketToRoom()
     },
   },
 }

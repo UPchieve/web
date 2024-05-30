@@ -268,7 +268,7 @@
         <button
           class="uc-form-button submit-btn"
           type="submit"
-          :disabled="invalidForm()"
+          :disabled="invalidForm() ? true : null"
         >
           Submit
         </button>

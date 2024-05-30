@@ -1,99 +1,103 @@
 <template>
-  <div class="survey-container" data-testid="survey-container">
-    <cross-icon @click="cancel()" class="cross-icon" />
+  <div class="survey-container">
+    <span
+      class="cross-icon-click-container"
+      @click="cancel()"
+      data-testid="survey-container"
+    >
+      <cross-icon class="cross-icon" />
+    </span>
     <div class="presession-survey">
-      <template>
-        <div class="presession-survey__title">Tell us about your request</div>
-        <div class="presession-survey__subtitle">
-          This will give your coach the info they need to help you.
+      <div class="presession-survey__title">Tell us about your request</div>
+      <div class="presession-survey__subtitle">
+        This will give your coach the info they need to help you.
+      </div>
+      <stepper
+        :totalSteps="survey.length"
+        :currentStep="currentStep"
+        class="stepper"
+      />
+      <div v-if="survey.length">
+        <div class="question__title">
+          {{ currentQuestion.questionText }}
         </div>
-        <stepper
-          :totalSteps="survey.length"
-          :currentStep="currentStep"
-          class="stepper"
-        />
-        <div v-if="survey.length">
-          <div class="question__title">
-            {{ currentQuestion.questionText }}
-          </div>
-          <div
-            class="question__responses"
-            :class="{
-              'question__responses-images': isRowOfImages,
-            }"
-          >
-            <template v-for="response in currentQuestion.responses">
-              <survey-image
-                v-if="isRowOfImages"
-                :data-testid="`survey-question-${response.responseText}`"
-                class="question__response question__response-image"
-                :key="`${response.responseId}-image`"
-                :src="response.responseDisplayImage"
-                :label="response.responseText"
-                :questionId="currentQuestion.questionId"
-                :responseId="response.responseId"
-                :isSelected="
-                  userResponse[currentQuestion.questionId].responseId ===
-                  response.responseId
-                "
-                @survey-image-click="updateUserResponse"
-              />
+        <div
+          class="question__responses"
+          :class="{
+            'question__responses-images': isRowOfImages,
+          }"
+        >
+          <template v-for="response in currentQuestion.responses">
+            <survey-image
+              v-if="isRowOfImages"
+              :data-testid="`survey-question-${response.responseText}`"
+              class="question__response question__response-image"
+              :key="`${response.responseId}-image`"
+              :src="response.responseDisplayImage"
+              :label="response.responseText"
+              :questionId="currentQuestion.questionId"
+              :responseId="response.responseId"
+              :isSelected="
+                userResponse[currentQuestion.questionId].responseId ===
+                response.responseId
+              "
+              @survey-image-click="updateUserResponse"
+            />
 
-              <survey-radio
-                v-else-if="
-                  currentQuestion.questionType === questionTypes.multipleChoice
-                "
-                class="question__response"
-                :key="`${response.responseId}-radio`"
-                :id="`${currentQuestion.questionId}_${response.responseId}`"
-                :radioValue="response.responseId"
-                :name="currentQuestion.questionId"
-                :data-testid="`survey-question-${response.responseText}`"
-                :checked="
-                  userResponse[currentQuestion.questionId].responseId ===
-                  response.responseId
-                "
-                :questionId="currentQuestion.questionId"
-                :responseId="response.responseId"
-                :label="response.responseText"
-                :isOpenResponseDisabled="
-                  userResponse[currentQuestion.questionId].responseId !==
-                  response.responseId
-                "
-                :openResponseValue="
-                  userResponse[currentQuestion.questionId].openResponse
-                "
-                @survey-radio-input="updateUserResponse"
-              />
-            </template>
-          </div>
+            <survey-radio
+              v-else-if="
+                currentQuestion.questionType === questionTypes.multipleChoice
+              "
+              class="question__response"
+              :data-testid="`survey-question-${response.responseText}`"
+              :key="`${response.responseId}-radio`"
+              :id="`${currentQuestion.questionId}_${response.responseId}`"
+              :radioValue="response.responseId"
+              :name="currentQuestion.questionId"
+              :checked="
+                userResponse[currentQuestion.questionId].responseId ===
+                response.responseId
+              "
+              :questionId="currentQuestion.questionId"
+              :responseId="response.responseId"
+              :label="response.responseText"
+              :isOpenResponseDisabled="
+                userResponse[currentQuestion.questionId].responseId !==
+                response.responseId
+              "
+              :openResponseValue="
+                userResponse[currentQuestion.questionId].openResponse
+              "
+              @survey-radio-input="updateUserResponse"
+            />
+          </template>
         </div>
+      </div>
 
-        <div v-if="!mobileMode" class="presession-survey__separator" />
-        <div class="presession-survey__buttons">
-          <large-button @click.native="prevStep" v-if="currentStep > 1"
-            >Back</large-button
-          >
+      <div v-if="!mobileMode" class="presession-survey__separator" />
+      <div class="presession-survey__buttons">
+        <large-button @click="prevStep" v-if="currentStep > 1"
+          >Back</large-button
+        >
 
-          <large-button
-            primary
-            @click.native="nextStep"
-            v-if="currentStep !== survey.length"
-            data-testid="presession-next-button"
-            :disabled="isNextButtonDisabled"
-            >Next</large-button
-          >
+        <large-button
+          primary
+          @click="nextStep"
+          data-testid="presession-next-button"
+          v-if="currentStep !== survey.length"
+          :disabled="isNextButtonDisabled ? true : null"
+          >Next</large-button
+        >
 
-          <large-button
-            primary
-            v-if="currentStep === survey.length"
-            data-testid="presession-submit"
-            @click.native="submitSurvey"
-            :disabled="!isSurveyComplete"
-            >Start a chat</large-button
-          >
-        </div>
-      </template>
+        <large-button
+          primary
+          data-testid="presession-submit"
+          v-if="currentStep === survey.length"
+          @click="submitSurvey"
+          :disabled="!isSurveyComplete ? true : null"
+          >Start a chat</large-button
+        >
+      </div>
     </div>
   </div>
 </template>
@@ -196,7 +200,7 @@ export default {
       )
     },
   },
-
+  emits: ['survey-completed'],
   methods: {
     submitSurvey() {
       let surveyResponses = this.responses
@@ -372,12 +376,14 @@ export default {
   margin: 1em 0 1.5em 0;
 }
 
-.cross-icon {
+.cross-icon-click-container {
   cursor: pointer;
   align-self: flex-end;
+  margin: 1.5em;
+}
+.cross-icon {
   fill: $icon-grey;
   width: 15px;
   height: 15px;
-  margin: 1.5em;
 }
 </style>

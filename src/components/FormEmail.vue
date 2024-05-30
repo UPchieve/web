@@ -23,7 +23,7 @@
       type="email"
       :placeholder="placeholder"
       v-model="email"
-      @input="$emit('input', $event.target.value)"
+      @input="$emit('update:modelValue', $event.target.value)"
       @blur="onBlur"
       :required="isRequired"
       :autofocus="isAutofocused"
@@ -63,8 +63,12 @@ export default {
       type: String,
       default: '',
     },
+    modelValue: {
+      type: String,
+      default: '',
+    },
   },
-
+  emits: ['update:modelValue'],
   setup() {
     return { v$: useVuelidate() }
   },

@@ -1,5 +1,5 @@
 import sidebarModule from '@/store/modules/app/sidebar'
-import { vi } from 'vitest';
+import { vi } from 'vitest'
 
 const { state, mutations, actions } = sidebarModule
 

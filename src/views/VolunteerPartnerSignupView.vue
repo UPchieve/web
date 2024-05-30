@@ -164,16 +164,13 @@
           <label for="phoneNumber" class="uc-form-label"
             >What's your cell phone number?</label
           >
-          <vue-phone-number-input
+          <maz-phone-number-input
             id="phoneNumber"
             class="phone-input"
-            v-model="formData.phone"
-            :required="true"
-            :error="
-              invalidInputs.indexOf('phone') > -1 && !phoneInputInfo.isValid
-            "
-            color="#555"
-            valid-color="#16ba97"
+            required="true"
+            v-model="phoneNational"
+            :country-code="internationalPhoneInfo.country"
+            show-code-on-list
             @update="onPhoneInputUpdate"
           />
           <p class="uc-form-subtext">
@@ -196,7 +193,11 @@
           </label>
         </div>
 
-        <button class="uc-form-button" type="submit" :disabled="isRegistering">
+        <button
+          class="uc-form-button"
+          type="submit"
+          :disabled="isRegistering ? true : null"
+        >
           Sign Up
         </button>
         <loader class="register-loader" v-if="isRegistering" />
@@ -219,16 +220,16 @@ import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import AuthService from '@/services/AuthService'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
-import VuePhoneNumberInput from 'vue-phone-number-input'
 import Loader from '@/components/Loader.vue'
 import { EVENTS } from '@/consts'
+import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 
 export default {
   name: 'volunteer-partner-signup-view',
   components: {
     FormPageTemplate,
-    VuePhoneNumberInput,
     Loader,
+    MazPhoneNumberInput,
   },
   beforeRouteEnter(to, from, next) {
     const partnerId = to.params.partnerId

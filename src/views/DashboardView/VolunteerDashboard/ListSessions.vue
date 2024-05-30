@@ -25,17 +25,21 @@
             flash: prioritySessions.has(session.id),
           }"
           @click="gotoSession(session)"
+          @mouseover="
+            (e) => {
+              if (this.shouldHighlightSession(session.paidTutorsPilotGroup)) {
+                openToast(e, toastText)
+              }
+            }
+          "
+          @mouseout="
+            () => {
+              if (this.shouldHighlightSession(session.paidTutorsPilotGroup)) {
+                closeToast()
+              }
+            }
+          "
         >
-          <b-tooltip
-            v-if="shouldHighlightSession(session.paidTutorsPilotGroup)"
-            :target="session.id"
-            placement="top"
-            variant="dark"
-            custom-class="tooltip"
-            delay="300"
-            >Please prioritize this request. We are prioritizing this session to
-            improve student wait times as part of our experiment.
-          </b-tooltip>
           <td>
             {{ session.student.firstname }}
           </td>
@@ -54,7 +58,7 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import Case from 'case'
-import { BTooltip } from 'bootstrap-vue'
+import { toastController } from '@ionic/vue'
 
 export default {
   name: 'ListSessions',
@@ -63,9 +67,11 @@ export default {
       emitListIntervalId: null,
       hasError: false,
       unsubscribeFromTick: () => undefined,
+      toast: null,
+      toastText:
+        'Please prioritize this request. We are prioritizing this session to improve student wait times as part of our experiment',
     }
   },
-  components: { BTooltip },
   computed: {
     ...mapState({
       user: (state) => state.user.user,
@@ -97,9 +103,9 @@ export default {
         state.volunteer.newWaitingStudentAudioElement,
       ticks: (state) => state.volunteer.ticks,
       prioritySessions: (state) => state.volunteer.prioritySessions,
+      openSessions: (state) => state.volunteer.openSessions,
     }),
     ...mapGetters({
-      openSessions: 'volunteer/openSessions',
       isMutedSubjectAlertsActive: 'featureFlags/isMutedSubjectAlertsActive',
       isPaidTutor: 'featureFlags/isPaidTutor',
       isPaidTutorsPilotRunning: 'featureFlags/isPaidTutorsPilotRunning',
@@ -112,10 +118,26 @@ export default {
       }
     })
   },
-  beforeDestroy() {
+  beforeUnmount() {
+    this.closeToast()
     this.unsubscribeFromTick()
   },
   methods: {
+    async openToast(e, text) {
+      if (text) {
+        this.toast = await toastController.create({
+          message: text,
+          cssClass: 'priority-student-toast',
+          positionAnchor: e.target.parentNode,
+        })
+        await this.toast.present()
+      }
+    },
+    closeToast() {
+      if (this.toast) {
+        this.toast.dismiss()
+      }
+    },
     gotoSession(session) {
       const { type, subTopic, _id } = session
       const path = `/session/${Case.kebab(type)}/${Case.kebab(subTopic)}/${_id}`
@@ -154,6 +176,12 @@ export default {
 }
 </script>
 
+<style lang="scss">
+.priority-student-toast {
+  --max-width: 200px;
+}
+</style>
+
 <style lang="scss" scoped>
 thead {
   text-align: center;
@@ -178,10 +206,6 @@ thead {
 
 .table-striped .paid-tutors-pilot-test-group {
   background-color: $c-background-blue;
-}
-
-.tooltip {
-  opacity: 1;
 }
 
 .flash {

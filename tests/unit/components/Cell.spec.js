@@ -9,21 +9,21 @@ import {
 
 it('renders the cell in the unselectable state', () => {
   const wrapper = mount(Cell, {
-    propsData: Unselectable.args,
+    props: Unselectable.args,
   })
   expect(wrapper.classes()).toContain('Cell-unselectable')
 })
 
 it('renders the cell in the selectable + unselected state', () => {
   const wrapper = mount(Cell, {
-    propsData: Selectable_Unselected.args,
+    props: Selectable_Unselected.args,
   })
   expect(wrapper.classes()).toContain('Cell-selectable')
 })
 
 it('renders the cell in the selectable + selected state', () => {
   const wrapper = mount(Cell, {
-    propsData: Selectable_Selected.args,
+    props: Selectable_Selected.args,
   })
   expect(wrapper.classes()).toContain('Cell-selectable--selected')
 })

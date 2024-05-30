@@ -26,7 +26,7 @@
     <div v-if="notification.cta" class="footer">
       <large-button
         class="cta-action"
-        @click.native="clickCta"
+        @click="clickCta"
         primary
         :showArrow="false"
         >{{ notification.cta.text }}</large-button
@@ -84,7 +84,7 @@ export default {
       this.$store.dispatch('notifications/remove', this.notification.id)
     }, this.notification.duration || 3000)
   },
-  beforeDestroy() {
+  beforeUnmount() {
     clearTimeout(this.timeoutId)
   },
 }

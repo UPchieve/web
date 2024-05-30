@@ -181,6 +181,7 @@ import SessionFlags from '@/components/Admin/SessionFlags.vue'
 import Separator from '@/components/Separator.vue'
 import config from '../../config'
 import { SESSION_TOOL_TYPES } from '@/consts'
+import { markRaw } from 'vue'
 
 export default {
   name: 'AdminSessionDetail',
@@ -294,12 +295,14 @@ export default {
       }
 
       if (this.isWhiteboardSession) {
-        this.zwibblerCtx = window.Zwibbler.create('zwibbler-container', {
-          showToolbar: false,
-          showColourPanel: false,
-          collaborationServer: `${config.websocketRoot}/whiteboard/admin/{name}`,
-          readOnly: true,
-        })
+        this.zwibblerCtx = markRaw(
+          window.Zwibbler.create('zwibbler-container', {
+            showToolbar: false,
+            showColourPanel: false,
+            collaborationServer: `${config.websocketRoot}/whiteboard/admin/{name}`,
+            readOnly: true,
+          })
+        )
 
         try {
           await this.zwibblerCtx.joinSharedSession(this.session._id, false)

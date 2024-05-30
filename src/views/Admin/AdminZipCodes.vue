@@ -12,7 +12,7 @@
           class="uc-form-button"
           type="button"
           @click="getZipCodes"
-          :disabled="!query || query.length !== 5"
+          :disabled="!query || query.length !== 5 ? true : null"
         >
           Search
         </button>

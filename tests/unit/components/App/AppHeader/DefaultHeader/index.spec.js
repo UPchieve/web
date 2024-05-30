@@ -1,15 +1,12 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils'
+import { RouterLinkStub, shallowMount } from '@vue/test-utils'
 import { merge } from 'lodash-es'
-import Vuex from 'vuex'
+import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
 import DefaultHeader from '@/components/App/AppHeader/DefaultHeader/index.vue'
 import HamburgerButton from '@/components/App/AppHeader/HamburgerButton.vue'
 
-const localVue = createLocalVue()
-localVue.use(Vuex)
-
 const getWrapper = (mobileMode = false) => {
-  const store = new Vuex.Store(
+  const store = createStore(
     merge({}, storeOptions, {
       modules: {
         app: { getters: { mobileMode: () => mobileMode } },
@@ -19,9 +16,12 @@ const getWrapper = (mobileMode = false) => {
   )
 
   return shallowMount(DefaultHeader, {
-    localVue,
-    store,
-    stubs: ['router-link', 'router-view'],
+    global: {
+      plugins: [store],
+      stubs: {
+        RouterLink: RouterLinkStub,
+      },
+    },
   })
 }
 

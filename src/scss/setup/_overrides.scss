@@ -7,19 +7,13 @@ $vs-border-color: $c-border-grey;
   }
 }
 
-// vue-phone-number-input overrides
-.vue-phone-number-input {
-  @include breakpoint-below("medium") {
-    .input-phone-number {
-      .field-input {
-        padding-top: 0 !important;
-      }
+// maz-phone-number-input overrides
+.maz-border-success {
+  border-color: #16ba97;
+}
 
-      .field-label {
-        display: none !important;
-      }
-    }
-  }
+.maz-text-success-600 {
+  color: #16ba97;
 }
 
 .profile #VuePhoneNumberInput_phone_number {

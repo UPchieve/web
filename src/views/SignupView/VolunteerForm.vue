@@ -139,14 +139,12 @@
 
     <div class="uc-column">
       <label for="phoneNumber" class="uc-form-label">Cell Phone Number</label>
-      <vue-phone-number-input
+      <maz-phone-number-input
         id="phoneNumber"
         class="phone-input"
+        required="true"
         v-model="profile.phone"
-        :required="true"
-        :error="invalidInputs.indexOf('phone') > -1 && !phoneInputInfo.isValid"
-        color="#555"
-        valid-color="#16ba97"
+        show-code-on-list
         @update="onPhoneInputUpdate"
       />
       <p class="uc-form-subtext">
@@ -201,7 +199,11 @@
       </label>
     </div>
 
-    <button class="uc-form-button" type="submit" :disabled="isRegistering">
+    <button
+      class="uc-form-button"
+      type="submit"
+      :disabled="isRegistering ? true : null"
+    >
       Sign Up
     </button>
     <loader class="register-loader" v-if="isRegistering" />
@@ -215,14 +217,14 @@
 import validator from 'validator'
 import LoggerService from '@/services/LoggerService'
 import AuthService from '@/services/AuthService'
-import VuePhoneNumberInput from 'vue-phone-number-input'
+import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'
 import { backOff } from 'exponential-backoff'
 
 export default {
   components: {
-    VuePhoneNumberInput,
+    MazPhoneNumberInput,
     Loader,
   },
   data() {

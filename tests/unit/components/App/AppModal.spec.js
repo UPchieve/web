@@ -1,24 +1,26 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import { merge } from 'lodash-es'
-import Vuex from 'vuex'
+import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
 import AppModal from '@/components/App/AppModal/index.vue'
 import ModalTemplate from '@/components/App/AppModal/ModalTemplate.vue'
 import SubjectSelectionModal from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectSelectionModal.vue'
 
-const localVue = createLocalVue()
-localVue.use(Vuex)
-
 const getWrapper = (state = {}) => {
   state = { component: null, data: {}, ...state }
 
-  const store = new Vuex.Store(
+  const store = createStore(
     merge({}, storeOptions, {
-      modules: { app: { modules: { modal: { state } } } },
+      modules: {
+        app: {
+          modules: { modal: { state } },
+          getters: { mobileMode: () => false },
+        },
+      },
     })
   )
 
-  return shallowMount(AppModal, { localVue, store })
+  return mount(AppModal, { global: { plugins: [store] } })
 }
 
 describe('AppModal', () => {

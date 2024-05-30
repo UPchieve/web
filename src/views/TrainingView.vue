@@ -178,9 +178,12 @@ export default {
     },
   },
   watch: {
-    'training.subjectTypes'(newValue, oldValue) {
-      const nowLoaded = newValue && !oldValue
-      if (nowLoaded) this.setInitialTopic()
+    'training.subjectTypes': {
+      handler(newValue, oldValue) {
+        const nowLoaded = newValue && !oldValue
+        if (nowLoaded) this.setInitialTopic()
+      },
+      deep: true,
     },
   },
 }

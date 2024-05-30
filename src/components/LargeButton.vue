@@ -5,6 +5,7 @@
     :class="buttonClasses"
     :showArrow="showArrow"
     :buttonType="buttonType"
+    @click="$emit('click')"
   >
     <slot />
   </button-template>
@@ -38,6 +39,7 @@ export default {
       }
     },
   },
+  emits: ['click'],
 }
 </script>
 
@@ -46,6 +48,7 @@ export default {
   border: 1px solid rgba(0, 0, 0, 0); // for consistent button size
   border-radius: 20px;
   padding: 9px 23px; // subtracted 1px for border
+  display: inline-flex;
 }
 
 .LargeButton-primary {

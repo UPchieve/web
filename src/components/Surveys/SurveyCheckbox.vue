@@ -48,7 +48,7 @@ export default {
       required: true,
     },
   },
-
+  emits: ['survey-checkbox-input'],
   methods: {
     handleCheckboxSelection() {
       this.$emit('survey-checkbox-input', this.questionId, this.responseId, '')

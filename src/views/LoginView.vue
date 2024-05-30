@@ -35,7 +35,7 @@
           data-testid="loginButton"
           type="submit"
           @click.prevent="signIn"
-          :disabled="!isValidForm || isLoggingIn"
+          :disabled="!isValidForm || isLoggingIn ? true : null"
         >
           {{ useNewSignUpFlow ? 'Log in' : 'Sign In' }}
         </button>

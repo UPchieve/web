@@ -15,12 +15,12 @@
         :key="`${i}_${$route.path}`"
       >
         <component
+          v-bind="el.props"
           v-for="(el, j) in row.elements"
           :key="`${i}-${j}_${$route.path}`"
           :is="el.element"
           :class="el.classes"
           :disabled="isDisabled(el)"
-          v-bind="el.props"
           @click="
             el.submitAction && el.isDisabledOnInvalid
               ? submitWithValidation(el.submitAction)

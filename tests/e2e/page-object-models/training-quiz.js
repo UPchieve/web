@@ -65,13 +65,17 @@ export class TrainingQuiz {
     return this.page.getByTestId(this.nextBtnTestId).isVisible()
   }
 
-  expectCongratMessage() {
-    this.page.waitForSelector('#title-quiz-result')
-    expect(this.page.getByText('What a rockstar! You passed!')).toBeVisible()
+  async expectCongratMessage() {
+    await this.page.waitForSelector('#title-quiz-result')
+    await expect(
+      this.page.getByText('What a rockstar! You passed!')
+    ).toBeVisible()
   }
 
-  expectFailedMessage() {
-    this.page.waitForSelector('#title-quiz-result')
-    expect(this.page.getByText("You failed this time, but don't give up!")).toBeVisible()
+  async expectFailedMessage() {
+    await this.page.waitForSelector('#title-quiz-result')
+    await expect(
+      this.page.getByText("You failed this time, but don't give up!")
+    ).toBeVisible()
   }
 }

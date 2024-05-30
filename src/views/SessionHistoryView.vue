@@ -74,7 +74,7 @@
                 <large-button
                   primary
                   class="session-list__session-recap__button"
-                  @click.native="routeToSessionRecap(session.id)"
+                  @click="routeToSessionRecap(session.id)"
                   >Session Recap</large-button
                 >
               </div>

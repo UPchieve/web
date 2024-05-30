@@ -73,31 +73,30 @@
         <p class="progress-survey__improve-header">
           {{ tellUsMoreTextQuestion.question.questionText }}
         </p>
-        <template
+        <div
           v-for="response in tellUsMoreTextQuestion?.question.responses"
+          :key="`${response.responseId}-free-response`"
         >
-          <div :key="`${response.responseId}-free-response`">
-            <feedback-textarea
-              :id="`${tellUsMoreTextQuestion.questionId}_${response.responseId}`"
-              @input="
-                (responseText) =>
-                  updateUserResponse(
-                    tellUsMoreTextQuestion.questionId,
-                    response.responseId,
-                    responseText
-                  )
-              "
-            >
-            </feedback-textarea>
-          </div>
-        </template>
+          <feedback-textarea
+            :id="`${tellUsMoreTextQuestion.questionId}_${response.responseId}`"
+            @input="
+              (responseText) =>
+                updateUserResponse(
+                  tellUsMoreTextQuestion.questionId,
+                  response.responseId,
+                  responseText
+                )
+            "
+          >
+          </feedback-textarea>
+        </div>
         <footer>
           <large-button
             class="progress-survey__button--center progress-survey__button--submit"
-            :disabled="!hasAnsweredAtLeastOneQuestion()"
+            :disabled="!hasAnsweredAtLeastOneQuestion() ? true : null"
             primary
             :showArrow="false"
-            @click.native="submitFeedback"
+            @click="submitFeedback"
           >
             Submit
           </large-button>
@@ -115,7 +114,7 @@
 
         <footer>
           <large-button
-            @click.native="handleCloseModal"
+            @click="handleCloseModal"
             class="progress-survey__button--center"
             >Close</large-button
           >

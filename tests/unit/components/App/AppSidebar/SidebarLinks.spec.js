@@ -1,10 +1,7 @@
 import SidebarLink from '@/components/App/AppSidebar/SidebarLink.vue'
 import SidebarLinks from '@/components/App/AppSidebar/SidebarLinks.vue'
-import { createLocalVue, shallowMount } from '@vue/test-utils'
-import Vuex from 'vuex'
-
-const localVue = createLocalVue()
-localVue.use(Vuex)
+import { shallowMount } from '@vue/test-utils'
+import { createStore } from 'vuex'
 
 // General links
 const CONTACT_LINK = { to: '/contact', text: 'Contact us' }
@@ -88,13 +85,14 @@ const getWrapper = (options = {}) => {
   const getters = {
     isReferFriendsActive: () => false,
   }
-  const store = new Vuex.Store({ getters })
+  const store = createStore({ getters })
 
   return shallowMount(SidebarLinks, {
-    localVue,
-    store,
-    mocks: { $route: { path: options.path } },
-    propsData: {
+    global: {
+      plugins: [store],
+      mocks: { $route: { path: options.path } },
+    },
+    props: {
       authenticated: options.authenticated,
       isVolunteer: options.isVolunteer,
       isAdmin: options.isAdmin,

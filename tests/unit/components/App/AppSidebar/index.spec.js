@@ -1,13 +1,10 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils'
 import { merge } from 'lodash-es'
-import Vuex from 'vuex'
+import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
 import AppSidebar from '@/components/App/AppSidebar/index.vue'
 import SidebarInfo from '@/components/App/AppSidebar/SidebarInfo.vue'
 import SidebarLinks from '@/components/App/AppSidebar/SidebarLinks.vue'
-
-const localVue = createLocalVue()
-localVue.use(Vuex)
 
 const getWrapper = (options = {}) => {
   options = {
@@ -18,7 +15,7 @@ const getWrapper = (options = {}) => {
     ...options,
   }
 
-  const store = new Vuex.Store(
+  const store = createStore(
     merge({}, storeOptions, {
       modules: {
         app: {
@@ -35,7 +32,7 @@ const getWrapper = (options = {}) => {
     })
   )
 
-  return shallowMount(AppSidebar, { localVue, store })
+  return shallowMount(AppSidebar, { global: { plugins: [store] } })
 }
 
 describe('AppSidebar', () => {

@@ -39,7 +39,7 @@
           Did not receive a code?
           <span
             class="uc-link secondary-btn"
-            :disabled="isSubmitting"
+            :disabled="isSubmitting ? true : null"
             @click.prevent="resendCode"
             id="resend-btn"
           >
@@ -50,7 +50,7 @@
         <div class="buttons-container">
           <button
             type="submit"
-            :disabled="!isValidVerificationCode"
+            :disabled="!isValidVerificationCode ? true : null"
             class="uc-form-button"
             data-testid="verify-code-btn"
             @click.prevent="confirmVerification"

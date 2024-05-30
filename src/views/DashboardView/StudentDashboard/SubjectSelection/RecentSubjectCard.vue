@@ -1,5 +1,5 @@
 <template>
-  <button class="SubjectCard" :disabled="disabled" type="button">
+  <button class="SubjectCard" :disabled="disabled ? true : null" type="button">
     <component class="SubjectCard-icon" v-bind:is="svg" />
     <span class="SubectCard-title">{{ title }}</span>
     <arrow-icon class="arrow-icon" />
@@ -18,7 +18,7 @@ export default {
     return {}
   },
 
-  beforeDestroy() {
+  beforeUnmount() {
     clearTimeout(this.timeoutId)
   },
   props: {
