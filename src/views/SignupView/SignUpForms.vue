@@ -49,6 +49,7 @@ import { useVuelidate } from '@vuelidate/core'
 import CheckCircled from '@/assets/check-circled.svg'
 import UpdogCrying from '@/assets/updog-crying.svg'
 import UpdogSmiling from '@/assets/updog-smiling.svg'
+import FormCheckBox from '@/components/FormCheckBox.vue'
 import FormEmail from '@/components/FormEmail.vue'
 import FormInput from '@/components/FormInput.vue'
 import FormErrors from '@/components/FormErrors.vue'
@@ -66,6 +67,7 @@ export default {
     CheckCircled,
     UpdogCrying,
     UpdogSmiling,
+    FormCheckBox,
     FormEmail,
     FormInput,
     FormErrors,

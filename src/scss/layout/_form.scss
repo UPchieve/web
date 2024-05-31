@@ -460,3 +460,44 @@
     color: $c-accent;
   }
 }
+
+.uc-form-checkbox {
+  @include flex-container(row, flex-start, baseline);
+
+  label {
+    @include font-category('body');
+    color: $c-soft-black;
+    margin: 0 0 0 16px;
+  }
+
+  input[type="checkbox"] {
+    @include flex-container(row, center, center);
+    $size: 20px;
+
+    border: 1px solid $c-border-grey;
+    border-radius: 4px;
+    box-shadow: none;
+    height: $size;
+    width: $size;
+
+    &:after {
+      content: '✓';
+      opacity: 0;
+    }
+    &:checked {
+      background-color: $uc-primary-blue;
+      border-color: $uc-primary-blue;
+      color: white;
+
+      &:after {
+        opacity: 1;
+      }
+    }
+
+    &:disabled {
+      background: $c-background-grey;
+      border-color: $c-background-grey;
+      color: $c-secondary-grey;
+    }
+  }
+}
