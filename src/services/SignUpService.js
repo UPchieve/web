@@ -401,6 +401,13 @@ function getSsoSectionElements() {
   return [
     getRow(null, getSsoButton(createAccountWithGoogle, 'Google')),
     getRow(null, getSsoButton(createAccountWithClever, 'Clever', 'clever')),
+    getRow(
+      'justify-center italic',
+      getTextElement(
+        'p',
+        'By clicking the button above, you agree to our User Agreement'
+      )
+    ),
     getRow(null, { element: 'LineDivider', props: { text: 'or' } }),
   ]
 }
@@ -421,7 +428,7 @@ function isParentGuardianConfirmationRoute(to, from) {
 }
 
 function isParentGuardianSignUp(to) {
-  return to.params.parent
+  return to.params.parent === true || to.params.parent === 'true'
 }
 
 function getFirstPageDetails(to) {
@@ -521,9 +528,21 @@ function getFirstPageDetails(to) {
         ? getRow(null, {
             element: 'FormSchoolSearch',
             props: {
+              name: InputName.SCHOOL_ID,
               label: getLabelPrefix(isParentGuardian) + 'School Name',
               placeholder: getLabelPrefix(isParentGuardian) + 'School Name',
               isRequired: isSchoolRequired(),
+            },
+            showIf: (form) => {
+              return [
+                '6th',
+                '7th',
+                '8th',
+                '9th',
+                '10th',
+                '11th',
+                '12th',
+              ].includes(form[InputName.GRADE_LEVEL])
             },
           })
         : null,
@@ -577,6 +596,7 @@ function getAccountPageDetails(to) {
     submitAction: createAccount,
     rows: [
       getRow(
+        null,
         getTextElement(
           'h1',
           (isParentGuardian ? 'Your child is ' : "You're ") +
@@ -601,7 +621,7 @@ function getAccountPageDetails(to) {
           EVENTS.STUDENT_ENTERED_LAST_NAME
         )
       ),
-      getRow(null, getStudentEmailElement(to)),
+      getRow(null, getStudentEmailElement(isParentGuardian)),
       !isParentGuardian
         ? getRow(null, {
             element: 'FormPassword',
@@ -614,9 +634,8 @@ function getAccountPageDetails(to) {
         : null,
       // TODO: getRow(null, getTermsCheckbox()),
       getRow(
-        'items-baseline',
-        ...getAlreadyHaveAccountElements(),
-        getButtonElement(createAccount, 'Confirm', 'button-narrow ml-auto')
+        'justify-end',
+        getButtonElement(createAccount, 'Confirm', 'button-narrow')
       ),
     ],
   }

@@ -14,23 +14,30 @@
         v-for="(row, i) in pageDetails.rows"
         :key="`${i}_${$route.path}`"
       >
-        <component
-          v-bind="el.props"
-          v-for="(el, j) in row.elements"
-          :key="`${i}-${j}_${$route.path}`"
-          :is="el.element"
-          :class="el.classes"
-          :disabled="isDisabled(el)"
-          @click="
-            el.submitAction && el.isDisabledOnInvalid
-              ? submitWithValidation(el.submitAction)
-              : el.submitAction
-                ? submit(el.submitAction)
-                : null
-          "
-        >
-          {{ el.content }}
-        </component>
+        <template v-for="(el, j) in row.elements">
+          <component
+            v-if="el.showIf ? el.showIf(form) : true"
+            :key="`${i}-${j}_${$route.path}`"
+            :is="el.element"
+            :class="el.classes"
+            :disabled="isDisabled(el)"
+            v-bind="el.props"
+            @input="
+              (e) => {
+                if (el.props?.name) form[el.props.name] = e.target?.value ?? e
+              }
+            "
+            @click="
+              el.submitAction && el.isDisabledOnInvalid
+                ? submitWithValidation(el.submitAction)
+                : el.submitAction
+                  ? submit(el.submitAction)
+                  : null
+            "
+          >
+            {{ el.content }}
+          </component>
+        </template>
       </div>
     </form>
     <loader v-if="isSubmitting" overlay />
@@ -78,6 +85,7 @@ export default {
 
   data() {
     return {
+      form: {},
       error: null,
       isSubmitting: false,
       pageDetails: {},
@@ -127,12 +135,11 @@ export default {
       }
     },
     getSubmitData() {
-      const form = document.getElementById('form')
-      const data = {}
-      for (const [key, value] of new FormData(form)) {
-        data[key] = value
+      const merged = {
+        ...this.form,
+        ...this.$route.params,
+        ...this.$route.query,
       }
-      const merged = { ...data, ...this.$route.params, ...this.$route.query }
       return merged
     },
     getPageDetails(to, from) {
@@ -178,6 +185,7 @@ p {
 
 .button-narrow {
   padding: 0 25px;
+  min-width: 180px;
   width: fit-content;
 }
 
