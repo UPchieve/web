@@ -23,6 +23,7 @@
       :searchable="false"
       :clearable="false"
       :loading="isLoading"
+      @update:model-value="(value) => $emit('input', value)"
       class="uc-form-select-input"
       :class="{
         'uc-form-select-input-invalid': hasValidationError(),
@@ -68,6 +69,7 @@ export default {
       type: Function,
     },
   },
+  emits: ['input'],
 
   async created() {
     this.isLoading = true

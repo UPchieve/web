@@ -22,6 +22,10 @@
 .uc-row {
   @include flex-container(row);
 
+  &.justify-end {
+    justify-content: end;
+  }
+
   &.justify-between {
     justify-content: space-between;
   }
@@ -53,6 +57,10 @@
 
 .center {
   text-align: center;
+}
+
+.italic {
+  font-style: italic;
 }
 
 .overflow-hidden {
