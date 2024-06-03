@@ -641,6 +641,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   PROGRESS_REPORT_SURVEY: 'progress-report-survey',
   USE_NEW_SIGN_UP_FLOW: 'use-new-sign-up-flow',
   SHOW_IN_APP_SESSION_NOTIFICATIONS: 'show-in-app-session-notifications',
+  TEACHER_SIGN_UP: 'teacher-sign-up',
 }
 
 export const ANALYTICS_REPORT_ROW = {

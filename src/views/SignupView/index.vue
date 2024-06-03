@@ -5,6 +5,14 @@
   >
     <sign-up-forms :getPageDetails="getStudentPageDetails" />
   </div>
+  <div
+    v-else-if="
+      isTeacherSignUpEnabled && this.userSelection === UserType.teacher
+    "
+    class="h-full"
+  >
+    <sign-up-forms :getPageDetails="getTeacherPageDetails" />
+  </div>
   <form-page-template v-else>
     <div class="uc-form">
       <volunteer-form v-if="this.userSelection === 'volunteer'" />
@@ -83,6 +91,7 @@ import AnalyticsService from '@/services/AnalyticsService'
 import NetworkService from '@/services/NetworkService'
 import { UserType } from '@/services/SignUpService'
 import { getPageDetails as getStudentPageDetails } from '@/services/SignUpService/StudentSignUpService'
+import { getPageDetails as getTeacherPageDetails } from '@/services/SignUpService/TeacherSignUpService'
 import StudentAvatar from '@/assets/student-avatar.svg'
 import VolunteerAvatar from '@/assets/volunteer-avatar.svg'
 import { EVENTS } from '@/consts'
@@ -104,6 +113,7 @@ export default {
       referredBy: {},
       UserType,
       getStudentPageDetails,
+      getTeacherPageDetails,
     }
   },
 
@@ -128,17 +138,19 @@ export default {
       } else this.referredBy = user
     }
 
-    if (this.$route.params)
+    if (this.$route.params) {
       if (this.$route.params.userType === this.UserType.student)
         this.userSelection = this.UserType.student
       else if (this.$route.params.userType === this.UserType.volunteer)
         this.userSelection = this.UserType.volunteer
       else if (this.$route.params.userType === this.UserType.teacher)
         this.userSelection = this.UserType.teacher
+    }
   },
   computed: {
     ...mapGetters({
       useNewSignUpFlow: 'featureFlags/useNewSignUpFlow',
+      isTeacherSignUpEnabled: 'featureFlags/isTeacherSignUpEnabled',
     }),
     welcomeMessage() {
       if (this.isReferred && this.referredBy)
