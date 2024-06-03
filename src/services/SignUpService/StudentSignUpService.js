@@ -43,6 +43,7 @@ export const InputName = {
   SIGNUP_SOURCE_ID: 'signupSourceId',
   STUDENT_PARTNER_ORG_KEY: 'studentPartnerOrgKey',
   STUDENT_PARTNER_ORG_SITE_NAME: 'studentPartnerOrgSiteName',
+  TERMS: 'terms',
   ZIP_CODE: 'zipCode',
 }
 
@@ -295,6 +296,30 @@ function getSignUpSourceElement() {
   }
 }
 
+export function getTermsCheckboxElements() {
+  return [
+    getRow(
+      'justify-start',
+      {
+        element: 'FormCheckBox',
+        props: {
+          label: 'I have read and accept the',
+          name: InputName.TERMS,
+        },
+      },
+      {
+        element: 'a',
+        classes: 'uc-link',
+        content: 'User Agreement',
+        props: {
+          href: '/legal',
+          target: '_blank',
+        },
+      }
+    ),
+  ]
+}
+
 function getFirstPageDetails(to) {
   function isEligibilitySignUp() {
     return to.params.step === 'eligibility'
@@ -496,7 +521,7 @@ function getAccountPageDetails(to) {
             },
           })
         : null,
-      // TODO: getRow(null, getTermsCheckbox()),
+      ...getTermsCheckboxElements(),
       getRow(
         'justify-end',
         getButtonElement(createAccount, 'Confirm', 'button-narrow')
