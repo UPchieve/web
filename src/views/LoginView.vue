@@ -104,11 +104,20 @@ export default {
       error = 'Your session has expired. Please log in again.'
     }
     if (this.$route.query['400'] === 'true') {
-      AnalyticsService.captureEvent(
-        EVENTS.USER_DOES_NOT_HAVE_LINKED_GOOGLE_ACCOUNT
-      )
-      error =
-        'Your Google account is not associated with this account. Please use your password instead.'
+      const provider = this.$route.query['provider']
+      if (provider === 'google') {
+        AnalyticsService.captureEvent(
+          EVENTS.USER_DOES_NOT_HAVE_LINKED_GOOGLE_ACCOUNT
+        )
+      }
+      if (provider === 'clever') {
+        AnalyticsService.captureEvent(
+          EVENTS.USER_DOES_NOT_HAVE_LINKED_CLEVER_ACCOUNT
+        )
+      }
+      error = provider
+        ? `Your ${provider} account is not associated with this account.`
+        : `Something went wrong. Please verify your login method and try again.`
     }
     return {
       credentials: {
@@ -133,7 +142,7 @@ export default {
         })
         .catch(() => {
           this.error =
-            "Oops! That email and password combination doesn't work. Check your password or if you signed up with Google SSO."
+            "Oops! That email and password combination doesn't work. Check your password or if you signed up with Google or Clever SSO."
         })
         .finally(() => {
           this.isLoggingIn = false
