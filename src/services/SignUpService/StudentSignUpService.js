@@ -577,3 +577,53 @@ function getParentGuardianConfirmationDetails(to) {
     ],
   }
 }
+
+export async function beforeEnter(to, from, next) {
+  if (
+    // Students must start from one of the form first pages,
+    // unless it is an error redirect.
+    !['eligibility', 'info'].includes(to.params.step) &&
+    !from.name &&
+    !to.query.error
+  ) {
+    return next({
+      name: 'SignupView',
+      params: { step: 'eligibility', userType: to.params.userType },
+      query: to.query,
+    })
+  }
+
+  const isParent = Object.keys(to.query ?? {}).some(
+    (key) => key.trim() === 'parent'
+  )
+  to.params.parent = isParent
+
+  const partnerKey = to.query?.partner
+  if (partnerKey) {
+    try {
+      const {
+        data: { studentPartner },
+      } = await NetworkService.getStudentPartner(partnerKey)
+      if (!studentPartner || studentPartner.deactivated) {
+        AnalyticsService.captureEvent(
+          EVENTS.STUDENT_VISITED_DEACTIVATED_PARTNER,
+          { partner: to.query.partner }
+        )
+        delete to.query.partner
+        return next({ path: to.path, query: to.query, params: to.params })
+      } else {
+        to.params.partner = studentPartner
+        to.params[InputName.STUDENT_PARTNER_ORG_KEY] = studentPartner.key
+      }
+    } catch (err) {
+      // TODO: Don't throw an error if a partner with the key does not exist.
+      if (err.response.status !== 422) {
+        LoggerService.noticeError(err)
+      }
+      delete to.query.partner
+      return next({ path: to.path, query: to.query, params: to.params })
+    }
+  }
+
+  return next()
+}
