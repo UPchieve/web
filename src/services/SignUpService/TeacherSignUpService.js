@@ -4,6 +4,7 @@ import {
   SignUpPage,
   getRow,
   getTextElement,
+  getInputElement,
   getButtonElement,
   continueToAccountPage,
 } from '@/services/SignUpService'
@@ -16,6 +17,10 @@ const RoutePath = {
 }
 
 export const InputName = {
+  EMAIL: 'email',
+  FIRST_NAME: 'firstName',
+  LAST_NAME: 'lastName',
+  PASSWORD: 'password',
   SCHOOL_ID: 'schoolId',
   WORKS_WITH_ELIGIBLE_STUDENTS: 'worksWithEligibleStudents',
 }
@@ -25,11 +30,19 @@ export function getPageDetails(to, from) {
     return getIneligiblePageDetails()
   }
 
+  if (isAccountRoute(to, from)) {
+    return getAccountPageDetails()
+  }
+
   return getEligibilityPageDetails(to, from)
 }
 
 function isIneligibleRoute(to) {
   return to.path === RoutePath.ineligible
+}
+
+function isAccountRoute(to, from) {
+  return to.path === RoutePath.account && from?.path === RoutePath.eligibility
 }
 
 function getEligibilityPageDetails() {
@@ -82,4 +95,52 @@ function getIneligiblePageDetails() {
       getRow(null, getTextElement('h1', 'Not eligible :(')),
     ],
   }
+}
+
+function getAccountPageDetails() {
+  return {
+    backgroundLayout: 'panel-right-75p',
+    submitAction: createAccount,
+    // TODO: Update copy.
+    rows: [
+      getRow(null, getTextElement('h1', 'Your school is eligible! 🎉')),
+      getRow(null, getTextElement('h2', 'Create an Account')),
+      getRow(
+        null,
+        getInputElement(
+          InputName.FIRST_NAME,
+          'First Name',
+          EVENTS.TEACHER_ENTERED_FIRST_NAME
+        ),
+        getInputElement(
+          InputName.LAST_NAME,
+          'Last Name',
+          EVENTS.TEACHER_ENTERED_LAST_NAME
+        )
+      ),
+      getRow(null, {
+        element: 'FormEmail',
+        props: {
+          name: InputName.EMAIL,
+          label: 'Email',
+          blurEvent: EVENTS.TEACHER_ENTERED_EMAIL,
+        },
+      }),
+      getRow(null, {
+        element: 'FormPassword',
+        props: {
+          name: InputName.PASSWORD,
+          metadata:
+            'Must have at least one number, one uppercase letter, one lowercase letter, and be at least 8 characters long.',
+          blurEvent: EVENTS.TEACHER_ENTERED_PASSWORD,
+        },
+      }),
+      getRow(null, getButtonElement(createAccount, 'Confirm')),
+    ],
+  }
+}
+
+function createAccount(data) {
+  // eslint-disable-next-line no-console
+  console.info('Create Account!', data)
 }
