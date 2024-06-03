@@ -59,7 +59,6 @@ import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import LineDivider from '@/components/LineDivider.vue'
 import Loader from '@/components/Loader.vue'
 import SsoButton from '@/components/SsoButton.vue'
-import * as SignUpService from '@/services/SignUpService'
 
 export default {
   name: 'sign-up-forms',
@@ -77,6 +76,13 @@ export default {
     Loader,
     LineDivider,
     SsoButton,
+  },
+
+  props: {
+    getPageDetails: {
+      type: Function,
+      required: true,
+    },
   },
 
   setup() {
@@ -99,12 +105,12 @@ export default {
       delete this.$route.query.error
     }
 
-    this.getPageDetails(this.$route)
+    this.loadPageDetails(this.$route)
   },
 
   watch: {
     $route(to, from) {
-      this.getPageDetails(to, from)
+      this.loadPageDetails(to, from)
     },
   },
 
@@ -142,8 +148,8 @@ export default {
       }
       return merged
     },
-    getPageDetails(to, from) {
-      this.pageDetails = SignUpService.getPageDetails(to, from)
+    loadPageDetails(to, from) {
+      this.pageDetails = this.getPageDetails(to, from)
     },
     isDisabled(el) {
       if (el.isDisabledOnInvalid) {

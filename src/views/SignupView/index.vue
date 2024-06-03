@@ -1,9 +1,9 @@
 <template>
   <div
-    v-if="useNewSignUpFlow && this.userSelection === 'student'"
+    v-if="useNewSignUpFlow && this.userSelection === UserType.student"
     class="h-full"
   >
-    <sign-up-forms />
+    <sign-up-forms :getPageDetails="getStudentPageDetails" />
   </div>
   <form-page-template v-else>
     <div class="uc-form">
@@ -79,8 +79,10 @@ import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import SignUpForms from './SignUpForms.vue'
 import StudentForm from './StudentForm.vue'
 import VolunteerForm from './VolunteerForm.vue'
-import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
+import NetworkService from '@/services/NetworkService'
+import { UserType } from '@/services/SignUpService'
+import { getPageDetails as getStudentPageDetails } from '@/services/SignUpService/StudentSignUpService'
 import StudentAvatar from '@/assets/student-avatar.svg'
 import VolunteerAvatar from '@/assets/volunteer-avatar.svg'
 import { EVENTS } from '@/consts'
@@ -100,6 +102,8 @@ export default {
       userSelection: null,
       isReferred: false,
       referredBy: {},
+      UserType,
+      getStudentPageDetails,
     }
   },
 
@@ -125,10 +129,12 @@ export default {
     }
 
     if (this.$route.params)
-      if (this.$route.params.userType === 'student')
-        this.userSelection = 'student'
-      else if (this.$route.params.userType === 'volunteer')
-        this.userSelection = 'volunteer'
+      if (this.$route.params.userType === this.UserType.student)
+        this.userSelection = this.UserType.student
+      else if (this.$route.params.userType === this.UserType.volunteer)
+        this.userSelection = this.UserType.volunteer
+      else if (this.$route.params.userType === this.UserType.teacher)
+        this.userSelection = this.UserType.teacher
   },
   computed: {
     ...mapGetters({
