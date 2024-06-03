@@ -13,6 +13,7 @@ export const SignUpPage = {
 export const UserType = {
   student: 'student',
   teacher: 'teacher',
+  volunteer: 'volunteer',
 }
 
 /**

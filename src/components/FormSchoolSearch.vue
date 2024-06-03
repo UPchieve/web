@@ -77,6 +77,18 @@ export default {
       type: String,
       default: 'School Name',
     },
+    startSearchEvent: {
+      type: String,
+      default: EVENTS.STUDENT_SEARCHED_SCHOOL,
+    },
+    cannotFindSchoolEvent: {
+      type: String,
+      default: EVENTS.STUDENT_CLICKED_CANT_FIND_SCHOOL,
+    },
+    selectedEvent: {
+      type: String,
+      default: EVENTS.STUDENT_SELECTED_SCHOOL,
+    },
   },
 
   created() {
@@ -108,7 +120,7 @@ export default {
       this.school = {}
 
       if (!this.hasStartedSearchingForSchool)
-        AnalyticsService.captureEvent(EVENTS.STUDENT_SEARCHED_SCHOOL)
+        AnalyticsService.captureEvent(this.startSearchEvent)
       this.hasStartedSearchingForSchool = true
 
       return new Promise((resolve) => {
@@ -136,9 +148,9 @@ export default {
     },
     handleSelectSchool(school) {
       if (school.value === this.CANNOT_FIND_SCHOOL_TEXT) {
-        AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CANT_FIND_SCHOOL)
+        AnalyticsService.captureEvent(this.cannotFindSchoolEvent)
       } else {
-        AnalyticsService.captureEvent(EVENTS.STUDENT_SELECTED_SCHOOL)
+        AnalyticsService.captureEvent(this.selectedEvent)
         this.school = school || {}
         this.$emit('input', school.id)
       }
