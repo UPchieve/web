@@ -161,9 +161,21 @@ function getAccountPageDetails() {
   }
 }
 
-function createAccount(data) {
-  // eslint-disable-next-line no-console
-  console.info('Create Account!', data)
+async function createAccount(data) {
+  try {
+    await NetworkService.registerTeacher({
+      [InputName.EMAIL]: data[InputName.EMAIL],
+      [InputName.FIRST_NAME]: data[InputName.FIRST_NAME],
+      [InputName.LAST_NAME]: data[InputName.LAST_NAME],
+      [InputName.PASSWORD]: data[InputName.PASSWORD],
+      [InputName.SCHOOL_ID]: data[InputName.SCHOOL_ID],
+    })
+
+    return getSubmitResponse(SignUpPage.verify)
+  } catch (err) {
+    LoggerService.noticeError(err)
+    return getSubmitResponse(null, null, err)
+  }
 }
 
 export async function beforeEnter(to, from, next) {
