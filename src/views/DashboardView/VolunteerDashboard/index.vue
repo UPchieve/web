@@ -77,7 +77,9 @@
           <div class="dashboard-card__icon">
             <verification-icon />
           </div>
-          <div class="dashboard-card__title">Safety Screening</div>
+          <div class="dashboard-card__title" data-testid="safety-screening">
+            Safety Screening
+          </div>
           <div class="dashboard-card__subtitle">
             {{ approvalCardSubheader }}
           </div>
@@ -90,6 +92,7 @@
               :status="accountAction.status"
               :icon="accountAction.icon"
               @click="accountAction.clickFn"
+              :data-testid="accountAction.title"
             />
           </template>
           <template v-else>
@@ -356,9 +359,10 @@ export default {
 
     hasCompletedBackgroundInfo() {
       return (
-        this.user.occupation &&
+        Object.hasOwn(this.user, 'occupation') &&
         this.user.occupation.length > 0 &&
-        this.user.country
+        Object.hasOwn(this.user, 'country') &&
+        this.user.country.length > 0
       )
     },
 

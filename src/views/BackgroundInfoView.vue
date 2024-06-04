@@ -1,14 +1,22 @@
 <template>
   <div class="background-info">
     <div class="background-info__wrapper">
-      <h1 class="background-info__header">Background Information</h1>
+      <h1
+        class="background-info__header"
+        data-testid="background-information-header"
+      >
+        Background Information
+      </h1>
       <div v-if="hasCompletedBackgroundInfo">
-        <p class="background-info__completed-message">
+        <p
+          class="background-info__completed-message"
+          data-testid="bg-info-complete"
+        >
           Thank you for submitting your background information!
         </p>
       </div>
       <form class="background-info__form" @submit="submitForm" v-else>
-        <p>
+        <p data-testid="background-information-explainer">
           Please provide some basic background information so that we can learn
           more about you! Don't worry: this information will be kept private
           unless we receive your permission to share it.
@@ -16,7 +24,7 @@
 
         <ol>
           <li class="uc-form-col">
-            <p>
+            <p data-testid="question-i-am-currently">
               I am currently...<span class="background-info__question-required"
                 >*</span
               >
@@ -37,6 +45,7 @@
                 :value="option"
                 v-model="occupation"
                 :id="option"
+                :data-testid="option"
               />
               <label class="uc-form-label" :for="option">
                 {{ option }}
@@ -70,7 +79,7 @@
           </li>
 
           <li class="uc-form-col">
-            <p>
+            <p data-testid="question-linkedin-profile">
               If you have one, please provide us with a link to your LinkedIn
               profile.
             </p>
@@ -83,6 +92,7 @@
               placeholder="https://www.linkedin.com/in/yourname"
               class="linkedin-input uc-form-input"
               id="linkedin"
+              data-testid="linked-in-input"
             />
             <p v-if="!isValidLinkedInUrl" class="error">
               Your url should be in this format:
@@ -91,7 +101,7 @@
           </li>
 
           <li class="uc-form-col">
-            <p>
+            <p data-testid="question-where-do-you-live">
               Where do you currently live?<span
                 class="background-info__question-required"
                 >*</span
@@ -104,6 +114,7 @@
               v-model="country"
               :options="countries"
               :searchable="true"
+              data-testid="location-input"
             />
             <template v-if="country === 'United States of America'">
               <label class="uc-form-label location-label">State</label>
@@ -113,6 +124,7 @@
                 v-model="state"
                 :options="states"
                 :searchable="true"
+                data-testid="state-select"
               />
             </template>
             <template v-if="country">
@@ -125,6 +137,7 @@
                 placeholder="Enter a city..."
                 class="uc-form-input location-input"
                 id="city"
+                data-testid="city-input"
               />
             </template>
             <p v-if="showInputErrors && !experience" class="error">
@@ -133,7 +146,7 @@
           </li>
 
           <li class="uc-form-col">
-            <p>
+            <p data-testid="question-experience">
               How much prior experience do you have with the following
               activities?<span class="background-info__question-required"
                 >*</span
@@ -182,6 +195,7 @@
                           "
                           type="radio"
                           :value="index"
+                          :data-testid="`${subquestion}-${experienceRadioQuestion.columnTitle[index - 1]}`"
                         />
                       </td>
                     </tr>
@@ -223,7 +237,7 @@
           </li>
 
           <li class="uc-form-col">
-            <p>
+            <p data-testid="question-languages">
               Are there any other languages (besides English) that you would
               feel comfortable tutoring a student in?
             </p>
@@ -241,6 +255,7 @@
                 :value="option"
                 v-model="languages"
                 :id="option"
+                :data-testid="option"
               />
               <label class="uc-form-label" :for="option">
                 {{ option }}
@@ -269,6 +284,7 @@
           class="uc-form-button submit-btn"
           type="submit"
           :disabled="invalidForm() ? true : null"
+          data-testid="submit-bg-info"
         >
           Submit
         </button>
@@ -348,9 +364,10 @@ export default {
     }),
     hasCompletedBackgroundInfo() {
       return (
-        this.user.occupation &&
+        Object.hasOwn(this.user, 'occupation') &&
         this.user.occupation.length > 0 &&
-        this.user.country
+        Object.hasOwn(this.user, 'country') &&
+        this.user.country.length > 0
       )
     },
     countries() {
@@ -441,8 +458,7 @@ export default {
           occupation: data.occupation,
           country: data.country,
         }
-
-        this.$store.dispatch('user/addToUser', update)
+        await this.$store.dispatch('user/addToUser', update)
       } catch (error) {
         this.formError = 'Sorry, we had some trouble saving your information.'
         this.wasSubmitted = false

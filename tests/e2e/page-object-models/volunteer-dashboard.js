@@ -5,8 +5,19 @@ export class VolunteerDashboard {
 
   constructor(page) {
     this.page = page
-    this.trainingLink = page.getByText('Training')
     this.mobileMenu = page.getByTestId('mobile-header-hamburger')
+
+    // Volunteer onboarding
+    // Upchieve 101
+    this.trainingLink = page.getByText('Training')
+
+    // Safety screening
+    this.safetyScreening = page.getByTestId('safety-screening')
+    this.backgroundInformationAccountAction = page.getByTestId(
+      'Background information'
+    )
+    this.proofOfIdentityAccountAction = page.getByTestId('Proof of identity')
+
   }
 
   get isMobile() {
@@ -28,5 +39,18 @@ export class VolunteerDashboard {
     }
 
     await this.trainingLink.click()
+  }
+
+  async safetyScreeningIsReady() {
+    await expect(this.safetyScreening).toBeVisible()
+    await expect(this.backgroundInformationAccountAction).toBeVisible()
+    await expect(this.proofOfIdentityAccountAction).toBeVisible()
+  }
+
+  async goToBackgroundInformation() {
+    await this.backgroundInformationAccountAction.click()
+    await this.page.waitForURL('**/background-information')
+
+    return this.page
   }
 }
