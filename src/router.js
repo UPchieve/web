@@ -156,7 +156,9 @@ const routes = [
           return next()
         default:
           // Unknown userType.
-          return next('/sign-up')
+          delete to.params.userType
+          delete to.params.step
+          return next()
       }
     },
   },
