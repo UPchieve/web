@@ -48,11 +48,11 @@ export const createPassword = () => {
 
 export const createStudent = async (dbClient, args = {}) => {
   const params = {
-    email: args?.email ?? faker.internet.email(),
-    firstName: args?.firstName ?? faker.person.firstName(),
-    lastName: args?.lastName ?? faker.person.lastName(),
-    password: args?.password ?? createPassword(),
-    verified: args?.verified ?? true,
+    email: faker.internet.email(),
+    firstName:faker.person.firstName(),
+    lastName: faker.person.lastName(),
+    password: createPassword(),
+    verified: true,
     ...args,
   }
   try {
@@ -77,16 +77,27 @@ export const createStudent = async (dbClient, args = {}) => {
   }
 }
 
-export const createVolunteer = async (dbClient, args = {}) => {
+export const createVolunteer = async (
+  dbClient,
+  userArgs = {},
+  options = {},
+) => {
   try {
     const params = {
-      email: args?.email ?? faker.internet.email(),
-      firstName: args?.firstName ?? faker.person.firstName(),
-      lastName: args?.lastName ?? faker.person.lastName(),
-      password: args?.password ?? createPassword(),
+      email: faker.internet.email(),
+      firstName: faker.person.firstName(),
+      lastName: faker.person.lastName(),
+      password: createPassword(),
       phone: `+${faker.string.numeric('###########')}`,
       terms: true,
-      ...args,
+      ...userArgs,
+    }
+
+    const opts = {
+      approved: true,
+      onboarded: true,
+      passedUpchieve101: true,
+      ...options,
     }
 
     const response = await fetch(
@@ -104,11 +115,10 @@ export const createVolunteer = async (dbClient, args = {}) => {
     await dbClient.query(
       `UPDATE users SET verified = true WHERE id = '${user.id}'`
     )
-    const hasOnboarded = args.hasOnboarded ?? true
     await dbClient.query(
-      `UPDATE volunteer_profiles SET approved = true, onboarded = ${hasOnboarded} WHERE user_id = '${user.id}'`
+      `UPDATE volunteer_profiles SET approved = ${opts.approved}, onboarded = ${opts.onboarded} WHERE user_id = '${user.id}'`
     )
-    if (hasOnboarded) {
+    if (opts.passedUpchieve101) {
       await passUpchieve101(dbClient, user.id)
     }
 

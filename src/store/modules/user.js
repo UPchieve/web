@@ -31,13 +31,7 @@ export default {
     setUser: (state, user = {}) => (state.user = user),
 
     updateUser: (state, user = {}) => {
-      if (
-        !user.date ||
-        !state.user.date ||
-        user.date.getTime() >= state.user.date.getTime()
-      ) {
-        state.user = user
-      }
+      state.user = user
     },
 
     setSession: (state, session = {}) => (state.session = session),
