@@ -247,13 +247,12 @@ export default {
   },
 
   getters: {
-    isReadyToTutor: (state, getters, rootState, rootGetters) => {
+    isReadyToTutor: (_state, _getters, rootState) => {
       return (
         rootState.user.user.isVolunteer &&
         rootState.user.user.isOnboarded &&
         rootState.user.user.isApproved &&
-        !rootState.user.user.isBanned &&
-        rootGetters['user/passedUpchieve101']
+        !rootState.user.user.isBanned
       )
     },
   },
