@@ -45,23 +45,31 @@
           :class="messageAlignment(message)"
           class="message"
         >
-          <component
-            class="avatar"
-            :is="avatar(message)"
-            v-if="message.user !== user.id"
-          />
+          <span
+            v-if="message.isSystemMessage"
+            :data-testid="`message-from-system`"
+          >
+            {{ message.contents }}</span
+          >
+          <template v-else>
+            <component
+              class="avatar"
+              :is="avatar(message)"
+              v-if="message.user !== user.id"
+            />
 
-          <div class="contents" :class="chatBotContents(message)">
-            <span v-if="message.hasHtml" v-html="message.contents"></span>
-            <span
-              v-else
-              :data-testid="`message-from-user-id-${message.user}`"
-              >{{ message.contents }}</span
-            >
-          </div>
-          <div class="time">
-            {{ formatTime(message.createdAt) }}
-          </div>
+            <div class="contents" :class="chatBotContents(message)">
+              <span v-if="message.hasHtml" v-html="message.contents"></span>
+              <span
+                v-else
+                :data-testid="`message-from-user-id-${message.user}`"
+                >{{ message.contents }}</span
+              >
+            </div>
+            <div class="time">
+              {{ formatTime(message.createdAt) }}
+            </div>
+          </template>
         </div>
         <chat-bot
           v-if="sessionHasEnded && isSessionRecapDmsActive && user.isVolunteer"
@@ -132,6 +140,7 @@ import sound from '@/assets/audio/receive-message.mp3'
 const MESSAGE_ALIGNMENT = {
   LEFT: 'left',
   RIGHT: 'right',
+  CENTER: 'center',
 }
 
 /**
@@ -408,6 +417,7 @@ export default {
         (messagesBox.lastElementChild?.offsetHeight ?? 0)
     },
     messageAlignment(message) {
+      if (message.isSystemMessage) return MESSAGE_ALIGNMENT.CENTER
       return message.user === this.user.id
         ? MESSAGE_ALIGNMENT.RIGHT
         : MESSAGE_ALIGNMENT.LEFT
@@ -474,6 +484,24 @@ export default {
           })
       },
       deep: true,
+    },
+    currentSession(newValue, oldValue) {
+      if (
+        newValue.endedBy !== this.user.id &&
+        newValue.endedAt &&
+        !oldValue.endedAt
+      ) {
+        this.$store.dispatch('user/addMessage', {
+          contents: `${this.sessionPartnerName} has left the chat`,
+          sessionId: this.currentSession.id,
+          isSystemMessage: true,
+          createdAt: new Date().toISOString(),
+        })
+        // Wait for the DOM to update
+        this.$nextTick(() => {
+          this.scrollToBottom()
+        })
+      }
     },
   },
 }
@@ -620,6 +648,11 @@ export default {
   .contents {
     background-color: $c-background-blue;
   }
+}
+
+.center {
+  justify-content: center;
+  align-items: center;
 }
 
 .chat-footer {

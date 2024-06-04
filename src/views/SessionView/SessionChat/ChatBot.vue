@@ -169,7 +169,8 @@ export default {
             )
           } else {
             this.$store.dispatch('user/addMessage', {
-              contents: 'Thanks so much for picking up this session!',
+              contents:
+                'The session has ended. Thanks so much for picking up this session!',
               createdAt: new Date().toISOString(),
               isVolunteer: false,
               user: null,
