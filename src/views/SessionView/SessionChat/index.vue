@@ -7,10 +7,20 @@
           class="chat-warning chat-warning--moderation"
           v-show="moderationWarningIsShown"
         >
-          <span
-            >Messages cannot contain personal information, profanity, or links
-            to third party video services</span
-          >
+          <div class="moderation-body">
+            <span
+              >Messages cannot contain personal information, profanity, or links
+              to third party video services</span
+            >
+            <ul class="moderation-reasons">
+              <li v-for="(value, key) in failureReasons" :key="key">
+                <div class="reason">{{ key }}</div>
+                <div class="instances">
+                  {{ value.map((s) => s.trim()).join(', ') }}
+                </div>
+              </li>
+            </ul>
+          </div>
           <span class="chat-warning__close" @click="hideModerationWarning"
             >×</span
           >
@@ -104,19 +114,25 @@
     </div>
 
     <div class="chat-footer" :class="isInRecap && 'chat-footer--recap'">
+      <loading-message
+        message="Sending"
+        class="waiting-for-moderation"
+        v-show="waitingForModeration"
+      />
       <transition name="fade">
         <div class="typing-indicator" v-show="typingIndicatorShown">
           {{ sessionPartnerName || 'Chatbot' }} is typing...
         </div>
       </transition>
-
       <textarea
         class="message-textarea"
         data-testid="chat-textarea"
+        autofocus
         @keydown.enter.prevent
         @keyup="handleOutgoingMessage"
         v-model="newMessage"
         placeholder="Type a message..."
+        :disabled="waitingForModeration"
       />
     </div>
   </div>
@@ -173,6 +189,8 @@ export default {
       showChatBot: false,
       eligibleForSessionRecapChat: false,
       receiveMessageAudio: new Audio(sound),
+      failureReasons: null,
+      waitingForModeration: false,
     }
   },
   computed: {
@@ -246,6 +264,7 @@ export default {
     },
     hideModerationWarning() {
       this.moderationWarningIsShown = false
+      this.failureReasons = null
     },
     toggleEligibleForSessionRecapChat() {
       this.eligibleForSessionRecapChat = true
@@ -271,7 +290,38 @@ export default {
         sessionId: this.currentSession.id,
       })
     },
-    handleOutgoingMessage(event) {
+    async moderateMessage(message) {
+      // Reset the chat warning
+      this.hideModerationWarning()
+      this.waitingForModeration = true
+      try {
+        // Check for personal info/profanity in message
+        const { failures } = await ModerationService.checkIfMessageIsClean({
+          message,
+          sessionId: this.currentSession.id,
+        })
+        const isClean = Object.keys(failures).length === 0
+        if (isClean) {
+          this.showNewMessage(message)
+          this.clearMessageInput()
+        } else {
+          // do not show the offending profanity to students
+          // in the event it was a typo
+          const { profanity, ...rest } = failures
+          this.failureReasons = this.user.isVolunteer
+            ? { profanity, ...rest }
+            : rest
+          this.showModerationWarning()
+        }
+      } catch (e) {
+        this.showNewMessage(message)
+        this.clearMessageInput()
+        LoggerService.noticeError(`ModerationService failed with`, e)
+      } finally {
+        this.waitingForModeration = false
+      }
+    },
+    async handleOutgoingMessage(event) {
       // If key pressed is Enter, send the message
       if (event.key == 'Enter') {
         const message = this.newMessage.trim()
@@ -279,24 +329,11 @@ export default {
         // Early exit if message is blank
         if (isEmpty(message)) return
 
-        // Reset the chat warning
-        this.hideModerationWarning()
-
-        // Check for personal info/profanity in message
-        ModerationService.checkIfMessageIsClean({
-          message,
-          sessionId: this.currentSession.id,
-        }).then((isClean) => {
-          if (isClean) {
-            this.showNewMessage(message)
-            this.clearMessageInput()
-          } else {
-            this.showModerationWarning()
-          }
-        })
+        await this.moderateMessage(message)
 
         // Disregard typing handler for enter
         this.notTyping()
+        this.$nextTick(() => event.target.focus())
         return
 
         // Disregard typing handler for backspace
@@ -538,6 +575,7 @@ export default {
     display: flex;
     align-items: center;
     background-color: $c-shadow-warn;
+    column-gap: 0.75em;
   }
 
   &--connection {
@@ -549,7 +587,12 @@ export default {
   }
 
   &__close {
-    font-size: 3.5rem;
+    align-self: start;
+    font-size: 44px;
+    line-height: 16px;
+    margin: 0;
+    line-height: 0.5em;
+    font-weight: 300;
     cursor: pointer;
   }
 }
@@ -559,7 +602,33 @@ export default {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  flex: 1;
+  flex-grow: 1;
+}
+.moderation-body {
+  /*
+   * min-width for flex content is `auto` by default.
+   * set to 0 to prevent growing
+   */
+  min-width: 0;
+}
+.moderation-reasons {
+  margin: 0;
+  padding: 0;
+  li:first-child {
+    padding-top: 1em;
+  }
+  li {
+    display: flex;
+    list-style: none;
+    column-gap: 12px;
+  }
+  .reason {
+    font-weight: 600;
+  }
+  .instances {
+    word-wrap: break-word;
+    min-width: 0;
+  }
 }
 
 .messages-overlay {
@@ -658,10 +727,25 @@ export default {
 .chat-footer {
   position: relative;
 
+  .waiting-for-moderation {
+    position: absolute;
+    right: 2em;
+    top: -2.3em;
+    transition: all 0.15s ease-in;
+    font-size: 13px;
+    font-weight: 300;
+  }
+
   @include breakpoint-below('medium') {
     padding: 1.25em 8.75em 2.5em 1.25em;
     display: flex;
     align-items: center;
+
+    .waiting-for-moderation {
+      top: -1.75em;
+      right: 8.5em;
+      padding: 0.25em 3.75em 2.5em 1.25em;
+    }
   }
 
   &--recap {
