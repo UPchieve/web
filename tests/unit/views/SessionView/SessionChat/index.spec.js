@@ -33,7 +33,7 @@ describe('SessionChat', () => {
         },
         socket: {
           messageData: {},
-        }
+        },
       },
     })
     return shallowMount(SessionChat, {
@@ -56,7 +56,7 @@ describe('SessionChat', () => {
     vi.resetAllMocks()
   })
 
-  test.each([true, false])(
+  test.each([{ failures: {} }, { failures: { profanity: ['butt'] } }])(
     'It clears the textarea only when the message is clean and can be sent (isClean=%s)',
     async (isClean) => {
       ModerationService.checkIfMessageIsClean = vi
@@ -78,7 +78,8 @@ describe('SessionChat', () => {
         sessionId: currentSession.id,
       })
       await flushPromises()
-      expect(textArea.element.value).toEqual(isClean ? '' : message)
+      const hasFailures = Boolean(isClean.failures.profanity)
+      expect(textArea.element.value).toEqual(hasFailures ? message : '')
     }
   )
 })
