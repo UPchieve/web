@@ -113,8 +113,6 @@ export default {
           throw new Error('No user returned from auth service')
         }
 
-        context.msg = 'Password has been reset!'
-
         if (redirect) {
           setTimeout(() => {
             context.$router.push(redirect)
