@@ -242,7 +242,7 @@ export default {
         }, delay)
       } else {
         LoggerService.noticeError(
-          `Max retry attempts reached, unable to fetch list of sessions for user: ${this.state.user.user.id}`
+          `Max retry attempts reached, unable to fetch list of sessions for user: ${this.user.id}`
         )
       }
     },
@@ -335,7 +335,7 @@ export default {
     $route(to, from) {
       // Capture PostHog pageviews on route transitions
       if (to.path !== from.path) posthog.capture('$pageview')
-      if (this.userAuthenticated) {
+      if (to.path !== '/logout' && this.userAuthenticated) {
         this.$store.dispatch('user/fetchSession', this)
 
         if (!this.isVolunteer) {

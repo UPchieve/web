@@ -184,7 +184,6 @@ export default {
             )
           }
         } catch (error) {
-          this.showSessionRecapNotEligibleMessages()
           LoggerService.noticeError(error)
         } finally {
           this.isFetchingIsSessionRecapEligible = false

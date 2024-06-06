@@ -8,6 +8,28 @@ import { socket } from '@/socket'
 
 export const INVALID_CSRF_ERROR = 'invalid csrf token'
 
+export async function logout(context) {
+  if (!context) return
+  try {
+    await NetworkService.logout()
+  } finally {
+    await handleLogout(context)
+    resetServices()
+    socket.disconnect()
+  }
+}
+
+async function handleLogout(context) {
+  await context.$router.push('/logout')
+  await context.$store.dispatch('user/clear')
+}
+
+function resetServices() {
+  AnalyticsService.reset()
+  LoggerService.reset()
+  ProductDiscoveryService.reset()
+}
+
 export default {
   async login(creds) {
     const { email, password } = creds
@@ -136,27 +158,7 @@ export default {
     })
   },
 
-  logout(context) {
-    if (context) {
-      NetworkService.logout()
-        .then(() => {
-          context.$router.push('/logout')
-          context.$store.dispatch('user/clear')
-        })
-        .catch(() => {
-          context.$router.push('/logout')
-          context.$store.dispatch('user/clear')
-        })
-        .finally(() => {
-          AnalyticsService.reset()
-          LoggerService.reset()
-          ProductDiscoveryService.reset()
-
-          // disconnect socket
-          socket.disconnect()
-        })
-    }
-  },
+  logout,
 
   getAuth() {
     return NetworkService.user()
