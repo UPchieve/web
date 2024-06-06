@@ -46,6 +46,17 @@
         <PenIcon class="toolbar-item__svg" />
       </div>
       <div
+        v-if="isWhiteboardEraserToolActive"
+        class="toolbar-item toolbar-item--eraser"
+        :class="selectedTool === 'eraser' ? 'selected-tool' : ''"
+        title="Eraser"
+        tabindex="0"
+        @click="useEraserTool"
+        @keydown.enter="useEraserTool"
+      >
+        <EraserIcon class="toolbar-item__svg" />
+      </div>
+      <div
         class="toolbar-item toolbar-item--shapes"
         title="Shapes"
         tabindex="0"
@@ -251,6 +262,7 @@ import RectangleIcon from '@/assets/whiteboard_icons/rectangle.svg'
 import TriangleIcon from '@/assets/whiteboard_icons/triangle.svg'
 import LineIcon from '@/assets/whiteboard_icons/line.svg'
 import ResetIcon from '@/assets/whiteboard_icons/reset.svg'
+import EraserIcon from '@/assets/whiteboard_icons/eraser.svg'
 import Loader from '@/components/Loader.vue'
 import ResetWhiteboardModal from './ResetWhiteboardModal.vue'
 import LoadingMessage from '@/components/LoadingMessage.vue'
@@ -259,6 +271,8 @@ import heic2any from 'heic2any'
 import LoggerService from '@/services/LoggerService'
 import { socket } from '@/socket'
 import { markRaw } from 'vue'
+import { EVENTS } from '@/consts'
+import AnalyticsService from '@/services/AnalyticsService'
 
 export default {
   components: {
@@ -277,6 +291,7 @@ export default {
     TriangleIcon,
     LineIcon,
     ResetIcon,
+    EraserIcon,
     Loader,
     ResetWhiteboardModal,
     LoadingMessage,
@@ -316,6 +331,7 @@ export default {
       shouldResetWhiteboard: false,
       resetWhiteboardError: false,
       uploadingPictureError: false,
+      selectedEraserTool: false,
     }
   },
   computed: {
@@ -325,6 +341,7 @@ export default {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
       isVolunteer: 'user/isVolunteer',
+      isWhiteboardEraserToolActive: 'featureFlags/isWhiteboardEraserToolActive',
     }),
     toolClass() {
       if (this.selectedTool === 'brush') return 'zwib-wrapper--brush'
@@ -334,6 +351,7 @@ export default {
       if (this.selectedTool === 'rectangle') return 'zwib-wrapper--rectangle'
       if (this.selectedTool === 'polygon') return 'zwib-wrapper--triangle'
       if (this.selectedTool === 'text') return 'zwib-wrapper--text'
+      if (this.selectedTool === 'eraser') return 'zwib-wrapper--eraser'
 
       return 'zwib-wrapper--default'
     },
@@ -441,6 +459,17 @@ export default {
     },
     useTextTool(event) {
       this.zwibblerCtx.useTextTool()
+      this.maybeFocusZwibbler(event)
+    },
+    useEraserTool(event) {
+      const layer = this.zwibblerCtx.getActiveLayer()
+      this.selectedEraserTool = true
+      this.zwibblerCtx.useBrushTool({
+        lineWidth: 10,
+        strokeStyle: 'erase',
+        layer,
+      })
+      AnalyticsService.captureEvent(EVENTS.USER_CLICKED_WHITEBOARD_ERASER_TOOL)
       this.maybeFocusZwibbler(event)
     },
     toggleColorPicker() {
@@ -702,7 +731,13 @@ export default {
 
         // Don't start setting selected tool until connected
         this.zwibblerCtx.on('tool-changed', (toolname) => {
-          this.selectedTool = toolname
+          // The eraser uses the brush tool. In order to make it seem as the eraser
+          // is active for the user, we're overriding the selectedTool to be
+          // `eraser` instead of `brush`
+          if (this.selectedEraserTool) {
+            this.selectedEraserTool = false
+            this.selectedTool = 'eraser'
+          } else this.selectedTool = toolname
           this.hideHoveredToolbars()
         })
       })

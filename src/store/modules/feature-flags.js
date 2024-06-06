@@ -32,6 +32,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.USE_NEW_SIGN_UP_FLOW]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_IN_APP_SESSION_NOTIFICATIONS]: false,
       [POSTHOG_FEATURE_FLAGS.TEACHER_SIGN_UP]: false,
+      [POSTHOG_FEATURE_FLAGS.WHITEBOARD_ERASER_TOOL]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.TOPIC_CARD_DASHBOARD_REORDER]: 'control',
@@ -152,5 +153,7 @@ export default {
       ],
     isTeacherSignUpEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.TEACHER_SIGN_UP],
+    isWhiteboardEraserToolActive: (state) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.WHITEBOARD_ERASER_TOOL],
   },
 }
