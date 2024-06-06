@@ -45,6 +45,8 @@ export default {
         commit('setIsConnected', false)
         socket.emit('client_disconnect', reason)
         this.dispatch('user/sessionDisconnected')
+        // Ignore logging errors for when we make manual disconnects, e.g logging out
+        if (reason === 'io client disconnect') return
         const userType = rootGetters['user/isVolunteer']
           ? 'volunteer'
           : 'student'

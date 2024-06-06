@@ -125,7 +125,6 @@ const routes = [
     path: '/logout',
     name: 'LogoutView',
     component: LogoutView,
-    meta: { loggedOutOnly: true },
   },
   {
     path: '/reference-form/:referenceId',
