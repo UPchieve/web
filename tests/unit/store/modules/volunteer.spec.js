@@ -106,7 +106,6 @@ describe('Volunteer store module', () => {
       { state: { isApproved: false } },
       { state: { isOnboarded: false } },
       { state: { isBanned: true } },
-      { getters: { passedUpchieve101: () => false } },
     ])('Negative cases: Returns FALSE when %s', (arg) => {
       const store = getStore({
         user: {
@@ -118,9 +117,6 @@ describe('Volunteer store module', () => {
               isBanned: false,
               ...(arg?.state ?? {}),
             },
-          },
-          getters: {
-            ...(arg?.getters ?? {}),
           },
         },
       })
