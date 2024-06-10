@@ -189,26 +189,18 @@ export default {
   created() {
     if (this.mobileMode) {
       this.$store.dispatch('app/hideNavigation')
+      Gleap.showFeedbackButton(false)
     } else {
       this.$store.dispatch('app/header/show', activeHeaderData)
       this.$store.dispatch('app/sidebar/hide')
     }
 
     window.addEventListener('resize', this.handleResize)
-
-    // Hide Gleap using CSS. The SDK's`hide` function is a no-op at the moment
-    const gleapEl = document.querySelector(this.gleapClass)
-    if (this.mobileMode && gleapEl) {
-      gleapEl.style.visibility = 'hidden'
-    }
   },
   beforeUnmount() {
     Gleap.removeCustomData('sessionId')
+    Gleap.showFeedbackButton(true)
     window.removeEventListener('resize', this.handleResize)
-    const gleapEl = document.querySelector(this.gleapClass)
-    if (gleapEl) {
-      gleapEl.style.visibility = 'visible'
-    }
   },
   /*
    * @notes
@@ -285,9 +277,6 @@ export default {
       }
 
       return false
-    },
-    gleapClass() {
-      return '.bb-feedback-button'
     },
     isConnectionReady() {
       return [this.isConnected, this.sessionId]
@@ -408,11 +397,8 @@ export default {
         this.$store.dispatch('app/modal/hide')
       }
     },
-    mobileMode(newValue, oldValue) {
-      if (newValue && !oldValue)
-        document.querySelector(this.gleapClass).style.visibility = 'hidden'
-      if (!newValue && oldValue)
-        document.querySelector(this.gleapClass).style.visibility = 'visible'
+    mobileMode(isMobileMode) {
+      Gleap.showFeedbackButton(!isMobileMode)
     },
     // Once session has ended, show chatbot to tutor
     async 'session.endedAt'(newValue, oldValue) {
