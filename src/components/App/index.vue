@@ -1,13 +1,6 @@
 <template>
   <div id="app" class="App" :class="isIOS && 'is-ios'">
-    <ion-alert
-      :is-open="shouldShowRefreshAlert"
-      header="New version of UPchieve!"
-      :message="`${refreshMessage}, please`"
-      :buttons="alertButtons"
-      class="refresh-alert"
-    >
-    </ion-alert>
+    <refresh-app-alert />
     <app-header v-if="showHeader" />
     <app-sidebar v-if="showSidebar" />
     <app-modal v-if="showModal" />
@@ -38,22 +31,21 @@ import isOutdatedMobileAppVersion from '@/utils/is-outdated-mobile-app-version'
 import AnalyticsService from '@/services/AnalyticsService'
 import FeatureFlagService from '@/services/FeatureFlagService'
 import LoggerService from '@/services/LoggerService'
-import VersionService from '@/services/VersionService'
 import Gleap from 'gleap'
 import posthog from 'posthog-js'
 import AttentionBoxes from '../AttentionBoxes.vue'
 import { socket } from '@/socket'
-import { IonAlert } from '@ionic/vue'
 import sound from '@/assets/audio/alert.mp3'
+import RefreshAppAlert from '@/views/RefreshAppAlert.vue'
 
 export default {
   name: 'App',
   components: {
+    RefreshAppAlert,
     AppHeader,
     AppSidebar,
     AppModal,
     AppBanner,
-    IonAlert,
     AttentionBoxes,
   },
   data() {
@@ -61,23 +53,7 @@ export default {
       audioAlert: new Audio(sound),
       isIOS: false,
       docHiddenProperty: '',
-      newServerVersionAvailable: false,
       checkForUpdateIntervalId: null,
-      alertButtons: [
-        {
-          text: 'Not now',
-          rol: 'cancel',
-          cssClass: 'alert-button-cancel',
-        },
-        {
-          text: 'Upgrade',
-          rol: 'confirm',
-          cssClass: 'alert-button-confirm',
-          handler: () => {
-            this.refreshPage()
-          },
-        },
-      ],
     }
   },
   async created() {
@@ -86,9 +62,6 @@ export default {
     this.handleResize()
     await this.$store.dispatch('app/checkEnvironment', this)
     PortalService.call('app.isLoaded')
-
-    // Get and set version on initial load.
-    await this.getCurrentServerVersion()
 
     this.setVisibilityListener()
 
@@ -114,13 +87,6 @@ export default {
     }
   },
   mounted() {
-    // every 10 minutes, check the current server version
-    this.checkForUpdateIntervalId = setInterval(
-      () => {
-        this.getCurrentServerVersion()
-      },
-      1000 * 60 * 10
-    )
     if (this.mobileMode) {
       Gleap.hide()
     }
@@ -142,17 +108,6 @@ export default {
     }
   },
   methods: {
-    async getCurrentServerVersion() {
-      const version = await VersionService.getCurrentServerVersion()
-      if (!this.version) {
-        this.$store.commit('app/setVersion', version)
-        return
-      }
-
-      if (version !== this.version) {
-        this.newServerVersionAvailable = true
-      }
-    },
     iOSFocusElements(e) {
       if (!e) {
         return
@@ -189,9 +144,6 @@ export default {
           target: '_system',
         })
       }
-    },
-    refreshPage() {
-      window.location.reload()
     },
     setVisibilityListener() {
       let visibilityChange
@@ -259,8 +211,6 @@ export default {
       user: (state) => state.user.user,
       session: (state) => state.user.session,
       subjects: (state) => state.subjects.subjects,
-      showCsrfRefreshAlert: (state) => state.app.showCsrfRefreshAlert,
-      version: (state) => state.app.version,
       isConnected: (state) => state.socket.isConnected,
     }),
     ...mapGetters({
@@ -272,18 +222,6 @@ export default {
       showInAppSessionNotifications:
         'featureFlags/showInAppSessionNotifications',
     }),
-    shouldShowRefreshAlert() {
-      return this.newServerVersionAvailable || this.showCsrfRefreshAlert
-    },
-    refreshMessage() {
-      const defaultMsg = 'Oops! Something went wrong'
-      if (this.newServerVersionAvailable && !this.showCsrfRefreshAlert) {
-        // Prefer the "Oops!" message over new app version when both apply
-        return 'There is a new version of the app available'
-      } else {
-        return defaultMsg
-      }
-    },
     isSocketReadyToGetWaitingStudents() {
       return [this.isConnected, this.isVolunteer]
     },
@@ -372,53 +310,6 @@ export default {
   border-radius: 20px;
   padding: 9px 23px; // subtracted 1px for border
   display: inline-flex;
-}
-.refresh-alert {
-  .alert-button-group {
-    padding-bottom: 20px;
-  }
-  .alert-button-confirm {
-    @extend %LargeButton;
-
-    background: $c-success-green;
-    color: white;
-
-    &:hover {
-      background: darken($c-success-green, 5%);
-      color: $c-background-grey;
-    }
-
-    &:disabled {
-      background: $c-background-grey;
-      color: $c-disabled-grey;
-    }
-
-    &--reverse {
-      background: white;
-      color: $c-success-green;
-    }
-  }
-  .alert-button-cancel {
-    @extend %LargeButton;
-
-    background: white;
-    border-color: $c-border-grey;
-    color: $c-soft-black;
-
-    &:hover {
-      border-color: $c-soft-black;
-    }
-
-    &:disabled {
-      background: $c-background-grey;
-      border-color: $c-background-grey;
-      color: $c-disabled-grey;
-    }
-
-    &--reverse {
-      border-color: white;
-    }
-  }
 }
 </style>
 
