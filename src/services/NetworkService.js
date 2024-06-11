@@ -930,4 +930,10 @@ export default {
       this._errorHandler
     )
   },
+  createTeacherClass(className) {
+    return httpPost(`${API_ROOT}/teachers/class`, { className }).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
 }
