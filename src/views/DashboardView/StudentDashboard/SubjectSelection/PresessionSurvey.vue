@@ -68,6 +68,7 @@
               :openResponseValue="
                 userResponse[currentQuestion.questionId].openResponse
               "
+              :placeholder="`Tell us your goal!`"
               @survey-radio-input="updateUserResponse"
             />
           </template>
@@ -196,7 +197,10 @@ export default {
       return (
         this.currentQuestion &&
         this.userResponse[this.currentQuestion.questionId] &&
-        !this.userResponse[this.currentQuestion.questionId].responseId
+        (!this.userResponse[this.currentQuestion.questionId].responseId ||
+          (this.userResponse[this.currentQuestion.questionId].responseId ===
+            '68' &&
+            !this.userResponse[this.currentQuestion.questionId].openResponse))
       )
     },
   },
