@@ -6,17 +6,13 @@ export class VolunteerTraining {
   constructor(page) {
     this.page = page
     this.subjectCertifications = this.page.getByTestId('subject-certifications')
-    this.startQuizBtn = this.page.getByRole('button', { name: 'Start Quiz' })
+    this.startQuizBtn = this.page.getByTestId('btn-start-quiz')
     this.submitQuiz = this.page.getByTestId('btn-submit-quiz')
     this.quizQuestions = this.page.getByTestId('quiz-questions')
     this.nextQuestion = this.page.getByTestId('btn-question-next')
     this.quizResultsHeader = this.page.getByTestId('quiz-results-header')
-    this.reviewAnswersBtn = this.page.getByRole('button', {
-      name: 'Review Answers',
-    })
-    this.reviewConceptsBtn = this.page.getByRole('button', {
-      name: 'Review Concepts',
-    })
+    this.reviewAnswersBtn = this.page.getByTestId('btn-review-answers')
+    this.reviewConceptsBtn = this.page.getByTestId('btn-review-concepts')
     this.reviewMaterialsHeader = this.page.getByTestId(
       'review-materials-header'
     )

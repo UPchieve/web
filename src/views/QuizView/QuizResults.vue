@@ -27,6 +27,7 @@
         :showArrow="false"
         :routeTo="leftBtn.route"
         class="btn"
+        :data-testid="leftBtn.dataTestId"
       >
         {{ leftBtn.text }}
       </large-button>
@@ -35,6 +36,7 @@
         :showArrow="false"
         @click="leftBtn.handleClick"
         class="btn"
+        :data-testid="leftBtn.dataTestId"
       >
         {{ leftBtn.text }}
       </large-button>
@@ -52,6 +54,7 @@
         :showArrow="false"
         :routeTo="rightBtn.route"
         class="btn"
+        :data-testid="rightBtn.dataTestId"
       >
         {{ rightBtn.text }}
       </large-button>
@@ -61,6 +64,7 @@
         :showArrow="false"
         @click="rightBtn.handleClick"
         class="btn"
+        :data-testid="rightBtn.dataTestId"
       >
         {{ rightBtn.text }}
       </large-button>
@@ -90,9 +94,14 @@ export default {
       headerMsg: '',
       instructionMsg: '',
       category: '',
-      leftBtn: { text: '', route: '', handleClick: undefined },
-      middleBtn: { text: '', route: '', handleClick: undefined },
-      rightBtn: { text: '', route: '', handleClick: undefined },
+      leftBtn: { text: '', route: '', handleClick: undefined, dataTestId: '' },
+      middleBtn: {
+        text: '',
+        route: '',
+        handleClick: undefined,
+        dataTestId: '',
+      },
+      rightBtn: { text: '', route: '', handleClick: undefined, dataTestId: '' },
       popUpBorderStyle: {},
       scoreStyle: {},
     }
@@ -110,7 +119,11 @@ export default {
         : isTrainingSubject
           ? "Now that you have this certification, you're one step closer to being able to help students!"
           : "Now that you have this certification, you'll be notified of student requests for help in this subject. If you want to help students with even more subjects, just pass more quizzes!"
-      this.leftBtn = { text: 'Review answers', handleClick: this.showReview }
+      this.leftBtn = {
+        text: 'Review answers',
+        handleClick: this.showReview,
+        dataTestId: 'btn-review-answers',
+      }
       this.rightBtn = {
         text: 'Take another quiz',
         route: '/training',
@@ -126,14 +139,23 @@ export default {
         ? 'Please try taking this quiz again after reviewing your incorrect answers and checking out the training course materials again.'
         : 'Please try taking this quiz again after reviewing your incorrect answers and checking out the subject-specific review materials we provide on the Training page.'
       this.leftBtn = {
+        dataTestId: 'btn-review-concepts',
         text: 'Review concepts',
         route: isTrainingSubject
           ? `/training/course/${Case.kebab(this.category)}`
           : `/training/review/${Case.kebab(this.category)}`,
       }
-      this.middleBtn = { text: 'Review answers', handleClick: this.showReview }
+      this.middleBtn = {
+        text: 'Review answers',
+        handleClick: this.showReview,
+        dataTestId: 'btn-review-answers',
+      }
       if (this.isFirstQuiz)
-        this.rightBtn = { text: 'Review answers', handleClick: this.showReview }
+        this.rightBtn = {
+          text: 'Review answers',
+          handleClick: this.showReview,
+          dataTestId: 'btn-review-answers',
+        }
       else this.rightBtn = { text: 'Retake quiz', handleClick: this.reloadQuiz }
     }
 
