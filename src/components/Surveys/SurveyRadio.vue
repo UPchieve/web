@@ -20,6 +20,7 @@
         @input="handleOpenResponse"
         :disabled="isOpenResponseDisabled ? true : null"
         :value="openResponseValue"
+        :placeholder="isOpenResponseDisabled ? '' : placeholder"
       />
     </label>
   </div>
@@ -62,6 +63,10 @@ export default {
       required: false,
     },
     openResponseValue: {
+      type: String,
+      default: '',
+    },
+    placeholder: {
       type: String,
       default: '',
     },
@@ -121,5 +126,8 @@ input[type='radio'] {
 input[type='text'] {
   margin: 0 0 0 0.6em;
   width: 250px;
+  border: 1px solid $border-grey;
+  padding: 5px;
+  border-radius: 5px;
 }
 </style>
