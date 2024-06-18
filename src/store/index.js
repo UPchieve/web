@@ -7,6 +7,7 @@ import subjectsModule from './modules/subjects'
 import volunteerModule from './modules/volunteer'
 import notificationsModule from './modules/notifications'
 import socketModule from './modules/socket'
+import sessionModule from './modules/session'
 
 export const storeOptions = {
   modules: {
@@ -18,6 +19,7 @@ export const storeOptions = {
     volunteer: volunteerModule,
     notifications: notificationsModule,
     socket: socketModule,
+    session: sessionModule,
   },
 }
 

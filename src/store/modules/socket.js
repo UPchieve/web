@@ -190,6 +190,10 @@ export default {
         if (data.report && data.report.status === 'complete')
           this.dispatch('user/getProgressReportOverviewSubjectStats')
       })
+
+      socket.on('sessions/partner:in-session', (isOnline) => {
+        this.dispatch('session/onlineStatusForPartner', isOnline)
+      })
     },
     connect() {
       socket.connect()
