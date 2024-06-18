@@ -3,38 +3,34 @@
     <div :class="{ inactive: !isSessionInProgress }" class="session-header">
       <div class="avatar-info-container">
         <component
+          v-if="!isSessionOver"
           :is="partnerAvatar"
           class="avatar"
           :class="!isSessionAlive && 'avatar--hidden'"
         />
         <div class="info">
-          <template v-if="isSessionEnding">
-            <loading-message message="Ending session" />
-          </template>
-          <template v-else-if="isSessionWaitingForVolunteer">
-            <loading-message message="Contacting coaches" />
-          </template>
-          <template v-else-if="isSessionInProgress">
-            <div class="volunteer-info">
-              <span class="volunteer-name">{{ sessionPartner.firstname }}</span
-              ><br />
-              <span class="in-session-label">In Session</span>
+          <loading-message v-if="isSessionEnding" message="Ending session" />
+          <loading-message
+            v-else-if="isSessionWaitingForVolunteer"
+            message="Contacting coaches"
+          />
+          <div v-else-if="isSessionInProgress" class="volunteer-info">
+            <span class="volunteer-name">{{ sessionPartner.firstname }}</span>
+            <div class="partner-status" v-if="isSessionPresenceActive">
+              <activity-dot
+                :class="{
+                  'partner-status__icon--online': isPartnerOnline,
+                  'partner-status__icon--offline': !isPartnerOnline,
+                }"
+              />
+              <p class="partner-status__text">
+                {{ isPartnerOnline ? 'In session' : 'Away' }}
+              </p>
             </div>
-          </template>
-          <template v-else-if="isSessionOver">
-            <template v-if="sessionPartner.firstname">
-              <span
-                >Your session with {{ sessionPartner.firstname }} has
-                ended</span
-              >
-            </template>
-            <template v-else>
-              <span>Your session has ended</span>
-            </template>
-          </template>
-          <template v-else>
-            <loading-message message="Loading" />
-          </template>
+            <span class="in-session-label" v-else>In Session</span>
+          </div>
+          <span v-else-if="isSessionOver">Session ended</span>
+          <loading-message v-else message="Loading" />
         </div>
       </div>
       <div class="button-container">
@@ -65,7 +61,7 @@
           Finish
         </button>
         <button v-else @click="end" class="end-session-btn" type="button">
-          End session
+          End
         </button>
       </div>
     </div>
@@ -97,6 +93,7 @@ import UnmatchedModal from '@/views/SessionView/UnmatchedModal.vue'
 import sendWebNotification from '@/utils/send-web-notification'
 import { socket } from '@/socket'
 import sound from '@/assets/audio/alert.mp3'
+import ActivityDot from '@/components/ActivityDot.vue'
 
 /**
  * @todo {1} Refactoring candidate: use a modal instead.
@@ -119,6 +116,7 @@ export default {
     LoadingMessage,
     TroubleMatchingModal,
     UnmatchedModal,
+    ActivityDot,
   },
   created() {
     /*
@@ -159,11 +157,15 @@ export default {
       }, 1000 * 60)
     }
   },
+  beforeUnmount() {
+    socket.emit('sessions/partner:online', false)
+  },
   computed: {
     ...mapState({
       user: (state) => state.user.user,
       session: (state) => state.user.session,
       isConnected: (state) => state.socket.isConnected,
+      isPartnerOnline: (state) => state.session.isPartnerOnline,
     }),
     ...mapGetters({
       sessionPartner: 'user/sessionPartner',
@@ -173,6 +175,7 @@ export default {
       isSessionOver: 'user/isSessionOver',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
       isRecapSocketUpdatesActive: 'featureFlags/isRecapSocketUpdatesActive',
+      isSessionPresenceActive: 'featureFlags/isSessionPresenceActive',
     }),
 
     partnerAvatar() {
@@ -452,7 +455,6 @@ h1 {
 
   @include breakpoint-below('large') {
     line-height: 1;
-    padding: 9px;
     min-height: 46px;
   }
 }
@@ -494,5 +496,30 @@ h1 {
 .avatar-info-container {
   display: flex;
   align-items: center;
+}
+
+.partner-status {
+  @include flex-container(row, initial, center);
+
+  &__text {
+    margin-bottom: 0;
+    margin-left: 0.2em;
+
+    @include breakpoint-above('medium') {
+      font-size: 12px;
+    }
+    @include breakpoint-above('large') {
+      font-size: 16px;
+    }
+  }
+
+  &__icon {
+    &--online {
+      background-color: $c-success-green;
+    }
+    &--offline {
+      background-color: $c-disabled-grey;
+    }
+  }
 }
 </style>

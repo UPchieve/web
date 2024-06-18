@@ -198,6 +198,9 @@ export default {
     window.addEventListener('resize', this.handleResize)
   },
   beforeUnmount() {
+    socket.emit('sessions:leave', {
+      sessionId: this.sessionId,
+    })
     Gleap.removeCustomData('sessionId')
     Gleap.showFeedbackButton(true)
     window.removeEventListener('resize', this.handleResize)
@@ -385,12 +388,30 @@ export default {
         }
       }
     },
-    isConnectionReady(currentValue) {
+    isConnectionReady(currentValue, prevValue) {
       const [isConnected, sessionId] = currentValue
+      const [prevIsConnected] = prevValue
       if (isConnected && sessionId) {
         this.joinSession(this.sessionId)
         this.$store.dispatch('user/sessionConnected')
       }
+
+      if (isConnected && !prevIsConnected)
+        AnalyticsService.captureEvent(
+          EVENTS.USER_SOCKET_IS_CONNECTED_IN_SESSION,
+          {
+            event: EVENTS.USER_SOCKET_IS_CONNECTED_IN_SESSION,
+            sessionId: this.sessionId,
+          }
+        )
+      if (!isConnected && prevIsConnected)
+        AnalyticsService.captureEvent(
+          EVENTS.USER_SOCKET_IS_DISCONNECTED_IN_SESSION,
+          {
+            event: EVENTS.USER_SOCKET_IS_DISCONNECTED_IN_SESSION,
+            sessionId: this.sessionId,
+          }
+        )
     },
     isSessionConnectionAlive(newValue, oldValue) {
       if (newValue && !oldValue) {
