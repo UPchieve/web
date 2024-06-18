@@ -199,7 +199,7 @@ export default {
         this.userResponse[this.currentQuestion.questionId] &&
         (!this.userResponse[this.currentQuestion.questionId].responseId ||
           (this.userResponse[this.currentQuestion.questionId].responseId ===
-            '68' &&
+            68 &&
             !this.userResponse[this.currentQuestion.questionId].openResponse))
       )
     },
