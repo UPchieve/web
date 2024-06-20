@@ -7,16 +7,16 @@
           class="chat-warning chat-warning--moderation"
           v-show="moderationWarningIsShown"
         >
-          <div class="moderation-body">
+          <div class="moderation-body" data-testid="moderation-body">
             <span
               >Messages cannot contain personal information, profanity, or links
               to third party video services</span
             >
             <ul class="moderation-reasons">
               <li v-for="(value, key) in failureReasons" :key="key">
-                <div class="reason">{{ key }}</div>
-                <div class="instances">
-                  {{ value.map((s) => s.trim()).join(', ') }}
+                <div class="reason" :data-testid="key">{{ key }}</div>
+                <div class="instances" :data-testid="`${key}-instances`">
+                  {{ getOffendingSubstringsForReason(key) }}
                 </div>
               </li>
             </ul>
@@ -256,6 +256,15 @@ export default {
     }
   },
   methods: {
+    getOffendingSubstringsForReason(reasonKey) {
+      if (
+        !Object.hasOwn(this.failureReasons, reasonKey) ||
+        this.failureReasons[reasonKey] === undefined
+      ) {
+        return ''
+      }
+      return this.failureReasons[reasonKey].map((s) => s.trim()).join(', ')
+    },
     formatTime(createdAt) {
       return moment(createdAt).format('h:mm a')
     },
@@ -307,10 +316,9 @@ export default {
         } else {
           // do not show the offending profanity to students
           // in the event it was a typo
+          // eslint-disable-next-line no-unused-vars
           const { profanity, ...rest } = failures
-          this.failureReasons = this.user.isVolunteer
-            ? { profanity, ...rest }
-            : rest
+          this.failureReasons = this.user.isVolunteer ? failures : rest
           this.showModerationWarning()
         }
       } catch (e) {
