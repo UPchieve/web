@@ -43,7 +43,9 @@
         </button>
         <p class="terms-text">
           By clicking the button above, you agree to our
-          <a href="/legal" target="_blank" class="uc-link">User Agreement</a>.
+          <a href="https://upchieve.org/legal" target="_blank" class="uc-link"
+            >User Agreement</a
+          >.
         </p>
       </div>
 
@@ -381,7 +383,9 @@
         </button>
         <p class="terms-text">
           By clicking the button above, you agree to our
-          <a href="/legal" target="_blank" class="uc-link">User Agreement</a>.
+          <a href="https://upchieve.org/legal" target="_blank" class="uc-link"
+            >User Agreement</a
+          >.
         </p>
       </form>
     </div>
