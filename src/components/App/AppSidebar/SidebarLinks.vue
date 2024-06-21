@@ -77,9 +77,6 @@
       <sidebar-link to="/contact" text="Contact us">
         <envelope-icon class="icon" />
       </sidebar-link>
-      <sidebar-link to="/legal" text="Legal policy" v-if="!isVolunteer">
-        <exclamation-icon class="icon" />
-      </sidebar-link>
       <sidebar-link
         v-if="isVolunteer"
         to="https://join.slack.com/t/upchieveaccommunity/shared_invite/zt-2g26wipfa-zd8l_ygf5NWYLkf3oJpk0Q"
@@ -98,7 +95,6 @@ import SidebarLink from './SidebarLink.vue'
 import ArchiveIcon from '@/assets/archive.svg'
 import CalendarIcon from '@/assets/sidebar_icons/calendar.svg'
 import EnvelopeIcon from '@/assets/sidebar_icons/envelope.svg'
-import ExclamationIcon from '@/assets/sidebar_icons/exclamation.svg'
 import FolderIcon from '@/assets/sidebar_icons/folder.svg'
 import GraduationCapIcon from '@/assets/sidebar_icons/graduation-cap.svg'
 import HeartIcon from '@/assets/heart.svg'
@@ -118,7 +114,6 @@ export default {
     ArchiveIcon,
     CalendarIcon,
     EnvelopeIcon,
-    ExclamationIcon,
     FolderIcon,
     GraduationCapIcon,
     HeartIcon,

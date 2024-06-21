@@ -23,7 +23,7 @@
         <router-link to="/contact">Contact Us</router-link>
       </div>
       <div>
-        <router-link to="/legal" target="_blank">Legal Policy</router-link>
+        <a href="https://upchieve.org/legal" target="_blank">Legal Policy</a>
       </div>
       <div>
         <a href="https://upchieve.org/" target="_blank">Our Website</a>

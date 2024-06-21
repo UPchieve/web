@@ -23,7 +23,6 @@ import ContactView from './views/ContactView.vue'
 import DashboardView from './views/DashboardView/index.vue'
 import FavoriteCoachesView from './views/FavoriteCoachesView.vue'
 import FeedbackView from './views/FeedbackView.vue'
-import LegalView from './views/LegalView.vue'
 import LoginView from './views/LoginView.vue'
 import LogoutView from './views/LogoutView.vue'
 import ProfileView from './views/ProfileView/index.vue'
@@ -112,8 +111,9 @@ const routes = [
   {
     path: '/legal',
     name: 'LegalView',
-    component: LegalView,
-    meta: { authOptional: true },
+    beforeEnter: () => {
+      window.location.href = 'https://upchieve.org/legal'
+    },
   },
   {
     path: '/login',

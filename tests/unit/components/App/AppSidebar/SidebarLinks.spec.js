@@ -17,10 +17,6 @@ const FAVORITE_COACHES_LINK = {
   to: '/favorite-coaches',
   text: 'Favorite Coaches',
 }
-const LEGAL_LINK = {
-  to: '/legal',
-  text: 'Legal policy',
-}
 
 // Volunteer links
 const CALENDAR_LINK = { to: '/calendar', text: 'Schedule' }
@@ -46,7 +42,6 @@ const links = {
       FAVORITE_COACHES_LINK,
       PROFILE_LINK,
       CONTACT_LINK,
-      LEGAL_LINK,
     ],
     volunteer: [
       DASHBOARD_LINK,

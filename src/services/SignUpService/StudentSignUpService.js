@@ -315,7 +315,7 @@ export function getTermsCheckboxElements() {
         classes: 'uc-link',
         content: 'User Agreement',
         props: {
-          href: '/legal',
+          href: 'https://upchieve.org/legal',
           target: '_blank',
         },
       }
