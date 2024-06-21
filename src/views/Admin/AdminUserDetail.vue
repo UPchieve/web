@@ -28,9 +28,14 @@
             >Admin</span
           >
           <span
-            v-if="user.isBanned"
+            v-if="user.banType === 'complete'"
             class="user-detail__account-notice user-detail__account-notice--ban"
             >Banned</span
+          >
+          <span
+            v-if="user.banType === 'shadow'"
+            class="user-detail__account-notice user-detail__account-notice--shadowban"
+            >Shadow Banned</span
           >
           <span
             v-if="user.isDeactivated"
@@ -301,6 +306,10 @@ export default {
 
     &--ban {
       background: $c-error-red;
+    }
+
+    &--shadowban {
+      background: $c-warning-orange;
     }
 
     &--deactivated {
