@@ -117,10 +117,7 @@ const mediaSrc = ["'self'", gleapUrl]
 
 if (config.nodeEnv !== 'production') {
   connectSrc.push('http://localhost:3000')
-  connectSrc.push('http://localhost:3001')
-  connectSrc.push('ws://localhost:3001')
   connectSrc.push('ws://localhost:3000')
-  connectSrc.push('http://localhost:3002')
 }
 
 const defaultSrc = [

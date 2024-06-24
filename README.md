@@ -5,6 +5,7 @@
 [Contributing Guide](CONTRIBUTING.md)
 
 ## IMPORTANT: THE FRONTEND IS IN A SEPARATE REPOSITORY
+
 This repository is the frontend SPA only. It relies on the API server and worker. To set that up follow [the readme for the backend repo](https://gitlab.com/upchieve/subway).
 
 **Table of Contents**
@@ -20,9 +21,10 @@ This repository is the frontend SPA only. It relies on the API server and worker
   - [Component Library](#component-library)
     - [Testing Components](#testing-components)
 
-Local Development
------------------
+## Local Development
+
 ### Local Dependencies
+
 The recommended tool for runtime version management is [`nvm`][nvm]. To use `nvm` on Windows, first install the appropriate Linux shell distribution using [`WSL`][wsl] (Windows Subsystem for Linux). We currently run on Node v20.10.0, you can switch to this using
 
 ```shell
@@ -32,10 +34,13 @@ $ nvm install v20.10.0 && nvm use v20.10.0
 After switching npm versions using nvm, you will need to run `$ npm install`.
 
 ### App Dependencies
-As noted above you will also need the backend running on `localhost` on ports `3000`, `3001` and `3002`
+
+As noted above you will also need the backend running on `localhost` on port `3000`
 
 ### Run the Dev Server
+
 The development server (which supports hot reloading) can be started using
+
 ```shell
 $ npm run serve
 ```
@@ -50,6 +55,7 @@ instructions for which are below.
 Once the both the backend and frontend dev servers are running, you can open the app at `http://localhost:8080`.
 
 ### Quality Checks
+
 The CI server runs checks on code linting and HTML validation.
 
 Lint checking currently runs as a pre-commit hook. To fix most issues you can run `$ npm run lint`.
@@ -59,21 +65,24 @@ we are working on correcting. The goal for new development should be to not add 
 
 Tests can be run using `$ npm run test`
 
+## Production Builds
 
-Production Builds
-----------------
 A production build of the frontend resources (index.html/js/css/images) can be done by running
+
 ```
 $ npm run build
 ```
+
 which puts the output in the directory `dist/`
 
 ### Production Server
+
 We deploy this application in a container, and the files built above are served by a Node/Express server
 which is defined in `server.js`.
 
 This handles security settings and also serves up the version of the app on `/healthz`. To test the feature
 where the frontend can recognize that a new version is available and prompt the user to refresh,
+
 1. do a production build
 2. set the environment variable `HIGH_LINE_VERSION` to something other than `development`
 3. start the server using `$ npm run start`
@@ -111,10 +120,10 @@ Our unit tests do not incorporate visual testing for SVG components (refer to th
 
 So, after extensive research and exhausting nearly all possible options of rendering and testing SVGs, as of August 4 2021, we realized that this has been a prolonged JSDOM/JavaScript [issue](https://github.com/vuejs/vue-test-utils/issues/369) and not something that is occuring due to vue-test-utils or jest capabilities. Hence, consider it acceptable to not visually test SVGs for the time being.
 
-
 ## E2E Testing (Under construction)
 
 ### How it works
+
 When you run `npm run test:e2e`, the subway and high-line servers are started for you, and subway will use fresh, dockerized postgres and redis instances that are hosted on ports 5500 and 5501 by default. The db is seeded with the scripts in the `/db_init` folder of the subway repo on your machine.
 
 If there was an existing E2E postgres or redis docker container, they will be destroyed before new ones are created.
@@ -122,17 +131,20 @@ If there was an existing E2E postgres or redis docker container, they will be de
 Note: You don't need to start the backend or frontend servers yourself. Playwright starts up the servers as part of test configuration with the NODE_ENV environment variable set to `test_e2e`. Playwright will fail to startup if you already have either running.
 
 ### Setup
+
 1. Install chrome for playwright: `npx playwright install chrome`
 2. **Set your environment variable `SUBWAY_REPO_PATH` to wherever your subway project is stored on your machine.** This enables the startup script to create the dockerized e2e environment and start the subway server.
 3. By default, the subway server logs are not output into the terminal, but to change this, set `log = true` in `/tests/e2e/setup.js`. (@TODO - Parameterize this in the npm command)
 4. Now run `npm run test:e2e` or `npm run test:e2e:ui`
 
 ### Adding test data
+
 You can use the DB client exposed in the `/tests/e2e` folder to add test data to the E2E database.
 
 For now, all test suites work off of the same postgres instance in parallel, and there is no cleanup step in between tests. This means collisions in test data are possible. **To mitigate that risk, please create new users/profiles for each test file that you create.** (@TODO - Cleanup db state between tests)
 
 ### Updating snapshots
+
 The E2E tests include several [snapshot tests](https://playwright.dev/docs/test-snapshots), which make pixel-by-pixel comparisons between a pre-saved snapshot file and the state of the screen during test.
 
 Remember to update snapshots as needed with `npm run test:e2e:update-snapshots` when applicable.
