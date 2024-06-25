@@ -188,7 +188,10 @@ export default {
 
         const isAdminOrTestUser = user.isAdmin || user.isTestUser
         // Show test accounts to admin and test volunteer accounts
-        if (session.student.isTestUser && !isAdminOrTestUser) {
+        if (
+          (session.student.isTestUser || session.student.isShadowBanned) &&
+          !isAdminOrTestUser
+        ) {
           continue
         }
 
