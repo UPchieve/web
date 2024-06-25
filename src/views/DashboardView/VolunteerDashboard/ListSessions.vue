@@ -42,6 +42,11 @@
         >
           <td>
             {{ session.student.firstname }}
+            <span
+              v-if="session.student.isShadowBanned && user.isAdmin"
+              class="shadow-ban"
+              >Shadow Banned</span
+            >
           </td>
           <td>
             {{ session.subjectDisplayName }}
@@ -216,5 +221,16 @@ thead {
   50% {
     background-color: $c-success-green;
   }
+}
+
+.shadow-ban {
+  margin-right: 8px;
+  font-size: 12px;
+  border-radius: 5px;
+  background: $c-warning-orange;
+  color: #fff;
+  padding: 5px;
+  font-weight: 500;
+  white-space: nowrap;
 }
 </style>
