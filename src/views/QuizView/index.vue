@@ -17,6 +17,7 @@
           <large-button
             primary
             :showArrow="false"
+            data-testid="btn-review-concepts"
             @click="goToStudyMaterials"
             class="review-buttons--button"
             ><span>Review concepts</span>

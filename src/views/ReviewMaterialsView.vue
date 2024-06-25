@@ -50,6 +50,7 @@
           :showArrow="false"
           :routeTo="quizLink"
           class="review-materials__start-quiz"
+          data-testid="btn-start-quiz"
         >
           <span>Start quiz</span>
         </large-button>
