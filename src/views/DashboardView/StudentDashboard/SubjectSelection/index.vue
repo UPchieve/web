@@ -67,9 +67,6 @@ export default {
       mobileMode: 'app/mobileMode',
       isSessionAlive: 'user/isSessionAlive',
       topicCards: 'subjects/sessionRequestTopicCards',
-      topicCardDashboardReorder: 'featureFlags/topicCardDashboardReorder',
-      isTopicDashboardReorderActive:
-        'featureFlags/isTopicDashboardReorderActive',
       showDashboardRedesign: 'user/showDashboardRedesign',
     }),
     waitingPeriodMessage() {
@@ -81,17 +78,7 @@ export default {
       return `You must wait at least ${countdown} ${minuteTextFormat} before requesting a new session.`
     },
     cards() {
-      let cards = [...this.topicCards]
-      if (this.isTopicDashboardReorderActive && this.topicCardDashboardReorder)
-        cards = cards
-          .map((card) => {
-            return {
-              ...card,
-              order: this.topicCardDashboardReorder[card.topic],
-            }
-          })
-          .sort((a, b) => a.order - b.order)
-
+      const cards = [...this.topicCards]
       if (!this.showDashboardRedesign) {
         cards.push({
           title: 'Give Feedback',

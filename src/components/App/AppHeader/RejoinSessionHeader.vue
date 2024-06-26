@@ -40,7 +40,6 @@ export default {
       avatarUrl: 'user/avatarUrl',
       name: 'user/firstName',
       sessionPath: 'user/sessionPath',
-      isRecapSocketUpdatesActive: 'featureFlags/isRecapSocketUpdatesActive',
     }),
     message() {
       return `You have a chat in session${this.mobileMode ? '' : '.'}`

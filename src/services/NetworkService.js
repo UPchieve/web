@@ -867,18 +867,6 @@ export default {
       this._errorHandler
     )
   },
-  queueStudentsTextReminder(data) {
-    return httpPost(`${API_ROOT}/students/reminders/text`, data).then(
-      this._successHandler,
-      this._errorHandler
-    )
-  },
-  fallIncentiveProgramEnrollmentEnroll(data) {
-    return httpPost(
-      `${API_ROOT}/product-flags/fall-incentive-enrollment/enroll`,
-      data
-    ).then(this._successHandler, this._errorHandler)
-  },
   isSessionRecapEligible(sessionId, data) {
     return httpPost(
       `${API_ROOT}/sessions/history/${sessionId}/eligible`,

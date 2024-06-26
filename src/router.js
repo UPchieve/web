@@ -47,12 +47,10 @@ import WelcomePage from './views/WelcomePage.vue'
 import ProgressReportsOverviewView from './views/ProgressReportsOverviewView.vue'
 import ProgressReportsOverviewSubjectView from './views/ProgressReportsOverviewSubjectView.vue'
 import Gleap from 'gleap'
-import AnalyticsService from './services/AnalyticsService'
 import NetworkService, { axiosInstance } from './services/NetworkService'
 import { UserType } from '@/services/SignUpService'
 import { beforeEnter as studentBeforeEnter } from '@/services/SignUpService/StudentSignUpService'
 import { beforeEnter as teacherBeforeEnter } from '@/services/SignUpService/TeacherSignUpService'
-import { EVENTS } from './consts'
 import { INVALID_CSRF_ERROR } from '@/services/AuthService'
 import Case from 'case'
 
@@ -74,11 +72,6 @@ const routes = [
     beforeEnter: (to, from, next) => {
       getUser()
         .then(() => {
-          if (to.query.s && to.query.s === 'tr')
-            AnalyticsService.captureEvent(
-              EVENTS.STUDENT_PROCRASTINATION_PREVENTION_RETURNED_FROM_REMINDER
-            )
-
           if (store.getters['user/isAuthenticated']) {
             if (store.getters['user/isAutoFlowUser']) next('/welcome')
             else next('/dashboard')

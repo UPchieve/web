@@ -22,9 +22,7 @@ export default {
     chatScrolledToMessageIndex: null,
     hadASession: false,
     prevSessionSubject: '',
-    requestedProgressReportOverview: false,
     progressReportOverviewSubjectStats: [],
-    hasSeenProgressReportModal: false,
     latestProgressReportOverview: {},
   },
   mutations: {
@@ -117,16 +115,8 @@ export default {
       state.prevSessionSubject = subject
     },
 
-    setRequestedProgressReportOverview: (state, flag) => {
-      state.requestedProgressReportOverview = flag
-    },
-
     setProgressReportOverviewSubjectStats: (state, stats) => {
       state.progressReportOverviewSubjectStats = stats
-    },
-
-    updateHasSeenProgressReportModal: (state, flag) => {
-      state.hasSeenProgressReportModal = flag
     },
   },
   actions: {
@@ -275,9 +265,6 @@ export default {
     updatePrevSessionSubject: ({ commit }, subject) => {
       commit('setPrevSessionSubject', subject)
     },
-    updateRequestedProgressReportOverview: ({ commit }, flag) => {
-      commit('setRequestedProgressReportOverview', flag)
-    },
 
     getProgressReportOverviewSubjectStats: async ({ commit, state }) => {
       if (state.user.isVolunteer) return
@@ -300,10 +287,6 @@ export default {
       } catch (error) {
         LoggerService.error(error.response.data.err)
       }
-    },
-
-    updateHasSeenProgressReportModal: ({ commit }, flag) => {
-      commit('updateHasSeenProgressReportModal', flag)
     },
 
     getLatestProgressReportOverview: async ({ commit }) => {
@@ -422,12 +405,11 @@ export default {
       )
     },
 
-    isQuizStudyMaterialUser: (state, getters, rootState, rootGetters) => {
+    isQuizStudyMaterialUser: (state, getters) => {
       return (
         !state.user.isOnboarded &&
         getters.isVolunteer &&
-        !getters.hasCertification &&
-        rootGetters['featureFlags/isQuizStudyMaterialsActive']
+        !getters.hasCertification
       )
     },
 

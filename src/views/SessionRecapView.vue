@@ -221,7 +221,6 @@ export default {
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
-      isRecapSocketUpdatesActive: 'featureFlags/isRecapSocketUpdatesActive',
     }),
     whiteboardDimensions() {
       return {
@@ -266,11 +265,6 @@ export default {
       this.session = response.data.session
       this.isRecapDmsAvailable = response.data.isRecapDmsAvailable
       this.$store.dispatch('user/fetchRecapSessionForDms', this.session.id)
-      if (this.user.isVolunteer)
-        AnalyticsService.captureEvent(EVENTS.VOLUNTEER_OPENED_SESSION_RECAP)
-      // This is to mock the previous behavior before the updates, where
-      // we kept`isSessionConnectionAlive` as `true`
-      if (!this.isRecapSocketUpdatesActive) this.socketJoinedRoom = true
 
       if (!this.user.isVolunteer) await this.getProgressReportForSession()
     } catch (error) {
@@ -282,8 +276,7 @@ export default {
     if (
       this.isJoinedSessionSocketReadyToEmit[0] &&
       this.isJoinedSessionSocketReadyToEmit[1] &&
-      this.isRecapDmsAvailable &&
-      this.isRecapSocketUpdatesActive
+      this.isRecapDmsAvailable
     )
       this.joinSocketToRoom()
 
@@ -416,11 +409,7 @@ export default {
         isConnected &&
         sessionId &&
         this.isRecapDmsAvailable &&
-        this.isRecapSocketUpdatesActive &&
-        (!prevIsConnected ||
-          !prevSessionId ||
-          !this.isRecapDmsAvailable ||
-          !this.isRecapSocketUpdatesActive)
+        (!prevIsConnected || !prevSessionId || !this.isRecapDmsAvailable)
       )
         this.joinSocketToRoom()
     },

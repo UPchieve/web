@@ -6,7 +6,6 @@ describe('User store module', () => {
   const mockFeatureFlagsModule = {
     namespaced: true,
     getters: {
-      isQuizStudyMaterialsActive: vi.fn().mockReturnValue(true),
       showDashboardRedesign: vi.fn().mockReturnValue(false),
     },
     state: {},

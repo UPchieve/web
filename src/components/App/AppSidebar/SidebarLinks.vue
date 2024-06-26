@@ -50,7 +50,7 @@
       </sidebar-link>
 
       <sidebar-link
-        v-if="isVolunteer && isTutorSessionHistoryActive"
+        v-if="isVolunteer"
         to="/sessions/history"
         text="Session History"
       >
@@ -132,7 +132,6 @@ export default {
   },
   computed: {
     ...mapGetters({
-      isTutorSessionHistoryActive: 'featureFlags/isTutorSessionHistoryActive',
       isProgressReportsActive: 'featureFlags/isProgressReportsActive',
       isAutoFlowUser: 'user/isAutoFlowUser',
       showDashboardRedesign: 'user/showDashboardRedesign',

@@ -18,20 +18,8 @@
     </div>
 
     <tell-them-college-prep-modal
-      v-if="isJustTellThemActive && showTellThemCollegePrepModal"
+      v-if="showTellThemCollegePrepModal"
       :closeModal="toggleTellThemCollegePrepModal"
-    />
-    <procrastination-prevention-modal
-      v-if="showThemProcrastinationPreventionModal"
-      :closeModal="toggleProcrastinationPreventionModal"
-    />
-    <fall-incentive-enrollment-modal
-      v-if="showFallIncentiveEnrollmentModal"
-      :closeModal="toggleFallIncentiveEnrollmentModal"
-    />
-    <progress-report-modal
-      v-if="showProgressReportModal"
-      :closeModal="toggleShowProgressReportModal"
     />
     <subject-selection />
   </div>
@@ -42,10 +30,7 @@ import { mapGetters, mapState } from 'vuex'
 import DashboardBanner from '../DashboardBanner.vue'
 import SubjectSelection from './SubjectSelection/index.vue'
 import TellThemCollegePrepModal from './TellThemCollegePrepModal.vue'
-import ProcrastinationPreventionModal from './ProcrastinationPreventionModal.vue'
-import FallIncentiveEnrollmentModal from './FallIncentiveEnrollmentModal.vue'
 import StudentOnboardingModal from './StudentOnboardingModal.vue'
-import ProgressReportModal from './ProgressReportModal.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
@@ -64,20 +49,12 @@ const bannedHeaderData = {
   component: 'BannedHeader',
 }
 
-// TODO: abstract this banner out more to allow for dynamic targeting
-const dashboardBannerData = {
-  component: 'DashboardBannerHeader',
-}
-
 export default {
   name: 'student-dashboard',
   components: {
     DashboardBanner,
     SubjectSelection,
     TellThemCollegePrepModal,
-    ProcrastinationPreventionModal,
-    FallIncentiveEnrollmentModal,
-    ProgressReportModal,
   },
   async created() {
     if (this.isSessionAlive) {
@@ -90,8 +67,6 @@ export default {
           phoneOrEmailToVerify: this.user.email,
         },
       })
-    } else if (this.isDashboardBannerActive) {
-      this.triggerIncentiveProgram()
     }
 
     if (this.isFirstDashboardVisit) {
@@ -123,24 +98,11 @@ export default {
       )
 
     if (
-      this.isCollegePrepAdActive[0] &&
-      this.isCollegePrepAdActive[1] &&
+      this.hadASession &&
       !getCookie('hasSeenTellThemCollegePrepModal') &&
       this.user.pastSessions.length >= 1
     )
       this.showTellThemCollegePrepModal = true
-
-    if (
-      this.isProcrastinationPreventionReminderActive[0] &&
-      this.isProcrastinationPreventionReminderActive[1] &&
-      !localStorage.getItem('hasSeenProcrastinationPreventionModal')
-    )
-      this.showThemProcrastinationPreventionModal = true
-
-    if (this.isEnrollmentForFallIncentiveModalActive)
-      this.showFallIncentiveEnrollmentModal = true
-
-    if (this.isProgressReportUserSegment) this.showProgressReportModal = true
 
     // TODO: move globally to show banner in all pages
     if (this.user && this.user.isBanned) {
@@ -150,9 +112,6 @@ export default {
   data() {
     return {
       showTellThemCollegePrepModal: false,
-      showThemProcrastinationPreventionModal: false,
-      showFallIncentiveEnrollmentModal: false,
-      showProgressReportModal: false,
     }
   },
   computed: {
@@ -161,25 +120,15 @@ export default {
       hadASession: (state) => state.user.hadASession,
       prevSessionSubject: (state) => state.user.prevSessionSubject,
       isFirstDashboardVisit: (state) => state.user.isFirstDashboardVisit,
-      productFlags: (state) => state.productFlags.flags,
       latestSession: (state) => state.user.latestSession,
-      hasSeenProgressReportModal: (state) =>
-        state.user.hasSeenProgressReportModal,
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
       downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
       orbitalSegments: 'featureFlags/orbitalSegments',
       isOrbitalSegmentsActive: 'featureFlags/isOrbitalSegmentsActive',
-      isJustTellThemActive: 'featureFlags/isJustTellThemActive',
-      isProcrastinationPreventionActive:
-        'featureFlags/isProcrastinationPreventionActive',
-      isDashboardBannerActive: 'featureFlags/isDashboardBannerActive',
-      isFallIncentiveEnrollmentActive:
-        'featureFlags/isFallIncentiveEnrollmentActive',
       showDashboardRedesign: 'user/showDashboardRedesign',
       isProgressReportsActive: 'featureFlags/isProgressReportsActive',
-      isProgressReportsModalActive: 'featureFlags/isProgressReportsModalActive',
       isAutoStartCollegeSessionActive:
         'featureFlags/isAutoStartCollegeSessionActive',
       autoStartCollegeSession: 'featureFlags/autoStartCollegeSession',
@@ -187,70 +136,15 @@ export default {
     userAndOrbitalSegment() {
       return [this.user, this.orbitalSegments, this.isOrbitalSegmentsActive]
     },
-    isCollegePrepAdActive() {
-      return [this.isJustTellThemActive, this.hadASession]
-    },
-    isFallIncentiveProgramActive() {
-      return [this.user, this.productFlags, this.isDashboardBannerActive]
-    },
-    isProcrastinationPreventionReminderActive() {
-      return [this.isProcrastinationPreventionActive, this.hadASession]
-    },
-    isEnrollmentForFallIncentiveActive() {
-      return [this.isFallIncentiveEnrollmentActive, this.hadASession]
-    },
-    isEnrollmentForFallIncentiveModalActive() {
-      return (
-        this.isEnrollmentForFallIncentiveActive[0] &&
-        this.isEnrollmentForFallIncentiveActive[1] &&
-        !localStorage.getItem('hasSeenFallIncentiveEnrollmentModal') &&
-        this.user.pastSessions.length === 1 &&
-        !this.user.phone
-      )
-    },
-    isProgressReportUserSegment() {
-      return (
-        this.isProgressReportsActive &&
-        this.isProgressReportsModalActive &&
-        this.latestSession.subject === 'reading' &&
-        this.latestSession.timeTutored >= 1000 * 60 &&
-        this.hadASession &&
-        // We keep track of this state to allow users to see the modal every time after
-        // having multiple sessions
-        !this.hasSeenProgressReportModal
-      )
-    },
   },
   methods: {
     toggleTellThemCollegePrepModal() {
       this.showTellThemCollegePrepModal = !this.showTellThemCollegePrepModal
     },
-    toggleProcrastinationPreventionModal() {
-      this.showThemProcrastinationPreventionModal =
-        !this.showThemProcrastinationPreventionModal
-    },
-    toggleFallIncentiveEnrollmentModal() {
-      this.showFallIncentiveEnrollmentModal =
-        !this.showFallIncentiveEnrollmentModal
-    },
-    toggleShowProgressReportModal() {
-      this.showProgressReportModal = !this.showProgressReportModal
-    },
     showGleapBot() {
       AnalyticsService.captureEvent(EVENTS.GLEAP_BOT_SHOWN)
       Gleap.startBot('64b555f1e8dd226df869b2e7')
       AnalyticsService.updateUser({ hasMessages: false })
-    },
-    // Only show the banner to those who have >= 1 sessions and < 10 session or in the incentive program
-    triggerIncentiveProgram() {
-      if (
-        !this.productFlags.fallIncentiveProgram &&
-        (this.user.pastSessions.length < 1 || this.user.pastSessions.length > 9)
-      )
-        return
-
-      this.$store.dispatch('app/header/show', dashboardBannerData)
-      Gleap.trackEvent('fall-incentive-program')
     },
   },
   watch: {
@@ -278,30 +172,15 @@ export default {
         this.$store.dispatch('app/header/show', activeHeaderData)
       }
     },
-    isCollegePrepAdActive: {
+    hadASession: {
       handler(currentValue, prevValue) {
         if (
-          currentValue[0] &&
-          currentValue[1] &&
-          (!prevValue[0] || !prevValue[1]) &&
+          currentValue &&
+          !prevValue &&
           !getCookie('hasSeenTellThemCollegePrepModal') &&
           this.user.pastSessions.length >= 1
         ) {
           this.showTellThemCollegePrepModal = true
-        }
-      },
-      deep: true,
-    },
-    isProcrastinationPreventionReminderActive: {
-      handler(currentValue, prevValue) {
-        if (
-          currentValue[0] &&
-          currentValue[1] &&
-          (!prevValue[0] || !prevValue[1]) &&
-          !localStorage.getItem('hasSeenProcrastinationPreventionModal') &&
-          this.user.pastSessions.length >= 1
-        ) {
-          this.showThemProcrastinationPreventionModal = true
         }
       },
       deep: true,
@@ -323,35 +202,6 @@ export default {
           )
       },
       deep: true,
-    },
-    isFallIncentiveProgramActive: {
-      handler: function (currentValue, prevValue) {
-        if (
-          Object.keys(currentValue[0]).length &&
-          Object.keys(currentValue[1]).length &&
-          currentValue[2] &&
-          !this.isSessionAlive &&
-          (!Object.keys(prevValue[0]).length ||
-            !Object.keys(prevValue[1]).length ||
-            !prevValue[2])
-        )
-          this.triggerIncentiveProgram()
-      },
-      deep: true,
-    },
-    isEnrollmentForFallIncentiveActive: {
-      handler: function (currentValue, prevValue) {
-        if (
-          (currentValue[0] && currentValue[1] && !prevValue[0]) ||
-          !prevValue[1]
-        )
-          if (this.isEnrollmentForFallIncentiveModalActive)
-            this.showFallIncentiveEnrollmentModal = true
-      },
-      deep: true,
-    },
-    isProgressReportUserSegment(currentValue, prevValue) {
-      if (currentValue && !prevValue) this.showProgressReportModal = true
     },
   },
 }

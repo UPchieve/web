@@ -12,7 +12,6 @@ import SessionHeader from './SessionHeader.vue'
 import RejoinSessionHeader from './RejoinSessionHeader.vue'
 import WaitingPeriodHeader from './WaitingPeriodHeader.vue'
 import BannedHeader from './BannedHeader.vue'
-import DashboardBannerHeader from './DashboardBannerHeader.vue'
 import VerificationHeader from '@/components/App/AppHeader/VerificationHeader.vue'
 
 export default {
@@ -24,7 +23,6 @@ export default {
     RejoinSessionHeader,
     WaitingPeriodHeader,
     BannedHeader,
-    DashboardBannerHeader,
     VerificationHeader,
   },
   computed: {

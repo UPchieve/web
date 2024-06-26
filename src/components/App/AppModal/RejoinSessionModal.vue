@@ -24,7 +24,6 @@ export default {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
       sessionPath: 'user/sessionPath',
-      isRecapSocketUpdatesActive: 'featureFlags/isRecapSocketUpdatesActive',
     }),
   },
   watch: {

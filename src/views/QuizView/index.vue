@@ -261,9 +261,6 @@ export default {
       })
     },
     goToStudyMaterials() {
-      AnalyticsService.captureEvent(
-        EVENTS.VOLUNTEER_CLICKED_QUIZ_STUDY_MATERIALS
-      )
       this.$router.push(`/training/review/${Case.kebab(this.category)}`)
     },
   },

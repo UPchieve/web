@@ -174,7 +174,6 @@ export default {
       isSessionInProgress: 'user/isSessionInProgress',
       isSessionOver: 'user/isSessionOver',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
-      isRecapSocketUpdatesActive: 'featureFlags/isRecapSocketUpdatesActive',
       isSessionPresenceActive: 'featureFlags/isSessionPresenceActive',
     }),
 
@@ -220,9 +219,6 @@ export default {
       SessionService.endSession(this, sessionId)
         .then(() => {
           this.$store.dispatch('user/sessionDisconnected')
-          // Potentially show the ProgressReportModal again to a student
-          // to let them decide if they would like to see an analysis for their Reading sessions
-          this.$store.dispatch('user/updateHasSeenProgressReportModal', false)
           if (!this.isSessionRecapDmsActive) this.goToFeedbackPage()
           // Do not send the user directly to the feedback page if they can leave DMs
           if (!this.user.isVolunteer) this.goToFeedbackPage()
