@@ -249,7 +249,6 @@ export default {
       isSessionOver: 'user/isSessionOver',
       isSessionAlive: 'user/isSessionAlive',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
-      isRecapSocketUpdatesActive: 'featureFlags/isRecapSocketUpdatesActive',
       shouldUseQuillV2: 'featureFlags/shouldUseQuillV2',
     }),
     sessionToolTypes() {

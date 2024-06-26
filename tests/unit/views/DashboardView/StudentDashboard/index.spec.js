@@ -13,9 +13,6 @@ const getWrapper = () => {
         user: {
           user: { state: { user: { pastSessions: [] } } },
         },
-        productFlags: {
-          flags: { state: { flags: { fallIncentiveProgram: false } } },
-        },
         featureFlags: {
           flags: { state: { flags: {} } },
         },

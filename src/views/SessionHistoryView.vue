@@ -321,9 +321,6 @@ export default {
       this.getSessionHistory(this.page),
       this.getTotalSessions(),
     ])
-
-    if (this.user.isVolunteer)
-      AnalyticsService.captureEvent(EVENTS.VOLUNTEER_OPENED_SESSION_HISTORY)
   },
 }
 </script>
