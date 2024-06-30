@@ -2,7 +2,7 @@
 
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 
-[Contributing Guide](CONTRIBUTING.md)
+[Contributing Guide](https://gitlab.com/groups/upchieve/-/wikis/1-Community-Development)
 
 ## IMPORTANT: THE FRONTEND IS IN A SEPARATE REPOSITORY
 
