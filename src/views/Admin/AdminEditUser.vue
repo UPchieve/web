@@ -65,7 +65,12 @@
       </div>
       <div class="row">
         <label for="banned" class="uc-form-label">Banned</label>
-        <select name="banned" id="banned" v-model="banType">
+        <select
+          name="banned"
+          id="banned"
+          v-model="banType"
+          data-testid="admin-edit-user-banned"
+        >
           <option
             v-for="option in banOptions"
             :value="option.value"
