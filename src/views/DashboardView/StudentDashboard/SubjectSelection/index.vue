@@ -11,20 +11,26 @@
       We had trouble loading the list of subjects. Please try refreshing the
       page.
     </p>
-    <div v-else :class="showDashboardRedesign ? 'cards' : 'cards-old'">
-      <subject-card
-        v-for="(card, index) in cards"
-        v-bind:key="index"
-        :title="card.title"
-        :subtitle="card.subtitle"
-        :svg="card.svg"
-        :topic="card.topic"
-        :subtopics="card.subtopics"
-        :subtopicDisplayNames="card.subtopicDisplayNames"
-        :button-text="card.buttonText"
-        :routeTo="card.routeTo"
-        :isDisabled="isCardDisabled()"
+    <div v-else>
+      <recent-subjects
+        v-if="isMostRecentSubjectsActive"
+        :disabled="isCardDisabled"
       />
+      <div :class="showDashboardRedesign ? 'cards' : 'cards-old'">
+        <subject-card
+          v-for="(card, index) in cards"
+          v-bind:key="index"
+          :title="card.title"
+          :subtitle="card.subtitle"
+          :svg="card.svg"
+          :topic="card.topic"
+          :subtopics="card.subtopics"
+          :subtopicDisplayNames="card.subtopicDisplayNames"
+          :button-text="card.buttonText"
+          :routeTo="card.routeTo"
+          :isDisabled="isCardDisabled"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -36,6 +42,7 @@ import calculateWaitingPeriodCountdown from '@/utils/calculate-waiting-period-co
 import ReferralSVG from '@/assets/dashboard_icons/student/referral.svg'
 import LightBulbSVG from '@/assets/dashboard_icons/student/light-bulb.svg'
 import Loader from '@/components/Loader.vue'
+import RecentSubjects from './RecentSubjects.vue'
 
 const defaultHeaderData = {
   component: 'DefaultHeader',
@@ -43,7 +50,7 @@ const defaultHeaderData = {
 
 export default {
   name: 'subject-selection',
-  components: { SubjectCard, Loader },
+  components: { SubjectCard, Loader, RecentSubjects },
   beforeUnmount() {
     clearTimeout(this.waitingPeriodTimeoutId)
   },
@@ -68,6 +75,7 @@ export default {
       isSessionAlive: 'user/isSessionAlive',
       topicCards: 'subjects/sessionRequestTopicCards',
       showDashboardRedesign: 'user/showDashboardRedesign',
+      isMostRecentSubjectsActive: 'featureFlags/isMostRecentSubjectsActive',
     }),
     waitingPeriodMessage() {
       const countdown = calculateWaitingPeriodCountdown(
@@ -97,6 +105,11 @@ export default {
         })
       }
       return cards
+    },
+    isCardDisabled() {
+      return (
+        this.disableSubjectCard || this.isSessionAlive || this.user.isBanned
+      )
     },
   },
   watch: {
@@ -155,11 +168,6 @@ export default {
       } else {
         this.hasWaitingPeriod = false
       }
-    },
-    isCardDisabled() {
-      return (
-        this.disableSubjectCard || this.isSessionAlive || this.user.isBanned
-      )
     },
   },
 }
