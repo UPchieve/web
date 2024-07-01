@@ -411,6 +411,7 @@ h1 {
 .in-session-label {
   font-weight: 400;
   font-size: 12px;
+  display: block;
 }
 
 .button-container {
