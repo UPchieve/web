@@ -27,6 +27,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.TEACHER_SIGN_UP]: false,
       [POSTHOG_FEATURE_FLAGS.WHITEBOARD_ERASER_TOOL]: false,
       [POSTHOG_FEATURE_FLAGS.SESSION_PRESENCE]: false,
+      [POSTHOG_FEATURE_FLAGS.MOST_RECENT_SUBJECTS]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -125,5 +126,7 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.WHITEBOARD_ERASER_TOOL],
     isSessionPresenceActive: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SESSION_PRESENCE],
+    isMostRecentSubjectsActive: (state) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.MOST_RECENT_SUBJECTS],
   },
 }
