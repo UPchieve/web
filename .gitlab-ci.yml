@@ -64,7 +64,6 @@ deploy_ax:
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: on_success
-    - when: manual
 
 build_production:
   stage: build
