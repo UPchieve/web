@@ -3,7 +3,6 @@ import volunteerModule from '@/store/modules/volunteer'
 import featureFlagsModule from '@/store/modules/feature-flags'
 import subjectsModule from '@/store/modules/subjects'
 import notificationsModule from '@/store/modules/notifications'
-import { it } from 'vitest'
 import { createStore } from 'vuex'
 import { shallowMount } from '@vue/test-utils'
 import ListSessions from '@/views/DashboardView/VolunteerDashboard/ListSessions.vue'
@@ -31,9 +30,21 @@ const sessions = [
     subjectDisplayName: 'Algebra 2',
     type: 'math',
   },
+  {
+    id: 'session-3',
+    student: {
+      firstname: 'Student3',
+      isTestUser: false,
+      isShadowBanned: true,
+    },
+    studentFirstName: 'Student3',
+    subTopic: 'algebraTwo',
+    subjectDisplayName: 'Algebra 2',
+    type: 'math',
+  },
 ]
 
-const getWrapper = async () => {
+const getWrapper = async (overrides = {}) => {
   const store = createStore({
     modules: {
       user: {
@@ -47,6 +58,7 @@ const getWrapper = async () => {
             isApproved: true,
             isOnboarded: true,
             isBanned: false,
+            ...(overrides.user ?? {}),
           },
         },
         getters: {
@@ -84,26 +96,23 @@ const getWrapper = async () => {
       },
     },
   })
-
   const mockVueContext = {
-    $router: {
-      history: {
-        current: {
-          path: '/dashboard',
+    router: {
+        currentRoute: {
+          value: {
+            path: '/dashboard',
+          },
         },
-      },
     },
   }
-
   store.dispatch('volunteer/handleIncomingSessions', {
     context: mockVueContext,
     sessions,
   })
-
-  return shallowMount(ListSessions, { store })
+  return shallowMount(ListSessions, { global: { plugins: [store] }})
 }
 
-describe.skip('Dashboard with Muted Subjects', () => {
+describe('Dashboard with Muted Subjects', () => {
   it('Should only show unmuted subject sessions', async () => {
     const wrapper = await getWrapper()
 
@@ -111,8 +120,20 @@ describe.skip('Dashboard with Muted Subjects', () => {
     const sessionRowUnmuted = wrapper.find(
       '[data-testid="session-row-Student2"]'
     )
-
     expect(sessionRowUnmuted.exists()).toBe(true)
     expect(sessionRowMuted.exists()).toBe(false)
+  })
+})
+
+describe('Dashboard with banned students', () => {
+  test.each([true, false])('Should only show shadow banned students to admin users', async (isAdmin) => {
+    const wrapper = await getWrapper({
+      user: {
+        isAdmin
+      }
+    })
+
+    const bannedStudentSession = wrapper.find('[data-testid="session-row-Student3"]')
+    expect(bannedStudentSession.exists()).toBe(isAdmin)
   })
 })

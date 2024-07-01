@@ -25,31 +25,37 @@
           <span
             v-if="user.isAdmin"
             class="user-detail__account-notice user-detail__account-notice--admin"
+            data-testid="user-detail-label-admin"
             >Admin</span
           >
           <span
             v-if="user.banType === 'complete'"
             class="user-detail__account-notice user-detail__account-notice--ban"
+            data-testid="user-detail-label-banned"
             >Banned</span
           >
           <span
             v-if="user.banType === 'shadow'"
             class="user-detail__account-notice user-detail__account-notice--shadowban"
+            data-testid="user-detail-label-shadowbanned"
             >Shadow Banned</span
           >
           <span
             v-if="user.isDeactivated"
             class="user-detail__account-notice user-detail__account-notice--deactivated"
+            data-testid="user-detail-label-deactivated"
             >Deactivated</span
           >
           <span
             v-if="user.isTestUser"
             class="user-detail__account-notice user-detail__account-notice--test"
+            data-testid="user-detail-label-test"
             >Test account</span
           >
           <span
             v-if="user.isFakeUser"
             class="user-detail__account-notice user-detail__account-notice--fake"
+            data-testid="user-detail-label-fake"
             >Fake account</span
           >
         </div>
