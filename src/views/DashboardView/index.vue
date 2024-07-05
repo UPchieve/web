@@ -1,19 +1,20 @@
 <template>
   <volunteer-dashboard v-if="isVolunteer" />
   <student-dashboard v-else-if="isStudent" />
-  <!-- TODO: TEACHER PROFILES. -->
+  <teacher-dashboard v-else-if="isTeacher" />
 </template>
 
 <script>
 import { mapGetters, mapState } from 'vuex'
 
-import VolunteerDashboard from './VolunteerDashboard/index.vue'
 import StudentDashboard from './StudentDashboard/index.vue'
+import TeacherDashboard from './TeacherDashboard/index.vue'
+import VolunteerDashboard from './VolunteerDashboard/index.vue'
 import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 
 export default {
   name: 'dashboard-view',
-  components: { VolunteerDashboard, StudentDashboard },
+  components: { VolunteerDashboard, StudentDashboard, TeacherDashboard },
   computed: {
     ...mapState({
       user: (state) => state.user.user,
@@ -22,6 +23,7 @@ export default {
       isAuthenticated: 'user/isAuthenticated',
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
+      isTeacher: 'user/isTeacher',
       gleapSegmentExperiments: 'featureFlags/gleapSegmentExperiments',
       isGleapSegmentExperimentsActive:
         'featureFlags/isGleapSegmentExperimentsActive',
