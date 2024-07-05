@@ -1,5 +1,7 @@
 import { mount } from '@vue/test-utils'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
+import { createStore } from 'vuex'
+import userModule from '@/store/modules/user'
 import AdminEditUser from '@/views/Admin/AdminEditUser.vue'
 import NetworkService from '@/services/NetworkService'
 
@@ -17,17 +19,31 @@ describe('AdminEditUser.vue', () => {
      isApproved: false,
      inGatesStudy: false,
      isAdmin: false,
-     isVolunteer: false,
      studentPartnerOrg: 'studentPartnerOrg',
      volunteerPartnerOrg: 'volunteerPartnerOrg',
    }
 
-  const getWrapper = async (overrides = {}) => {
+  const getWrapper = (overrides = {}) => {
     const localUser = { ...DEFAULT_USER, ...(overrides.user ?? {}) }
 
     return mount(
       AdminEditUser,
       {
+        global: {
+          plugins: [
+            createStore({
+              modules: {
+                user: {
+                  ...userModule,
+                  getters: {
+                    isVolunteer: () => localUser.isVolunteer,
+                    isStudent: () => !localUser.isVolunteer
+                  }
+                }
+              }
+            })
+          ]
+        },
         props: {
           user: localUser,
           toggleEditMode: vi.fn(),
@@ -41,7 +57,7 @@ describe('AdminEditUser.vue', () => {
     NetworkService.adminGetVolunteerPartners = vi
       .fn()
       .mockResolvedValueOnce({ data: { partnerOrgs: [] } })
-    const wrapper = await getWrapper({ user: { isVolunteer: true } })
+    const wrapper = getWrapper({ user: { isVolunteer: true } })
 
     const options = wrapper
       .find('[data-testid="admin-edit-user-banned"]')
@@ -59,7 +75,7 @@ describe('AdminEditUser.vue', () => {
     NetworkService.adminGetActivePartnersForStudent = vi
       .fn()
       .mockResolvedValueOnce({ data: { activePartners: [] } })
-    const wrapper = await getWrapper({ user: { isVolunteer: false } })
+    const wrapper = getWrapper({ user: { isVolunteer: false } })
 
     const options = wrapper
       .find('[data-testid="admin-edit-user-banned"]')

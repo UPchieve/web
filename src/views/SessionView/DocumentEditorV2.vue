@@ -20,7 +20,15 @@
 </template>
 
 <script>
+import { markRaw } from 'vue'
 import { mapState, mapGetters } from 'vuex'
+import Quill from 'quill'
+import QuillCursors from 'quill-cursors'
+import { QuillBinding } from 'y-quill'
+import { Doc, applyUpdate } from 'yjs'
+import { socket } from '@/socket'
+import LoadingMessage from '@/components/LoadingMessage.vue'
+import RefreshDocumentEditorModal from '@/views/SessionView/RefreshDocumentEditorModal.vue'
 import {
   ImageCompressor,
   maxImagesEventName,
@@ -28,14 +36,6 @@ import {
   MAX_TOTAL_IMAGES,
   volunteerAttemptedToAddImage,
 } from '@/utils/quill-image-optimizer'
-import Quill from 'quill'
-import QuillCursors from 'quill-cursors'
-import LoadingMessage from '@/components/LoadingMessage.vue'
-import RefreshDocumentEditorModal from '@/views/SessionView/RefreshDocumentEditorModal.vue'
-import { Doc, applyUpdate } from 'yjs'
-import { QuillBinding } from 'y-quill'
-import { socket } from '@/socket'
-import { markRaw } from 'vue'
 
 Quill.register('modules/cursors', QuillCursors)
 Quill.register('modules/image', ImageCompressor)
@@ -67,6 +67,7 @@ export default {
     }),
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',
+      isStudent: 'user/isStudent',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
     }),
     isSocketReadyToRequestForDoc() {
@@ -81,7 +82,7 @@ export default {
       [{ list: 'ordered' }, { list: 'bullet' }],
     ]
 
-    if (!this.isVolunteer) toolbar.push(['image'])
+    if (this.isStudent) toolbar.push(['image'])
 
     this.quillEditor = markRaw(
       new Quill('#quill-container', {

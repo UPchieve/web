@@ -2,7 +2,7 @@
   <modal :closeModal="closeModal">
     <div class="web-notifications-modal">
       <header>
-        <h1 class="web-notifications-modal__title" v-if="user.isVolunteer">
+        <h1 class="web-notifications-modal__title" v-if="isVolunteer">
           Do you want to turn on browser notifications?
         </h1>
         <h1 v-else class="web-notifications-modal__title">
@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import Modal from '@/components/Modal.vue'
 import Separator from '@/components/Separator.vue'
 import LargeButton from '@/components/LargeButton.vue'
@@ -43,18 +43,25 @@ export default {
     handleNotificationButton: { type: Function },
   },
   computed: {
+    ...mapGetters({
+      isVolunteer: 'user/isVolunteer',
+      isStudent: 'user/isStudent',
+    }),
     ...mapState({
       user: (state) => state.user.user,
     }),
     description() {
       if (this.isVolunteerDashboardView)
         return 'Turning on browser notifications will help ensure you never miss a student request while the dashboard is open. We’ll also notify you during the session if the student sends a message while you’re not looking. You can change this setting any time via your profile.'
-      if (this.user.isVolunteer)
+      if (this.isVolunteer)
         return 'Turning on browser notifications will help ensure you never miss a message from a student during your session. We’ll also notify you if a new student request comes in while you have the dashboard open. You can change this setting any time via your profile.'
-      return 'Turning on notifications will help you get support faster by making sure you don’t miss when your coach joins the session. We’ll also notify you during the session if they send you a message while you’re not looking.'
+      if (this.isStudent)
+        return 'Turning on notifications will help you get support faster by making sure you don’t miss when your coach joins the session. We’ll also notify you during the session if they send you a message while you’re not looking.'
+
+      return ''
     },
     isVolunteerDashboardView() {
-      return this.$route.name === 'DashboardView' && this.user.isVolunteer
+      return this.$route.name === 'DashboardView' && this.isVolunteer
     },
   },
   methods: {

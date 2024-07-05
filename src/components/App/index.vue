@@ -215,8 +215,9 @@ export default {
     }),
     ...mapGetters({
       userAuthenticated: 'user/isAuthenticated',
-      isVolunteer: 'user/isVolunteer',
       mobileMode: 'app/mobileMode',
+      isVolunteer: 'user/isVolunteer',
+      isStudent: 'user/isStudent',
       isAutoFlowUser: 'user/isAutoFlowUser',
       getUserPropsForAnalytics: 'user/getUserPropsForAnalytics',
       showInAppSessionNotifications:
@@ -240,7 +241,7 @@ export default {
         AnalyticsService.identify(currentUserValue.id, userProps)
         LoggerService.identify(currentUserValue._id)
 
-        if (this.mobileMode && !this.isMobileApp && !this.isVolunteer) {
+        if (this.mobileMode && !this.isMobileApp && this.isStudent) {
           this.$store.dispatch('app/banner/show', {
             component: 'MobileAppNoticeBanner',
           })
@@ -276,7 +277,7 @@ export default {
       if (to.path !== '/logout' && this.userAuthenticated) {
         this.$store.dispatch('user/fetchSession', this)
 
-        if (!this.isVolunteer) {
+        if (this.isStudent) {
           this.$store.dispatch('user/fetchLatestSession', this)
         }
       }

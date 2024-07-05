@@ -83,7 +83,6 @@ export default {
 
         (Only you are able to initiate a conversation after the session ends, a student cannot reach out to you first.)`,
         createdAt: new Date().toISOString(),
-        isVolunteer: false,
         user: null,
         hasHtml: true,
       })
@@ -157,7 +156,6 @@ export default {
 
               (Only you are able to initiate a conversation after the session ends, a student cannot reach out to you first.)`,
               createdAt: new Date().toISOString(),
-              isVolunteer: false,
               user: null,
               hasHtml: true,
             })
@@ -172,7 +170,6 @@ export default {
               contents:
                 'The session has ended. Thanks so much for picking up this session!',
               createdAt: new Date().toISOString(),
-              isVolunteer: false,
               user: null,
               hasHtml: true,
             })

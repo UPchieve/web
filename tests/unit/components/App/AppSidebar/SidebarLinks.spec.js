@@ -2,6 +2,7 @@ import SidebarLink from '@/components/App/AppSidebar/SidebarLink.vue'
 import SidebarLinks from '@/components/App/AppSidebar/SidebarLinks.vue'
 import { shallowMount } from '@vue/test-utils'
 import { createStore } from 'vuex'
+import userModule from '@/store/modules/user'
 
 // General links
 const CONTACT_LINK = { to: '/contact', text: 'Contact us' }
@@ -72,17 +73,28 @@ const links = {
 const getWrapper = (options = {}) => {
   options = {
     authenticated: false,
+    userType: 'student',
     isVolunteer: false,
+    isStudent: true,
+    isTeacher: false,
     isAdmin: false,
     mobileMode: false,
     path: '/',
     ...options,
   }
 
-  const getters = {
-    isReferFriendsActive: () => false,
-  }
-  const store = createStore({ getters })
+  const store = createStore({
+    modules: {
+      user: {
+        ...userModule,
+        getters: {
+          isVolunteer: () => options.isVolunteer,
+          isStudent: () => options.isStudent,
+          isTeacher: () => options.isTeacher,
+        }
+      }
+    }
+  })
 
   return shallowMount(SidebarLinks, {
     global: {
@@ -91,7 +103,7 @@ const getWrapper = (options = {}) => {
     },
     props: {
       authenticated: options.authenticated,
-      isVolunteer: options.isVolunteer,
+      userType: options.userType,
       isAdmin: options.isAdmin,
       mobileMode: options.mobileMode,
     },
@@ -143,8 +155,9 @@ describe('SidebarLinks', () => {
       it('renders default links for volunteer', () => {
         const wrapper = getWrapper({
           mobileMode: true,
-          isVolunteer: true,
           authenticated: true,
+          isVolunteer: true,
+          isStudent: false,
         })
         testLinks(wrapper, links.default.volunteer)
       })
@@ -153,6 +166,7 @@ describe('SidebarLinks', () => {
         const wrapper = getWrapper({
           mobileMode: true,
           isVolunteer: true,
+          isStudent: false,
           path: '/onboarding',
         })
         testLinks(wrapper, links.onboarding.volunteer)
@@ -164,6 +178,7 @@ describe('SidebarLinks', () => {
           isAdmin: true,
           authenticated: true,
           isVolunteer: true,
+          isStudent: false,
         })
         testLinks(wrapper, links.default.admin)
       })
@@ -188,8 +203,9 @@ describe('SidebarLinks', () => {
       it('renders default links for volunteer', () => {
         const wrapper = getWrapper({
           mobileMode: false,
-          isVolunteer: true,
           authenticated: true,
+          isVolunteer: true,
+          isStudent: false,
         })
         testLinks(wrapper, links.default.volunteer)
       })
@@ -198,6 +214,7 @@ describe('SidebarLinks', () => {
         const wrapper = getWrapper({
           mobileMode: false,
           isVolunteer: true,
+          isStudent: false,
           path: '/onboarding',
         })
         testLinks(wrapper, links.onboarding.volunteer)
@@ -207,8 +224,9 @@ describe('SidebarLinks', () => {
         const wrapper = getWrapper({
           mobileMode: false,
           isAdmin: true,
-          authenticated: true,
           isVolunteer: true,
+          isStudent: false,
+          authenticated: true,
         })
         testLinks(wrapper, links.default.admin)
       })

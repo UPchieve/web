@@ -570,8 +570,8 @@ router.afterEach((to, from) => {
       is_authenticated: isAuthenticated ? '1' : '0',
     }
     if (isAuthenticated) {
-      const isVolunteer = store.getters['user/isVolunteer']
-      gtagDimensions.is_volunteer = isVolunteer ? '1' : '0'
+      const userType = store.getters['user/userType']
+      gtagDimensions.userType = userType
     }
 
     // Send page view.

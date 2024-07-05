@@ -50,7 +50,7 @@
               <div id="phone-heading">
                 <div class="prompt">Your Phone Number</div>
                 <button
-                  v-if="user.phone && !user.isVolunteer"
+                  v-if="user.phone && isStudent"
                   class="remove-phone-btn"
                   value="Remove"
                   @click="toggleDeletePhoneConfirmationModal"
@@ -114,7 +114,7 @@
                   from UPchieve at the phone number provided above.</label
                 >
               </div>
-              <div class="description" v-if="user.isVolunteer">
+              <div class="description" v-if="isVolunteer">
                 We will use this number to send you notifications when a student
                 needs help. You will only receive notifications during the
                 periods that you select in your schedule.
@@ -122,7 +122,7 @@
             </div>
           </div>
 
-          <div v-if="user.isVolunteer" class="container-section">
+          <div v-if="isVolunteer" class="container-section">
             <div class="prompt">Account status</div>
             <div class="answer">
               <toggle-button
@@ -146,7 +146,10 @@
             </div>
           </div>
 
-          <div v-if="isNotificationPermissionGranted" class="container-section">
+          <div
+            v-if="isNotificationPermissionGranted && !isTeacher"
+            class="container-section"
+          >
             <div class="prompt">Browser Notifications</div>
             <div class="answer">
               <toggle-button
@@ -162,11 +165,11 @@
                 :sync="true"
               />
             </div>
-            <div v-if="user.isVolunteer" class="description">
+            <div v-if="isVolunteer" class="description">
               Browser alerts when a student appears on the dashboard waitlist
               and when a student sends a message while you're not looking.
             </div>
-            <div v-else class="description">
+            <div v-else-if="isStudent" class="description">
               Browser alerts when a coach joins your session and when a coach
               sends a message while you're not looking.
             </div>
@@ -180,7 +183,7 @@
         </div>
       </div>
 
-      <div v-if="user.isVolunteer" class="cert-info contain">
+      <div v-if="isVolunteer" class="cert-info contain">
         <div class="subheader-subjects">
           <div
             v-if="isMutedSubjectAlertsActive"
@@ -319,7 +322,7 @@ export default {
 
       this.smsConsent = this.user.smsConsent
     }
-    if (this.isMutedSubjectAlertsActive && this.user.isVolunteer) {
+    if (this.isMutedSubjectAlertsActive && this.isVolunteer) {
       this.newMutedSubjectAlerts = [...this.user.mutedSubjectAlerts]
     }
     this.setFlagsForEditingPhoneNumber()
@@ -331,6 +334,10 @@ export default {
       isFetchingSubjects: (state) => state.subjects.isFetchingSubjects,
     }),
     ...mapGetters({
+      userType: 'user/userType',
+      isVolunteer: 'user/isVolunteer',
+      isStudent: 'user/isStudent',
+      isTeacher: 'user/isTeacher',
       avatarUrl: 'user/avatarUrl',
       allSubtopics: 'subjects/allSubtopics',
       isFilterActiveSubjectsActive: 'featureFlags/isFilterActiveSubjectsActive',
@@ -338,7 +345,7 @@ export default {
     }),
     name() {
       const user = this.$store.state.user.user
-      return user.firstname || (user.isVolunteer ? 'volunteer' : 'student')
+      return user.firstname || this.userType
     },
     VERIFICATION_METHOD() {
       return VERIFICATION_METHOD
@@ -466,7 +473,7 @@ export default {
     },
 
     async updateVerifiedPhoneInfo() {
-      this.shouldSeeSmsConsentCheckbox = !this.user.isVolunteer
+      this.shouldSeeSmsConsentCheckbox = this.isStudent
     },
 
     /**
@@ -490,7 +497,7 @@ export default {
       this.saveFailed = false
 
       // Validate fields
-      if (this.user.isVolunteer) {
+      if (this.isVolunteer) {
         // volunteers must provide a phone number, so display error message and
         // mark field invalid
         if (
@@ -540,7 +547,7 @@ export default {
               isDeactivated: reqBody.isDeactivated ?? !this.isAccountActive,
               smsConsent: reqBody.smsConsent ?? this.user.smsConsent,
             }
-            if (this.isMutedSubjectAlertsActive && this.user.isVolunteer) {
+            if (this.isMutedSubjectAlertsActive && this.isVolunteer) {
               addToUserData.mutedSubjectAlerts =
                 reqBody.mutedSubjectAlerts ?? this.user.mutedSubjectAlerts
             }
@@ -563,19 +570,18 @@ export default {
       reqBody.isDeactivated = !this.isAccountActive
 
       // Students get a checkbox to opt in/out of SMS
-      if (!this.user.isVolunteer && this.smsConsent !== this.user.smsConsent) {
+      if (this.isStudent && this.smsConsent !== this.user.smsConsent) {
         reqBody.smsConsent = this.smsConsent
       }
 
-      if (this.isMutedSubjectAlertsActive && this.user.isVolunteer) {
+      if (this.isMutedSubjectAlertsActive && this.isVolunteer) {
         reqBody.mutedSubjectAlerts = this.newMutedSubjectAlerts
       }
       return reqBody
     },
 
     setFlagsForEditingPhoneNumber() {
-      this.shouldSeeSmsConsentCheckbox =
-        !this.user.isVolunteer && this.user.phone
+      this.shouldSeeSmsConsentCheckbox = this.isStudent && this.user.phone
     },
   },
 }

@@ -3,8 +3,8 @@ import { createStore } from 'vuex'
 import { vi } from 'vitest'
 import RemovePhoneConfirmationModal from '@/views/ProfileView/RemovePhoneConfirmationModal.vue'
 import NetworkService from '@/services/NetworkService'
-import * as userModule from '@/store/modules/user'
-import * as appModule from '@/store/modules/app/index'
+import userModule from '@/store/modules/user'
+import appModule from '@/store/modules/app/index'
 import flushPromises from 'flush-promises'
 
 vi.mock('../../../../src/services/NetworkService')
@@ -13,7 +13,7 @@ describe('RemovePhoneConfirmationModal', () => {
   const mockCancel = vi.fn()
   const mockAccept = vi.fn()
 
-  const getWrapper = (mobileMode = false, isVolunteer = false) => {
+  const getWrapper = (mobileMode = false, userType = 'student') => {
     const store = createStore({
       modules: {
         user: {
@@ -21,9 +21,13 @@ describe('RemovePhoneConfirmationModal', () => {
           state: {
             user: {
               ...defaultUserState,
-              isVolunteer,
             },
           },
+          getters: {
+            userType: () => userType,
+            isVolunteer: () => userType === 'volunteer',
+            isStudent: () => userType === 'student',
+          }
         },
         app: {
           ...appModule,
@@ -101,14 +105,14 @@ describe('RemovePhoneConfirmationModal', () => {
 
   it.each([
     [
-      true,
+      'volunteer',
       'Without a phone number you will no longer receive text notifications during your availability time.',
     ],
-    [false, 'Your phone number will be removed from your account.'],
+    ['student', 'Your phone number will be removed from your account.'],
   ])(
-    'Should render the correct text depending on if the user is a student or volunteer (isVolunteer=%s)',
-    async (isVolunteer, expectedCopy) => {
-      const wrapper = getWrapper(false, isVolunteer)
+    'Should render the correct text depending on if the user is a student or volunteer (userType=%s)',
+    async (userType, expectedCopy) => {
+      const wrapper = getWrapper(false, userType)
       expect(
         wrapper.find('[data-testid="confirmation-message"]').text()
       ).toEqual(expectedCopy)

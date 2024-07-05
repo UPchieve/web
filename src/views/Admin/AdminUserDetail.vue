@@ -7,7 +7,7 @@
       :getUser="getUser"
     />
     <admin-pending-volunteer-detail
-      v-else-if="user.isVolunteer && !user.isApproved"
+      v-else-if="isVolunteer && !user.isApproved"
       :toggleEditMode="toggleEditMode"
       :volunteer="user"
     />
@@ -91,7 +91,7 @@
           <div class="user-detail__section-title">Zip code</div>
           <div>{{ user.zipCode }}</div>
         </div>
-        <div v-if="user.isVolunteer" class="user-detail__section">
+        <div v-if="isVolunteer" class="user-detail__section">
           <div class="user-detail__section-title">Background Information</div>
           <div v-if="user.background.occupation">
             <div class="user-detail__subtitle">
@@ -160,6 +160,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import moment from 'moment'
 import NetworkService from '@/services/NetworkService'
 import SessionsList from '@/components/Admin/SessionsList.vue'
@@ -199,13 +200,20 @@ export default {
   },
 
   computed: {
+    ...mapGetters({
+      isVolunteer: 'user/isVolunteer',
+      isStudent: 'user/isStudent',
+    }),
+
     createdAt() {
       return moment(this.user.createdAt).format('l, h:mm a')
     },
 
     partnerOrg() {
-      if (this.user.isVolunteer) return this.user.volunteerPartnerOrg
-      else return this.user.studentPartnerOrg
+      if (this.isVolunteer) return this.user.volunteerPartnerOrg
+      else if (this.isStudent) return this.user.studentPartnerOrg
+
+      return ''
     },
 
     schoolName() {

@@ -1,7 +1,8 @@
 import { test, vi } from 'vitest'
 import { shallowMount } from '@vue/test-utils'
-import SessionChat from '@/views/SessionView/SessionChat/index.vue'
 import Vuex from 'vuex'
+import SessionChat from '@/views/SessionView/SessionChat/index.vue'
+import userModule from '@/store/modules/user'
 import ModerationService from '@/services/ModerationService'
 import flushPromises from 'flush-promises'
 
@@ -11,15 +12,17 @@ describe('SessionChat', () => {
     const store = new Vuex.Store({
       modules: {
         user: {
+          ...userModule,
           state: {
             user: {
-              isVolunteer: false,
               ...overrides?.user?.state ?? {}
             },
             unreadChatMessageIndices: [],
             chatScrolledToMessageIndex: null,
           },
           getters: {
+            isVolunteer: () => overrides?.user?.isVolunteer,
+            isStudent: () => overrides?.user?.isStudent,
             isSessionWaitingForVolunteer: () => true,
             numberOfUnreadChatMessages: () => 0,
           },
@@ -101,7 +104,7 @@ describe('SessionChat', () => {
     {
       hateful_language: ['1']
     },
-    { profanity: ['5hit'] } ,
+    { profanity: ['5hit'] },
     {
       hateful_language: ['1', '2'],
       profanity: undefined
@@ -116,9 +119,8 @@ describe('SessionChat', () => {
     })
     const wrapper = getWrapper({
       user: {
-        state: {
-          isVolunteer: true,
-        }
+        isVolunteer: true,
+        isStudent: false,
       }
     })
     const message = await sendMessage(wrapper)
@@ -148,9 +150,8 @@ describe('SessionChat', () => {
     })
     const wrapper = getWrapper({
       user: {
-        state: {
+          isStudent: true,
           isVolunteer: false,
-        }
       }
     })
     const message = await sendMessage(wrapper)

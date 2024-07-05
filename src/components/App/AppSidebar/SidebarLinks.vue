@@ -8,7 +8,7 @@
       </sidebar-link>
 
       <sidebar-link
-        v-if="!isVolunteer && isProgressReportsActive"
+        v-if="isStudent && isProgressReportsActive"
         text="My Progress"
         class="SidebarLinks__container"
         to="/sessions/progress"
@@ -21,7 +21,7 @@
       </sidebar-link>
 
       <sidebar-link
-        v-if="!isVolunteer"
+        v-if="isStudent"
         to="/sessions/history"
         text="Session History"
       >
@@ -29,7 +29,7 @@
       </sidebar-link>
 
       <sidebar-link
-        v-if="!isVolunteer"
+        v-if="isStudent"
         to="/favorite-coaches"
         text="Favorite Coaches"
       >
@@ -126,7 +126,6 @@ export default {
   },
   props: {
     authenticated: Boolean,
-    isVolunteer: Boolean,
     isAdmin: Boolean,
     mobileMode: Boolean,
   },
@@ -136,6 +135,9 @@ export default {
       isAutoFlowUser: 'user/isAutoFlowUser',
       showDashboardRedesign: 'user/showDashboardRedesign',
       hasUnreadProgressOverviewReports: 'user/hasUnreadProgressOverviewReports',
+      isVolunteer: 'user/isVolunteer',
+      isStudent: 'user/isStudent',
+      isTeacher: 'user/isTeacher',
     }),
   },
   methods: {

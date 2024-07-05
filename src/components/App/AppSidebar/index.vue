@@ -12,13 +12,11 @@
           v-if="!mobileMode"
           style="margin-bottom: 64px"
           :authenticated="isAuthenticated"
-          :isVolunteer="isVolunteer"
           :name="user.firstname"
         />
 
         <sidebar-links
           :authenticated="isAuthenticated"
-          :isVolunteer="isVolunteer"
           :isAdmin="user.isAdmin"
           :mobileMode="mobileMode"
         />
@@ -54,7 +52,6 @@ export default {
     }),
     ...mapGetters({
       isAuthenticated: 'user/isAuthenticated',
-      isVolunteer: 'user/isVolunteer',
       mobileMode: 'app/mobileMode',
     }),
     finalLinkClass() {

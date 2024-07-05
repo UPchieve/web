@@ -50,7 +50,7 @@
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import LargeButton from '@/components/LargeButton.vue'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import { EVENTS } from '@/consts'
 
 // TODO: Options should be hydrated via the database
@@ -88,6 +88,10 @@ export default {
       )
   },
   computed: {
+    ...mapGetters({
+      isVolunteer: 'user/isVolunteer',
+      isStudent: 'user/isStudent',
+    }),
     ...mapState({
       user: (state) => state.user.user,
     }),
@@ -102,17 +106,18 @@ export default {
     },
     reportReasonOptionsToDisplay() {
       if (!this.isInRecap) return reportReasonOptions
-      else {
-        if (this.user.isVolunteer) return reportReasonOptions
-        else return studentRecapReportReasonOptions
-      }
+
+      if (this.isVolunteer) return reportReasonOptions
+      else if (this.isStudent) return studentRecapReportReasonOptions
+
+      return []
     },
     reportModalSubtitle() {
-      if (this.isInRecap && !this.user.isVolunteer)
+      if (this.isInRecap && this.isStudent)
         return `Reporting coaches will result in immediate action from UPchieve. The coach won't be able to help any students while UPchieve staff investigates the issue. Please only report a coach for the reasons listed below, otherwise reach out with your concerns by clicking the contact us link instead!`
       else
         return `Reporting ${
-          this.user.isVolunteer ? 'students' : 'tutors'
+          this.isVolunteer ? 'students' : 'tutors'
         } will result
       in immediate action from UPchieve. If you have a concern that requires
       less immediate attention, please let us know in the feedback form after

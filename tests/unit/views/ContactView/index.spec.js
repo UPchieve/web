@@ -6,7 +6,7 @@ import ContactView from '@/views/ContactView.vue'
 
 const getWrapper = (
   isAuthenticated = true,
-  isVolunteer = false,
+  userType = 'student',
   isVerified = true
 ) => {
   const store = createStore({
@@ -18,7 +18,7 @@ const getWrapper = (
         ...userModule,
         getters: {
           isAuthenticated: () => isAuthenticated,
-          isVolunteer: () => isVolunteer,
+          userType: () => userType,
           isVerified: () => isVerified,
         },
       },
@@ -44,7 +44,7 @@ describe('ContactView', () => {
   })
 
   it('renders ContactView for an anonymous user', () => {
-    const wrapper = getWrapper(false, false, false)
+    const wrapper = getWrapper(false, undefined, false)
     expect(wrapper.vm.hasValidEmail).toBeFalsy()
     expect(wrapper.find('#contact-form-email').exists()).toBeTruthy()
     expect(wrapper.find('#contact-form-email').isVisible()).toBeTruthy()

@@ -51,7 +51,7 @@ const getWrapper = async (overrides = {}) => {
         state: {
           user: {
             ...userModule.state,
-            isVolunteer: true,
+            userType: 'volunteer',
             subjects: ['algebraOne', 'algebraTwo', 'biology'],
             activeSubjects: ['algebraOne', 'algebraTwo', 'biology'],
             mutedSubjectAlerts: ['algebraOne'],

@@ -3,7 +3,7 @@
     <div class="chat-header">
       <component
         class="chat-header__avatar"
-        :is="user.isVolunteer ? studentAvatar : volunteerAvatar"
+        :is="isVolunteer ? studentAvatar : volunteerAvatar"
       />
       <div class="chat-header__title">Session Chat</div>
     </div>
@@ -34,7 +34,7 @@
 import getChatAvatar from '@/utils/get-chat-avatar'
 import StudentIcon from '@/assets/student-icon.svg'
 import VolunteerIcon from '@/assets/volunteer-icon.svg'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import moment from 'moment'
 
 const MESSAGE_ALIGNMENT = {
@@ -46,6 +46,9 @@ export default {
   name: 'chat-log',
   components: { StudentIcon, VolunteerIcon },
   computed: {
+    ...mapGetters({
+      isVolunteer: 'user/isVolunteer',
+    }),
     ...mapState({
       user: (state) => state.user.user,
     }),

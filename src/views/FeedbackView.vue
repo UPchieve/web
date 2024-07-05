@@ -222,7 +222,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import NetworkService from '@/services/NetworkService'
 import LargeButton from '@/components/LargeButton.vue'
 import moment from 'moment'
@@ -263,12 +263,16 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      userType: 'user/userType',
+      isVolunteer: 'user/isVolunteer',
+      isStudent: 'user/isStudent',
+    }),
     ...mapState({
-      user: (state) => state.user.user,
       subjects: (state) => state.subjects.subjects,
     }),
     sessionPartnerFirstName() {
-      return this.user.isVolunteer
+      return this.isVolunteer
         ? this.session.student.firstName
         : this.session.volunteer.firstName
     },
@@ -281,9 +285,6 @@ export default {
     },
     sessionDate() {
       return moment(this.session.createdAt).local().format('MMMM Do, YYYY')
-    },
-    userType() {
-      return this.user.isVolunteer ? 'volunteer' : 'student'
     },
     questions() {
       return this.allQuestions.map((q) => q.question)
@@ -349,7 +350,7 @@ export default {
       return
     }
 
-    if (!this.user.isVolunteer) {
+    if (this.isStudent) {
       const response = await NetworkService.checkIsFavoriteVolunteer(
         this.session.volunteer._id
       )
@@ -388,7 +389,7 @@ export default {
         if (question.questionText.startsWith('How do you think')) {
           return "Student's Feelings"
         } else if (this.isStarRankingQuestion(question)) {
-          return this.user.isVolunteer ? "Student's Progress" : 'Your Goal'
+          return this.isVolunteer ? "Student's Progress" : 'Your Goal'
         } else if (this.isIssuePresentQuestion(question)) {
           return 'Your Concerns'
         } else if (this.isHowSupportiveQuestion(question)) {
@@ -490,7 +491,7 @@ export default {
       return selectedResponse.responseText
     },
     isFavoritingCoach() {
-      if (!this.user.isVolunteer) {
+      if (this.isStudent) {
         const coachFavoritingQuestion = this.filteredQuestions.find((q) =>
           this.isHighRatingQuestion(q.question)
         )

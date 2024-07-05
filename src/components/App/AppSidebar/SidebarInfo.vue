@@ -4,7 +4,7 @@
       <component class="SidebarInfo-avatar" :is="avatar" />
       <div class="SidebarInfo-name">{{ name }}</div>
       <div class="SidebarInfo-type">{{ type }}</div>
-      <div class="SidebarInfo-status">
+      <div v-if="!isTeacher" class="SidebarInfo-status">
         <div class="SidebarInfo-status-circle" :class="sessionStatus.class" />
         <div class="SidebarInfo-status-text">{{ sessionStatus.text }}</div>
       </div>
@@ -13,6 +13,7 @@
 </template>
 
 <script>
+import Case from 'case'
 import { mapGetters, mapState } from 'vuex'
 import StudentIcon from '@/assets/student-icon.svg'
 import VolunteerIcon from '@/assets/volunteer-icon.svg'
@@ -20,7 +21,6 @@ import VolunteerIcon from '@/assets/volunteer-icon.svg'
 export default {
   props: {
     authenticated: Boolean,
-    isVolunteer: Boolean,
     name: String,
   },
   components: {
@@ -33,9 +33,13 @@ export default {
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
+      userType: 'user/userType',
+      isVolunteer: 'user/isVolunteer',
+      isStudent: 'user/isStudent',
+      isTeacher: 'user/isTeacher',
     }),
     type() {
-      return this.isVolunteer ? 'Volunteer' : 'Student'
+      return Case.capital(this.userType ?? 'User')
     },
     sessionStatus() {
       const inSession = this.isSessionAlive
@@ -72,7 +76,15 @@ export default {
       return status
     },
     avatar() {
-      return this.isVolunteer ? VolunteerIcon : StudentIcon
+      if (this.isVolunteer) {
+        return VolunteerIcon
+      } else if (this.isStudent) {
+        return StudentIcon
+      } else if (this.isTeacher) {
+        // TODO: TEACHER PROFILES.
+        return VolunteerIcon
+      }
+      return ''
     },
   },
 }

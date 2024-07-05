@@ -10,7 +10,7 @@ describe('SessionView', () => {
   const DEFAULT_USER = {
     user: {
       id: 'test-user-id',
-      isVolunteer: false,
+      userType: 'student',
     },
     isSessionConnectionAlive: false,
   }
