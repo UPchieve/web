@@ -45,7 +45,7 @@
           'chat-container--hidden': shouldHideChatSection,
         }"
       >
-        <div class="about-session-container" v-if="user.isVolunteer">
+        <div class="about-session-container" v-if="isVolunteer">
           <loading-message
             v-if="isLoadingPresessionResponse"
             message="Loading"
@@ -76,7 +76,7 @@
         </div>
         <div
           class="about-session-container"
-          v-else-if="mobileMode && !user.isVolunteer"
+          v-else-if="mobileMode && isStudent"
         >
           <question-mark-icon @click="openHelp" class="help-icon" />
         </div>
@@ -246,6 +246,7 @@ export default {
       mobileMode: 'app/mobileMode',
       isAuthenticated: 'user/isAuthenticated',
       isVolunteer: 'user/isVolunteer',
+      isStudent: 'user/isStudent',
       isSessionOver: 'user/isSessionOver',
       isSessionAlive: 'user/isSessionAlive',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
@@ -273,7 +274,7 @@ export default {
     showPhotoUpload() {
       if (this.auxiliaryType !== 'WHITEBOARD') return false
 
-      if (!this.isVolunteer && this.mobileMode) {
+      if (this.isStudent && this.mobileMode) {
         if (this.isMobileApp && isOutdatedMobileAppVersion()) return false
         return true
       }
@@ -326,7 +327,7 @@ export default {
     promise
       .then(async (sessionId) => {
         this.sessionId = sessionId
-        if (!id && !this.isVolunteer)
+        if (!id && this.isStudent)
           AnalyticsService.captureEvent(EVENTS.SESSION_REQUESTED, {
             event: EVENTS.SESSION_REQUESTED,
             sessionId,
@@ -355,12 +356,12 @@ export default {
         if (!socket.connected) await socket.connect()
         Gleap.setCustomData('sessionId', sessionId)
 
-        if (this.user.isVolunteer) {
+        if (this.isVolunteer) {
           await this.getSessionContext(sessionId)
         }
 
         if (
-          (this.user.isVolunteer &&
+          (this.isVolunteer &&
             (!this.user.isOnboarded || !this.user.isApproved)) ||
           this.isMobileApp
         )

@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { describe, it, expect, vi } from 'vitest'
+import { createStore } from 'vuex'
 import AdminUserDetail from '@/views/Admin/AdminUserDetail.vue'
 import NetworkService from '@/services/NetworkService'
 
@@ -18,13 +19,13 @@ describe('Admin User Detail', () => {
     isApproved: false,
     inGatesStudy: false,
     isAdmin: false,
-    isVolunteer: false,
     pastSessions: []
   }
 
   const getWrapper = async () => {
     const wrapper = mount(AdminUserDetail, {
       global: {
+        plugins: [createStore()],
         mocks: {
           $route: {
             query: { page: '1' },
@@ -41,18 +42,18 @@ describe('Admin User Detail', () => {
 
   it.each([
     [{ banType: 'shadow' }, 'shadowbanned'],
-    [{ isAdmin: true}, 'admin'],
+    [{ isAdmin: true }, 'admin'],
     [{ banType: 'complete' }, 'banned'],
     [{ isDeactivated: true }, 'deactivated'],
     [{ isTestUser: true }, 'test'],
     [{ isFakeUser: true }, 'fake']
   ])('show correct label if property is true', async (arg, label) => {
     NetworkService.adminGetUser = vi.fn().mockResolvedValue({
-      data: { 
-        user: { 
-          ...DEFAULT_USER, 
+      data: {
+        user: {
+          ...DEFAULT_USER,
           ...arg
-        } 
+        }
       },
     })
 

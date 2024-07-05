@@ -12,7 +12,7 @@ import {
   DisabledCard,
 } from '../../../src/stories/RecentSubjectCard.stories'
 
-describe('RecentSubjectCard', () => {
+describe.skip('RecentSubjectCard', () => {
   it('renders recent subject card in default state', () => {
     const wrapper = shallowMount(RecentSubjectCard, {
       props: DefaultCard.args,

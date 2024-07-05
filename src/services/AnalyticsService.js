@@ -2,6 +2,7 @@ import Gleap from 'gleap'
 import posthog from 'posthog-js'
 import config from '../config'
 import { EVENTS } from '../consts'
+import { isVolunteerUserType } from '@/utils/user-type'
 
 const GLEAP_TRACK_EVENTS = new Set([
   EVENTS.STUDENT_SHOWN_ONBOARDING_MODAL,
@@ -143,7 +144,7 @@ class AnalyticsService {
     window.analytics.track('session ended', {
       // if volunteer joined then report volunteerSessionLength otherwise report null
       'volunteer session length':
-        volunteerSessionLength && user.isVolunteer
+        volunteerSessionLength && isVolunteerUserType(user.userType)
           ? volunteerSessionLength
           : null,
       'wait time': waitTime,
@@ -151,7 +152,7 @@ class AnalyticsService {
       'session topic': currentSession.type,
       'session subtopic': currentSession.subTopic,
       'session id': currentSession.sessionId,
-      user: user.isVolunteer ? 'volunteer' : 'student',
+      user: user.userType,
       'volunteer show time': volunteerShowed || null,
       'did volunteer show': !!volunteerShowed,
       'time ended': new Date(), // might be slightly off from the session's "endedAt"
@@ -172,7 +173,7 @@ class AnalyticsService {
     const user = context.$store.state.user.user
     window.analytics.track('session started', {
       'session started date': new Date(),
-      user: user.isVolunteer ? 'volunteer' : 'student',
+      user: user.userType,
       'session topic': topic,
       'session subtopic': subTopic,
       'session id': currentSession.sessionId,

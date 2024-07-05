@@ -1,9 +1,5 @@
 <template>
-  <div
-    v-if="user.isVolunteer"
-    class="training-quiz"
-    :class="trainingQuizClasses"
-  >
+  <div v-if="isVolunteer" class="training-quiz" :class="trainingQuizClasses">
     <div :class="showQuizReview ? 'done-header' : 'header'">
       <h1 class="title">{{ quizName }} Certification Quiz</h1>
       <div
@@ -173,6 +169,7 @@ export default {
       subjects: (state) => state.subjects.subjects,
     }),
     ...mapGetters({
+      isVolunteer: 'user/isVolunteer',
       allSubtopics: 'subjects/allSubtopics',
       isQuizStudyMaterialUser: 'user/isQuizStudyMaterialUser',
       hasCertification: 'user/hasCertification',

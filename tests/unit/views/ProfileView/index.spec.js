@@ -28,7 +28,7 @@ describe('ProfileView', () => {
       phoneVerified: false,
       deactivated: false,
       smsConsent: false,
-      isVolunteer: false,
+      userType: 'student',
       subjects: [],
       activeSubjects: [],
     }
@@ -74,44 +74,44 @@ describe('ProfileView', () => {
   }
 
   describe('Render differences between students and volunteers', () => {
-    test.each([true, false])(
-      "Should/shouldn't show the description text for what we use the phone number for when isVolunteer=%s",
-      (isVolunteer) => {
+    test.each(['volunteer', 'student'])(
+      "Should/shouldn't show the description text for what we use the phone number for when userType=%s",
+      (userType) => {
         const wrapper = getWrapper({
           user: {
-            isVolunteer,
+            userType,
           },
         })
-        expect(wrapper.find('.description').exists()).toEqual(isVolunteer)
+        expect(wrapper.find('.description').exists()).toEqual(userType === 'volunteer')
       }
     )
 
-    test.each([true, false])(
-      "Should/shouldn't show the deactivate account option when isVolunteer=%s",
-      (isVolunteer) => {
+    test.each(['volunteer', 'student'])(
+      "Should/shouldn't show the deactivate account option when userType=%s",
+      (userType) => {
         const wrapper = getWrapper({
           user: {
-            isVolunteer,
+            userType,
           },
         })
         expect(
           wrapper.find('[data-testid="deactivate-account-toggle"]').exists()
-        ).toEqual(isVolunteer)
+        ).toEqual(userType === 'volunteer')
       }
     )
 
-    test.each([true, false])(
+    test.each(['volunteer', 'student'])(
       "Should show 'Remove phone number' option for students only",
-      async (isVolunteer) => {
+      async (userType) => {
         const wrapper = getWrapper({
           user: {
-            isVolunteer,
+            userType,
             phone: '+18187776543',
           },
         })
         expect(
           wrapper.find('[data-testid="delete-phone-button"]').exists()
-        ).toEqual(!isVolunteer)
+        ).toEqual(userType === 'student')
       }
     )
   })
@@ -126,15 +126,15 @@ describe('ProfileView', () => {
     }
 
     test.each([
-      // isVolunteer, expected
-      [true, false],
-      [false, true],
+      // userType, expected
+      ['volunteer', false],
+      ['student', true],
     ])(
       'Should only show sms consent checkbox for students',
-      (isVolunteer, expected) => {
+      (userType, expected) => {
         const wrapper = getWrapper({
           user: {
-            isVolunteer,
+            userType,
             phone: '+18188888857',
           },
         })
@@ -145,7 +145,7 @@ describe('ProfileView', () => {
     it('Should not show SMS checkbox for students who have no phone number', () => {
       const wrapper = getWrapper({
         user: {
-          isVolunteer: false,
+          userType: 'student',
           phone: null,
         },
       })
@@ -172,7 +172,7 @@ describe('ProfileView', () => {
       const wrapper = getWrapper({
         user: {
           phone: '+18609998765',
-          isVolunteer: false,
+          userType: 'student',
         },
       })
       await wrapper.find('[data-testid="delete-phone-button"]').trigger('click')
@@ -183,7 +183,7 @@ describe('ProfileView', () => {
 
     it('Should not render the Remove Phone button if the user has no phone', async () => {
       const wrapper = getWrapper({
-        user: { phone: undefined, isVolunteer: false },
+        user: { phone: undefined, userType: 'student' },
       })
       expect(
         wrapper.find('[data-testid="delete-phone-button"]').exists()
@@ -193,7 +193,7 @@ describe('ProfileView', () => {
 
   describe.skip('Muted Subject Alert Tests', async () => {
     const user = {
-      isVolunteer: true,
+      userType: 'volunteer',
       subjects: ['algebraOne', 'algebraTwo', 'biology'],
       activeSubjects: ['algebraOne', 'algebraTwo', 'biology'],
       mutedSubjectAlerts: [],

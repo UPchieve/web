@@ -47,9 +47,7 @@ export default {
         this.dispatch('user/sessionDisconnected')
         // Ignore logging errors for when we make manual disconnects, e.g logging out
         if (reason === 'io client disconnect') return
-        const userType = rootGetters['user/isVolunteer']
-          ? 'volunteer'
-          : 'student'
+        const userType = rootGetters['user/userType']
         const err = new Error(
           `Socket.io connection for ${userType} with user id ${rootState.user.user?.id} disconnected for reason: ${reason}`
         )
@@ -109,7 +107,7 @@ export default {
       })
 
       socket.on('sessions', async (sessions) => {
-        if (rootState.user.user?.isVolunteer) {
+        if (rootGetters['user/isVolunteer']) {
           this.dispatch('volunteer/handleIncomingSessions', {
             context: { router },
             sessions,

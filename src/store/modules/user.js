@@ -1,3 +1,5 @@
+import Case from 'case'
+import { some } from 'lodash-es'
 import StudentAvatarUrl from '@/assets/defaultavatar3.png'
 import VolunteerAvatarUrl from '@/assets/defaultavatar4.png'
 import SessionService from '@/services/SessionService'
@@ -5,8 +7,11 @@ import UserService from '@/services/UserService'
 import LoggerService from '@/services/LoggerService'
 import FeatureFlagService from '@/services/FeatureFlagService'
 import NetworkService from '@/services/NetworkService'
-import Case from 'case'
-import { some } from 'lodash-es'
+import {
+  isStudentUserType,
+  isTeacherUserType,
+  isVolunteerUserType,
+} from '@/utils/user-type'
 
 export default {
   namespaced: true,
@@ -266,8 +271,8 @@ export default {
       commit('setPrevSessionSubject', subject)
     },
 
-    getProgressReportOverviewSubjectStats: async ({ commit, state }) => {
-      if (state.user.isVolunteer) return
+    getProgressReportOverviewSubjectStats: async ({ commit, getters }) => {
+      if (getters.isVolunteer) return
 
       try {
         const response =
@@ -299,18 +304,27 @@ export default {
     },
   },
   getters: {
-    avatarUrl: (state) =>
-      state.user.picture ||
-      (state.user.isVolunteer ? VolunteerAvatarUrl : StudentAvatarUrl),
+    avatarUrl: (_state, getters) => {
+      if (getters.isVolunteer) {
+        return VolunteerAvatarUrl
+      } else if (getters.isStudent) {
+        return StudentAvatarUrl
+      } else if (getters.isTeacher) {
+        // TODO: TEACHER PROFILES.
+        return VolunteerAvatarUrl
+      }
+    },
 
-    firstName: (state) =>
-      state.user.firstname ||
-      (state.user.isVolunteer ? 'Volunteer' : 'Student'),
+    firstName: (state, getters) =>
+      state.user.firstname || Case.capital(getters.userType),
     lastName: (state) => state.user.lastname,
     fullName: (state, getters) =>
       [getters.firstName, getters.lastName].join(' '),
 
-    isVolunteer: (state) => state.user.isVolunteer,
+    userType: (state) => state.user.userType,
+    isVolunteer: (state) => isVolunteerUserType(state.user.userType),
+    isStudent: (state) => isStudentUserType(state.user.userType),
+    isTeacher: (state) => isTeacherUserType(state.user.userType),
     isAdmin: (state) => state.user.isAdmin,
 
     isAuthenticated: (state) => !!(state.user && state.user._id),
@@ -407,16 +421,15 @@ export default {
 
     isQuizStudyMaterialUser: (state, getters) => {
       return (
-        !state.user.isOnboarded &&
         getters.isVolunteer &&
+        !state.user.isOnboarded &&
         !getters.hasCertification
       )
     },
 
-    showDashboardRedesign: (state, _getters, _rootState, rootGetters) => {
+    showDashboardRedesign: (_state, getters, _rootState, rootGetters) => {
       return (
-        !state.user.isVolunteer &&
-        rootGetters['featureFlags/showDashboardRedesign']
+        getters.isStudent && rootGetters['featureFlags/showDashboardRedesign']
       )
     },
 
@@ -444,12 +457,14 @@ export default {
           ...userProps,
           ...certificationInfo,
         }
-      } else {
+      } else if (getters.isStudent) {
         userProps.partner = state.user.studentPartnerOrg
         userProps.gradeLevel = state.user.gradeLevel
         if (state.user.isSchoolPartner) {
           userProps.schoolPartner = state.user.schoolName
         }
+      } else if (getters.isTeacher) {
+        // TODO: TEACHER PROFILES.
       }
 
       return userProps

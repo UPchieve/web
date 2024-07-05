@@ -10,10 +10,10 @@
       </div>
       <div v-else>
         <p class="subtitle">
-            To ensure the safety of our students, we need to confirm your identity
-            by reviewing a photo ID such as your driver's license, passport, or student
-            ID. Your full name, photo, and school name (if applicable) should be clearly
-            visible. Acceptable formats: jpeg, png.
+          To ensure the safety of our students, we need to confirm your identity
+          by reviewing a photo ID such as your driver's license, passport, or
+          student ID. Your full name, photo, and school name (if applicable)
+          should be clearly visible. Acceptable formats: jpeg, png.
         </p>
         <div v-if="photo" class="photo-id-container">
           <img :src="photo" class="photo-id-img" alt="your uploaded photo id" />

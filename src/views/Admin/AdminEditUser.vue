@@ -25,10 +25,7 @@
           v-model="partnerOrg"
         />
       </div>
-      <div
-        class="row"
-        v-if="!user.isVolunteer && partnerOrg && partnerOrg.sites"
-      >
+      <div class="row" v-if="isStudent && partnerOrg && partnerOrg.sites">
         <label for="partner-site" class="uc-form-label">Partner Site</label>
         <v-select
           id="partner-sites"
@@ -38,7 +35,7 @@
         />
       </div>
 
-      <div class="row" v-if="!user.isVolunteer">
+      <div class="row" v-if="isStudent">
         <label for="partner-school" class="uc-form-label">
           Partner school
         </label>
@@ -92,7 +89,7 @@
           </option>
         </select>
       </div>
-      <div class="row" v-if="user.isVolunteer">
+      <div class="row" v-if="isVolunteer">
         <label for="approved" class="uc-form-label">Approved</label>
         <select name="approved" id="approved" v-model="isApproved">
           <option
@@ -104,7 +101,7 @@
           </option>
         </select>
       </div>
-      <div class="row" v-if="!user.isVolunteer">
+      <div class="row" v-if="isStudent">
         <label for="gates-study" class="uc-form-label">In Gates study</label>
         <select name="gates-study" id="gates-study" v-model="inGatesStudy">
           <option
@@ -123,8 +120,9 @@
 </template>
 
 <script>
-import NetworkService from '@/services/NetworkService'
+import { mapGetters } from 'vuex'
 import { isEmpty } from 'lodash-es'
+import NetworkService from '@/services/NetworkService'
 
 export default {
   name: 'AdminEditUser',
@@ -136,17 +134,6 @@ export default {
   },
 
   data() {
-    const banOptions = this.user.isVolunteer
-      ? [
-          { text: 'False', value: null },
-          { text: 'True', value: 'complete' },
-        ]
-      : [
-          { text: 'None', value: null },
-          { text: 'Complete Ban', value: 'complete' },
-          { text: 'Shadow Ban', value: 'shadow' },
-        ]
-
     return {
       firstName: '',
       lastName: '',
@@ -164,22 +151,42 @@ export default {
         { text: 'False', value: false },
         { text: 'True', value: true },
       ],
-      banOptions: banOptions,
+      banOptions: [],
       error: '',
       listedPartnerOrgs: [],
       listedPartnerSchools: [],
     }
   },
+
+  computed: {
+    ...mapGetters({
+      isVolunteer: 'user/isVolunteer',
+      isStudent: 'user/isStudent',
+      isTeacher: 'user/isTeacher',
+    }),
+  },
+
   async created() {
+    this.banOptions = this.isVolunteer
+      ? [
+          { text: 'False', value: null },
+          { text: 'True', value: 'complete' },
+        ]
+      : [
+          { text: 'None', value: null },
+          { text: 'Complete Ban', value: 'complete' },
+          { text: 'Shadow Ban', value: 'shadow' },
+        ]
+
     let activeSchoolPartnerName = ''
 
-    if (this.user.isVolunteer) {
+    if (this.isVolunteer) {
       const response = await NetworkService.adminGetVolunteerPartners()
       const {
         data: { partnerOrgs },
       } = response
       this.listedPartnerOrgs = partnerOrgs
-    } else {
+    } else if (this.isStudent) {
       const response = await NetworkService.adminGetStudentPartners()
       const {
         data: { partnerOrgs },
@@ -265,6 +272,9 @@ export default {
       }
 
       try {
+        if (this.isTeacher) {
+          this.error = 'Unable to update teachers.'
+        }
         await NetworkService.adminUpdateUser(this.user._id, data)
         this.getUser()
         this.toggleEditMode()

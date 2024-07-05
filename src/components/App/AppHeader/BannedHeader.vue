@@ -9,24 +9,29 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
-import { DOCS_URL } from '@/consts'
+import { mapGetters } from 'vuex'
 import HamburgerButton from './HamburgerButton.vue'
+import { DOCS_URL } from '@/consts'
 
 export default {
   name: 'banned-header',
   components: { HamburgerButton },
   computed: {
-    ...mapState({
-      user: (state) => state.user.user,
-    }),
     ...mapGetters({
+      isVolunteer: 'user/isVolunteer',
+      isStudent: 'user/isStudent',
+      isTeacher: 'user/isTeacher',
       mobileMode: 'app/mobileMode',
     }),
     linkOut() {
-      return this.user.isVolunteer
-        ? `${DOCS_URL}/coach-community-guidelines.pdf`
-        : `${DOCS_URL}/Student-Community-Guidelines.pdf`
+      if (this.isVolunteer) {
+        return `${DOCS_URL}/coach-community-guidelines.pdf`
+      } else if (this.isStudent) {
+        return `${DOCS_URL}/Student-Community-Guidelines.pdf`
+      } else if (this.isTeacher) {
+        // Add for teachers as well?
+      }
+      return ''
     },
     message() {
       return 'Your account is under review'

@@ -340,8 +340,9 @@ export default {
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
-      isVolunteer: 'user/isVolunteer',
       isWhiteboardEraserToolActive: 'featureFlags/isWhiteboardEraserToolActive',
+      userType: 'user/userType',
+      isStudent: 'user/isStudent',
     }),
     toolClass() {
       if (this.selectedTool === 'brush') return 'zwib-wrapper--brush'
@@ -356,7 +357,7 @@ export default {
       return 'zwib-wrapper--default'
     },
     showPhotoUpload() {
-      if (!this.isVolunteer) {
+      if (this.isStudent) {
         if (this.isMobileApp && isOutdatedMobileAppVersion()) return false
         return true
       }
@@ -705,11 +706,10 @@ export default {
 
         // Intercept Zwibbler's websocket close handler to throw custom error
         zwibblerWsConnection.onclose = (closeEvent) => {
-          const userType = this.isVolunteer ? 'volunteer' : 'student'
           // Access Zwibbler's internal WebSocket stream name
           // Note: the properties to access will change with every new Zwibbler update
           const err = new Error(
-            `WebSocket for the ${userType} in session ${this.sessionId} closed with code ${closeEvent.code} for reason: "${closeEvent.reason}" in room: ${
+            `WebSocket for the ${this.userType} in session ${this.sessionId} closed with code ${closeEvent.code} for reason: "${closeEvent.reason}" in room: ${
               import.meta.env.NODE_ENV === 'development'
                 ? this.zwibblerCtx.zc.Hx
                 : this.zwibblerCtx.Ec.cC

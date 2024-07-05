@@ -35,7 +35,7 @@
       </div>
       <div class="button-container">
         <button
-          v-if="user.isVolunteer"
+          v-if="isVolunteer"
           class="report-btn"
           @click="reportSession"
           type="button"
@@ -142,7 +142,7 @@ export default {
 
   mounted() {
     // Show a modal if a student has been waiting too long to get matched with a volunteer
-    if (!this.user.isVolunteer) {
+    if (this.isStudent) {
       /**
        * There's a re-render that is triggered when fetching for the current session.
        * If the modal is shown before this re-render occurs it will not display on
@@ -168,6 +168,8 @@ export default {
       isPartnerOnline: (state) => state.session.isPartnerOnline,
     }),
     ...mapGetters({
+      isVolunteer: 'user/isVolunteer',
+      isStudent: 'user/isStudent',
       sessionPartner: 'user/sessionPartner',
       isSessionAlive: 'user/isSessionAlive',
       isSessionWaitingForVolunteer: 'user/isSessionWaitingForVolunteer',
@@ -180,8 +182,9 @@ export default {
     partnerAvatar() {
       if (this.isSessionWaitingForVolunteer) return ChatBotIcon
       // show the current user their partner's avatar
-      if (this.user.isVolunteer) return StudentIcon
-      else return VolunteerIcon
+      if (this.isVolunteer) return StudentIcon
+      if (this.isStudent) return VolunteerIcon
+      return ''
     },
   },
   emits: ['try-clicked'],
@@ -221,7 +224,7 @@ export default {
           this.$store.dispatch('user/sessionDisconnected')
           if (!this.isSessionRecapDmsActive) this.goToFeedbackPage()
           // Do not send the user directly to the feedback page if they can leave DMs
-          if (!this.user.isVolunteer) this.goToFeedbackPage()
+          if (this.isStudent) this.goToFeedbackPage()
           //Send students directly to feedback page whether or not volunteers can send DMs.
           this.isSessionEnding = false
         })

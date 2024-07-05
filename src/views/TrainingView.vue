@@ -1,5 +1,5 @@
 <template>
-  <div v-if="user.isVolunteer" class="training-view">
+  <div v-if="isVolunteer" class="training-view">
     <div class="body-container">
       <div class="body-header">Volunteer Training and Certifications</div>
       <p class="instructions">
@@ -116,6 +116,9 @@ export default {
     else this.setInitialTopic()
   },
   computed: {
+    ...mapGetters({
+      isVolunteer: 'user/isVolunteer',
+    }),
     ...mapState({
       user: (state) => state.user.user,
       isFetchingTraining: (state) => state.subjects.isFetchingTraining,

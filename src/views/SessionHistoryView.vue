@@ -4,7 +4,7 @@
       <h1 class="title">Session History</h1>
       <p v-if="!mobileMode" class="subtitle">
         {{
-          user.isVolunteer
+          isVolunteer
             ? 'On this page you can review your past sessions on UPchieve'
             : `On this page you can review your past sessions on UPchieve and favorite
         your preferred Academic Coaches. We'll do our best to pair you with your
@@ -17,7 +17,7 @@
         <div class="spacing--grid spacing--grid-4 session-list__headers">
           <span>SUBJECT</span>
           <span>DATE</span>
-          <span>{{ user.isVolunteer ? 'STUDENT' : 'COACH' }}</span>
+          <span>{{ isVolunteer ? 'STUDENT' : 'COACH' }}</span>
           <span>SESSION RECAP</span>
         </div>
         <div v-if="error">
@@ -56,7 +56,7 @@
               </p>
               <div class="session-list__partner-name-container">
                 <favoriting-toggle
-                  v-if="!user.isVolunteer"
+                  v-if="isStudent"
                   :initialIsFavorite="session.isFavorited"
                   :volunteerName="session.volunteerFirstName"
                   :volunteerId="session.volunteerId"
@@ -64,7 +64,7 @@
                 />
                 <span class="session-list__partner-name">
                   {{
-                    user.isVolunteer
+                    isVolunteer
                       ? session.studentFirstName
                       : session.volunteerFirstName
                   }}
@@ -145,7 +145,7 @@
                 <div class="mobile-session-list__createdAt-container">
                   <div class="mobile-session-list__partner-name-container">
                     <favoriting-toggle
-                      v-if="!user.isVolunteer"
+                      v-if="isStudent"
                       class="heart"
                       :initialIsFavorite="session.isFavorited"
                       :volunteerName="session.volunteerFirstName"
@@ -154,7 +154,7 @@
                     />
                     <span class="mobile-session-list__partner-name">
                       {{
-                        user.isVolunteer
+                        isVolunteer
                           ? session.studentFirstName
                           : session.volunteerFirstName
                       }}
@@ -206,7 +206,7 @@ import NetworkService from '../services/NetworkService'
 import CaretIcon from '@/assets/caret.svg'
 import FavoritingToggle from '../components/FavoritingToggle.vue'
 import LargeButton from '../components/LargeButton.vue'
-import { mapState, mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 import moment from 'moment'
 import Loader from '@/components/Loader.vue'
 import { backOff } from 'exponential-backoff'
@@ -229,11 +229,10 @@ export default {
     }
   },
   computed: {
-    ...mapState({
-      user: (state) => state.user.user,
-    }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
+      isVolunteer: 'user/isVolunteer',
+      isStudent: 'user/isStudent',
     }),
     isFirstPage() {
       return this.page === 1

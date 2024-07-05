@@ -51,7 +51,7 @@ describe('Volunteer store module', () => {
           state: {
             user: {
               isBanned: true, // should not be ready to tutor then
-              isVolunteer: true,
+              userType: 'volunteer',
               isApproved: true,
               isOnboarded: true,
             },
@@ -87,7 +87,7 @@ describe('Volunteer store module', () => {
         user: {
           state: {
             user: {
-              isVolunteer: true,
+              userType: 'volunteer',
               isOnboarded: true,
               isApproved: true,
               isBanned: false,
@@ -102,7 +102,7 @@ describe('Volunteer store module', () => {
     })
 
     it.each([
-      { state: { isVolunteer: false } },
+      { state: { userType: 'student' } },
       { state: { isApproved: false } },
       { state: { isOnboarded: false } },
       { state: { isBanned: true } },
@@ -111,7 +111,7 @@ describe('Volunteer store module', () => {
         user: {
           state: {
             user: {
-              isVolunteer: true,
+              userType: 'volunteer',
               isOnboarded: true,
               isApproved: true,
               isBanned: false,

@@ -12,7 +12,7 @@
       <p class="uc-form-header">Are you sure?</p>
       <p data-testid="confirmation-message">
         {{
-          user.isVolunteer
+          isVolunteer
             ? 'Without a phone number you will no longer receive text notifications during your availability time.'
             : 'Your phone number will be removed from your account.'
         }}
@@ -39,7 +39,7 @@
 <script>
 import Modal from '@/components/Modal.vue'
 import NetworkService from '@/services/NetworkService'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 
 export default {
   name: 'RemovePhoneConfirmationModal',
@@ -60,6 +60,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      isVolunteer: 'user/isVolunteer',
+    }),
     ...mapState({
       user: (state) => state.user.user,
     }),

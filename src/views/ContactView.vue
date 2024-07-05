@@ -138,7 +138,6 @@ export default {
   computed: {
     ...mapGetters({
       isAuthenticated: 'user/isAuthenticated',
-      isVolunteer: 'user/isVolunteer',
       isVerified: 'user/isVerified',
     }),
     hasValidEmail() {

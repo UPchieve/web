@@ -10,6 +10,7 @@
 
 <script>
 import moment from 'moment'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'UserListItem',
@@ -19,11 +20,11 @@ export default {
   },
 
   computed: {
+    ...mapGetters({
+      userType: 'user/userType',
+    }),
     createdAt() {
       return moment(this.user.createdAt).format('l, h:mm a')
-    },
-    userType() {
-      return this.user.isVolunteer ? 'Volunteer' : 'Student'
     },
   },
 }

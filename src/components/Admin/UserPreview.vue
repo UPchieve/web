@@ -17,6 +17,7 @@
 
 <script>
 import moment from 'moment'
+import { mapGetters } from 'vuex'
 import StudentIcon from '@/assets/student-icon.svg'
 import VolunteerIcon from '@/assets/volunteer-icon.svg'
 
@@ -25,8 +26,21 @@ export default {
     user: Object,
   },
   computed: {
+    ...mapGetters({
+      isVolunteer: 'user/isVolunteer',
+      isStudent: 'user/isStudent',
+      isTeacher: 'user/isTeacher',
+    }),
     userIcon() {
-      return this.user.isVolunteer ? VolunteerIcon : StudentIcon
+      if (this.isVolunteer) {
+        return VolunteerIcon
+      } else if (this.isStudent) {
+        return StudentIcon
+      } else if (this.isTeacher) {
+        // TODO: TEACHER PROFILES.
+        return VolunteerIcon
+      }
+      return ''
     },
     userSince() {
       return moment(this.user.createdAt).fromNow()

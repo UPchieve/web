@@ -46,7 +46,7 @@
     <div class="messages-container">
       <div class="messages" ref="messages" @scroll="handleScroll" tabindex="0">
         <chat-bot
-          v-if="!user.isVolunteer && isSessionWaitingForVolunteer"
+          v-if="isStudent && isSessionWaitingForVolunteer"
           @new-bot-message="handleIncomingMessage"
         />
         <div
@@ -82,7 +82,7 @@
           </template>
         </div>
         <chat-bot
-          v-if="sessionHasEnded && isSessionRecapDmsActive && user.isVolunteer"
+          v-if="sessionHasEnded && isSessionRecapDmsActive && isVolunteer"
           :isSessionRecapBot="true"
           :currentSession="currentSession"
           @recap-eligible="toggleEligibleForSessionRecapChat"
@@ -90,7 +90,7 @@
         />
         <chat-bot
           v-if="
-            user.isVolunteer &&
+            isVolunteer &&
             isInRecap &&
             currentSession.messages &&
             !tutorSentMessageAfterSessionEnded
@@ -204,13 +204,15 @@ export default {
       messageData: (state) => state.socket.messageData,
     }),
     ...mapGetters({
+      isVolunteer: 'user/isVolunteer',
+      isStudent: 'user/isStudent',
       isSessionWaitingForVolunteer: 'user/isSessionWaitingForVolunteer',
       numberOfUnreadChatMessages: 'user/numberOfUnreadChatMessages',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
     }),
     sessionPartnerName() {
       if (!this.currentSession) return ''
-      return this.user.isVolunteer
+      return this.isVolunteer
         ? this.currentSession.student?.firstName
         : this.currentSession.volunteer?.firstName
     },
@@ -318,7 +320,7 @@ export default {
           // in the event it was a typo
           // eslint-disable-next-line no-unused-vars
           const { profanity, ...rest } = failures
-          this.failureReasons = this.user.isVolunteer ? failures : rest
+          this.failureReasons = this.isVolunteer ? failures : rest
           this.showModerationWarning()
         }
       } catch (e) {

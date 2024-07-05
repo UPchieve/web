@@ -31,18 +31,18 @@
               {{ getSessionTime(session.createdAt) }}
             </div>
             <span class="card-detail__title">{{
-              user.isVolunteer ? 'Student:' : 'Coach:'
+              isVolunteer ? 'Student:' : 'Coach:'
             }}</span>
             <div class="card-detail card-detail__sub-container">
               <div class="card-detail">
                 {{
-                  user.isVolunteer
+                  isVolunteer
                     ? session.studentFirstName
                     : session.volunteerFirstName
                 }}
               </div>
               <favoriting-toggle
-                v-if="!user.isVolunteer"
+                v-if="isStudent"
                 :initialIsFavorite="session.isFavorited"
                 :volunteerName="session.volunteerFirstName"
                 :volunteerId="session.volunteerId"
@@ -64,7 +64,7 @@
               <div class="chat__dms-avatar-container">
                 <component
                   class="chat-header__avatar"
-                  :is="user.isVolunteer ? studentAvatar : volunteerAvatar"
+                  :is="isVolunteer ? studentAvatar : volunteerAvatar"
                 />
                 <div class="chat-header__title">Session Chat</div>
               </div>
@@ -146,7 +146,7 @@
             <div class="chat__dms-avatar-container">
               <component
                 class="chat-header__avatar"
-                :is="user.isVolunteer ? studentAvatar : volunteerAvatar"
+                :is="isVolunteer ? studentAvatar : volunteerAvatar"
               />
               <div class="chat-header__title">Session Chat</div>
             </div>
@@ -220,6 +220,8 @@ export default {
       isConnected: (state) => state.socket.isConnected,
     }),
     ...mapGetters({
+      isVolunteer: 'user/isVolunteer',
+      isStudent: 'user/isStudent',
       mobileMode: 'app/mobileMode',
     }),
     whiteboardDimensions() {
@@ -266,7 +268,7 @@ export default {
       this.isRecapDmsAvailable = response.data.isRecapDmsAvailable
       this.$store.dispatch('user/fetchRecapSessionForDms', this.session.id)
 
-      if (!this.user.isVolunteer) await this.getProgressReportForSession()
+      if (this.isStudent) await this.getProgressReportForSession()
     } catch (error) {
       if (error.status === 403) this.$router.push('/dashboard')
     } finally {

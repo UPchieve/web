@@ -12,7 +12,7 @@
           v-if="
             hasUnreadProgressOverviewReports &&
             isProgressReportsActive &&
-            !user.isVolunteer
+            isStudent
           "
           class="DefaultHeader-menu-notification"
         />
@@ -44,6 +44,7 @@ export default {
       user: (state) => state.user.user,
     }),
     ...mapGetters({
+      isStudent: 'user/isStudent',
       avatarUrl: 'user/avatarUrl',
       mobileMode: 'app/mobileMode',
       name: 'user/firstName',

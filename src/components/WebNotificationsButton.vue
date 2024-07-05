@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import WebNotificationsModal from '@/components/WebNotificationsModal.vue'
 import getNotificationPermission from '@/utils/get-notification-permission'
 import LargeButton from '@/components/LargeButton.vue'
@@ -31,6 +31,9 @@ export default {
     this.handleNotificationButton()
   },
   computed: {
+    ...mapGetters({
+      isVolunteer: 'user/isVolunteer',
+    }),
     ...mapState({
       user: (state) => state.user.user,
       isMobileApp: (state) => state.app.isMobileApp,
@@ -44,7 +47,7 @@ export default {
       // User is a volunteer who is not onboarded or approved
       // or user is using the mobile app
       if (
-        (this.user.isVolunteer &&
+        (this.isVolunteer &&
           (!this.user.isOnboarded || !this.user.isApproved)) ||
         this.isMobileApp
       )

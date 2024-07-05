@@ -1,6 +1,7 @@
 <template>
   <volunteer-dashboard v-if="isVolunteer" />
-  <student-dashboard v-else />
+  <student-dashboard v-else-if="isStudent" />
+  <!-- TODO: TEACHER PROFILES. -->
 </template>
 
 <script>
@@ -20,6 +21,7 @@ export default {
     ...mapGetters({
       isAuthenticated: 'user/isAuthenticated',
       isVolunteer: 'user/isVolunteer',
+      isStudent: 'user/isStudent',
       gleapSegmentExperiments: 'featureFlags/gleapSegmentExperiments',
       isGleapSegmentExperimentsActive:
         'featureFlags/isGleapSegmentExperimentsActive',
