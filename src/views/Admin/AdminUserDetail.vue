@@ -169,10 +169,8 @@ import AdminEditUser from '@/views/Admin/AdminEditUser.vue'
 import PageControl from '@/components/Admin/PageControl.vue'
 
 const getUser = async (userId, page) => {
-  const {
-    data: { user },
-  } = await NetworkService.adminGetUser(userId, page)
-  return user
+  const { data } = await NetworkService.adminGetUser(userId, page)
+  return data
 }
 
 export default {
