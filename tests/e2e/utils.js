@@ -5,40 +5,6 @@ import { snake } from 'case'
 import { StudentDashboard } from './page-object-models/student-dashboard'
 import { Login } from './page-object-models/login'
 
-/**
- * Inserts a row into the users table.
- * @param args - Args correspond to columns in the users table, in camelCase. Defaults used for any omitted columns.
- */
-export const createUserRow = async (dbClient, args = {}) => {
-  const requiredParams = {
-    email: args?.email ?? faker.internet.email(),
-    firstName: args?.firstName ?? faker.person.firstName(),
-    lastName: args?.lastName ?? faker.person.lastName(),
-    id: getDbUlid(),
-    referralCode: faker.string.uuid(),
-  }
-  const params = {
-    ...requiredParams,
-    password: args?.password ?? createPassword(),
-    verified: args?.verified ?? true,
-    ...args,
-  }
-  const columnNames = Object.keys(params)
-    .map((key) => snake(key))
-    .join(', ')
-  const placeholders = Object.values(params)
-    .map((val, index) => `$${index + 1}`)
-    .join(', ')
-  await dbClient.query(
-    `INSERT INTO users (${columnNames}) VALUES (${placeholders})`,
-    Object.values({
-      ...params,
-      password: params.password ? await hashPassword(params.password) : null,
-    })
-  )
-  return params
-}
-
 export const createPassword = () => {
   return faker.internet.password({
     length: 10,

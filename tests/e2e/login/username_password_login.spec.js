@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { getClient } from '../db'
-import { createUserRow } from '../utils'
+import { createStudent } from '../utils'
 import { Login } from '../page-object-models/login'
 import { POSTHOG_FEATURE_FLAGS } from '../../../src/consts'
 
@@ -11,7 +11,7 @@ let dbClient
 let testUser
 test.beforeAll(async () => {
   dbClient = await getClient().connect()
-  testUser = await createUserRow(dbClient)
+  testUser = await createStudent(dbClient)
 })
 
 test.afterAll(async () => {
