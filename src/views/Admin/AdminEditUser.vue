@@ -120,9 +120,13 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import { isEmpty } from 'lodash-es'
 import NetworkService from '@/services/NetworkService'
+import {
+  isVolunteerUserType,
+  isStudentUserType,
+  isTeacherUserType,
+} from '@/utils/user-type'
 
 export default {
   name: 'AdminEditUser',
@@ -159,11 +163,15 @@ export default {
   },
 
   computed: {
-    ...mapGetters({
-      isVolunteer: 'user/isVolunteer',
-      isStudent: 'user/isStudent',
-      isTeacher: 'user/isTeacher',
-    }),
+    isVolunteer() {
+      return isVolunteerUserType(this.user.userType)
+    },
+    isStudent() {
+      return isStudentUserType(this.user.userType)
+    },
+    isTeacher() {
+      return isTeacherUserType(this.user.userType)
+    },
   },
 
   async created() {

@@ -19,6 +19,7 @@ describe('Admin User Detail', () => {
     isApproved: false,
     inGatesStudy: false,
     isAdmin: false,
+    userType: 'student',
     pastSessions: []
   }
 
@@ -50,10 +51,8 @@ describe('Admin User Detail', () => {
   ])('show correct label if property is true', async (arg, label) => {
     NetworkService.adminGetUser = vi.fn().mockResolvedValue({
       data: {
-        user: {
-          ...DEFAULT_USER,
-          ...arg
-        }
+        ...DEFAULT_USER,
+        ...arg
       },
     })
 
@@ -76,10 +75,8 @@ describe('Admin User Detail', () => {
   ])('does not show label if property is false', async (arg, label) => {
     NetworkService.adminGetUser = vi.fn().mockResolvedValue({
       data: {
-        user: {
-          ...DEFAULT_USER,
-          ...arg,
-        },
+        ...DEFAULT_USER,
+        ...arg,
       },
     })
 

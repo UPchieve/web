@@ -17,20 +17,28 @@
 
 <script>
 import moment from 'moment'
-import { mapGetters } from 'vuex'
 import StudentIcon from '@/assets/student-icon.svg'
 import VolunteerIcon from '@/assets/volunteer-icon.svg'
+import {
+  isVolunteerUserType,
+  isStudentUserType,
+  isTeacherUserType,
+} from '@/utils/user-type'
 
 export default {
   props: {
     user: Object,
   },
   computed: {
-    ...mapGetters({
-      isVolunteer: 'user/isVolunteer',
-      isStudent: 'user/isStudent',
-      isTeacher: 'user/isTeacher',
-    }),
+    isVolunteer() {
+      return isVolunteerUserType(this.user.userType)
+    },
+    isStudent() {
+      return isStudentUserType(this.user.userType)
+    },
+    isTeacher() {
+      return isTeacherUserType(this.user.userType)
+    },
     userIcon() {
       if (this.isVolunteer) {
         return VolunteerIcon
