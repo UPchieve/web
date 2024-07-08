@@ -34,6 +34,7 @@ import VolunteerOnboardingModal from '@/views/DashboardView/VolunteerDashboard/V
 import StudentOnboardingModal from '@/views/DashboardView/StudentDashboard/StudentOnboardingModal.vue'
 import ReportSessionModal from '@/views/SessionView/ReportSessionModal.vue'
 import StartCollegeSessionModal from '@/views/DashboardView/StudentDashboard/StartCollegeSessionModal.vue'
+import CreateTeacherClassModal from '@/components/CreateTeacherClassModal.vue'
 
 export default {
   components: {
@@ -48,6 +49,7 @@ export default {
     StudentOnboardingModal,
     ReportSessionModal,
     StartCollegeSessionModal,
+    CreateTeacherClassModal,
   },
   data() {
     return {

@@ -75,8 +75,27 @@ export default {
       }
     },
 
+    async createTeacherClass(className) {
+      this.isLoading = true
+      try {
+        const {
+          data: { teacherClass },
+        } = await NetworkService.createTeacherClass(className)
+        this.classes.push(teacherClass)
+      } catch (err) {
+        this.error = err.response.data.err ?? 'Unable to create class.'
+      } finally {
+        this.isLoading = false
+      }
+    },
+
     openCreateTeacherClassModal() {
-      // TODO: Implement.
+      this.$store.dispatch('app/modal/show', {
+        component: 'CreateTeacherClassModal',
+        data: {
+          createTeacherClass: this.createTeacherClass,
+        },
+      })
     },
   },
 }
