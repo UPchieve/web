@@ -924,4 +924,10 @@ export default {
       `${API_ROOT}/survey/progress-report/${progressReportId}/response`
     ).then(this._successHandler, this._errorHandler)
   },
+  getTeacherClasses() {
+    return httpGet(`${API_ROOT}/teachers/classes`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
 }
