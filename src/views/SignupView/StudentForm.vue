@@ -426,7 +426,7 @@
       <router-link class="uc-link" to="/login">Log In</router-link>
     </p>
 
-    <div v-if="offerGoogleSSO">
+    <div>
       <button
         class="uc-form-button google"
         @click.prevent="signUpWithGoogle"
@@ -837,7 +837,6 @@ export default {
   },
   computed: {
     ...mapGetters({
-      offerGoogleSSO: 'featureFlags/offerGoogleSSO',
       ccIntroCopy: 'featureFlags/ccIntroCopy',
       isBfIntroCopyEnabled: 'featureFlags/isBfIntroCopyEnabled',
       bfIntroCopy: 'featureFlags/bfIntroCopy',
