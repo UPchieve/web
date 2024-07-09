@@ -19,8 +19,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_EMAIL]: false,
       [POSTHOG_FEATURE_FLAGS.PROGRESS_REPORTS]: false,
       [POSTHOG_FEATURE_FLAGS.QUILL_V2]: false,
-      [POSTHOG_FEATURE_FLAGS.PAID_TUTOR]: false,
-      [POSTHOG_FEATURE_FLAGS.PAID_TUTORS_PILOT]: false,
       [POSTHOG_FEATURE_FLAGS.PROGRESS_REPORT_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.USE_NEW_SIGN_UP_FLOW]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_IN_APP_SESSION_NOTIFICATIONS]: false,
@@ -109,9 +107,6 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.PROGRESS_REPORTS],
     shouldUseQuillV2: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.QUILL_V2],
-    isPaidTutor: (state) => state.toggleFlags[POSTHOG_FEATURE_FLAGS.PAID_TUTOR],
-    isPaidTutorsPilotRunning: (state) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.PAID_TUTORS_PILOT],
     isProgressReportsSurveyActive: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.PROGRESS_REPORT_SURVEY],
     useNewSignUpFlow: (state) =>

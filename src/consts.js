@@ -572,8 +572,6 @@ export const POSTHOG_FEATURE_FLAGS = {
   ELIGIBILITY_EMAIL: 'eligibility-email',
   PROGRESS_REPORTS: 'progress-reports',
   QUILL_V2: 'quill-v2',
-  PAID_TUTOR: 'paid-tutor',
-  PAID_TUTORS_PILOT: 'paid-tutors-pilot',
   PROGRESS_REPORT_SURVEY: 'progress-report-survey',
   USE_NEW_SIGN_UP_FLOW: 'use-new-sign-up-flow',
   SHOW_IN_APP_SESSION_NOTIFICATIONS: 'show-in-app-session-notifications',

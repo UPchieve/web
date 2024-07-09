@@ -2,18 +2,13 @@ import sendWebNotification from '@/utils/send-web-notification'
 import StudentIcon from '@/assets/student-icon.svg'
 import Case from 'case'
 
-function getWaitTimeInSeconds({ createdAt }) {
-  const newTime = new Date().getTime() - new Date(createdAt).getTime()
-  return Number((newTime / 1000).toFixed(0))
-}
-
 export default {
   namespaced: true,
   state: {
     newWaitingStudentAudioElement: null,
     openSessions: [],
     tickIntervalId: null,
-    prioritySessions: new Set(),
+    ticks: 0,
   },
   mutations: {
     setNewWaitingStudentAudioElement: (state, element) =>
@@ -22,12 +17,8 @@ export default {
       (state.openSessions = openSessions),
     setTickIntervalId: (state, tickIntervalId) =>
       (state.tickIntervalId = tickIntervalId),
-    addPrioritySession: (state, student) => {
-      state.prioritySessions.add(student)
-    },
-    removePrioritySession: (state, student) => {
-      state.prioritySessions.delete(student)
-    },
+    incTicks: (state) => (state.ticks = state.ticks + 1),
+    resetTicks: (state) => (state.ticks = 0),
   },
   actions: {
     gotoSession({ dispatch }, { context, session }) {
@@ -100,57 +91,21 @@ export default {
     },
 
     /*
-     * this action needs to be defined so consumers can subscribe
-     * to when this is dispatched and act accordingly
-     * example: ListSessions.vue component subscribes and rerenders the wait time
-     *          for open sessions
-     */
-    tick({ state, commit }) {
-      state.openSessions.forEach((session) => {
-        const seconds = getWaitTimeInSeconds({ createdAt: session.createdAt })
-        /*
-         * We want extra alerting for our paid tutors.
-         * When we get close to the 40 second mark, we
-         * want to alert the paid tutors that they should
-         * pick it up soon by playing audio queues and
-         * flashing the student that is closing in on the
-         * 60 second mark. once we're at the 60 second mark,
-         * it's too late for the study, we want to prioritize
-         * other students under 60 seconds
-         */
-        const isPaidTutor = this.getters['featureFlags/isPaidTutor']
-        if (seconds >= 35 && seconds <= 60 && isPaidTutor) {
-          commit('addPrioritySession', session.id)
-        } else {
-          commit('removePrioritySession', session.id)
-        }
-      })
-
-      if (state.prioritySessions.size > 0) {
-        try {
-          state.newWaitingStudentAudioElement.play()
-        } catch (error) {
-          // eslint-disable-next-line no-console
-          console.log('Unable to play audio', error)
-        }
-      }
-    },
-
-    /*
-     * Broadcast a `tick` action at a specified interval.
+     * Update the `tick` state at a specified interval.
      * This can be used for things like:
      *  - rendering a dynamic wait time for specific students
      *  - dispatching an audio or visual alert at specified times
      */
-    tickInterval({ commit, state, dispatch }, wait = 1000) {
+    tickInterval({ commit, state }, wait = 1000) {
       commit(
         'setTickIntervalId',
         setInterval(() => {
           if (state.openSessions.length === 0) {
             clearInterval(state.tickIntervalId)
             commit('setTickIntervalId', null)
+            commit('resetTicks', null)
           } else {
-            dispatch('tick')
+            commit('incTicks', null)
           }
         }, wait)
       )
@@ -161,9 +116,6 @@ export default {
       { context, sessions }
     ) {
       const user = this.state.user.user
-      const isPaidTutor = this.getters['featureFlags/isPaidTutor']
-      const isPaidTutorsPilotRunning =
-        this.getters['featureFlags/isPaidTutorsPilotRunning']
       const isMutedSubjectAlertsActive =
         this.getters['featureFlags/isMutedSubjectAlertsActive']
 
@@ -184,7 +136,7 @@ export default {
       const results = []
       const socketSessions = sessions.filter((session) => !session.volunteer)
       for (const session of socketSessions) {
-        const { subTopic, type, paidTutorsPilotGroup } = session
+        const { subTopic } = session
 
         const isAdminOrTestUser = user.isAdmin || user.isTestUser
         // Show test accounts to admin and test volunteer accounts
@@ -192,19 +144,6 @@ export default {
           (session.student.isTestUser || session.student.isShadowBanned) &&
           !isAdminOrTestUser
         ) {
-          continue
-        }
-
-        if (isPaidTutor && isPaidTutorsPilotRunning) {
-          if (
-            ['math', 'college'].includes(type) &&
-            paidTutorsPilotGroup === 'test' &&
-            user.subjects.includes(subTopic)
-          ) {
-            results.push(session)
-          }
-          // Paid tutor should only pick up students in the 'test' group
-          // Do not show any other sessions
           continue
         }
 
