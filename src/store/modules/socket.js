@@ -35,7 +35,11 @@ export default {
     bindEvents({ commit, rootState, rootGetters }) {
       socket.on('connect', async () => {
         commit('setIsConnected', true)
-        socket.emit('client_connect')
+        socket.emit('client_connect', {
+          metadata: {
+            pageVisibility: document.visibilityState,
+          },
+        })
         // TODO: Refactor references to isSessionConnectionAlive to use the isConnected state in this store
         this.dispatch('user/sessionConnected')
       })
@@ -43,7 +47,12 @@ export default {
       // https://socket.io/docs/v2/client-api/#event-disconnect
       socket.on('disconnect', async (reason) => {
         commit('setIsConnected', false)
-        socket.emit('client_disconnect', reason)
+        socket.emit('client_disconnect', {
+          reason,
+          metadata: {
+            pageVisibility: document.visibilityState,
+          },
+        })
         this.dispatch('user/sessionDisconnected')
         // Ignore logging errors for when we make manual disconnects, e.g logging out
         if (reason === 'io client disconnect') return
@@ -60,20 +69,35 @@ export default {
       })
 
       socket.on('connect_error', (error) => {
-        socket.emit('client_connect_error', error)
+        socket.emit('client_connect_error', {
+          error,
+          metadata: {
+            pageVisibility: document.visibilityState,
+          },
+        })
         // these are handled internally and shouldn't be forwarded to Sentry
         if (isExemptSocketError(error)) return
         LoggerService.noticeError(error)
       })
 
       socket.io.on('error', (error) => {
-        socket.emit('client_error', error)
+        socket.emit('client_error', {
+          error,
+          metadata: {
+            pageVisibility: document.visibilityState,
+          },
+        })
         if (isExemptSocketError(error)) return
         LoggerService.noticeError(error)
       })
 
       socket.io.on('reconnect_error', (error) => {
-        socket.emit('client_reconnect_error', error)
+        socket.emit('client_reconnect_error', {
+          error,
+          metadata: {
+            pageVisibility: document.visibilityState,
+          },
+        })
         if (isExemptSocketError(error)) return
         LoggerService.noticeError(error)
       })
