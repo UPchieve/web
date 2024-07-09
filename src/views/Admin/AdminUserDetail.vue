@@ -160,13 +160,13 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import moment from 'moment'
 import NetworkService from '@/services/NetworkService'
 import SessionsList from '@/components/Admin/SessionsList.vue'
 import AdminPendingVolunteerDetail from '@/views/Admin/AdminPendingVolunteerDetail.vue'
 import AdminEditUser from '@/views/Admin/AdminEditUser.vue'
 import PageControl from '@/components/Admin/PageControl.vue'
+import { isVolunteerUserType, isStudentUserType } from '@/utils/user-type'
 
 const getUser = async (userId, page) => {
   const { data } = await NetworkService.adminGetUser(userId, page)
@@ -198,10 +198,12 @@ export default {
   },
 
   computed: {
-    ...mapGetters({
-      isVolunteer: 'user/isVolunteer',
-      isStudent: 'user/isStudent',
-    }),
+    isVolunteer() {
+      return isVolunteerUserType(this.user.userType)
+    },
+    isStudent() {
+      return isStudentUserType(this.user.userType)
+    },
 
     createdAt() {
       return moment(this.user.createdAt).format('l, h:mm a')
