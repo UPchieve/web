@@ -1,64 +1,35 @@
 import { shallowMount } from '@vue/test-utils'
-
 import RecentSubjectCard from '../../../src/views/DashboardView/StudentDashboard/SubjectSelection/RecentSubjectCard.vue'
 
-//import ArrowIcon from '../../../src/assets/arrow.svg';
+const subject = {
+  id: 2,
+  displayName: 'Algebra 1',
+  topicIconLink: 'https://path.com/to/images/math.svg',
+}
 
-//👇 Imports a specific story for the test
-import {
-  DefaultCard,
-  HoveredCard,
-  ActiveCard,
-  DisabledCard,
-} from '../../../src/stories/RecentSubjectCard.stories'
-
-describe.skip('RecentSubjectCard', () => {
-  it('renders recent subject card in default state', () => {
+describe('RecentSubjectCard', () => {
+  it('renders subject card with subject data', () => {
     const wrapper = shallowMount(RecentSubjectCard, {
-      props: DefaultCard.args,
+      props: {
+        subject,
+        disabled: false,
+      },
     })
 
     expect(wrapper.findComponent(RecentSubjectCard))
-    expect(wrapper.props('title')).toBe('Algebra 1')
-    expect(wrapper.props('disableSubjectCard')).toBe(false)
-    expect(wrapper.find('.SubjectCard').exists()).toBe(true)
-
-    /* SVGs not rendered in tests. Refer to README.md here for further explanation: https://gitlab.com/upchieve/subway
-    expect(wrapper.contains('ArrowIcon')).toBe(true);
-    const arrow = wrapper.find('ArrowIcon');
-    expect(arrow.exists()).toBe(true);
-    expect(arrow.isVisible()).toBe(true);
-    expect(wrapper.find('svg')).toBe('MathSVG');
-    */
+    expect(wrapper.find('.subject-card').exists()).toBe(true)
+    expect(wrapper.find('.subject-card-title').text()).toBe('Algebra 1')
   })
 
-  //
-  it('renders the recent subject card in the hovered state', () => {
+  it('emits clicked event to parent', async () => {
     const wrapper = shallowMount(RecentSubjectCard, {
-      props: HoveredCard.args,
+      props: {
+        subject,
+        disabled: false,
+      },
     })
 
-    expect(wrapper.props('title')).toBe('Algebra 2')
-    expect(wrapper.props('disableSubjectCard')).toBe(false)
-  })
-
-  //unable to test SVGs and classes on SVG elements
-  it('renders the recent subject card in the active state', () => {
-    const wrapper = shallowMount(RecentSubjectCard, {
-      props: ActiveCard.args,
-    })
-
-    expect(wrapper.props('title')).toBe('Calc 1')
-    expect(wrapper.props('disableSubjectCard')).toBe(false)
-  })
-
-  //test for disabled recent subject card
-  it('renders the recent subject card in the disabled state', () => {
-    const wrapper = shallowMount(RecentSubjectCard, {
-      props: DisabledCard.args,
-    })
-
-    expect(wrapper.props('title')).toBe('Calc 2')
-    expect(wrapper.props('disableSubjectCard')).toBe(true)
+    await wrapper.find('.subject-card').trigger('click')
+    expect(wrapper.emitted('subject-clicked')).toBeTruthy()
   })
 })
