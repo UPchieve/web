@@ -26,6 +26,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.WHITEBOARD_ERASER_TOOL]: false,
       [POSTHOG_FEATURE_FLAGS.SESSION_PRESENCE]: false,
       [POSTHOG_FEATURE_FLAGS.MOST_RECENT_SUBJECTS]: false,
+      [POSTHOG_FEATURE_FLAGS.ABOUT_THIS_SESSION_SURVEY]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -123,5 +124,7 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SESSION_PRESENCE],
     isMostRecentSubjectsActive: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.MOST_RECENT_SUBJECTS],
+    isAboutThisSessionSurveyActive: (state) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.ABOUT_THIS_SESSION_SURVEY],
   },
 }
