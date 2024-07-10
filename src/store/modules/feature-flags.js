@@ -12,7 +12,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SESSION_RECAP_DMS]: false,
       [POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY]: false,
       [POSTHOG_FEATURE_FLAGS.NEW_ELIGIBILITY_FORM_DESIGN]: false,
-      [POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO]: true,
       [POSTHOG_FEATURE_FLAGS.DASHBOARD_REDESIGN]: false,
       [POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION]: false,
       [POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION]: false,
@@ -68,8 +67,6 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS],
     isPollingFlagsActive: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.POLL_FLAGS],
-    offerGoogleSSO: (state) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.OFFER_GOOGLE_SSO],
     orbitalSegments: (state) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS],
     isOrbitalSegmentsActive: (state) =>

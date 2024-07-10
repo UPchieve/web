@@ -50,7 +50,6 @@ describe('StudentForm', () => {
           ...featureFlagsModule,
           getters: {
             ...featureFlagsModule.getters,
-            offerGoogleSSO: () => true,
             ccIntroCopy: () => true,
             isBfIntroCopyEnabled: () => true,
             bfIntroCopy: () => true,
