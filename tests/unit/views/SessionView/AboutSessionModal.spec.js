@@ -1,26 +1,24 @@
 import { mount } from '@vue/test-utils'
 import { createStore } from 'vuex'
 import userModule from '@/store/modules/user'
+import featureFlagsModule from '@/store/modules/feature-flags'
 import AboutSessionModal from '@/views/SessionView/AboutSessionModal.vue'
 import { vi } from 'vitest'
 
 describe('AboutSessionModal', () => {
-  let DEFAULT_SESSION, DEFAULT_PROPS
+  const DEFAULT_PROPS = {
+    closeModal: vi.fn(),
+    responses: [],
+    totalStudentSessions: 5,
+  }
+  const DEFAULT_SESSION = {
+    student: {
+      firstname: 'Malzie',
+    },
+  }
 
   beforeEach(() => {
     vi.resetAllMocks()
-
-    DEFAULT_SESSION = {
-      student: {
-        firstname: 'Malzie',
-      },
-    }
-
-    DEFAULT_PROPS = {
-      closeModal: vi.fn(),
-      responses: [],
-      totalStudentSessions: 5,
-    }
   })
 
   /**
@@ -38,11 +36,25 @@ describe('AboutSessionModal', () => {
             },
           },
         },
+        featureFlags: {
+          ...featureFlagsModule,
+          getters: {
+            isAboutThisSessionSurveyActive: () =>
+              overrides.featureFlags?.isAboutThisSessionSurveyActive ?? false,
+          }
+        }
       },
     })
 
     return mount(AboutSessionModal, {
-      global: { plugins: [store] },
+      global: {
+        plugins: [store],
+        mocks: {
+          $route: {
+            params: { sessionId: '12345' },
+          },
+        },
+      },
       props: {
         ...DEFAULT_PROPS,
         ...(overrides.props ?? {}),
@@ -129,6 +141,19 @@ describe('AboutSessionModal', () => {
         },
       })
       expect(wrapper.find('[data-testid="upchieves-tip"]').exists()).toBeFalsy()
+    })
+  })
+
+  describe('About This Session survey', () => {
+    it.each([false, true])(
+      'Should only render the survey if the FF is on',
+      (surveyEnabled) => {
+        const wrapper = getWrapper({
+          featureFlags: {
+            isAboutThisSessionSurveyActive: surveyEnabled
+          }
+        })
+        expect(wrapper.find('[data-testid="about-this-session-survey"]').exists()).toEqual(surveyEnabled)
     })
   })
 })
