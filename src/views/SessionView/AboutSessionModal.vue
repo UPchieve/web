@@ -55,6 +55,10 @@
           </div>
         </div>
       </div>
+      <about-this-session-survey
+        data-testid="about-this-session-survey"
+        v-if="isAboutThisSessionSurveyEnabled"
+      />
     </div>
   </modal>
 </template>
@@ -64,19 +68,24 @@ import Modal from '@/components/Modal.vue'
 import Stepper from '@/components/Stepper.vue'
 import AlertIcon from '@/assets/blue-alert.svg'
 import CrossIcon from '@/assets/cross.svg'
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
+import AboutThisSessionSurvey from '@/components/AboutThisSessionSurvey.vue'
 
 const LOW_CONFIDENCE_THRESHOLD = 2
 
 export default {
   name: 'about-session-modal',
-  components: { Modal, Stepper, AlertIcon, CrossIcon },
+  components: { AboutThisSessionSurvey, Modal, Stepper, AlertIcon, CrossIcon },
   props: {
     closeModal: { type: Function, required: true },
     responses: { type: Array, required: true },
     totalStudentSessions: { type: Number, required: true },
   },
   computed: {
+    ...mapGetters({
+      isAboutThisSessionSurveyEnabled:
+        'featureFlags/isAboutThisSessionSurveyActive',
+    }),
     ...mapState({
       session: (state) => state.user.session,
     }),
@@ -172,14 +181,13 @@ export default {
 }
 
 .subtitle {
-  font-size: 12px;
   font-weight: 400;
   margin-top: 0.8em;
 }
 
 .session-info {
   background-color: #f7fbfe;
-  padding: 2em 3.5em 3.5em 3.5em;
+  padding: 3% 5% 5% 5%;
 
   &-stepper-container {
     @include flex-container(row);
@@ -233,7 +241,6 @@ export default {
 
 .tip {
   background-color: $c-background-blue;
-  font-size: 12px;
   margin-top: 1.4em;
   padding: 1.4em;
 
