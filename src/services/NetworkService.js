@@ -936,4 +936,10 @@ export default {
       this._errorHandler
     )
   },
+  saveBigFutureEmailForStudy(email) {
+    return httpPost(`${ELIGIBILITY_API_ROOT}/big-future/email`, { email }).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
 }

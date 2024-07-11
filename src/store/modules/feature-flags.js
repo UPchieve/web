@@ -26,6 +26,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SESSION_PRESENCE]: false,
       [POSTHOG_FEATURE_FLAGS.MOST_RECENT_SUBJECTS]: false,
       [POSTHOG_FEATURE_FLAGS.ABOUT_THIS_SESSION_SURVEY]: false,
+      [POSTHOG_FEATURE_FLAGS.BIG_FUTURE_EMAIL_ELIGIBILITY_FLOW]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -123,5 +124,9 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.MOST_RECENT_SUBJECTS],
     isAboutThisSessionSurveyActive: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.ABOUT_THIS_SESSION_SURVEY],
+    isBigFutureEmailFirstFlowActive: (state) =>
+      state.toggleFlags[
+        POSTHOG_FEATURE_FLAGS.BIG_FUTURE_EMAIL_ELIGIBILITY_FLOW
+      ],
   },
 }

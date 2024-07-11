@@ -9,10 +9,15 @@
     >
       {{ customEligibilityHeader || `Awesome! Let's check if we're a match` }}
     </h1>
-    <div v-if="showBigFutureIntroCopy">
+    <div
+      v-if="showBigFutureIntroCopy && !showBigFutureUpdatedEligibilityIntroCopy"
+    >
       <p class="uc-form-text">
         {{ bfIntroCopy }}
       </p>
+    </div>
+    <div v-if="showBigFutureUpdatedEligibilityIntroCopy">
+      <p class="uc-form-text">Just one more step to access free tutoring!</p>
     </div>
     <div v-if="isCollegeConfidential">
       <div v-if="ccIntroCopy === 'get-that-a'">
@@ -56,7 +61,60 @@
       Create an account now to access FREE, 24/7 tutoring in all your classes,
       including AP Computer Science.
     </div>
+
     <form
+      v-if="showBigFutureEmailFirstFlow"
+      id="form-eligibility-two"
+      class="uc-column"
+      @submit.prevent="submitBigFutureEmail()"
+    >
+      <div class="uc-form-element">
+        <div class="uc-row justify-between">
+          <label
+            for="student-email"
+            v-bind:class="{
+              error: hasFormValidationError(v$.eligibility.studentEmail),
+            }"
+            >Student Email</label
+          >
+          <div
+            v-if="hasFormValidationError(v$.eligibility.studentEmail)"
+            class="error-caption"
+          >
+            {{ getFormValidationError(v$.eligibility.studentEmail) }}
+          </div>
+        </div>
+        <input
+          id="student-email"
+          data-testid="student-email-input"
+          class="uc-form-text-input"
+          type="email"
+          :placeholder="`Enter ${getFormLabelIdentifierPossessive} email address`"
+          :aria-label="`Enter ${getFormLabelIdentifierPossessive} email address`"
+          v-model="eligibility.studentEmail"
+          v-bind:class="{
+            'uc-form-text-input-invalid': hasFormValidationError(
+              v$.eligibility.studentEmail
+            ),
+          }"
+          @blur="v$.eligibility.studentEmail.$touch"
+          required
+        />
+      </div>
+
+      <button
+        id="btn-eligibility-submit"
+        data-testid="eligibility-form-submit-btn"
+        class="uc-form-button"
+        :disabled="cannotSubmitForm(v$.eligibility.studentEmail) ? true : null"
+        type="submit"
+      >
+        Continue
+      </button>
+    </form>
+
+    <form
+      v-else
       id="form-eligibility"
       class="uc-column"
       @submit.prevent="
@@ -244,7 +302,10 @@
         />
       </div>
 
-      <div v-if="!skipEligibilityEmail" class="uc-form-element">
+      <div
+        v-if="!skipEligibilityEmail && !isEmailEligibilityHidden"
+        class="uc-form-element"
+      >
         <div class="uc-row justify-between">
           <label
             for="student-email"
@@ -777,6 +838,9 @@ export default {
       showCodeDotOrgIntroCopy: false,
       skipEligibilityEmail: false,
       useParentGuardianSignUpFlow: false,
+      showBigFutureEmailFirstFlow: false,
+      isEmailEligibilityHidden: false,
+      showBigFutureUpdatedEligibilityIntroCopy: false,
     }
   },
   async mounted() {
@@ -824,6 +888,20 @@ export default {
       ) {
         this.showBigFutureIntroCopy = true
       }
+
+      if (
+        this.partnerKey === 'bigfuture' &&
+        this.isBigFutureEmailFirstFlowActive
+      ) {
+        this.showBigFutureEmailFirstFlow = true
+        this.isEmailEligibilityHidden = true
+        AnalyticsService.captureEvent(
+          EVENTS.BIG_FUTURE_STUDENT_SAW_EMAIL_ONLY_FLOW,
+          {
+            partnerKey: this.partnerKey,
+          }
+        )
+      }
     }
 
     this.skipEligibilityEmail =
@@ -841,6 +919,8 @@ export default {
       isBfIntroCopyEnabled: 'featureFlags/isBfIntroCopyEnabled',
       bfIntroCopy: 'featureFlags/bfIntroCopy',
       eligibilityEmail: 'featureFlags/eligibilityEmail',
+      isBigFutureEmailFirstFlowActive:
+        'featureFlags/isBigFutureEmailFirstFlowActive',
     }),
     trimCurrentGrade() {
       // extracting the first word out of the gradeLevels
@@ -896,6 +976,15 @@ export default {
           AnalyticsService.captureEvent(EVENTS.STUDENT_ENTERED_EMAIL)
         this.hasEnteredEmail = true
       }
+    },
+    'eligibility.studentEmail': async function (currentValue, oldValue) {
+      if (currentValue && !oldValue) {
+        if (!this.hasEnteredEmail)
+          AnalyticsService.captureEvent(EVENTS.STUDENT_ENTERED_EMAIL)
+        this.hasEnteredEmail = true
+      }
+      if (!this.cannotSubmitForm(this.v$.eligibility.studentEmail))
+        await this.submitTypedBigFutureEmail()
     },
     'eligibility.zipCode': function (currentValue, oldValue) {
       if (currentValue && !oldValue) {
@@ -1080,6 +1169,41 @@ export default {
             'Unknown server error'
           this.errors.push(error)
         })
+    },
+
+    async submitBigFutureEmail() {
+      this.errors = []
+      AnalyticsService.captureEvent(
+        EVENTS.BIG_FUTURE_SUBMITTED_EMAIL_IN_EMAIL_ONLY_FLOW,
+        {
+          partnerKey: this.partnerKey,
+        }
+      )
+      if (!this.eligibility.studentEmail && !this.skipEligibilityEmail)
+        this.errors.push('An email address is required.')
+
+      try {
+        await NetworkService.saveBigFutureEmailForStudy(
+          this.eligibility.studentEmail
+        )
+        this.showBigFutureEmailFirstFlow = false
+        this.showBigFutureUpdatedEligibilityIntroCopy = true
+      } catch (res) {
+        const error =
+          (res.body && (res.body.err || res.body.message)) ||
+          'Unknown server error'
+        this.errors.push(error)
+      }
+    },
+
+    async submitTypedBigFutureEmail() {
+      try {
+        await NetworkService.saveBigFutureEmailForStudy(
+          this.eligibility.studentEmail
+        )
+      } catch (error) {
+        // silently error
+      }
     },
 
     async accountPage() {
