@@ -983,7 +983,10 @@ export default {
           AnalyticsService.captureEvent(EVENTS.STUDENT_ENTERED_EMAIL)
         this.hasEnteredEmail = true
       }
-      if (!this.cannotSubmitForm(this.v$.eligibility.studentEmail))
+      if (
+        !this.cannotSubmitForm(this.v$.eligibility.studentEmail) &&
+        this.isBigFutureEmailFirstFlowActive
+      )
         await this.submitTypedBigFutureEmail()
     },
     'eligibility.zipCode': function (currentValue, oldValue) {
