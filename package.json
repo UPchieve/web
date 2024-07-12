@@ -71,7 +71,7 @@
     "yjs": "^13.6.11"
   },
   "devDependencies": {
-    "@azure/static-web-apps-cli": "^1.1.7",
+    "@azure/static-web-apps-cli": "^1.1.10",
     "@faker-js/faker": "^8.4.1",
     "@playwright/test": "^1.42.1",
     "@types/node": "^20.11.30",
