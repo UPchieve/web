@@ -985,7 +985,8 @@ export default {
       }
       if (
         !this.cannotSubmitForm(this.v$.eligibility.studentEmail) &&
-        this.isBigFutureEmailFirstFlowActive
+        this.isBigFutureEmailFirstFlowActive &&
+        this.partnerKey === 'bigfuture'
       )
         await this.submitTypedBigFutureEmail()
     },
