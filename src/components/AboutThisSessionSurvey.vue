@@ -18,22 +18,10 @@
         <span class="question-text">Is this information helpful?</span>
         <div class="question-1">
           <div class="question-1--options">
-            <button
-              @click="submitRating(-1)"
-              class="thumbs-down"
-              :class="{ 'selected-rating-btn': rating === -1 }"
-              data-testid="low-rating-btn"
-            >
-              <ThumbsDownIcon />
-            </button>
-            <button
-              @click="submitRating(1)"
-              class="thumbs-up"
-              :class="{ 'selected-rating-btn': rating === 1 }"
-              data-testid="high-rating-btn"
-            >
-              <ThumbsUpIcon />
-            </button>
+            <ThumbsUpDownButtons
+              :onClickThumbsUp="() => submitRating(1)"
+              :onClickThumbsDown="() => submitRating(-1)"
+            />
           </div>
         </div>
       </div>
@@ -66,14 +54,13 @@
 <script>
 import AnalyticsService from '@/services/AnalyticsService'
 import LargeButton from '@/components/LargeButton.vue'
-import ThumbsUpIcon from '@/assets/thumbs-up.svg'
-import ThumbsDownIcon from '@/assets/thumbs-down.svg'
 import { nextTick } from 'vue'
 import { EVENTS } from '@/consts'
+import ThumbsUpDownButtons from '@/components/ThumbsUpDownButtons.vue'
 
 export default {
   name: 'about-this-session-survey',
-  components: { LargeButton, ThumbsDownIcon, ThumbsUpIcon },
+  components: { ThumbsUpDownButtons, LargeButton },
   async mounted() {
     AnalyticsService.captureEvent(EVENTS.USER_SHOWN_ABOUT_THIS_SESSION_SURVEY, {
       ...this.generalEventProperties,
@@ -142,47 +129,6 @@ export default {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-
-  button {
-    width: 60px;
-    height: 60px;
-    svg {
-      width: 50px;
-      height: 50px;
-      margin: auto;
-    }
-  }
-
-  .selected-rating-btn {
-    transform: scale(1.1);
-    border: 1px solid $c-soft-black;
-  }
-
-  .thumbs-up {
-    background-color: rgba($c-success-green, 0.5);
-    border-radius: 50%;
-    svg {
-      padding-bottom: 5px;
-    }
-
-    &:hover {
-      transform: scale(1.1);
-      background-color: lighten($c-success-green, 5%);
-    }
-  }
-
-  .thumbs-down {
-    background-color: rgba($c-error-red, 0.5);
-    border-radius: 50%;
-    svg {
-      padding-top: 5px;
-    }
-
-    &:hover {
-      transform: scale(1.1);
-      background-color: lighten($c-error-red, 5%);
-    }
-  }
 
   &--options {
     display: flex;
