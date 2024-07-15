@@ -43,7 +43,9 @@
         ref="question2"
         data-testid="question-2"
       >
-        <span class="question-text">How could we improve this page?</span>
+        <span class="question-text"
+          >What made you choose {{ ratingEmoji }}?</span
+        >
         <textarea
           class="comments-textarea"
           v-model="comments"
@@ -116,6 +118,13 @@ export default {
       return {
         sessionId: this.sessionId,
       }
+    },
+    ratingEmoji() {
+      return this.rating === 0
+        ? 'that response'
+        : this.rating === 1
+          ? '👍'
+          : '👎'
     },
   },
 }
