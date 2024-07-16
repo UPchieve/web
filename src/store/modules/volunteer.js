@@ -141,8 +141,8 @@ export default {
         const isAdminOrTestUser = user.isAdmin || user.isTestUser
         // Show test accounts to admin and test volunteer accounts
         if (
-          (session.student.isTestUser || session.student.isShadowBanned) &&
-          !isAdminOrTestUser
+          (session.student.isTestUser && !isAdminOrTestUser) ||
+          (session.student.isShadowBanned && !user.isAdmin)
         ) {
           continue
         }
@@ -194,7 +194,7 @@ export default {
         rootGetters['user/isVolunteer'] &&
         rootState.user.user.isOnboarded &&
         rootState.user.user.isApproved &&
-        !rootState.user.user.isBanned
+        rootState.user.user.banType !== 'complete'
       )
     },
   },

@@ -138,6 +138,17 @@ export default {
   },
 
   data() {
+    const banOptions = this.user.isVolunteer
+      ? [
+          { text: 'False', value: null },
+          { text: 'True', value: 'complete' },
+        ]
+      : [
+          { text: 'None', value: undefined },
+          { text: 'Complete Ban', value: 'complete' },
+          { text: 'Shadow Ban', value: 'shadow' },
+        ]
+
     return {
       firstName: '',
       lastName: '',
@@ -146,7 +157,6 @@ export default {
       partnerSchool: {},
       partnerSite: '',
       isVerified: false,
-      isBanned: false,
       banType: null,
       isDeactivated: false,
       isApproved: false,
@@ -226,7 +236,6 @@ export default {
     this.email = this.user.email
     this.partnerSite = this.user.partnerSite || ''
     this.isVerified = this.user.verified
-    this.isBanned = this.user.banType === 'complete'
     this.banType = this.user.banType
     this.isDeactivated = this.user.isDeactivated
     this.isApproved = this.user.isApproved
@@ -261,7 +270,6 @@ export default {
         partnerOrg: isEmpty(this.partnerOrg) ? '' : this.partnerOrg.key,
         partnerSite: '',
         isVerified: this.isVerified,
-        isBanned: this.banType === 'complete',
         banType: this.banType,
         isDeactivated: this.isDeactivated,
         isApproved: this.isApproved,

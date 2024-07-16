@@ -53,7 +53,7 @@ export default {
         status.text = 'Ready to help'
       }
 
-      if (this.user.isBanned) {
+      if (this.user.banType === 'complete') {
         status.class += '--banned'
         status.text = 'Paused'
       }
