@@ -439,7 +439,7 @@ export default {
         userType: state.user.type,
         createdAt: state.user.createdAt,
         totalSessions: state.user.pastSessions.length,
-        isBanned: state.user.isBanned,
+        banType: state.user.banType,
         isTestUser: state.user.isTestUser,
       }
       if (getters.isVolunteer) {

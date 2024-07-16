@@ -50,8 +50,8 @@ describe('Volunteer store module', () => {
         user: {
           state: {
             user: {
-              isBanned: true, // should not be ready to tutor then
-              userType: 'volunteer',
+              banType: 'complete',
+              isVolunteer: true,
               isApproved: true,
               isOnboarded: true,
             },
@@ -90,7 +90,7 @@ describe('Volunteer store module', () => {
               userType: 'volunteer',
               isOnboarded: true,
               isApproved: true,
-              isBanned: false,
+              banType: null,
             },
           },
           getters: {
@@ -105,7 +105,7 @@ describe('Volunteer store module', () => {
       { state: { userType: 'student' } },
       { state: { isApproved: false } },
       { state: { isOnboarded: false } },
-      { state: { isBanned: true } },
+      { state: { banType: 'complete' } },
     ])('Negative cases: Returns FALSE when %s', (arg) => {
       const store = getStore({
         user: {
@@ -114,7 +114,7 @@ describe('Volunteer store module', () => {
               userType: 'volunteer',
               isOnboarded: true,
               isApproved: true,
-              isBanned: false,
+              banType: null,
               ...(arg?.state ?? {}),
             },
           },

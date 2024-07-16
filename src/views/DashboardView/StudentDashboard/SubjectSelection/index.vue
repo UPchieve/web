@@ -169,6 +169,13 @@ export default {
         this.hasWaitingPeriod = false
       }
     },
+    isCardDisabled() {
+      return (
+        this.disableSubjectCard ||
+        this.isSessionAlive ||
+        this.user.banType === 'complete'
+      )
+    },
   },
 }
 </script>

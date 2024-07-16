@@ -105,7 +105,7 @@ export default {
       this.showTellThemCollegePrepModal = true
 
     // TODO: move globally to show banner in all pages
-    if (this.user && this.user.isBanned) {
+    if (this.user && this.user.banType === 'complete') {
       this.$store.dispatch('app/header/show', bannedHeaderData)
     }
   },
