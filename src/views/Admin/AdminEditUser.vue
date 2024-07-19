@@ -138,17 +138,6 @@ export default {
   },
 
   data() {
-    const banOptions = this.user.isVolunteer
-      ? [
-          { text: 'False', value: null },
-          { text: 'True', value: 'complete' },
-        ]
-      : [
-          { text: 'None', value: undefined },
-          { text: 'Complete Ban', value: 'complete' },
-          { text: 'Shadow Ban', value: 'shadow' },
-        ]
-
     return {
       firstName: '',
       lastName: '',

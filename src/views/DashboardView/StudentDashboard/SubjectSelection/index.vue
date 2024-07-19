@@ -108,7 +108,9 @@ export default {
     },
     isCardDisabled() {
       return (
-        this.disableSubjectCard || this.isSessionAlive || this.user.isBanned
+        this.disableSubjectCard ||
+        this.isSessionAlive ||
+        this.user.banType === 'complete'
       )
     },
   },
@@ -168,13 +170,6 @@ export default {
       } else {
         this.hasWaitingPeriod = false
       }
-    },
-    isCardDisabled() {
-      return (
-        this.disableSubjectCard ||
-        this.isSessionAlive ||
-        this.user.banType === 'complete'
-      )
     },
   },
 }
