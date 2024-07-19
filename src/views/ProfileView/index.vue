@@ -72,7 +72,7 @@
                 v-show="!activeEdit && user.phone"
                 class="answer phone-answer"
               >
-                {{ internationalPhoneInfo.number }}
+                {{ phoneInputInfo.e164 }}
 
                 <!-- Unverified phone number: Show alert with CTA to verify phone number -->
                 <div
@@ -95,8 +95,7 @@
                 class="phone-input"
                 required="true"
                 v-show="activeEdit"
-                v-model="phoneNational"
-                :country-code="internationalPhoneInfo.country"
+                v-model="phone"
                 show-code-on-list
                 @update="onPhoneInputUpdate"
               />
@@ -259,7 +258,6 @@
 </template>
 
 <script>
-import PhoneNumber from 'awesome-phonenumber'
 import { mapGetters, mapState } from 'vuex'
 import UserService from '@/services/UserService'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -294,7 +292,7 @@ export default {
       errors: [],
       invalidInputs: [],
       saveFailed: false,
-      phoneNational: '',
+      phone: '',
       phoneInputInfo: {},
       isAccountActive: true,
       isAllowingNotifications: true,
@@ -310,16 +308,7 @@ export default {
     this.isAllowingNotifications = getNotificationPermission() === 'granted'
     this.isAccountActive = !this.user.isDeactivated
     if (this.user.phone) {
-      const num =
-        this.user.phone[0] === '+' ? this.user.phone : `+1${this.user.phone}`
-      const pn = new PhoneNumber(num)
-      this.phoneNational = pn.getNumber('national')
-
-      this.phoneInputInfo = {
-        isValid: true,
-        e164: pn.getNumber('e164'),
-      }
-
+      this.phone = this.user.phone
       this.smsConsent = this.user.smsConsent
     }
     if (this.isMutedSubjectAlertsActive && this.isVolunteer) {
@@ -349,36 +338,6 @@ export default {
     },
     VERIFICATION_METHOD() {
       return VERIFICATION_METHOD
-    },
-    internationalPhoneInfo() {
-      if (!this.user.phone) return false
-
-      const num =
-        this.user.phone[0] === '+' ? this.user.phone : `+1 ${this.user.phone}`
-      const pn = new PhoneNumber(num)
-
-      return {
-        number: pn.getNumber('international'),
-        country: pn.getRegionCode(),
-      }
-    },
-    certKey() {
-      let subtopicObj = {}
-
-      for (let [topicName, topicData] of Object.entries(this.subjects)) {
-        for (let topic in topicData.subtopics) {
-          if (
-            Object.prototype.hasOwnProperty.call(topicData.subtopics, topic)
-          ) {
-            const { displayName } = topicData.subtopics[topic]
-            let topicDisplay = topicName
-            // TODO: remove when `readingWriting` is updated to have `english` as a key
-            if (topicDisplay === 'readingWriting') topicDisplay = 'english'
-            subtopicObj[displayName] = topicDisplay.toUpperCase()
-          }
-        }
-      }
-      return subtopicObj
     },
     userSubjects() {
       const user = this.$store.state.user.user

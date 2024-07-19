@@ -167,9 +167,8 @@
           <maz-phone-number-input
             id="phoneNumber"
             class="phone-input"
+            v-model="formData.phone"
             required="true"
-            v-model="phoneNational"
-            :country-code="internationalPhoneInfo.country"
             show-code-on-list
             @update="onPhoneInputUpdate"
           />
@@ -281,6 +280,8 @@ export default {
         phone: '',
         terms: false,
       },
+      // model emitted by maz-phone-number-input update event
+      // see https://maz-ui.com/components/maz-phone-number-input#types
       phoneInputInfo: {},
       errors: [],
       invalidInputs: [],

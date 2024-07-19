@@ -41,7 +41,6 @@
         id="phone-number-input"
         class="ph-mask"
         required="true"
-        v-model="phone"
         show-code-on-list
         @update="handlePhoneUpdate"
       />
@@ -73,7 +72,6 @@ export default {
       verificationInputs: {
         ...this.modelValue,
       },
-      phone: '',
     }
   },
   methods: {
