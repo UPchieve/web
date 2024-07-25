@@ -37,6 +37,7 @@ describe('StudentForm', () => {
     NetworkService.checkZipCode = vi.fn().mockResolvedValue({
       data: { isValidZipCode: true },
     })
+    localStorage.clear()
   })
 
   const getWrapper = async (
