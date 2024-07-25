@@ -420,7 +420,7 @@ import AuthService from '@/services/AuthService'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { backOff } from 'exponential-backoff'
-import { EVENTS, GRADES } from '@/consts'
+import { EVENTS, GRADES, INELIGIBLE_LOCAL_STORAGE_KEY } from '@/consts'
 import GoogleLogo from '@/assets/google_logo.svg'
 import config from '../../config'
 import VerificationBadge from '@/assets/verification.svg'
@@ -514,6 +514,7 @@ export default {
   },
   async mounted() {
     localStorage.removeItem('isSSOSignUpRedirect')
+    localStorage.removeItem(INELIGIBLE_LOCAL_STORAGE_KEY)
     const params = this.$route.query
     if (this.shouldUseSSO(params)) {
       this.useSSO = true

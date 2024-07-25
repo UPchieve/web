@@ -27,6 +27,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.MOST_RECENT_SUBJECTS]: false,
       [POSTHOG_FEATURE_FLAGS.ABOUT_THIS_SESSION_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.BIG_FUTURE_EMAIL_ELIGIBILITY_FLOW]: false,
+      [POSTHOG_FEATURE_FLAGS.BIG_FUTURE_TWO_QUESTION_ELIGIBILITY_FLOW]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -127,6 +128,10 @@ export default {
     isBigFutureEmailFirstFlowActive: (state) =>
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.BIG_FUTURE_EMAIL_ELIGIBILITY_FLOW
+      ],
+    isBigFutureTwoQuestionEligiblityFlowActive: (state) =>
+      state.toggleFlags[
+        POSTHOG_FEATURE_FLAGS.BIG_FUTURE_TWO_QUESTION_ELIGIBILITY_FLOW
       ],
   },
 }

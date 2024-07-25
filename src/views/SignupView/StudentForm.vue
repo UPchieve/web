@@ -10,10 +10,21 @@
       {{ customEligibilityHeader || `Awesome! Let's check if we're a match` }}
     </h1>
     <div
-      v-if="showBigFutureIntroCopy && !showBigFutureUpdatedEligibilityIntroCopy"
+      v-if="
+        showBigFutureIntroCopy &&
+        !showBigFutureUpdatedEligibilityIntroCopy &&
+        eligibilitySubStep !== 'secondary'
+      "
     >
       <p class="uc-form-text">
         {{ bfIntroCopy }}
+      </p>
+    </div>
+    <div v-if="eligibilitySubStep === 'secondary'">
+      <p class="uc-form-text">
+        You weren't eligible based on your school 😢, but lots of kids qualify
+        based on their zip code—let's see if we can give you access to 1:1
+        college counseling!
       </p>
     </div>
     <div v-if="showBigFutureUpdatedEligibilityIntroCopy">
@@ -64,49 +75,157 @@
 
     <form
       v-if="showBigFutureEmailFirstFlow"
-      id="form-eligibility-two"
       class="uc-column"
       @submit.prevent="submitBigFutureEmail()"
+    >
+      <FormEmail
+        v-model="eligibility.studentEmail"
+        data-testid="student-email-input"
+        :placeholder="`Enter ${getFormLabelIdentifierPossessive} email address`"
+        :aria-label="`Enter ${getFormLabelIdentifierPossessive} email address`"
+        label="Student Email"
+        :is-required="false"
+        v-bind:class="{
+          'uc-form-text-input-invalid': hasFormValidationError(
+            v$.eligibility.studentEmail
+          ),
+        }"
+        @blur="v$.eligibility.studentEmail.$touch"
+        required
+        is-autofocused
+      />
+
+      <button
+        data-testid="eligibility-form-submit-btn"
+        class="uc-form-button"
+        :disabled="cannotSubmitForm(v$.eligibility.studentEmail) ? true : null"
+        type="submit"
+      >
+        Continue
+      </button>
+    </form>
+
+    <form
+      v-else-if="eligibilitySubStep === 'primary'"
+      class="uc-column"
+      @submit.prevent="
+        isReferred ? submitReferralEligibilityForm() : submitEligibilityForm()
+      "
     >
       <div class="uc-form-element">
         <div class="uc-row justify-between">
           <label
-            for="student-email"
+            for="grade"
             v-bind:class="{
-              error: hasFormValidationError(v$.eligibility.studentEmail),
+              error: hasFormValidationError(v$.eligibility.currentGrade),
             }"
-            >Student Email</label
+            >Grade</label
           >
           <div
-            v-if="hasFormValidationError(v$.eligibility.studentEmail)"
+            v-if="hasFormValidationError(v$.eligibility.currentGrade)"
             class="error-caption"
           >
-            {{ getFormValidationError(v$.eligibility.studentEmail) }}
+            {{ getFormValidationError(v$.eligibility.currentGrade) }}
+          </div>
+        </div>
+        <v-select
+          id="grade"
+          data-testid="student-grade-select"
+          class="uc-form-select-input"
+          v-model="eligibility.currentGrade"
+          :placeholder="`Select ${getFormLabelIdentifierPossessive} grade`"
+          :aria-label="`Select ${getFormLabelIdentifierPossessive} grade`"
+          :options="gradeLevels"
+          :searchable="false"
+          :clearable="false"
+          v-bind:class="{
+            'uc-form-select-input-invalid': hasFormValidationError(
+              v$.eligibility.currentGrade
+            ),
+          }"
+          @close="onGradeClose"
+          required
+        ></v-select>
+      </div>
+
+      <form-school-search
+        data-testid="student-school-autocomplete"
+        base-class="uc-form-autocomplete-input"
+        :placeholder="`Search for ${getFormLabelIdentifierPossessive} school`"
+        :aria-label="`Search for ${getFormLabelIdentifierPossessive} school`"
+        :search="autocompleteSchool"
+        :get-result-value="getSchoolDisplayName"
+        :debounce-time="500"
+        @input="handleSelectHighSchool"
+        @blur="v$.eligibility.highSchool.$touch"
+        v-bind:class="{
+          'uc-form-autocomplete-input-invalid': hasFormValidationError(
+            v$.eligibility.highSchool
+          ),
+        }"
+        required
+      />
+
+      <button
+        data-testid="eligibility-form-submit-btn"
+        class="uc-form-button"
+        :disabled="
+          cannotSubmitForm(v$.eligibility.highSchool) ||
+          cannotSubmitForm(v$.eligibility.currentGrade)
+            ? true
+            : null
+        "
+        type="submit"
+      >
+        Continue
+      </button>
+    </form>
+
+    <form
+      v-else-if="eligibilitySubStep === 'secondary'"
+      class="uc-column"
+      @submit.prevent="
+        isReferred ? submitReferralEligibilityForm() : submitEligibilityForm()
+      "
+    >
+      <div class="uc-form-element">
+        <div class="uc-row justify-between">
+          <label
+            for="zipCode"
+            v-bind:class="{
+              error: hasFormValidationError(v$.eligibility.zipCode),
+            }"
+            >Zip Code</label
+          >
+          <div
+            v-if="hasFormValidationError(v$.eligibility.zipCode)"
+            class="error-caption"
+          >
+            {{ getFormValidationError(v$.eligibility.zipCode) }}
           </div>
         </div>
         <input
-          id="student-email"
-          data-testid="student-email-input"
+          id="zipCode"
+          data-testid="student-zipcode-input"
           class="uc-form-text-input"
-          type="email"
-          :placeholder="`Enter ${getFormLabelIdentifierPossessive} email address`"
-          :aria-label="`Enter ${getFormLabelIdentifierPossessive} email address`"
-          v-model="eligibility.studentEmail"
+          type="text"
+          :placeholder="`Enter ${getFormLabelIdentifierPossessive} zip code`"
+          :aria-label="`Enter ${getFormLabelIdentifierPossessive} zip code`"
+          v-model="eligibility.zipCode"
           v-bind:class="{
             'uc-form-text-input-invalid': hasFormValidationError(
-              v$.eligibility.studentEmail
+              v$.eligibility.zipCode
             ),
           }"
-          @blur="v$.eligibility.studentEmail.$touch"
+          @blur="v$.eligibility.zipCode.$touch"
           required
         />
       </div>
 
       <button
-        id="btn-eligibility-submit"
         data-testid="eligibility-form-submit-btn"
         class="uc-form-button"
-        :disabled="cannotSubmitForm(v$.eligibility.studentEmail) ? true : null"
+        :disabled="cannotSubmitForm(v$.eligibility) ? true : null"
         type="submit"
       >
         Continue
@@ -423,11 +542,11 @@
       >
     </p>
     <p v-else class="small-paragraph" data-testid="eligibility-appeal-message">
-      We weren’t able to verify
+      We weren't able to verify
       {{ getFormLabelIdentifierPossessive }}
-      eligibility based on the information you’ve entered so far.
+      eligibility based on the information you've entered so far.
       <strong
-        >Don’t worry: {{ getFormLabelIdentifier }} may still be
+        >Don't worry: {{ getFormLabelIdentifier }} may still be
         eligible!</strong
       >
       {{ getIneligibleCanAppealText }}
@@ -722,10 +841,12 @@ import AnalyticsService from '@/services/AnalyticsService'
 import VerificationBadge from '@/assets/verification.svg'
 import ErrorBadge from '@/assets/error_badge.svg'
 import GoogleLogo from '@/assets/google_logo.svg'
-import { EVENTS, GRADES } from '@/consts'
+import { EVENTS, GRADES, INELIGIBLE_LOCAL_STORAGE_KEY } from '@/consts'
 import FormErrors from '@/components/FormErrors.vue'
 import config from '../../config'
 import * as signupUtils from '@/utils/signup-utils'
+import FormEmail from '@/components/FormEmail.vue'
+import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
 
 export default {
   components: {
@@ -734,6 +855,8 @@ export default {
     ErrorBadge,
     GoogleLogo,
     FormErrors,
+    FormEmail,
+    FormSchoolSearch,
   },
   setup() {
     return { v$: useVuelidate() }
@@ -841,6 +964,7 @@ export default {
       showBigFutureEmailFirstFlow: false,
       isEmailEligibilityHidden: false,
       showBigFutureUpdatedEligibilityIntroCopy: false,
+      eligibilitySubStep: '',
     }
   },
   async mounted() {
@@ -902,12 +1026,26 @@ export default {
           }
         )
       }
-    }
 
-    this.skipEligibilityEmail =
-      this.eligibilityEmail && this.partnerKey === 'bigfuture'
-    if (this.skipEligibilityEmail) {
-      AnalyticsService.captureEvent(EVENTS.SKIPPING_ELIGIBILITY_EMAIL)
+      this.skipEligibilityEmail =
+        this.eligibilityEmail && this.partnerKey === 'bigfuture'
+      if (this.skipEligibilityEmail) {
+        AnalyticsService.captureEvent(EVENTS.SKIPPING_ELIGIBILITY_EMAIL)
+      }
+
+      if (
+        this.partnerKey === 'bigfuture' &&
+        this.isBigFutureTwoQuestionEligiblityFlowActive
+      ) {
+        this.eligibilitySubStep = 'primary'
+        this.skipEligibilityEmail = true
+        AnalyticsService.captureEvent(
+          EVENTS.BIG_FUTURE_STUDENT_SAW_GRADE_AND_SCHOOL_ONLY_FLOW,
+          {
+            partnerKey: this.partnerKey,
+          }
+        )
+      }
     }
 
     const isDomesticIpAddress = await this.isDomesticIpAddress()
@@ -921,6 +1059,8 @@ export default {
       eligibilityEmail: 'featureFlags/eligibilityEmail',
       isBigFutureEmailFirstFlowActive:
         'featureFlags/isBigFutureEmailFirstFlowActive',
+      isBigFutureTwoQuestionEligiblityFlowActive:
+        'featureFlags/isBigFutureTwoQuestionEligiblityFlowActive',
     }),
     trimCurrentGrade() {
       // extracting the first word out of the gradeLevels
@@ -1072,13 +1212,15 @@ export default {
         this.errors.push('You must select a school.')
       }
 
-      const zipCode = this.eligibility.zipCode
-
-      const {
-        data: { isValidZipCode },
-      } = await NetworkService.checkZipCode({ zipCode })
-      if (!isValidZipCode) {
-        this.errors.push('You must enter a valid United States zip code.')
+      // Skip the zipcode check for the BF two question eligibility flow
+      if (!this.isBigFutureTwoQuestionEligiblityFlowActive) {
+        const zipCode = this.eligibility.zipCode
+        const {
+          data: { isValidZipCode },
+        } = await NetworkService.checkZipCode({ zipCode })
+        if (!isValidZipCode) {
+          this.errors.push('You must enter a valid United States zip code.')
+        }
       }
 
       if (!this.eligibility.studentEmail && !this.skipEligibilityEmail) {
@@ -1111,6 +1253,16 @@ export default {
 
       if (await this.hasEligibilityFormErrors()) return
 
+      if (localStorage.getItem(INELIGIBLE_LOCAL_STORAGE_KEY)) {
+        AnalyticsService.captureEvent(EVENTS.ELIGIBILITY_INELIGIBLE, {
+          partnerKey: this.partnerKey,
+          hasLocalStorageIneligible: true,
+        })
+        this.step = 'ineligible'
+        this.$router.replace('/sign-up/student/ineligible')
+        return
+      }
+
       NetworkService.checkStudentEligibility({
         email: this.eligibility.studentEmail,
         gradeLevel: this.trimCurrentGrade,
@@ -1142,7 +1294,9 @@ export default {
                 parentGuardianEmail: this.eligibility.parentGuardianEmail,
                 schoolId: this.eligibility.highSchool.upchieveId,
                 studentPartnerOrgKey: this.partnerKey,
-                zipCode: this.eligibility.zipCode,
+                zipCode: this.eligibility.zipCode
+                  ? this.eligibility.zipCode
+                  : null,
               })
                 .then(() => {
                   this.step = 'parentGuardianConfirmation'
@@ -1161,7 +1315,23 @@ export default {
             }
           } else {
             if (response.data.isCollegeStudent) this.isCollegeStudent = true
+            // If not eligible, isn't a college student, and is on first eligibility
+            // substep, allow the user to try another way to become eligible
+            if (
+              !this.isCollegeStudent &&
+              this.eligibilitySubStep === 'primary'
+            ) {
+              this.eligibilitySubStep = 'secondary'
+              AnalyticsService.captureEvent(
+                EVENTS.BIG_FUTURE_STUDENT_SHOWN_ZIP_CODE_ELIGIBILITY_FALL_BACK,
+                {
+                  partnerKey: this.partnerKey,
+                }
+              )
+              return
+            }
             this.step = 'ineligible'
+            localStorage.setItem(INELIGIBLE_LOCAL_STORAGE_KEY, true)
             this.$router.replace('/sign-up/student/ineligible')
           }
           const isDomesticIpAddress = await this.isDomesticIpAddress()
@@ -1291,7 +1461,7 @@ export default {
           referredByCode: window.localStorage.getItem('upcReferredByCode'),
           schoolId: this.eligibility.highSchool.upchieveId,
           studentPartnerOrgKey: this.partnerKey,
-          zipCode: this.eligibility.zipCode,
+          zipCode: this.eligibility.zipCode ? this.eligibility.zipCode : null,
         })
         window.localStorage.removeItem('upcReferredByCode')
         this.$router.replace('/verify')

@@ -552,6 +552,10 @@ export const EVENTS = {
     'BIG_FUTURE_STUDENT_SAW_EMAIL_ONLY_FLOW',
   BIG_FUTURE_SUBMITTED_EMAIL_IN_EMAIL_ONLY_FLOW:
     'BIG_FUTURE_SUBMITTED_EMAIL_IN_EMAIL_ONLY_FLOW',
+  BIG_FUTURE_STUDENT_SAW_GRADE_AND_SCHOOL_ONLY_FLOW:
+    'BIG_FUTURE_STUDENT_SAW_GRADE_AND_SCHOOL_ONLY_FLOW',
+  BIG_FUTURE_STUDENT_SHOWN_ZIP_CODE_ELIGIBILITY_FALL_BACK:
+    'BIG_FUTURE_STUDENT_SHOWN_ZIP_CODE_ELIGIBILITY_FALL_BACK',
 }
 
 export const VERIFICATION_METHOD = {
@@ -589,6 +593,8 @@ export const POSTHOG_FEATURE_FLAGS = {
   MOST_RECENT_SUBJECTS: 'most-recent-subjects',
   ABOUT_THIS_SESSION_SURVEY: 'about-this-session-feedback',
   BIG_FUTURE_EMAIL_ELIGIBILITY_FLOW: 'big-future-email-eligibility-flow',
+  BIG_FUTURE_TWO_QUESTION_ELIGIBILITY_FLOW:
+    'big-future-two-question-eligibility-flow',
 }
 
 export const ANALYTICS_REPORT_ROW = {
@@ -646,3 +652,6 @@ export const SESSION_TOOL_TYPES = {
   DOCUMENT_EDITOR: 'documenteditor',
   WHITEBOARD: 'whiteboard',
 }
+
+// The key is obfuscated to avoid users easily recognizing what it is
+export const INELIGIBLE_LOCAL_STORAGE_KEY = '7x9h8'

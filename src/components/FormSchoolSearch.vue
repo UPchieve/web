@@ -152,7 +152,7 @@ export default {
       } else {
         AnalyticsService.captureEvent(this.selectedEvent)
         this.school = school || {}
-        this.$emit('input', school.id)
+        this.$emit('input', school)
       }
     },
 
