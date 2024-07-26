@@ -20,7 +20,10 @@
           v-if="message.user !== user._id"
         />
         <div class="contents" :class="messageStyling(message)">
-          <span>{{ message.contents }}</span>
+          <span v-if="message.type === 'voice'"
+            ><voice-message :message="message"></voice-message
+          ></span>
+          <span v-else>{{ message.contents }}</span>
         </div>
         <div class="time">
           {{ formatTime(message.createdAt) }}
@@ -36,6 +39,7 @@ import StudentIcon from '@/assets/student-icon.svg'
 import VolunteerIcon from '@/assets/volunteer-icon.svg'
 import { mapState, mapGetters } from 'vuex'
 import moment from 'moment'
+import VoiceMessage from '@/components/VoiceMessaging/VoiceMessage.vue'
 
 const MESSAGE_ALIGNMENT = {
   LEFT: 'left',
@@ -44,7 +48,7 @@ const MESSAGE_ALIGNMENT = {
 
 export default {
   name: 'chat-log',
-  components: { StudentIcon, VolunteerIcon },
+  components: { StudentIcon, VolunteerIcon, VoiceMessage },
   computed: {
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',

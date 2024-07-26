@@ -2,7 +2,10 @@
   <div class="chat-message">
     <div :class="message.user === volunteerId && 'chat-message--volunteer'">
       <component class="chat-message__avatar" :is="avatar" />
-      <div class="chat-message__content">{{ message.contents }}</div>
+      <div v-if="message.type === 'voice'">
+        <voice-message :message="message"></voice-message>
+      </div>
+      <div v-else class="chat-message__content">{{ message.contents }}</div>
     </div>
     <div class="chat-message__timestamp">{{ timestamp }}</div>
   </div>
@@ -11,9 +14,12 @@
 <script>
 import moment from 'moment'
 import getChatAvatar from '@/utils/get-chat-avatar'
+import VoiceMessage from '@/components/VoiceMessaging/VoiceMessage.vue'
 
 export default {
   name: 'ChatMessage',
+
+  components: { VoiceMessage },
 
   props: {
     message: Object,

@@ -113,7 +113,13 @@ const frameSrc = [
   cdnUrl,
 ]
 
-const mediaSrc = ["'self'", gleapUrl]
+const mediaSrc = [
+  "'self'",
+  `https://${config.host}/*`,
+  'data:',
+  'blob:',
+  gleapUrl,
+]
 
 if (config.nodeEnv !== 'production') {
   connectSrc.push('http://localhost:3000')

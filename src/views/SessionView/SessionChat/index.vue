@@ -70,6 +70,9 @@
 
             <div class="contents" :class="chatBotContents(message)">
               <span v-if="message.hasHtml" v-html="message.contents"></span>
+              <span v-else-if="message.type === 'voice'">
+                <voice-message :message="message" />
+              </span>
               <span
                 v-else
                 :data-testid="`message-from-user-id-${message.user}`"
@@ -124,16 +127,27 @@
           {{ sessionPartnerName || 'Chatbot' }} is typing...
         </div>
       </transition>
-      <textarea
-        class="message-textarea"
-        data-testid="chat-textarea"
-        autofocus
-        @keydown.enter.prevent
-        @keyup="handleOutgoingMessage"
-        v-model="newMessage"
-        placeholder="Type a message..."
-        :disabled="waitingForModeration"
-      />
+      <div class="message-input">
+        <textarea
+          class="message-textarea"
+          :class="{ hidden: textMessageHidden }"
+          data-testid="chat-textarea"
+          autofocus
+          @keydown.enter.prevent
+          @keyup="handleOutgoingMessage"
+          v-model="newMessage"
+          placeholder="Type a message..."
+          :disabled="waitingForModeration"
+        />
+        <record-voice-message
+          @idle="showTextMessage"
+          @not-idle="hideTextMessage"
+          v-if="showVoiceMessaging"
+          :onRecording="onRecording"
+          :onStopRecording="onStopRecording"
+          :sendMessage="sendVoiceMessage"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -143,9 +157,12 @@ import { isEmpty } from 'lodash-es'
 import { mapState, mapGetters } from 'vuex'
 
 import ChatBot from './ChatBot.vue'
+import RecordVoiceMessage from '@/components/VoiceMessaging/RecordVoiceMessage.vue'
+import VoiceMessage from '@/components/VoiceMessaging/VoiceMessage.vue'
 import DocumentTitle from '@/components/DocumentTitle.vue'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import ModerationService from '@/services/ModerationService'
+import VoiceMessageService from '@/services/VoiceMessageService'
 import sendWebNotification from '@/utils/send-web-notification'
 import getChatAvatar from '@/utils/get-chat-avatar'
 import LoggerService from '@/services/LoggerService'
@@ -166,7 +183,13 @@ const MESSAGE_ALIGNMENT = {
  */
 export default {
   name: 'session-chat',
-  components: { ChatBot, LoadingMessage, DocumentTitle },
+  components: {
+    ChatBot,
+    LoadingMessage,
+    DocumentTitle,
+    RecordVoiceMessage,
+    VoiceMessage,
+  },
   props: {
     setHasSeenNewMessage: { type: Function, required: true },
     shouldHideChatSection: { type: Boolean, required: true },
@@ -191,6 +214,9 @@ export default {
       receiveMessageAudio: new Audio(sound),
       failureReasons: null,
       waitingForModeration: false,
+      voiceMessagingAvailable:
+        navigator.mediaDevices && navigator.mediaDevices.getUserMedia,
+      textMessageHidden: false,
     }
   },
   computed: {
@@ -209,7 +235,11 @@ export default {
       isSessionWaitingForVolunteer: 'user/isSessionWaitingForVolunteer',
       numberOfUnreadChatMessages: 'user/numberOfUnreadChatMessages',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
+      eligibleForVoiceMessaging: 'featureFlags/eligibleForVoiceMessaging',
     }),
+    showVoiceMessaging() {
+      return this.voiceMessagingAvailable && this.eligibleForVoiceMessaging
+    },
     sessionPartnerName() {
       if (!this.currentSession) return ''
       return this.isVolunteer
@@ -258,6 +288,18 @@ export default {
     }
   },
   methods: {
+    showTextMessage() {
+      this.textMessageHidden = false
+    },
+    hideTextMessage() {
+      this.textMessageHidden = true
+    },
+    onRecording() {
+      socket.emit('typing', { sessionId: this.currentSession.id })
+    },
+    onStopRecording() {
+      this.notTyping()
+    },
     getOffendingSubstringsForReason(reasonKey) {
       if (
         !Object.hasOwn(this.failureReasons, reasonKey) ||
@@ -279,6 +321,22 @@ export default {
     },
     toggleEligibleForSessionRecapChat() {
       this.eligibleForSessionRecapChat = true
+    },
+    async sendVoiceMessage(messageBlob) {
+      const form = new FormData()
+      form.append('message', messageBlob)
+      form.append('senderId', this.user.id)
+      form.append('sessionId', this.currentSession.id)
+      const voiceMessageId = await VoiceMessageService.saveVoiceMessage(form)
+
+      socket.emit('message', {
+        type: 'voice',
+        sessionId: this.currentSession.id,
+        user: this.user,
+        message: voiceMessageId,
+        source:
+          this.isInRecap || this.eligibleForSessionRecapChat ? 'recap' : '',
+      })
     },
     showNewMessage(message) {
       socket.emit('message', {
@@ -747,7 +805,7 @@ export default {
   }
 
   @include breakpoint-below('medium') {
-    padding: 1.25em 8.75em 2.5em 1.25em;
+    padding: 1.25em 4.75em 2.5em 1.25em;
     display: flex;
     align-items: center;
 
@@ -777,14 +835,23 @@ export default {
     top: -1.5em;
   }
 }
-
+.message-input {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid $c-border-grey;
+  min-width: 0;
+  flex-grow: 1;
+  border-top: none;
+}
 .message-textarea {
   width: 100%;
   border: none;
-  border-top: 1px solid $c-border-grey;
   padding: 1em;
   resize: none;
-
+  place-content: center;
+  &.hidden {
+    display: none;
+  }
   &:focus {
     outline: none;
   }
