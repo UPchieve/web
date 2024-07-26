@@ -329,6 +329,18 @@ export default {
       this._errorHandler
     )
   },
+  saveVoiceMessage(sessionId, formData) {
+    return httpPost(
+      `${API_ROOT}/session/${sessionId}/voice-message`,
+      formData
+    ).then(this._successHandler, this._errorHandler)
+  },
+  getVoiceMessage(voiceMessageId) {
+    return httpGet(`${API_ROOT}/voice-messages/${voiceMessageId}`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
   timedOutSession(sessionId, data) {
     return httpPost(`${API_ROOT}/session/${sessionId}/timed-out`, data).then(
       this._successHandler,
