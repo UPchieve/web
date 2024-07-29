@@ -10,6 +10,7 @@ import { TrainingCourse } from '../page-object-models/training-course.js'
 import { TrainingQuiz } from '../page-object-models/training-quiz.js'
 import { VolunteerDashboard } from '../page-object-models/volunteer-dashboard'
 import { BackgroundInformation } from '../page-object-models/background-information'
+import path from "path";
 
 test.describe('Volunteer onboarding', () => {
   let dbClient
@@ -102,7 +103,7 @@ test.describe('UPchieve 101', async () => {
       )
     })
 
-    test('Dashboard shows safety screening after completing Upchieve101', async ({
+    test('Volunteer can complete safety screening steps (background info + proof of identity)', async ({
       browser,
     }) => {
       // From the dashboard, navigate to the Background Information form
@@ -129,6 +130,17 @@ test.describe('UPchieve 101', async () => {
       await volunteerPage.getByTestId('Background information').click()
       await volunteerPage.waitForURL('**/background-information')
       await expect(volunteerPage.getByTestId('bg-info-complete')).toBeVisible()
+
+      // Complete Proof of Identity
+      await volunteerPage.goto('/dashboard')
+      await volunteerPage.waitForURL('**/dashboard')
+      const testImagePath = path.join(__dirname, 'test-image-confetti.png')
+      await volunteerDashboard.openProofOfIdentityModal()
+      await volunteerDashboard.selectPhoto(testImagePath)
+      await volunteerDashboard.removePhoto()
+      await volunteerDashboard.selectPhoto(testImagePath)
+      await volunteerDashboard.submitPhoto()
+      await volunteerDashboard.photoUploadIsComplete()
     })
   })
 })

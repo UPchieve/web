@@ -46,7 +46,7 @@ export const createStudent = async (dbClient, args = {}) => {
 export const createVolunteer = async (
   dbClient,
   userArgs = {},
-  options = {},
+  options,
 ) => {
   try {
     const params = {
@@ -82,11 +82,10 @@ export const createVolunteer = async (
       `UPDATE users SET verified = true WHERE id = '${user.id}'`
     )
     await dbClient.query(
-      `UPDATE volunteer_profiles SET approved = ${opts.approved}, onboarded = ${opts.onboarded} WHERE user_id = '${user.id}'`
+      `UPDATE volunteer_profiles SET approved = $1, onboarded = $2 WHERE user_id = '${user.id}'`,
+      [opts.approved, opts.onboarded]
     )
-    if (opts.passedUpchieve101) {
-      await passUpchieve101(dbClient, user.id)
-    }
+    if (opts.passedUpchieve101) await passUpchieve101(dbClient, user.id)
 
     return { ...params, id: user.id }
   } catch (e) {

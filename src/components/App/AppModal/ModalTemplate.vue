@@ -21,7 +21,7 @@
       <slot />
 
       <template v-if="!mobileMode && showTemplateButtons">
-        <div class="ModalTemplate-seperator" />
+        <div class="ModalTemplate-separator" />
         <div class="ModalTemplate-buttons">
           <large-button v-if="!alertModal" @click="handleCancel"
             >Cancel</large-button
@@ -236,7 +236,7 @@ $header-height: 80px;
   }
 }
 
-.ModalTemplate-seperator {
+.ModalTemplate-separator {
   border: 1px solid $c-border-grey;
   width: 100%;
   height: 1px;
