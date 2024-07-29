@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onBeforeMount, reactive, computed } from 'vue'
+import { reactive, computed } from 'vue'
 import WaveForm from './WaveForm.vue'
 import RecordIcon from '@/assets/voice_message_icons/record-message.svg'
 import DeleteIcon from '@/assets/voice_message_icons/delete-message.svg'
@@ -45,7 +45,9 @@ function reset() {
 }
 
 async function setupAudio() {
-  if (stream) return
+  if (stream) {
+    return true
+  }
 
   try {
     stream = await navigator.mediaDevices.getUserMedia({

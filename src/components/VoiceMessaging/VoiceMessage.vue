@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
 import config from '../../config'
 const props = defineProps(['message'])
 </script>
