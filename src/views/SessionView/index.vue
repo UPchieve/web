@@ -189,7 +189,11 @@ export default {
   created() {
     if (this.mobileMode) {
       this.$store.dispatch('app/hideNavigation')
-      Gleap.showFeedbackButton(false)
+      try {
+        Gleap.showFeedbackButton(false)
+      } catch {
+        LoggerService.noticeError('Failed when hiding Gleap feedback button')
+      }
     } else {
       this.$store.dispatch('app/header/show', activeHeaderData)
       this.$store.dispatch('app/sidebar/hide')

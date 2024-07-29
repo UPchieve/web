@@ -1,11 +1,18 @@
 <template>
   <modal :closeModal="closeModal">
-    <div>
+    <div data-testid="photo-upload-modal">
       <header>
         <h1 class="title">Proof of identity</h1>
-        <cross-icon class="upc-modal-close-icon" @click="closeModal" />
+        <cross-icon
+          class="upc-modal-close-icon"
+          @click="closeModal"
+          data-testid="close-modal-btn"
+        />
       </header>
-      <div v-if="user.photoIdStatus === 'SUBMITTED'">
+      <div
+        v-if="user.photoIdStatus === 'SUBMITTED'"
+        data-testid="photo-submitted-content"
+      >
         <p class="subtitle">Your photo ID is under review.</p>
       </div>
       <div v-else>
@@ -16,8 +23,17 @@
           should be clearly visible. Acceptable formats: jpeg, png.
         </p>
         <div v-if="photo" class="photo-id-container">
-          <img :src="photo" class="photo-id-img" alt="your uploaded photo id" />
-          <div class="trash-icon-container" @click="removePhoto">
+          <img
+            :src="photo"
+            class="photo-id-img"
+            alt="your uploaded photo id"
+            data-testid="uploaded-photo"
+          />
+          <div
+            class="trash-icon-container"
+            @click="removePhoto"
+            data-testid="remove-photo-btn"
+          >
             <trash-icon class="trash-icon" />
           </div>
         </div>
@@ -27,8 +43,15 @@
             accept="image/png, image/jpeg"
             class="photo-id-input"
             @change="addPhoto"
+            data-testid="photo-upload-file-input"
           />
-          <button class="upload-photo-btn" type="button">Upload Photo</button>
+          <button
+            class="upload-photo-btn"
+            type="button"
+            data-testid="upload-photo-btn"
+          >
+            Upload Photo
+          </button>
         </label>
         <p v-if="error" class="error">{{ error }}</p>
 
@@ -38,6 +61,7 @@
           @click="submitPhoto"
           class="submit-btn"
           :disabled="!photo ? true : null"
+          data-testid="submit-photo-btn"
         >
           Submit
         </large-button>
