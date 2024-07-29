@@ -37,7 +37,16 @@ const audioURL = computed(
   () => recording.blob && window.URL.createObjectURL(recording.blob)
 )
 
-onBeforeMount(async () => {
+AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_RECORDING_BUTTON_SEEN)
+
+function reset() {
+  recording.chunks = []
+  recording.blob = null
+}
+
+async function setupAudio() {
+  if (stream) return
+
   try {
     stream = await navigator.mediaDevices.getUserMedia({
       audio: true,
@@ -53,28 +62,24 @@ onBeforeMount(async () => {
         type: 'audio/webm; codecs=opus',
       })
     }
-    emit('idle')
+    return true
   } catch (e) {
     recording.state = STATES.notSupported
     AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_MIC_ACCESS_DENIED)
     LoggerService.noticeError(e)
   }
-})
-
-AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_RECORDING_BUTTON_SEEN)
-
-function reset() {
-  recording.chunks = []
-  recording.blob = null
 }
 
-function record() {
-  AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_START_RECORDING)
-  emit('notIdle')
-  recording.state = STATES.recording
-  reset()
-  recorder?.start()
-  props.onRecording()
+async function record() {
+  const allowed = await setupAudio()
+  if (allowed) {
+    AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_START_RECORDING)
+    emit('notIdle')
+    recording.state = STATES.recording
+    reset()
+    recorder?.start()
+    props.onRecording()
+  }
 }
 
 function stop() {
