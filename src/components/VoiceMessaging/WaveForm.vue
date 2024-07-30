@@ -7,12 +7,12 @@ const obj = reactive({})
 const stop = ref(false)
 
 onMounted(async () => {
-  const audioContent = new AudioContext()
-  const streamSource = audioContent.createMediaStreamSource(props.stream)
+  const audioContext = new AudioContext()
+  const streamSource = audioContext.createMediaStreamSource(props.stream)
 
   const width = 200
   const height = 24
-  obj.analyser = audioContent.createAnalyser()
+  obj.analyser = audioContext.createAnalyser()
   streamSource.connect(obj.analyser)
   obj.analyser.fftSize = 2048
   obj.frequencyArray = new Float32Array(obj.analyser.fftSize)
@@ -21,9 +21,9 @@ onMounted(async () => {
   obj.height = height
   obj.bars = []
   canvas.value.width = width * window.devicePixelRatio
-  canvas.value.height = 44
+  canvas.value.height = height * window.devicePixelRatio
   canvas.value.style.width = '100%'
-  canvas.value.style.height = 44 + 'px'
+  canvas.value.style.height = '100%'
   obj.ctx.scale(window.devicePixelRatio, window.devicePixelRatio)
   loop()
 })
@@ -79,7 +79,7 @@ function draw() {
 </script>
 
 <template>
-  <div>
+  <div class="canvas-container">
     <canvas ref="canvas" class="canvas"></canvas>
     <div class="line-container1">
       <div class="vertical-line1" />
@@ -90,6 +90,10 @@ function draw() {
 </template>
 
 <style scoped>
+.canvas-container {
+  display: flex;
+  place-content: center;
+}
 .dot {
   height: 25px;
   width: 25px;

@@ -71,7 +71,10 @@
             <div class="contents" :class="chatBotContents(message)">
               <span v-if="message.hasHtml" v-html="message.contents"></span>
               <span v-else-if="message.type === 'voice'">
-                <voice-message :message="message" />
+                <voice-message
+                  :message="message"
+                  :isSender="message.user === user.id"
+                />
               </span>
               <span
                 v-else

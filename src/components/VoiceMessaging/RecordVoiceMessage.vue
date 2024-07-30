@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive, computed } from 'vue'
+import { reactive, computed, onBeforeUnmount } from 'vue'
 import WaveForm from './WaveForm.vue'
 import RecordIcon from '@/assets/voice_message_icons/record-message.svg'
 import DeleteIcon from '@/assets/voice_message_icons/delete-message.svg'
@@ -30,8 +30,8 @@ const recording = reactive<{
   blob: null,
   chunks: [],
 })
-let stream: MediaStream
-let recorder: MediaRecorder
+let stream: MediaStream | null = null
+let recorder: MediaRecorder | null = null
 
 const audioURL = computed(
   () => recording.blob && window.URL.createObjectURL(recording.blob)
@@ -39,16 +39,39 @@ const audioURL = computed(
 
 AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_RECORDING_BUTTON_SEEN)
 
+const ondataavailable = (e) => {
+  recording.chunks.push(e.data)
+}
+
+const onstop = () => {
+  recording.blob = new Blob(recording.chunks, {
+    type: 'audio/webm; codecs=opus',
+  })
+}
+
+function stopMicAccess() {
+  if (stream) {
+    for (const track of stream.getAudioTracks()) {
+      track.stop()
+    }
+  }
+}
+
 function reset() {
   recording.chunks = []
   recording.blob = null
+  stream = null
+  recorder?.removeEventListener('stop', onstop)
+  recorder?.removeEventListener('dataavailable', onstop)
+  recorder = null
 }
 
-async function setupAudio() {
-  if (stream) {
-    return true
-  }
+onBeforeUnmount(() => {
+  stopMicAccess()
+  reset()
+})
 
+async function setupAudio() {
   try {
     stream = await navigator.mediaDevices.getUserMedia({
       audio: true,
@@ -56,14 +79,8 @@ async function setupAudio() {
     recorder = new MediaRecorder(stream, {
       bitsPerSecond: 30000,
     })
-    recorder.ondataavailable = (e) => {
-      recording.chunks.push(e.data)
-    }
-    recorder.onstop = () => {
-      recording.blob = new Blob(recording.chunks, {
-        type: 'audio/webm; codecs=opus',
-      })
-    }
+    recorder.ondataavailable = ondataavailable
+    recorder.onstop = onstop
     return true
   } catch (e) {
     recording.state = STATES.notSupported
@@ -78,7 +95,6 @@ async function record() {
     AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_START_RECORDING)
     emit('notIdle')
     recording.state = STATES.recording
-    reset()
     recorder?.start()
     props.onRecording()
   }
@@ -89,6 +105,7 @@ function stop() {
   recording.state = STATES.recorded
   recorder?.stop()
   props.onStopRecording()
+  stopMicAccess()
 }
 
 async function send() {
