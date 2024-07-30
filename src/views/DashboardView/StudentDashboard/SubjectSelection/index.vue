@@ -117,11 +117,9 @@ export default {
   watch: {
     // This component mounts before the lastestSession and isSessionAlive
     // have a value in the store - watch for updates
-    latestSession() {
-      this.checkOrEnforceWaitingPeriod()
-    },
-    isSessionAlive() {
-      this.checkOrEnforceWaitingPeriod()
+    latestSession(session) {
+      if (session.endedByUserRole === 'student')
+        this.checkOrEnforceWaitingPeriod()
     },
   },
   methods: {
