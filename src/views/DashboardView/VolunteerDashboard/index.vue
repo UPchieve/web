@@ -452,7 +452,7 @@ export default {
     hourTrackingGuide() {
       if (this.isCustomVolunteerPartner)
         return 'https://cdn.upchieve.org/docs/Verizon-Volunteer-Hour-Tracking-Resource.pdf'
-      return 'https://upc-training-materials.s3.us-east-2.amazonaws.com/volunteer-hour-tracking-guide.pdf'
+      return 'https://cdn.upchieve.org/docs/volunteer-hour-tracking-guide.pdf'
     },
   },
   methods: {
