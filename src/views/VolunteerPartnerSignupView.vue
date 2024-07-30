@@ -21,7 +21,7 @@
         </div>
 
         <div class="step-header">
-          <div class="step-header__title">
+          <div class="step-header__title" data-testid="vp-signup-title">
             {{ welcomeTitle }}
           </div>
           <div class="step-header__subtitle">
@@ -46,6 +46,7 @@
             required
             autofocus
             autocomplete="email"
+            data-testid="vp-signup-email"
           />
         </div>
 
@@ -64,6 +65,7 @@
             v-model="formData.password"
             required
             autocomplete="new-password"
+            data-testid="vp-signup-password"
           />
           <p class="uc-form-subtext">
             Must contain at least one number, one uppercase letter, and one
@@ -75,6 +77,7 @@
           class="uc-form-button"
           type="submit"
           @click.prevent="formStepTwo()"
+          data-testid="vp-signup-step1-continue-btn"
         >
           Continue
         </button>
@@ -88,13 +91,15 @@
       >
         <div v-if="errors.length" class="step-errors">
           <h5>Please correct the following problems:</h5>
-          <ul>
+          <ul data-testid="vp-signup-errors">
             <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
           </ul>
         </div>
 
         <div class="step-header">
-          <div class="step-header__title">Finish creating your account</div>
+          <div class="step-header__title" data-testid="vp-signup-step-2-title">
+            Finish creating your account
+          </div>
           <div class="step-header__subtitle">
             You’re just a few minutes away from helping low-income students!
           </div>
@@ -138,6 +143,7 @@
                   required
                   autofocus
                   autocomplete="given-name"
+                  data-testid="vp-signup-first-name"
                 />
                 <p class="uc-form-subtext">First Name</p>
               </div>
@@ -153,6 +159,7 @@
                   v-model="formData.lastName"
                   required
                   autocomplete="family-name"
+                  data-testid="vp-signup-last-name"
                 />
                 <p class="uc-form-subtext">Last Name</p>
               </div>
@@ -184,6 +191,7 @@
             v-model="formData.terms"
             type="checkbox"
             required
+            data-testid="vp-signup-user-agreement"
           />
           <label for="userAgreement">
             I have read and accept the
@@ -203,6 +211,7 @@
           class="uc-form-button"
           type="submit"
           :disabled="isRegistering ? true : null"
+          data-testid="vp-signup-complete-button"
         >
           Sign Up
         </button>
