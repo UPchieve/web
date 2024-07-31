@@ -22,7 +22,7 @@
       }"
       type="email"
       :placeholder="placeholder"
-      v-model="email"
+      :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
       @blur="onBlur"
       :required="isRequired"
@@ -34,7 +34,6 @@
 <script>
 import { useVuelidate } from '@vuelidate/core'
 import { helpers, requiredIf, email } from '@vuelidate/validators'
-import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 
 export default {
@@ -61,7 +60,6 @@ export default {
     },
     blurEvent: {
       type: String,
-      default: EVENTS.STUDENT_ENTERED_EMAIL,
     },
     testid: {
       type: String,
@@ -73,20 +71,20 @@ export default {
     },
   },
   emits: ['update:modelValue'],
+
   setup() {
     return { v$: useVuelidate() }
   },
 
   data() {
     return {
-      email: '',
       hasEnteredEmail: false,
     }
   },
 
   validations() {
     return {
-      email: {
+      modelValue: {
         required: helpers.withMessage('Required', requiredIf(this.isRequired)),
         email: helpers.withMessage('Not a valid email address', email),
       },
@@ -95,8 +93,8 @@ export default {
 
   methods: {
     onBlur() {
-      this.v$.email.$touch()
-      if (this.email && !this.hasEnteredEmail) {
+      this.v$.modelValue.$touch()
+      if (this.modelValue && !this.hasEnteredEmail && this.blurEvent) {
         AnalyticsService.captureEvent(this.blurEvent)
         this.hasEnteredEmail = true
       }

@@ -43,7 +43,6 @@
         </li>
       </template>
     </autocomplete>
-    <input hidden :name="name" :value="school.id" />
   </div>
 </template>
 
@@ -89,7 +88,11 @@ export default {
       type: String,
       default: EVENTS.STUDENT_SELECTED_SCHOOL,
     },
+    modelValue: {
+      type: String,
+    },
   },
+  emits: ['update:modelValue'],
 
   created() {
     this.CANNOT_FIND_SCHOOL_TEXT = `Can't find your school?`
@@ -152,7 +155,7 @@ export default {
       } else {
         AnalyticsService.captureEvent(this.selectedEvent)
         this.school = school || {}
-        this.$emit('input', school)
+        this.$emit('update:modelValue', school.id)
       }
     },
 

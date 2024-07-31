@@ -954,4 +954,11 @@ export default {
       this._errorHandler
     )
   },
+  addStudentToClass({ email, classCode, gradeLevel }) {
+    return httpPost(`${API_PUBLIC_ROOT}/students/class`, {
+      email,
+      classCode,
+      gradeLevel,
+    }).then(this._successHandler, this._errorHandler)
+  },
 }
