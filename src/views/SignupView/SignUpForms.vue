@@ -22,9 +22,10 @@
             :class="el.classes"
             :disabled="isDisabled(el)"
             v-bind="el.props"
-            @input="
-              (e) => {
-                if (el.props?.name) form[el.props.name] = e.target?.value ?? e
+            :model-value="el.props?.name ? form[el.props.name] : undefined"
+            @update:model-value="
+              (value) => {
+                if (el.props?.name) form[el.props.name] = value
               }
             "
             @click="

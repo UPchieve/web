@@ -17,13 +17,13 @@
       :id="name"
       :label="optionTextField"
       :placeholder="placeholder"
-      v-model="selection"
       :options="selectOptions"
       :reduce="reduce"
       :searchable="false"
       :clearable="false"
       :loading="isLoading"
-      @update:model-value="(value) => $emit('input', value)"
+      :value="modelValue"
+      @update:model-value="$emit('update:modelValue', $event)"
       class="uc-form-select-input"
       :class="{
         'uc-form-select-input-invalid': hasValidationError(),
@@ -31,7 +31,6 @@
       @close="onBlur"
       :required="isRequired"
     />
-    <input hidden :name="name" :value="selection" />
   </div>
 </template>
 
@@ -68,8 +67,11 @@ export default {
     reduce: {
       type: Function,
     },
+    modelValue: {
+      type: [String, Number],
+    },
   },
-  emits: ['input'],
+  emits: ['update:modelValue'],
 
   async created() {
     this.isLoading = true
@@ -84,7 +86,6 @@ export default {
 
   data() {
     return {
-      selection: null,
       hasSelectedOption: false,
       isLoading: false,
       selectOptions: [],
@@ -93,7 +94,7 @@ export default {
 
   validations() {
     return {
-      selection: {
+      modelValue: {
         required: helpers.withMessage('Required', requiredIf(this.isRequired)),
       },
     }
@@ -101,8 +102,8 @@ export default {
 
   methods: {
     onBlur() {
-      this.v$.selection.$touch()
-      if (this.selection && !this.hasSelectedOption) {
+      this.v$.modelValue.$touch()
+      if (this.modelValue && !this.hasSelectedOption && this.blurEvent) {
         AnalyticsService.captureEvent(this.blurEvent)
         this.hasSelectedOption = true
       }

@@ -198,6 +198,7 @@ function getStudentEmailElement(isParentGuardian) {
       name: InputName.EMAIL,
       label: getLabelPrefix(isParentGuardian) + 'Email',
       placeholder: getLabelPrefix(isParentGuardian) + 'Email',
+      blurEvent: EVENTS.STUDENT_ENTERED_EMAIL,
     },
   }
 }
@@ -521,6 +522,7 @@ function getAccountPageDetails(to) {
               name: InputName.PASSWORD,
               metadata:
                 'Must have at least one number, one uppercase letter, one lowercase letter, and be at least 8 characters long.',
+              blurEvent: EVENTS.STUDENT_ENTERED_PASSWORD,
             },
           })
         : null,

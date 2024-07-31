@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import store from './store'
+import AddClassView from './views/AddClassView.vue'
 import AdminView from './views/Admin/index.vue'
 import AdminEditSchool from './views/Admin/AdminEditSchool.vue'
 import AdminIneligibleStudents from './views/Admin/AdminIneligibleStudents.vue'
@@ -123,6 +124,12 @@ const routes = [
     path: '/reference-form/:referenceId',
     name: 'ReferenceView',
     component: ReferenceView,
+    meta: { authOptional: true },
+  },
+  {
+    path: '/class',
+    name: 'AddClass',
+    component: AddClassView,
     meta: { authOptional: true },
   },
   {

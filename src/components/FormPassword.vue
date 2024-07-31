@@ -18,7 +18,7 @@
       :name="name"
       :placeholder="placeholder"
       type="password"
-      v-model="password"
+      :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
       class="uc-form-text-input"
       :class="{
@@ -41,7 +41,6 @@
 
 <script>
 import { helpers, requiredIf } from '@vuelidate/validators'
-import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import { useInputValidation } from '@/composables/InputValidation'
 
@@ -69,7 +68,6 @@ export default {
     },
     blurEvent: {
       type: String,
-      default: EVENTS.STUDENT_ENTERED_PASSWORD,
     },
     testid: {
       type: String,
@@ -90,14 +88,13 @@ export default {
 
   data() {
     return {
-      password: '',
       hasEnteredPassword: false,
     }
   },
 
   validations() {
     return {
-      password: {
+      modelValue: {
         required: helpers.withMessage('Required', requiredIf(this.isRequired)),
         isPasswordValid: helpers.regex(this.PASSWORD_PATTERN),
       },
@@ -110,8 +107,8 @@ export default {
 
   methods: {
     onBlur() {
-      this.v$.password.$touch()
-      if (this.password && !this.hasEnteredPassword) {
+      this.v$.modelValue.$touch()
+      if (this.modelValue && !this.hasEnteredPassword && this.blurEvent) {
         AnalyticsService.captureEvent(this.blurEvent)
         this.hasEnteredPassword = true
       }

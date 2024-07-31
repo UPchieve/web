@@ -21,7 +21,7 @@
       }"
       type="text"
       :placeholder="placeholder"
-      v-model="text"
+      :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
       @blur="onBlur"
       :required="isRequired"
@@ -77,7 +77,6 @@ export default {
 
   data() {
     return {
-      text: '',
       hasEnteredText: false,
     }
   },
@@ -101,14 +100,14 @@ export default {
     }
 
     return {
-      text: textValidations,
+      modelValue: textValidations,
     }
   },
 
   methods: {
     onBlur() {
-      this.v$.text.$touch()
-      if (this.text && !this.hasEnteredText) {
+      this.v$.modelValue.$touch()
+      if (this.modelValue && !this.hasEnteredText && this.blurEvent) {
         AnalyticsService.captureEvent(this.blurEvent)
         this.hasEnteredText = true
       }

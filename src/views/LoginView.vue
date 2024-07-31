@@ -154,6 +154,7 @@ export default {
       const params = new URLSearchParams({
         provider,
         isLogin: true,
+        redirect: this.$route.query.redirect ?? '',
       })
       const url = `${config.serverRoot}/auth/sso?${params.toString()}`
       window.location.replace(url)
