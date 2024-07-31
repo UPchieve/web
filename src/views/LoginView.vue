@@ -1,5 +1,9 @@
 <template>
-  <form-page-template :layout="formPageTemplateLayout" @submit.prevent="signIn">
+  <form-page-template
+    :layout="formPageTemplateLayout"
+    panelImg="updog-subjects"
+    @submit.prevent="signIn"
+  >
     <div class="uc-form">
       <h1 class="uc-form-header" data-testid="login-heading">
         Hey, welcome back!

@@ -396,6 +396,7 @@ function getFirstPageDetails(to) {
   const subheaderText = getSubheaderText()
   return {
     backgroundLayout: 'panel-right-50p',
+    panelImage: 'chat-one-on-one',
     submitAction: checkEligibility,
     rows: [
       getRow(null, getTextElement('h1', getHeaderText())),
