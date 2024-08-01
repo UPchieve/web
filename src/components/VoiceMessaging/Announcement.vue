@@ -1,11 +1,17 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import RecordIcon from '@/assets/voice_message_icons/record-message.svg'
+import { EVENTS } from '../../consts'
+import AnalyticsService from '@/services/AnalyticsService'
 
 const showAnnouncement = ref(
   JSON.parse(localStorage.getItem('showVmAnnouncement') ?? 'true')
 )
+if (showAnnouncement.value === true) {
+  AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_ANNOUNCEMENT_SEEN)
+}
 function close() {
+  AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_ANNOUNCEMENT_CLOSED)
   showAnnouncement.value = false
   localStorage.setItem('showVmAnnouncement', JSON.stringify(false))
 }
