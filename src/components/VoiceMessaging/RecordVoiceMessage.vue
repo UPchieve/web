@@ -9,6 +9,7 @@ import LoggerService from '@/services/LoggerService'
 import { vTooltip } from 'maz-ui'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '../../consts'
+import Announcement from './Announcement.vue'
 
 enum STATES {
   idle = 'IDLE',
@@ -134,17 +135,26 @@ function destroy() {
 </script>
 
 <template v-if="recorder.state !== STATES.notSupported">
-  <button
-    v-tooltip="{ text: 'Record audio', color: 'black', position: 'top' }"
-    @click="record"
-    @mouseover="
-      AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_HOVER_RECORDING_BUTTON)
-    "
-    class="button"
-    v-if="recording.state === STATES.idle"
-  >
-    <RecordIcon class="icon record-icon"></RecordIcon>
-  </button>
+  <div v-if="recording.state === STATES.idle">
+    <Announcement />
+
+    <button
+      v-tooltip="{
+        text: 'Record audio message',
+        color: 'black',
+        position: 'top',
+      }"
+      @click="record"
+      @mouseover="
+        AnalyticsService.captureEvent(
+          EVENTS.VOICE_MESSAGE_HOVER_RECORDING_BUTTON
+        )
+      "
+      class="button"
+    >
+      <RecordIcon class="icon record-icon"></RecordIcon>
+    </button>
+  </div>
   <div v-else class="recorder-container">
     <div
       v-if="
@@ -223,7 +233,7 @@ function destroy() {
     color: #fff;
     padding-left: 8px;
     padding-right: 8px;
-    left: -24px;
+    left: -48px;
     bottom: calc(100%);
     transition-property: none;
   }
