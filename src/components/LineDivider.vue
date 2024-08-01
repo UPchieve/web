@@ -22,7 +22,7 @@ export default {
 }
 
 .break-line {
-  background-color: $c-secondary-grey;
+  background-color: #c4c4c4;
   flex-grow: 1;
   height: 1px;
 }
@@ -30,7 +30,7 @@ export default {
 .text {
   color: $c-secondary-grey;
   font-style: italic;
-  padding: 0 10px;
+  padding: 0 30px;
   margin: 0;
   width: fit-content;
 }

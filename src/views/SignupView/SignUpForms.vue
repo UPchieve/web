@@ -142,7 +142,9 @@ export default {
           return
         }
 
-        this.$router.replace(next)
+        if (next) {
+          this.$router.replace(next)
+        }
       } catch (err) {
         this.error = 'Unknown server error'
       } finally {
@@ -196,6 +198,10 @@ p {
 
 .el-gap {
   gap: 10px;
+}
+
+.el-gap-sm {
+  gap: 4px;
 }
 
 .button-narrow {

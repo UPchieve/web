@@ -109,19 +109,12 @@ $footer-height-tiny: 100px;
       @include flex-container(column);
     }
 
+    .img-content,
     .form-content {
       min-height: calc(100vh - $footer-height);
 
       @include breakpoint-below('tiny') {
         min-height: calc(100vh - $footer-height-tiny);
-      }
-    }
-
-    .img-content {
-      min-height: calc(100vh - $footer-height);
-
-      @include breakpoint-below('small') {
-        display: none;
       }
     }
 
@@ -147,6 +140,10 @@ $footer-height-tiny: 100px;
       .img-content {
         background-color: #f0f9ff;
         flex: 1;
+
+        @include breakpoint-below('medium') {
+          display: none;
+        }
       }
     }
 
@@ -164,6 +161,10 @@ $footer-height-tiny: 100px;
 
       .img-content {
         flex: 1;
+
+        @include breakpoint-below('small') {
+          display: none;
+        }
       }
     }
   }

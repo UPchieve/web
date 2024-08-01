@@ -130,6 +130,7 @@ async function checkEligibility(data) {
 function ineligibleContinue() {
   AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_STUDENT_ACCESS_PAGE)
   window.location = 'https://upchieve.org/request-access'
+  return [null, null]
 }
 
 async function createAccount(data) {
@@ -182,7 +183,7 @@ function isIneligibleRoute(to) {
 }
 
 function isAccountRoute(to, from) {
-  return to.path === RoutePath.account && from?.path === RoutePath.eligibility
+  return to.path === RoutePath.account
 }
 
 function isParentGuardianConfirmationRoute(to, from) {
@@ -245,16 +246,16 @@ export function getGradeSelectionElement(isParentGuardian) {
 
 function getSsoSectionElements() {
   return [
-    getRow(null, getSsoButton(createAccountWithGoogle, 'Google')),
-    getRow(null, getSsoButton(createAccountWithClever, 'Clever', 'clever')),
+    getRow('mt-4', getSsoButton(createAccountWithGoogle, 'Google')),
+    getRow('mt-3', getSsoButton(createAccountWithClever, 'Clever', 'clever')),
     getRow(
-      'justify-center italic',
+      'justify-center italic mt-3',
       getTextElement(
         'p',
         'By clicking the button above, you agree to our User Agreement'
       )
     ),
-    getRow(null, { element: 'LineDivider', props: { text: 'or' } }),
+    getRow('mt-2 mb-2', { element: 'LineDivider', props: { text: 'or' } }),
   ]
 }
 
@@ -279,7 +280,7 @@ export function getPartnerSitesElement(to) {
 export function getTermsCheckboxElements() {
   return [
     getRow(
-      'justify-start',
+      'justify-start mt-4 el-gap-sm',
       {
         element: 'FormCheckBox',
         props: {
@@ -290,7 +291,7 @@ export function getTermsCheckboxElements() {
       {
         element: 'a',
         classes: 'uc-link',
-        content: 'User Agreement',
+        content: 'User Agreement.',
         props: {
           href: 'https://upchieve.org/legal',
           target: '_blank',
@@ -372,30 +373,37 @@ function getFirstPageDetails(to) {
   const subheaderText = getSubheaderText()
   return {
     backgroundLayout: 'panel-right-50p',
-    panelImage: 'chat-one-on-one',
     submitAction: checkEligibility,
+    panelImage: 'chat-one-on-one',
+    classes: 'uc-column justify-center justify-start-md',
     rows: [
-      getRow(null, getTextElement('h1', getHeaderText())),
-      subheaderText ? getRow(null, getTextElement('p', subheaderText)) : null,
+      getRow(
+        'justify-center',
+        {
+          element: 'header-logo-teal',
+        }
+      ),
+      getRow('mt-4', getTextElement('h1', getHeaderText())),
+      subheaderText ? getRow('mt-3', getTextElement('p', subheaderText)) : null,
       isPartnerStudentSignUp()
         ? getRow(
-          'justify-start',
+          'justify-start mt-1',
           getRouterLinkElement(
             `Not with ${to.params.partner?.name}?`,
             '/sign-up/student/eligibility'
           )
         )
-        : getRow('justify-start', ...getAlreadyHaveAccountElements()),
+        : getRow('justify-start mt-1 el-gap-sm', ...getAlreadyHaveAccountElements()),
       isPartnerStudentSignUp()
-        ? getRow(null, getPartnerSitesElement(to))
+        ? getRow('mt-2', getPartnerSitesElement(to))
         : null,
       getRow(
-        null,
+        'mt-2',
         getGradeSelectionElement(isParentGuardian),
         isEligibilitySignUp() ? getZipCodeElement() : null
       ),
       includeSchoolElement()
-        ? getRow(null, {
+        ? getRow('mt-2', {
           element: 'FormSchoolSearch',
           props: {
             name: InputName.SCHOOL_ID,
@@ -417,11 +425,10 @@ function getFirstPageDetails(to) {
         })
         : null,
       isOrganicStudentSignUp() || isEligibilityAppealSignUp()
-        ? getRow(null, getSignUpSourceElement(InputName.SIGNUP_SOURCE_ID, EVENTS.STUDENT_SELECTED_HOW_DID_YOUR_HEAR_ABOUT_US))
+        ? getRow('mt-2', getSignUpSourceElement(InputName.SIGNUP_SOURCE_ID, EVENTS.STUDENT_SELECTED_HOW_DID_YOUR_HEAR_ABOUT_US))
         : null,
-      getRow(null, { element: 'br' }),
       getRow(
-        null,
+        'mt-4',
         isEligibilitySignUp()
           ? getButtonElement(checkEligibility, 'Check eligibility')
           : getButtonElement(continueToAccountPage, 'Continue')
@@ -440,21 +447,9 @@ function getIneligiblePageDetails() {
         element: 'updog-crying',
         classes: 'updog',
       }),
-      getRow(
-        'justify-center',
-        getTextElement('h1', "Oops... looks like you're not eligible")
-      ),
-      getRow(
-        null,
-        getTextElement(
-          'p',
-          "While we weren't able to verify your eligibility based on the info provided, don't worry: you may still be eligible! We just need your parent/guardian to answer some more questions first!"
-        )
-      ),
-      getRow(
-        'justify-center',
-        getButtonElement(ineligibleContinue, 'Continue', 'button-narrow')
-      ),
+      getRow('justify-center center mt-4', getTextElement('h1', "Oops... looks like you're not eligible")),
+      getRow('justify-center center mt-3', getTextElement('p', "While we weren't able to verify your eligibility based on the info provided, don't worry: you may still be eligible! We just need your parent/guardian to answer some more questions first!")),
+      getRow('justify-center mt-3', getButtonElement(ineligibleContinue, 'Continue', 'button-narrow', false)),
     ],
   }
 }
@@ -466,18 +461,24 @@ function getAccountPageDetails(to) {
     submitAction: createAccount,
     rows: [
       getRow(
-        null,
+        'justify-start mt-4',
+        {
+          element: 'header-logo-teal',
+        }
+      ),
+      getRow(
+        'mt-4',
         getTextElement(
           'h1',
           (isParentGuardian ? 'Your child is ' : "You're ") +
           'eligible for UPchieve! 🎉'
         )
       ),
-      getRow(null, getTextElement('h2', 'Create an Account')),
+      getRow('mt-3', getTextElement('h2', 'Finish creating your account')),
       ...(!isParentGuardian ? getSsoSectionElements() : []),
-      isParentGuardian ? getRow(null, getParentGuardianEmailElement(to)) : null,
+      isParentGuardian ? getRow('mt-2', getParentGuardianEmailElement(to)) : null,
       getRow(
-        null,
+        'mt-2 uc-column-sm',
         getInputElement(
           InputName.FIRST_NAME,
           'First Name',
@@ -491,9 +492,9 @@ function getAccountPageDetails(to) {
           EVENTS.STUDENT_ENTERED_LAST_NAME
         )
       ),
-      getRow(null, getStudentEmailElement(isParentGuardian)),
+      getRow('mt-2', getStudentEmailElement(isParentGuardian)),
       !isParentGuardian
-        ? getRow(null, {
+        ? getRow('mt-2', {
           element: 'FormPassword',
           props: {
             name: InputName.PASSWORD,
@@ -505,7 +506,7 @@ function getAccountPageDetails(to) {
         : null,
       ...getTermsCheckboxElements(),
       getRow(
-        'justify-end',
+        'justify-end mt-4',
         getButtonElement(createAccount, 'Confirm', 'button-narrow')
       ),
     ],

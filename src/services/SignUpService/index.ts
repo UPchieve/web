@@ -25,7 +25,7 @@ type PageDetail = {
 }
 
 type SubmitAction = (data: Object) => SubmitActionResponse
-type SubmitActionResponse = [{ params: { step?: string, path?: string } } | null, ErrorMessage | null]
+type SubmitActionResponse = [{ params?: { step: string }, path?: string } | null, ErrorMessage | null]
 type ErrorMessage = string
 type FormRow = {
   classes: string
@@ -45,7 +45,7 @@ type FormElementType = 'h1' | 'p' | 'FormSelect' | 'FormInput' | 'FormEmail' | '
 
 export function getFilteredPageDetails(cb: () => PageDetail): PageDetail {
   const pd = cb()
-  pd.rows = pd.rows.filter((row: FormRow[]) => !!row)
+  pd.rows = pd.rows.filter((row) => !!row)
   return pd
 }
 
@@ -98,6 +98,7 @@ export function createAccountWithSso(provider: 'google' | 'clever', data: Object
     }
     const url = `${config.serverRoot}/auth/sso?${params.toString()}`
     window.location.replace(url)
+    return [null, null]
   } catch (err) {
     LoggerService.noticeError(err)
     return getSubmitResponseDefault(null, null, err)
@@ -142,12 +143,12 @@ export function getSsoButton(submitAction: SubmitAction, content: string, ssoMet
   }
 }
 
-export function getButtonElement(submitAction: SubmitAction, content: string, classes = ''): FormElement {
+export function getButtonElement(submitAction: SubmitAction, content: string, classes = '', isDisabledOnInvalid = true): FormElement {
   return {
     element: 'button',
     classes: 'uc-form-button ' + classes,
     content,
-    isDisabledOnInvalid: true,
+    isDisabledOnInvalid,
     submitAction,
   }
 }
