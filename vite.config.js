@@ -10,6 +10,9 @@ export default {
       process.env.SUBWAY_CUSTOM_VOLUNTEER_PARTNER_ORGS
     ),
   },
+  optimizeDeps: {
+    exclude: ['maz-ui'],
+  },
   resolve: {
     alias: {
       '~': path.resolve(__dirname, './node_modules'),

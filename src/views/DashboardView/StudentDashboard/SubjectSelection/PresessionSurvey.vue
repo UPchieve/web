@@ -146,17 +146,11 @@ export default {
     this.surveyTypeId = response.data.surveyTypeId
     this.buildUserResponse()
     /**
-     *
-     *
      * The Presession survey component is rendered within the SubjectSelectionModal,
-     * which is uses the ModalTemplate. Since the ModalTemplate has styles that are
-     * not desired for this design, and to avoid a refactor of multiple components,
-     * we are overriding styles of the ModalTemplate within this component and only
-     * for the lifecycle of this component.
-     *
-     *
+     * which is uses the ModalTemplate. Hide the default template buttons when we
+     * transition into this modal.
      */
-    this.overrideModalTemplateStyles()
+    this.$store.dispatch('app/modal/update', { showTemplateButtons: false })
   },
 
   computed: {
@@ -264,32 +258,6 @@ export default {
       }
       this.userResponse = Object.assign({}, this.userResponse, responseAnswer)
     },
-    overrideModalTemplateStyles() {
-      const formElem = document.querySelector('.ModalTemplate-form')
-      if (!this.mobileMode) {
-        formElem.style.overflow = 'initial'
-        formElem.style.borderRadius = '22px'
-      }
-      formElem.style.padding = 'initial'
-
-      const selectionModal = document.querySelector('.SubjectSelectionModal')
-      selectionModal.style.minHeight = 'initial'
-
-      const modalTemplateSeparator = document.querySelector(
-        '.ModalTemplate-seperator'
-      )
-      modalTemplateSeparator.style.display = 'none'
-
-      const modalTemplateButtons = document.querySelector(
-        '.ModalTemplate-buttons'
-      )
-      modalTemplateButtons.style.display = 'none'
-
-      const modalTemplatePaddingElem = document.querySelector(
-        '.ModalTemplate-form--bottom-padding'
-      )
-      modalTemplatePaddingElem.style.paddingTop = 'initial'
-    },
   },
 }
 </script>
@@ -301,14 +269,9 @@ export default {
 
 .presession-survey {
   width: 100%;
-  padding: 1em;
   display: flex;
   flex-direction: column;
   text-align: left;
-
-  @include breakpoint-above('medium') {
-    padding: 0 4em;
-  }
 
   &__title {
     font-weight: 500;
@@ -380,10 +343,13 @@ export default {
   margin: 1em 0 1.5em 0;
 }
 
+.stepper :deep(path) {
+  fill: white;
+}
+
 .cross-icon-click-container {
   cursor: pointer;
   align-self: flex-end;
-  margin: 1.5em;
 }
 .cross-icon {
   fill: $icon-grey;
