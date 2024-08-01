@@ -674,5 +674,5 @@ export const SESSION_TOOL_TYPES = {
 export const INELIGIBLE_LOCAL_STORAGE_KEY = '7x9h8'
 
 export const GleapSurveyIds = {
-  VOICE_MESSAGING_SURVEY_ID: '9zh0sm',
+  VOICE_MESSAGING_SURVEY_ID: 'azu74f',
 }
