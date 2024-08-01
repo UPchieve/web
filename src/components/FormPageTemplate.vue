@@ -10,7 +10,9 @@
         full: layout === 'full',
       }"
     >
-      <div class="img-content"></div>
+      <div v-if="layout.includes('panel')" class="img-content">
+        <component v-if="panelImg" :is="panelImg" class="img" />
+      </div>
       <div class="form-content">
         <img class="logo teal" src="@/assets/header_logo.png" aria-hidden />
         <slot></slot>
@@ -33,11 +35,20 @@
 </template>
 
 <script>
+import ChatOneOnOne from '@/assets/chat-1-on-1.svg'
+import UpdogSubjects from '@/assets/updog-subjects.svg'
 export default {
+  components: {
+    ChatOneOnOne,
+    UpdogSubjects,
+  },
   props: {
     layout: {
       type: String,
       default: 'card',
+    },
+    panelImg: {
+      type: String,
     },
   },
 }
@@ -175,6 +186,16 @@ $footer-height-tiny: 100px;
     margin-bottom: 16px;
     max-width: 95px;
   }
+}
+
+.img-content {
+  @include flex-container(column, center, center);
+}
+
+.img {
+  height: 100%;
+  padding-top: 25px;
+  width: 100%;
 }
 
 .footer {

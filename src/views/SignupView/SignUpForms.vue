@@ -1,5 +1,8 @@
 <template>
-  <form-page-template :layout="pageDetails.backgroundLayout">
+  <form-page-template
+    :layout="pageDetails.backgroundLayout"
+    :panelImg="pageDetails.panelImage"
+  >
     <FormErrors :errors="error ? [error] : []" />
 
     <form
