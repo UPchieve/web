@@ -94,6 +94,9 @@ async function record() {
   const allowed = await setupAudio()
   if (allowed) {
     AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_START_RECORDING)
+    AnalyticsService.updateUser({
+      hasRecordedVoiceMessage: true,
+    })
     emit('notIdle')
     recording.state = STATES.recording
     recorder?.start()
