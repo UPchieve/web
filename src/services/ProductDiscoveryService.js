@@ -2,7 +2,7 @@ import AnalyticsService from './AnalyticsService'
 import LoggerService from './LoggerService'
 import FeatureFlagService from './FeatureFlagService'
 import Gleap from 'gleap'
-import { EVENTS, GleapSurveyIds } from '@/consts'
+import { EVENTS } from '@/consts'
 const orbital = window.orbital
 const GLEAP_WIDGET_CONFIGS = {
   bot: {
@@ -52,10 +52,6 @@ function handleGleapWidget(widgetId, config) {
 
   if (!widgetsShown.includes(widgetId)) {
     config.showWidget(widgetId, config.widgetParam)
-
-    if (widgetId === GleapSurveyIds.VOICE_MESSAGING_SURVEY_ID) {
-      AnalyticsService.captureEvent(EVENTS.USER_SHOWN_VOICE_MESSAGING_SURVEY)
-    }
 
     AnalyticsService.captureEvent(config.event, { [config.idName]: widgetId })
     localStorage.setItem(
