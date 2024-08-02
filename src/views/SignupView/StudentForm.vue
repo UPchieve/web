@@ -148,23 +148,58 @@
         ></v-select>
       </div>
 
-      <form-school-search
-        data-testid="student-school-autocomplete"
-        base-class="uc-form-autocomplete-input"
-        :placeholder="`Search for ${getFormLabelIdentifierPossessive} school`"
-        :aria-label="`Search for ${getFormLabelIdentifierPossessive} school`"
-        :search="autocompleteSchool"
-        :get-result-value="getSchoolDisplayName"
-        :debounce-time="500"
-        @input="handleSelectHighSchool"
-        @blur="v$.eligibility.highSchool.$touch"
-        v-bind:class="{
-          'uc-form-autocomplete-input-invalid': hasFormValidationError(
-            v$.eligibility.highSchool
-          ),
-        }"
-        required
-      />
+      <div class="uc-form-element">
+        <div class="uc-row justify-between">
+          <label
+            for="school-bf"
+            v-bind:class="{
+              error: hasFormValidationError(v$.eligibility.highSchool),
+            }"
+            >School</label
+          >
+          <div
+            v-if="hasFormValidationError(v$.eligibility.highSchool)"
+            class="error-caption"
+          >
+            {{ getFormValidationError(v$.eligibility.highSchool) }}
+          </div>
+        </div>
+        <autocomplete
+          id="school-bf"
+          data-testid="student-school-autocomplete"
+          base-class="uc-form-autocomplete-input"
+          :placeholder="`Search for ${getFormLabelIdentifierPossessive} school`"
+          :aria-label="`Search for ${getFormLabelIdentifierPossessive} school`"
+          :search="autocompleteSchool"
+          :get-result-value="getSchoolDisplayName"
+          :debounce-time="500"
+          @submit="handleSelectHighSchool"
+          @blur="v$.eligibility.highSchool.$touch"
+          v-bind:class="{
+            'uc-form-autocomplete-input-invalid': hasFormValidationError(
+              v$.eligibility.highSchool
+            ),
+          }"
+          required
+        >
+          <template #result="{ result, props }">
+            <li v-bind="props">
+              <div v-if="result.name" id="ph-no-capture" class="result">
+                {{ result.name }} ({{ result.city }}, {{ result.state }})
+              </div>
+              <a
+                v-if="result.cantFindSchool"
+                target="_blank"
+                href="https://upchieve.org/cant-find-school"
+              >
+                <div class="result">
+                  {{ CANNOT_FIND_SCHOOL_TEXT }}
+                </div>
+              </a>
+            </li>
+          </template>
+        </autocomplete>
+      </div>
 
       <button
         data-testid="eligibility-form-submit-btn"
@@ -846,7 +881,6 @@ import FormErrors from '@/components/FormErrors.vue'
 import config from '../../config'
 import * as signupUtils from '@/utils/signup-utils'
 import FormEmail from '@/components/FormEmail.vue'
-import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
 
 export default {
   components: {
@@ -856,7 +890,6 @@ export default {
     GoogleLogo,
     FormErrors,
     FormEmail,
-    FormSchoolSearch,
   },
   setup() {
     return { v$: useVuelidate() }
@@ -1050,6 +1083,15 @@ export default {
 
     const isDomesticIpAddress = await this.isDomesticIpAddress()
     if (!isDomesticIpAddress) return this.internationalPage()
+
+    if (localStorage.getItem(INELIGIBLE_LOCAL_STORAGE_KEY)) {
+      AnalyticsService.captureEvent(
+        EVENTS.INELIGIBLE_STUDENT_RETURNED_TO_SIGN_UP,
+        {
+          partnerKey: this.partnerKey,
+        }
+      )
+    }
   },
   computed: {
     ...mapGetters({
