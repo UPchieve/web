@@ -105,28 +105,15 @@ $transition: transform 700ms;
   position: relative;
   display: flex;
   flex-direction: column;
-
-  @media screen and (min-width: get-breakpoint('medium')) and (max-width: get-breakpoint('huge')) and (orientation: landscape) {
-    padding-left: 2em;
-    height: initial;
-  }
+  justify-content: space-between;
 }
 
 .AppSidebar-final-link {
   @include font-category('display-small');
   cursor: pointer;
-  padding: 40px 0 60px;
-  text-align: left;
 
   &--desktop {
     @include font-category('button');
-    justify-content: space-between;
-
-    @media screen and (min-width: get-breakpoint('medium')) and (max-width: get-breakpoint('huge')) and (orientation: landscape) {
-      position: initial;
-      text-align: left;
-      margin: 4em 0 1em;
-    }
   }
 }
 </style>
