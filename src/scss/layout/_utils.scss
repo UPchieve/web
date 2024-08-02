@@ -17,6 +17,12 @@
   &.items-center {
     align-items: center;
   }
+
+  &.justify-start-sm {
+    @include breakpoint-below('small') {
+      justify-content: start;
+    }
+  }
 }
 
 .uc-row {
@@ -40,6 +46,12 @@
 
   &.items-baseline {
     align-items: baseline;
+  }
+
+  &.uc-column-sm {
+    @include breakpoint-below('small') {
+      flex-direction: column;
+    }
   }
 }
 

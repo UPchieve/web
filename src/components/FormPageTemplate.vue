@@ -14,7 +14,12 @@
         <component v-if="panelImg" :is="panelImg" class="img" />
       </div>
       <div class="form-content">
-        <img class="logo teal" src="@/assets/header_logo.png" aria-hidden />
+        <img
+          v-if="!hideLogo"
+          class="logo teal"
+          src="@/assets/header_logo.png"
+          aria-hidden
+        />
         <slot></slot>
       </div>
     </div>
@@ -36,10 +41,12 @@
 
 <script>
 import ChatOneOnOne from '@/assets/chat-1-on-1.svg'
+import EmpowerYourStudents from '@/assets/empower-your-students.svg'
 import UpdogSubjects from '@/assets/updog-subjects.svg'
 export default {
   components: {
     ChatOneOnOne,
+    EmpowerYourStudents,
     UpdogSubjects,
   },
   props: {
@@ -49,6 +56,9 @@ export default {
     },
     panelImg: {
       type: String,
+    },
+    hideLogo: {
+      default: false,
     },
   },
 }
@@ -99,12 +109,19 @@ $footer-height-tiny: 100px;
       @include flex-container(column);
     }
 
-    .form-content,
-    .img-content {
+    .form-content {
       min-height: calc(100vh - $footer-height);
 
       @include breakpoint-below('tiny') {
         min-height: calc(100vh - $footer-height-tiny);
+      }
+    }
+
+    .img-content {
+      min-height: calc(100vh - $footer-height);
+
+      @include breakpoint-below('small') {
+        display: none;
       }
     }
 
@@ -120,7 +137,11 @@ $footer-height-tiny: 100px;
       .form-content {
         background: white;
         flex: 1;
-        padding: 16px;
+        padding: 2rem;
+
+        @include breakpoint-below('small') {
+          padding: 16px;
+        }
       }
 
       .img-content {
@@ -133,15 +154,16 @@ $footer-height-tiny: 100px;
       .form-content {
         background: white;
         flex: 4;
-        padding: 16px;
+        padding: 2rem;
+
+        @include breakpoint-below('small') {
+          flex: 1;
+          padding: 16px;
+        }
       }
 
       .img-content {
         flex: 1;
-
-        @include breakpoint-below('tiny') {
-          flex: 0;
-        }
       }
     }
   }

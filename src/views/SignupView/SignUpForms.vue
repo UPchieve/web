@@ -2,6 +2,7 @@
   <form-page-template
     :layout="pageDetails.backgroundLayout"
     :panelImg="pageDetails.panelImage"
+    hideLogo="true"
   >
     <FormErrors :errors="error ? [error] : []" />
 
@@ -51,6 +52,7 @@
 <script>
 import { useVuelidate } from '@vuelidate/core'
 import CheckCircled from '@/assets/check-circled.svg'
+import HeaderLogoTeal from '@/assets/header-logo-teal.svg'
 import UpdogCrying from '@/assets/updog-crying.svg'
 import UpdogSmiling from '@/assets/updog-smiling.svg'
 import FormCheckBox from '@/components/FormCheckBox.vue'
@@ -69,6 +71,7 @@ export default {
   name: 'sign-up-forms',
   components: {
     CheckCircled,
+    HeaderLogoTeal,
     UpdogCrying,
     UpdogSmiling,
     FormCheckBox,
@@ -184,7 +187,7 @@ h2 {
 }
 
 p {
-  margin-bottom: 12px;
+  margin-bottom: 0;
 }
 
 .bold {
