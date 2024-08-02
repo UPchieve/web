@@ -70,7 +70,7 @@ function close() {
   font-size: 14px;
   color: lightslategray;
 }
-.mic::v-deep path {
+.mic :deep(path) {
   fill: rgb(52, 52, 64);
 }
 .title {

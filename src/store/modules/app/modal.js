@@ -16,6 +16,9 @@ export default {
       commit('setComponent', payload.component)
       commit('setData', payload.data)
     },
+    update: ({ commit, state }, payload = {}) => {
+      commit('setData', { ...state.data, ...payload })
+    },
     hide: ({ commit }) => {
       commit('setIsShown', false)
       commit('setComponent', null)
