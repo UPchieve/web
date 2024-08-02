@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onBeforeMount, ref, computed } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { GRADES, EVENTS } from '@/consts'
@@ -18,15 +18,14 @@ const $route = useRoute()
 const $router = useRouter()
 
 $store.dispatch('app/hideNavigation')
-const isAuthenticated = computed(() => $store.getters['user/isAuthenticated'])
-const user = computed<{ email: string } | undefined>(
-  () => $store.state.user.user
-)
 
 const errorMessage = ref<String>('')
-const email = ref<String | undefined>($route.query.email ?? user.value?.email)
-const classCode = ref<String | undefined>($route.params.classCode)
-const gradeLevel = ref<String | undefined>($route.query.gradeLevel)
+const email = ref<String | undefined>($route.query.email as string)
+const classCode = ref<String | undefined>(
+  ($route.params.classCode as string)?.toUpperCase()
+)
+const askForClassCode = ref<Boolean>(!classCode.value)
+const gradeLevel = ref<String | undefined>($route.query.gradeLevel as string)
 const isLoading = ref(false)
 
 onBeforeMount(async () => {
@@ -36,6 +35,12 @@ onBeforeMount(async () => {
     await addStudentToClass()
   }
 })
+
+function removeClass() {
+  askForClassCode.value = true
+  classCode.value = ''
+  $router.replace('/join-class')
+}
 
 async function addStudentToClass() {
   AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_ADD_CLASS)
@@ -50,7 +55,7 @@ async function addStudentToClass() {
 
     if (response.data.teacherClass) {
       // TODO: Show modal once get to dashboard.
-      return $router.replace(`/dashboard?classCode=${classCode.value}`)
+      return $router.push(`/dashboard?classCode=${classCode.value}`)
     }
 
     const data = {
@@ -60,11 +65,11 @@ async function addStudentToClass() {
     }
     if (response.data.isExistingStudent) {
       const redirectUriParams = new URLSearchParams({
-        redirect: `/join-class/${classCode.value}?${(new URLSearchParams(data)).toString()}`,
-        message: 'Sign in to finish adding yourself to the class.',
+        redirect: `/join-class/${classCode.value}?${new URLSearchParams(data).toString()}`,
+        email: email.value as string,
+        message: 'Sign in to finish joining your class!',
       })
-      // TODO: Show message to login in order to complete.
-      $router.replace('/login?' + redirectUriParams.toString())
+      $router.push('/login?' + redirectUriParams.toString())
     } else {
       $router.push({
         name: 'SignupView',
@@ -89,24 +94,29 @@ async function addStudentToClass() {
   <form-page-template>
     <loader v-if="isLoading" overlay />
 
-    <h1>Join your class!</h1>
-
     <form-errors v-if="errorMessage" :errors="[errorMessage]" />
 
-    <FormEmail v-if="!isAuthenticated" v-model="email" />
-    <div v-else class="uc-row justify-between">
-      <div>Adding class for {{ user?.email }}</div>
-    </div>
+    <h1>Join your class!</h1>
+    <p>When you join a class, your teacher will get access to information about your UPchieve usage.</p>
 
     <FormInput
+      v-if="askForClassCode"
+      class="mt-3"
       v-model="classCode"
       name="classCode"
       label="Class Code"
       placeholder="Class Code"
       :blur-event="EVENTS.STUDENT_ENTERED_CLASS_CODE"
     />
+    <div v-else class="uc-row mt-2">
+      <p>Class code: {{ classCode }}</p>
+      <a class="uc-link ml-2" @click="removeClass">Not your class?</a>
+    </div>
+
+    <FormEmail class="mt-3" v-model="email" />
 
     <FormSelect
+      class="mt-3"
       v-model="gradeLevel"
       name="gradeLevel"
       label="Grade in 2024-2025"
@@ -116,18 +126,26 @@ async function addStudentToClass() {
       :blur-event="EVENTS.STUDENT_SELECTED_GRADE"
     />
 
-    <button
-      class="uc-form-button mt-3"
-      type="submit"
-      @click="addStudentToClass"
-    >
+    <button class="uc-form-button" type="submit" @click="addStudentToClass">
       Continue
     </button>
   </form-page-template>
 </template>
 
 <style lang="scss" scoped>
+form-page-template {
+  padding: 50px;
+}
 h1 {
   font-size: 2rem;
+}
+
+p {
+  color: #666f7d;
+  margin-bottom: 0;
+}
+
+.uc-form-button {
+  margin-top: 3rem;
 }
 </style>

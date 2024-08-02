@@ -9,12 +9,13 @@
         Hey, welcome back!
       </h1>
       <div
-        v-if="error || $route.query['401'] === 'true'"
-        class="alert alert-danger"
+        v-if="error || message"
+        class="alert"
+        :class="{ 'alert-success': !!message, 'alert-danger': !!error }"
         role="alert"
         data-testid="error"
       >
-        {{ error }}
+        {{ error ?? message }}
       </div>
       <form>
         <!-- TODO: Do we want autofocus? -->
@@ -127,10 +128,11 @@ export default {
     }
     return {
       credentials: {
-        email: '',
+        email: this.$route.query.email ?? '',
         password: '',
       },
       error,
+      message: this.$route.query.message ?? '',
       isLoggingIn: false,
     }
   },
