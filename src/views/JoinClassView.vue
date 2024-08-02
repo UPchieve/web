@@ -4,8 +4,10 @@ import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { GRADES, EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
+import FeatureFlagService from '@/services/FeatureFlagService'
 import NetworkService from '@/services/NetworkService'
 import FormEmail from '@/components/FormEmail.vue'
+import FormErrors from '@/components/FormErrors.vue'
 import FormInput from '@/components/FormInput.vue'
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import FormSelect from '@/components/FormSelect.vue'
@@ -21,14 +23,15 @@ const user = computed<{ email: string } | undefined>(
   () => $store.state.user.user
 )
 
+const errorMessage = ref<String>('')
 const email = ref<String | undefined>($route.query.email ?? user.value?.email)
-const classCode = ref<String | undefined>(
-  $route.query.code ?? $route.query.classCode
-)
+const classCode = ref<String | undefined>($route.params.classCode)
 const gradeLevel = ref<String | undefined>($route.query.gradeLevel)
 const isLoading = ref(false)
 
 onBeforeMount(async () => {
+  FeatureFlagService.setPersonPropertiesForFlags({ cohort: 'joining-class' })
+
   if (email.value && classCode.value && gradeLevel.value) {
     await addStudentToClass()
   }
@@ -40,7 +43,7 @@ async function addStudentToClass() {
   isLoading.value = true
   try {
     const response = await NetworkService.addStudentToClass({
-      email: email.value ?? user.value?.email,
+      email: email.value,
       classCode: classCode.value,
       gradeLevel: gradeLevel.value,
     })
@@ -50,29 +53,32 @@ async function addStudentToClass() {
       return $router.replace(`/dashboard?classCode=${classCode.value}`)
     }
 
-    const params = new URLSearchParams({
-      email: (email.value ?? user.value?.email) as string,
+    const data = {
+      email: email.value as string,
       classCode: classCode.value as string,
       gradeLevel: gradeLevel.value as string,
-    })
+    }
     if (response.data.isExistingStudent) {
       const redirectUriParams = new URLSearchParams({
-        redirect: `/class?${params.toString()}`,
+        redirect: `/join-class/${classCode.value}?${(new URLSearchParams(data)).toString()}`,
         message: 'Sign in to finish adding yourself to the class.',
       })
       // TODO: Show message to login in order to complete.
       $router.replace('/login?' + redirectUriParams.toString())
     } else {
-      // TODO: Show message to finish creating account.
-      $router.replace({
-        path: '/sign-up/student/account?' + params.toString(),
-        query: {
-          isEligible: 'true',
+      $router.push({
+        name: 'SignupView',
+        params: {
+          userType: 'student',
+          step: 'account',
         },
+        query: data,
       })
     }
-  } catch {
-    // TODO: Show errors.
+  } catch (err) {
+    errorMessage.value =
+      err.response?.data?.err ??
+      'Something went wrong. Please refresh the page and try again.'
   } finally {
     isLoading.value = false
   }
@@ -83,11 +89,15 @@ async function addStudentToClass() {
   <form-page-template>
     <loader v-if="isLoading" overlay />
 
-    <h1>Add yourself to a class</h1>
+    <h1>Join your class!</h1>
+
+    <form-errors v-if="errorMessage" :errors="[errorMessage]" />
+
     <FormEmail v-if="!isAuthenticated" v-model="email" />
     <div v-else class="uc-row justify-between">
       <div>Adding class for {{ user?.email }}</div>
     </div>
+
     <FormInput
       v-model="classCode"
       name="classCode"
@@ -95,6 +105,7 @@ async function addStudentToClass() {
       placeholder="Class Code"
       :blur-event="EVENTS.STUDENT_ENTERED_CLASS_CODE"
     />
+
     <FormSelect
       v-model="gradeLevel"
       name="gradeLevel"
@@ -104,7 +115,12 @@ async function addStudentToClass() {
       :reduce="(option: string) => option.split(' ')[0]"
       :blur-event="EVENTS.STUDENT_SELECTED_GRADE"
     />
-    <button class="uc-form-button" type="submit" @click="addStudentToClass">
+
+    <button
+      class="uc-form-button mt-3"
+      type="submit"
+      @click="addStudentToClass"
+    >
       Continue
     </button>
   </form-page-template>

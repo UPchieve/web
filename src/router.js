@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import store from './store'
-import AddClassView from './views/AddClassView.vue'
 import AdminView from './views/Admin/index.vue'
 import AdminEditSchool from './views/Admin/AdminEditSchool.vue'
 import AdminIneligibleStudents from './views/Admin/AdminIneligibleStudents.vue'
@@ -24,6 +23,7 @@ import ContactView from './views/ContactView.vue'
 import DashboardView from './views/DashboardView/index.vue'
 import FavoriteCoachesView from './views/FavoriteCoachesView.vue'
 import FeedbackView from './views/FeedbackView.vue'
+import JoinClassView from './views/JoinClassView.vue'
 import LoginView from './views/LoginView.vue'
 import LogoutView from './views/LogoutView.vue'
 import ProfileView from './views/ProfileView/index.vue'
@@ -127,9 +127,9 @@ const routes = [
     meta: { authOptional: true },
   },
   {
-    path: '/class',
-    name: 'AddClass',
-    component: AddClassView,
+    path: '/join-class/:classCode?',
+    name: 'JoinClassView',
+    component: JoinClassView,
     meta: { authOptional: true },
   },
   {

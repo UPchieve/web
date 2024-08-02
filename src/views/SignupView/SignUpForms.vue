@@ -124,19 +124,19 @@ export default {
   },
 
   methods: {
-    async submitWithValidation(submit) {
+    async submitWithValidation(submitAction) {
       if (!(await this.v$.$validate())) {
         return
       }
 
-      await this.submit(submit)
+      await this.submit(submitAction)
     },
-    async submit(submit) {
+    async submit(submitAction) {
       this.isSubmitting = true
       this.error = null
 
       try {
-        const [next, error] = await submit(this.getSubmitData())
+        const [next, error] = await submitAction(this.getSubmitData())
         if (error) {
           this.error = error
           return
@@ -154,8 +154,8 @@ export default {
     getSubmitData() {
       const merged = {
         ...this.form,
-        ...this.$route.params,
         ...this.$route.query,
+        ...this.$route.params,
       }
       return merged
     },
