@@ -8,8 +8,10 @@ import {
   getTextElement,
   getInputElement,
   getButtonElement,
+  getAlreadyHaveAccountElements,
   getSubmitResponseDefault as getSubmitResponse,
 } from '@/services/SignUpService'
+import { getLinkElement, getRouterLinkElement } from '.'
 
 const RoutePath = {
   account: `/sign-up/teacher/${SignUpPage.account}`,
@@ -24,6 +26,7 @@ export const InputName = {
   LAST_NAME: 'lastName',
   PASSWORD: 'password',
   SCHOOL_ID: 'schoolId',
+  SIGNUP_SOURCE: 'signupSource',
   WORKS_WITH_ELIGIBLE_STUDENTS: 'worksWithEligibleStudents',
 }
 
@@ -44,22 +47,31 @@ function isIneligibleRoute(to) {
 }
 
 function isAccountRoute(to, from) {
-  return to.path === RoutePath.account && from?.path === RoutePath.eligibility
+  return to.path === RoutePath.account
 }
 
 function getEligibilityPageDetails() {
   return {
     backgroundLayout: 'panel-right-50p',
     submitAction: checkEligibility,
+    panelImage: 'empower-your-students',
+    classes: 'uc-column justify-center justify-start-sm',
     rows: [
       getRow(
-        null,
+        'justify-center',
+        {
+          element: 'header-logo-teal',
+        }
+      ),
+      getRow(
+        'mt-4',
         getTextElement(
           'h1',
-          'Check if your students are eligible for UPchieve!'
+          `Check if you're eligible for a FREE teacher account`
         )
       ),
-      getRow(null, {
+      getRow('justify-start mt-1', ...getAlreadyHaveAccountElements()),
+      getRow('mt-3', {
         element: 'FormSchoolSearch',
         props: {
           name: InputName.SCHOOL_ID,
@@ -70,15 +82,15 @@ function getEligibilityPageDetails() {
           selectedEvent: EVENTS.TEACHER_SELECTED_SCHOOL,
         },
       }),
-      getRow('justify-start', {
+      getRow('mt-2', getInputElement(InputName.SIGNUP_SOURCE, 'How did you hear about us?', EVENTS.TEACHER_ENTERED_SIGNUP_SOURCE)),
+      getRow('mt-4 justify-start', {
         element: 'FormCheckBox',
         props: {
           label: 'I work with 6th through 12th grade students',
           name: InputName.WORKS_WITH_ELIGIBLE_STUDENTS,
         },
       }),
-      getRow(null, { element: 'br' }),
-      getRow(null, getButtonElement(checkEligibility, 'Check eligibility')),
+      getRow('mt-5', getButtonElement(checkEligibility, 'Check eligibility')),
     ],
   }
 }
@@ -112,8 +124,14 @@ function getIneligiblePageDetails() {
   return {
     backgroundLayout: 'full',
     rows: [
-      // TODO: Design.
-      getRow(null, getTextElement('h1', 'Not eligible :(')),
+      getRow('justify-center center mt-3', getTextElement('h1', `Sorry! You're not eligible for an UPchieve account 😞`)),
+      getRow('justify-center center mt-2', getTextElement('p', 'UPchieve teacher accounts are only for 6th-12th grade teachers who work in Title I or majority low-income schools in the U.S.')),
+      getRow('justify-center center mt-4', getTextElement('p', 'Did we make a mistake?')),
+      getRow('justify-center center', getLinkElement('Request we add your school.', 'https://upchieve.org/cant-find-school')),
+      getRow('justify-center center mt-3', getTextElement('p', 'Do you teach low-income students in a different setting?')),
+      getRow('justify-center center', getRouterLinkElement('Your students can check their individual eligibility.', '/sign-up/student/eligibility')),
+      getRow('justify-center center mt-3', getTextElement('p', 'Know teachers who do work in Title I or low-income schools?')),
+      getRow('justify-center center', getLinkElement('Please share UPchieve with them!', 'https://upchieve.org/teachers')),
     ],
   }
 }
@@ -122,24 +140,29 @@ function getAccountPageDetails() {
   return {
     backgroundLayout: 'panel-right-75p',
     submitAction: createAccount,
-    // TODO: Update copy.
     rows: [
-      getRow(null, getTextElement('h1', 'Your school is eligible! 🎉')),
-      getRow(null, getTextElement('h2', 'Create an Account')),
       getRow(
-        null,
+        'justify-start mt-4',
+        {
+          element: 'header-logo-teal',
+        }
+      ),
+      getRow('mt-4', getTextElement('h1', 'Your school is eligible! 🎉')),
+      getRow('mt-3', getTextElement('h2', 'Finish creating your account')),
+      getRow(
+        'mt-3 uc-column-sm',
         getInputElement(
           InputName.FIRST_NAME,
           'First Name',
-          EVENTS.TEACHER_ENTERED_FIRST_NAME
+          EVENTS.TEACHER_ENTERED_FIRST_NAME,
         ),
         getInputElement(
           InputName.LAST_NAME,
           'Last Name',
-          EVENTS.TEACHER_ENTERED_LAST_NAME
+          EVENTS.TEACHER_ENTERED_LAST_NAME,
         )
       ),
-      getRow(null, {
+      getRow('mt-2', {
         element: 'FormEmail',
         props: {
           name: InputName.EMAIL,
@@ -147,7 +170,7 @@ function getAccountPageDetails() {
           blurEvent: EVENTS.TEACHER_ENTERED_EMAIL,
         },
       }),
-      getRow(null, {
+      getRow('mt-2', {
         element: 'FormPassword',
         props: {
           name: InputName.PASSWORD,
@@ -156,7 +179,7 @@ function getAccountPageDetails() {
           blurEvent: EVENTS.TEACHER_ENTERED_PASSWORD,
         },
       }),
-      getRow(null, getButtonElement(createAccount, 'Confirm')),
+      getRow('mt-4', getButtonElement(createAccount, 'Confirm')),
     ],
   }
 }
@@ -169,6 +192,7 @@ async function createAccount(data) {
       [InputName.LAST_NAME]: data[InputName.LAST_NAME],
       [InputName.PASSWORD]: data[InputName.PASSWORD],
       [InputName.SCHOOL_ID]: data[InputName.SCHOOL_ID],
+      [InputName.SIGNUP_SOURCE]: data[InputName.SIGNUP_SOURCE],
     })
 
     return getSubmitResponse(SignUpPage.verify)

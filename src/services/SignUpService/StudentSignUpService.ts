@@ -15,6 +15,7 @@ import {
   getRouterLinkElement,
   getSsoButton,
   getAlreadyHaveAccountElements,
+  getSignUpSourceElement,
   getInputElement,
 } from '@/services/SignUpService'
 import NetworkService from '@/services/NetworkService'
@@ -275,31 +276,6 @@ export function getPartnerSitesElement(to) {
   }
 }
 
-function getSignUpSourceElement() {
-  return {
-    element: 'FormSelect',
-    props: {
-      blurEvent: EVENTS.STUDENT_SELECTED_HOW_DID_YOU_HEAR_ABOUT_US,
-      getSelectOptions: async function () {
-        try {
-          const {
-            data: { signupSources },
-          } = await NetworkService.getStudentSignupSources()
-          return signupSources
-        } catch (err) {
-          LoggerService.noticeError(err)
-          return []
-        }
-      },
-      label: 'How did you hear about us?',
-      name: InputName.SIGNUP_SOURCE_ID,
-      optionTextField: 'name',
-      placeholder: 'How did you hear about us?',
-      reduce: (option) => option.id,
-    },
-  }
-}
-
 export function getTermsCheckboxElements() {
   return [
     getRow(
@@ -403,12 +379,12 @@ function getFirstPageDetails(to) {
       subheaderText ? getRow(null, getTextElement('p', subheaderText)) : null,
       isPartnerStudentSignUp()
         ? getRow(
-            'justify-start',
-            getRouterLinkElement(
-              `Not with ${to.params.partner?.name}?`,
-              '/sign-up/student/eligibility'
-            )
+          'justify-start',
+          getRouterLinkElement(
+            `Not with ${to.params.partner?.name}?`,
+            '/sign-up/student/eligibility'
           )
+        )
         : getRow('justify-start', ...getAlreadyHaveAccountElements()),
       isPartnerStudentSignUp()
         ? getRow(null, getPartnerSitesElement(to))
@@ -420,28 +396,28 @@ function getFirstPageDetails(to) {
       ),
       includeSchoolElement()
         ? getRow(null, {
-            element: 'FormSchoolSearch',
-            props: {
-              name: InputName.SCHOOL_ID,
-              label: getLabelPrefix(isParentGuardian) + 'School Name',
-              placeholder: getLabelPrefix(isParentGuardian) + 'School Name',
-              isRequired: isSchoolRequired(),
-            },
-            showIf: (form) => {
-              return [
-                '6th',
-                '7th',
-                '8th',
-                '9th',
-                '10th',
-                '11th',
-                '12th',
-              ].includes(form[InputName.GRADE_LEVEL])
-            },
-          })
+          element: 'FormSchoolSearch',
+          props: {
+            name: InputName.SCHOOL_ID,
+            label: getLabelPrefix(isParentGuardian) + 'School Name',
+            placeholder: getLabelPrefix(isParentGuardian) + 'School Name',
+            isRequired: isSchoolRequired(),
+          },
+          showIf: (form) => {
+            return [
+              '6th',
+              '7th',
+              '8th',
+              '9th',
+              '10th',
+              '11th',
+              '12th',
+            ].includes(form[InputName.GRADE_LEVEL])
+          },
+        })
         : null,
       isOrganicStudentSignUp() || isEligibilityAppealSignUp()
-        ? getRow(null, getSignUpSourceElement())
+        ? getRow(null, getSignUpSourceElement(InputName.SIGNUP_SOURCE_ID, EVENTS.STUDENT_SELECTED_HOW_DID_YOUR_HEAR_ABOUT_US))
         : null,
       getRow(null, { element: 'br' }),
       getRow(
@@ -494,7 +470,7 @@ function getAccountPageDetails(to) {
         getTextElement(
           'h1',
           (isParentGuardian ? 'Your child is ' : "You're ") +
-            'eligible for UPchieve! 🎉'
+          'eligible for UPchieve! 🎉'
         )
       ),
       getRow(null, getTextElement('h2', 'Create an Account')),
@@ -518,14 +494,14 @@ function getAccountPageDetails(to) {
       getRow(null, getStudentEmailElement(isParentGuardian)),
       !isParentGuardian
         ? getRow(null, {
-            element: 'FormPassword',
-            props: {
-              name: InputName.PASSWORD,
-              metadata:
-                'Must have at least one number, one uppercase letter, one lowercase letter, and be at least 8 characters long.',
-              blurEvent: EVENTS.STUDENT_ENTERED_PASSWORD,
-            },
-          })
+          element: 'FormPassword',
+          props: {
+            name: InputName.PASSWORD,
+            metadata:
+              'Must have at least one number, one uppercase letter, one lowercase letter, and be at least 8 characters long.',
+            blurEvent: EVENTS.STUDENT_ENTERED_PASSWORD,
+          },
+        })
         : null,
       ...getTermsCheckboxElements(),
       getRow(
