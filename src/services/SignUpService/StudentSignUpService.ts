@@ -33,6 +33,7 @@ const RoutePath = {
 // The following values are used as the `name` attribute on form elements,
 // and should match the keys in server requests.
 export const InputName = {
+  CLASS_CODE: 'classCode',
   EMAIL: 'email',
   FIRST_NAME: 'firstName',
   GRADE_LEVEL: 'gradeLevel',
@@ -136,6 +137,7 @@ function ineligibleContinue() {
 async function createAccount(data) {
   try {
     await AuthService.registerStudent({
+      [InputName.CLASS_CODE]: data[InputName.CLASS_CODE],
       [InputName.EMAIL]: data[InputName.EMAIL],
       [InputName.FIRST_NAME]: data[InputName.FIRST_NAME],
       [InputName.GRADE_LEVEL]: data[InputName.GRADE_LEVEL],
@@ -456,6 +458,21 @@ function getIneligiblePageDetails() {
 
 function getAccountPageDetails(to) {
   const isParentGuardian = isParentGuardianSignUp(to)
+  const isClassCodeSignUp = !!to.params.classCode
+
+  function getH1Text() {
+    if (isClassCodeSignUp) {
+      return `You're almost done! 🎉`
+    }
+
+    const prefixIdentifier =  isParentGuardian ? 'Your child is ' : "You're "
+    return prefixIdentifier + 'eligible for UPchieve! 🎉'
+  }
+  function getH2Text() {
+    const suffix = ` to join class ${to.params.classCode}`
+    return 'Finish creating your account' + suffix
+}
+
   return {
     backgroundLayout: 'panel-right-75p',
     submitAction: createAccount,
@@ -466,15 +483,8 @@ function getAccountPageDetails(to) {
           element: 'header-logo-teal',
         }
       ),
-      getRow(
-        'mt-4',
-        getTextElement(
-          'h1',
-          (isParentGuardian ? 'Your child is ' : "You're ") +
-          'eligible for UPchieve! 🎉'
-        )
-      ),
-      getRow('mt-3', getTextElement('h2', 'Finish creating your account')),
+      getRow('mt-4', getTextElement('h1', getH1Text())),
+      getRow('mt-3', getTextElement('h2', getH2Text())),
       ...(!isParentGuardian ? getSsoSectionElements() : []),
       isParentGuardian ? getRow('mt-2', getParentGuardianEmailElement(to)) : null,
       getRow(
@@ -492,7 +502,7 @@ function getAccountPageDetails(to) {
           EVENTS.STUDENT_ENTERED_LAST_NAME
         )
       ),
-      getRow('mt-2', getStudentEmailElement(isParentGuardian)),
+      !isClassCodeSignUp ? getRow('mt-2', getStudentEmailElement(isParentGuardian)) : null,
       !isParentGuardian
         ? getRow('mt-2', {
           element: 'FormPassword',
@@ -571,6 +581,15 @@ export async function beforeEnter(to, from, next) {
       params: { step: 'eligibility', userType: to.params.userType },
       query: to.query,
     })
+  }
+
+  if (to.query.classCode) {
+    to.params.classCode = to.query.classCode
+    to.params.email = to.query.email
+    to.params.gradeLevel = to.query.gradeLevel
+    delete to.query.classCode
+    delete to.query.email
+    delete to.query.gradeLevel
   }
 
   const isParent = Object.keys(to.query ?? {}).some(
