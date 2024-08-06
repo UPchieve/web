@@ -23,6 +23,12 @@
       justify-content: start;
     }
   }
+
+  &.justify-start-md {
+    @include breakpoint-below('medium') {
+      justify-content: start;
+    }
+  }
 }
 
 .uc-row {

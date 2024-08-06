@@ -45,12 +45,14 @@
         </button>
         <LineDivider v-if="useNewSignUpFlow" text="Or continue with:" />
         <SsoButton
+          class="mt-4"
           data-testid="googleSsoButton"
           @click="signInWithSso('google')"
           :buttonText="useNewSignUpFlow ? 'Google' : 'Sign In with Google'"
           ssoMethod="google"
         />
         <SsoButton
+          class="mt-3"
           data-testid="cleverSsoButton"
           v-if="useNewSignUpFlow"
           @click="signInWithSso('clever')"

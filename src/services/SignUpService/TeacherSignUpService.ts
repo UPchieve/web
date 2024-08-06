@@ -70,7 +70,7 @@ function getEligibilityPageDetails() {
           `Check if you're eligible for a FREE teacher account`
         )
       ),
-      getRow('justify-start mt-1', ...getAlreadyHaveAccountElements()),
+      getRow('justify-start mt-1 el-gap-sm', ...getAlreadyHaveAccountElements()),
       getRow('mt-3', {
         element: 'FormSchoolSearch',
         props: {

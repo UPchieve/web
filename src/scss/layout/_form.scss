@@ -118,7 +118,7 @@
     border-radius: 200px;
     color: $c-secondary-grey;
     height: 48px;
-    margin-top: 24px;
+    margin-top: 0;
 
     &:hover,
     &:active {
@@ -143,6 +143,7 @@
   border-radius: 4px;
   box-shadow: none;
   box-sizing: border-box;
+  height: 48px;
   padding: 11px 13px;
 
   &:focus {
@@ -161,6 +162,7 @@
 // Override v-select component styles.
 .v-select.uc-form-select-input {
   box-sizing: border-box;
+  min-width: 227px;
   width: 100%;
 
   .vs__search {
