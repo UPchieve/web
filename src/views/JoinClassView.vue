@@ -97,7 +97,10 @@ async function addStudentToClass() {
     <form-errors v-if="errorMessage" :errors="[errorMessage]" />
 
     <h1>Join your class!</h1>
-    <p>When you join a class, your teacher will get access to information about your UPchieve usage.</p>
+    <p>
+      When you join a class, your teacher will get access to information about
+      your UPchieve usage.
+    </p>
 
     <FormInput
       v-if="askForClassCode"

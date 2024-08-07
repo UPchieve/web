@@ -1,19 +1,42 @@
 <template>
   <modal :closeModal="close">
-    <h1>Create a New Class</h1>
-
-    <FormInput v-model="className" placeholder="Class Name" />
-
-    <button class="uc-form-button" @click="accept()">Create</button>
+    <div class="modal-container">
+      <h1>Create a New Class</h1>
+      <p>Fill out the details below to set up your new class.</p>
+      <FormInput v-model="className" placeholder="Class Name" />
+      <FormSelect
+        :name="'topic'"
+        :placeholder="'Choose a subject'"
+        :optionTextField="'displayName'"
+        :reduce="(option) => option.id"
+        :getSelectOptions="() => topics"
+        v-model="topicId"
+        required="false"
+      />
+      <div class="buttons">
+        <button class="uc-form-button cancel-button" @click="close()">
+          Cancel
+        </button>
+        <button
+          class="uc-form-button"
+          @click="accept()"
+          :disabled="!isFormValid"
+        >
+          Create Class
+        </button>
+      </div>
+    </div>
   </modal>
 </template>
 
 <script>
 import FormInput from '@/components/FormInput.vue'
 import Modal from '@/components/Modal.vue'
+import NetworkService from '@/services/NetworkService'
+import FormSelect from '@/components/FormSelect.vue'
 
 export default {
-  components: { FormInput, Modal },
+  components: { FormInput, Modal, FormSelect },
   name: 'CreateTeacherClassModal',
 
   props: {
@@ -27,18 +50,75 @@ export default {
     return {
       isLoading: false,
       className: '',
+      topicId: null,
+      topics: [],
     }
   },
 
+  computed: {
+    isFormValid() {
+      return this.topicId && this.className
+    },
+  },
+
+  async created() {
+    this.topics = this.modalData.topics
+  },
+
   methods: {
+    reduceOption(option) {
+      return option
+    },
+
     close() {
       this.$store.dispatch('app/modal/hide')
     },
 
+    async getTopics() {
+      const {
+        data: { topics },
+      } = await NetworkService.getTopics()
+      return topics
+    },
+
     accept() {
-      this.modalData.createTeacherClass(this.className)
+      this.modalData.createTeacherClass({
+        className: this.className,
+        topicId: this.topicId,
+      })
       this.$store.dispatch('app/modal/hide')
     },
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.buttons {
+  @include flex-container(row, right);
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.buttons button {
+  width: auto;
+  padding: 20px;
+}
+
+.cancel-button {
+  border: 1px solid #000000;
+  background-color: white;
+  color: #000;
+}
+
+.modal-container {
+  text-align: left;
+}
+
+.modal-container h1 {
+  font-size: 24px;
+}
+
+.modal-container p {
+  color: #77778b;
+}
+</style>

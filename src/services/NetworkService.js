@@ -942,8 +942,38 @@ export default {
       this._errorHandler
     )
   },
-  createTeacherClass(className) {
-    return httpPost(`${API_ROOT}/teachers/class`, { className }).then(
+  createTeacherClass(className, topicId) {
+    return httpPost(`${API_ROOT}/teachers/class`, { className, topicId }).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
+  getStudentsInTeacherClass(classId) {
+    return httpGet(`${API_ROOT}/teachers/class/${classId}/students`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
+  getTeacherClassByClassCode(classCode) {
+    return httpGet(`${API_ROOT}/teachers/class/?classCode=${classCode}`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
+  getTeacherClassById(classId) {
+    return httpGet(`${API_ROOT}/teachers/class/${classId}`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
+  getStudentSessionDetails(studentId) {
+    return httpGet(`${API_ROOT}/sessions/student/${studentId}`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
+  getTopics() {
+    return httpGet(`${API_ROOT}/topics`).then(
       this._successHandler,
       this._errorHandler
     )

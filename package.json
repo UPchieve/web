@@ -31,6 +31,7 @@
     "@vue/eslint-config-typescript": "^13.0.0",
     "@vuelidate/core": "^2.0.2",
     "@vuelidate/validators": "^2.0.2",
+    "@vueuse/core": "^10.11.0",
     "awesome-phonenumber": "^2.20.0",
     "axios": "^1.5.0",
     "bcrypt": "^5.1.1",
