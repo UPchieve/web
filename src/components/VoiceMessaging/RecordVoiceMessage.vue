@@ -109,7 +109,6 @@ async function record() {
   if (allowed) {
     recording.voiceRecognition = new VoiceRecognition()
     AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_START_RECORDING)
-    AnalyticsService.updateUser({ hasRecordedVoiceMessage: true })
     emit('notIdle')
     recording.state = STATES.recording
     await recording.voiceRecognition.start()
