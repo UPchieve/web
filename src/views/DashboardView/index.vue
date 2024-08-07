@@ -33,6 +33,9 @@ export default {
     },
   },
   mounted() {
+    if (this.isTeacher) {
+      this.$router.replace(`/dashboard/teacher`)
+    }
     if (this.isGleapSegmentExperimentsActive)
       ProductDiscoveryService.triggerDynamicGleapWidget(
         this.user,
