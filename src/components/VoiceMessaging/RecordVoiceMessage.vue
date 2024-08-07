@@ -10,6 +10,7 @@ import { vTooltip } from 'maz-ui'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '../../consts'
 import Announcement from './Announcement.vue'
+import { VoiceRecognition } from './voice-recognition'
 
 enum STATES {
   idle = 'IDLE',
@@ -18,21 +19,32 @@ enum STATES {
   sending = 'SENDING',
   error = 'ERROR',
   notSupported = 'NOT SUPPORTED',
+  transcribing = 'TRANSCRIBING',
 }
-
 const emit = defineEmits(['idle', 'notIdle'])
 const props = defineProps(['onRecording', 'onStopRecording', 'sendMessage'])
 const recording = reactive<{
   state: STATES
   blob: Blob | null
   chunks: Array<Blob>
+  voiceRecognition: VoiceRecognition | null
+  transcript: string
 }>({
   state: STATES.idle,
   blob: null,
   chunks: [],
+  voiceRecognition: null,
+  transcript: '',
 })
 let stream: MediaStream | null = null
 let recorder: MediaRecorder | null = null
+
+if (VoiceRecognition.notSupported()) {
+  recording.state = STATES.notSupported
+  AnalyticsService.captureEvent(
+    EVENTS.VOICE_MESSAGE_VOICE_RECOGNITION_NOT_SUPPORTED
+  )
+}
 
 const audioURL = computed(
   () => recording.blob && window.URL.createObjectURL(recording.blob)
@@ -59,6 +71,8 @@ function stopMicAccess() {
 }
 
 function reset() {
+  recording.transcript = ''
+  recording.voiceRecognition = null
   recording.chunks = []
   recording.blob = null
   stream = null
@@ -93,19 +107,21 @@ async function setupAudio() {
 async function record() {
   const allowed = await setupAudio()
   if (allowed) {
+    recording.voiceRecognition = new VoiceRecognition()
     AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_START_RECORDING)
-    AnalyticsService.updateUser({
-      hasRecordedVoiceMessage: true,
-    })
+    AnalyticsService.updateUser({ hasRecordedVoiceMessage: true })
     emit('notIdle')
     recording.state = STATES.recording
+    await recording.voiceRecognition.start()
     recorder?.start()
     props.onRecording()
   }
 }
 
-function stop() {
+async function stop() {
   AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_STOP_RECORDING)
+  recording.state = STATES.transcribing
+  recording.transcript = await recording.voiceRecognition!.stop()
   recording.state = STATES.recorded
   recorder?.stop()
   props.onStopRecording()
@@ -116,12 +132,21 @@ async function send() {
   AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_SEND_RECORDING)
   try {
     recording.state = STATES.sending
+    let results
     if (recording.blob) {
-      await props.sendMessage(recording.blob)
+      results = await props.sendMessage({
+        audio: recording.blob,
+        transcript: recording.transcript,
+      })
     }
-    reset()
-    recording.state = STATES.idle
-    emit('idle')
+    if (results) {
+      reset()
+      recording.state = STATES.idle
+      // Only emit idle if moderation passed
+      emit('idle')
+    } else {
+      recording.state = STATES.recorded
+    }
   } catch (e) {
     AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_SEND_RECORDING_ERRORED)
     recording.state = STATES.error
@@ -163,6 +188,7 @@ function destroy() {
       v-if="
         recording.state === STATES.recorded ||
         recording.state === STATES.sending ||
+        recording.state === STATES.transcribing ||
         recording.state === STATES.error
       "
     >
@@ -187,6 +213,9 @@ function destroy() {
       <source type="audio/webm; codecs=opus" :src="audioURL" />
       <source type="audio/mp4;" :src="audioURL" />
     </audio>
+    <div class="controls" v-if="recording.state === STATES.transcribing">
+      Processing...
+    </div>
     <div
       class="recording-container"
       v-if="recording.state === STATES.recording"
@@ -200,6 +229,7 @@ function destroy() {
       v-if="
         recording.state === STATES.recorded ||
         recording.state === STATES.sending ||
+        recording.state === STATES.transcribing ||
         recording.state === STATES.error
       "
     >

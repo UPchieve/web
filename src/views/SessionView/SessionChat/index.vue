@@ -178,7 +178,9 @@ const MESSAGE_ALIGNMENT = {
   RIGHT: 'right',
   CENTER: 'center',
 }
-
+function wasCensoredByChrome(transcript) {
+  return transcript.includes('*')
+}
 /**
  * @todo {1} Use more descriptive names that comply with the coding standards.
  *           Keep in mind that it also requires a small backend update in
@@ -293,6 +295,7 @@ export default {
   methods: {
     showTextMessage() {
       this.textMessageHidden = false
+      this.hideModerationWarning()
     },
     hideTextMessage() {
       this.textMessageHidden = true
@@ -325,21 +328,52 @@ export default {
     toggleEligibleForSessionRecapChat() {
       this.eligibleForSessionRecapChat = true
     },
-    async sendVoiceMessage(messageBlob) {
-      const form = new FormData()
-      form.append('message', messageBlob)
-      form.append('senderId', this.user.id)
-      form.append('sessionId', this.currentSession.id)
-      const voiceMessageId = await VoiceMessageService.saveVoiceMessage(form)
+    async sendVoiceMessage({ audio, transcript }) {
+      try {
+        this.hideModerationWarning()
+        this.waitingForModeration = true
 
-      socket.emit('message', {
-        type: 'voice',
-        sessionId: this.currentSession.id,
-        user: this.user,
-        message: voiceMessageId,
-        source:
-          this.isInRecap || this.eligibleForSessionRecapChat ? 'recap' : '',
-      })
+        if (wasCensoredByChrome(transcript)) {
+          this.waitingForModeration = false
+          this.showModerationWarning()
+          return false
+        }
+
+        const { failures } = await ModerationService.checkIfMessageIsClean({
+          message: transcript,
+          sessionId: this.currentSession.id,
+        })
+
+        const isClean = Object.keys(failures).length === 0
+        if (isClean) {
+          const form = new FormData()
+          form.append('message', audio)
+          form.append('senderId', this.user.id)
+          form.append('sessionId', this.currentSession.id)
+          const voiceMessageId =
+            await VoiceMessageService.saveVoiceMessage(form)
+
+          socket.emit('message', {
+            type: 'voice',
+            sessionId: this.currentSession.id,
+            user: this.user,
+            message: voiceMessageId,
+            source:
+              this.isInRecap || this.eligibleForSessionRecapChat ? 'recap' : '',
+          })
+          return true
+        } else {
+          // do not show the offending profanity to students
+          // in the event it was a typo
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { profanity, ...rest } = failures
+          this.failureReasons = this.isVolunteer ? failures : rest
+          this.showModerationWarning()
+          return false
+        }
+      } finally {
+        this.waitingForModeration = false
+      }
     },
     showNewMessage(message) {
       socket.emit('message', {
@@ -379,7 +413,7 @@ export default {
         } else {
           // do not show the offending profanity to students
           // in the event it was a typo
-          // eslint-disable-next-line no-unused-vars
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { profanity, ...rest } = failures
           this.failureReasons = this.isVolunteer ? failures : rest
           this.showModerationWarning()
