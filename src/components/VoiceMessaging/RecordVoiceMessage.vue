@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import { reactive, computed, onBeforeUnmount } from 'vue'
+import { nextTick, ref, reactive, computed, onBeforeUnmount } from 'vue'
 import WaveForm from './WaveForm.vue'
 import RecordIcon from '@/assets/voice_message_icons/record-message.svg'
 import DeleteIcon from '@/assets/voice_message_icons/delete-message.svg'
-import SendIcon from '@/assets/voice_message_icons/send-message.svg'
 import StopIcon from '@/assets/voice_message_icons/stop-recording-message.svg'
 import LoggerService from '@/services/LoggerService'
 import { vTooltip } from 'maz-ui'
@@ -11,6 +10,8 @@ import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '../../consts'
 import Announcement from './Announcement.vue'
 import { VoiceRecognition } from './voice-recognition'
+import Spinner from '../../components/Spinner.vue'
+import LargeButton from '../../components/LargeButton.vue'
 
 enum STATES {
   idle = 'IDLE',
@@ -21,20 +22,28 @@ enum STATES {
   notSupported = 'NOT SUPPORTED',
   transcribing = 'TRANSCRIBING',
 }
+const textarea = ref()
 const emit = defineEmits(['idle', 'notIdle'])
-const props = defineProps(['onRecording', 'onStopRecording', 'sendMessage'])
+const props = defineProps([
+  'onRecording',
+  'onStopRecording',
+  'sendTextMessage',
+  'sendAudioMessage',
+])
 const recording = reactive<{
   state: STATES
   blob: Blob | null
   chunks: Array<Blob>
   voiceRecognition: VoiceRecognition | null
   transcript: string
+  userEditedTranscript: string
 }>({
   state: STATES.idle,
   blob: null,
   chunks: [],
   voiceRecognition: null,
   transcript: '',
+  userEditedTranscript: '',
 })
 let stream: MediaStream | null = null
 let recorder: MediaRecorder | null = null
@@ -72,6 +81,7 @@ function stopMicAccess() {
 
 function reset() {
   recording.transcript = ''
+  recording.userEditedTranscript = ''
   recording.voiceRecognition = null
   recording.chunks = []
   recording.blob = null
@@ -120,28 +130,29 @@ async function record() {
 async function stop() {
   AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_STOP_RECORDING)
   recording.state = STATES.transcribing
-  recording.transcript = await recording.voiceRecognition!.stop()
+  recording.transcript = (await recording.voiceRecognition?.stop()) ?? ''
+  recording.userEditedTranscript = recording.transcript
   recording.state = STATES.recorded
   recorder?.stop()
   props.onStopRecording()
   stopMicAccess()
+  nextTick(() => textarea.value.focus())
 }
 
-async function send() {
-  AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_SEND_RECORDING)
+async function sendAudio() {
   try {
     recording.state = STATES.sending
     let results
     if (recording.blob) {
-      results = await props.sendMessage({
+      results = await props.sendAudioMessage({
         audio: recording.blob,
         transcript: recording.transcript,
       })
     }
     if (results) {
+      AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_SEND_RECORDING)
       reset()
       recording.state = STATES.idle
-      // Only emit idle if moderation passed
       emit('idle')
     } else {
       recording.state = STATES.recorded
@@ -150,6 +161,29 @@ async function send() {
     AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_SEND_RECORDING_ERRORED)
     recording.state = STATES.error
     LoggerService.noticeError(`Problem saving voice message - ${e}`)
+  }
+}
+
+async function sendText() {
+  AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_TRANSCRIPT_CREATED)
+  if (recording.transcript !== recording.userEditedTranscript) {
+    AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_TRANSCRIPT_EDITED)
+  }
+  try {
+    recording.state = STATES.sending
+    const results = await props.sendTextMessage(recording.userEditedTranscript)
+    if (results) {
+      AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_TRANSCRIPT_SENT)
+      reset()
+      recording.state = STATES.idle
+      emit('idle')
+    } else {
+      recording.state = STATES.recorded
+    }
+  } catch (e) {
+    AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_SEND_TRANSCRIPT_ERRORED)
+    recording.state = STATES.error
+    LoggerService.noticeError(`Problem saving transcript message - ${e}`)
   }
 }
 
@@ -183,84 +217,123 @@ function destroy() {
     </button>
   </div>
   <div v-else class="recorder-container">
-    <div
-      v-if="
-        recording.state === STATES.recorded ||
-        recording.state === STATES.sending ||
-        recording.state === STATES.transcribing ||
-        recording.state === STATES.error
-      "
-    >
-      <button
-        class="button"
-        @click="destroy"
-        :disabled="recording.state === STATES.sending"
-      >
-        <DeleteIcon class="icon delete"></DeleteIcon>
-      </button>
-    </div>
-    <audio
-      controls
-      class="controls"
-      v-if="
-        audioURL &&
-        (recording.state === STATES.recorded ||
-          recording.state === STATES.sending ||
-          recording.state === STATES.error)
-      "
-    >
-      <source type="audio/webm; codecs=opus" :src="audioURL" />
-      <source type="audio/mp4;" :src="audioURL" />
-    </audio>
-    <div class="controls" v-if="recording.state === STATES.transcribing">
-      Processing...
-    </div>
-    <div
-      class="recording-container"
-      v-if="recording.state === STATES.recording"
-    >
-      <WaveForm :stream="stream"></WaveForm>
-      <button class="button" @click="stop">
-        <StopIcon class="icon"></StopIcon>
-      </button>
-    </div>
-    <div
-      v-if="
-        recording.state === STATES.recorded ||
-        recording.state === STATES.sending ||
-        recording.state === STATES.transcribing ||
-        recording.state === STATES.error
-      "
-    >
-      <button
-        :disabled="
-          recording.state === STATES.sending ||
-          recording.state === STATES.transcribing
+    <div class="audio">
+      <audio
+        controls
+        class="controls"
+        v-if="
+          audioURL &&
+          (recording.state === STATES.recorded ||
+            recording.state === STATES.sending ||
+            recording.state === STATES.error)
         "
-        v-tooltip="{
-          text: 'Error!',
-          color: 'danger',
-          position: 'top',
-          open: recording.state === STATES.error,
-        }"
-        class="button send-button"
-        @click="send"
       >
-        <SendIcon class="icon"></SendIcon>
-      </button>
+        <source type="audio/webm; codecs=opus" :src="audioURL" />
+        <source type="audio/mp4;" :src="audioURL" />
+      </audio>
+      <div class="controls" v-if="recording.state === STATES.transcribing">
+        Processing...
+        <spinner
+          :container-height="44"
+          :container-width="44"
+          :width="24"
+          :height="24"
+          :thickness="4"
+        />
+      </div>
+      <div
+        class="recording-container"
+        v-if="recording.state === STATES.recording"
+      >
+        <WaveForm :stream="stream"></WaveForm>
+        <button class="button" @click="stop">
+          <StopIcon class="icon"></StopIcon>
+        </button>
+      </div>
+    </div>
+
+    <textarea
+      ref="textarea"
+      spellcheck="true"
+      class="transcript"
+      :disabled="
+        recording.state === STATES.sending ||
+        recording.state === STATES.transcribing ||
+        recording.state === STATES.recording
+      "
+      v-model="recording.userEditedTranscript"
+    />
+
+    <div class="buttons">
+      <div>
+        <button
+          class="button"
+          @click="destroy"
+          :disabled="
+            recording.state === STATES.sending ||
+            recording.state === STATES.transcribing ||
+            recording.state === STATES.recording
+          "
+        >
+          <DeleteIcon class="icon delete"></DeleteIcon>
+        </button>
+      </div>
+      <div class="send-buttons">
+        <div>
+          <LargeButton
+            :disabled="
+              recording.state === STATES.sending ||
+              recording.state === STATES.transcribing ||
+              recording.state === STATES.recording ||
+              recording.userEditedTranscript.length === 0
+            "
+            v-tooltip="{
+              text: 'Error!',
+              color: 'danger',
+              position: 'top',
+              open: recording.state === STATES.error,
+            }"
+            class="button send-button"
+            @click="sendText"
+          >
+            Send text
+          </LargeButton>
+        </div>
+        <div>
+          <LargeButton
+            :disabled="
+              recording.state === STATES.sending ||
+              recording.state === STATES.transcribing ||
+              recording.state === STATES.recording
+            "
+            v-tooltip="{
+              text: 'Error!',
+              color: 'danger',
+              position: 'top',
+              open: recording.state === STATES.error,
+            }"
+            class="button send-button"
+            @click="sendAudio"
+          >
+            Send audio
+          </LargeButton>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
 .button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   min-height: 44px;
-  min-width: 44px;
-  padding: 0;
   flex-grow: 0;
   &:disabled {
     filter: brightness(0.75) opacity(0.5);
   }
+  /* extra styling for v-tooltip */
   &::before {
     border-radius: 3px;
     font-size: 14px;
@@ -273,11 +346,48 @@ function destroy() {
     transition-property: none;
   }
 }
+
+.transcript {
+  flex-grow: 1;
+  width: 100%;
+  border-top: 1px solid $c-border-grey;
+  border-bottom: 1px solid $c-border-grey;
+  padding: 1em 0.5em;
+  resize: none;
+  place-content: center;
+
+  @include breakpoint-below('medium') {
+    padding: 0.6em 1em;
+    line-height: 18px;
+    border: 1px solid $c-border-grey;
+    border-radius: 20px;
+  }
+
+  &--recap {
+    @include breakpoint-below('medium') {
+      width: 100%;
+    }
+  }
+}
+
+.start {
+  justify-self: start;
+}
+.end {
+  justify-self: end;
+}
+.send-button {
+  font-size: 14px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+/* do not display v-tooltip error on hover */
 .send-button:hover {
   &::before {
     display: none;
   }
 }
+
 .icon {
   width: 24px;
   height: 24px;
@@ -287,18 +397,19 @@ function destroy() {
   width: 30px;
   height: 30px;
 }
-
 .recorder-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   padding-top: 12px;
   padding-bottom: 12px;
   flex-grow: 1;
   min-width: 0;
+  gap: 8px;
 
   @include breakpoint-below('medium') {
-    max-height: 44px;
+    padding-top: 0;
+    padding-bottom: 0;
   }
 }
 .recording-container {
@@ -308,9 +419,37 @@ function destroy() {
   max-height: 44px;
   justify-content: end;
 }
+.buttons {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 0.5em;
+  padding-left: 0.5em;
+}
+.send-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  justify-content: end;
+  align-items: center;
+}
+
+.audio {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  padding-right: 0.5em;
+}
 .controls {
   min-width: 0;
-  max-height: 44px;
+  height: 44px;
   flex-grow: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 0.5em;
 }
 </style>

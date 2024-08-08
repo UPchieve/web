@@ -148,7 +148,8 @@
           v-if="showVoiceMessaging"
           :onRecording="onRecording"
           :onStopRecording="onStopRecording"
-          :sendMessage="sendVoiceMessage"
+          :sendAudioMessage="sendVoiceMessage"
+          :sendTextMessage="sendTranscriptMessage"
         />
       </div>
     </div>
@@ -328,53 +329,6 @@ export default {
     toggleEligibleForSessionRecapChat() {
       this.eligibleForSessionRecapChat = true
     },
-    async sendVoiceMessage({ audio, transcript }) {
-      try {
-        this.hideModerationWarning()
-        this.waitingForModeration = true
-
-        if (wasCensoredByChrome(transcript)) {
-          this.waitingForModeration = false
-          this.showModerationWarning()
-          return false
-        }
-
-        const { failures } = await ModerationService.checkIfMessageIsClean({
-          message: transcript,
-          sessionId: this.currentSession.id,
-        })
-
-        const isClean = Object.keys(failures).length === 0
-        if (isClean) {
-          const form = new FormData()
-          form.append('message', audio)
-          form.append('senderId', this.user.id)
-          form.append('sessionId', this.currentSession.id)
-          const voiceMessageId =
-            await VoiceMessageService.saveVoiceMessage(form)
-
-          socket.emit('message', {
-            type: 'voice',
-            sessionId: this.currentSession.id,
-            user: this.user,
-            message: voiceMessageId,
-            source:
-              this.isInRecap || this.eligibleForSessionRecapChat ? 'recap' : '',
-          })
-          return true
-        } else {
-          // do not show the offending profanity to students
-          // in the event it was a typo
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { profanity, ...rest } = failures
-          this.failureReasons = this.isVolunteer ? failures : rest
-          this.showModerationWarning()
-          return false
-        }
-      } finally {
-        this.waitingForModeration = false
-      }
-    },
     showNewMessage(message) {
       socket.emit('message', {
         sessionId: this.currentSession.id,
@@ -422,6 +376,94 @@ export default {
         this.showNewMessage(message)
         this.clearMessageInput()
         LoggerService.noticeError(`ModerationService failed with`, e)
+      } finally {
+        this.waitingForModeration = false
+      }
+    },
+    async sendVoiceMessage({ audio, transcript }) {
+      try {
+        this.hideModerationWarning()
+        this.waitingForModeration = true
+
+        if (wasCensoredByChrome(transcript)) {
+          this.waitingForModeration = false
+          this.showModerationWarning()
+          return false
+        }
+
+        const { failures } = await ModerationService.checkIfMessageIsClean({
+          message: transcript,
+          sessionId: this.currentSession.id,
+        })
+
+        const isClean = Object.keys(failures).length === 0
+        if (isClean) {
+          const form = new FormData()
+          form.append('message', audio)
+          form.append('senderId', this.user.id)
+          form.append('sessionId', this.currentSession.id)
+          const voiceMessageId =
+            await VoiceMessageService.saveVoiceMessage(form)
+
+          socket.emit('message', {
+            type: 'voice',
+            sessionId: this.currentSession.id,
+            user: this.user,
+            message: voiceMessageId,
+            source:
+              this.isInRecap || this.eligibleForSessionRecapChat ? 'recap' : '',
+          })
+          return true
+        } else {
+          // do not show the offending profanity to students
+          // in the event it was a typo
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { profanity, ...rest } = failures
+          this.failureReasons = this.isVolunteer ? failures : rest
+          this.showModerationWarning()
+          return false
+        }
+      } catch (e) {
+        this.showNewMessage(message)
+        LoggerService.noticeError(`ModerationService failed with`, e)
+        return true
+      } finally {
+        this.waitingForModeration = false
+      }
+    },
+    async sendTranscriptMessage(transcript) {
+      try {
+        this.hideModerationWarning()
+        this.waitingForModeration = true
+
+        if (wasCensoredByChrome(transcript)) {
+          this.waitingForModeration = false
+          this.showModerationWarning()
+          return false
+        }
+
+        const { failures } = await ModerationService.checkIfMessageIsClean({
+          message: transcript,
+          sessionId: this.currentSession.id,
+        })
+
+        const isClean = Object.keys(failures).length === 0
+        if (isClean) {
+          this.showNewMessage(transcript)
+          return true
+        } else {
+          // do not show the offending profanity to students
+          // in the event it was a typo
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { profanity, ...rest } = failures
+          this.failureReasons = this.isVolunteer ? failures : rest
+          this.showModerationWarning()
+          return false
+        }
+      } catch (e) {
+        this.showNewMessage(transcript)
+        LoggerService.noticeError(`ModerationService failed with`, e)
+        return true
       } finally {
         this.waitingForModeration = false
       }
