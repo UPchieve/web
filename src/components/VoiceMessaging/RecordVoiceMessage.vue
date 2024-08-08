@@ -233,7 +233,10 @@ function destroy() {
       "
     >
       <button
-        :disabled="recording.state === STATES.sending"
+        :disabled="
+          recording.state === STATES.sending ||
+          recording.state === STATES.transcribing
+        "
         v-tooltip="{
           text: 'Error!',
           color: 'danger',

@@ -831,6 +831,7 @@ export default {
 
 .chat-footer {
   position: relative;
+  border-top: 1px solid $c-border-grey;
 
   .waiting-for-moderation {
     position: absolute;
