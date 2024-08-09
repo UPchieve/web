@@ -707,6 +707,12 @@ export default {
       this._errorHandler
     )
   },
+  checkIfImageIsClean(data) {
+    return httpPost(`${API_ROOT}/moderate/image`, data).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
   feedback(data) {
     return httpPost(`${API_ROOT}/feedback`, data).then(
       this._successHandler,
