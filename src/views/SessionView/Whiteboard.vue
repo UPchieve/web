@@ -20,7 +20,7 @@
     </transition>
     <transition name="uploading-picture-error">
       <p class="whiteboard-transition-error" v-show="uploadingPictureError">
-        Unable to upload the picture.
+        {{ imageUploadErrorMessage }}
       </p>
     </transition>
     <div id="toolbar" class="toolbar">
@@ -273,6 +273,7 @@ import { socket } from '@/socket'
 import { markRaw } from 'vue'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
+import ModerationService from '@/services/ModerationService'
 
 export default {
   components: {
@@ -332,6 +333,7 @@ export default {
       resetWhiteboardError: false,
       uploadingPictureError: false,
       selectedEraserTool: false,
+      imageUploadErrorMessage: 'Unable to upload the image',
     }
   },
   computed: {
@@ -341,8 +343,11 @@ export default {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
       isWhiteboardEraserToolActive: 'featureFlags/isWhiteboardEraserToolActive',
+      isVolunteerImageUploadEnabled:
+        'featureFlags/isVolunteerImageUploadEnabled',
       userType: 'user/userType',
       isStudent: 'user/isStudent',
+      isVolunteer: 'user/isVolunteer',
     }),
     toolClass() {
       if (this.selectedTool === 'brush') return 'zwib-wrapper--brush'
@@ -358,10 +363,10 @@ export default {
     },
     showPhotoUpload() {
       if (this.isStudent) {
-        if (this.isMobileApp && isOutdatedMobileAppVersion()) return false
-        return true
+        return !(this.isMobileApp && isOutdatedMobileAppVersion())
+      } else if (this.isVolunteer) {
+        return this.isVolunteerImageUploadEnabled
       }
-
       return false
     },
     isShapeSelected() {
@@ -494,7 +499,19 @@ export default {
       this.showShapes = false
     },
     openFileDialog(event) {
+      if (this.isVolunteer) {
+        AnalyticsService.captureEvent(EVENTS.VOLUNTEER_CLICKED_UPLOAD_IMAGE, {
+          sessionType: 'whiteboard',
+        })
+      }
       this.$refs.fileDialog.openFileDialog(event)
+    },
+    async showImageUploadError(message, timeMs) {
+      this.uploadingPictureError = true
+      this.imageUploadErrorMessage = message ?? 'Unable to upload image'
+      setTimeout(() => {
+        this.uploadingPictureError = false
+      }, timeMs ?? 2000)
     },
     async uploadPhoto(uploadEvents) {
       const { files } = uploadEvents.fileSelectionEvent.target
@@ -529,6 +546,24 @@ export default {
           })
         }
 
+        // Moderate the image
+        if (this.isVolunteer) {
+          // TODO - Also moderate student images
+          const formData = new FormData()
+          formData.append('image', file)
+          formData.append('sessionId', this.sessionId)
+          const { isClean } =
+            await ModerationService.checkIfImageIsClean(formData)
+          if (!isClean) {
+            AnalyticsService.captureEvent(EVENTS.VOLUNTEER_IMAGE_CENSORED)
+            this.showImageUploadError(
+              'The image is not appropriate. If you believe this to be an error, please contact us at support@upchieve.org',
+              6000
+            )
+            return
+          }
+        }
+
         const response = await NetworkService.getSessionPhotoUploadUrl(
           this.sessionId
         )
@@ -542,20 +577,21 @@ export default {
               'Content-Type': file.type,
             },
           })
-
           this.insertPhoto(imageUrl)
+          if (this.isVolunteer) {
+            AnalyticsService.captureEvent(EVENTS.VOLUNTEER_UPLOADED_IMAGE, {
+              sessionType: 'whiteboard',
+            })
+          }
         }
       } catch (error) {
-        this.isLoading = false
-        this.uploadingPictureError = true
-        setTimeout(() => {
-          this.uploadingPictureError = false
-        }, 2000)
+        this.showImageUploadError()
         LoggerService.noticeError(error)
         return
       } finally {
         // Reset the file input
         uploadEvents.fileSelectionEvent.target.value = ''
+        this.isLoading = false
       }
     },
     insertPhoto(imageUrl) {

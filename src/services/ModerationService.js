@@ -7,7 +7,7 @@ function _errHandler(/* err */) {
 }
 
 export default {
-  checkIfMessageIsClean({ message, sessionId }) {
+  async checkIfMessageIsClean({ message, sessionId }) {
     return NetworkService.checkIfMessageIsClean({
       message,
       sessionId,
@@ -23,5 +23,9 @@ export default {
         return _errHandler(err)
       }
     )
+  },
+  async checkIfImageIsClean(formData) {
+    const res = await NetworkService.checkIfImageIsClean(formData)
+    return res.data
   },
 }
