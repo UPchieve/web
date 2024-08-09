@@ -24,12 +24,18 @@ enum STATES {
 }
 const textarea = ref()
 const emit = defineEmits(['idle', 'notIdle'])
-const props = defineProps([
-  'onRecording',
-  'onStopRecording',
-  'sendTextMessage',
-  'sendAudioMessage',
-])
+const props = defineProps<{
+  onRecording: () => void
+  onStopRecording: () => void
+  sendTextMessage: (transcript: string) => boolean
+  sendAudioMessage: ({
+    audio,
+    transcript,
+  }: {
+    audio: Blob
+    transcript: string
+  }) => boolean
+}>()
 const recording = reactive<{
   state: STATES
   blob: Blob | null
@@ -165,15 +171,13 @@ async function sendAudio() {
 }
 
 async function sendText() {
-  AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_TRANSCRIPT_CREATED)
-  if (recording.transcript !== recording.userEditedTranscript) {
-    AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_TRANSCRIPT_EDITED)
-  }
   try {
     recording.state = STATES.sending
     const results = await props.sendTextMessage(recording.userEditedTranscript)
     if (results) {
-      AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_TRANSCRIPT_SENT)
+      AnalyticsService.captureEvent(EVENTS.VOICE_MESSAGE_TRANSCRIPT_SENT, {
+        isUserEdited: recording.transcript !== recording.userEditedTranscript,
+      })
       reset()
       recording.state = STATES.idle
       emit('idle')
@@ -201,7 +205,7 @@ function destroy() {
 
     <button
       v-tooltip="{
-        text: 'Record audio message',
+        text: 'Record audio message or speech-to-text',
         color: 'black',
         position: 'top',
       }"

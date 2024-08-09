@@ -29,8 +29,8 @@ function close() {
       </span>
     </div>
     <div class="body">
-      Exciting news! We're experimenting with audio messages in the chat,
-      available to a select group. Try it out today!
+      Exciting news! We're experimenting with audio messages and speech-to-text
+      in the chat, available to a select group. Try it out today!
     </div>
   </div>
 </template>
