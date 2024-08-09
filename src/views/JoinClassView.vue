@@ -19,13 +19,13 @@ const $router = useRouter()
 
 $store.dispatch('app/hideNavigation')
 
-const errorMessage = ref<String>('')
-const email = ref<String | undefined>($route.query.email as string)
-const classCode = ref<String | undefined>(
+const errorMessage = ref<string>('')
+const email = ref<string | undefined>($route.query.email as string)
+const classCode = ref<string | undefined>(
   ($route.params.classCode as string)?.toUpperCase()
 )
-const askForClassCode = ref<Boolean>(!classCode.value)
-const gradeLevel = ref<String | undefined>($route.query.gradeLevel as string)
+const askForClassCode = ref<boolean>(!classCode.value)
+const gradeLevel = ref<string | undefined>($route.query.gradeLevel as string)
 const isLoading = ref(false)
 
 onBeforeMount(async () => {
