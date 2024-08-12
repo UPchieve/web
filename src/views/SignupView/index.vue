@@ -5,12 +5,7 @@
   >
     <sign-up-forms :getPageDetails="getStudentPageDetails" />
   </div>
-  <div
-    v-else-if="
-      isTeacherSignUpEnabled && this.userSelection === UserType.teacher
-    "
-    class="h-full"
-  >
+  <div v-else-if="this.userSelection === UserType.teacher" class="h-full">
     <sign-up-forms :getPageDetails="getTeacherPageDetails" />
   </div>
   <form-page-template v-else>
@@ -150,7 +145,6 @@ export default {
   computed: {
     ...mapGetters({
       useNewSignUpFlow: 'featureFlags/useNewSignUpFlow',
-      isTeacherSignUpEnabled: 'featureFlags/isTeacherSignUpEnabled',
     }),
     welcomeMessage() {
       if (this.isReferred && this.referredBy)

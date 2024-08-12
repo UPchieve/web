@@ -21,7 +21,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.PROGRESS_REPORT_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.USE_NEW_SIGN_UP_FLOW]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_IN_APP_SESSION_NOTIFICATIONS]: false,
-      [POSTHOG_FEATURE_FLAGS.TEACHER_SIGN_UP]: false,
       [POSTHOG_FEATURE_FLAGS.WHITEBOARD_ERASER_TOOL]: false,
       [POSTHOG_FEATURE_FLAGS.SESSION_PRESENCE]: false,
       [POSTHOG_FEATURE_FLAGS.MOST_RECENT_SUBJECTS]: false,
@@ -117,8 +116,6 @@ export default {
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.SHOW_IN_APP_SESSION_NOTIFICATIONS
       ],
-    isTeacherSignUpEnabled: (state) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.TEACHER_SIGN_UP],
     isWhiteboardEraserToolActive: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.WHITEBOARD_ERASER_TOOL],
     isSessionPresenceActive: (state) =>
