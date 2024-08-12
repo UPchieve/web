@@ -41,12 +41,12 @@
 
 <script>
 import ChatOneOnOne from '@/assets/chat-1-on-1.svg'
-import EmpowerYourStudents from '@/assets/empower-your-students.svg'
+import ConnectYourStudents from '@/assets/connect-your-students.svg'
 import UpdogSubjects from '@/assets/updog-subjects.svg'
 export default {
   components: {
     ChatOneOnOne,
-    EmpowerYourStudents,
+    ConnectYourStudents,
     UpdogSubjects,
   },
   props: {
@@ -216,7 +216,8 @@ $footer-height-tiny: 100px;
 }
 
 .img {
-  height: 100%;
+  height: calc(100vh - $footer-height);
+  max-width: 1000px;
   padding-top: 25px;
   width: 100%;
 }

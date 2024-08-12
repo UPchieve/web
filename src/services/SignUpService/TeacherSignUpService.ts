@@ -54,7 +54,7 @@ function getEligibilityPageDetails() {
   return {
     backgroundLayout: 'panel-right-50p',
     submitAction: checkEligibility,
-    panelImage: 'empower-your-students',
+    panelImage: 'connect-your-students',
     classes: 'uc-column justify-center justify-start-sm',
     rows: [
       getRow(
