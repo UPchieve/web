@@ -5,7 +5,7 @@
       <div class="copy-code">
         <h2>Class Code</h2>
         <p>
-          Students can visit <b>upchieve.org/join-classes</b> and enter their
+          Students can visit <b>app.upchieve.org/join-class</b> and enter their
           code:
         </p>
       </div>
@@ -18,7 +18,7 @@
         your class.
       </p>
       <div class="link-container">
-        <div class="copy-link">www.upchieve.org/{{ this.code }}</div>
+        <div class="copy-link">https://app.upchieve.org/join-class/{{ this.code }}</div>
         <button @click="copyURL" class="link-text">
           <LinkUnion /><span>{{ copyMessage }}</span>
         </button>
@@ -62,7 +62,7 @@ export default {
     copyURL() {
       this.copyMessage = 'Copied'
       const { copy } = useClipboard()
-      copy(`https://www.upchieve.org/${this.code}`)
+      copy(`https://app.upchieve.org/join-class/${this.code}`)
       setTimeout(() => {
         this.copyMessage = 'Copy Link'
       }, 3000)
