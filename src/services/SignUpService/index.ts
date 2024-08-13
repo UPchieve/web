@@ -1,4 +1,6 @@
 import config from '@/config'
+import { EVENTS } from '@/consts'
+import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 
@@ -89,6 +91,9 @@ export function continueToAccountPage(data: Object) {
 }
 
 export function createAccountWithSso(provider: 'google' | 'clever', data: Object) {
+  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CREATE_ACCOUNT, {
+    provider
+  })
   try {
     const params = new URLSearchParams({
       provider,

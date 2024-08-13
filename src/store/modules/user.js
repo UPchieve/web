@@ -436,7 +436,7 @@ export default {
     getUserPropsForAnalytics: (state, getters) => {
       const userProps = {
         ucId: state.user.id,
-        userType: state.user.type,
+        userType: state.user.userType,
         createdAt: state.user.createdAt,
         totalSessions: state.user.pastSessions.length,
         banType: state.user.banType,

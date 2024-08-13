@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onBeforeMount, ref } from 'vue'
+import { computed, onBeforeMount, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { GRADES, EVENTS } from '@/consts'
@@ -12,6 +12,7 @@ import FormInput from '@/components/FormInput.vue'
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import FormSelect from '@/components/FormSelect.vue'
 import Loader from '@/components/Loader.vue'
+import useVuelidate from '@vuelidate/core'
 
 const $store = useStore()
 const $route = useRoute()
@@ -28,11 +29,16 @@ const askForClassCode = ref<boolean>(!classCode.value)
 const gradeLevel = ref<string | undefined>($route.query.gradeLevel as string)
 const isLoading = ref(false)
 
+const v$ = useVuelidate()
+const isDisabled = computed(() => {
+  return v$.value.$error || !!v$.value.$silentErrors?.length
+})
+
 onBeforeMount(async () => {
   FeatureFlagService.setPersonPropertiesForFlags({ cohort: 'joining-class' })
 
   if (email.value && classCode.value && gradeLevel.value) {
-    await addStudentToClass()
+    await addStudentToClass(undefined, EVENTS.STUDENT_REDIRECTED_TO_JOIN_CLASS_WITH_PARAMS)
   }
 })
 
@@ -42,8 +48,13 @@ function removeClass() {
   $router.replace('/join-class')
 }
 
-async function addStudentToClass() {
-  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_ADD_CLASS)
+async function addStudentToClass(_, overrideEvent?: string) {
+  AnalyticsService.captureEvent(
+    overrideEvent ?? EVENTS.STUDENT_CLICKED_JOIN_CLASS,
+    {
+      classCode: classCode.value,
+    }
+  )
 
   isLoading.value = true
   try {
@@ -55,6 +66,9 @@ async function addStudentToClass() {
 
     if (response.data.teacherClass) {
       // TODO: Show modal once get to dashboard.
+      AnalyticsService.captureEvent(EVENTS.STUDENT_JOINED_CLASS, {
+        classCode: classCode.value,
+      })
       return $router.push(`/dashboard?classCode=${classCode.value}`)
     }
 
@@ -69,8 +83,20 @@ async function addStudentToClass() {
         email: email.value as string,
         message: 'Sign in to finish joining your class!',
       })
+      AnalyticsService.captureEvent(
+        EVENTS.STUDENT_JOIN_CLASS_REDIRECT_TO_LOGIN,
+        {
+          classCode: classCode.value,
+        }
+      )
       $router.push('/login?' + redirectUriParams.toString())
     } else {
+      AnalyticsService.captureEvent(
+        EVENTS.STUDENT_JOIN_CLASS_REDIRECT_TO_SIGN_UP,
+        {
+          classCode: classCode.value,
+        }
+      )
       $router.push({
         name: 'SignupView',
         params: {
@@ -110,6 +136,7 @@ async function addStudentToClass() {
       label="Class Code"
       placeholder="Class Code"
       :blur-event="EVENTS.STUDENT_ENTERED_CLASS_CODE"
+      :is-required="askForClassCode"
       testid="input-class-code"
     />
     <div v-else class="uc-row mt-2">
@@ -117,7 +144,12 @@ async function addStudentToClass() {
       <a class="uc-link ml-2" data-testid="link-not-your-class" @click="removeClass">Not your class?</a>
     </div>
 
-    <FormEmail class="mt-3" v-model="email" testid="input-email" />
+    <FormEmail
+      class="mt-3"
+      v-model="email"
+      :blur-event="EVENTS.STUDENT_ENTERED_EMAIL_ON_JOIN_CLASS"
+      testid="input-email"
+    />
 
     <FormSelect
       class="mt-3"
@@ -127,7 +159,7 @@ async function addStudentToClass() {
       placeholder="Grade in 2024-2025"
       :get-select-options="() => GRADES"
       :reduce="(option: string) => option.split(' ')[0]"
-      :blur-event="EVENTS.STUDENT_SELECTED_GRADE"
+      :blur-event="EVENTS.STUDENT_SELECTED_GRADE_ON_JOIN_CLASS"
       testid="select-grade"
     />
 
@@ -135,6 +167,7 @@ async function addStudentToClass() {
       class="uc-form-button"
       type="submit"
       @click="addStudentToClass"
+      :disabled="isDisabled"
       data-testid="button-submit"
     >
       Continue

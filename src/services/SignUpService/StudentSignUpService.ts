@@ -135,6 +135,7 @@ function ineligibleContinue() {
 }
 
 async function createAccount(data) {
+  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CREATE_ACCOUNT)
   try {
     await AuthService.registerStudent({
       [InputName.CLASS_CODE]: data[InputName.CLASS_CODE],
