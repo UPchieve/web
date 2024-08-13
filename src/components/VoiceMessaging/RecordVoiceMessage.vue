@@ -322,7 +322,7 @@ function destroy() {
             class="button send-button"
             @click="sendAudio"
           >
-            Send both
+            Send audio + text
           </LargeButton>
         </div>
       </div>
