@@ -4,6 +4,7 @@
     class="step-errors"
     role="alert"
     aria-labelledby="formErrors"
+    data-testid="form-errors"
   >
     <h5 id="formErrors">Please correct the following problems:</h5>
     <ul>

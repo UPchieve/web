@@ -15,6 +15,7 @@
     <input
       :id="name"
       :name="name"
+      :data-testid="testid"
       class="uc-form-text-input"
       :class="{
         'uc-form-text-input-invalid': hasValidationError(),
@@ -62,6 +63,10 @@ export default {
     },
     placeholder: {
       type: String,
+    },
+    testid: {
+      type: String,
+      default: '',
     },
     modelValue: {
       type: String,
