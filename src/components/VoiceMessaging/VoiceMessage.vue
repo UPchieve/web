@@ -10,7 +10,7 @@ const props = defineProps<{
 }>()
 const playbackRateOptions = ref([0.5, 1, 1.25, 1.5, 2])
 const playbackRate = ref(1)
-const shouldShowTranscript = ref(false)
+const shouldShowTranscript = ref(true)
 const toggleShowTranscript = () =>
   (shouldShowTranscript.value = !shouldShowTranscript.value)
 
