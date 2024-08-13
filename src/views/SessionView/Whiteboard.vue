@@ -57,6 +57,22 @@
         <EraserIcon class="toolbar-item__svg" />
       </div>
       <div
+        v-if="showPhotoUpload"
+        class="toolbar-item toolbar-item--photo"
+        title="Upload photo"
+        tabindex="0"
+        @click="openFileDialog"
+        @keydown.enter="openFileDialog"
+      >
+        <FileDialog
+          ref="fileDialog"
+          class="upload-photo"
+          accept="image/*, image/heic"
+          @file-selected="uploadPhoto"
+        />
+        <PhotoUploadIcon class="toolbar-item__svg--photo" />
+      </div>
+      <div
         class="toolbar-item toolbar-item--shapes"
         title="Shapes"
         tabindex="0"
@@ -198,22 +214,6 @@
         @keydown.enter="redo"
       >
         <RedoIcon class="toolbar-item__svg" />
-      </div>
-      <div
-        v-if="showPhotoUpload"
-        class="toolbar-item toolbar-item--photo"
-        title="Upload photo"
-        tabindex="0"
-        @click="openFileDialog"
-        @keydown.enter="openFileDialog"
-      >
-        <FileDialog
-          ref="fileDialog"
-          class="upload-photo"
-          accept="image/*, image/heic"
-          @file-selected="uploadPhoto"
-        />
-        <PhotoUploadIcon class="toolbar-item__svg--photo" />
       </div>
       <div
         class="toolbar-item toolbar-item--clear"
@@ -386,6 +386,11 @@ export default {
     }
   },
   async mounted() {
+    if (this.isVolunteerImageUploadEnabled)
+      AnalyticsService.captureEvent(EVENTS.VOLUNTEER_IMAGE_UPLOAD_SEEN, {
+        sessionType: 'Whiteboard',
+      })
+
     /*
      * This seems like an anti-pattern.
      * Any events sent before `created()` is called will be missed.
