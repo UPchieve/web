@@ -1,3 +1,5 @@
+import { file2b64 } from '@/utils/fileToBase64'
+
 export const MAX_FILE_SIZE_KB = 750
 export const MAX_TOTAL_IMAGES = 5
 
@@ -127,26 +129,6 @@ const downscaleImage = async (
   ctx.drawImage(image, 0, 0, newWidth, newHeight)
   const newDataUrl = canvas.toDataURL(imageType, imageQuality)
   return newDataUrl
-}
-
-const file2b64 = async (file) => {
-  const fileReader = new FileReader()
-  const promise = new Promise((resolve, reject) => {
-    fileReader.addEventListener(
-      'load',
-      () => {
-        const base64ImageSrc = fileReader.result?.toString()
-        if (!base64ImageSrc) {
-          reject('Could not convert file to base64, invalid mime type')
-        } else {
-          resolve(base64ImageSrc)
-        }
-      },
-      false
-    )
-  })
-  fileReader.readAsDataURL(file)
-  return promise
 }
 
 class ImageDrop {

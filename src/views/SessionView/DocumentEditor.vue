@@ -16,6 +16,11 @@
       />
     </transition>
     <refresh-document-editor-modal v-if="showRefreshModal" />
+    <FileDialog
+      accept="image/*, image/heic"
+      ref="fileDialog"
+      @file-selected="onFileSelected"
+    />
   </div>
 </template>
 
@@ -34,14 +39,26 @@ import {
   MAX_TOTAL_IMAGES,
   volunteerAttemptedToAddImage,
 } from '@/utils/quill-image-optimizer'
+import FileDialog from '@/components/FileDialog.vue'
+import ModerationService from '@/services/ModerationService'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
+import { file2b64 } from '@/utils/fileToBase64'
 
 Quill.register('modules/cursors', QuillCursors)
 Quill.register('modules/image', ImageCompressor)
 
 export default {
   components: {
+    FileDialog,
     LoadingMessage,
     RefreshDocumentEditorModal,
+  },
+  props: {
+    sessionId: {
+      type: String,
+      required: false,
+    },
   },
   data() {
     return {
@@ -52,6 +69,10 @@ export default {
       retries: 0,
       showRefreshModal: false,
       isConnecting: false,
+      inappropriateImageErrorMessage:
+        'The image is not appropriate. If you believe this to be an error, please contact us at support@upchieve.org.',
+      failedToModerateImageMessage:
+        'There was an issue analyzing the image. Please try a different image, or reach out to support@upchieve.org for assistance.',
     }
   },
   computed: {
@@ -64,9 +85,16 @@ export default {
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
+      isVolunteerImageUploadEnabled:
+        'featureFlags/isVolunteerImageUploadEnabled',
     }),
     isSocketReadyToRequestForDoc() {
       return [this.isConnected, this.currentSession?.id]
+    },
+    volunteerImageAlertMessage() {
+      return this.isVolunteerImageUploadEnabled
+        ? 'Please upload images through the image button on the toolbar.'
+        : 'At this time, coaches cannot upload images for student safety reasons. Please direct the student to an online resource instead.'
     },
   },
   mounted() {
@@ -77,7 +105,11 @@ export default {
       [{ list: 'ordered' }, { list: 'bullet' }],
     ]
 
-    if (this.isStudent) toolbar.push(['image'])
+    if (
+      this.isStudent ||
+      (this.isVolunteer && this.isVolunteerImageUploadEnabled)
+    )
+      toolbar.push(['image'])
 
     this.quillEditor = markRaw(
       new Quill('#quill-container', {
@@ -111,6 +143,17 @@ export default {
       })
     )
 
+    const imageHandler = async () => {
+      AnalyticsService.captureEvent(EVENTS.VOLUNTEER_CLICKED_UPLOAD_IMAGE, {
+        sessionType: 'DocumentEditor',
+      })
+      this.$refs.fileDialog.openFileDialog()
+    }
+
+    if (this.isVolunteer && this.isVolunteerImageUploadEnabled) {
+      this.quillEditor.getModule('toolbar').addHandler('image', imageHandler)
+    }
+
     this.quillEditor.root.addEventListener(
       maxImagesEventName,
       () =>
@@ -129,10 +172,7 @@ export default {
     )
     this.quillEditor.root.addEventListener(
       volunteerAttemptedToAddImage,
-      () =>
-        alert(
-          'At this time, coaches cannot upload images for student safety reasons. Please direct the student to an online resource instead.'
-        ),
+      () => alert(this.volunteerImageAlertMessage),
       false
     )
 
@@ -230,6 +270,42 @@ export default {
       socket.emit('requestQuillState', {
         sessionId: this.currentSession.id,
       })
+    },
+    async onFileSelected(evt) {
+      const { files } = evt.fileSelectionEvent.target
+      let file = files[0]
+      const formData = new FormData()
+      formData.append('image', file)
+      formData.append('sessionId', this.sessionId)
+      try {
+        const { isClean } =
+          await ModerationService.checkIfImageIsClean(formData)
+        if (!isClean) {
+          AnalyticsService.captureEvent(EVENTS.VOLUNTEER_IMAGE_CENSORED, {
+            sessionType: 'DocumentEditor',
+          })
+          this.showImageUploadError(this.inappropriateImageErrorMessage)
+          return
+        }
+      } catch (err) {
+        AnalyticsService.captureEvent(
+          EVENTS.VOLUNTEER_IMAGE_MODERATION_FAILED,
+          {
+            sessionType: 'DocumentEditor',
+          }
+        )
+        this.showImageUploadError(this.failedToModerateImageMessage)
+      }
+
+      const range = this.quillEditor.getSelection()
+      const b64 = await file2b64(file)
+      this.quillEditor.insertEmbed(range.index, 'image', b64, 'user')
+      AnalyticsService.captureEvent(EVENTS.VOLUNTEER_UPLOADED_IMAGE, {
+        sessionType: 'DocumentEditor',
+      })
+    },
+    showImageUploadError(message) {
+      alert(message)
     },
   },
   watch: {
