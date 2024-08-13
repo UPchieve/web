@@ -153,15 +153,11 @@ export default {
   watch: {
     $route(to) {
       if (to.params.classId && !to.params.studentId) {
-        this.$router.push(`/dashboard/teacher/${to.params.classId}`)
         this.classId = to.params.classId
         this.view = 'classDetails'
       } else if (to.params.classId && to.params.studentId) {
-        this.$router.push(
-          `/dashboard/teacher/${to.params.classId}/${to.params.studentId}`
-        )
-        this.view = 'studentDetails'
         this.classId = to.params.classId
+        this.view = 'studentDetails'
       } else {
         this.view = ''
       }
@@ -176,10 +172,12 @@ export default {
         this.currentClassInfo = await this.getClassInfo(this.classId)
       }
       this.view = 'classDetails'
-    } else if (this.$route.params.classId && this.$route.params.studentId) {
-      this.classId = this.$route.params.classId
-      this.currentClassInfo = await this.getClassInfo(this.classId)
+    } else if (this.$route.params.studentId) {
       this.studentId = this.$route.params.studentId
+      this.classId = this.$route.params.classId
+      if (_.isEmpty(this.currentClassInfo)) {
+        this.currentClassInfo = await this.getClassInfo(this.classId)
+      }
       this.view = 'studentDetails'
     } else {
       this.view = ''
@@ -276,7 +274,7 @@ export default {
       this.classId = teacherClass.id
       this.currentClassInfo = teacherClass
       this.currentClassName = teacherClass.name
-      this.$router.push(`/dashboard/teacher/${teacherClass.id}`)
+      this.$router.push(`/dashboard/teacher/class/${teacherClass.id}`)
     },
   },
 }

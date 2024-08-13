@@ -138,13 +138,18 @@ export default {
     if (this.$route.params.studentId) {
       this.classId = this.$route.params.classId
       this.studentId = this.$route.params.studentId
+    } else if (this.$route.params.classId && !this.$route.params.studentId) {
+      this.classId = this.$route.params.classId
+      this.$router.push(`/dashboard/teacher/class/${this.classId}`)
+    } else {
+      this.$router.push(`/dashboard/teacher`)
     }
     this.sessions = await this.getStudentSessionDetails()
   },
 
   methods: {
     backToClassDetails() {
-      this.$router.push(`/dashboard/teacher/${this.classId}`)
+      this.$router.push(`/dashboard/teacher/class/${this.classId}`)
     },
 
     formatTimestamp(timestamp) {

@@ -18,7 +18,9 @@
         your class.
       </p>
       <div class="link-container">
-        <div class="copy-link">https://app.upchieve.org/join-class/{{ this.code }}</div>
+        <div class="copy-link">
+          https://app.upchieve.org/join-class/{{ this.code }}
+        </div>
         <button @click="copyURL" class="link-text">
           <LinkUnion /><span>{{ copyMessage }}</span>
         </button>

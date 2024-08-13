@@ -93,12 +93,10 @@ export default {
       type: Object,
     },
   },
+
   async created() {
-    if (this.studentId) {
-      this.view = 'studentDetails'
-    } else if (this.$route.params.classId && !this.$route.params.studentId) {
+    if (this.$route.params.classId && !this.$route.params.studentId) {
       this.students = await this.getStudents(this.classId)
-      this.view = 'classDetails'
     } else if (!this.$route.params.classId) {
       this.$router.push('/dashboard')
     }
@@ -176,7 +174,9 @@ export default {
 
     viewStudentDetails(student) {
       this.studentId = student.id
-      this.$router.push(`/dashboard/teacher/${this.classId}/${student.id}`)
+      this.$router.push(
+        `/dashboard/teacher/class/${this.classInfo.id}/student/${student.id}`
+      )
     },
   },
 }
