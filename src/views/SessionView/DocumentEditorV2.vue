@@ -103,18 +103,28 @@ export default {
     },
   },
   mounted() {
+    if (this.isVolunteerImageUploadEnabled)
+      AnalyticsService.captureEvent(EVENTS.VOLUNTEER_IMAGE_UPLOAD_SEEN, {
+        sessionType: 'DocumentEditorV2',
+      })
     const toolbar = [
       [{ header: [1, 2, false] }],
       ['bold', 'italic', 'underline', 'strike'],
-      [{ color: [] }, { background: [] }],
-      [{ list: 'ordered' }, { list: 'bullet' }],
     ]
 
+    // To increase exposure, put this near the more frequently used tools
     if (
       this.isStudent ||
       (this.isVolunteer && this.isVolunteerImageUploadEnabled)
     )
       toolbar.push(['image'])
+
+    toolbar.push([
+      { color: [] },
+      { background: [] },
+      { list: 'ordered' },
+      { list: 'bullet' },
+    ])
 
     this.quillEditor = markRaw(
       new Quill('#quill-container', {
