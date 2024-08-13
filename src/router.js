@@ -487,11 +487,22 @@ const routes = [
     meta: { protected: true },
   },
   {
-    path: '/dashboard/teacher/:classId?/:studentId?',
+    path: '/dashboard/teacher',
     name: 'TeacherDashboard',
     component: TeacherDashboardView,
     meta: { protected: true },
-    props: true,
+    children: [
+      {
+        path: 'class/:classId',
+        name: 'ClassDetailsView',
+        children: [
+          {
+            path: 'student/:studentId',
+            name: 'StudentDetailsView',
+          },
+        ],
+      },
+    ],
   },
 ]
 
