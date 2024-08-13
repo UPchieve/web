@@ -31,9 +31,11 @@ const props = defineProps<{
   sendAudioMessage: ({
     audio,
     transcript,
+    userEditedTranscript,
   }: {
     audio: Blob
     transcript: string
+    userEditedTranscript: string
   }) => boolean
 }>()
 const recording = reactive<{
@@ -152,7 +154,8 @@ async function sendAudio() {
     if (recording.blob) {
       results = await props.sendAudioMessage({
         audio: recording.blob,
-        transcript: recording.transcript,
+        transcript: recording.transcript.trim(),
+        userEditedTranscript: recording.userEditedTranscript.trim(),
       })
     }
     if (results) {
@@ -319,7 +322,7 @@ function destroy() {
             class="button send-button"
             @click="sendAudio"
           >
-            Send audio
+            Send both
           </LargeButton>
         </div>
       </div>

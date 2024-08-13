@@ -5,11 +5,14 @@ import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '../../consts'
 
 const props = defineProps<{
-  message: { contents: string }
+  message: { contents: string; transcript?: string }
   isSender?: boolean
 }>()
 const playbackRateOptions = ref([0.5, 1, 1.25, 1.5, 2])
 const playbackRate = ref(1)
+const shouldShowTranscript = ref(false)
+const toggleShowTranscript = () =>
+  (shouldShowTranscript.value = !shouldShowTranscript.value)
 
 function trackPlay() {
   if (typeof props.isSender === 'boolean') {
@@ -21,7 +24,7 @@ function trackPlay() {
 }
 </script>
 <template>
-  <div :class="{ self: isSender }">
+  <div class="audio-container" :class="{ self: isSender }">
     <audio
       controls
       preload="auto"
@@ -40,49 +43,64 @@ function trackPlay() {
       />
     </audio>
     <div class="speed">
-      speed
-      <div class="wrapper">
-        <select v-model="playbackRate">
-          <option
-            v-for="option in playbackRateOptions"
-            :value="option"
-            :key="option"
-          >
-            x{{ option }}
-          </option>
-        </select>
+      <select v-model="playbackRate">
+        <option
+          v-for="option in playbackRateOptions"
+          :value="option"
+          :key="option"
+        >
+          x{{ option }}
+        </option>
+      </select>
+    </div>
+    <div class="transcript-container">
+      <button
+        v-if="props.message.transcript && !shouldShowTranscript"
+        :onClick="toggleShowTranscript"
+      >
+        View Transcript
+      </button>
+      <div class="transcript" v-if="shouldShowTranscript">
+        {{ props.message.transcript }}
       </div>
+      <button v-if="shouldShowTranscript" :onClick="toggleShowTranscript">
+        See Less
+      </button>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
+.audio-container {
+  display: grid;
+  max-width: 100%;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: 1fr auto;
+  gap: 4px;
+  align-items: center;
+}
+
 .controls {
   max-width: 100%;
 }
 
 .speed {
-  font-size: 12px;
-  display: flex;
-  justify-content: end;
-  gap: 4px;
-  align-items: center;
-}
-
-.wrapper {
   position: relative;
+  font-size: 12px;
   select {
     -webkit-appearance: none;
+    appearance: none;
     padding: 4px;
     border-radius: 4px;
     border: 1px solid #bcbcc8;
+    background-color: transparent;
+    border: none;
+    option {
+      text-align: end;
+    }
   }
   &::before {
-    content: '▾';
-    position: absolute;
-    right: 4px;
-    top: 2px;
-    pointer-events: none;
+    display: none;
   }
 }
 
@@ -93,5 +111,18 @@ audio::-webkit-media-controls-panel {
   audio::-webkit-media-controls-panel {
     background-color: #e3f2fd;
   }
+}
+
+.transcript-container {
+  grid-column-start: span 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: end;
+  font-size: 14px;
+}
+
+.transcript {
+  align-self: start;
 }
 </style>
