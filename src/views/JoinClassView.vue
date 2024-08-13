@@ -110,13 +110,14 @@ async function addStudentToClass() {
       label="Class Code"
       placeholder="Class Code"
       :blur-event="EVENTS.STUDENT_ENTERED_CLASS_CODE"
+      testid="input-class-code"
     />
     <div v-else class="uc-row mt-2">
-      <p>Class code: {{ classCode }}</p>
-      <a class="uc-link ml-2" @click="removeClass">Not your class?</a>
+      <p data-testid="text-class-code">Class code: {{ classCode }}</p>
+      <a class="uc-link ml-2" data-testid="link-not-your-class" @click="removeClass">Not your class?</a>
     </div>
 
-    <FormEmail class="mt-3" v-model="email" />
+    <FormEmail class="mt-3" v-model="email" testid="input-email" />
 
     <FormSelect
       class="mt-3"
@@ -127,9 +128,15 @@ async function addStudentToClass() {
       :get-select-options="() => GRADES"
       :reduce="(option: string) => option.split(' ')[0]"
       :blur-event="EVENTS.STUDENT_SELECTED_GRADE"
+      testid="select-grade"
     />
 
-    <button class="uc-form-button" type="submit" @click="addStudentToClass">
+    <button
+      class="uc-form-button"
+      type="submit"
+      @click="addStudentToClass"
+      data-testid="button-submit"
+    >
       Continue
     </button>
   </form-page-template>
