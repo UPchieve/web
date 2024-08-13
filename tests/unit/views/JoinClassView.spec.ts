@@ -55,6 +55,9 @@ describe('JoinClassView', () => {
     expect(inputClassCode.exists()).toBeTruthy()
     expect(inputEmail.exists()).toBeTruthy()
 
+    await wrapper.vm.$nextTick()
+    expect(buttonSubmit.attributes('disabled')).toBeDefined()
+
     const classCode = faker.string.alphanumeric(6)
     const email = faker.internet.email()
     const gradeLevel = '6th'
@@ -62,6 +65,8 @@ describe('JoinClassView', () => {
     await inputEmail.setValue(email)
       ; (wrapper.vm as any).gradeLevel = gradeLevel
 
+    await wrapper.vm.$nextTick()
+    expect(buttonSubmit.attributes('disabled')).toBeUndefined()
     await buttonSubmit.trigger('click')
 
     expect(NetworkService.addStudentToClass).toHaveBeenCalledOnce()
@@ -207,10 +212,24 @@ describe('JoinClassView', () => {
     const {
       textClassCode,
       inputClassCode,
+      inputEmail,
+      buttonSubmit,
     } = getElements(wrapper)
 
     expect(inputClassCode.exists()).toBe(false)
     expect(textClassCode.text()).toBe(`Class code: ${classCode.toUpperCase()}`)
+
+    await wrapper.vm.$nextTick()
+    expect(buttonSubmit.attributes('disabled')).toBeDefined()
+
+    const email = faker.internet.email()
+    const gradeLevel = '9th'
+    inputEmail.setValue(email)
+      ; (wrapper.vm as any).gradeLevel = gradeLevel
+
+    await wrapper.vm.$nextTick()
+    expect(buttonSubmit.attributes('disabled')).toBeUndefined()
+    await buttonSubmit.trigger('click')
   })
 
   test('the form resets if the student selects the class code is not correct', async () => {

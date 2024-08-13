@@ -185,6 +185,7 @@ function getAccountPageDetails() {
 }
 
 async function createAccount(data) {
+  AnalyticsService.captureEvent(EVENTS.TEACHER_CLICKED_CREATE_ACCOUNT)
   try {
     await NetworkService.registerTeacher({
       [InputName.EMAIL]: data[InputName.EMAIL],
