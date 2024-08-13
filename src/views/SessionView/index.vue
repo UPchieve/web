@@ -33,9 +33,11 @@
             auxiliaryType === sessionToolTypes.DOCUMENT_EDITOR &&
             docEditorVersion === 2
           "
+          :sessionId="this.sessionId"
         />
         <document-editor
           v-else-if="auxiliaryType === sessionToolTypes.DOCUMENT_EDITOR"
+          :sessionId="this.sessionId"
         />
       </div>
       <div
