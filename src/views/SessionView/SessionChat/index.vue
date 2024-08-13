@@ -380,7 +380,7 @@ export default {
         this.waitingForModeration = false
       }
     },
-    async sendVoiceMessage({ audio, transcript }) {
+    async sendVoiceMessage({ audio, transcript, userEditedTranscript }) {
       try {
         this.hideModerationWarning()
         this.waitingForModeration = true
@@ -392,16 +392,20 @@ export default {
         }
 
         const { failures } = await ModerationService.checkIfMessageIsClean({
-          message: transcript,
+          // Moderate both original audio transcript and user edited
+          message: `${transcript} ${userEditedTranscript}`,
           sessionId: this.currentSession.id,
         })
-
+        const transcriptToSend = userEditedTranscript.length
+          ? userEditedTranscript
+          : transcript
         const isClean = Object.keys(failures).length === 0
         if (isClean) {
           const form = new FormData()
           form.append('message', audio)
           form.append('senderId', this.user.id)
           form.append('sessionId', this.currentSession.id)
+          form.append('transcript', transcriptToSend)
           const voiceMessageId =
             await VoiceMessageService.saveVoiceMessage(form)
 
@@ -410,6 +414,7 @@ export default {
             sessionId: this.currentSession.id,
             user: this.user,
             message: voiceMessageId,
+            transcript: transcriptToSend,
             source:
               this.isInRecap || this.eligibleForSessionRecapChat ? 'recap' : '',
           })
