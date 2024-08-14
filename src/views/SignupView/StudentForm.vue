@@ -1532,6 +1532,9 @@ export default {
         studentPartnerOrgKey: this.partnerKey,
         zipCode: this.eligibility.zipCode,
       }
+      // Allow for the provider to populate the email
+      if (!this.eligibility.email) delete data.email
+      if (!this.eligibility.zipCode) delete data.zipCode
       const params = new URLSearchParams(data).toString()
       const url = `${config.serverRoot}/auth/sso?${params}`
       window.location.replace(url)
