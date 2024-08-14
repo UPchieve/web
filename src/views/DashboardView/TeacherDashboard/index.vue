@@ -21,7 +21,7 @@
             account to track and share student usage.
           </p>
           <a
-            href="https://www.youtube.com/watch?v=xZcIMXERQeA"
+            href="https://vimeo.com/998375372?share=copy"
             target="_blank"
             rel="noopener"
             >See How UPchieve Works for Your Students</a
@@ -34,8 +34,7 @@
       <div v-else-if="!classes.length" class="empty-classes-container">
         <Checklist />
         <p>
-          Click here to get started and share your knowledge with eager
-          students!
+          Providing extra help is about to get easier. Click here to get started!
         </p>
         <button class="uc-form-button" @click="openCreateTeacherClassModal">
           Add Class
