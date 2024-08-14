@@ -141,7 +141,12 @@ async function addStudentToClass(_, overrideEvent?: string) {
     />
     <div v-else class="uc-row mt-2">
       <p data-testid="text-class-code">Class code: {{ classCode }}</p>
-      <a class="uc-link ml-2" data-testid="link-not-your-class" @click="removeClass">Not your class?</a>
+      <a
+        class="uc-link ml-2"
+        data-testid="link-not-your-class"
+        @click="removeClass"
+        >Not your class?</a
+      >
     </div>
 
     <FormEmail

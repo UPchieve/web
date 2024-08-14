@@ -109,6 +109,7 @@
 <script>
 import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'
+import AnalyticsService from '@/services/AnalyticsService'
 import ClassDetails from './ClassDetailsView.vue'
 import StudentDetails from './StudentDetailsView.vue'
 import ClassImg from '@/assets/class.svg'
@@ -116,6 +117,7 @@ import Checklist from '@/assets/Checklist.svg'
 import ExternalPage from '@/assets/ExternalPage.svg'
 import RightArrow from '@/assets/RightArrow.svg'
 import { mapState } from 'vuex'
+import { EVENTS } from '@/consts'
 import _ from 'lodash'
 
 export default {
@@ -259,6 +261,7 @@ export default {
           topics: this.topics,
         },
       })
+      AnalyticsService.captureEvent(EVENTS.TEACHER_OPENED_CREATE_CLASS_MODAL)
     },
 
     openTeacherCodeModal(code) {

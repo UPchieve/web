@@ -3,7 +3,11 @@
     <div class="modal-container">
       <h1>Create a New Class</h1>
       <p>Fill out the details below to set up your new class.</p>
-      <FormInput v-model="className" placeholder="Class Name" />
+      <FormInput
+        v-model="className"
+        placeholder="Class Name"
+        :blurEvent="EVENTS.TEACHER_INPUT_CLASS_NAME"
+      />
       <FormSelect
         :name="'topic'"
         :placeholder="'Choose a subject'"
@@ -12,6 +16,7 @@
         :getSelectOptions="() => topics"
         v-model="topicId"
         required="false"
+        :blur-event="EVENTS.TEACHER_SELECTED_CLASS_TOPIC"
       />
       <div class="buttons">
         <button class="uc-form-button cancel-button" @click="close()">
@@ -33,7 +38,9 @@
 import FormInput from '@/components/FormInput.vue'
 import Modal from '@/components/Modal.vue'
 import NetworkService from '@/services/NetworkService'
+import AnalyticsService from '@/services/AnalyticsService'
 import FormSelect from '@/components/FormSelect.vue'
+import { EVENTS } from '@/consts'
 
 export default {
   components: { FormInput, Modal, FormSelect },
@@ -52,6 +59,7 @@ export default {
       className: '',
       topicId: null,
       topics: [],
+      EVENTS,
     }
   },
 
@@ -82,6 +90,12 @@ export default {
     },
 
     accept() {
+      const topic = this.topics.find((topic) => topic.id === this.topicId)
+      AnalyticsService.captureEvent(EVENTS.TEACHER_CREATED_CLASS, {
+        className: this.className,
+        topicId: this.topicId,
+        topicName: topic.displayName,
+      })
       this.modalData.createTeacherClass({
         className: this.className,
         topicId: this.topicId,
