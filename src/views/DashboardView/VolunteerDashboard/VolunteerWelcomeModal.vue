@@ -6,16 +6,19 @@
   >
     <img
       class="volunteer-welcome-modal-header-img"
-      src="@/assets/volunteer-welcome-modal-header.png"
+      src="@/assets/updog-certificate-cheer.png"
       alt="image welcoming new volunteers"
     />
     <div class="volunteer-welcome-modal">
       <div class="volunteer-welcome-modal-title-container">
-        <h1 class="volunteer-welcome-modal-title">
-          Welcome {{ user.firstname }}!
-        </h1>
-        <p class="volunteer-welcome-modal-subtitle">
-          {{ message }}
+        <h1 class="volunteer-welcome-modal-title">Way to go!</h1>
+        <p class="volunteer-welcome-modal-text">
+          We're thrilled to have join our volunteer <br />
+          community!
+        </p>
+        <p class="volunteer-welcome-modal-text">
+          You've passed the quiz, and you're nearly ready! Continue in your
+          dashboard to complete the setup!
         </p>
       </div>
 
@@ -24,36 +27,20 @@
         class="volunteer-welcome-modal-btn"
         type="button"
       >
-        Get started <arrow-icon class="volunteer-welcome-modal-arrow-icon" />
+        Got it
       </button>
     </div>
   </modal>
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
-import ArrowIcon from '@/assets/arrow.svg'
 import Modal from '@/components/Modal.vue'
 
 export default {
   name: 'volunteer-welcome-modal',
-  components: { Modal, ArrowIcon },
+  components: { Modal },
   props: {
     closeModal: { type: Function, required: true },
-  },
-  computed: {
-    ...mapState({
-      user: (state) => state.user.user,
-    }),
-    ...mapGetters({
-      mobileMode: 'app/mobileMode',
-    }),
-    message() {
-      if (this.user.isApproved)
-        return "We're so glad you're joining our movement to democratize access to educational support. Before you can start making an impact in a student’s life, you'll need to complete a few quick steps."
-      else
-        return "We're so glad you're joining our movement to democratize access to educational support. Before you can start making an impact in a student’s life, you'll need to complete a few quick steps."
-    },
   },
   methods: {
     handleCloseModal() {
@@ -68,6 +55,9 @@ export default {
 // override styling defined in the Modal component to allow for image spread
 .volunteer-welcome-modal-wrapper .upc-modal-form {
   padding: 0;
+  @include breakpoint-above('medium') {
+    width: 550px;
+  }
 }
 
 .volunteer-welcome-modal {
@@ -78,9 +68,11 @@ export default {
   }
 
   &-title {
+    margin-top: 1em;
+    margin-bottom: 0.8em;
     @include font-category('display-small');
     @include breakpoint-above('medium') {
-      margin-top: 24px;
+      margin-top: 0.4em;
     }
   }
 
@@ -89,30 +81,24 @@ export default {
     width: 80%;
   }
 
-  &-subtitle {
+  &-text {
     font-size: 16px;
-    color: $c-secondary-grey;
+    color: $c-soft-black;
+    margin-bottom: 0;
   }
 
   &-header-img {
     width: 100%;
   }
 
-  &-arrow-icon {
-    fill: currentColor;
-    height: 16px;
-    width: 16px;
-    margin-left: 0.5em;
-  }
-
   // @todo: make global modal button styles
   &-btn {
     @include flex-container(row, center, center);
     width: 80%;
-    background-color: $c-success-green;
+    background-color: $c-information-blue;
     border-color: transparent;
     color: white;
-    margin: 1em auto;
+    margin: 2em auto;
     border: 1px solid rgba(0, 0, 0, 0);
     border-radius: 20px;
     padding: 9px 23px;
@@ -120,7 +106,7 @@ export default {
     border: none;
 
     &:hover {
-      background: darken($c-success-green, 5%);
+      background: darken($c-information-blue, 5%);
       color: $c-background-grey;
     }
 

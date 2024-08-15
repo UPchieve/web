@@ -15,15 +15,20 @@
       <div :style="imageStyle" class="question-image" />
       <form class="possible-answers" data-testid="quiz-questions">
         <div v-for="(item, index) in items" :key="`item-${index}`">
-          <div class="options">
+          <div class="options answer-option">
             <input
               :value="item.val"
               v-model="picked"
               type="radio"
               :id="item.val"
               :data-testid="item.val"
+              class="answer-option--input"
             />
-            <label :for="item.val" :id="'answer-' + item.val">
+            <label
+              :for="item.val"
+              :id="'answer-' + item.val"
+              class="answer-option--label"
+            >
               {{ item.val }}. {{ item.txt }}
             </label>
           </div>
@@ -277,6 +282,15 @@ label {
 
 .options {
   margin-bottom: 10px;
+}
+
+.answer-option {
+  @include flex-container(row, initial, center);
+
+  &--label {
+    margin-left: 0.2em;
+    margin-bottom: 0;
+  }
 }
 
 .question-number {
