@@ -1,120 +1,130 @@
 <template>
-  <div v-if="isVolunteer" class="training-quiz" :class="trainingQuizClasses">
-    <div :class="showQuizReview ? 'done-header' : 'header'">
-      <h1 class="title">{{ quizName }} Certification Quiz</h1>
-      <div
-        v-if="showQuizReview"
-        class="review-buttons"
-        :class="{
-          'review-buttons--align-end': quizResults.passed,
-        }"
-      >
-        <template v-if="!quizResults.passed">
-          <large-button
-            primary
-            :showArrow="false"
-            data-testid="btn-review-concepts"
-            @click="goToStudyMaterials"
-            class="review-buttons--button"
-            ><span>Review concepts</span>
-          </large-button>
-          <large-button
-            class="review-buttons--button review-buttons--button-end"
-            :showArrow="false"
-            data-testid="retake-quiz"
-            @click="reloadQuiz"
-            ><span>Retake quiz</span>
-          </large-button>
-        </template>
-        <template v-else>
-          <large-button
-            primary
-            :showArrow="false"
-            routeTo="/training"
-            class="review-buttons--button"
-            ><span>Take another quiz</span>
-          </large-button>
-          <large-button
-            class="review-buttons--button review-buttons--button-end"
-            :showArrow="false"
-            routeTo="/dashboard"
-            ><span>Go to Dashboard</span>
-          </large-button>
-        </template>
-      </div>
+  <div
+    class="quiz-container"
+    :class="showQuizReview && 'quiz-container--review-answers'"
+  >
+    <div v-if="isAutoFlowUser" class="subjects-link" @click="goToSubjectsPage">
+      <arrow-icon class="subjects-link--arrow-icon" />
+      <span class="subjects-link--text">Back to subjects page</span>
     </div>
-    <div class="quiz-inner">
-      <div v-if="quizLoading" class="loading-body">
-        <loading-message message="Loading quiz" />
-      </div>
-      <div v-else-if="loadingQuizResults" class="loading-body">
-        <loading-message message="Getting your quiz results" />
-      </div>
-      <div v-else>
-        <div v-if="showNoQuiz" class="instructions">
-          A {{ quizName }} quiz has not yet been created. If you would like to
-          begin tutoring students on this topic, please contact UPchieve.
-        </div>
-        <router-link
-          v-if="showNoQuiz"
-          class="contact btn"
-          type="button"
-          to="/contact"
+    <div class="training-quiz" :class="trainingQuizClasses">
+      <div :class="showQuizReview ? 'done-header' : 'header'">
+        <h1 class="title">{{ quizName }} Certification Quiz</h1>
+        <div
+          v-if="showQuizReview"
+          class="review-buttons"
+          :class="{
+            'review-buttons--align-end': quizResults.passed,
+          }"
         >
-          CONTACT US
-        </router-link>
-        <div v-if="showQuizStart" class="quiz-start">
-          <div>
-            <div class="instructions">
-              <h2 class="instructions-header">Get ready, set...</h2>
-              <div class="instructions-content">
-                <p>
-                  You're about to start a quiz with {{ quizLength }} questions.
-                  There's no time limit, but we recommend setting aside at least
-                  15 minutes. Once you feel ready, press
-                  <span class="instructions-start-quiz">"Start Quiz"</span>
-                  below!
-                </p>
-                <p v-if="isQuizStudyMaterialUser">
-                  You can also press the "Study" button to study the material
-                  we've created before taking the quiz
-                </p>
+          <template v-if="!quizResults.passed">
+            <large-button
+              primary
+              :showArrow="false"
+              data-testid="btn-review-concepts"
+              @click="goToStudyMaterials"
+              class="review-buttons--button"
+              ><span>Review concepts</span>
+            </large-button>
+            <large-button
+              class="review-buttons--button review-buttons--button-end"
+              :showArrow="false"
+              data-testid="retake-quiz"
+              @click="reloadQuiz"
+              ><span>Retake quiz</span>
+            </large-button>
+          </template>
+          <template v-else>
+            <large-button
+              primary
+              :showArrow="false"
+              routeTo="/training"
+              class="review-buttons--button"
+              ><span>Take another quiz</span>
+            </large-button>
+            <large-button
+              class="review-buttons--button review-buttons--button-end"
+              :showArrow="false"
+              routeTo="/dashboard"
+              ><span>Go to Dashboard</span>
+            </large-button>
+          </template>
+        </div>
+      </div>
+      <div class="quiz-inner">
+        <div v-if="quizLoading" class="loading-body">
+          <loading-message message="Loading quiz" />
+        </div>
+        <div v-else-if="loadingQuizResults" class="loading-body">
+          <loading-message message="Getting your quiz results" />
+        </div>
+        <div v-else>
+          <div v-if="showNoQuiz" class="instructions">
+            A {{ quizName }} quiz has not yet been created. If you would like to
+            begin tutoring students on this topic, please contact UPchieve.
+          </div>
+          <router-link
+            v-if="showNoQuiz"
+            class="contact btn"
+            type="button"
+            to="/contact"
+          >
+            CONTACT US
+          </router-link>
+          <div v-if="showQuizStart" class="quiz-start">
+            <div>
+              <div class="instructions">
+                <h2 class="instructions-header">Get ready, set...</h2>
+                <div class="instructions-content">
+                  <p>
+                    You're about to start a quiz with
+                    {{ quizLength }} questions. There's no time limit, but we
+                    recommend setting aside at least 15 minutes. Once you feel
+                    ready, press
+                    <span class="instructions-start-quiz">"Start Quiz"</span>
+                    below!
+                  </p>
+                  <p v-if="isQuizStudyMaterialUser">
+                    You can also press the "Study" button to study the material
+                    we've created before taking the quiz
+                  </p>
+                </div>
+              </div>
+              <div class="quiz-buttons">
+                <large-button
+                  v-if="isQuizStudyMaterialUser"
+                  :showArrow="false"
+                  @click="goToStudyMaterials()"
+                  class="quiz-buttons--button"
+                  ><span>Study</span>
+                </large-button>
+                <large-button
+                  data-testid="btn-start-quiz"
+                  primary
+                  :showArrow="false"
+                  @click="startQuiz()"
+                  class="quiz-buttons--button quiz-buttons--primary-button"
+                  ><span>Start Quiz</span>
+                </large-button>
               </div>
             </div>
-            <div class="quiz-buttons">
-              <large-button
-                v-if="isQuizStudyMaterialUser"
-                :showArrow="false"
-                @click="goToStudyMaterials()"
-                class="quiz-buttons--button"
-                ><span>Study</span>
-              </large-button>
-              <large-button
-                data-testid="btn-start-quiz"
-                primary
-                :showArrow="false"
-                @click="startQuiz()"
-                class="quiz-buttons--button quiz-buttons--primary-button"
-                ><span>Start Quiz</span>
-              </large-button>
-            </div>
           </div>
-        </div>
 
-        <quiz-questions
-          v-if="showQuizQuestions"
-          :quizLength="quizLength"
-          @submitQuiz="submitQuiz"
-        />
-        <quiz-review v-if="showQuizReview" />
-        <quiz-results
-          v-if="showQuizResults"
-          :quizResults="quizResults"
-          :quizLength="quizLength"
-          :reloadQuiz="reloadQuiz"
-          :isFirstQuiz="isFirstQuiz"
-          @showReview="showReview"
-        />
+          <quiz-questions
+            v-if="showQuizQuestions"
+            :quizLength="quizLength"
+            @submitQuiz="submitQuiz"
+          />
+          <quiz-review v-if="showQuizReview" />
+          <quiz-results
+            v-if="showQuizResults"
+            :quizResults="quizResults"
+            :quizLength="quizLength"
+            :reloadQuiz="reloadQuiz"
+            :isFirstQuiz="isFirstQuiz"
+            @showReview="showReview"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -134,6 +144,7 @@ import QuizReview from './QuizReview.vue'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import LargeButton from '@/components/LargeButton.vue'
+import ArrowIcon from '@/assets/arrow.svg'
 
 // TODO: Refactor this file - CSS, make use of async, and better error handling
 export default {
@@ -162,6 +173,7 @@ export default {
     QuizResults,
     QuizReview,
     LargeButton,
+    ArrowIcon,
   },
   computed: {
     ...mapState({
@@ -173,6 +185,7 @@ export default {
       allSubtopics: 'subjects/allSubtopics',
       isQuizStudyMaterialUser: 'user/isQuizStudyMaterialUser',
       hasCertification: 'user/hasCertification',
+      isAutoFlowUser: 'user/isAutoFlowUser',
     }),
     tries() {
       const { user } = this.$store.state.user
@@ -260,6 +273,10 @@ export default {
     goToStudyMaterials() {
       this.$router.push(`/training/review/${Case.kebab(this.category)}`)
     },
+    goToSubjectsPage() {
+      if (this.isAutoFlowUser) this.$router.push('/welcome')
+      else this.$router.push('/training')
+    },
   },
 }
 </script>
@@ -273,25 +290,12 @@ export default {
   background: #fff;
   border-radius: 8px;
   margin: 10px;
-  padding: 1.25em 0.9em;
-  max-width: 1000px;
   padding-bottom: 8em;
   border-left: 5px solid $c-information-blue;
 
   @include breakpoint-above('medium') {
-    margin: 2.5em;
+    margin: 0 0 2.5em 2.5em;
     padding: 2.5em;
-    width: 80%;
-  }
-
-  @include breakpoint-above('huge') {
-    width: 50%;
-  }
-
-  &--review-answers {
-    @include breakpoint-above('huge') {
-      width: 80%;
-    }
   }
 
   &--passed {
@@ -300,6 +304,51 @@ export default {
 
   &--failed {
     border-left: 5px solid $c-error-red;
+  }
+}
+
+.quiz-container {
+  max-width: 1000px;
+  margin-top: 1em;
+
+  @include breakpoint-above('medium') {
+    margin-top: 2.5em;
+    width: 80%;
+  }
+
+  @include breakpoint-above('huge') {
+    width: 55%;
+  }
+
+  &--review-answers {
+    @include breakpoint-above('huge') {
+      width: 80%;
+    }
+  }
+}
+
+.subjects-link {
+  @include flex-container(row, initial, center);
+  display: inline-flex;
+  padding-left: 0.9em;
+  max-width: 1000px;
+  margin-bottom: 1em;
+  color: $c-information-blue;
+  cursor: pointer;
+
+  @include breakpoint-above('medium') {
+    margin-left: 2.5em;
+  }
+
+  &--text {
+    margin-bottom: 0;
+  }
+
+  &--arrow-icon {
+    width: 20px;
+    fill: $c-information-blue;
+    transform: rotate(180deg);
+    margin-right: 0.4em;
   }
 }
 
