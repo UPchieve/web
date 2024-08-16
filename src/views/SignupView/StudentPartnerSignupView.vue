@@ -4,11 +4,22 @@
       <FormErrors :errors="errors" />
 
       <h1 v-if="studentPartner.name" class="uc-form-header">
-        Welcome {{ studentPartner.name }}
-        {{ useParentGuardianSignUpFlow ? `Parent/Guardian!` : `Student!` }}
+        Welcome
+        {{
+          isCollegeBoardSearch
+            ? ''
+            : useParentGuardianSignUpFlow
+              ? `Parent/Guardian!`
+              : `Student!`
+        }}
       </h1>
       <h1 v-else class="uc-form-header">Welcome to UPchieve!</h1>
-      <p v-if="studentPartner.name" class="uc-form-text">
+      <p v-if="isCollegeBoardSearch" class="uc-form-text">
+        UPchieve is here to connect you to 100% FREE, online tutoring and
+        college counseling available 24/7! Start chatting with a tutor in less
+        than 5 minutes
+      </p>
+      <p v-else-if="studentPartner.name" class="uc-form-text">
         Not with {{ studentPartner.name }}?
         <router-link class="uc-link" to="/sign-up">Click here</router-link>
       </p>
@@ -660,6 +671,12 @@ export default {
 
     getSortedPartnerSites() {
       return Array.from(this.studentPartner.sites).sort()
+    },
+    partner() {
+      return this.$route.params.partnerId
+    },
+    isCollegeBoardSearch() {
+      return this.partner === 'college-board-search'
     },
   },
   methods: {
