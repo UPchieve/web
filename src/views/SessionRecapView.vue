@@ -334,6 +334,9 @@ export default {
       }
     })
   },
+  beforeUnmount() {
+    socket.emit('sessions/recap:leave', { sessionId: this.session.id })
+  },
   methods: {
     getSessionTime(sessionCreatedAt) {
       return moment(sessionCreatedAt).format('l, h:mm A')
