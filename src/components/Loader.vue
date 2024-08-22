@@ -8,7 +8,7 @@
 <script>
 import Spinner from './Spinner.vue'
 export default {
-  components: [Spinner],
+  components: { Spinner },
   props: {
     overlay: Boolean,
     height: { type: Number, default: 64 },
