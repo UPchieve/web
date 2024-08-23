@@ -38,7 +38,10 @@ onBeforeMount(async () => {
   FeatureFlagService.setPersonPropertiesForFlags({ cohort: 'joining-class' })
 
   if (email.value && classCode.value && gradeLevel.value) {
-    await addStudentToClass(undefined, EVENTS.STUDENT_REDIRECTED_TO_JOIN_CLASS_WITH_PARAMS)
+    await addStudentToClass(
+      undefined,
+      EVENTS.STUDENT_REDIRECTED_TO_JOIN_CLASS_WITH_PARAMS
+    )
   }
 })
 

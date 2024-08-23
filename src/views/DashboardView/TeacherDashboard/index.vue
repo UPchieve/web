@@ -33,8 +33,9 @@
       <loader v-if="isLoading" />
       <div v-else-if="!classes.length" class="empty-classes-container">
         <Checklist />
-        <p>
-          Providing extra help is about to get easier. Click here to get started!
+        <p data-testid="empty-classes-msg">
+          Providing extra help is about to get easier. Click here to get
+          started!
         </p>
         <button class="uc-form-button" @click="openCreateTeacherClassModal">
           Add Class
@@ -53,7 +54,7 @@
             + Add Class
           </button>
         </div>
-        <div class="classes-container">
+        <div class="classes-container" data-testid="classes-container">
           <loader v-if="isLoading" />
           <table v-else class="classes-table">
             <tr>
@@ -93,6 +94,7 @@
                 <button
                   class="view-details-btn"
                   @click="viewDetails(teacherClass)"
+                  :data-testid="`class-details-btn-${teacherClass.id}`"
                 >
                   Class Details <RightArrow />
                 </button>
