@@ -8,19 +8,18 @@ import { socket } from '@/socket'
 
 export const INVALID_CSRF_ERROR = 'invalid csrf token'
 
-export async function logout(context) {
-  if (!context) return
+export async function logout(context, logoutRoute) {
   try {
     await NetworkService.logout()
   } finally {
-    await handleLogout(context)
+    await handleLogout(context, logoutRoute)
     resetServices()
     socket.disconnect()
   }
 }
 
-async function handleLogout(context) {
-  await context.$router.push('/logout')
+async function handleLogout(context, logoutRoute) {
+  await context.$router.push(logoutRoute ?? '/logout')
   await context.$store.dispatch('user/clear')
 }
 
