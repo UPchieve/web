@@ -55,7 +55,6 @@
         <SsoButton
           class="mt-3"
           data-testid="cleverSsoButton"
-          v-if="useNewSignUpFlow"
           @click="signInWithSso('clever')"
           buttonText="Clever"
           ssoMethod="clever"

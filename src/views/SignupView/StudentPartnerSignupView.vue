@@ -27,7 +27,9 @@
         We're a free online tutoring platform for high school students.
       </p>
 
-      <div v-if="useSSO && !useParentGuardianSignUpFlow">
+      <div
+        v-if="(useGoogleSSO || useCleverSSO) && !useParentGuardianSignUpFlow"
+      >
         <div class="uc-form-element">
           <div class="uc-row justify-between">
             <label for="grade">What is your current grade?</label>
@@ -44,14 +46,20 @@
             required
           ></v-select>
         </div>
-        <button
-          class="uc-form-button google"
-          @click.prevent="signUpWithGoogle"
-          :disabled="isSubmittingForm || !sso.currentGrade ? true : null"
-        >
-          <google-logo />
-          Sign Up with Google
-        </button>
+        <SsoButton
+          v-if="useGoogleSSO"
+          class="mt-3"
+          @click="signUpWithSso('google')"
+          buttonText="Sign Up with Google"
+          ssoMethod="google"
+        />
+        <SsoButton
+          v-if="useCleverSSO"
+          class="mt-3"
+          @click="signUpWithSso('clever')"
+          buttonText="Sign Up with Clever"
+          ssoMethod="clever"
+        />
         <p class="terms-text">
           By clicking the button above, you agree to our
           <a href="https://upchieve.org/legal" target="_blank" class="uc-link"
@@ -427,12 +435,12 @@ import Autocomplete from '@trevoreyre/autocomplete-vue'
 
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import FormErrors from '@/components/FormErrors.vue'
+import SsoButton from '@/components/SsoButton.vue'
 import AuthService from '@/services/AuthService'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { backOff } from 'exponential-backoff'
 import { EVENTS, GRADES, INELIGIBLE_LOCAL_STORAGE_KEY } from '@/consts'
-import GoogleLogo from '@/assets/google_logo.svg'
 import config from '../../config'
 import VerificationBadge from '@/assets/verification.svg'
 import * as signupUtils from '@/utils/signup-utils'
@@ -442,8 +450,8 @@ export default {
     FormPageTemplate,
     FormErrors,
     Autocomplete,
-    GoogleLogo,
     VerificationBadge,
+    SsoButton,
   },
   setup() {
     return { v$: useVuelidate() }
@@ -527,8 +535,11 @@ export default {
     localStorage.removeItem('isSSOSignUpRedirect')
     localStorage.removeItem(INELIGIBLE_LOCAL_STORAGE_KEY)
     const params = this.$route.query
-    if (this.shouldUseSSO(params)) {
-      this.useSSO = true
+    if (this.shouldUseGoogleSSO(params)) {
+      this.useGoogleSSO = true
+    }
+    if (this.shouldUseCleverSSO(params)) {
+      this.useCleverSSO = true
     }
     if (this.shouldUseParentGuardianSignUpFlow(params)) {
       this.useParentGuardianSignUpFlow = true
@@ -543,7 +554,8 @@ export default {
   },
   data() {
     return {
-      useSSO: false,
+      useGoogleSSO: false,
+      useCleverSSO: false,
       useParentGuardianSignUpFlow: false,
       showParentGuardianConfirmationPage: false,
       gradeLevels: GRADES,
@@ -683,8 +695,11 @@ export default {
     isFailureRedirect(params) {
       return Object.keys(params).includes('error')
     },
-    shouldUseSSO(params) {
+    shouldUseGoogleSSO(params) {
       return params['sso'] === 'google'
+    },
+    shouldUseCleverSSO(params) {
+      return params['sso'] === 'clever'
     },
     shouldUseParentGuardianSignUpFlow(params) {
       for (const key in params) {
@@ -820,20 +835,32 @@ export default {
         })
     },
 
-    signUpWithGoogle() {
-      AnalyticsService.captureEvent(
-        EVENTS.PARTNER_STUDENT_CLICKED_SIGN_UP_WITH_GOOGLE
-      )
+    signUpWithSso(provider) {
+      this.captureSsoClickEvent(provider)
+
       localStorage.setItem('isSSOSignUpRedirect', true)
       const data = {
         gradeLevel: this.trimGradeLevel,
         isLogin: false,
-        provider: 'google',
+        provider,
         studentPartnerOrgKey: this.studentPartner.key,
       }
       const params = new URLSearchParams(data).toString()
       const url = `${config.serverRoot}/auth/sso?${params}`
       window.location.replace(url)
+    },
+
+    captureSsoClickEvent(provider) {
+      if (provider === 'google') {
+        AnalyticsService.captureEvent(
+          EVENTS.PARTNER_STUDENT_CLICKED_SIGN_UP_WITH_GOOGLE
+        )
+      }
+      if (provider === 'clever') {
+        AnalyticsService.captureEvent(
+          EVENTS.PARTNER_STUDENT_CLICKED_SIGN_UP_WITH_CLEVER
+        )
+      }
     },
 
     hasFormValidationError(el) {
