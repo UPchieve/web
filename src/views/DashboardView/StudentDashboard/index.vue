@@ -100,7 +100,8 @@ export default {
     if (
       this.hadASession &&
       !getCookie('hasSeenTellThemCollegePrepModal') &&
-      this.user.pastSessions.length >= 1
+      this.user.pastSessions.length >= 1 &&
+      this.isCollegePrepAdEnabled
     )
       this.showTellThemCollegePrepModal = true
 
@@ -132,6 +133,7 @@ export default {
       isAutoStartCollegeSessionActive:
         'featureFlags/isAutoStartCollegeSessionActive',
       autoStartCollegeSession: 'featureFlags/autoStartCollegeSession',
+      isCollegePrepAdEnabled: 'featureFlags/isCollegePrepAdEnabled',
     }),
     userAndOrbitalSegment() {
       return [this.user, this.orbitalSegments, this.isOrbitalSegmentsActive]

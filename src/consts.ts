@@ -636,6 +636,7 @@ export const POSTHOG_FEATURE_FLAGS = {
     'big-future-two-question-eligibility-flow',
   VOICE_MESSAGE: 'voice-message',
   VOLUNTEER_IMAGE_UPLOAD: 'volunteer-image-upload',
+  COLLEGE_PREP_AD: 'college-prep-ad',
 }
 
 export const ANALYTICS_REPORT_ROW = {
