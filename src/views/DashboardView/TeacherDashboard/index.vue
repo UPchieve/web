@@ -30,10 +30,10 @@
         <ClassImg class="dashboard-img" />
       </div>
       <!-- TODO: Add error message on error. -->
-      <loader v-if="isLoading" />
+      <loader v-if="isLoading" class="loader" />
       <div v-else-if="!classes.length" class="empty-classes-container">
         <Checklist />
-        <p class='empty-classes-msg' data-testid="empty-classes-msg">
+        <p class="empty-classes-msg" data-testid="empty-classes-msg">
           Providing extra help is about to get easier. Click here to get
           started!
         </p>
@@ -289,8 +289,13 @@ export default {
   margin: 24px;
 }
 
+.loader {
+  @include flex-container(column, center, center);
+  margin-top: 100px;
+}
+
 .dashboard-banner {
-  @include flex-container(columns);
+  @include flex-container(column);
   background-color: #fff;
   border-color: #000;
   border-radius: 8px;
