@@ -142,6 +142,7 @@ export default {
             this.currentSession.id,
             {
               studentId: this.currentSession.student.id,
+              volunteerId: this.currentSession.volunteer.id,
             }
           )
           this.isFetchingIsSessionRecapEligible = false
