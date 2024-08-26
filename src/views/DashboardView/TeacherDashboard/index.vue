@@ -24,7 +24,7 @@
             href="https://vimeo.com/998375372?share=copy"
             target="_blank"
             rel="noopener"
-            >See How UPchieve Works for Your Students</a
+            >Demo Video: How UPchieve Works for Students</a
           >
         </div>
         <ClassImg class="dashboard-img" />
@@ -33,7 +33,7 @@
       <loader v-if="isLoading" />
       <div v-else-if="!classes.length" class="empty-classes-container">
         <Checklist />
-        <p data-testid="empty-classes-msg">
+        <p class='empty-classes-msg' data-testid="empty-classes-msg">
           Providing extra help is about to get easier. Click here to get
           started!
         </p>
@@ -314,7 +314,8 @@ export default {
   align-self: flex-start;
   padding-left: 0;
   color: #1855d1;
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 .dashboard-img {
@@ -414,5 +415,9 @@ export default {
   align-self: center;
   border: 1px solid #1855d1;
   border-radius: 32px;
+}
+
+.empty-classes-msg {
+  text-align: center;
 }
 </style>
