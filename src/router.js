@@ -167,22 +167,6 @@ const routes = [
     name: 'StudentPartnerSignupView',
     component: StudentPartnerSignupView,
     meta: { loggedOutOnly: true },
-    beforeEnter: async (to, _from, next) => {
-      if (store.getters['featureFlags/useNewSignUpFlow']) {
-        return next({
-          name: 'SignupView',
-          params: {
-            step: 'info',
-            userType: 'student',
-          },
-          query: {
-            partner: to.params.partnerId,
-            ...to.query,
-          },
-        })
-      }
-      return next()
-    },
   },
   {
     path: '/signup/volunteer/:partnerId',

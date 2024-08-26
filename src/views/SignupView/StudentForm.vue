@@ -632,6 +632,28 @@
     </div>
   </div>
 
+  <div v-else-if="step === 'account' && isCleverStudentRedirect">
+    <FormErrors :errors="errors" />
+
+    <h1 class="uc-form-header">Welcome Clever student!</h1>
+    <p class="mt-2">Enter your student email to get started using UPchieve.</p>
+
+    <FormEmail v-model="credentials.email" />
+
+    <button
+      class="uc-form-button"
+      type="submit"
+      :disabled="
+        v$.credentials.email.$error ||
+        v$.credentials.email.$silentErrors.length ||
+        isSubmittingAccountForm
+      "
+      @click="() => submitAccountForm(true)"
+    >
+      Continue
+    </button>
+  </div>
+
   <div v-else-if="step === 'account'">
     <FormErrors :errors="errors" />
 
@@ -1027,6 +1049,9 @@ export default {
         this.$route.query['error'] ??
           'Failed to sign up with Google. Please use password instead.'
       )
+      this.step = 'account'
+    } else if (this.$route.query['isCleverStudentEmailRedirect'] === 'true') {
+      this.isCleverStudentRedirect = true
       this.step = 'account'
     } else if (this.isReferred) this.step = 'referred'
     else this.eligibilityPage(queryParams)
@@ -1473,38 +1498,46 @@ export default {
       }
     },
 
-    hasAccountFormErrors() {
+    hasAccountFormErrors(isEmailOnly) {
       this.errors = []
 
-      if (!this.profile.firstName || !this.profile.lastName) {
-        this.errors.push('You must enter your first and last name.')
-      }
-      if (!this.credentials.password) {
-        this.errors.push('A password is required.')
+      if (isEmailOnly) {
+        if (!this.credentials.email) {
+          this.errors.push('Your email is required.')
+        }
+      } else {
+        if (!this.profile.firstName || !this.profile.lastName) {
+          this.errors.push('You must enter your first and last name.')
+        }
+        if (!this.credentials.password) {
+          this.errors.push('A password is required.')
+        }
       }
 
       return !!this.errors.length
     },
 
-    async submitAccountForm() {
+    async submitAccountForm(isEmailOnly) {
       this.isSubmittingAccountForm = true
-      if (this.hasAccountFormErrors()) {
+      if (this.hasAccountFormErrors(isEmailOnly)) {
         this.isSubmittingAccountForm = false
         return
       }
 
       try {
-        await AuthService.registerStudent({
+        const data = {
           email: this.credentials.email,
           firstName: this.profile.firstName,
-          gradeLevel: this.trimCurrentGrade,
+          gradeLevel: this.trimCurrentGrade || undefined,
           lastName: this.profile.lastName,
           password: this.credentials.password,
           referredByCode: window.localStorage.getItem('upcReferredByCode'),
           schoolId: this.eligibility.highSchool.upchieveId,
           studentPartnerOrgKey: this.partnerKey,
+          validator: this.$route.query.validator || undefined,
           zipCode: this.eligibility.zipCode ? this.eligibility.zipCode : null,
-        })
+        }
+        await AuthService.registerStudent(data)
         window.localStorage.removeItem('upcReferredByCode')
         this.$router.replace('/verify')
       } catch (e) {
