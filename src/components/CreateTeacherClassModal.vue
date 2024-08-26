@@ -70,7 +70,8 @@ export default {
   },
 
   async created() {
-    this.topics = this.modalData.topics
+    const topics = this.modalData.topics
+    this.topics = topics.sort((a, b) => a.dashboardOrder - b.dashboardOrder)
   },
 
   methods: {
