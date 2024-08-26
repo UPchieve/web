@@ -33,7 +33,7 @@
       <loader v-if="isLoading" />
       <div v-else-if="!classes.length" class="empty-classes-container">
         <Checklist />
-        <p class='empty-classes-msg' data-testid="empty-classes-msg">
+        <p class="empty-classes-msg" data-testid="empty-classes-msg">
           Providing extra help is about to get easier. Click here to get
           started!
         </p>
@@ -84,7 +84,7 @@
                 </span>
               </td>
               <td>{{ teacherClass.name }}</td>
-              <td>{{ teacherClass.totalStudents }}</td>
+              <td>{{ teacherClass.totalStudents || '0' }}</td>
               <td>
                 <button @click="openTeacherCodeModal(teacherClass.code)">
                   <ExternalPage /> View Code
