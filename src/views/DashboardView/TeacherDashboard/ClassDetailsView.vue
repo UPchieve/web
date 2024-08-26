@@ -8,7 +8,8 @@
         <div class="class-info">
           <h1>{{ classInfo.name }}</h1>
           <span class="students-text"
-            >{{ classInfo.totalStudents }} students</span
+            >{{ classInfo.totalStudents || '0' }}
+            {{ classInfo.totalStudents == 1 ? 'student' : 'students' }}</span
           >
           <button @click="openTeacherCodeModal">
             <LinkUnion /><span class="class-code-text">Class Code</span>
