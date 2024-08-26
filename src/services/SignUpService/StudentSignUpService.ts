@@ -17,45 +17,54 @@ import {
   getAlreadyHaveAccountElements,
   getSignUpSourceElement,
   getInputElement,
+  PageDetail,
+  FormElement,
+  FormRow,
+  SubmitActionResponse,
 } from '@/services/SignUpService'
 import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
 import { getFormAddressee, getLabelPrefix } from '@/utils/signup-utils'
+import { RouteLocation } from 'vue-router'
 
 const RoutePath = {
   account: `/sign-up/student/${SignUpPage.account}`,
   eligibility: `/sign-up/student/${SignUpPage.eligibility}`,
   ineligible: `/sign-up/student/${SignUpPage.ineligible}`,
-  parentGuardianConfirmation: `/sign-up/student/${SignUpPage.confirmation}`,
-  partnerInfo: `sign-up/student/${SignUpPage.info}`,
+  parentGuardianConfirmation: `/sign-up/student/${SignUpPage.parentGuardianConfirmation}`,
+  partnerInfo: `sign-up/student/${SignUpPage.partnerInfo}`,
   verify: `/${SignUpPage.verify}`,
 }
 // The following values are used as the `name` attribute on form elements,
 // and should match the keys in server requests.
-export const InputName = {
-  CLASS_CODE: 'classCode',
-  EMAIL: 'email',
-  FIRST_NAME: 'firstName',
-  GRADE_LEVEL: 'gradeLevel',
-  LAST_NAME: 'lastName',
-  PARENT_GUARDIAN_EMAIL: 'parentGuardianEmail',
-  PASSWORD: 'password',
-  REFERRED_BY_CODE: 'upcReferredByCode',
-  SCHOOL_ID: 'schoolId',
-  SIGNUP_SOURCE_ID: 'signupSourceId',
-  STUDENT_PARTNER_ORG_KEY: 'studentPartnerOrgKey',
-  STUDENT_PARTNER_ORG_SITE_NAME: 'studentPartnerOrgSiteName',
-  TERMS: 'terms',
-  ZIP_CODE: 'zipCode',
+export enum InputName {
+  CLASS_CODE = 'classCode',
+  EMAIL = 'email',
+  FIRST_NAME = 'firstName',
+  GRADE_LEVEL = 'gradeLevel',
+  LAST_NAME = 'lastName',
+  PARENT_GUARDIAN_EMAIL = 'parentGuardianEmail',
+  PASSWORD = 'password',
+  REFERRED_BY_CODE = 'upcReferredByCode',
+  SCHOOL_ID = 'schoolId',
+  SIGNUP_SOURCE_ID = 'signupSourceId',
+  STUDENT_PARTNER_ORG_KEY = 'studentPartnerOrgKey',
+  STUDENT_PARTNER_ORG_SITE_NAME = 'studentPartnerOrgSiteName',
+  TERMS = 'terms',
+  ZIP_CODE = 'zipCode',
 }
 
-export function getPageDetails(to, from) {
+export function getPageDetails(to: RouteLocation, from: RouteLocation): PageDetail {
   return getFilteredPageDetails(() => {
-    if (isIneligibleRoute(to, from)) {
+    if (isIneligibleRoute(to)) {
       return getIneligiblePageDetails()
     }
 
-    if (isAccountRoute(to, from)) {
+    if (isCleverStudentRedirect(to)) {
+      return getCleverStudentRedirectPageDetails()
+    }
+
+    if (isAccountRoute(to)) {
       return getAccountPageDetails(to)
     }
 
@@ -67,7 +76,7 @@ export function getPageDetails(to, from) {
   })
 }
 
-function getSubmitResponse(nextPage, data, err) {
+function getSubmitResponse(nextPage?: SignUpPage, data?: any, err?: Error): SubmitActionResponse {
   switch (nextPage) {
     case SignUpPage.eligibility:
       return [
@@ -98,7 +107,7 @@ function getSubmitResponse(nextPage, data, err) {
   }
 }
 
-async function checkEligibility(data) {
+async function checkEligibility(data): Promise<SubmitActionResponse> {
   AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CHECK_MY_ELIGIBILITY, {
     partnerKey: data.partner?.key,
   })
@@ -128,8 +137,9 @@ async function checkEligibility(data) {
   }
 }
 
-function ineligibleContinue() {
+function ineligibleContinue(): SubmitActionResponse {
   AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_STUDENT_ACCESS_PAGE)
+  // @ts-ignore
   window.location = 'https://upchieve.org/request-access'
   return [null, null]
 }
@@ -153,6 +163,7 @@ async function createAccount(data) {
         data[InputName.STUDENT_PARTNER_ORG_KEY],
       [InputName.STUDENT_PARTNER_ORG_SITE_NAME]:
         data[InputName.STUDENT_PARTNER_ORG_SITE_NAME],
+      validator: data.validator,
       [InputName.ZIP_CODE]: data[InputName.ZIP_CODE],
     })
     window.localStorage.removeItem('upcReferredByCode')
@@ -177,26 +188,31 @@ function createAccountWithClever(data) {
   return createAccountWithSso('clever', data)
 }
 
-function isParentGuardianSignUp(to) {
+function isParentGuardianSignUp(to: RouteLocation) {
+  // @ts-ignore
   return to.params.parent === true || to.params.parent === 'true'
 }
 
-function isIneligibleRoute(to) {
+function isIneligibleRoute(to: RouteLocation) {
   return to.path === RoutePath.ineligible
 }
 
-function isAccountRoute(to, from) {
+function isCleverStudentRedirect(to: RouteLocation) {
+  return to.query.isCleverStudentEmailRedirect === 'true'
+}
+
+function isAccountRoute(to: RouteLocation) {
   return to.path === RoutePath.account
 }
 
-function isParentGuardianConfirmationRoute(to, from) {
+function isParentGuardianConfirmationRoute(to: RouteLocation, from: RouteLocation) {
   return (
     to.path === SignUpPage.parentGuardianConfirmation &&
     from?.path === SignUpPage.account
   )
 }
 
-function getStudentEmailElement(isParentGuardian) {
+function getStudentEmailElement(isParentGuardian: boolean = false): FormElement {
   return {
     element: 'FormEmail',
     props: {
@@ -208,7 +224,7 @@ function getStudentEmailElement(isParentGuardian) {
   }
 }
 
-function getParentGuardianEmailElement() {
+function getParentGuardianEmailElement(): FormElement {
   return {
     element: 'FormEmail',
     props: {
@@ -219,7 +235,7 @@ function getParentGuardianEmailElement() {
   }
 }
 
-export function getZipCodeElement() {
+export function getZipCodeElement(): FormElement {
   return {
     element: 'FormInput',
     props: {
@@ -233,7 +249,7 @@ export function getZipCodeElement() {
   }
 }
 
-export function getGradeSelectionElement(isParentGuardian) {
+export function getGradeSelectionElement(isParentGuardian: boolean): FormElement {
   return {
     element: 'FormSelect',
     props: {
@@ -247,7 +263,7 @@ export function getGradeSelectionElement(isParentGuardian) {
   }
 }
 
-function getSsoSectionElements() {
+function getSsoSectionElements(): FormRow[] {
   return [
     getRow('mt-4', getSsoButton(createAccountWithGoogle, 'Google')),
     getRow('mt-3', getSsoButton(createAccountWithClever, 'Clever', 'clever')),
@@ -262,7 +278,8 @@ function getSsoSectionElements() {
   ]
 }
 
-export function getPartnerSitesElement(to) {
+export function getPartnerSitesElement(to: RouteLocation): FormElement {
+  // @ts-ignore
   const sites = to.params.partner?.sites
   if (!sites) {
     return
@@ -304,11 +321,12 @@ export function getTermsCheckboxElements() {
   ]
 }
 
-function getFirstPageDetails(to) {
+function getFirstPageDetails(to: RouteLocation): PageDetail {
   function isEligibilitySignUp() {
     return to.params.step === 'eligibility'
   }
   function isEligibilityAppealSignUp() {
+    // @ts-ignore
     return to.params.partner?.isManuallyApproved
   }
   function isOrganicStudentSignUp() {
@@ -318,9 +336,11 @@ function getFirstPageDetails(to) {
     return to.params.partner
   }
   function isCodeDotOrgStudent() {
+    // @ts-ignore
     return to.params.partner?.key === 'code-org'
   }
   function isBigFutureStudent() {
+    // @ts-ignore
     return to.params.partner?.key === 'bigfuture'
   }
   function isCollegeConfidentialStudent() {
@@ -337,6 +357,7 @@ function getFirstPageDetails(to) {
     if (isCollegeConfidentialStudent()) {
       return `Get that A you deserve!`
     }
+    // @ts-ignore
     const partnerName = to.params.partner?.name
     if (partnerName) {
       return `Welcome ${partnerName} ${getFormAddressee(isParentGuardianSignUp(to))}!`
@@ -360,6 +381,7 @@ function getFirstPageDetails(to) {
 
   function includeSchoolElement() {
     if (isPartnerStudentSignUp()) {
+      // @ts-ignore
       return !to.params.partner.isSchool
     }
     return true
@@ -367,6 +389,7 @@ function getFirstPageDetails(to) {
 
   function isSchoolRequired() {
     if (isPartnerStudentSignUp()) {
+      // @ts-ignore
       return to.params.partner.schoolSignupRequired
     }
     return true
@@ -392,6 +415,7 @@ function getFirstPageDetails(to) {
         ? getRow(
           'justify-start mt-1',
           getRouterLinkElement(
+            // @ts-ignore
             `Not with ${to.params.partner?.name}?`,
             '/sign-up/student/eligibility'
           )
@@ -440,7 +464,7 @@ function getFirstPageDetails(to) {
   }
 }
 
-function getIneligiblePageDetails() {
+function getIneligiblePageDetails(): PageDetail {
   return {
     backgroundLayout: 'full',
     submitAction: ineligibleContinue,
@@ -457,7 +481,20 @@ function getIneligiblePageDetails() {
   }
 }
 
-function getAccountPageDetails(to) {
+function getCleverStudentRedirectPageDetails(): PageDetail {
+  return {
+    backgroundLayout: 'card',
+    submitAction: createAccount,
+    rows: [
+      getRow('justify-center center mt-4', getTextElement('h1', 'Welcome Clever student!')),
+      getRow('justify-center center mt-3', getTextElement('p', 'Enter your student email to get started using UPchieve.')),
+      getRow('mt-2', getStudentEmailElement()),
+      getRow('justify-center mt-3', getButtonElement(createAccount, 'Continue')),
+    ]
+  }
+}
+
+function getAccountPageDetails(to: RouteLocation): PageDetail {
   const isParentGuardian = isParentGuardianSignUp(to)
   const isClassCodeSignUp = !!to.params.classCode
 
@@ -466,13 +503,13 @@ function getAccountPageDetails(to) {
       return `You're almost done! 🎉`
     }
 
-    const prefixIdentifier =  isParentGuardian ? 'Your child is ' : "You're "
+    const prefixIdentifier = isParentGuardian ? 'Your child is ' : "You're "
     return prefixIdentifier + 'eligible for UPchieve! 🎉'
   }
   function getH2Text() {
     const suffix = ` to join class ${to.params.classCode}`
-    return 'Finish creating your account' + suffix
-}
+    return 'Finish creating your account' + (isClassCodeSignUp ? suffix : '')
+  }
 
   return {
     backgroundLayout: 'panel-right-75p',
@@ -487,7 +524,7 @@ function getAccountPageDetails(to) {
       getRow('mt-4', getTextElement('h1', getH1Text())),
       getRow('mt-3', getTextElement('h2', getH2Text())),
       ...(!isParentGuardian ? getSsoSectionElements() : []),
-      isParentGuardian ? getRow('mt-2', getParentGuardianEmailElement(to)) : null,
+      isParentGuardian ? getRow('mt-2', getParentGuardianEmailElement()) : null,
       getRow(
         'mt-2 uc-column-sm',
         getInputElement(
@@ -524,7 +561,7 @@ function getAccountPageDetails(to) {
   }
 }
 
-function getParentGuardianConfirmationDetails(to) {
+function getParentGuardianConfirmationDetails(to: RouteLocation): PageDetail {
   function resetSignUp(data) {
     return getSubmitResponse(SignUpPage.eligibility, data)
   }

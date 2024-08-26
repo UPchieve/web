@@ -4,46 +4,63 @@ import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 
-export const SignUpPage = {
-  account: 'account',
-  eligibility: 'eligibility',
-  ineligible: 'ineligible',
-  parentGuardianConfirmation: 'confirmation',
-  partnerInfo: 'info',
-  verify: 'verify',
+export enum SignUpPage {
+  account = 'account',
+  eligibility = 'eligibility',
+  ineligible = 'ineligible',
+  parentGuardianConfirmation = 'confirmation',
+  partnerInfo = 'info',
+  verify = 'verify',
 }
 
-export const UserType = {
-  student: 'student',
-  teacher: 'teacher',
-  volunteer: 'volunteer',
+export enum UserType {
+  student= 'student',
+  teacher= 'teacher',
+  volunteer= 'volunteer',
 }
 
-type PageDetail = {
-  backgroundLayout: 'card' | 'panel-left-50p' | 'panel-left-75p' | 'panel-right-50p' | 'panel-right-75p'
+export type PageDetail = {
+  backgroundLayout?: 'full' | 'card' | 'panel-left-50p' | 'panel-left-75p' | 'panel-right-50p' | 'panel-right-75p'
+  panelImage?: string
   submitAction: SubmitAction
-  classes: string
+  classes?: string
   rows: FormRow[]
 }
 
-type SubmitAction = (data: Object) => SubmitActionResponse
-type SubmitActionResponse = [{ params?: { step: string }, path?: string } | null, ErrorMessage | null]
+type SubmitAction = (data: Object) => Promise<SubmitActionResponse> | SubmitActionResponse
+export type SubmitActionResponse = [{ params?: { step: string, userType?: UserType }, path?: string, query?: any } | null, ErrorMessage | null]
 type ErrorMessage = string
-type FormRow = {
+export type FormRow = {
   classes: string
   elements: FormElement[]
 }
-type FormElement = {
+export type FormElement = {
   element: FormElementType
   classes?: string
   content?: string
   isDisabledOnInvalid?: boolean
   submitAction?: SubmitAction
   props?: any // TODO: Make generic for each FormElement.
+  showIf?: (form: any) => boolean
 }
-type FormElementType = 'h1' | 'p' | 'FormSelect' | 'FormInput' | 'FormEmail' | 'SsoButton' | 'button' | 'router-link' | 'a'
-
-
+type FormElementType = 'h1' |
+  'h2' |
+  'p' |
+  'a' |
+  'button' |
+  'FormCheckBox' |
+  'FormSelect' |
+  'FormInput' |
+  'FormEmail' |
+  'FormSchoolSearch' |
+  'FormPassword' |
+  'SsoButton' |
+  'LineDivider'|
+  'router-link' |
+  'check-circled' |
+  'header-logo-teal' |
+  'updog-crying' |
+  'updog-smiling'
 
 export function getFilteredPageDetails(cb: () => PageDetail): PageDetail {
   const pd = cb()
@@ -90,7 +107,7 @@ export function continueToAccountPage(data: Object) {
   return getSubmitResponseDefault(SignUpPage.account, data)
 }
 
-export function createAccountWithSso(provider: 'google' | 'clever', data: Object) {
+export function createAccountWithSso(provider: 'google' | 'clever', data: any): SubmitActionResponse {
   AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CREATE_ACCOUNT, {
     provider
   })
@@ -180,7 +197,7 @@ export function getLinkElement(content: string, link: string): FormElement {
   }
 }
 
-export function getSignUpSourceElement(name: string, blurEvent: string) {
+export function getSignUpSourceElement(name: string, blurEvent: string): FormElement {
   return {
     element: 'FormSelect',
     props: {
