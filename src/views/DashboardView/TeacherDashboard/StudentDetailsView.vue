@@ -182,7 +182,7 @@ export default {
         )
       } catch (err) {
         err.response.data.err ??
-          'Unable to get class. Please refresh the page and try again.'
+          'Unable to get sessions. Please refresh the page and try again.'
       } finally {
         this.isLoading = false
       }
@@ -197,7 +197,6 @@ export default {
       const filteredSubjects = Object.values(subjects)
         .filter((subject) => subject.topicId === topicId)
         .map((subject) => subject.name)
-
       end.setDate(end.getDate() + 1)
       end.setHours(23, 59, 59, 999)
 
