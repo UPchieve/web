@@ -295,7 +295,7 @@ export default {
 }
 
 .dashboard-banner {
-  @include flex-container(column);
+  @include flex-container(row);
   background-color: #fff;
   border-color: #000;
   border-radius: 8px;
