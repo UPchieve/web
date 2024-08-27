@@ -20,7 +20,7 @@
         <loader v-if="isLoading" />
         <div v-else-if="!students.length" class="empty-sessions-container">
           <Checklist />
-          <p>
+          <p data-testid="no-students-msg">
             You currently don't have any students in this class. Click here to
             share the code with your students!
           </p>
@@ -36,7 +36,11 @@
             <th>Last Session</th>
             <th>Details</th>
           </tr>
-          <tr v-for="student in students" :key="student.id">
+          <tr
+            v-for="student in students"
+            :key="student.id"
+            data-testid="student-row"
+          >
             <td>{{ student.firstName }}</td>
             <td>{{ student.numSessions }}</td>
             <td>{{ student.timeTutored }}</td>
@@ -45,6 +49,7 @@
               <button
                 class="view-details-btn"
                 @click="viewStudentDetails(student)"
+                :data-testid="`view-details-btn-${student.id}`"
               >
                 Student Details <RightArrow />
               </button>
@@ -118,7 +123,6 @@ export default {
         const {
           data: { students },
         } = await NetworkService.getStudentsInTeacherClass(classId)
-
         const studentsAndSessions = await Promise.all(
           students.map(async (student) => {
             const {
