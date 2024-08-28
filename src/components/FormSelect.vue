@@ -28,6 +28,7 @@
       :class="{
         'uc-form-select-input-invalid': hasValidationError(),
       }"
+      @open="$emit('open')"
       @close="onBlur"
       :required="isRequired"
     />
@@ -71,7 +72,7 @@ export default {
       type: [String, Number],
     },
   },
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue', 'open', 'close'],
 
   async created() {
     this.isLoading = true
@@ -102,6 +103,7 @@ export default {
 
   methods: {
     onBlur() {
+      this.$emit('close')
       this.v$.modelValue.$touch()
       if (this.modelValue && !this.hasSelectedOption && this.blurEvent) {
         AnalyticsService.captureEvent(this.blurEvent)
