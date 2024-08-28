@@ -1,6 +1,6 @@
 <template>
   <modal :closeModal="close">
-    <div class="modal-container">
+    <div :class="['modal-container', { expanded: isDropdownOpen }]">
       <h1>Create a New Class</h1>
       <p>Fill out the details below to set up your new class.</p>
       <FormInput
@@ -17,6 +17,8 @@
         v-model="topicId"
         required="false"
         :blur-event="EVENTS.TEACHER_SELECTED_CLASS_TOPIC"
+        @open="handleDropdownOpen(true)"
+        @close="handleDropdownOpen(false)"
       />
       <div class="buttons">
         <button class="uc-form-button cancel-button" @click="close()">
@@ -59,6 +61,7 @@ export default {
       className: '',
       topicId: null,
       topics: [],
+      isDropdownOpen: false,
       EVENTS,
     }
   },
@@ -77,6 +80,10 @@ export default {
   methods: {
     reduceOption(option) {
       return option
+    },
+
+    handleDropdownOpen(isOpen) {
+      this.isDropdownOpen = isOpen
     },
 
     close() {
@@ -109,7 +116,7 @@ export default {
 
 <style lang="scss" scoped>
 .buttons {
-  @include flex-container(row, right);
+  @include flex-container(row, right, flex-end);
   gap: 20px;
   margin-top: 20px;
 }
@@ -127,6 +134,16 @@ export default {
 
 .modal-container {
   text-align: left;
+  overflow: hidden;
+  height: auto;
+}
+
+.modal-container.expanded {
+  min-height: 400px;
+}
+
+.modal-container:not(.expanded) {
+  height: auto; 
 }
 
 .modal-container h1 {
