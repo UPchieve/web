@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { GRADES, EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
+import AuthService from '@/services/AuthService'
 import FeatureFlagService from '@/services/FeatureFlagService'
 import NetworkService from '@/services/NetworkService'
 import FormEmail from '@/components/FormEmail.vue'
@@ -19,6 +20,9 @@ const $route = useRoute()
 const $router = useRouter()
 
 $store.dispatch('app/hideNavigation')
+
+const authenticatedUserEmail = ref<string>($store.state.user.user?.email)
+const verifyUser = ref<boolean>(!!authenticatedUserEmail.value)
 
 const errorMessage = ref<string>('')
 const email = ref<string | undefined>($route.query.email as string)
@@ -51,7 +55,26 @@ function removeClass() {
   $router.replace('/join-class')
 }
 
+async function removeUser() {
+  await AuthService.logout(
+    {
+      $router,
+      $store,
+    },
+    `/join-class/${classCode.value ?? ''}`
+  )
+  // Force reload page to avoid invalid CSRF token error.
+  $router.go(0)
+}
+
+function confirmUser() {
+  email.value = authenticatedUserEmail.value
+  verifyUser.value = false
+}
+
 async function addStudentToClass(_, overrideEvent?: string) {
+  isLoading.value = true
+
   AnalyticsService.captureEvent(
     overrideEvent ?? EVENTS.STUDENT_CLICKED_JOIN_CLASS,
     {
@@ -59,7 +82,6 @@ async function addStudentToClass(_, overrideEvent?: string) {
     }
   )
 
-  isLoading.value = true
   try {
     const response = await NetworkService.addStudentToClass({
       email: email.value,
@@ -110,9 +132,13 @@ async function addStudentToClass(_, overrideEvent?: string) {
       })
     }
   } catch (err) {
-    errorMessage.value =
-      err.response?.data?.err ??
-      'Something went wrong. Please refresh the page and try again.'
+    const INPUT_ERROR_STATUS_CODE = 422
+    if (err.response?.status === INPUT_ERROR_STATUS_CODE) {
+      errorMessage.value = `Invalid class code ${classCode.value}. Please double check the class code you have entered.`
+    } else {
+      errorMessage.value =
+        'Something went wrong. Please refresh the page and try again.'
+    }
   } finally {
     isLoading.value = false
   }
@@ -126,60 +152,78 @@ async function addStudentToClass(_, overrideEvent?: string) {
     <form-errors v-if="errorMessage" :errors="[errorMessage]" />
 
     <h1>Join your class!</h1>
-    <p>
-      When you join a class, your teacher will get access to information about
-      your UPchieve usage.
-    </p>
 
-    <FormInput
-      v-if="askForClassCode"
-      class="mt-3"
-      v-model="classCode"
-      name="classCode"
-      label="Class Code"
-      placeholder="Class Code"
-      :blur-event="EVENTS.STUDENT_ENTERED_CLASS_CODE"
-      :is-required="askForClassCode"
-      testid="input-class-code"
-    />
-    <div v-else class="uc-row mt-2">
-      <p data-testid="text-class-code">Class code: {{ classCode }}</p>
-      <a
-        class="uc-link ml-2"
-        data-testid="link-not-your-class"
-        @click="removeClass"
-        >Not your class?</a
-      >
+    <div v-if="verifyUser && !isLoading" class="center">
+      <p class="mt-4">This device is currently logged in as:</p>
+      <p class="bold">{{ authenticatedUserEmail }}</p>
+      <p class="mt-3">If this is you, press continue.</p>
+      <p class="mt-3">
+        <a class="mt-3 uc-link" @click="removeUser"
+          >I don't recognize this account.</a
+        >
+      </p>
+      <button class="uc-form-button" @click="confirmUser">Continue</button>
     </div>
 
-    <FormEmail
-      class="mt-3"
-      v-model="email"
-      :blur-event="EVENTS.STUDENT_ENTERED_EMAIL_ON_JOIN_CLASS"
-      testid="input-email"
-    />
+    <div v-else-if="!isLoading">
+      <p class="sub">
+        When you join a class, your teacher will get access to information about
+        your UPchieve usage.
+      </p>
 
-    <FormSelect
-      class="mt-3"
-      v-model="gradeLevel"
-      name="gradeLevel"
-      label="Grade in 2024-2025"
-      placeholder="Grade in 2024-2025"
-      :get-select-options="() => GRADES"
-      :reduce="(option: string) => option.split(' ')[0]"
-      :blur-event="EVENTS.STUDENT_SELECTED_GRADE_ON_JOIN_CLASS"
-      testid="select-grade"
-    />
+      <FormInput
+        v-if="askForClassCode"
+        class="mt-3"
+        v-model="classCode"
+        name="classCode"
+        label="Class Code"
+        placeholder="Class Code"
+        :blur-event="EVENTS.STUDENT_ENTERED_CLASS_CODE"
+        :is-required="askForClassCode"
+        testid="input-class-code"
+      />
+      <div v-else class="uc-row mt-2">
+        <p class="sub" data-testid="text-class-code">
+          Class code: <span class="bold">{{ classCode }}</span>
+        </p>
+        <a
+          class="uc-link ml-4"
+          data-testid="link-not-your-class"
+          @click="removeClass"
+          >Not your class?</a
+        >
+      </div>
 
-    <button
-      class="uc-form-button"
-      type="submit"
-      @click="addStudentToClass"
-      :disabled="isDisabled"
-      data-testid="button-submit"
-    >
-      Continue
-    </button>
+      <FormEmail
+        v-if="!authenticatedUserEmail"
+        class="mt-3"
+        v-model="email"
+        :blur-event="EVENTS.STUDENT_ENTERED_EMAIL_ON_JOIN_CLASS"
+        testid="input-email"
+      />
+
+      <FormSelect
+        class="mt-3"
+        v-model="gradeLevel"
+        name="gradeLevel"
+        label="Grade in 2024-2025"
+        placeholder="Grade in 2024-2025"
+        :get-select-options="() => GRADES"
+        :reduce="(option: string) => option.split(' ')[0]"
+        :blur-event="EVENTS.STUDENT_SELECTED_GRADE_ON_JOIN_CLASS"
+        testid="select-grade"
+      />
+
+      <button
+        class="uc-form-button"
+        type="submit"
+        @click="addStudentToClass"
+        :disabled="isDisabled"
+        data-testid="button-submit"
+      >
+        Continue
+      </button>
+    </div>
   </form-page-template>
 </template>
 
@@ -189,11 +233,16 @@ form-page-template {
 }
 h1 {
   font-size: 2rem;
+  width: 750px;
 }
 
 p {
-  color: #666f7d;
+  color: #343440;
   margin-bottom: 0;
+}
+
+p.sub {
+  color: #666f7d;
 }
 
 .uc-form-button {

@@ -27,3 +27,7 @@ $font-weight-medium: 500;
   font-weight: nth($list, 2);
   line-height: nth($list, 3);
 }
+
+.bold {
+  font-weight: 600;
+}
