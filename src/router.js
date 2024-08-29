@@ -227,7 +227,14 @@ const routes = [
     meta: { protected: true },
     beforeEnter: async (to, from, next) => {
       if (store.getters['user/isAutoFlowUser']) next('/welcome')
-      else next()
+
+      if (to.query.classCode) {
+        localStorage.setItem('joinedClassCode', to.query.classCode)
+        delete to.query.classCode
+        return next(to, from)
+      }
+
+      return next()
     },
   },
   {

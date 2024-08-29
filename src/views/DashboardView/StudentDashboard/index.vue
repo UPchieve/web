@@ -21,6 +21,11 @@
       v-if="showTellThemCollegePrepModal"
       :closeModal="toggleTellThemCollegePrepModal"
     />
+    <joined-class-modal
+      v-if="joinedClassCode"
+      @close-modal="() => (joinedClassCode = '')"
+      :classCode="joinedClassCode"
+    />
     <subject-selection />
   </div>
 </template>
@@ -30,6 +35,7 @@ import { mapGetters, mapState } from 'vuex'
 import DashboardBanner from '../DashboardBanner.vue'
 import SubjectSelection from './SubjectSelection/index.vue'
 import TellThemCollegePrepModal from './TellThemCollegePrepModal.vue'
+import JoinedClassModal from './JoinedClassModal.vue'
 import StudentOnboardingModal from './StudentOnboardingModal.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import ProductDiscoveryService from '@/services/ProductDiscoveryService'
@@ -55,6 +61,7 @@ export default {
     DashboardBanner,
     SubjectSelection,
     TellThemCollegePrepModal,
+    JoinedClassModal,
   },
   async created() {
     if (this.isSessionAlive) {
@@ -109,10 +116,17 @@ export default {
     if (this.user && this.user.banType === 'complete') {
       this.$store.dispatch('app/header/show', bannedHeaderData)
     }
+
+    const classCode = localStorage.getItem('joinedClassCode')
+    if (classCode) {
+      this.joinedClassCode = classCode
+      localStorage.removeItem('joinedClassCode')
+    }
   },
   data() {
     return {
       showTellThemCollegePrepModal: false,
+      joinedClassCode: '',
     }
   },
   computed: {
