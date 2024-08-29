@@ -218,6 +218,7 @@ export default {
       mobileMode: 'app/mobileMode',
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
+      isTeacher: 'user/isTeacher',
       isAutoFlowUser: 'user/isAutoFlowUser',
       getUserPropsForAnalytics: 'user/getUserPropsForAnalytics',
       showInAppSessionNotifications:
@@ -275,7 +276,9 @@ export default {
       // Capture PostHog pageviews on route transitions
       if (to.path !== from.path) posthog.capture('$pageview')
       if (to.path !== '/logout' && this.userAuthenticated) {
-        this.$store.dispatch('user/fetchSession', this)
+        if (!this.isTeacher) {
+          this.$store.dispatch('user/fetchSession', this)
+        }
 
         if (this.isStudent) {
           this.$store.dispatch('user/fetchLatestSession', this)
