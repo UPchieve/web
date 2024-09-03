@@ -360,11 +360,17 @@ export default {
     }
 
     addEventListener('mousemove', this.updatePosition.bind(this))
+    addEventListener('mouseup', this.release.bind(this))
   },
   unmounted() {
     removeEventListener('mousemove', this.updatePosition.bind(this))
+    removeEventListener('mouseup', this.release.bind(this))
   },
   methods: {
+    release() {
+      this.isResizing = false
+      this.isDragging = false
+    },
     updatePosition(event) {
       requestAnimationFrame(() => {
         if (
