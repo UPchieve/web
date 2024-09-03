@@ -30,6 +30,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.VOICE_MESSAGE]: false,
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_IMAGE_UPLOAD]: false,
       [POSTHOG_FEATURE_FLAGS.COLLEGE_PREP_AD]: false,
+      [POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -42,6 +43,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.GLEAP_SEGMENT_EXPERIMENTS]: [],
       [POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY]: '',
       [POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION]: '',
+      [POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT]: { type: 'unified' },
     },
   },
   mutations: {
@@ -139,5 +141,9 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.VOLUNTEER_IMAGE_UPLOAD],
     isCollegePrepAdEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.COLLEGE_PREP_AD],
+    isTutorBotChatEnabled: (state) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT],
+    tutorBotChatType: (state) =>
+      state.payloadFlags[POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT],
   },
 }

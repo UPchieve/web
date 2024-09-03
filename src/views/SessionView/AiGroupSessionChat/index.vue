@@ -45,15 +45,12 @@
 
     <div class="messages-container">
       <div class="messages" ref="messages" @scroll="handleScroll" tabindex="0">
-        <chat-bot
-          v-if="isStudent && isSessionWaitingForVolunteer && !aiWidgetPresent"
-          @new-bot-message="handleIncomingMessage"
-        />
         <div
-          v-for="(message, index) in filteredMessages"
+          v-for="(message, index) in currentSession.messages"
           :key="`message-${index}`"
           :class="[
             messageAlignment(message),
+            // @NEW - give us handles to style the bot messages
             isBotMessage(message) ? 'bot' : '',
           ]"
           class="message"
@@ -65,6 +62,7 @@
             {{ message.contents }}</span
           >
           <template v-else>
+            <!-- @NEW - show UPbot avatar for the phi3 bot -->
             <chat-bot-icon v-if="this.isBotMessage(message)" class="avatar" />
             <component
               class="avatar"
@@ -72,7 +70,7 @@
               v-else-if="message.user !== user.id"
             />
 
-            <div class="contents" :class="chatBotContents(message)">
+            <div class="contents">
               <span v-if="message.hasHtml" v-html="message.contents"></span>
               <span v-else-if="message.type === 'voice'">
                 <voice-message
@@ -84,7 +82,7 @@
                 v-else
                 :data-testid="`message-from-user-id-${message.user}`"
                 >{{
-                  // @NEW - strip bot tag before displaying
+                  // @NEW - strip the bot tag before displaying
                   message.contents.replace('<|bot says|>', '')
                 }}</span
               >
@@ -94,25 +92,25 @@
             </div>
           </template>
         </div>
-        <chat-bot
-          v-if="sessionHasEnded && isSessionRecapDmsActive && isVolunteer"
-          :isSessionRecapBot="true"
-          :currentSession="currentSession"
-          @recap-eligible="toggleEligibleForSessionRecapChat"
-          @loading-chatbot-message="scrollToBottom"
-        />
-        <chat-bot
-          v-if="
-            isVolunteer &&
-            isInRecap &&
-            currentSession.messages &&
-            !tutorSentMessageAfterSessionEnded
-          "
-          :isInRecap="isInRecap"
-          :currentSession="currentSession"
-          @loading-chatbot-message="scrollToBottom"
-        />
       </div>
+      <chat-bot
+        v-if="sessionHasEnded && isSessionRecapDmsActive && isVolunteer"
+        :isSessionRecapBot="true"
+        :currentSession="currentSession"
+        @recap-eligible="toggleEligibleForSessionRecapChat"
+        @loading-chatbot-message="scrollToBottom"
+      />
+      <chat-bot
+        v-if="
+          isVolunteer &&
+          isInRecap &&
+          currentSession.messages &&
+          !tutorSentMessageAfterSessionEnded
+        "
+        :isInRecap="isInRecap"
+        :currentSession="currentSession"
+        @loading-chatbot-message="scrollToBottom"
+      />
       <transition name="fade">
         <button
           type="button"
@@ -167,7 +165,7 @@
 import { isEmpty } from 'lodash-es'
 import { mapState, mapGetters } from 'vuex'
 
-import ChatBot from './ChatBot.vue'
+import ChatBot from '../SessionChat/ChatBot.vue'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import RecordVoiceMessage from '@/components/VoiceMessaging/RecordVoiceMessage.vue'
 import VoiceMessage from '@/components/VoiceMessaging/VoiceMessage.vue'
@@ -181,6 +179,9 @@ import LoggerService from '@/services/LoggerService'
 import moment from 'moment'
 import { socket } from '@/socket'
 import sound from '@/assets/audio/receive-message.mp3'
+import NetworkService from '@/services/NetworkService'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const MESSAGE_ALIGNMENT = {
   LEFT: 'left',
@@ -215,7 +216,6 @@ export default {
     isFetchingIsSessionRecapEligible: { type: Boolean, default: false },
     isSessionRecapEligible: { type: Boolean, default: false },
     sessionHasEnded: { type: Boolean, default: false },
-    aiWidgetPresent: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -233,6 +233,9 @@ export default {
       voiceMessagingAvailable:
         navigator.mediaDevices && navigator.mediaDevices.getUserMedia,
       textMessageHidden: false,
+      // @NEW determine if we should make that first call to the bot or not
+      hasNotSentInitialMessage: true,
+      hasNotSentGroupBotMessage: true,
     }
   },
   computed: {
@@ -253,15 +256,6 @@ export default {
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
       eligibleForVoiceMessaging: 'featureFlags/eligibleForVoiceMessaging',
     }),
-    filteredMessages() {
-      return this.aiWidgetPresent
-        ? this.currentSession.messages.filter(
-            (message) =>
-              !this.isBotMessage(message) &&
-              !this.isMessageForBot(message.contents)
-          )
-        : this.currentSession.messages
-    },
     showVoiceMessaging() {
       return this.voiceMessagingAvailable && this.eligibleForVoiceMessaging
     },
@@ -306,19 +300,89 @@ export default {
     },
   },
   mounted() {
+    AnalyticsService.captureEvent(EVENTS.USER_ENTERED_TUTOR_BOT_SESSION_UNIFIED)
+    if (this.currentSession.messages.length === 0) {
+      this.sendInitialBotMessage()
+    }
     if (this.chatScrolledToMessageIndex !== null) {
       const messageElements = this.getUserMessageElements()
-      this.$refs.messages.scrollTop =
-        messageElements[this.chatScrolledToMessageIndex].offsetTop
+      if (
+        this.$refs.messages &&
+        messageElements &&
+        messageElements[this.chatScrolledToMessageIndex] &&
+        messageElements[this.chatScrolledToMessageIndex]?.offsetTop
+      ) {
+        this.$refs.messages.scrollTop =
+          messageElements[this.chatScrolledToMessageIndex]?.offsetTop
+      }
     }
   },
   methods: {
-    // @NEW so bot messages are styled in recaps
-    isBotMessage(message) {
-      return /^<\|bot says\|>/.test(message.contents)
+    async sendInitialBotMessage() {
+      this.hasNotSentInitialMessage = false
+      this.$store.commit('socket/setIsTyping', true)
+      NetworkService.sendTutorBotMessage(
+        this.user.id,
+        this.currentSession.id,
+        `I need help with ${this.currentSession.subTopic}. Please respond to this message in this format: "Hi! I'm the UPchieve AI tutor bot, and I'm here to help you with ${this.currentSession.subTopic}. What are you currently working on? Let's tackle it together while you wait for your human tutor to join!"`
+      )
+        .then((resp) => {
+          socket.emit('message', {
+            sessionId: this.currentSession.id,
+            user: this.user,
+            // TODO replace this with a hard coded
+            message: `<|bot says|>${resp.data.message}`,
+            source: '',
+          })
+        })
+        .catch((err) => {
+          LoggerService.noticeError(
+            `Phi3 bot is scaled down or not responding - ${err}`
+          )
+        })
+        .finally(() => {
+          this.$store.commit('socket/setIsTyping', false)
+        })
     },
-    isMessageForBot(message) {
-      return /@bot/.test(message)
+    async sendMessageToPhi3Bot(message) {
+      try {
+        // @NEW - emit the student message so it shows up in the chat and is saved to session messages
+        socket.emit('message', {
+          sessionId: this.currentSession.id,
+          user: this.user,
+          message: `${message}`,
+          source: '',
+        })
+
+        this.$store.commit('socket/setIsTyping', true)
+
+        // @NEW - send the message to phi3 and wait for response
+        const resp = await NetworkService.sendTutorBotMessage(
+          this.user.id,
+          this.currentSession.id,
+          message
+        )
+
+        // @NEW - emit the bots response as a student message prefixed with `<|bot says|>`
+        socket.emit('message', {
+          sessionId: this.currentSession.id,
+          user: this.user,
+          message: `<|bot says|>${resp.data.message}`,
+          source: '',
+        })
+      } catch (e) {
+        socket.emit('message', {
+          sessionId: this.currentSession.id,
+          user: this.user,
+          message: `<|bot says|>Sorry! There's been an error and I don't seem to be working properly`,
+          source: '',
+        })
+        LoggerService.noticeError(
+          `Phi3 bot is scaled down or not responding - ${err}`
+        )
+      } finally {
+        this.$store.commit('socket/setIsTyping', false)
+      }
     },
     showTextMessage() {
       this.textMessageHidden = false
@@ -388,7 +452,12 @@ export default {
         })
         const isClean = Object.keys(failures).length === 0
         if (isClean) {
-          this.showNewMessage(message)
+          // @NEW - use phi3 method instead of original send
+          if (this.isMessageForBot(message)) {
+            await this.sendMessageToPhi3Bot(message)
+          } else {
+            this.showNewMessage(message)
+          }
           this.clearMessageInput()
         } else {
           // do not show the offending profanity to students
@@ -399,7 +468,12 @@ export default {
           this.showModerationWarning()
         }
       } catch (e) {
-        this.showNewMessage(message)
+        // @NEW - use phi3 method instead of original send
+        if (this.isMessageForBot(message)) {
+          await this.sendMessageToPhi3Bot(message)
+        } else {
+          this.showNewMessage(message)
+        }
         this.clearMessageInput()
         LoggerService.noticeError(`ModerationService failed with`, e)
       } finally {
@@ -631,8 +705,17 @@ export default {
         (messagesBox.lastElementChild?.offsetTop ?? 0) +
         (messagesBox.lastElementChild?.offsetHeight ?? 0)
     },
+    // @NEW - determine if message is from bot or not
+    isBotMessage(message) {
+      return /^<\|bot says\|>/.test(message.contents)
+    },
+    // @NEW - determine if message is to the bot or not
+    isMessageForBot(message) {
+      return /@bot/.test(message) || !this.currentSession.volunteer
+    },
     messageAlignment(message) {
       if (message.isSystemMessage) return MESSAGE_ALIGNMENT.CENTER
+      // @NEW - align bot messages to the LEFT
       if (this.isBotMessage(message)) {
         return MESSAGE_ALIGNMENT.LEFT
       }
@@ -682,18 +765,8 @@ export default {
         if (userId !== this.user.id && this.isWebPageHidden)
           this.triggerAlert(data)
 
-        if (this.isInRecap) {
-          this.$store.dispatch('user/addRecapMessage', data)
-        } else if (this.aiWidgetPresent) {
-          if (
-            !this.isBotMessage(data) &&
-            !this.isMessageForBot(data.contents)
-          ) {
-            this.$store.dispatch('user/addMessage', data)
-          }
-        } else {
-          this.$store.dispatch('user/addMessage', data)
-        }
+        if (this.isInRecap) this.$store.dispatch('user/addRecapMessage', data)
+        else this.$store.dispatch('user/addMessage', data)
 
         this.handleIncomingMessage()
       },
@@ -703,13 +776,43 @@ export default {
     isTyping(currentVal) {
       this.typingIndicatorShown = currentVal
     },
+    'currentSession.volunteer.id': {
+      handler(currentVal, prevVal) {
+        if (
+          currentVal &&
+          currentVal !== prevVal &&
+          this.hasNotSentGroupBotMessage
+        ) {
+          this.hasNotSentGroupBotMessage = false
+          this.$store.commit('socket/setIsTyping', true)
+          socket.emit('message', {
+            sessionId: this.currentSession.id,
+            user: this.user,
+            message: `<|bot says|>Now that your tutor, ${this.currentSession.volunteer.firstName}, is here. I'll move to the background. You can still as me questions by including "@bot" in your message.`,
+            source: '',
+          })
+          this.$store.commit('socket/setIsTyping', false)
+          AnalyticsService.captureEvent(
+            EVENTS.VOLUNTEER_JOINED_TUTOR_BOT_SESSION_UNIFIED
+          )
+        }
+      },
+      deep: true,
+    },
     'currentSession.messages': {
       handler(currentVal, prevVal) {
-        if ((this.isInRecap && currentVal, !prevVal))
+        if ((this.isInRecap && currentVal, !prevVal)) {
           // Wait for the DOM to update
           this.$nextTick(() => {
             this.scrollToBottom()
           })
+        }
+
+        // @NEW - maybe kick off that first message to the bot when the component is rendered
+        // `mount` doesn't work because this.currentSession.messages may be undefined
+        if (currentVal.length === 0 && this.hasNotSentInitialMessage) {
+          this.sendInitialBotMessage()
+        }
       },
       deep: true,
     },
@@ -890,6 +993,7 @@ export default {
   }
 }
 
+// @NEW - style the bot to have green background
 .bot .contents {
   background-color: $upchieve-chat-bot-green;
 }
