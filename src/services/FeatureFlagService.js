@@ -2,6 +2,7 @@ import posthog from 'posthog-js'
 import config from '@/config'
 import { POSTHOG_FEATURE_FLAGS } from '@/consts'
 import LoggerService from '@/services/LoggerService'
+import axios from 'axios'
 
 const FIVE_MINUTES_IN_MS = 1000 * 60 * 5
 
@@ -65,6 +66,41 @@ class FeatureFlagService {
     return posthog.isFeatureEnabled(featureFlagKey)
   }
 
+  static async isFeatureEnabledForUser(featureFlagKey, userId) {
+    try {
+      const axiosInstance = axios.create()
+      const res = await axiosInstance.post(
+        'https://p.upchieve.org/decide?v=3',
+        {
+          distinct_id: userId,
+          api_key: config.posthogToken,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+        }
+      )
+
+      const featureFlags = res.data.featureFlags
+      const featureFlagPayloads = res.data.featureFlagPayloads
+
+      return {
+        isEnabled: featureFlags[featureFlagKey] ?? false,
+        payload: JSON.parse(featureFlagPayloads[featureFlagKey]),
+      }
+    } catch (err) {
+      LoggerService.noticeError(
+        err,
+        `Failed to check if feature ${featureFlagKey} is enabled for user ${userId}.`
+      )
+      return {
+        isEnabled: false,
+      }
+    }
+  }
+
   static getFeatureFlag(featureFlagKey) {
     return posthog.getFeatureFlag(featureFlagKey)
   }
@@ -104,6 +140,15 @@ class DevFeatureFlagService {
   static isFeatureEnabled(featureFlagKey) {
     // eslint-disable-next-line no-console
     console.info('FeatureFlagService.isFeatureEnabled', featureFlagKey)
+  }
+
+  static async isFeatureEnabledForUser(featureFlagKey, userId) {
+    // eslint-disable-next-line no-console
+    console.info(
+      'FeatureFlagService.isFeatureEnabledForUser',
+      featureFlagKey,
+      userId
+    )
   }
 
   static getFeatureFlag(featureFlagKey) {

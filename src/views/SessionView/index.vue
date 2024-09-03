@@ -13,6 +13,15 @@
         'session-contents-container--mobile': mobileMode,
       }"
     >
+      <ai-widget-tool
+        v-if="showAiWidget"
+        :currentSession="session"
+        :shouldHideChatSection="shouldHideChatSection"
+        :setHasSeenNewMessage="setHasSeenNewMessage"
+        :isSessionConnectionAlive="isSessionConnectionAlive"
+        :isSessionAlive="isSessionAlive"
+        :sessionHasEnded="sessionHasEnded"
+      />
       <div
         class="auxiliary-container"
         id="auxiliary-container"
@@ -82,7 +91,19 @@
         >
           <question-mark-icon @click="openHelp" class="help-icon" />
         </div>
+        <!-- @NEW - show fake session chat or real session chat -->
+        <ai-group-session-chat
+          v-if="showUnifiedChat"
+          :currentSession="session"
+          :shouldHideChatSection="shouldHideChatSection"
+          :setHasSeenNewMessage="setHasSeenNewMessage"
+          :isSessionConnectionAlive="isSessionConnectionAlive"
+          :isSessionAlive="isSessionAlive"
+          :sessionHasEnded="sessionHasEnded"
+        />
         <session-chat
+          v-else
+          :aiWidgetPresent="showAiWidget"
           :currentSession="session"
           :shouldHideChatSection="shouldHideChatSection"
           :setHasSeenNewMessage="setHasSeenNewMessage"
@@ -151,6 +172,8 @@ import SessionService from '@/services/SessionService'
 import AnalyticsService from '@/services/AnalyticsService'
 import SessionHeader from './SessionHeader.vue'
 import SessionChat from './SessionChat/index.vue'
+import AiGroupSessionChat from './AiGroupSessionChat/index.vue'
+import AiWidgetTool from './AiWidgetTool/index.vue'
 import Whiteboard from './Whiteboard.vue'
 import DocumentEditor from './DocumentEditor.vue'
 import DocumentEditorV2 from './DocumentEditorV2.vue'
@@ -162,12 +185,14 @@ import QuestionMarkIcon from '@/assets/question-mark-icon.svg'
 import WebNotificationsModal from '@/components/WebNotificationsModal.vue'
 import AboutSessionModal from './AboutSessionModal.vue'
 import getNotificationPermission from '@/utils/get-notification-permission'
-import { EVENTS, SESSION_TOOL_TYPES } from '@/consts'
+import { EVENTS, POSTHOG_FEATURE_FLAGS, SESSION_TOOL_TYPES } from '@/consts'
 import Gleap from 'gleap'
 import { backOff } from 'exponential-backoff'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import LoggerService from '@/services/LoggerService'
 import { socket } from '@/socket'
+import FeatureFlagService from '@/services/FeatureFlagService'
+import loggerService from '@/services/LoggerService'
 
 const activeHeaderData = {
   component: 'SessionHeader',
@@ -176,8 +201,10 @@ const activeHeaderData = {
 export default {
   name: 'session-view',
   components: {
+    AiWidgetTool,
     SessionHeader,
     SessionChat,
+    AiGroupSessionChat,
     Whiteboard,
     PhotoUploadIcon,
     DocumentEditor,
@@ -230,6 +257,7 @@ export default {
       isFetchingIsSessionRecapEligible: false,
       sessionHasEnded: false,
       unsubscribeFromActionSubscription: () => undefined,
+      tutorBotChatType: null,
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -257,6 +285,7 @@ export default {
       isSessionAlive: 'user/isSessionAlive',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
       shouldUseQuillV2: 'featureFlags/shouldUseQuillV2',
+      isTutorBotChatEnabled: 'featureFlags/isTutorBotChatEnabled',
     }),
     sessionToolTypes() {
       return SESSION_TOOL_TYPES
@@ -289,6 +318,12 @@ export default {
     },
     isConnectionReady() {
       return [this.isConnected, this.sessionId]
+    },
+    showAiWidget() {
+      return this.tutorBotChatType === 'separate'
+    },
+    showUnifiedChat() {
+      return this.tutorBotChatType === 'unified'
     },
   },
   async mounted() {
@@ -375,6 +410,13 @@ export default {
 
         if (getNotificationPermission() === 'default')
           this.showNotificationModal = true
+      })
+      .then(() => {
+        if (this.isTutorBotChatEnabled) {
+          NetworkService.currentSession().then((res) => {
+            this.getStudentTutorBotChatType(res.data.data.student.id)
+          })
+        }
       })
       .catch((err) => {
         if (err?.response?.status !== 0 && err.code !== 'EUSERABORTED') {
@@ -532,6 +574,22 @@ export default {
     openHelp() {
       Gleap.open()
       AnalyticsService.captureEvent(EVENTS.USER_CLICKED_IN_SESSION_HELP)
+    },
+    async getStudentTutorBotChatType(studentId) {
+      try {
+        const ff = await FeatureFlagService.isFeatureEnabledForUser(
+          POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT,
+          studentId
+        )
+        this.tutorBotChatType = ff?.isEnabled ? ff?.payload?.type : null
+        return
+      } catch (err) {
+        loggerService.noticeError(
+          err,
+          `Failed to get Tutor Bot Chat type for session ${this.sessionId}`
+        )
+      }
+      this.tutorBotChatType = null
     },
   },
 }

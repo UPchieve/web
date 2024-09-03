@@ -1,98 +1,133 @@
 <template>
-  <div class="chat">
-    <document-title :title="documentTitle"></document-title>
-    <div>
-      <transition name="chat-warning">
-        <div
-          class="chat-warning chat-warning--moderation"
-          v-show="moderationWarningIsShown"
-        >
-          <div class="moderation-body" data-testid="moderation-body">
-            <span
-              >Messages cannot contain personal information, profanity, or links
-              to third party video services</span
-            >
-            <ul class="moderation-reasons">
-              <li v-for="(value, key) in failureReasons" :key="key">
-                <div class="reason" :data-testid="key">{{ key }}</div>
-                <div class="instances" :data-testid="`${key}-instances`">
-                  {{ getOffendingSubstringsForReason(key) }}
-                </div>
-              </li>
-            </ul>
-          </div>
-          <span class="chat-warning__close" @click="hideModerationWarning"
-            >×</span
-          >
-        </div>
-      </transition>
-      <transition name="chat-warning">
-        <loading-message
-          message="Attempting to connect the chat"
-          class="chat-warning chat-warning--connection"
-          v-show="isSessionConnectionFailure"
-        />
-      </transition>
-      <transition name="chat-warning">
-        <p
-          class="chat-warning chat-warning--message-error"
-          v-show="isMessageError"
-        >
-          Failed to send message
-        </p>
-      </transition>
+  <div
+    ref="container"
+    class="ai-chat-container"
+    :class="{ 'is-dragging': isDragging, 'is-minimized': isMinimized }"
+    :style="{
+      left: `${left}px`,
+      top: `${top}px`,
+      width: `${width}px`,
+      height: `${height}px`,
+    }"
+  >
+    <div
+      class="chat-header"
+      @mousedown="
+        () => {
+          const rect = this.$refs.container.getBoundingClientRect()
+          startingLeft = rect.left
+          startingTop = rect.top
+          isDragging = true
+        }
+      "
+      @mouseup="
+        () => {
+          startingLeft = null
+          startingTop = null
+          isDragging = false
+        }
+      "
+    >
+      <chat-bot-icon class="avatar" />
+      <span class="name">UPBot</span>
+      <span class="minimize-button" @click="isMinimized = !isMinimized">{{
+        isMinimized ? '+' : '-'
+      }}</span>
     </div>
-
-    <div class="messages-container">
-      <div class="messages" ref="messages" @scroll="handleScroll" tabindex="0">
-        <chat-bot
-          v-if="isStudent && isSessionWaitingForVolunteer && !aiWidgetPresent"
-          @new-bot-message="handleIncomingMessage"
-        />
-        <div
-          v-for="(message, index) in filteredMessages"
-          :key="`message-${index}`"
-          :class="[
-            messageAlignment(message),
-            isBotMessage(message) ? 'bot' : '',
-          ]"
-          class="message"
-        >
-          <span
-            v-if="message.isSystemMessage"
-            :data-testid="`message-from-system`"
+    <div class="chat" :class="{ 'is-minimized': isMinimized }">
+      <document-title :title="documentTitle"></document-title>
+      <div>
+        <transition name="chat-warning">
+          <div
+            class="chat-warning chat-warning--moderation"
+            v-show="moderationWarningIsShown"
           >
-            {{ message.contents }}</span
-          >
-          <template v-else>
-            <chat-bot-icon v-if="this.isBotMessage(message)" class="avatar" />
-            <component
-              class="avatar"
-              :is="avatar(message)"
-              v-else-if="message.user !== user.id"
-            />
-
-            <div class="contents" :class="chatBotContents(message)">
-              <span v-if="message.hasHtml" v-html="message.contents"></span>
-              <span v-else-if="message.type === 'voice'">
-                <voice-message
-                  :message="message"
-                  :isSender="message.user === user.id"
-                />
-              </span>
+            <div class="moderation-body" data-testid="moderation-body">
               <span
-                v-else
-                :data-testid="`message-from-user-id-${message.user}`"
-                >{{
-                  // @NEW - strip bot tag before displaying
-                  message.contents.replace('<|bot says|>', '')
-                }}</span
+                >Messages cannot contain personal information, profanity, or
+                links to third party video services</span
               >
+              <ul class="moderation-reasons">
+                <li v-for="(value, key) in failureReasons" :key="key">
+                  <div class="reason" :data-testid="key">{{ key }}</div>
+                  <div class="instances" :data-testid="`${key}-instances`">
+                    {{ getOffendingSubstringsForReason(key) }}
+                  </div>
+                </li>
+              </ul>
             </div>
-            <div class="time">
-              {{ formatTime(message.createdAt) }}
-            </div>
-          </template>
+            <span class="chat-warning__close" @click="hideModerationWarning"
+              >×</span
+            >
+          </div>
+        </transition>
+        <transition name="chat-warning">
+          <loading-message
+            message="Attempting to connect the chat"
+            class="chat-warning chat-warning--connection"
+            v-show="isSessionConnectionFailure"
+          />
+        </transition>
+        <transition name="chat-warning">
+          <p
+            class="chat-warning chat-warning--message-error"
+            v-show="isMessageError"
+          >
+            Failed to send message
+          </p>
+        </transition>
+      </div>
+
+      <div class="messages-container">
+        <div
+          class="messages"
+          ref="messages"
+          @scroll="handleScroll"
+          tabindex="0"
+        >
+          <div
+            v-for="(message, index) in filteredMessages"
+            :key="`message-${index}`"
+            :class="[
+              messageAlignment(message),
+              // @NEW - give us handles to style the bot messages
+              isBotMessage(message) ? 'bot' : '',
+            ]"
+            class="message"
+          >
+            <span
+              v-if="message.isSystemMessage"
+              :data-testid="`message-from-system`"
+            >
+              {{ message.contents }}</span
+            >
+            <template v-else>
+              <!-- @NEW - show UPbot avatar for the phi3 bot -->
+              <chat-bot-icon v-if="this.isBotMessage(message)" class="avatar" />
+              <component
+                class="avatar"
+                :is="avatar(message)"
+                v-else-if="message.user !== user.id"
+              />
+
+              <div class="contents">
+                <span v-if="message.hasHtml" v-html="message.contents"></span>
+                <span
+                  v-else
+                  :data-testid="`message-from-user-id-${message.user}`"
+                  >{{
+                    // @NEW - strip the bot tag before displaying
+                    message.contents
+                      .replace('<|bot says|>', '')
+                      .replace('@bot', '')
+                  }}</span
+                >
+              </div>
+              <div class="time">
+                {{ formatTime(message.createdAt) }}
+              </div>
+            </template>
+          </div>
         </div>
         <chat-bot
           v-if="sessionHasEnded && isSessionRecapDmsActive && isVolunteer"
@@ -112,52 +147,51 @@
           :currentSession="currentSession"
           @loading-chatbot-message="scrollToBottom"
         />
+        <transition name="fade">
+          <button
+            type="button"
+            v-show="numberOfUnreadChatMessages > 0"
+            class="messages-overlay unread-message-indicator"
+            @click="scrollToUnread"
+          >
+            {{ unreadMessageNote }}
+            <img src="@/assets/down_arrow.png" alt="down arrow" />
+          </button>
+        </transition>
       </div>
-      <transition name="fade">
-        <button
-          type="button"
-          v-show="numberOfUnreadChatMessages > 0"
-          class="messages-overlay unread-message-indicator"
-          @click="scrollToUnread"
-        >
-          {{ unreadMessageNote }}
-          <img src="@/assets/down_arrow.png" alt="down arrow" />
-        </button>
-      </transition>
-    </div>
 
-    <div class="chat-footer" :class="isInRecap && 'chat-footer--recap'">
-      <loading-message
-        message="Sending"
-        class="waiting-for-moderation"
-        v-show="waitingForModeration"
-      />
-      <transition name="fade">
-        <div class="typing-indicator" v-show="typingIndicatorShown">
-          {{ sessionPartnerName || 'Chatbot' }} is typing...
+      <div class="chat-footer" :class="isInRecap && 'chat-footer--recap'">
+        <loading-message
+          message="Sending"
+          class="waiting-for-moderation"
+          v-show="waitingForModeration"
+        />
+        <transition name="fade">
+          <div class="typing-indicator" v-show="typingIndicatorShown">
+            {{ sessionPartnerName || 'Chatbot' }} is typing...
+          </div>
+        </transition>
+        <div class="message-input">
+          <textarea
+            class="message-textarea"
+            :class="{ hidden: textMessageHidden }"
+            data-testid="chat-textarea"
+            autofocus
+            @keydown.enter.prevent
+            @keyup="handleOutgoingMessage"
+            v-model="newMessage"
+            placeholder="Type a message..."
+            :disabled="waitingForModeration"
+          />
         </div>
-      </transition>
-      <div class="message-input">
-        <textarea
-          class="message-textarea"
-          :class="{ hidden: textMessageHidden }"
-          data-testid="chat-textarea"
-          autofocus
-          @keydown.enter.prevent
-          @keyup="handleOutgoingMessage"
-          v-model="newMessage"
-          placeholder="Type a message..."
-          :disabled="waitingForModeration"
-        />
-        <record-voice-message
-          @idle="showTextMessage"
-          @not-idle="hideTextMessage"
-          v-if="showVoiceMessaging"
-          :onRecording="onRecording"
-          :onStopRecording="onStopRecording"
-          :sendAudioMessage="sendVoiceMessage"
-          :sendTextMessage="sendTranscriptMessage"
-        />
+        <div class="resize-handle-container">
+          <div
+            class="resize-handle"
+            :class="{ 'is-resizing': isResizing }"
+            @mousedown="this.isResizing = true"
+            @mouseup="this.isResizing = false"
+          ></div>
+        </div>
       </div>
     </div>
   </div>
@@ -167,28 +201,25 @@
 import { isEmpty } from 'lodash-es'
 import { mapState, mapGetters } from 'vuex'
 
-import ChatBot from './ChatBot.vue'
+import ChatBot from '../SessionChat/ChatBot.vue'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
-import RecordVoiceMessage from '@/components/VoiceMessaging/RecordVoiceMessage.vue'
-import VoiceMessage from '@/components/VoiceMessaging/VoiceMessage.vue'
 import DocumentTitle from '@/components/DocumentTitle.vue'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import ModerationService from '@/services/ModerationService'
-import VoiceMessageService from '@/services/VoiceMessageService'
 import sendWebNotification from '@/utils/send-web-notification'
 import getChatAvatar from '@/utils/get-chat-avatar'
 import LoggerService from '@/services/LoggerService'
 import moment from 'moment'
 import { socket } from '@/socket'
 import sound from '@/assets/audio/receive-message.mp3'
+import NetworkService from '@/services/NetworkService'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const MESSAGE_ALIGNMENT = {
   LEFT: 'left',
   RIGHT: 'right',
   CENTER: 'center',
-}
-function wasCensoredByChrome(transcript) {
-  return transcript.includes('*')
 }
 /**
  * @todo {1} Use more descriptive names that comply with the coding standards.
@@ -202,8 +233,6 @@ export default {
     ChatBotIcon,
     LoadingMessage,
     DocumentTitle,
-    RecordVoiceMessage,
-    VoiceMessage,
   },
   props: {
     setHasSeenNewMessage: { type: Function, required: true },
@@ -215,7 +244,6 @@ export default {
     isFetchingIsSessionRecapEligible: { type: Boolean, default: false },
     isSessionRecapEligible: { type: Boolean, default: false },
     sessionHasEnded: { type: Boolean, default: false },
-    aiWidgetPresent: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -230,9 +258,19 @@ export default {
       receiveMessageAudio: new Audio(sound),
       failureReasons: null,
       waitingForModeration: false,
-      voiceMessagingAvailable:
-        navigator.mediaDevices && navigator.mediaDevices.getUserMedia,
       textMessageHidden: false,
+      // @NEW determine if we should make that first call to the bot or not
+      hasNotSentInitialMessage: true,
+      hasNotSentGroupBotMessage: true,
+      startingTop: null,
+      startingLeft: null,
+      left: 70,
+      top: 70,
+      height: 600,
+      width: 300,
+      isDragging: false,
+      isMinimized: false,
+      isResizing: false,
     }
   },
   computed: {
@@ -251,19 +289,14 @@ export default {
       isSessionWaitingForVolunteer: 'user/isSessionWaitingForVolunteer',
       numberOfUnreadChatMessages: 'user/numberOfUnreadChatMessages',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
-      eligibleForVoiceMessaging: 'featureFlags/eligibleForVoiceMessaging',
     }),
     filteredMessages() {
-      return this.aiWidgetPresent
-        ? this.currentSession.messages.filter(
-            (message) =>
-              !this.isBotMessage(message) &&
-              !this.isMessageForBot(message.contents)
-          )
-        : this.currentSession.messages
-    },
-    showVoiceMessaging() {
-      return this.voiceMessagingAvailable && this.eligibleForVoiceMessaging
+      const x = this.currentSession.messages.filter((message) => {
+        return (
+          this.isBotMessage(message) || this.isMessageForBot(message.contents)
+        )
+      })
+      return x
     },
     sessionPartnerName() {
       if (!this.currentSession) return ''
@@ -306,19 +339,116 @@ export default {
     },
   },
   mounted() {
+    AnalyticsService.captureEvent(
+      EVENTS.USER_ENTERED_TUTOR_BOT_SESSION_SEPARATE
+    )
+
+    if (this.currentSession.messages.length === 0) {
+      this.sendInitialBotMessage()
+    }
     if (this.chatScrolledToMessageIndex !== null) {
       const messageElements = this.getUserMessageElements()
-      this.$refs.messages.scrollTop =
-        messageElements[this.chatScrolledToMessageIndex].offsetTop
+      if (
+        this.$refs.messages &&
+        messageElements &&
+        messageElements[this.chatScrolledToMessageIndex] &&
+        messageElements[this.chatScrolledToMessageIndex]?.offsetTop
+      ) {
+        this.$refs.messages.scrollTop =
+          messageElements[this.chatScrolledToMessageIndex]?.offsetTop
+      }
     }
+
+    addEventListener('mousemove', this.updatePosition.bind(this))
+  },
+  unmounted() {
+    removeEventListener('mousemove', this.updatePosition.bind(this))
   },
   methods: {
-    // @NEW so bot messages are styled in recaps
-    isBotMessage(message) {
-      return /^<\|bot says\|>/.test(message.contents)
+    updatePosition(event) {
+      requestAnimationFrame(() => {
+        if (
+          event.which === 1 &&
+          this.isDragging &&
+          this.startingTop &&
+          this.startingLeft
+        ) {
+          this.left = event.movementX + this.left
+          this.top = event.movementY + this.top
+        }
+        if (event.which === 1 && this.isResizing) {
+          const newWidth = event.movementX + this.width
+          const newHeight = event.movementY + this.height
+          this.width = newWidth < 200 ? 200 : newWidth
+          this.height = newHeight < 200 ? 200 : newHeight
+        }
+      })
     },
-    isMessageForBot(message) {
-      return /@bot/.test(message)
+    async sendInitialBotMessage() {
+      this.hasNotSentInitialMessage = false
+      this.$store.commit('socket/setIsTyping', true)
+      NetworkService.sendTutorBotMessage(
+        this.user.id,
+        this.currentSession.id,
+        `I need help with ${this.currentSession.subTopic}. Please respond in this format: "Hi! I'm the UPchieve AI tutor bot, and I'm here to help you with ${this.currentSession.subTopic}. What are you currently working on? Let's tackle it together while you wait for your human tutor to join!"`
+      )
+        .then((resp) => {
+          socket.emit('message', {
+            sessionId: this.currentSession.id,
+            user: this.user,
+            // TODO replace this with a hard coded
+            message: `<|bot says|>${resp.data.message}`,
+            source: '',
+          })
+        })
+        .catch((err) => {
+          LoggerService.noticeError(
+            `Phi3 bot is scaled down or not responding - ${err}`
+          )
+        })
+        .finally(() => {
+          this.$store.commit('socket/setIsTyping', false)
+        })
+    },
+    async sendMessageToPhi3Bot(message) {
+      try {
+        // @NEW - emit the student message so it shows up in the chat and is saved to session messages
+        socket.emit('message', {
+          sessionId: this.currentSession.id,
+          user: this.user,
+          message: `@bot${message}`,
+          source: '',
+        })
+
+        this.$store.commit('socket/setIsTyping', true)
+
+        // @NEW - send the message to phi3 and wait for response
+        const resp = await NetworkService.sendTutorBotMessage(
+          this.user.id,
+          this.currentSession.id,
+          message
+        )
+
+        // @NEW - emit the bots response as a student message prefixed with `<|bot says|>`
+        socket.emit('message', {
+          sessionId: this.currentSession.id,
+          user: this.user,
+          message: `<|bot says|>${resp.data.message}`,
+          source: '',
+        })
+      } catch (e) {
+        socket.emit('message', {
+          sessionId: this.currentSession.id,
+          user: this.user,
+          message: `<|bot says|>Sorry! There's been an error and I don't seem to be working properly`,
+          source: '',
+        })
+        LoggerService.noticeError(
+          `Phi3 bot is scaled down or not responding - ${err}`
+        )
+      } finally {
+        this.$store.commit('socket/setIsTyping', false)
+      }
     },
     showTextMessage() {
       this.textMessageHidden = false
@@ -388,7 +518,8 @@ export default {
         })
         const isClean = Object.keys(failures).length === 0
         if (isClean) {
-          this.showNewMessage(message)
+          // @NEW - use phi3 method instead of original send
+          await this.sendMessageToPhi3Bot(message)
           this.clearMessageInput()
         } else {
           // do not show the offending profanity to students
@@ -399,102 +530,10 @@ export default {
           this.showModerationWarning()
         }
       } catch (e) {
-        this.showNewMessage(message)
+        // @NEW - use phi3 method instead of original send
+        await this.sendMessageToPhi3Bot(message)
         this.clearMessageInput()
         LoggerService.noticeError(`ModerationService failed with`, e)
-      } finally {
-        this.waitingForModeration = false
-      }
-    },
-    async sendVoiceMessage({ audio, transcript, userEditedTranscript }) {
-      try {
-        this.hideModerationWarning()
-        this.waitingForModeration = true
-
-        if (wasCensoredByChrome(transcript)) {
-          this.waitingForModeration = false
-          this.showModerationWarning()
-          return false
-        }
-
-        const { failures } = await ModerationService.checkIfMessageIsClean({
-          // Moderate both original audio transcript and user edited
-          message: `${transcript} ${userEditedTranscript}`,
-          sessionId: this.currentSession.id,
-        })
-        const transcriptToSend = userEditedTranscript.length
-          ? userEditedTranscript
-          : transcript
-        const isClean = Object.keys(failures).length === 0
-        if (isClean) {
-          const form = new FormData()
-          form.append('message', audio)
-          form.append('senderId', this.user.id)
-          form.append('sessionId', this.currentSession.id)
-          form.append('transcript', transcriptToSend)
-          const voiceMessageId =
-            await VoiceMessageService.saveVoiceMessage(form)
-
-          socket.emit('message', {
-            type: 'voice',
-            sessionId: this.currentSession.id,
-            user: this.user,
-            message: voiceMessageId,
-            transcript: transcriptToSend,
-            source:
-              this.isInRecap || this.eligibleForSessionRecapChat ? 'recap' : '',
-          })
-          return true
-        } else {
-          // do not show the offending profanity to students
-          // in the event it was a typo
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { profanity, ...rest } = failures
-          this.failureReasons = this.isVolunteer ? failures : rest
-          this.showModerationWarning()
-          return false
-        }
-      } catch (e) {
-        this.showNewMessage(message)
-        LoggerService.noticeError(`ModerationService failed with`, e)
-        return true
-      } finally {
-        this.waitingForModeration = false
-      }
-    },
-    async sendTranscriptMessage(transcript) {
-      try {
-        this.hideModerationWarning()
-        this.waitingForModeration = true
-
-        if (wasCensoredByChrome(transcript)) {
-          this.waitingForModeration = false
-          this.showModerationWarning()
-          return false
-        }
-
-        const { failures } = await ModerationService.checkIfMessageIsClean({
-          message: transcript,
-          sessionId: this.currentSession.id,
-        })
-
-        const isClean = Object.keys(failures).length === 0
-        if (isClean) {
-          this.showNewMessage(transcript)
-          return true
-        } else {
-          // do not show the offending profanity to students
-          // in the event it was a typo
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { profanity, ...rest } = failures
-          this.failureReasons = this.isVolunteer ? failures : rest
-          this.showModerationWarning()
-          return false
-        }
-      } catch (e) {
-        this.showNewMessage(transcript)
-        LoggerService.noticeError(`ModerationService failed with`, e)
-        return true
       } finally {
         this.waitingForModeration = false
       }
@@ -631,8 +670,17 @@ export default {
         (messagesBox.lastElementChild?.offsetTop ?? 0) +
         (messagesBox.lastElementChild?.offsetHeight ?? 0)
     },
+    // @NEW - determine if message is from bot or not
+    isBotMessage(message) {
+      return /^<\|bot says\|>/.test(message.contents)
+    },
+    // @NEW - determine if message is to the bot or not
+    isMessageForBot(message) {
+      return /@bot/.test(message)
+    },
     messageAlignment(message) {
       if (message.isSystemMessage) return MESSAGE_ALIGNMENT.CENTER
+      // @NEW - align bot messages to the LEFT
       if (this.isBotMessage(message)) {
         return MESSAGE_ALIGNMENT.LEFT
       }
@@ -684,14 +732,10 @@ export default {
 
         if (this.isInRecap) {
           this.$store.dispatch('user/addRecapMessage', data)
-        } else if (this.aiWidgetPresent) {
-          if (
-            !this.isBotMessage(data) &&
-            !this.isMessageForBot(data.contents)
-          ) {
-            this.$store.dispatch('user/addMessage', data)
-          }
-        } else {
+        } else if (
+          this.isBotMessage(data) ||
+          this.isMessageForBot(data.contents)
+        ) {
           this.$store.dispatch('user/addMessage', data)
         }
 
@@ -703,13 +747,28 @@ export default {
     isTyping(currentVal) {
       this.typingIndicatorShown = currentVal
     },
+    'currentSession.volunteer.id': {
+      handler(currentVal, prevVal) {
+        if (!prevVal && currentVal) {
+          AnalyticsService.captureEvent(
+            EVENTS.VOLUNTEER_JOINED_TUTOR_BOT_SESSION_SEPARATE
+          )
+        }
+      },
+      deep: true,
+    },
     'currentSession.messages': {
       handler(currentVal, prevVal) {
-        if ((this.isInRecap && currentVal, !prevVal))
+        if ((this.isInRecap && currentVal, !prevVal)) {
           // Wait for the DOM to update
           this.$nextTick(() => {
             this.scrollToBottom()
           })
+        }
+
+        if (currentVal.length === 0 && this.hasNotSentInitialMessage) {
+          this.sendInitialBotMessage()
+        }
       },
       deep: true,
     },
@@ -736,6 +795,83 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.resize-handle-container {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+}
+.resize-handle {
+  width: 24px;
+  height: 24px;
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: nwse-resize;
+}
+.minimize-button {
+  line-height: 18px;
+  padding: 18px;
+  font-size: 24px;
+  cursor: pointer;
+  margin-left: auto;
+}
+.chat.is-minimized {
+  display: none;
+  visibility: hidden;
+  height: 0;
+  max-height: 0;
+}
+.is-dragging {
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.is-dragging .chat-header {
+  cursor: grabbing;
+}
+
+.ai-chat-container {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  overflow: hidden;
+
+  &--hidden {
+    display: none;
+  }
+
+  @include breakpoint-below('medium') {
+    display: none;
+  }
+
+  @include breakpoint-above('medium') {
+    position: absolute;
+    z-index: 10;
+    box-shadow:
+      3px 3px 3px $c-shadow-header,
+      -3px 3px 3px $c-shadow-header,
+      -0px -3px 3px $c-shadow-header;
+  }
+}
+
+.ai-chat-container.is-minimized {
+  height: auto !important;
+}
+
+.chat-header {
+  background-color: $upchieve-white;
+  padding: 4px 0 4px 18px;
+  border-bottom: 1px solid #d6e0ef;
+  cursor: grab;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+}
+
 .chat {
   position: relative;
   background-color: $upchieve-white;
@@ -890,6 +1026,7 @@ export default {
   }
 }
 
+// @NEW - style the bot to have green background
 .bot .contents {
   background-color: $upchieve-chat-bot-green;
 }
@@ -997,5 +1134,11 @@ export default {
       width: 100%;
     }
   }
+}
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  flex-shrink: 0;
 }
 </style>

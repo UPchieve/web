@@ -997,4 +997,11 @@ export default {
       gradeLevel,
     }).then(this._successHandler, this._errorHandler)
   },
+  sendTutorBotMessage(userId, sessionId, message) {
+    return httpPost(`${API_ROOT}/tutor-bot/message`, {
+      userId,
+      sessionId,
+      message,
+    }).then(this._successHandler, this._errorHandler)
+  },
 }
