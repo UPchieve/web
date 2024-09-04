@@ -137,6 +137,7 @@ async function addStudentToClass(_, overrideEvent?: string) {
       errorMessage.value = `Invalid class code ${classCode.value}. Please double check the class code you have entered.`
     } else {
       errorMessage.value =
+        err.response?.data?.err ??
         'Something went wrong. Please refresh the page and try again.'
     }
   } finally {
