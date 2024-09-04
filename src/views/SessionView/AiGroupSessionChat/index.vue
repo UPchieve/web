@@ -788,7 +788,7 @@ export default {
           socket.emit('message', {
             sessionId: this.currentSession.id,
             user: this.user,
-            message: `<|bot says|>Now that your tutor, ${this.currentSession.volunteer.firstName}, is here. I'll move to the background. You can still as me questions by including "@bot" in your message.`,
+            message: `<|bot says|>Now that your tutor, ${this.currentSession.volunteer.firstName}, is here. I'll move to the background. You can still ask me questions by including "@bot" in your message.`,
             source: '',
           })
           this.$store.commit('socket/setIsTyping', false)
