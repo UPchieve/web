@@ -143,7 +143,7 @@ export default {
 }
 
 .modal-container:not(.expanded) {
-  height: auto; 
+  height: auto;
 }
 
 .modal-container h1 {
