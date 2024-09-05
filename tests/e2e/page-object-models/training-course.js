@@ -1,5 +1,4 @@
 export class TrainingCourse {
-
   constructor(page) {
     this.page = page
     this.baseUrl = '/training/course/'

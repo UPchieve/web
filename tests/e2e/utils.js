@@ -13,7 +13,7 @@ export const createPassword = () => {
 export const createStudent = async (dbClient, args = {}) => {
   const params = {
     email: faker.internet.email(),
-    firstName:faker.person.firstName(),
+    firstName: faker.person.firstName(),
     lastName: faker.person.lastName(),
     password: createPassword(),
     verified: true,
@@ -41,11 +41,7 @@ export const createStudent = async (dbClient, args = {}) => {
   }
 }
 
-export const createVolunteer = async (
-  dbClient,
-  userArgs = {},
-  options,
-) => {
+export const createVolunteer = async (dbClient, userArgs = {}, options) => {
   try {
     const params = {
       email: faker.internet.email(),

@@ -73,8 +73,7 @@ const sessionDetails = [
   },
 ]
 
-const getWrapper = async ( { data = {}}) => {
-
+const getWrapper = async ({ data = {} }) => {
   const store = createStore({
     modules: {
       subjects: {
@@ -98,7 +97,7 @@ const getWrapper = async ( { data = {}}) => {
       },
     },
   })
-  
+
   const wrapper = mount(StudentDetailsView, {
     global: {
       plugins: [store, router],
@@ -121,10 +120,9 @@ const getWrapper = async ( { data = {}}) => {
 
 describe('Student Details View', () => {
   beforeEach(() => {
-
     NetworkService.getStudentSessionDetails = vi.fn().mockResolvedValue({
       data: {
-        sessionDetails
+        sessionDetails,
       },
     })
   })
@@ -137,7 +135,7 @@ describe('Student Details View', () => {
   })
 
   test('Filters sessions with just biology', async () => {
-    const wrapper = await getWrapper({ data: { filters: { topicId: 2 } }})
+    const wrapper = await getWrapper({ data: { filters: { topicId: 2 } } })
     await wrapper.vm.submitFilter()
 
     expect(wrapper.vm.sessions).toHaveLength(1)
@@ -146,7 +144,15 @@ describe('Student Details View', () => {
   })
 
   test('Filter session with earlier dates', async () => {
-    const wrapper = await getWrapper({data: { filters: { sessionActivityFrom: moment().subtract(11, 'days').format('YYYY-MM-DD')}}})
+    const wrapper = await getWrapper({
+      data: {
+        filters: {
+          sessionActivityFrom: moment()
+            .subtract(11, 'days')
+            .format('YYYY-MM-DD'),
+        },
+      },
+    })
     await wrapper.vm.submitFilter()
 
     expect(wrapper.vm.sessions).toHaveLength(2)

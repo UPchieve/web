@@ -10,7 +10,7 @@ import { TrainingCourse } from '../page-object-models/training-course.js'
 import { TrainingQuiz } from '../page-object-models/training-quiz.js'
 import { VolunteerDashboard } from '../page-object-models/volunteer-dashboard'
 import { BackgroundInformation } from '../page-object-models/background-information'
-import path from "path";
+import path from 'path'
 
 test.describe('Volunteer onboarding', () => {
   let dbClient
@@ -23,31 +23,35 @@ test.describe('Volunteer onboarding', () => {
     await dbClient.release()
   })
 
-test.describe('UPchieve 101', async () => {
-  test.beforeEach(async ({ page }) => {
-    // Create and sign-in the volunteer.
-    const volunteerUser = await createVolunteer(dbClient, {}, {
-      onboarded: false,
-      passedUpchieve101: false,
-      approved: false,
+  test.describe('UPchieve 101', async () => {
+    test.beforeEach(async ({ page }) => {
+      // Create and sign-in the volunteer.
+      const volunteerUser = await createVolunteer(
+        dbClient,
+        {},
+        {
+          onboarded: false,
+          passedUpchieve101: false,
+          approved: false,
+        }
+      )
+      // Add a single certification so we don't hit `isAutoFlowUser`.
+      await withCertifications(dbClient, {
+        userId: volunteerUser.id,
+        certificationNames: ['prealgebra'],
+      })
+      const volunteerLogin = new Login(page)
+      await volunteerLogin.goto()
+      await volunteerLogin.loginWith(volunteerUser)
+      await page.waitForURL('**/dashboard')
     })
-    // Add a single certification so we don't hit `isAutoFlowUser`.
-    await withCertifications(dbClient, {
-      userId: volunteerUser.id,
-      certificationNames: ['prealgebra'],
-    })
-    const volunteerLogin = new Login(page)
-    await volunteerLogin.goto()
-    await volunteerLogin.loginWith(volunteerUser)
-    await page.waitForURL('**/dashboard')
-  })
 
-  test('the quiz is available once the volunteer completes the material', async ({
-    page,
-  }) => {
-    // Go to UPchieve 101 training page.
-    const coursePage = new TrainingCourse(page)
-    await coursePage.goTo('upchieve101')
+    test('the quiz is available once the volunteer completes the material', async ({
+      page,
+    }) => {
+      // Go to UPchieve 101 training page.
+      const coursePage = new TrainingCourse(page)
+      await coursePage.goTo('upchieve101')
 
       await expect(page.getByTestId('course-name')).toBeVisible()
       await expect(page.getByTestId('course-description')).toBeVisible()
@@ -60,33 +64,33 @@ test.describe('UPchieve 101', async () => {
       await expect(quizLinkStatus).toHaveText('Not started')
     })
 
-    test('volunteer passes quiz', async ({page}) => {
+    test('volunteer passes quiz', async ({ page }) => {
       // Got to UPchieve 101 quiz page.
       const quizPage = new TrainingQuiz(page)
       await quizPage.goTo('upchieve101')
       await quizPage.startQuiz()
 
-    await quizPage.completeQuiz(true)
-    await quizPage.expectCongratMessage()
-  })
+      await quizPage.completeQuiz(true)
+      await quizPage.expectCongratMessage()
+    })
 
-  test('volunteer can retake the quiz if they fail', async ({ page }) => {
-    // Got to UPchieve 101 quiz page.
-    const quizPage = new TrainingQuiz(page)
-    await quizPage.goTo('upchieve101')
-    await quizPage.startQuiz()
+    test('volunteer can retake the quiz if they fail', async ({ page }) => {
+      // Got to UPchieve 101 quiz page.
+      const quizPage = new TrainingQuiz(page)
+      await quizPage.goTo('upchieve101')
+      await quizPage.startQuiz()
 
       await quizPage.completeQuiz(false)
       quizPage.expectFailedMessage()
 
-    await quizPage.reviewAnswers()
-    await quizPage.retakeQuiz()
-    await quizPage.startQuiz()
+      await quizPage.reviewAnswers()
+      await quizPage.retakeQuiz()
+      await quizPage.startQuiz()
 
-    await quizPage.completeQuiz(true)
-    await quizPage.expectCongratMessage()
+      await quizPage.completeQuiz(true)
+      await quizPage.expectCongratMessage()
+    })
   })
-})
 
   test.describe('Safety screening', () => {
     let volunteer

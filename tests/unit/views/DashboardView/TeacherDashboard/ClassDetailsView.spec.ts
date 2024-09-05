@@ -1,18 +1,12 @@
 import ClassDetailsView from '@/views/DashboardView/TeacherDashboard/ClassDetailsView.vue'
-import {
-  beforeEach,
-  describe,
-  expect,
-  test,
-  vi,
-} from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import store from '@/store'
 import router from '@/router'
 import NetworkService from '@/services/NetworkService'
 
 const getWrapper = async (data = {}) => {
-  const wrapper =  mount(ClassDetailsView, {
+  const wrapper = mount(ClassDetailsView, {
     global: {
       plugins: [store, router],
     },
@@ -33,9 +27,9 @@ const getWrapper = async (data = {}) => {
   wrapper.setData({
     ...wrapper.vm.$data,
     isLoading: false,
-    ...data
+    ...data,
   })
-  
+
   return wrapper
 }
 
@@ -92,9 +86,7 @@ describe('Class Details View', () => {
         ],
       },
     })
-    await router.push(
-      `/dashboard/teacher/class/class-id`
-    )
+    await router.push(`/dashboard/teacher/class/class-id`)
   })
 
   test('Show no students message if no students', async () => {
@@ -102,7 +94,6 @@ describe('Class Details View', () => {
     const wrapper = await getWrapper({ students: [] })
     const noStudentMsg = wrapper.find('[data-testid="no-students-msg"]')
     expect(noStudentMsg.exists()).toBe(true)
-
   })
 
   test('Show students in table', async () => {
@@ -138,33 +129,33 @@ describe('Class Details View', () => {
     expect(firstRowCells[1].text()).toBe(String(students[0].numSessions))
     expect(firstRowCells[2].text()).toBe(students[0].timeTutored)
     expect(firstRowCells[3].text()).toBe(students[0].lastSession)
+  }),
+    test('Click student details', async () => {
+      const routerPushSpy = vi.spyOn(router, 'push')
 
-  }), 
+      const wrapper = await getWrapper({
+        students: [
+          {
+            userId: 'userId1',
+            id: 'userId1',
+            firstName: 'Student',
+            lastName: 'UPchieve',
+            email: 'student1@upchieve.org',
+            numSessions: 3,
+            timeTutored: '1 hour(s)',
+            lastSession: '07/26/2024',
+          },
+        ],
+      })
 
-  test('Click student details', async () => {
-    const routerPushSpy = vi.spyOn(router, 'push')
+      const detailsButton = wrapper.find(
+        '[data-testid="view-details-btn-userId1"]'
+      )
+      expect(detailsButton.exists()).toBe(true)
 
-    const wrapper = await getWrapper({
-      students: [
-        {
-          userId: 'userId1',
-          id: 'userId1',
-          firstName: 'Student',
-          lastName: 'UPchieve',
-          email: 'student1@upchieve.org',
-          numSessions: 3,
-          timeTutored: '1 hour(s)',
-          lastSession: '07/26/2024',
-        },
-      ],
+      await detailsButton.trigger('click')
+      expect(routerPushSpy).toHaveBeenCalledWith(
+        `/dashboard/teacher/class/class-id/student/userId1`
+      )
     })
-
-    const detailsButton = wrapper.find('[data-testid="view-details-btn-userId1"]')
-    expect(detailsButton.exists()).toBe(true)
-
-    await detailsButton.trigger('click')
-    expect(routerPushSpy).toHaveBeenCalledWith(
-      `/dashboard/teacher/class/class-id/student/userId1`
-    )
-  })
 })

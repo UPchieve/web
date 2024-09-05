@@ -14,21 +14,36 @@ export enum SignUpPage {
 }
 
 export enum UserType {
-  student= 'student',
-  teacher= 'teacher',
-  volunteer= 'volunteer',
+  student = 'student',
+  teacher = 'teacher',
+  volunteer = 'volunteer',
 }
 
 export type PageDetail = {
-  backgroundLayout?: 'full' | 'card' | 'panel-left-50p' | 'panel-left-75p' | 'panel-right-50p' | 'panel-right-75p'
+  backgroundLayout?:
+    | 'full'
+    | 'card'
+    | 'panel-left-50p'
+    | 'panel-left-75p'
+    | 'panel-right-50p'
+    | 'panel-right-75p'
   panelImage?: string
   submitAction: SubmitAction
   classes?: string
   rows: FormRow[]
 }
 
-type SubmitAction = (data: Object) => Promise<SubmitActionResponse> | SubmitActionResponse
-export type SubmitActionResponse = [{ params?: { step: string, userType?: UserType }, path?: string, query?: any } | null, ErrorMessage | null]
+type SubmitAction = (
+  data: Object
+) => Promise<SubmitActionResponse> | SubmitActionResponse
+export type SubmitActionResponse = [
+  {
+    params?: { step: string; userType?: UserType }
+    path?: string
+    query?: any
+  } | null,
+  ErrorMessage | null,
+]
 type ErrorMessage = string
 export type FormRow = {
   classes: string
@@ -43,24 +58,25 @@ export type FormElement = {
   props?: any // TODO: Make generic for each FormElement.
   showIf?: (form: any) => boolean
 }
-type FormElementType = 'h1' |
-  'h2' |
-  'p' |
-  'a' |
-  'button' |
-  'FormCheckBox' |
-  'FormSelect' |
-  'FormInput' |
-  'FormEmail' |
-  'FormSchoolSearch' |
-  'FormPassword' |
-  'SsoButton' |
-  'LineDivider'|
-  'router-link' |
-  'check-circled' |
-  'header-logo-teal' |
-  'updog-crying' |
-  'updog-smiling'
+type FormElementType =
+  | 'h1'
+  | 'h2'
+  | 'p'
+  | 'a'
+  | 'button'
+  | 'FormCheckBox'
+  | 'FormSelect'
+  | 'FormInput'
+  | 'FormEmail'
+  | 'FormSchoolSearch'
+  | 'FormPassword'
+  | 'SsoButton'
+  | 'LineDivider'
+  | 'router-link'
+  | 'check-circled'
+  | 'header-logo-teal'
+  | 'updog-crying'
+  | 'updog-smiling'
 
 export function getFilteredPageDetails(cb: () => PageDetail): PageDetail {
   const pd = cb()
@@ -68,7 +84,11 @@ export function getFilteredPageDetails(cb: () => PageDetail): PageDetail {
   return pd
 }
 
-export function getSubmitResponseDefault(nextPage: string | null, data: Object | null, err?: any): SubmitActionResponse | undefined {
+export function getSubmitResponseDefault(
+  nextPage: string | null,
+  data: Object | null,
+  err?: any
+): SubmitActionResponse | undefined {
   if (err) {
     const error =
       typeof err === 'string'
@@ -107,9 +127,12 @@ export function continueToAccountPage(data: Object) {
   return getSubmitResponseDefault(SignUpPage.account, data)
 }
 
-export function createAccountWithSso(provider: 'google' | 'clever', data: any): SubmitActionResponse {
+export function createAccountWithSso(
+  provider: 'google' | 'clever',
+  data: any
+): SubmitActionResponse {
   AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CREATE_ACCOUNT, {
-    provider
+    provider,
   })
   try {
     const params = new URLSearchParams({
@@ -134,14 +157,22 @@ export function getRow(classes = '', ...elements: FormElement[]): FormRow {
   }
 }
 
-export function getTextElement(element: FormElementType, content: string): FormElement {
+export function getTextElement(
+  element: FormElementType,
+  content: string
+): FormElement {
   return {
     element,
     content,
   }
 }
 
-export function getInputElement(name: string, prettyName: string, blurEvent: string, classes): FormElement {
+export function getInputElement(
+  name: string,
+  prettyName: string,
+  blurEvent: string,
+  classes
+): FormElement {
   return {
     element: 'FormInput',
     classes,
@@ -154,7 +185,11 @@ export function getInputElement(name: string, prettyName: string, blurEvent: str
   }
 }
 
-export function getSsoButton(submitAction: SubmitAction, content: string, ssoMethod = 'google'): FormElement {
+export function getSsoButton(
+  submitAction: SubmitAction,
+  content: string,
+  ssoMethod = 'google'
+): FormElement {
   return {
     element: 'SsoButton',
     submitAction,
@@ -165,7 +200,12 @@ export function getSsoButton(submitAction: SubmitAction, content: string, ssoMet
   }
 }
 
-export function getButtonElement(submitAction: SubmitAction, content: string, classes = '', isDisabledOnInvalid = true): FormElement {
+export function getButtonElement(
+  submitAction: SubmitAction,
+  content: string,
+  classes = '',
+  isDisabledOnInvalid = true
+): FormElement {
   return {
     element: 'button',
     classes: 'uc-form-button ' + classes,
@@ -175,7 +215,10 @@ export function getButtonElement(submitAction: SubmitAction, content: string, cl
   }
 }
 
-export function getRouterLinkElement(content: string, pathTo: string): FormElement {
+export function getRouterLinkElement(
+  content: string,
+  pathTo: string
+): FormElement {
   return {
     element: 'router-link',
     classes: 'uc-link',
@@ -197,12 +240,15 @@ export function getLinkElement(content: string, link: string): FormElement {
   }
 }
 
-export function getSignUpSourceElement(name: string, blurEvent: string): FormElement {
+export function getSignUpSourceElement(
+  name: string,
+  blurEvent: string
+): FormElement {
   return {
     element: 'FormSelect',
     props: {
       blurEvent,
-      getSelectOptions: async function() {
+      getSelectOptions: async function () {
         try {
           const {
             data: { signupSources },
@@ -221,7 +267,6 @@ export function getSignUpSourceElement(name: string, blurEvent: string): FormEle
     },
   }
 }
-
 
 export function getAlreadyHaveAccountElements() {
   return [

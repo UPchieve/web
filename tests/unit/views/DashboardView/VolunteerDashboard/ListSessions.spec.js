@@ -98,18 +98,18 @@ const getWrapper = async (overrides = {}) => {
   })
   const mockVueContext = {
     router: {
-        currentRoute: {
-          value: {
-            path: '/dashboard',
-          },
+      currentRoute: {
+        value: {
+          path: '/dashboard',
         },
+      },
     },
   }
   store.dispatch('volunteer/handleIncomingSessions', {
     context: mockVueContext,
     sessions,
   })
-  return shallowMount(ListSessions, { global: { plugins: [store] }})
+  return shallowMount(ListSessions, { global: { plugins: [store] } })
 }
 
 describe('Dashboard with Muted Subjects', () => {
@@ -126,14 +126,19 @@ describe('Dashboard with Muted Subjects', () => {
 })
 
 describe('Dashboard with banned students', () => {
-  test.each([true, false])('Should only show shadow banned students to admin users', async (isAdmin) => {
-    const wrapper = await getWrapper({
-      user: {
-        isAdmin
-      }
-    })
+  test.each([true, false])(
+    'Should only show shadow banned students to admin users',
+    async (isAdmin) => {
+      const wrapper = await getWrapper({
+        user: {
+          isAdmin,
+        },
+      })
 
-    const bannedStudentSession = wrapper.find('[data-testid="session-row-Student3"]')
-    expect(bannedStudentSession.exists()).toBe(isAdmin)
-  })
+      const bannedStudentSession = wrapper.find(
+        '[data-testid="session-row-Student3"]'
+      )
+      expect(bannedStudentSession.exists()).toBe(isAdmin)
+    }
+  )
 })

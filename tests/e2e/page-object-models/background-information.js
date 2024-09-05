@@ -91,18 +91,23 @@ export class BackgroundInformation {
     await expect(this.submitButton).toBeEnabled()
   }
 
-
   async backgroundInformationFormIsComplete() {
     // Only the completed message is visible
     await this.page.waitForURL('**/background-information')
     await expect(this.completedMessage).toBeVisible()
-      const questions = [this.backgroundInformationFormSelectors.iAmCurrentlyQuestion.questionSelector,
+    const questions = [
+      this.backgroundInformationFormSelectors.iAmCurrentlyQuestion
+        .questionSelector,
       this.backgroundInformationFormSelectors.linkedInQuestion.questionSelector,
-      this.backgroundInformationFormSelectors.whereDoYouLiveQuestion.questionSelector,
-      this.backgroundInformationFormSelectors.experienceQuestion.questionSelector,
-      this.backgroundInformationFormSelectors.languagesQuestion.questionSelector]
-      questions.forEach(async (selector) => {
-        await expect(selector).not.toBeVisible()
+      this.backgroundInformationFormSelectors.whereDoYouLiveQuestion
+        .questionSelector,
+      this.backgroundInformationFormSelectors.experienceQuestion
+        .questionSelector,
+      this.backgroundInformationFormSelectors.languagesQuestion
+        .questionSelector,
+    ]
+    questions.forEach(async (selector) => {
+      await expect(selector).not.toBeVisible()
     })
   }
 }

@@ -41,8 +41,8 @@ describe('AboutSessionModal', () => {
           getters: {
             isAboutThisSessionSurveyActive: () =>
               overrides.featureFlags?.isAboutThisSessionSurveyActive ?? false,
-          }
-        }
+          },
+        },
       },
     })
 
@@ -150,10 +150,13 @@ describe('AboutSessionModal', () => {
       (surveyEnabled) => {
         const wrapper = getWrapper({
           featureFlags: {
-            isAboutThisSessionSurveyActive: surveyEnabled
-          }
+            isAboutThisSessionSurveyActive: surveyEnabled,
+          },
         })
-        expect(wrapper.find('[data-testid="about-this-session-survey"]').exists()).toEqual(surveyEnabled)
-    })
+        expect(
+          wrapper.find('[data-testid="about-this-session-survey"]').exists()
+        ).toEqual(surveyEnabled)
+      }
+    )
   })
 })

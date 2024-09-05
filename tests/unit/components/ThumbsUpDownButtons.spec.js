@@ -1,13 +1,13 @@
-import ThumbsUpDownButtons from "@/components/ThumbsUpDownButtons.vue";
-import { mount } from "@vue/test-utils";
+import ThumbsUpDownButtons from '@/components/ThumbsUpDownButtons.vue'
+import { mount } from '@vue/test-utils'
 import { vi } from 'vitest'
 
 describe('ThumbsUpDownButtons', () => {
   const getWrapper = (opts) => {
     return mount(ThumbsUpDownButtons, {
       props: {
-        ...opts?.props
-      }
+        ...opts?.props,
+      },
     })
   }
 
@@ -19,10 +19,10 @@ describe('ThumbsUpDownButtons', () => {
     const onClickThumbsUp = vi.fn()
     const onClickThumbsDown = vi.fn()
     const wrapper = getWrapper({
-        props: {
-          onClickThumbsUp,
-          onClickThumbsDown
-      }
+      props: {
+        onClickThumbsUp,
+        onClickThumbsDown,
+      },
     })
     expect(onClickThumbsUp).not.toHaveBeenCalled()
     await wrapper.find('[data-testid="high-rating-btn"]').trigger('click')

@@ -91,9 +91,9 @@ const getWrapper = (options = {}) => {
           isVolunteer: () => options.isVolunteer,
           isStudent: () => options.isStudent,
           isTeacher: () => options.isTeacher,
-        }
-      }
-    }
+        },
+      },
+    },
   })
 
   return shallowMount(SidebarLinks, {

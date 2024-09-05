@@ -57,12 +57,9 @@ function getEligibilityPageDetails() {
     panelImage: 'connect-your-students',
     classes: 'uc-column justify-center justify-start-sm',
     rows: [
-      getRow(
-        'justify-center',
-        {
-          element: 'header-logo-teal',
-        }
-      ),
+      getRow('justify-center', {
+        element: 'header-logo-teal',
+      }),
       getRow(
         'mt-4',
         getTextElement(
@@ -70,7 +67,10 @@ function getEligibilityPageDetails() {
           `Check if you're eligible for a FREE teacher account`
         )
       ),
-      getRow('justify-start mt-1 el-gap-sm', ...getAlreadyHaveAccountElements()),
+      getRow(
+        'justify-start mt-1 el-gap-sm',
+        ...getAlreadyHaveAccountElements()
+      ),
       getRow('mt-3', {
         element: 'FormSchoolSearch',
         props: {
@@ -82,7 +82,14 @@ function getEligibilityPageDetails() {
           selectedEvent: EVENTS.TEACHER_SELECTED_SCHOOL,
         },
       }),
-      getRow('mt-2', getInputElement(InputName.SIGNUP_SOURCE, 'How did you hear about us?', EVENTS.TEACHER_ENTERED_SIGNUP_SOURCE)),
+      getRow(
+        'mt-2',
+        getInputElement(
+          InputName.SIGNUP_SOURCE,
+          'How did you hear about us?',
+          EVENTS.TEACHER_ENTERED_SIGNUP_SOURCE
+        )
+      ),
       getRow('mt-4 justify-start', {
         element: 'FormCheckBox',
         props: {
@@ -124,14 +131,59 @@ function getIneligiblePageDetails() {
   return {
     backgroundLayout: 'full',
     rows: [
-      getRow('justify-center center mt-3', getTextElement('h1', `Sorry! You're not eligible for an UPchieve account 😞`)),
-      getRow('justify-center center mt-2', getTextElement('p', 'UPchieve teacher accounts are only for 6th-12th grade teachers who work in Title I or majority low-income schools in the U.S.')),
-      getRow('justify-center center mt-4', getTextElement('p', 'Did we make a mistake?')),
-      getRow('justify-center center', getLinkElement('Request we add your school.', 'https://upchieve.org/cant-find-school')),
-      getRow('justify-center center mt-3', getTextElement('p', 'Do you teach low-income students in a different setting?')),
-      getRow('justify-center center', getRouterLinkElement('Your students can check their individual eligibility.', '/sign-up/student/eligibility')),
-      getRow('justify-center center mt-3', getTextElement('p', 'Know teachers who do work in Title I or low-income schools?')),
-      getRow('justify-center center', getLinkElement('Please share UPchieve with them!', 'https://upchieve.org/teachers')),
+      getRow(
+        'justify-center center mt-3',
+        getTextElement(
+          'h1',
+          `Sorry! You're not eligible for an UPchieve account 😞`
+        )
+      ),
+      getRow(
+        'justify-center center mt-2',
+        getTextElement(
+          'p',
+          'UPchieve teacher accounts are only for 6th-12th grade teachers who work in Title I or majority low-income schools in the U.S.'
+        )
+      ),
+      getRow(
+        'justify-center center mt-4',
+        getTextElement('p', 'Did we make a mistake?')
+      ),
+      getRow(
+        'justify-center center',
+        getLinkElement(
+          'Request we add your school.',
+          'https://upchieve.org/cant-find-school'
+        )
+      ),
+      getRow(
+        'justify-center center mt-3',
+        getTextElement(
+          'p',
+          'Do you teach low-income students in a different setting?'
+        )
+      ),
+      getRow(
+        'justify-center center',
+        getRouterLinkElement(
+          'Your students can check their individual eligibility.',
+          '/sign-up/student/eligibility'
+        )
+      ),
+      getRow(
+        'justify-center center mt-3',
+        getTextElement(
+          'p',
+          'Know teachers who do work in Title I or low-income schools?'
+        )
+      ),
+      getRow(
+        'justify-center center',
+        getLinkElement(
+          'Please share UPchieve with them!',
+          'https://upchieve.org/teachers'
+        )
+      ),
     ],
   }
 }
@@ -141,12 +193,9 @@ function getAccountPageDetails() {
     backgroundLayout: 'panel-right-75p',
     submitAction: createAccount,
     rows: [
-      getRow(
-        'justify-start mt-4',
-        {
-          element: 'header-logo-teal',
-        }
-      ),
+      getRow('justify-start mt-4', {
+        element: 'header-logo-teal',
+      }),
       getRow('mt-4', getTextElement('h1', 'Your school is eligible! 🎉')),
       getRow('mt-3', getTextElement('h2', 'Finish creating your account')),
       getRow(
@@ -154,12 +203,12 @@ function getAccountPageDetails() {
         getInputElement(
           InputName.FIRST_NAME,
           'First Name',
-          EVENTS.TEACHER_ENTERED_FIRST_NAME,
+          EVENTS.TEACHER_ENTERED_FIRST_NAME
         ),
         getInputElement(
           InputName.LAST_NAME,
           'Last Name',
-          EVENTS.TEACHER_ENTERED_LAST_NAME,
+          EVENTS.TEACHER_ENTERED_LAST_NAME
         )
       ),
       getRow('mt-2', {

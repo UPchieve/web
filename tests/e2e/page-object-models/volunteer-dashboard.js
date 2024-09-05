@@ -83,7 +83,6 @@ export class VolunteerDashboard {
     await this.closePhotoUploadModal()
   }
 
-
   async removePhoto() {
     await expect(this.uploadedPhoto).toBeVisible()
     await this.removePhotoButton.click()
@@ -93,7 +92,9 @@ export class VolunteerDashboard {
   }
 
   async photoUploadIsComplete() {
-    await expect(this.proofOfIdentityAccountAction).toContainText('Waiting for review (1-2 business days)')
+    await expect(this.proofOfIdentityAccountAction).toContainText(
+      'Waiting for review (1-2 business days)'
+    )
     await this.proofOfIdentityAccountAction.click()
     await expect(this.page.getByTestId('photo-submitted-content')).toBeVisible()
   }

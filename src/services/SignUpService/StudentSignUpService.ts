@@ -56,7 +56,10 @@ export enum InputName {
   ZIP_CODE = 'zipCode',
 }
 
-export function getPageDetails(to: RouteLocation, from: RouteLocation): PageDetail {
+export function getPageDetails(
+  to: RouteLocation,
+  from: RouteLocation
+): PageDetail {
   return getFilteredPageDetails(() => {
     if (isIneligibleRoute(to)) {
       return getIneligiblePageDetails()
@@ -78,7 +81,11 @@ export function getPageDetails(to: RouteLocation, from: RouteLocation): PageDeta
   })
 }
 
-function getSubmitResponse(nextPage?: SignUpPage, data?: any, err?: Error): SubmitActionResponse {
+function getSubmitResponse(
+  nextPage?: SignUpPage,
+  data?: any,
+  err?: Error
+): SubmitActionResponse {
   switch (nextPage) {
     case SignUpPage.eligibility:
       return [
@@ -207,14 +214,19 @@ function isAccountRoute(to: RouteLocation) {
   return to.path === RoutePath.account
 }
 
-function isParentGuardianConfirmationRoute(to: RouteLocation, from: RouteLocation) {
+function isParentGuardianConfirmationRoute(
+  to: RouteLocation,
+  from: RouteLocation
+) {
   return (
     to.path === SignUpPage.parentGuardianConfirmation &&
     from?.path === SignUpPage.account
   )
 }
 
-function getStudentEmailElement(isParentGuardian: boolean = false): FormElement {
+function getStudentEmailElement(
+  isParentGuardian: boolean = false
+): FormElement {
   return {
     element: 'FormEmail',
     props: {
@@ -251,7 +263,9 @@ export function getZipCodeElement(): FormElement {
   }
 }
 
-export function getGradeSelectionElement(isParentGuardian: boolean): FormElement {
+export function getGradeSelectionElement(
+  isParentGuardian: boolean
+): FormElement {
   return {
     element: 'FormSelect',
     props: {
@@ -405,24 +419,24 @@ function getFirstPageDetails(to: RouteLocation): PageDetail {
     panelImage: 'chat-one-on-one',
     classes: 'uc-column justify-center justify-start-md',
     rows: [
-      getRow(
-        'justify-center',
-        {
-          element: 'header-logo-teal',
-        }
-      ),
+      getRow('justify-center', {
+        element: 'header-logo-teal',
+      }),
       getRow('mt-4', getTextElement('h1', getHeaderText())),
       subheaderText ? getRow('mt-3', getTextElement('p', subheaderText)) : null,
       isPartnerStudentSignUp()
         ? getRow(
-          'justify-start mt-1',
-          getRouterLinkElement(
-            // @ts-ignore
-            `Not with ${to.params.partner?.name}?`,
-            '/sign-up/student/eligibility'
+            'justify-start mt-1',
+            getRouterLinkElement(
+              // @ts-ignore
+              `Not with ${to.params.partner?.name}?`,
+              '/sign-up/student/eligibility'
+            )
           )
-        )
-        : getRow('justify-start mt-1 el-gap-sm', ...getAlreadyHaveAccountElements()),
+        : getRow(
+            'justify-start mt-1 el-gap-sm',
+            ...getAlreadyHaveAccountElements()
+          ),
       isPartnerStudentSignUp()
         ? getRow('mt-2', getPartnerSitesElement(to))
         : null,
@@ -433,28 +447,34 @@ function getFirstPageDetails(to: RouteLocation): PageDetail {
       ),
       includeSchoolElement()
         ? getRow('mt-2', {
-          element: 'FormSchoolSearch',
-          props: {
-            name: InputName.SCHOOL_ID,
-            label: getLabelPrefix(isParentGuardian) + 'School Name',
-            placeholder: getLabelPrefix(isParentGuardian) + 'School Name',
-            isRequired: isSchoolRequired(),
-          },
-          showIf: (form) => {
-            return [
-              '6th',
-              '7th',
-              '8th',
-              '9th',
-              '10th',
-              '11th',
-              '12th',
-            ].includes(form[InputName.GRADE_LEVEL])
-          },
-        })
+            element: 'FormSchoolSearch',
+            props: {
+              name: InputName.SCHOOL_ID,
+              label: getLabelPrefix(isParentGuardian) + 'School Name',
+              placeholder: getLabelPrefix(isParentGuardian) + 'School Name',
+              isRequired: isSchoolRequired(),
+            },
+            showIf: (form) => {
+              return [
+                '6th',
+                '7th',
+                '8th',
+                '9th',
+                '10th',
+                '11th',
+                '12th',
+              ].includes(form[InputName.GRADE_LEVEL])
+            },
+          })
         : null,
       isOrganicStudentSignUp() || isEligibilityAppealSignUp()
-        ? getRow('mt-2', getSignUpSourceElement(InputName.SIGNUP_SOURCE_ID, EVENTS.STUDENT_SELECTED_HOW_DID_YOUR_HEAR_ABOUT_US))
+        ? getRow(
+            'mt-2',
+            getSignUpSourceElement(
+              InputName.SIGNUP_SOURCE_ID,
+              EVENTS.STUDENT_SELECTED_HOW_DID_YOUR_HEAR_ABOUT_US
+            )
+          )
         : null,
       getRow(
         'mt-4',
@@ -476,9 +496,21 @@ function getIneligiblePageDetails(): PageDetail {
         element: 'updog-crying',
         classes: 'updog',
       }),
-      getRow('justify-center center mt-4', getTextElement('h1', "Oops... looks like you're not eligible")),
-      getRow('justify-center center mt-3', getTextElement('p', "While we weren't able to verify your eligibility based on the info provided, don't worry: you may still be eligible! We just need your parent/guardian to answer some more questions first!")),
-      getRow('justify-center mt-3', getButtonElement(ineligibleContinue, 'Continue', 'button-narrow', false)),
+      getRow(
+        'justify-center center mt-4',
+        getTextElement('h1', "Oops... looks like you're not eligible")
+      ),
+      getRow(
+        'justify-center center mt-3',
+        getTextElement(
+          'p',
+          "While we weren't able to verify your eligibility based on the info provided, don't worry: you may still be eligible! We just need your parent/guardian to answer some more questions first!"
+        )
+      ),
+      getRow(
+        'justify-center mt-3',
+        getButtonElement(ineligibleContinue, 'Continue', 'button-narrow', false)
+      ),
     ],
   }
 }
@@ -488,11 +520,23 @@ function getCleverStudentRedirectPageDetails(): PageDetail {
     backgroundLayout: 'card',
     submitAction: createAccount,
     rows: [
-      getRow('justify-center center mt-4', getTextElement('h1', 'Welcome Clever student!')),
-      getRow('justify-center center mt-3', getTextElement('p', 'Enter your student email to get started using UPchieve.')),
+      getRow(
+        'justify-center center mt-4',
+        getTextElement('h1', 'Welcome Clever student!')
+      ),
+      getRow(
+        'justify-center center mt-3',
+        getTextElement(
+          'p',
+          'Enter your student email to get started using UPchieve.'
+        )
+      ),
       getRow('mt-2', getStudentEmailElement()),
-      getRow('justify-center mt-3', getButtonElement(createAccount, 'Continue')),
-    ]
+      getRow(
+        'justify-center mt-3',
+        getButtonElement(createAccount, 'Continue')
+      ),
+    ],
   }
 }
 
@@ -517,12 +561,9 @@ function getAccountPageDetails(to: RouteLocation): PageDetail {
     backgroundLayout: 'panel-right-75p',
     submitAction: createAccount,
     rows: [
-      getRow(
-        'justify-start mt-4',
-        {
-          element: 'header-logo-teal',
-        }
-      ),
+      getRow('justify-start mt-4', {
+        element: 'header-logo-teal',
+      }),
       getRow('mt-4', getTextElement('h1', getH1Text())),
       getRow('mt-3', getTextElement('h2', getH2Text())),
       ...(!isParentGuardian ? getSsoSectionElements() : []),
@@ -542,17 +583,19 @@ function getAccountPageDetails(to: RouteLocation): PageDetail {
           EVENTS.STUDENT_ENTERED_LAST_NAME
         )
       ),
-      !isClassCodeSignUp ? getRow('mt-2', getStudentEmailElement(isParentGuardian)) : null,
+      !isClassCodeSignUp
+        ? getRow('mt-2', getStudentEmailElement(isParentGuardian))
+        : null,
       !isParentGuardian
         ? getRow('mt-2', {
-          element: 'FormPassword',
-          props: {
-            name: InputName.PASSWORD,
-            metadata:
-              'Must have at least one number, one uppercase letter, one lowercase letter, and be at least 8 characters long.',
-            blurEvent: EVENTS.STUDENT_ENTERED_PASSWORD,
-          },
-        })
+            element: 'FormPassword',
+            props: {
+              name: InputName.PASSWORD,
+              metadata:
+                'Must have at least one number, one uppercase letter, one lowercase letter, and be at least 8 characters long.',
+              blurEvent: EVENTS.STUDENT_ENTERED_PASSWORD,
+            },
+          })
         : null,
       ...getTermsCheckboxElements(),
       getRow(

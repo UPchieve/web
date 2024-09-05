@@ -1,19 +1,12 @@
 import TeacherDashboard from '@/views/DashboardView/TeacherDashboard/index.vue'
 import router from '@/router'
 import { createStore } from 'vuex'
-import {
-  beforeEach,
-  describe,
-  expect,
-  test,
-  vi,
-} from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import userModule from '@/store/modules/user'
 import NetworkService from '@/services/NetworkService'
 
 const getWrapper = async (overrides = {}) => {
-
   const store = createStore({
     modules: {
       user: {
@@ -31,7 +24,7 @@ const getWrapper = async (overrides = {}) => {
   })
 
   const wrapper = mount(TeacherDashboard, {
-    global: { plugins: [store, router] }
+    global: { plugins: [store, router] },
   })
 
   const formattedTopics = await TeacherDashboard.methods.formatTopics()
@@ -98,9 +91,7 @@ const topics = [
   },
 ]
 
-
 describe('Teacher Dashboard', () => {
-
   const classes = [
     {
       id: 'class-id',
@@ -148,7 +139,9 @@ describe('Teacher Dashboard', () => {
       .fn()
       .mockResolvedValue({ data: { teacherClasses: classes } })
     const wrapper = await getWrapper({ classes })
-    const classDetailsBtn = wrapper.find(`[data-testid="class-details-btn-${classes[0].id}"]`)
+    const classDetailsBtn = wrapper.find(
+      `[data-testid="class-details-btn-${classes[0].id}"]`
+    )
     classDetailsBtn.trigger('click')
     expect(routerPushSpy).toHaveBeenCalledOnce()
     expect(routerPushSpy).toHaveBeenCalledWith(
