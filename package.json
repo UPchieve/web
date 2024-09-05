@@ -22,7 +22,8 @@
     "test:e2e:update-snapshots": "npx playwright test --update-snapshots",
     "scan:add": "detect-secrets scan --baseline .secrets.baseline --exclude-files package-lock.json",
     "scan:diff": "git diff --staged --name-only -z | xargs -0 detect-secrets-hook --baseline .secrets.baseline --exclude-files package-lock.json",
-    "scan:audit": "detect-secrets audit .secrets.baseline"
+    "scan:audit": "detect-secrets audit .secrets.baseline",
+    "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
     "@ionic/vue": "^8.0.1",
@@ -78,10 +79,12 @@
     "@azure/static-web-apps-cli": "^1.1.10",
     "@faker-js/faker": "^8.4.1",
     "@playwright/test": "^1.42.1",
+    "@types/jsdom": "^21.1.7",
     "@types/node": "^20.11.30",
     "@vitejs/plugin-vue": "^5.0.3",
     "@vue/eslint-config-prettier": "^9.0.0",
     "@vue/test-utils": "^2.4.4",
+    "@vue/tsconfig": "^0.5.1",
     "autoprefixer": "^10.4.17",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
@@ -93,9 +96,12 @@
     "pg": "^8.11.5",
     "postcss": "^8.4.14",
     "prettier": "^3.2.4",
+    "typescript": "^5.5.4",
     "vite": "^5.0.12",
+    "vite-plugin-vue-devtools": "^7.3.9",
     "vite-svg-loader": "^5.1.0",
-    "vitest": "^1.2.2"
+    "vitest": "^1.2.2",
+    "vue-tsc": "^2.1.2"
   },
   "pre-commit": [
     "scan:diff",

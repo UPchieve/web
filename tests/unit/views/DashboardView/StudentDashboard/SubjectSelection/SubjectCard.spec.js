@@ -5,7 +5,6 @@ import { storeOptions } from '@/store'
 import SubjectCard from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectCard.vue'
 import HyperlinkButton from '@/components/HyperlinkButton.vue'
 import LargeButton from '@/components/LargeButton.vue'
-import { vi } from 'vitest'
 // import TestIcon from "@/assets/sidebar_icons/house.svg";
 
 const getWrapper = (mobileMode = false, props) => {

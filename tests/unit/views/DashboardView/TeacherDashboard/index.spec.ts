@@ -142,7 +142,7 @@ describe('Teacher Dashboard', () => {
   })
 
   test('goes to class details page when class is selected', async () => {
-    let routerPushSpy = vi.spyOn(router, 'push')
+    const routerPushSpy = vi.spyOn(router, 'push')
 
     NetworkService.getTeacherClasses = vi
       .fn()

@@ -22,4 +22,7 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2022,
   },
+  globals: {
+    vi: true,
+  },
 }

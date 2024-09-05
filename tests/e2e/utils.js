@@ -1,7 +1,5 @@
 import bcrypt from 'bcrypt'
-import { getDbUlid } from './db'
 import { faker } from '@faker-js/faker'
-import { snake } from 'case'
 import { StudentDashboard } from './page-object-models/student-dashboard'
 import { Login } from './page-object-models/login'
 

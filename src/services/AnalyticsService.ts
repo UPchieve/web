@@ -62,13 +62,13 @@ class AnalyticsService {
   static trackFeedback(feedbackComponent, isFakeUser) {
     if (isFakeUser) return
 
-    let aggResponses = []
+    const aggResponses = []
     let volunteerScore = 0
 
     // creates an array of an agreggate of all responses and subresponses
-    for (var response in feedbackComponent.userResponse) {
+    for (const response in feedbackComponent.userResponse) {
       if (typeof feedbackComponent.userResponse[response] === 'object') {
-        for (var subresponse in feedbackComponent.userResponse[response]) {
+        for (const subresponse in feedbackComponent.userResponse[response]) {
           aggResponses.push(
             feedbackComponent.userResponse[response][subresponse]
           )
@@ -124,7 +124,7 @@ class AnalyticsService {
     let successfulSession = false
 
     // loops through messages, and counts how many were by student vs. volunteer
-    for (var message in currentSession.messages) {
+    for (const message in currentSession.messages) {
       const isStudentMessage =
         currentSession.messages[message].user === currentSession.student._id
       const isVolunteerMessage =

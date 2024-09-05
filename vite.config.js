@@ -1,6 +1,7 @@
 import vue from '@vitejs/plugin-vue'
 import svgLoader from 'vite-svg-loader'
 import path from 'path'
+import vueDevTools from 'vite-plugin-vue-devtools'
 
 export default {
   envPrefix: 'VUE_',
@@ -36,6 +37,7 @@ export default {
         ],
       },
     }),
+    vueDevTools(),
   ],
   preview: {
     port: 8080,
