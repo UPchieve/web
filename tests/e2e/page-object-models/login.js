@@ -49,6 +49,8 @@ export class Login {
     const error = this.page.getByTestId('error')
     await expect(error).toBeVisible()
     await expect(error).toHaveText(expectedError)
-    await expect(this.page).toHaveScreenshot('error-message' + nameSuffix + '.png')
+    await expect(this.page).toHaveScreenshot(
+      'error-message' + nameSuffix + '.png'
+    )
   }
 }

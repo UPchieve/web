@@ -1,5 +1,13 @@
 import { faker } from '@faker-js/faker'
-import { beforeEach, describe, expect, it, MockInstance, test, vi } from 'vitest'
+import {
+  beforeEach,
+  describe,
+  expect,
+  it,
+  MockInstance,
+  test,
+  vi,
+} from 'vitest'
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils'
 import router from '@/router'
 import store from '@/store'
@@ -21,7 +29,7 @@ function getElements(wrapper: VueWrapper) {
     buttonSubmit: wrapper.find('[data-testid="button-submit"]'),
     textClassCode: wrapper.find('[data-testid="text-class-code"]'),
     linkNotYourClass: wrapper.find('[data-testid="link-not-your-class"]'),
-    formErrors: wrapper.find('[data-testid="form-errors"]')
+    formErrors: wrapper.find('[data-testid="form-errors"]'),
   }
 }
 
@@ -33,24 +41,20 @@ describe('JoinClassView', () => {
     routerPushSpy = vi.spyOn(router, 'push')
     NetworkService.user = vi.fn().mockResolvedValue({
       data: {
-        user: {}
-      }
+        user: {},
+      },
     })
   })
 
   test('student can join a class when signed in', async () => {
     NetworkService.addStudentToClass = vi.fn().mockResolvedValue({
       data: {
-        teacherClass: {}
-      }
+        teacherClass: {},
+      },
     })
 
     const wrapper = getWrapper()
-    const {
-      inputClassCode,
-      inputEmail,
-      buttonSubmit
-    } = getElements(wrapper)
+    const { inputClassCode, inputEmail, buttonSubmit } = getElements(wrapper)
 
     expect(inputClassCode.exists()).toBeTruthy()
     expect(inputEmail.exists()).toBeTruthy()
@@ -63,7 +67,7 @@ describe('JoinClassView', () => {
     const gradeLevel = '6th'
     await inputClassCode.setValue(classCode)
     await inputEmail.setValue(email)
-      ; (wrapper.vm as any).gradeLevel = gradeLevel
+    ;(wrapper.vm as any).gradeLevel = gradeLevel
 
     await wrapper.vm.$nextTick()
     expect(buttonSubmit.attributes('disabled')).toBeUndefined()
@@ -77,7 +81,9 @@ describe('JoinClassView', () => {
     })
 
     expect(routerPushSpy).toHaveBeenCalledOnce()
-    expect(routerPushSpy).toHaveBeenCalledWith(`/dashboard?classCode=${classCode}`)
+    expect(routerPushSpy).toHaveBeenCalledWith(
+      `/dashboard?classCode=${classCode}`
+    )
 
     routerPushSpy.mockRestore()
   })
@@ -85,23 +91,19 @@ describe('JoinClassView', () => {
   test('redirect student to login with query params when there is an account', async () => {
     NetworkService.addStudentToClass = vi.fn().mockResolvedValue({
       data: {
-        isExistingStudent: true
-      }
+        isExistingStudent: true,
+      },
     })
 
     const wrapper = getWrapper()
-    const {
-      inputClassCode,
-      inputEmail,
-      buttonSubmit
-    } = getElements(wrapper)
+    const { inputClassCode, inputEmail, buttonSubmit } = getElements(wrapper)
 
     const classCode = faker.string.alphanumeric(6)
     const email = faker.internet.email()
     const gradeLevel = '10th'
     inputClassCode.setValue(classCode)
     inputEmail.setValue(email)
-      ; (wrapper.vm as any).gradeLevel = gradeLevel
+    ;(wrapper.vm as any).gradeLevel = gradeLevel
 
     await wrapper.vm.$nextTick()
     await buttonSubmit.trigger('click')
@@ -118,9 +120,13 @@ describe('JoinClassView', () => {
     const firstCallArg = routerPushSpy.mock.calls[0][0]
     const url = new URL(firstCallArg, 'http://localhost:8080')
     expect(url.pathname).toBe('/login')
-    expect(url.searchParams.get('redirect')).toContain(`/join-class/${classCode}`)
+    expect(url.searchParams.get('redirect')).toContain(
+      `/join-class/${classCode}`
+    )
     expect(url.searchParams.get('message')).toBeDefined()
-    const redirectParams = new URLSearchParams(url.searchParams.get('redirect').split('?')[1])
+    const redirectParams = new URLSearchParams(
+      url.searchParams.get('redirect').split('?')[1]
+    )
     expect(redirectParams.get('email')).toBe(email)
     expect(redirectParams.get('classCode')).toBe(classCode)
     expect(redirectParams.get('gradeLevel')).toBe(gradeLevel)
@@ -129,23 +135,19 @@ describe('JoinClassView', () => {
   test('redirect student to finish creating account if no account', async () => {
     NetworkService.addStudentToClass = vi.fn().mockResolvedValue({
       data: {
-        isExistingStudent: false
-      }
+        isExistingStudent: false,
+      },
     })
 
     const wrapper = getWrapper()
-    const {
-      inputClassCode,
-      inputEmail,
-      buttonSubmit
-    } = getElements(wrapper)
+    const { inputClassCode, inputEmail, buttonSubmit } = getElements(wrapper)
 
     const classCode = faker.string.alphanumeric(6)
     const email = faker.internet.email()
     const gradeLevel = '10th'
     inputClassCode.setValue(classCode)
     inputEmail.setValue(email)
-      ; (wrapper.vm as any).gradeLevel = gradeLevel
+    ;(wrapper.vm as any).gradeLevel = gradeLevel
 
     await wrapper.vm.$nextTick()
     await buttonSubmit.trigger('click')
@@ -161,7 +163,10 @@ describe('JoinClassView', () => {
 
     const firstCallArg = routerPushSpy.mock.calls[0][0]
     expect(firstCallArg.name).toBe('SignupView')
-    expect(firstCallArg.params).toEqual({ userType: 'student', step: 'account' })
+    expect(firstCallArg.params).toEqual({
+      userType: 'student',
+      step: 'account',
+    })
     expect(firstCallArg.query).toEqual({ email, classCode, gradeLevel })
   })
 
@@ -170,31 +175,25 @@ describe('JoinClassView', () => {
     NetworkService.addStudentToClass = vi.fn().mockRejectedValue({
       response: {
         data: {
-          err: errorMessage
-        }
-      }
+          err: errorMessage,
+        },
+      },
     })
     const wrapper = getWrapper()
-    const {
-      inputClassCode,
-      inputEmail,
-      buttonSubmit
-    } = getElements(wrapper)
+    const { inputClassCode, inputEmail, buttonSubmit } = getElements(wrapper)
 
     const classCode = faker.string.alphanumeric(6)
     const email = faker.internet.email()
     const gradeLevel = '12th'
     inputClassCode.setValue(classCode)
     inputEmail.setValue(email)
-      ; (wrapper.vm as any).gradeLevel = gradeLevel
+    ;(wrapper.vm as any).gradeLevel = gradeLevel
 
     await wrapper.vm.$nextTick()
     await buttonSubmit.trigger('click')
     await wrapper.vm.$nextTick()
 
-    const {
-      formErrors
-    } = getElements(wrapper)
+    const { formErrors } = getElements(wrapper)
 
     expect((wrapper.vm as any).errorMessage).toBe(errorMessage)
     expect(formErrors.exists()).toBe(true)
@@ -209,12 +208,8 @@ describe('JoinClassView', () => {
     await router.isReady()
 
     const wrapper = getWrapper()
-    const {
-      textClassCode,
-      inputClassCode,
-      inputEmail,
-      buttonSubmit,
-    } = getElements(wrapper)
+    const { textClassCode, inputClassCode, inputEmail, buttonSubmit } =
+      getElements(wrapper)
 
     expect(inputClassCode.exists()).toBe(false)
     expect(textClassCode.text()).toBe(`Class code: ${classCode.toUpperCase()}`)
@@ -225,7 +220,7 @@ describe('JoinClassView', () => {
     const email = faker.internet.email()
     const gradeLevel = '9th'
     inputEmail.setValue(email)
-      ; (wrapper.vm as any).gradeLevel = gradeLevel
+    ;(wrapper.vm as any).gradeLevel = gradeLevel
 
     await wrapper.vm.$nextTick()
     expect(buttonSubmit.attributes('disabled')).toBeUndefined()
@@ -239,9 +234,7 @@ describe('JoinClassView', () => {
     await router.isReady()
 
     const wrapper = getWrapper()
-    const {
-      linkNotYourClass
-    } = getElements(wrapper)
+    const { linkNotYourClass } = getElements(wrapper)
 
     expect(wrapper.vm.$route.params.classCode).toBe(classCode)
     expect(linkNotYourClass.text()).toBe('Not your class?')

@@ -20,7 +20,7 @@ describe('Admin User Detail', () => {
     inGatesStudy: false,
     isAdmin: false,
     userType: 'student',
-    pastSessions: []
+    pastSessions: [],
   }
 
   const getWrapper = async () => {
@@ -47,20 +47,18 @@ describe('Admin User Detail', () => {
     [{ banType: 'complete' }, 'banned'],
     [{ isDeactivated: true }, 'deactivated'],
     [{ isTestUser: true }, 'test'],
-    [{ isFakeUser: true }, 'fake']
+    [{ isFakeUser: true }, 'fake'],
   ])('show correct label if property is true', async (arg, label) => {
     NetworkService.adminGetUser = vi.fn().mockResolvedValue({
       data: {
         ...DEFAULT_USER,
-        ...arg
+        ...arg,
       },
     })
 
     const wrapper = await getWrapper()
 
-    const result = wrapper.find(
-      `[data-testid="user-detail-label-${label}"]`
-    )
+    const result = wrapper.find(`[data-testid="user-detail-label-${label}"]`)
 
     expect(result.exists()).toBeTruthy()
   })

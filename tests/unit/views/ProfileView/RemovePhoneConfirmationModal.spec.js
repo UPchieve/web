@@ -27,7 +27,7 @@ describe('RemovePhoneConfirmationModal', () => {
             userType: () => userType,
             isVolunteer: () => userType === 'volunteer',
             isStudent: () => userType === 'student',
-          }
+          },
         },
         app: {
           ...appModule,

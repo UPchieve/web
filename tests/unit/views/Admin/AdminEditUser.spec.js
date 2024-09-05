@@ -5,35 +5,32 @@ import NetworkService from '@/services/NetworkService'
 
 describe('AdminEditUser.vue', () => {
   const DEFAULT_USER = {
-     firstName: 'Student',
-     lastName: 'Test',
-     email: 'student@test.com',
-     partnerOrg: {},
-     partnerSchool: {},
-     partnerSite: '',
-     isVerified: false,
-     isBanned: false,
-     isDeactivated: false,
-     isApproved: false,
-     inGatesStudy: false,
-     isAdmin: false,
-     studentPartnerOrg: 'studentPartnerOrg',
-     volunteerPartnerOrg: 'volunteerPartnerOrg',
-   }
+    firstName: 'Student',
+    lastName: 'Test',
+    email: 'student@test.com',
+    partnerOrg: {},
+    partnerSchool: {},
+    partnerSite: '',
+    isVerified: false,
+    isBanned: false,
+    isDeactivated: false,
+    isApproved: false,
+    inGatesStudy: false,
+    isAdmin: false,
+    studentPartnerOrg: 'studentPartnerOrg',
+    volunteerPartnerOrg: 'volunteerPartnerOrg',
+  }
 
   const getWrapper = (overrides = {}) => {
     const localUser = { ...DEFAULT_USER, ...(overrides.user ?? {}) }
 
-    return mount(
-      AdminEditUser,
-      {
-        props: {
-          user: localUser,
-          toggleEditMode: vi.fn(),
-          getUser: vi.fn(),
-        },
-      }
-    )
+    return mount(AdminEditUser, {
+      props: {
+        user: localUser,
+        toggleEditMode: vi.fn(),
+        getUser: vi.fn(),
+      },
+    })
   }
 
   it('should show TRUE OR FALSE options for banned for volunteers', async () => {

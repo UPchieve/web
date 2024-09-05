@@ -29,8 +29,8 @@ for (const v of [true, false]) {
       await page.route('*/**/feature-flags', async (route) => {
         const json = {
           featureFlags: {
-            [POSTHOG_FEATURE_FLAGS.USE_NEW_SIGN_UP_FLOW]: v
-          }
+            [POSTHOG_FEATURE_FLAGS.USE_NEW_SIGN_UP_FLOW]: v,
+          },
         }
         await route.fulfill({ json })
       })
@@ -43,18 +43,23 @@ for (const v of [true, false]) {
       await expect(page).toHaveScreenshot('page-load' + nameSuffix(v) + '.png')
     })
 
-    test('Enable/disable logic works correctly' + nameSuffix(v), async ({ page }) => {
-      const { email, password } = testUser
-      const loginPage = new Login(page)
-      await loginPage.isReady()
-      await loginPage.fillFormWith({ email, password })
-      await expect(loginPage.loginButton).toBeEnabled()
-      await loginPage.fillFormWith({ email, password: '' })
-      await expect(loginPage.loginButton).not.toBeEnabled()
-      await loginPage.fillFormWith({ email, password })
-      await expect(loginPage.loginButton).toBeEnabled()
-      await expect(page).toHaveScreenshot('sign-in-btn-enabled' + nameSuffix(v) + '.png')
-    })
+    test(
+      'Enable/disable logic works correctly' + nameSuffix(v),
+      async ({ page }) => {
+        const { email, password } = testUser
+        const loginPage = new Login(page)
+        await loginPage.isReady()
+        await loginPage.fillFormWith({ email, password })
+        await expect(loginPage.loginButton).toBeEnabled()
+        await loginPage.fillFormWith({ email, password: '' })
+        await expect(loginPage.loginButton).not.toBeEnabled()
+        await loginPage.fillFormWith({ email, password })
+        await expect(loginPage.loginButton).toBeEnabled()
+        await expect(page).toHaveScreenshot(
+          'sign-in-btn-enabled' + nameSuffix(v) + '.png'
+        )
+      }
+    )
 
     test('Logging in successfully' + nameSuffix(v), async ({ page }) => {
       const { email, password } = testUser
@@ -64,13 +69,15 @@ for (const v of [true, false]) {
       await expect(page.getByTestId('dashboard-banner')).toBeVisible()
     })
 
-    test('Error message appears when incorrect credentials are provided' + nameSuffix(v), async ({
-      page,
-    }) => {
-      const { email } = testUser
-      const loginPage = new Login(page)
-      await loginPage.loginWith({ email, password: 'incorrectPassword456' })
-      await loginPage.hasError(BAD_CREDENTIALS_ERROR, nameSuffix(v))
-    })
+    test(
+      'Error message appears when incorrect credentials are provided' +
+        nameSuffix(v),
+      async ({ page }) => {
+        const { email } = testUser
+        const loginPage = new Login(page)
+        await loginPage.loginWith({ email, password: 'incorrectPassword456' })
+        await loginPage.hasError(BAD_CREDENTIALS_ERROR, nameSuffix(v))
+      }
+    )
   })
 }

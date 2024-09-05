@@ -82,7 +82,9 @@ describe('ProfileView', () => {
             userType,
           },
         })
-        expect(wrapper.find('.description').exists()).toEqual(userType === 'volunteer')
+        expect(wrapper.find('.description').exists()).toEqual(
+          userType === 'volunteer'
+        )
       }
     )
 

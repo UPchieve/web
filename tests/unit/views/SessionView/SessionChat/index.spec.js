@@ -15,7 +15,7 @@ describe('SessionChat', () => {
           ...userModule,
           state: {
             user: {
-              ...overrides?.user?.state ?? {}
+              ...(overrides?.user?.state ?? {}),
             },
             unreadChatMessageIndices: [],
             chatScrolledToMessageIndex: null,
@@ -99,60 +99,69 @@ describe('SessionChat', () => {
   test.each([
     {
       hateful_language: ['1', '2'],
-      profanity: ['5hit']
+      profanity: ['5hit'],
     },
     {
-      hateful_language: ['1']
+      hateful_language: ['1'],
     },
     { profanity: ['5hit'] },
     {
       hateful_language: ['1', '2'],
-      profanity: undefined
+      profanity: undefined,
     },
     {
       hateful_language: ['1', '2'],
-      profanity: []
+      profanity: [],
     },
-  ])('It renders the moderation failure reasons (failures=%s)', async (moderationFailures) => {
-    ModerationService.checkIfMessageIsClean = vi.fn().mockResolvedValue({
-      failures: moderationFailures
-    })
-    const wrapper = getWrapper({
-      user: {
-        isVolunteer: true,
-        isStudent: false,
-      }
-    })
-    const message = await sendMessage(wrapper)
-    expect(ModerationService.checkIfMessageIsClean).toHaveBeenCalledWith({
-      message,
-      sessionId: currentSession.id,
-    })
-    expect(wrapper.find('[data-testid="moderation-body"]').isVisible()).toBeTruthy()
-    // Expect each reason to be rendered, as well as one additional div per reason
-    // that contains the offending substrings
-    const expectedDataTestIds = Object.keys(moderationFailures)
-    Object.keys(moderationFailures).forEach((reason) => {
-      expectedDataTestIds.push(`${reason}-instances`)
-    })
-    expect(expectedDataTestIds.length).toEqual(Object.keys(moderationFailures).length * 2)
-    expectedDataTestIds.forEach((testId) => {
-      expect(wrapper.find(`[data-testid="${testId}"]`).isVisible()).toBeTruthy()
-    })
-  })
+  ])(
+    'It renders the moderation failure reasons (failures=%s)',
+    async (moderationFailures) => {
+      ModerationService.checkIfMessageIsClean = vi.fn().mockResolvedValue({
+        failures: moderationFailures,
+      })
+      const wrapper = getWrapper({
+        user: {
+          isVolunteer: true,
+          isStudent: false,
+        },
+      })
+      const message = await sendMessage(wrapper)
+      expect(ModerationService.checkIfMessageIsClean).toHaveBeenCalledWith({
+        message,
+        sessionId: currentSession.id,
+      })
+      expect(
+        wrapper.find('[data-testid="moderation-body"]').isVisible()
+      ).toBeTruthy()
+      // Expect each reason to be rendered, as well as one additional div per reason
+      // that contains the offending substrings
+      const expectedDataTestIds = Object.keys(moderationFailures)
+      Object.keys(moderationFailures).forEach((reason) => {
+        expectedDataTestIds.push(`${reason}-instances`)
+      })
+      expect(expectedDataTestIds.length).toEqual(
+        Object.keys(moderationFailures).length * 2
+      )
+      expectedDataTestIds.forEach((testId) => {
+        expect(
+          wrapper.find(`[data-testid="${testId}"]`).isVisible()
+        ).toBeTruthy()
+      })
+    }
+  )
 
   it('Does not render profanity for students', async () => {
     ModerationService.checkIfMessageIsClean = vi.fn().mockResolvedValue({
       failures: {
         profanity: ['5hit'],
         hateful_language: ['1'],
-      }
+      },
     })
     const wrapper = getWrapper({
       user: {
-          isStudent: true,
-          isVolunteer: false,
-      }
+        isStudent: true,
+        isVolunteer: false,
+      },
     })
     const message = await sendMessage(wrapper)
 
@@ -160,10 +169,18 @@ describe('SessionChat', () => {
       message,
       sessionId: currentSession.id,
     })
-    expect(wrapper.find('[data-testid="moderation-body"]').isVisible()).toBeTruthy()
-    expect(wrapper.find('[data-testid="hateful_language"]').isVisible()).toBeTruthy()
-    expect(wrapper.find('[data-testid="hateful_language-instances"]').isVisible()).toBeTruthy()
+    expect(
+      wrapper.find('[data-testid="moderation-body"]').isVisible()
+    ).toBeTruthy()
+    expect(
+      wrapper.find('[data-testid="hateful_language"]').isVisible()
+    ).toBeTruthy()
+    expect(
+      wrapper.find('[data-testid="hateful_language-instances"]').isVisible()
+    ).toBeTruthy()
     expect(wrapper.find('[data-testid="profanity"]').exists()).toBeFalsy()
-    expect(wrapper.find('[data-testid="profanity-instances"]').exists()).toBeFalsy()
+    expect(
+      wrapper.find('[data-testid="profanity-instances"]').exists()
+    ).toBeFalsy()
   })
 })

@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { vi } from 'vitest'
 import AboutThisSessionSurvey from '@/components/AboutThisSessionSurvey.vue'
-import AnalyticsService from "@/services/AnalyticsService";
+import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 
 vi.mock('../../../../services/AnalyticsService')
@@ -27,10 +27,10 @@ describe('AboutThisSessionSurvey', () => {
       global: {
         mocks: {
           $route: {
-            params: { sessionId }
-          }
-        }
-      }
+            params: { sessionId },
+          },
+        },
+      },
     })
   }
 
@@ -65,26 +65,35 @@ describe('AboutThisSessionSurvey', () => {
     expect(captureEventSpy).not.toHaveBeenCalled()
 
     await wrapper.find(lowRatingButtonSelector).trigger('click')
-    expect(captureEventSpy).toHaveBeenCalledWith(EVENTS.SELECTED_ABOUT_THIS_SESSION_RATING, {
-      sessionId,
-      rating: -1
-    })
+    expect(captureEventSpy).toHaveBeenCalledWith(
+      EVENTS.SELECTED_ABOUT_THIS_SESSION_RATING,
+      {
+        sessionId,
+        rating: -1,
+      }
+    )
 
     vi.resetAllMocks()
     await wrapper.find(highRatingButtonSelector).trigger('click')
-    expect(captureEventSpy).toHaveBeenCalledWith(EVENTS.SELECTED_ABOUT_THIS_SESSION_RATING, {
-      sessionId,
-      rating: 1
-    })
+    expect(captureEventSpy).toHaveBeenCalledWith(
+      EVENTS.SELECTED_ABOUT_THIS_SESSION_RATING,
+      {
+        sessionId,
+        rating: 1,
+      }
+    )
 
     vi.resetAllMocks()
     const feedback = 'This is a test feedback'
     await wrapper.find(commentsTextAreaSelector).setValue(feedback)
     expect(captureEventSpy).not.toHaveBeenCalled()
     await wrapper.find(submitButtonSelector).trigger('click')
-    expect(captureEventSpy).toHaveBeenCalledWith(EVENTS.SUBMITTED_ABOUT_THIS_SESSION_COMMENTS, {
-      sessionId,
-      comments: feedback
-    })
+    expect(captureEventSpy).toHaveBeenCalledWith(
+      EVENTS.SUBMITTED_ABOUT_THIS_SESSION_COMMENTS,
+      {
+        sessionId,
+        comments: feedback,
+      }
+    )
   })
 })

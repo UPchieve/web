@@ -29,7 +29,9 @@ export class VolunteerPartnerSignup {
     await expect(this.passwordInput).toBeVisible()
     await expect(this.step1ContinueButton).toBeVisible()
     await expect(this.step1Title).toBeVisible()
-    await expect(this.step1Title).toHaveText(`Welcome ${partnerOrgName} Volunteer!`)
+    await expect(this.step1Title).toHaveText(
+      `Welcome ${partnerOrgName} Volunteer!`
+    )
   }
 
   async completeStep1(email, password) {
@@ -52,14 +54,13 @@ export class VolunteerPartnerSignup {
     await this.lastName.fill(faker.person.lastName())
     await this.phoneNumber.fill(
       '406' + // a known valid area code
-      faker.string.numeric({
-        length: 7,
-        allowLeadingZeros: false,
-    }))
+        faker.string.numeric({
+          length: 7,
+          allowLeadingZeros: false,
+        })
+    )
     await this.userAgreementCheckbox.check()
     await this.step2SignupButton.click()
     await this.page.waitForURL('**/verify')
   }
 }
-
-
