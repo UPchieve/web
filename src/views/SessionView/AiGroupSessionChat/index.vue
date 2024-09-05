@@ -164,7 +164,6 @@
 <script>
 import { isEmpty } from 'lodash-es'
 import { mapState, mapGetters } from 'vuex'
-
 import ChatBot from '../SessionChat/ChatBot.vue'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import RecordVoiceMessage from '@/components/VoiceMessaging/RecordVoiceMessage.vue'
@@ -180,8 +179,6 @@ import moment from 'moment'
 import { socket } from '@/socket'
 import sound from '@/assets/audio/receive-message.mp3'
 import NetworkService from '@/services/NetworkService'
-import AnalyticsService from '@/services/AnalyticsService'
-import { EVENTS } from '@/consts'
 
 const MESSAGE_ALIGNMENT = {
   LEFT: 'left',
@@ -300,7 +297,6 @@ export default {
     },
   },
   mounted() {
-    AnalyticsService.captureEvent(EVENTS.USER_ENTERED_TUTOR_BOT_SESSION_UNIFIED)
     if (this.currentSession.messages.length === 0) {
       this.sendInitialBotMessage()
     }
@@ -318,6 +314,13 @@ export default {
     }
   },
   methods: {
+    showTutorBotVolunteerJoinedInstructions() {
+      if (this.isStudent) {
+        alert(
+          `UPBot: Looks like a tutor has joined your session! You can still use me when you need me; your tutor will, too! Just type "@bot" in your message and I'll respond.`
+        )
+      }
+    },
     async sendInitialBotMessage() {
       this.hasNotSentInitialMessage = false
       this.$store.commit('socket/setIsTyping', true)
@@ -784,17 +787,15 @@ export default {
           this.hasNotSentGroupBotMessage
         ) {
           this.hasNotSentGroupBotMessage = false
+          this.showTutorBotVolunteerJoinedInstructions()
           this.$store.commit('socket/setIsTyping', true)
           socket.emit('message', {
             sessionId: this.currentSession.id,
             user: this.user,
-            message: `<|bot says|>Now that your tutor, ${this.currentSession.volunteer.firstName}, is here. I'll move to the background. You can still ask me questions by including "@bot" in your message.`,
+            message: `<|bot says|>Now that your tutor, ${this.currentSession.volunteer.firstName}, is here, I'll move to the background. You can still ask me questions by including "@bot" in your message.`,
             source: '',
           })
           this.$store.commit('socket/setIsTyping', false)
-          AnalyticsService.captureEvent(
-            EVENTS.VOLUNTEER_JOINED_TUTOR_BOT_SESSION_UNIFIED
-          )
         }
       },
       deep: true,

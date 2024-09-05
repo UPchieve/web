@@ -213,8 +213,6 @@ import moment from 'moment'
 import { socket } from '@/socket'
 import sound from '@/assets/audio/receive-message.mp3'
 import NetworkService from '@/services/NetworkService'
-import AnalyticsService from '@/services/AnalyticsService'
-import { EVENTS } from '@/consts'
 
 const MESSAGE_ALIGNMENT = {
   LEFT: 'left',
@@ -339,10 +337,6 @@ export default {
     },
   },
   mounted() {
-    AnalyticsService.captureEvent(
-      EVENTS.USER_ENTERED_TUTOR_BOT_SESSION_SEPARATE
-    )
-
     if (this.currentSession.messages.length === 0) {
       this.sendInitialBotMessage()
     }
@@ -370,6 +364,13 @@ export default {
     release() {
       this.isResizing = false
       this.isDragging = false
+    },
+    showTutorBotVolunteerJoinedInstructions() {
+      if (this.isStudent) {
+        alert(
+          "UPBot: Looks like a tutor has joined your session! You can still use me when you need me; your tutor will, too! Just type in the UPBot thread and I'll respond."
+        )
+      }
     },
     updatePosition(event) {
       requestAnimationFrame(() => {
@@ -756,9 +757,7 @@ export default {
     'currentSession.volunteer.id': {
       handler(currentVal, prevVal) {
         if (!prevVal && currentVal) {
-          AnalyticsService.captureEvent(
-            EVENTS.VOLUNTEER_JOINED_TUTOR_BOT_SESSION_SEPARATE
-          )
+          this.showTutorBotVolunteerJoinedInstructions()
         }
       },
       deep: true,
