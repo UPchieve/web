@@ -142,7 +142,7 @@ describe('Class Details View', () => {
   }), 
 
   test('Click student details', async () => {
-    let routerPushSpy = vi.spyOn(router, 'push')
+    const routerPushSpy = vi.spyOn(router, 'push')
 
     const wrapper = await getWrapper({
       students: [

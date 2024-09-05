@@ -17,6 +17,8 @@ import {
   getAlreadyHaveAccountElements,
   getSignUpSourceElement,
   getInputElement,
+} from '@/services/SignUpService'
+import type {
   PageDetail,
   FormElement,
   FormRow,
@@ -25,7 +27,7 @@ import {
 import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
 import { getFormAddressee, getLabelPrefix } from '@/utils/signup-utils'
-import { RouteLocation } from 'vue-router'
+import type { RouteLocation } from 'vue-router'
 
 const RoutePath = {
   account: `/sign-up/student/${SignUpPage.account}`,

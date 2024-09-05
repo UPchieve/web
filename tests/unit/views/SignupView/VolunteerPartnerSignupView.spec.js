@@ -3,7 +3,6 @@ import store from "@/store";
 import VolunteerPartnerSignupView from "@/views/VolunteerPartnerSignupView.vue";
 import { faker } from '@faker-js/faker'
 import {nextTick} from "vue";
-import flushPromises from "flush-promises";
 import { vi } from 'vitest'
 import AuthService from '@/services/AuthService'
 
