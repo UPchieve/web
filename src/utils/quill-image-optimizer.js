@@ -139,12 +139,12 @@ class ImageDrop {
     this.quill.root.addEventListener(
       'drop',
       (e) => this.handleImageUpload(e, isVolunteer, () => this.handleDrop(e)),
-      false
+      true
     )
     this.quill.root.addEventListener(
       'paste',
       (e) => this.handleImageUpload(e, isVolunteer, () => this.handlePaste(e)),
-      false
+      true
     )
   }
 
@@ -154,8 +154,9 @@ class ImageDrop {
       (evt.type === 'drop' && getImagesFromDragEvent(evt).length) ||
       (evt.type === 'paste' && getImagesFromPasteEvent(evt).length)
     if (isVolunteer && isImageUpload) {
-      this.quill.root.dispatchEvent(volunteerAttemptedToAddImageEvent)
       evt.preventDefault()
+      evt.stopImmediatePropagation()
+      this.quill.root.dispatchEvent(volunteerAttemptedToAddImageEvent)
     } else {
       await callback()
     }
