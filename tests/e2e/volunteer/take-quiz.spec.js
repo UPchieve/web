@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
-import { getClient } from '../db.js'
-import { createVolunteer } from '../utils.js'
+import { getClient } from '../db.ts'
+import { createVolunteer } from '../utils.ts'
 import { Login } from '../page-object-models/login.js'
 import { VolunteerDashboard } from '../page-object-models/volunteer-dashboard.js'
 import { VolunteerTraining } from '../page-object-models/volunteer-training.js'

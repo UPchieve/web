@@ -1,6 +1,6 @@
 import { test } from '@playwright/test'
-import { getClient } from '../db.js'
-import { createVolunteer } from '../utils.js'
+import { getClient } from '../db.ts'
+import { createVolunteer } from '../utils.ts'
 import { Login } from '../page-object-models/login.js'
 import { AvailabilityView } from '../page-object-models/availability-view.js'
 
