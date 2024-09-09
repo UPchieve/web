@@ -98,6 +98,9 @@
                 v-model="phone"
                 show-code-on-list
                 @update="onPhoneInputUpdate"
+                :country-code="showNationalPhoneNumbersOnly ? 'US' : null"
+                :only-countries="showNationalPhoneNumbersOnly ? ['US'] : null"
+                :no-search="showNationalPhoneNumbersOnly ? true : false"
               />
 
               <div class="sms-consent" v-if="shouldSeeSmsConsentCheckbox">
@@ -328,6 +331,7 @@ export default {
       isStudent: 'user/isStudent',
       isTeacher: 'user/isTeacher',
       avatarUrl: 'user/avatarUrl',
+      showNationalPhoneNumbersOnly: 'user/showNationalPhoneNumbersOnly',
       allSubtopics: 'subjects/allSubtopics',
       isFilterActiveSubjectsActive: 'featureFlags/isFilterActiveSubjectsActive',
       isMutedSubjectAlertsActive: 'featureFlags/isMutedSubjectAlertsActive',
