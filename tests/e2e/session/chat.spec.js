@@ -1,12 +1,11 @@
-// import { expect, test } from '@playwright/test'
 import { test } from '@playwright/test'
-import { getClient } from '../db.js'
+import { getClient } from '../db.ts'
 import {
   createStudent,
   createVolunteer,
   endSessionsFor,
   withCertifications,
-} from '../utils.js'
+} from '../utils.ts'
 import { SessionView } from '../page-object-models/session-view.js'
 import { StudentDashboard } from '../page-object-models/student-dashboard.js'
 import { Login } from '../page-object-models/login.js'

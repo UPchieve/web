@@ -1,16 +1,28 @@
-import bcrypt from 'bcrypt'
 import { faker } from '@faker-js/faker'
 import { StudentDashboard } from './page-object-models/student-dashboard'
 import { Login } from './page-object-models/login'
+import { Pool } from 'pg'
+import type { Browser, Page } from '@playwright/test'
 
-export const createPassword = () => {
+export const createPassword = (): string => {
   return faker.internet.password({
     length: 10,
     prefix: 'Pa1-',
   })
 }
 
-export const createStudent = async (dbClient, args = {}) => {
+export type StudentUser = {
+  id: string
+  email: string
+  firstName: string
+  lastName: string
+  password: string
+  verified: boolean
+}
+export const createStudent = async (
+  dbClient: Pool,
+  args = {}
+): Promise<StudentUser | undefined> => {
   const params = {
     email: faker.internet.email(),
     firstName: faker.person.firstName(),
@@ -41,7 +53,21 @@ export const createStudent = async (dbClient, args = {}) => {
   }
 }
 
-export const createVolunteer = async (dbClient, userArgs = {}, options) => {
+export type VolunteerUser = {
+  id: string
+  email: string
+  firstName: string
+  lastName: string
+  password: string
+  phone: string
+  terms: boolean
+}
+
+export const createVolunteer = async (
+  dbClient: Pool,
+  userArgs = {},
+  options: any
+): Promise<VolunteerUser | undefined> => {
   try {
     const params = {
       email: faker.internet.email(),
@@ -89,22 +115,22 @@ export const createVolunteer = async (dbClient, userArgs = {}, options) => {
 }
 
 export const withCertifications = async (
-  dbClient,
-  { userId, certificationNames }
+  dbClient: Pool,
+  args: { userId: string; certificationNames: string[] }
 ) => {
   const { rows: certificationIds } = await dbClient.query(
     `SELECT id FROM certifications WHERE name = ANY ($1)`,
-    [certificationNames]
+    [args.certificationNames]
   )
-  for (const id of certificationIds.map(({ id }) => id)) {
+  for (const id of certificationIds.map((r: { id: string }) => r.id)) {
     await dbClient.query(
       `INSERT INTO users_certifications (user_id, certification_id) VALUES ($1, $2)`,
-      [userId, id]
+      [args.userId, id]
     )
   }
 }
 
-export const passUpchieve101 = async (dbClient, userId) => {
+export const passUpchieve101 = async (dbClient: Pool, userId: string) => {
   const trainingCourseId = 1
   const trainingMaterialsCompleted = [
     '7b6a76',
@@ -124,18 +150,16 @@ export const passUpchieve101 = async (dbClient, userId) => {
   )
 }
 
-export const endSessionsFor = async (dbClient, userId) => {
+export const endSessionsFor = async (dbClient: Pool, userId: string) => {
   await dbClient.query(
     `UPDATE sessions SET ended_at = now() WHERE student_id = '${userId}'`
   )
 }
 
-export const hashPassword = async (password) => {
-  const salt = await bcrypt.genSalt(10)
-  return await bcrypt.hash(password, salt)
-}
-
-export const loginStudent = async (browser, studentUser) => {
+export const loginStudent = async (
+  browser: Browser,
+  studentUser: { email: string; password: string }
+) => {
   const studentContext = await browser.newContext()
   const studentPage = await studentContext.newPage()
   const studentDashboard = new StudentDashboard(studentPage)
@@ -154,7 +178,10 @@ export const loginStudent = async (browser, studentUser) => {
   }
 }
 
-export const requestSession = async (studentDashboard, sessionArgs) => {
+export const requestSession = async (
+  studentDashboard: StudentDashboard,
+  sessionArgs: { subject: string; topic: string }
+) => {
   const { sessionId } = await studentDashboard.createSessionFor(sessionArgs)
 
   return {
@@ -162,7 +189,10 @@ export const requestSession = async (studentDashboard, sessionArgs) => {
   }
 }
 
-export const loginVolunteer = async (browser, volunteerUser) => {
+export const loginVolunteer = async (
+  browser: Browser,
+  volunteerUser: { email: string; password: string }
+) => {
   const volunteerContext = await browser.newContext()
   const volunteerPage = await volunteerContext.newPage()
   const volunteerLogin = new Login(volunteerPage)
@@ -176,7 +206,7 @@ export const loginVolunteer = async (browser, volunteerUser) => {
   }
 }
 
-export const setFeatureFlags = async (page, featureFlags) => {
+export const setFeatureFlags = async (page: Page, featureFlags: any) => {
   await page.route('*/**/feature-flags', async (route) => {
     const json = {
       featureFlags,

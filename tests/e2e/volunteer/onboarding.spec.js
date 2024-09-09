@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test'
-import { getClient } from '../db.js'
+import { getClient } from '../db.ts'
 import {
   createVolunteer,
   loginVolunteer,
   withCertifications,
-} from '../utils.js'
+} from '../utils.ts'
 import { Login } from '../page-object-models/login.js'
 import { TrainingCourse } from '../page-object-models/training-course.js'
 import { TrainingQuiz } from '../page-object-models/training-quiz.js'

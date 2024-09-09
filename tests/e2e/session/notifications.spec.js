@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { getClient } from '../db.js'
+import { getClient } from '../db.ts'
 import {
   createStudent,
   createVolunteer,
