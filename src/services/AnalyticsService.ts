@@ -2,7 +2,6 @@ import Gleap from 'gleap'
 import posthog from 'posthog-js'
 import config from '../config'
 import { EVENTS } from '../consts'
-import { isVolunteerUserType } from '@/utils/user-type'
 
 const GLEAP_TRACK_EVENTS = new Set([
   EVENTS.STUDENT_SHOWN_ONBOARDING_MODAL,
@@ -10,6 +9,11 @@ const GLEAP_TRACK_EVENTS = new Set([
   EVENTS.VOICE_MESSAGE_START_RECORDING,
   EVENTS.VOICE_MESSAGE_PLAYED_PARTNER_MESSAGE_IN_CHAT,
 ])
+
+type UserProperties = {
+  userType: string
+  partner?: string
+}
 
 class AnalyticsService {
   static init() {
@@ -33,7 +37,7 @@ class AnalyticsService {
     posthog.setPersonProperties(update)
   }
 
-  static captureEvent(name, properties) {
+  static captureEvent(name, properties = {}) {
     posthog.capture(name, properties)
     if (GLEAP_TRACK_EVENTS.has(name)) {
       Gleap.trackEvent(name, properties)
@@ -47,7 +51,7 @@ class AnalyticsService {
   }
 
   static registerVolunteer(volunteer) {
-    const userProperties = {
+    const userProperties: UserProperties = {
       userType: 'volunteer',
     }
     if (volunteer.volunteerPartnerOrg)
@@ -55,130 +59,6 @@ class AnalyticsService {
     this.updateUser(userProperties)
     this.captureEvent(EVENTS.ACCOUNT_CREATED, {
       event: EVENTS.ACCOUNT_CREATED,
-    })
-  }
-
-  // tracking the information from the feedback form
-  static trackFeedback(feedbackComponent, isFakeUser) {
-    if (isFakeUser) return
-
-    const aggResponses = []
-    let volunteerScore = 0
-
-    // creates an array of an agreggate of all responses and subresponses
-    for (const response in feedbackComponent.userResponse) {
-      if (typeof feedbackComponent.userResponse[response] === 'object') {
-        for (const subresponse in feedbackComponent.userResponse[response]) {
-          aggResponses.push(
-            feedbackComponent.userResponse[response][subresponse]
-          )
-        }
-      } else {
-        aggResponses.push(feedbackComponent.userResponse[response])
-      }
-    }
-    // adds to volunteer score
-    if (feedbackComponent.userType === 'student') {
-      volunteerScore = aggResponses.reduce(function (acc, val) {
-        return acc + val
-      }, 0)
-    }
-    // sends information
-    window.analytics.track('feedback', {
-      'session id': feedbackComponent.sessionId,
-      user: feedbackComponent.userType,
-      'student id': feedbackComponent.studentId,
-      'volunteer id': feedbackComponent.volunteerId,
-      'volunteer score': volunteerScore,
-      // can get answers to specific response using aggResponses
-    })
-  }
-
-  // tracks when a help session has ended
-  static trackSessionEnded(context, currentSession, isFakeUser) {
-    if (isFakeUser) return
-
-    // calculating time-related session info (session length, wait time, etc.)
-    let volunteerSessionLength = null
-    let waitTime = null
-    let volunteerShowed = null
-    const timeSessionEnded = new Date()
-    const timeCreatedAt = new Date(currentSession.createdAt)
-
-    if (currentSession.volunteerJoinedAt) {
-      volunteerShowed = new Date(currentSession.volunteerJoinedAt)
-      waitTime = ((volunteerShowed - timeCreatedAt) / 60000).toFixed(2)
-      volunteerSessionLength = (
-        (timeSessionEnded - volunteerShowed) /
-        60000
-      ).toFixed(2)
-    }
-
-    const sessionLength = ((timeSessionEnded - timeCreatedAt) / 60000).toFixed(
-      2
-    )
-
-    // getting if messages were exchanged
-    let studentMessages = 0
-    let volunteerMessages = 0
-    let successfulSession = false
-
-    // loops through messages, and counts how many were by student vs. volunteer
-    for (const message in currentSession.messages) {
-      const isStudentMessage =
-        currentSession.messages[message].user === currentSession.student._id
-      const isVolunteerMessage =
-        currentSession.volunteer &&
-        currentSession.messages[message].user === currentSession.volunteer._id
-
-      if (isStudentMessage) {
-        studentMessages++
-      } else if (isVolunteerMessage) {
-        volunteerMessages++
-      }
-    }
-
-    // current criteria for a successful session
-    if (studentMessages > 0 && volunteerMessages > 0) {
-      successfulSession = true
-    }
-    const user = context.$store.state.user.user
-    window.analytics.track('session ended', {
-      // if volunteer joined then report volunteerSessionLength otherwise report null
-      'volunteer session length':
-        volunteerSessionLength && isVolunteerUserType(user.userType)
-          ? volunteerSessionLength
-          : null,
-      'wait time': waitTime,
-      'session length': sessionLength,
-      'session topic': currentSession.type,
-      'session subtopic': currentSession.subTopic,
-      'session id': currentSession.sessionId,
-      user: user.userType,
-      'volunteer show time': volunteerShowed || null,
-      'did volunteer show': !!volunteerShowed,
-      'time ended': new Date(), // might be slightly off from the session's "endedAt"
-      'successful session': successfulSession,
-    })
-  }
-
-  // tracks when a help session has started
-  static trackSessionStarted(
-    context,
-    currentSession,
-    topic,
-    subTopic,
-    isFakeUser
-  ) {
-    if (isFakeUser) return
-
-    const user = context.$store.state.user.user
-    window.analytics.track('session started', {
-      'session started date': new Date(),
-      user: user.userType,
-      'session topic': topic,
-      'session subtopic': subTopic,
-      'session id': currentSession.sessionId,
     })
   }
 }
@@ -217,21 +97,6 @@ class DevAnalyticsService {
   static registerVolunteer() {
     // eslint-disable-next-line no-console
     console.info('AnalyticsService.registerVolunteer')
-  }
-
-  static trackFeedback() {
-    // eslint-disable-next-line no-console
-    console.info('AnalyticsService.trackFeedback')
-  }
-
-  static trackSessionEnded() {
-    // eslint-disable-next-line no-console
-    console.info('AnalyticsService.trackSessionEnded')
-  }
-
-  static trackSessionStarted() {
-    // eslint-disable-next-line no-console
-    console.info('AnalyticsService.trackSessionStarted')
   }
 }
 

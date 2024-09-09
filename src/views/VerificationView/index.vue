@@ -91,6 +91,7 @@ import Loader from '@/components/Loader.vue'
 import AuthService from '@/services/AuthService'
 import LoggerService from '@/services/LoggerService'
 import AnalyticsService from '@/services/AnalyticsService'
+import * as UserProductFlagsService from '@/services/UserProductFlagsService'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 import RecaptchaCaption from '@/components/recaptcha/RecaptchaCaption.vue'
 import VerificationMethodSelector from '@/views/VerificationView/VerificationMethodSelector.vue'
@@ -138,6 +139,8 @@ export default {
     ...mapGetters({
       isAutoFlowUser: 'user/isAutoFlowUser',
       isSmsVerificationEnabled: 'featureFlags/isSmsVerificationEnabled', // Whether SMS verification is enabled across the app
+      isFallIncentiveProgramEnabled:
+        'featureFlags/isFallIncentiveProgramEnabled',
     }),
     sendTo() {
       if (this.verificationInputs.method === VERIFICATION_METHOD.SMS) {
@@ -210,6 +213,19 @@ export default {
           const userUpdates = { verified: true }
           if (this.verificationInputs.method === VERIFICATION_METHOD.SMS) {
             userUpdates.phoneVerified = true
+
+            if (
+              this.user.userType === 'student' &&
+              this.isFallIncentiveProgramEnabled
+            ) {
+              try {
+                await UserProductFlagsService.enrollStudentToIncentiveProgram(
+                  this.$store
+                )
+              } catch (error) {
+                LoggerService.noticeError(error.response?.data)
+              }
+            }
           } else {
             userUpdates.emailVerified = true
           }

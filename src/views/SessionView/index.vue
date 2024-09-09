@@ -87,9 +87,21 @@
         </div>
         <div
           class="about-session-container"
-          v-else-if="mobileMode && isStudent"
+          v-else-if="isStudent && (mobileMode || showReviewWarning)"
         >
-          <question-mark-icon @click="openHelp" class="help-icon" />
+          <div
+            v-if="showReviewWarning"
+            class="about-session-button"
+            @click="handleReviewWarningClick"
+          >
+            Session will be reviewed
+            <caret-icon class="caret" />
+          </div>
+          <question-mark-icon
+            v-if="mobileMode"
+            @click="openHelp"
+            class="help-icon"
+          />
         </div>
         <!-- @NEW - show fake session chat or real session chat -->
         <ai-group-session-chat
@@ -162,6 +174,10 @@
       :responses="studentPresessionResponses"
       :totalStudentSessions="totalStudentSessions"
     />
+    <fall-incentive-review-warning-modal
+      v-if="showFallIncentiveReviewWarningModal"
+      :closeModal="toggleFallIncentiveReviewWarningModal"
+    />
   </div>
 </template>
 
@@ -184,6 +200,7 @@ import CaretIcon from '@/assets/caret.svg'
 import QuestionMarkIcon from '@/assets/question-mark-icon.svg'
 import WebNotificationsModal from '@/components/WebNotificationsModal.vue'
 import AboutSessionModal from './AboutSessionModal.vue'
+import FallIncentiveReviewWarningModal from './FallIncentiveReviewWarningModal.vue'
 import getNotificationPermission from '@/utils/get-notification-permission'
 import { EVENTS, POSTHOG_FEATURE_FLAGS, SESSION_TOOL_TYPES } from '@/consts'
 import Gleap from 'gleap'
@@ -214,6 +231,7 @@ export default {
     AboutSessionModal,
     LoadingMessage,
     QuestionMarkIcon,
+    FallIncentiveReviewWarningModal,
   },
   created() {
     if (this.mobileMode) {
@@ -256,6 +274,7 @@ export default {
       isLoadingPresessionResponse: false,
       isFetchingIsSessionRecapEligible: false,
       sessionHasEnded: false,
+      showFallIncentiveReviewWarningModal: false,
       unsubscribeFromActionSubscription: () => undefined,
       tutorBotChatType: null,
     }
@@ -275,6 +294,7 @@ export default {
       docEditorVersion: (state) => state.user.session.docEditorVersion,
       auxiliaryType: (state) => state.user.session.toolType,
       isConnected: (state) => state.socket.isConnected,
+      productFlags: (state) => state.productFlags.flags,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -286,6 +306,8 @@ export default {
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
       shouldUseQuillV2: 'featureFlags/shouldUseQuillV2',
       isTutorBotChatEnabled: 'featureFlags/isTutorBotChatEnabled',
+      isFallIncentiveProgramEnabled:
+        'featureFlags/isFallIncentiveProgramEnabled',
     }),
     sessionToolTypes() {
       return SESSION_TOOL_TYPES
@@ -324,6 +346,12 @@ export default {
     },
     showUnifiedChat() {
       return this.tutorBotChatType === 'unified'
+    },
+    showReviewWarning() {
+      return (
+        this.isFallIncentiveProgramEnabled &&
+        this.productFlags.fallIncentiveEnrollmentAt
+      )
     },
   },
   async mounted() {
@@ -553,8 +581,18 @@ export default {
       AnalyticsService.captureEvent(EVENTS.VOLUNTEER_CLICKED_ABOUT_SESSION)
       this.toggleAboutSessionModal()
     },
+    handleReviewWarningClick() {
+      AnalyticsService.captureEvent(
+        EVENTS.STUDENT_FALL_INCENTIVE_REVIEW_SESSION_INFORMATION_CLICKED
+      )
+      this.toggleFallIncentiveReviewWarningModal()
+    },
     toggleAboutSessionModal() {
       this.showAboutSessionModal = !this.showAboutSessionModal
+    },
+    toggleFallIncentiveReviewWarningModal() {
+      this.showFallIncentiveReviewWarningModal =
+        !this.showFallIncentiveReviewWarningModal
     },
     async getSessionContext(sessionId) {
       try {

@@ -1004,4 +1004,14 @@ export default {
       message,
     }).then(this._successHandler, this._errorHandler)
   },
+  enrollStudentInIncentiveProgram() {
+    return httpPost(
+      `${API_ROOT}/product-flags/fall-incentive-enrollment/enroll`
+    ).then(this._successHandler, this._errorHandler)
+  },
+  deniedIncentiveProgramEnrollment() {
+    return httpPost(
+      `${API_ROOT}/product-flags/fall-incentive-enrollment/denied`
+    ).then(this._successHandler, this._errorHandler)
+  },
 }
