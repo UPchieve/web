@@ -31,6 +31,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_IMAGE_UPLOAD]: false,
       [POSTHOG_FEATURE_FLAGS.COLLEGE_PREP_AD]: false,
       [POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT]: false,
+      [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -145,5 +146,7 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT],
     tutorBotChatType: (state) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT],
+    isFallIncentiveProgramEnabled: (state) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM],
   },
 }

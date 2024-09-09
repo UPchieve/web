@@ -26,6 +26,11 @@
       @close-modal="() => (joinedClassCode = '')"
       :classCode="joinedClassCode"
     />
+    <fall-incentive-enrollment-modal
+      v-if="showFallIncentiveEnrollmentModal"
+      :closeModal="toggleFallIncentiveEnrollmentModal"
+      :isFirstModalView="fallIncentiveProgramModalViewCount === 0"
+    />
     <subject-selection />
   </div>
 </template>
@@ -37,6 +42,7 @@ import SubjectSelection from './SubjectSelection/index.vue'
 import TellThemCollegePrepModal from './TellThemCollegePrepModal.vue'
 import JoinedClassModal from './JoinedClassModal.vue'
 import StudentOnboardingModal from './StudentOnboardingModal.vue'
+import FallIncentiveEnrollmentModal from './FallIncentiveEnrollmentModal.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
@@ -62,11 +68,15 @@ export default {
     SubjectSelection,
     TellThemCollegePrepModal,
     JoinedClassModal,
+    FallIncentiveEnrollmentModal,
   },
   async created() {
     if (this.isSessionAlive) {
       this.$store.dispatch('app/header/show', activeHeaderData)
-    } else if (!this.user.emailVerified) {
+    } else if (
+      !this.user.emailVerified &&
+      !this.isFallIncentiveProgramEnabled
+    ) {
       this.$store.dispatch('app/header/show', {
         component: 'VerificationHeader',
         data: {
@@ -74,7 +84,14 @@ export default {
           phoneOrEmailToVerify: this.user.email,
         },
       })
-    }
+    } else if (this.isFallIncentiveProgramEnabled)
+      this.triggerIncentiveProgramBanner()
+
+    if (
+      this.shouldSeeIncentiveModalForFirstTime ||
+      this.shouldSeeIncentiveModalForSecondTime
+    )
+      this.triggerIncentiveEnrollmentModal()
 
     if (this.isFirstDashboardVisit) {
       this.$store.dispatch('app/modal/show', {
@@ -127,6 +144,7 @@ export default {
     return {
       showTellThemCollegePrepModal: false,
       joinedClassCode: '',
+      showFallIncentiveEnrollmentModal: false,
     }
   },
   computed: {
@@ -136,6 +154,7 @@ export default {
       prevSessionSubject: (state) => state.user.prevSessionSubject,
       isFirstDashboardVisit: (state) => state.user.isFirstDashboardVisit,
       latestSession: (state) => state.user.latestSession,
+      productFlags: (state) => state.productFlags.flags,
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
@@ -148,9 +167,35 @@ export default {
         'featureFlags/isAutoStartCollegeSessionActive',
       autoStartCollegeSession: 'featureFlags/autoStartCollegeSession',
       isCollegePrepAdEnabled: 'featureFlags/isCollegePrepAdEnabled',
+      isFallIncentiveProgramEnabled:
+        'featureFlags/isFallIncentiveProgramEnabled',
     }),
     userAndOrbitalSegment() {
       return [this.user, this.orbitalSegments, this.isOrbitalSegmentsActive]
+    },
+    shouldSeeIncentiveModalForFirstTime() {
+      return (
+        this.isFallIncentiveProgramEnabled &&
+        Object.entries(this.productFlags).length &&
+        !this.productFlags.fallIncentiveEnrollmentAt &&
+        this.fallIncentiveProgramModalViewCount === 0
+      )
+    },
+    shouldSeeIncentiveModalForSecondTime() {
+      return (
+        this.isFallIncentiveProgramEnabled &&
+        Object.entries(this.productFlags).length &&
+        !this.productFlags.fallIncentiveEnrollmentAt &&
+        this.fallIncentiveProgramModalViewCount === 1 &&
+        this.hadASession
+      )
+    },
+    fallIncentiveProgramModalViewCount() {
+      const viewCount = parseInt(
+        localStorage.getItem('fallIncentiveEnrollmentViewCount') ?? ''
+      )
+      if (!isNaN(viewCount)) return viewCount
+      else return 0
     },
   },
   methods: {
@@ -161,6 +206,24 @@ export default {
       AnalyticsService.captureEvent(EVENTS.GLEAP_BOT_SHOWN)
       Gleap.startBot('64b555f1e8dd226df869b2e7')
       AnalyticsService.updateUser({ hasMessages: false })
+    },
+    toggleFallIncentiveEnrollmentModal() {
+      this.showFallIncentiveEnrollmentModal =
+        !this.showFallIncentiveEnrollmentModal
+    },
+    triggerIncentiveProgramBanner() {
+      this.$store.dispatch('app/header/show', {
+        component: 'FallIncentiveHeader',
+      })
+      Gleap.trackEvent('fall-incentive-program')
+    },
+    triggerIncentiveEnrollmentModal() {
+      if (this.showFallIncentiveEnrollmentModal) return
+      localStorage.setItem(
+        'fallIncentiveEnrollmentViewCount',
+        this.fallIncentiveProgramModalViewCount + 1
+      )
+      this.showFallIncentiveEnrollmentModal = true
     },
   },
   watch: {
@@ -184,6 +247,11 @@ export default {
     isSessionAlive(isAlive) {
       if (!isAlive) {
         this.$store.dispatch('app/header/show', defaultHeaderData)
+        if (
+          this.isFallIncentiveProgramEnabled &&
+          this.user.banType !== 'complete'
+        )
+          this.triggerIncentiveProgramBanner()
       } else {
         this.$store.dispatch('app/header/show', activeHeaderData)
       }
@@ -218,6 +286,15 @@ export default {
           )
       },
       deep: true,
+    },
+    isFallIncentiveProgramEnabled(currentValue, prevValue) {
+      if (currentValue && !prevValue) this.triggerIncentiveProgramBanner()
+    },
+    shouldSeeIncentiveModalForFirstTime(currentValue, prevValue) {
+      if (currentValue && !prevValue) this.triggerIncentiveEnrollmentModal()
+    },
+    shouldSeeIncentiveModalForSecondTime(currentValue, prevValue) {
+      if (currentValue && !prevValue) this.triggerIncentiveEnrollmentModal()
     },
   },
 }
