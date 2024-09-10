@@ -91,10 +91,11 @@ import Loader from '@/components/Loader.vue'
 import Modal from '@/components/Modal.vue'
 import { VERIFICATION_METHOD } from '@/consts'
 import AuthService from '@/services/AuthService'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import RecaptchaCaption from '@/components/recaptcha/RecaptchaCaption.vue'
+import * as UserProductFlagsService from '@/services/UserProductFlagsService'
 
 export default {
   name: 'verification-modal',
@@ -158,6 +159,11 @@ export default {
     },
     ...mapState({
       user: (state) => state.user.user,
+      productFlags: (state) => state.productFlags.flags,
+    }),
+    ...mapGetters({
+      isFallIncentiveProgramEnabled:
+        'featureFlags/isFallIncentiveProgramEnabled',
     }),
     isValidVerificationCode() {
       return !(
@@ -211,6 +217,13 @@ export default {
           this.verificationComplete = true
           if (this.verificationMethod === VERIFICATION_METHOD.SMS) {
             AnalyticsService.captureEvent(EVENTS.PHONE_NUMBER_VERIFIED)
+            if (
+              !this.productFlags.fallIncentiveEnrollmentAt &&
+              this.isFallIncentiveProgramEnabled
+            )
+              await UserProductFlagsService.enrollStudentToIncentiveProgram(
+                this.$store
+              )
 
             if (this.user.phone !== this.phoneOrEmailToVerify) {
               AnalyticsService.captureEvent(EVENTS.PHONE_NUMBER_UPDATED)
