@@ -6,7 +6,7 @@
     "serve": "VITE_CJS_TRACE=true vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy:hackers": "echo '{\"version\": \"'$(date +%s%N | cut -b1-13)'\"}' > public/version.json && doppler run --token $(op read op://engineering/doppler-hackers-high-line/password) -- npm run build && swa deploy --no-use-keychain --resource-group hackers-resource-group --app-name hackers-static-web-app --env production ./dist",
+    "deploy:dev": "echo '{\"version\": \"'$(date +%s%N | cut -b1-13)'\"}' > public/version.json && doppler run --token $(op read op://engineering/doppler-high-line-dev/password) -- npm run build && swa deploy --no-use-keychain --resource-group development-resource-group --app-name development-static-web-app --env production ./dist",
     "deploy:local": "echo '{\"version\": \"'$(date +%s%N | cut -b1-13)'\"}' > public/version.json && doppler run --token $(op read op://private/doppler-high-line/password) -- npm run build && swa deploy --no-use-keychain --resource-group $(op read op://private/doppler-high-line/resource-group) --app-name $(op read op://private/doppler-high-line/app-name) --env production ./dist",
     "start": "node server.js",
     "lint": "eslint --ext .js,.vue,.ts --ignore-path .gitignore --fix src tests",
