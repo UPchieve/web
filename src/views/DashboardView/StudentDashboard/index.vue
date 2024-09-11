@@ -115,11 +115,13 @@ export default {
       })
     }
 
-    if (this.isOrbitalSegmentsActive)
-      ProductDiscoveryService.triggerDynamicSegment(
+    if (this.isOrbitalSegmentsActive) {
+      ProductDiscoveryService.triggerOrbitalSegment(
+        this,
         this.user,
         this.orbitalSegments
       )
+    }
 
     if (
       this.hadASession &&
@@ -280,7 +282,8 @@ export default {
             !prevValue[1].length ||
             !prevValue[2])
         )
-          ProductDiscoveryService.triggerDynamicSegment(
+          ProductDiscoveryService.triggerOrbitalSegment(
+            this,
             this.user,
             this.orbitalSegments
           )
