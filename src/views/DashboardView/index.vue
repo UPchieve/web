@@ -38,6 +38,7 @@ export default {
     }
     if (this.isGleapSegmentExperimentsActive)
       ProductDiscoveryService.triggerDynamicGleapWidget(
+        this,
         this.user,
         this.gleapSegmentExperiments
       )
@@ -51,6 +52,7 @@ export default {
           (!Object.keys(prevValue[0]).length || !prevValue[1].length)
         )
           ProductDiscoveryService.triggerDynamicGleapWidget(
+            this,
             this.user,
             this.gleapSegmentExperiments
           )
