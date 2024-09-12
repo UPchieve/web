@@ -43,12 +43,16 @@
         required="true"
         show-code-on-list
         @update="handlePhoneUpdate"
+        :country-code="showNationalPhoneNumbersOnly ? 'US' : null"
+        :only-countries="showNationalPhoneNumbersOnly ? ['US'] : null"
+        :no-search="showNationalPhoneNumbersOnly ? true : false"
       />
     </div>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { VERIFICATION_METHOD } from '@/consts'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 
@@ -91,6 +95,9 @@ export default {
     },
   },
   computed: {
+    ...mapGetters({
+      showNationalPhoneNumbersOnly: 'user/showNationalPhoneNumbersOnly',
+    }),
     VERIFICATION_METHOD() {
       return VERIFICATION_METHOD
     },

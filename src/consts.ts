@@ -663,6 +663,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   COLLEGE_PREP_AD: 'college-prep-ad',
   TUTOR_BOT_CHAT: 'tutor-bot-chat',
   FALL_INCENTIVE_PROGRAM: 'fall-incentive-program',
+  NATIONAL_STUDENT_PHONE: 'national-student-phone',
 }
 
 export const ANALYTICS_REPORT_ROW = {

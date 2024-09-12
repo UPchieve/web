@@ -475,5 +475,17 @@ export default {
         (subject) => subject.totalUnreadReports > 0
       )
     },
+
+    showNationalPhoneNumbersOnly: (
+      _state,
+      getters,
+      _rootState,
+      rootGetters
+    ) => {
+      return (
+        getters.isStudent &&
+        rootGetters['featureFlags/isNationalStudentPhoneEnabled']
+      )
+    },
   },
 }
