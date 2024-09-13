@@ -73,7 +73,7 @@
       <div class="right-btns">
         <button
           class="uc-form-button"
-          @click="accept()"
+          @click="createAssignment()"
           :disabled="!isFormValid"
         >
           Save
@@ -88,6 +88,7 @@ import Modal from '@/components/Modal.vue'
 import FormInput from '@/components/FormInput.vue'
 import FormDateInput from '@/components/FormDateInput.vue'
 import FormSelect from '@/components/FormSelect.vue'
+import NetworkService from '@/services/NetworkService'
 import moment from 'moment'
 import { mapState } from 'vuex'
 
@@ -153,6 +154,33 @@ export default {
           })
           return filteredSubject
         })
+    },
+
+    async createAssignment() {
+      const assignmentData = {
+        description: this.description,
+        title: this.assignmentName,
+        numberOfSessions: this.numSessions,
+        minDurationInMinutes: this.numMinutes,
+        dueDate: new Date(this.dueDate),
+        startDate: new Date(this.startDate),
+        isRequired: false,
+        subjectId: this.selectedSessionToComplete.id,
+      }
+
+      try {
+        await Promise.all(
+          this.selectedClasses.map((selectedClass) =>
+            NetworkService.createAssignment({
+              classId: selectedClass.id,
+              ...assignmentData,
+            })
+          )
+        )
+        this.$store.dispatch('app/modal/hide')
+      } catch (err) {
+        this.error = err.response.data.err ?? 'Unable to create assignment.'
+      }
     },
   },
 }
