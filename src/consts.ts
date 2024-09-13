@@ -664,6 +664,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   TUTOR_BOT_CHAT: 'tutor-bot-chat',
   FALL_INCENTIVE_PROGRAM: 'fall-incentive-program',
   NATIONAL_STUDENT_PHONE: 'national-student-phone',
+  ASSIGNMENTS: 'assignments',
 }
 
 export const ANALYTICS_REPORT_ROW = {
