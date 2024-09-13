@@ -1032,4 +1032,10 @@ export default {
       studentIds,
     }).then(this._successHandler, this._errorHandler)
   },
+  getAllAssignmentsForTeacher() {
+    return httpPost(`${API_ROOT}/teachers/assignments`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
 }
