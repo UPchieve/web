@@ -536,6 +536,11 @@ const routes = [
       },
     ],
   },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'Not Found',
+    beforeEnter: async (_to, _from, next) => next('/')
+  }
 ]
 
 /**
