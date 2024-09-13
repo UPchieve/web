@@ -1020,4 +1020,10 @@ export default {
       `${API_ROOT}/product-flags/fall-incentive-enrollment/denied`
     ).then(this._successHandler, this._errorHandler)
   },
+  createAssignment(assignmentData) {
+    return httpPost(`${API_ROOT}/assignment`, assignmentData).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
 }
