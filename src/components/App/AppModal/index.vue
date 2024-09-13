@@ -36,6 +36,7 @@ import ReportSessionModal from '@/views/SessionView/ReportSessionModal.vue'
 import StartCollegeSessionModal from '@/views/DashboardView/StudentDashboard/StartCollegeSessionModal.vue'
 import CreateTeacherClassModal from '@/components/CreateTeacherClassModal.vue'
 import TeacherClassCodeModal from '@/components/TeacherClassCodeModal.vue'
+import CreateAssignmentModal from '@/components/CreateAssignmentModal.vue'
 
 export default {
   components: {
@@ -52,6 +53,7 @@ export default {
     StartCollegeSessionModal,
     CreateTeacherClassModal,
     TeacherClassCodeModal,
+    CreateAssignmentModal,
   },
   data() {
     return {

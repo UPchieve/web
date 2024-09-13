@@ -20,7 +20,7 @@
       :class="{
         'uc-form-text-input-invalid': hasValidationError(),
       }"
-      type="text"
+      :type="type"
       :placeholder="placeholder"
       :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
@@ -68,8 +68,12 @@ export default {
       type: String,
       default: '',
     },
-    modelValue: {
+    type: {
       type: String,
+      default: 'text',
+    },
+    modelValue: {
+      type: [String, Number],
       default: '',
     },
   },
