@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
 import VerificationMethodSelector from '@/views/VerificationView/VerificationMethodSelector.vue'
+import store from '@/store'
 
 describe('VerificationMethodSelector', () => {
   beforeEach(() => {
@@ -8,6 +9,9 @@ describe('VerificationMethodSelector', () => {
 
   const getWrapper = (email = 'testEmail@gmail.com') => {
     return mount(VerificationMethodSelector, {
+      global: {
+        plugins: [store],
+      },
       props: {
         email,
       },
