@@ -6,14 +6,22 @@
           ← Back to your classes
         </button>
         <div class="class-info">
-          <h1>{{ classInfo.name }}</h1>
-          <span class="students-text"
-            >{{ classInfo.totalStudents || '0' }}
-            {{ classInfo.totalStudents == 1 ? 'student' : 'students' }}</span
-          >
-          <button @click="openTeacherCodeModal">
-            <LinkUnion /><span class="class-code-text">Class Code</span>
-          </button>
+          <div class="start-col">
+            <h1>{{ classInfo.name }}</h1>
+            <span class="students-text"
+              >{{ classInfo.totalStudents || '0' }}
+              {{ classInfo.totalStudents == 1 ? 'student' : 'students' }}</span
+            >
+            <button
+              class="open-teacher-code-modal"
+              @click="openTeacherCodeModal"
+            >
+              <LinkUnion /><span class="class-code-text">Class Code</span>
+            </button>
+          </div>
+          <div v-if="isAssignmentsEnabled" class="end-col">
+            <button class="create-assignment-btn">Create Assignments</button>
+          </div>
         </div>
       </div>
       <div class="classes-container">
@@ -68,6 +76,7 @@ import RightArrow from '@/assets/RightArrow.svg'
 import LinkUnion from '@/assets/LinkUnion.svg'
 import Checklist from '@/assets/Checklist.svg'
 import moment from 'moment'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'ClassDetails',
@@ -87,6 +96,11 @@ export default {
       student: {},
       studentId: '',
     }
+  },
+  computed: {
+    ...mapGetters({
+      isAssignmentsEnabled: 'featureFlags/isAssignmentsEnabled',
+    }),
   },
   props: {
     topics: {
@@ -226,26 +240,36 @@ export default {
 }
 
 .class-info {
-  display: flex;
-  align-items: center;
+  @include flex-container(row, space-between, left);
   margin-bottom: 10px;
+
+  h1 {
+    font-size: 24px;
+    margin-right: 14px;
+    margin-bottom: 0;
+  }
 }
 
-.class-info h1 {
-  font-size: 24px;
-  margin-right: 14px;
-  margin-bottom: 0;
+.start-col {
+  @include flex-container(row, left, center);
+
+  span {
+    font-size: 15px;
+    margin-right: 14px;
+  }
 }
 
-.class-info button {
+.create-assignment-btn {
+  background-color: #1855d1;
+  border-radius: 24px;
+  padding: 10px 16px;
+  color: #ffffff;
+  font-size: 12px;
+}
+
+.open-teacher-code-modal {
   font-size: 15px;
   color: #1855d1;
-  justify-content: left;
-}
-
-.class-info span {
-  font-size: 15px;
-  margin-right: 14px;
 }
 
 .students-text {
@@ -262,22 +286,23 @@ export default {
   border-radius: 10px;
   overflow: hidden;
   background-color: #ffffff;
-}
 
-.classes-table th {
-  background-color: #e3f2fd;
-  padding: 8px;
-  font-size: 16px;
-  font-weight: 500;
-}
-.classes-table tr {
-  text-align: center;
-}
+  th {
+    background-color: #e3f2fd;
+    padding: 8px;
+    font-size: 16px;
+    font-weight: 500;
+  }
 
-.classes-table td {
-  padding: 14px;
-  font-weight: 400;
-  font-size: 14px;
+  tr {
+    text-align: center;
+  }
+
+  td {
+    padding: 14px;
+    font-weight: 400;
+    font-size: 14px;
+  }
 }
 
 .view-details-btn {
