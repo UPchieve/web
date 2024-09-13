@@ -264,7 +264,8 @@ export default {
           currentValue &&
           !prevValue &&
           !getCookie('hasSeenTellThemCollegePrepModal') &&
-          this.user.pastSessions.length >= 1
+          this.user.pastSessions.length >= 1 &&
+          this.isCollegePrepAdEnabled
         ) {
           this.showTellThemCollegePrepModal = true
         }
