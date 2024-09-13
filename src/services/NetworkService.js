@@ -1026,4 +1026,10 @@ export default {
       this._errorHandler
     )
   },
+  addAssignmentToClass(assignmentId, classIds, studentIds) {
+    return httpPost(`${API_ROOT}/assignment/${assignmentId}`, {
+      classIds,
+      studentIds,
+    }).then(this._successHandler, this._errorHandler)
+  },
 }
