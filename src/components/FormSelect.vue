@@ -23,6 +23,7 @@
       :clearable="false"
       :loading="isLoading"
       :value="modelValue"
+      :multiple="multiple"
       @update:model-value="$emit('update:modelValue', $event)"
       class="uc-form-select-input"
       :class="{
@@ -44,6 +45,10 @@ export default {
   props: {
     blurEvent: {
       type: String,
+    },
+    multiple: {
+      type: Boolean,
+      default: false,
     },
     getSelectOptions: {
       type: Function,
@@ -69,7 +74,7 @@ export default {
       type: Function,
     },
     modelValue: {
-      type: [String, Number],
+      type: [String, Number, Array],
     },
   },
   emits: ['update:modelValue', 'open', 'close'],

@@ -4,6 +4,7 @@
       v-if="this.view === 'classDetails'"
       :classInfo="currentClassInfo"
       :classId="classId"
+      :classes="classes"
     />
     <StudentDetails
       v-else-if="this.view === 'studentDetails'"

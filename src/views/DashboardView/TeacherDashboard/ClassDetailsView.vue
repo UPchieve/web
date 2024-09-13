@@ -103,8 +103,8 @@ export default {
     }),
   },
   props: {
-    topics: {
-      type: Object,
+    classes: {
+      type: Array,
     },
     classId: {
       type: String,
@@ -187,6 +187,16 @@ export default {
         component: 'TeacherClassCodeModal',
         data: {
           code,
+        },
+      })
+    },
+
+    openCreateAssignmentModal() {
+      const classes = this.classes
+      this.$store.dispatch('app/modal/show', {
+        component: 'CreateAssignmentModal',
+        data: {
+          classes,
         },
       })
     },

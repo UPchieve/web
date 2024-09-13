@@ -185,11 +185,6 @@
     padding: 0;
   }
 
-  .vs__selected {
-    margin: 0;
-    padding: 0;
-  }
-
   &-invalid {
     .vs__dropdown-toggle {
       outline: 1px solid $c-error-red;
@@ -238,6 +233,30 @@
     }
   }
 }
+
+.v-select.vs--multiple.uc-form-select-input {
+  .vs__dropdown-toggle {
+    padding: 8px;
+    height: auto;
+    min-height: 48px;
+  }
+  .vs__selected-options { 
+    gap: 6px;
+  }
+  .vs__selected {
+    margin: 0;
+    padding: 2px;
+    font-size: 12px;
+  }
+}
+
+.v-select.vs--single.uc-form-select-input {
+  .vs__selected {
+    margin: 0;
+    padding: 0;
+  }
+}
+
 
 /// Helper class for creating a basic form checkbox.
 ///
