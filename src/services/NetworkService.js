@@ -1032,6 +1032,12 @@ export default {
       this._errorHandler
     )
   },
+  getAssignmentById(assignmentId) {
+    return httpGet(`${API_ROOT}/assignment/${assignmentId}`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
   createAssignment(assignmentData) {
     return httpPost(`${API_ROOT}/assignment`, assignmentData).then(
       this._successHandler,
