@@ -37,6 +37,7 @@ import SessionView from './views/SessionView/index.vue'
 import SetPasswordView from './views/SetPasswordView.vue'
 import SignupView from './views/SignupView/index.vue'
 import StudentPartnerSignupView from './views/SignupView/StudentPartnerSignupView.vue'
+import StudentClassesView from './views/StudentClassesView.vue'
 import TrainingCourseView from './views/TrainingCourseView/index.vue'
 import TrainingView from './views/TrainingView.vue'
 import VerificationView from './views/VerificationView/index.vue'
@@ -234,6 +235,19 @@ const routes = [
         return next(to, from)
       }
 
+      return next()
+    },
+  },
+  {
+    path: '/classes/:classId?',
+    name: 'StudentClassesView',
+    component: StudentClassesView,
+    meta: { protected: true },
+    props: true,
+    beforeEnter: async (_to, _from, next) => {
+      if (!store.getters['user/isStudent']) {
+        return next('/dashboard')
+      }
       return next()
     },
   },

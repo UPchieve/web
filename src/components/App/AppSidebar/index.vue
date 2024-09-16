@@ -79,6 +79,7 @@ $transition: transform 700ms;
   @include bind-app-sidebar-width(width);
 
   background: white;
+  box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
   height: 100%;
   overflow-y: auto;
 
