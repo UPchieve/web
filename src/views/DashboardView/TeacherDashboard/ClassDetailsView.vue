@@ -24,6 +24,22 @@
           </div>
         </div>
       </div>
+      <div v-if="isAssignmentsEnabled" class="tabs">
+        <p
+          class="tabs__header-type"
+          :class="isSelected === 'classDetails' ? 'is-selected' : null"
+          @click="openTab(isSelected)"
+        >
+          Class Details
+        </p>
+        <p
+          class="tabs__header-type"
+          :class="isSelected === 'assignments' ? 'is-selected' : null"
+          @click="openTab(isSelected)"
+        >
+          Assignments
+        </p>
+      </div>
       <div class="classes-container">
         <loader v-if="isLoading" />
         <div v-else-if="!students.length" class="empty-sessions-container">
@@ -95,6 +111,7 @@ export default {
       view: '',
       student: {},
       studentId: '',
+      isSelected: 'classDetails',
     }
   },
   computed: {
@@ -207,6 +224,11 @@ export default {
         `/dashboard/teacher/class/${this.classInfo.id}/student/${student.id}`
       )
     },
+
+    openTab(isSelected) {
+      if (isSelected === 'classDetails') this.isSelected = 'assignments'
+      else this.isSelected = 'classDetails'
+    },
   },
 }
 </script>
@@ -214,11 +236,16 @@ export default {
 <style lang="scss" scoped>
 .main {
   @include flex-container(column, center);
-  margin: 40px;
+  margin-top: 40px;
 }
 
 .teacher-dashboard {
   padding: 0 !important;
+}
+
+.class-header {
+  margin-left: 40px;
+  margin-right: 40px;
 }
 
 .empty-sessions-container {
@@ -287,7 +314,7 @@ export default {
 }
 
 .classes-container {
-  margin-top: 16px;
+  margin: 16px 40px 0 40px;
 }
 
 .classes-table {
@@ -329,5 +356,33 @@ export default {
   color: #1855d1;
   margin-bottom: 16px;
   font-size: 14px;
+}
+
+.tabs {
+  @include flex-container(row, flex-start, left);
+  margin-top: 1em;
+  text-align: left;
+  gap: 2em;
+  border-bottom: 4px solid #d8dee5;
+  z-index: 0;
+
+  &__header-type {
+    padding-bottom: 0.8em;
+    font-size: 16px;
+    margin-bottom: -4px;
+    margin-left: 40px;
+    border-bottom: 4px solid transparent;
+    padding-right: 0.5em;
+    text-align: left;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+.is-selected {
+  border-bottom: 4px solid $c-success-green;
+  z-index: 5;
 }
 </style>
