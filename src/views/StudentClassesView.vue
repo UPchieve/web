@@ -18,7 +18,7 @@ const $store = useStore()
 const $router = useRouter()
 
 const props = defineProps({
-  classId: { type: String, required: true },
+  classId: { type: String, required: false },
   assignmentId: { type: String, required: false },
 })
 
@@ -206,6 +206,7 @@ function viewAssignment(assignment: Assignment) {
       <div
         v-else-if="errorMessage"
         class="uc-column items-center justify-center h-full"
+        data-testid="error-message-container"
       >
         <updog-crying />
         <p class="mt-4">
@@ -214,7 +215,10 @@ function viewAssignment(assignment: Assignment) {
         <p>Error: {{ errorMessage }}</p>
       </div>
 
-      <div v-else-if="!allStudentClasses.length">
+      <div
+        v-else-if="!allStudentClasses.length"
+        data-testid="no-classes-container"
+      >
         You don't have any classes yet!
       </div>
 
@@ -224,6 +228,7 @@ function viewAssignment(assignment: Assignment) {
             v-for="(teacherClass, index) in allStudentClasses"
             :key="teacherClass.id"
             class="tabs"
+            data-testid="student-class"
             :class="{
               selected: teacherClass.id === currentClass?.id,
               'first-child': index === 0,
@@ -231,7 +236,7 @@ function viewAssignment(assignment: Assignment) {
             @click="viewClass(teacherClass)"
             role="button"
           >
-            <h2>{{ teacherClass.name }}</h2>
+            <h2 data-testid="student-class-name">{{ teacherClass.name }}</h2>
           </div>
           <div class="divider"></div>
         </div>
@@ -246,6 +251,7 @@ function viewAssignment(assignment: Assignment) {
               v-for="assignment in currentClass?.assignments"
               :key="assignment.id"
               class="assignment-card"
+              data-testid="current-assignments"
             >
               <div class="uc-row items-center">
                 <img
@@ -256,16 +262,26 @@ function viewAssignment(assignment: Assignment) {
                 />
                 <task-badge v-else class="assignment-task-badge" aria-hidden />
                 <div class="uc-column ml-3">
-                  <a class="title link" @click="viewAssignment(assignment)">{{
-                    assignment.title
-                  }}</a>
-                  <p class="meta-text">
+                  <a
+                    class="title link"
+                    @click="viewAssignment(assignment)"
+                    data-testid="current-assignment-title"
+                    >{{ assignment.title }}</a
+                  >
+                  <p
+                    class="meta-text"
+                    data-testid="current-assignment-due-date"
+                  >
                     Due Date:
                     {{ getAssignmentDueDate(assignment) }}
                   </p>
                 </div>
               </div>
-              <button class="outlined" @click="startSession(assignment)">
+              <button
+                class="outlined"
+                @click="startSession(assignment)"
+                data-testid="start-session-button"
+              >
                 Start Session <arrow-icon class="icon" />
               </button>
             </div>
@@ -275,6 +291,7 @@ function viewAssignment(assignment: Assignment) {
               v-for="assignment in currentClass?.pastAssignments"
               :key="assignment.id"
               class="assignment-card past"
+              data-testid="past-assignments"
             >
               <div class="uc-row items-center">
                 <div
@@ -288,8 +305,10 @@ function viewAssignment(assignment: Assignment) {
                   <cross-icon v-else class="icon" />
                 </div>
                 <div class="uc-column ml-3">
-                  <p class="title">{{ assignment.title }}</p>
-                  <p class="meta-text">
+                  <p class="title" data-testid="past-assignment-title">
+                    {{ assignment.title }}
+                  </p>
+                  <p class="meta-text" data-testid="past-assignment-due-date">
                     Due Date: {{ getAssignmentDueDate(assignment) }}
                   </p>
                 </div>
@@ -297,6 +316,7 @@ function viewAssignment(assignment: Assignment) {
               <div
                 class="assignment-status-text"
                 :class="{ completed: hadCompletedAssignment(assignment) }"
+                data-testid="past-assignment-status"
               >
                 {{
                   hadCompletedAssignment(assignment)
@@ -306,7 +326,11 @@ function viewAssignment(assignment: Assignment) {
               </div>
             </div>
           </div>
-          <div v-else class="uc-row justify-center">
+          <div
+            v-else
+            class="uc-row justify-center"
+            data-testid="no-assignments-container"
+          >
             You don't have any tasks yet!
           </div>
         </section>
