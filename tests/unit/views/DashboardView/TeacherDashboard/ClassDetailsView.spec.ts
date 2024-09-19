@@ -125,7 +125,9 @@ describe('Class Details View', () => {
     const studentRows = wrapper.findAll('[data-testid="student-row"]')
     expect(studentRows.length).toBe(students.length)
     const firstRowCells = studentRows[0].findAll('td')
-    expect(firstRowCells[0].text()).toBe(students[0].firstName)
+    expect(firstRowCells[0].text()).toBe(
+      students[0].firstName + ' ' + students[0].lastName
+    )
     expect(firstRowCells[1].text()).toBe(String(students[0].numSessions))
     expect(firstRowCells[2].text()).toBe(students[0].timeTutored)
     expect(firstRowCells[3].text()).toBe(students[0].lastSession)
