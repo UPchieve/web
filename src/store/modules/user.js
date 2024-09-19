@@ -460,6 +460,8 @@ export default {
       } else if (getters.isStudent) {
         userProps.partner = state.user.studentPartnerOrg
         userProps.gradeLevel = state.user.gradeLevel
+        userProps.usesClever = state.user.usesClever
+        userProps.usesGoogle = state.user.usesGoogle
         if (state.user.isSchoolPartner) {
           userProps.schoolPartner = state.user.schoolName
         }
