@@ -11,7 +11,7 @@
             <student-avatar class="img"></student-avatar>
           </div>
           <div class="student-info-text">
-            <h1>{{ studentFirstName }}</h1>
+            <h1>{{ studentFirstName }} {{ studentLastName }}</h1>
             <h3>{{ className }}</h3>
           </div>
         </div>
@@ -164,6 +164,7 @@ export default {
           data: { sessionDetails },
         } = await NetworkService.getStudentSessionDetails(this.studentId)
         this.studentFirstName = sessionDetails[0].firstName
+        this.studentLastName = sessionDetails[0].lastName
         const subjects = this.subjects
         const sessionsWithSubjects = sessionDetails.map((session) => {
           const created = new Date(session.createdAt)
