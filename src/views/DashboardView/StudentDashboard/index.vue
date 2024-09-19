@@ -292,6 +292,15 @@ export default {
       deep: true,
     },
     isFallIncentiveProgramEnabled(currentValue, prevValue) {
+      if (!currentValue && prevValue) {
+        this.$store.dispatch('app/header/show', {
+          component: 'DefaultHeader',
+        })
+        this.showFallIncentiveEnrollmentModal = false
+        AnalyticsService.captureEvent(
+          EVENTS.STUDENT_FALL_INCENTIVE_PROGRAM_ACCESS_REVOKED
+        )
+      }
       if (currentValue && !prevValue) this.triggerIncentiveProgramBanner()
     },
     shouldSeeIncentiveModalForFirstTime(currentValue, prevValue) {

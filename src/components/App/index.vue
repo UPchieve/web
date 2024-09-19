@@ -211,6 +211,7 @@ export default {
       user: (state) => state.user.user,
       session: (state) => state.user.session,
       subjects: (state) => state.subjects.subjects,
+      productFlags: (state) => state.productFlags.flags,
       isConnected: (state) => state.socket.isConnected,
     }),
     ...mapGetters({
@@ -229,14 +230,19 @@ export default {
     },
   },
   watch: {
-    user(currentUserValue, previousUserValue) {
+    async user(currentUserValue, previousUserValue) {
       const nowLoggedIn = currentUserValue.id && !previousUserValue.id
       if (nowLoggedIn) {
         if (!this.$store.state.socket.isConnected) {
           this.$store.dispatch('socket/connect')
         }
 
-        const userProps = this.getUserPropsForAnalytics
+        await this.$store.dispatch('productFlags/getUserProductFlags')
+        const userProps = {
+          ...this.getUserPropsForAnalytics,
+          fallIncentiveEnrollmentAt:
+            this.productFlags.fallIncentiveEnrollmentAt ?? null,
+        }
         FeatureFlagService.setPersonPropertiesForFlags(userProps)
 
         AnalyticsService.identify(currentUserValue.id, userProps)
@@ -248,7 +254,6 @@ export default {
           })
         }
 
-        this.$store.dispatch('productFlags/getUserProductFlags')
         if (Object.entries(this.subjects).length === 0)
           this.$store.dispatch('subjects/getSubjects')
 
