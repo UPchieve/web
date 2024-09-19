@@ -65,7 +65,7 @@
             :key="student.id"
             data-testid="student-row"
           >
-            <td>{{ student.firstName }}</td>
+            <td>{{ student.firstName }} {{ student.lastName }}</td>
             <td>{{ student.numSessions }}</td>
             <td>{{ student.timeTutored }}</td>
             <td>{{ student.lastSession }}</td>
