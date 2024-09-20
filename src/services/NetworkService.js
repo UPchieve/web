@@ -1020,8 +1020,26 @@ export default {
       `${API_ROOT}/product-flags/fall-incentive-enrollment/denied`
     ).then(this._successHandler, this._errorHandler)
   },
+  getStudentClasses() {
+    return httpGet(`${API_ROOT}/students/classes`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
+  getStudentAssignments() {
+    return httpGet(`${API_ROOT}/students/assignments`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
   createAssignment(assignmentData) {
     return httpPost(`${API_ROOT}/assignment`, assignmentData).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
+  getAllAssignmentsForTeacher() {
+    return httpPost(`${API_ROOT}/teachers/assignments`).then(
       this._successHandler,
       this._errorHandler
     )
@@ -1031,11 +1049,5 @@ export default {
       classIds,
       studentIds,
     }).then(this._successHandler, this._errorHandler)
-  },
-  getAllAssignmentsForTeacher() {
-    return httpPost(`${API_ROOT}/teachers/assignments`).then(
-      this._successHandler,
-      this._errorHandler
-    )
   },
 }
