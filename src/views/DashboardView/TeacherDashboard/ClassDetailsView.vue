@@ -45,7 +45,7 @@
           Assignments
         </p>
       </div>
-      <div class="classes-container">
+      <div v-if="isSelected === 'classDetails'" class="classes-container">
         <loader v-if="isLoading" />
         <div v-else-if="!students.length" class="empty-sessions-container">
           <Checklist />
@@ -86,6 +86,40 @@
           </tr>
         </table>
       </div>
+      <div
+        v-else
+        :class="
+          !assignments.length
+            ? 'assignments-container-empty'
+            : 'assignments-container'
+        "
+      >
+        <div v-if="!assignments.length" class="empty-assignments-container">
+          <h1>No Assignments Yet!</h1>
+          <p>
+            Create an assignment to kickstart your students' learning journey.
+          </p>
+          <button
+            class="create-assignment-btn"
+            @click="openCreateAssignmentModal()"
+          >
+            Create Assignments
+          </button>
+        </div>
+        <div v-else class="assignments-cards">
+          <div
+            v-for="assignment in assignments"
+            :key="assignment.id"
+            class="assignment-card"
+          >
+            <AssignmentIcon />
+            <div class="assignment-info">
+              <h1>{{ assignment.title }}</h1>
+              <p>Due date: {{ formatTimestamp(assignment.dueDate) }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -96,6 +130,7 @@ import NetworkService from '@/services/NetworkService'
 import RightArrow from '@/assets/RightArrow.svg'
 import LinkUnion from '@/assets/LinkUnion.svg'
 import Checklist from '@/assets/Checklist.svg'
+import AssignmentIcon from '@/assets/AssignmentIcon.svg'
 import moment from 'moment'
 import { mapGetters } from 'vuex'
 
@@ -106,6 +141,7 @@ export default {
     RightArrow,
     LinkUnion,
     Checklist,
+    AssignmentIcon,
   },
 
   data() {
@@ -117,6 +153,7 @@ export default {
       student: {},
       studentId: '',
       isSelected: 'classDetails',
+      assignments: [],
     }
   },
   computed: {
@@ -142,6 +179,7 @@ export default {
     } else if (!this.$route.params.classId) {
       this.$router.push('/dashboard')
     }
+    this.assignments = await this.getClassAssignments()
   },
 
   methods: {
@@ -234,6 +272,13 @@ export default {
       if (isSelected === 'classDetails') this.isSelected = 'assignments'
       else this.isSelected = 'classDetails'
     },
+
+    async getClassAssignments() {
+      const {
+        data: { assignments },
+      } = await NetworkService.getAssignmentsByClassId(this.classId)
+      return assignments
+    },
   },
 }
 </script>
@@ -242,10 +287,13 @@ export default {
 .main {
   @include flex-container(column, center);
   margin-top: 40px;
+  flex-grow: 1;
 }
 
 .teacher-dashboard {
+  @include flex-container(column, center);
   padding: 0 !important;
+  height: 90vh;
 }
 
 .class-header {
@@ -306,7 +354,7 @@ export default {
   border-radius: 24px;
   padding: 10px 16px;
   color: #ffffff;
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .open-teacher-code-modal {
@@ -320,6 +368,7 @@ export default {
 
 .classes-container {
   margin: 16px 40px 0 40px;
+  flex-grow: 1;
 }
 
 .classes-table {
@@ -361,6 +410,54 @@ export default {
   color: #1855d1;
   margin-bottom: 16px;
   font-size: 14px;
+}
+
+.assignments-container {
+  background-color: #ffffff;
+  flex-grow: 1;
+}
+
+.assignments-container-empty {
+  @include flex-container(column, center, center);
+  background-color: #ffffff;
+  flex-grow: 1;
+}
+
+.empty-assignments-container {
+  @include flex-container(column, center, center);
+  gap: 0.5em;
+  h1 {
+    font-size: 20px;
+  }
+}
+
+.assignments-cards {
+  @include flex-container(row, flex-start, center);
+  flex-grow: 1;
+  margin: 20px;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.assignment-card {
+  @include flex-container(row, flex-start);
+  border: solid $c-border-grey;
+  border-radius: 10px;
+  gap: 12px;
+  padding: 16px;
+  height: auto;
+
+  h1 {
+    font-size: 20px;
+    margin-bottom: 0;
+    font-weight: 600;
+  }
+
+  p {
+    font-size: 16px;
+    color: $c-soft-black;
+    margin-bottom: 0;
+  }
 }
 
 .tabs {
