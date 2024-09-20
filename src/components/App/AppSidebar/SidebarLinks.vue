@@ -37,6 +37,14 @@
       </sidebar-link>
 
       <sidebar-link
+        v-if="showStudentMyClassesLink"
+        to="/classes"
+        text="My Classes"
+      >
+        <book-icon class="icon" />
+      </sidebar-link>
+
+      <sidebar-link
         v-if="isVolunteer"
         to="/training"
         text="Training"
@@ -93,6 +101,7 @@
 import { mapGetters } from 'vuex'
 import SidebarLink from './SidebarLink.vue'
 import ArchiveIcon from '@/assets/archive.svg'
+import BookIcon from '@/assets/book-icon.svg'
 import CalendarIcon from '@/assets/sidebar_icons/calendar.svg'
 import EnvelopeIcon from '@/assets/sidebar_icons/envelope.svg'
 import FolderIcon from '@/assets/sidebar_icons/folder.svg'
@@ -112,6 +121,7 @@ export default {
   components: {
     SidebarLink,
     ArchiveIcon,
+    BookIcon,
     CalendarIcon,
     EnvelopeIcon,
     FolderIcon,
@@ -128,6 +138,7 @@ export default {
     authenticated: Boolean,
     isAdmin: Boolean,
     mobileMode: Boolean,
+    numberOfStudentClasses: Number,
   },
   computed: {
     ...mapGetters({
@@ -138,7 +149,15 @@ export default {
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
       isTeacher: 'user/isTeacher',
+      isStudentClassesEnabled: 'featureFlags/isAssignmentsEnabled',
     }),
+    showStudentMyClassesLink() {
+      return (
+        this.isStudent &&
+        this.isStudentClassesEnabled &&
+        this.numberOfStudentClasses > 0
+      )
+    },
   },
   methods: {
     openReferFriendModal() {

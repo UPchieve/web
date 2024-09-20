@@ -3,6 +3,7 @@ import SidebarLinks from '@/components/App/AppSidebar/SidebarLinks.vue'
 import { shallowMount } from '@vue/test-utils'
 import { createStore } from 'vuex'
 import userModule from '@/store/modules/user'
+import featureFlagsModule from '@/store/modules/feature-flags'
 
 // General links
 const CONTACT_LINK = { to: '/contact', text: 'Contact us' }
@@ -17,6 +18,10 @@ const SESSION_HISTORY_LINK = {
 const FAVORITE_COACHES_LINK = {
   to: '/favorite-coaches',
   text: 'Favorite Coaches',
+}
+const MY_CLASSES_LINK = {
+  to: '/classes',
+  text: 'My Classes',
 }
 
 // Volunteer links
@@ -41,6 +46,14 @@ const links = {
       DASHBOARD_LINK,
       SESSION_HISTORY_LINK,
       FAVORITE_COACHES_LINK,
+      PROFILE_LINK,
+      CONTACT_LINK,
+    ],
+    studentWithClasses: [
+      DASHBOARD_LINK,
+      SESSION_HISTORY_LINK,
+      FAVORITE_COACHES_LINK,
+      MY_CLASSES_LINK,
       PROFILE_LINK,
       CONTACT_LINK,
     ],
@@ -80,6 +93,8 @@ const getWrapper = (options = {}) => {
     isAdmin: false,
     mobileMode: false,
     path: '/',
+    isAssignmentsEnabled: false,
+    numberOfStudentClasses: 0,
     ...options,
   }
 
@@ -91,6 +106,12 @@ const getWrapper = (options = {}) => {
           isVolunteer: () => options.isVolunteer,
           isStudent: () => options.isStudent,
           isTeacher: () => options.isTeacher,
+        },
+      },
+      featureFlags: {
+        ...featureFlagsModule,
+        getters: {
+          isAssignmentsEnabled: () => options.isAssignmentsEnabled,
         },
       },
     },
@@ -106,6 +127,7 @@ const getWrapper = (options = {}) => {
       userType: options.userType,
       isAdmin: options.isAdmin,
       mobileMode: options.mobileMode,
+      numberOfStudentClasses: options.numberOfStudentClasses,
     },
   })
 }
@@ -182,6 +204,39 @@ describe('SidebarLinks', () => {
         })
         testLinks(wrapper, links.default.admin)
       })
+
+      it('renders "My Classes" link if the student has classes and feature flag is enabled', () => {
+        const wrapper = getWrapper({
+          authenticated: true,
+          mobileMode: true,
+          isStudent: true,
+          numberOfStudentClasses: 1,
+          isAssignmentsEnabled: true,
+        })
+        testLinks(wrapper, links.default.studentWithClasses)
+      })
+
+      it('does not render "My Classes" link if the student does not have any classes and the feature flag is enabled', () => {
+        const wrapper = getWrapper({
+          authenticated: true,
+          mobileMode: true,
+          isStudent: true,
+          numberOfStudentClasses: 0,
+          isAssignmentsEnabled: true,
+        })
+        testLinks(wrapper, links.default.student)
+      })
+
+      it('does not render "My Classes" link if the student have classes and the feature flag is disabled', () => {
+        const wrapper = getWrapper({
+          authenticated: true,
+          mobileMode: true,
+          isStudent: true,
+          numberOfStudentClasses: 2,
+          isAssignmentsEnabled: false,
+        })
+        testLinks(wrapper, links.default.student)
+      })
     })
 
     describe('mobileMode: false', () => {
@@ -229,6 +284,36 @@ describe('SidebarLinks', () => {
           authenticated: true,
         })
         testLinks(wrapper, links.default.admin)
+      })
+
+      it('renders "My Classes" link if the student has classes and feature flag is enabled', () => {
+        const wrapper = getWrapper({
+          authenticated: true,
+          isStudent: true,
+          numberOfStudentClasses: 1,
+          isAssignmentsEnabled: true,
+        })
+        testLinks(wrapper, links.default.studentWithClasses)
+      })
+
+      it('does not render "My Classes" link if the student does not have any classes and the feature flag is enabled', () => {
+        const wrapper = getWrapper({
+          authenticated: true,
+          isStudent: true,
+          numberOfStudentClasses: 0,
+          isAssignmentsEnabled: true,
+        })
+        testLinks(wrapper, links.default.student)
+      })
+
+      it('does not render "My Classes" link if the student have classes and the feature flag is disabled', () => {
+        const wrapper = getWrapper({
+          authenticated: true,
+          isStudent: true,
+          numberOfStudentClasses: 2,
+          isAssignmentsEnabled: false,
+        })
+        testLinks(wrapper, links.default.student)
       })
     })
   })

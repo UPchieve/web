@@ -19,6 +19,7 @@
           :authenticated="isAuthenticated"
           :isAdmin="user.isAdmin"
           :mobileMode="mobileMode"
+          :numberOfStudentClasses="user.numberOfStudentClasses"
         />
       </div>
 
