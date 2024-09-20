@@ -12,6 +12,7 @@
       :className="currentClassInfo.name"
       :topics="topics"
     />
+    <Assignment v-else-if="this.view === 'assignment'" :classId="classId" />
     <div v-else class="main">
       <div class="dashboard-banner">
         <div class="dashboard-text">
@@ -114,6 +115,7 @@ import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import ClassDetails from './ClassDetailsView.vue'
 import StudentDetails from './StudentDetailsView.vue'
+import Assignment from './AssignmentView.vue'
 import ClassImg from '@/assets/class.svg'
 import Checklist from '@/assets/Checklist.svg'
 import ExternalPage from '@/assets/ExternalPage.svg'
@@ -128,6 +130,7 @@ export default {
     Loader,
     ClassDetails,
     StudentDetails,
+    Assignment,
     ClassImg,
     Checklist,
     ExternalPage,
@@ -156,12 +159,18 @@ export default {
   },
   watch: {
     $route(to) {
-      if (to.params.classId && !to.params.studentId) {
+      if (
+        to.params.classId &&
+        !to.params.studentId &&
+        !to.params.assignmentId
+      ) {
         this.classId = to.params.classId
         this.view = 'classDetails'
       } else if (to.params.classId && to.params.studentId) {
         this.classId = to.params.classId
         this.view = 'studentDetails'
+      } else if (to.params.classId && to.params.assignmentId) {
+        this.view = 'assignment'
       } else {
         this.view = ''
       }
@@ -170,7 +179,11 @@ export default {
 
   async created() {
     this.topics = await this.getTopics()
-    if (this.$route.params.classId && !this.$route.params.studentId) {
+    if (
+      this.$route.params.classId &&
+      !this.$route.params.studentId &&
+      !this.$route.params.assignmentId
+    ) {
       this.classId = this.$route.params.classId
       if (_.isEmpty(this.currentClassInfo)) {
         this.currentClassInfo = await this.getClassInfo(this.classId)
@@ -183,6 +196,8 @@ export default {
         this.currentClassInfo = await this.getClassInfo(this.classId)
       }
       this.view = 'studentDetails'
+    } else if (this.$route.params.assignmentId) {
+      this.view = 'assignment'
     } else {
       this.view = ''
     }

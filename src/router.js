@@ -493,6 +493,10 @@ const routes = [
             path: 'student/:studentId',
             name: 'StudentDetailsView',
           },
+          {
+            path: 'assignment/:assignmentId',
+            name: 'AssignmentView',
+          },
         ],
       },
     ],

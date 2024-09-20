@@ -113,10 +113,13 @@
             class="assignment-card"
           >
             <AssignmentIcon />
-            <div class="assignment-info">
+            <button
+              @click="viewAssignment(assignment.id)"
+              class="assignment-info"
+            >
               <h1>{{ assignment.title }}</h1>
               <p>Due date: {{ formatTimestamp(assignment.dueDate) }}</p>
-            </div>
+            </button>
           </div>
         </div>
       </div>
@@ -149,7 +152,6 @@ export default {
       students: [],
       isLoading: true,
       viewSessions: false,
-      view: '',
       student: {},
       studentId: '',
       isSelected: 'classDetails',
@@ -278,6 +280,12 @@ export default {
         data: { assignments },
       } = await NetworkService.getAssignmentsByClassId(this.classId)
       return assignments
+    },
+
+    viewAssignment(assignmentId) {
+      this.$router.push(
+        `/dashboard/teacher/class/${this.classInfo.id}/assignment/${assignmentId}`
+      )
     },
   },
 }
@@ -413,6 +421,18 @@ export default {
 }
 
 .assignments-container {
+  background-color: #ffffff;
+  flex-grow: 1;
+}
+
+.assignments-container-empty {
+  @include flex-container(column, center, center);
+  background-color: #ffffff;
+  flex-grow: 1;
+}
+
+.assignments-container-empty {
+  @include flex-container(column, center, center);
   background-color: #ffffff;
   flex-grow: 1;
 }
