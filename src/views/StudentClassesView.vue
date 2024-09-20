@@ -19,6 +19,7 @@ const $router = useRouter()
 
 const props = defineProps({
   classId: { type: String, required: true },
+  assignmentId: { type: String, required: false },
 })
 
 type TeacherClass = {
@@ -30,7 +31,7 @@ type TeacherClass = {
   pastAssignments: Assignment[]
 }
 
-type Assignment = {
+export type Assignment = {
   id: string
   classId: string
   description?: string
@@ -50,7 +51,9 @@ const errorMessage = ref<string | undefined>()
 
 const allStudentClasses = ref<TeacherClass[]>([])
 const currentClass = ref<TeacherClass | undefined>()
+const selectedAssignment = ref<Assignment | undefined>()
 
+const showStudentClassesView = computed(() => !props.assignmentId)
 const subjects = computed(() => $store.state.subjects.subjects)
 
 onMounted(async () => {
@@ -150,13 +153,18 @@ function startSession(assignment: Assignment) {
 }
 
 function viewAssignment(assignment: Assignment) {
+  selectedAssignment.value = assignment
   $router.push(`/classes/${assignment.classId}/assignments/${assignment.id}`)
 }
 </script>
 
 <template>
   <div class="h-full">
-    <div class="uc-column h-full">
+    <router-view
+      :assignment="selectedAssignment"
+      :startSession="startSession"
+    />
+    <div class="uc-column h-full" v-if="showStudentClassesView">
       <div class="header">
         <h1>My Classes</h1>
       </div>

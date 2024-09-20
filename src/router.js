@@ -36,8 +36,9 @@ import ReviewMaterialsView from './views/ReviewMaterialsView.vue'
 import SessionView from './views/SessionView/index.vue'
 import SetPasswordView from './views/SetPasswordView.vue'
 import SignupView from './views/SignupView/index.vue'
-import StudentPartnerSignupView from './views/SignupView/StudentPartnerSignupView.vue'
+import StudentAssignmentView from './views/StudentAssignmentView.vue'
 import StudentClassesView from './views/StudentClassesView.vue'
+import StudentPartnerSignupView from './views/SignupView/StudentPartnerSignupView.vue'
 import TrainingCourseView from './views/TrainingCourseView/index.vue'
 import TrainingView from './views/TrainingView.vue'
 import VerificationView from './views/VerificationView/index.vue'
@@ -250,6 +251,14 @@ const routes = [
       }
       return next()
     },
+    children: [
+      {
+        path: 'assignments/:assignmentId',
+        name: 'StudentAssignmentView',
+        props: true,
+        component: StudentAssignmentView,
+      },
+    ],
   },
   {
     path: '/session/:topic/:subTopic/:sessionId?',
