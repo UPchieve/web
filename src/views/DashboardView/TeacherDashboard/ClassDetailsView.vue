@@ -110,16 +110,46 @@
           <div
             v-for="assignment in assignments"
             :key="assignment.id"
-            class="assignment-card"
+            class="assignment-card-wrapper"
           >
-            <AssignmentIcon />
-            <button
-              @click="viewAssignment(assignment.id)"
-              class="assignment-info"
+            <div class="assignment-card">
+              <AssignmentIcon />
+              <div class="assignment-info">
+                <button @click="viewAssignment(assignment.id)">
+                  <h1>{{ assignment.title }}</h1>
+                  <p>Due date: {{ formatTimestamp(assignment.dueDate) }}</p>
+                </button>
+                <button
+                  class="student-completion"
+                  @click="toggleStudentCompletion(assignment.id)"
+                >
+                  Student completion
+                  {{
+                    assignmentsCompletion[assignment.id].completedStudents
+                  }}/{{ assignmentsCompletion[assignment.id].totalStudents }}
+                </button>
+              </div>
+            </div>
+
+            <div
+              v-if="toggledAssignmentId === assignment.id"
+              class="students-container"
             >
-              <h1>{{ assignment.title }}</h1>
-              <p>Due date: {{ formatTimestamp(assignment.dueDate) }}</p>
-            </button>
+              <div
+                v-for="student in assignmentsCompletion[assignment.id]
+                  .studentsCompletion"
+                :key="student.assignmentId"
+                class="student-row"
+              >
+                <span v-if="student.submitted_at" class="check-mark"
+                  ><Check class="check"
+                /></span>
+                <span v-else class="check-mark"></span>
+                <p class="student-name">
+                  {{ student.first_name }} {{ student.last_name }}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -133,6 +163,7 @@ import NetworkService from '@/services/NetworkService'
 import RightArrow from '@/assets/RightArrow.svg'
 import LinkUnion from '@/assets/LinkUnion.svg'
 import Checklist from '@/assets/Checklist.svg'
+import Check from '@/assets/check.svg'
 import AssignmentIcon from '@/assets/AssignmentIcon.svg'
 import moment from 'moment'
 import { mapGetters } from 'vuex'
@@ -145,6 +176,7 @@ export default {
     LinkUnion,
     Checklist,
     AssignmentIcon,
+    Check,
   },
 
   data() {
@@ -156,6 +188,8 @@ export default {
       studentId: '',
       isSelected: 'classDetails',
       assignments: [],
+      toggledAssignmentId: '',
+      assignmentsCompletion: {},
     }
   },
   computed: {
@@ -182,6 +216,20 @@ export default {
       this.$router.push('/dashboard')
     }
     this.assignments = await this.getClassAssignments()
+    const assignmentIds = this.assignments.map((assignment) => assignment.id)
+
+    const getStudentAssignments = Object.assign(
+      ...(await this.getStudentAssignments(assignmentIds).then((assignments) =>
+        assignments.map((assignment) => ({
+          [assignment.assignmentId]: assignment.studentAssignments,
+        }))
+      ))
+    )
+
+    this.assignmentsCompletion = this.getAssignmentCompletion(
+      this.assignments,
+      getStudentAssignments
+    )
   },
 
   methods: {
@@ -286,6 +334,47 @@ export default {
       this.$router.push(
         `/dashboard/teacher/class/${this.classInfo.id}/assignment/${assignmentId}`
       )
+    },
+
+    async getStudentAssignments(assignmentIds) {
+      const studentAssignments = await Promise.all(
+        assignmentIds.map(async (assignmentId) => {
+          const {
+            data: { studentAssignments },
+          } = await NetworkService.getStudentAssignmentCompletion(assignmentId)
+          return { assignmentId, studentAssignments }
+        })
+      )
+      return studentAssignments
+    },
+
+    toggleStudentCompletion(assignmentId) {
+      if (this.toggledAssignmentId === assignmentId) {
+        this.toggledAssignmentId = null
+      } else {
+        this.toggledAssignmentId = assignmentId
+      }
+    },
+
+    getAssignmentCompletion(assignments, completionData) {
+      const result = {}
+
+      assignments.forEach((assignment) => {
+        const { id } = assignment
+        const studentsCompletion = completionData[id] || []
+        const totalStudents = studentsCompletion.length
+        const completedStudents = studentsCompletion.filter(
+          (student) => student.submitted_at !== null
+        ).length
+
+        result[id] = {
+          studentsCompletion,
+          totalStudents,
+          completedStudents,
+        }
+      })
+
+      return result
     },
   },
 }
@@ -443,6 +532,24 @@ export default {
   flex-grow: 1;
 }
 
+.assignments-container-empty {
+  @include flex-container(column, center, center);
+  background-color: #ffffff;
+  flex-grow: 1;
+}
+
+.assignments-container-empty {
+  @include flex-container(column, center, center);
+  background-color: #ffffff;
+  flex-grow: 1;
+}
+
+.assignments-container-empty {
+  @include flex-container(column, center, center);
+  background-color: #ffffff;
+  flex-grow: 1;
+}
+
 .empty-assignments-container {
   @include flex-container(column, center, center);
   gap: 0.5em;
@@ -451,12 +558,23 @@ export default {
   }
 }
 
-.assignments-cards {
-  @include flex-container(row, flex-start, center);
-  flex-grow: 1;
-  margin: 20px;
-  gap: 24px;
-  flex-wrap: wrap;
+.assignment-card-wrapper {
+  @include flex-container(column, flex-start, center);
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.students-container {
+  @include flex-container(column, flex-start);
+  background-color: #ffffff;
+  border: solid 1px #d8dee5;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 8px;
+  position: absolute;
+  top: 90%;
+  left: 20%;
+  width: 100%;
+  z-index: 3;
 }
 
 .assignment-card {
@@ -466,10 +584,12 @@ export default {
   gap: 12px;
   padding: 16px;
   height: auto;
+  position: relative;
+  text-align: left;
 
   h1 {
     font-size: 20px;
-    margin-bottom: 0;
+    margin-bottom: 6px;
     font-weight: 600;
   }
 
@@ -477,6 +597,50 @@ export default {
     font-size: 16px;
     color: $c-soft-black;
     margin-bottom: 0;
+  }
+
+  .student-completion {
+    padding: 0;
+    margin-top: 1.25rem;
+    color: #1855d1;
+    font-weight: 500;
+  }
+}
+
+.assignments-cards {
+  @include flex-container(row, flex-start, center);
+  flex-grow: 1;
+  margin: 20px;
+  gap: 24px;
+  flex-wrap: wrap;
+  z-index: 1;
+}
+
+.student-row {
+  @include flex-container(row, flex-start);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.student-name {
+  flex: 1;
+  overflow: hidden;
+}
+
+.check-mark {
+  display: table-cell;
+  padding-right: 8px;
+  width: 40px;
+  text-align: center;
+  height: 20px;
+}
+
+.assignment-info {
+  @include flex-container(column, flex-start);
+
+  button {
+    text-align: left;
+    padding: 0;
   }
 }
 
