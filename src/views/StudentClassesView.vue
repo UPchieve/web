@@ -90,7 +90,10 @@ function getClassesWithAssignments(
   for (const c of classes) {
     classesMap.set(c.id, { ...c, assignments: [], pastAssignments: [] })
   }
+
   for (const a of assignments) {
+    if (isFutureAssignment(a)) continue
+
     if (isCurrentAssignment(a)) {
       classesMap.get(a.classId)?.assignments.push(a)
     } else {
@@ -98,11 +101,38 @@ function getClassesWithAssignments(
     }
   }
 
+  for (const v of classesMap.values()) {
+    v.assignments.sort((a: Assignment, b: Assignment) =>
+      sortByDueDate(a, b, 'asc')
+    )
+    v.pastAssignments.sort((a: Assignment, b: Assignment) =>
+      sortByDueDate(a, b, 'desc')
+    )
+  }
+
   return Array.from(classesMap.values())
+}
+
+function isFutureAssignment(a: Assignment) {
+  if (!a.startDate) return false
+  return moment(a.startDate).isAfter(moment())
 }
 
 function isCurrentAssignment(a: Assignment) {
   return moment(a.dueDate).isSameOrAfter(moment()) && !a.submittedAt
+}
+
+function sortByDueDate(
+  a: Assignment,
+  b: Assignment,
+  direction?: 'asc' | 'desc'
+) {
+  if (direction === 'asc') {
+    return moment(a.dueDate).diff(moment(b.dueDate))
+  } else if (direction === 'desc') {
+    return moment(b.dueDate).diff(moment(a.dueDate))
+  }
+  return 0
 }
 
 function updateCurrentClassSelected() {
@@ -360,6 +390,7 @@ h4 {
   border: 1px solid #d8dee5;
   border-radius: 9px;
   padding: 20px 24px;
+  margin-bottom: 1rem;
 
   &.past {
     background: #f1f3f6;
