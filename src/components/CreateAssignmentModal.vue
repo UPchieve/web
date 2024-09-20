@@ -67,6 +67,7 @@
             id="description"
             class="description-input"
             name="description"
+            v-model="description"
           ></textarea>
         </div>
       </div>
@@ -129,10 +130,51 @@ export default {
       selectedSessionToComplete: {},
       numSessions: 1,
       numMinutes: 10,
+      description: null,
     }
   },
 
   async created() {
+    this.allSubjects = this.getActiveSubjects(this.subjects)
+    this.classes = this.modalData.classes
+  },
+
+  async created() {
+    this.allSubjects = this.getActiveSubjects(this.subjects)
+    this.classes = this.modalData.classes
+  },
+
+  async created() {
+    this.allSubjects = this.getActiveSubjects(this.subjects)
+    this.classes = this.modalData.classes
+  },
+
+  async created() {
+    this.allSubjects = this.getActiveSubjects(this.subjects)
+    this.classes = this.modalData.classes
+  },
+
+  async created() {
+    this.allSubjects = this.getActiveSubjects(this.subjects)
+    this.classes = this.modalData.classes
+  },
+
+  async created() {
+    this.allSubjects = this.getActiveSubjects(this.subjects)
+    this.classes = this.modalData.classes
+  },
+
+  async created() {
+    this.allSubjects = this.getActiveSubjects(this.subjects)
+    this.classes = this.modalData.classes
+  },
+
+  async created() {
+    this.allSubjects = this.getActiveSubjects(this.subjects)
+    this.classes = this.modalData.classes
+  },
+
+  created() {
     this.allSubjects = this.getActiveSubjects(this.subjects)
     this.classes = this.modalData.classes
   },
@@ -169,15 +211,19 @@ export default {
       }
 
       try {
-        await Promise.all(
-          this.selectedClasses.map((selectedClass) =>
-            NetworkService.createAssignment({
-              classId: selectedClass.id,
-              ...assignmentData,
-            })
-          )
+        const classIds = this.selectedClasses.map(
+          (selectedClass) => selectedClass.id
         )
+        const assignments = await Promise.all(
+          classIds.map((classId) => {
+            const assignment = { classId, ...assignmentData }
+            NetworkService.createAssignment(assignment)
+          })
+        )
+
         this.$store.dispatch('app/modal/hide')
+
+        return assignments
       } catch (err) {
         this.error = err.response.data.err ?? 'Unable to create assignment.'
       }

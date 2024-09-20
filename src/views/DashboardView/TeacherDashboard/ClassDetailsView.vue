@@ -20,7 +20,12 @@
             </button>
           </div>
           <div v-if="isAssignmentsEnabled" class="end-col">
-            <button class="create-assignment-btn">Create Assignments</button>
+            <button
+              class="create-assignment-btn"
+              @click="openCreateAssignmentModal"
+            >
+              Create Assignments
+            </button>
           </div>
         </div>
       </div>
