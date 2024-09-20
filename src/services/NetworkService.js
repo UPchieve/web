@@ -1067,4 +1067,16 @@ export default {
       this._errorHandler
     )
   },
+  getAssignmentsByClassId(classId) {
+    return httpGet(`${API_ROOT}/teachers/class/${classId}/assignments`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
+  getStudentsByAssignmentId(assignmentId) {
+    return httpGet(`${API_ROOT}/assignment/${assignmentId}/students`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
 }
