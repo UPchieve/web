@@ -1053,7 +1053,18 @@ export default {
   addAssignmentToClass(assignmentId, classIds, studentIds) {
     return httpPost(`${API_ROOT}/assignment/${assignmentId}`, {
       classIds,
-      studentIds,
     }).then(this._successHandler, this._errorHandler)
+  },
+  getAllAssignmentsForTeacher() {
+    return httpGet(`${API_ROOT}/teachers/assignments`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
+  getAssignmentsByClassId(classId) {
+    return httpGet(`${API_ROOT}/teachers/class/${classId}/assignments`).then(
+      this._successHandler,
+      this._errorHandler
+    )
   },
 }
