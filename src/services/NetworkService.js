@@ -1078,5 +1078,5 @@ export default {
       this._successHandler,
       this._errorHandler
     )
-  },
+  }
 }
