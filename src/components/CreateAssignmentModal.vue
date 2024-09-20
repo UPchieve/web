@@ -204,12 +204,11 @@ export default {
         title: this.assignmentName,
         numberOfSessions: this.numSessions,
         minDurationInMinutes: this.numMinutes,
-        dueDate: new Date(this.dueDate),
-        startDate: new Date(this.startDate),
+        dueDate: moment(this.dueDate).toDate(),
+        startDate: moment(this.startDate).toDate(),
         isRequired: false,
         subjectId: this.selectedSessionToComplete.id,
       }
-
       try {
         const classIds = this.selectedClasses.map(
           (selectedClass) => selectedClass.id
