@@ -22,7 +22,7 @@
           <div v-if="isAssignmentsEnabled" class="end-col">
             <button
               class="create-assignment-btn"
-              @click="openCreateAssignmentModal"
+              @click="openCreateAssignmentModal()"
             >
               Create Assignments
             </button>
