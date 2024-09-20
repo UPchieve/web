@@ -18,7 +18,7 @@ export default {
     })
   },
 
-  newSession(context, sessionType, sessionSubTopic, options) {
+  async newSession(context, sessionType, sessionSubTopic, options) {
     const onRetry = options && options.onRetry
     const docEditorVersion = options?.docEditorVersion
     const data = {
@@ -27,46 +27,23 @@ export default {
       docEditorVersion,
     }
 
-    if (localStorage.getItem('assignmentId')) {
-      data.assignmentId = localStorage.getItem('assignmentId')
-      data.problemId = localStorage.getItem('problemId')
-      data.studentId = localStorage.getItem('studentId')
+    const {
+      data: { sessionId },
+    } = await NetworkService.newSession(data, onRetry)
+    if (sessionId) {
+      const sessionData = {
+        type: sessionType,
+        subTopic: sessionSubTopic,
+        _id: sessionId,
+        id: sessionId,
+      }
+      await context.$store.dispatch('user/updateSession', sessionData)
+      context.$router.replace(context.$store.getters['user/sessionPath'])
+    } else {
+      context.$router.replace('/')
     }
 
-    return NetworkService.newSession(data, onRetry).then((res) => {
-      const data = res.data || {}
-      const { sessionId } = data
-
-      // const currentSession = {
-      //   sessionId,
-      //   data: context.$store.state.user.session
-      // };
-
-      if (sessionId) {
-        const sessionData = {
-          type: sessionType,
-          subTopic: sessionSubTopic,
-          _id: sessionId,
-        }
-        localStorage.removeItem('assignmentId')
-        localStorage.removeItem('problemId')
-        localStorage.removeItem('studentId')
-        context.$store.dispatch('user/updateSession', sessionData)
-        context.$router.replace(context.$store.getters['user/sessionPath'])
-      } else {
-        context.$router.replace('/')
-      }
-      // analytics: track when a session has started
-      // AnalyticsService.trackSessionStarted(
-      //   context,
-      //   currentSession,
-      //   sessionType,
-      //   sessionSubTopic,
-      //   context.$store.state.user.isFakeUser
-      // );
-
-      return sessionId
-    })
+    return sessionId
   },
 
   useExistingSession(context, sessionId, options) {
