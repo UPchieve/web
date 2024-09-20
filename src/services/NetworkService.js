@@ -1073,10 +1073,10 @@ export default {
       this._errorHandler
     )
   },
-  getStudentsByAssignmentId(assignmentId) {
+  getStudentAssignmentCompletion(assignmentId) {
     return httpGet(`${API_ROOT}/assignment/${assignmentId}/students`).then(
       this._successHandler,
       this._errorHandler
     )
-  }
+  },
 }
