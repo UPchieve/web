@@ -1,10 +1,9 @@
 <template>
   <div class="assignment-container">
     <div class="breadcrumbs-container">
-      <button class="back-btn" @click="backToClassDetails()">
-        Class Details
+      <button class="back-btn" @click="backToAssignments()">
+        ← Back to assignments
       </button>
-      <span class="assignment"> > {{ assignmentInfo.title }}</span>
     </div>
     <h1 class="assignment-header">
       <AssignmentIcon /><span class="assignment-title">{{
@@ -79,8 +78,8 @@ export default {
       return assignment
     },
 
-    backToClassDetails() {
-      this.$router.push(`/dashboard/teacher/class/${this.classId}`)
+    backToAssignments() {
+      this.$router.push(`/dashboard/teacher/class/${this.classId}/assignments`)
     },
   },
 }
