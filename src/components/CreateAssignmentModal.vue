@@ -89,7 +89,6 @@ import Modal from '@/components/Modal.vue'
 import FormInput from '@/components/FormInput.vue'
 import FormDateInput from '@/components/FormDateInput.vue'
 import FormSelect from '@/components/FormSelect.vue'
-import NetworkService from '@/services/NetworkService'
 import moment from 'moment'
 import { mapState } from 'vuex'
 
@@ -99,7 +98,7 @@ export default {
 
   props: {
     modalData: {
-      type: String,
+      type: Object,
       required: true,
     },
   },
@@ -139,46 +138,6 @@ export default {
     this.classes = this.modalData.classes
   },
 
-  async created() {
-    this.allSubjects = this.getActiveSubjects(this.subjects)
-    this.classes = this.modalData.classes
-  },
-
-  async created() {
-    this.allSubjects = this.getActiveSubjects(this.subjects)
-    this.classes = this.modalData.classes
-  },
-
-  async created() {
-    this.allSubjects = this.getActiveSubjects(this.subjects)
-    this.classes = this.modalData.classes
-  },
-
-  async created() {
-    this.allSubjects = this.getActiveSubjects(this.subjects)
-    this.classes = this.modalData.classes
-  },
-
-  async created() {
-    this.allSubjects = this.getActiveSubjects(this.subjects)
-    this.classes = this.modalData.classes
-  },
-
-  async created() {
-    this.allSubjects = this.getActiveSubjects(this.subjects)
-    this.classes = this.modalData.classes
-  },
-
-  async created() {
-    this.allSubjects = this.getActiveSubjects(this.subjects)
-    this.classes = this.modalData.classes
-  },
-
-  created() {
-    this.allSubjects = this.getActiveSubjects(this.subjects)
-    this.classes = this.modalData.classes
-  },
-
   methods: {
     close() {
       this.$store.dispatch('app/modal/hide')
@@ -209,23 +168,9 @@ export default {
         isRequired: false,
         subjectId: this.selectedSessionToComplete.id,
       }
-      try {
-        const classIds = this.selectedClasses.map(
-          (selectedClass) => selectedClass.id
-        )
-        const assignments = await Promise.all(
-          classIds.map((classId) => {
-            const assignment = { classId, ...assignmentData }
-            NetworkService.createAssignment(assignment)
-          })
-        )
-
-        this.$store.dispatch('app/modal/hide')
-
-        return assignments
-      } catch (err) {
-        this.error = err.response.data.err ?? 'Unable to create assignment.'
-      }
+      const selectedClasses = this.selectedClasses
+      this.modalData.onAssignmentCreated({ assignmentData, selectedClasses })
+      this.$store.dispatch('app/modal/hide')
     },
   },
 }
