@@ -497,6 +497,11 @@ const routes = [
             path: 'assignment/:assignmentId',
             name: 'AssignmentView',
           },
+          {
+            path: 'assignments',
+            name: 'ClassDetailsView',
+            component: TeacherDashboardView,
+          },
         ],
       },
     ],

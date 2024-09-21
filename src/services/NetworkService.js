@@ -1045,7 +1045,7 @@ export default {
     )
   },
   getAllAssignmentsForTeacher() {
-    return httpPost(`${API_ROOT}/teachers/assignments`).then(
+    return httpGet(`${API_ROOT}/teachers/assignments`).then(
       this._successHandler,
       this._errorHandler
     )
@@ -1058,6 +1058,12 @@ export default {
   },
   getStudentAssignmentCompletion(assignmentId) {
     return httpGet(`${API_ROOT}/assignment/${assignmentId}/students`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
+  getAllAssignmentsForTeacher() {
+    return httpPost(`${API_ROOT}/teachers/assignments`).then(
       this._successHandler,
       this._errorHandler
     )

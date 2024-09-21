@@ -3,7 +3,7 @@
     <div class="main">
       <div class="class-header">
         <button class="back-btn" @click="backToClasses()">
-          ← Back to your classes
+          <Arrow style="display: inline; transform: scale(-1,1)"/> Back to your classes
         </button>
         <div class="class-info">
           <div class="start-col">
@@ -164,6 +164,7 @@ import RightArrow from '@/assets/RightArrow.svg'
 import LinkUnion from '@/assets/LinkUnion.svg'
 import Checklist from '@/assets/Checklist.svg'
 import Check from '@/assets/check.svg'
+import Arrow from '@/assets/RightArrow.svg'
 import AssignmentIcon from '@/assets/AssignmentIcon.svg'
 import moment from 'moment'
 import { mapGetters } from 'vuex'
@@ -177,6 +178,7 @@ export default {
     Checklist,
     AssignmentIcon,
     Check,
+    Arrow,
   },
 
   data() {
@@ -210,8 +212,20 @@ export default {
   },
 
   async created() {
-    if (this.$route.params.classId && !this.$route.params.studentId) {
+    if (
+      this.$route.params.classId &&
+      !this.$route.path.includes('assignments') &&
+      !this.$route.params.studentId
+    ) {
       this.students = await this.getStudents(this.classId)
+    } else if (
+      this.$route.params.classId &&
+      this.$route.path.includes('assignments')
+    ) {
+      this.isSelected = 'assignments'
+      this.assignments = await this.getClassAssignments()
+      const assignmentIds = this.assignments.map((assignment) => assignment.id)
+      this.allStudentsAssigned = await this.getStudentAssignments(assignmentIds)
     } else if (!this.$route.params.classId) {
       this.$router.push('/dashboard')
     }
@@ -354,9 +368,23 @@ export default {
       )
     },
 
-    openTab(isSelected) {
-      if (isSelected === 'classDetails') this.isSelected = 'assignments'
-      else this.isSelected = 'classDetails'
+    async openTab(isSelected) {
+      this.assignments = await this.getClassAssignments()
+      const assignmentIds = this.assignments.map((assignment) => assignment.id)
+      this.allStudentsAssigned = await this.getStudentAssignments(assignmentIds)
+      if (
+        isSelected === 'classDetails' &&
+        !this.$route.path.includes('assignments')
+      ) {
+        this.isSelected = 'assignments'
+        this.$router.push(
+          `/dashboard/teacher/class/${this.classInfo.id}/assignments`
+        )
+      } else {
+        this.isSelected = 'classDetails'
+        this.$router.push(`/dashboard/teacher/class/${this.classInfo.id}`)
+        this.students = await this.getStudents(this.classId)
+      }
     },
 
     async getClassAssignments() {
@@ -427,6 +455,11 @@ export default {
   @include flex-container(column, center);
   padding: 0 !important;
   height: 90vh;
+}
+
+.class-header {
+  margin-left: 40px;
+  margin-right: 40px;
 }
 
 .class-header {
@@ -540,48 +573,14 @@ export default {
 }
 
 .back-btn {
+  @include flex-container(row, center, center);
+  gap: 8px;
   color: #1855d1;
   margin-bottom: 16px;
   font-size: 14px;
 }
 
 .assignments-container {
-  background-color: #ffffff;
-  flex-grow: 1;
-}
-
-.assignments-container-empty {
-  @include flex-container(column, center, center);
-  background-color: #ffffff;
-  flex-grow: 1;
-}
-
-.assignments-container-empty {
-  @include flex-container(column, center, center);
-  background-color: #ffffff;
-  flex-grow: 1;
-}
-
-.assignments-container-empty {
-  @include flex-container(column, center, center);
-  background-color: #ffffff;
-  flex-grow: 1;
-}
-
-.assignments-container-empty {
-  @include flex-container(column, center, center);
-  background-color: #ffffff;
-  flex-grow: 1;
-}
-
-.assignments-container-empty {
-  @include flex-container(column, center, center);
-  background-color: #ffffff;
-  flex-grow: 1;
-}
-
-.assignments-container-empty {
-  @include flex-container(column, center, center);
   background-color: #ffffff;
   flex-grow: 1;
 }
