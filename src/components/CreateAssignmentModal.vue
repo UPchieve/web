@@ -92,9 +92,10 @@ import Modal from '@/components/Modal.vue'
 import FormInput from '@/components/FormInput.vue'
 import FormDateInput from '@/components/FormDateInput.vue'
 import FormSelect from '@/components/FormSelect.vue'
-import NetworkService from '@/services/NetworkService'
 import moment from 'moment'
+import AnalyticsService from '@/services/AnalyticsService'
 import { mapState } from 'vuex'
+import { EVENTS } from '@/consts'
 
 export default {
   components: { Modal, FormInput, FormDateInput, FormSelect },
@@ -176,6 +177,7 @@ export default {
       }
       const selectedClasses = this.selectedClasses
       this.modalData.onAssignmentCreated({ assignmentData, selectedClasses })
+      AnalyticsService.captureEvent(EVENTS.ASSIGNMENT_CREATED, assignmentData)
       this.$store.dispatch('app/modal/hide')
     },
   },

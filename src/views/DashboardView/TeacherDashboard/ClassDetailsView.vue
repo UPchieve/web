@@ -3,7 +3,8 @@
     <div class="main">
       <div class="class-header">
         <button class="back-btn" @click="backToClasses()">
-          <Arrow style="display: inline; transform: scale(-1,1)"/> Back to your classes
+          <Arrow style="display: inline; transform: scale(-1, 1)" /> Back to
+          your classes
         </button>
         <div class="class-info">
           <div class="start-col">
@@ -160,6 +161,7 @@
 <script>
 import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'
+import AnalyticsService from '@/services/AnalyticsService'
 import RightArrow from '@/assets/RightArrow.svg'
 import LinkUnion from '@/assets/LinkUnion.svg'
 import Checklist from '@/assets/Checklist.svg'
@@ -168,6 +170,7 @@ import Arrow from '@/assets/RightArrow.svg'
 import AssignmentIcon from '@/assets/AssignmentIcon.svg'
 import moment from 'moment'
 import { mapGetters } from 'vuex'
+import { EVENTS } from '@/consts'
 
 export default {
   name: 'ClassDetails',
@@ -316,7 +319,7 @@ export default {
     },
 
     openCreateAssignmentModal() {
-      const classes = this.classes
+      AnalyticsService.captureEvent(EVENTS.ASSIGNMENT_OPEN_CREATE_MODAL)
       this.$store.dispatch('app/modal/show', {
         component: 'CreateAssignmentModal',
         data: {
@@ -441,60 +444,6 @@ export default {
 
       return result
     },
-
-    async getClassAssignments() {
-      const {
-        data: { assignments },
-      } = await NetworkService.getAssignmentsByClassId(this.classId)
-      return assignments
-    },
-
-    viewAssignment(assignmentId) {
-      this.$router.push(
-        `/dashboard/teacher/class/${this.classInfo.id}/assignment/${assignmentId}`
-      )
-    },
-
-    async getStudentAssignments(assignmentIds) {
-      const studentAssignments = await Promise.all(
-        assignmentIds.map(async (assignmentId) => {
-          const {
-            data: { studentAssignments },
-          } = await NetworkService.getStudentAssignmentCompletion(assignmentId)
-          return { assignmentId, studentAssignments }
-        })
-      )
-      return studentAssignments
-    },
-
-    toggleStudentCompletion(assignmentId) {
-      if (this.toggledAssignmentId === assignmentId) {
-        this.toggledAssignmentId = null
-      } else {
-        this.toggledAssignmentId = assignmentId
-      }
-    },
-
-    getAssignmentCompletion(assignments, completionData) {
-      const result = {}
-
-      assignments.forEach((assignment) => {
-        const { id } = assignment
-        const studentsCompletion = completionData[id] || []
-        const totalStudents = studentsCompletion.length
-        const completedStudents = studentsCompletion.filter(
-          (student) => student.submitted_at !== null
-        ).length
-
-        result[id] = {
-          studentsCompletion,
-          totalStudents,
-          completedStudents,
-        }
-      })
-
-      return result
-    },
   },
 }
 </script>
@@ -510,16 +459,6 @@ export default {
   @include flex-container(column, center);
   padding: 0 !important;
   height: 90vh;
-}
-
-.class-header {
-  margin-left: 40px;
-  margin-right: 40px;
-}
-
-.class-header {
-  margin-left: 40px;
-  margin-right: 40px;
 }
 
 .class-header {
@@ -641,6 +580,7 @@ export default {
 }
 
 .assignments-container {
+  @include flex-container(column, center, center);
   background-color: #ffffff;
   flex-grow: 1;
 }

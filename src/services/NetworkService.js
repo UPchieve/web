@@ -1044,12 +1044,6 @@ export default {
       this._errorHandler
     )
   },
-  getAllAssignmentsForTeacher() {
-    return httpGet(`${API_ROOT}/teachers/assignments`).then(
-      this._successHandler,
-      this._errorHandler
-    )
-  },
   getAssignmentsByClassId(classId) {
     return httpGet(`${API_ROOT}/teachers/class/${classId}/assignments`).then(
       this._successHandler,
@@ -1063,7 +1057,7 @@ export default {
     )
   },
   getAllAssignmentsForTeacher() {
-    return httpPost(`${API_ROOT}/teachers/assignments`).then(
+    return httpGet(`${API_ROOT}/teachers/assignments`).then(
       this._successHandler,
       this._errorHandler
     )
