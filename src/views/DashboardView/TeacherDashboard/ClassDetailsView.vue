@@ -302,13 +302,49 @@ export default {
     },
 
     openCreateAssignmentModal() {
-      const classes = this.classes
       this.$store.dispatch('app/modal/show', {
         component: 'CreateAssignmentModal',
         data: {
-          classes,
+          onAssignmentCreated: this.handleAssignmentCreated,
+          classes: this.classes,
         },
       })
+    },
+
+    async handleAssignmentCreated({ assignmentData, selectedClasses }) {
+      try {
+        const classIds = selectedClasses.map(
+          (selectedClass) => selectedClass.id
+        )
+        const assignments = await Promise.all(
+          classIds.map(async (classId) => {
+            const assignmentInfo = { classId, ...assignmentData }
+            const {
+              data: { assignment },
+            } = await NetworkService.createAssignment(assignmentInfo)
+            return assignment
+          })
+        )
+        this.assignments.push(...assignments)
+        const assignmentIds = this.assignments.map(
+          (assignment) => assignment.id
+        )
+        const getStudentAssignments = Object.assign(
+          ...(await this.getStudentAssignments(assignmentIds).then(
+            (assignments) =>
+              assignments.map((assignment) => ({
+                [assignment.assignmentId]: assignment.studentAssignments,
+              }))
+          ))
+        )
+
+        this.assignmentsCompletion = this.getAssignmentCompletion(
+          this.assignments,
+          getStudentAssignments
+        )
+      } catch (err) {
+        this.error = err.response.data.err ?? 'Unable to create assignment.'
+      }
     },
 
     viewStudentDetails(student) {
