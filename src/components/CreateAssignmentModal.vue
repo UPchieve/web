@@ -1,7 +1,7 @@
 <template>
   <modal :closeModal="close" class="create-assignment-wrapper">
     <div class="modal-container">
-      <h1>Assignment</h1>
+      <h1>Create a Tutoring Assignment</h1>
       <FormInput
         label="Title"
         v-model="assignmentName"
@@ -36,7 +36,7 @@
         </div>
         <div class="assignment-details-row">
           <FormSelect
-            label="Subject to complete"
+            label="Subject"
             class="session-dropdown"
             :name="'session-to-complete'"
             :getSelectOptions="() => allSubjects"
@@ -44,14 +44,14 @@
             :optionTextField="'displayName'"
           />
           <FormInput
-            label="Number of Sessions to Complete"
+            label="Number of sessions to complete"
             v-model="numSessions"
             type="number"
             placeholder="1"
             class="assignment-name"
           />
           <FormInput
-            label="Minimum time"
+            label="Minimum time per session"
             v-model="numMinutes"
             type="number"
             placeholder="10"
@@ -72,12 +72,15 @@
         </div>
       </div>
       <div class="right-btns">
+        <button class="uc-form-button cancel-button" @click="close()">
+          Cancel
+        </button>
         <button
           class="uc-form-button"
           @click="createAssignment()"
           :disabled="!isFormValid"
         >
-          Save
+          Assign
         </button>
       </div>
     </div>
@@ -89,6 +92,7 @@ import Modal from '@/components/Modal.vue'
 import FormInput from '@/components/FormInput.vue'
 import FormDateInput from '@/components/FormDateInput.vue'
 import FormSelect from '@/components/FormSelect.vue'
+import NetworkService from '@/services/NetworkService'
 import moment from 'moment'
 import { mapState } from 'vuex'
 
@@ -112,8 +116,10 @@ export default {
         this.assignmentName &&
         this.startDate &&
         this.dueDate &&
-        this.selectedClasses &&
-        this.selectedSessionToComplete
+        this.selectedClasses.length &&
+        Object.keys(this.selectedSessionToComplete).length &&
+        this.numSessions &&
+        this.numMinutes
       )
     },
   },
@@ -228,10 +234,17 @@ export default {
 .right-btns {
   @include flex-container(row, right, flex-end);
   margin-top: 12px;
+  gap: 15px;
 }
 
 .right-btns button {
   width: 200px;
   padding: 20px;
+}
+
+.cancel-button {
+  border: 1px solid #000000;
+  background-color: white;
+  color: #000;
 }
 </style>
