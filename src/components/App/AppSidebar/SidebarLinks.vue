@@ -3,8 +3,12 @@
     <template v-if="$route.path.indexOf('/onboarding') !== -1"></template>
 
     <template v-else-if="authenticated">
-      <sidebar-link to="/dashboard" text="Dashboard">
+      <sidebar-link v-if="!isTeacher" to="/dashboard" text="Dashboard">
         <house-icon class="icon" />
+      </sidebar-link>
+
+      <sidebar-link v-else to="/dashboard" text="My Classes">
+        <book-icon class="icon" />
       </sidebar-link>
 
       <sidebar-link
