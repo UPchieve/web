@@ -286,8 +286,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.main {
-  margin: 24px;
+.teacher-dashboard {
+  padding: 30px;
 }
 
 .loader {
@@ -403,7 +403,7 @@ export default {
 
 .class-header {
   @include flex-container(row, space-between);
-  margin: 30px;
+  margin: 30px 16px;
 }
 
 .class-header h1 {
