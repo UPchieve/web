@@ -80,9 +80,11 @@ export default {
     ...mapGetters({ mobileMode: 'app/mobileMode' }),
     hasNoEscape() {
       // TODO: Have this as a prop instead.
-      return ['SessionFulfilledModal', 'StudentOnboardingModal'].includes(
-        this.modalComponentName
-      )
+      return [
+        'SessionFulfilledModal',
+        'StudentOnboardingModal',
+        'CreateAssignmentModal',
+      ].includes(this.modalComponentName)
     },
   },
   methods: {

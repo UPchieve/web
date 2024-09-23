@@ -1,5 +1,5 @@
 <template>
-  <modal :closeModal="close" class="create-assignment-wrapper">
+  <modal class="create-assignment-wrapper">
     <div class="modal-container">
       <h1>Create a Tutoring Assignment</h1>
       <FormInput
