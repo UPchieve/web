@@ -15,6 +15,13 @@
           downtimeBannerMessage
         }}</a>
       </div>
+      <a
+        v-if="aiBotMessage"
+        class="dashboard-notice ai-bot"
+        :class="'dashboard-notice--downtime'"
+        href="/ai-tutor-conversations"
+        >{{ aiBotMessage }}<arrow-icon></arrow-icon
+      ></a>
     </div>
 
     <tell-them-college-prep-modal
@@ -48,6 +55,7 @@ import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 import getCookie from '@/utils/get-cookie'
 import Gleap from 'gleap'
+import ArrowIcon from '@/assets/arrow.svg'
 
 const defaultHeaderData = {
   component: 'DefaultHeader',
@@ -69,6 +77,7 @@ export default {
     TellThemCollegePrepModal,
     JoinedClassModal,
     FallIncentiveEnrollmentModal,
+    ArrowIcon,
   },
   async created() {
     if (this.isSessionAlive) {
@@ -161,6 +170,7 @@ export default {
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
       downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
+      isStandAloneAiTutorEnabled: 'featureFlags/isStandAloneAiTutorEnabled',
       orbitalSegments: 'featureFlags/orbitalSegments',
       isOrbitalSegmentsActive: 'featureFlags/isOrbitalSegmentsActive',
       showDashboardRedesign: 'user/showDashboardRedesign',
@@ -171,7 +181,15 @@ export default {
       isCollegePrepAdEnabled: 'featureFlags/isCollegePrepAdEnabled',
       isFallIncentiveProgramEnabled:
         'featureFlags/isFallIncentiveProgramEnabled',
+      isMobileMode: 'app/mobileMode',
     }),
+
+    aiBotMessage() {
+      return this.isStandAloneAiTutorEnabled && this.isMobileMode
+        ? 'Try out our new AI Tutor'
+        : null
+    },
+
     userAndOrbitalSegment() {
       return [this.user, this.orbitalSegments, this.isOrbitalSegmentsActive]
     },
@@ -369,6 +387,14 @@ export default {
       text-decoration: underline;
       font-weight: bold;
     }
+  }
+}
+.ai-bot {
+  color: white;
+  display: block;
+  svg {
+    fill: white;
+    transform: scale(0.6);
   }
 }
 </style>

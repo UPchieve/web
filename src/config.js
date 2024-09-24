@@ -14,4 +14,6 @@ config.customVolunteerPartnerOrgs =
 const customVolunteerPartnerOrgs = config.customVolunteerPartnerOrgs.split(',')
 config.customVolunteerPartnerOrgs = customVolunteerPartnerOrgs
 config.googleRecaptchaKey = import.meta.env.VUE_APP_GOOGLE_RECAPTCHA_KEY
+config.langfusePublicKey = import.meta.env.VUE_APP_LANGFUSE_PUBLIC_KEY
+config.langfuseBaseUrl = import.meta.env.VUE_APP_LANGFUSE_BASEURL
 export default config

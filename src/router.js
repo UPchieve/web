@@ -16,6 +16,7 @@ import AdminUsers from './views/Admin/AdminUsers.vue'
 import AdminVolunteerReports from './views/Admin/AdminVolunteerReports.vue'
 import AdminZipCodes from './views/Admin/AdminZipCodes.vue'
 import AdminRosterStudents from './views/Admin/AdminRosterStudents.vue'
+import BotConversationsView from './views/BotConversationsView/index.vue'
 import VolunteerCoverage from './views/Admin/VolunteerCoverage.vue'
 import BackgroundInfoView from './views/BackgroundInfoView.vue'
 import CalendarView from './views/CalendarView.vue'
@@ -57,6 +58,8 @@ import { beforeEnter as studentBeforeEnter } from '@/services/SignUpService/Stud
 import { beforeEnter as teacherBeforeEnter } from '@/services/SignUpService/TeacherSignUpService'
 import { INVALID_CSRF_ERROR } from '@/services/AuthService'
 import Case from 'case'
+import BotChat from './views/BotConversationsView/BotChat.vue'
+import NewBotChat from './views/BotConversationsView/NewBotChat.vue'
 
 const getUser = () => {
   if (store.getters['user/isAuthenticated']) {
@@ -244,6 +247,26 @@ const routes = [
     name: 'SessionView',
     component: SessionView,
     meta: { protected: true },
+  },
+  {
+    path: '/ai-tutor-conversations',
+    name: 'BotConversationsView',
+    component: BotConversationsView,
+    meta: { protected: true },
+    children: [
+      {
+        path: '',
+        name: 'NewBotChat',
+        component: NewBotChat,
+        meta: { protected: true },
+      },
+      {
+        path: ':conversationId',
+        name: 'BotChat',
+        component: BotChat,
+        meta: { protected: true },
+      },
+    ],
   },
   {
     path: '/resources',

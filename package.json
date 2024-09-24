@@ -46,6 +46,7 @@
     "gleap": "^13.5.13",
     "heic2any": "^0.0.4",
     "helmet": "^4.6.0",
+    "langfuse": "^3.25.0",
     "libphonenumber-js": "^1.10.60",
     "lodash-es": "^4.17.21",
     "maz-ui": "^3.39.1",
