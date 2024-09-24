@@ -60,7 +60,7 @@
         </div>
         <div class="uc-form-element w-full">
           <div class="uc-row justify-between">
-            <label for="description-input">Description</label>
+            <label for="description-input">Instructions</label>
           </div>
           <textarea
             type="text"

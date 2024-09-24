@@ -12,7 +12,7 @@
       :className="currentClassInfo.name"
       :topics="topics"
     />
-    <Assignment v-else-if="this.view === 'assignment'" :classId="classId" />
+    <Assignment v-else-if="this.view === 'assignment'" />
     <div v-else class="main">
       <div class="dashboard-banner">
         <div class="dashboard-text">
