@@ -124,7 +124,6 @@ function buildStudentAssignment(
     'prealgebra',
     'algebraOne',
     'algebraTwo',
-    undefined,
   ])
   return {
     id: faker.string.uuid(),
@@ -617,7 +616,7 @@ describe('StudentClassesView', () => {
     await startSessionButtons[0].trigger('click')
 
     expect(routerPushSpy).toHaveBeenCalledWith(
-      `/session/math/${assignment.subjectName}`
+      `/session/math/${assignment.subjectName}?assignmentId=${assignment.id}`
     )
     routerPushSpy.mockReset()
   })

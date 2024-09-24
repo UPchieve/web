@@ -21,10 +21,12 @@ export default {
   async newSession(context, sessionType, sessionSubTopic, options) {
     const onRetry = options && options.onRetry
     const docEditorVersion = options?.docEditorVersion
+    const assignmentId = options?.assignmentId
     const data = {
       sessionType,
       sessionSubTopic,
       docEditorVersion,
+      assignmentId,
     }
 
     const {

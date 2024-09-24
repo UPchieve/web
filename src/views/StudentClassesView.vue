@@ -2,7 +2,7 @@
 import type { AxiosError } from 'axios'
 import moment from 'moment'
 import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 
 import ArrowIcon from '@/assets/arrow.svg'
@@ -15,6 +15,7 @@ import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'
 
 const $store = useStore()
+const $route = useRoute()
 const $router = useRouter()
 
 const props = defineProps({
@@ -175,7 +176,9 @@ function hadCompletedAssignment(assignment: Assignment) {
 function startSession(assignment: Assignment) {
   if (assignment.subjectName) {
     const topicName = subjects.value[assignment.subjectName].topicName
-    $router.push(`/session/${topicName}/${assignment.subjectName}`)
+    $router.push(
+      `/session/${topicName}/${assignment.subjectName}?assignmentId=${assignment.id}`
+    )
     return
   }
 
@@ -186,13 +189,21 @@ function viewAssignment(assignment: Assignment) {
   selectedAssignment.value = assignment
   $router.push(`/classes/${assignment.classId}/assignments/${assignment.id}`)
 }
+
+function goToClassesFromAssignmentDetail() {
+  const CLASSES_PATH_INDEX = 0
+  const backRoute = $route.path.split('/assignments')[CLASSES_PATH_INDEX]
+  $router.replace(backRoute)
+}
 </script>
 
 <template>
   <div class="h-full">
     <router-view
+      class="assignment-detail-container"
       :assignment="selectedAssignment"
       :startSession="startSession"
+      :goBack="goToClassesFromAssignmentDetail"
     />
     <div class="uc-column h-full" v-if="showStudentClassesView">
       <div class="header">
@@ -347,6 +358,10 @@ function viewAssignment(assignment: Assignment) {
 
 <style lang="scss" scoped>
 $padding-horizontal: 45px;
+
+.assignment-detail-container {
+  padding: 30px 45px;
+}
 
 h1 {
   font-size: 24px;
