@@ -56,46 +56,48 @@
           'chat-container--hidden': shouldHideChatSection,
         }"
       >
-        <div class="about-session-container" v-if="isVolunteer">
+        <div
+          v-if="showSessionMetadataContainer"
+          class="about-session-container"
+        >
           <loading-message
-            v-if="isLoadingPresessionResponse"
+            v-if="isLoadingSessionMetadata"
             message="Loading"
             class="about-session-loader"
           />
-          <div
-            v-else-if="studentPresessionResponses.length > 0"
-            class="about-session-button"
-            @click="handleAboutSessionClick"
-          >
-            About the session
-            <caret-icon class="caret" />
-          </div>
-          <div
-            v-else-if="
-              showNoPresessionSurveyResponse ||
-              studentPresessionResponses.length === 0
-            "
-            class="about-session-no-responses"
-          >
-            No goal found for this session
-          </div>
-          <question-mark-icon
-            v-if="mobileMode"
-            @click="openHelp"
-            class="help-icon"
-          />
-        </div>
-        <div
-          class="about-session-container"
-          v-else-if="isStudent && (mobileMode || showReviewWarning)"
-        >
-          <div
-            v-if="showReviewWarning"
-            class="about-session-button"
-            @click="handleReviewWarningClick"
-          >
-            Session will be reviewed
-            <caret-icon class="caret" />
+          <div v-else>
+            <div
+              v-if="isStudent && showReviewWarning"
+              class="about-session-button"
+              @click="handleReviewWarningClick"
+              role="button"
+            >
+              Session will be reviewed
+              <caret-icon class="caret" />
+            </div>
+            <div
+              v-if="studentAssignment"
+              class="about-session-button"
+              @click="showAssignmentDetail"
+              role="button"
+            >
+              Assignment details
+              <caret-icon class="caret" />
+            </div>
+            <div
+              v-else-if="isVolunteer && studentPresessionResponses.length > 0"
+              class="about-session-button"
+              @click="handleAboutSessionClick"
+            >
+              About the session
+              <caret-icon class="caret" />
+            </div>
+            <div
+              v-else-if="isVolunteer && studentPresessionResponses.length === 0"
+              class="about-session-no-responses"
+            >
+              No goal found for this session
+            </div>
           </div>
           <question-mark-icon
             v-if="mobileMode"
@@ -174,6 +176,11 @@
       :responses="studentPresessionResponses"
       :totalStudentSessions="totalStudentSessions"
     />
+    <assignment-detail-modal
+      v-if="showAssignmentDetailModal"
+      :closeModal="toggleAssignmentDetailModal"
+      :assignment="studentAssignment"
+    />
     <fall-incentive-review-warning-modal
       v-if="showFallIncentiveReviewWarningModal"
       :closeModal="toggleFallIncentiveReviewWarningModal"
@@ -200,6 +207,7 @@ import CaretIcon from '@/assets/caret.svg'
 import QuestionMarkIcon from '@/assets/question-mark-icon.svg'
 import WebNotificationsModal from '@/components/WebNotificationsModal.vue'
 import AboutSessionModal from './AboutSessionModal.vue'
+import AssignmentDetailModal from './AssignmentDetailModal.vue'
 import FallIncentiveReviewWarningModal from './FallIncentiveReviewWarningModal.vue'
 import getNotificationPermission from '@/utils/get-notification-permission'
 import { EVENTS, POSTHOG_FEATURE_FLAGS, SESSION_TOOL_TYPES } from '@/consts'
@@ -232,6 +240,7 @@ export default {
     LoadingMessage,
     QuestionMarkIcon,
     FallIncentiveReviewWarningModal,
+    AssignmentDetailModal,
   },
   created() {
     if (this.mobileMode) {
@@ -268,10 +277,11 @@ export default {
       hasSeenNewMessage: true,
       showNotificationModal: false,
       showAboutSessionModal: false,
+      showAssignmentDetailModal: false,
+      studentAssignment: null,
       studentPresessionResponses: [],
       totalStudentSessions: 0,
-      showNoPresessionSurveyResponse: false,
-      isLoadingPresessionResponse: false,
+      isLoadingSessionMetadata: false,
       isFetchingIsSessionRecapEligible: false,
       sessionHasEnded: false,
       showFallIncentiveReviewWarningModal: false,
@@ -353,6 +363,15 @@ export default {
         this.productFlags.fallIncentiveEnrollmentAt
       )
     },
+    showSessionMetadataContainer() {
+      return (
+        this.isLoadingSessionMetadata ||
+        (this.isStudent && this.showReviewWarning) ||
+        this.studentAssignment ||
+        this.isVolunteer ||
+        this.mobileMode
+      )
+    },
   },
   async mounted() {
     const {
@@ -364,6 +383,7 @@ export default {
     if (!isValid) return this.$router.push('/dashboard')
 
     const id = this.$route.params.sessionId
+    const assignmentId = this.$route.query.assignmentId
 
     let promise
 
@@ -377,6 +397,10 @@ export default {
 
       if (this.shouldUseQuillV2) {
         options.docEditorVersion = 2
+      }
+
+      if (assignmentId) {
+        options.assignmentId = assignmentId
       }
 
       promise = SessionService.newSession(
@@ -425,9 +449,7 @@ export default {
         if (!socket.connected) await socket.connect()
         Gleap.setCustomData('sessionId', sessionId)
 
-        if (this.isVolunteer) {
-          await this.getSessionContext(sessionId)
-        }
+        await this.getSessionContext(sessionId)
 
         if (
           (this.isVolunteer &&
@@ -577,6 +599,15 @@ export default {
     setShowNotificationModal(value) {
       this.showNotificationModal = value
     },
+    showAssignmentDetail() {
+      AnalyticsService.captureEvent(
+        EVENTS.USER_CLICKED_TO_VIEW_SESSION_ASSIGNMENT_DETAILS,
+        {
+          userType: this.user.userType,
+        }
+      )
+      this.toggleAssignmentDetailModal()
+    },
     handleAboutSessionClick() {
       AnalyticsService.captureEvent(EVENTS.VOLUNTEER_CLICKED_ABOUT_SESSION)
       this.toggleAboutSessionModal()
@@ -587,6 +618,9 @@ export default {
       )
       this.toggleFallIncentiveReviewWarningModal()
     },
+    toggleAssignmentDetailModal() {
+      this.showAssignmentDetailModal = !this.showAssignmentDetailModal
+    },
     toggleAboutSessionModal() {
       this.showAboutSessionModal = !this.showAboutSessionModal
     },
@@ -596,17 +630,25 @@ export default {
     },
     async getSessionContext(sessionId) {
       try {
-        this.isLoadingPresessionResponse = true
-        const presessionSurveyResponse =
-          await NetworkService.getPresessionSurveyResponse(sessionId)
-        this.totalStudentSessions =
-          presessionSurveyResponse.data.totalStudentSessions
-        this.studentPresessionResponses =
-          presessionSurveyResponse.data.responses
+        this.isLoadingSessionMetadata = true
+
+        if (this.isVolunteer) {
+          const presessionSurveyResponse =
+            await NetworkService.getPresessionSurveyResponse(sessionId)
+          this.totalStudentSessions =
+            presessionSurveyResponse.data.totalStudentSessions
+          this.studentPresessionResponses =
+            presessionSurveyResponse.data.responses
+        }
+
+        const {
+          data: { assignment },
+        } = await NetworkService.getAssignmentForSession(sessionId)
+        this.studentAssignment = assignment
       } catch (err) {
-        this.showNoPresessionSurveyResponse = true
+        this.isLoadingSessionMetadata = false
       } finally {
-        this.isLoadingPresessionResponse = false
+        this.isLoadingSessionMetadata = false
       }
     },
     openHelp() {

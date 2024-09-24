@@ -1091,4 +1091,10 @@ export default {
       this._errorHandler
     )
   },
+  getAssignmentForSession(sessionId) {
+    return httpGet(`${API_ROOT}/session/${sessionId}/assignment`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
 }

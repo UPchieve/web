@@ -2,7 +2,6 @@
 import type { AxiosError } from 'axios'
 import moment from 'moment'
 import { computed, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 
 import type { Assignment } from './StudentClassesView.vue'
@@ -13,14 +12,13 @@ import UpdogCrying from '@/assets/updog-crying.svg'
 import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'
 
-const $route = useRoute()
-const $router = useRouter()
 const $store = useStore()
 
 const props = defineProps({
   assignmentId: { type: String, required: true },
   assignment: { type: Object, required: false },
-  startSession: { type: Function, required: true },
+  goBack: { type: Function, required: false },
+  startSession: { type: Function, required: false },
 })
 
 const isLoading = ref<boolean>(false)
@@ -49,12 +47,6 @@ onMounted(async () => {
     }
   }
 })
-
-function goBack() {
-  const CLASSES_PATH_INDEX = 0
-  const backRoute = $route.path.split('/assignments')[CLASSES_PATH_INDEX]
-  $router.replace(backRoute)
-}
 
 function formatDate(date?: Date) {
   if (date) {
@@ -88,12 +80,17 @@ function getAssignmentTutoringDetails(assignment: Assignment) {
 </script>
 
 <template>
-  <div class="main">
-    <div class="back" role="button" @click="goBack">
+  <div>
+    <div
+      v-if="props.goBack"
+      class="back mb-5"
+      role="button"
+      @click="props.goBack()"
+    >
       <arrow-icon class="back-arrow" />
       Back
     </div>
-    <div v-if="isLoading" class="uc-row justify-center mt-5">
+    <div v-if="isLoading" class="uc-row justify-center">
       <loader />
     </div>
     <div
@@ -106,7 +103,7 @@ function getAssignmentTutoringDetails(assignment: Assignment) {
       </p>
       <p>Error: {{ errorMessage }}</p>
     </div>
-    <div v-else-if="currentAssignment" class="uc-row w-full mt-5">
+    <div v-else-if="currentAssignment" class="uc-row w-full">
       <img
         v-if="currentAssignment.subjectName"
         :src="subjects[currentAssignment.subjectName].topicIconLink"
@@ -135,6 +132,7 @@ function getAssignmentTutoringDetails(assignment: Assignment) {
         </div>
         <button
           class="uc-form-button mt-5"
+          v-if="props.startSession"
           @click="props.startSession(currentAssignment)"
         >
           Start your session
@@ -145,10 +143,6 @@ function getAssignmentTutoringDetails(assignment: Assignment) {
 </template>
 
 <style lang="scss" scoped>
-.main {
-  padding: 30px 45px;
-}
-
 .back {
   color: $c-information-blue;
 
