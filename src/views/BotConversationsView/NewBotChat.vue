@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { useStore } from 'vuex'
-import { computed, nextTick, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import SelectTopic from './SelectTopic.vue'
 import { useRouter } from 'vue-router'
 import Textarea from './Textarea.vue'
-import LoggerService from '@/services/LoggerService'
 // import Logout from '@/assets/logout.svg'
 
 export type Subject = Partial<{ id: number; displayName: string }>
@@ -23,20 +22,20 @@ const fetchingConversation = computed(
 )
 
 const sendFirstMessage = async (message: string) => {
-  const conversationId = await store.dispatch(
-    'botConversations/createConversation',
-    {
-      message,
-      subjectId: currentSubject.value.id,
-    }
-  )
-  await nextTick()
-  if (conversationId) {
-    router.push(`/ai-tutor-conversations/${conversationId}`)
-  } else {
-    LoggerService.noticeError('No conversation id created')
-  }
+  await store.dispatch('botConversations/createConversation', {
+    message,
+    subjectId: currentSubject.value.id,
+  })
 }
+
+watch(
+  () => store.state.botConversations.currentConversation?.conversationId,
+  (current, prev) => {
+    if (current !== prev && current) {
+      router.push(`/ai-tutor-conversations/${current}`)
+    }
+  }
+)
 </script>
 
 <template>
