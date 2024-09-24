@@ -95,10 +95,10 @@ export default {
       }
     },
     async createConversation(
-      { commit, rootState, dispatch },
+      { commit, rootState },
       { message, subjectId }: { message: string; subjectId: number }
     ) {
-      dispatch('resetCurrentConversation')
+      commit('setCurrentConversation', {})
       commit('clearErrors')
       commit('setIsFetchingConversation', true)
       try {
