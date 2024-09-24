@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { useStore } from 'vuex'
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import SelectTopic from './SelectTopic.vue'
 import { useRouter } from 'vue-router'
 import Textarea from './Textarea.vue'
+import LoggerService from '@/services/LoggerService'
 // import Logout from '@/assets/logout.svg'
 
 export type Subject = Partial<{ id: number; displayName: string }>
@@ -29,7 +30,12 @@ const sendFirstMessage = async (message: string) => {
       subjectId: currentSubject.value.id,
     }
   )
-  router.push(`/ai-tutor-conversations/${conversationId}`)
+  await nextTick()
+  if (conversationId) {
+    router.push(`/ai-tutor-conversations/${conversationId}`)
+  } else {
+    LoggerService.noticeError('No conversation id created')
+  }
 }
 </script>
 
