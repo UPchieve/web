@@ -31,6 +31,11 @@ const posthogUrls = [
   'https://app-static-prod.posthog.com',
   'https://app.posthog.com',
 ]
+
+const langfuseUrls = [
+  'https://langfuse-3a4rkavt5lhq6-app.blackwave-abfc8d40.centralus.azurecontainerapps.io',
+]
+
 const mathJaxFetchUrl = 'https://api.cdnjs.com'
 const s3PhotoConnectUrls = [
   `${config.awsS3.photoIdBucket}.s3.us-east-2.amazonaws.com`,
@@ -71,6 +76,7 @@ const scriptSrc = [
   cdnUrl,
   mathJaxScriptUrl,
   ...posthogUrls,
+  ...langfuseUrls,
   ...newrelicUrls,
   gleapUrl,
   orbitalUrl,
@@ -93,6 +99,7 @@ const imgSrc = [
 const connectSrc = [
   "'self'",
   ...posthogUrls,
+  ...langfuseUrls,
   mathJaxFetchUrl,
   ...s3PhotoConnectUrls,
   ...newrelicUrls,

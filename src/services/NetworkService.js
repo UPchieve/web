@@ -1003,12 +1003,41 @@ export default {
       gradeLevel,
     }).then(this._successHandler, this._errorHandler)
   },
-  sendTutorBotMessage(userId, sessionId, message) {
-    return httpPost(`${API_ROOT}/tutor-bot/message`, {
+  getAllMessagesForBotConversation(conversationId) {
+    return httpGet(
+      `${API_ROOT}/tutor-bot/conversations/${conversationId}`
+    ).then(this._successHandler, this._errorHandler)
+  },
+  getAllBotConversationsForUser(userId) {
+    return httpGet(`${API_ROOT}/tutor-bot/conversations/users/${userId}`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
+  createTutorBotSession({
+    userId,
+    sessionId,
+    message,
+    senderUserType,
+    subjectId,
+  }) {
+    return httpPost(`${API_ROOT}/tutor-bot/conversations`, {
       userId,
       sessionId,
+      senderUserType,
       message,
+      subjectId,
     }).then(this._successHandler, this._errorHandler)
+  },
+  sendTutorBotMessage({ userId, conversationId, message, senderUserType }) {
+    return httpPost(
+      `${API_ROOT}/tutor-bot/conversations/${conversationId}/message`,
+      {
+        userId,
+        message,
+        senderUserType,
+      }
+    ).then(this._successHandler, this._errorHandler)
   },
   enrollStudentInIncentiveProgram() {
     return httpPost(
