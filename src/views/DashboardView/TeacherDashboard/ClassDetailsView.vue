@@ -114,13 +114,16 @@
             class="assignment-card-wrapper"
           >
             <div class="assignment-card">
-              <AssignmentIcon />
+              <div class="assignment-icon">
+                <AssignmentIcon />
+              </div>
               <div class="assignment-info">
                 <button @click="viewAssignment(assignment.id)">
                   <h1>{{ assignment.title }}</h1>
                   <p>Due date: {{ formatTimestamp(assignment.dueDate) }}</p>
                 </button>
                 <button
+                  v-if="assignmentsCompletion[assignment.id].totalStudents"
                   class="student-completion"
                   @click="toggleStudentCompletion(assignment.id)"
                 >
@@ -129,6 +132,11 @@
                     assignmentsCompletion[assignment.id].completedStudents
                   }}/{{ assignmentsCompletion[assignment.id].totalStudents }}
                 </button>
+                <div v-else>
+                  <p class="no-students-assigned">
+                    No students have been assigned.
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -580,7 +588,7 @@ export default {
 }
 
 .assignments-container {
-  @include flex-container(column, center, center);
+  @include flex-container(column, flex-start, flex-start);
   background-color: #ffffff;
   flex-grow: 1;
 }
@@ -619,37 +627,58 @@ export default {
 }
 
 .assignment-card {
-  @include flex-container(row, flex-start);
-  border: solid $c-border-grey;
-  border-radius: 10px;
-  gap: 12px;
-  padding: 16px;
-  height: auto;
-  position: relative;
-  text-align: left;
+  @include flex-container(row, flex-start, flex-start);
+  padding: 12px 8px;
+  border: 1px solid $c-border-grey;
+  border-radius: 8px;
+  background-color: #ffffff;
+  margin-bottom: 16px;
+  width: 350px;
 
-  h1 {
-    font-size: 20px;
-    margin-bottom: 6px;
-    font-weight: 600;
+  .assignment-icon {
+    margin: 0 8px;
   }
 
-  p {
-    font-size: 16px;
-    color: $c-soft-black;
-    margin-bottom: 0;
-  }
+  .assignment-info {
+    @include flex-container(column, flex-start, flex-start);
+    overflow: hidden;
+    flex-grow: 1;
 
-  .student-completion {
-    padding: 0;
-    margin-top: 1.25rem;
-    color: #1855d1;
-    font-weight: 500;
+    button {
+      display: block;
+      text-align: left;
+      width: 100%;
+    }
+
+    h1 {
+      font-size: 18px;
+      margin: 0;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    p {
+      font-size: 16px;
+      margin: 8px 0 0;
+    }
+
+    .student-completion,
+    .no-students-assigned {
+      padding-left: 6px;
+      margin-top: 1.25rem;
+      color: #1855d1;
+      font-weight: 500;
+    }
+
+    .no-students-assigned {
+      color: $c-secondary-grey;
+    }
   }
 }
 
 .assignments-cards {
-  @include flex-container(row, flex-start, center);
+  @include flex-container(row, flex-start, flex-start);
   flex-grow: 1;
   margin: 20px;
   gap: 24px;
@@ -674,15 +703,6 @@ export default {
   width: 40px;
   text-align: center;
   height: 20px;
-}
-
-.assignment-info {
-  @include flex-container(column, flex-start);
-
-  button {
-    text-align: left;
-    padding: 0;
-  }
 }
 
 .tabs {

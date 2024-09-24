@@ -37,6 +37,7 @@ import StartCollegeSessionModal from '@/views/DashboardView/StudentDashboard/Sta
 import CreateTeacherClassModal from '@/components/CreateTeacherClassModal.vue'
 import TeacherClassCodeModal from '@/components/TeacherClassCodeModal.vue'
 import CreateAssignmentModal from '@/components/CreateAssignmentModal.vue'
+import StudentCompletionModal from '@/components/StudentCompletionModal.vue'
 
 export default {
   components: {
@@ -54,6 +55,7 @@ export default {
     CreateTeacherClassModal,
     TeacherClassCodeModal,
     CreateAssignmentModal,
+    StudentCompletionModal,
   },
   data() {
     return {

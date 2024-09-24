@@ -11,6 +11,12 @@
       }}</span>
     </h1>
     <div class="assignment-info">
+      <button
+        class="student-completion-btn"
+        @click="openStudentCompletionModal"
+      >
+        Student Completion {{ completedStudents }}/{{ totalStudents }}
+      </button>
       <div class="dates-container">
         <span
           ><Calendar class="calendar-icon" /><strong class="bold-text"
@@ -54,13 +60,10 @@ export default {
       assignmentInfo: {},
       startDate: '',
       dueDate: '',
+      studentCompletion: [],
+      totalStudents: 0,
+      completedStudents: 0,
     }
-  },
-
-  props: {
-    classId: {
-      type: String,
-    },
   },
 
   async created() {
@@ -68,6 +71,14 @@ export default {
     this.assignmentInfo = await this.getAssignmentDetails(this.assignmentId)
     this.startDate = moment(this.assignmentInfo.startDate).format('MM/DD/YYYY')
     this.dueDate = moment(this.assignmentInfo.dueDate).format('MM/DD/YYYY')
+    this.classId = this.$route.params.classId
+    this.studentCompletion = await this.getAssignmentCompletionInfo(
+      this.assignmentId
+    )
+    this.totalStudents = this.studentCompletion.length
+    this.completedStudents = this.studentCompletion.filter(
+      (student) => student.submitted_at !== null
+    ).length
   },
 
   methods: {
@@ -80,6 +91,23 @@ export default {
 
     backToAssignments() {
       this.$router.push(`/dashboard/teacher/class/${this.classId}/assignments`)
+    },
+
+    async getAssignmentCompletionInfo(assignmentId) {
+      const {
+        data: { studentAssignments },
+      } = await NetworkService.getStudentAssignmentCompletion(assignmentId)
+      return studentAssignments
+    },
+
+    openStudentCompletionModal() {
+      this.$store.dispatch('app/modal/show', {
+        component: 'StudentCompletionModal',
+        data: {
+          assignmentInfo: this.assignmentInfo,
+          studentCompletion: this.studentCompletion,
+        },
+      })
     },
   },
 }
@@ -135,5 +163,12 @@ export default {
 .assignment-info {
   border-bottom: solid 2px #d9d9d9;
   margin-bottom: 1em;
+}
+
+.student-completion-btn {
+  padding: 0;
+  margin: 0.8rem 0;
+  color: #1855d1;
+  font-weight: 500;
 }
 </style>
