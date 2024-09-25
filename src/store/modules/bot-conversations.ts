@@ -73,19 +73,21 @@ export default {
       try {
         const userId = rootState.user.user.id
         const senderUserType = rootState.user.user.type
-        commit('addToCurrentConversation', {
+        // Optimistically insert message from user
+        const optimisticMessage = {
           message,
           senderUserType,
           tutorBotConversationId: state.currentConversation.conversationId,
           userId,
-        })
+        }
+        commit('addToCurrentConversation', optimisticMessage)
         const results = await NetworkService.sendTutorBotMessage({
           userId,
           conversationId: state.currentConversation.conversationId,
           message,
           senderUserType,
         })
-        commit('addToCurrentConversation', results.data)
+        commit('addToCurrentConversation', results.data.botResponse)
         AnalyticsService.captureEvent(EVENTS.AI_TUTOR_SEND_MESSAGE)
       } catch (e) {
         LoggerService.noticeError(e)
@@ -112,18 +114,8 @@ export default {
           senderUserType,
           subjectId,
         })
-
-        const messageResults =
-          await NetworkService.getAllMessagesForBotConversation(
-            results.data.conversationId
-          )
-        messageResults.data.messages[1].traceId =
-          results.data.botResponse.traceId
-        messageResults.data.messages[1].observationId =
-          results.data.botResponse.observationId
-        commit('setCurrentConversation', messageResults.data)
+        commit('setCurrentConversation', results.data)
         AnalyticsService.captureEvent(EVENTS.AI_TUTOR_CREATE_CONVERSATION)
-        return messageResults.data.conversationId
       } catch (e) {
         LoggerService.noticeError(e)
         commit('setError', 'Can not create conversation')

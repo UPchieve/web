@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import SendMessage from '@/assets/voice_message_icons/send-message.svg'
 
 const props = defineProps<{
@@ -8,9 +8,12 @@ const props = defineProps<{
 }>()
 const message = ref('')
 const textareaRef = ref('textareaRef')
+const messageIsEmpty = computed(() => message.value.trim().length === 0)
 const send = () => {
-  props.sendMessage(message.value)
-  message.value = ''
+  if (!messageIsEmpty.value) {
+    props.sendMessage(message.value)
+    message.value = ''
+  }
 }
 onMounted(() => textareaRef.value.focus())
 watch(
@@ -41,7 +44,11 @@ watch(
         }
       "
     />
-    <button :disabled="props.disabled" class="send-button" @click="send">
+    <button
+      :disabled="props.disabled || messageIsEmpty"
+      class="send-button"
+      @click="send"
+    >
       <SendMessage></SendMessage>
     </button>
   </div>
