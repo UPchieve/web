@@ -232,6 +232,8 @@ export default {
         !this.showFallIncentiveEnrollmentModal
     },
     triggerIncentiveProgramBanner() {
+      // Prioritize showing the in-session banner if there is a current session
+      if (this.isSessionAlive) return
       this.$store.dispatch('app/header/show', {
         component: 'FallIncentiveHeader',
       })
