@@ -1,27 +1,12 @@
 <script setup lang="ts">
 import { useStore } from 'vuex'
-import {
-  onMounted,
-  computed,
-  onBeforeMount,
-  ref,
-  watch,
-  nextTick,
-  onUnmounted,
-} from 'vue'
+import { onMounted, computed, ref, watch, nextTick } from 'vue'
 import BotChatMessages from './BotChatMessages.vue'
-import Errors from './Errors.vue'
-import { useRoute } from 'vue-router'
-import Math from '@/assets/subject_icons/math.svg'
 import Textarea from './Textarea.vue'
 
 const store = useStore()
-const route = useRoute()
 const user = computed(() => store.state.user.user)
 
-onBeforeMount(async () => {
-  await store.dispatch('botConversations/fetchAllSubjects')
-})
 const chatLog = ref()
 const scrollToBottom = async () => {
   if (chatLog?.value?.scrollHeight) {
@@ -29,16 +14,7 @@ const scrollToBottom = async () => {
     chatLog.value.scrollTop = chatLog.value.scrollHeight
   }
 }
-onBeforeMount(async () => {
-  await store.dispatch(
-    'botConversations/setConversation',
-    route.params.conversationId
-  )
-})
 onMounted(() => scrollToBottom())
-onUnmounted(
-  async () => await store.dispatch('botConversations/resetCurrentConversation')
-)
 
 const conversation = computed(
   () => store.getters['botConversations/currentConversation']
@@ -50,7 +26,6 @@ const fetchingConversation = computed(
   () => store.state.botConversations.isFetchingConversation
 )
 const messages = computed(() => conversation.value.messages ?? [])
-const subject = computed(() => conversation.value?.subject?.displayName ?? '')
 
 const sendMessage = async (message: string) => {
   const result = store.dispatch('botConversations/sendMessage', message)
@@ -61,15 +36,6 @@ watch(() => messages.value.length, scrollToBottom)
 
 <template>
   <div class="container">
-    <Errors class="errors" />
-
-    <div class="row header">
-      <span>
-        <Math class="math-icon"></Math>&nbsp;
-        <span class="subject">{{ subject }}</span></span
-      >
-    </div>
-
     <div class="row chat-log" ref="chatLog">
       <BotChatMessages
         :user="user"
@@ -95,22 +61,6 @@ watch(() => messages.value.length, scrollToBottom)
   row-gap: 24px;
   position: relative;
   max-width: 768px;
-}
-
-.subject {
-  font-size: 24px;
-  font-weight: 500;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.math-icon {
-  width: 48px;
-  height: 48px;
 }
 
 .row {

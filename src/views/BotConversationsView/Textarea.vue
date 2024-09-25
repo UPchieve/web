@@ -81,7 +81,7 @@ watch(
   padding-bottom: 18px;
 }
 .send-button:hover:not(:disabled) {
-  transform: scale(1.1);
+  filter: brightness(0.9);
 }
 .send-button:disabled {
   filter: grayscale(0.75);

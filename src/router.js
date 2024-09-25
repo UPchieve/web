@@ -58,7 +58,7 @@ import { beforeEnter as studentBeforeEnter } from '@/services/SignUpService/Stud
 import { beforeEnter as teacherBeforeEnter } from '@/services/SignUpService/TeacherSignUpService'
 import { INVALID_CSRF_ERROR } from '@/services/AuthService'
 import Case from 'case'
-import BotChat from './views/BotConversationsView/BotChat.vue'
+import BotChatView from './views/BotConversationsView/BotChatView.vue'
 import NewBotChat from './views/BotConversationsView/NewBotChat.vue'
 
 const getUser = () => {
@@ -263,7 +263,7 @@ const routes = [
       {
         path: ':conversationId',
         name: 'BotChat',
-        component: BotChat,
+        component: BotChatView,
         meta: { protected: true },
       },
     ],
