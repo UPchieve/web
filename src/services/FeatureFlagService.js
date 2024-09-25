@@ -7,13 +7,14 @@ import axios from 'axios'
 const FIVE_MINUTES_IN_MS = 1000 * 60 * 5
 
 class FeatureFlagService {
-  static async init(id, featureFlags, featureFlagPayloads) {
+  static async init(id, featureFlags, featureFlagPayloads, personProperties) {
     return new Promise((resolve) => {
       posthog.init(config.posthogToken, {
         api_host: 'https://p.upchieve.org',
         ui_host: 'app.posthog.com',
         persistence: 'localStorage+cookie',
         loaded() {
+          FeatureFlagService.setPersonProperties(personProperties)
           FeatureFlagService.listenForFlagReload()
           resolve()
         },
@@ -60,6 +61,10 @@ class FeatureFlagService {
 
   static setPersonPropertiesForFlags(props) {
     posthog.setPersonPropertiesForFlags(props)
+  }
+
+  static setPersonProperties(props) {
+    posthog.setPersonProperties(props)
   }
 
   static isFeatureEnabled(featureFlagKey) {
