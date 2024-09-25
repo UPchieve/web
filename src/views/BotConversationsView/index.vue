@@ -23,5 +23,6 @@ onBeforeMount(async () => {
 .layout {
   height: 100%;
   display: flex;
+  background-color: #fbfbfc;
 }
 </style>
