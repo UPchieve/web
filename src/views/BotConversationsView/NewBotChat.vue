@@ -21,7 +21,10 @@ watch(
     if (current) {
       const navFailure = await router.push(`/ai-tutor-conversations/${current}`)
       if (navFailure) {
-        LoggerService.noticeError(navFailure)
+        LoggerService.noticeError(navFailure, {
+          message: 'NewBotChat failed to redirect to conversation',
+          current,
+        })
       }
     }
   }
