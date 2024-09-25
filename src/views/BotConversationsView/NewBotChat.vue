@@ -78,6 +78,7 @@ const sendFirstMessage = async (message: string) => {
   padding: 36px;
   row-gap: 24px;
   max-height: 80vh;
+  max-width: 768px;
 }
 
 .row {

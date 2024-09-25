@@ -123,7 +123,8 @@ export default {
         commit('setIsFetchingConversation', false)
       }
     },
-    async fetchAllSubjects({ commit }) {
+    async fetchAllSubjects({ state, commit }) {
+      if (state.subjects.length) return
       const result = await NetworkService.getSubjects()
       commit('setSubjects', result.data.subjects)
     },

@@ -212,6 +212,9 @@ const giveFeedback = (event: Event) => {
 .thumbs-btn svg {
   width: 28px;
   height: 28px;
+  & path {
+    fill: #949ba5;
+  }
 }
 
 .thumbs-btn.down.selected,

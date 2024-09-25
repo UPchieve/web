@@ -51,12 +51,15 @@ function messageAlignment(message: (typeof props.messages)[number]) {
 
 <style lang="scss" scoped>
 .message {
-  max-width: 90%;
+  max-width: 80%;
+  line-height: 160%;
+  font-size: 18px;
+  font-family: system-ui, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 .right {
   align-self: end;
-  background-color: $c-border-grey;
-  border-radius: 13px;
+  background-color: $c-background-blue;
+  border-radius: 2em;
   padding: 9px 21px;
 }
 .left {

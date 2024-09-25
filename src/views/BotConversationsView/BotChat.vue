@@ -19,6 +19,9 @@ const store = useStore()
 const route = useRoute()
 const user = computed(() => store.state.user.user)
 
+onBeforeMount(async () => {
+  await store.dispatch('botConversations/fetchAllSubjects')
+})
 const chatLog = ref()
 const scrollToBottom = async () => {
   if (chatLog?.value?.scrollHeight) {
@@ -91,6 +94,7 @@ watch(() => messages.value.length, scrollToBottom)
   padding: 36px;
   row-gap: 24px;
   position: relative;
+  max-width: 768px;
 }
 
 .subject {
