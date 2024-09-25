@@ -142,6 +142,7 @@ export default {
         const quizzes = certData.certifications
         for (const quiz of quizzes) {
           const topic = state.subjects[quiz.key]?.topicName
+          if (!topic) continue
           formatted[quiz.key] = {
             ...state.subjects[quiz.key],
             topicDashboardOrder: state.training.subjectTypes.find(
