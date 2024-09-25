@@ -14,7 +14,7 @@ const SUPPORTED_SUBJECTS = [
 export default {
   namespaced: true,
   state: {
-    currentConversation: {}, // {id: 1, messages: []}
+    currentConversation: {},
     userConversations: [],
     messageIsSending: false,
     isFetchingConversation: false,
@@ -122,8 +122,6 @@ export default {
         messageResults.data.messages[1].observationId =
           results.data.botResponse.observationId
         commit('setCurrentConversation', messageResults.data)
-        /* not for v1. if we have a persistent history viewer we can call this to update it */
-        // dispatch('fetchAllConversations')
         AnalyticsService.captureEvent(EVENTS.AI_TUTOR_CREATE_CONVERSATION)
         return messageResults.data.conversationId
       } catch (e) {
@@ -133,14 +131,6 @@ export default {
         commit('setIsFetchingConversation', false)
       }
     },
-    /* not needed for v1
-    async fetchAllConversations({ commit, rootState }) {
-      commit('clearErrors')
-      const userId = rootState.user.user.id
-      const results = await NetworkService.getAllBotConversationsForUser(userId)
-      commit('setUserConversations', results.data)
-    },
-    */
     async fetchAllSubjects({ commit }) {
       const result = await NetworkService.getSubjects()
       commit('setSubjects', result.data.subjects)
