@@ -51,7 +51,8 @@ async function main() {
     await FeatureFlagService.init(
       flagsResponse.value?.data?.id,
       flagsResponse.value?.data?.featureFlags,
-      flagsResponse.value?.data?.featureFlagPayloads
+      flagsResponse.value?.data?.featureFlagPayloads,
+      flagsResponse.value?.data?.personProperties
     )
     AnalyticsService.init()
 
