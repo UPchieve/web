@@ -28,7 +28,7 @@ const subject = computed(() => conversation.value?.subject?.displayName ?? '')
 
 <template>
   <div class="container">
-    <Errors class="errors" />
+    <Errors />
 
     <div class="row header">
       <span>

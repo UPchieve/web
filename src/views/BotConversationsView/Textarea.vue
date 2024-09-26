@@ -4,15 +4,17 @@ import SendMessage from '@/assets/voice_message_icons/send-message.svg'
 
 const props = defineProps<{
   disabled: boolean
-  sendMessage: (message: string) => void
+  sendMessage: (message: string) => Promise<boolean>
 }>()
 const message = ref('')
 const textareaRef = ref('textareaRef')
 const messageIsEmpty = computed(() => message.value.trim().length === 0)
-const send = () => {
+const send = async () => {
   if (!messageIsEmpty.value) {
-    props.sendMessage(message.value)
-    message.value = ''
+    const results = await props.sendMessage(message.value)
+    if (results) {
+      message.value = ''
+    }
   }
 }
 onMounted(() => textareaRef.value.focus())
