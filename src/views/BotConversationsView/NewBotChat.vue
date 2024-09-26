@@ -6,7 +6,6 @@ import { useRouter } from 'vue-router'
 import Textarea from './Textarea.vue'
 import LoggerService from '@/services/LoggerService'
 import ModerationService from '@/services/ModerationService'
-import Errors from './Errors.vue'
 
 export type Subject = Partial<{ id: number; displayName: string }>
 
@@ -64,7 +63,6 @@ const sendFirstMessage = async (message: string) => {
 
 <template>
   <div class="container">
-    <Errors />
     <SelectTopic
       :subjects="subjects"
       :subject="currentSubject"
@@ -72,17 +70,21 @@ const sendFirstMessage = async (message: string) => {
       :firstName="store.getters['user/firstName']"
     />
 
-    <div class="row chat-log">
+    <div class="chat-log">
       <div class="typing-indicator" v-if="fetchingConversation">
         Creating chat
       </div>
     </div>
-
-    <Textarea
-      class="row"
-      :disabled="!currentSubject || fetchingConversation"
-      :sendMessage="(message: string) => sendFirstMessage(message)"
-    ></Textarea>
+    <span class="notice">
+      The UPchieve team monitors messages - let's keep them safe and respectful!
+    </span>
+    <div class="text-area-container">
+      <Textarea
+        class="textarea"
+        :disabled="!currentSubject || fetchingConversation"
+        :sendMessage="(message: string) => sendFirstMessage(message)"
+      ></Textarea>
+    </div>
   </div>
 </template>
 
@@ -91,28 +93,34 @@ const sendFirstMessage = async (message: string) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 36px;
-  row-gap: 24px;
-  max-height: 80vh;
+  justify-content: center;
+  row-gap: 18px;
+  height: 100%;
   max-width: 768px;
 }
 
-.row {
+.text-area-container {
   width: 100%;
-  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 36px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #fbfbfc;
+}
+.notice {
+  align-self: start;
+}
+.chat-log {
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  align-self: start;
 }
 
-.chat-log {
-  flex-grow: 1;
-  max-height: 200px;
-  align-items: end;
-}
-.chat textarea {
+.textarea {
   width: 100%;
-  height: 8em;
-  border-radius: 11px;
-  border: 1px solid $border-grey;
-  padding: 18px;
 }
 
 .typing-indicator {

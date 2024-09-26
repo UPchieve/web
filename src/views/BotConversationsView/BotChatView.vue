@@ -2,7 +2,6 @@
 import { useStore } from 'vuex'
 import { computed, onBeforeMount, onUnmounted } from 'vue'
 import BotChat from './BotChat.vue'
-import Errors from './Errors.vue'
 import { useRoute } from 'vue-router'
 import Math from '@/assets/subject_icons/math.svg'
 
@@ -27,45 +26,30 @@ const subject = computed(() => conversation.value?.subject?.displayName ?? '')
 </script>
 
 <template>
-  <div class="container">
-    <Errors />
-
-    <div class="row header">
+  <div class="bot-chat-view-container">
+    <div class="header">
       <span>
         <Math class="math-icon"></Math>&nbsp;
         <span class="subject">{{ subject }}</span></span
       >
     </div>
 
-    <BotChat class="bot-chat"></BotChat>
+    <BotChat></BotChat>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.container {
+.bot-chat-view-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 36px;
-  row-gap: 24px;
+  flex: 1 1 0%;
+  overflow: hidden;
   position: relative;
-  max-width: 768px;
-}
-
-.bot-chat {
-  flex-grow: 1;
-  overflow-y: auto;
-}
-
-.subject {
-  font-size: 24px;
-  font-weight: 500;
 }
 
 .header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  position: sticky;
+  padding: 20px;
 }
 
 .math-icon {
@@ -73,8 +57,8 @@ const subject = computed(() => conversation.value?.subject?.displayName ?? '')
   height: 48px;
 }
 
-.row {
-  width: 100%;
-  margin: 0 auto;
+.subject {
+  font-size: 24px;
+  font-weight: 500;
 }
 </style>

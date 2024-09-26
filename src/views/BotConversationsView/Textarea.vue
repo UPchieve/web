@@ -7,7 +7,7 @@ const props = defineProps<{
   sendMessage: (message: string) => Promise<boolean>
 }>()
 const message = ref('')
-const textareaRef = ref('textareaRef')
+const textareaRef = ref<HTMLTextAreaElement>()
 const messageIsEmpty = computed(() => message.value.trim().length === 0)
 const send = async () => {
   if (!messageIsEmpty.value) {
@@ -17,15 +17,56 @@ const send = async () => {
     }
   }
 }
-onMounted(() => textareaRef.value.focus())
+onMounted(() => textareaRef.value?.focus())
 watch(
   () => props.disabled,
   () => {
     if (!props.disabled) {
-      nextTick(() => textareaRef.value.focus())
+      nextTick(() => textareaRef.value?.focus())
     }
   }
 )
+const rows = ref(1)
+
+const resizeTextAreaToFitText = () => {
+  if (!textareaRef.value) return
+
+  // Store initial values of padding
+  const paddingTop = getComputedStyle(textareaRef.value).paddingTop
+  const paddingBottom = getComputedStyle(textareaRef.value).paddingBottom
+
+  /*
+   * Reset textarea to 1 row and remove padding so we can get an accurate
+   * measurment of the scrollheight
+   *
+   * NOTE: This isn't robust. If other CSS properties are added that modify
+   * the height (i.e. margin, height, etc...) you will need to account for
+   * those
+   */
+  textareaRef.value.rows = 1
+  textareaRef.value.style.paddingTop = '0'
+  textareaRef.value.style.paddingBottom = '0'
+  const scrollHeight = textareaRef.value.scrollHeight
+
+  /*
+   * Calculate line height so we can get the number of lines we need
+   * NOTE: parseInt is effectively rounding down the value
+   */
+  const computedLineHeight = parseInt(
+    getComputedStyle(textareaRef.value).lineHeight,
+    10
+  )
+
+  // Restore inital values
+  textareaRef.value.style.paddingTop = paddingTop
+  textareaRef.value.style.paddingBottom = paddingBottom
+  textareaRef.value.rows = rows.value
+
+  const lines = Math.floor(scrollHeight / computedLineHeight)
+  rows.value = lines >= 5 ? 5 : lines
+}
+
+watch(() => message.value, resizeTextAreaToFitText)
 </script>
 
 <template>
@@ -36,6 +77,7 @@ watch(
       :disabled="props.disabled"
       placeholder="Chat with UPbot"
       v-model="message"
+      :rows="rows"
       @keydown.enter.prevent
       @keyup="
         (event) => {
@@ -62,7 +104,7 @@ watch(
   background-color: white;
   border: 1px solid $border-grey;
   border-radius: 11px;
-  justify-content: end;
+  align-items: center;
 }
 
 .chat.disabled,
@@ -74,13 +116,12 @@ watch(
   border-radius: 11px;
   padding: 18px;
   width: 100%;
-  height: 8em;
   resize: none;
   outline: none;
+  line-height: 140%;
 }
 .send-button {
   padding-right: 18px;
-  padding-bottom: 18px;
 }
 .send-button:hover:not(:disabled) {
   filter: brightness(0.9);
