@@ -8,11 +8,11 @@ import ModerationService from '@/services/ModerationService'
 const store = useStore()
 const user = computed(() => store.state.user.user)
 
-const chatLog = ref()
+const chatContainer = ref()
 const scrollToBottom = async () => {
-  if (chatLog?.value?.scrollHeight) {
+  if (chatContainer?.value?.scrollHeight) {
     await nextTick()
-    chatLog.value.scrollTop = chatLog.value.scrollHeight
+    chatContainer.value.scrollTop = chatContainer.value.scrollHeight
   }
 }
 onMounted(() => scrollToBottom())
@@ -49,8 +49,8 @@ watch(() => messages.value.length, scrollToBottom)
 </script>
 
 <template>
-  <div class="container">
-    <div class="row chat-log" ref="chatLog">
+  <div class="chat-container" ref="chatContainer">
+    <div class="chat-log">
       <BotChatMessages
         :user="user"
         :messages="messages"
@@ -58,32 +58,39 @@ watch(() => messages.value.length, scrollToBottom)
       />
     </div>
 
-    <Textarea
-      class="row"
-      :disabled="messageSending || fetchingConversation"
-      :sendMessage="(message: string) => sendMessage(message)"
-    ></Textarea>
+    <div class="text-area-container">
+      <Textarea
+        class="text-area"
+        :disabled="messageSending || fetchingConversation"
+        :sendMessage="(message: string) => sendMessage(message)"
+      ></Textarea>
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 36px;
-  row-gap: 24px;
-  position: relative;
-  max-width: 768px;
+.chat-container {
+  overflow-y: scroll;
 }
-
-.row {
-  width: 100%;
-  margin: 0 auto;
-}
-
 .chat-log {
-  flex-grow: 1;
-  overflow-y: auto;
+  padding-bottom: calc(64px + 72px);
+}
+
+.text-area-container {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 36px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #fbfbfc;
+}
+
+.text-area {
+  width: 80%;
+  max-width: 695px;
 }
 </style>
