@@ -3,6 +3,7 @@ import { useStore } from 'vuex'
 import { onMounted, computed, ref, watch, nextTick } from 'vue'
 import BotChatMessages from './BotChatMessages.vue'
 import Textarea from './Textarea.vue'
+import ModerationService from '@/services/ModerationService'
 
 const store = useStore()
 const user = computed(() => store.state.user.user)
@@ -28,9 +29,22 @@ const fetchingConversation = computed(
 const messages = computed(() => conversation.value.messages ?? [])
 
 const sendMessage = async (message: string) => {
-  const result = store.dispatch('botConversations/sendMessage', message)
-  await result
+  store.commit('botConversations/clearErrors')
+  const isClean = await ModerationService.checkIfMessageIsClean({
+    message,
+    sessionId: conversation.value.sessionId,
+  })
+  if (isClean) {
+    await store.dispatch('botConversations/sendMessage', message)
+  } else {
+    store.commit(
+      'botConversations/setError',
+      'Messages cannot contain personal information, profanity, or links to third party video services'
+    )
+  }
+  return isClean
 }
+
 watch(() => messages.value.length, scrollToBottom)
 </script>
 

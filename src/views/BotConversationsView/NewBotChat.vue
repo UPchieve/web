@@ -5,6 +5,8 @@ import SelectTopic from './SelectTopic.vue'
 import { useRouter } from 'vue-router'
 import Textarea from './Textarea.vue'
 import LoggerService from '@/services/LoggerService'
+import ModerationService from '@/services/ModerationService'
+import Errors from './Errors.vue'
 
 export type Subject = Partial<{ id: number; displayName: string }>
 
@@ -40,15 +42,29 @@ const selectSubject = (subject: Subject) => {
 }
 
 const sendFirstMessage = async (message: string) => {
-  await store.dispatch('botConversations/createConversation', {
+  store.commit('botConversations/clearErrors')
+  const isClean = await ModerationService.checkIfMessageIsClean({
     message,
-    subjectId: currentSubject.value.id,
+    sessionId: undefined, // we will have a sessionId when creating an ai convo in session
   })
+  if (isClean) {
+    await store.dispatch('botConversations/createConversation', {
+      message,
+      subjectId: currentSubject.value.id,
+    })
+  } else {
+    store.commit(
+      'botConversations/setError',
+      'Messages cannot contain personal information, profanity, or links to third party video services'
+    )
+  }
+  return isClean
 }
 </script>
 
 <template>
   <div class="container">
+    <Errors />
     <SelectTopic
       :subjects="subjects"
       :subject="currentSubject"
