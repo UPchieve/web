@@ -23,6 +23,10 @@ const MY_CLASSES_LINK = {
   to: '/classes',
   text: 'My Classes',
 }
+const MY_CLASSES_LINK_TEACHERS = {
+  to: '/dashboard',
+  text: 'My Classes',
+}
 
 // Volunteer links
 const CALENDAR_LINK = { to: '/calendar', text: 'Schedule' }
@@ -76,6 +80,7 @@ const links = {
       CONTACT_LINK,
       COMMUNITY_LINK,
     ],
+    teacher: [MY_CLASSES_LINK_TEACHERS, PROFILE_LINK, CONTACT_LINK],
   },
   onboarding: {
     student: [],
@@ -236,6 +241,16 @@ describe('SidebarLinks', () => {
           isAssignmentsEnabled: false,
         })
         testLinks(wrapper, links.default.student)
+      })
+
+      it('renders default links for teacher', () => {
+        const wrapper = getWrapper({
+          authenticated: true,
+          isStudent: false,
+          mobileMode: true,
+          isTeacher: true,
+        })
+        testLinks(wrapper, links.default.teacher)
       })
     })
 
