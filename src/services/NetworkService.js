@@ -1008,6 +1008,11 @@ export default {
       `${API_ROOT}/tutor-bot/conversations/${conversationId}`
     ).then(this._successHandler, this._errorHandler)
   },
+  getConversationWithMessagesBySessionId(sessionId) {
+    return httpGet(
+      `${API_ROOT}/session/${sessionId}/tutor-bot-conversation`
+    ).then(this._successHandler, this._errorHandler)
+  },
   getAllBotConversationsForUser(userId) {
     return httpGet(`${API_ROOT}/tutor-bot/conversations/users/${userId}`).then(
       this._successHandler,

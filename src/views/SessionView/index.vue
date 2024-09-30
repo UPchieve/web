@@ -15,12 +15,8 @@
     >
       <ai-widget-tool
         v-if="showAiWidget"
-        :currentSession="session"
-        :shouldHideChatSection="shouldHideChatSection"
-        :setHasSeenNewMessage="setHasSeenNewMessage"
-        :isSessionConnectionAlive="isSessionConnectionAlive"
-        :isSessionAlive="isSessionAlive"
-        :sessionHasEnded="sessionHasEnded"
+        @minimize="() => (aiWidgetHidden = true)"
+        :conversationId="tutorBotConversationId"
       />
       <div
         class="auxiliary-container"
@@ -36,6 +32,9 @@
           :isWhiteboardOpen="auxiliaryOpen"
           :toggleWhiteboard="toggleAuxiliary"
           :isSessionOver="isSessionOver"
+          :aiWidgetHidden="aiWidgetHidden"
+          @toggleAiWidget="toggleAiWidget"
+          :aiWidgetEnabled="aiWidgetEnabled"
         />
         <document-editor-v2
           v-else-if="
@@ -105,16 +104,6 @@
             class="help-icon"
           />
         </div>
-        <!-- @NEW - show fake session chat or real session chat -->
-        <ai-group-session-chat
-          v-if="showUnifiedChat"
-          :currentSession="session"
-          :shouldHideChatSection="shouldHideChatSection"
-          :setHasSeenNewMessage="setHasSeenNewMessage"
-          :isSessionConnectionAlive="isSessionConnectionAlive"
-          :isSessionAlive="isSessionAlive"
-          :sessionHasEnded="sessionHasEnded"
-        />
         <session-chat
           v-else
           :aiWidgetPresent="showAiWidget"
@@ -195,7 +184,6 @@ import SessionService from '@/services/SessionService'
 import AnalyticsService from '@/services/AnalyticsService'
 import SessionHeader from './SessionHeader.vue'
 import SessionChat from './SessionChat/index.vue'
-import AiGroupSessionChat from './AiGroupSessionChat/index.vue'
 import AiWidgetTool from './AiWidgetTool/index.vue'
 import Whiteboard from './Whiteboard.vue'
 import DocumentEditor from './DocumentEditor.vue'
@@ -210,14 +198,12 @@ import AboutSessionModal from './AboutSessionModal.vue'
 import AssignmentDetailModal from './AssignmentDetailModal.vue'
 import FallIncentiveReviewWarningModal from './FallIncentiveReviewWarningModal.vue'
 import getNotificationPermission from '@/utils/get-notification-permission'
-import { EVENTS, POSTHOG_FEATURE_FLAGS, SESSION_TOOL_TYPES } from '@/consts'
+import { EVENTS, SESSION_TOOL_TYPES } from '@/consts'
 import Gleap from 'gleap'
 import { backOff } from 'exponential-backoff'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import LoggerService from '@/services/LoggerService'
 import { socket } from '@/socket'
-import FeatureFlagService from '@/services/FeatureFlagService'
-import loggerService from '@/services/LoggerService'
 
 const activeHeaderData = {
   component: 'SessionHeader',
@@ -229,7 +215,6 @@ export default {
     AiWidgetTool,
     SessionHeader,
     SessionChat,
-    AiGroupSessionChat,
     Whiteboard,
     PhotoUploadIcon,
     DocumentEditor,
@@ -286,7 +271,9 @@ export default {
       sessionHasEnded: false,
       showFallIncentiveReviewWarningModal: false,
       unsubscribeFromActionSubscription: () => undefined,
-      tutorBotChatType: null,
+      tutorBotConversationId: null,
+      aiWidgetHidden: true,
+      gettingTutorBotConversation: false,
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -352,10 +339,11 @@ export default {
       return [this.isConnected, this.sessionId]
     },
     showAiWidget() {
-      return this.tutorBotChatType === 'separate'
-    },
-    showUnifiedChat() {
-      return this.tutorBotChatType === 'unified'
+      return (
+        this.tutorBotConversationId &&
+        this.aiWidgetEnabled &&
+        !this.aiWidgetHidden
+      )
     },
     showReviewWarning() {
       return (
@@ -371,6 +359,16 @@ export default {
         this.isVolunteer ||
         this.mobileMode
       )
+    },
+
+    aiWidgetEnabled() {
+      /*
+       * TODO: when we want to enable this, we need to check the student's FF
+       *  `isStandAloneAiTutorEnabled`.
+       * if the user is a volunteer, we need to somehow know when this is enabled
+       * for the student and then enable it for the volunteer
+       */
+      return false
     },
   },
   async mounted() {
@@ -393,6 +391,11 @@ export default {
         onRetry: (res, abort) => {
           this.showTroubleStartingModal(abort)
         },
+      }
+
+      const tutorBotConversationId = this.$route.query.tutorBotConversationId
+      if (tutorBotConversationId) {
+        options.tutorBotConversationId = tutorBotConversationId
       }
 
       if (this.shouldUseQuillV2) {
@@ -420,6 +423,7 @@ export default {
     promise
       .then(async (sessionId) => {
         this.sessionId = sessionId
+
         if (!id && this.isStudent)
           AnalyticsService.captureEvent(EVENTS.SESSION_REQUESTED, {
             event: EVENTS.SESSION_REQUESTED,
@@ -460,13 +464,6 @@ export default {
 
         if (getNotificationPermission() === 'default')
           this.showNotificationModal = true
-      })
-      .then(() => {
-        if (this.isTutorBotChatEnabled) {
-          NetworkService.currentSession().then((res) => {
-            this.getStudentTutorBotChatType(res.data.data.student.id)
-          })
-        }
       })
       .catch((err) => {
         if (err?.response?.status !== 0 && err.code !== 'EUSERABORTED') {
@@ -525,6 +522,20 @@ export default {
     },
   },
   methods: {
+    toggleAiWidget() {
+      if (!this.tutorBotConversationId) {
+        if (this.gettingTutorBotConversation) return
+        this.gettingTutorBotConversation = true
+        NetworkService.getConversationWithMessagesBySessionId(this.sessionId)
+          .then(async ({ data }) => {
+            this.tutorBotConversationId = data.conversationId
+          })
+          .finally(() => {
+            this.gettingTutorBotConversation = false
+          })
+      }
+      this.aiWidgetHidden = !this.aiWidgetHidden
+    },
     handleResize() {
       if (this.mobileMode) {
         this.$store.dispatch('app/hideNavigation')
@@ -654,22 +665,6 @@ export default {
     openHelp() {
       Gleap.open()
       AnalyticsService.captureEvent(EVENTS.USER_CLICKED_IN_SESSION_HELP)
-    },
-    async getStudentTutorBotChatType(studentId) {
-      try {
-        const ff = await FeatureFlagService.isFeatureEnabledForUser(
-          POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT,
-          studentId
-        )
-        this.tutorBotChatType = ff?.isEnabled ? ff?.payload?.type : null
-        return
-      } catch (err) {
-        loggerService.noticeError(
-          err,
-          `Failed to get Tutor Bot Chat type for session ${this.sessionId}`
-        )
-      }
-      this.tutorBotChatType = null
     },
   },
 }

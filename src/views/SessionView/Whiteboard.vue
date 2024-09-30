@@ -26,6 +26,27 @@
     <div id="toolbar" class="toolbar">
       <p v-if="error" class="whiteboard-error">{{ error }}</p>
       <div
+        v-if="aiWidgetEnabled"
+        class="toolbar-item"
+        title="Ai Tutor"
+        :class="selectedTool === 'ai-tutor' ? 'selected-tool' : ''"
+        tabindex="0"
+        @click="
+          () => {
+            selectedTool = selectedTool === 'ai-tutor' ? '' : 'ai-tutor'
+            $emit('toggleAiWidget')
+          }
+        "
+        @keydown.enter="
+          () => {
+            selectedTool = selectedTool === 'ai-tutor' ? '' : 'ai-tutor'
+            $emit('toggleAiWidget')
+          }
+        "
+      >
+        <ChatBotIcon class="toolbar-item__svg" />
+      </div>
+      <div
         class="toolbar-item toolbar-item--pick"
         title="Pick tool"
         v-bind:class="selectedTool === 'pick' ? 'selected-tool' : ''"
@@ -274,6 +295,7 @@ import { markRaw } from 'vue'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import ModerationService from '@/services/ModerationService'
+import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 
 export default {
   components: {
@@ -296,6 +318,7 @@ export default {
     Loader,
     ResetWhiteboardModal,
     LoadingMessage,
+    ChatBotIcon,
   },
   props: {
     sessionId: {
@@ -311,6 +334,14 @@ export default {
       required: true,
     },
     isSessionOver: {
+      type: Boolean,
+      required: true,
+    },
+    aiWidgetHidden: {
+      type: Boolean,
+      required: true,
+    },
+    aiWidgetEnabled: {
       type: Boolean,
       required: true,
     },
@@ -336,6 +367,7 @@ export default {
       imageUploadErrorMessage: 'Unable to upload the image',
     }
   },
+  emits: ['toggleAiWidget'],
   computed: {
     ...mapState({
       isMobileApp: (state) => state.app.isMobileApp,
@@ -349,6 +381,9 @@ export default {
       isStudent: 'user/isStudent',
       isVolunteer: 'user/isVolunteer',
     }),
+    isAiWidgetHidden() {
+      return this.aiWidgetHidden
+    },
     toolClass() {
       if (this.selectedTool === 'brush') return 'zwib-wrapper--brush'
       if (this.selectedTool === 'pick') return 'zwib-wrapper--pick'
@@ -848,6 +883,11 @@ export default {
     this.zwibblerCtx.destroy()
   },
   watch: {
+    isAiWidgetHidden(isHidden) {
+      if (isHidden) {
+        this.selectedTool = ''
+      }
+    },
     isSessionOver(isSessionOver, oldIsSessionOver) {
       if (isSessionOver && !oldIsSessionOver)
         this.zwibblerCtx.setConfig('readOnly', true)
