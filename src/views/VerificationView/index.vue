@@ -228,6 +228,7 @@ export default {
             }
           } else {
             userUpdates.emailVerified = true
+            AnalyticsService.captureEvent(EVENTS.EMAIL_VERIFIED)
           }
           this.$store.dispatch('user/firstDashboardVisit', true)
           this.$store.dispatch('user/addToUser', userUpdates)
