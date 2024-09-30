@@ -105,7 +105,6 @@
           />
         </div>
         <session-chat
-          v-else
           :aiWidgetPresent="showAiWidget"
           :currentSession="session"
           :shouldHideChatSection="shouldHideChatSection"
