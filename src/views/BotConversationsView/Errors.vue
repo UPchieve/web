@@ -13,7 +13,7 @@ const dismiss = () => store.dispatch('botConversations/clearErrors')
     <div class="errors" v-for="error in errors" v-bind:key="error">
       {{ error }}
       <button class="close-button">
-        <cross-icon @click="dismiss" />
+        <cross-icon class="cross-icon-svg" @click="dismiss" />
       </button>
     </div>
   </div>
@@ -26,7 +26,7 @@ const dismiss = () => store.dispatch('botConversations/clearErrors')
   top: 0;
   left: 0;
   right: 0;
-  padding: 12px 24px;
+  padding: 12px 8px 12px 18px;
   background-color: $c-error-red;
   z-index: 1;
   display: flex;
@@ -36,9 +36,10 @@ const dismiss = () => store.dispatch('botConversations/clearErrors')
 
 .close-button {
   transform: scale(0.5);
-  fill: white;
+  stroke: white !important;
+  stroke-width: 2px !important;
 }
 .close-button:hover {
-  transform: scale(0.625);
+  filter: brightness(0.9);
 }
 </style>

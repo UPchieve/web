@@ -1,10 +1,21 @@
 <script setup lang="ts">
 import { useStore } from 'vuex'
-import { onMounted, computed, ref, watch, nextTick } from 'vue'
+import { onMounted, computed, defineProps, ref, watch, nextTick } from 'vue'
 import BotChatMessages from './BotChatMessages.vue'
 import Textarea from './Textarea.vue'
 import ModerationService from '@/services/ModerationService'
+import type MessageComponent from '../SessionView/MessageComponent.vue'
+import type WidgetMessageComponent from '../SessionView/WidgetMessageComponent.vue'
+import type TypingIndicatorComponent from '../SessionView/TypingIndicatorComponent.vue'
+import type WidgetTypingIndicatorComponent from '../SessionView/WidgetTypingIndicatorComponent.vue'
 
+const { bgColor, messageComponent, typingIndiciatorComponent } = defineProps<{
+  messageComponent: typeof MessageComponent | typeof WidgetMessageComponent
+  typingIndiciatorComponent:
+    | typeof TypingIndicatorComponent
+    | typeof WidgetTypingIndicatorComponent
+  bgColor?: string
+}>()
 const store = useStore()
 const user = computed(() => store.state.user.user)
 
@@ -29,11 +40,31 @@ const fetchingConversation = computed(
 const messages = computed(() => conversation.value.messages ?? [])
 
 const sendMessage = async (message: string) => {
+  store.commit('botConversations/setMessageIsSending', true)
   store.commit('botConversations/clearErrors')
   const isClean = await ModerationService.checkIfMessageIsClean({
     message,
     sessionId: conversation.value.sessionId,
   })
+  // When we have a sessionId, we get more granular moderation
+  if (isClean.failures && Object.keys(isClean.failures).length) {
+    const message = Object.entries(isClean.failures).reduce(
+      (message, [key, value], i) => {
+        message += i > 0 ? ',' : ''
+        if (key === 'profanity' && !user.value.isVolunteer) {
+          message += ` ${key}`
+        } else {
+          message += ` ${key} (${value})`
+        }
+        return message
+      },
+      'Messages cannot contain personal information, profanity, or links to third party video services: '
+    )
+    store.commit('botConversations/setError', message)
+    store.commit('botConversations/setMessageIsSending', false)
+    return false
+  }
+
   if (isClean) {
     await store.dispatch('botConversations/sendMessage', message)
   } else {
@@ -55,10 +86,22 @@ watch(() => messages.value.length, scrollToBottom)
         :user="user"
         :messages="messages"
         :messageSending="messageSending"
-      />
+      >
+        <template #message="{ alignment, message }">
+          <component :is="messageComponent" :alignment :message></component>
+        </template>
+        <template #typing-indicator="{ messageSending }">
+          <component
+            :is="typingIndiciatorComponent"
+            :messageSending="messageSending"
+          ></component>
+        </template>
+      </BotChatMessages>
     </div>
-
-    <div class="text-area-container">
+    <div
+      class="text-area-container"
+      :style="{ backgroundColor: bgColor ?? '#fbfbfc' }"
+    >
       <Textarea
         class="text-area"
         :disabled="messageSending || fetchingConversation"
@@ -86,7 +129,6 @@ watch(() => messages.value.length, scrollToBottom)
   padding-bottom: 36px;
   margin-left: auto;
   margin-right: auto;
-  background-color: #fbfbfc;
 }
 
 .text-area {

@@ -4,6 +4,8 @@ import { computed, onBeforeMount, onUnmounted } from 'vue'
 import BotChat from './BotChat.vue'
 import { useRoute } from 'vue-router'
 import Math from '@/assets/subject_icons/math.svg'
+import MessageComponent from '../SessionView/MessageComponent.vue'
+import TypingIndicatorComponent from '../SessionView/TypingIndicatorComponent.vue'
 
 const store = useStore()
 const route = useRoute()
@@ -34,7 +36,10 @@ const subject = computed(() => conversation.value?.subject?.displayName ?? '')
       >
     </div>
 
-    <BotChat></BotChat>
+    <BotChat
+      :message-component="MessageComponent"
+      :typing-indiciator-component="TypingIndicatorComponent"
+    ></BotChat>
   </div>
 </template>
 
