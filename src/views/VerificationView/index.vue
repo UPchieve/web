@@ -213,7 +213,7 @@ export default {
           const userUpdates = { verified: true }
           if (this.verificationInputs.method === VERIFICATION_METHOD.SMS) {
             userUpdates.phoneVerified = true
-
+            AnalyticsService.captureEvent(EVENTS.PHONE_NUMBER_VERIFIED)
             if (
               this.user.userType === 'student' &&
               this.isFallIncentiveProgramEnabled
