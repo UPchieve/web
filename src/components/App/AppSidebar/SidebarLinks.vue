@@ -3,13 +3,9 @@
     <template v-if="$route.path.indexOf('/onboarding') !== -1"></template>
 
     <template v-else-if="authenticated">
-      <large-button
-        class="ai-bot-button"
+      <ai-tutor-button
         v-if="isStudent && isStandAloneAiTutorActive"
-        routeTo="/ai-tutor-conversations"
-      >
-        <chat-bot-icon class="icon" />Request AI help
-      </large-button>
+      ></ai-tutor-button>
 
       <sidebar-link v-if="!isTeacher" to="/dashboard" text="Dashboard">
         <house-icon class="icon" />
@@ -119,7 +115,6 @@ import EnvelopeIcon from '@/assets/sidebar_icons/envelope.svg'
 import FolderIcon from '@/assets/sidebar_icons/folder.svg'
 import GraduationCapIcon from '@/assets/sidebar_icons/graduation-cap.svg'
 import HeartIcon from '@/assets/heart.svg'
-import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import HouseIcon from '@/assets/sidebar_icons/house.svg'
 import PortraitIcon from '@/assets/sidebar_icons/portrait.svg'
 import ReferFriendIcon from '@/assets/sidebar_icons/refer-friend-icon.svg'
@@ -129,7 +124,7 @@ import YourProgressIcon from '@/assets/your-progress.svg'
 import AnalyticsService from '@/services/AnalyticsService'
 import ActivityDot from '@/components/ActivityDot.vue'
 import { EVENTS } from '@/consts'
-import LargeButton from '@/components/LargeButton.vue'
+import AiTutorButton from '../AiTutorButton.vue'
 
 export default {
   components: {
@@ -141,13 +136,12 @@ export default {
     FolderIcon,
     GraduationCapIcon,
     HeartIcon,
-    ChatBotIcon,
+    AiTutorButton,
     HouseIcon,
     PortraitIcon,
     ReferFriendIcon,
     SlackLogoIcon,
     YourProgressIcon,
-    LargeButton,
     ActivityDot,
   },
   props: {
@@ -233,17 +227,5 @@ export default {
 .icon {
   margin-right: 0.8em;
   width: 24px;
-}
-
-.ai-bot-button {
-  background-color: $c-information-blue;
-  color: white;
-  padding: 4px 8px;
-  border-radius: 2em;
-  margin-top: -44px !important;
-  margin-bottom: 18px;
-  @include breakpoint-below('medium') {
-    margin-top: 0 !important;
-  }
 }
 </style>
