@@ -35,6 +35,7 @@
           class="tabs__header-type"
           :class="isSelected === 'classDetails' ? 'is-selected' : null"
           @click="openTab(isSelected)"
+          data-testid="class-details-tab"
         >
           Class Details
         </p>
@@ -42,6 +43,7 @@
           class="tabs__header-type"
           :class="isSelected === 'assignments' ? 'is-selected' : null"
           @click="openTab(isSelected)"
+          data-testid="assignments-tab"
         >
           Assignments
         </p>
@@ -95,7 +97,11 @@
             : 'assignments-container'
         "
       >
-        <div v-if="!assignments.length" class="empty-assignments-container">
+        <div
+          data-testid="no-assignments"
+          v-if="!assignments.length"
+          class="empty-assignments-container"
+        >
           <h1>No Assignments Yet!</h1>
           <p>
             Create an assignment to kickstart your students' learning journey.
@@ -107,7 +113,7 @@
             Assign Tutoring
           </button>
         </div>
-        <div v-else class="assignments-cards">
+        <div v-else class="assignments-cards" data-testid="has-assignments">
           <div
             v-for="assignment in assignments"
             :key="assignment.id"
@@ -119,24 +125,32 @@
               </div>
               <div class="assignment-info">
                 <button @click="viewAssignment(assignment.id)">
-                  <h1>{{ assignment.title }}</h1>
-                  <p>Due date: {{ formatTimestamp(assignment.dueDate) }}</p>
+                  <h1 :data-testid="'assignment-title-' + assignment.id">
+                    {{ assignment.title }}
+                  </h1>
+                  <p :data-testid="'assignment-due-date-' + assignment.id">
+                    Due date: {{ formatTimestamp(assignment.dueDate) }}
+                  </p>
                 </button>
+                <div v-if="!assignmentsCompletion[assignment.id]">
+                  <p
+                    data-testid="no-students-assigned"
+                    class="no-students-assigned"
+                  >
+                    No students have been assigned.
+                  </p>
+                </div>
                 <button
-                  v-if="assignmentsCompletion[assignment.id].totalStudents"
+                  v-else
                   class="student-completion"
                   @click="toggleStudentCompletion(assignment.id)"
+                  data-testid="student-completion"
                 >
                   Student completion
                   {{
                     assignmentsCompletion[assignment.id].completedStudents
                   }}/{{ assignmentsCompletion[assignment.id].totalStudents }}
                 </button>
-                <div v-else>
-                  <p class="no-students-assigned">
-                    No students have been assigned.
-                  </p>
-                </div>
               </div>
             </div>
 
@@ -234,27 +248,10 @@ export default {
       this.$route.path.includes('assignments')
     ) {
       this.isSelected = 'assignments'
-      this.assignments = await this.getClassAssignments()
-      const assignmentIds = this.assignments.map((assignment) => assignment.id)
-      this.allStudentsAssigned = await this.getStudentAssignments(assignmentIds)
+      await this.showAssignments()
     } else if (!this.$route.params.classId) {
       this.$router.push('/dashboard')
     }
-    this.assignments = await this.getClassAssignments()
-    const assignmentIds = this.assignments.map((assignment) => assignment.id)
-
-    const getStudentAssignments = Object.assign(
-      ...(await this.getStudentAssignments(assignmentIds).then((assignments) =>
-        assignments.map((assignment) => ({
-          [assignment.assignmentId]: assignment.studentAssignments,
-        }))
-      ))
-    )
-
-    this.assignmentsCompletion = this.getAssignmentCompletion(
-      this.assignments,
-      getStudentAssignments
-    )
   },
 
   methods: {
@@ -380,10 +377,25 @@ export default {
       )
     },
 
-    async openTab(isSelected) {
+    async showAssignments() {
       this.assignments = await this.getClassAssignments()
       const assignmentIds = this.assignments.map((assignment) => assignment.id)
-      this.allStudentsAssigned = await this.getStudentAssignments(assignmentIds)
+      const getStudentAssignments = Object.assign(
+        ...(await this.getStudentAssignments(assignmentIds).then(
+          (assignments) =>
+            assignments.map((assignment) => ({
+              [assignment.assignmentId]: assignment.studentAssignments,
+            }))
+        ))
+      )
+
+      this.assignmentsCompletion = this.getAssignmentCompletion(
+        this.assignments,
+        getStudentAssignments
+      )
+    },
+
+    async openTab(isSelected) {
       if (
         isSelected === 'classDetails' &&
         !this.$route.path.includes('assignments')
@@ -392,6 +404,7 @@ export default {
         this.$router.push(
           `/dashboard/teacher/class/${this.classInfo.id}/assignments`
         )
+        await this.showAssignments()
       } else {
         this.isSelected = 'classDetails'
         this.$router.push(`/dashboard/teacher/class/${this.classInfo.id}`)
@@ -437,16 +450,19 @@ export default {
 
       assignments.forEach((assignment) => {
         const { id } = assignment
-        const studentsCompletion = completionData[id] || []
-        const totalStudents = studentsCompletion.length
-        const completedStudents = studentsCompletion.filter(
-          (student) => student.submitted_at !== null
-        ).length
+        const studentsCompletion = completionData[id] || null
 
-        result[id] = {
-          studentsCompletion,
-          totalStudents,
-          completedStudents,
+        if (studentsCompletion && studentsCompletion.length > 0) {
+          const totalStudents = studentsCompletion.length
+          const completedStudents = studentsCompletion.filter(
+            (student) => student.submitted_at !== null
+          ).length
+
+          result[id] = {
+            studentsCompletion,
+            totalStudents,
+            completedStudents,
+          }
         }
       })
 
