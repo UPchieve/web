@@ -77,6 +77,7 @@
         </button>
         <button
           class="uc-form-button"
+          data-testid="create-assignment-btn"
           @click="createAssignment()"
           :disabled="!isFormValid"
         >
