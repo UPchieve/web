@@ -6,6 +6,8 @@ import { useRouter } from 'vue-router'
 import Textarea from './Textarea.vue'
 import LoggerService from '@/services/LoggerService'
 import ModerationService from '@/services/ModerationService'
+import { EVENTS } from '@/consts'
+import AnalyticsService from '@/services/AnalyticsService'
 
 export type Subject = Partial<{ id: number; displayName: string }>
 
@@ -38,6 +40,7 @@ const fetchingConversation = computed(
 
 const selectSubject = (subject: Subject) => {
   currentSubject.value = subject
+  AnalyticsService.captureEvent(EVENTS.AI_TUTOR_SUBJECT_SELECTED)
 }
 
 const sendFirstMessage = async (message: string) => {

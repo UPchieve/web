@@ -1,5 +1,11 @@
 <template>
-  <router-link v-if="routeTo" tag="button" :to="routeTo" class="ButtonTemplate">
+  <router-link
+    v-if="routeTo"
+    tag="button"
+    :to="routeTo"
+    class="ButtonTemplate"
+    @click="$emit('click')"
+  >
     <div>
       <slot />
     </div>

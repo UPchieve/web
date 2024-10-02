@@ -11,7 +11,17 @@ onMounted(() => {
 </script>
 
 <template>
-  <large-button class="ai-bot-button" routeTo="/ai-tutor-conversations">
+  <large-button
+    class="ai-bot-button"
+    @click="
+      () => {
+        AnalyticsService.captureEvent(
+          EVENTS.AI_TUTOR_STAND_ALONE_BUTTON_CLICKED
+        )
+      }
+    "
+    routeTo="/ai-tutor-conversations"
+  >
     <chat-bot-icon class="icon" />Request AI help
   </large-button>
 </template>
