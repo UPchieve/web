@@ -14,6 +14,7 @@
       <button
         class="student-completion-btn"
         @click="openStudentCompletionModal"
+        data-testid="student-completion"
       >
         Student Completion {{ completedStudents }}/{{ totalStudents }}
       </button>
@@ -39,7 +40,9 @@
     <div class="line-break"></div>
     <div class="instructions">
       <p><strong class="bold-text">Instructions:</strong></p>
-      <p>{{ assignmentInfo.description || `No instructions provided.` }}</p>
+      <p data-testid="description-text">
+        {{ assignmentInfo.description || `No instructions provided.` }}
+      </p>
     </div>
   </div>
 </template>
