@@ -75,7 +75,7 @@ deploy_staging:
   variables:
     API_TOKEN: $AZURE_SWA_API_TOKEN_STAGING
   needs:
-    - job: build_staging
+    - job: build_staging_artifact
       artifacts: true
     - job: test
   rules:
@@ -91,7 +91,7 @@ deploy_staging:
 #   variables:
 #     API_TOKEN: $AZURE_SWA_API_TOKEN_PRODUCTION
 #   needs:
-#     - job: build_production
+#     - job: build_production_artifact
 #       artifacts: true
 #   rules:
 #     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
