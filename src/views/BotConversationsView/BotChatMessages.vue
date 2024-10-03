@@ -1,11 +1,16 @@
 <script lang="ts" module>
-export const MESSAGE_ALIGNMENT = {
-  LEFT: 'left',
-  RIGHT: 'right',
-  CENTER: 'center',
+export enum MESSAGE_ALIGNMENT {
+  LEFT = 'left',
+  RIGHT = 'right',
+  CENTER = 'center',
 }
 </script>
+
 <script lang="ts" setup>
+import TypingIndicatorComponent from '../SessionView/TypingIndicatorComponent.vue'
+import MessageComponent from '../SessionView/MessageComponent.vue'
+import WidgetMessageComponent from '../SessionView/WidgetMessageComponent.vue'
+import { DISPLAY_CONTEXT } from './BotChat.vue'
 const props = defineProps<{
   messages: Partial<{
     id: string
@@ -19,13 +24,16 @@ const props = defineProps<{
   }>[]
   messageSending: boolean
   user: Partial<{ id: string; firstName: string }>
+  displayContext: DISPLAY_CONTEXT
 }>()
 
+const messageComponent =
+  props.displayContext === DISPLAY_CONTEXT.SESSION
+    ? WidgetMessageComponent
+    : MessageComponent
+
 function messageAlignment(message: (typeof props.messages)[number]) {
-  if (
-    message.senderUserType === 'bot' ||
-    message.senderUserType === 'volunteer'
-  ) {
+  if (message.senderUserType === 'bot') {
     return MESSAGE_ALIGNMENT.LEFT
   }
   if (message.senderUserType === 'system') {
@@ -43,13 +51,13 @@ function messageAlignment(message: (typeof props.messages)[number]) {
       :key="`message-${message.senderUserType}-${message.createdAt}`"
       class="message-container"
     >
-      <slot
-        name="message"
-        :message="message"
+      <component
+        :is="messageComponent"
         :alignment="messageAlignment(message)"
-      ></slot>
+        :message
+      ></component>
     </div>
-    <slot name="typing-indicator" :messageSending="props.messageSending"></slot>
+    <TypingIndicatorComponent :messageSending="props.messageSending" />
   </div>
 </template>
 

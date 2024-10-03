@@ -1,19 +1,19 @@
+<script module lang="ts">
+export enum DISPLAY_CONTEXT {
+  STAND_ALONE = 'stand-alone',
+  SESSION = 'session',
+}
+</script>
+
 <script setup lang="ts">
 import { useStore } from 'vuex'
 import { onMounted, computed, defineProps, ref, watch, nextTick } from 'vue'
 import BotChatMessages from './BotChatMessages.vue'
 import Textarea from './Textarea.vue'
 import ModerationService from '@/services/ModerationService'
-import type MessageComponent from '../SessionView/MessageComponent.vue'
-import type WidgetMessageComponent from '../SessionView/WidgetMessageComponent.vue'
-import type TypingIndicatorComponent from '../SessionView/TypingIndicatorComponent.vue'
-import type WidgetTypingIndicatorComponent from '../SessionView/WidgetTypingIndicatorComponent.vue'
 
-const { bgColor, messageComponent, typingIndiciatorComponent } = defineProps<{
-  messageComponent: typeof MessageComponent | typeof WidgetMessageComponent
-  typingIndiciatorComponent:
-    | typeof TypingIndicatorComponent
-    | typeof WidgetTypingIndicatorComponent
+const { bgColor, displayContext } = defineProps<{
+  displayContext: DISPLAY_CONTEXT
   bgColor?: string
 }>()
 const store = useStore()
@@ -80,23 +80,14 @@ watch(() => messages.value.length, scrollToBottom)
 </script>
 
 <template>
-  <div class="chat-container" ref="chatContainer">
+  <div class="bot-chat-container" ref="chatContainer">
     <div class="chat-log">
       <BotChatMessages
         :user="user"
         :messages="messages"
         :messageSending="messageSending"
-      >
-        <template #message="{ alignment, message }">
-          <component :is="messageComponent" :alignment :message></component>
-        </template>
-        <template #typing-indicator="{ messageSending }">
-          <component
-            :is="typingIndiciatorComponent"
-            :messageSending="messageSending"
-          ></component>
-        </template>
-      </BotChatMessages>
+        :displayContext
+      />
     </div>
     <div
       class="text-area-container"
@@ -112,7 +103,7 @@ watch(() => messages.value.length, scrollToBottom)
 </template>
 
 <style lang="scss" scoped>
-.chat-container {
+.bot-chat-container {
   overflow-y: scroll;
 }
 .chat-log {

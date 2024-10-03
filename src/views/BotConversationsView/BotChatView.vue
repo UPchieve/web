@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { useStore } from 'vuex'
 import { computed, onBeforeMount, onUnmounted } from 'vue'
-import BotChat from './BotChat.vue'
+import BotChat, { DISPLAY_CONTEXT } from './BotChat.vue'
 import { useRoute } from 'vue-router'
 import Math from '@/assets/subject_icons/math.svg'
-import MessageComponent from '../SessionView/MessageComponent.vue'
-import TypingIndicatorComponent from '../SessionView/TypingIndicatorComponent.vue'
 
 const store = useStore()
 const route = useRoute()
 
+const sessionId = computed(() => store.state.user.session.id)
 onBeforeMount(async () => {
+  if (sessionId.value) {
+    store.dispatch('app/header/show', { component: 'RejoinSessionHeader' })
+  }
   await store.dispatch('botConversations/fetchAllSubjects')
   await store.dispatch(
     'botConversations/setConversation',
@@ -36,10 +38,7 @@ const subject = computed(() => conversation.value?.subject?.displayName ?? '')
       >
     </div>
 
-    <BotChat
-      :message-component="MessageComponent"
-      :typing-indiciator-component="TypingIndicatorComponent"
-    ></BotChat>
+    <BotChat :displayContext="DISPLAY_CONTEXT.STAND_ALONE"></BotChat>
   </div>
 </template>
 

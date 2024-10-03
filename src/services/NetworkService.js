@@ -1009,7 +1009,7 @@ export default {
     ).then(this._successHandler, this._errorHandler)
   },
   getConversationWithMessagesBySessionId(sessionId) {
-    return httpGet(
+    return httpPut(
       `${API_ROOT}/session/${sessionId}/tutor-bot-conversation`
     ).then(this._successHandler, this._errorHandler)
   },
@@ -1034,13 +1034,20 @@ export default {
       subjectId,
     }).then(this._successHandler, this._errorHandler)
   },
-  sendTutorBotMessage({ userId, conversationId, message, senderUserType }) {
+  sendTutorBotMessage({
+    userId,
+    conversationId,
+    message,
+    senderUserType,
+    sessionId,
+  }) {
     return httpPost(
       `${API_ROOT}/tutor-bot/conversations/${conversationId}/message`,
       {
         userId,
         message,
         senderUserType,
+        sessionId,
       }
     ).then(this._successHandler, this._errorHandler)
   },

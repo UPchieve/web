@@ -66,9 +66,7 @@ export default {
   },
   methods: {
     async requestNotificationPermission() {
-      document.querySelector('.upc-modal-form').remove()
       this.isSelectionNotificationPermission = true
-
       if (!('Notification' in window)) return
       if (Notification.permission == 'default') {
         const result = await Notification.requestPermission()

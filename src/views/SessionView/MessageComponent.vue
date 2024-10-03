@@ -3,6 +3,8 @@ import { defineProps } from 'vue'
 import { MESSAGE_ALIGNMENT } from '../BotConversationsView/BotChatMessages.vue'
 import GenerationFeedback from '../BotConversationsView/GenerationFeedback.vue'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
+import VolunteerIcon from '@/assets/volunteer-icon.svg'
+import StudentIcon from '@/assets/student-icon.svg'
 const { alignment, message } = defineProps<{
   alignment: string
   message: any
@@ -13,8 +15,24 @@ const { alignment, message } = defineProps<{
   <div class="m-container" :class="alignment">
     <ChatBotIcon
       class="chat-bot-icon"
-      v-if="alignment === MESSAGE_ALIGNMENT.LEFT"
+      v-if="
+        alignment === MESSAGE_ALIGNMENT.LEFT && message.senderUserType === 'bot'
+      "
     ></ChatBotIcon>
+    <VolunteerIcon
+      class="chat-bot-icon"
+      v-else-if="
+        alignment === MESSAGE_ALIGNMENT.LEFT &&
+        message.senderUserType === 'volunteer'
+      "
+    ></VolunteerIcon>
+    <StudentIcon
+      class="chat-bot-icon"
+      v-else-if="
+        alignment === MESSAGE_ALIGNMENT.LEFT &&
+        message.senderUserType === 'student'
+      "
+    ></StudentIcon>
 
     <div class="message">
       {{ message.message }}
