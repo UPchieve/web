@@ -1,3 +1,9 @@
+stages:
+  - build
+  - test
+  - deploy
+  - post-deploy
+
 cache:
   key:
     files:
@@ -12,6 +18,100 @@ variables:
   NEW_RELIC_ENABLED: "false"
   NEW_RELIC_NO_CONFIG_FILE: "true"
 
+.build_artifact:
+  stage: build
+  image: "node:20.10.0-bullseye"
+  cache: []
+  environment:
+    action: prepare
+  artifacts:
+    when: on_success
+    paths:
+      - dist/
+  allow_failure: false
+  before_script:
+    - npm ci
+    - apt update && apt install -y curl gnupg
+    - curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh | sh
+  script:
+    - 'echo "{\"version\": \"$CI_COMMIT_SHA-$CI_ENVIRONMENT_NAME\"}" > public/version.json'
+    - doppler run --token $DOPPLER_TOKEN -- npm run build
+
+build_staging_artifact:
+  extends: .build_artifact
+  environment:
+    name: staging
+  variables:
+    DOPPLER_TOKEN: $DOPPLER_TOKEN_STAGING
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' # MR is created or updated.
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
+
+# TODO: Uncomment once production environment is set up.
+# build_production_artifact:
+#   extends: .build_artifact
+#   environment:
+#     name: production
+#   variables:
+#     DOPPLER_TOKEN: $DOPPLER_TOKEN_PRODUCTION
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
+
+.deploy:
+  stage: deploy
+  image: registry.gitlab.com/static-web-apps/azure-static-web-apps-deploy
+  variables:
+    APP_PATH: '$CI_PROJECT_DIR/dist'
+    SKIP_APP_BUILD: true
+    SKIP_API_BUILD: true
+  script:
+    - echo "Deploying SWA."
+
+deploy_staging:
+  extends: .deploy
+  environment:
+    name: staging
+  resource_group: staging
+  variables:
+    API_TOKEN: $AZURE_SWA_API_TOKEN_STAGING
+  needs:
+    - job: build_staging
+      artifacts: true
+    - job: test
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
+
+# TODO: Uncomment once production environment is set up.
+# deploy_production:
+#   extends: .deploy
+#   environment:
+#     name: production
+#   resource_group: production
+#   allow_failure: false
+#   variables:
+#     API_TOKEN: $AZURE_SWA_API_TOKEN_PRODUCTION
+#   needs:
+#     - job: build_production
+#       artifacts: true
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
+#       when: manual
+
+# TODO: Uncomment once production environment is set up.
+# tag_commit_production:
+#   stage: post-deploy
+#   image: registry.gitlab.com/gitlab-org/release-cli:latest
+#   needs:
+#     - job: deploy_production
+#   script:
+#     - echo 'Tag commit $CI_COMMIT_SHA'
+#   release:
+#     tag_name: 'deployed-$(date +%Y-%m-%d_%H-%M-%S)'
+#     description: 'Deployed from GitLab CI.'
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
+
+### TODO: Clean-up: Delete the following. ###
 build_production:
   stage: build
   image: "docker:20.10.6"
@@ -233,6 +333,7 @@ build_hackers:
       when: manual
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: manual
+###
 
 test:
   stage: test
@@ -241,11 +342,11 @@ test:
     - npm ci --cache .npm --prefer-offline
   script:
     - npm run test
-  needs: []
   rules:
     - if: '$TEST_DISABLED'
       when: never
-    - if: '$CI_COMMIT_TAG || $CI_COMMIT_BRANCH'
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' # MR is created or updated.
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
 
 lint:
   stage: test
@@ -254,11 +355,11 @@ lint:
     - npm ci --cache .npm --prefer-offline
   script:
     - npm run lint:dry
-  needs: []
   rules:
     - if: '$TEST_DISABLED'
       when: never
-    - if: '$CI_COMMIT_TAG || $CI_COMMIT_BRANCH'
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' # MR is created or updated.
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
 
 html_validate:
   stage: test
@@ -268,8 +369,8 @@ html_validate:
     - npm ci --cache .npm --prefer-offline
   script:
     - npm run html-validate
-  needs: []
   rules:
     - if: '$TEST_DISABLED'
       when: never
-    - if: '$CI_COMMIT_TAG || $CI_COMMIT_BRANCH'
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' # MR is created or updated.
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
