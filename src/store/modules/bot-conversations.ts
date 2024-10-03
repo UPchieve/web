@@ -1,15 +1,7 @@
 import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
-import { EVENTS } from '@/consts'
+import { AI_TUTOR_SUPPORTED_SUBJECTS, EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
-
-const SUPPORTED_SUBJECTS = [
-  '6thGradeMath',
-  '7thGradeMath',
-  '8thGradeMath',
-  'prealgebra',
-  'algebraOne',
-]
 
 export default {
   namespaced: true,
@@ -41,7 +33,7 @@ export default {
     clearErrors: (state) => (state.errors = []),
     setSubjects: (state, subjects) => {
       if (Object.keys(subjects).length === 0) return []
-      state.subjects = SUPPORTED_SUBJECTS.reduce((subs, subject) => {
+      state.subjects = AI_TUTOR_SUPPORTED_SUBJECTS.reduce((subs, subject) => {
         const supported = subjects?.[subject] ?? []
         return subs.concat(supported)
       }, [])
@@ -54,6 +46,7 @@ export default {
     },
     async setConversation({ commit, state }, conversationId: string) {
       if (state.currentConversation.conversationId === conversationId) return
+      commit('setCurrentConversation', {})
       commit('clearErrors')
       commit('setIsFetchingConversation', true)
       try {
@@ -73,21 +66,34 @@ export default {
       try {
         const userId = rootState.user.user.id
         const senderUserType = rootState.user.user.type
-        // Optimistically insert message from user
-        const optimisticMessage = {
-          message,
-          senderUserType,
-          tutorBotConversationId: state.currentConversation.conversationId,
-          userId,
+        const sessionId = state.currentConversation.sessionId
+        const currentSessionId = rootState.user.session.id
+        const isStandAloneBotConversation =
+          !sessionId || currentSessionId !== sessionId
+
+        if (isStandAloneBotConversation) {
+          // With no session, we don't watch the socket messages so optimistically insert message from user
+          const optimisticMessage = {
+            message,
+            senderUserType,
+            tutorBotConversationId: state.currentConversation.conversationId,
+            userId,
+          }
+          commit('addToCurrentConversation', optimisticMessage)
         }
-        commit('addToCurrentConversation', optimisticMessage)
+
         const results = await NetworkService.sendTutorBotMessage({
           userId,
           conversationId: state.currentConversation.conversationId,
           message,
           senderUserType,
+          sessionId: state.currentConversation.sessionId,
         })
-        commit('addToCurrentConversation', results.data.botResponse)
+
+        if (isStandAloneBotConversation) {
+          // Only add response to the current session if we aren't watching the session socket
+          commit('addToCurrentConversation', results.data.botResponse)
+        }
         AnalyticsService.captureEvent(EVENTS.AI_TUTOR_SEND_MESSAGE)
       } catch (e) {
         LoggerService.noticeError(e)
@@ -98,14 +104,17 @@ export default {
     },
     async createConversation(
       { commit, rootState },
-      { message, subjectId }: { message: string; subjectId: number }
+      {
+        message,
+        subjectId,
+        sessionId,
+      }: { message: string; subjectId: number; sessionId?: string }
     ) {
       commit('setCurrentConversation', {})
       commit('clearErrors')
       commit('setIsFetchingConversation', true)
       try {
         const userId = rootState.user.user.id
-        const sessionId = rootState.user.session.id
         const senderUserType = rootState.user.user.type
         const results = await NetworkService.createTutorBotSession({
           userId,

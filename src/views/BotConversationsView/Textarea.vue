@@ -4,6 +4,7 @@ import SendMessage from '@/assets/voice_message_icons/send-message.svg'
 
 const props = defineProps<{
   disabled: boolean
+  placeholder?: string
   sendMessage: (message: string) => Promise<boolean>
 }>()
 const message = ref('')
@@ -30,6 +31,11 @@ const rows = ref(1)
 
 const resizeTextAreaToFitText = () => {
   if (!textareaRef.value) return
+
+  if (message.value === '') {
+    rows.value = 1
+    return
+  }
 
   // Store initial values of padding
   const paddingTop = getComputedStyle(textareaRef.value).paddingTop
@@ -75,7 +81,7 @@ watch(() => message.value, resizeTextAreaToFitText)
       autofocus
       ref="textareaRef"
       :disabled="props.disabled"
-      placeholder="Chat with UPbot"
+      :placeholder="placeholder ?? 'Chat with UPbot'"
       v-model="message"
       :rows="rows"
       @keydown.enter.prevent

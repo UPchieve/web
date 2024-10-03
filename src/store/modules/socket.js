@@ -190,6 +190,15 @@ export default {
         }
       })
 
+      socket.on('tutorBotConversationMessage', (data) => {
+        if (
+          data.tutorBotConversationId ===
+          rootState.botConversations.currentConversation.conversationId
+        ) {
+          this.commit('botConversations/addToCurrentConversation', data)
+        }
+      })
+
       socket.on('messageError', (data) => {
         if (
           data.sessionId === rootState.user.session.id ||

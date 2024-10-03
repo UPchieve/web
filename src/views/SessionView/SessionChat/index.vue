@@ -50,12 +50,9 @@
           @new-bot-message="handleIncomingMessage"
         />
         <div
-          v-for="(message, index) in filteredMessages"
+          v-for="(message, index) in currentSession.messages"
           :key="`message-${index}`"
-          :class="[
-            messageAlignment(message),
-            isBotMessage(message) ? 'bot' : '',
-          ]"
+          :class="[messageAlignment(message)]"
           class="message"
         >
           <span
@@ -65,11 +62,10 @@
             {{ message.contents }}</span
           >
           <template v-else>
-            <chat-bot-icon v-if="this.isBotMessage(message)" class="avatar" />
             <component
               class="avatar"
               :is="avatar(message)"
-              v-else-if="message.user !== user.id"
+              v-if="message.user !== user.id"
             />
 
             <div class="contents" :class="chatBotContents(message)">
@@ -83,10 +79,7 @@
               <span
                 v-else
                 :data-testid="`message-from-user-id-${message.user}`"
-                >{{
-                  // @NEW - strip bot tag before displaying
-                  message.contents.replace('<|bot says|>', '')
-                }}</span
+                >{{ message.contents }}</span
               >
             </div>
             <div class="time">
@@ -168,7 +161,6 @@ import { isEmpty } from 'lodash-es'
 import { mapState, mapGetters } from 'vuex'
 
 import ChatBot from './ChatBot.vue'
-import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import RecordVoiceMessage from '@/components/VoiceMessaging/RecordVoiceMessage.vue'
 import VoiceMessage from '@/components/VoiceMessaging/VoiceMessage.vue'
 import DocumentTitle from '@/components/DocumentTitle.vue'
@@ -199,7 +191,6 @@ export default {
   name: 'session-chat',
   components: {
     ChatBot,
-    ChatBotIcon,
     LoadingMessage,
     DocumentTitle,
     RecordVoiceMessage,
@@ -253,15 +244,6 @@ export default {
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
       eligibleForVoiceMessaging: 'featureFlags/eligibleForVoiceMessaging',
     }),
-    filteredMessages() {
-      return this.aiWidgetPresent
-        ? this.currentSession.messages.filter(
-            (message) =>
-              !this.isBotMessage(message) &&
-              !this.isMessageForBot(message.contents)
-          )
-        : this.currentSession.messages
-    },
     showVoiceMessaging() {
       return this.voiceMessagingAvailable && this.eligibleForVoiceMessaging
     },
@@ -313,13 +295,6 @@ export default {
     }
   },
   methods: {
-    // @NEW so bot messages are styled in recaps
-    isBotMessage(message) {
-      return /^<\|bot says\|>/.test(message.contents)
-    },
-    isMessageForBot(message) {
-      return /@bot/.test(message)
-    },
     showTextMessage() {
       this.textMessageHidden = false
       this.hideModerationWarning()
@@ -633,9 +608,6 @@ export default {
     },
     messageAlignment(message) {
       if (message.isSystemMessage) return MESSAGE_ALIGNMENT.CENTER
-      if (this.isBotMessage(message)) {
-        return MESSAGE_ALIGNMENT.LEFT
-      }
       return message.user === this.user.id
         ? MESSAGE_ALIGNMENT.RIGHT
         : MESSAGE_ALIGNMENT.LEFT
@@ -684,13 +656,6 @@ export default {
 
         if (this.isInRecap) {
           this.$store.dispatch('user/addRecapMessage', data)
-        } else if (this.aiWidgetPresent) {
-          if (
-            !this.isBotMessage(data) &&
-            !this.isMessageForBot(data.contents)
-          ) {
-            this.$store.dispatch('user/addMessage', data)
-          }
         } else {
           this.$store.dispatch('user/addMessage', data)
         }
@@ -888,10 +853,6 @@ export default {
   &--chat-bot {
     background-color: $upchieve-chat-bot-green;
   }
-}
-
-.bot .contents {
-  background-color: $upchieve-chat-bot-green;
 }
 
 // transition element rulesets

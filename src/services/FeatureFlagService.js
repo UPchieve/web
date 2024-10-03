@@ -89,11 +89,9 @@ class FeatureFlagService {
       )
 
       const featureFlags = res.data.featureFlags
-      const featureFlagPayloads = res.data.featureFlagPayloads
 
       return {
         isEnabled: featureFlags[featureFlagKey] ?? false,
-        payload: JSON.parse(featureFlagPayloads[featureFlagKey]),
       }
     } catch (err) {
       LoggerService.noticeError(
@@ -148,12 +146,18 @@ class DevFeatureFlagService {
   }
 
   static async isFeatureEnabledForUser(featureFlagKey, userId) {
+    const { default: store } = await import('@/store')
     // eslint-disable-next-line no-console
     console.info(
       'FeatureFlagService.isFeatureEnabledForUser',
       featureFlagKey,
       userId
     )
+
+    const featureFlags = store.state.featureFlags.toggleFlags
+    return {
+      isEnabled: featureFlags[featureFlagKey],
+    }
   }
 
   static getFeatureFlag(featureFlagKey) {

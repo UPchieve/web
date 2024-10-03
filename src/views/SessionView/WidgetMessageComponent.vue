@@ -3,20 +3,54 @@ import { defineProps } from 'vue'
 import { MESSAGE_ALIGNMENT } from '../BotConversationsView/BotChatMessages.vue'
 import GenerationFeedback from '../BotConversationsView/GenerationFeedback.vue'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
+import StudentIcon from '@/assets/student-icon.svg'
+import VolunteerIcon from '@/assets/volunteer-icon.svg'
+
 const { alignment, message } = defineProps<{
-  alignment: string
+  alignment: MESSAGE_ALIGNMENT
   message: any
 }>()
+
+function messageClassFor(
+  senderUserType: 'bot' | 'student' | 'volunteer',
+  alignment: MESSAGE_ALIGNMENT
+) {
+  if (senderUserType === 'bot') {
+    return 'bot'
+  }
+  if (alignment === MESSAGE_ALIGNMENT.LEFT) {
+    return 'partner'
+  }
+}
 </script>
 
 <template>
   <div class="m-container" :class="alignment">
     <ChatBotIcon
-      class="chat-bot-icon"
-      v-if="alignment === MESSAGE_ALIGNMENT.LEFT"
+      class="icon"
+      v-if="
+        alignment === MESSAGE_ALIGNMENT.LEFT && message.senderUserType === 'bot'
+      "
     ></ChatBotIcon>
+    <VolunteerIcon
+      class="icon"
+      v-else-if="
+        alignment === MESSAGE_ALIGNMENT.LEFT &&
+        message.senderUserType === 'volunteer'
+      "
+    ></VolunteerIcon>
+    <StudentIcon
+      class="icon"
+      v-else-if="
+        alignment === MESSAGE_ALIGNMENT.LEFT &&
+        message.senderUserType === 'student'
+      "
+    ></StudentIcon>
 
-    <div class="message">
+    <div
+      class="message"
+      :class="messageClassFor(message.senderUserType, alignment)"
+    >
       <div class="system-message" v-if="message.senderUserType === 'system'">
         <div class="info">i</div>
         <span v-html="message.message"></span>
@@ -39,7 +73,7 @@ const { alignment, message } = defineProps<{
   padding-left: 20px;
   padding-right: 20px;
 }
-.chat-bot-icon {
+.icon {
   flex-shrink: 0;
   width: 30px;
   height: 30px;
@@ -93,8 +127,13 @@ const { alignment, message } = defineProps<{
 }
 .left {
   justify-content: start;
-  & .message {
+
+  & .bot {
     background-color: $selected-green;
+  }
+
+  & .partner {
+    background-color: $c-background-grey;
   }
 }
 </style>

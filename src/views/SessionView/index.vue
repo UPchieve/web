@@ -15,8 +15,9 @@
     >
       <ai-widget-tool
         v-if="showAiWidget"
-        @minimize="() => (aiWidgetHidden = true)"
-        :conversationId="tutorBotConversationId"
+        @minimize="minimizeAiWidget"
+        @dragging="draggingAiWidget"
+        @resizing="resizingAiWidget"
       />
       <div
         class="auxiliary-container"
@@ -35,6 +36,8 @@
           :aiWidgetHidden="aiWidgetHidden"
           @toggleAiWidget="toggleAiWidget"
           :aiWidgetEnabled="aiWidgetEnabled"
+          :showHasAiMessageIndicator="hasUnreadAiTutorMessage"
+          :aiWidgetMoving="aiWidgetDragging || aiWidgetResizing"
         />
         <document-editor-v2
           v-else-if="
@@ -105,7 +108,7 @@
           />
         </div>
         <session-chat
-          :aiWidgetPresent="showAiWidget"
+          :aiWidgetPresent="aiWidgetEnabled"
           :currentSession="session"
           :shouldHideChatSection="shouldHideChatSection"
           :setHasSeenNewMessage="setHasSeenNewMessage"
@@ -154,6 +157,11 @@
     >
       <photo-upload-icon class="photo-upload--icon" />
     </div>
+    <ai-assisted-tutoring-modal
+      v-if="showAiAssistedTutoringModal"
+      :isVolunteer="user.isVolunteer"
+      :closeModal="() => setShowAiAssistedTutoringModal(false)"
+    />
     <web-notifications-modal
       v-if="showNotificationModal"
       :closeModal="() => setShowNotificationModal(false)"
@@ -193,6 +201,7 @@ import isOutdatedMobileAppVersion from '@/utils/is-outdated-mobile-app-version'
 import CaretIcon from '@/assets/caret.svg'
 import QuestionMarkIcon from '@/assets/question-mark-icon.svg'
 import WebNotificationsModal from '@/components/WebNotificationsModal.vue'
+import AiAssistedTutoringModal from './AiAssistedTutoringModal.vue'
 import AboutSessionModal from './AboutSessionModal.vue'
 import AssignmentDetailModal from './AssignmentDetailModal.vue'
 import FallIncentiveReviewWarningModal from './FallIncentiveReviewWarningModal.vue'
@@ -203,6 +212,8 @@ import { backOff } from 'exponential-backoff'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import LoggerService from '@/services/LoggerService'
 import { socket } from '@/socket'
+import FeatureFlagService from '@/services/FeatureFlagService'
+import { POSTHOG_FEATURE_FLAGS, AI_TUTOR_SUPPORTED_SUBJECTS } from '@/consts'
 
 const activeHeaderData = {
   component: 'SessionHeader',
@@ -212,6 +223,7 @@ export default {
   name: 'session-view',
   components: {
     AiWidgetTool,
+    AiAssistedTutoringModal,
     SessionHeader,
     SessionChat,
     Whiteboard,
@@ -270,9 +282,13 @@ export default {
       sessionHasEnded: false,
       showFallIncentiveReviewWarningModal: false,
       unsubscribeFromActionSubscription: () => undefined,
-      tutorBotConversationId: null,
       aiWidgetHidden: true,
       gettingTutorBotConversation: false,
+      aiWidgetEnabled: false,
+      hasUnreadAiTutorMessage: false,
+      showAiAssistedTutoringModal: false,
+      aiWidgetDragging: false,
+      aiWidgetResizing: false,
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -304,6 +320,7 @@ export default {
       isTutorBotChatEnabled: 'featureFlags/isTutorBotChatEnabled',
       isFallIncentiveProgramEnabled:
         'featureFlags/isFallIncentiveProgramEnabled',
+      currentTutorBotConversation: 'botConversations/currentConversation',
     }),
     sessionToolTypes() {
       return SESSION_TOOL_TYPES
@@ -339,7 +356,7 @@ export default {
     },
     showAiWidget() {
       return (
-        this.tutorBotConversationId &&
+        this.currentTutorBotConversation.conversationId &&
         this.aiWidgetEnabled &&
         !this.aiWidgetHidden
       )
@@ -359,15 +376,11 @@ export default {
         this.mobileMode
       )
     },
-
-    aiWidgetEnabled() {
-      /*
-       * TODO: when we want to enable this, we need to check the student's FF
-       *  `isStandAloneAiTutorEnabled`.
-       * if the user is a volunteer, we need to somehow know when this is enabled
-       * for the student and then enable it for the volunteer
-       */
-      return false
+    maybeShowNewAiTutorIndicator() {
+      return {
+        aiWidgetHidden: this.aiWidgetHidden,
+        messagesLength: this.currentTutorBotConversation?.messages?.length ?? 0,
+      }
     },
   },
   async mounted() {
@@ -390,11 +403,6 @@ export default {
         onRetry: (res, abort) => {
           this.showTroubleStartingModal(abort)
         },
-      }
-
-      const tutorBotConversationId = this.$route.query.tutorBotConversationId
-      if (tutorBotConversationId) {
-        options.tutorBotConversationId = tutorBotConversationId
       }
 
       if (this.shouldUseQuillV2) {
@@ -422,6 +430,48 @@ export default {
     promise
       .then(async (sessionId) => {
         this.sessionId = sessionId
+
+        this.$watch('session', async (session) => {
+          /*
+           * Since the HYBRID_AI_TUTOR is only rolled out to students,
+           * we have to check to see if the student involved in this
+           * session is elgible, if they are, we can also enable it for
+           * the volunteer
+           */
+          FeatureFlagService.isFeatureEnabledForUser(
+            POSTHOG_FEATURE_FLAGS.HYBRID_AI_TUTOR,
+            session.student.id
+          ).then((r) => {
+            const isValidSubject = AI_TUTOR_SUPPORTED_SUBJECTS.includes(
+              session.subTopic
+            )
+            this.aiWidgetEnabled = r.isEnabled && isValidSubject
+            if (!localStorage.getItem('seen-ai-assisted-modal')) {
+              this.setShowAiAssistedTutoringModal(this.aiWidgetEnabled)
+            }
+          })
+
+          // TODO: when we transfer from a stand-alone, make sure we update the conversationId
+          // with the sessionId rather than creating one
+          if (!this.currentTutorBotConversation.sessionId !== this.sessionId) {
+            const { data: conversation } =
+              await NetworkService.getConversationWithMessagesBySessionId(
+                this.sessionId
+              )
+            await this.$store.dispatch(
+              'botConversations/setConversation',
+              conversation.conversationId
+            )
+            // Open if there are messages and it's enabled
+            if (
+              !this.mobileMode &&
+              this.aiWidgetEnabled &&
+              this.currentTutorBotConversation.messages.length
+            ) {
+              this.aiWidgetHidden = false
+            }
+          }
+        })
 
         if (!id && this.isStudent)
           AnalyticsService.captureEvent(EVENTS.SESSION_REQUESTED, {
@@ -473,6 +523,29 @@ export default {
       })
   },
   watch: {
+    aiWidgetDragging(dragging) {
+      if (!dragging)
+        AnalyticsService.captureEvent(EVENTS.AI_TUTOR_WIDGET_DRAGGED)
+    },
+    aiWidgetResizing(resizing) {
+      if (!resizing)
+        AnalyticsService.captureEvent(EVENTS.AI_TUTOR_WIDGET_RESIZED)
+    },
+    auxiliaryOpen(isOpen) {
+      if (!isOpen) {
+        this.aiWidgetHidden = true
+      }
+    },
+    maybeShowNewAiTutorIndicator(current, prev) {
+      if (
+        current.aiWidgetHidden &&
+        current.messagesLength > prev.messagesLength
+      ) {
+        this.hasUnreadAiTutorMessage = true
+      } else {
+        this.hasUnreadAiTutorMessage = false
+      }
+    },
     reconnectAttempts(prev, current) {
       if (current > prev) {
         this.$store.dispatch('user/sessionDisconnected')
@@ -522,22 +595,26 @@ export default {
   },
   methods: {
     toggleAiWidget() {
-      if (!this.tutorBotConversationId) {
-        if (this.gettingTutorBotConversation) return
-        this.gettingTutorBotConversation = true
-        NetworkService.getConversationWithMessagesBySessionId(this.sessionId)
-          .then(async ({ data }) => {
-            this.tutorBotConversationId = data.conversationId
-          })
-          .finally(() => {
-            this.gettingTutorBotConversation = false
-          })
-      }
+      const event = this.aiWidgetHidden
+        ? EVENTS.AI_TUTOR_WIDGET_TOOLBAR_BUTTON_OPEN
+        : EVENTS.AI_TUTOR_WIDGET_TOOLBAR_BUTTON_CLOSE
+      AnalyticsService.captureEvent(event)
       this.aiWidgetHidden = !this.aiWidgetHidden
+    },
+    minimizeAiWidget() {
+      AnalyticsService.captureEvent(EVENTS.AI_TUTOR_WIDGET_MINIMIZE)
+      this.aiWidgetHidden = true
+    },
+    draggingAiWidget(dragging) {
+      this.aiWidgetDragging = dragging
+    },
+    resizingAiWidget(resizing) {
+      this.aiWidgetResizing = resizing
     },
     handleResize() {
       if (this.mobileMode) {
         this.$store.dispatch('app/hideNavigation')
+        if (!this.auxiliaryOpen) this.aiWidgetHidden = true
       } else {
         this.$store.dispatch('app/header/show', activeHeaderData)
         this.$store.dispatch('app/sidebar/hide')
@@ -605,6 +682,9 @@ export default {
     },
     setHasSeenNewMessage(value) {
       this.hasSeenNewMessage = value
+    },
+    setShowAiAssistedTutoringModal(value) {
+      this.showAiAssistedTutoringModal = value
     },
     setShowNotificationModal(value) {
       this.showNotificationModal = value

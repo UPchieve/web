@@ -44,6 +44,10 @@
           }
         "
       >
+        <activity-dot
+          v-if="showHasAiMessageIndicator"
+          class="unread-indicator"
+        />
         <ChatBotIcon class="toolbar-item__svg" />
       </div>
       <div
@@ -296,9 +300,12 @@ import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import ModerationService from '@/services/ModerationService'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
+import ActivityDot from '@/components/ActivityDot.vue'
+import { WhiteboardNullTool } from './WhiteboardNullTool'
 
 export default {
   components: {
+    ActivityDot,
     SelectionIcon,
     ClearIcon,
     ColorPickerIcon,
@@ -339,9 +346,20 @@ export default {
     },
     aiWidgetHidden: {
       type: Boolean,
-      required: true,
+      required: false,
+      default: true,
     },
     aiWidgetEnabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    showHasAiMessageIndicator: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    aiWidgetMoving: {
       type: Boolean,
       required: true,
     },
@@ -365,6 +383,7 @@ export default {
       uploadingPictureError: false,
       selectedEraserTool: false,
       imageUploadErrorMessage: 'Unable to upload the image',
+      previouslySelectedTool: null,
     }
   },
   emits: ['toggleAiWidget'],
@@ -883,6 +902,52 @@ export default {
     this.zwibblerCtx.destroy()
   },
   watch: {
+    aiWidgetMoving(current) {
+      /*
+      This method prevents the selected tool (e.g. brush) from
+      drawing all over the whiteboard while you're moving or resizing the AI window.
+      We're storing the current tool, then setting current tool to WhiteboardNullTool (i.e. nothing)
+      when the dragging or reszing starts.
+
+      Then when the resizing ends, we restore the previous selection
+    */
+      if (current) {
+        this.previouslySelectedTool = this.zwibblerCtx.getCurrentTool()
+        this.zwibblerCtx.useCustomTool(new WhiteboardNullTool())
+        this.selectedTool = ''
+      } else {
+        this.selectedTool = this.previouslySelectedTool
+        switch (this.selectedTool) {
+          case 'brush':
+            this.useBrushTool()
+            break
+          case 'pick':
+            this.usePickTool()
+            break
+          case 'line':
+            this.useLineTool()
+            break
+          case 'circle':
+            this.useCircleTool()
+            break
+          case 'triangle':
+            this.useTriangleTool()
+            break
+          case 'rectangle':
+            this.useRectangleTool()
+            break
+          case 'text':
+            this.useTextTool()
+            break
+          case 'eraser':
+            this.useEraserTool()
+            break
+          default:
+            this.usePickTool()
+        }
+        this.previouslySelectedTool = ''
+      }
+    },
     isAiWidgetHidden(isHidden) {
       if (isHidden) {
         this.selectedTool = ''
@@ -1196,5 +1261,11 @@ export default {
 #zwib-div:focus-visible,
 #zwib-div canvas:focus-visible {
   border: 1px solid #000;
+}
+
+.unread-indicator {
+  position: absolute;
+  top: 15px;
+  left: 10px;
 }
 </style>

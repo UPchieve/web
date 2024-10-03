@@ -15,6 +15,9 @@ const props = defineProps<{ messageSending: boolean }>()
   gap: 27px;
   padding-left: 36px;
   padding-right: 36px;
+  max-width: 768px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .chat-bot-icon {
   flex-shrink: 0;

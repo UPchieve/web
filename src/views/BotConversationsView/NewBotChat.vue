@@ -15,7 +15,11 @@ const store = useStore()
 const router = useRouter()
 let currentSubject = ref()
 
+const sessionId = computed(() => store.state.user.session.id)
 onBeforeMount(async () => {
+  if (sessionId.value) {
+    store.dispatch('app/header/show', { component: 'RejoinSessionHeader' })
+  }
   await store.dispatch('botConversations/fetchAllSubjects')
 })
 watch(
@@ -47,7 +51,7 @@ const sendFirstMessage = async (message: string) => {
   store.commit('botConversations/clearErrors')
   const isClean = await ModerationService.checkIfMessageIsClean({
     message,
-    sessionId: undefined, // we will have a sessionId when creating an ai convo in session
+    sessionId: undefined,
   })
   if (isClean) {
     await store.dispatch('botConversations/createConversation', {
@@ -78,12 +82,14 @@ const sendFirstMessage = async (message: string) => {
         Creating chat
       </div>
     </div>
-    <span class="notice">
+    <span class="notice" v-if="currentSubject?.displayName">
       The UPchieve team monitors messages - let's keep them safe and respectful!
     </span>
     <div class="text-area-container">
       <Textarea
+        v-if="currentSubject?.displayName"
         class="textarea"
+        :placeholder="`How can UPbot help you with ${currentSubject.displayName} today?`"
         :disabled="!currentSubject || fetchingConversation"
         :sendMessage="(message: string) => sendFirstMessage(message)"
       ></Textarea>
@@ -96,7 +102,8 @@ const sendFirstMessage = async (message: string) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: start;
+  padding-top: 10vh;
   row-gap: 18px;
   height: 100%;
   max-width: 768px;
@@ -116,7 +123,8 @@ const sendFirstMessage = async (message: string) => {
   align-self: start;
 }
 .chat-log {
-  min-height: 150px;
+  flex-shrink: 0;
+  min-height: 24px;
   display: flex;
   align-items: center;
   align-self: start;

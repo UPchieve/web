@@ -15,13 +15,13 @@
           downtimeBannerMessage
         }}</a>
       </div>
-      <a
+      <large-button
         v-if="aiBotMessage"
         class="dashboard-notice ai-bot"
         :class="'dashboard-notice--downtime'"
-        href="/ai-tutor-conversations"
+        routeTo="/ai-tutor-conversations"
         >{{ aiBotMessage }}<arrow-icon></arrow-icon
-      ></a>
+      ></large-button>
     </div>
 
     <tell-them-college-prep-modal
@@ -56,6 +56,7 @@ import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 import getCookie from '@/utils/get-cookie'
 import Gleap from 'gleap'
 import ArrowIcon from '@/assets/arrow.svg'
+import LargeButton from '@/components/LargeButton.vue'
 
 const defaultHeaderData = {
   component: 'DefaultHeader',
@@ -78,6 +79,7 @@ export default {
     JoinedClassModal,
     FallIncentiveEnrollmentModal,
     ArrowIcon,
+    LargeButton,
   },
   async created() {
     if (this.isSessionAlive) {
