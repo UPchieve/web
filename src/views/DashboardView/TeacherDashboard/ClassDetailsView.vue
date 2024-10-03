@@ -482,7 +482,6 @@ export default {
 .teacher-dashboard {
   @include flex-container(column, center);
   padding: 0 !important;
-  height: 90vh;
 }
 
 .class-header {
