@@ -431,6 +431,19 @@ export default {
       .then(async (sessionId) => {
         this.sessionId = sessionId
 
+        const transferringFromTutorBot = Object.prototype.hasOwnProperty.call(
+          this.$route.query,
+          'tutorBotConversationId'
+        )
+        if (transferringFromTutorBot) {
+          const tutorBotConversationId =
+            this.$route.query.tutorBotConversationId
+          await NetworkService.updateTutorBotConversationWithSessionId(
+            tutorBotConversationId,
+            { conversationId: tutorBotConversationId, sessionId }
+          )
+        }
+
         this.$watch('session', async (session) => {
           /*
            * Since this is only rolled out to students,

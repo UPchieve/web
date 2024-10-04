@@ -35,7 +35,7 @@ const { alignment, message } = defineProps<{
     ></StudentIcon>
 
     <div class="message">
-      {{ message.message }}
+      <span v-html="message.message" />
       <GenerationFeedback
         v-if="message.traceId"
         :traceId="message.traceId"

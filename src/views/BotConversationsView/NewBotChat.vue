@@ -12,12 +12,17 @@ import Math from '@/assets/subject_icons/math.svg'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import SystemMessage from './SystemMessage.vue'
 
+import TransferToSessionView from '@/views/BotConversationsView/TransferToSessionView/index.vue'
 export type Subject = Partial<{ id: number; displayName: string }>
 
 const store = useStore()
 const router = useRouter()
 const route = useRoute()
 let currentSubject = ref()
+
+const sessionId = computed(() => store.state.user.session?.id)
+const isTransferToSessionEnabled =
+  store.getters['featureFlags/aiTutor'].includes('handoff')
 
 enum STEPS {
   subjectSelection = 'subjectSelection',
@@ -30,8 +35,6 @@ const step = computed(() => {
   }
   return STEPS.subjectSelection
 })
-
-const sessionId = computed(() => store.state.user.session.id)
 
 onBeforeMount(async () => {
   if (sessionId.value) {
@@ -144,7 +147,7 @@ const subjectSelectedMessage = computed(
             Creating chat
           </div>
         </div>
-        <div class="text-area-container">
+        <div class="text-area-container" v-if="currentSubject?.displayName">
           <Textarea
             v-if="currentSubject?.displayName"
             class="textarea"
@@ -152,6 +155,15 @@ const subjectSelectedMessage = computed(
             :disabled="!currentSubject || fetchingConversation"
             :sendMessage="(message: string) => sendFirstMessage(message)"
           ></Textarea>
+          <span class="ai-disclaimer"
+          >AI may not always be accurate. For more help, transfer to a live
+        tutor!</span
+          >
+          <TransferToSessionView
+            v-if="isTransferToSessionEnabled && !sessionId && currentSubject"
+            :subject="currentSubject?.topicName"
+            :topic="currentSubject?.name"
+          />
         </div>
       </div>
     </div>
@@ -243,12 +255,16 @@ const subjectSelectedMessage = computed(
 .text-area-container {
   width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding-bottom: 36px;
   margin-left: auto;
   margin-right: auto;
   background-color: #fbfbfc;
+  gap: 16px;
+}
+.ai-disclaimer {
+  color: $c-default-grey;
 }
 .chat-log {
   flex-shrink: 0;

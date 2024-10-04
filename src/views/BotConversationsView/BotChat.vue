@@ -11,6 +11,7 @@ import { onMounted, computed, defineProps, ref, watch, nextTick } from 'vue'
 import BotChatMessages from './BotChatMessages.vue'
 import Textarea from './Textarea.vue'
 import ModerationService from '@/services/ModerationService'
+import TransferToSessionView from '@/views/BotConversationsView/TransferToSessionView/index.vue'
 
 const { bgColor, displayContext } = defineProps<{
   displayContext: DISPLAY_CONTEXT
@@ -18,6 +19,9 @@ const { bgColor, displayContext } = defineProps<{
 }>()
 const store = useStore()
 const user = computed(() => store.state.user.user)
+const sessionId = computed(() => store.state.user.session.id)
+const isTransferToSessionEnabled =
+  store.getters['featureFlags/aiTutor'].includes('handoff')
 
 const chatContainer = ref()
 const scrollToBottom = async () => {
@@ -98,6 +102,17 @@ watch(() => messages.value.length, scrollToBottom)
         :disabled="messageSending || fetchingConversation"
         :sendMessage="(message: string) => sendMessage(message)"
       ></Textarea>
+      <span
+        v-if="displayContext === DISPLAY_CONTEXT.STAND_ALONE"
+        class="ai-disclaimer"
+        >AI may not always be accurate. For more help, transfer to a live
+        tutor!</span
+      >
+      <TransferToSessionView
+        v-if="isTransferToSessionEnabled && !sessionId && conversation.subject"
+        :subject="conversation.subject.topicName"
+        :topic="conversation.subject.name"
+      />
     </div>
   </div>
 </template>
@@ -115,11 +130,17 @@ watch(() => messages.value.length, scrollToBottom)
   bottom: 0;
   width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   padding-bottom: 36px;
   margin-left: auto;
   margin-right: auto;
+  gap: 16px;
+}
+
+.ai-disclaimer {
+  color: $c-default-grey;
 }
 
 .text-area {
