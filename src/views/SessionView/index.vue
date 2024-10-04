@@ -433,19 +433,23 @@ export default {
 
         this.$watch('session', async (session) => {
           /*
-           * Since the HYBRID_AI_TUTOR is only rolled out to students,
+           * Since this is only rolled out to students,
            * we have to check to see if the student involved in this
            * session is elgible, if they are, we can also enable it for
            * the volunteer
            */
           FeatureFlagService.isFeatureEnabledForUser(
-            POSTHOG_FEATURE_FLAGS.HYBRID_AI_TUTOR,
+            POSTHOG_FEATURE_FLAGS.AI_TUTOR,
             session.student.id
           ).then((r) => {
             const isValidSubject = AI_TUTOR_SUPPORTED_SUBJECTS.includes(
               session.subTopic
             )
-            this.aiWidgetEnabled = r.isEnabled && isValidSubject
+            this.aiWidgetEnabled =
+              [
+                'stand-alone-in-session',
+                'stand-alone-in-session-handoff',
+              ].includes(r.isEnabled) && isValidSubject
             if (!localStorage.getItem('seen-ai-assisted-modal')) {
               this.setShowAiAssistedTutoringModal(this.aiWidgetEnabled)
             }

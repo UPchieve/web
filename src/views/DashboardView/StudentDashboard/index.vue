@@ -172,7 +172,7 @@ export default {
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
       downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
-      isStandAloneAiTutorEnabled: 'featureFlags/isStandAloneAiTutorEnabled',
+      aiTutor: 'featureFlags/aiTutor',
       orbitalSegments: 'featureFlags/orbitalSegments',
       isOrbitalSegmentsActive: 'featureFlags/isOrbitalSegmentsActive',
       showDashboardRedesign: 'user/showDashboardRedesign',
@@ -187,7 +187,7 @@ export default {
     }),
 
     aiBotMessage() {
-      return this.isStandAloneAiTutorEnabled && this.isMobileMode
+      return this.aiTutor && this.isMobileMode
         ? 'Try out our new AI Tutor'
         : null
     },

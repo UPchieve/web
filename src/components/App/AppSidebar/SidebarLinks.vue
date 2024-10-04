@@ -3,9 +3,7 @@
     <template v-if="$route.path.indexOf('/onboarding') !== -1"></template>
 
     <template v-else-if="authenticated">
-      <ai-tutor-button
-        v-if="isStudent && isStandAloneAiTutorActive"
-      ></ai-tutor-button>
+      <ai-tutor-button v-if="isStudent && isAiTutorActive"></ai-tutor-button>
 
       <sidebar-link v-if="!isTeacher" to="/dashboard" text="Dashboard">
         <house-icon class="icon" />
@@ -160,7 +158,7 @@ export default {
       isStudent: 'user/isStudent',
       isTeacher: 'user/isTeacher',
       isStudentClassesEnabled: 'featureFlags/isAssignmentsEnabled',
-      isStandAloneAiTutorActive: 'featureFlags/isStandAloneAiTutorEnabled',
+      isAiTutorActive: 'featureFlags/aiTutor',
     }),
     showStudentMyClassesLink() {
       return (
