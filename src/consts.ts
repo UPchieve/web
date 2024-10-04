@@ -688,8 +688,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   FALL_INCENTIVE_PROGRAM: 'fall-incentive-program',
   NATIONAL_STUDENT_PHONE: 'national-student-phone',
   ASSIGNMENTS: 'assignments',
-  STAND_ALONE_AI_TUTOR: 'stand-alone-ai-tutor',
-  HYBRID_AI_TUTOR: 'hybrid-ai-tutor',
+  AI_TUTOR: 'stand-alone-ai-tutor',
 }
 
 export const ANALYTICS_REPORT_ROW = {
