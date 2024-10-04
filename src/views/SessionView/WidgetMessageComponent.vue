@@ -5,6 +5,7 @@ import GenerationFeedback from '../BotConversationsView/GenerationFeedback.vue'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import StudentIcon from '@/assets/student-icon.svg'
 import VolunteerIcon from '@/assets/volunteer-icon.svg'
+import SystemMessage from '../BotConversationsView/SystemMessage.vue'
 
 const { alignment, message } = defineProps<{
   alignment: MESSAGE_ALIGNMENT
@@ -51,10 +52,10 @@ function messageClassFor(
       class="message"
       :class="messageClassFor(message.senderUserType, alignment)"
     >
-      <div class="system-message" v-if="message.senderUserType === 'system'">
-        <div class="info">i</div>
+      <SystemMessage v-if="message.senderUserType === 'system'">
         <span v-html="message.message"></span>
-      </div>
+      </SystemMessage>
+
       <span v-else>{{ message.message }}</span>
       <GenerationFeedback
         v-if="message.traceId"
@@ -88,40 +89,16 @@ function messageClassFor(
   white-space: pre-line;
   text-align: left;
   border-radius: 20px;
-  padding: 10px 16px;
-}
-
-.system-message {
-  display: flex;
-  gap: 12px;
-}
-
-.info {
-  font-size: 18px;
-  font-weight: 500;
-  border-radius: 1rem;
-  line-height: 1rem;
-  background-color: $c-success-green;
-  color: white;
-  width: 23px;
-  height: 23px;
-  padding: 12px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .center {
   justify-content: center;
-  & .message {
-    max-width: 100%;
-    background-color: $selected-green;
-    border: 1px solid $c-success-green;
-  }
 }
+
 .right {
   justify-content: end;
   & .message {
+    padding: 10px 16px;
     background-color: $c-background-blue;
   }
 }
@@ -130,9 +107,11 @@ function messageClassFor(
 
   & .bot {
     background-color: $selected-green;
+    padding: 10px 16px;
   }
 
   & .partner {
+    padding: 10px 16px;
     background-color: $c-background-grey;
   }
 }

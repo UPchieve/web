@@ -154,9 +154,13 @@ class DevFeatureFlagService {
       userId
     )
 
-    const featureFlags = store.state.featureFlags.toggleFlags
+    const toggleFlags = store.state.featureFlags.toggleFlags
+    const multivariantFlags = store.state.featureFlags.multivariantFlags
+    const flag = Object.hasOwn(toggleFlags, featureFlagKey)
+      ? toggleFlags[featureFlagKey]
+      : multivariantFlags[featureFlagKey]
     return {
-      isEnabled: featureFlags[featureFlagKey],
+      isEnabled: flag,
     }
   }
 

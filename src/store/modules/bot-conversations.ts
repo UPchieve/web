@@ -38,9 +38,22 @@ export default {
         return subs.concat(supported)
       }, [])
     },
+    prependFakeMessage: (state, message) => {
+      return (state.currentConversation.messages = [
+        {
+          message,
+          senderUserType: 'bot',
+          tutorBotConversationId: state.currentConversation.conversationId,
+        },
+        ...state.currentConversation.messages,
+      ])
+    },
   },
 
   actions: {
+    prependSystemMessage({ commit }, message) {
+      commit('prependFakeMessage', message)
+    },
     resetCurrentConversation({ commit }) {
       commit('setCurrentConversation', {})
     },
