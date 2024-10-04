@@ -133,7 +133,18 @@ export default {
       else this.showSurvey = true
     },
     onSurveyCompleted() {
-      startSession(this.$router, this.modalData.topic, this.selectedSubtopic)
+      const queryParams = Object.prototype.hasOwnProperty.call(
+        this.modalData,
+        'sessionArgs'
+      )
+        ? this.modalData.sessionArgs
+        : undefined
+      startSession(
+        this.$router,
+        this.modalData.topic,
+        this.selectedSubtopic,
+        queryParams
+      )
     },
     startsWithVowel(word) {
       return /[AEIOUaeiou]/i.test(word[0])

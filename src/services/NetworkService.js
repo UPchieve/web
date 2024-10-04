@@ -53,6 +53,10 @@ export async function httpPut(path, data, config) {
   return axiosInstance.put(path, data, config)
 }
 
+export async function httpPatch(path, data, config) {
+  return axiosInstance.patch(path, data, config)
+}
+
 export async function httpDelete(path, config) {
   return axiosInstance.delete(path, config)
 }
@@ -1033,6 +1037,12 @@ export default {
       message,
       subjectId,
     }).then(this._successHandler, this._errorHandler)
+  },
+  updateTutorBotConversationWithSessionId(conversationId, data) {
+    return httpPatch(
+      `${API_ROOT}/tutor-bot/conversations/${conversationId}`,
+      data
+    ).then(this._successHandler, this._errorHandler)
   },
   sendTutorBotMessage({
     userId,

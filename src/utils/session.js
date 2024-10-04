@@ -6,9 +6,14 @@ import Case from 'case'
  * @param {VueRouter} router
  * @param {string} topic e.g. "math"
  * @param {string} subtopic e.g. "algebra"
+ * @param queryParams {object}
  */
-export const startSession = (router, topic, subtopic) =>
-  router.push(`/session/${Case.kebab(topic)}/${Case.kebab(subtopic)}`)
+export const startSession = (router, topic, subtopic, queryParams) => {
+  const query = queryParams
+    ? `?${new URLSearchParams(queryParams).toString()}`
+    : ''
+  router.push(`/session/${Case.kebab(topic)}/${Case.kebab(subtopic)}${query}`)
+}
 
 /**
  * Rejoins an existing session.
