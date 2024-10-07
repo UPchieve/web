@@ -470,9 +470,12 @@ export default {
 
           // TODO: when we transfer from a stand-alone, make sure we update the conversationId
           // with the sessionId rather than creating one
-          if (!this.currentTutorBotConversation.sessionId !== this.sessionId) {
+          if (
+            !this.currentTutorBotConversation.sessionId !== this.sessionId &&
+            this.aiWidgetEnabled
+          ) {
             const { data: conversation } =
-              await NetworkService.getConversationWithMessagesBySessionId(
+              await NetworkService.getOrCreateTutorBotConversationWithMessagesBySessionId(
                 this.sessionId
               )
             await this.$store.dispatch(
