@@ -156,8 +156,8 @@ const subjectSelectedMessage = computed(
             :sendMessage="(message: string) => sendFirstMessage(message)"
           ></Textarea>
           <span class="ai-disclaimer"
-          >AI may not always be accurate. For more help, transfer to a live
-        tutor!</span
+            >AI may not always be accurate. For more help, transfer to a live
+            tutor!</span
           >
           <TransferToSessionView
             v-if="isTransferToSessionEnabled && !sessionId && currentSubject"
