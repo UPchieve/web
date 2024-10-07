@@ -1008,7 +1008,7 @@ export default {
       `${API_ROOT}/tutor-bot/conversations/${conversationId}`
     ).then(this._successHandler, this._errorHandler)
   },
-  getConversationWithMessagesBySessionId(sessionId) {
+  getOrCreateTutorBotConversationWithMessagesBySessionId(sessionId) {
     return httpPut(
       `${API_ROOT}/session/${sessionId}/tutor-bot-conversation`
     ).then(this._successHandler, this._errorHandler)
