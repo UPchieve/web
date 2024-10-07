@@ -1,13 +1,5 @@
 import { faker } from '@faker-js/faker'
-import {
-  beforeEach,
-  describe,
-  expect,
-  it,
-  MockInstance,
-  test,
-  vi,
-} from 'vitest'
+import { beforeEach, describe, expect, MockInstance, test, vi } from 'vitest'
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils'
 import router from '@/router'
 import store from '@/store'

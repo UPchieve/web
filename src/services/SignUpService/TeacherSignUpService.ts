@@ -46,7 +46,7 @@ function isIneligibleRoute(to) {
   return to.path === RoutePath.ineligible
 }
 
-function isAccountRoute(to, from) {
+function isAccountRoute(to) {
   return to.path === RoutePath.account
 }
 
