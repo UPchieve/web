@@ -308,8 +308,8 @@ export default {
       this._errorHandler
     )
   },
-  latestSession(data) {
-    return httpPost(`${API_ROOT}/session/latest`, data).then(
+  latestSession() {
+    return httpPost(`${API_ROOT}/session/latest`).then(
       this._successHandler,
       this._errorHandler
     )

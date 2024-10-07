@@ -286,7 +286,7 @@ export default {
         }
 
         if (this.isStudent) {
-          this.$store.dispatch('user/fetchLatestSession', this)
+          this.$store.dispatch('session/fetchLatestSession', this)
         }
       }
     },

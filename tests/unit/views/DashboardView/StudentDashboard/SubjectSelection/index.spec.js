@@ -13,7 +13,7 @@ const getWrapper = (mobileMode = false) => {
           mobileMode: () => mobileMode,
         },
       },
-      user: { state: { latestSession: {} } },
+      session: { state: { latestSession: {} } },
     },
   })
 
