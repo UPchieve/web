@@ -107,7 +107,6 @@ export default {
       this.$store.dispatch('app/modal/show', {
         component: 'StudentCompletionModal',
         data: {
-          assignmentInfo: this.assignmentInfo,
           studentCompletion: this.studentCompletion,
         },
       })

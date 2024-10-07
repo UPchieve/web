@@ -8,14 +8,19 @@
     >
       <div class="student-row">
         <span v-if="student.submitted_at" class="check-mark"
-          ><Check class="check" /></span
+          ><Check
+            class="check"
+            :data-testid="
+              student.first_name + student.last_name + '-checkmark'
+            " /></span
         ><span v-else class="check-mark"></span
         ><span
+          :data-testid="'student-' + student.first_name + student.last_name"
           >{{ student.first_name }} {{ student.last_name }}
           {{
             student.submitted_at
-              ? ` submitted on  ${formatTimestamp(student.submitted_at)}`
-              : ' not submitted'
+              ? `submitted on  ${formatTimestamp(student.submitted_at)}`
+              : 'not submitted'
           }}</span
         >
       </div>
@@ -41,13 +46,11 @@ export default {
 
   data() {
     return {
-      assignmentInfo: {},
       studentAssignmentCompletion: [],
     }
   },
 
   async created() {
-    this.assignmentInfo = this.modalData.assignmentInfo
     this.studentAssignmentCompletion = this.modalData.studentCompletion
   },
 
