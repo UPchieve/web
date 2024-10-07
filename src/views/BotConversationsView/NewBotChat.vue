@@ -37,9 +37,6 @@ const step = computed(() => {
 })
 
 onBeforeMount(async () => {
-  if (sessionId.value) {
-    store.dispatch('app/header/show', { component: 'RejoinSessionHeader' })
-  }
   await store.dispatch('botConversations/fetchAllSubjects')
   router.replace({ query: { step: STEPS.subjectSelection } })
 })
@@ -126,11 +123,6 @@ const subjectSelectedMessage = computed(
           </SystemMessage>
         </div>
       </div>
-      <!-- <div class="fake-message followup">
-        <span class="message">
-          Tell me about the problem you need help with.
-        </span>
-      </div> -->
     </div>
     <div class="container">
       <SelectTopic

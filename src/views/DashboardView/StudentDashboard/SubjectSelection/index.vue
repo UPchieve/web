@@ -115,7 +115,7 @@ export default {
   watch: {
     // This component mounts before the lastestSession and isSessionAlive
     // have a value in the store - watch for updates
-    latestSession(session) {
+    latestSession() {
       this.checkOrEnforceWaitingPeriod()
     },
   },

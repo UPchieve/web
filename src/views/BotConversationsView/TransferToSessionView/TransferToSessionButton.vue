@@ -4,6 +4,7 @@ import VolunteerIcon from '@/assets/volunteer-icon.svg'
 
 const props = defineProps<{
   onClick: () => void
+  disableButton: false
 }>()
 </script>
 
@@ -13,6 +14,10 @@ const props = defineProps<{
     class="transfer-button"
     primary
     @click="props.onClick"
+    :disabled="disableButton"
+    :class="{
+      'enabled-button': !disableButton,
+    }"
   >
     <div class="button-content-container">
       <VolunteerIcon class="volunteer-icon" />
@@ -32,7 +37,9 @@ const props = defineProps<{
   background-color: $c-information-blue;
   border-radius: 200px;
   height: 48px;
+}
 
+.enabled-button {
   &:hover {
     background-color: $c-information-blue;
   }

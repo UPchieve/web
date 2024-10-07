@@ -1,5 +1,3 @@
-<script lang="ts" setup></script>
-
 <template>
   <div class="system-message">
     <div class="info">i</div>

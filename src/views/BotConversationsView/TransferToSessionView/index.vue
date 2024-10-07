@@ -21,6 +21,10 @@ const currentConversationId = computed(
   () => store.state.botConversations.currentConversation?.conversationId
 )
 
+const cooldownMinutes = computed(
+  () => store.getters['session/sessionRequestCooldownMinutes']
+)
+
 const showPresessionSurvey = () => {
   store.dispatch('app/modal/show', {
     // Hack for now: Render the SubjectSelectionModal in the state _after_ the topic is selected
@@ -40,7 +44,10 @@ const showPresessionSurvey = () => {
 
 <template>
   <div>
-    <TransferToSessionButton :onClick="showPresessionSurvey" />
+    <TransferToSessionButton
+      :onClick="showPresessionSurvey"
+      :disable-button="cooldownMinutes"
+    />
   </div>
 </template>
 

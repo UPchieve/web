@@ -8,11 +8,7 @@ import Math from '@/assets/subject_icons/math.svg'
 const store = useStore()
 const route = useRoute()
 
-const sessionId = computed(() => store.state.user.session.id)
 onBeforeMount(async () => {
-  if (sessionId.value) {
-    store.dispatch('app/header/show', { component: 'RejoinSessionHeader' })
-  }
   await store.dispatch('botConversations/fetchAllSubjects')
   await store.dispatch(
     'botConversations/setConversation',
