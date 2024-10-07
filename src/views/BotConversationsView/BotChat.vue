@@ -7,7 +7,7 @@ export enum DISPLAY_CONTEXT {
 
 <script setup lang="ts">
 import { useStore } from 'vuex'
-import { onMounted, computed, defineProps, ref, watch, nextTick } from 'vue'
+import { onMounted, computed, ref, watch, nextTick } from 'vue'
 import BotChatMessages from './BotChatMessages.vue'
 import Textarea from './Textarea.vue'
 import ModerationService from '@/services/ModerationService'
