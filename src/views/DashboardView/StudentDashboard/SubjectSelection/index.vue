@@ -38,7 +38,6 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import SubjectCard from './SubjectCard.vue'
-import calculateWaitingPeriodCountdown from '@/utils/calculate-waiting-period-countdown'
 import ReferralSVG from '@/assets/dashboard_icons/student/referral.svg'
 import LightBulbSVG from '@/assets/dashboard_icons/student/light-bulb.svg'
 import Loader from '@/components/Loader.vue'
@@ -64,7 +63,7 @@ export default {
   },
   computed: {
     ...mapState({
-      latestSession: (state) => state.user.latestSession,
+      latestSession: (state) => state.session.latestSession,
       subjects: (state) => state.subjects.subjects,
       isFetchingSubjects: (state) => state.subjects.isFetchingSubjects,
       fetchingSubjectsError: (state) => state.subjects.fetchingSubjectsError,
@@ -76,11 +75,10 @@ export default {
       topicCards: 'subjects/sessionRequestTopicCards',
       showDashboardRedesign: 'user/showDashboardRedesign',
       isMostRecentSubjectsActive: 'featureFlags/isMostRecentSubjectsActive',
+      sessionRequestCooldownMinutes: 'session/sessionRequestCooldownMinutes',
     }),
     waitingPeriodMessage() {
-      const countdown = calculateWaitingPeriodCountdown(
-        this.waitingPeriodTimeLeft
-      )
+      const countdown = this.sessionRequestCooldownMinutes
       const minuteTextFormat = countdown === 1 ? 'minute' : 'minutes'
 
       return `You must wait at least ${countdown} ${minuteTextFormat} before requesting a new session.`
@@ -118,52 +116,40 @@ export default {
     // This component mounts before the lastestSession and isSessionAlive
     // have a value in the store - watch for updates
     latestSession(session) {
-      if (session.endedByUserRole === 'student')
-        this.checkOrEnforceWaitingPeriod()
+      this.checkOrEnforceWaitingPeriod()
     },
   },
   methods: {
-    calculateTimeSinceLastSession() {
-      const sessionCreatedAtInMS = new Date(
-        this.latestSession.createdAt
-      ).getTime()
-      const currentDateInMS = new Date().getTime()
-      return currentDateInMS - sessionCreatedAtInMS
-    },
     checkOrEnforceWaitingPeriod() {
-      const timeSinceLastSession = this.calculateTimeSinceLastSession()
-      const fiveMinutes = 1000 * 60 * 5
-      const timeLeftUntilFiveMinutes = fiveMinutes - timeSinceLastSession
-
-      // Only show a waiting period message if there's no active session
-      // and the latest session's created at has been within a timeframe of 5 minutes.
-      // Sets a timeout to remove the waiting period message
-      if (timeSinceLastSession < fiveMinutes && !this.isSessionAlive) {
-        // Show the waiting period message as a header if not in mobile mode
+      const cooldownMinutes = this.sessionRequestCooldownMinutes
+      if (cooldownMinutes) {
+        const cooldownMs = cooldownMinutes * 1000 * 60
         if (!this.mobileMode) {
           this.disableSubjectCard = true
           const waitingHeaderData = {
             component: 'WaitingPeriodHeader',
             data: {
-              timeLeft: timeLeftUntilFiveMinutes,
+              timeLeft: cooldownMinutes,
             },
           }
           this.$store.dispatch('app/header/show', waitingHeaderData)
-
-          this.waitingPeriodTimeoutId = setTimeout(() => {
-            this.disableSubjectCard = false
-            this.$store.dispatch('app/header/show', defaultHeaderData)
-          }, timeLeftUntilFiveMinutes)
+          this.waitingPeriodTimeoutId = setTimeout(
+            () => {
+              this.disableSubjectCard = false
+              this.$store.dispatch('app/header/show', defaultHeaderData)
+            },
+            cooldownMs
+          )
         } else {
           // Show the waiting period message above the subject cards for mobile users
           this.hasWaitingPeriod = true
           this.disableSubjectCard = true
-          this.waitingPeriodTimeLeft = timeLeftUntilFiveMinutes
+          this.waitingPeriodTimeLeft = cooldownMinutes
 
           this.waitingPeriodTimeoutId = setTimeout(() => {
             this.hasWaitingPeriod = false
             this.disableSubjectCard = false
-          }, timeLeftUntilFiveMinutes)
+          }, cooldownMs)
         }
       } else {
         this.hasWaitingPeriod = false

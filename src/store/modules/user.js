@@ -18,7 +18,6 @@ export default {
   state: {
     user: {},
     session: {},
-    latestSession: {},
     recapSession: {},
     isFirstDashboardVisit: false,
     isSessionConnectionAlive: false,
@@ -40,8 +39,6 @@ export default {
     setSession: (state, session = {}) => (state.session = session),
 
     setRecapSession: (state, session = {}) => (state.recapSession = session),
-
-    setLatestSession: (state, session = {}) => (state.latestSession = session),
 
     addMessage: (state, message) => {
       if (message) state.session.messages.push(message)
@@ -159,17 +156,6 @@ export default {
         })
         .catch((err) => {
           commit('setSession', {})
-          LoggerService.noticeError(err)
-        })
-    },
-
-    fetchLatestSession: ({ commit, state }) => {
-      SessionService.getLatestSession(state.user)
-        .then(({ sessionData }) => {
-          commit('setLatestSession', sessionData)
-        })
-        .catch((err) => {
-          commit('setLatestSession', {})
           LoggerService.noticeError(err)
         })
     },

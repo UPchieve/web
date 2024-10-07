@@ -166,7 +166,7 @@ export default {
       hadASession: (state) => state.user.hadASession,
       prevSessionSubject: (state) => state.user.prevSessionSubject,
       isFirstDashboardVisit: (state) => state.user.isFirstDashboardVisit,
-      latestSession: (state) => state.user.latestSession,
+      latestSession: (state) => state.session.latestSession,
       productFlags: (state) => state.productFlags.flags,
     }),
     ...mapGetters({

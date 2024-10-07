@@ -9,7 +9,6 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import calculateWaitingPeriodCountdown from '@/utils/calculate-waiting-period-countdown'
 
 export default {
   name: 'waiting-period-header',
@@ -19,12 +18,12 @@ export default {
   computed: {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
+      sessionRequestCooldownMinutes: 'session/sessionRequestCooldownMinutes',
     }),
     message() {
       // TODO: implement a better timer and transition to the default header from this timer
       // instead of from within the dashboard
-      const { timeLeft } = this.headerData
-      const countdown = calculateWaitingPeriodCountdown(timeLeft)
+      const countdown = this.sessionRequestCooldownMinutes
       const minuteTextFormat = countdown === 1 ? 'minute' : 'minutes'
 
       return `You must wait at least ${countdown} ${minuteTextFormat} before requesting a new session.`
