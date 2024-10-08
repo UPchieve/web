@@ -25,11 +25,12 @@
     </transition>
     <div id="toolbar" class="toolbar">
       <p v-if="error" class="whiteboard-error">{{ error }}</p>
-      <div
+      <WhiteboardAiTutorButton
         v-if="aiWidgetEnabled"
         class="toolbar-item"
         title="Ai Tutor"
         :class="selectedTool === 'ai-tutor' ? 'selected-tool' : ''"
+        :showHasAiMessageIndicator="showHasAiMessageIndicator"
         tabindex="0"
         @click="
           () => {
@@ -43,13 +44,7 @@
             $emit('toggleAiWidget')
           }
         "
-      >
-        <activity-dot
-          v-if="showHasAiMessageIndicator"
-          class="unread-indicator"
-        />
-        <ChatBotIcon class="toolbar-item__svg" />
-      </div>
+      />
       <div
         class="toolbar-item toolbar-item--pick"
         title="Pick tool"
@@ -299,13 +294,12 @@ import { markRaw } from 'vue'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import ModerationService from '@/services/ModerationService'
-import ChatBotIcon from '@/assets/chat-bot-icon.svg'
-import ActivityDot from '@/components/ActivityDot.vue'
 import { WhiteboardNullTool } from './WhiteboardNullTool'
+import WhiteboardAiTutorButton from './WhiteboardAiTutorButton.vue'
 
 export default {
   components: {
-    ActivityDot,
+    WhiteboardAiTutorButton,
     SelectionIcon,
     ClearIcon,
     ColorPickerIcon,
@@ -325,7 +319,6 @@ export default {
     Loader,
     ResetWhiteboardModal,
     LoadingMessage,
-    ChatBotIcon,
   },
   props: {
     sessionId: {
@@ -1261,11 +1254,5 @@ export default {
 #zwib-div:focus-visible,
 #zwib-div canvas:focus-visible {
   border: 1px solid #000;
-}
-
-.unread-indicator {
-  position: absolute;
-  top: 15px;
-  left: 10px;
 }
 </style>
