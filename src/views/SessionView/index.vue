@@ -523,7 +523,7 @@ export default {
             r.isEnabled
           ) && isValidSubject
         if (!localStorage.getItem('seen-ai-assisted-modal')) {
-          this.setShowAiAssistedTutoringModal(aiWidgetEnabled)
+          this.setShowAiAssistedTutoringModal(this.aiWidgetEnabled)
         }
       })
     },
