@@ -133,13 +133,10 @@ export default {
             },
           }
           this.$store.dispatch('app/header/show', waitingHeaderData)
-          this.waitingPeriodTimeoutId = setTimeout(
-            () => {
-              this.disableSubjectCard = false
-              this.$store.dispatch('app/header/show', defaultHeaderData)
-            },
-            cooldownMs
-          )
+          this.waitingPeriodTimeoutId = setTimeout(() => {
+            this.disableSubjectCard = false
+            this.$store.dispatch('app/header/show', defaultHeaderData)
+          }, cooldownMs)
         } else {
           // Show the waiting period message above the subject cards for mobile users
           this.hasWaitingPeriod = true
