@@ -37,7 +37,7 @@ export default {
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
-      [POSTHOG_FEATURE_FLAGS.AI_TUTOR]: 'stand-alone-in-session', // stand-alone | stand-alone-in-session | stand-alone-in-session-handoff
+      [POSTHOG_FEATURE_FLAGS.AI_TUTOR]: '', // stand-alone | stand-alone-in-session | stand-alone-in-session-handoff
     },
     payloadFlags: {
       [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: [],
