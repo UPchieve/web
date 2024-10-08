@@ -1,11 +1,26 @@
 <script lang="ts" setup>
 import LargeButton from '@/components/LargeButton.vue'
 import VolunteerIcon from '@/assets/volunteer-icon.svg'
+import { onMounted } from 'vue'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const props = defineProps<{
   onClick: () => void
   disableButton: false
 }>()
+
+onMounted(async () => {
+  AnalyticsService.captureEvent(
+    EVENTS.USER_SAW_AI_TUTOR_TRANSFER_TO_SESSION_BUTTON
+  )
+})
+const handleClick = async () => {
+  AnalyticsService.captureEvent(
+    EVENTS.USER_CLICKED_AI_TUTOR_TRANSFER_TO_SESSION
+  )
+  props.onClick()
+}
 </script>
 
 <template>
@@ -13,7 +28,7 @@ const props = defineProps<{
     :show-arrow="false"
     class="transfer-button"
     primary
-    @click="props.onClick"
+    @click="handleClick"
     :disabled="disableButton"
     :class="{
       'enabled-button': !disableButton,
