@@ -289,6 +289,7 @@ export default {
       showAiAssistedTutoringModal: false,
       aiWidgetDragging: false,
       aiWidgetResizing: false,
+      didAutoOpen: false,
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -307,6 +308,8 @@ export default {
       auxiliaryType: (state) => state.user.session.toolType,
       isConnected: (state) => state.socket.isConnected,
       productFlags: (state) => state.productFlags.flags,
+      isFetchingConversation: (state) =>
+        state.botConversations.isFetchingConversation,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -322,6 +325,15 @@ export default {
         'featureFlags/isFallIncentiveProgramEnabled',
       currentTutorBotConversation: 'botConversations/currentConversation',
     }),
+    aiTutorSetupProps() {
+      return {
+        currentTutorBotConversationId:
+          this.currentTutorBotConversation?.sessionId,
+        aiWidgetEnabled: this.aiWidgetEnabled,
+        sessionId: this.sessionId,
+      }
+    },
+
     sessionToolTypes() {
       return SESSION_TOOL_TYPES
     },
@@ -444,55 +456,6 @@ export default {
           )
         }
 
-        this.$watch('session', async (session) => {
-          /*
-           * Since this is only rolled out to students,
-           * we have to check to see if the student involved in this
-           * session is elgible, if they are, we can also enable it for
-           * the volunteer
-           */
-          FeatureFlagService.isFeatureEnabledForUser(
-            POSTHOG_FEATURE_FLAGS.AI_TUTOR,
-            session.student.id
-          ).then((r) => {
-            const isValidSubject = AI_TUTOR_SUPPORTED_SUBJECTS.includes(
-              session.subTopic
-            )
-            this.aiWidgetEnabled =
-              [
-                'stand-alone-in-session',
-                'stand-alone-in-session-handoff',
-              ].includes(r.isEnabled) && isValidSubject
-            if (!localStorage.getItem('seen-ai-assisted-modal')) {
-              this.setShowAiAssistedTutoringModal(this.aiWidgetEnabled)
-            }
-          })
-
-          // TODO: when we transfer from a stand-alone, make sure we update the conversationId
-          // with the sessionId rather than creating one
-          if (
-            !this.currentTutorBotConversation.sessionId !== this.sessionId &&
-            this.aiWidgetEnabled
-          ) {
-            const { data: conversation } =
-              await NetworkService.getOrCreateTutorBotConversationWithMessagesBySessionId(
-                this.sessionId
-              )
-            await this.$store.dispatch(
-              'botConversations/setConversation',
-              conversation.conversationId
-            )
-            // Open if there are messages and it's enabled
-            if (
-              !this.mobileMode &&
-              this.aiWidgetEnabled &&
-              this.currentTutorBotConversation.messages.length
-            ) {
-              this.aiWidgetHidden = false
-            }
-          }
-        })
-
         if (!id && this.isStudent)
           AnalyticsService.captureEvent(EVENTS.SESSION_REQUESTED, {
             event: EVENTS.SESSION_REQUESTED,
@@ -543,6 +506,64 @@ export default {
       })
   },
   watch: {
+    session({ student, subTopic }) {
+      /*
+       * Since this is only rolled out to students,
+       * we have to check to see if the student involved in this
+       * session is elgible, if they are, we can also enable it for
+       * the volunteer
+       */
+      FeatureFlagService.isFeatureEnabledForUser(
+        POSTHOG_FEATURE_FLAGS.AI_TUTOR,
+        student.id
+      ).then((r) => {
+        const isValidSubject = AI_TUTOR_SUPPORTED_SUBJECTS.includes(subTopic)
+        this.aiWidgetEnabled =
+          ['stand-alone-in-session', 'stand-alone-in-session-handoff'].includes(
+            r.isEnabled
+          ) && isValidSubject
+        if (!localStorage.getItem('seen-ai-assisted-modal')) {
+          this.setShowAiAssistedTutoringModal(aiWidgetEnabled)
+        }
+      })
+    },
+
+    async aiTutorSetupProps({
+      currentTutorBotConversationSessionId,
+      aiWidgetEnabled,
+      sessionId,
+      isFetchingConversation,
+    }) {
+      if (
+        (!currentTutorBotConversationSessionId ||
+          currentTutorBotConversationSessionId !== sessionId) &&
+        aiWidgetEnabled &&
+        !isFetchingConversation &&
+        sessionId
+      ) {
+        this.$store.commit('botConversations/setIsFetchingConversation', true)
+        const { data: conversation } =
+          await NetworkService.getOrCreateTutorBotConversationWithMessagesBySessionId(
+            sessionId
+          )
+        await this.$store.dispatch(
+          'botConversations/setConversation',
+          conversation.conversationId
+        )
+
+        this.$store.commit('botConversations/setIsFetchingConversation', false)
+
+        if (
+          !this.mobileMode &&
+          this.aiWidgetEnabled &&
+          this.currentTutorBotConversation?.messages?.length > 0 &&
+          !this.didAutoOpen
+        ) {
+          this.aiWidgetHidden = false
+          this.didAutoOpen = true
+        }
+      }
+    },
     aiWidgetDragging(dragging) {
       if (!dragging)
         AnalyticsService.captureEvent(EVENTS.AI_TUTOR_WIDGET_DRAGGED)
