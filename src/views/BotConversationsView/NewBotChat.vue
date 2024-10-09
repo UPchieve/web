@@ -13,6 +13,7 @@ import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import SystemMessage from './SystemMessage.vue'
 
 import TransferToSessionView from '@/views/BotConversationsView/TransferToSessionView/index.vue'
+import Gleap from 'gleap'
 export type Subject = Partial<{ id: number; displayName: string }>
 
 const store = useStore()
@@ -56,15 +57,26 @@ watch(
   }
 )
 
-const subjects = computed(() => store.state.botConversations.subjects)
+const OTHER_SUBJECT = { id: 'other', displayName: 'Other' }
+const subjects = computed(() => {
+  return store.getters['featureFlags/showAiOtherSubjectSurvey']
+    ? [...store.state.botConversations.subjects, OTHER_SUBJECT]
+    : store.state.botConversations.subjects
+})
 const fetchingConversation = computed(
   () => store.state.botConversations.isFetchingConversation
 )
 
 const selectSubject = (subject: Subject) => {
   currentSubject.value = subject
-  router.push({ query: { step: STEPS.firstMessage } })
-  AnalyticsService.captureEvent(EVENTS.AI_TUTOR_SUBJECT_SELECTED)
+  if (currentSubject.value.id === OTHER_SUBJECT.id) {
+    AnalyticsService.captureEvent(EVENTS.AI_TUTOR_OTHER_SUBJECT_SELECTED)
+    Gleap.startBot('67049f133676cef7172c6748')
+    AnalyticsService.captureEvent(EVENTS.GLEAP_BOT_SHOWN)
+  } else {
+    router.push({ query: { step: STEPS.firstMessage } })
+    AnalyticsService.captureEvent(EVENTS.AI_TUTOR_SUBJECT_SELECTED)
+  }
 }
 
 const sendFirstMessage = async (message: string) => {
