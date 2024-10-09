@@ -55,7 +55,7 @@ import { EVENTS } from '@/consts'
 
 // TODO: Options should be hydrated via the database
 const reportReasonOptions = [
-  'This student was extremely rude or inappropriate',
+  '[Immediate ban] Student extremely rude/inappropriate',
   'I am worried for the immediate safety of this student',
 ]
 
