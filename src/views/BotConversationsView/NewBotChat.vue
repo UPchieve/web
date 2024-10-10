@@ -282,7 +282,7 @@ const isMobilePortrait = computed(() => store.getters['app/isMobilePortrait'])
 }
 
 .text-area-container {
-  width: 90%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -301,6 +301,7 @@ const isMobilePortrait = computed(() => store.getters['app/isMobilePortrait'])
   flex-direction: column;
   align-self: center;
   gap: 8px;
+  width: 90%;
 }
 
 .chat-log {

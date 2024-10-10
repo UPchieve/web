@@ -132,7 +132,7 @@ watch(() => messages.value.length, scrollToBottom)
 .text-area-container {
   position: absolute;
   bottom: 0;
-  width: 90%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
