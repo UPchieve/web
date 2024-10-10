@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { defineProps } from 'vue'
 import { MESSAGE_ALIGNMENT } from '../BotConversationsView/BotChatMessages.vue'
 import GenerationFeedback from '../BotConversationsView/GenerationFeedback.vue'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
