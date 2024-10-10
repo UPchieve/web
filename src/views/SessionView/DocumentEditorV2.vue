@@ -312,6 +312,10 @@ export default {
 </script>
 
 <style lang="scss">
+.ql-editor {
+  overflow: visible;
+}
+
 .document-editor {
   height: 100%;
   text-align: left;
@@ -320,7 +324,7 @@ export default {
   position: relative;
 
   .ql-container.ql-snow {
-    overflow: scroll;
+    overflow: auto;
     border: none;
   }
 
