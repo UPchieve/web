@@ -20,8 +20,9 @@ const { bgColor, displayContext } = defineProps<{
 const store = useStore()
 const user = computed(() => store.state.user.user)
 const sessionId = computed(() => store.state.user.session.id)
-const isTransferToSessionEnabled =
+const isTransferToSessionEnabled = computed(() =>
   store.getters['featureFlags/aiTutor'].includes('handoff')
+)
 
 const chatContainer = ref()
 const scrollToBottom = async () => {
@@ -42,6 +43,7 @@ const fetchingConversation = computed(
   () => store.state.botConversations.isFetchingConversation
 )
 const messages = computed(() => conversation.value.messages ?? [])
+const isMobileMode = computed(() => store.getters['app/mobileMode'])
 
 const sendMessage = async (message: string) => {
   store.commit('botConversations/setMessageIsSending', true)
@@ -94,7 +96,13 @@ watch(() => messages.value.length, scrollToBottom)
       />
     </div>
     <div
-      class="text-area-container"
+      :class="{
+        'text-area-container': true,
+        'text-area-container-mobile-standalone':
+          isMobileMode && displayContext === DISPLAY_CONTEXT.STAND_ALONE,
+        'text-area-container-mobile-session':
+          isMobileMode && displayContext === DISPLAY_CONTEXT.SESSION,
+      }"
       :style="{ backgroundColor: bgColor ?? '#fbfbfc' }"
     >
       <Textarea
@@ -102,16 +110,12 @@ watch(() => messages.value.length, scrollToBottom)
         :disabled="messageSending || fetchingConversation"
         :sendMessage="(message: string) => sendMessage(message)"
       ></Textarea>
-      <span
-        v-if="displayContext === DISPLAY_CONTEXT.STAND_ALONE"
-        class="ai-disclaimer"
-        >AI may not always be accurate. For more help, transfer to a live
-        tutor!</span
-      >
       <TransferToSessionView
         v-if="isTransferToSessionEnabled && !sessionId && conversation.subject"
         :subject="conversation.subject.topicName"
         :topic="conversation.subject.name"
+        :display-context="displayContext"
+        :is-mobile-mode="isMobileMode"
       />
     </div>
   </div>
@@ -128,7 +132,7 @@ watch(() => messages.value.length, scrollToBottom)
 .text-area-container {
   position: absolute;
   bottom: 0;
-  width: 100%;
+  width: 90%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -137,6 +141,18 @@ watch(() => messages.value.length, scrollToBottom)
   margin-left: auto;
   margin-right: auto;
   gap: 16px;
+}
+
+.text-area-container-mobile-standalone {
+  bottom: 0;
+  position: fixed;
+  padding-bottom: 8px;
+  gap: 8px;
+}
+
+.text-area-container-mobile-session {
+  padding-bottom: 8px;
+  gap: 8px;
 }
 
 .ai-disclaimer {

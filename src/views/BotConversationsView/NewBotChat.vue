@@ -14,6 +14,7 @@ import SystemMessage from './SystemMessage.vue'
 
 import TransferToSessionView from '@/views/BotConversationsView/TransferToSessionView/index.vue'
 import Gleap from 'gleap'
+import { DISPLAY_CONTEXT } from '@/views/BotConversationsView/BotChat.vue'
 export type Subject = Partial<{ id: number; displayName: string }>
 
 const store = useStore()
@@ -22,8 +23,9 @@ const route = useRoute()
 let currentSubject = ref()
 
 const sessionId = computed(() => store.state.user.session?.id)
-const isTransferToSessionEnabled =
+const isTransferToSessionEnabled = computed(() =>
   store.getters['featureFlags/aiTutor'].includes('handoff')
+)
 
 enum STEPS {
   subjectSelection = 'subjectSelection',
@@ -71,7 +73,7 @@ const selectSubject = (subject: Subject) => {
   currentSubject.value = subject
   if (currentSubject.value.id === OTHER_SUBJECT.id) {
     AnalyticsService.captureEvent(EVENTS.AI_TUTOR_OTHER_SUBJECT_SELECTED)
-    Gleap.startBot('67049f133676cef7172c6748')
+    Gleap.startBot('67049f133676cef7172c6748') // pragma: allowlist secret
     AnalyticsService.captureEvent(EVENTS.GLEAP_BOT_SHOWN)
   } else {
     router.push({ query: { step: STEPS.firstMessage } })
@@ -106,6 +108,9 @@ const subjectSelectedMessage = computed(
   () =>
     `You’ve selected ${currentSubject.value.displayName}! I will now assist you with your questions. Tell me about the problem you need help with.`
 )
+const isMobileMode = computed(() => store.getters['app/mobileMode'])
+const isMobileLandscape = computed(() => store.getters['app/isMobileLandscape'])
+const isMobilePortrait = computed(() => store.getters['app/isMobilePortrait'])
 </script>
 
 <template>
@@ -116,8 +121,15 @@ const subjectSelectedMessage = computed(
         <span class="subject">{{ currentSubject.displayName }}</span></span
       >
     </div>
-    <div class="fake-messages" v-if="step === STEPS.firstMessage">
-      <div class="fake-message">
+    <div
+      v-if="step === STEPS.firstMessage"
+      :class="{
+        'fake-messages': true,
+        'padding-mobile-landscape': isMobileLandscape,
+        'padding-mobile-portrait': isMobilePortrait,
+      }"
+    >
+      <div :class="{ 'fake-message': true }">
         <ChatBotIcon class="chat-bot-icon"></ChatBotIcon>
         <span class="message">{{ subjectSelectedMessage }}</span>
       </div>
@@ -151,7 +163,13 @@ const subjectSelectedMessage = computed(
             Creating chat
           </div>
         </div>
-        <div class="text-area-container" v-if="currentSubject?.displayName">
+        <div
+          v-if="currentSubject?.displayName"
+          :class="{
+            'text-area-container': true,
+            'text-area-container-mobile': isMobileMode,
+          }"
+        >
           <Textarea
             v-if="currentSubject?.displayName"
             class="textarea"
@@ -159,14 +177,12 @@ const subjectSelectedMessage = computed(
             :disabled="!currentSubject || fetchingConversation"
             :sendMessage="(message: string) => sendFirstMessage(message)"
           ></Textarea>
-          <span class="ai-disclaimer"
-            >AI may not always be accurate. For more help, transfer to a live
-            tutor!</span
-          >
           <TransferToSessionView
             v-if="isTransferToSessionEnabled && !sessionId && currentSubject"
             :subject="currentSubject?.topicName"
             :topic="currentSubject?.name"
+            :display-context="DISPLAY_CONTEXT.STAND_ALONE"
+            :is-mobile-mode="isMobileMode"
           />
         </div>
       </div>
@@ -175,6 +191,14 @@ const subjectSelectedMessage = computed(
 </template>
 
 <style lang="scss" scoped>
+.padding-mobile-landscape {
+  padding-bottom: 100px;
+}
+
+.padding-mobile-portrait {
+  padding-bottom: 200px;
+}
+
 .first-message {
   width: 100%;
   max-width: 695px;
@@ -193,6 +217,7 @@ const subjectSelectedMessage = computed(
   justify-content: space-between;
   flex-grow: 1;
   padding-top: 11.25px;
+  background-color: #fbfbfc;
 }
 .fake-message {
   display: flex;
@@ -257,7 +282,7 @@ const subjectSelectedMessage = computed(
 }
 
 .text-area-container {
-  width: 100%;
+  width: 90%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -267,9 +292,17 @@ const subjectSelectedMessage = computed(
   background-color: #fbfbfc;
   gap: 16px;
 }
-.ai-disclaimer {
-  color: $c-default-grey;
+
+.text-area-container-mobile {
+  bottom: 0;
+  position: fixed;
+  padding-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  gap: 8px;
 }
+
 .chat-log {
   flex-shrink: 0;
   min-height: 24px;

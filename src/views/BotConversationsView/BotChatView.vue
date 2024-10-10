@@ -23,10 +23,16 @@ const conversation = computed(
   () => store.getters['botConversations/currentConversation']
 )
 const subject = computed(() => conversation.value?.subject?.displayName ?? '')
+const isMobileMode = computed(() => store.getters['app/mobileMode'])
 </script>
 
 <template>
-  <div class="bot-chat-view-container">
+  <div
+    :class="{
+      'bot-chat-view-container': true,
+      'web-chat-padding': !isMobileMode,
+    }"
+  >
     <div class="header">
       <span>
         <Math class="math-icon"></Math>&nbsp;
@@ -45,6 +51,10 @@ const subject = computed(() => conversation.value?.subject?.displayName ?? '')
   flex: 1 1 0%;
   overflow: hidden;
   position: relative;
+}
+
+.web-chat-padding {
+  padding-bottom: 80px;
 }
 
 .header {
