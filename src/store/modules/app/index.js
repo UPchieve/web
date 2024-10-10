@@ -64,6 +64,10 @@ export default {
   },
   getters: {
     mobileMode: (state) => state.windowWidth <= MAX_MOBILE_MODE_WIDTH,
+    isMobileLandscape: (state, getters) =>
+      getters.mobileMode && state.windowWidth > state.windowHeight,
+    isMobilePortrait: (state, getters) =>
+      getters.mobileMode && state.windowWidth < state.windowHeight,
     csrfToken: (state) => state.csrfToken,
   },
 }
