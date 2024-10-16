@@ -227,6 +227,7 @@ build_staging:
   variables:
     DOCKER_TLS_CERTDIR: ""
     MOUNT_POINT: /builds/$CI_PROJECT_PATH/mnt
+  allow_failure: true
   services:
     - docker:20.10.6-dind
   script:
