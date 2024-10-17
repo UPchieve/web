@@ -32,6 +32,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.COLLEGE_PREP_AD]: false,
       [POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT]: false,
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM]: false,
+      [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM_PARENTAL_CONSENT]: false,
       [POSTHOG_FEATURE_FLAGS.NATIONAL_STUDENT_PHONE]: false,
       [POSTHOG_FEATURE_FLAGS.ASSIGNMENTS]: false,
       [POSTHOG_FEATURE_FLAGS.AI_OTHER_SUBJECT_SURVEY]: false,
@@ -152,6 +153,10 @@ export default {
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT],
     isFallIncentiveProgramEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM],
+    isFallIncentiveParentalConsentEnabled: (state) =>
+      state.toggleFlags[
+        POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM_PARENTAL_CONSENT
+      ],
     isNationalStudentPhoneEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.NATIONAL_STUDENT_PHONE],
     isAssignmentsEnabled: (state) =>

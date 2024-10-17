@@ -692,6 +692,8 @@ export const POSTHOG_FEATURE_FLAGS = {
   COLLEGE_PREP_AD: 'college-prep-ad',
   TUTOR_BOT_CHAT: 'tutor-bot-chat',
   FALL_INCENTIVE_PROGRAM: 'fall-incentive-program',
+  FALL_INCENTIVE_PROGRAM_PARENTAL_CONSENT:
+    'fall-incentive-program-parental-consent',
   NATIONAL_STUDENT_PHONE: 'national-student-phone',
   ASSIGNMENTS: 'assignments',
   AI_TUTOR: 'stand-alone-ai-tutor',
