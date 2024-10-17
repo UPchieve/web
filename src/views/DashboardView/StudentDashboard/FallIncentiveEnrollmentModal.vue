@@ -6,6 +6,7 @@ import Modal from '@/components/Modal.vue'
 import Loader from '@/components/Loader.vue'
 import UpdogHooray from '@/assets/updog-hooray.svg'
 import RecaptchaCaption from '@/components/recaptcha/RecaptchaCaption.vue'
+import Checkbox from '@/components/CheckBox.vue'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import type {
   CountryCode,
@@ -34,9 +35,13 @@ const hasResentCode = ref(false)
 const isSubmitting = ref(false)
 const loadingMessage = ref('')
 const error = ref('')
+const parentalConsent = defineModel()
 
 const user = computed(() => store.state.user.user)
 const isValidPhone = computed(() => phoneInput.value.isValid)
+const isFallIncentiveParentalConsentEnabled = computed(
+  () => store.getters['featureFlags/isFallIncentiveParentalConsentEnabled']
+)
 const isInternationalCountryCode = computed(
   () => phoneInput.value.countryCode !== 'US'
 )
@@ -58,7 +63,8 @@ const isSendingCodeToPhoneDisabled = computed(() => {
   return (
     phone.value === '' ||
     !isValidPhone.value ||
-    isInternationalCountryCode.value
+    isInternationalCountryCode.value ||
+    (isFallIncentiveParentalConsentEnabled.value && !parentalConsent.value)
   )
 })
 
@@ -241,6 +247,16 @@ onMounted(() => {
               error || 'We were unable to save your number. Please try again.'
             }}
           </p>
+
+          <div class="parental-consent-container">
+            <checkbox
+              v-if="isFallIncentiveParentalConsentEnabled"
+              id="parental-consent"
+              v-model="parentalConsent"
+            >
+              I have consent from my parent/guardian to receive gift cards.
+            </checkbox>
+          </div>
         </section>
         <footer class="incentive-enrollment-modal__footer">
           <div
@@ -457,5 +473,9 @@ onMounted(() => {
 .updog {
   width: 120px;
   height: 120px;
+}
+
+.parental-consent-container {
+  margin-top: 0.4em;
 }
 </style>
