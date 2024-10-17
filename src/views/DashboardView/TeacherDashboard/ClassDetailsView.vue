@@ -1,22 +1,115 @@
 <template>
-  <div class="main">
-    <div class="class-header">
-      <button class="back-btn" @click="backToClasses()">
-        <Arrow style="display: inline; transform: scale(-1, 1)" /> Back to your
-        classes
-      </button>
-      <div class="class-info">
-        <div class="start-col">
-          <h1>{{ classInfo.name }}</h1>
-          <span class="students-text"
-            >{{ classInfo.totalStudents || '0' }}
-            {{ classInfo.totalStudents == 1 ? 'student' : 'students' }}</span
-          >
-          <button class="open-teacher-code-modal" @click="openTeacherCodeModal">
-            <LinkUnion /><span class="class-code-text">Class Code</span>
+  <div class="teacher-dashboard">
+    <div class="main">
+      <div class="class-header">
+        <button class="back-btn" @click="backToClasses()">
+          <Arrow style="display: inline; transform: scale(-1, 1)" /> Back to
+          your classes
+        </button>
+        <div class="class-info">
+          <div class="start-col">
+            <h1>{{ className }}</h1>
+            <span class="students-text"
+              >{{ classInfo.totalStudents || '0' }}
+              {{ classInfo.totalStudents == 1 ? 'student' : 'students' }}</span
+            >
+            <button
+              class="open-teacher-code-modal"
+              @click="openTeacherCodeModal"
+            >
+              <LinkUnion /><span class="class-code-text">Class Code</span>
+            </button>
+          </div>
+          <div class="end-col">
+            <button class="edit-class-btn" @click="openEditClassModal()">
+              <Pencil class="pencil" /> Edit Class
+            </button>
+            <button
+              v-if="isAssignmentsEnabled"
+              class="create-assignment-btn"
+              @click="openCreateAssignmentModal()"
+            >
+              Assign Tutoring
+            </button>
+          </div>
+        </div>
+      </div>
+      <div v-if="isAssignmentsEnabled" class="tabs">
+        <p
+          class="tabs__header-type"
+          :class="isSelected === 'classDetails' ? 'is-selected' : null"
+          @click="openTab(isSelected)"
+          data-testid="class-details-tab"
+        >
+          Class Details
+        </p>
+        <p
+          class="tabs__header-type"
+          :class="isSelected === 'assignments' ? 'is-selected' : null"
+          @click="openTab(isSelected)"
+          data-testid="assignments-tab"
+        >
+          Assignments
+        </p>
+      </div>
+      <div v-if="isSelected === 'classDetails'" class="classes-container">
+        <loader v-if="isLoading" />
+        <div v-else-if="!students.length" class="empty-sessions-container">
+          <Checklist />
+          <p data-testid="no-students-msg">
+            You currently don't have any students in this class. Click here to
+            share the code with your students!
+          </p>
+          <button class="uc-form-button" @click="openTeacherCodeModal">
+            Get Code
           </button>
         </div>
-        <div v-if="isAssignmentsEnabled" class="end-col">
+        <table v-else class="classes-table">
+          <tr>
+            <th>Student</th>
+            <th># of Sessions</th>
+            <th>Time Tutored</th>
+            <th>Last Session</th>
+            <th>Details</th>
+          </tr>
+          <tr
+            v-for="student in students"
+            :key="student.id"
+            data-testid="student-row"
+          >
+            <td>{{ student.firstName }} {{ student.lastName }}</td>
+            <td>{{ student.numSessions }}</td>
+            <td>{{ student.timeTutored }}</td>
+            <td>{{ student.lastSession }}</td>
+            <td>
+              <button
+                class="view-details-btn"
+                @click="viewStudentDetails(student)"
+                :data-testid="`view-details-btn-${student.id}`"
+              >
+                Student Details <RightArrow />
+              </button>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div
+        v-else
+        :class="
+          !assignments.length
+            ? 'assignments-container-empty'
+            : 'assignments-container'
+        "
+      >
+        <div
+          data-testid="no-assignments"
+          v-if="!assignments.length"
+          class="empty-assignments-container"
+        >
+          <h1>No Assignments Yet!</h1>
+          <p>
+            Create an assignment to kickstart your students' learning journey.
+          </p>
           <button
             class="create-assignment-btn"
             @click="openCreateAssignmentModal()"
@@ -24,149 +117,65 @@
             Assign Tutoring
           </button>
         </div>
-      </div>
-    </div>
-    <div v-if="isAssignmentsEnabled" class="tabs">
-      <p
-        class="tabs__header-type"
-        :class="isSelected === 'classDetails' ? 'is-selected' : null"
-        @click="openTab(isSelected)"
-        data-testid="class-details-tab"
-      >
-        Class Details
-      </p>
-      <p
-        class="tabs__header-type"
-        :class="isSelected === 'assignments' ? 'is-selected' : null"
-        @click="openTab(isSelected)"
-        data-testid="assignments-tab"
-      >
-        Assignments
-      </p>
-    </div>
-    <div v-if="isSelected === 'classDetails'" class="classes-container">
-      <loader v-if="isLoading" />
-      <div v-else-if="!students.length" class="empty-sessions-container">
-        <Checklist />
-        <p data-testid="no-students-msg">
-          You currently don't have any students in this class. Click here to
-          share the code with your students!
-        </p>
-        <button class="uc-form-button" @click="openTeacherCodeModal">
-          Get Code
-        </button>
-      </div>
-      <table v-else class="classes-table">
-        <tr>
-          <th>Student</th>
-          <th># of Sessions</th>
-          <th>Time Tutored</th>
-          <th>Last Session</th>
-          <th>Details</th>
-        </tr>
-        <tr
-          v-for="student in students"
-          :key="student.id"
-          data-testid="student-row"
-        >
-          <td>{{ student.firstName }} {{ student.lastName }}</td>
-          <td>{{ student.numSessions }}</td>
-          <td>{{ student.timeTutored }}</td>
-          <td>{{ student.lastSession }}</td>
-          <td>
-            <button
-              class="view-details-btn"
-              @click="viewStudentDetails(student)"
-              :data-testid="`view-details-btn-${student.id}`"
-            >
-              Student Details <RightArrow />
-            </button>
-          </td>
-        </tr>
-      </table>
-    </div>
-    <div
-      v-else
-      :class="
-        !assignments.length
-          ? 'assignments-container-empty'
-          : 'assignments-container'
-      "
-    >
-      <div
-        data-testid="no-assignments"
-        v-if="!assignments.length"
-        class="empty-assignments-container"
-      >
-        <h1>No Assignments Yet!</h1>
-        <p>
-          Create an assignment to kickstart your students' learning journey.
-        </p>
-        <button
-          class="create-assignment-btn"
-          @click="openCreateAssignmentModal()"
-        >
-          Assign Tutoring
-        </button>
-      </div>
-      <div v-else class="assignments-cards" data-testid="has-assignments">
-        <div
-          v-for="assignment in assignments"
-          :key="assignment.id"
-          class="assignment-card-wrapper"
-        >
-          <div class="assignment-card">
-            <div class="assignment-icon">
-              <AssignmentIcon />
-            </div>
-            <div class="assignment-info">
-              <button @click="viewAssignment(assignment.id)">
-                <h1 :data-testid="'assignment-title-' + assignment.id">
-                  {{ assignment.title }}
-                </h1>
-                <p :data-testid="'assignment-due-date-' + assignment.id">
-                  Due date: {{ formatTimestamp(assignment.dueDate) }}
-                </p>
-              </button>
-              <div v-if="!assignmentsCompletion[assignment.id]">
-                <p
-                  data-testid="no-students-assigned"
-                  class="no-students-assigned"
+        <div v-else class="assignments-cards" data-testid="has-assignments">
+          <div
+            v-for="assignment in assignments"
+            :key="assignment.id"
+            class="assignment-card-wrapper"
+          >
+            <div class="assignment-card">
+              <div class="assignment-icon">
+                <AssignmentIcon />
+              </div>
+              <div class="assignment-info">
+                <button @click="viewAssignment(assignment.id)">
+                  <h1 :data-testid="'assignment-title-' + assignment.id">
+                    {{ assignment.title }}
+                  </h1>
+                  <p :data-testid="'assignment-due-date-' + assignment.id">
+                    Due date: {{ formatTimestamp(assignment.dueDate) }}
+                  </p>
+                </button>
+                <div v-if="!assignmentsCompletion[assignment.id]">
+                  <p
+                    data-testid="no-students-assigned"
+                    class="no-students-assigned"
+                  >
+                    No students have been assigned.
+                  </p>
+                </div>
+                <button
+                  v-else
+                  class="student-completion"
+                  @click="toggleStudentCompletion(assignment.id)"
+                  data-testid="student-completion"
                 >
-                  No students have been assigned.
+                  Student completion
+                  {{
+                    assignmentsCompletion[assignment.id].completedStudents
+                  }}/{{ assignmentsCompletion[assignment.id].totalStudents }}
+                </button>
+              </div>
+            </div>
+
+            <div
+              v-if="toggledAssignmentId === assignment.id"
+              class="students-container"
+            >
+              <div
+                v-for="student in assignmentsCompletion[assignment.id]
+                  .studentsCompletion"
+                :key="student.assignmentId"
+                class="student-row"
+              >
+                <span v-if="student.submitted_at" class="check-mark"
+                  ><Check class="check"
+                /></span>
+                <span v-else class="check-mark"></span>
+                <p class="student-name">
+                  {{ student.first_name }} {{ student.last_name }}
                 </p>
               </div>
-              <button
-                v-else
-                class="student-completion"
-                @click="toggleStudentCompletion(assignment.id)"
-                data-testid="student-completion"
-              >
-                Student completion
-                {{ assignmentsCompletion[assignment.id].completedStudents }}/{{
-                  assignmentsCompletion[assignment.id].totalStudents
-                }}
-              </button>
-            </div>
-          </div>
-
-          <div
-            v-if="toggledAssignmentId === assignment.id"
-            class="students-container"
-          >
-            <div
-              v-for="student in assignmentsCompletion[assignment.id]
-                .studentsCompletion"
-              :key="student.assignmentId"
-              class="student-row"
-            >
-              <span v-if="student.submitted_at" class="check-mark"
-                ><Check class="check"
-              /></span>
-              <span v-else class="check-mark"></span>
-              <p class="student-name">
-                {{ student.first_name }} {{ student.last_name }}
-              </p>
             </div>
           </div>
         </div>
@@ -185,6 +194,7 @@ import Checklist from '@/assets/Checklist.svg'
 import Check from '@/assets/check.svg'
 import Arrow from '@/assets/RightArrow.svg'
 import AssignmentIcon from '@/assets/AssignmentIcon.svg'
+import Pencil from '@/assets/pencil.svg'
 import moment from 'moment'
 import { mapGetters } from 'vuex'
 import { EVENTS } from '@/consts'
@@ -199,6 +209,7 @@ export default {
     AssignmentIcon,
     Check,
     Arrow,
+    Pencil,
   },
 
   data() {
@@ -212,6 +223,8 @@ export default {
       assignments: [],
       toggledAssignmentId: '',
       assignmentsCompletion: {},
+      className: this.classInfo.name,
+      topicId: this.classInfo.topicId,
     }
   },
   computed: {
@@ -222,12 +235,19 @@ export default {
   props: {
     classes: {
       type: Array,
+      required: true,
     },
     classId: {
       type: String,
+      required: true,
     },
     classInfo: {
       type: Object,
+      required: true,
+    },
+    topics: {
+      type: Array,
+      required: true,
     },
   },
 
@@ -314,6 +334,18 @@ export default {
         component: 'TeacherClassCodeModal',
         data: {
           code,
+        },
+      })
+    },
+
+    openEditClassModal() {
+      this.$store.dispatch('app/modal/show', {
+        component: 'EditTeacherClassModal',
+        data: {
+          classInfo: this.classInfo,
+          topics: this.topics,
+          updateTeacherClass: this.updateTeacherClass,
+          deactivateTeacherClass: this.deactivateTeacherClass,
         },
       })
     },
@@ -477,6 +509,27 @@ export default {
 
       return result
     },
+
+    async updateTeacherClass(classData) {
+      try {
+        const {
+          data: { updatedClass },
+        } = await NetworkService.updateTeacherClass(classData)
+        this.className = updatedClass.name
+        this.topicId = updatedClass.topicId
+      } catch (err) {
+        this.error = err.response.data.err ?? 'Unable to edit class.'
+      }
+    },
+
+    async deactivateTeacherClass(classId) {
+      try {
+        await NetworkService.deactivateTeacherClass(classId)
+        this.$router.push('/dashboard')
+      } catch (err) {
+        this.error = err.response.data.err ?? 'Unable to deactivate class.'
+      }
+    },
   },
 }
 </script>
@@ -546,6 +599,27 @@ export default {
   }
 }
 
+.end-col {
+  @include flex-container(row, right, center);
+  gap: 16px;
+}
+
+.edit-class-btn {
+  @include flex-container(row, center, center);
+  background-color: #ffffff;
+  gap: 6px;
+  border-radius: 24px;
+  padding: 10px 12px;
+  border: $c-border-grey 1px solid;
+  color: $c-soft-black;
+  max-height: 44px;
+  font-weight: 500;
+}
+
+.pencil {
+  height: 100%;
+  padding: 6px;
+}
 .create-assignment-btn {
   background-color: #1855d1;
   border-radius: 24px;

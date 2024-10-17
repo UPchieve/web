@@ -1121,4 +1121,16 @@ export default {
       this._errorHandler
     )
   },
+  updateTeacherClass({ classData }) {
+    return httpPost(`${API_ROOT}/teachers/class/update`, classData).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
+  deactivateTeacherClass(id) {
+    return httpPost(`${API_ROOT}/teachers/class/deactivate`, id).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
 }

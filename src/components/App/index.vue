@@ -328,6 +328,7 @@ export default {
 <style lang="scss" scoped>
 ion-content {
   --background: transparent;
+  font-family: $font-family-default;
 }
 
 .App {

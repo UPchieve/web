@@ -65,6 +65,10 @@ const props = defineProps({
     type: String,
     required: false,
   },
+  reduce: {
+    type: Function,
+    required: false,
+  },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -77,16 +81,6 @@ const updateValue = (event: any) => {
 <style lang="scss">
 .sc-ion-select-popover-md {
   padding: 0;
-}
-
-.select-text {
-  font-size: 14px;
-  font-family: $font-family-default;
-  color: #000000;
-}
-
-.select-text:active {
-  color: #000000;
 }
 
 ion-checkbox {
@@ -113,8 +107,12 @@ ion-select {
 
   &.select-input {
     text-align: left;
-    font-size: 14px;
+    font-size: 16px;
     font-family: $font-family-default;
+
+    &:active {
+      color: #000;
+    }
   }
 }
 </style>
