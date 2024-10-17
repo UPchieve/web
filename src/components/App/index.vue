@@ -1,25 +1,32 @@
 <template>
   <div id="app" class="App" :class="isIOS && 'is-ios'">
-    <refresh-app-alert />
-    <app-header v-if="showHeader" />
-    <app-sidebar v-if="showSidebar" />
-    <app-modal v-if="showModal" />
-    <app-banner v-if="showBanner" />
-    <div
-      :class="{
-        'App-router-view-wrapper': true,
-        'App-router-view-wrapper--header': showHeader,
-        'App-router-view-wrapper--sidebar': showSidebar,
-      }"
-    >
-      <attention-boxes v-if="showInAppSessionNotifications" />
-      <router-view />
-    </div>
+    <ion-app>
+      <ion-content>
+        <refresh-app-alert />
+        <app-header v-if="showHeader" />
+        <app-sidebar v-if="showSidebar" />
+        <app-modal v-if="showModal" />
+        <app-banner v-if="showBanner" />
+        <div
+          :class="{
+            'App-router-view-wrapper': true,
+            'App-router-view-wrapper--header': showHeader,
+            'App-router-view-wrapper--sidebar': showSidebar,
+          }"
+        >
+          <attention-boxes v-if="showInAppSessionNotifications" />
+          <router-view />
+        </div>
+      </ion-content>
+    </ion-app>
   </div>
 </template>
 
 <script>
 import { mapState, mapGetters } from 'vuex'
+import { IonApp, IonContent } from '@ionic/vue'
+import Gleap from 'gleap'
+import posthog from 'posthog-js'
 import '@/scss/main.scss'
 import AppHeader from './AppHeader/index.vue'
 import AppSidebar from './AppSidebar/index.vue'
@@ -31,8 +38,6 @@ import isOutdatedMobileAppVersion from '@/utils/is-outdated-mobile-app-version'
 import AnalyticsService from '@/services/AnalyticsService'
 import FeatureFlagService from '@/services/FeatureFlagService'
 import LoggerService from '@/services/LoggerService'
-import Gleap from 'gleap'
-import posthog from 'posthog-js'
 import AttentionBoxes from '../AttentionBoxes.vue'
 import { socket } from '@/socket'
 import sound from '@/assets/audio/alert.mp3'
@@ -47,6 +52,8 @@ export default {
     AppModal,
     AppBanner,
     AttentionBoxes,
+    IonApp,
+    IonContent,
   },
   data() {
     return {
@@ -319,6 +326,10 @@ export default {
 </style>
 
 <style lang="scss" scoped>
+ion-content {
+  --background: transparent;
+}
+
 .App {
   height: 100%;
 }

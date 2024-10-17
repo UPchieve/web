@@ -102,7 +102,6 @@ describe('Create Assignment Modal', () => {
     'Assign button should be disabled if missing required input',
     async (data, disabled) => {
       const wrapper = await getWrapper(data)
-
       const assignButton = wrapper.find('[data-testid="create-assignment-btn"]')
 
       if (disabled) {

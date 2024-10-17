@@ -1091,11 +1091,11 @@ export default {
       this._errorHandler
     )
   },
-  createAssignment(assignmentData) {
-    return httpPost(`${API_ROOT}/assignment`, assignmentData).then(
-      this._successHandler,
-      this._errorHandler
-    )
+  createAssignment(assignmentData, studentIds) {
+    return httpPost(`${API_ROOT}/assignment`, {
+      assignmentData,
+      studentIds,
+    }).then(this._successHandler, this._errorHandler)
   },
   getAssignmentsByClassId(classId) {
     return httpGet(`${API_ROOT}/teachers/class/${classId}/assignments`).then(
