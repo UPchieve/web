@@ -5,6 +5,7 @@
       :classInfo="currentClassInfo"
       :classId="classId"
       :classes="classes"
+      :topics="topics"
     />
     <StudentDetails
       v-else-if="this.view === 'studentDetails'"
@@ -227,7 +228,7 @@ export default {
           data: { teacherClasses },
         } = await NetworkService.getTeacherClasses()
         // TODO: Filter by active vs. not active; Have a tab to switch between the two.
-        this.classes = teacherClasses.filter((c) => c.active)
+        this.classes = teacherClasses.filter((c) => !c.deactivatedOn)
       } catch (err) {
         this.error =
           err.response.data.err ??
