@@ -25,11 +25,7 @@ let currentSubject = ref<PartialSubject | undefined>(undefined)
 const sessionId = computed(() => store.state.user.session?.id)
 const isTransferToSessionEnabled = computed(() => {
   const ff: boolean | string = store.getters['featureFlags/aiTutor']
-  return (
-    typeof ff === 'string' &&
-    ff.includes('handoff') &&
-    store.getters['botConversations/isWhiteboardSubject'](currentSubject.value)
-  )
+  return typeof ff === 'string' && ff.includes('handoff')
 })
 
 enum STEPS {

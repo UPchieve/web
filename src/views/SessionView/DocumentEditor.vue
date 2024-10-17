@@ -1,5 +1,22 @@
 <template>
   <div class="document-editor">
+    <div id="ql-toolbar">
+      <select class="ql-header">
+        <option value="small"></option>
+        <option selected></option>
+        <option value="large"></option>
+        <option value="huge"></option>
+      </select>
+      <button class="ql-bold" />
+      <button class="ql-italic" />
+      <button class="ql-underline" />
+      <button class="ql-strike" />
+      <button v-if="showImageUpload" class="ql-image" />
+      <select class="ql-color" />
+      <select class="ql-background" />
+      <button class="ql-list" value="ordered" />
+      <button class="ql-list" value="bullet" />
+    </div>
     <div id="quill-container"></div>
     <transition name="document-loading">
       <loading-message
@@ -96,30 +113,20 @@ export default {
         ? 'Please upload images through the image button on the toolbar.'
         : 'At this time, coaches cannot upload images for student safety reasons. Please direct the student to an online resource instead.'
     },
+    showImageUpload() {
+      return (
+        this.isStudent ||
+        (this.isVolunteer && this.isVolunteerImageUploadEnabled)
+      )
+    },
   },
   mounted() {
     if (this.isVolunteerImageUploadEnabled)
       AnalyticsService.captureEvent(EVENTS.VOLUNTEER_IMAGE_UPLOAD_SEEN, {
         sessionType: 'DocumentEditor',
       })
-    const toolbar = [
-      [{ header: [1, 2, false] }],
-      ['bold', 'italic', 'underline', 'strike'],
-    ]
 
-    // To increase exposure, put this near the more frequently used tools
-    if (
-      this.isStudent ||
-      (this.isVolunteer && this.isVolunteerImageUploadEnabled)
-    )
-      toolbar.push(['image'])
-
-    toolbar.push([
-      { color: [] },
-      { background: [] },
-      { list: 'ordered' },
-      { list: 'bullet' },
-    ])
+    let handlers = {}
 
     this.quillEditor = markRaw(
       new Quill('#quill-container', {
@@ -148,20 +155,21 @@ export default {
             selectionChangeSource: 'cursor-api',
             transformOnTextChange: true,
           },
-          toolbar,
+          toolbar: {
+            container: '#ql-toolbar',
+            handlers,
+          },
         },
       })
     )
 
-    const imageHandler = async () => {
-      AnalyticsService.captureEvent(EVENTS.VOLUNTEER_CLICKED_UPLOAD_IMAGE, {
-        sessionType: 'DocumentEditor',
-      })
-      this.$refs.fileDialog.openFileDialog()
-    }
-
     if (this.isVolunteer && this.isVolunteerImageUploadEnabled) {
-      this.quillEditor.getModule('toolbar').addHandler('image', imageHandler)
+      this.quillEditor.getModule('toolbar').addHandler('image', async () => {
+        AnalyticsService.captureEvent(EVENTS.VOLUNTEER_CLICKED_UPLOAD_IMAGE, {
+          sessionType: 'DocumentEditor',
+        })
+        this.$refs.fileDialog.openFileDialog()
+      })
     }
 
     this.quillEditor.root.addEventListener(
