@@ -238,11 +238,7 @@ export default {
         }
 
         await this.$store.dispatch('productFlags/getUserProductFlags')
-        const userProps = {
-          ...this.getUserPropsForAnalytics,
-          fallIncentiveEnrollmentAt:
-            this.productFlags.fallIncentiveEnrollmentAt ?? null,
-        }
+        const userProps = this.getUserPropsForAnalytics()
         FeatureFlagService.setPersonPropertiesForFlags(userProps)
 
         AnalyticsService.identify(currentUserValue.id, userProps)
@@ -259,7 +255,7 @@ export default {
 
         this.$store.dispatch('user/getProgressReportOverviewSubjectStats')
       } else if (currentUserValue.id) {
-        const userProps = this.getUserPropsForAnalytics
+        const userProps = this.getUserPropsForAnalytics()
         AnalyticsService.updateUser(userProps)
       }
     },
