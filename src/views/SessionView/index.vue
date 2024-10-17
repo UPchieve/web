@@ -213,7 +213,7 @@ import LoadingMessage from '@/components/LoadingMessage.vue'
 import LoggerService from '@/services/LoggerService'
 import { socket } from '@/socket'
 import FeatureFlagService from '@/services/FeatureFlagService'
-import { POSTHOG_FEATURE_FLAGS, AI_TUTOR_SUPPORTED_SUBJECTS } from '@/consts'
+import { POSTHOG_FEATURE_FLAGS } from '@/consts'
 
 const activeHeaderData = {
   component: 'SessionHeader',
@@ -327,7 +327,7 @@ export default {
     }),
     aiTutorSetupProps() {
       return {
-        currentTutorBotConversationId:
+        currentTutorBotConversationSessionId:
           this.currentTutorBotConversation?.sessionId,
         aiWidgetEnabled: this.aiWidgetEnabled,
         sessionId: this.sessionId,
@@ -506,7 +506,7 @@ export default {
       })
   },
   watch: {
-    session({ student, subTopic }) {
+    session({ student }) {
       /*
        * Since this is only rolled out to students,
        * we have to check to see if the student involved in this
@@ -517,11 +517,10 @@ export default {
         POSTHOG_FEATURE_FLAGS.AI_TUTOR,
         student.id
       ).then((r) => {
-        const isValidSubject = AI_TUTOR_SUPPORTED_SUBJECTS.includes(subTopic)
-        this.aiWidgetEnabled =
-          ['stand-alone-in-session', 'stand-alone-in-session-handoff'].includes(
-            r.isEnabled
-          ) && isValidSubject
+        this.aiWidgetEnabled = [
+          'stand-alone-in-session',
+          'stand-alone-in-session-handoff',
+        ].includes(r.isEnabled)
         if (!localStorage.getItem('seen-ai-assisted-modal')) {
           this.setShowAiAssistedTutoringModal(this.aiWidgetEnabled)
         }

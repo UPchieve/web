@@ -20,9 +20,15 @@ const { bgColor, displayContext } = defineProps<{
 const store = useStore()
 const user = computed(() => store.state.user.user)
 const sessionId = computed(() => store.state.user.session.id)
-const isTransferToSessionEnabled = computed(() =>
-  store.getters['featureFlags/aiTutor'].includes('handoff')
-)
+const isTransferToSessionEnabled = computed(() => {
+  const ff: boolean | string = store.getters['featureFlags/aiTutor']
+  const currentSubject = conversation.value?.subject
+  return (
+    typeof ff === 'string' &&
+    ff.includes('handoff') &&
+    store.getters['botConversations/isWhiteboardSubject'](currentSubject)
+  )
+})
 
 const chatContainer = ref()
 const scrollToBottom = async () => {
@@ -112,8 +118,8 @@ watch(() => messages.value.length, scrollToBottom)
       ></Textarea>
       <TransferToSessionView
         v-if="isTransferToSessionEnabled && !sessionId && conversation.subject"
-        :subject="conversation.subject.topicName"
-        :topic="conversation.subject.name"
+        :topic="conversation.subject.topicName"
+        :subject="conversation.subject.name"
         :display-context="displayContext"
         :is-mobile-mode="isMobileMode"
       />

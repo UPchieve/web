@@ -756,11 +756,3 @@ export const SESSION_TOOL_TYPES = {
 
 // The key is obfuscated to avoid users easily recognizing what it is
 export const INELIGIBLE_LOCAL_STORAGE_KEY = '7x9h8'
-
-export const AI_TUTOR_SUPPORTED_SUBJECTS = [
-  '6thGradeMath',
-  '7thGradeMath',
-  '8thGradeMath',
-  'prealgebra',
-  'algebraOne',
-]

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useStore } from 'vuex'
 import { computed, onBeforeMount, ref, watch } from 'vue'
-import SelectTopic from './SelectTopic.vue'
+import SelectTopicAndSubject from './SelectTopicAndSubject.vue'
 import { useRoute, useRouter } from 'vue-router'
 import Textarea from './Textarea.vue'
 import LoggerService from '@/services/LoggerService'
@@ -13,19 +13,24 @@ import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import SystemMessage from './SystemMessage.vue'
 
 import TransferToSessionView from '@/views/BotConversationsView/TransferToSessionView/index.vue'
-import Gleap from 'gleap'
 import { DISPLAY_CONTEXT } from '@/views/BotConversationsView/BotChat.vue'
-export type Subject = Partial<{ id: number; displayName: string }>
+import type { Subject } from '@/store/modules/bot-conversations'
 
 const store = useStore()
 const router = useRouter()
 const route = useRoute()
-let currentSubject = ref()
+type PartialSubject = Pick<Subject, 'id' | 'displayName' | 'topicName' | 'name'>
+let currentSubject = ref<PartialSubject | undefined>(undefined)
 
 const sessionId = computed(() => store.state.user.session?.id)
-const isTransferToSessionEnabled = computed(() =>
-  store.getters['featureFlags/aiTutor'].includes('handoff')
-)
+const isTransferToSessionEnabled = computed(() => {
+  const ff: boolean | string = store.getters['featureFlags/aiTutor']
+  return (
+    typeof ff === 'string' &&
+    ff.includes('handoff') &&
+    store.getters['botConversations/isWhiteboardSubject'](currentSubject.value)
+  )
+})
 
 enum STEPS {
   subjectSelection = 'subjectSelection',
@@ -59,26 +64,16 @@ watch(
   }
 )
 
-const OTHER_SUBJECT = { id: 'other', displayName: 'Other' }
-const subjects = computed(() => {
-  return store.getters['featureFlags/showAiOtherSubjectSurvey']
-    ? [...store.state.botConversations.subjects, OTHER_SUBJECT]
-    : store.state.botConversations.subjects
-})
 const fetchingConversation = computed(
   () => store.state.botConversations.isFetchingConversation
 )
 
-const selectSubject = (subject: Subject) => {
+const selectSubject = (subject: PartialSubject) => {
   currentSubject.value = subject
-  if (currentSubject.value.id === OTHER_SUBJECT.id) {
-    AnalyticsService.captureEvent(EVENTS.AI_TUTOR_OTHER_SUBJECT_SELECTED)
-    Gleap.startBot('67049f133676cef7172c6748') // pragma: allowlist secret
-    AnalyticsService.captureEvent(EVENTS.GLEAP_BOT_SHOWN)
-  } else {
-    router.push({ query: { step: STEPS.firstMessage } })
-    AnalyticsService.captureEvent(EVENTS.AI_TUTOR_SUBJECT_SELECTED)
-  }
+  router.push({ query: { step: STEPS.firstMessage } })
+  AnalyticsService.captureEvent(EVENTS.AI_TUTOR_SUBJECT_SELECTED, {
+    subject: subject.displayName,
+  })
 }
 
 const sendFirstMessage = async (message: string) => {
@@ -90,7 +85,7 @@ const sendFirstMessage = async (message: string) => {
   if (isClean) {
     await store.dispatch('botConversations/createConversation', {
       message,
-      subjectId: currentSubject.value.id,
+      subjectId: currentSubject.value?.id,
     })
     store.dispatch(
       'botConversations/prependSystemMessage',
@@ -106,7 +101,7 @@ const sendFirstMessage = async (message: string) => {
 }
 const subjectSelectedMessage = computed(
   () =>
-    `You’ve selected ${currentSubject.value.displayName}! I will now assist you with your questions. Tell me about the problem you need help with.`
+    `You’ve selected ${currentSubject.value?.displayName}! I will now assist you with your questions. Tell me about the problem you need help with.`
 )
 const isMobileMode = computed(() => store.getters['app/mobileMode'])
 const isMobileLandscape = computed(() => store.getters['app/isMobileLandscape'])
@@ -118,7 +113,7 @@ const isMobilePortrait = computed(() => store.getters['app/isMobilePortrait'])
     <div class="header" v-if="step === STEPS.firstMessage">
       <span>
         <Math class="math-icon"></Math>&nbsp;
-        <span class="subject">{{ currentSubject.displayName }}</span></span
+        <span class="subject">{{ currentSubject?.displayName }}</span></span
       >
     </div>
     <div
@@ -149,12 +144,11 @@ const isMobilePortrait = computed(() => store.getters['app/isMobilePortrait'])
       </div>
     </div>
     <div class="container">
-      <SelectTopic
+      <SelectTopicAndSubject
         v-if="step === STEPS.subjectSelection"
-        :subjects="subjects"
-        :subject="currentSubject"
-        :selectSubject="selectSubject"
         :firstName="store.getters['user/firstName']"
+        :topics="store.state.botConversations.topics"
+        :on-select-subject="selectSubject"
       />
 
       <div class="first-message" v-if="step === STEPS.firstMessage">
@@ -179,8 +173,8 @@ const isMobilePortrait = computed(() => store.getters['app/isMobilePortrait'])
           ></Textarea>
           <TransferToSessionView
             v-if="isTransferToSessionEnabled && !sessionId && currentSubject"
-            :subject="currentSubject?.topicName"
-            :topic="currentSubject?.name"
+            :subject="currentSubject?.name"
+            :topic="currentSubject?.topicName"
             :display-context="DISPLAY_CONTEXT.STAND_ALONE"
             :is-mobile-mode="isMobileMode"
           />
