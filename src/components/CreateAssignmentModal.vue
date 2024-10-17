@@ -6,7 +6,7 @@
         label="Title"
         v-model="assignmentName"
         placeholder="Untitled Assignment"
-        class="assignment-name"
+        class="untitled"
       />
       <div class="assignment-details">
         <div class="assignment-details-row">
@@ -24,24 +24,36 @@
           />
         </div>
         <div class="assignment-details-row">
-          <FormSelect
+          <IonicSelect
             label="Assign to class(es)"
-            class="classes-dropdown assignment-name"
-            :multiple="true"
-            :name="'classes'"
-            :getSelectOptions="() => classes"
+            name="classes"
+            class="assignment-name"
+            :options="classes"
+            optionTextField="name"
             v-model="selectedClasses"
-            :optionTextField="'name'"
+            :multiple="true"
+            @ionChange="showClassStudents"
+          />
+          <IonicSelect
+            label="Selected student(s)"
+            name="students"
+            class="assignment-name"
+            :options="classStudents"
+            optionTextField="firstName"
+            :multiple="true"
+            v-model="selectedStudents"
+            :disabled="showStudentsInClassDisabled"
           />
         </div>
         <div class="assignment-details-row">
-          <FormSelect
+          <IonicSelect
             label="Subject"
+            name="session-to-complete"
             class="session-dropdown"
-            :name="'session-to-complete'"
-            :getSelectOptions="() => allSubjects"
+            :options="allSubjects"
+            optionTextField="displayName"
+            :multiple="false"
             v-model="selectedSessionToComplete"
-            :optionTextField="'displayName'"
           />
           <FormInput
             label="Number of sessions to complete"
@@ -78,8 +90,8 @@
         <button
           class="uc-form-button"
           data-testid="create-assignment-btn"
-          @click="createAssignment()"
           :disabled="!isFormValid"
+          @click="createAssignment()"
         >
           Assign
         </button>
@@ -89,17 +101,17 @@
 </template>
 
 <script>
-import Modal from '@/components/Modal.vue'
-import FormInput from '@/components/FormInput.vue'
-import FormDateInput from '@/components/FormDateInput.vue'
-import FormSelect from '@/components/FormSelect.vue'
 import moment from 'moment'
-import AnalyticsService from '@/services/AnalyticsService'
 import { mapState } from 'vuex'
 import { EVENTS } from '@/consts'
+import FormInput from '@/components/FormInput.vue'
+import FormDateInput from '@/components/FormDateInput.vue'
+import IonicSelect from '@/components/IonicSelect.vue'
+import Modal from '@/components/Modal.vue'
+import AnalyticsService from '@/services/AnalyticsService'
 
 export default {
-  components: { Modal, FormInput, FormDateInput, FormSelect },
+  components: { Modal, FormInput, FormDateInput, IonicSelect },
   name: 'CreateAssignmentModal',
 
   props: {
@@ -124,6 +136,9 @@ export default {
         this.numMinutes
       )
     },
+    showStudentsInClassDisabled() {
+      return this.selectedClasses.length !== 1
+    },
   },
 
   data() {
@@ -138,12 +153,18 @@ export default {
       numSessions: 1,
       numMinutes: 10,
       description: null,
+      classStudents: [],
+      selectedStudents: [],
     }
   },
 
   async created() {
     this.allSubjects = this.getActiveSubjects(this.subjects)
     this.classes = this.modalData.classes
+    this.selectedClasses = this.classes.filter(
+      (cls) => cls.id === this.modalData.currentClassId
+    )
+    this.showClassStudents()
   },
 
   methods: {
@@ -165,6 +186,16 @@ export default {
         })
     },
 
+    showClassStudents() {
+      if (this.selectedClasses.length === 1) {
+        this.classStudents = this.selectedClasses[0].students ?? []
+        this.selectedStudents = this.selectedClasses[0].students ?? []
+      } else {
+        this.classStudents = []
+        this.selectedStudents = []
+      }
+    },
+
     async createAssignment() {
       const assignmentData = {
         description: this.description,
@@ -177,7 +208,12 @@ export default {
         subjectId: this.selectedSessionToComplete.id,
       }
       const selectedClasses = this.selectedClasses
-      this.modalData.onAssignmentCreated({ assignmentData, selectedClasses })
+      const selectedStudents = this.selectedStudents
+      this.modalData.onAssignmentCreated({
+        assignmentData,
+        selectedClasses,
+        selectedStudents,
+      })
       AnalyticsService.captureEvent(EVENTS.ASSIGNMENT_CREATED, assignmentData)
       this.$store.dispatch('app/modal/hide')
     },
@@ -196,7 +232,7 @@ export default {
 <style lang="scss" scoped>
 .modal-container h1 {
   text-align: left;
-  font-size: 15px;
+  font-size: 20px;
   color: $c-secondary-grey;
 }
 
@@ -204,15 +240,22 @@ export default {
   @include flex-container(row, space-between);
   justify-content: left;
   gap: 12px;
+  overflow: visible;
 }
 
 .assignment-details-col {
   @include flex-container(column, left);
 }
 
+.untitled {
+  max-width: 67%;
+  margin: 4px;
+}
+
 .assignment-name,
 .session-dropdown {
   max-width: 33%;
+  margin: 4px;
 }
 
 /* TODO: create custom textarea input*/
@@ -232,6 +275,7 @@ export default {
   &-invalid {
     outline: 1px solid $c-error-red;
   }
+  margin: 4px;
 }
 
 .right-btns {

@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import { merge } from 'lodash-es'
 import { createStore } from 'vuex'
 import router from '@/router'
@@ -29,18 +29,18 @@ const getWrapper = (options = {}) => {
       },
     })
   )
-
-  return shallowMount(App, { global: { plugins: [router, store] } })
+  return mount(App, {
+    global: { plugins: [router, store] },
+  })
 }
 
 describe('App', () => {
   it('renders expected elements', () => {
-    const wrapper = getWrapper()
+    const wrapper = getWrapper().find('#app')
     expect(wrapper.classes('App')).toBe(true)
     expect(wrapper.findComponent(AppHeader).exists()).toBe(true)
     expect(wrapper.findComponent(AppSidebar).exists()).toBe(true)
     expect(wrapper.findComponent(AppModal).exists()).toBe(false)
-    expect(wrapper.find('router-view-stub').exists()).toBe(true)
 
     const routerViewWrapper = wrapper.find('.App-router-view-wrapper')
     expect(routerViewWrapper.exists()).toBe(true)
@@ -50,7 +50,6 @@ describe('App', () => {
       'App-router-view-wrapper--header',
       'App-router-view-wrapper--sidebar',
     ])
-    expect(routerViewWrapper.find('router-view-stub').exists()).toBe(true)
   })
 
   it('conditionally renders `AppHeader`', () => {
