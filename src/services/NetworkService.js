@@ -1050,6 +1050,7 @@ export default {
     message,
     senderUserType,
     sessionId,
+    subjectName,
   }) {
     return httpPost(
       `${API_ROOT}/tutor-bot/conversations/${conversationId}/message`,
@@ -1058,6 +1059,7 @@ export default {
         message,
         senderUserType,
         sessionId,
+        subjectName,
       }
     ).then(this._successHandler, this._errorHandler)
   },

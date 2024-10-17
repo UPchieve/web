@@ -5,8 +5,6 @@ import { computed, onBeforeMount, onBeforeUnmount, ref, watch } from 'vue'
 import { RouterView } from 'vue-router'
 import Errors from './Errors.vue'
 import { useStore } from 'vuex'
-import Banner from './Banner.vue'
-import moment from 'moment'
 
 const store = useStore()
 const sessionId = computed(() => store.state.user.session.id)
@@ -15,20 +13,6 @@ const cooldownMinutes = computed(
 )
 const waitingPeriodTimeoutId = ref<null | number>(null)
 const latestSession = computed(() => store.state.session.latestSession)
-
-const showHoursBanner = ref(true)
-
-const UTChours = {
-  start: 17,
-  end: 3,
-}
-
-const localHours = computed(() => {
-  return {
-    start: moment(moment.utc().hour(UTChours.start)).local().format('hA'),
-    end: moment(moment.utc().hour(UTChours.end)).local().format('hA'),
-  }
-})
 
 onBeforeMount(async () => {
   if (sessionId.value) {
@@ -72,11 +56,6 @@ watch(latestSession, () => {
 
 <template>
   <div class="layout">
-    <Banner
-      v-if="showHoursBanner"
-      :dismiss="() => (showHoursBanner = false)"
-      :message="`UPbot is only available to use from ${localHours.start} - ${localHours.end}`"
-    />
     <Errors />
     <RouterView></RouterView>
   </div>

@@ -14,8 +14,8 @@ import { DISPLAY_CONTEXT } from '@/views/BotConversationsView/BotChat.vue'
 const store = useStore()
 
 const props = defineProps<{
-  subject: 'math'
   topic: string
+  subject: string
   displayContext: DISPLAY_CONTEXT
   isMobileMode: boolean
 }>()
@@ -34,8 +34,8 @@ const showPresessionSurvey = () => {
     // (The presession survey step)
     component: SubjectSelectionModal,
     data: {
-      preSelectedSubtopic: props.topic,
-      topic: props.subject,
+      preSelectedSubtopic: props.subject,
+      topic: props.topic,
       // If there is a current conversation, pass it to the session args
       ...(currentConversationId.value
         ? { sessionArgs: { tutorBotConversationId: currentConversationId } }
