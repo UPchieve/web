@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import store from './store'
 import AdminView from './views/Admin/index.vue'
+import AdminCleverRoster from './views/Admin/AdminCleverRoster.vue'
 import AdminEditSchool from './views/Admin/AdminEditSchool.vue'
 import AdminIneligibleStudents from './views/Admin/AdminIneligibleStudents.vue'
 import AdminPendingVolunteers from './views/Admin/AdminPendingVolunteers.vue'
@@ -457,6 +458,12 @@ const routes = [
     path: '/admin/roster-students',
     name: 'AdminRosterStudents',
     component: AdminRosterStudents,
+    meta: { protected: true, requiresAdmin: true },
+  },
+  {
+    path: '/admin/clever-roster',
+    name: 'AdminCleverRoster',
+    component: AdminCleverRoster,
     meta: { protected: true, requiresAdmin: true },
   },
   {

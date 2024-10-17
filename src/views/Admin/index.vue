@@ -38,6 +38,9 @@
       <router-link to="admin/roster-students" class="admin-link btn"
         >Roster Students</router-link
       >
+      <router-link to="admin/clever-roster" class="admin-link btn"
+        >Clever Roster</router-link
+      >
     </div>
   </div>
 </template>
