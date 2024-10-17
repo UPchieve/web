@@ -20,6 +20,7 @@ const getWrapper = (
           isAuthenticated: () => isAuthenticated,
           userType: () => userType,
           isVerified: () => isVerified,
+          getUserPropsForAnalytics: vi.fn(() => () => {}),
         },
       },
     },

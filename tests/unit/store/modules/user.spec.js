@@ -27,7 +27,7 @@ describe('User store module', () => {
           },
           getters: {
             ...userModule.getters,
-            getUserPropsForAnalytics: vi.fn().mockReturnValue({}),
+            getUserPropsForAnalytics: vi.fn(() => () => {}),
             ...(args.user?.getters ?? {}),
           },
         },

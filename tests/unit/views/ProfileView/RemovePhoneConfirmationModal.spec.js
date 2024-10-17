@@ -27,6 +27,7 @@ describe('RemovePhoneConfirmationModal', () => {
             userType: () => userType,
             isVolunteer: () => userType === 'volunteer',
             isStudent: () => userType === 'student',
+            getUserPropsForAnalytics: vi.fn(() => () => {}),
           },
         },
         app: {

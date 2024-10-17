@@ -217,7 +217,7 @@ export default {
       commit('updateUser', updatedUser)
       // Ensure that properties are up to date with for feature flag evaluation
       FeatureFlagService.setPersonPropertiesForFlags(
-        getters.getUserPropsForAnalytics
+        getters.getUserPropsForAnalytics()
       )
     },
 
@@ -419,7 +419,11 @@ export default {
       )
     },
 
-    getUserPropsForAnalytics: (state, getters) => {
+    // This getter returns a function to help bypass Vuex's caching.
+    // We can ensure that the latest user properties are computed each time,
+    // preventing any caching issues that might interfere
+    // with the dynamic loading of feature flags
+    getUserPropsForAnalytics: (state, getters, rootState) => () => {
       const userProps = {
         ucId: state.user.id,
         userType: state.user.userType,
@@ -454,6 +458,12 @@ export default {
       } else if (getters.isTeacher) {
         // TODO: TEACHER PROFILES.
       }
+
+      // Although 'fallIncentiveEnrollmentAt' is only relevant to student users,
+      // we apply it to all users to override any existing values in the merged PostHog
+      // Person profiles. This allows for consistent rollout for the Fall Incentive program
+      userProps.fallIncentiveEnrollmentAt =
+        rootState.productFlags.fallIncentiveEnrollmentAt ?? null
 
       return userProps
     },
