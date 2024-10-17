@@ -1,5 +1,27 @@
 <template>
   <div class="document-editor" data-document-editor-version="2">
+    <div id="ql-toolbar">
+      <select class="ql-header">
+        <option value="small"></option>
+        <option selected></option>
+        <option value="large"></option>
+        <option value="huge"></option>
+      </select>
+      <button class="ql-bold" />
+      <button class="ql-italic" />
+      <button class="ql-underline" />
+      <button class="ql-strike" />
+      <button v-if="showImageUpload" class="ql-image" />
+      <select class="ql-color" />
+      <select class="ql-background" />
+      <button class="ql-list" value="ordered" />
+      <button class="ql-list" value="bullet" />
+      <button class="ql-aiWidget" v-if="isAiWidgetEnabled">
+        <ChatBotIcon class="chat-bot-icon" />
+        <activity-dot v-if="showHasAiMessageIndicator" />
+      </button>
+    </div>
+
     <div id="quill-container"></div>
     <transition name="document-loading">
       <loading-message
@@ -46,6 +68,9 @@ import ModerationService from '@/services/ModerationService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import { file2b64 } from '@/utils/fileToBase64'
+import ChatBotIcon from '@/assets/chat-bot-icon.svg'
+import LoggerService from '@/services/LoggerService'
+import ActivityDot from '@/components/ActivityDot.vue'
 
 Quill.register('modules/cursors', QuillCursors)
 Quill.register('modules/image', ImageCompressor)
@@ -58,11 +83,31 @@ export default {
     FileDialog,
     LoadingMessage,
     RefreshDocumentEditorModal,
+    ChatBotIcon,
+    ActivityDot,
   },
   props: {
     sessionId: {
       type: String,
       required: false,
+    },
+    isAiWidgetEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    onWidgetClicked: {
+      type: Function,
+      required: false,
+      default: () => {
+        if (this.isAiWidgetEnabled)
+          LoggerService.noticeError(
+            'No widget handler was passed to the document editor'
+          )
+      },
+    },
+    showHasAiMessageIndicator: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -101,30 +146,23 @@ export default {
         ? 'Please upload images through the image button on the toolbar.'
         : 'At this time, coaches cannot upload images for student safety reasons. Please direct the student to an online resource instead.'
     },
+    showImageUpload() {
+      return (
+        this.isStudent ||
+        (this.isVolunteer && this.isVolunteerImageUploadEnabled)
+      )
+    },
   },
   mounted() {
     if (this.isVolunteerImageUploadEnabled)
       AnalyticsService.captureEvent(EVENTS.VOLUNTEER_IMAGE_UPLOAD_SEEN, {
         sessionType: 'DocumentEditorV2',
       })
-    const toolbar = [
-      [{ header: [1, 2, false] }],
-      ['bold', 'italic', 'underline', 'strike'],
-    ]
 
-    // To increase exposure, put this near the more frequently used tools
-    if (
-      this.isStudent ||
-      (this.isVolunteer && this.isVolunteerImageUploadEnabled)
-    )
-      toolbar.push(['image'])
-
-    toolbar.push([
-      { color: [] },
-      { background: [] },
-      { list: 'ordered' },
-      { list: 'bullet' },
-    ])
+    const handlers = {}
+    if (this.isAiWidgetEnabled) {
+      handlers.aiWidget = this.onWidgetClicked
+    }
 
     this.quillEditor = markRaw(
       new Quill('#quill-container', {
@@ -153,19 +191,21 @@ export default {
             selectionChangeSource: 'cursor-api',
             transformOnTextChange: true,
           },
-          toolbar,
+          toolbar: {
+            container: '#ql-toolbar',
+            handlers,
+          },
         },
       })
     )
-    const imageHandler = async () => {
-      AnalyticsService.captureEvent(EVENTS.VOLUNTEER_CLICKED_UPLOAD_IMAGE, {
-        sessionType: 'DocumentEditorV2',
-      })
-      this.$refs.fileDialog.openFileDialog()
-    }
 
     if (this.isVolunteer && this.isVolunteerImageUploadEnabled) {
-      this.quillEditor.getModule('toolbar').addHandler('image', imageHandler)
+      this.quillEditor.getModule('toolbar').addHandler('image', async () => {
+        AnalyticsService.captureEvent(EVENTS.VOLUNTEER_CLICKED_UPLOAD_IMAGE, {
+          sessionType: 'DocumentEditorV2',
+        })
+        this.$refs.fileDialog.openFileDialog()
+      })
     }
 
     // Delegate tracking the contents of the doc to Yjs instead of Quill.
@@ -336,6 +376,18 @@ export default {
   .ql-cursor-flag {
     display: none;
   }
+}
+
+.chat-bot-icon {
+  flex-shrink: 0;
+  height: 20px;
+  width: 20px;
+}
+
+.activity-dot {
+  position: relative;
+  bottom: 10px;
+  left: 10px;
 }
 
 .document-loading {

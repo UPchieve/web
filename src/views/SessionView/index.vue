@@ -45,6 +45,9 @@
             docEditorVersion === 2
           "
           :sessionId="this.sessionId"
+          :isAiWidgetEnabled="aiWidgetEnabled"
+          :onWidgetClicked="toggleAiWidget"
+          :showHasAiMessageIndicator="hasUnreadAiTutorMessage"
         />
         <document-editor
           v-else-if="auxiliaryType === sessionToolTypes.DOCUMENT_EDITOR"
@@ -515,7 +518,7 @@ export default {
        */
       FeatureFlagService.isFeatureEnabledForUser(
         POSTHOG_FEATURE_FLAGS.AI_TUTOR,
-        student.id
+        student?.id
       ).then((r) => {
         this.aiWidgetEnabled = [
           'stand-alone-in-session',

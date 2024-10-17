@@ -23,11 +23,7 @@ const sessionId = computed(() => store.state.user.session.id)
 const isTransferToSessionEnabled = computed(() => {
   const ff: boolean | string = store.getters['featureFlags/aiTutor']
   const currentSubject = conversation.value?.subject
-  return (
-    typeof ff === 'string' &&
-    ff.includes('handoff') &&
-    store.getters['botConversations/isWhiteboardSubject'](currentSubject)
-  )
+  return typeof ff === 'string' && ff.includes('handoff')
 })
 
 const chatContainer = ref()

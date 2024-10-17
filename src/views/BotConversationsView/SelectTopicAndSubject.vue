@@ -40,7 +40,7 @@ const selectSubject = (subject: PartialSubject) => {
       <ChatBotIcon class="avatar" />
       <div>
         <div class="title">Hey, {{ firstName }}!</div>
-        <div class="sub-title">I'm UPbot, your AI Math Tutor</div>
+        <div class="sub-title">I'm UPbot, your AI Tutor</div>
       </div>
     </div>
     <div class="row subjects">

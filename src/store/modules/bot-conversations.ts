@@ -208,14 +208,5 @@ export default {
         subject: currentSubject,
       }
     },
-    isWhiteboardSubject:
-      () => (subject: Pick<Subject, 'name' | 'topicName'> | undefined) => {
-        // This is a stopgap until the DocumentEditor has AI tutor support.
-        if (!subject) return false
-        const isMathOrScience = ['math', 'science'].includes(
-          subject?.topicName ?? ''
-        )
-        return isMathOrScience || subject.name === 'satMath'
-      },
   },
 }
