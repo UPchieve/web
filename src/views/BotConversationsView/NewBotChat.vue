@@ -11,7 +11,7 @@ import AnalyticsService from '@/services/AnalyticsService'
 import Math from '@/assets/subject_icons/math.svg'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import SystemMessage from './SystemMessage.vue'
-
+import AiDisclaimer from '@/views/BotConversationsView/AiDisclaimer.vue'
 import TransferToSessionView from '@/views/BotConversationsView/TransferToSessionView/index.vue'
 import { DISPLAY_CONTEXT } from '@/views/BotConversationsView/BotChat.vue'
 import type { Subject } from '@/store/modules/bot-conversations'
@@ -26,6 +26,15 @@ const sessionId = computed(() => store.state.user.session?.id)
 const isTransferToSessionEnabled = computed(() => {
   const ff: boolean | string = store.getters['featureFlags/aiTutor']
   return typeof ff === 'string' && ff.includes('handoff')
+})
+const disclaimerMessage = computed(() => {
+  const baseMessage = 'AI may not always be accurate.'
+  // Show transfer message if there is not an ongoing session and if the transfer button is available
+  const transferMessage =
+    isTransferToSessionEnabled.value && !sessionId.value
+      ? ' For more help, transfer to a live tutor!'
+      : ''
+  return `${baseMessage}${transferMessage}`
 })
 
 enum STEPS {
@@ -167,13 +176,16 @@ const isMobilePortrait = computed(() => store.getters['app/isMobilePortrait'])
             :disabled="!currentSubject || fetchingConversation"
             :sendMessage="(message: string) => sendFirstMessage(message)"
           ></Textarea>
-          <TransferToSessionView
-            v-if="isTransferToSessionEnabled && !sessionId && currentSubject"
-            :subject="currentSubject?.name"
-            :topic="currentSubject?.topicName"
-            :display-context="DISPLAY_CONTEXT.STAND_ALONE"
-            :is-mobile-mode="isMobileMode"
-          />
+          <div class="footer-content">
+            <TransferToSessionView
+              v-if="isTransferToSessionEnabled && !sessionId && currentSubject"
+              :subject="currentSubject?.name"
+              :topic="currentSubject?.topicName"
+              :display-context="DISPLAY_CONTEXT.STAND_ALONE"
+              :is-mobile-mode="isMobileMode"
+            />
+            <AiDisclaimer :message="disclaimerMessage" />
+          </div>
         </div>
       </div>
     </div>
@@ -318,6 +330,12 @@ const isMobilePortrait = computed(() => store.getters['app/isMobilePortrait'])
   animation: ellipsis steps(4, end) 900ms infinite;
   content: '\2026'; /* ascii code for the ellipsis character */
   width: 0px;
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 @keyframes ellipsis {
