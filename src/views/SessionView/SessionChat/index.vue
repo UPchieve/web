@@ -136,7 +136,6 @@
           :class="{ hidden: textMessageHidden }"
           data-testid="chat-textarea"
           autofocus
-          @keydown.enter.prevent
           @keyup="handleOutgoingMessage"
           v-model="newMessage"
           placeholder="Type a message..."
@@ -475,8 +474,14 @@ export default {
       }
     },
     async handleOutgoingMessage(event) {
+      if (event.key == 'Enter' && event.shiftKey) {
+        // Allow multi-line messages.
+        return
+      }
+
       // If key pressed is Enter, send the message
       if (event.key == 'Enter') {
+        event.preventDefault()
         const message = this.newMessage.trim()
 
         // Early exit if message is blank
