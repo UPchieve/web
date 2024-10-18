@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import type { Subject, Topic } from '@/store/modules/bot-conversations'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 type PartialTopic = Pick<Topic, 'id' | 'displayName' | 'subjects'>
 type PartialSubject = Pick<Subject, 'id' | 'displayName'>
@@ -10,6 +10,17 @@ const props = defineProps<{
   topics: PartialTopic[]
   onSelectSubject: (subject: PartialSubject) => void
 }>()
+
+const alphabeticalSort = (
+  a: PartialSubject | PartialTopic,
+  b: PartialSubject | PartialTopic
+): number => a.displayName.localeCompare(b.displayName)
+const sortedTopics = computed(() =>
+  Array.from(props.topics).sort(alphabeticalSort)
+)
+const sortedSubjects = computed(() =>
+  Array.from(selectedTopic?.value?.subjects ?? []).sort(alphabeticalSort)
+)
 
 enum STEPS {
   selectTopic = 'selectTopic', // i.e. math
@@ -51,7 +62,7 @@ const selectSubject = (subject: PartialSubject) => {
           'subject-button': true,
           selected: topic.id === selectedTopic?.id,
         }"
-        v-for="topic in props.topics"
+        v-for="topic in sortedTopics"
         v-bind:key="topic.id"
         @click="selectTopic(topic)"
       >
@@ -65,7 +76,7 @@ const selectSubject = (subject: PartialSubject) => {
       </p>
       <button
         :class="{ 'subject-button': true }"
-        v-for="subject in selectedTopic?.subjects"
+        v-for="subject in sortedSubjects"
         v-bind:key="subject.id"
         @click="selectSubject(subject)"
       >

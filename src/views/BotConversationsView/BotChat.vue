@@ -12,6 +12,7 @@ import BotChatMessages from './BotChatMessages.vue'
 import Textarea from './Textarea.vue'
 import ModerationService from '@/services/ModerationService'
 import TransferToSessionView from '@/views/BotConversationsView/TransferToSessionView/index.vue'
+import AiDisclaimer from '@/views/BotConversationsView/AiDisclaimer.vue'
 
 const { bgColor, displayContext } = defineProps<{
   displayContext: DISPLAY_CONTEXT
@@ -22,7 +23,6 @@ const user = computed(() => store.state.user.user)
 const sessionId = computed(() => store.state.user.session.id)
 const isTransferToSessionEnabled = computed(() => {
   const ff: boolean | string = store.getters['featureFlags/aiTutor']
-  const currentSubject = conversation.value?.subject
   return typeof ff === 'string' && ff.includes('handoff')
 })
 
@@ -46,6 +46,15 @@ const fetchingConversation = computed(
 )
 const messages = computed(() => conversation.value.messages ?? [])
 const isMobileMode = computed(() => store.getters['app/mobileMode'])
+const disclaimerMessage = computed(() => {
+  const baseMessage = 'AI may not always be accurate.'
+  // Show transfer message if there is not an ongoing session and if the transfer button is available
+  const transferMessage =
+    isTransferToSessionEnabled.value && !sessionId.value
+      ? ' For more help, transfer to a live tutor!'
+      : ''
+  return `${baseMessage}${transferMessage}`
+})
 
 const sendMessage = async (message: string) => {
   store.commit('botConversations/setMessageIsSending', true)
@@ -112,13 +121,21 @@ watch(() => messages.value.length, scrollToBottom)
         :disabled="messageSending || fetchingConversation"
         :sendMessage="(message: string) => sendMessage(message)"
       ></Textarea>
-      <TransferToSessionView
-        v-if="isTransferToSessionEnabled && !sessionId && conversation.subject"
-        :topic="conversation.subject.topicName"
-        :subject="conversation.subject.name"
-        :display-context="displayContext"
-        :is-mobile-mode="isMobileMode"
-      />
+      <div class="footer-content">
+        <TransferToSessionView
+          v-if="
+            isTransferToSessionEnabled && !sessionId && conversation.subject
+          "
+          :topic="conversation.subject.topicName"
+          :subject="conversation.subject.name"
+          :display-context="displayContext"
+          :is-mobile-mode="isMobileMode"
+        />
+        <AiDisclaimer
+          :message="disclaimerMessage"
+          v-if="displayContext === DISPLAY_CONTEXT.STAND_ALONE"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -157,12 +174,14 @@ watch(() => messages.value.length, scrollToBottom)
   gap: 8px;
 }
 
-.ai-disclaimer {
-  color: $c-default-grey;
-}
-
 .text-area {
   width: 80%;
   max-width: 695px;
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 </style>
