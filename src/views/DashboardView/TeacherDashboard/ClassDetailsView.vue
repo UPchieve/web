@@ -25,7 +25,6 @@
               <Pencil class="pencil" /> Edit Class
             </button>
             <button
-              v-if="isAssignmentsEnabled"
               class="create-assignment-btn"
               @click="openCreateAssignmentModal()"
             >
@@ -34,7 +33,7 @@
           </div>
         </div>
       </div>
-      <div v-if="isAssignmentsEnabled" class="tabs">
+      <div class="tabs">
         <p
           class="tabs__header-type"
           :class="isSelected === 'classDetails' ? 'is-selected' : null"
@@ -196,7 +195,6 @@ import Arrow from '@/assets/RightArrow.svg'
 import AssignmentIcon from '@/assets/AssignmentIcon.svg'
 import Pencil from '@/assets/pencil.svg'
 import moment from 'moment'
-import { mapGetters } from 'vuex'
 import { EVENTS } from '@/consts'
 
 export default {
@@ -226,11 +224,6 @@ export default {
       className: this.classInfo.name,
       topicId: this.classInfo.topicId,
     }
-  },
-  computed: {
-    ...mapGetters({
-      isAssignmentsEnabled: 'featureFlags/isAssignmentsEnabled',
-    }),
   },
   props: {
     classes: {
