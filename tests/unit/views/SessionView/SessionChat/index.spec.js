@@ -61,7 +61,7 @@ describe('SessionChat', () => {
     await textArea.setValue(message)
     expect(textArea.element.value).toEqual(message)
 
-    await textArea.trigger('keyup', {
+    await textArea.trigger('keydown', {
       key: 'Enter', // Send message
     })
 
