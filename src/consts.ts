@@ -695,7 +695,6 @@ export const POSTHOG_FEATURE_FLAGS = {
   FALL_INCENTIVE_PROGRAM_PARENTAL_CONSENT:
     'fall-incentive-program-parental-consent',
   NATIONAL_STUDENT_PHONE: 'national-student-phone',
-  ASSIGNMENTS: 'assignments',
   AI_TUTOR: 'stand-alone-ai-tutor',
   AI_OTHER_SUBJECT_SURVEY: 'ai-other-subject-survey',
 }

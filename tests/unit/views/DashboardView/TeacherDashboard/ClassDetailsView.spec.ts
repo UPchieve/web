@@ -8,7 +8,6 @@ import userModule from '@/store/modules/user'
 import featureFlagsModule from '@/store/modules/feature-flags'
 
 type Overrides = {
-  isAssignmentsEnabled?: boolean
   data?: Record<string, any>
 }
 
@@ -20,9 +19,6 @@ const getWrapper = async (overrides: Overrides = {}) => {
       },
       featureFlags: {
         ...featureFlagsModule,
-        getters: {
-          isAssignmentsEnabled: () => overrides.isAssignmentsEnabled,
-        },
       },
     },
   })
@@ -266,7 +262,6 @@ describe('Assignments View', () => {
       data: { assignments: [] },
     })
     const wrapper = await getWrapper({
-      isAssignmentsEnabled: true,
       data: { assignments: [], isSelected: 'assignments' },
     })
     const noAssignments = wrapper.find('[data-testid="no-assignments"]')
@@ -275,7 +270,6 @@ describe('Assignments View', () => {
 
   test('Shows assignments', async () => {
     const wrapper = await getWrapper({
-      isAssignmentsEnabled: true,
       data: { isSelected: 'assignments', assignments },
     })
 
@@ -286,7 +280,6 @@ describe('Assignments View', () => {
   describe('Open tabs', () => {
     test('Click class details tab', async () => {
       const wrapper = await getWrapper({
-        isAssignmentsEnabled: true,
         data: { isSelected: 'assignments' },
       })
       const classDetailsBtn = wrapper.find('[data-testid="class-details-tab"]')
@@ -296,7 +289,6 @@ describe('Assignments View', () => {
 
     test('Click assignments tab', async () => {
       const wrapper = await getWrapper({
-        isAssignmentsEnabled: true,
         data: { isSelected: 'classDetails' },
       })
       const classDetailsBtn = wrapper.find('[data-testid="assignments-tab"]')
@@ -308,7 +300,6 @@ describe('Assignments View', () => {
   describe('View assignment info', () => {
     test('See assignment title and due date', async () => {
       const wrapper = await getWrapper({
-        isAssignmentsEnabled: true,
         data: { isSelected: 'assignments', assignments, assignmentsCompletion },
       })
       const assignmentTitle = wrapper.find(
@@ -323,7 +314,6 @@ describe('Assignments View', () => {
 
     test('See no students assigned text', async () => {
       const wrapper = await getWrapper({
-        isAssignmentsEnabled: true,
         data: {
           isSelected: 'assignments',
           assignments,
@@ -338,7 +328,6 @@ describe('Assignments View', () => {
 
     test('See correct student completion text', async () => {
       const wrapper = await getWrapper({
-        isAssignmentsEnabled: true,
         data: { isSelected: 'assignments', assignments, assignmentsCompletion },
       })
       const studentCompletion = wrapper.find(

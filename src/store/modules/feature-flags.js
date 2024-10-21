@@ -34,7 +34,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM]: false,
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM_PARENTAL_CONSENT]: false,
       [POSTHOG_FEATURE_FLAGS.NATIONAL_STUDENT_PHONE]: false,
-      [POSTHOG_FEATURE_FLAGS.ASSIGNMENTS]: false,
       [POSTHOG_FEATURE_FLAGS.AI_OTHER_SUBJECT_SURVEY]: false,
     },
     multivariantFlags: {
@@ -159,8 +158,6 @@ export default {
       ],
     isNationalStudentPhoneEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.NATIONAL_STUDENT_PHONE],
-    isAssignmentsEnabled: (state) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.ASSIGNMENTS],
     aiTutor: (state) => state.multivariantFlags[POSTHOG_FEATURE_FLAGS.AI_TUTOR],
     showAiOtherSubjectSurvey: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.AI_OTHER_SUBJECT_SURVEY],

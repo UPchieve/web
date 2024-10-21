@@ -157,15 +157,10 @@ export default {
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
       isTeacher: 'user/isTeacher',
-      isStudentClassesEnabled: 'featureFlags/isAssignmentsEnabled',
       isAiTutorActive: 'featureFlags/aiTutor',
     }),
     showStudentMyClassesLink() {
-      return (
-        this.isStudent &&
-        this.isStudentClassesEnabled &&
-        this.numberOfStudentClasses > 0
-      )
+      return this.isStudent && this.numberOfStudentClasses > 0
     },
   },
   methods: {
