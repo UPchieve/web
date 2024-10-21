@@ -102,7 +102,7 @@
 
 <script>
 import moment from 'moment'
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { EVENTS } from '@/consts'
 import FormInput from '@/components/FormInput.vue'
 import FormDateInput from '@/components/FormDateInput.vue'
@@ -122,6 +122,9 @@ export default {
   },
 
   computed: {
+    ...mapGetters({
+      subjectRequestRollout: 'featureFlags/subjectRequestRollout',
+    }),
     ...mapState({
       subjects: (state) => state.subjects.subjects,
     }),
@@ -176,7 +179,10 @@ export default {
       const properties = ['id', 'name', 'displayName', 'topicId']
 
       return Object.values(allSubj)
-        .filter((subject) => subject.active)
+        .filter(
+          (subject) =>
+            subject.active || this.subjectRequestRollout.includes(subject.name)
+        )
         .map((subject) => {
           const filteredSubject = {}
           properties.forEach((prop) => {
