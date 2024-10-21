@@ -1,4 +1,5 @@
 import { createStore } from 'vuex'
+import featureFlagsModule from '@/store/modules/feature-flags'
 import subjectsModule from '@/store/modules/subjects'
 import { mount } from '@vue/test-utils'
 import CreateAssignmentModal from '@/components/CreateAssignmentModal.vue'
@@ -31,6 +32,7 @@ const classes = [
 const getWrapper = async (data: {}) => {
   const store = createStore({
     modules: {
+      featureFlags: featureFlagsModule,
       subjects: {
         state: {
           ...subjectsModule,
