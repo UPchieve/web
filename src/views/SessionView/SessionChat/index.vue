@@ -136,7 +136,7 @@
           :class="{ hidden: textMessageHidden }"
           data-testid="chat-textarea"
           autofocus
-          @keyup="handleOutgoingMessage"
+          @keydown="handleOutgoingMessage"
           v-model="newMessage"
           placeholder="Type a message..."
           :disabled="waitingForModeration"
