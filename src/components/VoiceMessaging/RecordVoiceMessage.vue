@@ -202,7 +202,7 @@ function destroy() {
 }
 </script>
 
-<template v-if="recorder.state !== STATES.notSupported">
+<template>
   <div v-if="recording.state === STATES.idle">
     <Announcement />
 
@@ -223,7 +223,10 @@ function destroy() {
       <RecordIcon class="icon record-icon"></RecordIcon>
     </button>
   </div>
-  <div v-else class="recorder-container">
+  <div
+    v-else-if="recording.state !== STATES.notSupported"
+    class="recorder-container"
+  >
     <div class="audio">
       <audio
         controls
