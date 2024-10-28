@@ -68,7 +68,7 @@ export default {
 
     subTopicDisplayName() {
       const { subTopic } = this.session
-      return this.subjects[subTopic].displayName
+      return this.subjects[subTopic]?.displayName
     },
 
     studentRating() {
