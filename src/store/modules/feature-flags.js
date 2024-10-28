@@ -49,6 +49,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY]: '',
       [POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION]: '',
       [POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT]: { type: 'unified' },
+      [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM]: {},
     },
   },
   mutations: {
@@ -152,6 +153,13 @@ export default {
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT],
     isFallIncentiveProgramEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM],
+    getFallIncentiveProgramPayload: (state) => {
+      const payload =
+        state.payloadFlags[POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM]
+      if (!payload?.maxQualifiedSessionsPerWeek)
+        payload.maxQualifiedSessionsPerWeek = 1
+      return payload
+    },
     isFallIncentiveParentalConsentEnabled: (state) =>
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM_PARENTAL_CONSENT
