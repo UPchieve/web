@@ -38,6 +38,9 @@ const error = ref('')
 const parentalConsent = defineModel()
 
 const user = computed(() => store.state.user.user)
+const fallIncentiveProgramPayload = computed(
+  () => store.getters['featureFlags/getFallIncentiveProgramPayload']
+)
 const isValidPhone = computed(() => phoneInput.value.isValid)
 const isFallIncentiveParentalConsentEnabled = computed(
   () => store.getters['featureFlags/isFallIncentiveParentalConsentEnabled']
@@ -210,11 +213,30 @@ onMounted(() => {
       <div v-else-if="step === 1" class="incentive-enrollment-modal">
         <header>
           <h1 class="incentive-enrollment-modal__title">
-            Earn $10 a week just for getting help! 💸
+            Earn ${{
+              fallIncentiveProgramPayload.maxQualifiedSessionsPerWeek * 10
+            }}
+            a week just for getting help! 💸
           </h1>
-          <p class="incentive-enrollment-modal__body">
+          <p
+            class="incentive-enrollment-modal__body"
+            v-if="fallIncentiveProgramPayload.maxQualifiedSessionsPerWeek === 1"
+          >
             This fall, for every week you have a tutoring session on UPchieve,
             we'll send you a $10 gift card—up to $100 total! 👀
+          </p>
+          <p
+            class="incentive-enrollment-modal__body"
+            v-else-if="
+              fallIncentiveProgramPayload.maxQualifiedSessionsPerWeek >= 2
+            "
+          >
+            This fall, for every week you have
+            {{ fallIncentiveProgramPayload.maxQualifiedSessionsPerWeek }}
+            tutoring sessions on UPchieve, we'll send you a ${{
+              fallIncentiveProgramPayload.maxQualifiedSessionsPerWeek * 10
+            }}
+            gift card—up to $100 total! 👀
           </p>
           <p class="incentive-enrollment-modal__body">
             Join our Fall Challenge by verifying your phone number now!

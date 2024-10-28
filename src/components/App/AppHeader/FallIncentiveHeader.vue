@@ -9,11 +9,23 @@ const store = useStore()
 const showFallIncentiveEnrollmentModal = ref(false)
 const productFlags = computed(() => store.state.productFlags.flags)
 const mobileMode = computed(() => store.getters['app/mobileMode'])
-const fallIncentiveHeaderText = computed(() =>
-  productFlags.value.fallIncentiveEnrollmentAt
-    ? `You're enrolled in UPchieve's Fall Challenge! Earn $100 this fall & boost your grades`
-    : `You're invited to earn $10 for having a session each week!`
+const fallIncentiveProgramPayload = computed(
+  () => store.getters['featureFlags/getFallIncentiveProgramPayload']
 )
+const fallIncentiveHeaderText = computed(() => {
+  if (productFlags.value.fallIncentiveEnrollmentAt) {
+    if (fallIncentiveProgramPayload.value.maxQualifiedSessionsPerWeek === 1)
+      return `You're enrolled in UPchieve's Fall Challenge! Earn $100 this fall & boost your grades`
+    if (fallIncentiveProgramPayload.value.maxQualifiedSessionsPerWeek > 1)
+      return `You're enrolled in UPchieve's Fall Challenge! Earn $${fallIncentiveProgramPayload.value.maxQualifiedSessionsPerWeek * 10} this week if you have ${fallIncentiveProgramPayload.value.maxQualifiedSessionsPerWeek} sessions!`
+  }
+
+  if (fallIncentiveProgramPayload.value.maxQualifiedSessionsPerWeek === 1)
+    return `You're invited to earn $10 for having a session each week!`
+  if (fallIncentiveProgramPayload.value.maxQualifiedSessionsPerWeek > 1)
+    return `You're invited to earn $${fallIncentiveProgramPayload.value.maxQualifiedSessionsPerWeek * 10} this week if you have ${fallIncentiveProgramPayload.value.maxQualifiedSessionsPerWeek} sessions!`
+  return ''
+})
 
 const toggleFallIncentiveEnrollmentModal = () => {
   showFallIncentiveEnrollmentModal.value =
