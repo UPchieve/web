@@ -463,7 +463,7 @@ export default {
       // we apply it to all users to override any existing values in the merged PostHog
       // Person profiles. This allows for consistent rollout for the Fall Incentive program
       userProps.fallIncentiveEnrollmentAt =
-        rootState.productFlags.fallIncentiveEnrollmentAt ?? null
+        rootState.productFlags.flags.fallIncentiveEnrollmentAt ?? null
 
       return userProps
     },
