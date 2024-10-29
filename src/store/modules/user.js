@@ -455,6 +455,11 @@ export default {
         if (state.user.isSchoolPartner) {
           userProps.schoolPartner = state.user.schoolName
         }
+
+        if (rootState.featureFlags.eligibleForChooseTutorType) {
+          userProps.eligibleForChooseTutorType =
+            rootState.featureFlags.eligibleForChooseTutorType
+        }
       } else if (getters.isTeacher) {
         // TODO: TEACHER PROFILES.
       }
