@@ -71,8 +71,12 @@
         <div class="school-detail__section">
           <div class="school-detail__section-title">School Properties</div>
           <div>
-            Title1 or Title1 Eligible:
-            {{ school.isSchoolWideTitle1 || school.isTitle1Eligible }}
+            School Wide Title1:
+            {{ school.isSchoolWideTitle1 }}
+          </div>
+          <div>
+            Title1 School Status:
+            {{ school.title1SchoolStatus }}
           </div>
           <div>
             National School Lunch Program:
