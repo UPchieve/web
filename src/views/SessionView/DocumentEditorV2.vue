@@ -355,7 +355,9 @@ export default {
 .ql-editor {
   overflow: visible;
 }
+</style>
 
+<style lang="scss" scoped>
 .document-editor {
   height: 100%;
   text-align: left;
