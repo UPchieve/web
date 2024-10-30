@@ -515,6 +515,12 @@ export default {
       this._errorHandler
     )
   },
+  adminCleverRoster(districtId) {
+    return httpPost(`${ADMIN_ROOT}/clever/roster`, { districtId }).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
   adminGetSessionReport({
     joinedBefore,
     joinedAfter,
