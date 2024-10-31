@@ -11,7 +11,7 @@ export default {
   actions: {
     async getUserProductFlags({ commit }) {
       const response = await NetworkService.getUserProductFlags()
-      commit('setUserProductFlags', response.data.flags)
+      commit('setUserProductFlags', response.data.flags ?? {})
     },
     addToProductFlags: ({ commit, state }, data) => {
       const { flags } = state
