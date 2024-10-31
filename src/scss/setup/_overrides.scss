@@ -19,3 +19,8 @@ $vs-border-color: $c-border-grey;
 .profile #VuePhoneNumberInput_phone_number {
   margin-left: -1px !important;
 }
+
+// Allow the Quill Doc to scroll.
+.ql-container {
+  overflow: auto;
+}
