@@ -13,12 +13,15 @@ import type {
   Result as PhoneResults,
 } from 'maz-ui/components/MazPhoneNumberInput'
 import PhoneNumber from 'awesome-phonenumber'
-import { EVENTS, VERIFICATION_METHOD } from '@/consts'
+import { EVENTS, VERIFICATION_METHOD, VERIFICATION_TYPE } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import NetworkService from '@/services/NetworkService'
 import AuthService from '@/services/AuthService'
 import LoggerService from '@/services/LoggerService'
 import { enrollStudentToIncentiveProgram } from '@/services/UserProductFlagsService'
+import FormEmail from '@/components/FormEmail.vue'
+import useVuelidate from '@vuelidate/core'
+import type { AxiosError } from 'axios'
 
 const store = useStore()
 const { closeModal, isFirstModalView } = defineProps<{
@@ -36,12 +39,18 @@ const isSubmitting = ref(false)
 const loadingMessage = ref('')
 const error = ref('')
 const parentalConsent = defineModel()
+const proxyEmail = ref('')
+
+const v$ = useVuelidate()
 
 const user = computed(() => store.state.user.user)
 const fallIncentiveProgramPayload = computed(
   () => store.getters['featureFlags/getFallIncentiveProgramPayload']
 )
 const isValidPhone = computed(() => phoneInput.value.isValid)
+const isValidEmail = computed(
+  () => !v$.value.$error && !v$.value.$silentErrors?.length
+)
 const isFallIncentiveParentalConsentEnabled = computed(
   () => store.getters['featureFlags/isFallIncentiveParentalConsentEnabled']
 )
@@ -62,13 +71,37 @@ const isValidVerificationCode = computed(() => {
     verificationCode.value.length !== 6 || isNaN(Number(verificationCode.value))
   )
 })
-const isSendingCodeToPhoneDisabled = computed(() => {
-  return (
-    phone.value === '' ||
-    !isValidPhone.value ||
-    isInternationalCountryCode.value ||
-    (isFallIncentiveParentalConsentEnabled.value && !parentalConsent.value)
-  )
+
+const verificationMethod = computed(() =>
+  user.value.isSchoolPartner
+    ? VERIFICATION_METHOD.EMAIL
+    : VERIFICATION_METHOD.SMS
+)
+const verificationMethodText = computed(() =>
+  verificationMethod.value === VERIFICATION_METHOD.SMS
+    ? 'phone number'
+    : 'email'
+)
+const sendTo = computed(() =>
+  verificationMethod.value === VERIFICATION_METHOD.SMS
+    ? phoneInput.value.e164
+    : proxyEmail.value
+)
+const isSendingCodeToUserDisabled = computed(() => {
+  if (user.value.isSchoolPartner)
+    // No parental consent is needed for school partners
+    // Only school partners are given the ption to enroll with email
+    return !isValidEmail.value
+  else {
+    const isVerificationMethodDisabled =
+      phone.value === '' ||
+      !isValidPhone.value ||
+      isInternationalCountryCode.value
+    return (
+      isVerificationMethodDisabled ||
+      (isFallIncentiveParentalConsentEnabled.value && !parentalConsent.value)
+    )
+  }
 })
 
 function handleCloseModal() {
@@ -84,23 +117,39 @@ async function resendCode() {
 }
 
 async function sendCode(isResending: boolean = false) {
+  if (isSubmitting.value) return
   error.value = ''
   isPhoneError.value = false
   AnalyticsService.captureEvent(
     EVENTS.STUDENT_FALL_INCENTIVE_ENROLLMENT_CLICKED_SEND_CODE
   )
-  if (!isValidPhone.value) {
+  if (
+    verificationMethod.value === VERIFICATION_METHOD.SMS &&
+    !isValidPhone.value
+  ) {
     isPhoneError.value = true
     return
   }
-  if (isSubmitting.value || isInternationalCountryCode.value) return
+
+  if (
+    (verificationMethod.value === VERIFICATION_METHOD.SMS &&
+      isInternationalCountryCode.value) ||
+    (verificationMethod.value === VERIFICATION_METHOD.EMAIL &&
+      !isValidEmail.value)
+  )
+    return
+
   isSubmitting.value = true
   loadingMessage.value = 'Sending a verification code. Please wait...'
 
   try {
     await NetworkService.sendVerification({
-      sendTo: phoneInput.value.e164,
-      verificationMethod: VERIFICATION_METHOD.SMS,
+      sendTo: sendTo.value,
+      verificationMethod: verificationMethod.value,
+      verificationType:
+        verificationMethod.value === VERIFICATION_METHOD.EMAIL
+          ? VERIFICATION_TYPE.EMAIL_FOR_PROXY_EMAIL
+          : undefined,
     })
     step.value = 2
     AnalyticsService.captureEvent(
@@ -109,16 +158,16 @@ async function sendCode(isResending: boolean = false) {
         : EVENTS.STUDENT_FALL_INCENTIVE_ENROLLMENT_VERIFICATION_CODE_SENT
     )
   } catch (err) {
-    // TODO: Remove ignore once NetworkService is converted to TS
-    // @ts-ignore
-    error.value = err.response.data.err
+    error.value =
+      ((err as AxiosError).response?.data as { err?: string })?.err ??
+      'Unknown error'
   } finally {
     isSubmitting.value = false
     loadingMessage.value = ''
   }
 }
 
-async function handlePhoneConfirmation() {
+async function handleCodeConfirmation() {
   error.value = ''
   if (isSubmitting.value) return
   isSubmitting.value = true
@@ -136,28 +185,42 @@ async function handlePhoneConfirmation() {
       data: { success },
     } = await AuthService.confirmVerification({
       verificationCode: verificationCode.value,
-      sendTo: phoneInput.value.e164,
-      verificationMethod: VERIFICATION_METHOD.SMS,
+      sendTo: sendTo.value,
+      verificationMethod: verificationMethod.value,
       forSignup: false,
+      verificationType:
+        verificationMethod.value === VERIFICATION_METHOD.EMAIL
+          ? VERIFICATION_TYPE.EMAIL_FOR_PROXY_EMAIL
+          : undefined,
     })
     AnalyticsService.captureEvent(
-      EVENTS.STUDENT_FALL_INCENTIVE_ENROLLMENT_PHONE_CONFIRMED
+      EVENTS.STUDENT_FALL_INCENTIVE_ENROLLMENT_CONFIRMED,
+      {
+        verificationMethod: verificationMethod.value,
+      }
     )
     if (success) {
       await enrollStudentToIncentiveProgram(store)
-      store.dispatch('user/addToUser', {
-        phone: phoneInput.value.e164,
-        phoneVerified: true,
-      })
+      const addToUserPayload =
+        verificationMethod.value === VERIFICATION_METHOD.SMS
+          ? {
+              phone: phoneInput.value.e164,
+              phoneVerified: true,
+            }
+          : {
+              email: proxyEmail.value,
+              emailVerified: true,
+            }
+      store.dispatch('user/addToUser', addToUserPayload)
       step.value = 3
     } else {
       error.value =
         'Please enter the most recent verification code that was sent to you'
     }
   } catch (err) {
-    // TODO: Remove ignore once NetworkService is converted to TS
-    // @ts-ignore
-    error.value = err.response.data.err
+    error.value =
+      ((err as AxiosError).response?.data as { err?: string })?.err ??
+      'Unknown error'
   } finally {
     isSubmitting.value = false
     loadingMessage.value = ''
@@ -173,9 +236,10 @@ async function handleEnrollmentDenial() {
     if (isFirstModalView)
       await NetworkService.deniedIncentiveProgramEnrollment()
   } catch (error) {
-    // TODO: Remove ignore once NetworkService is converted to TS
-    // @ts-ignore
-    LoggerService.noticeError(error.response.data.err)
+    LoggerService.noticeError(
+      ((error as AxiosError).response?.data as { err?: string })?.err ??
+        'Unknown error'
+    )
   } finally {
     handleCloseModal()
   }
@@ -186,13 +250,17 @@ onMounted(() => {
     EVENTS.STUDENT_FALL_INCENTIVE_ENROLLMENT_MODAL_SHOWN
   )
 
-  if (user.value.phone) {
-    const pn = new PhoneNumber(user.value.phone)
-    phone.value = pn.getNumber('national')
-    phoneInput.value = {
-      isValid: true,
-      e164: pn.getNumber('e164'),
+  if (verificationMethod.value === VERIFICATION_METHOD.SMS) {
+    if (user.value.phone) {
+      const pn = new PhoneNumber(user.value.phone)
+      phone.value = pn.getNumber('national')
+      phoneInput.value = {
+        isValid: true,
+        e164: pn.getNumber('e164'),
+      }
     }
+  } else {
+    if (user.value.proxyEmail) proxyEmail.value = user.value.proxyEmail
   }
 })
 </script>
@@ -238,13 +306,25 @@ onMounted(() => {
             }}
             gift card—up to $100 total! 👀
           </p>
-          <p class="incentive-enrollment-modal__body">
-            Join our Fall Challenge by verifying your phone number now!
+          <p
+            v-if="verificationMethod === VERIFICATION_METHOD.SMS"
+            class="incentive-enrollment-modal__body"
+          >
+            Join our Fall Challenge by verifying your
+            {{ verificationMethodText }}
+            now!
+          </p>
+          <p v-else class="incentive-enrollment-modal__body">
+            Your school email will not allow virtual gift cards so please verify
+            a personal email to enroll in the challenge!
           </p>
         </header>
 
         <section class="incentive-enrollment-modal__section">
-          <label class="incentive-enrollment-modal__phone-input">
+          <label
+            class="incentive-enrollment-modal__phone-input"
+            v-if="verificationMethod === VERIFICATION_METHOD.SMS"
+          >
             Phone Number
             <maz-phone-number-input
               class="incentive-enrollment-modal__phone-input"
@@ -264,18 +344,27 @@ onMounted(() => {
               Please enter a US phone number.
             </span>
           </label>
+
+          <FormEmail
+            v-else
+            v-model="proxyEmail"
+            :is-required="true"
+            label="Personal email"
+          />
           <p v-if="error" class="error">
             {{
-              error || 'We were unable to save your number. Please try again.'
+              error ||
+              'We were unable to send a verification code to you. Please try again.'
             }}
           </p>
 
-          <div class="parental-consent-container">
-            <checkbox
-              v-if="isFallIncentiveParentalConsentEnabled"
-              id="parental-consent"
-              v-model="parentalConsent"
-            >
+          <div
+            v-if="
+              isFallIncentiveParentalConsentEnabled && !user.isSchoolPartner
+            "
+            class="parental-consent-container"
+          >
+            <checkbox id="parental-consent" v-model="parentalConsent">
               I have consent from my parent/guardian to receive gift cards.
             </checkbox>
           </div>
@@ -292,7 +381,7 @@ onMounted(() => {
             <large-button
               class="incentive-enrollment-modal__buttons-button incentive-enrollment-modal__buttons-button--primary"
               @click="sendCode"
-              :disabled="isSendingCodeToPhoneDisabled"
+              :disabled="isSendingCodeToUserDisabled"
               primary
               :showArrow="false"
             >
@@ -305,8 +394,8 @@ onMounted(() => {
       <div v-else-if="step === 2" class="incentive-enrollment-modal">
         <header>
           <h1 class="incentive-enrollment-modal__title">
-            We just texted you your verification code to
-            <span class="verification__send-to">{{ phone }}</span>
+            We just sent a verification code to
+            <span class="verification__send-to">{{ sendTo }}</span>
           </h1>
         </header>
 
@@ -328,7 +417,7 @@ onMounted(() => {
             class="uc-form-subtext verification__sub-text"
             v-if="!hasResentCode"
           >
-            Did not receive a text?
+            Did not receive a code?
             <span
               :disabled="isSubmitting ? true : null"
               @click="resendCode"
@@ -355,12 +444,13 @@ onMounted(() => {
             >
             <large-button
               class="incentive-enrollment-modal__buttons-button incentive-enrollment-modal__buttons-button--primary"
-              @click="handlePhoneConfirmation"
+              @click="handleCodeConfirmation"
               :disabled="!isValidVerificationCode ? true : null"
               :showArrow="false"
               primary
             >
-              Verify my phone number
+              Verify my
+              {{ verificationMethodText }}
             </large-button>
           </div>
         </footer>
@@ -370,7 +460,7 @@ onMounted(() => {
           <h1
             class="incentive-enrollment-modal__title incentive-enrollment-modal__title--center"
           >
-            Your phone is verified!
+            Your {{ verificationMethodText }} is verified!
           </h1>
         </header>
 
