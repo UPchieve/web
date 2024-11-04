@@ -1,15 +1,12 @@
 <template>
   <div class="ReferralModal">
-    <component v-if="!mobileMode" :is="modalData.svg" class="icon" />
+    <updog-star class="icon" />
     <h1 class="ReferralModal-title">
-      {{ modalData.header || 'Invite Your Friends' }}
+      {{ headerText }}
     </h1>
-    <h2 class="ReferralModal-subtitle">
-      {{
-        modalData.subcopy ||
-        'Sharing is caring! Your friends can create their very own UPchieve account using the link below.'
-      }}
-    </h2>
+    <p class="ReferralModal-subtitle">
+      {{ bodyText }}
+    </p>
 
     <div>
       <h4 class="share-link">Share link</h4>
@@ -21,20 +18,28 @@
 <script>
 import { mapGetters } from 'vuex'
 import ReferralLink from '@/components/ReferralLink.vue'
+import UpdogStar from '@/assets/updog-star.svg'
 
 export default {
-  components: { ReferralLink },
-  props: {
-    modalData: { type: Object, required: true },
-  },
-  data() {
-    return {
-      selectedSubtopic: '',
-      copyMessage: 'Copy',
-    }
-  },
+  components: { ReferralLink, UpdogStar },
   computed: {
-    ...mapGetters({ mobileMode: 'app/mobileMode' }),
+    ...mapGetters({
+      mobileMode: 'app/mobileMode',
+      isStudent: 'user/isStudent',
+      isVolunteer: 'user/isVolunteer',
+    }),
+    headerText() {
+      return 'Invite Your Friends'
+    },
+    bodyText() {
+      if (this.isStudent) {
+        return 'Sharing is caring! Your friends can create their very own UPchieve account using the link below.'
+      }
+      if (this.isVolunteer) {
+        return 'Do you have a friend who would enjoy tutoring on UPchieve? Send them an invite to sign-up using your special link below!'
+      }
+      return 'Your friends can create their very own UPchieve account using the link below.'
+    },
   },
 }
 </script>
@@ -49,6 +54,8 @@ p {
 
 .icon {
   align-self: center;
+  height: fit-content;
+  width: 50%;
 }
 
 .ReferralModal {

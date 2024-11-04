@@ -34,6 +34,10 @@ const TRAINING_LINK = {
   to: '/training',
   text: 'Training',
 }
+const INVITE_FRIEND_LINK = {
+  onClick: () => {},
+  text: 'Invite a Friend',
+}
 const COMMUNITY_LINK = {
   // This link changes. Just match the consistent portion.
   to: 'https://join.slack.com/t/upchieveaccommunity/shared_invite/',
@@ -67,6 +71,7 @@ const links = {
       CALENDAR_LINK,
       SESSION_HISTORY_LINK,
       PROFILE_LINK,
+      INVITE_FRIEND_LINK,
       CONTACT_LINK,
       COMMUNITY_LINK,
     ],
@@ -77,6 +82,7 @@ const links = {
       SESSION_HISTORY_LINK,
       ADMIN_LINK,
       PROFILE_LINK,
+      INVITE_FRIEND_LINK,
       CONTACT_LINK,
       COMMUNITY_LINK,
     ],
@@ -153,7 +159,10 @@ describe('SidebarLinks', () => {
       expect(sidebarLinks.length).toBe(expectedLinks.length)
       expectedLinks.forEach((link, i) => {
         const sidebarLink = sidebarLinks.at(i)
-        expect(sidebarLink.props('to')).toContain(link.to)
+        if (!link.onClick) {
+          expect(sidebarLink.props('to')).toContain(link.to)
+        }
+
         // expect(sidebarLink.contains(link.icon)).toBe(true);
         expect(sidebarLink.props('text')).toBe(link.text)
       })

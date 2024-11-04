@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import config from '@/config'
@@ -21,13 +21,15 @@ import config from '@/config'
 export default {
   data() {
     return {
-      selectedSubtopic: '',
       copyMessage: 'Copy',
     }
   },
   computed: {
     ...mapState({
       user: (state) => state.user.user,
+    }),
+    ...mapGetters({
+      userType: 'user/userType',
     }),
     referralLink() {
       const { referralCode } = this.user
@@ -46,7 +48,9 @@ export default {
       }
       try {
         await navigator.clipboard.writeText(this.referralLink)
-        AnalyticsService.captureEvent(EVENTS.STUDENT_COPIED_REFERRAL_LINK)
+        AnalyticsService.captureEvent(EVENTS.USER_COPIED_REFERRAL_LINK, {
+          userType: this.userType,
+        })
         this.copyMessage = 'Copied'
         setTimeout(() => {
           this.copyMessage = 'Copy'
