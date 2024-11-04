@@ -70,6 +70,7 @@
             <th>Time Tutored</th>
             <th>Last Session</th>
             <th>Details</th>
+            <th></th>
           </tr>
           <tr
             v-for="student in students"
@@ -86,8 +87,23 @@
                 @click="viewStudentDetails(student)"
                 :data-testid="`view-details-btn-${student.id}`"
               >
-                Student Details <RightArrow />
+                View Details
               </button>
+            </td>
+            <td>
+              <div class="menu-button">
+                <button @click="openStudentMenu(student)">
+                  <MenuButtons />
+                </button>
+              </div>
+              <div
+                class="student-menu"
+                v-if="toggledStudentMenuId === student.id"
+              >
+                <button @click="removeStudent(student.id)">
+                  <p><Remove /> Remove from class</p>
+                </button>
+              </div>
             </td>
           </tr>
         </table>
@@ -187,7 +203,6 @@
 import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
-import RightArrow from '@/assets/RightArrow.svg'
 import LinkUnion from '@/assets/LinkUnion.svg'
 import Checklist from '@/assets/Checklist.svg'
 import Check from '@/assets/check.svg'
@@ -196,18 +211,21 @@ import AssignmentIcon from '@/assets/AssignmentIcon.svg'
 import Pencil from '@/assets/pencil.svg'
 import moment from 'moment'
 import { EVENTS } from '@/consts'
+import MenuButtons from '@/assets/Menu.svg'
+import Remove from '@/assets/Remove.svg'
 
 export default {
   name: 'ClassDetails',
   components: {
     Loader,
-    RightArrow,
     LinkUnion,
     Checklist,
     AssignmentIcon,
     Check,
     Arrow,
     Pencil,
+    MenuButtons,
+    Remove,
   },
 
   data() {
@@ -223,6 +241,7 @@ export default {
       assignmentsCompletion: {},
       className: this.classInfo.name,
       topicId: this.classInfo.topicId,
+      toggledStudentMenuId: '',
     }
   },
   props: {
@@ -411,6 +430,14 @@ export default {
       )
     },
 
+    openStudentMenu(student) {
+      if (this.toggledStudentMenuId === student.id) {
+        this.toggledStudentMenuId = null
+      } else {
+        this.toggledStudentMenuId = student.id
+      }
+    },
+
     async showAssignments() {
       this.assignments = await this.getClassAssignments()
       const assignmentIds = this.assignments.map((assignment) => assignment.id)
@@ -521,6 +548,27 @@ export default {
         this.$router.push('/dashboard')
       } catch (err) {
         this.error = err.response.data.err ?? 'Unable to deactivate class.'
+      }
+    },
+
+    async removeStudent(studentId) {
+      try {
+        const {
+          data: { removedId },
+        } = await NetworkService.removeStudentFromClass({
+          studentId,
+          classId: this.classInfo.id,
+        })
+        if (!removedId) {
+          alert('This student was unable to be removed from class.')
+        }
+        this.toggledStudentMenuId = ''
+        this.students = this.students.filter(
+          (student) => student.userId !== removedId[0].studentid
+        )
+      } catch (err) {
+        this.error =
+          err.response.data.err ?? 'Unable to remove student from class.'
       }
     },
   },
@@ -665,8 +713,6 @@ export default {
   font-size: 14px;
   color: #1855d1;
   align-self: center;
-  border: 1px solid #1855d1;
-  border-radius: 32px;
   font-weight: 500;
 }
 
@@ -822,5 +868,32 @@ export default {
 .is-selected {
   border-bottom: 4px solid $c-success-green;
   z-index: 5;
+}
+
+.menu-button {
+  @include flex-container(column, center, center);
+  width: 30px;
+  height: 30px;
+}
+
+.menu-button:hover {
+  border-radius: 100%;
+  background-color: $c-background-grey;
+}
+
+.student-menu {
+  @include flex-container(column, center, center);
+  border: 1px solid $c-border-grey;
+  border-radius: 6px;
+  padding: 8px;
+  position: absolute;
+  right: 7%;
+  width: auto;
+  z-index: 3;
+  background-color: #fff;
+
+  p {
+    margin-bottom: 0;
+  }
 }
 </style>
