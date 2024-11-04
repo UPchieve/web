@@ -51,7 +51,16 @@ const step = computed(() => {
 
 onBeforeMount(async () => {
   await store.dispatch('botConversations/fetchAllSubjects')
-  router.replace({ query: { step: STEPS.subjectSelection } })
+  const subject = store.state.botConversations.subjects.find(
+    ({ name }) => name === route.query.subject
+  )
+  // Skip subject selection when subject query param is present
+  if (subject) {
+    currentSubject.value = subject
+    router.replace({ query: { step: STEPS.firstMessage } })
+  } else {
+    router.replace({ query: { step: STEPS.subjectSelection } })
+  }
 })
 
 watch(

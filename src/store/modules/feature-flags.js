@@ -35,6 +35,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM_PARENTAL_CONSENT]: false,
       [POSTHOG_FEATURE_FLAGS.NATIONAL_STUDENT_PHONE]: false,
       [POSTHOG_FEATURE_FLAGS.AI_OTHER_SUBJECT_SURVEY]: false,
+      [POSTHOG_FEATURE_FLAGS.CHOOSE_TUTOR_TYPE]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -51,8 +52,12 @@ export default {
       [POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT]: { type: 'unified' },
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM]: {},
     },
+    eligibleForChooseTutorType: false,
   },
   mutations: {
+    updateEligibleForChooseTutorType(state, value) {
+      state.eligibleForChooseTutorType = value
+    },
     updateFlags(state) {
       for (const flag of Object.keys(state.toggleFlags)) {
         state.toggleFlags[flag] =
@@ -169,5 +174,8 @@ export default {
     aiTutor: (state) => state.multivariantFlags[POSTHOG_FEATURE_FLAGS.AI_TUTOR],
     showAiOtherSubjectSurvey: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.AI_OTHER_SUBJECT_SURVEY],
+    showChooseTutorType: (state) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.CHOOSE_TUTOR_TYPE] ||
+      state.eligibleForChooseTutorType,
   },
 }

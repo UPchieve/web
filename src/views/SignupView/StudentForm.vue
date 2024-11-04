@@ -1033,6 +1033,11 @@ export default {
       this.useParentGuardianSignUpFlow = true
     }
 
+    this.$store.commit(
+      'featureFlags/updateEligibleForChooseTutorType',
+      queryParams['utm_source'] === 'AI Landing page'
+    )
+
     localStorage.removeItem('isSSOSignUpRedirect')
     if (this.isFailureRedirect()) {
       this.eligibility = {
