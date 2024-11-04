@@ -1139,4 +1139,9 @@ export default {
       this._errorHandler
     )
   },
+  removeStudentFromClass({ studentId, classId }) {
+    return httpDelete(
+      `${API_ROOT}/teachers/class/${classId}/student/${studentId}/remove`
+    ).then(this._successHandler, this._errorHandler)
+  },
 }
