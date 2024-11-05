@@ -1344,6 +1344,18 @@ export default {
       })
         .then(async (response) => {
           const isEligible = response.data.isEligible
+          const isExistingUser = response.data.isExistingUser || false
+
+          if (isExistingUser) {
+            const redirectUriParams = new URLSearchParams({
+              message:
+                'Looks like you already have an UPchieve account, please sign in!',
+              email: this.eligibility.studentEmail,
+            })
+            this.$router.push('/login?' + redirectUriParams.toString())
+            return
+          }
+
           AnalyticsService.captureEvent(
             isEligible
               ? EVENTS.ELIGIBILITY_ELIGIBLE
