@@ -1,7 +1,7 @@
 import Gleap from 'gleap'
 import posthog from 'posthog-js'
 import config from '../config'
-import { EVENTS } from '../consts'
+import { EVENTS } from '@/consts'
 
 const GLEAP_TRACK_EVENTS = new Set([
   EVENTS.STUDENT_SHOWN_ONBOARDING_MODAL,
@@ -16,7 +16,7 @@ type UserProperties = {
 }
 
 class AnalyticsService {
-  static init() {
+  static async init() {
     if (config.gleapSdkKey) {
       Gleap.initialize(config.gleapSdkKey)
       Gleap.getInstance().softReInitialize()
@@ -24,6 +24,24 @@ class AnalyticsService {
         this.captureEvent(EVENTS.GLEAP_CLOSED)
       })
     }
+
+    // Update the Gleap posthogFeatureFlags person property as feature flags are updated
+    const { default: store } = await import('@/store')
+    store.subscribe((mutation, state) => {
+      if (mutation.type === 'featureFlags/updateFlags') {
+        const keyPrefix = 'ph-ff-'
+        const posthogFeatureFlags: Record<string, string | boolean> = {}
+        for (const key in state.featureFlags.toggleFlags) {
+          posthogFeatureFlags[`${keyPrefix}${key}`] =
+            state.featureFlags.toggleFlags[key]
+        }
+        for (const key in state.featureFlags.multivariantFlags) {
+          posthogFeatureFlags[`${keyPrefix}${key}`] =
+            state.featureFlags.multivariantFlags[key]
+        }
+        Gleap.identify(state.user.user.id, { customData: posthogFeatureFlags })
+      }
+    })
   }
 
   static identify(userId, properties) {
