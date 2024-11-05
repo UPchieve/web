@@ -54,7 +54,7 @@ async function main() {
       flagsResponse.value?.data?.featureFlagPayloads,
       flagsResponse.value?.data?.personProperties
     )
-    AnalyticsService.init()
+    await AnalyticsService.init()
 
     // Create Vue instance
     const app = createApp(App)
