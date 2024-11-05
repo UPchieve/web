@@ -533,6 +533,16 @@ export default {
     toggleColorPicker() {
       this.showColorPicker = !this.showColorPicker
       this.showShapes = false
+      /* since the eraser is also a `brush`, let's assume the user
+       * doesn't want to erase in the color they just chose and automatically switch
+       * to the brush
+       */
+      if (
+        this.zwibblerCtx.getCurrentTool() === 'brush' &&
+        !this.showColorPicker
+      ) {
+        this.useBrushTool()
+      }
     },
     toggleShapes() {
       this.showShapes = !this.showShapes
@@ -779,11 +789,11 @@ export default {
         this.isConnected = true
         this.zwibblerCtx.setConfig('readOnly', false)
         // @todo access the connection in a less sketchy way
-        // 'development' assumes using zwibbler-demo, other envs use zwibbler2 from the cdn
-        const zwibblerWsConnection =
-          import.meta.env.NODE_ENV === 'development'
-            ? this.zwibblerCtx.zc.Pb.Pb
-            : this.zwibblerCtx.Ec.rc.rc
+        // If you're using public/static/zwibbler-demo.js as your VUE_APP_ZWIBBLER_URL value,
+        // then get the `zc.Pb.Pb` else assume you're using zwibbler2.js from the cdn
+        const zwibblerWsConnection = this.zwibblerCtx?.zc?.Pb?.Pb
+          ? this.zwibblerCtx.zc.Pb.Pb
+          : this.zwibblerCtx.Ec.rc.rc
         const zwibblerOnMessage = zwibblerWsConnection.onmessage
         const zwibblerOnClose = zwibblerWsConnection.onclose
         // Intercept Zwibbler's websocket message handler
@@ -798,7 +808,9 @@ export default {
           // Note: the properties to access will change with every new Zwibbler update
           const err = new Error(
             `WebSocket for the ${this.userType} in session ${this.sessionId} closed with code ${closeEvent.code} for reason: "${closeEvent.reason}" in room: ${
-              import.meta.env.NODE_ENV === 'development'
+              // If you're using public/static/zwibbler-demo.js as your VUE_APP_ZWIBBLER_URL value,
+              // then get the `zc.zc.Hx` else assume you're using zwibbler2.js from the cdn
+              this.zwibblerCtx?.zc?.Hx
                 ? this.zwibblerCtx.zc.Hx
                 : this.zwibblerCtx.Ec.cC
             }`
