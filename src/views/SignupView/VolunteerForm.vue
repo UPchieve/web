@@ -346,9 +346,11 @@ export default {
         phone: this.phoneInputInfo.e164,
         signupSourceId: this.signupSourceId,
         otherSignupSource: this.otherSignupSource,
+        referredByCode: window.localStorage.getItem('upcReferredByCode'),
       })
         .then(() => {
           this.isRegistering = false
+          window.localStorage.removeItem('upcReferredByCode')
           this.$router.push('/verify')
         })
         .catch((err) => {
