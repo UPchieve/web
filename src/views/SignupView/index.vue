@@ -148,14 +148,12 @@ export default {
     const referralCode = this.$route.query.referral
     if (referralCode) {
       this.isCheckingReferral = true
-      window.localStorage.setItem('upcReferredByCode', referralCode)
 
       try {
         const {
           data: { user },
         } = await NetworkService.getReferredBy(referralCode)
         if (!user) {
-          window.localStorage.removeItem('upcReferredByCode')
           AnalyticsService.captureEvent(
             EVENTS.USER_VISITED_INCORRECT_REFERRAL_LINK,
             {
@@ -164,6 +162,7 @@ export default {
           )
         } else {
           this.referredBy = user
+          window.localStorage.setItem('upcReferredByCode', referralCode)
           AnalyticsService.captureEvent(EVENTS.USER_VISITED_REFERRAL_LINK, {
             referralCode,
             userType: this.referredBy.userType,
