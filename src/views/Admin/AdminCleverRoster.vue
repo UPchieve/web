@@ -7,6 +7,7 @@ import NetworkService from '@/services/NetworkService'
 import type { AxiosError } from 'axios'
 
 const districtId = ref<string>('')
+const cleverToUPchieveIds = ref<string>('')
 const isSubmitting = ref<boolean>(false)
 const msg = ref<string | JSON>()
 const isError = ref<boolean>(false)
@@ -18,7 +19,10 @@ async function submit() {
   try {
     const {
       data: { report },
-    } = await NetworkService.adminCleverRoster(districtId.value)
+    } = await NetworkService.adminCleverRoster(
+      districtId.value,
+      cleverToUPchieveIds.value
+    )
     if (!isEmpty(report.failedSchools)) {
       isError.value = true
     }
@@ -67,7 +71,11 @@ function disableSubmit() {
     <ul>
       <li>
         If a school is missing an nces_id, reach out to Clever support for them
-        to fill it in.
+        to fill it in. Alternatively, you can use the `Clever to UPchieve IDs`
+        input field to create JSON string (something that looks like:
+        `{"cleverSchoolId": "upchieveSchoolId", "otherCleverSchoolId":
+        "otherUPchieveSchoolId"}` mapping the Clever School ID to UPchieve
+        school ID. The schools in that mapping take precedence.
       </li>
       <li>
         If any students are missing required fields, reach out to the district
@@ -85,6 +93,13 @@ function disableSubmit() {
         name="clever-district-id"
         v-model="districtId"
       ></form-input>
+      <div class="uc-form-element mt-4">
+        <label for="clever-to-upchieve-ids">Clever to UPchieve IDs</label>
+        <textarea
+          name="clever-to-upchieve-ids"
+          v-model="cleverToUPchieveIds"
+        ></textarea>
+      </div>
       <button
         class="uc-form-button"
         type="submit"
