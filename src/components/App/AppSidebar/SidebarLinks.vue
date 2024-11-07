@@ -80,6 +80,14 @@
       </sidebar-link>
 
       <sidebar-link
+        v-if="isVolunteer"
+        :onClick="openReferFriendModal"
+        text="Invite a Friend"
+      >
+        <refer-friend-icon class="icon" />
+      </sidebar-link>
+
+      <sidebar-link
         v-if="showDashboardRedesign"
         text="Refer a Friend"
         :onClick="openReferFriendModal"
@@ -116,7 +124,6 @@ import HeartIcon from '@/assets/heart.svg'
 import HouseIcon from '@/assets/sidebar_icons/house.svg'
 import PortraitIcon from '@/assets/sidebar_icons/portrait.svg'
 import ReferFriendIcon from '@/assets/sidebar_icons/refer-friend-icon.svg'
-import ReferralSVG from '@/assets/dashboard_icons/student/referral.svg'
 import SlackLogoIcon from '@/assets/slack-logo-icon.svg'
 import YourProgressIcon from '@/assets/your-progress.svg'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -158,6 +165,7 @@ export default {
       isStudent: 'user/isStudent',
       isTeacher: 'user/isTeacher',
       isAiTutorActive: 'featureFlags/aiTutor',
+      userType: 'user/userType',
     }),
     showStudentMyClassesLink() {
       return this.isStudent && this.numberOfStudentClasses > 0
@@ -165,29 +173,16 @@ export default {
   },
   methods: {
     openReferFriendModal() {
-      AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_REFER_A_FRIEND)
-      let header
-      let subcopy
-      if (this.referralCopy === 'baseline') {
-        header =
-          'Know a friend or classmate who would benefit from free 24/7 tutoring?'
-        subcopy = 'Invite them to UPchieve!'
-      } else if (this.referralCopy === 'small-gift-card') {
-        header =
-          'UPchieve can help your friends succeed! Refer 5 friends to UPchieve and get a $25 gift card when they sign up.'
-        subcopy = 'Refer your friends now'
-      } else if (this.referralCopy === 'emotional-appeal-struggling') {
-        header =
-          'Do you have friends, siblings, or classmates struggling in a class? When you share UPchieve, you can help a struggling friend succeed!'
-        subcopy = 'Invite them to UPchieve!'
-      }
+      AnalyticsService.captureEvent(
+        EVENTS.USER_CLICKED_REFER_A_FRIEND_SIDEBAR_LINK,
+        {
+          userType: this.userType,
+        }
+      )
       this.$store.dispatch('app/modal/show', {
         component: 'ReferralModal',
         data: {
-          svg: ReferralSVG,
           showAccept: false,
-          header,
-          subcopy,
         },
       })
     },

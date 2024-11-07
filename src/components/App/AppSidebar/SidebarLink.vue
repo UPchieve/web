@@ -80,6 +80,7 @@ export default {
   cursor: pointer;
 
   p {
+    color: $c-soft-black;
     margin: 0;
     padding: 0;
   }
