@@ -13,18 +13,29 @@
       <volunteer-form v-if="this.userSelection === 'volunteer'" />
       <student-form v-else-if="this.userSelection === 'student'" />
 
+      <loader
+        v-else-if="isCheckingReferral"
+        class="uc-row justify-center"
+      ></loader>
       <div v-else>
         <h1 class="uc-form-header">{{ welcomeMessage }}</h1>
-        <p v-if="isReferred" class="uc-form-text">
+        <p v-if="isReferredByStudent" class="uc-form-text">
           UPchieve is a nonprofit that provides 100% free online tutoring and
           college counseling, available 24/7! Check if you are eligible!
+        </p>
+        <p v-else-if="isReferredByVolunteer" class="uc-form-text">
+          UPchieve is a nonprofit that provides 100% free online tutoring and
+          college counseling to low income students in the U.S.
+          <br /><br />
+          Sign up as a tutor to help low income students succeed in school and
+          beyond!
         </p>
         <p v-else class="uc-form-text">
           We are a nonprofit that provides free, online tutoring and college
           counseling to eligible middle and high school students.
         </p>
 
-        <div v-if="isReferred" class="uc-column items-center">
+        <div v-if="isReferredByStudent" class="uc-column items-center">
           <button
             class="uc-form-button"
             type="submit"
@@ -38,6 +49,23 @@
             rel="noopener noreferrer"
             class="link"
             href="https://upchieve.org/students"
+            >Tell me more about UPchieve first
+          </a>
+        </div>
+        <div v-else-if="isReferredByVolunteer" class="uc-column items-center">
+          <button
+            class="uc-form-button"
+            type="submit"
+            @click.prevent="selectVolunteer()"
+          >
+            I'm ready to tutor!
+          </button>
+
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            class="link"
+            href="https://upchieve.org/volunteer-with-us"
             >Tell me more about UPchieve first
           </a>
         </div>
@@ -79,6 +107,7 @@
 import { mapGetters } from 'vuex'
 import { capitalize } from 'lodash-es'
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
+import Loader from '@/components/Loader.vue'
 import SignUpForms from './SignUpForms.vue'
 import StudentForm from './StudentForm.vue'
 import VolunteerForm from './VolunteerForm.vue'
@@ -95,6 +124,7 @@ export default {
   name: 'signup-view',
   components: {
     FormPageTemplate,
+    Loader,
     SignUpForms,
     StudentForm,
     VolunteerForm,
@@ -104,7 +134,7 @@ export default {
   data() {
     return {
       userSelection: null,
-      isReferred: false,
+      isCheckingReferral: false,
       referredBy: {},
       UserType,
       getStudentPageDetails,
@@ -117,20 +147,31 @@ export default {
 
     const referralCode = this.$route.query.referral
     if (referralCode) {
+      this.isCheckingReferral = true
       window.localStorage.setItem('upcReferredByCode', referralCode)
-      AnalyticsService.captureEvent(EVENTS.USER_VISITED_REFERRAL_LINK, {
-        referralCode,
-      })
-      this.isReferred = true
 
-      const {
-        data: { user },
-      } = await NetworkService.getReferredBy(referralCode)
-
-      if (!user) {
-        this.isReferred = false
-        window.localStorage.removeItem('upcReferredByCode')
-      } else this.referredBy = user
+      try {
+        const {
+          data: { user },
+        } = await NetworkService.getReferredBy(referralCode)
+        if (!user) {
+          window.localStorage.removeItem('upcReferredByCode')
+          AnalyticsService.captureEvent(
+            EVENTS.USER_VISITED_INCORRECT_REFERRAL_LINK,
+            {
+              referralCode,
+            }
+          )
+        } else {
+          this.referredBy = user
+          AnalyticsService.captureEvent(EVENTS.USER_VISITED_REFERRAL_LINK, {
+            referralCode,
+            userType: this.referredBy.userType,
+          })
+        }
+      } finally {
+        this.isCheckingReferral = false
+      }
     }
 
     if (this.$route.params) {
@@ -147,15 +188,16 @@ export default {
       useNewSignUpFlow: 'featureFlags/useNewSignUpFlow',
     }),
     welcomeMessage() {
-      if (this.isReferred && this.referredBy)
-        return `${this.firstName} invited you to UPchieve!`
+      if (this.referredBy?.firstName)
+        return `${capitalize(this.referredBy.firstName)} invited you to UPchieve!`
 
       return 'Welcome to UPchieve!'
     },
-    firstName() {
-      if (this.referredBy && this.referredBy.firstname)
-        return capitalize(this.referredBy.firstname)
-      else return ''
+    isReferredByStudent() {
+      return this.referredBy.userType === this.UserType.student
+    },
+    isReferredByVolunteer() {
+      return this.referredBy.userType === this.UserType.volunteer
     },
   },
 
@@ -180,6 +222,7 @@ export default {
 }
 
 .uc-form-text {
+  font-size: 16px;
   margin-top: 25px;
   text-align: center;
 
