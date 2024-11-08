@@ -284,9 +284,7 @@ export default {
       isFetchingIsSessionRecapEligible: false,
       sessionHasEnded: false,
       showFallIncentiveReviewWarningModal: false,
-      unsubscribeFromActionSubscription: () => undefined,
       aiWidgetHidden: true,
-      gettingTutorBotConversation: false,
       aiWidgetEnabled: false,
       hasUnreadAiTutorMessage: false,
       showAiAssistedTutoringModal: false,
@@ -336,7 +334,6 @@ export default {
         sessionId: this.sessionId,
       }
     },
-
     sessionToolTypes() {
       return SESSION_TOOL_TYPES
     },
@@ -516,18 +513,27 @@ export default {
        * session is elgible, if they are, we can also enable it for
        * the volunteer
        */
-      FeatureFlagService.isFeatureEnabledForUser(
-        POSTHOG_FEATURE_FLAGS.AI_TUTOR,
-        student?.id
-      ).then((r) => {
-        this.aiWidgetEnabled = [
-          'stand-alone-in-session',
-          'stand-alone-in-session-handoff',
-        ].includes(r.isEnabled)
-        if (!localStorage.getItem('seen-ai-assisted-modal')) {
-          this.setShowAiAssistedTutoringModal(this.aiWidgetEnabled)
-        }
-      })
+      if (student?.id) {
+        FeatureFlagService.isFeatureEnabledForUser(
+          POSTHOG_FEATURE_FLAGS.AI_TUTOR,
+          student?.id
+        )
+          .then((r) => {
+            this.aiWidgetEnabled = [
+              'stand-alone-in-session',
+              'stand-alone-in-session-handoff',
+            ].includes(r.isEnabled)
+            if (!localStorage.getItem('seen-ai-assisted-modal')) {
+              this.setShowAiAssistedTutoringModal(this.aiWidgetEnabled)
+            }
+          })
+          .catch((err) => {
+            LoggerService.noticeError(
+              `Failed to check if AI tutor is enabled for user=${student?.id}`,
+              err
+            )
+          })
+      }
     },
 
     async aiTutorSetupProps({
@@ -544,16 +550,26 @@ export default {
         sessionId
       ) {
         this.$store.commit('botConversations/setIsFetchingConversation', true)
-        const { data: conversation } =
-          await NetworkService.getOrCreateTutorBotConversationWithMessagesBySessionId(
-            sessionId
+        try {
+          const { data: conversation } =
+            await NetworkService.getOrCreateTutorBotConversationWithMessagesBySessionId(
+              sessionId
+            )
+          await this.$store.dispatch(
+            'botConversations/setConversation',
+            conversation.conversationId
           )
-        await this.$store.dispatch(
-          'botConversations/setConversation',
-          conversation.conversationId
-        )
-
-        this.$store.commit('botConversations/setIsFetchingConversation', false)
+        } catch (err) {
+          LoggerService.noticeError(
+            `Failed to get or created tutor bot conversation for session ${sessionId}`,
+            err
+          )
+        } finally {
+          this.$store.commit(
+            'botConversations/setIsFetchingConversation',
+            false
+          )
+        }
 
         if (
           !this.mobileMode &&
