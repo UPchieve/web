@@ -190,45 +190,56 @@ export default {
   emits: ['try-clicked'],
   methods: {
     end() {
+      if (this.isSessionEnding) {
+        return
+      }
+      this.isSessionEnding = true
+
       if (this.isSessionWaitingForVolunteer) {
         const shouldEndSession = window.confirm(
           "Are you sure you want to cancel this request? If you've been waiting less than 5 minutes, you won't be able to make another request right away."
         )
 
         if (!shouldEndSession) {
+          this.isSessionEnding = false
           return
         }
       } else {
-        // Only ask for confirmation if session hasn't been ended by other user
+        // Only ask for confirmation if session hasn't been ended by other user.
         const shouldEndSession = this.isSessionAlive
           ? window.confirm('Do you really want to end the session?')
           : true
 
         // Early exit if user didn't confirm
         if (!shouldEndSession) {
+          this.isSessionEnding = false
           return
         }
       }
 
-      if (this.isSessionEnding) {
-        return
-      }
-      this.isSessionEnding = true
       this.endSession()
     },
-    endSession() {
+    async endSession() {
       const sessionId = this.session._id
+      let isSuccessful = false
 
-      SessionService.endSession(this, sessionId)
-        .then(() => {
+      try {
+        await SessionService.endSession(sessionId, this.session.subTopic)
+        isSuccessful = true
+      } catch (err) {
+        if (err?.response?.data?.err === 'Session has already ended') {
+          isSuccessful = true
+        }
+      } finally {
+        if (isSuccessful) {
           this.$store.dispatch('user/sessionDisconnected')
-          if (!this.isSessionRecapDmsActive) this.goToFeedbackPage()
           // Do not send the user directly to the feedback page if they can leave DMs
+          if (!this.isSessionRecapDmsActive) this.goToFeedbackPage()
+          // Send students directly to feedback page whether or not volunteers can send DMs.
           if (this.isStudent) this.goToFeedbackPage()
-          //Send students directly to feedback page whether or not volunteers can send DMs.
           this.isSessionEnding = false
-        })
-        .catch(this.alertCouldNotEnd)
+        }
+      }
     },
     reportSession() {
       this.$store.dispatch('app/modal/show', {
@@ -238,10 +249,6 @@ export default {
           currentSession: this.session,
         },
       })
-    },
-    alertCouldNotEnd() {
-      this.isSessionEnding = false
-      window.alert('Could not end session')
     },
     tryReconnect() {
       // socket must be closed before reopening for automatic reconnections
