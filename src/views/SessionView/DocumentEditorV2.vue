@@ -16,7 +16,11 @@
       <select class="ql-background" />
       <button class="ql-list" value="ordered" />
       <button class="ql-list" value="bullet" />
-      <button class="ql-aiWidget" v-if="isAiWidgetEnabled">
+      <button
+        class="ql-aiWidget"
+        v-if="isAiWidgetEnabled"
+        @click="onWidgetClicked"
+      >
         <ChatBotIcon class="chat-bot-icon" />
         <activity-dot v-if="showHasAiMessageIndicator" />
       </button>
@@ -159,11 +163,6 @@ export default {
         sessionType: 'DocumentEditorV2',
       })
 
-    const handlers = {}
-    if (this.isAiWidgetEnabled) {
-      handlers.aiWidget = this.onWidgetClicked
-    }
-
     this.quillEditor = markRaw(
       new Quill('#quill-container', {
         placeholder: 'Type or paste something...',
@@ -193,7 +192,6 @@ export default {
           },
           toolbar: {
             container: '#ql-toolbar',
-            handlers,
           },
         },
       })
