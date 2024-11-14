@@ -4,17 +4,12 @@ import AnalyticsService from './AnalyticsService'
 import NetworkService from './NetworkService'
 
 export default {
-  loading: false,
-
-  endSession(context, sessionId) {
-    return NetworkService.endSession({ sessionId }).then(() => {
-      const currentSessionData = context.$store.state.user.session
-
-      AnalyticsService.captureEvent(EVENTS.SESSION_ENDED, {
-        event: EVENTS.SESSION_ENDED,
-        sessionId: sessionId,
-        subject: currentSessionData.subTopic,
-      })
+  async endSession(sessionId: string, subTopic: string) {
+    await NetworkService.endSession({ sessionId })
+    AnalyticsService.captureEvent(EVENTS.SESSION_ENDED, {
+      event: EVENTS.SESSION_ENDED,
+      sessionId: sessionId,
+      subject: subTopic,
     })
   },
 
