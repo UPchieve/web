@@ -3,9 +3,6 @@
     class="session"
     :class="{ 'session--whiteboard': auxiliaryType === 'WHITEBOARD' }"
   >
-    <div class="session-header-container">
-      <session-header @try-clicked="tryClicked" />
-    </div>
     <div
       v-if="sessionId"
       class="session-contents-container"
@@ -19,6 +16,7 @@
         @dragging="draggingAiWidget"
         @resizing="resizingAiWidget"
       />
+
       <div
         class="auxiliary-container"
         id="auxiliary-container"
@@ -53,6 +51,10 @@
           v-else-if="auxiliaryType === sessionToolTypes.DOCUMENT_EDITOR"
           :sessionId="this.sessionId"
         />
+      </div>
+
+      <div class="session-header-container">
+        <session-header @try-clicked="tryClicked" />
       </div>
       <div
         class="chat-container"
@@ -815,6 +817,7 @@ export default {
   *     (we need to rethink the containing model in order to do so)
   */
 .session {
+  width: 100%;
   position: relative; /*[1]*/
   height: 100%; /*[1]*/
 
@@ -827,44 +830,36 @@ export default {
 }
 
 .session-header-container {
-  position: fixed;
-  z-index: 3;
-  top: 0;
-  left: 0;
+  grid-area: 1 / 1 / 2 / 2;
   width: 100%;
   background: #fff;
 
   @include breakpoint-above('medium') {
-    position: absolute;
-    top: 20px;
-    left: unset;
-    right: 20px;
-    width: 300px;
-    height: 70px;
+    grid-area: 1 / 4 / 2 / 5;
     background: #fff;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     overflow: hidden;
   }
-
-  @include breakpoint-above('large') {
-    width: 400px;
-  }
 }
 
 .session-contents-container {
   height: 100%;
-  padding-top: 100px;
-  display: flex;
   background: $c-background-grey;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: minmax(min-content, max-content) 1fr;
+  grid-column-gap: 15px;
+  grid-row-gap: 0px;
 
   @include breakpoint-above('medium') {
     padding: 20px;
-    @include child-spacing(right, 15px);
+    grid-template-columns: repeat(3, 1fr) minmax(300px, 1fr);
+    grid-template-rows: minmax(min-content, max-content) 1fr;
   }
 
-  @include breakpoint-below('medium') {
-    padding-top: 80px;
+  @include breakpoint-above('large') {
+    grid-template-columns: repeat(3, 1fr) minmax(400px, 400px);
   }
 }
 
@@ -904,54 +899,43 @@ export default {
 .auxiliary-container,
 .chat-container {
   @include breakpoint-above('medium') {
-    border-radius: 8px;
     overflow: hidden;
-  }
-
-  @include breakpoint-below('medium') {
-    width: 100%;
   }
 }
 
 .auxiliary-container {
+  grid-area: 2 / 1 / 6 / 2;
   background: #fff;
   padding: 0;
   flex-grow: 1;
   overflow: hidden;
-  position: relative;
+
+  @include breakpoint-above('medium') {
+    border-radius: 8px;
+    grid-area: 1 / 1 / 3 / 4;
+  }
 
   // TODO: research performance implications of position: absolute
   // vs alternatives and how they impact DOM reflow triggers
   &--hidden {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: -500px;
-    left: -500px;
+    display: none;
   }
 }
 
 .chat-container {
+  grid-area: 2 / 1 / 6 / 2;
   padding: 0;
   max-width: 100%;
   display: flex;
   flex-direction: column;
 
+  @include breakpoint-above('medium') {
+    grid-area: 2 / 4 / 3 / 5;
+    border-radius: 8px;
+  }
+
   &--hidden {
     display: none;
-  }
-
-  @include breakpoint-above('medium') {
-    min-width: 300px;
-    flex-basis: 300px;
-    position: relative;
-    // offsets the session-header height
-    padding-top: 70px;
-  }
-
-  @include breakpoint-above('large') {
-    min-width: 400px;
-    flex-basis: 400px;
   }
 }
 
