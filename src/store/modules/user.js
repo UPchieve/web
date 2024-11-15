@@ -28,6 +28,7 @@ export default {
     prevSessionSubject: '',
     progressReportOverviewSubjectStats: [],
     latestProgressReportOverview: {},
+    sessionIsEnding: false,
   },
   mutations: {
     setUser: (state, user = {}) => (state.user = user),
@@ -119,6 +120,9 @@ export default {
 
     setProgressReportOverviewSubjectStats: (state, stats) => {
       state.progressReportOverviewSubjectStats = stats
+    },
+    setSessionIsEnding: (state, isEnding) => {
+      state.sessionIsEnding = isEnding
     },
   },
   actions: {
@@ -371,6 +375,10 @@ export default {
 
       // True if volunteer hasn't joined
       return !state.session.volunteerJoinedAt
+    },
+
+    isSessionEnding: (state) => {
+      return state.session.isEnding
     },
 
     isSessionInProgress: (state) => {
