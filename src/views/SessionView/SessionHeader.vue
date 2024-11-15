@@ -353,15 +353,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.session-header-wrapper {
-  height: 100%;
-}
-
 .session-header {
   position: relative;
-  height: 100%;
   background-color: $c-information-blue;
-  padding: 0 20px;
+  padding: 8px 20px;
   text-align: left;
   display: flex;
   flex-direction: row;
@@ -369,7 +364,6 @@ export default {
   align-items: center;
 
   @include breakpoint-below('medium') {
-    border-radius: 0px 0px 20px 20px;
     height: 80px;
   }
 }
