@@ -1069,9 +1069,12 @@ export default {
       }
     ).then(this._successHandler, this._errorHandler)
   },
-  enrollStudentInIncentiveProgram() {
+  enrollStudentInIncentiveProgram(proxyEmail) {
     return httpPost(
-      `${API_ROOT}/product-flags/fall-incentive-enrollment/enroll`
+      `${API_ROOT}/product-flags/fall-incentive-enrollment/enroll`,
+      {
+        proxyEmail,
+      }
     ).then(this._successHandler, this._errorHandler)
   },
   deniedIncentiveProgramEnrollment() {
