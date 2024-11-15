@@ -3,6 +3,29 @@ import errorFromHttpResponse from '../utils/error-from-http-response.js'
 import AnalyticsService from './AnalyticsService'
 import NetworkService from './NetworkService'
 
+function isAbsentUser(session: Record<string, any>) {
+  const { student, volunteer } = session
+  if (!volunteer) return true
+
+  const messages = getMessagesAfterVolunteerJoined(session)
+  let isAbsentStudent = true
+  let isAbsentVolunteer = true
+  for (const message of messages) {
+    if (message.user === student._id) isAbsentStudent = false
+    if (message.user === volunteer._id) isAbsentVolunteer = false
+    if (!isAbsentStudent && !isAbsentVolunteer) break
+  }
+  return isAbsentStudent || isAbsentVolunteer
+}
+
+function getMessagesAfterVolunteerJoined(session) {
+  return session.messages.filter(
+    (message: Record<string, any> & { createdAt: string }) =>
+      new Date(message.createdAt).getTime() >=
+      new Date(session.volunteerJoinedAt).getTime()
+  )
+}
+
 export default {
   async endSession(sessionId: string, subTopic: string) {
     await NetworkService.endSession({ sessionId })
@@ -11,6 +34,43 @@ export default {
       sessionId: sessionId,
       subject: subTopic,
     })
+  },
+
+  postSessionRedirect(router, session) {
+    // redirect to the home page if there is an absent user
+    // or if the student was not paired with a tutor
+    if (isAbsentUser(session)) return router.push('/')
+    router.push(`/feedback/${session.id}`)
+  },
+
+  async endAndExitSession({ store, router }) {
+    let isSuccessful = false
+
+    const isSessionRecapDmsActive =
+      store.getters['featureFlags/isSessionRecapDmsActive']
+    const isStudent = store.getters['user/isStudent']
+    try {
+      await this.endSession(
+        store.state.user.session.id,
+        store.state.user.session.subTopic
+      )
+      isSuccessful = true
+    } catch (err) {
+      if (err?.response?.data?.err === 'Session has already ended') {
+        isSuccessful = true
+      }
+    } finally {
+      if (isSuccessful) {
+        store.dispatch('user/sessionDisconnected')
+        // Do not send the user directly to the feedback page if they can leave DMs
+        if (!isSessionRecapDmsActive)
+          this.postSessionRedirect(router, store.state.user.session)
+        // Send students directly to feedback page whether or not volunteers can send DMs.
+        if (isStudent)
+          this.postSessionRedirect(router, store.state.user.session)
+        store.commit('user/setSessionIsEnding', false)
+      }
+    }
   },
 
   async newSession(context, sessionType, sessionSubTopic, options) {

@@ -867,7 +867,7 @@ export default {
   &-container {
     background-color: $light-blue-background;
     z-index: 1;
-    padding: 0.75em 0.6em;
+    padding: 0.6em 0.6em;
     width: 100%;
     @include flex-container(row, space-between, center);
   }

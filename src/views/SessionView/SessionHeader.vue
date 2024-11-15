@@ -8,6 +8,7 @@
           class="avatar"
           :class="!isSessionAlive && 'avatar--hidden'"
         />
+
         <div class="info">
           <loading-message v-if="isSessionEnding" message="Ending session" />
           <loading-message
@@ -29,61 +30,34 @@
             </div>
             <span class="in-session-label" v-else>In Session</span>
           </div>
-          <span v-else-if="isSessionOver">Session ended</span>
+          <div class="session-ended" v-else-if="isSessionOver">
+            Session ended
+          </div>
           <loading-message v-else message="Loading" />
         </div>
       </div>
-      <div class="button-container">
-        <button
-          v-if="isVolunteer"
-          class="report-btn"
-          @click="reportSession"
-          type="button"
-        >
-          Report
-        </button>
-
-        <button
-          v-if="isSessionWaitingForVolunteer"
-          @click="end"
-          class="end-session-btn"
-          type="button"
-          data-testid="cancel-session-button"
-        >
-          Cancel
-        </button>
-        <button
-          v-else-if="isSessionOver"
-          @click="goToFeedbackPage"
-          class="end-session-btn"
-          type="button"
-        >
-          Finish
-        </button>
-        <button v-else @click="end" class="end-session-btn" type="button">
-          End
-        </button>
+      <div class="session-control-buttons" v-if="mobileMode">
+        <report-session-button :variant="'tertiary'" class="report-button" />
+        <end-session-button
+          class="end-button"
+          :variant="'secondary'"
+          :end-text="'End'"
+        />
       </div>
     </div>
     <trouble-matching-modal
       v-if="showTroubleMatchingModal"
       :closeModal="toggleTroubleMatchingModal"
-      :endSession="endSession"
+      :endSession="endAndExitSession"
       :sessionId="session._id"
     />
-    <unmatched-modal
-      v-if="showUnmatchedModal"
-      :endSession="endSession"
-      :sessionId="session._id"
-    />
+    <unmatched-modal v-if="showUnmatchedModal" :sessionId="session._id" />
   </div>
 </template>
 
 <script>
 // TODO: This file needs to be refactored to remove session logic from this component
 import { mapState, mapGetters } from 'vuex'
-import SessionService from '@/services/SessionService'
-import router from '@/router'
 import StudentIcon from '@/assets/student-icon.svg'
 import VolunteerIcon from '@/assets/volunteer-icon.svg'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
@@ -94,7 +68,9 @@ import sendWebNotification from '@/utils/send-web-notification'
 import { socket } from '@/socket'
 import sound from '@/assets/audio/alert.mp3'
 import ActivityDot from '@/components/ActivityDot.vue'
-
+import ReportSessionButton from '@/components/ReportSessionButton.vue'
+import EndSessionButton from '@/components/EndSessionButton.vue'
+import SessionService from '@/services/SessionService'
 /**
  * @todo {1} Refactoring candidate: use a modal instead.
  */
@@ -104,7 +80,6 @@ export default {
       connectionMsg: '',
       connectionMsgType: '',
       reconnectAttemptMsg: '',
-      isSessionEnding: false,
       showTroubleMatchingModal: false,
       showUnmatchedModal: false,
       hasSeenTroubleMatchingModal: false,
@@ -117,6 +92,8 @@ export default {
     TroubleMatchingModal,
     UnmatchedModal,
     ActivityDot,
+    ReportSessionButton,
+    EndSessionButton,
   },
   created() {
     /*
@@ -173,10 +150,11 @@ export default {
       sessionPartner: 'user/sessionPartner',
       isSessionAlive: 'user/isSessionAlive',
       isSessionWaitingForVolunteer: 'user/isSessionWaitingForVolunteer',
+      isSessionEnding: 'user/isSessionEnding',
       isSessionInProgress: 'user/isSessionInProgress',
       isSessionOver: 'user/isSessionOver',
-      isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
       isSessionPresenceActive: 'featureFlags/isSessionPresenceActive',
+      mobileMode: 'app/mobileMode',
     }),
 
     partnerAvatar() {
@@ -189,65 +167,10 @@ export default {
   },
   emits: ['try-clicked'],
   methods: {
-    end() {
-      if (this.isSessionEnding) {
-        return
-      }
-      this.isSessionEnding = true
-
-      if (this.isSessionWaitingForVolunteer) {
-        const shouldEndSession = window.confirm(
-          "Are you sure you want to cancel this request? If you've been waiting less than 5 minutes, you won't be able to make another request right away."
-        )
-
-        if (!shouldEndSession) {
-          this.isSessionEnding = false
-          return
-        }
-      } else {
-        // Only ask for confirmation if session hasn't been ended by other user.
-        const shouldEndSession = this.isSessionAlive
-          ? window.confirm('Do you really want to end the session?')
-          : true
-
-        // Early exit if user didn't confirm
-        if (!shouldEndSession) {
-          this.isSessionEnding = false
-          return
-        }
-      }
-
-      this.endSession()
-    },
-    async endSession() {
-      const sessionId = this.session._id
-      let isSuccessful = false
-
-      try {
-        await SessionService.endSession(sessionId, this.session.subTopic)
-        isSuccessful = true
-      } catch (err) {
-        if (err?.response?.data?.err === 'Session has already ended') {
-          isSuccessful = true
-        }
-      } finally {
-        if (isSuccessful) {
-          this.$store.dispatch('user/sessionDisconnected')
-          // Do not send the user directly to the feedback page if they can leave DMs
-          if (!this.isSessionRecapDmsActive) this.goToFeedbackPage()
-          // Send students directly to feedback page whether or not volunteers can send DMs.
-          if (this.isStudent) this.goToFeedbackPage()
-          this.isSessionEnding = false
-        }
-      }
-    },
-    reportSession() {
-      this.$store.dispatch('app/modal/show', {
-        component: 'ReportSessionModal',
-        data: {
-          showTemplateButtons: false,
-          currentSession: this.session,
-        },
+    endAndExitSession() {
+      SessionService.endAndExitSession({
+        store: this.$store,
+        router: this.$router,
       })
     },
     tryReconnect() {
@@ -262,34 +185,6 @@ export default {
       this.connectionMsg = ''
       this.reconnectAttemptMsg = ''
       this.connectionMsgType = ''
-    },
-    isAbsentUser() {
-      const { student, volunteer } = this.session
-      if (!volunteer) return true
-
-      const messages = this.getMessagesAfterVolunteerJoined()
-      let isAbsentStudent = true
-      let isAbsentVolunteer = true
-      for (const message of messages) {
-        if (message.user === student._id) isAbsentStudent = false
-        if (message.user === volunteer._id) isAbsentVolunteer = false
-        if (!isAbsentStudent && !isAbsentVolunteer) break
-      }
-      return isAbsentStudent || isAbsentVolunteer
-    },
-    getMessagesAfterVolunteerJoined() {
-      return this.session.messages.filter(
-        (message) =>
-          new Date(message.createdAt).getTime() >=
-          new Date(this.session.volunteerJoinedAt).getTime()
-      )
-    },
-    goToFeedbackPage() {
-      // redirect to the home page if there is an absent user
-      // or if the student was not paired with a tutor
-      if (this.isAbsentUser()) return this.$router.push('/')
-
-      router.push(`/feedback/${this.session._id}`)
     },
     toggleTroubleMatchingModal() {
       this.showTroubleMatchingModal = !this.showTroubleMatchingModal
@@ -418,80 +313,8 @@ h1 {
   display: block;
 }
 
-.button-container {
-  display: flex;
-  align-items: center;
-}
-
-.report-btn {
-  display: block;
-  border: none;
-  background-color: inherit;
-  font-weight: 500;
-  cursor: pointer;
-  color: #fff;
-  padding: 0 5px;
-  margin-right: 10px;
-
-  &:hover {
-    color: #e8e8e8;
-  }
-}
-
-.end-session-btn {
-  display: inline;
-  background-color: inherit;
-  font-weight: 500;
-  cursor: pointer;
-  border: solid 1px #fff;
-  color: #fff;
-  font-size: 16px;
-  line-height: 125%;
-  padding: 12px 24px;
-  border-radius: 9999px;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
-
-  @include breakpoint-below('large') {
-    line-height: 1;
-    min-height: 46px;
-  }
-}
-
 .session-header.inactive {
   background-color: #7a91a8;
-}
-
-.connection-message {
-  padding: 3px;
-  background-color: #858585;
-  color: #fff;
-  text-align: center;
-  font-weight: 600;
-  position: absolute;
-  width: 100%;
-  bottom: 0;
-  left: 0;
-
-  &.warning {
-    background-color: #ffde5e;
-    color: #000;
-  }
-
-  &.success {
-    background-color: #fff;
-    color: #000;
-  }
-
-  .connection-try-again {
-    border: 0;
-    background: none;
-    padding: 0;
-    margin: 0;
-    text-decoration: underline;
-  }
 }
 
 .avatar-info-container {
@@ -522,5 +345,31 @@ h1 {
       background-color: $c-disabled-grey;
     }
   }
+}
+
+.session-control-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.report-button {
+  background-color: transparent;
+  color: white;
+  border: none;
+  &:hover {
+    background-color: #fff3;
+  }
+}
+.end-button {
+  background-color: transparent;
+  color: white;
+  border-color: white;
+  &:hover {
+    border-color: white;
+    background-color: #fff3;
+  }
+}
+.session-ended {
+  padding: 10px 0;
 }
 </style>

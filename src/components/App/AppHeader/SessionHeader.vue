@@ -10,17 +10,28 @@
         <img class="session-header__logo" :src="logoUrl" alt="UPchieve" />
       </router-link>
     </div>
-    <div class="session-header__right"></div>
+    <div class="session-header__right">
+      <report-session-button v-if="sessionId" :variant="'tertiary'" />
+      <end-session-button v-if="sessionId" :variant="'secondary'" />
+    </div>
   </div>
 </template>
 
 <script>
 import LogoImageUrl from '@/assets/header_logo.png'
+import ReportSessionButton from '@/components/ReportSessionButton.vue'
+import EndSessionButton from '@/components/EndSessionButton.vue'
 
 export default {
   name: 'session-header',
+  components: { ReportSessionButton, EndSessionButton },
   data() {
     return { logoUrl: LogoImageUrl }
+  },
+  computed: {
+    sessionId() {
+      return this.$store.state.user?.session?.id
+    },
   },
 }
 </script>
@@ -46,7 +57,9 @@ export default {
   }
 
   &__right {
-    text-align: right;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
   }
 
   &__logo {

@@ -1,6 +1,6 @@
 <template>
   <button-template
-    :primary="primary"
+    :variant="variant"
     :routeTo="routeTo"
     :class="buttonClasses"
     :showArrow="showArrow"
@@ -20,6 +20,10 @@ export default {
   props: {
     primary: Boolean,
     reverse: Boolean,
+    variant: {
+      type: String,
+      default: 'secondary',
+    },
     routeTo: String,
     showArrow: {
       type: Boolean,
@@ -32,7 +36,15 @@ export default {
   },
   computed: {
     buttonClasses() {
-      const base = `LargeButton-${this.primary ? 'primary' : 'secondary'}`
+      if (this.primary) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          'LargeButton: `primary` is deprecated, use `variant` instead'
+        )
+      }
+      const base = this.primary
+        ? `LargeButton-primary`
+        : `LargeButton-${this.variant}`
       return {
         [base]: true,
         [`${base}--reverse`]: this.reverse,
@@ -92,6 +104,27 @@ export default {
 
   &--reverse {
     border-color: white;
+  }
+}
+
+.LargeButton-tertiary {
+  @extend %LargeButton;
+
+  background: white;
+  color: $c-soft-black;
+
+  &:hover {
+    background: $c-background-grey;
+  }
+
+  &:disabled {
+    background: $c-background-grey;
+    border-color: $c-background-grey;
+    color: $c-disabled-grey;
+  }
+
+  &--reverse {
+    background: $c-background-grey;
   }
 }
 </style>

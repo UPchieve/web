@@ -10,7 +10,7 @@
       <slot />
     </div>
     <arrow-icon
-      v-if="primary && showArrow"
+      v-if="(primary || variant === 'primary') && showArrow"
       class="ButtonTemplate-icon arrow-icon"
     />
   </router-link>
@@ -25,7 +25,7 @@
       <slot />
     </span>
     <arrow-icon
-      v-if="primary && showArrow"
+      v-if="(primary || variant === 'primary') && showArrow"
       class="ButtonTemplate-icon arrow-icon"
     />
   </button>
@@ -40,6 +40,10 @@ export default {
   emits: ['click'],
   props: {
     primary: Boolean,
+    variant: {
+      type: String,
+      default: 'secondary',
+    },
     routeTo: String,
     showArrow: Boolean,
     buttonType: {
