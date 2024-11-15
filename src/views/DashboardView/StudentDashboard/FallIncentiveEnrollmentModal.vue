@@ -245,6 +245,11 @@ async function handleEnrollmentDenial() {
   }
 }
 
+async function handleStudentPartnerEnrollment() {
+  await enrollStudentToIncentiveProgram(store, proxyEmail.value)
+  step.value = 3
+}
+
 onMounted(() => {
   AnalyticsService.captureEvent(
     EVENTS.STUDENT_FALL_INCENTIVE_ENROLLMENT_MODAL_SHOWN
@@ -380,12 +385,16 @@ onMounted(() => {
             >
             <large-button
               class="incentive-enrollment-modal__buttons-button incentive-enrollment-modal__buttons-button--primary"
-              @click="sendCode"
+              @click="
+                user.isSchoolPartner
+                  ? handleStudentPartnerEnrollment()
+                  : sendCode()
+              "
               :disabled="isSendingCodeToUserDisabled"
               primary
               :showArrow="false"
             >
-              Send code
+              {{ user.isSchoolPartner ? 'Enroll' : 'Send code' }}
             </large-button>
           </div>
           <RecaptchaCaption />
@@ -460,7 +469,11 @@ onMounted(() => {
           <h1
             class="incentive-enrollment-modal__title incentive-enrollment-modal__title--center"
           >
-            Your {{ verificationMethodText }} is verified!
+            {{
+              user.isSchoolPartner
+                ? `You're enrolled!`
+                : `Your ${verificationMethodText} is verified!`
+            }}
           </h1>
         </header>
 
