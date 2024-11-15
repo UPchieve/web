@@ -28,7 +28,13 @@ function getMessagesAfterVolunteerJoined(session) {
 
 export default {
   async endSession(sessionId: string, subTopic: string) {
-    await NetworkService.endSession({ sessionId })
+    try {
+      await NetworkService.endSession({ sessionId })
+    } catch (err) {
+      if (err?.response?.data?.err !== 'Session has already ended') {
+        throw err
+      }
+    }
     AnalyticsService.captureEvent(EVENTS.SESSION_ENDED, {
       event: EVENTS.SESSION_ENDED,
       sessionId: sessionId,
@@ -44,33 +50,21 @@ export default {
   },
 
   async endAndExitSession({ store, router }) {
-    let isSuccessful = false
-
     const isSessionRecapDmsActive =
       store.getters['featureFlags/isSessionRecapDmsActive']
     const isStudent = store.getters['user/isStudent']
-    try {
-      await this.endSession(
-        store.state.user.session.id,
-        store.state.user.session.subTopic
-      )
-      isSuccessful = true
-    } catch (err) {
-      if (err?.response?.data?.err === 'Session has already ended') {
-        isSuccessful = true
-      }
-    } finally {
-      if (isSuccessful) {
-        store.dispatch('user/sessionDisconnected')
-        // Do not send the user directly to the feedback page if they can leave DMs
-        if (!isSessionRecapDmsActive)
-          this.postSessionRedirect(router, store.state.user.session)
-        // Send students directly to feedback page whether or not volunteers can send DMs.
-        if (isStudent)
-          this.postSessionRedirect(router, store.state.user.session)
-        store.commit('user/setSessionIsEnding', false)
-      }
-    }
+    await this.endSession(
+      store.state.user.session.id,
+      store.state.user.session.subTopic
+    )
+    store.dispatch('user/sessionDisconnected')
+    // Do not send the user directly to the feedback page if they can leave DMs
+    if (!isSessionRecapDmsActive)
+      this.postSessionRedirect(router, store.state.user.session)
+    // Send students directly to feedback page whether or not volunteers can send DMs.
+    if (isStudent)
+      this.postSessionRedirect(router, store.state.user.session)
+    store.commit('user/setSessionIsEnding', false)
   },
 
   async newSession(context, sessionType, sessionSubTopic, options) {

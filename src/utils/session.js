@@ -30,7 +30,7 @@ export const rejoinSession = (router, sessionPath) => {
  */
 export const endSession = (context) => {
   const sessionId = context.$store.state.user.session._id
-  SessionService.endSession(context, sessionId)
+  SessionService.endSession(sessionId)
     .then(() => {
       context.$router.replace('/')
       context.$store.dispatch('user/fetch', context)
