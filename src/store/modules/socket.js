@@ -139,8 +139,7 @@ export default {
         }
       })
 
-      socket.on('bump', (data) => {
-        const userId = rootState.user.id
+      socket.on('bump', async (data, err) => {
         const endedAt = rootState.user.session.endedAt
         // Do not show the session fulfilled modal if a user is already
         // present on the page after a session has ended
@@ -150,10 +149,9 @@ export default {
             data: {
               acceptText: 'Return to Dashboard',
               alertModal: true,
-              isSessionEnded: !!data.endedAt,
-              volunteerJoined: !!data.volunteer,
-              isSessionVolunteer: userId === data.volunteer,
-              isSessionStudent: userId === data.student,
+              error: err,
+              sessionStudentId: data.student,
+              sessionVolunteerId: data.volunteer,
             },
           })
         }
