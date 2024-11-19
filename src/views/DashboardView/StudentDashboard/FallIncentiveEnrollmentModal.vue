@@ -246,7 +246,20 @@ async function handleEnrollmentDenial() {
 }
 
 async function handleStudentPartnerEnrollment() {
-  await enrollStudentToIncentiveProgram(store, proxyEmail.value)
+  error.value = ''
+
+  if (proxyEmail.value.toLowerCase() === user.value.email.toLowerCase()) {
+    error.value = 'Please enter a personal email (not your school email).'
+    return
+  }
+
+  try {
+    await enrollStudentToIncentiveProgram(store, proxyEmail.value)
+  } catch (err) {
+    error.value =
+      ((err as AxiosError).response?.data as { err?: string })?.err ??
+      'Unknown error'
+  }
   step.value = 3
 }
 
@@ -315,12 +328,10 @@ onMounted(() => {
             v-if="verificationMethod === VERIFICATION_METHOD.SMS"
             class="incentive-enrollment-modal__body"
           >
-            Join our Fall Challenge by verifying your
-            {{ verificationMethodText }}
-            now!
+            Join our Fall Challenge by verifying your phone number now!
           </p>
           <p v-else class="incentive-enrollment-modal__body">
-            Your school email will not allow virtual gift cards so please verify
+            Your school email will not allow virtual gift cards so please enter
             a personal email to enroll in the challenge!
           </p>
         </header>
@@ -328,7 +339,7 @@ onMounted(() => {
         <section class="incentive-enrollment-modal__section">
           <label
             class="incentive-enrollment-modal__phone-input"
-            v-if="verificationMethod === VERIFICATION_METHOD.SMS"
+            v-if="!user.isSchoolPartner"
           >
             Phone Number
             <maz-phone-number-input

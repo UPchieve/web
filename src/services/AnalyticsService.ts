@@ -56,7 +56,7 @@ class AnalyticsService {
     posthog.setPersonProperties(update)
   }
 
-  static captureEvent(name, properties = {}) {
+  static captureEvent(name: string, properties = {}) {
     posthog.capture(name, properties)
     if (GLEAP_TRACK_EVENTS.has(name)) {
       Gleap.trackEvent(name, properties)
@@ -98,7 +98,7 @@ class DevAnalyticsService {
     console.info('AnalyticsService.updateUser', update)
   }
 
-  static captureEvent(name, properties) {
+  static captureEvent(name: string, properties = {}) {
     // eslint-disable-next-line no-console
     console.info(
       'AnalyticsService.captureEvent',
