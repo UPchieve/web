@@ -113,7 +113,7 @@ export default {
 
 <style lang="scss" scoped>
 thead {
-  text-align: center;
+  text-align: left;
 }
 
 .session-list {
