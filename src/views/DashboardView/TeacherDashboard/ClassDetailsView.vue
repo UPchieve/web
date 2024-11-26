@@ -369,7 +369,8 @@ export default {
         data: {
           onAssignmentCreated: this.handleAssignmentCreated,
           classes: this.classes,
-          currentClassId: this.classId,
+          currentClass: this.classInfo,
+          topics: this.topics,
         },
       })
     },

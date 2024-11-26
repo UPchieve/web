@@ -15,14 +15,43 @@
       @ionChange="updateValue"
       :disabled="props.disabled || !props.options.length"
     >
-      <ion-select-option
-        v-for="option in props.options"
-        :key="props.optionTextField ? option[props.optionTextField] : option"
-        :value="option"
-        class="select-text"
-      >
-        {{ props.optionTextField ? option[props.optionTextField] : option }}
-      </ion-select-option>
+      <template>
+        <div v-if="props.groupField">
+          <template
+            v-for="group in props.options"
+            :key="group[props.groupField]"
+          >
+            {{ group[props.groupField] }}
+            <ion-select-option disabled>
+              {{ group[props.groupField] }}
+            </ion-select-option>
+            <ion-select-option
+              v-for="option in group[props.group]"
+              :key="
+                props.optionTextField ? option[props.optionTextField] : option
+              "
+              class="select-text"
+              :value="option"
+            >
+              {{
+                props.optionTextField ? option[props.optionTextField] : option
+              }}
+            </ion-select-option>
+          </template>
+        </div>
+        <div v-else>
+          <ion-select-option
+            v-for="option in props.options"
+            :key="
+              props.optionTextField ? option[props.optionTextField] : option
+            "
+            :value="option"
+            class="select-text"
+          >
+            {{ props.optionTextField ? option[props.optionTextField] : option }}
+          </ion-select-option>
+        </div>
+      </template>
     </ion-select>
   </div>
 </template>
@@ -68,6 +97,16 @@ const props = defineProps({
   reduce: {
     type: Function,
     required: false,
+  },
+  groupField: {
+    type: String,
+    required: false,
+    default: null,
+  },
+  group: {
+    type: String,
+    required: false,
+    default: null,
   },
 })
 

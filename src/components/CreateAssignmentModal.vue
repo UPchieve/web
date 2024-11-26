@@ -51,8 +51,10 @@
             name="session-to-complete"
             class="session-dropdown"
             :options="allSubjects"
-            optionTextField="displayName"
             :multiple="false"
+            optionTextField="displayName"
+            groupField="topicName"
+            group="subjects"
             v-model="selectedSessionToComplete"
           />
           <FormInput
@@ -165,7 +167,7 @@ export default {
     this.allSubjects = this.getActiveSubjects(this.subjects)
     this.classes = this.modalData.classes
     this.selectedClasses = this.classes.filter(
-      (cls) => cls.id === this.modalData.currentClassId
+      (cls) => cls.id === this.modalData.currentClass.id
     )
     this.showClassStudents()
   },
@@ -176,9 +178,11 @@ export default {
     },
 
     getActiveSubjects(allSubj) {
-      const properties = ['id', 'name', 'displayName', 'topicId']
+      const properties = ['id', 'name', 'displayName', 'topicId', 'topicName']
+      const currentTopicId = this.modalData.currentClass.topicId
+      const topicList = this.modalData.topics
 
-      return Object.values(allSubj)
+      const filteredSubjects = Object.values(allSubj)
         .filter(
           (subject) =>
             subject.active || this.subjectRequestRollout.includes(subject.name)
@@ -190,6 +194,21 @@ export default {
           })
           return filteredSubject
         })
+
+      const topicsAndSubjects = {}
+      topicList.forEach((topic) => {
+        topicsAndSubjects[topic.name] = {
+          topicId: topic.id,
+          topicName: topic.displayName,
+          subjects: filteredSubjects.filter(
+            (subj) => subj.topicName === topic.name
+          ),
+        }
+      })
+
+      return Object.values(topicsAndSubjects).sort((a, b) =>
+        a.topicId === currentTopicId ? -1 : b.topicId === currentTopicId ? 1 : 0
+      )
     },
 
     showClassStudents() {
