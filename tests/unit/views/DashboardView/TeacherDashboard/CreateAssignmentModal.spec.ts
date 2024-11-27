@@ -29,6 +29,59 @@ const classes = [
     updatedAt: '2024-09-23T18:19:21.059Z',
   },
 ]
+
+const topics = [
+  {
+    id: 1,
+    name: 'math',
+    displayName: 'Math',
+    iconLink: 'https://cdn.upchieve.org/site-images/topic-icons/math.svg',
+    dashboardOrder: 1,
+    trainingOrder: 1,
+  },
+  {
+    id: 2,
+    name: 'science',
+    displayName: 'Science',
+    iconLink: 'https://cdn.upchieve.org/site-images/topic-icons/science.svg',
+    dashboardOrder: 3,
+    trainingOrder: 2,
+  },
+  {
+    id: 3,
+    name: 'college',
+    displayName: 'College Counseling',
+    iconLink: 'https://cdn.upchieve.org/site-images/topic-icons/college.svg',
+    dashboardOrder: 5,
+    trainingOrder: 5,
+  },
+  {
+    id: 5,
+    name: 'readingWriting',
+    displayName: 'English',
+    iconLink: 'https://cdn.upchieve.org/site-images/topic-icons/english.svg',
+    dashboardOrder: 2,
+    trainingOrder: 3,
+  },
+  {
+    id: 6,
+    name: 'socialStudies',
+    displayName: 'Social Studies',
+    iconLink:
+      'https://cdn.upchieve.org/site-images/topic-icons/social-studies.svg',
+    dashboardOrder: 4,
+    trainingOrder: 4,
+  },
+  {
+    id: 4,
+    name: 'sat',
+    displayName: 'SAT & ACT Prep',
+    iconLink: 'https://cdn.upchieve.org/site-images/topic-icons/sat.svg',
+    dashboardOrder: 6,
+    trainingOrder: 6,
+  },
+]
+
 const getWrapper = async (data: {}) => {
   const store = createStore({
     modules: {
@@ -62,7 +115,12 @@ const getWrapper = async (data: {}) => {
       plugins: [store],
     },
     props: {
-      modalData: { classes, onAssignmentCreated: onAssignmentCreatedMock },
+      modalData: {
+        classes,
+        currentClass: classes[0],
+        topics,
+        onAssignmentCreated: onAssignmentCreatedMock,
+      },
     },
   })
 
