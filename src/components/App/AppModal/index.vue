@@ -39,6 +39,7 @@ import TeacherClassCodeModal from '@/components/TeacherClassCodeModal.vue'
 import CreateAssignmentModal from '@/components/CreateAssignmentModal.vue'
 import StudentCompletionModal from '@/components/StudentCompletionModal.vue'
 import EditTeacherClassModal from '@/components/EditTeacherClassModal.vue'
+import RemoveAssignmentConfirmationModal from '@/components/RemoveAssignmentConfirmationModal.vue'
 
 export default {
   components: {
@@ -58,6 +59,7 @@ export default {
     CreateAssignmentModal,
     StudentCompletionModal,
     EditTeacherClassModal,
+    RemoveAssignmentConfirmationModal,
   },
   data() {
     return {

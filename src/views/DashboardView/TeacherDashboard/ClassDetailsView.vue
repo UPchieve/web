@@ -1,5 +1,5 @@
 <template>
-  <div class="teacher-dashboard">
+  <div class="class-details-view">
     <div class="main">
       <div class="class-header">
         <button class="back-btn" @click="backToClasses()">
@@ -71,6 +71,7 @@
             <th>Last Session</th>
             <th>Details</th>
             <th></th>
+            <th></th>
           </tr>
           <tr
             v-for="student in students"
@@ -93,7 +94,7 @@
             <td>
               <div class="menu-button">
                 <button @click="openStudentMenu(student)">
-                  <MenuButtons />
+                  <MenuButtonsIcon />
                 </button>
               </div>
               <div
@@ -101,7 +102,22 @@
                 v-if="toggledStudentMenuId === student.id"
               >
                 <button @click="removeStudent(student.id)">
-                  <p><Remove /> Remove from class</p>
+                  <p><RemoveIcon /> Remove from class</p>
+                </button>
+              </div>
+            </td>
+            <td>
+              <div class="menu-button">
+                <button @click="openStudentMenu(student)">
+                  <MenuButtonsIcon />
+                </button>
+              </div>
+              <div
+                class="student-menu"
+                v-if="toggledStudentMenuId === student.id"
+              >
+                <button @click="removeStudent(student.id)">
+                  <p><RemoveIcon /> Remove from class</p>
                 </button>
               </div>
             </td>
@@ -143,14 +159,40 @@
                 <AssignmentIcon />
               </div>
               <div class="assignment-info">
-                <button @click="viewAssignment(assignment.id)">
-                  <h1 :data-testid="'assignment-title-' + assignment.id">
-                    {{ assignment.title }}
-                  </h1>
-                  <p :data-testid="'assignment-due-date-' + assignment.id">
-                    Due date: {{ formatTimestamp(assignment.dueDate) }}
-                  </p>
-                </button>
+                <div class="assignment-heading">
+                  <button
+                    class="assignment-info-btn"
+                    @click="viewAssignment(assignment.id)"
+                  >
+                    <h1 :data-testid="'assignment-title-' + assignment.id">
+                      {{ assignment.title }}
+                    </h1>
+                  </button>
+                  <button
+                    class="assignment-menu-btns"
+                    @click="toggleAssignmentMenu(assignment.id)"
+                  >
+                    <VerticalMenuButtonsIcon />
+                  </button>
+                  <div
+                    v-if="toggledAssignmentMenuId === assignment.id"
+                    class="assignment-menu"
+                  >
+                    <button
+                      @click="
+                        openRemoveAssignmentConfirmationModal(assignment.id)
+                      "
+                    >
+                      <div class="assignment-menu-item">
+                        <TrashIcon class="trash-icon" />
+                        <span class="delete-btn">Delete</span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+                <p :data-testid="'assignment-due-date-' + assignment.id">
+                  Due date: {{ formatTimestamp(assignment.dueDate) }}
+                </p>
                 <div v-if="!assignmentsCompletion[assignment.id]">
                   <p
                     data-testid="no-students-assigned"
@@ -211,8 +253,10 @@ import AssignmentIcon from '@/assets/AssignmentIcon.svg'
 import Pencil from '@/assets/pencil.svg'
 import moment from 'moment'
 import { EVENTS } from '@/consts'
-import MenuButtons from '@/assets/Menu.svg'
-import Remove from '@/assets/Remove.svg'
+import MenuButtonsIcon from '@/assets/Menu.svg'
+import VerticalMenuButtonsIcon from '@/assets/VerticalMenuButtons.svg'
+import TrashIcon from '@/assets/trash.svg'
+import RemoveIcon from '@/assets/Remove.svg'
 
 export default {
   name: 'ClassDetails',
@@ -224,8 +268,10 @@ export default {
     Check,
     Arrow,
     Pencil,
-    MenuButtons,
-    Remove,
+    MenuButtonsIcon,
+    VerticalMenuButtonsIcon,
+    RemoveIcon,
+    TrashIcon,
   },
 
   data() {
@@ -242,6 +288,7 @@ export default {
       className: this.classInfo.name,
       topicId: this.classInfo.topicId,
       toggledStudentMenuId: '',
+      toggledAssignmentMenuId: '',
     }
   },
   props: {
@@ -372,6 +419,18 @@ export default {
           currentClassId: this.classId,
         },
       })
+    },
+
+    openRemoveAssignmentConfirmationModal(assignmentId) {
+      this.$store.dispatch('app/modal/show', {
+        component: 'RemoveAssignmentConfirmationModal',
+        data: {
+          showTemplateButtons: false,
+          deleteAssignment: this.deleteAssignment,
+          assignmentId,
+        },
+      })
+      this.toggledAssignmentMenuId = ''
     },
 
     async handleAssignmentCreated({
@@ -506,6 +565,14 @@ export default {
       }
     },
 
+    toggleAssignmentMenu(assignmentId) {
+      if (this.toggledAssignmentMenuId === assignmentId) {
+        this.toggledAssignmentMenuId = null
+      } else {
+        this.toggledAssignmentMenuId = assignmentId
+      }
+    },
+
     getAssignmentCompletion(assignments, completionData) {
       const result = {}
 
@@ -571,6 +638,19 @@ export default {
           err.response.data.err ?? 'Unable to remove student from class.'
       }
     },
+
+    async deleteAssignment(assignmentId) {
+      try {
+        await NetworkService.deleteAssignment(assignmentId)
+        this.toggledAssignmentMenuId = ''
+        this.assignments = this.assignments.filter(
+          (assignment) => assignment.id !== assignmentId
+        )
+      } catch (err) {
+        this.error =
+          err.response.data.err ?? 'Unable to remove assignment from class.'
+      }
+    },
   },
 }
 </script>
@@ -582,9 +662,10 @@ export default {
   flex-grow: 1;
 }
 
-.teacher-dashboard {
+.class-details-view {
   @include flex-container(column, center);
-  padding: 0 !important;
+  padding: 0;
+  height: 100%;
 }
 
 .class-header {
@@ -781,12 +862,6 @@ export default {
     overflow: hidden;
     flex-grow: 1;
 
-    button {
-      display: block;
-      text-align: left;
-      width: 100%;
-    }
-
     h1 {
       font-size: 18px;
       margin: 0;
@@ -802,7 +877,7 @@ export default {
 
     .student-completion,
     .no-students-assigned {
-      padding-left: 6px;
+      padding-left: 0;
       margin-top: 1.25rem;
       color: #1855d1;
       font-weight: 500;
@@ -894,6 +969,48 @@ export default {
 
   p {
     margin-bottom: 0;
+  }
+}
+
+.assignment-heading {
+  @include flex-container(row, space-between, center);
+  width: 100%;
+}
+
+.assignment-menu-btns {
+  text-align: right;
+}
+
+.assignment-info-btn {
+  padding: 0;
+}
+
+.assignment-menu {
+  @include flex-container(column, center, flex-start);
+  border-radius: 4px;
+  padding: 16px;
+  position: absolute;
+  left: 90%;
+  top: 30%;
+  width: 160px;
+  z-index: 10;
+  background-color: #fff;
+  gap: 10px;
+  box-shadow: 0px 8px 20px 4px rgba(0, 0, 0, 0.12);
+}
+
+.assignment-menu-item {
+  @include flex-container(row, flex-start, center);
+  gap: 10px;
+
+  .delete-btn {
+    color: red;
+  }
+
+  .trash-icon {
+    fill: red;
+    height: 20px;
+    width: auto;
   }
 }
 </style>
