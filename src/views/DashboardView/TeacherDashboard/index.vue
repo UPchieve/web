@@ -304,6 +304,7 @@ export default {
 <style lang="scss" scoped>
 .teacher-dashboard {
   padding: 30px;
+  height: 100%;
 }
 
 .loader {

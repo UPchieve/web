@@ -1130,6 +1130,12 @@ export default {
       this._errorHandler
     )
   },
+  deleteAssignment(assignmentId) {
+    return httpDelete(`${API_ROOT}/assignment/${assignmentId}`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
   updateTeacherClass({ classData }) {
     return httpPost(`${API_ROOT}/teachers/class/update`, classData).then(
       this._successHandler,
