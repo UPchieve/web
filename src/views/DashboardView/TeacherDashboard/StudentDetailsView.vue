@@ -24,15 +24,20 @@
               class="topics-dropdown"
               :name="'topic'"
               :placeholder="
-                filters.topicId
-                  ? topics.find((topic) => topic.id === filters.topicId)
+                filters.topic.name !== 'other'
+                  ? topics.find((topic) => topic.name === filters.topic.name)
                       .displayName
                   : 'Select Subject'
               "
               :optionTextField="'displayName'"
-              :reduce="(option) => option.id"
-              :getSelectOptions="() => topics"
-              v-model="filters.topicId"
+              :reduce="(option) => option.name"
+              :getSelectOptions="
+                () => [
+                  ...topics,
+                  { name: 'other', displayName: 'All Subjects' },
+                ]
+              "
+              v-model="filters.topic.name"
             />
           </label>
           <div class="date-input-container">
@@ -107,7 +112,9 @@ export default {
       studentLastName: '',
       isLoading: true,
       filters: {
-        topicId: '',
+        topic: {
+          name: '',
+        },
         sessionActivityFrom: moment().subtract(7, 'days').format('YYYY-MM-DD'),
         sessionActivityTo: moment().format('YYYY-MM-DD'),
       },
@@ -132,9 +139,16 @@ export default {
   },
 
   async created() {
-    this.topics.forEach((topic) => {
-      if (topic.id == this.classInfo.topicId) this.filters.topicId = topic.id
-    })
+    if (!this.classInfo.topicId) {
+      this.filters.topic.name = 'other'
+    } else {
+      for (const topic of this.topics) {
+        if (topic.id === this.classInfo.topicId) {
+          this.filters.topic.name = topic.name
+        }
+      }
+    }
+
     if (this.$route.params.studentId) {
       this.classId = this.$route.params.classId
       this.studentId = this.$route.params.studentId
@@ -192,13 +206,13 @@ export default {
     filterSessions(sessions, subjects, filters) {
       const start = new Date(filters.sessionActivityFrom)
       const end = new Date(filters.sessionActivityTo)
-      const topicId = filters.topicId
-      //TODO: show all sessions in all subjects when no subject
-      //is selected during class creation
       const filteredSubjects = Object.values(subjects)
-        .filter((subject) => subject.topicId === topicId)
+        .filter(
+          (subject) =>
+            filters.topic.name === 'other' ||
+            subject.topicName === filters.topic.name
+        )
         .map((subject) => subject.name)
-      end.setDate(end.getDate() + 1)
       end.setHours(23, 59, 59, 999)
 
       const filtered = sessions.filter((session) => {
