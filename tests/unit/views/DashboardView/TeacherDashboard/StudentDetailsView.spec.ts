@@ -5,7 +5,7 @@ import { mount } from '@vue/test-utils'
 import router from '@/router'
 import { createStore } from 'vuex'
 import subjectsModule from '@/store/modules/subjects'
-import moment = require('moment')
+import moment from 'moment'
 
 const topics = [
   {
@@ -85,12 +85,14 @@ const getWrapper = async ({ data = {} }) => {
               name: 'algebraOne',
               displayName: 'Algebra 1',
               topicId: 1,
+              topicName: 'math',
             },
             biology: {
               id: 10,
               name: 'biology',
               displayName: 'Biology',
               topicId: 2,
+              topicName: 'science',
             },
           },
         },
@@ -135,7 +137,9 @@ describe('Student Details View', () => {
   })
 
   test('Filters sessions with just biology', async () => {
-    const wrapper = await getWrapper({ data: { filters: { topicId: 2 } } })
+    const wrapper = await getWrapper({
+      data: { filters: { topic: { name: 'science' } } },
+    })
     await wrapper.vm.submitFilter()
 
     expect(wrapper.vm.sessions).toHaveLength(1)

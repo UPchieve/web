@@ -12,9 +12,9 @@
         :name="'topic'"
         :placeholder="'Choose a subject'"
         :optionTextField="'displayName'"
-        :reduce="(option) => option.id"
+        :reduce="(option) => option.name"
         :getSelectOptions="() => topics"
-        v-model="topicId"
+        v-model="selectedTopic"
         required="false"
         :blur-event="EVENTS.TEACHER_SELECTED_CLASS_TOPIC"
         @open="handleDropdownOpen(true)"
@@ -59,7 +59,7 @@ export default {
     return {
       isLoading: false,
       className: '',
-      topicId: null,
+      selectedTopic: '',
       topics: [],
       isDropdownOpen: false,
       EVENTS,
@@ -68,12 +68,15 @@ export default {
 
   computed: {
     isFormValid() {
-      return this.topicId && this.className
+      return this.selectedTopic && this.className
     },
   },
 
   async created() {
-    const topics = this.modalData.topics
+    const topics = [
+      ...this.modalData.topics,
+      { name: 'other', displayName: 'Other' },
+    ]
     this.topics = topics.sort((a, b) => a.dashboardOrder - b.dashboardOrder)
   },
 
