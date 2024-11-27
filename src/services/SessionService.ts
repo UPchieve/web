@@ -62,8 +62,7 @@ export default {
     if (!isSessionRecapDmsActive)
       this.postSessionRedirect(router, store.state.user.session)
     // Send students directly to feedback page whether or not volunteers can send DMs.
-    if (isStudent)
-      this.postSessionRedirect(router, store.state.user.session)
+    if (isStudent) this.postSessionRedirect(router, store.state.user.session)
     store.commit('user/setSessionIsEnding', false)
   },
 

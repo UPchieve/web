@@ -12,6 +12,7 @@ import {
   getSubmitResponseDefault as getSubmitResponse,
 } from '@/services/SignUpService'
 import { getLinkElement, getRouterLinkElement } from '.'
+import router from '@/router'
 
 const RoutePath = {
   account: `/sign-up/teacher/${SignUpPage.account}`,
@@ -247,8 +248,22 @@ async function createAccount(data) {
 
     return getSubmitResponse(SignUpPage.verify)
   } catch (err) {
-    LoggerService.noticeError(err)
-    return getSubmitResponse(null, null, err)
+    const submitResponse = getSubmitResponse(null, null, err)
+    if (
+      submitResponse &&
+      submitResponse[1] === 'The email address you entered is already in use'
+    ) {
+      const redirectUriParams = new URLSearchParams({
+        message:
+          'Looks like you already have an UPchieve account, please sign in!',
+        email: data[InputName.EMAIL],
+      })
+      router.push('/login?' + redirectUriParams.toString())
+      return
+    } else {
+      LoggerService.noticeError(err)
+      return submitResponse
+    }
   }
 }
 
