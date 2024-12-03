@@ -354,6 +354,7 @@ function destroy() {
     left: -48px;
     bottom: calc(100%);
     transition-property: none;
+    max-width: 130px;
   }
 }
 
