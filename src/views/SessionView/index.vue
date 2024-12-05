@@ -54,7 +54,19 @@
       </div>
 
       <div class="session-header-container">
-        <session-header @try-clicked="tryClicked" />
+        <session-header
+          v-if="
+            !isSessionAudioCallEnabled ||
+            (isSessionAudioCallEnabled && !isSessionInProgress)
+          "
+          @try-clicked="tryClicked"
+        />
+        <ZoomSessionHeader
+          v-if="isSessionInProgress && isSessionAudioCallEnabled"
+          class="zoom-container"
+          :sessionId="sessionId"
+          :isStudent="isStudent"
+        />
       </div>
       <div
         class="chat-container"
@@ -219,6 +231,7 @@ import LoggerService from '@/services/LoggerService'
 import { socket } from '@/socket'
 import FeatureFlagService from '@/services/FeatureFlagService'
 import { POSTHOG_FEATURE_FLAGS } from '@/consts'
+import ZoomSessionHeader from '@/components/ScreenShare/ZoomSessionHeader.vue'
 
 const activeHeaderData = {
   component: 'SessionHeader',
@@ -242,6 +255,7 @@ export default {
     QuestionMarkIcon,
     FallIncentiveReviewWarningModal,
     AssignmentDetailModal,
+    ZoomSessionHeader,
   },
   created() {
     if (this.mobileMode) {
@@ -327,6 +341,8 @@ export default {
       isFallIncentiveProgramEnabled:
         'featureFlags/isFallIncentiveProgramEnabled',
       currentTutorBotConversation: 'botConversations/currentConversation',
+      isSessionInProgress: 'user/isSessionInProgress',
+      isSessionAudioCallEnabled: 'featureFlags/isSessionAudioCallEnabled',
     }),
     aiTutorSetupProps() {
       return {
@@ -839,7 +855,10 @@ export default {
     background: #fff;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
-    overflow: hidden;
+    background: $c-information-blue;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 }
 
@@ -850,7 +869,7 @@ export default {
   grid-template-columns: 1fr;
   grid-template-rows: minmax(min-content, max-content) 1fr;
   grid-column-gap: 15px;
-  grid-row-gap: 0px;
+  grid-row-gap: 0;
 
   @include breakpoint-above('medium') {
     padding: 20px;
@@ -866,7 +885,6 @@ export default {
 .about-session {
   &-container {
     background-color: $light-blue-background;
-    z-index: 1;
     padding: 0.6em 0.6em;
     width: 100%;
     @include flex-container(row, space-between, center);
@@ -931,7 +949,6 @@ export default {
 
   @include breakpoint-above('medium') {
     grid-area: 2 / 4 / 3 / 5;
-    border-radius: 8px;
   }
 
   &--hidden {
@@ -1008,5 +1025,9 @@ export default {
     cursor: pointer;
     transform: scale(1.1);
   }
+}
+
+.zoom-container {
+  width: 100%;
 }
 </style>

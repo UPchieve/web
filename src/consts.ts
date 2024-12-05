@@ -704,6 +704,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   AI_TUTOR: 'stand-alone-ai-tutor',
   AI_OTHER_SUBJECT_SURVEY: 'ai-other-subject-survey',
   CHOOSE_TUTOR_TYPE: 'choose-tutor-type',
+  SESSION_AUDIO_CALL: 'session-audio-call',
 }
 
 export const ANALYTICS_REPORT_ROW = {

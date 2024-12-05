@@ -18,6 +18,7 @@ const newrelicUrls = [
 const gleapUrl = 'https://*.gleap.io'
 const gleapWss = 'wss://ws.gleap.io'
 const orbitalUrl = 'https://*.useorbital.com'
+const zoomUrls = ['https://zoom.us', 'https://*.zoom.us', 'wss://*.zoom.us']
 
 // connect sources
 const googleConnectUrls = [
@@ -80,6 +81,7 @@ const scriptSrc = [
   ...newrelicUrls,
   gleapUrl,
   orbitalUrl,
+  ...zoomUrls,
   "'unsafe-eval'",
   "'unsafe-inline'",
   'blob:',
@@ -107,6 +109,7 @@ const connectSrc = [
   gleapUrl,
   gleapWss,
   orbitalUrl,
+  ...zoomUrls,
   `wss://${config.host}`,
   `https://${config.host}`,
 ]
@@ -118,6 +121,7 @@ const frameSrc = [
   gleapUrl,
   orbitalUrl,
   cdnUrl,
+  ...zoomUrls,
 ]
 
 const mediaSrc = [
@@ -126,6 +130,7 @@ const mediaSrc = [
   'data:',
   'blob:',
   gleapUrl,
+  ...zoomUrls,
 ]
 
 if (config.nodeEnv !== 'production') {

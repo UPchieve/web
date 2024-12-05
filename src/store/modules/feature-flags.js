@@ -36,6 +36,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.NATIONAL_STUDENT_PHONE]: false,
       [POSTHOG_FEATURE_FLAGS.AI_OTHER_SUBJECT_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.CHOOSE_TUTOR_TYPE]: false,
+      [POSTHOG_FEATURE_FLAGS.SESSION_AUDIO_CALL]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -177,5 +178,7 @@ export default {
     showChooseTutorType: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.CHOOSE_TUTOR_TYPE] ||
       state.eligibleForChooseTutorType,
+    isSessionAudioCallEnabled: (state) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.SESSION_AUDIO_CALL],
   },
 }

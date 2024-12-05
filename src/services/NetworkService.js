@@ -1153,4 +1153,22 @@ export default {
       `${API_ROOT}/teachers/class/${classId}/student/${studentId}/remove`
     ).then(this._successHandler, this._errorHandler)
   },
+  getZoomSignature(sessionName, role) {
+    return httpPost(`${API_ROOT}/zoom/token`, { sessionName, role }).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
+  getOrCreateSessionAudio(sessionId) {
+    return httpPost(`${API_ROOT}/sessions/${sessionId}/call`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
+  updateSessionAudio(sessionId, data) {
+    return httpPut(`${API_ROOT}/sessions/${sessionId}/call`, data).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
 }

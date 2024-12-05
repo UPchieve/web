@@ -50,9 +50,14 @@
           @new-bot-message="handleIncomingMessage"
         />
         <div
-          v-for="(message, index) in currentSession.messages"
+          v-for="(message, index) in withPendingMessages"
           :key="`message-${index}`"
-          :class="[messageAlignment(message)]"
+          :class="[
+            messageAlignment(message),
+            message.type === 'audio-transcription'
+              ? 'message--transcribed'
+              : null,
+          ]"
           class="message"
         >
           <span
@@ -61,6 +66,12 @@
           >
             {{ message.contents }}</span
           >
+          <template v-else-if="message.type === 'audio-transcription'">
+            <transcribed-message
+              :message="message"
+              :sessionPartnerName="sessionPartnerName"
+            />
+          </template>
           <template v-else>
             <component
               class="avatar"
@@ -87,6 +98,30 @@
             </div>
           </template>
         </div>
+        <div
+          v-if="showMyInProgressCaptionMessage"
+          class="message message--transcribed right"
+        >
+          <transcribed-message
+            :message="{
+              contents: myInProgressCaptionMessage.text,
+              user: myInProgressCaptionMessage.displayName,
+            }"
+            :sessionPartnerName="sessionPartnerName"
+          />
+        </div>
+        <div
+          v-if="showPartnerInProgressCaptionMessage"
+          class="message message--transcribed left"
+        >
+          <transcribed-message
+            :message="{
+              contents: partnerInProgressCaptionMessage.text,
+              user: partnerInProgressCaptionMessage.displayName,
+            }"
+            :sessionPartnerName="sessionPartnerName"
+          />
+        </div>
         <chat-bot
           v-if="sessionHasEnded && isSessionRecapDmsActive && isVolunteer"
           :isSessionRecapBot="true"
@@ -106,6 +141,12 @@
           @loading-chatbot-message="scrollToBottom"
         />
       </div>
+      <transition name="fade">
+        <CallStatusIndicator
+          class="messages-overlay call-status-indicator"
+          v-if="isSessionAudioCallEnabled"
+        />
+      </transition>
       <transition name="fade">
         <button
           type="button"
@@ -172,6 +213,9 @@ import LoggerService from '@/services/LoggerService'
 import moment from 'moment'
 import { socket } from '@/socket'
 import sound from '@/assets/audio/receive-message.mp3'
+import CallStatusIndicator from '@/components/ScreenShare/CallStatusIndicator.vue'
+import SpeakerFilledIcon from '@/assets/voice_message_icons/speaker-filled.svg'
+import TranscribedMessage from './TranscribedMessage.vue'
 
 const MESSAGE_ALIGNMENT = {
   LEFT: 'left',
@@ -194,6 +238,9 @@ export default {
     DocumentTitle,
     RecordVoiceMessage,
     VoiceMessage,
+    CallStatusIndicator,
+    SpeakerFilledIcon,
+    TranscribedMessage,
   },
   props: {
     setHasSeenNewMessage: { type: Function, required: true },
@@ -234,6 +281,10 @@ export default {
         state.user.chatScrolledToMessageIndex,
       isTyping: (state) => state.socket.isTyping,
       messageData: (state) => state.socket.messageData,
+      myInProgressCaptionMessage: (state) =>
+        state.sessionAudio?.myInProgressCaptionMessage,
+      partnerInProgressCaptionMessage: (state) =>
+        state.sessionAudio?.partnerInProgressCaptionMessage,
     }),
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',
@@ -242,9 +293,26 @@ export default {
       numberOfUnreadChatMessages: 'user/numberOfUnreadChatMessages',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
       eligibleForVoiceMessaging: 'featureFlags/eligibleForVoiceMessaging',
+      isSessionAudioCallEnabled: 'featureFlags/isSessionAudioCallEnabled',
     }),
+    showMyInProgressCaptionMessage() {
+      return this.myInProgressCaptionMessage?.text?.length > 0
+    },
+    showPartnerInProgressCaptionMessage() {
+      return this.partnerInProgressCaptionMessage?.text?.length > 0
+    },
+    withPendingMessages() {
+      const currentMessages = this.currentSession?.messages ?? []
+
+      return currentMessages.concat(this.currentSession?.pendingMessages ?? [])
+    },
     showVoiceMessaging() {
       return this.voiceMessagingAvailable && this.eligibleForVoiceMessaging
+    },
+    sessionPartner() {
+      return this.isVolunteer
+        ? this.currentSession.student
+        : this.currentSession.volunteer
     },
     sessionPartnerName() {
       if (!this.currentSession) return ''
@@ -639,6 +707,24 @@ export default {
     },
   },
   watch: {
+    myInProgressCaptionMessage: {
+      handler(currentVal) {
+        if (this.isAutoscrolling && currentVal?.text)
+          this.$nextTick(() => {
+            this.scrollToBottom()
+          })
+      },
+      deep: true,
+    },
+    partnerInProgressCaptionMessage: {
+      handler(currentVal) {
+        if (this.isAutoscrolling && currentVal?.text)
+          this.$nextTick(() => {
+            this.scrollToBottom()
+          })
+      },
+      deep: true,
+    },
     messageError() {
       if (this.isMessageError) return
       this.isMessageError = true
@@ -806,10 +892,10 @@ export default {
   background-color: $c-information-blue;
   border: 0;
   border-radius: 12px;
-  padding: 0 0.8em;
+  padding: 0.4em 0.8em;
   color: $upchieve-white;
   position: absolute;
-  bottom: 1.5em;
+  bottom: 4em;
   transition: 0.25s;
   left: 50%;
   transform: translateX(-50%);
@@ -824,6 +910,11 @@ export default {
 
   /* Safari needs this specified to lay out the message divs properly. */
   flex-shrink: 0;
+
+  &--transcribed {
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+  }
 }
 
 .avatar {
@@ -902,6 +993,7 @@ export default {
     padding: 1.25em 4.75em 2.5em 1.25em;
     display: flex;
     align-items: center;
+    flex-direction: column;
 
     .waiting-for-moderation {
       top: -1.75em;
@@ -928,6 +1020,14 @@ export default {
   @include breakpoint-below('medium') {
     top: -1.5em;
   }
+}
+
+.call-status-indicator {
+  width: 100%;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  transition: all 0.25s ease-in;
 }
 .message-input {
   display: flex;

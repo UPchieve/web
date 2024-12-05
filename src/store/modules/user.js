@@ -41,6 +41,26 @@ export default {
 
     setRecapSession: (state, session = {}) => (state.recapSession = session),
 
+    addPendingMessage: (state, message) => {
+      if (
+        message &&
+        !state.session.messages.some(
+          (m) => m.zoomMessageId === message.zoomMessageId
+        )
+      ) {
+        if (!state.session.pendingMessages) {
+          state.session.pendingMessages = []
+        }
+        state.session.pendingMessages.push(message)
+      }
+    },
+    removePendingMessage: (state, message) => {
+      if (message)
+        state.session.pendingMessages =
+          state.session.pendingMessages?.filter(
+            (m) => m?.zoomMessageId !== message.zoomMessageId
+          ) ?? []
+    },
     addMessage: (state, message) => {
       if (message) state.session.messages.push(message)
     },
@@ -202,8 +222,11 @@ export default {
     updateTimezone: ({ commit }, timezone, date = Date.now()) => {
       commit('setTimezone', timezone, date)
     },
-
+    addPendingMessage: ({ commit }, message) => {
+      commit('addPendingMessage', message)
+    },
     addMessage: ({ commit }, message) => {
+      commit('removePendingMessage', message)
       commit('addMessage', message)
     },
 
@@ -497,6 +520,10 @@ export default {
         getters.isStudent &&
         rootGetters['featureFlags/isNationalStudentPhoneEnabled']
       )
+    },
+
+    banType: (state) => {
+      return state.user?.banType ?? null
     },
   },
 }
