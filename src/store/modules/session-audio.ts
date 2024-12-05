@@ -380,6 +380,12 @@ export default {
       commit('setIsStartingAudio', true)
       try {
         const stream = state.zoomClient.getMediaStream()
+        // Start with all audio muted if our speaker is muted
+        if (state.isSpeakerMuted) {
+          await muteUser(stream, state.partnerZoomUser?.userId)
+        } else {
+          await unmuteUser(stream, state.partnerZoomUser?.userId)
+        }
 
         if (state.micState === 'denied' || speakerOnly) {
           await stream.startAudio({ speakerOnly: true })
@@ -389,12 +395,6 @@ export default {
           commit('setIsSpeakerOnly', false)
         }
         await stream.muteAudio()
-        // Start with all audio muted if our speaker is muted
-        if (state.isSpeakerMuted) {
-          await muteUser(stream, state.partnerZoomUser?.userId)
-        } else {
-          await unmuteUser(stream, state.partnerZoomUser?.userId)
-        }
 
         commit('setIsAudioStarted', true)
       } catch (e) {
