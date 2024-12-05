@@ -9,6 +9,7 @@ import notificationsModule from './modules/notifications'
 import socketModule from './modules/socket'
 import sessionModule from './modules/session'
 import botConversationsModule from './modules/bot-conversations'
+import sessionAudioModule from './modules/session-audio'
 
 export const storeOptions = {
   modules: {
@@ -21,6 +22,7 @@ export const storeOptions = {
     notifications: notificationsModule,
     socket: socketModule,
     session: sessionModule,
+    sessionAudio: sessionAudioModule,
     botConversations: botConversationsModule,
   },
 }

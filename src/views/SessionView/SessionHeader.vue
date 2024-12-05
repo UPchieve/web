@@ -248,6 +248,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.session-header-wrapper {
+  flex-grow: 1;
+}
 .session-header {
   position: relative;
   background-color: $c-information-blue;
@@ -257,9 +260,10 @@ export default {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-
+  min-height: 64px;
+  border-radius: 8px 8px 0 0;
   @include breakpoint-below('medium') {
-    height: 80px;
+    border-radius: 0;
   }
 }
 

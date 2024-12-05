@@ -225,6 +225,14 @@ export default {
       socket.on('sessions/partner:in-session', (isOnline) => {
         this.dispatch('session/onlineStatusForPartner', isOnline)
       })
+
+      socket.on('sessions:partner-banned-from-live-media', () => {
+        this.dispatch('sessionAudio/partnerBannedFromLiveMedia')
+      })
+
+      socket.on('sessions:banned-from-live-media', () => {
+        this.dispatch('sessionAudio/bannedFromLiveMedia')
+      })
     },
     connect() {
       socket.connect()
