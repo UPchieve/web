@@ -1,10 +1,14 @@
 <template>
   <div class="student-dashboard">
     <dashboard-banner
+      v-if="!assignments.length"
       :subheader="
         showDashboardRedesign ? `What can we help you with today?` : ``
       "
     />
+    <div v-else>
+      <StudentAssignments :assignments="assignments" />
+    </div>
     <div class="dashboard-notices">
       <div
         v-if="downtimeBannerMessage"
@@ -57,6 +61,8 @@ import getCookie from '@/utils/get-cookie'
 import Gleap from 'gleap'
 import ArrowIcon from '@/assets/arrow.svg'
 import LargeButton from '@/components/LargeButton.vue'
+import StudentAssignments from '@/components/StudentAssignments.vue'
+import * as StudentAssignmentUtils from '@/utils/student-assignments-utils'
 
 const defaultHeaderData = {
   component: 'DefaultHeader',
@@ -80,6 +86,7 @@ export default {
     FallIncentiveEnrollmentModal,
     ArrowIcon,
     LargeButton,
+    StudentAssignments,
   },
   async created() {
     if (this.isSessionAlive) {
@@ -97,6 +104,9 @@ export default {
       })
     } else if (this.isFallIncentiveProgramEnabled)
       this.triggerIncentiveProgramBanner()
+    else if (this.assignments.length) {
+      this.$store.dispatch('app/header/show')
+    }
 
     if (
       this.shouldSeeIncentiveModalForFirstTime ||
@@ -152,12 +162,16 @@ export default {
       this.joinedClassCode = classCode
       localStorage.removeItem('joinedClassCode')
     }
+    this.assignments = this.filterStudentAssignments(
+      this.user.studentAssignments
+    )
   },
   data() {
     return {
       showTellThemCollegePrepModal: false,
       joinedClassCode: '',
       showFallIncentiveEnrollmentModal: false,
+      assignments: [],
     }
   },
   computed: {
@@ -248,6 +262,13 @@ export default {
         this.fallIncentiveProgramModalViewCount + 1
       )
       this.showFallIncentiveEnrollmentModal = true
+    },
+    filterStudentAssignments(assignments) {
+      //Only show the first 3 incomplete assignments
+      return StudentAssignmentUtils.getIncompleteAssignments(assignments).slice(
+        0,
+        3
+      )
     },
   },
   watch: {

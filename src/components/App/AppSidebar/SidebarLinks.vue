@@ -48,6 +48,10 @@
         text="My Classes"
       >
         <book-icon class="icon" />
+        <activity-dot
+          v-if="hasIncompleteAssignments"
+          class="SidebarLinks__notification"
+        />
       </sidebar-link>
 
       <sidebar-link
@@ -112,7 +116,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import SidebarLink from './SidebarLink.vue'
 import ArchiveIcon from '@/assets/archive.svg'
 import BookIcon from '@/assets/book-icon.svg'
@@ -130,6 +134,7 @@ import AnalyticsService from '@/services/AnalyticsService'
 import ActivityDot from '@/components/ActivityDot.vue'
 import { EVENTS } from '@/consts'
 import AiTutorButton from '../AiTutorButton.vue'
+import { getIncompleteAssignments } from '@/utils/student-assignments-utils'
 
 export default {
   components: {
@@ -156,6 +161,9 @@ export default {
     numberOfStudentClasses: Number,
   },
   computed: {
+    ...mapState({
+      user: (state) => state.user.user,
+    }),
     ...mapGetters({
       isProgressReportsActive: 'featureFlags/isProgressReportsActive',
       isAutoFlowUser: 'user/isAutoFlowUser',
@@ -169,6 +177,9 @@ export default {
     }),
     showStudentMyClassesLink() {
       return this.isStudent && this.numberOfStudentClasses > 0
+    },
+    hasIncompleteAssignments() {
+      return !!getIncompleteAssignments(this.user.studentAssignments).length
     },
   },
   methods: {
