@@ -58,6 +58,18 @@
         <div v-else-if="loadingQuizResults" class="loading-body">
           <loading-message message="Getting your quiz results" />
         </div>
+        <div v-else-if="errorMessage" class="">
+          <div class="resubmit-quiz">
+            <p>{{ errorMessage }}</p>
+          </div>
+          <div class="quiz-buttons">
+            <large-button
+              class="quiz-buttons--button--resubmit"
+              @click="submitQuiz"
+              ><span>Resubmit Quiz</span></large-button
+            >
+          </div>
+        </div>
         <div v-else>
           <div v-if="showNoQuiz" class="instructions">
             A {{ quizName }} quiz has not yet been created. If you would like to
@@ -145,6 +157,7 @@ import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import LargeButton from '@/components/LargeButton.vue'
 import ArrowIcon from '@/assets/arrow.svg'
+import LoggerService from '@/services/LoggerService'
 
 // TODO: Refactor this file - CSS, make use of async, and better error handling
 export default {
@@ -165,6 +178,7 @@ export default {
       quizResults: {},
       loadingQuizResults: false,
       isFirstQuiz: false,
+      errorMessage: '',
     }
   },
   components: {
@@ -233,25 +247,35 @@ export default {
     submitQuiz() {
       this.showQuizQuestions = false
       this.loadingQuizResults = true
-      TrainingService.submitQuiz().then((data) => {
-        this.quizResults = data
-        this.loadingQuizResults = false
-        this.showQuizResults = true
-        const quizEvent = data.passed ? EVENTS.QUIZ_PASSED : EVENTS.QUIZ_FAILED
-        AnalyticsService.captureEvent(quizEvent, {
-          action: quizEvent,
-          subject: this.category,
+      this.errorMessage = ''
+      TrainingService.submitQuiz()
+        .then((data) => {
+          this.quizResults = data
+          this.loadingQuizResults = false
+          this.showQuizResults = true
+          const quizEvent = data.passed
+            ? EVENTS.QUIZ_PASSED
+            : EVENTS.QUIZ_FAILED
+          AnalyticsService.captureEvent(quizEvent, {
+            action: quizEvent,
+            subject: this.category,
+          })
+          if (data.passed) {
+            const updatedCerts = Object.assign(this.user.certifications, {
+              [this.category]: { passed: true, tries: data.tries },
+            })
+            this.$store.dispatch('user/addToUser', {
+              certifications: updatedCerts,
+              totalQuizzesPassed: this.user.totalQuizzesPassed + 1,
+            })
+          }
         })
-        if (data.passed) {
-          const updatedCerts = Object.assign(this.user.certifications, {
-            [this.category]: { passed: true, tries: data.tries },
-          })
-          this.$store.dispatch('user/addToUser', {
-            certifications: updatedCerts,
-            totalQuizzesPassed: this.user.totalQuizzesPassed + 1,
-          })
-        }
-      })
+        .catch((err) => {
+          this.loadingQuizResults = false
+          this.errorMessage =
+            'Something went wrong, please resubmit. If the issue persists, please reach out to UPchieve.'
+          LoggerService.noticeError(err)
+        })
     },
     showReview() {
       this.showQuizResults = false
@@ -486,6 +510,11 @@ export default {
     @include breakpoint-above('large') {
       margin-left: 2em;
     }
+
+    &--resubmit {
+      background-color: #16d2aa;
+      color: white;
+    }
   }
 }
 
@@ -493,5 +522,10 @@ export default {
   .training-quiz--review-answers {
     width: 90%;
   }
+}
+
+.resubmit-quiz {
+  @include flex-container(column, center, center);
+  margin: 5em 0;
 }
 </style>
