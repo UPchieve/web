@@ -11,7 +11,12 @@ const getWrapper = () => {
     merge({}, storeOptions, {
       modules: {
         user: {
-          user: { state: { user: { pastSessions: [] } } },
+          state: {
+            user: {
+              pastSessions: [],
+              studentAssignments: [],
+            },
+          },
         },
         featureFlags: {
           flags: { state: { flags: {} } },
@@ -24,7 +29,7 @@ const getWrapper = () => {
 }
 
 describe('StudentDashboard', () => {
-  test('layout', () => {
+  test('layout without assignments', () => {
     const wrapper = getWrapper()
     expect(wrapper.classes('student-dashboard')).toBe(true)
 

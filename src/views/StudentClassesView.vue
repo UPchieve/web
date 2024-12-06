@@ -379,7 +379,7 @@ h2 {
 }
 
 .tabs-container {
-  overflow-x: scroll;
+  // overflow-x: scroll;
   position: relative;
 }
 
