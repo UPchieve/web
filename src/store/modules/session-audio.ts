@@ -88,9 +88,11 @@ export default {
   getters: {
     audioCallSupported: (state) =>
       state.sessionAudioState !== SessionAudioState.AudioNotSupported,
-    partnerIsInAudioChannel: (state) => {
+    partnerIsInAudioChannel: (state, getters) => {
       return Boolean(
-        state.partnerZoomUser && state.partnerZoomUser.audio?.length > 0
+        state.partnerZoomUser &&
+          state.partnerZoomUser.audio?.length > 0 &&
+          !getters.isPartnerBannedFromLiveMedia
       )
     },
     micStatus: (state, getters, rootState) => {
