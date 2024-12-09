@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import ReportSessionButton from '../ReportSessionButton.vue'
-import EndSessionButton from '../EndSessionButton.vue'
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import MutedMicIcon from '@/assets/muted-mic.svg'
@@ -13,7 +11,6 @@ const props = defineProps<{
   audioCallSupported: boolean
 }>()
 
-const mobileMode = computed(() => store.getters['app/mobileMode'])
 const sessionPartner = computed(() => store.getters['user/sessionPartner'])
 const micStatus = computed(() => store.getters['sessionAudio/micStatus'])
 </script>
@@ -37,14 +34,6 @@ const micStatus = computed(() => store.getters['sessionAudio/micStatus'])
       <div class="status">
         {{ props.partnerStatus }}
       </div>
-    </div>
-    <div class="session-buttons" :class="props.userType" v-if="mobileMode">
-      <ReportSessionButton :variant="'tertiary'" class="report-button" />
-      <EndSessionButton
-        class="end-button"
-        :variant="'secondary'"
-        :end-text="'End'"
-      />
     </div>
   </div>
 </template>
@@ -86,32 +75,5 @@ const micStatus = computed(() => store.getters['sessionAudio/micStatus'])
 .status {
   font-size: 14px;
   font-weight: 400;
-}
-
-.session-buttons {
-  display: flex;
-  justify-content: end;
-  align-items: center;
-}
-.session-buttons.volunteer {
-  justify-content: space-between;
-}
-
-.report-button {
-  background-color: transparent;
-  color: white;
-  border: none;
-  &:hover {
-    background-color: #fff3;
-  }
-}
-.end-button {
-  background-color: transparent;
-  color: white;
-  border-color: white;
-  &:hover {
-    border-color: white;
-    background-color: #fff3;
-  }
 }
 </style>

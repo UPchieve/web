@@ -8,6 +8,8 @@ import {
   SessionAudioEvent,
   SessionAudioService,
 } from '@/services/LiveShareService/SessionAudioService'
+import EndSessionButton from '@/components/EndSessionButton.vue'
+import ReportSessionButton from '@/components/ReportSessionButton.vue'
 
 const store = useStore()
 const userType = computed(
@@ -57,6 +59,7 @@ const isJoining = computed(() => store.getters['sessionAudio/isJoining'])
 const isActiveInAnotherTab = computed(
   () => store.getters['sessionAudio/isActiveInAnotherTab']
 )
+const mobileMode = computed(() => store.getters['app/mobileMode'])
 </script>
 
 <template>
@@ -75,17 +78,32 @@ const isActiveInAnotherTab = computed(
       :partnerStatus="partnerStatus"
       :audioCallSupported="audioCallSupported"
     />
-    <TalkButton
-      :isMicMuted="isMicMuted"
-      :isSpeaking="isSpeaking"
-      :micState="micState"
-      :hasSpeakingPrivileges="hasSpeakingPrivileges"
-      :audioCallSupported="audioCallSupported"
-      :isJoining="isJoining"
-      :isActiveInAnotherTab="isActiveInAnotherTab"
-      :isStartingAudio="isStartingAudio"
-      @toggleMuteMic="toggleMuteMic"
-    />
+    <div class="session-buttons" :class="userType">
+      <!--        There is no session header in mobile mode, in which case
+render the session control buttons in here-->
+      <ReportSessionButton
+        v-if="mobileMode"
+        :variant="'tertiary'"
+        class="report-button"
+      />
+      <EndSessionButton
+        v-if="mobileMode"
+        class="end-button"
+        :variant="'secondary'"
+        :end-text="'End'"
+      />
+      <TalkButton
+        :isMicMuted="isMicMuted"
+        :isSpeaking="isSpeaking"
+        :micState="micState"
+        :hasSpeakingPrivileges="hasSpeakingPrivileges"
+        :audioCallSupported="audioCallSupported"
+        :isJoining="isJoining"
+        :isActiveInAnotherTab="isActiveInAnotherTab"
+        :isStartingAudio="isStartingAudio"
+        @toggleMuteMic="toggleMuteMic"
+      />
+    </div>
   </div>
 </template>
 
@@ -103,6 +121,11 @@ const isActiveInAnotherTab = computed(
   @include breakpoint-below('medium') {
     border-radius: 0;
   }
+
+  @include breakpoint-below('tiny') {
+    gap: 4px;
+    padding: 8px 8px;
+  }
 }
 
 .grow {
@@ -114,11 +137,32 @@ const isActiveInAnotherTab = computed(
   height: 24px;
 }
 
-.container {
+.session-buttons {
   display: flex;
-  overflow: hidden;
-  align-self: center;
-  height: 80vh;
-  width: 80vw;
+  justify-content: end;
+  align-items: center;
+  gap: 12px;
+}
+.session-buttons.volunteer {
+  justify-content: space-between;
+}
+
+.report-button {
+  background-color: transparent;
+  color: white;
+  border: none;
+  padding: 0px;
+  &:hover {
+    background-color: #fff3;
+  }
+}
+.end-button {
+  background-color: transparent;
+  color: white;
+  border-color: white;
+  &:hover {
+    border-color: white;
+    background-color: #fff3;
+  }
 }
 </style>
