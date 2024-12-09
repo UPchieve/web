@@ -270,6 +270,7 @@ export default {
       voiceMessagingAvailable:
         navigator.mediaDevices && navigator.mediaDevices.getUserMedia,
       textMessageHidden: false,
+      hasStartedTyping: false,
     }
   },
   computed: {
@@ -413,6 +414,7 @@ export default {
       this.newMessage = ''
     },
     notTyping() {
+      this.hasStartedTyping = false
       // Tell the server that the user is no longer typing
       socket.emit('notTyping', {
         sessionId: this.currentSession.id,
@@ -566,9 +568,12 @@ export default {
       } else if (event.key == 'Backspace') return
 
       // Typing handler for when non-Enter/Backspace keys are pressed
-      socket.emit('typing', {
-        sessionId: this.currentSession.id,
-      })
+      if (!this.hasStartedTyping) {
+        this.hasStartedTyping = true
+        socket.emit('typing', {
+          sessionId: this.currentSession.id,
+        })
+      }
 
       /** Every time a key is pressed, set an inactive timer
           If another key is pressed within 2 seconds, reset timer**/
