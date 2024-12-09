@@ -8,7 +8,6 @@ const { variant } = defineProps<{
 }>()
 
 const store = useStore()
-const isVolunteer = computed(() => store.getters['user/isVolunteer'])
 const session = computed(() => store.state.user.session)
 
 const reportSession = () => {
@@ -17,18 +16,14 @@ const reportSession = () => {
     data: {
       showTemplateButtons: false,
       currentSession: session.value,
+      source: 'session',
     },
   })
 }
 </script>
 
 <template>
-  <large-button
-    v-if="isVolunteer"
-    @click="reportSession"
-    type="button"
-    :variant="variant"
-  >
+  <large-button @click="reportSession" type="button" :variant="variant">
     Report
   </large-button>
 </template>

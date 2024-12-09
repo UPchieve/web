@@ -54,14 +54,14 @@
       </div>
 
       <div class="session-header-container">
-        <session-header
+        <session-chat-header
           v-if="
             !isSessionAudioCallEnabled ||
             (isSessionAudioCallEnabled && !isSessionInProgress)
           "
           @try-clicked="tryClicked"
         />
-        <ZoomSessionHeader
+        <ZoomSessionChatHeader
           v-if="isSessionInProgress && isSessionAudioCallEnabled"
           class="zoom-container"
           :sessionId="sessionId"
@@ -206,7 +206,7 @@ import { mapState, mapGetters } from 'vuex'
 import NetworkService from '@/services/NetworkService'
 import SessionService from '@/services/SessionService'
 import AnalyticsService from '@/services/AnalyticsService'
-import SessionHeader from './SessionHeader.vue'
+import SessionChatHeader from './SessionChatHeader.vue'
 import SessionChat from './SessionChat/index.vue'
 import AiWidgetTool from './AiWidgetTool/index.vue'
 import Whiteboard from './Whiteboard.vue'
@@ -231,7 +231,7 @@ import LoggerService from '@/services/LoggerService'
 import { socket } from '@/socket'
 import FeatureFlagService from '@/services/FeatureFlagService'
 import { POSTHOG_FEATURE_FLAGS } from '@/consts'
-import ZoomSessionHeader from '@/components/ScreenShare/ZoomSessionHeader.vue'
+import ZoomSessionChatHeader from '@/components/ScreenShare/ZoomSessionChatHeader.vue'
 
 const activeHeaderData = {
   component: 'SessionHeader',
@@ -242,7 +242,7 @@ export default {
   components: {
     AiWidgetTool,
     AiAssistedTutoringModal,
-    SessionHeader,
+    SessionChatHeader,
     SessionChat,
     Whiteboard,
     PhotoUploadIcon,
@@ -255,7 +255,7 @@ export default {
     QuestionMarkIcon,
     FallIncentiveReviewWarningModal,
     AssignmentDetailModal,
-    ZoomSessionHeader,
+    ZoomSessionChatHeader,
   },
   created() {
     if (this.mobileMode) {
