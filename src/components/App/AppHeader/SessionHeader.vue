@@ -11,7 +11,10 @@
       </router-link>
     </div>
     <div class="session-header__right">
-      <report-session-button v-if="sessionId" :variant="'tertiary'" />
+      <report-session-button
+        v-if="sessionId && canReport"
+        :variant="'tertiary'"
+      />
       <end-session-button v-if="sessionId" :variant="'secondary'" />
     </div>
   </div>
@@ -21,6 +24,7 @@
 import LogoImageUrl from '@/assets/header_logo.png'
 import ReportSessionButton from '@/components/ReportSessionButton.vue'
 import EndSessionButton from '@/components/EndSessionButton.vue'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'session-header',
@@ -29,8 +33,22 @@ export default {
     return { logoUrl: LogoImageUrl }
   },
   computed: {
+    ...mapGetters({
+      isVolunteer: 'user/isVolunteer',
+      isStudent: 'user/isStudent',
+      isSessionAudioCallEnabled: 'featureFlags/isSessionAudioCallEnabled',
+      isSessionWaitingForVolunteer: 'user/isSessionWaitingForVolunteer',
+    }),
     sessionId() {
       return this.$store.state.user?.session?.id
+    },
+    canReport() {
+      return (
+        this.isVolunteer ||
+        (this.isStudent &&
+          this.isSessionAudioCallEnabled &&
+          !this.isSessionWaitingForVolunteer)
+      )
     },
   },
 }

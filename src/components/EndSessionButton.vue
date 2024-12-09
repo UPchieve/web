@@ -76,5 +76,14 @@ const endSession = async () => {
   <large-button v-else-if="isSessionOver" @click="finish" type="button"
     >Finish</large-button
   >
-  <large-button v-else @click="end" type="button">{{ endText }}</large-button>
+  <large-button class="end-session-button" v-else @click="end" type="button">{{
+    endText
+  }}</large-button>
 </template>
+
+<style lang="scss" scoped>
+.end-session-button {
+  border-color: $c-error-red;
+  color: $c-error-red;
+}
+</style>

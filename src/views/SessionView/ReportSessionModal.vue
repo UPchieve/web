@@ -54,12 +54,12 @@ import { mapState, mapGetters } from 'vuex'
 import { EVENTS } from '@/consts'
 
 // TODO: Options should be hydrated via the database
-const reportReasonOptions = [
+const volunteerReportReasonOptions = [
   '[Immediate ban] Student extremely rude/inappropriate',
   'I am worried for the immediate safety of this student',
 ]
 
-const studentRecapReportReasonOptions = [
+const studentReportReasonOptions = [
   'Coach asked me to connect off of UPchieve',
   'Coach made me feel uncomfortable or unsafe',
   'Coach used inappropriate language',
@@ -69,11 +69,19 @@ const studentRecapReportReasonOptions = [
 export default {
   components: { LargeButton },
   props: {
+    /*
+     * @TODO: Move to Composition API and use Typescript
+     *  modalData: {
+     *   currentSession: the session object
+     *   source: 'session' | 'recap' (where the report modal is opened from)
+     *   toggleReportSubmitted: function, optional
+     * }
+     */
     modalData: { type: Object, required: true },
   },
   data() {
     return {
-      reportReasonOptions,
+      reportReasonOptions: volunteerReportReasonOptions,
       reportReason: null,
       reportMessage: '',
     }
@@ -102,15 +110,12 @@ export default {
       return this.modalData.currentSession
     },
     isInRecap() {
-      return this.modalData.isInRecap ?? false
+      return this.modalData.source === 'recap'
     },
     reportReasonOptionsToDisplay() {
-      if (!this.isInRecap) return reportReasonOptions
-
-      if (this.isVolunteer) return reportReasonOptions
-      else if (this.isStudent) return studentRecapReportReasonOptions
-
-      return []
+      return this.isVolunteer
+        ? volunteerReportReasonOptions
+        : studentReportReasonOptions
     },
     reportModalSubtitle() {
       if (this.isInRecap && this.isStudent)
@@ -131,7 +136,7 @@ export default {
           sessionId: this.currentSession.id,
           reportReason: this.reportReason,
           reportMessage: this.reportMessage,
-          source: this.isInRecap ? 'recap' : '',
+          source: this.modalData.source,
         })
         if (this.modalData.toggleReportSubmitted)
           this.modalData.toggleReportSubmitted()

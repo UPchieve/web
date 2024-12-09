@@ -37,7 +37,11 @@
         </div>
       </div>
       <div class="session-control-buttons" v-if="mobileMode">
-        <report-session-button :variant="'tertiary'" class="report-button" />
+        <report-session-button
+          :variant="'tertiary'"
+          class="report-button"
+          v-if="canReport"
+        />
         <end-session-button
           class="end-button"
           :variant="'secondary'"
@@ -144,6 +148,9 @@ export default {
       isConnected: (state) => state.socket.isConnected,
       isPartnerOnline: (state) => state.session.isPartnerOnline,
     }),
+    canReport() {
+      return this.isVolunteer
+    },
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',

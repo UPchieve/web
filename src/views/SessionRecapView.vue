@@ -367,7 +367,7 @@ export default {
         data: {
           showTemplateButtons: false,
           currentSession: this.recapSession,
-          isInRecap: true,
+          source: 'recap',
           toggleReportSubmitted: this.toggleReportSubmitted,
         },
       })
