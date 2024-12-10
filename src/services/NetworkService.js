@@ -729,16 +729,6 @@ export default {
       this._errorHandler
     )
   },
-  getFeedback({ sessionId, userType }) {
-    const queryParams = new URLSearchParams({
-      sessionId,
-      userType,
-    }).toString()
-    return httpGet(`${API_ROOT}/feedback?${queryParams}`).then(
-      this._successHandler,
-      this._errorHandler
-    )
-  },
   savePushToken(data) {
     return httpPost(`${API_ROOT}/push-token/save`, data).then(
       this._successHandler,

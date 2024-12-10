@@ -278,7 +278,7 @@ export default {
     },
     sessionSubject() {
       const subject = this.session.subTopic
-      return this.subjects[subject].displayName
+      return this.subjects[subject]?.displayName
     },
     sessionTime() {
       return moment(this.session.createdAt).local().format('LT')
@@ -299,19 +299,12 @@ export default {
       component: 'SessionHeader',
     })
     const sessionId = this.$route.params.sessionId
-    const [feedbackResponse, sessionResponse, postsessionAlreadySavedResponse] =
+    const [sessionResponse, postsessionAlreadySavedResponse] =
       await Promise.all([
-        NetworkService.getFeedback({
-          sessionId,
-          userType: this.userType,
-        }),
         NetworkService.getSession(sessionId),
         NetworkService.getPostsessionSurveyResponse(sessionId, this.userType),
       ])
 
-    const {
-      data: { feedback },
-    } = feedbackResponse
     const {
       data: { session },
     } = sessionResponse
@@ -344,7 +337,7 @@ export default {
     )
     this.buildUserResponse()
 
-    if (feedback || postsessionAlreadySavedResponse.data.length > 0) {
+    if (postsessionAlreadySavedResponse.data.length > 0) {
       this.loading = false
       this.completedFeedback = true
       return
