@@ -1040,6 +1040,7 @@ export default {
   border-top: 1px solid $c-border-grey;
   min-width: 0;
   flex-grow: 1;
+  width: 100%;
   border-top: none;
 }
 .message-textarea {
