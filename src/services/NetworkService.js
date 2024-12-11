@@ -811,12 +811,6 @@ export default {
       `${API_ROOT}/survey/postsession/response?sessionId=${sessionId}&role=${role}`
     ).then(this._successHandler, this._errorHandler)
   },
-  getPostsessionSurveyRatings() {
-    return httpGet(`${API_ROOT}/survey/postsession/ratings`).then(
-      this._successHandler,
-      this._errorHandler
-    )
-  },
   getUserProductFlags() {
     return httpGet(`${API_ROOT}/product-flags`).then(
       this._successHandler,
