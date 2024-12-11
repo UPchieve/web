@@ -691,6 +691,7 @@ export default {
   },
   methods: {
     async fetchSessionAudioFlag() {
+      if (!this.sessionPartner?.id) return
       this.isFetchingSessionAudioCallFlag = true
       try {
         this.isSessionAudioCallEnabled = await this.$store.dispatch(

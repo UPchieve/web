@@ -73,6 +73,7 @@ class FeatureFlagService {
 
   static async isFeatureEnabledForUser(featureFlagKey, userId) {
     try {
+      if (!userId) throw new Error('Missing user ID')
       const axiosInstance = axios.create()
       const res = await axiosInstance.post(
         'https://p.upchieve.org/decide?v=3',
