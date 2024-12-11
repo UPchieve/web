@@ -54,8 +54,16 @@
       </div>
 
       <div class="session-header-container">
+        <Spinner
+          v-if="isFetchingSessionAudioCallFlag"
+          :container-height="48"
+          :container-width="48"
+          :width="36"
+          :height="36"
+          :thickness="3"
+        />
         <session-chat-header
-          v-if="
+          v-else-if="
             !isSessionAudioCallEnabled ||
             (isSessionAudioCallEnabled && !isSessionInProgress)
           "
@@ -232,6 +240,7 @@ import { socket } from '@/socket'
 import FeatureFlagService from '@/services/FeatureFlagService'
 import { POSTHOG_FEATURE_FLAGS } from '@/consts'
 import ZoomSessionChatHeader from '@/components/ScreenShare/ZoomSessionChatHeader.vue'
+import Spinner from '@/components/Spinner.vue'
 
 const activeHeaderData = {
   component: 'SessionHeader',
@@ -240,6 +249,7 @@ const activeHeaderData = {
 export default {
   name: 'session-view',
   components: {
+    Spinner,
     AiWidgetTool,
     AiAssistedTutoringModal,
     SessionChatHeader,
@@ -307,6 +317,8 @@ export default {
       aiWidgetDragging: false,
       aiWidgetResizing: false,
       didAutoOpen: false,
+      isFetchingSessionAudioCallFlag: false,
+      isSessionAudioCallEnabled: false,
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -342,7 +354,7 @@ export default {
         'featureFlags/isFallIncentiveProgramEnabled',
       currentTutorBotConversation: 'botConversations/currentConversation',
       isSessionInProgress: 'user/isSessionInProgress',
-      isSessionAudioCallEnabled: 'featureFlags/isSessionAudioCallEnabled',
+      sessionPartner: 'user/sessionPartner',
     }),
     aiTutorSetupProps() {
       return {
@@ -414,6 +426,7 @@ export default {
     },
   },
   async mounted() {
+    await this.fetchSessionAudioFlag()
     const {
       data: { isValid },
     } = await NetworkService.getIsSubjectValid(
@@ -669,8 +682,27 @@ export default {
     async 'session.endedAt'(newValue, oldValue) {
       if (newValue && !oldValue) this.sessionHasEnded = true
     },
+
+    async sessionPartner(current, previous) {
+      if (current?.id !== previous?.id && current?.id) {
+        await this.fetchSessionAudioFlag()
+      }
+    },
   },
   methods: {
+    async fetchSessionAudioFlag() {
+      this.isFetchingSessionAudioCallFlag = true
+      try {
+        this.isSessionAudioCallEnabled = await this.$store.dispatch(
+          'featureFlags/isSessionAudioCallEnabled',
+          this.sessionPartner?.id
+        )
+      } catch (err) {
+        this.isSessionAudioCallEnabled = false
+      } finally {
+        this.isFetchingSessionAudioCallFlag = false
+      }
+    },
     toggleAiWidget() {
       const event = this.aiWidgetHidden
         ? EVENTS.AI_TUTOR_WIDGET_TOOLBAR_BUTTON_OPEN

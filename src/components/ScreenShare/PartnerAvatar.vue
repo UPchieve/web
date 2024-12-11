@@ -5,6 +5,8 @@ import VolunteerIcon from '@/assets/volunteer-icon.svg'
 import SpeakerIcon from '@/assets/voice_message_icons/speaker.svg'
 import SpeakerFilledIcon from '@/assets/voice_message_icons/speaker-filled.svg'
 import { computed } from 'vue'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const props = defineProps<{
   isPartnerSpeaking: boolean
@@ -22,6 +24,19 @@ const tooltipText = computed(() => {
     ? `Click to unmute ${props.sessionPartnerFirstName}`
     : `Click to mute ${props.sessionPartnerFirstName}`
 })
+
+const onClickPartnerAvatar = () => {
+  AnalyticsService.captureEvent(
+    EVENTS.VOICE_CHAT_USER_CLICKED_PARTNER_AVATAR_BUTTON
+  )
+  emit('toggleMuteSpeaker')
+}
+
+const onMouseEnterPartnerAvatar = () => {
+  AnalyticsService.captureEvent(
+    EVENTS.VOICE_CHAT_USER_MOUSED_OVER_PARTNER_AVATAR
+  )
+}
 </script>
 
 <template>
@@ -33,7 +48,8 @@ const tooltipText = computed(() => {
       muted: props.isSpeakerMuted,
       speaking: props.isPartnerSpeaking,
     }"
-    @click="emit('toggleMuteSpeaker')"
+    @click="onClickPartnerAvatar"
+    @mouseenter="onMouseEnterPartnerAvatar"
     v-tooltip="{
       text: tooltipText,
       color: 'black',

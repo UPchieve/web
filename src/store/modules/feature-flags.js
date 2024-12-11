@@ -181,4 +181,14 @@ export default {
     isSessionAudioCallEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SESSION_AUDIO_CALL],
   },
+  actions: {
+    isSessionAudioCallEnabled: async ({ getters }, partnerUserId) => {
+      const isEnabledForPartner =
+        await FeatureFlagService.isFeatureEnabledForUser(
+          POSTHOG_FEATURE_FLAGS.SESSION_AUDIO_CALL,
+          partnerUserId
+        )
+      return isEnabledForPartner.isEnabled || getters.isSessionAudioCallEnabled
+    },
+  },
 }

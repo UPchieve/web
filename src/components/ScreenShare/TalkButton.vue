@@ -3,6 +3,8 @@ import RecordIcon from '@/assets/voice_message_icons/record-message.svg'
 import Spinner from '@/components/Spinner.vue'
 import { vTooltip } from 'maz-ui'
 import { computed } from 'vue'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const props = defineProps<{
   isSpeaking: boolean
@@ -49,6 +51,19 @@ const tooltipText = computed(() => {
 
   return 'Click to mute'
 })
+
+const onClickMute = () => {
+  AnalyticsService.captureEvent(
+    EVENTS.VOICE_CHAT_USER_CLICKED_MICROPHONE_BUTTON
+  )
+  emit('toggleMuteMic')
+}
+
+const onMouseEnterMicButton = () => {
+  AnalyticsService.captureEvent(
+    EVENTS.VOICE_CHAT_USER_MOUSED_OVER_MICROPHONE_BUTTON
+  )
+}
 </script>
 <template>
   <div class="start-call-container" :class="{ muted: props.isMicMuted }">
@@ -70,7 +85,8 @@ const tooltipText = computed(() => {
       :disabled="isDisabled"
       class="speak-button"
       :class="{ muted: props.isMicMuted, speaking: props.isSpeaking }"
-      @click="emit('toggleMuteMic')"
+      @click="onClickMute"
+      @mouseenter="onMouseEnterMicButton"
       v-tooltip="{
         text: tooltipText,
         color: 'black',
