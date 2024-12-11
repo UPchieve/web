@@ -106,21 +106,6 @@
                 </button>
               </div>
             </td>
-            <td>
-              <div class="menu-button">
-                <button @click="openStudentMenu(student)">
-                  <MenuButtonsIcon />
-                </button>
-              </div>
-              <div
-                class="student-menu"
-                v-if="toggledStudentMenuId === student.id"
-              >
-                <button @click="removeStudent(student.id)">
-                  <p><RemoveIcon /> Remove from class</p>
-                </button>
-              </div>
-            </td>
           </tr>
         </table>
       </div>
@@ -666,7 +651,6 @@ export default {
 .class-details-view {
   @include flex-container(column, center);
   padding: 0;
-  height: 100%;
 }
 
 .class-header {
@@ -816,6 +800,7 @@ export default {
   @include flex-container(column, center, center);
   background-color: #ffffff;
   flex-grow: 1;
+  min-height: 40vh;
 }
 
 .empty-assignments-container {

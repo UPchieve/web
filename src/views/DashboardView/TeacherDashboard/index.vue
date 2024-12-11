@@ -416,6 +416,7 @@ export default {
 .classes-container {
   width: 100%;
   margin: 0 auto;
+  padding-bottom: 16px;
 }
 
 .class-header {
