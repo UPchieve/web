@@ -3,7 +3,6 @@ import LoggerService from './LoggerService'
 import FeatureFlagService from './FeatureFlagService'
 import Gleap from 'gleap'
 import { EVENTS } from '@/consts'
-import NetworkService from './NetworkService'
 
 /*
   This service is used to dynamically target users in specific segments.
@@ -100,19 +99,6 @@ const validationFns = {
     properties.accountCreatedBefore !== undefined
       ? Date.parse(properties.accountCreatedBefore) > Date.parse(user.createdAt)
       : true,
-  averageSessionRatingLessThan: async ({ properties }: CheckArgs) => {
-    if (properties.averageSessionRatingLessThan !== undefined) {
-      const {
-        data: { ratings },
-      } = await NetworkService.getPostsessionSurveyRatings()
-      if (ratings.length === 0) return false
-      const sum = ratings.reduce((sum, { score }) => sum + score, 0)
-      const avg = sum / ratings.length
-      return avg < properties.averageSessionRatingLessThan
-    } else {
-      return true
-    }
-  },
 }
 
 async function isValidUserForSegment(user, properties) {
