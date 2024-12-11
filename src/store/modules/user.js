@@ -463,6 +463,18 @@ export default {
         banType: state.user.banType,
         isTestUser: state.user.isTestUser,
       }
+
+      if (state.user?.ratings) {
+        userProps.averageRatingSelfReported =
+          state.user.ratings.selfReportedRating.average
+        userProps.averageRatingPartnerReported =
+          state.user.ratings.partnerReportedRating.average
+        userProps.totalSelfReportedRatings =
+          state.user.ratings.selfReportedRating.total
+        userProps.totalPartnerReportedRatings =
+          state.user.ratings.partnerReportedRating.total
+      }
+
       if (getters.isVolunteer) {
         userProps.onboarded = state.user.isOnboarded
         userProps.approved = state.user.isApproved
