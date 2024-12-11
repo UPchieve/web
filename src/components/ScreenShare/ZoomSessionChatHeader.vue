@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import PartnerInfo from './PartnerInfo.vue'
 import TalkButton from './TalkButton.vue'
 import { useStore } from 'vuex'
@@ -10,6 +10,8 @@ import {
 } from '@/services/LiveShareService/SessionAudioService'
 import EndSessionButton from '@/components/EndSessionButton.vue'
 import ReportSessionButton from '@/components/ReportSessionButton.vue'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const store = useStore()
 const userType = computed(
@@ -21,6 +23,10 @@ const sessionPartnerFirstName = computed(
 const isStartingAudio = computed(() => store.state.sessionAudio.isStartingAudio)
 
 SessionAudioService.start()
+
+onMounted(async () => {
+  AnalyticsService.captureEvent(EVENTS.VOICE_CHAT_USER_SAW_ZOOM_CHAT_HEADER)
+})
 
 onUnmounted(async () => {
   // NOTE: for now, do not keep the zoom call open when they navigate away

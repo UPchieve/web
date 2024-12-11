@@ -7,6 +7,8 @@ import {
 } from '@/services/LiveShareService/SessionAudioService'
 import { socket } from '@/socket'
 import LoggerService from '@/services/LoggerService'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 ZoomVideo.preloadDependentAssets()
 const zoomClient = ZoomVideo.createClient()
@@ -284,6 +286,10 @@ export default {
           commit('setIsPartnerSpeaking', false)
         }, 1500)
       )
+      if (isSpeaking)
+        AnalyticsService.captureEvent(
+          EVENTS.VOICE_CHAT_USER_SPOKE_IN_AUDIO_CHANNEL
+        )
     },
     resetState: ({ commit }) => commit('resetState'),
 

@@ -3,6 +3,8 @@ import { computed } from 'vue'
 import { useStore } from 'vuex'
 import MutedMicIcon from '@/assets/muted-mic.svg'
 import { vTooltip } from 'maz-ui'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const store = useStore()
 const props = defineProps<{
@@ -13,6 +15,12 @@ const props = defineProps<{
 
 const sessionPartner = computed(() => store.getters['user/sessionPartner'])
 const micStatus = computed(() => store.getters['sessionAudio/micStatus'])
+
+const onMouseEnterAudioStatus = () => {
+  AnalyticsService.captureEvent(
+    EVENTS.VOICE_CHAT_USER_MOUSED_OVER_PARTNER_MIC_STATUS
+  )
+}
 </script>
 
 <template>
@@ -23,6 +31,7 @@ const micStatus = computed(() => store.getters['sessionAudio/micStatus'])
         }}<span
           class="disabled-mic"
           v-if="micStatus && props.audioCallSupported"
+          @mouseenter="onMouseEnterAudioStatus"
           v-tooltip="{
             text: micStatus,
             color: 'black',

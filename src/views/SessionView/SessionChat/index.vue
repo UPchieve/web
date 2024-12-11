@@ -271,6 +271,7 @@ export default {
         navigator.mediaDevices && navigator.mediaDevices.getUserMedia,
       textMessageHidden: false,
       hasStartedTyping: false,
+      isSessionAudioCallEnabled: false,
     }
   },
   computed: {
@@ -294,7 +295,7 @@ export default {
       numberOfUnreadChatMessages: 'user/numberOfUnreadChatMessages',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
       eligibleForVoiceMessaging: 'featureFlags/eligibleForVoiceMessaging',
-      isSessionAudioCallEnabled: 'featureFlags/isSessionAudioCallEnabled',
+      sessionPartner: 'user/sessionPartner',
     }),
     showMyInProgressCaptionMessage() {
       return this.myInProgressCaptionMessage?.text?.length > 0
@@ -363,6 +364,12 @@ export default {
     }
   },
   methods: {
+    async fetchIsSessionAudioCallEnabled(partnerUserId) {
+      this.isSessionAudioCallEnabled = await this.$store.dispatch(
+        'featureFlags/isSessionAudioCallEnabled',
+        partnerUserId
+      )
+    },
     showTextMessage() {
       this.textMessageHidden = false
       this.hideModerationWarning()
@@ -712,6 +719,11 @@ export default {
     },
   },
   watch: {
+    async sessionPartner(current, previous) {
+      if (current?.id !== previous?.id && current?.id) {
+        await this.fetchIsSessionAudioCallEnabled(current?.id)
+      }
+    },
     myInProgressCaptionMessage: {
       handler(currentVal) {
         if (this.isAutoscrolling && currentVal?.text)
