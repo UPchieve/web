@@ -12,7 +12,6 @@ import { EVENTS } from '@/consts'
 
 ZoomVideo.preloadDependentAssets()
 const zoomClient = ZoomVideo.createClient()
-
 if (ZoomVideo.checkSystemRequirements().audio) {
   zoomClient.init('en-US', 'Global', {
     patchJsMedia: true,
@@ -23,8 +22,8 @@ if (ZoomVideo.checkSystemRequirements().audio) {
 const MIN_VOLUME = 0
 const MAX_VOLUME = 100
 
-const muteUser = async (stream, zoomUserId) =>
-  Promise.allSettled([
+const muteUser = async (stream, zoomUserId) => {
+  const p = Promise.allSettled([
     // iOS safari
     stream.muteAllUserAudioLocally(),
     // safari and chrome
@@ -34,9 +33,27 @@ const muteUser = async (stream, zoomUserId) =>
       ? stream.adjustUserAudioVolumeLocally(zoomUserId, MIN_VOLUME)
       : Promise.resolve(),
   ])
+  /*
+   * iOS safari on initial load
+   * This hack is necessary because the zoom SDK does not properly mute the speaker
+   * when joining the call in iOS Safari. So what we do is loop through all of the
+   * audio elements on the page and mute them.
 
-const unmuteUser = async (stream, zoomUserId) =>
-  Promise.allSettled([
+   * NOTE: the way this works right now is that anytime a participant is added to the call,
+   * Zoom adds a new `<audio>` element to the DOM. Since refreshing the page can give a user a new zoom `userId`,
+   * it's possible there will be multiple audio elements on the page
+  */
+  const audioEls = document.querySelectorAll('audio')
+  if (audioEls.length > 0) {
+    audioEls.forEach((audioEl) => {
+      audioEl.muted = true
+    })
+  }
+  return p
+}
+
+const unmuteUser = async (stream, zoomUserId) => {
+  const p = Promise.allSettled([
     // iOS safari
     stream.unmuteAllUserAudioLocally(),
     // safari and chrome
@@ -46,6 +63,16 @@ const unmuteUser = async (stream, zoomUserId) =>
       ? stream.adjustUserAudioVolumeLocally(zoomUserId, MAX_VOLUME)
       : Promise.resolve(),
   ])
+  // iOS safari on initial load
+  const audioEls = document.querySelectorAll('audio')
+  if (audioEls.length > 0) {
+    audioEls.forEach((audioEl) => {
+      audioEl.muted = false
+    })
+  }
+
+  return p
+}
 
 const getDefaultState = () => ({
   // NOTE: sessionAudioState should only ever be set by the SessionAudioService
@@ -261,7 +288,7 @@ export default {
         }
       }
     },
-    setActiveSpeakers: ({ commit, state }, payload) => {
+    setActiveSpeakers: ({ commit, state, dispatch }, payload) => {
       clearTimeout(state.isSpeakingTimeout)
       clearTimeout(state.isPartnerSpeakingTimeout)
 
@@ -286,10 +313,15 @@ export default {
           commit('setIsPartnerSpeaking', false)
         }, 1500)
       )
-      if (isSpeaking)
+      if (isSpeaking) {
         AnalyticsService.captureEvent(
           EVENTS.VOICE_CHAT_USER_SPOKE_IN_AUDIO_CHANNEL
         )
+      }
+
+      // This hack handles any oddball cases where iOS safari doesn't properly mute the speaker. (ex: user refreshes their page)
+      // We spam this everytime a user speaks to ensure the partner's speaker is muted when it should be
+      dispatch('maybeMutePartnerLocally', state.partnerZoomUser?.userId)
     },
     resetState: ({ commit }) => commit('resetState'),
 
@@ -389,6 +421,8 @@ export default {
       try {
         const stream = state.zoomClient.getMediaStream()
         // Start with all audio muted if our speaker is muted
+        // This works in most browsers and will prevent any sound
+        // from the partner from being heard while we start up
         if (state.isSpeakerMuted) {
           await muteUser(stream, state.partnerZoomUser?.userId)
         } else {
@@ -405,6 +439,14 @@ export default {
         await stream.muteAudio()
 
         commit('setIsAudioStarted', true)
+
+        // Because iOS Safari doesn't properly mute the speaker when joining the call,
+        // We call it hear after the call starts (which sometimes works and sometimes doesn't :gif of me pulling out my hair:)
+        if (state.isSpeakerMuted) {
+          await muteUser(stream, state.partnerZoomUser?.userId)
+        } else {
+          await unmuteUser(stream, state.partnerZoomUser?.userId)
+        }
       } catch (e) {
         LoggerService.noticeError(JSON.stringify(e))
       } finally {
@@ -480,15 +522,17 @@ export default {
       }
     },
 
-    async setPartnerZoomUser({ dispatch, commit }, zoomUser) {
+    setPartnerZoomUser({ dispatch, commit }, zoomUser) {
       commit('setPartnerZoomUser', zoomUser)
-      await dispatch('maybeMutePartnerLocally', zoomUser.userId)
+      dispatch('maybeMutePartnerLocally', zoomUser.userId)
     },
 
     async updatePartnerZoomUser(
       { dispatch, commit, state, getters, rootGetters },
       zoomUser
     ) {
+      dispatch('maybeMutePartnerLocally', zoomUser.userId)
+
       const wasPreviouslyMuted = getters.partnerIsMuted
       if (state.myZoomUser && state.myZoomUser?.userId !== zoomUser.userId) {
         if (
@@ -551,7 +595,6 @@ export default {
           commit('setEverShownDisplayCallStatus', true)
         }
       }
-      await dispatch('maybeMutePartnerLocally', zoomUser.userId)
     },
     dismissDisplayCallStatus: (
       { commit },
