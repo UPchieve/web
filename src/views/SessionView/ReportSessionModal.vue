@@ -4,7 +4,7 @@
     <h2 class="report-modal__subtitle">
       {{ reportModalSubtitle }}
       <a
-        v-if="!isInRecap"
+        v-if="!isInRecap && !isStudent"
         href="https://upc-training-materials.s3.us-east-2.amazonaws.com/reporting-guidelines.pdf"
         target="_blank"
         rel="noopener noreferrer"
