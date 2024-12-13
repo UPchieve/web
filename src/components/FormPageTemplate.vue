@@ -9,6 +9,9 @@
         'form-panel right w-75p': layout === 'panel-right-75p',
         full: layout === 'full',
       }"
+      :style="{
+        maxWidth: layout === 'card' && formCardMaxWidth ? formCardMaxWidth : '',
+      }"
     >
       <div v-if="layout.includes('panel')" class="img-content">
         <component v-if="panelImg" :is="panelImg" class="img" />
@@ -59,6 +62,10 @@ export default {
     },
     hideLogo: {
       default: false,
+    },
+    formCardMaxWidth: {
+      type: String,
+      default: null,
     },
   },
 }
