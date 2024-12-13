@@ -8,7 +8,7 @@
   <div v-else-if="this.userSelection === UserType.teacher" class="h-full">
     <sign-up-forms :getPageDetails="getTeacherPageDetails" />
   </div>
-  <form-page-template v-else>
+  <form-page-template v-else :formCardMaxWidth="'660px'">
     <div class="uc-form">
       <volunteer-form v-if="this.userSelection === 'volunteer'" />
       <student-form v-else-if="this.userSelection === 'student'" />
@@ -70,7 +70,7 @@
           </a>
         </div>
         <div v-else>
-          <p class="uc-form-text bold">I want to sign up as...</p>
+          <p class="uc-form-text bold">I want to sign up as a...</p>
           <div class="btn-card-container">
             <button
               data-testid="studentCard"
@@ -80,7 +80,7 @@
               <div class="img-container">
                 <student-avatar class="img"></student-avatar>
               </div>
-              <p class="text">A Student</p>
+              <p class="text">Student</p>
             </button>
             <button
               data-testid="volunteerCard"
@@ -90,7 +90,17 @@
               <div class="img-container">
                 <volunteer-avatar class="img"></volunteer-avatar>
               </div>
-              <p class="text">An Academic Coach</p>
+              <p class="text">Volunteer</p>
+            </button>
+            <button
+              data-testid="teacherCard"
+              class="btn-card teacher"
+              @click.prevent="selectTeacher"
+            >
+              <div class="img-container">
+                <teacher-avatar class="img"></teacher-avatar>
+              </div>
+              <p class="text">Teacher</p>
             </button>
           </div>
         </div>
@@ -118,6 +128,7 @@ import { getPageDetails as getStudentPageDetails } from '@/services/SignUpServic
 import { getPageDetails as getTeacherPageDetails } from '@/services/SignUpService/TeacherSignUpService'
 import StudentAvatar from '@/assets/student-avatar.svg'
 import VolunteerAvatar from '@/assets/volunteer-avatar.svg'
+import TeacherAvatar from '@/assets/teacher-avatar.svg'
 import { EVENTS } from '@/consts'
 
 export default {
@@ -130,6 +141,7 @@ export default {
     VolunteerForm,
     StudentAvatar,
     VolunteerAvatar,
+    TeacherAvatar,
   },
   data() {
     return {
@@ -209,6 +221,10 @@ export default {
       this.$router.push('/sign-up/student/eligibility')
       this.userSelection = 'student'
     },
+    selectTeacher() {
+      this.$router.push('/sign-up/teacher/eligibility')
+      this.userSelection = 'teacher'
+    },
   },
 }
 </script>
@@ -261,18 +277,19 @@ export default {
 
   &.volunteer {
     .img-container {
-      background: #a5e9ff;
-
-      .img {
-        height: 85%;
-        top: 8px;
-      }
+      background: #fedf85;
     }
   }
 
   &.student {
     .img-container {
       background: #f9bef9;
+    }
+  }
+
+  &.teacher {
+    .img-container {
+      background: #76e5fd;
     }
   }
 
