@@ -101,15 +101,17 @@ export default {
     },
 
     accept() {
-      const topic = this.topics.find((topic) => topic.id === this.topicId)
+      const topic = this.topics.find(
+        (topic) => topic.name === this.selectedTopic
+      )
       AnalyticsService.captureEvent(EVENTS.TEACHER_CREATED_CLASS, {
         className: this.className,
-        topicId: this.topicId,
+        topicId: topic.id,
         topicName: topic.displayName,
       })
       this.modalData.createTeacherClass({
         className: this.className,
-        topicId: this.topicId,
+        topicId: topic.id,
       })
       this.$store.dispatch('app/modal/hide')
     },

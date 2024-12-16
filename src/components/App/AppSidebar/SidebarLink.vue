@@ -9,8 +9,7 @@
     </div>
     <template v-else>
       <router-link
-        :class="parentClass"
-        active-class="SidebarLink--active"
+        :class="[parentClass, { 'SidebarLink--active': isActive }]"
         :to="to"
         tag="div"
         @click="$store.dispatch('app/sidebar/collapse')"
@@ -58,6 +57,11 @@ export default {
         SidebarLink: true,
         'SidebarLink--desktop': !this.mobileMode,
       }
+    },
+    isActive() {
+      return (
+        this.$route.path === this.to || this.$route.path.startsWith(this.to)
+      )
     },
   },
   methods: {

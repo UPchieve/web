@@ -1,6 +1,7 @@
 import { shallowMount } from '@vue/test-utils'
 import { merge } from 'lodash-es'
 import { createStore } from 'vuex'
+import router from '@/router'
 import { storeOptions } from '@/store'
 import SidebarLink from '@/components/App/AppSidebar/SidebarLink.vue'
 import { vi } from 'vitest'
@@ -14,7 +15,7 @@ const getWrapper = (props = {}, collapse) => {
 
   return shallowMount(SidebarLink, {
     global: {
-      plugins: [store],
+      plugins: [router, store],
     },
     props,
     slots: {
