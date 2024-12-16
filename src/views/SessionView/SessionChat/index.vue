@@ -52,12 +52,7 @@
         <div
           v-for="(message, index) in withPendingMessages"
           :key="`message-${index}`"
-          :class="[
-            messageAlignment(message),
-            message.type === 'audio-transcription'
-              ? 'message--transcribed'
-              : null,
-          ]"
+          :class="[messageAlignment(message)]"
           class="message"
         >
           <span
@@ -67,10 +62,15 @@
             {{ message.contents }}</span
           >
           <template v-else-if="message.type === 'audio-transcription'">
-            <transcribed-message
-              :message="message"
-              :sessionPartnerName="sessionPartnerName"
+            <component
+              class="avatar"
+              :is="avatar(message)"
+              v-if="message.user !== user.id"
             />
+            <transcribed-message :message="message" class="contents" />
+            <div class="time">
+              {{ formatTime(message.createdAt) }}
+            </div>
           </template>
           <template v-else>
             <component
@@ -98,28 +98,21 @@
             </div>
           </template>
         </div>
-        <div
-          v-if="showMyInProgressCaptionMessage"
-          class="message message--transcribed right"
-        >
+        <div v-if="showMyInProgressCaptionMessage" class="message right">
           <transcribed-message
+            class="contents"
             :message="{
               contents: myInProgressCaptionMessage.text,
-              user: myInProgressCaptionMessage.displayName,
             }"
-            :sessionPartnerName="sessionPartnerName"
           />
         </div>
-        <div
-          v-if="showPartnerInProgressCaptionMessage"
-          class="message message--transcribed left"
-        >
+        <div v-if="showPartnerInProgressCaptionMessage" class="message left">
+          <component class="avatar" :is="avatar({ user: sessionPartner.id })" />
           <transcribed-message
+            class="contents"
             :message="{
               contents: partnerInProgressCaptionMessage.text,
-              user: partnerInProgressCaptionMessage.displayName,
             }"
-            :sessionPartnerName="sessionPartnerName"
           />
         </div>
         <chat-bot
@@ -927,11 +920,6 @@ export default {
 
   /* Safari needs this specified to lay out the message divs properly. */
   flex-shrink: 0;
-
-  &--transcribed {
-    padding-top: 0.5em;
-    padding-bottom: 0.5em;
-  }
 }
 
 .avatar {

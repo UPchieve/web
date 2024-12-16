@@ -1,23 +1,15 @@
 <script setup lang="ts">
 import SpeakerFilledIcon from '@/assets/voice_message_icons/speaker-filled.svg'
-import { computed } from 'vue'
-import store from '@/store'
 
 const props = defineProps<{
-  message: { [key: string]: any; contents: string; user: string }
-  sessionPartnerName: string
+  message: { [key: string]: any; contents: string }
 }>()
-
-const userId = computed(() => store.state.user.user.id)
 </script>
 
 <template>
   <div class="live-caption">
     <div class="live-caption-contents">
       <speaker-filled-icon class="icon" />
-      <span class="live-caption-name">
-        {{ props.message.user === userId ? 'You' : props.sessionPartnerName }}:
-      </span>
     </div>
     <span class="message">{{ props.message.contents }}</span>
   </div>
@@ -25,7 +17,7 @@ const userId = computed(() => store.state.user.user.id)
 
 <style scoped lang="scss">
 .live-caption {
-  width: 80%;
+  max-width: 80%;
   display: inline;
 
   .live-caption-contents {
