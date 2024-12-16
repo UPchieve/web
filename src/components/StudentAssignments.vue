@@ -11,7 +11,9 @@
           @click="goToAssignment(assignment.classId, assignment.id)"
         >
           <div class="assignment-card--header">
-            <AssignmentIcon />
+            <div class="assignment-card--icon">
+              <AssignmentIcon />
+            </div>
             <div class="assignment-card--header-text">
               <h2>{{ assignment.title }}</h2>
               <p>Due Date: {{ formatDate(assignment.dueDate) }}</p>
@@ -99,12 +101,12 @@ export default {
     }
 
     @include breakpoint-between('760px', '992px') {
-      @include flex-container(row, space-between, flex-start);
+      @include flex-container(row, flex-start, flex-start);
       gap: 8px;
     }
 
     @include breakpoint-above('large') {
-      @include flex-container(row, space-between, flex-start);
+      @include flex-container(row, flex-start, flex-start);
       flex-flow: wrap;
     }
   }
@@ -139,15 +141,19 @@ export default {
   &--header {
     @include flex-container(row, flex-start, flex-start);
     gap: 16px;
-
-    h2 {
-      font-size: 18px;
-      margin-bottom: 0;
-    }
   }
 
   &--header-text {
     text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+
+    h2 {
+      font-size: 18px;
+      margin-bottom: 0;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
   }
 
   .assignments-progress-text {

@@ -828,6 +828,7 @@ export default {
   left: 20%;
   width: 100%;
   z-index: 3;
+  margin-bottom: 16px;
 }
 
 .assignment-card {
@@ -837,7 +838,14 @@ export default {
   border-radius: 8px;
   background-color: #ffffff;
   margin-bottom: 16px;
-  width: 350px;
+
+  @include breakpoint-below('medium') {
+    width: 80%;
+  }
+
+  @include breakpoint-above('medium') {
+    width: 350px;
+  }
 
   .assignment-icon {
     margin: 0 8px;
@@ -850,10 +858,15 @@ export default {
 
     h1 {
       font-size: 18px;
-      margin: 0;
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
+      width: 250px;
+      text-align: left;
+
+      @include breakpoint-below('medium') {
+        width: 120px;
+      }
     }
 
     p {
@@ -867,6 +880,7 @@ export default {
       margin-top: 1.25rem;
       color: #1855d1;
       font-weight: 500;
+      text-align: left;
     }
 
     .no-students-assigned {
