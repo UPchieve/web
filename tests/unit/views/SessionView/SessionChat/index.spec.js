@@ -40,6 +40,14 @@ describe('SessionChat', () => {
         socket: {
           messageData: {},
         },
+        liveMedia: {
+          namespaced: true,
+          modules: {
+            audio: {
+              state: {},
+            },
+          },
+        },
       },
     })
     return shallowMount(SessionChat, {

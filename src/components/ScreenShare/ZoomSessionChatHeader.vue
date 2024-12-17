@@ -20,7 +20,9 @@ const userType = computed(
 const sessionPartnerFirstName = computed(
   () => store.getters['user/sessionPartner'].firstname
 )
-const isStartingAudio = computed(() => store.state.sessionAudio.isStartingAudio)
+const isStartingAudio = computed(
+  () => store.state.liveMedia.audio.isStartingAudio
+)
 
 SessionAudioService.start()
 
@@ -34,36 +36,38 @@ onUnmounted(async () => {
 })
 
 const isPartnerSpeaking = computed(
-  () => store.state.sessionAudio.isPartnerSpeaking
+  () => store.state.liveMedia.audio.isPartnerSpeaking
 )
-const isSpeakerMuted = computed(() => store.state.sessionAudio.isSpeakerMuted)
-const isMicMuted = computed(() => store.state.sessionAudio.isMicMuted)
+const isSpeakerMuted = computed(
+  () => store.state.liveMedia.audio.isSpeakerMuted
+)
+const isMicMuted = computed(() => store.state.liveMedia.audio.isMicMuted)
 
 const toggleMuteSpeaker = async () => {
-  await store.dispatch('sessionAudio/toggleMuteSpeaker')
+  await store.dispatch('liveMedia/audio/toggleMuteSpeaker')
 }
 const toggleMuteMic = async () => {
-  await store.dispatch('sessionAudio/toggleMuteMic')
+  await store.dispatch('liveMedia/audio/toggleMuteMic')
 }
 
 const partnerStatus = computed(
-  () => store.getters['sessionAudio/partnerStatus']
+  () => store.getters['liveMedia/audio/partnerStatus']
 )
-const isSpeaking = computed(() => store.state.sessionAudio.isSpeaking)
-const micState = computed(() => store.state.sessionAudio.micState)
+const isSpeaking = computed(() => store.state.liveMedia.audio.isSpeaking)
+const micState = computed(() => store.state.liveMedia.audio.micState)
 const hasSpeakingPrivileges = computed(
-  () => store.getters['sessionAudio/hasSpeakingPrivileges']
+  () => store.getters['liveMedia/audio/hasSpeakingPrivileges']
 )
 const partnerIsInAudioChannel = computed(
-  () => store.getters['sessionAudio/partnerIsInAudioChannel']
+  () => store.getters['liveMedia/audio/partnerIsInAudioChannel']
 )
 
 const audioCallSupported = computed(
-  () => store.getters['sessionAudio/audioCallSupported']
+  () => store.getters['liveMedia/audio/audioCallSupported']
 )
-const isJoining = computed(() => store.getters['sessionAudio/isJoining'])
+const isJoining = computed(() => store.getters['liveMedia/audio/isJoining'])
 const isActiveInAnotherTab = computed(
-  () => store.getters['sessionAudio/isActiveInAnotherTab']
+  () => store.getters['liveMedia/audio/isActiveInAnotherTab']
 )
 const mobileMode = computed(() => store.getters['app/mobileMode'])
 </script>

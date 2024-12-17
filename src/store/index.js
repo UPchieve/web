@@ -9,7 +9,7 @@ import notificationsModule from './modules/notifications'
 import socketModule from './modules/socket'
 import sessionModule from './modules/session'
 import botConversationsModule from './modules/bot-conversations'
-import sessionAudioModule from './modules/session-audio'
+import liveMediaModule from './modules/liveMedia'
 
 export const storeOptions = {
   modules: {
@@ -22,7 +22,7 @@ export const storeOptions = {
     notifications: notificationsModule,
     socket: socketModule,
     session: sessionModule,
-    sessionAudio: sessionAudioModule,
+    liveMedia: liveMediaModule,
     botConversations: botConversationsModule,
   },
 }
