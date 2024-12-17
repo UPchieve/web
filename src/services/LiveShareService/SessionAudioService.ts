@@ -154,8 +154,8 @@ const userAddedHandler = async (zoomUsers) => {
   for (const zoomUser of zoomUsers) {
     const isMeInAnotherTab =
       zoomUser.userIdentity ===
-        store.state.sessionAudio.myZoomUser?.userIdentity &&
-      zoomUser.userId !== store.state.sessionAudio.myZoomUser?.userId
+        store.state.liveMedia.audio.myZoomUser?.userIdentity &&
+      zoomUser.userId !== store.state.liveMedia.audio.myZoomUser?.userId
 
     /*
       user is me in another tab, move state to JOINED_IN_OTHER_TAB
@@ -168,16 +168,16 @@ const userAddedHandler = async (zoomUsers) => {
       continue
     }
     zoomUser.userIdentity === store.state.user.user.id
-      ? store.commit('sessionAudio/setMyZoomUser', zoomUser)
-      : store.dispatch('sessionAudio/setPartnerZoomUser', zoomUser)
+      ? store.commit('liveMedia/setMyZoomUser', zoomUser)
+      : store.dispatch('liveMedia/setPartnerZoomUser', zoomUser)
   }
 }
 const userRemovedHandler = async (zoomUsers) => {
   for (const zoomUser of zoomUsers) {
     const isMeInAnotherTab =
       zoomUser.userIdentity ===
-        store.state.sessionAudio.myZoomUser?.userIdentity &&
-      zoomUser.userId !== store.state.sessionAudio.myZoomUser?.userId
+        store.state.liveMedia.audio.myZoomUser?.userIdentity &&
+      zoomUser.userId !== store.state.liveMedia.audio.myZoomUser?.userId
 
     /*
       user is me in another tab, move state to JOINED_IN_OTHER_TAB
@@ -191,7 +191,7 @@ const userRemovedHandler = async (zoomUsers) => {
     }
 
     if (zoomUser.userIdentity !== store.state.user.user.id) {
-      store.commit('sessionAudio/setPartnerZoomUser', null)
+      store.commit('liveMedia/setPartnerZoomUser', null)
     }
   }
 }
@@ -199,26 +199,26 @@ const userRemovedHandler = async (zoomUsers) => {
 const userUpdatedHandler = async (zoomUsers) => {
   for (const zoomUser of zoomUsers) {
     if (zoomUser.userIdentity === store.state.user.user.id) {
-      store.dispatch('sessionAudio/updateMyZoomUser', zoomUser)
+      store.dispatch('liveMedia/updateMyZoomUser', zoomUser)
     } else {
-      store.dispatch('sessionAudio/updatePartnerZoomUser', zoomUser)
+      store.dispatch('liveMedia/updatePartnerZoomUser', zoomUser)
     }
   }
 }
 const activeSpeakerHandler = (payload) => {
-  store.dispatch('sessionAudio/setActiveSpeakers', payload)
+  store.dispatch('liveMedia/audio/setActiveSpeakers', payload)
 }
 
 const captionMessageHandler = (payload) => {
   if (payload.done) {
-    store.dispatch('sessionAudio/setCaptionMessage', payload)
+    store.dispatch('liveMedia/audio/setCaptionMessage', payload)
   } else {
-    store.dispatch('sessionAudio/inProgressCaptionMessage', payload)
+    store.dispatch('liveMedia/audio/inProgressCaptionMessage', payload)
   }
 }
 const devicePermissionChangeHandler = (payload) => {
   if (payload.name === 'microphone') {
-    store.dispatch('sessionAudio/setMicState', payload.state)
+    store.dispatch('liveMedia/audio/setMicState', payload.state)
   }
 }
 
@@ -229,13 +229,13 @@ export class SessionAudioService {
     await this.send(SessionAudioEvent.CHECK_ELIGIBILITY)
   }
   static async send(event: SessionAudioEvent) {
-    const currentState = store.state.sessionAudio
+    const currentState = store.state.liveMedia.audio
       .sessionAudioState as SessionAudioState
     const currentStateConfig = callStateDefinition.states[currentState]
     const nextState = currentStateConfig?.on?.[event]
 
     if (nextState) {
-      store.commit('sessionAudio/setSessionAudioState', nextState)
+      store.commit('liveMedia/audio/setSessionAudioState', nextState)
 
       const nextStateConfig =
         callStateDefinition.states[nextState as SessionAudioState]
@@ -254,18 +254,18 @@ export class SessionAudioService {
     async handleJoinError() {
       LoggerService.noticeError('Failed to join call, retrying...')
 
-      if (store.state.sessionAudio.retryCount < 5) {
+      if (store.state.liveMedia.retryCount < 5) {
         setTimeout(async () => {
           store.commit(
-            'sessionAudio/setRetryCount',
-            store.state.sessionAudio.retryCount + 1
+            'liveMedia/setRetryCount',
+            store.state.liveMedia.retryCount + 1
           )
           store.commit(
-            'sessionAudio/setRetryBackoff',
-            store.state.sessionAudio.retryBackoff * 3
+            'liveMedia/setRetryBackoff',
+            store.state.liveMedia.retryBackoff * 3
           )
           await SessionAudioService.send(SessionAudioEvent.RETRY)
-        }, store.state.sessionAudio.retryBackoff)
+        }, store.state.liveMedia.retryBackoff)
       } else {
         LoggerService.noticeError('Unable to join call. Not retrying')
         await SessionAudioService.send(SessionAudioEvent.UNABLE_TO_JOIN)
@@ -274,8 +274,8 @@ export class SessionAudioService {
 
     async joinChannelCommon() {
       try {
-        await store.dispatch('sessionAudio/syncSessionAudio')
-        const zoomClient = store.state.sessionAudio.zoomClient
+        await store.dispatch('liveMedia/audio/syncSessionAudio')
+        const zoomClient = store.state.liveMedia.zoomClient
 
         /* TODO: we should remove these handlers in a`JoinError` state action
           or add the event handlers in an earlier state. that way we don't risk
@@ -292,7 +292,7 @@ export class SessionAudioService {
         // NOTE: when adding a new handler, make sure to remove it in the `leaveChannel` method
 
         const token = await getSignature(
-          store.getters['sessionAudio/sessionId']
+          store.getters['liveMedia/audio/sessionId']
         )
 
         /*
@@ -308,7 +308,7 @@ export class SessionAudioService {
         */
         await Promise.race([
           zoomClient.join(
-            store.getters['sessionAudio/sessionId'],
+            store.getters['liveMedia/audio/sessionId'],
             token,
             store.state.user.user.id
           ),
@@ -323,7 +323,7 @@ export class SessionAudioService {
         }
 
         const ltc =
-          store.state.sessionAudio.zoomClient.getLiveTranscriptionClient()
+          store.state.liveMedia.zoomClient.getLiveTranscriptionClient()
         await ltc.startLiveTranscription({ language: 'en' })
       } catch (e) {
         LoggerService.noticeError(e)
@@ -357,40 +357,40 @@ export class SessionAudioService {
         // TODO: do we need a retry if this somehow throws?
         // and if we can never leave, then refresh the page?
         this.removeHandlers()
-        await store.state.sessionAudio.zoomClient.getMediaStream().stopAudio()
-        await store.state.sessionAudio.zoomClient.leave()
+        await store.state.liveMedia.zoomClient.getMediaStream().stopAudio()
+        await store.state.liveMedia.zoomClient.leave()
         // reset audio
         await SessionAudioService.send(SessionAudioEvent.LEFT_CALL)
       } catch (e) {
         LoggerService.noticeError(e)
       } finally {
-        store.dispatch('sessionAudio/resetState')
+        store.dispatch('liveMedia/audio/resetState')
       }
     },
 
     async inactivate() {
-      const zoomClient = store.state.sessionAudio.zoomClient
+      const zoomClient = store.state.liveMedia.zoomClient
       // Remove all handlers EXCEPT for device-permissions and user-removed
       zoomClient.off('user-added', userAddedHandler)
       zoomClient.off('user-updated', userUpdatedHandler)
       zoomClient.off(`caption-message`, captionMessageHandler)
       zoomClient.off(`active-speaker`, activeSpeakerHandler)
 
-      await store.state.sessionAudio.zoomClient.getMediaStream().stopAudio()
-      store.commit('sessionAudio/setIsMicMuted', true)
+      await store.state.liveMedia.zoomClient.getMediaStream().stopAudio()
+      store.commit('liveMedia/audio/setIsMicMuted', true)
       // TODO why is the `paratner speaking` pop up showing?
     },
 
     async reactivate() {
-      const zoomClient = store.state.sessionAudio.zoomClient
+      const zoomClient = store.state.liveMedia.zoomClient
       zoomClient.on('user-added', userAddedHandler)
       zoomClient.on('user-updated', userUpdatedHandler)
       zoomClient.on(`caption-message`, captionMessageHandler)
       zoomClient.on(`active-speaker`, activeSpeakerHandler)
 
-      await store.dispatch('sessionAudio/startAudio')
+      await store.dispatch('liveMedia/audio/startAudio')
 
-      if (store.state.sessionAudio.isBanned) {
+      if (store.state.liveMedia.audio.isBanned) {
         await SessionAudioService.send(SessionAudioEvent.REACTIVATE_AS_BANNED)
       } else {
         await SessionAudioService.send(SessionAudioEvent.REACTIVATE)
@@ -398,31 +398,25 @@ export class SessionAudioService {
     },
 
     removeHandlers() {
-      store.state.sessionAudio.zoomClient.off('user-added', userAddedHandler)
-      store.state.sessionAudio.zoomClient.off(
-        'user-removed',
-        userRemovedHandler
-      )
-      store.state.sessionAudio.zoomClient.off(
-        'user-updated',
-        userUpdatedHandler
-      )
-      store.state.sessionAudio.zoomClient.off(
+      store.state.liveMedia.zoomClient.off('user-added', userAddedHandler)
+      store.state.liveMedia.zoomClient.off('user-removed', userRemovedHandler)
+      store.state.liveMedia.zoomClient.off('user-updated', userUpdatedHandler)
+      store.state.liveMedia.zoomClient.off(
         `caption-message`,
         captionMessageHandler
       )
-      store.state.sessionAudio.zoomClient.off(
+      store.state.liveMedia.zoomClient.off(
         `active-speaker`,
         activeSpeakerHandler
       )
-      store.state.sessionAudio.zoomClient.off(
+      store.state.liveMedia.zoomClient.off(
         `device-permission-change`,
         devicePermissionChangeHandler
       )
     },
 
     async revokeSpeakingPrivileges() {
-      await store.dispatch('sessionAudio/updateMicMuted', true)
+      await store.dispatch('liveMedia/audio/updateMicMuted', true)
     },
 
     async checkEligibility() {
@@ -433,7 +427,7 @@ export class SessionAudioService {
       }
 
       const isBannedFromLiveMedia =
-        store.getters['sessionAudio/isBannedFromLiveMedia']
+        store.getters['liveMedia/isBannedFromLiveMedia']
       if (isBannedFromLiveMedia) {
         await SessionAudioService.send(SessionAudioEvent.JOIN_AS_BANNED)
       } else {

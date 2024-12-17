@@ -277,9 +277,9 @@ export default {
       isTyping: (state) => state.socket.isTyping,
       messageData: (state) => state.socket.messageData,
       myInProgressCaptionMessage: (state) =>
-        state.sessionAudio?.myInProgressCaptionMessage,
+        state.liveMedia.audio.myInProgressCaptionMessage,
       partnerInProgressCaptionMessage: (state) =>
-        state.sessionAudio?.partnerInProgressCaptionMessage,
+        state.liveMedia.audio.partnerInProgressCaptionMessage,
     }),
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',
@@ -350,6 +350,7 @@ export default {
     },
   },
   mounted() {
+    this.fetchIsSessionAudioCallEnabled(this.sessionPartner?.id)
     if (this.chatScrolledToMessageIndex !== null) {
       const messageElements = this.getUserMessageElements()
       this.$refs.messages.scrollTop =
@@ -358,6 +359,7 @@ export default {
   },
   methods: {
     async fetchIsSessionAudioCallEnabled(partnerUserId) {
+      if (!partnerUserId) return
       this.isSessionAudioCallEnabled = await this.$store.dispatch(
         'featureFlags/isSessionAudioCallEnabled',
         partnerUserId

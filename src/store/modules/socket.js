@@ -225,11 +225,11 @@ export default {
       })
 
       socket.on('sessions:partner-banned-from-live-media', () => {
-        this.dispatch('sessionAudio/partnerBannedFromLiveMedia')
+        this.dispatch('liveMedia/partnerBannedFromLiveMedia')
       })
 
       socket.on('sessions:banned-from-live-media', () => {
-        this.dispatch('sessionAudio/bannedFromLiveMedia')
+        this.dispatch('liveMedia/bannedFromLiveMedia')
       })
     },
     connect() {

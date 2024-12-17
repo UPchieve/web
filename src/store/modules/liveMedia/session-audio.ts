@@ -1,23 +1,9 @@
-import ZoomVideo from '@zoom/videosdk'
 import NetworkService from '@/services/NetworkService'
-import {
-  SessionAudioEvent,
-  SessionAudioService,
-  SessionAudioState,
-} from '@/services/LiveShareService/SessionAudioService'
+import { SessionAudioState } from '@/services/LiveShareService/SessionAudioService'
 import { socket } from '@/socket'
 import LoggerService from '@/services/LoggerService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
-
-ZoomVideo.preloadDependentAssets()
-const zoomClient = ZoomVideo.createClient()
-if (ZoomVideo.checkSystemRequirements().audio) {
-  zoomClient.init('en-US', 'Global', {
-    patchJsMedia: true,
-    leaveOnPageUnload: true,
-  })
-}
 
 const MIN_VOLUME = 0
 const MAX_VOLUME = 100
@@ -85,14 +71,9 @@ const getDefaultState = () => ({
   isSpeakerOnly: true,
   isPartnerSpeaking: false,
   isPartnerSpeakingTimeout: null,
-  myZoomUser: null,
-  partnerZoomUser: null,
   isAudioStarted: false,
   displayCallStatus: null,
   everShownDisplayCallStatus: false,
-  retryCount: 0,
-  retryBackoff: 100,
-  isPartnerJustBannedFromLiveMedia: false,
   partnerHasNeverJoinedAudio: true,
   isStartingAudio: false,
   myInProgressCaptionMessage: null,
@@ -109,7 +90,6 @@ const getDefaultState = () => ({
 export default {
   namespaced: true,
   state: {
-    zoomClient,
     micState: 'prompt', // prompt, denied, granted
     ...getDefaultState(),
   },
@@ -117,28 +97,33 @@ export default {
   getters: {
     audioCallSupported: (state) =>
       state.sessionAudioState !== SessionAudioState.AudioNotSupported,
-    partnerIsInAudioChannel: (state, getters) => {
+    partnerIsInAudioChannel: (_state, _getters, rootState, rootGetters) => {
       return Boolean(
-        state.partnerZoomUser &&
-          state.partnerZoomUser.audio?.length > 0 &&
-          !getters.isPartnerBannedFromLiveMedia
+        rootState.liveMedia.partnerZoomUser &&
+          rootState.liveMedia.partnerZoomUser.audio?.length > 0 &&
+          !rootGetters['liveMedia/isPartnerBannedFromLiveMedia']
       )
     },
-    micStatus: (state, getters, rootState) => {
+    micStatus: (state, getters, rootState, rootGetters) => {
       const name = getters.userType === 'student' ? 'Coach' : 'Student'
       const possessive = name + "'s"
       const online = rootState.session.isPartnerOnline
       const deniedMicPermissions =
-        state.partnerZoomUser?.isSpeakerOnly && online && getters.partnerIsMuted
+        rootState.liveMedia.partnerZoomUser?.isSpeakerOnly &&
+        online &&
+        getters.partnerIsMuted
       const hasNotJoinedAudioYet =
-        state.partnerZoomUser &&
-        (state.partnerZoomUser.audio?.length === 0 ||
-          typeof state.partnerZoomUser.audio === 'undefined') &&
+        rootState.liveMedia.partnerZoomUser &&
+        (rootState.liveMedia.partnerZoomUser.audio?.length === 0 ||
+          typeof rootState.liveMedia.partnerZoomUser.audio === 'undefined') &&
         getters.partnerIsMuted &&
         online
-      if (deniedMicPermissions || state.partnerZoomUser === null) {
+      if (
+        deniedMicPermissions ||
+        rootState.liveMedia.partnerZoomUser === null
+      ) {
         return `${name} has no mic`
-      } else if (getters.isPartnerBannedFromLiveMedia) {
+      } else if (rootGetters['liveMedia/isPartnerBannedFromLiveMedia']) {
         return `${possessive} mic is censored`
       } else if (hasNotJoinedAudioYet && state.partnerHasNeverJoinedAudio) {
         return `${name} has not enabled their mic yet`
@@ -164,24 +149,9 @@ export default {
     userType: (state, getters, rootState) => {
       return rootState.user.user.userType
     },
-    partnerIsMuted: (state) => {
-      return state.partnerZoomUser?.muted ?? true
+    partnerIsMuted: (_state, _getters, rootState) => {
+      return rootState.liveMedia.partnerZoomUser?.muted ?? true
     },
-    isBannedFromLiveMedia: (state, getters, rootState, rootGetters) => {
-      const banType = rootGetters['user/banType']
-      return banType && banType === 'live_media'
-    },
-
-    isPartnerBannedFromLiveMedia: (state, getters, rootState) => {
-      if (state.isPartnerJustBannedFromLiveMedia) return true
-      const session = rootState.user.session
-      const key =
-        getters.userType === 'student'
-          ? 'volunteerBannedFromLiveMedia'
-          : 'studentBannedFromLiveMedia'
-      return session && session[key]
-    },
-
     hasSpeakingPrivileges: (state) => {
       return ![
         SessionAudioState.JoinedAsBanned,
@@ -221,33 +191,20 @@ export default {
     setPartnerHasJoinedAudio: (state) => {
       state.partnerHasNeverJoinedAudio = false
     },
-    setRetryCount: (state, retryCount) => (state.retryCount = retryCount),
-    setRetryBackoff: (state, retryBackoff) =>
-      (state.retryBackoff = retryBackoff),
     setDisplayCallStatus: (state, displayCallStatus) =>
       (state.displayCallStatus = displayCallStatus),
     setIsSpeakerMuted: (state, isSpeakerMuted) =>
       (state.isSpeakerMuted = isSpeakerMuted),
     setIsMicMuted: (state, isMicMuted) => (state.isMicMuted = isMicMuted),
-    setMyZoomUser: (state, zoomUser) => (state.myZoomUser = zoomUser),
-    setPartnerZoomUser: (state, zoomUser) => (state.partnerZoomUser = zoomUser),
     setIsAudioStarted: (state, flag) => (state.isAudioStarted = flag),
     setIsPartnerSpeaking: (state, flag) => (state.isPartnerSpeaking = flag),
     setIsSpeaking: (state, flag) => (state.isSpeaking = flag),
     setEverShownDisplayCallStatus: (state, flag) =>
       (state.everShownDisplayCallStatus = flag),
-    updatePartnerZoomUser: (state, zoomUser) =>
-      (state.partnerZoomUser = {
-        ...state.partnerZoomUser,
-        ...zoomUser,
-      }),
-    updateMyZoomUser: (state, zoomUser) =>
-      (state.myZoomUser = { ...state.myZoomUser, ...zoomUser }),
     resetState: (state) => {
       clearTimeout(state.isSpeakingTimeout)
       clearTimeout(state.isPartnerSpeakingTimeout)
       Object.assign(state, {
-        zoomClient: state.zoomClient,
         micState: state.micState,
         ...getDefaultState(),
       })
@@ -263,13 +220,11 @@ export default {
       return (state.partnerInProgressCaptionMessage = data)
     },
     setMicState: (state, micState) => (state.micState = micState),
-    setIsPartnerJustBannedFromLiveMedia: (state, val) =>
-      (state.isPartnerJustBannedFromLiveMedia = val),
     setIsStartingAudio: (state, val) => (state.isStartingAudio = val),
   },
 
   actions: {
-    setMicState: async ({ state, commit, dispatch }, micState) => {
+    setMicState: async ({ state, rootState, commit, dispatch }, micState) => {
       commit('setMicState', micState)
 
       // Only do this if the audio has been started. starting audio
@@ -279,24 +234,24 @@ export default {
         if (micState === 'denied') {
           commit('setIsMicMuted', true)
           // if we are denying mic access during the call, stop and rejoin with speaker only
-          await state.zoomClient.getMediaStream().stopAudio()
+          await rootState.liveMedia.zoomClient.getMediaStream().stopAudio()
           await dispatch('startAudio', { speakerOnly: true })
         } else {
           // if we grant mic access during the call, stop and rejoin
-          await state.zoomClient.getMediaStream().stopAudio()
+          await rootState.liveMedia.getMediaStream().stopAudio()
           await dispatch('startAudio', { speakerOnly: false })
         }
       }
     },
-    setActiveSpeakers: ({ commit, state, dispatch }, payload) => {
+    setActiveSpeakers: ({ commit, state, rootState, dispatch }, payload) => {
       clearTimeout(state.isSpeakingTimeout)
       clearTimeout(state.isPartnerSpeakingTimeout)
 
       const isSpeaking = payload.some(
-        (p) => p.userId === state?.myZoomUser?.userId
+        (p) => p.userId === rootState.liveMedia.myZoomUser?.userId
       )
       const isPartnerSpeaking = payload.some(
-        (p) => p.userId === state?.partnerZoomUser?.userId
+        (p) => p.userId === rootState.liveMedia.partnerZoomUser?.userId
       )
       commit('setIsSpeaking', isSpeaking)
       commit('setIsPartnerSpeaking', isPartnerSpeaking)
@@ -321,7 +276,10 @@ export default {
 
       // This hack handles any oddball cases where iOS safari doesn't properly mute the speaker. (ex: user refreshes their page)
       // We spam this everytime a user speaks to ensure the partner's speaker is muted when it should be
-      dispatch('maybeMutePartnerLocally', state.partnerZoomUser?.userId)
+      dispatch(
+        'maybeMutePartnerLocally',
+        rootState.liveMedia.partnerZoomUser?.userId
+      )
     },
     resetState: ({ commit }) => commit('resetState'),
 
@@ -416,17 +374,20 @@ export default {
       }
     },
 
-    async startAudio({ commit, state }, { speakerOnly = false } = {}) {
+    async startAudio(
+      { commit, state, rootState },
+      { speakerOnly = false } = {}
+    ) {
       commit('setIsStartingAudio', true)
       try {
-        const stream = state.zoomClient.getMediaStream()
+        const stream = rootState.liveMedia.zoomClient.getMediaStream()
         // Start with all audio muted if our speaker is muted
         // This works in most browsers and will prevent any sound
         // from the partner from being heard while we start up
         if (state.isSpeakerMuted) {
-          await muteUser(stream, state.partnerZoomUser?.userId)
+          await muteUser(stream, rootState.liveMedia.partnerZoomUser?.userId)
         } else {
-          await unmuteUser(stream, state.partnerZoomUser?.userId)
+          await unmuteUser(stream, rootState.liveMedia.partnerZoomUser?.userId)
         }
 
         if (state.micState === 'denied' || speakerOnly) {
@@ -443,9 +404,9 @@ export default {
         // Because iOS Safari doesn't properly mute the speaker when joining the call,
         // We call it hear after the call starts (which sometimes works and sometimes doesn't :gif of me pulling out my hair:)
         if (state.isSpeakerMuted) {
-          await muteUser(stream, state.partnerZoomUser?.userId)
+          await muteUser(stream, rootState.liveMedia.partnerZoomUser?.userId)
         } else {
-          await unmuteUser(stream, state.partnerZoomUser?.userId)
+          await unmuteUser(stream, rootState.liveMedia.partnerZoomUser?.userId)
         }
       } catch (e) {
         LoggerService.noticeError(JSON.stringify(e))
@@ -454,7 +415,7 @@ export default {
       }
     },
 
-    async toggleMuteMic({ dispatch, state }) {
+    async toggleMuteMic({ dispatch, state, rootState }) {
       if (!state.isAudioStarted) {
         await dispatch('startAudio', { speakerOnly: false })
       } else if (
@@ -462,14 +423,17 @@ export default {
         state.micState !== 'denied' &&
         state.isSpeakerOnly
       ) {
-        await state.zoomClient.getMediaStream().stopAudio()
+        await rootState.liveMedia.zoomClient.getMediaStream().stopAudio()
         await dispatch('startAudio', { speakerOnly: false })
       }
       await dispatch('updateMicMuted', !state.isMicMuted)
     },
 
-    async updateMicMuted({ commit, state, dispatch }, muted: boolean) {
-      const stream = state.zoomClient.getMediaStream()
+    async updateMicMuted(
+      { commit, state, rootState, dispatch },
+      muted: boolean
+    ) {
+      const stream = rootState.liveMedia.zoomClient.getMediaStream()
 
       if (!muted && state.isMicMuted) {
         await stream.unmuteAudio()
@@ -486,11 +450,11 @@ export default {
       }
     },
 
-    async toggleMuteSpeaker({ dispatch, commit, state }) {
+    async toggleMuteSpeaker({ dispatch, commit, state, rootState }) {
       const isMuted = !state.isSpeakerMuted
       commit('setIsSpeakerMuted', isMuted)
 
-      const stream = state.zoomClient.getMediaStream()
+      const stream = rootState.liveMedia.zoomClient.getMediaStream()
       if (!state.isAudioStarted) {
         await dispatch('startAudio', { speakerOnly: true })
       }
@@ -500,21 +464,21 @@ export default {
       // AND their speaker was muted, unmute them
       if (
         isMuted &&
-        state.partnerZoomUser &&
-        state.partnerZoomUser?.audio?.length > 0
+        rootState.liveMedia.partnerZoomUser &&
+        rootState.liveMedia.partnerZoomUser?.audio?.length > 0
       ) {
-        await muteUser(stream, state.partnerZoomUser?.userId)
+        await muteUser(stream, rootState.liveMedia.partnerZoomUser?.userId)
       } else if (
-        state.partnerZoomUser &&
-        state.partnerZoomUser?.audio?.length > 0
+        rootState.liveMedia.partnerZoomUser &&
+        rootState.liveMedia.partnerZoomUser?.audio?.length > 0
       ) {
-        await unmuteUser(stream, state.partnerZoomUser?.userId)
+        await unmuteUser(stream, rootState.liveMedia.partnerZoomUser?.userId)
         await dispatch('dismissDisplayCallStatus')
       }
     },
 
-    async maybeMutePartnerLocally({ state }, zoomUserId) {
-      const stream = state.zoomClient.getMediaStream()
+    async maybeMutePartnerLocally({ state, rootState }, zoomUserId) {
+      const stream = rootState.liveMedia.zoomClient.getMediaStream()
       if (state.isSpeakerMuted) {
         await muteUser(stream, zoomUserId)
       } else {
@@ -522,78 +486,54 @@ export default {
       }
     },
 
-    setPartnerZoomUser({ dispatch, commit }, zoomUser) {
-      commit('setPartnerZoomUser', zoomUser)
-      dispatch('maybeMutePartnerLocally', zoomUser.userId)
-    },
-
     async updatePartnerZoomUser(
-      { dispatch, commit, state, getters, rootGetters },
-      zoomUser
+      { dispatch, commit, state, rootState, getters, rootGetters },
+      data: { zoomUser: any; wasPreviouslyMuted: boolean }
     ) {
-      dispatch('maybeMutePartnerLocally', zoomUser.userId)
-
-      const wasPreviouslyMuted = getters.partnerIsMuted
-      if (state.myZoomUser && state.myZoomUser?.userId !== zoomUser.userId) {
-        if (
-          (zoomUser?.audio?.length === 0 ||
-            state.partnerZoomUser?.audio?.length === 0) &&
-          zoomUser.muted === false
-        ) {
-          // Zoom SDK seems to have a bug where it doesn't always mute
-          // even when `await stream.muteAudioUponStartAudio(true)` is called.
-          // seems to be a race condition where they are unmuted before Joining
-          // audio but then quickly muted after. This is a workaround to ensure
-          // they are always muted on join
-          zoomUser.muted = true
+      if (data.zoomUser.muted) {
+        if (!data.wasPreviouslyMuted && getters.partnerIsMuted) {
+          await dispatch('dismissDisplayCallStatus')
         }
+        // The partner may still have an in-progress transcription when they mute themself.
+        // Send it as the final transcription (consider it complete)
+        // and track the message ID so that when they next unmute,
+        // we ignore any further transcription events with that ID.
+        await dispatch(
+          'setCaptionMessage',
+          state.partnerInProgressCaptionMessage
+        )
+        commit(
+          'setPartnerCaptionsLastMessageIdBeforeMute',
+          state.partnerCurrentMessageId
+        )
+        commit('setPartnerInProgressCaptionMessage', null)
+      }
 
-        commit('updatePartnerZoomUser', zoomUser)
-        if (zoomUser.muted) {
-          if (!wasPreviouslyMuted && getters.partnerIsMuted) {
-            await dispatch('dismissDisplayCallStatus')
-          }
-          // The partner may still have an in-progress transcription when they mute themself.
-          // Send it as the final transcription (consider it complete)
-          // and track the message ID so that when they next unmute,
-          // we ignore any further transcription events with that ID.
-          await dispatch(
-            'setCaptionMessage',
-            state.partnerInProgressCaptionMessage
-          )
-          commit(
-            'setPartnerCaptionsLastMessageIdBeforeMute',
-            state.partnerCurrentMessageId
-          )
-          commit('setPartnerInProgressCaptionMessage', null)
-        }
+      const partnerIsInAudioChannel =
+        rootState.liveMedia.partnerZoomUser &&
+        rootState.liveMedia.partnerZoomUser.audio &&
+        rootState.liveMedia.partnerZoomUser.audio.length > 0
 
-        const partnerIsInAudioChannel =
-          state.partnerZoomUser &&
-          state.partnerZoomUser.audio &&
-          state.partnerZoomUser.audio.length > 0
+      if (partnerIsInAudioChannel) {
+        commit('setPartnerHasJoinedAudio')
+      }
 
-        if (partnerIsInAudioChannel) {
-          commit('setPartnerHasJoinedAudio')
-        }
+      const shouldShowDisplayCallStatus =
+        partnerIsInAudioChannel &&
+        typeof rootState.liveMedia.partnerZoomUser.muted === 'boolean' &&
+        !rootState.liveMedia.partnerZoomUser.muted &&
+        !state.everShownDisplayCallStatus &&
+        state.isSpeakerMuted
 
-        const shouldShowDisplayCallStatus =
-          partnerIsInAudioChannel &&
-          typeof state.partnerZoomUser.muted === 'boolean' &&
-          !state.partnerZoomUser.muted &&
-          !state.everShownDisplayCallStatus &&
-          state.isSpeakerMuted
-
-        if (shouldShowDisplayCallStatus) {
-          commit('setDisplayCallStatus', {
-            type: 'partner-speaking',
-            icon: 'speaker',
-            main: `${rootGetters['user/sessionPartner'].firstName} is speaking`,
-            secondary: `Click ${rootGetters['user/sessionPartner'].firstName}'s icon to listen`,
-            fadeOutAfterMs: 3000,
-          })
-          commit('setEverShownDisplayCallStatus', true)
-        }
+      if (shouldShowDisplayCallStatus) {
+        commit('setDisplayCallStatus', {
+          type: 'partner-speaking',
+          icon: 'speaker',
+          main: `${rootGetters['user/sessionPartner'].firstName} is speaking`,
+          secondary: `Click ${rootGetters['user/sessionPartner'].firstName}'s icon to listen`,
+          fadeOutAfterMs: 3000,
+        })
+        commit('setEverShownDisplayCallStatus', true)
       }
     },
     dismissDisplayCallStatus: (
@@ -606,10 +546,6 @@ export default {
       } else {
         dismiss()
       }
-    },
-
-    async updateMyZoomUser({ commit }, zoomUser) {
-      commit('updateMyZoomUser', zoomUser)
     },
 
     // TDOO create this before volunteer joins
@@ -644,19 +580,6 @@ export default {
           }
         )
       }
-    },
-
-    async bannedFromLiveMedia({ dispatch }) {
-      await dispatch(
-        'user/addToUser',
-        { banType: 'live_media' },
-        { root: true }
-      )
-      await SessionAudioService.send(SessionAudioEvent.BAN)
-    },
-
-    partnerBannedFromLiveMedia({ commit }) {
-      commit('setIsPartnerJustBannedFromLiveMedia', true)
     },
   },
 }

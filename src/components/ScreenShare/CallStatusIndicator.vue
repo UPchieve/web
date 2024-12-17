@@ -6,10 +6,10 @@ import SpeakerIcon from '@/assets/voice_message_icons/speaker.svg'
 const store = useStore()
 
 const displayCallStatus = computed(() => {
-  return store.state.sessionAudio.displayCallStatus
+  return store.state.liveMedia.audio.displayCallStatus
 })
 function clearDisplayCallStatusImmediately() {
-  store.dispatch('sessionAudio/dismissDisplayCallStatus', {
+  store.dispatch('liveMedia/audio/dismissDisplayCallStatus', {
     fadeOut: true,
     afterMs: 0,
   })

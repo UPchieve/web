@@ -14,7 +14,7 @@ const props = defineProps<{
 }>()
 
 const sessionPartner = computed(() => store.getters['user/sessionPartner'])
-const micStatus = computed(() => store.getters['sessionAudio/micStatus'])
+const micStatus = computed(() => store.getters['liveMedia/audio/micStatus'])
 
 const onMouseEnterAudioStatus = () => {
   AnalyticsService.captureEvent(
