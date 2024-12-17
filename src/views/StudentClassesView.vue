@@ -13,6 +13,7 @@ import TaskBadge from '@/assets/task-badge.svg'
 import UpdogCrying from '@/assets/updog-crying.svg'
 import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'
+import ActivityDot from '@/components/ActivityDot.vue'
 
 const $store = useStore()
 const $route = useRoute()
@@ -248,6 +249,10 @@ function goToClassesFromAssignmentDetail() {
             role="button"
           >
             <h2 data-testid="student-class-name">{{ teacherClass.name }}</h2>
+            <activity-dot
+              v-if="teacherClass.assignments.length"
+              class="tabs__notification"
+            ></activity-dot>
           </div>
           <div class="divider"></div>
         </div>
@@ -379,12 +384,12 @@ h2 {
 }
 
 .tabs-container {
-  // overflow-x: scroll;
   position: relative;
 }
 
 .tabs {
   padding: 12px 24px;
+  @include flex-container(row, center, center);
 
   &.selected {
     border-bottom: 4px solid #61ceac;
@@ -392,6 +397,10 @@ h2 {
 
   &.first-child {
     margin-left: $padding-horizontal;
+  }
+
+  &__notification {
+    margin-left: 0.4em;
   }
 }
 
