@@ -12,7 +12,26 @@
         Question {{ questionNumber }}
       </div>
       <div class="questionText">{{ questionText }}</div>
-      <div :style="imageStyle" class="question-image" />
+      <div class="question-image-container">
+        <div :style="imageStyle" class="question-image" />
+        <image-expand-icon
+          class="image-sizer-icon"
+          @click="handleImageExpansion"
+        />
+      </div>
+      <div
+        v-if="isImageExpanded"
+        @click="handleImageExpansion"
+        class="upc-modal question-image-modal"
+      >
+        <div class="question-image-expanded-container">
+          <image-collapse-icon
+            class="image-sizer-icon"
+            @click="handleImageExpansion"
+          />
+          <img :src="imageSrc" class="question-image--expanded" />
+        </div>
+      </div>
       <form class="possible-answers" data-testid="quiz-questions">
         <div v-for="(item, index) in items" :key="`item-${index}`">
           <div class="options answer-option">
@@ -71,6 +90,8 @@
 import TrainingService from '@/services/TrainingService'
 
 import ProgressBar from './ProgressBar.vue'
+import ImageExpandIcon from '@/assets/image-expand.svg'
+import ImageCollapseIcon from '@/assets/image-collapse.svg'
 
 export default {
   props: ['quizLength'],
@@ -86,10 +107,14 @@ export default {
       items: [],
       imageStyle: {},
       errorMsg: '',
+      imageSrc: '',
+      isImageExpanded: false,
     }
   },
   components: {
     ProgressBar,
+    ImageExpandIcon,
+    ImageCollapseIcon,
   },
   mounted() {
     this.getFirstQuestion()
@@ -176,8 +201,8 @@ export default {
       if (imageSrc) {
         this.imageStyle = {
           backgroundImage: `url(${imageSrc})`,
-          width: '300px',
-          height: '300px',
+          width: '100%',
+          height: '100%',
           display: 'flex',
           backgroundSize: 'contain',
           backgroundRepeat: 'no-repeat',
@@ -191,6 +216,7 @@ export default {
       const question = TrainingService.getFirstQuestion()
       this.questionText = question.questionText
       this.styleImage(question.imageSrc)
+      this.imageSrc = question.imageSrc
       this.items = question.possibleAnswers
       this.showNext = true
       if (!TrainingService.hasNext()) {
@@ -243,6 +269,17 @@ export default {
       } else {
         this.$emit('submitQuiz')
       }
+    },
+    handleImageExpansion(event) {
+      event.stopImmediatePropagation()
+      const { target } = event
+      if (
+        this.isImageExpanded &&
+        target &&
+        target.classList.contains('question-image--expanded')
+      )
+        return
+      else this.isImageExpanded = !this.isImageExpanded
     },
   },
 }
@@ -338,6 +375,55 @@ label {
 
 .questionText {
   white-space: pre-wrap;
+}
+
+.question-image {
+  &-container {
+    position: relative;
+    width: 300px;
+    height: 300px;
+  }
+
+  &-modal {
+    background: rgba(0, 0, 0, 0.4);
+    @include breakpoint-below('medium') {
+      @include flex-container(row, initial, center);
+    }
+  }
+
+  &--expanded {
+    height: 100%;
+    width: 100%;
+  }
+
+  &-expanded-container {
+    position: relative;
+    height: 100%;
+    margin: 0 auto;
+
+    @include breakpoint-below('medium') {
+      width: 80%;
+      height: 80%;
+    }
+
+    @include breakpoint-below('tiny') {
+      width: 90%;
+      height: 90%;
+    }
+  }
+}
+
+.image-sizer-icon {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  margin: 1em;
+  top: 0;
+  right: 0;
+  &:hover {
+    transform: scale(1.1);
+    transition: scale 0.5s ease;
+  }
 }
 
 @media screen and (max-width: 700px) {
