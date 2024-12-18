@@ -2,7 +2,8 @@
   <div class="edit-container">
     <button class="back-button" @click="goBack" type="button">← Back</button>
 
-    <form class="col" @submit="submitUpdate">
+    <loader v-if="isLoading" />
+    <form v-else class="col" @submit="submitUpdate">
       <div class="row">
         <label for="first-name" class="uc-form-label">First name</label>
         <input id="first-name" type="text" v-model="firstName" />
@@ -15,7 +16,7 @@
         <label for="email" class="uc-form-label">Email</label>
         <input id="email" type="text" v-model="email" />
       </div>
-      <div class="row">
+      <div class="row" v-if="isStudent || isVolunteer">
         <label for="partner-org" class="uc-form-label"> Partner org </label>
         <v-select
           id="partner-org"
@@ -45,6 +46,18 @@
           :options="listedPartnerSchools"
           label="displayName"
           v-model="partnerSchool"
+        />
+      </div>
+
+      <div class="row" v-if="isTeacher">
+        <FormSchoolSearch
+          v-model="school.id"
+          :defaultValue="school.name"
+          :hasDefaultValue="true"
+          :isRequired="false"
+          startSearchEvent=""
+          cannotFindSchoolEvent=""
+          selectedEvent=""
         />
       </div>
 
@@ -101,18 +114,6 @@
           </option>
         </select>
       </div>
-      <div class="row" v-if="isStudent">
-        <label for="gates-study" class="uc-form-label">In Gates study</label>
-        <select name="gates-study" id="gates-study" v-model="inGatesStudy">
-          <option
-            v-for="option in options"
-            :value="option.value"
-            :key="option.text"
-          >
-            {{ option.text }}
-          </option>
-        </select>
-      </div>
       <p class="error" v-if="error">{{ error }}</p>
       <button class="uc-form-button" type="submit">Update</button>
     </form>
@@ -121,6 +122,8 @@
 
 <script>
 import { isEmpty } from 'lodash-es'
+import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
+import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'
 import {
   isVolunteerUserType,
@@ -130,6 +133,7 @@ import {
 
 export default {
   name: 'AdminEditUser',
+  components: { FormSchoolSearch, Loader },
 
   props: {
     user: { type: Object, required: true },
@@ -149,15 +153,19 @@ export default {
       banType: null,
       isDeactivated: false,
       isApproved: false,
-      inGatesStudy: false,
       options: [
         { text: 'False', value: false },
         { text: 'True', value: true },
       ],
       banOptions: [],
-      error: '',
       listedPartnerOrgs: [],
       listedPartnerSchools: [],
+      school: {
+        id: '',
+        name: '',
+      },
+      isLoading: false,
+      error: '',
     }
   },
 
@@ -174,83 +182,95 @@ export default {
   },
 
   async created() {
-    this.banOptions = this.isVolunteer
-      ? [
-          { text: 'False', value: null },
-          { text: 'True', value: 'complete' },
-        ]
-      : [
-          { text: 'None', value: null },
-          { text: 'Complete Ban', value: 'complete' },
-          { text: 'Shadow Ban', value: 'shadow' },
-        ]
+    this.isLoading = true
+    try {
+      this.banOptions = this.isVolunteer || this.isTeacher
+        ? [
+            { text: 'False', value: null },
+            { text: 'True', value: 'complete' },
+          ]
+        : [
+            { text: 'None', value: null },
+            { text: 'Complete Ban', value: 'complete' },
+            { text: 'Shadow Ban', value: 'shadow' },
+          ]
 
-    let activeSchoolPartnerName = ''
+      let activeSchoolPartnerName = ''
 
-    if (this.isVolunteer) {
-      const response = await NetworkService.adminGetVolunteerPartners()
-      const {
-        data: { partnerOrgs },
-      } = response
-      this.listedPartnerOrgs = partnerOrgs
-    } else if (this.isStudent) {
-      const response = await NetworkService.adminGetStudentPartners()
-      const {
-        data: { partnerOrgs },
-      } = response
-      const activeSchoolPartnerResponse =
-        await NetworkService.adminGetActivePartnersForStudent(this.user.id)
-      const {
-        data: { activePartners },
-      } = activeSchoolPartnerResponse
+      if (this.isVolunteer) {
+        const response = await NetworkService.adminGetVolunteerPartners()
+        const {
+          data: { partnerOrgs },
+        } = response
+        this.listedPartnerOrgs = partnerOrgs
+      } else if (this.isStudent) {
+        const response = await NetworkService.adminGetStudentPartners()
+        const {
+          data: { partnerOrgs },
+        } = response
+        const activeSchoolPartnerResponse =
+          await NetworkService.adminGetActivePartnersForStudent(this.user.id)
+        const {
+          data: { activePartners },
+        } = activeSchoolPartnerResponse
 
-      const listedPartnerOrgs = []
-      const listedPartnerSchools = []
+        const listedPartnerOrgs = []
+        const listedPartnerSchools = []
 
-      for (let org of partnerOrgs) {
-        if (org.isSchool) listedPartnerSchools.push(org)
-        else listedPartnerOrgs.push(org)
+        for (let org of partnerOrgs) {
+          if (org.isSchool) listedPartnerSchools.push(org)
+          else listedPartnerOrgs.push(org)
+        }
+
+        this.listedPartnerOrgs = listedPartnerOrgs
+        this.listedPartnerSchools = listedPartnerSchools
+
+        for (let partner of activePartners) {
+          if (partner.schoolId) activeSchoolPartnerName = partner.name
+        }
+      } else if (this.isTeacher) {
+        const {
+          data: { school },
+        } = await NetworkService.adminGetSchool(this.user.schoolId)
+        this.school = school
       }
 
-      this.listedPartnerOrgs = listedPartnerOrgs
-      this.listedPartnerSchools = listedPartnerSchools
+      this.firstName = this.user.firstName
+      this.lastName = this.user.lastName
+      this.email = this.user.email
+      this.partnerSite = this.user.partnerSite || ''
+      this.isVerified = this.user.verified
+      this.banType = this.user.banType
+      this.isDeactivated = this.user.isDeactivated
+      this.isApproved = this.user.isApproved
+      this.partnerOrg = {}
 
-      for (let partner of activePartners) {
-        if (partner.schoolId) activeSchoolPartnerName = partner.name
+      for (let org of this.listedPartnerOrgs) {
+        if (
+          org.name === this.user.studentPartnerOrg ||
+          org.name === this.user.volunteerPartnerOrg
+        ) {
+          this.partnerOrg = org
+          break
+        }
       }
-    }
 
-    this.firstName = this.user.firstName
-    this.lastName = this.user.lastName
-    this.email = this.user.email
-    this.partnerSite = this.user.partnerSite || ''
-    this.isVerified = this.user.verified
-    this.banType = this.user.banType
-    this.isDeactivated = this.user.isDeactivated
-    this.isApproved = this.user.isApproved
-    this.inGatesStudy = this.user.inGatesStudy
-    this.partnerOrg = {}
-
-    for (let org of this.listedPartnerOrgs) {
-      if (
-        org.name === this.user.studentPartnerOrg ||
-        org.name === this.user.volunteerPartnerOrg
-      ) {
-        this.partnerOrg = org
-        break
+      for (let org of this.listedPartnerSchools) {
+        if (activeSchoolPartnerName === org.name) {
+          this.partnerSchool = org
+          break
+        }
       }
-    }
-
-    for (let org of this.listedPartnerSchools) {
-      if (activeSchoolPartnerName === org.name) {
-        this.partnerSchool = org
-        break
-      }
+    } catch {
+      this.error = 'Failed to set up component. Please refresh and try again.'
+    } finally {
+      this.isLoading = false
     }
   },
 
   methods: {
     async submitUpdate(event) {
+      this.isLoading = true
       event.preventDefault()
       const data = {
         firstName: this.firstName,
@@ -262,10 +282,10 @@ export default {
         banType: this.banType,
         isDeactivated: this.isDeactivated,
         isApproved: this.isApproved,
-        inGatesStudy: this.inGatesStudy,
         partnerSchool: isEmpty(this.partnerSchool)
           ? ''
           : this.partnerSchool.key,
+        schoolId: this.school.id,
       }
 
       if (
@@ -277,14 +297,13 @@ export default {
       }
 
       try {
-        if (this.isTeacher) {
-          this.error = 'Unable to update teachers.'
-        }
         await NetworkService.adminUpdateUser(this.user.id, data)
         this.getUser()
         this.toggleEditMode()
       } catch (error) {
         this.error = 'There was a problem updating the user.'
+      } finally {
+        this.isLoading = false
       }
     },
     goBack() {
