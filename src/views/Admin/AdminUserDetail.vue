@@ -1,5 +1,5 @@
 <template>
-  <div v-if="user._id" class="user-detail">
+  <div v-if="user.id" class="user-detail">
     <admin-edit-user
       v-if="isEditMode"
       :user="user"
@@ -62,7 +62,7 @@
         <div class="user-detail__title">
           {{ user.firstName }} {{ user.lastName }}
         </div>
-        <div class="user-detail__subtitle">ID: {{ user._id }}</div>
+        <div class="user-detail__subtitle">ID: {{ user.id }}</div>
         <div class="user-detail__section">
           <div class="user-detail__section-title">Joined</div>
           <div>{{ createdAt }}</div>
@@ -79,9 +79,9 @@
           <div class="user-detail__section-title">Partner site</div>
           <div>{{ user.partnerSite }}</div>
         </div>
-        <div v-if="schoolName" class="user-detail__section">
+        <div v-if="user.schoolName" class="user-detail__section">
           <div class="user-detail__section-title">School</div>
-          <div>{{ schoolName }}</div>
+          <div>{{ user.schoolName }}</div>
         </div>
         <div v-if="user.currentGrade" class="user-detail__section">
           <div class="user-detail__section-title">Grade level</div>
@@ -215,13 +215,6 @@ export default {
 
       return ''
     },
-
-    schoolName() {
-      const school = this.user.approvedHighSchool
-      if (!school) return null
-
-      return school.nameStored ? school.nameStored : school.SCH_NAME
-    },
     isFirstPage() {
       return this.page === 1
     },
@@ -260,7 +253,7 @@ export default {
       // show page query in the url if the user has had past sessions
       if (this.user.numPastSessions > 0)
         this.$router.push({
-          path: `/admin/users/${this.user._id}`,
+          path: `/admin/users/${this.user.id}`,
           query: { page: this.page },
         })
     },

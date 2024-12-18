@@ -6,7 +6,7 @@ import NetworkService from '@/services/NetworkService'
 
 describe('Admin User Detail', () => {
   const DEFAULT_USER = {
-    _id: '12345',
+    id: '12345',
     firstName: 'Student',
     lastName: 'Test',
     email: 'student@test.com',
@@ -17,7 +17,6 @@ describe('Admin User Detail', () => {
     isBanned: false,
     isDeactivated: false,
     isApproved: false,
-    inGatesStudy: false,
     isAdmin: false,
     userType: 'student',
     pastSessions: [],

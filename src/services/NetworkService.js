@@ -445,7 +445,7 @@ export default {
     lastName,
     email,
     partnerOrg,
-    highSchool,
+    school,
   }) {
     const queryParams = new URLSearchParams({
       page,
@@ -454,7 +454,7 @@ export default {
       lastName,
       email,
       partnerOrg,
-      highSchool,
+      school,
     }).toString()
 
     return httpGet(`${API_ROOT}/users?${queryParams}`).then(

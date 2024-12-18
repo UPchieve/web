@@ -280,7 +280,7 @@ export default {
         if (this.isTeacher) {
           this.error = 'Unable to update teachers.'
         }
-        await NetworkService.adminUpdateUser(this.user._id, data)
+        await NetworkService.adminUpdateUser(this.user.id, data)
         this.getUser()
         this.toggleEditMode()
       } catch (error) {

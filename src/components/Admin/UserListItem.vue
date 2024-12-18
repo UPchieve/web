@@ -1,5 +1,5 @@
 <template>
-  <router-link :to="`/admin/users/${user._id}`" class="list-item">
+  <router-link :to="`/admin/users/${user.id}`" class="list-item">
     <p class="list-item__column">{{ user.id }}</p>
     <p class="list-item__column">{{ createdAt }}</p>
     <p class="list-item__column">{{ user.firstName }} {{ user.lastName }}</p>
