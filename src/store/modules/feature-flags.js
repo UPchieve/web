@@ -37,6 +37,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.AI_OTHER_SUBJECT_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.CHOOSE_TUTOR_TYPE]: false,
       [POSTHOG_FEATURE_FLAGS.SESSION_AUDIO_CALL]: false,
+      [POSTHOG_FEATURE_FLAGS.SCREENSHARE]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -180,6 +181,8 @@ export default {
       state.eligibleForChooseTutorType,
     isSessionAudioCallEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SESSION_AUDIO_CALL],
+    isScreenshareEnabled: (state) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.SCREENSHARE],
   },
   actions: {
     isSessionAudioCallEnabled: async ({ getters }, partnerUserId) => {
@@ -189,6 +192,14 @@ export default {
           partnerUserId
         )
       return isEnabledForPartner.isEnabled || getters.isSessionAudioCallEnabled
+    },
+    isScreenshareEnabled: async ({ getters }, partnerUserId) => {
+      const isEnabledForPartner =
+        await FeatureFlagService.isFeatureEnabledForUser(
+          POSTHOG_FEATURE_FLAGS.SCREENSHARE,
+          partnerUserId
+        )
+      return isEnabledForPartner.isEnabled || getters.isScreenshareEnabled
     },
   },
 }

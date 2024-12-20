@@ -25,6 +25,36 @@
     </transition>
     <div id="toolbar" class="toolbar">
       <p v-if="error" class="whiteboard-error">{{ error }}</p>
+      <div v-if="showScreenShareTool" class="toolbar-item" tabindex="0">
+        <Spinner
+          v-if="isJoiningCall"
+          height="24"
+          width="24"
+          container-height="24"
+          container-width="24"
+        />
+        <span
+          v-else-if="unableToJoinCall"
+          @mouseenter="toggleTooltipOpen"
+          @mouseleave="toggleTooltipOpen"
+          @click="toggleTooltipOpen"
+          v-tooltip="{
+            text: tooltipText,
+            position: 'right',
+            color: 'black',
+            open: tooltipOpen,
+          }"
+        >
+          <ErrorIcon class="screenshare-error" />
+        </span>
+        <button v-else @click="$emit('toggleScreenShareWindow')">
+          <StopScreenShareIcon
+            v-if="isScreenSharing"
+            class="toolbar-item__svg"
+          />
+          <ScreenShareIcon v-else class="toolbar-item__svg" />
+        </button>
+      </div>
       <WhiteboardAiTutorButton
         v-if="aiWidgetEnabled"
         class="toolbar-item"
@@ -274,6 +304,7 @@ import RedoIcon from '@/assets/whiteboard_icons/redo.svg'
 import DeleteSelectionIcon from '@/assets/whiteboard_icons/delete_selection.png'
 import RotateIcon from '@/assets/whiteboard_icons/rotate.png'
 import PhotoUploadIcon from '@/assets/whiteboard_icons/photo-upload.svg'
+import ErrorIcon from '@/assets/sidebar_icons/exclamation.svg'
 import FileDialog from '@/components/FileDialog.vue'
 import ShapesIcon from '@/assets/whiteboard_icons/shapes.svg'
 import TextIcon from '@/assets/whiteboard_icons/text.svg'
@@ -296,8 +327,15 @@ import AnalyticsService from '@/services/AnalyticsService'
 import ModerationService from '@/services/ModerationService'
 import { WhiteboardNullTool } from './WhiteboardNullTool'
 import WhiteboardAiTutorButton from './WhiteboardAiTutorButton.vue'
+import ScreenShareIcon from '@/assets/screen-share.svg'
+import StopScreenShareIcon from '@/assets/stop-screen-share.svg'
+import Spinner from '@/components/Spinner.vue'
+import { vTooltip } from 'maz-ui'
 
 export default {
+  directives: {
+    tooltip: vTooltip,
+  },
   components: {
     WhiteboardAiTutorButton,
     SelectionIcon,
@@ -319,6 +357,10 @@ export default {
     Loader,
     ResetWhiteboardModal,
     LoadingMessage,
+    ScreenShareIcon,
+    StopScreenShareIcon,
+    Spinner,
+    ErrorIcon,
   },
   props: {
     sessionId: {
@@ -347,12 +389,21 @@ export default {
       required: false,
       default: false,
     },
+    screenShareAvailable: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     showHasAiMessageIndicator: {
       type: Boolean,
       required: false,
       default: false,
     },
     aiWidgetMoving: {
+      type: Boolean,
+      required: true,
+    },
+    isScreenSharing: {
       type: Boolean,
       required: true,
     },
@@ -377,9 +428,10 @@ export default {
       selectedEraserTool: false,
       imageUploadErrorMessage: 'Unable to upload the image',
       previouslySelectedTool: null,
+      tooltipOpen: false,
     }
   },
-  emits: ['toggleAiWidget'],
+  emits: ['toggleAiWidget', 'toggleScreenShareWindow'],
   computed: {
     ...mapState({
       isMobileApp: (state) => state.app.isMobileApp,
@@ -392,7 +444,23 @@ export default {
       userType: 'user/userType',
       isStudent: 'user/isStudent',
       isVolunteer: 'user/isVolunteer',
+      isJoiningCall: 'liveMedia/isJoiningCall',
+      unableToJoinCall: 'liveMedia/unableToJoinCall',
+      sessionPartner: 'user/sessionPartner',
     }),
+    tooltipText() {
+      return this.mobileMode
+        ? 'Screen Share unavailable'
+        : 'Could not load the Screen Share tool. Please refresh and try again.'
+    },
+    showScreenShareTool() {
+      // Show to students once a volunteer is sharing their screen
+      // and show to volunteers right away
+      return (
+        (this.isVolunteer && this.screenShareAvailable) ||
+        (this.isStudent && this.unableToJoinCall)
+      )
+    },
     isAiWidgetHidden() {
       return this.aiWidgetHidden
     },
@@ -454,6 +522,9 @@ export default {
     this.loadZwibbler()
   },
   methods: {
+    toggleTooltipOpen() {
+      this.tooltipOpen = !this.tooltipOpen
+    },
     isMobile() {
       return /iPhone|iPad|iPod/i.test(navigator.userAgent)
     },
@@ -1266,5 +1337,11 @@ export default {
 #zwib-div:focus-visible,
 #zwib-div canvas:focus-visible {
   border: 1px solid #000;
+}
+
+.screenshare-error {
+  fill: $c-error-red;
+  height: 26px;
+  width: 26px;
 }
 </style>

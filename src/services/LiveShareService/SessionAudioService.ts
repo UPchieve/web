@@ -2,6 +2,8 @@ import store from '@/store'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '../NetworkService'
 import ZoomVideo from '@zoom/videosdk'
+import { createScreenShareActor } from './ScreenShareService'
+import { ScreenShareEvent } from './machines/screenShareMachine'
 
 const getSignature = async (sessionId: string) => {
   // Role 1 is host/co-host, 0 is attendee
@@ -75,6 +77,7 @@ const callStateDefinition: FSMDefinition = {
     },
     [SessionAudioState.AudioNotSupported]: {},
     [SessionAudioState.Joined]: {
+      actions: ['createScreenShareActor'],
       on: {
         [SessionAudioEvent.LEAVE]: SessionAudioState.Leaving,
         [SessionAudioEvent.BAN]: SessionAudioState.JoinedAsBanned,
@@ -222,6 +225,49 @@ const devicePermissionChangeHandler = (payload) => {
   }
 }
 
+const screenShareHandler = (payload: {
+  state: 'Active' | 'Inactive'
+  userId: string
+}) => {
+  if (payload.state === 'Active' && store.state.liveMedia.screenShareActor) {
+    store.state.liveMedia.screenShareActor.send(
+      ScreenShareEvent.SCREEN_SHARE_ACTIVATED,
+      { zoomUserId: payload.userId }
+    )
+  } else if (
+    payload.state === 'Inactive' &&
+    store.state.liveMedia.screenShareActor
+  ) {
+    // NOTE: this only gets hit if this user has called `stream.startShareView`
+    store.state.liveMedia.screenShareActor.send(
+      ScreenShareEvent.SCREEN_SHARE_DEACTIVATED
+    )
+    store.dispatch('liveMedia/screenShare/setScreenShareDimensions', {
+      width: undefined,
+      height: undefined,
+    })
+  }
+}
+
+// Passive stop is when the share is stopped w/o clicking "Stop Sharing,"
+// i.e. by removing the browser permissions
+const passivelyStopShareHandler = () => {
+  store.state.liveMedia.screenShareActor.send(
+    ScreenShareEvent.STOP_SCREEN_SHARE
+  )
+  store.dispatch('liveMedia/screenShare/setScreenShareDimensions', {
+    width: undefined,
+    height: undefined,
+  })
+}
+
+const shareContentDimensionChange = (payload) => {
+  store.dispatch('liveMedia/screenShare/setScreenShareDimensions', {
+    width: payload.width,
+    height: payload.height,
+  })
+}
+
 type Actions = keyof (typeof SessionAudioService)['actions']
 
 export class SessionAudioService {
@@ -251,6 +297,11 @@ export class SessionAudioService {
   }
 
   private static actions = {
+    createScreenShareActor() {
+      const screenShareActor = createScreenShareActor({ inspect: false })
+      screenShareActor.start()
+      store.commit('liveMedia/setScreenShareActor', screenShareActor)
+    },
     async handleJoinError() {
       LoggerService.noticeError('Failed to join call, retrying...')
 
@@ -289,6 +340,12 @@ export class SessionAudioService {
         zoomClient.on(`caption-message`, captionMessageHandler)
         zoomClient.on(`active-speaker`, activeSpeakerHandler)
         zoomClient.on(`device-permission-change`, devicePermissionChangeHandler)
+        zoomClient.on(`active-share-change`, screenShareHandler)
+        zoomClient.on('passively-stop-share', passivelyStopShareHandler)
+        zoomClient.on(
+          'share-content-dimension-change',
+          shareContentDimensionChange
+        )
         // NOTE: when adding a new handler, make sure to remove it in the `leaveChannel` method
 
         const token = await getSignature(
@@ -357,6 +414,10 @@ export class SessionAudioService {
         // TODO: do we need a retry if this somehow throws?
         // and if we can never leave, then refresh the page?
         this.removeHandlers()
+
+        store.state.liveMedia.screenShareActor.send(ScreenShareEvent.DESTROY)
+        store.commit('liveMedia/setScreenShareActor', null)
+
         await store.state.liveMedia.zoomClient.getMediaStream().stopAudio()
         await store.state.liveMedia.zoomClient.leave()
         // reset audio
@@ -375,6 +436,10 @@ export class SessionAudioService {
       zoomClient.off('user-updated', userUpdatedHandler)
       zoomClient.off(`caption-message`, captionMessageHandler)
       zoomClient.off(`active-speaker`, activeSpeakerHandler)
+      zoomClient.off(
+        'share-content-dimension-change',
+        shareContentDimensionChange
+      )
 
       await store.state.liveMedia.zoomClient.getMediaStream().stopAudio()
       store.commit('liveMedia/audio/setIsMicMuted', true)
@@ -387,6 +452,10 @@ export class SessionAudioService {
       zoomClient.on('user-updated', userUpdatedHandler)
       zoomClient.on(`caption-message`, captionMessageHandler)
       zoomClient.on(`active-speaker`, activeSpeakerHandler)
+      zoomClient.on(
+        'share-content-dimension-change',
+        shareContentDimensionChange
+      )
 
       await store.dispatch('liveMedia/audio/startAudio')
 
@@ -398,20 +467,18 @@ export class SessionAudioService {
     },
 
     removeHandlers() {
-      store.state.liveMedia.zoomClient.off('user-added', userAddedHandler)
-      store.state.liveMedia.zoomClient.off('user-removed', userRemovedHandler)
-      store.state.liveMedia.zoomClient.off('user-updated', userUpdatedHandler)
-      store.state.liveMedia.zoomClient.off(
-        `caption-message`,
-        captionMessageHandler
-      )
-      store.state.liveMedia.zoomClient.off(
-        `active-speaker`,
-        activeSpeakerHandler
-      )
-      store.state.liveMedia.zoomClient.off(
-        `device-permission-change`,
-        devicePermissionChangeHandler
+      const zoomClient = store.state.liveMedia.zoomClient
+      zoomClient.off('user-added', userAddedHandler)
+      zoomClient.off('user-removed', userRemovedHandler)
+      zoomClient.off('user-updated', userUpdatedHandler)
+      zoomClient.off(`caption-message`, captionMessageHandler)
+      zoomClient.off(`active-speaker`, activeSpeakerHandler)
+      zoomClient.off(`device-permission-change`, devicePermissionChangeHandler)
+      zoomClient.off(`active-share-change`, screenShareHandler)
+      zoomClient.off('passively-stop-share', passivelyStopShareHandler)
+      zoomClient.off(
+        'share-content-dimension-change',
+        shareContentDimensionChange
       )
     },
 
