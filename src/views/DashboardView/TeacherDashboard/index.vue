@@ -107,6 +107,12 @@
         </div>
       </div>
     </div>
+
+    <onboarding-modal
+      v-if="isFirstDashboardVisit"
+      :closeModal="() => $store.dispatch('user/firstDashboardVisit', false)"
+      :pages="pages"
+    />
   </div>
 </template>
 
@@ -121,6 +127,11 @@ import ClassImg from '@/assets/class.svg'
 import Checklist from '@/assets/Checklist.svg'
 import ExternalPage from '@/assets/ExternalPage.svg'
 import RightArrow from '@/assets/RightArrow.svg'
+import OnboardingModal from '@/components/OnboardingModal.vue'
+import TeacherOnboarding_Frame1 from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame1.svg'
+import TeacherOnboarding_Frame2 from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame2.svg'
+import TeacherOnboarding_Frame3 from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame3.svg'
+import TeacherOnboarding_Frame4 from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame4.svg'
 import { mapState } from 'vuex'
 import { EVENTS } from '@/consts'
 import _ from 'lodash'
@@ -136,12 +147,14 @@ export default {
     Checklist,
     ExternalPage,
     RightArrow,
+    OnboardingModal,
   },
 
   computed: {
     ...mapState({
       user: (state) => state.user,
       subjects: (state) => state.subjects.subjects,
+      isFirstDashboardVisit: (state) => state.user.isFirstDashboardVisit,
     }),
   },
 
@@ -156,6 +169,8 @@ export default {
       formattedTopics: {},
       studentId: '',
       currentClassInfo: {},
+      showOnboardingModal: false,
+      pages: [],
     }
   },
   watch: {
@@ -205,6 +220,36 @@ export default {
 
     this.formattedTopics = await this.formatTopics()
     await this.getTeacherClasses()
+
+    if (this.isFirstDashboardVisit) this.showOnboardingModal = true
+
+    this.pages = [
+      {
+        step: 1,
+        heading:
+          'Give your students unlimited access to live tutors & college counselors',
+        text: 'Caring human beings are standing by, ready to help your students 24/7—especially when they need it most: late at night and in their homes',
+        image: TeacherOnboarding_Frame1,
+      },
+      {
+        step: 2,
+        heading: 'Academic help in 30+ subjects',
+        text: 'In under 5-10 mins your students get expert help completing assignments, filling learning gaps, and building confidence',
+        image: TeacherOnboarding_Frame2,
+      },
+      {
+        step: 3,
+        heading: 'Connect tutoring to classwork',
+        text: 'Assign tutoring sessions, complete with links and instructions, to tell students (and their tutors) exactly what to get help with',
+        image: TeacherOnboarding_Frame3,
+      },
+      {
+        step: 4,
+        heading: 'Track & report on student usage',
+        text: `See how your students are using the platform with "Class Details" and "Student Details"`,
+        image: TeacherOnboarding_Frame4,
+      },
+    ]
   },
 
   methods: {
