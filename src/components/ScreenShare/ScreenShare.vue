@@ -3,6 +3,8 @@ import { onMounted, onUnmounted, ref } from 'vue'
 import FloatingWindow from '../FloatingWindow.vue'
 import { useStore } from 'vuex'
 import { ScreenShareEvent } from '@/services/LiveShareService/machines/screenShareMachine'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const store = useStore()
 const emit = defineEmits<{
@@ -32,12 +34,17 @@ onMounted(() => {
 onUnmounted(async () => {
   await screenShareActor.send(ScreenShareEvent.VIEWER_REMOVED)
 })
+
+const onMinimize = () => {
+  AnalyticsService.captureEvent(EVENTS.SCREENSHARE_USER_MINIMIZED_SCREENSHARE)
+}
 </script>
 
 <template>
   <FloatingWindow
     @dragging="(event) => emit('dragging', event)"
     @resizing="(event) => emit('resizing', event)"
+    @minimize="onMinimize"
     :contentSize="store.state.liveMedia.screenShare.screenShareDimensions"
     :independentResize="false"
   >

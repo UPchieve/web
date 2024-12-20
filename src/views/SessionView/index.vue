@@ -17,7 +17,7 @@
         @resizing="resizingAiWidget"
       />
       <screen-share
-        v-if="hasJoinedZoomCall"
+        v-if="hasJoinedZoomCall && this.isScreenshareEnabled"
         :class="{ 'display-none': !screenShareActive }"
         :isVolunteer="isVolunteer"
         :firstName="isVolunteer ? user.firstName : session.volunteer.firstName"

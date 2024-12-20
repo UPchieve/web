@@ -7,6 +7,8 @@ import {
   screenShareMachine,
   ScreenShareState,
 } from './machines/screenShareMachine'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 interface ScreenShareContext {
   targetElement: HTMLCanvasElement | HTMLVideoElement | null
@@ -39,6 +41,9 @@ export function createScreenShareActor({
         // TODO: this sometimes hangs forever
         await stream.startShareView(context.targetElement, payload.zoomUserId)
         await send(ScreenShareEvent.JOINED_SCREEN_SHARE)
+        AnalyticsService.captureEvent(
+          EVENTS.SCREENSHARE_USER_VIEWED_SCREENSHARE
+        )
         store.commit('liveMedia/screenShare/setScreenShareActive', true)
       } else if (context.targetElement) {
         for (const user of zoomClient.getAllUser()) {
@@ -82,8 +87,12 @@ export function createScreenShareActor({
         LoggerService.noticeError({ error }, 'Failed to start screenshare')
       }
     },
+    [ScreenShareActions.SHARING_SCREEN]: async () => {
+      AnalyticsService.captureEvent(EVENTS.SCREENSHARE_USER_SHARED_SCREEN)
+    },
     [ScreenShareActions.STOP_SCREEN_SHARE]: async ({ context }) => {
       await stream.stopShareScreen()
+      AnalyticsService.captureEvent(EVENTS.SCREENSHARE_USER_STOPPED_SCREENSHARE)
       // TODO: is there a method for this?
       if (context.targetElement && context.targetElement.tagName === 'CANVAS') {
         context.targetElement
@@ -100,6 +109,9 @@ export function createScreenShareActor({
     },
     [ScreenShareActions.STOP_VIEW_SCREEN_SHARE]: async () => {
       await stream.stopShareView()
+      AnalyticsService.captureEvent(
+        EVENTS.SCREENSHARE_USER_STOPPED_VIEWING_SCREENSHARE
+      )
       store.commit('liveMedia/screenShare/setScreenShareActive', false)
       await send(ScreenShareEvent.VIEW_SCREEN_SHARE_STOPPED)
 
@@ -115,6 +127,9 @@ export function createScreenShareActor({
     },
     [ScreenShareActions.REMOVE_VIEWER]: async ({ context }) => {
       await stream.stopShareView()
+      AnalyticsService.captureEvent(
+        EVENTS.SCREENSHARE_USER_STOPPED_VIEWING_SCREENSHARE
+      )
       context.targetElement = null
       store.commit('liveMedia/screenShare/setScreenShareActive', false)
       await send(ScreenShareEvent.VIEW_SCREEN_SHARE_STOPPED)
