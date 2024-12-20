@@ -31,7 +31,6 @@ import NotificationsModal from '@/views/DashboardView/StudentDashboard/SubjectSe
 import ReferralModal from '@/views/DashboardView/StudentDashboard/ReferralModal.vue'
 import SessionFulfilledModal from '@/views/SessionView/SessionFulfilledModal.vue'
 import VolunteerOnboardingModal from '@/views/DashboardView/VolunteerDashboard/VolunteerOnboardingModal.vue'
-import StudentOnboardingModal from '@/views/DashboardView/StudentDashboard/StudentOnboardingModal.vue'
 import ReportSessionModal from '@/views/SessionView/ReportSessionModal.vue'
 import StartCollegeSessionModal from '@/views/DashboardView/StudentDashboard/StartCollegeSessionModal.vue'
 import CreateTeacherClassModal from '@/components/CreateTeacherClassModal.vue'
@@ -51,7 +50,6 @@ export default {
     SessionFulfilledModal,
     VolunteerOnboardingModal,
     UpgradeAppModal,
-    StudentOnboardingModal,
     ReportSessionModal,
     StartCollegeSessionModal,
     CreateTeacherClassModal,

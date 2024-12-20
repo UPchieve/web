@@ -103,10 +103,12 @@ const hasPreviousPage = () => {
 
 <style lang="scss" scoped>
 :deep(.upc-modal-form) {
-  padding: 0;
+  padding-bottom: 16px;
+  max-height: 100vh;
 
   @include breakpoint-above('medium') {
     padding: 0;
+    padding-bottom: 16px;
   }
 }
 
@@ -126,7 +128,7 @@ const hasPreviousPage = () => {
     padding: 40px 20px 10px 20px;
     width: 100%;
 
-    svg {
+    img {
       width: 100%;
       max-height: 300px;
     }

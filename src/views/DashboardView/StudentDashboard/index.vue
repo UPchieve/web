@@ -43,6 +43,14 @@
       :isFirstModalView="fallIncentiveProgramModalViewCount === 0"
     />
     <subject-selection />
+
+    <onboarding-modal
+      v-if="this.isFirstDashboardVisit"
+      :pages="onboardingFrames"
+      :closeModal="() => $store.dispatch('user/firstDashboardVisit', false)"
+      nextButtonText="Next"
+      acceptButtonText="Get started!"
+    />
   </div>
 </template>
 
@@ -52,7 +60,6 @@ import DashboardBanner from '../DashboardBanner.vue'
 import SubjectSelection from './SubjectSelection/index.vue'
 import TellThemCollegePrepModal from './TellThemCollegePrepModal.vue'
 import JoinedClassModal from './JoinedClassModal.vue'
-import StudentOnboardingModal from './StudentOnboardingModal.vue'
 import FallIncentiveEnrollmentModal from './FallIncentiveEnrollmentModal.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import ProductDiscoveryService from '@/services/ProductDiscoveryService'
@@ -63,6 +70,11 @@ import ArrowIcon from '@/assets/arrow.svg'
 import LargeButton from '@/components/LargeButton.vue'
 import StudentAssignments from '@/components/StudentAssignments.vue'
 import * as StudentAssignmentUtils from '@/utils/student-assignments-utils'
+import OnboardingModal from '@/components/OnboardingModal.vue'
+import Student_Onboarding_Frame1 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame1.svg'
+import Student_Onboarding_Frame2 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame2.svg'
+import Student_Onboarding_Frame3 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame3.svg'
+import Student_Onboarding_Frame4 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame4.svg'
 
 const defaultHeaderData = {
   component: 'DefaultHeader',
@@ -87,6 +99,7 @@ export default {
     ArrowIcon,
     LargeButton,
     StudentAssignments,
+    OnboardingModal,
   },
   async created() {
     if (this.isSessionAlive) {
@@ -114,26 +127,11 @@ export default {
     )
       this.triggerIncentiveEnrollmentModal()
 
-    if (this.isFirstDashboardVisit) {
-      this.$store.dispatch('app/modal/show', {
-        component: StudentOnboardingModal,
-        data: {
-          showTemplateButtons: false,
-        },
-      })
-    }
-
     if (localStorage.getItem('isSSOSignUpRedirect')) {
       AnalyticsService.captureEvent(EVENTS.ACCOUNT_CREATED)
       AnalyticsService.captureEvent(EVENTS.ACCOUNT_VERIFIED)
       localStorage.removeItem('isSSOSignUpRedirect')
       this.$store.dispatch('user/firstDashboardVisit', true)
-      this.$store.dispatch('app/modal/show', {
-        component: StudentOnboardingModal,
-        data: {
-          showTemplateButtons: false,
-        },
-      })
     }
 
     if (this.isOrbitalSegmentsActive) {
@@ -165,6 +163,32 @@ export default {
     this.assignments = this.filterStudentAssignments(
       this.user.studentAssignments
     )
+    this.onboardingFrames = [
+      {
+        step: 1,
+        heading: 'Welcome to UPchieve!',
+        text: "You're almost ready to get started! We just need to lay down some ground rules.",
+        image: Student_Onboarding_Frame1,
+      },
+      {
+        step: 2,
+        heading: 'Rule #1: Play Nice with Your Coach',
+        text: "All UPchieve coaches are unpaid volunteers who want to help you succeed. Make sure to be friendly and respectful, and don't forget to say thank you and goodbye before ending your session!",
+        image: Student_Onboarding_Frame2,
+      },
+      {
+        step: 3,
+        heading: 'Rule #2: Engage in Learning',
+        text: "You're on UPchieve to learn! Our coaches are only there to guide you, so be sure to actively participate in your session. Coaches are not allowed to give you the answers or do the work for you.",
+        image: Student_Onboarding_Frame3,
+      },
+      {
+        step: 4,
+        heading: 'Rule #3: Stay Safe Out There',
+        text: "You came to UPchieve for homework help, not the tea. Keep conversations on-topic and don't share personal information like your phone number, IG handle, or email. Never connect with a coach offline.",
+        image: Student_Onboarding_Frame4,
+      },
+    ]
   },
   data() {
     return {
@@ -172,6 +196,7 @@ export default {
       joinedClassCode: '',
       showFallIncentiveEnrollmentModal: false,
       assignments: [],
+      onboardingFrames: [],
     }
   },
   computed: {
