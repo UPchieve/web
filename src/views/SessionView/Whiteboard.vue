@@ -39,7 +39,7 @@
           @mouseleave="toggleTooltipOpen"
           @click="toggleTooltipOpen"
           v-tooltip="{
-            text: tooltipText,
+            text: 'Could not load the Screen Share tool. Please refresh and try again.',
             position: 'right',
             color: 'black',
             open: tooltipOpen,
@@ -448,11 +448,6 @@ export default {
       unableToJoinCall: 'liveMedia/unableToJoinCall',
       sessionPartner: 'user/sessionPartner',
     }),
-    tooltipText() {
-      return this.mobileMode
-        ? 'Screen Share unavailable'
-        : 'Could not load the Screen Share tool. Please refresh and try again.'
-    },
     showScreenShareTool() {
       // Show to students once a volunteer is sharing their screen
       // and show to volunteers right away

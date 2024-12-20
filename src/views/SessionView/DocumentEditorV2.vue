@@ -31,7 +31,7 @@
           @mouseleave="toggleShowTooltip"
           @click="toggleShowTooltip"
           v-tooltip="{
-            text: tooltipText,
+            text: 'Could not load the Screen Share tool. Please refresh and try again.',
             position: 'bottom',
             color: 'black',
             open: showTooltip,
@@ -192,11 +192,6 @@ export default {
       sessionPartner: 'user/sessionPartner',
       mobileMode: 'app/mobileMode',
     }),
-    tooltipText() {
-      return this.mobileMode
-        ? 'Screen Share unavailable'
-        : 'Could not load the Screen Share tool. Please refresh and try again.'
-    },
     showScreenShareTool() {
       // Show to students once a volunteer is sharing their screen
       // and show to volunteers right away
@@ -496,5 +491,14 @@ export default {
   height: 20px;
   width: 20px;
   display: flex;
+}
+
+.m-tooltip--bottom::before {
+  @include breakpoint-below('large') {
+    left: -20px;
+  }
+  @include breakpoint-below('small') {
+    left: -100px;
+  }
 }
 </style>
