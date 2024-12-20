@@ -88,7 +88,7 @@ function getAssignmentTutoringDetails(assignment: Assignment) {
       @click="props.goBack()"
     >
       <arrow-icon class="back-arrow" />
-      Back to All Assignmentss
+      Back to All Assignments
     </div>
     <div v-if="isLoading" class="uc-row justify-center">
       <loader />
