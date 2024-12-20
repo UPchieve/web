@@ -1,8 +1,10 @@
 import ZoomVideo from '@zoom/videosdk'
 import audio from './session-audio'
+import screenShare from './session-screenshare'
 import {
   SessionAudioEvent,
   SessionAudioService,
+  SessionAudioState,
 } from '@/services/LiveShareService/SessionAudioService'
 
 ZoomVideo.preloadDependentAssets()
@@ -18,7 +20,7 @@ export default {
   namespaced: true,
   modules: {
     audio,
-    // screenshare, @TODO register screenshare module
+    screenShare,
   },
   state: {
     zoomClient,
@@ -27,6 +29,7 @@ export default {
     retryCount: 0,
     retryBackoff: 100,
     isPartnerJustBannedFromLiveMedia: false,
+    screenShareActor: null,
   },
   mutations: {
     setMyZoomUser: (state, zoomUser) => (state.myZoomUser = zoomUser),
@@ -44,8 +47,22 @@ export default {
       (state.retryBackoff = retryBackoff),
     setIsPartnerJustBannedFromLiveMedia: (state, val) =>
       (state.isPartnerJustBannedFromLiveMedia = val),
+    setScreenShareActor(state, actor) {
+      state.screenShareActor = actor
+    },
   },
   getters: {
+    isJoiningCall: (state, getters, rootState, rootGetters) => {
+      // @TODO hoist up here from session-audio store
+      return rootGetters['liveMedia/audio/isJoining']
+    },
+    unableToJoinCall: (_state, _getters, rootState) => {
+      // @TODO Rename states for UnableToJoinAudio to UnableToJoinCall
+      return (
+        rootState.liveMedia.audio.sessionAudioState ===
+        SessionAudioState.AudioNotSupported
+      )
+    },
     isBannedFromLiveMedia: (state, getters, rootState, rootGetters) => {
       const banType = rootGetters['user/banType']
       return banType && banType === 'live_media'

@@ -166,6 +166,7 @@ export default {
         SessionAudioState.Joining,
         SessionAudioState.JoiningAsBanned,
         SessionAudioState.ReactivatingCurrentTab,
+        SessionAudioState.JoinError,
       ].includes(state.sessionAudioState)
     },
     isActiveInAnotherTab: (state) => {

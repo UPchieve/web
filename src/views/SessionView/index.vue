@@ -16,12 +16,30 @@
         @dragging="draggingAiWidget"
         @resizing="resizingAiWidget"
       />
-
+      <screen-share
+        v-if="hasJoinedZoomCall"
+        :class="{ 'display-none': !screenShareActive }"
+        :isVolunteer="isVolunteer"
+        :firstName="isVolunteer ? user.firstName : session.volunteer.firstName"
+        :can-share-screen="isVolunteer"
+        @dragging="(value) => (draggingScreenShare = value)"
+        @resizing="(value) => (resizingScreenShare = value)"
+      />
       <div
         class="auxiliary-container"
         id="auxiliary-container"
-        v-bind:class="{
+        :class="{
           'auxiliary-container--hidden': shouldHideAuxiliarySection,
+          /*
+           * since whiteboard is a sibling to screen share, stopPropagation on mousemove events do not work.
+           * we are manually disabling pointer events on the whiteboard when the screen share is being dragged
+           * or resized to prevent any stray whiteboard marks from being drawn
+           */
+          'no-pointer-events':
+            draggingScreenShare ||
+            resizingScreenShare ||
+            aiWidgetDragging ||
+            aiWidgetResizing,
         }"
       >
         <whiteboard
@@ -36,6 +54,13 @@
           :aiWidgetEnabled="aiWidgetEnabled"
           :showHasAiMessageIndicator="hasUnreadAiTutorMessage"
           :aiWidgetMoving="aiWidgetDragging || aiWidgetResizing"
+          :screenShareAvailable="
+            isSessionInProgress &&
+            isScreenshareEnabled &&
+            getDisplayMediaSupported
+          "
+          @toggleScreenShareWindow="toggleScreenShareWindow"
+          :isScreenSharing="isScreenSharing"
         />
         <document-editor-v2
           v-else-if="
@@ -46,6 +71,8 @@
           :isAiWidgetEnabled="aiWidgetEnabled"
           :onWidgetClicked="toggleAiWidget"
           :showHasAiMessageIndicator="hasUnreadAiTutorMessage"
+          :isScreenShareEnabled="isScreenshareEnabled"
+          @toggleScreenShareWindow="toggleScreenShareWindow"
         />
         <document-editor
           v-else-if="auxiliaryType === sessionToolTypes.DOCUMENT_EDITOR"
@@ -241,6 +268,9 @@ import FeatureFlagService from '@/services/FeatureFlagService'
 import { POSTHOG_FEATURE_FLAGS } from '@/consts'
 import ZoomSessionChatHeader from '@/components/ScreenShare/ZoomSessionChatHeader.vue'
 import Spinner from '@/components/Spinner.vue'
+import { SessionAudioState } from '@/services/LiveShareService/SessionAudioService'
+import ScreenShare from '@/components/ScreenShare/ScreenShare.vue'
+import { ScreenShareState } from '@/services/LiveShareService/machines/screenShareMachine'
 
 const activeHeaderData = {
   component: 'SessionHeader',
@@ -249,6 +279,7 @@ const activeHeaderData = {
 export default {
   name: 'session-view',
   components: {
+    ScreenShare,
     Spinner,
     AiWidgetTool,
     AiAssistedTutoringModal,
@@ -319,6 +350,14 @@ export default {
       didAutoOpen: false,
       isFetchingSessionAudioCallFlag: false,
       isSessionAudioCallEnabled: false,
+      isScreenshareEnabled: false,
+      draggingScreenShare: false,
+      resizingScreenShare: false,
+      // zoom uses getDisplayMedia for screen sharing and iOS safari does not support it
+      // so we hide the screen share button on iOS.
+      // NOTE: users can still view a shared screen in iOS safari, they just can't share their own screen
+      getDisplayMediaSupported:
+        typeof navigator.mediaDevices.getDisplayMedia !== 'undefined',
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -328,6 +367,8 @@ export default {
   },
   computed: {
     ...mapState({
+      hasJoinedZoomCall: (state) =>
+        state.liveMedia.audio.sessionAudioState === SessionAudioState.Joined,
       user: (state) => state.user.user,
       session: (state) => state.user.session,
       isSessionConnectionAlive: (state) => state.user.isSessionConnectionAlive,
@@ -339,6 +380,9 @@ export default {
       productFlags: (state) => state.productFlags.flags,
       isFetchingConversation: (state) =>
         state.botConversations.isFetchingConversation,
+      isScreenSharing: (state) =>
+        state.liveMedia?.screenShareActor?.state ===
+        ScreenShareState.SharingScreen,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -353,8 +397,10 @@ export default {
       isFallIncentiveProgramEnabled:
         'featureFlags/isFallIncentiveProgramEnabled',
       currentTutorBotConversation: 'botConversations/currentConversation',
+      screenShareActive: 'liveMedia/screenShare/screenShareActive',
       isSessionInProgress: 'user/isSessionInProgress',
       sessionPartner: 'user/sessionPartner',
+      isScreenshareEnabledFeatureFlag: 'featureFlags/isScreenshareEnabled',
     }),
     aiTutorSetupProps() {
       return {
@@ -427,6 +473,7 @@ export default {
   },
   async mounted() {
     await this.fetchSessionAudioFlag()
+    await this.fetchScreenshareFlag()
     const {
       data: { isValid },
     } = await NetworkService.getIsSubjectValid(
@@ -686,10 +733,14 @@ export default {
     async sessionPartner(current, previous) {
       if (current?.id !== previous?.id && current?.id) {
         await this.fetchSessionAudioFlag()
+        await this.fetchScreenshareFlag()
       }
     },
   },
   methods: {
+    toggleScreenShareWindow() {
+      this.$store.dispatch('liveMedia/screenShare/toggleScreenShareWindow')
+    },
     async fetchSessionAudioFlag() {
       if (!this.sessionPartner?.id) return
       this.isFetchingSessionAudioCallFlag = true
@@ -702,6 +753,17 @@ export default {
         this.isSessionAudioCallEnabled = false
       } finally {
         this.isFetchingSessionAudioCallFlag = false
+      }
+    },
+    async fetchScreenshareFlag() {
+      if (!this.sessionPartner?.id) return
+      try {
+        this.isScreenshareEnabled = await this.$store.dispatch(
+          'featureFlags/isScreenshareEnabled',
+          this.sessionPartner?.id
+        )
+      } catch (err) {
+        this.isScreenshareEnabled = false
       }
     },
     toggleAiWidget() {
@@ -1062,5 +1124,13 @@ export default {
 
 .zoom-container {
   width: 100%;
+}
+
+.display-none {
+  display: none;
+}
+
+.no-pointer-events {
+  pointer-events: none;
 }
 </style>

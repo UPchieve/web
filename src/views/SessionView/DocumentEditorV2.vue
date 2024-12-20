@@ -24,6 +24,33 @@
         <ChatBotIcon class="chat-bot-icon" />
         <activity-dot v-if="showHasAiMessageIndicator" />
       </button>
+      <div v-if="showScreenShareTool">
+        <span
+          v-if="unableToJoinCall"
+          @mouseenter="toggleShowTooltip"
+          @mouseleave="toggleShowTooltip"
+          @click="toggleShowTooltip"
+          v-tooltip="{
+            text: tooltipText,
+            position: 'bottom',
+            color: 'black',
+            open: showTooltip,
+          }"
+        >
+          <ErrorIcon class="screenshare-error" />
+        </span>
+        <Spinner
+          v-else-if="isJoiningCall"
+          height="20"
+          width="20"
+          container-height="20"
+          container-width="20"
+        />
+        <button v-else @click="toggleScreenShare">
+          <StopScreenShareIcon v-if="isSharingScreen" />
+          <ScreenShareIcon v-else />
+        </button>
+      </div>
     </div>
 
     <div id="quill-container"></div>
@@ -52,19 +79,19 @@
 
 <script>
 import { markRaw } from 'vue'
-import { mapState, mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import Quill from 'quill'
 import QuillCursors from 'quill-cursors'
 import { QuillBinding } from 'y-quill'
-import { Doc, applyUpdate } from 'yjs'
+import { applyUpdate, Doc } from 'yjs'
 import { socket } from '@/socket'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import RefreshDocumentEditorModal from '@/views/SessionView/RefreshDocumentEditorModal.vue'
 import {
-  ImageCompressor,
-  maxImagesEventName,
   fileSizeTooBigEventName,
+  ImageCompressor,
   MAX_TOTAL_IMAGES,
+  maxImagesEventName,
   volunteerAttemptedToAddImage,
 } from '@/utils/quill-image-optimizer'
 import FileDialog from '@/components/FileDialog.vue'
@@ -73,8 +100,14 @@ import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import { file2b64 } from '@/utils/fileToBase64'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
+import ScreenShareIcon from '@/assets/screen-share.svg'
+import StopScreenShareIcon from '@/assets/stop-screen-share.svg'
+import ErrorIcon from '@/assets/sidebar_icons/exclamation.svg'
 import LoggerService from '@/services/LoggerService'
 import ActivityDot from '@/components/ActivityDot.vue'
+import { ScreenShareState } from '@/services/LiveShareService/machines/screenShareMachine'
+import Spinner from '@/components/Spinner.vue'
+import { vTooltip } from 'maz-ui'
 
 Quill.register('modules/cursors', QuillCursors)
 Quill.register('modules/image', ImageCompressor)
@@ -83,12 +116,19 @@ const encode = (array) => array.toString()
 const decode = (str) => Uint8Array.from(str.split(',').map(Number))
 
 export default {
+  directives: {
+    tooltip: vTooltip,
+  },
   components: {
     FileDialog,
     LoadingMessage,
     RefreshDocumentEditorModal,
     ChatBotIcon,
+    ScreenShareIcon,
+    StopScreenShareIcon,
+    ErrorIcon,
     ActivityDot,
+    Spinner,
   },
   props: {
     sessionId: {
@@ -99,6 +139,7 @@ export default {
       type: Boolean,
       default: false,
     },
+
     onWidgetClicked: {
       type: Function,
       required: false,
@@ -110,6 +151,10 @@ export default {
       },
     },
     showHasAiMessageIndicator: {
+      type: Boolean,
+      default: false,
+    },
+    isScreenShareEnabled: {
       type: Boolean,
       default: false,
     },
@@ -127,6 +172,7 @@ export default {
         'The image is not appropriate. If you believe this to be an error, please contact us at support@upchieve.org',
       failedToModerateImageMessage:
         'There was an issue analyzing the image. Please try a different image, or reach out to support@upchieve.org for assistance.',
+      showTooltip: false,
     }
   },
   computed: {
@@ -141,7 +187,30 @@ export default {
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
       isVolunteerImageUploadEnabled:
         'featureFlags/isVolunteerImageUploadEnabled',
+      isJoiningCall: 'liveMedia/isJoiningCall',
+      unableToJoinCall: 'liveMedia/unableToJoinCall',
+      sessionPartner: 'user/sessionPartner',
+      mobileMode: 'app/mobileMode',
     }),
+    tooltipText() {
+      return this.mobileMode
+        ? 'Screen Share unavailable'
+        : 'Could not load the Screen Share tool. Please refresh and try again.'
+    },
+    showScreenShareTool() {
+      // Show to students once a volunteer is sharing their screen
+      // and show to volunteers right away
+      return (
+        this.isScreenShareEnabled &&
+        (this.isVolunteer || (this.isStudent && this.unableToJoinCall))
+      )
+    },
+    isSharingScreen() {
+      return (
+        this.$store.state.liveMedia.screenShareActor?.state ===
+        ScreenShareState.SharingScreen
+      )
+    },
     isSocketReadyToRequestForDoc() {
       return [this.isConnected, this.currentSession?.id]
     },
@@ -268,6 +337,12 @@ export default {
     if (this.isConnected && this.currentSession?.id) this.requestQuillDoc()
   },
   methods: {
+    toggleShowTooltip() {
+      this.showTooltip = !this.showTooltip
+    },
+    toggleScreenShare() {
+      this.$emit('toggleScreenShareWindow')
+    },
     quillTextChange(update, origin, doc) {
       // Only emit changes that are made in this component
       if (origin?.doc === doc) {
@@ -368,6 +443,12 @@ export default {
     border: none;
   }
 
+  .ql-toolbar {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+  }
+
   .ql-toolbar.ql-snow {
     border-width: 0 0 1px 0;
     border-color: $c-border-grey;
@@ -408,5 +489,12 @@ export default {
   &--connection {
     background-color: rgba(110, 140, 171, 0.87);
   }
+}
+
+.screenshare-error {
+  fill: $c-error-red;
+  height: 20px;
+  width: 20px;
+  display: flex;
 }
 </style>
