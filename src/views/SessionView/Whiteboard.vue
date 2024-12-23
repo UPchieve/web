@@ -35,14 +35,14 @@
         />
         <span
           v-else-if="unableToJoinCall"
-          @mouseenter="toggleTooltipOpen"
-          @mouseleave="toggleTooltipOpen"
-          @click="toggleTooltipOpen"
+          @mouseenter="toggleScreenShareErrorTooltip"
+          @mouseleave="toggleScreenShareErrorTooltip"
+          @click="toggleScreenShareErrorTooltip"
           v-tooltip="{
             text: 'Could not load the Screen Share tool. Please refresh and try again.',
             position: 'right',
             color: 'black',
-            open: tooltipOpen,
+            open: screenShareErrorTooltipOpen,
           }"
         >
           <ErrorIcon class="screenshare-error" />
@@ -428,7 +428,7 @@ export default {
       selectedEraserTool: false,
       imageUploadErrorMessage: 'Unable to upload the image',
       previouslySelectedTool: null,
-      tooltipOpen: false,
+      screenShareErrorTooltipOpen: false,
     }
   },
   emits: ['toggleAiWidget', 'toggleScreenShareWindow'],
@@ -527,9 +527,9 @@ export default {
       )
       this.$emit('toggleScreenShareWindow')
     },
-    toggleTooltipOpen() {
-      this.tooltipOpen = !this.tooltipOpen
-      if (this.tooltipOpen)
+    toggleScreenShareErrorTooltip() {
+      this.screenShareErrorTooltipOpen = !this.screenShareErrorTooltipOpen
+      if (this.screenShareErrorTooltipOpen)
         AnalyticsService.captureEvent(
           EVENTS.SCREENSHARE_USER_SAW_ERROR_TOOLTIP,
           {

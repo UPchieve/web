@@ -27,14 +27,14 @@
       <div v-if="showScreenShareTool">
         <span
           v-if="unableToJoinCall"
-          @mouseenter="toggleShowTooltip"
-          @mouseleave="toggleShowTooltip"
-          @click="toggleShowTooltip"
+          @mouseenter="toggleScreenShareErrorTooltipOpen"
+          @mouseleave="toggleScreenShareErrorTooltipOpen"
+          @click="toggleScreenShareErrorTooltipOpen"
           v-tooltip="{
             text: 'Could not load the Screen Share tool. Please refresh and try again.',
             position: 'bottom',
             color: 'black',
-            open: showTooltip,
+            open: showScreenShareErrorTooltip,
           }"
         >
           <ErrorIcon class="screenshare-error" />
@@ -172,7 +172,7 @@ export default {
         'The image is not appropriate. If you believe this to be an error, please contact us at support@upchieve.org',
       failedToModerateImageMessage:
         'There was an issue analyzing the image. Please try a different image, or reach out to support@upchieve.org for assistance.',
-      showTooltip: false,
+      showScreenShareErrorTooltip: false,
     }
   },
   computed: {
@@ -333,9 +333,9 @@ export default {
     if (this.isConnected && this.currentSession?.id) this.requestQuillDoc()
   },
   methods: {
-    toggleShowTooltip() {
-      this.showTooltip = !this.showTooltip
-      if (this.showTooltip)
+    toggleScreenShareErrorTooltipOpen() {
+      this.showScreenShareErrorTooltip = !this.showScreenShareErrorTooltip
+      if (this.showScreenShareErrorTooltip)
         AnalyticsService.captureEvent(
           EVENTS.SCREENSHARE_USER_SAW_ERROR_TOOLTIP,
           {
