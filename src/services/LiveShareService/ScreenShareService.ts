@@ -25,10 +25,13 @@ export function createScreenShareActor({
   const zoomClient = store.state.liveMedia.zoomClient
   const state = ref(ScreenShareState.Initial)
   const context = reactive({ ...INITIAL_STATE })
-  const actions: Record<
-    ScreenShareActions,
-    (context: any, payload?: any) => void
-  > = {
+
+  const actions: {
+    [key in ScreenShareActions]: (args: {
+      context?: any
+      payload?: any
+    }) => Promise<void>
+  } = {
     [ScreenShareActions.DESTROY]: async () => {
       await stream.stopShareScreen()
       await stream.stopShareView()
@@ -135,29 +138,28 @@ export function createScreenShareActor({
       // eslint-disable-next-line no-console
       console.debug(`recieved event: ${event} while in state: ${state.value}`)
     }
+
     const nextState = screenShareMachine.states[state.value].on?.[event]
     if (nextState) {
       // Check the leaf nodes for a transition first
       state.value = nextState
-      if (inspect) console.debug(`set state to: ${nextState}`)
+      // eslint-disable-next-line no-console
+      if (inspect) console.debug(`set state to ${nextState}`)
 
       const nextStateConfig =
         screenShareMachine.states[nextState as ScreenShareState]
 
       for (const action of nextStateConfig?.actions ?? []) {
+        // eslint-disable-next-line no-console
         if (inspect) console.debug(`executing action: ${action}`)
-        await actions[action]({ context, payload })
-      }
-    } else if (screenShareMachine.on?.[event]) {
-      // Then go up to the root level to see if there's a transition defined
-      const nextState = screenShareMachine.on?.[event]
 
-      if (nextState) {
-        state.value = nextState
-        const nextStateConfig =
-          screenShareMachine.states[nextState as ScreenShareState]
-        for (const action of nextStateConfig?.actions ?? []) {
+        try {
           await actions[action]({ context, payload })
+        } catch (error) {
+          LoggerService.noticeError(
+            { error },
+            `Error while executing action ${action}`
+          )
         }
       }
     } else {
