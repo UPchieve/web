@@ -84,6 +84,11 @@ const previousLeft = ref(0)
 const previousUserSizedHeight = ref(NOT_SMALL_SCREEN.height)
 const previousUserSizedWidth = ref(NOT_SMALL_SCREEN.width)
 
+const endResizing = () => {
+  position.isResizing = false
+  emit('resizing', false)
+}
+
 /*
   Account for border and padding of conatiner element
 */
@@ -384,6 +389,8 @@ onUnmounted(() => {
       width: `${position.width}px`,
       height: `${position.height}px`,
     }"
+    @mouseup="endResizing"
+    @touchend="endResizing"
   >
     <div
       class="header no-select"
