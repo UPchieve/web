@@ -184,6 +184,7 @@ export default {
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
+      userType: 'user/userType',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
       isVolunteerImageUploadEnabled:
         'featureFlags/isVolunteerImageUploadEnabled',
@@ -334,8 +335,23 @@ export default {
   methods: {
     toggleShowTooltip() {
       this.showTooltip = !this.showTooltip
+      if (this.showTooltip)
+        AnalyticsService.captureEvent(
+          EVENTS.SCREENSHARE_USER_SAW_ERROR_TOOLTIP,
+          {
+            tool: 'document-editor',
+            userType: this.userType,
+          }
+        )
     },
     toggleScreenShare() {
+      AnalyticsService.captureEvent(
+        EVENTS.SCREENSHARE_USER_CLICKED_SCREENSHARE_BUTTON,
+        {
+          tool: 'document-editor',
+          userType: this.userType,
+        }
+      )
       this.$emit('toggleScreenShareWindow')
     },
     quillTextChange(update, origin, doc) {

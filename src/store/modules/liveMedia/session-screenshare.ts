@@ -2,6 +2,8 @@ import {
   ScreenShareEvent,
   ScreenShareState,
 } from '@/services/LiveShareService/machines/screenShareMachine'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 export default {
   namespaced: true,
@@ -21,8 +23,12 @@ export default {
     },
   },
   mutations: {
-    setScreenShareActive: (state, screenShareActive) =>
-      (state.screenShareActive = screenShareActive),
+    setScreenShareActive: (state, screenShareActive) => {
+      state.screenShareActive = screenShareActive
+      state.screenShareActive
+        ? AnalyticsService.captureEvent(EVENTS.SCREENSHARE_WINDOW_OPENED)
+        : AnalyticsService.captureEvent(EVENTS.SCREENSHARE_WINDOW_CLOSED)
+    },
     setScreenShareDimensions: (state, screenShareDimensions) =>
       (state.screenShareDimensions = screenShareDimensions),
   },

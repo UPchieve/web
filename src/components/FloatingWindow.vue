@@ -14,7 +14,6 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'minimize'): void
-  (e: 'maximize'): void
   (e: 'dragging', v: boolean): void
   (e: 'resizing', v: boolean): void
 }>()
@@ -90,7 +89,7 @@ const endResizing = () => {
 }
 
 /*
-  Account for border and padding of conatiner element
+  Account for border and padding of container element
 */
 function getInnerDimensions(element: HTMLElement) {
   const computedStyle = getComputedStyle(element)
@@ -120,6 +119,7 @@ function getInnerDimensions(element: HTMLElement) {
 
 function toggleMinimizeWindow() {
   isMinimized.value = !isMinimized.value
+  if (isMinimized.value) emit('minimize')
 }
 
 function toggleMaximizeWindow() {

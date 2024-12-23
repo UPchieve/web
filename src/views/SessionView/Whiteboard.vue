@@ -47,7 +47,7 @@
         >
           <ErrorIcon class="screenshare-error" />
         </span>
-        <button v-else @click="$emit('toggleScreenShareWindow')">
+        <button v-else @click="toggleScreenShareWindow">
           <StopScreenShareIcon
             v-if="isScreenSharing"
             class="toolbar-item__svg"
@@ -517,8 +517,26 @@ export default {
     this.loadZwibbler()
   },
   methods: {
+    toggleScreenShareWindow() {
+      AnalyticsService.captureEvent(
+        EVENTS.SCREENSHARE_USER_CLICKED_SCREENSHARE_BUTTON,
+        {
+          tool: 'whiteboard',
+          userType: this.userType,
+        }
+      )
+      this.$emit('toggleScreenShareWindow')
+    },
     toggleTooltipOpen() {
       this.tooltipOpen = !this.tooltipOpen
+      if (this.tooltipOpen)
+        AnalyticsService.captureEvent(
+          EVENTS.SCREENSHARE_USER_SAW_ERROR_TOOLTIP,
+          {
+            tool: 'whiteboard',
+            userType: this.userType,
+          }
+        )
     },
     isMobile() {
       return /iPhone|iPad|iPod/i.test(navigator.userAgent)

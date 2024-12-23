@@ -45,6 +45,7 @@ export enum ScreenShareActions {
   STOP_VIEW_SCREEN_SHARE = 'STOP_VIEW_SCREEN_SHARE',
   REMOVE_VIEWER = 'REMOVE_VIEWER',
   CHECK_SCREEN_SHARE = 'CHECK_SCREEN_SHARE',
+  SHARING_SCREEN = 'SHARING_SCREEN',
 }
 
 interface FSMStateConfig {
@@ -91,6 +92,7 @@ export const screenShareMachine: FSMDefinition = {
       },
     },
     [ScreenShareState.SharingScreen]: {
+      actions: [ScreenShareActions.SHARING_SCREEN],
       on: {
         [ScreenShareEvent.STOP_SCREEN_SHARE]:
           ScreenShareState.StoppingScreenShare,
