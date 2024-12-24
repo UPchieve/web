@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { describe, it, expect, vi } from 'vitest'
+import flushPromises from 'flush-promises'
 import AdminEditUser from '@/views/Admin/AdminEditUser.vue'
 import NetworkService from '@/services/NetworkService'
 
@@ -39,6 +40,8 @@ describe('AdminEditUser.vue', () => {
       .mockResolvedValueOnce({ data: { partnerOrgs: [] } })
     const wrapper = getWrapper({ user: { userType: 'volunteer' } })
 
+    await flushPromises()
+
     const options = wrapper
       .find('[data-testid="admin-edit-user-banned"]')
       .findAll('option')
@@ -56,6 +59,8 @@ describe('AdminEditUser.vue', () => {
       .fn()
       .mockResolvedValueOnce({ data: { activePartners: [] } })
     const wrapper = getWrapper({ user: { userType: 'student' } })
+
+    await flushPromises()
 
     const options = wrapper
       .find('[data-testid="admin-edit-user-banned"]')

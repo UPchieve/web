@@ -17,6 +17,7 @@
       :placeholder="placeholder"
       :search="autocompleteSchool"
       :get-result-value="getSchoolDisplayName"
+      :default-value="defaultValue"
       :debounce-time="500"
       @submit="handleSelectSchool"
       @blur="onBlur"
@@ -88,7 +89,7 @@ export default {
       type: String,
       default: EVENTS.STUDENT_SELECTED_SCHOOL,
     },
-    modelValue: {
+    defaultValue: {
       type: String,
     },
   },
@@ -122,8 +123,9 @@ export default {
     async autocompleteSchool(input) {
       this.school = {}
 
-      if (!this.hasStartedSearchingForSchool)
+      if (!this.hasStartedSearchingForSchool && this.startSearchEvent) {
         AnalyticsService.captureEvent(this.startSearchEvent)
+      }
       this.hasStartedSearchingForSchool = true
 
       return new Promise((resolve) => {
@@ -151,9 +153,13 @@ export default {
     },
     handleSelectSchool(school) {
       if (school.value === this.CANNOT_FIND_SCHOOL_TEXT) {
-        AnalyticsService.captureEvent(this.cannotFindSchoolEvent)
+        if (this.cannotFindSchoolEvent) {
+          AnalyticsService.captureEvent(this.cannotFindSchoolEvent)
+        }
       } else {
-        AnalyticsService.captureEvent(this.selectedEvent)
+        if (this.selectedEvent) {
+          AnalyticsService.captureEvent(this.selectedEvent)
+        }
         this.school = school || {}
         this.$emit('update:modelValue', school.id)
       }
