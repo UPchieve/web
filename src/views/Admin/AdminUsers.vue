@@ -30,8 +30,8 @@
         />
       </div>
       <div class="row">
-        <label for="email" class="uc-form-label">High school</label>
-        <input id="email" type="text" v-model="highSchool" />
+        <label for="email" class="uc-form-label">School</label>
+        <input id="email" type="text" v-model="school" />
       </div>
 
       <div>
@@ -49,7 +49,7 @@
     />
     <div class="list-wrapper">
       <div class="list">
-        <user-list-item v-for="user in users" :key="user._id" :user="user" />
+        <user-list-item v-for="user in users" :key="user.id" :user="user" />
       </div>
     </div>
   </div>
@@ -86,7 +86,7 @@ export default {
       listedPartnerOrgs: [],
       partnerOrg: {},
       partnerSite: '',
-      highSchool: '',
+      school: '',
     }
   },
 
@@ -99,7 +99,7 @@ export default {
         lastName,
         email,
         partnerOrg,
-        highSchool,
+        school,
       },
     } = this.$route
     const page = parseInt(pageQuery)
@@ -108,7 +108,7 @@ export default {
     this.firstName = firstName || this.firstName
     this.lastName = lastName || this.lastName
     this.email = email || this.email
-    this.highSchool = highSchool || this.highSchool
+    this.school = school || this.school
 
     const [studentPartnersResponse, volunteerPartnersResponse] =
       await Promise.all([
@@ -146,7 +146,7 @@ export default {
       this.lastName ||
       this.email ||
       (this.partnerOrg.length && this.partnerOrg.length > 0) ||
-      this.highSchool
+      this.school
     if (anyFieldHasData) this.getUsers()
   },
   computed: {
@@ -177,7 +177,7 @@ export default {
         lastName: this.lastName,
         email: this.email,
         partnerOrg: isEmpty(this.partnerOrg) ? '' : this.partnerOrg.key,
-        highSchool: this.highSchool,
+        school: this.school,
         page: this.page.toString(),
       }
       if (!isEqual(data, this.$route.query)) {
