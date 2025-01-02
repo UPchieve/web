@@ -21,7 +21,7 @@
           </div>
           <p class="assignments-progress-text">
             {{ assignment.completedSessions.length }} /
-            {{ assignment.numberOfSessions }} Sessions
+            {{ assignment.numberOfSessions }} sessions completed
           </p>
           <div class="progress-bar-container">
             <div
