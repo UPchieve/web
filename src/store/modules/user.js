@@ -340,7 +340,7 @@ export default {
     isTeacher: (state) => isTeacherUserType(state.user.userType),
     isAdmin: (state) => state.user.isAdmin,
 
-    isAuthenticated: (state) => !!(state.user && state.user._id),
+    isAuthenticated: (state) => !!(state.user && state.user.id),
 
     isVerified: (state) => state.user.verified,
 

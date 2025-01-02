@@ -167,7 +167,7 @@ export default {
           this.contactFormData.userEmail = this.$store.state.user.user.email
         }
         if (this.isAuthenticated) {
-          this.contactFormData.userId = this.$store.state.user.user._id
+          this.contactFormData.userId = this.$store.state.user.user.id
         }
 
         // there's not much a user can do at this point

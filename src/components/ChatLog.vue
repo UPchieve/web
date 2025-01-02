@@ -17,7 +17,7 @@
         <component
           class="avatar"
           :is="avatar(message)"
-          v-if="message.user !== user._id"
+          v-if="message.user !== user.id"
         />
         <div class="contents" :class="messageStyling(message)">
           <span v-if="message.type === 'voice'"
@@ -73,7 +73,7 @@ export default {
       return moment(createdAt).format('h:mm a')
     },
     messageAlignment(message) {
-      return message.user === this.user._id
+      return message.user === this.user.id
         ? MESSAGE_ALIGNMENT.RIGHT
         : MESSAGE_ALIGNMENT.LEFT
     },

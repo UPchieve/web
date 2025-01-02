@@ -1,5 +1,5 @@
 <template>
-  <div v-if="volunteer._id" class="user-detail">
+  <div v-if="volunteer.id" class="user-detail">
     <div class="user-detail__body">
       <button class="edit-btn btn" type="button" @click="toggleEditMode()">
         Edit
@@ -7,7 +7,7 @@
       <div class="user-detail__title">
         {{ volunteer.firstName }} {{ volunteer.lastName }}
       </div>
-      <div class="user-detail__subtitle">ID: {{ volunteer._id }}</div>
+      <div class="user-detail__subtitle">ID: {{ volunteer.id }}</div>
       <div class="user-detail__section">
         <div class="user-detail__section-title">Joined</div>
         <div>{{ createdAt }}</div>
@@ -96,11 +96,11 @@ export default {
 
       const data = {
         photoIdStatus: this.photoIdStatus,
-        volunteerId: this.volunteer._id,
+        volunteerId: this.volunteer.id,
       }
       try {
         await NetworkService.adminReviewPendingVolunteer({
-          volunteerId: this.volunteer._id,
+          volunteerId: this.volunteer.id,
           data,
         })
       } catch (error) {

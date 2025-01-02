@@ -2,7 +2,7 @@
   <tr class="list-item">
     <td class="list-item__cell">{{ readyForReviewAt }}</td>
     <td class="list-item__cell bold">
-      <router-link :to="`/admin/users/${volunteer._id}`">{{
+      <router-link :to="`/admin/users/${volunteer.id}`">{{
         fullName
       }}</router-link>
     </td>

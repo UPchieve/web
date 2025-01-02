@@ -18,7 +18,7 @@
         </thead>
         <pending-volunteer-list-item
           v-for="volunteer in volunteers"
-          :key="volunteer._id"
+          :key="volunteer.id"
           :volunteer="volunteer"
         />
       </table>
