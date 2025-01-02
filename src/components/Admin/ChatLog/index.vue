@@ -17,10 +17,10 @@
         class="chat-log__message"
         :class="{
           'chat-log__message--right':
-            volunteer && message.user === volunteer._id,
+            volunteer && message.user === volunteer.id,
         }"
-        :studentId="student._id"
-        :volunteerId="volunteer && volunteer._id"
+        :studentId="student.id"
+        :volunteerId="volunteer && volunteer.id"
       />
     </div>
   </div>

@@ -249,7 +249,7 @@ export default {
         FeatureFlagService.setPersonPropertiesForFlags(userProps)
 
         AnalyticsService.identify(currentUserValue.id, userProps)
-        LoggerService.identify(currentUserValue._id)
+        LoggerService.identify(currentUserValue.id)
 
         if (this.mobileMode && !this.isMobileApp && this.isStudent) {
           this.$store.dispatch('app/banner/show', {

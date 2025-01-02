@@ -375,7 +375,7 @@ export default {
           this.didSubmit = true
           AnalyticsService.captureEvent(EVENTS.REFERENCE_FORM_SUBMITTED, {
             event: EVENTS.REFERENCE_FORM_SUBMITTED,
-            userId: this.user._id,
+            userId: this.user.id,
             referenceId: referenceId,
           })
         })

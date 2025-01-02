@@ -1,5 +1,5 @@
 <template>
-  <router-link :to="`/admin/users/${user._id}`" class="user-preview">
+  <router-link :to="`/admin/users/${user.id}`" class="user-preview">
     <div class="user-preview__left">
       <component class="user-preview__icon" :is="userIcon" />
     </div>

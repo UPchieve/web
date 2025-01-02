@@ -11,8 +11,8 @@ function isAbsentUser(session: Record<string, any>) {
   let isAbsentStudent = true
   let isAbsentVolunteer = true
   for (const message of messages) {
-    if (message.user === student._id) isAbsentStudent = false
-    if (message.user === volunteer._id) isAbsentVolunteer = false
+    if (message.user === student.id) isAbsentStudent = false
+    if (message.user === volunteer.id) isAbsentVolunteer = false
     if (!isAbsentStudent && !isAbsentVolunteer) break
   }
   return isAbsentStudent || isAbsentVolunteer
