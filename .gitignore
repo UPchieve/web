@@ -29,3 +29,6 @@ newrelic_agent.log
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# python virtual environment
+.venv
