@@ -26,6 +26,7 @@
       @input="$emit('update:modelValue', $event.target.value)"
       @blur="onBlur"
       :required="isRequired"
+      :min="type === 'number' ? min : undefined"
     />
   </div>
 </template>
@@ -36,6 +37,7 @@ import {
   maxLength,
   minLength,
   requiredIf,
+  minValue,
 } from '@vuelidate/validators'
 import AnalyticsService from '@/services/AnalyticsService'
 import { useInputValidation } from '@/composables/InputValidation'
@@ -76,6 +78,9 @@ export default {
       type: [String, Number],
       default: '',
     },
+    minValue: {
+      type: Number,
+    },
   },
   emits: ['update:modelValue'],
 
@@ -105,6 +110,13 @@ export default {
       textValidations.maxLength = helpers.withMessage(
         `Must be no more than ${this.maxLength} characters`,
         maxLength(this.maxLength)
+      )
+    }
+
+    if (this.minValue) {
+      textValidations.minValue = helpers.withMessage(
+        `Must be greater than ${this.minValue}`,
+        minValue(this.minValue)
       )
     }
 
