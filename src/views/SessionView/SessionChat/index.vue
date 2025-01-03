@@ -174,6 +174,7 @@
           v-model="newMessage"
           placeholder="Type a message..."
           :disabled="waitingForModeration"
+          ref="textareaRef"
         />
         <record-voice-message
           @idle="showTextMessage"
@@ -184,6 +185,14 @@
           :sendAudioMessage="sendVoiceMessage"
           :sendTextMessage="sendTranscriptMessage"
         />
+        <button
+          :disabled="waitingForModeration || newMessage.length === 0"
+          class="send-button"
+          :class="{ hidden: textMessageHidden }"
+          @click="sendMessage"
+        >
+          <SendMessage></SendMessage>
+        </button>
       </div>
     </div>
   </div>
@@ -209,6 +218,7 @@ import sound from '@/assets/audio/receive-message.mp3'
 import CallStatusIndicator from '@/components/ScreenShare/CallStatusIndicator.vue'
 import SpeakerFilledIcon from '@/assets/voice_message_icons/speaker-filled.svg'
 import TranscribedMessage from './TranscribedMessage.vue'
+import SendMessage from '@/assets/voice_message_icons/send-message.svg'
 
 const MESSAGE_ALIGNMENT = {
   LEFT: 'left',
@@ -234,6 +244,7 @@ export default {
     CallStatusIndicator,
     SpeakerFilledIcon,
     TranscribedMessage,
+    SendMessage,
   },
   props: {
     setHasSeenNewMessage: { type: Function, required: true },
@@ -545,6 +556,17 @@ export default {
         this.waitingForModeration = false
       }
     },
+
+    async sendMessage() {
+      const message = this.newMessage.trim()
+      // Early exit if message is blank
+      if (isEmpty(message)) return
+
+      await this.moderateMessage(message)
+      this.notTyping()
+      this.$nextTick(() => this.$refs.textareaRef.focus())
+    },
+
     async handleOutgoingMessage(event) {
       if (event.key == 'Enter' && event.shiftKey) {
         // Allow multi-line messages.
@@ -552,18 +574,9 @@ export default {
       }
 
       // If key pressed is Enter, send the message
-      if (event.key == 'Enter') {
+      if (event.key === 'Enter') {
         event.preventDefault()
-        const message = this.newMessage.trim()
-
-        // Early exit if message is blank
-        if (isEmpty(message)) return
-
-        await this.moderateMessage(message)
-
-        // Disregard typing handler for enter
-        this.notTyping()
-        this.$nextTick(() => event.target.focus())
+        await this.sendMessage()
         return
 
         // Disregard typing handler for backspace
@@ -1071,5 +1084,17 @@ export default {
       width: 100%;
     }
   }
+}
+.send-button {
+  padding-right: 18px;
+  @include breakpoint-below('medium') {
+    padding-right: 0;
+  }
+}
+.send-button:hover:not(:disabled) {
+  filter: brightness(0.9);
+}
+.send-button:disabled {
+  filter: grayscale(0.75);
 }
 </style>
