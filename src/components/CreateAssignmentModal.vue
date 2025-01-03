@@ -15,12 +15,14 @@
             class="date-input assignment-name"
             v-model="startDate"
             :placeholder="startDate"
+            :minDate="new Date()"
           />
           <FormDateInput
             label="Due Date"
             class="date-input assignment-name"
             v-model="dueDate"
             :placeholder="dueDate"
+            :minDate="minDueDate"
           />
         </div>
         <div class="assignment-details-row">
@@ -63,6 +65,7 @@
             type="number"
             placeholder="1"
             class="assignment-name"
+            :minValue="1"
           />
           <FormInput
             label="Minimum time per session"
@@ -70,6 +73,7 @@
             type="number"
             placeholder="10"
             class="assignment-name"
+            :minValue="1"
           />
         </div>
         <div class="uc-form-element w-full">
@@ -144,13 +148,16 @@ export default {
     showStudentsInClassDisabled() {
       return this.selectedClasses.length !== 1
     },
+    minDueDate() {
+      return moment(this.startDate).add(1, 'day').endOf('day').toDate()
+    },
   },
 
   data() {
     return {
       assignmentName: '',
       startDate: moment().format('YYYY-MM-DD'),
-      dueDate: moment().add(7, 'days').format('YYYY-MM-DD'),
+      dueDate: moment().add(7, 'days').endOf('day').format('YYYY-MM-DD'),
       classes: [],
       selectedClasses: [],
       allSubjects: [],

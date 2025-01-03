@@ -23,6 +23,7 @@
       v-model="date"
       @input="$emit('update:modelValue', new Date($event.target.value))"
       :required="isRequired"
+      :min="formattedMinDate"
     />
   </div>
 </template>
@@ -30,6 +31,7 @@
 <script>
 import { helpers, requiredIf } from '@vuelidate/validators'
 import { useInputValidation } from '@/composables/InputValidation'
+import moment from 'moment'
 
 export default {
   props: {
@@ -52,6 +54,10 @@ export default {
     modelValue: {
       type: Date,
     },
+    minDate: {
+      type: Date,
+      default: null,
+    },
   },
   emits: ['update:modelValue'],
 
@@ -67,11 +73,11 @@ export default {
   },
 
   computed: {
-    formattedPlaceholder() {
-      if (this.placeholder instanceof Date) {
-        return this.placeholder.toISOString().split('T')[0]
+    formattedMinDate() {
+      if (this.minDate instanceof Date) {
+        return moment(this.minDate).format('YYYY-MM-DD')
       }
-      return this.placeholder
+      return null
     },
   },
 
