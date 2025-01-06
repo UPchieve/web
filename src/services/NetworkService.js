@@ -811,6 +811,12 @@ export default {
       `${API_ROOT}/survey/postsession/response?sessionId=${sessionId}&role=${role}`
     ).then(this._successHandler, this._errorHandler)
   },
+  getImpactStudySurvey() {
+    return httpGet(`${API_ROOT}/survey/impact-study`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
   getUserProductFlags() {
     return httpGet(`${API_ROOT}/product-flags`).then(
       this._successHandler,
