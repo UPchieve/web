@@ -73,6 +73,7 @@
     "typeface-work-sans": "^0.0.72",
     "validator": "^13.6.0",
     "vue": "^3.4.15",
+    "vue-draggable-resizable": "^3.0.0",
     "vue-router": "^4.2.5",
     "vue-select": "^4.0.0-beta.6",
     "vue-star-rating": "^2.1.0",
