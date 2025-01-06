@@ -30,9 +30,6 @@ const screenShareVideo = ref<HTMLVideoElement>()
 const screenShareWindow = ref()
 const sizeState = ref<'minimized' | 'maximized' | 'user-sized'>('user-sized')
 
-const positionX = ref<number>(0)
-const positionY = ref<number>(0)
-
 const screenShareDimensions = computed(
   () => store.state.liveMedia.screenShare.screenShareDimensions
 )
@@ -115,6 +112,8 @@ const resize = (x, y, requestedWidth) => {
 <template>
   <vue-draggable-resizable
     ref="screenShareWindow"
+    :y="70"
+    :x="8"
     class="window"
     :enable-native-drag="false"
     :active="true"
@@ -122,8 +121,6 @@ const resize = (x, y, requestedWidth) => {
     :z="10"
     :style="{
       position: 'absolute',
-      x: positionX,
-      y: positionY,
     }"
     @resizing="resize"
     @resizeStop="emit('resizing', false)"
@@ -197,6 +194,7 @@ canvas {
   font-weight: 500;
   color: white;
   padding-left: 18px;
+  border: 1px solid white;
 }
 
 .resize-buttons {
