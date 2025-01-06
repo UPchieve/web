@@ -185,13 +185,22 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SCREENSHARE],
   },
   actions: {
-    isSessionAudioCallEnabled: async ({ getters }, partnerUserId) => {
+    isSessionAudioCallEnabled: async ({ getters, dispatch }, partnerUserId) => {
       const isEnabledForPartner =
         await FeatureFlagService.isFeatureEnabledForUser(
           POSTHOG_FEATURE_FLAGS.SESSION_AUDIO_CALL,
           partnerUserId
         )
-      return isEnabledForPartner.isEnabled || getters.isSessionAudioCallEnabled
+      const isScreenshareEnabled = await dispatch(
+        'isScreenshareEnabled',
+        partnerUserId
+      )
+
+      return (
+        isEnabledForPartner.isEnabled ||
+        getters.isSessionAudioCallEnabled ||
+        isScreenshareEnabled
+      )
     },
     isScreenshareEnabled: async ({ getters }, partnerUserId) => {
       const isEnabledForPartner =
