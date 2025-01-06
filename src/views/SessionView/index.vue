@@ -9,6 +9,7 @@
       v-bind:class="{
         'session-contents-container--mobile': mobileMode,
       }"
+      ref="sessionContentsContainerMobile"
     >
       <ai-widget-tool
         v-if="showAiWidget"
@@ -22,11 +23,17 @@
         :isVolunteer="isVolunteer"
         :firstName="isVolunteer ? user.firstName : session.volunteer.firstName"
         :can-share-screen="isVolunteer"
+        :container-ref="
+          mobileMode
+            ? this.$refs.sessionContentsContainerMobile
+            : this.$refs.auxiliaryContainer
+        "
         @dragging="(value) => (draggingScreenShare = value)"
         @resizing="(value) => (resizingScreenShare = value)"
       />
       <div
         class="auxiliary-container"
+        ref="auxiliaryContainer"
         id="auxiliary-container"
         :class="{
           'auxiliary-container--hidden': shouldHideAuxiliarySection,

@@ -12,6 +12,7 @@ import FeatureFlagService from './services/FeatureFlagService'
 import LoggerService from './services/LoggerService'
 import { socket } from './socket'
 import { IonicVue } from '@ionic/vue'
+import VueDraggableResizable from 'vue-draggable-resizable'
 
 LoggerService.init()
 
@@ -65,6 +66,8 @@ async function main() {
     app.component('v-select', vSelect)
     // Set up vue-star-rating
     app.component('vue-star-rating', VueStarRating)
+    // Set up vue-draggable-resizable
+    app.component('vue-draggable-resizable', VueDraggableResizable)
     app.mount('#mount')
   } catch (err) {
     LoggerService.noticeError(err)
