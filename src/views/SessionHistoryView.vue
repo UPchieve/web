@@ -244,7 +244,7 @@ export default {
     },
   },
   async created() {
-    this.page = Number(this.$route.query.page) ?? this.page
+    this.page = Number(this.$route.query.page ?? this.page)
     await this.getTotalSessions()
     await this.getSessionHistory(this.page)
   },
