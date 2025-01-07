@@ -86,7 +86,7 @@
           <div class="page-actions">
             <div
               @click="() => getSessionHistory(page - 1)"
-              :class="isFirstPage && 'page-actions__stepper--disabled'"
+              :class="{ 'page-actions__stepper--disabled': isFirstPage }"
               class="page-actions__stepper"
             >
               <caret-icon class="caret caret--previous" /><span>Previous</span>
@@ -98,7 +98,7 @@
             </div>
             <div
               @click="() => getSessionHistory(page + 1)"
-              :class="isLastPage && 'page-actions__stepper--disabled'"
+              :class="{ 'page-actions__stepper--disabled': isLastPage }"
               class="page-actions__stepper"
             >
               <span>Next</span><caret-icon class="caret caret--next" />
@@ -220,12 +220,12 @@ export default {
   data() {
     return {
       sessions: [],
-      page: 1,
       hasNext: false,
       total: 0,
       isFetchingSessions: false,
       isLastPage: false,
       error: '',
+      page: 1,
     }
   },
   computed: {
@@ -243,24 +243,29 @@ export default {
       return totalPages === 0 ? 1 : totalPages
     },
   },
+  async created() {
+    this.page = Number(this.$route.query.page) ?? this.page
+    await this.getTotalSessions()
+    await this.getSessionHistory(this.page)
+  },
   methods: {
     async getSessionHistory(page) {
       if (page < 1 || page > this.totalPages) return
+
       this.isFetchingSessions = true
-      if (page > this.page)
-        AnalyticsService.captureEvent(
-          EVENTS.USER_CLICKED_NEXT_SESSION_HISTORY_PAGE,
-          {
-            page,
-          }
-        )
-      if (page < this.page)
-        AnalyticsService.captureEvent(
-          EVENTS.USER_CLICKED_PREVIOUS_SESSION_HISTORY_PAGE,
-          {
-            page,
-          }
-        )
+      this.$router.push({
+        path: '/sessions/history',
+        query: {
+          page,
+        },
+      })
+
+      AnalyticsService.captureEvent(
+        page > this.page
+          ? EVENTS.USER_CLICKED_NEXT_SESSION_HISTORY_PAGE
+          : EVENTS.USER_CLICKED_PREVIOUS_SESSION_HISTORY_PAGE
+      )
+
       try {
         const response = await backOff(() =>
           NetworkService.getSessionHistory(page)
@@ -314,12 +319,6 @@ export default {
     routeToSessionRecap(sessionId) {
       this.$router.push(`/sessions/${sessionId}/recap`)
     },
-  },
-  async created() {
-    await Promise.all([
-      this.getSessionHistory(this.page),
-      this.getTotalSessions(),
-    ])
   },
 }
 </script>
