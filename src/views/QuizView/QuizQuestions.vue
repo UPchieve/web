@@ -12,7 +12,7 @@
         Question {{ questionNumber }}
       </div>
       <div class="questionText">{{ questionText }}</div>
-      <div class="question-image-container">
+      <div class="question-image-container" v-if="imageSrc">
         <div :style="imageStyle" class="question-image" />
         <image-expand-icon
           class="image-sizer-icon"
@@ -20,7 +20,7 @@
         />
       </div>
       <div
-        v-if="isImageExpanded"
+        v-if="isImageExpanded && imageSrc"
         @click="handleImageExpansion"
         class="upc-modal question-image-modal"
       >
