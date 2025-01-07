@@ -234,6 +234,7 @@ export default {
       this.picked = data.picked
       this.questionText = question.questionText
       this.updateProgressBar()
+      this.imageSrc = question.imageSrc
       this.styleImage(question.imageSrc)
       this.items = question.possibleAnswers
       if (!TrainingService.hasPrevious(this)) {
@@ -252,8 +253,9 @@ export default {
       const { question } = data
       this.picked = data.picked
       this.questionText = question.questionText
+      this.imageSrc = question.imageSrc
       this.updateProgressBar()
-      this.styleImage(question.imageSrc)
+      this.styleImage(this.imageSrc)
       this.items = question.possibleAnswers
       if (!TrainingService.hasNext(this)) {
         this.showNext = false
