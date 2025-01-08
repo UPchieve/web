@@ -1,7 +1,7 @@
 <template>
   <modal class="create-assignment-wrapper">
     <div class="modal-container">
-      <h1>Create a Tutoring Assignment</h1>
+      <h1>{{ headingText }} Tutoring Assignment</h1>
       <FormInput
         label="Title"
         v-model="assignmentName"
@@ -34,6 +34,7 @@
             optionTextField="name"
             v-model="selectedClasses"
             :multiple="true"
+            :disabled="isEdit"
             @ionChange="showClassStudents"
           />
           <IonicSelect
@@ -94,12 +95,12 @@
           Cancel
         </button>
         <button
-          class="uc-form-button"
+          class="uc-form-button save-button"
           data-testid="create-assignment-btn"
           :disabled="!isFormValid"
           @click="createAssignment()"
         >
-          Assign
+          {{ isEdit ? 'Save for this class' : 'Assign' }}
         </button>
       </div>
     </div>
@@ -118,7 +119,7 @@ import AnalyticsService from '@/services/AnalyticsService'
 
 export default {
   components: { Modal, FormInput, FormDateInput, IonicSelect },
-  name: 'CreateAssignmentModal',
+  name: 'CreateAndEditAssignmentModal',
 
   props: {
     modalData: {
@@ -139,7 +140,7 @@ export default {
         this.assignmentName &&
         this.startDate &&
         this.dueDate &&
-        this.selectedClasses.length &&
+        this.selectedClasses.length >= 1 &&
         Object.keys(this.selectedSessionToComplete).length &&
         this.numSessions &&
         this.numMinutes
@@ -167,11 +168,46 @@ export default {
       description: null,
       classStudents: [],
       selectedStudents: [],
+      headingText: 'Create a',
+      isEdit: false,
+      assignmentId: '',
+      removedStudents: [],
     }
   },
 
   async created() {
     this.allSubjects = this.getActiveSubjects(this.subjects)
+
+    if (this.modalData.assignment) {
+      this.isEdit = true
+      this.headingText = 'Edit'
+
+      const { assignment } = this.modalData
+
+      this.assignmentId = assignment.id
+      this.assignmentName = assignment.title
+      this.startDate = moment(assignment.startDate).format('YYYY-MM-DD')
+      this.dueDate = moment(assignment.dueDate).format('YYYY-MM-DD')
+      this.numSessions = assignment.numberOfSessions
+      this.numMinutes = assignment.minDurationInMinutes
+      this.description = assignment.description || ''
+
+      const assignmentSubject = Object.values(this.subjects).find(
+        (subject) => subject.id === assignment.subjectId
+      )
+
+      if (assignmentSubject) {
+        const filteredSubjects =
+          this.allSubjects.find(
+            (subj) => subj.topicId === assignmentSubject.topicId
+          )?.subjects || []
+
+        this.selectedSessionToComplete = filteredSubjects.filter(
+          (subj) => subj.id === assignment.subjectId
+        )[0]
+      }
+    }
+
     this.classes = this.modalData.classes
     this.selectedClasses = this.classes.filter(
       (cls) => cls.id === this.modalData.currentClass.id
@@ -221,7 +257,15 @@ export default {
     showClassStudents() {
       if (this.selectedClasses.length === 1) {
         this.classStudents = this.selectedClasses[0].students ?? []
-        this.selectedStudents = this.selectedClasses[0].students ?? []
+        if (this.modalData.assignment) {
+          const assignedStudents = this.modalData.assignment.studentIds
+
+          this.selectedStudents = this.classStudents.filter((student) =>
+            assignedStudents.includes(student.id)
+          )
+        } else {
+          this.selectedStudents = this.selectedClasses[0].students ?? []
+        }
       } else {
         this.classStudents = []
         this.selectedStudents = []
@@ -229,7 +273,7 @@ export default {
     },
 
     async createAssignment() {
-      const assignmentData = {
+      let assignmentData = {
         description: this.description,
         title: this.assignmentName,
         numberOfSessions: this.numSessions,
@@ -239,15 +283,35 @@ export default {
         isRequired: false,
         subjectId: this.selectedSessionToComplete.id,
       }
-      const selectedClasses = this.selectedClasses
-      const selectedStudents = this.selectedStudents
-      this.modalData.onAssignmentCreated({
-        assignmentData,
-        selectedClasses,
-        selectedStudents,
-      })
-      AnalyticsService.captureEvent(EVENTS.ASSIGNMENT_CREATED, assignmentData)
-      this.$store.dispatch('app/modal/hide')
+      if (this.isEdit) {
+        const currentStudentsAssigned = this.modalData.assignment.studentIds
+        const selectedStudentIds = this.selectedStudents.map(
+          (student) => student.id
+        )
+        const studentsToRemove = currentStudentsAssigned.filter(
+          (id) => !selectedStudentIds.includes(id)
+        )
+        const studentsToAdd = selectedStudentIds.filter(
+          (id) => !currentStudentsAssigned.includes(id)
+        )
+
+        assignmentData.id = this.assignmentId
+        this.modalData.onAssignmentEdited({
+          assignmentData,
+          studentsToAdd,
+          studentsToRemove,
+          selectedStudents: selectedStudentIds,
+        })
+        this.$store.dispatch('app/modal/hide')
+      } else {
+        this.modalData.onAssignmentCreated({
+          assignmentData,
+          selectedClasses: this.selectedClasses,
+          selectedStudents: this.selectedStudents,
+        })
+        AnalyticsService.captureEvent(EVENTS.ASSIGNMENT_CREATED, assignmentData)
+        this.$store.dispatch('app/modal/hide')
+      }
     },
   },
 }
@@ -317,7 +381,7 @@ export default {
 }
 
 .right-btns button {
-  width: 200px;
+  min-width: 200px;
   padding: 20px;
 }
 
@@ -325,5 +389,10 @@ export default {
   border: 1px solid #000000;
   background-color: white;
   color: #000;
+}
+
+.uc-form-button,
+.save-button {
+  width: auto;
 }
 </style>
