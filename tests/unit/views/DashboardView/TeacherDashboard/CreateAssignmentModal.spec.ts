@@ -2,7 +2,7 @@ import { createStore } from 'vuex'
 import featureFlagsModule from '@/store/modules/feature-flags'
 import subjectsModule from '@/store/modules/subjects'
 import { mount } from '@vue/test-utils'
-import CreateAssignmentModal from '@/components/CreateAssignmentModal.vue'
+import CreateAndEditAssignmentModal from '@/components/CreateAndEditAssignmentModal.vue'
 import { describe, expect, test, vi } from 'vitest'
 
 const classes = [
@@ -110,7 +110,7 @@ const getWrapper = async (data: {}) => {
 
   const onAssignmentCreatedMock = vi.fn()
 
-  const wrapper = mount(CreateAssignmentModal, {
+  const wrapper = mount(CreateAndEditAssignmentModal, {
     global: {
       plugins: [store],
     },

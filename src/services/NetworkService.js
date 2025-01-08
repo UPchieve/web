@@ -1096,6 +1096,11 @@ export default {
       studentIds,
     }).then(this._successHandler, this._errorHandler)
   },
+  editAssignment(assignmentData) {
+    return httpPost(`${API_ROOT}/assignment/edit`, {
+      assignmentData,
+    }).then(this._successHandler, this._errorHandler)
+  },
   getAssignmentsByClassId(classId) {
     return httpGet(`${API_ROOT}/teachers/class/${classId}/assignments`).then(
       this._successHandler,

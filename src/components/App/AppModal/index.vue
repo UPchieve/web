@@ -35,7 +35,7 @@ import ReportSessionModal from '@/views/SessionView/ReportSessionModal.vue'
 import StartCollegeSessionModal from '@/views/DashboardView/StudentDashboard/StartCollegeSessionModal.vue'
 import CreateTeacherClassModal from '@/components/CreateTeacherClassModal.vue'
 import TeacherClassCodeModal from '@/components/TeacherClassCodeModal.vue'
-import CreateAssignmentModal from '@/components/CreateAssignmentModal.vue'
+import CreateAndEditAssignmentModal from '@/components/CreateAndEditAssignmentModal.vue'
 import StudentCompletionModal from '@/components/StudentCompletionModal.vue'
 import EditTeacherClassModal from '@/components/EditTeacherClassModal.vue'
 import RemoveAssignmentConfirmationModal from '@/components/RemoveAssignmentConfirmationModal.vue'
@@ -54,7 +54,7 @@ export default {
     StartCollegeSessionModal,
     CreateTeacherClassModal,
     TeacherClassCodeModal,
-    CreateAssignmentModal,
+    CreateAndEditAssignmentModal,
     StudentCompletionModal,
     EditTeacherClassModal,
     RemoveAssignmentConfirmationModal,

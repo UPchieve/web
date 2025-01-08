@@ -1,5 +1,5 @@
 <template>
-  <div class="class-details-view">
+  <div class="class-details-view" ref="classDetails">
     <div class="main">
       <div class="class-header">
         <button class="back-btn" @click="backToClasses()">
@@ -157,7 +157,7 @@
                     class="assignment-menu-btns"
                     @click="toggleAssignmentMenu(assignment.id)"
                   >
-                    <VerticalMenuButtonsIcon />
+                    <VerticalMenuButtonsIcon class="menu-btns" />
                   </button>
                   <div
                     v-if="toggledAssignmentMenuId === assignment.id"
@@ -173,9 +173,18 @@
                         <span class="delete-btn">Delete</span>
                       </div>
                     </button>
+                    <button @click="openEditAssignmentModal(assignment)">
+                      <div class="assignment-menu-item">
+                        <Pencil class="pencil-icon" />
+                        <span>Edit</span>
+                      </div>
+                    </button>
                   </div>
                 </div>
-                <p :data-testid="'assignment-due-date-' + assignment.id">
+                <p
+                  :data-testid="'assignment-due-date-' + assignment.id"
+                  class="due-date-text"
+                >
                   Due date: {{ formatTimestamp(assignment.dueDate) }}
                 </p>
                 <div v-if="!assignmentsCompletion[assignment.id]">
@@ -295,6 +304,14 @@ export default {
     },
   },
 
+  mounted() {
+    this.$refs.classDetails.addEventListener('click', this.closeMenu)
+  },
+
+  beforeUnmount() {
+    this.$refs.classDetails.removeEventListener('click', this.closeMenu)
+  },
+
   async created() {
     if (
       this.$route.params.classId &&
@@ -321,6 +338,15 @@ export default {
     formatTimestamp(timestamp) {
       const date = moment(timestamp)
       return date.format('MM/DD/YYYY')
+    },
+
+    closeMenu(event) {
+      if (
+        !event.target.classList.contains('menu-btns') &&
+        this.toggledAssignmentMenuId
+      ) {
+        this.toggledAssignmentMenuId = null
+      }
     },
 
     async getStudents(classId) {
@@ -397,12 +423,25 @@ export default {
     openCreateAssignmentModal() {
       AnalyticsService.captureEvent(EVENTS.ASSIGNMENT_OPEN_CREATE_MODAL)
       this.$store.dispatch('app/modal/show', {
-        component: 'CreateAssignmentModal',
+        component: 'CreateAndEditAssignmentModal',
         data: {
           onAssignmentCreated: this.handleAssignmentCreated,
           classes: this.classes,
           currentClass: this.classInfo,
           topics: this.topics,
+        },
+      })
+    },
+
+    openEditAssignmentModal(assignment) {
+      this.$store.dispatch('app/modal/show', {
+        component: 'CreateAndEditAssignmentModal',
+        data: {
+          onAssignmentEdited: this.handleEditAssignment,
+          classes: this.classes,
+          currentClass: this.classInfo,
+          topics: this.topics,
+          assignment: assignment,
         },
       })
     },
@@ -438,7 +477,7 @@ export default {
             const {
               data: { assignment },
             } = await NetworkService.createAssignment(assignmentInfo)
-            return assignment
+            return { ...assignment, studentIds }
           })
         )
         const selectedClassAssignment = assignments.find(
@@ -450,21 +489,61 @@ export default {
         const assignmentIds = this.assignments.map(
           (assignment) => assignment.id
         )
-        const getStudentAssignments = Object.assign(
-          ...(await this.getStudentAssignments(assignmentIds).then(
-            (assignments) =>
-              assignments.map((assignment) => ({
-                [assignment.assignmentId]: assignment.studentAssignments,
-              }))
-          ))
-        )
+        const studentAssignments = this.mapStudentAssignments(assignmentIds)
 
         this.assignmentsCompletion = this.getAssignmentCompletion(
           this.assignments,
-          getStudentAssignments
+          studentAssignments
         )
       } catch (err) {
         this.error = err.response.data.err ?? 'Unable to create assignment.'
+      }
+    },
+
+    async mapStudentAssignments(assignmentIds) {
+      return Object.assign(
+        ...(await this.getStudentAssignments(assignmentIds).then(
+          (assignments) =>
+            assignments.map((assignment) => ({
+              [assignment.assignmentId]: assignment.studentAssignments,
+            }))
+        ))
+      )
+    },
+
+    async handleEditAssignment({
+      assignmentData,
+      studentsToAdd,
+      studentsToRemove,
+      selectedStudents,
+    }) {
+      try {
+        const {
+          data: { assignment },
+        } = await NetworkService.editAssignment({
+          ...assignmentData,
+          studentsToAdd,
+          studentsToRemove,
+        })
+        //Changes the assignment info in the UI
+        const updatedAssignments = this.assignments.map((assnmt) =>
+          assnmt.id === assignment.id
+            ? { ...assignment, studentIds: selectedStudents }
+            : assnmt
+        )
+        this.assignments = updatedAssignments
+
+        const getStudentAssignments = await this.mapStudentAssignments([
+          assignment.id,
+        ])
+
+        this.assignmentsCompletion[assignment.id] =
+          this.getSingleAssignmentCompletion(
+            assignment.id,
+            getStudentAssignments
+          )
+      } catch (err) {
+        this.error = err.response.data.err ?? 'Unable to edit assignment.'
       }
     },
 
@@ -486,15 +565,9 @@ export default {
     async showAssignments() {
       this.assignments = await this.getClassAssignments()
       const assignmentIds = this.assignments.map((assignment) => assignment.id)
-      const getStudentAssignments = Object.assign(
-        ...(await this.getStudentAssignments(assignmentIds).then(
-          (assignments) =>
-            assignments.map((assignment) => ({
-              [assignment.assignmentId]: assignment.studentAssignments,
-            }))
-        ))
-      )
 
+      const getStudentAssignments =
+        await this.mapStudentAssignments(assignmentIds)
       this.assignmentsCompletion = this.getAssignmentCompletion(
         this.assignments,
         getStudentAssignments
@@ -563,24 +636,35 @@ export default {
       const result = {}
 
       assignments.forEach((assignment) => {
-        const { id } = assignment
-        const studentsCompletion = completionData[id] || null
-
-        if (studentsCompletion && studentsCompletion.length > 0) {
-          const totalStudents = studentsCompletion.length
-          const completedStudents = studentsCompletion.filter(
-            (student) => student.submitted_at !== null
-          ).length
-
-          result[id] = {
-            studentsCompletion,
-            totalStudents,
-            completedStudents,
-          }
+        const completion = this.getSingleAssignmentCompletion(
+          assignment.id,
+          completionData
+        )
+        if (completion) {
+          result[assignment.id] = completion
         }
       })
 
       return result
+    },
+
+    getSingleAssignmentCompletion(assignmentId, completionData) {
+      const studentsCompletion = completionData[assignmentId] || null
+
+      if (studentsCompletion && studentsCompletion.length > 0) {
+        const totalStudents = studentsCompletion.length
+        const completedStudents = studentsCompletion.filter(
+          (student) => student.submitted_at !== null
+        ).length
+
+        return {
+          studentsCompletion,
+          totalStudents,
+          completedStudents,
+        }
+      }
+
+      return null // Return null if there are no students or no completion data
     },
 
     async updateTeacherClass(classData) {
@@ -869,7 +953,8 @@ export default {
       }
     }
 
-    p {
+    due-date-text,
+    .no-students-assigned {
       font-size: 16px;
       margin: 8px 0 0;
     }
@@ -1009,6 +1094,11 @@ export default {
 
   .trash-icon {
     fill: red;
+    height: 20px;
+    width: auto;
+  }
+
+  .pencil-icon {
     height: 20px;
     width: auto;
   }
