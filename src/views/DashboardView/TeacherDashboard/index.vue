@@ -194,36 +194,7 @@ export default {
   },
 
   async created() {
-    this.topics = await this.getTopics()
-    if (
-      this.$route.params.classId &&
-      !this.$route.params.studentId &&
-      !this.$route.params.assignmentId
-    ) {
-      this.classId = this.$route.params.classId
-      if (_.isEmpty(this.currentClassInfo)) {
-        this.currentClassInfo = await this.getClassInfo(this.classId)
-      }
-      this.view = 'classDetails'
-    } else if (this.$route.params.studentId) {
-      this.studentId = this.$route.params.studentId
-      this.classId = this.$route.params.classId
-      if (_.isEmpty(this.currentClassInfo)) {
-        this.currentClassInfo = await this.getClassInfo(this.classId)
-      }
-      this.view = 'studentDetails'
-    } else if (this.$route.params.assignmentId) {
-      this.view = 'assignment'
-    } else {
-      this.view = ''
-    }
-
-    this.formattedTopics = await this.formatTopics()
-    await this.getTeacherClasses()
-
-    if (this.isFirstDashboardVisit) this.showOnboardingModal = true
-
-    this.pages = [
+     this.pages = [
       {
         step: 1,
         heading:
@@ -250,6 +221,32 @@ export default {
         image: TeacherOnboarding_Frame4,
       },
     ]
+    this.topics = await this.getTopics()
+    if (
+      this.$route.params.classId &&
+      !this.$route.params.studentId &&
+      !this.$route.params.assignmentId
+    ) {
+      this.classId = this.$route.params.classId
+      if (_.isEmpty(this.currentClassInfo)) {
+        this.currentClassInfo = await this.getClassInfo(this.classId)
+      }
+      this.view = 'classDetails'
+    } else if (this.$route.params.studentId) {
+      this.studentId = this.$route.params.studentId
+      this.classId = this.$route.params.classId
+      if (_.isEmpty(this.currentClassInfo)) {
+        this.currentClassInfo = await this.getClassInfo(this.classId)
+      }
+      this.view = 'studentDetails'
+    } else if (this.$route.params.assignmentId) {
+      this.view = 'assignment'
+    } else {
+      this.view = ''
+    }
+
+    this.formattedTopics = await this.formatTopics()
+    await this.getTeacherClasses()
   },
 
   methods: {
