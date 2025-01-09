@@ -1,0 +1,168 @@
+<script setup lang="ts">
+import { computed, defineProps, toRefs } from 'vue'
+import { QUESTION_TYPES } from '@/consts'
+import FormInput from '@/components/FormInput.vue'
+import SurveyRadio from '@/components/Surveys/SurveyRadio.vue'
+import SurveyImage from '@/components/Surveys/SurveyImage.vue'
+import type {
+  SurveyQuestionDefinition,
+  SurveyResponseDefinition,
+  SurveyUserQuestionResponse,
+} from '@/services/SurveyService'
+
+const props = defineProps<{
+  question: SurveyQuestionDefinition
+  userResponse: SurveyUserQuestionResponse
+  updateUserResponse: (
+    questionId: number,
+    responseId: number | undefined,
+    response?: string
+  ) => void
+}>()
+
+const { question, userResponse, updateUserResponse } = toRefs(props)
+
+const isRowOfImages = computed(() => {
+  const responses = question.value.responses
+  return responses.length > 0 && responses.every((a) => a.responseDisplayImage)
+})
+
+function isSelected(response: SurveyResponseDefinition) {
+  return (
+    userResponse.value.responseId === response.responseId ||
+    userResponse.value.openResponse === response.responseText
+  )
+}
+
+function isGpaQuestion(question: string) {
+  return question === `What's your GPA right now?`
+}
+
+function isLowestGradeQuestion(question: string) {
+  return question === `What's your lowest grade this semester?`
+}
+
+function isNumberedResponseQuestion(question: string) {
+  return isGpaQuestion(question) || isLowestGradeQuestion(question)
+}
+
+function calculateMaxValue(question: string) {
+  if (isGpaQuestion(question)) return 4
+  if (isLowestGradeQuestion(question)) return 100
+}
+
+function calculateMinValue(question: string) {
+  if (isGpaQuestion(question) || isLowestGradeQuestion(question)) return 0
+}
+</script>
+
+<template>
+  <div>
+    <div class="question__title">
+      {{ question.questionText }}
+    </div>
+    <div
+      class="question__responses"
+      :class="isRowOfImages ? 'question__responses-images' : ''"
+    >
+      <template
+        v-for="response in question.responses"
+        :key="response.responseId"
+      >
+        <SurveyImage
+          v-if="response.responseDisplayImage"
+          :data-testid="`survey-question-${response.responseText}`"
+          class="question__response question__response-image"
+          :src="response.responseDisplayImage"
+          :label="response.responseText"
+          :questionId="question.questionId"
+          :responseId="response.responseId"
+          :isSelected="isSelected(response)"
+          @survey-image-click="updateUserResponse"
+        />
+
+        <SurveyRadio
+          v-else-if="question.questionType === QUESTION_TYPES.multipleChoice"
+          class="question__response"
+          :data-testid="`survey-question-${response.responseText}`"
+          :id="`${question.questionId}_${response.responseId}`"
+          :radioValue="response.responseId"
+          :name="question.questionId"
+          :checked="isSelected(response)"
+          :questionId="question.questionId"
+          :responseId="response.responseId"
+          :label="response.responseText"
+          :isOpenResponseDisabled="!isSelected(response)"
+          :openResponseValue="userResponse.openResponse"
+          @survey-radio-input="updateUserResponse"
+        />
+      </template>
+
+      <FormInput
+        v-if="
+          question.questionType === QUESTION_TYPES.freeResponse &&
+          isNumberedResponseQuestion(question.questionText)
+        "
+        :modelValue="userResponse.openResponse"
+        @update:modelValue="
+          (response) =>
+            updateUserResponse(question.questionId, undefined, response)
+        "
+        type="number"
+        :maxValue="calculateMaxValue(question.questionText)"
+        :minValue="calculateMinValue(question.questionText)"
+        :name="'response-' + question.questionId"
+        :testid="'response-' + question.questionId"
+        :isRequired="true"
+        :blurEvent="'blur-event-' + question.questionId"
+      />
+      <FormInput
+        v-else-if="question.questionType === QUESTION_TYPES.freeResponse"
+        :modelValue="userResponse.openResponse"
+        @update:modelValue="
+          (response) =>
+            updateUserResponse(question.questionId, undefined, response)
+        "
+        type="text"
+        :name="'response-' + question.questionId"
+        :testid="'response-' + question.questionId"
+        :isRequired="true"
+        :blurEvent="'blur-event-' + question.questionId"
+      />
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.question {
+  &__title {
+    @include font-category('heading');
+    margin-bottom: 0.3em;
+    text-align: left;
+    color: $c-soft-black;
+  }
+
+  &__responses {
+    text-align: left;
+    margin-bottom: 1.5em;
+
+    &-images {
+      @include flex-container(row, center);
+      flex-wrap: wrap;
+      margin-top: 2em;
+    }
+  }
+
+  &__response {
+    margin: 0.75em 0;
+
+    &-image {
+      flex-basis: 30%;
+
+      @include breakpoint-above('medium') {
+        flex-basis: 20%;
+      }
+    }
+  }
+}
+</style>

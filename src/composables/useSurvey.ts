@@ -38,27 +38,6 @@ export function useSurvey(data: UseSurveyPayload) {
     return true
   })
 
-  function isGpaQuestion(question: string) {
-    return question === `What's your GPA right now?`
-  }
-
-  function isLowestGradeQuestion(question: string) {
-    return question === `What's your lowest grade this semester?`
-  }
-
-  function isNumberedResponseQuestion(question: string) {
-    return isGpaQuestion(question) || isLowestGradeQuestion(question)
-  }
-
-  function calculateMaxValue(question: string) {
-    if (isGpaQuestion(question)) return 4
-    if (isLowestGradeQuestion(question)) return 100
-  }
-
-  function calculateMinValue(question: string) {
-    if (isGpaQuestion(question) || isLowestGradeQuestion(question)) return 0
-  }
-
   function buildUserResponse() {
     const initialResponses: SurveyUserResponsesMap = {}
     survey.value.forEach((question) => {
@@ -160,9 +139,6 @@ export function useSurvey(data: UseSurveyPayload) {
     loadingMessage,
     isSurveyComplete,
     updateUserResponse,
-    isNumberedResponseQuestion,
-    calculateMaxValue,
-    calculateMinValue,
     handleSurveySubmit,
     initializeSurvey,
     buildUserResponse,
