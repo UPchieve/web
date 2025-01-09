@@ -1072,6 +1072,11 @@ export default {
       `${API_ROOT}/product-flags/fall-incentive-enrollment/denied`
     ).then(this._successHandler, this._errorHandler)
   },
+  impactStudyEnrollment(surveyId) {
+    return httpPost(`${API_ROOT}/product-flags/impact-study`, {
+      surveyId,
+    }).then(this._successHandler, this._errorHandler)
+  },
   getStudentClasses() {
     return httpGet(`${API_ROOT}/students/classes`).then(
       this._successHandler,
