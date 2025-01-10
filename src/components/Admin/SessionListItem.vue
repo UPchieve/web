@@ -15,6 +15,13 @@
       <div class="session-list-item__column">
         <span>{{ studentRating }}</span>
       </div>
+      <div class="session-list-item__column">
+        <span>{{
+          session?.volunteerFirstName
+            ? `${session?.volunteerFirstName} (Coach)`
+            : '-'
+        }}</span>
+      </div>
     </div>
     <session-flags :flags="session.reviewReasons" />
   </router-link>
